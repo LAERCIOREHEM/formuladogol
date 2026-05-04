@@ -2,31 +2,21 @@
 """
 Script que busca os próximos jogos do Brasileirão e salva em jogos.json.
 
-Roda no GitHub Actions, sem CORS, sem token.
-Fluxo:
-1. Pega o número da rodada atual em api.globoesporte.globo.com
-2. Busca os jogos da rodada atual
-3. Filtra: apenas jogos que ainda não aconteceram (status agendado, ou data >= hoje)
-4. Se a rodada atual já acabou completamente, busca a próxima
-5. Sempre tenta também a próxima rodada para mostrar o que vem por aí
-6. Salva em jogos.json
+Estratégia:
+1. Descobre a rodada atual via classificação (max de jogos disputados).
+2. Busca jogos das rodadas: atual, atual+1 e atual+2.
+3. Considera jogo "futuro" se NÃO tem placar definido (independente do status).
+4. Loga o JSON cru das primeiras respostas pra debug em caso de falha.
 """
 
 import json
 import sys
-import re
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
 
 
-# ============================================================================
-# CONFIGURAÇÕES
-# ============================================================================
-
 FUSO_BRASILIA = timezone(timedelta(hours=-3))
-
-# UUID do Brasileirão Série A (mesmo usado pelo próprio site do GloboEsporte)
 TUUID_BRASILEIRAO = "d1a37fa4-e948-43a6-ba53-ab24ab3a45b1"
 
 HEADERS = {
@@ -39,109 +29,72 @@ HEADERS = {
     "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
 }
 
-STATUS_AGENDADOS = {
-    "AGENDADO", "PRE_JOGO", "PRÉ_JOGO", "SCHEDULED", "PRE_MATCH",
-    "ADIADO",  # Jogo adiado também aparece como próximo
-}
-
-STATUS_FINALIZADOS = {
-    "FIM_DE_JOGO", "ENCERRADO", "FINISHED", "FT", "ENCERRADA",
-    "TERMINADO", "FINALIZADO",
-}
-
-
-# ============================================================================
-# UTILITÁRIOS
-# ============================================================================
 
 def agora_brasilia():
     return datetime.now(FUSO_BRASILIA)
 
 
 def fetch_json(url, timeout=20):
-    """Baixa JSON de uma URL com headers de navegador."""
-    separador = "&" if "?" in url else "?"
-    url_anticache = f"{url}{separador}_={int(datetime.now().timestamp())}"
-
-    req = urllib.request.Request(url_anticache, headers=HEADERS)
+    """Baixa JSON com headers de navegador e anti-cache."""
+    sep = "&" if "?" in url else "?"
+    url_full = f"{url}{sep}_={int(datetime.now().timestamp())}"
+    req = urllib.request.Request(url_full, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         charset = resp.headers.get_content_charset() or "utf-8"
         raw = resp.read().decode(charset, errors="replace")
         return json.loads(raw)
 
 
-# ============================================================================
-# BUSCA: rodada atual
-# ============================================================================
-
 def buscar_rodada_atual(ano):
     """
-    Busca a rodada atualmente em curso no campeonato.
-    Retorna o número da rodada (int).
+    Determina a rodada atual a partir da classificação.
     """
     url = (
         f"https://api.globoesporte.globo.com/tabela/{TUUID_BRASILEIRAO}/"
-        f"fase/fase-unica-campeonato-brasileiro-{ano}/"
+        f"fase/fase-unica-campeonato-brasileiro-{ano}/classificacao/"
     )
-    data = fetch_json(url)
+    classificacao = fetch_json(url)
 
-    # A API retorna a rodada atual em "rodada_atual" ou similar.
-    # Estrutura conhecida: data["rodada"] tem o número, ou data["fase"]["rodada_atual"]
-    rodada = (
-        data.get("rodada_atual")
-        or data.get("rodada")
-        or (data.get("fase") or {}).get("rodada_atual")
-    )
+    if not isinstance(classificacao, list) or not classificacao:
+        raise Exception("Classificação retornou vazia ou em formato inesperado")
 
-    if isinstance(rodada, dict):
-        rodada = rodada.get("numero") or rodada.get("rodada")
-
-    if not rodada:
-        # Fallback: tentar inferir pela tabela de classificação
-        url_class = url + "classificacao/"
+    jogos_disputados = []
+    for item in classificacao:
+        j = item.get("jogos") or 0
         try:
-            classificacao = fetch_json(url_class)
-            if isinstance(classificacao, list) and classificacao:
-                jogos_disputados = [
-                    int(item.get("jogos") or 0) for item in classificacao
-                ]
-                # Aproximação: rodada atual = max de jogos disputados
-                rodada = max(jogos_disputados) if jogos_disputados else 1
-                # Adiciona 1 se rodada já acabou (todos jogaram esse número)
-                if jogos_disputados and min(jogos_disputados) == max(jogos_disputados):
-                    rodada += 1
-        except Exception:
+            jogos_disputados.append(int(j))
+        except (ValueError, TypeError):
             pass
 
-    if not rodada:
-        raise Exception("Não foi possível determinar a rodada atual")
+    if not jogos_disputados:
+        raise Exception("Nenhum dado de jogos disputados na classificação")
 
-    return int(rodada)
+    max_jogos = max(jogos_disputados)
+    min_jogos = min(jogos_disputados)
+
+    print(f"  Jogos disputados: min={min_jogos}, max={max_jogos}")
+
+    # Se todos jogaram o mesmo número, a rodada acabou e já entramos na próxima.
+    if min_jogos == max_jogos:
+        rodada_atual = max_jogos + 1
+        print(f"  Todos com {max_jogos} jogos disputados -> rodada atual = {rodada_atual}")
+    else:
+        rodada_atual = max_jogos
+        print(f"  Diferenca entre {min_jogos} e {max_jogos} -> rodada atual = {rodada_atual}")
+
+    return rodada_atual
 
 
-# ============================================================================
-# BUSCA: jogos de uma rodada específica
-# ============================================================================
-
-def buscar_jogos_da_rodada(ano, numero_rodada):
-    """
-    Busca todos os jogos de uma rodada específica.
-    Retorna a lista bruta de jogos da API.
-    """
+def buscar_jogos_da_rodada(ano, num_rodada):
     url = (
         f"https://api.globoesporte.globo.com/tabela/{TUUID_BRASILEIRAO}/"
         f"fase/fase-unica-campeonato-brasileiro-{ano}/"
-        f"rodada/{numero_rodada}/jogos/"
+        f"rodada/{num_rodada}/jogos/"
     )
     return fetch_json(url)
 
 
-# ============================================================================
-# NORMALIZAÇÃO de um jogo da API para nosso formato
-# ============================================================================
-
 def extrair_data_iso(jogo):
-    """Tenta achar a data ISO do jogo em diferentes campos."""
     candidatos = [
         jogo.get("data_realizacao_iso"),
         jogo.get("data_realizacao"),
@@ -155,30 +108,24 @@ def extrair_data_iso(jogo):
 
 
 def extrair_time(equipe_dict):
-    """Extrai nome e escudo de uma equipe."""
     if not equipe_dict:
-        return {"nome": "?", "escudo": ""}
-
+        return {"nome": "?", "escudo": "", "sigla": ""}
     nome = (
         equipe_dict.get("nome_popular")
         or equipe_dict.get("nome")
         or equipe_dict.get("sigla")
         or "?"
     )
-
     escudo = ""
     escudos = equipe_dict.get("escudos") or {}
     if isinstance(escudos, dict):
-        # Tenta diferentes tamanhos
         for key in ("svg", "60x60", "30x30", "default", "url"):
             val = escudos.get(key)
             if val:
                 escudo = val
                 break
-
     if not escudo:
         escudo = equipe_dict.get("escudo") or ""
-
     return {
         "nome": nome,
         "escudo": escudo,
@@ -187,7 +134,6 @@ def extrair_time(equipe_dict):
 
 
 def extrair_estadio(jogo):
-    """Tenta extrair o nome do estádio."""
     candidatos = [
         (jogo.get("sede") or {}).get("nome_popular"),
         (jogo.get("sede") or {}).get("nome"),
@@ -201,18 +147,11 @@ def extrair_estadio(jogo):
 
 
 def extrair_transmissao(jogo):
-    """Extrai informações de transmissão (TV/streaming)."""
     transmissao = jogo.get("transmissao") or {}
-
-    # Lista de canais/streams
     canais = []
-
-    # Pode estar em "label", "broadcast" ou similar
     label = transmissao.get("label") or transmissao.get("broadcast")
     if label:
         canais.append(label.strip())
-
-    # Pode ter lista de "broadcasters"
     broadcasters = transmissao.get("broadcasters") or []
     if isinstance(broadcasters, list):
         for b in broadcasters:
@@ -222,91 +161,66 @@ def extrair_transmissao(jogo):
                     canais.append(nome.strip())
             elif isinstance(b, str):
                 canais.append(b.strip())
-
-    # Remove duplicatas mantendo ordem
     seen = set()
-    canais_unicos = []
+    out = []
     for c in canais:
         if c and c not in seen:
             seen.add(c)
-            canais_unicos.append(c)
-
-    return ", ".join(canais_unicos) if canais_unicos else ""
-
-
-def extrair_status(jogo):
-    """Extrai status do jogo, normalizado em maiúsculas."""
-    status = (
-        jogo.get("transmissao", {}).get("periodo")
-        or jogo.get("status")
-        or jogo.get("placar_oficial_visitante", None) is None and "AGENDADO"
-        or "DESCONHECIDO"
-    )
-    if isinstance(status, str):
-        return status.strip().upper().replace(" ", "_")
-    return "DESCONHECIDO"
+            out.append(c)
+    return ", ".join(out)
 
 
-def jogo_ja_aconteceu(jogo_normalizado):
-    """Decide se um jogo já aconteceu (não deve aparecer em 'próximos')."""
-    status = jogo_normalizado["status"]
-    if status in STATUS_FINALIZADOS:
+def tem_placar_definido(jogo):
+    """
+    Retorna True se o jogo tem placar gravado (já foi disputado).
+    """
+    placar = jogo.get("placar_oficial")
+    if isinstance(placar, dict):
+        m = placar.get("mandante")
+        v = placar.get("visitante")
+        if m is not None and v is not None:
+            return True
+
+    pm = jogo.get("placar_oficial_mandante")
+    pv = jogo.get("placar_oficial_visitante")
+    if pm is not None and pv is not None:
         return True
 
-    # Se tem placar definido, considera finalizado
-    if jogo_normalizado.get("placar_mandante") is not None and jogo_normalizado.get("placar_visitante") is not None:
-        # Mas só se a data já passou (jogos no futuro com placar 0x0 vazio são raros)
+    equipes = jogo.get("equipes") or {}
+    m_equipe = equipes.get("mandante") or {}
+    v_equipe = equipes.get("visitante") or {}
+    if (m_equipe.get("placar_oficial") is not None
+            and v_equipe.get("placar_oficial") is not None):
         return True
-
-    # Se a data do jogo já passou há mais de 3 horas, considera finalizado
-    data_iso = jogo_normalizado.get("data_iso")
-    if data_iso:
-        try:
-            dt = datetime.fromisoformat(data_iso.replace("Z", "+00:00"))
-            if dt.tzinfo is None:
-                dt = dt.replace(tzinfo=FUSO_BRASILIA)
-            agora = agora_brasilia()
-            # Se o jogo começou há mais de 3 horas, considera que acabou
-            if dt < agora - timedelta(hours=3):
-                return True
-        except Exception:
-            pass
 
     return False
 
 
-def normalizar_jogo(jogo, numero_rodada):
-    """Converte um jogo cru da API no nosso formato simplificado."""
+def normalizar_jogo(jogo, num_rodada):
     equipes = jogo.get("equipes") or {}
     mandante = extrair_time(equipes.get("mandante") or jogo.get("mandante"))
     visitante = extrair_time(equipes.get("visitante") or jogo.get("visitante"))
 
     placar = jogo.get("placar_oficial") or {}
-    placar_mandante = placar.get("mandante") if isinstance(placar, dict) else None
-    placar_visitante = placar.get("visitante") if isinstance(placar, dict) else None
-
-    # Tentar pegar placar de outros campos se não achou acima
-    if placar_mandante is None:
-        placar_mandante = jogo.get("placar_oficial_mandante")
-    if placar_visitante is None:
-        placar_visitante = jogo.get("placar_oficial_visitante")
+    pm = placar.get("mandante") if isinstance(placar, dict) else None
+    pv = placar.get("visitante") if isinstance(placar, dict) else None
+    if pm is None:
+        pm = jogo.get("placar_oficial_mandante")
+    if pv is None:
+        pv = jogo.get("placar_oficial_visitante")
 
     return {
-        "rodada": numero_rodada,
+        "rodada": num_rodada,
         "data_iso": extrair_data_iso(jogo),
         "mandante": mandante,
         "visitante": visitante,
         "estadio": extrair_estadio(jogo),
         "transmissao": extrair_transmissao(jogo),
-        "status": extrair_status(jogo),
-        "placar_mandante": placar_mandante,
-        "placar_visitante": placar_visitante,
+        "status": jogo.get("status") or "",
+        "placar_mandante": pm,
+        "placar_visitante": pv,
     }
 
-
-# ============================================================================
-# MAIN
-# ============================================================================
 
 def main():
     inicio = agora_brasilia()
@@ -315,57 +229,72 @@ def main():
     print("=" * 70)
     print("Atualização dos próximos jogos do Brasileirão")
     print("=" * 70)
-    print(f"Início em Brasília: {inicio.strftime('%d/%m/%Y %H:%M:%S BRT')}")
-    print(f"Ano: {ano}")
+    print(f"Início: {inicio.strftime('%d/%m/%Y %H:%M:%S BRT')}")
     print()
 
     try:
+        print("Descobrindo rodada atual via classificação:")
         rodada_atual = buscar_rodada_atual(ano)
-        print(f"Rodada atual identificada: {rodada_atual}")
     except Exception as e:
-        print(f"AVISO: erro ao buscar rodada atual: {e}")
+        print(f"ERRO ao descobrir rodada atual: {type(e).__name__}: {e}")
         print("Tentando rodada 1 como fallback")
         rodada_atual = 1
 
-    rodadas_a_buscar = [rodada_atual, rodada_atual + 1]
-    print(f"Rodadas a buscar: {rodadas_a_buscar}")
+    rodadas = [r for r in (rodada_atual, rodada_atual + 1, rodada_atual + 2) if 1 <= r <= 38]
+    print(f"\nRodadas a buscar: {rodadas}")
     print()
 
     todos_jogos = []
     rodadas_ok = []
+    primeiro_jogo_logado = False
 
-    for num_rodada in rodadas_a_buscar:
-        if num_rodada > 38:
-            continue
+    for num in rodadas:
         try:
-            print(f"Buscando jogos da rodada {num_rodada}...")
-            crus = buscar_jogos_da_rodada(ano, num_rodada)
+            print(f"Buscando rodada {num}...")
+            crus = buscar_jogos_da_rodada(ano, num)
+
             if not isinstance(crus, list):
-                print(f"  Resposta inesperada (não é lista): {type(crus).__name__}")
+                print(f"  Formato inesperado: {type(crus).__name__}")
                 continue
 
+            print(f"  {len(crus)} jogos brutos retornados")
+
+            # Loga estrutura do primeiro jogo (DEBUG)
+            if not primeiro_jogo_logado and crus:
+                primeiro_jogo_logado = True
+                print(f"  Estrutura do 1o jogo bruto (debug):")
+                texto = json.dumps(crus[0], ensure_ascii=False, indent=2)
+                if len(texto) > 2500:
+                    texto = texto[:2500] + "...[truncado]"
+                for linha in texto.split("\n"):
+                    print("  " + linha)
+
+            futuros = 0
+            disputados = 0
+
             for jogo_cru in crus:
-                normalizado = normalizar_jogo(jogo_cru, num_rodada)
-                if not jogo_ja_aconteceu(normalizado):
-                    todos_jogos.append(normalizado)
+                if tem_placar_definido(jogo_cru):
+                    disputados += 1
+                    continue
+                normalizado = normalizar_jogo(jogo_cru, num)
+                todos_jogos.append(normalizado)
+                futuros += 1
 
-            rodadas_ok.append(num_rodada)
-            print(f"  Rodada {num_rodada}: {len(crus)} jogos brutos")
+            print(f"  Rodada {num}: {disputados} ja disputados, {futuros} pendentes")
+            rodadas_ok.append(num)
+
         except urllib.error.HTTPError as e:
-            print(f"  Erro HTTP {e.code} na rodada {num_rodada}")
+            print(f"  HTTPError {e.code} na rodada {num}")
         except Exception as e:
-            print(f"  Erro na rodada {num_rodada}: {type(e).__name__}: {e}")
+            print(f"  Erro na rodada {num}: {type(e).__name__}: {e}")
 
-    # Ordena por data
-    def chave_ordenacao(j):
-        d = j.get("data_iso") or "9999"
-        return d
-    todos_jogos.sort(key=chave_ordenacao)
+    def chave(j):
+        return j.get("data_iso") or "9999"
+    todos_jogos.sort(key=chave)
 
     print()
-    print(f"Total de jogos futuros encontrados: {len(todos_jogos)}")
+    print(f"Total de jogos pendentes encontrados: {len(todos_jogos)}")
 
-    # Monta o JSON final
     fim = agora_brasilia()
     output = {
         "atualizado_em": fim.isoformat(),
@@ -385,21 +314,21 @@ def main():
     print("jogos.json salvo com sucesso")
     print("=" * 70)
     print(f"Atualizado em: {output['atualizado_em_br']}")
-    print(f"Rodada atual: {rodada_atual}")
+    print(f"Rodada atual identificada: {rodada_atual}")
     print(f"Rodadas consultadas: {rodadas_ok}")
-    print(f"Total de jogos futuros: {len(todos_jogos)}")
+    print(f"Total de jogos pendentes: {len(todos_jogos)}")
     print()
 
     if todos_jogos:
-        print("Próximos 5 jogos:")
+        print("Proximos 5 jogos:")
         for j in todos_jogos[:5]:
-            data = j.get("data_iso", "?")
             mand = j["mandante"]["nome"]
             visi = j["visitante"]["nome"]
+            data = j.get("data_iso", "?")
             print(f"  R{j['rodada']:>2} | {data} | {mand} x {visi}")
-
-    print()
-    print("Concluído.")
+    else:
+        print("AVISO: Nenhum jogo pendente foi encontrado.")
+        print("Verifique a estrutura do '1o jogo bruto' nos logs acima.")
 
 
 if __name__ == "__main__":
