@@ -266,7 +266,7 @@
     background: var(--card);
     z-index: 2;
   }
-  .ranking-table thead th.col-pos { width: 36px; text-align: center; left: 0; }
+  .ranking-table thead th.col-pos { width: 76px; text-align: center; left: 0; }
   .ranking-table thead th.col-nome { text-align: left; padding-left: 10px; min-width: 130px; }
   .ranking-table thead th.col-total {
     background: rgba(74,222,128,0.08);
@@ -410,6 +410,149 @@
     .cell-pts { font-size: 12px; }
     .cell-palp { font-size: 8px; }
   }
+
+  /* PRÓXIMOS JOGOS */
+  .dia-header {
+    margin-top: 18px;
+    margin-bottom: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    background: rgba(74,222,128,0.06);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+  }
+  .jogos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+  }
+  .jogo-card {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .jogo-horario {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  .jogo-times {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+  .jogo-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    min-width: 0;
+  }
+  .jogo-escudo {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .jogo-escudo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .escudo-fallback {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--card-hover);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .jogo-nome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    max-width: 100%;
+  }
+  .jogo-vs {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    padding: 0 4px;
+  }
+  .jogo-detalhes {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .jogo-detalhe {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+  @media (max-width: 720px) {
+    .jogos-grid { grid-template-columns: 1fr; }
+    .jogo-horario { font-size: 16px; }
+    .jogo-escudo, .escudo-fallback { width: 38px; height: 38px; }
+    .jogo-nome { font-size: 12px; }
+  }
+
+  /* SETAS DE MOVIMENTO ENTRE RODADAS */
+  .seta-mov {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin: 0 4px;
+    line-height: 1;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .seta-up {
+    color: var(--accent);
+    background: rgba(74,222,128,0.10);
+  }
+  .seta-down {
+    color: var(--danger);
+    background: rgba(248,113,113,0.10);
+  }
+  /* Container que segura medalha + seta no ranking */
+  .pos-com-seta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  @media (max-width: 720px) {
+    .seta-mov { font-size: 9px; padding: 1px 3px; margin: 0 2px; }
+  }
 </style>
 </head>
 <body>
@@ -422,19 +565,18 @@
     <div class="nav">
       <button onclick="setView('rank')" id="btn-rank" class="active">Ranking</button>
       <button onclick="setView('tabela')" id="btn-tabela">Brasileirão</button>
+      <button onclick="setView('jogos')" id="btn-jogos">Próximos Jogos</button>
       <button onclick="adminAction()" id="btn-admin">Admin</button>
     </div>
   </header>
 
   <div class="status-bar" id="status-bar">
     <span id="status-text">Carregando...</span>
-    <span id="status-actions">
-      <button class="btn" onclick="refresh()" style="padding: 4px 10px; font-size: 12px;">Atualizar agora</button>
-    </span>
   </div>
 
   <div id="view-rank"></div>
   <div id="view-tabela" style="display: none;"></div>
+  <div id="view-jogos" style="display: none;"></div>
   <div id="view-participantes" style="display: none;"></div>
 </div>
 
@@ -490,7 +632,12 @@ let state = {
   ehAdmin: false,
   view: 'rank',
   expandido: null,
-  editIdx: null
+  editIdx: null,
+  // Próximos jogos (preenchido sob demanda)
+  jogos: [],
+  jogosMeta: null,       // { atualizado_em_br, fonte, rodada_atual, ... }
+  jogosCarregados: false,
+  jogosErro: null
 };
 
 // ========================================================================
@@ -594,14 +741,11 @@ function setStatus(tipo, msg) {
 }
 
 function mensagemStatusAtualizacao() {
-  const prox = proximaAtualizacaoProgramada();
-  const proxTxt = prox ? ` · próxima verificação automática: ${formatarSomenteHora(prox)}` : '';
-
   if (state._atualizadoEmServidor) {
     const dt = new Date(state._atualizadoEmServidor);
-    return `Tabela atualizada em ${formatarHora(dt)} (fonte: ${state._fonteServidor || '—'})${proxTxt}`;
+    return `Tabela atualizada em ${formatarHora(dt)} (fonte: ${state._fonteServidor || '—'})`;
   }
-  return `Atualizado agora · ${formatarHora(state.ultimaAtualizacao)}${proxTxt}`;
+  return `Atualizado agora · ${formatarHora(state.ultimaAtualizacao)}`;
 }
 
 function agendarProximaAtualizacao() {
@@ -678,6 +822,139 @@ function dadosTime(nome) {
   return state.tabela.find(t => t.time === nome) || { pos: 0, pontos: 0 };
 }
 
+// ========================================================================
+// SNAPSHOTS DE POSIÇÃO — para mostrar setas de movimento entre rodadas
+// ========================================================================
+// Lógica: guardamos a posição "anterior" de cada time/participante.
+// Quando a rodada muda (mais jogos jogados), a posição atual vira a anterior,
+// e a nova posição vira a atual. Assim mostramos quanto subiu/caiu.
+
+function carregarSnapshot(chave) {
+  try {
+    const s = localStorage.getItem(chave);
+    if (s) return JSON.parse(s);
+  } catch (e) {}
+  return null;
+}
+
+function salvarSnapshot(chave, dados) {
+  try {
+    localStorage.setItem(chave, JSON.stringify(dados));
+  } catch (e) {}
+}
+
+// Snapshot da tabela: salva quando o número total de jogos muda (rodada nova).
+// Estrutura: { jogosTotais: N, posicoesAnteriores: { "Palmeiras": 1, ... }, posicoesAtuais: {...} }
+function gerenciarSnapshotTabela() {
+  if (!state.tabela || state.tabela.length === 0) return null;
+
+  const totalJogos = state.tabela.reduce((s, t) => s + (t.jogos || 0), 0);
+  const posAtuais = {};
+  state.tabela.forEach(t => { posAtuais[t.time] = t.pos; });
+
+  let snap = carregarSnapshot('snapshot_tabela');
+
+  if (!snap) {
+    // Primeira vez: cria snapshot sem variação ainda
+    snap = { jogosTotais: totalJogos, posicoesAnteriores: { ...posAtuais }, posicoesAtuais: posAtuais };
+    salvarSnapshot('snapshot_tabela', snap);
+    return snap;
+  }
+
+  // Se as posições atuais são diferentes do que estava salvo como "atuais",
+  // significa que a tabela mudou desde a última visita. Promove "atuais" → "anteriores".
+  const posAtuaisSalvas = snap.posicoesAtuais || {};
+  let mudou = false;
+  for (const time in posAtuais) {
+    if (posAtuaisSalvas[time] !== posAtuais[time]) { mudou = true; break; }
+  }
+
+  if (mudou) {
+    // Só atualiza "anteriores" quando entrou uma rodada nova (jogos totais aumentou de forma significativa).
+    // Critério: se aumentou em pelo menos 10 jogos (uma rodada inteira tem 20 = 10 partidas × 2).
+    const diffJogos = totalJogos - (snap.jogosTotais || 0);
+    if (diffJogos >= 10) {
+      // Rodada nova: as posições "atuais" antigas viram "anteriores"
+      snap = {
+        jogosTotais: totalJogos,
+        posicoesAnteriores: { ...posAtuaisSalvas },
+        posicoesAtuais: posAtuais
+      };
+    } else {
+      // Mesma rodada, só atualiza "atuais" sem mexer nas "anteriores"
+      snap = {
+        jogosTotais: totalJogos,
+        posicoesAnteriores: snap.posicoesAnteriores || posAtuais,
+        posicoesAtuais: posAtuais
+      };
+    }
+    salvarSnapshot('snapshot_tabela', snap);
+  }
+
+  return snap;
+}
+
+// Snapshot do ranking dos participantes: salva quando a tabela do brasileirão muda de rodada.
+// Compara posições do ranking entre rodadas.
+function gerenciarSnapshotRanking(rankingAtual) {
+  if (!rankingAtual || rankingAtual.length === 0) return null;
+
+  const totalJogosTabela = (state.tabela || []).reduce((s, t) => s + (t.jogos || 0), 0);
+  const posAtuais = {};
+  rankingAtual.forEach((r, i) => { posAtuais[r.nome] = i + 1; });
+
+  let snap = carregarSnapshot('snapshot_ranking');
+
+  if (!snap) {
+    snap = {
+      jogosTotaisTabela: totalJogosTabela,
+      posicoesAnteriores: { ...posAtuais },
+      posicoesAtuais: posAtuais
+    };
+    salvarSnapshot('snapshot_ranking', snap);
+    return snap;
+  }
+
+  const posAtuaisSalvas = snap.posicoesAtuais || {};
+  let mudou = false;
+  for (const nome in posAtuais) {
+    if (posAtuaisSalvas[nome] !== posAtuais[nome]) { mudou = true; break; }
+  }
+
+  if (mudou) {
+    const diffJogos = totalJogosTabela - (snap.jogosTotaisTabela || 0);
+    if (diffJogos >= 10) {
+      snap = {
+        jogosTotaisTabela: totalJogosTabela,
+        posicoesAnteriores: { ...posAtuaisSalvas },
+        posicoesAtuais: posAtuais
+      };
+    } else {
+      snap = {
+        jogosTotaisTabela: totalJogosTabela,
+        posicoesAnteriores: snap.posicoesAnteriores || posAtuais,
+        posicoesAtuais: posAtuais
+      };
+    }
+    salvarSnapshot('snapshot_ranking', snap);
+  }
+
+  return snap;
+}
+
+// Renderiza a seta de movimento entre duas posições.
+// Retorna HTML pronto. Se diff = 0, retorna string vazia.
+function htmlSetaMovimento(posAnterior, posAtual) {
+  if (!posAnterior || !posAtual || posAnterior === posAtual) return '';
+  // Subiu: posAnterior > posAtual (ex: era 5º, agora é 3º → subiu 2)
+  const diff = posAnterior - posAtual;
+  if (diff > 0) {
+    return `<span class="seta-mov seta-up" title="Subiu ${diff} ${diff === 1 ? 'posição' : 'posições'}">▲ ${diff}</span>`;
+  } else {
+    return `<span class="seta-mov seta-down" title="Caiu ${-diff} ${-diff === 1 ? 'posição' : 'posições'}">▼ ${-diff}</span>`;
+  }
+}
+
 function calcular(participante) {
   const detalhes = [];
   let total = 0;
@@ -724,20 +1001,29 @@ function render() {
   const v = state.view;
   document.getElementById('view-rank').style.display = v === 'rank' ? 'block' : 'none';
   document.getElementById('view-tabela').style.display = v === 'tabela' ? 'block' : 'none';
+  document.getElementById('view-jogos').style.display = v === 'jogos' ? 'block' : 'none';
   document.getElementById('view-participantes').style.display = v === 'participantes' ? 'block' : 'none';
-  ['rank','tabela','admin'].forEach(k => {
+  ['rank','tabela','jogos','admin'].forEach(k => {
     const b = document.getElementById('btn-' + k);
     if (b) b.classList.toggle('active', v === k);
   });
   if (v === 'rank') renderRank();
   else if (v === 'tabela') renderTabela();
+  else if (v === 'jogos') renderJogos();
   else if (v === 'participantes') renderParticipantes();
   // Botão de admin
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = state.ehAdmin ? 'Sair do admin' : 'Admin';
 }
 
-function setView(v) { state.view = v; render(); }
+function setView(v) {
+  state.view = v;
+  // Carrega jogos.json sob demanda quando entra na aba pela primeira vez
+  if (v === 'jogos' && !state.jogosCarregados) {
+    carregarJogos();
+  }
+  render();
+}
 
 function renderRank() {
   if (state.tabela.length === 0) {
@@ -781,6 +1067,10 @@ function renderRank() {
   html += '</tr>';
   html += '</thead><tbody>';
 
+  // Calcula o snapshot de movimento do ranking
+  const snapRank = gerenciarSnapshotRanking(ranking);
+  const posAnterioresRank = (snapRank && snapRank.posicoesAnteriores) || {};
+
   // Linhas
   ranking.forEach((r, i) => {
     const posClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
@@ -792,8 +1082,9 @@ function renderRank() {
     }
 
     const rowClass = isBob ? 'bob-row' : '';
+    const setaRank = htmlSetaMovimento(posAnterioresRank[r.nome], i + 1);
     html += `<tr class="${rowClass}">`;
-    html += `<td><span class="pos-num ${posClass}">${i+1}</span></td>`;
+    html += `<td><span class="pos-com-seta"><span class="pos-num ${posClass}">${i+1}</span>${setaRank}</span></td>`;
     html += `<td class="col-nome">${r.nome}</td>`;
     html += `<td class="col-total">${r.total}</td>`;
 
@@ -855,16 +1146,175 @@ function renderTabela() {
     document.getElementById('view-tabela').innerHTML = '<div class="card empty">Carregando...</div>';
     return;
   }
-  let html = '<div class="card"><table><thead><tr><th style="width:40px;">Pos</th><th>Time</th><th style="text-align:center;">P</th><th style="text-align:center;">J</th><th style="text-align:center;">V</th><th style="text-align:center;">E</th><th style="text-align:center;">D</th><th style="text-align:center;">SG</th><th style="text-align:center;">%</th></tr></thead><tbody>';
+
+  // Atualiza/lê o snapshot de posições anteriores
+  const snap = gerenciarSnapshotTabela();
+  const posAnteriores = (snap && snap.posicoesAnteriores) || {};
+
+  let html = '<div class="card"><table><thead><tr><th style="width:60px;">Pos</th><th>Time</th><th style="text-align:center;">P</th><th style="text-align:center;">J</th><th style="text-align:center;">V</th><th style="text-align:center;">E</th><th style="text-align:center;">D</th><th style="text-align:center;">SG</th><th style="text-align:center;">%</th></tr></thead><tbody>';
   state.tabela.forEach(t => {
     let cls = '';
     if (t.pos >= 17) cls = 'zona-rebaixamento';
     else if (t.pos <= 4) cls = 'zona-libertadores';
-    html += `<tr class="${cls}"><td><strong>${t.pos}</strong></td><td>${t.time}</td><td style="text-align:center; font-weight:600;">${t.pontos}</td><td style="text-align:center;">${t.jogos}</td><td style="text-align:center;">${t.vitorias}</td><td style="text-align:center;">${t.empates}</td><td style="text-align:center;">${t.derrotas}</td><td style="text-align:center;">${t.sg > 0 ? '+' : ''}${t.sg}</td><td style="text-align:center;">${t.aproveitamento}%</td></tr>`;
+    const seta = htmlSetaMovimento(posAnteriores[t.time], t.pos);
+    html += `<tr class="${cls}"><td><strong>${t.pos}</strong>${seta}</td><td>${t.time}</td><td style="text-align:center; font-weight:600;">${t.pontos}</td><td style="text-align:center;">${t.jogos}</td><td style="text-align:center;">${t.vitorias}</td><td style="text-align:center;">${t.empates}</td><td style="text-align:center;">${t.derrotas}</td><td style="text-align:center;">${t.sg > 0 ? '+' : ''}${t.sg}</td><td style="text-align:center;">${t.aproveitamento}%</td></tr>`;
   });
   html += '</tbody></table></div>';
-  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:rgba(74,222,128,0.4);"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:rgba(248,113,113,0.4);"></div>Rebaixamento (Z4)</div></div>';
+  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:rgba(74,222,128,0.4);"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:rgba(248,113,113,0.4);"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu de posição</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu de posição</div></div>';
   document.getElementById('view-tabela').innerHTML = html;
+}
+
+// ========================================================================
+// PRÓXIMOS JOGOS
+// ========================================================================
+async function carregarJogos() {
+  try {
+    const url = 'jogos.json?t=' + Date.now();
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    state.jogos = Array.isArray(data.jogos) ? data.jogos : [];
+    state.jogosMeta = {
+      atualizado_em: data.atualizado_em,
+      atualizado_em_br: data.atualizado_em_br,
+      fonte: data.fonte,
+      rodada_atual: data.rodada_atual,
+      rodadas_consultadas: data.rodadas_consultadas
+    };
+    state.jogosCarregados = true;
+    state.jogosErro = null;
+  } catch (e) {
+    console.error('Erro ao carregar jogos.json:', e);
+    state.jogosErro = e.message;
+    state.jogosCarregados = true;
+  }
+  if (state.view === 'jogos') renderJogos();
+}
+
+function formatarDataAgrupada(dataIso) {
+  // Devolve algo tipo "DOMINGO, 4 DE MAIO"
+  if (!dataIso) return 'Data a definir';
+  try {
+    const d = new Date(dataIso);
+    if (isNaN(d.getTime())) return 'Data a definir';
+    const dias = ['DOMINGO','SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO'];
+    const meses = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+    return `${dias[d.getDay()]}, ${d.getDate()} DE ${meses[d.getMonth()]}`;
+  } catch (e) {
+    return 'Data a definir';
+  }
+}
+
+function formatarHorarioJogo(dataIso) {
+  if (!dataIso) return '--:--';
+  try {
+    const d = new Date(dataIso);
+    if (isNaN(d.getTime())) return '--:--';
+    return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  } catch (e) {
+    return '--:--';
+  }
+}
+
+function chaveDataAgrupada(dataIso) {
+  if (!dataIso) return 'zzz';
+  try {
+    const d = new Date(dataIso);
+    if (isNaN(d.getTime())) return 'zzz';
+    return d.toISOString().slice(0,10);
+  } catch (e) {
+    return 'zzz';
+  }
+}
+
+function renderJogos() {
+  const container = document.getElementById('view-jogos');
+
+  if (!state.jogosCarregados) {
+    container.innerHTML = '<div class="card empty">Carregando próximos jogos...</div>';
+    return;
+  }
+
+  if (state.jogosErro) {
+    container.innerHTML = `<div class="card empty"><div style="color: var(--danger); margin-bottom: 6px;">⚠ Não foi possível carregar os próximos jogos</div><div style="font-size: 12px; color: var(--text-tertiary);">${state.jogosErro}</div></div>`;
+    return;
+  }
+
+  if (!state.jogos || state.jogos.length === 0) {
+    container.innerHTML = '<div class="card empty">Nenhum jogo futuro encontrado para a rodada atual.</div>';
+    return;
+  }
+
+  // Agrupa por dia
+  const grupos = {};
+  for (const j of state.jogos) {
+    const chave = chaveDataAgrupada(j.data_iso);
+    if (!grupos[chave]) grupos[chave] = [];
+    grupos[chave].push(j);
+  }
+  const chavesOrdenadas = Object.keys(grupos).sort();
+
+  // Cabeçalho
+  const meta = state.jogosMeta || {};
+  let html = '<div class="secao-header" style="display: flex; justify-content: space-between; align-items: center;">';
+  html += `<h2>Próximos jogos${meta.rodada_atual ? ' · Rodada ' + meta.rodada_atual : ''}</h2>`;
+  if (meta.atualizado_em_br) {
+    html += `<span style="font-size: 11px; color: var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
+  }
+  html += '</div>';
+
+  for (const chave of chavesOrdenadas) {
+    const jogos = grupos[chave];
+    const labelData = formatarDataAgrupada(jogos[0].data_iso);
+
+    html += `<div class="dia-header">${labelData}</div>`;
+    html += '<div class="jogos-grid">';
+
+    for (const j of jogos) {
+      const m = j.mandante || {};
+      const v = j.visitante || {};
+      const escudoMandante = m.escudo
+        ? `<img src="${m.escudo}" alt="${m.nome || ''}" loading="lazy">`
+        : `<div class="escudo-fallback">${(m.sigla || (m.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+      const escudoVisitante = v.escudo
+        ? `<img src="${v.escudo}" alt="${v.nome || ''}" loading="lazy">`
+        : `<div class="escudo-fallback">${(v.sigla || (v.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+
+      const horario = formatarHorarioJogo(j.data_iso);
+
+      html += `<div class="jogo-card">
+        <div class="jogo-horario">${horario}</div>
+        <div class="jogo-times">
+          <div class="jogo-time">
+            <span class="jogo-escudo">${escudoMandante}</span>
+            <span class="jogo-nome">${m.nome || '?'}</span>
+          </div>
+          <div class="jogo-vs">×</div>
+          <div class="jogo-time">
+            <span class="jogo-escudo">${escudoVisitante}</span>
+            <span class="jogo-nome">${v.nome || '?'}</span>
+          </div>
+        </div>`;
+
+      const detalhes = [];
+      if (j.estadio) detalhes.push(`<span class="jogo-detalhe">📍 ${j.estadio}</span>`);
+      if (j.transmissao) detalhes.push(`<span class="jogo-detalhe">📺 ${j.transmissao}</span>`);
+      if (detalhes.length > 0) {
+        html += `<div class="jogo-detalhes">${detalhes.join('')}</div>`;
+      }
+
+      html += '</div>';
+    }
+
+    html += '</div>';
+  }
+
+  // Rodapé com info de fonte
+  if (meta.fonte) {
+    html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
+  }
+
+  container.innerHTML = html;
 }
 
 function renderParticipantes() {
