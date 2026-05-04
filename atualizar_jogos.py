@@ -45,44 +45,100 @@ def fetch_json(url, timeout=20):
         return json.loads(raw)
 
 
-def buscar_rodada_atual(ano):
+def descobrir_rodada_a_partir_do_tabela_json():
     """
-    Determina a rodada atual a partir da classificação.
+    Lê tabela.json (gerado pelo outro workflow) para descobrir a rodada atual.
+    Mais confiável que chamar a API porque tabela.json sai do Terra.
     """
-    url = (
-        f"https://api.globoesporte.globo.com/tabela/{TUUID_BRASILEIRAO}/"
-        f"fase/fase-unica-campeonato-brasileiro-{ano}/classificacao/"
-    )
-    classificacao = fetch_json(url)
+    try:
+        with open("tabela.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        raise Exception("tabela.json não encontrado")
 
-    if not isinstance(classificacao, list) or not classificacao:
-        raise Exception("Classificação retornou vazia ou em formato inesperado")
+    tabela = data.get("tabela") or []
+    if not tabela:
+        raise Exception("tabela.json sem dados")
 
     jogos_disputados = []
-    for item in classificacao:
-        j = item.get("jogos") or 0
-        try:
-            jogos_disputados.append(int(j))
-        except (ValueError, TypeError):
-            pass
+    for t in tabela:
+        j = t.get("jogos")
+        if isinstance(j, int):
+            jogos_disputados.append(j)
 
     if not jogos_disputados:
-        raise Exception("Nenhum dado de jogos disputados na classificação")
+        raise Exception("tabela.json não tem campo 'jogos' nos times")
 
     max_jogos = max(jogos_disputados)
     min_jogos = min(jogos_disputados)
+    print(f"  tabela.json: jogos disputados min={min_jogos}, max={max_jogos}")
 
-    print(f"  Jogos disputados: min={min_jogos}, max={max_jogos}")
-
-    # Se todos jogaram o mesmo número, a rodada acabou e já entramos na próxima.
     if min_jogos == max_jogos:
-        rodada_atual = max_jogos + 1
-        print(f"  Todos com {max_jogos} jogos disputados -> rodada atual = {rodada_atual}")
+        rodada = max_jogos + 1
+        print(f"  Todos com {max_jogos} jogos -> proxima rodada a buscar = {rodada}")
     else:
-        rodada_atual = max_jogos
-        print(f"  Diferenca entre {min_jogos} e {max_jogos} -> rodada atual = {rodada_atual}")
+        rodada = max_jogos
+        print(f"  Diferenca {min_jogos}-{max_jogos} -> rodada em curso = {rodada}")
 
-    return rodada_atual
+    return rodada
+
+
+def descobrir_rodada_escaneando(ano):
+    """
+    Fallback final: escaneia da rodada 1 até a 38 e identifica a primeira
+    em que TODOS os jogos ainda não foram disputados (ou pelo menos um).
+    Isto é mais lento mas sempre funciona.
+    """
+    print("  Iniciando escaneamento (fallback final)...")
+    for r in range(1, 39):
+        try:
+            jogos = buscar_jogos_da_rodada(ano, r)
+            if not isinstance(jogos, list) or not jogos:
+                continue
+            disputados = sum(1 for j in jogos if tem_placar_definido(j))
+            pendentes = len(jogos) - disputados
+            print(f"  Rodada {r}: {disputados} disputados, {pendentes} pendentes")
+            if pendentes > 0:
+                # Achei a primeira rodada com pelo menos 1 jogo pendente
+                return r
+        except Exception as e:
+            print(f"  Rodada {r}: erro ({type(e).__name__}: {e})")
+            continue
+    raise Exception("Escaneamento não achou rodadas com jogos pendentes (campeonato pode ter terminado)")
+
+
+def buscar_rodada_atual(ano):
+    """
+    Determina a rodada atual em ordem de preferência:
+    1. Lendo o tabela.json local (mais confiável)
+    2. Via API de classificação (pode falhar)
+    3. Escaneando rodadas até achar uma com jogo pendente (mais lento)
+    """
+    # Tentativa 1: tabela.json local
+    try:
+        return descobrir_rodada_a_partir_do_tabela_json()
+    except Exception as e:
+        print(f"  Falha ao usar tabela.json: {e}")
+
+    # Tentativa 2: API classificacao
+    try:
+        url = (
+            f"https://api.globoesporte.globo.com/tabela/{TUUID_BRASILEIRAO}/"
+            f"fase/fase-unica-campeonato-brasileiro-{ano}/classificacao/"
+        )
+        classificacao = fetch_json(url)
+        if isinstance(classificacao, list) and classificacao:
+            jogos_disp = [int(it.get("jogos") or 0) for it in classificacao]
+            if jogos_disp:
+                max_j = max(jogos_disp)
+                min_j = min(jogos_disp)
+                print(f"  API classificacao: min={min_j}, max={max_j}")
+                return (max_j + 1) if min_j == max_j else max_j
+    except Exception as e:
+        print(f"  Falha na API classificacao: {e}")
+
+    # Tentativa 3: escaneamento
+    return descobrir_rodada_escaneando(ano)
 
 
 def buscar_jogos_da_rodada(ano, num_rodada):
