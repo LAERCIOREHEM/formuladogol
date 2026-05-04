@@ -553,6 +553,207 @@
   @media (max-width: 720px) {
     .seta-mov { font-size: 9px; padding: 1px 3px; margin: 0 2px; }
   }
+
+  /* RESULTADOS */
+  .resultados-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0 12px;
+    padding: 0 4px;
+  }
+  .resultados-titulo-area {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .resultados-filtro {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .select-filtro {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 180px;
+  }
+  .select-filtro:focus {
+    outline: none;
+    border-color: var(--info);
+  }
+  .btn-limpar-filtro {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-limpar-filtro:hover {
+    background: var(--card-hover);
+    color: var(--text);
+  }
+  .resultados-stats {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .resultados-stats .stat-v { color: var(--accent); }
+  .resultados-stats .stat-e { color: var(--text); }
+  .resultados-stats .stat-d { color: var(--danger); }
+  .resultados-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .resultado-card {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .resultado-card.resultado-vitoria { border-left: 3px solid var(--accent); background: rgba(74,222,128,0.05); }
+  .resultado-card.resultado-empate { border-left: 3px solid var(--text-tertiary); }
+  .resultado-card.resultado-derrota { border-left: 3px solid var(--danger); background: rgba(248,113,113,0.05); }
+
+  .resultado-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    font-size: 11px;
+  }
+  .resultado-rodada {
+    font-weight: 600;
+    color: var(--info);
+    background: rgba(96,165,250,0.10);
+    padding: 1px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+  .resultado-data {
+    color: var(--text-tertiary);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+  .resultado-jogo {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+  .resultado-time {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .resultado-time.mandante { justify-content: flex-end; }
+  .resultado-time.visitante { justify-content: flex-start; }
+  .resultado-nome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .resultado-escudo {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .resultado-escudo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .escudo-fallback-pequeno {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--card-hover);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .resultado-placar {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 60px;
+  }
+  .resultado-placar .placar-x {
+    color: var(--text-tertiary);
+    font-size: 14px;
+    margin: 0 2px;
+  }
+  .resultado-estadio {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-align: right;
+    white-space: nowrap;
+  }
+  @media (max-width: 720px) {
+    .resultado-card {
+      grid-template-columns: 50px 1fr;
+      gap: 8px;
+      padding: 8px 10px;
+    }
+    .resultado-estadio {
+      grid-column: 1 / -1;
+      text-align: left;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+      margin-top: 2px;
+    }
+    .resultado-jogo { gap: 8px; }
+    .resultado-nome { font-size: 11px; }
+    .resultado-placar { font-size: 16px; min-width: 50px; }
+    .resultado-escudo, .escudo-fallback-pequeno { width: 22px; height: 22px; }
+    .resultados-stats { gap: 12px; font-size: 12px; }
+    .resultados-header { flex-direction: column; align-items: stretch; }
+    .resultados-filtro { width: 100%; }
+    .select-filtro { flex: 1; }
+  }
 </style>
 </head>
 <body>
@@ -566,6 +767,7 @@
       <button onclick="setView('rank')" id="btn-rank" class="active">Ranking</button>
       <button onclick="setView('tabela')" id="btn-tabela">Brasileirão</button>
       <button onclick="setView('jogos')" id="btn-jogos">Próximos Jogos</button>
+      <button onclick="setView('resultados')" id="btn-resultados">Resultados</button>
       <button onclick="adminAction()" id="btn-admin">Admin</button>
     </div>
   </header>
@@ -577,6 +779,7 @@
   <div id="view-rank"></div>
   <div id="view-tabela" style="display: none;"></div>
   <div id="view-jogos" style="display: none;"></div>
+  <div id="view-resultados" style="display: none;"></div>
   <div id="view-participantes" style="display: none;"></div>
 </div>
 
@@ -637,7 +840,14 @@ let state = {
   jogos: [],
   jogosMeta: null,       // { atualizado_em_br, fonte, rodada_atual, ... }
   jogosCarregados: false,
-  jogosErro: null
+  jogosErro: null,
+  // Resultados (preenchido sob demanda)
+  resultados: [],
+  resultadosMeta: null,
+  resultadosTimes: [],     // lista de times disponíveis pro filtro
+  resultadosCarregados: false,
+  resultadosErro: null,
+  resultadosFiltroTime: ''  // time atualmente filtrado (vazio = todos)
 };
 
 // ========================================================================
@@ -1002,14 +1212,16 @@ function render() {
   document.getElementById('view-rank').style.display = v === 'rank' ? 'block' : 'none';
   document.getElementById('view-tabela').style.display = v === 'tabela' ? 'block' : 'none';
   document.getElementById('view-jogos').style.display = v === 'jogos' ? 'block' : 'none';
+  document.getElementById('view-resultados').style.display = v === 'resultados' ? 'block' : 'none';
   document.getElementById('view-participantes').style.display = v === 'participantes' ? 'block' : 'none';
-  ['rank','tabela','jogos','admin'].forEach(k => {
+  ['rank','tabela','jogos','resultados','admin'].forEach(k => {
     const b = document.getElementById('btn-' + k);
     if (b) b.classList.toggle('active', v === k);
   });
   if (v === 'rank') renderRank();
   else if (v === 'tabela') renderTabela();
   else if (v === 'jogos') renderJogos();
+  else if (v === 'resultados') renderResultados();
   else if (v === 'participantes') renderParticipantes();
   // Botão de admin
   const btnAdmin = document.getElementById('btn-admin');
@@ -1021,6 +1233,10 @@ function setView(v) {
   // Carrega jogos.json sob demanda quando entra na aba pela primeira vez
   if (v === 'jogos' && !state.jogosCarregados) {
     carregarJogos();
+  }
+  // Carrega resultados.json sob demanda
+  if (v === 'resultados' && !state.resultadosCarregados) {
+    carregarResultados();
   }
   render();
 }
@@ -1310,6 +1526,189 @@ function renderJogos() {
   }
 
   // Rodapé com info de fonte
+  if (meta.fonte) {
+    html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ========================================================================
+// RESULTADOS
+// ========================================================================
+async function carregarResultados() {
+  try {
+    const url = 'resultados.json?t=' + Date.now();
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    state.resultados = Array.isArray(data.resultados) ? data.resultados : [];
+    state.resultadosTimes = Array.isArray(data.times) ? data.times : [];
+    state.resultadosMeta = {
+      atualizado_em: data.atualizado_em,
+      atualizado_em_br: data.atualizado_em_br,
+      fonte: data.fonte,
+      ultima_rodada_disputada: data.ultima_rodada_disputada,
+      total_resultados: data.total_resultados
+    };
+    state.resultadosCarregados = true;
+    state.resultadosErro = null;
+  } catch (e) {
+    console.error('Erro ao carregar resultados.json:', e);
+    state.resultadosErro = e.message;
+    state.resultadosCarregados = true;
+  }
+  if (state.view === 'resultados') renderResultados();
+}
+
+function setFiltroResultados(time) {
+  state.resultadosFiltroTime = time || '';
+  renderResultados();
+}
+
+function formatarDataResultado(dataIso) {
+  if (!dataIso) return '';
+  try {
+    const d = new Date(dataIso);
+    if (isNaN(d.getTime())) return '';
+    const dias = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+    const dia = String(d.getDate()).padStart(2,'0');
+    const mes = String(d.getMonth() + 1).padStart(2,'0');
+    return `${dias[d.getDay()]} ${dia}/${mes}`;
+  } catch (e) {
+    return '';
+  }
+}
+
+function renderResultados() {
+  const container = document.getElementById('view-resultados');
+
+  if (!state.resultadosCarregados) {
+    container.innerHTML = '<div class="card empty">Carregando resultados...</div>';
+    return;
+  }
+
+  if (state.resultadosErro) {
+    container.innerHTML = `<div class="card empty"><div style="color: var(--danger); margin-bottom: 6px;">⚠ Não foi possível carregar os resultados</div><div style="font-size: 12px; color: var(--text-tertiary);">${state.resultadosErro}</div></div>`;
+    return;
+  }
+
+  if (!state.resultados || state.resultados.length === 0) {
+    container.innerHTML = '<div class="card empty">Nenhum resultado encontrado ainda. Aguarde a primeira atualização automática.</div>';
+    return;
+  }
+
+  const meta = state.resultadosMeta || {};
+  const filtroTime = state.resultadosFiltroTime;
+
+  // Filtra resultados se houver um time selecionado
+  let resultadosFiltrados = state.resultados;
+  if (filtroTime) {
+    resultadosFiltrados = state.resultados.filter(r =>
+      (r.mandante && r.mandante.nome === filtroTime) ||
+      (r.visitante && r.visitante.nome === filtroTime)
+    );
+  }
+
+  // Cabeçalho com filtro
+  let html = '<div class="resultados-header">';
+  html += '<div class="resultados-titulo-area">';
+  html += `<h2 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin: 0;">Resultados${filtroTime ? ' · ' + filtroTime : ''}</h2>`;
+  if (meta.atualizado_em_br) {
+    html += `<span style="font-size: 11px; color: var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
+  }
+  html += '</div>';
+
+  html += '<div class="resultados-filtro">';
+  html += '<label style="font-size: 12px; color: var(--text-secondary);">Filtrar por time:</label>';
+  html += `<select onchange="setFiltroResultados(this.value)" class="select-filtro">`;
+  html += `<option value="" ${filtroTime === '' ? 'selected' : ''}>Todos os times</option>`;
+  for (const t of state.resultadosTimes) {
+    html += `<option value="${t}" ${filtroTime === t ? 'selected' : ''}>${t}</option>`;
+  }
+  html += '</select>';
+  if (filtroTime) {
+    html += '<button class="btn-limpar-filtro" onclick="setFiltroResultados(\'\')">Limpar</button>';
+  }
+  html += '</div>';
+  html += '</div>';
+
+  // Estatística rápida quando filtra por time
+  if (filtroTime && resultadosFiltrados.length > 0) {
+    let v = 0, e = 0, d = 0, gp = 0, gc = 0;
+    for (const r of resultadosFiltrados) {
+      const eMandante = r.mandante.nome === filtroTime;
+      const meusGols = eMandante ? r.placar_mandante : r.placar_visitante;
+      const golsAdv = eMandante ? r.placar_visitante : r.placar_mandante;
+      gp += meusGols;
+      gc += golsAdv;
+      if (meusGols > golsAdv) v++;
+      else if (meusGols === golsAdv) e++;
+      else d++;
+    }
+    html += `<div class="resultados-stats">
+      <span><strong>${resultadosFiltrados.length}</strong> jogos</span>
+      <span class="stat-v"><strong>${v}</strong> V</span>
+      <span class="stat-e"><strong>${e}</strong> E</span>
+      <span class="stat-d"><strong>${d}</strong> D</span>
+      <span><strong>${gp}</strong> gols pró</span>
+      <span><strong>${gc}</strong> gols sofridos</span>
+    </div>`;
+  }
+
+  // Lista dos resultados
+  if (resultadosFiltrados.length === 0) {
+    html += '<div class="card empty">Nenhum jogo encontrado para esse time.</div>';
+  } else {
+    html += '<div class="resultados-lista">';
+    for (const r of resultadosFiltrados) {
+      const m = r.mandante || {};
+      const v = r.visitante || {};
+      const pm = r.placar_mandante;
+      const pv = r.placar_visitante;
+
+      // Determina classe de cor se filtrado por time
+      let classeJogo = '';
+      if (filtroTime) {
+        const eMandante = m.nome === filtroTime;
+        const meusGols = eMandante ? pm : pv;
+        const golsAdv = eMandante ? pv : pm;
+        if (meusGols > golsAdv) classeJogo = 'resultado-vitoria';
+        else if (meusGols === golsAdv) classeJogo = 'resultado-empate';
+        else classeJogo = 'resultado-derrota';
+      }
+
+      const escudoMandante = m.escudo
+        ? `<img src="${m.escudo}" alt="${m.nome || ''}" loading="lazy">`
+        : `<div class="escudo-fallback-pequeno">${(m.sigla || (m.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+      const escudoVisitante = v.escudo
+        ? `<img src="${v.escudo}" alt="${v.nome || ''}" loading="lazy">`
+        : `<div class="escudo-fallback-pequeno">${(v.sigla || (v.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+
+      const dataFmt = formatarDataResultado(r.data_iso);
+
+      html += `<div class="resultado-card ${classeJogo}">
+        <div class="resultado-meta">
+          <span class="resultado-rodada">R${r.rodada}</span>
+          <span class="resultado-data">${dataFmt}</span>
+        </div>
+        <div class="resultado-jogo">
+          <div class="resultado-time mandante">
+            <span class="resultado-nome">${m.nome || '?'}</span>
+            <span class="resultado-escudo">${escudoMandante}</span>
+          </div>
+          <div class="resultado-placar">${pm} <span class="placar-x">×</span> ${pv}</div>
+          <div class="resultado-time visitante">
+            <span class="resultado-escudo">${escudoVisitante}</span>
+            <span class="resultado-nome">${v.nome || '?'}</span>
+          </div>
+        </div>
+        ${r.estadio ? `<div class="resultado-estadio">📍 ${r.estadio}</div>` : ''}
+      </div>`;
+    }
+    html += '</div>';
+  }
+
   if (meta.fonte) {
     html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
   }
