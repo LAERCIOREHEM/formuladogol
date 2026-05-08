@@ -1,15 +1,15 @@
-name: Atualizar próximos jogos
+name: Atualizar proximos jogos
 
 on:
-  # Roda 2x ao dia: 09:23 e 21:23 horário UTC (06:23 e 18:23 Brasília).
-  # Calendário do Brasileirão é estável; não precisa rodar com frequência alta.
+  # Roda 2x ao dia: 09:23 e 21:23 UTC (06:23 e 18:23 Brasilia).
+  # Calendario de jogos eh estavel; nao precisa rodar com frequencia alta.
   schedule:
     - cron: '23 9,21 * * *'
 
   # Permite rodar manualmente
   workflow_dispatch:
 
-  # Roda também quando o script ou o workflow forem alterados
+  # Roda tambem quando o script ou workflow forem alterados
   push:
     paths:
       - 'atualizar_jogos.py'
@@ -18,17 +18,19 @@ on:
 permissions:
   contents: write
 
+# Concurrency GLOBAL do repositorio: compartilha grupo com os outros workflows
+# de escrita, garantindo que apenas UM rode por vez.
 concurrency:
-  group: atualizar-jogos-brasileirao
-  cancel-in-progress: true
+  group: bolao-brasileirao-write
+  cancel-in-progress: false
 
 jobs:
   atualizar:
-    name: Buscar próximos jogos e publicar jogos.json
+    name: Buscar proximos jogos e publicar jogos.json
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar repositório
+      - name: Baixar repositorio
         uses: actions/checkout@v4
         with:
           persist-credentials: true
@@ -39,11 +41,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Mostrar horário da execução
+      - name: Mostrar horario da execucao
         run: |
-          echo "Horário UTC:"
+          echo "Horario UTC:"
           date -u '+%d/%m/%Y %H:%M:%S UTC'
-          echo "Horário Brasília:"
+          echo "Horario Brasilia:"
           TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
 
       - name: Buscar jogos e gerar jogos.json
@@ -52,15 +54,14 @@ jobs:
       - name: Conferir se jogos.json foi gerado
         run: |
           if [ ! -f jogos.json ]; then
-            echo "ERRO: jogos.json não foi gerado pelo atualizar_jogos.py"
+            echo "ERRO: jogos.json nao foi gerado pelo atualizar_jogos.py"
             exit 1
           fi
-
           echo "jogos.json gerado com sucesso."
           echo "Primeiras linhas:"
           head -n 30 jogos.json
 
-      - name: Commitar jogos.json
+      - name: Commitar jogos.json com retry
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -68,9 +69,23 @@ jobs:
           git add jogos.json
 
           if git diff --staged --quiet; then
-            echo "Sem mudanças em jogos.json — nada a commitar."
-          else
-            git commit -m "Atualizar jogos.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
-            git push
-            echo "Commit realizado com sucesso."
+            echo "Sem mudancas em jogos.json - nada a commitar."
+            exit 0
           fi
+
+          git commit -m "Atualizar jogos.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+          MAX_TENTATIVAS=5
+          for tentativa in $(seq 1 $MAX_TENTATIVAS); do
+            echo "Tentativa $tentativa/$MAX_TENTATIVAS de push..."
+            if git push; then
+              echo "Push bem-sucedido na tentativa $tentativa."
+              exit 0
+            fi
+            echo "Push falhou. Fazendo pull --rebase e tentando de novo..."
+            git pull --rebase --autostash || true
+            sleep 3
+          done
+
+          echo "ERRO: Push falhou apos $MAX_TENTATIVAS tentativas."
+          exit 1
