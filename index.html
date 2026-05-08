@@ -1407,18 +1407,52 @@ async function carregarJogos() {
   if (state.view === 'jogos') renderJogos();
 }
 
-function formatarDataAgrupada(dataIso) {
-  // Devolve algo tipo "DOMINGO, 4 DE MAIO"
-  if (!dataIso) return 'Data a definir';
+// Helper: extrai a data calendário no fuso de Brasília a partir de um ISO.
+// Retorna { ano, mes, dia, diaSemana } na data LOCAL brasileira.
+// Resolve o bug de jogos noturnos serem agrupados no dia seguinte (UTC).
+function dataLocalBR(dataIso) {
+  if (!dataIso) return null;
   try {
     const d = new Date(dataIso);
-    if (isNaN(d.getTime())) return 'Data a definir';
-    const dias = ['DOMINGO','SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO'];
-    const meses = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
-    return `${dias[d.getDay()]}, ${d.getDate()} DE ${meses[d.getMonth()]}`;
+    if (isNaN(d.getTime())) return null;
+    // Usa toLocaleString com timeZone Brasil pra garantir extração no fuso correto,
+    // independentemente do fuso do navegador do usuário.
+    const fmt = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'short'
+    });
+    const partes = fmt.formatToParts(d);
+    const obj = {};
+    for (const p of partes) {
+      if (p.type !== 'literal') obj[p.type] = p.value;
+    }
+    // diaSemana 0..6 (dom..sab) — mapeamos a partir do weekday curto
+    const mapDia = {
+      'dom': 0, 'seg': 1, 'ter': 2, 'qua': 3, 'qui': 4, 'sex': 5, 'sáb': 6, 'sab': 6
+    };
+    const w = (obj.weekday || '').toLowerCase().replace('.', '').trim();
+    const diaSemana = mapDia[w] != null ? mapDia[w] : 0;
+    return {
+      ano: parseInt(obj.year),
+      mes: parseInt(obj.month),
+      dia: parseInt(obj.day),
+      diaSemana: diaSemana
+    };
   } catch (e) {
-    return 'Data a definir';
+    return null;
   }
+}
+
+function formatarDataAgrupada(dataIso) {
+  // Devolve algo tipo "DOMINGO, 4 DE MAIO" — usando fuso de Brasília
+  const d = dataLocalBR(dataIso);
+  if (!d) return 'Data a definir';
+  const dias = ['DOMINGO','SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO'];
+  const meses = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+  return `${dias[d.diaSemana]}, ${d.dia} DE ${meses[d.mes - 1]}`;
 }
 
 function formatarHorarioJogo(dataIso) {
@@ -1426,21 +1460,23 @@ function formatarHorarioJogo(dataIso) {
   try {
     const d = new Date(dataIso);
     if (isNaN(d.getTime())) return '--:--';
-    return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+    // Força fuso de Brasília no output, independente do fuso do navegador
+    return d.toLocaleTimeString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   } catch (e) {
     return '--:--';
   }
 }
 
 function chaveDataAgrupada(dataIso) {
-  if (!dataIso) return 'zzz';
-  try {
-    const d = new Date(dataIso);
-    if (isNaN(d.getTime())) return 'zzz';
-    return d.toISOString().slice(0,10);
-  } catch (e) {
-    return 'zzz';
-  }
+  // Chave de agrupamento usando data NO FUSO DE BRASÍLIA, não UTC.
+  // Sem isso, jogos de sábado à noite eram agrupados como domingo.
+  const d = dataLocalBR(dataIso);
+  if (!d) return 'zzz';
+  return `${d.ano}-${String(d.mes).padStart(2,'0')}-${String(d.dia).padStart(2,'0')}`;
 }
 
 function renderJogos() {
@@ -1567,17 +1603,13 @@ function setFiltroResultados(time) {
 }
 
 function formatarDataResultado(dataIso) {
-  if (!dataIso) return '';
-  try {
-    const d = new Date(dataIso);
-    if (isNaN(d.getTime())) return '';
-    const dias = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
-    const dia = String(d.getDate()).padStart(2,'0');
-    const mes = String(d.getMonth() + 1).padStart(2,'0');
-    return `${dias[d.getDay()]} ${dia}/${mes}`;
-  } catch (e) {
-    return '';
-  }
+  // Usa fuso de Brasília pra evitar bug de jogos noturnos aparecerem no dia seguinte
+  const d = dataLocalBR(dataIso);
+  if (!d) return '';
+  const dias = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+  const dia = String(d.dia).padStart(2,'0');
+  const mes = String(d.mes).padStart(2,'0');
+  return `${dias[d.diaSemana]} ${dia}/${mes}`;
 }
 
 function renderResultados() {
