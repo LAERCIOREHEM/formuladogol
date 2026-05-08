@@ -1,17 +1,11 @@
 name: Atualizar tabela do Brasileirão
 
 on:
-  # Roda automaticamente 4 vezes por hora, nos minutos :02, :17, :32 e :47.
-  # Aumentar a frequência (em vez de só 2x/h) compensa o cron do GitHub Actions
-  # que costuma atrasar 5-30 min ou pular ciclos em horário de pico.
-  # Cabe no limite gratuito: ~96 execuções/dia × 30s × 30 dias ≈ 1.440 min/mês (limite: 2.000).
-  schedule:
-    - cron: '2,17,32,47 * * * *'
-
-  # Permite rodar manualmente pelo botão "Run workflow"
+  # Disparado pelo cron-job.org a cada 15 minutos via API.
+  # Cron interno desativado para evitar disputa com o cron-job.org.
   workflow_dispatch:
 
-  # Roda também quando o script ou o próprio workflow forem alterados
+  # Roda tambem quando o script ou workflow forem alterados
   push:
     paths:
       - 'atualizar.py'
@@ -20,9 +14,12 @@ on:
 permissions:
   contents: write
 
+# Concurrency GLOBAL do repositorio: apenas UMA execucao
+# de QUALQUER workflow de atualizacao roda por vez.
+# Isso evita conflitos de git push entre workflows diferentes.
 concurrency:
-  group: atualizar-tabela-brasileirao
-  cancel-in-progress: true
+  group: bolao-brasileirao-write
+  cancel-in-progress: false
 
 jobs:
   atualizar:
@@ -30,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Baixar repositório
+      - name: Baixar repositorio
         uses: actions/checkout@v4
         with:
           persist-credentials: true
@@ -41,11 +38,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Mostrar horário da execução
+      - name: Mostrar horario da execucao
         run: |
-          echo "Horário UTC:"
+          echo "Horario UTC:"
           date -u '+%d/%m/%Y %H:%M:%S UTC'
-          echo "Horário Brasília:"
+          echo "Horario Brasilia:"
           TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
 
       - name: Buscar tabela e gerar tabela.json
@@ -54,15 +51,14 @@ jobs:
       - name: Conferir se tabela.json foi gerado
         run: |
           if [ ! -f tabela.json ]; then
-            echo "ERRO: tabela.json não foi gerado pelo atualizar.py"
+            echo "ERRO: tabela.json nao foi gerado pelo atualizar.py"
             exit 1
           fi
-
           echo "tabela.json gerado com sucesso."
           echo "Primeiras linhas:"
           head -n 20 tabela.json
 
-      - name: Commitar tabela.json
+      - name: Commitar tabela.json com retry
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -70,9 +66,25 @@ jobs:
           git add tabela.json
 
           if git diff --staged --quiet; then
-            echo "Sem mudanças em tabela.json — nada a commitar."
-          else
-            git commit -m "Atualizar tabela.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
-            git push
-            echo "Commit realizado com sucesso."
+            echo "Sem mudancas em tabela.json - nada a commitar."
+            exit 0
           fi
+
+          git commit -m "Atualizar tabela.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+          # Tenta push ate 5 vezes com pull rebase entre tentativas.
+          # Resolve corridas raras com outros workflows.
+          MAX_TENTATIVAS=5
+          for tentativa in $(seq 1 $MAX_TENTATIVAS); do
+            echo "Tentativa $tentativa/$MAX_TENTATIVAS de push..."
+            if git push; then
+              echo "Push bem-sucedido na tentativa $tentativa."
+              exit 0
+            fi
+            echo "Push falhou. Fazendo pull --rebase e tentando de novo..."
+            git pull --rebase --autostash || true
+            sleep 3
+          done
+
+          echo "ERRO: Push falhou apos $MAX_TENTATIVAS tentativas."
+          exit 1
