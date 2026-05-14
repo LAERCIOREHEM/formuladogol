@@ -933,6 +933,7 @@
       <button onclick="setView('jogos')" id="btn-jogos">Próximos Jogos</button>
       <button onclick="setView('resultados')" id="btn-resultados">Resultados</button>
       <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversariantes</button>
+      <button onclick="setView('tupal')" id="btn-tupal">🏎️ TUPAL</button>
       <button onclick="adminAction()" id="btn-admin">Admin</button>
     </div>
   </header>
@@ -946,6 +947,7 @@
   <div id="view-jogos" style="display: none;"></div>
   <div id="view-resultados" style="display: none;"></div>
   <div id="view-aniversariantes" style="display: none;"></div>
+  <div id="view-tupal" style="display: none;"></div>
   <div id="view-participantes" style="display: none;"></div>
 </div>
 
@@ -1026,18 +1028,80 @@ const MEMBROS_INICIAIS = [
 ];
 
 // ========================================================================
+// MEMBROS TUPAL — 52 pessoas do grupo Tupal (outro grupo do Antônio)
+// Nome = "Usuário" do Tupal (nome compacto Fantasy)
+// Aniversário extraído do campo "Nascimento" do cadastro Tupal
+// ========================================================================
+const MEMBROS_TUPAL_INICIAIS = [
+  {nome: "Rodrigo Castro",              aniversario: {dia: 13, mes: 7}},
+  {nome: "Felipe Guilhon",              aniversario: {dia: 4,  mes: 4}},
+  {nome: "Arminio Alexandre Arns",      aniversario: {dia: 13, mes: 9}},
+  {nome: "ALEX CASTRO",                 aniversario: {dia: 28, mes: 10}},
+  {nome: "Milton Balieiro Junior",      aniversario: {dia: 25, mes: 8}},
+  {nome: "Welington Papa",              aniversario: {dia: 19, mes: 10}},
+  {nome: "Alex Melillo",                aniversario: {dia: 1,  mes: 8}},
+  {nome: "Lucas Guimarães",             aniversario: {dia: 5,  mes: 3}},
+  {nome: "Andre Cotia",                 aniversario: {dia: 15, mes: 2}},
+  {nome: "Jeferson Ribeiro",            aniversario: {dia: 15, mes: 2}},
+  {nome: "Marco Accioli",               aniversario: {dia: 17, mes: 8}},
+  {nome: "Edson Fontenele",             aniversario: {dia: 2,  mes: 11}},
+  {nome: "ROBERTO AMORIM",              aniversario: {dia: 30, mes: 1}},
+  {nome: "Adrian Pippi da Rosa",        aniversario: {dia: 2,  mes: 1}},
+  {nome: "JOSÉ PEDRO NETO",             aniversario: {dia: 27, mes: 7}},
+  {nome: "Wellington Oliveira",         aniversario: {dia: 18, mes: 4}},
+  {nome: "Luiz Lima",                   aniversario: {dia: 21, mes: 6}},
+  {nome: "Diego Bassin",                aniversario: null},
+  {nome: "Fernando Chagas",             aniversario: {dia: 17, mes: 5}},
+  {nome: "Laércio Rehem",               aniversario: {dia: 8,  mes: 2}},
+  {nome: "Flávio Avila",                aniversario: {dia: 13, mes: 7}},
+  {nome: "Thiago Queiroz",              aniversario: {dia: 21, mes: 3}},
+  {nome: "Erico Abreu",                 aniversario: {dia: 2,  mes: 4}},
+  {nome: "HENRIQUE MARTINS SILVA",      aniversario: {dia: 4,  mes: 8}},
+  {nome: "Anderson Cunha",              aniversario: {dia: 24, mes: 12}},
+  {nome: "Rick Soares",                 aniversario: {dia: 30, mes: 1}},
+  {nome: "Marco Jardim",                aniversario: {dia: 16, mes: 11}},
+  {nome: "Waltinho Ferrari Junior",     aniversario: {dia: 5,  mes: 4}},
+  {nome: "Wanderson Pereira Neves",     aniversario: {dia: 10, mes: 12}},
+  {nome: "Celestino Fracon junior",     aniversario: {dia: 27, mes: 5}},
+  {nome: "RPC_26",                      aniversario: {dia: 8,  mes: 10}},
+  {nome: "Paulo Laureano Laureano",     aniversario: {dia: 14, mes: 10}},
+  {nome: "Lucas Sobral",                aniversario: {dia: 5,  mes: 12}},
+  {nome: "Wisney Oliveira",             aniversario: {dia: 26, mes: 6}},
+  {nome: "Welligton Marques",           aniversario: {dia: 19, mes: 12}},
+  {nome: "Gilson Araujo Borges",        aniversario: {dia: 16, mes: 6}},
+  {nome: "Stellio Moreira",             aniversario: {dia: 1,  mes: 11}},
+  {nome: "Martovane Pereira",           aniversario: {dia: 7,  mes: 10}},
+  {nome: "Leandro Barcellos",           aniversario: {dia: 18, mes: 7}},
+  {nome: "Francisco Moreira",           aniversario: {dia: 10, mes: 10}},
+  {nome: "Thiago Maia",                 aniversario: {dia: 7,  mes: 8}},
+  {nome: "Alessandro Kalleb",           aniversario: {dia: 25, mes: 12}},
+  {nome: "Gabriel Sasse",               aniversario: {dia: 2,  mes: 10}},
+  {nome: "CRISTIANO LOIOLA",            aniversario: {dia: 29, mes: 12}},
+  {nome: "Rogerio Costa de Almeida",    aniversario: {dia: 19, mes: 6}},
+  {nome: "DIEGO VALADAO",               aniversario: {dia: 2,  mes: 2}},
+  {nome: "Renato Constantino",          aniversario: {dia: 11, mes: 9}},
+  {nome: "Wesley Oliveira",             aniversario: null},
+  {nome: "Timbo Timbo",                 aniversario: null},
+  {nome: "Liander Michelon",            aniversario: null},
+  {nome: "Marcelo Lagos",               aniversario: {dia: 14, mes: 5}},
+  {nome: "Luiz Barros",                 aniversario: {dia: 7,  mes: 2}}
+];
+
+// ========================================================================
 // ESTADO
 // ========================================================================
 let state = {
   tabela: [],          // [{ pos, time, pontos, jogos, vitorias, empates, derrotas, gp, gc, sg, aproveitamento }]
   participantes: [],
-  membros: [],         // 27 membros do grupo (cada um: { nome, aniversario: { dia, mes } | null })
+  membros: [],         // 27 membros do grupo Almoço de Sexta
+  membrosTupal: [],    // 52 membros do grupo Tupal
   ultimaAtualizacao: null,
   ehAdmin: false,
   view: 'rank',
   expandido: null,
   editIdx: null,
   editMembroIdx: null,
+  editMembroTupalIdx: null,
   // Próximos jogos (preenchido sob demanda)
   jogos: [],
   jogosMeta: null,       // { atualizado_em_br, fonte, rodada_atual, ... }
@@ -1072,6 +1136,16 @@ function carregarMembros() {
   const s = localStorage.getItem('bolao_membros');
   if (s) {
     try { state.membros = JSON.parse(s); return true; } catch(e) {}
+  }
+  return false;
+}
+function salvarMembrosTupal() {
+  localStorage.setItem('bolao_membros_tupal', JSON.stringify(state.membrosTupal));
+}
+function carregarMembrosTupal() {
+  const s = localStorage.getItem('bolao_membros_tupal');
+  if (s) {
+    try { state.membrosTupal = JSON.parse(s); return true; } catch(e) {}
   }
   return false;
 }
@@ -1198,8 +1272,14 @@ async function inicializar() {
     state.membros = JSON.parse(JSON.stringify(MEMBROS_INICIAIS));
     salvarMembros();
   }
-  // Carregamento assíncrono do membros.json do servidor (atualiza se for mais novo)
+  // 1c. Membros TUPAL: mesma lógica
+  if (!carregarMembrosTupal()) {
+    state.membrosTupal = JSON.parse(JSON.stringify(MEMBROS_TUPAL_INICIAIS));
+    salvarMembrosTupal();
+  }
+  // Carregamento assíncrono dos JSONs do servidor (atualiza se for mais novo)
   carregarMembrosDoServidor();
+  carregarMembrosTupalDoServidor();
 
   // 2. Fonte de verdade: sempre buscar o tabela.json do servidor ao abrir a página.
   // O cache local só é usado como plano B se a busca falhar.
@@ -1434,8 +1514,9 @@ function render() {
   document.getElementById('view-jogos').style.display = v === 'jogos' ? 'block' : 'none';
   document.getElementById('view-resultados').style.display = v === 'resultados' ? 'block' : 'none';
   document.getElementById('view-aniversariantes').style.display = v === 'aniversariantes' ? 'block' : 'none';
+  document.getElementById('view-tupal').style.display = v === 'tupal' ? 'block' : 'none';
   document.getElementById('view-participantes').style.display = v === 'participantes' ? 'block' : 'none';
-  ['rank','tabela','jogos','resultados','aniversariantes','admin'].forEach(k => {
+  ['rank','tabela','jogos','resultados','aniversariantes','tupal','admin'].forEach(k => {
     const b = document.getElementById('btn-' + k);
     if (b) b.classList.toggle('active', v === k);
   });
@@ -1444,6 +1525,7 @@ function render() {
   else if (v === 'jogos') renderJogos();
   else if (v === 'resultados') renderResultados();
   else if (v === 'aniversariantes') renderAniversariantes();
+  else if (v === 'tupal') renderAniversariantesTupal();
   else if (v === 'participantes') renderParticipantes();
   // Botão de admin
   const btnAdmin = document.getElementById('btn-admin');
@@ -1987,6 +2069,8 @@ function renderParticipantes() {
   html += '</tbody></table></div>';
   // Subsessão de membros do grupo (27 nomes pra aniversários)
   html += renderMembrosAdmin();
+  // Subsessão de membros TUPAL (52 nomes)
+  html += renderMembrosTupalAdmin();
   document.getElementById('view-participantes').innerHTML = html;
 }
 
@@ -2161,6 +2245,22 @@ async function carregarMembrosDoServidor() {
   } catch (e) {
     // Sem problema, segue com a lista do localStorage / padrão
   }
+}
+
+async function carregarMembrosTupalDoServidor() {
+  // Tenta baixar membros_tupal.json do servidor.
+  try {
+    const resp = await fetch('membros_tupal.json?t=' + Date.now());
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const membros = Array.isArray(data.membros) ? data.membros : null;
+    if (!membros || membros.length === 0) return;
+    if (JSON.stringify(membros) !== JSON.stringify(state.membrosTupal)) {
+      state.membrosTupal = membros;
+      salvarMembrosTupal();
+      if (state.view === 'tupal') render();
+    }
+  } catch (e) {}
 }
 
 function aniversariantesDeHoje() {
@@ -2527,6 +2627,240 @@ function copiarExportado() {
 
 function fecharExportar() {
   document.getElementById('modal-container').innerHTML = '';
+}
+
+// ========================================================================
+// ABA TUPAL — Aniversariantes do grupo Tupal (52 membros)
+// ========================================================================
+function renderAniversariantesTupal() {
+  const container = document.getElementById('view-tupal');
+
+  // Data atual em Brasília
+  const fmt = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit'
+  });
+  const partes = fmt.formatToParts(new Date());
+  const obj = {};
+  for (const p of partes) if (p.type !== 'literal') obj[p.type] = p.value;
+  const diaHoje = parseInt(obj.day);
+  const mesAtual = parseInt(obj.month);
+
+  const mesesNome = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+
+  // Agrupa membros por mês
+  const porMes = {};
+  const semData = [];
+  for (const m of state.membrosTupal) {
+    if (m.aniversario && m.aniversario.dia && m.aniversario.mes) {
+      const mes = m.aniversario.mes;
+      if (!porMes[mes]) porMes[mes] = [];
+      porMes[mes].push(m);
+    } else {
+      semData.push(m);
+    }
+  }
+  for (const mes in porMes) {
+    porMes[mes].sort((a,b) => a.aniversario.dia - b.aniversario.dia);
+  }
+
+  // Ordem dos meses começando pelo atual
+  const ordemMeses = [];
+  for (let i = 0; i < 12; i++) {
+    const mes = ((mesAtual - 1 + i) % 12) + 1;
+    ordemMeses.push(mes);
+  }
+
+  let html = '<div class="secao-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">';
+  html += `<h2 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin: 0;">🏎️ TUPAL · ${state.membrosTupal.length} membros</h2>`;
+  html += '</div>';
+
+  // Hoje
+  const hoje = state.membrosTupal.filter(m =>
+    m.aniversario && m.aniversario.dia === diaHoje && m.aniversario.mes === mesAtual
+  );
+  if (hoje.length > 0) {
+    html += '<div class="aniv-hoje">';
+    html += '<div class="aniv-hoje-titulo">🎂 HOJE</div>';
+    for (const m of hoje) {
+      html += `<div class="aniv-hoje-card">`;
+      html += `<span class="aniv-hoje-nome">${m.nome}</span>`;
+      html += `<a href="${linkWhatsAppParabens(m.nome)}" target="_blank" rel="noopener" class="aniv-link-zap">📱 Parabenizar</a>`;
+      html += `</div>`;
+    }
+    html += '</div>';
+  }
+
+  for (const mes of ordemMeses) {
+    const lista = porMes[mes] || [];
+    if (lista.length === 0) continue;
+    const ehMesAtual = mes === mesAtual;
+    html += `<div class="aniv-mes ${ehMesAtual ? 'aniv-mes-atual' : ''}">`;
+    html += `<div class="aniv-mes-header">${mesesNome[mes-1]}${ehMesAtual ? ' · Mês atual' : ''} · ${lista.length}</div>`;
+    html += '<div class="aniv-mes-lista">';
+    for (const m of lista) {
+      const ehHoje = ehMesAtual && m.aniversario.dia === diaHoje;
+      const dia = String(m.aniversario.dia).padStart(2, '0');
+      const mesFmt = String(m.aniversario.mes).padStart(2, '0');
+      html += `<div class="aniv-item ${ehHoje ? 'aniv-item-hoje' : ''}">`;
+      html += `<span class="aniv-data">${dia}/${mesFmt}</span>`;
+      html += `<span class="aniv-nome">${m.nome}</span>`;
+      html += `<a href="${linkWhatsAppParabens(m.nome)}" target="_blank" rel="noopener" class="aniv-link-zap-pequeno" title="Parabenizar no WhatsApp">📱</a>`;
+      html += `</div>`;
+    }
+    html += '</div></div>';
+  }
+
+  if (semData.length > 0) {
+    html += `<div class="aniv-mes aniv-mes-sem-data">`;
+    html += `<div class="aniv-mes-header">SEM DATA CADASTRADA · ${semData.length} membro(s)</div>`;
+    html += '<div class="aniv-mes-lista">';
+    for (const m of semData) {
+      html += `<div class="aniv-item aniv-item-sem-data">`;
+      html += `<span class="aniv-data">—</span>`;
+      html += `<span class="aniv-nome">${m.nome}</span>`;
+      html += `</div>`;
+    }
+    html += '</div></div>';
+  }
+
+  if (state.membrosTupal.length === 0) {
+    html += '<div class="card empty">Nenhum membro TUPAL cadastrado. Use a aba Admin pra adicionar.</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ========================================================================
+// ADMIN — MEMBROS TUPAL
+// ========================================================================
+function renderMembrosTupalAdmin() {
+  let html = '<div style="display:flex; justify-content:space-between; align-items:center; margin: 24px 0 12px; flex-wrap: wrap; gap: 8px;">';
+  html += '<h2 style="font-size:16px; font-weight:600;">🏎️ Membros TUPAL (' + state.membrosTupal.length + ')</h2>';
+  html += '<div style="display:flex; gap:8px;">';
+  html += '<button class="btn" onclick="exportarMembrosTupalJSON()" title="Gera o JSON pra colar no GitHub">📤 Exportar JSON</button>';
+  html += '<button class="btn btn-primary" onclick="novoMembroTupal()">+ Adicionar</button>';
+  html += '</div></div>';
+
+  html += '<div class="card"><table><thead><tr>';
+  html += '<th>Nome</th><th style="text-align:center; width:120px;">Aniversário</th><th style="width:160px;"></th>';
+  html += '</tr></thead><tbody>';
+
+  state.membrosTupal.forEach((m, i) => {
+    const dataFmt = (m.aniversario && m.aniversario.dia)
+      ? `${String(m.aniversario.dia).padStart(2,'0')}/${String(m.aniversario.mes).padStart(2,'0')}`
+      : '<span style="color: var(--text-tertiary);">— não cadastrado —</span>';
+    html += `<tr>`;
+    html += `<td>${m.nome}</td>`;
+    html += `<td style="text-align:center;">${dataFmt}</td>`;
+    html += `<td style="text-align:right;">`;
+    html += `<button class="btn" style="padding:4px 10px; font-size:12px;" onclick="editarMembroTupal(${i})">Editar</button> `;
+    html += `<button class="btn" style="padding:4px 10px; font-size:12px; color: var(--danger);" onclick="removerMembroTupal(${i})">Remover</button>`;
+    html += `</td>`;
+    html += `</tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function novoMembroTupal() {
+  state.editMembroTupalIdx = -1;
+  abrirEditorMembroTupal({nome: "", aniversario: null});
+}
+
+function editarMembroTupal(idx) {
+  state.editMembroTupalIdx = idx;
+  abrirEditorMembroTupal(state.membrosTupal[idx]);
+}
+
+function removerMembroTupal(idx) {
+  const m = state.membrosTupal[idx];
+  if (!confirm(`Remover ${m.nome} da lista TUPAL?`)) return;
+  state.membrosTupal.splice(idx, 1);
+  salvarMembrosTupal();
+  render();
+}
+
+function abrirEditorMembroTupal(m) {
+  const opcoesDia = ['<option value="">--</option>']
+    .concat(Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`))
+    .join('');
+  const mesesNome = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const opcoesMes = ['<option value="">--</option>']
+    .concat(mesesNome.map((nome, i) => `<option value="${i+1}">${nome}</option>`))
+    .join('');
+
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharEditorMembroTupal()">
+    <div class="modal">
+      <h2>${state.editMembroTupalIdx === -1 ? 'Novo membro TUPAL' : 'Editar membro TUPAL'}</h2>
+      <div class="form-group">
+        <label>Nome</label>
+        <input id="ed-mt-nome" type="text" value="${m.nome.replace(/"/g,'&quot;')}" placeholder="Nome do membro">
+      </div>
+      <div class="form-group">
+        <label>🎂 Aniversário (opcional)</label>
+        <div class="form-row" style="grid-template-columns: 100px 1fr;">
+          <select id="ed-mt-dia">${opcoesDia}</select>
+          <select id="ed-mt-mes">${opcoesMes}</select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharEditorMembroTupal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarMembroTupalEditor()">Salvar</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
+  document.getElementById('ed-mt-dia').value = (m.aniversario && m.aniversario.dia) || '';
+  document.getElementById('ed-mt-mes').value = (m.aniversario && m.aniversario.mes) || '';
+}
+
+function salvarMembroTupalEditor() {
+  const nome = document.getElementById('ed-mt-nome').value.trim();
+  if (!nome) {
+    alert('Nome é obrigatório');
+    return;
+  }
+  const dia = parseInt(document.getElementById('ed-mt-dia').value) || null;
+  const mes = parseInt(document.getElementById('ed-mt-mes').value) || null;
+  const aniversario = (dia && mes) ? { dia, mes } : null;
+  const m = { nome, aniversario };
+
+  if (state.editMembroTupalIdx === -1) state.membrosTupal.push(m);
+  else state.membrosTupal[state.editMembroTupalIdx] = m;
+  salvarMembrosTupal();
+  state.editMembroTupalIdx = null;
+  document.getElementById('modal-container').innerHTML = '';
+  render();
+}
+
+function fecharEditorMembroTupal() {
+  state.editMembroTupalIdx = null;
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+function exportarMembrosTupalJSON() {
+  const data = {
+    atualizado_em: new Date().toISOString(),
+    total: state.membrosTupal.length,
+    membros: state.membrosTupal
+  };
+  const json = JSON.stringify(data, null, 2);
+
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharExportar()">
+    <div class="modal" style="max-width: 600px;">
+      <h2>📤 Exportar TUPAL para GitHub</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 12px;">
+        Copie e cole no arquivo <strong>membros_tupal.json</strong> do repositório no GitHub.
+      </p>
+      <textarea id="export-textarea" readonly style="width:100%; height:300px; font-family: monospace; font-size:11px; padding:10px; background: var(--card-solid); color: var(--text); border: 1px solid var(--border); border-radius: 8px; resize: vertical;">${json.replace(/</g,'&lt;')}</textarea>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharExportar()">Fechar</button>
+        <button class="btn btn-primary" onclick="copiarExportado()">📋 Copiar tudo</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
 }
 
 // ========================================================================
