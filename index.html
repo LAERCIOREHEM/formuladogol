@@ -754,6 +754,170 @@
     .resultados-filtro { width: 100%; }
     .select-filtro { flex: 1; }
   }
+
+  /* BANNER DE ANIVERSÁRIO */
+  .banner-aniversario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(244,114,182,0.18), rgba(251,191,36,0.15));
+    border: 1px solid rgba(244,114,182,0.5);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text);
+    flex-wrap: wrap;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .banner-aniversario strong { color: #f472b6; }
+  .banner-icone {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .banner-link {
+    margin-left: auto;
+    background: rgba(244,114,182,0.25);
+    color: #f472b6;
+    border: 1px solid rgba(244,114,182,0.5);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .banner-link:hover {
+    background: rgba(244,114,182,0.35);
+  }
+  @media (max-width: 720px) {
+    .banner-aniversario { font-size: 12px; padding: 8px 10px; }
+    .banner-link { margin-left: 0; width: 100%; text-align: center; margin-top: 4px; }
+  }
+
+  /* ABA ANIVERSARIANTES */
+  .aniv-hoje {
+    background: linear-gradient(135deg, rgba(244,114,182,0.18), rgba(251,191,36,0.12));
+    border: 1px solid rgba(244,114,182,0.5);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 16px 0;
+  }
+  .aniv-hoje-titulo {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f472b6;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .aniv-hoje-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(244,114,182,0.10);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .aniv-hoje-card:last-child { margin-bottom: 0; }
+  .aniv-hoje-nome {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .aniv-link-zap {
+    background: rgba(74,222,128,0.18);
+    color: var(--accent);
+    border: 1px solid rgba(74,222,128,0.4);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .aniv-link-zap:hover { background: rgba(74,222,128,0.28); }
+
+  .aniv-mes {
+    margin-top: 16px;
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .aniv-mes-atual {
+    border-left: 3px solid var(--accent);
+  }
+  .aniv-mes-sem-data {
+    border-left: 3px solid var(--text-tertiary);
+    opacity: 0.7;
+  }
+  .aniv-mes-header {
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+  }
+  .aniv-mes-atual .aniv-mes-header {
+    color: var(--accent);
+    background: rgba(74,222,128,0.06);
+  }
+  .aniv-mes-lista {
+    display: flex;
+    flex-direction: column;
+  }
+  .aniv-item {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .aniv-item:last-child { border-bottom: none; }
+  .aniv-item:hover { background: rgba(255,255,255,0.02); }
+  .aniv-item-hoje {
+    background: rgba(244,114,182,0.08);
+  }
+  .aniv-item-hoje .aniv-nome { color: #f472b6; font-weight: 600; }
+  .aniv-item-sem-data .aniv-data { color: var(--text-tertiary); }
+  .aniv-item-sem-data .aniv-nome { color: var(--text-tertiary); }
+  .aniv-data {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .aniv-nome {
+    font-size: 14px;
+    color: var(--text);
+  }
+  .aniv-link-zap-pequeno {
+    text-decoration: none;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .aniv-link-zap-pequeno:hover {
+    background: rgba(74,222,128,0.15);
+  }
+  @media (max-width: 720px) {
+    .aniv-item { grid-template-columns: 50px 1fr auto; gap: 6px; padding: 8px 10px; }
+    .aniv-data { font-size: 12px; }
+    .aniv-nome { font-size: 13px; }
+    .aniv-hoje-nome { font-size: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -768,6 +932,7 @@
       <button onclick="setView('tabela')" id="btn-tabela">Brasileirão</button>
       <button onclick="setView('jogos')" id="btn-jogos">Próximos Jogos</button>
       <button onclick="setView('resultados')" id="btn-resultados">Resultados</button>
+      <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversariantes</button>
       <button onclick="adminAction()" id="btn-admin">Admin</button>
     </div>
   </header>
@@ -780,6 +945,7 @@
   <div id="view-tabela" style="display: none;"></div>
   <div id="view-jogos" style="display: none;"></div>
   <div id="view-resultados" style="display: none;"></div>
+  <div id="view-aniversariantes" style="display: none;"></div>
   <div id="view-participantes" style="display: none;"></div>
 </div>
 
@@ -826,16 +992,52 @@ const PARTICIPANTES_INICIAIS = [
 const TIMES_LISTA = ["Athletico-PR","Atlético-MG","Bahia","Botafogo","Bragantino","Chapecoense","Corinthians","Coritiba","Cruzeiro","Flamengo","Fluminense","Grêmio","Internacional","Mirassol","Palmeiras","Remo","Santos","São Paulo","Vasco da Gama","Vitória"];
 
 // ========================================================================
+// MEMBROS DO GRUPO — 27 pessoas, com data de aniversário (dia/mês)
+// Lista pré-cadastrada. As datas serão preenchidas no Admin pelo usuário.
+// ========================================================================
+const MEMBROS_INICIAIS = [
+  {nome: "Antônio",                  aniversario: null},
+  {nome: "Alexandre Melillo Lopes",  aniversario: null},
+  {nome: "Jardim",                   aniversario: null},
+  {nome: "Jovail Vilela",            aniversario: null},
+  {nome: "Leonardo Farias",          aniversario: null},
+  {nome: "Luiz Henrique de Barros",  aniversario: null},
+  {nome: "Max",                      aniversario: null},
+  {nome: "Roberto Amorim",           aniversario: null},
+  {nome: "Uélito Borboleta",         aniversario: null},
+  {nome: "Wlamir Silva",             aniversario: null},
+  {nome: "Armínio TUPAL",            aniversario: null},
+  {nome: "Augusto TUPAL",            aniversario: null},
+  {nome: "Dario Araujo",             aniversario: null},
+  {nome: "Érica",                    aniversario: null},
+  {nome: "Marco Lopes",              aniversario: null},
+  {nome: "Marco Torres",             aniversario: null},
+  {nome: "Marcos Eduardo de Carvalho", aniversario: null},
+  {nome: "Roberto Monteiro",         aniversario: null},
+  {nome: "Rodrigo TUPAL",            aniversario: null},
+  {nome: "Rubens Mazer",             aniversario: null},
+  {nome: "Wellington Papa",          aniversario: null},
+  {nome: "Zaqueu SUMPE",             aniversario: null},
+  {nome: "Carlinhos",                aniversario: null},
+  {nome: "José Renato - ZeGrande",   aniversario: null},
+  {nome: "Marcio Vantil",            aniversario: null},
+  {nome: "Marcus Gaze",              aniversario: null},
+  {nome: "Sérgio Nogueira",          aniversario: null}
+];
+
+// ========================================================================
 // ESTADO
 // ========================================================================
 let state = {
   tabela: [],          // [{ pos, time, pontos, jogos, vitorias, empates, derrotas, gp, gc, sg, aproveitamento }]
   participantes: [],
+  membros: [],         // 27 membros do grupo (cada um: { nome, aniversario: { dia, mes } | null })
   ultimaAtualizacao: null,
   ehAdmin: false,
   view: 'rank',
   expandido: null,
   editIdx: null,
+  editMembroIdx: null,
   // Próximos jogos (preenchido sob demanda)
   jogos: [],
   jogosMeta: null,       // { atualizado_em_br, fonte, rodada_atual, ... }
@@ -860,6 +1062,16 @@ function carregarParticipantes() {
   const s = localStorage.getItem('bolao_participantes');
   if (s) {
     try { state.participantes = JSON.parse(s); return true; } catch(e) {}
+  }
+  return false;
+}
+function salvarMembros() {
+  localStorage.setItem('bolao_membros', JSON.stringify(state.membros));
+}
+function carregarMembros() {
+  const s = localStorage.getItem('bolao_membros');
+  if (s) {
+    try { state.membros = JSON.parse(s); return true; } catch(e) {}
   }
   return false;
 }
@@ -980,6 +1192,14 @@ async function inicializar() {
     state.participantes = JSON.parse(JSON.stringify(PARTICIPANTES_INICIAIS));
     salvarParticipantes();
   }
+  // 1b. Membros do grupo: tenta carregar membros.json do servidor primeiro,
+  // depois localStorage, depois lista padrão.
+  if (!carregarMembros()) {
+    state.membros = JSON.parse(JSON.stringify(MEMBROS_INICIAIS));
+    salvarMembros();
+  }
+  // Carregamento assíncrono do membros.json do servidor (atualiza se for mais novo)
+  carregarMembrosDoServidor();
 
   // 2. Fonte de verdade: sempre buscar o tabela.json do servidor ao abrir a página.
   // O cache local só é usado como plano B se a busca falhar.
@@ -1213,8 +1433,9 @@ function render() {
   document.getElementById('view-tabela').style.display = v === 'tabela' ? 'block' : 'none';
   document.getElementById('view-jogos').style.display = v === 'jogos' ? 'block' : 'none';
   document.getElementById('view-resultados').style.display = v === 'resultados' ? 'block' : 'none';
+  document.getElementById('view-aniversariantes').style.display = v === 'aniversariantes' ? 'block' : 'none';
   document.getElementById('view-participantes').style.display = v === 'participantes' ? 'block' : 'none';
-  ['rank','tabela','jogos','resultados','admin'].forEach(k => {
+  ['rank','tabela','jogos','resultados','aniversariantes','admin'].forEach(k => {
     const b = document.getElementById('btn-' + k);
     if (b) b.classList.toggle('active', v === k);
   });
@@ -1222,6 +1443,7 @@ function render() {
   else if (v === 'tabela') renderTabela();
   else if (v === 'jogos') renderJogos();
   else if (v === 'resultados') renderResultados();
+  else if (v === 'aniversariantes') renderAniversariantes();
   else if (v === 'participantes') renderParticipantes();
   // Botão de admin
   const btnAdmin = document.getElementById('btn-admin');
@@ -1230,11 +1452,9 @@ function render() {
 
 function setView(v) {
   state.view = v;
-  // Carrega jogos.json sob demanda quando entra na aba pela primeira vez
   if (v === 'jogos' && !state.jogosCarregados) {
     carregarJogos();
   }
-  // Carrega resultados.json sob demanda
   if (v === 'resultados' && !state.resultadosCarregados) {
     carregarResultados();
   }
@@ -1749,7 +1969,7 @@ function renderResultados() {
 }
 
 function renderParticipantes() {
-  let html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><h2 style="font-size:16px; font-weight:600;">Gerenciar participantes</h2><button class="btn btn-primary" onclick="novoParticipante()">+ Adicionar</button></div>';
+  let html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><h2 style="font-size:16px; font-weight:600;">⚽ Participantes do bolão (' + state.participantes.length + ')</h2><button class="btn btn-primary" onclick="novoParticipante()">+ Adicionar</button></div>';
   html += '<div class="card"><table><thead><tr><th>Nome</th><th>Time Coração</th><th>Time que cai</th><th style="text-align:right;">Total</th><th style="width:140px;"></th></tr></thead><tbody>';
   state.participantes.forEach((p, i) => {
     const { total } = calcular(p);
@@ -1765,6 +1985,8 @@ function renderParticipantes() {
     </tr>`;
   });
   html += '</tbody></table></div>';
+  // Subsessão de membros do grupo (27 nomes pra aniversários)
+  html += renderMembrosAdmin();
   document.getElementById('view-participantes').innerHTML = html;
 }
 
@@ -1821,6 +2043,13 @@ function removerParticipante(idx) {
 function abrirEditor(p) {
   const opcoesTime = TIMES_LISTA.map(t => `<option value="${t}">${t}</option>`).join('');
   const opcoesPos = Array.from({length:20}, (_,i) => `<option value="${i+1}">${i+1}º</option>`).join('');
+  const opcoesDia = ['<option value="">--</option>']
+    .concat(Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`))
+    .join('');
+  const mesesNome = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const opcoesMes = ['<option value="">--</option>']
+    .concat(mesesNome.map((nome, i) => `<option value="${i+1}">${nome}</option>`))
+    .join('');
 
   let html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharEditor()">
     <div class="modal">
@@ -1828,6 +2057,13 @@ function abrirEditor(p) {
       <div class="form-group">
         <label>Nome</label>
         <input id="ed-nome" type="text" value="${p.nome.replace(/"/g,'&quot;')}" placeholder="Nome do participante">
+      </div>
+      <div class="form-group">
+        <label>🎂 Aniversário (opcional)</label>
+        <div class="form-row" style="grid-template-columns: 100px 1fr;">
+          <select id="ed-aniv-dia">${opcoesDia}</select>
+          <select id="ed-aniv-mes">${opcoesMes}</select>
+        </div>
       </div>
       <div class="form-group">
         <label>❤️ Time Coração (acertar exato = +12 pts)</label>
@@ -1858,6 +2094,8 @@ function abrirEditor(p) {
   document.getElementById('modal-container').innerHTML = html;
   document.getElementById('ed-cor-time').value = p.coracao.time;
   document.getElementById('ed-cor-palp').value = p.coracao.palpite;
+  document.getElementById('ed-aniv-dia').value = (p.aniversario && p.aniversario.dia) || '';
+  document.getElementById('ed-aniv-mes').value = (p.aniversario && p.aniversario.mes) || '';
   for (let k = 0; k < 5; k++) {
     document.getElementById(`ed-t${k}-time`).value = p.times[k].time;
     document.getElementById(`ed-t${k}-palp`).value = p.times[k].palpite;
@@ -1866,6 +2104,10 @@ function abrirEditor(p) {
 }
 
 function salvarEditor() {
+  const aniDia = parseInt(document.getElementById('ed-aniv-dia').value) || null;
+  const aniMes = parseInt(document.getElementById('ed-aniv-mes').value) || null;
+  const aniversario = (aniDia && aniMes) ? { dia: aniDia, mes: aniMes } : null;
+
   const p = {
     nome: document.getElementById('ed-nome').value.trim() || 'Sem nome',
     coracao: {
@@ -1873,7 +2115,8 @@ function salvarEditor() {
       palpite: parseInt(document.getElementById('ed-cor-palp').value)
     },
     times: [],
-    cai: document.getElementById('ed-cai').value
+    cai: document.getElementById('ed-cai').value,
+    aniversario: aniversario
   };
   for (let k = 0; k < 5; k++) {
     p.times.push({
@@ -1895,9 +2138,410 @@ function fecharEditor() {
 }
 
 // ========================================================================
+// ANIVERSÁRIOS — pop-up e banner do dia
+// ========================================================================
+async function carregarMembrosDoServidor() {
+  // Tenta baixar membros.json do servidor.
+  // Se sucesso e for diferente do localStorage, atualiza.
+  try {
+    const resp = await fetch('membros.json?t=' + Date.now());
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const membros = Array.isArray(data.membros) ? data.membros : null;
+    if (!membros || membros.length === 0) return;
+    // Substitui se for diferente
+    if (JSON.stringify(membros) !== JSON.stringify(state.membros)) {
+      state.membros = membros;
+      salvarMembros();
+      // Re-renderiza banner e pop-up se aplicável
+      try {
+        mostrarPopupAniversario();
+      } catch (e) {}
+    }
+  } catch (e) {
+    // Sem problema, segue com a lista do localStorage / padrão
+  }
+}
+
+function aniversariantesDeHoje() {
+  // Usa fuso de Brasília pra pegar o dia correto
+  const fmt = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit', month: '2-digit'
+  });
+  const partes = fmt.formatToParts(new Date());
+  const obj = {};
+  for (const p of partes) if (p.type !== 'literal') obj[p.type] = p.value;
+  const diaHoje = parseInt(obj.day);
+  const mesHoje = parseInt(obj.month);
+
+  return state.membros.filter(p =>
+    p.aniversario && p.aniversario.dia === diaHoje && p.aniversario.mes === mesHoje
+  );
+}
+
+function linkWhatsAppParabens(nome) {
+  const msg = `Parabéns, ${nome}! Tudo de bom no seu dia! 🎂`;
+  return `https://wa.me/?text=${encodeURIComponent(msg)}`;
+}
+
+function mostrarPopupAniversario() {
+  const aniversariantes = aniversariantesDeHoje();
+  if (aniversariantes.length === 0) return;
+
+  // Verifica se já mostrou o pop-up hoje (pra não saturar quem fica abrindo o site)
+  const fmt = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit', year:'numeric'
+  });
+  const partes = fmt.formatToParts(new Date());
+  const obj = {};
+  for (const p of partes) if (p.type !== 'literal') obj[p.type] = p.value;
+  const hojeChave = `${obj.year}-${obj.month}-${obj.day}`;
+  const jaMostrado = localStorage.getItem('popup_aniv_data');
+  if (jaMostrado === hojeChave) {
+    // Já mostrou hoje; só renderiza o banner discreto
+    renderBannerAniversario(aniversariantes);
+    return;
+  }
+
+  // Monta o conteúdo do modal
+  let conteudo = '<div style="text-align: center; padding: 8px 4px;">';
+  conteudo += '<div style="font-size: 48px; margin-bottom: 8px;">🎂</div>';
+  conteudo += '<h2 style="font-size: 22px; font-weight: 700; margin-bottom: 12px;">Hoje é aniversário!</h2>';
+
+  for (const p of aniversariantes) {
+    conteudo += `<div style="background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.4); border-radius: 10px; padding: 14px; margin-bottom: 10px;">`;
+    conteudo += `<div style="font-size: 20px; font-weight: 600; color: #f472b6; margin-bottom: 8px;">${p.nome}</div>`;
+    conteudo += `<a href="${linkWhatsAppParabens(p.nome)}" target="_blank" rel="noopener" class="btn btn-primary" style="display: inline-block; padding: 8px 16px; text-decoration: none; font-size: 14px;">📱 Mandar parabéns no WhatsApp</a>`;
+    conteudo += `</div>`;
+  }
+  conteudo += '<button class="btn" onclick="fecharPopupAniversario()" style="margin-top: 8px; padding: 8px 20px;">Fechar</button>';
+  conteudo += '</div>';
+
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharPopupAniversario()">
+    <div class="modal" style="max-width: 460px;">${conteudo}</div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
+
+  // Marca como mostrado hoje
+  localStorage.setItem('popup_aniv_data', hojeChave);
+
+  // Também renderiza o banner permanente
+  renderBannerAniversario(aniversariantes);
+}
+
+function fecharPopupAniversario() {
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+function renderBannerAniversario(aniversariantes) {
+  // Renderiza banner permanente no topo do site (acima da status-bar)
+  const containerExistente = document.getElementById('banner-aniversario');
+  if (containerExistente) containerExistente.remove();
+
+  if (!aniversariantes || aniversariantes.length === 0) return;
+
+  const div = document.createElement('div');
+  div.id = 'banner-aniversario';
+  div.className = 'banner-aniversario';
+
+  let html = '<span class="banner-icone">🎂</span>';
+  if (aniversariantes.length === 1) {
+    const p = aniversariantes[0];
+    html += `<span>Hoje é aniversário de <strong>${p.nome}</strong></span>`;
+    html += `<a href="${linkWhatsAppParabens(p.nome)}" target="_blank" rel="noopener" class="banner-link">Parabenizar 📱</a>`;
+  } else {
+    const nomes = aniversariantes.map(p => p.nome).join(', ');
+    html += `<span>Hoje fazem aniversário: <strong>${nomes}</strong></span>`;
+    html += `<button onclick="abrirPopupAniversarioForcado()" class="banner-link">Ver todos</button>`;
+  }
+  div.innerHTML = html;
+
+  const statusBar = document.getElementById('status-bar');
+  statusBar.parentNode.insertBefore(div, statusBar);
+}
+
+function abrirPopupAniversarioForcado() {
+  // Força a abertura do pop-up mesmo já tendo sido fechado hoje
+  localStorage.removeItem('popup_aniv_data');
+  mostrarPopupAniversario();
+}
+
+// ========================================================================
+// ABA ANIVERSARIANTES — lista completa, separada por mês
+// ========================================================================
+function renderAniversariantes() {
+  const container = document.getElementById('view-aniversariantes');
+
+  // Mês atual em Brasília
+  const fmt = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit'
+  });
+  const partes = fmt.formatToParts(new Date());
+  const obj = {};
+  for (const p of partes) if (p.type !== 'literal') obj[p.type] = p.value;
+  const diaHoje = parseInt(obj.day);
+  const mesAtual = parseInt(obj.month);
+
+  const mesesNome = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+
+  // Agrupa membros por mês (só os que têm aniversário cadastrado)
+  const porMes = {};
+  const semData = [];
+  for (const m of state.membros) {
+    if (m.aniversario && m.aniversario.dia && m.aniversario.mes) {
+      const mes = m.aniversario.mes;
+      if (!porMes[mes]) porMes[mes] = [];
+      porMes[mes].push(m);
+    } else {
+      semData.push(m);
+    }
+  }
+
+  // Ordena por dia dentro de cada mês
+  for (const mes in porMes) {
+    porMes[mes].sort((a,b) => a.aniversario.dia - b.aniversario.dia);
+  }
+
+  // Ordem dos meses começando pelo mês atual
+  const ordemMeses = [];
+  for (let i = 0; i < 12; i++) {
+    const mes = ((mesAtual - 1 + i) % 12) + 1;
+    ordemMeses.push(mes);
+  }
+
+  // Header
+  let html = '<div class="secao-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">';
+  html += `<h2 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin: 0;">Aniversariantes · ${state.membros.length} membros</h2>`;
+  html += '</div>';
+
+  // Aniversariantes de hoje (destaque)
+  const hoje = state.membros.filter(m =>
+    m.aniversario && m.aniversario.dia === diaHoje && m.aniversario.mes === mesAtual
+  );
+  if (hoje.length > 0) {
+    html += '<div class="aniv-hoje">';
+    html += '<div class="aniv-hoje-titulo">🎂 HOJE</div>';
+    for (const m of hoje) {
+      html += `<div class="aniv-hoje-card">`;
+      html += `<span class="aniv-hoje-nome">${m.nome}</span>`;
+      html += `<a href="${linkWhatsAppParabens(m.nome)}" target="_blank" rel="noopener" class="aniv-link-zap">📱 Parabenizar</a>`;
+      html += `</div>`;
+    }
+    html += '</div>';
+  }
+
+  // Lista por mês
+  for (const mes of ordemMeses) {
+    const lista = porMes[mes] || [];
+    if (lista.length === 0) continue;
+    const ehMesAtual = mes === mesAtual;
+    html += `<div class="aniv-mes ${ehMesAtual ? 'aniv-mes-atual' : ''}">`;
+    html += `<div class="aniv-mes-header">${mesesNome[mes-1]}${ehMesAtual ? ' · Mês atual' : ''}</div>`;
+    html += '<div class="aniv-mes-lista">';
+    for (const m of lista) {
+      const ehHoje = ehMesAtual && m.aniversario.dia === diaHoje;
+      const dia = String(m.aniversario.dia).padStart(2, '0');
+      const mesFmt = String(m.aniversario.mes).padStart(2, '0');
+      html += `<div class="aniv-item ${ehHoje ? 'aniv-item-hoje' : ''}">`;
+      html += `<span class="aniv-data">${dia}/${mesFmt}</span>`;
+      html += `<span class="aniv-nome">${m.nome}</span>`;
+      html += `<a href="${linkWhatsAppParabens(m.nome)}" target="_blank" rel="noopener" class="aniv-link-zap-pequeno" title="Parabenizar no WhatsApp">📱</a>`;
+      html += `</div>`;
+    }
+    html += '</div></div>';
+  }
+
+  // Sem data cadastrada
+  if (semData.length > 0) {
+    html += `<div class="aniv-mes aniv-mes-sem-data">`;
+    html += `<div class="aniv-mes-header">SEM DATA CADASTRADA · ${semData.length} membro(s)</div>`;
+    html += '<div class="aniv-mes-lista">';
+    for (const m of semData) {
+      html += `<div class="aniv-item aniv-item-sem-data">`;
+      html += `<span class="aniv-data">—</span>`;
+      html += `<span class="aniv-nome">${m.nome}</span>`;
+      html += `</div>`;
+    }
+    html += '</div></div>';
+  }
+
+  if (state.membros.length === 0) {
+    html += '<div class="card empty">Nenhum membro cadastrado ainda. Use a aba Admin pra adicionar.</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ========================================================================
+// ADMIN — MEMBROS DO GRUPO
+// ========================================================================
+function renderMembrosAdmin() {
+  // Renderiza a lista de membros DENTRO da view-participantes (Admin)
+  // Retorna HTML para ser concatenado
+  let html = '<div style="display:flex; justify-content:space-between; align-items:center; margin: 24px 0 12px;">';
+  html += '<h2 style="font-size:16px; font-weight:600;">🎂 Membros do grupo (' + state.membros.length + ')</h2>';
+  html += '<div style="display:flex; gap:8px;">';
+  html += '<button class="btn" onclick="exportarMembrosJSON()" title="Gera o JSON pra colar no GitHub">📤 Exportar JSON</button>';
+  html += '<button class="btn btn-primary" onclick="novoMembro()">+ Adicionar</button>';
+  html += '</div></div>';
+
+  html += '<div class="card"><table><thead><tr>';
+  html += '<th>Nome</th><th style="text-align:center; width:120px;">Aniversário</th><th style="width:160px;"></th>';
+  html += '</tr></thead><tbody>';
+
+  state.membros.forEach((m, i) => {
+    const dataFmt = (m.aniversario && m.aniversario.dia)
+      ? `${String(m.aniversario.dia).padStart(2,'0')}/${String(m.aniversario.mes).padStart(2,'0')}`
+      : '<span style="color: var(--text-tertiary);">— não cadastrado —</span>';
+    html += `<tr>`;
+    html += `<td>${m.nome}</td>`;
+    html += `<td style="text-align:center;">${dataFmt}</td>`;
+    html += `<td style="text-align:right;">`;
+    html += `<button class="btn" style="padding:4px 10px; font-size:12px;" onclick="editarMembro(${i})">Editar</button> `;
+    html += `<button class="btn" style="padding:4px 10px; font-size:12px; color: var(--danger);" onclick="removerMembro(${i})">Remover</button>`;
+    html += `</td>`;
+    html += `</tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function novoMembro() {
+  state.editMembroIdx = -1;
+  abrirEditorMembro({nome: "", aniversario: null});
+}
+
+function editarMembro(idx) {
+  state.editMembroIdx = idx;
+  abrirEditorMembro(state.membros[idx]);
+}
+
+function removerMembro(idx) {
+  const m = state.membros[idx];
+  if (!confirm(`Remover ${m.nome} da lista de membros?`)) return;
+  state.membros.splice(idx, 1);
+  salvarMembros();
+  render();
+}
+
+function abrirEditorMembro(m) {
+  const opcoesDia = ['<option value="">--</option>']
+    .concat(Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`))
+    .join('');
+  const mesesNome = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const opcoesMes = ['<option value="">--</option>']
+    .concat(mesesNome.map((nome, i) => `<option value="${i+1}">${nome}</option>`))
+    .join('');
+
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharEditorMembro()">
+    <div class="modal">
+      <h2>${state.editMembroIdx === -1 ? 'Novo membro' : 'Editar membro'}</h2>
+      <div class="form-group">
+        <label>Nome</label>
+        <input id="ed-membro-nome" type="text" value="${m.nome.replace(/"/g,'&quot;')}" placeholder="Nome do membro">
+      </div>
+      <div class="form-group">
+        <label>🎂 Aniversário (opcional)</label>
+        <div class="form-row" style="grid-template-columns: 100px 1fr;">
+          <select id="ed-membro-dia">${opcoesDia}</select>
+          <select id="ed-membro-mes">${opcoesMes}</select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharEditorMembro()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarMembroEditor()">Salvar</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
+  document.getElementById('ed-membro-dia').value = (m.aniversario && m.aniversario.dia) || '';
+  document.getElementById('ed-membro-mes').value = (m.aniversario && m.aniversario.mes) || '';
+}
+
+function salvarMembroEditor() {
+  const nome = document.getElementById('ed-membro-nome').value.trim();
+  if (!nome) {
+    alert('Nome é obrigatório');
+    return;
+  }
+  const dia = parseInt(document.getElementById('ed-membro-dia').value) || null;
+  const mes = parseInt(document.getElementById('ed-membro-mes').value) || null;
+  const aniversario = (dia && mes) ? { dia, mes } : null;
+  const m = { nome, aniversario };
+
+  if (state.editMembroIdx === -1) state.membros.push(m);
+  else state.membros[state.editMembroIdx] = m;
+  salvarMembros();
+  state.editMembroIdx = null;
+  document.getElementById('modal-container').innerHTML = '';
+  render();
+}
+
+function fecharEditorMembro() {
+  state.editMembroIdx = null;
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+function exportarMembrosJSON() {
+  const data = {
+    atualizado_em: new Date().toISOString(),
+    total: state.membros.length,
+    membros: state.membros
+  };
+  const json = JSON.stringify(data, null, 2);
+
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharExportar()">
+    <div class="modal" style="max-width: 600px;">
+      <h2>📤 Exportar membros para GitHub</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 12px;">
+        Copie o conteúdo abaixo e cole no arquivo <strong>membros.json</strong> do repositório no GitHub.
+        Isso é necessário para que o robô do email saiba quem faz aniversário.
+      </p>
+      <textarea id="export-textarea" readonly style="width:100%; height:300px; font-family: monospace; font-size:11px; padding:10px; background: var(--card-solid); color: var(--text); border: 1px solid var(--border); border-radius: 8px; resize: vertical;">${json.replace(/</g,'&lt;')}</textarea>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharExportar()">Fechar</button>
+        <button class="btn btn-primary" onclick="copiarExportado()">📋 Copiar tudo</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
+}
+
+function copiarExportado() {
+  const ta = document.getElementById('export-textarea');
+  ta.select();
+  ta.setSelectionRange(0, 99999);
+  try {
+    navigator.clipboard.writeText(ta.value);
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  } catch (e) {
+    document.execCommand('copy');
+    alert('Texto copiado!');
+  }
+}
+
+function fecharExportar() {
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+// ========================================================================
 // INICIALIZAÇÃO
 // ========================================================================
 inicializar();
+
+// Verifica aniversariantes do dia após inicialização
+setTimeout(() => {
+  try {
+    mostrarPopupAniversario();
+  } catch (e) {
+    console.error('Erro ao verificar aniversariantes:', e);
+  }
+}, 800);
 </script>
 </body>
 </html>
