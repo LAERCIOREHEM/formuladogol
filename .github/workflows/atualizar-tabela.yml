@@ -17,9 +17,16 @@ permissions:
 # Concurrency GLOBAL do repositorio: apenas UMA execucao
 # de QUALQUER workflow de atualizacao roda por vez.
 # Isso evita conflitos de git push entre workflows diferentes.
+#
+# cancel-in-progress: true
+#   -> Se um novo trigger chegar enquanto outro esta rodando,
+#      o que esta rodando e cancelado e o novo comeca.
+#   -> Evita o erro "No jobs were run" causado por filas longas.
+#   -> O retry do git push (5 tentativas) cobre o caso raro de
+#      cancelamento durante o push.
 concurrency:
   group: bolao-brasileirao-write
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   atualizar:
