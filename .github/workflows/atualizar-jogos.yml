@@ -1,15 +1,13 @@
-name: Atualizar proximos jogos
+name: Atualizar próximos jogos
 
 on:
-  # Roda 2x ao dia: 09:23 e 21:23 UTC (06:23 e 18:23 Brasilia).
-  # Calendario de jogos eh estavel; nao precisa rodar com frequencia alta.
+  # Roda 2x por dia: 09:23 e 21:23 BRT (12:23 e 00:23 UTC)
   schedule:
-    - cron: '23 9,21 * * *'
+    - cron: '23 12 * * *'
+    - cron: '23 0 * * *'
 
-  # Permite rodar manualmente
   workflow_dispatch:
 
-  # Roda tambem quando o script ou workflow forem alterados
   push:
     paths:
       - 'atualizar_jogos.py'
@@ -18,15 +16,16 @@ on:
 permissions:
   contents: write
 
-# Concurrency GLOBAL do repositorio: compartilha grupo com os outros workflows
-# de escrita, garantindo que apenas UM rode por vez.
+# Mesmo concurrency group dos outros workflows que escrevem no repo.
+# cancel-in-progress: true evita o erro "No jobs were run" quando varios
+# triggers chegam proximos uns dos outros.
 concurrency:
   group: bolao-brasileirao-write
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   atualizar:
-    name: Buscar proximos jogos e publicar jogos.json
+    name: Buscar próximos jogos e publicar jogos.json
     runs-on: ubuntu-latest
 
     steps:
@@ -59,7 +58,7 @@ jobs:
           fi
           echo "jogos.json gerado com sucesso."
           echo "Primeiras linhas:"
-          head -n 30 jogos.json
+          head -n 20 jogos.json
 
       - name: Commitar jogos.json com retry
         run: |
