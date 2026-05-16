@@ -1,15 +1,12 @@
-name: Atualizar resultados
+name: Atualizar resultados do Brasileirão
 
 on:
-  # Roda 1x ao dia: 09:33 UTC (06:33 Brasilia).
-  # Resultados de jogos passados nao mudam mais; 1x ao dia eh suficiente.
+  # Roda 1x por dia: 09:33 BRT (12:33 UTC)
   schedule:
-    - cron: '33 9 * * *'
+    - cron: '33 12 * * *'
 
-  # Permite rodar manualmente
   workflow_dispatch:
 
-  # Roda tambem quando o script ou workflow forem alterados
   push:
     paths:
       - 'atualizar_resultados.py'
@@ -18,11 +15,11 @@ on:
 permissions:
   contents: write
 
-# Concurrency GLOBAL do repositorio: compartilha grupo com os outros workflows
-# de escrita, garantindo que apenas UM rode por vez.
+# Mesmo concurrency group dos outros workflows que escrevem no repo.
+# cancel-in-progress: true evita o erro "No jobs were run".
 concurrency:
   group: bolao-brasileirao-write
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   atualizar:
@@ -54,11 +51,12 @@ jobs:
       - name: Conferir se resultados.json foi gerado
         run: |
           if [ ! -f resultados.json ]; then
-            echo "ERRO: resultados.json nao foi gerado"
+            echo "ERRO: resultados.json nao foi gerado pelo atualizar_resultados.py"
             exit 1
           fi
           echo "resultados.json gerado com sucesso."
-          echo "Tamanho: $(wc -c < resultados.json) bytes"
+          echo "Primeiras linhas:"
+          head -n 20 resultados.json
 
       - name: Commitar resultados.json com retry
         run: |
