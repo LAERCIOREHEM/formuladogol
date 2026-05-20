@@ -138,6 +138,10 @@ def enviar_email_resend(api_key, remetente, destinatario, assunto, html_corpo):
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
+            # User-Agent explicito: o Cloudflare que protege a API do Resend
+            # bloqueia o User-Agent padrao do urllib (erro 403 / code 1010).
+            "User-Agent": "BolaoBrasileirao2026/1.0 (+https://brasileirao2026almoco.com.br)",
+            "Accept": "application/json",
         },
         method="POST"
     )
@@ -203,7 +207,7 @@ def main():
     try:
         status, body = enviar_email_resend(api_key, remetente, destino, assunto, html_email)
         print(f"Status HTTP: {status}")
-        print(f"Resposta: {body[:300]}")
+        print(f"Resposta: {body[:500]}")
         if 200 <= status < 300:
             print("\nEmail enviado com sucesso!")
         else:
@@ -211,7 +215,13 @@ def main():
             sys.exit(1)
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace") if hasattr(e, "read") else ""
-        print(f"ERRO HTTP {e.code}: {body}")
+        print(f"ERRO HTTP {e.code}")
+        print(f"Cabecalhos da resposta: {dict(e.headers)}")
+        print(f"Corpo da resposta: {body[:800]}")
+        # Dica de diagnostico
+        if "1010" in body or e.code == 403:
+            print("\nDICA: erro 403/1010 costuma ser bloqueio do Cloudflare.")
+            print("Verifique se o User-Agent esta presente na requisicao.")
         sys.exit(1)
     except Exception as e:
         print(f"ERRO: {type(e).__name__}: {e}")
