@@ -1,0 +1,90 @@
+name: Atualizar resultados do Brasileirão
+
+on:
+  # Roda DE HORA EM HORA, no minuto 5 de cada hora.
+  # Assim, no maximo 1h depois de um jogo terminar, o resultado ja aparece
+  # na aba Resultados e o jogo some da aba Proximos Jogos.
+  schedule:
+    - cron: '5 * * * *'
+
+  workflow_dispatch:
+
+  push:
+    paths:
+      - 'atualizar_resultados.py'
+      - '.github/workflows/atualizar-resultados.yml'
+
+permissions:
+  contents: write
+
+# Mesmo concurrency group dos outros workflows que escrevem no repo.
+# cancel-in-progress: true evita o erro "No jobs were run".
+concurrency:
+  group: bolao-brasileirao-write
+  cancel-in-progress: true
+
+jobs:
+  atualizar:
+    name: Buscar resultados e publicar resultados.json
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Mostrar horario da execucao
+        run: |
+          echo "Horario UTC:"
+          date -u '+%d/%m/%Y %H:%M:%S UTC'
+          echo "Horario Brasilia:"
+          TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
+
+      - name: Buscar resultados e gerar resultados.json
+        run: python atualizar_resultados.py
+
+      - name: Conferir se resultados.json foi gerado
+        run: |
+          if [ ! -f resultados.json ]; then
+            echo "ERRO: resultados.json nao foi gerado pelo atualizar_resultados.py"
+            exit 1
+          fi
+          echo "resultados.json gerado com sucesso."
+          echo "Primeiras linhas:"
+          head -n 20 resultados.json
+
+      - name: Commitar resultados.json com retry
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add resultados.json
+
+          if git diff --staged --quiet; then
+            echo "Sem mudancas em resultados.json - nada a commitar."
+            exit 0
+          fi
+
+          git commit -m "Atualizar resultados.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+          MAX_TENTATIVAS=5
+          for tentativa in $(seq 1 $MAX_TENTATIVAS); do
+            echo "Tentativa $tentativa/$MAX_TENTATIVAS de push..."
+            if git push; then
+              echo "Push bem-sucedido na tentativa $tentativa."
+              exit 0
+            fi
+            echo "Push falhou. Fazendo pull --rebase e tentando de novo..."
+            git pull --rebase --autostash || true
+            sleep 3
+          done
+
+          echo "ERRO: Push falhou apos $MAX_TENTATIVAS tentativas."
+          exit 1
