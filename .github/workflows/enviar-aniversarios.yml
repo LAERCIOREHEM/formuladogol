@@ -3,7 +3,7 @@ name: Enviar email de aniversariantes
 on:
   # Roda todo dia as 11:00 UTC = 08:00 BRT
   schedule:
-    - cron: '0 11 * * *'
+    - cron: '0 3 * * *'
 
   # Permite rodar manualmente pra testar
   workflow_dispatch:
