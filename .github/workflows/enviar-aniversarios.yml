@@ -1,7 +1,7 @@
 name: Enviar email de aniversariantes
 
 on:
-  # Roda todo dia as 11:00 UTC = 08:00 BRT
+  # Roda todo dia as 6:00 UTC = 03:00 BRT
   schedule:
     - cron: '0 3 * * *'
 
