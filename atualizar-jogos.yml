@@ -1,13 +1,10 @@
 name: Atualizar próximos jogos
 
 on:
-  # Roda DE HORA EM HORA, no minuto 8 de cada hora.
-  # (8 min depois do workflow de resultados, pra evitar disputa)
-  # Assim que um jogo acaba e entra em Resultados, ele tambem some
-  # rapidamente da aba Proximos Jogos.
-  schedule:
-    - cron: '8 * * * *'
-
+  # Disparado pelo cron-job.org de hora em hora via API do GitHub.
+  # O cron interno do GitHub Actions foi REMOVIDO porque, em repositorios
+  # pequenos, ele atrasa muito ou pula execucoes. O cron-job.org dispara
+  # de forma pontual e confiavel.
   workflow_dispatch:
 
   push:
@@ -18,11 +15,12 @@ on:
 permissions:
   contents: write
 
-# Mesmo concurrency group dos outros workflows que escrevem no repo.
-# cancel-in-progress: true evita o erro "No jobs were run".
+# Grupo de concorrencia PROPRIO (separado dos outros workflows).
+# Assim o disparo da tabela/resultados NAO cancela este workflow.
+# O conflito de git push e tratado pelo retry de 5 tentativas mais abaixo.
 concurrency:
-  group: bolao-brasileirao-write
-  cancel-in-progress: true
+  group: bolao-jogos
+  cancel-in-progress: false
 
 jobs:
   atualizar:
@@ -31,13 +29,13 @@ jobs:
 
     steps:
       - name: Baixar repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: true
           fetch-depth: 0
 
       - name: Configurar Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 

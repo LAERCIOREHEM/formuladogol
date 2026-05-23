@@ -1,12 +1,10 @@
 name: Atualizar resultados do Brasileirão
 
 on:
-  # Roda DE HORA EM HORA, no minuto 5 de cada hora.
-  # Assim, no maximo 1h depois de um jogo terminar, o resultado ja aparece
-  # na aba Resultados e o jogo some da aba Proximos Jogos.
-  schedule:
-    - cron: '5 * * * *'
-
+  # Disparado pelo cron-job.org de hora em hora via API do GitHub.
+  # O cron interno do GitHub Actions foi REMOVIDO porque, em repositorios
+  # pequenos, ele atrasa muito ou pula execucoes (rodava ~1x/dia em vez
+  # de 1x/hora). O cron-job.org dispara de forma pontual e confiavel.
   workflow_dispatch:
 
   push:
@@ -17,11 +15,12 @@ on:
 permissions:
   contents: write
 
-# Mesmo concurrency group dos outros workflows que escrevem no repo.
-# cancel-in-progress: true evita o erro "No jobs were run".
+# Grupo de concorrencia PROPRIO (separado dos outros workflows).
+# Assim o disparo da tabela (a cada 15 min) NAO cancela este workflow.
+# O conflito de git push e tratado pelo retry de 5 tentativas mais abaixo.
 concurrency:
-  group: bolao-brasileirao-write
-  cancel-in-progress: true
+  group: bolao-resultados
+  cancel-in-progress: false
 
 jobs:
   atualizar:
@@ -30,13 +29,13 @@ jobs:
 
     steps:
       - name: Baixar repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           persist-credentials: true
           fetch-depth: 0
 
       - name: Configurar Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
