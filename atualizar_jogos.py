@@ -228,7 +228,10 @@ def extrair_transmissao(jogo):
 
 def tem_placar_definido(jogo):
     """
-    Retorna True se o jogo tem placar gravado (já foi disputado).
+    Retorna True se o jogo tem placar gravado.
+    ATENCAO: ter placar NAO significa que o jogo acabou — um jogo em
+    andamento ja tem placar (ex: 1x0 no primeiro tempo). Para saber se
+    o jogo realmente encerrou, use jogo_ja_encerrado().
     """
     placar = jogo.get("placar_oficial")
     if isinstance(placar, dict):
@@ -249,6 +252,90 @@ def tem_placar_definido(jogo):
             and v_equipe.get("placar_oficial") is not None):
         return True
 
+    return False
+
+
+# Tolerancia: tempo apos o INICIO do jogo a partir do qual consideramos
+# que ele certamente ja terminou. Um jogo de futebol dura ~2h com
+# intervalo, acrescimos e relatorio. 2h15 cobre com folga.
+# Antes desse tempo, o jogo (mesmo com placar parcial) continua
+# aparecendo em "Proximos Jogos" para o usuario saber que esta rolando.
+TOLERANCIA_FIM_JOGO = timedelta(hours=2, minutes=15)
+
+
+def parse_data_jogo(data_iso):
+    """
+    Converte a data ISO do jogo em datetime com fuso de Brasilia.
+    Retorna None se nao conseguir interpretar.
+    """
+    if not data_iso:
+        return None
+    txt = str(data_iso).strip()
+    # Formatos possiveis vindos da API
+    formatos = [
+        "%Y-%m-%dT%H:%M:%S%z",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%dT%H:%M",
+        "%Y-%m-%d %H:%M",
+        "%Y-%m-%d",
+    ]
+    # Normaliza 'Z' (UTC) para +00:00
+    txt_norm = txt.replace("Z", "+00:00")
+    for fmt in formatos:
+        try:
+            dt = datetime.strptime(txt_norm, fmt)
+            # Se veio sem fuso, assume horario de Brasilia
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=FUSO_BRASILIA)
+            return dt.astimezone(FUSO_BRASILIA)
+        except ValueError:
+            continue
+    # Tentativa final: fromisoformat
+    try:
+        dt = datetime.fromisoformat(txt_norm)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=FUSO_BRASILIA)
+        return dt.astimezone(FUSO_BRASILIA)
+    except (ValueError, TypeError):
+        return None
+
+
+def jogo_ja_encerrado(jogo_cru):
+    """
+    Decide se um jogo JA TERMINOU (e portanto deve sair de Proximos Jogos).
+
+    Regra:
+      - Se faz MAIS de 2h15 desde o inicio do jogo -> encerrado.
+      - Se o jogo ainda esta dentro da janela de 2h15 (em andamento
+        ou recem-acabado) -> NAO encerrado, continua em Proximos Jogos.
+      - Se nao tem placar nenhum -> nao comecou, continua em Proximos.
+      - Se nao foi possivel ler a data, cai no criterio antigo
+        (tem placar = considera encerrado) para nao travar a lista.
+    """
+    tem_placar = tem_placar_definido(jogo_cru)
+
+    # Sem placar: jogo nao comecou. Continua em Proximos Jogos.
+    if not tem_placar:
+        return False
+
+    # Tem placar: precisa saber ha quanto tempo o jogo comecou.
+    data_iso = extrair_data_iso(jogo_cru)
+    inicio_jogo = parse_data_jogo(data_iso)
+
+    if inicio_jogo is None:
+        # Nao deu pra ler a data: usa o criterio antigo (tem placar = encerrado).
+        return True
+
+    agora = agora_brasilia()
+    tempo_decorrido = agora - inicio_jogo
+
+    # Passou da janela de 2h15 desde o inicio -> jogo encerrado.
+    if tempo_decorrido >= TOLERANCIA_FIM_JOGO:
+        return True
+
+    # Ainda dentro da janela: jogo em andamento ou recem-acabado.
+    # Mantem em Proximos Jogos para o usuario ver que esta rolando.
     return False
 
 
@@ -326,17 +413,24 @@ def main():
                     print("  " + linha)
 
             futuros = 0
-            disputados = 0
+            encerrados = 0
+            em_andamento = 0
 
             for jogo_cru in crus:
-                if tem_placar_definido(jogo_cru):
-                    disputados += 1
+                # Um jogo so SAI de "Proximos Jogos" se ja terminou de verdade
+                # (passou 2h15 do inicio). Jogo em andamento continua na lista.
+                if jogo_ja_encerrado(jogo_cru):
+                    encerrados += 1
                     continue
                 normalizado = normalizar_jogo(jogo_cru, num)
                 todos_jogos.append(normalizado)
                 futuros += 1
+                # Conta quantos dos que ficaram ja tem placar (estao rolando)
+                if tem_placar_definido(jogo_cru):
+                    em_andamento += 1
 
-            print(f"  Rodada {num}: {disputados} ja disputados, {futuros} pendentes")
+            print(f"  Rodada {num}: {encerrados} encerrados, "
+                  f"{futuros} em Proximos Jogos ({em_andamento} em andamento)")
             rodadas_ok.append(num)
 
         except urllib.error.HTTPError as e:
