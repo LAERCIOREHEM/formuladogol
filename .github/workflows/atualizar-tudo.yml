@@ -1,0 +1,124 @@
+name: Atualizar tudo (tabela, resultados e jogos)
+
+on:
+  # Disparado pelo cron-job.org a cada 5 minutos via API do GitHub.
+  # Um unico workflow roda os 3 scripts EM SEQUENCIA e faz UM commit
+  # com os 3 arquivos juntos. Assim tabela.json, resultados.json e
+  # jogos.json sao sempre da MESMA "foto" — acaba o descasamento entre
+  # as abas Ranking, Brasileirao, Resultados e Proximos Jogos.
+  workflow_dispatch:
+
+  push:
+    paths:
+      - 'atualizar.py'
+      - 'atualizar_resultados.py'
+      - 'atualizar_jogos.py'
+      - '.github/workflows/atualizar-tudo.yml'
+
+permissions:
+  contents: write
+
+# Grupo unico. cancel-in-progress: true -> se um disparo novo chega
+# enquanto outro roda, o antigo e cancelado e o novo assume.
+# Evita acumulo de fila e o erro "No jobs were run".
+concurrency:
+  group: bolao-atualizar-tudo
+  cancel-in-progress: true
+
+jobs:
+  atualizar:
+    name: Buscar dados e publicar os 3 JSONs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Mostrar horario da execucao
+        run: |
+          echo "Horario UTC:"
+          date -u '+%d/%m/%Y %H:%M:%S UTC'
+          echo "Horario Brasilia:"
+          TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
+
+      # --- 1. TABELA ---
+      # continue-on-error: se um script falhar, os outros ainda rodam.
+      # Melhor publicar 2 de 3 JSONs atualizados do que travar tudo.
+      - name: Atualizar tabela.json
+        id: tabela
+        continue-on-error: true
+        run: python atualizar.py
+
+      # --- 2. RESULTADOS ---
+      - name: Atualizar resultados.json
+        id: resultados
+        continue-on-error: true
+        run: python atualizar_resultados.py
+
+      # --- 3. JOGOS ---
+      - name: Atualizar jogos.json
+        id: jogos
+        continue-on-error: true
+        run: python atualizar_jogos.py
+
+      - name: Conferir o que foi gerado
+        run: |
+          echo "Arquivos JSON presentes:"
+          for arq in tabela.json resultados.json jogos.json; do
+            if [ -f "$arq" ]; then
+              echo "  OK   $arq"
+            else
+              echo "  FALTA $arq"
+            fi
+          done
+
+      - name: Commitar os 3 JSONs juntos com retry
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Adiciona os 3 (os que existirem)
+          git add tabela.json resultados.json jogos.json 2>/dev/null || true
+
+          if git diff --staged --quiet; then
+            echo "Sem mudancas nos JSONs - nada a commitar."
+            exit 0
+          fi
+
+          git commit -m "Atualizar dados do site - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+          # Retry de push: ate 5 tentativas com pull --rebase entre elas.
+          MAX_TENTATIVAS=5
+          for tentativa in $(seq 1 $MAX_TENTATIVAS); do
+            echo "Tentativa $tentativa/$MAX_TENTATIVAS de push..."
+            if git push; then
+              echo "Push bem-sucedido na tentativa $tentativa."
+              exit 0
+            fi
+            echo "Push falhou. Fazendo pull --rebase e tentando de novo..."
+            git pull --rebase --autostash || true
+            sleep 3
+          done
+
+          echo "ERRO: Push falhou apos $MAX_TENTATIVAS tentativas."
+          exit 1
+
+      # Se algum script falhou, avisa no final (sem derrubar o workflow,
+      # ja que o commit do que deu certo ja foi feito).
+      - name: Avisar se algum script falhou
+        if: steps.tabela.outcome == 'failure' || steps.resultados.outcome == 'failure' || steps.jogos.outcome == 'failure'
+        run: |
+          echo "ATENCAO: um ou mais scripts falharam nesta execucao:"
+          echo "  tabela:     ${{ steps.tabela.outcome }}"
+          echo "  resultados: ${{ steps.resultados.outcome }}"
+          echo "  jogos:      ${{ steps.jogos.outcome }}"
+          echo "Os arquivos que deram certo foram publicados normalmente."
+          echo "A proxima execucao (em 5 min) tentara novamente os que falharam."
