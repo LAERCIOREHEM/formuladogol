@@ -172,18 +172,10 @@ def main():
 
     erros = 0
     for destinatario in destinatarios:
-    print(f"Enviando para {destinatario}...")
-    try:
-        status, body = enviar_email_resend(api_key, remetente, destinatario, assunto, html_email)
-        print(f"  OK HTTP {status}: {body[:200]}")
-        time.sleep(0.5)
-    except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", errors="replace") if hasattr(e, "read") else ""
-        print(f"  ERRO HTTP {e.code}: {body[:500]}")
-        erros += 1
-    except Exception as e:
-        print(f"  ERRO {type(e).__name__}: {e}")
-        erros += 1
+        print(f"Enviando para {destinatario}...")
+        try:
+            status, body = enviar_email_resend(api_key, remetente, destinatario, assunto, html_email)
+            print(f"  OK HTTP {status}: {body[:200]}")
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", errors="replace") if hasattr(e, "read") else ""
             print(f"  ERRO HTTP {e.code}: {body[:500]}")
@@ -191,6 +183,9 @@ def main():
         except Exception as e:
             print(f"  ERRO {type(e).__name__}: {e}")
             erros += 1
+
+        # Pausa para respeitar o limite do Resend no plano atual.
+        time.sleep(0.5)
 
     if erros:
         print(f"Concluído com {erros} erro(s).")
