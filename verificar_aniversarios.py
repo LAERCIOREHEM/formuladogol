@@ -154,7 +154,7 @@ def enviar_email_resend(api_key, remetente, destinatario, assunto, html_corpo):
 def main():
     inicio = agora_brasilia()
     print("=" * 70)
-    print("Verificacao de aniversariantes (Almoco + TUPAL)")
+    print("Verificacao de aniversariantes (Almoco de Sexta)")
     print("=" * 70)
     print(f"Inicio: {inicio.strftime('%d/%m/%Y %H:%M:%S BRT')}")
     print()
@@ -175,10 +175,9 @@ def main():
     print()
 
     membros_almoco = ler_arquivo_membros("membros.json")
-    membros_tupal = ler_arquivo_membros("membros_tupal.json")
+    membros_tupal = []
 
     print(f"Membros Almoco: {len(membros_almoco)}")
-    print(f"Membros TUPAL: {len(membros_tupal)}")
     print()
 
     aniv_almoco = aniversariantes_de_hoje(membros_almoco)
@@ -187,10 +186,6 @@ def main():
     print(f"Aniversariantes Almoco hoje: {len(aniv_almoco)}")
     for a in aniv_almoco:
         print(f"  - {a.get('nome')}")
-    print(f"Aniversariantes TUPAL hoje: {len(aniv_tupal)}")
-    for a in aniv_tupal:
-        print(f"  - {a.get('nome')}")
-
     total = len(aniv_almoco) + len(aniv_tupal)
     if total == 0:
         print("\nNenhum aniversariante hoje nos dois grupos. Nada a enviar.")
