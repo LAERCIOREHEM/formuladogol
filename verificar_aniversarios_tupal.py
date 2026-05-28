@@ -18,6 +18,7 @@ Observação:
 import json
 import os
 import sys
+import time
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
@@ -175,6 +176,7 @@ def main():
         try:
             status, body = enviar_email_resend(api_key, remetente, destinatario, assunto, html_email)
             print(f"  OK HTTP {status}: {body[:200]}")
+                    time.sleep(0.5)
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", errors="replace") if hasattr(e, "read") else ""
             print(f"  ERRO HTTP {e.code}: {body[:500]}")
