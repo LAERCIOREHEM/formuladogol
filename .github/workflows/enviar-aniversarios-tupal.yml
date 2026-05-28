@@ -1,0 +1,51 @@
+name: Enviar email de aniversariantes TUPAL
+
+on:
+  # Roda todo dia às 09:00 BRT = 12:00 UTC
+  schedule:
+    - cron: '0 12 * * *'
+
+  # Permite rodar manualmente para testar
+  workflow_dispatch:
+
+  # Roda também quando o script/workflow/lista TUPAL forem alterados
+  push:
+    paths:
+      - 'verificar_aniversarios_tupal.py'
+      - 'membros_tupal.json'
+      - '.github/workflows/enviar-aniversarios-tupal.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: enviar-aniversarios-tupal
+  cancel-in-progress: false
+
+jobs:
+  enviar:
+    name: Verificar aniversariantes TUPAL e enviar email
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Mostrar horário da execução
+        run: |
+          echo "Horário UTC:"
+          date -u '+%d/%m/%Y %H:%M:%S UTC'
+          echo "Horário Brasília:"
+          TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
+
+      - name: Verificar aniversariantes TUPAL e enviar email
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
+          EMAIL_DESTINATARIOS_TUPAL: ${{ secrets.EMAIL_DESTINATARIOS_TUPAL }}
+        run: python verificar_aniversarios_tupal.py
