@@ -184,3 +184,6 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 .jogo.empate{border-color:var(--vermelho);box-shadow:0 0 0 1px var(--vermelho) inset}
 .vencedor.erro{color:var(--vermelho);font-weight:600}
 .aviso-anexo.erro-box{border-color:var(--vermelho);color:var(--vermelho)}
+
+/* Botão de avançar desabilitado (fase com empate/pendência) */
+.btn-primario.desabilitado, .btn-primario:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.35)}
