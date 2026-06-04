@@ -992,13 +992,17 @@
 </style>
 </head>
   <script>
+  /* MODO COPA: durante o período, o site abre DIRETO no Bolão da Copa.
+     As outras abas ficam quietas. Para ver o Brasileirão (pausado),
+     acesse com ?brasileirao=1 (há um link de volta dentro da Copa). */
   (function () {
-    var ini = new Date('2026-06-04T00:00:00-03:00'); // a partir de quando aparece
-    var fim = new Date('2026-07-20T23:59:59-03:00'); // até quando aparece
+    var ini = new Date('2026-06-04T00:00:00-03:00'); // início do modo Copa
+    var fim = new Date('2026-07-20T23:59:59-03:00'); // fim do modo Copa
     var agora = new Date();
-    if (agora >= ini && agora <= fim) {
-      var b = document.getElementById('btn-copa');
-      if (b) b.style.display = '';
+    var emCopa = agora >= ini && agora <= fim;
+    if (location.search.indexOf('brasileirao') > -1) sessionStorage.setItem('verBrasileirao', '1');
+    if (emCopa && sessionStorage.getItem('verBrasileirao') !== '1') {
+      location.replace('copa2026/');
     }
   })();
 </script>
@@ -1017,7 +1021,6 @@
       <button onclick="setView('resultados')" id="btn-resultados">Resultados</button>
       <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversariantes</button>
       <button onclick="setView('tupal')" id="btn-tupal">🏎️ TUPAL</button>
-      <button onclick="location.href='copa2026/'" id="btn-copa">🏆 Bolão Copa 2026</button>
       <button onclick="adminAction()" id="btn-admin">Admin</button>
     </div>
   </header>
@@ -3127,6 +3130,19 @@ setTimeout(() => {
     console.error('Erro ao verificar aniversariantes:', e);
   }
 }, 800);
+</script>
+<script>
+  /* Mostra o botão da Copa no menu durante o período (quando você está
+     vendo o Brasileirão pausado, dá pra pular pra Copa pelo botão). */
+  (function () {
+    var ini = new Date('2026-06-04T00:00:00-03:00');
+    var fim = new Date('2026-07-20T23:59:59-03:00');
+    var agora = new Date();
+    if (agora >= ini && agora <= fim) {
+      var b = document.getElementById('btn-copa');
+      if (b) b.style.display = '';
+    }
+  })();
 </script>
 </body>
 </html>
