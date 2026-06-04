@@ -314,16 +314,31 @@
     const c = $("#conteudo-fase"); c.innerHTML = ""; recomputar();
     if (fase === "r32" && derivado.faltaMapa) c.appendChild(avisoAnexoC(derivado.chave));
     c.appendChild(el("div", "titulo-fase", FASES.find(f => f.id === fase).nome));
-    const lista = el("div", "lista-jogos");
+
+    let jogos;
     if (fase === "final") {
-      [{ id: "M104", rot: "🏆 Disputa do Título" }, { id: "M103", rot: "Disputa do 3º Lugar" }].forEach(d => {
-        const t = derivado.timeDe[d.id] || {};
-        lista.appendChild(el("div", "rotulo-jogo", d.rot));
-        lista.appendChild(cardJogoMata({ id: d.id, a: t.a, b: t.b }));
-      });
+      jogos = [{ id: "M104", rot: "🏆 Disputa do Título" }, { id: "M103", rot: "Disputa do 3º Lugar" }]
+        .map(d => { const t = derivado.timeDe[d.id] || {}; return { id: d.id, a: t.a, b: t.b, rot: d.rot }; });
     } else {
-      jogosDaFase(fase).forEach(m => lista.appendChild(cardJogoMata(m)));
+      jogos = jogosDaFase(fase);
     }
+
+    let empates = 0, aguardando = 0;
+    jogos.forEach(m => {
+      const p = P.placaresMata[m.id] || {};
+      if (!m.a || !m.b) { aguardando++; return; }
+      if (p.a != null && p.b != null && p.a === p.b) empates++;
+    });
+    if (empates > 0) c.appendChild(el("div", "aviso-anexo erro-box",
+      `⚠ <b>${empates} confronto(s) empatado(s)</b> nesta fase. No mata-mata não há empate — defina um vencedor em cada um, senão a próxima fase fica sem time ("aguardando").`));
+    if (aguardando > 0) c.appendChild(el("div", "aviso-anexo",
+      `Há <b>${aguardando} confronto(s) "aguardando"</b>: o vencedor da fase anterior ainda não foi definido (geralmente um empate lá atrás). Volte uma fase e resolva.`));
+
+    const lista = el("div", "lista-jogos");
+    jogos.forEach(m => {
+      if (m.rot) lista.appendChild(el("div", "rotulo-jogo", m.rot));
+      lista.appendChild(cardJogoMata(m));
+    });
     c.appendChild(lista);
     if (fase === "final") c.appendChild(blocoRevisao());
     const acoes = el("div", "acoes");
@@ -332,7 +347,12 @@
     if (idx < FASES.length - 1) { const p = el("button", "btn-primario", FASES[idx + 1].nome + " →"); p.onclick = () => { faseAtual = FASES[idx + 1].id; renderPalpite(); }; acoes.appendChild(p); }
     if (fase === "final") {
       const concluir = el("button", "btn-primario", "Concluir e ver Resultados →");
-      concluir.onclick = () => { persistir(); trocarTela("resultados", document.querySelector('.aba[data-tela="resultados"]')); };
+      concluir.onclick = () => {
+        persistir();
+        const faltam = 104 - totalPreenchidos();
+        if (faltam > 0) { popup("Ainda faltam " + faltam + " jogo(s) para concluir. Verifique se há empates no mata-mata — eles não contam até você definir um vencedor."); return; }
+        trocarTela("resultados", document.querySelector('.aba[data-tela="resultados"]'));
+      };
       acoes.appendChild(concluir);
     }
     c.appendChild(acoes);
@@ -353,7 +373,8 @@
       `<input data-k="b" inputmode="numeric" maxlength="1" value="${p.b ?? ""}" ${m.b ? "" : "disabled"}></div>` +
       `<div class="time dir"><div><div>${nomeB}</div><div class="sigla">${m.b || "aguardando"}</div></div>${m.b ? bandeira(m.b) : ""}</div>`;
     const venc = el("div", "vencedor");
-    wrap.appendChild(card); wrap.appendChild(venc); mostrarVencedor(venc, m, p);
+    wrap.appendChild(card); wrap.appendChild(venc);
+    pintarCard(card, venc, m, P.placaresMata[m.id] || {});
     card.querySelectorAll("input").forEach(inp => {
       inp.oninput = () => {
         inp.value = inp.value.replace(/[^0-9]/g, "").slice(0, 1);
@@ -361,15 +382,26 @@
         const va = a === "" ? null : +a, vb = b === "" ? null : +b;
         P.placaresMata[m.id] = { a: va, b: vb };
         persistir();
-        if (va != null && vb != null && va === vb) popup("No mata-mata não pode haver empate. Defina um vencedor.");
-        mostrarVencedor(venc, m, { a: va, b: vb }); atualizarProgresso(); renderEtapas();
-        if (inp.value !== "") focarProximo(inp);
+        if (va != null && vb != null && va === vb) popup("No mata-mata não pode haver empate. Defina um vencedor — quem empata não avança e trava a próxima fase.");
+        pintarCard(card, venc, m, { a: va, b: vb });
+        atualizarProgresso(); renderEtapas();
+        if (inp.value !== "" && va !== vb) focarProximo(inp);
       };
     });
     return wrap;
   }
-  function mostrarVencedor(elv, m, p) {
-    if (p && p.a != null && p.b != null && p.a !== p.b && m.a && m.b) {
+  // pinta o estado do confronto: vencedor, empate inválido (vermelho) ou vazio
+  function pintarCard(card, elv, m, p) {
+    const cheio = p && p.a != null && p.b != null;
+    const empate = cheio && p.a === p.b && m.a && m.b;
+    card.classList.toggle("empate", !!empate);
+    if (empate) {
+      elv.className = "vencedor erro";
+      elv.innerHTML = "⚠ Empate não vale — defina um vencedor (senão a próxima fase fica travada)";
+      return;
+    }
+    elv.className = "vencedor";
+    if (cheio && p.a !== p.b && m.a && m.b) {
       const w = p.a > p.b ? m.a : m.b;
       elv.innerHTML = "Vencedor: " + bandeira(w) + " " + DADOS.nomeDe[w];
     } else elv.textContent = "";
