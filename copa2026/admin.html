@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Bolão Copa 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/copa.css">
+<style>
+  .wrap{max-width:760px;margin:0 auto;padding:0 14px 60px}
+  .painel{background:var(--navy-2);border:1px solid var(--linha);border-radius:14px;padding:18px;margin-top:16px}
+  .painel h3{font-family:'Anton',sans-serif;font-weight:400;font-size:18px;margin-bottom:6px;letter-spacing:.5px}
+  .painel p.dica{font-size:13px;color:var(--cinza);margin-bottom:12px;line-height:1.5}
+  textarea{width:100%;min-height:130px;background:var(--navy);border:1px solid var(--linha);color:var(--branco);
+    border-radius:10px;padding:12px;font-family:inherit;font-size:15px;resize:vertical}
+  textarea:focus{outline:none;border-color:var(--gold)}
+  .btn-primario{background:var(--gold);color:#3a2a00;border:none;padding:12px 18px;border-radius:10px;
+    font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;margin-top:12px}
+  .btn-primario:active{transform:scale(.99)}
+  .msg{margin-top:12px;padding:10px 12px;border-radius:9px;font-size:14px;font-weight:600}
+  .msg.ok{background:rgba(29,185,84,.15);color:var(--verde);border:1px solid rgba(29,185,84,.4)}
+  .msg.erro{background:rgba(224,71,62,.15);color:var(--vermelho);border:1px solid rgba(224,71,62,.4)}
+  .barra-lista{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
+  #contador{font-size:13px;color:var(--cinza)}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);
+    padding:8px 6px;border-bottom:1px solid var(--linha)}
+  td{padding:10px 6px;border-bottom:1px solid var(--linha);font-size:14px;vertical-align:middle}
+  td.pin{font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);letter-spacing:2px}
+  .tag{font-size:11px;color:var(--cinza);border:1px solid var(--linha);padding:3px 8px;border-radius:99px}
+  .tag.ok{color:var(--verde);border-color:rgba(29,185,84,.4)}
+  .acoes-td{text-align:right;white-space:nowrap}
+  button.mini{background:transparent;border:1px solid var(--linha);color:var(--cinza);padding:5px 9px;
+    border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;margin-left:5px}
+  button.mini:hover{color:var(--branco);border-color:var(--cinza)}
+  button.mini.del:hover{color:var(--vermelho);border-color:var(--vermelho)}
+  .rodape-admin{margin-top:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+  .rodape-admin a{color:var(--gold);font-size:14px;text-decoration:none}
+  #btn-limpar{background:transparent;border:1px solid rgba(224,71,62,.4);color:var(--vermelho);
+    padding:8px 12px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:13px}
+  .nota-seg{font-size:12px;color:var(--cinza);margin-top:14px;line-height:1.5;border-top:1px solid var(--linha);padding-top:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topo">
+    <div class="topo-marca">
+      <span class="trofeu">🏆</span>
+      <div><h1>Admin <b>Copa 2026</b></h1><div class="sub">Organizador do bolão</div></div>
+    </div>
+    <a href="index.html" class="btn-mini" style="text-decoration:none">Ver o bolão →</a>
+  </div>
+
+  <div class="painel">
+    <h3>1. Cadastrar participantes</h3>
+    <p class="dica">Digite um nome por linha. Ao gerar, cada pessoa nova recebe um PIN de 6 dígitos
+      automático. Quem já está na lista mantém o PIN — pode adicionar nomes novos sem perder os antigos.</p>
+    <textarea id="nomes" placeholder="Carlos&#10;Mariana&#10;Suellen&#10;João Pedro"></textarea>
+    <button id="btn-gerar" class="btn-primario">Gerar PINs</button>
+    <div id="msg" class="msg oculto"></div>
+  </div>
+
+  <div class="painel">
+    <h3>2. Enviar os acessos</h3>
+    <div class="barra-lista">
+      <span id="contador"></span>
+      <button id="btn-copiar-tudo" class="btn-mini" style="display:none">Copiar lista toda</button>
+    </div>
+    <table>
+      <thead><tr><th>Nome</th><th>PIN</th><th>Status</th><th></th></tr></thead>
+      <tbody id="lista"></tbody>
+    </table>
+    <p class="nota-seg">O botão <b>WhatsApp</b> copia uma mensagem pronta com o nome, o PIN e o link —
+      é só colar na conversa da pessoa. <b>Resetar PIN</b> gera um novo número (use se alguém perder).
+      A coluna <b>Status</b> mostra quem já enviou o palpite.</p>
+  </div>
+
+  <div class="rodape-admin">
+    <span style="font-size:13px;color:var(--cinza)">Modo teste: a lista fica salva só neste navegador.</span>
+    <button id="btn-limpar">Apagar lista</button>
+  </div>
+
+  <p class="nota-seg">⚠️ Em produção (com Supabase), os PINs ficam guardados com criptografia no banco,
+    nunca em texto puro. Esta tela é o atalho para o modo de testes no seu PC — no servidor, o cadastro
+    roda pelo SQL/RPC descrito no PASSO-A-PASSO.</p>
+</div>
+<script src="js/admin.js"></script>
+</body>
+</html>
