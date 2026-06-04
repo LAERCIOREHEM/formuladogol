@@ -28,6 +28,13 @@
     return `<img class="flag" src="https://flagcdn.com/w40/${iso}.png" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`;
   }
 
+  // pula para o próximo campo de placar disponível (ignora os desabilitados)
+  function focarProximo(inp) {
+    const ins = Array.from(document.querySelectorAll('#conteudo-fase input:not([disabled])'));
+    const i = ins.indexOf(inp);
+    if (i > -1 && i < ins.length - 1) ins[i + 1].focus();
+  }
+
   // ---------- Supabase ----------
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -63,6 +70,8 @@
     $("#btn-sair").onclick = sair;
     $("#popup-ok").onclick = () => $("#popup").classList.add("oculto");
     document.querySelectorAll(".aba").forEach(b => b.onclick = () => trocarTela(b.dataset.tela, b));
+    const ba = $("#btn-alterar-palpite");
+    if (ba) ba.onclick = () => trocarTela("palpite", document.querySelector('.aba[data-tela="palpite"]'));
   }
   function popup(msg) { $("#popup-texto").textContent = msg; $("#popup").classList.remove("oculto"); }
   function palpiteVazio() { return { placaresGrupos: {}, placaresMata: {}, status: "rascunho" }; }
@@ -145,7 +154,7 @@
   }
   function derivadoResumo() {
     recomputar();
-    return { campeao: derivado.campeao, vice: derivado.vice, terceiro: derivado.terceiro, quarto: derivado.quarto, chave: derivado.chave };
+    return { campeao: derivado.campeao, vice: derivado.vice, terceiro: derivado.terceiro, quarto: derivado.quarto, chave: derivado.chave, preenchidos: totalPreenchidos() };
   }
   function persistir() {
     if (ONLINE) {
@@ -259,6 +268,7 @@
         const ga = card.querySelector('[data-k="ga"]').value, gb = card.querySelector('[data-k="gb"]').value;
         P.placaresGrupos[j.jogo_id] = { ga: ga === "" ? null : +ga, gb: gb === "" ? null : +gb };
         persistir(); atualizarClassificacao(j.grupo); atualizarProgresso(); renderEtapas();
+        if (inp.value !== "") focarProximo(inp);
       };
     });
     return card;
@@ -290,13 +300,26 @@
     if (fase === "r32" && derivado.faltaMapa) c.appendChild(avisoAnexoC(derivado.chave));
     c.appendChild(el("div", "titulo-fase", FASES.find(f => f.id === fase).nome));
     const lista = el("div", "lista-jogos");
-    jogosDaFase(fase).forEach(m => lista.appendChild(cardJogoMata(m)));
+    if (fase === "final") {
+      [{ id: "M104", rot: "🏆 Disputa do Título" }, { id: "M103", rot: "Disputa do 3º Lugar" }].forEach(d => {
+        const t = derivado.timeDe[d.id] || {};
+        lista.appendChild(el("div", "rotulo-jogo", d.rot));
+        lista.appendChild(cardJogoMata({ id: d.id, a: t.a, b: t.b }));
+      });
+    } else {
+      jogosDaFase(fase).forEach(m => lista.appendChild(cardJogoMata(m)));
+    }
     c.appendChild(lista);
     if (fase === "final") c.appendChild(blocoRevisao());
     const acoes = el("div", "acoes");
     const idx = FASES.findIndex(f => f.id === fase);
     if (idx > 0) { const a = el("button", "btn-sec", "← " + FASES[idx - 1].nome); a.onclick = () => { faseAtual = FASES[idx - 1].id; renderPalpite(); }; acoes.appendChild(a); }
     if (idx < FASES.length - 1) { const p = el("button", "btn-primario", FASES[idx + 1].nome + " →"); p.onclick = () => { faseAtual = FASES[idx + 1].id; renderPalpite(); }; acoes.appendChild(p); }
+    if (fase === "final") {
+      const concluir = el("button", "btn-primario", "Concluir e ver Resultados →");
+      concluir.onclick = () => { persistir(); trocarTela("resultados", document.querySelector('.aba[data-tela="resultados"]')); };
+      acoes.appendChild(concluir);
+    }
     c.appendChild(acoes);
   }
   function jogosDaFase(fase) {
@@ -325,6 +348,7 @@
         persistir();
         if (va != null && vb != null && va === vb) popup("No mata-mata não pode haver empate. Defina um vencedor.");
         mostrarVencedor(venc, m, { a: va, b: vb }); atualizarProgresso(); renderEtapas();
+        if (inp.value !== "") focarProximo(inp);
       };
     });
     return wrap;
@@ -361,21 +385,25 @@
   // ---------- Ranking (quem já enviou) ----------
   async function renderRanking() {
     const c = $("#ranking-conteudo");
-    if (!ONLINE) { c.innerHTML = "<p>Conecte o Supabase (js/config.js) para ver o ranking entre os participantes.</p>"; return; }
+    if (!ONLINE) { c.innerHTML = "<p>Conecte o Supabase (js/config.js) para ver o preenchimento dos participantes.</p>"; return; }
     c.innerHTML = "<p>Carregando…</p>";
     try {
       const lista = await rpc("copa_status", {});
-      const enviados = lista.filter(x => x.enviado).length;
+      const completos = lista.filter(x => x.pct >= 100).length;
       const box = el("div", "classif");
-      box.innerHTML = `<h4>${enviados} de ${lista.length} já enviaram</h4><ol></ol>`;
-      const ol = box.querySelector("ol");
+      box.innerHTML = `<h4>Preenchimento dos palpites — ${completos}/${lista.length} completos</h4>`;
+      const wrap = el("div", "rank-pct");
       lista.forEach(x => {
-        const li = el("li", x.enviado ? "passa" : "");
-        li.innerHTML = `<span>${x.nome}</span><span>${x.enviado ? "enviou ✓" : "aguardando"}</span>`;
-        ol.appendChild(li);
+        const row = el("div", "rank-linha" + (x.pct >= 100 ? " completo" : ""));
+        row.innerHTML =
+          `<span class="rank-nome">${x.nome}</span>` +
+          `<span class="rank-barra"><span class="rank-fill" style="width:${x.pct}%"></span></span>` +
+          `<span class="rank-num">${x.pct}%</span>`;
+        wrap.appendChild(row);
       });
+      box.appendChild(wrap);
       c.innerHTML = ""; c.appendChild(box);
-      c.appendChild(el("p", "placeholder", "<p>A pontuação competitiva entra quando os resultados oficiais começarem a ser registrados.</p>"));
+      c.appendChild(el("p", "placeholder", "<p>Esta é a % de preenchimento (104 jogos). A pontuação competitiva entra quando os resultados oficiais começarem a ser registrados.</p>"));
     } catch (e) { c.innerHTML = "<p>Não consegui carregar o ranking agora.</p>"; }
   }
 
