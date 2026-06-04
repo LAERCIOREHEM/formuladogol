@@ -114,22 +114,35 @@
       const salvo = localStorage.getItem(chaveUser(USER.nome));
       P = (salvo && JSON.parse(salvo).palpite) || palpiteVazio();
     }
-    sessionStorage.setItem("copa2026_sessao", JSON.stringify(USER));
+    localStorage.setItem("copa2026_sessao", JSON.stringify(USER));
+    localStorage.setItem("copa2026_login", JSON.stringify(USER)); // lembra neste aparelho
     abrirApp();
   }
 
   async function restaurarSessao() {
-    const ses = sessionStorage.getItem("copa2026_sessao");
-    if (!ses) return;
-    USER = JSON.parse(ses);
-    if (ONLINE) {
-      let pl = null; try { pl = await rpc("copa_meu_palpite", { p_nome: USER.nome, p_pin: USER.pin }); } catch (e) {}
-      P = pl || palpiteVazio();
-    } else {
-      const salvo = localStorage.getItem(chaveUser(USER.nome));
-      P = (salvo && JSON.parse(salvo).palpite) || palpiteVazio();
+    const ses = localStorage.getItem("copa2026_sessao");
+    if (ses) {
+      USER = JSON.parse(ses);
+      if (ONLINE) {
+        let pl = null; try { pl = await rpc("copa_meu_palpite", { p_nome: USER.nome, p_pin: USER.pin }); } catch (e) {}
+        P = pl || palpiteVazio();
+      } else {
+        const salvo = localStorage.getItem(chaveUser(USER.nome));
+        P = (salvo && JSON.parse(salvo).palpite) || palpiteVazio();
+      }
+      abrirApp();
+      return;
     }
-    abrirApp();
+    // login salvo neste aparelho: entra sozinho (até clicar em Sair)
+    const lembrado = localStorage.getItem("copa2026_login");
+    if (lembrado) {
+      try {
+        const u = JSON.parse(lembrado);
+        $("#in-nome").value = u.nome;
+        $("#in-pin").value = u.pin;
+        entrar();
+      } catch (e) {}
+    }
   }
 
   function abrirApp() {
@@ -140,7 +153,8 @@
     trocarTela("palpite");
   }
   function sair() {
-    sessionStorage.removeItem("copa2026_sessao");
+    localStorage.removeItem("copa2026_sessao");
+    localStorage.removeItem("copa2026_login");
     USER = null; P = null; derivado = null;
     $("#abas").classList.add("oculto"); $("#topo-usuario").classList.add("oculto");
     document.querySelectorAll(".tela").forEach(t => t.classList.add("oculto"));
