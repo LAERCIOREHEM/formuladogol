@@ -1,0 +1,64 @@
+{
+  "_nota": "Grupos baseados no dataset openfootball (domínio público). CONFIRME contra o sorteio oficial as seleções marcadas com 'verificar' (vindas de repescagem). 'seed' = ranking FIFA aproximado (menor = mais forte), usado só como último desempate. 'iso2' = código de país para a bandeira (flagcdn.com); Inglaterra e Escócia usam gb-eng/gb-sct.",
+  "selecoes": [
+    {"id":"MEX","nome":"México","grupo":"A","seed":14,"iso2":"mx"},
+    {"id":"RSA","nome":"África do Sul","grupo":"A","seed":60,"iso2":"za"},
+    {"id":"KOR","nome":"Coreia do Sul","grupo":"A","seed":23,"iso2":"kr"},
+    {"id":"CZE","nome":"Rep. Tcheca","grupo":"A","seed":43,"iso2":"cz","verificar":true},
+
+    {"id":"CAN","nome":"Canadá","grupo":"B","seed":30,"iso2":"ca"},
+    {"id":"BIH","nome":"Bósnia","grupo":"B","seed":74,"iso2":"ba","verificar":true},
+    {"id":"QAT","nome":"Catar","grupo":"B","seed":35,"iso2":"qa"},
+    {"id":"SUI","nome":"Suíça","grupo":"B","seed":19,"iso2":"ch"},
+
+    {"id":"BRA","nome":"Brasil","grupo":"C","seed":5,"iso2":"br"},
+    {"id":"MAR","nome":"Marrocos","grupo":"C","seed":12,"iso2":"ma"},
+    {"id":"HAI","nome":"Haiti","grupo":"C","seed":84,"iso2":"ht"},
+    {"id":"SCO","nome":"Escócia","grupo":"C","seed":38,"iso2":"gb-sct"},
+
+    {"id":"USA","nome":"EUA","grupo":"D","seed":16,"iso2":"us"},
+    {"id":"PAR","nome":"Paraguai","grupo":"D","seed":41,"iso2":"py"},
+    {"id":"AUS","nome":"Austrália","grupo":"D","seed":24,"iso2":"au"},
+    {"id":"TUR","nome":"Turquia","grupo":"D","seed":26,"iso2":"tr"},
+
+    {"id":"GER","nome":"Alemanha","grupo":"E","seed":9,"iso2":"de"},
+    {"id":"CUW","nome":"Curaçao","grupo":"E","seed":90,"iso2":"cw"},
+    {"id":"CIV","nome":"Costa do Marfim","grupo":"E","seed":40,"iso2":"ci"},
+    {"id":"ECU","nome":"Equador","grupo":"E","seed":22,"iso2":"ec"},
+
+    {"id":"NED","nome":"Holanda","grupo":"F","seed":7,"iso2":"nl"},
+    {"id":"JPN","nome":"Japão","grupo":"F","seed":17,"iso2":"jp"},
+    {"id":"SWE","nome":"Suécia","grupo":"F","seed":33,"iso2":"se","verificar":true},
+    {"id":"TUN","nome":"Tunísia","grupo":"F","seed":49,"iso2":"tn"},
+
+    {"id":"BEL","nome":"Bélgica","grupo":"G","seed":8,"iso2":"be"},
+    {"id":"EGY","nome":"Egito","grupo":"G","seed":32,"iso2":"eg"},
+    {"id":"IRN","nome":"Irã","grupo":"G","seed":20,"iso2":"ir"},
+    {"id":"NZL","nome":"Nova Zelândia","grupo":"G","seed":86,"iso2":"nz"},
+
+    {"id":"ESP","nome":"Espanha","grupo":"H","seed":1,"iso2":"es"},
+    {"id":"CPV","nome":"Cabo Verde","grupo":"H","seed":70,"iso2":"cv"},
+    {"id":"KSA","nome":"Arábia Saudita","grupo":"H","seed":58,"iso2":"sa"},
+    {"id":"URU","nome":"Uruguai","grupo":"H","seed":11,"iso2":"uy"},
+
+    {"id":"FRA","nome":"França","grupo":"I","seed":3,"iso2":"fr"},
+    {"id":"SEN","nome":"Senegal","grupo":"I","seed":18,"iso2":"sn"},
+    {"id":"IRQ","nome":"Iraque","grupo":"I","seed":57,"iso2":"iq","verificar":true},
+    {"id":"NOR","nome":"Noruega","grupo":"I","seed":28,"iso2":"no"},
+
+    {"id":"ARG","nome":"Argentina","grupo":"J","seed":2,"iso2":"ar"},
+    {"id":"ALG","nome":"Argélia","grupo":"J","seed":37,"iso2":"dz"},
+    {"id":"AUT","nome":"Áustria","grupo":"J","seed":25,"iso2":"at"},
+    {"id":"JOR","nome":"Jordânia","grupo":"J","seed":64,"iso2":"jo"},
+
+    {"id":"POR","nome":"Portugal","grupo":"K","seed":6,"iso2":"pt"},
+    {"id":"COD","nome":"RD Congo","grupo":"K","seed":56,"iso2":"cd","verificar":true},
+    {"id":"UZB","nome":"Uzbequistão","grupo":"K","seed":53,"iso2":"uz"},
+    {"id":"COL","nome":"Colômbia","grupo":"K","seed":13,"iso2":"co"},
+
+    {"id":"ENG","nome":"Inglaterra","grupo":"L","seed":4,"iso2":"gb-eng"},
+    {"id":"CRO","nome":"Croácia","grupo":"L","seed":10,"iso2":"hr"},
+    {"id":"GHA","nome":"Gana","grupo":"L","seed":72,"iso2":"gh"},
+    {"id":"PAN","nome":"Panamá","grupo":"L","seed":42,"iso2":"pa"}
+  ]
+}

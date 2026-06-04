@@ -1,0 +1,44 @@
+{
+  "_nota": "Estrutura OFICIAL da fase final (FIFA 2026). 16 vagas da Round of 32 (M73-M88) e árvore (M89-M104) extraídas do chaveamento oficial. Vagas 'terceiro' recebem o 3o colocado conforme terceiros_map.json (Anexo C). Ordem das vagas no Anexo C: 1A,1B,1D,1E,1G,1I,1K,1L.",
+
+  "r32": [
+    {"id": "M73", "tipo": "fixo",     "a": "2A", "b": "2B"},
+    {"id": "M74", "tipo": "terceiro", "host": "1E", "elegiveis": ["A","B","C","D","F"]},
+    {"id": "M75", "tipo": "fixo",     "a": "1F", "b": "2C"},
+    {"id": "M76", "tipo": "fixo",     "a": "1C", "b": "2F"},
+    {"id": "M77", "tipo": "terceiro", "host": "1I", "elegiveis": ["C","D","F","G","H"]},
+    {"id": "M78", "tipo": "fixo",     "a": "2E", "b": "2I"},
+    {"id": "M79", "tipo": "terceiro", "host": "1A", "elegiveis": ["C","E","F","H","I"]},
+    {"id": "M80", "tipo": "terceiro", "host": "1L", "elegiveis": ["E","H","I","J","K"]},
+    {"id": "M81", "tipo": "terceiro", "host": "1D", "elegiveis": ["B","E","F","I","J"]},
+    {"id": "M82", "tipo": "terceiro", "host": "1G", "elegiveis": ["A","E","H","I","J"]},
+    {"id": "M83", "tipo": "fixo",     "a": "2K", "b": "2L"},
+    {"id": "M84", "tipo": "fixo",     "a": "1H", "b": "2J"},
+    {"id": "M85", "tipo": "terceiro", "host": "1B", "elegiveis": ["E","F","G","I","J"]},
+    {"id": "M86", "tipo": "fixo",     "a": "1J", "b": "2H"},
+    {"id": "M87", "tipo": "terceiro", "host": "1K", "elegiveis": ["D","E","I","J","L"]},
+    {"id": "M88", "tipo": "fixo",     "a": "2D", "b": "2G"}
+  ],
+
+  "arvore": [
+    {"id": "M89", "fase": "oitavas", "a": "WM74", "b": "WM77"},
+    {"id": "M90", "fase": "oitavas", "a": "WM73", "b": "WM75"},
+    {"id": "M91", "fase": "oitavas", "a": "WM76", "b": "WM78"},
+    {"id": "M92", "fase": "oitavas", "a": "WM79", "b": "WM80"},
+    {"id": "M93", "fase": "oitavas", "a": "WM83", "b": "WM84"},
+    {"id": "M94", "fase": "oitavas", "a": "WM81", "b": "WM82"},
+    {"id": "M95", "fase": "oitavas", "a": "WM86", "b": "WM88"},
+    {"id": "M96", "fase": "oitavas", "a": "WM85", "b": "WM87"},
+
+    {"id": "M97",  "fase": "quartas", "a": "WM89", "b": "WM90"},
+    {"id": "M98",  "fase": "quartas", "a": "WM93", "b": "WM94"},
+    {"id": "M99",  "fase": "quartas", "a": "WM91", "b": "WM92"},
+    {"id": "M100", "fase": "quartas", "a": "WM95", "b": "WM96"},
+
+    {"id": "M101", "fase": "semifinais", "a": "WM97", "b": "WM98"},
+    {"id": "M102", "fase": "semifinais", "a": "WM99", "b": "WM100"},
+
+    {"id": "M103", "fase": "terceiro", "a": "LM101", "b": "LM102"},
+    {"id": "M104", "fase": "final",    "a": "WM101", "b": "WM102"}
+  ]
+}

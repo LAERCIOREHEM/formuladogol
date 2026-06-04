@@ -1,0 +1,166 @@
+/* Bolão Copa 2026 — estilo wallchart esportivo (navy + dourado), mobile-first */
+:root{
+  --navy:#0b1f3a;
+  --navy-2:#13294b;
+  --navy-3:#1c3a63;
+  --gold:#f4c542;
+  --gold-2:#e0a82e;
+  --verde:#1db954;
+  --vermelho:#e0473e;
+  --branco:#f7f8fb;
+  --cinza:#9fb0c7;
+  --linha:rgba(255,255,255,.10);
+  --raio:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Archivo',system-ui,sans-serif;
+  background:
+    radial-gradient(1200px 500px at 80% -10%, rgba(244,197,66,.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(29,185,84,.08), transparent 55%),
+    var(--navy);
+  color:var(--branco);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+#app{max-width:760px;margin:0 auto;padding:0 14px 60px}
+.oculto{display:none !important}
+
+/* TOPO */
+.topo{display:flex;align-items:center;justify-content:space-between;
+  padding:18px 4px 14px;border-bottom:1px solid var(--linha)}
+.topo-marca{display:flex;align-items:center;gap:12px}
+.trofeu{font-size:30px;color:var(--gold);line-height:1;filter:drop-shadow(0 2px 6px rgba(244,197,66,.4))}
+.topo h1{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.5px;font-weight:400;line-height:.95}
+.topo h1 b{color:var(--gold)}
+.sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--cinza);margin-top:2px}
+.topo-usuario{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+.btn-mini{background:transparent;border:1px solid var(--linha);color:var(--cinza);
+  padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px}
+.btn-mini:hover{color:var(--branco);border-color:var(--cinza)}
+
+/* TELAS */
+.tela{padding-top:18px}
+h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:.5px;margin-bottom:14px}
+
+/* LOGIN */
+.cartao-login{background:var(--navy-2);border:1px solid var(--linha);border-radius:var(--raio);
+  padding:24px;margin-top:30px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.cartao-login h2{margin-bottom:8px}
+.prazo{color:var(--cinza);font-size:14px;line-height:1.5;margin-bottom:18px}
+.prazo b{color:var(--gold)}
+.cartao-login label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--cinza);margin:14px 0 6px}
+.cartao-login input{width:100%;background:var(--navy);border:1px solid var(--linha);
+  color:var(--branco);padding:13px 14px;border-radius:10px;font-size:16px;font-family:inherit}
+.cartao-login input:focus{outline:none;border-color:var(--gold)}
+#in-pin{letter-spacing:8px;text-align:center;font-weight:700}
+.btn-primario{width:100%;margin-top:18px;background:var(--gold);color:#3a2a00;border:none;
+  padding:14px;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer;font-family:inherit;
+  transition:transform .08s,box-shadow .2s}
+.btn-primario:hover{box-shadow:0 8px 24px rgba(244,197,66,.35)}
+.btn-primario:active{transform:translateY(1px)}
+.aviso-pin{margin-top:14px;font-size:12px;color:var(--cinza);text-align:center}
+.erro{margin-top:12px;color:var(--vermelho);font-size:14px;font-weight:600;text-align:center}
+
+/* ABAS */
+.abas{display:flex;gap:6px;margin-top:16px;background:var(--navy-2);border:1px solid var(--linha);
+  border-radius:12px;padding:5px}
+.aba{flex:1;background:transparent;border:none;color:var(--cinza);padding:11px;border-radius:8px;
+  font-family:inherit;font-weight:600;font-size:14px;cursor:pointer}
+.aba.ativa{background:var(--gold);color:#3a2a00}
+
+/* PROGRESSO */
+.progresso-geral{margin:18px 0 10px}
+.barra{height:9px;background:var(--navy-3);border-radius:99px;overflow:hidden}
+.barra-fill{height:100%;width:0;background:linear-gradient(90deg,var(--verde),var(--gold));
+  border-radius:99px;transition:width .3s}
+#progresso-texto{font-size:13px;color:var(--cinza);margin-top:7px}
+.salvo{font-size:12px;color:var(--verde);margin-top:2px;min-height:16px}
+
+/* ETAPAS */
+.etapas{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 18px}
+.etapa{font-size:12px;font-weight:600;padding:7px 11px;border-radius:99px;border:1px solid var(--linha);
+  color:var(--cinza);cursor:pointer;white-space:nowrap}
+.etapa.ok{color:var(--verde);border-color:rgba(29,185,84,.4)}
+.etapa.atual{background:var(--navy-3);color:var(--branco);border-color:var(--gold)}
+.etapa.travada{opacity:.45;cursor:not-allowed}
+
+/* CARDS DE GRUPO */
+.grid-grupos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card-grupo{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:14px;cursor:pointer;
+  transition:border-color .2s,transform .08s}
+.card-grupo:hover{border-color:var(--gold)}
+.card-grupo:active{transform:scale(.99)}
+.card-grupo h3{font-family:'Anton',sans-serif;font-weight:400;font-size:20px}
+.card-grupo .estado{font-size:12px;color:var(--cinza);margin-top:4px}
+.card-grupo.completo{border-color:rgba(29,185,84,.5)}
+.card-grupo.completo .estado{color:var(--verde)}
+
+/* JOGO */
+.lista-jogos{display:flex;flex-direction:column;gap:10px}
+.jogo{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
+  background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:12px}
+.jogo .time{font-weight:600;font-size:15px;display:flex;align-items:center;gap:9px;min-width:0}
+.jogo .time.dir{justify-content:flex-end;text-align:right}
+.jogo .time>div{min-width:0}
+/* BANDEIRAS (imagens flagcdn; emoji de bandeira não renderiza no Windows) */
+.flag{width:26px;height:auto;border-radius:3px;flex:0 0 auto;
+  box-shadow:0 0 0 1px rgba(255,255,255,.14);display:inline-block}
+.classif .flag,.vencedor .flag,.revisao .flag{width:18px;vertical-align:middle;margin-right:3px}
+.jogo .sigla{font-size:11px;color:var(--cinza);letter-spacing:1px}
+.placar{display:flex;align-items:center;gap:6px}
+.placar input{width:46px;height:46px;text-align:center;font-size:20px;font-weight:700;
+  background:var(--navy);border:1px solid var(--linha);color:var(--branco);border-radius:10px;font-family:inherit}
+.placar input:focus{outline:none;border-color:var(--gold)}
+.placar .x{color:var(--cinza);font-weight:700}
+.vencedor{font-size:11px;color:var(--gold);text-align:center;margin-top:4px;font-weight:700;min-height:14px}
+
+/* CLASSIFICAÇÃO */
+.classif{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:14px;margin-top:14px}
+.classif h4{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);margin-bottom:10px}
+.classif ol{list-style:none;counter-reset:pos}
+.classif li{counter-increment:pos;display:flex;justify-content:space-between;padding:7px 0;
+  border-bottom:1px solid var(--linha);font-size:14px}
+.classif li:last-child{border:none}
+.classif li::before{content:counter(pos)"º";color:var(--gold);font-weight:700;margin-right:10px;width:26px;display:inline-block}
+.classif li.passa span:first-child::after{content:" ✓";color:var(--verde)}
+
+/* BOTÕES DE NAVEGAÇÃO */
+.acoes{display:flex;gap:10px;margin-top:18px}
+.acoes .btn-primario{margin-top:0}
+.btn-sec{flex:1;background:var(--navy-3);color:var(--branco);border:1px solid var(--linha);
+  padding:14px;border-radius:10px;font-weight:600;cursor:pointer;font-family:inherit;font-size:15px}
+.btn-sec:hover{border-color:var(--gold)}
+.titulo-fase{font-family:'Anton',sans-serif;font-weight:400;font-size:22px;margin:6px 0 14px}
+
+/* REVISÃO */
+.revisao{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:18px;margin-top:8px}
+.revisao .linha{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--linha);font-size:15px}
+.revisao .linha b{color:var(--gold)}
+.pontos-box{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.pt{background:var(--navy-3);border:1px solid var(--linha);border-radius:12px;padding:14px;text-align:center}
+.pt .n{font-family:'Anton',sans-serif;font-size:28px;color:var(--gold)}
+.pt .l{font-size:11px;color:var(--cinza);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* AVISO ANEXO C */
+.aviso-anexo{background:rgba(224,71,62,.12);border:1px solid rgba(224,71,62,.4);
+  border-radius:12px;padding:14px;margin-top:14px;font-size:14px;line-height:1.5}
+.aviso-anexo b{color:var(--gold)}
+
+/* PLACEHOLDER */
+.placeholder{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:20px;
+  color:var(--cinza);font-size:14px;line-height:1.6}
+.placeholder code{background:var(--navy);padding:2px 6px;border-radius:5px;color:var(--gold);font-size:13px}
+
+/* POPUP */
+.popup{position:fixed;inset:0;background:rgba(5,12,24,.7);display:flex;align-items:center;
+  justify-content:center;padding:20px;z-index:50}
+.popup-caixa{background:var(--navy-2);border:1px solid var(--gold);border-radius:14px;padding:24px;
+  max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.popup-caixa p{font-size:15px;line-height:1.5;margin-bottom:16px}
+
+@media(max-width:420px){
+  .grid-grupos{grid-template-columns:1fr}
+  .placar input{width:42px;height:42px;font-size:18px}
+}
