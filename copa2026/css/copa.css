@@ -179,3 +179,8 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 .rank-num{flex:0 0 46px;text-align:right;font-family:'Anton',sans-serif;font-size:16px;color:var(--branco)}
 .rank-linha.completo .rank-fill{background:var(--verde)}
 .rank-linha.completo .rank-num{color:var(--verde)}
+
+/* ---- Empate inválido no mata-mata ---- */
+.jogo.empate{border-color:var(--vermelho);box-shadow:0 0 0 1px var(--vermelho) inset}
+.vencedor.erro{color:var(--vermelho);font-weight:600}
+.aviso-anexo.erro-box{border-color:var(--vermelho);color:var(--vermelho)}
