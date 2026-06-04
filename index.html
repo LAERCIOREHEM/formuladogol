@@ -991,6 +991,17 @@
   }
 </style>
 </head>
+  <script>
+  (function () {
+    var ini = new Date('2026-06-04T00:00:00-03:00'); // a partir de quando aparece
+    var fim = new Date('2026-07-20T23:59:59-03:00'); // até quando aparece
+    var agora = new Date();
+    if (agora >= ini && agora <= fim) {
+      var b = document.getElementById('btn-copa');
+      if (b) b.style.display = '';
+    }
+  })();
+</script>
 <body>
 <div class="container">
   <header>
@@ -999,6 +1010,7 @@
       <p class="subtitle">Almoço de Sexta</p>
     </div>
     <div class="nav">
+      <button onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
       <button onclick="setView('rank')" id="btn-rank" class="active">Ranking</button>
       <button onclick="setView('tabela')" id="btn-tabela">Brasileirão</button>
       <button onclick="setView('jogos')" id="btn-jogos">Próximos Jogos</button>
