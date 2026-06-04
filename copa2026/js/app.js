@@ -18,6 +18,7 @@
 
   let DADOS = {}, USER = null, P = null, derivado = null;
   let faseAtual = "grupos", grupoAberto = null, saveTimer = null;
+  let atualizarFeedbackFase = null;
 
   const $ = s => document.querySelector(s);
   const el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; };
@@ -323,16 +324,7 @@
       jogos = jogosDaFase(fase);
     }
 
-    let empates = 0, aguardando = 0;
-    jogos.forEach(m => {
-      const p = P.placaresMata[m.id] || {};
-      if (!m.a || !m.b) { aguardando++; return; }
-      if (p.a != null && p.b != null && p.a === p.b) empates++;
-    });
-    if (empates > 0) c.appendChild(el("div", "aviso-anexo erro-box",
-      `⚠ <b>${empates} confronto(s) empatado(s)</b> nesta fase. No mata-mata não há empate — defina um vencedor em cada um, senão a próxima fase fica sem time ("aguardando").`));
-    if (aguardando > 0) c.appendChild(el("div", "aviso-anexo",
-      `Há <b>${aguardando} confronto(s) "aguardando"</b>: o vencedor da fase anterior ainda não foi definido (geralmente um empate lá atrás). Volte uma fase e resolva.`));
+    const alertasEl = el("div"); alertasEl.id = "fase-alertas"; c.appendChild(alertasEl);
 
     const lista = el("div", "lista-jogos");
     jogos.forEach(m => {
@@ -344,7 +336,36 @@
     const acoes = el("div", "acoes");
     const idx = FASES.findIndex(f => f.id === fase);
     if (idx > 0) { const a = el("button", "btn-sec", "← " + FASES[idx - 1].nome); a.onclick = () => { faseAtual = FASES[idx - 1].id; renderPalpite(); }; acoes.appendChild(a); }
-    if (idx < FASES.length - 1) { const p = el("button", "btn-primario", FASES[idx + 1].nome + " →"); p.onclick = () => { faseAtual = FASES[idx + 1].id; renderPalpite(); }; acoes.appendChild(p); }
+    let pbtn = null;
+    if (idx < FASES.length - 1) { pbtn = el("button", "btn-primario"); acoes.appendChild(pbtn); }
+
+    // alerta + botão de avançar atualizam AO VIVO a cada dígito (sem re-render, preserva o foco)
+    atualizarFeedbackFase = function () {
+      let emp = 0, agu = 0, res = 0;
+      jogos.forEach(m => {
+        const p = P.placaresMata[m.id] || {};
+        if (!m.a || !m.b) { agu++; return; }
+        if (p.a == null || p.b == null) return;
+        if (p.a === p.b) { emp++; return; }
+        res++;
+      });
+      let h = "";
+      if (emp > 0) h += '<div class="aviso-anexo erro-box">⚠ <b>' + emp + ' confronto(s) empatado(s)</b> nesta fase — empate não avança. Defina um vencedor em cada um.</div>';
+      if (agu > 0) h += '<div class="aviso-anexo">Há <b>' + agu + ' confronto(s) "aguardando"</b>: o vencedor da fase anterior ainda não foi definido. Volte uma fase e resolva.</div>';
+      alertasEl.innerHTML = h;
+      if (pbtn) {
+        const faltam = jogos.length - res;
+        if (faltam > 0) {
+          pbtn.textContent = "Defina o vencedor de " + faltam + " confronto(s) para avançar";
+          pbtn.classList.add("desabilitado"); pbtn.disabled = true; pbtn.onclick = null;
+        } else {
+          pbtn.textContent = FASES[idx + 1].nome + " →";
+          pbtn.classList.remove("desabilitado"); pbtn.disabled = false;
+          pbtn.onclick = () => { faseAtual = FASES[idx + 1].id; renderPalpite(); };
+        }
+      }
+    };
+    atualizarFeedbackFase();
     if (fase === "final") {
       const concluir = el("button", "btn-primario", "Concluir e ver Resultados →");
       concluir.onclick = () => {
@@ -385,6 +406,7 @@
         if (va != null && vb != null && va === vb) popup("No mata-mata não pode haver empate. Defina um vencedor — quem empata não avança e trava a próxima fase.");
         pintarCard(card, venc, m, { a: va, b: vb });
         atualizarProgresso(); renderEtapas();
+        if (atualizarFeedbackFase) atualizarFeedbackFase();
         if (inp.value !== "" && va !== vb) focarProximo(inp);
       };
     });
