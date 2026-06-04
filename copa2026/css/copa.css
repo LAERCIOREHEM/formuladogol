@@ -164,3 +164,18 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .grid-grupos{grid-template-columns:1fr}
   .placar input{width:42px;height:42px;font-size:18px}
 }
+
+/* ---- Ajustes UX: rótulos da final, ranking por % ---- */
+.rotulo-jogo{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.5px;font-size:13px;
+  text-transform:uppercase;color:var(--gold);margin:16px 2px 6px}
+.lista-jogos .rotulo-jogo:first-child{margin-top:4px}
+
+.rank-pct{margin-top:4px}
+.rank-linha{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--linha)}
+.rank-linha:last-child{border-bottom:none}
+.rank-nome{flex:0 0 32%;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-barra{flex:1;height:10px;background:var(--navy);border:1px solid var(--linha);border-radius:99px;overflow:hidden}
+.rank-fill{display:block;height:100%;width:0;background:var(--gold);border-radius:99px;transition:width .35s ease}
+.rank-num{flex:0 0 46px;text-align:right;font-family:'Anton',sans-serif;font-size:16px;color:var(--branco)}
+.rank-linha.completo .rank-fill{background:var(--verde)}
+.rank-linha.completo .rank-num{color:var(--verde)}
