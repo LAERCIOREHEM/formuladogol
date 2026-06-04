@@ -6,6 +6,9 @@
 (function () {
   "use strict";
 
+  // >>> TROQUE por uma senha sua. Quem não souber não acessa esta área. <<<
+  const ADMIN_SENHA = "Geloca@1979";
+
   const KEY = "copa2026_roster";
   const $ = s => document.querySelector(s);
 
@@ -81,6 +84,43 @@
     copiar("Bolão Copa 2026 — acessos\n" + txt, $("#btn-copiar-tudo"));
   }
 
+  // Gera o SQL pronto para inserir os participantes no Supabase.
+  // 'on conflict (nome) do nothing' = nunca sobrescreve quem já existe;
+  // só adiciona os nomes novos. (Para trocar um PIN, use UPDATE no banco.)
+  function copiarSQL() {
+    const r = getRoster();
+    if (!r.length) return;
+    const linhas = r.map(i =>
+      "  ('" + i.nome.replace(/'/g, "''") + "', crypt('" + i.pin + "', gen_salt('bf')))"
+    ).join(",\n");
+    const sql = "insert into participantes (nome, pin_hash) values\n" + linhas +
+      "\non conflict (nome) do nothing;";
+    copiar(sql, $("#btn-copiar-sql"));
+  }
+
+  // Trava a área por senha (definida na constante ADMIN_SENHA, no topo deste arquivo)
+  function travaAdmin() {
+    var senha = ADMIN_SENHA;
+    function abrir() {
+      document.getElementById("gate").style.display = "none";
+      document.getElementById("painel-admin").style.display = "";
+      render();
+    }
+    if (localStorage.getItem("copa_admin_ok") === "1") { abrir(); return; }
+    var inp = document.getElementById("gate-pass");
+    function tenta() {
+      if (senha && inp.value === senha) {
+        localStorage.setItem("copa_admin_ok", "1"); abrir();
+      } else {
+        var e = document.getElementById("gate-erro");
+        e.textContent = "Senha incorreta."; e.className = "msg erro"; e.classList.remove("oculto");
+      }
+    }
+    document.getElementById("gate-btn").onclick = tenta;
+    inp.onkeydown = function (ev) { if (ev.key === "Enter") tenta(); };
+    inp.focus();
+  }
+
   function alerta(msg, ok) {
     const e = $("#msg"); e.textContent = msg;
     e.className = "msg " + (ok ? "ok" : "erro"); e.classList.remove("oculto");
@@ -90,6 +130,7 @@
     const r = getRoster();
     $("#contador").textContent = r.length ? r.length + " participante(s)" : "Nenhum participante ainda";
     $("#btn-copiar-tudo").style.display = r.length ? "inline-block" : "none";
+    $("#btn-copiar-sql").style.display = r.length ? "inline-block" : "none";
     const tb = $("#lista"); tb.innerHTML = "";
     r.forEach(item => {
       const enviou = jaEnviou(item.nome);
@@ -121,7 +162,8 @@
   document.addEventListener("DOMContentLoaded", () => {
     $("#btn-gerar").onclick = gerar;
     $("#btn-copiar-tudo").onclick = copiarTudo;
+    $("#btn-copiar-sql").onclick = copiarSQL;
     $("#btn-limpar").onclick = limparTudo;
-    render();
+    travaAdmin();
   });
 })();
