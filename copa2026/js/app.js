@@ -196,6 +196,7 @@
     if (qual === "palpite") { $("#tela-palpite").classList.remove("oculto"); renderPalpite(); }
     if (qual === "ranking") { $("#tela-ranking").classList.remove("oculto"); renderRanking(); }
     if (qual === "resultados") { $("#tela-resultados").classList.remove("oculto"); renderResultados(); }
+    if (qual === "regras") { $("#tela-regras").classList.remove("oculto"); }
   }
 
   function recomputar() {
