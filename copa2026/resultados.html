@@ -58,6 +58,15 @@
   .placar .x{color:var(--cinza);font-size:15px}
   .hora{font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;white-space:nowrap}
   .venue{font-size:11px;color:var(--cinza);text-align:center;margin-top:8px}
+  .vermais{background:none;border:none;color:var(--gold);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px;padding:0}
+  .subpal{margin-top:6px;border-top:1px dashed var(--linha);padding-top:4px}
+  .subcnt{font-size:11px;color:var(--cinza);margin:4px 0}
+  .subpal .prow{display:flex;justify-content:space-between;align-items:center;padding:6px 2px;font-size:13px;border-top:1px solid var(--linha)}
+  .subpal .pal{color:var(--cinza);font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:2px}
+  .bola{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:9px}
+  .bola.v{background:var(--verde)}.bola.x{background:rgba(159,176,199,.25)}
+  .cravou{color:var(--gold);font-weight:700;font-size:11px;margin-left:8px}
+  .aguard{color:var(--cinza);font-size:11px;margin-left:8px}
   .vazio{color:var(--cinza);text-align:center;padding:24px;line-height:1.6}
 </style>
 </head>
@@ -82,6 +91,8 @@
   <div id="lista"></div>
 </div>
 
+<script src="js/config.js"></script>
+<script src="js/engine.js"></script>
 <script src="js/resultados.js"></script>
 <footer class="rodape">
   <a href="regras.html">Regras</a><span class="sep">·</span>
