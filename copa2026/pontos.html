@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classificação — Bolão Copa 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/copa.css">
+<style>
+  .wrap{max-width:580px;margin:0 auto;padding:16px 12px 60px}
+  .cab-topo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .cab-topo .tro{font-size:26px}
+  .cab-topo h1{font-family:'Anton',sans-serif;font-weight:400;font-size:19px;letter-spacing:.5px;line-height:1}
+  .cab-topo h1 b{color:var(--gold)}
+  .cab-topo .sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);margin-top:3px}
+  .voltar{display:inline-block;color:var(--cinza);font-size:13px;text-decoration:none;border-bottom:1px dotted var(--cinza);margin-bottom:12px}
+  .premio{font-size:12px;color:var(--cinza);margin:0 2px 10px}.premio b{color:var(--gold)}
+  .legenda-top{display:flex;gap:14px;justify-content:center;font-size:11px;color:var(--cinza);margin-bottom:12px}
+  .legenda-top span{display:inline-flex;align-items:center;gap:5px}
+  .sq{width:11px;height:11px;border-radius:3px;display:inline-block}.sq.v{background:var(--verde)}.sq.r{background:var(--vermelho)}.sq.g{background:rgba(159,176,199,.3)}
+  .aviso{background:rgba(244,197,66,.10);border:1px solid var(--gold-2);border-radius:12px;padding:11px 13px;margin-bottom:14px;font-size:13px;line-height:1.55;color:#f3dea6}.aviso b{color:var(--gold)}
+
+  .card{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:12px 13px;margin-bottom:8px}
+  .card.p1{border-color:rgba(244,197,66,.55);background:linear-gradient(90deg,rgba(244,197,66,.10),var(--navy-2))}
+  .card.p2{border-color:rgba(199,208,220,.4)}.card.p3{border-color:rgba(205,127,77,.45)}
+  .head{display:flex;align-items:center;gap:10px}
+  .head .pos{font-family:'Anton',sans-serif;font-size:18px;width:28px;text-align:center;color:var(--cinza)}
+  .head .medal{font-size:20px;width:28px;text-align:center}
+  .head .nm{flex:1;font-weight:700;font-size:16px}
+  .head .conq{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:1px}
+  .card.p1 .conq{color:var(--gold)}.card.p2 .conq{color:#c7d0dc}.card.p3 .conq{color:#cd7f4d}
+  .head .conq small{display:block;font-family:'Archivo';font-size:9px;font-weight:600;color:var(--cinza);letter-spacing:1px;text-align:right}
+  .barra{display:flex;height:9px;border-radius:99px;overflow:hidden;margin:10px 0 8px;background:rgba(0,0,0,.25)}
+  .barra .b{height:100%}.barra .v{background:var(--verde)}.barra .r{background:var(--vermelho)}.barra .g{background:rgba(159,176,199,.3)}
+  .nums{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px}
+  .nums b{font-family:'Anton',sans-serif;font-size:14px;letter-spacing:.5px}
+  .nums .cn b{color:var(--verde)}.nums .pn b{color:var(--vermelho)}.nums .sn b{color:var(--cinza)}.nums .tn b{color:var(--gold)}
+  .nums span{color:var(--cinza)}
+  .sel{margin-top:10px;border-top:1px solid var(--linha);padding-top:8px;font-size:12px;color:var(--cinza);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .fases{display:flex;flex-wrap:wrap;gap:4px 12px}.ph b{color:var(--branco);font-family:'Anton',sans-serif;font-size:13px}
+  .det{display:none;margin-top:8px;font-size:12px;line-height:1.7}.det.aberto{display:block}
+  .fp{display:flex;justify-content:space-between;padding:3px 0;font-size:13px}
+  .fp img{width:18px;border-radius:2px;vertical-align:-3px}
+  .fp .ok{color:var(--verde)}.fp .err{color:var(--vermelho)}.fp .pend{color:var(--cinza)}
+  .pend{color:var(--cinza)}
+
+  .bloq{max-width:420px;margin:50px auto 0;text-align:center;background:var(--navy-2);border:1px solid var(--linha);border-radius:14px;padding:28px 20px}
+  .bloq .cad{font-size:40px;margin-bottom:10px}.bloq h2{font-family:'Anton',sans-serif;font-weight:400;font-size:20px;margin-bottom:8px}
+  .bloq p{font-size:14px;color:var(--cinza);line-height:1.6}
+  .vazio{color:var(--cinza);text-align:center;padding:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="cab-topo"><span class="tro">🏆</span>
+    <div><h1>Classificação — <b>por pontos</b></h1><div class="sub">Bolão Copa 2026</div></div></div>
+  <a href="index.html" class="voltar">← Voltar ao bolão</a>
+  <div class="premio">Premiação: <b>60%</b> campeão · <b>25%</b> 2º · <b>15%</b> 3º</div>
+  <div class="legenda-top"><span><span class="sq v"></span> conquistados</span><span><span class="sq r"></span> perdidos</span><span><span class="sq g"></span> possíveis</span></div>
+  <div id="app"><p class="vazio">Carregando…</p></div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/pontuacao.js"></script>
+<script src="js/pontos.js"></script>
+</body>
+</html>
