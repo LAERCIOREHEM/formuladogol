@@ -1,0 +1,189 @@
+/* =========================================================================
+   pontos.js — Classificação do bolão por PONTOS (Copa 2026)
+   Cruza o palpite de cada um (derivado pela engine) com o resultado OFICIAL
+   (montado a partir do feed da ESPN) usando COPA_PONTUACAO.calcular.
+   Pontuação só começa na 2ª fase (quando as 32 são definidas).
+   ========================================================================= */
+(function () {
+  "use strict";
+  const CFG = window.COPA_CFG || { url: "", key: "" };
+  const $ = s => document.querySelector(s);
+  const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+  const ESPN_OVR = {};
+  // janelas de data por fase (calendário oficial da ESPN)
+  const JANELAS = ["20260611-20260627", "20260628-20260703", "20260704-20260707", "20260709-20260711", "20260714-20260715", "20260718-20260718", "20260719-20260719"];
+  let DADOS = {}, JOGOS = [], GRUPOS = [], PART = [], timer = null;
+
+  async function rpc(fn, body) {
+    const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": CFG.key, "Authorization": "Bearer " + CFG.key },
+      body: JSON.stringify(body || {})
+    });
+    if (!r.ok) throw new Error("RPC " + fn);
+    return r.json();
+  }
+  const nome = id => (DADOS.nomeDe && DADOS.nomeDe[id]) || id || "—";
+  const iso = id => (DADOS.isoDe && DADOS.isoDe[id]) || "";
+  const flag = id => { const c = iso(id); return c ? `<img src="https://flagcdn.com/w40/${c}.png" title="${nome(id)}" alt="" onerror="this.style.visibility='hidden'">` : ""; };
+  const norm = ab => ESPN_OVR[ab] || ab;
+  const inter = (a, b) => { const s = new Set(b || []); return (a || []).filter(x => s.has(x)); };
+
+  async function init() {
+    try {
+      const [s, e, t] = await Promise.all([
+        fetch("dados/selecoes.json").then(r => r.json()),
+        fetch("dados/estrutura_mata_mata.json").then(r => r.json()),
+        fetch("dados/terceiros_map.json").then(r => r.json())
+      ]);
+      DADOS.selecoes = s.selecoes; DADOS.estrutura = e; DADOS.terceirosMap = t;
+      DADOS.nomeDe = {}; DADOS.isoDe = {};
+      s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
+    } catch (err) { $("#app").innerHTML = '<p class="vazio">Erro ao carregar os dados da Copa.</p>'; return; }
+    JOGOS = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes);
+    GRUPOS = [...new Set(JOGOS.map(j => j.grupo))].sort();
+
+    try {
+      const rows = await rpc("copa_revelados", {});
+      PART = (rows || []).map(r => {
+        const pl = r.payload || {};
+        const g = Object.keys(pl.placaresGrupos || {}).map(id => ({ jogo_id: id, ga: pl.placaresGrupos[id].ga, gb: pl.placaresGrupos[id].gb }));
+        let d = null;
+        try { d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap); } catch (e) {}
+        return { nome: r.nome, d };
+      }).filter(p => p.d);
+    } catch (e) { PART = []; }
+
+    if (!PART.length) { $("#app").innerHTML = '<div class="bloq"><div class="cad">🔒</div><h2>Aguardando a trava</h2><p>A classificação aparece depois que as apostas travarem (10/06 23h59) e os palpites forem liberados.</p></div>'; return; }
+
+    atualizar(); timer = setInterval(atualizar, 120000); // recalcula a cada 2 min
+  }
+
+  // ---- monta o resultado OFICIAL a partir da ESPN ----
+  function phaseOf(ev) { return (ev.season && ev.season.slug) || ""; }
+  function teamsOf(ev) { return (ev.competitions[0].competitors || []).map(c => norm((c.team || {}).abbreviation)); }
+  function isPost(ev) { return ev.competitions[0].status.type.state === "post"; }
+  function winLoseOf(ev) {
+    const cs = ev.competitions[0].competitors || [];
+    const w = cs.find(c => c.winner), l = cs.find(c => !c.winner);
+    return { w: w ? norm(w.team.abbreviation) : null, l: l ? norm(l.team.abbreviation) : null };
+  }
+
+  function buildOficial(events) {
+    const o = { decididos: {} };
+    const slugTeams = slug => [...new Set(events.filter(e => phaseOf(e) === slug).flatMap(teamsOf))];
+
+    // --- mata-mata: quem ALCANÇOU cada fase = quem está nos confrontos daquela fase ---
+    const r32 = slugTeams("round-of-32");
+    o.avancam_oitavas = slugTeams("round-of-16");
+    o.avancam_quartas = slugTeams("quarterfinals");
+    o.semifinalistas = slugTeams("semifinals");
+    o.finalistas = slugTeams("final");
+
+    // --- grupos: posições + melhores terceiros, derivados com a própria engine ---
+    const realG = [];
+    events.filter(e => phaseOf(e) === "group-stage" && isPost(e)).forEach(ev => {
+      const cs = ev.competitions[0].competitors;
+      const home = cs.find(c => c.homeAway === "home") || cs[0], away = cs.find(c => c.homeAway === "away") || cs[1];
+      const hId = norm(home.team.abbreviation), aId = norm(away.team.abbreviation);
+      const j = JOGOS.find(x => (x.a === hId && x.b === aId) || (x.a === aId && x.b === hId));
+      if (!j) return;
+      const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
+      const ga = j.a === hId ? hs : as, gb = j.a === hId ? as : hs;
+      realG.push({ jogo_id: j.jogo_id, ga, gb });
+    });
+    const completos = {}; GRUPOS.forEach(g => completos[g] = realG.filter(p => p.jogo_id.startsWith("G_" + g + "_")).length === 6);
+    const todosGrupos = GRUPOS.every(g => completos[g]);
+
+    if (realG.length) {
+      let dg = null; try { dg = COPA_ENGINE.derivar(DADOS.selecoes, realG, {}, DADOS.estrutura, DADOS.terceirosMap); } catch (e) {}
+      if (dg) {
+        o.classificacao = {};
+        GRUPOS.forEach(g => { if (completos[g]) o.classificacao[g] = dg.classificacao[g]; });
+        if (todosGrupos) { o.classificados32 = dg.classificados32; o.melhores_terceiros = dg.melhores_terceiros; }
+      }
+    }
+    if (r32.length) o.classificados32 = r32; // se a ESPN já publicou os confrontos da 2ª fase, é a fonte oficial
+
+    // --- 1º a 4º ---
+    const fin = events.find(e => phaseOf(e) === "final" && isPost(e));
+    if (fin) { const wl = winLoseOf(fin); o.campeao = wl.w; o.vice = wl.l; o.decididos.campeao = true; o.decididos.vice = true; }
+    const ter = events.find(e => (phaseOf(e) === "third-place") && isPost(e));
+    if (ter) { const wl = winLoseOf(ter); o.terceiro = wl.w; o.quarto = wl.l; o.decididos.terceiro = true; o.decididos.quarto = true; }
+
+    // --- eliminados (para os "perdidos") ---
+    const elim = new Set();
+    events.forEach(ev => { if (phaseOf(ev) !== "group-stage" && isPost(ev)) { const wl = winLoseOf(ev); if (wl.l) elim.add(wl.l); } });
+    if (todosGrupos && o.classificados32) {
+      const passou = new Set(o.classificados32);
+      DADOS.selecoes.forEach(s => { if (!passou.has(s.id)) elim.add(s.id); });
+    }
+    o.eliminados = [...elim];
+
+    o._meta = { todosGrupos, segundaFase: !!(o.classificados32 && o.classificados32.length), nGruposCompletos: GRUPOS.filter(g => completos[g]).length };
+    return o;
+  }
+
+  async function atualizar() {
+    let events = [];
+    try {
+      const lotes = await Promise.all(JANELAS.map(d => fetch(`${API}?dates=${d}&limit=120`).then(r => r.json()).catch(() => ({ events: [] }))));
+      const vistos = new Set();
+      lotes.forEach(l => (l.events || []).forEach(ev => { if (!vistos.has(ev.id)) { vistos.add(ev.id); events.push(ev); } }));
+    } catch (e) {}
+    const o = buildOficial(events);
+    render(o);
+  }
+
+  // ---- render ----
+  const FASES = [
+    { k: "classificados32", n: 32, lab: "2ª fase" },
+    { k: "avancam_oitavas", n: 16, lab: "Oitavas" },
+    { k: "avancam_quartas", n: 8, lab: "Quartas" },
+    { k: "semifinalistas", n: 4, lab: "Semifinal" }
+  ];
+  function detalheFinal(p, o) {
+    const labs = [["campeao", "Campeão", 40], ["vice", "Vice", 25], ["terceiro", "3º lugar", 15], ["quarto", "4º lugar", 10]];
+    return labs.map(([k, lab]) => {
+      const pick = p[k]; if (!pick) return "";
+      let st = "", cls = "pend";
+      if (o.decididos && o.decididos[k]) { if (o[k] === pick) { st = "✓ acertou"; cls = "ok"; } else { st = "✗ errou"; cls = "err"; } }
+      else st = "aguardando";
+      return `<div class="fp"><span>${lab}: ${flag(pick)} ${nome(pick)}</span><span class="${cls}">${st}</span></div>`;
+    }).join("");
+  }
+
+  function render(o) {
+    const lin = PART.map(p => {
+      const r = COPA_PONTUACAO.calcular(p.d, o);
+      return { nome: p.nome, d: p.d, r };
+    }).sort((a, b) => b.r.atuais - a.r.atuais || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+
+    let banner = "";
+    if (!o._meta.segundaFase) banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>teto</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
+
+    $("#app").innerHTML = banner + lin.map((x, i) => {
+      const pos = i + 1, r = x.r;
+      const tot = r.atuais + r.perdidos + r.possiveis || 1;
+      const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
+      const cls = pos <= 3 ? " p" + pos : "";
+      const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
+      const fasesHTML = FASES.map(f => {
+        const real = o[f.k] || [];
+        if (!real.length) return `<span class="ph">${f.lab}: <b>—</b></span>`;
+        const ac = inter(x.d[f.k], real).length;
+        return `<span class="ph">${f.lab}: <b>${ac}/${f.n}</b></span>`;
+      }).join("");
+      return `<div class="card${cls}">
+        <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
+        <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
+        <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">teto <b>${r.teto}</b></span></div>
+        <div class="sel" data-i="${i}"><span class="fases">${fasesHTML}</span><span class="seta">▾</span></div>
+        <div class="det" id="det${i}">${detalheFinal(x.d, o) || '<p class="pend">Final ainda não definida.</p>'}</div>
+      </div>`;
+    }).join("");
+    document.querySelectorAll(".sel[data-i]").forEach(e => e.onclick = () => { const d = $("#det" + e.dataset.i); d.classList.toggle("aberto"); e.querySelector(".seta").textContent = d.classList.contains("aberto") ? "▴" : "▾"; });
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
