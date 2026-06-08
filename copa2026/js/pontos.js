@@ -50,7 +50,7 @@
         const g = Object.keys(pl.placaresGrupos || {}).map(id => ({ jogo_id: id, ga: pl.placaresGrupos[id].ga, gb: pl.placaresGrupos[id].gb }));
         let d = null;
         try { d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap); } catch (e) {}
-        return { nome: r.nome, d };
+        return { nome: r.nome, d, pg: pl.placaresGrupos || {} };
       }).filter(p => p.d);
     } catch (e) { PART = []; }
 
@@ -120,6 +120,7 @@
     }
     o.eliminados = [...elim];
 
+    o._realGrupos = {}; realG.forEach(x => o._realGrupos[x.jogo_id] = { ga: x.ga, gb: x.gb });
     o._meta = { todosGrupos, segundaFase: !!(o.classificados32 && o.classificados32.length), nGruposCompletos: GRUPOS.filter(g => completos[g]).length };
     return o;
   }
@@ -134,6 +135,8 @@
     const o = buildOficial(events);
     render(o);
   }
+
+  function cravadosDe(pg, real) { let n = 0; for (const id in real) { const a = pg[id]; if (a && a.ga === real[id].ga && a.gb === real[id].gb) n++; } return n; }
 
   // ---- render ----
   const FASES = [
@@ -156,13 +159,15 @@
   function render(o) {
     const lin = PART.map(p => {
       const r = COPA_PONTUACAO.calcular(p.d, o);
-      return { nome: p.nome, d: p.d, r };
-    }).sort((a, b) => b.r.atuais - a.r.atuais || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+      const cr = cravadosDe(p.pg, o._realGrupos || {});
+      return { nome: p.nome, d: p.d, r, cr };
+    }).sort((a, b) => b.r.atuais - a.r.atuais || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
 
     let banner = "";
     if (!o._meta.segundaFase) banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>teto</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
 
-    $("#app").innerHTML = banner + lin.map((x, i) => {
+    const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯</p>';
+    $("#app").innerHTML = banner + tbnote + lin.map((x, i) => {
       const pos = i + 1, r = x.r;
       const tot = r.atuais + r.perdidos + r.possiveis || 1;
       const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
@@ -178,7 +183,7 @@
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
         <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
         <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">teto <b>${r.teto}</b></span></div>
-        <div class="sel" data-i="${i}"><span class="fases">${fasesHTML}</span><span class="seta">▾</span></div>
+        <div class="sel" data-i="${i}"><span class="fases">${fasesHTML}<span class="ph">🎯 <b>${x.cr}</b> cravados</span></span><span class="seta">▾</span></div>
         <div class="det" id="det${i}">${detalheFinal(x.d, o) || '<p class="pend">Final ainda não definida.</p>'}</div>
       </div>`;
     }).join("");
