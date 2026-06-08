@@ -148,7 +148,6 @@
 
   function abrirApp() {
     $("#tela-login").classList.add("oculto");
-    $("#abas").classList.remove("oculto");
     $("#topo-usuario").classList.remove("oculto");
     $("#usuario-nome").textContent = "Olá, " + USER.nome;
     trocarTela("palpite");
@@ -157,7 +156,7 @@
     localStorage.removeItem("copa2026_sessao");
     localStorage.removeItem("copa2026_login");
     USER = null; P = null; derivado = null;
-    $("#abas").classList.add("oculto"); $("#topo-usuario").classList.add("oculto");
+    $("#topo-usuario").classList.add("oculto");
     document.querySelectorAll(".tela").forEach(t => t.classList.add("oculto"));
     $("#tela-login").classList.remove("oculto");
     $("#in-nome").value = ""; $("#in-pin").value = "";
@@ -189,15 +188,10 @@
     }
   }
 
-  function trocarTela(qual, btn) {
+  function trocarTela(qual) {
     document.querySelectorAll(".tela").forEach(t => t.classList.add("oculto"));
-    document.querySelectorAll(".aba").forEach(b => b.classList.remove("ativa"));
-    if (btn) btn.classList.add("ativa");
-    else document.querySelector('.aba[data-tela="palpite"]').classList.add("ativa");
-    if (qual === "palpite") { $("#tela-palpite").classList.remove("oculto"); renderPalpite(); }
-    if (qual === "ranking") { $("#tela-ranking").classList.remove("oculto"); renderRanking(); }
-    if (qual === "resultados") { $("#tela-resultados").classList.remove("oculto"); renderResultados(); }
-    if (qual === "regras") { $("#tela-regras").classList.remove("oculto"); }
+    $("#tela-palpite").classList.remove("oculto");
+    renderPalpite();
   }
 
   function recomputar() {
@@ -367,12 +361,12 @@
     };
     atualizarFeedbackFase();
     if (fase === "final") {
-      const concluir = el("button", "btn-primario", "Concluir e ver Resultados →");
+      const concluir = el("button", "btn-primario", "Concluir meu palpite ✓");
       concluir.onclick = () => {
         persistir();
         const faltam = 104 - totalPreenchidos();
         if (faltam > 0) { popup("Ainda faltam " + faltam + " jogo(s) para concluir. Verifique se há empates no mata-mata — eles não contam até você definir um vencedor."); return; }
-        trocarTela("resultados", document.querySelector('.aba[data-tela="resultados"]'));
+        popup("Palpite completo! 🎉 Está salvo. Você pode alterar até 10/06 às 23h59 — depois trava e fica visível a todos em \"Palpites\".");
       };
       acoes.appendChild(concluir);
     }
