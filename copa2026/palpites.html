@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palpites de todos — Bolão Copa 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/copa.css">
+<style>
+  .wrap{max-width:580px;margin:0 auto;padding:16px 12px 60px}
+  .cab-topo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .cab-topo .tro{font-size:26px}
+  .cab-topo h1{font-family:'Anton',sans-serif;font-weight:400;font-size:19px;letter-spacing:.5px;line-height:1}
+  .cab-topo h1 b{color:var(--gold)}
+  .cab-topo .sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);margin-top:3px}
+  .voltar{display:inline-block;color:var(--cinza);font-size:13px;text-decoration:none;border-bottom:1px dotted var(--cinza);margin-bottom:14px}
+  .aviso{background:rgba(29,185,84,.10);border:1px solid rgba(29,185,84,.35);border-radius:12px;padding:10px 13px;margin:8px 0 14px;font-size:12px;line-height:1.5;color:#bfeccd}
+  .aviso b{color:var(--verde)}
+  .abas{display:flex;gap:8px;margin-bottom:14px}
+  .abas button{flex:1;font-family:inherit;font-weight:700;font-size:14px;padding:11px;border-radius:10px;cursor:pointer;border:1px solid var(--linha);background:var(--navy-2);color:var(--cinza)}
+  .abas button.on{background:var(--gold);color:#3a2a00;border-color:var(--gold)}
+  #contagem{font-size:12px;color:var(--cinza);text-align:center;margin-bottom:12px}
+
+  .grupo-tit{font-family:'Anton',sans-serif;font-size:14px;letter-spacing:1px;color:var(--gold);margin:16px 2px 8px;text-transform:uppercase}
+  .jogo{background:var(--navy-2);border:1px solid var(--linha);border-radius:11px;margin-bottom:7px;overflow:hidden}
+  .jogo .cab{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer}
+  .jogo .conf{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700}
+  .jogo .conf img{width:24px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+  .jogo .conf .vs{color:var(--cinza);font-size:12px}
+  .jogo .seta{color:var(--cinza);font-size:12px;transition:.2s}
+  .jogo.aberto .seta{transform:rotate(90deg)}
+  .jogo .palps{display:none;border-top:1px solid var(--linha);padding:6px 13px 12px;background:rgba(0,0,0,.12)}
+  .jogo.aberto .palps{display:block}
+  .pp{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px}
+  .pp:last-child{border-bottom:none}
+  .pp .nm{font-weight:600}
+  .pp .pl{font-family:'Anton',sans-serif;font-size:16px;letter-spacing:1px;background:rgba(0,0,0,.25);border:1px solid var(--linha);border-radius:7px;padding:2px 9px}
+  .pp .pl i{color:var(--cinza);font-style:normal;margin:0 3px}
+
+  .pessoa{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;margin-bottom:8px;overflow:hidden}
+  .pessoa .linha{display:grid;grid-template-columns:1fr 52px 52px 52px;gap:6px;align-items:center;padding:11px 12px;cursor:pointer}
+  .pessoa .nm{font-weight:700;font-size:15px;display:flex;align-items:center;gap:7px}
+  .pessoa .nm .seta{color:var(--cinza);font-size:11px;transition:.2s}
+  .pessoa.aberto .seta{transform:rotate(90deg)}
+  .cel{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .cel img{width:28px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+  .cel .sg{font-size:9px;color:var(--cinza)}
+  .pessoa .det{display:none;border-top:1px solid var(--linha);padding:12px;background:rgba(0,0,0,.12)}
+  .pessoa.aberto .det{display:block}
+  .det .q{font-size:12px;color:var(--cinza);margin-bottom:10px} .det .q b{color:var(--branco)}
+  .det .tit{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .grid32{display:grid;grid-template-columns:repeat(8,1fr);gap:7px}
+  .t{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .t img{width:24px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
+  .t .sg{font-size:8px;color:var(--cinza)}
+  .t.campeao img{box-shadow:0 0 0 2px var(--gold),0 0 9px rgba(244,197,66,.5)}
+  .incompleto{color:var(--cinza);font-size:13px}
+  @media(max-width:520px){.grid32{grid-template-columns:repeat(6,1fr)}}
+
+  .bloq{max-width:420px;margin:50px auto 0;text-align:center;background:var(--navy-2);border:1px solid var(--linha);border-radius:14px;padding:28px 20px}
+  .bloq .cad{font-size:40px;margin-bottom:10px}
+  .bloq h2{font-family:'Anton',sans-serif;font-weight:400;font-size:20px;margin-bottom:8px}
+  .bloq p{font-size:14px;color:var(--cinza);line-height:1.6}
+  .bloq p b{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="cab-topo"><span class="tro">🏆</span>
+    <div><h1>Palpites de <b>todos</b></h1><div class="sub">Bolão Copa 2026</div></div></div>
+  <a href="index.html" class="voltar">← Voltar ao bolão</a>
+
+  <div id="topo" style="display:none">
+    <div class="aviso">🔓 Apostas encerradas — agora é tudo aberto. Veja o que cada um cravou em cada jogo (aba <b>Por jogo</b>) e a aposta de classificação de cada um (aba <b>Por classificação</b>).</div>
+    <div class="abas"><button id="ab-jogo" class="on">Por jogo</button><button id="ab-class">Por classificação</button></div>
+    <div id="contagem"></div>
+  </div>
+
+  <div id="app"></div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/palpites.js"></script>
+</body>
+</html>
