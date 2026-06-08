@@ -187,3 +187,20 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 
 /* Botão de avançar desabilitado (fase com empate/pendência) */
 .btn-primario.desabilitado, .btn-primario:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.35)}
+
+/* ===== MENU UNIFICADO (todas as páginas) ===== */
+.menu{display:flex;gap:6px;margin-top:14px;background:var(--navy-2);border:1px solid var(--linha);
+  border-radius:12px;padding:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.menu::-webkit-scrollbar{display:none}
+.menu a{flex:1 0 auto;text-align:center;white-space:nowrap;color:var(--cinza);text-decoration:none;
+  font-weight:600;font-size:14px;padding:10px 14px;border-radius:8px;transition:background .15s,color .15s}
+.menu a:hover{color:var(--branco)}
+.menu a.ativo{background:var(--gold);color:#3a2a00}
+
+/* ===== RODAPÉ APARTADO (regras/admin/brasileirão) ===== */
+.rodape{max-width:760px;margin:30px auto 0;padding:16px 14px 34px;border-top:1px solid var(--linha);
+  display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;align-items:center}
+.rodape a{color:var(--cinza);text-decoration:none;font-size:13px}
+.rodape a:hover{color:var(--branco)}
+.rodape a.adm{opacity:.65}
+.rodape .sep{color:var(--linha);font-size:13px}
