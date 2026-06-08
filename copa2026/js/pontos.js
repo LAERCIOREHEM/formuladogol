@@ -28,6 +28,12 @@
   const flag = id => { const c = iso(id); return c ? `<img src="https://flagcdn.com/w40/${c}.png" title="${nome(id)}" alt="" onerror="this.style.visibility='hidden'">` : ""; };
   const norm = ab => ESPN_OVR[ab] || ab;
   const inter = (a, b) => { const s = new Set(b || []); return (a || []).filter(x => s.has(x)); };
+  const fateDe = (team, o) => {
+    if (!o.classificados32 || !o.classificados32.length) return "pend";
+    if (o.classificados32.indexOf(team) === -1) return "wrong";
+    if ((o.eliminados || []).indexOf(team) !== -1) return "out";
+    return "alive";
+  };
 
   async function init() {
     try {
@@ -179,15 +185,22 @@
         const ac = inter(x.d[f.k], real).length;
         return `<span class="ph">${f.lab}: <b>${ac}/${f.n}</b></span>`;
       }).join("");
+      const decidiu = o.classificados32 && o.classificados32.length;
+      const picks32 = x.d.classificados32 || [];
+      const vivos = picks32.filter(t => fateDe(t, o) === "alive").length;
+      const funil = picks32.map(t => `<span class="${fateDe(t, o)}">${flag(t)}</span>`).join("");
+      const f32lab = decidiu ? `As 32 de ${x.nome} — <b>${vivos} ainda vivas</b>:` : `As 32 que ${x.nome} classificou no palpite:`;
+      const f32leg = decidiu ? '<div class="f32leg"><span><i class="lg-a"></i>na disputa</span><span><i class="lg-o"></i>caiu</span><span><i class="lg-w"></i>não classificou</span></div>' : "";
       return `<div class="card${cls}">
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
         <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
         <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">teto <b>${r.teto}</b></span></div>
-        <div class="sel" data-i="${i}"><span class="fases">${fasesHTML}<span class="ph">🎯 <b>${x.cr}</b> cravados</span></span><span class="seta">▾</span></div>
-        <div class="det" id="det${i}">${detalheFinal(x.d, o) || '<p class="pend">Final ainda não definida.</p>'}</div>
+        <div class="fases">${fasesHTML}<span class="ph">🎯 <b>${x.cr}</b> cravados</span></div>
+        <div class="podiodet">${detalheFinal(x.d, o)}</div>
+        <div class="f32lab">${f32lab}</div>${f32leg}
+        <div class="f32">${funil}</div>
       </div>`;
     }).join("");
-    document.querySelectorAll(".sel[data-i]").forEach(e => e.onclick = () => { const d = $("#det" + e.dataset.i); d.classList.toggle("aberto"); e.querySelector(".seta").textContent = d.classList.contains("aberto") ? "▴" : "▾"; });
   }
 
   document.addEventListener("DOMContentLoaded", init);
