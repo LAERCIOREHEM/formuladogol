@@ -25,11 +25,14 @@
         <button id="btn-sair" class="btn-mini">Sair</button>
       </div>
     </header>
-    <p style="margin:10px 0 0"><a href="/?brasileirao=1" style="color:var(--gold);font-size:15px;font-weight:600;text-decoration:none">← Ver Brasileirão (pausado durante a Copa)</a></p>
-    <p style="margin:6px 0 0"><a href="palpites.html" style="color:var(--cinza);font-size:14px;text-decoration:none;border-bottom:1px dotted var(--cinza)">🔓 Palpites de todos (após a trava)</a></p>
-    <p style="margin:6px 0 0"><a href="resultados.html" style="color:var(--gold-2);font-size:14px;text-decoration:none;border-bottom:1px dotted var(--gold-2)">⚽ Resultados das partidas</a></p>
-    <p style="margin:6px 0 0"><a href="aovivo.html" style="color:#ff8a82;font-size:14px;text-decoration:none;border-bottom:1px dotted #ff8a82">🔴 Ao vivo</a></p>
-    <p style="margin:6px 0 0"><a href="pontos.html" style="color:var(--gold);font-size:14px;text-decoration:none;border-bottom:1px dotted var(--gold)">📊 Classificação por pontos</a></p>
+
+    <nav class="menu">
+      <a href="index.html" class="ativo">Meu Palpite</a>
+      <a href="aovivo.html">Ao vivo</a>
+      <a href="resultados.html">Resultados</a>
+      <a href="palpites.html">Palpites</a>
+      <a href="pontos.html">Classificação</a>
+    </nav>
 
     <!-- LOGIN -->
     <section id="tela-login" class="tela">
@@ -45,16 +48,8 @@
         <p class="aviso-pin">Guarde seu PIN — você usará esse número para voltar ao palpite.</p>
         <p id="login-erro" class="erro oculto"></p>
       </div>
-      <p style="text-align:center;margin-top:18px"><a href="admin.html" style="color:var(--cinza);font-size:13px;text-decoration:none;border-bottom:1px dotted var(--cinza);padding-bottom:1px">Área do administrador</a></p>
     </section>
 
-    <!-- NAVEGAÇÃO DE FASES -->
-    <nav id="abas" class="abas oculto">
-      <button class="aba ativa" data-tela="palpite">Meu Palpite</button>
-      <button class="aba" data-tela="ranking">Ranking</button>
-      <button class="aba" data-tela="resultados">Resultados</button>
-      <button class="aba" data-tela="regras">Regras</button>
-    </nav>
 
     <!-- MEU PALPITE -->
     <section id="tela-palpite" class="tela oculto">
@@ -69,93 +64,13 @@
       <div id="conteudo-fase"></div>
     </section>
 
-    <!-- RANKING -->
-    <section id="tela-ranking" class="tela oculto">
-      <h2>Ranking</h2>
-      <div id="ranking-conteudo" class="placeholder">
-        <p>O ranking competitivo entre participantes aparece aqui quando o módulo
-           estiver conectado ao banco (Supabase). Veja o passo a passo em
-           <code>PASSO-A-PASSO.md</code>.</p>
-        <p>Sua pontuação pessoal (atuais / possíveis / perdidos) já é calculada localmente
-           e aparece em <b>Meu Palpite → Revisão</b>.</p>
-      </div>
-    </section>
-
-    <!-- RESULTADOS -->
-    <section id="tela-resultados" class="tela oculto">
-      <h2>Resultados oficiais</h2>
-      <div class="acoes" style="margin:0 0 14px"><button id="btn-alterar-palpite" class="btn-sec">← Alterar meus palpites</button></div>
-      <div id="resultados-conteudo" class="placeholder">
-        <p>Os placares oficiais entram aqui, atualizados pelo script
-           <code>scripts/atualizar_copa.py</code> (GitHub Actions), gravando
-           <code>dados/copa2026_resultados.json</code>.</p>
-      </div>
-    </section>
-
-    <!-- REGRAS -->
-    <section id="tela-regras" class="tela oculto">
-      <h2>Regras do Bolão</h2>
-
-      <div class="classif" style="border-color:var(--gold)">
-        <h4 style="color:var(--gold)">Entrada e premiação</h4>
-        <p style="font-size:15px;line-height:1.6;margin:6px 0 10px">
-          Cada participante entra com <b>R$ 100</b>. O prêmio é o <b>total arrecadado</b>
-          (nº de participantes × R$ 100), dividido assim:</p>
-        <ol>
-          <li class="passa"><span>🥇 Campeão do bolão</span><span><b>60%</b></span></li>
-          <li class="passa"><span>🥈 2º lugar</span><span><b>25%</b></span></li>
-          <li class="passa"><span>🥉 3º lugar</span><span><b>15%</b></span></li>
-        </ol>
-        <p class="prazo" style="margin-top:10px">Exemplo com 25 participantes (R$ 2.500): campeão R$ 1.500,
-          2º lugar R$ 625, 3º lugar R$ 375.</p>
-      </div>
-
-      <div class="classif">
-        <h4>Como pontua</h4>
-        <p style="font-size:14px;line-height:1.6;color:var(--cinza)">
-          A pontuação <b>não</b> depende de acertar o placar exato. Vale acertar quem se classifica,
-          as posições nos grupos, os terceiros que avançam, quem chega a cada fase e o campeão, vice,
-          3º e 4º. O placar exato é usado só como <b>critério de desempate</b>.</p>
-      </div>
-
-      <div class="classif">
-        <h4>Pontos — fase de grupos</h4>
-        <ol>
-          <li><span>Cada seleção entre as 32 classificadas</span><span>3</span></li>
-          <li><span>Cada campeão de grupo (1º) correto</span><span>+2</span></li>
-          <li><span>Cada vice de grupo (2º) correto</span><span>+1</span></li>
-          <li><span>Cada 3º de grupo correto</span><span>+1</span></li>
-          <li><span>Cada último (4º) de grupo correto</span><span>+1</span></li>
-          <li><span>Cada um dos 8 melhores terceiros correto</span><span>+3</span></li>
-        </ol>
-      </div>
-
-      <div class="classif">
-        <h4>Pontos — mata-mata (por seleção que avança)</h4>
-        <ol>
-          <li><span>Cada seleção nas oitavas</span><span>4</span></li>
-          <li><span>Cada seleção nas quartas</span><span>6</span></li>
-          <li><span>Cada semifinalista</span><span>9</span></li>
-          <li><span>Cada finalista</span><span>12</span></li>
-          <li class="passa"><span>Campeão</span><span>40</span></li>
-          <li class="passa"><span>Vice-campeão</span><span>25</span></li>
-          <li class="passa"><span>3º lugar</span><span>15</span></li>
-          <li class="passa"><span>4º lugar</span><span>10</span></li>
-        </ol>
-        <p class="prazo" style="margin-top:10px">A seleção acumula os pontos conforme avança (ex.: um campeão
-          pontua nas 32, oitavas, quartas, semi, final e como campeão).</p>
-      </div>
-
-      <div class="classif">
-        <h4>Desempate e prazos</h4>
-        <p style="font-size:14px;line-height:1.6;color:var(--cinza)">
-          Empate é <b>permitido nos grupos</b> e <b>proibido no mata-mata</b>. Em caso de empate na
-          pontuação, desempata quem acertou mais <b>placares exatos</b>. O prazo final para preencher
-          ou alterar é <b>10/06/2026 às 23h59</b> (horário de Brasília); a partir de 11/06 os palpites
-          travam e ficam visíveis a todos. Quem não completar os 104 jogos não concorre.</p>
-      </div>
-    </section>
   </div>
+
+  <footer class="rodape">
+    <a href="regras.html">Regras</a><span class="sep">·</span>
+    <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
+    <a href="/?brasileirao=1">← Brasileirão</a>
+  </footer>
 
   <!-- POPUP -->
   <div id="popup" class="popup oculto">
