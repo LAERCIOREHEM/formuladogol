@@ -204,3 +204,10 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 .rodape a:hover{color:var(--branco)}
 .rodape a.adm{opacity:.65}
 .rodape .sep{color:var(--linha);font-size:13px}
+
+
+/* ===== PALPITE FINALIZADO (lacre individual) ===== */
+.lacrado #etapas,.lacrado #conteudo-fase{pointer-events:none;opacity:.82}
+.banner-lacre{background:rgba(244,197,66,.10);border:1px solid var(--gold-2);border-radius:12px;
+  padding:11px 13px;margin:12px 0;font-size:13px;line-height:1.55;color:#f3dea6}
+.banner-lacre b{color:var(--gold)}
