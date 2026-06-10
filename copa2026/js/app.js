@@ -69,11 +69,83 @@
   function eventos() {
     $("#btn-entrar").onclick = entrar;
     $("#btn-sair").onclick = sair;
+    const bc = $("#btn-comprovante"); if (bc) bc.onclick = gerarComprovante;
     $("#popup-ok").onclick = () => $("#popup").classList.add("oculto");
     document.querySelectorAll(".aba").forEach(b => b.onclick = () => trocarTela(b.dataset.tela, b));
     const ba = $("#btn-alterar-palpite");
     if (ba) ba.onclick = () => trocarTela("palpite", document.querySelector('.aba[data-tela="palpite"]'));
   }
+  // ---------- Comprovante com impressão digital (hash) ----------
+  function canonical(o) {
+    if (o === null || typeof o !== "object") return JSON.stringify(o);
+    if (Array.isArray(o)) return "[" + o.map(canonical).join(",") + "]";
+    return "{" + Object.keys(o).sort().map(k => JSON.stringify(k) + ":" + canonical(o[k])).join(",") + "}";
+  }
+  async function sha256hex(str) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  async function gerarComprovante() {
+    if (!USER || !P) { popup("Entre com seu nome e PIN primeiro."); return; }
+    const agora = new Date();
+    const dataBR = agora.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    const TRAVA = new Date("2026-06-11T03:00:00Z"); // 10/06 23h59 Brasília (~)
+    const hash = await sha256hex(canonical({ g: P.placaresGrupos || {}, m: P.placaresMata || {} }));
+
+    const sig = {}; (DADOS.selecoes || []).forEach(x => sig[x.id] = x.id);
+    const jogos = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes);
+    const porGrupo = {};
+    jogos.forEach(j => {
+      const g = P.placaresGrupos[j.jogo_id];
+      const linha = `${j.a} ${g && g.ga != null ? g.ga : "?"} x ${g && g.gb != null ? g.gb : "?"} ${j.b}`;
+      (porGrupo[j.grupo] = porGrupo[j.grupo] || []).push(linha);
+    });
+    let txt = "";
+    txt += "==============================================\n";
+    txt += " COMPROVANTE DE PALPITE — BOLÃO COPA 2026\n";
+    txt += " Brasileirão Almoço · brasileirao2026almoco.com.br\n";
+    txt += "==============================================\n";
+    txt += `Participante: ${USER.nome}\n`;
+    txt += `Gerado em: ${dataBR} (horário de Brasília)\n`;
+    txt += (agora < TRAVA
+      ? "Situação: ANTES da trava — palpites ainda podiam ser alterados até 10/06 23h59.\n           Gere novamente após a trava para ter o comprovante definitivo.\n"
+      : "Situação: APÓS a trava de 10/06 23h59 — palpites bloqueados para alteração.\n");
+    txt += "\n----- FASE DE GRUPOS (72 jogos) -----\n";
+    Object.keys(porGrupo).sort().forEach(g => { txt += `\nGrupo ${g}\n  ` + porGrupo[g].join("\n  ") + "\n"; });
+
+    let d = null;
+    try {
+      const arr = Object.keys(P.placaresGrupos).map(id => ({ jogo_id: id, ga: P.placaresGrupos[id].ga, gb: P.placaresGrupos[id].gb }));
+      d = COPA_ENGINE.derivar(DADOS.selecoes, arr, P.placaresMata, DADOS.estrutura, DADOS.terceirosMap);
+    } catch (e) {}
+    if (d && d.campeao) {
+      txt += "\n----- MATA-MATA (decorrente dos seus placares) -----\n";
+      txt += `Classificados (32): ${(d.classificados32 || []).join(", ")}\n`;
+      txt += `Oitavas (16): ${(d.avancam_oitavas || []).join(", ")}\n`;
+      txt += `Quartas (8): ${(d.avancam_quartas || []).join(", ")}\n`;
+      txt += `Semifinal (4): ${(d.semifinalistas || []).join(", ")}\n`;
+      txt += `Final (2): ${(d.finalistas || []).join(", ")}\n`;
+      txt += `CAMPEÃO: ${d.campeao} | Vice: ${d.vice} | 3º: ${d.terceiro} | 4º: ${d.quarto}\n`;
+    } else {
+      txt += "\n(Palpite ainda incompleto — chave do mata-mata não fechada.)\n";
+    }
+    txt += "\n----- IMPRESSÃO DIGITAL (SHA-256) -----\n";
+    txt += hash + "\n\n";
+    txt += "Como conferir: após a revelação (11/06), a página \"Palpites\" mostra a\n";
+    txt += "impressão digital calculada direto do banco para cada participante.\n";
+    txt += "Se ela for IGUAL à deste comprovante, seu palpite não foi alterado por\n";
+    txt += "ninguém — nem pelo administrador. Qualquer mudança de 1 gol em 1 jogo\n";
+    txt += "gera uma impressão completamente diferente.\n";
+
+    const blob = new Blob([txt], { type: "text/plain;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `comprovante-copa2026-${USER.nome.replace(/\s+/g, "_")}.txt`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    popup("Comprovante baixado! Guarde o arquivo (ou mande no seu próprio WhatsApp). A impressão digital nele permite conferir depois que nada foi alterado.");
+  }
+
   function popup(msg) { $("#popup-texto").textContent = msg; $("#popup").classList.remove("oculto"); }
   function palpiteVazio() { return { placaresGrupos: {}, placaresMata: {}, status: "rascunho" }; }
   function getRoster() { try { return JSON.parse(localStorage.getItem("copa2026_roster") || "[]"); } catch (e) { return []; } }

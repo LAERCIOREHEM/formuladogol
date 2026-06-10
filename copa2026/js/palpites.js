@@ -53,7 +53,7 @@
       const g = Object.keys(pl.placaresGrupos || {}).map(id => ({ jogo_id: id, ga: pl.placaresGrupos[id].ga, gb: pl.placaresGrupos[id].gb }));
       let d = null;
       try { d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap); } catch (e2) {}
-      return { nome: r.nome, grupos: pl.placaresGrupos || {}, d };
+      return { nome: r.nome, grupos: pl.placaresGrupos || {}, d, raw: pl };
     }).sort((a, b) => a.nome.localeCompare(b.nome));
 
     montarTopo(); render();
@@ -105,8 +105,27 @@
         <div class="det">
           <div class="q">4º lugar: <b>${nome(q)}</b> · Campeão: <b>${nome(c)}</b></div>
           <div class="tit">As 32 classificadas no palpite de ${p.nome}</div>
-          <div class="grid32">${grid}</div></div></div>`;
+          <div class="grid32">${grid}</div>
+          <div class="hashlinha">🔐 Impressão digital deste palpite (confira com seu comprovante):<br><code id="hash_${idx}">calculando…</code></div></div></div>`;
     }).join("");
+  }
+
+  function canonical(o) {
+    if (o === null || typeof o !== "object") return JSON.stringify(o);
+    if (Array.isArray(o)) return "[" + o.map(canonical).join(",") + "]";
+    return "{" + Object.keys(o).sort().map(k => JSON.stringify(k) + ":" + canonical(o[k])).join(",") + "}";
+  }
+  async function sha256hex(str) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  async function preencherHashes() {
+    for (let i = 0; i < PART.length; i++) {
+      const el = document.getElementById("hash_" + i);
+      if (!el) continue;
+      const pl = PART[i].raw || {};
+      el.textContent = await sha256hex(canonical({ g: pl.placaresGrupos || {}, m: pl.placaresMata || {} }));
+    }
   }
 
   function render() {
@@ -114,7 +133,7 @@
     $("#ab-class").className = aba === "class" ? "on" : "";
     $("#app").innerHTML = aba === "jogo" ? viewJogo() : viewClass();
     document.querySelectorAll("[data-tg]").forEach(e => e.onclick = () => e.closest(".jogo").classList.toggle("aberto"));
-    document.querySelectorAll("[data-tp]").forEach(e => e.onclick = () => e.closest(".pessoa").classList.toggle("aberto"));
+    document.querySelectorAll("[data-tp]").forEach(e => e.onclick = () => e.closest(".pessoa").classList.toggle("aberto"));    if (aba !== "jogo") preencherHashes();
   }
 
   document.addEventListener("DOMContentLoaded", init);
