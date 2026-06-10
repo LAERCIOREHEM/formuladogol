@@ -37,8 +37,8 @@
   .navdia .meio{flex:1;text-align:center}
   #dia-rotulo{font-family:'Anton',sans-serif;font-size:16px;letter-spacing:.5px;text-transform:capitalize}
 
-  .jogo{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:11px 13px;margin-bottom:8px}
-  .jogo .topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .jogo{display:block;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:11px 13px;margin-bottom:8px}
+  .jogo .topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0;border-bottom:none}
   .jogo .fase{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza)}
   .badge{font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:99px}
   .badge.ag{color:var(--cinza);border:1px solid var(--linha)}
@@ -68,6 +68,16 @@
   .cravou{color:var(--gold);font-weight:700;font-size:11px;margin-left:8px}
   .aguard{color:var(--cinza);font-size:11px;margin-left:8px}
   .vazio{color:var(--cinza);text-align:center;padding:24px;line-height:1.6}
+  @media(max-width:480px){
+    .linha{gap:6px}
+    .lado{flex-direction:column;justify-content:flex-start;align-items:center;gap:5px;text-align:center}
+    .lado.f{flex-direction:column;align-items:center}
+    .lado img{width:34px}
+    .lado .t{white-space:normal;font-size:12.5px;line-height:1.25;max-width:100%}
+    .placar .g{font-size:22px;min-width:22px}
+    .hora{font-size:15px}
+    .jogo .fase{letter-spacing:1px}
+  }
 </style>
 </head>
 <body>
