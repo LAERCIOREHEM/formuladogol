@@ -17,6 +17,7 @@
   ];
 
   let DADOS = {}, USER = null, P = null, derivado = null;
+  let FINALIZADO = false, FINALIZADO_EM = null;
   let faseAtual = "grupos", grupoAberto = null, saveTimer = null;
   let atualizarFeedbackFase = null;
 
@@ -70,11 +71,63 @@
     $("#btn-entrar").onclick = entrar;
     $("#btn-sair").onclick = sair;
     const bc = $("#btn-comprovante"); if (bc) bc.onclick = gerarComprovante;
+    const bf = $("#btn-finalizar"); if (bf) bf.onclick = finalizarPalpite;
     $("#popup-ok").onclick = () => $("#popup").classList.add("oculto");
     document.querySelectorAll(".aba").forEach(b => b.onclick = () => trocarTela(b.dataset.tela, b));
     const ba = $("#btn-alterar-palpite");
     if (ba) ba.onclick = () => trocarTela("palpite", document.querySelector('.aba[data-tela="palpite"]'));
   }
+  // ---------- Finalizar (lacre individual) ----------
+  async function carregarSituacao() {
+    FINALIZADO = false; FINALIZADO_EM = null;
+    if (!ONLINE) return;
+    try {
+      const st = await rpc("copa_minha_situacao", { p_nome: USER.nome, p_pin: USER.pin });
+      if (st && st.finalizado) { FINALIZADO = true; FINALIZADO_EM = st.finalizado_em || null; }
+    } catch (e) {} // função ainda não criada no banco -> segue sem lacre
+  }
+  function aplicarLacre() {
+    const tp = $("#tela-palpite");
+    if (!tp || !FINALIZADO) return;
+    tp.classList.add("lacrado");
+    const bf = $("#btn-finalizar"); if (bf) bf.style.display = "none";
+    if (!$("#banner-lacre")) {
+      const quando = FINALIZADO_EM ? new Date(FINALIZADO_EM).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) : "";
+      const b = document.createElement("div");
+      b.id = "banner-lacre"; b.className = "banner-lacre";
+      b.innerHTML = `🔒 <b>Palpite finalizado${quando ? " em " + quando : ""}</b> — lacrado, não pode mais ser alterado. Use <b>📄 Comprovante</b> para reemitir seu comprovante quando quiser.`;
+      tp.insertBefore(b, tp.firstChild);
+    }
+  }
+  async function finalizarPalpite() {
+    if (!USER || !P) { popup("Entre com seu nome e PIN primeiro."); return; }
+    if (!ONLINE) { popup("Finalização só funciona no site publicado (online)."); return; }
+    if (FINALIZADO) { popup("Seu palpite já está finalizado."); return; }
+    const certeza = confirm(
+      "FINALIZAR PALPITE?\n\n" +
+      "Ao confirmar:\n" +
+      "• Seu palpite fica LACRADO — não poderá mais ser alterado, nem antes do prazo.\n" +
+      "• O comprovante definitivo será gerado automaticamente.\n\n" +
+      "Essa ação não pode ser desfeita. Confirmar?");
+    if (!certeza) return;
+    try {
+      const res = await rpc("copa_finalizar", { p_nome: USER.nome, p_pin: USER.pin });
+      if (res === "OK") {
+        FINALIZADO = true; FINALIZADO_EM = new Date().toISOString();
+        aplicarLacre();
+        await gerarComprovante();
+      } else if (res === "JA_FINALIZADO") {
+        FINALIZADO = true; aplicarLacre(); popup("Seu palpite já estava finalizado.");
+      } else if (res === "SEM_PALPITE") {
+        popup("Você ainda não tem palpite salvo para finalizar. Preencha e aguarde o \"Salvo\" aparecer.");
+      } else {
+        popup("Não consegui finalizar (verifique o PIN e tente de novo).");
+      }
+    } catch (e) {
+      popup("A finalização ainda não está ativa no servidor ou houve falha de conexão. Tente novamente.");
+    }
+  }
+
   // ---------- Comprovante com impressão digital (hash) ----------
   function canonical(o) {
     if (o === null || typeof o !== "object") return JSON.stringify(o);
@@ -107,9 +160,14 @@
     txt += "==============================================\n";
     txt += `Participante: ${USER.nome}\n`;
     txt += `Gerado em: ${dataBR} (horário de Brasília)\n`;
-    txt += (agora < TRAVA
-      ? "Situação: ANTES da trava — palpites ainda podiam ser alterados até 10/06 23h59.\n           Gere novamente após a trava para ter o comprovante definitivo.\n"
-      : "Situação: APÓS a trava de 10/06 23h59 — palpites bloqueados para alteração.\n");
+    if (FINALIZADO) {
+      const fq = FINALIZADO_EM ? new Date(FINALIZADO_EM).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) : dataBR;
+      txt += `Situação: FINALIZADO pelo participante em ${fq} — lacrado, sem alteração possível.\n`;
+    } else {
+      txt += (agora < TRAVA
+        ? "Situação: ANTES da trava — palpites ainda podiam ser alterados até 10/06 23h59.\n           Gere novamente após a trava para ter o comprovante definitivo.\n"
+        : "Situação: APÓS a trava de 10/06 23h59 — palpites bloqueados para alteração.\n");
+    }
     txt += "\n----- FASE DE GRUPOS (72 jogos) -----\n";
     Object.keys(porGrupo).sort().forEach(g => { txt += `\nGrupo ${g}\n  ` + porGrupo[g].join("\n  ") + "\n"; });
 
@@ -171,6 +229,7 @@
         USER = { nome: res.nome, pin };
         let pl = null; try { pl = await rpc("copa_meu_palpite", { p_nome: nome, p_pin: pin }); } catch (e) {}
         P = pl || palpiteVazio();
+        await carregarSituacao();
       } catch (e) {
         return mostrarErro("Não consegui falar com o servidor. Tente de novo.");
       } finally {
@@ -199,6 +258,7 @@
       if (ONLINE) {
         let pl = null; try { pl = await rpc("copa_meu_palpite", { p_nome: USER.nome, p_pin: USER.pin }); } catch (e) {}
         P = pl || palpiteVazio();
+        await carregarSituacao();
       } else {
         const salvo = localStorage.getItem(chaveUser(USER.nome));
         P = (salvo && JSON.parse(salvo).palpite) || palpiteVazio();
@@ -223,6 +283,7 @@
     $("#topo-usuario").classList.remove("oculto");
     $("#usuario-nome").textContent = "Olá, " + USER.nome;
     trocarTela("palpite");
+    aplicarLacre();
   }
   function sair() {
     localStorage.removeItem("copa2026_sessao");
@@ -243,6 +304,7 @@
     return { campeao: derivado.campeao, vice: derivado.vice, terceiro: derivado.terceiro, quarto: derivado.quarto, chave: derivado.chave, preenchidos: totalPreenchidos() };
   }
   function persistir() {
+    if (FINALIZADO) { $("#salvo-texto").textContent = "🔒 Finalizado — palpite lacrado."; return; }
     if (ONLINE) {
       $("#salvo-texto").textContent = "Salvando...";
       clearTimeout(saveTimer);
@@ -251,6 +313,7 @@
           const res = await rpc("copa_salvar", { p_nome: USER.nome, p_pin: USER.pin, p_payload: P, p_derivado: derivadoResumo() });
           if (res === "OK") marcaSalvo();
           else if (res === "TRAVADO") $("#salvo-texto").textContent = "Prazo encerrado — palpites travados.";
+          else if (res === "FINALIZADO") { FINALIZADO = true; aplicarLacre(); $("#salvo-texto").textContent = "🔒 Finalizado — palpite lacrado."; }
           else $("#salvo-texto").textContent = "Não salvou (verifique o PIN).";
         } catch (e) { $("#salvo-texto").textContent = "Sem conexão — salvo será reenviado ao editar."; }
       }, 800);
