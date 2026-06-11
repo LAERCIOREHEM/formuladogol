@@ -9,7 +9,6 @@
   const CFG = window.COPA_CFG || { url: "", key: "" };
   const $ = s => document.querySelector(s);
   let SENHA = null;
-  let REVELADO = false;
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -52,8 +51,9 @@
     try { data = await rpc("copa_admin_listar", { p_senha: SENHA }); }
     catch (e) { tb.innerHTML = '<tr><td colspan="4">Erro ao carregar.</td></tr>'; return; }
     if (data && data.erro) { sair(); return; }
-    REVELADO = !!data.revelado;
-    atualizarBotaoRevelar();
+    let LAC = {};
+    try { (await rpc("copa_lacres", {})).forEach(r => LAC[r.nome] = { em: r.lacrado_em, vol: r.voluntario }); } catch (e) {}
+    const fmtData = iso => new Date(iso).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
     const lista = data.participantes || [];
     const completos = lista.filter(x => x.pct >= 100).length;
     $("#contador").textContent = lista.length + " participantes · " + completos + " completos (100%)";
@@ -64,7 +64,11 @@
         '<td>' + x.nome + '</td>' +
         '<td><span class="rank-barra" style="display:inline-block;width:90px;vertical-align:middle"><span class="rank-fill" style="width:' + x.pct + '%"></span></span> ' +
         '<b style="color:' + (x.pct >= 100 ? "var(--verde)" : "var(--branco)") + '">' + x.pct + '%</b></td>' +
-        '<td>' + (x.enviado ? '<span class="tag ok">enviou</span>' : '<span class="tag">vazio</span>') + '</td>' +
+        '<td>' + (x.enviado
+          ? (LAC[x.nome] && LAC[x.nome].em
+              ? '<span class="tag ok">' + fmtData(LAC[x.nome].em) + (LAC[x.nome].vol ? ' 🔒' : ' ⏰') + '</span>'
+              : '<span class="tag ok">enviou</span>')
+          : '<span class="tag">vazio</span>') + '</td>' +
         '<td class="acoes-td"></td>';
       const td = tr.querySelector(".acoes-td");
       td.append(
@@ -133,23 +137,7 @@
     else alerta("Não consegui trocar (" + res + ").", false);
   }
 
-  function atualizarBotaoRevelar() {
-    const b = $("#btn-revelar");
-    b.textContent = REVELADO ? "Palpites VISÍVEIS para todos — clique para ocultar" : "Palpites ocultos — clique para revelar a todos";
-    b.className = "btn-toggle " + (REVELADO ? "on" : "");
-  }
-  async function alternarRevelar() {
-    let res; try { res = await rpc("copa_admin_revelar", { p_senha: SENHA, p_valor: !REVELADO }); } catch (e) { res = "ERRO"; }
-    if (res === "OK") carregar(); else alerta("Não consegui alterar (" + res + ").", false);
-  }
 
-  async function removerIncompletos() {
-    if (!confirm("ENCERRAR O BOLÃO: remover TODOS que não chegaram a 100%? Isso apaga os palpites deles e não tem volta.")) return;
-    if (!confirm("Tem certeza mesmo? Esta ação é definitiva.")) return;
-    let n; try { n = await rpc("copa_admin_remover_incompletos", { p_senha: SENHA }); } catch (e) { n = -1; }
-    if (n >= 0) { alerta(n + " participante(s) incompleto(s) removido(s).", true); carregar(); }
-    else alerta("Não consegui executar.", false);
-  }
 
   function sair() {
     localStorage.removeItem("copa_admin_senha"); SENHA = null;
@@ -163,8 +151,6 @@
     $("#btn-add").onclick = adicionar;
     $("#btn-refresh").onclick = carregar;
     $("#btn-senha").onclick = trocarSenha;
-    $("#btn-revelar").onclick = alternarRevelar;
-    $("#btn-incompletos").onclick = removerIncompletos;
     $("#btn-sair-admin").onclick = sair;
     const guard = localStorage.getItem("copa_admin_senha");
     if (guard) tentaLogin(guard, true); else $("#gate-pass").focus();

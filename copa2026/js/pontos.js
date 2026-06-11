@@ -13,6 +13,7 @@
   // janelas de data por fase (calendário oficial da ESPN)
   const JANELAS = ["20260611-20260627", "20260628-20260703", "20260704-20260707", "20260709-20260711", "20260714-20260715", "20260718-20260718", "20260719-20260719"];
   let DADOS = {}, JOGOS = [], GRUPOS = [], PART = [], timer = null;
+  let FILTRO = "", ORDEM = "atuais", ULTIMO_O = null;
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -67,12 +68,13 @@
 
   // ---- monta o resultado OFICIAL a partir da ESPN ----
   function phaseOf(ev) { return (ev.season && ev.season.slug) || ""; }
-  function teamsOf(ev) { return (ev.competitions[0].competitors || []).map(c => norm((c.team || {}).abbreviation)); }
+  function teamsOf(ev) { return (ev.competitions[0].competitors || []).map(c => norm((c.team || {}).abbreviation)).filter(t => DADOS.nomeDe && DADOS.nomeDe[t]); }
   function isPost(ev) { return ev.competitions[0].status.type.state === "post"; }
   function winLoseOf(ev) {
     const cs = ev.competitions[0].competitors || [];
     const w = cs.find(c => c.winner), l = cs.find(c => !c.winner);
-    return { w: w ? norm(w.team.abbreviation) : null, l: l ? norm(l.team.abbreviation) : null };
+    const W = w ? norm((w.team || {}).abbreviation) : null, L = l ? norm((l.team || {}).abbreviation) : null;
+    return { w: (W && DADOS.nomeDe[W]) ? W : null, l: (L && DADOS.nomeDe[L]) ? L : null };
   }
 
   function buildOficial(events) {
@@ -109,7 +111,7 @@
         if (todosGrupos) { o.classificados32 = dg.classificados32; o.melhores_terceiros = dg.melhores_terceiros; }
       }
     }
-    if (r32.length) o.classificados32 = r32; // se a ESPN já publicou os confrontos da 2ª fase, é a fonte oficial
+    if (r32.length === 32) o.classificados32 = r32; // so vale com os 32 REAIS definidos (ignora placeholders 'a definir' da ESPN)
 
     // --- 1º a 4º ---
     const fin = events.find(e => phaseOf(e) === "final" && isPost(e));
@@ -139,6 +141,7 @@
       lotes.forEach(l => (l.events || []).forEach(ev => { if (!vistos.has(ev.id)) { vistos.add(ev.id); events.push(ev); } }));
     } catch (e) {}
     const o = buildOficial(events);
+    ULTIMO_O = o;
     render(o);
   }
 
@@ -163,18 +166,31 @@
   }
 
   function render(o) {
+    const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos };
+    const kf = KEY[ORDEM] || KEY.atuais;
     const lin = PART.map(p => {
       const r = COPA_PONTUACAO.calcular(p.d, o);
       const cr = cravadosDe(p.pg, o._realGrupos || {});
       return { nome: p.nome, d: p.d, r, cr };
-    }).sort((a, b) => b.r.atuais - a.r.atuais || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+    }).sort((a, b) => kf(b) - kf(a) || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+    lin.forEach((x, i) => x.posReal = i + 1);
+    const visiveis = FILTRO ? lin.filter(x => x.nome === FILTRO) : lin;
+
+    const opts = PART.map(p => p.nome).sort((a, b) => a.localeCompare(b))
+      .map(n => `<option value="${n}" ${n === FILTRO ? "selected" : ""}>${n}</option>`).join("");
+    const ROT = { atuais: "conquistados", possiveis: "possíveis", perdidos: "perdidos" };
+    const pills = Object.keys(ROT).map(k => `<button class="ordbtn ${ORDEM === k ? "on" : ""}" data-ord="${k}">${ROT[k]}</button>`).join("");
+    const controles = `<div class="ctrlbar">
+      <select id="filtro-part"><option value="">👥 Todos os participantes</option>${opts}</select>
+      <div class="ordwrap"><span class="ordlab">ordenar:</span>${pills}</div>
+    </div>`;
 
     let banner = "";
     if (!o._meta.segundaFase) banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>teto</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
 
     const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯</p>';
-    $("#app").innerHTML = banner + tbnote + lin.map((x, i) => {
-      const pos = i + 1, r = x.r;
+    $("#app").innerHTML = controles + banner + tbnote + visiveis.map((x, i) => {
+      const pos = x.posReal, r = x.r;
       const tot = r.atuais + r.perdidos + r.possiveis || 1;
       const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
       const cls = pos <= 3 ? " p" + pos : "";
@@ -201,6 +217,9 @@
         <div class="f32">${funil}</div>
       </div>`;
     }).join("");
+    const fp = $("#filtro-part");
+    if (fp) fp.onchange = e => { FILTRO = e.target.value; if (ULTIMO_O) render(ULTIMO_O); };
+    document.querySelectorAll(".ordbtn").forEach(b => b.onclick = () => { ORDEM = b.dataset.ord; if (ULTIMO_O) render(ULTIMO_O); });
   }
 
   document.addEventListener("DOMContentLoaded", init);

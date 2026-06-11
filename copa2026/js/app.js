@@ -18,6 +18,7 @@
 
   let DADOS = {}, USER = null, P = null, derivado = null;
   let FINALIZADO = false, FINALIZADO_EM = null;
+  const TRAVA_MS = Date.parse("2026-06-11T03:00:00Z"); // 10/06 23h59 Brasília
   let faseAtual = "grupos", grupoAberto = null, saveTimer = null;
   let atualizarFeedbackFase = null;
 
@@ -88,14 +89,19 @@
   }
   function aplicarLacre() {
     const tp = $("#tela-palpite");
-    if (!tp || !FINALIZADO) return;
+    const posTrava = Date.now() > TRAVA_MS;
+    if (!tp || (!FINALIZADO && !posTrava)) return;
     tp.classList.add("lacrado");
     const bf = $("#btn-finalizar"); if (bf) bf.style.display = "none";
     if (!$("#banner-lacre")) {
-      const quando = FINALIZADO_EM ? new Date(FINALIZADO_EM).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) : "";
       const b = document.createElement("div");
       b.id = "banner-lacre"; b.className = "banner-lacre";
-      b.innerHTML = `🔒 <b>Palpite finalizado${quando ? " em " + quando : ""}</b> — lacrado, não pode mais ser alterado. Use <b>📄 Comprovante</b> para reemitir seu comprovante quando quiser.`;
+      if (FINALIZADO) {
+        const quando = FINALIZADO_EM ? new Date(FINALIZADO_EM).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) : "";
+        b.innerHTML = `🔒 <b>Palpite finalizado${quando ? " em " + quando : ""}</b> — lacrado. Você pode navegar pelos seus palpites, mas nada pode ser alterado. Use <b>📄 Comprovante</b> quando quiser.`;
+      } else {
+        b.innerHTML = `🔒 <b>Palpites travados em 10/06 às 23h59</b> — a Copa começou! Navegue pelos seus palpites à vontade (nada pode ser alterado) e baixe seu <b>📄 Comprovante</b>. Os palpites de todos estão na página <b>Palpites</b>.`;
+      }
       tp.insertBefore(b, tp.firstChild);
     }
   }
@@ -305,6 +311,7 @@
   }
   function persistir() {
     if (FINALIZADO) { $("#salvo-texto").textContent = "🔒 Finalizado — palpite lacrado."; return; }
+    if (Date.now() > TRAVA_MS) { $("#salvo-texto").textContent = "🔒 Palpites travados (10/06 23h59)."; return; }
     if (ONLINE) {
       $("#salvo-texto").textContent = "Salvando...";
       clearTimeout(saveTimer);
@@ -501,7 +508,7 @@
         persistir();
         const faltam = 104 - totalPreenchidos();
         if (faltam > 0) { popup("Ainda faltam " + faltam + " jogo(s) para concluir. Verifique se há empates no mata-mata — eles não contam até você definir um vencedor."); return; }
-        popup("Palpite completo! 🎉 Está salvo. Você pode alterar até 10/06 às 23h59 — depois trava e fica visível a todos em \"Palpites\".");
+        popup("Palpite completo! 🎉 Está salvo e lacrado. Boa sorte — acompanhe tudo nas páginas Ao vivo, Resultados e Classificação!");
       };
       acoes.appendChild(concluir);
     }

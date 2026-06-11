@@ -11,6 +11,9 @@
   const $ = s => document.querySelector(s);
   let DADOS = {}, PART = [], JOGOS = [], GRUPOS = [], aba = "jogo";
 
+  const ESPN = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+  let RES = {}; // jogo_id -> {ga, gb, fim}
+
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
       method: "POST",
@@ -45,6 +48,22 @@
     JOGOS = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes);
     GRUPOS = [...new Set(JOGOS.map(j => j.grupo))].sort();
 
+    // resultados reais da fase de grupos (ESPN) — para as medalhinhas por jogo
+    try {
+      const d = await fetch(ESPN + "?dates=20260611-20260627&limit=120").then(r => r.json());
+      (d.events || []).forEach(ev => {
+        if (((ev.season && ev.season.slug) || "") !== "group-stage") return;
+        const c = ev.competitions[0]; if (!c || c.status.type.state === "pre") return;
+        const cs = c.competitors || [];
+        const h = cs.find(x => x.homeAway === "home") || cs[0], a = cs.find(x => x.homeAway === "away") || cs[1];
+        const hId = (h.team || {}).abbreviation, aId = (a.team || {}).abbreviation;
+        const j = JOGOS.find(x => (x.a === hId && x.b === aId) || (x.a === aId && x.b === hId));
+        if (!j) return;
+        const hs = parseInt(h.score || "0", 10), as = parseInt(a.score || "0", 10);
+        RES[j.jogo_id] = { ga: j.a === hId ? hs : as, gb: j.a === hId ? as : hs, fim: c.status.type.state === "post" };
+      });
+    } catch (e) { RES = {}; }
+
     try { rows = await rpc("copa_revelados", {}); } catch (err) { rows = []; }
     if (!rows || !rows.length) { bloqueio(); return; }
 
@@ -73,16 +92,30 @@
       html += `<div class="grupo-tit">Grupo ${g}</div>`;
       JOGOS.filter(j => j.grupo === g).forEach((j, i) => {
         const id = "j_" + j.jogo_id;
+        const real = RES[j.jogo_id];
+        const encerrado = !!(real && real.fim);
+        const sgn = x => x > 0 ? 1 : x < 0 ? -1 : 0;
+        let acertos = 0;
         const linhas = PART.map(p => {
           const sc = p.grupos[j.jogo_id];
-          const txt = (sc && sc.ga != null && sc.gb != null) ? `${sc.ga}<i>×</i>${sc.gb}` : "—";
-          return `<div class="pp"><span class="nm">${p.nome}</span><span class="pl">${txt}</span></div>`;
+          const tem = sc && sc.ga != null && sc.gb != null;
+          const txt = tem ? `${sc.ga}<i>×</i>${sc.gb}` : "—";
+          let tag = "";
+          if (encerrado && tem) {
+            const exato = sc.ga === real.ga && sc.gb === real.gb;
+            const certo = sgn(sc.ga - sc.gb) === sgn(real.ga - real.gb);
+            if (certo) acertos++;
+            tag = exato ? '<span class="medalha">CRAVOU 🎯</span>' : `<span class="bolinha ${certo ? "v" : "x"}"></span>`;
+          }
+          return `<div class="pp"><span class="nm">${p.nome}</span><span class="pl">${txt}${tag}</span></div>`;
         }).join("");
+        const chipReal = real ? `<span class="realsc ${encerrado ? "" : "andamento"}">${real.ga}×${real.gb}${encerrado ? "" : " 🔴"}</span>` : "";
+        const resumo = encerrado ? `<div class="resumo-jogo">${acertos} de ${PART.length} acertaram o resultado · 🎯 = cravou o placar</div>` : "";
         html += `<div class="jogo" id="${id}">
           <div class="cab" data-tg="${id}">
-            <span class="conf">${flag(j.a)}${j.a}<span class="vs">×</span>${j.b}${flag(j.b)}</span>
+            <span class="conf">${flag(j.a)}${j.a}<span class="vs">×</span>${j.b}${flag(j.b)}${chipReal}</span>
             <span class="seta">▶</span></div>
-          <div class="palps">${linhas}</div></div>`;
+          <div class="palps">${resumo}${linhas}</div></div>`;
       });
     });
     return html;
