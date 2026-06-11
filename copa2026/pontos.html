@@ -77,6 +77,12 @@
   .f32 span.alive{outline:2px solid var(--gold)}
   .f32 span.out img{opacity:.30;filter:grayscale(.7)}
   .f32 span.wrong{outline:2px solid var(--vermelho)}.f32 span.wrong img{opacity:.35;filter:grayscale(.7)}
+  .ctrlbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .ctrlbar select{background:var(--navy-2);border:1px solid var(--linha);color:var(--branco);border-radius:9px;padding:8px 10px;font-family:inherit;font-size:13px;max-width:100%}
+  .ordwrap{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+  .ordlab{font-size:11px;color:var(--cinza)}
+  .ordbtn{background:var(--navy-2);border:1px solid var(--linha);color:var(--cinza);border-radius:99px;padding:5px 11px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+  .ordbtn.on{background:var(--gold);border-color:var(--gold);color:#3a2a00}
 </style>
 </head>
 <body>
@@ -84,7 +90,7 @@
   <div class="cab-topo"><span class="tro">🏆</span>
     <div><h1>Classificação — <b>por pontos</b></h1><div class="sub">Bolão Copa 2026</div></div></div>
   <nav class="menu">
-    <a href="index.html">Meu Palpite</a>
+    <a href="index.html">Meus Palpites</a>
     <a href="aovivo.html">Ao vivo</a>
     <a href="resultados.html">Resultados</a>
     <a href="palpites.html">Palpites</a>
