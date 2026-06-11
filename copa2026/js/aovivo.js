@@ -1,7 +1,7 @@
 /* =========================================================================
    aovivo.js — Tela "AO VIVO" (Copa 2026)
    Lê o feed da ESPN (navegador direto, 30s). Quando há jogo ao vivo (ou nos
-   5 min de pré-jogo), mostra a tela cheia; quando acaba (status oficial),
+   10 min de pré-jogo), mostra a tela cheia; quando acaba (status oficial),
    sai sozinho. Na FASE DE GRUPOS, cruza com os palpites e mostra as bolinhas
    (acertando / cravou). No mata-mata, só o placar (palpite por jogo não se
    aplica — cada um tem chave diferente).
@@ -12,7 +12,7 @@
   const $ = s => document.querySelector(s);
   const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
   const DEMO = /[?&]demo=1/.test(location.search);
-  const PRE_MIN = 5;                 // abre 5 min antes do início oficial
+  const PRE_MIN = 10;                 // abre 10 min antes do início oficial
   const ESPN_OVR = {};               // se alguma sigla da ESPN diferir do nosso id, mapear aqui (ex.: {"GER":"ALE"})
   let DADOS = {}, JOGOS = [], PART = [], timer = null;
 
@@ -58,7 +58,7 @@
     let lives = (data.events || []).filter(ev => {
       const st = ev.competitions[0].status.type;
       if (st.state === "in") return true;
-      if (st.state === "pre") { const dt = new Date(ev.date).getTime(); return dt - now <= PRE_MIN * 60000 && dt - now > -1; }
+      if (st.state === "pre") { const dt = new Date(ev.date).getTime(); return now >= dt - PRE_MIN * 60000 && now <= dt + 60 * 60000; } // entra 10min antes; segura até 1h se a ESPN demorar a virar "ao vivo"
       return false;
     });
     let demoFlag = false;
