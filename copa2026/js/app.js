@@ -502,7 +502,7 @@
       }
     };
     atualizarFeedbackFase();
-    if (fase === "final") {
+    if (fase === "final" && !FINALIZADO && Date.now() <= TRAVA_MS) {
       const concluir = el("button", "btn-primario", "Concluir meu palpite ✓");
       concluir.onclick = () => {
         persistir();
