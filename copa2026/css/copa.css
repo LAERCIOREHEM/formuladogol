@@ -190,7 +190,8 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 
 /* ===== MENU UNIFICADO (todas as páginas) ===== */
 .menu{display:flex;gap:6px;margin-top:14px;background:var(--navy-2);border:1px solid var(--linha);
-  border-radius:12px;padding:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  border-radius:12px;padding:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  position:sticky;top:8px;z-index:60;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 .menu::-webkit-scrollbar{display:none}
 .menu a{flex:1 0 auto;text-align:center;white-space:nowrap;color:var(--cinza);text-decoration:none;
   font-weight:600;font-size:14px;padding:10px 14px;border-radius:8px;transition:background .15s,color .15s}
