@@ -12,7 +12,7 @@
   const START = "20260611", END = "20260719";
   const CFG = window.COPA_CFG || { url: "", key: "" };
 
-  let JOGOS = [], PALP = [], dia, timer = null;
+  let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -37,7 +37,24 @@
   function horaBR(iso) { try { return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }); } catch (e) { return ""; } }
 
   // carrega seleções (p/ casar jogo da ESPN -> nosso id) e palpites (Supabase)
+  const TV_CAT = { // ordem de exibição; cores aproximadas das marcas
+    globo:   ["Globo", "#0a7cff", "#fff"],
+    sbt:     ["SBT", "#00a651", "#fff"],
+    sportv:  ["SporTV", "#ff7a00", "#fff"],
+    getv:    ["ge tv", "#06aa48", "#fff"],
+    gplay:   ["Globoplay", "#fb0234", "#fff"],
+    nsports: ["N Sports", "#222a38", "#fff"],
+    caze:    ["CazéTV", "#f7d116", "#3a2a00"]
+  };
+  function tvChips(aAb, bAb) {
+    const k = [aAb, bAb].sort().join("-");
+    const extras = (TVS.jogos && TVS.jogos[k]) || [];
+    const lista = Object.keys(TV_CAT).filter(c => c === "caze" || extras.indexOf(c) !== -1);
+    return `<div class="tvs">📺 ${lista.map(c => `<span class="tvchip" style="background:${TV_CAT[c][1]};color:${TV_CAT[c][2]}">${TV_CAT[c][0]}</span>`).join("")}</div>`;
+  }
+
   async function carregarBase() {
+    try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
     try {
       const s = await fetch("dados/selecoes.json").then(r => r.json());
       JOGOS = COPA_ENGINE.gerarJogosGrupos(s.selecoes);
@@ -101,6 +118,7 @@
         <div class="lado f ${vencA}"><span class="t">${teamNome(away)}</span>${escudo(away)}</div>
       </div>
       ${venue ? `<div class="venue">${venue}</div>` : ""}
+      ${tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${palpites}
     </div>`;
   }

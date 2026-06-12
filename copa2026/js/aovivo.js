@@ -15,6 +15,7 @@
   const PRE_MIN = 10;                 // abre 10 min antes do início oficial
   const ESPN_OVR = {};               // se alguma sigla da ESPN diferir do nosso id, mapear aqui (ex.: {"GER":"ALE"})
   let DADOS = {}, JOGOS = [], PART = [], timer = null;
+  let TVS = {};
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -31,7 +32,24 @@
   const norm = ab => ESPN_OVR[ab] || ab;
   const sgn = n => n > 0 ? 1 : n < 0 ? -1 : 0;
 
+  const TV_CAT = { // ordem de exibição; cores aproximadas das marcas
+    globo:   ["Globo", "#0a7cff", "#fff"],
+    sbt:     ["SBT", "#00a651", "#fff"],
+    sportv:  ["SporTV", "#ff7a00", "#fff"],
+    getv:    ["ge tv", "#06aa48", "#fff"],
+    gplay:   ["Globoplay", "#fb0234", "#fff"],
+    nsports: ["N Sports", "#222a38", "#fff"],
+    caze:    ["CazéTV", "#f7d116", "#3a2a00"]
+  };
+  function tvChips(aAb, bAb) {
+    const k = [aAb, bAb].sort().join("-");
+    const extras = (TVS.jogos && TVS.jogos[k]) || [];
+    const lista = Object.keys(TV_CAT).filter(c => c === "caze" || extras.indexOf(c) !== -1);
+    return `<div class="tvs">📺 ${lista.map(c => `<span class="tvchip" style="background:${TV_CAT[c][1]};color:${TV_CAT[c][2]}">${TV_CAT[c][0]}</span>`).join("")}</div>`;
+  }
+
   async function init() {
+    try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
     try {
       const [s, e, t] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
@@ -135,6 +153,7 @@
         <div class="sel">${escudo(away)}<div class="nm">${tNome(away)}</div></div>
       </div>
       <div class="minuto">${minuto}</div>
+      ${tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${palpHTML}
     </div>`;
   }
