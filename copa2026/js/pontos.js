@@ -14,6 +14,8 @@
   const JANELAS = ["20260611-20260627", "20260628-20260703", "20260704-20260707", "20260709-20260711", "20260714-20260715", "20260718-20260718", "20260719-20260719"];
   let DADOS = {}, JOGOS = [], GRUPOS = [], PART = [], timer = null;
   let FILTRO = "", ORDEM = "atuais", ULTIMO_O = null;
+  let ABA = (new URLSearchParams(location.search).get("aba") === "placares") ? "placares" : "bolao";
+  let ORDEM_P = "pts";
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -165,7 +167,22 @@
     }).join("");
   }
 
-  function render(o) {
+  function toggleHTML() {
+    return `<div class="vistog">
+      <button class="vbtn ${ABA === "bolao" ? "on" : ""}" data-v="bolao">🏆 Bolão</button>
+      <button class="vbtn ${ABA === "placares" ? "on" : ""}" data-v="placares">🎯 Placares</button>
+    </div>`;
+  }
+  function wireToggle() {
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = () => {
+      if (ABA === b.dataset.v) return;
+      ABA = b.dataset.v; FILTRO = "";
+      if (ULTIMO_O) render(ULTIMO_O);
+    });
+  }
+  function render(o) { if (ABA === "placares") renderPlacares(o); else renderBolao(o); }
+
+  function renderBolao(o) {
     const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos };
     const kf = KEY[ORDEM] || KEY.atuais;
     const lin = PART.map(p => {
@@ -189,7 +206,7 @@
     if (!o._meta.segundaFase) banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>teto</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
 
     const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯</p>';
-    $("#app").innerHTML = controles + banner + tbnote + visiveis.map((x, i) => {
+    $("#app").innerHTML = toggleHTML() + controles + banner + tbnote + visiveis.map((x, i) => {
       const pos = x.posReal, r = x.r;
       const tot = r.atuais + r.perdidos + r.possiveis || 1;
       const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
@@ -219,7 +236,85 @@
     }).join("");
     const fp = $("#filtro-part");
     if (fp) fp.onchange = e => { FILTRO = e.target.value; if (ULTIMO_O) render(ULTIMO_O); };
-    document.querySelectorAll(".ordbtn").forEach(b => b.onclick = () => { ORDEM = b.dataset.ord; if (ULTIMO_O) render(ULTIMO_O); });
+    document.querySelectorAll(".ordbtn[data-ord]").forEach(b => b.onclick = () => { ORDEM = b.dataset.ord; if (ULTIMO_O) render(ULTIMO_O); });
+    wireToggle();
+  }
+
+  // ===== 🎯 PLACARES (Reis do Cravo) — fase de grupos, 5/3/2/0 =====
+  function tierDe(g, R) { // retorna [pontos, simbolo]
+    if (!g || g.ga == null || g.gb == null) return [0, "—"];
+    const sg = Math.sign(g.ga - g.gb), sR = Math.sign(R.ga - R.gb);
+    if (g.ga === R.ga && g.gb === R.gb) return [5, "🎯"];
+    if (sg === sR && sR !== 0 && (g.ga - g.gb) === (R.ga - R.gb)) return [3, "📐"];
+    if (sg === sR) return [2, "✅"];
+    return [0, "❌"];
+  }
+  function calcPlacares(o) {
+    const real = o._realGrupos || {};
+    const ids = Object.keys(real);
+    const lin = PART.map(p => {
+      let pts = 0, cr = 0, sal = 0, res = 0;
+      ids.forEach(id => {
+        const [v] = tierDe(p.pg[id], real[id]);
+        pts += v;
+        if (v === 5) cr++; else if (v === 3) sal++; else if (v === 2) res++;
+      });
+      return { nome: p.nome, pts, cr, sal, res };
+    });
+    return { lin, n: ids.length };
+  }
+  function extrato(nm, o) {
+    const p = PART.find(x => x.nome === nm); if (!p) return "";
+    const real = o._realGrupos || {};
+    const ids = Object.keys(real).sort();
+    if (!ids.length) return '<div class="ext"><div class="extt">Extrato</div><p class="pend">Nenhum jogo encerrado ainda.</p></div>';
+    const rows = ids.map(id => {
+      const j = JOGOS.find(x => x.jogo_id === id); if (!j) return "";
+      const R = real[id], g = p.pg[id];
+      const [pts, tag] = tierDe(g, R);
+      const pal = (g && g.ga != null) ? `${g.ga}×${g.gb}` : "—";
+      return `<div class="extrow">
+        <span class="extj"><i>${j.grupo}</i> ${flag(j.a)} ${j.a} <b>${R.ga}×${R.gb}</b> ${j.b} ${flag(j.b)}</span>
+        <span class="extp">palpite ${pal}</span><span class="extpts">${tag} ${pts} pts</span></div>`;
+    }).join("");
+    return `<div class="ext"><div class="extt">Extrato jogo a jogo (encerrados)</div>${rows}</div>`;
+  }
+  function renderPlacares(o) {
+    const { lin, n } = calcPlacares(o);
+    const cmpN = (a, b) => a.nome.localeCompare(b.nome);
+    lin.sort(ORDEM_P === "cr"
+      ? (a, b) => b.cr - a.cr || b.pts - a.pts || b.sal - a.sal || cmpN(a, b)
+      : (a, b) => b.pts - a.pts || b.cr - a.cr || b.sal - a.sal || cmpN(a, b));
+    lin.forEach((x, i) => x.posReal = i + 1);
+    const vis = FILTRO ? lin.filter(x => x.nome === FILTRO) : lin;
+
+    const opts = PART.map(p => p.nome).sort((a, b) => a.localeCompare(b))
+      .map(x => `<option value="${x}" ${x === FILTRO ? "selected" : ""}>${x}</option>`).join("");
+    const pills = [["pts", "pontos"], ["cr", "cravadas"]]
+      .map(([k, lab]) => `<button class="ordbtn ${ORDEM_P === k ? "on" : ""}" data-ordp="${k}">${lab}</button>`).join("");
+    const controles = `<div class="ctrlbar">
+      <select id="filtro-part"><option value="">👥 Todos os participantes</option>${opts}</select>
+      <div class="ordwrap"><span class="ordlab">ordenar:</span>${pills}</div></div>`;
+    const banner = `<div class="aviso">🍷 <b>Reis do Cravo</b> — desafio apartado da fase de grupos:
+      placar cravado <b>5</b> · vencedor + saldo de gols <b>3</b> · só o resultado <b>2</b> · errou <b>0</b>
+      (empate vale 5 ou 2). Prêmio do organizador ao 1º no fim dos grupos: <b>duas garrafas de vinho</b> 🍷🍷.
+      Pontua só jogo <b>encerrado</b> — <b>${n} de 72</b> computados.
+      Regra completa em <a href="regras.html" style="color:var(--gold)">Regras</a>.</div>`;
+    const cards = vis.map(x => {
+      const pos = x.posReal, medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
+      const cls = pos <= 3 ? " p" + pos : "";
+      const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
+      return `<div class="card${cls}">
+        <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${x.pts}<small>pontos</small></span></div>
+        <div class="fases"><span class="ph">🎯 cravadas <b>${x.cr}</b></span><span class="ph">📐 no saldo <b>${x.sal}</b></span><span class="ph">✅ resultados <b>${x.res}</b></span></div>
+        ${FILTRO === x.nome ? extrato(x.nome, o) : ""}
+      </div>`;
+    }).join("");
+    $("#app").innerHTML = toggleHTML() + controles + banner + cards;
+    wireToggle();
+    const fp = $("#filtro-part");
+    if (fp) fp.onchange = e => { FILTRO = e.target.value; if (ULTIMO_O) render(ULTIMO_O); };
+    document.querySelectorAll(".ordbtn[data-ordp]").forEach(b => b.onclick = () => { ORDEM_P = b.dataset.ordp; if (ULTIMO_O) render(ULTIMO_O); });
   }
 
   document.addEventListener("DOMContentLoaded", init);
