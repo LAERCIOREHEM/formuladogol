@@ -134,12 +134,12 @@
       const n = arr.filter(x => x.s === "acertando" || x.s === "exato").length;
       palpHTML = `<div class="contador"><b>${n}</b> de ${PART.length} acertando o resultado</div>
         <div class="lista">${arr.map(x => {
-          const marca = x.s === "exato" ? '<span class="badge-ex">cravou</span>'
+          const marca = x.s === "exato" ? '<span class="badge-ex">cravando</span>'
             : x.s === "acertando" ? '<span class="dot v"></span>'
             : x.s === "vazio" ? '<span class="dot z"></span>' : '<span class="dot x"></span>';
           return `<div class="pp ${x.s}"><span class="nm">${x.nome}</span><span class="chip">${x.txt}</span>${marca}</div>`;
         }).join("")}</div>
-        <div class="legenda"><span><span class="dot v"></span> acertando</span><span><span class="badge-ex" style="animation:none">cravou</span> placar exato</span><span><span class="dot x"></span> errando</span></div>`;
+        <div class="legenda"><span><span class="dot v"></span> acertando</span><span><span class="badge-ex" style="animation:none">cravando</span> placar exato</span><span><span class="dot x"></span> errando</span></div>`;
     } else if (!j) {
       palpHTML = `<div class="obs-fase">Mata-mata: o palpite por placar vale na fase de grupos. Aqui mostramos só o jogo ao vivo.</div>`;
     }
@@ -154,6 +154,7 @@
       </div>
       <div class="minuto">${minuto}</div>
       ${tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
+      <a class="btn-caze" href="https://www.youtube.com/@CazeTV/live" target="_blank" rel="noopener">▶️ Assistir ao vivo na CazéTV</a>
       ${palpHTML}
     </div>`;
   }

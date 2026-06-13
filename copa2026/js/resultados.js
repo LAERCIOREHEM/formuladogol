@@ -144,7 +144,8 @@
         const exato = g.ga === ra && g.gb === rb;
         const certo = Math.sign(g.ga - g.gb) === Math.sign(ra - rb);
         if (certo) ac++;
-        tag = exato ? '<span class="cravou">CRAVOU 🎯</span>' : `<span class="bola ${certo ? "v" : "x"}"></span>`;
+        const rotuloEx = st.state === "post" ? "CRAVOU" : "CRAVANDO";
+        tag = exato ? `<span class="cravou">${rotuloEx} 🎯</span>` : `<span class="bola ${certo ? "v" : "x"}"></span>`;
       } else { tag = '<span class="aguard">aguardando</span>'; }
       return `<div class="prow"><span>${p.nome}</span><span class="pal">${g.ga} - ${g.gb}${tag}</span></div>`;
     }).join("");
