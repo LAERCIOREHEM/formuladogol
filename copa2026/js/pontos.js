@@ -263,22 +263,25 @@
     });
     return { lin, n: ids.length };
   }
-  function extrato(nm, o) {
-    const p = PART.find(x => x.nome === nm); if (!p) return "";
+  const SELO = { 5: "CRAVOU", 3: "acertou saldo", 2: "acertou resultado", 0: "errou" };
+  function extrato(p, o) {
     const real = o._realGrupos || {};
     const ids = Object.keys(real).sort();
-    if (!ids.length) return '<div class="ext"><div class="extt">Extrato</div><p class="pend">Nenhum jogo encerrado ainda.</p></div>';
-    const rows = ids.map(id => {
+    if (!ids.length) return '<p class="pend" style="padding:4px 2px">Nenhum jogo encerrado ainda.</p>';
+    return ids.map(id => {
       const j = JOGOS.find(x => x.jogo_id === id); if (!j) return "";
       const R = real[id], g = p.pg[id];
       const [pts, tag] = tierDe(g, R);
       const pal = (g && g.ga != null) ? `${g.ga}×${g.gb}` : "—";
+      const cls = pts === 5 ? "s5" : pts === 3 ? "s3" : pts === 2 ? "s2" : "s0";
       return `<div class="extrow">
         <span class="extj"><i>${j.grupo}</i> ${flag(j.a)} ${j.a} <b>${R.ga}×${R.gb}</b> ${j.b} ${flag(j.b)}</span>
-        <span class="extp">palpite ${pal}</span><span class="extpts">${tag} ${pts} pts</span></div>`;
+        <span class="extp">palpite ${pal}</span>
+        <span class="extpts ${cls}">${tag} ${SELO[pts]} · ${pts}pt</span></div>`;
     }).join("");
-    return `<div class="ext"><div class="extt">Extrato jogo a jogo (encerrados)</div>${rows}</div>`;
   }
+  const cssId = nm => nm.replace(/[^a-zA-Z0-9]/g, "_");
+
   function renderPlacares(o) {
     const { lin, n } = calcPlacares(o);
     const cmpN = (a, b) => a.nome.localeCompare(b.nome);
@@ -304,10 +307,13 @@
       const pos = x.posReal, medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
       const cls = pos <= 3 ? " p" + pos : "";
       const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
+      const p = PART.find(pp => pp.nome === x.nome);
+      const aberto = FILTRO === x.nome; // ao filtrar 1 pessoa, já abre
       return `<div class="card${cls}">
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${x.pts}<small>pontos</small></span></div>
         <div class="fases"><span class="ph">🎯 cravadas <b>${x.cr}</b></span><span class="ph">📐 no saldo <b>${x.sal}</b></span><span class="ph">✅ resultados <b>${x.res}</b></span></div>
-        ${FILTRO === x.nome ? extrato(x.nome, o) : ""}
+        <button class="vermais" data-jg="${x.nome}">${aberto ? "Ocultar jogos ▴" : "Ver jogos ▾"}</button>
+        <div class="extbox" id="jg-${cssId(x.nome)}" style="display:${aberto ? "block" : "none"}">${extrato(p, o)}</div>
       </div>`;
     }).join("");
     $("#app").innerHTML = toggleHTML() + controles + banner + cards;
@@ -315,6 +321,11 @@
     const fp = $("#filtro-part");
     if (fp) fp.onchange = e => { FILTRO = e.target.value; if (ULTIMO_O) render(ULTIMO_O); };
     document.querySelectorAll(".ordbtn[data-ordp]").forEach(b => b.onclick = () => { ORDEM_P = b.dataset.ordp; if (ULTIMO_O) render(ULTIMO_O); });
+    document.querySelectorAll(".vermais[data-jg]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("jg-" + cssId(b.dataset.jg)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "Ocultar jogos ▴" : "Ver jogos ▾";
+    });
   }
 
   document.addEventListener("DOMContentLoaded", init);
