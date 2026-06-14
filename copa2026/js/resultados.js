@@ -68,6 +68,7 @@
   }
 
   async function carregar() {
+    if (ABA !== "jogos") return;
     $("#dia-rotulo").textContent = rotuloDia(dia);
     $("#prev").disabled = dia <= START;
     $("#next").disabled = dia >= END;
@@ -234,6 +235,6 @@
     $("#prev").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() - 864e5))); carregar(); };
     $("#next").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
     carregar();
-    timer = setInterval(carregar, 60000);
+    timer = setInterval(() => { if (ABA === "jogos") carregar(); }, 60000);
   });
 })();
