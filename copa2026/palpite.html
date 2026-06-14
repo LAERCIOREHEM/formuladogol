@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bolão Copa 2026 — Brasileirão Almoço</title>
+  <meta name="description" content="Faça seus palpites da Copa do Mundo 2026 e dispute o bolão do Brasileirão Almoço.">
+  <meta name="theme-color" content="#0b1f3a">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Bolão Copa 2026 — Brasileirão Almoço">
+  <meta property="og:title" content="Bolão Copa 2026 — Brasileirão Almoço">
+  <meta property="og:description" content="Faça seus palpites da Copa do Mundo 2026 e dispute o bolão do Brasileirão Almoço.">
+  <meta property="og:image" content="https://brasileirao2026almoco.com.br/og-image.png">
+  <meta property="og:url" content="https://brasileirao2026almoco.com.br/copa2026/">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0PPWGP93FD"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0PPWGP93FD');</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/copa.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- TOPO -->
+    <header class="topo">
+      <div class="topo-marca">
+        <span class="trofeu">★</span>
+        <div>
+          <h1>BOLÃO COPA <b>2026</b></h1>
+          <p class="sub">Brasileirão Almoço</p>
+        </div>
+      </div>
+      <div id="topo-usuario" class="topo-usuario oculto">
+        <span id="usuario-nome"></span>
+        <button id="btn-comprovante" class="btn-mini">📄 Comprovante</button>
+        <button id="btn-sair" class="btn-mini">Sair</button>
+      </div>
+    </header>
+
+    <nav class="menu">
+            <a href="index.html">Jogos</a>
+      <a href="pontos.html">Classificação</a>
+      <a href="aovivo.html">Ao vivo</a>
+      <a href="palpites.html">Palpites</a>
+      <a href="palpite.html" class="ativo">Meus Palpites</a>
+    </nav>
+
+    <!-- LOGIN -->
+    <section id="tela-login" class="tela">
+      <div class="cartao-login">
+        <h2>Entrar no Bolão</h2>
+        <p class="prazo">Preencha seus palpites da Copa inteira. Você pode salvar e continuar depois.<br>
+           <b>Prazo final: 10/06/2026 às 23h59.</b></p>
+        <label>Seu nome</label>
+        <input id="in-nome" type="text" placeholder="Como você aparece no grupo" autocomplete="username" />
+        <label>PIN de 6 dígitos</label>
+        <input id="in-pin" type="text" inputmode="numeric" maxlength="6" placeholder="••••••" autocomplete="current-password" />
+        <button id="btn-entrar" class="btn-primario">Entrar</button>
+        <p class="aviso-pin">Guarde seu PIN — você usará esse número para voltar ao palpite.</p>
+        <p id="login-erro" class="erro oculto"></p>
+      </div>
+    </section>
+
+
+    <!-- MEU PALPITE -->
+    <section id="tela-palpite" class="tela oculto">
+      <div class="progresso-geral">
+        <div class="barra"><div id="barra-fill" class="barra-fill"></div></div>
+        <p id="progresso-texto">0 de 104 jogos preenchidos</p>
+        <p id="salvo-texto" class="salvo"></p>
+      </div>
+
+      <div class="etapas" id="etapas"></div>
+
+      <div id="conteudo-fase"></div>
+    </section>
+
+  </div>
+
+  <footer class="rodape">
+    <a href="regras.html">Regras</a><span class="sep">·</span>
+    <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
+    <a href="/?brasileirao=1">← Brasileirão</a>
+  </footer>
+
+  <!-- POPUP -->
+  <div id="popup" class="popup oculto">
+    <div class="popup-caixa">
+      <p id="popup-texto"></p>
+      <button id="popup-ok" class="btn-primario">Entendi</button>
+    </div>
+  </div>
+
+  <script src="js/engine.js"></script>
+  <script src="js/pontuacao.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
