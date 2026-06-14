@@ -13,6 +13,7 @@
   const CFG = window.COPA_CFG || { url: "", key: "" };
 
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
+  let ABA = "jogos", SEL = [], GRP_EVENTS = [];
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -56,8 +57,9 @@
   async function carregarBase() {
     try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
     try {
-      const s = await fetch("dados/selecoes.json").then(r => r.json());
-      JOGOS = COPA_ENGINE.gerarJogosGrupos(s.selecoes);
+      const sj = await fetch("dados/selecoes.json").then(r => r.json());
+      SEL = sj.selecoes;
+      JOGOS = COPA_ENGINE.gerarJogosGrupos(sj.selecoes);
     } catch (e) { JOGOS = []; }
     try {
       const rows = await rpc("copa_revelados", {});
@@ -78,13 +80,75 @@
       return;
     }
     const evs = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
-    if (!evs.length) { $("#lista").innerHTML = '<p class="vazio">Nenhum jogo neste dia.</p>'; return; }
-    $("#lista").innerHTML = evs.map(card).join("");
+    if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
+    $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
       const d = document.getElementById("sp-" + b.dataset.sp), ab = d.style.display === "none";
       d.style.display = ab ? "block" : "none";
       b.innerHTML = ab ? "Ocultar palpites ▴" : "Ver palpites ▾";
     });
+  }
+
+  function abasHTML() {
+    return `<div class="vistog">
+      <button class="vbtn ${ABA === "jogos" ? "on" : ""}" data-v="jogos">📅 Jogos</button>
+      <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Grupos</button>
+    </div>`;
+  }
+  async function buscarGruposEvents() {
+    if (GRP_EVENTS.length) return GRP_EVENTS;
+    try {
+      const d = await fetch(`${API}?dates=20260611-20260627&limit=120`).then(r => r.json());
+      GRP_EVENTS = (d.events || []).filter(e => ((e.season && e.season.slug) || "") === "group-stage");
+    } catch (e) { GRP_EVENTS = []; }
+    return GRP_EVENTS;
+  }
+  function nomeDe(id) { const t = SEL.find(x => x.id === id); return t ? t.nome : id; }
+  function isoDe(id) { const t = SEL.find(x => x.id === id); return t ? t.iso2 : ""; }
+  function flagId(id) { const c = isoDe(id); return c ? `<img src="https://flagcdn.com/w40/${c}.png" alt="" onerror="this.style.visibility='hidden'">` : ""; }
+  function tabelaGrupos(events) {
+    const tab = {};
+    SEL.forEach(t => { (tab[t.grupo] = tab[t.grupo] || {})[t.id] = { id: t.id, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, pts: 0 }; });
+    events.forEach(ev => {
+      const c = ev.competitions[0]; if (!c || c.status.type.state !== "post") return;
+      const cs = c.competitors || [];
+      const h = cs.find(x => x.homeAway === "home") || cs[0], a = cs.find(x => x.homeAway === "away") || cs[1];
+      const hId = (h.team || {}).abbreviation, aId = (a.team || {}).abbreviation;
+      const hs = parseInt(h.score || "0", 10), as = parseInt(a.score || "0", 10);
+      let g = null; for (const G in tab) { if (tab[G][hId] && tab[G][aId]) { g = G; break; } }
+      if (!g) return;
+      const H = tab[g][hId], A = tab[g][aId];
+      H.j++; A.j++; H.gp += hs; H.gc += as; A.gp += as; A.gc += hs;
+      if (hs > as) { H.v++; A.d++; H.pts += 3; }
+      else if (as > hs) { A.v++; H.d++; A.pts += 3; }
+      else { H.e++; A.e++; H.pts++; A.pts++; }
+    });
+    return tab;
+  }
+  function renderGrupos() {
+    $("#lista").innerHTML = abasHTML() + '<p class="vazio">Carregando tabela…</p>';
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    buscarGruposEvents().then(events => {
+      if (ABA !== "grupos") return;
+      const tab = tabelaGrupos(events);
+      const ord = (a, b) => b.pts - a.pts || (b.gp - b.gc) - (a.gp - a.gc) || b.gp - a.gp || nomeDe(a.id).localeCompare(nomeDe(b.id));
+      const blocos = Object.keys(tab).sort().map(G => {
+        const linhas = Object.values(tab[G]).sort(ord).map((t, i) => {
+          const sg = t.gp - t.gc, cls = i < 2 ? "classif" : "";
+          return `<tr class="${cls}"><td class="cpos">${i + 1}</td><td class="ctime">${flagId(t.id)} <span>${nomeDe(t.id)}</span></td><td><b>${t.pts}</b></td><td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td class="men">${t.gp}</td><td class="men">${t.gc}</td><td>${sg > 0 ? "+" + sg : sg}</td></tr>`;
+        }).join("");
+        return `<div class="grpcard"><div class="grpcab">Grupo ${G}</div><table class="tabgrp"><thead><tr><th></th><th class="ctime">Seleção</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th class="men">GP</th><th class="men">GC</th><th>SG</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
+      }).join("");
+      $("#lista").innerHTML = abasHTML() + '<p class="leg-grp">As <b>2 primeiras</b> de cada grupo avançam, mais os 8 melhores terceiros. Tabela calculada dos resultados oficiais.</p>' + blocos;
+      document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    });
+  }
+  function trocarAba(e) {
+    const v = e.currentTarget.dataset.v; if (v === ABA) return;
+    ABA = v;
+    if (ABA === "grupos") { $("#prev").parentElement.style.display = "none"; renderGrupos(); }
+    else { $("#prev").parentElement.style.display = ""; carregar(); }
   }
 
   function card(ev) {
