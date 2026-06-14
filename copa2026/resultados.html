@@ -80,6 +80,24 @@
   }
   .tvs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center;margin-top:8px;font-size:11px;color:var(--cinza)}
   .tvchip{font-size:9.5px;font-weight:700;letter-spacing:.3px;padding:2px 7px;border-radius:99px;white-space:nowrap}
+  .vistog{display:flex;gap:6px;margin-bottom:12px}
+  .vbtn{flex:1;font-family:inherit;font-weight:700;font-size:14px;padding:10px;border-radius:10px;cursor:pointer;
+    border:1px solid var(--linha);background:var(--navy-2);color:var(--cinza)}
+  .vbtn.on{background:var(--gold);color:#3a2a00;border-color:var(--gold)}
+  .leg-grp{font-size:11px;color:var(--cinza);line-height:1.5;margin:0 2px 12px}.leg-grp b{color:var(--gold)}
+  .grpcard{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:8px 6px 4px;margin-bottom:10px;overflow:hidden}
+  .grpcab{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;color:var(--gold);padding:2px 8px 8px}
+  .tabgrp{width:100%;border-collapse:collapse;font-size:13px}
+  .tabgrp th{font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;padding:4px 3px;text-align:center;border-bottom:1px solid var(--linha)}
+  .tabgrp td{padding:7px 3px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05)}
+  .tabgrp tr:last-child td{border-bottom:none}
+  .tabgrp .ctime{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+  .tabgrp .ctime img{width:20px;border-radius:2px;vertical-align:-4px;margin-right:5px}
+  .tabgrp .cpos{color:var(--cinza);width:18px}
+  .tabgrp td b{color:var(--branco);font-family:'Anton',sans-serif;font-size:14px}
+  .tabgrp tr.classif{background:rgba(244,197,66,.07)}
+  .tabgrp tr.classif .cpos{color:var(--gold);font-weight:700}
+  @media(max-width:430px){.tabgrp .men{display:none}.tabgrp .ctime{max-width:96px;font-size:12px}}
 </style>
 </head>
 <body>
@@ -87,11 +105,11 @@
   <div class="cab-topo"><span class="tro">🏆</span>
     <div><h1>Resultados — <b>Copa 2026</b></h1><div class="sub">Bolão Brasileirão Almoço</div></div></div>
   <nav class="menu">
-    <a href="index.html">Meus Palpites</a>
-    <a href="aovivo.html">Ao vivo</a>
-    <a href="resultados.html" class="ativo">Resultados</a>
-    <a href="palpites.html">Palpites</a>
+        <a href="resultados.html" class="ativo">Jogos</a>
     <a href="pontos.html">Classificação</a>
+    <a href="aovivo.html">Ao vivo</a>
+    <a href="palpites.html">Palpites</a>
+    <a href="index.html">Meus Palpites</a>
   </nav>
 
   <div class="navdia">
