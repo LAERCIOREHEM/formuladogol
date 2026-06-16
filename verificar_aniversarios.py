@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-Script que verifica aniversariantes do dia em DOIS grupos:
-- Almoço de Sexta (membros.json)
-- TUPAL (membros_tupal.json)
+Script que verifica aniversariantes do dia no grupo Almoço de Sexta (membros.json).
 
-E envia email único via Resend.com com aniversariantes de ambos.
+E envia email via Resend.com com os aniversariantes do dia.
 
 Roda 1x por dia (08:00 BRT = 11:00 UTC) pelo GitHub Actions.
 
@@ -90,9 +88,9 @@ def montar_secao_grupo(titulo_grupo, aniversariantes, cor_borda):
     return html
 
 
-def montar_html_email(aniv_almoco, aniv_tupal):
+def montar_html_email(aniv_almoco):
     """Monta corpo HTML do email com os dois grupos."""
-    total = len(aniv_almoco) + len(aniv_tupal)
+    total = len(aniv_almoco)
     titulo = "Aniversariante de hoje!" if total == 1 else f"{total} aniversariantes de hoje!"
 
     html = f"""<!DOCTYPE html>
@@ -107,8 +105,6 @@ def montar_html_email(aniv_almoco, aniv_tupal):
     if aniv_almoco:
         html += montar_secao_grupo("Almoco de Sexta", aniv_almoco, "#f472b6")
 
-    if aniv_tupal:
-        html += montar_secao_grupo("TUPAL", aniv_tupal, "#fbbf24")
 
     html += """
     <p style="font-size:12px; color:#9ca3af; margin:20px 0 0; padding-top:16px; border-top:1px solid #e5e7eb;">
@@ -175,26 +171,24 @@ def main():
     print()
 
     membros_almoco = ler_arquivo_membros("membros.json")
-    membros_tupal = []
 
     print(f"Membros Almoco: {len(membros_almoco)}")
     print()
 
     aniv_almoco = aniversariantes_de_hoje(membros_almoco)
-    aniv_tupal = aniversariantes_de_hoje(membros_tupal)
 
     print(f"Aniversariantes Almoco hoje: {len(aniv_almoco)}")
     for a in aniv_almoco:
         print(f"  - {a.get('nome')}")
-    total = len(aniv_almoco) + len(aniv_tupal)
+    total = len(aniv_almoco)
     if total == 0:
-        print("\nNenhum aniversariante hoje nos dois grupos. Nada a enviar.")
+        print("\nNenhum aniversariante hoje. Nada a enviar.")
         return
 
     print("\nMontando email...")
-    html_email = montar_html_email(aniv_almoco, aniv_tupal)
+    html_email = montar_html_email(aniv_almoco)
 
-    todos_nomes = [a.get("nome", "?") for a in aniv_almoco] + [a.get("nome", "?") for a in aniv_tupal]
+    todos_nomes = [a.get("nome", "?") for a in aniv_almoco]
     nomes = ", ".join(todos_nomes)
     assunto = f"Hoje: aniversario de {nomes}"
 
