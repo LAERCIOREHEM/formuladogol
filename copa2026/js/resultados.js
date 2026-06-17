@@ -93,7 +93,7 @@
       return;
     }
     const evs = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
-    if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
+    if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
     $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
@@ -105,8 +105,8 @@
 
   function abasHTML() {
     return `<div class="vistog">
-      <button class="vbtn ${ABA === "jogos" ? "on" : ""}" data-v="jogos">📅 Jogos</button>
-      <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Grupos</button>
+      <button class="vbtn ${ABA === "jogos" ? "on" : ""}" data-v="jogos">📅 Partidas</button>
+      <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Tabela dos Grupos</button>
     </div>`;
   }
   async function buscarGruposEvents() {

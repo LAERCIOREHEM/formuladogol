@@ -9,7 +9,7 @@
     globo: ["Globo", "#0a7cff"], sbt: ["SBT", "#00a651"], sportv: ["SporTV", "#ff7a00"],
     getv: ["ge tv", "#06aa48"], gplay: ["Globoplay", "#fb0234"], caze: ["CazéTV", "#f7d116"]
   };
-  var SEL = {}, TVS = {}, JOGOS = [];
+  var SEL = {}, ISO = {}, TVS = {}, MM = {}, JOGOS = [];
 
   function fmtData(d) {
     return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", weekday: "short", day: "2-digit", month: "2-digit" }).format(d);
@@ -21,6 +21,13 @@
     var p = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric" }).formatToParts(d);
     var o = {}; p.forEach(function (x) { if (x.type !== "literal") o[x.type] = x.value; });
     return o.year + "-" + o.month + "-" + o.day;
+  }
+  function flag(id) {
+    var c = ISO[id]; return c ? '<img class="oa-flag" src="https://flagcdn.com/w40/' + c + '.png" alt="" onerror="this.style.display=\'none\'">' : "";
+  }
+  function momento(aId, bId) {
+    var k = [aId, bId].sort().join("-");
+    return MM[k] || null;
   }
   function chips(aId, bId) {
     var k = [aId, bId].sort().join("-");
@@ -42,11 +49,12 @@
         html += '<div class="dia-cab">' + fmtData(j.date) + "</div>";
       }
       var estado = j.state === "post" ? '<span class="oa-fim">encerrado</span>' : j.state === "in" ? '<span class="oa-vivo">🔴 ao vivo</span>' : '<span class="oa-hora">' + fmtHora(j.date) + "</span>";
+      var m = (j.state === "post") ? momento(j.a, j.b) : null;
       html += '<div class="oa-jogo">' +
-        '<div class="oa-times"><span>' + (j.an || j.a) + "</span><b>×</b><span>" + (j.bn || j.b) + "</span></div>" +
+        '<div class="oa-times">' + flag(j.a) + '<span>' + (j.an || j.a) + "</span><b>×</b><span>" + (j.bn || j.b) + "</span>" + flag(j.b) + "</div>" +
         '<div class="oa-info">' + estado + (j.venue ? ' · <span class="oa-loc">' + j.venue + "</span>" : "") + "</div>" +
-        '<div class="oa-tv">📺 ' + chips(j.a, j.b) + "</div>" +
-        '<a class="oa-caze" href="https://www.youtube.com/@CazeTV/live" target="_blank" rel="noopener">▶️ CazéTV ao vivo</a>' +
+        (m && m.url ? '<a class="oa-assista" href="' + m.url + '" target="_blank" rel="noopener">▶️ Assista como foi (melhores momentos)</a>'
+                    : '<div class="oa-tv">📺 ' + chips(j.a, j.b) + "</div>") +
         "</div>";
     });
     $("#lista").innerHTML = html;
@@ -93,9 +101,11 @@
     Promise.all([
       fetch("dados/selecoes.json").then(function (r) { return r.json(); }),
       fetch("dados/transmissoes.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
-      fetch(API + "?dates=20260611-20260719&limit=200").then(function (r) { return r.json(); })
+      fetch(API + "?dates=20260611-20260719&limit=200").then(function (r) { return r.json(); }),
+      fetch("dados/melhores-momentos.json?t=" + Date.now()).then(function (r) { return r.json(); }).catch(function () { return {}; })
     ]).then(function (res) {
-      (res[0].selecoes || []).forEach(function (s) { SEL[s.id] = s.nome; });
+      MM = (res[3] && res[3].jogos) || {};
+      (res[0].selecoes || []).forEach(function (s) { SEL[s.id] = s.nome; ISO[s.id] = s.iso2; });
       TVS = res[1] || {};
       (res[2].events || []).forEach(function (ev) {
         var c = ev.competitions[0]; if (!c) return;
