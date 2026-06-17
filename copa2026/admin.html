@@ -53,6 +53,8 @@
   .hdr-svg{display:block;width:100%;height:auto;max-width:520px}
   .hdr{margin:0 0 14px;text-align:center}
   .hdr-img{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;border-radius:10px;box-sizing:border-box}
+  .admin-bar{display:flex;gap:8px;justify-content:flex-end;margin:-4px 0 14px}
+  .admin-bar .btn-mini{cursor:pointer}
 </style>
 </head>
 <body>
@@ -70,12 +72,10 @@
 
 <!-- PAINEL -->
 <div class="wrap" id="painel-admin" style="display:none">
-  <div class="topo">
-    <div class="hdr"><img class="hdr-img" src="img/header-copa26.png" alt="COPA 26 — Bolão Brasileirão Almoço"></div>
-    <div>
-      <a href="index.html" class="btn-mini" style="text-decoration:none">Ver o bolão →</a>
-      <button id="btn-sair-admin" class="btn-mini">Sair</button>
-    </div>
+  <div class="hdr"><img class="hdr-img" src="img/header-copa26.png" alt="COPA 26 — Bolão Brasileirão Almoço"></div>
+  <div class="admin-bar">
+    <a href="index.html" class="btn-mini" style="text-decoration:none">← Voltar ao bolão</a>
+    <button id="btn-sair-admin" class="btn-mini">Sair</button>
   </div>
 
   <div id="msg" class="msg oculto"></div>
