@@ -13,6 +13,7 @@
   const CFG = window.COPA_CFG || { url: "", key: "" };
 
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
+  let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
   let ABA = "jogos", SEL = [], GRP_EVENTS = [];
 
   async function rpc(fn, body) {
@@ -47,6 +48,16 @@
     nsports: ["N Sports", "#222a38", "#fff"],
     caze:    ["CazéTV", "#f7d116", "#3a2a00"]
   };
+  function momentoDe(aAb, bAb) {
+    const k = [aAb, bAb].sort().join("-");
+    return MM[k] || null;
+  }
+  function blocoMomento(aAb, bAb) {
+    const m = momentoDe(aAb, bAb);
+    if (!m || !m.url) return "";
+    return `<a class="assista" href="${m.url}" target="_blank" rel="noopener">▶️ Assista como foi (melhores momentos)</a>`;
+  }
+
   function tvChips(aAb, bAb) {
     const k = [aAb, bAb].sort().join("-");
     const extras = (TVS.jogos && TVS.jogos[k]) || [];
@@ -56,6 +67,7 @@
 
   async function carregarBase() {
     try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
+    try { const mm = await fetch("dados/melhores-momentos.json?t=" + Date.now()).then(r => r.json()); MM = mm.jogos || {}; } catch (e) { MM = {}; }
     try {
       const sj = await fetch("dados/selecoes.json").then(r => r.json());
       SEL = sj.selecoes;
@@ -183,7 +195,9 @@
         <div class="lado f ${vencA}"><span class="t">${teamNome(away)}</span>${escudo(away)}</div>
       </div>
       ${venue ? `<div class="venue">${venue}</div>` : ""}
-      ${tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
+      ${(st.state === "post" && momentoDe((home.team || {}).abbreviation, (away.team || {}).abbreviation))
+        ? blocoMomento((home.team || {}).abbreviation, (away.team || {}).abbreviation)
+        : tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${palpites}
     </div>`;
   }
