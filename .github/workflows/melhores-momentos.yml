@@ -1,0 +1,43 @@
+name: Buscar melhores momentos (CazéTV)
+
+on:
+  # Roda automaticamente de manhã (13h UTC = 10h BRT), quando a Cazé já subiu
+  # os vídeos da véspera. Ajuste o horário se quiser.
+  schedule:
+    - cron: '0 13 * * *'
+  # Permite rodar manualmente pelo botão "Run workflow" na aba Actions.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o repositório
+        uses: actions/checkout@v5
+
+      - name: Configurar Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Rodar o buscador de melhores momentos
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          CAZE_PLAYLIST_ID: ${{ secrets.CAZE_PLAYLIST_ID }}
+        run: python3 copa2026/buscar_melhores_momentos.py
+
+      - name: Commitar se houve mudança
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          if [[ -n "$(git status --porcelain copa2026/dados/melhores-momentos.json)" ]]; then
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add copa2026/dados/melhores-momentos.json
+            git commit -m "Atualiza melhores momentos (automático)"
+            git push
+          else
+            echo "Nada mudou — sem commit."
+          fi
