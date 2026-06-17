@@ -90,7 +90,7 @@
         <h2>Nenhum jogo ao vivo agora</h2>
         <p>Quando uma partida começa, ela aparece aqui sozinha — e some quando acaba.</p>
         ${proximo(data) ? `<p class="prox">Próximo jogo: <b>${proximo(data)}</b></p>` : ""}
-        <a class="link" href="resultados.html">Ver resultados →</a></div>`;
+        <a class="link" href="index.html">Ver jogos →</a></div>`;
       return;
     }
     $("#app").innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado com os palpites reais. No dia, é automático (abra sem <b>?demo=1</b>).</div>' : "")
