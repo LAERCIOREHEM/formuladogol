@@ -8,6 +8,15 @@
    ========================================================================= */
 (function () {
   "use strict";
+  // ===== DE-PARA embutido (à prova de timing): sigla/nome EN -> PT + bandeira =====
+  var DEPARA = {"MEX": {"n": "México", "i": "mx"}, "RSA": {"n": "África do Sul", "i": "za"}, "KOR": {"n": "Coreia do Sul", "i": "kr"}, "CZE": {"n": "Rep. Tcheca", "i": "cz"}, "CAN": {"n": "Canadá", "i": "ca"}, "BIH": {"n": "Bósnia", "i": "ba"}, "QAT": {"n": "Catar", "i": "qa"}, "SUI": {"n": "Suíça", "i": "ch"}, "BRA": {"n": "Brasil", "i": "br"}, "MAR": {"n": "Marrocos", "i": "ma"}, "HAI": {"n": "Haiti", "i": "ht"}, "SCO": {"n": "Escócia", "i": "gb-sct"}, "USA": {"n": "EUA", "i": "us"}, "PAR": {"n": "Paraguai", "i": "py"}, "AUS": {"n": "Austrália", "i": "au"}, "TUR": {"n": "Turquia", "i": "tr"}, "GER": {"n": "Alemanha", "i": "de"}, "CUW": {"n": "Curaçao", "i": "cw"}, "CIV": {"n": "Costa do Marfim", "i": "ci"}, "ECU": {"n": "Equador", "i": "ec"}, "NED": {"n": "Holanda", "i": "nl"}, "JPN": {"n": "Japão", "i": "jp"}, "SWE": {"n": "Suécia", "i": "se"}, "TUN": {"n": "Tunísia", "i": "tn"}, "BEL": {"n": "Bélgica", "i": "be"}, "EGY": {"n": "Egito", "i": "eg"}, "IRN": {"n": "Irã", "i": "ir"}, "NZL": {"n": "Nova Zelândia", "i": "nz"}, "ESP": {"n": "Espanha", "i": "es"}, "CPV": {"n": "Cabo Verde", "i": "cv"}, "KSA": {"n": "Arábia Saudita", "i": "sa"}, "URU": {"n": "Uruguai", "i": "uy"}, "FRA": {"n": "França", "i": "fr"}, "SEN": {"n": "Senegal", "i": "sn"}, "IRQ": {"n": "Iraque", "i": "iq"}, "NOR": {"n": "Noruega", "i": "no"}, "ARG": {"n": "Argentina", "i": "ar"}, "ALG": {"n": "Argélia", "i": "dz"}, "AUT": {"n": "Áustria", "i": "at"}, "JOR": {"n": "Jordânia", "i": "jo"}, "POR": {"n": "Portugal", "i": "pt"}, "COD": {"n": "RD Congo", "i": "cd"}, "UZB": {"n": "Uzbequistão", "i": "uz"}, "COL": {"n": "Colômbia", "i": "co"}, "ENG": {"n": "Inglaterra", "i": "gb-eng"}, "CRO": {"n": "Croácia", "i": "hr"}, "GHA": {"n": "Gana", "i": "gh"}, "PAN": {"n": "Panamá", "i": "pa"}};
+  var DEPARA_EN = {"mexico": "MEX", "south africa": "RSA", "south korea": "KOR", "korea republic": "KOR", "czechia": "CZE", "czech republic": "CZE", "canada": "CAN", "bosnia and herzegovina": "BIH", "bosnia": "BIH", "qatar": "QAT", "switzerland": "SUI", "brazil": "BRA", "morocco": "MAR", "haiti": "HAI", "scotland": "SCO", "united states": "USA", "paraguay": "PAR", "australia": "AUS", "turkey": "TUR", "turkiye": "TUR", "germany": "GER", "curacao": "CUW", "ivory coast": "CIV", "cote d ivoire": "CIV", "ecuador": "ECU", "netherlands": "NED", "japan": "JPN", "sweden": "SWE", "tunisia": "TUN", "belgium": "BEL", "egypt": "EGY", "iran": "IRN", "new zealand": "NZL", "spain": "ESP", "cape verde": "CPV", "saudi arabia": "KSA", "uruguay": "URU", "france": "FRA", "senegal": "SEN", "iraq": "IRQ", "norway": "NOR", "argentina": "ARG", "algeria": "ALG", "austria": "AUT", "jordan": "JOR", "portugal": "POR", "dr congo": "COD", "congo dr": "COD", "congo": "COD", "uzbekistan": "UZB", "colombia": "COL", "england": "ENG", "croatia": "CRO", "ghana": "GHA", "panama": "PAN"};
+  function dpNorm(s){return String(s||"").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();}
+  function dpSigla(x){ if(!x) return null; if(DEPARA[x]) return x; var n=dpNorm(x); for(var k in DEPARA){ if(dpNorm(DEPARA[k].n)===n) return k; } return DEPARA_EN[n]||null; }
+  function dpNome(x){ var s=dpSigla(x); return s?DEPARA[s].n:(x||"—"); }
+  function dpIso(x){ var s=dpSigla(x); return s?DEPARA[s].i:""; }
+  function dpFlag(x,w){ var c=dpIso(x); return c?("https://flagcdn.com/w"+(w||80)+"/"+c+".png"):""; }
+
   const CFG = window.COPA_CFG || { url: "", key: "" };
   const $ = s => document.querySelector(s);
   const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
@@ -57,7 +66,7 @@
         fetch("dados/terceiros_map.json").then(r => r.json())
       ]);
       DADOS.selecoes = s.selecoes; DADOS.estrutura = e; DADOS.terceirosMap = t;
-      DADOS.nomeDe = {}; DADOS.isoDe = {};
+        DADOS.nomeDe = {}; DADOS.isoDe = {};
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
     } catch (err) { $("#app").innerHTML = '<p class="vazio">Erro ao carregar os dados da Copa.</p>'; return; }
     JOGOS = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes);
@@ -112,8 +121,12 @@
     const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
     const pre = st.state === "pre";
     const minuto = pre ? "Pré-jogo" : (st.shortDetail || "Ao vivo");
-    const escudo = c => c.team && c.team.logo ? `<img src="${c.team.logo}" alt="" onerror="this.style.visibility='hidden'">` : "";
-    const tNome = c => (c.team && (c.team.shortDisplayName || c.team.displayName)) || "—";
+    const escudo = c => {
+      const ab = (c.team && c.team.abbreviation) || (c.team && c.team.displayName);
+      const src = dpFlag(ab, 80) || (c.team && c.team.logo) || "";
+      return src ? `<img src="${src}" alt="" title="${dpNome(ab)}" onerror="this.style.visibility='hidden'">` : "";
+    };
+    const tNome = c => dpNome((c.team && c.team.abbreviation) || (c.team && c.team.displayName));
 
     // palpites (só fase de grupos e se já houver palpites revelados)
     const j = ourGame(ev);
@@ -168,7 +181,7 @@
     if (!ev) return "";
     const cs = ev.competitions[0].competitors, h = cs.find(c => c.homeAway === "home"), a = cs.find(c => c.homeAway === "away");
     const t = new Date(ev.date).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
-    return `${(h.team.shortDisplayName)} × ${(a.team.shortDisplayName)} — ${t}`;
+    return `${dpNome(h.team.abbreviation || h.team.displayName)} × ${dpNome(a.team.abbreviation || a.team.displayName)} — ${t}`;
   }
 
   // jogo simulado (apenas com ?demo=1) usando o 1º jogo de grupo e placar fixo 2×1
