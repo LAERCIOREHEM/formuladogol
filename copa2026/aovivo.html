@@ -77,6 +77,41 @@
   .nada p{font-size:14px;color:var(--cinza);line-height:1.6}
   .nada .prox{margin-top:10px} .nada .prox b{color:var(--branco)}
   .nada .link{display:inline-block;margin-top:16px;color:var(--gold);text-decoration:none;font-weight:600}
+
+  /* ===== Tela de espera (cartaz do próximo jogo) ===== */
+  .espera{max-width:680px;margin:24px auto 0;text-align:center}
+  .cartazes{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .cartaz{flex:1;min-width:280px;max-width:480px;background:linear-gradient(160deg,#13294d,#0b1f3a);
+    border:1px solid var(--gold-2);border-radius:18px;padding:26px 20px 24px;
+    box-shadow:0 12px 40px rgba(0,0,0,.35);position:relative;overflow:hidden}
+  .cartaz::before{content:"";position:absolute;top:-40%;left:-30%;width:160%;height:80%;
+    background:radial-gradient(ellipse,rgba(244,197,66,.10),transparent 70%);pointer-events:none}
+  .cz-tag{display:inline-block;background:var(--gold);color:#3a2a00;font-family:'Anton',sans-serif;
+    font-size:13px;letter-spacing:1.5px;padding:4px 14px;border-radius:99px;margin-bottom:18px}
+  .cz-times{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:18px}
+  .cz-time{display:flex;flex-direction:column;align-items:center;gap:10px;flex:1;min-width:0}
+  .cz-flag{width:84px;height:auto;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+  .cz-nome{font-family:'Anton',sans-serif;font-size:21px;line-height:1.1;color:#fff;letter-spacing:.3px}
+  .cz-x{font-family:'Anton',sans-serif;font-size:26px;color:var(--gold);flex-shrink:0}
+  .cz-quando{font-size:16px;color:var(--branco);margin-bottom:6px}
+  .cz-quando b{font-family:'Anton',sans-serif;font-size:20px;color:var(--gold)}
+  .cz-bsb{font-size:12px;color:var(--cinza)}
+  .cz-contador{display:inline-block;background:rgba(244,197,66,.12);border:1px solid var(--gold-2);
+    color:var(--gold);font-weight:800;font-size:15px;padding:7px 18px;border-radius:99px;margin:10px 0 16px}
+  .cz-contador.cz-agora{background:#1db954;border-color:#1db954;color:#fff;animation:pulsa 1.2s infinite}
+  @keyframes pulsa{50%{opacity:.6}}
+  .cz-frase{font-family:'Anton',sans-serif;font-size:19px;color:#fff;line-height:1.2;
+    text-shadow:0 2px 8px rgba(0,0,0,.4)}
+  .cz-auto{font-size:13px;color:var(--cinza);margin:20px auto 0;max-width:460px;line-height:1.6}
+  .espera .link{display:inline-block;margin-top:14px;color:var(--gold);text-decoration:none;font-weight:700}
+  /* dois jogos simultâneos: lado a lado no PC, empilhados no celular */
+  @media(max-width:560px){
+    .cartazes.multi{flex-direction:column;align-items:center}
+    .cz-flag{width:66px}
+    .cz-nome{font-size:18px}
+    .cz-x{font-size:22px}
+    .cartaz{padding:22px 16px 20px;min-width:0}
+  }
   .vazio{color:var(--cinza);text-align:center;padding:24px}
   .tvs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center;margin-top:8px;font-size:11px;color:var(--cinza)}
   .tvchip{font-size:9.5px;font-weight:700;letter-spacing:.3px;padding:2px 7px;border-radius:99px;white-space:nowrap}
@@ -103,15 +138,15 @@
   <div id="app"><p class="vazio">Carregando…</p></div>
 </div>
 
-<script src="js/config.js?v=20260618b"></script>
-<script src="js/engine.js?v=20260618b"></script>
-<script src="js/aovivo.js?v=20260618b"></script>
+<script src="js/config.js?v=20260618c"></script>
+<script src="js/engine.js?v=20260618c"></script>
+<script src="js/aovivo.js?v=20260618c"></script>
 <footer class="rodape">
   <a href="regras.html">Regras</a><span class="sep">·</span>
   <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
   <a href="/?brasileirao=1">← Brasileirão</a>
 </footer>
-  <script src="js/aniversarios.js?v=20260618b"></script>
+  <script src="js/aniversarios.js?v=20260618c"></script>
   <footer class="rodape-site">
     <nav class="rs-nav" aria-label="Links do site">
       <a href="index.html">Jogos</a> · <a href="onde-assistir.html">Onde assistir</a> · <a href="pontos.html">Classificação</a> · <a href="aovivo.html">Ao vivo</a> · <a href="palpites.html">Palpites</a> · <a href="regras.html">Regras</a>
