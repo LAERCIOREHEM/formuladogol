@@ -95,11 +95,8 @@
 
   function render(lives, data, demoFlag) {
     if (!lives.length) {
-      $("#app").innerHTML = `<div class="nada"><div class="bola">⚽</div>
-        <h2>Nenhum jogo ao vivo agora</h2>
-        <p>Quando uma partida começa, ela aparece aqui sozinha — e some quando acaba.</p>
-        ${proximo(data) ? `<p class="prox">Próximo jogo: <b>${proximo(data)}</b></p>` : ""}
-        <a class="link" href="index.html">Ver jogos →</a></div>`;
+      $("#app").innerHTML = telaEspera(data);
+      iniciarContadores();
       return;
     }
     $("#app").innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado com os palpites reais. No dia, é automático (abra sem <b>?demo=1</b>).</div>' : "")
@@ -176,12 +173,88 @@
     const map = { "group-stage": "Fase de grupos", "round-of-32": "Segunda fase", "round-of-16": "Oitavas", "quarterfinals": "Quartas", "semifinals": "Semifinal", "third-place": "Disputa de 3º", "final": "Final" };
     return map[(ev.season && ev.season.slug)] || "Copa do Mundo";
   }
-  function proximo(data) {
-    const ev = (data.events || []).filter(e => e.competitions[0].status.type.state === "pre").sort((a, b) => new Date(a.date) - new Date(b.date))[0];
-    if (!ev) return "";
-    const cs = ev.competitions[0].competitors, h = cs.find(c => c.homeAway === "home"), a = cs.find(c => c.homeAway === "away");
-    const t = new Date(ev.date).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
-    return `${dpNome(h.team.abbreviation || h.team.displayName)} × ${dpNome(a.team.abbreviation || a.team.displayName)} — ${t}`;
+  // ===== Tela de espera (nenhum jogo ao vivo): cartaz do próximo jogo =====
+  function frasePorHora(h) {
+    // h = hora (0-23) do início do jogo, fuso de Brasília
+    var manha = ["Começa o dia com Copa!", "Café da manhã com gol?", "Bom dia com futebol!"];
+    var almoco = ["Prepara o almoço que já vem jogo!", "Almoço de sexta com Copa!", "Separa o prato e chama a galera!"];
+    var tarde = ["Larga tudo, é dia de Copa!", "A tarde é nossa e da bola!", "Chama a galera pro jogo!"];
+    var noite = ["Esquenta que a noite é de Copa!", "Separa a cerveja, é jogo!", "Fim de dia é com futebol!"];
+    var arr = h < 11 ? manha : h < 15 ? almoco : h < 18 ? tarde : noite;
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+  function cartazJogo(ev) {
+    var cs = ev.competitions[0].competitors;
+    var h = cs.find(c => c.homeAway === "home") || cs[0];
+    var a = cs.find(c => c.homeAway === "away") || cs[1];
+    var hAb = (h.team || {}).abbreviation || (h.team || {}).displayName;
+    var aAb = (a.team || {}).abbreviation || (a.team || {}).displayName;
+    var d = new Date(ev.date);
+    var hora = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(d);
+    var diaTxt = rotuloDiaJogo(d);
+    var bandH = dpFlag(hAb, 160), bandA = dpFlag(aAb, 160);
+    return `<div class="cartaz">
+      <div class="cz-tag">PRÓXIMO JOGO</div>
+      <div class="cz-times">
+        <div class="cz-time">
+          ${bandH ? `<img class="cz-flag" src="${bandH}" alt="">` : ""}
+          <span class="cz-nome">${dpNome(hAb)}</span>
+        </div>
+        <span class="cz-x">×</span>
+        <div class="cz-time">
+          ${bandA ? `<img class="cz-flag" src="${bandA}" alt="">` : ""}
+          <span class="cz-nome">${dpNome(aAb)}</span>
+        </div>
+      </div>
+      <div class="cz-quando">${diaTxt}, <b>${hora}</b> <span class="cz-bsb">(Brasília)</span></div>
+      <div class="cz-contador" data-inicio="${d.getTime()}">calculando…</div>
+      <div class="cz-frase">${frasePorHora(horaBSB(d))}</div>
+    </div>`;
+  }
+  function horaBSB(d) {
+    return parseInt(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", hour12: false }).format(d), 10);
+  }
+  function rotuloDiaJogo(d) {
+    var hoje = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+    var dia = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(d);
+    var amanha = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date(Date.now() + 864e5));
+    if (dia === hoje) return "Hoje";
+    if (dia === amanha) return "Amanhã";
+    return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", weekday: "long", day: "2-digit", month: "2-digit" }).format(d);
+  }
+  function telaEspera(data) {
+    var pres = (data.events || []).filter(e => e.competitions[0].status.type.state === "pre")
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (!pres.length) {
+      return `<div class="nada"><div class="bola">⚽</div>
+        <h2>Sem jogos ao vivo agora</h2>
+        <p>Os jogos da Copa aparecem aqui automaticamente quando começam.</p>
+        <a class="link" href="index.html">Ver todos os jogos →</a></div>`;
+    }
+    // jogos simultâneos: mesmo horário do primeiro "pre"
+    var t0 = new Date(pres[0].date).getTime();
+    var simultaneos = pres.filter(e => Math.abs(new Date(e.date).getTime() - t0) < 60000);
+    var cartazes = simultaneos.map(cartazJogo).join("");
+    var multi = simultaneos.length > 1 ? " multi" : "";
+    return `<div class="espera">
+      <div class="cartazes${multi}">${cartazes}</div>
+      <p class="cz-auto">⏱️ Deixe esta tela aberta: assim que a bola rolar, ela vira o jogo ao vivo sozinha.</p>
+      <a class="link" href="index.html">Ver todos os jogos →</a>
+    </div>`;
+  }
+  function iniciarContadores() {
+    function tick() {
+      document.querySelectorAll(".cz-contador").forEach(function (el) {
+        var ini = parseInt(el.dataset.inicio, 10);
+        var ms = ini - Date.now();
+        if (ms <= 0) { el.textContent = "Começando agora!"; el.classList.add("cz-agora"); return; }
+        var min = Math.floor(ms / 60000), hh = Math.floor(min / 60), mm = min % 60;
+        el.textContent = "Começa em " + (hh > 0 ? hh + "h " : "") + mm + "min";
+      });
+    }
+    tick();
+    if (window._czTimer) clearInterval(window._czTimer);
+    window._czTimer = setInterval(tick, 30000);
   }
 
   // jogo simulado (apenas com ?demo=1) usando o 1º jogo de grupo e placar fixo 2×1
