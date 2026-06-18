@@ -68,6 +68,7 @@
   async function carregarBase() {
     try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
     try { const mm = await fetch("dados/melhores-momentos.json?t=" + Date.now()).then(r => r.json()); MM = mm.jogos || {}; } catch (e) { MM = {}; }
+    if (window.COPA_TIMES) { try { await COPA_TIMES.carregar(); } catch (e) {} }
     try {
       const sj = await fetch("dados/selecoes.json").then(r => r.json());
       SEL = sj.selecoes;
@@ -233,10 +234,10 @@
       <div class="subpal" id="sp-${ev.id}" style="display:none"><div class="subcnt">${cnt}</div>${rows}</div>`;
   }
 
-  function teamNome(c) { return (c.team && (c.team.shortDisplayName || c.team.displayName || c.team.abbreviation)) || "—"; }
+  function teamNome(c) { const ab = c.team && c.team.abbreviation; return (window.COPA_TIMES ? COPA_TIMES.nome(ab || (c.team && c.team.displayName)) : (ab || "—")); }
   function escudo(c) {
     const logo = c.team && c.team.logo;
-    return logo ? `<img src="${logo}" alt="" title="${(c.team.displayName) || ""}" onerror="this.style.visibility='hidden'">` : "";
+    const tit = window.COPA_TIMES ? COPA_TIMES.nome((c.team && c.team.abbreviation) || (c.team && c.team.displayName)) : ((c.team && c.team.displayName) || ""); return logo ? `<img src="${logo}" alt="" title="${tit}" onerror="this.style.visibility='hidden'">` : "";
   }
   function faseLabel(slug) {
     const map = { "group-stage": "Fase de grupos", "round-of-32": "Segunda fase", "round-of-16": "Oitavas", "quarterfinals": "Quartas", "semifinals": "Semifinal", "third-place": "Disputa de 3º", "final": "Final" };
