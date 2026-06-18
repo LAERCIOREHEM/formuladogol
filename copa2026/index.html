@@ -114,6 +114,23 @@
     color:#1a1100;font-weight:800;font-size:13px;text-decoration:none;padding:10px 14px;border-radius:99px;
     box-shadow:0 4px 16px rgba(224,71,62,.25)}
   .assista:active{transform:scale(.99)}
+  /* ===== Player de melhores momentos (modal embutido) ===== */
+  .mm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;
+    display:flex;align-items:center;justify-content:center;padding:16px}
+  .mm-box{width:100%;max-width:860px;position:relative}
+  .mm-frame{position:relative;width:100%;padding-top:56.25%;border-radius:12px;overflow:hidden;
+    background:#000;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .mm-frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+  .mm-fechar{position:absolute;top:-44px;right:0;background:rgba(255,255,255,.12);color:#fff;
+    border:1px solid rgba(255,255,255,.3);border-radius:50%;width:36px;height:36px;font-size:17px;
+    cursor:pointer;line-height:1}
+  .mm-fechar:active{transform:scale(.95)}
+  .mm-yt{display:block;text-align:center;margin-top:12px;color:var(--gold);font-size:13px;
+    text-decoration:none;font-weight:600}
+  @media(max-width:560px){
+    .mm-box{max-width:100%}
+    .mm-fechar{top:-40px;width:34px;height:34px}
+  }
 </style>
 </head>
 <body>
@@ -137,15 +154,15 @@
   <div id="lista"></div>
 </div>
 
-<script src="js/config.js?v=20260618d"></script>
-<script src="js/engine.js?v=20260618d"></script>
-<script src="js/resultados.js?v=20260618d"></script>
+<script src="js/config.js?v=20260618e"></script>
+<script src="js/engine.js?v=20260618e"></script>
+<script src="js/resultados.js?v=20260618e"></script>
 <footer class="rodape">
   <a href="regras.html">Regras</a><span class="sep">·</span>
   <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
   <a href="/?brasileirao=1">← Brasileirão</a>
 </footer>
-  <script src="js/aniversarios.js?v=20260618d"></script>
+  <script src="js/aniversarios.js?v=20260618e"></script>
   <footer class="rodape-site">
     <nav class="rs-nav" aria-label="Links do site">
       <a href="index.html">Jogos</a> · <a href="onde-assistir.html">Onde assistir</a> · <a href="pontos.html">Classificação</a> · <a href="aovivo.html">Ao vivo</a> · <a href="palpites.html">Palpites</a> · <a href="regras.html">Regras</a>
