@@ -1,21 +1,23 @@
 name: Buscar melhores momentos (CazéTV)
 
 on:
-  # Horários de Brasília - BRT/UTC-3.
-  # O GitHub Actions usa UTC.
-  #
-  # 07h BRT = 10h UTC
-  # Das 15h às 23h45 BRT = das 18h às 02h45 UTC, a cada 15 minutos.
+  # Horários de Brasília (BRT/UTC-3). O GitHub Actions usa UTC.
+  #   07h BRT = 10h UTC
+  #   15h às 23h45 BRT = 18h às 02h45 UTC, a cada 15 minutos.
   schedule:
-    - cron: '0 10 * * *'       # 07h BRT
-    - cron: '*/15 18-23 * * *' # 15h até 20h45 BRT, a cada 15 min
-    - cron: '*/15 0-2 * * *'   # 21h até 23h45 BRT, a cada 15 min
-
+    - cron: '0 10 * * *'        # 07h BRT (pega os jogos da véspera)
+    - cron: '*/15 18-23 * * *'  # 15h às 20h45 BRT, a cada 15 min
+    - cron: '*/15 0-2 * * *'    # 21h às 23h45 BRT, a cada 15 min
   # Permite rodar manualmente pelo botão "Run workflow" na aba Actions.
   workflow_dispatch:
 
 permissions:
   contents: write
+
+# Evita que duas execuções rodem ao mesmo tempo e colidam no push.
+concurrency:
+  group: melhores-momentos
+  cancel-in-progress: false
 
 jobs:
   buscar:
@@ -35,15 +37,27 @@ jobs:
           CAZE_PLAYLIST_ID: ${{ secrets.CAZE_PLAYLIST_ID }}
         run: python3 copa2026/buscar_melhores_momentos.py
 
-      - name: Commitar se houve mudança
+      - name: Commitar e enviar se houve mudança
         run: |
           cd "$GITHUB_WORKSPACE"
-          if [[ -n "$(git status --porcelain copa2026/dados/melhores-momentos.json)" ]]; then
-            git config user.name "github-actions"
-            git config user.email "actions@github.com"
-            git add copa2026/dados/melhores-momentos.json
-            git commit -m "Atualiza melhores momentos (automático)"
-            git push
-          else
+          if [[ -z "$(git status --porcelain copa2026/dados/melhores-momentos.json)" ]]; then
             echo "Nada mudou — sem commit."
+            exit 0
           fi
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add copa2026/dados/melhores-momentos.json
+          git commit -m "Atualiza melhores momentos (automático)"
+          # Tenta enviar; se o repositório tiver mudado no meio do caminho,
+          # puxa as novidades (rebase) e tenta de novo. Repete algumas vezes.
+          for i in 1 2 3 4 5; do
+            if git push; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+            echo "Push rejeitado (tentativa $i). Puxando novidades e tentando de novo..."
+            git pull --rebase --autostash origin main || true
+            sleep 3
+          done
+          echo "Não consegui enviar após várias tentativas."
+          exit 1
