@@ -61,10 +61,46 @@
     const k = [aAb, bAb].sort().join("-");
     return MM[k] || null;
   }
+  function ytId(url) {
+    // extrai o ID do vídeo de youtu.be/ID, youtube.com/watch?v=ID, /embed/ID
+    const m = String(url || "").match(/(?:youtu\.be\/|v=|\/embed\/)([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : null;
+  }
   function blocoMomento(aAb, bAb) {
     const m = momentoDe(aAb, bAb);
     if (!m || !m.url) return "";
+    const id = ytId(m.url);
+    if (id) {
+      // botão que abre o player DENTRO do site (modal)
+      return `<button class="assista" data-vid="${id}" data-url="${m.url}">▶️ Assista como foi (melhores momentos)</button>`;
+    }
+    // sem id reconhecível: cai no link externo (reserva)
     return `<a class="assista" href="${m.url}" target="_blank" rel="noopener">▶️ Assista como foi (melhores momentos)</a>`;
+  }
+  // abre o player modal; se o vídeo bloquear incorporação, oferece abrir no YouTube
+  function abrirPlayer(id, url) {
+    let bd = document.getElementById("mm-modal");
+    if (bd) bd.remove();
+    bd = document.createElement("div");
+    bd.id = "mm-modal";
+    bd.className = "mm-backdrop";
+    bd.innerHTML = `
+      <div class="mm-box">
+        <button class="mm-fechar" aria-label="Fechar">✕</button>
+        <div class="mm-frame">
+          <iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1"
+            title="Melhores momentos" frameborder="0"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allowfullscreen></iframe>
+        </div>
+        <a class="mm-yt" href="${url}" target="_blank" rel="noopener">Não carregou? Abrir no YouTube ↗</a>
+      </div>`;
+    document.body.appendChild(bd);
+    document.body.style.overflow = "hidden"; // trava o scroll do fundo
+    const fechar = () => { bd.remove(); document.body.style.overflow = ""; };
+    bd.querySelector(".mm-fechar").onclick = fechar;
+    bd.addEventListener("click", e => { if (e.target === bd) fechar(); });
+    document.addEventListener("keydown", function esc(ev) { if (ev.key === "Escape") { fechar(); document.removeEventListener("keydown", esc); } });
   }
 
   function tvChips(aAb, bAb) {
@@ -105,6 +141,7 @@
     if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
     $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    document.querySelectorAll("button.assista[data-vid]").forEach(b => b.onclick = () => abrirPlayer(b.dataset.vid, b.dataset.url));
     document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
       const d = document.getElementById("sp-" + b.dataset.sp), ab = d.style.display === "none";
       d.style.display = ab ? "block" : "none";
