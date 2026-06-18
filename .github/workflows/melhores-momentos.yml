@@ -3,16 +3,10 @@ name: Buscar melhores momentos (CazéTV)
 on:
   # Horários de Brasília (UTC-3): 7h, 18h, 19h, 20h, 21h, 22h e 23h.
   # Convertidos para UTC abaixo (o GitHub Actions usa UTC).
-  schedule:
-    - cron: '0 10 * * *'   # 07h BRT
-    - cron: '0 19 * * *'   # 16h BRT
-    - cron: '0 20 * * *'   # 17h BRT
-    - cron: '0 21 * * *'   # 18h BRT
-    - cron: '0 22 * * *'   # 19h BRT
-    - cron: '0 23 * * *'   # 20h BRT
-    - cron: '0 0 * * *'    # 21h BRT
-    - cron: '0 1 * * *'    # 22h BRT
-    - cron: '0 2 * * *'    # 23h BRT
+ schedule:
+  - cron: '0 10 * * *'       # 07h BRT
+  - cron: '*/15 18-23 * * *' # de 15h a 20h45 BRT, a cada 15 min
+  - cron: '*/15 0-2 * * *'   # de 21h a 23h45 BRT, a cada 15 min
   # Permite rodar manualmente pelo botão "Run workflow" na aba Actions.
   workflow_dispatch:
 
