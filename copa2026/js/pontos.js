@@ -100,7 +100,8 @@
       if (!j) return;
       const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
       const ga = j.a === hId ? hs : as, gb = j.a === hId ? as : hs;
-      realG.push({ jogo_id: j.jogo_id, ga, gb });
+      const inv = (j.a !== hId); // ESPN mostra invertido vs engine?
+      realG.push({ jogo_id: j.jogo_id, ga, gb, inv: inv, homeId: hId, awayId: aId });
     });
     const completos = {}; GRUPOS.forEach(g => completos[g] = realG.filter(p => p.jogo_id.startsWith("G_" + g + "_")).length === 6);
     const todosGrupos = GRUPOS.every(g => completos[g]);
@@ -130,7 +131,7 @@
     }
     o.eliminados = [...elim];
 
-    o._realGrupos = {}; realG.forEach(x => o._realGrupos[x.jogo_id] = { ga: x.ga, gb: x.gb });
+    o._realGrupos = {}; realG.forEach(x => o._realGrupos[x.jogo_id] = { ga: x.ga, gb: x.gb, inv: x.inv, homeId: x.homeId, awayId: x.awayId });
     o._meta = { todosGrupos, segundaFase: !!(o.classificados32 && o.classificados32.length), nGruposCompletos: GRUPOS.filter(g => completos[g]).length };
     return o;
   }
@@ -271,11 +272,17 @@
     return ids.map(id => {
       const j = JOGOS.find(x => x.jogo_id === id); if (!j) return "";
       const R = real[id], g = p.pg[id];
-      const [pts, tag] = tierDe(g, R);
-      const pal = (g && g.ga != null) ? `${g.ga}×${g.gb}` : "—";
+      const [pts, tag] = tierDe(g, R); // pontuação SEMPRE na ordem da engine (não muda)
+      // exibição na ordem da ESPN (mandante na frente):
+      const inv = R.inv;
+      const ladoA = inv ? j.b : j.a, ladoB = inv ? j.a : j.b;
+      const rGa = inv ? R.gb : R.ga, rGb = inv ? R.ga : R.gb;
+      const pGa = (g && g.ga != null) ? (inv ? g.gb : g.ga) : null;
+      const pGb = (g && g.ga != null) ? (inv ? g.ga : g.gb) : null;
+      const pal = (pGa != null) ? `${pGa}×${pGb}` : "—";
       const cls = pts === 5 ? "s5" : pts === 3 ? "s3" : pts === 2 ? "s2" : "s0";
       return `<div class="extrow">
-        <span class="extj"><i>${j.grupo}</i> ${flag(j.a)} ${j.a} <b>${R.ga}×${R.gb}</b> ${j.b} ${flag(j.b)}</span>
+        <span class="extj"><i>${j.grupo}</i> ${flag(ladoA)} ${ladoA} <b>${rGa}×${rGb}</b> ${ladoB} ${flag(ladoB)}</span>
         <span class="extp">palpite ${pal}</span>
         <span class="extpts ${cls}">${tag} ${SELO[pts]} · ${pts}pt</span></div>`;
     }).join("");
