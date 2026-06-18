@@ -23,6 +23,14 @@ jobs:
   buscar:
     runs-on: ubuntu-latest
     steps:
+      - name: Parar após a Copa (20/07/2026)
+        run: |
+          HOJE=$(date -u +%Y%m%d)
+          if [[ "$HOJE" -gt "20260720" ]]; then
+            echo "A Copa acabou (passou de 20/07/2026). Nada a fazer."
+            exit 0
+          fi
+
       - name: Baixar o repositório
         uses: actions/checkout@v5
 
