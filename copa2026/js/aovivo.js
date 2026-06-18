@@ -177,7 +177,7 @@
   function frasePorHora(h) {
     // h = hora (0-23) do início do jogo, fuso de Brasília
     var manha = ["Começa o dia com Copa!", "Café da manhã com gol?", "Bom dia com futebol!"];
-    var almoco = ["Prepara o almoço que já vem jogo!", "Almoço de sexta com Copa!", "Separa o prato e chama a galera!"];
+    var almoco = ["Prepara o almoço que já vem jogo!", "Almoço com Copa!", "Prepara o rango e chama a galera!"];
     var tarde = ["Larga tudo, é dia de Copa!", "A tarde é nossa e da bola!", "Chama a galera pro jogo!"];
     var noite = ["Esquenta que a noite é de Copa!", "Separa a cerveja, é jogo!", "Fim de dia é com futebol!"];
     var arr = h < 11 ? manha : h < 15 ? almoco : h < 18 ? tarde : noite;
