@@ -12,7 +12,8 @@
   let DADOS = {}, PART = [], JOGOS = [], GRUPOS = [], aba = "jogo";
 
   const ESPN = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
-  let RES = {}; // jogo_id -> {ga, gb, fim}
+  let RES = {}; // jogo_id -> {ga, gb, fim, inv, homeId, awayId}
+  let ESPNORD = {}; // jogo_id -> {homeId, awayId, inv} (ordem oficial da ESPN)
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -60,7 +61,10 @@
         const j = JOGOS.find(x => (x.a === hId && x.b === aId) || (x.a === aId && x.b === hId));
         if (!j) return;
         const hs = parseInt(h.score || "0", 10), as = parseInt(a.score || "0", 10);
-        RES[j.jogo_id] = { ga: j.a === hId ? hs : as, gb: j.a === hId ? as : hs, fim: c.status.type.state === "post" };
+        // inv = ESPN mostra invertido em relação à engine (mandante = j.b)
+        const inv = (j.a !== hId);
+        RES[j.jogo_id] = { ga: hs, gb: as, fim: c.status.type.state === "post", inv: inv, homeId: hId, awayId: aId };
+        ESPNORD[j.jogo_id] = { homeId: hId, awayId: aId, inv: inv };
       });
     } catch (e) { RES = {}; }
 
@@ -96,14 +100,18 @@
         const encerrado = !!(real && real.fim);
         const sgn = x => x > 0 ? 1 : x < 0 ? -1 : 0;
         let acertos = 0;
+        const ord = ESPNORD[j.jogo_id];
+        const inv = ord ? ord.inv : false; // se ESPN inverteu, espelha tudo
+        const ladoA = inv ? j.b : j.a, ladoB = inv ? j.a : j.b; // mandante x visitante (ordem ESPN)
         const linhas = PART.map(p => {
           const sc = p.grupos[j.jogo_id];
           const tem = sc && sc.ga != null && sc.gb != null;
-          const txt = tem ? `${sc.ga}<i>×</i>${sc.gb}` : "—";
+          const pga = tem ? (inv ? sc.gb : sc.ga) : null, pgb = tem ? (inv ? sc.ga : sc.gb) : null;
+          const txt = tem ? `${pga}<i>×</i>${pgb}` : "—";
           let tag = "";
           if (encerrado && tem) {
-            const exato = sc.ga === real.ga && sc.gb === real.gb;
-            const certo = sgn(sc.ga - sc.gb) === sgn(real.ga - real.gb);
+            const exato = pga === real.ga && pgb === real.gb;
+            const certo = sgn(pga - pgb) === sgn(real.ga - real.gb);
             if (certo) acertos++;
             tag = exato ? '<span class="medalha">CRAVOU 🎯</span>' : `<span class="bolinha ${certo ? "v" : "x"}"></span>`;
           }
@@ -113,7 +121,7 @@
         const resumo = encerrado ? `<div class="resumo-jogo">${acertos} de ${PART.length} acertaram o resultado · 🎯 = cravou o placar</div>` : "";
         html += `<div class="jogo" id="${id}">
           <div class="cab" data-tg="${id}">
-            <span class="conf">${flag(j.a)}${j.a}<span class="vs">×</span>${j.b}${flag(j.b)}${chipReal}</span>
+            <span class="conf">${flag(ladoA)}${ladoA}<span class="vs">×</span>${ladoB}${flag(ladoB)}${chipReal}</span>
             <span class="seta">▶</span></div>
           <div class="palps">${resumo}${linhas}</div></div>`;
       });

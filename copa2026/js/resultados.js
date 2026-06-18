@@ -217,25 +217,28 @@
     const hId = home.team && home.team.abbreviation, aId = away.team && away.team.abbreviation;
     const j = JOGOS.find(x => (x.a === hId && x.b === aId) || (x.a === aId && x.b === hId));
     if (!j) return "";
+    const inv = (j.a !== hId); // ESPN mostra invertido em relação à engine?
     const jogado = st.state !== "pre";
     let ra, rb;
     if (jogado) {
       const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
-      ra = j.a === hId ? hs : as; rb = j.a === hId ? as : hs;
+      ra = hs; rb = as; // já na ordem da ESPN (mandante x visitante)
     }
     let ac = 0;
     const rows = PALP.map(p => {
-      const g = p.pg[j.jogo_id];
-      if (!g) return `<div class="prow"><span>${p.nome}</span><span class="pal">—</span></div>`;
+      const graw = p.pg[j.jogo_id];
+      if (!graw) return `<div class="prow"><span>${p.nome}</span><span class="pal">—</span></div>`;
+      // orienta o palpite na MESMA ordem da exibição (ESPN/mandante)
+      const pga = inv ? graw.gb : graw.ga, pgb = inv ? graw.ga : graw.gb;
       let tag = "";
       if (jogado) {
-        const exato = g.ga === ra && g.gb === rb;
-        const certo = Math.sign(g.ga - g.gb) === Math.sign(ra - rb);
+        const exato = pga === ra && pgb === rb;
+        const certo = Math.sign(pga - pgb) === Math.sign(ra - rb);
         if (certo) ac++;
         const rotuloEx = st.state === "post" ? "CRAVOU" : "CRAVANDO";
         tag = exato ? `<span class="cravou">${rotuloEx} 🎯</span>` : `<span class="bola ${certo ? "v" : "x"}"></span>`;
       } else { tag = '<span class="aguard">aguardando</span>'; }
-      return `<div class="prow"><span>${p.nome}</span><span class="pal">${g.ga} - ${g.gb}${tag}</span></div>`;
+      return `<div class="prow"><span>${p.nome}</span><span class="pal">${pga} - ${pgb}${tag}</span></div>`;
     }).join("");
     const cnt = jogado ? `${ac} de ${PALP.length} acertaram o resultado` : "Palpites de todos (jogo ainda não começou)";
     return `<button class="vermais" data-sp="${ev.id}">Ver palpites (${PALP.length}) ▾</button>
