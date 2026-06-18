@@ -5,6 +5,8 @@ on:
   # Convertidos para UTC abaixo (o GitHub Actions usa UTC).
   schedule:
     - cron: '0 10 * * *'   # 07h BRT
+    - cron: '0 19 * * *'   # 16h BRT
+    - cron: '0 20 * * *'   # 17h BRT
     - cron: '0 21 * * *'   # 18h BRT
     - cron: '0 22 * * *'   # 19h BRT
     - cron: '0 23 * * *'   # 20h BRT
