@@ -102,10 +102,11 @@
     perdidos += naoConfirmados("semifinalistas", o.semifinalistas, PESOS.semi);
     perdidos += naoConfirmados("finalistas", o.finalistas, PESOS.final);
     const dec = o.decididos || {};
-    if (dec.campeao  && atuais.campeao  === 0) perdidos += PESOS.campeao;
-    if (dec.vice     && atuais.vice     === 0) perdidos += PESOS.vice;
-    if (dec.terceiro && atuais.terceiro === 0) perdidos += PESOS.terceiro;
-    if (dec.quarto   && atuais.quarto   === 0) perdidos += PESOS.quarto;
+    // Perdido se o título já foi decidido e ele errou, OU se a seleção que ele apostou já foi eliminada.
+    if ((dec.campeao  && atuais.campeao  === 0) || (p.campeao  && elim.has(p.campeao)))  perdidos += PESOS.campeao;
+    if ((dec.vice     && atuais.vice     === 0) || (p.vice     && elim.has(p.vice)))     perdidos += PESOS.vice;
+    if ((dec.terceiro && atuais.terceiro === 0) || (p.terceiro && elim.has(p.terceiro))) perdidos += PESOS.terceiro;
+    if ((dec.quarto   && atuais.quarto   === 0) || (p.quarto   && elim.has(p.quarto)))   perdidos += PESOS.quarto;
 
     const possiveis = Math.max(0, tetoMax - atuais.total - perdidos);
 
