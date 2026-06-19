@@ -16,6 +16,10 @@
   let FILTRO = "", ORDEM = "atuais", ULTIMO_O = null;
   let ABA = (new URLSearchParams(location.search).get("aba") === "placares") ? "placares" : "bolao";
   let ORDEM_P = "pts";
+  // Até esta data/hora (Brasília), o Ranking mostra a PRÉVIA SIMULADA (foto de hoje).
+  // Depois, vira o Ranking normal (pontuação real da 2ª fase).
+  const VIRADA_SIMULADO = new Date("2026-06-28T02:00:00-03:00");
+  function modoSimulado() { return Date.now() < VIRADA_SIMULADO.getTime(); }
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -112,6 +116,12 @@
         o.classificacao = {};
         GRUPOS.forEach(g => { if (completos[g]) o.classificacao[g] = dg.classificacao[g]; });
         if (todosGrupos) { o.classificados32 = dg.classificados32; o.melhores_terceiros = dg.melhores_terceiros; }
+        else if (modoSimulado()) {
+          // PRÉVIA: usa a foto parcial de hoje para simular os classificados
+          o.classificados32 = dg.classificados32;
+          o.melhores_terceiros = dg.melhores_terceiros;
+          o._simulado = true;
+        }
       }
     }
     if (r32.length === 32) o.classificados32 = r32; // so vale com os 32 REAIS definidos (ignora placeholders 'a definir' da ESPN)
@@ -132,7 +142,7 @@
     o.eliminados = [...elim];
 
     o._realGrupos = {}; realG.forEach(x => o._realGrupos[x.jogo_id] = { ga: x.ga, gb: x.gb, inv: x.inv, homeId: x.homeId, awayId: x.awayId });
-    o._meta = { todosGrupos, segundaFase: !!(o.classificados32 && o.classificados32.length), nGruposCompletos: GRUPOS.filter(g => completos[g]).length };
+    o._meta = { todosGrupos, segundaFase: !!(o.classificados32 && o.classificados32.length), nGruposCompletos: GRUPOS.filter(g => completos[g]).length, simulado: !!o._simulado };
     return o;
   }
 
@@ -170,7 +180,7 @@
 
   function toggleHTML() {
     return `<div class="vistog">
-      <button class="vbtn ${ABA === "bolao" ? "on" : ""}" data-v="bolao">🏆 Ranking</button>
+      <button class="vbtn ${ABA === "bolao" ? "on" : ""}" data-v="bolao">🏆 ${modoSimulado() ? "Ranking Simulado" : "Ranking"}</button>
       <button class="vbtn ${ABA === "placares" ? "on" : ""}" data-v="placares">🎯 Reis do Cravo</button>
     </div>`;
   }
@@ -204,7 +214,11 @@
     </div>`;
 
     let banner = "";
-    if (!o._meta.segundaFase) banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>teto</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
+    if (o._meta.simulado) {
+      banner = `<div class="aviso">⚠️ <b>Ranking SIMULADO</b>: como ficaria se a fase de grupos acabasse <b>agora</b>. Muda a cada jogo — <b>nada está definido!</b> ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
+    } else if (!o._meta.segundaFase) {
+      banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>teto</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
+    }
 
     const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯</p>';
     $("#app").innerHTML = toggleHTML() + controles + banner + tbnote + visiveis.map((x, i) => {
