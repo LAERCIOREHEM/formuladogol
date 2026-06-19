@@ -1,14 +1,9 @@
 name: Buscar melhores momentos (CazéTV)
 
 on:
-  # Horários de Brasília (BRT/UTC-3). O GitHub Actions usa UTC.
-  #   07h BRT = 10h UTC
-  #   15h às 23h45 BRT = 18h às 02h45 UTC, a cada 15 minutos.
-  schedule:
-    - cron: '0 10 * * *'        # 07h BRT (pega os jogos da véspera)
-    - cron: '*/15 18-23 * * *'  # 15h às 20h45 BRT, a cada 15 min
-    - cron: '*/15 0-2 * * *'    # 21h às 23h45 BRT, a cada 15 min
-  # Permite rodar manualmente pelo botão "Run workflow" na aba Actions.
+  # Disparado EXTERNAMENTE pelo cron-job.org (pontual, de 10 em 10 min na janela
+  # dos jogos e 1x às 6h). NÃO usamos 'schedule' do GitHub aqui porque ele atrasa
+  # muito em horário de pico. O cron-job.org chama a API de dispatch deste workflow.
   workflow_dispatch:
 
 permissions:
@@ -25,7 +20,7 @@ jobs:
     steps:
       - name: Parar após a Copa (20/07/2026)
         run: |
-          HOJE=$(date -u +%Y%m%d)
+          HOJE=$(TZ=America/Sao_Paulo date +%Y%m%d)
           if [[ "$HOJE" -gt "20260720" ]]; then
             echo "A Copa acabou (passou de 20/07/2026). Nada a fazer."
             exit 0
@@ -56,8 +51,6 @@ jobs:
           git config user.email "actions@github.com"
           git add copa2026/dados/melhores-momentos.json
           git commit -m "Atualiza melhores momentos (automático)"
-          # Tenta enviar; se o repositório tiver mudado no meio do caminho,
-          # puxa as novidades (rebase) e tenta de novo. Repete algumas vezes.
           for i in 1 2 3 4 5; do
             if git push; then
               echo "Push OK na tentativa $i."
