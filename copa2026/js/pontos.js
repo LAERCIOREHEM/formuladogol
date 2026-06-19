@@ -139,11 +139,11 @@
       const passou = new Set(o.classificados32);
       DADOS.selecoes.forEach(s => { if (!passou.has(s.id)) elim.add(s.id); });
     } else if (o._simulado && o.classificados32) {
-      // SIMULADO: quem ficou fora dos 32 de hoje E cujo grupo JÁ encerrou (6 jogos) está
-      // realmente eliminado. Quem está fora mas o grupo ainda não acabou continua "possível".
+      // SIMULADO (foto de HOJE): se a Copa acabasse agora, quem está fora dos 32 já era.
+      // Marca como eliminado todo mundo que não está nos classificados de hoje.
       const passou = new Set(o.classificados32);
       DADOS.selecoes.forEach(s => {
-        if (!passou.has(s.id) && completos[s.grupo]) elim.add(s.id);
+        if (!passou.has(s.id)) elim.add(s.id);
       });
     }
     o.eliminados = [...elim];
