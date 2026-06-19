@@ -170,8 +170,8 @@
 
   function toggleHTML() {
     return `<div class="vistog">
-      <button class="vbtn ${ABA === "bolao" ? "on" : ""}" data-v="bolao">🏆 Bolão</button>
-      <button class="vbtn ${ABA === "placares" ? "on" : ""}" data-v="placares">🎯 Placares</button>
+      <button class="vbtn ${ABA === "bolao" ? "on" : ""}" data-v="bolao">🏆 Ranking</button>
+      <button class="vbtn ${ABA === "placares" ? "on" : ""}" data-v="placares">🎯 Reis do Cravo</button>
     </div>`;
   }
   function wireToggle() {
