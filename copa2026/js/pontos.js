@@ -269,6 +269,11 @@
       d.style.display = ab ? "block" : "none";
       b.innerHTML = ab ? "Ocultar extrato ▴" : "Ver extrato dos pontos ▾";
     });
+    document.querySelectorAll(".vermais2[data-gg]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("gg-" + cssId(b.dataset.gg)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "Ocultar detalhe por grupo ▴" : "Ver detalhe por grupo (quem você acerta) ▾";
+    });
     wireToggle();
   }
 
@@ -324,10 +329,43 @@
     if (p.quarto && elim.has(p.quarto)) perd.push(`<div class="exb-row err"><span class="exb-d">4º lugar (${nome(p.quarto)}) já caiu</span><span class="exb-p">-${P.quarto}</span></div>`);
     const perdHTML = perd.length ? perd.join("") : '<div class="exb-row"><span class="exb-d">Nada perdido ainda 🎉</span><span class="exb-p">0</span></div>';
 
+    // SEGUNDO NÍVEL: detalhe por grupo (1º/2º/3º/4º com ✅/❌)
+    const oc2 = o.classificacao || {};
+    const pc = p.classificacao || {};
+    const ter = new Set(o.melhores_terceiros || []);
+    const pter = new Set(p.melhores_terceiros || []);
+    const POS = ["1º", "2º", "3º", "4º"];
+    const gradeGrupos = GRUPOS.map(g => {
+      const og = oc2[g], pgg = pc[g];
+      if (!og) return "";
+      const cels = POS.map((lab, i) => {
+        const real = og[i] ? og[i].id : null;
+        if (!real) return `<span class="gg-cel"><i>${lab}</i> —</span>`;
+        const acertou = pgg && pgg[i] && pgg[i].id === real;
+        return `<span class="gg-cel ${acertou ? "gg-ok" : "gg-no"}"><i>${lab}</i> ${flag(real)} ${real} ${acertou ? "✅" : "❌"}</span>`;
+      }).join("");
+      return `<div class="gg-lin"><span class="gg-g">Grupo ${g}</span><div class="gg-cels">${cels}</div></div>`;
+    }).join("");
+
+    // melhores terceiros: quais ele acertou
+    const terReais = (o.melhores_terceiros || []);
+    const terCels = terReais.map(id => {
+      const acertou = pter.has(id);
+      return `<span class="gg-cel ${acertou ? "gg-ok" : "gg-no"}">${flag(id)} ${id} ${acertou ? "✅" : "❌"}</span>`;
+    }).join("");
+    const terBloco = terReais.length ? `<div class="gg-lin"><span class="gg-g">Melhores 3ºs</span><div class="gg-cels">${terCels}</div></div>` : "";
+
+    const detalheGrupos = `<button class="vermais2" data-gg="${x.nome}">Ver detalhe por grupo (quem você acerta) ▾</button>
+      <div class="ggbox" id="gg-${cssId(x.nome)}" style="display:none">
+        <div class="gg-leg">✅ você cravou esta posição · ❌ ainda não</div>
+        ${gradeGrupos}${terBloco}
+      </div>`;
+
     return `<div class="exb">
       <div class="exb-sec">✅ Conquistados (${x.r.atuais} pts)</div>${conqHTML}
       <div class="exb-sec">❌ Perdidos (${x.r.perdidos} pts)</div>${perdHTML}
       <div class="exb-sec">⏳ Ainda possíveis: <b>${x.r.possiveis} pts</b> · Teto: <b>${x.r.teto} pts</b></div>
+      ${detalheGrupos}
     </div>`;
   }
 
