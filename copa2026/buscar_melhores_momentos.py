@@ -96,12 +96,10 @@ def parse_titulo(titulo):
     extrai (idA, idB). Retorna (None,None) se não casar o padrão.
     """
     t = titulo
-    # tira tudo após a primeira barra (| COPA DO MUNDO...)
-    t = t.split("|")[0]
-    # remove o prefixo "MELHORES MOMENTOS:"
-    t = re.sub(r"(?i)melhores\s+momentos\s*:?", "", t)
-    # acha o "N X N" no meio (com ou sem acento, com x maiúsculo/minúsculo)
-    m = re.search(r"(.+?)\s+\d+\s*[xX]\s*\d+\s+(.+)", t)
+    # remove o rótulo "MELHORES MOMENTOS" em qualquer posição (com : ou |)
+    t = re.sub(r"(?i)melhores\s+momentos\s*[:|]?", " ", t)
+    # acha o "N X N" no meio; o lado B vai até a próxima barra ou fim
+    m = re.search(r"(.+?)\s+\d+\s*[xX]\s*\d+\s+([^|]+)", t)
     if not m:
         return None, None
     a = id_do_time(m.group(1))
@@ -112,6 +110,32 @@ def yt_get(url):
     req = urllib.request.Request(url, headers={"User-Agent": "bolao-copa/1.0"})
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.loads(r.read().decode("utf-8"))
+
+CAZE_CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"  # canal oficial da CazéTV
+
+def buscar_no_canal_caze(termo, api_key, max_results=10):
+    """Busca vídeos de 'melhores momentos' DENTRO do canal da CazéTV.
+    Mantém o padrão (só pega vídeo da Cazé). Retorna lista de {titulo, videoId}."""
+    base = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        "part": "snippet", "channelId": CAZE_CHANNEL_ID,
+        "q": termo, "type": "video", "maxResults": str(max_results),
+        "order": "date", "key": api_key
+    }
+    try:
+        data = yt_get(base + "?" + urllib.parse.urlencode(params))
+    except Exception as e:
+        print("  busca no canal falhou:", e)
+        return []
+    out = []
+    for it in data.get("items", []):
+        sn = it.get("snippet", {})
+        vid = (it.get("id") or {}).get("videoId")
+        tit = sn.get("title", "")
+        # confirma que é do canal da Cazé (a API já filtra, mas garantimos)
+        if vid and tit and sn.get("channelId") == CAZE_CHANNEL_ID:
+            out.append({"titulo": tit, "videoId": vid})
+    return out
 
 def listar_playlist(playlist_id, api_key):
     """retorna lista de {titulo, videoId} de toda a playlist (pagina automaticamente)."""
@@ -179,6 +203,39 @@ def main():
             "fonte": "auto"
         }
         novos += 1
+
+    # --- ETAPA 2: busca no CANAL da Cazé (pega jogos que NÃO entraram na playlist) ---
+    # A Cazé às vezes não adiciona o vídeo na playlist oficial (ex.: EUA x Austrália).
+    # Então procuramos direto no canal dela, mantendo o padrão (só vídeo da Cazé).
+    print("Buscando melhores momentos direto no canal da CazéTV...")
+    termos = ["melhores momentos copa do mundo", "melhores momentos copa 2026"]
+    vistos = set(v["videoId"] for v in videos)
+    extra = []
+    for termo in termos:
+        for v in buscar_no_canal_caze(termo, API_KEY, max_results=25):
+            if v["videoId"] not in vistos:
+                vistos.add(v["videoId"])
+                extra.append(v)
+    print(f"  vídeos extras encontrados no canal: {len(extra)}")
+    for v in extra:
+        if "MELHORES MOMENTOS" not in norm(v["titulo"]):
+            continue
+        a, b = parse_titulo(v["titulo"])
+        if not a or not b:
+            continue
+        chave = "-".join(sorted([a, b]))
+        if jogos.get(chave, {}).get("fonte") == "admin":
+            continue
+        # só preenche se ainda não tiver (não sobrescreve auto já existente da playlist)
+        if chave in jogos and jogos[chave].get("fonte") == "auto":
+            continue
+        jogos[chave] = {
+            "url": "https://youtu.be/" + v["videoId"],
+            "titulo": v["titulo"].split("|")[0].strip(),
+            "fonte": "auto"
+        }
+        novos += 1
+        print(f"  + (canal) {chave}: {v['titulo'][:55]}")
 
     atual["jogos"] = jogos
     json.dump(atual, open(SAIDA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
