@@ -46,6 +46,38 @@
   function ymdToDate(ymd) { return new Date(+ymd.slice(0, 4), +ymd.slice(4, 6) - 1, +ymd.slice(6, 8), 12, 0, 0); }
   function dateToYMD(d) { return "" + d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0"); }
   function rotuloDia(ymd) { const d = ymdToDate(ymd); return `${SEM[d.getDay()]}, ${d.getDate()} de ${["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"][d.getMonth()]}`; }
+  // SEM curto para a faixa (3 letras)
+  const SEM3 = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
+  const MES3 = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+  function montarFaixaDias() {
+    const faixa = document.getElementById("dias-faixa");
+    if (!faixa) return;
+    const hoje = hojeYMD();
+    let html = "";
+    let cur = START;
+    while (cur <= END) {
+      const d = ymdToDate(cur);
+      const ativo = cur === dia ? " ativo" : "";
+      const ehHoje = cur === hoje ? " hoje" : "";
+      html += `<div class="dia-item${ativo}${ehHoje}" data-ymd="${cur}">
+        <span class="dsem">${SEM3[d.getDay()]}</span>
+        <span class="dnum">${d.getDate()}</span>
+        <span class="dmes">${MES3[d.getMonth()]}</span>
+      </div>`;
+      cur = dateToYMD(new Date(ymdToDate(cur).getTime() + 864e5));
+    }
+    faixa.innerHTML = html;
+    // liga o clique em cada dia
+    faixa.querySelectorAll(".dia-item[data-ymd]").forEach(el => {
+      el.onclick = () => { dia = el.dataset.ymd; carregar(); };
+    });
+    // centraliza o dia ativo na faixa
+    const at = faixa.querySelector(".dia-item.ativo");
+    if (at) {
+      const alvo = at.offsetLeft - (faixa.clientWidth / 2) + (at.clientWidth / 2);
+      faixa.scrollTo({ left: Math.max(0, alvo), behavior: "smooth" });
+    }
+  }
   function horaBR(iso) { try { return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }); } catch (e) { return ""; } }
 
   // carrega seleções (p/ casar jogo da ESPN -> nosso id) e palpites (Supabase)
@@ -93,7 +125,7 @@
 
   async function carregar() {
     if (ABA !== "jogos") return;
-    $("#dia-rotulo").textContent = rotuloDia(dia);
+    montarFaixaDias();
     $("#prev").disabled = dia <= START;
     $("#next").disabled = dia >= END;
     let data;
