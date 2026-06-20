@@ -259,11 +259,53 @@
     return map[slug] || "Copa do Mundo";
   }
 
+  async function baixarICSJogos(btn) {
+    const txtOrig = btn.textContent;
+    btn.textContent = "⏳ Gerando seu calendário…";
+    btn.disabled = true;
+    try {
+      // busca todos os jogos da Copa (mesma janela do onde-assistir)
+      const data = await fetch(API + "?dates=20260611-20260719&limit=200").then(r => r.json());
+      const pad = n => (n < 10 ? "0" : "") + n;
+      const dt = d => d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
+      const linhas = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Bolao Copa 2026//PT-BR", "CALSCALE:GREGORIAN"];
+      (data.events || []).forEach(ev => {
+        const c = ev.competitions[0], cs = c.competitors;
+        const home = cs.find(x => x.homeAway === "home") || cs[0];
+        const away = cs.find(x => x.homeAway === "away") || cs[1];
+        const ini = new Date(ev.date), fim = new Date(ini.getTime() + 2 * 3600 * 1000);
+        const an = dpNome((home.team || {}).abbreviation), bn = dpNome((away.team || {}).abbreviation);
+        const venue = c.venue ? c.venue.fullName + (c.venue.address && c.venue.address.city ? " · " + c.venue.address.city : "") : "";
+        linhas.push("BEGIN:VEVENT");
+        linhas.push("UID:" + ev.id + "@brasileirao2026almoco");
+        linhas.push("DTSTAMP:" + dt(new Date()));
+        linhas.push("DTSTART:" + dt(ini));
+        linhas.push("DTEND:" + dt(fim));
+        linhas.push("SUMMARY:" + an + " x " + bn + " — Copa 2026");
+        if (venue) linhas.push("LOCATION:" + venue.replace(/,/g, "\\,"));
+        linhas.push("DESCRIPTION:Copa do Mundo 2026. Acompanhe o bolão em brasileirao2026almoco.com.br/copa2026");
+        linhas.push("END:VEVENT");
+      });
+      linhas.push("END:VCALENDAR");
+      const blob = new Blob([linhas.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "copa-2026-jogos.ics";
+      document.body.appendChild(a); a.click(); a.remove();
+      btn.textContent = "✅ Pronto! Abra o arquivo pra adicionar";
+      setTimeout(() => { btn.textContent = txtOrig; btn.disabled = false; }, 4000);
+    } catch (e) {
+      btn.textContent = "❌ Erro ao gerar. Tente de novo";
+      setTimeout(() => { btn.textContent = txtOrig; btn.disabled = false; }, 3000);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", async () => {
     dia = clamp(hojeYMD());
     await carregarBase();
     $("#prev").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() - 864e5))); carregar(); };
     $("#next").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
+    const bcal = $("#btn-cal-jogos"); if (bcal) bcal.onclick = () => baixarICSJogos(bcal);
     carregar();
     timer = setInterval(() => { if (ABA === "jogos") carregar(); }, 60000);
   });
