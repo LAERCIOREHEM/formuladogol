@@ -71,14 +71,25 @@
     faixa.querySelectorAll(".dia-item[data-ymd]").forEach(el => {
       el.onclick = () => { dia = el.dataset.ymd; carregar(); };
     });
-    // centraliza o dia ativo na faixa (espera o layout estar medido)
-    const centralizar = () => {
+    // centraliza o dia ativo: roda várias vezes para garantir que o layout já foi medido
+    centralizarDia();
+  }
+  function centralizarDia() {
+    const faixa = document.getElementById("dias-faixa");
+    if (!faixa) return;
+    const fazer = () => {
       const at = faixa.querySelector(".dia-item.ativo");
-      if (!at) return;
+      if (!at || !faixa.clientWidth) return false;
       const alvo = at.offsetLeft - (faixa.clientWidth / 2) + (at.offsetWidth / 2);
-      faixa.scrollLeft = Math.max(0, alvo); // posiciona já no centro, sem animação na 1ª carga
+      const max = faixa.scrollWidth - faixa.clientWidth;
+      faixa.scrollLeft = Math.max(0, Math.min(alvo, max));
+      return true;
     };
-    requestAnimationFrame(() => { centralizar(); requestAnimationFrame(centralizar); });
+    // tenta agora, no próximo frame, e com pequenos atrasos (fontes/layout podem mudar a medida)
+    fazer();
+    requestAnimationFrame(fazer);
+    setTimeout(fazer, 60);
+    setTimeout(fazer, 200);
   }
   function horaBR(iso) { try { return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }); } catch (e) { return ""; } }
 
