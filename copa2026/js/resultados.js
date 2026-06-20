@@ -24,6 +24,7 @@
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
   let ABA = "jogos", SEL = [], GRP_EVENTS = [];
+  let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -112,6 +113,13 @@
       d.style.display = ab ? "block" : "none";
       b.innerHTML = ab ? "Ocultar palpites ▴" : "Ver palpites ▾";
     });
+    document.querySelectorAll(".grupo-link[data-grupo]").forEach(b => b.onclick = () => {
+      VOLTAR_JOGO = b.dataset.jogo;   // lembra o jogo de origem
+      FOCO_GRUPO = b.dataset.grupo;   // grupo a destacar/rolar
+      ABA = "grupos";
+      $("#prev").parentElement.style.display = "none";
+      renderGrupos();
+    });
   }
 
   function abasHTML() {
@@ -162,15 +170,35 @@
           const sg = t.gp - t.gc, cls = i < 2 ? "classif" : "";
           return `<tr class="${cls}"><td class="cpos">${i + 1}</td><td class="ctime">${flagId(t.id)} <span>${nomeDe(t.id)}</span></td><td><b>${t.pts}</b></td><td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td class="men">${t.gp}</td><td class="men">${t.gc}</td><td>${sg > 0 ? "+" + sg : sg}</td></tr>`;
         }).join("");
-        return `<div class="grpcard"><div class="grpcab">Grupo ${G}</div><table class="tabgrp"><thead><tr><th></th><th class="ctime">Seleção</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th class="men">GP</th><th class="men">GC</th><th>SG</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
+        const focado = (FOCO_GRUPO === G) ? " grp-focado" : "";
+        const voltar = (FOCO_GRUPO === G && VOLTAR_JOGO)
+          ? `<button class="voltar-jogo" data-voltar="${VOLTAR_JOGO}">‹ Voltar ao jogo</button>` : "";
+        return `<div class="grpcard${focado}" id="grp-${G}"><div class="grpcab">Grupo ${G}</div>${voltar}<table class="tabgrp"><thead><tr><th></th><th class="ctime">Seleção</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th class="men">GP</th><th class="men">GC</th><th>SG</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
       }).join("");
       $("#lista").innerHTML = abasHTML() + '<p class="leg-grp">As <b>2 primeiras</b> de cada grupo avançam, mais os 8 melhores terceiros. Tabela calculada dos resultados oficiais.</p>' + blocos;
       document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+      // botão voltar ao jogo
+      document.querySelectorAll(".voltar-jogo[data-voltar]").forEach(b => b.onclick = () => {
+        const idJogo = b.dataset.voltar;
+        ABA = "jogos";
+        $("#prev").parentElement.style.display = "";
+        FOCO_GRUPO = null; VOLTAR_JOGO = null;
+        carregar().then(() => {
+          const alvo = document.getElementById("jogo-" + idJogo);
+          if (alvo) { alvo.scrollIntoView({ behavior: "smooth", block: "center" }); alvo.classList.add("jogo-destaque"); setTimeout(() => alvo.classList.remove("jogo-destaque"), 2000); }
+        });
+      });
+      // rola até o grupo focado
+      if (FOCO_GRUPO) {
+        const alvo = document.getElementById("grp-" + FOCO_GRUPO);
+        if (alvo) setTimeout(() => alvo.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+      }
     });
   }
   function trocarAba(e) {
     const v = e.currentTarget.dataset.v; if (v === ABA) return;
     ABA = v;
+    FOCO_GRUPO = null; VOLTAR_JOGO = null; // entrada normal: sem grupo focado
     if (ABA === "grupos") { $("#prev").parentElement.style.display = "none"; renderGrupos(); }
     else { $("#prev").parentElement.style.display = ""; carregar(); }
   }
@@ -198,8 +226,14 @@
     }
     const vencH = home.winner ? "venc" : "", vencA = away.winner ? "venc" : "";
     const palpites = slug === "group-stage" ? palpiteBloco(ev, home, away, st) : "";
-    return `<div class="jogo">
-      <div class="topo"><span class="fase">${fase}</span>${badge}</div>
+    // grupo do jogo (só na fase de grupos): link que leva à Tabela dos Grupos
+    let grupoTag = "";
+    if (slug === "group-stage") {
+      const gJogo = grupoDoJogo(home, away);
+      if (gJogo) grupoTag = `<button class="grupo-link" data-grupo="${gJogo}" data-jogo="${ev.id}">Grupo ${gJogo} ›</button>`;
+    }
+    return `<div class="jogo" id="jogo-${ev.id}">
+      <div class="topo"><span class="fase">${fase}</span>${grupoTag}${badge}</div>
       <div class="linha">
         <div class="lado ${vencH}">${escudo(home)}<span class="t">${teamNome(home)}</span></div>
         ${meio}
@@ -211,6 +245,14 @@
         : tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${palpites}
     </div>`;
+  }
+
+  // descobre o grupo de um jogo pela sigla de um dos times (via DE-PARA + selecoes.json)
+  function grupoDoJogo(home, away) {
+    const hAb = dpSigla((home.team || {}).abbreviation) || (home.team || {}).abbreviation;
+    const aAb = dpSigla((away.team || {}).abbreviation) || (away.team || {}).abbreviation;
+    const t = SEL.find(x => x.id === hAb) || SEL.find(x => x.id === aAb);
+    return t ? t.grupo : null;
   }
 
   // palpites de todos para UM jogo de grupo (recolhido)
