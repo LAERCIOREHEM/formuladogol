@@ -79,17 +79,23 @@
     if (!faixa) return;
     const fazer = () => {
       const at = faixa.querySelector(".dia-item.ativo");
-      if (!at || !faixa.clientWidth) return false;
-      const alvo = at.offsetLeft - (faixa.clientWidth / 2) + (at.offsetWidth / 2);
+      if (!at || !faixa.clientWidth) return;
+      // mede pela posição REAL na tela (getBoundingClientRect é imune a transform:scale e offsetParent)
+      const rFaixa = faixa.getBoundingClientRect();
+      const rItem = at.getBoundingClientRect();
+      // centro do item na tela menos centro da faixa na tela = quanto precisa rolar
+      const centroItem = rItem.left + rItem.width / 2;
+      const centroFaixa = rFaixa.left + rFaixa.width / 2;
+      const delta = centroItem - centroFaixa;
       const max = faixa.scrollWidth - faixa.clientWidth;
-      faixa.scrollLeft = Math.max(0, Math.min(alvo, max));
-      return true;
+      faixa.scrollLeft = Math.max(0, Math.min(faixa.scrollLeft + delta, max));
     };
-    // tenta agora, no próximo frame, e com pequenos atrasos (fontes/layout podem mudar a medida)
+    // roda várias vezes: o layout/fontes/scale podem mudar a medida após o 1º paint
     fazer();
     requestAnimationFrame(fazer);
-    setTimeout(fazer, 60);
-    setTimeout(fazer, 200);
+    setTimeout(fazer, 50);
+    setTimeout(fazer, 150);
+    setTimeout(fazer, 350);
   }
   function horaBR(iso) { try { return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }); } catch (e) { return ""; } }
 
