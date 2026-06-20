@@ -47,10 +47,12 @@
   .dia-item .dnum{display:block;font-family:'Anton',sans-serif;font-size:20px;line-height:1.1;color:var(--branco)}
   .dia-item .dmes{display:block;font-size:9px;color:var(--cinza);text-transform:uppercase}
   .dia-item.hoje .dnum{color:var(--gold)}
-  .dia-item.ativo{opacity:1;background:var(--gold);border-color:var(--gold)}
-  .dia-item.ativo .dsem,.dia-item.ativo .dnum,.dia-item.ativo .dmes{color:#1a1205}
+  .dia-item.ativo{opacity:1;background:var(--gold);border-color:var(--gold);
+    box-shadow:0 3px 14px rgba(244,197,66,.45);transform:scale(1.06)}
+  .dia-item.ativo .dsem,.dia-item.ativo .dmes{color:#3a2a00}
+  .dia-item.ativo .dnum{color:#3a2a00;font-weight:900}
   .dia-item.tem-jogo::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--verde);margin:3px auto 0}
-  .dia-item.ativo.tem-jogo::after{background:#1a1205}
+  .dia-item.ativo.tem-jogo::after{background:#3a2a00}
 
   .jogo{display:block;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:11px 13px;margin-bottom:8px}
   .jogo .topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0;border-bottom:none}
@@ -149,7 +151,6 @@
     <a href="palpites.html">Palpites</a>
     <a href="palpite.html">Meus Palpites</a>
   </nav>
-  <a href="onde-assistir.html" class="oa-destaque">📺 Onde assistir cada jogo da Copa (horários de Brasília) →</a>
 
   <div class="navdia">
     <button id="prev" aria-label="Dia anterior">‹</button>
