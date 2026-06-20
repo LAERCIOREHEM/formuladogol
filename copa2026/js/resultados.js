@@ -182,6 +182,39 @@
     return GRP_EVENTS;
   }
   function nomeDe(id) { const t = SEL.find(x => x.id === id); return t ? t.nome : id; }
+  // jogos de UM grupo, formatados (encerrado com placar; futuro/ao vivo com hora)
+  function jogosDoGrupoHTML(events, G) {
+    const jogos = (events || []).filter(ev => {
+      const cs = ev.competitions[0].competitors;
+      const h = cs.find(c => c.homeAway === "home") || cs[0];
+      const a = cs.find(c => c.homeAway === "away") || cs[1];
+      return grupoDoJogo(h, a) === G;
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (!jogos.length) return '<p class="jg-vazio">Sem jogos para mostrar.</p>';
+    return jogos.map(ev => {
+      const comp = ev.competitions[0], st = comp.status.type, cs = comp.competitors;
+      const home = cs.find(c => c.homeAway === "home") || cs[0];
+      const away = cs.find(c => c.homeAway === "away") || cs[1];
+      const hAb = (home.team || {}).abbreviation, aAb = (away.team || {}).abbreviation;
+      const flagH = dpFlag(hAb, 40), flagA = dpFlag(aAb, 40);
+      let meio, cls = "";
+      if (st.state === "pre") {
+        const d = new Date(ev.date);
+        const dia = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "America/Sao_Paulo" });
+        meio = `<span class="jg-hora">${dia} · ${horaBR(ev.date)}</span>`;
+      } else if (st.state === "in") {
+        meio = `<span class="jg-placar jg-live">${home.score ?? ""} × ${away.score ?? ""}</span>`;
+        cls = " jg-aovivo";
+      } else {
+        meio = `<span class="jg-placar">${home.score ?? ""} × ${away.score ?? ""}</span>`;
+      }
+      return `<div class="jg-row${cls}">
+        <span class="jg-lado jg-h">${dpNome(hAb)} ${flagH ? `<img src="${flagH}" alt="">` : ""}</span>
+        ${meio}
+        <span class="jg-lado jg-a">${flagA ? `<img src="${flagA}" alt="">` : ""} ${dpNome(aAb)}</span>
+      </div>`;
+    }).join("");
+  }
   function isoDe(id) { const t = SEL.find(x => x.id === id); return t ? t.iso2 : ""; }
   function flagId(id) { const c = isoDe(id); return c ? `<img src="https://flagcdn.com/w40/${c}.png" alt="" onerror="this.style.visibility='hidden'">` : ""; }
   function tabelaGrupos(events) {
@@ -218,11 +251,20 @@
         const focado = (FOCO_GRUPO === G) ? " grp-focado" : "";
         const voltar = (FOCO_GRUPO === G && VOLTAR_JOGO)
           ? `<button class="voltar-jogo" data-voltar="${VOLTAR_JOGO}">‹ Voltar ao jogo</button>` : "";
-        return `<div class="grpcard${focado}" id="grp-${G}"><div class="grpcab">Grupo ${G}</div>${voltar}<table class="tabgrp"><thead><tr><th></th><th class="ctime">Seleção</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th class="men">GP</th><th class="men">GC</th><th>SG</th></tr></thead><tbody>${linhas}</tbody></table></div>`;
+        const jogosHTML = jogosDoGrupoHTML(events, G);
+        return `<div class="grpcard${focado}" id="grp-${G}"><div class="grpcab">Grupo ${G}</div>${voltar}<table class="tabgrp"><thead><tr><th></th><th class="ctime">Seleção</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th class="men">GP</th><th class="men">GC</th><th>SG</th></tr></thead><tbody>${linhas}</tbody></table>
+          <button class="jg-toggle" data-jg-grupo="${G}">⚽ Ver jogos do grupo ▾</button>
+          <div class="jg-box" id="jgs-${G}" style="display:none">${jogosHTML}</div>
+        </div>`;
       }).join("");
       $("#lista").innerHTML = abasHTML() + '<p class="leg-grp">As <b>2 primeiras</b> de cada grupo avançam, mais os 8 melhores terceiros. Tabela calculada dos resultados oficiais.</p>' + blocos;
       document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
-      // botão voltar ao jogo
+      // toggle dos jogos do grupo
+      document.querySelectorAll(".jg-toggle[data-jg-grupo]").forEach(b => b.onclick = () => {
+        const d = document.getElementById("jgs-" + b.dataset.jgGrupo), ab = d.style.display === "none";
+        d.style.display = ab ? "block" : "none";
+        b.innerHTML = ab ? "⚽ Ocultar jogos do grupo ▴" : "⚽ Ver jogos do grupo ▾";
+      });
       document.querySelectorAll(".voltar-jogo[data-voltar]").forEach(b => b.onclick = () => {
         const idJogo = b.dataset.voltar;
         ABA = "jogos";
