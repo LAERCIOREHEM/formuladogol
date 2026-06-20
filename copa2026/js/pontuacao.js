@@ -79,6 +79,41 @@
     return calcularAtuais(p, oficialFicticio).total;
   }
 
+  // PERDIDOS no modo SIMULADO ("se acabasse hoje"): para cada categoria, conta o que
+  // o jogador apostou e que NÃO está batendo com a foto de hoje. É o espelho de calcularAtuais.
+  // conquistados + perdidos(simulado) = teto SEMPRE (por construção), porque toda vaga
+  // apostada ou está certa hoje (conquistado) ou errada hoje (perdido). Nada fica "possível"
+  // no simulado: a foto de hoje decide tudo — e muda a cada jogo.
+  function perdidosSimulado(p, o) {
+    const d = {};
+    // seleções entre as 32: apostou e não está entre os 32 de hoje
+    const c32 = new Set(o.classificados32 || []);
+    d.classificados = (p.classificados32 || []).filter(id => !c32.has(id)).length * PESOS.classificado32;
+    // melhores terceiros: apostou e não está entre os 8 de hoje
+    const t8 = new Set(o.melhores_terceiros || []);
+    d.terceiros = (p.melhores_terceiros || []).filter(id => !t8.has(id)).length * PESOS.melhorTerceiro;
+    // posições de grupo: para cada grupo e posição, apostou alguém != do dono de hoje
+    d.posGrupos = 0;
+    const oc = o.classificacao || {};
+    const pesos = [PESOS.campGrupo, PESOS.viceGrupo, PESOS.terGrupo, PESOS.ultGrupo];
+    Object.keys(oc).forEach(g => {
+      const pg = (p.classificacao || {})[g];
+      if (!pg) return;
+      for (let i = 0; i < 4; i++) {
+        if (pg[i] && oc[g][i] && pg[i].id !== oc[g][i].id) d.posGrupos += pesos[i];
+      }
+    });
+    // mata-mata e títulos: no simulado da fase de grupos ainda não há foto, então
+    // só conta como perdido se a seleção apostada já está fora dos 32 de hoje.
+    const elim = new Set(o.eliminados || []);
+    d.campeao  = (p.campeao  && elim.has(p.campeao))  ? PESOS.campeao  : 0;
+    d.vice     = (p.vice     && elim.has(p.vice))     ? PESOS.vice     : 0;
+    d.terceiro = (p.terceiro && elim.has(p.terceiro)) ? PESOS.terceiro : 0;
+    d.quarto   = (p.quarto   && elim.has(p.quarto))   ? PESOS.quarto   : 0;
+    d.total = Object.values(d).reduce((a, b) => a + b, 0);
+    return d;
+  }
+
   // Visão completa. o pode incluir o.eliminados (array de ids já fora) e
   // o.decididos = {campeao:bool, vice:bool, terceiro:bool, quarto:bool}.
   function calcular(p, o) {
@@ -108,6 +143,13 @@
     if ((dec.terceiro && atuais.terceiro === 0) || (p.terceiro && elim.has(p.terceiro))) perdidos += PESOS.terceiro;
     if ((dec.quarto   && atuais.quarto   === 0) || (p.quarto   && elim.has(p.quarto)))   perdidos += PESOS.quarto;
 
+    let detPerdidos = null;
+    if (o._simulado) {
+      // No simulado, os perdidos são TUDO que está errado na foto de hoje.
+      detPerdidos = perdidosSimulado(p, o);
+      perdidos = detPerdidos.total;
+    }
+
     const possiveis = Math.max(0, tetoMax - atuais.total - perdidos);
 
     return {
@@ -115,9 +157,10 @@
       perdidos,
       possiveis,
       teto: tetoMax,
-      detalhe: atuais
+      detalhe: atuais,
+      detPerdidos: detPerdidos
     };
   }
 
-  global.COPA_PONTUACAO = { PESOS, calcular, calcularAtuais, teto };
+  global.COPA_PONTUACAO = { PESOS, calcular, calcularAtuais, teto, perdidosSimulado };
 })(typeof window !== "undefined" ? window : globalThis);

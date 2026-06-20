@@ -319,15 +319,36 @@
     if (det.quarto) row(`4º lugar certo`, 1, P.quarto, det.quarto, "ok");
     const conqHTML = linhas.length ? linhas.join("") : '<div class="exb-row"><span class="exb-d">Ainda sem pontos conquistados</span><span class="exb-p">0</span></div>';
 
-    // PERDIDOS (na foto de hoje)
+    // PERDIDOS (na foto de hoje) — detalhado por categoria
     const perd = [];
-    const classFora = (p.classificados32 || []).filter(id => elim.has(id) && !passou.has(id));
-    if (classFora.length) perd.push(`<div class="exb-row err"><span class="exb-d">${classFora.length} seleções dele fora dos 32 (×${P.classificado32}): ${classFora.map(id => nome(id)).join(", ")}</span><span class="exb-p">-${classFora.length * P.classificado32}</span></div>`);
-    if (p.campeao && elim.has(p.campeao)) perd.push(`<div class="exb-row err"><span class="exb-d">Campeão (${nome(p.campeao)}) já caiu</span><span class="exb-p">-${P.campeao}</span></div>`);
-    if (p.vice && elim.has(p.vice)) perd.push(`<div class="exb-row err"><span class="exb-d">Vice (${nome(p.vice)}) já caiu</span><span class="exb-p">-${P.vice}</span></div>`);
-    if (p.terceiro && elim.has(p.terceiro)) perd.push(`<div class="exb-row err"><span class="exb-d">3º lugar (${nome(p.terceiro)}) já caiu</span><span class="exb-p">-${P.terceiro}</span></div>`);
-    if (p.quarto && elim.has(p.quarto)) perd.push(`<div class="exb-row err"><span class="exb-d">4º lugar (${nome(p.quarto)}) já caiu</span><span class="exb-p">-${P.quarto}</span></div>`);
-    const perdHTML = perd.length ? perd.join("") : '<div class="exb-row"><span class="exb-d">Nada perdido ainda 🎉</span><span class="exb-p">0</span></div>';
+    function prow(lab, pts) { perd.push(`<div class="exb-row err"><span class="exb-d">${lab}</span><span class="exb-p">-${pts}</span></div>`); }
+    // seleções fora dos 32
+    const classFora = (p.classificados32 || []).filter(id => !passou.has(id));
+    if (classFora.length) prow(`${classFora.length} seleções fora dos 32 (×${P.classificado32}): ${classFora.map(id => nome(id)).join(", ")}`, classFora.length * P.classificado32);
+    // melhores terceiros errados
+    const t8 = new Set(o.melhores_terceiros || []);
+    const terErr = (p.melhores_terceiros || []).filter(id => !t8.has(id)).length;
+    if (terErr) prow(`${terErr} melhores terceiros errados (×${P.melhorTerceiro})`, terErr * P.melhorTerceiro);
+    // posições de grupo erradas (1º/2º/3º/4º)
+    const oc3 = o.classificacao || {};
+    let e1 = 0, e2 = 0, e3 = 0, e4 = 0;
+    Object.keys(oc3).forEach(g => {
+      const pg = (p.classificacao || {})[g]; if (!pg) return;
+      if (pg[0] && oc3[g][0] && pg[0].id !== oc3[g][0].id) e1++;
+      if (pg[1] && oc3[g][1] && pg[1].id !== oc3[g][1].id) e2++;
+      if (pg[2] && oc3[g][2] && pg[2].id !== oc3[g][2].id) e3++;
+      if (pg[3] && oc3[g][3] && pg[3].id !== oc3[g][3].id) e4++;
+    });
+    if (e1) prow(`${e1} campeões de grupo (1º) errados (×${P.campGrupo})`, e1 * P.campGrupo);
+    if (e2) prow(`${e2} vices de grupo (2º) errados (×${P.viceGrupo})`, e2 * P.viceGrupo);
+    if (e3) prow(`${e3} terceiros de grupo errados (×${P.terGrupo})`, e3 * P.terGrupo);
+    if (e4) prow(`${e4} quartos de grupo errados (×${P.ultGrupo})`, e4 * P.ultGrupo);
+    // títulos cuja seleção já caiu
+    if (p.campeao && elim.has(p.campeao)) prow(`Campeão (${nome(p.campeao)}) já caiu`, P.campeao);
+    if (p.vice && elim.has(p.vice)) prow(`Vice (${nome(p.vice)}) já caiu`, P.vice);
+    if (p.terceiro && elim.has(p.terceiro)) prow(`3º lugar (${nome(p.terceiro)}) já caiu`, P.terceiro);
+    if (p.quarto && elim.has(p.quarto)) prow(`4º lugar (${nome(p.quarto)}) já caiu`, P.quarto);
+    const perdHTML = perd.length ? perd.join("") : '<div class="exb-row"><span class="exb-d">Nada perdido na foto de hoje 🎉</span><span class="exb-p">0</span></div>';
 
     // SEGUNDO NÍVEL: detalhe por grupo (1º/2º/3º/4º com ✅/❌)
     const oc2 = o.classificacao || {};
