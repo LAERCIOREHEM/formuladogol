@@ -87,6 +87,7 @@
     $("#contagem").textContent = PART.length + " participantes";
     $("#ab-jogo").onclick = () => { aba = "jogo"; render(); };
     $("#ab-class").onclick = () => { aba = "class"; render(); };
+    $("#ab-grupo").onclick = () => { aba = "grupo"; render(); };
   }
 
   // ---------- aba: por jogo ----------
@@ -151,6 +152,28 @@
     }).join("");
   }
 
+  // ===== Por grupo: como cada apostador classificou 1º/2º/3º/4º de cada grupo =====
+  function viewGrupo() {
+    const POS = ["1º", "2º", "3º", "4º"];
+    // bloco por grupo; dentro, cada apostador com sua linha de classificação
+    const blocos = GRUPOS.map((g, gi) => {
+      const linhas = PART.map(p => {
+        const cg = (p.d && p.d.classificacao && p.d.classificacao[g]) || null;
+        if (!cg) return `<div class="pg-linha"><span class="pg-nome">${p.nome}</span><span class="pg-vazio">palpite incompleto</span></div>`;
+        const cels = POS.map((lab, i) => {
+          const id = cg[i] && cg[i].id;
+          return id ? `<span class="pg-cel"><i>${lab}</i> ${flag(id)} <b>${id}</b></span>` : `<span class="pg-cel"><i>${lab}</i> —</span>`;
+        }).join("");
+        return `<div class="pg-linha"><span class="pg-nome">${p.nome}</span><div class="pg-cels">${cels}</div></div>`;
+      }).join("");
+      return `<div class="pg-grupo" id="pg_${g}">
+        <button class="pg-cab" data-pgg="${g}"><span class="seta">▶</span> Grupo ${g} <span class="pg-cont">${PART.length} palpites</span></button>
+        <div class="pg-corpo">${linhas}</div>
+      </div>`;
+    }).join("");
+    return `<p class="pg-intro">Veja como cada apostador classificou os 4 times de cada grupo. Toque num grupo para abrir.</p>${blocos}`;
+  }
+
   function canonical(o) {
     if (o === null || typeof o !== "object") return JSON.stringify(o);
     if (Array.isArray(o)) return "[" + o.map(canonical).join(",") + "]";
@@ -172,9 +195,12 @@
   function render() {
     $("#ab-jogo").className = aba === "jogo" ? "on" : "";
     $("#ab-class").className = aba === "class" ? "on" : "";
-    $("#app").innerHTML = aba === "jogo" ? viewJogo() : viewClass();
+    $("#ab-grupo").className = aba === "grupo" ? "on" : "";
+    $("#app").innerHTML = aba === "jogo" ? viewJogo() : aba === "class" ? viewClass() : viewGrupo();
     document.querySelectorAll("[data-tg]").forEach(e => e.onclick = () => e.closest(".jogo").classList.toggle("aberto"));
-    document.querySelectorAll("[data-tp]").forEach(e => e.onclick = () => e.closest(".pessoa").classList.toggle("aberto"));    if (aba !== "jogo") preencherHashes();
+    document.querySelectorAll("[data-tp]").forEach(e => e.onclick = () => e.closest(".pessoa").classList.toggle("aberto"));
+    document.querySelectorAll("[data-pgg]").forEach(e => e.onclick = () => e.closest(".pg-grupo").classList.toggle("aberto"));
+    if (aba === "class") preencherHashes();
   }
 
   document.addEventListener("DOMContentLoaded", init);
