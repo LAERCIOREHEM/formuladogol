@@ -144,9 +144,27 @@
     if ((dec.quarto   && atuais.quarto   === 0) || (p.quarto   && elim.has(p.quarto)))   perdidos += PESOS.quarto;
 
     let detPerdidos = null;
-    if (o._simulado) {
-      // No simulado, os perdidos são TUDO que está errado na foto de hoje.
+    // Sempre que há classificação de grupos (simulado parcial OU oficial encerrado),
+    // os perdidos da FASE DE GRUPOS são tudo que está errado na foto atual.
+    // Isso garante que posições/terceiros errados sejam debitados nos dois modos.
+    const temGrupos = o.classificacao && Object.keys(o.classificacao).length > 0;
+    if (o._simulado || temGrupos) {
       detPerdidos = perdidosSimulado(p, o);
+      // no oficial, soma também os perdidos de mata-mata (fases já decididas) do cálculo padrão
+      if (!o._simulado) {
+        const dec = o.decididos || {};
+        let pmm = 0;
+        const naoConf = (pset, oset, peso) => {
+          const conf = new Set(oset || []);
+          return (p[pset] || []).filter(id => elim.has(id) && !conf.has(id)).length * peso;
+        };
+        pmm += naoConf("avancam_oitavas", o.avancam_oitavas, PESOS.oitavas);
+        pmm += naoConf("avancam_quartas", o.avancam_quartas, PESOS.quartas);
+        pmm += naoConf("semifinalistas", o.semifinalistas, PESOS.semi);
+        pmm += naoConf("finalistas", o.finalistas, PESOS.final);
+        detPerdidos.matamata = pmm;
+        detPerdidos.total += pmm;
+      }
       perdidos = detPerdidos.total;
     }
 

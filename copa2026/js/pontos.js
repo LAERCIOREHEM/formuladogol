@@ -343,6 +343,8 @@
     if (e2) prow(`${e2} vices de grupo (2º) errados (×${P.viceGrupo})`, e2 * P.viceGrupo);
     if (e3) prow(`${e3} terceiros de grupo errados (×${P.terGrupo})`, e3 * P.terGrupo);
     if (e4) prow(`${e4} quartos de grupo errados (×${P.ultGrupo})`, e4 * P.ultGrupo);
+    // mata-mata perdido (só no oficial, quando fases já decididas)
+    if (x.r.detPerdidos && x.r.detPerdidos.matamata) prow(`Seleções que não avançaram no mata-mata`, x.r.detPerdidos.matamata);
     // títulos cuja seleção já caiu
     if (p.campeao && elim.has(p.campeao)) prow(`Campeão (${nome(p.campeao)}) já caiu`, P.campeao);
     if (p.vice && elim.has(p.vice)) prow(`Vice (${nome(p.vice)}) já caiu`, P.vice);
