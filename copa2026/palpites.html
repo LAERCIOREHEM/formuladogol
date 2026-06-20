@@ -94,6 +94,23 @@
   .hdr-svg{display:block;width:100%;height:auto;max-width:520px}
   .hdr{margin:0 0 14px;text-align:center}
   .hdr-img{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;border-radius:10px;box-sizing:border-box}
+  .pg-intro{font-size:12.5px;color:var(--cinza);margin:0 0 12px;text-align:center}
+  .pg-grupo{background:var(--navy-2);border:1px solid var(--linha);border-radius:10px;margin-bottom:8px;overflow:hidden}
+  .pg-cab{width:100%;text-align:left;background:none;border:none;color:var(--branco);font-family:inherit;
+    font-weight:800;font-size:14px;padding:13px 14px;cursor:pointer;display:flex;align-items:center;gap:8px}
+  .pg-cab .seta{font-size:10px;color:var(--gold);transition:transform .2s}
+  .pg-grupo.aberto .pg-cab .seta{transform:rotate(90deg)}
+  .pg-cont{margin-left:auto;font-size:11px;color:var(--cinza);font-weight:600}
+  .pg-corpo{display:none;padding:0 12px 10px}
+  .pg-grupo.aberto .pg-corpo{display:block}
+  .pg-linha{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid rgba(255,255,255,.06)}
+  .pg-nome{font-weight:700;font-size:12.5px;color:var(--gold);min-width:90px;max-width:90px;word-break:break-word;padding-top:2px}
+  .pg-cels{display:flex;flex-wrap:wrap;gap:5px;flex:1}
+  .pg-cel{font-size:11.5px;background:rgba(255,255,255,.04);border-radius:6px;padding:3px 7px;
+    display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+  .pg-cel i{font-style:normal;color:var(--cinza);font-size:10px;font-weight:700}
+  .pg-cel img{width:16px;height:11px;border-radius:2px;object-fit:cover}
+  .pg-vazio{font-size:11.5px;color:var(--cinza);font-style:italic;padding-top:2px}
 </style>
 </head>
 <body>
@@ -109,22 +126,22 @@
 
   <div id="topo" style="display:none">
     <div class="aviso">🔓 Apostas encerradas — agora é tudo aberto. Veja o que cada um cravou em cada jogo (aba <b>Por jogo</b>) e a aposta de classificação de cada um (aba <b>Por classificação</b>).</div>
-    <div class="abas"><button id="ab-jogo" class="on">Por jogo</button><button id="ab-class">Por classificação</button></div>
+    <div class="abas"><button id="ab-jogo" class="on">Por jogo</button><button id="ab-class">Por classificação</button><button id="ab-grupo">Por grupo</button></div>
     <div id="contagem"></div>
   </div>
 
   <div id="app"></div>
 </div>
 
-<script src="js/config.js?v=20260618d"></script>
-<script src="js/engine.js?v=20260618d"></script>
-<script src="js/palpites.js?v=20260618d"></script>
+<script src="js/config.js?v=20260620f"></script>
+<script src="js/engine.js?v=20260620f"></script>
+<script src="js/palpites.js?v=20260620f"></script>
 <footer class="rodape">
   <a href="regras.html">Regras</a><span class="sep">·</span>
   <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
   <a href="/?brasileirao=1">← Brasileirão</a>
 </footer>
-  <script src="js/aniversarios.js?v=20260618d"></script>
+  <script src="js/aniversarios.js?v=20260620f"></script>
   <footer class="rodape-site">
     <nav class="rs-nav" aria-label="Links do site">
       <a href="index.html">Jogos</a> · <a href="onde-assistir.html">Onde assistir</a> · <a href="pontos.html">Bolão</a> · <a href="aovivo.html">Ao vivo</a> · <a href="palpites.html">Palpites</a> · <a href="regras.html">Regras</a>
