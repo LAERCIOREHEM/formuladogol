@@ -117,7 +117,10 @@
         GRUPOS.forEach(g => { if (completos[g]) o.classificacao[g] = dg.classificacao[g]; });
         if (todosGrupos) { o.classificados32 = dg.classificados32; o.melhores_terceiros = dg.melhores_terceiros; }
         else if (modoSimulado()) {
-          // PRÉVIA: usa a foto parcial de hoje para simular os classificados
+          // PRÉVIA (foto de hoje): usa a classificação SIMULADA COMPLETA de todos os grupos,
+          // para pontuar 1º/2º/3º/4º e os 8 melhores terceiros como se a fase acabasse agora.
+          o.classificacao = {};
+          GRUPOS.forEach(g => { if (dg.classificacao[g]) o.classificacao[g] = dg.classificacao[g]; });
           o.classificados32 = dg.classificados32;
           o.melhores_terceiros = dg.melhores_terceiros;
           o._simulado = true;
@@ -254,12 +257,78 @@
         <div class="podiodet">${detalheFinal(x.d, o)}</div>
         <div class="f32lab">${f32lab}</div>${f32leg}
         <div class="f32">${funil}</div>
+        <button class="vermais" data-ext="${x.nome}">Ver extrato dos pontos ▾</button>
+        <div class="extbox" id="ext-${cssId(x.nome)}" style="display:none">${extratoBolao(x.d, o, x)}</div>
       </div>`;
     }).join("");
     const fp = $("#filtro-part");
     if (fp) fp.onchange = e => { FILTRO = e.target.value; if (ULTIMO_O) render(ULTIMO_O); };
     document.querySelectorAll(".ordbtn[data-ord]").forEach(b => b.onclick = () => { ORDEM = b.dataset.ord; if (ULTIMO_O) render(ULTIMO_O); });
+    document.querySelectorAll(".vermais[data-ext]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("ext-" + cssId(b.dataset.ext)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "Ocultar extrato ▴" : "Ver extrato dos pontos ▾";
+    });
     wireToggle();
+  }
+
+  // ===== Extrato da pontuação do Bolão (detalhe de onde vem cada ponto) =====
+  function extratoBolao(p, o, x) {
+    const P = COPA_PONTUACAO.PESOS;
+    const det = COPA_PONTUACAO.calcularAtuais(p, o);
+    const elim = new Set(o.eliminados || []);
+    const passou = new Set(o.classificados32 || []);
+    const linhas = [];
+    function row(lab, qtd, peso, pts, tipo) {
+      linhas.push(`<div class="exb-row ${tipo}"><span class="exb-d">${lab}</span><span class="exb-p">${pts >= 0 ? "+" : ""}${pts}</span></div>`);
+    }
+    // CONQUISTADOS
+    const nClassif = inter(p.classificados32, o.classificados32 || []).length;
+    if (nClassif) row(`${nClassif} seleções entre as 32 classificadas (×${P.classificado32})`, nClassif, P.classificado32, nClassif * P.classificado32, "ok");
+    const nTer = inter(p.melhores_terceiros, o.melhores_terceiros || []).length;
+    if (nTer) row(`${nTer} melhores terceiros (×${P.melhorTerceiro})`, nTer, P.melhorTerceiro, nTer * P.melhorTerceiro, "ok");
+    // posições de grupo detalhadas (1º/2º/3º/4º)
+    if (det.posGrupos) {
+      const oc = o.classificacao || {};
+      let a1 = 0, a2 = 0, a3 = 0, a4 = 0;
+      Object.keys(oc).forEach(g => {
+        const pg = (p.classificacao || {})[g];
+        if (!pg) return;
+        if (pg[0] && oc[g][0] && pg[0].id === oc[g][0].id) a1++;
+        if (pg[1] && oc[g][1] && pg[1].id === oc[g][1].id) a2++;
+        if (pg[2] && oc[g][2] && pg[2].id === oc[g][2].id) a3++;
+        if (pg[3] && oc[g][3] && pg[3].id === oc[g][3].id) a4++;
+      });
+      if (a1) row(`${a1} campeões de grupo (1º) certos (×${P.campGrupo})`, a1, P.campGrupo, a1 * P.campGrupo, "ok");
+      if (a2) row(`${a2} vices de grupo (2º) certos (×${P.viceGrupo})`, a2, P.viceGrupo, a2 * P.viceGrupo, "ok");
+      if (a3) row(`${a3} terceiros de grupo certos (×${P.terGrupo})`, a3, P.terGrupo, a3 * P.terGrupo, "ok");
+      if (a4) row(`${a4} quartos de grupo certos (×${P.ultGrupo})`, a4, P.ultGrupo, a4 * P.ultGrupo, "ok");
+    }
+    if (det.oitavas) row(`Seleções nas oitavas (×${P.oitavas})`, 1, P.oitavas, det.oitavas, "ok");
+    if (det.quartas) row(`Seleções nas quartas (×${P.quartas})`, 1, P.quartas, det.quartas, "ok");
+    if (det.semis) row(`Semifinalistas (×${P.semi})`, 1, P.semi, det.semis, "ok");
+    if (det.final) row(`Finalistas (×${P.final})`, 1, P.final, det.final, "ok");
+    if (det.campeao) row(`Campeão certo`, 1, P.campeao, det.campeao, "ok");
+    if (det.vice) row(`Vice certo`, 1, P.vice, det.vice, "ok");
+    if (det.terceiro) row(`3º lugar certo`, 1, P.terceiro, det.terceiro, "ok");
+    if (det.quarto) row(`4º lugar certo`, 1, P.quarto, det.quarto, "ok");
+    const conqHTML = linhas.length ? linhas.join("") : '<div class="exb-row"><span class="exb-d">Ainda sem pontos conquistados</span><span class="exb-p">0</span></div>';
+
+    // PERDIDOS (na foto de hoje)
+    const perd = [];
+    const classFora = (p.classificados32 || []).filter(id => elim.has(id) && !passou.has(id));
+    if (classFora.length) perd.push(`<div class="exb-row err"><span class="exb-d">${classFora.length} seleções dele fora dos 32 (×${P.classificado32}): ${classFora.map(id => nome(id)).join(", ")}</span><span class="exb-p">-${classFora.length * P.classificado32}</span></div>`);
+    if (p.campeao && elim.has(p.campeao)) perd.push(`<div class="exb-row err"><span class="exb-d">Campeão (${nome(p.campeao)}) já caiu</span><span class="exb-p">-${P.campeao}</span></div>`);
+    if (p.vice && elim.has(p.vice)) perd.push(`<div class="exb-row err"><span class="exb-d">Vice (${nome(p.vice)}) já caiu</span><span class="exb-p">-${P.vice}</span></div>`);
+    if (p.terceiro && elim.has(p.terceiro)) perd.push(`<div class="exb-row err"><span class="exb-d">3º lugar (${nome(p.terceiro)}) já caiu</span><span class="exb-p">-${P.terceiro}</span></div>`);
+    if (p.quarto && elim.has(p.quarto)) perd.push(`<div class="exb-row err"><span class="exb-d">4º lugar (${nome(p.quarto)}) já caiu</span><span class="exb-p">-${P.quarto}</span></div>`);
+    const perdHTML = perd.length ? perd.join("") : '<div class="exb-row"><span class="exb-d">Nada perdido ainda 🎉</span><span class="exb-p">0</span></div>';
+
+    return `<div class="exb">
+      <div class="exb-sec">✅ Conquistados (${x.r.atuais} pts)</div>${conqHTML}
+      <div class="exb-sec">❌ Perdidos (${x.r.perdidos} pts)</div>${perdHTML}
+      <div class="exb-sec">⏳ Ainda possíveis: <b>${x.r.possiveis} pts</b> · Teto: <b>${x.r.teto} pts</b></div>
+    </div>`;
   }
 
   // ===== 🎯 PLACARES (Reis do Cravo) — fase de grupos, 5/3/2/0 =====
