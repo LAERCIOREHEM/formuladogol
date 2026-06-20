@@ -35,11 +35,22 @@
   .cab-topo .sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);margin-top:3px}
   .voltar{display:inline-block;color:var(--cinza);font-size:13px;text-decoration:none;border-bottom:1px dotted var(--cinza);margin-bottom:14px}
 
-  .navdia{display:flex;align-items:center;gap:10px;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:10px;margin-bottom:14px}
-  .navdia button{font-family:inherit;font-weight:700;font-size:18px;width:42px;height:42px;border-radius:9px;cursor:pointer;border:1px solid var(--linha);background:var(--navy-3);color:var(--branco)}
-  .navdia button:disabled{opacity:.35;cursor:not-allowed}
-  .navdia .meio{flex:1;text-align:center}
-  #dia-rotulo{font-family:'Anton',sans-serif;font-size:16px;letter-spacing:.5px;text-transform:capitalize}
+  .navdia{display:flex;align-items:center;gap:6px;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:8px;margin-bottom:14px}
+  .navdia>button{flex:0 0 auto;font-family:inherit;font-weight:700;font-size:18px;width:34px;height:52px;border-radius:9px;cursor:pointer;border:1px solid var(--linha);background:var(--navy-3);color:var(--branco)}
+  .navdia>button:disabled{opacity:.3;cursor:not-allowed}
+  .dias-faixa{flex:1;display:flex;gap:6px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;padding:2px}
+  .dias-faixa::-webkit-scrollbar{display:none}
+  .dia-item{flex:0 0 auto;min-width:54px;padding:7px 4px;border-radius:9px;cursor:pointer;text-align:center;
+    background:transparent;border:1px solid transparent;transition:all .15s;opacity:.42}
+  .dia-item:hover{opacity:.7}
+  .dia-item .dsem{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--cinza)}
+  .dia-item .dnum{display:block;font-family:'Anton',sans-serif;font-size:20px;line-height:1.1;color:var(--branco)}
+  .dia-item .dmes{display:block;font-size:9px;color:var(--cinza);text-transform:uppercase}
+  .dia-item.hoje .dnum{color:var(--gold)}
+  .dia-item.ativo{opacity:1;background:var(--gold);border-color:var(--gold)}
+  .dia-item.ativo .dsem,.dia-item.ativo .dnum,.dia-item.ativo .dmes{color:#1a1205}
+  .dia-item.tem-jogo::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--verde);margin:3px auto 0}
+  .dia-item.ativo.tem-jogo::after{background:#1a1205}
 
   .jogo{display:block;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:11px 13px;margin-bottom:8px}
   .jogo .topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0;border-bottom:none}
@@ -141,9 +152,9 @@
   <a href="onde-assistir.html" class="oa-destaque">📺 Onde assistir cada jogo da Copa (horários de Brasília) →</a>
 
   <div class="navdia">
-    <button id="prev">‹</button>
-    <div class="meio"><div id="dia-rotulo">…</div></div>
-    <button id="next">›</button>
+    <button id="prev" aria-label="Dia anterior">‹</button>
+    <div class="dias-faixa" id="dias-faixa"></div>
+    <button id="next" aria-label="Próximo dia">›</button>
   </div>
 
   <button id="btn-cal-jogos" class="cal-jogos">📅 Adicionar todos os jogos ao meu calendário</button>
@@ -151,15 +162,15 @@
   <div id="lista"></div>
 </div>
 
-<script src="js/config.js?v=20260620g"></script>
-<script src="js/engine.js?v=20260620g"></script>
-<script src="js/resultados.js?v=20260620g"></script>
+<script src="js/config.js?v=20260620h"></script>
+<script src="js/engine.js?v=20260620h"></script>
+<script src="js/resultados.js?v=20260620h"></script>
 <footer class="rodape">
   <a href="regras.html">Regras</a><span class="sep">·</span>
   <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
   <a href="/?brasileirao=1">← Brasileirão</a>
 </footer>
-  <script src="js/aniversarios.js?v=20260620g"></script>
+  <script src="js/aniversarios.js?v=20260620h"></script>
   <footer class="rodape-site">
     <nav class="rs-nav" aria-label="Links do site">
       <a href="index.html">Jogos</a> · <a href="onde-assistir.html">Onde assistir</a> · <a href="pontos.html">Bolão</a> · <a href="aovivo.html">Ao vivo</a> · <a href="palpites.html">Palpites</a> · <a href="regras.html">Regras</a>
