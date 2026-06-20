@@ -114,6 +114,10 @@
     color:#1a1100;font-weight:800;font-size:13px;text-decoration:none;padding:10px 14px;border-radius:99px;
     box-shadow:0 4px 16px rgba(224,71,62,.25)}
   .assista:active{transform:scale(.99)}
+  .cal-jogos{display:block;width:100%;margin:0 0 14px;padding:11px;border-radius:10px;cursor:pointer;
+    background:rgba(244,197,66,.10);border:1px solid var(--gold);color:var(--gold);
+    font-family:inherit;font-weight:700;font-size:13.5px}
+  .cal-jogos:active{transform:scale(.99)}
 </style>
 </head>
 <body>
@@ -134,18 +138,20 @@
     <button id="next">›</button>
   </div>
 
+  <button id="btn-cal-jogos" class="cal-jogos">📅 Adicionar todos os jogos ao meu calendário</button>
+
   <div id="lista"></div>
 </div>
 
-<script src="js/config.js?v=20260619f"></script>
-<script src="js/engine.js?v=20260619f"></script>
-<script src="js/resultados.js?v=20260619f"></script>
+<script src="js/config.js?v=20260620d"></script>
+<script src="js/engine.js?v=20260620d"></script>
+<script src="js/resultados.js?v=20260620d"></script>
 <footer class="rodape">
   <a href="regras.html">Regras</a><span class="sep">·</span>
   <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
   <a href="/?brasileirao=1">← Brasileirão</a>
 </footer>
-  <script src="js/aniversarios.js?v=20260619f"></script>
+  <script src="js/aniversarios.js?v=20260620d"></script>
   <footer class="rodape-site">
     <nav class="rs-nav" aria-label="Links do site">
       <a href="index.html">Jogos</a> · <a href="onde-assistir.html">Onde assistir</a> · <a href="pontos.html">Bolão</a> · <a href="aovivo.html">Ao vivo</a> · <a href="palpites.html">Palpites</a> · <a href="regras.html">Regras</a>
