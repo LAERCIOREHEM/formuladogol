@@ -40,14 +40,67 @@
     });
     times.forEach(id => { T[id].sg = T[id].gf - T[id].gc; });
 
-    const cmp = (x, y) =>
-      y.pts - x.pts || y.sg - x.sg || y.gf - x.gf;
-
-    let ordenados = times.map(id => T[id]).sort(cmp);
-
-    // Desempate por confronto direto entre os empatados, depois seed
-    ordenados = quebrarEmpates(ordenados, jogosGrupo, seed);
+    // Ordenação FIFA 2026 (Art. 13): pontos primeiro; entre empatados em PONTOS,
+    // aplica HEAD-TO-HEAD (pts, saldo, gols entre os empatados) ANTES do saldo geral.
+    // Só depois: saldo geral, gols geral, fair-play (não temos), seed (ranking FIFA).
+    let ordenados = times.map(id => T[id]).sort((x, y) => y.pts - x.pts);
+    // resolve blocos empatados em PONTOS
+    ordenados = resolverEmpatesPorPontos(ordenados, jogosGrupo, seed);
     return ordenados; // [1º,2º,3º,4º] objetos com stats
+  }
+
+  // resolve blocos de times com MESMOS PONTOS, seguindo a ordem oficial da FIFA
+  function resolverEmpatesPorPontos(lista, jogosGrupo, seed) {
+    const res = [];
+    let i = 0;
+    while (i < lista.length) {
+      let j = i + 1;
+      while (j < lista.length && lista[j].pts === lista[i].pts) j++;
+      let bloco = lista.slice(i, j);
+      if (bloco.length > 1) {
+        bloco = ordenarBlocoEmpatado(bloco, jogosGrupo, seed);
+      }
+      bloco.forEach(t => res.push(t));
+      i = j;
+    }
+    return res;
+  }
+
+  // ordena um bloco de times empatados em pontos pela escada oficial da FIFA
+  function ordenarBlocoEmpatado(bloco, jogosGrupo, seed) {
+    // Passo 1: head-to-head (só jogos ENTRE os empatados): pts, saldo, gols
+    const ids = bloco.map(t => t.id);
+    const mini = miniTabela(ids, jogosGrupo);
+    let ordenado = bloco.slice().sort((x, y) =>
+      mini[y.id].pts - mini[x.id].pts ||
+      mini[y.id].sg - mini[x.id].sg ||
+      mini[y.id].gf - mini[x.id].gf
+    );
+    // se o head-to-head separou todos, pode haver sub-empates remanescentes:
+    // aplica recursivamente nos que continuam idênticos no h2h; senão cai pro geral
+    const grupos = [];
+    let k = 0;
+    while (k < ordenado.length) {
+      let m = k + 1;
+      while (m < ordenado.length &&
+             mini[ordenado[m].id].pts === mini[ordenado[k].id].pts &&
+             mini[ordenado[m].id].sg === mini[ordenado[k].id].sg &&
+             mini[ordenado[m].id].gf === mini[ordenado[k].id].gf) m++;
+      grupos.push(ordenado.slice(k, m));
+      k = m;
+    }
+    // para cada sub-bloco ainda empatado no head-to-head, desempata pelo GERAL
+    const final = [];
+    grupos.forEach(sub => {
+      if (sub.length > 1) {
+        sub.sort((x, y) =>
+          y.sg - x.sg ||           // saldo geral
+          y.gf - x.gf ||           // gols feitos geral
+          (seed[x.id] || 999) - (seed[y.id] || 999)); // ranking FIFA (proxy)
+      }
+      sub.forEach(t => final.push(t));
+    });
+    return final;
   }
 
   function quebrarEmpates(lista, jogosGrupo, seed) {
