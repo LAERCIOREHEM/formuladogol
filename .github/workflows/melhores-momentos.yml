@@ -43,14 +43,14 @@ jobs:
       - name: Commitar e enviar se houve mudança
         run: |
           cd "$GITHUB_WORKSPACE"
-          if [[ -z "$(git status --porcelain copa2026/dados/melhores-momentos.json)" ]]; then
+          if [[ -z "$(git status --porcelain copa2026/dados/melhores-momentos.json copa2026/dados/lives.json)" ]]; then
             echo "Nada mudou — sem commit."
             exit 0
           fi
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add copa2026/dados/melhores-momentos.json
-          git commit -m "Atualiza melhores momentos (automático)"
+          git add copa2026/dados/melhores-momentos.json copa2026/dados/lives.json
+          git commit -m "Atualiza melhores momentos e lives (automático)"
           for i in 1 2 3 4 5; do
             if git push; then
               echo "Push OK na tentativa $i."
