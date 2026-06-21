@@ -79,7 +79,15 @@
 
   async function loop() {
     let data;
-    try { data = await (await fetch(API)).json(); }
+    // janela de ontem até +4 dias (fuso Brasília), pra sempre achar jogos ao vivo E o próximo jogo.
+    // Sem ?dates=, a ESPN devolve só o dia atual no fuso dos EUA — o que some com o "próximo jogo"
+    // quando vira o dia no Brasil. A janela resolve isso.
+    function ymdSP(offsetDias) {
+      const d = new Date(Date.now() + offsetDias * 864e5);
+      return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).format(d).replace(/-/g, "");
+    }
+    const url = `${API}?dates=${ymdSP(-1)}-${ymdSP(4)}&limit=80`;
+    try { data = await (await fetch(url)).json(); }
     catch (e) { if (!DEMO) { $("#app").innerHTML = '<p class="vazio">Sem conexão com o feed agora. Tentando de novo…</p>'; return; } data = { events: [] }; }
     const now = Date.now();
     let lives = (data.events || []).filter(ev => {
@@ -193,8 +201,15 @@
     var hora = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(d);
     var diaTxt = rotuloDiaJogo(d);
     var bandH = dpFlag(hAb, 160), bandA = dpFlag(aAb, 160);
+    // grupo do jogo (só na fase de grupos)
+    var grupoTag = "";
+    if ((ev.season && ev.season.slug) === "group-stage") {
+      var g = grupoDoJogoAV(hAb, aAb);
+      if (g) grupoTag = `<div class="cz-grupo">Grupo ${g}</div>`;
+    }
     return `<div class="cartaz">
       <div class="cz-tag">PRÓXIMO JOGO</div>
+      ${grupoTag}
       <div class="cz-times">
         <div class="cz-time">
           ${bandH ? `<img class="cz-flag" src="${bandH}" alt="">` : ""}
@@ -211,6 +226,13 @@
       <div class="cz-frase">${frasePorHora(horaBSB(d))}</div>
     </div>`;
   }
+  // descobre o grupo do jogo pela sigla (via seleções carregadas)
+  function grupoDoJogoAV(hAb, aAb) {
+    var hId = dpSigla(hAb) || hAb, aId = dpSigla(aAb) || aAb;
+    var sels = (DADOS.selecoes || []);
+    var t = sels.find(x => x.id === hId) || sels.find(x => x.id === aId);
+    return t ? t.grupo : null;
+  }
   function horaBSB(d) {
     return parseInt(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", hour12: false }).format(d), 10);
   }
@@ -223,7 +245,10 @@
     return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", weekday: "long", day: "2-digit", month: "2-digit" }).format(d);
   }
   function telaEspera(data) {
-    var pres = (data.events || []).filter(e => e.competitions[0].status.type.state === "pre")
+    var agora = Date.now();
+    // só jogos realmente futuros (com 70min de tolerância, caso a ESPN demore a virar "in")
+    var pres = (data.events || []).filter(e => e.competitions[0].status.type.state === "pre"
+        && new Date(e.date).getTime() > agora - 70 * 60000)
       .sort((a, b) => new Date(a.date) - new Date(b.date));
     if (!pres.length) {
       return `<div class="nada"><div class="bola">⚽</div>
