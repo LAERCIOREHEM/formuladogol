@@ -24,6 +24,7 @@
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
   let ABA = "jogos", SEL = [], GRP_EVENTS = [];
+  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [];
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
 
   async function rpc(fn, body) {
@@ -137,6 +138,10 @@
       JOGOS = COPA_ENGINE.gerarJogosGrupos(sj.selecoes);
     } catch (e) { JOGOS = []; }
     try {
+      ESTRUT = await fetch("dados/estrutura_mata_mata.json").then(r => r.json());
+      TERMAP = await fetch("dados/terceiros_map.json").then(r => r.json());
+    } catch (e) { ESTRUT = null; TERMAP = null; }
+    try {
       const rows = await rpc("copa_revelados", {});
       PALP = (rows || []).map(r => ({ nome: r.nome, pg: (r.payload || {}).placaresGrupos || {} }));
     } catch (e) { PALP = []; } // antes da trava vem vazio — normal
@@ -176,7 +181,8 @@
   function abasHTML() {
     return `<div class="vistog">
       <button class="vbtn ${ABA === "jogos" ? "on" : ""}" data-v="jogos">📅 Partidas</button>
-      <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Tabela dos Grupos</button>
+      <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Grupos</button>
+      <button class="vbtn ${ABA === "mata" ? "on" : ""}" data-v="mata">🏆 Mata-mata</button>
     </div>`;
   }
   async function buscarGruposEvents() {
@@ -188,6 +194,121 @@
     return GRP_EVENTS;
   }
   function nomeDe(id) { const t = SEL.find(x => x.id === id); return t ? t.nome : id; }
+  // ====== ABA MATA-MATA (chaveamento "as it stands") ======
+  // converte os resultados dos grupos (ESPN) para o formato do engine (placaresGrupos)
+  function placaresGruposDaESPN(events) {
+    const res = [];
+    const jogosBase = COPA_ENGINE.gerarJogosGrupos(SEL); // tem jogo_id, a, b
+    events.forEach(ev => {
+      const c = ev.competitions[0]; if (!c || c.status.type.state !== "post") return;
+      const cs = c.competitors || [];
+      const h = cs.find(x => x.homeAway === "home") || cs[0];
+      const a = cs.find(x => x.homeAway === "away") || cs[1];
+      const hId = dpSigla((h.team || {}).abbreviation) || (h.team || {}).abbreviation;
+      const aId = dpSigla((a.team || {}).abbreviation) || (a.team || {}).abbreviation;
+      const hs = parseInt(h.score || "0", 10), as = parseInt(a.score || "0", 10);
+      // acha o jogo_id correspondente (mesmo par de times, em qualquer ordem)
+      const jb = jogosBase.find(j => (j.a === hId && j.b === aId) || (j.a === aId && j.b === hId));
+      if (!jb) return;
+      // respeita a ordem a/b do jogo base
+      if (jb.a === hId) res.push({ jogo_id: jb.jogo_id, ga: hs, gb: as });
+      else res.push({ jogo_id: jb.jogo_id, ga: as, gb: hs });
+    });
+    return res;
+  }
+
+  // casa um confronto (par de ids) com o jogo real da ESPN no mata-mata (pra placar/horário)
+  function eventoMataDe(idA, idB, mataEvents) {
+    if (!idA || !idB) return null;
+    return (mataEvents || []).find(ev => {
+      const cs = ev.competitions[0].competitors;
+      const x = dpSigla((cs[0].team || {}).abbreviation) || (cs[0].team || {}).abbreviation;
+      const y = dpSigla((cs[1].team || {}).abbreviation) || (cs[1].team || {}).abbreviation;
+      return (x === idA && y === idB) || (x === idB && y === idA);
+    }) || null;
+  }
+
+  // monta uma caixa de confronto (times + placar + horário)
+  function caixaConfronto(idA, idB, mataEvents) {
+    const ev = eventoMataDe(idA, idB, mataEvents);
+    let linhaInfo = "", scoreA = "", scoreB = "", vA = "", vB = "";
+    if (ev) {
+      const comp = ev.competitions[0], st = comp.status.type, cs = comp.competitors;
+      const h = cs.find(c => c.homeAway === "home") || cs[0];
+      const a = cs.find(c => c.homeAway === "away") || cs[1];
+      const hId = dpSigla((h.team || {}).abbreviation) || (h.team || {}).abbreviation;
+      const hs = h.score, as = a.score;
+      // alinha placar com idA/idB
+      const aScore = (hId === idA) ? hs : as, bScore = (hId === idA) ? as : hs;
+      if (st.state === "post") {
+        scoreA = `<b>${aScore ?? ""}</b>`; scoreB = `<b>${bScore ?? ""}</b>`;
+        if (h.winner) { if (hId === idA) vA = "mm-venc"; else vB = "mm-venc"; }
+        else if (a.winner) { if (hId === idA) vB = "mm-venc"; else vA = "mm-venc"; }
+        linhaInfo = `<div class="mm-info">Encerrado</div>`;
+      } else if (st.state === "in") {
+        scoreA = `<b class="mm-live">${aScore ?? ""}</b>`; scoreB = `<b class="mm-live">${bScore ?? ""}</b>`;
+        linhaInfo = `<div class="mm-info mm-aovivo">● ${comp.status.displayClock || "ao vivo"}</div>`;
+      } else {
+        const d = new Date(ev.date);
+        const dia = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "America/Sao_Paulo" });
+        linhaInfo = `<div class="mm-info">${dia} · ${horaBR(ev.date)}</div>`;
+      }
+    }
+    const time = (id, score, vcls) => {
+      if (!id) return `<div class="mm-time mm-tbd"><span class="mm-nome">A definir</span></div>`;
+      const fl = dpFlag(id, 40);
+      return `<div class="mm-time ${vcls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span><span class="mm-score">${score}</span></div>`;
+    };
+    return `<div class="mm-jogo">${time(idA, scoreA, vA)}${time(idB, scoreB, vB)}${linhaInfo}</div>`;
+  }
+
+  async function renderMata() {
+    $("#lista").innerHTML = abasHTML() + '<p class="vazio">Montando o chaveamento…</p>';
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    if (!ESTRUT || !TERMAP) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Não foi possível carregar a estrutura do mata-mata.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
+
+    // 1) resultados dos grupos (as it stands)
+    const grpEvents = await buscarGruposEvents();
+    const placG = placaresGruposDaESPN(grpEvents);
+    // 2) roda o engine
+    let d;
+    try { d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP); }
+    catch (e) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Erro ao calcular o chaveamento.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
+    // 3) jogos reais do mata-mata na ESPN (placar/horário)
+    if (!MATA_EVENTS.length) {
+      try {
+        const r = await fetch(`${API}?dates=20260628-20260719&limit=80`).then(x => x.json());
+        MATA_EVENTS = (r.events || []).filter(e => ((e.season && e.season.slug) || "") !== "group-stage");
+      } catch (e) { MATA_EVENTS = []; }
+    }
+
+    // 4) monta as colunas
+    const fases = [
+      { nome: "32-avos", jogos: d.r32.map(m => ({ a: m.a, b: m.b })) },
+      { nome: "Oitavas", jogos: ESTRUT.arvore.filter(m => m.fase === "oitavas").map(m => d.timeDe[m.id] || {}) },
+      { nome: "Quartas", jogos: ESTRUT.arvore.filter(m => m.fase === "quartas").map(m => d.timeDe[m.id] || {}) },
+      { nome: "Semis", jogos: ESTRUT.arvore.filter(m => m.fase === "semifinais").map(m => d.timeDe[m.id] || {}) },
+      { nome: "Final", jogos: ESTRUT.arvore.filter(m => m.fase === "final").map(m => d.timeDe[m.id] || {}) }
+    ];
+    const colunas = fases.map(f => {
+      const caixas = f.jogos.map(j => caixaConfronto(j.a, j.b, MATA_EVENTS)).join("");
+      return `<div class="mm-coluna"><div class="mm-fasetit">${f.nome}</div>${caixas}</div>`;
+    }).join("");
+
+    // disputa de 3º lugar (separada)
+    const t3 = ESTRUT.arvore.find(m => m.fase === "terceiro");
+    const caixa3 = t3 && d.timeDe[t3.id] ? caixaConfronto(d.timeDe[t3.id].a, d.timeDe[t3.id].b, MATA_EVENTS) : "";
+
+    const aviso = d.faltaMapa
+      ? '<p class="mm-aviso">⚠️ O cruzamento exato depende da definição dos grupos. Mostrando a melhor estimativa.</p>'
+      : '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — atualiza conforme os grupos avançam.</p>';
+
+    $("#lista").innerHTML = abasHTML() + aviso
+      + `<div class="mm-scroll"><div class="mm-bracket">${colunas}</div></div>`
+      + (caixa3 ? `<div class="mm-terceiro"><div class="mm-fasetit">Disputa de 3º lugar</div>${caixa3}</div>` : "");
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+  }
+
   // jogos de UM grupo, formatados (encerrado com placar; futuro/ao vivo com hora)
   function jogosDoGrupoHTML(events, G) {
     const jogos = (events || []).filter(ev => {
@@ -293,6 +414,7 @@
     ABA = v;
     FOCO_GRUPO = null; VOLTAR_JOGO = null; // entrada normal: sem grupo focado
     if (ABA === "grupos") { $("#prev").parentElement.style.display = "none"; renderGrupos(); }
+    else if (ABA === "mata") { $("#prev").parentElement.style.display = "none"; renderMata(); }
     else { $("#prev").parentElement.style.display = ""; carregar(); }
   }
 
