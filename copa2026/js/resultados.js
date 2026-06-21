@@ -23,8 +23,8 @@
 
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
-  let ABA = "jogos", SEL = [], GRP_EVENTS = [];
-  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [];
+  let ABA = "jogos", SEL = [], GRP_EVENTS = [], GRP_EVENTS_TS = 0;
+  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0;
   let FASE_MATA = "32-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
@@ -188,11 +188,14 @@
     </div>`;
   }
   async function buscarGruposEvents() {
-    if (GRP_EVENTS.length) return GRP_EVENTS;
+    // cache com validade de 90s: senão o chaveamento usa resultados velhos
+    // (era um cache eterno — não atualizava quando novos jogos terminavam)
+    if (GRP_EVENTS.length && (Date.now() - GRP_EVENTS_TS) < 90000) return GRP_EVENTS;
     try {
-      const d = await fetch(`${API}?dates=20260611-20260627&limit=120`).then(r => r.json());
+      const d = await fetch(`${API}?dates=20260611-20260627&limit=120&_=${Date.now()}`).then(r => r.json());
       GRP_EVENTS = (d.events || []).filter(e => ((e.season && e.season.slug) || "") === "group-stage");
-    } catch (e) { GRP_EVENTS = []; }
+      GRP_EVENTS_TS = Date.now();
+    } catch (e) { /* mantém o cache anterior se a busca falhar */ }
     return GRP_EVENTS;
   }
   function nomeDe(id) { const t = SEL.find(x => x.id === id); return t ? t.nome : id; }
@@ -335,11 +338,12 @@
     catch (e) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Erro ao calcular o chaveamento.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
     MATA_CACHE = d;
     // 3) jogos reais do mata-mata na ESPN (placar/horário)
-    if (!MATA_EVENTS.length) {
+    if (!MATA_EVENTS.length || (Date.now() - MATA_EVENTS_TS) >= 90000) {
       try {
-        const r = await fetch(`${API}?dates=20260628-20260719&limit=80`).then(x => x.json());
+        const r = await fetch(`${API}?dates=20260628-20260719&limit=80&_=${Date.now()}`).then(x => x.json());
         MATA_EVENTS = (r.events || []).filter(e => ((e.season && e.season.slug) || "") !== "group-stage");
-      } catch (e) { MATA_EVENTS = []; }
+        MATA_EVENTS_TS = Date.now();
+      } catch (e) { /* mantém cache anterior */ }
     }
     pintarFaseMata();
   }
