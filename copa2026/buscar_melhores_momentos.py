@@ -19,6 +19,7 @@ import os, re, json, sys, unicodedata, urllib.request, urllib.parse
 DIR = os.path.dirname(os.path.abspath(__file__))
 SELECOES = os.path.join(DIR, "dados", "selecoes.json")
 SAIDA    = os.path.join(DIR, "dados", "melhores-momentos.json")
+SAIDA_LIVES = os.path.join(DIR, "dados", "lives.json")
 
 API_KEY     = os.environ.get("YOUTUBE_API_KEY", "").strip()
 PLAYLIST_ID = os.environ.get("CAZE_PLAYLIST_ID", "").strip()
@@ -167,6 +168,99 @@ def listar_playlist(playlist_id, api_key):
             break
     return itens
 
+def parse_live(titulo):
+    """De 'AO VIVO: ESPANHA X ARÁBIA SAUDITA | COPA DO MUNDO...' extrai (idA, idB).
+    Diferente de parse_titulo (que espera placar N x N), aqui é só 'TIME x TIME'."""
+    t = titulo
+    # remove rótulos de transmissão ao vivo
+    t = re.sub(r"(?i)ao\s+vivo\s*[:|]?", " ", t)
+    t = re.sub(r"(?i)\blive\b\s*[:|]?", " ", t)
+    # pega só o trecho antes da primeira barra (onde estão os times)
+    antes_barra = t.split("|")[0]
+    # casa "TIME x TIME" (sem exigir placar)
+    m = re.search(r"(.+?)\s+[xX]\s+(.+)", antes_barra)
+    if not m:
+        return None, None
+    a = id_do_time(m.group(1))
+    b = id_do_time(m.group(2))
+    return a, b
+
+def buscar_lives_caze(api_key, event_type):
+    """Lista as transmissões do canal da Cazé por tipo: 'upcoming' (agendadas) ou 'live' (no ar).
+    Retorna lista de {titulo, videoId}. Pagina até pegar todas (até 200)."""
+    base = "https://www.googleapis.com/youtube/v3/search"
+    itens, token, p = [], "", 0
+    while p < 4:
+        params = {
+            "part": "snippet", "channelId": CAZE_CHANNEL_ID,
+            "eventType": event_type, "type": "video",
+            "maxResults": "50", "order": "date", "key": api_key
+        }
+        if token:
+            params["pageToken"] = token
+        try:
+            data = yt_get(base + "?" + urllib.parse.urlencode(params))
+        except Exception as e:
+            print(f"  busca de lives ({event_type}) falhou:", e)
+            break
+        for it in data.get("items", []):
+            sn = it.get("snippet", {})
+            vid = (it.get("id") or {}).get("videoId")
+            tit = sn.get("title", "")
+            if vid and tit and sn.get("channelId") == CAZE_CHANNEL_ID:
+                itens.append({"titulo": tit, "videoId": vid})
+        token = data.get("nextPageToken", "")
+        p += 1
+        if not token:
+            break
+    return itens
+
+def atualizar_lives(api_key):
+    """Busca lives agendadas + ao vivo da Cazé, casa com os jogos pelo título,
+    e grava dados/lives.json = { "ESP-KSA": {url, titulo, estado}, ... }.
+    'estado' = 'live' (no ar) tem prioridade sobre 'upcoming' (agendada)."""
+    # carrega o atual (preserva correções manuais 'admin')
+    try:
+        atual = json.load(open(SAIDA_LIVES, encoding="utf-8"))
+    except Exception:
+        atual = {"_comentario": "Lives da CazéTV por jogo. Chave = siglas em ordem alfabética. "
+                 "Valor = {url, titulo, estado, fonte}. 'admin' nunca é sobrescrito pelo robô.", "jogos": {}}
+    jogos = atual.get("jogos", {})
+
+    # busca as duas categorias: live (no ar) e upcoming (agendadas)
+    no_ar = buscar_lives_caze(api_key, "live")
+    agendadas = buscar_lives_caze(api_key, "upcoming")
+    print(f"Lives no ar: {len(no_ar)} | agendadas: {len(agendadas)}")
+
+    # processa: 'upcoming' primeiro, 'live' depois (live sobrescreve, é o estado mais atual)
+    def processar(lista, estado):
+        n = 0
+        for v in lista:
+            a, b = parse_live(v["titulo"])
+            if not a or not b:
+                continue
+            chave = "-".join(sorted([a, b]))
+            # respeita correção manual
+            if jogos.get(chave, {}).get("fonte") == "admin":
+                continue
+            # 'live' sempre atualiza; 'upcoming' só preenche se ainda não houver um 'live'
+            if estado == "upcoming" and jogos.get(chave, {}).get("estado") == "live":
+                continue
+            jogos[chave] = {
+                "url": "https://www.youtube.com/watch?v=" + v["videoId"],
+                "titulo": v["titulo"].split("|")[0].strip(),
+                "estado": estado,
+                "fonte": "auto"
+            }
+            n += 1
+        return n
+
+    n1 = processar(agendadas, "upcoming")
+    n2 = processar(no_ar, "live")
+    atual["jogos"] = jogos
+    json.dump(atual, open(SAIDA_LIVES, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    print(f"Lives gravadas: {n1} agendadas + {n2} no ar. Total no arquivo: {len(jogos)}.")
+
 def main():
     if not API_KEY:
         print("ERRO: defina a variável de ambiente YOUTUBE_API_KEY (secret do GitHub).")
@@ -246,6 +340,13 @@ def main():
     atual["jogos"] = jogos
     json.dump(atual, open(SAIDA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     print(f"OK. Preenchidos/atualizados (auto): {novos}. Títulos não reconhecidos: {ignorados}. Total no arquivo: {len(jogos)}.")
+
+    # --- ETAPA 3: lives da Cazé (agendadas + ao vivo) coladas em cada jogo ---
+    print("\nAtualizando lives da CazéTV...")
+    try:
+        atualizar_lives(API_KEY)
+    except Exception as e:
+        print("Falha ao atualizar lives (não interrompe os melhores momentos):", e)
 
 if __name__ == "__main__":
     main()
