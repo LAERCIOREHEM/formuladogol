@@ -246,7 +246,14 @@
         scoreA = `<b>${aScore ?? ""}</b>`; scoreB = `<b>${bScore ?? ""}</b>`;
         if (h.winner) { if (hId === idA) vA = "mm-venc"; else vB = "mm-venc"; }
         else if (a.winner) { if (hId === idA) vB = "mm-venc"; else vA = "mm-venc"; }
-        linhaInfo = `<div class="mm-info">Encerrado</div>`;
+        // disputa de pênaltis: a ESPN traz shootoutScore quando o jogo foi decidido nos pênaltis
+        const hPen = h.shootoutScore, aPen = a.shootoutScore;
+        if (hPen != null && aPen != null) {
+          const aPenV = (hId === idA) ? hPen : aPen, bPenV = (hId === idA) ? aPen : hPen;
+          linhaInfo = `<div class="mm-info">Encerrado · <span class="mm-pen">pênaltis ${aPenV}-${bPenV}</span></div>`;
+        } else {
+          linhaInfo = `<div class="mm-info">Encerrado</div>`;
+        }
       } else if (st.state === "in") {
         scoreA = `<b class="mm-live">${aScore ?? ""}</b>`; scoreB = `<b class="mm-live">${bScore ?? ""}</b>`;
         linhaInfo = `<div class="mm-info mm-aovivo">● ${comp.status.displayClock || "ao vivo"}</div>`;
@@ -314,9 +321,17 @@
       }
     }
 
-    const aviso = d.faltaMapa
-      ? '<p class="mm-aviso">⚠️ O cruzamento exato ainda depende da definição dos grupos. Mostrando a melhor estimativa.</p>'
-      : '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — muda conforme os jogos avançam.</p>';
+    // após o fim da fase de grupos (mesma virada do Ranking Simulado), o chaveamento é oficial
+    const VIRADA_MATA = new Date("2026-06-28T02:00:00-03:00").getTime();
+    const oficial = Date.now() >= VIRADA_MATA;
+    let aviso;
+    if (oficial) {
+      aviso = '<p class="mm-aviso">🏆 Chaveamento <b>oficial</b> do mata-mata.</p>';
+    } else if (d.faltaMapa) {
+      aviso = '<p class="mm-aviso">⚠️ O cruzamento exato ainda depende da definição dos grupos. Mostrando a melhor estimativa.</p>';
+    } else {
+      aviso = '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — muda conforme os jogos avançam.</p>';
+    }
 
     $("#lista").innerHTML = abasHTML() + aviso
       + `<div class="mm-pills">${pills}</div>`

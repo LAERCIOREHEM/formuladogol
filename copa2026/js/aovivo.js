@@ -92,12 +92,22 @@
     try { data = await (await fetch(url)).json(); }
     catch (e) { if (!DEMO) { $("#app").innerHTML = '<p class="vazio">Sem conexão com o feed agora. Tentando de novo…</p>'; return; } data = { events: [] }; }
     const now = Date.now();
-    let lives = (data.events || []).filter(ev => {
-      const st = ev.competitions[0].status.type;
-      if (st.state === "in") return true;
-      if (st.state === "pre") { const dt = new Date(ev.date).getTime(); return now >= dt - PRE_MIN * 60000 && now <= dt + 60 * 60000; } // entra 10min antes; segura até 1h se a ESPN demorar a virar "ao vivo"
-      return false;
-    });
+    // jogos REALMENTE ao vivo agora
+    const noAr = (data.events || []).filter(ev => ev.competitions[0].status.type.state === "in");
+    let lives;
+    if (noAr.length) {
+      // TRAVA: se tem jogo ao vivo de verdade, mostra SÓ ele(s).
+      // Não deixa o próximo jogo (que abre 10min antes) tomar o lugar de um jogo em andamento.
+      lives = noAr;
+    } else {
+      // ninguém ao vivo: aí sim mostra o próximo que está prestes a começar (10min antes)
+      lives = (data.events || []).filter(ev => {
+        const st = ev.competitions[0].status.type;
+        if (st.state !== "pre") return false;
+        const dt = new Date(ev.date).getTime();
+        return now >= dt - PRE_MIN * 60000 && now <= dt + 60 * 60000;
+      });
+    }
     let demoFlag = false;
     if (DEMO && !lives.length) { lives = [fabricar()]; demoFlag = true; }
     render(lives, data, demoFlag);
