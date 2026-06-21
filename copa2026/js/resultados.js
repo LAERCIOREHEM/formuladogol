@@ -271,6 +271,56 @@
     return `<div class="mm-jogo">${time(idA, scoreA, vA)}${time(idB, scoreB, vB)}${linhaInfo}</div>`;
   }
 
+  // ranking "quem acertou as seleções que avançaram" (sem importar posição/cruzamento)
+  function rankingSelecoesHTML(d) {
+    if (!PALP.length) return "";
+    // fases com seleções já definidas (só mostra a linha se a fase tem gente avançando)
+    const fases = [
+      { rot: "Classificados (32)", real: d.classificados32 || [], campo: "classificados32" },
+      { rot: "Oitavas (16)", real: d.avancam_oitavas || [], campo: "avancam_oitavas" },
+      { rot: "Quartas (8)", real: d.avancam_quartas || [], campo: "avancam_quartas" },
+      { rot: "Semifinais (4)", real: d.semifinalistas || [], campo: "semifinalistas" },
+      { rot: "Finalistas (2)", real: d.finalistas || [], campo: "finalistas" }
+    ].filter(f => f.real.length > 0);
+
+    // deriva cada palpite e conta a interseção por fase
+    const linhas = PALP.map(p => {
+      let pd;
+      try { pd = COPA_ENGINE.derivar(SEL, pgToArr(p.pg), {}, ESTRUT, TERMAP); }
+      catch (e) { pd = null; }
+      const acertosPorFase = fases.map(f => {
+        if (!pd) return 0;
+        const setReal = new Set(f.real);
+        return (pd[f.campo] || []).filter(id => setReal.has(id)).length;
+      });
+      // ordena pelo acerto da PRIMEIRA fase (32) como critério principal, depois as seguintes
+      return { nome: p.nome, acertos: acertosPorFase, chave: acertosPorFase };
+    });
+
+    // ordena: mais acertos nas 32, desempate nas fases seguintes
+    linhas.sort((a, b) => {
+      for (let i = 0; i < a.acertos.length; i++) {
+        if (b.acertos[i] !== a.acertos[i]) return b.acertos[i] - a.acertos[i];
+      }
+      return a.nome.localeCompare(b.nome);
+    });
+
+    const cabecalho = `<tr><th class="rs-nome">Apostador</th>${fases.map(f => `<th>${f.rot}</th>`).join("")}</tr>`;
+    const corpo = linhas.map((l, i) => {
+      const cels = l.acertos.map((n, j) => `<td><b>${n}</b><span class="rs-de">/${fases[j].real.length}</span></td>`).join("");
+      return `<tr><td class="rs-nome">${i + 1}. ${l.nome}</td>${cels}</tr>`;
+    }).join("");
+
+    return `<div class="rs-box" id="rs-box" style="display:none">
+      <p class="rs-leg">Quantas seleções que avançaram (ou estão avançando) cada um cravou — <b>não importa a posição nem o cruzamento</b>, só se a seleção certa passou.</p>
+      <div class="rs-scroll"><table class="rs-tab"><thead>${cabecalho}</thead><tbody>${corpo}</tbody></table></div>
+    </div>`;
+  }
+  // converte o placaresGrupos {jogo_id:{ga,gb}} para o array que o engine espera
+  function pgToArr(pg) {
+    return Object.keys(pg || {}).map(jid => ({ jogo_id: jid, ga: pg[jid].ga, gb: pg[jid].gb }));
+  }
+
   async function renderMata() {
     $("#lista").innerHTML = abasHTML() + '<p class="vazio">Montando o chaveamento…</p>';
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
@@ -336,9 +386,16 @@
     $("#lista").innerHTML = abasHTML() + aviso
       + `<div class="mm-pills">${pills}</div>`
       + `<div class="mm-fase-grid">${caixas}</div>`
-      + extra;
+      + extra
+      + (PALP.length ? `<button class="rs-toggle" id="rs-toggle">🎯 Quem acertou as seleções que avançaram ▾</button>` + rankingSelecoesHTML(d) : "");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     document.querySelectorAll(".mm-pill[data-fase]").forEach(b => b.onclick = () => { FASE_MATA = b.dataset.fase; pintarFaseMata(); });
+    const rsBtn = document.getElementById("rs-toggle");
+    if (rsBtn) rsBtn.onclick = () => {
+      const box = document.getElementById("rs-box"), ab = box.style.display === "none";
+      box.style.display = ab ? "block" : "none";
+      rsBtn.innerHTML = ab ? "🎯 Quem acertou as seleções que avançaram ▴" : "🎯 Quem acertou as seleções que avançaram ▾";
+    };
   }
 
   // jogos de UM grupo, formatados (encerrado com placar; futuro/ao vivo com hora)
