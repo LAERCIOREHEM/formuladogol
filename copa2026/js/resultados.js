@@ -25,6 +25,8 @@
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
   let ABA = "jogos", SEL = [], GRP_EVENTS = [];
   let ESTRUT = null, TERMAP = null, MATA_EVENTS = [];
+  let FASE_MATA = "32-avos"; // fase selecionada na aba mata-mata
+  let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
 
   async function rpc(fn, body) {
@@ -274,6 +276,7 @@
     let d;
     try { d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP); }
     catch (e) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Erro ao calcular o chaveamento.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
+    MATA_CACHE = d;
     // 3) jogos reais do mata-mata na ESPN (placar/horário)
     if (!MATA_EVENTS.length) {
       try {
@@ -281,32 +284,46 @@
         MATA_EVENTS = (r.events || []).filter(e => ((e.season && e.season.slug) || "") !== "group-stage");
       } catch (e) { MATA_EVENTS = []; }
     }
+    pintarFaseMata();
+  }
 
-    // 4) monta as colunas
-    const fases = [
+  // desenha SÓ a fase selecionada (uma por vez, ocupando a tela no celular)
+  function pintarFaseMata() {
+    const d = MATA_CACHE; if (!d) return;
+    const FASES = [
       { nome: "32-avos", jogos: d.r32.map(m => ({ a: m.a, b: m.b })) },
       { nome: "Oitavas", jogos: ESTRUT.arvore.filter(m => m.fase === "oitavas").map(m => d.timeDe[m.id] || {}) },
       { nome: "Quartas", jogos: ESTRUT.arvore.filter(m => m.fase === "quartas").map(m => d.timeDe[m.id] || {}) },
       { nome: "Semis", jogos: ESTRUT.arvore.filter(m => m.fase === "semifinais").map(m => d.timeDe[m.id] || {}) },
       { nome: "Final", jogos: ESTRUT.arvore.filter(m => m.fase === "final").map(m => d.timeDe[m.id] || {}) }
     ];
-    const colunas = fases.map(f => {
-      const caixas = f.jogos.map(j => caixaConfronto(j.a, j.b, MATA_EVENTS)).join("");
-      return `<div class="mm-coluna"><div class="mm-fasetit">${f.nome}</div>${caixas}</div>`;
-    }).join("");
+    // seletor de fases (pílulas)
+    const pills = FASES.map(f =>
+      `<button class="mm-pill ${FASE_MATA === f.nome ? "on" : ""}" data-fase="${f.nome}">${f.nome}</button>`
+    ).join("");
 
-    // disputa de 3º lugar (separada)
-    const t3 = ESTRUT.arvore.find(m => m.fase === "terceiro");
-    const caixa3 = t3 && d.timeDe[t3.id] ? caixaConfronto(d.timeDe[t3.id].a, d.timeDe[t3.id].b, MATA_EVENTS) : "";
+    const faseAtual = FASES.find(f => f.nome === FASE_MATA) || FASES[0];
+    const caixas = faseAtual.jogos.map(j => caixaConfronto(j.a, j.b, MATA_EVENTS)).join("");
+
+    // a disputa de 3º entra junto da Final
+    let extra = "";
+    if (FASE_MATA === "Final") {
+      const t3 = ESTRUT.arvore.find(m => m.fase === "terceiro");
+      if (t3 && d.timeDe[t3.id]) {
+        extra = `<div class="mm-3tit">Disputa de 3º lugar</div><div class="mm-fase-grid">${caixaConfronto(d.timeDe[t3.id].a, d.timeDe[t3.id].b, MATA_EVENTS)}</div>`;
+      }
+    }
 
     const aviso = d.faltaMapa
-      ? '<p class="mm-aviso">⚠️ O cruzamento exato depende da definição dos grupos. Mostrando a melhor estimativa.</p>'
-      : '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — atualiza conforme os grupos avançam.</p>';
+      ? '<p class="mm-aviso">⚠️ O cruzamento exato ainda depende da definição dos grupos. Mostrando a melhor estimativa.</p>'
+      : '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — muda conforme os jogos avançam.</p>';
 
     $("#lista").innerHTML = abasHTML() + aviso
-      + `<div class="mm-scroll"><div class="mm-bracket">${colunas}</div></div>`
-      + (caixa3 ? `<div class="mm-terceiro"><div class="mm-fasetit">Disputa de 3º lugar</div>${caixa3}</div>` : "");
+      + `<div class="mm-pills">${pills}</div>`
+      + `<div class="mm-fase-grid">${caixas}</div>`
+      + extra;
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    document.querySelectorAll(".mm-pill[data-fase]").forEach(b => b.onclick = () => { FASE_MATA = b.dataset.fase; pintarFaseMata(); });
   }
 
   // jogos de UM grupo, formatados (encerrado com placar; futuro/ao vivo com hora)
