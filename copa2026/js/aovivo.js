@@ -25,6 +25,7 @@
   const ESPN_OVR = {};               // se alguma sigla da ESPN diferir do nosso id, mapear aqui (ex.: {"GER":"ALE"})
   let DADOS = {}, JOGOS = [], PART = [], timer = null;
   let TVS = {};
+  let LIVES = {};
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -59,6 +60,7 @@
 
   async function init() {
     try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
+    try { LIVES = (await fetch("dados/lives.json?t=" + Date.now()).then(r => r.json())).jogos || {}; } catch (e) { LIVES = {}; }
     try {
       const [s, e, t] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
@@ -172,9 +174,22 @@
       </div>
       <div class="minuto">${minuto}</div>
       ${tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
-      <a class="btn-caze" href="https://www.youtube.com/@CazeTV/live" target="_blank" rel="noopener">▶️ Assistir ao vivo na CazéTV</a>
+      ${botaoCaze((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${palpHTML}
     </div>`;
+  }
+
+  // acha a live certa pro jogo no lives.json (gerado pelo robô). Cai no fallback se não houver.
+  function liveDoJogo(aAb, bAb) {
+    var sa = dpSigla(aAb) || aAb, sb = dpSigla(bAb) || bAb;
+    var k = [sa, sb].sort().join("-");
+    return LIVES[k] || null;
+  }
+  function botaoCaze(aAb, bAb) {
+    var L = liveDoJogo(aAb, bAb);
+    // se o robô achou a live exata do jogo, aponta direto pro vídeo certo
+    var href = (L && L.url) ? L.url : "https://www.youtube.com/@CazeTV/live";
+    return `<a class="btn-caze" href="${href}" target="_blank" rel="noopener">▶️ Assistir ao vivo na CazéTV</a>`;
   }
 
   function faseLabel(ev) {
