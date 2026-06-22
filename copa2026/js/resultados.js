@@ -325,36 +325,16 @@
     return Object.keys(pg || {}).map(jid => ({ jogo_id: jid, ga: pg[jid].ga, gb: pg[jid].gb }));
   }
 
-  // busca os cartões (fair play) de cada jogo de grupo encerrado, soma por seleção.
-  // só é relevante em empates totais, mas calculamos uma vez e cacheamos (5min).
-  async function buscarFairPlay(grpEvents) {
+  // lê o fair play (cartões) do JSON gerado pelo robô (estável, rápido).
+  // Antes buscava 38 summaries ao vivo — lento e oscilava quando algum falhava.
+  async function buscarFairPlay() {
     if (Object.keys(FAIRPLAY).length && (Date.now() - FAIRPLAY_TS) < 300000) return FAIRPLAY;
-    const encerrados = (grpEvents || []).filter(e => e.competitions[0].status.type.state === "post");
-    const fp = {};
-    // busca os summaries em paralelo (cada um traz yellowCards/redCards no boxscore)
-    const proms = encerrados.map(ev =>
-      fetch(`${API.replace("/scoreboard", "/summary")}?event=${ev.id}`)
-        .then(r => r.json()).catch(() => null)
-    );
-    const sums = await Promise.all(proms);
-    sums.forEach(s => {
-      if (!s || !s.boxscore || !s.boxscore.teams) return;
-      s.boxscore.teams.forEach(t => {
-        const ab = (t.team || {}).abbreviation;
-        const id = dpSigla(ab) || ab;
-        const stats = t.statistics || [];
-        const getStat = nome => {
-          const st = stats.find(x => (x.name || x.displayName) === nome);
-          return st ? parseInt(st.displayValue || st.value || "0", 10) : 0;
-        };
-        const yc = getStat("yellowCards"), rc = getStat("redCards");
-        if (!(id in fp)) fp[id] = 0;
-        // fair play FIFA: -1 por amarelo, -4 por vermelho direto (aproximação padrão)
-        fp[id] += (yc * -1) + (rc * -4);
-      });
-    });
-    FAIRPLAY = fp; FAIRPLAY_TS = Date.now();
-    return fp;
+    try {
+      const j = await fetch("dados/fairplay.json?t=" + Date.now()).then(r => r.json());
+      FAIRPLAY = j.fairplay || {};
+      FAIRPLAY_TS = Date.now();
+    } catch (e) { /* sem fair play: o engine cai pro ranking FIFA, ainda funciona */ }
+    return FAIRPLAY;
   }
 
   async function renderMata() {
@@ -365,8 +345,8 @@
     // 1) resultados dos grupos (as it stands)
     const grpEvents = await buscarGruposEvents();
     const placG = placaresGruposDaESPN(grpEvents);
-    // 1b) fair play (cartões) — critério oficial de desempate antes do ranking FIFA
-    const fp = await buscarFairPlay(grpEvents);
+    // 1b) fair play (cartões) — lido do JSON do robô; desempate antes do ranking FIFA
+    const fp = await buscarFairPlay();
     // 2) roda o engine
     let d;
     try { d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp); }
