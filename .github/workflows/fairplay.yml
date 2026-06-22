@@ -1,0 +1,50 @@
+name: Atualiza fair play (cartões)
+
+on:
+  schedule:
+    # de hora em hora durante a fase de grupos (11 a 27 de junho de 2026, UTC)
+    - cron: "5 * * * *"
+  workflow_dispatch: {}   # permite rodar manualmente também
+
+permissions:
+  contents: write
+
+jobs:
+  fairplay:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Calcula o fair play
+        run: |
+          cd "$GITHUB_WORKSPACE/copa2026"
+          python buscar_fairplay.py
+
+      - name: Commit do fairplay.json (se mudou)
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          if [[ -z "$(git status --porcelain copa2026/dados/fairplay.json)" ]]; then
+            echo "Nada mudou — sem commit."
+            exit 0
+          fi
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add copa2026/dados/fairplay.json
+          git commit -m "Atualiza fair play (cartões) — automático"
+          for i in 1 2 3 4 5; do
+            if git push; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+            echo "Push rejeitado (tentativa $i). Puxando e tentando de novo..."
+            git pull --rebase --autostash origin main || true
+            sleep 3
+          done
+          echo "Não consegui enviar após várias tentativas."
+          exit 1
