@@ -25,6 +25,7 @@
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
   let ABA = "jogos", SEL = [], GRP_EVENTS = [], GRP_EVENTS_TS = 0;
   let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0;
+  let FAIRPLAY = {}, FAIRPLAY_TS = 0; // {sigla: pontos de conduta}, cache 5min
   let FASE_MATA = "32-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
@@ -324,6 +325,38 @@
     return Object.keys(pg || {}).map(jid => ({ jogo_id: jid, ga: pg[jid].ga, gb: pg[jid].gb }));
   }
 
+  // busca os cartões (fair play) de cada jogo de grupo encerrado, soma por seleção.
+  // só é relevante em empates totais, mas calculamos uma vez e cacheamos (5min).
+  async function buscarFairPlay(grpEvents) {
+    if (Object.keys(FAIRPLAY).length && (Date.now() - FAIRPLAY_TS) < 300000) return FAIRPLAY;
+    const encerrados = (grpEvents || []).filter(e => e.competitions[0].status.type.state === "post");
+    const fp = {};
+    // busca os summaries em paralelo (cada um traz yellowCards/redCards no boxscore)
+    const proms = encerrados.map(ev =>
+      fetch(`${API.replace("/scoreboard", "/summary")}?event=${ev.id}`)
+        .then(r => r.json()).catch(() => null)
+    );
+    const sums = await Promise.all(proms);
+    sums.forEach(s => {
+      if (!s || !s.boxscore || !s.boxscore.teams) return;
+      s.boxscore.teams.forEach(t => {
+        const ab = (t.team || {}).abbreviation;
+        const id = dpSigla(ab) || ab;
+        const stats = t.statistics || [];
+        const getStat = nome => {
+          const st = stats.find(x => (x.name || x.displayName) === nome);
+          return st ? parseInt(st.displayValue || st.value || "0", 10) : 0;
+        };
+        const yc = getStat("yellowCards"), rc = getStat("redCards");
+        if (!(id in fp)) fp[id] = 0;
+        // fair play FIFA: -1 por amarelo, -4 por vermelho direto (aproximação padrão)
+        fp[id] += (yc * -1) + (rc * -4);
+      });
+    });
+    FAIRPLAY = fp; FAIRPLAY_TS = Date.now();
+    return fp;
+  }
+
   async function renderMata() {
     $("#lista").innerHTML = abasHTML() + '<p class="vazio">Montando o chaveamento…</p>';
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
@@ -332,9 +365,11 @@
     // 1) resultados dos grupos (as it stands)
     const grpEvents = await buscarGruposEvents();
     const placG = placaresGruposDaESPN(grpEvents);
+    // 1b) fair play (cartões) — critério oficial de desempate antes do ranking FIFA
+    const fp = await buscarFairPlay(grpEvents);
     // 2) roda o engine
     let d;
-    try { d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP); }
+    try { d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp); }
     catch (e) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Erro ao calcular o chaveamento.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
     MATA_CACHE = d;
     // 3) jogos reais do mata-mata na ESPN (placar/horário)

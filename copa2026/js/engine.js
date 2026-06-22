@@ -27,7 +27,8 @@
   // ---- 2. Classificação de um grupo (critérios FIFA) ----------------------
   // jogosGrupo: [{a,b,ga,gb}], times: [id...], seed: {id:seed}
   // Critérios: pontos > saldo > gols pró > confronto direto > seed (determinístico)
-  function classificarGrupo(jogosGrupo, times, seed) {
+  function classificarGrupo(jogosGrupo, times, seed, fairplay) {
+    const FP = fairplay || {};
     const T = {};
     times.forEach(id => { T[id] = { id, pts: 0, gf: 0, gc: 0, sg: 0 }; });
     jogosGrupo.forEach(j => {
@@ -42,15 +43,15 @@
 
     // Ordenação FIFA 2026 (Art. 13): pontos primeiro; entre empatados em PONTOS,
     // aplica HEAD-TO-HEAD (pts, saldo, gols entre os empatados) ANTES do saldo geral.
-    // Só depois: saldo geral, gols geral, fair-play (não temos), seed (ranking FIFA).
+    // Depois: saldo geral, gols geral, FAIR PLAY (cartões), ranking FIFA (seed).
     let ordenados = times.map(id => T[id]).sort((x, y) => y.pts - x.pts);
-    // resolve blocos empatados em PONTOS
-    ordenados = resolverEmpatesPorPontos(ordenados, jogosGrupo, seed);
+    ordenados = resolverEmpatesPorPontos(ordenados, jogosGrupo, seed, FP);
     return ordenados; // [1º,2º,3º,4º] objetos com stats
   }
 
   // resolve blocos de times com MESMOS PONTOS, seguindo a ordem oficial da FIFA
-  function resolverEmpatesPorPontos(lista, jogosGrupo, seed) {
+  function resolverEmpatesPorPontos(lista, jogosGrupo, seed, fairplay) {
+    const FP = fairplay || {};
     const res = [];
     let i = 0;
     while (i < lista.length) {
@@ -58,7 +59,7 @@
       while (j < lista.length && lista[j].pts === lista[i].pts) j++;
       let bloco = lista.slice(i, j);
       if (bloco.length > 1) {
-        bloco = ordenarBlocoEmpatado(bloco, jogosGrupo, seed);
+        bloco = ordenarBlocoEmpatado(bloco, jogosGrupo, seed, FP);
       }
       bloco.forEach(t => res.push(t));
       i = j;
@@ -67,7 +68,8 @@
   }
 
   // ordena um bloco de times empatados em pontos pela escada oficial da FIFA
-  function ordenarBlocoEmpatado(bloco, jogosGrupo, seed) {
+  function ordenarBlocoEmpatado(bloco, jogosGrupo, seed, fairplay) {
+    const FP = fairplay || {};
     // Passo 1: head-to-head (só jogos ENTRE os empatados): pts, saldo, gols
     const ids = bloco.map(t => t.id);
     const mini = miniTabela(ids, jogosGrupo);
@@ -76,8 +78,7 @@
       mini[y.id].sg - mini[x.id].sg ||
       mini[y.id].gf - mini[x.id].gf
     );
-    // se o head-to-head separou todos, pode haver sub-empates remanescentes:
-    // aplica recursivamente nos que continuam idênticos no h2h; senão cai pro geral
+    // sub-blocos ainda empatados no head-to-head
     const grupos = [];
     let k = 0;
     while (k < ordenado.length) {
@@ -89,14 +90,15 @@
       grupos.push(ordenado.slice(k, m));
       k = m;
     }
-    // para cada sub-bloco ainda empatado no head-to-head, desempata pelo GERAL
+    // para cada sub-bloco ainda empatado: saldo geral, gols geral, FAIR PLAY, ranking FIFA
     const final = [];
     grupos.forEach(sub => {
       if (sub.length > 1) {
         sub.sort((x, y) =>
-          y.sg - x.sg ||           // saldo geral
-          y.gf - x.gf ||           // gols feitos geral
-          (seed[x.id] || 999) - (seed[y.id] || 999)); // ranking FIFA (proxy)
+          y.sg - x.sg ||                                   // saldo geral
+          y.gf - x.gf ||                                   // gols feitos geral
+          (FP[y.id] || 0) - (FP[x.id] || 0) ||             // fair play: MAIOR (menos negativo) na frente
+          (seed[x.id] || 999) - (seed[y.id] || 999));      // ranking FIFA (proxy seed)
       }
       sub.forEach(t => final.push(t));
     });
@@ -147,13 +149,17 @@
 
   // ---- 3. Ranking dos 8 melhores terceiros --------------------------------
   // classificacao: {A:[1º,2º,3º,4º], ...} (objetos com stats e .grupo)
-  function melhoresTerceiros(classificacao, seed) {
+  function melhoresTerceiros(classificacao, seed, fairplay) {
+    const FP = fairplay || {};
     const terceiros = Object.keys(classificacao).map(g => {
       const t = classificacao[g][2];
       return Object.assign({}, t, { grupo: g });
     });
+    // critério oficial p/ rankear os 3ºs: pts, saldo, gols, FAIR PLAY, ranking FIFA
+    // (sem head-to-head: 3ºs de grupos diferentes nunca se enfrentaram)
     terceiros.sort((x, y) =>
       y.pts - x.pts || y.sg - x.sg || y.gf - x.gf ||
+      (FP[y.id] || 0) - (FP[x.id] || 0) ||
       (seed[x.id] || 999) - (seed[y.id] || 999));
     return terceiros.slice(0, 8); // 8 objetos com .grupo e .id
   }
@@ -257,8 +263,9 @@
 
   // ---- 6. Função orquestradora -------------------------------------------
   // Recebe os placares dos grupos e do mata-mata e devolve tudo "derivado".
-  function derivar(selecoes, placaresGrupos, placaresMata, estrutura, terceirosMap) {
+  function derivar(selecoes, placaresGrupos, placaresMata, estrutura, terceirosMap, fairplay) {
     const seed = {}; selecoes.forEach(s => { seed[s.id] = s.seed; });
+    const FP = fairplay || {}; // {sigla: pontos de conduta, negativo}. Opcional.
     const jogos = gerarJogosGrupos(selecoes);
 
     // injeta os gols informados nos jogos
@@ -274,11 +281,11 @@
     const classificacao = {};
     Object.keys(porGrupo).sort().forEach(g => {
       const times = [...new Set(porGrupo[g].map(j => [j.a, j.b]).flat())];
-      classificacao[g] = classificarGrupo(porGrupo[g], times, seed)
+      classificacao[g] = classificarGrupo(porGrupo[g], times, seed, FP)
         .map(t => Object.assign(t, { grupo: g }));
     });
 
-    const best8 = melhoresTerceiros(classificacao, seed);
+    const best8 = melhoresTerceiros(classificacao, seed, FP);
     const { r32, faltaMapa, chave } = montarR32(classificacao, best8, estrutura, terceirosMap);
     const fim = propagar(r32, estrutura.arvore, placaresMata || {});
 
