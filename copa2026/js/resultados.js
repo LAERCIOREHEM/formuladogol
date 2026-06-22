@@ -26,7 +26,7 @@
   let ABA = "jogos", SEL = [], GRP_EVENTS = [], GRP_EVENTS_TS = 0;
   let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0;
   let FAIRPLAY = {}, FAIRPLAY_TS = 0; // {sigla: pontos de conduta}, cache 5min
-  let FASE_MATA = "32-avos"; // fase selecionada na aba mata-mata
+  let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
 
@@ -367,7 +367,7 @@
   function pintarFaseMata() {
     const d = MATA_CACHE; if (!d) return;
     const FASES = [
-      { nome: "32-avos", jogos: d.r32.map(m => ({ a: m.a, b: m.b })) },
+      { nome: "16-avos", jogos: d.r32.map(m => ({ a: m.a, b: m.b })) },
       { nome: "Oitavas", jogos: ESTRUT.arvore.filter(m => m.fase === "oitavas").map(m => d.timeDe[m.id] || {}) },
       { nome: "Quartas", jogos: ESTRUT.arvore.filter(m => m.fase === "quartas").map(m => d.timeDe[m.id] || {}) },
       { nome: "Semis", jogos: ESTRUT.arvore.filter(m => m.fase === "semifinais").map(m => d.timeDe[m.id] || {}) },
