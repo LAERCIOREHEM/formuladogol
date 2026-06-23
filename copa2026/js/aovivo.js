@@ -197,8 +197,18 @@
   }
   function botaoCaze(aAb, bAb) {
     var L = liveDoJogo(aAb, bAb);
-    // se o robô achou a live exata do jogo, aponta direto pro vídeo certo
-    var href = (L && L.url) ? L.url : "https://www.youtube.com/@CazeTV/live";
+    var href;
+    if (L && L.url) {
+      // o robô achou a live exata do jogo: aponta direto pro vídeo certo
+      href = L.url;
+    } else {
+      // fallback: em vez do link genérico (que abre o jogo MAIS RECENTE e erra
+      // quando há jogos simultâneos), busca na Cazé pelos nomes dos dois times.
+      var na = dpNome(dpSigla(aAb) || aAb) || aAb;
+      var nb = dpNome(dpSigla(bAb) || bAb) || bAb;
+      var q = encodeURIComponent(na + " x " + nb + " ao vivo");
+      href = "https://www.youtube.com/@CazeTV/search?query=" + q;
+    }
     return `<a class="btn-caze" href="${href}" target="_blank" rel="noopener">▶️ Assistir ao vivo na CazéTV</a>`;
   }
 
