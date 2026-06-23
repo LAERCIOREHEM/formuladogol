@@ -44,14 +44,19 @@
 
   async function init() {
     try {
-      const [s, e, t, pm] = await Promise.all([
+      const [s, e, t, pm, fp] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
         fetch("dados/estrutura_mata_mata.json").then(r => r.json()),
         fetch("dados/terceiros_map.json").then(r => r.json()),
-        fetch("dados/palpites_mata.json").then(r => r.json()).catch(() => ({ apostadores: {} }))
+        fetch("dados/palpites_mata.json").then(r => r.json()).catch(() => ({ apostadores: {} })),
+        // Fair play OFICIAL, gerado pelo robô em dados/fairplay.json.
+        // Usado apenas para classificar os resultados reais/atuais da Copa.
+        // Não é aplicado nos palpites lacrados, porque o apostador não informou cartões.
+        fetch("dados/fairplay.json?t=" + Date.now()).then(r => r.json()).catch(() => ({ fairplay: {} }))
       ]);
       DADOS.selecoes = s.selecoes; DADOS.estrutura = e; DADOS.terceirosMap = t;
       DADOS.palpitesMata = (pm && pm.apostadores) || {};
+      DADOS.fairplay = (fp && fp.fairplay) || {};
       DADOS.nomeDe = {}; DADOS.isoDe = {};
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
     } catch (err) { $("#app").innerHTML = '<p class="vazio">Erro ao carregar os dados da Copa.</p>'; return; }
@@ -130,7 +135,12 @@
     const todosGrupos = GRUPOS.every(g => completos[g]);
 
     if (realG.length) {
-      let dg = null; try { dg = COPA_ENGINE.derivar(DADOS.selecoes, realG, {}, DADOS.estrutura, DADOS.terceirosMap); } catch (e) {}
+      let dg = null;
+      try {
+        // Resultado oficial: aqui SIM precisa considerar fair play antes do ranking FIFA.
+        // Mantém a aba Pontos alinhada com Resultados/chaveamento oficial.
+        dg = COPA_ENGINE.derivar(DADOS.selecoes, realG, {}, DADOS.estrutura, DADOS.terceirosMap, DADOS.fairplay || {});
+      } catch (e) {}
       if (dg) {
         o.classificacao = {};
         GRUPOS.forEach(g => { if (completos[g]) o.classificacao[g] = dg.classificacao[g]; });
