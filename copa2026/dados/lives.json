@@ -2,9 +2,9 @@
   "_comentario": "Lives da CazéTV por jogo. Chave = siglas dos dois times em ordem alfabética (ex.: ESP-KSA). Valor = {url, titulo, estado, fonte}. 'estado':'upcoming' = live agendada; 'estado':'live' = no ar agora. 'fonte':'auto' = preenchido pelo robô; 'fonte':'admin' = correção manual (o robô NÃO sobrescreve). Gerado por buscar_melhores_momentos.py via GitHub Actions.",
   "jogos": {
     "ALG-JOR": {
-      "url": "https://www.youtube.com/watch?v=dFPUO7Vdh6Q",
-      "titulo": "AO VIVO: JORDÂNIA X ARGÉLIA",
-      "estado": "live",
+      "url": "https://www.youtube.com/watch?v=c13RLST2hg0",
+      "titulo": "JOGO COMPLETO: JORDÂNIA X ARGÉLIA",
+      "estado": "none",
       "fonte": "auto"
     },
     "FRA-IRQ": {
@@ -28,6 +28,12 @@
     "ESP-KSA": {
       "url": "https://www.youtube.com/watch?v=lMtrJbAfEaY",
       "titulo": "JOGO COMPLETO: ESPANHA X ARÁBIA SAUDITA",
+      "estado": "none",
+      "fonte": "auto"
+    },
+    "ARG-AUT": {
+      "url": "https://www.youtube.com/watch?v=dFPUO7Vdh6Q",
+      "titulo": "JOGO COMPLETO: ARGENTINA X ÁUSTRIA",
       "estado": "none",
       "fonte": "auto"
     }
