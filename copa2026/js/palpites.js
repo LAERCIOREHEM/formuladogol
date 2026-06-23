@@ -34,14 +34,16 @@
   }
 
   async function init() {
-    let s, e, t, rows;
+    let s, e, t, pm, rows;
     try {
-      [s, e, t] = await Promise.all([
+      [s, e, t, pm] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
         fetch("dados/estrutura_mata_mata.json").then(r => r.json()),
-        fetch("dados/terceiros_map.json").then(r => r.json())
+        fetch("dados/terceiros_map.json").then(r => r.json()),
+        fetch("dados/palpites_mata.json").then(r => r.json()).catch(() => ({ apostadores: {} }))
       ]);
       DADOS.selecoes = s.selecoes; DADOS.estrutura = e; DADOS.terceirosMap = t;
+      DADOS.palpitesMata = (pm && pm.apostadores) || {};
       DADOS.nomeDe = {}; DADOS.isoDe = {};
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
     } catch (err) { bloqueio("Erro ao carregar os dados da Copa. Tente recarregar a página."); return; }
@@ -76,6 +78,26 @@
       const g = Object.keys(pl.placaresGrupos || {}).map(id => ({ jogo_id: id, ga: pl.placaresGrupos[id].ga, gb: pl.placaresGrupos[id].gb }));
       let d = null;
       try { d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap); } catch (e2) {}
+      // PALPITE DE MATA-MATA: usa as listas FIÉIS do relatório de auditoria (12/jun),
+      // que registram QUAIS SELEÇÕES cada um cravou que avançam em cada fase.
+      // A propagação por POSIÇÃO do chaveamento (M73, 2H...) mudava de seleção quando
+      // o critério de desempate FIFA foi corrigido — por isso as fases eliminatórias
+      // exibiam a seleção errada (ex.: "2º do grupo H" virou Arábia em vez de Espanha).
+      // As listas auditadas (com hash) são imutáveis e refletem o que cada um apostou.
+      if (d) {
+        const pmt = DADOS.palpitesMata[r.nome];
+        if (pmt) {
+          d.classificados32 = pmt.classificados32 || d.classificados32;
+          d.avancam_oitavas = pmt.avancam_oitavas || d.avancam_oitavas;
+          d.avancam_quartas = pmt.avancam_quartas || d.avancam_quartas;
+          d.semifinalistas  = pmt.semifinalistas  || d.semifinalistas;
+          d.finalistas      = pmt.finalistas      || d.finalistas;
+          d.campeao  = pmt.campeao  || d.campeao;
+          d.vice     = pmt.vice     || d.vice;
+          d.terceiro = pmt.terceiro || d.terceiro;
+          d.quarto   = pmt.quarto   || d.quarto;
+        }
+      }
       return { nome: r.nome, grupos: pl.placaresGrupos || {}, d, raw: pl };
     }).sort((a, b) => a.nome.localeCompare(b.nome));
 
@@ -132,6 +154,13 @@
 
   // ---------- aba: por classificação ----------
   function cel(id) { return `<div class="cel">${flag(id)}<span class="sg">${id || "—"}</span></div>`; }
+  // bloco de uma fase do mata-mata: lista as SELEÇÕES que o apostador cravou que avançam
+  // (e não as posições/cruzamentos do chaveamento, que mudam com o desempate FIFA)
+  function faseBloco(rotulo, lista, campeao) {
+    if (!lista || !lista.length) return "";
+    const chips = lista.map(s => `<div class="t ${s === campeao ? "campeao" : ""}">${flag(s)}<span class="sg">${s}</span></div>`).join("");
+    return `<div class="fase-tit">${rotulo} <span class="fase-n">(${lista.length})</span></div><div class="grid32">${chips}</div>`;
+  }
   function viewClass() {
     return PART.map((p, idx) => {
       const d = p.d || {};
@@ -140,6 +169,14 @@
       const grid = trinta2.length
         ? trinta2.map(s => `<div class="t ${s === c ? "campeao" : ""}">${flag(s)}<span class="sg">${s}</span></div>`).join("")
         : `<p class="incompleto">Palpite incompleto — sem chave completa.</p>`;
+      // fases eliminatórias: mostra as SELEÇÕES que avançam (fiel ao palpite auditado),
+      // nunca os indicadores de posição (1L, 3G, 2B...).
+      const fases = trinta2.length ? (
+        faseBloco("Avançam às Oitavas", d.avancam_oitavas, c) +
+        faseBloco("Avançam às Quartas", d.avancam_quartas, c) +
+        faseBloco("Semifinalistas", d.semifinalistas, c) +
+        faseBloco("Finalistas", d.finalistas, c)
+      ) : "";
       return `<div class="pessoa" id="p_${idx}">
         <div class="linha" data-tp="p_${idx}">
           <span class="nm"><span class="seta">▶</span>${p.nome}</span>
@@ -148,6 +185,7 @@
           <div class="q">4º lugar: <b>${nome(q)}</b> · Campeão: <b>${nome(c)}</b></div>
           <div class="tit">As 32 classificadas no palpite de ${p.nome}</div>
           <div class="grid32">${grid}</div>
+          ${fases}
           <div class="hashlinha">🔐 Impressão digital deste palpite (confira com seu comprovante):<br><code id="hash_${idx}">calculando…</code></div></div></div>`;
     }).join("");
   }

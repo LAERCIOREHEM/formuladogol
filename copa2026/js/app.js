@@ -51,12 +51,14 @@
 
   async function init() {
     try {
-      const [s, e, t] = await Promise.all([
+      const [s, e, t, pm] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
         fetch("dados/estrutura_mata_mata.json").then(r => r.json()),
-        fetch("dados/terceiros_map.json").then(r => r.json())
+        fetch("dados/terceiros_map.json").then(r => r.json()),
+        fetch("dados/palpites_mata.json").then(r => r.json()).catch(() => ({ apostadores: {} }))
       ]);
       DADOS.selecoes = s.selecoes; DADOS.estrutura = e; DADOS.terceirosMap = t;
+      DADOS.palpitesMata = (pm && pm.apostadores) || {};
       DADOS.nomeDe = {}; DADOS.isoDe = {};
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
     } catch (err) {
@@ -134,6 +136,18 @@
     }
   }
 
+  // Palpite CANÔNICO de mata-mata do usuário logado (lista auditada, fiel ao que ele cravou
+  // que avança em cada fase). Independe da posição no chaveamento — por isso NÃO muda quando
+  // o critério de desempate da FIFA reordena os grupos. Busca por nome (sem diferenciar maiúsc.).
+  function meuCanonico() {
+    const pm = DADOS.palpitesMata || {};
+    if (!USER || !USER.nome) return null;
+    if (pm[USER.nome]) return pm[USER.nome];
+    const alvo = USER.nome.trim().toLowerCase();
+    const k = Object.keys(pm).find(n => n.trim().toLowerCase() === alvo);
+    return k ? pm[k] : null;
+  }
+
   // ---------- Comprovante com impressão digital (hash) ----------
   function canonical(o) {
     if (o === null || typeof o !== "object") return JSON.stringify(o);
@@ -182,14 +196,26 @@
       const arr = Object.keys(P.placaresGrupos).map(id => ({ jogo_id: id, ga: P.placaresGrupos[id].ga, gb: P.placaresGrupos[id].gb }));
       d = COPA_ENGINE.derivar(DADOS.selecoes, arr, P.placaresMata, DADOS.estrutura, DADOS.terceirosMap);
     } catch (e) {}
-    if (d && d.campeao) {
-      txt += "\n----- MATA-MATA (decorrente dos seus placares) -----\n";
-      txt += `Classificados (32): ${(d.classificados32 || []).join(", ")}\n`;
-      txt += `Oitavas (16): ${(d.avancam_oitavas || []).join(", ")}\n`;
-      txt += `Quartas (8): ${(d.avancam_quartas || []).join(", ")}\n`;
-      txt += `Semifinal (4): ${(d.semifinalistas || []).join(", ")}\n`;
-      txt += `Final (2): ${(d.finalistas || []).join(", ")}\n`;
-      txt += `CAMPEÃO: ${d.campeao} | Vice: ${d.vice} | 3º: ${d.terceiro} | 4º: ${d.quarto}\n`;
+    // Para as SELEÇÕES que avançam em cada fase, prioriza a lista CANÔNICA auditada
+    // (fiel ao que o participante cravou). Ela não depende da posição no chaveamento,
+    // por isso não é afetada pela correção do critério de desempate da FIFA.
+    const can = meuCanonico();
+    const mm = can ? {
+      classificados32: can.classificados32, avancam_oitavas: can.avancam_oitavas,
+      avancam_quartas: can.avancam_quartas, semifinalistas: can.semifinalistas,
+      finalistas: can.finalistas, campeao: can.campeao, vice: can.vice,
+      terceiro: can.terceiro, quarto: can.quarto
+    } : d;
+    if (mm && mm.campeao) {
+      txt += "\n----- MATA-MATA (seleções que avançam) -----\n";
+      txt += `Classificados (32): ${(mm.classificados32 || []).join(", ")}\n`;
+      txt += `Oitavas (16): ${(mm.avancam_oitavas || []).join(", ")}\n`;
+      txt += `Quartas (8): ${(mm.avancam_quartas || []).join(", ")}\n`;
+      txt += `Semifinal (4): ${(mm.semifinalistas || []).join(", ")}\n`;
+      txt += `Final (2): ${(mm.finalistas || []).join(", ")}\n`;
+      txt += `CAMPEÃO: ${mm.campeao} | Vice: ${mm.vice} | 3º: ${mm.terceiro} | 4º: ${mm.quarto}\n`;
+      txt += "(No mata-mata o que vale é QUEM avança, não o placar. As seleções acima são\n";
+      txt += " as que você cravou — registradas e auditadas com a impressão digital abaixo.)\n";
     } else {
       txt += "\n(Palpite ainda incompleto — chave do mata-mata não fechada.)\n";
     }
@@ -446,11 +472,41 @@
     $("#progresso-texto").textContent = tot + " de 104 jogos preenchidos";
   }
 
+  // Painel READ-ONLY com as SELEÇÕES que avançam nesta fase, conforme o palpite canônico
+  // auditado. Só aparece depois da trava (palpite lacrado), pra não atrapalhar a digitação.
+  // É a fonte fiel de "quem passa" — independente das posições do chaveamento.
+  function painelCanonicoFase(fase) {
+    const can = meuCanonico();
+    if (!can) return null;
+    const travado = FINALIZADO || Date.now() > TRAVA_MS;
+    if (!travado) return null;
+    const mapa = {
+      r32: ["Seleções nos 16-avos (32)", can.classificados32],
+      oitavas: ["Avançam às Oitavas (16)", can.avancam_oitavas],
+      quartas: ["Avançam às Quartas (8)", can.avancam_quartas],
+      semifinais: ["Semifinalistas (4)", can.semifinalistas],
+      final: ["Finalistas (2)", can.finalistas]
+    };
+    const cfg = mapa[fase];
+    if (!cfg || !cfg[1] || !cfg[1].length) return null;
+    const [rot, lista] = cfg;
+    const chips = lista.map(id =>
+      `<span class="cn-chip">${bandeira(id)}${id}</span>`
+    ).join("");
+    const box = el("div", "canon-fase");
+    box.innerHTML = `<div class="cn-tit">✅ Seu palpite (seleções que avançam) — ${rot}</div>
+      <div class="cn-chips">${chips}</div>
+      <div class="cn-nota">No mata-mata vale <b>quem você cravou que avança</b>, não o placar nem a posição no chaveamento. Esta é a sua aposta auditada (confira no 📄 Comprovante).</div>`;
+    return box;
+  }
+
   // ---------- mata-mata ----------
   function renderFaseMata(fase) {
     const c = $("#conteudo-fase"); c.innerHTML = ""; recomputar();
     if (fase === "r32" && derivado.faltaMapa) c.appendChild(avisoAnexoC(derivado.chave));
     c.appendChild(el("div", "titulo-fase", FASES.find(f => f.id === fase).nome));
+    const painelCan = painelCanonicoFase(fase);
+    if (painelCan) c.appendChild(painelCan);
 
     let jogos;
     if (fase === "final") {
@@ -573,8 +629,15 @@
     recomputar();
     const box = el("div", "revisao");
     box.innerHTML = "<h4 style='margin-bottom:10px;color:var(--cinza);font-size:13px;letter-spacing:1px;text-transform:uppercase'>Revisão do palpite</h4>";
-    [["Campeão", derivado.campeao], ["Vice", derivado.vice], ["3º lugar", derivado.terceiro], ["4º lugar", derivado.quarto]].forEach(([l, id]) => {
-      box.appendChild(el("div", "linha", `<span>${l}</span><b>${id ? bandeira(id) + " " + DADOS.nomeDe[id] : "—"}</b>`));
+    // Campeão/Vice/3º/4º: usa a lista CANÔNICA auditada quando disponível (fiel ao que foi
+    // cravado), em vez da propagação por posição do chaveamento — que mudava de seleção com
+    // a correção do desempate da FIFA (ex.: vice aparecia como Arábia em vez de Espanha).
+    const can = meuCanonico();
+    const pod = can
+      ? { campeao: can.campeao, vice: can.vice, terceiro: can.terceiro, quarto: can.quarto }
+      : { campeao: derivado.campeao, vice: derivado.vice, terceiro: derivado.terceiro, quarto: derivado.quarto };
+    [["Campeão", pod.campeao], ["Vice", pod.vice], ["3º lugar", pod.terceiro], ["4º lugar", pod.quarto]].forEach(([l, id]) => {
+      box.appendChild(el("div", "linha", `<span>${l}</span><b>${id ? bandeira(id) + " " + (DADOS.nomeDe[id] || id) : "—"}</b>`));
     });
     const teto = COPA_PONTUACAO.teto(derivado);
     const pb = el("div", "pontos-box");

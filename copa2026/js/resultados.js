@@ -24,7 +24,7 @@
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
   let ABA = "jogos", SEL = [], GRP_EVENTS = [], GRP_EVENTS_TS = 0;
-  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0;
+  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0, PALPMATA = {};
   let FAIRPLAY = {}, FAIRPLAY_TS = 0; // {sigla: pontos de conduta}, cache 5min
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
@@ -148,6 +148,21 @@
       const rows = await rpc("copa_revelados", {});
       PALP = (rows || []).map(r => ({ nome: r.nome, pg: (r.payload || {}).placaresGrupos || {} }));
     } catch (e) { PALP = []; } // antes da trava vem vazio — normal
+    // Palpites do mata-mata auditados (com hash) — fonte imutável de quem cada um
+    // colocou avançando em cada fase. Usado para corrigir a exibição quando o
+    // desempate FIFA muda quem ocupa cada posição do chaveamento. NÃO altera o banco.
+    try {
+      const pm = await fetch("dados/palpites_mata.json?t=" + Date.now()).then(r => r.json());
+      PALPMATA = (pm && pm.apostadores) || {};
+    } catch (e) { PALPMATA = {}; }
+  }
+  // busca case-insensitive das listas canônicas do mata-mata por nome do apostador
+  function canonicoDe(nome) {
+    if (!nome || !PALPMATA) return null;
+    if (PALPMATA[nome]) return PALPMATA[nome];
+    const alvo = String(nome).trim().toUpperCase();
+    for (const k in PALPMATA) { if (k.toUpperCase() === alvo) return PALPMATA[k]; }
+    return null;
   }
 
   async function carregar() {
@@ -292,6 +307,17 @@
       let pd;
       try { pd = COPA_ENGINE.derivar(SEL, pgToArr(p.pg), {}, ESTRUT, TERMAP); }
       catch (e) { pd = null; }
+      // Sobrescreve as fases do mata-mata com as listas auditadas (imutáveis): como
+      // o palpite é derivado sem placares de mata-mata ({}), as fases de avanço
+      // viriam vazias. As listas com hash refletem quem cada um cravou avançando.
+      const pmt = pd && canonicoDe(p.nome);
+      if (pmt) {
+        pd.classificados32 = pmt.classificados32 || pd.classificados32;
+        pd.avancam_oitavas = pmt.avancam_oitavas || pd.avancam_oitavas;
+        pd.avancam_quartas = pmt.avancam_quartas || pd.avancam_quartas;
+        pd.semifinalistas = pmt.semifinalistas || pd.semifinalistas;
+        pd.finalistas = pmt.finalistas || pd.finalistas;
+      }
       const acertosPorFase = fases.map(f => {
         if (!pd) return 0;
         const setReal = new Set(f.real);
