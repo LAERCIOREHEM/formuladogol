@@ -202,12 +202,11 @@
       // o robô achou a live exata do jogo: aponta direto pro vídeo certo
       href = L.url;
     } else {
-      // fallback: em vez do link genérico (que abre o jogo MAIS RECENTE e erra
-      // quando há jogos simultâneos), busca na Cazé pelos nomes dos dois times.
-      var na = dpNome(dpSigla(aAb) || aAb) || aAb;
-      var nb = dpNome(dpSigla(bAb) || bAb) || bAb;
-      var q = encodeURIComponent(na + " x " + nb + " ao vivo");
-      href = "https://www.youtube.com/@CazeTV/search?query=" + q;
+      // Último fallback: não gera mais @CazeTV/search, porque isso abre só a
+      // página de pesquisa do canal e parece erro. A live exata deve vir do
+      // dados/lives.json, gerado pelo robô. Se ainda não veio, abre o /live
+      // oficial como plano B provisório até o próximo cron preencher o jogo.
+      href = "https://www.youtube.com/@CazeTV/live";
     }
     return `<a class="btn-caze" href="${href}" target="_blank" rel="noopener">▶️ Assistir ao vivo na CazéTV</a>`;
   }

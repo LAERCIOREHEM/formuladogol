@@ -15,6 +15,8 @@ REGRAS:
 Uso local (teste):  YOUTUBE_API_KEY=xxxx CAZE_PLAYLIST_ID=PLxxx python3 buscar_melhores_momentos.py
 """
 import os, re, json, sys, unicodedata, urllib.request, urllib.parse
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 SELECOES = os.path.join(DIR, "dados", "selecoes.json")
@@ -92,6 +94,14 @@ def id_do_time(trecho):
             return APELIDOS[ape]
     return None
 
+def id_do_time_parse(trecho):
+    """Parser usado nos títulos. Quando o alias flexível já existe, aceita
+    também nomes em inglês vindos do YouTube/ESPN; antes disso, usa o parser base."""
+    flex = globals().get("id_do_time_flex")
+    if flex:
+        return flex(trecho)
+    return id_do_time(trecho)
+
 def parse_titulo(titulo):
     """
     De 'MELHORES MOMENTOS: ESTADOS UNIDOS 4 X 1 PARAGUAI | COPA ...'
@@ -104,8 +114,8 @@ def parse_titulo(titulo):
     m = re.search(r"(.+?)\s+\d+\s*[xX]\s*\d+\s+([^|]+)", t)
     if not m:
         return None, None
-    a = id_do_time(m.group(1))
-    b = id_do_time(m.group(2))
+    a = id_do_time_parse(m.group(1))
+    b = id_do_time_parse(m.group(2))
     return a, b
 
 
@@ -148,8 +158,8 @@ def parse_confronto_generico(titulo):
     m = re.search(r"(.+?)\s+(?:\d+\s*)?[xX]\s*(?:\d+\s*)?(.+)", t)
     if not m:
         return None, None
-    a = id_do_time(m.group(1))
-    b = id_do_time(m.group(2))
+    a = id_do_time_parse(m.group(1))
+    b = id_do_time_parse(m.group(2))
     if a and b and a != b:
         return a, b
     return None, None
@@ -163,6 +173,229 @@ CAZE_CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"  # canal oficial da CazéTV
 # A "uploads playlist" de um canal lista TODOS os vídeos em ordem cronológica.
 # Para qualquer canal UC..., a playlist de uploads é UU... (troca UC por UU).
 CAZE_UPLOADS_ID = "UU" + CAZE_CHANNEL_ID[2:]
+
+SCOREBOARD_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard"
+
+# Alguns nomes vêm em inglês no feed da ESPN; estes aliases ajudam a converter
+# para as mesmas siglas usadas no site.
+APELIDOS_EN = {
+    "MEXICO": "MEX",
+    "SOUTH AFRICA": "RSA",
+    "SOUTH KOREA": "KOR", "KOREA REPUBLIC": "KOR",
+    "CZECHIA": "CZE", "CZECH REPUBLIC": "CZE",
+    "CANADA": "CAN",
+    "BOSNIA AND HERZEGOVINA": "BIH", "BOSNIA": "BIH",
+    "QATAR": "QAT",
+    "SWITZERLAND": "SUI",
+    "BRAZIL": "BRA",
+    "MOROCCO": "MAR",
+    "HAITI": "HAI",
+    "SCOTLAND": "SCO",
+    "UNITED STATES": "USA", "USA": "USA",
+    "PARAGUAY": "PAR",
+    "AUSTRALIA": "AUS",
+    "TURKEY": "TUR", "TURKIYE": "TUR",
+    "GERMANY": "GER",
+    "CURACAO": "CUW",
+    "IVORY COAST": "CIV", "COTE D IVOIRE": "CIV",
+    "ECUADOR": "ECU",
+    "NETHERLANDS": "NED",
+    "JAPAN": "JPN",
+    "SWEDEN": "SWE",
+    "TUNISIA": "TUN",
+    "BELGIUM": "BEL",
+    "EGYPT": "EGY",
+    "IRAN": "IRN", "IR IRAN": "IRN",
+    "NEW ZEALAND": "NZL",
+    "SPAIN": "ESP",
+    "CAPE VERDE": "CPV",
+    "SAUDI ARABIA": "KSA",
+    "URUGUAY": "URU",
+    "FRANCE": "FRA",
+    "SENEGAL": "SEN",
+    "IRAQ": "IRQ",
+    "NORWAY": "NOR",
+    "ARGENTINA": "ARG",
+    "ALGERIA": "ALG",
+    "AUSTRIA": "AUT",
+    "JORDAN": "JOR",
+    "PORTUGAL": "POR",
+    "DR CONGO": "COD", "CONGO DR": "COD", "CONGO": "COD",
+    "UZBEKISTAN": "UZB",
+    "COLOMBIA": "COL",
+    "ENGLAND": "ENG",
+    "CROATIA": "CRO",
+    "GHANA": "GHA",
+    "PANAMA": "PAN",
+}
+
+
+def agora_sp():
+    try:
+        return datetime.now(ZoneInfo("America/Sao_Paulo"))
+    except Exception:
+        return datetime.now(timezone(timedelta(hours=-3)))
+
+
+def ymd_sp(offset_dias=0):
+    return (agora_sp() + timedelta(days=offset_dias)).strftime("%Y%m%d")
+
+
+def id_do_time_flex(trecho):
+    """Versão mais ampla de id_do_time: aceita português, inglês e siglas."""
+    if not trecho:
+        return None
+    t = norm(trecho)
+    ids = set(APELIDOS.values())
+    if t in ids:
+        return t
+    a = id_do_time(trecho)
+    if a:
+        return a
+    for ape in sorted(APELIDOS_EN, key=len, reverse=True):
+        if re.search(r"(^| )" + re.escape(ape) + r"($| )", t):
+            return APELIDOS_EN[ape]
+    return None
+
+
+def nome_por_id():
+    """Nome PT-BR oficial do nosso arquivo, usado para montar busca exata no YouTube."""
+    try:
+        data = json.load(open(SELECOES, encoding="utf-8"))
+        return {x["id"]: x.get("nome") or x["id"] for x in data.get("selecoes", [])}
+    except Exception:
+        return {v: k.title() for k, v in APELIDOS.items()}
+
+
+def id_time_espn(comp):
+    team = (comp or {}).get("team", {}) or {}
+    for campo in ("abbreviation", "displayName", "shortDisplayName", "name", "location"):
+        achou = id_do_time_flex(team.get(campo))
+        if achou:
+            return achou
+    return None
+
+
+def jogos_espn_para_buscar_live():
+    """Retorna confrontos do feed ESPN que estão ao vivo ou perto de começar.
+    Isso evita fazer 1.128 buscas no YouTube: só consultamos a Cazé para jogos
+    relevantes naquele momento."""
+    url = f"{SCOREBOARD_API}?dates={ymd_sp(-1)}-{ymd_sp(4)}&limit=80"
+    try:
+        data = yt_get(url)
+    except Exception as e:
+        print("  ESPN scoreboard falhou para lives exatas:", e)
+        return []
+
+    now = datetime.now(timezone.utc)
+    out, vistos = [], set()
+    for ev in data.get("events", []) or []:
+        comps = (ev.get("competitions") or [])
+        if not comps:
+            continue
+        comp = comps[0]
+        st = ((comp.get("status") or {}).get("type") or {}).get("state")
+        dt_txt = ev.get("date") or ""
+        try:
+            dt = datetime.fromisoformat(dt_txt.replace("Z", "+00:00"))
+            diff_min = (dt - now).total_seconds() / 60
+        except Exception:
+            diff_min = 999999
+
+        # Busca live para: jogo no ar, pré-jogo perto do início, ou partida que acabou há pouco.
+        if not (st == "in" or (st == "pre" and -15 <= diff_min <= 180) or (st == "post" and -240 <= diff_min <= 30)):
+            continue
+
+        cs = comp.get("competitors") or []
+        if len(cs) < 2:
+            continue
+        a = id_time_espn(cs[0])
+        b = id_time_espn(cs[1])
+        if not a or not b or a == b:
+            continue
+        chave = "-".join(sorted([a, b]))
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        out.append({"a": a, "b": b, "chave": chave, "estado_espn": st, "data": dt_txt})
+    return out
+
+
+def yt_search_caze(api_key, query, max_results=8):
+    """Busca textual restrita ao canal oficial da CazéTV e retorna vídeos."""
+    base = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        "part": "snippet",
+        "channelId": CAZE_CHANNEL_ID,
+        "type": "video",
+        "order": "date",
+        "maxResults": str(max_results),
+        "q": query,
+        "key": api_key,
+    }
+    try:
+        data = yt_get(base + "?" + urllib.parse.urlencode(params))
+    except Exception as e:
+        print(f"  busca Cazé falhou ({query}):", e)
+        return []
+    out = []
+    for it in data.get("items", []) or []:
+        vid = ((it.get("id") or {}).get("videoId") or "").strip()
+        sn = it.get("snippet", {}) or {}
+        tit = sn.get("title", "")
+        if not vid or not tit:
+            continue
+        out.append({
+            "videoId": vid,
+            "titulo": tit,
+            "estado": sn.get("liveBroadcastContent", "none") or "none",
+        })
+    return out
+
+
+def parse_jogo_live_ou_generico(titulo):
+    a, b = parse_jogo_live(titulo)
+    if a and b:
+        return a, b
+    return parse_confronto_generico(titulo)
+
+
+def buscar_lives_exatas_por_espn(api_key):
+    """Fallback novo para AO VIVO: pega o jogo atual/próximo na ESPN e faz
+    uma busca restrita ao canal da CazéTV. Assim o site grava o watch?v=... do
+    confronto específico, em vez de mandar o usuário para @CazeTV/search."""
+    nomes = nome_por_id()
+    jogos = jogos_espn_para_buscar_live()
+    if not jogos:
+        return []
+
+    achados, vistos_video = [], set()
+    for j in jogos:
+        na, nb = nomes.get(j["a"], j["a"]), nomes.get(j["b"], j["b"])
+        consultas = [
+            f"{na} x {nb} ao vivo",
+            f"{nb} x {na} ao vivo",
+            f"{j['a']} x {j['b']} ao vivo",
+        ]
+        for q in consultas:
+            for v in yt_search_caze(api_key, q):
+                if v["videoId"] in vistos_video:
+                    continue
+                a, b = parse_jogo_live_ou_generico(v["titulo"])
+                if set([a, b]) != set([j["a"], j["b"]]):
+                    continue
+                vistos_video.add(v["videoId"])
+                achados.append({
+                    "a": j["a"],
+                    "b": j["b"],
+                    "videoId": v["videoId"],
+                    "titulo": v["titulo"],
+                    "estado": v.get("estado", "none"),
+                    "origem": "search-exata-caze",
+                })
+                print(f"  + (live exata Cazé) {j['chave']}: {v['titulo'][:70]}")
+    return achados
+
 
 def buscar_uploads_recentes(api_key, paginas=4):
     """Lê os uploads MAIS RECENTES do canal da Cazé direto da playlist de uploads.
@@ -232,7 +465,7 @@ def parse_jogo_live(titulo):
     m = re.search(r"(.+?)\s+[xX]\s+(.+)", antes_barra)
     if not m:
         return None, None
-    return id_do_time(m.group(1)), id_do_time(m.group(2))
+    return id_do_time_parse(m.group(1)), id_do_time_parse(m.group(2))
 
 
 def estado_dos_videos(api_key, video_ids):
@@ -276,22 +509,29 @@ def atualizar_lives(api_key):
         if a and b:
             candidatos.append({"a": a, "b": b, "videoId": v["videoId"], "titulo": v["titulo"]})
 
-    # 3) descobre quais estão AO VIVO agora (liveBroadcastContent)
+    # 3) Fallback novo: se os uploads ainda não têm a live/sala agendada,
+    # busca o confronto exato no canal oficial da CazéTV com base no jogo
+    # atual/próximo do feed ESPN. Isso corrige o botão da aba AO VIVO para
+    # apontar direto no watch?v=... daquele jogo.
+    candidatos.extend(buscar_lives_exatas_por_espn(api_key))
+
+    # 4) descobre quais estão AO VIVO agora (liveBroadcastContent).
+    # A busca textual já traz esse campo, mas videos.list confirma/atualiza.
     estados = estado_dos_videos(api_key, [c["videoId"] for c in candidatos])
     prioridade = {"live": 3, "upcoming": 2, "none": 1}
 
-    # 4) para cada jogo, escolhe o melhor vídeo (live > upcoming > jogo completo).
+    # 5) para cada jogo, escolhe o melhor vídeo (live > upcoming > jogo completo).
     #    Se houver mais de um vídeo do mesmo confronto, fica com o de maior prioridade
     #    e, em empate, o mais recente (uploads já vêm do mais novo pro mais antigo).
     melhor = {}  # chave -> {videoId, estado, titulo, prio}
     for c in candidatos:
         chave = "-".join(sorted([c["a"], c["b"]]))
-        est = estados.get(c["videoId"], "none")
+        est = estados.get(c["videoId"], c.get("estado", "none"))
         prio = prioridade.get(est, 1)
         if chave not in melhor or prio > melhor[chave]["prio"]:
             melhor[chave] = {"videoId": c["videoId"], "estado": est, "titulo": c["titulo"], "prio": prio}
 
-    # 5) grava (respeitando correções manuais 'admin')
+    # 6) grava (respeitando correções manuais 'admin')
     n_live = n_outros = 0
     for chave, m in melhor.items():
         if jogos.get(chave, {}).get("fonte") == "admin":
