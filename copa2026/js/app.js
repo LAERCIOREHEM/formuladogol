@@ -508,6 +508,11 @@
     const painelCan = painelCanonicoFase(fase);
     if (painelCan) c.appendChild(painelCan);
 
+    // Palpite LACRADO + lista canônica auditada disponível: o mata-mata é exibido
+    // SOMENTE como as seleções que avançam (igual ao Bolão), nunca os confrontos
+    // propagados por posição — que mostravam a seleção errada (ex.: França × Arábia
+    // em vez de França × Espanha) por causa do desempate da FIFA.
+    const travadoRO = (FINALIZADO || Date.now() > TRAVA_MS) && !!meuCanonico();
     let jogos;
     if (fase === "final") {
       jogos = [{ id: "M104", rot: "🏆 Disputa do Título" }, { id: "M103", rot: "Disputa do 3º Lugar" }]
@@ -516,14 +521,16 @@
       jogos = jogosDaFase(fase);
     }
 
-    const alertasEl = el("div"); alertasEl.id = "fase-alertas"; c.appendChild(alertasEl);
-
-    const lista = el("div", "lista-jogos");
-    jogos.forEach(m => {
-      if (m.rot) lista.appendChild(el("div", "rotulo-jogo", m.rot));
-      lista.appendChild(cardJogoMata(m));
-    });
-    c.appendChild(lista);
+    const alertasEl = el("div"); alertasEl.id = "fase-alertas";
+    if (!travadoRO) {
+      c.appendChild(alertasEl);
+      const lista = el("div", "lista-jogos");
+      jogos.forEach(m => {
+        if (m.rot) lista.appendChild(el("div", "rotulo-jogo", m.rot));
+        lista.appendChild(cardJogoMata(m));
+      });
+      c.appendChild(lista);
+    }
     if (fase === "final") c.appendChild(blocoRevisao());
     const acoes = el("div", "acoes");
     const idx = FASES.findIndex(f => f.id === fase);
@@ -533,6 +540,14 @@
 
     // alerta + botão de avançar atualizam AO VIVO a cada dígito (sem re-render, preserva o foco)
     atualizarFeedbackFase = function () {
+      if (travadoRO) {
+        if (pbtn) {
+          pbtn.textContent = FASES[idx + 1].nome + " →";
+          pbtn.classList.remove("desabilitado"); pbtn.disabled = false;
+          pbtn.onclick = () => { faseAtual = FASES[idx + 1].id; renderPalpite(); };
+        }
+        return;
+      }
       let emp = 0, agu = 0, res = 0;
       jogos.forEach(m => {
         const p = P.placaresMata[m.id] || {};
