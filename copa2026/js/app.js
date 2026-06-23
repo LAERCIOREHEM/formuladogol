@@ -493,9 +493,10 @@
     const cfg = mapa[fase];
     if (!cfg || !cfg[1] || !cfg[1].length) return null;
     const [rot, lista] = cfg;
-    const chips = lista.map(id =>
-      `<span class="cn-chip">${bandeira(id)}${id}</span>`
-    ).join("");
+    const chips = lista.map(id => {
+      const nome = (DADOS.nomeDe && DADOS.nomeDe[id]) ? DADOS.nomeDe[id] : id;
+      return `<span class="cn-chip">${bandeira(id)}<span>${nome}</span></span>`;
+    }).join("");
     const box = el("div", "canon-fase");
     box.innerHTML = `<div class="cn-tit">✅ Seu palpite (seleções que avançam) — ${rot}</div>
       <div class="cn-chips">${chips}</div>

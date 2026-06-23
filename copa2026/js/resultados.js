@@ -1,7 +1,7 @@
 /* =========================================================================
    resultados.js — Resultados das partidas (Copa 2026), direto da ESPN
    Navegador puxa o feed público da ESPN (sem chave, CORS liberado).
-   Navegação por dia + atualização automática a cada 60s para os jogos ao vivo.
+   Navegação por dia + atualização automática a cada 30s para os jogos ao vivo.
    NOVO: na FASE DE GRUPOS, cada jogo mostra os palpites de todos (recolhidos,
    abre no "ver palpites"). Verde = acertou o resultado · 🎯 = cravou o placar.
    ========================================================================= */
@@ -9,6 +9,7 @@
   "use strict";
   const $ = s => document.querySelector(s);
   const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+  const SUMMARY_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary";
   const START = "20260611", END = "20260719";
   const CFG = window.COPA_CFG || { url: "", key: "" };
 
@@ -29,6 +30,7 @@
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
+  let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols/cartões exibidos nos cards
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -102,6 +104,176 @@
     setTimeout(fazer, 350);
   }
   function horaBR(iso) { try { return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }); } catch (e) { return ""; } }
+
+  // ===== Gols e cartões vermelhos nos cards de jogos =====
+  // A página principal usa o scoreboard da ESPN para placar. Para não poluir nem
+  // atrasar a tela, os lances são carregados em segundo plano via summary do jogo.
+  function escTxt(s) {
+    return String(s || "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+  }
+  function getPath(obj, path, def) {
+    let cur = obj;
+    for (const p of path) {
+      if (cur && typeof cur === "object" && p in cur) cur = cur[p];
+      else return def;
+    }
+    return cur == null ? def : cur;
+  }
+  function textoTipo(o) {
+    const t = o && o.type;
+    if (!t) return "";
+    if (typeof t === "string") return t;
+    if (typeof t === "object") return [t.id, t.text, t.name, t.displayName, t.abbreviation].filter(Boolean).join(" ");
+    return String(t);
+  }
+  function textoLance(o) {
+    return String((o && (o.text || o.description || o.shortText || o.displayText || o.headline)) || "");
+  }
+  function nomeAtleta(a) {
+    if (!a || typeof a !== "object") return "";
+    if (a.athlete) return nomeAtleta(a.athlete);
+    return String(a.displayName || a.fullName || a.shortName || a.name || "").replace(/\s+/g, " ").trim();
+  }
+  function jogadorDoLance(o) {
+    if (!o || typeof o !== "object") return "";
+    for (const k of ["athlete", "player", "scorer"]) {
+      const n = nomeAtleta(o[k]); if (n) return n;
+    }
+    for (const k of ["athletes", "participants", "athletesInvolved", "players"]) {
+      const arr = o[k];
+      if (Array.isArray(arr)) {
+        for (const it of arr) { const n = nomeAtleta(it); if (n) return n; }
+      }
+    }
+    return String(o.displayName || o.athleteDisplayName || o.name || "").replace(/\s+/g, " ").trim();
+  }
+  function minutoDoLance(o) {
+    let v = getPath(o, ["clock", "displayValue"], "") || getPath(o, ["time", "displayValue"], "") || o.displayClock || o.clock || o.minute || "";
+    v = String(v || "").trim();
+    if (!v) return "";
+    if (/^\d+$/.test(v)) return v + "'";
+    return v.replace(/\s+/g, " ");
+  }
+  function golDoTexto(txt) {
+    if (!txt) return "";
+    const pats = [
+      /Goal!.*?\.\s*([^\.]+?)\s*\((?:[^)]*)\)/i,
+      /Gol!.*?\.\s*([^\.]+?)\s*\((?:[^)]*)\)/i,
+      /^\s*([^\.]+?)\s+\((?:[^)]*)\)\s*(?:right|left|header|converts|marca|finaliza|chuta)/i
+    ];
+    for (const p of pats) { const m = txt.match(p); if (m && m[1] && m[1].length <= 60) return m[1].replace(/\s+/g, " ").trim(); }
+    return "";
+  }
+  function arraysLances(summary) {
+    const out = [];
+    for (const p of [["scoringPlays"], ["competitions", 0, "scoringPlays"], ["header", "competitions", 0, "scoringPlays"]]) {
+      const arr = getPath(summary, p, []); if (Array.isArray(arr)) out.push(...arr);
+    }
+    return out;
+  }
+  function arraysComentario(summary) {
+    const out = [];
+    for (const p of [["commentary"], ["plays"], ["competitions", 0, "details"]]) {
+      let arr = getPath(summary, p, []);
+      if (arr && !Array.isArray(arr) && typeof arr === "object") arr = arr.items || arr.plays || [];
+      if (Array.isArray(arr)) out.push(...arr);
+    }
+    return out;
+  }
+  function contarVermelhosPorEstatistica(summary) {
+    let total = 0;
+    const equipes = getPath(summary, ["boxscore", "teams"], []);
+    if (!Array.isArray(equipes)) return 0;
+    equipes.forEach(t => {
+      const stats = t.statistics || [];
+      if (!Array.isArray(stats)) return;
+      stats.forEach(st => {
+        const nome = String(st.name || st.displayName || st.label || "").toLowerCase();
+        if (/red/.test(nome) || /vermelh/.test(nome)) {
+          const n = parseInt(st.value ?? st.displayValue ?? "0", 10);
+          if (!isNaN(n)) total += n;
+        }
+      });
+    });
+    return total;
+  }
+  function extrairLances(summary) {
+    const gols = [], usados = new Set();
+    arraysLances(summary).forEach(sp => {
+      const raw = (textoTipo(sp) + " " + textoLance(sp)).toLowerCase();
+      if (/shootout|penalty shootout|disputa de p[eê]naltis/.test(raw)) return;
+      // scoringPlays às vezes inclui cartões em outros esportes; aqui aceitamos só lance com cara de gol.
+      if (!(raw.includes("goal") || raw.includes("gol") || parseInt(sp.scoreValue || "0", 10) === 1)) return;
+      const nome = jogadorDoLance(sp) || golDoTexto(textoLance(sp));
+      if (!nome) return;
+      const min = minutoDoLance(sp);
+      const key = min + "|" + nome.toLowerCase();
+      if (usados.has(key)) return;
+      usados.add(key);
+      gols.push({ minuto: min, nome: nome });
+    });
+
+    // Fallback: alguns summaries não trazem scoringPlays, mas trazem commentary/plays.
+    if (!gols.length) {
+      arraysComentario(summary).forEach(ev => {
+        const raw = (textoTipo(ev) + " " + textoLance(ev)).toLowerCase();
+        const ehGol = (raw.includes("goal") || raw.includes("gol!")) && !/own goal|shootout|penalty shootout/.test(raw);
+        if (!ehGol) return;
+        const nome = jogadorDoLance(ev) || golDoTexto(textoLance(ev));
+        if (!nome) return;
+        const min = minutoDoLance(ev);
+        const key = min + "|" + nome.toLowerCase();
+        if (usados.has(key)) return;
+        usados.add(key);
+        gols.push({ minuto: min, nome: nome });
+      });
+    }
+
+    let vermelhos = 0;
+    const redsUsados = new Set();
+    arraysComentario(summary).forEach(ev => {
+      const raw = (textoTipo(ev) + " " + textoLance(ev)).toLowerCase();
+      const ehVermelho = /red card|cart[aã]o vermelho|second yellow|segundo amarelo/.test(raw);
+      if (!ehVermelho) return;
+      const key = (minutoDoLance(ev) + "|" + textoLance(ev)).toLowerCase();
+      if (redsUsados.has(key)) return;
+      redsUsados.add(key);
+      vermelhos++;
+    });
+    if (!vermelhos) vermelhos = contarVermelhosPorEstatistica(summary);
+    return { gols, vermelhos };
+  }
+  function htmlLances(dados) {
+    if (!dados || ((!dados.gols || !dados.gols.length) && !dados.vermelhos)) return "";
+    const gols = (dados.gols || []).map(g => `<span class="gol-chip">⚽ ${g.minuto ? escTxt(g.minuto) + " " : ""}${escTxt(g.nome)}</span>`).join(" ");
+    const reds = dados.vermelhos ? `<span class="redcards" title="${dados.vermelhos} cartão(ões) vermelho(s)">${"🟥".repeat(Math.min(dados.vermelhos, 4))}${dados.vermelhos > 4 ? `<span class="rednum">×${dados.vermelhos}</span>` : ""}</span>` : "";
+    return [gols, reds].filter(Boolean).join(" ");
+  }
+  async function carregarLancesVisiveis(events) {
+    const lista = (events || []).filter(ev => getPath(ev, ["competitions", 0, "status", "type", "state"], "pre") !== "pre");
+    lista.forEach(async ev => {
+      const id = ev.id;
+      const el = document.getElementById("gols-" + id);
+      if (!id || !el) return;
+      const st = getPath(ev, ["competitions", 0, "status", "type", "state"], "post");
+      const ttl = st === "in" ? 25000 : 6 * 60 * 60 * 1000;
+      try {
+        let dados;
+        const c = LANCES_CACHE[id];
+        if (c && (Date.now() - c.ts) < ttl) dados = c.dados;
+        else {
+          const url = `${SUMMARY_API}?event=${encodeURIComponent(id)}${st === "in" ? "&_=" + Date.now() : ""}`;
+          const summary = await fetch(url).then(r => r.json());
+          dados = extrairLances(summary);
+          LANCES_CACHE[id] = { ts: Date.now(), dados };
+        }
+        const alvo = document.getElementById("gols-" + id);
+        if (alvo) alvo.innerHTML = htmlLances(dados);
+      } catch (e) {
+        // Sem lances não quebra a página. O placar/estádio continuam normais.
+      }
+    });
+  }
 
   // carrega seleções (p/ casar jogo da ESPN -> nosso id) e palpites (Supabase)
   const TV_CAT = { // ordem de exibição; cores aproximadas das marcas
@@ -194,6 +366,7 @@
       $("#prev").parentElement.style.display = "none";
       renderGrupos();
     });
+    carregarLancesVisiveis(evs);
   }
 
   function abasHTML() {
@@ -588,6 +761,7 @@
         ${meio}
         <div class="lado f ${vencA}"><span class="t">${teamNome(away)}</span>${escudo(away)}</div>
       </div>
+      ${st.state !== "pre" ? `<div class="gols-jogo" id="gols-${ev.id}" aria-label="Gols e cartões vermelhos"></div>` : ""}
       ${venue ? `<div class="venue">${venue}</div>` : ""}
       ${(st.state === "post" && momentoDe((home.team || {}).abbreviation, (away.team || {}).abbreviation))
         ? blocoMomento((home.team || {}).abbreviation, (away.team || {}).abbreviation)
@@ -698,6 +872,6 @@
     $("#next").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
     const bcal = $("#btn-cal-jogos"); if (bcal) bcal.onclick = () => baixarICSJogos(bcal);
     carregar();
-    timer = setInterval(() => { if (ABA === "jogos") carregar(); }, 60000);
+    timer = setInterval(() => { if (ABA === "jogos") carregar(); }, 30000);
   });
 })();
