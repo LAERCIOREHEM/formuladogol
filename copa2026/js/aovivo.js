@@ -189,26 +189,32 @@
     </div>`;
   }
 
-  // acha a live certa pro jogo no lives.json (gerado pelo robô). Cai no fallback se não houver.
-  function liveDoJogo(aAb, bAb) {
+  // acha a live certa pro jogo no lives.json (gerado pelo robô).
+  // Regra: só usa link validado para aquele confronto. Não chuta @CazeTV/live.
+  function chaveJogoCaze(aAb, bAb) {
     var sa = dpSigla(aAb) || aAb, sb = dpSigla(bAb) || bAb;
-    var k = [sa, sb].sort().join("-");
-    return LIVES[k] || null;
+    return [sa, sb].sort().join("-");
+  }
+  function liveDoJogo(aAb, bAb) {
+    return LIVES[chaveJogoCaze(aAb, bAb)] || null;
+  }
+  function linkCazeValidado(L) {
+    if (!L || !L.url) return false;
+    // Bloqueia os fallbacks problemáticos. O /live só poderia ser usado se o
+    // robô marcasse expressamente como validado; na prática ele salva watch?v=.
+    if (L.url.indexOf("@CazeTV/search") !== -1) return false;
+    if (L.url.indexOf("@CazeTV/live") !== -1 && L.validado_confronto !== true) return false;
+    return L.validado_confronto === true || L.fonte === "admin" || L.url.indexOf("watch?v=") !== -1 || L.url.indexOf("youtu.be/") !== -1;
   }
   function botaoCaze(aAb, bAb) {
     var L = liveDoJogo(aAb, bAb);
-    var href;
-    if (L && L.url) {
-      // o robô achou a live exata do jogo: aponta direto pro vídeo certo
-      href = L.url;
-    } else {
-      // Último fallback: não gera mais @CazeTV/search, porque isso abre só a
-      // página de pesquisa do canal e parece erro. A live exata deve vir do
-      // dados/lives.json, gerado pelo robô. Se ainda não veio, abre o /live
-      // oficial como plano B provisório até o próximo cron preencher o jogo.
-      href = "https://www.youtube.com/@CazeTV/live";
+    if (linkCazeValidado(L)) {
+      return `<a class="btn-caze" href="${L.url}" target="_blank" rel="noopener">▶️ Assistir ao vivo na CazéTV</a>`;
     }
-    return `<a class="btn-caze" href="${href}" target="_blank" rel="noopener">▶️ Assistir ao vivo na CazéTV</a>`;
+    // Sem link exato validado, não abre mais @CazeTV/live, porque pode cair
+    // na transmissão principal de outro jogo. O cron deve preencher
+    // dados/lives.json com watch?v=... quando validar o confronto.
+    return `<div class="btn-caze" title="O robô ainda não validou uma live da CazéTV exatamente para este confronto.">⏳ Live exata da CazéTV ainda não validada</div>`;
   }
 
   function faseLabel(ev) {
