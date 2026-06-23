@@ -168,58 +168,51 @@ def listar_playlist(playlist_id, api_key):
             break
     return itens
 
-def parse_live(titulo):
-    """De 'AO VIVO: ESPANHA X ARÁBIA SAUDITA | COPA DO MUNDO...' extrai (idA, idB).
-    Diferente de parse_titulo (que espera placar N x N), aqui é só 'TIME x TIME'."""
+def parse_jogo_live(titulo):
+    """Extrai (idA, idB) de títulos de JOGO da Cazé:
+    'AO VIVO: FRANÇA X IRAQUE |...' ou 'JOGO COMPLETO: FRANÇA X IRAQUE |...'.
+    Ignora clipes ('MELHORES MOMENTOS', 'TODOS OS LANCES', narração, etc.)."""
     t = titulo
-    # remove rótulos de transmissão ao vivo
+    # só considera se for marcado como jogo (ao vivo ou jogo completo)
+    if not re.search(r"(?i)\b(ao\s+vivo|jogo\s+completo)\b", t):
+        return None, None
+    # mas NÃO é melhores momentos (que tem placar no meio)
+    if re.search(r"(?i)melhores\s+momentos", t):
+        return None, None
+    t = re.sub(r"(?i)jogo\s+completo\s*[:|]?", " ", t)
     t = re.sub(r"(?i)ao\s+vivo\s*[:|]?", " ", t)
-    t = re.sub(r"(?i)\blive\b\s*[:|]?", " ", t)
-    # pega só o trecho antes da primeira barra (onde estão os times)
     antes_barra = t.split("|")[0]
-    # casa "TIME x TIME" (sem exigir placar)
     m = re.search(r"(.+?)\s+[xX]\s+(.+)", antes_barra)
     if not m:
         return None, None
-    a = id_do_time(m.group(1))
-    b = id_do_time(m.group(2))
-    return a, b
+    return id_do_time(m.group(1)), id_do_time(m.group(2))
 
-def buscar_lives_caze(api_key, event_type):
-    """Lista as transmissões do canal da Cazé por tipo: 'upcoming' (agendadas) ou 'live' (no ar).
-    Retorna lista de {titulo, videoId}. Pagina até pegar todas (até 200)."""
-    base = "https://www.googleapis.com/youtube/v3/search"
-    itens, token, p = [], "", 0
-    while p < 4:
-        params = {
-            "part": "snippet", "channelId": CAZE_CHANNEL_ID,
-            "eventType": event_type, "type": "video",
-            "maxResults": "50", "order": "date", "key": api_key
-        }
-        if token:
-            params["pageToken"] = token
+
+def estado_dos_videos(api_key, video_ids):
+    """Para uma lista de videoIds, retorna {videoId: 'live'|'upcoming'|'none'}
+    via liveBroadcastContent. É assim que sabemos o que está NO AR agora
+    (o eventType=live da Search API não é confiável para a Cazé)."""
+    out = {}
+    base = "https://www.googleapis.com/youtube/v3/videos"
+    # a API aceita até 50 ids por chamada
+    for i in range(0, len(video_ids), 50):
+        lote = video_ids[i:i + 50]
+        params = {"part": "snippet", "id": ",".join(lote), "key": api_key}
         try:
             data = yt_get(base + "?" + urllib.parse.urlencode(params))
         except Exception as e:
-            print(f"  busca de lives ({event_type}) falhou:", e)
-            break
+            print("  estado dos vídeos falhou:", e)
+            continue
         for it in data.get("items", []):
-            sn = it.get("snippet", {})
-            vid = (it.get("id") or {}).get("videoId")
-            tit = sn.get("title", "")
-            if vid and tit and sn.get("channelId") == CAZE_CHANNEL_ID:
-                itens.append({"titulo": tit, "videoId": vid})
-        token = data.get("nextPageToken", "")
-        p += 1
-        if not token:
-            break
-    return itens
+            out[it["id"]] = (it.get("snippet", {}) or {}).get("liveBroadcastContent", "none")
+    return out
+
 
 def atualizar_lives(api_key):
-    """Busca lives agendadas + ao vivo da Cazé, casa com os jogos pelo título,
-    e grava dados/lives.json = { "ESP-KSA": {url, titulo, estado}, ... }.
-    'estado' = 'live' (no ar) tem prioridade sobre 'upcoming' (agendada)."""
-    # carrega o atual (preserva correções manuais 'admin')
+    """Casa as transmissões de JOGO da Cazé com cada partida e grava dados/lives.json.
+    Estratégia (validada por diagnóstico): NÃO usa eventType=live (retorna vazio
+    para a Cazé). Usa os UPLOADS recentes do canal + liveBroadcastContent para
+    saber o que está ao vivo. 'live' > 'upcoming' > 'none' (jogo completo)."""
     try:
         atual = json.load(open(SAIDA_LIVES, encoding="utf-8"))
     except Exception:
@@ -227,39 +220,49 @@ def atualizar_lives(api_key):
                  "Valor = {url, titulo, estado, fonte}. 'admin' nunca é sobrescrito pelo robô.", "jogos": {}}
     jogos = atual.get("jogos", {})
 
-    # busca as duas categorias: live (no ar) e upcoming (agendadas)
-    no_ar = buscar_lives_caze(api_key, "live")
-    agendadas = buscar_lives_caze(api_key, "upcoming")
-    print(f"Lives no ar: {len(no_ar)} | agendadas: {len(agendadas)}")
+    # 1) uploads recentes do canal (isto SEMPRE funciona — o eventType não)
+    uploads = buscar_uploads_recentes(api_key, paginas=2)  # ~100 vídeos recentes
+    # 2) filtra os que são JOGO (ao vivo / jogo completo) e extrai os times
+    candidatos = []
+    for v in uploads:
+        a, b = parse_jogo_live(v["titulo"])
+        if a and b:
+            candidatos.append({"a": a, "b": b, "videoId": v["videoId"], "titulo": v["titulo"]})
 
-    # processa: 'upcoming' primeiro, 'live' depois (live sobrescreve, é o estado mais atual)
-    def processar(lista, estado):
-        n = 0
-        for v in lista:
-            a, b = parse_live(v["titulo"])
-            if not a or not b:
-                continue
-            chave = "-".join(sorted([a, b]))
-            # respeita correção manual
-            if jogos.get(chave, {}).get("fonte") == "admin":
-                continue
-            # 'live' sempre atualiza; 'upcoming' só preenche se ainda não houver um 'live'
-            if estado == "upcoming" and jogos.get(chave, {}).get("estado") == "live":
-                continue
-            jogos[chave] = {
-                "url": "https://www.youtube.com/watch?v=" + v["videoId"],
-                "titulo": v["titulo"].split("|")[0].strip(),
-                "estado": estado,
-                "fonte": "auto"
-            }
-            n += 1
-        return n
+    # 3) descobre quais estão AO VIVO agora (liveBroadcastContent)
+    estados = estado_dos_videos(api_key, [c["videoId"] for c in candidatos])
+    prioridade = {"live": 3, "upcoming": 2, "none": 1}
 
-    n1 = processar(agendadas, "upcoming")
-    n2 = processar(no_ar, "live")
+    # 4) para cada jogo, escolhe o melhor vídeo (live > upcoming > jogo completo).
+    #    Se houver mais de um vídeo do mesmo confronto, fica com o de maior prioridade
+    #    e, em empate, o mais recente (uploads já vêm do mais novo pro mais antigo).
+    melhor = {}  # chave -> {videoId, estado, titulo, prio}
+    for c in candidatos:
+        chave = "-".join(sorted([c["a"], c["b"]]))
+        est = estados.get(c["videoId"], "none")
+        prio = prioridade.get(est, 1)
+        if chave not in melhor or prio > melhor[chave]["prio"]:
+            melhor[chave] = {"videoId": c["videoId"], "estado": est, "titulo": c["titulo"], "prio": prio}
+
+    # 5) grava (respeitando correções manuais 'admin')
+    n_live = n_outros = 0
+    for chave, m in melhor.items():
+        if jogos.get(chave, {}).get("fonte") == "admin":
+            continue
+        jogos[chave] = {
+            "url": "https://www.youtube.com/watch?v=" + m["videoId"],
+            "titulo": m["titulo"].split("|")[0].strip(),
+            "estado": m["estado"],
+            "fonte": "auto"
+        }
+        if m["estado"] == "live":
+            n_live += 1
+        else:
+            n_outros += 1
+
     atual["jogos"] = jogos
     json.dump(atual, open(SAIDA_LIVES, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-    print(f"Lives gravadas: {n1} agendadas + {n2} no ar. Total no arquivo: {len(jogos)}.")
+    print(f"Lives: {n_live} ao vivo + {n_outros} (agendada/completo). Total no arquivo: {len(jogos)}.")
 
 def main():
     if not API_KEY:
