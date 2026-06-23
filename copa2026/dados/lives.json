@@ -1,4 +1,35 @@
 {
   "_comentario": "Lives da CazéTV por jogo. Chave = siglas dos dois times em ordem alfabética (ex.: ESP-KSA). Valor = {url, titulo, estado, fonte}. 'estado':'upcoming' = live agendada; 'estado':'live' = no ar agora. 'fonte':'auto' = preenchido pelo robô; 'fonte':'admin' = correção manual (o robô NÃO sobrescreve). Gerado por buscar_melhores_momentos.py via GitHub Actions.",
-  "jogos": {}
+  "jogos": {
+    "ALG-JOR": {
+      "url": "https://www.youtube.com/watch?v=ptoJO9bn8T4",
+      "titulo": "AO VIVO: JORDÂNIA X ARGÉLIA",
+      "estado": "live",
+      "fonte": "auto"
+    },
+    "FRA-IRQ": {
+      "url": "https://www.youtube.com/watch?v=zE4W8SI8yns",
+      "titulo": "JOGO COMPLETO: FRANÇA X IRAQUE",
+      "estado": "none",
+      "fonte": "auto"
+    },
+    "NOR-SEN": {
+      "url": "https://www.youtube.com/watch?v=dFPUO7Vdh6Q",
+      "titulo": "AO VIVO: NORUEGA X SENEGAL",
+      "estado": "live",
+      "fonte": "auto"
+    },
+    "EGY-NZL": {
+      "url": "https://www.youtube.com/watch?v=nLFPUeA-Naw",
+      "titulo": "JOGO COMPLETO: NOVA ZELÂNDIA X EGITO",
+      "estado": "none",
+      "fonte": "auto"
+    },
+    "ESP-KSA": {
+      "url": "https://www.youtube.com/watch?v=lMtrJbAfEaY",
+      "titulo": "JOGO COMPLETO: ESPANHA X ARÁBIA SAUDITA",
+      "estado": "none",
+      "fonte": "auto"
+    }
+  }
 }
