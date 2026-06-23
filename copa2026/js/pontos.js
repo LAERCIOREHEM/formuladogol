@@ -44,12 +44,14 @@
 
   async function init() {
     try {
-      const [s, e, t] = await Promise.all([
+      const [s, e, t, pm] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
         fetch("dados/estrutura_mata_mata.json").then(r => r.json()),
-        fetch("dados/terceiros_map.json").then(r => r.json())
+        fetch("dados/terceiros_map.json").then(r => r.json()),
+        fetch("dados/palpites_mata.json").then(r => r.json()).catch(() => ({ apostadores: {} }))
       ]);
       DADOS.selecoes = s.selecoes; DADOS.estrutura = e; DADOS.terceirosMap = t;
+      DADOS.palpitesMata = (pm && pm.apostadores) || {};
       DADOS.nomeDe = {}; DADOS.isoDe = {};
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
     } catch (err) { $("#app").innerHTML = '<p class="vazio">Erro ao carregar os dados da Copa.</p>'; return; }
@@ -63,6 +65,23 @@
         const g = Object.keys(pl.placaresGrupos || {}).map(id => ({ jogo_id: id, ga: pl.placaresGrupos[id].ga, gb: pl.placaresGrupos[id].gb }));
         let d = null;
         try { d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap); } catch (e) {}
+        // PALPITE DE MATA-MATA: usa as listas FIÉIS do relatório de auditoria (12/jun),
+        // não a propagação por posição (que mudava com a correção do desempate).
+        // O que cada um CRAVOU que avança em cada fase é fixo e foi auditado com hash.
+        if (d) {
+          const pm = DADOS.palpitesMata[r.nome];
+          if (pm) {
+            d.classificados32  = pm.classificados32 || d.classificados32;
+            d.avancam_oitavas  = pm.avancam_oitavas  || d.avancam_oitavas;
+            d.avancam_quartas  = pm.avancam_quartas  || d.avancam_quartas;
+            d.semifinalistas   = pm.semifinalistas   || d.semifinalistas;
+            d.finalistas       = pm.finalistas       || d.finalistas;
+            d.campeao  = pm.campeao  || d.campeao;
+            d.vice     = pm.vice     || d.vice;
+            d.terceiro = pm.terceiro || d.terceiro;
+            d.quarto   = pm.quarto   || d.quarto;
+          }
+        }
         return { nome: r.nome, d, pg: pl.placaresGrupos || {} };
       }).filter(p => p.d);
     } catch (e) { PART = []; }
