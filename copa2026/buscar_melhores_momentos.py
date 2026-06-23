@@ -173,6 +173,7 @@ CAZE_CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"  # canal oficial da CazéTV
 # A "uploads playlist" de um canal lista TODOS os vídeos em ordem cronológica.
 # Para qualquer canal UC..., a playlist de uploads é UU... (troca UC por UU).
 CAZE_UPLOADS_ID = "UU" + CAZE_CHANNEL_ID[2:]
+CAZE_STREAMS_URL = "https://www.youtube.com/@CazeTV/streams"
 
 SCOREBOARD_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard"
 
@@ -321,6 +322,42 @@ def jogos_espn_para_buscar_live():
     return out
 
 
+
+def jogos_espn_para_mapear_streams(dias_futuros=45):
+    """Retorna todos os confrontos conhecidos no feed ESPN dentro de uma janela.
+
+    Isso serve para validar a página /streams da CazéTV: se a live agendada
+    cita Portugal x Uzbequistão, gravamos POR-UZB; se for mata-mata ainda com
+    TBD, só será gravado quando a ESPN já trouxer os classificados reais.
+    """
+    url = f"{SCOREBOARD_API}?dates={ymd_sp(-1)}-{ymd_sp(dias_futuros)}&limit=400"
+    try:
+        data = yt_get(url)
+    except Exception as e:
+        print("  ESPN scoreboard falhou para mapear streams futuras:", e)
+        return []
+
+    out, vistos = [], set()
+    for ev in data.get("events", []) or []:
+        comps = ev.get("competitions") or []
+        if not comps:
+            continue
+        comp = comps[0]
+        cs = comp.get("competitors") or []
+        if len(cs) < 2:
+            continue
+        a = id_time_espn(cs[0])
+        b = id_time_espn(cs[1])
+        if not a or not b or a == b:
+            continue
+        chave = "-".join(sorted([a, b]))
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        st = ((comp.get("status") or {}).get("type") or {}).get("state")
+        out.append({"a": a, "b": b, "chave": chave, "estado_espn": st, "data": ev.get("date") or ""})
+    return out
+
 def yt_search_caze(api_key, query, max_results=8):
     """Busca textual restrita ao canal oficial da CazéTV e retorna vídeos."""
     base = "https://www.googleapis.com/youtube/v3/search"
@@ -353,47 +390,387 @@ def yt_search_caze(api_key, query, max_results=8):
     return out
 
 
+def yt_search_caze_evento(api_key, event_type, max_results=25):
+    """Lista lives/upcoming do canal oficial da CazéTV pela Search API.
+    eventType=live/upcoming é tentado primeiro porque, quando funciona, já
+    entrega as transmissões certas sem depender de texto da busca."""
+    base = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        "part": "snippet",
+        "channelId": CAZE_CHANNEL_ID,
+        "type": "video",
+        "eventType": event_type,
+        "order": "date",
+        "maxResults": str(max_results),
+        "key": api_key,
+    }
+    try:
+        data = yt_get(base + "?" + urllib.parse.urlencode(params))
+    except Exception as e:
+        print(f"  busca Cazé eventType={event_type} falhou:", e)
+        return []
+    out = []
+    for it in data.get("items", []) or []:
+        vid = ((it.get("id") or {}).get("videoId") or "").strip()
+        sn = it.get("snippet", {}) or {}
+        tit = sn.get("title", "")
+        if not vid or not tit:
+            continue
+        out.append({
+            "videoId": vid,
+            "titulo": tit,
+            "estado": sn.get("liveBroadcastContent", event_type) or event_type,
+            "origem": f"search-eventType-{event_type}",
+        })
+    return out
+
+
+def ids_times_no_texto(trecho):
+    """Retorna as siglas de seleções citadas no texto, por apelidos PT/EN.
+    Usado apenas para validar live de jogo quando o título não está no padrão
+    perfeito 'TIME X TIME', mas contém claramente os dois países."""
+    t = norm(trecho)
+    achados = []
+    pares = list(APELIDOS.items()) + list(APELIDOS_EN.items())
+    for ape, cod in sorted(pares, key=lambda x: len(x[0]), reverse=True):
+        if re.search(r"(^| )" + re.escape(ape) + r"($| )", t) and cod not in achados:
+            achados.append(cod)
+    return achados
+
+
+def parse_confronto_por_presenca(titulo):
+    ids = ids_times_no_texto(titulo)
+    if len(ids) == 2 and ids[0] != ids[1]:
+        return ids[0], ids[1]
+    return None, None
+
+
+def titulo_ruim_para_live(titulo):
+    """Bloqueia clipes/resumos/cortes. Para AO VIVO, só queremos a página de
+    transmissão do jogo ou o jogo completo depois que acabou."""
+    t = norm(titulo)
+    termos_bloqueados = (
+        "MELHORES MOMENTOS", "TODOS OS LANCES", "GOL DE", "GOLACO",
+        "SHORTS", "SHORT", "ENTREVISTA", "BASTIDORES", "REACT", "CORTE",
+        "COLETIVA", "ESCALACAO", "PENALTI"
+    )
+    return any(x in t for x in termos_bloqueados)
+
+
+def parece_transmissao_de_jogo(titulo, estado="none"):
+    """Aceita somente coisas com cara de transmissão do jogo.
+    Importante: @CazeTV/live genérico só entra depois de resolvido para um
+    videoId e validado contra o confronto."""
+    t = norm(titulo)
+    if titulo_ruim_para_live(titulo):
+        return False
+    if estado in ("live", "upcoming"):
+        return True
+    termos_ok = ("AO VIVO", "JOGO COMPLETO", "TRANSMISSAO", "COM IMAGENS")
+    return any(x in t for x in termos_ok)
+
+
+def detalhes_videos(api_key, video_ids):
+    """Retorna detalhes básicos de vídeos pelo videos.list."""
+    out = {}
+    base = "https://www.googleapis.com/youtube/v3/videos"
+    video_ids = [v for v in dict.fromkeys(video_ids) if v]
+    for i in range(0, len(video_ids), 50):
+        lote = video_ids[i:i + 50]
+        params = {"part": "snippet,liveStreamingDetails", "id": ",".join(lote), "key": api_key}
+        try:
+            data = yt_get(base + "?" + urllib.parse.urlencode(params))
+        except Exception as e:
+            print("  detalhes dos vídeos falhou:", e)
+            continue
+        for it in data.get("items", []) or []:
+            sn = it.get("snippet", {}) or {}
+            live = it.get("liveStreamingDetails", {}) or {}
+            out[it["id"]] = {
+                "videoId": it["id"],
+                "titulo": sn.get("title", ""),
+                "estado": sn.get("liveBroadcastContent", "none") or "none",
+                "scheduledStartTime": live.get("scheduledStartTime"),
+                "actualStartTime": live.get("actualStartTime"),
+                "actualEndTime": live.get("actualEndTime"),
+            }
+    return out
+
+
+def extrair_video_ids_de_url_ou_html(final_url, html):
+    ids = []
+    def add(v):
+        if v and re.match(r"^[A-Za-z0-9_-]{8,}$", v) and v not in ids:
+            ids.append(v)
+    parsed = urllib.parse.urlparse(final_url or "")
+    qs = urllib.parse.parse_qs(parsed.query)
+    for v in qs.get("v", []):
+        add(v)
+    for padrao in (
+        r'"videoId"\s*:\s*"([A-Za-z0-9_-]{8,})"',
+        r"watch\?v=([A-Za-z0-9_-]{8,})",
+        r"/embed/([A-Za-z0-9_-]{8,})",
+    ):
+        for v in re.findall(padrao, html or ""):
+            add(v)
+    return ids
+
+
+def resolver_caze_live_generico(api_key):
+    """Tenta resolver https://www.youtube.com/@CazeTV/live para o videoId real.
+    Só serve como candidato. A aceitação final ainda valida o título contra o
+    confronto esperado; se /live estiver apontando para outro jogo, será descartado."""
+    url = "https://www.youtube.com/@CazeTV/live"
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=20) as r:
+            final_url = r.geturl()
+            html = r.read(350000).decode("utf-8", "ignore")
+    except Exception as e:
+        print("  não consegui resolver @CazeTV/live:", e)
+        return None
+    ids = extrair_video_ids_de_url_ou_html(final_url, html)
+    if not ids:
+        return None
+    detalhes = detalhes_videos(api_key, ids[:8])
+    # prefere o vídeo que a API diz estar live; se não houver, pega o primeiro resolvido
+    ordenados = sorted(detalhes.values(), key=lambda x: 0 if x.get("estado") == "live" else 1)
+    if not ordenados:
+        return None
+    v = ordenados[0]
+    v["origem"] = "caze-live-resolvido"
+    return v
+
+
+
+def listar_caze_streams_page(api_key):
+    """Varre a aba /streams do canal da CazéTV e transforma os vídeos
+    encontrados em candidatos via videos.list.
+
+    A Search API com eventType=upcoming costuma funcionar, mas a aba /streams
+    é a fonte visual onde a Cazé publica as próximas lives. Usamos as duas para
+    aumentar a chance de preencher lives.json ANTES do jogo começar.
+    """
+    req = urllib.request.Request(CAZE_STREAMS_URL, headers={
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+        "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=25) as r:
+            html = r.read(800000).decode("utf-8", "ignore")
+    except Exception as e:
+        print("  leitura da aba /streams da CazéTV falhou:", e)
+        return []
+
+    ids = []
+    def add(v):
+        if v and re.match(r"^[A-Za-z0-9_-]{8,}$", v) and v not in ids:
+            ids.append(v)
+
+    for padrao in (
+        r'"videoId"\s*:\s*"([A-Za-z0-9_-]{8,})"',
+        r'watch\?v=([A-Za-z0-9_-]{8,})',
+        r'/watch/([A-Za-z0-9_-]{8,})',
+    ):
+        for v in re.findall(padrao, html):
+            add(v)
+
+    if not ids:
+        return []
+
+    detalhes = detalhes_videos(api_key, ids[:80])
+    out = []
+    for v in detalhes.values():
+        vv = dict(v)
+        vv["origem"] = "caze-streams-page"
+        out.append(vv)
+    return out
+
+
+def buscar_lives_agendadas_por_streams(api_key):
+    """Pré-mapeia lives futuras já publicadas pela CazéTV.
+
+    Regra: varre lives/upcoming do canal e a página @CazeTV/streams; aceita só
+    se o título citar exatamente as duas seleções de um jogo conhecido no feed
+    da ESPN. Assim não usamos /live genérico e não pegamos transmissão errada.
+    """
+    agenda = {j["chave"]: j for j in jogos_espn_para_mapear_streams(dias_futuros=45)}
+    if not agenda:
+        return []
+
+    candidatos = []
+    candidatos.extend(yt_search_caze_evento(api_key, "live", max_results=50))
+    candidatos.extend(yt_search_caze_evento(api_key, "upcoming", max_results=50))
+    candidatos.extend(listar_caze_streams_page(api_key))
+    candidatos = dedupe_videos(candidatos)
+
+    detalhes = detalhes_videos(api_key, [v["videoId"] for v in candidatos])
+    achados, vistos = [], set()
+    for v in candidatos:
+        d = detalhes.get(v["videoId"], {})
+        vv = dict(v)
+        if d.get("titulo"):
+            vv["titulo"] = d["titulo"]
+        if d.get("estado"):
+            vv["estado"] = d["estado"]
+        if d.get("scheduledStartTime"):
+            vv["scheduledStartTime"] = d["scheduledStartTime"]
+        if d.get("actualStartTime"):
+            vv["actualStartTime"] = d["actualStartTime"]
+        if d.get("actualEndTime"):
+            vv["actualEndTime"] = d["actualEndTime"]
+
+        estado = vv.get("estado", "none") or "none"
+        # Para pré-mapeamento via /streams, só queremos lives no ar/agendadas.
+        # Replays/completos continuam entrando pelo fluxo de uploads recentes.
+        if estado not in ("live", "upcoming"):
+            continue
+        if not parece_transmissao_de_jogo(vv.get("titulo", ""), estado):
+            continue
+
+        a, b = parse_jogo_live_ou_generico(vv.get("titulo", ""))
+        if not a or not b:
+            a, b = parse_confronto_por_presenca(vv.get("titulo", ""))
+        if not a or not b or a == b:
+            continue
+        chave = "-".join(sorted([a, b]))
+        jogo = agenda.get(chave)
+        if not jogo:
+            # Evita mapear outras competições que a Cazé também pode transmitir.
+            continue
+        if (vv["videoId"], chave) in vistos:
+            continue
+        vistos.add((vv["videoId"], chave))
+        achados.append({
+            "a": jogo["a"],
+            "b": jogo["b"],
+            "videoId": vv["videoId"],
+            "titulo": vv.get("titulo", ""),
+            "estado": estado,
+            "origem": vv.get("origem") or "caze-streams/upcoming",
+            "scheduledStartTime": vv.get("scheduledStartTime"),
+            "validado_confronto": True,
+        })
+        print(f"  + (live agendada /streams Cazé) {chave}: {vv.get('titulo','')[:75]} [{estado}]")
+    return achados
+
+def dedupe_videos(videos):
+    out, vistos = [], set()
+    for v in videos:
+        vid = v.get("videoId")
+        if not vid or vid in vistos:
+            continue
+        vistos.add(vid)
+        out.append(v)
+    return out
+
+
+def aceitar_live_para_jogo(video, jogo, origem=""):
+    """Validação central: só aceita o vídeo se o título contém exatamente as
+    duas seleções daquele jogo, em qualquer ordem. Sem isso, não grava link."""
+    titulo = video.get("titulo", "")
+    estado = video.get("estado", "none") or "none"
+    if not parece_transmissao_de_jogo(titulo, estado):
+        return None
+    a, b = parse_jogo_live_ou_generico(titulo)
+    if not a or not b:
+        a, b = parse_confronto_por_presenca(titulo)
+    if not a or not b or set([a, b]) != set([jogo["a"], jogo["b"]]):
+        return None
+    return {
+        "a": jogo["a"],
+        "b": jogo["b"],
+        "videoId": video["videoId"],
+        "titulo": titulo,
+        "estado": estado,
+        "origem": origem or video.get("origem") or "validado-caze",
+        "validado_confronto": True,
+    }
+
+
 def parse_jogo_live_ou_generico(titulo):
     a, b = parse_jogo_live(titulo)
     if a and b:
         return a, b
-    return parse_confronto_generico(titulo)
+    a, b = parse_confronto_generico(titulo)
+    if a and b:
+        return a, b
+    return parse_confronto_por_presenca(titulo)
 
 
 def buscar_lives_exatas_por_espn(api_key):
-    """Fallback novo para AO VIVO: pega o jogo atual/próximo na ESPN e faz
-    uma busca restrita ao canal da CazéTV. Assim o site grava o watch?v=... do
-    confronto específico, em vez de mandar o usuário para @CazeTV/search."""
+    """Busca/valida transmissões exatas para a aba AO VIVO.
+
+    Regra de ouro: NUNCA grava @CazeTV/search nem @CazeTV/live como chute.
+    O link só entra se for possível validar o título do vídeo contra o jogo
+    esperado (ex.: POR-UZB), aceitando mandante/visitante em qualquer ordem.
+    """
     nomes = nome_por_id()
     jogos = jogos_espn_para_buscar_live()
     if not jogos:
         return []
 
-    achados, vistos_video = [], set()
+    # Candidatos globais do canal: lives/upcoming + busca ampla por "ao vivo".
+    # Eles são filtrados jogo a jogo pela validação central.
+    globais = []
+    globais.extend(yt_search_caze_evento(api_key, "live", max_results=25))
+    globais.extend(yt_search_caze_evento(api_key, "upcoming", max_results=25))
+    globais.extend(listar_caze_streams_page(api_key))
+    globais.extend(yt_search_caze(api_key, "ao vivo", max_results=25))
+
+    # Resolve o /live genérico só para descobrir o videoId real. Se esse vídeo
+    # for de outro confronto, será descartado em aceitar_live_para_jogo().
+    live_generica = resolver_caze_live_generico(api_key)
+    if live_generica:
+        globais.append(live_generica)
+
+    globais = dedupe_videos(globais)
+
+    achados, vistos_video_jogo = [], set()
     for j in jogos:
         na, nb = nomes.get(j["a"], j["a"]), nomes.get(j["b"], j["b"])
+
+        candidatos_jogo = list(globais)
         consultas = [
             f"{na} x {nb} ao vivo",
             f"{nb} x {na} ao vivo",
+            f"{na} {nb} ao vivo",
+            f"{nb} {na} ao vivo",
+            f"{na} x {nb}",
+            f"{nb} x {na}",
             f"{j['a']} x {j['b']} ao vivo",
+            f"{j['b']} x {j['a']} ao vivo",
         ]
         for q in consultas:
-            for v in yt_search_caze(api_key, q):
-                if v["videoId"] in vistos_video:
-                    continue
-                a, b = parse_jogo_live_ou_generico(v["titulo"])
-                if set([a, b]) != set([j["a"], j["b"]]):
-                    continue
-                vistos_video.add(v["videoId"])
-                achados.append({
-                    "a": j["a"],
-                    "b": j["b"],
-                    "videoId": v["videoId"],
-                    "titulo": v["titulo"],
-                    "estado": v.get("estado", "none"),
-                    "origem": "search-exata-caze",
-                })
-                print(f"  + (live exata Cazé) {j['chave']}: {v['titulo'][:70]}")
+            candidatos_jogo.extend(yt_search_caze(api_key, q, max_results=12))
+
+        # Confirma estado/título atual via videos.list antes de validar.
+        candidatos_jogo = dedupe_videos(candidatos_jogo)
+        detalhes = detalhes_videos(api_key, [v["videoId"] for v in candidatos_jogo])
+        enriquecidos = []
+        for v in candidatos_jogo:
+            d = detalhes.get(v["videoId"], {})
+            vv = dict(v)
+            if d.get("titulo"):
+                vv["titulo"] = d["titulo"]
+            if d.get("estado"):
+                vv["estado"] = d["estado"]
+            enriquecidos.append(vv)
+
+        for v in enriquecidos:
+            aceito = aceitar_live_para_jogo(v, j, origem=v.get("origem") or "search-exata-caze")
+            if not aceito:
+                continue
+            vk = (aceito["videoId"], j["chave"])
+            if vk in vistos_video_jogo:
+                continue
+            vistos_video_jogo.add(vk)
+            achados.append(aceito)
+            print(f"  + (live validada Cazé) {j['chave']}: {aceito['titulo'][:75]} [{aceito['estado']}]")
+
     return achados
 
 
@@ -490,15 +867,26 @@ def estado_dos_videos(api_key, video_ids):
 
 def atualizar_lives(api_key):
     """Casa as transmissões de JOGO da Cazé com cada partida e grava dados/lives.json.
-    Estratégia (validada por diagnóstico): NÃO usa eventType=live (retorna vazio
-    para a Cazé). Usa os UPLOADS recentes do canal + liveBroadcastContent para
-    saber o que está ao vivo. 'live' > 'upcoming' > 'none' (jogo completo)."""
+    Estratégia: usa uploads recentes + aba /streams + buscas restritas ao canal
+    + tentativa de resolver @CazeTV/live, mas só grava link quando o vídeo é
+    validado contra o confronto esperado. Prioridade: live > upcoming > none
+    (jogo completo)."""
     try:
         atual = json.load(open(SAIDA_LIVES, encoding="utf-8"))
     except Exception:
         atual = {"_comentario": "Lives da CazéTV por jogo. Chave = siglas em ordem alfabética. "
                  "Valor = {url, titulo, estado, fonte}. 'admin' nunca é sobrescrito pelo robô.", "jogos": {}}
     jogos = atual.get("jogos", {})
+
+    # Limpa fallbacks antigos não validados que possam ter ficado no JSON.
+    # O front também bloqueia, mas limpar aqui evita o link errado reaparecer.
+    for chave, item in list(jogos.items()):
+        if item.get("fonte") == "admin":
+            continue
+        url = item.get("url", "")
+        if "@CazeTV/search" in url or "@CazeTV/live" in url:
+            print(f"  removendo fallback não validado de live: {chave} -> {url}")
+            del jogos[chave]
 
     # 1) uploads recentes do canal (isto SEMPRE funciona — o eventType não)
     uploads = buscar_uploads_recentes(api_key, paginas=2)  # ~100 vídeos recentes
@@ -507,20 +895,25 @@ def atualizar_lives(api_key):
     for v in uploads:
         a, b = parse_jogo_live(v["titulo"])
         if a and b:
-            candidatos.append({"a": a, "b": b, "videoId": v["videoId"], "titulo": v["titulo"]})
+            candidatos.append({"a": a, "b": b, "videoId": v["videoId"], "titulo": v["titulo"], "origem": "uploads-recentes", "validado_confronto": True})
 
-    # 3) Fallback novo: se os uploads ainda não têm a live/sala agendada,
+    # 3) Pré-mapeia lives publicadas em @CazeTV/streams e eventType=upcoming.
+    # Isso preenche lives.json ANTES do jogo começar, desde que o título da
+    # live agendada cite exatamente as duas seleções do confronto.
+    candidatos.extend(buscar_lives_agendadas_por_streams(api_key))
+
+    # 4) Fallback dinâmico: se a live ainda não estava prevista em /streams,
     # busca o confronto exato no canal oficial da CazéTV com base no jogo
-    # atual/próximo do feed ESPN. Isso corrige o botão da aba AO VIVO para
-    # apontar direto no watch?v=... daquele jogo.
+    # atual/próximo do feed ESPN. Útil para fases futuras assim que os
+    # classificados reais aparecem no feed.
     candidatos.extend(buscar_lives_exatas_por_espn(api_key))
 
-    # 4) descobre quais estão AO VIVO agora (liveBroadcastContent).
+    # 5) descobre quais estão AO VIVO agora (liveBroadcastContent).
     # A busca textual já traz esse campo, mas videos.list confirma/atualiza.
     estados = estado_dos_videos(api_key, [c["videoId"] for c in candidatos])
     prioridade = {"live": 3, "upcoming": 2, "none": 1}
 
-    # 5) para cada jogo, escolhe o melhor vídeo (live > upcoming > jogo completo).
+    # 6) para cada jogo, escolhe o melhor vídeo (live > upcoming > jogo completo).
     #    Se houver mais de um vídeo do mesmo confronto, fica com o de maior prioridade
     #    e, em empate, o mais recente (uploads já vêm do mais novo pro mais antigo).
     melhor = {}  # chave -> {videoId, estado, titulo, prio}
@@ -529,9 +922,17 @@ def atualizar_lives(api_key):
         est = estados.get(c["videoId"], c.get("estado", "none"))
         prio = prioridade.get(est, 1)
         if chave not in melhor or prio > melhor[chave]["prio"]:
-            melhor[chave] = {"videoId": c["videoId"], "estado": est, "titulo": c["titulo"], "prio": prio}
+            melhor[chave] = {
+                "videoId": c["videoId"],
+                "estado": est,
+                "titulo": c["titulo"],
+                "prio": prio,
+                "origem": c.get("origem", "auto"),
+                "scheduledStartTime": c.get("scheduledStartTime"),
+                "validado_confronto": bool(c.get("validado_confronto", True)),
+            }
 
-    # 6) grava (respeitando correções manuais 'admin')
+    # 7) grava (respeitando correções manuais 'admin')
     n_live = n_outros = 0
     for chave, m in melhor.items():
         if jogos.get(chave, {}).get("fonte") == "admin":
@@ -540,7 +941,11 @@ def atualizar_lives(api_key):
             "url": "https://www.youtube.com/watch?v=" + m["videoId"],
             "titulo": m["titulo"].split("|")[0].strip(),
             "estado": m["estado"],
-            "fonte": "auto"
+            "fonte": "auto",
+            "origem": m.get("origem", "auto"),
+            "scheduledStartTime": m.get("scheduledStartTime"),
+            "validado_confronto": True,
+            "atualizado_em": agora_sp().isoformat(timespec="seconds")
         }
         if m["estado"] == "live":
             n_live += 1
