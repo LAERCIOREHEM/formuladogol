@@ -1,13 +1,4725 @@
 {
-  "_comentario": "Arquivo inicial. Será atualizado automaticamente por copa2026/buscar_estatisticas.py.",
+  "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências dependem de disponibilidade no summary/comentário da ESPN.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": null,
+  "atualizado_em": "2026-06-23T20:29:21.356042Z",
   "periodo": "20260611-20260719",
-  "jogos_encontrados": 0,
-  "jogos_processados": 0,
+  "jogos_encontrados": 104,
+  "jogos_processados": 46,
   "falhas_summary": [],
-  "artilheiros": [],
-  "assistencias": [],
-  "cartoes": [],
-  "por_selecao": []
+  "artilheiros": [
+    {
+      "nome": "Lionel Messi",
+      "equipe": "ARG",
+      "gols": 5,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760433",
+        "760456"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Erling Haaland",
+      "equipe": "NOR",
+      "gols": 4,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760430",
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Kylian Mbappé",
+      "equipe": "FRA",
+      "gols": 4,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760457"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Deniz Undav",
+      "equipe": "GER",
+      "gols": 3,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422",
+        "760448"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Jonathan David",
+      "equipe": "CAN",
+      "gols": 3,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760440"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ayase Ueda",
+      "equipe": "JPN",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Brian Brobbey",
+      "equipe": "NED",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Cody Gakpo",
+      "equipe": "NED",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Cristiano Ronaldo",
+      "equipe": "POR",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760461"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Crysencio Summerville",
+      "equipe": "NED",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Cyle Larin",
+      "equipe": "CAN",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760416",
+        "760440"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Daichi Kamada",
+      "equipe": "JPN",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Elijah Just",
+      "equipe": "NZL",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Folarin Balogun",
+      "equipe": "USA",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760417",
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Harry Kane",
+      "equipe": "ENG",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ismael Saibari",
+      "equipe": "MAR",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760419",
+        "760445"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ismaïla Sarr",
+      "equipe": "SEN",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Johan Manzambi",
+      "equipe": "SUI",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760439"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Kai Havertz",
+      "equipe": "GER",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Matheus Cunha",
+      "equipe": "BRA",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760444"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Maxi Araújo",
+      "equipe": "URU",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760429",
+        "760450"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mikel Oyarzabal",
+      "equipe": "ESP",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760453"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Vinícius Júnior",
+      "equipe": "BRA",
+      "gols": 2,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760419",
+        "760444"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Yasin Ayari",
+      "equipe": "SWE",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760424",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Abbosbek Fayzullaev",
+      "equipe": "UZB",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Abdulelah Al Amri",
+      "equipe": "KSA",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760429"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Agustín Canobbio",
+      "equipe": "URU",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760450"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Alex Freeman",
+      "equipe": "USA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417",
+        "760442"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Alexander Isak",
+      "equipe": "SWE",
+      "gols": 1,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760424",
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ali Olwan",
+      "equipe": "JOR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760431"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Amad Diallo",
+      "equipe": "CIV",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760423"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Amine Gouiri",
+      "equipe": "ALG",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Anthony Elanga",
+      "equipe": "SWE",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Aymen Hussein",
+      "equipe": "IRQ",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760430"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Bradley Barcola",
+      "equipe": "FRA",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Breel Embolo",
+      "equipe": "SUI",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760420",
+        "760439"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Caleb Yirenkyi",
+      "equipe": "GHA",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760434"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Connor Metcalfe",
+      "equipe": "AUS",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760421"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Daniel Muñoz",
+      "equipe": "COL",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Emam Ashour",
+      "equipe": "EGY",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760426"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ermin Mahmic",
+      "equipe": "BIH",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760439"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Felix Nmecha",
+      "equipe": "GER",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422",
+        "760448"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Finn Surman",
+      "equipe": "NZL",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427",
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Franck Kessie",
+      "equipe": "CIV",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760423",
+        "760448"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Giovanni Reyna",
+      "equipe": "USA",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Granit Xhaka",
+      "equipe": "SUI",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760439"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Hwang In-Beom",
+      "equipe": "KOR",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760414"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Hélio Varela",
+      "equipe": "CPV",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760450"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ibrahim Mbaye",
+      "equipe": "SEN",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Jamal Musiala",
+      "equipe": "GER",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Jaminton Campaz",
+      "equipe": "COL",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "John McGinn",
+      "equipe": "SCO",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760418"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Jovo Lukic",
+      "equipe": "BIH",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760416"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "João Neves",
+      "equipe": "POR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760435"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Jude Bellingham",
+      "equipe": "ENG",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Julián Quiñones",
+      "equipe": "MEX",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760415",
+        "760441"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Junya Ito",
+      "equipe": "JPN",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Keito Nakamura",
+      "equipe": "JPN",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Kevin Pina",
+      "equipe": "CPV",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760450"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ladislav Krejcí",
+      "equipe": "CZE",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760414",
+        "760438"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Lamine Yamal",
+      "equipe": "ESP",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760453"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Leo Østigård",
+      "equipe": "NOR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760430"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Livano Comenencia",
+      "equipe": "CUW",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760422",
+        "760446"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Luis Díaz",
+      "equipe": "COL",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Luis Romo",
+      "equipe": "MEX",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760441"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Marcus Pedersen",
+      "equipe": "NOR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Marcus Rashford",
+      "equipe": "ENG",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Marko Arnautovic",
+      "equipe": "AUT",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760431"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Martin Baturina",
+      "equipe": "CRO",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mattias Svanberg",
+      "equipe": "SWE",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760424"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Matías Galarza",
+      "equipe": "PAR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760443"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Mauricio",
+      "equipe": "PAR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Michal Sadílek",
+      "equipe": "CZE",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760438"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mohamed Salah",
+      "equipe": "EGY",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760426",
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mohammad Mohebbi",
+      "equipe": "",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mostafa Zico",
+      "equipe": "EGY",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nadhir Benbouali",
+      "equipe": "ALG",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nathan Saliba",
+      "equipe": "CAN",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760440"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nathaniel Brown",
+      "equipe": "GER",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nestory Irankunda",
+      "equipe": "AUS",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760421"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nico Schlotterbeck",
+      "equipe": "GER",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nizar Al Rashdan",
+      "equipe": "JOR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nuno Mendes",
+      "equipe": "POR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760461"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Oh Hyeon-Gyu",
+      "equipe": "KOR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760414"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Omar Rekik",
+      "equipe": "TUN",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760424"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ousmane Dembélé",
+      "equipe": "FRA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760457"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Petar Musa",
+      "equipe": "CRO",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Rafael Leão",
+      "equipe": "POR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760461"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ramin Rezaeian",
+      "equipe": "",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Raúl Jiménez",
+      "equipe": "MEX",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760415"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Romano Schmid",
+      "equipe": "AUT",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760431"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Rubén Vargas",
+      "equipe": "SUI",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760420",
+        "760439"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Teboho Mokoena",
+      "equipe": "RSA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760415",
+        "760438"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Trezeguet",
+      "equipe": "EGY",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Viktor Gyökeres",
+      "equipe": "SWE",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760424"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Virgil van Dijk",
+      "equipe": "NED",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Yoane Wissa",
+      "equipe": "COD",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760435"
+      ],
+      "total_cartoes": 0
+    }
+  ],
+  "assistencias": [
+    {
+      "nome": "Joshua Kimmich",
+      "equipe": "GER",
+      "gols": 0,
+      "assistencias": 4,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Michael Olise",
+      "equipe": "FRA",
+      "gols": 0,
+      "assistencias": 4,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760457"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Alexander Isak",
+      "equipe": "SWE",
+      "gols": 1,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760424",
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Chris Wood",
+      "equipe": "NZL",
+      "gols": 0,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ivan Basic",
+      "equipe": "BIH",
+      "gols": 0,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760416",
+        "760439"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Julio Enciso",
+      "equipe": "PAR",
+      "gols": 0,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417",
+        "760443"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Leandro Trossard",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760426",
+        "760451"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Brahim Díaz",
+      "equipe": "MAR",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760419",
+        "760445"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Breel Embolo",
+      "equipe": "SUI",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760420",
+        "760439"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Bruno Fernandes",
+      "equipe": "POR",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760461"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Bruno Guimarães",
+      "equipe": "BRA",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760419",
+        "760444"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Declan Rice",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Deniz Undav",
+      "equipe": "GER",
+      "gols": 3,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422",
+        "760448"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Denzel Dumfries",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Felix Nmecha",
+      "equipe": "GER",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422",
+        "760448"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ferdi Kadioglu",
+      "equipe": "TUR",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760421",
+        "760443"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Florian Wirtz",
+      "equipe": "GER",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422",
+        "760448"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Kenan Yildiz",
+      "equipe": "TUR",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760421",
+        "760443"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Lucas Paquetá",
+      "equipe": "BRA",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760419",
+        "760444"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Marko Stamenic",
+      "equipe": "NZL",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Martin Ødegaard",
+      "equipe": "NOR",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760430",
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mohamed Salah",
+      "equipe": "EGY",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760426",
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Moisés Caicedo",
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Noor Al Rawabdeh",
+      "equipe": "JOR",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760431"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Pedro Vite",
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Riyad Mahrez",
+      "equipe": "ALG",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Roberto Alvarado",
+      "equipe": "MEX",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760415",
+        "760441"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Rubén Vargas",
+      "equipe": "SUI",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760420",
+        "760439"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ryan Gravenberch",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Vinícius Júnior",
+      "equipe": "BRA",
+      "gols": 2,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760419",
+        "760444"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Vladimír Coufal",
+      "equipe": "CZE",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760414",
+        "760438"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Abdülkerim Bardakci",
+      "equipe": "TUR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760443"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Adrien Rabiot",
+      "equipe": "FRA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Aiden O'Neill",
+      "equipe": "AUS",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760421"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Aleksandar Pavlovic",
+      "equipe": "GER",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Alex Freeman",
+      "equipe": "USA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417",
+        "760442"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Alexandr Sojka",
+      "equipe": "CZE",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760438"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Alexis Mac Allister",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760433"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Alistair Johnston",
+      "equipe": "CAN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760416",
+        "760440"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Amir Al Ammari",
+      "equipe": "IRQ",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760430",
+        "760457"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Amirhossein Hosseinzadeh",
+      "equipe": "NZL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Arthur Masuaku",
+      "equipe": "COD",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760435"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ayase Ueda",
+      "equipe": "JPN",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Aymeric Laporte",
+      "equipe": "ESP",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760453"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Azarías Londoño",
+      "equipe": "PAN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760434"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Brandon Thomas-Asante",
+      "equipe": "GHA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760434"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Bukayo Saka",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Christian Pulisic",
+      "equipe": "USA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Cody Gakpo",
+      "equipe": "NED",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Cristian Volpato",
+      "equipe": "AUS",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760442"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Crysencio Summerville",
+      "equipe": "NED",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Cucho Hernández",
+      "equipe": "COL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Dani Olmo",
+      "equipe": "ESP",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760453"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "David Møller Wolfe",
+      "equipe": "NOR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760430"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Dayot Upamecano",
+      "equipe": "FRA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760457"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Donyell Malen",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Elliot Anderson",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Elliot Stroud",
+      "equipe": "SWE",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Eom Ji-Sung",
+      "equipe": "KOR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760441"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Erling Haaland",
+      "equipe": "NOR",
+      "gols": 4,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760430",
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Fabian Rieder",
+      "equipe": "SUI",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760420"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Facundo Medina",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760456"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Finn Surman",
+      "equipe": "NZL",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427",
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ghislain Konan",
+      "equipe": "CIV",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760423"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Gustavo Puerta",
+      "equipe": "COL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Hannibal Mejbri",
+      "equipe": "TUN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760424"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Hicham Boudaoui",
+      "equipe": "ALG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Hossein Kanani",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760451"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Hwang In-Beom",
+      "equipe": "KOR",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760414"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ibrahim Maza",
+      "equipe": "ALG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Iliman Ndiaye",
+      "equipe": "SEN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ismaïla Sarr",
+      "equipe": "SEN",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ivan Perisic",
+      "equipe": "CRO",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Jesse Randall",
+      "equipe": "NZL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "John Yeboah",
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Jordan Bos",
+      "equipe": "AUS",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760421",
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Josip Stanisic",
+      "equipe": "CRO",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "João Cancelo",
+      "equipe": "POR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760461"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Juan Manuel Sanabria",
+      "equipe": "URU",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760429"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Jules Koundé",
+      "equipe": "FRA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Julian Ryerson",
+      "equipe": "NOR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Julián Quiñones",
+      "equipe": "MEX",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760415",
+        "760441"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Junya Ito",
+      "equipe": "JPN",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Kaishu Sano",
+      "equipe": "JPN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Kamaldeen Sulemana",
+      "equipe": "GHA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760434"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Keito Nakamura",
+      "equipe": "JPN",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Kerem Aktürkoglu",
+      "equipe": "TUR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760443"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Khojiakbar Alijonov",
+      "equipe": "UZB",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760461"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Khuliso Mudau",
+      "equipe": "RSA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760438"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ko Itakura",
+      "equipe": "JPN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760449"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Koki Ogawa",
+      "equipe": "JPN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Krépin Diatta",
+      "equipe": "SEN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Leandro Bacuna",
+      "equipe": "CUW",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Lee Kang-In",
+      "equipe": "KOR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760414",
+        "760441"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Lenny Joseph",
+      "equipe": "HAI",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760418"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Lionel Messi",
+      "equipe": "ARG",
+      "gols": 5,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760433",
+        "760456"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Lucas Bergvall",
+      "equipe": "SWE",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760424",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Luis Díaz",
+      "equipe": "COL",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Luiz Henrique",
+      "equipe": "BRA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760419"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Malik Tillman",
+      "equipe": "USA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Marcos Llorente",
+      "equipe": "ESP",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760428"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Marwan Attia",
+      "equipe": "EGY",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760426"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Matías Viña",
+      "equipe": "URU",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760429"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Maxi Araújo",
+      "equipe": "URU",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760429",
+        "760450"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Memphis Depay",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Merih Demiral",
+      "equipe": "TUR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760421"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Michel Aebischer",
+      "equipe": "SUI",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760420"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Micky van de Ven",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Mikel Merino",
+      "equipe": "ESP",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760428"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mikel Oyarzabal",
+      "equipe": "ESP",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760453"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mohamed Hany",
+      "equipe": "EGY",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Morgan Rogers",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mostafa Zico",
+      "equipe": "EGY",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Mousa Al Tamari",
+      "equipe": "JOR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Musab Al Juwayr",
+      "equipe": "KSA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760429"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nadiem Amiri",
+      "equipe": "GER",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760448"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nathan Saliba",
+      "equipe": "CAN",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760440"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nathaniel Brown",
+      "equipe": "GER",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760422"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nico González",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760433"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Nicolas Jackson",
+      "equipe": "SEN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Noni Madueke",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ousmane Dembélé",
+      "equipe": "FRA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760457"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Patrick Berg",
+      "equipe": "NOR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Pau Cubarsí",
+      "equipe": "ESP",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760453"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Paul Okon-Engstler",
+      "equipe": "AUS",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760421"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Pedri",
+      "equipe": "ESP",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760428"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Pedro Neto",
+      "equipe": "POR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760435"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Petar Sucic",
+      "equipe": "CRO",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760437"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Promise David",
+      "equipe": "CAN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760416"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ramin Rezaeian",
+      "equipe": "",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Raúl Jiménez",
+      "equipe": "MEX",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760415"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Rodrigo De Paul",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760433"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ryan Mendes",
+      "equipe": "CPV",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760450"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Sadio Mané",
+      "equipe": "SEN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760454"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Saman Ghoddos",
+      "equipe": "NZL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Sead Kolasinac",
+      "equipe": "BIH",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760416"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Tajon Buchanan",
+      "equipe": "CAN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760440"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Takefusa Kubo",
+      "equipe": "JPN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Teboho Mokoena",
+      "equipe": "RSA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760415",
+        "760438"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Telmo Arcanjo",
+      "equipe": "CPV",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760428"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Thomas Meunier",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760426"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Tijjani Reijnders",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Tim Payne",
+      "equipe": "NZL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Timothy Castagne",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760426",
+        "760451"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Viktor Gyökeres",
+      "equipe": "SWE",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760424"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Weston McKennie",
+      "equipe": "USA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Wilfried Singo",
+      "equipe": "CIV",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760423"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Xaver Schlager",
+      "equipe": "AUT",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760431"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Yan Diomande",
+      "equipe": "CIV",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760423"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Érik Lira",
+      "equipe": "MEX",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760415"
+      ],
+      "total_cartoes": 0
+    }
+  ],
+  "cartoes": [
+    {
+      "nome": "Miguel Almirón",
+      "equipe": "PAR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 1,
+      "jogos": [
+        "760417",
+        "760443"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Assim Madibo",
+      "equipe": "QAT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 1,
+      "jogos": [
+        "760440"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "César Montes",
+      "equipe": "MEX",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 1,
+      "jogos": [
+        "760415"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Homam El Amin",
+      "equipe": "QAT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 1,
+      "jogos": [
+        "760440"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Nathan Ngoy",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 1,
+      "jogos": [
+        "760451"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Tarik Muharemovic",
+      "equipe": "BIH",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 1,
+      "jogos": [
+        "760439"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Themba Zwane",
+      "equipe": "RSA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 1,
+      "jogos": [
+        "760415"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Yaya Sithole",
+      "equipe": "RSA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 1,
+      "jogos": [
+        "760415"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Sidny Cabral",
+      "equipe": "CPV",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760428",
+        "760450"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Teboho Mokoena",
+      "equipe": "RSA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760415",
+        "760438"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Aaron Hickey",
+      "equipe": "SCO",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760418"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Abdukodir Khusanov",
+      "equipe": "UZB",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Abdulelah Al Amri",
+      "equipe": "KSA",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760429"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Ahmed Fathy",
+      "equipe": "QAT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760440"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Ahmed Fatouh",
+      "equipe": "EGY",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760426"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Alessandro Circati",
+      "equipe": "AUS",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Alistair Johnston",
+      "equipe": "CAN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760416",
+        "760440"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Amar Dedic",
+      "equipe": "BIH",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760439"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Amir Al Ammari",
+      "equipe": "IRQ",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760430",
+        "760457"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Andy Robertson",
+      "equipe": "SCO",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760445"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Antonee Robinson",
+      "equipe": "USA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Bernardo Silva",
+      "equipe": "POR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760435"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Brian Gutiérrez",
+      "equipe": "MEX",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760415"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Caleb Yirenkyi",
+      "equipe": "GHA",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760434"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Callum McCowatt",
+      "equipe": "NZL",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Carlens Arcus",
+      "equipe": "HAI",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760444"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Carlos Harvey",
+      "equipe": "PAN",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760434"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Casemiro",
+      "equipe": "BRA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760419"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Chancel Mbemba",
+      "equipe": "COD",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760435"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Chris Richards",
+      "equipe": "USA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Crysencio Summerville",
+      "equipe": "NED",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "César Blackman",
+      "equipe": "PAN",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760434"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Danley Jean Jacques",
+      "equipe": "HAI",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760444"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Denis Zakaria",
+      "equipe": "SUI",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760420"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Derek Cornelius",
+      "equipe": "CAN",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760440"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Diego Gómez",
+      "equipe": "PAR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Diney Borges",
+      "equipe": "CPV",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760450"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Douglas Santos",
+      "equipe": "BRA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760444"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Edin Dzeko",
+      "equipe": "BIH",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760439"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Ehsan Hajisafi",
+      "equipe": "",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760427"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Eren Elmali",
+      "equipe": "TUR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760443"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Ermedin Demirovic",
+      "equipe": "BIH",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760416"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Facundo Medina",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760456"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Findlay Curtis",
+      "equipe": "SCO",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760418"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Folarin Balogun",
+      "equipe": "USA",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760417",
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Franck Kessie",
+      "equipe": "CIV",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760423",
+        "760448"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Frantzdy Pierrot",
+      "equipe": "HAI",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760444"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Gabriel Gudmundsson",
+      "equipe": "SWE",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Gervane Kastaneer",
+      "equipe": "CUW",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Guéla Doué",
+      "equipe": "CIV",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760423"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Harry Souttar",
+      "equipe": "AUS",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Husam Abu Dahab",
+      "equipe": "JOR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Issa Diop",
+      "equipe": "MAR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760445"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Jackson Porozo",
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760423"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Jacob Italiano",
+      "equipe": "AUS",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Jassem Gaber",
+      "equipe": "QAT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760420"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Jean-Ricner Bellegarde",
+      "equipe": "HAI",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760418"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Johan Mojica",
+      "equipe": "COL",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760436"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Jordan Bos",
+      "equipe": "AUS",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760421",
+        "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Jordy Alcívar",
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Jovo Lukic",
+      "equipe": "BIH",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760416"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Juan José Cáceres",
+      "equipe": "PAR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Juninho Bacuna",
+      "equipe": "CUW",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Juriën Gaari",
+      "equipe": "CUW",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Júnior Alonso",
+      "equipe": "PAR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Kenny McLean",
+      "equipe": "SCO",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760418"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Konrad Laimer",
+      "equipe": "AUT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760456"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Ladislav Krejcí",
+      "equipe": "CZE",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760414",
+        "760438"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Leandro Bacuna",
+      "equipe": "CUW",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760446"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Leandro Paredes",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760456"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Lee Gi-Hyuk",
+      "equipe": "KOR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760414"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Lee Kang-In",
+      "equipe": "KOR",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760414",
+        "760441"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Livano Comenencia",
+      "equipe": "CUW",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760422",
+        "760446"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Luc De Fougerolles",
+      "equipe": "CAN",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760416"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Lucas Bergvall",
+      "equipe": "SWE",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760424",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Mahmoud Abunada",
+      "equipe": "QAT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760420"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Marcel Sabitzer",
+      "equipe": "AUT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760431"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Marwan Attia",
+      "equipe": "EGY",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760426"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Mathías Olivera",
+      "equipe": "URU",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760450"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Matías Galarza",
+      "equipe": "PAR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760443"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Maxim De Cuyper",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760426"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Memphis Depay",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Micky van de Ven",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Mohamed Kanno",
+      "equipe": "KSA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760453"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Mohanad Lasheen",
+      "equipe": "EGY",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Nico Elvedi",
+      "equipe": "SUI",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760439"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Nikola Katic",
+      "equipe": "BIH",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760416"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Nkosinathi Sibisi",
+      "equipe": "RSA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760415"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Nélson Semedo",
+      "equipe": "POR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760435"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Odiljon Khamrobekov",
+      "equipe": "UZB",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760461"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Paik Seung-Ho",
+      "equipe": "KOR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760441"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Pedri",
+      "equipe": "ESP",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760428"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Ramiz Zerrouki",
+      "equipe": "ALG",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760455"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Rani Khedira",
+      "equipe": "TUN",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760424"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Renato Veiga",
+      "equipe": "POR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760461"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Rodrigo Bentancur",
+      "equipe": "URU",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760450"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Roger Ibañez",
+      "equipe": "BRA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760419"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Romelu Lukaku",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760451"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Saeid Ezatolahi",
+      "equipe": "",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760451"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Salem Al Dawsari",
+      "equipe": "KSA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760453"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Sarpreet Singh",
+      "equipe": "NZL",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760452"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Seko Fofana",
+      "equipe": "CIV",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760423"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Stefan Posch",
+      "equipe": "AUT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760456"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Thalente Mbatha",
+      "equipe": "RSA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760438"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Timothy Castagne",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760426",
+        "760451"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Tomás Araújo",
+      "equipe": "POR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760435"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Tyler Adams",
+      "equipe": "USA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Yasin Ayari",
+      "equipe": "SWE",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760424",
+        "760447"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Yunus Akgün",
+      "equipe": "TUR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760421"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Zaid Tahseen",
+      "equipe": "IRQ",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760430"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Álex Arce",
+      "equipe": "PAR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 1
+    }
+  ],
+  "por_selecao": [
+    {
+      "equipe": "ALG",
+      "gols": 2,
+      "assistencias": 4,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "ARG",
+      "gols": 5,
+      "assistencias": 5,
+      "amarelos": 2,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "AUS",
+      "gols": 2,
+      "assistencias": 4,
+      "amarelos": 4,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "AUT",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 6,
+      "amarelos": 3,
+      "vermelhos": 1
+    },
+    {
+      "equipe": "BIH",
+      "gols": 2,
+      "assistencias": 4,
+      "amarelos": 5,
+      "vermelhos": 1
+    },
+    {
+      "equipe": "BRA",
+      "gols": 4,
+      "assistencias": 7,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "CAN",
+      "gols": 6,
+      "assistencias": 4,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "CIV",
+      "gols": 2,
+      "assistencias": 3,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "COD",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "COL",
+      "gols": 3,
+      "assistencias": 3,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "CPV",
+      "gols": 2,
+      "assistencias": 2,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "CRO",
+      "gols": 2,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "CUW",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 5,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "CZE",
+      "gols": 2,
+      "assistencias": 3,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 5,
+      "amarelos": 2,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "EGY",
+      "gols": 4,
+      "assistencias": 5,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "ENG",
+      "gols": 4,
+      "assistencias": 6,
+      "amarelos": 0,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "ESP",
+      "gols": 3,
+      "assistencias": 7,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "FRA",
+      "gols": 6,
+      "assistencias": 8,
+      "amarelos": 0,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "GER",
+      "gols": 9,
+      "assistencias": 13,
+      "amarelos": 0,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "GHA",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "HAI",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 4,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "IRQ",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "JOR",
+      "gols": 2,
+      "assistencias": 3,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "JPN",
+      "gols": 6,
+      "assistencias": 7,
+      "amarelos": 0,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "KOR",
+      "gols": 2,
+      "assistencias": 3,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "KSA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "MAR",
+      "gols": 2,
+      "assistencias": 2,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "MEX",
+      "gols": 3,
+      "assistencias": 5,
+      "amarelos": 1,
+      "vermelhos": 1
+    },
+    {
+      "equipe": "NED",
+      "gols": 7,
+      "assistencias": 10,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "NOR",
+      "gols": 6,
+      "assistencias": 6,
+      "amarelos": 0,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "NZL",
+      "gols": 3,
+      "assistencias": 10,
+      "amarelos": 2,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "PAN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "PAR",
+      "gols": 2,
+      "assistencias": 3,
+      "amarelos": 6,
+      "vermelhos": 1
+    },
+    {
+      "equipe": "POR",
+      "gols": 5,
+      "assistencias": 4,
+      "amarelos": 4,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "QAT",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 3,
+      "vermelhos": 2
+    },
+    {
+      "equipe": "RSA",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 4,
+      "vermelhos": 2
+    },
+    {
+      "equipe": "SCO",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 4,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "SEN",
+      "gols": 3,
+      "assistencias": 5,
+      "amarelos": 0,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "SUI",
+      "gols": 5,
+      "assistencias": 6,
+      "amarelos": 2,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "SWE",
+      "gols": 6,
+      "assistencias": 6,
+      "amarelos": 3,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "TUN",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "TUR",
+      "gols": 0,
+      "assistencias": 7,
+      "amarelos": 2,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "URU",
+      "gols": 3,
+      "assistencias": 3,
+      "amarelos": 2,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "USA",
+      "gols": 4,
+      "assistencias": 4,
+      "amarelos": 4,
+      "vermelhos": 0
+    },
+    {
+      "equipe": "UZB",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0
+    }
+  ]
 }
