@@ -9,6 +9,13 @@
 
   const CFG = window.COPA_CFG || { url: "", key: "" };
   const ONLINE = !!(CFG.url && CFG.key);
+  const API_ESPN = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+  const JANELAS_ESPN = [
+    "20260611-20260627", "20260628-20260703", "20260704-20260707",
+    "20260709-20260711", "20260714-20260715", "20260718-20260718", "20260719-20260719"
+  ];
+  const ESPN_OVR = {};
+  const VIRADA_SIMULADO = new Date("2026-06-28T02:00:00-03:00");
 
   const FASES = [
     { id: "grupos", nome: "Grupos" }, { id: "r32", nome: "2ª fase" },
@@ -51,16 +58,19 @@
 
   async function init() {
     try {
-      const [s, e, t, pm] = await Promise.all([
+      const [s, e, t, pm, fp] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
         fetch("dados/estrutura_mata_mata.json").then(r => r.json()),
         fetch("dados/terceiros_map.json").then(r => r.json()),
-        fetch("dados/palpites_mata.json").then(r => r.json()).catch(() => ({ apostadores: {} }))
+        fetch("dados/palpites_mata.json").then(r => r.json()).catch(() => ({ apostadores: {} })),
+        fetch("dados/fairplay.json?t=" + Date.now()).then(r => r.json()).catch(() => ({ fairplay: {} }))
       ]);
       DADOS.selecoes = s.selecoes; DADOS.estrutura = e; DADOS.terceirosMap = t;
       DADOS.palpitesMata = (pm && pm.apostadores) || {};
+      DADOS.fairplay = (fp && fp.fairplay) || {};
       DADOS.nomeDe = {}; DADOS.isoDe = {};
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
+      carregarOficialAtual(); // assíncrono: alimenta os ✓/✗ dos palpites sem travar o login
     } catch (err) {
       $("#tela-login").innerHTML = '<div class="cartao-login"><h2>Erro ao carregar dados</h2>' +
         '<p class="prazo">Abra o módulo por um servidor (ex.: <code>python -m http.server</code>) ' +
@@ -475,6 +485,130 @@
     $("#progresso-texto").textContent = tot + " de 104 jogos preenchidos";
   }
 
+  function modoSimulado() { return Date.now() < VIRADA_SIMULADO.getTime(); }
+  function normESPN(ab) { return ESPN_OVR[ab] || ab; }
+  function phaseOf(ev) { return (ev && ev.season && ev.season.slug) || ""; }
+  function isPost(ev) { return !!(ev && ev.competitions && ev.competitions[0] && ev.competitions[0].status && ev.competitions[0].status.type && ev.competitions[0].status.type.state === "post"); }
+  function teamsOf(ev) {
+    try {
+      return (ev.competitions[0].competitors || [])
+        .map(c => normESPN((c.team || {}).abbreviation))
+        .filter(t => DADOS.nomeDe && DADOS.nomeDe[t]);
+    } catch (e) { return []; }
+  }
+  function winLoseOf(ev) {
+    try {
+      const cs = ev.competitions[0].competitors || [];
+      const w = cs.find(c => c.winner), l = cs.find(c => !c.winner);
+      const W = w ? normESPN((w.team || {}).abbreviation) : null;
+      const L = l ? normESPN((l.team || {}).abbreviation) : null;
+      return { w: (W && DADOS.nomeDe[W]) ? W : null, l: (L && DADOS.nomeDe[L]) ? L : null };
+    } catch (e) { return { w: null, l: null }; }
+  }
+  function buildOficial(events) {
+    const o = { decididos: {} };
+    const JOGOS = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes || []);
+    const GRUPOS = [...new Set(JOGOS.map(j => j.grupo))].sort();
+    const slugTeams = slug => [...new Set((events || []).filter(e => phaseOf(e) === slug).flatMap(teamsOf))];
+
+    const r32 = slugTeams("round-of-32");
+    o.avancam_oitavas = slugTeams("round-of-16");
+    o.avancam_quartas = slugTeams("quarterfinals");
+    o.semifinalistas = slugTeams("semifinals");
+    o.finalistas = slugTeams("final");
+
+    const realG = [];
+    (events || []).filter(e => phaseOf(e) === "group-stage" && isPost(e)).forEach(ev => {
+      try {
+        const cs = ev.competitions[0].competitors || [];
+        const home = cs.find(c => c.homeAway === "home") || cs[0], away = cs.find(c => c.homeAway === "away") || cs[1];
+        if (!home || !away) return;
+        const hId = normESPN(home.team.abbreviation), aId = normESPN(away.team.abbreviation);
+        const j = JOGOS.find(x => (x.a === hId && x.b === aId) || (x.a === aId && x.b === hId));
+        if (!j) return;
+        const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
+        realG.push({ jogo_id: j.jogo_id, ga: j.a === hId ? hs : as, gb: j.a === hId ? as : hs });
+      } catch (e) {}
+    });
+
+    const completos = {}; GRUPOS.forEach(g => completos[g] = realG.filter(p => p.jogo_id.startsWith("G_" + g + "_")).length === 6);
+    const todosGrupos = GRUPOS.length && GRUPOS.every(g => completos[g]);
+    if (realG.length) {
+      let dg = null;
+      try { dg = COPA_ENGINE.derivar(DADOS.selecoes, realG, {}, DADOS.estrutura, DADOS.terceirosMap, DADOS.fairplay || {}); } catch (e) {}
+      if (dg) {
+        o.classificacao = {};
+        GRUPOS.forEach(g => { if (completos[g]) o.classificacao[g] = dg.classificacao[g]; });
+        if (todosGrupos) { o.classificados32 = dg.classificados32; o.melhores_terceiros = dg.melhores_terceiros; }
+        else if (modoSimulado()) {
+          // mesma foto de hoje usada no Bolão: quem passaria se a fase de grupos acabasse agora
+          o.classificacao = {};
+          GRUPOS.forEach(g => { if (dg.classificacao[g]) o.classificacao[g] = dg.classificacao[g]; });
+          o.classificados32 = dg.classificados32;
+          o.melhores_terceiros = dg.melhores_terceiros;
+          o._simulado = true;
+        }
+      }
+    }
+    if (r32.length === 32) o.classificados32 = r32;
+
+    const fin = (events || []).find(e => phaseOf(e) === "final" && isPost(e));
+    if (fin) { const wl = winLoseOf(fin); o.campeao = wl.w; o.vice = wl.l; o.decididos.campeao = true; o.decididos.vice = true; }
+    const ter = (events || []).find(e => phaseOf(e) === "third-place" && isPost(e));
+    if (ter) { const wl = winLoseOf(ter); o.terceiro = wl.w; o.quarto = wl.l; o.decididos.terceiro = true; o.decididos.quarto = true; }
+
+    const elim = new Set();
+    (events || []).forEach(ev => {
+      if (phaseOf(ev) !== "group-stage" && isPost(ev)) {
+        const wl = winLoseOf(ev); if (wl.l) elim.add(wl.l);
+      }
+    });
+    if ((todosGrupos || o._simulado) && o.classificados32) {
+      const passou = new Set(o.classificados32);
+      (DADOS.selecoes || []).forEach(s => { if (!passou.has(s.id)) elim.add(s.id); });
+    }
+    o.eliminados = [...elim];
+    o._meta = { todosGrupos, simulado: !!o._simulado };
+    return o;
+  }
+  async function carregarOficialAtual() {
+    try {
+      const lotes = await Promise.all(JANELAS_ESPN.map(d => fetch(`${API_ESPN}?dates=${d}&limit=120`).then(r => r.json()).catch(() => ({ events: [] }))));
+      const vistos = new Set(); const events = [];
+      lotes.forEach(l => (l.events || []).forEach(ev => { if (!vistos.has(ev.id)) { vistos.add(ev.id); events.push(ev); } }));
+      DADOS.oficial = buildOficial(events);
+      const tela = document.querySelector("#tela-palpite:not(.oculto)");
+      if (tela && faseAtual !== "grupos") renderPalpite();
+    } catch (e) {
+      DADOS.oficial = null;
+    }
+  }
+  function statusPalpiteFase(id, fase) {
+    const o = DADOS.oficial;
+    if (!o || !id) return "pend";
+    const mapa = {
+      r32: "classificados32",
+      oitavas: "avancam_oitavas",
+      quartas: "avancam_quartas",
+      semifinais: "semifinalistas",
+      final: "finalistas"
+    };
+    const campo = mapa[fase];
+    const listaFase = (campo && o[campo]) || [];
+    // Se a fase já tem lista oficial/simulada, compara diretamente com ela.
+    if (listaFase.length) return listaFase.indexOf(id) !== -1 ? "ok" : "err";
+    // Antes da fase acontecer: vermelho para quem já caiu; verde para quem ainda pode confirmar.
+    if ((o.eliminados || []).indexOf(id) !== -1) return "err";
+    if ((o.classificados32 || []).indexOf(id) !== -1) return "ok";
+    return "pend";
+  }
+  function marcadorStatus(id, fase) {
+    const st = statusPalpiteFase(id, fase);
+    if (st === "ok") return `<span class="cn-status cn-ok" title="Ainda vivo / batendo com a situação atual">✓</span>`;
+    if (st === "err") return `<span class="cn-status cn-err" title="Hoje está fora / não confirma este palpite">×</span>`;
+    return "";
+  }
+
   // Painel READ-ONLY com as SELEÇÕES que avançam nesta fase, conforme o palpite canônico
   // auditado. Só aparece depois da trava (palpite lacrado), pra não atrapalhar a digitação.
   // É a fonte fiel de "quem passa" — independente das posições do chaveamento.
@@ -495,12 +629,13 @@
     const [rot, lista] = cfg;
     const chips = lista.map(id => {
       const nome = (DADOS.nomeDe && DADOS.nomeDe[id]) ? DADOS.nomeDe[id] : id;
-      return `<span class="cn-chip">${bandeira(id)}<span>${nome}</span></span>`;
+      const st = statusPalpiteFase(id, fase);
+      return `<span class="cn-chip cn-chip-${st}">${bandeira(id)}<span>${nome}</span>${marcadorStatus(id, fase)}</span>`;
     }).join("");
     const box = el("div", "canon-fase");
     box.innerHTML = `<div class="cn-tit">✅ Seu palpite (seleções que avançam) — ${rot}</div>
       <div class="cn-chips">${chips}</div>
-      <div class="cn-nota">No mata-mata vale <b>quem você cravou que avança</b>, não o placar nem a posição no chaveamento. Esta é a sua aposta auditada (confira no 📄 Comprovante).</div>`;
+      <div class="cn-nota">No mata-mata vale <b>quem você cravou que avança</b>, não o placar nem a posição no chaveamento. ✓/× indica a situação atual pelo feed oficial/simulado do Bolão.</div>`;
     return box;
   }
 

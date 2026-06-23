@@ -328,3 +328,12 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .stat-num b{font-size:22px}
   .stat-bar{align-items:flex-end}
 }
+
+/* Situação atual dos palpites no mata-mata (Meus Palpites) */
+.canon-fase .cn-chip{position:relative;padding-right:6px}
+.canon-fase .cn-chip-ok{border-color:rgba(42,211,111,.45);background:rgba(42,211,111,.10)}
+.canon-fase .cn-chip-err{border-color:rgba(255,75,91,.45);background:rgba(255,75,91,.10)}
+.canon-fase .cn-status{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:5px;margin-left:1px;font-size:11px;font-weight:900;line-height:1;color:#fff}
+.canon-fase .cn-ok{background:#2ad36f}
+.canon-fase .cn-err{background:#ff4b5b}
+@media (max-width:640px){.canon-fase .cn-chip{font-size:11.5px;padding:3px 7px}.canon-fase .cn-status{width:14px;height:14px;font-size:10px}}
