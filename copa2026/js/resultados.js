@@ -226,7 +226,7 @@
   }
   function siglaObjTime(o, mapa) {
     if (!o || typeof o !== "object") return "";
-    const candObjs = [o.team, o.scoringTeam, o.competitor, o.participant, o.opponent, o.club];
+    const candObjs = [o.team, o.scoringTeam, o.competitor, o.participant, o.club];
     for (const t of candObjs) {
       if (!t || typeof t !== "object") continue;
       const sig = dpSigla(t.abbreviation) || dpSigla(t.shortDisplayName) || dpSigla(t.displayName) || dpSigla(t.name);
@@ -258,22 +258,28 @@
     }
     return out;
   }
-  function contarVermelhosPorEstatistica(summary) {
-    let total = 0;
+  function contarVermelhosPorEstatistica(summary, mapaTimes, homeSig, awaySig) {
+    const out = { home: 0, away: 0, total: 0 };
     const equipes = getPath(summary, ["boxscore", "teams"], []);
-    if (!Array.isArray(equipes)) return 0;
+    if (!Array.isArray(equipes)) return out;
     equipes.forEach(t => {
       const stats = t.statistics || [];
       if (!Array.isArray(stats)) return;
+      let nTime = 0;
       stats.forEach(st => {
         const nome = String(st.name || st.displayName || st.label || "").toLowerCase();
         if (/red/.test(nome) || /vermelh/.test(nome)) {
           const n = parseInt(st.value ?? st.displayValue ?? "0", 10);
-          if (!isNaN(n)) total += n;
+          if (!isNaN(n)) nTime += n;
         }
       });
+      if (!nTime) return;
+      const sig = siglaObjTime(t, mapaTimes) || dpSigla(getPath(t, ["team", "abbreviation"], "")) || dpSigla(getPath(t, ["team", "displayName"], ""));
+      if (sig && homeSig && sig === homeSig) out.home += nTime;
+      else if (sig && awaySig && sig === awaySig) out.away += nTime;
+      out.total += nTime;
     });
-    return total;
+    return out;
   }
   function extrairLances(summary, ev) {
     const comp = getPath(ev, ["competitions", 0], {}) || {};
@@ -286,26 +292,62 @@
     const gols = [], usados = new Set();
     let ultimoScore = { home: 0, away: 0 };
 
+    const finalHome = scoreNum(home.score);
+    const finalAway = scoreNum(away.score);
+
     function ladoDoGol(lance) {
       const sig = siglaObjTime(lance, mapaTimes);
-      if (sig && homeSig && sig === homeSig) return "home";
-      if (sig && awaySig && sig === awaySig) return "away";
+      if (sig && homeSig && sig === homeSig) return { lado: "home", fonte: "time" };
+      if (sig && awaySig && sig === awaySig) return { lado: "away", fonte: "time" };
       const sc = scoreDoLance(lance);
       if (sc) {
-        if (sc.home > ultimoScore.home && sc.away === ultimoScore.away) return "home";
-        if (sc.away > ultimoScore.away && sc.home === ultimoScore.home) return "away";
+        if (sc.home > ultimoScore.home && sc.away === ultimoScore.away) return { lado: "home", fonte: "placar" };
+        if (sc.away > ultimoScore.away && sc.home === ultimoScore.home) return { lado: "away", fonte: "placar" };
       }
-      return "";
+      return { lado: "", fonte: "" };
+    }
+    function ordemMinuto(g) {
+      const m = String(g.minuto || "").match(/\d+/);
+      return m ? parseInt(m[0], 10) : 999;
+    }
+    function normalizarLadosDosGols() {
+      if (finalHome == null || finalAway == null) return;
+
+      // 1) Se algum lance veio sem time no feed da ESPN, encaixa pelo placar final.
+      // Ex.: jogo 6x0; qualquer gol sem time só pode ser do lado que ainda falta completar.
+      let h = gols.filter(g => g.lado === "home").length;
+      let a = gols.filter(g => g.lado === "away").length;
+      gols.filter(g => !g.lado).sort((x, y) => ordemMinuto(x) - ordemMinuto(y)).forEach(g => {
+        let faltaH = Math.max(0, finalHome - h);
+        let faltaA = Math.max(0, finalAway - a);
+        if (faltaH > 0 && faltaA <= 0) { g.lado = "home"; g.fonte = "placar-final"; h++; return; }
+        if (faltaA > 0 && faltaH <= 0) { g.lado = "away"; g.fonte = "placar-final"; a++; return; }
+        if (faltaH > faltaA) { g.lado = "home"; g.fonte = "inferido"; h++; return; }
+        if (faltaA > faltaH) { g.lado = "away"; g.fonte = "inferido"; a++; return; }
+      });
+
+      // 2) Segurança: se ainda sobrou algum sem lado, distribui sem deixar no meio do card.
+      h = gols.filter(g => g.lado === "home").length;
+      a = gols.filter(g => g.lado === "away").length;
+      gols.filter(g => !g.lado).sort((x, y) => ordemMinuto(x) - ordemMinuto(y)).forEach(g => {
+        const faltaH = Math.max(0, finalHome - h);
+        const faltaA = Math.max(0, finalAway - a);
+        if (faltaH >= faltaA && faltaH > 0) { g.lado = "home"; h++; }
+        else if (faltaA > 0) { g.lado = "away"; a++; }
+        else { g.lado = h <= a ? "home" : "away"; if (g.lado === "home") h++; else a++; }
+        g.fonte = g.fonte || "distribuido";
+      });
     }
     function registrarGol(lance) {
       const nome = jogadorDoLance(lance) || golDoTexto(textoLance(lance));
       if (!nome) return;
       const min = minutoDoLance(lance);
-      const lado = ladoDoGol(lance);
+      const infoLado = ladoDoGol(lance);
+      const lado = infoLado.lado;
       const key = min + "|" + nome.toLowerCase() + "|" + lado;
       if (usados.has(key)) return;
       usados.add(key);
-      gols.push({ minuto: min, nome: nome, lado: lado });
+      gols.push({ minuto: min, nome: nome, lado: lado, fonte: infoLado.fonte });
       const sc = scoreDoLance(lance);
       if (sc) ultimoScore = sc;
     }
@@ -328,8 +370,14 @@
       });
     }
 
-    let vermelhos = 0;
+    const vermelhos = { home: 0, away: 0, total: 0 };
     const redsUsados = new Set();
+    function ladoDoCartao(lance) {
+      const sig = siglaObjTime(lance, mapaTimes) || dpSigla(timeDoTexto(textoLance(lance)));
+      if (sig && homeSig && sig === homeSig) return "home";
+      if (sig && awaySig && sig === awaySig) return "away";
+      return "";
+    }
     arraysComentario(summary).forEach(ev2 => {
       const raw = (textoTipo(ev2) + " " + textoLance(ev2)).toLowerCase();
       const ehVermelho = /red card|cart[aã]o vermelho|second yellow|segundo amarelo/.test(raw);
@@ -337,21 +385,45 @@
       const key = (minutoDoLance(ev2) + "|" + textoLance(ev2)).toLowerCase();
       if (redsUsados.has(key)) return;
       redsUsados.add(key);
-      vermelhos++;
+      const lado = ladoDoCartao(ev2);
+      if (lado === "home") vermelhos.home++;
+      else if (lado === "away") vermelhos.away++;
+      vermelhos.total++;
     });
-    if (!vermelhos) vermelhos = contarVermelhosPorEstatistica(summary);
-    return { gols, golsHome: gols.filter(g => g.lado === "home"), golsAway: gols.filter(g => g.lado === "away"), golsIndef: gols.filter(g => !g.lado), vermelhos };
+
+    // Complemento/segurança: quando o comentário não traz o time do cartão,
+    // usa o boxscore da ESPN, que normalmente informa cartões por seleção.
+    const statsReds = contarVermelhosPorEstatistica(summary, mapaTimes, homeSig, awaySig);
+    if (statsReds.home > vermelhos.home) vermelhos.home = statsReds.home;
+    if (statsReds.away > vermelhos.away) vermelhos.away = statsReds.away;
+    vermelhos.total = Math.max(vermelhos.total, statsReds.total, vermelhos.home + vermelhos.away);
+
+    normalizarLadosDosGols();
+    const ordenados = gols.slice().sort((x, y) => ordemMinuto(x) - ordemMinuto(y));
+    return {
+      gols: ordenados,
+      golsHome: ordenados.filter(g => g.lado === "home"),
+      golsAway: ordenados.filter(g => g.lado === "away"),
+      vermelhosHome: vermelhos.home,
+      vermelhosAway: vermelhos.away,
+      vermelhos: vermelhos.total
+    };
   }
   function chipGol(g) {
     return `<span class="gol-chip">⚽ ${g.minuto ? escTxt(g.minuto) + " " : ""}${escTxt(g.nome)}</span>`;
   }
+  function chipVermelho(qtd, lado) {
+    if (!qtd) return "";
+    const icones = "🟥".repeat(Math.min(qtd, 4));
+    const extra = qtd > 4 ? `<span class="rednum">×${qtd}</span>` : "";
+    const rotulo = lado === "home" ? "seleção da esquerda" : "seleção da direita";
+    return `<span class="redcards" title="${qtd} cartão(ões) vermelho(s) — ${rotulo}">${icones}${extra}</span>`;
+  }
   function htmlLances(dados) {
     if (!dados || ((!dados.gols || !dados.gols.length) && !dados.vermelhos)) return "";
-    const home = (dados.golsHome || []).map(chipGol).join(" ");
-    const away = (dados.golsAway || []).map(chipGol).join(" ");
-    const indef = (dados.golsIndef || []).map(chipGol).join(" ");
-    const reds = dados.vermelhos ? `<span class="redcards" title="${dados.vermelhos} cartão(ões) vermelho(s)">${"🟥".repeat(Math.min(dados.vermelhos, 4))}${dados.vermelhos > 4 ? `<span class="rednum">×${dados.vermelhos}</span>` : ""}</span>` : "";
-    return `<div class="gols-time gols-home">${home}</div><div class="gols-centro">${reds}${indef ? `<span class="gols-indef">${indef}</span>` : ""}</div><div class="gols-time gols-away">${away}</div>`;
+    const home = chipVermelho(dados.vermelhosHome || 0, "home") + (dados.golsHome || []).map(chipGol).join("");
+    const away = chipVermelho(dados.vermelhosAway || 0, "away") + (dados.golsAway || []).map(chipGol).join("");
+    return `<div class="gols-time gols-home">${home}</div><div class="gols-centro"></div><div class="gols-time gols-away">${away}</div>`;
   }
   async function carregarLancesVisiveis(events) {
     const lista = (events || []).filter(ev => getPath(ev, ["competitions", 0, "status", "type", "state"], "pre") !== "pre");
