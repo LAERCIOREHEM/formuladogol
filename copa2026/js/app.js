@@ -143,8 +143,11 @@
     const pm = DADOS.palpitesMata || {};
     if (!USER || !USER.nome) return null;
     if (pm[USER.nome]) return pm[USER.nome];
-    const alvo = USER.nome.trim().toLowerCase();
-    const k = Object.keys(pm).find(n => n.trim().toLowerCase() === alvo);
+    // casa o nome ignorando MAIÚSC/minúsc E acentos (ex.: "Léo" == "LEO", "Marcão" == "MARCAO"),
+    // pra nenhum apostador ficar sem a lista auditada por uma diferença de grafia.
+    const norm = s => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+    const alvo = norm(USER.nome);
+    const k = Object.keys(pm).find(n => norm(n) === alvo);
     return k ? pm[k] : null;
   }
 
@@ -508,11 +511,20 @@
     const painelCan = painelCanonicoFase(fase);
     if (painelCan) c.appendChild(painelCan);
 
-    // Palpite LACRADO + lista canônica auditada disponível: o mata-mata é exibido
-    // SOMENTE como as seleções que avançam (igual ao Bolão), nunca os confrontos
-    // propagados por posição — que mostravam a seleção errada (ex.: França × Arábia
-    // em vez de França × Espanha) por causa do desempate da FIFA.
-    const travadoRO = (FINALIZADO || Date.now() > TRAVA_MS) && !!meuCanonico();
+    // Depois da TRAVA (ou palpite finalizado) o mata-mata vira READ-ONLY e é exibido
+    // SOMENTE como as seleções que avançam (painel canônico auditado), NUNCA os
+    // confrontos propagados por posição — que mostravam a seleção errada (ex.:
+    // "Argentina × Arábia" / "México × Espanha") porque o desempate da FIFA reordenou
+    // os grupos e o slot "2H" passou a apontar pra outra seleção. A supressão NÃO
+    // depende mais de achar o canônico: travou, não mostra confronto-fantasma.
+    const travadoRO = (FINALIZADO || Date.now() > TRAVA_MS);
+    // Salvaguarda: travado mas sem lista auditada localizada pelo nome → avisa em vez
+    // de exibir o chaveamento enganoso (não deve ocorrer; os 24 têm lista com hash).
+    if (travadoRO && !painelCan && !meuCanonico()) {
+      c.appendChild(el("div", "aviso-anexo",
+        "Seu palpite de mata-mata auditado não foi localizado pelo nome de login. " +
+        "Fale com o administrador para conferir o cadastro — nada foi alterado no banco."));
+    }
     let jogos;
     if (fase === "final") {
       jogos = [{ id: "M104", rot: "🏆 Disputa do Título" }, { id: "M103", rot: "Disputa do 3º Lugar" }]
