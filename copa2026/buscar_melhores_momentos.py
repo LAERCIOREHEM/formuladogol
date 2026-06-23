@@ -85,9 +85,10 @@ APELIDOS = {
 def id_do_time(trecho):
     """recebe um pedaço de texto e tenta achar o id do time (casa pelo apelido mais longo)."""
     t = norm(trecho)
-    # tenta casar os apelidos do mais longo pro mais curto (evita 'CONGO' casar antes de 'RD CONGO')
+    # tenta casar os apelidos do mais longo pro mais curto (evita 'CONGO' casar antes de 'RD CONGO').
+    # O casamento por palavra evita falsos positivos com apelidos curtos (ex.: IRA dentro de IRAQUE).
     for ape in sorted(APELIDOS, key=len, reverse=True):
-        if ape in t:
+        if re.search(r"(^| )" + re.escape(ape) + r"($| )", t):
             return APELIDOS[ape]
     return None
 
@@ -106,6 +107,52 @@ def parse_titulo(titulo):
     a = id_do_time(m.group(1))
     b = id_do_time(m.group(2))
     return a, b
+
+
+def tem_melhores_momentos_no_titulo(titulo):
+    return "MELHORES MOMENTOS" in norm(titulo)
+
+
+def titulo_ruim_para_fallback_generico(titulo):
+    """Bloqueia vídeos do canal que parecem live, jogo completo, corte ou clipe solto.
+    O fallback genérico só deve entrar quando o vídeo parece ser o VT/resumo do confronto,
+    mas a Cazé esqueceu de escrever 'MELHORES MOMENTOS' no título."""
+    t = norm(titulo)
+    termos_bloqueados = (
+        "AO VIVO", "JOGO COMPLETO", "PRE JOGO", "POS JOGO", "TRANSMISSAO",
+        "ASSISTA", "NARRACAO", "AQUECIMENTO", "ESQUENTA", "COLETIVA",
+        "ENTREVISTA", "BASTIDORES", "REACT", "CORTE", "SHORTS", "SHORT",
+        "GOL DE", "GOLACO", "PENALTI", "ESCALACAO", "TODOS OS LANCES"
+    )
+    return any(x in t for x in termos_bloqueados)
+
+
+def parse_confronto_generico(titulo):
+    """Extrai (idA, idB) de títulos no formato seleção x seleção, mesmo sem
+    o texto 'MELHORES MOMENTOS' e mesmo sem placar.
+
+    Ex.: 'JORDÂNIA 0 X 1 ARGÉLIA | COPA ...'
+         'JORDÂNIA X ARGÉLIA | COPA ...'
+    """
+    # Se houver placar, usa primeiro o parser mais específico já existente.
+    a, b = parse_titulo(titulo)
+    if a and b:
+        return a, b
+
+    # Remove rótulos que podem aparecer antes do confronto e limita no primeiro '|'.
+    t = re.sub(r"(?i)melhores\s+momentos\s*[:|]?", " ", titulo)
+    t = re.sub(r"(?i)resumo\s*[:|]?", " ", t)
+    t = t.split("|")[0]
+
+    # Padrões aceitos: TIME X TIME, TIME 0 X 1 TIME, TIME 0x1 TIME.
+    m = re.search(r"(.+?)\s+(?:\d+\s*)?[xX]\s*(?:\d+\s*)?(.+)", t)
+    if not m:
+        return None, None
+    a = id_do_time(m.group(1))
+    b = id_do_time(m.group(2))
+    if a and b and a != b:
+        return a, b
+    return None, None
 
 def yt_get(url):
     req = urllib.request.Request(url, headers={"User-Agent": "bolao-copa/1.0"})
@@ -288,11 +335,26 @@ def main():
     print(f"Vídeos na playlist: {len(videos)}")
 
     novos, ignorados = 0, 0
+
+    # --- ETAPA 1: playlist oficial da CazéTV ---
+    # Regra nova: se o vídeo está NA PLAYLIST oficial, ele é fortíssimo sinal de que é destaque.
+    # Então tentamos casar o confronto mesmo quando o estagiário esqueceu de escrever
+    # "MELHORES MOMENTOS" no título (caso Jordânia x Argélia).
     for v in videos:
-        # só nos interessam os de "melhores momentos"
-        if "MELHORES MOMENTOS" not in norm(v["titulo"]):
-            continue
-        a, b = parse_titulo(v["titulo"])
+        titulo_tem_mm = tem_melhores_momentos_no_titulo(v["titulo"])
+        if titulo_tem_mm:
+            a, b = parse_titulo(v["titulo"])
+            # tolerância: se tiver "melhores momentos" mas sem placar no título, ainda tenta TIME X TIME.
+            if not a or not b:
+                a, b = parse_confronto_generico(v["titulo"])
+        else:
+            # Mesmo dentro da playlist, não usa como melhores momentos se for claramente live,
+            # jogo completo, corte, gol isolado etc.
+            if titulo_ruim_para_fallback_generico(v["titulo"]):
+                a, b = None, None
+            else:
+                a, b = parse_confronto_generico(v["titulo"])
+
         if not a or not b:
             ignorados += 1
             print("  não casei:", v["titulo"][:70])
@@ -307,6 +369,8 @@ def main():
             "fonte": "auto"
         }
         novos += 1
+        if not titulo_tem_mm:
+            print(f"  + (playlist/confronto sem rótulo) {chave}: {v['titulo'][:60]}")
 
     # --- ETAPA 2: lê os UPLOADS RECENTES do canal da Cazé (determinístico) ---
     # A Cazé às vezes não adiciona o vídeo na playlist de melhores momentos (ex.: EUA x Austrália,
@@ -320,10 +384,14 @@ def main():
             vistos.add(v["videoId"])
             extra.append(v)
     print(f"  uploads recentes lidos (novos): {len(extra)}")
+
+    # ETAPA 2A: fallback antigo e seguro — só vídeos com "MELHORES MOMENTOS" no título.
     for v in extra:
-        if "MELHORES MOMENTOS" not in norm(v["titulo"]):
+        if not tem_melhores_momentos_no_titulo(v["titulo"]):
             continue
         a, b = parse_titulo(v["titulo"])
+        if not a or not b:
+            a, b = parse_confronto_generico(v["titulo"])
         if not a or not b:
             continue
         chave = "-".join(sorted([a, b]))
@@ -338,7 +406,31 @@ def main():
             "fonte": "auto"
         }
         novos += 1
-        print(f"  + (uploads) {chave}: {v['titulo'][:55]}")
+        print(f"  + (uploads/melhores momentos) {chave}: {v['titulo'][:55]}")
+
+    # ETAPA 2B: fallback novo — seleção x seleção NO CANAL DA CAZÉTV, sem depender do rótulo.
+    # Aqui somos mais conservadores: não pegamos live, jogo completo, corte, gol isolado etc.
+    # Só entra se ainda não existir registro do confronto.
+    for v in extra:
+        if tem_melhores_momentos_no_titulo(v["titulo"]):
+            continue
+        if titulo_ruim_para_fallback_generico(v["titulo"]):
+            continue
+        a, b = parse_confronto_generico(v["titulo"])
+        if not a or not b:
+            continue
+        chave = "-".join(sorted([a, b]))
+        if jogos.get(chave, {}).get("fonte") == "admin":
+            continue
+        if chave in jogos and jogos[chave].get("fonte") == "auto":
+            continue
+        jogos[chave] = {
+            "url": "https://youtu.be/" + v["videoId"],
+            "titulo": v["titulo"].split("|")[0].strip(),
+            "fonte": "auto"
+        }
+        novos += 1
+        print(f"  + (uploads/confronto Cazé sem rótulo) {chave}: {v['titulo'][:55]}")
 
     atual["jogos"] = jogos
     json.dump(atual, open(SAIDA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
