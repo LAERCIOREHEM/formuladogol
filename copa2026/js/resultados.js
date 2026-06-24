@@ -552,22 +552,54 @@
       <button class="vbtn ${ABA === "mata" ? "on" : ""}" data-v="mata">🏆 Mata-mata</button>
     </div>`;
   }
+  function fetchJSONNoCache(url) {
+    // Durante jogo ao vivo, alguns navegadores/CDNs seguram resposta por alguns segundos.
+    // O carimbo + no-store força a aba Grupos a ler o mesmo placar fresco da aba Jogos.
+    const sep = url.includes("?") ? "&" : "?";
+    return fetch(url + sep + "_=" + Date.now(), {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
+    }).then(r => r.json());
+  }
   function estadoEvento(ev) {
     return getPath(ev, ["competitions", 0, "status", "type", "state"], "pre");
   }
   function placarCompetidor(c) {
-    const n = scoreNum(c && c.score);
-    if (n != null) return n;
-    const dn = scoreNum(c && c.displayScore);
-    if (dn != null) return dn;
+    // ESPN pode entregar score como número/string, displayScore, curScore ou linescores.
+    const candidatos = [
+      c && c.score,
+      c && c.displayScore,
+      c && c.curScore,
+      c && c.currentScore,
+      c && c.value,
+      getPath(c, ["score", "value"], null)
+    ];
+    for (const v of candidatos) {
+      const n = scoreNum(v);
+      if (n != null) return n;
+    }
+    const ls = c && c.linescores;
+    if (Array.isArray(ls) && ls.length) {
+      const ultimo = ls[ls.length - 1];
+      const n = scoreNum(ultimo && (ultimo.value ?? ultimo.displayValue));
+      if (n != null) return n;
+    }
     return null;
   }
-  function eventoTemPlacar(ev) {
-    const cs = getPath(ev, ["competitions", 0, "competitors"], []);
-    if (!Array.isArray(cs) || cs.length < 2) return false;
+  function infoPlacarEvento(ev) {
+    const comp = getPath(ev, ["competitions", 0], null);
+    const cs = comp && Array.isArray(comp.competitors) ? comp.competitors : [];
+    if (cs.length < 2) return null;
     const h = cs.find(x => x.homeAway === "home") || cs[0];
     const a = cs.find(x => x.homeAway === "away") || cs[1];
-    return placarCompetidor(h) != null && placarCompetidor(a) != null;
+    const hId = dpSigla((h.team || {}).abbreviation) || dpSigla((h.team || {}).shortDisplayName) || dpSigla((h.team || {}).displayName) || (h.team || {}).abbreviation;
+    const aId = dpSigla((a.team || {}).abbreviation) || dpSigla((a.team || {}).shortDisplayName) || dpSigla((a.team || {}).displayName) || (a.team || {}).abbreviation;
+    const hs = placarCompetidor(h), as = placarCompetidor(a);
+    if (!hId || !aId || hs == null || as == null) return null;
+    return { comp, home: h, away: a, hId, aId, hs, as, state: estadoEvento(ev) };
+  }
+  function eventoTemPlacar(ev) {
+    return !!infoPlacarEvento(ev);
   }
   function eventoEhGrupo(ev) {
     const slug = ((ev && ev.season && ev.season.slug) || "").toLowerCase();
@@ -575,17 +607,20 @@
     if (slug && slug !== "group-stage") return false;
     // Segurança: alguns retornos do scoreboard diário vêm sem season.slug.
     // Nesse caso, identifica pelo par de seleções cadastrado em selecoes.json.
+    const info = infoPlacarEvento(ev);
+    if (info) return !!grupoDoJogo(info.home, info.away);
     const cs = getPath(ev, ["competitions", 0, "competitors"], []);
     if (!Array.isArray(cs) || cs.length < 2) return false;
     const h = cs.find(x => x.homeAway === "home") || cs[0];
     const a = cs.find(x => x.homeAway === "away") || cs[1];
     return !!grupoDoJogo(h, a);
   }
-  function preferirEvento(novo, antigo) {
+  function preferirEvento(novo, antigo, prioridadeDiaria) {
     if (!antigo) return novo;
     const en = estadoEvento(novo), ea = estadoEvento(antigo);
-    // O scoreboard de faixa grande da ESPN às vezes fica atrasado para jogos ao vivo.
-    // O scoreboard do dia costuma ser o mais fresco; então ele deve vencer em estado/placar.
+    // O scoreboard diário é o que atualiza placar ao vivo com mais rapidez.
+    // Quando ele traz o mesmo jogo, ele deve sobrescrever o retorno grande da fase.
+    if (prioridadeDiaria && (en !== "pre" || eventoTemPlacar(novo))) return novo;
     if (en === "in" && ea !== "in") return novo;
     if (en === "post" && ea !== "post") return novo;
     if (eventoTemPlacar(novo) && !eventoTemPlacar(antigo)) return novo;
@@ -595,29 +630,30 @@
     return antigo;
   }
   async function buscarGruposEvents() {
-    // cache curto (25s): a aba Grupos/Mata-mata precisa refletir jogos ao vivo
-    // com a mesma sensação de tempo real da página principal (refresh de 30s).
-    if (GRP_EVENTS.length && (Date.now() - GRP_EVENTS_TS) < 25000) return GRP_EVENTS;
+    // Cache bem curto: a tabela de grupos deve reagir quase junto com o placar ao vivo.
+    if (GRP_EVENTS.length && (Date.now() - GRP_EVENTS_TS) < 8000) return GRP_EVENTS;
     try {
       const mapa = new Map();
-      const adicionar = (evs) => {
+      const adicionar = (evs, prioridadeDiaria) => {
         (evs || []).filter(eventoEhGrupo).forEach(ev => {
-          mapa.set(String(ev.id), preferirEvento(ev, mapa.get(String(ev.id))));
+          const id = String(ev.id || getPath(ev, ["competitions", 0, "id"], ""));
+          if (!id) return;
+          mapa.set(id, preferirEvento(ev, mapa.get(id), !!prioridadeDiaria));
         });
       };
 
       // 1) Busca geral da fase de grupos, para trazer todos os jogos.
-      const geral = await fetch(`${API}?dates=20260611-20260627&limit=120&_=${Date.now()}`).then(r => r.json());
-      adicionar(geral.events || []);
+      const geral = await fetchJSONNoCache(`${API}?dates=20260611-20260627&limit=120`);
+      adicionar(geral.events || [], false);
 
-      // 2) Sobrepõe com o scoreboard diário, que é mais confiável para jogo AO VIVO.
-      // Inclui ontem/hoje/amanhã para cobrir virada de dia/UTC sem depender do fuso.
+      // 2) Sobrepõe com scoreboards diários, que são os mais frescos para jogos AO VIVO.
+      // Usa janela maior para cobrir fuso/UTC e jogos perto da virada do dia.
       const base = ymdToDate(hojeYMD());
-      const dias = [-1, 0, 1].map(off => dateToYMD(new Date(base.getTime() + off * 864e5)));
+      const dias = [-2, -1, 0, 1, 2].map(off => dateToYMD(new Date(base.getTime() + off * 864e5)));
       await Promise.all(dias.map(async dstr => {
         try {
-          const dd = await fetch(`${API}?dates=${dstr}&limit=80&_=${Date.now()}`).then(r => r.json());
-          adicionar(dd.events || []);
+          const dd = await fetchJSONNoCache(`${API}?dates=${dstr}&limit=80`);
+          adicionar(dd.events || [], true);
         } catch (e) { /* ignora um dia que falhe */ }
       }));
 
@@ -633,24 +669,18 @@
     const res = [];
     const jogosBase = COPA_ENGINE.gerarJogosGrupos(SEL); // tem jogo_id, a, b
     events.forEach(ev => {
-      const c = ev.competitions[0];
-      if (!c || estadoEvento(ev) === "pre" || !eventoTemPlacar(ev)) return;
-      const cs = c.competitors || [];
-      const h = cs.find(x => x.homeAway === "home") || cs[0];
-      const a = cs.find(x => x.homeAway === "away") || cs[1];
-      const hId = dpSigla((h.team || {}).abbreviation) || (h.team || {}).abbreviation;
-      const aId = dpSigla((a.team || {}).abbreviation) || (a.team || {}).abbreviation;
-      const hs = placarCompetidor(h), as = placarCompetidor(a);
-      if (hs == null || as == null) return;
-      // acha o jogo_id correspondente (mesmo par de times, em qualquer ordem)
-      const jb = jogosBase.find(j => (j.a === hId && j.b === aId) || (j.a === aId && j.b === hId));
+      const info = infoPlacarEvento(ev);
+      // Só entra jogo iniciado/encerrado. Jogo futuro 0x0 não pode virar empate.
+      if (!info || info.state === "pre") return;
+      const jb = jogosBase.find(j => (j.a === info.hId && j.b === info.aId) || (j.a === info.aId && j.b === info.hId));
       if (!jb) return;
       // respeita a ordem a/b do jogo base
-      if (jb.a === hId) res.push({ jogo_id: jb.jogo_id, ga: hs, gb: as });
-      else res.push({ jogo_id: jb.jogo_id, ga: as, gb: hs });
+      if (jb.a === info.hId) res.push({ jogo_id: jb.jogo_id, ga: info.hs, gb: info.as });
+      else res.push({ jogo_id: jb.jogo_id, ga: info.as, gb: info.hs });
     });
     return res;
   }
+
 
   // casa um confronto (par de ids) com o jogo real da ESPN no mata-mata (pra placar/horário)
   function eventoMataDe(idA, idB, mataEvents) {
@@ -871,6 +901,9 @@
       const home = cs.find(c => c.homeAway === "home") || cs[0];
       const away = cs.find(c => c.homeAway === "away") || cs[1];
       const hAb = (home.team || {}).abbreviation, aAb = (away.team || {}).abbreviation;
+      const info = infoPlacarEvento(ev);
+      const hScore = info ? info.hs : (home.score ?? "");
+      const aScore = info ? info.as : (away.score ?? "");
       const flagH = dpFlag(hAb, 40), flagA = dpFlag(aAb, 40);
       let meio, cls = "";
       if (st.state === "pre") {
@@ -878,10 +911,10 @@
         const dia = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "America/Sao_Paulo" });
         meio = `<span class="jg-hora">${dia} · ${horaBR(ev.date)}</span>`;
       } else if (st.state === "in") {
-        meio = `<span class="jg-placar jg-live">${home.score ?? ""} × ${away.score ?? ""}</span>`;
+        meio = `<span class="jg-placar jg-live">${hScore} × ${aScore}</span>`;
         cls = " jg-aovivo";
       } else {
-        meio = `<span class="jg-placar">${home.score ?? ""} × ${away.score ?? ""}</span>`;
+        meio = `<span class="jg-placar">${hScore} × ${aScore}</span>`;
       }
       return `<div class="jg-row${cls}">
         <span class="jg-lado jg-h">${dpNome(hAb)} ${flagH ? `<img src="${flagH}" alt="">` : ""}</span>
@@ -894,26 +927,30 @@
   function flagId(id) { const c = isoDe(id); return c ? `<img src="https://flagcdn.com/w40/${c}.png" alt="" onerror="this.style.visibility='hidden'">` : ""; }
   function tabelaGrupos(events) {
     const tab = {};
-    SEL.forEach(t => { (tab[t.grupo] = tab[t.grupo] || {})[t.id] = { id: t.id, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, pts: 0 }; });
+    SEL.forEach(t => {
+      (tab[t.grupo] = tab[t.grupo] || {})[t.id] = { id: t.id, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, pts: 0 };
+    });
     events.forEach(ev => {
-      const c = ev.competitions[0];
-      if (!c || estadoEvento(ev) === "pre" || !eventoTemPlacar(ev)) return;
-      const cs = c.competitors || [];
-      const h = cs.find(x => x.homeAway === "home") || cs[0], a = cs.find(x => x.homeAway === "away") || cs[1];
-      const hId = dpSigla((h.team || {}).abbreviation) || (h.team || {}).abbreviation;
-      const aId = dpSigla((a.team || {}).abbreviation) || (a.team || {}).abbreviation;
-      const hs = placarCompetidor(h), as = placarCompetidor(a);
-      if (hs == null || as == null) return;
-      let g = null; for (const G in tab) { if (tab[G][hId] && tab[G][aId]) { g = G; break; } }
+      const info = infoPlacarEvento(ev);
+      // Só contabiliza jogo que já começou. Isso inclui o placar parcial ao vivo.
+      if (!info || info.state === "pre") return;
+      let g = null;
+      for (const G in tab) {
+        if (tab[G][info.hId] && tab[G][info.aId]) { g = G; break; }
+      }
       if (!g) return;
-      const H = tab[g][hId], A = tab[g][aId];
-      H.j++; A.j++; H.gp += hs; H.gc += as; A.gp += as; A.gc += hs;
+      const H = tab[g][info.hId], A = tab[g][info.aId];
+      const hs = info.hs, as = info.as;
+      H.j++; A.j++;
+      H.gp += hs; H.gc += as;
+      A.gp += as; A.gc += hs;
       if (hs > as) { H.v++; A.d++; H.pts += 3; }
       else if (as > hs) { A.v++; H.d++; A.pts += 3; }
       else { H.e++; A.e++; H.pts++; A.pts++; }
     });
     return tab;
   }
+
 
   // Ordenação oficial FIFA também durante jogos ao vivo.
   // A tabela acima calcula números (P/J/V/E/D/GP/GC/SG); esta função usa a
