@@ -317,9 +317,9 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .stat-wrap{max-width:580px}
   .stat-resumo{grid-template-columns:1fr}
   .stat-res-card strong{white-space:normal}
-  .stat-abas{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .stat-abas{overflow-x:hidden;scrollbar-width:none;gap:4px;padding:4px}
   .stat-abas::-webkit-scrollbar{display:none}
-  .stat-tab{flex:0 0 auto;min-width:122px}
+  .stat-tab{flex:1 1 0;min-width:0;font-size:12px;padding:10px 4px;letter-spacing:-.15px}
   .stat-row{grid-template-columns:36px 1fr 64px;gap:7px;padding:10px 9px}
   .stat-meta{display:none}
   .stat-mobile-meta{display:block}
