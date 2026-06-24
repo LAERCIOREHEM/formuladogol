@@ -105,6 +105,17 @@
     setTimeout(fazer, 350);
   }
   function horaBR(iso) { try { return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" }); } catch (e) { return ""; } }
+  function ymdEventoBR(iso) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit"
+      }).formatToParts(new Date(iso));
+      const get = t => (parts.find(p => p.type === t) || {}).value || "";
+      return `${get("year")}${get("month")}${get("day")}`;
+    } catch (e) {
+      return dateToYMD(new Date(iso));
+    }
+  }
 
   // ===== Gols e cartões vermelhos nos cards de jogos =====
   // A página principal usa o scoreboard da ESPN para placar. Para não poluir nem
@@ -1062,6 +1073,23 @@
     };
   }
 
+  function irParaJogoNoDia(idJogo, ymd) {
+    if (ymd) dia = clamp(String(ymd));
+    ABA = "jogos";
+    const nav = $("#prev") && $("#prev").parentElement;
+    if (nav) nav.style.display = "";
+    FOCO_GRUPO = null;
+    VOLTAR_JOGO = null;
+    carregar().then(() => {
+      const alvo = document.getElementById("jogo-" + idJogo);
+      if (alvo) {
+        alvo.scrollIntoView({ behavior: "smooth", block: "center" });
+        alvo.classList.add("jogo-destaque");
+        setTimeout(() => alvo.classList.remove("jogo-destaque"), 2200);
+      }
+    });
+  }
+
   // jogos de UM grupo, formatados (encerrado com placar; futuro/ao vivo com hora)
   function jogosDoGrupoHTML(events, G) {
     const jogos = (events || []).filter(ev => {
@@ -1081,17 +1109,18 @@
       const aScore = info ? info.as : (away.score ?? "");
       const flagH = dpFlag(hAb, 40), flagA = dpFlag(aAb, 40);
       let meio, cls = "";
+      const diaJogo = ymdEventoBR(ev.date);
       if (st.state === "pre") {
         const d = new Date(ev.date);
         const dia = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", timeZone: "America/Sao_Paulo" });
-        meio = `<span class="jg-hora">${dia} · ${horaBR(ev.date)}</span>`;
+        meio = `<span class="jg-meio"><span class="jg-hora">${dia} · ${horaBR(ev.date)}</span><span class="jg-ir">ver jogo ›</span></span>`;
       } else if (st.state === "in") {
-        meio = `<span class="jg-placar jg-live">${hScore} × ${aScore}</span>`;
+        meio = `<span class="jg-meio"><span class="jg-placar jg-live">${hScore} × ${aScore}</span><span class="jg-ir">ver jogo ›</span></span>`;
         cls = " jg-aovivo";
       } else {
-        meio = `<span class="jg-placar">${hScore} × ${aScore}</span>`;
+        meio = `<span class="jg-meio"><span class="jg-placar">${hScore} × ${aScore}</span><span class="jg-ir">ver jogo ›</span></span>`;
       }
-      return `<div class="jg-row${cls}">
+      return `<div class="jg-row jg-go-jogo${cls}" data-jogo="${ev.id}" data-dia="${diaJogo}" role="button" tabindex="0" title="Ver detalhes, gols e melhores momentos na aba Jogos">
         <span class="jg-lado jg-h">${dpNome(hAb)} ${flagH ? `<img src="${flagH}" alt="">` : ""}</span>
         ${meio}
         <span class="jg-lado jg-a">${flagA ? `<img src="${flagA}" alt="">` : ""} ${dpNome(aAb)}</span>
@@ -1186,6 +1215,11 @@
         const d = document.getElementById("jgs-" + b.dataset.jgGrupo), ab = d.style.display === "none";
         d.style.display = ab ? "block" : "none";
         b.innerHTML = ab ? "⚽ Ocultar jogos do grupo ▴" : "⚽ Ver jogos do grupo ▾";
+      });
+      document.querySelectorAll(".jg-go-jogo[data-jogo][data-dia]").forEach(el => {
+        const abrir = () => irParaJogoNoDia(el.dataset.jogo, el.dataset.dia);
+        el.onclick = abrir;
+        el.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); abrir(); } };
       });
       document.querySelectorAll(".voltar-jogo[data-voltar]").forEach(b => b.onclick = () => {
         const idJogo = b.dataset.voltar;
