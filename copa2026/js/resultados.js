@@ -554,12 +554,11 @@
   }
   function fetchJSONNoCache(url) {
     // Durante jogo ao vivo, alguns navegadores/CDNs seguram resposta por alguns segundos.
-    // O carimbo + no-store força a aba Grupos a ler o mesmo placar fresco da aba Jogos.
+    // IMPORTANTE: não enviar headers customizados (Cache-Control/Pragma) para a ESPN,
+    // porque isso dispara preflight CORS e pode bloquear a chamada no navegador.
+    // O carimbo na URL + cache:no-store já força resposta fresca sem quebrar CORS.
     const sep = url.includes("?") ? "&" : "?";
-    return fetch(url + sep + "_=" + Date.now(), {
-      cache: "no-store",
-      headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
-    }).then(r => r.json());
+    return fetch(url + sep + "_=" + Date.now(), { cache: "no-store" }).then(r => r.json());
   }
   function estadoEvento(ev) {
     return getPath(ev, ["competitions", 0, "status", "type", "state"], "pre");
