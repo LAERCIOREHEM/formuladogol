@@ -1145,7 +1145,8 @@
     const aId = dpSigla((a.team || {}).abbreviation) || dpSigla((a.team || {}).displayName) || (a.team || {}).abbreviation;
     const hs = h.score, as = a.score;
     let aScore = "", bScore = "";
-    if (idA && idB) {
+    // Em jogo agendado a ESPN costuma devolver 0x0; não exibimos para não parecer placar real.
+    if (idA && idB && (st.state === "in" || st.state === "post")) {
       if (hId === idA) { aScore = hs; bScore = as; }
       else if (aId === idA) { aScore = as; bScore = hs; }
     }
