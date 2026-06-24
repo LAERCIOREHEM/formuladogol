@@ -164,6 +164,24 @@
     for (const p of pats) { const m = txt.match(p); if (m && m[1] && m[1].length <= 60) return m[1].replace(/\s+/g, " ").trim(); }
     return "";
   }
+  function ehGolContra(lance) {
+    const raw = (textoTipo(lance) + " " + textoLance(lance)).toLowerCase();
+    return /own goal|gol contra|autogol/.test(raw);
+  }
+  function nomeGolContraDoTexto(txt) {
+    txt = String(txt || "");
+    const pats = [
+      /own goal by\s+([^,.]+)(?:[,\.]|$)/i,
+      /gol contra de\s+([^,.]+)(?:[,\.]|$)/i,
+      /autogol de\s+([^,.]+)(?:[,\.]|$)/i
+    ];
+    for (const p of pats) {
+      const m = txt.match(p);
+      if (m && m[1]) return m[1].replace(/\s+/g, " ").trim();
+    }
+    return "";
+  }
+  function escRegex(s) { return String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
   function timeDoTexto(txt) {
     if (!txt) return "";
     const pats = [
@@ -295,16 +313,48 @@
     const finalHome = scoreNum(home.score);
     const finalAway = scoreNum(away.score);
 
-    function ladoDoGol(lance) {
-      const sig = siglaObjTime(lance, mapaTimes);
-      if (sig && homeSig && sig === homeSig) return { lado: "home", fonte: "time" };
-      if (sig && awaySig && sig === awaySig) return { lado: "away", fonte: "time" };
-      const sc = scoreDoLance(lance);
-      if (sc) {
-        if (sc.home > ultimoScore.home && sc.away === ultimoScore.away) return { lado: "home", fonte: "placar" };
-        if (sc.away > ultimoScore.away && sc.home === ultimoScore.home) return { lado: "away", fonte: "placar" };
+    function nomesDoCompetidor(c, sig) {
+      const t = (c && c.team) || {};
+      const vals = [t.displayName, t.shortDisplayName, t.name, t.location, t.nickname, t.abbreviation, sig ? dpNome(sig) : "", sig].filter(Boolean);
+      const unicos = [];
+      vals.forEach(v => { const n = dpNorm(v); if (n && !unicos.includes(n)) unicos.push(n); });
+      return unicos;
+    }
+    const nomesHome = nomesDoCompetidor(home, homeSig);
+    const nomesAway = nomesDoCompetidor(away, awaySig);
+    function scoreDoTextoLocal(txt) {
+      const n = dpNorm(txt);
+      if (!n) return null;
+      for (const hn of nomesHome) for (const an of nomesAway) {
+        let re = new RegExp("\b" + escRegex(hn) + "\s+(\d+)\s+" + escRegex(an) + "\s+(\d+)\b");
+        let m = n.match(re);
+        if (m) return { home: parseInt(m[1], 10), away: parseInt(m[2], 10) };
+        re = new RegExp("\b" + escRegex(an) + "\s+(\d+)\s+" + escRegex(hn) + "\s+(\d+)\b");
+        m = n.match(re);
+        if (m) return { home: parseInt(m[2], 10), away: parseInt(m[1], 10) };
       }
-      return { lado: "", fonte: "" };
+      return null;
+    }
+    function scoreLance(lance) {
+      return scoreDoLance(lance) || scoreDoTextoLocal(textoLance(lance));
+    }
+
+    function ladoDoGol(lance) {
+      const isOG = ehGolContra(lance);
+      // Gol contra: o time associado ao atleta é, por definição, o time que sofreu o gol.
+      // Por isso, primeiro tentamos inferir pelo placar do lance; se não vier claro,
+      // deixamos sem lado para a normalização encaixar no lado que falta no placar final.
+      if (!isOG) {
+        const sig = siglaObjTime(lance, mapaTimes);
+        if (sig && homeSig && sig === homeSig) return { lado: "home", fonte: "time" };
+        if (sig && awaySig && sig === awaySig) return { lado: "away", fonte: "time" };
+      }
+      const sc = scoreLance(lance);
+      if (sc) {
+        if (sc.home > ultimoScore.home && sc.away === ultimoScore.away) return { lado: "home", fonte: isOG ? "placar-og" : "placar" };
+        if (sc.away > ultimoScore.away && sc.home === ultimoScore.home) return { lado: "away", fonte: isOG ? "placar-og" : "placar" };
+      }
+      return { lado: "", fonte: isOG ? "og-pendente" : "" };
     }
     function ordemMinuto(g) {
       const m = String(g.minuto || "").match(/\d+/);
@@ -339,16 +389,18 @@
       });
     }
     function registrarGol(lance) {
-      const nome = jogadorDoLance(lance) || golDoTexto(textoLance(lance));
+      const og = ehGolContra(lance);
+      const txt = textoLance(lance);
+      const nome = (og ? (nomeGolContraDoTexto(txt) || jogadorDoLance(lance) || golDoTexto(txt)) : (jogadorDoLance(lance) || golDoTexto(txt)));
       if (!nome) return;
       const min = minutoDoLance(lance);
       const infoLado = ladoDoGol(lance);
       const lado = infoLado.lado;
-      const key = min + "|" + nome.toLowerCase() + "|" + lado;
+      const key = min + "|" + nome.toLowerCase() + "|" + (og ? "OG" : lado);
       if (usados.has(key)) return;
       usados.add(key);
-      gols.push({ minuto: min, nome: nome, lado: lado, fonte: infoLado.fonte });
-      const sc = scoreDoLance(lance);
+      gols.push({ minuto: min, nome: nome, lado: lado, fonte: infoLado.fonte, og: og });
+      const sc = scoreLance(lance);
       if (sc) ultimoScore = sc;
     }
 
@@ -358,6 +410,15 @@
       // scoringPlays às vezes inclui cartões em outros esportes; aqui aceitamos só lance com cara de gol.
       if (!(raw.includes("goal") || raw.includes("gol") || parseInt(sp.scoreValue || "0", 10) === 1)) return;
       registrarGol(sp);
+    });
+
+    // Gol contra pode não aparecer em scoringPlays; quando aparecer só no comentário,
+    // registramos mesmo que os demais gols já tenham sido encontrados.
+    arraysComentario(summary).forEach(ev2 => {
+      const raw = (textoTipo(ev2) + " " + textoLance(ev2)).toLowerCase();
+      if (/shootout|penalty shootout|disputa de p[eê]naltis/.test(raw)) return;
+      if (!ehGolContra(ev2)) return;
+      registrarGol(ev2);
     });
 
     // Fallback: alguns summaries não trazem scoringPlays, mas trazem commentary/plays.
@@ -410,7 +471,8 @@
     };
   }
   function chipGol(g) {
-    return `<span class="gol-chip">⚽ ${g.minuto ? escTxt(g.minuto) + " " : ""}${escTxt(g.nome)}</span>`;
+    const og = g && g.og ? ` <span class="og-tag" title="Gol contra">OG</span>` : "";
+    return `<span class="gol-chip">⚽ ${g.minuto ? escTxt(g.minuto) + " " : ""}${escTxt(g.nome)}${og}</span>`;
   }
   function chipVermelho(qtd, lado) {
     if (!qtd) return "";
