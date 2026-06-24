@@ -29,6 +29,7 @@
   let FAIRPLAY = {}, FAIRPLAY_TS = 0; // {sigla: pontos de conduta}, cache 5min
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
+  let MATA_LOCK_TOKENS = {}; // slots matematicamente definidos no mata-mata (1A, 2B, 3C...)
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
   let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols/cartões exibidos nos cards
 
@@ -747,7 +748,7 @@
   }
 
   // monta uma caixa de confronto (times + placar + horário)
-  function caixaConfronto(idA, idB, mataEvents) {
+  function caixaConfronto(idA, idB, mataEvents, travado) {
     const ev = eventoMataDe(idA, idB, mataEvents);
     let linhaInfo = "", scoreA = "", scoreB = "", vA = "", vB = "";
     if (ev) {
@@ -779,12 +780,15 @@
         linhaInfo = `<div class="mm-info">${dia} · ${horaBR(ev.date)}</div>`;
       }
     }
-    const time = (id, score, vcls) => {
+    const time = (id, score, vcls, lock) => {
       if (!id) return `<div class="mm-time mm-tbd"><span class="mm-nome">A definir</span></div>`;
       const fl = dpFlag(id, 40);
-      return `<div class="mm-time ${vcls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span><span class="mm-score">${score}</span></div>`;
+      const lockCls = lock ? " mm-definido" : "";
+      const lockMark = lock ? `<span class="mm-lockmark" title="Vaga já garantida">✓</span>` : "";
+      return `<div class="mm-time ${vcls}${lockCls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span><span class="mm-score">${score}</span>${lockMark}</div>`;
     };
-    return `<div class="mm-jogo">${time(idA, scoreA, vA)}${time(idB, scoreB, vB)}${linhaInfo}</div>`;
+    travado = travado || {};
+    return `<div class="mm-jogo">${time(idA, scoreA, vA, !!travado.a)}${time(idB, scoreB, vB, !!travado.b)}${linhaInfo}</div>`;
   }
 
   // ranking "quem acertou as seleções que avançaram" (sem importar posição/cruzamento)
@@ -860,6 +864,118 @@
     return FAIRPLAY;
   }
 
+
+
+  // Marca no mata-mata apenas as vagas matematicamente definidas.
+  // Antes do fim dos 72 jogos de grupos, marca só slots fixos de 1º/2º quando
+  // o grupo já fechou ou quando o 1º colocado já não pode ser alcançado.
+  // Slots de melhores 3ºs só são travados após o encerramento de toda a fase de grupos.
+  function placaresGruposDaESPNFiltrados(events, aceitaEstado) {
+    const res = [];
+    const jogosBase = COPA_ENGINE.gerarJogosGrupos(SEL);
+    (events || []).forEach(ev => {
+      const info = infoPlacarEvento(ev);
+      if (!info || !aceitaEstado(info.state)) return;
+      const jb = jogosBase.find(j => (j.a === info.hId && j.b === info.aId) || (j.a === info.aId && j.b === info.hId));
+      if (!jb) return;
+      if (jb.a === info.hId) res.push({ jogo_id: jb.jogo_id, grupo: jb.grupo, a: jb.a, b: jb.b, ga: info.hs, gb: info.as, state: info.state });
+      else res.push({ jogo_id: jb.jogo_id, grupo: jb.grupo, a: jb.a, b: jb.b, ga: info.as, gb: info.hs, state: info.state });
+    });
+    return res;
+  }
+
+  function classificacaoPorPlacares(placares, fairplay) {
+    try {
+      const plac = {};
+      (placares || []).forEach(p => { plac[p.jogo_id] = p; });
+      const jogos = COPA_ENGINE.gerarJogosGrupos(SEL);
+      const seed = {}; SEL.forEach(s => { seed[s.id] = s.seed; });
+      const porGrupo = {};
+      jogos.forEach(j => {
+        const p = plac[j.jogo_id];
+        const jj = Object.assign({}, j, { ga: p ? p.ga : null, gb: p ? p.gb : null });
+        (porGrupo[j.grupo] = porGrupo[j.grupo] || []).push(jj);
+      });
+      const out = {};
+      Object.keys(porGrupo).sort().forEach(G => {
+        const times = [...new Set(porGrupo[G].map(j => [j.a, j.b]).flat())];
+        out[G] = COPA_ENGINE.classificarGrupo(porGrupo[G], times, seed, fairplay || {}).map(t => Object.assign({}, t, { grupo: G }));
+      });
+      return out;
+    } catch(e) { return {}; }
+  }
+
+  function ganhouConfrontoDireto(cand, outro, placMap) {
+    const jogos = COPA_ENGINE.gerarJogosGrupos(SEL);
+    const j = jogos.find(x => (x.a === cand && x.b === outro) || (x.a === outro && x.b === cand));
+    if (!j || !placMap[j.jogo_id]) return false;
+    const p = placMap[j.jogo_id];
+    const golsCand = (j.a === cand) ? p.ga : p.gb;
+    const golsOutro = (j.a === cand) ? p.gb : p.ga;
+    return golsCand > golsOutro;
+  }
+
+  function primeiroGrupoTravado(G, classPost, placPost) {
+    const lista = classPost && classPost[G];
+    if (!lista || !lista.length) return false;
+    const cand = lista[0].id;
+    const placMap = {}; (placPost || []).forEach(p => { placMap[p.jogo_id] = p; });
+    const jogosG = COPA_ENGINE.gerarJogosGrupos(SEL).filter(j => j.grupo === G);
+    const stats = {};
+    (classPost[G] || []).forEach(t => { stats[t.id] = { pts: t.pts || 0, rest: 0 }; });
+    jogosG.forEach(j => {
+      if (!placMap[j.jogo_id]) {
+        if (stats[j.a]) stats[j.a].rest++;
+        if (stats[j.b]) stats[j.b].rest++;
+      }
+    });
+    const ptsCand = stats[cand] ? stats[cand].pts : 0;
+    return Object.keys(stats).every(id => {
+      if (id === cand) return true;
+      const maxOutro = stats[id].pts + stats[id].rest * 3;
+      if (maxOutro > ptsCand) return false;
+      if (maxOutro < ptsCand) return true;
+      // Se só pode igualar em pontos, aceita como travado quando já perdeu o confronto direto para o líder.
+      return ganhouConfrontoDireto(cand, id, placMap);
+    });
+  }
+
+  function tokensTravadosMata(events, fairplay) {
+    const placPost = placaresGruposDaESPNFiltrados(events, st => st === "post");
+    const jogosBase = COPA_ENGINE.gerarJogosGrupos(SEL);
+    const totalGrupos = jogosBase.length;
+    const allGroupsDone = placPost.length >= totalGrupos;
+    const porGrupoPost = {};
+    placPost.forEach(p => { porGrupoPost[p.grupo] = (porGrupoPost[p.grupo] || 0) + 1; });
+    const classPost = classificacaoPorPlacares(placPost, fairplay);
+    const tokens = {};
+    Object.keys(classPost).forEach(G => {
+      const completo = (porGrupoPost[G] || 0) >= 6;
+      if (completo) {
+        tokens["1" + G] = true;
+        tokens["2" + G] = true;
+      } else if (primeiroGrupoTravado(G, classPost, placPost)) {
+        tokens["1" + G] = true;
+      }
+      if (allGroupsDone) tokens["3" + G] = true;
+    });
+    return tokens;
+  }
+
+  function tokensDosJogosR32(d) {
+    const out = {};
+    const mapaTerceiros = d && d.chave && TERMAP && TERMAP.mapa ? TERMAP.mapa[d.chave] : null;
+    (d.r32 || []).forEach(j => {
+      const e = (ESTRUT.r32 || []).find(x => x.id === j.id);
+      if (!e) return;
+      if (e.tipo === "fixo") {
+        out[j.id] = { a: e.a, b: e.b };
+      } else {
+        out[j.id] = { a: e.host, b: (mapaTerceiros && mapaTerceiros[e.host]) ? ("3" + mapaTerceiros[e.host]) : null };
+      }
+    });
+    return out;
+  }
   async function renderMata() {
     $("#lista").innerHTML = abasHTML() + '<p class="vazio">Montando o chaveamento…</p>';
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
@@ -875,6 +991,7 @@
     try { d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp); }
     catch (e) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Erro ao calcular o chaveamento.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
     MATA_CACHE = d;
+    MATA_LOCK_TOKENS = tokensTravadosMata(grpEvents, fp);
     // 3) jogos reais do mata-mata na ESPN (placar/horário)
     if (!MATA_EVENTS.length || (Date.now() - MATA_EVENTS_TS) >= 90000) {
       try {
@@ -890,7 +1007,7 @@
   function pintarFaseMata() {
     const d = MATA_CACHE; if (!d) return;
     const FASES = [
-      { nome: "16-avos", jogos: d.r32.map(m => ({ a: m.a, b: m.b })) },
+      { nome: "16-avos", jogos: d.r32.map(m => ({ id: m.id, a: m.a, b: m.b })) },
       { nome: "Oitavas", jogos: ESTRUT.arvore.filter(m => m.fase === "oitavas").map(m => d.timeDe[m.id] || {}) },
       { nome: "Quartas", jogos: ESTRUT.arvore.filter(m => m.fase === "quartas").map(m => d.timeDe[m.id] || {}) },
       { nome: "Semis", jogos: ESTRUT.arvore.filter(m => m.fase === "semifinais").map(m => d.timeDe[m.id] || {}) },
@@ -902,7 +1019,12 @@
     ).join("");
 
     const faseAtual = FASES.find(f => f.nome === FASE_MATA) || FASES[0];
-    const caixas = faseAtual.jogos.map(j => caixaConfronto(j.a, j.b, MATA_EVENTS)).join("");
+    const tokensR32 = tokensDosJogosR32(d);
+    const caixas = faseAtual.jogos.map(j => {
+      const tok = j.id ? tokensR32[j.id] : null;
+      const travado = tok ? { a: !!MATA_LOCK_TOKENS[tok.a], b: !!MATA_LOCK_TOKENS[tok.b] } : {};
+      return caixaConfronto(j.a, j.b, MATA_EVENTS, travado);
+    }).join("");
 
     // a disputa de 3º entra junto da Final
     let extra = "";
