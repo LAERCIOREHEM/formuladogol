@@ -326,10 +326,10 @@
       const n = dpNorm(txt);
       if (!n) return null;
       for (const hn of nomesHome) for (const an of nomesAway) {
-        let re = new RegExp("\b" + escRegex(hn) + "\s+(\d+)\s+" + escRegex(an) + "\s+(\d+)\b");
+        let re = new RegExp("\\b" + escRegex(hn) + "\\s+(\\d+)\\s+" + escRegex(an) + "\\s+(\\d+)\\b");
         let m = n.match(re);
         if (m) return { home: parseInt(m[1], 10), away: parseInt(m[2], 10) };
-        re = new RegExp("\b" + escRegex(an) + "\s+(\d+)\s+" + escRegex(hn) + "\s+(\d+)\b");
+        re = new RegExp("\\b" + escRegex(an) + "\\s+(\\d+)\\s+" + escRegex(hn) + "\\s+(\\d+)\\b");
         m = n.match(re);
         if (m) return { home: parseInt(m[2], 10), away: parseInt(m[1], 10) };
       }
@@ -396,7 +396,7 @@
       const min = minutoDoLance(lance);
       const infoLado = ladoDoGol(lance);
       const lado = infoLado.lado;
-      const key = min + "|" + nome.toLowerCase() + "|" + (og ? "OG" : lado);
+      const key = min + "|" + nome.toLowerCase() + "|" + (og ? "OG" : "GOL");
       if (usados.has(key)) return;
       usados.add(key);
       gols.push({ minuto: min, nome: nome, lado: lado, fonte: infoLado.fonte, og: og });
@@ -412,24 +412,16 @@
       registrarGol(sp);
     });
 
-    // Gol contra pode não aparecer em scoringPlays; quando aparecer só no comentário,
-    // registramos mesmo que os demais gols já tenham sido encontrados.
+    // Complemento: após o apito final, a ESPN às vezes esvazia/limita scoringPlays
+    // e deixa os gols completos apenas em commentary/plays. Por isso varremos os comentários
+    // SEM depender de gols.length. O dedupe acima evita repetir os gols que já vieram em scoringPlays.
     arraysComentario(summary).forEach(ev2 => {
       const raw = (textoTipo(ev2) + " " + textoLance(ev2)).toLowerCase();
       if (/shootout|penalty shootout|disputa de p[eê]naltis/.test(raw)) return;
-      if (!ehGolContra(ev2)) return;
+      const ehGol = raw.includes("goal") || raw.includes("gol!") || ehGolContra(ev2);
+      if (!ehGol) return;
       registrarGol(ev2);
     });
-
-    // Fallback: alguns summaries não trazem scoringPlays, mas trazem commentary/plays.
-    if (!gols.length) {
-      arraysComentario(summary).forEach(ev2 => {
-        const raw = (textoTipo(ev2) + " " + textoLance(ev2)).toLowerCase();
-        const ehGol = (raw.includes("goal") || raw.includes("gol!")) && !/own goal|shootout|penalty shootout/.test(raw);
-        if (!ehGol) return;
-        registrarGol(ev2);
-      });
-    }
 
     const vermelhos = { home: 0, away: 0, total: 0 };
     const redsUsados = new Set();
