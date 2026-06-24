@@ -1014,57 +1014,190 @@
     pintarFaseMata();
   }
 
-  // desenha SÓ a fase selecionada (uma por vez, ocupando a tela no celular)
+  // ===== Chave horizontal completa do mata-mata =====
+  // A ordem abaixo organiza a árvore de forma visual: cada par de jogos da coluna
+  // da esquerda alimenta o jogo imediatamente ao lado, até chegar à final.
+  const MATA_VISUAL = {
+    r32: ["M74", "M77", "M73", "M75", "M83", "M84", "M81", "M82", "M76", "M78", "M79", "M80", "M86", "M88", "M85", "M87"],
+    oitavas: ["M89", "M90", "M93", "M94", "M91", "M92", "M95", "M96"],
+    quartas: ["M97", "M98", "M99", "M100"],
+    semis: ["M101", "M102"],
+    final: ["M104"]
+  };
+  const MATA_LABEL = { "16-avos":"16-avos", "Oitavas":"Oitavas", "Quartas":"Quartas", "Semis":"Semis", "Final":"Final" };
+  const MATA_FASE_ID = { "16-avos":"r32", "Oitavas":"oitavas", "Quartas":"quartas", "Semis":"semis", "Final":"final" };
+
+  function faseLabelPorEstrutura(fase) {
+    if (fase === "oitavas") return "Oitavas";
+    if (fase === "quartas") return "Quartas";
+    if (fase === "semifinais") return "Semis";
+    if (fase === "final") return "Final";
+    if (fase === "terceiro") return "3º lugar";
+    return fase || "Mata-mata";
+  }
+  function idFaseClasse(nome) { return String(nome || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+  function textoSlot(slot) {
+    if (!slot) return "A definir";
+    const s = String(slot);
+    let m = s.match(/^WM(\d+)$/i); if (m) return "Venc. M" + m[1];
+    m = s.match(/^LM(\d+)$/i); if (m) return "Perd. M" + m[1];
+    return s;
+  }
+  function normTokenMata(s) { return String(s || "").toUpperCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9]/g, ""); }
+  function infoTimesEvento(ev) {
+    const out = [];
+    try {
+      const cs = ev.competitions[0].competitors || [];
+      cs.forEach(c => {
+        const t = c.team || {};
+        const sig = dpSigla(t.abbreviation) || dpSigla(t.shortDisplayName) || dpSigla(t.displayName) || dpSigla(t.name) || t.abbreviation || "";
+        const toks = [sig, t.abbreviation, t.shortDisplayName, t.displayName, t.name, t.location, t.nickname]
+          .filter(Boolean).map(normTokenMata);
+        out.push({ sig, toks });
+      });
+    } catch (e) { /* ignora */ }
+    return out;
+  }
+  function eventoTemToken(ev, token) {
+    const nt = normTokenMata(token);
+    if (!nt) return false;
+    return infoTimesEvento(ev).some(x => x.toks.includes(nt));
+  }
+  function eventoMataDeOuSlot(j, mataEvents) {
+    const idA = dpSigla(j.a), idB = dpSigla(j.b);
+    if (idA && idB) {
+      const exato = eventoMataDe(idA, idB, mataEvents);
+      if (exato) return exato;
+    }
+    // Quando a ESPN ainda mostra slot (1C, 2F, 3RD etc.), tenta casar pelos rótulos.
+    const alvoA = idA || j.slotA || j.a;
+    const alvoB = idB || j.slotB || j.b;
+    if (alvoA && alvoB) {
+      const porSlot = (mataEvents || []).find(ev => eventoTemToken(ev, alvoA) && eventoTemToken(ev, alvoB));
+      if (porSlot) return porSlot;
+    }
+    return null;
+  }
+  function infoJogoMata(ev, idA, idB) {
+    if (!ev) return { status:"Agendado", cls:"", scoreA:"", scoreB:"", info:"" };
+    const comp = ev.competitions[0], st = comp.status.type, cs = comp.competitors;
+    const h = cs.find(c => c.homeAway === "home") || cs[0];
+    const a = cs.find(c => c.homeAway === "away") || cs[1];
+    const hId = dpSigla((h.team || {}).abbreviation) || dpSigla((h.team || {}).displayName) || (h.team || {}).abbreviation;
+    const hs = h.score, as = a.score;
+    const aScore = idA && hId === idA ? hs : (idA ? as : "");
+    const bScore = idA && hId === idA ? as : (idA ? hs : "");
+    let vA = "", vB = "", status = "Agendado", cls = "", info = "";
+    if (st.state === "post") {
+      status = "Encerrado"; cls = "post";
+      if (h.winner) { if (idA && hId === idA) vA = "mm-venc"; else vB = "mm-venc"; }
+      else if (a.winner) { if (idA && hId === idA) vB = "mm-venc"; else vA = "mm-venc"; }
+      const hPen = h.shootoutScore, aPen = a.shootoutScore;
+      if (hPen != null && aPen != null && idA) {
+        const aPenV = (hId === idA) ? hPen : aPen, bPenV = (hId === idA) ? aPen : hPen;
+        info = `<span class="mm-pen">pênaltis ${aPenV}-${bPenV}</span>`;
+      }
+    } else if (st.state === "in") {
+      status = comp.status.displayClock || "Ao vivo"; cls = "live";
+      info = `<span class="mm-live">● ao vivo</span>`;
+    }
+    const d = new Date(ev.date);
+    const data = d.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit", timeZone:"America/Sao_Paulo" });
+    const estadio = getPath(ev, ["competitions",0,"venue","fullName"], "") || getPath(ev, ["competitions",0,"venue","displayName"], "") || "";
+    const local = [estadio].filter(Boolean).join(" · ");
+    const linha = `${data} · ${horaBR(ev.date)}${info ? " · " + info : ""}${local ? `<span class="mm-estadio">${escTxt(local)}</span>` : ""}`;
+    return { status, cls, scoreA:aScore, scoreB:bScore, vA, vB, info:linha };
+  }
+  function montarJogosMata(d) {
+    const r32ById = {};
+    const tokensR32 = tokensDosJogosR32(d);
+    (d.r32 || []).forEach(j => {
+      const tok = tokensR32[j.id] || {};
+      r32ById[j.id] = { id:j.id, fase:"16-avos", a:j.a, b:j.b, slotA:tok.a, slotB:tok.b, travA:!!MATA_LOCK_TOKENS[tok.a], travB:!!MATA_LOCK_TOKENS[tok.b] };
+    });
+    const arvById = {};
+    (ESTRUT.arvore || []).forEach(m => {
+      const t = (d.timeDe && d.timeDe[m.id]) || {};
+      arvById[m.id] = { id:m.id, fase:faseLabelPorEstrutura(m.fase), a:t.a, b:t.b, slotA:m.a, slotB:m.b, travA:false, travB:false };
+    });
+    const get = id => r32ById[id] || arvById[id] || { id, fase:"Mata-mata" };
+    return {
+      "16-avos": MATA_VISUAL.r32.map(get),
+      "Oitavas": MATA_VISUAL.oitavas.map(get),
+      "Quartas": MATA_VISUAL.quartas.map(get),
+      "Semis": MATA_VISUAL.semis.map(get),
+      "Final": MATA_VISUAL.final.map(get),
+      terceiro: arvById.M103
+    };
+  }
+  function linhaEquipeMata(valor, slot, score, vcls, travado) {
+    const id = dpSigla(valor);
+    if (id) {
+      const fl = dpFlag(id, 40);
+      const lockCls = travado ? " mm-definido" : "";
+      const lockMark = travado ? `<span class="mm-lockmark" title="Vaga já garantida">✓</span>` : "";
+      return `<div class="mm-equipe ${vcls || ""}${lockCls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span>${score !== "" && score != null ? `<span class="mm-score">${score}</span>` : ""}${lockMark}</div>`;
+    }
+    const txt = textoSlot(valor || slot);
+    return `<div class="mm-equipe mm-tbd"><span class="mm-slot">${escTxt(txt)}</span></div>`;
+  }
+  function cardMata(j, row, span, faseNome) {
+    const idA = dpSigla(j.a), idB = dpSigla(j.b);
+    const ev = eventoMataDeOuSlot(j, MATA_EVENTS);
+    const inf = infoJogoMata(ev, idA, idB);
+    return `<div class="mm-card ${faseNome === "Final" ? "mm-card-final" : ""}" style="grid-row:${row} / span ${span}" data-mm-id="${j.id}">
+      <div class="mm-card-id"><b>${j.id || "—"}</b><span class="mm-status-chip ${inf.cls}">${escTxt(inf.status)}</span></div>
+      ${linhaEquipeMata(j.a, j.slotA, inf.scoreA, inf.vA, j.travA)}
+      ${linhaEquipeMata(j.b, j.slotB, inf.scoreB, inf.vB, j.travB)}
+      ${inf.info ? `<div class="mm-card-info">${inf.info}</div>` : ""}
+    </div>`;
+  }
+  function colunaMata(nome, jogos) {
+    const n = jogos.length || 1;
+    const span = Math.max(1, Math.floor(16 / n));
+    const cards = jogos.map((j, i) => cardMata(j, i * span + 1, span, nome)).join("");
+    const cls = nome === "Final" ? " mm-col-final" : "";
+    return `<section class="mm-col${cls}" id="mm-col-${idFaseClasse(nome)}" data-col-fase="${nome}">
+      <div class="mm-col-head">${nome}</div><div class="mm-col-grid">${cards}</div>
+    </section>`;
+  }
+  function rolarFaseMata(nome, suave) {
+    const box = document.getElementById("mm-bracket-scroll"), col = document.querySelector(`[data-col-fase="${nome}"]`);
+    if (!box || !col) return;
+    box.scrollTo({ left: Math.max(0, col.offsetLeft - 10), behavior: suave === false ? "auto" : "smooth" });
+  }
+
   function pintarFaseMata() {
     const d = MATA_CACHE; if (!d) return;
-    const FASES = [
-      { nome: "16-avos", jogos: d.r32.map(m => ({ id: m.id, a: m.a, b: m.b })) },
-      { nome: "Oitavas", jogos: ESTRUT.arvore.filter(m => m.fase === "oitavas").map(m => d.timeDe[m.id] || {}) },
-      { nome: "Quartas", jogos: ESTRUT.arvore.filter(m => m.fase === "quartas").map(m => d.timeDe[m.id] || {}) },
-      { nome: "Semis", jogos: ESTRUT.arvore.filter(m => m.fase === "semifinais").map(m => d.timeDe[m.id] || {}) },
-      { nome: "Final", jogos: ESTRUT.arvore.filter(m => m.fase === "final").map(m => d.timeDe[m.id] || {}) }
-    ];
-    // seletor de fases (pílulas)
-    const pills = FASES.map(f =>
-      `<button class="mm-pill ${FASE_MATA === f.nome ? "on" : ""}" data-fase="${f.nome}">${f.nome}</button>`
-    ).join("");
+    const FASES = ["16-avos", "Oitavas", "Quartas", "Semis", "Final"];
+    const pills = FASES.map(f => `<button class="mm-pill ${FASE_MATA === f ? "on" : ""}" data-fase="${f}">${f}</button>`).join("");
+    const jogos = montarJogosMata(d);
+    const colunas = FASES.map(f => colunaMata(f, jogos[f] || [])).join("");
 
-    const faseAtual = FASES.find(f => f.nome === FASE_MATA) || FASES[0];
-    const tokensR32 = tokensDosJogosR32(d);
-    const caixas = faseAtual.jogos.map(j => {
-      const tok = j.id ? tokensR32[j.id] : null;
-      const travado = tok ? { a: !!MATA_LOCK_TOKENS[tok.a], b: !!MATA_LOCK_TOKENS[tok.b] } : {};
-      return caixaConfronto(j.a, j.b, MATA_EVENTS, travado);
-    }).join("");
-
-    // a disputa de 3º entra junto da Final
-    let extra = "";
-    if (FASE_MATA === "Final") {
-      const t3 = ESTRUT.arvore.find(m => m.fase === "terceiro");
-      if (t3 && d.timeDe[t3.id]) {
-        extra = `<div class="mm-3tit">Disputa de 3º lugar</div><div class="mm-fase-grid">${caixaConfronto(d.timeDe[t3.id].a, d.timeDe[t3.id].b, MATA_EVENTS)}</div>`;
-      }
+    let terceiro = "";
+    if (jogos.terceiro) {
+      terceiro = `<div class="mm-terceiro-box"><div class="mm-3tit">Disputa de 3º lugar</div>${cardMata(jogos.terceiro, 1, 1, "3º lugar")}</div>`;
     }
 
-    // após o fim da fase de grupos (mesma virada do Ranking Simulado), o chaveamento é oficial
     const VIRADA_MATA = new Date("2026-06-28T02:00:00-03:00").getTime();
     const oficial = Date.now() >= VIRADA_MATA;
     let aviso;
-    if (oficial) {
-      aviso = '<p class="mm-aviso">🏆 Chaveamento <b>oficial</b> do mata-mata.</p>';
-    } else if (d.faltaMapa) {
-      aviso = '<p class="mm-aviso">⚠️ O cruzamento exato ainda depende da definição dos grupos. Mostrando a melhor estimativa.</p>';
-    } else {
-      aviso = '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — muda conforme os jogos avançam.</p>';
-    }
+    if (oficial) aviso = '<p class="mm-aviso">🏆 Chaveamento <b>oficial</b> do mata-mata.</p>';
+    else if (d.faltaMapa) aviso = '<p class="mm-aviso">⚠️ O cruzamento exato ainda depende da definição dos grupos. Mostrando a melhor estimativa.</p>';
+    else aviso = '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — arraste para o lado para ver o caminho até a final.</p>';
 
     $("#lista").innerHTML = abasHTML() + aviso
       + `<div class="mm-pills">${pills}</div>`
-      + `<div class="mm-fase-grid">${caixas}</div>`
-      + extra
+      + `<div class="mm-bracket-shell"><p class="mm-scroll-hint">👆 <b>Arraste lateralmente</b> para acompanhar o caminho até a final.</p><div class="mm-bracket-scroll" id="mm-bracket-scroll"><div class="mm-bracket">${colunas}</div></div></div>`
+      + terceiro
       + (PALP.length ? `<button class="rs-toggle" id="rs-toggle">🎯 Quem acertou as seleções que avançaram ▾</button>` + rankingSelecoesHTML(d) : "");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
-    document.querySelectorAll(".mm-pill[data-fase]").forEach(b => b.onclick = () => { FASE_MATA = b.dataset.fase; pintarFaseMata(); });
+    document.querySelectorAll(".mm-pill[data-fase]").forEach(b => b.onclick = () => {
+      FASE_MATA = b.dataset.fase;
+      document.querySelectorAll(".mm-pill").forEach(x => x.classList.toggle("on", x.dataset.fase === FASE_MATA));
+      rolarFaseMata(FASE_MATA);
+    });
+    setTimeout(() => rolarFaseMata(FASE_MATA, false), 40);
     const rsBtn = document.getElementById("rs-toggle");
     if (rsBtn) rsBtn.onclick = () => {
       const box = document.getElementById("rs-box"), ab = box.style.display === "none";
