@@ -1,7 +1,7 @@
 /* =========================================================================
    resultados.js — Resultados das partidas (Copa 2026), direto da ESPN
    Navegador puxa o feed público da ESPN (sem chave, CORS liberado).
-   Navegação por dia + atualização automática a cada 30s para os jogos ao vivo.
+   Navegação por dia + atualização automática a cada 30s para jogos, grupos e mata-mata ao vivo.
    NOVO: na FASE DE GRUPOS, cada jogo mostra os palpites de todos (recolhidos,
    abre no "ver palpites"). Verde = acertou o resultado · 🎯 = cravou o placar.
    ========================================================================= */
@@ -552,13 +552,76 @@
       <button class="vbtn ${ABA === "mata" ? "on" : ""}" data-v="mata">🏆 Mata-mata</button>
     </div>`;
   }
+  function estadoEvento(ev) {
+    return getPath(ev, ["competitions", 0, "status", "type", "state"], "pre");
+  }
+  function placarCompetidor(c) {
+    const n = scoreNum(c && c.score);
+    if (n != null) return n;
+    const dn = scoreNum(c && c.displayScore);
+    if (dn != null) return dn;
+    return null;
+  }
+  function eventoTemPlacar(ev) {
+    const cs = getPath(ev, ["competitions", 0, "competitors"], []);
+    if (!Array.isArray(cs) || cs.length < 2) return false;
+    const h = cs.find(x => x.homeAway === "home") || cs[0];
+    const a = cs.find(x => x.homeAway === "away") || cs[1];
+    return placarCompetidor(h) != null && placarCompetidor(a) != null;
+  }
+  function eventoEhGrupo(ev) {
+    const slug = ((ev && ev.season && ev.season.slug) || "").toLowerCase();
+    if (slug === "group-stage") return true;
+    if (slug && slug !== "group-stage") return false;
+    // Segurança: alguns retornos do scoreboard diário vêm sem season.slug.
+    // Nesse caso, identifica pelo par de seleções cadastrado em selecoes.json.
+    const cs = getPath(ev, ["competitions", 0, "competitors"], []);
+    if (!Array.isArray(cs) || cs.length < 2) return false;
+    const h = cs.find(x => x.homeAway === "home") || cs[0];
+    const a = cs.find(x => x.homeAway === "away") || cs[1];
+    return !!grupoDoJogo(h, a);
+  }
+  function preferirEvento(novo, antigo) {
+    if (!antigo) return novo;
+    const en = estadoEvento(novo), ea = estadoEvento(antigo);
+    // O scoreboard de faixa grande da ESPN às vezes fica atrasado para jogos ao vivo.
+    // O scoreboard do dia costuma ser o mais fresco; então ele deve vencer em estado/placar.
+    if (en === "in" && ea !== "in") return novo;
+    if (en === "post" && ea !== "post") return novo;
+    if (eventoTemPlacar(novo) && !eventoTemPlacar(antigo)) return novo;
+    const sn = getPath(novo, ["competitions", 0, "status", "displayClock"], "");
+    const sa = getPath(antigo, ["competitions", 0, "status", "displayClock"], "");
+    if (en === "in" && sn && sn !== sa) return novo;
+    return antigo;
+  }
   async function buscarGruposEvents() {
-    // cache com validade de 90s: senão o chaveamento usa resultados velhos
-    // (era um cache eterno — não atualizava quando novos jogos terminavam)
-    if (GRP_EVENTS.length && (Date.now() - GRP_EVENTS_TS) < 90000) return GRP_EVENTS;
+    // cache curto (25s): a aba Grupos/Mata-mata precisa refletir jogos ao vivo
+    // com a mesma sensação de tempo real da página principal (refresh de 30s).
+    if (GRP_EVENTS.length && (Date.now() - GRP_EVENTS_TS) < 25000) return GRP_EVENTS;
     try {
-      const d = await fetch(`${API}?dates=20260611-20260627&limit=120&_=${Date.now()}`).then(r => r.json());
-      GRP_EVENTS = (d.events || []).filter(e => ((e.season && e.season.slug) || "") === "group-stage");
+      const mapa = new Map();
+      const adicionar = (evs) => {
+        (evs || []).filter(eventoEhGrupo).forEach(ev => {
+          mapa.set(String(ev.id), preferirEvento(ev, mapa.get(String(ev.id))));
+        });
+      };
+
+      // 1) Busca geral da fase de grupos, para trazer todos os jogos.
+      const geral = await fetch(`${API}?dates=20260611-20260627&limit=120&_=${Date.now()}`).then(r => r.json());
+      adicionar(geral.events || []);
+
+      // 2) Sobrepõe com o scoreboard diário, que é mais confiável para jogo AO VIVO.
+      // Inclui ontem/hoje/amanhã para cobrir virada de dia/UTC sem depender do fuso.
+      const base = ymdToDate(hojeYMD());
+      const dias = [-1, 0, 1].map(off => dateToYMD(new Date(base.getTime() + off * 864e5)));
+      await Promise.all(dias.map(async dstr => {
+        try {
+          const dd = await fetch(`${API}?dates=${dstr}&limit=80&_=${Date.now()}`).then(r => r.json());
+          adicionar(dd.events || []);
+        } catch (e) { /* ignora um dia que falhe */ }
+      }));
+
+      GRP_EVENTS = Array.from(mapa.values()).sort((a, b) => new Date(a.date) - new Date(b.date));
       GRP_EVENTS_TS = Date.now();
     } catch (e) { /* mantém o cache anterior se a busca falhar */ }
     return GRP_EVENTS;
@@ -570,13 +633,15 @@
     const res = [];
     const jogosBase = COPA_ENGINE.gerarJogosGrupos(SEL); // tem jogo_id, a, b
     events.forEach(ev => {
-      const c = ev.competitions[0]; if (!c || c.status.type.state !== "post") return;
+      const c = ev.competitions[0];
+      if (!c || estadoEvento(ev) === "pre" || !eventoTemPlacar(ev)) return;
       const cs = c.competitors || [];
       const h = cs.find(x => x.homeAway === "home") || cs[0];
       const a = cs.find(x => x.homeAway === "away") || cs[1];
       const hId = dpSigla((h.team || {}).abbreviation) || (h.team || {}).abbreviation;
       const aId = dpSigla((a.team || {}).abbreviation) || (a.team || {}).abbreviation;
-      const hs = parseInt(h.score || "0", 10), as = parseInt(a.score || "0", 10);
+      const hs = placarCompetidor(h), as = placarCompetidor(a);
+      if (hs == null || as == null) return;
       // acha o jogo_id correspondente (mesmo par de times, em qualquer ordem)
       const jb = jogosBase.find(j => (j.a === hId && j.b === aId) || (j.a === aId && j.b === hId));
       if (!jb) return;
@@ -831,11 +896,14 @@
     const tab = {};
     SEL.forEach(t => { (tab[t.grupo] = tab[t.grupo] || {})[t.id] = { id: t.id, j: 0, v: 0, e: 0, d: 0, gp: 0, gc: 0, pts: 0 }; });
     events.forEach(ev => {
-      const c = ev.competitions[0]; if (!c || c.status.type.state !== "post") return;
+      const c = ev.competitions[0];
+      if (!c || estadoEvento(ev) === "pre" || !eventoTemPlacar(ev)) return;
       const cs = c.competitors || [];
       const h = cs.find(x => x.homeAway === "home") || cs[0], a = cs.find(x => x.homeAway === "away") || cs[1];
-      const hId = (h.team || {}).abbreviation, aId = (a.team || {}).abbreviation;
-      const hs = parseInt(h.score || "0", 10), as = parseInt(a.score || "0", 10);
+      const hId = dpSigla((h.team || {}).abbreviation) || (h.team || {}).abbreviation;
+      const aId = dpSigla((a.team || {}).abbreviation) || (a.team || {}).abbreviation;
+      const hs = placarCompetidor(h), as = placarCompetidor(a);
+      if (hs == null || as == null) return;
       let g = null; for (const G in tab) { if (tab[G][hId] && tab[G][aId]) { g = G; break; } }
       if (!g) return;
       const H = tab[g][hId], A = tab[g][aId];
@@ -846,15 +914,47 @@
     });
     return tab;
   }
+
+  // Ordenação oficial FIFA também durante jogos ao vivo.
+  // A tabela acima calcula números (P/J/V/E/D/GP/GC/SG); esta função usa a
+  // engine para ordenar cada grupo pelos critérios oficiais, inclusive fair play
+  // quando o JSON já tiver sido atualizado pelo robô.
+  function classificacaoGruposEngine(events, fairplay) {
+    try {
+      if (!COPA_ENGINE || !SEL || !SEL.length) return null;
+      const plac = {};
+      placaresGruposDaESPN(events).forEach(p => { plac[p.jogo_id] = p; });
+      const jogos = COPA_ENGINE.gerarJogosGrupos(SEL);
+      const seed = {}; SEL.forEach(s => { seed[s.id] = s.seed; });
+      const porGrupo = {};
+      jogos.forEach(j => {
+        const p = plac[j.jogo_id];
+        const jj = Object.assign({}, j, { ga: p ? p.ga : null, gb: p ? p.gb : null });
+        (porGrupo[j.grupo] = porGrupo[j.grupo] || []).push(jj);
+      });
+      const out = {};
+      Object.keys(porGrupo).sort().forEach(G => {
+        const times = [...new Set(porGrupo[G].map(j => [j.a, j.b]).flat())];
+        out[G] = COPA_ENGINE.classificarGrupo(porGrupo[G], times, seed, fairplay || {})
+          .map(t => Object.assign({}, t, { grupo: G }));
+      });
+      return out;
+    } catch (e) { return null; }
+  }
   function renderGrupos() {
     $("#lista").innerHTML = abasHTML() + '<p class="vazio">Carregando tabela…</p>';
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
-    buscarGruposEvents().then(events => {
+    buscarGruposEvents().then(async events => {
       if (ABA !== "grupos") return;
       const tab = tabelaGrupos(events);
+      const fp = await buscarFairPlay();
+      const classifEngine = classificacaoGruposEngine(events, fp);
       const ord = (a, b) => b.pts - a.pts || (b.gp - b.gc) - (a.gp - a.gc) || b.gp - a.gp || nomeDe(a.id).localeCompare(nomeDe(b.id));
       const blocos = Object.keys(tab).sort().map(G => {
-        const linhas = Object.values(tab[G]).sort(ord).map((t, i) => {
+        const listaOrdenada = (classifEngine && classifEngine[G])
+          ? classifEngine[G].map(x => tab[G][x.id]).filter(Boolean)
+          : Object.values(tab[G]).sort(ord);
+        const linhas = listaOrdenada.map((t, i) => {
           const sg = t.gp - t.gc, cls = i < 2 ? "classif" : "";
           return `<tr class="${cls}"><td class="cpos">${i + 1}</td><td class="ctime">${flagId(t.id)} <span>${nomeDe(t.id)}</span></td><td><b>${t.pts}</b></td><td>${t.j}</td><td>${t.v}</td><td>${t.e}</td><td>${t.d}</td><td class="men">${t.gp}</td><td class="men">${t.gc}</td><td>${sg > 0 ? "+" + sg : sg}</td></tr>`;
         }).join("");
@@ -867,7 +967,7 @@
           <div class="jg-box" id="jgs-${G}" style="display:none">${jogosHTML}</div>
         </div>`;
       }).join("");
-      $("#lista").innerHTML = abasHTML() + '<p class="leg-grp">As <b>2 primeiras</b> de cada grupo avançam, mais os 8 melhores terceiros. Tabela calculada dos resultados oficiais.</p>' + blocos;
+      $("#lista").innerHTML = abasHTML() + '<p class="leg-grp">As <b>2 primeiras</b> de cada grupo avançam, mais os 8 melhores terceiros. Durante jogos ao vivo, a tabela é calculada <b>como está agora</b> e atualiza automaticamente.</p>' + blocos;
       document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
       // toggle dos jogos do grupo
       document.querySelectorAll(".jg-toggle[data-jg-grupo]").forEach(b => b.onclick = () => {
@@ -1048,6 +1148,10 @@
     $("#next").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
     const bcal = $("#btn-cal-jogos"); if (bcal) bcal.onclick = () => baixarICSJogos(bcal);
     carregar();
-    timer = setInterval(() => { if (ABA === "jogos") carregar(); }, 30000);
+    timer = setInterval(() => {
+      if (ABA === "jogos") carregar();
+      else if (ABA === "grupos") renderGrupos();
+      else if (ABA === "mata") renderMata();
+    }, 30000);
   });
 })();
