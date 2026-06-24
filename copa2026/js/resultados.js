@@ -1022,7 +1022,7 @@
     oitavas: ["M89", "M90", "M93", "M94", "M91", "M92", "M95", "M96"],
     quartas: ["M97", "M98", "M99", "M100"],
     semis: ["M101", "M102"],
-    final: ["M104"]
+    final: ["M104", "M103"]
   };
   const MATA_LABEL = { "16-avos":"16-avos", "Oitavas":"Oitavas", "Quartas":"Quartas", "Semis":"Semis", "Final":"Final" };
   const MATA_FASE_ID = { "16-avos":"r32", "Oitavas":"oitavas", "Quartas":"quartas", "Semis":"semis", "Final":"final" };
@@ -1044,6 +1044,53 @@
     return s;
   }
   function normTokenMata(s) { return String(s || "").toUpperCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9]/g, ""); }
+
+  function textosEventoMata(ev) {
+    const textos = [];
+    try {
+      textos.push(ev.id, ev.name, ev.shortName);
+      const comp = ev.competitions && ev.competitions[0] ? ev.competitions[0] : {};
+      textos.push(comp.name, comp.shortName, comp.note, comp.notes);
+      (comp.competitors || []).forEach(c => {
+        const t = c.team || {};
+        textos.push(t.abbreviation, t.shortDisplayName, t.displayName, t.name, t.location, t.nickname);
+      });
+    } catch (e) { /* ignora */ }
+    return textos.filter(Boolean).map(normTokenMata);
+  }
+  function eventoContemTokenMata(ev, token) {
+    const nt = normTokenMata(token);
+    if (!nt) return false;
+    const textos = textosEventoMata(ev);
+    if (textos.some(t => t === nt || t.includes(nt))) return true;
+    // A árvore do nosso JSON usa WM74/LM101; alguns feeds usam W74/L101.
+    const mw = nt.match(/^([WL])M(\d+)$/);
+    if (mw) {
+      const curto = mw[1] + mw[2];
+      if (textos.some(t => t === curto || t.includes(curto))) return true;
+    }
+    // Slots como 1E, 2F e 3C podem vir como "1st Group E" ou "3ABCDF".
+    const m = nt.match(/^([123])([A-L])$/);
+    if (m) {
+      const pos = m[1], grupo = m[2];
+      return textos.some(t => {
+        if (t.includes(pos + grupo)) return true;
+        if (pos === "3" && /^3[A-L]+$/.test(t) && t.includes(grupo)) return true;
+        if (t.includes(pos + "STGROUP") && t.includes(grupo)) return true;
+        if (t.includes(pos + "NDGROUP") && t.includes(grupo)) return true;
+        if (t.includes(pos + "RDGROUP") && t.includes(grupo)) return true;
+        if (t.includes(pos + "THGROUP") && t.includes(grupo)) return true;
+        if (pos === "3" && t.includes("THIRD") && t.includes("GROUP") && t.includes(grupo)) return true;
+        return false;
+      });
+    }
+    return false;
+  }
+  function eventoContemIdMata(ev, id) {
+    const mid = normTokenMata(id);
+    return !!mid && textosEventoMata(ev).some(t => t.includes(mid));
+  }
+
   function infoTimesEvento(ev) {
     const out = [];
     try {
@@ -1059,53 +1106,73 @@
     return out;
   }
   function eventoTemToken(ev, token) {
-    const nt = normTokenMata(token);
-    if (!nt) return false;
-    return infoTimesEvento(ev).some(x => x.toks.includes(nt));
+    return eventoContemTokenMata(ev, token);
   }
   function eventoMataDeOuSlot(j, mataEvents) {
+    const lista = mataEvents || [];
     const idA = dpSigla(j.a), idB = dpSigla(j.b);
+
+    // 1) Se o feed trouxer o código FIFA do jogo (M74, M89 etc.), é o casamento mais seguro.
+    const porId = lista.find(ev => eventoContemIdMata(ev, j.id));
+    if (porId) return porId;
+
+    // 2) Quando as duas seleções já estão no feed, casa pelo confronto exato.
     if (idA && idB) {
-      const exato = eventoMataDe(idA, idB, mataEvents);
+      const exato = eventoMataDe(idA, idB, lista);
       if (exato) return exato;
     }
-    // Quando a ESPN ainda mostra slot (1C, 2F, 3RD etc.), tenta casar pelos rótulos.
-    const alvoA = idA || j.slotA || j.a;
-    const alvoB = idB || j.slotB || j.b;
-    if (alvoA && alvoB) {
-      const porSlot = (mataEvents || []).find(ev => eventoTemToken(ev, alvoA) && eventoTemToken(ev, alvoB));
-      if (porSlot) return porSlot;
-    }
-    return null;
+
+    // 3) Antes de a FIFA/ESPN substituir os slots por seleções, casa pelos rótulos (1E, 2F, 3C etc.).
+    const alvosA = [idA, j.slotA, j.a].filter(Boolean);
+    const alvosB = [idB, j.slotB, j.b].filter(Boolean);
+    const porSlot = lista.find(ev => alvosA.some(a => eventoTemToken(ev, a)) && alvosB.some(b => eventoTemToken(ev, b)));
+    if (porSlot) return porSlot;
+
+    // 4) Caso um lado já tenha seleção e o outro ainda esteja como slot/TBD no feed.
+    const umLado = lista.find(ev => {
+      const okA = alvosA.some(a => eventoTemToken(ev, a));
+      const okB = alvosB.some(b => eventoTemToken(ev, b));
+      return okA && okB;
+    });
+    return umLado || null;
   }
-  function infoJogoMata(ev, idA, idB) {
-    if (!ev) return { status:"Agendado", cls:"", scoreA:"", scoreB:"", info:"" };
+  function infoJogoMata(ev, idA, idB, j) {
+    if (!ev) return { status:"Agendado", cls:"", scoreA:"", scoreB:"", vA:"", vB:"", info:"" };
     const comp = ev.competitions[0], st = comp.status.type, cs = comp.competitors;
     const h = cs.find(c => c.homeAway === "home") || cs[0];
     const a = cs.find(c => c.homeAway === "away") || cs[1];
     const hId = dpSigla((h.team || {}).abbreviation) || dpSigla((h.team || {}).displayName) || (h.team || {}).abbreviation;
+    const aId = dpSigla((a.team || {}).abbreviation) || dpSigla((a.team || {}).displayName) || (a.team || {}).abbreviation;
     const hs = h.score, as = a.score;
-    const aScore = idA && hId === idA ? hs : (idA ? as : "");
-    const bScore = idA && hId === idA ? as : (idA ? hs : "");
-    let vA = "", vB = "", status = "Agendado", cls = "", info = "";
+    let aScore = "", bScore = "";
+    if (idA && idB) {
+      if (hId === idA) { aScore = hs; bScore = as; }
+      else if (aId === idA) { aScore = as; bScore = hs; }
+    }
+    let vA = "", vB = "", status = "Agendado", cls = "", extra = "";
     if (st.state === "post") {
       status = "Encerrado"; cls = "post";
-      if (h.winner) { if (idA && hId === idA) vA = "mm-venc"; else vB = "mm-venc"; }
-      else if (a.winner) { if (idA && hId === idA) vB = "mm-venc"; else vA = "mm-venc"; }
+      if (idA && idB) {
+        if (h.winner) { if (hId === idA) vA = "mm-venc"; else if (hId === idB) vB = "mm-venc"; }
+        else if (a.winner) { if (aId === idA) vA = "mm-venc"; else if (aId === idB) vB = "mm-venc"; }
+      }
       const hPen = h.shootoutScore, aPen = a.shootoutScore;
       if (hPen != null && aPen != null && idA) {
         const aPenV = (hId === idA) ? hPen : aPen, bPenV = (hId === idA) ? aPen : hPen;
-        info = `<span class="mm-pen">pênaltis ${aPenV}-${bPenV}</span>`;
+        extra = `<span class="mm-pen">pênaltis ${aPenV}-${bPenV}</span>`;
       }
     } else if (st.state === "in") {
       status = comp.status.displayClock || "Ao vivo"; cls = "live";
-      info = `<span class="mm-live">● ao vivo</span>`;
+      extra = `<span class="mm-live">● ao vivo</span>`;
+    } else if (st.state === "pre") {
+      status = "Agendado";
     }
     const d = new Date(ev.date);
     const data = d.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit", timeZone:"America/Sao_Paulo" });
     const estadio = getPath(ev, ["competitions",0,"venue","fullName"], "") || getPath(ev, ["competitions",0,"venue","displayName"], "") || "";
-    const local = [estadio].filter(Boolean).join(" · ");
-    const linha = `${data} · ${horaBR(ev.date)}${info ? " · " + info : ""}${local ? `<span class="mm-estadio">${escTxt(local)}</span>` : ""}`;
+    const cidade = getPath(ev, ["competitions",0,"venue","address","city"], "") || "";
+    const onde = [estadio, cidade].filter(Boolean).join(" · ");
+    const linha = `<span class="mm-data">${data} · ${horaBR(ev.date)}</span>${extra ? `<span class="mm-extra">${extra}</span>` : ""}${onde ? `<span class="mm-estadio">${escTxt(onde)}</span>` : ""}`;
     return { status, cls, scoreA:aScore, scoreB:bScore, vA, vB, info:linha };
   }
   function montarJogosMata(d) {
@@ -1126,8 +1193,7 @@
       "Oitavas": MATA_VISUAL.oitavas.map(get),
       "Quartas": MATA_VISUAL.quartas.map(get),
       "Semis": MATA_VISUAL.semis.map(get),
-      "Final": MATA_VISUAL.final.map(get),
-      terceiro: arvById.M103
+      "Final": MATA_VISUAL.final.map(get)
     };
   }
   function linhaEquipeMata(valor, slot, score, vcls, travado) {
@@ -1144,19 +1210,28 @@
   function cardMata(j, row, span, faseNome) {
     const idA = dpSigla(j.a), idB = dpSigla(j.b);
     const ev = eventoMataDeOuSlot(j, MATA_EVENTS);
-    const inf = infoJogoMata(ev, idA, idB);
-    return `<div class="mm-card ${faseNome === "Final" ? "mm-card-final" : ""}" style="grid-row:${row} / span ${span}" data-mm-id="${j.id}">
-      <div class="mm-card-id"><b>${j.id || "—"}</b><span class="mm-status-chip ${inf.cls}">${escTxt(inf.status)}</span></div>
+    const inf = infoJogoMata(ev, idA, idB, j);
+    const especial = j.id === "M103" ? " mm-card-terceiro" : (j.id === "M104" ? " mm-card-final" : "");
+    return `<div class="mm-card${especial}" style="grid-row:${row} / span ${span}" data-mm-id="${j.id}">
+      <div class="mm-card-id"><b>${j.id || "—"}${j.id === "M104" ? " · Final" : (j.id === "M103" ? " · 3º lugar" : "")}</b><span class="mm-status-chip ${inf.cls}">${escTxt(inf.status)}</span></div>
       ${linhaEquipeMata(j.a, j.slotA, inf.scoreA, inf.vA, j.travA)}
       ${linhaEquipeMata(j.b, j.slotB, inf.scoreB, inf.vB, j.travB)}
       ${inf.info ? `<div class="mm-card-info">${inf.info}</div>` : ""}
     </div>`;
   }
   function colunaMata(nome, jogos) {
-    const n = jogos.length || 1;
-    const span = Math.max(1, Math.floor(16 / n));
-    const cards = jogos.map((j, i) => cardMata(j, i * span + 1, span, nome)).join("");
-    const cls = nome === "Final" ? " mm-col-final" : "";
+    let cards;
+    let cls = nome === "Final" ? " mm-col-final" : "";
+    if (nome === "Final") {
+      // Final e disputa do 3º lugar ficam na mesma coluna, como no chaveamento oficial/BBC.
+      const final = (jogos || []).find(j => j.id === "M104") || (jogos || [])[0];
+      const terceiro = (jogos || []).find(j => j.id === "M103");
+      cards = [final ? cardMata(final, 3, 4, nome) : "", terceiro ? cardMata(terceiro, 11, 4, "3º lugar") : ""].join("");
+    } else {
+      const n = jogos.length || 1;
+      const span = Math.max(1, Math.floor(16 / n));
+      cards = jogos.map((j, i) => cardMata(j, i * span + 1, span, nome)).join("");
+    }
     return `<section class="mm-col${cls}" id="mm-col-${idFaseClasse(nome)}" data-col-fase="${nome}">
       <div class="mm-col-head">${nome}</div><div class="mm-col-grid">${cards}</div>
     </section>`;
@@ -1174,10 +1249,6 @@
     const jogos = montarJogosMata(d);
     const colunas = FASES.map(f => colunaMata(f, jogos[f] || [])).join("");
 
-    let terceiro = "";
-    if (jogos.terceiro) {
-      terceiro = `<div class="mm-terceiro-box"><div class="mm-3tit">Disputa de 3º lugar</div>${cardMata(jogos.terceiro, 1, 1, "3º lugar")}</div>`;
-    }
 
     const VIRADA_MATA = new Date("2026-06-28T02:00:00-03:00").getTime();
     const oficial = Date.now() >= VIRADA_MATA;
@@ -1189,7 +1260,6 @@
     $("#lista").innerHTML = abasHTML() + aviso
       + `<div class="mm-pills">${pills}</div>`
       + `<div class="mm-bracket-shell"><p class="mm-scroll-hint">👆 <b>Arraste lateralmente</b> para acompanhar o caminho até a final.</p><div class="mm-bracket-scroll" id="mm-bracket-scroll"><div class="mm-bracket">${colunas}</div></div></div>`
-      + terceiro
       + (PALP.length ? `<button class="rs-toggle" id="rs-toggle">🎯 Quem acertou as seleções que avançaram ▾</button>` + rankingSelecoesHTML(d) : "");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     document.querySelectorAll(".mm-pill[data-fase]").forEach(b => b.onclick = () => {
