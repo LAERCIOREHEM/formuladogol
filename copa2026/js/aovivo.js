@@ -214,7 +214,7 @@
     // Sem link exato validado, não abre mais @CazeTV/live, porque pode cair
     // na transmissão principal de outro jogo. O cron deve preencher
     // dados/lives.json com watch?v=... quando validar o confronto.
-    return `<div class="btn-caze" title="O robô ainda não validou uma live da CazéTV exatamente para este confronto.">⏳ Live exata da CazéTV ainda não validada</div>`;
+    return `<div class="btn-caze wait" title="O robô ainda não validou uma live da CazéTV exatamente para este confronto.">⏳ Aguardando link exato da CazéTV</div>`;
   }
 
   function faseLabel(ev) {

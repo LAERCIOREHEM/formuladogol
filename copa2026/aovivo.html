@@ -38,7 +38,7 @@
 
   .placar{display:block;gap:0;position:relative;overflow:hidden;background:linear-gradient(180deg,var(--navy-2),var(--navy));border:1px solid var(--linha);border-radius:16px;padding:16px 14px 14px;margin-bottom:12px;box-shadow:0 14px 34px rgba(0,0,0,.35)}
   .placar.pre{opacity:.96}
-  .placar::before{content:"";position:absolute;inset:0;opacity:.07;pointer-events:none;background:radial-gradient(circle at 50% 44%, transparent 28px, rgba(255,255,255,.6) 29px, transparent 31px),linear-gradient(90deg,transparent 49.7%,rgba(255,255,255,.6) 50%,transparent 50.3%)}
+  .placar::before{content:"";position:absolute;inset:0;opacity:.045;pointer-events:none;background:radial-gradient(circle at 50% 44%,rgba(255,255,255,.20),transparent 48%)}
   .topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;position:relative;padding:0;border-bottom:none}
   .fase{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza)}
   .aovivo{display:inline-flex;align-items:center;gap:6px;background:rgba(224,71,62,.15);color:#ff8a82;border:1px solid rgba(224,71,62,.4);padding:3px 10px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:1.5px}
@@ -121,6 +121,9 @@
     background:#f7d116;color:#3a2a00;font-weight:800;font-size:14px;text-decoration:none;
     padding:11px 16px;border-radius:99px;box-shadow:0 4px 14px rgba(247,209,22,.25)}
   .btn-caze:active{transform:scale(.98)}
+  .btn-caze.wait{max-width:300px;background:rgba(244,197,66,.10);color:var(--gold);
+    border:1px solid var(--gold-2);box-shadow:none;font-size:12px;padding:8px 12px;cursor:default}
+  .btn-caze.wait:active{transform:none}
   .hdr{margin:0 0 14px}
   .hdr-svg{display:block;width:100%;height:auto;max-width:520px}
   .hdr{margin:0 0 14px;text-align:center}
@@ -145,7 +148,7 @@
 
 <script src="js/config.js?v=20260621d"></script>
 <script src="js/engine.js?v=20260622b"></script>
-<script src="js/aovivo.js?v=20260622c"></script>
+<script src="js/aovivo.js?v=20260624b"></script>
 <footer class="rodape">
   <a href="regras.html">Regras</a><span class="sep">·</span>
   <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
