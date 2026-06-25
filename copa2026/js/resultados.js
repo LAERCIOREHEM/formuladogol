@@ -30,7 +30,8 @@
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
   let MATA_LOCK_TOKENS = {}; // slots matematicamente definidos no mata-mata (1A, 2B, 3C...)
-  let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
+  let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Jogo -> tabela -> voltar
+  let RETORNO_GRUPO = null; // navegação Tabela de grupos -> jogo -> voltar para a mesma tabela
   let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols/cartões exibidos nos cards
   let JOGOS_DIA_EVENTS = []; // cache dos eventos do dia exibido na aba Jogos
   let REFRESH_MONITOR_EVENTS = [], REFRESH_MONITOR_TS = 0; // monitor leve para ligar/desligar auto-refresh
@@ -581,6 +582,41 @@
     return null;
   }
 
+  function retornoGrupoHTML() {
+    if (!RETORNO_GRUPO || !RETORNO_GRUPO.grupo) return "";
+    return `<button class="voltar-grupo" id="voltar-grupo-jogo">‹ Voltar para a tabela do Grupo ${escTxt(RETORNO_GRUPO.grupo)}</button>`;
+  }
+
+  function bindRetornoGrupo() {
+    const btn = document.getElementById("voltar-grupo-jogo");
+    if (!btn) return;
+    btn.onclick = () => {
+      const alvoGrupo = RETORNO_GRUPO && RETORNO_GRUPO.grupo;
+      const y = RETORNO_GRUPO && Number.isFinite(RETORNO_GRUPO.scrollY) ? RETORNO_GRUPO.scrollY : null;
+      ABA = "grupos";
+      const nav = $("#prev") && $("#prev").parentElement;
+      if (nav) nav.style.display = "none";
+      FOCO_GRUPO = alvoGrupo;
+      VOLTAR_JOGO = null;
+      RETORNO_GRUPO = null;
+      renderGrupos().then(() => {
+        if (alvoGrupo) {
+          const box = document.getElementById("jgs-" + alvoGrupo);
+          const tog = document.querySelector(`.jg-toggle[data-jg-grupo="${alvoGrupo}"]`);
+          if (box) box.style.display = "block";
+          if (tog) tog.innerHTML = "⚽ Ocultar jogos do grupo ▴";
+          const card = document.getElementById("grp-" + alvoGrupo);
+          if (card) {
+            card.classList.add("grp-focado");
+            if (y !== null) window.scrollTo({ top: y, behavior: "smooth" });
+            else card.scrollIntoView({ behavior: "smooth", block: "start" });
+            setTimeout(() => card.classList.remove("grp-focado"), 2200);
+          }
+        }
+      });
+    };
+  }
+
   async function carregar() {
     if (ABA !== "jogos") return;
     montarFaixaDias();
@@ -596,9 +632,11 @@
     }
     const evs = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
     JOGOS_DIA_EVENTS = evs;
-    if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
-    $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
+    const retornoHTML = retornoGrupoHTML();
+    if (!evs.length) { $("#lista").innerHTML = abasHTML() + retornoHTML + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); bindRetornoGrupo(); return; }
+    $("#lista").innerHTML = abasHTML() + retornoHTML + evs.map(card).join("");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    bindRetornoGrupo();
     document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
       const d = document.getElementById("sp-" + b.dataset.sp), ab = d.style.display === "none";
       d.style.display = ab ? "block" : "none";
@@ -607,6 +645,7 @@
     document.querySelectorAll(".grupo-link[data-grupo]").forEach(b => b.onclick = () => {
       VOLTAR_JOGO = b.dataset.jogo;   // lembra o jogo de origem
       FOCO_GRUPO = b.dataset.grupo;   // grupo a destacar/rolar
+      RETORNO_GRUPO = null;
       ABA = "grupos";
       $("#prev").parentElement.style.display = "none";
       renderGrupos();
@@ -1274,8 +1313,13 @@
     };
   }
 
-  function irParaJogoNoDia(idJogo, ymd) {
+  function irParaJogoNoDia(idJogo, ymd, origemGrupo) {
     if (ymd) dia = clamp(String(ymd));
+    if (origemGrupo) {
+      RETORNO_GRUPO = { grupo: origemGrupo, jogo: idJogo, scrollY: window.scrollY };
+    } else {
+      RETORNO_GRUPO = null;
+    }
     ABA = "jogos";
     const nav = $("#prev") && $("#prev").parentElement;
     if (nav) nav.style.display = "";
@@ -1321,7 +1365,7 @@
       } else {
         meio = `<span class="jg-meio"><span class="jg-placar">${hScore} × ${aScore}</span><span class="jg-ir">ver jogo ›</span></span>`;
       }
-      return `<div class="jg-row jg-go-jogo${cls}" data-jogo="${ev.id}" data-dia="${diaJogo}" role="button" tabindex="0" title="Ver detalhes, gols e melhores momentos na aba Jogos">
+      return `<div class="jg-row jg-go-jogo${cls}" data-jogo="${ev.id}" data-dia="${diaJogo}" data-grupo="${G}" role="button" tabindex="0" title="Ver detalhes, gols e melhores momentos na aba Jogos">
         <span class="jg-lado jg-h">${dpNome(hAb)} ${flagH ? `<img src="${flagH}" alt="">` : ""}</span>
         ${meio}
         <span class="jg-lado jg-a">${flagA ? `<img src="${flagA}" alt="">` : ""} ${dpNome(aAb)}</span>
@@ -1418,7 +1462,7 @@
         b.innerHTML = ab ? "⚽ Ocultar jogos do grupo ▴" : "⚽ Ver jogos do grupo ▾";
       });
       document.querySelectorAll(".jg-go-jogo[data-jogo][data-dia]").forEach(el => {
-        const abrir = () => irParaJogoNoDia(el.dataset.jogo, el.dataset.dia);
+        const abrir = () => irParaJogoNoDia(el.dataset.jogo, el.dataset.dia, el.dataset.grupo);
         el.onclick = abrir;
         el.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); abrir(); } };
       });
@@ -1440,9 +1484,14 @@
     });
   }
   function trocarAba(e) {
-    const v = e.currentTarget.dataset.v; if (v === ABA) return;
+    const v = e.currentTarget.dataset.v;
+    if (v === ABA) {
+      // Se o usuário tocar em "Partidas" estando no retorno contextual, considera navegação normal e remove o botão temporário.
+      if (v === "jogos" && RETORNO_GRUPO) { RETORNO_GRUPO = null; carregar(); }
+      return;
+    }
     ABA = v;
-    FOCO_GRUPO = null; VOLTAR_JOGO = null; // entrada normal: sem grupo focado
+    FOCO_GRUPO = null; VOLTAR_JOGO = null; RETORNO_GRUPO = null; // entrada normal: sem retorno contextual
     if (ABA === "grupos") { $("#prev").parentElement.style.display = "none"; renderGrupos(); }
     else if (ABA === "mata") { $("#prev").parentElement.style.display = "none"; renderMata(); }
     else { $("#prev").parentElement.style.display = ""; carregar(); }
@@ -1685,8 +1734,8 @@
   document.addEventListener("DOMContentLoaded", async () => {
     dia = clamp(hojeYMD());
     await carregarBase();
-    $("#prev").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() - 864e5))); carregar(); };
-    $("#next").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
+    $("#prev").onclick = () => { RETORNO_GRUPO = null; dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() - 864e5))); carregar(); };
+    $("#next").onclick = () => { RETORNO_GRUPO = null; dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
     const bcal = $("#btn-cal-jogos"); if (bcal) bcal.onclick = () => baixarICSJogos(bcal);
     carregar();
     timer = setInterval(tickAtualizacaoInteligente, AUTO_REFRESH_MS);
