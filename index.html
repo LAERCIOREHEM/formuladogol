@@ -3,303 +3,2816 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jogos — Bolão Copa 2026</title>
-  <meta name="description" content="Copa do Mundo 2026: jogos de hoje, resultados ao vivo e tabela dos grupos atualizada. Acompanhe todas as partidas em tempo real.">
-  <link rel="canonical" href="https://brasileirao2026almoco.com.br/copa2026/">
-  <meta name="keywords" content="Copa do Mundo 2026, jogos hoje, onde assistir, tabela grupos, ao vivo, CazéTV, bolão">
-  <meta name="theme-color" content="#0b1f3a">
-  <link rel="icon" type="image/png" href="favicon-copa.png" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-copa-32.png">
-  <link rel="apple-touch-icon" href="favicon-copa.png">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Bolão Copa 2026 — Brasileirão Almoço">
-  <meta property="og:title" content="Jogos — Bolão Copa 2026">
-  <meta property="og:description" content="Copa do Mundo 2026: jogos de hoje, resultados ao vivo e tabela dos grupos atualizada. Acompanhe todas as partidas em tempo real.">
-  <meta property="og:image" content="https://brasileirao2026almoco.com.br/copa2026/og-copa.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:url" content="https://brasileirao2026almoco.com.br/copa2026/">
-  <meta name="twitter:card" content="summary_large_image">
-  <!-- Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-0PPWGP93FD"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0PPWGP93FD');</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css">
+<title>Bolão Brasileirão 2026 — Almoço de Sexta</title>
+
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-0PPWGP93FD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-0PPWGP93FD');
+</script>
+
+<!-- Favicons (logo do site nas abas/atalhos do navegador) -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="shortcut icon" href="favicon.ico">
+<meta name="theme-color" content="#10b981">
+
+<!-- Open Graph (preview no WhatsApp, Facebook, LinkedIn, Telegram) -->
+<meta property="og:title" content="Bolão Brasileirão 2026 — Almoço de Sexta">
+<meta property="og:description" content="Acompanhe o ranking, palpites e classificação do Brasileirão 2026 entre os amigos do almoço de sexta.">
+<meta property="og:image" content="https://brasileirao2026almoco.com.br/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://brasileirao2026almoco.com.br">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Bolão Brasileirão 2026">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bolão Brasileirão 2026 — Almoço de Sexta">
+<meta name="twitter:description" content="Acompanhe o ranking, palpites e classificação do Brasileirão 2026.">
+<meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image.png">
+
+<!-- Descrição geral para SEO -->
+<meta name="description" content="Site do bolão do Campeonato Brasileiro 2026 entre amigos. Veja ranking, classificação, próximos jogos e resultados.">
+
 <style>
-  .wrap{max-width:580px;margin:0 auto;padding:16px 12px 60px}
-  .cab-topo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-  .cab-topo .tro{font-size:26px}
-  .cab-topo h1{font-family:'Anton',sans-serif;font-weight:400;font-size:19px;letter-spacing:.5px;line-height:1}
-  .cab-topo h1 b{color:var(--gold)}
-  .cab-topo .sub{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cinza);margin-top:3px}
-  .voltar{display:inline-block;color:var(--cinza);font-size:13px;text-decoration:none;border-bottom:1px dotted var(--cinza);margin-bottom:14px}
-
-  .navdia{display:flex;align-items:center;gap:6px;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:8px;margin-bottom:14px}
-  .navdia>button{flex:0 0 auto;font-family:inherit;font-weight:700;font-size:18px;width:34px;height:52px;border-radius:9px;cursor:pointer;border:1px solid var(--linha);background:var(--navy-3);color:var(--branco)}
-  .navdia>button:disabled{opacity:.3;cursor:not-allowed}
-  .dias-faixa{flex:1 1 0;min-width:0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:2px}
-  .dias-faixa::-webkit-scrollbar{display:none}
-  .dia-item{flex:0 0 auto;min-width:54px;padding:7px 4px;border-radius:9px;cursor:pointer;text-align:center;
-    background:transparent;border:1px solid transparent;transition:all .15s;opacity:.42}
-  .dia-item:hover{opacity:.7}
-  .dia-item .dsem{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--cinza)}
-  .dia-item .dnum{display:block;font-family:'Anton',sans-serif;font-size:20px;line-height:1.1;color:var(--branco)}
-  .dia-item .dmes{display:block;font-size:9px;color:var(--cinza);text-transform:uppercase}
-  .dia-item.hoje .dnum{color:var(--gold)}
-  .dia-item.ativo{opacity:1;background:var(--gold);border-color:var(--gold);
-    box-shadow:0 3px 14px rgba(244,197,66,.45);transform:scale(1.06)}
-  .dia-item.ativo .dsem,.dia-item.ativo .dmes{color:#3a2a00}
-  .dia-item.ativo .dnum{color:#3a2a00;font-weight:900}
-  .dia-item.tem-jogo::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--verde);margin:3px auto 0}
-  .dia-item.ativo.tem-jogo::after{background:#3a2a00}
-
-  .jogo{display:block;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:11px 13px;margin-bottom:8px;scroll-margin-top:90px}
-  .jogo .topo{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding:0;border-bottom:none}
-  .jogo .fase{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--cinza)}
-  .badge{font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:99px}
-  .badge.ag{color:var(--cinza);border:1px solid var(--linha)}
-  .badge.fim{color:var(--gold);border:1px solid var(--gold-2)}
-  .badge.live{color:#ff8a82;background:rgba(224,71,62,.15);border:1px solid rgba(224,71,62,.4);display:inline-flex;align-items:center;gap:6px}
-  .pulse{width:7px;height:7px;border-radius:50%;background:var(--vermelho);animation:pulse 1.4s infinite}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(224,71,62,.6)}70%{box-shadow:0 0 0 8px rgba(224,71,62,0)}100%{box-shadow:0 0 0 0 rgba(224,71,62,0)}}
-
-  .linha{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px}
-  .lado{display:flex;align-items:center;gap:9px;min-width:0}
-  .lado.f{justify-content:flex-end}
-  .lado img{width:30px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
-  .lado .t{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .lado.venc .t{color:var(--gold)}
-  .placar{display:flex;align-items:center;gap:9px;font-family:'Anton',sans-serif}
-  .placar .g{font-size:26px;min-width:26px;text-align:center}
-  .placar .x{color:var(--cinza);font-size:15px}
-  .hora{font-family:'Anton',sans-serif;font-size:18px;color:var(--gold);letter-spacing:1px;white-space:nowrap}
-  .venue{font-size:11px;color:var(--cinza);text-align:center;margin-top:8px}
-  .gols-jogo{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:10px;align-items:start;color:var(--cinza);margin:5px 2px 0;padding:0 4px}
-  .gols-jogo:empty{display:none}
-  .gols-time{min-width:0;display:flex;flex-direction:column;gap:2px;font-size:10.5px;line-height:1.22}
-  .gols-home{align-items:flex-start;text-align:left;padding-left:2px}
-  .gols-away{align-items:flex-end;text-align:right;padding-right:2px}
-  .gols-centro{display:block;min-width:0}
-  .gol-chip{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
-  .og-tag{display:inline-block;margin-left:3px;padding:0 3px;border-radius:4px;background:rgba(255,207,58,.18);border:1px solid rgba(255,207,58,.45);color:var(--gold);font-size:8px;font-weight:800;line-height:1.25;vertical-align:1px;letter-spacing:.2px}
-  .redcards{display:block;width:max-content;max-width:100%;font-size:8px;line-height:1;margin-bottom:3px;opacity:.95;white-space:nowrap}
-  .gols-home .redcards{margin-right:auto}
-  .gols-away .redcards{margin-left:auto}
-  .rednum{font-size:9px;color:var(--cinza);margin-left:2px}
-  .vermais{background:none;border:none;color:var(--gold);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;margin-top:10px;padding:0}
-  .subpal{margin-top:6px;border-top:1px dashed var(--linha);padding-top:4px}
-  .subcnt{font-size:11px;color:var(--cinza);margin:4px 0}
-  .subpal .prow{display:flex;justify-content:space-between;align-items:center;padding:6px 2px;font-size:13px;border-top:1px solid var(--linha)}
-  .subpal .pal{color:var(--cinza);font-variant-numeric:tabular-nums;display:inline-flex;align-items:center;gap:2px}
-  .bola{display:inline-block;width:11px;height:11px;border-radius:50%;margin-left:9px}
-  .bola.v{background:var(--verde)}.bola.x{background:rgba(159,176,199,.25)}
-  .cravou{color:var(--gold);font-weight:700;font-size:11px;margin-left:8px}
-  .aguard{color:var(--cinza);font-size:11px;margin-left:8px}
-  .vazio{color:var(--cinza);text-align:center;padding:24px;line-height:1.6}
-  @media(max-width:480px){
-    .linha{gap:6px}
-    .lado{flex-direction:column;justify-content:flex-start;align-items:center;gap:5px;text-align:center}
-    .lado.f{flex-direction:column;align-items:center}
-    .lado img{width:34px}
-    .lado .t{white-space:normal;font-size:12.5px;line-height:1.25;max-width:100%}
-    .placar .g{font-size:22px;min-width:22px}
-    .hora{font-size:15px}
-    .jogo .fase{letter-spacing:1px}
-    .gols-jogo{grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:5px;margin-top:5px;padding:0 1px}
-    .gols-time{font-size:9.5px;line-height:1.18;gap:2px}
-    .gol-chip{max-width:142px}
+  :root {
+    --bg: #0f1419;
+    --card: #1a2027;
+    --card-hover: #232a33;
+    --border: #2a3340;
+    --text: #e6e9ed;
+    --text-secondary: #8b95a3;
+    --text-tertiary: #5a6573;
+    --accent: #4ade80;
+    --accent-dim: #16432a;
+    --danger: #f87171;
+    --danger-dim: #4a1a1a;
+    --warning: #fbbf24;
+    --warning-dim: #4a3a0f;
+    --info: #60a5fa;
+    --info-dim: #1a3050;
+    --gold: #fbbf24;
+    --silver: #cbd5e1;
+    --bronze: #f59e0b;
   }
-  .tvs{display:flex;flex-wrap:wrap;gap:4px;align-items:center;justify-content:center;margin-top:8px;font-size:11px;color:var(--cinza)}
-  .tvchip{font-size:9.5px;font-weight:700;letter-spacing:.3px;padding:2px 7px;border-radius:99px;white-space:nowrap}
-  .vistog{display:flex;gap:6px;margin-bottom:12px}
-  .vbtn{flex:1;font-family:inherit;font-weight:700;font-size:14px;padding:10px;border-radius:10px;cursor:pointer;
-    border:1px solid var(--linha);background:var(--navy-2);color:var(--cinza)}
-  .vbtn.on{background:var(--gold);color:#3a2a00;border-color:var(--gold)}
-  .leg-grp{font-size:11px;color:var(--cinza);line-height:1.5;margin:0 2px 12px}.leg-grp b{color:var(--gold)}
-  .grpcard{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:8px 6px 4px;margin-bottom:10px;overflow:hidden;scroll-margin-top:90px}
-  .grpcab{font-family:'Anton',sans-serif;font-size:15px;letter-spacing:.5px;color:var(--gold);padding:2px 8px 8px}
-  .tabgrp{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
-  .tabgrp th,.tabgrp td{width:26px;padding:7px 0;text-align:center;box-sizing:border-box}
-  .tabgrp th{font-size:10px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.2px;border-bottom:1px solid var(--linha)}
-  .tabgrp td{border-bottom:1px solid rgba(255,255,255,.05)}
-  .tabgrp th.cpos,.tabgrp td.cpos{width:22px}
-  .tabgrp th.ctime,.tabgrp td.ctime{width:auto}
-  .tabgrp tr:last-child td{border-bottom:none}
-  .tabgrp .ctime{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:2px}
-  .tabgrp .ctime img{width:20px;border-radius:2px;vertical-align:-4px;margin-right:5px}
-  .tabgrp .cpos{color:var(--cinza)}
-  .tabgrp td b{color:var(--branco);font-family:'Anton',sans-serif;font-size:14px}
-  .tabgrp tr.classif{background:rgba(244,197,66,.07)}
-  .tabgrp tr.classif .cpos{color:var(--gold);font-weight:700}
-  @media(max-width:430px){.tabgrp{font-size:12px}.tabgrp th,.tabgrp td{width:22px;padding:7px 0}.tabgrp th.cpos,.tabgrp td.cpos{width:18px}.tabgrp th{font-size:9px}.tabgrp .ctime{font-size:11.5px}.tabgrp .ctime img{width:17px;margin-right:4px}.tabgrp td b{font-size:13px}}
-  @media(max-width:360px){.tabgrp th,.tabgrp td{width:19px}.tabgrp .ctime img{display:none}}
-  .hdr{margin:0 0 14px}
-  .hdr-svg{display:block;width:100%;height:auto;max-width:520px}
-  .hdr{margin:0 0 14px;text-align:center}
-  .hdr-img{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;border-radius:10px;box-sizing:border-box}
-  .assista{display:block;text-align:center;margin-top:9px;background:linear-gradient(90deg,#e0473e,#f4c542);
-    color:#1a1100;font-weight:800;font-size:13px;text-decoration:none;padding:10px 14px;border-radius:99px;
-    box-shadow:0 4px 16px rgba(224,71,62,.25)}
-  .assista:active{transform:scale(.99)}
-  .cal-jogos{display:block;width:100%;margin:0 0 14px;padding:11px;border-radius:10px;cursor:pointer;
-    background:rgba(244,197,66,.10);border:1px solid var(--gold);color:var(--gold);
-    font-family:inherit;font-weight:700;font-size:13.5px}
-  .cal-jogos:active{transform:scale(.99)}
-  .part-modo{display:flex;gap:6px;margin:0 0 12px}
-  .pmodo{flex:1;font-family:inherit;font-weight:800;font-size:13px;padding:9px 10px;border-radius:10px;cursor:pointer;
-    border:1px solid var(--linha);background:var(--navy-2);color:var(--cinza);transition:all .15s}
-  .pmodo.on{background:var(--gold);border-color:var(--gold);color:#3a2a00;box-shadow:0 4px 14px rgba(244,197,66,.22)}
-  .todos-wrap{display:grid;gap:12px}
-  .todos-dia{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:10px}
-  .todos-dia h3{margin:0 0 8px;font-family:'Anton',sans-serif;font-size:16px;font-weight:400;letter-spacing:.6px;color:var(--gold)}
-  .todos-row{display:grid;grid-template-columns:minmax(0,1fr) 86px minmax(0,1fr) auto;gap:8px;align-items:center;padding:9px 4px;border-top:1px solid rgba(255,255,255,.06);cursor:pointer;border-radius:8px}
-  .todos-row:first-of-type{border-top:0}
-  .todos-row:hover{background:rgba(255,255,255,.035)}
-  .todos-team{display:flex;align-items:center;gap:6px;min-width:0;font-weight:800;font-size:12.5px;color:var(--branco)}
-  .todos-team img{width:22px;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}.todos-team span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .todos-team.away{justify-content:flex-end;text-align:right}.todos-mid{text-align:center;min-width:0}.todos-score{font-family:'Anton',sans-serif;font-size:17px;color:var(--branco);letter-spacing:.5px}.todos-hora{font-family:'Anton',sans-serif;color:var(--gold);font-size:14px;letter-spacing:.5px}.todos-status{display:block;color:var(--cinza);font-size:9.5px;line-height:1.2;text-transform:uppercase;letter-spacing:.5px}
-  .todos-ir{color:var(--gold);font-weight:900;font-size:11px;white-space:nowrap}.todos-venue{grid-column:1 / -1;text-align:center;color:var(--cinza);font-size:10.5px;margin-top:-3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.todos-live .todos-score{color:var(--verde)}
-  @media(max-width:480px){.part-modo{gap:5px}.pmodo{font-size:12.5px;padding:8px}.todos-dia{padding:8px}.todos-row{grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);gap:5px;padding:8px 2px}.todos-ir{grid-column:1 / -1;text-align:center;margin-top:-2px}.todos-team{font-size:11.5px}.todos-team img{width:20px}.todos-score{font-size:15px}.todos-hora{font-size:12.5px}.todos-venue{font-size:9.5px}}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 16px;
+  }
+  .container { max-width: 1100px; margin: 0 auto; }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); }
+  .nav { display: flex; gap: 6px; flex-wrap: wrap; }
+  .nav button, .btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: inherit;
+    transition: background 0.15s;
+  }
+  .nav button:hover, .btn:hover { background: var(--card-hover); }
+  .nav button.active { background: var(--info-dim); border-color: var(--info); color: var(--info); }
+  .btn-primary { background: var(--info-dim); border-color: var(--info); color: var(--info); }
+  .btn-danger { color: var(--danger); }
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .status-ok { color: var(--accent); }
+  .status-loading { color: var(--warning); }
+  .status-error { color: var(--danger); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 10px 14px; text-align: left; }
+  thead th {
+    background: rgba(255,255,255,0.02);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-top: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:first-child { border-top: none; }
+  tbody tr.clickable { cursor: pointer; }
+  tbody tr.clickable:hover { background: var(--card-hover); }
+  .pos-medal {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: 600;
+    font-size: 12px;
+    color: #000;
+  }
+  .pos-1 { background: var(--gold); }
+  .pos-2 { background: var(--silver); }
+  .pos-3 { background: var(--bronze); }
+  .pos-other { background: var(--card-hover); color: var(--text-secondary); border: 1px solid var(--border); }
+  .total {
+    font-weight: 600;
+    font-size: 16px;
+    text-align: right;
+  }
+  .zona-rebaixamento { background: rgba(248,113,113,0.05); }
+  .zona-libertadores { background: rgba(74,222,128,0.04); }
+  .detail-row { background: rgba(96,165,250,0.04); }
+  .detail-row td { padding: 0; }
+  .detail-content { padding: 12px 16px; }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 12px;
+    margin-top: 6px;
+  }
+  .detail-grid > div {
+    background: var(--card);
+    padding: 8px 10px;
+  }
+  .detail-grid .header {
+    background: rgba(255,255,255,0.02);
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .badge-success { background: var(--accent-dim); color: var(--accent); }
+  .badge-info { background: var(--info-dim); color: var(--info); }
+  .badge-danger { background: var(--danger-dim); color: var(--danger); }
+  .badge-warning { background: var(--warning-dim); color: var(--warning); }
+  .badge-coracao { background: rgba(244,114,182,0.15); color: #f472b6; }
+  .empty { text-align: center; padding: 40px; color: var(--text-secondary); font-size: 14px; }
+  /* Modais */
+  .modal-backdrop {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; z-index: 100;
+  }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h2 { font-size: 18px; margin-bottom: 16px; font-weight: 600; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  input, select {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+  }
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--info);
+  }
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 100px;
+    gap: 8px;
+  }
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .legenda {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    flex-wrap: wrap;
+  }
+  .legenda-item { display: flex; align-items: center; gap: 6px; }
+  .legenda-dot { width: 10px; height: 10px; border-radius: 2px; }
+  @media (max-width: 720px) {
+    body { padding: 8px; }
+    h1 { font-size: 20px; }
+    th, td { padding: 8px 10px; font-size: 13px; }
+    .detail-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .detail-grid .desktop-only { display: none; }
+  }
+  .spinner {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border: 2px solid var(--border);
+    border-top-color: var(--warning);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 6px;
+    vertical-align: -2px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  .grupo-link{background:rgba(244,197,66,.12);border:1px solid var(--gold);color:var(--gold);
-    font-family:inherit;font-weight:700;font-size:11px;padding:3px 9px;border-radius:20px;cursor:pointer;margin:0 6px}
-  .grupo-link:active{transform:scale(.96)}
-  .grp-focado{outline:2px solid var(--gold);box-shadow:0 0 18px rgba(244,197,66,.25)}
-  .voltar-jogo{display:block;width:100%;background:rgba(244,197,66,.12);border:1px solid var(--gold);
-    color:var(--gold);font-family:inherit;font-weight:700;font-size:13px;padding:9px;border-radius:8px;cursor:pointer;margin-bottom:10px}
-  .voltar-jogo:active{transform:scale(.99)}
-  .voltar-grupo{display:block;width:100%;margin:0 0 12px;padding:10px 12px;border-radius:10px;cursor:pointer;
-    background:linear-gradient(90deg,rgba(244,197,66,.22),rgba(244,197,66,.10));border:1px solid var(--gold);
-    color:var(--gold);font-family:inherit;font-weight:800;font-size:13px;text-align:center;box-shadow:0 4px 14px rgba(244,197,66,.10)}
-  .voltar-grupo:active{transform:scale(.99)}
-  .jogo-destaque{outline:2px solid var(--gold);box-shadow:0 0 20px rgba(244,197,66,.3);transition:box-shadow .3s}
-  .jg-toggle{width:100%;margin-top:10px;background:rgba(244,197,66,.10);border:1px solid var(--gold);
-    color:var(--gold);font-family:inherit;font-weight:700;font-size:12.5px;padding:9px;border-radius:8px;cursor:pointer}
-  .jg-toggle:active{transform:scale(.99)}
-  .jg-box{margin-top:8px}
-  .jg-row{display:flex;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px}
-  .jg-row:last-child{border-bottom:none}
-  .jg-go-jogo{cursor:pointer;border-radius:7px;transition:background .15s,transform .12s}
-  .jg-go-jogo:hover{background:rgba(244,197,66,.08)}
-  .jg-go-jogo:active{transform:scale(.995)}
-  .jg-aovivo{background:rgba(29,185,84,.08);border-radius:6px}
-  .jg-lado{flex:1;display:flex;align-items:center;gap:5px;font-weight:600;color:var(--branco);min-width:0}
-  .jg-lado span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .jg-h{justify-content:flex-end;text-align:right}
-  .jg-a{justify-content:flex-start;text-align:left}
-  .jg-lado img{width:20px;height:14px;border-radius:2px;object-fit:cover;flex:0 0 auto}
-  .jg-meio{min-width:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;flex:0 0 auto}
-  .jg-placar{font-family:'Anton',sans-serif;font-size:16px;color:var(--branco);min-width:54px;text-align:center}
-  .jg-meio .jg-placar{min-width:0}
-  .jg-live{color:var(--verde)}
-  .jg-hora{font-size:11.5px;color:var(--cinza);min-width:80px;text-align:center;font-weight:600}
-  .jg-meio .jg-hora{min-width:0}
-  .jg-ir{margin-top:3px;font-size:10px;line-height:1;color:var(--gold);font-weight:800;letter-spacing:.02em;white-space:nowrap}
-  @media(max-width:430px){.jg-row{gap:6px;padding:8px 4px}.jg-meio{min-width:64px}.jg-ir{font-size:9px}.jg-hora{font-size:10.5px}}
-  .jg-vazio{font-size:12.5px;color:var(--cinza);text-align:center;padding:8px}
-  .mm-aviso{font-size:12px;color:var(--cinza);text-align:center;margin:0 0 12px;background:var(--navy-2);padding:9px;border-radius:8px;border:1px solid var(--linha)}
-  .mm-aviso b{color:var(--gold)}
-  .mm-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;margin-bottom:14px;padding-bottom:2px}
-  .mm-pills::-webkit-scrollbar{display:none}
-  .mm-pill{flex:0 0 auto;font-family:inherit;font-weight:700;font-size:13px;padding:8px 16px;border-radius:20px;cursor:pointer;
-    background:var(--navy-2);border:1px solid var(--linha);color:var(--cinza);transition:all .15s}
-  .mm-pill.on{background:var(--gold);border-color:var(--gold);color:#3a2a00}
-  .mm-fase-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-  .mm-jogo{background:var(--navy-2);border:1px solid var(--linha);border-radius:11px;padding:9px;display:flex;flex-direction:column;gap:5px}
-  .mm-time{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.03)}
-  .mm-time.mm-definido{background:linear-gradient(90deg,#ffd447,#f4b528);border:1px solid rgba(255,235,130,.95);box-shadow:0 6px 18px rgba(244,197,66,.18);color:#14213b}
-  .mm-time.mm-definido .mm-nome{color:#14213b;font-weight:900}
-  .mm-time.mm-definido .mm-score{color:#14213b}
-  .mm-time.mm-definido img{box-shadow:0 0 0 1px rgba(20,33,59,.18)}
-  .mm-lockmark{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:6px;background:#22c55e;color:#fff;font-size:12px;font-weight:900;line-height:1;flex:0 0 auto;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
-  .mm-time img{width:26px;height:18px;border-radius:3px;object-fit:cover;flex:0 0 auto}
-  .mm-nome{font-size:13.5px;font-weight:600;color:var(--branco);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .mm-score{font-family:'Anton',sans-serif;font-size:18px;color:var(--branco);min-width:18px;text-align:right}
-  .mm-score .mm-live,.mm-live{color:var(--verde)}
-  .mm-venc{background:rgba(244,197,66,.16)}
-  .mm-venc .mm-nome{color:var(--gold);font-weight:800}
-  .mm-tbd .mm-nome{color:var(--cinza);font-style:italic;font-weight:500}
-  .mm-info{font-size:11px;color:var(--cinza);text-align:center;padding-top:2px}
-  .mm-aovivo{color:var(--verde);font-weight:700}
-  .mm-pen{color:var(--gold);font-weight:700}
-  .mm-3tit{font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);text-align:center;text-transform:uppercase;letter-spacing:.5px;margin:18px 0 10px}
+  /* Ranking compacto estilo planilha */
+  .ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    background: var(--card);
+  }
+  .ranking-table thead th {
+    background: rgba(255,255,255,0.04);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 8px 6px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .ranking-table thead th.sticky-col,
+  .ranking-table tbody td.sticky-col {
+    position: sticky;
+    background: var(--card);
+    z-index: 2;
+  }
+  .ranking-table thead th.col-pos { width: 76px; text-align: center; left: 0; }
+  .ranking-table thead th.col-nome { text-align: left; padding-left: 10px; min-width: 130px; }
+  .ranking-table thead th.col-total {
+    background: rgba(74,222,128,0.08);
+    color: var(--accent);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  .ranking-table thead .group-header {
+    background: rgba(255,255,255,0.02);
+    color: var(--text-tertiary);
+    font-size: 9px;
+    padding: 4px 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ranking-table thead .group-header.coracao { background: rgba(244,114,182,0.08); color: #f472b6; }
+  .ranking-table thead .group-header.cai { background: rgba(251,191,36,0.08); color: var(--warning); }
+  .ranking-table tbody td {
+    padding: 6px 6px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    text-align: center;
+    vertical-align: middle;
+  }
+  .ranking-table tbody td.col-nome {
+    text-align: left;
+    padding-left: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+  }
+  .ranking-table tbody td.col-total {
+    background: rgba(74,222,128,0.05);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 15px;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+  .ranking-table tbody td.cell-coracao { background: rgba(244,114,182,0.04); }
+  .ranking-table tbody td.cell-cai { background: rgba(251,191,36,0.04); }
+  .cell-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.2;
+    margin-bottom: 1px;
+  }
+  .cell-pts {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .cell-pts.acerto { color: var(--accent); }
+  .cell-palp {
+    font-size: 9px;
+    color: var(--text-tertiary);
+    margin-top: 1px;
+    letter-spacing: 0.3px;
+  }
+  .cell-palp.acerto {
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .cell-palp.acerto::before { content: "✓ "; }
+  .ranking-table .pos-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--card-hover);
+    color: var(--text-secondary);
+  }
+  .ranking-table .pos-num.gold { background: var(--gold); color: #000; }
+  .ranking-table .pos-num.silver { background: var(--silver); color: #000; }
+  .ranking-table .pos-num.bronze { background: var(--bronze); color: #000; }
 
-  /* ===== MATA-MATA POR FASE / PARES DO CHAVEAMENTO ===== */
-  .mm-fase-shell{position:relative;margin-top:4px;border:1px solid var(--linha);background:rgba(19,41,75,.34);border-radius:13px;padding:12px 10px 12px;overflow:hidden}
-  .mm-fase-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin:0 2px 12px}
-  .mm-fase-title{font-family:'Anton',sans-serif;font-weight:400;font-size:20px;letter-spacing:.5px;color:var(--gold);text-transform:uppercase;line-height:1}
-  .mm-fase-sub{font-size:11px;color:var(--cinza);line-height:1.35;text-align:right;max-width:270px}.mm-fase-sub b{color:var(--gold)}
-  .mm-pares{display:grid;grid-template-columns:1fr;gap:14px}
-  .mm-pair{position:relative;border:2px solid rgba(136,198,89,.62);border-radius:24px;padding:11px;background:linear-gradient(180deg,rgba(12,35,66,.72),rgba(10,31,58,.72));box-shadow:0 10px 28px rgba(0,0,0,.16), inset 0 0 0 1px rgba(255,255,255,.035)}
-  .mm-pair::before{content:"";position:absolute;inset:5px;border:1px solid rgba(244,197,66,.18);border-radius:19px;pointer-events:none}
-  .mm-pair-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 9px;position:relative;z-index:1}
-  .mm-pair-title{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--cinza);font-weight:900}.mm-pair-title b{color:var(--gold)}
-  .mm-next-chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;border-radius:999px;border:1px solid rgba(244,197,66,.55);background:rgba(244,197,66,.10);color:var(--gold);font-size:10px;font-weight:900;padding:4px 8px;white-space:nowrap}
-  .mm-card{position:relative;background:linear-gradient(180deg,rgba(24,55,99,.98),rgba(17,42,78,.98));border:1px solid var(--linha);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;box-shadow:0 8px 18px rgba(0,0,0,.13);overflow:hidden;z-index:1}
-  .mm-pair .mm-card + .mm-card{margin-top:10px}
-  .mm-card::after,.mm-card::before{display:none!important}
-  .mm-card-id{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:9.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--cinza);line-height:1;margin-bottom:1px}.mm-card-id b{color:var(--gold);font-size:10.5px}.mm-status-chip{border:1px solid var(--linha);border-radius:999px;padding:2px 6px;color:var(--cinza);font-size:9px;letter-spacing:.6px}.mm-status-chip.live{color:var(--verde);border-color:rgba(29,185,84,.4)}.mm-status-chip.post{color:var(--gold);border-color:rgba(244,197,66,.45)}
-  .mm-equipe{display:flex;align-items:center;gap:7px;min-width:0;background:rgba(255,255,255,.04);border:1px solid transparent;border-radius:9px;padding:7px 8px;color:var(--branco)}
-  .mm-equipe img{width:25px;height:17px;border-radius:3px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}.mm-equipe .mm-nome{font-size:13.2px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}.mm-equipe .mm-slot{font-size:12.5px;color:var(--cinza);font-weight:800;font-style:italic}.mm-equipe .mm-score{font-family:'Anton',sans-serif;font-size:18px;line-height:1;color:var(--branco);min-width:18px;text-align:right}.mm-equipe.mm-tbd{opacity:.72}.mm-equipe.mm-venc{background:rgba(244,197,66,.14);border-color:rgba(244,197,66,.25)}.mm-equipe.mm-venc .mm-nome{color:var(--gold)}
-  .mm-equipe.mm-definido{background:linear-gradient(90deg,#ffd447,#f4b528);border-color:rgba(255,235,130,.95);box-shadow:0 6px 16px rgba(244,197,66,.20);color:#14213b}.mm-equipe.mm-definido .mm-nome,.mm-equipe.mm-definido .mm-score{color:#14213b}.mm-equipe.mm-definido img{box-shadow:0 0 0 1px rgba(20,33,59,.18)}
-  .mm-lockmark{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:6px;background:#22c55e;color:#fff;font-size:12px;font-weight:900;line-height:1;flex:0 0 auto;box-shadow:0 0 0 1px rgba(0,0,0,.12)}
-  .mm-card-info{margin-top:2px;text-align:center;color:var(--cinza);font-size:10px;line-height:1.28;white-space:normal;border-top:1px solid rgba(255,255,255,.08);padding-top:7px;min-height:0}.mm-card-info b{color:var(--gold)}.mm-card-info .mm-data{display:block;color:#eaf3ff;font-weight:900;letter-spacing:.2px}.mm-card-info .mm-extra{display:block}.mm-card-info .mm-estadio{display:block;white-space:normal;overflow:visible;text-overflow:clip;max-width:100%;opacity:.94;font-size:9.6px;line-height:1.22;margin-top:2px}.mm-card-info .mm-pen{color:var(--gold);font-weight:800}.mm-card-info .mm-live{color:var(--verde);font-weight:800}
-  .mm-card-terceiro{border-style:dashed}.mm-card-final,.mm-card-terceiro{background:linear-gradient(180deg,rgba(31,68,116,.96),rgba(17,42,78,.96))}
-  .mm-finals{display:grid;grid-template-columns:1fr;gap:12px}.mm-final-block{border:1px solid rgba(244,197,66,.34);border-radius:18px;padding:10px;background:rgba(12,35,66,.56)}
-  .mm-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;margin-bottom:12px;padding-bottom:2px}.mm-pills::-webkit-scrollbar{display:none}.mm-pill{flex:0 0 auto;font-family:inherit;font-weight:700;font-size:13px;padding:8px 16px;border-radius:20px;cursor:pointer;background:var(--navy-2);border:1px solid var(--linha);color:var(--cinza);transition:all .15s}.mm-pill.on{background:var(--gold);border-color:var(--gold);color:#3a2a00}
-  @media(min-width:780px){.mm-pares{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.mm-fase-shell{padding:14px 12px}.mm-card{padding:11px}.mm-equipe .mm-nome{font-size:13.8px}.mm-card-info{font-size:10.4px}.mm-card-info .mm-estadio{font-size:9.9px}.mm-finals{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media(max-width:480px){.mm-fase-shell{margin-left:-2px;margin-right:-2px;padding:11px 8px}.mm-fase-head{display:block}.mm-fase-title{font-size:18px;margin-bottom:4px}.mm-fase-sub{text-align:left;font-size:10.5px;max-width:none}.mm-pair{border-radius:22px;padding:10px}.mm-pair::before{border-radius:17px}.mm-pair-head{align-items:flex-start}.mm-pair-title{font-size:9.5px}.mm-next-chip{font-size:9.5px;padding:3px 7px}.mm-card{padding:9px}.mm-equipe{gap:6px;padding:7px}.mm-equipe img{width:24px;height:17px}.mm-equipe .mm-nome{font-size:12.8px}.mm-equipe .mm-score{font-size:17px}.mm-card-info{font-size:9.6px}.mm-card-info .mm-estadio{font-size:9px}.mm-status-chip{font-size:8.5px;padding:2px 5px}}
+  /* Linhas com destaque (BOB e divisão pagantes) */
+  .ranking-table tbody tr.bob-row td { background: rgba(244,114,182,0.10) !important; }
+  .ranking-table tbody tr.bob-row td.col-nome { color: #f472b6; }
+  .ranking-table tbody tr.bob-row td.cell-coracao { background: rgba(244,114,182,0.18) !important; }
+  .ranking-table tbody tr.bob-row td.cell-cai { background: rgba(244,114,182,0.14) !important; }
+  .ranking-table tbody tr.bob-row td.col-total { background: rgba(244,114,182,0.18) !important; color: #f472b6 !important; }
 
+  .divisor-row td {
+    background: linear-gradient(90deg, var(--danger-dim) 0%, transparent 100%) !important;
+    padding: 8px 14px !important;
+    text-align: left !important;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--danger);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-top: 2px solid var(--danger);
+    border-bottom: 2px solid var(--danger) !important;
+  }
 
-  .rs-toggle{width:100%;margin-top:18px;background:rgba(244,197,66,.10);border:1px solid var(--gold);
-    color:var(--gold);font-family:inherit;font-weight:700;font-size:13px;padding:11px;border-radius:9px;cursor:pointer}
-  .rs-toggle:active{transform:scale(.99)}
-  .rs-box{margin-top:10px;background:var(--navy-2);border:1px solid var(--linha);border-radius:10px;padding:10px}
-  .rs-leg{font-size:11.5px;color:var(--cinza);margin:0 0 10px;text-align:center}
-  .rs-leg b{color:var(--gold)}
-  .rs-scroll{overflow-x:auto;scrollbar-width:thin}
-  .rs-tab{width:100%;border-collapse:collapse;font-size:12.5px}
-  .rs-tab th{color:var(--gold);font-weight:700;padding:6px 8px;text-align:center;white-space:nowrap;border-bottom:1px solid var(--linha);font-size:11px}
-  .rs-tab th.rs-nome{text-align:left}
-  .rs-tab td{padding:6px 8px;text-align:center;border-bottom:1px solid rgba(255,255,255,.05);color:var(--branco)}
-  .rs-tab td.rs-nome{text-align:left;font-weight:600;white-space:nowrap}
-  .rs-tab td b{color:var(--branco);font-size:13.5px}
-  .rs-de{color:var(--cinza);font-size:10px}
-  .rs-tab tbody tr:first-child td{background:rgba(244,197,66,.08)}
+  .secao-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 16px 0 8px;
+    padding: 0 4px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .secao-header h2 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .secao-header .legenda-cores {
+    display: flex;
+    gap: 14px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+  }
+  .secao-header .leg-item { display: flex; align-items: center; gap: 5px; }
+  .secao-header .leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  .ranking-wrapper {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: auto;
+    background: var(--card);
+    max-width: 100%;
+  }
+
+  @media (max-width: 720px) {
+    .ranking-table { font-size: 11px; }
+    .ranking-table thead th { font-size: 9px; padding: 6px 4px; }
+    .ranking-table tbody td { padding: 5px 4px; }
+    .ranking-table tbody td.col-nome { font-size: 11px; padding-left: 6px; max-width: 90px; }
+    .cell-time { font-size: 10px; }
+    .cell-pts { font-size: 12px; }
+    .cell-palp { font-size: 8px; }
+  }
+
+  /* PRÓXIMOS JOGOS */
+  .dia-header {
+    margin-top: 18px;
+    margin-bottom: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    background: rgba(74,222,128,0.06);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+  }
+  .jogos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+  }
+  .jogo-card {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .jogo-horario {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  .jogo-times {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+  .jogo-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    min-width: 0;
+  }
+  .jogo-escudo {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .jogo-escudo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .escudo-fallback {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--card-hover);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .jogo-nome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    max-width: 100%;
+  }
+  .jogo-vs {
+    font-size: 13px;
+    color: var(--text-tertiary);
+    font-weight: 600;
+    padding: 0 4px;
+  }
+  .jogo-detalhes {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+  }
+  .jogo-detalhe {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+  @media (max-width: 720px) {
+    .jogos-grid { grid-template-columns: 1fr; }
+    .jogo-horario { font-size: 16px; }
+    .jogo-escudo, .escudo-fallback { width: 38px; height: 38px; }
+    .jogo-nome { font-size: 12px; }
+  }
+
+  /* SETAS DE MOVIMENTO ENTRE RODADAS */
+  .seta-mov {
+    display: inline-flex;
+    align-items: center;
+    gap: 1px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin: 0 4px;
+    line-height: 1;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .seta-up {
+    color: var(--accent);
+    background: rgba(74,222,128,0.10);
+  }
+  .seta-down {
+    color: var(--danger);
+    background: rgba(248,113,113,0.10);
+  }
+  /* Container que segura medalha + seta no ranking */
+  .pos-com-seta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  @media (max-width: 720px) {
+    .seta-mov { font-size: 9px; padding: 1px 3px; margin: 0 2px; }
+  }
+
+  /* RESULTADOS */
+  .resultados-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 16px 0 12px;
+    padding: 0 4px;
+  }
+  .resultados-titulo-area {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .resultados-filtro {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .select-filtro {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    min-width: 180px;
+  }
+  .select-filtro:focus {
+    outline: none;
+    border-color: var(--info);
+  }
+  .btn-limpar-filtro {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn-limpar-filtro:hover {
+    background: var(--card-hover);
+    color: var(--text);
+  }
+  .resultados-stats {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .resultados-stats .stat-v { color: var(--accent); }
+  .resultados-stats .stat-e { color: var(--text); }
+  .resultados-stats .stat-d { color: var(--danger); }
+  .resultados-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .resultado-card {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: grid;
+    grid-template-columns: 70px 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .resultado-card.resultado-vitoria { border-left: 3px solid var(--accent); background: rgba(74,222,128,0.05); }
+  .resultado-card.resultado-empate { border-left: 3px solid var(--text-tertiary); }
+  .resultado-card.resultado-derrota { border-left: 3px solid var(--danger); background: rgba(248,113,113,0.05); }
+
+  .resultado-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    font-size: 11px;
+  }
+  .resultado-rodada {
+    font-weight: 600;
+    color: var(--info);
+    background: rgba(96,165,250,0.10);
+    padding: 1px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+  .resultado-data {
+    color: var(--text-tertiary);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+  .resultado-jogo {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 12px;
+  }
+  .resultado-time {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .resultado-time.mandante { justify-content: flex-end; }
+  .resultado-time.visitante { justify-content: flex-start; }
+  .resultado-nome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .resultado-escudo {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .resultado-escudo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  .escudo-fallback-pequeno {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--card-hover);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .resultado-placar {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 60px;
+  }
+  .resultado-placar .placar-x {
+    color: var(--text-tertiary);
+    font-size: 14px;
+    margin: 0 2px;
+  }
+  .resultado-estadio {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-align: right;
+    white-space: nowrap;
+  }
+  @media (max-width: 720px) {
+    .resultado-card {
+      grid-template-columns: 50px 1fr;
+      gap: 8px;
+      padding: 8px 10px;
+    }
+    .resultado-estadio {
+      grid-column: 1 / -1;
+      text-align: left;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+      margin-top: 2px;
+    }
+    .resultado-jogo { gap: 8px; }
+    .resultado-nome { font-size: 11px; }
+    .resultado-placar { font-size: 16px; min-width: 50px; }
+    .resultado-escudo, .escudo-fallback-pequeno { width: 22px; height: 22px; }
+    .resultados-stats { gap: 12px; font-size: 12px; }
+    .resultados-header { flex-direction: column; align-items: stretch; }
+    .resultados-filtro { width: 100%; }
+    .select-filtro { flex: 1; }
+  }
+
+  /* BANNER DE ANIVERSÁRIO */
+  .banner-aniversario {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(244,114,182,0.18), rgba(251,191,36,0.15));
+    border: 1px solid rgba(244,114,182,0.5);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text);
+    flex-wrap: wrap;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .banner-aniversario strong { color: #f472b6; }
+  .banner-icone {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .banner-link {
+    margin-left: auto;
+    background: rgba(244,114,182,0.25);
+    color: #f472b6;
+    border: 1px solid rgba(244,114,182,0.5);
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .banner-link:hover {
+    background: rgba(244,114,182,0.35);
+  }
+  @media (max-width: 720px) {
+    .banner-aniversario { font-size: 12px; padding: 8px 10px; }
+    .banner-link { margin-left: 0; width: 100%; text-align: center; margin-top: 4px; }
+  }
+
+  /* ABA ANIVERSARIANTES */
+  .aniv-hoje {
+    background: linear-gradient(135deg, rgba(244,114,182,0.18), rgba(251,191,36,0.12));
+    border: 1px solid rgba(244,114,182,0.5);
+    border-radius: 12px;
+    padding: 14px;
+    margin: 16px 0;
+  }
+  .aniv-hoje-titulo {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f472b6;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .aniv-hoje-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(244,114,182,0.10);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .aniv-hoje-card:last-child { margin-bottom: 0; }
+  .aniv-hoje-nome {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .aniv-link-zap {
+    background: rgba(74,222,128,0.18);
+    color: var(--accent);
+    border: 1px solid rgba(74,222,128,0.4);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .aniv-link-zap:hover { background: rgba(74,222,128,0.28); }
+
+  .aniv-mes {
+    margin-top: 16px;
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .aniv-mes-atual {
+    border-left: 3px solid var(--accent);
+  }
+  .aniv-mes-sem-data {
+    border-left: 3px solid var(--text-tertiary);
+    opacity: 0.7;
+  }
+  .aniv-mes-header {
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: var(--text-secondary);
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--border);
+    text-transform: uppercase;
+  }
+  .aniv-mes-atual .aniv-mes-header {
+    color: var(--accent);
+    background: rgba(74,222,128,0.06);
+  }
+  .aniv-mes-lista {
+    display: flex;
+    flex-direction: column;
+  }
+  .aniv-item {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .aniv-item:last-child { border-bottom: none; }
+  .aniv-item:hover { background: rgba(255,255,255,0.02); }
+  .aniv-item-hoje {
+    background: rgba(244,114,182,0.08);
+  }
+  .aniv-item-hoje .aniv-nome { color: #f472b6; font-weight: 600; }
+  .aniv-item-sem-data .aniv-data { color: var(--text-tertiary); }
+  .aniv-item-sem-data .aniv-nome { color: var(--text-tertiary); }
+  .aniv-data {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .aniv-nome {
+    font-size: 14px;
+    color: var(--text);
+  }
+  .aniv-link-zap-pequeno {
+    text-decoration: none;
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .aniv-link-zap-pequeno:hover {
+    background: rgba(74,222,128,0.15);
+  }
+  @media (max-width: 720px) {
+    .aniv-item { grid-template-columns: 50px 1fr auto; gap: 6px; padding: 8px 10px; }
+    .aniv-data { font-size: 12px; }
+    .aniv-nome { font-size: 13px; }
+    .aniv-hoje-nome { font-size: 14px; }
+  }
+
+  /* TOAST — aviso flutuante de sincronização */
+  .toast-sync {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .toast-ok {
+    background: #064e3b;
+    color: #6ee7b7;
+    border: 1px solid #10b981;
+  }
+  .toast-erro {
+    background: #4c1d1d;
+    color: #fca5a5;
+    border: 1px solid #ef4444;
+  }
+  .toast-sumindo {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
 </style>
 </head>
+  <script>
+  /* MODO COPA: durante o período, o site abre DIRETO no Bolão da Copa.
+     As outras abas ficam quietas. Para ver o Brasileirão (pausado),
+     acesse com ?brasileirao=1 (há um link de volta dentro da Copa). */
+  (function () {
+    var ini = new Date('2026-06-04T00:00:00-03:00'); // início do modo Copa
+    var fim = new Date('2026-07-20T23:59:59-03:00'); // fim do modo Copa
+    var agora = new Date();
+    var emCopa = agora >= ini && agora <= fim;
+    if (location.search.indexOf('brasileirao') > -1) sessionStorage.setItem('verBrasileirao', '1');
+    if (emCopa && sessionStorage.getItem('verBrasileirao') !== '1') {
+      location.replace('copa2026/');
+    }
+  })();
+</script>
 <body>
-<div class="wrap">
-  <div class="hdr"><img class="hdr-img" src="img/header-copa26.jpg" width="920" height="236" alt="COPA 26 — Bolão Brasileirão Almoço"></div>
-  <nav class="menu">
-        <a href="index.html" class="ativo">Jogos</a>
-        <a href="aovivo.html">Ao vivo</a>
-        <a href="estatisticas.html">Estatísticas</a>
-    <a href="pontos.html">Bolão</a>
-    <a href="palpites.html">Palpites</a>
-    <a href="palpite.html">Meus Palpites</a>
-  </nav>
+<div class="container">
+  <header>
+    <div>
+      <h1>Bolão Brasileirão 2026</h1>
+      <p class="subtitle">Almoço de Sexta</p>
+    </div>
+    <div class="nav">
+      <button onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
+      <button onclick="setView('rank')" id="btn-rank" class="active">Ranking</button>
+      <button onclick="setView('tabela')" id="btn-tabela">Brasileirão</button>
+      <button onclick="setView('jogos')" id="btn-jogos">Próximos Jogos</button>
+      <button onclick="setView('resultados')" id="btn-resultados">Resultados</button>
+      <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversariantes</button>
+      <button onclick="adminAction()" id="btn-admin">Admin</button>
+    </div>
+  </header>
 
-  <div id="lista"></div>
+  <div class="status-bar" id="status-bar">
+    <span id="status-text">Carregando...</span>
+  </div>
+
+  <div id="view-rank"></div>
+  <div id="view-tabela" style="display: none;"></div>
+  <div id="view-jogos" style="display: none;"></div>
+  <div id="view-resultados" style="display: none;"></div>
+  <div id="view-aniversariantes" style="display: none;"></div>
+  <div id="view-participantes" style="display: none;"></div>
 </div>
 
-<script src="js/config.js?v=20260621f"></script>
-<script src="js/engine.js?v=20260622b"></script>
-<script src="js/resultados.js?v=20260625pairs1"></script>
-<footer class="rodape">
-  <a href="regras.html">Regras</a><span class="sep">·</span>
-  <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
-  <a href="/?brasileirao=1">← Brasileirão</a>
-</footer>
-  <script src="js/aniversarios.js?v=20260621f"></script>
-  <footer class="rodape-site">
-    <nav class="rs-nav" aria-label="Links do site">
-      <a href="index.html">Jogos</a> · <a href="onde-assistir.html">Onde assistir</a> · <a href="pontos.html">Bolão</a> · <a href="aovivo.html">Ao vivo</a>
-        <a href="estatisticas.html">Estatísticas</a> · <a href="palpites.html">Palpites</a> · <a href="regras.html">Regras</a>
-    </nav>
-    <p class="rs-legal">Bolão Brasileirão Almoço · Brasília-DF · © 2026 — Todos os direitos reservados.</p>
-    <p class="rs-disc">Site independente, feito por e para amigos. Não é afiliado nem patrocinado pela FIFA, CBF, CazéTV ou qualquer emissora. Nomes de competições e canais pertencem aos seus titulares. Dados de jogos obtidos de fontes públicas.</p>
-  </footer>
+<div id="modal-container"></div>
+
+<script>
+// ========================================================================
+// CONFIGURAÇÃO — você pode mudar a senha de admin aqui
+// ========================================================================
+const ADMIN_SENHA = "almocosexta2026";
+
+// O index.html não gera a tabela; ele apenas lê o tabela.json publicado pelo GitHub Actions.
+// A verificação automática abaixo faz o navegador buscar o tabela.json nos minutos 07 e 37
+// de cada hora, além de buscar imediatamente quando a página abre.
+const URL_TABELA_LOCAL = "tabela.json";
+const MINUTOS_ATUALIZACAO = [7, 37];
+const SEGUNDO_ATUALIZACAO = 10; // dentro do minuto 07/37, dá alguns segundos para o workflow concluir
+
+let timerAtualizacao = null;
+let refreshEmAndamento = false;
+
+// ========================================================================
+// PARTICIPANTES INICIAIS — vindos da planilha
+// ========================================================================
+const PARTICIPANTES_INICIAIS = [
+  {nome:"LAÉRCIO", coracao:{time:"Bahia",palpite:5}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Cruzeiro",palpite:3},{time:"Fluminense",palpite:4},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
+  {nome:"VILELLA", coracao:{time:"Botafogo",palpite:6}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Cruzeiro",palpite:4},{time:"Fluminense",palpite:3},{time:"Athletico-PR",palpite:13}], cai:"Chapecoense"},
+  {nome:"BARRICHELLO (ARMÍNIO)", coracao:{time:"Corinthians",palpite:6}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Cruzeiro",palpite:7},{time:"Bahia",palpite:5},{time:"Athletico-PR",palpite:11}], cai:"Remo"},
+  {nome:"RODRIGO", coracao:{time:"Atlético-MG",palpite:3}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Cruzeiro",palpite:5},{time:"Fluminense",palpite:4},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
+  {nome:"MAX", coracao:{time:"São Paulo",palpite:6}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Atlético-MG",palpite:6},{time:"Internacional",palpite:8},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
+  {nome:"DÁRIO", coracao:{time:"Botafogo",palpite:4}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Bragantino",palpite:6},{time:"Internacional",palpite:8},{time:"Athletico-PR",palpite:14}], cai:"Chapecoense"},
+  {nome:"MARCOS EDUARDO", coracao:{time:"Fluminense",palpite:4}, times:[{time:"Palmeiras",palpite:1},{time:"Cruzeiro",palpite:2},{time:"Flamengo",palpite:3},{time:"Botafogo",palpite:5},{time:"Athletico-PR",palpite:11}], cai:"Chapecoense"},
+  {nome:"JARDIM", coracao:{time:"Atlético-MG",palpite:1}, times:[{time:"Palmeiras",palpite:4},{time:"Flamengo",palpite:2},{time:"Fluminense",palpite:5},{time:"Cruzeiro",palpite:3},{time:"Athletico-PR",palpite:15}], cai:"Remo"},
+  {nome:"BOB BONECA", coracao:{time:"Cruzeiro",palpite:2}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:3},{time:"Mirassol",palpite:4},{time:"Fluminense",palpite:5},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
+  {nome:"MARCO LOPES", coracao:{time:"Grêmio",palpite:6}, times:[{time:"Flamengo",palpite:1},{time:"Palmeiras",palpite:2},{time:"Cruzeiro",palpite:3},{time:"Fluminense",palpite:4},{time:"Athletico-PR",palpite:12}], cai:"Chapecoense"},
+  {nome:"RUBÃO", coracao:{time:"Coritiba",palpite:10}, times:[{time:"Flamengo",palpite:1},{time:"Palmeiras",palpite:2},{time:"Atlético-MG",palpite:5},{time:"Botafogo",palpite:7},{time:"Athletico-PR",palpite:12}], cai:"Chapecoense"},
+  {nome:"WELLINGTON PAPA", coracao:{time:"Flamengo",palpite:1}, times:[{time:"Cruzeiro",palpite:2},{time:"Palmeiras",palpite:3},{time:"São Paulo",palpite:4},{time:"Botafogo",palpite:5},{time:"Chapecoense",palpite:16}], cai:"Remo"},
+  {nome:"ZAQUEU", coracao:{time:"Flamengo",palpite:1}, times:[{time:"Palmeiras",palpite:2},{time:"Cruzeiro",palpite:3},{time:"Grêmio",palpite:4},{time:"São Paulo",palpite:5},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
+  {nome:"MELILLO", coracao:{time:"Botafogo",palpite:1}, times:[{time:"Palmeiras",palpite:2},{time:"Flamengo",palpite:3},{time:"Corinthians",palpite:4},{time:"Fluminense",palpite:5},{time:"Athletico-PR",palpite:12}], cai:"Cruzeiro"},
+  {nome:"AUGUSTO", coracao:{time:"Botafogo",palpite:1}, times:[{time:"Palmeiras",palpite:2},{time:"Flamengo",palpite:3},{time:"Cruzeiro",palpite:4},{time:"Corinthians",palpite:5},{time:"Coritiba",palpite:13}], cai:"Remo"},
+  {nome:"WELLINGTON B.", coracao:{time:"Vasco da Gama",palpite:14}, times:[{time:"Cruzeiro",palpite:1},{time:"Flamengo",palpite:2},{time:"Palmeiras",palpite:3},{time:"Mirassol",palpite:4},{time:"Remo",palpite:15}], cai:"Vitória"}
+];
+
+const TIMES_LISTA = ["Athletico-PR","Atlético-MG","Bahia","Botafogo","Bragantino","Chapecoense","Corinthians","Coritiba","Cruzeiro","Flamengo","Fluminense","Grêmio","Internacional","Mirassol","Palmeiras","Remo","Santos","São Paulo","Vasco da Gama","Vitória"];
+
+// ========================================================================
+// MEMBROS DO GRUPO — 27 pessoas, com data de aniversário (dia/mês)
+// Lista pré-cadastrada. As datas serão preenchidas no Admin pelo usuário.
+// ========================================================================
+const MEMBROS_INICIAIS = [
+  {nome: "Antônio",                  aniversario: null},
+  {nome: "Alexandre Melillo Lopes",  aniversario: null},
+  {nome: "Jardim",                   aniversario: null},
+  {nome: "Jovail Vilela",            aniversario: null},
+  {nome: "Leonardo Farias",          aniversario: null},
+  {nome: "Luiz Henrique de Barros",  aniversario: null},
+  {nome: "Max",                      aniversario: null},
+  {nome: "Roberto Amorim",           aniversario: null},
+  {nome: "Uélito Borboleta",         aniversario: null},
+  {nome: "Wlamir Silva",             aniversario: null},
+  {nome: "Armínio TUPAL",            aniversario: null},
+  {nome: "Augusto TUPAL",            aniversario: null},
+  {nome: "Dario Araujo",             aniversario: null},
+  {nome: "Érica",                    aniversario: null},
+  {nome: "Marco Lopes",              aniversario: null},
+  {nome: "Marco Torres",             aniversario: null},
+  {nome: "Marcos Eduardo de Carvalho", aniversario: null},
+  {nome: "Roberto Monteiro",         aniversario: null},
+  {nome: "Rodrigo TUPAL",            aniversario: null},
+  {nome: "Rubens Mazer",             aniversario: null},
+  {nome: "Wellington Papa",          aniversario: null},
+  {nome: "Zaqueu SUMPE",             aniversario: null},
+  {nome: "Carlinhos",                aniversario: null},
+  {nome: "José Renato - ZeGrande",   aniversario: null},
+  {nome: "Marcio Vantil",            aniversario: null},
+  {nome: "Marcus Gaze",              aniversario: null},
+  {nome: "Sérgio Nogueira",          aniversario: null}
+];
+
+// ========================================================================
+
+// ========================================================================
+// ESTADO
+// ========================================================================
+let state = {
+  tabela: [],          // [{ pos, time, pontos, jogos, vitorias, empates, derrotas, gp, gc, sg, aproveitamento }]
+  participantes: [],
+  membros: [],         // 27 membros do grupo Almoço de Sexta
+  ultimaAtualizacao: null,
+  ehAdmin: false,
+  view: 'rank',
+  expandido: null,
+  editIdx: null,
+  editMembroIdx: null,
+  // Próximos jogos (preenchido sob demanda)
+  jogos: [],
+  jogosMeta: null,       // { atualizado_em_br, fonte, rodada_atual, ... }
+  jogosCarregados: false,
+  jogosErro: null,
+  // Resultados (preenchido sob demanda)
+  resultados: [],
+  resultadosMeta: null,
+  resultadosTimes: [],     // lista de times disponíveis pro filtro
+  resultadosCarregados: false,
+  resultadosErro: null,
+  resultadosFiltroTime: ''  // time atualmente filtrado (vazio = todos)
+};
+
+// ========================================================================
+// PERSISTÊNCIA — localStorage
+// ========================================================================
+function salvarParticipantes() {
+  localStorage.setItem('bolao_participantes', JSON.stringify(state.participantes));
+}
+function carregarParticipantes() {
+  const s = localStorage.getItem('bolao_participantes');
+  if (s) {
+    try { state.participantes = JSON.parse(s); return true; } catch(e) {}
+  }
+  return false;
+}
+function salvarMembros() {
+  localStorage.setItem('bolao_membros', JSON.stringify(state.membros));
+}
+function carregarMembros() {
+  const s = localStorage.getItem('bolao_membros');
+  if (s) {
+    try { state.membros = JSON.parse(s); return true; } catch(e) {}
+  }
+  return false;
+}
+function salvarCache(tabela) {
+  localStorage.setItem('bolao_cache_tabela', JSON.stringify({
+    tabela: tabela,
+    timestamp: Date.now()
+  }));
+}
+function carregarCache() {
+  const s = localStorage.getItem('bolao_cache_tabela');
+  if (!s) return null;
+  try {
+    const obj = JSON.parse(s);
+    const idadeMin = (Date.now() - obj.timestamp) / 60000;
+    return { tabela: obj.tabela, idadeMin: idadeMin };
+  } catch(e) { return null; }
+}
+
+// ========================================================================
+// FETCH DA TABELA — lê o tabela.json gerado pelo GitHub Actions
+// ========================================================================
+async function buscarTabelaTerra() {
+  // Anti-cache forte: evita o navegador/CDN reutilizar tabela.json antigo.
+  const url = `${URL_TABELA_LOCAL}?nocache=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const resp = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
+    }
+  });
+
+  if (!resp.ok) {
+    throw new Error("Não consegui ler o tabela.json (HTTP " + resp.status + "). Verifique se o arquivo existe no repositório.");
+  }
+  const data = await resp.json();
+  if (!data || !Array.isArray(data.tabela)) {
+    throw new Error("Formato inválido de tabela.json");
+  }
+  if (data.tabela.length !== 20) {
+    throw new Error("Tabela com " + data.tabela.length + " times, esperado 20");
+  }
+
+  // Guarda quando o SERVIDOR atualizou a tabela. Esta é a hora verdadeira do GitHub Actions.
+  state._atualizadoEmServidor = data.atualizado_em || null;
+  state._fonteServidor = data.fonte || "—";
+  return data.tabela;
+}
+
+function proximaAtualizacaoProgramada(base = new Date()) {
+  const agora = new Date(base);
+  const candidatos = [];
+
+  // Gera candidatos para a hora atual e a próxima hora.
+  for (let acrescimoHora = 0; acrescimoHora <= 1; acrescimoHora++) {
+    for (const minuto of MINUTOS_ATUALIZACAO) {
+      const d = new Date(agora);
+      d.setHours(agora.getHours() + acrescimoHora, minuto, SEGUNDO_ATUALIZACAO, 0);
+      if (d > agora) candidatos.push(d);
+    }
+  }
+
+  candidatos.sort((a, b) => a - b);
+  return candidatos[0];
+}
+
+function formatarSomenteHora(d) {
+  if (!d) return '—';
+  return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+}
+
+function formatarHora(d) {
+  if (!d) return '—';
+  return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+}
+
+function setStatus(tipo, msg) {
+  const el = document.getElementById('status-text');
+  if (!el) return;
+  el.className = 'status-' + tipo;
+  if (tipo === 'loading') {
+    el.innerHTML = '<span class="spinner"></span>' + msg;
+  } else if (tipo === 'ok') {
+    el.innerHTML = '✓ ' + msg;
+  } else {
+    el.innerHTML = '⚠ ' + msg;
+  }
+}
+
+function mensagemStatusAtualizacao() {
+  if (state._atualizadoEmServidor) {
+    const dt = new Date(state._atualizadoEmServidor);
+    return `Tabela atualizada em ${formatarHora(dt)} (fonte: ${state._fonteServidor || '—'})`;
+  }
+  return `Atualizado agora · ${formatarHora(state.ultimaAtualizacao)}`;
+}
+
+function agendarProximaAtualizacao() {
+  if (timerAtualizacao) clearTimeout(timerAtualizacao);
+
+  const proxima = proximaAtualizacaoProgramada();
+  if (!proxima) return;
+
+  const atraso = Math.max(1000, proxima.getTime() - Date.now());
+  timerAtualizacao = setTimeout(async () => {
+    await refresh(true);
+    agendarProximaAtualizacao();
+  }, atraso);
+}
+
+// ========================================================================
+// CARREGAMENTO PRINCIPAL
+// ========================================================================
+async function inicializar() {
+  // 1. Participantes: do localStorage ou padrão
+  if (!carregarParticipantes()) {
+    state.participantes = JSON.parse(JSON.stringify(PARTICIPANTES_INICIAIS));
+    salvarParticipantes();
+  }
+  // 1b. Membros do grupo: tenta carregar membros.json do servidor primeiro,
+  // depois localStorage, depois lista padrão.
+  if (!carregarMembros()) {
+    state.membros = JSON.parse(JSON.stringify(MEMBROS_INICIAIS));
+    salvarMembros();
+  }
+  // Carregamento assíncrono dos JSONs do servidor (atualiza se for mais novo)
+  carregarMembrosDoServidor();
+
+  // 2. Fonte de verdade: sempre buscar o tabela.json do servidor ao abrir a página.
+  // O cache local só é usado como plano B se a busca falhar.
+  const cache = carregarCache();
+  if (cache) {
+    state._cacheBackup = cache;
+  }
+
+  await refresh();
+  agendarProximaAtualizacao();
+}
+
+async function refresh(silencioso = false) {
+  if (refreshEmAndamento) return;
+  refreshEmAndamento = true;
+
+  if (!silencioso) setStatus('loading', 'Carregando tabela...');
+  try {
+    const tabela = await buscarTabelaTerra();
+    state.tabela = tabela;
+    state.ultimaAtualizacao = new Date();
+    salvarCache(tabela);
+    setStatus('ok', mensagemStatusAtualizacao());
+    render();
+  } catch(e) {
+    console.error(e);
+
+    // Só aqui usamos o cache local, para não mostrar dado antigo como se fosse atual.
+    const cache = state._cacheBackup || carregarCache();
+    if (state.tabela.length === 0 && cache && Array.isArray(cache.tabela)) {
+      state.tabela = cache.tabela;
+      state.ultimaAtualizacao = new Date(Date.now() - cache.idadeMin * 60000);
+      render();
+    }
+
+    if (state.tabela.length > 0) {
+      setStatus('error', `Falha ao recarregar o tabela.json; usando cache local de ${formatarHora(state.ultimaAtualizacao)}. Erro: ${e.message}`);
+    } else {
+      setStatus('error', `Falha ao carregar tabela.json. ${e.message}`);
+    }
+  } finally {
+    refreshEmAndamento = false;
+  }
+}
+
+// ========================================================================
+// CÁLCULOS
+// ========================================================================
+function dadosTime(nome) {
+  return state.tabela.find(t => t.time === nome) || { pos: 0, pontos: 0 };
+}
+
+// ========================================================================
+// SNAPSHOTS DE POSIÇÃO — para mostrar setas de movimento entre rodadas
+// ========================================================================
+// Lógica nova (regra de dia da semana):
+//   - As rodadas do Brasileirão acontecem em quarta, sábado e domingo.
+//   - TERÇA-FEIRA: as setas somem. A rodada acabou; não há o que comparar.
+//     Na terça, tiramos um "snapshot base" da classificação — ele será o
+//     ponto de partida da próxima rodada.
+//   - QUARTA a SEGUNDA: as setas aparecem comparando a posição atual com
+//     o snapshot base (tirado na última terça).
+// Isso evita setas "fantasma" de uma rodada antiga aparecendo na semana nova.
+
+function carregarSnapshot(chave) {
+  try {
+    const s = localStorage.getItem(chave);
+    if (s) return JSON.parse(s);
+  } catch (e) {}
+  return null;
+}
+
+function salvarSnapshot(chave, dados) {
+  try {
+    localStorage.setItem(chave, JSON.stringify(dados));
+  } catch (e) {}
+}
+
+// Retorna o dia da semana em Brasília (0=domingo, 1=segunda, 2=terça, ...).
+function diaDaSemanaBR() {
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo', weekday: 'short'
+  });
+  const dia = fmt.format(new Date());
+  const mapa = { Sun:0, Mon:1, Tue:2, Wed:3, Thu:4, Fri:5, Sat:6 };
+  return mapa[dia] !== undefined ? mapa[dia] : new Date().getDay();
+}
+
+// Retorna a data de hoje em Brasília no formato "AAAA-MM-DD".
+function dataHojeBR() {
+  const fmt = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo', year:'numeric', month:'2-digit', day:'2-digit'
+  });
+  return fmt.format(new Date());
+}
+
+// Indica se hoje é terça-feira (dia em que as setas somem).
+function hojeEhTerca() {
+  return diaDaSemanaBR() === 2;
+}
+
+// Snapshot da tabela do Brasileirão.
+// Estrutura: { dataBase: "AAAA-MM-DD", posicoesBase: { "Palmeiras": 1, ... } }
+// posicoesBase = a classificação congelada na última terça-feira.
+function gerenciarSnapshotTabela() {
+  if (!state.tabela || state.tabela.length === 0) return null;
+
+  const posAtuais = {};
+  state.tabela.forEach(t => { posAtuais[t.time] = t.pos; });
+
+  const hoje = dataHojeBR();
+  let snap = carregarSnapshot('snapshot_tabela_v2');
+
+  // Primeira vez: cria o snapshot base com a classificação atual.
+  if (!snap) {
+    snap = { dataBase: hoje, posicoesBase: { ...posAtuais } };
+    salvarSnapshot('snapshot_tabela_v2', snap);
+    return snap;
+  }
+
+  // Se hoje é terça-feira E ainda não tiramos o snapshot base hoje,
+  // congela a classificação atual como novo ponto de partida da rodada.
+  if (hojeEhTerca() && snap.dataBase !== hoje) {
+    snap = { dataBase: hoje, posicoesBase: { ...posAtuais } };
+    salvarSnapshot('snapshot_tabela_v2', snap);
+  }
+
+  return snap;
+}
+
+// Snapshot do ranking dos participantes — mesma lógica de dia da semana.
+function gerenciarSnapshotRanking(rankingAtual) {
+  if (!rankingAtual || rankingAtual.length === 0) return null;
+
+  const posAtuais = {};
+  rankingAtual.forEach((r, i) => { posAtuais[r.nome] = i + 1; });
+
+  const hoje = dataHojeBR();
+  let snap = carregarSnapshot('snapshot_ranking_v2');
+
+  if (!snap) {
+    snap = { dataBase: hoje, posicoesBase: { ...posAtuais } };
+    salvarSnapshot('snapshot_ranking_v2', snap);
+    return snap;
+  }
+
+  if (hojeEhTerca() && snap.dataBase !== hoje) {
+    snap = { dataBase: hoje, posicoesBase: { ...posAtuais } };
+    salvarSnapshot('snapshot_ranking_v2', snap);
+  }
+
+  return snap;
+}
+
+// Renderiza a seta de movimento entre a posição base e a atual.
+// Retorna HTML pronto. Se hoje é terça, ou se não há diferença, retorna vazio.
+function htmlSetaMovimento(posBase, posAtual) {
+  // Terça-feira: sem setas (rodada acabou, nada a comparar)
+  if (hojeEhTerca()) return '';
+  if (!posBase || !posAtual || posBase === posAtual) return '';
+  // Subiu: posBase > posAtual (ex: era 5º, agora é 3º → subiu 2)
+  const diff = posBase - posAtual;
+  if (diff > 0) {
+    return `<span class="seta-mov seta-up" title="Subiu ${diff} ${diff === 1 ? 'posição' : 'posições'}">▲ ${diff}</span>`;
+  } else {
+    return `<span class="seta-mov seta-down" title="Caiu ${-diff} ${-diff === 1 ? 'posição' : 'posições'}">▼ ${-diff}</span>`;
+  }
+}
+
+function calcular(participante) {
+  const detalhes = [];
+  let total = 0;
+
+  // Time coração
+  const tc = dadosTime(participante.coracao.time);
+  const bonusCoracao = (tc.pos === participante.coracao.palpite) ? 12 : 0;
+  total += tc.pontos + bonusCoracao;
+  detalhes.push({
+    tipo: 'coracao', label: '❤️ Coração',
+    time: participante.coracao.time, palpite: participante.coracao.palpite,
+    posAtual: tc.pos, pontos: tc.pontos, bonus: bonusCoracao
+  });
+
+  // 5 outros times
+  for (const t of participante.times) {
+    const td = dadosTime(t.time);
+    const bonus = (td.pos === t.palpite) ? 9 : 0;
+    total += td.pontos + bonus;
+    detalhes.push({
+      tipo: 'normal', label: 'Time',
+      time: t.time, palpite: t.palpite,
+      posAtual: td.pos, pontos: td.pontos, bonus: bonus
+    });
+  }
+
+  // Time que cai
+  const cai = dadosTime(participante.cai);
+  const bonusCai = (cai.pos >= 17 && cai.pos <= 20) ? 6 : 0;
+  total += bonusCai;
+  detalhes.push({
+    tipo: 'rebaixamento', label: '⬇️ Cai',
+    time: participante.cai, palpite: '17º+',
+    posAtual: cai.pos, pontos: 0, bonus: bonusCai
+  });
+
+  return { total, detalhes };
+}
+
+// ========================================================================
+// RENDERIZAÇÃO
+// ========================================================================
+function render() {
+  const v = state.view;
+  document.getElementById('view-rank').style.display = v === 'rank' ? 'block' : 'none';
+  document.getElementById('view-tabela').style.display = v === 'tabela' ? 'block' : 'none';
+  document.getElementById('view-jogos').style.display = v === 'jogos' ? 'block' : 'none';
+  document.getElementById('view-resultados').style.display = v === 'resultados' ? 'block' : 'none';
+  document.getElementById('view-aniversariantes').style.display = v === 'aniversariantes' ? 'block' : 'none';
+  document.getElementById('view-participantes').style.display = v === 'participantes' ? 'block' : 'none';
+  ['rank','tabela','jogos','resultados','aniversariantes','admin'].forEach(k => {
+    const b = document.getElementById('btn-' + k);
+    if (b) b.classList.toggle('active', v === k);
+  });
+  if (v === 'rank') renderRank();
+  else if (v === 'tabela') renderTabela();
+  else if (v === 'jogos') renderJogos();
+  else if (v === 'resultados') renderResultados();
+  else if (v === 'aniversariantes') renderAniversariantes();
+  else if (v === 'participantes') renderParticipantes();
+  // Botão de admin
+  const btnAdmin = document.getElementById('btn-admin');
+  btnAdmin.textContent = state.ehAdmin ? 'Sair do admin' : 'Admin';
+}
+
+function setView(v) {
+  state.view = v;
+  if (v === 'jogos' && !state.jogosCarregados) {
+    carregarJogos();
+  }
+  if (v === 'resultados' && !state.resultadosCarregados) {
+    carregarResultados();
+  }
+  render();
+}
+
+function renderRank() {
+  if (state.tabela.length === 0) {
+    document.getElementById('view-rank').innerHTML = '<div class="card empty">Carregando tabela do Brasileirão...</div>';
+    return;
+  }
+  const ranking = state.participantes
+    .map((p,i) => ({ ...p, idx:i, ...calcular(p) }))
+    .sort((a,b) => b.total - a.total);
+
+  // Limite entre não-pagantes (top 8) e pagantes (bottom 8)
+  // Se tiver menos de 16, ajusta proporcionalmente
+  const total = ranking.length;
+  const corteNaoPagantes = Math.floor(total / 2);
+
+  // Cabeçalho: posição | nome | total | coração | time1..5 | cai
+  let html = '<div class="secao-header">';
+  html += '<h2>Classificação geral</h2>';
+  html += '<div class="legenda-cores">';
+  html += '<div class="leg-item"><div class="leg-dot" style="background:rgba(244,114,182,0.5);"></div>Time coração (+12)</div>';
+  html += '<div class="leg-item"><div class="leg-dot" style="background:rgba(251,191,36,0.5);"></div>Time que cai (+6)</div>';
+  html += '<div class="leg-item"><div class="leg-dot" style="background:rgba(74,222,128,0.5);"></div>Acertou posição</div>';
+  html += '</div></div>';
+
+  html += '<div class="ranking-wrapper"><table class="ranking-table">';
+
+  // Header com 2 linhas
+  html += '<thead>';
+  html += '<tr>';
+  html += '<th class="col-pos" rowspan="2">#</th>';
+  html += '<th class="col-nome" rowspan="2">Participante</th>';
+  html += '<th class="col-total" rowspan="2">Total</th>';
+  html += '<th colspan="1" class="group-header coracao">❤️ Coração</th>';
+  html += '<th colspan="5" class="group-header">Times escolhidos (+9 se acertar posição)</th>';
+  html += '<th colspan="1" class="group-header cai">⬇️ Cai</th>';
+  html += '</tr>';
+  html += '<tr>';
+  html += '<th>Time</th>';
+  for (let k = 1; k <= 5; k++) html += `<th>Time ${k}</th>`;
+  html += '<th>Time</th>';
+  html += '</tr>';
+  html += '</thead><tbody>';
+
+  // Calcula o snapshot de movimento do ranking
+  const snapRank = gerenciarSnapshotRanking(ranking);
+  const posBaseRank = (snapRank && snapRank.posicoesBase) || {};
+
+  // Linhas
+  ranking.forEach((r, i) => {
+    const posClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+    const isBob = r.nome.toUpperCase().includes('BOB');
+
+    // Linha divisora entre não-pagantes e pagantes
+    if (i === corteNaoPagantes) {
+      html += `<tr class="divisor-row"><td colspan="9">⚠️ Daqui pra baixo: pagantes do almoço de fim de ano</td></tr>`;
+    }
+
+    const rowClass = isBob ? 'bob-row' : '';
+    const setaRank = htmlSetaMovimento(posBaseRank[r.nome], i + 1);
+    html += `<tr class="${rowClass}">`;
+    html += `<td><span class="pos-com-seta"><span class="pos-num ${posClass}">${i+1}</span>${setaRank}</span></td>`;
+    html += `<td class="col-nome">${r.nome}</td>`;
+    html += `<td class="col-total">${r.total}</td>`;
+
+    // Detalhes na ordem: coração, 5 times, cai
+    r.detalhes.forEach((d, idxD) => {
+      let cellClass = '';
+      let cellHtml = '';
+      const acertou = d.bonus > 0;
+
+      if (d.tipo === 'coracao') {
+        cellClass = 'cell-coracao';
+        cellHtml = `<div class="cell-time">${d.time}</div>
+          <div class="cell-pts ${acertou ? 'acerto' : ''}">${d.pontos}${acertou ? ' +12' : ''}</div>
+          <div class="cell-palp ${acertou ? 'acerto' : ''}">palp ${d.palpite}º · atual ${d.posAtual || '—'}º</div>`;
+      } else if (d.tipo === 'rebaixamento') {
+        cellClass = 'cell-cai';
+        cellHtml = `<div class="cell-time">${d.time}</div>
+          <div class="cell-pts ${acertou ? 'acerto' : ''}">${acertou ? '+6' : '0'}</div>
+          <div class="cell-palp ${acertou ? 'acerto' : ''}">atual ${d.posAtual || '—'}º</div>`;
+      } else {
+        cellHtml = `<div class="cell-time">${d.time}</div>
+          <div class="cell-pts ${acertou ? 'acerto' : ''}">${d.pontos}${acertou ? ' +9' : ''}</div>
+          <div class="cell-palp ${acertou ? 'acerto' : ''}">palp ${d.palpite}º · atual ${d.posAtual || '—'}º</div>`;
+      }
+
+      html += `<td class="${cellClass}">${cellHtml}</td>`;
+    });
+
+    html += `</tr>`;
+  });
+
+  html += '</tbody></table></div>';
+
+  // Como funciona o jogo + regras
+  html += `<div style="background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-top: 16px; font-size: 12px; color: var(--text-secondary);">
+    <strong style="color: var(--text); display: block; margin-bottom: 8px;">Como pontua</strong>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 6px; line-height: 1.6;">
+      <div>Cada célula mostra: <strong>nome do time</strong>, <strong>pontos do time</strong> + bônus (se acertou) e <strong>palpite vs posição atual</strong></div>
+      <div>❤️ <strong>Coração:</strong> +12 se acertar a posição exata</div>
+      <div>⚪ <strong>Demais 5 times:</strong> +9 se acertar a posição exata</div>
+      <div>⬇️ <strong>Time que cai:</strong> +6 se estiver entre 17º e 20º</div>
+    </div>
+    <div style="margin-top:10px; padding-top:8px; border-top: 1px solid var(--border); color: var(--danger);">
+      🍽️ <strong>Os ${total - corteNaoPagantes} últimos colocados pagam a conta do almoço de fim de ano.</strong>
+    </div>
+  </div>`;
+
+  document.getElementById('view-rank').innerHTML = html;
+}
+
+function toggleExpand(idx) {
+  // mantida por compatibilidade
+  state.expandido = state.expandido === idx ? null : idx;
+  renderRank();
+}
+
+function renderTabela() {
+  if (state.tabela.length === 0) {
+    document.getElementById('view-tabela').innerHTML = '<div class="card empty">Carregando...</div>';
+    return;
+  }
+
+  // Atualiza/lê o snapshot de posições base (congelado na última terça)
+  const snap = gerenciarSnapshotTabela();
+  const posBase = (snap && snap.posicoesBase) || {};
+
+  let html = '<div class="card"><table><thead><tr><th style="width:60px;">Pos</th><th>Time</th><th style="text-align:center;">P</th><th style="text-align:center;">J</th><th style="text-align:center;">V</th><th style="text-align:center;">E</th><th style="text-align:center;">D</th><th style="text-align:center;">SG</th><th style="text-align:center;">%</th></tr></thead><tbody>';
+  state.tabela.forEach(t => {
+    let cls = '';
+    if (t.pos >= 17) cls = 'zona-rebaixamento';
+    else if (t.pos <= 4) cls = 'zona-libertadores';
+    const seta = htmlSetaMovimento(posBase[t.time], t.pos);
+    html += `<tr class="${cls}"><td><strong>${t.pos}</strong>${seta}</td><td>${t.time}</td><td style="text-align:center; font-weight:600;">${t.pontos}</td><td style="text-align:center;">${t.jogos}</td><td style="text-align:center;">${t.vitorias}</td><td style="text-align:center;">${t.empates}</td><td style="text-align:center;">${t.derrotas}</td><td style="text-align:center;">${t.sg > 0 ? '+' : ''}${t.sg}</td><td style="text-align:center;">${t.aproveitamento}%</td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:rgba(74,222,128,0.4);"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:rgba(248,113,113,0.4);"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu de posição</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu de posição</div></div>';
+  document.getElementById('view-tabela').innerHTML = html;
+}
+
+// ========================================================================
+// PRÓXIMOS JOGOS
+// ========================================================================
+async function carregarJogos() {
+  try {
+    const url = 'jogos.json?t=' + Date.now();
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    state.jogos = Array.isArray(data.jogos) ? data.jogos : [];
+    state.jogosMeta = {
+      atualizado_em: data.atualizado_em,
+      atualizado_em_br: data.atualizado_em_br,
+      fonte: data.fonte,
+      rodada_atual: data.rodada_atual,
+      rodadas_consultadas: data.rodadas_consultadas
+    };
+    state.jogosCarregados = true;
+    state.jogosErro = null;
+  } catch (e) {
+    console.error('Erro ao carregar jogos.json:', e);
+    state.jogosErro = e.message;
+    state.jogosCarregados = true;
+  }
+  if (state.view === 'jogos') renderJogos();
+}
+
+// Helper: extrai a data calendário no fuso de Brasília a partir de um ISO.
+// Retorna { ano, mes, dia, diaSemana } na data LOCAL brasileira.
+// Resolve o bug de jogos noturnos serem agrupados no dia seguinte (UTC).
+function dataLocalBR(dataIso) {
+  if (!dataIso) return null;
+  try {
+    const d = new Date(dataIso);
+    if (isNaN(d.getTime())) return null;
+    // Usa toLocaleString com timeZone Brasil pra garantir extração no fuso correto,
+    // independentemente do fuso do navegador do usuário.
+    const fmt = new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      weekday: 'short'
+    });
+    const partes = fmt.formatToParts(d);
+    const obj = {};
+    for (const p of partes) {
+      if (p.type !== 'literal') obj[p.type] = p.value;
+    }
+    // diaSemana 0..6 (dom..sab) — mapeamos a partir do weekday curto
+    const mapDia = {
+      'dom': 0, 'seg': 1, 'ter': 2, 'qua': 3, 'qui': 4, 'sex': 5, 'sáb': 6, 'sab': 6
+    };
+    const w = (obj.weekday || '').toLowerCase().replace('.', '').trim();
+    const diaSemana = mapDia[w] != null ? mapDia[w] : 0;
+    return {
+      ano: parseInt(obj.year),
+      mes: parseInt(obj.month),
+      dia: parseInt(obj.day),
+      diaSemana: diaSemana
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+function formatarDataAgrupada(dataIso) {
+  // Devolve algo tipo "DOMINGO, 4 DE MAIO" — usando fuso de Brasília
+  const d = dataLocalBR(dataIso);
+  if (!d) return 'Data a definir';
+  const dias = ['DOMINGO','SEGUNDA','TERÇA','QUARTA','QUINTA','SEXTA','SÁBADO'];
+  const meses = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+  return `${dias[d.diaSemana]}, ${d.dia} DE ${meses[d.mes - 1]}`;
+}
+
+function formatarHorarioJogo(dataIso) {
+  if (!dataIso) return '--:--';
+  try {
+    const d = new Date(dataIso);
+    if (isNaN(d.getTime())) return '--:--';
+    // Força fuso de Brasília no output, independente do fuso do navegador
+    return d.toLocaleTimeString('pt-BR', {
+      timeZone: 'America/Sao_Paulo',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  } catch (e) {
+    return '--:--';
+  }
+}
+
+function chaveDataAgrupada(dataIso) {
+  // Chave de agrupamento usando data NO FUSO DE BRASÍLIA, não UTC.
+  // Sem isso, jogos de sábado à noite eram agrupados como domingo.
+  const d = dataLocalBR(dataIso);
+  if (!d) return 'zzz';
+  return `${d.ano}-${String(d.mes).padStart(2,'0')}-${String(d.dia).padStart(2,'0')}`;
+}
+
+function renderJogos() {
+  const container = document.getElementById('view-jogos');
+
+  if (!state.jogosCarregados) {
+    container.innerHTML = '<div class="card empty">Carregando próximos jogos...</div>';
+    return;
+  }
+
+  if (state.jogosErro) {
+    container.innerHTML = `<div class="card empty"><div style="color: var(--danger); margin-bottom: 6px;">⚠ Não foi possível carregar os próximos jogos</div><div style="font-size: 12px; color: var(--text-tertiary);">${state.jogosErro}</div></div>`;
+    return;
+  }
+
+  if (!state.jogos || state.jogos.length === 0) {
+    container.innerHTML = '<div class="card empty">Nenhum jogo futuro encontrado para a rodada atual.</div>';
+    return;
+  }
+
+  // Agrupa por dia
+  const grupos = {};
+  for (const j of state.jogos) {
+    const chave = chaveDataAgrupada(j.data_iso);
+    if (!grupos[chave]) grupos[chave] = [];
+    grupos[chave].push(j);
+  }
+  const chavesOrdenadas = Object.keys(grupos).sort();
+
+  // Cabeçalho
+  const meta = state.jogosMeta || {};
+  let html = '<div class="secao-header" style="display: flex; justify-content: space-between; align-items: center;">';
+  html += `<h2>Próximos jogos${meta.rodada_atual ? ' · Rodada ' + meta.rodada_atual : ''}</h2>`;
+  if (meta.atualizado_em_br) {
+    html += `<span style="font-size: 11px; color: var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
+  }
+  html += '</div>';
+
+  for (const chave of chavesOrdenadas) {
+    const jogos = grupos[chave];
+    const labelData = formatarDataAgrupada(jogos[0].data_iso);
+
+    html += `<div class="dia-header">${labelData}</div>`;
+    html += '<div class="jogos-grid">';
+
+    for (const j of jogos) {
+      const m = j.mandante || {};
+      const v = j.visitante || {};
+      const escudoMandante = m.escudo
+        ? `<img src="${m.escudo}" alt="${m.nome || ''}" loading="lazy">`
+        : `<div class="escudo-fallback">${(m.sigla || (m.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+      const escudoVisitante = v.escudo
+        ? `<img src="${v.escudo}" alt="${v.nome || ''}" loading="lazy">`
+        : `<div class="escudo-fallback">${(v.sigla || (v.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+
+      const horario = formatarHorarioJogo(j.data_iso);
+
+      html += `<div class="jogo-card">
+        <div class="jogo-horario">${horario}</div>
+        <div class="jogo-times">
+          <div class="jogo-time">
+            <span class="jogo-escudo">${escudoMandante}</span>
+            <span class="jogo-nome">${m.nome || '?'}</span>
+          </div>
+          <div class="jogo-vs">×</div>
+          <div class="jogo-time">
+            <span class="jogo-escudo">${escudoVisitante}</span>
+            <span class="jogo-nome">${v.nome || '?'}</span>
+          </div>
+        </div>`;
+
+      const detalhes = [];
+      if (j.estadio) detalhes.push(`<span class="jogo-detalhe">📍 ${j.estadio}</span>`);
+      if (j.transmissao) detalhes.push(`<span class="jogo-detalhe">📺 ${j.transmissao}</span>`);
+      if (detalhes.length > 0) {
+        html += `<div class="jogo-detalhes">${detalhes.join('')}</div>`;
+      }
+
+      html += '</div>';
+    }
+
+    html += '</div>';
+  }
+
+  // Rodapé com info de fonte
+  if (meta.fonte) {
+    html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ========================================================================
+// RESULTADOS
+// ========================================================================
+async function carregarResultados() {
+  try {
+    const url = 'resultados.json?t=' + Date.now();
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    state.resultados = Array.isArray(data.resultados) ? data.resultados : [];
+    state.resultadosTimes = Array.isArray(data.times) ? data.times : [];
+    state.resultadosMeta = {
+      atualizado_em: data.atualizado_em,
+      atualizado_em_br: data.atualizado_em_br,
+      fonte: data.fonte,
+      ultima_rodada_disputada: data.ultima_rodada_disputada,
+      total_resultados: data.total_resultados
+    };
+    state.resultadosCarregados = true;
+    state.resultadosErro = null;
+  } catch (e) {
+    console.error('Erro ao carregar resultados.json:', e);
+    state.resultadosErro = e.message;
+    state.resultadosCarregados = true;
+  }
+  if (state.view === 'resultados') renderResultados();
+}
+
+function setFiltroResultados(time) {
+  state.resultadosFiltroTime = time || '';
+  renderResultados();
+}
+
+function formatarDataResultado(dataIso) {
+  // Usa fuso de Brasília pra evitar bug de jogos noturnos aparecerem no dia seguinte
+  const d = dataLocalBR(dataIso);
+  if (!d) return '';
+  const dias = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+  const dia = String(d.dia).padStart(2,'0');
+  const mes = String(d.mes).padStart(2,'0');
+  return `${dias[d.diaSemana]} ${dia}/${mes}`;
+}
+
+function renderResultados() {
+  const container = document.getElementById('view-resultados');
+
+  if (!state.resultadosCarregados) {
+    container.innerHTML = '<div class="card empty">Carregando resultados...</div>';
+    return;
+  }
+
+  if (state.resultadosErro) {
+    container.innerHTML = `<div class="card empty"><div style="color: var(--danger); margin-bottom: 6px;">⚠ Não foi possível carregar os resultados</div><div style="font-size: 12px; color: var(--text-tertiary);">${state.resultadosErro}</div></div>`;
+    return;
+  }
+
+  if (!state.resultados || state.resultados.length === 0) {
+    container.innerHTML = '<div class="card empty">Nenhum resultado encontrado ainda. Aguarde a primeira atualização automática.</div>';
+    return;
+  }
+
+  const meta = state.resultadosMeta || {};
+  const filtroTime = state.resultadosFiltroTime;
+
+  // Filtra resultados se houver um time selecionado
+  let resultadosFiltrados = state.resultados;
+  if (filtroTime) {
+    resultadosFiltrados = state.resultados.filter(r =>
+      (r.mandante && r.mandante.nome === filtroTime) ||
+      (r.visitante && r.visitante.nome === filtroTime)
+    );
+  }
+
+  // Cabeçalho com filtro
+  let html = '<div class="resultados-header">';
+  html += '<div class="resultados-titulo-area">';
+  html += `<h2 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin: 0;">Resultados${filtroTime ? ' · ' + filtroTime : ''}</h2>`;
+  if (meta.atualizado_em_br) {
+    html += `<span style="font-size: 11px; color: var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
+  }
+  html += '</div>';
+
+  html += '<div class="resultados-filtro">';
+  html += '<label style="font-size: 12px; color: var(--text-secondary);">Filtrar por time:</label>';
+  html += `<select onchange="setFiltroResultados(this.value)" class="select-filtro">`;
+  html += `<option value="" ${filtroTime === '' ? 'selected' : ''}>Todos os times</option>`;
+  for (const t of state.resultadosTimes) {
+    html += `<option value="${t}" ${filtroTime === t ? 'selected' : ''}>${t}</option>`;
+  }
+  html += '</select>';
+  if (filtroTime) {
+    html += '<button class="btn-limpar-filtro" onclick="setFiltroResultados(\'\')">Limpar</button>';
+  }
+  html += '</div>';
+  html += '</div>';
+
+  // Estatística rápida quando filtra por time
+  if (filtroTime && resultadosFiltrados.length > 0) {
+    let v = 0, e = 0, d = 0, gp = 0, gc = 0;
+    for (const r of resultadosFiltrados) {
+      const eMandante = r.mandante.nome === filtroTime;
+      const meusGols = eMandante ? r.placar_mandante : r.placar_visitante;
+      const golsAdv = eMandante ? r.placar_visitante : r.placar_mandante;
+      gp += meusGols;
+      gc += golsAdv;
+      if (meusGols > golsAdv) v++;
+      else if (meusGols === golsAdv) e++;
+      else d++;
+    }
+    html += `<div class="resultados-stats">
+      <span><strong>${resultadosFiltrados.length}</strong> jogos</span>
+      <span class="stat-v"><strong>${v}</strong> V</span>
+      <span class="stat-e"><strong>${e}</strong> E</span>
+      <span class="stat-d"><strong>${d}</strong> D</span>
+      <span><strong>${gp}</strong> gols pró</span>
+      <span><strong>${gc}</strong> gols sofridos</span>
+    </div>`;
+  }
+
+  // Lista dos resultados
+  if (resultadosFiltrados.length === 0) {
+    html += '<div class="card empty">Nenhum jogo encontrado para esse time.</div>';
+  } else {
+    html += '<div class="resultados-lista">';
+    for (const r of resultadosFiltrados) {
+      const m = r.mandante || {};
+      const v = r.visitante || {};
+      const pm = r.placar_mandante;
+      const pv = r.placar_visitante;
+
+      // Determina classe de cor se filtrado por time
+      let classeJogo = '';
+      if (filtroTime) {
+        const eMandante = m.nome === filtroTime;
+        const meusGols = eMandante ? pm : pv;
+        const golsAdv = eMandante ? pv : pm;
+        if (meusGols > golsAdv) classeJogo = 'resultado-vitoria';
+        else if (meusGols === golsAdv) classeJogo = 'resultado-empate';
+        else classeJogo = 'resultado-derrota';
+      }
+
+      const escudoMandante = m.escudo
+        ? `<img src="${m.escudo}" alt="${m.nome || ''}" loading="lazy">`
+        : `<div class="escudo-fallback-pequeno">${(m.sigla || (m.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+      const escudoVisitante = v.escudo
+        ? `<img src="${v.escudo}" alt="${v.nome || ''}" loading="lazy">`
+        : `<div class="escudo-fallback-pequeno">${(v.sigla || (v.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+
+      const dataFmt = formatarDataResultado(r.data_iso);
+
+      html += `<div class="resultado-card ${classeJogo}">
+        <div class="resultado-meta">
+          <span class="resultado-rodada">R${r.rodada}</span>
+          <span class="resultado-data">${dataFmt}</span>
+        </div>
+        <div class="resultado-jogo">
+          <div class="resultado-time mandante">
+            <span class="resultado-nome">${m.nome || '?'}</span>
+            <span class="resultado-escudo">${escudoMandante}</span>
+          </div>
+          <div class="resultado-placar">${pm} <span class="placar-x">×</span> ${pv}</div>
+          <div class="resultado-time visitante">
+            <span class="resultado-escudo">${escudoVisitante}</span>
+            <span class="resultado-nome">${v.nome || '?'}</span>
+          </div>
+        </div>
+        ${r.estadio ? `<div class="resultado-estadio">📍 ${r.estadio}</div>` : ''}
+      </div>`;
+    }
+    html += '</div>';
+  }
+
+  if (meta.fonte) {
+    html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function renderParticipantes() {
+  let html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;"><h2 style="font-size:16px; font-weight:600;">⚽ Participantes do bolão (' + state.participantes.length + ')</h2><button class="btn btn-primary" onclick="novoParticipante()">+ Adicionar</button></div>';
+  html += '<div class="card"><table><thead><tr><th>Nome</th><th>Time Coração</th><th>Time que cai</th><th style="text-align:right;">Total</th><th style="width:140px;"></th></tr></thead><tbody>';
+  state.participantes.forEach((p, i) => {
+    const { total } = calcular(p);
+    html += `<tr>
+      <td><strong>${p.nome}</strong></td>
+      <td>${p.coracao.time} (${p.coracao.palpite}º)</td>
+      <td>${p.cai}</td>
+      <td class="total">${total}</td>
+      <td>
+        <button class="btn" onclick="editarParticipante(${i})" style="padding:4px 10px; font-size:12px;">Editar</button>
+        <button class="btn btn-danger" onclick="removerParticipante(${i})" style="padding:4px 10px; font-size:12px;">×</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  // Subsessão de membros do grupo (27 nomes pra aniversários)
+  html += renderMembrosAdmin();
+  document.getElementById('view-participantes').innerHTML = html;
+}
+
+// ========================================================================
+// ADMIN E EDIÇÃO
+// ========================================================================
+function adminAction() {
+  if (state.ehAdmin) {
+    state.ehAdmin = false;
+    state.view = 'rank';
+    render();
+    return;
+  }
+  const senha = prompt('Senha de admin:');
+  if (senha === null) return;
+  if (senha === ADMIN_SENHA) {
+    state.ehAdmin = true;
+    state.view = 'participantes';
+    render();
+  } else {
+    alert('Senha incorreta');
+  }
+}
+
+function novoParticipante() {
+  state.editIdx = -1;
+  abrirEditor({
+    nome: "",
+    coracao: { time: TIMES_LISTA[0], palpite: 1 },
+    times: [
+      { time: TIMES_LISTA[1], palpite: 2 },
+      { time: TIMES_LISTA[2], palpite: 3 },
+      { time: TIMES_LISTA[3], palpite: 4 },
+      { time: TIMES_LISTA[4], palpite: 5 },
+      { time: TIMES_LISTA[5], palpite: 6 }
+    ],
+    cai: TIMES_LISTA[19]
+  });
+}
+
+function editarParticipante(idx) {
+  state.editIdx = idx;
+  abrirEditor(JSON.parse(JSON.stringify(state.participantes[idx])));
+}
+
+function removerParticipante(idx) {
+  const p = state.participantes[idx];
+  if (!confirm(`Remover ${p.nome}?`)) return;
+  state.participantes.splice(idx, 1);
+  salvarParticipantes();
+  render();
+}
+
+function abrirEditor(p) {
+  const opcoesTime = TIMES_LISTA.map(t => `<option value="${t}">${t}</option>`).join('');
+  const opcoesPos = Array.from({length:20}, (_,i) => `<option value="${i+1}">${i+1}º</option>`).join('');
+  const opcoesDia = ['<option value="">--</option>']
+    .concat(Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`))
+    .join('');
+  const mesesNome = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const opcoesMes = ['<option value="">--</option>']
+    .concat(mesesNome.map((nome, i) => `<option value="${i+1}">${nome}</option>`))
+    .join('');
+
+  let html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharEditor()">
+    <div class="modal">
+      <h2>${state.editIdx === -1 ? 'Novo participante' : 'Editar participante'}</h2>
+      <div class="form-group">
+        <label>Nome</label>
+        <input id="ed-nome" type="text" value="${p.nome.replace(/"/g,'&quot;')}" placeholder="Nome do participante">
+      </div>
+      <div class="form-group">
+        <label>🎂 Aniversário (opcional)</label>
+        <div class="form-row" style="grid-template-columns: 100px 1fr;">
+          <select id="ed-aniv-dia">${opcoesDia}</select>
+          <select id="ed-aniv-mes">${opcoesMes}</select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>❤️ Time Coração (acertar exato = +12 pts)</label>
+        <div class="form-row">
+          <select id="ed-cor-time">${opcoesTime}</select>
+          <select id="ed-cor-palp">${opcoesPos}</select>
+        </div>
+      </div>`;
+  for (let k = 0; k < 5; k++) {
+    html += `<div class="form-group">
+      <label>Time ${k+1} (acertar exato = +9 pts)</label>
+      <div class="form-row">
+        <select id="ed-t${k}-time">${opcoesTime}</select>
+        <select id="ed-t${k}-palp">${opcoesPos}</select>
+      </div>
+    </div>`;
+  }
+  html += `<div class="form-group">
+        <label>⬇️ Time que vai cair (cair entre 17º e 20º = +6 pts)</label>
+        <select id="ed-cai">${opcoesTime}</select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharEditor()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarEditor()">Salvar</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
+  document.getElementById('ed-cor-time').value = p.coracao.time;
+  document.getElementById('ed-cor-palp').value = p.coracao.palpite;
+  document.getElementById('ed-aniv-dia').value = (p.aniversario && p.aniversario.dia) || '';
+  document.getElementById('ed-aniv-mes').value = (p.aniversario && p.aniversario.mes) || '';
+  for (let k = 0; k < 5; k++) {
+    document.getElementById(`ed-t${k}-time`).value = p.times[k].time;
+    document.getElementById(`ed-t${k}-palp`).value = p.times[k].palpite;
+  }
+  document.getElementById('ed-cai').value = p.cai;
+}
+
+function salvarEditor() {
+  const aniDia = parseInt(document.getElementById('ed-aniv-dia').value) || null;
+  const aniMes = parseInt(document.getElementById('ed-aniv-mes').value) || null;
+  const aniversario = (aniDia && aniMes) ? { dia: aniDia, mes: aniMes } : null;
+
+  const p = {
+    nome: document.getElementById('ed-nome').value.trim() || 'Sem nome',
+    coracao: {
+      time: document.getElementById('ed-cor-time').value,
+      palpite: parseInt(document.getElementById('ed-cor-palp').value)
+    },
+    times: [],
+    cai: document.getElementById('ed-cai').value,
+    aniversario: aniversario
+  };
+  for (let k = 0; k < 5; k++) {
+    p.times.push({
+      time: document.getElementById(`ed-t${k}-time`).value,
+      palpite: parseInt(document.getElementById(`ed-t${k}-palp`).value)
+    });
+  }
+  if (state.editIdx === -1) state.participantes.push(p);
+  else state.participantes[state.editIdx] = p;
+  salvarParticipantes();
+  state.editIdx = null;
+  document.getElementById('modal-container').innerHTML = '';
+  render();
+}
+
+function fecharEditor() {
+  state.editIdx = null;
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+// ========================================================================
+// ANIVERSÁRIOS — pop-up e banner do dia
+// ========================================================================
+async function carregarMembrosDoServidor() {
+  // Tenta baixar membros.json do servidor.
+  // Se sucesso e for diferente do localStorage, atualiza.
+  try {
+    const resp = await fetch('membros.json?t=' + Date.now());
+    if (!resp.ok) return;
+    const data = await resp.json();
+    const membros = Array.isArray(data.membros) ? data.membros : null;
+    if (!membros || membros.length === 0) return;
+    // Substitui se for diferente
+    if (JSON.stringify(membros) !== JSON.stringify(state.membros)) {
+      state.membros = membros;
+      salvarMembros();
+      // Re-renderiza banner e pop-up se aplicável
+      try {
+        mostrarPopupAniversario();
+      } catch (e) {}
+    }
+  } catch (e) {
+    // Sem problema, segue com a lista do localStorage / padrão
+  }
+}
+
+
+function aniversariantesDeHoje() {
+  // Usa fuso de Brasília pra pegar o dia correto
+  const fmt = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit', month: '2-digit'
+  });
+  const partes = fmt.formatToParts(new Date());
+  const obj = {};
+  for (const p of partes) if (p.type !== 'literal') obj[p.type] = p.value;
+  const diaHoje = parseInt(obj.day);
+  const mesHoje = parseInt(obj.month);
+
+  return state.membros.filter(p =>
+    p.aniversario && p.aniversario.dia === diaHoje && p.aniversario.mes === mesHoje
+  );
+}
+
+function linkWhatsAppParabens(nome) {
+  const msg = `Parabéns, ${nome}! Tudo de bom no seu dia! 🎂`;
+  return `https://wa.me/?text=${encodeURIComponent(msg)}`;
+}
+
+
+function mostrarPopupAniversario() {
+  const anivAlmoco = aniversariantesDeHoje();
+  if (anivAlmoco.length === 0) return;
+
+  // Verifica se já mostrou o pop-up hoje (pra não saturar quem fica abrindo o site)
+  const fmt = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit', year:'numeric'
+  });
+  const partes = fmt.formatToParts(new Date());
+  const obj = {};
+  for (const p of partes) if (p.type !== 'literal') obj[p.type] = p.value;
+  const hojeChave = `${obj.year}-${obj.month}-${obj.day}`;
+  const jaMostrado = localStorage.getItem('popup_aniv_data');
+  if (jaMostrado === hojeChave) {
+    // Já mostrou hoje; só renderiza o banner discreto
+    renderBannerAniversario(anivAlmoco);
+    return;
+  }
+
+  // Monta uma seção de grupo dentro do modal
+  function secaoGrupo(titulo, lista, corTitulo) {
+    if (lista.length === 0) return '';
+    let s = `<div style="margin-bottom: 14px;">`;
+    s += `<div style="font-size: 12px; font-weight: 700; letter-spacing: 1px; color: ${corTitulo}; margin-bottom: 8px; text-transform: uppercase;">${titulo}</div>`;
+    for (const p of lista) {
+      s += `<div style="background: rgba(244,114,182,0.12); border: 1px solid rgba(244,114,182,0.4); border-radius: 10px; padding: 14px; margin-bottom: 8px;">`;
+      s += `<div style="font-size: 19px; font-weight: 600; color: #f472b6; margin-bottom: 8px;">${p.nome}</div>`;
+      s += `<a href="${linkWhatsAppParabens(p.nome)}" target="_blank" rel="noopener" class="btn btn-primary" style="display: inline-block; padding: 8px 16px; text-decoration: none; font-size: 14px;">📱 Mandar parabéns no WhatsApp</a>`;
+      s += `</div>`;
+    }
+    s += `</div>`;
+    return s;
+  }
+
+  // Monta o conteúdo do modal
+  let conteudo = '<div style="text-align: center; padding: 8px 4px;">';
+  conteudo += '<div style="font-size: 48px; margin-bottom: 8px;">🎂</div>';
+  conteudo += '<h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Hoje é aniversário!</h2>';
+  conteudo += secaoGrupo('🍻 Almoço de Sexta', anivAlmoco, '#f472b6');
+  conteudo += '<button class="btn" onclick="fecharPopupAniversario()" style="margin-top: 4px; padding: 8px 20px;">Fechar</button>';
+  conteudo += '</div>';
+
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharPopupAniversario()">
+    <div class="modal" style="max-width: 460px;">${conteudo}</div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
+
+  // Marca como mostrado hoje
+  localStorage.setItem('popup_aniv_data', hojeChave);
+
+  // Também renderiza o banner permanente
+  renderBannerAniversario(anivAlmoco);
+}
+
+function fecharPopupAniversario() {
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+function renderBannerAniversario(anivAlmoco) {
+  // Renderiza banner permanente no topo do site (acima da status-bar)
+  const containerExistente = document.getElementById('banner-aniversario');
+  if (containerExistente) containerExistente.remove();
+
+  anivAlmoco = anivAlmoco || [];
+  const total = anivAlmoco.length;
+  if (total === 0) return;
+
+  const div = document.createElement('div');
+  div.id = 'banner-aniversario';
+  div.className = 'banner-aniversario';
+
+  let html = '<span class="banner-icone">🎂</span>';
+  if (total === 1) {
+    // Um aniversariante só — mostra nome e botão direto
+    const p = anivAlmoco[0];
+    html += `<span>Hoje é aniversário de <strong>${p.nome}</strong></span>`;
+    html += `<a href="${linkWhatsAppParabens(p.nome)}" target="_blank" rel="noopener" class="banner-link">Parabenizar 📱</a>`;
+  } else {
+    // Vários — resume e abre o pop-up ao clicar
+    const todosNomes = anivAlmoco.map(p => p.nome).join(', ');
+    html += `<span>Hoje fazem aniversário: <strong>${todosNomes}</strong></span>`;
+    html += `<button onclick="abrirPopupAniversarioForcado()" class="banner-link">Ver todos</button>`;
+  }
+  div.innerHTML = html;
+
+  const statusBar = document.getElementById('status-bar');
+  statusBar.parentNode.insertBefore(div, statusBar);
+}
+
+function abrirPopupAniversarioForcado() {
+  // Força a abertura do pop-up mesmo já tendo sido fechado hoje
+  localStorage.removeItem('popup_aniv_data');
+  mostrarPopupAniversario();
+}
+
+// ========================================================================
+// ABA ANIVERSARIANTES — lista completa, separada por mês
+// ========================================================================
+function renderAniversariantes() {
+  const container = document.getElementById('view-aniversariantes');
+
+  // Mês atual em Brasília
+  const fmt = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit'
+  });
+  const partes = fmt.formatToParts(new Date());
+  const obj = {};
+  for (const p of partes) if (p.type !== 'literal') obj[p.type] = p.value;
+  const diaHoje = parseInt(obj.day);
+  const mesAtual = parseInt(obj.month);
+
+  const mesesNome = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+
+  // Agrupa membros por mês (só os que têm aniversário cadastrado)
+  const porMes = {};
+  const semData = [];
+  for (const m of state.membros) {
+    if (m.aniversario && m.aniversario.dia && m.aniversario.mes) {
+      const mes = m.aniversario.mes;
+      if (!porMes[mes]) porMes[mes] = [];
+      porMes[mes].push(m);
+    } else {
+      semData.push(m);
+    }
+  }
+
+  // Ordena por dia dentro de cada mês
+  for (const mes in porMes) {
+    porMes[mes].sort((a,b) => a.aniversario.dia - b.aniversario.dia);
+  }
+
+  // Ordem dos meses começando pelo mês atual
+  const ordemMeses = [];
+  for (let i = 0; i < 12; i++) {
+    const mes = ((mesAtual - 1 + i) % 12) + 1;
+    ordemMeses.push(mes);
+  }
+
+  // Header
+  let html = '<div class="secao-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">';
+  html += `<h2 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin: 0;">Aniversariantes · ${state.membros.length} membros</h2>`;
+  html += '</div>';
+
+  // Aniversariantes de hoje (destaque)
+  const hoje = state.membros.filter(m =>
+    m.aniversario && m.aniversario.dia === diaHoje && m.aniversario.mes === mesAtual
+  );
+  if (hoje.length > 0) {
+    html += '<div class="aniv-hoje">';
+    html += '<div class="aniv-hoje-titulo">🎂 HOJE</div>';
+    for (const m of hoje) {
+      html += `<div class="aniv-hoje-card">`;
+      html += `<span class="aniv-hoje-nome">${m.nome}</span>`;
+      html += `<a href="${linkWhatsAppParabens(m.nome)}" target="_blank" rel="noopener" class="aniv-link-zap">📱 Parabenizar</a>`;
+      html += `</div>`;
+    }
+    html += '</div>';
+  }
+
+  // Lista por mês
+  for (const mes of ordemMeses) {
+    const lista = porMes[mes] || [];
+    if (lista.length === 0) continue;
+    const ehMesAtual = mes === mesAtual;
+    html += `<div class="aniv-mes ${ehMesAtual ? 'aniv-mes-atual' : ''}">`;
+    html += `<div class="aniv-mes-header">${mesesNome[mes-1]}${ehMesAtual ? ' · Mês atual' : ''}</div>`;
+    html += '<div class="aniv-mes-lista">';
+    for (const m of lista) {
+      const ehHoje = ehMesAtual && m.aniversario.dia === diaHoje;
+      const dia = String(m.aniversario.dia).padStart(2, '0');
+      const mesFmt = String(m.aniversario.mes).padStart(2, '0');
+      html += `<div class="aniv-item ${ehHoje ? 'aniv-item-hoje' : ''}">`;
+      html += `<span class="aniv-data">${dia}/${mesFmt}</span>`;
+      html += `<span class="aniv-nome">${m.nome}</span>`;
+      html += `<a href="${linkWhatsAppParabens(m.nome)}" target="_blank" rel="noopener" class="aniv-link-zap-pequeno" title="Parabenizar no WhatsApp">📱</a>`;
+      html += `</div>`;
+    }
+    html += '</div></div>';
+  }
+
+  // Sem data cadastrada
+  if (semData.length > 0) {
+    html += `<div class="aniv-mes aniv-mes-sem-data">`;
+    html += `<div class="aniv-mes-header">SEM DATA CADASTRADA · ${semData.length} membro(s)</div>`;
+    html += '<div class="aniv-mes-lista">';
+    for (const m of semData) {
+      html += `<div class="aniv-item aniv-item-sem-data">`;
+      html += `<span class="aniv-data">—</span>`;
+      html += `<span class="aniv-nome">${m.nome}</span>`;
+      html += `</div>`;
+    }
+    html += '</div></div>';
+  }
+
+  if (state.membros.length === 0) {
+    html += '<div class="card empty">Nenhum membro cadastrado ainda. Use a aba Admin pra adicionar.</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ========================================================================
+// ADMIN — MEMBROS DO GRUPO
+// ========================================================================
+// Barra de status do token do GitHub — mostrada no topo das seções do Admin.
+function htmlBarraTokenGithub() {
+  const tem = !!getGithubToken();
+  const cor = tem ? '#10b981' : '#fbbf24';
+  const icone = tem ? '🟢' : '🟡';
+  const texto = tem
+    ? 'Salvamento automático ATIVO — alterações vão direto pro GitHub.'
+    : 'Token do GitHub não configurado — alterações salvam só neste navegador.';
+  return `<div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+       background: rgba(255,255,255,0.03); border: 1px solid ${cor}55;
+       border-left: 3px solid ${cor}; border-radius: 8px; padding: 10px 14px; margin: 16px 0;">
+    <span style="font-size:14px;">${icone}</span>
+    <span style="font-size:12px; color: var(--text-secondary); flex:1; min-width:180px;">${texto}</span>
+    <button class="btn" style="padding:5px 12px; font-size:12px;" onclick="abrirEditorToken()">
+      ${tem ? 'Trocar token' : 'Configurar token'}
+    </button>
+  </div>`;
+}
+
+function renderMembrosAdmin() {
+  // Renderiza a lista de membros DENTRO da view-participantes (Admin)
+  // Retorna HTML para ser concatenado
+  let html = htmlBarraTokenGithub();
+  html += '<div style="display:flex; justify-content:space-between; align-items:center; margin: 16px 0 12px;">';
+  html += '<h2 style="font-size:16px; font-weight:600;">🎂 Membros do grupo (' + state.membros.length + ')</h2>';
+  html += '<div style="display:flex; gap:8px;">';
+  html += '<button class="btn btn-primary" onclick="novoMembro()">+ Adicionar</button>';
+  html += '</div></div>';
+
+  html += '<div class="card"><table><thead><tr>';
+  html += '<th>Nome</th><th style="text-align:center; width:120px;">Aniversário</th><th style="width:160px;"></th>';
+  html += '</tr></thead><tbody>';
+
+  state.membros.forEach((m, i) => {
+    const dataFmt = (m.aniversario && m.aniversario.dia)
+      ? `${String(m.aniversario.dia).padStart(2,'0')}/${String(m.aniversario.mes).padStart(2,'0')}`
+      : '<span style="color: var(--text-tertiary);">— não cadastrado —</span>';
+    html += `<tr>`;
+    html += `<td>${m.nome}</td>`;
+    html += `<td style="text-align:center;">${dataFmt}</td>`;
+    html += `<td style="text-align:right;">`;
+    html += `<button class="btn" style="padding:4px 10px; font-size:12px;" onclick="editarMembro(${i})">Editar</button> `;
+    html += `<button class="btn" style="padding:4px 10px; font-size:12px; color: var(--danger);" onclick="removerMembro(${i})">Remover</button>`;
+    html += `</td>`;
+    html += `</tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function novoMembro() {
+  state.editMembroIdx = -1;
+  abrirEditorMembro({nome: "", aniversario: null});
+}
+
+function editarMembro(idx) {
+  state.editMembroIdx = idx;
+  abrirEditorMembro(state.membros[idx]);
+}
+
+function removerMembro(idx) {
+  const m = state.membros[idx];
+  if (!confirm(`Remover ${m.nome} da lista de membros?`)) return;
+  state.membros.splice(idx, 1);
+  salvarMembros();
+  render();
+  sincronizarEAvisar('almoco');
+}
+
+function abrirEditorMembro(m) {
+  const opcoesDia = ['<option value="">--</option>']
+    .concat(Array.from({length:31}, (_,i) => `<option value="${i+1}">${i+1}</option>`))
+    .join('');
+  const mesesNome = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const opcoesMes = ['<option value="">--</option>']
+    .concat(mesesNome.map((nome, i) => `<option value="${i+1}">${nome}</option>`))
+    .join('');
+
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharEditorMembro()">
+    <div class="modal">
+      <h2>${state.editMembroIdx === -1 ? 'Novo membro' : 'Editar membro'}</h2>
+      <div class="form-group">
+        <label>Nome</label>
+        <input id="ed-membro-nome" type="text" value="${m.nome.replace(/"/g,'&quot;')}" placeholder="Nome do membro">
+      </div>
+      <div class="form-group">
+        <label>🎂 Aniversário (opcional)</label>
+        <div class="form-row" style="grid-template-columns: 100px 1fr;">
+          <select id="ed-membro-dia">${opcoesDia}</select>
+          <select id="ed-membro-mes">${opcoesMes}</select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharEditorMembro()">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarMembroEditor()">Salvar</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
+  document.getElementById('ed-membro-dia').value = (m.aniversario && m.aniversario.dia) || '';
+  document.getElementById('ed-membro-mes').value = (m.aniversario && m.aniversario.mes) || '';
+}
+
+function salvarMembroEditor() {
+  const nome = document.getElementById('ed-membro-nome').value.trim();
+  if (!nome) {
+    alert('Nome é obrigatório');
+    return;
+  }
+  const dia = parseInt(document.getElementById('ed-membro-dia').value) || null;
+  const mes = parseInt(document.getElementById('ed-membro-mes').value) || null;
+  const aniversario = (dia && mes) ? { dia, mes } : null;
+  const m = { nome, aniversario };
+
+  if (state.editMembroIdx === -1) state.membros.push(m);
+  else state.membros[state.editMembroIdx] = m;
+  salvarMembros();
+  state.editMembroIdx = null;
+  document.getElementById('modal-container').innerHTML = '';
+  render();
+  sincronizarEAvisar('almoco');
+}
+
+// Sincroniza um grupo com o GitHub e mostra toast de resultado.
+async function sincronizarEAvisar(grupo) {
+  if (!getGithubToken()) {
+    mostrarToast('Salvo no navegador. Configure o token do GitHub para sincronizar automaticamente.', false);
+    return;
+  }
+  mostrarToast('Salvando no GitHub...', true);
+  const resultado = await sincronizarMembrosGithub();
+  mostrarToast(
+    resultado.ok ? '✓ Salvo no GitHub com sucesso!' : '✗ ' + resultado.mensagem,
+    resultado.ok
+  );
+}
+
+function fecharEditorMembro() {
+  state.editMembroIdx = null;
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+// ========================================================================
+// SALVAMENTO AUTOMÁTICO VIA API DO GITHUB
+// ========================================================================
+// O token fica salvo SÓ no localStorage do navegador do admin.
+// Nunca vai pro código público. Permissão minima: conteudo, 1 repo.
+const GITHUB_REPO = 'LAERCIOREHEM/BRASILEIRAO2026ALMOCO';
+const GITHUB_BRANCH = 'main';
+
+function getGithubToken() {
+  return localStorage.getItem('github_token') || '';
+}
+
+function setGithubToken(token) {
+  if (token) {
+    localStorage.setItem('github_token', token.trim());
+  } else {
+    localStorage.removeItem('github_token');
+  }
+}
+
+// Codifica string UTF-8 para base64 (a API do GitHub exige base64).
+function utf8ParaBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin);
+}
+
+// Salva um arquivo no GitHub via API. Retorna {ok, mensagem}.
+// Faz GET pra pegar o SHA atual do arquivo (necessario pra atualizar),
+// depois PUT com o novo conteudo.
+async function salvarArquivoNoGithub(caminhoArquivo, conteudoTexto, mensagemCommit) {
+  const token = getGithubToken();
+  if (!token) {
+    return { ok: false, mensagem: 'Token do GitHub não configurado. Configure no topo da aba Admin.' };
+  }
+
+  const apiBase = `https://api.github.com/repos/${GITHUB_REPO}/contents/${caminhoArquivo}`;
+  const headers = {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+
+  try {
+    // 1. Pega o SHA atual do arquivo (se existir)
+    let sha = null;
+    const getResp = await fetch(`${apiBase}?ref=${GITHUB_BRANCH}&t=${Date.now()}`, { headers });
+    if (getResp.ok) {
+      const info = await getResp.json();
+      sha = info.sha;
+    } else if (getResp.status === 401) {
+      return { ok: false, mensagem: 'Token inválido ou expirado. Gere um novo token no GitHub.' };
+    } else if (getResp.status === 404) {
+      // Arquivo ainda não existe — será criado (sha fica null)
+      sha = null;
+    } else if (getResp.status === 403) {
+      return { ok: false, mensagem: 'Token sem permissão para este repositório.' };
+    }
+
+    // 2. Faz o PUT com o novo conteúdo
+    const corpo = {
+      message: mensagemCommit,
+      content: utf8ParaBase64(conteudoTexto),
+      branch: GITHUB_BRANCH
+    };
+    if (sha) corpo.sha = sha;
+
+    const putResp = await fetch(apiBase, {
+      method: 'PUT',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify(corpo)
+    });
+
+    if (putResp.ok) {
+      return { ok: true, mensagem: 'Salvo no GitHub com sucesso.' };
+    } else {
+      const erro = await putResp.json().catch(() => ({}));
+      return { ok: false, mensagem: `Erro ${putResp.status}: ${erro.message || 'falha ao salvar'}` };
+    }
+  } catch (e) {
+    return { ok: false, mensagem: `Erro de conexão: ${e.message}` };
+  }
+}
+
+// Salva o membros.json no GitHub (grupo Almoço de Sexta).
+async function sincronizarMembrosGithub() {
+  const data = {
+    atualizado_em: new Date().toISOString(),
+    total: state.membros.length,
+    membros: state.membros
+  };
+  const json = JSON.stringify(data, null, 2);
+  return await salvarArquivoNoGithub('membros.json', json,
+    `Atualizar membros.json (Almoço) via Admin do site`);
+}
+
+
+// Mostra um aviso flutuante temporário (toast) no rodapé.
+function mostrarToast(mensagem, sucesso) {
+  let toast = document.getElementById('toast-sync');
+  if (toast) toast.remove();
+  toast = document.createElement('div');
+  toast.id = 'toast-sync';
+  toast.className = 'toast-sync ' + (sucesso ? 'toast-ok' : 'toast-erro');
+  toast.textContent = mensagem;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    if (toast) toast.classList.add('toast-sumindo');
+    setTimeout(() => { if (toast) toast.remove(); }, 400);
+  }, 3500);
+}
+
+// Editor do token do GitHub (modal).
+function abrirEditorToken() {
+  const tokenAtual = getGithubToken();
+  const mascarado = tokenAtual
+    ? tokenAtual.slice(0, 7) + '...' + tokenAtual.slice(-4)
+    : '(nenhum token salvo)';
+
+  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharEditorToken()">
+    <div class="modal" style="max-width: 540px;">
+      <h2>🔑 Token do GitHub</h2>
+      <p style="font-size: 13px; color: var(--text-secondary); margin: 8px 0 12px;">
+        O token permite que o site salve as alterações direto no GitHub, sem copia-e-cola.
+        Ele fica guardado <strong>só neste navegador</strong> — nunca vai pro código público.
+      </p>
+      <div style="background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.35); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+        Token atual: <strong style="color: var(--text);">${mascarado}</strong>
+      </div>
+      <div class="form-group">
+        <label>Colar token novo (começa com github_pat_ ou ghp_)</label>
+        <input id="ed-token" type="password" placeholder="github_pat_..." autocomplete="off">
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="fecharEditorToken()">Cancelar</button>
+        ${tokenAtual ? '<button class="btn" style="color: var(--danger);" onclick="removerToken()">Remover token</button>' : ''}
+        <button class="btn btn-primary" onclick="salvarToken()">Salvar token</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('modal-container').innerHTML = html;
+}
+
+function salvarToken() {
+  const valor = document.getElementById('ed-token').value.trim();
+  if (!valor) {
+    alert('Cole um token válido.');
+    return;
+  }
+  setGithubToken(valor);
+  document.getElementById('modal-container').innerHTML = '';
+  mostrarToast('Token salvo neste navegador.', true);
+  render();
+}
+
+function removerToken() {
+  if (!confirm('Remover o token deste navegador? O salvamento automático deixará de funcionar.')) return;
+  setGithubToken('');
+  document.getElementById('modal-container').innerHTML = '';
+  mostrarToast('Token removido.', true);
+  render();
+}
+
+function fecharEditorToken() {
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+// ========================================================================
+// ========================================================================
+
+// ========================================================================
+// ========================================================================
+
+
+
+
+
+
+
+// ========================================================================
+// INICIALIZAÇÃO
+// ========================================================================
+inicializar();
+
+// Verifica aniversariantes do dia após inicialização
+setTimeout(() => {
+  try {
+    mostrarPopupAniversario();
+  } catch (e) {
+    console.error('Erro ao verificar aniversariantes:', e);
+  }
+}, 800);
+</script>
+<script>
+  /* Mostra o botão da Copa no menu durante o período (quando você está
+     vendo o Brasileirão pausado, dá pra pular pra Copa pelo botão). */
+  (function () {
+    var ini = new Date('2026-06-04T00:00:00-03:00');
+    var fim = new Date('2026-07-20T23:59:59-03:00');
+    var agora = new Date();
+    if (agora >= ini && agora <= fim) {
+      var b = document.getElementById('btn-copa');
+      if (b) b.style.display = '';
+    }
+  })();
+</script>
 </body>
 </html>
