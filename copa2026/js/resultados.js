@@ -657,7 +657,8 @@
       <button class="vbtn ${ABA === "jogos" ? "on" : ""}" data-v="jogos">📅 Partidas</button>
       <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Grupos</button>
       <button class="vbtn ${ABA === "mata" ? "on" : ""}" data-v="mata">🏆 Mata-mata</button>
-    </div>`;
+    </div>
+    <a class="todos-jogos-cta" href="onde-assistir.html">📋 Visualizar todos os jogos</a>`;
   }
   function fetchJSONNoCache(url) {
     // Durante jogo ao vivo, alguns navegadores/CDNs seguram resposta por alguns segundos.
