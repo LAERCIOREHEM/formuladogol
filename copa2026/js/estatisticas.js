@@ -1,5 +1,5 @@
 /* =========================================================================
-   estatisticas.js — Artilheiros, assistências e cartões da Copa 2026
+   estatisticas.js — Artilheiros, assistências e gols por seleção da Copa 2026
    Consome dados/estatisticas.json gerado por buscar_estatisticas.py.
    Não mexe em palpites, pontos, engine nem regras do bolão.
    ========================================================================= */
@@ -44,19 +44,21 @@
   function listaDaAba() {
     if (!DADOS) return [];
     if (ABA === "assistencias") return DADOS.assistencias || [];
-    if (ABA === "cartoes") return DADOS.cartoes || [];
+    if (ABA === "gols_selecao") {
+      return (DADOS.por_selecao || []).slice().sort(function (a, b) {
+        return (b.gols || 0) - (a.gols || 0) || (b.media_gols || 0) - (a.media_gols || 0) || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
+      });
+    }
     return DADOS.artilheiros || [];
   }
 
   function valorPrincipal(item) {
     if (ABA === "assistencias") return item.assistencias || 0;
-    if (ABA === "cartoes") return (item.vermelhos || 0) + (item.amarelos || 0);
     return item.gols || 0;
   }
 
   function rotuloValor(v) {
     if (ABA === "assistencias") return v === 1 ? "assistência" : "assistências";
-    if (ABA === "cartoes") return v === 1 ? "cartão" : "cartões";
     return v === 1 ? "gol" : "gols";
   }
 
@@ -65,24 +67,35 @@
     return arr.filter(function (x) { return x.equipe === FILTRO; });
   }
 
+  function melhorAtaque() {
+    var lista = (DADOS.por_selecao || []).slice().sort(function (a, b) {
+      return (b.gols || 0) - (a.gols || 0) || (b.media_gols || 0) - (a.media_gols || 0) || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
+    });
+    return lista[0];
+  }
+
   function renderResumo() {
     var gols = (DADOS.artilheiros || [])[0];
     var ass = (DADOS.assistencias || [])[0];
-    var car = (DADOS.cartoes || [])[0];
+    var ataque = melhorAtaque();
     var cards = [
-      { tit: "Artilheiro", item: gols, val: gols ? gols.gols : 0, suf: "gols", ico: "⚽" },
-      { tit: "Garçom", item: ass, val: ass ? ass.assistencias : 0, suf: "assist.", ico: "🎯" },
-      { tit: "Cartões", item: car, val: car ? ((car.amarelos || 0) + (car.vermelhos || 0)) : 0, suf: "cartões", ico: "🟥" }
+      { tit: "Artilheiro", item: gols, val: gols ? gols.gols : 0, suf: "gols", ico: "⚽", tipo: "jogador" },
+      { tit: "Garçom", item: ass, val: ass ? ass.assistencias : 0, suf: "assist.", ico: "🎯", tipo: "jogador" },
+      { tit: "Melhor ataque", item: ataque, val: ataque ? ataque.gols : 0, suf: "gols", ico: "🥅", tipo: "selecao" }
     ];
     $("#stats-resumo").innerHTML = cards.map(function (c) {
       if (!c.item) {
         return '<div class="stat-res-card"><div class="stat-res-ico">' + c.ico + '</div><div><b>' + c.tit + '</b><span>Aguardando dados</span></div></div>';
       }
+      var nome = c.tipo === "selecao" ? nomeSelecao(c.item.equipe) : c.item.nome;
+      var detalhe = c.tipo === "selecao"
+        ? (flag(c.item.equipe) + esc(c.item.equipe || "") + ' · ' + c.val + ' ' + esc(c.suf))
+        : (flag(c.item.equipe) + esc(nomeSelecao(c.item.equipe)) + ' · ' + c.val + ' ' + esc(c.suf));
       return '<div class="stat-res-card">' +
         '<div class="stat-res-ico">' + c.ico + '</div>' +
         '<div class="stat-res-info"><b>' + esc(c.tit) + '</b>' +
-        '<strong>' + esc(c.item.nome) + '</strong>' +
-        '<span>' + flag(c.item.equipe) + esc(nomeSelecao(c.item.equipe)) + ' · ' + c.val + ' ' + esc(c.suf) + '</span></div>' +
+        '<strong>' + esc(nome) + '</strong>' +
+        '<span>' + detalhe + '</span></div>' +
       '</div>';
     }).join("");
   }
@@ -90,7 +103,7 @@
   function renderFiltro() {
     var sel = $("#stat-selecao");
     var equipes = {};
-    ["artilheiros", "assistencias", "cartoes"].forEach(function (k) {
+    ["artilheiros", "assistencias", "cartoes", "por_selecao"].forEach(function (k) {
       (DADOS[k] || []).forEach(function (x) { if (x.equipe) equipes[x.equipe] = true; });
     });
     var lista = Object.keys(equipes).sort(function (a, b) { return nomeSelecao(a).localeCompare(nomeSelecao(b), "pt-BR"); });
@@ -111,9 +124,25 @@
 
   function row(item, idx) {
     var val = valorPrincipal(item);
-    var meta = ABA === "cartoes"
-      ? detalheCartoes(item)
-      : '<span class="stat-muted">' + (item.jogos && item.jogos.length ? item.jogos.length : 1) + ' jogo' + ((item.jogos || []).length > 1 ? 's' : '') + '</span>';
+    if (ABA === "gols_selecao") {
+      var jogos = item.jogos || item.partidas || 0;
+      var media = item.media_gols || (jogos ? (val / jogos) : 0);
+      var metaSel = jogos
+        ? '<span class="stat-muted">' + jogos + ' jogo' + (jogos > 1 ? 's' : '') + ' · média ' + media.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) + '</span>'
+        : '<span class="stat-muted">gols marcados pela seleção</span>';
+      return '<article class="stat-row stat-row-selecao">' +
+        '<div class="stat-pos">' + (idx + 1) + 'º</div>' +
+        '<div class="stat-player">' +
+          '<strong>' + esc(nomeSelecao(item.equipe)) + '</strong>' +
+          '<span>' + flag(item.equipe) + esc(item.equipe || "—") + '</span>' +
+          '<div class="stat-mobile-meta">' + metaSel + '</div>' +
+        '</div>' +
+        '<div class="stat-meta">' + metaSel + '</div>' +
+        '<div class="stat-num"><b>' + val + '</b><small>' + esc(rotuloValor(val)) + '</small></div>' +
+      '</article>';
+    }
+
+    var meta = '<span class="stat-muted">' + (item.jogos && item.jogos.length ? item.jogos.length : 1) + ' jogo' + ((item.jogos || []).length > 1 ? 's' : '') + '</span>';
     return '<article class="stat-row">' +
       '<div class="stat-pos">' + (idx + 1) + 'º</div>' +
       '<div class="stat-player">' +
@@ -129,11 +158,13 @@
   function renderLista() {
     $$(".stat-tab").forEach(function (b) { b.classList.toggle("ativa", b.dataset.aba === ABA); });
     var arr = filtrar(listaDaAba());
-    var titulo = ABA === "assistencias" ? "Assistências" : (ABA === "cartoes" ? "Cartões" : "Artilheiros");
+    var titulo = ABA === "assistencias" ? "Assistências" : (ABA === "gols_selecao" ? "Gols por seleção" : "Artilheiros");
     $("#stats-titulo-lista").textContent = titulo;
-    $("#stats-contagem").textContent = arr.length ? (arr.length + " jogador" + (arr.length > 1 ? "es" : "")) : "sem dados";
+    $("#stats-contagem").textContent = arr.length
+      ? (arr.length + " " + (ABA === "gols_selecao" ? (arr.length > 1 ? "seleções" : "seleção") : (arr.length > 1 ? "jogadores" : "jogador")))
+      : "sem dados";
     if (!arr.length) {
-      $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há dados disponíveis para esta aba. A ESPN pode levar alguns minutos para disponibilizar gols, assistências e cartões no feed.</div>';
+      $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há dados disponíveis para esta aba. A ESPN pode levar alguns minutos para disponibilizar gols e assistências no feed.</div>';
       return;
     }
     $("#stats-lista").innerHTML = arr.map(row).join("");
