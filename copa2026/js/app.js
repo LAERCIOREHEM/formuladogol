@@ -639,32 +639,12 @@
     const noPareo = itensStatus.filter(item => item.st === "ok");
     const fora = itensStatus.filter(item => item.st === "err");
     const indef = itensStatus.filter(item => item.st !== "ok" && item.st !== "err");
-    const chipsResumo = (arr) => arr.map(item =>
-      `<span class="cn-mini-chip cn-mini-${item.st}">${bandeira(item.id)}<span>${item.nome}</span></span>`
-    ).join("");
-    const blocoIndef = indef.length ? `
-        <div class="cn-resumo-grupo">
-          <div class="cn-resumo-label cn-pend-label">⏳ Ainda sem definição (${indef.length})</div>
-          <div class="cn-resumo-chips">${chipsResumo(indef)}</div>
-        </div>` : "";
+    const resumoPill = `<span class="cn-resumo-inline"><span>📊 ${noPareo.length} no páreo</span><span>·</span><span>${fora.length} fora</span>${indef.length ? `<span>·</span><span>${indef.length} indef.</span>` : ""}</span>`;
 
     const box = el("div", "canon-fase");
-    box.innerHTML = `<div class="cn-tit">✅ Seu palpite (seleções que avançam) — ${rot}</div>
+    box.innerHTML = `<div class="cn-tit"><span>✅ Seu palpite (seleções que avançam) — ${rot}</span>${resumoPill}</div>
       <div class="cn-chips">${chips}</div>
-      <div class="cn-nota">No mata-mata vale <b>quem você cravou que avança</b>, não o placar nem a posição no chaveamento. ✓/× indica a situação atual pelo feed oficial/simulado do Bolão.</div>
-      <details class="cn-resumo">
-        <summary>📊 Resumo: <b>${noPareo.length}</b> no páreo · <b>${fora.length}</b> fora</summary>
-        <div class="cn-resumo-body">
-          <div class="cn-resumo-grupo">
-            <div class="cn-resumo-label cn-ok-label">✅ Ainda no páreo (${noPareo.length})</div>
-            <div class="cn-resumo-chips">${noPareo.length ? chipsResumo(noPareo) : '<span class="cn-vazio">Nenhuma seleção nesta situação.</span>'}</div>
-          </div>
-          <div class="cn-resumo-grupo">
-            <div class="cn-resumo-label cn-err-label">❌ Fora do páreo (${fora.length})</div>
-            <div class="cn-resumo-chips">${fora.length ? chipsResumo(fora) : '<span class="cn-vazio">Nenhuma seleção nesta situação.</span>'}</div>
-          </div>${blocoIndef}
-        </div>
-      </details>`;
+      <div class="cn-nota">No mata-mata vale <b>quem você cravou que avança</b>, não o placar nem a posição no chaveamento. ✓ = ainda no páreo · × = fora do páreo.</div>`;
     return box;
   }
 
