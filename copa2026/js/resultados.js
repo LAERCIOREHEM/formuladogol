@@ -1014,9 +1014,9 @@
     pintarFaseMata();
   }
 
-  // ===== Chave horizontal completa do mata-mata =====
-  // A ordem abaixo organiza a árvore de forma visual: cada par de jogos da coluna
-  // da esquerda alimenta o jogo imediatamente ao lado, até chegar à final.
+  // ===== Mata-mata por fase, agrupado por caminho oficial =====
+  // Cada bloco reúne os dois jogos cujos vencedores se enfrentam na fase seguinte.
+  // A estrutura vem do arquivo oficial estrutura_mata_mata.json — não é agrupamento visual no chute.
   const MATA_VISUAL = {
     r32: ["M74", "M77", "M73", "M75", "M83", "M84", "M81", "M82", "M76", "M78", "M79", "M80", "M86", "M88", "M85", "M87"],
     oitavas: ["M89", "M90", "M93", "M94", "M91", "M92", "M95", "M96"],
@@ -1024,7 +1024,6 @@
     semis: ["M101", "M102"],
     final: ["M104", "M103"]
   };
-  const MATA_LABEL = { "16-avos":"16-avos", "Oitavas":"Oitavas", "Quartas":"Quartas", "Semis":"Semis", "Final":"Final" };
   const MATA_FASE_ID = { "16-avos":"r32", "Oitavas":"oitavas", "Quartas":"quartas", "Semis":"semis", "Final":"final" };
 
   function faseLabelPorEstrutura(fase) {
@@ -1035,7 +1034,6 @@
     if (fase === "terceiro") return "3º lugar";
     return fase || "Mata-mata";
   }
-  function idFaseClasse(nome) { return String(nome || "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
   function textoSlot(slot) {
     if (!slot) return "A definir";
     const s = String(slot);
@@ -1063,13 +1061,11 @@
     if (!nt) return false;
     const textos = textosEventoMata(ev);
     if (textos.some(t => t === nt || t.includes(nt))) return true;
-    // A árvore do nosso JSON usa WM74/LM101; alguns feeds usam W74/L101.
     const mw = nt.match(/^([WL])M(\d+)$/);
     if (mw) {
       const curto = mw[1] + mw[2];
       if (textos.some(t => t === curto || t.includes(curto))) return true;
     }
-    // Slots como 1E, 2F e 3C podem vir como "1st Group E" ou "3ABCDF".
     const m = nt.match(/^([123])([A-L])$/);
     if (m) {
       const pos = m[1], grupo = m[2];
@@ -1090,52 +1086,22 @@
     const mid = normTokenMata(id);
     return !!mid && textosEventoMata(ev).some(t => t.includes(mid));
   }
+  function eventoTemToken(ev, token) { return eventoContemTokenMata(ev, token); }
 
-  function infoTimesEvento(ev) {
-    const out = [];
-    try {
-      const cs = ev.competitions[0].competitors || [];
-      cs.forEach(c => {
-        const t = c.team || {};
-        const sig = dpSigla(t.abbreviation) || dpSigla(t.shortDisplayName) || dpSigla(t.displayName) || dpSigla(t.name) || t.abbreviation || "";
-        const toks = [sig, t.abbreviation, t.shortDisplayName, t.displayName, t.name, t.location, t.nickname]
-          .filter(Boolean).map(normTokenMata);
-        out.push({ sig, toks });
-      });
-    } catch (e) { /* ignora */ }
-    return out;
-  }
-  function eventoTemToken(ev, token) {
-    return eventoContemTokenMata(ev, token);
-  }
   function eventoMataDeOuSlot(j, mataEvents) {
     const lista = mataEvents || [];
     const idA = dpSigla(j.a), idB = dpSigla(j.b);
-
-    // 1) Se o feed trouxer o código FIFA do jogo (M74, M89 etc.), é o casamento mais seguro.
     const porId = lista.find(ev => eventoContemIdMata(ev, j.id));
     if (porId) return porId;
-
-    // 2) Quando as duas seleções já estão no feed, casa pelo confronto exato.
     if (idA && idB) {
       const exato = eventoMataDe(idA, idB, lista);
       if (exato) return exato;
     }
-
-    // 3) Antes de a FIFA/ESPN substituir os slots por seleções, casa pelos rótulos (1E, 2F, 3C etc.).
     const alvosA = [idA, j.slotA, j.a].filter(Boolean);
     const alvosB = [idB, j.slotB, j.b].filter(Boolean);
-    const porSlot = lista.find(ev => alvosA.some(a => eventoTemToken(ev, a)) && alvosB.some(b => eventoTemToken(ev, b)));
-    if (porSlot) return porSlot;
-
-    // 4) Caso um lado já tenha seleção e o outro ainda esteja como slot/TBD no feed.
-    const umLado = lista.find(ev => {
-      const okA = alvosA.some(a => eventoTemToken(ev, a));
-      const okB = alvosB.some(b => eventoTemToken(ev, b));
-      return okA && okB;
-    });
-    return umLado || null;
+    return lista.find(ev => alvosA.some(a => eventoTemToken(ev, a)) && alvosB.some(b => eventoTemToken(ev, b))) || null;
   }
+
   function infoJogoMata(ev, idA, idB, j) {
     if (!ev) return { status:"Agendado", cls:"", scoreA:"", scoreB:"", vA:"", vB:"", info:"" };
     const comp = ev.competitions[0], st = comp.status.type, cs = comp.competitors;
@@ -1145,7 +1111,6 @@
     const aId = dpSigla((a.team || {}).abbreviation) || dpSigla((a.team || {}).displayName) || (a.team || {}).abbreviation;
     const hs = h.score, as = a.score;
     let aScore = "", bScore = "";
-    // Em jogo agendado a ESPN costuma devolver 0x0; não exibimos para não parecer placar real.
     if (idA && idB && (st.state === "in" || st.state === "post")) {
       if (hId === idA) { aScore = hs; bScore = as; }
       else if (aId === idA) { aScore = as; bScore = hs; }
@@ -1176,6 +1141,7 @@
     const linha = `<span class="mm-data">${data} · ${horaBR(ev.date)}</span>${extra ? `<span class="mm-extra">${extra}</span>` : ""}${onde ? `<span class="mm-estadio">${escTxt(onde)}</span>` : ""}`;
     return { status, cls, scoreA:aScore, scoreB:bScore, vA, vB, info:linha };
   }
+
   function montarJogosMata(d) {
     const r32ById = {};
     const tokensR32 = tokensDosJogosR32(d);
@@ -1197,6 +1163,7 @@
       "Final": MATA_VISUAL.final.map(get)
     };
   }
+
   function linhaEquipeMata(valor, slot, score, vcls, travado) {
     const id = dpSigla(valor);
     if (id) {
@@ -1208,39 +1175,69 @@
     const txt = textoSlot(valor || slot);
     return `<div class="mm-equipe mm-tbd"><span class="mm-slot">${escTxt(txt)}</span></div>`;
   }
-  function cardMata(j, row, span, faseNome) {
+
+  function cardMata(j) {
     const idA = dpSigla(j.a), idB = dpSigla(j.b);
     const ev = eventoMataDeOuSlot(j, MATA_EVENTS);
     const inf = infoJogoMata(ev, idA, idB, j);
     const especial = j.id === "M103" ? " mm-card-terceiro" : (j.id === "M104" ? " mm-card-final" : "");
-    return `<div class="mm-card${especial}" style="grid-row:${row} / span ${span}" data-mm-id="${j.id}">
+    return `<div class="mm-card${especial}" data-mm-id="${j.id}">
       <div class="mm-card-id"><b>${j.id || "—"}${j.id === "M104" ? " · Final" : (j.id === "M103" ? " · 3º lugar" : "")}</b><span class="mm-status-chip ${inf.cls}">${escTxt(inf.status)}</span></div>
       ${linhaEquipeMata(j.a, j.slotA, inf.scoreA, inf.vA, j.travA)}
       ${linhaEquipeMata(j.b, j.slotB, inf.scoreB, inf.vB, j.travB)}
       ${inf.info ? `<div class="mm-card-info">${inf.info}</div>` : ""}
     </div>`;
   }
-  function colunaMata(nome, jogos) {
-    let cards;
-    let cls = nome === "Final" ? " mm-col-final" : "";
-    if (nome === "Final") {
-      // Final e disputa do 3º lugar ficam na mesma coluna, como no chaveamento oficial/BBC.
-      const final = (jogos || []).find(j => j.id === "M104") || (jogos || [])[0];
-      const terceiro = (jogos || []).find(j => j.id === "M103");
-      cards = [final ? cardMata(final, 3, 4, nome) : "", terceiro ? cardMata(terceiro, 11, 4, "3º lugar") : ""].join("");
-    } else {
-      const n = jogos.length || 1;
-      const span = Math.max(1, Math.floor(16 / n));
-      cards = jogos.map((j, i) => cardMata(j, i * span + 1, span, nome)).join("");
-    }
-    return `<section class="mm-col${cls}" id="mm-col-${idFaseClasse(nome)}" data-col-fase="${nome}">
-      <div class="mm-col-head">${nome}</div><div class="mm-col-grid">${cards}</div>
+
+  function numMata(id) { const m = String(id || "").match(/M(\d+)/i); return m ? parseInt(m[1], 10) : 999; }
+  function destinoVencedor(id) {
+    const alvo = "WM" + String(id || "").replace(/\D/g, "");
+    return (ESTRUT.arvore || []).find(m => m.a === alvo || m.b === alvo) || null;
+  }
+  function dataMsMata(j) {
+    const ev = eventoMataDeOuSlot(j, MATA_EVENTS);
+    const t = ev && ev.date ? new Date(ev.date).getTime() : NaN;
+    return Number.isFinite(t) ? t : 9e15 + numMata(j.id);
+  }
+  function gruposDaFaseMata(fase, jogosPorFase) {
+    if (fase === "Final") return [];
+    const jogos = (jogosPorFase[fase] || []).slice();
+    const mapa = {};
+    jogos.forEach(j => {
+      const dest = destinoVencedor(j.id);
+      const key = dest ? dest.id : ("avulso-" + j.id);
+      if (!mapa[key]) mapa[key] = { id:key, dest, jogos:[] };
+      mapa[key].jogos.push(j);
+    });
+    const grupos = Object.values(mapa);
+    grupos.forEach(g => g.jogos.sort((a,b) => dataMsMata(a) - dataMsMata(b) || numMata(a.id) - numMata(b.id)));
+    grupos.sort((a,b) => Math.min(...a.jogos.map(dataMsMata)) - Math.min(...b.jogos.map(dataMsMata)) || numMata(a.id) - numMata(b.id));
+    return grupos;
+  }
+  function destinoGrupoTexto(g, fase) {
+    if (fase === "Semis") return "🏆 Final · 🥉 3º lugar";
+    const dest = g.dest;
+    if (!dest) return "Caminho";
+    return `Vencedores → ${dest.id}`;
+  }
+  function grupoMataHTML(g, fase, idx) {
+    const jogos = g.jogos || [];
+    const titulo = fase === "Semis" ? "Semifinais" : `Caminho ${idx + 1}`;
+    return `<section class="mm-pair" data-next="${escTxt(g.id)}">
+      <div class="mm-pair-head"><span class="mm-pair-title"><b>${escTxt(titulo)}</b></span><span class="mm-next-chip">${destinoGrupoTexto(g, fase)}</span></div>
+      ${jogos.map(cardMata).join("")}
     </section>`;
   }
-  function rolarFaseMata(nome, suave) {
-    const box = document.getElementById("mm-bracket-scroll"), col = document.querySelector(`[data-col-fase="${nome}"]`);
-    if (!box || !col) return;
-    box.scrollTo({ left: Math.max(0, col.offsetLeft - 10), behavior: suave === false ? "auto" : "smooth" });
+  function faseMataHTML(fase, jogosPorFase) {
+    if (fase === "Final") {
+      const jogos = (jogosPorFase.Final || []).slice().sort((a,b) => (a.id === "M104" ? -1 : 1));
+      return `<div class="mm-fase-shell"><div class="mm-fase-head"><div class="mm-fase-title">Final</div><div class="mm-fase-sub">Final e disputa de 3º lugar ficam separadas, sem agrupamento adicional.</div></div><div class="mm-finals">${jogos.map(cardMata).join("")}</div></div>`;
+    }
+    const grupos = gruposDaFaseMata(fase, jogosPorFase);
+    const sub = fase === "Semis"
+      ? "Os vencedores das duas semifinais vão para a Final; os perdedores disputam o 3º lugar."
+      : "Cada retângulo reúne os dois jogos cujos vencedores se enfrentam na fase seguinte.";
+    return `<div class="mm-fase-shell"><div class="mm-fase-head"><div class="mm-fase-title">${fase}</div><div class="mm-fase-sub">${sub}</div></div><div class="mm-pares">${grupos.map((g,i) => grupoMataHTML(g, fase, i)).join("")}</div></div>`;
   }
 
   function pintarFaseMata() {
@@ -1248,27 +1245,24 @@
     const FASES = ["16-avos", "Oitavas", "Quartas", "Semis", "Final"];
     const pills = FASES.map(f => `<button class="mm-pill ${FASE_MATA === f ? "on" : ""}" data-fase="${f}">${f}</button>`).join("");
     const jogos = montarJogosMata(d);
-    const colunas = FASES.map(f => colunaMata(f, jogos[f] || [])).join("");
-
+    const corpo = faseMataHTML(FASE_MATA, jogos);
 
     const VIRADA_MATA = new Date("2026-06-28T02:00:00-03:00").getTime();
     const oficial = Date.now() >= VIRADA_MATA;
     let aviso;
     if (oficial) aviso = '<p class="mm-aviso">🏆 Chaveamento <b>oficial</b> do mata-mata.</p>';
     else if (d.faltaMapa) aviso = '<p class="mm-aviso">⚠️ O cruzamento exato ainda depende da definição dos grupos. Mostrando a melhor estimativa.</p>';
-    else aviso = '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — arraste para o lado para ver o caminho até a final.</p>';
+    else aviso = '<p class="mm-aviso">📊 Chaveamento <b>como está agora</b> — selecione a fase para ver o caminho dos vencedores.</p>';
 
     $("#lista").innerHTML = abasHTML() + aviso
       + `<div class="mm-pills">${pills}</div>`
-      + `<div class="mm-bracket-shell"><p class="mm-scroll-hint">👆 <b>Arraste lateralmente</b> para acompanhar o caminho até a final.</p><div class="mm-bracket-scroll" id="mm-bracket-scroll"><div class="mm-bracket">${colunas}</div></div></div>`
+      + corpo
       + (PALP.length ? `<button class="rs-toggle" id="rs-toggle">🎯 Quem acertou as seleções que avançaram ▾</button>` + rankingSelecoesHTML(d) : "");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     document.querySelectorAll(".mm-pill[data-fase]").forEach(b => b.onclick = () => {
       FASE_MATA = b.dataset.fase;
-      document.querySelectorAll(".mm-pill").forEach(x => x.classList.toggle("on", x.dataset.fase === FASE_MATA));
-      rolarFaseMata(FASE_MATA);
+      pintarFaseMata();
     });
-    setTimeout(() => rolarFaseMata(FASE_MATA, false), 40);
     const rsBtn = document.getElementById("rs-toggle");
     if (rsBtn) rsBtn.onclick = () => {
       const box = document.getElementById("rs-box"), ab = box.style.display === "none";
