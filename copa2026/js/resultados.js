@@ -1172,10 +1172,8 @@
     const data = d.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit", timeZone:"America/Sao_Paulo" });
     const estadio = getPath(ev, ["competitions",0,"venue","fullName"], "") || getPath(ev, ["competitions",0,"venue","displayName"], "") || "";
     const cidade = getPath(ev, ["competitions",0,"venue","address","city"], "") || "";
-    const linha = `<span class="mm-data">${data} · ${horaBR(ev.date)}</span>`
-      + (extra ? `<span class="mm-extra">${extra}</span>` : "")
-      + (estadio ? `<span class="mm-estadio">${escTxt(estadio)}</span>` : "")
-      + (cidade ? `<span class="mm-cidade">${escTxt(cidade)}</span>` : "");
+    const onde = [estadio, cidade].filter(Boolean).join(" · ");
+    const linha = `<span class="mm-data">${data} · ${horaBR(ev.date)}</span>${extra ? `<span class="mm-extra">${extra}</span>` : ""}${onde ? `<span class="mm-estadio">${escTxt(onde)}</span>` : ""}`;
     return { status, cls, scoreA:aScore, scoreB:bScore, vA, vB, info:linha };
   }
   function montarJogosMata(d) {
@@ -1210,32 +1208,30 @@
     const txt = textoSlot(valor || slot);
     return `<div class="mm-equipe mm-tbd"><span class="mm-slot">${escTxt(txt)}</span></div>`;
   }
-  function cardMata(j) {
+  function cardMata(j, row, span, faseNome) {
     const idA = dpSigla(j.a), idB = dpSigla(j.b);
     const ev = eventoMataDeOuSlot(j, MATA_EVENTS);
     const inf = infoJogoMata(ev, idA, idB, j);
     const especial = j.id === "M103" ? " mm-card-terceiro" : (j.id === "M104" ? " mm-card-final" : "");
-    const sufixo = j.id === "M104" ? " · Final" : (j.id === "M103" ? " · 3º lugar" : "");
-    return `<div class="mm-card${especial}" data-mm-id="${j.id}">
-      <div class="mm-card-id"><b>${j.id || "—"}${sufixo}</b><span class="mm-status-chip ${inf.cls}">${escTxt(inf.status)}</span></div>
+    return `<div class="mm-card${especial}" style="grid-row:${row} / span ${span}" data-mm-id="${j.id}">
+      <div class="mm-card-id"><b>${j.id || "—"}${j.id === "M104" ? " · Final" : (j.id === "M103" ? " · 3º lugar" : "")}</b><span class="mm-status-chip ${inf.cls}">${escTxt(inf.status)}</span></div>
       ${linhaEquipeMata(j.a, j.slotA, inf.scoreA, inf.vA, j.travA)}
       ${linhaEquipeMata(j.b, j.slotB, inf.scoreB, inf.vB, j.travB)}
       ${inf.info ? `<div class="mm-card-info">${inf.info}</div>` : ""}
     </div>`;
   }
   function colunaMata(nome, jogos) {
-    const cls = nome === "Final" ? " mm-col-final" : "";
     let cards;
+    let cls = nome === "Final" ? " mm-col-final" : "";
     if (nome === "Final") {
       // Final e disputa do 3º lugar ficam na mesma coluna, como no chaveamento oficial/BBC.
       const final = (jogos || []).find(j => j.id === "M104") || (jogos || [])[0];
       const terceiro = (jogos || []).find(j => j.id === "M103");
-      cards = [
-        final ? `<div class="mm-match mm-match-final">${cardMata(final)}</div>` : "",
-        terceiro ? `<div class="mm-match mm-match-terceiro">${cardMata(terceiro)}</div>` : ""
-      ].join("");
+      cards = [final ? cardMata(final, 3, 4, nome) : "", terceiro ? cardMata(terceiro, 11, 4, "3º lugar") : ""].join("");
     } else {
-      cards = (jogos || []).map(j => `<div class="mm-match">${cardMata(j)}</div>`).join("");
+      const n = jogos.length || 1;
+      const span = Math.max(1, Math.floor(16 / n));
+      cards = jogos.map((j, i) => cardMata(j, i * span + 1, span, nome)).join("");
     }
     return `<section class="mm-col${cls}" id="mm-col-${idFaseClasse(nome)}" data-col-fase="${nome}">
       <div class="mm-col-head">${nome}</div><div class="mm-col-grid">${cards}</div>
@@ -1245,68 +1241,6 @@
     const box = document.getElementById("mm-bracket-scroll"), col = document.querySelector(`[data-col-fase="${nome}"]`);
     if (!box || !col) return;
     box.scrollTo({ left: Math.max(0, col.offsetLeft - 10), behavior: suave === false ? "auto" : "smooth" });
-  }
-
-  // ===== Conectores do chaveamento: linha do meio de cada card afunilando para o próximo =====
-  // Desenhados em SVG medindo a posição real de cada card (robusto a qualquer tamanho/tela).
-  // Os pares saem da árvore oficial do estrutura_mata_mata.json: WMxx alimenta o jogo;
-  // LMxx (perdedores) ligam à disputa de 3º lugar, em tracejado.
-  let _mmRO = null, _mmResizeWired = false;
-  function desenharConectoresMata() {
-    const grid = document.getElementById("mm-bracket");
-    const svg = document.getElementById("mm-conn");
-    if (!grid || !svg || !ESTRUT || !ESTRUT.arvore) return;
-    const NS = "http://www.w3.org/2000/svg";
-    const w = grid.scrollWidth, h = grid.scrollHeight;
-    svg.setAttribute("width", w); svg.setAttribute("height", h);
-    svg.innerHTML = '<defs>'
-      + '<marker id="mmArr" markerWidth="7" markerHeight="7" refX="5.2" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="rgba(244,197,66,.92)"/></marker>'
-      + '<marker id="mmArrG" markerWidth="7" markerHeight="7" refX="5.2" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="rgba(170,192,224,.6)"/></marker>'
-      + '</defs>';
-    const g = grid.getBoundingClientRect();
-    const cardEls = {};
-    grid.querySelectorAll(".mm-card[data-mm-id]").forEach(c => { cardEls[c.getAttribute("data-mm-id")] = c; });
-    const ponto = (card, dir) => {
-      const r = card.getBoundingClientRect();
-      const x = (dir === "r" ? r.right : r.left) - g.left;
-      return { x: dir === "r" ? x : x - 3, y: r.top - g.top + r.height / 2 };
-    };
-    const traco = (p1, p2, ghost) => {
-      const dx = Math.max(14, (p2.x - p1.x) * 0.5);
-      const d = "M" + p1.x.toFixed(1) + "," + p1.y.toFixed(1)
-        + " C" + (p1.x + dx).toFixed(1) + "," + p1.y.toFixed(1)
-        + " " + (p2.x - dx).toFixed(1) + "," + p2.y.toFixed(1)
-        + " " + p2.x.toFixed(1) + "," + p2.y.toFixed(1);
-      const el = document.createElementNS(NS, "path");
-      el.setAttribute("d", d);
-      el.setAttribute("class", ghost ? "mm-link mm-link-ghost" : "mm-link");
-      el.setAttribute("marker-end", ghost ? "url(#mmArrG)" : "url(#mmArr)");
-      svg.appendChild(el);
-    };
-    ESTRUT.arvore.forEach(m => {
-      [m.a, m.b].forEach(lado => {
-        const mw = /^([WL])M(\d+)$/i.exec(lado || "");
-        if (!mw) return;
-        const de = cardEls["M" + mw[2]], para = cardEls[m.id];
-        if (de && para) traco(ponto(de, "r"), ponto(para, "l"), mw[1].toUpperCase() === "L");
-      });
-    });
-  }
-  function agendarConectoresMata() {
-    const grid = document.getElementById("mm-bracket");
-    if (!grid) return;
-    const run = () => requestAnimationFrame(desenharConectoresMata);
-    run(); setTimeout(run, 120); setTimeout(run, 400);
-    grid.querySelectorAll("img").forEach(im => { if (!im.complete) im.addEventListener("load", run, { once: true }); });
-    if (window.ResizeObserver) {
-      if (_mmRO) { try { _mmRO.disconnect(); } catch (e) {} }
-      _mmRO = new ResizeObserver(run);
-      _mmRO.observe(grid);
-    }
-    if (!_mmResizeWired) {
-      window.addEventListener("resize", () => { if (document.getElementById("mm-bracket")) requestAnimationFrame(desenharConectoresMata); });
-      _mmResizeWired = true;
-    }
   }
 
   function pintarFaseMata() {
@@ -1326,7 +1260,7 @@
 
     $("#lista").innerHTML = abasHTML() + aviso
       + `<div class="mm-pills">${pills}</div>`
-      + `<div class="mm-bracket-shell"><p class="mm-scroll-hint">👆 <b>Arraste lateralmente</b> para acompanhar o caminho até a final.</p><div class="mm-bracket-scroll" id="mm-bracket-scroll"><div class="mm-bracket" id="mm-bracket"><svg class="mm-conn" id="mm-conn" aria-hidden="true"></svg>${colunas}</div></div></div>`
+      + `<div class="mm-bracket-shell"><p class="mm-scroll-hint">👆 <b>Arraste lateralmente</b> para acompanhar o caminho até a final.</p><div class="mm-bracket-scroll" id="mm-bracket-scroll"><div class="mm-bracket">${colunas}</div></div></div>`
       + (PALP.length ? `<button class="rs-toggle" id="rs-toggle">🎯 Quem acertou as seleções que avançaram ▾</button>` + rankingSelecoesHTML(d) : "");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     document.querySelectorAll(".mm-pill[data-fase]").forEach(b => b.onclick = () => {
@@ -1335,7 +1269,6 @@
       rolarFaseMata(FASE_MATA);
     });
     setTimeout(() => rolarFaseMata(FASE_MATA, false), 40);
-    agendarConectoresMata();
     const rsBtn = document.getElementById("rs-toggle");
     if (rsBtn) rsBtn.onclick = () => {
       const box = document.getElementById("rs-box"), ab = box.style.display === "none";
