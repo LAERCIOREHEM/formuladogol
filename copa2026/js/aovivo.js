@@ -119,8 +119,9 @@
       iniciarContadores();
       return;
     }
+    const colapsarPalpites = lives.length > 1;
     $("#app").innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado com os palpites reais. No dia, é automático (abra sem <b>?demo=1</b>).</div>' : "")
-      + lives.map(card).join("");
+      + lives.map(ev => card(ev, colapsarPalpites)).join("");
   }
 
   function ourGame(ev) {
@@ -131,7 +132,7 @@
     return JOGOS.find(j => (j.a === h && j.b === a) || (j.a === a && j.b === h)) || null;
   }
 
-  function card(ev) {
+  function card(ev, colapsarPalpites) {
     const comp = ev.competitions[0], st = comp.status.type, cs = comp.competitors;
     const home = cs.find(c => c.homeAway === "home") || cs[0];
     const away = cs.find(c => c.homeAway === "away") || cs[1];
@@ -162,14 +163,22 @@
       const ord = { exato: 0, acertando: 1, errando: 2, vazio: 3 };
       arr.sort((x, y) => ord[x.s] - ord[y.s] || x.nome.localeCompare(y.nome));
       const n = arr.filter(x => x.s === "acertando" || x.s === "exato").length;
-      palpHTML = `<div class="contador"><b>${n}</b> de ${PART.length} acertando o resultado</div>
-        <div class="lista">${arr.map(x => {
+      const listaHTML = `<div class="lista">${arr.map(x => {
           const marca = x.s === "exato" ? '<span class="badge-ex">cravando</span>'
             : x.s === "acertando" ? '<span class="dot v"></span>'
             : x.s === "vazio" ? '<span class="dot z"></span>' : '<span class="dot x"></span>';
           return `<div class="pp ${x.s}"><span class="nm">${x.nome}</span><span class="chip">${x.txt}</span>${marca}</div>`;
         }).join("")}</div>
         <div class="legenda"><span><span class="dot v"></span> acertando</span><span><span class="badge-ex" style="animation:none">cravando</span> placar exato</span><span><span class="dot x"></span> errando</span></div>`;
+      if (colapsarPalpites) {
+        palpHTML = `<div class="contador compacto"><b>${n}</b> de ${PART.length} acertando o resultado</div>
+          <details class="palp-live-fold">
+            <summary><span class="sum-closed">Ver apostadores (${PART.length}) ▾</span><span class="sum-open">Ocultar apostadores ▲</span></summary>
+            ${listaHTML}
+          </details>`;
+      } else {
+        palpHTML = `<div class="contador"><b>${n}</b> de ${PART.length} acertando o resultado</div>${listaHTML}`;
+      }
     } else if (!j) {
       palpHTML = `<div class="obs-fase">Mata-mata: o palpite por placar vale na fase de grupos. Aqui mostramos só o jogo ao vivo.</div>`;
     }
