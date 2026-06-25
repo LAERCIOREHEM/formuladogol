@@ -470,6 +470,127 @@ def parece_transmissao_de_jogo(titulo, estado="none"):
     return any(x in t for x in termos_ok)
 
 
+def parse_iso8601_duration_seconds(valor):
+    """Converte durações ISO 8601 do YouTube (PT8M12S) para segundos.
+    Retorna None quando a duração não está disponível."""
+    if not valor:
+        return None
+    m = re.match(r"^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$", valor)
+    if not m:
+        return None
+    dias, horas, minutos, segundos = [int(x or 0) for x in m.groups()]
+    return dias * 86400 + horas * 3600 + minutos * 60 + segundos
+
+
+def tem_placar_no_titulo(titulo):
+    return bool(re.search(r"\b\d+\s*[xX]\s*\d+\b", titulo or ""))
+
+
+def chave_confronto(a, b):
+    return "-".join(sorted([a, b]))
+
+
+def mapa_jogos_espn_status():
+    """Mapeia confrontos da Copa no feed ESPN.
+
+    Uso nos melhores momentos: só publicar automaticamente quando o jogo já
+    estiver encerrado no scoreboard. Isso evita pegar live, pré-jogo, corte ou
+    vídeo errado antes de o VT/resumo oficial realmente sair.
+    """
+    ano = agora_sp().year
+    url = f"{SCOREBOARD_API}?dates={ano}0611-{ano}0719&limit=500"
+    try:
+        data = yt_get(url)
+    except Exception as e:
+        print("  ESPN scoreboard falhou para validar melhores momentos:", e)
+        return {}
+    out = {}
+    for ev in data.get("events", []) or []:
+        comps = ev.get("competitions") or []
+        if not comps:
+            continue
+        comp = comps[0]
+        cs = comp.get("competitors") or []
+        if len(cs) < 2:
+            continue
+        a = id_time_espn(cs[0])
+        b = id_time_espn(cs[1])
+        if not a or not b or a == b:
+            continue
+        chave = chave_confronto(a, b)
+        st_type = ((comp.get("status") or {}).get("type") or {})
+        out[chave] = {
+            "state": st_type.get("state") or "",
+            "completed": bool(st_type.get("completed")),
+            "detail": st_type.get("detail") or "",
+            "data": ev.get("date") or "",
+        }
+    return out
+
+
+def jogo_ja_encerrado_para_melhores(chave, status_jogos):
+    info = status_jogos.get(chave)
+    # Se o jogo está no feed, só aceita quando finalizado.
+    if info:
+        return info.get("state") == "post" or info.get("completed") is True
+    # Se não achou o jogo no feed, não derruba vídeos antigos/fora da janela,
+    # mas a validação de vídeo continua rigorosa.
+    return True
+
+
+def video_mm_valido(v, detalhe, chave, status_jogos, titulo_tem_mm, origem):
+    """Validação única para preencher melhores-momentos.json.
+
+    Regras principais:
+    - nunca aceitar live/upcoming como melhores momentos;
+    - nunca aceitar vídeo antes do jogo terminar no feed ESPN;
+    - bloquear full match, pré/pós-jogo, cortes, gols isolados e shorts;
+    - aceitar vídeo sem o rótulo 'MELHORES MOMENTOS' só se estiver na playlist
+      oficial ou se tiver placar no título + duração curta típica de resumo.
+    """
+    titulo = (detalhe or {}).get("titulo") or v.get("titulo", "")
+    estado = ((detalhe or {}).get("estado") or "none").lower()
+    canal = (detalhe or {}).get("channelId") or ""
+    dur = (detalhe or {}).get("duration_seconds")
+
+    if estado in ("live", "upcoming"):
+        print(f"  rejeitei MM ainda live/upcoming: {chave} -> {titulo[:70]}")
+        return False
+    if canal and canal != CAZE_CHANNEL_ID:
+        print(f"  rejeitei MM fora do canal CazéTV: {chave} -> {titulo[:70]}")
+        return False
+    if not jogo_ja_encerrado_para_melhores(chave, status_jogos):
+        print(f"  rejeitei MM antes do jogo encerrar: {chave} -> {titulo[:70]}")
+        return False
+
+    # Shorts/clipes muito curtos e jogo completo/replay longo não entram.
+    if dur is not None:
+        if dur < 45:
+            print(f"  rejeitei MM curto demais/short: {chave} -> {titulo[:70]} ({dur}s)")
+            return False
+        if dur > 30 * 60:
+            print(f"  rejeitei MM longo demais/full match: {chave} -> {titulo[:70]} ({dur}s)")
+            return False
+
+    if titulo_tem_mm:
+        return True
+
+    # Sem o rótulo, só aceita se NÃO parecer live/corte e tiver estrutura forte
+    # de confronto com placar. Isso cobre o caso do estagiário que pôs o vídeo
+    # na playlist, mas esqueceu de escrever 'MELHORES MOMENTOS'.
+    if titulo_ruim_para_fallback_generico(titulo):
+        return False
+    if not tem_placar_no_titulo(titulo):
+        return False
+    if dur is None:
+        return False
+
+    # Fora da playlist oficial, seja ainda mais conservador.
+    if origem != "playlist" and dur > 20 * 60:
+        return False
+    return True
+
+
 def detalhes_videos(api_key, video_ids):
     """Retorna detalhes básicos de vídeos pelo videos.list."""
     out = {}
@@ -477,7 +598,7 @@ def detalhes_videos(api_key, video_ids):
     video_ids = [v for v in dict.fromkeys(video_ids) if v]
     for i in range(0, len(video_ids), 50):
         lote = video_ids[i:i + 50]
-        params = {"part": "snippet,liveStreamingDetails", "id": ",".join(lote), "key": api_key}
+        params = {"part": "snippet,liveStreamingDetails,contentDetails", "id": ",".join(lote), "key": api_key}
         try:
             data = yt_get(base + "?" + urllib.parse.urlencode(params))
         except Exception as e:
@@ -490,6 +611,9 @@ def detalhes_videos(api_key, video_ids):
                 "videoId": it["id"],
                 "titulo": sn.get("title", ""),
                 "estado": sn.get("liveBroadcastContent", "none") or "none",
+                "channelId": sn.get("channelId", ""),
+                "duration": ((it.get("contentDetails") or {}).get("duration") or ""),
+                "duration_seconds": parse_iso8601_duration_seconds(((it.get("contentDetails") or {}).get("duration") or "")),
                 "scheduledStartTime": live.get("scheduledStartTime"),
                 "actualStartTime": live.get("actualStartTime"),
                 "actualEndTime": live.get("actualEndTime"),
@@ -964,14 +1088,22 @@ def main():
         print("ERRO: defina a variável CAZE_PLAYLIST_ID com o ID da playlist de melhores momentos da CazéTV.")
         sys.exit(1)
 
-    # carrega o arquivo atual (preserva correções 'admin')
+    # carrega o arquivo atual; preserva somente correções manuais admin.
+    # Entradas auto são reconstruídas a cada execução com validação rigorosa,
+    # para remover links errados que tenham sido capturados por fallback antigo.
     try:
         atual = json.load(open(SAIDA, encoding="utf-8"))
     except Exception:
         atual = {"_comentario": "", "jogos": {}}
-    jogos = atual.get("jogos", {})
+    antigos = atual.get("jogos", {}) or {}
+    jogos = {k: v for k, v in antigos.items() if (v or {}).get("fonte") == "admin"}
+    removidos_auto = len([1 for v in antigos.values() if (v or {}).get("fonte") == "auto"])
+    if removidos_auto:
+        print(f"Revalidando/remontando {removidos_auto} registros automáticos de melhores momentos.")
 
-    # lê a playlist
+    status_jogos = mapa_jogos_espn_status()
+
+    # lê a playlist oficial
     try:
         videos = listar_playlist(PLAYLIST_ID, API_KEY)
     except Exception as e:
@@ -979,48 +1111,58 @@ def main():
         sys.exit(1)
     print(f"Vídeos na playlist: {len(videos)}")
 
+    # Detalhes dos vídeos da playlist: status live/upcoming, canal e duração.
+    detalhes_playlist = detalhes_videos(API_KEY, [v["videoId"] for v in videos])
+
     novos, ignorados = 0, 0
+    validos_auto = set()
+
+    def registrar(chave, v, detalhe, titulo_tem_mm, origem):
+        nonlocal novos
+        if jogos.get(chave, {}).get("fonte") == "admin":
+            return False
+        if not video_mm_valido(v, detalhe, chave, status_jogos, titulo_tem_mm, origem):
+            return False
+        titulo_final = ((detalhe or {}).get("titulo") or v.get("titulo", "")).split("|")[0].strip()
+        jogos[chave] = {
+            "url": "https://youtu.be/" + v["videoId"],
+            "titulo": titulo_final,
+            "fonte": "auto",
+            "origem": origem,
+            "validado_mm": True,
+            "atualizado_em": agora_sp().isoformat(timespec="seconds"),
+        }
+        validos_auto.add(chave)
+        novos += 1
+        print(f"  + ({origem}) {chave}: {titulo_final[:70]}")
+        return True
 
     # --- ETAPA 1: playlist oficial da CazéTV ---
-    # Regra nova: se o vídeo está NA PLAYLIST oficial, ele é fortíssimo sinal de que é destaque.
-    # Então tentamos casar o confronto mesmo quando o estagiário esqueceu de escrever
-    # "MELHORES MOMENTOS" no título (caso Jordânia x Argélia).
+    # Continua sendo a fonte prioritária. Mas agora só aceita vídeo finalizado,
+    # curto/típico de resumo e com jogo já encerrado no feed ESPN.
     for v in videos:
-        titulo_tem_mm = tem_melhores_momentos_no_titulo(v["titulo"])
+        titulo = v.get("titulo", "")
+        titulo_tem_mm = tem_melhores_momentos_no_titulo(titulo)
+        detalhe = detalhes_playlist.get(v["videoId"], {})
+        titulo_parse = detalhe.get("titulo") or titulo
         if titulo_tem_mm:
-            a, b = parse_titulo(v["titulo"])
-            # tolerância: se tiver "melhores momentos" mas sem placar no título, ainda tenta TIME X TIME.
+            a, b = parse_titulo(titulo_parse)
             if not a or not b:
-                a, b = parse_confronto_generico(v["titulo"])
+                a, b = parse_confronto_generico(titulo_parse)
         else:
-            # Mesmo dentro da playlist, não usa como melhores momentos se for claramente live,
-            # jogo completo, corte, gol isolado etc.
-            if titulo_ruim_para_fallback_generico(v["titulo"]):
+            if titulo_ruim_para_fallback_generico(titulo_parse):
                 a, b = None, None
             else:
-                a, b = parse_confronto_generico(v["titulo"])
+                a, b = parse_confronto_generico(titulo_parse)
 
         if not a or not b:
             ignorados += 1
-            print("  não casei:", v["titulo"][:70])
+            print("  não casei:", titulo[:70])
             continue
-        chave = "-".join(sorted([a, b]))
-        # respeita correção manual
-        if jogos.get(chave, {}).get("fonte") == "admin":
-            continue
-        jogos[chave] = {
-            "url": "https://youtu.be/" + v["videoId"],
-            "titulo": v["titulo"].split("|")[0].strip(),
-            "fonte": "auto"
-        }
-        novos += 1
-        if not titulo_tem_mm:
-            print(f"  + (playlist/confronto sem rótulo) {chave}: {v['titulo'][:60]}")
+        chave = chave_confronto(a, b)
+        registrar(chave, v, detalhe, titulo_tem_mm, "playlist")
 
-    # --- ETAPA 2: lê os UPLOADS RECENTES do canal da Cazé (determinístico) ---
-    # A Cazé às vezes não adiciona o vídeo na playlist de melhores momentos (ex.: EUA x Austrália,
-    # Tunísia x Japão). Em vez da busca textual (que falha), lemos os uploads recentes do canal
-    # direto da playlist de uploads — pega TODO vídeo novo, inclusive os que faltaram na playlist.
+    # --- ETAPA 2: uploads recentes do canal da CazéTV ---
     print("Lendo uploads recentes do canal da CazéTV (fallback determinístico)...")
     vistos = set(v["videoId"] for v in videos)
     extra = []
@@ -1029,57 +1171,46 @@ def main():
             vistos.add(v["videoId"])
             extra.append(v)
     print(f"  uploads recentes lidos (novos): {len(extra)}")
+    detalhes_extra = detalhes_videos(API_KEY, [v["videoId"] for v in extra])
 
-    # ETAPA 2A: fallback antigo e seguro — só vídeos com "MELHORES MOMENTOS" no título.
+    # ETAPA 2A: vídeos com 'MELHORES MOMENTOS' no título.
     for v in extra:
-        if not tem_melhores_momentos_no_titulo(v["titulo"]):
+        titulo = (detalhes_extra.get(v["videoId"], {}) or {}).get("titulo") or v.get("titulo", "")
+        if not tem_melhores_momentos_no_titulo(titulo):
             continue
-        a, b = parse_titulo(v["titulo"])
+        a, b = parse_titulo(titulo)
         if not a or not b:
-            a, b = parse_confronto_generico(v["titulo"])
+            a, b = parse_confronto_generico(titulo)
         if not a or not b:
             continue
-        chave = "-".join(sorted([a, b]))
-        if jogos.get(chave, {}).get("fonte") == "admin":
+        chave = chave_confronto(a, b)
+        # não sobrescreve auto já validado pela playlist
+        if chave in validos_auto:
             continue
-        # só preenche se ainda não tiver (não sobrescreve auto já existente da playlist)
-        if chave in jogos and jogos[chave].get("fonte") == "auto":
-            continue
-        jogos[chave] = {
-            "url": "https://youtu.be/" + v["videoId"],
-            "titulo": v["titulo"].split("|")[0].strip(),
-            "fonte": "auto"
-        }
-        novos += 1
-        print(f"  + (uploads/melhores momentos) {chave}: {v['titulo'][:55]}")
+        registrar(chave, v, detalhes_extra.get(v["videoId"], {}), True, "uploads-melhores-momentos")
 
-    # ETAPA 2B: fallback novo — seleção x seleção NO CANAL DA CAZÉTV, sem depender do rótulo.
-    # Aqui somos mais conservadores: não pegamos live, jogo completo, corte, gol isolado etc.
-    # Só entra se ainda não existir registro do confronto.
+    # ETAPA 2B: fallback sem rótulo, agora MUITO mais conservador.
+    # Só aceita se for vídeo curto, com placar no título, jogo já encerrado e
+    # sem cara de live/corte. Isso evita aparecer 'melhores momentos' antes de sair.
     for v in extra:
-        if tem_melhores_momentos_no_titulo(v["titulo"]):
+        titulo = (detalhes_extra.get(v["videoId"], {}) or {}).get("titulo") or v.get("titulo", "")
+        if tem_melhores_momentos_no_titulo(titulo):
             continue
-        if titulo_ruim_para_fallback_generico(v["titulo"]):
+        if titulo_ruim_para_fallback_generico(titulo):
             continue
-        a, b = parse_confronto_generico(v["titulo"])
+        if not tem_placar_no_titulo(titulo):
+            continue
+        a, b = parse_confronto_generico(titulo)
         if not a or not b:
             continue
-        chave = "-".join(sorted([a, b]))
-        if jogos.get(chave, {}).get("fonte") == "admin":
+        chave = chave_confronto(a, b)
+        if chave in validos_auto:
             continue
-        if chave in jogos and jogos[chave].get("fonte") == "auto":
-            continue
-        jogos[chave] = {
-            "url": "https://youtu.be/" + v["videoId"],
-            "titulo": v["titulo"].split("|")[0].strip(),
-            "fonte": "auto"
-        }
-        novos += 1
-        print(f"  + (uploads/confronto Cazé sem rótulo) {chave}: {v['titulo'][:55]}")
+        registrar(chave, v, detalhes_extra.get(v["videoId"], {}), False, "uploads-confronto-validado")
 
     atual["jogos"] = jogos
     json.dump(atual, open(SAIDA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
-    print(f"OK. Preenchidos/atualizados (auto): {novos}. Títulos não reconhecidos: {ignorados}. Total no arquivo: {len(jogos)}.")
+    print(f"OK. Melhores momentos automáticos válidos: {len(validos_auto)}. Títulos não reconhecidos: {ignorados}. Total no arquivo: {len(jogos)}.")
 
     # --- ETAPA 3: lives da Cazé (agendadas + ao vivo) coladas em cada jogo ---
     print("\nAtualizando lives da CazéTV...")
