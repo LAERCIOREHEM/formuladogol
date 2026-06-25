@@ -12,6 +12,7 @@ Observações:
 - Artilharia: extraída primeiro de scoringPlays; se não existir, tenta commentary.
 - Assistências: extraídas quando a ESPN disponibilizar no summary/texto do lance.
 - Cartões: extraídos do commentary quando houver nome do jogador.
+- Gols por seleção: consolidados pelo placar oficial dos jogos processados, incluindo gols contra.
 - O script é defensivo: se a ESPN oscilar, preserva o arquivo atual em vez de zerar.
 """
 import json
@@ -158,6 +159,34 @@ def team_from_obj(obj):
         if s:
             return s
     return None
+
+
+def score_int(v):
+    try:
+        if v is None or v == "":
+            return 0
+        return int(float(str(v).replace(",", ".")))
+    except Exception:
+        return 0
+
+
+def team_from_competitor(comp):
+    if not isinstance(comp, dict):
+        return None
+    candidates = [
+        get_path(comp, "team", "abbreviation"),
+        get_path(comp, "team", "shortDisplayName"),
+        get_path(comp, "team", "displayName"),
+        comp.get("abbreviation"),
+        comp.get("teamAbbreviation"),
+        comp.get("displayName"),
+        comp.get("name"),
+    ]
+    for c in candidates:
+        s = sigla(c)
+        if s:
+            return s
+    return team_from_obj(comp)
 
 
 def player_name_from_athlete(a):
@@ -402,6 +431,27 @@ def coletar():
         if status in ("post", "in"):
             processaveis.append(ev)
 
+    # Ranking de gols por seleção: usa o placar oficial/momentâneo do jogo,
+    # portanto inclui gol contra para a seleção beneficiada e evita depender
+    # somente da atribuição individual do artilheiro.
+    por_sel_placar = {}
+    for ev in processaveis:
+        comp = get_path(ev, "competitions", 0, default={}) or {}
+        for c in comp.get("competitors") or []:
+            equipe = team_from_competitor(c)
+            if not equipe:
+                continue
+            r = por_sel_placar.setdefault(equipe, {
+                "equipe": equipe,
+                "gols": 0,
+                "assistencias": 0,
+                "amarelos": 0,
+                "vermelhos": 0,
+                "jogos": 0,
+            })
+            r["gols"] += score_int(c.get("score"))
+            r["jogos"] += 1
+
     agg = {}
     falhas = []
     for ev in processaveis:
@@ -437,20 +487,24 @@ def coletar():
         key=lambda x: (-x.get("vermelhos", 0), -x.get("amarelos", 0), x.get("nome", ""), x.get("equipe", ""))
     )
 
-    # Consolida por seleção para cards-resumo/uso futuro.
-    por_sel = {}
+    # Consolida por seleção. Os gols vêm do placar oficial/momentâneo, e não
+    # apenas da soma dos artilheiros, para incluir gols contra corretamente.
+    por_sel = por_sel_placar
     for x in jogadores:
         e = x.get("equipe") or ""
         if not e:
             continue
-        r = por_sel.setdefault(e, {"equipe": e, "gols": 0, "assistencias": 0, "amarelos": 0, "vermelhos": 0})
-        r["gols"] += x.get("gols", 0)
+        r = por_sel.setdefault(e, {"equipe": e, "gols": 0, "assistencias": 0, "amarelos": 0, "vermelhos": 0, "jogos": 0})
         r["assistencias"] += x.get("assistencias", 0)
         r["amarelos"] += x.get("amarelos", 0)
         r["vermelhos"] += x.get("vermelhos", 0)
 
+    for r in por_sel.values():
+        jogos = r.get("jogos", 0) or 0
+        r["media_gols"] = round((r.get("gols", 0) / jogos), 2) if jogos else 0
+
     return {
-        "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências dependem de disponibilidade no summary/comentário da ESPN.",
+        "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências dependem de disponibilidade no summary/comentário da ESPN. Gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
         "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
         "atualizado_em": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "periodo": DATES,
@@ -460,7 +514,7 @@ def coletar():
         "artilheiros": artilheiros,
         "assistencias": assistencias,
         "cartoes": cartoes,
-        "por_selecao": sorted(por_sel.values(), key=lambda x: x["equipe"]),
+        "por_selecao": sorted(por_sel.values(), key=lambda x: (-x.get("gols", 0), -x.get("media_gols", 0), x.get("equipe", ""))),
     }
 
 
