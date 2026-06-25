@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências dependem de disponibilidade no summary/comentário da ESPN. Gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-06-25T23:20:34.003836Z",
+  "atualizado_em": "2026-06-25T23:30:36.476734Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 56,
+  "jogos_processados": 58,
   "falhas_summary": [],
   "artilheiros": [
     {
@@ -57,6 +57,19 @@
         "760419",
         "760444",
         "760465"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Brian Brobbey",
+      "equipe": "NED",
+      "gols": 3,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447",
+        "760472"
       ],
       "total_cartoes": 0
     },
@@ -136,18 +149,6 @@
       "vermelhos": 0,
       "jogos": [
         "760449"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Brian Brobbey",
-      "equipe": "NED",
-      "gols": 2,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760447"
       ],
       "total_cartoes": 0
     },
@@ -1351,11 +1352,12 @@
       "nome": "Virgil van Dijk",
       "equipe": "NED",
       "gols": 1,
-      "assistencias": 0,
+      "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
-        "760425"
+        "760425",
+        "760472"
       ],
       "total_cartoes": 0
     },
@@ -1657,6 +1659,19 @@
       "vermelhos": 0,
       "jogos": [
         "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Donyell Malen",
+      "equipe": "NED",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760447",
+        "760472"
       ],
       "total_cartoes": 0
     },
@@ -2226,18 +2241,6 @@
       "vermelhos": 0,
       "jogos": [
         "760462"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Donyell Malen",
-      "equipe": "NED",
-      "gols": 0,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760447"
       ],
       "total_cartoes": 0
     },
@@ -3562,6 +3565,19 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Virgil van Dijk",
+      "equipe": "NED",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760425",
+        "760472"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Weston McKennie",
       "equipe": "USA",
       "gols": 0,
@@ -3594,6 +3610,18 @@
       "vermelhos": 0,
       "jogos": [
         "760431"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Yan Valery",
+      "equipe": "TUN",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760472"
       ],
       "total_cartoes": 0
     },
@@ -5283,6 +5311,15 @@
       "media_gols": 3.33
     },
     {
+      "equipe": "NED",
+      "gols": 9,
+      "assistencias": 12,
+      "amarelos": 3,
+      "vermelhos": 0,
+      "jogos": 3,
+      "media_gols": 3.0
+    },
+    {
       "equipe": "CAN",
       "gols": 8,
       "assistencias": 9,
@@ -5290,15 +5327,6 @@
       "vermelhos": 0,
       "jogos": 3,
       "media_gols": 2.67
-    },
-    {
-      "equipe": "NED",
-      "gols": 7,
-      "assistencias": 10,
-      "amarelos": 3,
-      "vermelhos": 0,
-      "jogos": 2,
-      "media_gols": 3.5
     },
     {
       "equipe": "NOR",
@@ -5337,28 +5365,10 @@
       "media_gols": 3.0
     },
     {
-      "equipe": "JPN",
-      "gols": 6,
-      "assistencias": 7,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": 2,
-      "media_gols": 3.0
-    },
-    {
       "equipe": "POR",
       "gols": 6,
       "assistencias": 4,
       "amarelos": 4,
-      "vermelhos": 0,
-      "jogos": 2,
-      "media_gols": 3.0
-    },
-    {
-      "equipe": "SWE",
-      "gols": 6,
-      "assistencias": 6,
-      "amarelos": 3,
       "vermelhos": 0,
       "jogos": 2,
       "media_gols": 3.0
@@ -5371,6 +5381,15 @@
       "vermelhos": 0,
       "jogos": 2,
       "media_gols": 3.0
+    },
+    {
+      "equipe": "JPN",
+      "gols": 6,
+      "assistencias": 7,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": 3,
+      "media_gols": 2.0
     },
     {
       "equipe": "MAR",
@@ -5387,6 +5406,15 @@
       "assistencias": 8,
       "amarelos": 2,
       "vermelhos": 1,
+      "jogos": 3,
+      "media_gols": 2.0
+    },
+    {
+      "equipe": "SWE",
+      "gols": 6,
+      "assistencias": 6,
+      "amarelos": 3,
+      "vermelhos": 0,
       "jogos": 3,
       "media_gols": 2.0
     },
@@ -5652,15 +5680,6 @@
       "media_gols": 0.5
     },
     {
-      "equipe": "TUN",
-      "gols": 1,
-      "assistencias": 1,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": 2,
-      "media_gols": 0.5
-    },
-    {
       "equipe": "UZB",
       "gols": 1,
       "assistencias": 1,
@@ -5683,6 +5702,15 @@
       "gols": 1,
       "assistencias": 3,
       "amarelos": 5,
+      "vermelhos": 0,
+      "jogos": 3,
+      "media_gols": 0.33
+    },
+    {
+      "equipe": "TUN",
+      "gols": 1,
+      "assistencias": 2,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": 3,
       "media_gols": 0.33
