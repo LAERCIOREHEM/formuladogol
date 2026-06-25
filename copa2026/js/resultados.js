@@ -632,9 +632,8 @@
     }
     const evs = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
     JOGOS_DIA_EVENTS = evs;
-    const retornoHTML = retornoGrupoHTML();
-    if (!evs.length) { $("#lista").innerHTML = abasHTML() + retornoHTML + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); bindRetornoGrupo(); return; }
-    $("#lista").innerHTML = abasHTML() + retornoHTML + evs.map(card).join("");
+    if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); bindRetornoGrupo(); return; }
+    $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     bindRetornoGrupo();
     document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
@@ -1506,6 +1505,9 @@
     const slug = (ev.season && ev.season.slug) || "";
     const fase = faseLabel(slug);
     const venue = comp.venue ? (comp.venue.fullName + (comp.venue.address && comp.venue.address.city ? " · " + comp.venue.address.city : "")) : "";
+    const retornoCard = (RETORNO_GRUPO && String(RETORNO_GRUPO.jogo) === String(ev.id))
+      ? retornoGrupoHTML()
+      : "";
 
     let meio, badge;
     if (st.state === "pre") {
@@ -1527,6 +1529,7 @@
       if (gJogo) grupoTag = `<button class="grupo-link" data-grupo="${gJogo}" data-jogo="${ev.id}">Grupo ${gJogo} ›</button>`;
     }
     return `<div class="jogo" id="jogo-${ev.id}">
+      ${retornoCard}
       <div class="topo"><span class="fase">${fase}</span>${grupoTag}${badge}</div>
       <div class="linha">
         <div class="lado ${vencH}">${escudo(home)}<span class="t">${teamNome(home)}</span></div>
