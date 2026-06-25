@@ -1,0 +1,358 @@
+/* Bolão Copa 2026 — estilo wallchart esportivo (navy + dourado), mobile-first */
+:root{
+  --navy:#0b1f3a;
+  --navy-2:#13294b;
+  --navy-3:#1c3a63;
+  --gold:#f4c542;
+  --gold-2:#e0a82e;
+  --verde:#1db954;
+  --vermelho:#e0473e;
+  --branco:#f7f8fb;
+  --cinza:#9fb0c7;
+  --linha:rgba(255,255,255,.10);
+  --raio:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Archivo',system-ui,sans-serif;
+  background:
+    radial-gradient(1200px 500px at 80% -10%, rgba(244,197,66,.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(29,185,84,.08), transparent 55%),
+    var(--navy);
+  color:var(--branco);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+#app{max-width:560px;margin:0 auto;padding:16px 12px 60px}
+.oculto{display:none !important}
+
+/* TOPO */
+.topo{display:flex;align-items:center;justify-content:space-between;
+  padding:18px 4px 14px;border-bottom:1px solid var(--linha)}
+.topo-marca{display:flex;align-items:center;gap:12px}
+.trofeu{font-size:30px;color:var(--gold);line-height:1;filter:drop-shadow(0 2px 6px rgba(244,197,66,.4))}
+.topo h1{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.5px;font-weight:400;line-height:.95}
+.topo h1 b{color:var(--gold)}
+.sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--cinza);margin-top:2px}
+.topo-usuario{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+.btn-mini{background:transparent;border:1px solid var(--linha);color:var(--cinza);
+  padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px}
+.btn-mini:hover{color:var(--branco);border-color:var(--cinza)}
+
+/* TELAS */
+.tela{padding-top:18px}
+h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:.5px;margin-bottom:14px}
+
+/* LOGIN */
+.cartao-login{background:var(--navy-2);border:1px solid var(--linha);border-radius:var(--raio);
+  padding:24px;margin-top:30px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.cartao-login h2{margin-bottom:8px}
+.prazo{color:var(--cinza);font-size:14px;line-height:1.5;margin-bottom:18px}
+.prazo b{color:var(--gold)}
+.cartao-login label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--cinza);margin:14px 0 6px}
+.cartao-login input{width:100%;background:var(--navy);border:1px solid var(--linha);
+  color:var(--branco);padding:13px 14px;border-radius:10px;font-size:16px;font-family:inherit}
+.cartao-login input:focus{outline:none;border-color:var(--gold)}
+#in-pin{letter-spacing:8px;text-align:center;font-weight:700}
+.btn-primario{width:100%;margin-top:18px;background:var(--gold);color:#3a2a00;border:none;
+  padding:14px;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer;font-family:inherit;
+  transition:transform .08s,box-shadow .2s}
+.btn-primario:hover{box-shadow:0 8px 24px rgba(244,197,66,.35)}
+.btn-primario:active{transform:translateY(1px)}
+.aviso-pin{margin-top:14px;font-size:12px;color:var(--cinza);text-align:center}
+.erro{margin-top:12px;color:var(--vermelho);font-size:14px;font-weight:600;text-align:center}
+
+/* ABAS */
+.abas{display:flex;gap:6px;margin-top:16px;background:var(--navy-2);border:1px solid var(--linha);
+  border-radius:12px;padding:5px}
+.aba{flex:1;background:transparent;border:none;color:var(--cinza);padding:11px;border-radius:8px;
+  font-family:inherit;font-weight:600;font-size:14px;cursor:pointer}
+.aba.ativa{background:var(--gold);color:#3a2a00}
+
+/* PROGRESSO */
+.progresso-geral{margin:18px 0 10px}
+.barra{height:9px;background:var(--navy-3);border-radius:99px;overflow:hidden}
+.barra-fill{height:100%;width:0;background:linear-gradient(90deg,var(--verde),var(--gold));
+  border-radius:99px;transition:width .3s}
+#progresso-texto{font-size:13px;color:var(--cinza);margin-top:7px}
+.salvo{font-size:12px;color:var(--verde);margin-top:2px;min-height:16px}
+
+/* ETAPAS */
+.etapas{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 18px}
+.etapa{font-size:12px;font-weight:600;padding:7px 11px;border-radius:99px;border:1px solid var(--linha);
+  color:var(--cinza);cursor:pointer;white-space:nowrap}
+.etapa.ok{color:var(--verde);border-color:rgba(29,185,84,.4)}
+.etapa.atual{background:var(--navy-3);color:var(--branco);border-color:var(--gold)}
+.etapa.travada{opacity:.45;cursor:not-allowed}
+
+/* CARDS DE GRUPO */
+.grid-grupos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.card-grupo{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:14px;cursor:pointer;
+  transition:border-color .2s,transform .08s}
+.card-grupo:hover{border-color:var(--gold)}
+.card-grupo:active{transform:scale(.99)}
+.card-grupo h3{font-family:'Anton',sans-serif;font-weight:400;font-size:20px}
+.card-grupo .estado{font-size:12px;color:var(--cinza);margin-top:4px}
+.card-grupo.completo{border-color:rgba(29,185,84,.5)}
+.card-grupo.completo .estado{color:var(--verde)}
+
+/* JOGO */
+.lista-jogos{display:flex;flex-direction:column;gap:10px}
+.jogo{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
+  background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:12px}
+.jogo .time{font-weight:600;font-size:15px;display:flex;align-items:center;gap:9px;min-width:0}
+.jogo .time.dir{justify-content:flex-end;text-align:right}
+.jogo .time>div{min-width:0}
+/* BANDEIRAS (imagens flagcdn; emoji de bandeira não renderiza no Windows) */
+.flag{width:26px;height:auto;border-radius:3px;flex:0 0 auto;
+  box-shadow:0 0 0 1px rgba(255,255,255,.14);display:inline-block}
+.classif .flag,.vencedor .flag,.revisao .flag{width:18px;vertical-align:middle;margin-right:3px}
+.jogo .sigla{font-size:11px;color:var(--cinza);letter-spacing:1px}
+.placar{display:flex;align-items:center;gap:6px}
+.placar input{width:46px;height:46px;text-align:center;font-size:20px;font-weight:700;
+  background:var(--navy);border:1px solid var(--linha);color:var(--branco);border-radius:10px;font-family:inherit}
+.placar input:focus{outline:none;border-color:var(--gold)}
+.placar .x{color:var(--cinza);font-weight:700}
+.vencedor{font-size:11px;color:var(--gold);text-align:center;margin-top:4px;font-weight:700;min-height:14px}
+
+/* CLASSIFICAÇÃO */
+.classif{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:14px;margin-top:14px}
+.classif h4{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);margin-bottom:10px}
+.classif ol{list-style:none;counter-reset:pos}
+.classif li{counter-increment:pos;display:flex;justify-content:space-between;padding:7px 0;
+  border-bottom:1px solid var(--linha);font-size:14px}
+.classif li:last-child{border:none}
+.classif li::before{content:counter(pos)"º";color:var(--gold);font-weight:700;margin-right:10px;width:26px;display:inline-block}
+.classif li.passa span:first-child::after{content:" ✓";color:var(--verde)}
+
+/* BOTÕES DE NAVEGAÇÃO */
+.acoes{display:flex;gap:10px;margin-top:18px}
+.acoes .btn-primario{margin-top:0}
+.btn-sec{flex:1;background:var(--navy-3);color:var(--branco);border:1px solid var(--linha);
+  padding:14px;border-radius:10px;font-weight:600;cursor:pointer;font-family:inherit;font-size:15px}
+.btn-sec:hover{border-color:var(--gold)}
+.titulo-fase{font-family:'Anton',sans-serif;font-weight:400;font-size:22px;margin:6px 0 14px}
+
+/* PAINEL CANÔNICO (seleções que avançam — fiel ao palpite auditado) */
+.canon-fase{background:rgba(244,197,66,.07);border:1px solid var(--gold-2,rgba(244,197,66,.35));border-radius:12px;padding:14px 16px;margin:0 0 16px}
+.canon-fase .cn-tit{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px}
+.canon-fase .cn-chips{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.canon-fase .cn-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.22);border:1px solid var(--linha);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--branco);line-height:1.2;max-width:100%}
+.canon-fase .cn-chip img,.canon-fase .cn-chip .flag{width:18px;height:auto;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}
+.canon-fase .cn-chip span{white-space:normal}
+.canon-fase .cn-nota{margin-top:10px;font-size:11.5px;color:var(--cinza);line-height:1.55}
+.canon-fase .cn-nota b{color:var(--branco)}
+
+/* REVISÃO */
+.revisao{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:18px;margin-top:8px}
+.revisao .linha{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--linha);font-size:15px}
+.revisao .linha b{color:var(--gold)}
+.pontos-box{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.pt{background:var(--navy-3);border:1px solid var(--linha);border-radius:12px;padding:14px;text-align:center}
+.pt .n{font-family:'Anton',sans-serif;font-size:28px;color:var(--gold)}
+.pt .l{font-size:11px;color:var(--cinza);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+
+/* AVISO ANEXO C */
+.aviso-anexo{background:rgba(224,71,62,.12);border:1px solid rgba(224,71,62,.4);
+  border-radius:12px;padding:14px;margin-top:14px;font-size:14px;line-height:1.5}
+.aviso-anexo b{color:var(--gold)}
+
+/* PLACEHOLDER */
+.placeholder{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:20px;
+  color:var(--cinza);font-size:14px;line-height:1.6}
+.placeholder code{background:var(--navy);padding:2px 6px;border-radius:5px;color:var(--gold);font-size:13px}
+
+/* POPUP */
+.popup{position:fixed;inset:0;background:rgba(5,12,24,.7);display:flex;align-items:center;
+  justify-content:center;padding:20px;z-index:50}
+.popup-caixa{background:var(--navy-2);border:1px solid var(--gold);border-radius:14px;padding:24px;
+  max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.popup-caixa p{font-size:15px;line-height:1.5;margin-bottom:16px}
+
+@media(max-width:420px){
+  .grid-grupos{grid-template-columns:1fr}
+  .placar input{width:42px;height:42px;font-size:18px}
+}
+
+/* ---- Ajustes UX: rótulos da final, ranking por % ---- */
+.rotulo-jogo{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.5px;font-size:13px;
+  text-transform:uppercase;color:var(--gold);margin:16px 2px 6px}
+.lista-jogos .rotulo-jogo:first-child{margin-top:4px}
+
+.rank-pct{margin-top:4px}
+.rank-linha{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--linha)}
+.rank-linha:last-child{border-bottom:none}
+.rank-nome{flex:0 0 32%;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-barra{flex:1;height:10px;background:var(--navy);border:1px solid var(--linha);border-radius:99px;overflow:hidden}
+.rank-fill{display:block;height:100%;width:0;background:var(--gold);border-radius:99px;transition:width .35s ease}
+.rank-num{flex:0 0 46px;text-align:right;font-family:'Anton',sans-serif;font-size:16px;color:var(--branco)}
+.rank-linha.completo .rank-fill{background:var(--verde)}
+.rank-linha.completo .rank-num{color:var(--verde)}
+
+/* ---- Empate inválido no mata-mata ---- */
+.jogo.empate{border-color:var(--vermelho);box-shadow:0 0 0 1px var(--vermelho) inset}
+.vencedor.erro{color:var(--vermelho);font-weight:600}
+.aviso-anexo.erro-box{border-color:var(--vermelho);color:var(--vermelho)}
+
+/* Botão de avançar desabilitado (fase com empate/pendência) */
+.btn-primario.desabilitado, .btn-primario:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.35)}
+
+/* ===== MENU UNIFICADO (todas as páginas) ===== */
+.menu{display:flex;gap:6px;margin-top:14px;background:var(--navy-2);border:1px solid var(--linha);
+  border-radius:12px;padding:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  position:sticky;top:8px;z-index:60;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.menu::-webkit-scrollbar{display:none}
+.menu a{flex:1 0 auto;text-align:center;white-space:nowrap;color:var(--cinza);text-decoration:none;
+  font-weight:600;font-size:14px;padding:10px 14px;border-radius:8px;transition:background .15s,color .15s}
+.menu a:hover{color:var(--branco)}
+.menu a.ativo{background:var(--gold);color:#3a2a00}
+
+/* ===== RODAPÉ APARTADO (regras/admin/brasileirão) ===== */
+.rodape{max-width:760px;margin:30px auto 0;padding:16px 14px 34px;border-top:1px solid var(--linha);
+  display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;align-items:center}
+.rodape a{color:var(--cinza);text-decoration:none;font-size:13px}
+.rodape a:hover{color:var(--branco)}
+.rodape a.adm{opacity:.65}
+.rodape .sep{color:var(--linha);font-size:13px}
+
+
+/* ===== PALPITE FINALIZADO (lacre individual) ===== */
+.lacrado .placar input{pointer-events:none;opacity:.7;border-color:transparent}
+.banner-lacre{background:rgba(244,197,66,.10);border:1px solid var(--gold-2);border-radius:12px;
+  padding:11px 13px;margin:12px 0;font-size:13px;line-height:1.55;color:#f3dea6}
+.banner-lacre b{color:var(--gold)}
+
+
+/* ===== Cabeçalho único (marca COPA 26) ===== */
+  .hdr{margin:0 0 14px;text-align:center}
+  .hdr-img{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;border-radius:10px;box-sizing:border-box}
+
+.topo.bar-user{justify-content:flex-end;margin-top:-4px;margin-bottom:10px}
+@media(max-width:520px){.topo.bar-user{justify-content:flex-start}}
+
+
+/* ===== Banner/Pop-up de aniversário (vindo do Brasileirão) ===== */
+.banner-aniv-copa{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  background:linear-gradient(90deg,rgba(244,114,182,.14),rgba(244,197,66,.10));
+  border-bottom:1px solid rgba(244,114,182,.4);color:#f7d7e8;font-size:13px;padding:9px 14px}
+.banner-aniv-copa strong{color:#f9a8d4}
+.bac-link{background:rgba(244,114,182,.25);border:1px solid rgba(244,114,182,.5);color:#fff;
+  border-radius:99px;padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit}
+.bac-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
+.bac-modal{background:var(--navy-2,#12233f);border:1px solid var(--linha,#1f3a5f);border-radius:16px;
+  padding:24px 20px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.bac-card{background:rgba(244,114,182,.12);border:1px solid rgba(244,114,182,.4);border-radius:12px;padding:14px;margin-bottom:10px}
+.bac-nome{font-size:19px;font-weight:700;color:#f9a8d4;margin-bottom:10px}
+.bac-btn{display:inline-block;background:#25d366;color:#063b1e;font-weight:700;text-decoration:none;
+  padding:9px 16px;border-radius:10px;font-size:14px}
+.bac-fechar{margin-top:6px;background:var(--navy-3,#0b1f3a);border:1px solid var(--linha,#1f3a5f);
+  color:var(--branco,#e8edf4);border-radius:10px;padding:9px 22px;font-size:14px;cursor:pointer;font-family:inherit}
+
+
+/* ===== Rodapé do site (SEO + Pix + disclaimer) ===== */
+.rodape-site{max-width:560px;margin:32px auto 0;padding:18px 14px 30px;border-top:1px solid var(--linha);text-align:center}
+.rs-pix{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:16px}
+.rs-pix span{font-size:13px;color:var(--cinza)}
+.rs-pix-btn{background:rgba(244,197,66,.12);border:1px solid var(--gold-2);color:var(--gold);
+  border-radius:99px;padding:8px 16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+.rs-pix-btn:active{transform:scale(.98)}
+.rs-legal{font-size:12px;color:var(--cinza);margin:0 0 6px}
+.rs-disc{font-size:10.5px;line-height:1.5;color:#5f7088;margin:0;max-width:480px;margin-left:auto;margin-right:auto}
+
+.rs-nav{font-size:12px;color:var(--cinza);margin-bottom:14px;line-height:1.9}
+.rs-nav a{color:var(--gold);text-decoration:none}
+
+.oa-destaque{display:block;text-align:center;background:linear-gradient(90deg,#1db954,#0a7cff);
+  border:none;color:#fff;text-decoration:none;border-radius:12px;padding:13px 14px;margin:12px 0;
+  font-size:14px;font-weight:800;box-shadow:0 6px 20px rgba(10,124,255,.28);letter-spacing:.2px}
+.oa-destaque:active{transform:scale(.99)}
+
+/* ===== ESTATÍSTICAS DA COPA ===== */
+.stat-wrap{max-width:760px;margin:0 auto;padding:16px 12px 60px}
+.stat-hero{background:linear-gradient(135deg,rgba(244,197,66,.12),rgba(29,185,84,.06));border:1px solid var(--linha);border-radius:16px;padding:16px;margin:14px 0 12px;box-shadow:0 12px 34px rgba(0,0,0,.22)}
+.stat-hero h2{margin:0 0 6px;font-size:24px}
+.stat-hero p{color:var(--cinza);font-size:13px;line-height:1.55;margin:0}
+.stat-info{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.stat-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.20);border:1px solid var(--linha);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--cinza)}
+.stat-pill b{color:var(--branco)}
+.stat-resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}
+.stat-res-card{min-width:0;background:var(--navy-2);border:1px solid var(--linha);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:flex-start}
+.stat-res-ico{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);border:1px solid var(--linha);border-radius:10px;flex:0 0 auto}
+.stat-res-card b{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
+.stat-res-card strong{display:block;font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-res-card span{display:flex;align-items:center;gap:5px;color:var(--cinza);font-size:11px;line-height:1.4;margin-top:3px;min-width:0}
+.stat-abas{display:flex;gap:7px;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:5px;margin:12px 0}
+.stat-tab{flex:1;background:transparent;border:none;color:var(--cinza);font-family:inherit;font-weight:700;font-size:13px;padding:11px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.stat-tab:hover{color:var(--branco)}
+.stat-tab.ativa{background:var(--gold);color:#3a2a00}
+.stat-bar{display:flex;gap:9px;align-items:center;justify-content:space-between;margin:10px 0 9px}
+.stat-bar h3{font-family:'Anton',sans-serif;font-size:18px;font-weight:400;letter-spacing:.5px;margin:0}
+.stat-bar span{font-size:12px;color:var(--cinza)}
+.stat-filtro{display:flex;align-items:center;gap:8px;margin:0 0 12px}
+.stat-filtro label{font-size:12px;color:var(--cinza);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
+.stat-filtro select{min-width:0;flex:1;background:var(--navy-2);border:1px solid var(--linha);color:var(--branco);border-radius:10px;padding:10px 11px;font-family:inherit;font-weight:600}
+.stat-lista{display:flex;flex-direction:column;gap:7px}
+.stat-row{display:grid;grid-template-columns:44px 1fr auto 76px;align-items:center;gap:10px;background:var(--navy-2);border:1px solid var(--linha);border-radius:13px;padding:10px 11px}
+.stat-row:nth-child(1){border-color:rgba(244,197,66,.55);background:linear-gradient(90deg,rgba(244,197,66,.10),var(--navy-2))}
+.stat-pos{font-family:'Anton',sans-serif;color:var(--gold);font-size:18px;text-align:center}
+.stat-player{min-width:0}
+.stat-player strong{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-player span{display:flex;align-items:center;gap:5px;margin-top:3px;color:var(--cinza);font-size:11.5px;min-width:0}
+.stat-flag{width:20px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}
+.stat-meta{font-size:12px;color:var(--cinza);white-space:nowrap}
+.stat-mobile-meta{display:none;margin-top:6px;font-size:11px;color:var(--cinza)}
+.stat-num{text-align:center;background:rgba(0,0,0,.24);border:1px solid var(--linha);border-radius:10px;padding:6px 6px;min-width:64px}
+.stat-num b{display:block;font-family:'Anton',sans-serif;font-size:24px;line-height:1;color:var(--branco)}
+.stat-num small{display:block;font-size:9.5px;color:var(--cinza);margin-top:2px;white-space:nowrap}
+.stat-cardtag{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 7px;font-size:10.5px;font-weight:700;margin-left:3px}
+.stat-cardtag.amarelo{background:rgba(244,197,66,.13);border:1px solid rgba(244,197,66,.35);color:var(--gold)}
+.stat-cardtag.vermelho{background:rgba(224,71,62,.13);border:1px solid rgba(224,71,62,.38);color:#ff918a}
+.stat-muted{color:var(--cinza)}
+.stat-vazio{background:var(--navy-2);border:1px dashed var(--linha);border-radius:13px;color:var(--cinza);padding:22px 16px;text-align:center;font-size:13px;line-height:1.55}
+.stat-vazio.erro{border-color:rgba(224,71,62,.45);color:#ffada7}
+.stat-nota{margin-top:12px;color:var(--cinza);font-size:11.5px;line-height:1.55;text-align:center}
+.stat-nota b{color:var(--gold)}
+@media(max-width:680px){
+  .stat-wrap{max-width:580px}
+  .stat-resumo{grid-template-columns:1fr}
+  .stat-res-card strong{white-space:normal}
+  .stat-abas{overflow-x:hidden;scrollbar-width:none;gap:4px;padding:4px}
+  .stat-abas::-webkit-scrollbar{display:none}
+  .stat-tab{flex:1 1 0;min-width:0;font-size:12px;padding:10px 4px;letter-spacing:-.15px}
+  .stat-row{grid-template-columns:36px 1fr 64px;gap:7px;padding:10px 9px}
+  .stat-meta{display:none}
+  .stat-mobile-meta{display:block}
+  .stat-player strong{font-size:13.5px}
+  .stat-num{min-width:58px;padding:5px}
+  .stat-num b{font-size:22px}
+  .stat-bar{align-items:flex-end}
+}
+
+/* Situação atual dos palpites no mata-mata (Meus Palpites) */
+.canon-fase .cn-chip{position:relative;padding-right:6px}
+.canon-fase .cn-chip-ok{border-color:rgba(42,211,111,.45);background:rgba(42,211,111,.10)}
+.canon-fase .cn-chip-err{border-color:rgba(255,75,91,.45);background:rgba(255,75,91,.10)}
+.canon-fase .cn-status{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:5px;margin-left:1px;font-size:11px;font-weight:900;line-height:1;color:#fff}
+.canon-fase .cn-ok{background:#2ad36f}
+.canon-fase .cn-err{background:#ff4b5b}
+@media (max-width:640px){.canon-fase .cn-chip{font-size:11.5px;padding:3px 7px}.canon-fase .cn-status{width:14px;height:14px;font-size:10px}}
+
+/* Resumo recolhível dos acertos no painel "Meus Palpites" */
+.canon-fase .cn-resumo{margin-top:10px;border:1px solid rgba(244,197,66,.28);border-radius:12px;background:rgba(0,0,0,.16);overflow:hidden}
+.canon-fase .cn-resumo summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 12px;color:var(--gold);font-weight:800;font-size:12px;letter-spacing:.15px;text-align:center;user-select:none}
+.canon-fase .cn-resumo summary::-webkit-details-marker{display:none}
+.canon-fase .cn-resumo summary::after{content:"▾";font-size:11px;margin-left:2px;color:var(--gold)}
+.canon-fase .cn-resumo[open] summary::after{content:"▴"}
+.canon-fase .cn-resumo-body{border-top:1px solid rgba(255,255,255,.08);padding:11px 12px 12px;display:grid;gap:10px}
+.canon-fase .cn-resumo-label{font-size:11px;font-weight:900;letter-spacing:.35px;text-transform:uppercase;margin-bottom:6px}
+.canon-fase .cn-ok-label{color:#5ff08f}
+.canon-fase .cn-err-label{color:#ff7885}
+.canon-fase .cn-pend-label{color:var(--cinza)}
+.canon-fase .cn-resumo-chips{display:flex;flex-wrap:wrap;gap:6px}
+.canon-fase .cn-mini-chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:11.5px;font-weight:700;line-height:1.15;background:rgba(0,0,0,.20);border:1px solid var(--linha);color:var(--branco)}
+.canon-fase .cn-mini-chip img,.canon-fase .cn-mini-chip .flag{width:16px;height:auto;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}
+.canon-fase .cn-mini-ok{border-color:rgba(42,211,111,.35);background:rgba(42,211,111,.09)}
+.canon-fase .cn-mini-err{border-color:rgba(255,75,91,.36);background:rgba(255,75,91,.10)}
+.canon-fase .cn-vazio{font-size:11.5px;color:var(--cinza);font-style:italic}
+@media (max-width:640px){.canon-fase .cn-resumo summary{font-size:11.5px;padding:9px 8px}.canon-fase .cn-resumo-body{padding:10px 9px}.canon-fase .cn-mini-chip{font-size:11px;padding:3px 7px}}
