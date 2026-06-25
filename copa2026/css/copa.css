@@ -337,3 +337,22 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 .canon-fase .cn-ok{background:#2ad36f}
 .canon-fase .cn-err{background:#ff4b5b}
 @media (max-width:640px){.canon-fase .cn-chip{font-size:11.5px;padding:3px 7px}.canon-fase .cn-status{width:14px;height:14px;font-size:10px}}
+
+/* Resumo recolhível dos acertos no painel "Meus Palpites" */
+.canon-fase .cn-resumo{margin-top:10px;border:1px solid rgba(244,197,66,.28);border-radius:12px;background:rgba(0,0,0,.16);overflow:hidden}
+.canon-fase .cn-resumo summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 12px;color:var(--gold);font-weight:800;font-size:12px;letter-spacing:.15px;text-align:center;user-select:none}
+.canon-fase .cn-resumo summary::-webkit-details-marker{display:none}
+.canon-fase .cn-resumo summary::after{content:"▾";font-size:11px;margin-left:2px;color:var(--gold)}
+.canon-fase .cn-resumo[open] summary::after{content:"▴"}
+.canon-fase .cn-resumo-body{border-top:1px solid rgba(255,255,255,.08);padding:11px 12px 12px;display:grid;gap:10px}
+.canon-fase .cn-resumo-label{font-size:11px;font-weight:900;letter-spacing:.35px;text-transform:uppercase;margin-bottom:6px}
+.canon-fase .cn-ok-label{color:#5ff08f}
+.canon-fase .cn-err-label{color:#ff7885}
+.canon-fase .cn-pend-label{color:var(--cinza)}
+.canon-fase .cn-resumo-chips{display:flex;flex-wrap:wrap;gap:6px}
+.canon-fase .cn-mini-chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:11.5px;font-weight:700;line-height:1.15;background:rgba(0,0,0,.20);border:1px solid var(--linha);color:var(--branco)}
+.canon-fase .cn-mini-chip img,.canon-fase .cn-mini-chip .flag{width:16px;height:auto;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}
+.canon-fase .cn-mini-ok{border-color:rgba(42,211,111,.35);background:rgba(42,211,111,.09)}
+.canon-fase .cn-mini-err{border-color:rgba(255,75,91,.36);background:rgba(255,75,91,.10)}
+.canon-fase .cn-vazio{font-size:11.5px;color:var(--cinza);font-style:italic}
+@media (max-width:640px){.canon-fase .cn-resumo summary{font-size:11.5px;padding:9px 8px}.canon-fase .cn-resumo-body{padding:10px 9px}.canon-fase .cn-mini-chip{font-size:11px;padding:3px 7px}}
