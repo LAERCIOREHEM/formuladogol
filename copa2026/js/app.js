@@ -632,18 +632,25 @@
       const st = statusPalpiteFase(id, fase);
       return { id, nome, st };
     });
-    const chips = itensStatus.map(item =>
-      `<span class="cn-chip cn-chip-${item.st}">${bandeira(item.id)}<span>${item.nome}</span>${marcadorStatus(item.id, fase)}</span>`
-    ).join("");
-
     const noPareo = itensStatus.filter(item => item.st === "ok");
     const fora = itensStatus.filter(item => item.st === "err");
     const indef = itensStatus.filter(item => item.st !== "ok" && item.st !== "err");
     const resumoPill = `<span class="cn-resumo-inline"><span>📊 ${noPareo.length} no páreo</span><span>·</span><span>${fora.length} fora</span>${indef.length ? `<span>·</span><span>${indef.length} indef.</span>` : ""}</span>`;
+    const chip = item => `<span class="cn-chip cn-chip-${item.st}">${bandeira(item.id)}<span>${item.nome}</span>${marcadorStatus(item.id, fase)}</span>`;
+    const vazio = texto => `<span class="cn-vazio">${texto}</span>`;
+    const secao = (classe, icone, titulo, itens, vazioTxt) => `
+      <div class="cn-grupo-status cn-grupo-${classe}">
+        <div class="cn-grupo-tit">${icone} ${titulo} (${itens.length})</div>
+        <div class="cn-chips cn-chips-status">${itens.length ? itens.map(chip).join("") : vazio(vazioTxt)}</div>
+      </div>`;
 
     const box = el("div", "canon-fase");
     box.innerHTML = `<div class="cn-tit"><span>✅ Seu palpite (seleções que avançam) — ${rot}</span>${resumoPill}</div>
-      <div class="cn-chips">${chips}</div>
+      <div class="cn-grupos-status">
+        ${secao("ok", "✅", "Ainda no páreo", noPareo, "Nenhuma seleção no páreo neste momento.")}
+        ${secao("err", "❌", "Fora do páreo", fora, "Nenhuma seleção fora do páreo neste momento.")}
+        ${indef.length ? secao("pend", "⏳", "Ainda sem definição", indef, "") : ""}
+      </div>
       <div class="cn-nota">No mata-mata vale <b>quem você cravou que avança</b>, não o placar nem a posição no chaveamento. ✓ = ainda no páreo · × = fora do páreo.</div>`;
     return box;
   }
