@@ -1,7 +1,7 @@
 /* =========================================================================
    resultados.js — Resultados das partidas (Copa 2026), direto da ESPN
    Navegador puxa o feed público da ESPN (sem chave, CORS liberado).
-   Navegação por dia + atualização automática a cada 30s para jogos, grupos e mata-mata ao vivo.
+   Navegação por dia + atualização inteligente: 30s só em janela de jogo/ao vivo.
    NOVO: na FASE DE GRUPOS, cada jogo mostra os palpites de todos (recolhidos,
    abre no "ver palpites"). Verde = acertou o resultado · 🎯 = cravou o placar.
    ========================================================================= */
@@ -32,6 +32,8 @@
   let MATA_LOCK_TOKENS = {}; // slots matematicamente definidos no mata-mata (1A, 2B, 3C...)
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Grupo X -> tabela -> voltar
   let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols/cartões exibidos nos cards
+  let JOGOS_DIA_EVENTS = []; // cache dos eventos do dia exibido na aba Jogos
+  let REFRESH_MONITOR_EVENTS = [], REFRESH_MONITOR_TS = 0; // monitor leve para ligar/desligar auto-refresh
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -593,6 +595,7 @@
       return;
     }
     const evs = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+    JOGOS_DIA_EVENTS = evs;
     if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
     $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
@@ -1585,6 +1588,100 @@
     }
   }
 
+
+  // ===== Atualização automática inteligente =====
+  // Antes, a página redesenhava Jogos/Grupos/Mata-mata a cada 30s sempre.
+  // Isso atrapalhava a leitura. Agora o refresh de 30s só liga quando existe
+  // jogo perto de começar, em andamento, atrasado/interrompido, ou recém encerrado.
+  const AUTO_REFRESH_MS = 30000;
+  const AUTO_REFRESH_PRE_MS = 10 * 60 * 1000;          // começa 10 min antes
+  const AUTO_REFRESH_POST_MS = 60 * 60 * 1000;         // mantém ~1h após encerrado
+  const AUTO_REFRESH_ESTIMATED_GAME_MS = 4 * 60 * 60 * 1000; // margem segura p/ jogo + acréscimos
+  const AUTO_REFRESH_OPEN_WINDOW_MS = 8 * 60 * 60 * 1000;    // atraso climático/delay sem ficar eterno
+
+  function dataYMDOffset(baseYmd, off) {
+    return dateToYMD(new Date(ymdToDate(baseYmd).getTime() + off * 864e5));
+  }
+  function statusTextoEvento(ev) {
+    const st = getPath(ev, ["competitions", 0, "status"], {}) || {};
+    const tp = st.type || {};
+    return [
+      st.displayClock, st.period, st.detail, st.shortDetail,
+      tp.id, tp.name, tp.description, tp.detail, tp.shortDetail, tp.state, tp.completed
+    ].filter(v => v != null && v !== "").join(" ").toLowerCase();
+  }
+  function eventoAoVivoOuAtrasado(ev) {
+    const state = estadoEvento(ev);
+    const txt = statusTextoEvento(ev);
+    if (state === "in") return true;
+    return /delay|delayed|weather|suspend|suspended|postpon|adiad|atras|chuva|clima|interromp|penalt|shootout|extra time|overtime|halftime|half time|intervalo/.test(txt);
+  }
+  function eventoPedeRefresh(ev, agoraMs) {
+    if (!ev || !ev.date) return false;
+    const inicio = new Date(ev.date).getTime();
+    if (!isFinite(inicio)) return false;
+    const state = estadoEvento(ev);
+    const agora = agoraMs || Date.now();
+
+    // Enquanto a ESPN disser que está ao vivo, atrasado, suspenso, em intervalo,
+    // prorrogação ou pênaltis, mantemos o refresh ligado.
+    if (eventoAoVivoOuAtrasado(ev)) {
+      return agora >= inicio - AUTO_REFRESH_PRE_MS && agora <= inicio + AUTO_REFRESH_OPEN_WINDOW_MS;
+    }
+
+    // Jogo encerrado: mantém por uma janela curta para absorver placar final,
+    // cartões, gols, melhores momentos e recálculo de grupos/mata-mata.
+    if (state === "post") {
+      return agora >= inicio - AUTO_REFRESH_PRE_MS && agora <= inicio + AUTO_REFRESH_ESTIMATED_GAME_MS + AUTO_REFRESH_POST_MS;
+    }
+
+    // Jogo pré/agendado: só liga 10 minutos antes; se houver atraso e o feed
+    // ainda não marcou como post, a janela ampla segura a atualização.
+    return agora >= inicio - AUTO_REFRESH_PRE_MS && agora <= inicio + AUTO_REFRESH_OPEN_WINDOW_MS;
+  }
+  function eventosConhecidosParaRefresh() {
+    const out = [];
+    [JOGOS_DIA_EVENTS, GRP_EVENTS, MATA_EVENTS, REFRESH_MONITOR_EVENTS].forEach(arr => {
+      if (Array.isArray(arr)) arr.forEach(ev => { if (ev && ev.date) out.push(ev); });
+    });
+    return out;
+  }
+  async function buscarEventosMonitoramentoRefresh() {
+    // Monitor leve: busca só ontem/hoje/amanhã para descobrir se há jogo atual
+    // sem redesenhar a página. Cache de 60s para não martelar a ESPN.
+    if (REFRESH_MONITOR_EVENTS.length && (Date.now() - REFRESH_MONITOR_TS) < 60000) return REFRESH_MONITOR_EVENTS;
+    const base = hojeYMD();
+    const dias = [-1, 0, 1].map(off => dataYMDOffset(base, off));
+    const mapa = new Map();
+    await Promise.all(dias.map(async dstr => {
+      try {
+        const dd = await fetchJSONNoCache(`${API}?dates=${dstr}&limit=80`);
+        (dd.events || []).forEach(ev => {
+          const id = String(ev.id || getPath(ev, ["competitions", 0, "id"], ""));
+          if (id) mapa.set(id, ev);
+        });
+      } catch (e) { /* ignora falha temporária do monitor */ }
+    }));
+    REFRESH_MONITOR_EVENTS = Array.from(mapa.values());
+    REFRESH_MONITOR_TS = Date.now();
+    return REFRESH_MONITOR_EVENTS;
+  }
+  async function deveAtualizarAutomaticamente() {
+    const agora = Date.now();
+    if (eventosConhecidosParaRefresh().some(ev => eventoPedeRefresh(ev, agora))) return true;
+    const monitor = await buscarEventosMonitoramentoRefresh();
+    return monitor.some(ev => eventoPedeRefresh(ev, agora));
+  }
+  async function tickAtualizacaoInteligente() {
+    try {
+      const ativo = await deveAtualizarAutomaticamente();
+      if (!ativo) return;
+      if (ABA === "jogos") await carregar();
+      else if (ABA === "grupos") renderGrupos();
+      else if (ABA === "mata") renderMata();
+    } catch (e) { /* não derruba a página por falha temporária de rede */ }
+  }
+
   document.addEventListener("DOMContentLoaded", async () => {
     dia = clamp(hojeYMD());
     await carregarBase();
@@ -1592,10 +1689,6 @@
     $("#next").onclick = () => { dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
     const bcal = $("#btn-cal-jogos"); if (bcal) bcal.onclick = () => baixarICSJogos(bcal);
     carregar();
-    timer = setInterval(() => {
-      if (ABA === "jogos") carregar();
-      else if (ABA === "grupos") renderGrupos();
-      else if (ABA === "mata") renderMata();
-    }, 30000);
+    timer = setInterval(tickAtualizacaoInteligente, AUTO_REFRESH_MS);
   });
 })();
