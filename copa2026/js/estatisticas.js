@@ -9,6 +9,7 @@
   var DADOS = null;
   var ABA = "artilheiros";
   var FILTRO = "TODAS";
+  var SELECOES = [];
 
   var $ = function (s) { return document.querySelector(s); };
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
@@ -30,6 +31,49 @@
     return src ? '<img class="stat-flag" src="' + esc(src) + '" alt="" loading="lazy">' : "";
   }
 
+  function siglaSelecao(valor) {
+    if (!valor) return "";
+    if (window.COPA_TIMES && COPA_TIMES.sigla) return COPA_TIMES.sigla(valor) || valor;
+    return valor;
+  }
+
+  function todasSiglas() {
+    var mapa = {};
+    (SELECOES || []).forEach(function (s) {
+      if (s && s.id) mapa[s.id] = true;
+    });
+    if (DADOS) {
+      ["artilheiros", "assistencias", "cartoes", "por_selecao"].forEach(function (k) {
+        (DADOS[k] || []).forEach(function (x) {
+          var eq = siglaSelecao(x.equipe);
+          if (eq) mapa[eq] = true;
+        });
+      });
+    }
+    return Object.keys(mapa).sort(function (a, b) {
+      return nomeSelecao(a).localeCompare(nomeSelecao(b), "pt-BR");
+    });
+  }
+
+  function normalizarItemEquipe(item) {
+    var novo = Object.assign({}, item || {});
+    novo.equipe = siglaSelecao(novo.equipe);
+    return novo;
+  }
+
+  function completarGolsPorSelecao(lista) {
+    var mapa = {};
+    (lista || []).forEach(function (item) {
+      var x = normalizarItemEquipe(item);
+      if (!x.equipe) return;
+      mapa[x.equipe] = Object.assign({ gols: 0, assistencias: 0, amarelos: 0, vermelhos: 0, jogos: 0, media_gols: 0 }, x);
+    });
+    todasSiglas().forEach(function (eq) {
+      if (!mapa[eq]) mapa[eq] = { equipe: eq, gols: 0, assistencias: 0, amarelos: 0, vermelhos: 0, jogos: 0, media_gols: 0 };
+    });
+    return Object.keys(mapa).map(function (eq) { return mapa[eq]; });
+  }
+
   function fmtData(iso) {
     if (!iso) return "Ainda não atualizado";
     try {
@@ -43,13 +87,13 @@
 
   function listaDaAba() {
     if (!DADOS) return [];
-    if (ABA === "assistencias") return DADOS.assistencias || [];
+    if (ABA === "assistencias") return (DADOS.assistencias || []).map(normalizarItemEquipe);
     if (ABA === "gols_selecao") {
-      return (DADOS.por_selecao || []).slice().sort(function (a, b) {
+      return completarGolsPorSelecao(DADOS.por_selecao || []).sort(function (a, b) {
         return (b.gols || 0) - (a.gols || 0) || (b.media_gols || 0) - (a.media_gols || 0) || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
       });
     }
-    return DADOS.artilheiros || [];
+    return (DADOS.artilheiros || []).map(normalizarItemEquipe);
   }
 
   function valorPrincipal(item) {
@@ -68,10 +112,10 @@
   }
 
   function melhorAtaque() {
-    var lista = (DADOS.por_selecao || []).slice().sort(function (a, b) {
+    var lista = completarGolsPorSelecao(DADOS.por_selecao || []).sort(function (a, b) {
       return (b.gols || 0) - (a.gols || 0) || (b.media_gols || 0) - (a.media_gols || 0) || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
     });
-    return lista[0];
+    return lista.find(function (x) { return (x.gols || 0) > 0; }) || lista[0];
   }
 
   function renderResumo() {
@@ -102,11 +146,7 @@
 
   function renderFiltro() {
     var sel = $("#stat-selecao");
-    var equipes = {};
-    ["artilheiros", "assistencias", "cartoes", "por_selecao"].forEach(function (k) {
-      (DADOS[k] || []).forEach(function (x) { if (x.equipe) equipes[x.equipe] = true; });
-    });
-    var lista = Object.keys(equipes).sort(function (a, b) { return nomeSelecao(a).localeCompare(nomeSelecao(b), "pt-BR"); });
+    var lista = todasSiglas();
     sel.innerHTML = '<option value="TODAS">Todas as seleções</option>' + lista.map(function (s) {
       return '<option value="' + esc(s) + '">' + esc(nomeSelecao(s)) + '</option>';
     }).join("");
@@ -190,6 +230,13 @@
   async function carregar() {
     try {
       if (window.COPA_TIMES && COPA_TIMES.carregar) await COPA_TIMES.carregar();
+    } catch (e) {}
+    try {
+      var rs = await fetch("dados/selecoes.json?v=" + Date.now());
+      if (rs.ok) {
+        var js = await rs.json();
+        SELECOES = js.selecoes || [];
+      }
     } catch (e) {}
     try {
       var r = await fetch("dados/estatisticas.json?v=" + Date.now());

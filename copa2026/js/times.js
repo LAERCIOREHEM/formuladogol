@@ -47,7 +47,7 @@
     "tunisia": "TUN",
     "belgium": "BEL",
     "egypt": "EGY",
-    "iran": "IRN", "ir iran": "IRN",
+    "iran": "IRN", "ir iran": "IRN", "iri": "IRN", "iran islamic republic": "IRN", "islamic republic of iran": "IRN",
     "new zealand": "NZL",
     "spain": "ESP",
     "cape verde": "CPV", "cabo verde": "CPV",
