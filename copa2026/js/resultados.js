@@ -24,7 +24,7 @@
 
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
-  let ABA = "jogos", SEL = [], GRP_EVENTS = [], GRP_EVENTS_TS = 0;
+  let ABA = "jogos", MODO_PARTIDAS = "data", SEL = [], GRP_EVENTS = [], GRP_EVENTS_TS = 0;
   let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0, PALPMATA = {};
   let FAIRPLAY = {}, FAIRPLAY_TS = 0; // {sigla: pontos de conduta}, cache 5min
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
@@ -34,6 +34,7 @@
   let RETORNO_GRUPO = null; // navegação Tabela de grupos -> jogo -> voltar para a mesma tabela
   let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols/cartões exibidos nos cards
   let JOGOS_DIA_EVENTS = []; // cache dos eventos do dia exibido na aba Jogos
+  let TODOS_EVENTS = [], TODOS_EVENTS_TS = 0; // cache da visão compacta com todos os jogos
   let REFRESH_MONITOR_EVENTS = [], REFRESH_MONITOR_TS = 0; // monitor leve para ligar/desligar auto-refresh
 
   async function rpc(fn, body) {
@@ -617,24 +618,75 @@
     };
   }
 
+  function navDiaHTML() {
+    return `<div class="navdia" id="navdia-box">
+      <button id="prev" aria-label="Dia anterior">‹</button>
+      <div class="dias-faixa" id="dias-faixa"></div>
+      <button id="next" aria-label="Próximo dia">›</button>
+    </div>`;
+  }
+
+  function subModoPartidasHTML() {
+    if (ABA !== "jogos") return "";
+    return `<div class="part-modo" role="tablist" aria-label="Modo de exibição das partidas">
+      <button class="pmodo ${MODO_PARTIDAS === "data" ? "on" : ""}" data-modo="data">📅 Por data</button>
+      <button class="pmodo ${MODO_PARTIDAS === "todos" ? "on" : ""}" data-modo="todos">📋 Todos os jogos</button>
+    </div>${MODO_PARTIDAS === "data" ? navDiaHTML() : `<button id="btn-cal-jogos" class="cal-jogos">📅 Adicionar todos os jogos ao meu calendário</button>`}`;
+  }
+
+  function bindControles() {
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    document.querySelectorAll(".pmodo[data-modo]").forEach(b => b.onclick = () => {
+      const modo = b.dataset.modo === "todos" ? "todos" : "data";
+      if (modo === MODO_PARTIDAS) return;
+      MODO_PARTIDAS = modo;
+      RETORNO_GRUPO = null;
+      carregar();
+    });
+    const prev = $("#prev"), next = $("#next");
+    if (prev) {
+      prev.disabled = dia <= START;
+      prev.onclick = () => { RETORNO_GRUPO = null; dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() - 864e5))); carregar(); };
+    }
+    if (next) {
+      next.disabled = dia >= END;
+      next.onclick = () => { RETORNO_GRUPO = null; dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
+    }
+    const bcal = $("#btn-cal-jogos");
+    if (bcal) bcal.onclick = () => baixarICSJogos(bcal);
+  }
+
+  function montarControlesData() {
+    montarFaixaDias();
+    bindControles();
+  }
+
   async function carregar() {
     if (ABA !== "jogos") return;
-    montarFaixaDias();
-    $("#prev").disabled = dia <= START;
-    $("#next").disabled = dia >= END;
+    if (MODO_PARTIDAS === "todos") return carregarTodosJogos();
+
+    $("#lista").innerHTML = abasHTML() + '<p class="vazio">Carregando jogos...</p>';
+    montarControlesData();
+
     let data;
     try {
       const r = await fetch(`${API}?dates=${dia}&limit=60`);
       data = await r.json();
     } catch (e) {
-      $("#lista").innerHTML = '<p class="vazio">Não consegui buscar os jogos agora. Verifique a conexão e tente recarregar.</p>';
+      $("#lista").innerHTML = abasHTML() + '<p class="vazio">Não consegui buscar os jogos agora. Verifique a conexão e tente recarregar.</p>';
+      montarControlesData();
       return;
     }
     const evs = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
     JOGOS_DIA_EVENTS = evs;
-    if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); bindRetornoGrupo(); return; }
+    if (!evs.length) {
+      $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>';
+      montarControlesData();
+      bindRetornoGrupo();
+      return;
+    }
     $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
-    document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    montarControlesData();
     bindRetornoGrupo();
     document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
       const d = document.getElementById("sp-" + b.dataset.sp), ab = d.style.display === "none";
@@ -646,10 +698,67 @@
       FOCO_GRUPO = b.dataset.grupo;   // grupo a destacar/rolar
       RETORNO_GRUPO = null;
       ABA = "grupos";
-      $("#prev").parentElement.style.display = "none";
       renderGrupos();
     });
     carregarLancesVisiveis(evs);
+  }
+
+  async function carregarTodosJogos() {
+    if (ABA !== "jogos") return;
+    $("#lista").innerHTML = abasHTML() + '<p class="vazio">Carregando programação completa...</p>';
+    bindControles();
+    try {
+      if (!TODOS_EVENTS.length || (Date.now() - TODOS_EVENTS_TS) > 5 * 60 * 1000) {
+        const data = await fetch(`${API}?dates=${START}-${END}&limit=200`).then(r => r.json());
+        TODOS_EVENTS = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+        TODOS_EVENTS_TS = Date.now();
+      }
+      $("#lista").innerHTML = abasHTML() + todosJogosHTML(TODOS_EVENTS);
+      bindControles();
+      document.querySelectorAll(".todos-row[data-jogo][data-dia]").forEach(el => {
+        const abrir = () => { MODO_PARTIDAS = "data"; irParaJogoNoDia(el.dataset.jogo, el.dataset.dia, null); };
+        el.onclick = abrir;
+        el.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); abrir(); } };
+      });
+    } catch (e) {
+      $("#lista").innerHTML = abasHTML() + '<p class="vazio">Não consegui carregar a programação completa agora.</p>';
+      bindControles();
+    }
+  }
+
+  function todosJogosHTML(evs) {
+    if (!evs || !evs.length) return '<p class="vazio">Nenhum jogo encontrado.</p>';
+    const grupos = {};
+    evs.forEach(ev => { const y = ymdEventoBR(ev.date); (grupos[y] = grupos[y] || []).push(ev); });
+    return `<div class="todos-wrap">${Object.keys(grupos).sort().map(ymd => {
+      const d = ymdToDate(ymd);
+      const titulo = `${String(d.getDate()).padStart(2,"0")} ${MES3[d.getMonth()]} · ${SEM3[d.getDay()]}`;
+      const linhas = grupos[ymd].map(ev => todosJogoRowHTML(ev, ymd)).join("");
+      return `<section class="todos-dia"><h3>${titulo}</h3>${linhas}</section>`;
+    }).join("")}</div>`;
+  }
+
+  function todosJogoRowHTML(ev, ymd) {
+    const comp = ev.competitions && ev.competitions[0] || {};
+    const st = comp.status && comp.status.type || {};
+    const cs = comp.competitors || [];
+    const home = cs.find(c => c.homeAway === "home") || cs[0] || {};
+    const away = cs.find(c => c.homeAway === "away") || cs[1] || {};
+    const hAb = (home.team || {}).abbreviation, aAb = (away.team || {}).abbreviation;
+    const info = infoPlacarEvento(ev);
+    const flagH = dpFlag(hAb, 40), flagA = dpFlag(aAb, 40);
+    const venue = comp.venue ? (comp.venue.fullName + (comp.venue.address && comp.venue.address.city ? " · " + comp.venue.address.city : "")) : "";
+    let meio = "";
+    if (st.state === "pre") meio = `<span class="todos-hora">${horaBR(ev.date)}</span><span class="todos-status">${faseLabel((ev.season && ev.season.slug) || "")}</span>`;
+    else meio = `<span class="todos-score">${info ? info.hs : (home.score ?? "")} × ${info ? info.as : (away.score ?? "")}</span><span class="todos-status">${st.state === "in" ? "Ao vivo" : "Encerrado"}</span>`;
+    const liveCls = st.state === "in" ? " todos-live" : "";
+    return `<div class="todos-row${liveCls}" data-jogo="${ev.id}" data-dia="${ymd}" role="button" tabindex="0" title="Ver detalhes, gols e melhores momentos na aba Partidas">
+      <span class="todos-team home">${flagH ? `<img src="${flagH}" alt="">` : ""}<span>${dpNome(hAb)}</span></span>
+      <span class="todos-mid">${meio}</span>
+      <span class="todos-team away"><span>${dpNome(aAb)}</span>${flagA ? `<img src="${flagA}" alt="">` : ""}</span>
+      <span class="todos-ir">ver jogo ›</span>
+      ${venue ? `<span class="todos-venue">${escTxt(venue)}</span>` : ""}
+    </div>`;
   }
 
   function abasHTML() {
@@ -657,7 +766,7 @@
       <button class="vbtn ${ABA === "jogos" ? "on" : ""}" data-v="jogos">📅 Partidas</button>
       <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Grupos</button>
       <button class="vbtn ${ABA === "mata" ? "on" : ""}" data-v="mata">🏆 Mata-mata</button>
-    </div>`;
+    </div>${subModoPartidasHTML()}`;
   }
   function fetchJSONNoCache(url) {
     // Durante jogo ao vivo, alguns navegadores/CDNs seguram resposta por alguns segundos.
@@ -1320,8 +1429,7 @@
       RETORNO_GRUPO = null;
     }
     ABA = "jogos";
-    const nav = $("#prev") && $("#prev").parentElement;
-    if (nav) nav.style.display = "";
+    MODO_PARTIDAS = "data";
     FOCO_GRUPO = null;
     VOLTAR_JOGO = null;
     carregar().then(() => {
@@ -1468,7 +1576,7 @@
       document.querySelectorAll(".voltar-jogo[data-voltar]").forEach(b => b.onclick = () => {
         const idJogo = b.dataset.voltar;
         ABA = "jogos";
-        $("#prev").parentElement.style.display = "";
+        MODO_PARTIDAS = "data";
         FOCO_GRUPO = null; VOLTAR_JOGO = null;
         carregar().then(() => {
           const alvo = document.getElementById("jogo-" + idJogo);
@@ -1491,9 +1599,9 @@
     }
     ABA = v;
     FOCO_GRUPO = null; VOLTAR_JOGO = null; RETORNO_GRUPO = null; // entrada normal: sem retorno contextual
-    if (ABA === "grupos") { $("#prev").parentElement.style.display = "none"; renderGrupos(); }
-    else if (ABA === "mata") { $("#prev").parentElement.style.display = "none"; renderMata(); }
-    else { $("#prev").parentElement.style.display = ""; carregar(); }
+    if (ABA === "grupos") { renderGrupos(); }
+    else if (ABA === "mata") { renderMata(); }
+    else { MODO_PARTIDAS = "data"; carregar(); }
   }
 
   function card(ev) {
@@ -1737,9 +1845,6 @@
   document.addEventListener("DOMContentLoaded", async () => {
     dia = clamp(hojeYMD());
     await carregarBase();
-    $("#prev").onclick = () => { RETORNO_GRUPO = null; dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() - 864e5))); carregar(); };
-    $("#next").onclick = () => { RETORNO_GRUPO = null; dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
-    const bcal = $("#btn-cal-jogos"); if (bcal) bcal.onclick = () => baixarICSJogos(bcal);
     carregar();
     timer = setInterval(tickAtualizacaoInteligente, AUTO_REFRESH_MS);
   });
