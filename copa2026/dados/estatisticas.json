@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências dependem de disponibilidade no summary/comentário da ESPN. Gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-06-25T21:50:29.620915Z",
+  "atualizado_em": "2026-06-25T22:00:47.980710Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 56,
@@ -657,12 +657,12 @@
       "equipe": "ECU",
       "gols": 1,
       "assistencias": 0,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760468"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Granit Xhaka",
@@ -4373,6 +4373,18 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Gonzalo Plata",
+      "equipe": "ECU",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760468"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Granit Xhaka",
       "equipe": "SUI",
       "gols": 1,
@@ -5433,15 +5445,6 @@
       "media_gols": 2.0
     },
     {
-      "equipe": "CIV",
-      "gols": 4,
-      "assistencias": 5,
-      "amarelos": 4,
-      "vermelhos": 0,
-      "jogos": 3,
-      "media_gols": 1.33
-    },
-    {
       "equipe": "AUT",
       "gols": 3,
       "assistencias": 1,
@@ -5485,6 +5488,15 @@
       "vermelhos": 0,
       "jogos": 2,
       "media_gols": 1.5
+    },
+    {
+      "equipe": "CIV",
+      "gols": 3,
+      "assistencias": 5,
+      "amarelos": 4,
+      "vermelhos": 0,
+      "jogos": 3,
+      "media_gols": 1.0
     },
     {
       "equipe": "ALG",
@@ -5545,15 +5557,6 @@
       "gols": 2,
       "assistencias": 3,
       "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": 3,
-      "media_gols": 0.67
-    },
-    {
-      "equipe": "ECU",
-      "gols": 2,
-      "assistencias": 7,
-      "amarelos": 4,
       "vermelhos": 0,
       "jogos": 3,
       "media_gols": 0.67
@@ -5662,6 +5665,15 @@
       "gols": 1,
       "assistencias": 1,
       "amarelos": 7,
+      "vermelhos": 0,
+      "jogos": 3,
+      "media_gols": 0.33
+    },
+    {
+      "equipe": "ECU",
+      "gols": 1,
+      "assistencias": 7,
+      "amarelos": 5,
       "vermelhos": 0,
       "jogos": 3,
       "media_gols": 0.33
