@@ -652,13 +652,61 @@
     carregarLancesVisiveis(evs);
   }
 
+  // "Visualizar todos os jogos" SEM sair do index: lista todos os jogos da Copa,
+  // agrupados por data, reusando exatamente o card() das Partidas (nenhum layout novo).
+  async function renderTodosJogos() {
+    ABA = "todos";
+    FOCO_GRUPO = null; VOLTAR_JOGO = null; RETORNO_GRUPO = null;
+    const nav = $("#prev") && $("#prev").parentElement; if (nav) nav.style.display = "none";
+    $("#lista").innerHTML = abasHTML() + '<p class="vazio">Carregando todos os jogos…</p>';
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    let data;
+    try {
+      data = await fetchJSONNoCache(`${API}?dates=${START}-${END}&limit=200`);
+    } catch (e) {
+      if (ABA !== "todos") return;
+      $("#lista").innerHTML = abasHTML() + '<p class="vazio">Não consegui buscar os jogos agora. Verifique a conexão e tente recarregar.</p>';
+      document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+      return;
+    }
+    if (ABA !== "todos") return; // usuário trocou de aba durante o fetch
+    const evs = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (!evs.length) {
+      $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo encontrado.</p>';
+      document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+      return;
+    }
+    const chaveDia = ev => new Date(ev.date).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    const cabDia = ev => new Date(ev.date).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", timeZone: "America/Sao_Paulo" });
+    let html = "", ultimo = "";
+    evs.forEach(ev => {
+      const k = chaveDia(ev);
+      if (k !== ultimo) { html += `<div class="mm-3tit">${cabDia(ev)}</div>`; ultimo = k; }
+      html += card(ev);
+    });
+    $("#lista").innerHTML = abasHTML() + html;
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
+    bindRetornoGrupo();
+    document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("sp-" + b.dataset.sp), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "Ocultar palpites ▴" : "Ver palpites ▾";
+    });
+    document.querySelectorAll(".grupo-link[data-grupo]").forEach(b => b.onclick = () => {
+      VOLTAR_JOGO = b.dataset.jogo; FOCO_GRUPO = b.dataset.grupo; RETORNO_GRUPO = null;
+      ABA = "grupos"; const n = $("#prev") && $("#prev").parentElement; if (n) n.style.display = "none";
+      renderGrupos();
+    });
+    carregarLancesVisiveis(evs);
+  }
+
   function abasHTML() {
     return `<div class="vistog">
       <button class="vbtn ${ABA === "jogos" ? "on" : ""}" data-v="jogos">📅 Partidas</button>
       <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Grupos</button>
       <button class="vbtn ${ABA === "mata" ? "on" : ""}" data-v="mata">🏆 Mata-mata</button>
     </div>
-    <a class="todos-jogos-cta" href="onde-assistir.html">📋 Visualizar todos os jogos</a>`;
+    <a class="todos-jogos-cta" id="cta-todos" role="button" tabindex="0" style="cursor:pointer">📋 Visualizar todos os jogos</a>`;
   }
   function fetchJSONNoCache(url) {
     // Durante jogo ao vivo, alguns navegadores/CDNs seguram resposta por alguns segundos.
@@ -1732,6 +1780,7 @@
       if (ABA === "jogos") await carregar();
       else if (ABA === "grupos") renderGrupos();
       else if (ABA === "mata") renderMata();
+      else if (ABA === "todos") renderTodosJogos();
     } catch (e) { /* não derruba a página por falha temporária de rede */ }
   }
 
@@ -1741,6 +1790,15 @@
     $("#prev").onclick = () => { RETORNO_GRUPO = null; dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() - 864e5))); carregar(); };
     $("#next").onclick = () => { RETORNO_GRUPO = null; dia = clamp(dateToYMD(new Date(ymdToDate(dia).getTime() + 864e5))); carregar(); };
     const bcal = $("#btn-cal-jogos"); if (bcal) bcal.onclick = () => baixarICSJogos(bcal);
+    // "Visualizar todos os jogos" abre a lista completa SEM sair do index (delegação no #lista,
+    // que persiste mesmo quando o conteúdo é re-renderizado).
+    $("#lista").addEventListener("click", (e) => {
+      const cta = e.target.closest(".todos-jogos-cta");
+      if (!cta) return;
+      e.preventDefault();
+      if (ABA === "todos") return;
+      renderTodosJogos();
+    });
     carregar();
     timer = setInterval(tickAtualizacaoInteligente, AUTO_REFRESH_MS);
   });
