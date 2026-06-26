@@ -887,7 +887,9 @@
       if (!id) return `<div class="mm-time mm-tbd"><span class="mm-nome">A definir</span></div>`;
       const fl = dpFlag(id, 40);
       const lockCls = lock ? " mm-definido" : "";
-      const lockMark = lock ? `<span class="mm-lockmark" title="Vaga já garantida">✓</span>` : "";
+      const lockMark = lock
+        ? `<span class="mm-lockmark" title="Vaga confirmada">✓</span>`
+        : `<span class="mm-pendmark" title="Projeção ao vivo — ainda pode mudar">⌛</span>`;
       return `<div class="mm-time ${vcls}${lockCls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span><span class="mm-score">${score}</span>${lockMark}</div>`;
     };
     travado = travado || {};
@@ -1365,7 +1367,9 @@
     if (id) {
       const fl = dpFlag(id, 40);
       const lockCls = travado ? " mm-definido" : "";
-      const lockMark = travado ? `<span class="mm-lockmark" title="Vaga já garantida">✓</span>` : "";
+      const lockMark = travado
+        ? `<span class="mm-lockmark" title="Vaga confirmada">✓</span>`
+        : `<span class="mm-pendmark" title="Projeção ao vivo — ainda pode mudar">⌛</span>`;
       return `<div class="mm-equipe ${vcls || ""}${lockCls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span>${score !== "" && score != null ? `<span class="mm-score">${score}</span>` : ""}${lockMark}</div>`;
     }
     const txt = textoSlot(valor || slot);
