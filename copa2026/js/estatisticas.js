@@ -162,6 +162,52 @@
     return partes.join(" ") || '<span class="stat-muted">—</span>';
   }
 
+  function marcadoresDaSelecao(item) {
+    var eq = item && item.equipe;
+    var lista = ((DADOS && DADOS.artilheiros) || [])
+      .map(normalizarItemEquipe)
+      .filter(function (x) { return x.equipe === eq && (x.gols || 0) > 0; })
+      .sort(function (a, b) {
+        return (b.gols || 0) - (a.gols || 0) || String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR');
+      });
+
+    var totalMarcadores = lista.reduce(function (acc, x) { return acc + (x.gols || 0); }, 0);
+    var golsRestantes = Math.max(0, (item.gols || 0) - totalMarcadores);
+
+    var htmlItens = lista.map(function (x) {
+      var qtd = x.gols || 0;
+      return '<div class="stat-goal-item">' +
+        '<div class="stat-goal-player">' +
+          '<strong>' + esc(x.nome || '—') + '</strong>' +
+          '<span>' + flag(x.equipe) + esc(nomeSelecao(x.equipe)) + '</span>' +
+        '</div>' +
+        '<div class="stat-goal-num"><b>' + qtd + '</b><small>' + esc(rotuloValor(qtd)) + '</small></div>' +
+      '</div>';
+    });
+
+    if (golsRestantes > 0) {
+      htmlItens.push('<div class="stat-goal-item stat-goal-item-extra">' +
+        '<div class="stat-goal-player">' +
+          '<strong>Gol contra a favor</strong>' +
+          '<span>Diferença entre o total da seleção e os artilheiros identificados no feed</span>' +
+        '</div>' +
+        '<div class="stat-goal-num"><b>' + golsRestantes + '</b><small>' + (golsRestantes === 1 ? 'gol' : 'gols') + '</small></div>' +
+      '</div>');
+    }
+
+    if (!htmlItens.length) {
+      htmlItens.push('<div class="stat-goals-empty">Ainda não há marcadores individuais identificados para esta seleção.</div>');
+    }
+
+    return '<details class="stat-goals-toggle">' +
+      '<summary class="stat-goals-summary">' +
+        '<span class="stat-goals-summary-closed">⚽ Ver marcadores dos gols</span>' +
+        '<span class="stat-goals-summary-open">⚽ Ocultar marcadores dos gols</span>' +
+      '</summary>' +
+      '<div class="stat-goals-body">' + htmlItens.join('') + '</div>' +
+    '</details>';
+  }
+
   function row(item, idx) {
     var val = valorPrincipal(item);
     if (ABA === "gols_selecao") {
@@ -179,6 +225,7 @@
         '</div>' +
         '<div class="stat-meta">' + metaSel + '</div>' +
         '<div class="stat-num"><b>' + val + '</b><small>' + esc(rotuloValor(val)) + '</small></div>' +
+        marcadoresDaSelecao(item) +
       '</article>';
     }
 
