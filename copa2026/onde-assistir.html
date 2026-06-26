@@ -60,6 +60,22 @@
   .gols-centro{min-height:1px}
   .gol-chip{display:block;color:#9fd0ff;font-size:11px;line-height:1.35;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .og-tag{display:inline-flex;align-items:center;margin-left:4px;background:rgba(244,197,66,.22);border:1px solid rgba(244,197,66,.55);color:var(--gold);border-radius:5px;padding:0 4px;font-size:8px;font-weight:900;vertical-align:1px}
+
+  .oa-subtabs{display:flex;gap:8px;margin:0 0 8px}
+  .oa-subtab{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-width:0;padding:10px 8px;border-radius:10px;
+    background:var(--navy-2);border:1px solid var(--linha);color:var(--cinza);text-decoration:none;
+    font-family:inherit;font-size:13px;font-weight:800;line-height:1.15;white-space:nowrap}
+  .oa-subtab:hover,.oa-subtab:focus{color:var(--branco);border-color:rgba(244,197,66,.55);outline:none}
+  .oa-todos-ativo{display:flex;align-items:center;justify-content:center;width:100%;box-sizing:border-box;margin:0 0 14px;padding:11px 14px;border-radius:10px;
+    border:1px solid var(--linha);background:linear-gradient(180deg,rgba(30,62,105,.92),rgba(18,43,78,.92));color:var(--gold);text-decoration:none;
+    font-family:inherit;font-weight:900;font-size:14px;line-height:1.2;letter-spacing:.1px;box-shadow:0 8px 18px rgba(0,0,0,.14)}
+  .oa-todos-ativo:hover,.oa-todos-ativo:focus{border-color:var(--gold);background:linear-gradient(180deg,rgba(38,78,130,.96),rgba(22,53,94,.96));outline:none}
+  @media(min-width:700px){.oa-todos-ativo{font-size:15px;padding:12px 16px}}
+  @media(max-width:420px){
+    .oa-subtabs{gap:6px}
+    .oa-subtab{font-size:12px;padding:9px 5px}
+    .oa-todos-ativo{font-size:13.5px}
+  }
   @media(max-width:480px){
     .wrap{padding-left:10px;padding-right:10px}
     .oa-jogo{padding:11px 12px}
@@ -77,13 +93,20 @@
 <div class="wrap">
   <div class="hdr"><img class="hdr-img" src="img/header-copa26.jpg" width="920" height="236" alt="COPA 26 — Bolão Brasileirão Almoço"></div>
   <nav class="menu">
-    <a href="index.html">Jogos</a>
-        <a href="aovivo.html">Ao vivo</a>
-        <a href="estatisticas.html">Estatísticas</a>
+    <a href="index.html" class="ativo">Jogos</a>
+    <a href="aovivo.html">Ao vivo</a>
+    <a href="estatisticas.html">Estatísticas</a>
     <a href="pontos.html">Bolão</a>
     <a href="palpites.html">Palpites</a>
     <a href="palpite.html">Meus Palpites</a>
   </nav>
+
+  <div class="oa-subtabs" aria-label="Navegação de jogos">
+    <a class="oa-subtab" href="index.html">📅 Partidas</a>
+    <a class="oa-subtab" href="index.html#grupos">📊 Grupos</a>
+    <a class="oa-subtab" href="index.html#mata">🏆 Mata-mata</a>
+  </div>
+  <a class="oa-todos-ativo" href="onde-assistir.html" aria-current="page">📋 Visualizar todos os jogos</a>
 
   <h1 style="font-family:'Anton',sans-serif;font-size:22px;margin:6px 2px 2px">Onde assistir os jogos da Copa 2026</h1>
   <p class="oa-intro">Todos os jogos da Copa do Mundo 2026 com <b>data, horário de Brasília</b> e os canais que transmitem cada partida. Horários e transmissões podem mudar — confirme perto da hora.</p>
@@ -91,7 +114,7 @@
 
   <div class="oa-acoes">
     <button id="btn-ics">📅 Adicionar todos ao meu calendário</button>
-    <button id="btn-share">🔗 Compartilhar</button>
+    <button id="btn-share">🔗 Compartilhe com amigos</button>
   </div>
 
   <div id="lista"><p class="vazio">Carregando jogos…</p></div>
@@ -106,7 +129,7 @@
     <p class="rs-disc">Site independente, feito por e para amigos. Não é afiliado nem patrocinado pela FIFA, CBF, CazéTV ou qualquer emissora. Nomes de competições e canais pertencem aos seus titulares. Dados de jogos obtidos de fontes públicas.</p>
   </footer>
 
-  <script src="js/onde-assistir.js?v=20260626placar-gols"></script>
+  <script src="js/onde-assistir.js?v=20260626integrado-jogos"></script>
   <script src="js/aniversarios.js?v=20260618b"></script>
 </body>
 </html>
