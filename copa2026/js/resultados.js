@@ -703,12 +703,15 @@
   }
 
   function abasHTML() {
+    const atalhoTerceiros = (ABA === "grupos")
+      ? `<a class="melhores-terceiros-cta" href="#grp-melhores-terceiros">✅ Melhores terceiros</a>`
+      : "";
     return `<div class="vistog">
       <button class="vbtn ${ABA === "jogos" ? "on" : ""}" data-v="jogos">📅 Partidas</button>
       <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Grupos</button>
       <button class="vbtn ${ABA === "mata" ? "on" : ""}" data-v="mata">🏆 Mata-mata</button>
     </div>
-    <a class="todos-jogos-cta" id="cta-todos" href="onde-assistir.html">📋 Visualizar todos os jogos</a>`;
+    <a class="todos-jogos-cta" id="cta-todos" href="onde-assistir.html">📋 Visualizar todos os jogos</a>${atalhoTerceiros}`;
   }
   function fetchJSONNoCache(url) {
     // Durante jogo ao vivo, alguns navegadores/CDNs seguram resposta por alguns segundos.
