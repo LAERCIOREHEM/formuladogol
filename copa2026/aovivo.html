@@ -54,6 +54,15 @@
   .escore .g{font-family:'Anton',sans-serif;font-size:46px;line-height:.9;min-width:42px;text-align:center;background:rgba(0,0,0,.25);border:1px solid var(--linha);border-radius:10px;padding:4px}
   .escore .x{color:var(--cinza)}
   .minuto{text-align:center;margin-top:10px;font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:1px}
+
+  .live-gols-jogo{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:10px;align-items:start;color:var(--cinza);margin:10px 2px 0;padding:0 8px;min-height:0}
+  .live-gols-jogo:empty{display:none}
+  .live-gols-time{min-width:0;display:flex;flex-direction:column;gap:3px;font-size:11px;line-height:1.25}
+  .live-gols-home{align-items:flex-start;text-align:left}
+  .live-gols-away{align-items:flex-end;text-align:right}
+  .live-gols-centro{display:block;min-width:0}
+  .live-gol-chip{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+  .live-og-tag{display:inline-block;margin-left:3px;padding:0 3px;border-radius:4px;background:rgba(255,207,58,.18);border:1px solid rgba(255,207,58,.45);color:var(--gold);font-size:8px;font-weight:800;line-height:1.25;vertical-align:1px;letter-spacing:.2px}
   .contador{text-align:center;font-size:13px;color:var(--cinza);margin:14px 0 8px}
   .contador b{font-family:'Anton',sans-serif;font-size:18px;color:var(--verde);vertical-align:-1px}
   .lista{display:flex;flex-direction:column;gap:6px}
@@ -143,6 +152,12 @@
   .palp-live-fold[open] .sum-closed{display:none}
   .palp-live-fold[open] summary{margin-bottom:10px;background:rgba(244,197,66,.14)}
 
+  @media(max-width:560px){
+    .live-gols-jogo{grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:5px;margin-top:9px;padding:0 2px}
+    .live-gols-time{font-size:10.5px;gap:2px}
+    .live-gol-chip{max-width:150px}
+  }
+
 </style>
 </head>
 <body>
@@ -161,7 +176,7 @@
 
 <script src="js/config.js?v=20260621d"></script>
 <script src="js/engine.js?v=20260622b"></script>
-<script src="js/aovivo.js?v=20260625a"></script>
+<script src="js/aovivo.js?v=20260626gols"></script>
 <footer class="rodape">
   <a href="regras.html">Regras</a><span class="sep">·</span>
   <a href="admin.html" class="adm">Área do administrador</a><span class="sep">·</span>
