@@ -20,11 +20,13 @@
   const CFG = window.COPA_CFG || { url: "", key: "" };
   const $ = s => document.querySelector(s);
   const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+  const SUMMARY_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary";
   const DEMO = /[?&]demo=1/.test(location.search);
   const PRE_MIN = 30;                 // abre 30 min antes do início oficial
   const ESPN_OVR = {};               // se alguma sigla da ESPN diferir do nosso id, mapear aqui (ex.: {"GER":"ALE"})
   let DADOS = {}, JOGOS = [], PART = [], timer = null;
   let TVS = {};
+  let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols ao vivo exibidos no card
   let LIVES = {};
 
   async function rpc(fn, body) {
@@ -122,6 +124,7 @@
     const colapsarPalpites = lives.length > 1;
     $("#app").innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado com os palpites reais. No dia, é automático (abra sem <b>?demo=1</b>).</div>' : "")
       + lives.map(ev => card(ev, colapsarPalpites)).join("");
+    carregarLancesAoVivo(lives);
   }
 
   function ourGame(ev) {
@@ -130,6 +133,328 @@
     const h = norm((cs.find(c => c.homeAway === "home").team || {}).abbreviation);
     const a = norm((cs.find(c => c.homeAway === "away").team || {}).abbreviation);
     return JOGOS.find(j => (j.a === h && j.b === a) || (j.a === a && j.b === h)) || null;
+  }
+
+  // ===== Gols ao vivo no card =====
+  // Mesmo princípio da aba Jogos: placar vem do scoreboard; marcadores vêm do summary ESPN.
+  function escTxt(s) {
+    return String(s || "").replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+  }
+  function getPath(obj, path, def) {
+    let cur = obj;
+    for (const k of path) {
+      if (cur && typeof cur === "object" && k in cur) cur = cur[k];
+      else return def;
+    }
+    return cur == null ? def : cur;
+  }
+  function textoTipo(o) {
+    const t = o && o.type;
+    if (!t) return "";
+    if (typeof t === "string") return t;
+    if (typeof t === "object") return [t.id, t.text, t.name, t.displayName, t.abbreviation].filter(Boolean).join(" ");
+    return String(t);
+  }
+  function textoLance(o) {
+    return String((o && (o.text || o.description || o.shortText || o.displayText || o.headline)) || "");
+  }
+  function nomeAtleta(a) {
+    if (!a || typeof a !== "object") return "";
+    if (a.athlete) return nomeAtleta(a.athlete);
+    return String(a.displayName || a.fullName || a.shortName || a.name || "").replace(/\s+/g, " ").trim();
+  }
+  function jogadorDoLance(o) {
+    if (!o || typeof o !== "object") return "";
+    for (const k of ["athlete", "player", "scorer"]) {
+      const n = nomeAtleta(o[k]);
+      if (n) return n;
+    }
+    for (const k of ["athletes", "participants", "athletesInvolved", "players"]) {
+      const arr = o[k];
+      if (Array.isArray(arr)) {
+        for (const it of arr) {
+          const n = nomeAtleta(it);
+          if (n) return n;
+        }
+      }
+    }
+    return String(o.displayName || o.athleteDisplayName || o.name || "").replace(/\s+/g, " ").trim();
+  }
+  function minutoDoLance(o) {
+    let v = getPath(o, ["clock", "displayValue"], "") || getPath(o, ["time", "displayValue"], "") || o.displayClock || o.clock || o.minute || "";
+    v = String(v || "").trim();
+    if (!v) return "";
+    if (/^\d+$/.test(v)) return v + "'";
+    return v.replace(/\s+/g, " ");
+  }
+  function golDoTexto(txt) {
+    if (!txt) return "";
+    const pats = [
+      /Goal!.*?\.\s*([^\.]+?)\s*\((?:[^)]*)\)/i,
+      /Gol!.*?\.\s*([^\.]+?)\s*\((?:[^)]*)\)/i,
+      /^\s*([^\.]+?)\s+\((?:[^)]*)\)\s*(?:right|left|header|converts|marca|finaliza|chuta)/i
+    ];
+    for (const p of pats) {
+      const m = txt.match(p);
+      if (m && m[1] && m[1].length <= 60) return m[1].replace(/\s+/g, " ").trim();
+    }
+    return "";
+  }
+  function ehGolContra(lance) {
+    const raw = (textoTipo(lance) + " " + textoLance(lance)).toLowerCase();
+    return /own goal|gol contra|autogol/.test(raw);
+  }
+  function nomeGolContraDoTexto(txt) {
+    txt = String(txt || "");
+    const pats = [
+      /own goal by\s+([^,.]+)(?:[,\.]|$)/i,
+      /gol contra de\s+([^,.]+)(?:[,\.]|$)/i,
+      /autogol de\s+([^,.]+)(?:[,\.]|$)/i
+    ];
+    for (const p of pats) {
+      const m = txt.match(p);
+      if (m && m[1]) return m[1].replace(/\s+/g, " ").trim();
+    }
+    return "";
+  }
+  function escRegex(s) { return String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+  function timeDoTexto(txt) {
+    if (!txt) return "";
+    const pats = [
+      /Goal!.*?\.\s*[^\.]+?\s*\(([^)]+)\)/i,
+      /Gol!.*?\.\s*[^\.]+?\s*\(([^)]+)\)/i,
+      /^\s*[^\.]+?\s+\(([^)]+)\)\s*(?:right|left|header|converts|marca|finaliza|chuta)/i
+    ];
+    for (const p of pats) {
+      const m = txt.match(p);
+      if (m && m[1]) return String(m[1]).replace(/\s+/g, " ").trim();
+    }
+    return "";
+  }
+  function scoreNum(v) {
+    if (v == null || v === "") return null;
+    const n = parseInt(String(v).replace(/[^0-9-]/g, ""), 10);
+    return isNaN(n) ? null : n;
+  }
+  function scoreDoLance(o) {
+    const pares = [["homeScore", "awayScore"], ["home_score", "away_score"], ["homeTeamScore", "awayTeamScore"], ["home", "away"]];
+    for (const [h, a] of pares) {
+      if (!o || !(h in o) || !(a in o)) continue;
+      const hs = scoreNum(o[h]), as = scoreNum(o[a]);
+      if (hs != null && as != null) return { home: hs, away: as };
+    }
+    const sh = getPath(o, ["score", "home"], null), sa = getPath(o, ["score", "away"], null);
+    const hs = scoreNum(sh), as = scoreNum(sa);
+    if (hs != null && as != null) return { home: hs, away: as };
+    return null;
+  }
+  function mapTimesDoSummary(summary, ev) {
+    const m = {};
+    function addKey(k, sig) { if (k != null && k !== "" && sig) m[String(k).toLowerCase()] = sig; }
+    function addTeam(t, sigFallback) {
+      if (!t || typeof t !== "object") return;
+      const sig = dpSigla(t.abbreviation) || dpSigla(t.shortDisplayName) || dpSigla(t.displayName) || dpSigla(t.name) || sigFallback || "";
+      if (!sig) return;
+      addKey(t.id, sig); addKey(t.uid, sig); addKey(t.guid, sig); addKey(t.slug, sig);
+      [t.abbreviation, t.shortDisplayName, t.displayName, t.name, t.location, t.nickname].forEach(v => addKey(dpNorm(v), sig));
+    }
+    function addCompetitor(c) {
+      if (!c || typeof c !== "object") return;
+      const t = c.team || c;
+      const sig = dpSigla(t.abbreviation) || dpSigla(t.shortDisplayName) || dpSigla(t.displayName) || dpSigla(t.name) || "";
+      addKey(c.id, sig); addKey(c.uid, sig); addKey(c.competitorId, sig);
+      addTeam(t, sig);
+    }
+    const comps = [];
+    const a = getPath(summary, ["header", "competitions", 0, "competitors"], []);
+    const b = getPath(summary, ["competitions", 0, "competitors"], []);
+    const c = getPath(ev || {}, ["competitions", 0, "competitors"], []);
+    if (Array.isArray(a)) comps.push(...a);
+    if (Array.isArray(b)) comps.push(...b);
+    if (Array.isArray(c)) comps.push(...c);
+    comps.forEach(addCompetitor);
+    return m;
+  }
+  function siglaObjTime(o, mapa) {
+    if (!o || typeof o !== "object") return "";
+    const candObjs = [o.team, o.scoringTeam, o.competitor, o.participant, o.club];
+    for (const t of candObjs) {
+      if (!t || typeof t !== "object") continue;
+      const sig = dpSigla(t.abbreviation) || dpSigla(t.shortDisplayName) || dpSigla(t.displayName) || dpSigla(t.name);
+      if (sig) return sig;
+      for (const k of ["id", "uid", "guid", "slug"]) {
+        if (t[k] != null && mapa[String(t[k]).toLowerCase()]) return mapa[String(t[k]).toLowerCase()];
+      }
+    }
+    for (const k of ["teamId", "teamID", "competitorId", "competitorID", "participantId", "participantID", "athleteTeamId"]) {
+      if (o[k] != null && mapa[String(o[k]).toLowerCase()]) return mapa[String(o[k]).toLowerCase()];
+    }
+    const txtTeam = dpSigla(timeDoTexto(textoLance(o)));
+    if (txtTeam) return txtTeam;
+    return "";
+  }
+  function arraysLances(summary) {
+    const out = [];
+    for (const p of [["scoringPlays"], ["competitions", 0, "scoringPlays"], ["header", "competitions", 0, "scoringPlays"]]) {
+      const arr = getPath(summary, p, []);
+      if (Array.isArray(arr)) out.push(...arr);
+    }
+    return out;
+  }
+  function arraysComentario(summary) {
+    const out = [];
+    for (const p of [["commentary"], ["plays"], ["competitions", 0, "details"]]) {
+      let arr = getPath(summary, p, []);
+      if (arr && !Array.isArray(arr) && typeof arr === "object") arr = arr.items || arr.plays || [];
+      if (Array.isArray(arr)) out.push(...arr);
+    }
+    return out;
+  }
+  function extrairGols(summary, ev) {
+    const comp = getPath(ev, ["competitions", 0], {}) || {};
+    const cs = comp.competitors || [];
+    const home = cs.find(c => c.homeAway === "home") || cs[0] || {};
+    const away = cs.find(c => c.homeAway === "away") || cs[1] || {};
+    const homeSig = dpSigla(getPath(home, ["team", "abbreviation"], "")) || dpSigla(getPath(home, ["team", "displayName"], ""));
+    const awaySig = dpSigla(getPath(away, ["team", "abbreviation"], "")) || dpSigla(getPath(away, ["team", "displayName"], ""));
+    const mapaTimes = mapTimesDoSummary(summary, ev);
+    const gols = [], usados = new Set();
+    let ultimoScore = { home: 0, away: 0 };
+    const finalHome = scoreNum(home.score);
+    const finalAway = scoreNum(away.score);
+
+    function nomesDoCompetidor(c, sig) {
+      const t = (c && c.team) || {};
+      const vals = [t.displayName, t.shortDisplayName, t.name, t.location, t.nickname, t.abbreviation, sig ? dpNome(sig) : "", sig].filter(Boolean);
+      const unicos = [];
+      vals.forEach(v => { const n = dpNorm(v); if (n && !unicos.includes(n)) unicos.push(n); });
+      return unicos;
+    }
+    const nomesHome = nomesDoCompetidor(home, homeSig);
+    const nomesAway = nomesDoCompetidor(away, awaySig);
+    function scoreDoTextoLocal(txt) {
+      const n = dpNorm(txt);
+      if (!n) return null;
+      for (const hn of nomesHome) for (const an of nomesAway) {
+        let re = new RegExp("\\b" + escRegex(hn) + "\\s+(\\d+)\\s+" + escRegex(an) + "\\s+(\\d+)\\b");
+        let m = n.match(re);
+        if (m) return { home: parseInt(m[1], 10), away: parseInt(m[2], 10) };
+        re = new RegExp("\\b" + escRegex(an) + "\\s+(\\d+)\\s+" + escRegex(hn) + "\\s+(\\d+)\\b");
+        m = n.match(re);
+        if (m) return { home: parseInt(m[2], 10), away: parseInt(m[1], 10) };
+      }
+      return null;
+    }
+    function scoreLance(lance) { return scoreDoLance(lance) || scoreDoTextoLocal(textoLance(lance)); }
+    function ladoDoGol(lance) {
+      const isOG = ehGolContra(lance);
+      if (!isOG) {
+        const sig = siglaObjTime(lance, mapaTimes);
+        if (sig && homeSig && sig === homeSig) return { lado: "home", fonte: "time" };
+        if (sig && awaySig && sig === awaySig) return { lado: "away", fonte: "time" };
+      }
+      const sigTxt = dpSigla(timeDoTexto(textoLance(lance)));
+      if (!isOG && sigTxt) {
+        if (sigTxt === homeSig) return { lado: "home", fonte: "texto" };
+        if (sigTxt === awaySig) return { lado: "away", fonte: "texto" };
+      }
+      const sc = scoreLance(lance);
+      if (sc) {
+        if (sc.home > ultimoScore.home && sc.away === ultimoScore.away) return { lado: "home", fonte: isOG ? "placar-og" : "placar" };
+        if (sc.away > ultimoScore.away && sc.home === ultimoScore.home) return { lado: "away", fonte: isOG ? "placar-og" : "placar" };
+      }
+      return { lado: "", fonte: isOG ? "og-pendente" : "" };
+    }
+    function ordemMinuto(g) {
+      const m = String(g.minuto || "").match(/\d+/);
+      return m ? parseInt(m[0], 10) : 999;
+    }
+    function normalizarLadosDosGols() {
+      if (finalHome == null || finalAway == null) return;
+      let h = gols.filter(g => g.lado === "home").length;
+      let a = gols.filter(g => g.lado === "away").length;
+      gols.filter(g => !g.lado).sort((x, y) => ordemMinuto(x) - ordemMinuto(y)).forEach(g => {
+        let faltaH = Math.max(0, finalHome - h);
+        let faltaA = Math.max(0, finalAway - a);
+        if (faltaH > 0 && faltaA <= 0) { g.lado = "home"; h++; return; }
+        if (faltaA > 0 && faltaH <= 0) { g.lado = "away"; a++; return; }
+        if (faltaH > faltaA) { g.lado = "home"; h++; return; }
+        if (faltaA > faltaH) { g.lado = "away"; a++; return; }
+      });
+      h = gols.filter(g => g.lado === "home").length;
+      a = gols.filter(g => g.lado === "away").length;
+      gols.filter(g => !g.lado).sort((x, y) => ordemMinuto(x) - ordemMinuto(y)).forEach(g => {
+        const faltaH = Math.max(0, finalHome - h);
+        const faltaA = Math.max(0, finalAway - a);
+        if (faltaH >= faltaA && faltaH > 0) { g.lado = "home"; h++; }
+        else if (faltaA > 0) { g.lado = "away"; a++; }
+        else { g.lado = h <= a ? "home" : "away"; if (g.lado === "home") h++; else a++; }
+      });
+    }
+    function registrarGol(lance) {
+      const og = ehGolContra(lance);
+      const txt = textoLance(lance);
+      const nome = (og ? (nomeGolContraDoTexto(txt) || jogadorDoLance(lance) || golDoTexto(txt)) : (jogadorDoLance(lance) || golDoTexto(txt)));
+      if (!nome) return;
+      const min = minutoDoLance(lance);
+      const infoLado = ladoDoGol(lance);
+      const key = min + "|" + nome.toLowerCase() + "|" + (og ? "OG" : "GOL");
+      if (usados.has(key)) return;
+      usados.add(key);
+      gols.push({ minuto: min, nome: nome, lado: infoLado.lado, og: og });
+      const sc = scoreLance(lance);
+      if (sc) ultimoScore = sc;
+    }
+
+    arraysLances(summary).forEach(sp => {
+      const raw = (textoTipo(sp) + " " + textoLance(sp)).toLowerCase();
+      if (/shootout|penalty shootout|disputa de p[eê]naltis/.test(raw)) return;
+      if (!(raw.includes("goal") || raw.includes("gol") || parseInt(sp.scoreValue || "0", 10) === 1)) return;
+      registrarGol(sp);
+    });
+    arraysComentario(summary).forEach(ev2 => {
+      const raw = (textoTipo(ev2) + " " + textoLance(ev2)).toLowerCase();
+      if (/shootout|penalty shootout|disputa de p[eê]naltis/.test(raw)) return;
+      const ehGol = raw.includes("goal") || raw.includes("gol!") || ehGolContra(ev2);
+      if (!ehGol) return;
+      registrarGol(ev2);
+    });
+    normalizarLadosDosGols();
+    const ordenados = gols.slice().sort((x, y) => ordemMinuto(x) - ordemMinuto(y));
+    return { gols: ordenados, golsHome: ordenados.filter(g => g.lado === "home"), golsAway: ordenados.filter(g => g.lado === "away") };
+  }
+  function chipGolAoVivo(g) {
+    const og = g && g.og ? ` <span class="live-og-tag" title="Gol contra">OG</span>` : "";
+    return `<span class="live-gol-chip">⚽ ${g.minuto ? escTxt(g.minuto) + " " : ""}${escTxt(g.nome)}${og}</span>`;
+  }
+  function htmlGolsAoVivo(dados) {
+    if (!dados || !dados.gols || !dados.gols.length) return "";
+    const home = (dados.golsHome || []).map(chipGolAoVivo).join("");
+    const away = (dados.golsAway || []).map(chipGolAoVivo).join("");
+    return `<div class="live-gols-time live-gols-home">${home}</div><div class="live-gols-centro"></div><div class="live-gols-time live-gols-away">${away}</div>`;
+  }
+  async function carregarLancesAoVivo(events) {
+    const lista = (events || []).filter(ev => getPath(ev, ["competitions", 0, "status", "type", "state"], "pre") !== "pre");
+    lista.forEach(async ev => {
+      const id = ev.id;
+      const el = document.getElementById("live-gols-" + id);
+      if (!id || !el) return;
+      try {
+        let dados;
+        const c = LANCES_CACHE[id];
+        const ttl = 25000;
+        if (c && (Date.now() - c.ts) < ttl) dados = c.dados;
+        else {
+          const summary = await fetch(`${SUMMARY_API}?event=${encodeURIComponent(id)}&_=${Date.now()}`).then(r => r.json());
+          dados = extrairGols(summary, ev);
+          LANCES_CACHE[id] = { ts: Date.now(), dados };
+        }
+        const alvo = document.getElementById("live-gols-" + id);
+        if (alvo) alvo.innerHTML = htmlGolsAoVivo(dados);
+      } catch (e) {
+        // Sem lances não quebra o ao vivo; o placar segue normal.
+      }
+    });
   }
 
   function card(ev, colapsarPalpites) {
@@ -191,6 +516,7 @@
         <div class="escore"><div class="g">${pre ? "–" : hs}</div><div class="x">×</div><div class="g">${pre ? "–" : as}</div></div>
         <div class="sel">${escudo(away)}<div class="nm">${tNome(away)}</div></div>
       </div>
+      ${pre ? "" : `<div class="live-gols-jogo" id="live-gols-${ev.id}" aria-label="Gols do jogo ao vivo"></div>`}
       <div class="minuto">${minuto}</div>
       ${tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${botaoCaze((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
