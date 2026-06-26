@@ -22,9 +22,11 @@ DIR = os.path.dirname(os.path.abspath(__file__))
 SELECOES = os.path.join(DIR, "dados", "selecoes.json")
 SAIDA    = os.path.join(DIR, "dados", "melhores-momentos.json")
 SAIDA_LIVES = os.path.join(DIR, "dados", "lives.json")
+SAIDA_COMPLETOS = os.path.join(DIR, "dados", "jogos-completos.json")
 
 API_KEY     = os.environ.get("YOUTUBE_API_KEY", "").strip()
 PLAYLIST_ID = os.environ.get("CAZE_PLAYLIST_ID", "").strip()
+PLAYLIST_COMPLETOS_ID = os.environ.get("CAZE_COMPLETOS_PLAYLIST_ID", "").strip() or "PLsFWLnYCEXEVWs5wf60vfwUU4FaOEre3D"
 
 def norm(s):
     """maiúsculas, sem acento, sem pontuação — para casar nomes de forma robusta."""
@@ -989,6 +991,146 @@ def estado_dos_videos(api_key, video_ids):
     return out
 
 
+
+def titulo_ruim_para_jogo_completo(titulo):
+    """Bloqueia vídeos que não devem virar link de jogo completo."""
+    t = norm(titulo)
+    termos_bloqueados = (
+        "MELHORES MOMENTOS", "TODOS OS LANCES", "GOL DE", "GOLACO",
+        "SHORTS", "SHORT", "ENTREVISTA", "BASTIDORES", "REACT", "CORTE",
+        "COLETIVA", "ESCALACAO", "PENALTI", "PRE JOGO", "POS JOGO",
+        "AQUECIMENTO", "ESQUENTA"
+    )
+    return any(x in t for x in termos_bloqueados)
+
+
+def parse_jogo_completo_ou_confronto(titulo):
+    """Extrai confronto de títulos de jogo completo ou de títulos genéricos."""
+    a, b = parse_jogo_live(titulo)  # entende 'JOGO COMPLETO: A X B'
+    if a and b:
+        return a, b
+    a, b = parse_confronto_generico(titulo)
+    if a and b:
+        return a, b
+    return parse_confronto_por_presenca(titulo)
+
+
+def video_completo_valido(v, detalhe, chave, status_jogos, origem):
+    """Validação para jogo completo."""
+    titulo = (detalhe or {}).get("titulo") or v.get("titulo", "")
+    estado = ((detalhe or {}).get("estado") or v.get("estado") or "none").lower()
+    canal = (detalhe or {}).get("channelId") or ""
+    dur = (detalhe or {}).get("duration_seconds")
+    t = norm(titulo)
+
+    if estado in ("live", "upcoming"):
+        return False
+    if canal and canal != CAZE_CHANNEL_ID:
+        return False
+    if not jogo_ja_encerrado_para_melhores(chave, status_jogos):
+        print(f"  rejeitei jogo completo antes do jogo encerrar: {chave} -> {titulo[:70]}")
+        return False
+    if titulo_ruim_para_jogo_completo(titulo):
+        return False
+    if dur is not None:
+        if origem == "playlist-completos" and dur < 45 * 60:
+            print(f"  rejeitei jogo completo curto demais: {chave} -> {titulo[:70]} ({dur}s)")
+            return False
+        if origem != "playlist-completos" and dur < 60 * 60:
+            print(f"  rejeitei fallback de jogo completo curto demais: {chave} -> {titulo[:70]} ({dur}s)")
+            return False
+    if origem != "playlist-completos" and not any(x in t for x in ("JOGO COMPLETO", "TRANSMISSAO COMPLETA", "INTEGRA")):
+        return False
+    return True
+
+
+def atualizar_jogos_completos(api_key):
+    """Busca jogos completos da CazéTV e grava dados/jogos-completos.json."""
+    try:
+        atual = json.load(open(SAIDA_COMPLETOS, encoding="utf-8"))
+    except Exception:
+        atual = {"_comentario": "Jogos completos da CazéTV por confronto. Chave = siglas em ordem alfabética. Registros fonte=admin nunca são sobrescritos.", "jogos": {}}
+    antigos = atual.get("jogos", {}) or {}
+    jogos = {k: v for k, v in antigos.items() if (v or {}).get("fonte") == "admin"}
+
+    status_jogos = mapa_jogos_espn_status()
+    nomes = nome_por_id()
+    validos = set()
+
+    def registrar(chave, v, detalhe, origem):
+        if jogos.get(chave, {}).get("fonte") == "admin":
+            return False
+        if not video_completo_valido(v, detalhe, chave, status_jogos, origem):
+            return False
+        titulo_final = ((detalhe or {}).get("titulo") or v.get("titulo", "")).split("|")[0].strip()
+        jogos[chave] = {
+            "url": "https://youtu.be/" + v["videoId"],
+            "titulo": titulo_final,
+            "fonte": "auto",
+            "origem": origem,
+            "validado_completo": True,
+            "atualizado_em": agora_sp().isoformat(timespec="seconds"),
+        }
+        validos.add(chave)
+        print(f"  + ({origem}) jogo completo {chave}: {titulo_final[:70]}")
+        return True
+
+    try:
+        videos = listar_playlist(PLAYLIST_COMPLETOS_ID, api_key)
+        print(f"Vídeos na playlist de jogos completos: {len(videos)}")
+    except Exception as e:
+        print("  leitura da playlist de jogos completos falhou:", e)
+        videos = []
+
+    detalhes_playlist = detalhes_videos(api_key, [v["videoId"] for v in videos])
+    for v in videos:
+        detalhe = detalhes_playlist.get(v["videoId"], {})
+        titulo = detalhe.get("titulo") or v.get("titulo", "")
+        if titulo_ruim_para_jogo_completo(titulo):
+            continue
+        a, b = parse_jogo_completo_ou_confronto(titulo)
+        if not a or not b or a == b:
+            print("  não casei jogo completo:", titulo[:70])
+            continue
+        chave = chave_confronto(a, b)
+        registrar(chave, v, detalhe, "playlist-completos")
+
+    jogos_encerrados = []
+    for chave, info in status_jogos.items():
+        if chave in validos or chave in jogos:
+            continue
+        if not (info.get("state") == "post" or info.get("completed") is True):
+            continue
+        partes = chave.split("-")
+        if len(partes) == 2:
+            jogos_encerrados.append({"chave": chave, "a": partes[0], "b": partes[1]})
+
+    for j in jogos_encerrados[:80]:
+        na, nb = nomes.get(j["a"], j["a"]), nomes.get(j["b"], j["b"])
+        candidatos = []
+        for q in (
+            f"{na} x {nb} jogo completo",
+            f"{nb} x {na} jogo completo",
+            f"{na} {nb} transmissão completa",
+            f"{nb} {na} transmissão completa",
+            f"{j['a']} x {j['b']} jogo completo",
+        ):
+            candidatos.extend(yt_search_caze(api_key, q, max_results=6))
+        candidatos = dedupe_videos(candidatos)
+        detalhes = detalhes_videos(api_key, [v["videoId"] for v in candidatos])
+        for v in candidatos:
+            detalhe = detalhes.get(v["videoId"], {})
+            titulo = detalhe.get("titulo") or v.get("titulo", "")
+            a, b = parse_jogo_completo_ou_confronto(titulo)
+            if not a or not b or set([a, b]) != set([j["a"], j["b"]]):
+                continue
+            if registrar(j["chave"], v, detalhe, "search-completo-caze"):
+                break
+
+    atual["jogos"] = jogos
+    json.dump(atual, open(SAIDA_COMPLETOS, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    print(f"Jogos completos automáticos válidos: {len(validos)}. Total no arquivo: {len(jogos)}.")
+
 def atualizar_lives(api_key):
     """Casa as transmissões de JOGO da Cazé com cada partida e grava dados/lives.json.
     Estratégia: usa uploads recentes + aba /streams + buscas restritas ao canal
@@ -1212,7 +1354,14 @@ def main():
     json.dump(atual, open(SAIDA, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     print(f"OK. Melhores momentos automáticos válidos: {len(validos_auto)}. Títulos não reconhecidos: {ignorados}. Total no arquivo: {len(jogos)}.")
 
-    # --- ETAPA 3: lives da Cazé (agendadas + ao vivo) coladas em cada jogo ---
+    # --- ETAPA 3: jogos completos da CazéTV ---
+    print("\nAtualizando jogos completos da CazéTV...")
+    try:
+        atualizar_jogos_completos(API_KEY)
+    except Exception as e:
+        print("Falha ao atualizar jogos completos (não interrompe os melhores momentos):", e)
+
+    # --- ETAPA 4: lives da Cazé (agendadas + ao vivo) coladas em cada jogo ---
     print("\nAtualizando lives da CazéTV...")
     try:
         atualizar_lives(API_KEY)
