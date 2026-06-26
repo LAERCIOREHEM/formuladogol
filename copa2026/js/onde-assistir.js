@@ -367,8 +367,8 @@
 
   function compartilhar() {
     var url = "https://brasileirao2026almoco.com.br/copa2026/onde-assistir.html";
-    var texto = "Onde assistir todos os jogos da Copa 2026 (horário de Brasília) 🏆⚽";
-    if (navigator.share) navigator.share({ title: "Copa 2026 — Onde assistir", text: texto, url: url }).catch(function () {});
+    var texto = "Acompanhe a Copa 2026: jogos, horários, onde assistir, placares, melhores momentos e jogos completos 🏆⚽";
+    if (navigator.share) navigator.share({ title: "Copa 2026 — jogos e onde assistir", text: texto, url: url }).catch(function () {});
     else window.open("https://wa.me/?text=" + encodeURIComponent(texto + " " + url), "_blank");
   }
 
