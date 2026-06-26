@@ -1121,6 +1121,7 @@
       <div class="grpcab">Melhores terceiros <span>ao vivo</span></div>
       <p class="mt-leg">Ranking dos 3º colocados <b>como está agora</b>. Os 8 acima da linha avançam.</p>
       <table class="tabgrp mt-tab"><thead><tr><th></th><th class="ctime">Seleção</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th class="men">GP</th><th>SG</th><th></th></tr></thead><tbody>${linhas}</tbody></table>
+      <a class="voltar-topo-terceiros" href="#lista">↑ Voltar ao topo</a>
     </div>`;
   }
 
