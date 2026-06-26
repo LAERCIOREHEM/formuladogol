@@ -30,6 +30,7 @@
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
   let MATA_LOCK_TOKENS = {}; // slots matematicamente definidos no mata-mata (1A, 2B, 3C...)
+  let PARTIDAS_MATA_MAP = {}; // eventId ESPN -> confronto projetado/confirmado para cards da aba Partidas
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Jogo -> tabela -> voltar
   let RETORNO_GRUPO = null; // navegação Tabela de grupos -> jogo -> voltar para a mesma tabela
   let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols/cartões exibidos nos cards
@@ -632,6 +633,7 @@
     }
     const evs = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
     JOGOS_DIA_EVENTS = evs;
+    await prepararMataProjetadoParaPartidas(evs);
     if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); bindRetornoGrupo(); return; }
     $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
@@ -706,7 +708,7 @@
       <button class="vbtn ${ABA === "grupos" ? "on" : ""}" data-v="grupos">📊 Grupos</button>
       <button class="vbtn ${ABA === "mata" ? "on" : ""}" data-v="mata">🏆 Mata-mata</button>
     </div>
-    <a class="todos-jogos-cta" id="cta-todos" role="button" tabindex="0" style="cursor:pointer">📋 Visualizar todos os jogos</a>`;
+    <a class="todos-jogos-cta" id="cta-todos" href="onde-assistir.html">📋 Visualizar todos os jogos</a>`;
   }
   function fetchJSONNoCache(url) {
     // Durante jogo ao vivo, alguns navegadores/CDNs seguram resposta por alguns segundos.
@@ -1077,6 +1079,110 @@
     });
     return out;
   }
+
+  function rankingTerceirosCompleto(classificacao, fairplay) {
+    const seed = {}; (SEL || []).forEach(s => { seed[s.id] = s.seed; });
+    const FP = fairplay || {};
+    return Object.keys(classificacao || {}).sort().map(G => {
+      const t = classificacao[G] && classificacao[G][2];
+      return t ? Object.assign({}, t, { grupo: G }) : null;
+    }).filter(Boolean).sort((x, y) =>
+      (y.pts || 0) - (x.pts || 0) ||
+      (y.sg || 0) - (x.sg || 0) ||
+      (y.gf || 0) - (x.gf || 0) ||
+      (FP[y.id] || 0) - (FP[x.id] || 0) ||
+      (seed[x.id] || 999) - (seed[y.id] || 999)
+    );
+  }
+
+  function melhoresTerceirosHTML(classificacao, tab, fairplay) {
+    const todos = rankingTerceirosCompleto(classificacao, fairplay);
+    if (!todos.length) return "";
+    const linhas = todos.map((t, i) => {
+      const base = tab && tab[t.grupo] && tab[t.grupo][t.id];
+      const pts = base ? base.pts : (t.pts || 0);
+      const j = base ? base.j : 0;
+      const v = base ? base.v : 0;
+      const e = base ? base.e : 0;
+      const d = base ? base.d : 0;
+      const gp = base ? base.gp : (t.gf || 0);
+      const gc = base ? base.gc : (t.gc || 0);
+      const sg = gp - gc;
+      const dentro = i < 8;
+      const corte = i === 8 ? '<tr class="mt-corte"><td colspan="10"><span>linha de corte — 8 melhores terceiros avançam</span></td></tr>' : '';
+      return corte + `<tr class="${dentro ? 'mt-dentro' : 'mt-fora'}"><td class="cpos">${i + 1}</td><td class="ctime">${flagId(t.id)} <span>${nomeDe(t.id)}</span> <small>Grupo ${t.grupo}</small></td><td><b>${pts}</b></td><td>${j}</td><td>${v}</td><td>${e}</td><td>${d}</td><td class="men">${gp}</td><td>${sg > 0 ? '+' + sg : sg}</td><td class="mt-status">${dentro ? '✅' : '❌'}</td></tr>`;
+    }).join("");
+    return `<div class="grpcard melhores-terceiros" id="grp-melhores-terceiros">
+      <div class="grpcab">Melhores terceiros <span>ao vivo</span></div>
+      <p class="mt-leg">Ranking dos 3º colocados <b>como está agora</b>. Os 8 acima da linha avançam.</p>
+      <table class="tabgrp mt-tab"><thead><tr><th></th><th class="ctime">Seleção</th><th>P</th><th>J</th><th>V</th><th>E</th><th>D</th><th class="men">GP</th><th>SG</th><th></th></tr></thead><tbody>${linhas}</tbody></table>
+    </div>`;
+  }
+
+  async function prepararMataProjetadoParaPartidas(evsDia) {
+    PARTIDAS_MATA_MAP = {};
+    try {
+      if (!ESTRUT || !TERMAP || !(evsDia || []).some(ev => ((ev.season && ev.season.slug) || "") !== "group-stage")) return;
+      const grpEvents = await buscarGruposEvents();
+      const placG = placaresGruposDaESPN(grpEvents);
+      const fp = await buscarFairPlay();
+      const d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp);
+      MATA_CACHE = d;
+      MATA_LOCK_TOKENS = tokensTravadosMata(grpEvents, fp);
+      const jogos = montarJogosMata(d);
+      const lista = [].concat(jogos["16-avos"] || [], jogos["Oitavas"] || [], jogos["Quartas"] || [], jogos["Semis"] || [], jogos["Final"] || []);
+      lista.forEach(j => {
+        const ev = eventoMataDeOuSlot(j, evsDia || []);
+        if (ev && ev.id) PARTIDAS_MATA_MAP[String(ev.id)] = j;
+      });
+    } catch (e) {
+      PARTIDAS_MATA_MAP = {};
+    }
+  }
+
+  function tokenTextoCompetidor(c) {
+    const t = c && c.team ? c.team : {};
+    return [t.abbreviation, t.displayName, t.shortDisplayName, t.name, t.location, t.nickname]
+      .filter(Boolean).join(" ").toUpperCase();
+  }
+
+  function resolveProjetadoCompetidor(c, proj, preferido) {
+    if (!proj) return null;
+    const txt = tokenTextoCompetidor(c);
+    const time = c && c.team ? c.team : {};
+    const realId = dpSigla(time.abbreviation) || dpSigla(time.displayName) || dpSigla(time.shortDisplayName) || dpSigla(time.name);
+    const norm = s => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const t = norm(txt);
+    const aTok = norm(proj.slotA), bTok = norm(proj.slotB);
+    const a3 = /^3[A-L]$/.test(String(proj.slotA || ""));
+    const b3 = /^3[A-L]$/.test(String(proj.slotB || ""));
+
+    let lado = null;
+    if (realId && realId === proj.a) lado = "a";
+    else if (realId && realId === proj.b) lado = "b";
+    else if (aTok && t.includes(aTok)) lado = "a";
+    else if (bTok && t.includes(bTok)) lado = "b";
+    else if (/\b3RD\b|THIRD|3RDP/.test(txt)) lado = a3 && !b3 ? "a" : (b3 && !a3 ? "b" : null);
+    else lado = preferido;
+
+    if (lado === "a" && proj.a) return { id: proj.a, slot: proj.slotA, travado: !!proj.travA };
+    if (lado === "b" && proj.b) return { id: proj.b, slot: proj.slotB, travado: !!proj.travB };
+    return null;
+  }
+
+  function ladoPartidaHTML(c, cls, projInfo, vencedorCls) {
+    if (projInfo && projInfo.id) {
+      const fl = dpFlag(projInfo.id, 80);
+      const mark = projInfo.travado
+        ? '<span class="jogo-slot-mark ok" title="Vaga confirmada">✓</span>'
+        : '<span class="jogo-slot-mark wait" title="Projeção como está agora">⌛</span>';
+      const img = fl ? `<img src="${fl}" alt="" title="${dpNome(projInfo.id)}" onerror="this.style.visibility='hidden'">` : "";
+      const nome = `<span class="t">${dpNome(projInfo.id)} ${mark}</span>`;
+      return `<div class="lado ${cls} ${vencedorCls || ""}">${cls.indexOf("f") >= 0 ? (nome + img) : (img + nome)}</div>`;
+    }
+    return `<div class="lado ${cls} ${vencedorCls || ""}">${cls.indexOf("f") >= 0 ? `<span class="t">${teamNome(c)}</span>${escudo(c)}` : `${escudo(c)}<span class="t">${teamNome(c)}</span>`}</div>`;
+  }
+
   async function renderMata() {
     $("#lista").innerHTML = abasHTML() + '<p class="vazio">Montando o chaveamento…</p>';
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
@@ -1501,7 +1607,8 @@
           <div class="jg-box" id="jgs-${G}" style="display:none">${jogosHTML}</div>
         </div>`;
       }).join("");
-      $("#lista").innerHTML = abasHTML() + '<p class="leg-grp">As <b>2 primeiras</b> de cada grupo avançam, mais os 8 melhores terceiros. Durante jogos ao vivo, a tabela é calculada <b>como está agora</b> e atualiza automaticamente.</p>' + blocos;
+      const terceirosHTML = melhoresTerceirosHTML(classifEngine, tab, fp);
+      $("#lista").innerHTML = abasHTML() + '<p class="leg-grp">As <b>2 primeiras</b> de cada grupo avançam, mais os 8 melhores terceiros. Durante jogos ao vivo, a tabela é calculada <b>como está agora</b> e atualiza automaticamente.</p>' + blocos + terceirosHTML;
       document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
       // toggle dos jogos do grupo
       document.querySelectorAll(".jg-toggle[data-jg-grupo]").forEach(b => b.onclick = () => {
@@ -1570,6 +1677,9 @@
       badge = `<span class="badge fim">Encerrado${st.shortDetail && /pen/i.test(st.shortDetail) ? " (pên.)" : ""}</span>`;
     }
     const vencH = home.winner ? "venc" : "", vencA = away.winner ? "venc" : "";
+    const proj = PARTIDAS_MATA_MAP[String(ev.id)] || null;
+    const projHome = (st.state === "pre" && slug !== "group-stage") ? resolveProjetadoCompetidor(home, proj, "a") : null;
+    const projAway = (st.state === "pre" && slug !== "group-stage") ? resolveProjetadoCompetidor(away, proj, "b") : null;
     const palpites = slug === "group-stage" ? palpiteBloco(ev, home, away, st) : "";
     // grupo do jogo (só na fase de grupos): link que leva à Tabela dos Grupos
     let grupoTag = "";
@@ -1581,9 +1691,9 @@
       ${retornoCard}
       <div class="topo"><span class="fase">${fase}</span>${grupoTag}${badge}</div>
       <div class="linha">
-        <div class="lado ${vencH}">${escudo(home)}<span class="t">${teamNome(home)}</span></div>
+        ${ladoPartidaHTML(home, "", projHome, vencH)}
         ${meio}
-        <div class="lado f ${vencA}"><span class="t">${teamNome(away)}</span>${escudo(away)}</div>
+        ${ladoPartidaHTML(away, "f", projAway, vencA)}
       </div>
       ${st.state !== "pre" ? `<div class="gols-jogo" id="gols-${ev.id}" aria-label="Gols e cartões vermelhos"></div>` : ""}
       ${venue ? `<div class="venue">${venue}</div>` : ""}
@@ -1795,6 +1905,7 @@
     $("#lista").addEventListener("click", (e) => {
       const cta = e.target.closest(".todos-jogos-cta");
       if (!cta) return;
+      if (cta.getAttribute("href")) return; // botão atual apenas redireciona para onde-assistir.html
       e.preventDefault();
       if (ABA === "todos") return;
       renderTodosJogos();
