@@ -25,7 +25,7 @@
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
   let ABA = "jogos", SEL = [], GRP_EVENTS = [], GRP_EVENTS_TS = 0;
-  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0, PALPMATA = {};
+  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0, PALPMATA = {}, AGENDA_MATA = {};
   let FAIRPLAY = {}, FAIRPLAY_TS = 0; // {sigla: pontos de conduta}, cache 5min
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
@@ -562,6 +562,9 @@
       ESTRUT = await fetch("dados/estrutura_mata_mata.json").then(r => r.json());
       TERMAP = await fetch("dados/terceiros_map.json").then(r => r.json());
     } catch (e) { ESTRUT = null; TERMAP = null; }
+    try {
+      AGENDA_MATA = await fetch("dados/agenda_mata.json").then(r => r.json());
+    } catch (e) { AGENDA_MATA = {}; }
     try {
       const rows = await rpc("copa_revelados", {});
       PALP = (rows || []).map(r => ({ nome: r.nome, pg: (r.payload || {}).placaresGrupos || {} }));
@@ -1245,44 +1248,6 @@
   }
   function normTokenMata(s) { return String(s || "").toUpperCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9]/g, ""); }
 
-  function ordemFifaMata(id) {
-    const n = parseInt(String(id || "").replace(/\D/g, ""), 10);
-    if (!Number.isFinite(n)) return null;
-    if (n >= 73 && n <= 88) return { fase:"32", ord:n - 72, rotulos:["32", "R32", "ROUND32", "LAST32"] };
-    if (n >= 89 && n <= 96) return { fase:"16", ord:n - 88, rotulos:["16", "R16", "ROUND16", "LAST16"] };
-    if (n >= 97 && n <= 100) return { fase:"QF", ord:n - 96, rotulos:["QF", "QUARTERFINAL", "QUARTERS", "QUARTER"] };
-    if (n >= 101 && n <= 102) return { fase:"SF", ord:n - 100, rotulos:["SF", "SEMIFINAL", "SEMIFINALS", "SEMI"] };
-    return null;
-  }
-
-  function aliasesTokenMata(token) {
-    const bruto = String(token || "").trim();
-    const out = [bruto];
-    const n = normTokenMata(bruto);
-    if (!n) return [];
-    out.push(n);
-    const wl = n.match(/^([WL])M(\d+)$/);
-    if (wl) {
-      const prefixo = wl[1];
-      const num = parseInt(wl[2], 10);
-      const ord = ordemFifaMata("M" + num);
-      out.push(prefixo + "M" + num, prefixo + num);
-      out.push((prefixo === "W" ? "WINNER" : "LOSER") + "MATCH" + num);
-      out.push((prefixo === "W" ? "WINNER" : "LOSER") + "M" + num);
-      if (ord) {
-        const o = String(ord.ord), op = o.padStart(2, "0");
-        ord.rotulos.forEach(r => {
-          out.push(prefixo + r + o, prefixo + r + op);
-          out.push(prefixo + r + "MATCH" + o, prefixo + r + "MATCH" + op);
-          out.push(prefixo + "MATCH" + r + o, prefixo + "MATCH" + r + op);
-          out.push((prefixo === "W" ? "WINNER" : "LOSER") + r + o);
-          out.push((prefixo === "W" ? "WINNER" : "LOSER") + r + op);
-        });
-      }
-    }
-    return Array.from(new Set(out.map(normTokenMata).filter(Boolean)));
-  }
-
   function textosEventoMata(ev) {
     const textos = [];
     try {
@@ -1300,8 +1265,12 @@
     const nt = normTokenMata(token);
     if (!nt) return false;
     const textos = textosEventoMata(ev);
-    const aliases = aliasesTokenMata(token);
-    if (textos.some(t => aliases.some(a => t === a || t.includes(a)))) return true;
+    if (textos.some(t => t === nt || t.includes(nt))) return true;
+    const mw = nt.match(/^([WL])M(\d+)$/);
+    if (mw) {
+      const curto = mw[1] + mw[2];
+      if (textos.some(t => t === curto || t.includes(curto))) return true;
+    }
     const m = nt.match(/^([123])([A-L])$/);
     if (m) {
       const pos = m[1], grupo = m[2];
@@ -1339,7 +1308,17 @@
   }
 
   function infoJogoMata(ev, idA, idB, j) {
-    if (!ev) return { status:"Agendado", cls:"", scoreA:"", scoreB:"", vA:"", vB:"", info:"" };
+    if (!ev) {
+      const ag = AGENDA_MATA[(j && j.id) || ""];
+      if (ag && ag.data) {
+        const dd = new Date(ag.data);
+        const dataAg = dd.toLocaleDateString("pt-BR", { day:"2-digit", month:"2-digit", timeZone:"America/Sao_Paulo" });
+        const ondeAg = ag.local || "";
+        const linhaAg = `<span class="mm-data">${dataAg} · ${horaBR(ag.data)}</span>${ondeAg ? `<span class="mm-estadio">${escTxt(ondeAg)}</span>` : ""}`;
+        return { status:"Agendado", cls:"", scoreA:"", scoreB:"", vA:"", vB:"", info:linhaAg };
+      }
+      return { status:"Agendado", cls:"", scoreA:"", scoreB:"", vA:"", vB:"", info:"" };
+    }
     const comp = ev.competitions[0], st = comp.status.type, cs = comp.competitors;
     const h = cs.find(c => c.homeAway === "home") || cs[0];
     const a = cs.find(c => c.homeAway === "away") || cs[1];
