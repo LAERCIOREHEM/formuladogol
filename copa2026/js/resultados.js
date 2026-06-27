@@ -1245,6 +1245,44 @@
   }
   function normTokenMata(s) { return String(s || "").toUpperCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9]/g, ""); }
 
+  function ordemFifaMata(id) {
+    const n = parseInt(String(id || "").replace(/\D/g, ""), 10);
+    if (!Number.isFinite(n)) return null;
+    if (n >= 73 && n <= 88) return { fase:"32", ord:n - 72, rotulos:["32", "R32", "ROUND32", "LAST32"] };
+    if (n >= 89 && n <= 96) return { fase:"16", ord:n - 88, rotulos:["16", "R16", "ROUND16", "LAST16"] };
+    if (n >= 97 && n <= 100) return { fase:"QF", ord:n - 96, rotulos:["QF", "QUARTERFINAL", "QUARTERS", "QUARTER"] };
+    if (n >= 101 && n <= 102) return { fase:"SF", ord:n - 100, rotulos:["SF", "SEMIFINAL", "SEMIFINALS", "SEMI"] };
+    return null;
+  }
+
+  function aliasesTokenMata(token) {
+    const bruto = String(token || "").trim();
+    const out = [bruto];
+    const n = normTokenMata(bruto);
+    if (!n) return [];
+    out.push(n);
+    const wl = n.match(/^([WL])M(\d+)$/);
+    if (wl) {
+      const prefixo = wl[1];
+      const num = parseInt(wl[2], 10);
+      const ord = ordemFifaMata("M" + num);
+      out.push(prefixo + "M" + num, prefixo + num);
+      out.push((prefixo === "W" ? "WINNER" : "LOSER") + "MATCH" + num);
+      out.push((prefixo === "W" ? "WINNER" : "LOSER") + "M" + num);
+      if (ord) {
+        const o = String(ord.ord), op = o.padStart(2, "0");
+        ord.rotulos.forEach(r => {
+          out.push(prefixo + r + o, prefixo + r + op);
+          out.push(prefixo + r + "MATCH" + o, prefixo + r + "MATCH" + op);
+          out.push(prefixo + "MATCH" + r + o, prefixo + "MATCH" + r + op);
+          out.push((prefixo === "W" ? "WINNER" : "LOSER") + r + o);
+          out.push((prefixo === "W" ? "WINNER" : "LOSER") + r + op);
+        });
+      }
+    }
+    return Array.from(new Set(out.map(normTokenMata).filter(Boolean)));
+  }
+
   function textosEventoMata(ev) {
     const textos = [];
     try {
@@ -1262,12 +1300,8 @@
     const nt = normTokenMata(token);
     if (!nt) return false;
     const textos = textosEventoMata(ev);
-    if (textos.some(t => t === nt || t.includes(nt))) return true;
-    const mw = nt.match(/^([WL])M(\d+)$/);
-    if (mw) {
-      const curto = mw[1] + mw[2];
-      if (textos.some(t => t === curto || t.includes(curto))) return true;
-    }
+    const aliases = aliasesTokenMata(token);
+    if (textos.some(t => aliases.some(a => t === a || t.includes(a)))) return true;
     const m = nt.match(/^([123])([A-L])$/);
     if (m) {
       const pos = m[1], grupo = m[2];
