@@ -1,7 +1,7 @@
 /* =========================================================================
    aovivo.js — Tela "AO VIVO" (Copa 2026)
-   Lê o feed da ESPN (navegador direto, 30s). Quando há jogo ao vivo (ou nos
-   30 min de pré-jogo), mostra a tela cheia; quando acaba (status oficial),
+   Lê o feed da ESPN. Fora da janela de jogo não atualiza; quando há jogo ao vivo (ou nos
+   10 min de pré-jogo), mostra a tela cheia; quando acaba (status oficial),
    sai sozinho. Na FASE DE GRUPOS, cruza com os palpites e mostra as bolinhas
    (acertando / cravou). No mata-mata, só o placar (palpite por jogo não se
    aplica — cada um tem chave diferente).
@@ -22,7 +22,13 @@
   const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
   const SUMMARY_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary";
   const DEMO = /[?&]demo=1/.test(location.search);
-  const PRE_MIN = 30;                 // abre 30 min antes do início oficial
+  const PRE_MIN = 10;                 // abre 10 min antes do início oficial
+  const LIVE_REFRESH_MS = 30000;        // durante jogo/janela ativa
+  const LIVE_POST_MS = 60 * 60 * 1000; // 1h após fim detectado/estimado
+  const LIVE_ESTIMATED_GAME_MS = 4 * 60 * 60 * 1000;
+  const LIVE_OPEN_WINDOW_MS = 8 * 60 * 60 * 1000;
+  const LIVE_RECHECK_MS = 12 * 60 * 60 * 1000;
+  const LIVE_DONE_KEY = "copa2026_aovivo_post_";
   const ESPN_OVR = {};               // se alguma sigla da ESPN diferir do nosso id, mapear aqui (ex.: {"GER":"ALE"})
   let DADOS = {}, JOGOS = [], PART = [], timer = null;
   let TVS = {};
@@ -78,41 +84,128 @@
       const rows = await rpc("copa_revelados", {});
       PART = (rows || []).map(r => ({ nome: r.nome, grupos: (r.payload || {}).placaresGrupos || {} })).sort((a, b) => a.nome.localeCompare(b.nome));
     } catch (e) { PART = []; }
-    loop(); timer = setInterval(loop, 30000);
+    loop();
+  }
+
+  function estadoEventoAoVivo(ev) {
+    return getPath(ev, ["competitions", 0, "status", "type", "state"], "pre");
+  }
+  function statusTextoAoVivo(ev) {
+    const st = getPath(ev, ["competitions", 0, "status"], {}) || {};
+    const tp = st.type || {};
+    return [
+      st.displayClock, st.period, st.detail, st.shortDetail,
+      tp.id, tp.name, tp.description, tp.detail, tp.shortDetail, tp.state, tp.completed
+    ].filter(v => v != null && v !== "").join(" ").toLowerCase();
+  }
+  function eventoAoVivoOuAtrasado(ev) {
+    const state = estadoEventoAoVivo(ev);
+    const txt = statusTextoAoVivo(ev);
+    if (state === "in") return true;
+    return /delay|delayed|weather|suspend|suspended|postpon|adiad|atras|chuva|clima|interromp|penalt|shootout|extra time|overtime|halftime|half time|intervalo/.test(txt);
+  }
+  function eventoIdAoVivo(ev) {
+    return String((ev && (ev.id || getPath(ev, ["competitions", 0, "id"], ""))) || "");
+  }
+  function postDetectadoAoVivoMs(ev, inicio, agora) {
+    const id = eventoIdAoVivo(ev);
+    if (!id || typeof localStorage === "undefined") return 0;
+    const key = LIVE_DONE_KEY + id;
+    const salvo = parseInt(localStorage.getItem(key) || "0", 10);
+    if (salvo > 0) return salvo;
+    if (agora >= inicio - PRE_MIN * 60000 && agora <= inicio + LIVE_ESTIMATED_GAME_MS) {
+      try { localStorage.setItem(key, String(agora)); } catch (e) {}
+      return agora;
+    }
+    return 0;
+  }
+  function fimEstimadoAoVivoMs(ev, inicio, agora) {
+    if (estadoEventoAoVivo(ev) === "post") {
+      const detectado = postDetectadoAoVivoMs(ev, inicio, agora);
+      if (detectado) return detectado;
+    }
+    return inicio + LIVE_ESTIMATED_GAME_MS;
+  }
+  function eventoPedeLoop(ev, agoraMs) {
+    if (!ev || !ev.date) return false;
+    const inicio = new Date(ev.date).getTime();
+    if (!isFinite(inicio)) return false;
+    const agora = agoraMs || Date.now();
+    const state = estadoEventoAoVivo(ev);
+    const preMs = PRE_MIN * 60000;
+
+    if (eventoAoVivoOuAtrasado(ev)) {
+      return agora >= inicio - preMs && agora <= inicio + LIVE_OPEN_WINDOW_MS;
+    }
+    if (state === "post") {
+      const fim = fimEstimadoAoVivoMs(ev, inicio, agora);
+      return agora >= inicio - preMs && agora <= fim + LIVE_POST_MS;
+    }
+    return agora >= inicio - preMs && agora <= inicio + LIVE_OPEN_WINDOW_MS;
+  }
+  function inicioJanelaAoVivo(ev) {
+    if (!ev || !ev.date) return Infinity;
+    const t = new Date(ev.date).getTime();
+    return isFinite(t) ? t - PRE_MIN * 60000 : Infinity;
+  }
+  function proximoInicioAoVivo(events, agora) {
+    let prox = Infinity;
+    (events || []).forEach(ev => {
+      const ini = inicioJanelaAoVivo(ev);
+      if (ini > agora && ini < prox) prox = ini;
+    });
+    return prox;
+  }
+  function agendarLoop(delay) {
+    if (timer) clearTimeout(timer);
+    const d = Math.max(15000, Math.min(delay || LIVE_RECHECK_MS, LIVE_RECHECK_MS));
+    timer = setTimeout(loop, d);
+  }
+  function delayProximoLoop(events) {
+    const agora = Date.now();
+    if ((events || []).some(ev => eventoPedeLoop(ev, agora))) return LIVE_REFRESH_MS;
+    const prox = proximoInicioAoVivo(events || [], agora);
+    if (isFinite(prox)) return Math.max(15000, Math.min(prox - agora, LIVE_RECHECK_MS));
+    return LIVE_RECHECK_MS;
   }
 
   async function loop() {
     let data;
-    // janela de ontem até +4 dias (fuso Brasília), pra sempre achar jogos ao vivo E o próximo jogo.
-    // Sem ?dates=, a ESPN devolve só o dia atual no fuso dos EUA — o que some com o "próximo jogo"
-    // quando vira o dia no Brasil. A janela resolve isso.
-    function ymdSP(offsetDias) {
-      const d = new Date(Date.now() + offsetDias * 864e5);
-      return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).format(d).replace(/-/g, "");
+    // Calendário da Copa: permite saber quando acordar novamente sem ficar
+    // atualizando a página fora de horário de jogo.
+    const url = `${API}?dates=20260611-20260719&limit=200&_=${Date.now()}`;
+    try { data = await (await fetch(url, { cache: "no-store" })).json(); }
+    catch (e) {
+      if (!DEMO) { $("#app").innerHTML = '<p class="vazio">Sem conexão com o feed agora. Tentando de novo…</p>'; agendarLoop(5 * 60 * 1000); return; }
+      data = { events: [] };
     }
-    const url = `${API}?dates=${ymdSP(-1)}-${ymdSP(4)}&limit=80`;
-    try { data = await (await fetch(url)).json(); }
-    catch (e) { if (!DEMO) { $("#app").innerHTML = '<p class="vazio">Sem conexão com o feed agora. Tentando de novo…</p>'; return; } data = { events: [] }; }
+
     const now = Date.now();
+    const eventos = (data.events || []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+
     // jogos REALMENTE ao vivo agora
-    const noAr = (data.events || []).filter(ev => ev.competitions[0].status.type.state === "in");
+    const noAr = eventos.filter(ev => estadoEventoAoVivo(ev) === "in");
     let lives;
     if (noAr.length) {
       // TRAVA: se tem jogo ao vivo de verdade, mostra SÓ ele(s).
-      // Não deixa o próximo jogo (que abre 30min antes) tomar o lugar de um jogo em andamento.
       lives = noAr;
     } else {
-      // ninguém ao vivo: aí sim mostra o próximo que está prestes a começar (30min antes)
-      lives = (data.events || []).filter(ev => {
-        const st = ev.competitions[0].status.type;
-        if (st.state !== "pre") return false;
+      // ninguém ao vivo: mostra apenas jogos que estão na janela de pré-jogo/atraso.
+      lives = eventos.filter(ev => {
+        const st = estadoEventoAoVivo(ev);
         const dt = new Date(ev.date).getTime();
-        return now >= dt - PRE_MIN * 60000 && now <= dt + 60 * 60000;
+        if (st === "pre") {
+          if (eventoAoVivoOuAtrasado(ev)) return now >= dt - PRE_MIN * 60000 && now <= dt + LIVE_OPEN_WINDOW_MS;
+          return now >= dt - PRE_MIN * 60000 && now <= dt + 60 * 60000;
+        }
+        return false;
       });
     }
+
     let demoFlag = false;
     if (DEMO && !lives.length) { lives = [fabricar()]; demoFlag = true; }
     render(lives, data, demoFlag);
+    agendarLoop(delayProximoLoop(eventos));
   }
 
   function render(lives, data, demoFlag) {
