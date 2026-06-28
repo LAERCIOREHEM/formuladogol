@@ -1445,7 +1445,8 @@
       // mantendo o comportamento visual atual do mata-mata.
       return linhaEquipeMata(resolvido.id, null, "", "", true);
     }
-    return slotMataHTML(valor, slot);
+    const txt = textoSlot(valor || slot);
+    return `<div class="mm-equipe mm-tbd"><span class="mm-slot">${escTxt(txt)}</span></div>`;
   }
 
   function linhaEquipeMata(valor, slot, score, vcls, travado) {
