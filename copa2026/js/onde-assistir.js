@@ -11,7 +11,8 @@
     globo: ["Globo", "#0a7cff"], sbt: ["SBT", "#00a651"], sportv: ["SporTV", "#ff7a00"],
     getv: ["ge tv", "#06aa48"], gplay: ["Globoplay", "#fb0234"], caze: ["CazéTV", "#f7d116"]
   };
-  var SEL = {}, ISO = {}, TVS = {}, MM = {}, JC = {}, JOGOS = [], LANCES_CACHE = {};
+  var SEL = {}, ISO = {}, SELECOES = [], TVS = {}, MM = {}, JC = {}, JOGOS = [], LANCES_CACHE = {};
+  var ESTRUT = null, TERMAP = null, FAIRPLAY = {}, PROJ_EVENT = {};
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (ch) {
@@ -49,6 +50,231 @@
     return lista.map(function (c) {
       return '<span class="tvchip" style="background:' + TV_CAT[c][1] + ';color:' + (c === "caze" ? "#3a2a00" : "#fff") + '">' + TV_CAT[c][0] + "</span>";
     }).join("");
+  }
+
+  function grupoId(id) {
+    var t = SELECOES.find(function (s) { return s.id === id; });
+    return t ? t.grupo : "";
+  }
+  function ehJogoGrupo(j) {
+    var ga = grupoId(j.a), gb = grupoId(j.b);
+    return !!ga && ga === gb;
+  }
+  function jogoBaseGrupo(aId, bId) {
+    if (!window.COPA_ENGINE || !SELECOES.length) return null;
+    return COPA_ENGINE.gerarJogosGrupos(SELECOES).find(function (x) {
+      return (x.a === aId && x.b === bId) || (x.a === bId && x.b === aId);
+    }) || null;
+  }
+  function placaresGruposOnde(somentePost) {
+    var res = [];
+    JOGOS.forEach(function (j) {
+      if (!ehJogoGrupo(j) || j.scoreA == null || j.scoreB == null) return;
+      if (j.state === "pre") return;
+      if (somentePost && j.state !== "post") return;
+      var jb = jogoBaseGrupo(j.a, j.b);
+      if (!jb) return;
+      if (jb.a === j.a) res.push({ jogo_id: jb.jogo_id, grupo: jb.grupo, a: jb.a, b: jb.b, ga: j.scoreA, gb: j.scoreB, state: j.state });
+      else res.push({ jogo_id: jb.jogo_id, grupo: jb.grupo, a: jb.a, b: jb.b, ga: j.scoreB, gb: j.scoreA, state: j.state });
+    });
+    return res;
+  }
+  function classificacaoPorPlacaresOnde(placares) {
+    try {
+      var plac = {}; (placares || []).forEach(function (p) { plac[p.jogo_id] = p; });
+      var jogos = COPA_ENGINE.gerarJogosGrupos(SELECOES);
+      var seed = {}; SELECOES.forEach(function (s) { seed[s.id] = s.seed; });
+      var porGrupo = {};
+      jogos.forEach(function (j) {
+        var p = plac[j.jogo_id];
+        var jj = Object.assign({}, j, { ga: p ? p.ga : null, gb: p ? p.gb : null });
+        (porGrupo[j.grupo] = porGrupo[j.grupo] || []).push(jj);
+      });
+      var out = {};
+      Object.keys(porGrupo).sort().forEach(function (G) {
+        var times = [];
+        porGrupo[G].forEach(function (j) { if (times.indexOf(j.a) < 0) times.push(j.a); if (times.indexOf(j.b) < 0) times.push(j.b); });
+        out[G] = COPA_ENGINE.classificarGrupo(porGrupo[G], times, seed, FAIRPLAY || {}).map(function (t) { return Object.assign({}, t, { grupo: G }); });
+      });
+      return out;
+    } catch (e) { return {}; }
+  }
+  function rankingTerceirosOnde(classificacao) {
+    var seed = {}; SELECOES.forEach(function (s) { seed[s.id] = s.seed; });
+    return Object.keys(classificacao || {}).sort().map(function (G) {
+      var t = classificacao[G] && classificacao[G][2];
+      return t ? Object.assign({}, t, { grupo: G }) : null;
+    }).filter(Boolean).sort(function (x, y) {
+      return (y.pts || 0) - (x.pts || 0) || (y.sg || 0) - (x.sg || 0) || (y.gf || 0) - (x.gf || 0) ||
+        (FAIRPLAY[y.id] || 0) - (FAIRPLAY[x.id] || 0) || (seed[x.id] || 999) - (seed[y.id] || 999);
+    });
+  }
+  function gruposOrdenadosOnde() {
+    var out = [];
+    SELECOES.forEach(function (s) { if (out.indexOf(s.grupo) < 0) out.push(s.grupo); });
+    return out.sort();
+  }
+  function completosOnde(placPost) {
+    var cnt = {}, out = {};
+    (placPost || []).forEach(function (p) { cnt[p.grupo] = (cnt[p.grupo] || 0) + 1; });
+    gruposOrdenadosOnde().forEach(function (G) { out[G] = (cnt[G] || 0) >= 6; });
+    return out;
+  }
+  function subconjuntosOnde(arr, max) {
+    var res = [];
+    function rec(i, cur) {
+      if (cur.length > max) return;
+      if (i >= arr.length) { res.push(cur.slice()); return; }
+      rec(i + 1, cur); cur.push(arr[i]); rec(i + 1, cur); cur.pop();
+    }
+    rec(0, []);
+    return res;
+  }
+  function chavesPossiveisOnde(placPost) {
+    if (!TERMAP || !TERMAP.mapa) return [];
+    var comp = completosOnde(placPost);
+    var classPost = classificacaoPorPlacaresOnde(placPost);
+    var ranking = rankingTerceirosOnde(classPost).filter(function (t) { return comp[t.grupo]; });
+    var incompletos = gruposOrdenadosOnde().filter(function (G) { return !comp[G]; });
+    if (!incompletos.length) {
+      var key0 = ranking.slice(0, 8).map(function (t) { return t.grupo; }).sort().join("");
+      return key0 && TERMAP.mapa[key0] ? [key0] : [];
+    }
+    if (incompletos.length > 4) return [];
+    var flut = Math.min(8, incompletos.length);
+    var garantidos = ranking.slice(0, Math.max(0, 8 - flut)).map(function (t) { return t.grupo; });
+    var suplentes = ranking.slice(garantidos.length, garantidos.length + flut).map(function (t) { return t.grupo; });
+    var keys = {};
+    subconjuntosOnde(incompletos, flut).forEach(function (sub) {
+      var faltam = flut - sub.length;
+      var grupos = garantidos.concat(sub).concat(suplentes.slice(0, faltam));
+      var uniq = [];
+      grupos.forEach(function (g) { if (uniq.indexOf(g) < 0) uniq.push(g); });
+      uniq.sort();
+      if (uniq.length === 8) {
+        var k = uniq.join("");
+        if (TERMAP.mapa[k]) keys[k] = true;
+      }
+    });
+    return Object.keys(keys);
+  }
+  function ganhouConfrontoOnde(cand, outro, placMap) {
+    var j = COPA_ENGINE.gerarJogosGrupos(SELECOES).find(function (x) { return (x.a === cand && x.b === outro) || (x.a === outro && x.b === cand); });
+    if (!j || !placMap[j.jogo_id]) return false;
+    var p = placMap[j.jogo_id], gc = (j.a === cand) ? p.ga : p.gb, go = (j.a === cand) ? p.gb : p.ga;
+    return gc > go;
+  }
+  function primeiroTravadoOnde(G, classPost, placPost) {
+    var lista = classPost && classPost[G]; if (!lista || !lista.length) return false;
+    var cand = lista[0].id, placMap = {}; (placPost || []).forEach(function (p) { placMap[p.jogo_id] = p; });
+    var stats = {}; (classPost[G] || []).forEach(function (t) { stats[t.id] = { pts: t.pts || 0, rest: 0 }; });
+    COPA_ENGINE.gerarJogosGrupos(SELECOES).filter(function (j) { return j.grupo === G; }).forEach(function (j) {
+      if (!placMap[j.jogo_id]) { if (stats[j.a]) stats[j.a].rest++; if (stats[j.b]) stats[j.b].rest++; }
+    });
+    var pts = stats[cand] ? stats[cand].pts : 0;
+    return Object.keys(stats).every(function (id) {
+      if (id === cand) return true;
+      var max = stats[id].pts + stats[id].rest * 3;
+      if (max > pts) return false;
+      if (max < pts) return true;
+      return ganhouConfrontoOnde(cand, id, placMap);
+    });
+  }
+  function montarR32Onde(d, placPost) {
+    var out = [];
+    if (!d || !ESTRUT || !TERMAP) return out;
+    var classPost = classificacaoPorPlacaresOnde(placPost), comp = completosOnde(placPost), keys = chavesPossiveisOnde(placPost);
+    var tokens = {}, cnt = {};
+    placPost.forEach(function (p) { cnt[p.grupo] = (cnt[p.grupo] || 0) + 1; });
+    Object.keys(classPost).forEach(function (G) {
+      if ((cnt[G] || 0) >= 6) { tokens["1" + G] = true; tokens["2" + G] = true; }
+      else if (primeiroTravadoOnde(G, classPost, placPost)) tokens["1" + G] = true;
+    });
+    var mapaAtual = d.chave && TERMAP.mapa[d.chave] ? TERMAP.mapa[d.chave] : null;
+    (d.r32 || []).forEach(function (j) {
+      var e = ESTRUT.r32.find(function (x) { return x.id === j.id; }); if (!e) return;
+      var slotA, slotB, travA, travB;
+      if (e.tipo === "fixo") { slotA = e.a; slotB = e.b; travA = !!tokens[slotA]; travB = !!tokens[slotB]; }
+      else {
+        slotA = e.host;
+        var grupoAtual = mapaAtual && mapaAtual[e.host];
+        slotB = grupoAtual ? ("3" + grupoAtual) : null;
+        travA = !!tokens[slotA];
+        var terceiroAtual = grupoAtual && classPost[grupoAtual] && classPost[grupoAtual][2] ? classPost[grupoAtual][2].id : null;
+        var mesmoGrupo = !!grupoAtual && keys.length > 0 && keys.every(function (k) { return TERMAP.mapa[k] && TERMAP.mapa[k][e.host] === grupoAtual; });
+        travB = !!(mesmoGrupo && comp[grupoAtual] && terceiroAtual && terceiroAtual === j.b);
+      }
+      out.push({ id: j.id, a: j.a, b: j.b, slotA: slotA, slotB: slotB, travA: travA, travB: travB });
+    });
+    return out;
+  }
+  function normTokenMataOnde(s) { return String(s || "").toUpperCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9]/g, ""); }
+  function textosEventoOnde(ev) {
+    var textos = [];
+    try {
+      textos.push(ev.id, ev.name, ev.shortName);
+      var c = ev.competitions && ev.competitions[0] ? ev.competitions[0] : {};
+      textos.push(c.name, c.shortName, c.note, c.notes);
+      (c.competitors || []).forEach(function (cc) { var t = cc.team || {}; textos.push(t.abbreviation, t.shortDisplayName, t.displayName, t.name, t.location, t.nickname); });
+    } catch (e) {}
+    return textos.filter(Boolean).map(normTokenMataOnde);
+  }
+  function eventoTemTokenOnde(ev, token) {
+    var nt = normTokenMataOnde(token); if (!nt) return false;
+    var textos = textosEventoOnde(ev);
+    if (textos.some(function (t) { return t === nt || t.indexOf(nt) >= 0; })) return true;
+    var mw = nt.match(/^([WL])M(\d+)$/); if (mw) { var curto = mw[1] + mw[2]; if (textos.some(function (t) { return t === curto || t.indexOf(curto) >= 0; })) return true; }
+    var m = nt.match(/^([123])([A-L])$/);
+    if (m) {
+      var pos = m[1], grupo = m[2];
+      return textos.some(function (t) {
+        if (t.indexOf(pos + grupo) >= 0) return true;
+        if (pos === "3" && /^3[A-L]+$/.test(t) && t.indexOf(grupo) >= 0) return true;
+        if (pos === "3" && t.indexOf("THIRD") >= 0 && t.indexOf("GROUP") >= 0 && t.indexOf(grupo) >= 0) return true;
+        return false;
+      });
+    }
+    return false;
+  }
+  function eventoIdOnde(ev, id) { var mid = normTokenMataOnde(id); return !!mid && textosEventoOnde(ev).some(function (t) { return t.indexOf(mid) >= 0; }); }
+  function eventoExatoOnde(aId, bId) {
+    return JOGOS.find(function (j) { return (j.a === aId && j.b === bId) || (j.a === bId && j.b === aId); }) || null;
+  }
+  function eventoDeSlotOnde(j) {
+    var aId = siglaTimeTexto(j.a), bId = siglaTimeTexto(j.b);
+    var porId = JOGOS.find(function (x) { return x.raw && eventoIdOnde(x.raw, j.id); });
+    if (porId) return porId;
+    if (aId && bId) { var ex = eventoExatoOnde(aId, bId); if (ex) return ex; }
+    var alvosA = [aId, j.slotA, j.a].filter(Boolean), alvosB = [bId, j.slotB, j.b].filter(Boolean);
+    return JOGOS.find(function (x) { return x.raw && alvosA.some(function (a) { return eventoTemTokenOnde(x.raw, a); }) && alvosB.some(function (b) { return eventoTemTokenOnde(x.raw, b); }); }) || null;
+  }
+  function aplicarProjecoesMata() {
+    PROJ_EVENT = {};
+    if (!window.COPA_ENGINE || !ESTRUT || !TERMAP || !SELECOES.length) return;
+    try {
+      var d = COPA_ENGINE.derivar(SELECOES, placaresGruposOnde(false), {}, ESTRUT, TERMAP, FAIRPLAY || {});
+      var lista = montarR32Onde(d, placaresGruposOnde(true));
+      lista.forEach(function (j) {
+        var ev = eventoDeSlotOnde(j);
+        if (ev && ev.id) PROJ_EVENT[String(ev.id)] = j;
+      });
+      JOGOS.forEach(function (j) { j.proj = PROJ_EVENT[String(j.id)] || null; });
+    } catch (e) { PROJ_EVENT = {}; }
+  }
+  function projLado(j, lado) {
+    if (!j.proj || j.state !== "pre") return null;
+    if (lado === "a" && j.proj.a) return { id:j.proj.a, travado:!!j.proj.travA };
+    if (lado === "b" && j.proj.b) return { id:j.proj.b, travado:!!j.proj.travB };
+    return null;
+  }
+  function timeHTML(j, lado) {
+    var p = projLado(j, lado);
+    var id = p ? p.id : (lado === "a" ? j.a : j.b);
+    var nome = p ? (SEL[id] || id) : (lado === "a" ? (j.an || j.a) : (j.bn || j.b));
+    var mark = p ? '<span class="oa-slot-mark ' + (p.travado ? 'ok' : 'wait') + '" title="' + (p.travado ? 'Vaga confirmada' : 'Projeção como está agora') + '">' + (p.travado ? '✓' : '⌛') + '</span>' : '';
+    var img = flag(id);
+    if (lado === "a") return '<div class="oa-team oa-home">' + img + '<span>' + esc(nome) + mark + '</span></div>';
+    return '<div class="oa-team oa-away"><span>' + esc(nome) + mark + '</span>' + img + '</div>';
   }
 
   function getPath(obj, path, def) {
@@ -328,9 +554,9 @@
       var botoes = botoesPosJogo(j);
       html += '<div class="oa-jogo">' +
         '<div class="oa-matchline">' +
-          '<div class="oa-team oa-home">' + flag(j.a) + '<span>' + esc(j.an || j.a) + '</span></div>' +
+          timeHTML(j, "a") +
           placarHTML(j) +
-          '<div class="oa-team oa-away"><span>' + esc(j.bn || j.b) + '</span>' + flag(j.b) + '</div>' +
+          timeHTML(j, "b") +
         '</div>' +
         '<div id="oa-gols-' + esc(j.id) + '" class="oa-gols-wrap" data-lances-id="' + esc(j.id) + '"></div>' +
         '<div class="oa-info">' + statusHTML(j) + (j.venue ? ' · <span class="oa-loc">' + esc(j.venue) + "</span>" : "") + "</div>" +
@@ -378,11 +604,18 @@
       fetch("dados/transmissoes.json").then(function (r) { return r.json(); }).catch(function () { return {}; }),
       fetch(API + "?dates=20260611-20260719&limit=200&_=" + Date.now()).then(function (r) { return r.json(); }),
       fetch("dados/melhores-momentos.json?t=" + Date.now()).then(function (r) { return r.json(); }).catch(function () { return {}; }),
-      fetch("dados/jogos-completos.json?t=" + Date.now()).then(function (r) { return r.json(); }).catch(function () { return {}; })
+      fetch("dados/jogos-completos.json?t=" + Date.now()).then(function (r) { return r.json(); }).catch(function () { return {}; }),
+      fetch("dados/estrutura_mata_mata.json?t=" + Date.now()).then(function (r) { return r.json(); }).catch(function () { return null; }),
+      fetch("dados/terceiros_map.json?t=" + Date.now()).then(function (r) { return r.json(); }).catch(function () { return null; }),
+      fetch("dados/fairplay.json?t=" + Date.now()).then(function (r) { return r.json(); }).catch(function () { return {}; })
     ]).then(function (res) {
       MM = (res[3] && res[3].jogos) || {};
       JC = (res[4] && res[4].jogos) || {};
-      (res[0].selecoes || []).forEach(function (s) { SEL[s.id] = s.nome; ISO[s.id] = s.iso2; });
+      ESTRUT = res[5] || null;
+      TERMAP = res[6] || null;
+      FAIRPLAY = (res[7] && res[7].fairplay) || {};
+      SELECOES = (res[0].selecoes || []);
+      SELECOES.forEach(function (s) { SEL[s.id] = s.nome; ISO[s.id] = s.iso2; });
       TVS = res[1] || {};
       (res[2].events || []).forEach(function (ev) {
         var c = ev.competitions && ev.competitions[0]; if (!c) return;
@@ -390,14 +623,16 @@
         var h = cs.find(function (x) { return x.homeAway === "home"; }) || cs[0];
         var a = cs.find(function (x) { return x.homeAway === "away"; }) || cs[1];
         if (!h || !a) return;
-        var aId = (h.team || {}).abbreviation, bId = (a.team || {}).abbreviation;
+        var aRaw = (h.team || {}).abbreviation, bRaw = (a.team || {}).abbreviation;
+        var aId = siglaTimeTexto(aRaw) || aRaw, bId = siglaTimeTexto(bRaw) || bRaw;
         JOGOS.push({
-          id: ev.id, date: new Date(ev.date), state: getPath(c, ["status", "type", "state"], "pre"),
+          id: ev.id, raw: ev, date: new Date(ev.date), state: getPath(c, ["status", "type", "state"], "pre"),
           a: aId, b: bId, an: SEL[aId] || getPath(h, ["team", "shortDisplayName"], aId), bn: SEL[bId] || getPath(a, ["team", "shortDisplayName"], bId),
           scoreA: scoreCompetidor(h), scoreB: scoreCompetidor(a),
           venue: (c.venue && c.venue.fullName) || ""
         });
       });
+      aplicarProjecoesMata();
       render();
       var bi = $("#btn-ics"); if (bi) bi.onclick = baixarICS;
       var bc = $("#btn-share"); if (bc) bc.onclick = compartilhar;

@@ -30,6 +30,7 @@
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
   let MATA_LOCK_TOKENS = {}; // slots matematicamente definidos no mata-mata (1A, 2B, 3C...)
+  let MATA_LOCK_R32 = {}; // travamento por lado do jogo da fase 32 (quando o cruzamento de 3º já não muda)
   let PARTIDAS_MATA_MAP = {}; // eventId ESPN -> confronto projetado/confirmado para cards da aba Partidas
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Jogo -> tabela -> voltar
   let RETORNO_GRUPO = null; // navegação Tabela de grupos -> jogo -> voltar para a mesma tabela
@@ -1051,7 +1052,88 @@
     });
   }
 
-  function tokensTravadosMata(events, fairplay) {
+  function gruposCopaOrdenados() {
+    return [...new Set((SEL || []).map(s => s.grupo).filter(Boolean))].sort();
+  }
+
+  function gruposCompletosPorPlacares(placPost) {
+    const porGrupoPost = {};
+    (placPost || []).forEach(p => { porGrupoPost[p.grupo] = (porGrupoPost[p.grupo] || 0) + 1; });
+    const out = {};
+    gruposCopaOrdenados().forEach(G => { out[G] = (porGrupoPost[G] || 0) >= 6; });
+    return out;
+  }
+
+  function subconjuntosAte(arr, max) {
+    const res = [];
+    const n = arr.length;
+    function rec(i, cur) {
+      if (cur.length > max) return;
+      if (i >= n) { res.push(cur.slice()); return; }
+      rec(i + 1, cur);
+      cur.push(arr[i]); rec(i + 1, cur); cur.pop();
+    }
+    rec(0, []);
+    return res;
+  }
+
+  function chavesPossiveisTerceiros(events, fairplay) {
+    if (!TERMAP || !TERMAP.mapa) return [];
+    const placPost = placaresGruposDaESPNFiltrados(events, st => st === "post");
+    const completos = gruposCompletosPorPlacares(placPost);
+    const classPost = classificacaoPorPlacares(placPost, fairplay);
+    const rankingCompletos = rankingTerceirosCompleto(classPost, fairplay).filter(t => completos[t.grupo]);
+    const incompletos = gruposCopaOrdenados().filter(G => !completos[G]);
+
+    if (!incompletos.length) {
+      const key = rankingCompletos.slice(0, 8).map(t => t.grupo).sort().join("");
+      return key && TERMAP.mapa[key] ? [key] : [];
+    }
+
+    // Evita explosão combinatória no começo da Copa. No fim da fase de grupos
+    // (caso atual), normalmente há 1 ou 2 grupos pendentes e o cálculo é leve.
+    if (incompletos.length > 4) return [];
+
+    const vagasFlutuantes = Math.min(8, incompletos.length);
+    const qtdGarantidos = Math.max(0, 8 - vagasFlutuantes);
+    const garantidos = rankingCompletos.slice(0, qtdGarantidos).map(t => t.grupo);
+    const suplentes = rankingCompletos.slice(qtdGarantidos, qtdGarantidos + vagasFlutuantes).map(t => t.grupo);
+    const keys = new Set();
+
+    subconjuntosAte(incompletos, vagasFlutuantes).forEach(sub => {
+      const faltam = vagasFlutuantes - sub.length;
+      const grupos = garantidos.concat(sub).concat(suplentes.slice(0, faltam));
+      const uniq = [...new Set(grupos)].sort();
+      if (uniq.length === 8) {
+        const key = uniq.join("");
+        if (TERMAP.mapa[key]) keys.add(key);
+      }
+    });
+    return Array.from(keys);
+  }
+
+  function travamentosR32PorCenarios(d, tokens, events, fairplay, classPost, completos) {
+    const locks = {};
+    const keys = chavesPossiveisTerceiros(events, fairplay);
+    const mapaAtual = d && d.chave && TERMAP && TERMAP.mapa ? TERMAP.mapa[d.chave] : null;
+    (d && d.r32 ? d.r32 : []).forEach(j => {
+      const e = (ESTRUT.r32 || []).find(x => x.id === j.id);
+      if (!e) return;
+      if (e.tipo === "fixo") {
+        locks[j.id] = { a: !!tokens[e.a], b: !!tokens[e.b] };
+        return;
+      }
+      const host = e.host;
+      const grupoAtual = mapaAtual && mapaAtual[host];
+      const todosMantemMesmoGrupo = !!grupoAtual && keys.length > 0 && keys.every(k => TERMAP.mapa[k] && TERMAP.mapa[k][host] === grupoAtual);
+      const terceiroAtual = grupoAtual && classPost[grupoAtual] && classPost[grupoAtual][2] ? classPost[grupoAtual][2].id : null;
+      const ladoTerceiroTravado = !!(todosMantemMesmoGrupo && completos[grupoAtual] && terceiroAtual && dpSigla(j.b) === terceiroAtual);
+      locks[j.id] = { a: !!tokens[host], b: ladoTerceiroTravado };
+    });
+    return locks;
+  }
+
+  function tokensTravadosMata(events, fairplay, d) {
     const placPost = placaresGruposDaESPNFiltrados(events, st => st === "post");
     const jogosBase = COPA_ENGINE.gerarJogosGrupos(SEL);
     const totalGrupos = jogosBase.length;
@@ -1059,6 +1141,7 @@
     const porGrupoPost = {};
     placPost.forEach(p => { porGrupoPost[p.grupo] = (porGrupoPost[p.grupo] || 0) + 1; });
     const classPost = classificacaoPorPlacares(placPost, fairplay);
+    const completos = gruposCompletosPorPlacares(placPost);
     const tokens = {};
     Object.keys(classPost).forEach(G => {
       const completo = (porGrupoPost[G] || 0) >= 6;
@@ -1070,6 +1153,11 @@
       }
       if (allGroupsDone) tokens["3" + G] = true;
     });
+
+    // Mais inteligente que o critério anterior: com poucos grupos restantes,
+    // testa as combinações possíveis de melhores terceiros. Se o mesmo 3º cai
+    // no mesmo jogo em todos os cenários ainda possíveis, já troca ampulheta por ✓.
+    MATA_LOCK_R32 = d ? travamentosR32PorCenarios(d, tokens, events, fairplay, classPost, completos) : {};
     return tokens;
   }
 
@@ -1137,7 +1225,7 @@
       const fp = await buscarFairPlay();
       const d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp);
       MATA_CACHE = d;
-      MATA_LOCK_TOKENS = tokensTravadosMata(grpEvents, fp);
+      MATA_LOCK_TOKENS = tokensTravadosMata(grpEvents, fp, d);
       const jogos = montarJogosMata(d);
       const lista = [].concat(jogos["16-avos"] || [], jogos["Oitavas"] || [], jogos["Quartas"] || [], jogos["Semis"] || [], jogos["Final"] || []);
       lista.forEach(j => {
@@ -1207,7 +1295,7 @@
     try { d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp); }
     catch (e) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Erro ao calcular o chaveamento.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
     MATA_CACHE = d;
-    MATA_LOCK_TOKENS = tokensTravadosMata(grpEvents, fp);
+    MATA_LOCK_TOKENS = tokensTravadosMata(grpEvents, fp, d);
     // 3) jogos reais do mata-mata na ESPN (placar/horário)
     if (!MATA_EVENTS.length || (Date.now() - MATA_EVENTS_TS) >= 90000) {
       try {
@@ -1362,7 +1450,8 @@
     const tokensR32 = tokensDosJogosR32(d);
     (d.r32 || []).forEach(j => {
       const tok = tokensR32[j.id] || {};
-      r32ById[j.id] = { id:j.id, fase:"16-avos", a:j.a, b:j.b, slotA:tok.a, slotB:tok.b, travA:!!MATA_LOCK_TOKENS[tok.a], travB:!!MATA_LOCK_TOKENS[tok.b] };
+      const ladoLock = MATA_LOCK_R32[j.id] || {};
+      r32ById[j.id] = { id:j.id, fase:"16-avos", a:j.a, b:j.b, slotA:tok.a, slotB:tok.b, travA:("a" in ladoLock ? !!ladoLock.a : !!MATA_LOCK_TOKENS[tok.a]), travB:("b" in ladoLock ? !!ladoLock.b : !!MATA_LOCK_TOKENS[tok.b]) };
     });
     const arvById = {};
     (ESTRUT.arvore || []).forEach(m => {
