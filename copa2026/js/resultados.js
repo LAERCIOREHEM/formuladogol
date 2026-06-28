@@ -29,6 +29,7 @@
   let FAIRPLAY = {}, FAIRPLAY_TS = 0; // {sigla: pontos de conduta}, cache 5min
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
+  let MATA_JOGOS_BY_ID = {}; // mapa M73..M104 para resolver "Venc. Mxx" em possibilidades visuais
   let MATA_LOCK_TOKENS = {}; // slots matematicamente definidos no mata-mata (1A, 2B, 3C...)
   let PARTIDAS_MATA_MAP = {}; // eventId ESPN -> confronto projetado/confirmado para cards da aba Partidas
   let VOLTAR_JOGO = null, FOCO_GRUPO = null; // navegação Jogo -> tabela -> voltar
@@ -1370,13 +1371,81 @@
       arvById[m.id] = { id:m.id, fase:faseLabelPorEstrutura(m.fase), a:t.a, b:t.b, slotA:m.a, slotB:m.b, travA:false, travB:false };
     });
     const get = id => r32ById[id] || arvById[id] || { id, fase:"Mata-mata" };
-    return {
+    const fases = {
       "16-avos": MATA_VISUAL.r32.map(get),
       "Oitavas": MATA_VISUAL.oitavas.map(get),
       "Quartas": MATA_VISUAL.quartas.map(get),
       "Semis": MATA_VISUAL.semis.map(get),
       "Final": MATA_VISUAL.final.map(get)
     };
+    MATA_JOGOS_BY_ID = {};
+    Object.values(fases).forEach(lista => (lista || []).forEach(j => { if (j && j.id) MATA_JOGOS_BY_ID[j.id] = j; }));
+    return fases;
+  }
+
+  function siglaHTMLMata(id) {
+    const sig = dpSigla(id);
+    if (!sig) return "";
+    const fl = dpFlag(sig, 40);
+    return `<span class="mm-opcao-time">${fl ? `<img src="${fl}" alt="${escTxt(sig)}">` : ""}<b>${escTxt(sig)}</b></span>`;
+  }
+  function vencedorPerdedorDoEventoMata(ev, tipo) {
+    if (!ev || !ev.competitions || !ev.competitions[0]) return null;
+    const comp = ev.competitions[0];
+    const st = comp.status && comp.status.type ? comp.status.type : {};
+    if (st.state !== "post") return null;
+    const cs = comp.competitors || [];
+    const alvo = tipo === "L" ? cs.find(c => !c.winner) : cs.find(c => c.winner);
+    const id = alvo ? (dpSigla((alvo.team || {}).abbreviation) || dpSigla((alvo.team || {}).displayName) || dpSigla((alvo.team || {}).shortDisplayName)) : null;
+    return id || null;
+  }
+  function timesConcretosDoEventoMata(ev) {
+    if (!ev || !ev.competitions || !ev.competitions[0]) return [];
+    const ids = [];
+    (ev.competitions[0].competitors || []).forEach(c => {
+      const id = dpSigla((c.team || {}).abbreviation) || dpSigla((c.team || {}).displayName) || dpSigla((c.team || {}).shortDisplayName);
+      if (id && ids.indexOf(id) === -1) ids.push(id);
+    });
+    return ids;
+  }
+  function timesConcretosDoJogoMata(j) {
+    if (!j) return [];
+    const ids = [dpSigla(j.a), dpSigla(j.b)].filter(Boolean);
+    return ids.length === 2 && ids[0] !== ids[1] ? ids : [];
+  }
+  function resolverSlotMataVisual(valor, slot) {
+    const raw = String(valor || slot || "");
+    const m = raw.match(/^([WL])M(\d+)$/i);
+    if (!m) return null;
+    const tipo = m[1].toUpperCase();
+    const srcId = "M" + m[2];
+    const src = MATA_JOGOS_BY_ID[srcId] || null;
+    const ev = src ? eventoMataDeOuSlot(src, MATA_EVENTS) : (MATA_EVENTS || []).find(e => eventoContemIdMata(e, srcId));
+
+    const definido = vencedorPerdedorDoEventoMata(ev, tipo);
+    if (definido) return { tipo:"definido", id:definido };
+
+    // Versão elegante: só expande quando o jogo de origem tem exatamente dois lados
+    // concretos e limpos. Não mostra 4/8 possibilidades nem polui fases posteriores.
+    let poss = timesConcretosDoJogoMata(src);
+    if (poss.length !== 2) poss = timesConcretosDoEventoMata(ev);
+    if (poss.length === 2 && poss[0] !== poss[1]) return { tipo:"possiveis", ids:poss, src:srcId };
+
+    return null;
+  }
+  function slotMataHTML(valor, slot) {
+    const resolvido = resolverSlotMataVisual(valor, slot);
+    if (resolvido && resolvido.tipo === "possiveis") {
+      return `<div class="mm-equipe mm-tbd mm-slot-opcoes" title="Possíveis classificados de ${escTxt(resolvido.src || "")}">
+        <span class="mm-opcoes">${siglaHTMLMata(resolvido.ids[0])}<span class="mm-ou">ou</span>${siglaHTMLMata(resolvido.ids[1])}</span>
+      </div>`;
+    }
+    if (resolvido && resolvido.tipo === "definido") {
+      // Se o jogo anterior já acabou, mostra o vencedor/perdedor como seleção definida,
+      // mantendo o comportamento visual atual do mata-mata.
+      return linhaEquipeMata(resolvido.id, null, "", "", true);
+    }
+    return slotMataHTML(valor, slot);
   }
 
   function linhaEquipeMata(valor, slot, score, vcls, travado) {
@@ -1389,8 +1458,7 @@
         : `<span class="mm-pendmark" title="Projeção ao vivo — ainda pode mudar">⌛</span>`;
       return `<div class="mm-equipe ${vcls || ""}${lockCls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span>${score !== "" && score != null ? `<span class="mm-score">${score}</span>` : ""}${lockMark}</div>`;
     }
-    const txt = textoSlot(valor || slot);
-    return `<div class="mm-equipe mm-tbd"><span class="mm-slot">${escTxt(txt)}</span></div>`;
+    return slotMataHTML(valor, slot);
   }
 
   function cardMata(j) {
