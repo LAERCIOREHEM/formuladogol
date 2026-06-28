@@ -111,12 +111,31 @@
     const o = { decididos: {} };
     const slugTeams = slug => [...new Set(events.filter(e => phaseOf(e) === slug).flatMap(teamsOf))];
 
-    // --- mata-mata: quem ALCANÇOU cada fase = quem está nos confrontos daquela fase ---
+    // --- mata-mata: quem ALCANÇOU cada fase ---
+    // 1) usa os times que já aparecem nos confrontos da fase;
+    // 2) soma os vencedores dos jogos encerrados da fase anterior.
+    // Isso evita o bug clássico: Canadá venceu os 16-avos, mas ainda não apareceu
+    // no card ESPN das oitavas; mesmo assim, já conquistou os +4.
+    const addUnico = (arr, id) => { if (id && arr.indexOf(id) === -1) arr.push(id); };
     const r32 = slugTeams("round-of-32");
     o.avancam_oitavas = slugTeams("round-of-16");
     o.avancam_quartas = slugTeams("quarterfinals");
     o.semifinalistas = slugTeams("semifinals");
     o.finalistas = slugTeams("final");
+    const semiLosers = [];
+    events.filter(e => phaseOf(e) !== "group-stage" && isPost(e)).forEach(ev => {
+      const wl = winLoseOf(ev);
+      if (!wl.w) return;
+      const ph = phaseOf(ev);
+      if (ph === "round-of-32") addUnico(o.avancam_oitavas, wl.w);
+      else if (ph === "round-of-16") addUnico(o.avancam_quartas, wl.w);
+      else if (ph === "quarterfinals") addUnico(o.semifinalistas, wl.w);
+      else if (ph === "semifinals") {
+        addUnico(o.finalistas, wl.w);
+        if (wl.l) addUnico(semiLosers, wl.l);
+      }
+    });
+    o._semiLosers = semiLosers;
 
     // --- grupos: posições + melhores terceiros, derivados com a própria engine ---
     const realG = [];
@@ -217,6 +236,54 @@
     }).join("");
   }
 
+  function statusFasePalpite(id, key, o) {
+    const oficiais = new Set(o[key] || []);
+    if (oficiais.has(id)) return "ok";
+    if ((o.eliminados || []).indexOf(id) !== -1) return "no";
+    if (key === "classificados32" && o.classificados32 && o.classificados32.length && o.classificados32.indexOf(id) === -1) return "no";
+    return "pend";
+  }
+  function chipFasePalpite(id, key, o) {
+    const st = statusFasePalpite(id, key, o);
+    const ico = st === "ok" ? "✅" : (st === "no" ? "❌" : "⏳");
+    const cls = st === "ok" ? "gg-ok" : (st === "no" ? "gg-no" : "gg-pend");
+    return `<span class="gg-cel ${cls}">${flag(id)} ${id} ${ico}</span>`;
+  }
+  function fasesDoPalpiteHTML(p, o, apostador) {
+    const fases = [
+      ["classificados32", "2ª fase", 32],
+      ["avancam_oitavas", "Oitavas", 16],
+      ["avancam_quartas", "Quartas", 8],
+      ["semifinalistas", "Semis", 4],
+      ["finalistas", "Final", 2]
+    ];
+    const linhas = fases.map(([key, lab, total]) => {
+      const ids = p[key] || [];
+      if (!ids.length) return "";
+      const ok = ids.filter(id => statusFasePalpite(id, key, o) === "ok").length;
+      const no = ids.filter(id => statusFasePalpite(id, key, o) === "no").length;
+      const pend = ids.length - ok - no;
+      return `<div class="gg-lin"><span class="gg-g">${lab}<small>${ok}/${total}</small></span><div class="gg-cels">${ids.map(id => chipFasePalpite(id, key, o)).join("")}</div></div>`;
+    }).join("");
+    const podio = [["campeao","Campeão"],["vice","Vice"],["terceiro","3º"],["quarto","4º"]]
+      .map(([key, lab]) => {
+        const id = p[key]; if (!id) return "";
+        let cls = "gg-pend", ico = "⏳";
+        if (o.decididos && o.decididos[key]) {
+          const ok = o[key] === id; cls = ok ? "gg-ok" : "gg-no"; ico = ok ? "✅" : "❌";
+        } else if ((o.eliminados || []).indexOf(id) !== -1 && key !== "terceiro" && key !== "quarto") {
+          cls = "gg-no"; ico = "❌";
+        }
+        return `<span class="gg-cel ${cls}"><i>${lab}</i> ${flag(id)} ${id} ${ico}</span>`;
+      }).join("");
+    const podioBloco = podio ? `<div class="gg-lin"><span class="gg-g">Pódio</span><div class="gg-cels">${podio}</div></div>` : "";
+    return `<button class="vermais2" data-fases="${apostador}">🧭 Fases do palpite ▾</button>
+      <div class="ggbox" id="fases-${cssId(apostador)}" style="display:none">
+        <div class="gg-leg">✅ conquistou · ⏳ ainda possível · ❌ perdeu nesta fase</div>
+        ${linhas}${podioBloco}
+      </div>`;
+  }
+
   function toggleHTML() {
     return `<div class="vistog">
       <button class="vbtn ${ABA === "bolao" ? "on" : ""}" data-v="bolao">🏆 ${modoSimulado() ? "Ranking Simulado" : "Ranking"}</button>
@@ -286,6 +353,7 @@
         <div class="podiodet">${detalheFinal(x.d, o)}</div>
         <div class="f32lab">${f32lab}</div>${f32leg}
         <div class="f32">${funil}</div>
+        ${fasesDoPalpiteHTML(x.d, o, x.nome)}
         <button class="vermais" data-ext="${x.nome}">Ver extrato dos pontos ▾</button>
         <div class="extbox" id="ext-${cssId(x.nome)}" style="display:none">${extratoBolao(x.d, o, x)}</div>
       </div>`;
@@ -297,6 +365,11 @@
       const d = document.getElementById("ext-" + cssId(b.dataset.ext)), ab = d.style.display === "none";
       d.style.display = ab ? "block" : "none";
       b.innerHTML = ab ? "Ocultar extrato ▴" : "Ver extrato dos pontos ▾";
+    });
+    document.querySelectorAll(".vermais2[data-fases]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("fases-" + cssId(b.dataset.fases)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "🧭 Ocultar fases do palpite ▴" : "🧭 Fases do palpite ▾";
     });
     document.querySelectorAll(".vermais2[data-gg]").forEach(b => b.onclick = () => {
       const d = document.getElementById("gg-" + cssId(b.dataset.gg)), ab = d.style.display === "none";
@@ -338,10 +411,14 @@
       if (a3) row(`${a3} terceiros de grupo certos (×${P.terGrupo})`, a3, P.terGrupo, a3 * P.terGrupo, "ok");
       if (a4) row(`${a4} quartos de grupo certos (×${P.ultGrupo})`, a4, P.ultGrupo, a4 * P.ultGrupo, "ok");
     }
-    if (det.oitavas) row(`Seleções nas oitavas (×${P.oitavas})`, 1, P.oitavas, det.oitavas, "ok");
-    if (det.quartas) row(`Seleções nas quartas (×${P.quartas})`, 1, P.quartas, det.quartas, "ok");
-    if (det.semis) row(`Semifinalistas (×${P.semi})`, 1, P.semi, det.semis, "ok");
-    if (det.final) row(`Finalistas (×${P.final})`, 1, P.final, det.final, "ok");
+    const nOit = inter(p.avancam_oitavas, o.avancam_oitavas || []).length;
+    if (nOit) row(`${nOit} seleções nas oitavas (×${P.oitavas})`, nOit, P.oitavas, nOit * P.oitavas, "ok");
+    const nQua = inter(p.avancam_quartas, o.avancam_quartas || []).length;
+    if (nQua) row(`${nQua} seleções nas quartas (×${P.quartas})`, nQua, P.quartas, nQua * P.quartas, "ok");
+    const nSemi = inter(p.semifinalistas, o.semifinalistas || []).length;
+    if (nSemi) row(`${nSemi} semifinalistas (×${P.semi})`, nSemi, P.semi, nSemi * P.semi, "ok");
+    const nFin = inter(p.finalistas, o.finalistas || []).length;
+    if (nFin) row(`${nFin} finalistas (×${P.final})`, nFin, P.final, nFin * P.final, "ok");
     if (det.campeao) row(`Campeão certo`, 1, P.campeao, det.campeao, "ok");
     if (det.vice) row(`Vice certo`, 1, P.vice, det.vice, "ok");
     if (det.terceiro) row(`3º lugar certo`, 1, P.terceiro, det.terceiro, "ok");
@@ -372,8 +449,17 @@
     if (e2) prow(`${e2} vices de grupo (2º) errados (×${P.viceGrupo})`, e2 * P.viceGrupo);
     if (e3) prow(`${e3} terceiros de grupo errados (×${P.terGrupo})`, e3 * P.terGrupo);
     if (e4) prow(`${e4} quartos de grupo errados (×${P.ultGrupo})`, e4 * P.ultGrupo);
-    // mata-mata perdido (só no oficial, quando fases já decididas)
-    if (x.r.detPerdidos && x.r.detPerdidos.matamata) prow(`Seleções que não avançaram no mata-mata`, x.r.detPerdidos.matamata);
+    // mata-mata perdido (só no oficial, quando fases já decididas):
+    // cada seleção apostada para uma fase que já caiu antes dela debita o peso daquela fase.
+    const perdMata = (key, oficiais, peso, rotulo) => {
+      const conf = new Set(oficiais || []);
+      const ids = (p[key] || []).filter(id => elim.has(id) && !conf.has(id));
+      if (ids.length) prow(`${ids.length} ${rotulo} (×${peso}): ${ids.map(id => nome(id)).join(", ")}`, ids.length * peso);
+    };
+    perdMata("avancam_oitavas", o.avancam_oitavas, P.oitavas, "seleções não avançaram às oitavas");
+    perdMata("avancam_quartas", o.avancam_quartas, P.quartas, "seleções não avançaram às quartas");
+    perdMata("semifinalistas", o.semifinalistas, P.semi, "seleções não chegaram à semifinal");
+    perdMata("finalistas", o.finalistas, P.final, "seleções não chegaram à final");
     // títulos cuja seleção já caiu
     if (p.campeao && elim.has(p.campeao)) prow(`Campeão (${nome(p.campeao)}) já caiu`, P.campeao);
     if (p.vice && elim.has(p.vice)) prow(`Vice (${nome(p.vice)}) já caiu`, P.vice);
