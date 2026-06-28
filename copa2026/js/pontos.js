@@ -301,7 +301,7 @@
     document.querySelectorAll(".vermais2[data-gg]").forEach(b => b.onclick = () => {
       const d = document.getElementById("gg-" + cssId(b.dataset.gg)), ab = d.style.display === "none";
       d.style.display = ab ? "block" : "none";
-      b.innerHTML = ab ? "Ocultar detalhe por grupo ▴" : "Ver detalhe por grupo (quem você acerta) ▾";
+      b.innerHTML = ab ? "Ocultar quem você acertou ▴" : "QUEM VOCÊ ACERTOU ▾";
     });
     wireToggle();
   }
@@ -407,9 +407,9 @@
     }).join("");
     const terBloco = terReais.length ? `<div class="gg-lin"><span class="gg-g">Melhores 3ºs</span><div class="gg-cels">${terCels}</div></div>` : "";
 
-    const detalheGrupos = `<button class="vermais2" data-gg="${x.nome}">Ver detalhe por grupo (quem você acerta) ▾</button>
+    const detalheGrupos = `<button class="vermais2" data-gg="${x.nome}">QUEM VOCÊ ACERTOU ▾</button>
       <div class="ggbox" id="gg-${cssId(x.nome)}" style="display:none">
-        <div class="gg-leg">✅ você cravou esta posição · ❌ ainda não</div>
+        <div class="gg-leg">✅ você cravou esta posição · ❌ ERROU!</div>
         ${gradeGrupos}${terBloco}
       </div>`;
 
@@ -492,11 +492,14 @@
       Regra completa em <a href="regras.html" style="color:var(--gold)">Regras</a>.</div>`;
     const cards = vis.map(x => {
       const pos = x.posReal, medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
-      const cls = pos <= 3 ? " p" + pos : "";
+      const campeaoDefinido = n >= 72 && pos === 1;
+      const cls = (pos <= 3 ? " p" + pos : "") + (campeaoDefinido ? " cravo-campeao" : "");
+      const seloCampeao = campeaoDefinido ? '<div class="cravo-campeao-selo">CAMPEÃO!</div>' : "";
       const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
       const p = PART.find(pp => pp.nome === x.nome);
       const aberto = FILTRO === x.nome; // ao filtrar 1 pessoa, já abre
       return `<div class="card${cls}">
+        ${seloCampeao}
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${x.pts}<small>pontos</small></span></div>
         <div class="fases"><span class="ph">🎯 cravadas <b>${x.cr}</b></span><span class="ph">📐 no saldo <b>${x.sal}</b></span><span class="ph">✅ resultados <b>${x.res}</b></span></div>
         <button class="vermais" data-jg="${x.nome}">${aberto ? "Ocultar jogos ▴" : "Ver jogos ▾"}</button>
