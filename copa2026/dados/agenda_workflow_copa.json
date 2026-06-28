@@ -1,0 +1,241 @@
+{
+  "_nota": "Agenda de execução do workflow da COPA2026. Horários em America/Sao_Paulo. O workflow deve rodar somente de 1h antes do jogo até 2h após o encerramento detectado pela ESPN; se a ESPN estiver indisponível, usa janela fallback segura por tempo estimado de jogo.",
+  "timezone": "America/Sao_Paulo",
+  "pre_horas": 1,
+  "pos_horas": 2,
+  "fallback_horas_apos_inicio": 4,
+  "limite_duro_horas_apos_inicio": 8,
+  "jogos": [
+    {
+      "id": "M73",
+      "fase": "16-avos",
+      "inicio_brt": "2026-06-28T16:00:00-03:00",
+      "descricao": "África do Sul x Canadá",
+      "local": "Los Angeles Stadium"
+    },
+    {
+      "id": "M76",
+      "fase": "16-avos",
+      "inicio_brt": "2026-06-29T14:00:00-03:00",
+      "descricao": "Brasil x Japão",
+      "local": "Houston Stadium"
+    },
+    {
+      "id": "M74",
+      "fase": "16-avos",
+      "inicio_brt": "2026-06-29T17:30:00-03:00",
+      "descricao": "Alemanha x Paraguai",
+      "local": "Boston Stadium"
+    },
+    {
+      "id": "M75",
+      "fase": "16-avos",
+      "inicio_brt": "2026-06-29T22:00:00-03:00",
+      "descricao": "Holanda x Marrocos",
+      "local": "Monterrey Stadium"
+    },
+    {
+      "id": "M78",
+      "fase": "16-avos",
+      "inicio_brt": "2026-06-30T14:00:00-03:00",
+      "descricao": "Costa do Marfim x Noruega",
+      "local": "Dallas Stadium"
+    },
+    {
+      "id": "M77",
+      "fase": "16-avos",
+      "inicio_brt": "2026-06-30T18:00:00-03:00",
+      "descricao": "França x Suécia",
+      "local": "New York New Jersey Stadium"
+    },
+    {
+      "id": "M79",
+      "fase": "16-avos",
+      "inicio_brt": "2026-06-30T22:00:00-03:00",
+      "descricao": "México x Equador",
+      "local": "Mexico City Stadium"
+    },
+    {
+      "id": "M80",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-01T13:00:00-03:00",
+      "descricao": "Inglaterra x RD Congo",
+      "local": "Atlanta Stadium"
+    },
+    {
+      "id": "M82",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-01T17:00:00-03:00",
+      "descricao": "Bélgica x Senegal",
+      "local": "Seattle Stadium"
+    },
+    {
+      "id": "M81",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-01T21:00:00-03:00",
+      "descricao": "EUA x Bósnia",
+      "local": "San Francisco Bay Area Stadium"
+    },
+    {
+      "id": "M84",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-02T16:00:00-03:00",
+      "descricao": "Espanha x Áustria",
+      "local": "Los Angeles Stadium"
+    },
+    {
+      "id": "M83",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-02T20:00:00-03:00",
+      "descricao": "Portugal x Croácia",
+      "local": "Toronto Stadium"
+    },
+    {
+      "id": "M85",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-03T00:00:00-03:00",
+      "descricao": "Suíça x Argélia",
+      "local": "BC Place Vancouver"
+    },
+    {
+      "id": "M88",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-03T15:00:00-03:00",
+      "descricao": "Austrália x Egito",
+      "local": "Dallas Stadium"
+    },
+    {
+      "id": "M86",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-03T19:00:00-03:00",
+      "descricao": "Argentina x Cabo Verde",
+      "local": "Miami Stadium"
+    },
+    {
+      "id": "M87",
+      "fase": "16-avos",
+      "inicio_brt": "2026-07-03T22:30:00-03:00",
+      "descricao": "Colômbia x Gana",
+      "local": "Kansas City Stadium"
+    },
+    {
+      "id": "M90",
+      "fase": "oitavas",
+      "inicio_brt": "2026-07-04T14:00:00-03:00",
+      "descricao": "Oitavas M90",
+      "local": "Houston Stadium"
+    },
+    {
+      "id": "M89",
+      "fase": "oitavas",
+      "inicio_brt": "2026-07-04T18:00:00-03:00",
+      "descricao": "Oitavas M89",
+      "local": "Philadelphia Stadium"
+    },
+    {
+      "id": "M91",
+      "fase": "oitavas",
+      "inicio_brt": "2026-07-05T17:00:00-03:00",
+      "descricao": "Oitavas M91",
+      "local": "New York New Jersey Stadium"
+    },
+    {
+      "id": "M92",
+      "fase": "oitavas",
+      "inicio_brt": "2026-07-05T21:00:00-03:00",
+      "descricao": "Oitavas M92",
+      "local": "Mexico City Stadium"
+    },
+    {
+      "id": "M93",
+      "fase": "oitavas",
+      "inicio_brt": "2026-07-06T16:00:00-03:00",
+      "descricao": "Oitavas M93",
+      "local": "Dallas Stadium"
+    },
+    {
+      "id": "M94",
+      "fase": "oitavas",
+      "inicio_brt": "2026-07-06T21:00:00-03:00",
+      "descricao": "Oitavas M94",
+      "local": "Seattle Stadium"
+    },
+    {
+      "id": "M95",
+      "fase": "oitavas",
+      "inicio_brt": "2026-07-07T13:00:00-03:00",
+      "descricao": "Oitavas M95",
+      "local": "Atlanta Stadium"
+    },
+    {
+      "id": "M96",
+      "fase": "oitavas",
+      "inicio_brt": "2026-07-07T17:00:00-03:00",
+      "descricao": "Oitavas M96",
+      "local": "BC Place Vancouver"
+    },
+    {
+      "id": "M97",
+      "fase": "quartas",
+      "inicio_brt": "2026-07-09T17:00:00-03:00",
+      "descricao": "Quartas M97",
+      "local": "Boston Stadium"
+    },
+    {
+      "id": "M98",
+      "fase": "quartas",
+      "inicio_brt": "2026-07-10T16:00:00-03:00",
+      "descricao": "Quartas M98",
+      "local": "Los Angeles Stadium"
+    },
+    {
+      "id": "M99",
+      "fase": "quartas",
+      "inicio_brt": "2026-07-11T18:00:00-03:00",
+      "descricao": "Quartas M99",
+      "local": "Miami Stadium"
+    },
+    {
+      "id": "M100",
+      "fase": "quartas",
+      "inicio_brt": "2026-07-11T22:00:00-03:00",
+      "descricao": "Quartas M100",
+      "local": "Kansas City Stadium"
+    },
+    {
+      "id": "M101",
+      "fase": "semifinal",
+      "inicio_brt": "2026-07-14T16:00:00-03:00",
+      "descricao": "Semifinal M101",
+      "local": "Dallas Stadium"
+    },
+    {
+      "id": "M102",
+      "fase": "semifinal",
+      "inicio_brt": "2026-07-15T16:00:00-03:00",
+      "descricao": "Semifinal M102",
+      "local": "Atlanta Stadium"
+    },
+    {
+      "id": "M103",
+      "fase": "3º lugar",
+      "inicio_brt": "2026-07-18T18:00:00-03:00",
+      "descricao": "Disputa de 3º lugar",
+      "local": "Miami Stadium"
+    },
+    {
+      "id": "M104",
+      "fase": "final",
+      "inicio_brt": "2026-07-19T16:00:00-03:00",
+      "descricao": "Final",
+      "local": "New York New Jersey Stadium"
+    }
+  ],
+  "dias_sem_jogos_confirmados": [
+    "2026-07-08",
+    "2026-07-12",
+    "2026-07-13",
+    "2026-07-16",
+    "2026-07-17"
+  ]
+}
