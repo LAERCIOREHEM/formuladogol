@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências dependem de disponibilidade no summary/comentário da ESPN. Gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-06-28T01:10:48.442534Z",
+  "atualizado_em": "2026-06-28T01:21:00.477018Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 70,
@@ -796,6 +796,18 @@
       "jogos": [
         "760427",
         "760452"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Fiston Mayele",
+      "equipe": "COD",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760482"
       ],
       "total_cartoes": 0
     },
@@ -3052,12 +3064,13 @@
       "equipe": "COL",
       "gols": 0,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760436"
+        "760436",
+        "760481"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Habib Diarra",
@@ -5353,6 +5366,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Gustavo Puerta",
+      "equipe": "COL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760436",
+        "760481"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Guéla Doué",
       "equipe": "CIV",
       "gols": 0,
@@ -6740,7 +6766,7 @@
       "equipe": "COL",
       "gols": 4,
       "assistencias": 8,
-      "amarelos": 3,
+      "amarelos": 4,
       "vermelhos": 0,
       "jogos": 3,
       "media_gols": 1.33
