@@ -586,20 +586,22 @@
   function statusPalpiteFase(id, fase) {
     const o = DADOS.oficial;
     if (!o || !id) return "pend";
-    const mapa = {
-      r32: "classificados32",
-      oitavas: "avancam_oitavas",
-      quartas: "avancam_quartas",
-      semifinais: "semifinalistas",
-      final: "finalistas"
-    };
-    const campo = mapa[fase];
-    const listaFase = (campo && o[campo]) || [];
-    // Se a fase já tem lista oficial/simulada, compara diretamente com ela.
-    if (listaFase.length) return listaFase.indexOf(id) !== -1 ? "ok" : "err";
-    // Antes da fase acontecer: vermelho para quem já caiu; verde para quem ainda pode confirmar.
-    if ((o.eliminados || []).indexOf(id) !== -1) return "err";
-    if ((o.classificados32 || []).indexOf(id) !== -1) return "ok";
+    const classificados32 = o.classificados32 || [];
+    const eliminados = o.eliminados || [];
+
+    // 2ª fase/16-avos: aqui o acerto é efetivamente ter entrado entre os 32.
+    if (fase === "r32") {
+      if (classificados32.length) return classificados32.indexOf(id) !== -1 ? "ok" : "err";
+      if (eliminados.indexOf(id) !== -1) return "err";
+      return "pend";
+    }
+
+    // Oitavas em diante: NÃO compara com a lista projetada da ESPN/chaveamento.
+    // A pergunta é: esta seleção que eu cravei para avançar ainda está viva?
+    // Só sai do páreo quando não classificou para os 32 ou quando foi eliminada em campo.
+    if (classificados32.length && classificados32.indexOf(id) === -1) return "err";
+    if (eliminados.indexOf(id) !== -1) return "err";
+    if (classificados32.length && classificados32.indexOf(id) !== -1) return "ok";
     return "pend";
   }
   function marcadorStatus(id, fase) {

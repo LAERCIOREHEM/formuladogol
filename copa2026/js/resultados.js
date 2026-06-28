@@ -904,25 +904,50 @@
   }
 
   // ranking "quem acertou as seleções que avançaram" (sem importar posição/cruzamento)
+  function eliminadosMataAtual() {
+    const elim = new Set();
+    (MATA_EVENTS || []).forEach(ev => {
+      try {
+        if (((ev.season && ev.season.slug) || "") === "group-stage") return;
+        if (estadoEvento(ev) !== "post") return;
+        const cs = getPath(ev, ["competitions", 0, "competitors"], []) || [];
+        const perd = cs.find(c => c && c.winner === false);
+        const id = perd ? (dpSigla((perd.team || {}).abbreviation) || dpSigla((perd.team || {}).displayName) || dpSigla((perd.team || {}).shortDisplayName)) : null;
+        if (id) elim.add(id);
+      } catch (e) { /* ignora evento malformado */ }
+    });
+    return elim;
+  }
+  function vivosMataAtual(d) {
+    const base = new Set((d && d.classificados32) || []);
+    const elim = eliminadosMataAtual();
+    elim.forEach(id => base.delete(id));
+    return Array.from(base);
+  }
+  function faseRankingAtual(d) {
+    const vivos = vivosMataAtual(d);
+    const mapa = {
+      "16-avos": { rot:"Classificados (32)", campo:"classificados32", real:(d && d.classificados32) || [], alvo:32 },
+      "Oitavas": { rot:"Avançam às Oitavas (16)", campo:"avancam_oitavas", real:vivos, alvo:16 },
+      "Quartas": { rot:"Avançam às Quartas (8)", campo:"avancam_quartas", real:vivos, alvo:8 },
+      "Semis": { rot:"Semifinalistas (4)", campo:"semifinalistas", real:vivos, alvo:4 },
+      "Final": { rot:"Finalistas (2)", campo:"finalistas", real:vivos, alvo:2 }
+    };
+    return mapa[FASE_MATA] || mapa["16-avos"];
+  }
   function rankingSelecoesHTML(d) {
     if (!PALP.length) return "";
-    // fases com seleções já definidas (só mostra a linha se a fase tem gente avançando)
-    const fases = [
-      { rot: "Classificados (32)", real: d.classificados32 || [], campo: "classificados32" },
-      { rot: "Oitavas (16)", real: d.avancam_oitavas || [], campo: "avancam_oitavas" },
-      { rot: "Quartas (8)", real: d.avancam_quartas || [], campo: "avancam_quartas" },
-      { rot: "Semifinais (4)", real: d.semifinalistas || [], campo: "semifinalistas" },
-      { rot: "Finalistas (2)", real: d.finalistas || [], campo: "finalistas" }
-    ].filter(f => f.real.length > 0);
+    const fase = faseRankingAtual(d);
+    if (!fase || !fase.real || !fase.real.length) return "";
 
-    // deriva cada palpite e conta a interseção por fase
+    // Deriva cada palpite, substitui pelas listas auditadas e conta apenas a fase aberta.
+    // Para Oitavas em diante, "real" = seleções ainda vivas. Assim ninguém cai antes
+    // de ser eliminado efetivamente em campo.
+    const setReal = new Set(fase.real || []);
     const linhas = PALP.map(p => {
       let pd;
       try { pd = COPA_ENGINE.derivar(SEL, pgToArr(p.pg), {}, ESTRUT, TERMAP); }
       catch (e) { pd = null; }
-      // Sobrescreve as fases do mata-mata com as listas auditadas (imutáveis): como
-      // o palpite é derivado sem placares de mata-mata ({}), as fases de avanço
-      // viriam vazias. As listas com hash refletem quem cada um cravou avançando.
       const pmt = pd && canonicoDe(p.nome);
       if (pmt) {
         pd.classificados32 = pmt.classificados32 || pd.classificados32;
@@ -931,31 +956,22 @@
         pd.semifinalistas = pmt.semifinalistas || pd.semifinalistas;
         pd.finalistas = pmt.finalistas || pd.finalistas;
       }
-      const acertosPorFase = fases.map(f => {
-        if (!pd) return 0;
-        const setReal = new Set(f.real);
-        return (pd[f.campo] || []).filter(id => setReal.has(id)).length;
-      });
-      // ordena pelo acerto da PRIMEIRA fase (32) como critério principal, depois as seguintes
-      return { nome: p.nome, acertos: acertosPorFase, chave: acertosPorFase };
+      const acertos = pd ? (pd[fase.campo] || []).filter(id => setReal.has(id)).length : 0;
+      return { nome:p.nome, acertos };
     });
 
-    // ordena: mais acertos nas 32, desempate nas fases seguintes
-    linhas.sort((a, b) => {
-      for (let i = 0; i < a.acertos.length; i++) {
-        if (b.acertos[i] !== a.acertos[i]) return b.acertos[i] - a.acertos[i];
-      }
-      return a.nome.localeCompare(b.nome);
-    });
+    linhas.sort((a, b) => b.acertos - a.acertos || a.nome.localeCompare(b.nome));
 
-    const cabecalho = `<tr><th class="rs-nome">Apostador</th>${fases.map(f => `<th>${f.rot}</th>`).join("")}</tr>`;
+    const cabecalho = `<tr><th class="rs-nome">Apostador</th><th>${fase.rot}</th></tr>`;
     const corpo = linhas.map((l, i) => {
-      const cels = l.acertos.map((n, j) => `<td><b>${n}</b><span class="rs-de">/${fases[j].real.length}</span></td>`).join("");
-      return `<tr><td class="rs-nome">${i + 1}. ${l.nome}</td>${cels}</tr>`;
+      return `<tr><td class="rs-nome">${i + 1}. ${l.nome}</td><td><b>${l.acertos}</b><span class="rs-de">/${fase.alvo}</span></td></tr>`;
     }).join("");
 
+    const legenda = FASE_MATA === "16-avos"
+      ? "Quantas seleções classificadas entre as 32 cada um cravou — <b>não importa a posição nem o cruzamento</b>."
+      : "Quantas seleções cravadas para esta fase ainda permanecem no páreo — <b>só sai quando é eliminada em campo</b>.";
     return `<div class="rs-box" id="rs-box" style="display:none">
-      <p class="rs-leg">Quantas seleções que avançaram (ou estão avançando) cada um cravou — <b>não importa a posição nem o cruzamento</b>, só se a seleção certa passou.</p>
+      <p class="rs-leg">${legenda}</p>
       <div class="rs-scroll"><table class="rs-tab"><thead>${cabecalho}</thead><tbody>${corpo}</tbody></table></div>
     </div>`;
   }
