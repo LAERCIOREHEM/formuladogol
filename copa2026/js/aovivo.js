@@ -1,7 +1,7 @@
 /* =========================================================================
    aovivo.js — Tela "AO VIVO" (Copa 2026)
    Lê o feed da ESPN. Fora da janela de jogo não atualiza; quando há jogo ao vivo (ou nos
-   10 min de pré-jogo), mostra a tela cheia; quando acaba (status oficial),
+   15 min de pré-jogo), mostra a tela cheia; quando acaba (status oficial),
    sai sozinho. Na FASE DE GRUPOS, cruza com os palpites e mostra as bolinhas
    (acertando / cravou). No mata-mata, só o placar (palpite por jogo não se
    aplica — cada um tem chave diferente).
@@ -22,7 +22,7 @@
   const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
   const SUMMARY_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary";
   const DEMO = /[?&]demo=1/.test(location.search);
-  const PRE_MIN = 10;                 // abre 10 min antes do início oficial
+  const PRE_MIN = 15;                 // abre 15 min antes do início oficial
   const LIVE_REFRESH_MS = 30000;        // durante jogo/janela ativa
   const LIVE_POST_MS = 60 * 60 * 1000; // 1h após fim detectado/estimado
   const LIVE_ESTIMATED_GAME_MS = 4 * 60 * 60 * 1000;
