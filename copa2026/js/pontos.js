@@ -97,7 +97,46 @@
   }
 
   // ---- monta o resultado OFICIAL a partir da ESPN ----
-  function phaseOf(ev) { return (ev.season && ev.season.slug) || ""; }
+  function ymdEventoBR(iso) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", { timeZone:"America/Sao_Paulo", year:"numeric", month:"2-digit", day:"2-digit" }).formatToParts(new Date(iso));
+      const get = t => (parts.find(p => p.type === t) || {}).value || "";
+      return `${get("year")}${get("month")}${get("day")}`;
+    } catch (e) { return ""; }
+  }
+  function phaseOf(ev) {
+    const comp = ev && ev.competitions && ev.competitions[0] ? ev.competitions[0] : {};
+    const raw = [
+      ev && ev.season && ev.season.slug,
+      ev && ev.name,
+      ev && ev.shortName,
+      comp.name,
+      comp.shortName,
+      comp.note,
+      comp.notes
+    ].filter(Boolean).join(" ").toLowerCase();
+
+    // Primeiro tenta pelo texto/slug da ESPN. A ESPN pode variar o slug conforme a fase.
+    if (/group/.test(raw)) return "group-stage";
+    if (/third|3rd|bronze|terceiro/.test(raw)) return "third-place";
+    if (/round[-\s_]*of[-\s_]*32|round32|\br32\b|\b32\b/.test(raw)) return "round-of-32";
+    if (/round[-\s_]*of[-\s_]*16|round16|\br16\b|\b16\b|oitava|octav/.test(raw)) return "round-of-16";
+    if (/quarter|quartas|quarterfinal/.test(raw)) return "quarterfinals";
+    if (/semi|semifinal/.test(raw)) return "semifinals";
+    if (/final/.test(raw)) return "final";
+
+    // Fallback por calendário oficial da Copa 2026, em Brasília.
+    // Isso garante a apuração mesmo se a ESPN trocar slug/nome da fase.
+    const d = ymdEventoBR(ev && ev.date);
+    if (d >= "20260611" && d <= "20260627") return "group-stage";
+    if (d >= "20260628" && d <= "20260703") return "round-of-32";
+    if (d >= "20260704" && d <= "20260707") return "round-of-16";
+    if (d >= "20260709" && d <= "20260711") return "quarterfinals";
+    if (d >= "20260714" && d <= "20260715") return "semifinals";
+    if (d === "20260718") return "third-place";
+    if (d === "20260719") return "final";
+    return "";
+  }
   function teamsOf(ev) { return (ev.competitions[0].competitors || []).map(c => norm((c.team || {}).abbreviation)).filter(t => DADOS.nomeDe && DADOS.nomeDe[t]); }
   function isPost(ev) { return ev.competitions[0].status.type.state === "post"; }
   function winLoseOf(ev) {

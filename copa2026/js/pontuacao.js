@@ -85,7 +85,10 @@
       avancam_quartas: p.avancam_quartas,
       semifinalistas: p.semifinalistas,
       finalistas: p.finalistas,
-      campeao: p.campeao, vice: p.vice, terceiro: p.terceiro, quarto: p.quarto
+      campeao: p.campeao, vice: p.vice, terceiro: p.terceiro, quarto: p.quarto,
+      // TETO é o máximo teórico do palpite, não a apuração fase-a-fase.
+      // Portanto, todas as fases precisam contar aqui.
+      _apurarMata: { oitavas:true, quartas:true, semis:true, final:true }
     };
     return calcularAtuais(p, oficialFicticio).total;
   }
