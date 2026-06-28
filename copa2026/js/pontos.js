@@ -117,7 +117,14 @@
     // Isso evita o bug clássico: Canadá venceu os 16-avos, mas ainda não apareceu
     // no card ESPN das oitavas; mesmo assim, já conquistou os +4.
     const addUnico = (arr, id) => { if (id && arr.indexOf(id) === -1) arr.push(id); };
+    const faseComecou = slug => events.some(e => phaseOf(e) === slug && e.competitions && e.competitions[0] && e.competitions[0].status && e.competitions[0].status.type && e.competitions[0].status.type.state !== "pre");
     const r32 = slugTeams("round-of-32");
+    o._apurarMata = {
+      oitavas: faseComecou("round-of-32"),
+      quartas: faseComecou("round-of-16"),
+      semis: faseComecou("quarterfinals"),
+      final: faseComecou("semifinals")
+    };
     o.avancam_oitavas = slugTeams("round-of-16");
     o.avancam_quartas = slugTeams("quarterfinals");
     o.semifinalistas = slugTeams("semifinals");
@@ -236,11 +243,21 @@
     }).join("");
   }
 
+  function fasePalpiteAtiva(key, o) {
+    const ap = (o && o._apurarMata) || {};
+    if (key === "classificados32") return true;
+    if (key === "avancam_oitavas") return !!ap.oitavas;
+    if (key === "avancam_quartas") return !!ap.quartas;
+    if (key === "semifinalistas") return !!ap.semis;
+    if (key === "finalistas") return !!ap.final;
+    return true;
+  }
   function statusFasePalpite(id, key, o) {
     const oficiais = new Set(o[key] || []);
     if (oficiais.has(id)) return "ok";
-    if ((o.eliminados || []).indexOf(id) !== -1) return "no";
+    // Visual alinhado ao motor: fases futuras ainda ficam possíveis até entrarem em apuração.
     if (key === "classificados32" && o.classificados32 && o.classificados32.length && o.classificados32.indexOf(id) === -1) return "no";
+    if (fasePalpiteAtiva(key, o) && (o.eliminados || []).indexOf(id) !== -1) return "no";
     return "pend";
   }
   function chipFasePalpite(id, key, o) {
@@ -452,6 +469,7 @@
     // mata-mata perdido (só no oficial, quando fases já decididas):
     // cada seleção apostada para uma fase que já caiu antes dela debita o peso daquela fase.
     const perdMata = (key, oficiais, peso, rotulo) => {
+      if (!fasePalpiteAtiva(key, o)) return;
       const conf = new Set(oficiais || []);
       const ids = (p[key] || []).filter(id => elim.has(id) && !conf.has(id));
       if (ids.length) prow(`${ids.length} ${rotulo} (×${peso}): ${ids.map(id => nome(id)).join(", ")}`, ids.length * peso);

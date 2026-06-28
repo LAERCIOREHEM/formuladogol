@@ -26,8 +26,17 @@
   };
 
   function inter(a, b) {
-    const sb = new Set(b);
-    return a.filter(x => sb.has(x));
+    const sb = new Set(b || []);
+    return (a || []).filter(x => sb.has(x));
+  }
+  function lista(p, k) { return Array.isArray(p && p[k]) ? p[k] : []; }
+  function faseMataAtiva(o, key) {
+    const ap = (o && o._apurarMata) || {};
+    if (key === "avancam_oitavas") return !!ap.oitavas;
+    if (key === "avancam_quartas") return !!ap.quartas;
+    if (key === "semifinalistas") return !!ap.semis;
+    if (key === "finalistas") return !!ap.final;
+    return true;
   }
 
   // Pontos ATUAIS: compara palpite (p) com oficial parcial (o).
@@ -50,10 +59,12 @@
       }
     });
 
-    d.oitavas = inter(p.avancam_oitavas, o.avancam_oitavas || []).length * PESOS.oitavas;
-    d.quartas = inter(p.avancam_quartas, o.avancam_quartas || []).length * PESOS.quartas;
-    d.semis   = inter(p.semifinalistas, o.semifinalistas || []).length * PESOS.semi;
-    d.final   = inter(p.finalistas, o.finalistas || []).length * PESOS.final;
+    // Mata-mata é apurado fase por fase: não antecipa pontuação de quartas/semis/final
+    // só porque uma seleção ainda está viva ou eliminada. A fase precisa estar aberta.
+    d.oitavas = faseMataAtiva(o, "avancam_oitavas") ? inter(p.avancam_oitavas, o.avancam_oitavas || []).length * PESOS.oitavas : 0;
+    d.quartas = faseMataAtiva(o, "avancam_quartas") ? inter(p.avancam_quartas, o.avancam_quartas || []).length * PESOS.quartas : 0;
+    d.semis   = faseMataAtiva(o, "semifinalistas") ? inter(p.semifinalistas, o.semifinalistas || []).length * PESOS.semi : 0;
+    d.final   = faseMataAtiva(o, "finalistas") ? inter(p.finalistas, o.finalistas || []).length * PESOS.final : 0;
 
     d.campeao  = (o.campeao  && p.campeao  === o.campeao)  ? PESOS.campeao  : 0;
     d.vice     = (o.vice     && p.vice     === o.vice)     ? PESOS.vice     : 0;
@@ -103,13 +114,9 @@
         if (pg[i] && oc[g][i] && pg[i].id !== oc[g][i].id) d.posGrupos += pesos[i];
       }
     });
-    // mata-mata e títulos: no simulado da fase de grupos ainda não há foto, então
-    // só conta como perdido se a seleção apostada já está fora dos 32 de hoje.
-    const elim = new Set(o.eliminados || []);
-    d.campeao  = (p.campeao  && elim.has(p.campeao))  ? PESOS.campeao  : 0;
-    d.vice     = (p.vice     && elim.has(p.vice))     ? PESOS.vice     : 0;
-    d.terceiro = (p.terceiro && elim.has(p.terceiro)) ? PESOS.terceiro : 0;
-    d.quarto   = (p.quarto   && elim.has(p.quarto))   ? PESOS.quarto   : 0;
+    // títulos/pódio não são antecipados como perdidos aqui. Eles só são debitados
+    // quando a posição for oficialmente decidida, mantendo a apuração fase por fase.
+    d.campeao = 0; d.vice = 0; d.terceiro = 0; d.quarto = 0;
     d.total = Object.values(d).reduce((a, b) => a + b, 0);
     return d;
   }
@@ -124,24 +131,24 @@
     // PERDIDOS (aproximação honesta a partir dos times já eliminados)
     let perdidos = 0;
     const elim = new Set(o.eliminados || []);
-    const fora = (set) => p[set].filter(id => elim.has(id));
-    // seleção prevista numa fase mas já eliminada e que NÃO está no oficial daquela fase
+    // seleção prevista numa fase mas já eliminada e que NÃO está no oficial daquela fase.
+    // Para mata-mata, só debita fases já abertas/apuradas.
     const naoConfirmados = (pset, oset, peso) => {
       const conf = new Set(oset || []);
-      return p[pset].filter(id => elim.has(id) && !conf.has(id)).length * peso;
+      return lista(p, pset).filter(id => elim.has(id) && !conf.has(id)).length * peso;
     };
     perdidos += naoConfirmados("classificados32", o.classificados32, PESOS.classificado32);
     perdidos += naoConfirmados("melhores_terceiros", o.melhores_terceiros, PESOS.melhorTerceiro);
-    perdidos += naoConfirmados("avancam_oitavas", o.avancam_oitavas, PESOS.oitavas);
-    perdidos += naoConfirmados("avancam_quartas", o.avancam_quartas, PESOS.quartas);
-    perdidos += naoConfirmados("semifinalistas", o.semifinalistas, PESOS.semi);
-    perdidos += naoConfirmados("finalistas", o.finalistas, PESOS.final);
+    if (faseMataAtiva(o, "avancam_oitavas")) perdidos += naoConfirmados("avancam_oitavas", o.avancam_oitavas, PESOS.oitavas);
+    if (faseMataAtiva(o, "avancam_quartas")) perdidos += naoConfirmados("avancam_quartas", o.avancam_quartas, PESOS.quartas);
+    if (faseMataAtiva(o, "semifinalistas")) perdidos += naoConfirmados("semifinalistas", o.semifinalistas, PESOS.semi);
+    if (faseMataAtiva(o, "finalistas")) perdidos += naoConfirmados("finalistas", o.finalistas, PESOS.final);
     const dec = o.decididos || {};
-    // Perdido se o título já foi decidido e ele errou, OU se a seleção que ele apostou já foi eliminada.
-    if ((dec.campeao  && atuais.campeao  === 0) || (p.campeao  && elim.has(p.campeao)))  perdidos += PESOS.campeao;
-    if ((dec.vice     && atuais.vice     === 0) || (p.vice     && elim.has(p.vice)))     perdidos += PESOS.vice;
-    if ((dec.terceiro && atuais.terceiro === 0) || (p.terceiro && elim.has(p.terceiro))) perdidos += PESOS.terceiro;
-    if ((dec.quarto   && atuais.quarto   === 0) || (p.quarto   && elim.has(p.quarto)))   perdidos += PESOS.quarto;
+    // Títulos/pódio só entram como perdidos quando a posição estiver decidida.
+    if (dec.campeao  && atuais.campeao  === 0) perdidos += PESOS.campeao;
+    if (dec.vice     && atuais.vice     === 0) perdidos += PESOS.vice;
+    if (dec.terceiro && atuais.terceiro === 0) perdidos += PESOS.terceiro;
+    if (dec.quarto   && atuais.quarto   === 0) perdidos += PESOS.quarto;
 
     let detPerdidos = null;
     // Sempre que há classificação de grupos (simulado parcial OU oficial encerrado),
@@ -158,10 +165,14 @@
           const conf = new Set(oset || []);
           return (p[pset] || []).filter(id => elim.has(id) && !conf.has(id)).length * peso;
         };
-        pmm += naoConf("avancam_oitavas", o.avancam_oitavas, PESOS.oitavas);
-        pmm += naoConf("avancam_quartas", o.avancam_quartas, PESOS.quartas);
-        pmm += naoConf("semifinalistas", o.semifinalistas, PESOS.semi);
-        pmm += naoConf("finalistas", o.finalistas, PESOS.final);
+        if (faseMataAtiva(o, "avancam_oitavas")) pmm += naoConf("avancam_oitavas", o.avancam_oitavas, PESOS.oitavas);
+        if (faseMataAtiva(o, "avancam_quartas")) pmm += naoConf("avancam_quartas", o.avancam_quartas, PESOS.quartas);
+        if (faseMataAtiva(o, "semifinalistas")) pmm += naoConf("semifinalistas", o.semifinalistas, PESOS.semi);
+        if (faseMataAtiva(o, "finalistas")) pmm += naoConf("finalistas", o.finalistas, PESOS.final);
+        if (dec.campeao  && atuais.campeao  === 0) pmm += PESOS.campeao;
+        if (dec.vice     && atuais.vice     === 0) pmm += PESOS.vice;
+        if (dec.terceiro && atuais.terceiro === 0) pmm += PESOS.terceiro;
+        if (dec.quarto   && atuais.quarto   === 0) pmm += PESOS.quarto;
         detPerdidos.matamata = pmm;
         detPerdidos.total += pmm;
       }
@@ -180,5 +191,5 @@
     };
   }
 
-  global.COPA_PONTUACAO = { PESOS, calcular, calcularAtuais, teto, perdidosSimulado };
+  global.COPA_PONTUACAO = { PESOS, calcular, calcularAtuais, teto, perdidosSimulado, faseMataAtiva };
 })(typeof window !== "undefined" ? window : globalThis);
