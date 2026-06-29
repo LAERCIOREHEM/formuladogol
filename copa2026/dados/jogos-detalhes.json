@@ -1,6 +1,5968 @@
 {
-  "_comentario": "Arquivo inicial. Será preenchido por copa2026/buscar_detalhes_jogos.py. O site também tenta buscar o summary da ESPN ao abrir o botão se este JSON ainda não tiver o jogo.",
-  "gerado_em": null,
-  "total_jogos": 0,
-  "jogos": {}
+  "_comentario": "Gerado por copa2026/buscar_detalhes_jogos.py. Estatísticas podem variar conforme disponibilidade da ESPN.",
+  "gerado_em": "2026-06-29T21:40:45.756579+00:00",
+  "total_jogos": 104,
+  "jogos": {
+    "760415": {
+      "event_id": "760415",
+      "date": "2026-06-11T19:00Z",
+      "home": "MEX",
+      "away": "RSA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "60.5%",
+          "away": "39.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "16",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "70%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "467",
+          "away": "272"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:12.024753+00:00"
+    },
+    "760414": {
+      "event_id": "760414",
+      "date": "2026-06-12T02:00Z",
+      "home": "KOR",
+      "away": "CZE",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "61.5%",
+          "away": "38.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "15",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "60%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "469",
+          "away": "230"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:12.346748+00:00"
+    },
+    "760416": {
+      "event_id": "760416",
+      "date": "2026-06-12T19:00Z",
+      "home": "CAN",
+      "away": "BIH",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "61.1%",
+          "away": "38.9%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "9",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "20"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "310",
+          "away": "172"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "60%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:12.625468+00:00"
+    },
+    "760417": {
+      "event_id": "760417",
+      "date": "2026-06-13T01:00Z",
+      "home": "USA",
+      "away": "PAR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "65.3%",
+          "away": "34.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "16",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "10%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "17"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "509",
+          "away": "232"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:12.984245+00:00"
+    },
+    "760420": {
+      "event_id": "760420",
+      "date": "2026-06-13T19:00Z",
+      "home": "QAT",
+      "away": "SUI",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "32%",
+          "away": "68%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "6",
+          "away": "26"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "0",
+          "away": "9"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "10"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "200",
+          "away": "527"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:13.321958+00:00"
+    },
+    "760419": {
+      "event_id": "760419",
+      "date": "2026-06-13T22:00Z",
+      "home": "BRA",
+      "away": "MAR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "51.4%",
+          "away": "48.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "12",
+          "away": "14"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "6"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "16",
+          "away": "14"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "449",
+          "away": "419"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:13.646251+00:00"
+    },
+    "760418": {
+      "event_id": "760418",
+      "date": "2026-06-14T01:00Z",
+      "home": "HAI",
+      "away": "SCO",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "53.7%",
+          "away": "46.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "15",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Faltas",
+          "home": "23",
+          "away": "21"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "367",
+          "away": "307"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:13.991472+00:00"
+    },
+    "760421": {
+      "event_id": "760421",
+      "date": "2026-06-14T04:00Z",
+      "home": "AUS",
+      "away": "TUR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "28.4%",
+          "away": "71.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "9",
+          "away": "30"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "12"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "8"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "8",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "201",
+          "away": "635"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:14.327794+00:00"
+    },
+    "760422": {
+      "event_id": "760422",
+      "date": "2026-06-14T17:00Z",
+      "home": "GER",
+      "away": "CUW",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "64.6%",
+          "away": "35.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "26",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "12",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "8",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "8",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "18",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "554",
+          "away": "282"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:14.725434+00:00"
+    },
+    "760425": {
+      "event_id": "760425",
+      "date": "2026-06-14T20:00Z",
+      "home": "NED",
+      "away": "JPN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "59.8%",
+          "away": "40.2%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "10",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "60%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "7",
+          "away": "7"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "463",
+          "away": "286"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:15.014981+00:00"
+    },
+    "760423": {
+      "event_id": "760423",
+      "date": "2026-06-14T23:00Z",
+      "home": "CIV",
+      "away": "ECU",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "48.4%",
+          "away": "51.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "15",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "10%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "397",
+          "away": "419"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:15.312268+00:00"
+    },
+    "760424": {
+      "event_id": "760424",
+      "date": "2026-06-15T02:00Z",
+      "home": "SWE",
+      "away": "TUN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "48.7%",
+          "away": "51.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "6"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "278",
+          "away": "292"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:15.638008+00:00"
+    },
+    "760428": {
+      "event_id": "760428",
+      "date": "2026-06-15T16:00Z",
+      "home": "ESP",
+      "away": "CPV",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "74.3%",
+          "away": "25.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "27",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "8",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "11",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "1"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "7"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "734",
+          "away": "205"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:15.930917+00:00"
+    },
+    "760426": {
+      "event_id": "760426",
+      "date": "2026-06-15T19:00Z",
+      "home": "BEL",
+      "away": "EGY",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "53.6%",
+          "away": "46.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "15",
+          "away": "14"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "7"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "7"
+        },
+        {
+          "nome": "Faltas",
+          "home": "15",
+          "away": "15"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "391",
+          "away": "323"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:16.296894+00:00"
+    },
+    "760429": {
+      "event_id": "760429",
+      "date": "2026-06-15T22:00Z",
+      "home": "KSA",
+      "away": "URU",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "33.2%",
+          "away": "66.8%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "7",
+          "away": "27"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "7"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "14"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "6"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "6"
+        },
+        {
+          "nome": "Defesas",
+          "home": "9",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "236",
+          "away": "540"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:16.696682+00:00"
+    },
+    "760427": {
+      "event_id": "760427",
+      "date": "2026-06-16T01:00Z",
+      "home": "IRN",
+      "away": "NZL",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "48.5%",
+          "away": "51.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "17",
+          "away": "14"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "60%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "314",
+          "away": "376"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:17.046477+00:00"
+    },
+    "760432": {
+      "event_id": "760432",
+      "date": "2026-06-16T19:00Z",
+      "home": "FRA",
+      "away": "SEN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "53.4%",
+          "away": "46.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "8",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "70%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "5",
+          "away": "9"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "5"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "505",
+          "away": "430"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:17.533171+00:00"
+    },
+    "760430": {
+      "event_id": "760430",
+      "date": "2026-06-16T22:00Z",
+      "home": "IRQ",
+      "away": "NOR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "38.7%",
+          "away": "61.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "271",
+          "away": "477"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:17.854626+00:00"
+    },
+    "760433": {
+      "event_id": "760433",
+      "date": "2026-06-17T01:00Z",
+      "home": "ARG",
+      "away": "ALG",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "47.8%",
+          "away": "52.2%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "10",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "60%",
+          "away": "0%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "504",
+          "away": "563"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:18.234129+00:00"
+    },
+    "760431": {
+      "event_id": "760431",
+      "date": "2026-06-17T04:00Z",
+      "home": "AUT",
+      "away": "JOR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "63.2%",
+          "away": "36.8%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "11"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "7"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "487",
+          "away": "241"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:18.535646+00:00"
+    },
+    "760435": {
+      "event_id": "760435",
+      "date": "2026-06-17T17:00Z",
+      "home": "POR",
+      "away": "COD",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "75.4%",
+          "away": "24.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "7",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "10"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "724",
+          "away": "195"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:18.997094+00:00"
+    },
+    "760437": {
+      "event_id": "760437",
+      "date": "2026-06-17T20:00Z",
+      "home": "ENG",
+      "away": "CRO",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "51.7%",
+          "away": "48.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "11",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "8",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "12"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "7"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "406",
+          "away": "381"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:19.343168+00:00"
+    },
+    "760434": {
+      "event_id": "760434",
+      "date": "2026-06-17T23:00Z",
+      "home": "GHA",
+      "away": "PAN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "38%",
+          "away": "62%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "7",
+          "away": "11"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "292",
+          "away": "503"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:19.727277+00:00"
+    },
+    "760436": {
+      "event_id": "760436",
+      "date": "2026-06-18T02:00Z",
+      "home": "UZB",
+      "away": "COL",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "38.6%",
+          "away": "61.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "8",
+          "away": "15"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "14",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "243",
+          "away": "444"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:20.017638+00:00"
+    },
+    "760438": {
+      "event_id": "760438",
+      "date": "2026-06-18T16:00Z",
+      "home": "CZE",
+      "away": "RSA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "38.3%",
+          "away": "61.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "14",
+          "away": "17"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "8"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "10"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "272",
+          "away": "508"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:20.294588+00:00"
+    },
+    "760439": {
+      "event_id": "760439",
+      "date": "2026-06-18T19:00Z",
+      "home": "SUI",
+      "away": "BIH",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "62.3%",
+          "away": "37.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "60%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "3"
+        },
+        {
+          "nome": "Faltas",
+          "home": "7",
+          "away": "18"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "516",
+          "away": "287"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:20.674578+00:00"
+    },
+    "760440": {
+      "event_id": "760440",
+      "date": "2026-06-18T22:00Z",
+      "home": "CAN",
+      "away": "QAT",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "79%",
+          "away": "21%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "32",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "10",
+          "away": "0"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "14",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "0%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "19",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "10"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "515",
+          "away": "104"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "60%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:20.988361+00:00"
+    },
+    "760441": {
+      "event_id": "760441",
+      "date": "2026-06-19T01:00Z",
+      "home": "MEX",
+      "away": "KOR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "42.4%",
+          "away": "57.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "8",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "7"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "6"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "349",
+          "away": "488"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:21.346219+00:00"
+    },
+    "760442": {
+      "event_id": "760442",
+      "date": "2026-06-19T19:00Z",
+      "home": "USA",
+      "away": "AUS",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "61.9%",
+          "away": "38.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "10",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "444",
+          "away": "219"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:21.732993+00:00"
+    },
+    "760445": {
+      "event_id": "760445",
+      "date": "2026-06-19T22:00Z",
+      "home": "SCO",
+      "away": "MAR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "41.1%",
+          "away": "58.9%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "6",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "0%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "388",
+          "away": "600"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:22.080518+00:00"
+    },
+    "760444": {
+      "event_id": "760444",
+      "date": "2026-06-20T00:30Z",
+      "home": "BRA",
+      "away": "HAI",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "56.7%",
+          "away": "43.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "8",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "60%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "14"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "8",
+          "away": "4"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "462",
+          "away": "332"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:22.364840+00:00"
+    },
+    "760443": {
+      "event_id": "760443",
+      "date": "2026-06-20T03:00Z",
+      "home": "TUR",
+      "away": "PAR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "78.5%",
+          "away": "21.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "32",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "12",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "12",
+          "away": "0"
+        },
+        {
+          "nome": "Faltas",
+          "home": "14",
+          "away": "15"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "559",
+          "away": "96"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "50%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:22.681605+00:00"
+    },
+    "760447": {
+      "event_id": "760447",
+      "date": "2026-06-20T17:00Z",
+      "home": "NED",
+      "away": "SWE",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "50.9%",
+          "away": "49.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "10",
+          "away": "16"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "70%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "12"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "7",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "398",
+          "away": "361"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:23.004028+00:00"
+    },
+    "760448": {
+      "event_id": "760448",
+      "date": "2026-06-20T20:00Z",
+      "home": "GER",
+      "away": "CIV",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "59.5%",
+          "away": "40.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "16",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "8",
+          "away": "3"
+        },
+        {
+          "nome": "Faltas",
+          "home": "5",
+          "away": "7"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "555",
+          "away": "367"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:23.289819+00:00"
+    },
+    "760446": {
+      "event_id": "760446",
+      "date": "2026-06-21T00:00Z",
+      "home": "ECU",
+      "away": "CUW",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "74.6%",
+          "away": "25.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "27",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "15",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "60%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "9",
+          "away": "0"
+        },
+        {
+          "nome": "Faltas",
+          "home": "7",
+          "away": "10"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "15"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "581",
+          "away": "159"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:23.622865+00:00"
+    },
+    "760449": {
+      "event_id": "760449",
+      "date": "2026-06-21T04:00Z",
+      "home": "TUN",
+      "away": "JPN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "37.9%",
+          "away": "62.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "2",
+          "away": "11"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "0",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "0%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "8",
+          "away": "15"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "284",
+          "away": "521"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:23.955748+00:00"
+    },
+    "760453": {
+      "event_id": "760453",
+      "date": "2026-06-21T16:00Z",
+      "home": "ESP",
+      "away": "KSA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "67.1%",
+          "away": "32.9%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "8",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "2"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "668",
+          "away": "294"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:24.360715+00:00"
+    },
+    "760451": {
+      "event_id": "760451",
+      "date": "2026-06-21T19:00Z",
+      "home": "BEL",
+      "away": "IRN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "70.1%",
+          "away": "29.9%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "23",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "7",
+          "away": "9"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "7"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "533",
+          "away": "198"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:24.654651+00:00"
+    },
+    "760450": {
+      "event_id": "760450",
+      "date": "2026-06-21T22:00Z",
+      "home": "URU",
+      "away": "CPV",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "65.2%",
+          "away": "34.8%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "17",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "7",
+          "away": "4"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "11",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "420",
+          "away": "205"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:25.014908+00:00"
+    },
+    "760452": {
+      "event_id": "760452",
+      "date": "2026-06-22T01:00Z",
+      "home": "NZL",
+      "away": "EGY",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "44.4%",
+          "away": "55.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "19"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "6"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "14",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "337",
+          "away": "460"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:25.341372+00:00"
+    },
+    "760456": {
+      "event_id": "760456",
+      "date": "2026-06-22T17:00Z",
+      "home": "ARG",
+      "away": "AUT",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "53.6%",
+          "away": "46.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "12",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "494",
+          "away": "401"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:25.673690+00:00"
+    },
+    "760457": {
+      "event_id": "760457",
+      "date": "2026-06-22T21:00Z",
+      "home": "FRA",
+      "away": "IRQ",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "55.6%",
+          "away": "44.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "19",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "0"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "0%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "8",
+          "away": "4"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "540",
+          "away": "413"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:25.942744+00:00"
+    },
+    "760454": {
+      "event_id": "760454",
+      "date": "2026-06-23T00:00Z",
+      "home": "NOR",
+      "away": "SEN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "41.7%",
+          "away": "58.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "16"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "5"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "4"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "282",
+          "away": "430"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:26.336427+00:00"
+    },
+    "760455": {
+      "event_id": "760455",
+      "date": "2026-06-23T03:00Z",
+      "home": "JOR",
+      "away": "ALG",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "27.9%",
+          "away": "72.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "8",
+          "away": "17"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "0",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "1",
+          "away": "10"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "6"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "6",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "181",
+          "away": "561"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:26.702707+00:00"
+    },
+    "760461": {
+      "event_id": "760461",
+      "date": "2026-06-23T17:00Z",
+      "home": "POR",
+      "away": "UZB",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "65.9%",
+          "away": "34.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "17",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "9",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "14",
+          "away": "15"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "561",
+          "away": "262"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:27.020579+00:00"
+    },
+    "760458": {
+      "event_id": "760458",
+      "date": "2026-06-23T20:00Z",
+      "home": "ENG",
+      "away": "GHA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "78.9%",
+          "away": "21.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "19",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "9",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "14",
+          "away": "24"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "586",
+          "away": "127"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:27.365234+00:00"
+    },
+    "760460": {
+      "event_id": "760460",
+      "date": "2026-06-23T23:00Z",
+      "home": "PAN",
+      "away": "CRO",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "42%",
+          "away": "58%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "8",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "19",
+          "away": "12"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "277",
+          "away": "432"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:27.682440+00:00"
+    },
+    "760459": {
+      "event_id": "760459",
+      "date": "2026-06-24T02:00Z",
+      "home": "COL",
+      "away": "COD",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "63.5%",
+          "away": "36.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "20",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "9",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "10%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "7",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "8"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "473",
+          "away": "226"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:27.959939+00:00"
+    },
+    "760462": {
+      "event_id": "760462",
+      "date": "2026-06-24T19:00Z",
+      "home": "BIH",
+      "away": "QAT",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "54.4%",
+          "away": "45.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "14",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "14"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "452",
+          "away": "371"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:28.302849+00:00"
+    },
+    "760463": {
+      "event_id": "760463",
+      "date": "2026-06-24T19:00Z",
+      "home": "SUI",
+      "away": "CAN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "55.3%",
+          "away": "44.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "6",
+          "away": "13"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "70%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "7"
+        },
+        {
+          "nome": "Faltas",
+          "home": "19",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "369",
+          "away": "271"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:28.656709+00:00"
+    },
+    "760464": {
+      "event_id": "760464",
+      "date": "2026-06-24T22:00Z",
+      "home": "MAR",
+      "away": "HAI",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "69.1%",
+          "away": "30.9%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "11",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "9",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "18"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "5",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "8"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "477",
+          "away": "198"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:29.162029+00:00"
+    },
+    "760465": {
+      "event_id": "760465",
+      "date": "2026-06-24T22:00Z",
+      "home": "SCO",
+      "away": "BRA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "46%",
+          "away": "54%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "14",
+          "away": "21"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "7",
+          "away": "7"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "5"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "450",
+          "away": "564"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:29.499215+00:00"
+    },
+    "760467": {
+      "event_id": "760467",
+      "date": "2026-06-25T01:00Z",
+      "home": "CZE",
+      "away": "MEX",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "51.9%",
+          "away": "48.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "11"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "333",
+          "away": "330"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:29.822665+00:00"
+    },
+    "760466": {
+      "event_id": "760466",
+      "date": "2026-06-25T01:00Z",
+      "home": "RSA",
+      "away": "KOR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "31.6%",
+          "away": "68.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "7",
+          "away": "9"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "277",
+          "away": "641"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:30.100074+00:00"
+    },
+    "760473": {
+      "event_id": "760473",
+      "date": "2026-06-25T20:00Z",
+      "home": "CUW",
+      "away": "CIV",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "36.7%",
+          "away": "63.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "6"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "295",
+          "away": "558"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:30.401862+00:00"
+    },
+    "760468": {
+      "event_id": "760468",
+      "date": "2026-06-25T20:00Z",
+      "home": "ECU",
+      "away": "GER",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "38.9%",
+          "away": "61.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "7",
+          "away": "11"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "15",
+          "away": "10"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "312",
+          "away": "517"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:30.755522+00:00"
+    },
+    "760471": {
+      "event_id": "760471",
+      "date": "2026-06-25T23:00Z",
+      "home": "JPN",
+      "away": "SWE",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "52.3%",
+          "away": "47.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "8",
+          "away": "11"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "8"
+        },
+        {
+          "nome": "Faltas",
+          "home": "20",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "378",
+          "away": "312"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:31.034690+00:00"
+    },
+    "760472": {
+      "event_id": "760472",
+      "date": "2026-06-25T23:00Z",
+      "home": "TUN",
+      "away": "NED",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "28.6%",
+          "away": "71.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "10",
+          "away": "20"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "10"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "199",
+          "away": "602"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:31.366710+00:00"
+    },
+    "760469": {
+      "event_id": "760469",
+      "date": "2026-06-26T02:00Z",
+      "home": "PAR",
+      "away": "AUS",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "44%",
+          "away": "56%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "7",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "6"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "330",
+          "away": "438"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:31.651092+00:00"
+    },
+    "760470": {
+      "event_id": "760470",
+      "date": "2026-06-26T02:00Z",
+      "home": "TUR",
+      "away": "USA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "47.4%",
+          "away": "52.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "9",
+          "away": "18"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "5"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "9"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "5"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "335",
+          "away": "398"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:31.955749+00:00"
+    },
+    "760475": {
+      "event_id": "760475",
+      "date": "2026-06-26T19:00Z",
+      "home": "NOR",
+      "away": "FRA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "43.3%",
+          "away": "56.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "10",
+          "away": "18"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "343",
+          "away": "480"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:32.296791+00:00"
+    },
+    "760474": {
+      "event_id": "760474",
+      "date": "2026-06-26T19:00Z",
+      "home": "SEN",
+      "away": "IRQ",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "69.2%",
+          "away": "30.8%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "28",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "12",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "12",
+          "away": "3"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "7"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "517",
+          "away": "184"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "70%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:32.637516+00:00"
+    },
+    "760478": {
+      "event_id": "760478",
+      "date": "2026-06-27T00:00Z",
+      "home": "CPV",
+      "away": "KSA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "51%",
+          "away": "49%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "15",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "381",
+          "away": "359"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:32.921731+00:00"
+    },
+    "760479": {
+      "event_id": "760479",
+      "date": "2026-06-27T00:00Z",
+      "home": "URU",
+      "away": "ESP",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "33.1%",
+          "away": "66.9%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "5",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "1",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "14",
+          "away": "14"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "228",
+          "away": "553"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:33.241703+00:00"
+    },
+    "760476": {
+      "event_id": "760476",
+      "date": "2026-06-27T03:00Z",
+      "home": "EGY",
+      "away": "IRN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "61.4%",
+          "away": "38.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "15",
+          "away": "13"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "8",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "513",
+          "away": "281"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:33.511686+00:00"
+    },
+    "760477": {
+      "event_id": "760477",
+      "date": "2026-06-27T03:00Z",
+      "home": "NZL",
+      "away": "BEL",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "45.5%",
+          "away": "54.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "6",
+          "away": "35"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "12"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "8"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "7"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "369",
+          "away": "462"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:33.912077+00:00"
+    },
+    "760480": {
+      "event_id": "760480",
+      "date": "2026-06-27T21:00Z",
+      "home": "CRO",
+      "away": "GHA",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "53.3%",
+          "away": "46.7%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "8",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "50%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "477",
+          "away": "402"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:34.236074+00:00"
+    },
+    "760485": {
+      "event_id": "760485",
+      "date": "2026-06-27T21:00Z",
+      "home": "PAN",
+      "away": "ENG",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "32.9%",
+          "away": "67.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "13",
+          "away": "17"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "6"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "7"
+        },
+        {
+          "nome": "Faltas",
+          "home": "16",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "4",
+          "away": "4"
+        },
+        {
+          "nome": "Defesas",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "202",
+          "away": "490"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:34.587181+00:00"
+    },
+    "760481": {
+      "event_id": "760481",
+      "date": "2026-06-27T23:30Z",
+      "home": "COL",
+      "away": "POR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "54.6%",
+          "away": "45.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "24",
+          "away": "13"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "7",
+          "away": "4"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "6"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "6"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "485",
+          "away": "405"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:34.961040+00:00"
+    },
+    "760482": {
+      "event_id": "760482",
+      "date": "2026-06-27T23:30Z",
+      "home": "COD",
+      "away": "UZB",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "57.6%",
+          "away": "42.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "19",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "4",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "6",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "400",
+          "away": "269"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:35.342794+00:00"
+    },
+    "760484": {
+      "event_id": "760484",
+      "date": "2026-06-28T02:00Z",
+      "home": "ALG",
+      "away": "AUT",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "65%",
+          "away": "35%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "12",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "0",
+          "away": "3"
+        },
+        {
+          "nome": "Faltas",
+          "home": "3",
+          "away": "7"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "706",
+          "away": "346"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:35.630777+00:00"
+    },
+    "760483": {
+      "event_id": "760483",
+      "date": "2026-06-28T02:00Z",
+      "home": "JOR",
+      "away": "ARG",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "26.7%",
+          "away": "73.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "5",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "1",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "2",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "7"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "228",
+          "away": "737"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:35.900315+00:00"
+    },
+    "760486": {
+      "event_id": "760486",
+      "date": "2026-06-28T19:00Z",
+      "home": "RSA",
+      "away": "CAN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "58.4%",
+          "away": "41.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "6",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "1",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "60%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "1",
+          "away": "4"
+        },
+        {
+          "nome": "Faltas",
+          "home": "10",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "466",
+          "away": "298"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:36.293574+00:00"
+    },
+    "760487": {
+      "event_id": "760487",
+      "date": "2026-06-29T17:00Z",
+      "home": "BRA",
+      "away": "JPN",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "68.6%",
+          "away": "31.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "19",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "7",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "4",
+          "away": "13"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "625",
+          "away": "261"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:36.601981+00:00"
+    },
+    "760489": {
+      "event_id": "760489",
+      "date": "2026-06-29T20:30Z",
+      "home": "GER",
+      "away": "PAR",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "78.7%",
+          "away": "21.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "0%",
+          "away": "70%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "9",
+          "away": "2"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "308",
+          "away": "55"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "60%"
+        }
+      ],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:36.934047+00:00"
+    },
+    "760488": {
+      "event_id": "760488",
+      "date": "2026-06-30T01:00Z",
+      "home": "NED",
+      "away": "MAR",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:37.247828+00:00"
+    },
+    "760490": {
+      "event_id": "760490",
+      "date": "2026-06-30T17:00Z",
+      "home": "CIV",
+      "away": "NOR",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:37.529669+00:00"
+    },
+    "760492": {
+      "event_id": "760492",
+      "date": "2026-06-30T21:00Z",
+      "home": "FRA",
+      "away": "SWE",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:37.751396+00:00"
+    },
+    "760491": {
+      "event_id": "760491",
+      "date": "2026-07-01T01:00Z",
+      "home": "MEX",
+      "away": "ECU",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:37.974828+00:00"
+    },
+    "760495": {
+      "event_id": "760495",
+      "date": "2026-07-01T16:00Z",
+      "home": "ENG",
+      "away": "COD",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:38.262486+00:00"
+    },
+    "760493": {
+      "event_id": "760493",
+      "date": "2026-07-01T20:00Z",
+      "home": "BEL",
+      "away": "SEN",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:38.512336+00:00"
+    },
+    "760494": {
+      "event_id": "760494",
+      "date": "2026-07-02T00:00Z",
+      "home": "USA",
+      "away": "BIH",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:38.818464+00:00"
+    },
+    "760497": {
+      "event_id": "760497",
+      "date": "2026-07-02T19:00Z",
+      "home": "ESP",
+      "away": "AUT",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:39.198435+00:00"
+    },
+    "760496": {
+      "event_id": "760496",
+      "date": "2026-07-02T23:00Z",
+      "home": "POR",
+      "away": "CRO",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:39.508440+00:00"
+    },
+    "760498": {
+      "event_id": "760498",
+      "date": "2026-07-03T03:00Z",
+      "home": "SUI",
+      "away": "ALG",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:39.794566+00:00"
+    },
+    "760499": {
+      "event_id": "760499",
+      "date": "2026-07-03T18:00Z",
+      "home": "AUS",
+      "away": "EGY",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:40.066774+00:00"
+    },
+    "760500": {
+      "event_id": "760500",
+      "date": "2026-07-03T22:00Z",
+      "home": "ARG",
+      "away": "CPV",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:40.452625+00:00"
+    },
+    "760501": {
+      "event_id": "760501",
+      "date": "2026-07-04T01:30Z",
+      "home": "COL",
+      "away": "GHA",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:40.707829+00:00"
+    },
+    "760502": {
+      "event_id": "760502",
+      "date": "2026-07-04T17:00Z",
+      "home": "CAN",
+      "away": "RD32",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:40.978801+00:00"
+    },
+    "760503": {
+      "event_id": "760503",
+      "date": "2026-07-04T21:00Z",
+      "home": "RD32",
+      "away": "RD32",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:41.256169+00:00"
+    },
+    "760504": {
+      "event_id": "760504",
+      "date": "2026-07-05T20:00Z",
+      "home": "BRA",
+      "away": "RD32",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:41.492300+00:00"
+    },
+    "760505": {
+      "event_id": "760505",
+      "date": "2026-07-06T00:00Z",
+      "home": "RD32",
+      "away": "RD32",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:41.881614+00:00"
+    },
+    "760506": {
+      "event_id": "760506",
+      "date": "2026-07-06T19:00Z",
+      "home": "RD32",
+      "away": "RD32",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:42.247906+00:00"
+    },
+    "760507": {
+      "event_id": "760507",
+      "date": "2026-07-07T00:00Z",
+      "home": "RD32",
+      "away": "RD32",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:42.499185+00:00"
+    },
+    "760509": {
+      "event_id": "760509",
+      "date": "2026-07-07T16:00Z",
+      "home": "RD32",
+      "away": "RD32",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:42.852424+00:00"
+    },
+    "760508": {
+      "event_id": "760508",
+      "date": "2026-07-07T20:00Z",
+      "home": "RD32",
+      "away": "RD32",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:43.143734+00:00"
+    },
+    "760510": {
+      "event_id": "760510",
+      "date": "2026-07-09T20:00Z",
+      "home": "RD16 W1",
+      "away": "RD16 W2",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:43.741022+00:00"
+    },
+    "760511": {
+      "event_id": "760511",
+      "date": "2026-07-10T19:00Z",
+      "home": "RD16 W5",
+      "away": "RD16 W6",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:43.997706+00:00"
+    },
+    "760512": {
+      "event_id": "760512",
+      "date": "2026-07-11T21:00Z",
+      "home": "RD16 W3",
+      "away": "RD16 W4",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:44.355407+00:00"
+    },
+    "760513": {
+      "event_id": "760513",
+      "date": "2026-07-12T01:00Z",
+      "home": "RD16 W7",
+      "away": "RD16 W8",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:44.625297+00:00"
+    },
+    "760514": {
+      "event_id": "760514",
+      "date": "2026-07-14T19:00Z",
+      "home": "QFW1",
+      "away": "QFW2",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:44.857038+00:00"
+    },
+    "760515": {
+      "event_id": "760515",
+      "date": "2026-07-15T19:00Z",
+      "home": "QFW3",
+      "away": "QW4",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:45.094335+00:00"
+    },
+    "760516": {
+      "event_id": "760516",
+      "date": "2026-07-18T21:00Z",
+      "home": "SF L1",
+      "away": "SF L2",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:45.407629+00:00"
+    },
+    "760517": {
+      "event_id": "760517",
+      "date": "2026-07-19T19:00Z",
+      "home": "SFW1",
+      "away": "SFW2",
+      "stats": [],
+      "fonte": "ESPN summary",
+      "atualizado_em": "2026-06-29T21:40:45.636415+00:00"
+    }
+  }
 }
