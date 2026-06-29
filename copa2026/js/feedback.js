@@ -21,21 +21,39 @@
     const st = document.createElement("style");
     st.id = "feedback-style";
     st.textContent = `
-      .fb-modal{position:fixed;inset:0;z-index:9998;background:rgba(2,8,23,.78);display:flex;align-items:center;justify-content:center;padding:16px}
-      .fb-box{width:min(560px,96vw);background:#071b33;color:#fff;border:1px solid rgba(244,197,66,.32);border-radius:22px;box-shadow:0 24px 80px rgba(0,0,0,.55);padding:18px}
-      .fb-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.10);padding-bottom:12px;margin-bottom:12px}
-      .fb-head h3{margin:0;color:#f4c542;font-family:Anton,Archivo,sans-serif;letter-spacing:.4px;font-size:25px}.fb-head p{margin:5px 0 0;color:#b9c7da;font-size:13px;line-height:1.35}
-      .fb-close{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:7px 11px;font-weight:900;cursor:pointer}
-      .fb-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px}.fb-type{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.055);border-radius:14px;padding:9px 10px;cursor:pointer;font-weight:900;color:#e8eef8;font-size:13px;text-align:center}.fb-type.on{background:rgba(244,197,66,.18);border-color:rgba(244,197,66,.48);color:#fff}
-      .fb-box label{display:block;color:#b9c7da;font-size:12px;text-transform:uppercase;font-weight:900;letter-spacing:.7px;margin:11px 0 6px}
-      .fb-box textarea,.fb-box input{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;border-radius:14px;padding:11px;font:inherit;outline:none}.fb-box textarea{min-height:150px;resize:vertical;line-height:1.35}.fb-box textarea:focus,.fb-box input:focus{border-color:rgba(244,197,66,.58);box-shadow:0 0 0 3px rgba(244,197,66,.10)}
-      .fb-muted{font-size:12px;color:#b9c7da;line-height:1.4;margin:8px 0 0}.fb-count{float:right;color:#b9c7da;font-size:12px;margin-top:5px}.fb-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}.fb-send{border:0;background:#f4c542;color:#13213c;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer}.fb-send:disabled{opacity:.6;cursor:not-allowed}.fb-secondary{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:10px 14px;font-weight:900;cursor:pointer}.fb-status{min-height:20px;font-size:13px;margin-top:10px;color:#b9c7da}.fb-ok{color:#6ef0a0}.fb-err{color:#ffb3ad}.fb-hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}
-      @media(max-width:560px){.fb-box{padding:15px;border-radius:18px}.fb-grid{grid-template-columns:1fr}.fb-head h3{font-size:22px}.fb-actions{justify-content:stretch}.fb-actions button{width:100%}}
+      .fb-modal{position:fixed;inset:0;z-index:9998;background:rgba(2,8,23,.78);display:flex;align-items:center;justify-content:center;padding:10px;overflow-y:auto}
+      .fb-box{width:min(520px,calc(100vw - 20px));max-height:calc(100dvh - 20px);overflow-y:auto;background:#071b33;color:#fff;border:1px solid rgba(244,197,66,.32);border-radius:18px;box-shadow:0 18px 62px rgba(0,0,0,.52);padding:14px}
+      .fb-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.10);padding-bottom:8px;margin-bottom:10px}
+      .fb-head h3{margin:0;color:#f4c542;font-family:Anton,Archivo,sans-serif;letter-spacing:.3px;font-size:22px;line-height:1}.fb-head p{margin:5px 0 0;color:#b9c7da;font-size:13px;line-height:1.28}
+      .fb-close{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:6px 10px;font-weight:900;cursor:pointer;line-height:1.1}
+      .fb-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:9px}
+      .fb-type{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.055);border-radius:13px;padding:9px 8px;cursor:pointer;font-weight:900;color:#e8eef8;font-size:13px;text-align:center;min-height:40px}
+      .fb-type.on{background:rgba(244,197,66,.18);border-color:rgba(244,197,66,.48);color:#fff}
+      .fb-box label{display:block;color:#b9c7da;font-size:11px;text-transform:uppercase;font-weight:900;letter-spacing:.7px;margin:8px 0 5px}
+      .fb-box textarea,.fb-box input{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;border-radius:13px;padding:9px 10px;font:inherit;outline:none}
+      .fb-box textarea{min-height:92px;resize:vertical;line-height:1.28}.fb-box textarea:focus,.fb-box input:focus{border-color:rgba(244,197,66,.58);box-shadow:0 0 0 3px rgba(244,197,66,.10)}
+      .fb-muted{font-size:12px;color:#b9c7da;line-height:1.32;margin:7px 0 0}.fb-count{float:right;color:#b9c7da;font-size:12px;margin-top:4px}
+      .fb-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center;margin-top:10px}.fb-send{border:0;background:#f4c542;color:#13213c;border-radius:999px;padding:9px 10px;font-weight:900;cursor:pointer;min-height:40px}.fb-send:disabled{opacity:.6;cursor:not-allowed}
+      .fb-secondary{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;padding:9px 10px;font-weight:900;cursor:pointer;min-height:40px}
+      .fb-status{min-height:18px;font-size:12px;margin-top:8px;color:#b9c7da}.fb-ok{color:#6ef0a0}.fb-err{color:#ffb3ad}
+      .fb-hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}
+      @media(max-width:560px){
+        .fb-modal{align-items:flex-start;padding:8px;padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(8px,env(safe-area-inset-bottom))}
+        .fb-box{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:16px;padding:12px}
+        .fb-head h3{font-size:20px}.fb-head p{font-size:12.5px}.fb-close{padding:6px 9px}
+        .fb-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.fb-type{font-size:12.5px;padding:8px 6px;min-height:38px}
+        .fb-box label{margin-top:7px}.fb-box textarea{min-height:84px}.fb-box input{padding:8px 9px}
+        .fb-muted{font-size:11.5px}.fb-actions{grid-template-columns:1fr 1fr;gap:7px}.fb-actions button{width:100%;font-size:13px}
+      }
+      @media(max-width:360px){
+        .fb-head{gap:8px}.fb-head h3{font-size:18px}.fb-grid{grid-template-columns:1fr 1fr}.fb-type{font-size:12px}
+        .fb-box textarea{min-height:76px}.fb-muted{display:none}
+      }
     `;
     document.head.appendChild(st);
   }
   function modalHTML() {
-    return `<div class="fb-modal" role="dialog" aria-modal="true" aria-labelledby="fb-title"><div class="fb-box"><div class="fb-head"><div><h3 id="fb-title">💬 Sugestões</h3><p>Encontrou erro, teve uma ideia ou quer mandar uma crítica? Escreva aqui. Não precisa se identificar.</p></div><button type="button" class="fb-close" aria-label="Fechar">Fechar</button></div><div class="fb-grid" data-fb-types><button type="button" class="fb-type on" data-tipo="Sugestão">💡 Sugestão</button><button type="button" class="fb-type" data-tipo="Erro no site">🐞 Erro no site</button><button type="button" class="fb-type" data-tipo="Elogio">👏 Elogio</button><button type="button" class="fb-type" data-tipo="Crítica">📝 Crítica</button></div><label for="fb-msg">Mensagem</label><textarea id="fb-msg" maxlength="${MAX_MSG}" placeholder="Digite sua mensagem..."></textarea><span class="fb-count"><span id="fb-count">0</span>/${MAX_MSG}</span><label for="fb-nome">Assinar como, se quiser</label><input id="fb-nome" maxlength="80" placeholder="Opcional: nome, apelido ou deixe em branco"><input class="fb-hp" id="fb-site" autocomplete="off" tabindex="-1" aria-hidden="true"><p class="fb-muted">Canal anônimo: nenhum e-mail, telefone ou rede social do organizador é exibido. A página de origem é salva para ajudar a entender o contexto.</p><div class="fb-status" id="fb-status"></div><div class="fb-actions"><button type="button" class="fb-secondary" data-fb-cancel>Cancelar</button><button type="button" class="fb-send" data-fb-send>Enviar mensagem</button></div></div></div>`;
+    return `<div class="fb-modal" role="dialog" aria-modal="true" aria-labelledby="fb-title"><div class="fb-box"><div class="fb-head"><div><h3 id="fb-title">💬 Sugestões</h3><p>Encontrou erro ou teve uma ideia? Escreva aqui. Não precisa se identificar.</p></div><button type="button" class="fb-close" aria-label="Fechar">Fechar</button></div><div class="fb-grid" data-fb-types><button type="button" class="fb-type on" data-tipo="Sugestão">💡 Sugestão</button><button type="button" class="fb-type" data-tipo="Erro no site">🐞 Erro no site</button><button type="button" class="fb-type" data-tipo="Elogio">👏 Elogio</button><button type="button" class="fb-type" data-tipo="Crítica">📝 Crítica</button></div><label for="fb-msg">Mensagem</label><textarea id="fb-msg" maxlength="${MAX_MSG}" placeholder="Digite sua mensagem..."></textarea><span class="fb-count"><span id="fb-count">0</span>/${MAX_MSG}</span><label for="fb-nome">Assinar como, se quiser</label><input id="fb-nome" maxlength="80" placeholder="Opcional: nome, apelido ou deixe em branco"><input class="fb-hp" id="fb-site" autocomplete="off" tabindex="-1" aria-hidden="true"><p class="fb-muted">Canal anônimo. Nenhum contato pessoal é exibido. A página de origem é salva para contexto.</p><div class="fb-status" id="fb-status"></div><div class="fb-actions"><button type="button" class="fb-secondary" data-fb-cancel>Cancelar</button><button type="button" class="fb-send" data-fb-send>Enviar mensagem</button></div></div></div>`;
   }
   function abrirFeedback() {
     injectCSS(); document.querySelectorAll(".fb-modal").forEach(x => x.remove());
