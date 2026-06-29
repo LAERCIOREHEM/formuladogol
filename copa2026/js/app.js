@@ -84,6 +84,7 @@
     $("#btn-entrar").onclick = entrar;
     $("#btn-sair").onclick = sair;
     const bc = $("#btn-comprovante"); if (bc) bc.onclick = gerarComprovante;
+    const baudit = $("#btn-auditoria-geral"); if (baudit) baudit.onclick = auditarRankingGeral;
     const bf = $("#btn-finalizar"); if (bf) bf.onclick = finalizarPalpite;
     $("#popup-ok").onclick = () => $("#popup").classList.add("oculto");
     document.querySelectorAll(".aba").forEach(b => b.onclick = () => trocarTela(b.dataset.tela, b));
@@ -487,8 +488,45 @@
 
   function modoSimulado() { return Date.now() < VIRADA_SIMULADO.getTime(); }
   function normESPN(ab) { return ESPN_OVR[ab] || ab; }
-  function phaseOf(ev) { return (ev && ev.season && ev.season.slug) || ""; }
+  function ymdEventoBR(iso) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", { timeZone:"America/Sao_Paulo", year:"numeric", month:"2-digit", day:"2-digit" }).formatToParts(new Date(iso));
+      const get = t => (parts.find(p => p.type === t) || {}).value || "";
+      return `${get("year")}${get("month")}${get("day")}`;
+    } catch (e) { return ""; }
+  }
+  function phaseOf(ev) {
+    const comp = ev && ev.competitions && ev.competitions[0] ? ev.competitions[0] : {};
+    const raw = [
+      ev && ev.season && ev.season.slug,
+      ev && ev.name,
+      ev && ev.shortName,
+      comp.name,
+      comp.shortName,
+      comp.note,
+      comp.notes
+    ].filter(Boolean).join(" ").toLowerCase();
+    if (/group/.test(raw)) return "group-stage";
+    if (/third|3rd|bronze|terceiro/.test(raw)) return "third-place";
+    if (/round[-\s_]*of[-\s_]*32|round32|\br32\b|\b32\b/.test(raw)) return "round-of-32";
+    if (/round[-\s_]*of[-\s_]*16|round16|\br16\b|\b16\b|oitava|octav/.test(raw)) return "round-of-16";
+    if (/quarter|quartas|quarterfinal/.test(raw)) return "quarterfinals";
+    if (/semi|semifinal/.test(raw)) return "semifinals";
+    if (/final/.test(raw)) return "final";
+    const d = ymdEventoBR(ev && ev.date);
+    if (d >= "20260611" && d <= "20260627") return "group-stage";
+    if (d >= "20260628" && d <= "20260703") return "round-of-32";
+    if (d >= "20260704" && d <= "20260707") return "round-of-16";
+    if (d >= "20260709" && d <= "20260711") return "quarterfinals";
+    if (d >= "20260714" && d <= "20260715") return "semifinals";
+    if (d === "20260718") return "third-place";
+    if (d === "20260719") return "final";
+    return "";
+  }
   function isPost(ev) { return !!(ev && ev.competitions && ev.competitions[0] && ev.competitions[0].status && ev.competitions[0].status.type && ev.competitions[0].status.type.state === "post"); }
+  function faseComecou(events, slug) {
+    return (events || []).some(e => phaseOf(e) === slug && e.competitions && e.competitions[0] && e.competitions[0].status && e.competitions[0].status.type && e.competitions[0].status.type.state !== "pre");
+  }
   function teamsOf(ev) {
     try {
       return (ev.competitions[0].competitors || [])
@@ -510,12 +548,34 @@
     const JOGOS = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes || []);
     const GRUPOS = [...new Set(JOGOS.map(j => j.grupo))].sort();
     const slugTeams = slug => [...new Set((events || []).filter(e => phaseOf(e) === slug).flatMap(teamsOf))];
+    const addUnico = (arr, id) => { if (id && arr.indexOf(id) === -1) arr.push(id); };
 
     const r32 = slugTeams("round-of-32");
+    o._apurarMata = {
+      oitavas: faseComecou(events, "round-of-32"),
+      quartas: faseComecou(events, "round-of-16"),
+      semis: faseComecou(events, "quarterfinals"),
+      final: faseComecou(events, "semifinals")
+    };
     o.avancam_oitavas = slugTeams("round-of-16");
     o.avancam_quartas = slugTeams("quarterfinals");
     o.semifinalistas = slugTeams("semifinals");
     o.finalistas = slugTeams("final");
+
+    const semiLosers = [];
+    (events || []).filter(e => phaseOf(e) !== "group-stage" && isPost(e)).forEach(ev => {
+      const wl = winLoseOf(ev);
+      if (!wl.w) return;
+      const ph = phaseOf(ev);
+      if (ph === "round-of-32") addUnico(o.avancam_oitavas, wl.w);
+      else if (ph === "round-of-16") addUnico(o.avancam_quartas, wl.w);
+      else if (ph === "quarterfinals") addUnico(o.semifinalistas, wl.w);
+      else if (ph === "semifinals") {
+        addUnico(o.finalistas, wl.w);
+        if (wl.l) addUnico(semiLosers, wl.l);
+      }
+    });
+    o._semiLosers = semiLosers;
 
     const realG = [];
     (events || []).filter(e => phaseOf(e) === "group-stage" && isPost(e)).forEach(ev => {
@@ -527,7 +587,7 @@
         const j = JOGOS.find(x => (x.a === hId && x.b === aId) || (x.a === aId && x.b === hId));
         if (!j) return;
         const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
-        realG.push({ jogo_id: j.jogo_id, ga: j.a === hId ? hs : as, gb: j.a === hId ? as : hs });
+        realG.push({ jogo_id: j.jogo_id, ga: j.a === hId ? hs : as, gb: j.a === hId ? as : hs, homeId:hId, awayId:aId });
       } catch (e) {}
     });
 
@@ -541,7 +601,6 @@
         GRUPOS.forEach(g => { if (completos[g]) o.classificacao[g] = dg.classificacao[g]; });
         if (todosGrupos) { o.classificados32 = dg.classificados32; o.melhores_terceiros = dg.melhores_terceiros; }
         else if (modoSimulado()) {
-          // mesma foto de hoje usada no Bolão: quem passaria se a fase de grupos acabasse agora
           o.classificacao = {};
           GRUPOS.forEach(g => { if (dg.classificacao[g]) o.classificacao[g] = dg.classificacao[g]; });
           o.classificados32 = dg.classificados32;
@@ -568,10 +627,12 @@
       (DADOS.selecoes || []).forEach(s => { if (!passou.has(s.id)) elim.add(s.id); });
     }
     o.eliminados = [...elim];
-    o._meta = { todosGrupos, simulado: !!o._simulado };
+    o._realGrupos = {}; realG.forEach(x => o._realGrupos[x.jogo_id] = { ga:x.ga, gb:x.gb, homeId:x.homeId, awayId:x.awayId });
+    o._meta = { todosGrupos, segundaFase: !!(o.classificados32 && o.classificados32.length), nGruposCompletos: GRUPOS.filter(g => completos[g]).length, simulado: !!o._simulado };
     return o;
   }
-  async function carregarOficialAtual() {
+
+async function carregarOficialAtual() {
     try {
       const lotes = await Promise.all(JANELAS_ESPN.map(d => fetch(`${API_ESPN}?dates=${d}&limit=120`).then(r => r.json()).catch(() => ({ events: [] }))));
       const vistos = new Set(); const events = [];
@@ -830,6 +891,184 @@
     box.appendChild(el("div", "linha", `<span style='color:var(--cinza);font-size:13px'>Atuais e perdidos passam a contar quando os resultados oficiais entrarem.</span><span></span>`));
     return box;
   }
+
+  // ---------- Auditoria geral do ranking ----------
+  function escHTML(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+  }
+  function normNomeAud(s) {
+    return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+  }
+  function canonicoPorNome(nome) {
+    const pm = DADOS.palpitesMata || {};
+    if (pm[nome]) return pm[nome];
+    const alvo = normNomeAud(nome);
+    const k = Object.keys(pm).find(n => normNomeAud(n) === alvo);
+    return k ? pm[k] : null;
+  }
+  function aplicarMataCanonico(d, nome) {
+    const pm = canonicoPorNome(nome);
+    if (!d || !pm) return d;
+    d.classificados32  = pm.classificados32  || d.classificados32;
+    d.avancam_oitavas  = pm.avancam_oitavas  || d.avancam_oitavas;
+    d.avancam_quartas  = pm.avancam_quartas  || d.avancam_quartas;
+    d.semifinalistas   = pm.semifinalistas   || d.semifinalistas;
+    d.finalistas       = pm.finalistas       || d.finalistas;
+    d.campeao  = pm.campeao  || d.campeao;
+    d.vice     = pm.vice     || d.vice;
+    d.terceiro = pm.terceiro || d.terceiro;
+    d.quarto   = pm.quarto   || d.quarto;
+    return d;
+  }
+  async function buscarEventosOficiaisAuditoria() {
+    const lotes = await Promise.all(JANELAS_ESPN.map(d => fetch(`${API_ESPN}?dates=${d}&limit=120&_=${Date.now()}`).then(r => r.json()).catch(() => ({ events: [] }))));
+    const vistos = new Set(), events = [];
+    lotes.forEach(l => (l.events || []).forEach(ev => {
+      const id = String(ev.id || (ev.competitions && ev.competitions[0] && ev.competitions[0].id) || "");
+      if (!id || vistos.has(id)) return;
+      vistos.add(id); events.push(ev);
+    }));
+    return events;
+  }
+  function cravadosAuditoria(pg, real) {
+    let n = 0;
+    for (const id in (real || {})) {
+      const a = pg && pg[id];
+      if (a && Number(a.ga) === Number(real[id].ga) && Number(a.gb) === Number(real[id].gb)) n++;
+    }
+    return n;
+  }
+  function derivarPalpiteAuditoria(row) {
+    const pl = row.payload || {};
+    const g = Object.keys(pl.placaresGrupos || {}).map(id => ({
+      jogo_id: id,
+      ga: pl.placaresGrupos[id].ga,
+      gb: pl.placaresGrupos[id].gb
+    }));
+    let d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap, DADOS.fairplay || {});
+    d = aplicarMataCanonico(d, row.nome);
+    return { d, pg: pl.placaresGrupos || {}, payload: pl };
+  }
+  function baixarTextoAuditoria(nome, texto) {
+    const blob = new Blob([texto], { type:"text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = nome;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 800);
+  }
+  function abrirModalAuditoria(html, textoDownload) {
+    document.querySelectorAll(".auditoria-modal").forEach(x => x.remove());
+    const modal = document.createElement("div");
+    modal.className = "auditoria-modal";
+    modal.innerHTML = `<div class="auditoria-box">
+      <div class="auditoria-head">
+        <div><h3>🧾 Auditoria geral do ranking</h3><p>Recalcula todos os participantes diretamente das apostas lacradas no banco e dos resultados oficiais atuais.</p></div>
+        <button class="auditoria-close" type="button">Fechar</button>
+      </div>
+      ${html}
+    </div>`;
+    document.body.appendChild(modal);
+    modal.querySelector(".auditoria-close").onclick = () => modal.remove();
+    modal.onclick = e => { if (e.target === modal) modal.remove(); };
+    const down = modal.querySelector("[data-baixar-auditoria]");
+    if (down) down.onclick = () => baixarTextoAuditoria("auditoria-ranking-copa2026.txt", textoDownload || "Auditoria indisponível.");
+    const copy = modal.querySelector("[data-copiar-auditoria]");
+    if (copy) copy.onclick = async () => {
+      try { await navigator.clipboard.writeText(textoDownload || ""); copy.textContent = "Copiado ✓"; }
+      catch(e) { copy.textContent = "Não copiou"; }
+    };
+  }
+  async function auditarRankingGeral() {
+    if (!USER) return popup("Entre no bolão para acessar a auditoria geral.");
+    if (!ONLINE) return popup("A auditoria geral consulta o banco lacrado e só funciona no site publicado.");
+    const btn = $("#btn-auditoria-geral");
+    const old = btn ? btn.textContent : "";
+    if (btn) { btn.disabled = true; btn.textContent = "Auditando..."; }
+    try {
+      const [rows, events] = await Promise.all([
+        rpc("copa_revelados", {}),
+        buscarEventosOficiaisAuditoria()
+      ]);
+      const oficial = buildOficial(events);
+      DADOS.oficial = oficial;
+      const lista = [];
+      const problemas = [];
+      for (const row of (rows || [])) {
+        try {
+          const { d, pg, payload } = derivarPalpiteAuditoria(row);
+          const r = COPA_PONTUACAO.calcular(d, oficial);
+          const hash = await sha256hex(canonical({ g: payload.placaresGrupos || {}, m: payload.placaresMata || {} }));
+          lista.push({
+            nome: row.nome,
+            hash,
+            atuais: r.atuais,
+            perdidos: r.perdidos,
+            possiveis: r.possiveis,
+            teto: r.teto,
+            cr: cravadosAuditoria(pg, oficial._realGrupos || {})
+          });
+        } catch (e) {
+          problemas.push({ nome: row && row.nome ? row.nome : "sem nome", erro: e.message || String(e) });
+        }
+      }
+      lista.sort((a,b) => b.atuais - a.atuais || b.cr - a.cr || b.teto - a.teto || a.nome.localeCompare(b.nome));
+      lista.forEach((x,i) => x.pos = i + 1);
+
+      const total = (rows || []).length;
+      const ok = lista.length;
+      const diverg = problemas.length;
+      const now = new Date().toLocaleString("pt-BR", { timeZone:"America/Sao_Paulo" });
+      const faseTxt = oficial._apurarMata && oficial._apurarMata.oitavas ? "mata-mata em apuração" : (oficial._meta && oficial._meta.segundaFase ? "2ª fase definida" : "fase de grupos/simulação");
+      const resumoClass = diverg ? "auditoria-warn" : "auditoria-ok";
+
+      const linhas = lista.map(x => `<div class="auditoria-row">
+        <span>${x.pos}º</span><span class="nome">${escHTML(x.nome)}</span>
+        <b>${x.atuais}</b><b>${x.perdidos}</b><b>${x.possiveis}</b><b class="teto">${x.teto}</b>
+        <span class="hash" title="${escHTML(x.hash)}">${escHTML(x.hash.slice(0,16))}...</span>
+      </div>`).join("");
+      const probs = problemas.length
+        ? `<div class="auditoria-lista">${problemas.map(p => `<div class="auditoria-row"><span>⚠️</span><span class="nome">${escHTML(p.nome)}</span><span class="auditoria-erro" style="grid-column:3/8">${escHTML(p.erro)}</span></div>`).join("")}</div>`
+        : "";
+
+      const html = `<div class="auditoria-resumo">
+          <div class="auditoria-kpi ${resumoClass}"><b>${ok}/${total}</b><span>participantes calculados</span></div>
+          <div class="auditoria-kpi"><b>${diverg}</b><span>problemas</span></div>
+          <div class="auditoria-kpi"><b>${oficial.eliminados ? oficial.eliminados.length : 0}</b><span>eliminados reconhecidos</span></div>
+          <div class="auditoria-kpi"><b>${escHTML(faseTxt)}</b><span>fase atual</span></div>
+        </div>
+        <div class="auditoria-nota">Fonte: <b>copa_revelados</b> no banco lacrado + <b>palpites_mata.json</b> auditado + placares atuais da ESPN. O cálculo usa o mesmo motor de pontuação do Bolão, com teto preservado e apuração fase a fase.</div>
+        <div class="auditoria-lista">
+          <div class="auditoria-row head"><span>pos.</span><span>participante</span><span>conq.</span><span>perd.</span><span>poss.</span><span class="teto">teto</span><span class="hash">hash calculado</span></div>
+          ${linhas || '<div class="auditoria-row"><span>—</span><span class="nome">Nenhum participante retornado</span><span></span><span></span><span></span><span class="teto"></span><span class="hash"></span></div>'}
+        </div>${probs}
+        <div class="auditoria-actions"><button type="button" data-baixar-auditoria>Baixar auditoria TXT</button><button class="sec" type="button" data-copiar-auditoria>Copiar resumo</button></div>
+        <div class="auditoria-nota">Hash calculado sobre <code>placaresGrupos</code> e <code>placaresMata</code> do payload lacrado. Se alguém questionar, o TXT baixado mostra a base recalculada de todos os participantes.</div>`;
+
+      const txt = [
+        "AUDITORIA GERAL DO RANKING — BOLÃO COPA 2026",
+        "Gerado em: " + now + " (Brasília)",
+        "Fonte: banco lacrado via copa_revelados + resultados oficiais atuais",
+        "Participantes retornados: " + total,
+        "Participantes calculados: " + ok,
+        "Problemas: " + diverg,
+        "Fase atual: " + faseTxt,
+        "",
+        "RANKING RECALCULADO",
+        ...lista.map(x => `${String(x.pos).padStart(2,"0")}. ${x.nome} | conquistados=${x.atuais} | perdidos=${x.perdidos} | possiveis=${x.possiveis} | teto=${x.teto} | cravados=${x.cr} | hash=${x.hash}`),
+        "",
+        "PROBLEMAS",
+        ...(problemas.length ? problemas.map(p => `${p.nome}: ${p.erro}`) : ["Nenhum."])
+      ].join("\n");
+
+      abrirModalAuditoria(html, txt);
+    } catch (e) {
+      popup("Não consegui executar a auditoria geral. Verifique conexão/Supabase e tente novamente.");
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = old || "🧾 Auditoria geral"; }
+    }
+  }
+
 
   document.addEventListener("DOMContentLoaded", init);
 })();
