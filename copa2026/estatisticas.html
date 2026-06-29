@@ -33,6 +33,38 @@
   @media(max-width:480px){
     .stat-hero h2{font-size:23px}
   }
+
+  .stat-filtros-linha{display:grid;grid-template-columns:1fr;gap:12px}
+  .stat-filtro-extra[hidden]{display:none !important}
+  .stat-jogo-card{background:rgba(14,38,76,.92);border:1px solid rgba(255,255,255,.10);border-radius:20px;padding:14px 14px 12px;box-shadow:0 10px 24px rgba(0,0,0,.18)}
+  .stat-jogo-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+  .stat-jogo-fase{font-size:12px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#cbd8ea}
+  .stat-jogo-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(244,197,66,.7);color:#f6d35b;background:rgba(244,197,66,.08);padding:5px 11px;border-radius:999px;font-size:12px;font-weight:800}
+  .stat-jogo-badge.live{border-color:rgba(238,94,97,.75);color:#ffd2d2;background:rgba(238,94,97,.12)}
+  .stat-jogo-badge.live::before{content:"";width:7px;height:7px;border-radius:50%;background:#ff5b63;box-shadow:0 0 0 0 rgba(255,91,99,.7);animation:statPulse 1.5s infinite}
+  .stat-jogo-badge.pre{border-color:rgba(151,177,210,.55);color:#d7e4f7;background:rgba(151,177,210,.08)}
+  @keyframes statPulse{0%{box-shadow:0 0 0 0 rgba(255,91,99,.75)}70%{box-shadow:0 0 0 7px rgba(255,91,99,0)}100%{box-shadow:0 0 0 0 rgba(255,91,99,0)}}
+  .stat-jogo-linha{display:grid;grid-template-columns:minmax(120px,1fr) auto minmax(120px,1fr);gap:10px;align-items:center}
+  .stat-jogo-lado{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:15px;min-width:0}
+  .stat-jogo-lado img{width:34px;height:24px;object-fit:cover;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+  .stat-jogo-lado span{display:block;white-space:normal;line-height:1.1}
+  .stat-jogo-lado.dir{justify-content:flex-end;text-align:right}
+  .stat-jogo-meio{text-align:center;min-width:98px}
+  .stat-jogo-placar{font-family:Anton,system-ui,sans-serif;font-size:28px;line-height:1;color:#fff;letter-spacing:.03em}
+  .stat-jogo-data{margin-top:3px;color:#b6c7df;font-size:12px;font-weight:700}
+  .stat-jogo-venue{margin-top:10px;color:#a9bdd8;font-size:13px;text-align:center;line-height:1.32}
+  .stat-jogo-sep{margin:0 6px;color:#94aac6}
+  .stat-jogo-hint{margin-top:8px;color:#9fb0c7;font-size:12px;line-height:1.35;text-align:center}
+  @media(min-width:760px){.stat-filtros-linha{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){
+    .stat-jogo-card{padding:13px 12px 11px;border-radius:18px}
+    .stat-jogo-linha{grid-template-columns:1fr;gap:8px}
+    .stat-jogo-lado,.stat-jogo-lado.dir{justify-content:center;text-align:center}
+    .stat-jogo-meio{order:-1}
+    .stat-jogo-placar{font-size:30px}
+    .stat-jogo-venue{font-size:12px}
+  }
+
 </style>
 </head>
 <body>
@@ -50,7 +82,7 @@
 
   <section class="stat-hero">
     <h2>Estatísticas Copa 2026</h2>
-    <p>Ranking de artilheiros, assistências e gols por seleção. Os dados são consolidados automaticamente a partir do mesmo feed ESPN usado no site para jogos e resultados.</p>
+    <p>Ranking de artilheiros, assistências, gols por seleção e agora também <b>raio-x por partida</b>. Os dados são consolidados automaticamente a partir do mesmo feed ESPN usado no site para jogos e resultados.</p>
     <div class="stat-info">
       <span class="stat-pill">Atualizado: <b id="stat-atualizado">carregando…</b></span>
       <span class="stat-pill">Jogos processados: <b id="stat-processados">0</b></span>
@@ -63,11 +95,18 @@
     <button class="stat-tab ativa" type="button" data-aba="artilheiros">⚽ Artilheiros</button>
     <button class="stat-tab" type="button" data-aba="assistencias">🎯 Assistências</button>
     <button class="stat-tab" type="button" data-aba="gols_selecao">🥅 Gols/seleção</button>
+    <button class="stat-tab" type="button" data-aba="jogos">📋 Por jogo</button>
   </div>
 
-  <div class="stat-filtro">
-    <label for="stat-selecao">Seleção</label>
-    <select id="stat-selecao"><option>Todas as seleções</option></select>
+  <div class="stat-filtros-linha">
+    <div class="stat-filtro">
+      <label for="stat-selecao">Seleção</label>
+      <select id="stat-selecao"><option>Todas as seleções</option></select>
+    </div>
+    <div class="stat-filtro stat-filtro-extra" id="stat-fase-wrap" hidden>
+      <label for="stat-fase">Fase</label>
+      <select id="stat-fase"><option value="TODAS">Todas as fases</option></select>
+    </div>
   </div>
 
   <div class="stat-bar">
@@ -93,6 +132,7 @@
 </footer>
 
 <script src="js/times.js?v=20260623e2"></script>
-<script src="js/estatisticas.js?v=20260625gols"></script>
+<script src="js/jogo-stats.js?v=20260629fase1-v2"></script>
+<script src="js/estatisticas.js?v=20260629fase2jogos"></script>
 </body>
 </html>
