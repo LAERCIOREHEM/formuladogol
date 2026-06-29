@@ -35,7 +35,7 @@
       .jstats-head,.jstats-row{display:grid;grid-template-columns:minmax(72px,1fr) minmax(105px,1.2fr) minmax(72px,1fr);gap:8px;align-items:center}
       .jstats-head{color:#cbd8ea;font-size:12px;font-weight:900;margin:2px 0 6px}.jstats-head div:nth-child(2){text-align:center;color:#f4c542}
       .jstats-row{border-top:1px solid rgba(255,255,255,.07);padding:7px 0;font-size:13px}
-      .jstats-row:first-of-type{border-top:0}.jstats-row .metric{text-align:center;color:#cbd8ea;font-weight:800;font-size:12px}.jstats-row .val{font-weight:900;color:#fff}.jstats-row .right{text-align:right}
+      .jstats-row:first-of-type{border-top:0}.jstats-row .metric{text-align:center;color:#cbd8ea;font-weight:800;font-size:12px}.jstats-row .metric small{color:#f4c542;font-size:10px;margin-left:3px}.jstats-row .val{font-weight:900;color:#fff}.jstats-row .right{text-align:right}
       .jstats-bar{height:4px;background:rgba(255,255,255,.10);border-radius:999px;margin-top:4px;overflow:hidden}.jstats-bar span{display:block;height:100%;background:#f4c542;border-radius:999px}
       .jstats-msg{color:#cbd8ea;font-size:13px;line-height:1.35;text-align:center;padding:9px}.jstats-msg.err{color:#ffb3ad}
       .jstats-more{margin-top:8px;color:#9fb0c7;font-size:11px;line-height:1.35;text-align:center}
@@ -95,41 +95,52 @@
     return p;
   }
 
-  const LABELS = [
-    ["expected goals", "xG"],
-    ["xg", "xG"],
-    ["possession", "Posse"],
-    ["posse", "Posse"],
-    ["total shots", "Finalizações"],
-    ["shots", "Finalizações"],
-    ["finalizacoes", "Finalizações"],
-    ["shots on goal", "Chutes no gol"],
-    ["shots on target", "Chutes no gol"],
-    ["chutes no gol", "Chutes no gol"],
-    ["big chances created", "Grandes chances"],
-    ["big chances missed", "Chances perdidas"],
-    ["corner", "Escanteios"],
-    ["escanteios", "Escanteios"],
-    ["fouls", "Faltas"],
-    ["faltas", "Faltas"],
-    ["yellow", "Amarelos"],
-    ["amarelos", "Amarelos"],
-    ["red", "Vermelhos"],
-    ["vermelhos", "Vermelhos"],
-    ["offsides", "Impedimentos"],
-    ["impedimentos", "Impedimentos"],
-    ["saves", "Defesas"],
-    ["defesas", "Defesas"],
-    ["accurate passes", "Passes certos"],
-    ["pass accuracy", "Precisão passe"],
-    ["duels won", "Duelos vencidos"]
+  const METRIC_RULES = [
+    { keys:["expected goals","expectedgoals","xg"], label:"xG", order:1, note:"gols esperados" },
+    { keys:["possession pct","possession percent","possession percentage","possessionpct","possession"], label:"Posse", order:2, percent:true },
+    { keys:["total shots","totalshots","shots total"], label:"Finalizações", order:3 },
+    { keys:["shots on goal","shots on target","shotsongoal","shotsontarget"], label:"Chutes no gol", order:4 },
+    { keys:["shots off target","shotsofftarget"], label:"Chutes para fora", order:5 },
+    { keys:["blocked shots","blockedshots"], label:"Chutes bloqueados", order:6 },
+    { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage"], label:"Aproveitamento dos chutes", order:7, percent01:true, note:"chutes no gol ÷ finalizações" },
+    { keys:["big chances created","bigchancescreated"], label:"Grandes chances", order:8 },
+    { keys:["big chances missed","bigchancesmissed"], label:"Chances perdidas", order:9 },
+    { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:10 },
+    { keys:["fouls committed","foulscommitted","fouls"], label:"Faltas", order:11 },
+    { keys:["yellow cards","yellowcards"], label:"Amarelos", order:12 },
+    { keys:["red cards","redcards"], label:"Vermelhos", order:13 },
+    { keys:["offsides","offside"], label:"Impedimentos", order:14 },
+    { keys:["saves","goalkeeper saves"], label:"Defesas", order:15 },
+    { keys:["accurate passes","accuratepasses"], label:"Passes certos", order:16 },
+    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:17, percent01:true },
+    { keys:["duels won","duelswon"], label:"Duelos vencidos", order:18 }
   ];
-  const ORDER = ["xG","Posse","Finalizações","Chutes no gol","Grandes chances","Chances perdidas","Escanteios","Faltas","Amarelos","Vermelhos","Impedimentos","Defesas","Passes certos","Precisão passe","Duelos vencidos"];
 
-  function labelOf(name) {
-    const n = norm(name);
-    for (const [needle, label] of LABELS) if (n.includes(norm(needle))) return label;
-    return name || "";
+  function camelSpaces(s) {
+    return String(s || "")
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+      .replace(/\bpct\b/ig, " pct");
+  }
+  function metricKey(s) {
+    return norm(camelSpaces(s));
+  }
+  function metricKeyCompact(s) {
+    return metricKey(s).replace(/\s+/g, "");
+  }
+  function ruleOf(name) {
+    const k = metricKey(name);
+    const kc = metricKeyCompact(name);
+    for (const r of METRIC_RULES) {
+      if (r.keys.some(x => k === norm(x) || kc === norm(x).replace(/\s+/g, ""))) return r;
+    }
+    // Só aceita correspondência parcial quando é uma métrica bem específica.
+    // Isso evita transformar blockedShots, shotsOnTarget etc. em "Finalizações".
+    for (const r of METRIC_RULES) {
+      if (r.label === "Finalizações") continue;
+      if (r.keys.some(x => k.includes(norm(x)) || kc.includes(norm(x).replace(/\s+/g, "")))) return r;
+    }
+    return null;
   }
   function statName(s) {
     return s.displayName || s.shortDisplayName || s.name || s.label || s.abbreviation || "";
@@ -137,9 +148,39 @@
   function statVal(s) {
     return s.displayValue != null ? s.displayValue : (s.value != null ? String(s.value) : (s.v != null ? String(s.v) : ""));
   }
+  function numeric(v) {
+    if (v == null) return NaN;
+    const s = String(v).replace(",", ".").replace("%", "").match(/-?\d+(\.\d+)?/);
+    return s ? parseFloat(s[0]) : NaN;
+  }
+  function formatMetricValue(rule, raw) {
+    if (raw == null || raw === "") return "";
+    let s = String(raw).trim().replace(",", ".");
+    const n = numeric(s);
+    if ((rule.percent || rule.percent01) && !/%/.test(s) && !isNaN(n)) {
+      if (rule.percent01 && n >= 0 && n <= 1) return Math.round(n * 100) + "%";
+      return (Number.isInteger(n) ? String(n) : String(Math.round(n * 10) / 10)) + "%";
+    }
+    return String(raw).trim();
+  }
   function normalizarRegistro(reg) {
-    if (reg.stats && Array.isArray(reg.stats)) return { stats: reg.stats.map(x => ({ nome: x.nome || x.name || x.label, home: x.home ?? x.mandante, away: x.away ?? x.visitante })), fonte: reg.fonte || "arquivo" };
-    return { stats: [], fonte: reg.fonte || "arquivo" };
+    if (!reg || !reg.stats || !Array.isArray(reg.stats)) return { stats: [], fonte: (reg && reg.fonte) || "arquivo" };
+    const porLabel = new Map();
+    reg.stats.forEach(x => {
+      const rawName = x.nome || x.name || x.label || x.displayName || x.shortDisplayName || "";
+      const rule = ruleOf(rawName);
+      if (!rule) return;
+      const item = {
+        nome: rule.label,
+        home: formatMetricValue(rule, x.home ?? x.mandante),
+        away: formatMetricValue(rule, x.away ?? x.visitante),
+        order: rule.order,
+        note: rule.note || ""
+      };
+      const old = porLabel.get(rule.label);
+      if (!old || item.order < old.order) porLabel.set(rule.label, item);
+    });
+    return { stats: [...porLabel.values()].sort((a,b) => a.order - b.order), fonte: reg.fonte || "arquivo" };
   }
   function parseSummary(json) {
     const teams = (((json || {}).boxscore || {}).teams || []);
@@ -147,38 +188,39 @@
     const a = teams[0], b = teams[1];
     const arrA = a.statistics || a.stats || [];
     const arrB = b.statistics || b.stats || [];
-    const mapB = new Map(arrB.map(s => [labelOf(statName(s)), statVal(s)]));
-    const stats = [];
+    const mapB = new Map();
+    arrB.forEach(s => {
+      const rule = ruleOf(statName(s));
+      if (!rule) return;
+      mapB.set(rule.label, { rule, val: statVal(s) });
+    });
+    const porLabel = new Map();
     arrA.forEach(s => {
-      const nome = labelOf(statName(s));
-      if (!nome) return;
-      const home = statVal(s);
-      const away = mapB.get(nome);
-      if (home === "" && (away == null || away === "")) return;
-      stats.push({ nome, home, away: away == null ? "" : away });
+      const rule = ruleOf(statName(s));
+      if (!rule) return;
+      const mb = mapB.get(rule.label);
+      const home = formatMetricValue(rule, statVal(s));
+      const away = formatMetricValue(rule, mb ? mb.val : "");
+      if (home === "" && away === "") return;
+      const item = { nome: rule.label, home, away, order: rule.order, note: rule.note || "" };
+      const old = porLabel.get(rule.label);
+      if (!old || item.order < old.order) porLabel.set(rule.label, item);
     });
-    stats.sort((x, y) => {
-      const ix = ORDER.indexOf(x.nome), iy = ORDER.indexOf(y.nome);
-      return (ix < 0 ? 999 : ix) - (iy < 0 ? 999 : iy);
-    });
-    return { stats, fonte: "ESPN" };
+    return { stats: [...porLabel.values()].sort((x, y) => x.order - y.order), fonte: "ESPN" };
   }
 
-  function numeric(v) {
-    if (v == null) return NaN;
-    const s = String(v).replace(",", ".").replace("%", "").match(/-?\d+(\.\d+)?/);
-    return s ? parseFloat(s[0]) : NaN;
-  }
   function rowHTML(s) {
     const a = numeric(s.home), b = numeric(s.away);
     let pa = 50, pb = 50;
     if (!isNaN(a) && !isNaN(b) && (a + b) > 0) { pa = Math.round(a / (a + b) * 100); pb = 100 - pa; }
+    const note = s.note ? `<small title="${esc(s.note)}">ⓘ</small>` : "";
     return `<div class="jstats-row">
       <div class="val">${esc(s.home || "—")}<div class="jstats-bar"><span style="width:${pa}%"></span></div></div>
-      <div class="metric">${esc(s.nome)}</div>
+      <div class="metric">${esc(s.nome)} ${note}</div>
       <div class="val right">${esc(s.away || "—")}<div class="jstats-bar"><span style="width:${pb}%"></span></div></div>
     </div>`;
   }
+
   function render(data, host) {
     const panel = host.querySelector("[data-jstats-panel]");
     const homeName = host.dataset.homeName || host.dataset.homeId || "Mandante";
@@ -191,7 +233,7 @@
     panel.innerHTML = `<div class="jstats-title"><span>Raio-X da partida</span><span class="jstats-source">${esc(data.fonte || "ESPN")}</span></div>
       <div class="jstats-head"><div>${esc(homeName)}</div><div>comparativo</div><div style="text-align:right">${esc(awayName)}</div></div>
       ${stats.map(rowHTML).join("")}
-      <div class="jstats-more">Mostramos somente métricas disponíveis na fonte. O site não inventa estatísticas ausentes.</div>`;
+      <div class="jstats-more">Mostramos somente métricas disponíveis na fonte. ⓘ Aproveitamento dos chutes = chutes no gol ÷ finalizações. O site não inventa estatísticas ausentes.</div>`;
   }
   function bind(root) {
     injectCSS();
