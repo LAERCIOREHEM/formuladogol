@@ -82,7 +82,15 @@
     const p = (async () => {
       const data = await loadStatic();
       const stat = byEvent(data, eventId);
-      if (stat && ((stat.stats && stat.stats.length) || stat.home || stat.away)) return normalizarRegistro(stat);
+
+      // Se o workflow já gerou JSON estático, usa ele.
+      // Mas, se por qualquer razão o normalizador não entender o formato,
+      // NÃO bloqueia o botão: tenta o summary da ESPN como fallback.
+      if (stat && stat.stats && stat.stats.length) {
+        const normalizado = normalizarRegistro(stat);
+        if (normalizado.stats && normalizado.stats.length) return normalizado;
+      }
+
       try {
         const r = await fetch(SUMMARY + encodeURIComponent(eventId));
         if (!r.ok) throw new Error("summary HTTP " + r.status);
@@ -97,12 +105,12 @@
 
   const METRIC_RULES = [
     { keys:["expected goals","expectedgoals","xg"], label:"xG", order:1, note:"gols esperados" },
-    { keys:["possession pct","possession percent","possession percentage","possessionpct","possession"], label:"Posse", order:2, percent:true },
-    { keys:["total shots","totalshots","shots total"], label:"Finalizações", order:3 },
-    { keys:["shots on goal","shots on target","shotsongoal","shotsontarget"], label:"Chutes no gol", order:4 },
+    { keys:["possession pct","possession percent","possession percentage","possessionpct","possession","posse"], label:"Posse", order:2, percent:true },
+    { keys:["total shots","totalshots","shots total","finalizacoes","finalizações"], label:"Finalizações", order:3 },
+    { keys:["shots on goal","shots on target","shotsongoal","shotsontarget","chutes no gol"], label:"Chutes no gol", order:4 },
     { keys:["shots off target","shotsofftarget"], label:"Chutes para fora", order:5 },
     { keys:["blocked shots","blockedshots"], label:"Chutes bloqueados", order:6 },
-    { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage"], label:"Aproveitamento dos chutes", order:7, percent01:true, note:"chutes no gol ÷ finalizações" },
+    { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage","aproveitamento dos chutes"], label:"Aproveitamento dos chutes", order:7, percent01:true, note:"chutes no gol ÷ finalizações" },
     { keys:["big chances created","bigchancescreated"], label:"Grandes chances", order:8 },
     { keys:["big chances missed","bigchancesmissed"], label:"Chances perdidas", order:9 },
     { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:10 },
@@ -131,13 +139,29 @@
   function ruleOf(name) {
     const k = metricKey(name);
     const kc = metricKeyCompact(name);
+
+    // 1) Aceita nomes já traduzidos/normalizados no JSON estático
+    //    ex.: "Posse", "Finalizações", "Chutes no gol".
+    for (const r of METRIC_RULES) {
+      const lk = norm(r.label);
+      const lkc = lk.replace(/\s+/g, "");
+      if (k === lk || kc === lkc) return r;
+    }
+
+    // 2) Aceita nomes crus da ESPN
+    //    ex.: possessionPct, totalShots, shotsOnTarget, shotPct.
     for (const r of METRIC_RULES) {
       if (r.keys.some(x => k === norm(x) || kc === norm(x).replace(/\s+/g, ""))) return r;
     }
-    // Só aceita correspondência parcial quando é uma métrica bem específica.
-    // Isso evita transformar blockedShots, shotsOnTarget etc. em "Finalizações".
+
+    // 3) Correspondência parcial só para métrica específica.
+    //    Nunca para "Finalizações", para não transformar shotsOnTarget,
+    //    shotsOffTarget e blockedShots tudo em "Finalizações".
     for (const r of METRIC_RULES) {
       if (r.label === "Finalizações") continue;
+      const lk = norm(r.label);
+      const lkc = lk.replace(/\s+/g, "");
+      if (k.includes(lk) || kc.includes(lkc)) return r;
       if (r.keys.some(x => k.includes(norm(x)) || kc.includes(norm(x).replace(/\s+/g, "")))) return r;
     }
     return null;
@@ -256,7 +280,7 @@
     });
   }
 
-  window.COPA_JOGO_STATS = { bloco, bind, _parseSummary: parseSummary, _normalizarRegistro: normalizarRegistro };
+  window.COPA_JOGO_STATS = { bloco, bind, _parseSummary: parseSummary, _normalizarRegistro: normalizarRegistro, _getStats: getStats };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => bind());
   else bind();
 })();
