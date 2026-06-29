@@ -67,6 +67,7 @@
         '<div class="oa-info">' + estado + (j.venue ? ' · <span class="oa-loc">' + j.venue + "</span>" : "") + "</div>" +
         (m && m.url ? '<a class="oa-assista" href="' + m.url + '" target="_blank" rel="noopener">▶️ Assista como foi (melhores momentos)</a>'
                     : '<div class="oa-tv">📺 ' + chips(j.a, j.b) + "</div>") +
+        statsBlocoOA(j) +
         "</div>";
     });
     $("#lista").innerHTML = html;
