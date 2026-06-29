@@ -937,7 +937,10 @@ async function carregarOficialAtual() {
     const conf = new Set((o && o[key]) || []);
     const elim = (o && o.eliminados) || [];
     if (conf.has(id)) return "ok";
+    // Categorias de grupo ficam congeladas quando o resultado oficial delas existe.
+    // Portanto, se não bateu com a lista oficial, é perdido — não fica pendente.
     if (key === "classificados32" && o && o.classificados32 && o.classificados32.length && !conf.has(id)) return "no";
+    if (key === "melhores_terceiros" && o && o.melhores_terceiros && o.melhores_terceiros.length && !conf.has(id)) return "no";
     if (faseAtivaAud(key, o) && elim.indexOf(id) !== -1) return "no";
     return "pend";
   }
@@ -976,7 +979,10 @@ async function carregarOficialAtual() {
       ga: pl.placaresGrupos[id].ga,
       gb: pl.placaresGrupos[id].gb
     }));
-    let d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap, DADOS.fairplay || {});
+    // ATENÇÃO: aqui precisa espelhar o ranking principal.
+    // O palpite lacrado do participante NÃO usa fair play oficial na derivação.
+    // Fair play só é usado para montar o resultado oficial atual.
+    let d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap);
     d = aplicarMataCanonico(d, row.nome);
     return { d, pg: pl.placaresGrupos || {}, payload: pl };
   }
@@ -1037,7 +1043,9 @@ async function carregarOficialAtual() {
       grupos[g].real = ((oficial.classificacao || {})[g] || []).map(x => x.id);
     });
 
-    return { row, d, pg, payload, r, oficial, hash, cr, s32, mt, oit, qua, sem, fin, pos, grupos };
+    const ganhosDetalhados = s32.ganhos + mt.ganhos + pos.reduce((a,x)=>a+x.ganhos,0) + oit.ganhos + qua.ganhos + sem.ganhos + fin.ganhos;
+    const perdidosDetalhados = s32.perdidos + mt.perdidos + pos.reduce((a,x)=>a+x.perdidos,0) + oit.perdidos + qua.perdidos + sem.perdidos + fin.perdidos;
+    return { row, d, pg, payload, r, oficial, hash, cr, s32, mt, oit, qua, sem, fin, pos, grupos, ganhosDetalhados, perdidosDetalhados };
   }
   function pontuacaoGrupoHTML(det) {
     const posG = det.pos.reduce((a,x) => a + x.ganhos, 0);
@@ -1114,6 +1122,11 @@ async function carregarOficialAtual() {
     const totalMataGanhos = det.oit.ganhos + det.qua.ganhos + det.sem.ganhos + det.fin.ganhos;
     const totalGruposPerdidos = det.s32.perdidos + det.mt.perdidos + det.pos.reduce((a,x)=>a+x.perdidos,0);
     const totalMataPerdidos = det.oit.perdidos + det.qua.perdidos + det.sem.perdidos + det.fin.perdidos;
+    const diffGanhos = item.atuais - det.ganhosDetalhados;
+    const diffPerdidos = item.perdidos - det.perdidosDetalhados;
+    const notaConsistencia = (diffGanhos || diffPerdidos)
+      ? `<div class="auditoria-nota auditoria-erro">Atenção: total do motor = ${item.atuais}/${item.perdidos}, detalhamento visual = ${det.ganhosDetalhados}/${det.perdidosDetalhados}. Esta linha precisa ser investigada.</div>`
+      : `<div class="auditoria-nota">Conferência interna OK: o dossiê abaixo soma exatamente os mesmos números do ranking.</div>`;
     return `<div class="aud-det-top">
       <div><h4>${escHTML(item.nome)} — dossiê da auditoria</h4><div class="hash">Hash calculado: ${escHTML(item.hash)}</div></div>
       <div class="auditoria-actions" style="margin-top:0"><button type="button" data-baixar-dossie="${item.idx}">Baixar dossiê TXT</button></div>
@@ -1123,7 +1136,7 @@ async function carregarOficialAtual() {
       <div class="aud-card"><b>${item.perdidos}</b><span>perdidos</span></div>
       <div class="aud-card"><b>${item.possiveis}</b><span>possíveis</span></div>
       <div class="aud-card"><b>${item.teto}</b><span>teto</span></div>
-    </div>
+    </div>${notaConsistencia}
     <div class="aud-section-title">1. Extrato dos pontos</div>
     <div class="aud-grid">
       <div class="aud-card"><h5>Resumo conquistado</h5>${linhaPonto("Fase de grupos", totalGruposGanhos)}${linhaPonto("Mata-mata já apurado", totalMataGanhos)}${linhaPonto("Pódio/títulos definidos", item.atuais - totalGruposGanhos - totalMataGanhos)}<div class="aud-line"><span><b>Total conquistado</b></span><b>+${item.atuais}</b></div></div>
