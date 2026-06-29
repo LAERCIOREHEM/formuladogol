@@ -28,27 +28,49 @@
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/copa.css?v=20260623p6" />
 
+
   <style>
-    .auditoria-modal{position:fixed;inset:0;z-index:9999;background:rgba(2,8,23,.76);display:flex;align-items:center;justify-content:center;padding:16px}
-    .auditoria-box{width:min(980px,96vw);max-height:88vh;overflow:auto;background:#0b1f3a;border:1px solid rgba(244,197,66,.28);border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.45);padding:18px;color:#fff}
-    .auditoria-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.10);padding-bottom:12px;margin-bottom:12px}
-    .auditoria-head h3{margin:0;color:#f4c542;font-family:Anton,Archivo,sans-serif;letter-spacing:.5px}
-    .auditoria-head p{margin:4px 0 0;color:#b9c7da;font-size:13px;line-height:1.35}
-    .auditoria-close{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;padding:7px 11px;font-weight:900;cursor:pointer}
-    .auditoria-resumo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
-    .auditoria-kpi{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px;text-align:center}
-    .auditoria-kpi b{display:block;font-size:20px;color:#fff}.auditoria-kpi span{display:block;font-size:11px;text-transform:uppercase;color:#b9c7da;font-weight:800;letter-spacing:.7px}
+    .auditoria-modal{position:fixed;inset:0;z-index:9999;background:rgba(2,8,23,.78);display:flex;align-items:center;justify-content:center;padding:14px}
+    .auditoria-box{width:min(1120px,97vw);max-height:90vh;overflow:auto;background:#071b33;border:1px solid rgba(244,197,66,.32);border-radius:22px;box-shadow:0 24px 80px rgba(0,0,0,.55);padding:18px;color:#fff}
+    .auditoria-head{position:sticky;top:-18px;z-index:2;background:linear-gradient(180deg,#071b33 78%,rgba(7,27,51,.92));display:flex;gap:12px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.10);padding:6px 0 14px;margin-bottom:12px}
+    .auditoria-head h3{margin:0;color:#f4c542;font-family:Anton,Archivo,sans-serif;letter-spacing:.5px;font-size:26px}
+    .auditoria-head p{margin:4px 0 0;color:#b9c7da;font-size:13px;line-height:1.38}
+    .auditoria-close{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;padding:8px 12px;font-weight:900;cursor:pointer}
+    .auditoria-resumo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
+    .auditoria-kpi{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:12px;text-align:center}
+    .auditoria-kpi b{display:block;font-size:22px;color:#fff;line-height:1.05}.auditoria-kpi span{display:block;font-size:11px;text-transform:uppercase;color:#b9c7da;font-weight:900;letter-spacing:.7px;margin-top:4px}
     .auditoria-ok{border-color:rgba(86,232,141,.38);background:rgba(29,185,84,.12)}
-    .auditoria-warn{border-color:rgba(255,181,71,.40);background:rgba(255,181,71,.10)}
-    .auditoria-lista{margin-top:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;overflow:hidden}
-    .auditoria-row{display:grid;grid-template-columns:44px 1.2fr repeat(4,.62fr) 1.1fr;gap:8px;align-items:center;padding:9px 10px;border-top:1px solid rgba(255,255,255,.08);font-size:13px}
+    .auditoria-warn{border-color:rgba(255,181,71,.42);background:rgba(255,181,71,.10)}
+    .auditoria-lista{margin-top:10px;border:1px solid rgba(255,255,255,.10);border-radius:16px;overflow:hidden}
+    .auditoria-row{display:grid;grid-template-columns:44px 1.2fr repeat(4,.62fr) 1.1fr 92px;gap:8px;align-items:center;padding:10px 11px;border-top:1px solid rgba(255,255,255,.08);font-size:13px}
     .auditoria-row:first-child{border-top:0}.auditoria-row.head{background:rgba(255,255,255,.07);font-size:11px;text-transform:uppercase;color:#b9c7da;font-weight:900;letter-spacing:.6px}
     .auditoria-row .nome{font-weight:900;color:#fff}.auditoria-row .hash{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#b9c7da;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .auditoria-btn{border:0;border-radius:999px;background:#f4c542;color:#13213c;font-weight:900;padding:8px 10px;cursor:pointer;font-size:12px}
     .auditoria-erro{color:#ffb3ad;font-weight:900}.auditoria-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
     .auditoria-actions button{border:0;border-radius:999px;background:#f4c542;color:#13213c;font-weight:900;padding:9px 12px;cursor:pointer}
     .auditoria-actions button.sec{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);color:#fff}
     .auditoria-nota{font-size:12px;color:#b9c7da;line-height:1.45;margin-top:10px}
-    @media(max-width:720px){.auditoria-resumo{grid-template-columns:repeat(2,minmax(0,1fr))}.auditoria-row{grid-template-columns:34px 1.3fr .55fr .55fr .55fr}.auditoria-row .teto,.auditoria-row .hash{display:none}}
+    .auditoria-detalhe{margin-top:16px;border:1px solid rgba(244,197,66,.24);background:linear-gradient(180deg,rgba(244,197,66,.08),rgba(255,255,255,.035));border-radius:18px;padding:14px}
+    .aud-det-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+    .aud-det-top h4{margin:0;color:#f4c542;font-size:22px}.aud-det-top .hash{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#cbd8ea;font-size:11px;word-break:break-all}
+    .aud-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .aud-card{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);border-radius:16px;padding:12px}
+    .aud-card h5{margin:0 0 9px;color:#fff;font-size:14px;text-transform:uppercase;letter-spacing:.65px}
+    .aud-mini{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.aud-mini .aud-card{text-align:center}.aud-mini b{display:block;font-size:21px}.aud-mini span{font-size:11px;color:#b9c7da;text-transform:uppercase;font-weight:900}
+    .aud-line{display:flex;justify-content:space-between;gap:10px;border-top:1px solid rgba(255,255,255,.08);padding:7px 0;font-size:13px}.aud-line:first-child{border-top:0}.aud-line b{white-space:nowrap}
+    .aud-chipwrap{display:flex;gap:6px;flex-wrap:wrap}.aud-chip{display:inline-flex;align-items:center;gap:4px;border-radius:999px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.06);padding:5px 8px;font-size:12px;font-weight:800}.aud-chip img{width:18px;height:12px;object-fit:cover;border-radius:2px}
+    .aud-chip.ok{background:rgba(29,185,84,.14);border-color:rgba(86,232,141,.38)}.aud-chip.no{background:rgba(255,82,82,.12);border-color:rgba(255,82,82,.32)}.aud-chip.pend{background:rgba(244,197,66,.10);border-color:rgba(244,197,66,.30)}
+    .aud-accordion details{border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:9px 11px;background:rgba(255,255,255,.04);margin:8px 0}.aud-accordion summary{cursor:pointer;font-weight:900;color:#f4c542}
+    .aud-placares{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}.aud-placar{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(0,0,0,.18);border-radius:9px;padding:6px;font-size:12px;color:#e8eef8}
+    .aud-classif{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.aud-classif ol{margin:4px 0 0 20px;padding:0}.aud-classif li{padding:2px 0;font-size:12px}
+    .aud-section-title{margin:14px 0 8px;color:#f4c542;text-transform:uppercase;font-size:13px;letter-spacing:.8px}
+    @media(max-width:820px){
+      .auditoria-box{padding:14px;border-radius:18px}.auditoria-head{top:-14px}.auditoria-head h3{font-size:22px}
+      .auditoria-resumo{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .auditoria-row{grid-template-columns:34px 1.3fr .56fr .56fr .56fr 82px;font-size:12px}.auditoria-row .teto,.auditoria-row .hash{display:none}
+      .aud-grid{grid-template-columns:1fr}.aud-mini{grid-template-columns:repeat(2,1fr)}
+      .aud-placares{grid-template-columns:1fr}.aud-classif{grid-template-columns:1fr}.aud-det-top{display:block}
+    }
   </style>
 
 </head>
@@ -123,7 +145,7 @@
   <script src="js/engine.js?v=20260622b"></script>
   <script src="js/pontuacao.js?v=20260628teto-fix"></script>
   <script src="js/config.js?v=20260618b"></script>
-  <script src="js/app.js?v=20260629auditoria-geral"></script>
+  <script src="js/app.js?v=20260629auditoria-completa"></script>
   <script src="js/aniversarios.js?v=20260618b"></script>
   <footer class="rodape-site">
     <nav class="rs-nav" aria-label="Links do site">
