@@ -67,13 +67,24 @@ def compact(s: str) -> str:
 
 def rule_of(name: str) -> dict | None:
     k, kc = norm(name), compact(name)
+
+    # Aceita nome já traduzido no próprio JSON/rotina.
+    for r in METRIC_RULES:
+        if k == norm(r["label"]) or kc == compact(r["label"]):
+            return r
+
+    # Aceita nomes crus da ESPN.
     for r in METRIC_RULES:
         for key in r["keys"]:
             if k == norm(key) or kc == compact(key):
                 return r
+
+    # Parcial só para métricas específicas. Evita duplicar "Finalizações".
     for r in METRIC_RULES:
         if r["label"] == "Finalizações":
             continue
+        if norm(r["label"]) in k or compact(r["label"]) in kc:
+            return r
         for key in r["keys"]:
             if norm(key) in k or compact(key) in kc:
                 return r
