@@ -68,17 +68,23 @@ jobs:
         # agendamento interno do GitHub Actions.
         run: python3 copa2026/buscar_estatisticas.py
 
+      - name: Rodar estatísticas detalhadas dos jogos
+        if: env.RUN_COPA == 'true'
+        # Gera dados/jogos-detalhes.json para o botão recolhível
+        # "📊 Estatísticas do jogo" em Jogos e Onde assistir.
+        run: python3 copa2026/buscar_detalhes_jogos.py
+
       - name: Commitar e enviar se houve mudança
         if: env.RUN_COPA == 'true'
         run: |
           cd "$GITHUB_WORKSPACE"
-          if [[ -z "$(git status --porcelain copa2026/dados/melhores-momentos.json copa2026/dados/lives.json copa2026/dados/jogos-completos.json copa2026/dados/estatisticas.json copa2026/dados/workflow_copa_estado.json)" ]]; then
+          if [[ -z "$(git status --porcelain copa2026/dados/melhores-momentos.json copa2026/dados/lives.json copa2026/dados/jogos-completos.json copa2026/dados/estatisticas.json copa2026/dados/jogos-detalhes.json copa2026/dados/workflow_copa_estado.json)" ]]; then
             echo "Nada mudou — sem commit."
             exit 0
           fi
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add copa2026/dados/melhores-momentos.json copa2026/dados/lives.json copa2026/dados/jogos-completos.json copa2026/dados/estatisticas.json copa2026/dados/workflow_copa_estado.json
+          git add copa2026/dados/melhores-momentos.json copa2026/dados/lives.json copa2026/dados/jogos-completos.json copa2026/dados/estatisticas.json copa2026/dados/jogos-detalhes.json copa2026/dados/workflow_copa_estado.json
           git commit -m "Atualiza melhores momentos, jogos completos, lives e estatísticas (automático)"
           for i in 1 2 3 4 5; do
             if git push; then
