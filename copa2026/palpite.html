@@ -27,6 +27,30 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/copa.css?v=20260623p6" />
+
+  <style>
+    .auditoria-modal{position:fixed;inset:0;z-index:9999;background:rgba(2,8,23,.76);display:flex;align-items:center;justify-content:center;padding:16px}
+    .auditoria-box{width:min(980px,96vw);max-height:88vh;overflow:auto;background:#0b1f3a;border:1px solid rgba(244,197,66,.28);border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.45);padding:18px;color:#fff}
+    .auditoria-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.10);padding-bottom:12px;margin-bottom:12px}
+    .auditoria-head h3{margin:0;color:#f4c542;font-family:Anton,Archivo,sans-serif;letter-spacing:.5px}
+    .auditoria-head p{margin:4px 0 0;color:#b9c7da;font-size:13px;line-height:1.35}
+    .auditoria-close{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:999px;color:#fff;padding:7px 11px;font-weight:900;cursor:pointer}
+    .auditoria-resumo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+    .auditoria-kpi{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:10px;text-align:center}
+    .auditoria-kpi b{display:block;font-size:20px;color:#fff}.auditoria-kpi span{display:block;font-size:11px;text-transform:uppercase;color:#b9c7da;font-weight:800;letter-spacing:.7px}
+    .auditoria-ok{border-color:rgba(86,232,141,.38);background:rgba(29,185,84,.12)}
+    .auditoria-warn{border-color:rgba(255,181,71,.40);background:rgba(255,181,71,.10)}
+    .auditoria-lista{margin-top:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;overflow:hidden}
+    .auditoria-row{display:grid;grid-template-columns:44px 1.2fr repeat(4,.62fr) 1.1fr;gap:8px;align-items:center;padding:9px 10px;border-top:1px solid rgba(255,255,255,.08);font-size:13px}
+    .auditoria-row:first-child{border-top:0}.auditoria-row.head{background:rgba(255,255,255,.07);font-size:11px;text-transform:uppercase;color:#b9c7da;font-weight:900;letter-spacing:.6px}
+    .auditoria-row .nome{font-weight:900;color:#fff}.auditoria-row .hash{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#b9c7da;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .auditoria-erro{color:#ffb3ad;font-weight:900}.auditoria-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .auditoria-actions button{border:0;border-radius:999px;background:#f4c542;color:#13213c;font-weight:900;padding:9px 12px;cursor:pointer}
+    .auditoria-actions button.sec{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.16);color:#fff}
+    .auditoria-nota{font-size:12px;color:#b9c7da;line-height:1.45;margin-top:10px}
+    @media(max-width:720px){.auditoria-resumo{grid-template-columns:repeat(2,minmax(0,1fr))}.auditoria-row{grid-template-columns:34px 1.3fr .55fr .55fr .55fr}.auditoria-row .teto,.auditoria-row .hash{display:none}}
+  </style>
+
 </head>
 <body>
   <div id="app">
@@ -36,6 +60,7 @@
       <div id="topo-usuario" class="topo-usuario oculto">
         <span id="usuario-nome"></span>
         <button id="btn-comprovante" class="btn-mini">📄 Comprovante</button>
+        <button id="btn-auditoria-geral" class="btn-mini">🧾 Auditoria geral</button>
         <button id="btn-sair" class="btn-mini">Sair</button>
       </div>
     </header>
@@ -96,9 +121,9 @@
   </div>
 
   <script src="js/engine.js?v=20260622b"></script>
-  <script src="js/pontuacao.js?v=20260618b"></script>
+  <script src="js/pontuacao.js?v=20260628teto-fix"></script>
   <script src="js/config.js?v=20260618b"></script>
-  <script src="js/app.js?v=20260628fase-status"></script>
+  <script src="js/app.js?v=20260629auditoria-geral"></script>
   <script src="js/aniversarios.js?v=20260618b"></script>
   <footer class="rodape-site">
     <nav class="rs-nav" aria-label="Links do site">
