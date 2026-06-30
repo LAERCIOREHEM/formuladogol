@@ -71,24 +71,38 @@
     el.innerHTML = SEL.length ? SEL.map(cardHTML).join("") : '<div class="sel-vazio">Não foi possível carregar as seleções.</div>';
   }
 
+  function pluralJogadores(n) {
+    return n === 1 ? "1 jogador" : n + " jogadores";
+  }
+
   function squadHTML(id) {
     var lista = (ELENCOS.times && ELENCOS.times[id]) || [];
     if (!lista.length) {
-      return '<div class="sel-squad-vazio">Elenco em breve — atualiza automaticamente a partir da ESPN.</div>';
+      return '<details class="sel-squad-box">' +
+        '<summary class="sel-squad-toggle"><span>👥 Ver convocados</span><small>elenco em breve</small></summary>' +
+        '<div class="sel-squad-vazio">Elenco em breve — atualiza automaticamente a partir da ESPN.</div>' +
+      '</details>';
     }
     lista = lista.slice().sort(function (a, b) {
       var na = parseInt(a.num, 10), nb = parseInt(b.num, 10);
       if (isNaN(na)) na = 999; if (isNaN(nb)) nb = 999;
       return na - nb || String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
     });
-    return '<div class="sel-squad">' + lista.map(function (p) {
-      var face = p.foto ? '<span class="sel-face"><img src="' + esc(p.foto) + '" alt="" loading="lazy"></span>' : silhueta();
-      var sub = [p.pos, p.num].filter(Boolean).join(" · ");
-      return '<div class="sel-player">' + face +
-        '<span class="sel-player-nome">' + esc(p.nome || "—") + "</span>" +
-        (sub ? '<span class="sel-player-pos">' + esc(sub) + "</span>" : "") +
-        "</div>";
-    }).join("") + "</div>";
+    return '<details class="sel-squad-box">' +
+      '<summary class="sel-squad-toggle">' +
+        '<span class="sel-squad-closed">👥 Ver convocados</span>' +
+        '<span class="sel-squad-open">👥 Ocultar convocados</span>' +
+        '<small>' + esc(pluralJogadores(lista.length)) + '</small>' +
+      '</summary>' +
+      '<div class="sel-squad">' + lista.map(function (p) {
+        var face = p.foto ? '<span class="sel-face"><img src="' + esc(p.foto) + '" alt="" loading="lazy"></span>' : silhueta();
+        var sub = [p.pos, p.num].filter(Boolean).join(" · ");
+        return '<div class="sel-player">' + face +
+          '<span class="sel-player-nome">' + esc(p.nome || "—") + "</span>" +
+          (sub ? '<span class="sel-player-pos">' + esc(sub) + "</span>" : "") +
+          "</div>";
+      }).join("") + "</div>" +
+    "</details>";
   }
 
   function fact(label, val) {
