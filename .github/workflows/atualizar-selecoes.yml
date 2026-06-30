@@ -4,12 +4,18 @@ on:
   schedule:
     # 2h e 10h de Brasília (UTC-3) = 05:00 e 13:00 UTC
     - cron: "0 5,13 * * *"
-  workflow_dispatch: {}   # permite rodar manualmente também
+  workflow_dispatch:
+    inputs:
+      minutos_rostos:
+        description: "Teto de tempo do robô de rostos (min)"
+        default: "8"
+      limite_rostos:
+        description: "Máx. de jogadores por rodada"
+        default: "250"
 
 permissions:
   contents: write
 
-# Evita que duas execuções colidam no push.
 concurrency:
   group: atualizar-selecoes
   cancel-in-progress: false
@@ -17,6 +23,7 @@ concurrency:
 jobs:
   selecoes:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,41 +33,39 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Sanidade da lógica (selftest offline)
+      - name: Sanidade (selftests offline)
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
           python buscar_selecoes.py --selftest
           python buscar_rostos_jogadores.py --selftest
 
-      - name: Buscar elencos e rostos na ESPN
+      - name: Atualizar elencos (ESPN)
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
           python buscar_selecoes.py
 
-      - name: Enriquecer rostos com ESPN/Wikimedia
+      - name: Povoar rostos (upkeep leve, com teto de tempo)
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
-          python buscar_rostos_jogadores.py
+          python buscar_rostos_jogadores.py --minutos "${{ github.event.inputs.minutos_rostos || '8' }}" --limite "${{ github.event.inputs.limite_rostos || '250' }}"
 
       - name: Commit (se algo mudou)
         run: |
           cd "$GITHUB_WORKSPACE"
-          git add copa2026/dados/elencos.json copa2026/dados/rostos.json copa2026/dados/rostos_relatorio.json copa2026/img/jogadores 2>/dev/null || true
+          git add copa2026/dados/elencos.json copa2026/dados/rostos.json \
+                  copa2026/dados/rostos_estado.json copa2026/dados/rostos_creditos.json \
+                  copa2026/dados/rostos_relatorio.json copa2026/img/jogadores 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "Nada mudou — sem commit."
+            echo "Nada mudou - sem commit."
             exit 0
           fi
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git commit -m "Atualiza seleções (elencos + rostos) — automático"
+          git commit -m "Atualiza selecoes (elencos + rostos) - automatico"
           for i in 1 2 3 4 5; do
-            if git push; then
-              echo "Push OK na tentativa $i."
-              exit 0
-            fi
-            echo "Push rejeitado (tentativa $i). Puxando e tentando de novo..."
+            if git push; then echo "Push OK ($i)."; exit 0; fi
+            echo "Push rejeitado ($i); rebase e tenta de novo..."
             git pull --rebase --autostash origin main || true
             sleep 3
           done
-          echo "Não consegui enviar após várias tentativas."
-          exit 1
+          echo "Falha ao enviar."; exit 1
