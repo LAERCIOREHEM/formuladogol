@@ -1,38 +1,47 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-buscar_rostos_jogadores.py — enriquecimento de fotos dos jogadores da Copa 2026
+buscar_rostos_jogadores.py — povoamento INTELIGENTE das fotos dos jogadores.
 
-Objetivo:
-  - Ler dados/elencos.json já gerado pela ESPN.
-  - Preservar todas as fotos existentes.
-  - Tentar preencher fotos faltantes em camadas:
-      1) ESPN headshot direto pelo id do atleta.
-      2) Wikidata/Wikimedia Commons, com validação conservadora de nome.
-      3) Fallback visual do site, sem quebrar card nenhum.
-  - Atualizar:
-      dados/elencos.json
-      dados/rostos.json
-      dados/rostos_relatorio.json
-      img/jogadores/*
+Princípios (resolvem os 50 min / 10% do pipeline anterior):
+  1) O ARQUIVO no disco é o cache. Se a foto do jogador já existe em
+     img/jogadores/ -> nunca mais toca a rede para ele.
+  2) MEMÓRIA dos ausentes. dados/rostos_estado.json guarda quem já foi
+     checado e não tinha foto, com data; só re-tenta a cada N dias
+     (--retry-dias, padrão 30). Assim a rodada CONVERGE e depois fica ociosa.
+  3) Camadas, em ordem, parando na primeira que acha:
+       a) ESPN headshot direto pelo id do atleta (determinístico).
+       b) Wikipedia 'pageimages' (miniatura da página do jogador).
+       c) Wikidata (wbsearchentities -> wbgetclaims P18 -> Commons), leve.
+       d) Sem foto -> o FRONT desenha avatar de iniciais (nada é baixado).
+  4) Downloads em PARALELO (pool de threads) + TETO DE TEMPO (--minutos) e de
+     lote (--limite), para nunca estourar o GitHub Actions.
+  5) Atribuição (autor + licença) salva para imagens do Wikimedia/Wikipedia,
+     e exportada em dados/rostos_creditos.json para o link "Créditos das imagens".
 
-Importante:
-  - Não consulta mecanismo de busca genérico de imagens.
-  - Não salva foto se a confiança do nome for baixa.
-  - Não aborta por jogador sem foto: fallback é esperado.
-  - Aborta se o arquivo de elencos não tiver as 48 seleções.
+Fluxo recomendado:
+  - 1x pesado, LOCAL (sua máquina/servidor, sem limite, paralelo):
+        python3 buscar_rostos_jogadores.py
+    commita as imagens + estado.
+  - Depois, manutenção leve no Actions:
+        python3 buscar_rostos_jogadores.py --minutos 8 --limite 250
+
+Sem rede? Valide a lógica:
+        python3 buscar_rostos_jogadores.py --selftest
 """
 
 import argparse
+import concurrent.futures as futures
 import json
 import os
 import re
 import sys
+import threading
 import time
 import unicodedata
 import urllib.parse
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 DADOS = os.path.join(DIR, "dados")
@@ -41,67 +50,78 @@ IMG_DIR = os.path.join(DIR, "img", "jogadores")
 SELECOES_JSON = os.path.join(DADOS, "selecoes.json")
 ELENCOS_JSON = os.path.join(DADOS, "elencos.json")
 ROSTOS_JSON = os.path.join(DADOS, "rostos.json")
+ESTADO_JSON = os.path.join(DADOS, "rostos_estado.json")
+CREDITOS_JSON = os.path.join(DADOS, "rostos_creditos.json")
 RELATORIO_JSON = os.path.join(DADOS, "rostos_relatorio.json")
 
 HEADERS = {
-    "User-Agent": "bolao-copa2026-rostos/1.0 (+brasileirao2026almoco.com.br)",
+    "User-Agent": "bolao-copa2026-rostos/2.0 (+brasileirao2026almoco.com.br)",
     "Accept": "application/json,text/plain,*/*",
 }
 
 ESPN_HEADSHOT = "https://a.espncdn.com/i/headshots/soccer/players/full/{id}.png"
-WIKIDATA_SEARCH = "https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=en&uselang=en&type=item&limit=5&search={q}"
-WIKIDATA_ENTITY = "https://www.wikidata.org/wiki/Special:EntityData/{qid}.json"
-COMMONS_INFO = "https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url|mime|extmetadata&titles=File:{file}"
+WP_PAGEIMG = ("https://{lang}.wikipedia.org/w/api.php?action=query&format=json&redirects=1"
+              "&prop=pageimages&piprop=thumbnail|name&pithumbsize=200&titles={t}")
+WB_SEARCH = ("https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json"
+             "&language=en&uselang=en&type=item&limit=6&search={q}")
+WB_CLAIMS = "https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&property=P18&entity={qid}"
+COMMONS_FILEPATH = "https://commons.wikimedia.org/wiki/Special:FilePath/{file}?width=200"
+COMMONS_INFO = ("https://commons.wikimedia.org/w/api.php?action=query&format=json"
+                "&prop=imageinfo&iiprop=extmetadata&titles=File:{file}")
 
+WP_LANGS = ["en", "pt", "es"]
+
+# ------------------------------------------------------------------ utilidades
 def agora_iso():
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
+def hoje():
+    return date.today().isoformat()
+
 def norm(s):
-    s = unicodedata.normalize("NFKD", str(s or ""))
+    """Normalização IDÊNTICA ao normNome() do estatisticas.js (paridade de chave)."""
+    s = unicodedata.normalize("NFD", str(s or "").lower())
     s = "".join(c for c in s if not unicodedata.combining(c))
-    s = re.sub(r"[^a-zA-Z0-9 ]+", " ", s).lower()
+    s = re.sub(r"[^a-z0-9]+", " ", s)
     return re.sub(r"\s+", " ", s).strip()
 
-def tokens_nome(s):
-    stop = {"de", "da", "do", "dos", "das", "del", "della", "van", "von", "bin", "al", "el", "jr", "junior", "ii", "iii"}
+def tokens(s):
+    stop = {"de", "da", "do", "dos", "das", "del", "della", "van", "von", "bin",
+            "al", "el", "jr", "junior", "ii", "iii", "dos", "the"}
     return [t for t in norm(s).split() if len(t) > 1 and t not in stop]
 
-def chave_rosto(sigla, nome):
+def chave(sigla, nome):
     return "%s|%s" % (str(sigla or "").upper(), norm(nome))
 
 def nome_score(nome, label, descricao=""):
-    a = tokens_nome(nome)
-    b = tokens_nome(label)
-    d = tokens_nome(descricao)
+    a, b = tokens(nome), tokens(label)
     if not a or not b:
         return 0.0
     if norm(nome) == norm(label):
         return 1.0
-
-    set_a, set_b = set(a), set(b)
-    inter = len(set_a & set_b)
-    union = max(1, len(set_a | set_b))
-    score = inter / union
-
-    if a[0] in set_b:
-        score += 0.12
-    if a[-1] in set_b:
+    sa, sb = set(a), set(b)
+    score = len(sa & sb) / max(1, len(sa | sb))
+    if a[0] in sb:
+        score += 0.10
+    if a[-1] in sb:
         score += 0.22
-
-    desc = " ".join(d)
-    if any(x in desc for x in ["football", "soccer", "futbol", "futebol"]):
+    d = norm(descricao)
+    if any(x in d for x in ("football", "soccer", "footballer", "futbol", "futebol", "goalkeeper")):
         score += 0.12
-
     return min(1.0, score)
 
+def eh_footballer(descricao):
+    d = norm(descricao)
+    return any(x in d for x in ("football", "soccer", "footballer", "futbol", "futebol", "goalkeeper"))
+
+# ------------------------------------------------------------------ HTTP
 def http_bytes(url, timeout=25):
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         data = r.read()
         info = r.info()
         ctype = info.get_content_type() if info else ""
-        final_url = r.geturl()
-    return data, ctype, final_url
+        return data, (ctype or ""), r.geturl()
 
 def http_json(url, timeout=25, tentativas=2):
     ultimo = None
@@ -111,54 +131,41 @@ def http_json(url, timeout=25, tentativas=2):
             return json.loads(data.decode("utf-8", "replace"))
         except Exception as e:
             ultimo = e
-            time.sleep(0.8 * (i + 1))
+            time.sleep(0.6 * (i + 1))
     return None
-
-def escrever_json(caminho, obj):
-    tmp = caminho + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, indent=2)
-        f.write("\n")
-    os.replace(tmp, caminho)
-
-def carregar_json(caminho, padrao):
-    if not os.path.exists(caminho):
-        return padrao
-    with open(caminho, "r", encoding="utf-8") as f:
-        return json.load(f)
 
 def ext_por_mime(mime, url=""):
     mime = (mime or "").lower()
-    if mime in ("image/jpeg", "image/jpg"):
-        return ".jpg"
-    if mime == "image/png":
-        return ".png"
-    if mime == "image/webp":
-        return ".webp"
-    if mime == "image/gif":
-        return ".gif"
+    m = {"image/jpeg": ".jpg", "image/jpg": ".jpg", "image/png": ".png",
+         "image/webp": ".webp", "image/gif": ".gif"}
+    if mime in m:
+        return m[mime]
     ext = os.path.splitext(urllib.parse.urlparse(url).path)[1].lower()
-    if ext in (".jpg", ".jpeg", ".png", ".webp", ".gif"):
-        return ".jpg" if ext == ".jpeg" else ext
-    return ".jpg"
+    return {".jpeg": ".jpg"}.get(ext, ext) if ext in (".jpg", ".jpeg", ".png", ".webp", ".gif") else ".jpg"
 
-def salvar_imagem(url, dest_base, forcar=False):
+def arquivo_existe(rel_or_abs):
+    if not rel_or_abs:
+        return False
+    p = rel_or_abs if os.path.isabs(rel_or_abs) else os.path.join(DIR, rel_or_abs)
+    return os.path.exists(p)
+
+def relpath_site(abs_path):
+    return os.path.relpath(abs_path, DIR).replace(os.sep, "/")
+
+def baixar(url, dest_base, forcar=False):
+    """Baixa imagem para dest_base+<ext>. Reaproveita se já existe (cache)."""
     for ext in (".png", ".jpg", ".webp", ".gif"):
         if os.path.exists(dest_base + ext) and not forcar:
             return dest_base + ext
-
     try:
-        data, mime, final_url = http_bytes(url)
+        data, mime, final = http_bytes(url)
     except Exception:
         return None
-
-    if not data or len(data) < 2048:
+    if not data or len(data) < 1500:
         return None
     if mime and not mime.lower().startswith("image/"):
         return None
-
-    ext = ext_por_mime(mime, final_url)
-    dest = dest_base + ext
+    dest = dest_base + ext_por_mime(mime, final)
     os.makedirs(os.path.dirname(dest), exist_ok=True)
     tmp = dest + ".tmp"
     with open(tmp, "wb") as f:
@@ -166,294 +173,371 @@ def salvar_imagem(url, dest_base, forcar=False):
     os.replace(tmp, dest)
     return dest
 
-def relpath_site(abs_path):
-    return os.path.relpath(abs_path, DIR).replace(os.sep, "/")
-
-def tentar_espn_direto(jogador, forcar=False):
-    aid = str(jogador.get("id") or "").strip()
-    if not aid:
-        return None
-    url = ESPN_HEADSHOT.format(id=urllib.parse.quote(aid))
-    dest = os.path.join(IMG_DIR, aid)
-    salvo = salvar_imagem(url, dest, forcar=forcar)
-    if not salvo:
-        return None
-    return {
-        "foto": relpath_site(salvo),
-        "fonte": "ESPN",
-        "origem": "espn-headshot-direto",
-        "credito": "ESPN",
-        "licenca": None,
-        "url": url,
-        "confianca": 0.90,
-    }
-
-def wikidata_candidates(nome):
-    url = WIKIDATA_SEARCH.format(q=urllib.parse.quote(nome))
-    data = http_json(url)
-    if not data:
-        return []
-    return data.get("search") or []
-
-def wikidata_entity(qid):
-    data = http_json(WIKIDATA_ENTITY.format(qid=urllib.parse.quote(qid)))
-    if not data:
-        return None
-    return (data.get("entities") or {}).get(qid)
-
-def claim_p18(entity):
-    claims = (entity or {}).get("claims") or {}
-    p18 = claims.get("P18") or []
-    if not p18:
-        return None
+# ------------------------------------------------------------------ parsers puros (testáveis)
+def parse_pageimages(data):
+    """Retorna {'thumb':url,'file':'Nome.jpg'} ou None a partir do JSON do pageimages."""
     try:
+        pages = (data.get("query") or {}).get("pages") or {}
+    except Exception:
+        return None
+    for page in pages.values():
+        if "missing" in page:
+            continue
+        thumb = (page.get("thumbnail") or {}).get("source")
+        arq = page.get("pageimage")
+        if thumb:
+            return {"thumb": thumb, "file": arq, "title": page.get("title")}
+    return None
+
+def parse_wbsearch(data, nome, min_conf=0.80):
+    """Escolhe o melhor QID footballer pelo score do nome."""
+    if not data:
+        return None
+    melhor, melhor_sc = None, 0.0
+    for cand in (data.get("search") or []):
+        label = cand.get("label") or ""
+        desc = cand.get("description") or ""
+        sc = nome_score(nome, label, desc)
+        if eh_footballer(desc):
+            sc += 0.05
+        if sc > melhor_sc:
+            melhor_sc, melhor = sc, cand
+    if melhor and melhor_sc >= min_conf:
+        return {"qid": melhor.get("id"), "label": melhor.get("label"),
+                "descricao": melhor.get("description"), "confianca": round(melhor_sc, 3)}
+    return None
+
+def parse_p18(data):
+    """Lê o nome do arquivo da claim P18 do wbgetclaims."""
+    try:
+        p18 = (data.get("claims") or {}).get("P18") or []
         return p18[0]["mainsnak"]["datavalue"]["value"]
     except Exception:
         return None
 
-def commons_image_info(filename):
-    title = urllib.parse.quote(filename.replace(" ", "_"))
-    data = http_json(COMMONS_INFO.format(file=title))
-    if not data:
-        return None
-    pages = (data.get("query") or {}).get("pages") or {}
+def commons_thumb_url(filename):
+    return COMMONS_FILEPATH.format(file=urllib.parse.quote(filename.replace(" ", "_")))
+
+def limpa_html(s):
+    return re.sub(r"<[^>]+>", "", str(s or "")).strip()
+
+def parse_imageinfo(data):
+    """Extrai autor + licença do extmetadata do Commons."""
+    try:
+        pages = (data.get("query") or {}).get("pages") or {}
+    except Exception:
+        return {}
     for page in pages.values():
         infos = page.get("imageinfo") or []
-        if infos:
-            return infos[0]
-    return None
+        if not infos:
+            continue
+        meta = infos[0].get("extmetadata") or {}
+        def mv(k):
+            return limpa_html((meta.get(k) or {}).get("value"))
+        return {"autor": mv("Artist") or mv("Credit"),
+                "licenca": mv("LicenseShortName") or mv("UsageTerms")}
+    return {}
 
-def meta_val(meta, chave):
-    try:
-        v = (meta or {}).get(chave) or {}
-        return re.sub(r"<[^>]+>", "", str(v.get("value") or "")).strip()
-    except Exception:
-        return ""
-
-def tentar_wikimedia(jogador, forcar=False, min_conf=0.86):
-    nome = str(jogador.get("nome") or "").strip()
-    if not nome:
+# ------------------------------------------------------------------ camadas (rede)
+def camada_espn(jog, forcar=False):
+    aid = str(jog.get("id") or "").strip()
+    if not aid:
         return None
-
-    melhor = None
-    for cand in wikidata_candidates(nome):
-        qid = cand.get("id")
-        label = cand.get("label") or ""
-        desc = cand.get("description") or ""
-        score = nome_score(nome, label, desc)
-        if score < min_conf:
-            continue
-
-        ent = wikidata_entity(qid)
-        filename = claim_p18(ent)
-        if not filename:
-            continue
-
-        info = commons_image_info(filename)
-        if not info:
-            continue
-
-        mime = (info.get("mime") or "").lower()
-        if mime and not mime.startswith("image/"):
-            continue
-
-        url = info.get("url")
-        if not url:
-            continue
-
-        meta = info.get("extmetadata") or {}
-        autor = meta_val(meta, "Artist") or meta_val(meta, "Credit")
-        licenca = meta_val(meta, "LicenseShortName") or meta_val(meta, "UsageTerms")
-        credito = meta_val(meta, "Credit")
-
-        melhor = {
-            "qid": qid,
-            "arquivo": filename,
-            "url": url,
-            "label": label,
-            "descricao": desc,
-            "autor": autor,
-            "licenca": licenca,
-            "credito": credito,
-            "confianca": round(score, 3),
-        }
-        break
-
-    if not melhor:
-        return None
-
-    aid = str(jogador.get("id") or norm(nome).replace(" ", "-"))
-    dest_base = os.path.join(IMG_DIR, aid + "_wiki")
-    salvo = salvar_imagem(melhor["url"], dest_base, forcar=forcar)
+    url = ESPN_HEADSHOT.format(id=urllib.parse.quote(aid))
+    salvo = baixar(url, os.path.join(IMG_DIR, aid), forcar=forcar)
     if not salvo:
         return None
+    return {"foto": relpath_site(salvo), "fonte": "ESPN", "credito": "ESPN",
+            "licenca": None, "autor": None, "url": url, "confianca": 0.9}
 
-    return {
-        "foto": relpath_site(salvo),
-        "fonte": "Wikimedia Commons",
-        "origem": "wikidata-p18",
-        "credito": melhor.get("credito") or melhor.get("autor") or "Wikimedia Commons",
-        "autor": melhor.get("autor"),
-        "licenca": melhor.get("licenca"),
-        "url": melhor.get("url"),
-        "qid": melhor.get("qid"),
-        "arquivo": melhor.get("arquivo"),
-        "confianca": melhor.get("confianca"),
-    }
+def camada_wikipedia(jog, forcar=False):
+    nome = str(jog.get("nome") or "").strip()
+    if not nome:
+        return None
+    aid = str(jog.get("id") or norm(nome).replace(" ", "-"))
+    for lang in WP_LANGS:
+        data = http_json(WP_PAGEIMG.format(lang=lang, t=urllib.parse.quote(nome)))
+        achou = parse_pageimages(data or {})
+        if not achou:
+            continue
+        if nome_score(nome, achou.get("title") or nome) < 0.5:
+            continue
+        salvo = baixar(achou["thumb"], os.path.join(IMG_DIR, aid + "_wp"), forcar=forcar)
+        if not salvo:
+            continue
+        cred = {"autor": None, "licenca": None}
+        if achou.get("file"):
+            cred = parse_imageinfo(http_json(COMMONS_INFO.format(file=urllib.parse.quote(achou["file"].replace(" ", "_")))) or {}) or cred
+        return {"foto": relpath_site(salvo), "fonte": "Wikipedia", "credito": cred.get("autor") or "Wikipedia/Wikimedia",
+                "autor": cred.get("autor"), "licenca": cred.get("licenca"),
+                "url": achou["thumb"], "arquivo": achou.get("file"), "confianca": 0.8}
+    return None
 
-def reconstruir_rostos(elencos, existente=None):
+def camada_wikidata(jog, forcar=False, min_conf=0.80):
+    nome = str(jog.get("nome") or "").strip()
+    if not nome:
+        return None
+    cand = parse_wbsearch(http_json(WB_SEARCH.format(q=urllib.parse.quote(nome))) or {}, nome, min_conf=min_conf)
+    if not cand:
+        return None
+    arq = parse_p18(http_json(WB_CLAIMS.format(qid=urllib.parse.quote(cand["qid"]))) or {})
+    if not arq:
+        return None
+    aid = str(jog.get("id") or norm(nome).replace(" ", "-"))
+    salvo = baixar(commons_thumb_url(arq), os.path.join(IMG_DIR, aid + "_wiki"), forcar=forcar)
+    if not salvo:
+        return None
+    cred = parse_imageinfo(http_json(COMMONS_INFO.format(file=urllib.parse.quote(arq.replace(" ", "_")))) or {}) or {}
+    return {"foto": relpath_site(salvo), "fonte": "Wikimedia Commons",
+            "credito": cred.get("autor") or "Wikimedia Commons", "autor": cred.get("autor"),
+            "licenca": cred.get("licenca"), "url": commons_thumb_url(arq), "arquivo": arq,
+            "qid": cand.get("qid"), "confianca": cand.get("confianca")}
+
+def resolver(sigla, jog, args, deadline):
+    """Tenta as camadas em ordem; respeita o teto de tempo."""
+    if deadline and time.time() > deadline:
+        return ("skip", None)
+    if not args.sem_espn:
+        a = camada_espn(jog, forcar=args.forcar)
+        if a:
+            return ("ok", a)
+    if not args.sem_wikipedia:
+        a = camada_wikipedia(jog, forcar=args.forcar)
+        if a:
+            return ("ok", a)
+    if not args.sem_wikimedia:
+        a = camada_wikidata(jog, forcar=args.forcar, min_conf=args.min_conf)
+        if a:
+            return ("ok", a)
+    return ("miss", None)
+
+# ------------------------------------------------------------------ saídas
+def reconstruir_rostos(elencos):
     mapa = {}
     for sigla, jogadores in (elencos.get("times") or {}).items():
         for p in jogadores or []:
-            foto = p.get("foto")
-            if foto:
-                mapa[chave_rosto(sigla, p.get("nome"))] = foto
-    obj = {
-        "_nota": "Mapa de rostos para artilheiros/assistências. Gerado automaticamente a partir de elencos.json.",
-        "gerado_em": agora_iso(),
-        "mapa": mapa,
-    }
-    if isinstance(existente, dict):
-        for k, v in existente.items():
-            if k not in obj and k != "mapa":
-                obj[k] = v
-    return obj
+            if p.get("foto"):
+                mapa[chave(sigla, p.get("nome"))] = p["foto"]
+    return {"_nota": "Mapa de rostos p/ artilheiros/assistências. Gerado de elencos.json.",
+            "gerado_em": agora_iso(), "mapa": mapa}
 
-def validar_48(elencos, selecoes):
-    esperadas = {s.get("id") for s in (selecoes.get("selecoes") or []) if s.get("id")}
-    times = set((elencos.get("times") or {}).keys())
-    faltando = sorted(esperadas - times)
-    return len(esperadas), faltando
+def montar_creditos(elencos):
+    itens = []
+    for sigla, jogadores in (elencos.get("times") or {}).items():
+        for p in jogadores or []:
+            fonte = p.get("foto_fonte")
+            if fonte in ("Wikipedia", "Wikimedia Commons") and (p.get("foto_autor") or p.get("foto_licenca")):
+                itens.append({"nome": p.get("nome"), "selecao": sigla, "fonte": fonte,
+                              "autor": p.get("foto_autor"), "licenca": p.get("foto_licenca"),
+                              "url": p.get("foto_url_origem")})
+    itens.sort(key=lambda x: (x["selecao"], x["nome"] or ""))
+    return {"_nota": "Créditos das imagens de jogadores vindas de Wikipedia/Wikimedia Commons.",
+            "gerado_em": agora_iso(), "fonte_padrao": "ESPN / Wikipedia / Wikimedia Commons",
+            "creditos": itens}
 
+def carregar_json(caminho, padrao):
+    if not os.path.exists(caminho):
+        return padrao
+    try:
+        with open(caminho, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return padrao
+
+def escrever_json(caminho, obj):
+    tmp = caminho + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, indent=1)
+        f.write("\n")
+    os.replace(tmp, caminho)
+
+def dias_desde(iso_d):
+    try:
+        d = date.fromisoformat((iso_d or "")[:10])
+        return (date.today() - d).days
+    except Exception:
+        return 99999
+
+# ------------------------------------------------------------------ execução
 def rodar(args):
     selecoes = carregar_json(SELECOES_JSON, {"selecoes": []})
     elencos = carregar_json(ELENCOS_JSON, {"times": {}})
-    rostos_old = carregar_json(ROSTOS_JSON, {"mapa": {}})
+    estado = carregar_json(ESTADO_JSON, {"itens": {}})
+    if "itens" not in estado:
+        estado = {"itens": {}}
 
-    total_sel, faltando = validar_48(elencos, selecoes)
-    if total_sel != 48 or faltando:
-        print("ERRO: elencos.json não cobre as 48 seleções. Faltando:", ", ".join(faltando))
+    esperadas = {s.get("id") for s in (selecoes.get("selecoes") or []) if s.get("id")}
+    times = elencos.get("times") or {}
+    faltando = sorted(esperadas - set(times.keys()))
+    if len(esperadas) != 48 or faltando:
+        print("ERRO: elencos.json não cobre as 48 seleções. Faltando:", ", ".join(faltando) or "(elencos vazio)")
+        print("      Rode antes: python3 buscar_selecoes.py")
         return 2
 
-    stats = {
-        "selecoes": len(elencos.get("times") or {}),
-        "jogadores": 0,
-        "ja_tinham_foto": 0,
-        "adicionados_espn": 0,
-        "adicionados_wikimedia": 0,
-        "sem_foto": 0,
-        "erros": [],
-        "fontes": {"ESPN": 0, "Wikimedia Commons": 0},
-    }
+    os.makedirs(IMG_DIR, exist_ok=True)
+    est = estado["itens"]
+    st = {"jogadores": 0, "ja_tinham": 0, "novas": 0, "sem_foto": 0, "pulados_memoria": 0,
+          "skip_tempo": 0, "fontes": {"ESPN": 0, "Wikipedia": 0, "Wikimedia Commons": 0}}
 
-    max_wiki = int(os.environ.get("MAX_WIKIDATA_ROSTOS", "0") or "0")
-    wiki_usados = 0
-
-    for sigla in sorted((elencos.get("times") or {}).keys()):
-        jogadores = elencos["times"].get(sigla) or []
-        for p in jogadores:
-            stats["jogadores"] += 1
-            if p.get("foto") and not args.forcar:
-                stats["ja_tinham_foto"] += 1
+    # 1) Monta a lista de trabalho aplicando o CACHE (arquivo) e a MEMÓRIA (estado)
+    trabalho = []
+    for sigla in sorted(times.keys()):
+        for p in times[sigla] or []:
+            st["jogadores"] += 1
+            k = chave(sigla, p.get("nome"))
+            if p.get("foto") and arquivo_existe(p.get("foto")) and not args.forcar:
+                st["ja_tinham"] += 1
+                est[k] = {"status": "ok", "fonte": p.get("foto_fonte") or "?", "foto": p.get("foto"), "ultimo": hoje()}
                 continue
+            e = est.get(k)
+            if e and not args.forcar:
+                if e.get("status") == "ok" and arquivo_existe(e.get("foto")):
+                    p["foto"] = e.get("foto")
+                    st["ja_tinham"] += 1
+                    continue
+                if e.get("status") == "sem_foto" and dias_desde(e.get("ultimo")) < args.retry_dias:
+                    st["pulados_memoria"] += 1
+                    st["sem_foto"] += 1
+                    continue
+            trabalho.append((sigla, p, k))
 
-            achou = None
-            if not args.sem_espn:
-                achou = tentar_espn_direto(p, forcar=args.forcar)
-                if achou:
-                    stats["adicionados_espn"] += 1
-                    stats["fontes"]["ESPN"] += 1
+    if args.limite and len(trabalho) > args.limite:
+        trabalho = trabalho[:args.limite]
+    print("→ %d jogadores no total | %d já tinham foto | %d pulados por memória | %d a processar agora"
+          % (st["jogadores"], st["ja_tinham"], st["pulados_memoria"], len(trabalho)))
 
-            if not achou and not args.sem_wikimedia:
-                if max_wiki and wiki_usados >= max_wiki:
-                    pass
-                else:
-                    try:
-                        achou = tentar_wikimedia(p, forcar=args.forcar, min_conf=args.min_conf)
-                        wiki_usados += 1
-                        time.sleep(args.wikimedia_pausa)
-                    except Exception as e:
-                        stats["erros"].append("%s|%s: %s" % (sigla, p.get("nome"), e))
-                        achou = None
-                    if achou:
-                        stats["adicionados_wikimedia"] += 1
-                        stats["fontes"]["Wikimedia Commons"] += 1
+    deadline = (time.time() + args.minutos * 60) if args.minutos else 0
 
-            if achou:
-                p["foto"] = achou["foto"]
-                p["foto_fonte"] = achou.get("fonte")
-                p["foto_origem"] = achou.get("origem")
-                p["foto_credito"] = achou.get("credito")
-                p["foto_licenca"] = achou.get("licenca")
-                p["foto_confianca"] = achou.get("confianca")
-                if achou.get("url"):
-                    p["foto_url_origem"] = achou.get("url")
-                if achou.get("qid"):
-                    p["wikidata"] = achou.get("qid")
-            else:
-                if args.forcar:
-                    p["foto"] = None
-                stats["sem_foto"] += 1
+    # 2) Resolve em PARALELO (rede), aplicando resultados na thread principal
+    resultados = {}
+    if trabalho:
+        with futures.ThreadPoolExecutor(max_workers=max(1, args.workers)) as ex:
+            fut2key = {ex.submit(resolver, sg, p, args, deadline): (sg, p, k) for (sg, p, k) in trabalho}
+            for fut in futures.as_completed(fut2key):
+                sg, p, k = fut2key[fut]
+                try:
+                    status, achou = fut.result()
+                except Exception as e:
+                    status, achou = "miss", None
+                resultados[k] = (status, achou, sg, p)
 
-    elencos["_nota_fotos"] = (
-        "Fotos locais em img/jogadores quando disponíveis. "
-        "Fontes: ESPN e Wikimedia Commons, com fallback visual no site para ausentes."
-    )
+    for k, (status, achou, sg, p) in resultados.items():
+        if status == "skip":
+            st["skip_tempo"] += 1
+            continue
+        if status == "ok" and achou:
+            p["foto"] = achou["foto"]
+            p["foto_fonte"] = achou.get("fonte")
+            p["foto_credito"] = achou.get("credito")
+            p["foto_autor"] = achou.get("autor")
+            p["foto_licenca"] = achou.get("licenca")
+            p["foto_url_origem"] = achou.get("url")
+            p["foto_confianca"] = achou.get("confianca")
+            if achou.get("qid"):
+                p["wikidata"] = achou["qid"]
+            st["novas"] += 1
+            st["fontes"][achou.get("fonte", "?")] = st["fontes"].get(achou.get("fonte", "?"), 0) + 1
+            est[k] = {"status": "ok", "fonte": achou.get("fonte"), "foto": achou["foto"], "ultimo": hoje()}
+        else:  # miss
+            st["sem_foto"] += 1
+            tent = (est.get(k, {}).get("tentativas") or 0) + 1
+            est[k] = {"status": "sem_foto", "tentativas": tent, "ultimo": hoje()}
+
+    # 3) Grava tudo
     elencos["rostos_atualizado_em"] = agora_iso()
-
-    rostos = reconstruir_rostos(elencos, rostos_old)
-    rel = {
-        "_nota": "Relatório de cobertura de fotos dos jogadores. Ausência de foto não é erro; o front usa fallback.",
-        "gerado_em": agora_iso(),
-        "config": {
-            "sem_espn": args.sem_espn,
-            "sem_wikimedia": args.sem_wikimedia,
-            "min_conf": args.min_conf,
-            "max_wikidata_rostos": max_wiki,
-        },
-        "cobertura": stats,
-    }
-
+    elencos["_nota_fotos"] = ("Fotos locais em img/jogadores. Camadas: ESPN, Wikipedia e Wikimedia Commons; "
+                              "ausentes recebem avatar de iniciais no site.")
     escrever_json(ELENCOS_JSON, elencos)
-    escrever_json(ROSTOS_JSON, rostos)
+    escrever_json(ROSTOS_JSON, reconstruir_rostos(elencos))
+    escrever_json(CREDITOS_JSON, montar_creditos(elencos))
+    escrever_json(ESTADO_JSON, {"_nota": "Cache de quem já tem foto e de quem foi checado sem foto (re-tenta após retry-dias).",
+                                "gerado_em": agora_iso(), "itens": est})
+    com_foto = sum(1 for sg in times for p in times[sg] if p.get("foto"))
+    rel = {"_nota": "Cobertura de fotos. Ausência não é erro: o front usa avatar de iniciais.",
+           "gerado_em": agora_iso(),
+           "cobertura": {"selecoes": len(times), "jogadores": st["jogadores"], "com_foto": com_foto,
+                         "fallback": st["jogadores"] - com_foto},
+           "execucao": st}
     escrever_json(RELATORIO_JSON, rel)
-
-    print("Seleções:", stats["selecoes"])
-    print("Jogadores:", stats["jogadores"])
-    print("Já tinham foto:", stats["ja_tinham_foto"])
-    print("Novas ESPN:", stats["adicionados_espn"])
-    print("Novas Wikimedia:", stats["adicionados_wikimedia"])
-    print("Sem foto/fallback:", stats["sem_foto"])
-    print("Relatório:", os.path.relpath(RELATORIO_JSON, DIR))
+    print("✓ +%d fotos novas (ESPN %d | Wikipedia %d | Commons %d) | com foto: %d/%d | fallback: %d | skip_tempo: %d"
+          % (st["novas"], st["fontes"].get("ESPN", 0), st["fontes"].get("Wikipedia", 0),
+             st["fontes"].get("Wikimedia Commons", 0), com_foto, st["jogadores"],
+             st["jogadores"] - com_foto, st["skip_tempo"]))
     return 0
 
+# ------------------------------------------------------------------ selftest (offline)
 def selftest():
-    assert norm("Manuel Neuer") == "manuel neuer"
-    assert nome_score("Manuel Neuer", "Manuel Neuer", "German footballer") >= 0.99
-    assert nome_score("Manuel Neuer", "Manuel Peter Neuer", "German footballer") >= 0.86
-    assert nome_score("Manuel Neuer", "Manuel Akanji", "Swiss footballer") < 0.86
+    ok = True
+    def checa(c, m):
+        nonlocal ok
+        print(("  ok  " if c else "  ERRO ") + m)
+        ok = ok and c
 
-    elencos = {"times": {"GER": [{"nome": "Manuel Neuer", "foto": "img/jogadores/123.png"}]}}
-    rostos = reconstruir_rostos(elencos, {})
-    assert rostos["mapa"]["GER|manuel neuer"] == "img/jogadores/123.png"
+    # paridade de chave com o front
+    checa(chave("ARG", "Lionel Messi") == "ARG|lionel messi", "chave SIGLA|nome-normalizado")
+    checa(norm("Vinícius Júnior") == "vinicius junior" and norm("Mbappé") == "mbappe", "norm com acentos")
 
-    selecoes = {"selecoes": [{"id": "T%02d" % i} for i in range(48)]}
-    el48 = {"times": {"T%02d" % i: [] for i in range(48)}}
-    total, faltando = validar_48(el48, selecoes)
-    assert total == 48 and not faltando
-    print("SELFTEST OK")
-    return 0
+    # parse_pageimages
+    pg = {"query": {"pages": {"1": {"title": "Lionel Messi", "pageimage": "Messi.jpg",
+          "thumbnail": {"source": "https://x/Messi_200.jpg"}}}}}
+    r = parse_pageimages(pg)
+    checa(r and r["thumb"].endswith("Messi_200.jpg") and r["file"] == "Messi.jpg", "parse_pageimages acha miniatura")
+    checa(parse_pageimages({"query": {"pages": {"-1": {"missing": ""}}}}) is None, "pageimages 'missing' -> None")
+
+    # parse_wbsearch (escolhe footballer pelo score)
+    wb = {"search": [
+        {"id": "Q615", "label": "Lionel Messi", "description": "Argentine association football player"},
+        {"id": "Q999", "label": "Lionel Messi (film)", "description": "2014 film"}]}
+    sel = parse_wbsearch(wb, "Lionel Messi", min_conf=0.8)
+    checa(sel and sel["qid"] == "Q615", "parse_wbsearch escolhe o jogador certo")
+    fraco = parse_wbsearch({"search": [{"id": "Q1", "label": "Outro Nome", "description": "painter"}]}, "Lionel Messi")
+    checa(fraco is None, "parse_wbsearch rejeita nome fraco")
+
+    # parse_p18 + commons url
+    p18 = {"claims": {"P18": [{"mainsnak": {"datavalue": {"value": "Lionel Messi 2018.jpg"}}}]}}
+    checa(parse_p18(p18) == "Lionel Messi 2018.jpg", "parse_p18 lê arquivo")
+    checa("Lionel_Messi_2018.jpg" in commons_thumb_url("Lionel Messi 2018.jpg"), "commons_thumb_url troca espaço por _")
+
+    # parse_imageinfo (autor/licença)
+    ii = {"query": {"pages": {"1": {"imageinfo": [{"extmetadata": {
+        "Artist": {"value": "<a href=x>Foto Autor</a>"}, "LicenseShortName": {"value": "CC BY-SA 4.0"}}}]}}}}
+    cr = parse_imageinfo(ii)
+    checa(cr.get("autor") == "Foto Autor" and cr.get("licenca") == "CC BY-SA 4.0", "parse_imageinfo limpa HTML e lê licença")
+
+    # memória de ausências (janela de retry)
+    checa(dias_desde((date.today()).isoformat()) == 0, "dias_desde hoje = 0")
+    checa(dias_desde("2000-01-01") > 30, "dias_desde antigo > 30")
+
+    # reconstrução do rostos.json (só quem tem foto)
+    el = {"times": {"BRA": [{"nome": "Alisson", "foto": "img/jogadores/1.png"},
+                            {"nome": "Vinicius", "foto": None}]}}
+    rec = reconstruir_rostos(el)
+    checa(rec["mapa"].get("BRA|alisson") == "img/jogadores/1.png" and "BRA|vinicius" not in rec["mapa"],
+          "reconstruir_rostos inclui só quem tem foto (chave casa com o front)")
+
+    # créditos só p/ wiki com atribuição
+    el2 = {"times": {"GER": [{"nome": "Manuel Neuer", "foto_fonte": "Wikimedia Commons",
+                              "foto_autor": "Fulano", "foto_licenca": "CC BY 4.0", "foto_url_origem": "u"},
+                             {"nome": "X", "foto_fonte": "ESPN"}]}}
+    cre = montar_creditos(el2)
+    checa(len(cre["creditos"]) == 1 and cre["creditos"][0]["selecao"] == "GER", "créditos só Wikipedia/Commons com autor/licença")
+
+    print("\nSELFTEST:", "PASSOU ✅" if ok else "FALHOU ❌")
+    return 0 if ok else 1
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--forcar", action="store_true", help="reprocessa fotos já existentes")
-    ap.add_argument("--sem-espn", action="store_true", help="não tenta ESPN headshot direto")
-    ap.add_argument("--sem-wikimedia", action="store_true", help="não tenta Wikidata/Wikimedia")
-    ap.add_argument("--min-conf", type=float, default=0.86, help="confiança mínima para aceitar foto do Wikidata")
-    ap.add_argument("--wikimedia-pausa", type=float, default=0.20, help="pausa entre chamadas Wikidata/Wikimedia")
+    ap = argparse.ArgumentParser(description="Povoa fotos dos jogadores (ESPN/Wikipedia/Wikimedia) com cache e fallback.")
+    ap.add_argument("--forcar", action="store_true", help="reprocessa mesmo quem já tem foto")
+    ap.add_argument("--sem-espn", action="store_true")
+    ap.add_argument("--sem-wikipedia", action="store_true")
+    ap.add_argument("--sem-wikimedia", action="store_true")
+    ap.add_argument("--min-conf", type=float, default=0.80, help="confiança mínima no nome (Wikidata)")
+    ap.add_argument("--workers", type=int, default=12, help="downloads em paralelo")
+    ap.add_argument("--minutos", type=float, default=0, help="teto de tempo (0 = sem limite, p/ rodar local)")
+    ap.add_argument("--limite", type=int, default=0, help="máx. de jogadores a processar nesta rodada (0 = todos)")
+    ap.add_argument("--retry-dias", type=int, default=30, help="re-tenta 'sem foto' após N dias")
     ap.add_argument("--selftest", action="store_true")
     args = ap.parse_args()
-
     if args.selftest:
         return selftest()
     return rodar(args)
