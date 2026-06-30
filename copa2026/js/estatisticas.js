@@ -189,8 +189,44 @@
     var v = compOf(ev).venue;
     return v ? (v.fullName + (v.address && v.address.city ? ' · ' + v.address.city : '')) : '';
   }
+  function numPlacar(v) {
+    if (v == null || v === "") return null;
+    var n = parseInt(String(v).replace(/[^0-9-]/g, ""), 10);
+    return isNaN(n) ? null : n;
+  }
+  function placarPenaltiCompetidor(c) {
+    var vals = [
+      c && c.shootoutScore,
+      c && c.shootoutDisplayScore,
+      c && c.penaltyScore,
+      c && c.penalties,
+      c && c.shootout
+    ];
+    for (var i = 0; i < vals.length; i++) {
+      var n = numPlacar(vals[i]);
+      if (n != null) return n;
+    }
+    return null;
+  }
+  function vencedorPorPenaltis(home, away, penHome, penAway) {
+    if (home && home.winner) return teamSigla(home);
+    if (away && away.winner) return teamSigla(away);
+    if (penHome != null && penAway != null) {
+      if (penHome > penAway) return teamSigla(home);
+      if (penAway > penHome) return teamSigla(away);
+    }
+    return "";
+  }
+  function linhaPenaltisJogo(j) {
+    if (!j || j.state !== "post" || j.penA == null || j.penB == null) return "";
+    var vencedor = j.vencedor ? nomeSelecao(j.vencedor) : "";
+    return '<div class="stat-jogo-pen">pênaltis ' + esc(j.penA) + '-' + esc(j.penB) +
+      (vencedor ? ' · <b>' + esc(vencedor) + '</b> venceu' : '') +
+    '</div>';
+  }
   function normalizarJogo(ev) {
     var comp = compOf(ev), st = ((comp.status || {}).type || {}), home = teamOf(ev, 'home'), away = teamOf(ev, 'away');
+    var penHome = placarPenaltiCompetidor(home), penAway = placarPenaltiCompetidor(away);
     return {
       id: String(ev.id || ''),
       date: ev.date || '',
@@ -200,13 +236,16 @@
       shortDetail: st.shortDetail || '',
       home: { sigla: teamSigla(home), nome: teamNome(home), score: home.score != null ? String(home.score) : '' },
       away: { sigla: teamSigla(away), nome: teamNome(away), score: away.score != null ? String(away.score) : '' },
+      penA: penHome,
+      penB: penAway,
+      vencedor: vencedorPorPenaltis(home, away, penHome, penAway),
       venue: venueOf(ev)
     };
   }
   function statusBadge(j) {
     if (j.state === 'in') return '<span class="stat-jogo-badge live">Ao vivo' + (j.shortDetail ? ' · ' + esc(j.shortDetail) : '') + '</span>';
     if (j.state === 'pre') return '<span class="stat-jogo-badge pre">Agendado</span>';
-    var extra = j.shortDetail && /pen/i.test(j.shortDetail) ? ' (pên.)' : '';
+    var extra = (j.penA != null && j.penB != null) || (j.shortDetail && /pen/i.test(j.shortDetail)) ? ' (pên.)' : '';
     return '<span class="stat-jogo-badge">Encerrado' + extra + '</span>';
   }
   function renderFiltro() {
@@ -346,6 +385,7 @@
         '<div class="stat-jogo-meio"><div class="stat-jogo-placar">' + placar + '</div><div class="stat-jogo-data">' + fmtJogo(j.date) + '</div></div>' +
         '<div class="stat-jogo-lado dir"><span>' + esc(j.away.nome) + '</span>' + teamFlag({team:{abbreviation:j.away.sigla}}) + '</div>' +
       '</div>' +
+      linhaPenaltisJogo(j) +
       (j.venue ? '<div class="stat-jogo-venue">' + esc(j.venue) + '</div>' : '') +
       bloco +
     '</article>';
