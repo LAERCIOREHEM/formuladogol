@@ -13,6 +13,7 @@
   };
   var SEL = {}, ISO = {}, SELECOES = [], TVS = {}, MM = {}, JC = {}, JOGOS = [], LANCES_CACHE = {};
   var ESTRUT = null, TERMAP = null, FAIRPLAY = {}, PROJ_EVENT = {};
+  var FILTROS = { selecao: "", data: "", campo: "data", direcao: "asc" };
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (ch) {
@@ -29,6 +30,20 @@
     var p = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric" }).formatToParts(d);
     var o = {}; p.forEach(function (x) { if (x.type !== "literal") o[x.type] = x.value; });
     return o.year + "-" + o.month + "-" + o.day;
+  }
+  function optionHTML(value, text) {
+    return '<option value="' + esc(value) + '">' + esc(text) + '</option>';
+  }
+  function nomeSelecao(id) {
+    return SEL[id] || id || "";
+  }
+  function nomePrincipalOrdenacao(j) {
+    var a = nomeSelecao(j.a);
+    var b = nomeSelecao(j.b);
+    return (a || "").localeCompare(b || "", "pt-BR") <= 0 ? a : b;
+  }
+  function temSelecao(j, id) {
+    return !id || j.a === id || j.b === id;
   }
   function flag(id) {
     var c = ISO[id];
@@ -554,6 +569,94 @@
     itens.forEach(function (el) { io.observe(el); });
   }
 
+  function datasDisponiveis() {
+    var mapa = {};
+    JOGOS.forEach(function (j) { mapa[diaChave(j.date)] = fmtData(j.date); });
+    return Object.keys(mapa).sort().map(function (k) { return { id:k, label:mapa[k] }; });
+  }
+
+  function preencherFiltros() {
+    var sel = $("#oa-filtro-selecao");
+    var dt = $("#oa-filtro-data");
+    if (sel) {
+      var optsSel = SELECOES.slice().sort(function (a, b) {
+        return String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR");
+      }).map(function (s) { return optionHTML(s.id, (s.nome || s.id) + " (" + s.id + ")"); }).join("");
+      sel.innerHTML = '<option value="">Todas as seleções</option>' + optsSel;
+    }
+    if (dt) {
+      dt.innerHTML = '<option value="">Todas as datas</option>' + datasDisponiveis().map(function (d) {
+        return optionHTML(d.id, d.label);
+      }).join("");
+    }
+  }
+
+  function lerFiltrosDoFormulario() {
+    var sel = $("#oa-filtro-selecao");
+    var dt = $("#oa-filtro-data");
+    var campo = $("#oa-ordem-campo");
+    var dir = $("#oa-ordem-direcao");
+    FILTROS.selecao = sel ? sel.value : "";
+    FILTROS.data = dt ? dt.value : "";
+    FILTROS.campo = campo ? campo.value : "data";
+    FILTROS.direcao = dir ? dir.value : "asc";
+  }
+
+  function jogosFiltradosOrdenados() {
+    lerFiltrosDoFormulario();
+    var lista = JOGOS.filter(function (j) {
+      if (!temSelecao(j, FILTROS.selecao)) return false;
+      if (FILTROS.data && diaChave(j.date) !== FILTROS.data) return false;
+      return true;
+    });
+    lista.sort(function (a, b) {
+      var r;
+      if (FILTROS.campo === "selecao") {
+        r = nomePrincipalOrdenacao(a).localeCompare(nomePrincipalOrdenacao(b), "pt-BR") ||
+            nomeSelecao(a.a).localeCompare(nomeSelecao(b.a), "pt-BR") ||
+            nomeSelecao(a.b).localeCompare(nomeSelecao(b.b), "pt-BR") ||
+            (a.date - b.date);
+      } else {
+        r = (a.date - b.date) ||
+            nomePrincipalOrdenacao(a).localeCompare(nomePrincipalOrdenacao(b), "pt-BR");
+      }
+      return FILTROS.direcao === "desc" ? -r : r;
+    });
+    return lista;
+  }
+
+  function atualizarResumoFiltros(total) {
+    var el = $("#oa-filtro-resumo");
+    if (!el) return;
+    var partes = [];
+    if (FILTROS.selecao) partes.push(nomeSelecao(FILTROS.selecao));
+    if (FILTROS.data) partes.push(fmtData(JOGOS.find(function (j) { return diaChave(j.date) === FILTROS.data; }).date));
+    var base = total === 1 ? "1 jogo" : total + " jogos";
+    el.textContent = partes.length ? base + " encontrados · " + partes.join(" · ") : base + " no total";
+  }
+
+  function ligarFiltros() {
+    ["oa-filtro-selecao", "oa-filtro-data", "oa-ordem-campo", "oa-ordem-direcao"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && !el.dataset.oaFiltroLigado) {
+        el.dataset.oaFiltroLigado = "1";
+        el.addEventListener("change", render);
+      }
+    });
+    var limpar = $("#oa-limpar-filtros");
+    if (limpar && !limpar.dataset.oaFiltroLigado) {
+      limpar.dataset.oaFiltroLigado = "1";
+      limpar.addEventListener("click", function () {
+        var s = $("#oa-filtro-selecao"), d = $("#oa-filtro-data"), c = $("#oa-ordem-campo"), o = $("#oa-ordem-direcao");
+        if (s) s.value = "";
+        if (d) d.value = "";
+        if (c) c.value = "data";
+        if (o) o.value = "asc";
+        render();
+      });
+    }
+  }
+
   function placarHTML(j) {
     if (j.scoreA == null || j.scoreB == null || j.state === "pre") return '<b>×</b>';
     return '<span class="oa-score"><b>' + j.scoreA + '</b><em>×</em><b>' + j.scoreB + '</b></span>';
@@ -573,17 +676,28 @@
   }
 
   function render() {
-    if (!JOGOS.length) { $("#lista").innerHTML = '<p class="vazio">Não consegui carregar os jogos agora. Tente recarregar a página.</p>'; return; }
-    JOGOS.sort(function (a, b) { return a.date - b.date; });
+    if (!JOGOS.length) {
+      $("#lista").innerHTML = '<p class="vazio">Não consegui carregar os jogos agora. Tente recarregar a página.</p>';
+      atualizarResumoFiltros(0);
+      return;
+    }
+    var lista = jogosFiltradosOrdenados();
+    atualizarResumoFiltros(lista.length);
+    if (!lista.length) {
+      $("#lista").innerHTML = '<div class="oa-sem-resultados">Nenhum jogo encontrado com esses filtros.<br>Use “Limpar filtros” para voltar à lista completa.</div>';
+      return;
+    }
+
     var html = "", diaAtual = "";
-    JOGOS.forEach(function (j) {
+    lista.forEach(function (j) {
       var dk = diaChave(j.date);
-      if (dk !== diaAtual) {
+      if (FILTROS.campo !== "selecao" && dk !== diaAtual) {
         diaAtual = dk;
         html += '<div class="dia-cab">' + fmtData(j.date) + "</div>";
       }
       var botoes = botoesPosJogo(j);
       html += '<div class="oa-jogo">' +
+        (FILTROS.campo === "selecao" ? '<div class="dia-cab" style="margin-top:0">' + fmtData(j.date) + "</div>" : "") +
         '<div class="oa-matchline">' +
           timeHTML(j, "a") +
           placarHTML(j) +
@@ -669,6 +783,8 @@
         });
       });
       aplicarProjecoesMata();
+      preencherFiltros();
+      ligarFiltros();
       render();
       var bi = $("#btn-ics"); if (bi) bi.onclick = baixarICS;
       var bc = $("#btn-share"); if (bc) bc.onclick = compartilhar;
