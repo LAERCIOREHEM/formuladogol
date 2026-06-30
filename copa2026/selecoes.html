@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://flagcdn.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css?v=20260630v2">
+<link rel="stylesheet" href="css/copa.css?v=20260630menu-selecoes-v1">
 <style>
   .wrap{max-width:600px;margin:0 auto;padding:16px 12px 60px}
 </style>
@@ -46,6 +46,13 @@
   </nav>
 
   <div class="sel-hint" id="sel-hint">Deslize para o lado <b>→</b> e toque em uma seleção para ver tudo</div>
+
+  <section class="sel-menu-box" aria-label="Menu de seleções">
+    <div class="sel-menu-title">Escolha uma seleção</div>
+    <div id="sel-menu-paises" class="sel-menu-paises" aria-label="Todos os países da Copa 2026">
+      <span class="sel-menu-loading">Carregando países…</span>
+    </div>
+  </section>
 
   <div id="sel-scroller" class="sel-scroller" aria-label="Seleções (deslize para o lado)">
     <div class="sel-vazio">Carregando seleções…</div>
@@ -67,7 +74,7 @@
 </footer>
 
 <script src="js/times.js?v=20260623e2"></script>
-<script src="js/selecoes.js?v=20260630sel-v2"></script>
+<script src="js/selecoes.js?v=20260630sel-menu-v1"></script>
 <script src="js/config.js?v=20260621f"></script>
 <script src="js/feedback.js?v=20260629sugestoes-compacto"></script>
 </body>
