@@ -289,6 +289,7 @@
         '</div>' +
         '<div class="stat-meta">' + metaSel + '</div>' +
         '<div class="stat-num"><b>' + val + '</b><small>' + esc(rotuloValor(val)) + '</small></div>' +
+        marcadoresDaSelecao(item) +
       '</article>';
     }
     var meta = '<span class="stat-muted">' + (item.jogos && item.jogos.length ? item.jogos.length : 1) + ' jogo' + ((item.jogos || []).length > 1 ? 's' : '') + '</span>';
