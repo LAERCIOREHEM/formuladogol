@@ -38,6 +38,33 @@
       "</button>";
   }
 
+
+  function menuPaisHTML(s) {
+    return '<button class="sel-menu-chip" type="button" data-id="' + esc(s.id) + '">' +
+      '<img src="' + flagUrl(s.iso2, 40) + '" alt="" loading="lazy" width="24" height="16">' +
+      '<span>' + esc(s.nome) + '</span>' +
+      '<small>' + esc(s.id) + '</small>' +
+    '</button>';
+  }
+
+  function renderMenuPaises() {
+    var el = $("#sel-menu-paises");
+    if (!el) return;
+    el.innerHTML = SEL.length ? SEL.map(menuPaisHTML).join("") : '<span class="sel-menu-loading">Não foi possível carregar os países.</span>';
+  }
+
+  function marcaPaisAtivo(id) {
+    var box = $("#sel-menu-paises");
+    if (!box) return;
+    Array.prototype.slice.call(box.querySelectorAll(".sel-menu-chip")).forEach(function (b) {
+      var on = b.getAttribute("data-id") === id;
+      b.classList.toggle("on", on);
+      if (on && b.scrollIntoView) {
+        try { b.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); } catch (e) {}
+      }
+    });
+  }
+
   function renderLista() {
     var el = $("#sel-scroller");
     el.innerHTML = SEL.length ? SEL.map(cardHTML).join("") : '<div class="sel-vazio">Não foi possível carregar as seleções.</div>';
@@ -70,6 +97,7 @@
   function abreFicha(id) {
     var s = SEL.find(function (x) { return x.id === id; });
     if (!s) return;
+    marcaPaisAtivo(id);
     var pa = PAISES[id] || {};
     var trofeus = pa.copas ? '<div class="sel-det-copas"><span class="sel-det-trofeus" title="Títulos mundiais">' +
       "🏆".repeat(Math.min(pa.copas, 5)) + " <small>" + pa.copas + (pa.copas > 1 ? " títulos mundiais" : " título mundial") + "</small></span></div>" : "";
@@ -108,6 +136,12 @@
     $("#sel-scroller").addEventListener("click", function (e) {
       var b = e.target.closest(".sel-card"); if (b) abreFicha(b.getAttribute("data-id"));
     });
+    var menu = $("#sel-menu-paises");
+    if (menu) {
+      menu.addEventListener("click", function (e) {
+        var b = e.target.closest(".sel-menu-chip"); if (b) abreFicha(b.getAttribute("data-id"));
+      });
+    }
     $("#sel-detalhe").addEventListener("click", function (e) {
       if (e.target.closest(".sel-voltar")) voltar();
     });
@@ -129,7 +163,7 @@
       PAISES = (pj.paises) || {};
       ELENCOS = ej || {};
       if (!SEL.length) { $("#sel-scroller").innerHTML = '<div class="sel-vazio">Não foi possível carregar as seleções.</div>'; return; }
-      ligar(); renderLista();
+      renderMenuPaises(); ligar(); renderLista();
       var h = (location.hash || "").replace("#", "").toUpperCase();
       if (h && SEL.find(function (x) { return x.id === h; })) abreFicha(h);
     });
