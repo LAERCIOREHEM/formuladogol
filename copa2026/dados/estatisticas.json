@@ -1,12 +1,27 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências dependem de disponibilidade no summary/comentário da ESPN. Gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-06-30T22:30:55.335170Z",
+  "atualizado_em": "2026-06-30T22:40:54.108903Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 78,
   "falhas_summary": [],
   "artilheiros": [
+    {
+      "nome": "Kylian Mbappé",
+      "equipe": "FRA",
+      "gols": 6,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760457",
+        "760475",
+        "760492"
+      ],
+      "total_cartoes": 0
+    },
     {
       "nome": "Lionel Messi",
       "equipe": "ARG",
@@ -32,21 +47,6 @@
         "760430",
         "760454",
         "760490"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Kylian Mbappé",
-      "equipe": "FRA",
-      "gols": 5,
-      "assistencias": 2,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760432",
-        "760457",
-        "760475",
-        "760492"
       ],
       "total_cartoes": 0
     },
@@ -2013,7 +2013,7 @@
       "nome": "Michael Olise",
       "equipe": "FRA",
       "gols": 0,
-      "assistencias": 5,
+      "assistencias": 6,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
@@ -2197,6 +2197,21 @@
         "760417",
         "760443",
         "760489"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Kylian Mbappé",
+      "equipe": "FRA",
+      "gols": 6,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760457",
+        "760475",
+        "760492"
       ],
       "total_cartoes": 0
     },
@@ -2551,21 +2566,6 @@
       "jogos": [
         "760454",
         "760474"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Kylian Mbappé",
-      "equipe": "FRA",
-      "gols": 5,
-      "assistencias": 2,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760432",
-        "760457",
-        "760475",
-        "760492"
       ],
       "total_cartoes": 0
     },
@@ -7251,12 +7251,12 @@
   "por_selecao": [
     {
       "equipe": "FRA",
-      "gols": 11,
-      "assistencias": 17,
+      "gols": 12,
+      "assistencias": 19,
       "amarelos": 1,
       "vermelhos": 0,
       "jogos": 4,
-      "media_gols": 2.75
+      "media_gols": 3.0
     },
     {
       "equipe": "GER",
