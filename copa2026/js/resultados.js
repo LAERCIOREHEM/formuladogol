@@ -1445,20 +1445,40 @@
     const ids = [dpSigla(j.a), dpSigla(j.b)].filter(Boolean);
     return ids.length === 2 && ids[0] !== ids[1] ? ids : [];
   }
+  function refSlotMataVisual(valor, slot) {
+    // Em algumas estruturas o campo "valor" pode vir já humanizado como
+    // "Venc. M90" / "Perd. M101". Antes o resolver só entendia "WM90"/"LM101";
+    // por isso a fase seguinte mostrava "Venc. M90" em vez de "CAN ou MAR".
+    const candidatos = [slot, valor].filter(v => v !== undefined && v !== null && String(v).trim() !== "");
+    for (const c of candidatos) {
+      const raw = String(c || "").trim();
+      let m = raw.match(/^([WL])M\s*\.?\s*(\d+)$/i);
+      if (m) return { tipo:m[1].toUpperCase(), srcId:"M" + m[2] };
+
+      m = raw.match(/^(?:VENC\.?|VENCEDOR(?:ES)?|WIN(?:NER)?\.?)\s*M\s*\.?\s*(\d+)$/i);
+      if (m) return { tipo:"W", srcId:"M" + m[1] };
+
+      m = raw.match(/^(?:PERD\.?|PERDEDOR(?:ES)?|LOSER\.?)\s*M\s*\.?\s*(\d+)$/i);
+      if (m) return { tipo:"L", srcId:"M" + m[1] };
+    }
+    return null;
+  }
+
   function resolverSlotMataVisual(valor, slot) {
-    const raw = String(valor || slot || "");
-    const m = raw.match(/^([WL])M(\d+)$/i);
-    if (!m) return null;
-    const tipo = m[1].toUpperCase();
-    const srcId = "M" + m[2];
+    const ref = refSlotMataVisual(valor, slot);
+    if (!ref) return null;
+    const tipo = ref.tipo;
+    const srcId = ref.srcId;
     const src = MATA_JOGOS_BY_ID[srcId] || null;
     const ev = src ? eventoMataDeOuSlot(src, MATA_EVENTS) : (MATA_EVENTS || []).find(e => eventoContemIdMata(e, srcId));
 
     const definido = vencedorPerdedorDoEventoMata(ev, tipo);
     if (definido) return { tipo:"definido", id:definido };
 
-    // Versão elegante: só expande quando o jogo de origem tem exatamente dois lados
-    // concretos e limpos. Não mostra 4/8 possibilidades nem polui fases posteriores.
+    // Mostra os dois possíveis classificados quando o jogo de origem já tem
+    // os dois lados definidos, mesmo que a vaga ainda esteja como "Venc. Mxx".
+    // Isso replica a regra que já funciona na fase anterior e propaga para
+    // Quartas, Semis e Final sem inventar confronto.
     let poss = timesConcretosDoJogoMata(src);
     if (poss.length !== 2) poss = timesConcretosDoEventoMata(ev);
     if (poss.length === 2 && poss[0] !== poss[1]) return { tipo:"possiveis", ids:poss, src:srcId };
