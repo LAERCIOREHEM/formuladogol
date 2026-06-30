@@ -76,24 +76,69 @@ jobs:
 
       - name: Commitar e enviar se houve mudança
         if: env.RUN_COPA == 'true'
+        shell: bash
         run: |
+          set -euo pipefail
           cd "$GITHUB_WORKSPACE"
-          if [[ -z "$(git status --porcelain copa2026/dados/melhores-momentos.json copa2026/dados/lives.json copa2026/dados/jogos-completos.json copa2026/dados/estatisticas.json copa2026/dados/jogos-detalhes.json copa2026/dados/workflow_copa_estado.json)" ]]; then
+
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          FILES=(
+            "copa2026/dados/melhores-momentos.json"
+            "copa2026/dados/lives.json"
+            "copa2026/dados/jogos-completos.json"
+            "copa2026/dados/estatisticas.json"
+            "copa2026/dados/jogos-detalhes.json"
+            "copa2026/dados/workflow_copa_estado.json"
+          )
+
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Nada mudou — sem commit."
             exit 0
           fi
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add copa2026/dados/melhores-momentos.json copa2026/dados/lives.json copa2026/dados/jogos-completos.json copa2026/dados/estatisticas.json copa2026/dados/jogos-detalhes.json copa2026/dados/workflow_copa_estado.json
-          git commit -m "Atualiza melhores momentos, jogos completos, lives e estatísticas (automático)"
+
+          # Estes arquivos são artefatos automáticos. Se outro workflow ou commit
+          # chegar antes do nosso push, NÃO fazemos rebase desses JSONs, porque isso
+          # gera conflito artificial. Guardamos a saída recém-gerada, atualizamos
+          # para o origin/main mais novo e reaplicamos os JSONs por cima.
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            if [[ -f "$f" ]]; then
+              mkdir -p "$TMP_DIR/$(dirname "$f")"
+              cp "$f" "$TMP_DIR/$f"
+            fi
+          done
+
           for i in 1 2 3 4 5; do
-            if git push; then
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              if [[ -f "$TMP_DIR/$f" ]]; then
+                mkdir -p "$(dirname "$f")"
+                cp "$TMP_DIR/$f" "$f"
+              fi
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Após atualizar com origin/main, nada mudou — sem commit."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualiza melhores momentos, jogos completos, lives e estatísticas (automático)"
+
+            if git push origin HEAD:main; then
               echo "Push OK na tentativa $i."
               exit 0
             fi
-            echo "Push rejeitado (tentativa $i). Puxando novidades e tentando de novo..."
-            git pull --rebase --autostash origin main || true
+
+            echo "Push rejeitado na tentativa $i. O remoto avançou de novo; vou recalcular em cima do origin/main mais recente."
             sleep 3
           done
+
           echo "Não consegui enviar após várias tentativas."
           exit 1
