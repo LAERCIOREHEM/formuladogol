@@ -2,16 +2,19 @@ name: Atualiza seleções (elencos + rostos)
 
 on:
   schedule:
-    # 2h e 10h de Brasília (UTC-3) = 05:00 e 13:00 UTC
-    - cron: "0 5,13 * * *"
+    # VARREDURA DE MADRUGADA: 3h-6h de Brasília (UTC-3) = 6h,7h,8h,9h UTC, de hora em hora.
+    - cron: "0 6-9 * * *"
   workflow_dispatch:
     inputs:
       minutos_rostos:
         description: "Teto de tempo do robô de rostos (min)"
-        default: "8"
+        default: "18"
       limite_rostos:
         description: "Máx. de jogadores por rodada"
-        default: "250"
+        default: "400"
+      retry_dias:
+        description: "Re-tenta 'sem foto' após N dias (0 = re-tenta sempre, modo varredura)"
+        default: "0"
 
 permissions:
   contents: write
@@ -25,31 +28,55 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # Liga/desliga por data: depois de JANELA_FIM o workflow vira no-op (desliga sozinho).
+      - name: Janela de povoamento (liga/desliga por data)
+        id: guard
+        env:
+          JANELA_FIM: "2026-07-05"   # <-- edite aqui para estender/encurtar a janela
+        run: |
+          HOJE="$(date -u +%F)"
+          if [[ "$HOJE" > "$JANELA_FIM" ]]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Fora da janela de povoamento (terminou em $JANELA_FIM). Nada a fazer."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Dentro da janela (até $JANELA_FIM)."
+          fi
+
       - name: Checkout
+        if: steps.guard.outputs.run == 'true'
         uses: actions/checkout@v4
 
       - name: Set up Python
+        if: steps.guard.outputs.run == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Sanidade (selftests offline)
+        if: steps.guard.outputs.run == 'true'
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
           python buscar_selecoes.py --selftest
           python buscar_rostos_jogadores.py --selftest
 
       - name: Atualizar elencos (ESPN)
+        if: steps.guard.outputs.run == 'true'
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
           python buscar_selecoes.py
 
-      - name: Povoar rostos (upkeep leve, com teto de tempo)
+      - name: Povoar rostos (varredura, ritmo educado + retry)
+        if: steps.guard.outputs.run == 'true'
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
-          python buscar_rostos_jogadores.py --minutos "${{ github.event.inputs.minutos_rostos || '8' }}" --limite "${{ github.event.inputs.limite_rostos || '250' }}"
+          python buscar_rostos_jogadores.py \
+            --minutos "${{ github.event.inputs.minutos_rostos || '18' }}" \
+            --limite "${{ github.event.inputs.limite_rostos || '400' }}" \
+            --retry-dias "${{ github.event.inputs.retry_dias || '0' }}"
 
       - name: Commit (se algo mudou)
+        if: steps.guard.outputs.run == 'true'
         run: |
           cd "$GITHUB_WORKSPACE"
           git add copa2026/dados/elencos.json copa2026/dados/rostos.json \
@@ -61,7 +88,7 @@ jobs:
           fi
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git commit -m "Atualiza selecoes (elencos + rostos) - automatico"
+          git commit -m "Povoa rostos (varredura) - automatico"
           for i in 1 2 3 4 5; do
             if git push; then echo "Push OK ($i)."; exit 0; fi
             echo "Push rejeitado ($i); rebase e tenta de novo..."
