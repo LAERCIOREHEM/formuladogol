@@ -1446,9 +1446,9 @@
     return ids.length === 2 && ids[0] !== ids[1] ? ids : [];
   }
   function refSlotMataVisual(valor, slot) {
-    // Em algumas estruturas o campo "valor" pode vir já humanizado como
-    // "Venc. M90" / "Perd. M101". Antes o resolver só entendia "WM90"/"LM101";
-    // por isso a fase seguinte mostrava "Venc. M90" em vez de "CAN ou MAR".
+    // Aceita tanto a estrutura crua (WM90/LM101) quanto o texto humanizado
+    // ("Venc. M90" / "Perd. M101"). A ordem slot -> valor preserva a estrutura
+    // oficial quando os dois campos existem.
     const candidatos = [slot, valor].filter(v => v !== undefined && v !== null && String(v).trim() !== "");
     for (const c of candidatos) {
       const raw = String(c || "").trim();
@@ -1464,23 +1464,65 @@
     return null;
   }
 
+  function jogoMataPorIdOuEvento(srcId) {
+    return MATA_JOGOS_BY_ID[srcId] || null;
+  }
+
+  function eventoMataPorJogoOuId(src, srcId) {
+    return src ? eventoMataDeOuSlot(src, MATA_EVENTS) : (MATA_EVENTS || []).find(e => eventoContemIdMata(e, srcId));
+  }
+
+  function ladoUnicoResolvidoMata(valor, slot, visitados) {
+    const direto = dpSigla(valor) || dpSigla(slot);
+    if (direto) return direto;
+
+    const ref = refSlotMataVisual(valor, slot);
+    if (!ref) return null;
+    const chave = ref.tipo + ref.srcId;
+    if (visitados && visitados[chave]) return null;
+
+    const novoVisitados = Object.assign({}, visitados || {});
+    novoVisitados[chave] = true;
+
+    const src = jogoMataPorIdOuEvento(ref.srcId);
+    const ev = eventoMataPorJogoOuId(src, ref.srcId);
+
+    // Para um lado virar uma seleção única, o jogo de origem precisa estar
+    // encerrado. Antes disso, o vencedor/perdedor ainda é uma possibilidade,
+    // não uma seleção única.
+    const definido = vencedorPerdedorDoEventoMata(ev, ref.tipo);
+    if (definido) return definido;
+
+    return null;
+  }
+
+  function timesResolvidosDosLadosMata(j, visitados) {
+    if (!j) return [];
+    const a = ladoUnicoResolvidoMata(j.a, j.slotA, visitados);
+    const b = ladoUnicoResolvidoMata(j.b, j.slotB, visitados);
+    return a && b && a !== b ? [a, b] : [];
+  }
+
   function resolverSlotMataVisual(valor, slot) {
     const ref = refSlotMataVisual(valor, slot);
     if (!ref) return null;
-    const tipo = ref.tipo;
     const srcId = ref.srcId;
-    const src = MATA_JOGOS_BY_ID[srcId] || null;
-    const ev = src ? eventoMataDeOuSlot(src, MATA_EVENTS) : (MATA_EVENTS || []).find(e => eventoContemIdMata(e, srcId));
+    const src = jogoMataPorIdOuEvento(srcId);
+    const ev = eventoMataPorJogoOuId(src, srcId);
 
-    const definido = vencedorPerdedorDoEventoMata(ev, tipo);
+    const definido = vencedorPerdedorDoEventoMata(ev, ref.tipo);
     if (definido) return { tipo:"definido", id:definido };
 
-    // Mostra os dois possíveis classificados quando o jogo de origem já tem
-    // os dois lados definidos, mesmo que a vaga ainda esteja como "Venc. Mxx".
-    // Isso replica a regra que já funciona na fase anterior e propaga para
-    // Quartas, Semis e Final sem inventar confronto.
+    // Primeiro tenta participantes diretamente concretos; depois tenta os dois
+    // lados já resolvidos por jogos anteriores encerrados. Esse era o ponto que
+    // faltava: M90 podia aparecer visualmente como Canadá x Marrocos, mas M97
+    // ainda lia o M90 como "Venc. M73" x "Venc. M75".
     let poss = timesConcretosDoJogoMata(src);
+    if (poss.length !== 2) poss = timesResolvidosDosLadosMata(src, {});
     if (poss.length !== 2) poss = timesConcretosDoEventoMata(ev);
+
+    // Segurança: só mostra "A ou B" quando o jogo de origem tem exatamente
+    // dois lados resolvidos. Não abre 3/4/8 possibilidades em fases futuras.
     if (poss.length === 2 && poss[0] !== poss[1]) return { tipo:"possiveis", ids:poss, src:srcId };
 
     return null;
