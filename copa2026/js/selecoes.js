@@ -38,15 +38,9 @@
       "</button>";
   }
 
-  function renderGrid() {
-    var q = norm($("#sel-busca").value), g = $("#sel-grupo").value;
-    var arr = SEL.filter(function (s) {
-      if (g && s.grupo !== g) return false;
-      if (q && norm(s.nome).indexOf(q) < 0 && norm(s.id).indexOf(q) < 0) return false;
-      return true;
-    });
-    var el = $("#sel-grid");
-    el.innerHTML = arr.length ? arr.map(cardHTML).join("") : '<div class="sel-vazio">Nenhuma seleção encontrada.</div>';
+  function renderLista() {
+    var el = $("#sel-scroller");
+    el.innerHTML = SEL.length ? SEL.map(cardHTML).join("") : '<div class="sel-vazio">Não foi possível carregar as seleções.</div>';
   }
 
   function squadHTML(id) {
@@ -99,29 +93,19 @@
       squadHTML(id);
     var det = $("#sel-detalhe");
     det.innerHTML = html; det.hidden = false;
-    $("#sel-grid").hidden = true; $(".sel-bar").hidden = true; $(".sel-hero").hidden = true;
+    $("#sel-scroller").hidden = true; $("#sel-hint").hidden = true;
     if (window.history && history.replaceState) { try { history.replaceState(null, "", "#" + id); } catch (e) {} }
     window.scrollTo(0, 0);
   }
 
   function voltar() {
     var det = $("#sel-detalhe"); det.hidden = true; det.innerHTML = "";
-    $("#sel-grid").hidden = false; $(".sel-bar").hidden = false; $(".sel-hero").hidden = false;
+    $("#sel-scroller").hidden = false; $("#sel-hint").hidden = false;
     if (window.history && history.replaceState) { try { history.replaceState(null, "", location.pathname); } catch (e) {} }
   }
 
-  function popularGrupos() {
-    var gs = [];
-    SEL.forEach(function (s) { if (s.grupo && gs.indexOf(s.grupo) < 0) gs.push(s.grupo); });
-    gs.sort();
-    $("#sel-grupo").innerHTML = '<option value="">Todos os grupos</option>' +
-      gs.map(function (g) { return '<option value="' + esc(g) + '">Grupo ' + esc(g) + "</option>"; }).join("");
-  }
-
   function ligar() {
-    $("#sel-busca").addEventListener("input", renderGrid);
-    $("#sel-grupo").addEventListener("change", renderGrid);
-    $("#sel-grid").addEventListener("click", function (e) {
+    $("#sel-scroller").addEventListener("click", function (e) {
       var b = e.target.closest(".sel-card"); if (b) abreFicha(b.getAttribute("data-id"));
     });
     $("#sel-detalhe").addEventListener("click", function (e) {
@@ -144,8 +128,8 @@
       SEL.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), "pt-BR"); });
       PAISES = (pj.paises) || {};
       ELENCOS = ej || {};
-      if (!SEL.length) { $("#sel-grid").innerHTML = '<div class="sel-vazio">Não foi possível carregar as seleções.</div>'; return; }
-      popularGrupos(); ligar(); renderGrid();
+      if (!SEL.length) { $("#sel-scroller").innerHTML = '<div class="sel-vazio">Não foi possível carregar as seleções.</div>'; return; }
+      ligar(); renderLista();
       var h = (location.hash || "").replace("#", "").toUpperCase();
       if (h && SEL.find(function (x) { return x.id === h; })) abreFicha(h);
     });
