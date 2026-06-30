@@ -11,6 +11,7 @@
 
   var API_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200";
   var DADOS = { atualizado_em: null, jogos_processados: 0, artilheiros: [], assistencias: [], por_selecao: [] };
+  var ROSTOS = {};
   var JOGOS = [];
   var ABA = "artilheiros";
   var FILTRO = "TODAS";
@@ -33,6 +34,22 @@
     if (!sigla) return "";
     var src = window.COPA_TIMES && COPA_TIMES.flag ? COPA_TIMES.flag(sigla, 80) : "";
     return src ? '<img class="stat-flag" src="' + esc(src) + '" alt="" loading="lazy">' : "";
+  }
+
+  function normNome(s) {
+    return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+  }
+  function silhuetaArt() {
+    return '<span class="stat-face stat-face-ph" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.4 0-9 2.2-9 6v2h18v-2c0-3.8-4.6-6-9-6Z"/></svg></span>';
+  }
+  function faceArtilheiro(equipe, nome) {
+    var mapa = ROSTOS && ROSTOS.mapa;
+    if (mapa && equipe && nome) {
+      var foto = mapa[String(equipe).toUpperCase() + "|" + normNome(nome)];
+      if (foto) return '<span class="stat-face"><img src="' + esc(foto) + '" alt="" loading="lazy"></span>';
+    }
+    return silhuetaArt();
   }
 
   function siglaSelecao(valor) {
@@ -295,6 +312,7 @@
     var meta = '<span class="stat-muted">' + (item.jogos && item.jogos.length ? item.jogos.length : 1) + ' jogo' + ((item.jogos || []).length > 1 ? 's' : '') + '</span>';
     return '<article class="stat-row">' +
       '<div class="stat-pos">' + (idx + 1) + 'º</div>' +
+      faceArtilheiro(item.equipe, item.nome) +
       '<div class="stat-player">' +
         '<strong>' + esc(item.nome || '—') + '</strong>' +
         '<span>' + flag(item.equipe) + esc(nomeSelecao(item.equipe)) + '</span>' +
@@ -392,9 +410,15 @@
       return (j.events || []).map(normalizarJogo);
     }).catch(function () { return []; });
 
-    var ambos = await Promise.all([dadosReq, jogosReq]);
+    var rostosReq = fetch('dados/rostos.json?v=' + Date.now()).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).catch(function () { return {}; });
+
+    var ambos = await Promise.all([dadosReq, jogosReq, rostosReq]);
     DADOS = ambos[0] || DADOS;
     JOGOS = ambos[1] || [];
+    ROSTOS = ambos[2] || {};
     renderTudo();
   }
   document.addEventListener('DOMContentLoaded', function () {
