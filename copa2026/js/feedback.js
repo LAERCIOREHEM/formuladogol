@@ -78,3 +78,58 @@
   function iniciar() { document.querySelectorAll("[data-feedback], .js-feedback").forEach(a => { if (a.dataset.fbReady) return; a.dataset.fbReady = "1"; a.addEventListener("click", e => { e.preventDefault(); abrirFeedback(); }); }); }
   document.addEventListener("DOMContentLoaded", iniciar);
 })();
+
+
+/* ==========================================================================
+   MENU PRINCIPAL — centralizar item ativo
+   Não altera layout, largura, fonte, espaçamento nem o comportamento do scroll.
+   Apenas ajusta a posição inicial do scroll para deixar a aba ativa no centro.
+   ========================================================================== */
+(function () {
+  "use strict";
+
+  function centerActiveMenuItem() {
+    var menu = document.querySelector(".menu");
+    if (!menu) return;
+
+    var active = menu.querySelector("a.ativo, a.active, [aria-current='page']");
+    if (!active) return;
+
+    if (menu.scrollWidth <= menu.clientWidth + 2) return;
+
+    var target = active.offsetLeft - ((menu.clientWidth - active.offsetWidth) / 2);
+    var max = menu.scrollWidth - menu.clientWidth;
+    if (target < 0) target = 0;
+    if (target > max) target = max;
+
+    try {
+      menu.scrollTo({ left: target, behavior: "auto" });
+    } catch (e) {
+      menu.scrollLeft = target;
+    }
+  }
+
+  function scheduleCenter() {
+    centerActiveMenuItem();
+    setTimeout(centerActiveMenuItem, 40);
+    setTimeout(centerActiveMenuItem, 160);
+    setTimeout(centerActiveMenuItem, 420);
+  }
+
+  var resizeTimer = null;
+  function onResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(centerActiveMenuItem, 120);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", scheduleCenter);
+  } else {
+    scheduleCenter();
+  }
+
+  window.addEventListener("load", scheduleCenter);
+  window.addEventListener("pageshow", scheduleCenter);
+  window.addEventListener("resize", onResize);
+})();
+
