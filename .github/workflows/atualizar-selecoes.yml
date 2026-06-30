@@ -30,16 +30,22 @@ jobs:
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
           python buscar_selecoes.py --selftest
+          python buscar_rostos_jogadores.py --selftest
 
       - name: Buscar elencos e rostos na ESPN
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
           python buscar_selecoes.py
 
+      - name: Enriquecer rostos com ESPN/Wikimedia
+        run: |
+          cd "$GITHUB_WORKSPACE/copa2026"
+          python buscar_rostos_jogadores.py
+
       - name: Commit (se algo mudou)
         run: |
           cd "$GITHUB_WORKSPACE"
-          git add copa2026/dados/elencos.json copa2026/dados/rostos.json copa2026/img/jogadores 2>/dev/null || true
+          git add copa2026/dados/elencos.json copa2026/dados/rostos.json copa2026/dados/rostos_relatorio.json copa2026/img/jogadores 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "Nada mudou — sem commit."
             exit 0
