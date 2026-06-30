@@ -879,3 +879,69 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 .sel-cred-lista{list-style:none;margin:0;padding:0;max-height:320px;overflow:auto;display:flex;flex-direction:column;gap:6px}
 .sel-cred-lista li{font-size:11.5px;color:#dce7f5;line-height:1.4;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:5px}
 .sel-cred-lista li b{color:#fff}
+
+/* ========================================================================== 
+   SELEÇÕES — desempenho por seleção, ranking FIFA e jogos da equipe
+   Adiciona informações sem alterar menu, scroll superior ou identidade visual.
+   ========================================================================== */
+.sel-det-ranking{font-size:10.5px;max-width:124px;text-align:center;line-height:1.15}
+.sel-section-title{font-family:'Anton',sans-serif;font-weight:400;font-size:15px;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;margin:16px 2px 10px}
+.sel-performance{margin:10px 0 14px;background:rgba(19,41,75,.74);border:1px solid var(--linha);border-radius:16px;padding:12px;box-shadow:0 10px 28px rgba(0,0,0,.14)}
+.sel-perf-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.sel-perf-head b{display:block;font-family:'Anton',sans-serif;font-weight:400;font-size:17px;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;line-height:1.05}
+.sel-perf-head span{display:block;color:#cbd8ea;font-size:11.5px;line-height:1.35;margin-top:3px}
+.sel-perf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sel-perf-card{background:rgba(7,27,51,.58);border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:9px 8px;min-width:0;text-align:center}
+.sel-perf-card.destaque{background:linear-gradient(180deg,rgba(244,197,66,.16),rgba(244,197,66,.07));border-color:rgba(244,197,66,.32)}
+.sel-perf-card span{display:block;color:var(--cinza);font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.55px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sel-perf-card b{display:block;color:var(--branco);font-size:17px;font-weight:900;line-height:1.1;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sel-perf-card small{display:block;color:#b7c5d9;font-size:9.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sel-perf-note{margin:9px 2px 0;color:#cbd8ea;font-size:11px;line-height:1.35}
+.sel-leaders{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.sel-leaders div{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:9px 10px;min-width:0}
+.sel-leaders span{display:block;color:var(--cinza);font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.45px;margin-bottom:3px}
+.sel-leaders b{display:block;color:var(--branco);font-size:12px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sel-matches{margin:14px 0 14px}
+.sel-match-list{display:flex;flex-direction:column;gap:10px}
+.sel-match-card{background:var(--navy-2);border:1px solid var(--linha);border-radius:14px;padding:11px;box-shadow:0 9px 22px rgba(0,0,0,.12)}
+.sel-match-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.sel-match-fase{color:var(--gold);font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+.sel-match-badge{flex:0 0 auto;color:#dce7f5;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.09);border-radius:999px;padding:4px 8px;font-size:10px;font-weight:900;white-space:nowrap}
+.sel-match-badge.pre{color:#f4d266;background:rgba(244,197,66,.10);border-color:rgba(244,197,66,.28)}
+.sel-match-badge.live{color:#fff;background:rgba(224,71,62,.86);border-color:rgba(255,255,255,.18)}
+.sel-match-line{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:9px}
+.sel-match-team{display:flex;align-items:center;gap:7px;min-width:0;color:#dce7f5;font-size:12px;font-weight:800;line-height:1.15}
+.sel-match-team.dir{justify-content:flex-end;text-align:right}
+.sel-match-team img{width:25px;height:17px;object-fit:cover;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.14);flex:0 0 auto}
+.sel-match-team span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel-match-team-on span{color:#fff;text-decoration:underline;text-decoration-color:rgba(244,197,66,.70);text-underline-offset:3px}
+.sel-match-mid{text-align:center;min-width:58px}
+.sel-match-score{font-size:17px;font-weight:900;color:#fff;line-height:1.05;white-space:nowrap}
+.sel-match-date{font-size:10px;color:var(--cinza);margin-top:4px;white-space:nowrap}
+.sel-match-sep{display:inline-block;color:var(--gold);margin:0 4px}
+.sel-match-pen{color:#f4d266;font-size:11px;text-align:center;margin-top:8px;line-height:1.35}
+.sel-match-venue{color:var(--cinza);font-size:11px;text-align:center;line-height:1.35;margin-top:8px}
+.sel-scorers-box{margin:12px 0 14px;background:rgba(7,27,51,.48);border:1px solid var(--linha);border-radius:14px;overflow:hidden}
+.sel-scorers-box > summary{list-style:none;color:var(--gold);font-weight:900;font-size:12.5px;cursor:pointer;padding:12px 13px}
+.sel-scorers-box > summary::-webkit-details-marker{display:none}
+.sel-scorer-list{border-top:1px solid rgba(255,255,255,.08)}
+.sel-scorer-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 13px;border-top:1px solid rgba(255,255,255,.06)}
+.sel-scorer-row:first-child{border-top:0}
+.sel-scorer-row span{color:#dce7f5;font-size:12px;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel-scorer-row b{flex:0 0 auto;color:#332400;background:var(--gold);border-radius:999px;min-width:28px;padding:3px 8px;text-align:center;font-size:12px;font-weight:900}
+.sel-scorer-row.muted span{color:var(--cinza);font-weight:700;white-space:normal}
+@media(max-width:520px){
+  .sel-det-ranking{max-width:102px;font-size:9.5px;padding:5px 8px}
+  .sel-performance{padding:11px 10px;border-radius:15px}
+  .sel-perf-grid{grid-template-columns:repeat(2,1fr);gap:7px}
+  .sel-perf-card{padding:8px 7px}
+  .sel-perf-card b{font-size:16px}
+  .sel-leaders{grid-template-columns:1fr}
+  .sel-match-card{padding:10px;border-radius:13px}
+  .sel-match-line{gap:7px}
+  .sel-match-team{font-size:11.5px;gap:5px}
+  .sel-match-team img{width:22px;height:15px}
+  .sel-match-score{font-size:16px}
+  .sel-match-mid{min-width:54px}
+}
+.sel-card-meta{justify-content:center;text-align:center;line-height:1.08;white-space:normal;max-width:92px;flex-wrap:wrap}
