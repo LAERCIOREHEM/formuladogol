@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://flagcdn.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css?v=20260630sel">
+<link rel="stylesheet" href="css/copa.css?v=20260630v2">
 <style>
   .wrap{max-width:600px;margin:0 auto;padding:16px 12px 60px}
 </style>
@@ -45,19 +45,11 @@
     <a href="palpite.html"><span class="mi" aria-hidden="true">📝</span> Meus Palpites</a>
   </nav>
 
-  <section class="sel-hero">
-    <h2>Seleções da Copa 2026</h2>
-    <p>Curiosidades, elenco e os rostos das <b>48 seleções</b>. Toque em um país para abrir a ficha completa.</p>
-  </section>
+  <div class="sel-hint" id="sel-hint">Deslize para o lado <b>→</b> e toque em uma seleção para ver tudo</div>
 
-  <div class="sel-bar">
-    <input id="sel-busca" type="search" placeholder="Buscar seleção…" autocomplete="off" aria-label="Buscar seleção">
-    <select id="sel-grupo" aria-label="Filtrar por grupo"><option value="">Todos os grupos</option></select>
-  </div>
-
-  <main id="sel-grid" class="sel-grid" aria-label="Lista de seleções">
+  <div id="sel-scroller" class="sel-scroller" aria-label="Seleções (deslize para o lado)">
     <div class="sel-vazio">Carregando seleções…</div>
-  </main>
+  </div>
 
   <section id="sel-detalhe" class="sel-detalhe" aria-live="polite" hidden></section>
 
@@ -75,7 +67,7 @@
 </footer>
 
 <script src="js/times.js?v=20260623e2"></script>
-<script src="js/selecoes.js?v=20260630sel-v1"></script>
+<script src="js/selecoes.js?v=20260630sel-v2"></script>
 <script src="js/config.js?v=20260621f"></script>
 <script src="js/feedback.js?v=20260629sugestoes-compacto"></script>
 </body>
