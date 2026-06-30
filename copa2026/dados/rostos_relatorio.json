@@ -1,10 +1,23 @@
 {
-  "_nota": "Relatório inicial. O workflow Atualiza seleções preencherá/atualizará após rodar buscar_rostos_jogadores.py.",
-  "gerado_em": "manual-pacote",
-  "cobertura_atual": {
+  "_nota": "Relatório de cobertura de fotos dos jogadores. Ausência de foto não é erro; o front usa fallback.",
+  "gerado_em": "2026-06-30T16:04:32Z",
+  "config": {
+    "sem_espn": false,
+    "sem_wikimedia": false,
+    "min_conf": 0.86,
+    "max_wikidata_rostos": 0
+  },
+  "cobertura": {
     "selecoes": 48,
     "jogadores": 1246,
-    "com_foto_atual": 127,
-    "fallback_atual": 1119
+    "ja_tinham_foto": 127,
+    "adicionados_espn": 0,
+    "adicionados_wikimedia": 48,
+    "sem_foto": 1071,
+    "erros": [],
+    "fontes": {
+      "ESPN": 0,
+      "Wikimedia Commons": 48
+    }
   }
 }
