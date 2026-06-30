@@ -40,6 +40,7 @@ import threading
 import time
 import unicodedata
 import urllib.parse
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone, date
 
@@ -115,24 +116,61 @@ def eh_footballer(descricao):
     return any(x in d for x in ("football", "soccer", "footballer", "futbol", "futebol", "goalkeeper"))
 
 # ------------------------------------------------------------------ HTTP
-def http_bytes(url, timeout=25):
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        data = r.read()
-        info = r.info()
-        ctype = info.get_content_type() if info else ""
-        return data, (ctype or ""), r.geturl()
+# --- Rate limit "educado" por host + retry com espera (Retry-After) ---------
+_LIM_LOCK = threading.Lock()
+_HOST_LOCK = {}
+_HOST_ULT = {}
 
-def http_json(url, timeout=25, tentativas=2):
+def _balde(host):
+    h = (host or "").lower()
+    if "wikipedia.org" in h or "wikimedia.org" in h or "wikidata.org" in h:
+        return "wiki", 0.34          # ~3 req/s no total para todas as fontes wiki
+    if "espncdn.com" in h or "espn.com" in h:
+        return "espn", 0.05
+    return host, 0.05
+
+def _throttle(url):
+    host = urllib.parse.urlparse(url).netloc
+    chave, intervalo = _balde(host)
+    with _LIM_LOCK:
+        lock = _HOST_LOCK.setdefault(chave, threading.Lock())
+    with lock:  # serializa o balde -> ritmo global educado mesmo com várias threads
+        espera = _HOST_ULT.get(chave, 0.0) + intervalo - time.time()
+        if espera > 0:
+            time.sleep(espera)
+        _HOST_ULT[chave] = time.time()
+
+def http_bytes(url, timeout=25, tentativas=4):
     ultimo = None
     for i in range(tentativas):
+        _throttle(url)
         try:
-            data, _, _ = http_bytes(url, timeout=timeout)
-            return json.loads(data.decode("utf-8", "replace"))
+            req = urllib.request.Request(url, headers=HEADERS)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                info = r.info()
+                return r.read(), (info.get_content_type() if info else "") or "", r.geturl()
+        except urllib.error.HTTPError as e:
+            ultimo = e
+            if e.code in (429, 503):           # too many requests / indisponível -> espera e re-tenta
+                ra = e.headers.get("Retry-After") if e.headers else None
+                espera = min(float(ra), 45) if (ra and str(ra).strip().isdigit()) else min(3.0 * (i + 1), 30)
+                time.sleep(espera)
+                continue
+            if 500 <= e.code < 600:
+                time.sleep(1.5 * (i + 1))
+                continue
+            raise                              # 404 etc.: não adianta re-tentar
         except Exception as e:
             ultimo = e
-            time.sleep(0.6 * (i + 1))
-    return None
+            time.sleep(1.0 * (i + 1))
+    raise ultimo if ultimo else RuntimeError("falha http")
+
+def http_json(url, timeout=25):
+    try:
+        data, _, _ = http_bytes(url, timeout=timeout)
+        return json.loads(data.decode("utf-8", "replace"))
+    except Exception:
+        return None
 
 def ext_por_mime(mime, url=""):
     mime = (mime or "").lower()
@@ -402,6 +440,8 @@ def rodar(args):
             trabalho.append((sigla, p, k))
 
     if args.limite and len(trabalho) > args.limite:
+        import random
+        random.shuffle(trabalho)          # amostra diferente a cada rodada (varredura)
         trabalho = trabalho[:args.limite]
     print("→ %d jogadores no total | %d já tinham foto | %d pulados por memória | %d a processar agora"
           % (st["jogadores"], st["ja_tinham"], st["pulados_memoria"], len(trabalho)))
@@ -532,7 +572,7 @@ def main():
     ap.add_argument("--sem-wikipedia", action="store_true")
     ap.add_argument("--sem-wikimedia", action="store_true")
     ap.add_argument("--min-conf", type=float, default=0.80, help="confiança mínima no nome (Wikidata)")
-    ap.add_argument("--workers", type=int, default=12, help="downloads em paralelo")
+    ap.add_argument("--workers", type=int, default=8, help="downloads em paralelo")
     ap.add_argument("--minutos", type=float, default=0, help="teto de tempo (0 = sem limite, p/ rodar local)")
     ap.add_argument("--limite", type=int, default=0, help="máx. de jogadores a processar nesta rodada (0 = todos)")
     ap.add_argument("--retry-dias", type=int, default=30, help="re-tenta 'sem foto' após N dias")
