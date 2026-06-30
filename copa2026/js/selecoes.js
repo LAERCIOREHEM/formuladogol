@@ -1,16 +1,19 @@
 /* =========================================================================
    selecoes.js — Aba SELEÇÕES
-   Lê dados/selecoes.json (países/grupos/iso2), dados/paises.json (curiosidades)
-   e dados/elencos.json (elenco + fotos, gerado por buscar_selecoes.py).
-   Degrada com elegância: sem elencos.json populado, mostra silhuetas.
+   Lê dados/selecoes.json (países/ranking/iso2), dados/paises.json
+   (curiosidades), dados/elencos.json (elenco + fotos) e reaproveita
+   dados/estatisticas.json + scoreboard ESPN para montar o raio-x de cada país.
+   Degrada com elegância: se um feed falhar, mostra apenas o que estiver seguro.
    ========================================================================= */
 (function () {
   "use strict";
   var $ = function (s, r) { return (r || document).querySelector(s); };
 
+  var API_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=20260611-20260719&limit=200";
+
   function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    return String(s == null ? "" : s).replace(/[&<>\"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '\"': "&quot;", "'": "&#39;" }[c];
     });
   }
   function norm(s) {
@@ -45,7 +48,14 @@
       esc(iniciais(nome)) + "</span>";
   }
 
-  var SEL = [], PAISES = {}, ELENCOS = {};
+  var SEL = [], PAISES = {}, ELENCOS = {}, DADOS = {}, JOGOS = [];
+  var STATS_CARREGADAS = false;
+  var ID_ATUAL = "";
+
+  function rankingLabel(s) {
+    var r = s && s.seed;
+    return r ? ("Ranking FIFA #" + r) : "Ranking FIFA —";
+  }
 
   function cardHTML(s) {
     var pa = PAISES[s.id] || {};
@@ -53,10 +63,9 @@
     return '<button class="sel-card" type="button" data-id="' + esc(s.id) + '">' +
       '<img class="sel-flag" src="' + flagUrl(s.iso2, 80) + '" alt="" loading="lazy" width="48" height="32">' +
       '<span class="sel-card-nome">' + esc(s.nome) + "</span>" +
-      '<span class="sel-card-meta">Grupo ' + esc(s.grupo || "?") + copas + "</span>" +
+      '<span class="sel-card-meta">' + esc(rankingLabel(s)) + copas + "</span>" +
       "</button>";
   }
-
 
   function menuPaisHTML(s) {
     return '<option value="' + esc(s.id) + '">' +
@@ -120,9 +129,285 @@
     return val ? '<div class="sel-fact"><span>' + esc(label) + "</span><b>" + esc(val) + "</b></div>" : "";
   }
 
+  function nomeSelecao(sigla) {
+    if (window.COPA_TIMES && COPA_TIMES.nome) return COPA_TIMES.nome(sigla);
+    var achou = SEL.find(function (x) { return x.id === sigla; });
+    return achou ? achou.nome : (sigla || "—");
+  }
+  function siglaSelecao(valor) {
+    if (!valor) return "";
+    if (window.COPA_TIMES && COPA_TIMES.sigla) return COPA_TIMES.sigla(valor) || valor;
+    return valor;
+  }
+  function flagEquipe(sigla) {
+    var src = window.COPA_TIMES && COPA_TIMES.flag ? COPA_TIMES.flag(sigla, 80) : "";
+    if (!src) {
+      var s = SEL.find(function (x) { return x.id === sigla; });
+      src = s ? flagUrl(s.iso2, 80) : "";
+    }
+    return src ? '<img src="' + esc(src) + '" alt="" loading="lazy">' : "";
+  }
+  function getPath(o, path, fb) {
+    var x = o;
+    for (var i = 0; i < path.length; i++) {
+      if (x == null) return fb;
+      x = x[path[i]];
+    }
+    return x == null ? fb : x;
+  }
+  function numPlacar(v) {
+    if (v == null || v === "") return null;
+    var n = parseInt(String(v).replace(/[^0-9-]/g, ""), 10);
+    return isNaN(n) ? null : n;
+  }
+  function scoreCompetidor(c) {
+    var vals = [c && c.score, c && c.displayScore, c && c.curScore, c && c.currentScore, getPath(c, ["score", "value"], null)];
+    for (var i = 0; i < vals.length; i++) {
+      var n = numPlacar(vals[i]);
+      if (n != null) return n;
+    }
+    var ls = c && c.linescores;
+    if (ls && ls.length) {
+      var ultimo = ls[ls.length - 1] || {};
+      var n2 = numPlacar(ultimo.value != null ? ultimo.value : ultimo.displayValue);
+      if (n2 != null) return n2;
+    }
+    return null;
+  }
+  function placarPenaltiCompetidor(c) {
+    var vals = [c && c.shootoutScore, c && c.shootoutDisplayScore, c && c.penaltyScore, c && c.penalties, c && c.shootout];
+    for (var i = 0; i < vals.length; i++) {
+      var n = numPlacar(vals[i]);
+      if (n != null) return n;
+    }
+    return null;
+  }
+  function compOf(ev) { return (ev && ev.competitions && ev.competitions[0]) || {}; }
+  function teamOf(ev, side) {
+    var cs = compOf(ev).competitors || [];
+    return cs.filter(function (c) { return c.homeAway === side; })[0] || (side === "home" ? cs[0] : cs[1]) || {};
+  }
+  function teamSigla(c) {
+    return siglaSelecao((c.team && (c.team.abbreviation || c.team.shortDisplayName || c.team.displayName)) || "");
+  }
+  function venueOf(ev) {
+    var v = compOf(ev).venue;
+    return v ? (v.fullName + (v.address && v.address.city ? " · " + v.address.city : "")) : "";
+  }
+  function faseLabel(slug) {
+    var map = {
+      "group-stage": "Fase de grupos",
+      "round-of-32": "Segunda fase",
+      "round-of-16": "Oitavas",
+      "quarterfinals": "Quartas",
+      "semifinals": "Semifinal",
+      "third-place": "Disputa de 3º",
+      "final": "Final"
+    };
+    return map[slug] || "Copa do Mundo";
+  }
+  function vencedorPorPenaltis(home, away, penHome, penAway) {
+    if (home && home.winner) return teamSigla(home);
+    if (away && away.winner) return teamSigla(away);
+    if (penHome != null && penAway != null) {
+      if (penHome > penAway) return teamSigla(home);
+      if (penAway > penHome) return teamSigla(away);
+    }
+    return "";
+  }
+  function normalizarJogo(ev) {
+    var comp = compOf(ev), st = ((comp.status || {}).type || {}), home = teamOf(ev, "home"), away = teamOf(ev, "away");
+    var sgHome = teamSigla(home), sgAway = teamSigla(away);
+    var penHome = placarPenaltiCompetidor(home), penAway = placarPenaltiCompetidor(away);
+    return {
+      id: String(ev.id || ""),
+      date: ev.date || "",
+      fase: (ev.season && ev.season.slug) || "",
+      fase_nome: faseLabel((ev.season && ev.season.slug) || ""),
+      state: st.state || "",
+      shortDetail: st.shortDetail || "",
+      home: { sigla: sgHome, nome: nomeSelecao(sgHome), score: scoreCompetidor(home) },
+      away: { sigla: sgAway, nome: nomeSelecao(sgAway), score: scoreCompetidor(away) },
+      penA: penHome,
+      penB: penAway,
+      vencedor: vencedorPorPenaltis(home, away, penHome, penAway),
+      venue: venueOf(ev)
+    };
+  }
+  function fmtJogo(iso) {
+    if (!iso) return "—";
+    try {
+      var d = new Date(iso);
+      return d.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit" }) +
+        '<span class="sel-match-sep">•</span>' +
+        d.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
+    } catch (e) { return iso; }
+  }
+  function statusBadge(j) {
+    if (j.state === "in") return '<span class="sel-match-badge live">Ao vivo' + (j.shortDetail ? " · " + esc(j.shortDetail) : "") + "</span>";
+    if (j.state === "pre") return '<span class="sel-match-badge pre">Agendado</span>';
+    var extra = (j.penA != null && j.penB != null) || (j.shortDetail && /pen/i.test(j.shortDetail)) ? " (pên.)" : "";
+    return '<span class="sel-match-badge">Encerrado' + extra + "</span>";
+  }
+  function linhaPenaltis(j) {
+    if (!j || j.state !== "post" || j.penA == null || j.penB == null) return "";
+    var vencedor = j.vencedor ? nomeSelecao(j.vencedor) : "";
+    return '<div class="sel-match-pen">pênaltis ' + esc(j.penA) + "-" + esc(j.penB) +
+      (vencedor ? " · <b>" + esc(vencedor) + "</b> venceu" : "") +
+    "</div>";
+  }
+  function jogosDaSelecao(id) {
+    return (JOGOS || []).filter(function (j) {
+      return (j.home && j.home.sigla === id) || (j.away && j.away.sigla === id);
+    }).sort(function (a, b) { return new Date(a.date).getTime() - new Date(b.date).getTime(); });
+  }
+  function jogoCard(j, id) {
+    var pre = j.state === "pre";
+    var placar = pre ? "×" : ((j.home.score == null ? "—" : j.home.score) + " × " + (j.away.score == null ? "—" : j.away.score));
+    var stats = (!pre && window.COPA_JOGO_STATS && COPA_JOGO_STATS.bloco)
+      ? COPA_JOGO_STATS.bloco({ eventId: j.id, homeId: j.home.sigla, awayId: j.away.sigla, homeName: j.home.nome, awayName: j.away.nome })
+      : "";
+    return '<article class="sel-match-card">' +
+      '<div class="sel-match-top"><span class="sel-match-fase">' + esc(j.fase_nome) + "</span>" + statusBadge(j) + "</div>" +
+      '<div class="sel-match-line">' +
+        '<div class="sel-match-team ' + (j.home.sigla === id ? "sel-match-team-on" : "") + '">' + flagEquipe(j.home.sigla) + '<span>' + esc(j.home.nome) + "</span></div>" +
+        '<div class="sel-match-mid"><div class="sel-match-score">' + esc(placar) + '</div><div class="sel-match-date">' + fmtJogo(j.date) + "</div></div>" +
+        '<div class="sel-match-team dir ' + (j.away.sigla === id ? "sel-match-team-on" : "") + '"><span>' + esc(j.away.nome) + "</span>" + flagEquipe(j.away.sigla) + "</div>" +
+      "</div>" +
+      linhaPenaltis(j) +
+      (j.venue ? '<div class="sel-match-venue">' + esc(j.venue) + "</div>" : "") +
+      stats +
+    "</article>";
+  }
+
+  function itemPorEquipe(arr, id) {
+    return (arr || []).map(function (x) {
+      var y = Object.assign({}, x || {});
+      y.equipe = siglaSelecao(y.equipe);
+      return y;
+    }).filter(function (x) { return x.equipe === id; });
+  }
+  function statsSelecao(id) {
+    var por = itemPorEquipe(DADOS.por_selecao || [], id)[0] || {};
+    var artilheiros = itemPorEquipe(DADOS.artilheiros || [], id).sort(function (a, b) {
+      return (b.gols || 0) - (a.gols || 0) || String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+    });
+    var assists = itemPorEquipe(DADOS.assistencias || [], id).sort(function (a, b) {
+      return (b.assistencias || 0) - (a.assistencias || 0) || String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+    });
+    var cartoesLista = itemPorEquipe(DADOS.cartoes || [], id);
+    var cartoes = (por && (por.amarelos != null || por.vermelhos != null)) ? por : cartoesLista.reduce(function (acc, x) {
+      acc.amarelos += x.amarelos || 0;
+      acc.vermelhos += x.vermelhos || 0;
+      return acc;
+    }, { amarelos: 0, vermelhos: 0 });
+    return { por: por, artilheiros: artilheiros, assists: assists, cartoes: cartoes };
+  }
+  function campanhaSelecao(id) {
+    var jogos = jogosDaSelecao(id), c = { jogos: 0, v: 0, e: 0, d: 0, gm: 0, gs: 0, vPen: 0, dPen: 0, proximos: 0, aoVivo: 0 };
+    jogos.forEach(function (j) {
+      if (j.state === "pre") { c.proximos++; return; }
+      if (j.state === "in") { c.aoVivo++; return; }
+      var ehHome = j.home && j.home.sigla === id;
+      var gf = ehHome ? j.home.score : j.away.score;
+      var ga = ehHome ? j.away.score : j.home.score;
+      if (gf == null || ga == null) return;
+      c.jogos++; c.gm += gf; c.gs += ga;
+      if (gf > ga) c.v++;
+      else if (gf < ga) c.d++;
+      else if (j.vencedor) {
+        if (j.vencedor === id) { c.v++; c.vPen++; }
+        else { c.d++; c.dPen++; }
+      } else c.e++;
+    });
+    c.saldo = c.gm - c.gs;
+    return c;
+  }
+  function fmtNum(n) {
+    return n == null || n === "" || isNaN(n) ? "—" : String(n);
+  }
+  function saldo(n) {
+    if (n == null || isNaN(n)) return "—";
+    return n > 0 ? "+" + n : String(n);
+  }
+  function topLabel(item, campo, unidade) {
+    if (!item || !item.nome) return "—";
+    var v = item[campo] || 0;
+    return item.nome + (v ? " — " + v + " " + unidade : "");
+  }
+  function momentoTexto(id, campanha, stats, jogos) {
+    if (!STATS_CARREGADAS && !jogos.length) return "Carregando desempenho da seleção…";
+    if (campanha.aoVivo) return "Tem jogo ao vivo agora.";
+    if (campanha.jogos && campanha.d === 0 && campanha.e === 0) return "100% de aproveitamento até aqui.";
+    if (campanha.jogos && campanha.d === 0) return "Invicta até aqui.";
+    if (jogos.some(function (j) { return j.state === "pre"; })) return "Próximo jogo definido.";
+    if ((stats.por && stats.por.gols) || campanha.jogos) return "Dados consolidados com o que já está disponível.";
+    return "Aguardando dados oficiais da seleção.";
+  }
+  function desempenhoHTML(id) {
+    var stats = statsSelecao(id), camp = campanhaSelecao(id), jogos = jogosDaSelecao(id);
+    var golsMarcados = camp.jogos ? camp.gm : (stats.por.gols || 0);
+    var golsSofridos = camp.jogos ? camp.gs : null;
+    var jogosDisputados = camp.jogos || stats.por.jogos || 0;
+    var media = jogosDisputados ? (golsMarcados / jogosDisputados) : 0;
+    var topGol = stats.artilheiros[0], topAss = stats.assists[0];
+    var amarelos = (stats.cartoes && stats.cartoes.amarelos) || 0;
+    var vermelhos = (stats.cartoes && stats.cartoes.vermelhos) || 0;
+    var penNota = [];
+    if (camp.vPen) penNota.push(camp.vPen + (camp.vPen === 1 ? " vitória nos pênaltis" : " vitórias nos pênaltis"));
+    if (camp.dPen) penNota.push(camp.dPen + (camp.dPen === 1 ? " derrota nos pênaltis" : " derrotas nos pênaltis"));
+
+    var html = '<section class="sel-performance" aria-label="Desempenho da seleção na Copa">' +
+      '<div class="sel-perf-head"><div><b>Desempenho na Copa</b><span>' + esc(momentoTexto(id, camp, stats, jogos)) + '</span></div></div>' +
+      '<div class="sel-perf-grid">' +
+        '<div class="sel-perf-card destaque"><span>Campanha</span><b>' + fmtNum(camp.v) + 'V ' + fmtNum(camp.e) + 'E ' + fmtNum(camp.d) + 'D</b><small>' + fmtNum(jogosDisputados) + ' jogo' + (jogosDisputados === 1 ? "" : "s") + '</small></div>' +
+        '<div class="sel-perf-card"><span>Gols</span><b>' + fmtNum(golsMarcados) + '</b><small>marcados</small></div>' +
+        '<div class="sel-perf-card"><span>Sofridos</span><b>' + fmtNum(golsSofridos) + '</b><small>gols contra</small></div>' +
+        '<div class="sel-perf-card"><span>Saldo</span><b>' + saldo(camp.jogos ? camp.saldo : null) + '</b><small>diferença</small></div>' +
+        '<div class="sel-perf-card"><span>Média</span><b>' + (jogosDisputados ? media.toLocaleString("pt-BR", { maximumFractionDigits: 2 }) : "—") + '</b><small>gols/jogo</small></div>' +
+        '<div class="sel-perf-card"><span>Cartões</span><b>' + fmtNum(amarelos) + '/' + fmtNum(vermelhos) + '</b><small>amarelos/vermelhos</small></div>' +
+      '</div>' +
+      (penNota.length ? '<div class="sel-perf-note">Obs.: campanha considera ' + esc(penNota.join(" e ")) + ' no mata-mata.</div>' : "") +
+      '<div class="sel-leaders">' +
+        '<div><span>⚽ Artilheiro</span><b>' + esc(topLabel(topGol, "gols", "gols")) + '</b></div>' +
+        '<div><span>🎯 Assistências</span><b>' + esc(topLabel(topAss, "assistencias", "assist.")) + '</b></div>' +
+      '</div>' +
+    '</section>';
+    return html;
+  }
+  function marcadoresHTML(id) {
+    var stats = statsSelecao(id), lista = stats.artilheiros || [], total = stats.por.gols || 0;
+    var soma = lista.reduce(function (acc, x) { return acc + (x.gols || 0); }, 0);
+    var resto = Math.max(0, total - soma);
+    if (!lista.length && !resto) return "";
+    var linhas = lista.map(function (x) {
+      return '<div class="sel-scorer-row"><span>' + esc(x.nome || "—") + '</span><b>' + esc(x.gols || 0) + '</b></div>';
+    });
+    if (resto) {
+      linhas.push('<div class="sel-scorer-row muted"><span>Gol contra a favor / não identificado no feed</span><b>' + esc(resto) + '</b></div>');
+    }
+    return '<details class="sel-scorers-box">' +
+      '<summary>⚽ Marcadores da seleção</summary>' +
+      '<div class="sel-scorer-list">' + linhas.join("") + '</div>' +
+    '</details>';
+  }
+  function jogosHTML(id) {
+    var jogos = jogosDaSelecao(id);
+    if (!STATS_CARREGADAS && !jogos.length) {
+      return '<section class="sel-matches"><div class="sel-section-title">Jogos da seleção</div><div class="sel-vazio">Carregando jogos da seleção…</div></section>';
+    }
+    if (!jogos.length) {
+      return '<section class="sel-matches"><div class="sel-section-title">Jogos da seleção</div><div class="sel-vazio">Ainda não há jogos disponíveis para esta seleção.</div></section>';
+    }
+    return '<section class="sel-matches"><div class="sel-section-title">Jogos da seleção</div><div class="sel-match-list">' +
+      jogos.map(function (j) { return jogoCard(j, id); }).join("") +
+    '</div></section>';
+  }
+
   function abreFicha(id) {
     var s = SEL.find(function (x) { return x.id === id; });
     if (!s) return;
+    ID_ATUAL = id;
     marcaPaisAtivo(id);
     var pa = PAISES[id] || {};
     var trofeus = pa.copas ? '<div class="sel-det-copas"><span class="sel-det-trofeus" title="Títulos mundiais">' +
@@ -133,9 +418,13 @@
         '<img class="sel-det-flag" src="' + flagUrl(s.iso2, 160) + '" alt="Bandeira: ' + esc(s.nome) + '" width="72" height="48">' +
         '<div class="sel-det-id"><div class="sel-det-nome">' + esc(s.nome) + "</div>" +
           (pa.apelido ? '<div class="sel-det-apelido">"' + esc(pa.apelido) + '"</div>' : "") + "</div>" +
-        '<div class="sel-det-grupo">Grupo ' + esc(s.grupo || "?") + "</div>" +
+        '<div class="sel-det-grupo sel-det-ranking">' + esc(rankingLabel(s)) + "</div>" +
       "</div>" +
       trofeus +
+      desempenhoHTML(id) +
+      jogosHTML(id) +
+      marcadoresHTML(id) +
+      '<div class="sel-section-title">Curiosidades</div>' +
       '<div class="sel-facts">' +
         fact("Capital", pa.capital) +
         fact("População", pa.populacao) +
@@ -148,11 +437,19 @@
     var det = $("#sel-detalhe");
     det.innerHTML = html; det.hidden = false;
     $("#sel-scroller").hidden = true; $("#sel-hint").hidden = true;
+    if (window.COPA_JOGO_STATS && COPA_JOGO_STATS.bind) COPA_JOGO_STATS.bind(det);
     if (window.history && history.replaceState) { try { history.replaceState(null, "", "#" + id); } catch (e) {} }
     window.scrollTo(0, 0);
   }
 
+  function reabreFichaAtual() {
+    if (!ID_ATUAL) return;
+    var det = $("#sel-detalhe");
+    if (det && !det.hidden) abreFicha(ID_ATUAL);
+  }
+
   function voltar() {
+    ID_ATUAL = "";
     var det = $("#sel-detalhe"); det.hidden = true; det.innerHTML = "";
     marcaPaisAtivo("");
     $("#sel-scroller").hidden = false; $("#sel-hint").hidden = false;
@@ -209,11 +506,37 @@
   function getJSON(u) {
     return fetch(u).then(function (r) { if (!r.ok) throw 0; return r.json(); }).catch(function () { return null; });
   }
+  function getJSONTimeout(u, ms) {
+    var done = false;
+    return new Promise(function (resolve) {
+      var t = setTimeout(function () { if (!done) { done = true; resolve(null); } }, ms || 8000);
+      fetch(u).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (j) {
+        if (!done) { done = true; clearTimeout(t); resolve(j); }
+      }).catch(function () {
+        if (!done) { done = true; clearTimeout(t); resolve(null); }
+      });
+    });
+  }
+  function carregarDesempenho() {
+    var dadosReq = getJSON("dados/estatisticas.json?v=" + Date.now()).then(function (j) {
+      DADOS = j || { artilheiros: [], assistencias: [], cartoes: [], por_selecao: [] };
+    });
+    var jogosReq = getJSONTimeout(API_SCOREBOARD + "&_=" + Date.now(), 8000).then(function (j) {
+      JOGOS = j && j.events ? j.events.map(normalizarJogo) : [];
+    });
+    return Promise.all([dadosReq, jogosReq]).then(function () {
+      STATS_CARREGADAS = true;
+      reabreFichaAtual();
+    }).catch(function () {
+      STATS_CARREGADAS = true;
+      reabreFichaAtual();
+    });
+  }
 
   Promise.all([getJSON("dados/selecoes.json"), getJSON("dados/paises.json"), getJSON("dados/elencos.json")])
     .then(function (res) {
       var sj = res[0] || {}, pj = res[1] || {}, ej = res[2] || {};
-      SEL = ((sj.selecoes) || []).map(function (s) { return { id: s.id, nome: s.nome, grupo: s.grupo, iso2: s.iso2 }; });
+      SEL = ((sj.selecoes) || []).map(function (s) { return { id: s.id, nome: s.nome, grupo: s.grupo, seed: s.seed, iso2: s.iso2 }; });
       SEL.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), "pt-BR"); });
       PAISES = (pj.paises) || {};
       ELENCOS = ej || {};
@@ -221,5 +544,7 @@
       renderMenuPaises(); ligar(); renderLista();
       var h = (location.hash || "").replace("#", "").toUpperCase();
       if (h && SEL.find(function (x) { return x.id === h; })) abreFicha(h);
+      try { if (window.COPA_TIMES && COPA_TIMES.carregar) window.COPA_TIMES.carregar().then(carregarDesempenho); else carregarDesempenho(); }
+      catch (e) { carregarDesempenho(); }
     });
 })();
