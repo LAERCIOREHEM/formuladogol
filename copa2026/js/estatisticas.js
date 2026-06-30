@@ -34,6 +34,47 @@
     var src = window.COPA_TIMES && COPA_TIMES.flag ? COPA_TIMES.flag(sigla, 80) : "";
     return src ? '<img class="stat-flag" src="' + esc(src) + '" alt="" loading="lazy">' : "";
   }
+
+  function siglaSelecao(valor) {
+    if (!valor) return "";
+    if (window.COPA_TIMES && COPA_TIMES.sigla) return COPA_TIMES.sigla(valor) || valor;
+    return valor;
+  }
+  function todasSiglas() {
+    var mapa = {};
+    if (DADOS) {
+      ["artilheiros", "assistencias", "cartoes", "por_selecao"].forEach(function (k) {
+        (DADOS[k] || []).forEach(function (x) {
+          var eq = siglaSelecao(x.equipe);
+          if (eq) mapa[eq] = true;
+        });
+      });
+    }
+    (JOGOS || []).forEach(function (j) {
+      if (j.home && j.home.sigla) mapa[j.home.sigla] = true;
+      if (j.away && j.away.sigla) mapa[j.away.sigla] = true;
+    });
+    return Object.keys(mapa).sort(function (a, b) {
+      return nomeSelecao(a).localeCompare(nomeSelecao(b), "pt-BR");
+    });
+  }
+  function normalizarItemEquipe(item) {
+    var novo = Object.assign({}, item || {});
+    novo.equipe = siglaSelecao(novo.equipe);
+    return novo;
+  }
+  function completarGolsPorSelecao(lista) {
+    var mapa = {};
+    (lista || []).forEach(function (item) {
+      var x = normalizarItemEquipe(item);
+      if (!x.equipe) return;
+      mapa[x.equipe] = Object.assign({ gols: 0, assistencias: 0, amarelos: 0, vermelhos: 0, jogos: 0, media_gols: 0 }, x);
+    });
+    todasSiglas().forEach(function (eq) {
+      if (!mapa[eq]) mapa[eq] = { equipe: eq, gols: 0, assistencias: 0, amarelos: 0, vermelhos: 0, jogos: 0, media_gols: 0 };
+    });
+    return Object.keys(mapa).map(function (eq) { return mapa[eq]; });
+  }
   function fmtData(iso) {
     if (!iso) return "Ainda não atualizado";
     try {
@@ -54,14 +95,14 @@
     } catch (e) { return iso; }
   }
   function listaDaAba() {
-    if (ABA === "assistencias") return DADOS.assistencias || [];
+    if (ABA === "assistencias") return (DADOS.assistencias || []).map(normalizarItemEquipe);
     if (ABA === "gols_selecao") {
-      return (DADOS.por_selecao || []).slice().sort(function (a, b) {
+      return completarGolsPorSelecao(DADOS.por_selecao || []).sort(function (a, b) {
         return (b.gols || 0) - (a.gols || 0) || (b.media_gols || 0) - (a.media_gols || 0) || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
       });
     }
     if (ABA === "jogos") return JOGOS.slice();
-    return DADOS.artilheiros || [];
+    return (DADOS.artilheiros || []).map(normalizarItemEquipe);
   }
   function valorPrincipal(item) {
     if (ABA === "assistencias") return item.assistencias || 0;
@@ -72,10 +113,10 @@
     return v === 1 ? "gol" : "gols";
   }
   function melhorAtaque() {
-    var lista = (DADOS.por_selecao || []).slice().sort(function (a, b) {
+    var lista = completarGolsPorSelecao(DADOS.por_selecao || []).sort(function (a, b) {
       return (b.gols || 0) - (a.gols || 0) || (b.media_gols || 0) - (a.media_gols || 0) || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
     });
-    return lista[0];
+    return lista.find(function (x) { return (x.gols || 0) > 0; }) || lista[0];
   }
   function renderResumo() {
     var gols = (DADOS.artilheiros || [])[0];
@@ -184,6 +225,53 @@
     }
     if (faseWrap) faseWrap.hidden = ABA !== 'jogos';
   }
+
+  function marcadoresDaSelecao(item) {
+    var eq = item && item.equipe;
+    var lista = ((DADOS && DADOS.artilheiros) || [])
+      .map(normalizarItemEquipe)
+      .filter(function (x) { return x.equipe === eq && (x.gols || 0) > 0; })
+      .sort(function (a, b) {
+        return (b.gols || 0) - (a.gols || 0) || String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+      });
+
+    var totalMarcadores = lista.reduce(function (acc, x) { return acc + (x.gols || 0); }, 0);
+    var golsRestantes = Math.max(0, (item.gols || 0) - totalMarcadores);
+
+    var htmlItens = lista.map(function (x) {
+      var qtd = x.gols || 0;
+      return '<div class="stat-goal-item">' +
+        '<div class="stat-goal-player">' +
+          '<strong>' + esc(x.nome || "—") + '</strong>' +
+          '<span>' + flag(x.equipe) + esc(nomeSelecao(x.equipe)) + '</span>' +
+        '</div>' +
+        '<div class="stat-goal-num"><b>' + qtd + '</b><small>' + esc(rotuloValor(qtd)) + '</small></div>' +
+      '</div>';
+    });
+
+    if (golsRestantes > 0) {
+      htmlItens.push('<div class="stat-goal-item stat-goal-item-extra">' +
+        '<div class="stat-goal-player">' +
+          '<strong>Gol contra a favor</strong>' +
+          '<span>Diferença entre o total da seleção e os artilheiros identificados no feed</span>' +
+        '</div>' +
+        '<div class="stat-goal-num"><b>' + golsRestantes + '</b><small>' + (golsRestantes === 1 ? "gol" : "gols") + '</small></div>' +
+      '</div>');
+    }
+
+    if (!htmlItens.length) {
+      htmlItens.push('<div class="stat-goals-empty">Ainda não há marcadores individuais identificados para esta seleção.</div>');
+    }
+
+    return '<details class="stat-goals-toggle">' +
+      '<summary class="stat-goals-summary">' +
+        '<span class="stat-goals-summary-closed">⚽ Ver marcadores dos gols</span>' +
+        '<span class="stat-goals-summary-open">⚽ Ocultar marcadores dos gols</span>' +
+      '</summary>' +
+      '<div class="stat-goals-body">' + htmlItens.join("") + '</div>' +
+    '</details>';
+  }
+
   function row(item, idx) {
     var val = valorPrincipal(item);
     if (ABA === 'gols_selecao') {

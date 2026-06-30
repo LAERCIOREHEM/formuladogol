@@ -66,6 +66,22 @@
     return `<div class="tvs">📺 ${lista.map(c => `<span class="tvchip" style="background:${TV_CAT[c][1]};color:${TV_CAT[c][2]}">${TV_CAT[c][0]}</span>`).join("")}</div>`;
   }
 
+
+  function statsBlocoAoVivo(ev, home, away) {
+    if (!window.COPA_JOGO_STATS || !ev || !ev.id) return "";
+    const hAb = (home.team && (home.team.abbreviation || home.team.displayName)) || "";
+    const aAb = (away.team && (away.team.abbreviation || away.team.displayName)) || "";
+    const hId = dpSigla(hAb) || hAb;
+    const aId = dpSigla(aAb) || aAb;
+    return window.COPA_JOGO_STATS.bloco({
+      eventId: ev.id,
+      homeId: hId,
+      awayId: aId,
+      homeName: dpNome(hId),
+      awayName: dpNome(aId)
+    });
+  }
+
   async function init() {
     try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
     try { LIVES = (await fetch("dados/lives.json?t=" + Date.now()).then(r => r.json())).jogos || {}; } catch (e) { LIVES = {}; }
@@ -218,6 +234,7 @@
     $("#app").innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado com os palpites reais. No dia, é automático (abra sem <b>?demo=1</b>).</div>' : "")
       + lives.map(ev => card(ev, colapsarPalpites)).join("");
     carregarLancesAoVivo(lives);
+    if (window.COPA_JOGO_STATS) window.COPA_JOGO_STATS.bind($("#app"));
   }
 
   function ourGame(ev) {
@@ -613,6 +630,7 @@
       <div class="minuto">${minuto}</div>
       ${tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${botaoCaze((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
+      ${statsBlocoAoVivo(ev, home, away)}
       ${palpHTML}
     </div>`;
   }

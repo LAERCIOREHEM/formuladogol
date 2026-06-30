@@ -573,6 +573,7 @@
         '<div id="oa-gols-' + esc(j.id) + '" class="oa-gols-wrap" data-lances-id="' + esc(j.id) + '"></div>' +
         '<div class="oa-info">' + statusHTML(j) + (j.venue ? ' · <span class="oa-loc">' + esc(j.venue) + "</span>" : "") + "</div>" +
         (botoes || '<div class="oa-tv">📺 ' + chips(j.a, j.b) + "</div>") +
+        statsBlocoOA(j) +
         "</div>";
     });
     $("#lista").innerHTML = html;
