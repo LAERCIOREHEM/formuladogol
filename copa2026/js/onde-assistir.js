@@ -317,6 +317,25 @@
     }
     return null;
   }
+  function placarPenaltiCompetidor(c) {
+    var vals = [
+      c && c.shootoutScore,
+      c && c.shootoutDisplayScore,
+      c && c.penaltyScore,
+      getPath(c, ["shootoutScore", "value"], null),
+      getPath(c, ["penaltyScore", "value"], null)
+    ];
+    for (var i = 0; i < vals.length; i++) {
+      var n = scoreNum(vals[i]);
+      if (n != null) return n;
+    }
+    return null;
+  }
+  function linhaPenaltisOnde(j) {
+    if (!j || j.state !== "post" || j.penA == null || j.penB == null) return "";
+    var vencedor = j.vencedor ? (SEL[j.vencedor] || j.vencedor) : "";
+    return '<div class="oa-penalti">pênaltis ' + esc(j.penA) + '-' + esc(j.penB) + (vencedor ? ' · <b>' + esc(vencedor) + '</b> venceu' : '') + '</div>';
+  }
   function textoTipo(o) {
     var t = o && o.type;
     if (!t) return "";
@@ -540,7 +559,7 @@
     return '<span class="oa-score"><b>' + j.scoreA + '</b><em>×</em><b>' + j.scoreB + '</b></span>';
   }
   function statusHTML(j) {
-    if (j.state === "post") return '<span class="oa-fim">encerrado</span>';
+    if (j.state === "post") return '<span class="oa-fim">encerrado' + (j.penA != null && j.penB != null ? ' (pên.)' : '') + '</span>';
     if (j.state === "in") return '<span class="oa-vivo">🔴 ao vivo</span>';
     return '<span class="oa-hora">' + fmtHora(j.date) + '</span>';
   }
@@ -570,6 +589,7 @@
           placarHTML(j) +
           timeHTML(j, "b") +
         '</div>' +
+        linhaPenaltisOnde(j) +
         '<div id="oa-gols-' + esc(j.id) + '" class="oa-gols-wrap" data-lances-id="' + esc(j.id) + '"></div>' +
         '<div class="oa-info">' + statusHTML(j) + (j.venue ? ' · <span class="oa-loc">' + esc(j.venue) + "</span>" : "") + "</div>" +
         (botoes || '<div class="oa-tv">📺 ' + chips(j.a, j.b) + "</div>") +
@@ -643,6 +663,8 @@
           id: ev.id, raw: ev, date: new Date(ev.date), state: getPath(c, ["status", "type", "state"], "pre"),
           a: aId, b: bId, an: SEL[aId] || getPath(h, ["team", "shortDisplayName"], aId), bn: SEL[bId] || getPath(a, ["team", "shortDisplayName"], bId),
           scoreA: scoreCompetidor(h), scoreB: scoreCompetidor(a),
+          penA: placarPenaltiCompetidor(h), penB: placarPenaltiCompetidor(a),
+          vencedor: h.winner ? aId : (a.winner ? bId : ""),
           venue: (c.venue && c.venue.fullName) || ""
         });
       });

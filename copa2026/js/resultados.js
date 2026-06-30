@@ -778,6 +778,64 @@
     if (!hId || !aId || hs == null || as == null) return null;
     return { comp, home: h, away: a, hId, aId, hs, as, state: estadoEvento(ev) };
   }
+
+  function idCompetidor(c) {
+    const t = (c && c.team) || {};
+    return dpSigla(t.abbreviation) || dpSigla(t.shortDisplayName) || dpSigla(t.displayName) || dpSigla(t.name) || t.abbreviation || "";
+  }
+  function placarPenaltiCompetidor(c) {
+    const vals = [
+      c && c.shootoutScore,
+      c && c.shootoutDisplayScore,
+      c && c.penaltyScore,
+      getPath(c, ["shootoutScore", "value"], null),
+      getPath(c, ["penaltyScore", "value"], null)
+    ];
+    for (const v of vals) {
+      const n = scoreNum(v);
+      if (n != null) return n;
+    }
+    return null;
+  }
+  function penaltiInfoEvento(ev, idA, idB) {
+    const comp = getPath(ev, ["competitions", 0], null);
+    const cs = comp && Array.isArray(comp.competitors) ? comp.competitors : [];
+    if (cs.length < 2) return null;
+    const h = cs.find(x => x.homeAway === "home") || cs[0];
+    const a = cs.find(x => x.homeAway === "away") || cs[1];
+    const hId = idCompetidor(h), aId = idCompetidor(a);
+    const hPen = placarPenaltiCompetidor(h), aPen = placarPenaltiCompetidor(a);
+    if (!hId || !aId || hPen == null || aPen == null) return null;
+
+    const ladoA = dpSigla(idA) || hId;
+    const ladoB = dpSigla(idB) || aId;
+    let penA = hPen, penB = aPen;
+    if (ladoA && ladoB && hId === ladoB && aId === ladoA) {
+      penA = aPen; penB = hPen;
+    }
+
+    let vencedorId = "";
+    if (h.winner) vencedorId = hId;
+    else if (a.winner) vencedorId = aId;
+    else if (hPen > aPen) vencedorId = hId;
+    else if (aPen > hPen) vencedorId = aId;
+
+    const vencedorNome = vencedorId ? dpNome(vencedorId) : "";
+    return {
+      penA,
+      penB,
+      vencedorId,
+      vencedorNome,
+      label: `pênaltis ${penA}-${penB}${vencedorNome ? ` · ${vencedorNome} venceu` : ""}`
+    };
+  }
+  function linhaPenaltisPartida(ev, home, away) {
+    const st = getPath(ev, ["competitions", 0, "status", "type", "state"], "pre");
+    if (st !== "post") return "";
+    const hId = idCompetidor(home), aId = idCompetidor(away);
+    const p = penaltiInfoEvento(ev, hId, aId);
+    return p ? `<div class="penalti-jogo">${escTxt(p.label)}</div>` : "";
+  }
   function eventoTemPlacar(ev) {
     return !!infoPlacarEvento(ev);
   }
@@ -1370,10 +1428,9 @@
         if (h.winner) { if (hId === idA) vA = "mm-venc"; else if (hId === idB) vB = "mm-venc"; }
         else if (a.winner) { if (aId === idA) vA = "mm-venc"; else if (aId === idB) vB = "mm-venc"; }
       }
-      const hPen = h.shootoutScore, aPen = a.shootoutScore;
-      if (hPen != null && aPen != null && idA) {
-        const aPenV = (hId === idA) ? hPen : aPen, bPenV = (hId === idA) ? aPen : hPen;
-        extra = `<span class="mm-pen">pênaltis ${aPenV}-${bPenV}</span>`;
+      const pen = penaltiInfoEvento(ev, idA || hId, idB || aId);
+      if (pen) {
+        extra = `<span class="mm-pen">${escTxt(pen.label)}</span>`;
       }
     } else if (st.state === "in") {
       status = comp.status.displayClock || "Ao vivo"; cls = "live";
@@ -1879,6 +1936,7 @@
         ${meio}
         ${ladoPartidaHTML(away, "f", projAway, vencA)}
       </div>
+      ${linhaPenaltisPartida(ev, home, away)}
       ${st.state !== "pre" ? `<div class="gols-jogo" id="gols-${ev.id}" aria-label="Gols e cartões vermelhos"></div>` : ""}
       ${venue ? `<div class="venue">${venue}</div>` : ""}
       ${(st.state === "post" && momentoDe((home.team || {}).abbreviation, (away.team || {}).abbreviation))
