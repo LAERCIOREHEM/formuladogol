@@ -1,23 +1,23 @@
 {
-  "_nota": "Relatório de cobertura de fotos dos jogadores. Ausência de foto não é erro; o front usa fallback.",
-  "gerado_em": "2026-06-30T16:04:32Z",
-  "config": {
-    "sem_espn": false,
-    "sem_wikimedia": false,
-    "min_conf": 0.86,
-    "max_wikidata_rostos": 0
-  },
-  "cobertura": {
-    "selecoes": 48,
-    "jogadores": 1246,
-    "ja_tinham_foto": 127,
-    "adicionados_espn": 0,
-    "adicionados_wikimedia": 48,
-    "sem_foto": 1071,
-    "erros": [],
-    "fontes": {
-      "ESPN": 0,
-      "Wikimedia Commons": 48
-    }
+ "_nota": "Cobertura de fotos. Ausência não é erro: o front usa avatar de iniciais.",
+ "gerado_em": "2026-06-30T18:29:31Z",
+ "cobertura": {
+  "selecoes": 48,
+  "jogadores": 1246,
+  "com_foto": 135,
+  "fallback": 1111
+ },
+ "execucao": {
+  "jogadores": 1246,
+  "ja_tinham": 127,
+  "novas": 8,
+  "sem_foto": 241,
+  "pulados_memoria": 0,
+  "skip_tempo": 0,
+  "fontes": {
+   "ESPN": 0,
+   "Wikipedia": 8,
+   "Wikimedia Commons": 0
   }
+ }
 }
