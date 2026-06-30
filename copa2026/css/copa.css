@@ -727,3 +727,70 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .sel-menu-chip{min-width:112px;font-size:12px;padding:8px 10px}
 }
 
+/* ==========================================================================
+   SELEÇÕES — dropdown superior de escolha do país
+   Substitui apenas o scroll superior por um seletor tipo card.
+   A grade inferior de seleções permanece igual.
+   ========================================================================== */
+.sel-menu-box-select{
+  padding:10px;
+}
+.sel-select-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+  width:100%;
+  background:linear-gradient(180deg,rgba(21,48,90,.98),rgba(13,38,76,.96));
+  border:1px solid rgba(244,197,66,.34);
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.06);
+  min-height:46px;
+}
+.sel-select-ico{
+  flex:0 0 auto;
+  width:42px;
+  text-align:center;
+  font-size:18px;
+  pointer-events:none;
+}
+.sel-menu-select{
+  appearance:none;
+  -webkit-appearance:none;
+  width:100%;
+  min-width:0;
+  height:46px;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:var(--branco);
+  font-family:inherit;
+  font-size:15px;
+  font-weight:800;
+  padding:0 42px 0 0;
+  cursor:pointer;
+}
+.sel-menu-select option{
+  background:#102d56;
+  color:#fff;
+  font-weight:700;
+}
+.sel-select-arrow{
+  position:absolute;
+  right:13px;
+  top:50%;
+  transform:translateY(-54%);
+  color:var(--gold);
+  font-size:19px;
+  font-weight:900;
+  pointer-events:none;
+}
+.sel-select-wrap:focus-within{
+  border-color:rgba(244,197,66,.78);
+  box-shadow:0 0 0 3px rgba(244,197,66,.13), 0 8px 20px rgba(0,0,0,.20);
+}
+@media(max-width:520px){
+  .sel-select-wrap{min-height:44px}
+  .sel-menu-select{height:44px;font-size:14px}
+  .sel-select-ico{width:38px}
+}
+
