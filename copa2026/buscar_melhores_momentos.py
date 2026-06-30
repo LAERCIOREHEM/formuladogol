@@ -34,6 +34,13 @@ def norm(s):
     s = re.sub(r"[^A-Za-z0-9 ]", " ", s).upper()
     return re.sub(r"\s+", " ", s).strip()
 
+# Placar normal e placar com pênaltis no título.
+# Exemplos aceitos:
+#   "Brasil 2 x 1 Japão"
+#   "Holanda 1 (2) x (3) 1 Marrocos"
+#   "Alemanha 1 (4) X (5) 1 Paraguai"
+PLACAR_RE = re.compile(r"\b\d+\s*(?:\(\s*\d+\s*\)\s*)?[xX]\s*(?:\(\s*\d+\s*\)\s*)?\d+\b")
+
 # Apelidos: como a CazéTV pode escrever -> nosso id. Inclui variações comuns.
 APELIDOS = {
     "MEXICO": "MEX",
@@ -108,12 +115,15 @@ def parse_titulo(titulo):
     """
     De 'MELHORES MOMENTOS: ESTADOS UNIDOS 4 X 1 PARAGUAI | COPA ...'
     extrai (idA, idB). Retorna (None,None) se não casar o padrão.
+
+    Também aceita placar de pênaltis no título:
+    'HOLANDA 1 (2) X (3) 1 MARROCOS | ...'
     """
     t = titulo
     # remove o rótulo "MELHORES MOMENTOS" em qualquer posição (com : ou |)
     t = re.sub(r"(?i)melhores\s+momentos\s*[:|]?", " ", t)
-    # acha o "N X N" no meio; o lado B vai até a próxima barra ou fim
-    m = re.search(r"(.+?)\s+\d+\s*[xX]\s*\d+\s+([^|]+)", t)
+    # acha placar normal ou com pênaltis; o lado B vai até a próxima barra ou fim
+    m = re.search(r"(.+?)\s+\d+\s*(?:\(\s*\d+\s*\)\s*)?[xX]\s*(?:\(\s*\d+\s*\)\s*)?\d+\s+([^|]+)", t)
     if not m:
         return None, None
     a = id_do_time_parse(m.group(1))
@@ -156,8 +166,11 @@ def parse_confronto_generico(titulo):
     t = re.sub(r"(?i)resumo\s*[:|]?", " ", t)
     t = t.split("|")[0]
 
-    # Padrões aceitos: TIME X TIME, TIME 0 X 1 TIME, TIME 0x1 TIME.
-    m = re.search(r"(.+?)\s+(?:\d+\s*)?[xX]\s*(?:\d+\s*)?(.+)", t)
+    # Padrões aceitos:
+    # TIME X TIME
+    # TIME 0 X 1 TIME
+    # TIME 1 (2) X (3) 1 TIME
+    m = re.search(r"(.+?)\s+(?:\d+\s*(?:\(\s*\d+\s*\)\s*)?)?[xX]\s*(?:(?:\(\s*\d+\s*\)\s*)?\d+\s*)?(.+)", t)
     if not m:
         return None, None
     a = id_do_time_parse(m.group(1))
@@ -485,7 +498,7 @@ def parse_iso8601_duration_seconds(valor):
 
 
 def tem_placar_no_titulo(titulo):
-    return bool(re.search(r"\b\d+\s*[xX]\s*\d+\b", titulo or ""))
+    return bool(PLACAR_RE.search(titulo or ""))
 
 
 def chave_confronto(a, b):
