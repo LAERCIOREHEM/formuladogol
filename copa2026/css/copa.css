@@ -794,3 +794,76 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .sel-select-ico{width:38px}
 }
 
+/* ==========================================================================
+   SELEÇÕES — convocados recolhíveis
+   Lista começa fechada para não alongar demais a ficha da seleção no celular.
+   ========================================================================== */
+.sel-squad-box{
+  margin-top:8px;
+}
+.sel-squad-box > summary{
+  list-style:none;
+}
+.sel-squad-box > summary::-webkit-details-marker{
+  display:none;
+}
+.sel-squad-toggle{
+  width:100%;
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(244,197,66,.38);
+  background:linear-gradient(180deg,rgba(28,56,98,.94),rgba(18,43,82,.94));
+  color:var(--gold);
+  font-family:inherit;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 8px 18px rgba(0,0,0,.14);
+}
+.sel-squad-toggle::after{
+  content:"▾";
+  color:var(--gold);
+  font-size:13px;
+  font-weight:900;
+  transition:transform .16s ease;
+}
+.sel-squad-box[open] .sel-squad-toggle::after{
+  transform:rotate(180deg);
+}
+.sel-squad-toggle small{
+  margin-left:auto;
+  color:var(--cinza);
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+}
+.sel-squad-open{
+  display:none;
+}
+.sel-squad-box[open] .sel-squad-open{
+  display:inline;
+}
+.sel-squad-box[open] .sel-squad-closed{
+  display:none;
+}
+.sel-squad-box[open] .sel-squad{
+  margin-top:13px;
+}
+.sel-squad-box[open] .sel-squad-vazio{
+  margin-top:12px;
+}
+@media(max-width:520px){
+  .sel-squad-toggle{
+    min-height:46px;
+    padding:11px 12px;
+    font-size:13px;
+  }
+  .sel-squad-toggle small{
+    font-size:10px;
+  }
+}
+
