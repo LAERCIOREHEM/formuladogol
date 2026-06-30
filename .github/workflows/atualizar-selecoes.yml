@@ -1,0 +1,60 @@
+name: Atualiza seleções (elencos + rostos)
+
+on:
+  schedule:
+    # 2h e 10h de Brasília (UTC-3) = 05:00 e 13:00 UTC
+    - cron: "0 5,13 * * *"
+  workflow_dispatch: {}   # permite rodar manualmente também
+
+permissions:
+  contents: write
+
+# Evita que duas execuções colidam no push.
+concurrency:
+  group: atualizar-selecoes
+  cancel-in-progress: false
+
+jobs:
+  selecoes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Sanidade da lógica (selftest offline)
+        run: |
+          cd "$GITHUB_WORKSPACE/copa2026"
+          python buscar_selecoes.py --selftest
+
+      - name: Buscar elencos e rostos na ESPN
+        run: |
+          cd "$GITHUB_WORKSPACE/copa2026"
+          python buscar_selecoes.py
+
+      - name: Commit (se algo mudou)
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          git add copa2026/dados/elencos.json copa2026/dados/rostos.json copa2026/img/jogadores 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Nada mudou — sem commit."
+            exit 0
+          fi
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git commit -m "Atualiza seleções (elencos + rostos) — automático"
+          for i in 1 2 3 4 5; do
+            if git push; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+            echo "Push rejeitado (tentativa $i). Puxando e tentando de novo..."
+            git pull --rebase --autostash origin main || true
+            sleep 3
+          done
+          echo "Não consegui enviar após várias tentativas."
+          exit 1
