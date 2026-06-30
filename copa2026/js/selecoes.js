@@ -20,6 +20,14 @@
     if (!iso2) return "";
     return "https://flagcdn.com/w" + (w || 80) + "/" + String(iso2).toLowerCase() + ".png";
   }
+
+  function flagEmoji(iso2) {
+    iso2 = String(iso2 || "").toUpperCase();
+    if (!/^[A-Z]{2}$/.test(iso2)) return "🌎";
+    return iso2.replace(/./g, function (c) {
+      return String.fromCodePoint(127397 + c.charCodeAt(0));
+    });
+  }
   function silhueta() {
     return '<span class="sel-face sel-face-ph" aria-hidden="true">' +
       '<svg viewBox="0 0 24 24" width="58%" height="58%"><path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.4 0-9 2.2-9 6v2h18v-2c0-3.8-4.6-6-9-6Z"/></svg>' +
@@ -40,29 +48,22 @@
 
 
   function menuPaisHTML(s) {
-    return '<button class="sel-menu-chip" type="button" data-id="' + esc(s.id) + '">' +
-      '<img src="' + flagUrl(s.iso2, 40) + '" alt="" loading="lazy" width="24" height="16">' +
-      '<span>' + esc(s.nome) + '</span>' +
-      '<small>' + esc(s.id) + '</small>' +
-    '</button>';
+    return '<option value="' + esc(s.id) + '">' +
+      esc(flagEmoji(s.iso2) + " " + s.nome + " (" + s.id + ")") +
+    '</option>';
   }
 
   function renderMenuPaises() {
     var el = $("#sel-menu-paises");
     if (!el) return;
-    el.innerHTML = SEL.length ? SEL.map(menuPaisHTML).join("") : '<span class="sel-menu-loading">Não foi possível carregar os países.</span>';
+    el.innerHTML = '<option value="">🌎 Escolha uma seleção</option>' +
+      (SEL.length ? SEL.map(menuPaisHTML).join("") : '<option value="">Não foi possível carregar os países</option>');
   }
 
   function marcaPaisAtivo(id) {
-    var box = $("#sel-menu-paises");
-    if (!box) return;
-    Array.prototype.slice.call(box.querySelectorAll(".sel-menu-chip")).forEach(function (b) {
-      var on = b.getAttribute("data-id") === id;
-      b.classList.toggle("on", on);
-      if (on && b.scrollIntoView) {
-        try { b.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); } catch (e) {}
-      }
-    });
+    var el = $("#sel-menu-paises");
+    if (!el) return;
+    el.value = id || "";
   }
 
   function renderLista() {
@@ -128,6 +129,7 @@
 
   function voltar() {
     var det = $("#sel-detalhe"); det.hidden = true; det.innerHTML = "";
+    marcaPaisAtivo("");
     $("#sel-scroller").hidden = false; $("#sel-hint").hidden = false;
     if (window.history && history.replaceState) { try { history.replaceState(null, "", location.pathname); } catch (e) {} }
   }
@@ -138,8 +140,8 @@
     });
     var menu = $("#sel-menu-paises");
     if (menu) {
-      menu.addEventListener("click", function (e) {
-        var b = e.target.closest(".sel-menu-chip"); if (b) abreFicha(b.getAttribute("data-id"));
+      menu.addEventListener("change", function () {
+        if (menu.value) abreFicha(menu.value);
       });
     }
     $("#sel-detalhe").addEventListener("click", function (e) {
