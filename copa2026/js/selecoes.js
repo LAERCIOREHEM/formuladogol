@@ -28,10 +28,21 @@
       return String.fromCodePoint(127397 + c.charCodeAt(0));
     });
   }
-  function silhueta() {
-    return '<span class="sel-face sel-face-ph" aria-hidden="true">' +
-      '<svg viewBox="0 0 24 24" width="58%" height="58%"><path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.4 0-9 2.2-9 6v2h18v-2c0-3.8-4.6-6-9-6Z"/></svg>' +
-      '</span>';
+  var PAL_AVATAR = ["#3b5bdb", "#2f9e44", "#e8590c", "#9c36b5", "#1098ad", "#c2255c", "#0c8599", "#5c7cfa"];
+  function corAvatar(nome) {
+    var s = norm(nome), h = 0;
+    for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+    return PAL_AVATAR[h % PAL_AVATAR.length];
+  }
+  function iniciais(nome) {
+    var t = norm(nome).split(" ").filter(Boolean);
+    if (!t.length) return "?";
+    if (t.length >= 2) return (t[0][0] + t[t.length - 1][0]).toUpperCase();
+    return t[0].slice(0, 2).toUpperCase();
+  }
+  function avatar(nome) {
+    return '<span class="sel-face sel-face-ini" style="background:' + corAvatar(nome) + '" aria-hidden="true">' +
+      esc(iniciais(nome)) + "</span>";
   }
 
   var SEL = [], PAISES = {}, ELENCOS = {};
@@ -95,7 +106,7 @@
         '<small>' + esc(pluralJogadores(lista.length)) + '</small>' +
       '</summary>' +
       '<div class="sel-squad">' + lista.map(function (p) {
-        var face = p.foto ? '<span class="sel-face"><img src="' + esc(p.foto) + '" alt="" loading="lazy"></span>' : silhueta();
+        var face = p.foto ? '<span class="sel-face"><img src="' + esc(p.foto) + '" alt="" loading="lazy"></span>' : avatar(p.nome);
         var sub = [p.pos, p.num].filter(Boolean).join(" · ");
         return '<div class="sel-player">' + face +
           '<span class="sel-player-nome">' + esc(p.nome || "—") + "</span>" +
@@ -152,6 +163,9 @@
     $("#sel-scroller").addEventListener("click", function (e) {
       var b = e.target.closest(".sel-card"); if (b) abreFicha(b.getAttribute("data-id"));
     });
+    document.addEventListener("click", function (e) {
+      if (e.target.closest("[data-creditos]")) { e.preventDefault(); mostrarCreditos(); }
+    });
     var menu = $("#sel-menu-paises");
     if (menu) {
       menu.addEventListener("change", function () {
@@ -164,6 +178,31 @@
     window.addEventListener("hashchange", function () {
       var h = (location.hash || "").replace("#", "").toUpperCase();
       if (h && SEL.find(function (x) { return x.id === h; })) abreFicha(h); else voltar();
+    });
+  }
+
+  var CRED_CARREGADO = false;
+  function mostrarCreditos() {
+    var box = document.getElementById("sel-creditos");
+    if (!box) return;
+    if (box.hidden) { box.hidden = false; } else { box.hidden = true; return; }
+    if (CRED_CARREGADO) return;
+    CRED_CARREGADO = true;
+    box.innerHTML = '<div class="sel-cred-tit">Créditos das imagens</div><div class="sel-cred-load">Carregando…</div>';
+    getJSON("dados/rostos_creditos.json").then(function (cj) {
+      var itens = (cj && cj.creditos) || [];
+      var html = '<div class="sel-cred-tit">Créditos das imagens</div>';
+      html += '<p class="sel-cred-intro">Fotos: ESPN, Wikipedia e Wikimedia Commons quando disponíveis; quando não há fonte segura, exibimos um avatar com as iniciais.</p>';
+      if (itens.length) {
+        html += '<ul class="sel-cred-lista">' + itens.map(function (c) {
+          var aut = c.autor ? esc(c.autor) : (c.fonte || "");
+          var lic = c.licenca ? " — " + esc(c.licenca) : "";
+          return "<li><b>" + esc(c.nome || "") + "</b> (" + esc(c.selecao || "") + "): " + aut + lic + "</li>";
+        }).join("") + "</ul>";
+      } else {
+        html += '<p class="sel-cred-intro">Ainda não há imagens licenciadas registradas (o robô preenche ao rodar).</p>';
+      }
+      box.innerHTML = html;
     });
   }
 

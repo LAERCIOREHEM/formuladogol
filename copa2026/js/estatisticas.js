@@ -39,9 +39,21 @@
   function normNome(s) {
     return String(s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
   }
-  function silhuetaArt() {
-    return '<span class="stat-face stat-face-ph" aria-hidden="true">' +
-      '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.4 0-9 2.2-9 6v2h18v-2c0-3.8-4.6-6-9-6Z"/></svg></span>';
+  var PAL_AVATAR = ["#3b5bdb", "#2f9e44", "#e8590c", "#9c36b5", "#1098ad", "#c2255c", "#0c8599", "#5c7cfa"];
+  function corAvatar(nome) {
+    var s = normNome(nome), h = 0;
+    for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+    return PAL_AVATAR[h % PAL_AVATAR.length];
+  }
+  function iniciaisArt(nome) {
+    var t = normNome(nome).split(" ").filter(Boolean);
+    if (!t.length) return "?";
+    if (t.length >= 2) return (t[0][0] + t[t.length - 1][0]).toUpperCase();
+    return t[0].slice(0, 2).toUpperCase();
+  }
+  function avatarArt(nome) {
+    return '<span class="stat-face stat-face-ini" style="background:' + corAvatar(nome) + '" aria-hidden="true">' +
+      esc(iniciaisArt(nome)) + "</span>";
   }
   function faceArtilheiro(equipe, nome) {
     var mapa = ROSTOS && ROSTOS.mapa;
@@ -49,7 +61,7 @@
       var foto = mapa[String(equipe).toUpperCase() + "|" + normNome(nome)];
       if (foto) return '<span class="stat-face"><img src="' + esc(foto) + '" alt="" loading="lazy"></span>';
     }
-    return silhuetaArt();
+    return avatarArt(nome);
   }
 
   function siglaSelecao(valor) {
