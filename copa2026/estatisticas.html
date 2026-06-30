@@ -25,7 +25,7 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0PPWGP93FD');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css?v=20260630v2">
+<link rel="stylesheet" href="css/copa.css?v=20260630estat-layout-v1">
 <style>
   .wrap{max-width:580px;margin:0 auto;padding:16px 12px 60px}
   .stat-hero{margin-top:14px}
@@ -80,6 +80,152 @@
     max-width:max-content;
   }
   .stat-jogo-pen b{color:var(--branco)}
+
+
+  /* ==========================================================================
+     ESTATÍSTICAS — ajuste fino de layout
+     Corrige:
+     1) Gols/seleção: nome completo, quantidade de gols à direita e botão abaixo.
+     2) Por jogo no celular: placar volta para o centro, com seleções nas laterais.
+     ========================================================================== */
+
+  /* Gols/seleção — desktop e notebook */
+  .stat-row.stat-row-selecao{
+    grid-template-columns:34px minmax(0,1fr) auto 82px !important;
+    align-items:center;
+    column-gap:12px;
+  }
+  .stat-row.stat-row-selecao .stat-player{
+    min-width:0;
+  }
+  .stat-row.stat-row-selecao .stat-player strong{
+    white-space:normal;
+    overflow:visible;
+    text-overflow:clip;
+    line-height:1.12;
+    font-size:14.8px;
+  }
+  .stat-row.stat-row-selecao .stat-player span{
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .stat-row.stat-row-selecao .stat-meta{
+    justify-self:start;
+    white-space:nowrap;
+  }
+  .stat-row.stat-row-selecao .stat-num{
+    justify-self:end;
+    min-width:78px;
+  }
+  .stat-row.stat-row-selecao .stat-goals-toggle{
+    grid-column:1 / -1;
+    width:100%;
+  }
+
+  @media(max-width:680px){
+    .stat-row.stat-row-selecao{
+      grid-template-columns:38px minmax(0,1fr) 78px !important;
+      gap:8px 10px;
+      padding:12px 11px;
+      align-items:center;
+    }
+    .stat-row.stat-row-selecao .stat-pos{
+      grid-column:1;
+      grid-row:1;
+      align-self:center;
+      font-size:22px;
+    }
+    .stat-row.stat-row-selecao .stat-player{
+      grid-column:2;
+      grid-row:1;
+      align-self:center;
+    }
+    .stat-row.stat-row-selecao .stat-player strong{
+      font-size:15px;
+      line-height:1.12;
+    }
+    .stat-row.stat-row-selecao .stat-player span{
+      margin-top:4px;
+      font-size:12px;
+    }
+    .stat-row.stat-row-selecao .stat-meta{
+      display:none;
+    }
+    .stat-row.stat-row-selecao .stat-mobile-meta{
+      display:block;
+      line-height:1.35;
+      margin-top:5px;
+    }
+    .stat-row.stat-row-selecao .stat-num{
+      grid-column:3;
+      grid-row:1;
+      align-self:center;
+      justify-self:end;
+      min-width:74px;
+    }
+    .stat-row.stat-row-selecao .stat-goals-toggle{
+      grid-column:1 / -1;
+      grid-row:2;
+      margin-top:2px;
+    }
+  }
+
+  /* Por jogo — no celular não empilha placar em cima e seleções embaixo */
+  @media(max-width:520px){
+    .stat-jogo-linha{
+      grid-template-columns:minmax(0,1fr) minmax(74px,88px) minmax(0,1fr) !important;
+      gap:7px;
+      align-items:center;
+    }
+    .stat-jogo-meio{
+      order:0 !important;
+      min-width:0;
+      text-align:center;
+    }
+    .stat-jogo-lado,
+    .stat-jogo-lado.dir{
+      justify-content:center;
+      text-align:center;
+      flex-direction:column;
+      gap:5px;
+      font-size:13px;
+      min-width:0;
+    }
+    .stat-jogo-lado img{
+      width:32px;
+      height:22px;
+    }
+    .stat-jogo-lado span{
+      max-width:100%;
+      white-space:normal;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      line-height:1.08;
+      font-size:13px;
+    }
+    .stat-jogo-placar{
+      font-size:28px;
+      line-height:1;
+    }
+    .stat-jogo-data{
+      font-size:11px;
+      line-height:1.2;
+      white-space:normal;
+    }
+    .stat-jogo-venue{
+      font-size:12px;
+      line-height:1.28;
+    }
+    .stat-jogo-pen{
+      max-width:100%;
+      font-size:11.5px;
+      line-height:1.25;
+      padding:5px 9px;
+    }
+  }
+
 
 </style>
 </head>
