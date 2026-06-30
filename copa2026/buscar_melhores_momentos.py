@@ -173,8 +173,8 @@ def parse_confronto_generico(titulo):
     m = re.search(r"(.+?)\s+(?:\d+\s*(?:\(\s*\d+\s*\)\s*)?)?[xX]\s*(?:(?:\(\s*\d+\s*\)\s*)?\d+\s*)?(.+)", t)
     if not m:
         return None, None
-    a = id_do_time_parse(m.group(1))
-    b = id_do_time_parse(m.group(2))
+    a = id_unico_lado_confronto(m.group(1))
+    b = id_unico_lado_confronto(m.group(2))
     if a and b and a != b:
         return a, b
     return None, None
@@ -441,14 +441,20 @@ def yt_search_caze_evento(api_key, event_type, max_results=25):
 
 
 def ids_times_no_texto(trecho):
-    """Retorna as siglas de seleções citadas no texto, por apelidos PT/EN.
-    Usado apenas para validar live de jogo quando o título não está no padrão
-    perfeito 'TIME X TIME', mas contém claramente os dois países."""
+    """Retorna as siglas de seleções citadas no texto, por apelidos PT/EN
+    e também por sigla pura, como CIV/NOR/GER.
+
+    Usado para validar live de jogo quando o título não está no padrão perfeito
+    'TIME X TIME', mas contém claramente os dois países.
+    """
     t = norm(trecho)
     achados = []
     pares = list(APELIDOS.items()) + list(APELIDOS_EN.items())
     for ape, cod in sorted(pares, key=lambda x: len(x[0]), reverse=True):
         if re.search(r"(^| )" + re.escape(ape) + r"($| )", t) and cod not in achados:
+            achados.append(cod)
+    for cod in sorted(set(APELIDOS.values()) | set(APELIDOS_EN.values()), key=len, reverse=True):
+        if len(cod) >= 3 and re.search(r"(^| )" + re.escape(cod) + r"($| )", t) and cod not in achados:
             achados.append(cod)
     return achados
 
@@ -458,6 +464,25 @@ def parse_confronto_por_presenca(titulo):
     if len(ids) == 2 and ids[0] != ids[1]:
         return ids[0], ids[1]
     return None, None
+
+
+def id_unico_lado_confronto(trecho):
+    """Retorna a seleção de um lado do confronto somente se aquele lado
+    contém exatamente UM país reconhecido.
+
+    Evita aceitar título contaminado:
+    'BRASIL CONHECE ADVERSÁRIO! COSTA DO MARFIM X NORUEGA'
+    não pode virar CIV x NOR.
+    """
+    ids = ids_times_no_texto(trecho)
+    if len(ids) == 1:
+        return ids[0]
+    return None
+
+
+def titulo_tem_selecao_fora_do_jogo(titulo, esperados):
+    esperados = set(esperados or [])
+    return [x for x in ids_times_no_texto(titulo) if x not in esperados]
 
 
 def titulo_ruim_para_live(titulo):
@@ -809,10 +834,19 @@ def dedupe_videos(videos):
 
 def aceitar_live_para_jogo(video, jogo, origem=""):
     """Validação central: só aceita o vídeo se o título contém exatamente as
-    duas seleções daquele jogo, em qualquer ordem. Sem isso, não grava link."""
+    duas seleções daquele jogo, em qualquer ordem. Sem isso, não grava link.
+
+    Proteção adicional: se o título citar uma terceira seleção, rejeita.
+    Ex.: 'BRASIL CONHECE ADVERSÁRIO! COSTA DO MARFIM X NORUEGA' não pode
+    virar link oficial de CIV-NOR.
+    """
     titulo = video.get("titulo", "")
     estado = video.get("estado", "none") or "none"
     if not parece_transmissao_de_jogo(titulo, estado):
+        return None
+    extras = titulo_tem_selecao_fora_do_jogo(titulo, [jogo["a"], jogo["b"]])
+    if extras:
+        print(f"  rejeitei live com seleção extra no título ({jogo['chave']}): {extras} -> {titulo[:90]}")
         return None
     a, b = parse_jogo_live_ou_generico(titulo)
     if not a or not b:
@@ -981,7 +1015,7 @@ def parse_jogo_live(titulo):
     m = re.search(r"(.+?)\s+[xX]\s+(.+)", antes_barra)
     if not m:
         return None, None
-    return id_do_time_parse(m.group(1)), id_do_time_parse(m.group(2))
+    return id_unico_lado_confronto(m.group(1)), id_unico_lado_confronto(m.group(2))
 
 
 def estado_dos_videos(api_key, video_ids):
@@ -1167,6 +1201,26 @@ def atualizar_lives(api_key):
             print(f"  removendo fallback não validado de live: {chave} -> {url}")
             del jogos[chave]
 
+    # Revalida links automáticos já gravados contra a agenda atual.
+    # Isso remove casos em que um título de pré-jogo/comentário mencionou o
+    # confronto, mas também citou outra seleção, como BRASIL + CIV + NOR.
+    agenda_revalidacao = {j["chave"]: j for j in jogos_espn_para_mapear_streams(dias_futuros=45)}
+    for chave, item in list(jogos.items()):
+        if item.get("fonte") == "admin":
+            continue
+        jogo = agenda_revalidacao.get(chave)
+        if not jogo:
+            continue
+        video_id = (item.get("url", "").split("v=")[-1].split("&")[0] if item.get("url") else "")
+        simulado = {
+            "videoId": video_id,
+            "titulo": item.get("titulo", ""),
+            "estado": item.get("estado", "none") or "none",
+        }
+        if not aceitar_live_para_jogo(simulado, jogo, origem="revalidacao-lives-json"):
+            print(f"  removendo live automática reprovada na revalidação: {chave} -> {item.get('titulo','')[:80]}")
+            del jogos[chave]
+
     # 1) uploads recentes do canal (isto SEMPRE funciona — o eventType não)
     uploads = buscar_uploads_recentes(api_key, paginas=2)  # ~100 vídeos recentes
     # 2) filtra os que são JOGO (ao vivo / jogo completo) e extrai os times
@@ -1174,7 +1228,15 @@ def atualizar_lives(api_key):
     for v in uploads:
         a, b = parse_jogo_live(v["titulo"])
         if a and b:
-            candidatos.append({"a": a, "b": b, "videoId": v["videoId"], "titulo": v["titulo"], "origem": "uploads-recentes", "validado_confronto": True})
+            chave = "-".join(sorted([a, b]))
+            jogo = agenda_revalidacao.get(chave, {"a": a, "b": b, "chave": chave})
+            aceito = aceitar_live_para_jogo(
+                {"videoId": v["videoId"], "titulo": v["titulo"], "estado": "none"},
+                jogo,
+                origem="uploads-recentes"
+            )
+            if aceito:
+                candidatos.append(aceito)
 
     # 3) Pré-mapeia lives publicadas em @CazeTV/streams e eventType=upcoming.
     # Isso preenche lives.json ANTES do jogo começar, desde que o título da
