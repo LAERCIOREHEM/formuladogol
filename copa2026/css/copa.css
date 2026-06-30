@@ -341,3 +341,73 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 .canon-fase .cn-ok{background:#2ad36f}
 .canon-fase .cn-err{background:#ff4b5b}
 @media (max-width:640px){.canon-fase .cn-chip{font-size:11.5px;padding:3px 7px}.canon-fase .cn-status{width:14px;height:14px;font-size:10px}}
+
+/* Resumo recolhível dos acertos no painel "Meus Palpites" */
+.canon-fase .cn-resumo{margin-top:10px;border:1px solid rgba(244,197,66,.28);border-radius:12px;background:rgba(0,0,0,.16);overflow:hidden}
+.canon-fase .cn-resumo summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 12px;color:var(--gold);font-weight:800;font-size:12px;letter-spacing:.15px;text-align:center;user-select:none}
+.canon-fase .cn-resumo summary::-webkit-details-marker{display:none}
+.canon-fase .cn-resumo summary::after{content:"▾";font-size:11px;margin-left:2px;color:var(--gold)}
+.canon-fase .cn-resumo[open] summary::after{content:"▴"}
+.canon-fase .cn-resumo-body{border-top:1px solid rgba(255,255,255,.08);padding:11px 12px 12px;display:grid;gap:10px}
+.canon-fase .cn-resumo-label{font-size:11px;font-weight:900;letter-spacing:.35px;text-transform:uppercase;margin-bottom:6px}
+.canon-fase .cn-ok-label{color:#5ff08f}
+.canon-fase .cn-err-label{color:#ff7885}
+.canon-fase .cn-pend-label{color:var(--cinza)}
+.canon-fase .cn-resumo-chips{display:flex;flex-wrap:wrap;gap:6px}
+.canon-fase .cn-mini-chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:11.5px;font-weight:700;line-height:1.15;background:rgba(0,0,0,.20);border:1px solid var(--linha);color:var(--branco)}
+.canon-fase .cn-mini-chip img,.canon-fase .cn-mini-chip .flag{width:16px;height:auto;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}
+.canon-fase .cn-mini-ok{border-color:rgba(42,211,111,.35);background:rgba(42,211,111,.09)}
+.canon-fase .cn-mini-err{border-color:rgba(255,75,91,.36);background:rgba(255,75,91,.10)}
+.canon-fase .cn-vazio{font-size:11.5px;color:var(--cinza);font-style:italic}
+@media (max-width:640px){.canon-fase .cn-resumo summary{font-size:11.5px;padding:9px 8px}.canon-fase .cn-resumo-body{padding:10px 9px}.canon-fase .cn-mini-chip{font-size:11px;padding:3px 7px}}
+
+/* Resumo direto no título do painel "Meus Palpites" */
+.canon-fase .cn-tit{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.canon-fase .cn-resumo-inline{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(244,197,66,.35);background:rgba(244,197,66,.10);color:var(--gold);border-radius:999px;padding:4px 9px;font-size:11.5px;font-weight:900;letter-spacing:.05px;white-space:nowrap;text-transform:none}
+@media (max-width:640px){.canon-fase .cn-tit{align-items:flex-start;gap:6px}.canon-fase .cn-resumo-inline{font-size:10.8px;padding:4px 7px;gap:4px;white-space:normal}}
+
+
+/* Meus Palpites: resumo separado dentro do painel principal */
+.canon-fase .cn-grupos-status{display:grid;gap:10px;margin-top:10px}
+.canon-fase .cn-grupo-status{border-radius:14px;padding:9px 10px;background:rgba(0,0,0,.10);border:1px solid rgba(255,255,255,.07)}
+.canon-fase .cn-grupo-ok{border-color:rgba(42,211,111,.20);background:rgba(42,211,111,.055)}
+.canon-fase .cn-grupo-err{border-color:rgba(255,75,91,.22);background:rgba(255,75,91,.055)}
+.canon-fase .cn-grupo-pend{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.035)}
+.canon-fase .cn-grupo-tit{font-size:11.5px;font-weight:900;letter-spacing:.35px;text-transform:uppercase;margin-bottom:7px;color:var(--branco)}
+.canon-fase .cn-grupo-ok .cn-grupo-tit{color:#68f29a}
+.canon-fase .cn-grupo-err .cn-grupo-tit{color:#ff7786}
+.canon-fase .cn-grupo-pend .cn-grupo-tit{color:var(--cinza)}
+.canon-fase .cn-chips-status{gap:6px}
+.canon-fase .cn-chips-status .cn-chip{font-size:11.5px;padding:3px 7px}
+@media (max-width:640px){
+  .canon-fase .cn-grupos-status{gap:8px;margin-top:8px}
+  .canon-fase .cn-grupo-status{padding:8px 8px;border-radius:12px}
+  .canon-fase .cn-grupo-tit{font-size:10.8px;margin-bottom:6px}
+  .canon-fase .cn-chips-status .cn-chip{font-size:10.9px;padding:3px 6px;gap:5px}
+}
+
+
+.stat-goals-toggle{grid-column:1 / -1;margin-top:2px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px}
+.stat-goals-summary{list-style:none;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(0,0,0,.16);border:1px solid var(--linha);border-radius:10px;padding:9px 12px;color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;user-select:none}
+.stat-goals-summary::-webkit-details-marker{display:none}
+.stat-goals-summary:hover{filter:brightness(1.04)}
+.stat-goals-summary-open{display:none}
+.stat-goals-toggle[open] .stat-goals-summary-closed{display:none}
+.stat-goals-toggle[open] .stat-goals-summary-open{display:inline}
+.stat-goals-body{display:flex;flex-direction:column;gap:7px;padding-top:8px}
+.stat-goal-item{display:grid;grid-template-columns:1fr 68px;align-items:center;gap:9px;background:rgba(0,0,0,.16);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:9px 10px}
+.stat-goal-player{min-width:0}
+.stat-goal-player strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat-goal-player span{display:flex;align-items:center;gap:5px;margin-top:3px;color:var(--cinza);font-size:11px;line-height:1.35}
+.stat-goal-num{text-align:center;background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:5px 4px}
+.stat-goal-num b{display:block;font-family:'Anton',sans-serif;font-size:20px;line-height:1;color:var(--branco)}
+.stat-goal-num small{display:block;font-size:9px;color:var(--cinza);margin-top:2px;white-space:nowrap}
+.stat-goal-item-extra strong{color:var(--gold)}
+.stat-goals-empty{background:rgba(0,0,0,.12);border:1px dashed rgba(255,255,255,.10);border-radius:10px;padding:12px 10px;text-align:center;color:var(--cinza);font-size:12px;line-height:1.45}
+@media(max-width:640px){
+  .stat-goals-summary{font-size:11.5px;padding:8px 10px}
+  .stat-goal-item{grid-template-columns:1fr 60px;gap:8px;padding:8px 9px}
+  .stat-goal-player strong{font-size:12.5px}
+  .stat-goal-player span{font-size:10.5px}
+  .stat-goal-num b{font-size:18px}
+}
