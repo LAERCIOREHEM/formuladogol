@@ -88,6 +88,98 @@
   .oa-penalti{margin:7px auto 2px;text-align:center;color:var(--gold);font-size:12px;font-weight:900;background:rgba(244,197,66,.09);border:1px solid rgba(244,197,66,.27);border-radius:999px;padding:5px 10px;max-width:max-content}
   .oa-penalti b{color:var(--branco)}
 
+
+  .oa-filtros{
+    margin:0 0 15px;
+    padding:11px;
+    border:1px solid var(--linha);
+    border-radius:14px;
+    background:linear-gradient(180deg,rgba(28,58,101,.72),rgba(15,39,77,.72));
+    box-shadow:0 8px 18px rgba(0,0,0,.14);
+  }
+  .oa-filtros-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:9px;
+  }
+  .oa-filtros-top strong{
+    color:var(--gold);
+    font-size:13px;
+    font-weight:900;
+  }
+  .oa-filtros-top span{
+    color:var(--cinza);
+    font-size:11px;
+    font-weight:700;
+    text-align:right;
+  }
+  .oa-filtros-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .oa-filtros label{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    color:var(--cinza);
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+  }
+  .oa-filtros select{
+    width:100%;
+    min-height:40px;
+    border:1px solid var(--linha);
+    border-radius:10px;
+    background:var(--navy-2);
+    color:var(--branco);
+    font-family:inherit;
+    font-size:13px;
+    font-weight:800;
+    padding:0 10px;
+    outline:none;
+  }
+  .oa-filtros select:focus{
+    border-color:rgba(244,197,66,.76);
+    box-shadow:0 0 0 3px rgba(244,197,66,.12);
+  }
+  #oa-limpar-filtros{
+    width:100%;
+    margin-top:8px;
+    min-height:38px;
+    border:1px solid rgba(244,197,66,.32);
+    border-radius:10px;
+    background:rgba(244,197,66,.08);
+    color:var(--gold);
+    font-family:inherit;
+    font-size:12px;
+    font-weight:900;
+    cursor:pointer;
+  }
+  #oa-limpar-filtros:active{transform:scale(.99)}
+  .oa-sem-resultados{
+    text-align:center;
+    color:var(--cinza);
+    background:var(--navy-2);
+    border:1px solid var(--linha);
+    border-radius:12px;
+    padding:18px 12px;
+    margin:10px 0;
+    line-height:1.45;
+  }
+  @media(max-width:480px){
+    .oa-filtros{padding:10px}
+    .oa-filtros-grid{grid-template-columns:1fr}
+    .oa-filtros-top{align-items:flex-start;flex-direction:column;gap:4px}
+    .oa-filtros-top span{text-align:left}
+    .oa-filtros select{min-height:42px;font-size:13px}
+  }
+
+
 </style>
 </head>
 <body>
@@ -114,6 +206,38 @@
     <button id="btn-share">🔗 Compartilhe com amigos</button>
   </div>
 
+  <section class="oa-filtros" aria-label="Filtrar e ordenar jogos">
+    <div class="oa-filtros-top">
+      <strong>🔎 Filtrar e ordenar</strong>
+      <span id="oa-filtro-resumo">Carregando jogos…</span>
+    </div>
+    <div class="oa-filtros-grid">
+      <label>Seleção
+        <select id="oa-filtro-selecao">
+          <option value="">Todas as seleções</option>
+        </select>
+      </label>
+      <label>Data
+        <select id="oa-filtro-data">
+          <option value="">Todas as datas</option>
+        </select>
+      </label>
+      <label>Ordenar por
+        <select id="oa-ordem-campo">
+          <option value="data">Data</option>
+          <option value="selecao">Seleção</option>
+        </select>
+      </label>
+      <label>Ordem
+        <select id="oa-ordem-direcao">
+          <option value="asc">Crescente</option>
+          <option value="desc">Decrescente</option>
+        </select>
+      </label>
+    </div>
+    <button id="oa-limpar-filtros" type="button">Limpar filtros</button>
+  </section>
+
   <div id="lista"><p class="vazio">Carregando jogos…</p></div>
 </div>
 
@@ -127,7 +251,7 @@
   </footer>
 
 <script src="js/jogo-stats.js?v=20260629fase1-v2"></script>
-  <script src="js/onde-assistir.js?v=20260630penaltis-v1"></script>
+  <script src="js/onde-assistir.js?v=20260630filtros-v1"></script>
   <script src="js/aniversarios.js?v=20260618b"></script>
   <script src="js/config.js?v=20260621f"></script>
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
