@@ -411,3 +411,48 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .stat-goal-player span{font-size:10.5px}
   .stat-goal-num b{font-size:18px}
 }
+
+/* ==========================================================================
+   Correção do menu principal — mantém TODOS os links visíveis.
+   Motivo: em larguras intermediárias do navegador, o menu flex anterior
+   deixava "Meus Palpites" fora da área visível.
+   ========================================================================== */
+.menu{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  overflow:visible;
+  gap:6px;
+}
+.menu a{
+  min-width:0;
+  flex:none;
+  padding:10px 7px;
+  font-size:13px;
+  line-height:1.15;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+}
+@media(max-width:780px){
+  .menu{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
+  .menu a{
+    padding:9px 6px;
+    font-size:13px;
+  }
+}
+@media(max-width:420px){
+  .menu{
+    gap:5px;
+    padding:5px;
+  }
+  .menu a{
+    padding:8px 3px;
+    font-size:12px;
+    letter-spacing:-.15px;
+  }
+}
+
