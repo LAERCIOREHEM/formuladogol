@@ -42,15 +42,18 @@ jobs:
           HORA="$(date -u +%H)"
           MINUTO="$(date -u +%M)"
 
+          HOJE_EPOCH="$(date -u -d "$HOJE" +%s)"
+          TURBO_FIM_EPOCH="$(date -u -d "$TURBO_FIM" +%s)"
+
           if [[ "$EVENTO" == "workflow_dispatch" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "mode=manual" >> "$GITHUB_OUTPUT"
             echo "Execução manual liberada."
-          elif [[ "$HOJE" <= "$TURBO_FIM" ]]; then
+          elif (( HOJE_EPOCH <= TURBO_FIM_EPOCH )); then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "mode=turbo" >> "$GITHUB_OUTPUT"
             echo "Modo turbo de fotos ativo até $TURBO_FIM."
-          elif [[ "$MINUTO" == "00" && ( "$HORA" == "06" || "$HORA" == "07" || "$HORA" == "08" || "$HORA" == "09" ) ]]; then
+          elif [[ "$MINUTO" == "00" ]] && [[ "$HORA" =~ ^(06|07|08|09)$ ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "mode=normal" >> "$GITHUB_OUTPUT"
             echo "Janela normal liberada: $HORA:$MINUTO UTC."
