@@ -1,10 +1,10 @@
 {
-  "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
+  "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-01T02:50:47.746384Z",
+  "atualizado_em": "2026-07-01T16:53:56.774540Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 79,
+  "jogos_processados": 80,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -48,21 +48,6 @@
         "760430",
         "760454",
         "760490"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Ismael Saibari",
-      "equipe": "MAR",
-      "gols": 4,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760419",
-        "760445",
-        "760464",
-        "760488"
       ],
       "total_cartoes": 0
     },
@@ -156,6 +141,20 @@
       "jogos": [
         "760437",
         "760485"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ismael Saibari",
+      "equipe": "MAR",
+      "gols": 3,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760419",
+        "760445",
+        "760464"
       ],
       "total_cartoes": 0
     },
@@ -396,30 +395,18 @@
       "total_cartoes": 1
     },
     {
-      "nome": "Jamal Musiala",
-      "equipe": "GER",
-      "gols": 2,
-      "assistencias": 0,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760422",
-        "760489"
-      ],
-      "total_cartoes": 1
-    },
-    {
       "nome": "Jude Bellingham",
       "equipe": "ENG",
       "gols": 2,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760437",
-        "760485"
+        "760485",
+        "760495"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Leandro Trossard",
@@ -445,32 +432,6 @@
         "760484"
       ],
       "total_cartoes": 1
-    },
-    {
-      "nome": "Matías Galarza",
-      "equipe": "PAR",
-      "gols": 2,
-      "assistencias": 1,
-      "amarelos": 2,
-      "vermelhos": 0,
-      "jogos": [
-        "760443",
-        "760489"
-      ],
-      "total_cartoes": 2
-    },
-    {
-      "nome": "Mauricio",
-      "equipe": "PAR",
-      "gols": 2,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760417",
-        "760489"
-      ],
-      "total_cartoes": 0
     },
     {
       "nome": "Maxi Araújo",
@@ -571,19 +532,6 @@
       "jogos": [
         "760439",
         "760463"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Soufiane Rahimi",
-      "equipe": "MAR",
-      "gols": 2,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760464",
-        "760488"
       ],
       "total_cartoes": 0
     },
@@ -798,6 +746,18 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Brian Cipenga",
+      "equipe": "COD",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760495"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Caleb Yirenkyi",
       "equipe": "GHA",
       "gols": 1,
@@ -821,18 +781,6 @@
         "760487"
       ],
       "total_cartoes": 2
-    },
-    {
-      "nome": "Chemsdine Talbi",
-      "equipe": "MAR",
-      "gols": 1,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760488"
-      ],
-      "total_cartoes": 0
     },
     {
       "nome": "Connor Metcalfe",
@@ -1030,18 +978,6 @@
       "total_cartoes": 1
     },
     {
-      "nome": "Gustavo Gómez",
-      "equipe": "PAR",
-      "gols": 1,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760489"
-      ],
-      "total_cartoes": 0
-    },
-    {
       "nome": "Habib Diarra",
       "equipe": "SEN",
       "gols": 1,
@@ -1140,6 +1076,19 @@
       "total_cartoes": 2
     },
     {
+      "nome": "Jamal Musiala",
+      "equipe": "GER",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760422",
+        "760489"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Jaminton Campaz",
       "equipe": "COL",
       "gols": 1,
@@ -1172,31 +1121,6 @@
       "vermelhos": 0,
       "jogos": [
         "760418"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Joshua Kimmich",
-      "equipe": "GER",
-      "gols": 1,
-      "assistencias": 2,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760422",
-        "760489"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "José Canale",
-      "equipe": "PAR",
-      "gols": 1,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760489"
       ],
       "total_cartoes": 0
     },
@@ -1509,6 +1433,31 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Matías Galarza",
+      "equipe": "PAR",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760443",
+        "760489"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Mauricio",
+      "equipe": "PAR",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Michal Sadílek",
       "equipe": "CZE",
       "gols": 1,
@@ -1579,19 +1528,6 @@
       "vermelhos": 0,
       "jogos": [
         "760455"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Nadiem Amiri",
-      "equipe": "GER",
-      "gols": 1,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760448",
-        "760489"
       ],
       "total_cartoes": 0
     },
@@ -1830,6 +1766,18 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Soufiane Rahimi",
+      "equipe": "MAR",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760464"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Stephen Eustaquio",
       "equipe": "CAN",
       "gols": 1,
@@ -1853,18 +1801,6 @@
         "760438"
       ],
       "total_cartoes": 2
-    },
-    {
-      "nome": "Teun Koopmeiners",
-      "equipe": "NED",
-      "gols": 1,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760488"
-      ],
-      "total_cartoes": 0
     },
     {
       "nome": "Thapelo Maseko",
@@ -1938,18 +1874,6 @@
       "vermelhos": 0,
       "jogos": [
         "760464"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Wout Weghorst",
-      "equipe": "NED",
-      "gols": 1,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760488"
       ],
       "total_cartoes": 0
     },
@@ -2194,13 +2118,12 @@
     {
       "nome": "Joshua Kimmich",
       "equipe": "GER",
-      "gols": 1,
+      "gols": 0,
       "assistencias": 2,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
-        "760422",
-        "760489"
+        "760422"
       ],
       "total_cartoes": 0
     },
@@ -2523,9 +2446,22 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Chancel Mbemba",
+      "equipe": "COD",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760435",
+        "760495"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Chemsdine Talbi",
       "equipe": "MAR",
-      "gols": 1,
+      "gols": 0,
       "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
@@ -2882,13 +2818,14 @@
       "equipe": "ENG",
       "gols": 2,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760437",
-        "760485"
+        "760485",
+        "760495"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Julián Quiñones",
@@ -3105,7 +3042,7 @@
     {
       "nome": "Matías Galarza",
       "equipe": "PAR",
-      "gols": 2,
+      "gols": 1,
       "assistencias": 1,
       "amarelos": 2,
       "vermelhos": 0,
@@ -3217,13 +3154,12 @@
     {
       "nome": "Nadiem Amiri",
       "equipe": "GER",
-      "gols": 1,
+      "gols": 0,
       "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
-        "760448",
-        "760489"
+        "760448"
       ],
       "total_cartoes": 0
     },
@@ -3514,13 +3450,12 @@
     {
       "nome": "Soufiane Rahimi",
       "equipe": "MAR",
-      "gols": 2,
+      "gols": 1,
       "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
-        "760464",
-        "760488"
+        "760464"
       ],
       "total_cartoes": 0
     },
@@ -3684,6 +3619,19 @@
       "jogos": [
         "760417",
         "760443"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Piero Hincapié",
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 1,
+      "jogos": [
+        "760468",
+        "760491"
       ],
       "total_cartoes": 2
     },
@@ -3930,7 +3878,7 @@
     {
       "nome": "Matías Galarza",
       "equipe": "PAR",
-      "gols": 2,
+      "gols": 1,
       "assistencias": 1,
       "amarelos": 2,
       "vermelhos": 0,
@@ -3950,6 +3898,19 @@
       "jogos": [
         "760452",
         "760476"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Noah Sadiki",
+      "equipe": "COD",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760482",
+        "760495"
       ],
       "total_cartoes": 2
     },
@@ -4260,11 +4221,12 @@
       "nome": "Chancel Mbemba",
       "equipe": "COD",
       "gols": 0,
-      "assistencias": 0,
+      "assistencias": 1,
       "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760435"
+        "760435",
+        "760495"
       ],
       "total_cartoes": 1
     },
@@ -4801,7 +4763,7 @@
     {
       "nome": "Jamal Musiala",
       "equipe": "GER",
-      "gols": 2,
+      "gols": 1,
       "assistencias": 0,
       "amarelos": 1,
       "vermelhos": 0,
@@ -4980,6 +4942,20 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Jude Bellingham",
+      "equipe": "ENG",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760437",
+        "760485",
+        "760495"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Junnosuke Suzuki",
       "equipe": "JPN",
       "gols": 0,
@@ -5038,6 +5014,18 @@
       "jogos": [
         "760449",
         "760487"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Kendry Páez",
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760491"
       ],
       "total_cartoes": 1
     },
@@ -5362,6 +5350,18 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Moisés Caicedo",
+      "equipe": "ECU",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760491"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Nasser Al Dawsari",
       "equipe": "KSA",
       "gols": 0,
@@ -5473,18 +5473,6 @@
       "total_cartoes": 1
     },
     {
-      "nome": "Noah Sadiki",
-      "equipe": "COD",
-      "gols": 0,
-      "assistencias": 0,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760482"
-      ],
-      "total_cartoes": 1
-    },
-    {
       "nome": "Nélson Semedo",
       "equipe": "POR",
       "gols": 0,
@@ -5569,18 +5557,6 @@
         "760437",
         "760460",
         "760480"
-      ],
-      "total_cartoes": 1
-    },
-    {
-      "nome": "Piero Hincapié",
-      "equipe": "ECU",
-      "gols": 0,
-      "assistencias": 0,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760468"
       ],
       "total_cartoes": 1
     },
@@ -6106,15 +6082,6 @@
       "media_gols": 2.0
     },
     {
-      "equipe": "ENG",
-      "gols": 6,
-      "assistencias": 5,
-      "amarelos": 2,
-      "vermelhos": 0,
-      "jogos": 3,
-      "media_gols": 2.0
-    },
-    {
       "equipe": "POR",
       "gols": 6,
       "assistencias": 3,
@@ -6122,6 +6089,15 @@
       "vermelhos": 0,
       "jogos": 3,
       "media_gols": 2.0
+    },
+    {
+      "equipe": "ENG",
+      "gols": 6,
+      "assistencias": 5,
+      "amarelos": 3,
+      "vermelhos": 0,
+      "jogos": 4,
+      "media_gols": 1.5
     },
     {
       "equipe": "ALG",
@@ -6179,12 +6155,12 @@
     },
     {
       "equipe": "COD",
-      "gols": 4,
-      "assistencias": 2,
-      "amarelos": 5,
+      "gols": 5,
+      "assistencias": 3,
+      "amarelos": 6,
       "vermelhos": 0,
-      "jogos": 3,
-      "media_gols": 1.33
+      "jogos": 4,
+      "media_gols": 1.25
     },
     {
       "equipe": "COL",
@@ -6334,8 +6310,8 @@
       "equipe": "ECU",
       "gols": 2,
       "assistencias": 2,
-      "amarelos": 6,
-      "vermelhos": 0,
+      "amarelos": 8,
+      "vermelhos": 1,
       "jogos": 4,
       "media_gols": 0.5
     },
