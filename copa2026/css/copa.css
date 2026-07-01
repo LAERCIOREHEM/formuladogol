@@ -945,3 +945,27 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .sel-match-mid{min-width:54px}
 }
 .sel-card-meta{justify-content:center;text-align:center;line-height:1.08;white-space:normal;max-width:92px;flex-wrap:wrap}
+
+
+/* ==========================================================================
+   Links discretos para a ficha da seleção nas páginas vivas da Copa.
+   Mantém o visual original: apenas bandeira/nome ficam clicáveis.
+   ========================================================================== */
+.team-link{color:inherit;text-decoration:none;min-width:0}
+.team-link:focus-visible{outline:2px solid rgba(244,197,66,.85);outline-offset:3px;border-radius:8px}
+.team-link:hover .t,.team-link:hover .mm-nome,.team-link:hover .mm-opcao-time b,.team-link:hover .nm,.team-link:hover .cz-nome,.team-link:hover span{text-decoration:underline;text-decoration-color:rgba(244,197,66,.72);text-underline-offset:3px}
+.lado .team-link-lado{display:flex;align-items:center;gap:9px;min-width:0;max-width:100%}
+.lado.f .team-link-lado{justify-content:flex-end}
+.mm-equipe .team-link-mm{display:flex;align-items:center;gap:7px;min-width:0;flex:1;color:inherit}
+.mm-equipe.mm-definido .team-link-mm{color:#14213b}
+.team-link-mm-opcao{display:inline-flex;align-items:center;min-width:0;color:inherit}
+.oa-team .team-link-oa{display:flex;align-items:center;gap:7px;min-width:0;max-width:100%;color:inherit}
+.oa-away .team-link-oa{justify-content:flex-end}
+.oa-team .team-link-oa span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sel .team-link-live{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;color:inherit}
+.cz-time .team-link-cartaz{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0;color:inherit}
+@media(max-width:480px){
+  .lado .team-link-lado{flex-direction:column;justify-content:flex-start;align-items:center;gap:5px;text-align:center}
+  .lado.f .team-link-lado{flex-direction:column;align-items:center}
+  .oa-team .team-link-oa{gap:6px}
+}
