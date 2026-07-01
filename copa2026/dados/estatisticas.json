@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-01T22:42:46.965349Z",
+  "atualizado_em": "2026-07-01T22:54:05.544999Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 81,
@@ -427,11 +427,12 @@
       "nome": "Leandro Trossard",
       "equipe": "BEL",
       "gols": 2,
-      "assistencias": 0,
+      "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
-        "760477"
+        "760477",
+        "760493"
       ],
       "total_cartoes": 0
     },
@@ -536,6 +537,20 @@
         "760484"
       ],
       "total_cartoes": 0
+    },
+    {
+      "nome": "Romelu Lukaku",
+      "equipe": "BEL",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760451",
+        "760477",
+        "760493"
+      ],
+      "total_cartoes": 1
     },
     {
       "nome": "Rubén Vargas",
@@ -1732,19 +1747,6 @@
       "total_cartoes": 0
     },
     {
-      "nome": "Romelu Lukaku",
-      "equipe": "BEL",
-      "gols": 1,
-      "assistencias": 1,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760451",
-        "760477"
-      ],
-      "total_cartoes": 1
-    },
-    {
       "nome": "Sasa Kalajdzic",
       "equipe": "AUT",
       "gols": 1,
@@ -1877,6 +1879,18 @@
       "vermelhos": 0,
       "jogos": [
         "760464"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Youri Tielemans",
+      "equipe": "BEL",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760493"
       ],
       "total_cartoes": 0
     },
@@ -2946,6 +2960,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Leandro Trossard",
+      "equipe": "BEL",
+      "gols": 2,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760477",
+        "760493"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Lee Kang-In",
       "equipe": "KOR",
       "gols": 0,
@@ -3417,13 +3444,14 @@
     {
       "nome": "Romelu Lukaku",
       "equipe": "BEL",
-      "gols": 1,
+      "gols": 2,
       "assistencias": 1,
       "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760451",
-        "760477"
+        "760477",
+        "760493"
       ],
       "total_cartoes": 1
     },
@@ -3497,6 +3525,18 @@
       "vermelhos": 0,
       "jogos": [
         "760425"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Thomas Meunier",
+      "equipe": "BEL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760493"
       ],
       "total_cartoes": 0
     },
@@ -5677,13 +5717,14 @@
     {
       "nome": "Romelu Lukaku",
       "equipe": "BEL",
-      "gols": 1,
+      "gols": 2,
       "assistencias": 1,
       "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760451",
-        "760477"
+        "760477",
+        "760493"
       ],
       "total_cartoes": 1
     },
@@ -6073,6 +6114,15 @@
       "media_gols": 2.67
     },
     {
+      "equipe": "BEL",
+      "gols": 8,
+      "assistencias": 5,
+      "amarelos": 4,
+      "vermelhos": 1,
+      "jogos": 4,
+      "media_gols": 2.0
+    },
+    {
       "equipe": "ENG",
       "gols": 8,
       "assistencias": 7,
@@ -6143,15 +6193,6 @@
       "vermelhos": 0,
       "jogos": 3,
       "media_gols": 2.0
-    },
-    {
-      "equipe": "BEL",
-      "gols": 6,
-      "assistencias": 3,
-      "amarelos": 4,
-      "vermelhos": 1,
-      "jogos": 4,
-      "media_gols": 1.5
     },
     {
       "equipe": "ALG",
