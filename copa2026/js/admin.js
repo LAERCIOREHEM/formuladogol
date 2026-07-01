@@ -33,6 +33,126 @@
   }
   function alerta(m, ok) { const e = $("#msg"); e.textContent = m; e.className = "msg " + (ok ? "ok" : "erro"); e.classList.remove("oculto"); setTimeout(() => e.classList.add("oculto"), 4000); }
 
+
+  // ---------- aviso de novidade da página principal ----------
+  function slugDataHoje() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const dia = String(d.getDate()).padStart(2, "0");
+    return `novidades-${y}-${m}-${dia}`;
+  }
+
+  function limparIdAviso(v) {
+    return String(v || "")
+      .trim()
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9_-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 80);
+  }
+
+  function setValor(id, valor) {
+    const el = $(id);
+    if (el) el.value = valor == null ? "" : valor;
+  }
+
+  function getValor(id) {
+    const el = $(id);
+    return el ? String(el.value || "").trim() : "";
+  }
+
+  function normalizarAviso(raw) {
+    const aviso = raw && typeof raw === "object" ? raw : {};
+    return {
+      ativo: aviso.ativo === true,
+      id: limparIdAviso(aviso.id || aviso.id_aviso || "") || slugDataHoje(),
+      titulo: String(aviso.titulo || "🚀 Novidades no site").slice(0, 80),
+      mensagem: String(aviso.mensagem || "").slice(0, 420),
+      tempo_segundos: Math.min(15, Math.max(5, parseInt(aviso.tempo_segundos || aviso.tempo || 9, 10) || 9)),
+      data_inicio: aviso.data_inicio || "",
+      data_fim: aviso.data_fim || ""
+    };
+  }
+
+  function preencherAviso(aviso) {
+    const a = normalizarAviso(aviso);
+    setValor("#aviso-ativo", a.ativo ? "true" : "false");
+    setValor("#aviso-id", a.id);
+    setValor("#aviso-titulo", a.titulo);
+    setValor("#aviso-mensagem", a.mensagem);
+    setValor("#aviso-tempo", a.tempo_segundos);
+    setValor("#aviso-inicio", a.data_inicio || "");
+    setValor("#aviso-fim", a.data_fim || "");
+    atualizarPreviewAviso();
+  }
+
+  function atualizarPreviewAviso() {
+    const box = $("#aviso-preview");
+    if (!box) return;
+    const ativo = getValor("#aviso-ativo") === "true";
+    const id = limparIdAviso(getValor("#aviso-id")) || slugDataHoje();
+    const titulo = getValor("#aviso-titulo") || "🚀 Novidades no site";
+    const msg = getValor("#aviso-mensagem");
+    const tempo = Math.min(15, Math.max(5, parseInt(getValor("#aviso-tempo") || "9", 10) || 9));
+    const estado = ativo ? "<b>ATIVO</b>" : "<b>INATIVO</b>";
+    box.innerHTML = "Status: " + estado + " · ID: <b>" + id + "</b> · tempo: <b>" + tempo + "s</b><br>" +
+      "Prévia: <b>" + escapeHtml(titulo) + "</b>" + (msg ? " — " + escapeHtml(msg) : "");
+  }
+
+  function escapeHtml(txt) {
+    return String(txt || "").replace(/[&<>'"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[ch]));
+  }
+
+  async function carregarAvisoSite() {
+    if (!$("#painel-aviso-site")) return;
+    preencherAviso(null);
+    try {
+      const atual = await rpc("copa_admin_obter_aviso_site", { p_senha: SENHA });
+      if (atual && atual.erro) throw new Error(atual.erro);
+      if (atual) preencherAviso(atual);
+    } catch (e) {
+      const box = $("#aviso-preview");
+      if (box) box.innerHTML = "Status: não consegui carregar o aviso. Confirme se o SQL do recurso já foi rodado no Supabase.";
+    }
+  }
+
+  function lerFormularioAviso(forcarAtivo) {
+    const id = limparIdAviso(getValor("#aviso-id")) || slugDataHoje();
+    const titulo = getValor("#aviso-titulo") || "🚀 Novidades no site";
+    const mensagem = getValor("#aviso-mensagem");
+    const tempo = Math.min(15, Math.max(5, parseInt(getValor("#aviso-tempo") || "9", 10) || 9));
+    const ativo = typeof forcarAtivo === "boolean" ? forcarAtivo : getValor("#aviso-ativo") === "true";
+    if (ativo && !mensagem) throw new Error("Escreva a mensagem do aviso antes de ativar.");
+    return {
+      ativo,
+      id,
+      titulo: titulo.slice(0, 80),
+      mensagem: mensagem.slice(0, 420),
+      tempo_segundos: tempo,
+      data_inicio: getValor("#aviso-inicio") || null,
+      data_fim: getValor("#aviso-fim") || null,
+      atualizado_em: new Date().toISOString()
+    };
+  }
+
+  async function salvarAvisoSite(forcarAtivo) {
+    let aviso;
+    try { aviso = lerFormularioAviso(forcarAtivo); }
+    catch (e) { alerta(e.message, false); return; }
+    preencherAviso(aviso);
+    let res;
+    try { res = await rpc("copa_admin_salvar_aviso_site", { p_senha: SENHA, p_aviso: aviso }); }
+    catch (e) { alerta("Não consegui salvar o aviso. Rode o SQL do recurso no Supabase e tente de novo.", false); return; }
+    if (res === "OK" || (res && res.ok)) {
+      alerta(aviso.ativo ? "Aviso salvo e ativo na página principal." : "Aviso salvo como inativo.", true);
+      atualizarPreviewAviso();
+    } else {
+      alerta("Não consegui salvar o aviso.", false);
+    }
+  }
+
   // ---------- gate ----------
   async function tentaLogin(s, silencioso) {
     try {
@@ -42,7 +162,7 @@
     if (!silencioso) { const e = $("#gate-erro"); e.textContent = "Senha incorreta."; e.classList.remove("oculto"); }
     return false;
   }
-  function abrir() { $("#gate").style.display = "none"; $("#painel-admin").style.display = ""; carregar(); }
+  function abrir() { $("#gate").style.display = "none"; $("#painel-admin").style.display = ""; carregar(); carregarAvisoSite(); }
 
   // ---------- carregar lista ----------
   async function carregar() {
@@ -152,6 +272,11 @@
     $("#btn-refresh").onclick = carregar;
     $("#btn-senha").onclick = trocarSenha;
     $("#btn-sair-admin").onclick = sair;
+    const avisoSalvar = $("#aviso-salvar"); if (avisoSalvar) avisoSalvar.onclick = () => salvarAvisoSite();
+    const avisoDesativar = $("#aviso-desativar"); if (avisoDesativar) avisoDesativar.onclick = () => salvarAvisoSite(false);
+    ["#aviso-ativo", "#aviso-id", "#aviso-titulo", "#aviso-mensagem", "#aviso-tempo", "#aviso-inicio", "#aviso-fim"].forEach(sel => {
+      const el = $(sel); if (el) { el.addEventListener("input", atualizarPreviewAviso); el.addEventListener("change", atualizarPreviewAviso); }
+    });
     // ===== Melhores momentos =====
   async function popularJogosMM() {
     const sel = document.getElementById("mm-jogo");
