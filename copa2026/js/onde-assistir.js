@@ -49,6 +49,13 @@
     var c = ISO[id];
     return c ? '<img class="oa-flag" src="https://flagcdn.com/w40/' + c + '.png" alt="" onerror="this.style.display=\'none\'">' : "";
   }
+  function linkSelecaoHTML(id, conteudo, classeExtra) {
+    var sig = siglaTimeTexto(id) || id;
+    if (!sig || !SEL[sig]) return conteudo;
+    var nome = SEL[sig] || sig;
+    var cls = classeExtra ? " " + classeExtra : "";
+    return '<a class="team-link' + cls + '" href="selecoes.html#' + encodeURIComponent(sig) + '" title="Ver seleção: ' + esc(nome) + '" aria-label="Ver seleção ' + esc(nome) + '">' + conteudo + '</a>';
+  }
   function chave(aId, bId) { return [aId, bId].filter(Boolean).sort().join("-"); }
   function momento(aId, bId) {
     var k = chave(aId, bId);
@@ -300,8 +307,9 @@
     var nome = p ? (SEL[id] || id) : (lado === "a" ? (j.an || j.a) : (j.bn || j.b));
     var mark = p ? '<span class="oa-slot-mark ' + (p.travado ? 'ok' : 'wait') + '" title="' + (p.travado ? 'Vaga confirmada' : 'Projeção como está agora') + '">' + (p.travado ? '✓' : '⌛') + '</span>' : '';
     var img = flag(id);
-    if (lado === "a") return '<div class="oa-team oa-home">' + img + '<span>' + esc(nome) + mark + '</span></div>';
-    return '<div class="oa-team oa-away"><span>' + esc(nome) + mark + '</span>' + img + '</div>';
+    var texto = '<span>' + esc(nome) + mark + '</span>';
+    var corpo = lado === "a" ? (img + texto) : (texto + img);
+    return '<div class="oa-team ' + (lado === "a" ? 'oa-home' : 'oa-away') + '">' + linkSelecaoHTML(id, corpo, "team-link-oa") + '</div>';
   }
 
   function getPath(obj, path, def) {

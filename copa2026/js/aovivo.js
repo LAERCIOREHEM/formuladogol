@@ -16,6 +16,13 @@
   function dpNome(x){ var s=dpSigla(x); return s?DEPARA[s].n:(x||"—"); }
   function dpIso(x){ var s=dpSigla(x); return s?DEPARA[s].i:""; }
   function dpFlag(x,w){ var c=dpIso(x); return c?("https://flagcdn.com/w"+(w||80)+"/"+c+".png"):""; }
+  function selecaoLinkHTML(id, conteudo, classeExtra) {
+    var sig = dpSigla(id);
+    if (!sig) return conteudo;
+    var nomeSel = dpNome(sig);
+    var cls = classeExtra ? " " + classeExtra : "";
+    return `<a class="team-link${cls}" href="selecoes.html#${encodeURIComponent(sig)}" title="Ver seleção: ${escTxt(nomeSel)}" aria-label="Ver seleção ${escTxt(nomeSel)}">${conteudo}</a>`;
+  }
 
   const CFG = window.COPA_CFG || { url: "", key: "" };
   const $ = s => document.querySelector(s);
@@ -574,12 +581,14 @@
     const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
     const pre = st.state === "pre";
     const minuto = pre ? "Pré-jogo" : (st.shortDetail || "Ao vivo");
+    const timeId = c => (c.team && (c.team.abbreviation || c.team.displayName)) || "";
     const escudo = c => {
-      const ab = (c.team && c.team.abbreviation) || (c.team && c.team.displayName);
+      const ab = timeId(c);
       const src = dpFlag(ab, 80) || (c.team && c.team.logo) || "";
       return src ? `<img src="${src}" alt="" title="${dpNome(ab)}" onerror="this.style.visibility='hidden'">` : "";
     };
-    const tNome = c => dpNome((c.team && c.team.abbreviation) || (c.team && c.team.displayName));
+    const tNome = c => dpNome(timeId(c));
+    const timeAoVivoHTML = c => selecaoLinkHTML(timeId(c), `${escudo(c)}<div class="nm">${escTxt(tNome(c))}</div>`, "team-link-live");
 
     // palpites (só fase de grupos e se já houver palpites revelados)
     const j = ourGame(ev);
@@ -622,9 +631,9 @@
       <div class="topo"><span class="fase">${faseLabel(ev)}</span>
         <span class="aovivo ${pre ? "preb" : ""}"><span class="pulse"></span> ${pre ? "Em breve" : "Ao vivo"}</span></div>
       <div class="lp">
-        <div class="sel">${escudo(home)}<div class="nm">${tNome(home)}</div></div>
+        <div class="sel">${timeAoVivoHTML(home)}</div>
         <div class="escore"><div class="g">${pre ? "–" : hs}</div><div class="x">×</div><div class="g">${pre ? "–" : as}</div></div>
-        <div class="sel">${escudo(away)}<div class="nm">${tNome(away)}</div></div>
+        <div class="sel">${timeAoVivoHTML(away)}</div>
       </div>
       ${pre ? "" : `<div class="live-gols-jogo" id="live-gols-${ev.id}" aria-label="Gols do jogo ao vivo"></div>`}
       <div class="minuto">${minuto}</div>
@@ -693,18 +702,18 @@
       var g = grupoDoJogoAV(hAb, aAb);
       if (g) grupoTag = `<div class="cz-grupo">Grupo ${g}</div>`;
     }
+    var hConteudo = `${bandH ? `<img class="cz-flag" src="${bandH}" alt="">` : ""}<span class="cz-nome">${dpNome(hAb)}</span>`;
+    var aConteudo = `${bandA ? `<img class="cz-flag" src="${bandA}" alt="">` : ""}<span class="cz-nome">${dpNome(aAb)}</span>`;
     return `<div class="cartaz">
       <div class="cz-tag">PRÓXIMO JOGO</div>
       ${grupoTag}
       <div class="cz-times">
         <div class="cz-time">
-          ${bandH ? `<img class="cz-flag" src="${bandH}" alt="">` : ""}
-          <span class="cz-nome">${dpNome(hAb)}</span>
+          ${selecaoLinkHTML(hAb, hConteudo, "team-link-cartaz")}
         </div>
         <span class="cz-x">×</span>
         <div class="cz-time">
-          ${bandA ? `<img class="cz-flag" src="${bandA}" alt="">` : ""}
-          <span class="cz-nome">${dpNome(aAb)}</span>
+          ${selecaoLinkHTML(aAb, aConteudo, "team-link-cartaz")}
         </div>
       </div>
       <div class="cz-quando">${diaTxt}, <b>${hora}</b> <span class="cz-bsb">(Brasília)</span></div>

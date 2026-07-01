@@ -21,6 +21,13 @@
   function dpNome(x){ var s=dpSigla(x); return s?DEPARA[s].n:(x||"—"); }
   function dpIso(x){ var s=dpSigla(x); return s?DEPARA[s].i:""; }
   function dpFlag(x,w){ var c=dpIso(x); return c?("https://flagcdn.com/w"+(w||80)+"/"+c+".png"):""; }
+  function selecaoLinkHTML(id, conteudo, classeExtra) {
+    const sig = dpSigla(id);
+    if (!sig) return conteudo;
+    const nome = dpNome(sig);
+    const cls = classeExtra ? " " + classeExtra : "";
+    return `<a class="team-link${cls}" href="selecoes.html#${encodeURIComponent(sig)}" title="Ver seleção: ${escTxt(nome)}" aria-label="Ver seleção ${escTxt(nome)}">${conteudo}</a>`;
+  }
 
   let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
@@ -1278,9 +1285,12 @@
         : '<span class="jogo-slot-mark wait" title="Projeção como está agora">⌛</span>';
       const img = fl ? `<img src="${fl}" alt="" title="${dpNome(projInfo.id)}" onerror="this.style.visibility='hidden'">` : "";
       const nome = `<span class="t">${dpNome(projInfo.id)} ${mark}</span>`;
-      return `<div class="lado ${cls} ${vencedorCls || ""}">${cls.indexOf("f") >= 0 ? (nome + img) : (img + nome)}</div>`;
+      const corpo = cls.indexOf("f") >= 0 ? (nome + img) : (img + nome);
+      return `<div class="lado ${cls} ${vencedorCls || ""}">${selecaoLinkHTML(projInfo.id, corpo, "team-link-lado")}</div>`;
     }
-    return `<div class="lado ${cls} ${vencedorCls || ""}">${cls.indexOf("f") >= 0 ? `<span class="t">${teamNome(c)}</span>${escudo(c)}` : `${escudo(c)}<span class="t">${teamNome(c)}</span>`}</div>`;
+    const ab = (c.team && (c.team.abbreviation || c.team.displayName)) || "";
+    const corpo = cls.indexOf("f") >= 0 ? `<span class="t">${teamNome(c)}</span>${escudo(c)}` : `${escudo(c)}<span class="t">${teamNome(c)}</span>`;
+    return `<div class="lado ${cls} ${vencedorCls || ""}">${selecaoLinkHTML(ab, corpo, "team-link-lado")}</div>`;
   }
 
   async function renderMata() {
@@ -1476,7 +1486,8 @@
     const sig = dpSigla(id);
     if (!sig) return "";
     const fl = dpFlag(sig, 40);
-    return `<span class="mm-opcao-time">${fl ? `<img src="${fl}" alt="${escTxt(sig)}">` : ""}<b>${escTxt(sig)}</b></span>`;
+    const corpo = `<span class="mm-opcao-time">${fl ? `<img src="${fl}" alt="${escTxt(sig)}">` : ""}<b>${escTxt(sig)}</b></span>`;
+    return selecaoLinkHTML(sig, corpo, "team-link-mm-opcao");
   }
   function vencedorPerdedorDoEventoMata(ev, tipo) {
     if (!ev || !ev.competitions || !ev.competitions[0]) return null;
@@ -1608,7 +1619,8 @@
       const lockMark = travado
         ? `<span class="mm-lockmark" title="Vaga confirmada">✓</span>`
         : `<span class="mm-pendmark" title="Projeção ao vivo — ainda pode mudar">⌛</span>`;
-      return `<div class="mm-equipe ${vcls || ""}${lockCls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span>${score !== "" && score != null ? `<span class="mm-score">${score}</span>` : ""}${lockMark}</div>`;
+      const identidade = `${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span>`;
+      return `<div class="mm-equipe ${vcls || ""}${lockCls}">${selecaoLinkHTML(id, identidade, "team-link-mm")}${score !== "" && score != null ? `<span class="mm-score">${score}</span>` : ""}${lockMark}</div>`;
     }
     return slotMataHTML(valor, slot);
   }
