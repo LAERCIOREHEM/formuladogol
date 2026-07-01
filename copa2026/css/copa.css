@@ -969,3 +969,40 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .lado.f .team-link-lado{flex-direction:column;align-items:center}
   .oa-team .team-link-oa{gap:6px}
 }
+
+/* Toast de novidade da página principal */
+.copa-aviso-site{
+  position:fixed;
+  left:50%;
+  bottom:calc(18px + env(safe-area-inset-bottom));
+  width:min(430px,calc(100vw - 28px));
+  z-index:9999;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  background:
+    radial-gradient(280px 120px at 18% 0%, rgba(244,197,66,.16), transparent 68%),
+    linear-gradient(180deg, rgba(19,41,75,.98), rgba(11,31,58,.98));
+  border:1px solid rgba(244,197,66,.55);
+  border-radius:18px;
+  padding:15px 14px 14px 16px;
+  box-shadow:0 18px 55px rgba(0,0,0,.46), 0 0 0 1px rgba(255,255,255,.04) inset;
+  transform:translate(-50%,18px) scale(.98);
+  opacity:0;
+  pointer-events:auto;
+  transition:opacity .28s ease, transform .28s ease;
+}
+.copa-aviso-site.visivel{opacity:1;transform:translate(-50%,0) scale(1)}
+.copa-aviso-site.saindo{opacity:0;transform:translate(-50%,14px) scale(.985)}
+.copa-aviso-corpo{min-width:0;flex:1}
+.copa-aviso-titulo{font-family:'Anton',sans-serif;font-weight:400;font-size:18px;letter-spacing:.35px;color:var(--gold);line-height:1.1;margin-bottom:5px}
+.copa-aviso-msg{font-size:13.5px;line-height:1.45;color:#eaf3ff;word-wrap:break-word}
+.copa-aviso-fechar{flex:0 0 auto;background:rgba(244,197,66,.12);border:1px solid rgba(244,197,66,.45);color:var(--gold);font-family:inherit;font-size:12px;font-weight:800;border-radius:999px;padding:7px 10px;cursor:pointer;line-height:1}
+.copa-aviso-fechar:hover{background:rgba(244,197,66,.20);border-color:rgba(244,197,66,.75)}
+.copa-aviso-fechar:focus-visible{outline:2px solid rgba(244,197,66,.95);outline-offset:2px}
+@media(max-width:480px){
+  .copa-aviso-site{width:calc(100vw - 22px);bottom:calc(12px + env(safe-area-inset-bottom));border-radius:16px;padding:14px 12px 13px 14px;gap:10px}
+  .copa-aviso-titulo{font-size:17px}
+  .copa-aviso-msg{font-size:13px;line-height:1.42}
+  .copa-aviso-fechar{font-size:11.5px;padding:7px 9px}
+}
