@@ -2,13 +2,12 @@ name: Atualiza seleções (elencos + rostos)
 
 on:
   schedule:
-    # Otimizado: 1x por HORA no minuto :20, das 01h20 as 12h20 de Brasilia
-    # (UTC-3) = 04h20 as 15h20 UTC. Cada execucao dura ~25 min (timeout 35),
-    # entao o intervalo de 1h garante folga de ~35 min entre execucoes e
-    # ACABA com a sobreposicao que o antigo "*/30" (a cada 30 min) causava.
-    # Minuto :20 escolhido de proposito para nao coincidir com o :00/:05 do
-    # atualizar-tudo, o :45 do fairplay, nem o :23/:33 de jogos/resultados.
-    - cron: "20 4-15 * * *"
+    # Fallback interno do GitHub: 1x por HORA no minuto :20.
+    # Durante o turbo (ate 02/07/2026 BRT), qualquer disparo agendado entra
+    # em modo turbo. O cron externo pode disparar este workflow 1x/hora tambem.
+    # IMPORTANTE: se usar cron externo de hora em hora, nao precisa depender
+    # deste schedule interno; a concurrency global protege o push.
+    - cron: "20 * * * *"
   workflow_dispatch:
     inputs:
       confirmar_execucao:
@@ -49,35 +48,40 @@ jobs:
       - name: Determinar modo de execução
         id: modo
         env:
-          # Modo turbo ativo em 01/07 e 02/07/2026, considerando a data UTC do GitHub Actions.
-          # Na prática: cobre as janelas de manhã de quarta e quinta no horário de Brasília.
-          TURBO_FIM: "2026-07-02"
+          # Turbo de fotos por 2 dias completos no horário de Brasília.
+          # Até 02/07/2026 23:59 BRT, schedule interno OU cron externo via
+          # workflow_dispatch sem inputs rodam em modo turbo. Depois disso,
+          # dispatch externo sem confirmar_execucao=SIM vira no-op.
+          TURBO_INICIO_BRT: "2026-07-01"
+          TURBO_FIM_BRT: "2026-07-02"
         run: |
           EVENTO="${{ github.event_name }}"
           CONFIRMAR="${{ github.event.inputs.confirmar_execucao || 'NAO' }}"
-          HOJE="$(date -u +%F)"
-          HORA="$(date -u +%H)"
-          MINUTO="$(date -u +%M)"
 
-          HOJE_EPOCH="$(date -u -d "$HOJE" +%s)"
-          TURBO_FIM_EPOCH="$(date -u -d "$TURBO_FIM" +%s)"
+          HOJE_BRT="$(TZ=America/Sao_Paulo date +%F)"
+          HORA_BRT="$(TZ=America/Sao_Paulo date +%H)"
+          MINUTO_BRT="$(TZ=America/Sao_Paulo date +%M)"
+
+          HOJE_EPOCH="$(date -u -d "$HOJE_BRT" +%s)"
+          TURBO_INICIO_EPOCH="$(date -u -d "$TURBO_INICIO_BRT" +%s)"
+          TURBO_FIM_EPOCH="$(date -u -d "$TURBO_FIM_BRT" +%s)"
 
           if [[ "$EVENTO" == "workflow_dispatch" && "$CONFIRMAR" == "SIM" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "mode=manual" >> "$GITHUB_OUTPUT"
             echo "Execução manual confirmada explicitamente."
+          elif (( HOJE_EPOCH >= TURBO_INICIO_EPOCH && HOJE_EPOCH <= TURBO_FIM_EPOCH )); then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "mode=turbo" >> "$GITHUB_OUTPUT"
+            echo "Modo turbo de fotos ativo de $TURBO_INICIO_BRT até $TURBO_FIM_BRT no horário de Brasília."
           elif [[ "$EVENTO" == "workflow_dispatch" ]]; then
             echo "run=false" >> "$GITHUB_OUTPUT"
             echo "mode=skip" >> "$GITHUB_OUTPUT"
-            echo "Dispatch externo/manual sem confirmar_execucao=SIM. Nada a fazer."
-          elif (( HOJE_EPOCH <= TURBO_FIM_EPOCH )); then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "mode=turbo" >> "$GITHUB_OUTPUT"
-            echo "Modo turbo de fotos ativo até $TURBO_FIM."
-          elif [[ "$MINUTO" == "20" ]] && [[ "$HORA" =~ ^(06|07|08|09)$ ]]; then
+            echo "Dispatch externo/manual fora do turbo e sem confirmar_execucao=SIM. Nada a fazer."
+          elif [[ "$MINUTO_BRT" == "20" ]] && [[ "$HORA_BRT" =~ ^(03|04|05|06)$ ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "mode=normal" >> "$GITHUB_OUTPUT"
-            echo "Janela normal liberada: $HORA:$MINUTO UTC."
+            echo "Janela normal liberada: $HORA_BRT:$MINUTO_BRT BRT."
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
             echo "mode=skip" >> "$GITHUB_OUTPUT"
