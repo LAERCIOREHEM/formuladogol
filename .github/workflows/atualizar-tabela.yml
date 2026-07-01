@@ -1,8 +1,9 @@
 name: Atualizar tabela do Brasileirão
 
 on:
-  # Disparado pelo cron-job.org a cada 15 minutos via API.
-  # Cron interno desativado para evitar disputa com o cron-job.org.
+  # Disparado pelo cron-job.org via API (fallback). O grosso da atualizacao
+  # ja e feito por atualizar-tudo.yml (a cada 5 min). Este workflow existe
+  # como reforco pontual e para rodar quando o script/YAML for alterado.
   workflow_dispatch:
 
   # Roda tambem quando o script ou workflow forem alterados
@@ -14,24 +15,19 @@ on:
 permissions:
   contents: write
 
-# Concurrency GLOBAL do repositorio: apenas UMA execucao
-# de QUALQUER workflow de atualizacao roda por vez.
-# Isso evita conflitos de git push entre workflows diferentes.
-#
-# cancel-in-progress: true
-#   -> Se um novo trigger chegar enquanto outro esta rodando,
-#      o que esta rodando e cancelado e o novo comeca.
-#   -> Evita o erro "No jobs were run" causado por filas longas.
-#   -> O retry do git push (5 tentativas) cobre o caso raro de
-#      cancelamento durante o push.
+# GRUPO GLOBAL DE ESCRITA (repo-write-main) — unico para todos os workflows
+# que dao git push no main. Serializa qualquer escrita -> zero corrida de push.
+# cancel-in-progress: false -> as execucoes enfileiram em vez de se cancelar,
+# eliminando o erro "No jobs were run".
 concurrency:
-  group: bolao-brasileirao-write
-  cancel-in-progress: true
+  group: repo-write-main
+  cancel-in-progress: false
 
 jobs:
   atualizar:
     name: Buscar tabela e publicar tabela.json
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Baixar repositorio
@@ -61,37 +57,70 @@ jobs:
             echo "ERRO: tabela.json nao foi gerado pelo atualizar.py"
             exit 1
           fi
-          echo "tabela.json gerado com sucesso."
+          python -m json.tool tabela.json > /dev/null
+          echo "tabela.json gerado e validado com sucesso."
           echo "Primeiras linhas:"
           head -n 20 tabela.json
 
-      - name: Commitar tabela.json com retry
+      # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
+      # guarda o artefato -> fetch + reset --hard origin/main -> reaplica ->
+      # commit -> push. Nunca gera conflito artificial de rebase.
+      - name: Commitar tabela.json com push robusto
+        shell: bash
         run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add tabela.json
+          FILES=(
+            "tabela.json"
+          )
 
-          if git diff --staged --quiet; then
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Sem mudancas em tabela.json - nada a commitar."
             exit 0
           fi
 
-          git commit -m "Atualizar tabela.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            if [[ -e "$f" ]]; then
+              mkdir -p "$TMP_DIR/$(dirname "$f")"
+              cp -a "$f" "$TMP_DIR/$f"
+            fi
+          done
 
-          # Tenta push ate 5 vezes com pull rebase entre tentativas.
-          # Resolve corridas raras com outros workflows.
-          MAX_TENTATIVAS=5
-          for tentativa in $(seq 1 $MAX_TENTATIVAS); do
-            echo "Tentativa $tentativa/$MAX_TENTATIVAS de push..."
-            if git push; then
-              echo "Push bem-sucedido na tentativa $tentativa."
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              if [[ -e "$TMP_DIR/$f" ]]; then
+                rm -rf "$f"
+                mkdir -p "$(dirname "$f")"
+                cp -a "$TMP_DIR/$f" "$f"
+              fi
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Apos atualizar com origin/main, nada mudou - sem commit."
               exit 0
             fi
-            echo "Push falhou. Fazendo pull --rebase e tentando de novo..."
-            git pull --rebase --autostash || true
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar tabela.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+            if git push origin HEAD:main; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+
+            echo "Push rejeitado na tentativa $i; recalculando sobre origin/main mais recente..."
             sleep 3
           done
 
-          echo "ERRO: Push falhou apos $MAX_TENTATIVAS tentativas."
+          echo "ERRO: Push falhou apos 5 tentativas."
           exit 1

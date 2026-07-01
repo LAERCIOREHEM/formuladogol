@@ -6,6 +6,9 @@ on:
   # com os 3 arquivos juntos. Assim tabela.json, resultados.json e
   # jogos.json sao sempre da MESMA "foto" — acaba o descasamento entre
   # as abas Ranking, Brasileirao, Resultados e Proximos Jogos.
+  #
+  # Este e o workflow de PRIORIDADE MAXIMA: mantem o site praticamente
+  # em tempo real durante os jogos. Frequencia de 5 min preservada.
   workflow_dispatch:
 
   push:
@@ -18,27 +21,33 @@ on:
 permissions:
   contents: write
 
-# Grupo unico. cancel-in-progress: true -> se um disparo novo chega
-# enquanto outro roda, o antigo e cancelado e o novo assume.
-# Evita acumulo de fila e o erro "No jobs were run".
+# GRUPO GLOBAL DE ESCRITA (repo-write-main).
+# TODOS os workflows que dao git push no main compartilham este grupo,
+# garantindo que apenas UMA escrita ocorra por vez -> zero corrida de push.
+#
+# cancel-in-progress: false
+#   -> As execucoes NAO se cancelam: elas enfileiram e rodam em serie.
+#   -> Como cada execucao dura ~30-60s, a fila drena rapido.
+#   -> Acaba com o erro "No jobs were run" causado por cancelamento em cadeia.
 concurrency:
-  group: bolao-atualizar-tudo
-  cancel-in-progress: true
+  group: repo-write-main
+  cancel-in-progress: false
 
 jobs:
   atualizar:
     name: Buscar dados e publicar os 3 JSONs
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Baixar repositorio
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           persist-credentials: true
           fetch-depth: 0
 
       - name: Configurar Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -50,75 +59,99 @@ jobs:
           TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
 
       # --- 1. TABELA ---
-      # continue-on-error: se um script falhar, os outros ainda rodam.
-      # Melhor publicar 2 de 3 JSONs atualizados do que travar tudo.
+      # Regra de seguranca: atualizacao atomica.
+      # Se qualquer script falhar, NAO publica pacote parcial/inconsistente.
       - name: Atualizar tabela.json
         id: tabela
-        continue-on-error: true
         run: python atualizar.py
 
       # --- 2. RESULTADOS ---
       - name: Atualizar resultados.json
         id: resultados
-        continue-on-error: true
         run: python atualizar_resultados.py
 
       # --- 3. JOGOS ---
       - name: Atualizar jogos.json
         id: jogos
-        continue-on-error: true
         run: python atualizar_jogos.py
 
-      - name: Conferir o que foi gerado
+      - name: Conferir e validar JSONs gerados
         run: |
-          echo "Arquivos JSON presentes:"
+          set -euo pipefail
+          echo "Arquivos JSON presentes e validos:"
           for arq in tabela.json resultados.json jogos.json; do
-            if [ -f "$arq" ]; then
-              echo "  OK   $arq"
-            else
-              echo "  FALTA $arq"
+            if [ ! -f "$arq" ]; then
+              echo "ERRO: $arq nao foi gerado."
+              exit 1
             fi
+            python -m json.tool "$arq" > /dev/null
+            echo "  OK   $arq"
           done
 
-      - name: Commitar os 3 JSONs juntos com retry
+      # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
+      # guarda os artefatos gerados -> fetch + reset --hard origin/main ->
+      # reaplica os arquivos -> commit -> push. Nunca gera conflito artificial
+      # de rebase em arquivos-artefato, mesmo sob concorrencia real.
+      - name: Commitar os 3 JSONs juntos com push robusto
+        shell: bash
         run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Adiciona os 3 (os que existirem)
-          git add tabela.json resultados.json jogos.json 2>/dev/null || true
+          FILES=(
+            "tabela.json"
+            "resultados.json"
+            "jogos.json"
+          )
 
-          if git diff --staged --quiet; then
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Sem mudancas nos JSONs - nada a commitar."
             exit 0
           fi
 
-          git commit -m "Atualizar dados do site - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+          # Guarda a saida recem-gerada num diretorio temporario.
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            if [[ -e "$f" ]]; then
+              mkdir -p "$TMP_DIR/$(dirname "$f")"
+              cp -a "$f" "$TMP_DIR/$f"
+            fi
+          done
 
-          # Retry de push: ate 5 tentativas com pull --rebase entre elas.
-          MAX_TENTATIVAS=5
-          for tentativa in $(seq 1 $MAX_TENTATIVAS); do
-            echo "Tentativa $tentativa/$MAX_TENTATIVAS de push..."
-            if git push; then
-              echo "Push bem-sucedido na tentativa $tentativa."
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              if [[ -e "$TMP_DIR/$f" ]]; then
+                rm -rf "$f"
+                mkdir -p "$(dirname "$f")"
+                cp -a "$TMP_DIR/$f" "$f"
+              fi
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Apos atualizar com origin/main, nada mudou - sem commit."
               exit 0
             fi
-            echo "Push falhou. Fazendo pull --rebase e tentando de novo..."
-            git pull --rebase --autostash || true
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar dados do site - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+            if git push origin HEAD:main; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+
+            echo "Push rejeitado na tentativa $i; recalculando sobre origin/main mais recente..."
             sleep 3
           done
 
-          echo "ERRO: Push falhou apos $MAX_TENTATIVAS tentativas."
+          echo "ERRO: Push falhou apos 5 tentativas."
           exit 1
 
-      # Se algum script falhou, avisa no final (sem derrubar o workflow,
-      # ja que o commit do que deu certo ja foi feito).
-      - name: Avisar se algum script falhou
-        if: steps.tabela.outcome == 'failure' || steps.resultados.outcome == 'failure' || steps.jogos.outcome == 'failure'
-        run: |
-          echo "ATENCAO: um ou mais scripts falharam nesta execucao:"
-          echo "  tabela:     ${{ steps.tabela.outcome }}"
-          echo "  resultados: ${{ steps.resultados.outcome }}"
-          echo "  jogos:      ${{ steps.jogos.outcome }}"
-          echo "Os arquivos que deram certo foram publicados normalmente."
-          echo "A proxima execucao (em 5 min) tentara novamente os que falharam."

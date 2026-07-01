@@ -1,7 +1,9 @@
 name: Atualizar próximos jogos
 
 on:
-  # Roda 2x por dia: 09:23 e 21:23 BRT (12:23 e 00:23 UTC)
+  # Roda 2x por dia como fallback: 09:23 e 21:23 BRT (12:23 e 00:23 UTC).
+  # Minutos deslocados (:23) de proposito para NAO coincidir com o :00/:05
+  # do atualizar-tudo (a cada 5 min) nem com o fairplay (:45).
   schedule:
     - cron: '23 12 * * *'
     - cron: '23 0 * * *'
@@ -16,17 +18,17 @@ on:
 permissions:
   contents: write
 
-# Mesmo concurrency group dos outros workflows que escrevem no repo.
-# cancel-in-progress: true evita o erro "No jobs were run" quando varios
-# triggers chegam proximos uns dos outros.
+# GRUPO GLOBAL DE ESCRITA (repo-write-main). Serializa toda escrita no main.
+# cancel-in-progress: false -> execucoes enfileiram, nunca se cancelam.
 concurrency:
-  group: bolao-brasileirao-write
-  cancel-in-progress: true
+  group: repo-write-main
+  cancel-in-progress: false
 
 jobs:
   atualizar:
     name: Buscar próximos jogos e publicar jogos.json
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Baixar repositorio
@@ -56,35 +58,68 @@ jobs:
             echo "ERRO: jogos.json nao foi gerado pelo atualizar_jogos.py"
             exit 1
           fi
-          echo "jogos.json gerado com sucesso."
+          python -m json.tool jogos.json > /dev/null
+          echo "jogos.json gerado e validado com sucesso."
           echo "Primeiras linhas:"
           head -n 20 jogos.json
 
-      - name: Commitar jogos.json com retry
+      # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos).
+      - name: Commitar jogos.json com push robusto
+        shell: bash
         run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add jogos.json
+          FILES=(
+            "jogos.json"
+          )
 
-          if git diff --staged --quiet; then
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Sem mudancas em jogos.json - nada a commitar."
             exit 0
           fi
 
-          git commit -m "Atualizar jogos.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            if [[ -e "$f" ]]; then
+              mkdir -p "$TMP_DIR/$(dirname "$f")"
+              cp -a "$f" "$TMP_DIR/$f"
+            fi
+          done
 
-          MAX_TENTATIVAS=5
-          for tentativa in $(seq 1 $MAX_TENTATIVAS); do
-            echo "Tentativa $tentativa/$MAX_TENTATIVAS de push..."
-            if git push; then
-              echo "Push bem-sucedido na tentativa $tentativa."
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              if [[ -e "$TMP_DIR/$f" ]]; then
+                rm -rf "$f"
+                mkdir -p "$(dirname "$f")"
+                cp -a "$TMP_DIR/$f" "$f"
+              fi
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Apos atualizar com origin/main, nada mudou - sem commit."
               exit 0
             fi
-            echo "Push falhou. Fazendo pull --rebase e tentando de novo..."
-            git pull --rebase --autostash || true
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar jogos.json - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+            if git push origin HEAD:main; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+
+            echo "Push rejeitado na tentativa $i; recalculando sobre origin/main mais recente..."
             sleep 3
           done
 
-          echo "ERRO: Push falhou apos $MAX_TENTATIVAS tentativas."
+          echo "ERRO: Push falhou apos 5 tentativas."
           exit 1

@@ -2,27 +2,43 @@ name: Atualiza seleções (elencos + rostos)
 
 on:
   schedule:
-    # TURBO TEMPORÁRIO (fotos): 01h-12h de Brasília (UTC-3) = 04h-15h UTC, a cada 30 min.
-    # Depois da janela turbo, o próprio workflow volta ao ritmo normal (03h-06h BRT, de hora em hora).
-    - cron: "*/30 4-14 * * *"
-    - cron: "0 15 * * *"
+    # Otimizado: 1x por HORA no minuto :20, das 01h20 as 12h20 de Brasilia
+    # (UTC-3) = 04h20 as 15h20 UTC. Cada execucao dura ~25 min (timeout 35),
+    # entao o intervalo de 1h garante folga de ~35 min entre execucoes e
+    # ACABA com a sobreposicao que o antigo "*/30" (a cada 30 min) causava.
+    # Minuto :20 escolhido de proposito para nao coincidir com o :00/:05 do
+    # atualizar-tudo, o :45 do fairplay, nem o :23/:33 de jogos/resultados.
+    - cron: "20 4-15 * * *"
   workflow_dispatch:
     inputs:
+      confirmar_execucao:
+        description: "Para rodar manualmente fora da janela segura, digite SIM. Dispatch externo sem este campo vira no-op."
+        default: "NAO"
+        required: false
       minutos_rostos:
         description: "Teto de tempo do robô de rostos (min)"
         default: "18"
+        required: false
       limite_rostos:
         description: "Máx. de jogadores por rodada"
         default: "400"
+        required: false
       retry_dias:
         description: "Re-tenta 'sem foto' após N dias (0 = re-tenta sempre, modo varredura)"
         default: "0"
+        required: false
 
 permissions:
   contents: write
 
+# GRUPO GLOBAL DE ESCRITA (repo-write-main) — o MESMO grupo de todos os
+# workflows que escrevem no main. Antes este job ficava isolado no grupo
+# "atualizar-selecoes", entao podia rodar em paralelo com atualizar-tudo e
+# colidir no push. Agora tudo e serializado.
+# cancel-in-progress: false: este job e longo (~25 min) e NUNCA deve ser
+# cancelado no meio (perderia trabalho pesado de rostos/fotos).
 concurrency:
-  group: atualizar-selecoes
+  group: repo-write-main
   cancel-in-progress: false
 
 jobs:
@@ -38,6 +54,7 @@ jobs:
           TURBO_FIM: "2026-07-02"
         run: |
           EVENTO="${{ github.event_name }}"
+          CONFIRMAR="${{ github.event.inputs.confirmar_execucao || 'NAO' }}"
           HOJE="$(date -u +%F)"
           HORA="$(date -u +%H)"
           MINUTO="$(date -u +%M)"
@@ -45,15 +62,19 @@ jobs:
           HOJE_EPOCH="$(date -u -d "$HOJE" +%s)"
           TURBO_FIM_EPOCH="$(date -u -d "$TURBO_FIM" +%s)"
 
-          if [[ "$EVENTO" == "workflow_dispatch" ]]; then
+          if [[ "$EVENTO" == "workflow_dispatch" && "$CONFIRMAR" == "SIM" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "mode=manual" >> "$GITHUB_OUTPUT"
-            echo "Execução manual liberada."
+            echo "Execução manual confirmada explicitamente."
+          elif [[ "$EVENTO" == "workflow_dispatch" ]]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "mode=skip" >> "$GITHUB_OUTPUT"
+            echo "Dispatch externo/manual sem confirmar_execucao=SIM. Nada a fazer."
           elif (( HOJE_EPOCH <= TURBO_FIM_EPOCH )); then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "mode=turbo" >> "$GITHUB_OUTPUT"
             echo "Modo turbo de fotos ativo até $TURBO_FIM."
-          elif [[ "$MINUTO" == "00" ]] && [[ "$HORA" =~ ^(06|07|08|09)$ ]]; then
+          elif [[ "$MINUTO" == "20" ]] && [[ "$HORA" =~ ^(06|07|08|09)$ ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "mode=normal" >> "$GITHUB_OUTPUT"
             echo "Janela normal liberada: $HORA:$MINUTO UTC."
@@ -66,6 +87,9 @@ jobs:
       - name: Checkout
         if: steps.modo.outputs.run == 'true'
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Set up Python
         if: steps.modo.outputs.run == 'true'
@@ -112,24 +136,72 @@ jobs:
               --retry-dias "$RETRY_INPUT"
           fi
 
-      - name: Commit (se algo mudou)
+      # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos),
+      # adaptada para incluir o DIRETORIO de imagens copa2026/img/jogadores.
+      # O cp -a preserva arquivos e diretorios; o reset+clean garante base
+      # limpa em origin/main e a reaplicacao repoe os artefatos gerados.
+      - name: Commit (push robusto se algo mudou)
         if: steps.modo.outputs.run == 'true'
+        shell: bash
         run: |
+          set -euo pipefail
           cd "$GITHUB_WORKSPACE"
-          git add copa2026/dados/elencos.json copa2026/dados/rostos.json \
-                  copa2026/dados/rostos_estado.json copa2026/dados/rostos_creditos.json \
-                  copa2026/dados/rostos_relatorio.json copa2026/img/jogadores 2>/dev/null || true
-          if git diff --cached --quiet; then
+
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          FILES=(
+            "copa2026/dados/elencos.json"
+            "copa2026/dados/rostos.json"
+            "copa2026/dados/rostos_estado.json"
+            "copa2026/dados/rostos_creditos.json"
+            "copa2026/dados/rostos_relatorio.json"
+            "copa2026/img/jogadores"
+          )
+
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Nada mudou - sem commit."
             exit 0
           fi
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git commit -m "Povoa rostos (modo ${{ steps.modo.outputs.mode }}) - automatico"
+
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            if [[ -e "$f" ]]; then
+              mkdir -p "$TMP_DIR/$(dirname "$f")"
+              cp -a "$f" "$TMP_DIR/$f"
+            fi
+          done
+
           for i in 1 2 3 4 5; do
-            if git push; then echo "Push OK ($i)."; exit 0; fi
-            echo "Push rejeitado ($i); rebase e tenta de novo..."
-            git pull --rebase --autostash origin main || true
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              if [[ -e "$TMP_DIR/$f" ]]; then
+                rm -rf "$f"
+                mkdir -p "$(dirname "$f")"
+                cp -a "$TMP_DIR/$f" "$f"
+              fi
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Apos atualizar com origin/main, nada mudou - sem commit."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Povoa rostos (modo ${{ steps.modo.outputs.mode }}) - automatico"
+
+            if git push origin HEAD:main; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+
+            echo "Push rejeitado na tentativa $i; recalculando sobre origin/main mais recente..."
             sleep 3
           done
-          echo "Falha ao enviar."; exit 1
+
+          echo "Falha ao enviar apos 5 tentativas."
+          exit 1

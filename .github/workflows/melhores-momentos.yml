@@ -1,9 +1,8 @@
 name: Buscar melhores momentos (CazéTV)
 
 on:
-  # Disparado EXTERNAMENTE pelo cron-job.org (pontual, de 10 em 10 min na janela
-  # dos jogos e 1x às 6h). NÃO usamos 'schedule' do GitHub aqui porque ele atrasa
-  # muito em horário de pico. O cron-job.org chama a API de dispatch deste workflow.
+  # Disparado EXTERNAMENTE pelo cron-job.org via workflow_dispatch.
+  # Não usa schedule interno do GitHub porque o agendamento nativo atrasa em pico.
   workflow_dispatch:
     inputs:
       forcar_execucao:
@@ -18,16 +17,20 @@ on:
 permissions:
   contents: write
 
-# Evita que duas execuções rodem ao mesmo tempo e colidam no push.
+# Grupo global de escrita: este workflow também faz git push no main.
+# Com repo-write-main, ele entra na mesma fila de Atualizar tudo, Seleções e Fair Play.
 concurrency:
-  group: melhores-momentos
+  group: repo-write-main
   cancel-in-progress: false
 
 jobs:
   buscar:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+
     steps:
       - name: Parar após a Copa (20/07/2026)
+        shell: bash
         run: |
           HOJE=$(TZ=America/Sao_Paulo date +%Y%m%d)
           if [[ "$HOJE" -gt "20260720" ]]; then
@@ -36,10 +39,13 @@ jobs:
           fi
 
       - name: Baixar o repositório
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Configurar Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -49,9 +55,10 @@ jobs:
         run: python3 copa2026/deve_rodar_workflow_copa.py
 
       - name: Mostrar decisão do guard
+        shell: bash
         run: |
-          echo "RUN_COPA=${RUN_COPA}"
-          echo "Motivo: ${RUN_COPA_MOTIVO}"
+          echo "RUN_COPA=${RUN_COPA:-}"
+          echo "Motivo: ${RUN_COPA_MOTIVO:-}"
 
       - name: Rodar o buscador de melhores momentos
         if: env.RUN_COPA == 'true'
@@ -63,16 +70,36 @@ jobs:
 
       - name: Rodar estatísticas da Copa
         if: env.RUN_COPA == 'true'
-        # Aproveita o mesmo workflow acionado externamente pelo cron-job.org.
-        # Assim as estatísticas acompanham o ciclo de 10 min sem depender do
-        # agendamento interno do GitHub Actions.
         run: python3 copa2026/buscar_estatisticas.py
 
       - name: Rodar estatísticas detalhadas dos jogos
         if: env.RUN_COPA == 'true'
-        # Gera dados/jogos-detalhes.json para o botão recolhível
-        # "📊 Estatísticas do jogo" em Jogos e Onde assistir.
         run: python3 copa2026/buscar_detalhes_jogos.py
+
+      - name: Validar JSONs gerados
+        if: env.RUN_COPA == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+
+          FILES=(
+            "copa2026/dados/melhores-momentos.json"
+            "copa2026/dados/lives.json"
+            "copa2026/dados/jogos-completos.json"
+            "copa2026/dados/estatisticas.json"
+            "copa2026/dados/jogos-detalhes.json"
+            "copa2026/dados/workflow_copa_estado.json"
+          )
+
+          for f in "${FILES[@]}"; do
+            if [[ -f "$f" ]]; then
+              python -m json.tool "$f" > /dev/null
+              echo "OK $f"
+            else
+              echo "Aviso: $f não existe nesta execução."
+            fi
+          done
 
       - name: Commitar e enviar se houve mudança
         if: env.RUN_COPA == 'true'
@@ -81,8 +108,8 @@ jobs:
           set -euo pipefail
           cd "$GITHUB_WORKSPACE"
 
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           FILES=(
             "copa2026/dados/melhores-momentos.json"
@@ -98,15 +125,13 @@ jobs:
             exit 0
           fi
 
-          # Estes arquivos são artefatos automáticos. Se outro workflow ou commit
-          # chegar antes do nosso push, NÃO fazemos rebase desses JSONs, porque isso
-          # gera conflito artificial. Guardamos a saída recém-gerada, atualizamos
-          # para o origin/main mais novo e reaplicamos os JSONs por cima.
+          # Artefatos automáticos: guarda a saída, atualiza para origin/main e reaplica.
+          # Evita conflito artificial de rebase quando outro workflow publicou antes.
           TMP_DIR="$(mktemp -d)"
           for f in "${FILES[@]}"; do
             if [[ -f "$f" ]]; then
               mkdir -p "$TMP_DIR/$(dirname "$f")"
-              cp "$f" "$TMP_DIR/$f"
+              cp -a "$f" "$TMP_DIR/$f"
             fi
           done
 
@@ -118,8 +143,9 @@ jobs:
 
             for f in "${FILES[@]}"; do
               if [[ -f "$TMP_DIR/$f" ]]; then
+                rm -rf "$f"
                 mkdir -p "$(dirname "$f")"
-                cp "$TMP_DIR/$f" "$f"
+                cp -a "$TMP_DIR/$f" "$f"
               fi
             done
 
