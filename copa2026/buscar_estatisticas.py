@@ -10,7 +10,7 @@ Gera: copa2026/dados/estatisticas.json
 
 Observações:
 - Artilharia: extraída primeiro de scoringPlays; se não existir, tenta commentary.
-- Assistências: extraídas quando a ESPN disponibilizar no summary/texto do lance.
+- Assistências: extraídas somente quando vinculadas a lance de gol real da ESPN.
 - Cartões: extraídos do commentary quando houver nome do jogador.
 - Gols por seleção: consolidados pelo placar oficial dos jogos processados, incluindo gols contra.
 - O script é defensivo: se a ESPN oscilar, preserva o arquivo atual em vez de zerar.
@@ -241,6 +241,78 @@ def minute_from_obj(obj):
     return ""
 
 
+def normalizar_minuto(minuto):
+    """Normaliza minuto para deduplicar scoringPlays/commentary sem confundir 45+2 com 45."""
+    txt = str(minuto or "").strip().lower()
+    if not txt:
+        return ""
+    nums = re.findall(r"\d+", txt)
+    if not nums:
+        return norm(txt)
+    if len(nums) >= 2 and ("+" in txt or "'" in txt or "stoppage" in txt or "acr" in txt):
+        return f"{int(nums[0])}+{int(nums[1])}"
+    return str(int(nums[0]))
+
+
+def texto_indica_gol_real(txt):
+    """True apenas para texto típico de gol, evitando 'shot on goal', 'saved ... goal' etc."""
+    texto = str(txt or "").strip()
+    bruto = texto.lower()
+    if not texto:
+        return False
+    if "own goal" in bruto or "gol contra" in bruto or "shootout" in bruto or "penalty shootout" in bruto:
+        return False
+    # ESPN costuma iniciar lances de gol com Goal!/Gol!.
+    # Não usa fallback amplo do tipo "Fulano (Time) right footed...",
+    # porque esse formato também aparece em chute defendido/para fora.
+    return bool(re.search(r"^\s*(?:goal|gol)\s*!", texto, flags=re.I))
+
+
+def tipo_indica_gol_real(ev):
+    """Usa o tipo estruturado da ESPN, mas sem aceitar frases amplas como 'shot on goal'."""
+    ttxt = type_text(ev).lower()
+    if not ttxt:
+        return False
+    if "shootout" in ttxt or "own goal" in ttxt or "penalty" in ttxt and "shootout" in ttxt:
+        return False
+    bloqueios = (
+        "shot on goal", "attempt", "save", "saved", "goalkeeper",
+        "goal kick", "miss", "missed", "blocked", "off target",
+    )
+    if any(b in ttxt for b in bloqueios):
+        return False
+    return bool(re.search(r"\b(?:goal|gol)\b", ttxt, flags=re.I))
+
+
+def evento_e_gol_real(ev, txt=None):
+    txt = text_of(ev) if txt is None else txt
+    return tipo_indica_gol_real(ev) or texto_indica_gol_real(txt)
+
+
+def chave_gol(equipe, minuto):
+    return (equipe or "", normalizar_minuto(minuto))
+
+
+def match_gol_real(gols_reais, equipe, minuto):
+    """Vincula assistência do commentary a um gol real já identificado em scoringPlays."""
+    if not gols_reais:
+        return None
+    m = normalizar_minuto(minuto)
+    candidatos = [g for g in gols_reais if (not equipe or not g.get("equipe") or g.get("equipe") == equipe)]
+    if m:
+        exatos = [g for g in candidatos if normalizar_minuto(g.get("minuto")) == m]
+        if len(exatos) == 1:
+            return exatos[0]
+        if equipe and exatos:
+            return exatos[0]
+    # Fallback muito conservador: se há apenas um gol do mesmo time no jogo.
+    if equipe:
+        mesmo_time = [g for g in gols_reais if g.get("equipe") == equipe]
+        if len(mesmo_time) == 1:
+            return mesmo_time[0]
+    return None
+
+
 def add(agg, nome, equipe, campo, valor, jogo_id, minuto=""):
     if not nome:
         return
@@ -259,7 +331,8 @@ def add(agg, nome, equipe, campo, valor, jogo_id, minuto=""):
         "jogos": set(),
         "lances": set(),
     })
-    lance_key = f"{jogo_id}|{campo}|{minuto}|{norm(nome)}|{equipe}"
+    minuto_key = normalizar_minuto(minuto)
+    lance_key = f"{jogo_id}|{campo}|{minuto_key}|{norm(nome)}|{equipe}"
     if lance_key in rec["lances"]:
         return
     rec["lances"].add(lance_key)
@@ -351,6 +424,8 @@ def extract_scoring_plays(summary, jogo_id, agg):
             plays.extend(v)
 
     used = 0
+    gols_reais = []
+    chaves_usadas = set()
     for sp in plays:
         if not isinstance(sp, dict):
             continue
@@ -365,7 +440,11 @@ def extract_scoring_plays(summary, jogo_id, agg):
         if scorer:
             add(agg, scorer, equipe, "gols", 1, jogo_id, minuto)
             used += 1
-        # assistência pode vir estruturada ou no texto.
+            ck = chave_gol(equipe, minuto)
+            if ck not in chaves_usadas:
+                gols_reais.append({"equipe": equipe, "minuto": minuto, "scorer": scorer})
+                chaves_usadas.add(ck)
+        # assistência pode vir estruturada ou no texto, mas apenas dentro de scoringPlay real.
         ast = None
         for key in ("assist", "assistedBy"):
             ast = player_name_from_athlete(sp.get(key)) if isinstance(sp, dict) else None
@@ -373,18 +452,19 @@ def extract_scoring_plays(summary, jogo_id, agg):
                 break
         if not ast:
             ast = assist_from_text(txt)
-        if ast:
+        if ast and scorer:
             add(agg, ast, equipe, "assistencias", 1, jogo_id, minuto)
-    return used
+    return used, gols_reais
 
 
-def extract_commentary(summary, jogo_id, agg, skip_goals_if_scoringplays=True):
+def extract_commentary(summary, jogo_id, agg, skip_goals_if_scoringplays=True, gols_reais=None):
     commentary = summary.get("commentary") or summary.get("plays") or []
     if isinstance(commentary, dict):
         commentary = commentary.get("items") or commentary.get("plays") or []
     if not isinstance(commentary, list):
-        return
+        return []
 
+    gols_commentary = []
     for ev in commentary:
         if not isinstance(ev, dict):
             continue
@@ -393,7 +473,9 @@ def extract_commentary(summary, jogo_id, agg, skip_goals_if_scoringplays=True):
         minuto = minute_from_obj(ev)
         equipe = team_from_obj(ev) or team_from_text(txt)
 
-        is_goal = ("goal" in raw or "gol!" in raw or " gol " in raw) and "own goal" not in raw and "shootout" not in raw
+        # Importante: não usa mais `"goal" in raw`. Isso pegava "shot on goal",
+        # "saved ... goal", "goal kick" etc. e inflava assistências falsas.
+        is_goal = evento_e_gol_real(ev, txt)
         is_yellow = "yellow card" in raw or "cartão amarelo" in raw or "cartao amarelo" in raw
         is_red = "red card" in raw or "cartão vermelho" in raw or "cartao vermelho" in raw
 
@@ -401,14 +483,17 @@ def extract_commentary(summary, jogo_id, agg, skip_goals_if_scoringplays=True):
             scorer = player_from_obj(ev) or goal_scorer_from_text(txt)
             if scorer:
                 add(agg, scorer, equipe, "gols", 1, jogo_id, minuto)
+                gols_commentary.append({"equipe": equipe, "minuto": minuto, "scorer": scorer})
             ast = assist_from_text(txt)
-            if ast:
+            if ast and scorer:
                 add(agg, ast, equipe, "assistencias", 1, jogo_id, minuto)
         elif is_goal:
-            # Mesmo que o gol já tenha vindo de scoringPlays, a assistência às vezes só vem no commentary.
+            # Mesmo que o gol já tenha vindo de scoringPlays, a assistência às vezes
+            # só vem no commentary. Agora ela só é aceita se bater com um gol real.
+            gol_real = match_gol_real(gols_reais or [], equipe, minuto)
             ast = assist_from_text(txt)
-            if ast:
-                add(agg, ast, equipe, "assistencias", 1, jogo_id, minuto)
+            if ast and gol_real:
+                add(agg, ast, gol_real.get("equipe") or equipe, "assistencias", 1, jogo_id, gol_real.get("minuto") or minuto)
 
         if is_yellow or is_red:
             p = player_from_obj(ev) or card_player_from_text(txt)
@@ -417,6 +502,7 @@ def extract_commentary(summary, jogo_id, agg, skip_goals_if_scoringplays=True):
                     add(agg, p, equipe, "amarelos", 1, jogo_id, minuto)
                 if is_red:
                     add(agg, p, equipe, "vermelhos", 1, jogo_id, minuto)
+    return gols_commentary
 
 
 def coletar():
@@ -463,8 +549,8 @@ def coletar():
         except Exception as e:
             falhas.append({"event": eid, "erro": str(e)[:140]})
             continue
-        qtd_gols_sp = extract_scoring_plays(summary, eid, agg)
-        extract_commentary(summary, eid, agg, skip_goals_if_scoringplays=(qtd_gols_sp > 0))
+        qtd_gols_sp, gols_reais = extract_scoring_plays(summary, eid, agg)
+        extract_commentary(summary, eid, agg, skip_goals_if_scoringplays=(qtd_gols_sp > 0), gols_reais=gols_reais)
 
     jogadores = []
     for rec in agg.values():
@@ -473,6 +559,35 @@ def coletar():
         rec["jogos"] = jogos
         rec["total_cartoes"] = rec.get("amarelos", 0) + rec.get("vermelhos", 0)
         jogadores.append(rec)
+
+    alertas_consistencia = []
+
+    # Trava final de sanidade: em futebol, uma seleção não pode ter mais
+    # assistências do que gols marcados. Se a ESPN/API mudar o texto e o parser
+    # voltar a produzir falso positivo, não publica estatística impossível.
+    gols_por_equipe = {e: r.get("gols", 0) for e, r in por_sel_placar.items()}
+    assist_por_equipe = {}
+    for x in jogadores:
+        e = x.get("equipe") or ""
+        if not e:
+            continue
+        assist_por_equipe[e] = assist_por_equipe.get(e, 0) + x.get("assistencias", 0)
+    equipes_assist_invalidas = {
+        e for e, total in assist_por_equipe.items()
+        if total > (gols_por_equipe.get(e, 0) or 0)
+    }
+    if equipes_assist_invalidas:
+        for e in sorted(equipes_assist_invalidas):
+            alertas_consistencia.append({
+                "tipo": "assistencias_maiores_que_gols",
+                "equipe": e,
+                "gols": gols_por_equipe.get(e, 0) or 0,
+                "assistencias_descartadas": assist_por_equipe.get(e, 0) or 0,
+                "acao": "assistencias_da_equipe_descartadas_para_nao_publicar_dado_impossivel",
+            })
+        for x in jogadores:
+            if x.get("equipe") in equipes_assist_invalidas:
+                x["assistencias"] = 0
 
     def sort_base(campo):
         return sorted(
@@ -504,13 +619,14 @@ def coletar():
         r["media_gols"] = round((r.get("gols", 0) / jogos), 2) if jogos else 0
 
     return {
-        "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências dependem de disponibilidade no summary/comentário da ESPN. Gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
+        "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
         "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
         "atualizado_em": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         "periodo": DATES,
         "jogos_encontrados": len(eventos),
         "jogos_processados": len(processaveis),
         "falhas_summary": falhas[:20],
+        "alertas_consistencia": alertas_consistencia[:50],
         "artilheiros": artilheiros,
         "assistencias": assistencias,
         "cartoes": cartoes,
@@ -536,6 +652,7 @@ def main():
             "jogos_encontrados": 0,
             "jogos_processados": 0,
             "falhas_summary": [{"erro": str(e)[:180]}],
+            "alertas_consistencia": [],
             "artilheiros": [],
             "assistencias": [],
             "cartoes": [],
