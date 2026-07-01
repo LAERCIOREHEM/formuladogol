@@ -2,8 +2,10 @@ name: Atualiza seleções (elencos + rostos)
 
 on:
   schedule:
-    # VARREDURA DE MADRUGADA: 3h-6h de Brasília (UTC-3) = 6h,7h,8h,9h UTC, de hora em hora.
-    - cron: "0 6-9 * * *"
+    # TURBO TEMPORÁRIO (fotos): 01h-12h de Brasília (UTC-3) = 04h-15h UTC, a cada 30 min.
+    # Depois da janela turbo, o próprio workflow volta ao ritmo normal (03h-06h BRT, de hora em hora).
+    - cron: "*/30 4-14 * * *"
+    - cron: "0 15 * * *"
   workflow_dispatch:
     inputs:
       minutos_rostos:
@@ -26,57 +28,89 @@ concurrency:
 jobs:
   selecoes:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
-      # Liga/desliga por data: depois de JANELA_FIM o workflow vira no-op (desliga sozinho).
-      - name: Janela de povoamento (liga/desliga por data)
-        id: guard
+      - name: Determinar modo de execução
+        id: modo
         env:
-          JANELA_FIM: "2026-07-05"   # <-- edite aqui para estender/encurtar a janela
+          # Modo turbo ativo em 01/07 e 02/07/2026, considerando a data UTC do GitHub Actions.
+          # Na prática: cobre as janelas de manhã de quarta e quinta no horário de Brasília.
+          TURBO_FIM: "2026-07-02"
         run: |
+          EVENTO="${{ github.event_name }}"
           HOJE="$(date -u +%F)"
-          if [[ "$HOJE" > "$JANELA_FIM" ]]; then
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Fora da janela de povoamento (terminou em $JANELA_FIM). Nada a fazer."
-          else
+          HORA="$(date -u +%H)"
+          MINUTO="$(date -u +%M)"
+
+          if [[ "$EVENTO" == "workflow_dispatch" ]]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Dentro da janela (até $JANELA_FIM)."
+            echo "mode=manual" >> "$GITHUB_OUTPUT"
+            echo "Execução manual liberada."
+          elif [[ "$HOJE" <= "$TURBO_FIM" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "mode=turbo" >> "$GITHUB_OUTPUT"
+            echo "Modo turbo de fotos ativo até $TURBO_FIM."
+          elif [[ "$MINUTO" == "00" && ( "$HORA" == "06" || "$HORA" == "07" || "$HORA" == "08" || "$HORA" == "09" ) ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "mode=normal" >> "$GITHUB_OUTPUT"
+            echo "Janela normal liberada: $HORA:$MINUTO UTC."
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "mode=skip" >> "$GITHUB_OUTPUT"
+            echo "Fora da janela normal/turbo. Nada a fazer."
           fi
 
       - name: Checkout
-        if: steps.guard.outputs.run == 'true'
+        if: steps.modo.outputs.run == 'true'
         uses: actions/checkout@v4
 
       - name: Set up Python
-        if: steps.guard.outputs.run == 'true'
+        if: steps.modo.outputs.run == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Sanidade (selftests offline)
-        if: steps.guard.outputs.run == 'true'
+        if: steps.modo.outputs.run == 'true'
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
           python buscar_selecoes.py --selftest
           python buscar_rostos_jogadores.py --selftest
 
       - name: Atualizar elencos (ESPN)
-        if: steps.guard.outputs.run == 'true'
+        if: steps.modo.outputs.run == 'true' && steps.modo.outputs.mode != 'turbo'
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
           python buscar_selecoes.py
 
-      - name: Povoar rostos (varredura, ritmo educado + retry)
-        if: steps.guard.outputs.run == 'true'
+      - name: Povoar rostos (modo turbo/normal)
+        if: steps.modo.outputs.run == 'true'
+        env:
+          MODO: ${{ steps.modo.outputs.mode }}
+          MINUTOS_INPUT: ${{ github.event.inputs.minutos_rostos || '18' }}
+          LIMITE_INPUT: ${{ github.event.inputs.limite_rostos || '400' }}
+          RETRY_INPUT: ${{ github.event.inputs.retry_dias || '0' }}
         run: |
           cd "$GITHUB_WORKSPACE/copa2026"
-          python buscar_rostos_jogadores.py \
-            --minutos "${{ github.event.inputs.minutos_rostos || '18' }}" \
-            --limite "${{ github.event.inputs.limite_rostos || '400' }}" \
-            --retry-dias "${{ github.event.inputs.retry_dias || '0' }}"
+
+          if [[ "$MODO" == "turbo" ]]; then
+            echo "Rodando fotos em MODO TURBO: 23 min, limite 600, 10 workers, sem ESPN."
+            python buscar_rostos_jogadores.py \
+              --minutos 23 \
+              --limite 600 \
+              --retry-dias 0 \
+              --workers 10 \
+              --sem-espn
+          else
+            echo "Rodando fotos em modo $MODO: parâmetros padrão/manuais."
+            python buscar_rostos_jogadores.py \
+              --minutos "$MINUTOS_INPUT" \
+              --limite "$LIMITE_INPUT" \
+              --retry-dias "$RETRY_INPUT"
+          fi
 
       - name: Commit (se algo mudou)
-        if: steps.guard.outputs.run == 'true'
+        if: steps.modo.outputs.run == 'true'
         run: |
           cd "$GITHUB_WORKSPACE"
           git add copa2026/dados/elencos.json copa2026/dados/rostos.json \
@@ -88,7 +122,7 @@ jobs:
           fi
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git commit -m "Povoa rostos (varredura) - automatico"
+          git commit -m "Povoa rostos (modo ${{ steps.modo.outputs.mode }}) - automatico"
           for i in 1 2 3 4 5; do
             if git push; then echo "Push OK ($i)."; exit 0; fi
             echo "Push rejeitado ($i); rebase e tenta de novo..."
