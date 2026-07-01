@@ -66,8 +66,10 @@
 
   function siglaSelecao(valor) {
     if (!valor) return "";
-    if (window.COPA_TIMES && COPA_TIMES.sigla) return COPA_TIMES.sigla(valor) || valor;
-    return valor;
+    if (window.COPA_TIMES && COPA_TIMES.sigla) {
+      return COPA_TIMES.sigla(valor) || "";
+    }
+    return /^[A-Z]{3}$/.test(String(valor || "")) ? String(valor).toUpperCase() : "";
   }
   function todasSiglas() {
     var mapa = {};
@@ -80,8 +82,10 @@
       });
     }
     (JOGOS || []).forEach(function (j) {
-      if (j.home && j.home.sigla) mapa[j.home.sigla] = true;
-      if (j.away && j.away.sigla) mapa[j.away.sigla] = true;
+      var home = j.home && siglaSelecao(j.home.sigla);
+      var away = j.away && siglaSelecao(j.away.sigla);
+      if (home) mapa[home] = true;
+      if (away) mapa[away] = true;
     });
     return Object.keys(mapa).sort(function (a, b) {
       return nomeSelecao(a).localeCompare(nomeSelecao(b), "pt-BR");
@@ -124,14 +128,14 @@
     } catch (e) { return iso; }
   }
   function listaDaAba() {
-    if (ABA === "assistencias") return (DADOS.assistencias || []).map(normalizarItemEquipe);
+    if (ABA === "assistencias") return (DADOS.assistencias || []).map(normalizarItemEquipe).filter(function (x) { return !!x.equipe; });
     if (ABA === "gols_selecao") {
-      return completarGolsPorSelecao(DADOS.por_selecao || []).sort(function (a, b) {
+      return completarGolsPorSelecao(DADOS.por_selecao || []).filter(function (x) { return !!x.equipe; }).sort(function (a, b) {
         return (b.gols || 0) - (a.gols || 0) || (b.media_gols || 0) - (a.media_gols || 0) || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
       });
     }
     if (ABA === "jogos") return JOGOS.slice();
-    return (DADOS.artilheiros || []).map(normalizarItemEquipe);
+    return (DADOS.artilheiros || []).map(normalizarItemEquipe).filter(function (x) { return !!x.equipe; });
   }
   function valorPrincipal(item) {
     if (ABA === "assistencias") return item.assistencias || 0;
@@ -264,13 +268,21 @@
     var sel = $("#stat-selecao");
     var equipes = {};
     ["artilheiros", "assistencias", "cartoes", "por_selecao"].forEach(function (k) {
-      (DADOS[k] || []).forEach(function (x) { if (x.equipe) equipes[x.equipe] = true; });
+      (DADOS[k] || []).forEach(function (x) {
+        var eq = siglaSelecao(x.equipe);
+        if (eq) equipes[eq] = true;
+      });
     });
     (JOGOS || []).forEach(function (j) {
-      if (j.home && j.home.sigla) equipes[j.home.sigla] = true;
-      if (j.away && j.away.sigla) equipes[j.away.sigla] = true;
+      var home = j.home && siglaSelecao(j.home.sigla);
+      var away = j.away && siglaSelecao(j.away.sigla);
+      if (home) equipes[home] = true;
+      if (away) equipes[away] = true;
     });
     var lista = Object.keys(equipes).sort(function (a, b) { return nomeSelecao(a).localeCompare(nomeSelecao(b), "pt-BR"); });
+    var valoresValidos = { TODAS: true };
+    lista.forEach(function (s) { valoresValidos[s] = true; });
+    if (!valoresValidos[FILTRO]) FILTRO = "TODAS";
     sel.innerHTML = '<option value="TODAS">Todas as seleções</option>' + lista.map(function (s) {
       return '<option value="' + esc(s) + '">' + esc(nomeSelecao(s)) + '</option>';
     }).join('');
