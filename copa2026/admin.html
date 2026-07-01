@@ -55,6 +55,17 @@
   .hdr-img{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;border-radius:10px;box-sizing:border-box}
   .admin-bar{display:flex;gap:8px;justify-content:flex-end;margin:-4px 0 14px}
   .admin-bar .btn-mini{cursor:pointer}
+
+  .aviso-grid{display:grid;grid-template-columns:1fr 160px;gap:10px;margin-top:10px}
+  .aviso-grid .full{grid-column:1/-1}
+  .aviso-lbl{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--cinza);font-weight:700;margin:0 0 5px}
+  .aviso-actions{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .aviso-actions .btn-primario{width:auto;margin-top:0;min-width:160px}
+  .aviso-actions .mini{margin-left:0;padding:10px 13px}
+  .aviso-preview{margin-top:12px;background:rgba(244,197,66,.07);border:1px solid rgba(244,197,66,.22);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.45;color:var(--cinza)}
+  .aviso-preview b{color:var(--gold)}
+  @media(max-width:560px){.aviso-grid{grid-template-columns:1fr}.aviso-actions .btn-primario{width:100%}.aviso-actions .mini{width:100%;margin-left:0}}
+
 </style>
 </head>
 <body>
@@ -79,6 +90,50 @@
   </div>
 
   <div id="msg" class="msg oculto"></div>
+
+
+  <div class="painel" id="painel-aviso-site">
+    <h3>🚀 Aviso de novidade na página principal</h3>
+    <p class="dica">Mensagem curta exibida apenas no <b>index.html</b>. Ela aparece 1 segundo após a abertura, some sozinha e não reaparece para quem já viu o mesmo ID.</p>
+    <div class="aviso-grid">
+      <div>
+        <label class="aviso-lbl" for="aviso-ativo">Ativo</label>
+        <select id="aviso-ativo" class="txt">
+          <option value="false">Não</option>
+          <option value="true">Sim</option>
+        </select>
+      </div>
+      <div>
+        <label class="aviso-lbl" for="aviso-tempo">Tempo na tela</label>
+        <input id="aviso-tempo" class="txt" type="number" min="5" max="15" step="1" value="9">
+      </div>
+      <div class="full">
+        <label class="aviso-lbl" for="aviso-id">ID do aviso</label>
+        <input id="aviso-id" class="txt" type="text" placeholder="novidades-2026-07-01">
+      </div>
+      <div class="full">
+        <label class="aviso-lbl" for="aviso-titulo">Título</label>
+        <input id="aviso-titulo" class="txt" type="text" maxlength="80" placeholder="🚀 Novidades no site">
+      </div>
+      <div class="full">
+        <label class="aviso-lbl" for="aviso-mensagem">Mensagem</label>
+        <textarea id="aviso-mensagem" maxlength="420" placeholder="Escreva uma mensagem curta para os usuários..."></textarea>
+      </div>
+      <div>
+        <label class="aviso-lbl" for="aviso-inicio">Início opcional</label>
+        <input id="aviso-inicio" class="txt" type="datetime-local">
+      </div>
+      <div>
+        <label class="aviso-lbl" for="aviso-fim">Fim opcional</label>
+        <input id="aviso-fim" class="txt" type="datetime-local">
+      </div>
+    </div>
+    <div class="aviso-actions">
+      <button id="aviso-salvar" class="btn-primario">Salvar aviso</button>
+      <button id="aviso-desativar" class="mini" type="button">Desativar agora</button>
+    </div>
+    <div id="aviso-preview" class="aviso-preview">Status: carregando configuração do aviso…</div>
+  </div>
 
   <div class="painel">
     <h3>Adicionar participantes</h3>
@@ -128,7 +183,7 @@
 <script src="js/config.js?v=20260618b"></script>
 <script src="js/feedback.js?v=20260629sugestoes-compacto"></script>
 <script src="js/engine.js?v=20260618b"></script>
-<script src="js/admin.js?v=20260618b"></script>
+<script src="js/admin.js?v=20260701-aviso-v1"></script>
   <script src="js/aniversarios.js?v=20260618b"></script>
 </body>
 </html>
