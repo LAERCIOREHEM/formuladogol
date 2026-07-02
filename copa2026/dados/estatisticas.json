@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-02T02:42:53.808672Z",
+  "atualizado_em": "2026-07-02T18:43:04.108436Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 82,
@@ -1389,6 +1389,19 @@
         "760476"
       ],
       "total_cartoes": 1
+    },
+    {
+      "nome": "Malik Tillman",
+      "equipe": "USA",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760417",
+        "760494"
+      ],
+      "total_cartoes": 0
     },
     {
       "nome": "Marcel Sabitzer",
@@ -3051,12 +3064,13 @@
     {
       "nome": "Malik Tillman",
       "equipe": "USA",
-      "gols": 0,
+      "gols": 1,
       "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
-        "760417"
+        "760417",
+        "760494"
       ],
       "total_cartoes": 0
     },
@@ -6092,6 +6106,15 @@
       "media_gols": 2.5
     },
     {
+      "equipe": "USA",
+      "gols": 10,
+      "assistencias": 4,
+      "amarelos": 5,
+      "vermelhos": 1,
+      "jogos": 4,
+      "media_gols": 2.5
+    },
+    {
       "equipe": "BEL",
       "gols": 9,
       "assistencias": 5,
@@ -6115,15 +6138,6 @@
       "assistencias": 3,
       "amarelos": 7,
       "vermelhos": 0,
-      "jogos": 4,
-      "media_gols": 2.25
-    },
-    {
-      "equipe": "USA",
-      "gols": 9,
-      "assistencias": 4,
-      "amarelos": 5,
-      "vermelhos": 1,
       "jogos": 4,
       "media_gols": 2.25
     },
