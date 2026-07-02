@@ -95,10 +95,18 @@
     return n === 1 ? "1 jogador" : n + " jogadores";
   }
 
-  function clubeJogador(p) {
+  function clubeJogador(p, id) {
     var v = p && (p.clube || p.club || p.time || p.equipe || p.team || p.currentTeam || p.current_team || "");
     if (v && typeof v === "object") v = v.nome || v.name || v.displayName || v.shortDisplayName || "";
-    return v ? String(v) : "";
+    v = v ? String(v).trim() : "";
+    if (!v) return "";
+    var nv = norm(v);
+    var ns = norm(nomeSelecao(id));
+    var sid = norm(id || "");
+    if (nv === ns || nv === sid) return "";
+    if (nv.indexOf(" national ") >= 0 || nv.indexOf("national football team") >= 0 || nv.indexOf("national team") >= 0) return "";
+    if (nv.indexOf("selecao") >= 0 || nv.indexOf("seleccion") >= 0) return "";
+    return v;
   }
 
   function squadHTML(id) {
@@ -121,13 +129,12 @@
       '<div class="sel-roster-head"><div><b>Elenco da seleção</b><span>' + esc(pluralJogadores(lista.length)) + ' com fotos quando disponíveis</span></div></div>' +
       '<div class="sel-roster-grid">' + lista.map(function (p) {
         var face = p.foto ? '<span class="sel-roster-face"><img src="' + esc(p.foto) + '" alt="" loading="lazy"></span>' : '<span class="sel-roster-face sel-face-ini" style="background:' + corAvatar(p.nome) + '" aria-hidden="true">' + esc(iniciais(p.nome)) + '</span>';
-        var clube = clubeJogador(p);
+        var clube = clubeJogador(p, id);
         var linha1 = [p.pos, p.num ? ("#" + p.num) : ""].filter(Boolean).join(" · ");
-        var linha2 = clube ? clube : nomeSelecao(id);
         return '<article class="sel-roster-card">' + face +
           '<strong>' + esc(p.nome || "—") + '</strong>' +
           (linha1 ? '<span class="sel-roster-meta">' + esc(linha1) + '</span>' : '') +
-          '<small>' + esc(linha2) + '</small>' +
+          (clube ? '<small class="sel-roster-club">' + esc(clube) + '</small>' : '') +
         '</article>';
       }).join("") + '</div>' +
     '</section>';
