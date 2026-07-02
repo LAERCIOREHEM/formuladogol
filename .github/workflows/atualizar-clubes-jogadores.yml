@@ -8,12 +8,20 @@ on:
         default: "NAO"
         required: false
       limite:
-        description: "Limite de jogadores pendentes nesta rodada (0 = todos)"
+        description: "Limite de jogadores pendentes nesta rodada (0 = todos; recomendado deixar 0 com limite interno de tempo)"
         default: "0"
         required: false
       sem_wikipedia:
         description: "Pular fallback Wikipedia? (SIM/NAO)"
         default: "NAO"
+        required: false
+      max_minutos:
+        description: "Tempo interno máximo antes de salvar parcial e commitar (recomendado: 55)"
+        default: "55"
+        required: false
+      checkpoint_cada:
+        description: "Salvar parcial a cada N jogadores processados (recomendado: 25)"
+        default: "25"
         required: false
 
 permissions:
@@ -51,11 +59,13 @@ jobs:
           FORCE: ${{ github.event.inputs.force || 'NAO' }}
           LIMITE: ${{ github.event.inputs.limite || '0' }}
           SEM_WIKIPEDIA: ${{ github.event.inputs.sem_wikipedia || 'NAO' }}
+          MAX_MINUTOS: ${{ github.event.inputs.max_minutos || '55' }}
+          CHECKPOINT_CADA: ${{ github.event.inputs.checkpoint_cada || '25' }}
         run: |
           set -euo pipefail
           cd "$GITHUB_WORKSPACE/copa2026"
 
-          ARGS=(--limite "$LIMITE")
+          ARGS=(--limite "$LIMITE" --max-minutos "$MAX_MINUTOS" --checkpoint-cada "$CHECKPOINT_CADA")
           if [[ "$FORCE" == "SIM" ]]; then
             ARGS+=(--force)
           fi
@@ -128,7 +138,7 @@ jobs:
             fi
 
             git add -- "${FILES[@]}"
-            git commit -m "Atualiza clubes dos jogadores - automatico"
+            git commit -m "Atualiza clubes dos jogadores - parcial/automatico"
 
             if git push origin HEAD:main; then
               echo "Push OK na tentativa $i."
