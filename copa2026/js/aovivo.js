@@ -41,6 +41,7 @@
   let TVS = {};
   let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols ao vivo exibidos no card
   let LIVES = {};
+  let AGENDA_COPA = [];
 
   async function rpc(fn, body) {
     const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
@@ -74,6 +75,44 @@
   }
 
 
+  function venueDaESPN(ev) {
+    const comp = getPath(ev, ["competitions", 0], {}) || {};
+    const v = comp.venue || ev.venue || {};
+    if (!v || typeof v !== "object") return "";
+    const nome = v.fullName || v.displayName || v.name || v.shortName || "";
+    const addr = v.address || {};
+    const cidade = [addr.city, addr.state || addr.country].filter(Boolean).join(", ");
+    const txt = [nome, cidade].filter(Boolean).join(" · ").replace(/\s+/g, " ").trim();
+    return txt;
+  }
+  function agendaLocalJogo(ev, hAb, aAb) {
+    const hId = dpSigla(hAb) || hAb;
+    const aId = dpSigla(aAb) || aAb;
+    const hNome = dpNorm(dpNome(hId));
+    const aNome = dpNorm(dpNome(aId));
+    const dt = new Date(ev && ev.date ? ev.date : 0).getTime();
+    if (!dt || !isFinite(dt) || !AGENDA_COPA.length) return "";
+    let melhor = null;
+    let melhorDif = Infinity;
+    (AGENDA_COPA || []).forEach(function (j) {
+      if (!j || !j.local || !j.inicio_brt || !j.descricao) return;
+      const desc = dpNorm(j.descricao);
+      if (!(desc.indexOf(hNome) !== -1 && desc.indexOf(aNome) !== -1)) return;
+      const jd = new Date(j.inicio_brt).getTime();
+      const dif = Math.abs(jd - dt);
+      if (dif < melhorDif && dif <= 6 * 60 * 60 * 1000) {
+        melhor = j;
+        melhorDif = dif;
+      }
+    });
+    return melhor ? String(melhor.local || "").trim() : "";
+  }
+  function localJogoHTML(ev, hAb, aAb, classe) {
+    const local = venueDaESPN(ev) || agendaLocalJogo(ev, hAb, aAb);
+    if (!local) return "";
+    return `<div class="${classe || "live-venue"}" title="Local da partida">🏟️ <span>${escTxt(local)}</span></div>`;
+  }
+
   function statsBlocoAoVivo(ev, home, away) {
     if (!window.COPA_JOGO_STATS || !ev || !ev.id) return "";
     const hAb = (home.team && (home.team.abbreviation || home.team.displayName)) || "";
@@ -92,6 +131,7 @@
   async function init() {
     try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
     try { LIVES = (await fetch("dados/lives.json?t=" + Date.now()).then(r => r.json())).jogos || {}; } catch (e) { LIVES = {}; }
+    try { AGENDA_COPA = (await fetch("dados/agenda_workflow_copa.json?t=" + Date.now()).then(r => r.json())).jogos || []; } catch (e) { AGENDA_COPA = []; }
     try {
       const [s, e, t] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
@@ -637,6 +677,7 @@
       </div>
       ${pre ? "" : `<div class="live-gols-jogo" id="live-gols-${ev.id}" aria-label="Gols do jogo ao vivo"></div>`}
       <div class="minuto">${minuto}</div>
+      ${localJogoHTML(ev, (home.team || {}).abbreviation, (away.team || {}).abbreviation, "live-venue")}
       ${tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${botaoCaze((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${statsBlocoAoVivo(ev, home, away)}
@@ -717,6 +758,7 @@
         </div>
       </div>
       <div class="cz-quando">${diaTxt}, <b>${hora}</b> <span class="cz-bsb">(Brasília)</span></div>
+      ${localJogoHTML(ev, hAb, aAb, "cz-venue")}
       <div class="cz-contador" data-inicio="${d.getTime()}">calculando…</div>
       <div class="cz-frase">${frasePorHora(horaBSB(d))}</div>
     </div>`;
