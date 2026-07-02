@@ -48,6 +48,14 @@
       esc(iniciais(nome)) + "</span>";
   }
 
+  function previewAttrs(src, titulo, subtitulo) {
+    if (!src) return "";
+    return ' data-image-preview="' + esc(src) + '"' +
+      ' data-preview-title="' + esc(titulo || "") + '"' +
+      ' data-preview-subtitle="' + esc(subtitulo || "") + '"' +
+      ' tabindex="0" role="button"';
+  }
+
   var SEL = [], PAISES = {}, ELENCOS = {}, DADOS = {}, JOGOS = [];
   var STATS_CARREGADAS = false;
   var ID_ATUAL = "";
@@ -131,7 +139,9 @@
         var face = p.foto ? '<span class="sel-roster-face"><img src="' + esc(p.foto) + '" alt="" loading="lazy"></span>' : '<span class="sel-roster-face sel-face-ini" style="background:' + corAvatar(p.nome) + '" aria-hidden="true">' + esc(iniciais(p.nome)) + '</span>';
         var clube = clubeJogador(p, id);
         var linha1 = [p.pos, p.num ? ("#" + p.num) : ""].filter(Boolean).join(" · ");
-        return '<article class="sel-roster-card">' + face +
+        var subPreview = [nomeSelecao(id), linha1, clube].filter(Boolean).join(" • ");
+        var attrs = p.foto ? previewAttrs(p.foto, p.nome || "Jogador", subPreview) : "";
+        return '<article class="sel-roster-card ' + (p.foto ? 'sel-previewable' : '') + '"' + attrs + ' aria-label="Ampliar foto de ' + esc(p.nome || "jogador") + '">' + face +
           '<strong>' + esc(p.nome || "—") + '</strong>' +
           (linha1 ? '<span class="sel-roster-meta">' + esc(linha1) + '</span>' : '') +
           (clube ? '<small class="sel-roster-club">' + esc(clube) + '</small>' : '') +
@@ -372,6 +382,13 @@
     }
     return '<span class="sel-scorer-face sel-face-ini" style="background:' + corAvatar(nome) + '" aria-hidden="true">' + esc(iniciais(nome)) + '</span>';
   }
+  function previewMarcadorAttrs(id, nome) {
+    var p = jogadorElenco(id, nome);
+    if (!p || !p.foto) return "";
+    var clube = clubeJogador(p, id);
+    var linha1 = [nomeSelecao(id), p.pos, p.num ? ("#" + p.num) : "", clube].filter(Boolean).join(" • ");
+    return previewAttrs(p.foto, nome || p.nome || "Goleador", linha1);
+  }
   function golsLabel(n) {
     n = n || 0;
     return n === 1 ? "gol" : "gols";
@@ -451,7 +468,8 @@
     }
     var linhas = lista.map(function (x, i) {
       var gols = x.gols || 0;
-      return '<article class="sel-scorer-card ' + (i === 0 ? 'lider' : '') + '">' +
+      var pPrevAttrs = previewMarcadorAttrs(id, x.nome || "");
+      return '<article class="sel-scorer-card ' + (i === 0 ? 'lider ' : '') + (pPrevAttrs ? 'sel-previewable' : '') + '"' + pPrevAttrs + ' aria-label="Ampliar foto de ' + esc(x.nome || "goleador") + '">' +
         '<span class="sel-scorer-rank">' + (i + 1) + 'º</span>' +
         faceMarcador(id, x.nome || "") +
         '<div class="sel-scorer-info">' +

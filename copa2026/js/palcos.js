@@ -17,6 +17,14 @@
     return "https://flagcdn.com/w" + (w || 40) + "/" + String(iso2 || "").toLowerCase() + ".png";
   }
 
+  function previewAttrs(src, titulo, subtitulo) {
+    if (!src) return "";
+    return ' data-image-preview="' + esc(src) + '"' +
+      ' data-preview-title="' + esc(titulo || "") + '"' +
+      ' data-preview-subtitle="' + esc(subtitulo || "") + '"' +
+      ' tabindex="0" role="button"';
+  }
+
   var DADOS = { paises: [], estadios: [] };
   var FILTRO = "";
 
@@ -36,7 +44,7 @@
     var foto = "img/palcos/" + esc(e.id) + ".jpg";
     return '<div class="pal-card-foto" style="--pc:' + cor + '">' +
       '<img src="' + foto + '" alt="' + esc(e.nomeReal) + '" loading="lazy" ' +
-      'onerror="this.parentNode.classList.add(\'sem-img\');this.remove()">' +
+      'onerror="this.parentNode.classList.add(\'sem-img\');var c=this.closest(\'.pal-card\');if(c){c.removeAttribute(\'data-image-preview\');c.removeAttribute(\'tabindex\');c.removeAttribute(\'role\');c.classList.remove(\'pal-previewable\');}this.remove()">' +
       '<span class="pal-card-ini" aria-hidden="true">🏟️</span>' +
       '<img class="pal-card-flag" src="' + flagUrl(e.iso2, 40) + '" alt="" loading="lazy" width="22" height="15">' +
       (e.destaque ? '<span class="pal-card-dest">' + esc(e.destaque) + "</span>" : "") +
@@ -44,7 +52,9 @@
   }
 
   function cardEstadio(e) {
-    return '<article class="pal-card" data-pais="' + esc(e.pais) + '">' +
+    var foto = "img/palcos/" + esc(e.id) + ".jpg";
+    var sub = [e.cidade, e.capacidade ? ("Capacidade: " + e.capacidade) : "", e.jogos ? (e.jogos + " jogos") : ""].filter(Boolean).join(" • ");
+    return '<article class="pal-card pal-previewable" data-pais="' + esc(e.pais) + '"' + previewAttrs(foto, e.nomeReal || e.nomeFifa, sub) + ' aria-label="Ampliar foto de ' + esc(e.nomeReal || e.nomeFifa) + '">' +
       heroEstadio(e) +
       '<div class="pal-card-corpo">' +
         '<div class="pal-card-nome">' + esc(e.nomeFifa) + "</div>" +
