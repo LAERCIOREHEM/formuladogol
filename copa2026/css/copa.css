@@ -1099,3 +1099,67 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .sel-roster-face{width:44px;height:44px}
   .sel-roster-card strong{font-size:9.8px}
 }
+
+/* ==========================================================================
+   ABA SEDES / PALCOS DA COPA (02/07/2026) — países-sede, 16 estádios
+   (2 cards por linha no celular, 4 no desktop), mascotes e TRIONDA.
+   ========================================================================== */
+.pal-hero{margin:14px 2px 12px}
+.pal-hero h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:.5px;color:var(--gold);text-transform:uppercase;line-height:1.05;margin-bottom:6px}
+.pal-hero p{font-size:13px;color:var(--cinza);line-height:1.5}
+.pal-sec-tit{font-family:'Anton',sans-serif;font-weight:400;font-size:16px;color:var(--gold);text-transform:uppercase;letter-spacing:.6px;margin:20px 2px 10px}
+
+.pal-paises{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pal-pais{background:var(--navy-2);border:1px solid var(--linha);border-radius:13px;padding:11px 10px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px}
+.pal-pais-flag{width:44px;height:30px;border-radius:4px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.14)}
+.pal-pais-nome{font-size:12.5px;font-weight:800;color:var(--branco);line-height:1.15}
+.pal-pais-meta{font-size:10px;color:var(--gold);font-weight:700}
+.pal-pais-nota{font-size:10px;color:var(--cinza);line-height:1.4}
+
+.pal-filtro{display:flex;gap:7px;margin:0 2px 12px;flex-wrap:wrap}
+.pal-chip{background:var(--navy-2);border:1px solid var(--linha);color:var(--cinza);font-family:inherit;font-weight:700;font-size:12.5px;padding:8px 13px;border-radius:999px;cursor:pointer;transition:all .15s}
+.pal-chip:hover{border-color:rgba(244,197,66,.5)}
+.pal-chip.ativo{background:var(--gold);color:#3a2a00;border-color:var(--gold)}
+
+.pal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:640px){ .pal-grid{grid-template-columns:repeat(4,1fr);gap:9px} }
+.pal-card{background:var(--navy-2);border:1px solid var(--linha);border-radius:13px;overflow:hidden;display:flex;flex-direction:column}
+.pal-card-foto{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,var(--pc,#3b5bdb) 0%,var(--navy-3) 90%);overflow:hidden}
+.pal-card-foto img:not(.pal-card-flag){position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pal-card-ini{display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:30px;opacity:.85}
+.pal-card-foto.sem-img .pal-card-ini{display:flex}
+.pal-card-flag{position:absolute;top:6px;left:6px;width:22px;height:15px;border-radius:2.5px;box-shadow:0 0 0 1px rgba(0,0,0,.35);z-index:2}
+.pal-card-dest{position:absolute;bottom:6px;left:6px;right:6px;z-index:2;background:rgba(11,31,58,.88);border:1px solid rgba(244,197,66,.45);color:var(--gold);font-size:8.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;border-radius:999px;padding:3px 7px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pal-card-corpo{padding:9px 9px 11px;display:flex;flex-direction:column;gap:3px;flex:1}
+.pal-card-nome{font-size:12px;font-weight:800;color:var(--branco);line-height:1.2}
+.pal-card-real{font-size:10px;color:var(--gold);font-weight:700}
+.pal-card-cid{font-size:9.5px;color:var(--cinza)}
+.pal-card-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.pal-mini{background:rgba(0,0,0,.24);border:1px solid var(--linha);border-radius:8px;padding:3px 7px;font-size:9px;color:#dce7f5;font-weight:700;white-space:nowrap}
+.pal-card-curio{font-size:9.5px;color:var(--cinza);line-height:1.45;margin-top:5px;border-top:1px solid rgba(255,255,255,.07);padding-top:6px}
+.pal-vazio{grid-column:1/-1;color:var(--cinza);font-size:13px;text-align:center;padding:24px 10px;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px}
+
+.pal-mascotes{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.pal-mascote{background:var(--navy-2);border:1px solid var(--linha);border-radius:13px;padding:11px 8px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:5px}
+.pal-mascote-img{position:relative;width:72px;height:72px;border-radius:50%;background:var(--navy-3);border:2px solid rgba(244,197,66,.35);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.pal-mascote-img img{width:100%;height:100%;object-fit:cover}
+.pal-mascote-emoji{display:none;font-size:32px}
+.pal-mascote-img.sem-img .pal-mascote-emoji{display:block}
+.pal-mascote-nome{font-family:'Anton',sans-serif;font-size:14px;color:var(--gold);letter-spacing:.5px}
+.pal-mascote-desc{font-size:10px;color:var(--cinza);line-height:1.4}
+
+.pal-trionda{background:linear-gradient(135deg,rgba(244,197,66,.10),var(--navy-2) 55%);border:1px solid rgba(244,197,66,.35);border-radius:14px;padding:13px;display:flex;gap:13px;align-items:center}
+.pal-trionda-img{position:relative;flex:0 0 auto;width:92px;height:92px;border-radius:50%;background:var(--navy-3);border:2px solid rgba(244,197,66,.45);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.pal-trionda-img img{width:100%;height:100%;object-fit:cover}
+.pal-trionda-emoji{display:none;font-size:40px}
+.pal-trionda-img.sem-img .pal-trionda-emoji{display:block}
+.pal-trionda-txt{flex:1;min-width:0}
+.pal-trionda-nome{font-family:'Anton',sans-serif;font-size:19px;color:var(--gold);letter-spacing:.8px;margin-bottom:4px}
+.pal-trionda-txt p{font-size:11.5px;color:#dce7f5;line-height:1.5;margin-bottom:6px}
+.pal-trionda-txt ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}
+.pal-trionda-txt li{font-size:10.5px;color:var(--cinza);padding-left:14px;position:relative}
+.pal-trionda-txt li::before{content:"•";color:var(--gold);position:absolute;left:2px}
+@media(max-width:480px){ .pal-trionda{flex-direction:column;text-align:center} .pal-trionda-txt li{text-align:left} }
+
+.pal-legal{font-size:9.5px;color:var(--cinza);line-height:1.55;margin-top:16px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--linha);border-radius:10px}
+.pal-legal b{color:#dce7f5}
