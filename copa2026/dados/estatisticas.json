@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-02T01:12:47.999626Z",
+  "atualizado_em": "2026-07-02T01:42:58.089287Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 82,
@@ -389,12 +389,13 @@
       "gols": 2,
       "assistencias": 0,
       "amarelos": 1,
-      "vermelhos": 0,
+      "vermelhos": 1,
       "jogos": [
         "760417",
-        "760442"
+        "760442",
+        "760494"
       ],
-      "total_cartoes": 1
+      "total_cartoes": 2
     },
     {
       "nome": "Habib Diarra",
@@ -3679,6 +3680,20 @@
   ],
   "cartoes": [
     {
+      "nome": "Folarin Balogun",
+      "equipe": "USA",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 1,
+      "jogos": [
+        "760417",
+        "760442",
+        "760494"
+      ],
+      "total_cartoes": 2
+    },
+    {
       "nome": "Miguel Almirón",
       "equipe": "PAR",
       "gols": 0,
@@ -4617,19 +4632,6 @@
       "vermelhos": 0,
       "jogos": [
         "760418"
-      ],
-      "total_cartoes": 1
-    },
-    {
-      "nome": "Folarin Balogun",
-      "equipe": "USA",
-      "gols": 2,
-      "assistencias": 0,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760417",
-        "760442"
       ],
       "total_cartoes": 1
     },
@@ -6145,7 +6147,7 @@
       "gols": 8,
       "assistencias": 4,
       "amarelos": 5,
-      "vermelhos": 0,
+      "vermelhos": 1,
       "jogos": 4,
       "media_gols": 2.0
     },
