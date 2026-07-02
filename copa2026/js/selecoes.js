@@ -335,6 +335,49 @@
     var v = item[campo] || 0;
     return item.nome + (v ? " — " + v + " " + unidade : "");
   }
+  function chaveNomeJogador(nome) {
+    return norm(nome).replace(/[^a-z0-9]+/g, " ").replace(/\b(jr|junior|sr|filho|neto)\b/g, "").replace(/\s+/g, " ").trim();
+  }
+  function jogadorElenco(id, nome) {
+    var lista = (ELENCOS.times && ELENCOS.times[id]) || [];
+    if (!lista.length || !nome) return null;
+    var alvo = chaveNomeJogador(nome);
+    var direto = lista.filter(function (p) { return chaveNomeJogador(p.nome) === alvo; })[0];
+    if (direto) return direto;
+    return lista.filter(function (p) {
+      var k = chaveNomeJogador(p.nome);
+      return k && alvo && (k.indexOf(alvo) >= 0 || alvo.indexOf(k) >= 0);
+    })[0] || null;
+  }
+  function faceMarcador(id, nome) {
+    var p = jogadorElenco(id, nome);
+    var foto = p && p.foto;
+    if (foto) {
+      return '<span class="sel-scorer-face"><img src="' + esc(foto) + '" alt="" loading="lazy"></span>';
+    }
+    return '<span class="sel-scorer-face sel-face-ini" style="background:' + corAvatar(nome) + '" aria-hidden="true">' + esc(iniciais(nome)) + '</span>';
+  }
+  function golsLabel(n) {
+    n = n || 0;
+    return n === 1 ? "gol" : "gols";
+  }
+  function jogosLabelDeLista(jogos) {
+    var n = Array.isArray(jogos) ? jogos.length : 0;
+    if (!n) return "Copa 2026";
+    return n === 1 ? "1 jogo" : n + " jogos";
+  }
+  function curiosidadesHTML(id, pa) {
+    pa = pa || {};
+    var facts = fact("Capital", pa.capital) +
+      fact("População", pa.populacao) +
+      fact("Língua", pa.lingua) +
+      fact("Continente", pa.continente);
+    return '<section class="sel-curios-section" aria-label="Curiosidades da seleção">' +
+      '<div class="sel-section-title">Curiosidades</div>' +
+      '<div class="sel-facts">' + facts + '</div>' +
+      (pa.curiosidade ? '<div class="sel-curio"><b>Você sabia?</b> ' + esc(pa.curiosidade) + '</div>' : '') +
+    '</section>';
+  }
   function momentoTexto(id, campanha, stats, jogos) {
     if (!STATS_CARREGADAS && !jogos.length) return "Carregando desempenho da seleção…";
     if (campanha.aoVivo) return "Tem jogo ao vivo agora.";
@@ -379,17 +422,43 @@
     var stats = statsSelecao(id), lista = stats.artilheiros || [], total = stats.por.gols || 0;
     var soma = lista.reduce(function (acc, x) { return acc + (x.gols || 0); }, 0);
     var resto = Math.max(0, total - soma);
-    if (!lista.length && !resto) return "";
-    var linhas = lista.map(function (x) {
-      return '<div class="sel-scorer-row"><span>' + esc(x.nome || "—") + '</span><b>' + esc(x.gols || 0) + '</b></div>';
+    var subtitulo = total ? (total + " " + golsLabel(total) + " da seleção") : "dados do feed oficial";
+    if (!STATS_CARREGADAS && !lista.length && !resto) {
+      return '<section class="sel-scorers-section" aria-label="Marcadores da seleção">' +
+        '<div class="sel-scorers-head"><div><b>Marcadores da seleção</b><span>Carregando gols da seleção…</span></div></div>' +
+        '<div class="sel-vazio">Carregando marcadores…</div>' +
+      '</section>';
+    }
+    if (!lista.length && !resto) {
+      return '<section class="sel-scorers-section" aria-label="Marcadores da seleção">' +
+        '<div class="sel-scorers-head"><div><b>Marcadores da seleção</b><span>Ainda sem gols registrados para esta seleção.</span></div></div>' +
+      '</section>';
+    }
+    var linhas = lista.map(function (x, i) {
+      var gols = x.gols || 0;
+      return '<article class="sel-scorer-card ' + (i === 0 ? 'lider' : '') + '">' +
+        '<span class="sel-scorer-rank">' + (i + 1) + 'º</span>' +
+        faceMarcador(id, x.nome || "") +
+        '<div class="sel-scorer-info">' +
+          '<strong>' + esc(x.nome || "—") + '</strong>' +
+          '<span>' + flagEquipe(id) + '<em>' + esc(nomeSelecao(id)) + '</em><small>•</small><em>' + esc(jogosLabelDeLista(x.jogos)) + '</em></span>' +
+        '</div>' +
+        '<div class="sel-scorer-goals"><b>' + esc(gols) + '</b><small>' + esc(golsLabel(gols)) + '</small></div>' +
+      '</article>';
     });
     if (resto) {
-      linhas.push('<div class="sel-scorer-row muted"><span>Gol contra a favor / não identificado no feed</span><b>' + esc(resto) + '</b></div>');
+      linhas.push('<article class="sel-scorer-card extra">' +
+        '<span class="sel-scorer-rank">+</span>' +
+        '<span class="sel-scorer-face sel-scorer-flag">' + flagEquipe(id) + '</span>' +
+        '<div class="sel-scorer-info"><strong>Gol contra a favor / não identificado</strong>' +
+        '<span><em>Diferença entre gols da seleção e autores identificados no feed</em></span></div>' +
+        '<div class="sel-scorer-goals"><b>' + esc(resto) + '</b><small>' + esc(golsLabel(resto)) + '</small></div>' +
+      '</article>');
     }
-    return '<details class="sel-scorers-box">' +
-      '<summary>⚽ Marcadores da seleção</summary>' +
-      '<div class="sel-scorer-list">' + linhas.join("") + '</div>' +
-    '</details>';
+    return '<section class="sel-scorers-section" aria-label="Marcadores da seleção">' +
+      '<div class="sel-scorers-head"><div><b>Marcadores da seleção</b><span>' + esc(subtitulo) + '</span></div></div>' +
+      '<div class="sel-scorers-list">' + linhas.join("") + '</div>' +
+    '</section>';
   }
   function jogosHTML(id) {
     var jogos = jogosDaSelecao(id);
@@ -421,19 +490,12 @@
         '<div class="sel-det-grupo sel-det-ranking">' + esc(rankingLabel(s)) + "</div>" +
       "</div>" +
       trofeus +
-      desempenhoHTML(id) +
-      jogosHTML(id) +
+      curiosidadesHTML(id, pa) +
       marcadoresHTML(id) +
-      '<div class="sel-section-title">Curiosidades</div>' +
-      '<div class="sel-facts">' +
-        fact("Capital", pa.capital) +
-        fact("População", pa.populacao) +
-        fact("Língua", pa.lingua) +
-        fact("Continente", pa.continente) +
-      "</div>" +
-      (pa.curiosidade ? '<div class="sel-curio"><b>Você sabia?</b> ' + esc(pa.curiosidade) + "</div>" : "") +
       '<div class="sel-squad-head">Convocados</div>' +
-      squadHTML(id);
+      squadHTML(id) +
+      desempenhoHTML(id) +
+      jogosHTML(id);
     var det = $("#sel-detalhe");
     det.innerHTML = html; det.hidden = false;
     $("#sel-scroller").hidden = true; $("#sel-hint").hidden = true;
