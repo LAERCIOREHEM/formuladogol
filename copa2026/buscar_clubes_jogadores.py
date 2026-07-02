@@ -123,6 +123,47 @@ def escrever_json(caminho, obj):
     os.replace(tmp, caminho)
 
 
+def tempo_esgotando(inicio, max_minutos, margem_seg=90):
+    """Retorna True quando está perto do limite autoimposto.
+
+    O workflow do GitHub tem timeout próprio. Este limite interno serve para
+    encerrar com sucesso, gravar JSONs parciais e permitir o commit, em vez de
+    perder tudo quando o GitHub mata o job.
+    """
+    if not max_minutos or max_minutos <= 0:
+        return False
+    return (time.monotonic() - inicio) >= max(0, (max_minutos * 60) - margem_seg)
+
+
+def resumo_final(elencos, jogadores, agora, rel, encerrado_por_tempo=False):
+    total_com = 0
+    por_sel = {}
+    for sigla, lista in (elencos.get("times") or {}).items():
+        qtd = sum(1 for p in lista if p.get("clube"))
+        por_sel[sigla] = {"jogadores": len(lista), "com_clube": qtd, "faltando": max(0, len(lista) - qtd)}
+        total_com += qtd
+    rel["com_clube_total"] = total_com
+    rel["faltando_total"] = len(jogadores) - total_com
+    rel["por_selecao"] = por_sel
+    if encerrado_por_tempo:
+        rel["encerrado_por_tempo"] = True
+        rel["nota_execucao"] = "Execução encerrada antes do timeout do GitHub para preservar e publicar resultado parcial. Rode novamente para continuar."
+    return rel
+
+
+def salvar_parcial(elencos, cache, rel, jogadores, agora, motivo):
+    elencos["clubes_atualizado_em"] = agora
+    elencos["_nota_clubes"] = "Campo clube preenchido por buscar_clubes_jogadores.py. Se não houver clube seguro, o front não exibe fallback de seleção."
+    cache["gerado_em"] = agora
+    cache["_nota"] = "Cache de clube atual por jogador. Chave principal = id ESPN."
+    rel["ultimo_checkpoint_em"] = agora_iso()
+    rel["ultimo_checkpoint_motivo"] = motivo
+    resumo_final(elencos, jogadores, agora, rel, encerrado_por_tempo=(motivo == "limite_tempo"))
+    escrever_json(ELENCOS_JSON, elencos)
+    escrever_json(CACHE_JSON, cache)
+    escrever_json(RELATORIO_JSON, rel)
+
+
 def http_json(url, timeout=30, tentativas=3, data=None, headers=None):
     ultimo = None
     for i in range(tentativas):
@@ -438,10 +479,14 @@ def sparql_literal(s):
     return '"' + str(s).replace('\\', '\\\\').replace('"', '\\"') + '"'
 
 
-def preencher_lote_sparql(pendentes, aliases, rel, batch_size=45):
+def preencher_lote_sparql(pendentes, aliases, rel, batch_size=45, inicio=None, max_minutos=0):
     """Primeira camada: consulta Wikidata em lotes por label exato. Retorna dict chave_cache->resultado."""
     achados = {}
     for i in range(0, len(pendentes), batch_size):
+        if inicio is not None and tempo_esgotando(inicio, max_minutos, margem_seg=240):
+            print("⚠️ Interrompendo SPARQL em lote por limite interno de tempo; salvarei o que já foi encontrado.")
+            rel["sparql_interrompido_por_tempo"] = True
+            break
         bloco = pendentes[i:i + batch_size]
         names = []
         key_by_name = {}
@@ -537,7 +582,13 @@ def rodar(args):
         "linhas_sparql": 0,
         "fontes": {},
         "sem_clube_amostra": [],
+        "processados_nesta_rodada": 0,
+        "pendentes_iniciais": 0,
+        "limite_minutos": args.max_minutos,
+        "checkpoint_cada": args.checkpoint_cada,
     }
+
+    inicio_execucao = time.monotonic()
 
     # Limpa qualquer lixo anterior do tipo "Brasil/Argentina" como clube.
     for _, p in jogadores:
@@ -567,15 +618,37 @@ def rodar(args):
     if args.limite and args.limite > 0:
         pendentes = pendentes[:args.limite]
 
-    print("→ Jogadores: %d | pendentes para busca: %d" % (len(jogadores), len(pendentes)))
+    rel["pendentes_iniciais"] = len(pendentes)
+    print("→ Jogadores: %d | pendentes para busca: %d | limite interno: %s min" % (len(jogadores), len(pendentes), args.max_minutos or "sem limite"))
 
-    achados_sparql = preencher_lote_sparql(pendentes, aliases, rel, batch_size=args.batch)
+    achados_sparql = preencher_lote_sparql(pendentes, aliases, rel, batch_size=args.batch, inicio=inicio_execucao, max_minutos=args.max_minutos)
+    # Já salva se o SPARQL em lote encontrou algo, para não perder esta parte se a execução parar depois.
+    if achados_sparql:
+        for sigla, p in pendentes:
+            key = chave_cache(sigla, p)
+            res0 = achados_sparql.get(key)
+            if res0 and not p.get("clube"):
+                aplicar_resultado(p, res0, agora)
+                cache_item = dict(res0)
+                cache_item["nome"] = p.get("nome")
+                cache_item["selecao"] = sigla
+                cache_item["atualizado_em"] = agora
+                itens[key] = cache_item
+                rel["novos"] += 1
+                fonte = res0.get("fonte") or "desconhecida"
+                rel["fontes"][fonte] = rel["fontes"].get(fonte, 0) + 1
+        salvar_parcial(elencos, cache, rel, jogadores, agora, "pos_sparql")
+
     processados = 0
     for sigla, p in pendentes:
         key = chave_cache(sigla, p)
-        res = achados_sparql.get(key)
-        if not res:
-            qid = p.get("wikidata")
+        if p.get("clube") and not args.force:
+            processados += 1
+            rel["processados_nesta_rodada"] = processados
+            continue
+        res = None
+        qid = p.get("wikidata")
+        if True:
             if qid:
                 res = buscar_com_qid(qid, aliases, usar_wikipedia=not args.sem_wikipedia)
             if not res:
@@ -601,30 +674,22 @@ def rodar(args):
             if len(rel["sem_clube_amostra"]) < 20:
                 rel["sem_clube_amostra"].append({"selecao": sigla, "nome": p.get("nome")})
         processados += 1
+        rel["processados_nesta_rodada"] = processados
         if processados % 25 == 0:
             print("  processados %d/%d | novos=%d | sem=%d" % (processados, len(pendentes), rel["novos"], rel["sem_clube"]))
+        if args.checkpoint_cada and args.checkpoint_cada > 0 and processados % args.checkpoint_cada == 0:
+            salvar_parcial(elencos, cache, rel, jogadores, agora, "checkpoint_%d" % processados)
+            print("  ✓ checkpoint salvo em %d/%d" % (processados, len(pendentes)))
+        if tempo_esgotando(inicio_execucao, args.max_minutos):
+            print("⚠️ Limite interno de tempo se aproximando. Salvando parcial e encerrando com sucesso para permitir commit.")
+            salvar_parcial(elencos, cache, rel, jogadores, agora, "limite_tempo")
+            print("✓ Parcial salvo. Rode o workflow novamente para continuar do cache.")
+            return 0
         time.sleep(args.sleep)
 
     # Contagem final real após aplicar.
-    total_com = 0
-    por_sel = {}
-    for sigla, lista in (elencos.get("times") or {}).items():
-        qtd = sum(1 for p in lista if p.get("clube"))
-        por_sel[sigla] = {"jogadores": len(lista), "com_clube": qtd, "faltando": max(0, len(lista) - qtd)}
-        total_com += qtd
-
-    elencos["clubes_atualizado_em"] = agora
-    elencos["_nota_clubes"] = "Campo clube preenchido por buscar_clubes_jogadores.py. Se não houver clube seguro, o front não exibe fallback de seleção."
-    cache["gerado_em"] = agora
-    cache["_nota"] = "Cache de clube atual por jogador. Chave principal = id ESPN."
-    rel["com_clube_total"] = total_com
-    rel["faltando_total"] = len(jogadores) - total_com
-    rel["por_selecao"] = por_sel
-
-    escrever_json(ELENCOS_JSON, elencos)
-    escrever_json(CACHE_JSON, cache)
-    escrever_json(RELATORIO_JSON, rel)
-    print("✓ Clubes: %d/%d jogadores com clube. Novos nesta rodada: %d." % (total_com, len(jogadores), rel["novos"]))
+    salvar_parcial(elencos, cache, rel, jogadores, agora, "final")
+    print("✓ Clubes: %d/%d jogadores com clube. Novos nesta rodada: %d." % (rel.get("com_clube_total"), len(jogadores), rel["novos"]))
     print("  Relatório: dados/clubes_jogadores_relatorio.json")
     return 0
 
@@ -665,6 +730,8 @@ def main():
     ap.add_argument("--batch", type=int, default=45, help="tamanho do lote SPARQL")
     ap.add_argument("--sleep", type=float, default=0.08, help="pausa curta entre jogadores no fallback")
     ap.add_argument("--sem-wikipedia", action="store_true", help="não tenta fallback por infobox Wikipedia")
+    ap.add_argument("--max-minutos", type=int, default=55, help="limite interno em minutos para salvar parcial antes do timeout do GitHub")
+    ap.add_argument("--checkpoint-cada", type=int, default=25, help="salva JSONs a cada N jogadores processados")
     args = ap.parse_args()
     if args.selftest:
         return selftest()
