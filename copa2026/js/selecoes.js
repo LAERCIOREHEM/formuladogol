@@ -95,34 +95,42 @@
     return n === 1 ? "1 jogador" : n + " jogadores";
   }
 
+  function clubeJogador(p) {
+    var v = p && (p.clube || p.club || p.time || p.equipe || p.team || p.currentTeam || p.current_team || "");
+    if (v && typeof v === "object") v = v.nome || v.name || v.displayName || v.shortDisplayName || "";
+    return v ? String(v) : "";
+  }
+
   function squadHTML(id) {
     var lista = (ELENCOS.times && ELENCOS.times[id]) || [];
     if (!lista.length) {
-      return '<details class="sel-squad-box">' +
-        '<summary class="sel-squad-toggle"><span>👥 Ver convocados</span><small>elenco em breve</small></summary>' +
-        '<div class="sel-squad-vazio">Elenco em breve — atualiza automaticamente a partir da ESPN.</div>' +
-      '</details>';
+      return '<section class="sel-roster-section" aria-label="Elenco da seleção">' +
+        '<div class="sel-roster-head"><div><b>Elenco da seleção</b><span>Elenco em breve — atualiza automaticamente a partir da ESPN.</span></div></div>' +
+        '<div class="sel-squad-vazio">Quando os dados estiverem disponíveis, os jogadores aparecerão aqui com foto ou avatar de iniciais.</div>' +
+      '</section>';
     }
     lista = lista.slice().sort(function (a, b) {
+      var ordem = { GOL: 1, GK: 1, DEF: 2, ZAG: 2, LAT: 2, MEI: 3, MID: 3, ATA: 4, FWD: 4, AT: 4 };
+      var pa = ordem[String(a.pos || "").toUpperCase()] || 9;
+      var pb = ordem[String(b.pos || "").toUpperCase()] || 9;
       var na = parseInt(a.num, 10), nb = parseInt(b.num, 10);
       if (isNaN(na)) na = 999; if (isNaN(nb)) nb = 999;
-      return na - nb || String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
+      return pa - pb || na - nb || String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR");
     });
-    return '<details class="sel-squad-box">' +
-      '<summary class="sel-squad-toggle">' +
-        '<span class="sel-squad-closed">👥 Ver convocados</span>' +
-        '<span class="sel-squad-open">👥 Ocultar convocados</span>' +
-        '<small>' + esc(pluralJogadores(lista.length)) + '</small>' +
-      '</summary>' +
-      '<div class="sel-squad">' + lista.map(function (p) {
-        var face = p.foto ? '<span class="sel-face"><img src="' + esc(p.foto) + '" alt="" loading="lazy"></span>' : avatar(p.nome);
-        var sub = [p.pos, p.num].filter(Boolean).join(" · ");
-        return '<div class="sel-player">' + face +
-          '<span class="sel-player-nome">' + esc(p.nome || "—") + "</span>" +
-          (sub ? '<span class="sel-player-pos">' + esc(sub) + "</span>" : "") +
-          "</div>";
-      }).join("") + "</div>" +
-    "</details>";
+    return '<section class="sel-roster-section" aria-label="Elenco da seleção">' +
+      '<div class="sel-roster-head"><div><b>Elenco da seleção</b><span>' + esc(pluralJogadores(lista.length)) + ' com fotos quando disponíveis</span></div></div>' +
+      '<div class="sel-roster-grid">' + lista.map(function (p) {
+        var face = p.foto ? '<span class="sel-roster-face"><img src="' + esc(p.foto) + '" alt="" loading="lazy"></span>' : '<span class="sel-roster-face sel-face-ini" style="background:' + corAvatar(p.nome) + '" aria-hidden="true">' + esc(iniciais(p.nome)) + '</span>';
+        var clube = clubeJogador(p);
+        var linha1 = [p.pos, p.num ? ("#" + p.num) : ""].filter(Boolean).join(" · ");
+        var linha2 = clube ? clube : nomeSelecao(id);
+        return '<article class="sel-roster-card">' + face +
+          '<strong>' + esc(p.nome || "—") + '</strong>' +
+          (linha1 ? '<span class="sel-roster-meta">' + esc(linha1) + '</span>' : '') +
+          '<small>' + esc(linha2) + '</small>' +
+        '</article>';
+      }).join("") + '</div>' +
+    '</section>';
   }
 
   function fact(label, val) {
@@ -424,14 +432,14 @@
     var resto = Math.max(0, total - soma);
     var subtitulo = total ? (total + " " + golsLabel(total) + " da seleção") : "dados do feed oficial";
     if (!STATS_CARREGADAS && !lista.length && !resto) {
-      return '<section class="sel-scorers-section" aria-label="Marcadores da seleção">' +
-        '<div class="sel-scorers-head"><div><b>Marcadores da seleção</b><span>Carregando gols da seleção…</span></div></div>' +
+      return '<section class="sel-scorers-section" aria-label="Goleadores">' +
+        '<div class="sel-scorers-head"><div><b>Goleadores</b><span>Carregando gols da seleção…</span></div></div>' +
         '<div class="sel-vazio">Carregando marcadores…</div>' +
       '</section>';
     }
     if (!lista.length && !resto) {
-      return '<section class="sel-scorers-section" aria-label="Marcadores da seleção">' +
-        '<div class="sel-scorers-head"><div><b>Marcadores da seleção</b><span>Ainda sem gols registrados para esta seleção.</span></div></div>' +
+      return '<section class="sel-scorers-section" aria-label="Goleadores">' +
+        '<div class="sel-scorers-head"><div><b>Goleadores</b><span>Ainda sem gols registrados para esta seleção.</span></div></div>' +
       '</section>';
     }
     var linhas = lista.map(function (x, i) {
@@ -455,8 +463,8 @@
         '<div class="sel-scorer-goals"><b>' + esc(resto) + '</b><small>' + esc(golsLabel(resto)) + '</small></div>' +
       '</article>');
     }
-    return '<section class="sel-scorers-section" aria-label="Marcadores da seleção">' +
-      '<div class="sel-scorers-head"><div><b>Marcadores da seleção</b><span>' + esc(subtitulo) + '</span></div></div>' +
+    return '<section class="sel-scorers-section" aria-label="Goleadores">' +
+      '<div class="sel-scorers-head"><div><b>Goleadores</b><span>' + esc(subtitulo) + '</span></div></div>' +
       '<div class="sel-scorers-list">' + linhas.join("") + '</div>' +
     '</section>';
   }
@@ -492,7 +500,6 @@
       trofeus +
       curiosidadesHTML(id, pa) +
       marcadoresHTML(id) +
-      '<div class="sel-squad-head">Convocados</div>' +
       squadHTML(id) +
       desempenhoHTML(id) +
       jogosHTML(id);
