@@ -1163,3 +1163,44 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 
 .pal-legal{font-size:9.5px;color:var(--cinza);line-height:1.55;margin-top:16px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--linha);border-radius:10px}
 .pal-legal b{color:#dce7f5}
+
+/* ==========================================================================
+   IMAGE PREVIEW / LIGHTBOX — jogadores, palcos, mascotes e bola
+   Clique/toque no card para ver a foto ampliada sem bagunçar o layout.
+   ========================================================================== */
+.sel-previewable,
+.pal-previewable{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,filter .16s ease}
+.sel-previewable:hover,
+.pal-previewable:hover{transform:translateY(-1px);border-color:rgba(244,197,66,.55);box-shadow:0 12px 28px rgba(0,0,0,.22),0 0 0 1px rgba(244,197,66,.12);filter:saturate(1.06)}
+.sel-previewable:focus-visible,
+.pal-previewable:focus-visible{outline:2px solid rgba(244,197,66,.92);outline-offset:3px}
+.sel-roster-card.sel-previewable::after,
+.sel-scorer-card.sel-previewable::after,
+.pal-card.pal-previewable .pal-card-foto::after,
+.pal-mascote.pal-previewable .pal-mascote-img::after,
+.pal-trionda.pal-previewable .pal-trionda-img::after{content:"🔍";position:absolute;right:4px;bottom:4px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;background:rgba(7,21,42,.78);border:1px solid rgba(244,197,66,.45);box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:3}
+.sel-roster-card.sel-previewable,.sel-scorer-card.sel-previewable{position:relative}
+.sel-roster-card.sel-previewable::after,.sel-scorer-card.sel-previewable::after{right:7px;top:7px;bottom:auto}
+
+.copa-preview-open body{overflow:hidden}
+.copa-img-preview{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px;opacity:0;transition:opacity .18s ease}
+.copa-img-preview.ativo{opacity:1}
+.copa-img-preview[hidden]{display:none}
+.copa-img-preview-backdrop{position:absolute;inset:0;background:rgba(2,10,24,.82);backdrop-filter:blur(5px)}
+.copa-img-preview-card{position:relative;width:min(92vw,560px);max-height:88vh;background:linear-gradient(180deg,rgba(15,43,78,.98),rgba(6,22,44,.98));border:1px solid rgba(244,197,66,.46);border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.58),0 0 0 1px rgba(255,255,255,.05) inset;overflow:hidden;transform:translateY(8px) scale(.985);transition:transform .18s ease;display:flex;flex-direction:column}
+.copa-img-preview.ativo .copa-img-preview-card{transform:translateY(0) scale(1)}
+.copa-img-preview-close{position:absolute;top:9px;right:9px;z-index:4;width:36px;height:36px;border-radius:50%;border:1px solid rgba(244,197,66,.65);background:rgba(7,21,42,.84);color:var(--gold);font-size:25px;line-height:1;font-weight:900;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.32)}
+.copa-img-preview-close:focus-visible{outline:2px solid rgba(244,197,66,.95);outline-offset:2px}
+.copa-img-preview-media{background:radial-gradient(circle at center,rgba(244,197,66,.10),rgba(0,0,0,.18));display:flex;align-items:center;justify-content:center;min-height:220px;max-height:72vh;padding:12px}
+.copa-img-preview-media img{display:block;max-width:100%;max-height:70vh;width:auto;height:auto;object-fit:contain;border-radius:15px;box-shadow:0 12px 36px rgba(0,0,0,.38)}
+.copa-img-preview-caption{padding:12px 15px 15px;text-align:center;border-top:1px solid rgba(255,255,255,.08)}
+.copa-img-preview-caption strong{display:block;color:var(--branco);font-size:16px;font-weight:900;line-height:1.18;margin-bottom:4px}
+.copa-img-preview-caption span{display:block;color:#cbd8ea;font-size:12.5px;line-height:1.35}
+@media(max-width:520px){
+  .copa-img-preview{padding:10px}
+  .copa-img-preview-card{width:calc(100vw - 20px);border-radius:18px;max-height:90vh}
+  .copa-img-preview-media{padding:10px;min-height:260px;max-height:74vh}
+  .copa-img-preview-media img{max-height:72vh;border-radius:14px}
+  .copa-img-preview-caption strong{font-size:15px}
+  .copa-img-preview-caption span{font-size:12px}
+}
