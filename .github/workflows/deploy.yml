@@ -1,0 +1,110 @@
+name: Deploy site (GitHub Pages)
+
+on:
+  workflow_dispatch:
+
+  # Quando voce subir arquivos manualmente no GitHub, este deploy publica o site.
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'CNAME'
+      - '*.json'
+      - '*.png'
+      - '*.jpg'
+      - '*.jpeg'
+      - '*.webp'
+      - '*.ico'
+      - 'favicon*'
+      - 'apple-touch-icon.png'
+      - 'copa2026/**'
+      - 'docs/**'
+      - '.github/workflows/deploy.yml'
+
+  # Quando um workflow que altera dados terminar com sucesso, publica o site.
+  # IMPORTANTE: nomes precisam bater exatamente com o campo name: dos workflows.
+  workflow_run:
+    workflows:
+      - 'Atualizar tudo (tabela, resultados e jogos)'
+      - 'Buscar melhores momentos (CazéTV)'
+      - 'Atualiza fair play (cartões)'
+      - 'Atualizar próximos jogos'
+      - 'Atualizar resultados do Brasileirão'
+      - 'Atualizar tabela do Brasileirão'
+    types:
+      - completed
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Publicar GitHub Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Publica somente se:
+    # - for execucao manual; ou
+    # - for push manual no main; ou
+    # - workflow observado terminou com sucesso no main.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Montar site estatico limpo
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+
+          # Arquivos da raiz usados pelo site
+          for item in \
+            index.html CNAME robots.txt sitemap.xml \
+            tabela.json resultados.json jogos.json membros.json \
+            favicon.ico favicon-16.png favicon-32.png favicon-96.png favicon-192.png favicon-512.png \
+            apple-touch-icon.png og-image.png; do
+            if [[ -e "$item" ]]; then
+              cp -a "$item" _site/
+            fi
+          done
+
+          # Pastas publicas
+          if [[ -d copa2026 ]]; then cp -a copa2026 _site/; fi
+          if [[ -d docs ]]; then cp -a docs _site/; fi
+
+          # GitHub Pages nao deve processar Jekyll.
+          touch _site/.nojekyll
+
+          echo "Conteudo publicado em _site:" 
+          find _site -maxdepth 2 -type f | sort | head -200
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        timeout-minutes: 10
