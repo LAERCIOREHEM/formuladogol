@@ -216,9 +216,53 @@ def extrair_atletas(roster_json):
     return res
 
 
-def construir_saida(atletas_por_sigla, fotos_ok):
+CAMPOS_PRESERVAR_JOGADOR = (
+    "clube", "clube_fonte", "clube_confianca", "clube_atualizado_em", "clube_wikidata", "wikidata"
+)
+
+
+def carregar_metadados_jogadores_existentes():
+    """Preserva dados enriquecidos manualmente por outros robôs, como clube atual.
+    O buscar_selecoes.py reconstrói o elenco via ESPN; sem esta mescla ele apagaria
+    campos como 'clube' a cada atualização de elenco.
+    """
+    out = {}
+    try:
+        with open(ELENCOS_JSON, "r", encoding="utf-8") as f:
+            atual = json.load(f)
+    except Exception:
+        return out
+    for sg, jogadores in (atual.get("times") or {}).items():
+        for j in jogadores or []:
+            if not isinstance(j, dict):
+                continue
+            base = {k: j.get(k) for k in CAMPOS_PRESERVAR_JOGADOR if j.get(k) not in (None, "")}
+            if not base:
+                continue
+            jid = str(j.get("id") or "").strip()
+            nome = norm(j.get("nome"))
+            if jid:
+                out[("id", jid)] = base
+            if sg and nome:
+                out[("nome", str(sg).upper(), nome)] = base
+    return out
+
+
+def mesclar_metadados_jogador(destino, sg, nome, jid, metadados):
+    if not metadados:
+        return destino
+    extra = metadados.get(("id", str(jid or ""))) or metadados.get(("nome", str(sg or "").upper(), norm(nome)))
+    if extra:
+        for k, v in extra.items():
+            if v not in (None, ""):
+                destino[k] = v
+    return destino
+
+
+def construir_saida(atletas_por_sigla, fotos_ok, metadados=None):
     """Monta os dicts de elencos.json e rostos.json.
-    atletas_por_sigla: {SIGLA: [atleta...]}; fotos_ok: set de ids com foto salva."""
+    atletas_por_sigla: {SIGLA: [atleta...]}; fotos_ok: set de ids com foto salva.
+    metadados preserva campos enriquecidos, como clube atual."""
     times = {}
     mapa = {}
     for sg in sorted(atletas_por_sigla.keys()):
@@ -226,13 +270,15 @@ def construir_saida(atletas_por_sigla, fotos_ok):
         for p in atletas_por_sigla[sg]:
             tem_foto = p["id"] in fotos_ok
             caminho = "img/jogadores/%s.png" % p["id"] if tem_foto else None
-            linha.append({
+            item = {
                 "id": p["id"],
                 "nome": p["nome"],
                 "pos": p.get("pos"),
                 "num": p.get("num"),
                 "foto": caminho,
-            })
+            }
+            mesclar_metadados_jogador(item, sg, p.get("nome"), p.get("id"), metadados or {})
+            linha.append(item)
             if tem_foto:
                 mapa["%s|%s" % (sg, norm(p["nome"]))] = caminho
         times[sg] = linha
@@ -329,10 +375,11 @@ def rodar(forcar=False):
         print("  %s: %d jogadores, %d fotos." % (sg, len(atletas), baixadas))
         time.sleep(0.4)
 
-    times, mapa = construir_saida(atletas_por_sigla, fotos_ok)
+    metadados = carregar_metadados_jogadores_existentes()
+    times, mapa = construir_saida(atletas_por_sigla, fotos_ok, metadados)
     agora = datetime.now(timezone.utc).isoformat()
     escrever_json(ELENCOS_JSON, {
-        "_nota": "Elencos por seleção + caminho das fotos. Gerado por buscar_selecoes.py (ESPN). times[SIGLA] = [ {id,nome,pos,num,foto} ].",
+        "_nota": "Elencos por seleção + caminho das fotos. Gerado por buscar_selecoes.py (ESPN). Preserva campos enriquecidos como clube quando já existirem.",
         "gerado_em": agora,
         "fonte": "site.api.espn.com (fifa.world)",
         "times": times,
