@@ -1,3 +1,5 @@
+/* BRFIX 20260703 — correção Danilo Santos/Casemiro/Rayan
+   ========================================================================= */
 /* =========================================================================
    selecoes.js — Aba SELEÇÕES
    Lê dados/selecoes.json (países/ranking/iso2), dados/paises.json
@@ -57,6 +59,7 @@
   }
 
   var SEL = [], PAISES = {}, ELENCOS = {}, DADOS = {}, JOGOS = [];
+  var CORRECOES_JOGADORES = {};
   var STATS_CARREGADAS = false;
   var ID_ATUAL = "";
 
@@ -101,6 +104,35 @@
 
   function pluralJogadores(n) {
     return n === 1 ? "1 jogador" : n + " jogadores";
+  }
+
+
+  function aplicarCorrecoesJogadores(cj) {
+    CORRECOES_JOGADORES = cj || {};
+    var lista = (CORRECOES_JOGADORES && CORRECOES_JOGADORES.jogadores) || [];
+    if (!lista.length || !ELENCOS || !ELENCOS.times) return;
+
+    lista.forEach(function (corr) {
+      var sid = String(corr.selecao || "").toUpperCase();
+      var arr = ELENCOS.times[sid] || [];
+      if (!arr.length) return;
+
+      var alvo = null;
+      if (corr.id) {
+        alvo = arr.find(function (p) { return String(p.id || "") === String(corr.id); });
+      }
+      if (!alvo && corr.nome) {
+        var nn = norm(corr.nome);
+        alvo = arr.find(function (p) { return norm(p.nome) === nn; });
+      }
+      if (!alvo) return;
+
+      Object.keys(corr).forEach(function (k) {
+        if (["selecao"].indexOf(k) >= 0) return;
+        if (k === "id" || k === "nome") return;
+        alvo[k] = corr[k];
+      });
+    });
   }
 
   function clubeJogador(p, id) {
@@ -581,7 +613,14 @@
     CRED_CARREGADO = true;
     box.innerHTML = '<div class="sel-cred-tit">Créditos das imagens</div><div class="sel-cred-load">Carregando…</div>';
     getJSON("dados/rostos_creditos.json").then(function (cj) {
-      var itens = (cj && cj.creditos) || [];
+      var itens = ((cj && cj.creditos) || []).slice();
+      var extras = (CORRECOES_JOGADORES && CORRECOES_JOGADORES.creditos) || [];
+      extras.forEach(function (x) {
+        var existe = itens.some(function (i) {
+          return norm(i.nome) === norm(x.nome) && String(i.selecao || "").toUpperCase() === String(x.selecao || "").toUpperCase();
+        });
+        if (!existe) itens.push(x);
+      });
       var html = '<div class="sel-cred-tit">Créditos das imagens</div>';
       html += '<p class="sel-cred-intro">Fotos: ESPN, Wikipedia e Wikimedia Commons quando disponíveis; quando não há fonte segura, exibimos um avatar com as iniciais.</p>';
       if (itens.length) {
@@ -627,13 +666,14 @@
     });
   }
 
-  Promise.all([getJSON("dados/selecoes.json"), getJSON("dados/paises.json"), getJSON("dados/elencos.json")])
+  Promise.all([getJSON("dados/selecoes.json"), getJSON("dados/paises.json"), getJSON("dados/elencos.json"), getJSON("dados/correcoes-jogadores.json?v=20260703brfix-v1")])
     .then(function (res) {
-      var sj = res[0] || {}, pj = res[1] || {}, ej = res[2] || {};
+      var sj = res[0] || {}, pj = res[1] || {}, ej = res[2] || {}, cj = res[3] || {};
       SEL = ((sj.selecoes) || []).map(function (s) { return { id: s.id, nome: s.nome, grupo: s.grupo, seed: s.seed, iso2: s.iso2 }; });
       SEL.sort(function (a, b) { return String(a.nome).localeCompare(String(b.nome), "pt-BR"); });
       PAISES = (pj.paises) || {};
       ELENCOS = ej || {};
+      aplicarCorrecoesJogadores(cj);
       if (!SEL.length) { $("#sel-scroller").innerHTML = '<div class="sel-vazio">Não foi possível carregar as seleções.</div>'; return; }
       renderMenuPaises(); ligar(); renderLista();
       var h = (location.hash || "").replace("#", "").toUpperCase();
