@@ -1262,3 +1262,30 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 .museu-visual span{display:block;font-size:30px;margin-bottom:8px}.museu-brasil-card span,.museu-momento span{display:inline-flex;color:#3a2a00;background:var(--gold);border-radius:999px;padding:4px 8px;font-weight:900;font-size:12px;margin-bottom:8px}.museu-brasil-card p,.museu-momento p{color:#d8e4f4;font-size:13px;line-height:1.45;margin:6px 0 0}.museu-vazio,.museu-erro{background:var(--navy-2);border:1px solid var(--linha);border-radius:14px;padding:16px;color:var(--cinza);text-align:center}.museu-nota{color:var(--cinza);font-size:12px;line-height:1.5;margin:18px 2px}
 @media (max-width:900px){.museu-stats{grid-template-columns:repeat(2,1fr)}.museu-salas{grid-template-columns:repeat(2,1fr)}.museu-ed-grid,.museu-rank-grid,.museu-record-grid,.museu-visual-grid,.museu-brasil-grid,.museu-momento-grid,.museu-mini-grid{grid-template-columns:repeat(2,1fr)}.museu-duo{grid-template-columns:1fr}.museu-final-list{grid-template-columns:1fr}}
 @media (max-width:520px){.museu-hero{padding:18px}.museu-hero h1{font-size:38px}.museu-hero p{font-size:14px}.museu-stats{gap:8px}.museu-stat{padding:11px;min-height:76px}.museu-stat b{font-size:24px}.museu-salas{gap:8px}.museu-sala{min-height:118px;padding:12px}.museu-sala-ico{font-size:24px}.museu-sec-head h2{font-size:24px}.museu-ed-grid{grid-template-columns:1fr}.museu-rank-grid,.museu-record-grid,.museu-visual-grid,.museu-brasil-grid,.museu-momento-grid,.museu-mini-grid{grid-template-columns:repeat(2,1fr);gap:8px}.museu-record strong{font-size:15px}.museu-nav{top:54px;margin-left:-2px;margin-right:-2px}.museu-topscorer{grid-template-columns:26px 1fr 32px}.museu-topscorer b{font-size:12px}}
+
+/* ===== Museu da Copa v2 — ajuste desktop, flags e créditos visuais ===== */
+.museu-nav{margin:28px 0 28px;top:80px;z-index:55}
+.museu-section{scroll-margin-top:154px;margin-top:30px}
+.museu-ed-grid{grid-template-columns:repeat(3,1fr)}
+.museu-rank-grid,.museu-record-grid,.museu-visual-grid,.museu-brasil-grid,.museu-momento-grid,.museu-mini-grid{grid-template-columns:repeat(3,1fr)}
+.museu-ed-campeao{display:flex;align-items:center;gap:7px;min-height:24px}
+.museu-ed-campeao span{min-width:0;line-height:1.2}
+.museu-flag{width:24px;max-width:24px;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.18);flex:0 0 auto}
+.museu-flag-placeholder{width:24px;height:18px;display:inline-grid;place-items:center;flex:0 0 auto;font-size:15px}
+.museu-rank-title{display:flex;align-items:center;gap:7px;margin-bottom:4px;min-width:0}
+.museu-rank-title b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.museu-visual code{display:block;margin-top:9px;background:rgba(7,20,39,.68);border:1px solid rgba(255,255,255,.10);border-radius:9px;color:var(--gold);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;line-height:1.35;padding:7px 8px;word-break:break-word}
+.museu-disclaimer{margin:10px 2px 0;background:rgba(255,204,41,.08);border:1px solid rgba(255,204,41,.22);border-radius:12px;padding:10px 12px;color:#d8e4f4;font-size:11.5px;line-height:1.45}
+.museu-disclaimer b{color:var(--gold)}
+@media (max-width:900px){
+  .museu-nav{top:74px;margin:24px 0 24px}
+  .museu-ed-grid,.museu-rank-grid,.museu-record-grid,.museu-visual-grid,.museu-brasil-grid,.museu-momento-grid,.museu-mini-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:520px){
+  .museu-nav{top:70px;margin:22px -2px 22px}
+  .museu-section{scroll-margin-top:142px;margin-top:26px}
+  .museu-ed-grid{grid-template-columns:1fr}
+  .museu-rank-grid,.museu-record-grid,.museu-visual-grid,.museu-brasil-grid,.museu-momento-grid,.museu-mini-grid{grid-template-columns:repeat(2,1fr)}
+  .museu-flag{width:22px;max-width:22px}
+  .museu-visual code{font-size:10.5px;padding:6px 7px}
+}
