@@ -1696,3 +1696,86 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
 .museu-visual.museu-visual-com-img.sem-img::after{
   display:none !important;
 }
+
+/* ==========================================================
+   Museu da Copa — FIX V9 FINAL: cards limpos e imagens circulares
+   Não mostra emoji nem nome do arquivo PNG em mascotes/bolas.
+   ========================================================== */
+.museu-visual.museu-visual-com-img{
+  align-items:center !important;
+  text-align:center !important;
+  justify-content:flex-start !important;
+  overflow:hidden !important;
+}
+.museu-visual.museu-visual-com-img code,
+.museu-visual.museu-visual-com-img .museu-visual-fallback{
+  display:none !important;
+  visibility:hidden !important;
+  width:0 !important;
+  height:0 !important;
+  overflow:hidden !important;
+}
+.museu-visual.museu-visual-com-img .museu-visual-imgbox{
+  width:112px !important;
+  height:112px !important;
+  min-width:112px !important;
+  min-height:112px !important;
+  max-width:112px !important;
+  max-height:112px !important;
+  flex:0 0 112px !important;
+  margin:0 auto 11px !important;
+  padding:11px !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+  background:
+    radial-gradient(circle at 38% 28%, rgba(255,255,255,.18), transparent 24%),
+    radial-gradient(circle at center, rgba(255,204,41,.18), rgba(255,204,41,.05) 44%, rgba(6,22,44,.90) 75%),
+    linear-gradient(180deg, rgba(15,43,78,.98), rgba(8,27,53,.98)) !important;
+  border:1px solid rgba(255,204,41,.34) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),0 10px 24px rgba(0,0,0,.26) !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+.museu-visual.museu-visual-com-img .museu-visual-imgbox img{
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 8px 12px rgba(0,0,0,.28)) !important;
+}
+.museu-visual.museu-visual-com-img b{
+  width:100% !important;
+  min-height:auto !important;
+  margin-top:2px !important;
+  text-align:center !important;
+}
+.museu-visual.museu-visual-com-img small{
+  width:100% !important;
+  min-height:auto !important;
+  margin-top:2px !important;
+  text-align:center !important;
+}
+.museu-visual.museu-visual-com-img.sem-img::after{
+  display:none !important;
+}
+@media (max-width:520px){
+  .museu-visual.museu-visual-com-img .museu-visual-imgbox{
+    width:92px !important;
+    height:92px !important;
+    min-width:92px !important;
+    min-height:92px !important;
+    max-width:92px !important;
+    max-height:92px !important;
+    flex-basis:92px !important;
+    padding:9px !important;
+    margin-bottom:9px !important;
+  }
+}

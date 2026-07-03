@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v8';
+  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v9';
   const $ = (sel, root=document) => root.querySelector(sel);
   const statsEl = $('#museu-stats');
   const salasEl = $('#museu-salas');
@@ -137,7 +137,7 @@
       ? `Mascote ${item.nome} da Copa de ${item.ano}`
       : `Bola ${item.nome} da Copa de ${item.ano}`;
     const previewAttrs = img
-      ? ` tabindex="0" role="button" data-image-preview="${esc(img)}" data-preview-title="${esc(titulo)}" data-preview-subtitle="${esc(subtitulo || arquivo)}" aria-label="Ampliar imagem: ${esc(titulo)}"`
+      ? ` tabindex="0" role="button" data-image-preview="${esc(img)}" data-preview-title="${esc(titulo)}" data-preview-subtitle="${esc(subtitulo || '')}" aria-label="Ampliar imagem: ${esc(titulo)}"`
       : '';
     const imgHtml = img ? `<div class="museu-visual-imgbox"><img loading="lazy" decoding="async" src="${esc(img)}" alt="${esc(alt)}" onerror="var c=this.closest('.museu-visual');if(c){c.classList.add('sem-img');c.removeAttribute('data-image-preview');c.removeAttribute('tabindex');c.removeAttribute('role');}this.remove();"></div>` : '';
     return `<div class="museu-visual museu-visual-com-img"${previewAttrs}>${imgHtml}<b>${esc(titulo)}</b><small>${esc(subtitulo)}</small></div>`;
