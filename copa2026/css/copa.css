@@ -1779,3 +1779,199 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
     margin-bottom:9px !important;
   }
 }
+
+/* ==========================================================
+   Museu da Copa — FIX V10: Artilheiros bonito e responsivo
+   Separa ano, nome, gols e país para não colar o número no jogador.
+   ========================================================== */
+.museu-artilheiros-layout{
+  align-items:start;
+}
+.museu-artilheiros-bloco h3{
+  margin:0 0 10px;
+  color:var(--branco);
+  font-size:19px;
+  line-height:1.15;
+}
+.museu-scorer-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.museu-scorer-ed{
+  position:relative;
+  min-height:132px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:7px;
+  background:linear-gradient(180deg,rgba(19,41,75,.98),rgba(11,31,58,.98));
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:15px;
+  padding:13px;
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
+  overflow:hidden;
+}
+.museu-scorer-ed::after{
+  content:"";
+  position:absolute;
+  right:-24px;
+  top:-24px;
+  width:74px;
+  height:74px;
+  border-radius:50%;
+  background:rgba(255,204,41,.06);
+  border:1px solid rgba(255,204,41,.10);
+}
+.museu-scorer-year{
+  font-family:'Anton',sans-serif;
+  color:var(--gold);
+  font-size:24px;
+  line-height:.95;
+  letter-spacing:.3px;
+  position:relative;
+  z-index:1;
+}
+.museu-scorer-name{
+  color:#fff;
+  font-weight:900;
+  font-size:15.5px;
+  line-height:1.12;
+  word-break:normal;
+  overflow-wrap:break-word;
+  position:relative;
+  z-index:1;
+}
+.museu-scorer-meta{
+  margin-top:auto;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  align-items:center;
+  position:relative;
+  z-index:1;
+}
+.museu-scorer-goals{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:26px;
+  padding:5px 9px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#ffd953,#f6be25);
+  color:#142441;
+  font-weight:900;
+  font-size:12px;
+  line-height:1;
+  white-space:nowrap;
+}
+.museu-scorer-country{
+  color:#d8e4f4;
+  font-size:12px;
+  line-height:1.2;
+}
+.museu-topscorers{
+  display:grid;
+  gap:8px;
+}
+.museu-topscorer{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+  min-height:66px;
+  background:linear-gradient(180deg,rgba(19,41,75,.98),rgba(11,31,58,.98));
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:14px;
+  padding:10px;
+  box-shadow:0 8px 18px rgba(0,0,0,.18);
+}
+.museu-topscorer-pos{
+  width:28px;
+  height:28px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:linear-gradient(180deg,#ffd953,#f6be25);
+  color:#142441;
+  font-weight:900;
+  font-size:13px;
+}
+.museu-topscorer-main{
+  min-width:0;
+}
+.museu-topscorer-main b{
+  display:block;
+  color:#fff;
+  font-size:14px;
+  line-height:1.15;
+  overflow-wrap:break-word;
+}
+.museu-topscorer-main small{
+  display:block;
+  margin-top:3px;
+  color:#c8d5e7;
+  font-size:11.5px;
+  line-height:1.25;
+}
+.museu-topscorer strong{
+  color:var(--gold);
+  font-size:22px;
+  font-weight:900;
+  line-height:1;
+  padding-left:4px;
+}
+@media (max-width:900px){
+  .museu-scorer-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media (max-width:520px){
+  .museu-artilheiros-bloco h3{
+    font-size:18px;
+    margin-bottom:9px;
+  }
+  .museu-scorer-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:9px;
+  }
+  .museu-scorer-ed{
+    min-height:128px;
+    padding:12px;
+    border-radius:14px;
+  }
+  .museu-scorer-year{
+    font-size:22px;
+  }
+  .museu-scorer-name{
+    font-size:14.5px;
+  }
+  .museu-scorer-goals{
+    font-size:11.5px;
+    padding:5px 8px;
+    min-height:24px;
+  }
+  .museu-scorer-country{
+    font-size:11.5px;
+  }
+  .museu-topscorer{
+    grid-template-columns:31px minmax(0,1fr) auto;
+    gap:8px;
+    min-height:62px;
+    padding:9px;
+  }
+  .museu-topscorer-pos{
+    width:27px;
+    height:27px;
+    font-size:12px;
+  }
+  .museu-topscorer-main b{
+    font-size:13.5px;
+  }
+  .museu-topscorer-main small{
+    font-size:11px;
+  }
+  .museu-topscorer strong{
+    font-size:20px;
+  }
+}

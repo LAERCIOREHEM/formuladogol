@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v9';
+  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v10';
   const $ = (sel, root=document) => root.querySelector(sel);
   const statsEl = $('#museu-stats');
   const salasEl = $('#museu-salas');
@@ -116,13 +116,45 @@
   }
 
   function renderArtilheiros(edicoes, historicos){
-    const porEdicao = edicoes.map(e=>`
-      <div class="museu-mini-card"><b>${esc(e.ano)}</b><span>${esc(e.artilheiro && e.artilheiro.nome)}</span><small>${e.artilheiro && e.artilheiro.gols ? `${esc(e.artilheiro.gols)} gols · ${esc(e.artilheiro.pais)}` : 'Em andamento'}</small></div>
-    `).join('');
+    const porEdicao = edicoes.map(e=>{
+      const a = e.artilheiro || {};
+      const gols = a.gols ? `${esc(a.gols)} gols` : 'Em andamento';
+      const pais = a.pais ? esc(a.pais) : '';
+      return `
+        <div class="museu-scorer-ed">
+          <div class="museu-scorer-year">${esc(e.ano)}</div>
+          <div class="museu-scorer-name">${esc(a.nome || 'A definir')}</div>
+          <div class="museu-scorer-meta">
+            <span class="museu-scorer-goals">${gols}</span>
+            ${pais ? `<span class="museu-scorer-country">${pais}</span>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
     const hist = historicos.map((a,i)=>`
-      <div class="museu-topscorer"><span>${i+1}</span><b>${esc(a.nome)}</b><strong>${esc(a.gols)}</strong><small>${esc(a.pais)} · ${esc(a.periodo)}</small></div>
+      <div class="museu-topscorer">
+        <span class="museu-topscorer-pos">${i+1}</span>
+        <div class="museu-topscorer-main">
+          <b>${esc(a.nome)}</b>
+          <small>${esc(a.pais)} · ${esc(a.periodo)}</small>
+        </div>
+        <strong>${esc(a.gols)}</strong>
+      </div>
     `).join('');
-    return sec('artilheiros','⚽ Artilheiros','Goleadores por edição e ranking histórico até 2022.', `<div class="museu-duo"><div><h3>Por edição</h3><div class="museu-mini-grid">${porEdicao}</div></div><div><h3>Ranking histórico</h3><div class="museu-topscorers">${hist}</div></div></div>`);
+
+    return sec('artilheiros','⚽ Artilheiros','Goleadores por edição e ranking histórico até 2022.', `
+      <div class="museu-duo museu-artilheiros-layout">
+        <div class="museu-artilheiros-bloco">
+          <h3>Por edição</h3>
+          <div class="museu-scorer-grid">${porEdicao}</div>
+        </div>
+        <div class="museu-artilheiros-bloco">
+          <h3>Ranking histórico</h3>
+          <div class="museu-topscorers">${hist}</div>
+        </div>
+      </div>
+    `);
   }
 
   function renderRecordes(recordes){
