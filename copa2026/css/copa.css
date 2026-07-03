@@ -2109,3 +2109,25 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
     line-height:1.52;
   }
 }
+
+/* ==========================================================
+   Ajustes visuais v13 — Estatísticas, Seleções e Artilheiros Museu
+   ========================================================== */
+.museu-scorer-goals.museu-scorer-status{
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;
+  white-space:normal !important;
+  text-align:center;
+  line-height:1.05;
+  font-size:10.5px;
+  padding:6px 6px;
+  min-height:28px;
+}
+@media(max-width:520px){
+  .museu-scorer-goals.museu-scorer-status{
+    font-size:10px;
+    padding:6px 5px;
+    min-height:28px;
+  }
+}

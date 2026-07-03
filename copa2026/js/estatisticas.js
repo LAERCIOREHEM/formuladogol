@@ -184,7 +184,10 @@
       "third-place": "Disputa de 3º",
       "final": "Final"
     };
-    return map[slug] || "Copa do Mundo";
+    return map[slug] || "";
+  }
+  function faseConhecida(slug) {
+    return !!faseLabel(slug);
   }
   function faseOrder(slug) {
     var order = { "group-stage": 1, "round-of-32": 2, "round-of-16": 3, "quarterfinals": 4, "semifinals": 5, "third-place": 6, "final": 7 };
@@ -294,9 +297,10 @@
       var fases = [];
       var seen = {};
       (JOGOS || []).forEach(function (j) {
-        if (j.fase && !seen[j.fase]) { seen[j.fase] = true; fases.push(j.fase); }
+        if (j.fase && faseConhecida(j.fase) && !seen[j.fase]) { seen[j.fase] = true; fases.push(j.fase); }
       });
       fases.sort(function (a, b) { return faseOrder(a) - faseOrder(b); });
+      if (FASE !== "TODAS" && !faseConhecida(FASE)) FASE = "TODAS";
       faseSel.innerHTML = '<option value="TODAS">Todas as fases</option>' + fases.map(function (f) {
         return '<option value="' + esc(f) + '">' + esc(faseLabel(f)) + '</option>';
       }).join('');

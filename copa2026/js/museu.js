@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v12legal';
+  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v13visual';
   const $ = (sel, root=document) => root.querySelector(sel);
   const statsEl = $('#museu-stats');
   const salasEl = $('#museu-salas');
@@ -118,14 +118,15 @@
   function renderArtilheiros(edicoes, historicos){
     const porEdicao = edicoes.map(e=>{
       const a = e.artilheiro || {};
-      const gols = a.gols ? `${esc(a.gols)} gols` : 'Em andamento';
+      const temGols = !!a.gols;
+      const gols = temGols ? `${esc(a.gols)} gols` : 'Em andamento';
       const pais = a.pais ? esc(a.pais) : '';
       return `
         <div class="museu-scorer-ed">
           <div class="museu-scorer-year">${esc(e.ano)}</div>
           <div class="museu-scorer-name">${esc(a.nome || 'A definir')}</div>
           <div class="museu-scorer-meta">
-            <span class="museu-scorer-goals">${gols}</span>
+            <span class="museu-scorer-goals ${temGols ? '' : 'museu-scorer-status'}">${gols}</span>
             ${pais ? `<span class="museu-scorer-country">${pais}</span>` : ''}
           </div>
         </div>

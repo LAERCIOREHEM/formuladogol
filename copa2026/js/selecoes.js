@@ -27,8 +27,11 @@
   }
 
   function flagEmoji(iso2) {
+    var raw = String(iso2 || "").toLowerCase();
+    if (raw === "gb-eng") return "EN";
+    if (raw === "gb-sct") return "SC";
     iso2 = String(iso2 || "").toUpperCase();
-    if (!/^[A-Z]{2}$/.test(iso2)) return "🌎";
+    if (!/^[A-Z]{2}$/.test(iso2)) return "";
     return iso2.replace(/./g, function (c) {
       return String.fromCodePoint(127397 + c.charCodeAt(0));
     });
