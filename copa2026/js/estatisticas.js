@@ -16,6 +16,10 @@
   var ABA = "artilheiros";
   var FILTRO = "TODAS";
   var FASE = "TODAS";
+  var LIVE_REFRESH_MS = 30000;
+  var LIVE_TIMER = null;
+  var LIVE_TICKING = false;
+  var LIVE_ULTIMA_ATUALIZACAO = "";
 
   var $ = function (s) { return document.querySelector(s); };
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
@@ -403,7 +407,7 @@
   }
   function jogoCard(j) {
     var bloco = (window.COPA_JOGO_STATS && COPA_JOGO_STATS.bloco)
-      ? COPA_JOGO_STATS.bloco({ eventId: j.id, homeId: j.home.sigla, awayId: j.away.sigla, homeName: j.home.nome, awayName: j.away.nome })
+      ? COPA_JOGO_STATS.bloco({ eventId: j.id, homeId: j.home.sigla, awayId: j.away.sigla, homeName: j.home.nome, awayName: j.away.nome, live: j.state === "in" })
       : '<div class="stat-jogo-hint">Estatísticas detalhadas indisponíveis neste navegador.</div>';
     var placar = j.state === 'pre' ? '×' : (esc(j.home.score || '0') + ' × ' + esc(j.away.score || '0'));
     return '<article class="stat-jogo-card">' +
@@ -418,6 +422,74 @@
       bloco +
     '</article>';
   }
+  function idsJstatsAbertos() {
+    return $$("#stats-lista [data-jstats].open").map(function (el) { return el.getAttribute("data-jstats"); }).filter(Boolean);
+  }
+  function restaurarJstatsAbertos(ids) {
+    if (!ids || !ids.length || !window.COPA_JOGO_STATS) return;
+    ids.forEach(function (id) {
+      var host = $("#stats-lista [data-jstats='" + String(id).replace(/'/g, "\\'") + "']");
+      if (!host) return;
+      var btn = host.querySelector("[data-jstats-btn]");
+      host.classList.add("open");
+      host.dataset.loaded = "1";
+      if (btn) btn.innerHTML = "📊 Ocultar estatísticas ▴";
+      if (COPA_JOGO_STATS.refreshHost) COPA_JOGO_STATS.refreshHost(host);
+    });
+  }
+  function jogosAoVivoVisiveis(arr) {
+    return (arr || []).filter(function (j) { return j && j.state === "in"; });
+  }
+  function atualizarStatusLive(arr) {
+    var box = $("#stats-live-status");
+    if (!box) return;
+    var lives = (ABA === "jogos") ? jogosAoVivoVisiveis(arr || []) : [];
+    if (!lives.length) {
+      box.hidden = true;
+      box.innerHTML = "";
+      return;
+    }
+    box.hidden = false;
+    var ult = LIVE_ULTIMA_ATUALIZACAO ? (" · última: <b>" + esc(LIVE_ULTIMA_ATUALIZACAO) + "</b>") : "";
+    box.innerHTML = "🔴 Atualizando ao vivo a cada 30s" + ult;
+  }
+  function pararMonitorAoVivo() {
+    if (LIVE_TIMER) {
+      clearInterval(LIVE_TIMER);
+      LIVE_TIMER = null;
+    }
+  }
+  function iniciarMonitorAoVivo(arr) {
+    var lives = jogosAoVivoVisiveis(arr || []);
+    atualizarStatusLive(arr);
+    if (ABA !== "jogos" || !lives.length) {
+      pararMonitorAoVivo();
+      return;
+    }
+    if (LIVE_TIMER) return;
+    LIVE_TIMER = setInterval(atualizarJogosAoVivo, LIVE_REFRESH_MS);
+  }
+  async function atualizarJogosAoVivo() {
+    if (LIVE_TICKING || ABA !== "jogos" || document.hidden) return;
+    LIVE_TICKING = true;
+    try {
+      var r = await fetch(API_SCOREBOARD + "&_=" + Date.now());
+      if (r.ok) {
+        var j = await r.json();
+        var novos = (j.events || []).map(normalizarJogo);
+        if (novos.length) JOGOS = novos;
+      }
+      LIVE_ULTIMA_ATUALIZACAO = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      renderLista();
+    } catch (e) {
+      LIVE_ULTIMA_ATUALIZACAO = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      atualizarStatusLive(filtrar(listaDaAba()));
+      if (window.COPA_JOGO_STATS && COPA_JOGO_STATS.refreshLive) COPA_JOGO_STATS.refreshLive($("#stats-lista"));
+    } finally {
+      LIVE_TICKING = false;
+    }
+  }
+
   function renderLista() {
     $$(".stat-tab").forEach(function (b) { b.classList.toggle("ativa", b.dataset.aba === ABA); });
     renderFiltro();
@@ -429,14 +501,20 @@
       $("#stats-contagem").textContent = arr.length ? (arr.length + ' ' + (arr.length > 1 ? 'jogos' : 'jogo')) : 'sem jogos';
       if (!arr.length) {
         $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há partidas encerradas ou ao vivo para este filtro. Quando houver, o raio-x por jogo aparecerá aqui.</div>';
+        iniciarMonitorAoVivo(arr);
         return;
       }
       arr.sort(function (a, b) { return new Date(b.date).getTime() - new Date(a.date).getTime(); });
+      var abertos = idsJstatsAbertos();
       $("#stats-lista").innerHTML = arr.map(jogoCard).join('');
       if (window.COPA_JOGO_STATS && COPA_JOGO_STATS.bind) COPA_JOGO_STATS.bind($("#stats-lista"));
+      restaurarJstatsAbertos(abertos);
+      iniciarMonitorAoVivo(arr);
       return;
     }
 
+    pararMonitorAoVivo();
+    atualizarStatusLive([]);
     $("#stats-contagem").textContent = arr.length
       ? (arr.length + ' ' + (ABA === 'gols_selecao' ? (arr.length > 1 ? 'seleções' : 'seleção') : (arr.length > 1 ? 'jogadores' : 'jogador')))
       : 'sem dados';
@@ -489,6 +567,10 @@
     ROSTOS = ambos[2] || {};
     renderTudo();
   }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) pararMonitorAoVivo();
+    else if (ABA === "jogos") renderLista();
+  });
   document.addEventListener('DOMContentLoaded', function () {
     initTabs();
     carregar();

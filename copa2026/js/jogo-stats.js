@@ -1,3 +1,5 @@
+/* LIVE 30S V14 — refresh de estatísticas do jogo ao vivo
+   ========================================================================= */
 /* =========================================================================
    jogo-stats.js — Estatísticas recolhíveis por partida (Copa 2026)
    Fase 1: usado em index.html e onde-assistir.html.
@@ -38,7 +40,7 @@
       .jstats-row:first-of-type{border-top:0}.jstats-row .metric{text-align:center;color:#cbd8ea;font-weight:800;font-size:12px}.jstats-row .metric small{color:#f4c542;font-size:10px;margin-left:3px}.jstats-row .val{font-weight:900;color:#fff}.jstats-row .right{text-align:right}
       .jstats-bar{height:4px;background:rgba(255,255,255,.10);border-radius:999px;margin-top:4px;overflow:hidden}.jstats-bar span{display:block;height:100%;background:#f4c542;border-radius:999px}
       .jstats-msg{color:#cbd8ea;font-size:13px;line-height:1.35;text-align:center;padding:9px}.jstats-msg.err{color:#ffb3ad}
-      .jstats-more{margin-top:8px;color:#9fb0c7;font-size:11px;line-height:1.35;text-align:center}
+      .jstats-more{margin-top:8px;color:#9fb0c7;font-size:11px;line-height:1.35;text-align:center}\n      .jstats-live-note{margin:-2px 0 8px;color:#ffcbcf;background:rgba(238,94,97,.10);border:1px solid rgba(238,94,97,.24);border-radius:999px;padding:5px 8px;text-align:center;font-size:11px;font-weight:900}\n      .jstats-live-note b{color:#fff}
       @media(max-width:640px){
         .jstats{margin-top:8px;padding-top:8px}.jstats-btn{border-radius:13px;padding:9px 10px;font-size:13px}
         .jstats-panel{border-radius:14px;padding:9px}.jstats-head,.jstats-row{grid-template-columns:minmax(58px,.8fr) minmax(90px,1.25fr) minmax(58px,.8fr);gap:6px}
@@ -51,7 +53,8 @@
   function bloco(opts) {
     injectCSS();
     const eventId = esc(opts.eventId || "");
-    return `<div class="jstats" data-jstats="${eventId}" data-home-id="${esc(opts.homeId || "")}" data-away-id="${esc(opts.awayId || "")}" data-home-name="${esc(opts.homeName || opts.homeId || "Mandante")}" data-away-name="${esc(opts.awayName || opts.awayId || "Visitante")}">
+    const live = opts && opts.live ? "1" : "0";
+    return `<div class="jstats" data-jstats="${eventId}" data-live="${live}" data-home-id="${esc(opts.homeId || "")}" data-away-id="${esc(opts.awayId || "")}" data-home-name="${esc(opts.homeName || opts.homeId || "Mandante")}" data-away-name="${esc(opts.awayName || opts.awayId || "Visitante")}">
       <button class="jstats-btn" type="button" data-jstats-btn>📊 Estatísticas do jogo ▾</button>
       <div class="jstats-panel" data-jstats-panel><div class="jstats-msg">Toque para carregar o raio-x da partida.</div></div>
     </div>`;
@@ -77,29 +80,40 @@
     if (data.eventos && Array.isArray(data.eventos)) return data.eventos.find(x => String(x.event_id || x.eventId || x.id) === String(eventId)) || null;
     return null;
   }
-  async function getStats(eventId) {
-    if (reqCache.has(eventId)) return reqCache.get(eventId);
-    const p = (async () => {
-      const data = await loadStatic();
-      const stat = byEvent(data, eventId);
+  async function getStats(eventId, opts) {
+    opts = opts || {};
+    const forceNetwork = !!opts.forceNetwork;
+    const cacheKey = String(eventId || "");
+    if (!forceNetwork && reqCache.has(cacheKey)) return reqCache.get(cacheKey);
 
-      // Se o workflow já gerou JSON estático, usa ele.
-      // Mas, se por qualquer razão o normalizador não entender o formato,
-      // NÃO bloqueia o botão: tenta o summary da ESPN como fallback.
-      if (stat && stat.stats && stat.stats.length) {
-        const normalizado = normalizarRegistro(stat);
-        if (normalizado.stats && normalizado.stats.length) return normalizado;
+    const p = (async () => {
+      if (!forceNetwork) {
+        const data = await loadStatic();
+        const stat = byEvent(data, eventId);
+
+        // Se o workflow já gerou JSON estático, usa ele.
+        // Mas, se por qualquer razão o normalizador não entender o formato,
+        // NÃO bloqueia o botão: tenta o summary da ESPN como fallback.
+        if (stat && stat.stats && stat.stats.length) {
+          const normalizado = normalizarRegistro(stat);
+          if (normalizado.stats && normalizado.stats.length) return normalizado;
+        }
       }
 
       try {
-        const r = await fetch(SUMMARY + encodeURIComponent(eventId));
+        const url = SUMMARY + encodeURIComponent(eventId) + (forceNetwork ? ("&_=" + Date.now()) : "");
+        const r = await fetch(url);
         if (!r.ok) throw new Error("summary HTTP " + r.status);
-        return parseSummary(await r.json());
+        const out = parseSummary(await r.json());
+        out.fonte = forceNetwork ? "ESPN ao vivo" : (out.fonte || "ESPN");
+        out.atualizado_em = new Date().toISOString();
+        return out;
       } catch (e) {
-        return { stats: [], fonte: "ESPN", erro: true };
+        return { stats: [], fonte: forceNetwork ? "ESPN ao vivo" : "ESPN", erro: true, atualizado_em: new Date().toISOString() };
       }
     })();
-    reqCache.set(eventId, p);
+
+    if (!forceNetwork) reqCache.set(cacheKey, p);
     return p;
   }
 
@@ -254,7 +268,10 @@
       return;
     }
     const stats = data.stats.filter(s => s && s.nome && (s.home != null || s.away != null)).slice(0, 12);
-    panel.innerHTML = `<div class="jstats-title"><span>Raio-X da partida</span><span class="jstats-source">${esc(data.fonte || "ESPN")}</span></div>
+    const liveNote = host.dataset.live === "1"
+      ? `<div class="jstats-live-note">🔴 Atualizando ao vivo a cada 30s${data.atualizado_em ? ` · <b>${new Date(data.atualizado_em).toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit", second:"2-digit"})}</b>` : ""}</div>`
+      : "";
+    panel.innerHTML = liveNote + `<div class="jstats-title"><span>Raio-X da partida</span><span class="jstats-source">${esc(data.fonte || "ESPN")}</span></div>
       <div class="jstats-head"><div>${esc(homeName)}</div><div>comparativo</div><div style="text-align:right">${esc(awayName)}</div></div>
       ${stats.map(rowHTML).join("")}
       <div class="jstats-more">Mostramos somente métricas disponíveis na fonte. ⓘ Aproveitamento dos chutes = chutes no gol ÷ finalizações. O site não inventa estatísticas ausentes.</div>`;
@@ -272,15 +289,41 @@
         if (!open || host.dataset.loaded) return;
         btn.disabled = true;
         panel.innerHTML = '<div class="jstats-msg">Carregando estatísticas da partida…</div>';
-        const data = await getStats(host.dataset.jstats);
+        const data = await getStats(host.dataset.jstats, { forceNetwork: host.dataset.live === "1" });
         render(data, host);
         host.dataset.loaded = "1";
         btn.disabled = false;
       });
     });
   }
+  async function refreshHost(host) {
+    if (!host || !host.dataset || !host.dataset.jstats) return;
+    if (host.dataset.live !== "1") return;
+    const panel = host.querySelector("[data-jstats-panel]");
+    if (!panel) return;
 
-  window.COPA_JOGO_STATS = { bloco, bind, _parseSummary: parseSummary, _normalizarRegistro: normalizarRegistro, _getStats: getStats };
+    const aberto = host.classList.contains("open");
+    const jaCarregado = host.dataset.loaded === "1";
+    if (!aberto && !jaCarregado) return;
+
+    if (aberto && !panel.dataset.refreshing) {
+      panel.dataset.refreshing = "1";
+      try {
+        const data = await getStats(host.dataset.jstats, { forceNetwork: true });
+        render(data, host);
+        host.dataset.loaded = "1";
+      } finally {
+        delete panel.dataset.refreshing;
+      }
+    }
+  }
+
+  async function refreshLive(root) {
+    const hosts = Array.from((root || document).querySelectorAll('[data-jstats][data-live="1"]'));
+    await Promise.all(hosts.map(refreshHost));
+  }
+
+  window.COPA_JOGO_STATS = { bloco, bind, refreshHost, refreshLive, _parseSummary: parseSummary, _normalizarRegistro: normalizarRegistro, _getStats: getStats };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => bind());
   else bind();
 })();
