@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v5';
+  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v7';
   const $ = (sel, root=document) => root.querySelector(sel);
   const statsEl = $('#museu-stats');
   const salasEl = $('#museu-salas');
@@ -45,6 +45,7 @@
         renderMomentos(data.momentos || [])
       ].join('');
     }
+    inicializarNavMuseu();
   }
 
   function renderStats(s){
@@ -158,6 +159,70 @@
   }
   function renderMomentos(momentos){
     return sec('momentos','🎞️ Momentos eternos','Histórias que atravessam gerações.', `<div class="museu-momento-grid">${momentos.map(m=>`<article class="museu-momento"><span>${esc(m.ano)}</span><b>${esc(m.titulo)}</b><p>${esc(m.texto)}</p></article>`).join('')}</div>`);
+  }
+
+
+  function inicializarNavMuseu(){
+    const nav = document.getElementById('museu-nav');
+    if(!nav) return;
+    const links = Array.from(nav.querySelectorAll('a[href^="#"]'));
+    if(!links.length) return;
+
+    function centralizarLink(link, behavior){
+      if(!link) return;
+      const left = link.offsetLeft - (nav.clientWidth / 2) + (link.offsetWidth / 2);
+      nav.scrollTo({ left: Math.max(0, left), behavior: behavior || 'smooth' });
+    }
+
+    function ativarPorId(id, behavior){
+      if(!id) return;
+      let ativo = null;
+      links.forEach(a => {
+        const ok = a.getAttribute('href') === '#' + id;
+        a.classList.toggle('ativo', ok);
+        if(ok) ativo = a;
+      });
+      if(ativo) centralizarLink(ativo, behavior);
+    }
+
+    links.forEach(a => {
+      a.addEventListener('click', function(){
+        const id = (a.getAttribute('href') || '').replace('#','');
+        window.setTimeout(() => ativarPorId(id, 'smooth'), 80);
+      });
+    });
+
+    const sectionIds = links.map(a => (a.getAttribute('href') || '').replace('#','')).filter(Boolean);
+    const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+    function ativarPeloScroll(){
+      let atual = sectionIds[0];
+      const ref = 155;
+      for(const sec of sections){
+        const top = sec.getBoundingClientRect().top;
+        if(top <= ref) atual = sec.id;
+        else break;
+      }
+      ativarPorId(atual, 'smooth');
+    }
+
+    let ticking = false;
+    window.addEventListener('scroll', function(){
+      if(ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(function(){
+        ticking = false;
+        ativarPeloScroll();
+      });
+    }, {passive:true});
+
+    window.addEventListener('hashchange', function(){
+      ativarPorId((location.hash || '#linha').replace('#',''), 'smooth');
+    });
+
+    window.setTimeout(function(){
+      ativarPorId((location.hash || '#linha').replace('#',''), 'auto');
+    }, 250);
   }
 
   carregar();

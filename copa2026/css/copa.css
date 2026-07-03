@@ -1618,3 +1618,58 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
     margin-bottom:9px !important;
   }
 }
+
+/* ==========================================================
+   Museu da Copa — FIX V7: submenu com rolagem visível e item ativo
+   Mantém o menu principal intacto. Atua só no submenu interno do Museu.
+   ========================================================== */
+#museu-nav.museu-nav{
+  overflow-x:auto !important;
+  overflow-y:hidden !important;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+  scrollbar-width:thin;
+  scrollbar-color:var(--gold) rgba(255,255,255,.10);
+  padding:8px 8px 13px !important;
+  margin:24px 0 26px !important;
+  gap:8px !important;
+  justify-content:flex-start !important;
+}
+#museu-nav.museu-nav::-webkit-scrollbar{
+  height:7px !important;
+  display:block !important;
+}
+#museu-nav.museu-nav::-webkit-scrollbar-track{
+  background:rgba(255,255,255,.10);
+  border-radius:999px;
+}
+#museu-nav.museu-nav::-webkit-scrollbar-thumb{
+  background:linear-gradient(90deg,rgba(255,204,41,.92),rgba(255,229,117,.92));
+  border-radius:999px;
+}
+#museu-nav.museu-nav a{
+  flex:0 0 auto !important;
+  user-select:none;
+}
+#museu-nav.museu-nav a.ativo{
+  background:linear-gradient(180deg,#ffd953,#f6be25) !important;
+  color:#16243e !important;
+  border-color:rgba(255,221,91,.96) !important;
+  box-shadow:0 8px 20px rgba(255,204,41,.20) !important;
+}
+@media (min-width:901px){
+  #museu-nav.museu-nav{
+    max-width:100%;
+    margin-top:26px !important;
+    margin-bottom:28px !important;
+  }
+}
+@media (max-width:520px){
+  #museu-nav.museu-nav{
+    margin:22px -2px 24px !important;
+    padding:8px 8px 12px !important;
+  }
+  #museu-nav.museu-nav::-webkit-scrollbar{
+    height:6px !important;
+  }
+}
