@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v7';
+  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v8';
   const $ = (sel, root=document) => root.querySelector(sel);
   const statsEl = $('#museu-stats');
   const salasEl = $('#museu-salas');
@@ -133,7 +133,6 @@
     const img = item.imagem || (arquivo ? `img/${tipo}/${arquivo}` : '');
     const titulo = `${item.ano} · ${item.nome}`;
     const subtitulo = tipo === 'mascotes' ? item.sede : item.nota;
-    const ico = tipo === 'mascotes' ? (item.emoji || '🦁') : '⚽';
     const alt = tipo === 'mascotes'
       ? `Mascote ${item.nome} da Copa de ${item.ano}`
       : `Bola ${item.nome} da Copa de ${item.ano}`;
@@ -141,7 +140,7 @@
       ? ` tabindex="0" role="button" data-image-preview="${esc(img)}" data-preview-title="${esc(titulo)}" data-preview-subtitle="${esc(subtitulo || arquivo)}" aria-label="Ampliar imagem: ${esc(titulo)}"`
       : '';
     const imgHtml = img ? `<div class="museu-visual-imgbox"><img loading="lazy" decoding="async" src="${esc(img)}" alt="${esc(alt)}" onerror="var c=this.closest('.museu-visual');if(c){c.classList.add('sem-img');c.removeAttribute('data-image-preview');c.removeAttribute('tabindex');c.removeAttribute('role');}this.remove();"></div>` : '';
-    return `<div class="museu-visual museu-visual-com-img"${previewAttrs}>${imgHtml}<span class="museu-visual-fallback">${esc(ico)}</span><b>${esc(titulo)}</b><small>${esc(subtitulo)}</small><code>${esc(arquivo)}</code></div>`;
+    return `<div class="museu-visual museu-visual-com-img"${previewAttrs}>${imgHtml}<b>${esc(titulo)}</b><small>${esc(subtitulo)}</small></div>`;
   }
 
   function renderMascotes(mascotes, notaLegal){

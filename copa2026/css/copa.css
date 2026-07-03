@@ -1673,3 +1673,26 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
     height:6px !important;
   }
 }
+
+/* ==========================================================
+   Museu da Copa — FIX V8: cards visuais limpos
+   Remove emoji/fallback e nome técnico do arquivo PNG de mascotes/bolas.
+   ========================================================== */
+.museu-visual.museu-visual-com-img code,
+.museu-visual.museu-visual-com-img .museu-visual-fallback{
+  display:none !important;
+}
+.museu-visual.museu-visual-com-img{
+  justify-content:flex-start !important;
+}
+.museu-visual.museu-visual-com-img b{
+  min-height:auto !important;
+  margin-top:2px;
+}
+.museu-visual.museu-visual-com-img small{
+  min-height:auto !important;
+  margin-top:2px;
+}
+.museu-visual.museu-visual-com-img.sem-img::after{
+  display:none !important;
+}
