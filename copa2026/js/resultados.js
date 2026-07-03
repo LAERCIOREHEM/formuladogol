@@ -561,7 +561,8 @@
       homeId: hId,
       awayId: aId,
       homeName: teamNome(home),
-      awayName: teamNome(away)
+      awayName: teamNome(away),
+      live: estadoEvento(ev) === "in"
     });
   }
 
@@ -643,6 +644,28 @@
     };
   }
 
+  function idsStatsAbertosLista() {
+    return Array.from(document.querySelectorAll("#lista [data-jstats].open")).map(function (el) {
+      return el.getAttribute("data-jstats");
+    }).filter(Boolean);
+  }
+  function restaurarStatsAbertosLista(ids) {
+    if (!ids || !ids.length || !window.COPA_JOGO_STATS) return;
+    ids.forEach(function (id) {
+      var host = document.querySelector("#lista [data-jstats='" + String(id).replace(/'/g, "\\'") + "']");
+      if (!host) return;
+      var btn = host.querySelector("[data-jstats-btn]");
+      host.classList.add("open");
+      host.dataset.loaded = "1";
+      if (btn) btn.innerHTML = "📊 Ocultar estatísticas ▴";
+      if (COPA_JOGO_STATS.refreshHost) COPA_JOGO_STATS.refreshHost(host);
+    });
+  }
+  function avisoStatsPartidas(evs) {
+    var tem = (evs || []).some(function (ev) { return estadoEvento(ev) === "in"; });
+    return tem ? '<div class="stat-live-status jogos-live-status">🔴 Estatísticas do jogo atualizando ao vivo a cada 30s</div>' : '';
+  }
+
   async function carregar() {
     if (ABA !== "jogos") return;
     montarFaixaDias();
@@ -660,7 +683,8 @@
     JOGOS_DIA_EVENTS = evs;
     await prepararMataProjetadoParaPartidas(evs);
     if (!evs.length) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">⚽ Nenhum jogo neste dia.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); bindRetornoGrupo(); return; }
-    $("#lista").innerHTML = abasHTML() + evs.map(card).join("");
+    const statsAbertos = idsStatsAbertosLista();
+    $("#lista").innerHTML = abasHTML() + avisoStatsPartidas(evs) + evs.map(card).join("");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     bindRetornoGrupo();
     document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
@@ -677,7 +701,11 @@
       renderGrupos();
     });
     carregarLancesVisiveis(evs);
-    if (window.COPA_JOGO_STATS) window.COPA_JOGO_STATS.bind();
+    if (window.COPA_JOGO_STATS) {
+      window.COPA_JOGO_STATS.bind();
+      restaurarStatsAbertosLista(statsAbertos);
+      if (COPA_JOGO_STATS.refreshLive) COPA_JOGO_STATS.refreshLive(document.getElementById("lista"));
+    }
   }
 
   // "Visualizar todos os jogos" SEM sair do index: lista todos os jogos da Copa,
@@ -706,13 +734,14 @@
     }
     const chaveDia = ev => new Date(ev.date).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
     const cabDia = ev => new Date(ev.date).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", timeZone: "America/Sao_Paulo" });
+    const statsAbertos = idsStatsAbertosLista();
     let html = "", ultimo = "";
     evs.forEach(ev => {
       const k = chaveDia(ev);
       if (k !== ultimo) { html += `<div class="mm-3tit">${cabDia(ev)}</div>`; ultimo = k; }
       html += card(ev);
     });
-    $("#lista").innerHTML = abasHTML() + html;
+    $("#lista").innerHTML = abasHTML() + avisoStatsPartidas(evs) + html;
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     bindRetornoGrupo();
     document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
@@ -726,7 +755,11 @@
       renderGrupos();
     });
     carregarLancesVisiveis(evs);
-    if (window.COPA_JOGO_STATS) window.COPA_JOGO_STATS.bind();
+    if (window.COPA_JOGO_STATS) {
+      window.COPA_JOGO_STATS.bind();
+      restaurarStatsAbertosLista(statsAbertos);
+      if (COPA_JOGO_STATS.refreshLive) COPA_JOGO_STATS.refreshLive(document.getElementById("lista"));
+    }
   }
 
   function abasHTML() {

@@ -124,7 +124,8 @@
       homeId: hId,
       awayId: aId,
       homeName: dpNome(hId),
-      awayName: dpNome(aId)
+      awayName: dpNome(aId),
+      live: estadoEventoAoVivo(ev) === "in"
     });
   }
 
@@ -271,17 +272,48 @@
     agendarLoop(delayProximoLoop(eventos));
   }
 
+  function idsStatsAbertos(root) {
+    root = root || document;
+    return Array.from(root.querySelectorAll("[data-jstats].open")).map(function (el) {
+      return el.getAttribute("data-jstats");
+    }).filter(Boolean);
+  }
+  function restaurarStatsAbertos(root, ids) {
+    if (!ids || !ids.length || !window.COPA_JOGO_STATS) return;
+    root = root || document;
+    ids.forEach(function (id) {
+      var host = root.querySelector("[data-jstats='" + String(id).replace(/'/g, "\\'") + "']");
+      if (!host) return;
+      var btn = host.querySelector("[data-jstats-btn]");
+      host.classList.add("open");
+      host.dataset.loaded = "1";
+      if (btn) btn.innerHTML = "📊 Ocultar estatísticas ▴";
+      if (COPA_JOGO_STATS.refreshHost) COPA_JOGO_STATS.refreshHost(host);
+    });
+  }
+  function avisoStatsAoVivo(lives) {
+    var tem = (lives || []).some(function (ev) { return estadoEventoAoVivo(ev) === "in"; });
+    return tem ? '<div class="stat-live-status live-page-status">🔴 Estatísticas do jogo atualizando ao vivo a cada 30s</div>' : '';
+  }
+
   function render(lives, data, demoFlag) {
+    var app = $("#app");
+    var abertos = idsStatsAbertos(app || document);
     if (!lives.length) {
-      $("#app").innerHTML = telaEspera(data);
+      if (app) app.innerHTML = telaEspera(data);
       iniciarContadores();
       return;
     }
     const colapsarPalpites = lives.length > 1;
-    $("#app").innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado com os palpites reais. No dia, é automático (abra sem <b>?demo=1</b>).</div>' : "")
+    app.innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado com os palpites reais. No dia, é automático (abra sem <b>?demo=1</b>).</div>' : "")
+      + avisoStatsAoVivo(lives)
       + lives.map(ev => card(ev, colapsarPalpites)).join("");
     carregarLancesAoVivo(lives);
-    if (window.COPA_JOGO_STATS) window.COPA_JOGO_STATS.bind($("#app"));
+    if (window.COPA_JOGO_STATS) {
+      window.COPA_JOGO_STATS.bind(app);
+      restaurarStatsAbertos(app, abertos);
+      if (COPA_JOGO_STATS.refreshLive) COPA_JOGO_STATS.refreshLive(app);
+    }
   }
 
   function ourGame(ev) {

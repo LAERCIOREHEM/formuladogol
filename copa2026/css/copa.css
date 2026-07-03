@@ -2158,3 +2158,17 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
     padding:9px 10px;
   }
 }
+
+/* ==========================================================
+   Ao Vivo / Jogos — aviso de estatísticas ao vivo v15
+   ========================================================== */
+.live-page-status,
+.jogos-live-status{
+  margin:10px 0 12px;
+}
+@media(max-width:520px){
+  .live-page-status,
+  .jogos-live-status{
+    margin:9px 0 11px;
+  }
+}
