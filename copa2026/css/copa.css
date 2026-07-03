@@ -1289,3 +1289,147 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .museu-flag{width:22px;max-width:22px}
   .museu-visual code{font-size:10.5px;padding:6px 7px}
 }
+
+/* Museu da Copa — imagens de mascotes e bolas ampliáveis */
+.museu-visual-com-img{position:relative;overflow:hidden;cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.museu-visual-com-img:hover{transform:translateY(-2px);border-color:rgba(255,204,41,.46);box-shadow:0 12px 26px rgba(0,0,0,.28)}
+.museu-visual-com-img:focus-visible{outline:2px solid rgba(255,204,41,.9);outline-offset:3px}
+.museu-visual-imgbox{height:92px;margin:-2px -2px 10px;border-radius:13px;background:radial-gradient(circle at center,rgba(255,204,41,.16),rgba(7,20,39,.72));border:1px solid rgba(255,255,255,.10);display:flex;align-items:center;justify-content:center;padding:8px}
+.museu-visual-imgbox img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 8px 12px rgba(0,0,0,.35))}
+.museu-visual-fallback{display:none}
+.museu-visual-com-img.sem-img{cursor:default}
+.museu-visual-com-img.sem-img:hover{transform:none;border-color:rgba(255,255,255,.12);box-shadow:0 8px 18px rgba(0,0,0,.18)}
+.museu-visual-com-img.sem-img .museu-visual-fallback{display:block;font-size:30px;margin-bottom:8px}
+.museu-visual-com-img.sem-img::after{content:"PNG pendente";position:absolute;top:9px;right:9px;border-radius:999px;background:rgba(255,204,41,.14);border:1px solid rgba(255,204,41,.30);color:var(--gold);font-size:10px;font-weight:900;padding:4px 7px;text-transform:uppercase;letter-spacing:.3px}
+.museu-visual-com-img:not(.sem-img)::after{content:"🔍";position:absolute;right:9px;top:9px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(7,20,39,.74);border:1px solid rgba(255,204,41,.40);font-size:12px;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+@media (max-width:520px){
+  .museu-visual-imgbox{height:82px;margin-bottom:8px;padding:7px}
+  .museu-visual-com-img:not(.sem-img)::after{width:22px;height:22px;font-size:11px}
+}
+
+/* ==========================================================
+   Museu da Copa — FIX V4: padronização rígida de mascotes/bolas
+   ========================================================== */
+.museu-visual-grid{align-items:stretch}
+.museu-visual.museu-visual-com-img{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+  gap:6px;
+  overflow:hidden;
+}
+.museu-visual.museu-visual-com-img .museu-visual-imgbox{
+  width:100% !important;
+  height:118px !important;
+  min-height:118px !important;
+  max-height:118px !important;
+  margin:0 0 9px !important;
+  padding:8px !important;
+  box-sizing:border-box !important;
+  overflow:hidden !important;
+  border-radius:13px !important;
+  background:
+    linear-gradient(45deg,rgba(255,255,255,.92) 25%,rgba(238,242,247,.92) 25%,rgba(238,242,247,.92) 50%,rgba(255,255,255,.92) 50%,rgba(255,255,255,.92) 75%,rgba(238,242,247,.92) 75%);
+  background-size:22px 22px;
+  border:1px solid rgba(255,255,255,.14);
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  flex:0 0 118px !important;
+}
+.museu-visual.museu-visual-com-img .museu-visual-imgbox img{
+  display:block !important;
+  width:auto !important;
+  height:auto !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 7px 9px rgba(0,0,0,.24));
+}
+.museu-visual.museu-visual-com-img b{min-height:36px}
+.museu-visual.museu-visual-com-img small{min-height:32px}
+.museu-visual.museu-visual-com-img code{margin-top:auto}
+.museu-visual.museu-visual-com-img.sem-img .museu-visual-imgbox{display:none !important}
+.museu-visual.museu-visual-com-img.sem-img .museu-visual-fallback{display:block !important;font-size:30px;margin-bottom:8px}
+.museu-visual.museu-visual-com-img.sem-img:hover{transform:none;border-color:rgba(255,255,255,.12);box-shadow:0 8px 18px rgba(0,0,0,.18)}
+.museu-visual.museu-visual-com-img.sem-img::after{
+  content:"PNG pendente";
+  position:absolute;
+  top:9px;
+  right:9px;
+  border-radius:999px;
+  background:rgba(255,204,41,.14);
+  border:1px solid rgba(255,204,41,.30);
+  color:var(--gold);
+  font-size:10px;
+  font-weight:900;
+  padding:4px 7px;
+  text-transform:uppercase;
+  letter-spacing:.3px;
+}
+.museu-visual.museu-visual-com-img:not(.sem-img)::after{
+  content:"🔍";
+  position:absolute;
+  right:9px;
+  top:9px;
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(7,20,39,.74);
+  border:1px solid rgba(255,204,41,.40);
+  font-size:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+
+/* Lightbox: ampliado, mas controlado */
+.copa-img-preview-card{width:min(92vw,560px) !important;max-height:88vh !important}
+.copa-img-preview-media{
+  min-height:260px !important;
+  max-height:68vh !important;
+  padding:16px !important;
+  overflow:hidden !important;
+  background:
+    linear-gradient(45deg,rgba(255,255,255,.95) 25%,rgba(238,242,247,.95) 25%,rgba(238,242,247,.95) 50%,rgba(255,255,255,.95) 50%,rgba(255,255,255,.95) 75%,rgba(238,242,247,.95) 75%) !important;
+  background-size:28px 28px !important;
+}
+.copa-img-preview-media img{
+  width:auto !important;
+  height:auto !important;
+  max-width:100% !important;
+  max-height:62vh !important;
+  object-fit:contain !important;
+  border-radius:12px !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 12px 22px rgba(0,0,0,.34));
+}
+@media (min-width:901px){
+  .museu-visual.museu-visual-com-img .museu-visual-imgbox{
+    height:112px !important;
+    min-height:112px !important;
+    max-height:112px !important;
+    flex-basis:112px !important;
+  }
+}
+@media (max-width:520px){
+  .museu-visual.museu-visual-com-img{padding:10px}
+  .museu-visual.museu-visual-com-img .museu-visual-imgbox{
+    height:92px !important;
+    min-height:92px !important;
+    max-height:92px !important;
+    flex-basis:92px !important;
+    padding:7px !important;
+    border-radius:12px !important;
+  }
+  .museu-visual.museu-visual-com-img b{font-size:13px;min-height:32px}
+  .museu-visual.museu-visual-com-img small{font-size:11.5px;min-height:30px}
+  .copa-img-preview-card{width:calc(100vw - 20px) !important;max-height:90vh !important}
+  .copa-img-preview-media{min-height:250px !important;max-height:66vh !important;padding:12px !important}
+  .copa-img-preview-media img{max-height:60vh !important}
+}
