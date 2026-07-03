@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v1';
+  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v2';
   const $ = (sel, root=document) => root.querySelector(sel);
   const statsEl = $('#museu-stats');
   const salasEl = $('#museu-salas');
@@ -11,6 +11,11 @@
   }
   function num(v){ return v == null ? '—' : Number(v).toLocaleString('pt-BR'); }
   function slug(v){ return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+  function flagHtml(iso2, nome){
+    const code = String(iso2 || '').trim().toLowerCase();
+    if(!code) return '<span class="museu-flag-placeholder" aria-hidden="true">🏆</span>';
+    return `<img class="flag museu-flag" loading="lazy" decoding="async" src="https://flagcdn.com/w40/${esc(code)}.png" alt="Bandeira de ${esc(nome || '')}">`;
+  }
 
   async function carregar(){
     try{
@@ -34,8 +39,8 @@
         renderFinais(data.edicoes || []),
         renderArtilheiros(data.edicoes || [], data.artilheirosHistoricos || []),
         renderRecordes(data.recordes || []),
-        renderMascotes(data.mascotes || []),
-        renderBolas(data.bolas || []),
+        renderMascotes(data.mascotes || [], data.notasLegais && data.notasLegais.mascotes),
+        renderBolas(data.bolas || [], data.notasLegais && data.notasLegais.bolas),
         renderBrasil(data.brasil || []),
         renderMomentos(data.momentos || [])
       ].join('');
@@ -74,7 +79,7 @@
     const cards = edicoes.map(e => `
       <article class="museu-ed-card ${e.ano===2026?'museu-ed-atual':''}">
         <div class="museu-ed-top"><span>${esc(e.ano)}</span><b>${esc(e.sede)}</b></div>
-        <div class="museu-ed-campeao">🏆 ${esc(e.campeao)}</div>
+        <div class="museu-ed-campeao">${flagHtml(e.campeaoIso2, e.campeao)}<span>🏆 ${esc(e.campeao)}</span></div>
         <div class="museu-ed-final">${esc(e.final && e.final.placar)}</div>
         <details>
           <summary>Ver detalhes</summary>
@@ -97,7 +102,7 @@
 
   function renderCampeoes(rank){
     const html = `<div class="museu-rank-grid">${rank.map((r,i)=>`
-      <div class="museu-rank-card"><span class="museu-rank-pos">${i+1}</span><b>${esc(r.pais)}</b><strong>${esc(r.titulos)} título${r.titulos>1?'s':''}</strong><small>${esc((r.anos||[]).join(', '))}</small></div>
+      <div class="museu-rank-card"><span class="museu-rank-pos">${i+1}</span><div class="museu-rank-title">${flagHtml(r.iso2, r.pais)}<b>${esc(r.pais)}</b></div><strong>${esc(r.titulos)} título${r.titulos>1?'s':''}</strong><small>${esc((r.anos||[]).join(', '))}</small></div>
     `).join('')}</div>`;
     return sec('campeoes','🏆 Campeões','As oito seleções que já levantaram a taça.', html);
   }
@@ -122,11 +127,15 @@
   function renderRecordes(recordes){
     return sec('recordes','🔥 Recordes','Marcas que ajudam a contar a grandeza do torneio.', `<div class="museu-record-grid">${recordes.map(r=>`<div class="museu-record"><b>${esc(r.titulo)}</b><strong>${esc(r.valor)}</strong><small>${esc(r.detalhe)}</small></div>`).join('')}</div>`);
   }
-  function renderMascotes(mascotes){
-    return sec('mascotes','🦁 Mascotes','Os personagens oficiais que deram rosto às Copas desde 1966.', `<div class="museu-visual-grid">${mascotes.map(m=>`<div class="museu-visual"><span>${esc(m.emoji)}</span><b>${esc(m.ano)} · ${esc(m.nome)}</b><small>${esc(m.sede)}</small></div>`).join('')}</div>`);
+  function renderMascotes(mascotes, notaLegal){
+    const cards = mascotes.map(m=>`<div class="museu-visual"><span>${esc(m.emoji)}</span><b>${esc(m.ano)} · ${esc(m.nome)}</b><small>${esc(m.sede)}</small><code>${esc(m.arquivo_png || '')}</code></div>`).join('');
+    const nota = notaLegal ? `<p class="museu-disclaimer"><b>Nota:</b> ${esc(notaLegal)}</p>` : '';
+    return sec('mascotes','🦁 Mascotes','Nomes dos mascotes oficiais e o arquivo PNG sugerido para você gerar/subir depois.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
   }
-  function renderBolas(bolas){
-    return sec('bolas','🏐 Bolas','A evolução visual das bolas oficiais da Copa.', `<div class="museu-visual-grid">${bolas.map(b=>`<div class="museu-visual"><span>⚽</span><b>${esc(b.ano)} · ${esc(b.nome)}</b><small>${esc(b.nota)}</small></div>`).join('')}</div>`);
+  function renderBolas(bolas, notaLegal){
+    const cards = bolas.map(b=>`<div class="museu-visual"><span>⚽</span><b>${esc(b.ano)} · ${esc(b.nome)}</b><small>${esc(b.nota)}</small><code>${esc(b.arquivo_png || '')}</code></div>`).join('');
+    const nota = notaLegal ? `<p class="museu-disclaimer"><b>Nota:</b> ${esc(notaLegal)}</p>` : '';
+    return sec('bolas','🏐 Bolas','Nomes das bolas oficiais e o arquivo PNG sugerido para você gerar/subir depois.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
   }
   function renderBrasil(brasil){
     return sec('brasil','🇧🇷 Brasil nas Copas','Os grandes capítulos da seleção brasileira no torneio.', `<div class="museu-brasil-grid">${brasil.map(b=>`<div class="museu-brasil-card"><span>${esc(b.ano)}</span><b>${esc(b.titulo)}</b><p>${esc(b.texto)}</p></div>`).join('')}</div>`);
