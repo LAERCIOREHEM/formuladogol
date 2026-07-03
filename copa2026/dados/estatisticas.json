@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-03T18:37:18.922748Z",
+  "atualizado_em": "2026-07-03T18:42:42.938681Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 86,
@@ -411,6 +411,19 @@
       "jogos": [
         "760436",
         "760459"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Emam Ashour",
+      "equipe": "EGY",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760426",
+        "760499"
       ],
       "total_cartoes": 0
     },
@@ -898,18 +911,6 @@
       "vermelhos": 0,
       "jogos": [
         "760482"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Emam Ashour",
-      "equipe": "EGY",
-      "gols": 1,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760426"
       ],
       "total_cartoes": 0
     },
@@ -2968,6 +2969,18 @@
         "760487"
       ],
       "total_cartoes": 1
+    },
+    {
+      "nome": "Karim Hafez",
+      "equipe": "EGY",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760499"
+      ],
+      "total_cartoes": 0
     },
     {
       "nome": "Keito Nakamura",
@@ -6392,6 +6405,15 @@
       "media_gols": 1.5
     },
     {
+      "equipe": "EGY",
+      "gols": 6,
+      "assistencias": 6,
+      "amarelos": 6,
+      "vermelhos": 0,
+      "jogos": 4,
+      "media_gols": 1.5
+    },
+    {
       "equipe": "ALG",
       "gols": 5,
       "assistencias": 3,
@@ -6422,15 +6444,6 @@
       "equipe": "COD",
       "gols": 5,
       "assistencias": 3,
-      "amarelos": 6,
-      "vermelhos": 0,
-      "jogos": 4,
-      "media_gols": 1.25
-    },
-    {
-      "equipe": "EGY",
-      "gols": 5,
-      "assistencias": 5,
       "amarelos": 6,
       "vermelhos": 0,
       "jogos": 4,
