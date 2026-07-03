@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v2';
+  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v3';
   const $ = (sel, root=document) => root.querySelector(sel);
   const statsEl = $('#museu-stats');
   const salasEl = $('#museu-salas');
@@ -127,15 +127,31 @@
   function renderRecordes(recordes){
     return sec('recordes','🔥 Recordes','Marcas que ajudam a contar a grandeza do torneio.', `<div class="museu-record-grid">${recordes.map(r=>`<div class="museu-record"><b>${esc(r.titulo)}</b><strong>${esc(r.valor)}</strong><small>${esc(r.detalhe)}</small></div>`).join('')}</div>`);
   }
+  function visualCard(tipo, item){
+    const arquivo = item.arquivo_png || '';
+    const img = item.imagem || (arquivo ? `img/${tipo}/${arquivo}` : '');
+    const titulo = `${item.ano} · ${item.nome}`;
+    const subtitulo = tipo === 'mascotes' ? item.sede : item.nota;
+    const ico = tipo === 'mascotes' ? (item.emoji || '🦁') : '⚽';
+    const alt = tipo === 'mascotes'
+      ? `Mascote ${item.nome} da Copa de ${item.ano}`
+      : `Bola ${item.nome} da Copa de ${item.ano}`;
+    const previewAttrs = img
+      ? ` tabindex="0" role="button" data-image-preview="${esc(img)}" data-preview-title="${esc(titulo)}" data-preview-subtitle="${esc(subtitulo || arquivo)}" aria-label="Ampliar imagem: ${esc(titulo)}"`
+      : '';
+    const imgHtml = img ? `<div class="museu-visual-imgbox"><img loading="lazy" decoding="async" src="${esc(img)}" alt="${esc(alt)}" onerror="var c=this.closest('.museu-visual');if(c){c.classList.add('sem-img');c.removeAttribute('data-image-preview');c.removeAttribute('tabindex');c.removeAttribute('role');}this.remove();"></div>` : '';
+    return `<div class="museu-visual museu-visual-com-img"${previewAttrs}>${imgHtml}<span class="museu-visual-fallback">${esc(ico)}</span><b>${esc(titulo)}</b><small>${esc(subtitulo)}</small><code>${esc(arquivo)}</code></div>`;
+  }
+
   function renderMascotes(mascotes, notaLegal){
-    const cards = mascotes.map(m=>`<div class="museu-visual"><span>${esc(m.emoji)}</span><b>${esc(m.ano)} · ${esc(m.nome)}</b><small>${esc(m.sede)}</small><code>${esc(m.arquivo_png || '')}</code></div>`).join('');
+    const cards = mascotes.map(m=>visualCard('mascotes', m)).join('');
     const nota = notaLegal ? `<p class="museu-disclaimer"><b>Nota:</b> ${esc(notaLegal)}</p>` : '';
-    return sec('mascotes','🦁 Mascotes','Nomes dos mascotes oficiais e o arquivo PNG sugerido para você gerar/subir depois.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
+    return sec('mascotes','🦁 Mascotes','As imagens devem ser salvas em <b>copa2026/img/mascotes/</b> com os nomes exibidos nos cards. Ao tocar/clicar, a imagem abre ampliada.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
   }
   function renderBolas(bolas, notaLegal){
-    const cards = bolas.map(b=>`<div class="museu-visual"><span>⚽</span><b>${esc(b.ano)} · ${esc(b.nome)}</b><small>${esc(b.nota)}</small><code>${esc(b.arquivo_png || '')}</code></div>`).join('');
+    const cards = bolas.map(b=>visualCard('bolas', b)).join('');
     const nota = notaLegal ? `<p class="museu-disclaimer"><b>Nota:</b> ${esc(notaLegal)}</p>` : '';
-    return sec('bolas','🏐 Bolas','Nomes das bolas oficiais e o arquivo PNG sugerido para você gerar/subir depois.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
+    return sec('bolas','🏐 Bolas','As imagens devem ser salvas em <b>copa2026/img/bolas/</b> com os nomes exibidos nos cards. Ao tocar/clicar, a imagem abre ampliada.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
   }
   function renderBrasil(brasil){
     return sec('brasil','🇧🇷 Brasil nas Copas','Os grandes capítulos da seleção brasileira no torneio.', `<div class="museu-brasil-grid">${brasil.map(b=>`<div class="museu-brasil-card"><span>${esc(b.ano)}</span><b>${esc(b.titulo)}</b><p>${esc(b.texto)}</p></div>`).join('')}</div>`);
