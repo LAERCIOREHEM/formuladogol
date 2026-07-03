@@ -1540,3 +1540,81 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
     max-height:58vh !important;
   }
 }
+
+/* ==========================================================
+   Museu da Copa — FIX V6: mascotes/bolas em círculo no card
+   Card continua normal; só a imagem interna fica circular.
+   No clique, o lightbox permanece retangular com cantos arredondados.
+   ========================================================== */
+.museu-visual.museu-visual-com-img{
+  align-items:center;
+  text-align:center;
+}
+.museu-visual.museu-visual-com-img .museu-visual-imgbox{
+  width:118px !important;
+  height:118px !important;
+  min-width:118px !important;
+  min-height:118px !important;
+  max-width:118px !important;
+  max-height:118px !important;
+  flex:0 0 118px !important;
+  margin:0 auto 11px !important;
+  padding:12px !important;
+  border-radius:50% !important;
+  overflow:hidden !important;
+  background:
+    radial-gradient(circle at 38% 28%, rgba(255,255,255,.18), transparent 24%),
+    radial-gradient(circle at center, rgba(255,204,41,.18), rgba(255,204,41,.05) 44%, rgba(6,22,44,.90) 75%),
+    linear-gradient(180deg, rgba(15,43,78,.98), rgba(8,27,53,.98)) !important;
+  border:1px solid rgba(255,204,41,.34) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 10px 24px rgba(0,0,0,.26) !important;
+}
+.museu-visual.museu-visual-com-img .museu-visual-imgbox img{
+  width:100% !important;
+  height:100% !important;
+  max-width:100% !important;
+  max-height:100% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  border-radius:0 !important;
+  filter:drop-shadow(0 8px 12px rgba(0,0,0,.28)) !important;
+}
+.museu-visual.museu-visual-com-img:not(.sem-img)::after{
+  top:10px !important;
+  right:10px !important;
+}
+.museu-visual.museu-visual-com-img b,
+.museu-visual.museu-visual-com-img small,
+.museu-visual.museu-visual-com-img code{
+  width:100%;
+}
+.museu-visual.museu-visual-com-img.sem-img .museu-visual-imgbox{
+  display:none !important;
+}
+
+@media (min-width:901px){
+  .museu-visual.museu-visual-com-img .museu-visual-imgbox{
+    width:112px !important;
+    height:112px !important;
+    min-width:112px !important;
+    min-height:112px !important;
+    max-width:112px !important;
+    max-height:112px !important;
+    flex-basis:112px !important;
+  }
+}
+@media (max-width:520px){
+  .museu-visual.museu-visual-com-img .museu-visual-imgbox{
+    width:92px !important;
+    height:92px !important;
+    min-width:92px !important;
+    min-height:92px !important;
+    max-width:92px !important;
+    max-height:92px !important;
+    flex-basis:92px !important;
+    padding:9px !important;
+    margin-bottom:9px !important;
+  }
+}
