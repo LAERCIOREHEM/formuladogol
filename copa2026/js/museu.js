@@ -1,6 +1,6 @@
 (function(){
   'use strict';
-  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v3';
+  const DATA_URL = 'dados/museu-copa.json?v=20260703museu-v4';
   const $ = (sel, root=document) => root.querySelector(sel);
   const statsEl = $('#museu-stats');
   const salasEl = $('#museu-salas');
@@ -146,12 +146,12 @@
   function renderMascotes(mascotes, notaLegal){
     const cards = mascotes.map(m=>visualCard('mascotes', m)).join('');
     const nota = notaLegal ? `<p class="museu-disclaimer"><b>Nota:</b> ${esc(notaLegal)}</p>` : '';
-    return sec('mascotes','🦁 Mascotes','As imagens devem ser salvas em <b>copa2026/img/mascotes/</b> com os nomes exibidos nos cards. Ao tocar/clicar, a imagem abre ampliada.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
+    return sec('mascotes','🦁 Mascotes','Os personagens oficiais que marcaram a identidade visual das Copas.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
   }
   function renderBolas(bolas, notaLegal){
     const cards = bolas.map(b=>visualCard('bolas', b)).join('');
     const nota = notaLegal ? `<p class="museu-disclaimer"><b>Nota:</b> ${esc(notaLegal)}</p>` : '';
-    return sec('bolas','🏐 Bolas','As imagens devem ser salvas em <b>copa2026/img/bolas/</b> com os nomes exibidos nos cards. Ao tocar/clicar, a imagem abre ampliada.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
+    return sec('bolas','🏐 Bolas','As bolas oficiais e seus desenhos mais marcantes em cada geração.', `<div class="museu-visual-grid">${cards}</div>${nota}`);
   }
   function renderBrasil(brasil){
     return sec('brasil','🇧🇷 Brasil nas Copas','Os grandes capítulos da seleção brasileira no torneio.', `<div class="museu-brasil-grid">${brasil.map(b=>`<div class="museu-brasil-card"><span>${esc(b.ano)}</span><b>${esc(b.titulo)}</b><p>${esc(b.texto)}</p></div>`).join('')}</div>`);
