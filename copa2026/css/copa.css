@@ -1975,3 +1975,42 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
     font-size:20px;
   }
 }
+
+/* ==========================================================
+   Avisos legais reforçados — imagens, marcas e conteúdo editorial
+   ========================================================== */
+.legal-box{
+  margin:18px 0 14px;
+  padding:13px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,204,41,.26);
+  background:linear-gradient(180deg,rgba(255,204,41,.09),rgba(19,41,75,.78));
+  color:#d8e4f4;
+  font-size:12.2px;
+  line-height:1.52;
+  box-shadow:0 10px 24px rgba(0,0,0,.20);
+}
+.legal-box b{
+  color:var(--gold);
+  font-weight:900;
+}
+.legal-box a{
+  color:var(--gold);
+  font-weight:900;
+  text-decoration:none;
+}
+.legal-box a:hover{
+  text-decoration:underline;
+}
+.legal-box-atletas,.legal-box-palcos,.legal-box-museu{
+  max-width:100%;
+}
+@media(max-width:520px){
+  .legal-box{
+    margin:16px 0 12px;
+    padding:12px;
+    font-size:11.7px;
+    line-height:1.48;
+    border-radius:13px;
+  }
+}
