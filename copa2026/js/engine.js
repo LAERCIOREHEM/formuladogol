@@ -202,30 +202,45 @@
   }
 
   // ---- 5. Propagação dos vencedores até a final ---------------------------
-  // placares: { M73:{a:2,b:1}, ... }  (a/b = gols)
+  // placares: { M73:{a:2,b:1,vencedor:"BRA",perdedor:"JPN"}, ... }
+  // a/b = gols no tempo/prorrogação; vencedor/perdedor resolve pênaltis quando o
+  // placar termina empatado. Compatível com o formato antigo {a,b}.
+  function resultadoMata(mId, ladoA, ladoB, placares, vencedor, perdedor) {
+    const p = placares[mId];
+    if (!p || !ladoA || !ladoB) return;
+
+    let win = p.vencedor || p.winner || null;
+    let lose = p.perdedor || p.loser || null;
+
+    if (win && win !== ladoA && win !== ladoB) win = null;
+    if (lose && lose !== ladoA && lose !== ladoB) lose = null;
+
+    if (!win && p.a != null && p.b != null) {
+      if (p.a > p.b) win = ladoA;
+      else if (p.b > p.a) win = ladoB;
+    }
+
+    if (!win) return; // empate sem pênaltis/sem vencedor explícito: não propaga
+
+    if (!lose) lose = win === ladoA ? ladoB : ladoA;
+    vencedor[mId] = win;
+    perdedor[mId] = lose;
+  }
+
   function propagar(r32, arvore, placares) {
     const vencedor = {}, perdedor = {}, timeDe = {};
+    placares = placares || {};
     // R32
     r32.forEach(m => {
       timeDe[m.id] = { a: m.a, b: m.b };
-      const p = placares[m.id];
-      if (p && p.a != null && p.b != null && m.a && m.b) {
-        if (p.a === p.b) return; // empate inválido no mata-mata: não propaga
-        vencedor[m.id] = p.a > p.b ? m.a : m.b;
-        perdedor[m.id] = p.a > p.b ? m.b : m.a;
-      }
+      resultadoMata(m.id, m.a, m.b, placares, vencedor, perdedor);
     });
     // Árvore
     arvore.forEach(m => {
       const a = referencia(m.a, vencedor, perdedor);
       const b = referencia(m.b, vencedor, perdedor);
       timeDe[m.id] = { a, b };
-      const p = placares[m.id];
-      if (p && p.a != null && p.b != null && a && b) {
-        if (p.a === p.b) return;
-        vencedor[m.id] = p.a > p.b ? a : b;
-        perdedor[m.id] = p.a > p.b ? b : a;
-      }
+      resultadoMata(m.id, a, b, placares, vencedor, perdedor);
     });
 
     // Conjuntos por fase (presença = avançou para aquela fase)

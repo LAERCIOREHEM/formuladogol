@@ -959,6 +959,94 @@
     return res;
   }
 
+  async function buscarMataEvents(force) {
+    if (!force && MATA_EVENTS.length && (Date.now() - MATA_EVENTS_TS) < 45000) return MATA_EVENTS;
+    try {
+      const r = await fetch(`${API}?dates=20260628-20260719&limit=120&_=${Date.now()}`).then(x => x.json());
+      MATA_EVENTS = (r.events || []).filter(e => ((e.season && e.season.slug) || "") !== "group-stage");
+      MATA_EVENTS_TS = Date.now();
+    } catch (e) {
+      // mantém cache anterior
+    }
+    return MATA_EVENTS;
+  }
+
+  function resultadoDetalhadoMata(ev) {
+    const info = infoPlacarEvento(ev);
+    if (!info || info.state !== "post") return null;
+    const h = info.home, a = info.away;
+    const hId = info.hId, aId = info.aId;
+
+    let vencedorId = "", perdedorId = "", motivo = "";
+    if (h && h.winner === true) { vencedorId = hId; perdedorId = aId; motivo = "winner"; }
+    else if (a && a.winner === true) { vencedorId = aId; perdedorId = hId; motivo = "winner"; }
+    else {
+      const hPen = placarPenaltiCompetidor(h), aPen = placarPenaltiCompetidor(a);
+      if (hPen != null && aPen != null && hPen !== aPen) {
+        vencedorId = hPen > aPen ? hId : aId;
+        perdedorId = hPen > aPen ? aId : hId;
+        motivo = "penaltis";
+      } else if (info.hs !== info.as) {
+        vencedorId = info.hs > info.as ? hId : aId;
+        perdedorId = info.hs > info.as ? aId : hId;
+        motivo = "placar";
+      }
+    }
+
+    if (!vencedorId || !perdedorId) return null;
+    return { vencedorId, perdedorId, hId, aId, hs:info.hs, as:info.as, motivo };
+  }
+
+  function placaresMataDaESPN(d) {
+    const out = {};
+    const jogosPorFase = montarJogosMata(d);
+    const lista = [].concat(
+      jogosPorFase["16-avos"] || [],
+      jogosPorFase["Oitavas"] || [],
+      jogosPorFase["Quartas"] || [],
+      jogosPorFase["Semis"] || [],
+      jogosPorFase["Final"] || []
+    );
+
+    lista.forEach(j => {
+      const idA = dpSigla(j.a), idB = dpSigla(j.b);
+      if (!j || !j.id || !idA || !idB) return;
+      const ev = eventoMataDeOuSlot(j, MATA_EVENTS);
+      const det = resultadoDetalhadoMata(ev);
+      if (!det) return;
+
+      let aScore = null, bScore = null;
+      if (det.hId === idA && det.aId === idB) { aScore = det.hs; bScore = det.as; }
+      else if (det.hId === idB && det.aId === idA) { aScore = det.as; bScore = det.hs; }
+      else return;
+
+      out[j.id] = {
+        a: aScore,
+        b: bScore,
+        vencedor: det.vencedorId,
+        perdedor: det.perdedorId,
+        motivo: det.motivo
+      };
+    });
+    return out;
+  }
+
+  function derivarMataComPlacaresReais(placG, fp) {
+    let d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp);
+    let ultimo = "";
+    // Itera para resolver R32 -> Oitavas -> Quartas -> Semis -> Final.
+    // Ex.: M97 depende do vencedor de M90; M90 só fica conhecido após os
+    // placares reais dos jogos anteriores entrarem no motor.
+    for (let i = 0; i < 6; i++) {
+      const pm = placaresMataDaESPN(d);
+      const chave = JSON.stringify(pm);
+      if (!chave || chave === "{}" || chave === ultimo) break;
+      ultimo = chave;
+      d = COPA_ENGINE.derivar(SEL, placG, pm, ESTRUT, TERMAP, fp);
+    }
+    return d;
+  }
+
 
   // casa um confronto (par de ids) com o jogo real da ESPN no mata-mata (pra placar/horário)
   function eventoMataDe(idA, idB, mataEvents) {
@@ -1023,11 +1111,8 @@
     (MATA_EVENTS || []).forEach(ev => {
       try {
         if (((ev.season && ev.season.slug) || "") === "group-stage") return;
-        if (estadoEvento(ev) !== "post") return;
-        const cs = getPath(ev, ["competitions", 0, "competitors"], []) || [];
-        const perd = cs.find(c => c && c.winner === false);
-        const id = perd ? (dpSigla((perd.team || {}).abbreviation) || dpSigla((perd.team || {}).displayName) || dpSigla((perd.team || {}).shortDisplayName)) : null;
-        if (id) elim.add(id);
+        const det = resultadoDetalhadoMata(ev);
+        if (det && det.perdedorId) elim.add(det.perdedorId);
       } catch (e) { /* ignora evento malformado */ }
     });
     return elim;
@@ -1266,7 +1351,8 @@
       const grpEvents = await buscarGruposEvents();
       const placG = placaresGruposDaESPN(grpEvents);
       const fp = await buscarFairPlay();
-      const d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp);
+      await buscarMataEvents(false);
+      const d = derivarMataComPlacaresReais(placG, fp);
       MATA_CACHE = d;
       MATA_LOCK_TOKENS = tokensTravadosMata(grpEvents, fp);
       const jogos = montarJogosMata(d);
@@ -1336,20 +1422,13 @@
     const placG = placaresGruposDaESPN(grpEvents);
     // 1b) fair play (cartões) — lido do JSON do robô; desempate antes do ranking FIFA
     const fp = await buscarFairPlay();
-    // 2) roda o engine
+    // 2) busca jogos reais do mata-mata e roda o engine com placares reais.
+    await buscarMataEvents(true);
     let d;
-    try { d = COPA_ENGINE.derivar(SEL, placG, {}, ESTRUT, TERMAP, fp); }
+    try { d = derivarMataComPlacaresReais(placG, fp); }
     catch (e) { $("#lista").innerHTML = abasHTML() + '<p class="vazio">Erro ao calcular o chaveamento.</p>'; document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba); return; }
     MATA_CACHE = d;
     MATA_LOCK_TOKENS = tokensTravadosMata(grpEvents, fp);
-    // 3) jogos reais do mata-mata na ESPN (placar/horário)
-    if (!MATA_EVENTS.length || (Date.now() - MATA_EVENTS_TS) >= 90000) {
-      try {
-        const r = await fetch(`${API}?dates=20260628-20260719&limit=80&_=${Date.now()}`).then(x => x.json());
-        MATA_EVENTS = (r.events || []).filter(e => ((e.season && e.season.slug) || "") !== "group-stage");
-        MATA_EVENTS_TS = Date.now();
-      } catch (e) { /* mantém cache anterior */ }
-    }
     const jogosAuto = montarJogosMata(d);
     FASE_MATA = escolherFaseMataAtual(jogosAuto);
     pintarFaseMata();
@@ -1470,8 +1549,9 @@
     if (st.state === "post") {
       status = "Encerrado"; cls = "post";
       if (idA && idB) {
-        if (h.winner) { if (hId === idA) vA = "mm-venc"; else if (hId === idB) vB = "mm-venc"; }
-        else if (a.winner) { if (aId === idA) vA = "mm-venc"; else if (aId === idB) vB = "mm-venc"; }
+        const det = resultadoDetalhadoMata(ev);
+        if (det && det.vencedorId === idA) vA = "mm-venc";
+        else if (det && det.vencedorId === idB) vB = "mm-venc";
       }
       const pen = penaltiInfoEvento(ev, idA || hId, idB || aId);
       if (pen) {
@@ -1551,14 +1631,9 @@
     return selecaoLinkHTML(sig, corpo, "team-link-mm-opcao");
   }
   function vencedorPerdedorDoEventoMata(ev, tipo) {
-    if (!ev || !ev.competitions || !ev.competitions[0]) return null;
-    const comp = ev.competitions[0];
-    const st = comp.status && comp.status.type ? comp.status.type : {};
-    if (st.state !== "post") return null;
-    const cs = comp.competitors || [];
-    const alvo = tipo === "L" ? cs.find(c => !c.winner) : cs.find(c => c.winner);
-    const id = alvo ? (dpSigla((alvo.team || {}).abbreviation) || dpSigla((alvo.team || {}).displayName) || dpSigla((alvo.team || {}).shortDisplayName)) : null;
-    return id || null;
+    const det = resultadoDetalhadoMata(ev);
+    if (!det) return null;
+    return tipo === "L" ? det.perdedorId : det.vencedorId;
   }
   function timesConcretosDoEventoMata(ev) {
     if (!ev || !ev.competitions || !ev.competitions[0]) return [];
