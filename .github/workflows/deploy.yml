@@ -3,11 +3,6 @@ name: Deploy site (GitHub Pages)
 on:
   workflow_dispatch:
 
-  # Publica quando houver push no main.
-  # Observação importante:
-  # Os workflows de dados já fazem commit/push no main. Portanto, o próprio push
-  # já dispara o deploy. Não usamos workflow_run aqui para evitar deploy duplicado
-  # e corrida na etapa "syncing_files" do GitHub Pages.
   push:
     branches: [main]
     paths:
@@ -25,14 +20,24 @@ on:
       - 'docs/**'
       - '.github/workflows/deploy.yml'
 
+  # Publica imediatamente após workflows que atualizam dados do site.
+  # Isso cobre commits feitos por GitHub Actions, que nem sempre disparam outro
+  # workflow por "push" usando GITHUB_TOKEN.
+  workflow_run:
+    workflows:
+      - 'Atualizar tudo (tabela, resultados e jogos)'
+      - 'Buscar melhores momentos (CazéTV)'
+      - 'Atualiza fair play (cartões)'
+      - 'Atualizar próximos jogos'
+      - 'Atualizar resultados do Brasileirão'
+      - 'Atualizar tabela do Brasileirão'
+    types: [completed]
+
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Deploy do Pages precisa ser serializado.
-# Não cancelar deploy em andamento: cancelamento no meio do "syncing_files"
-# pode deixar uma publicação criada no GitHub Pages e a próxima batendo por cima.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -43,6 +48,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -50,6 +62,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Montar site estatico limpo
         shell: bash
@@ -58,7 +72,6 @@ jobs:
           rm -rf _site
           mkdir -p _site
 
-          # Arquivos da raiz usados pelo site
           for item in \
             index.html CNAME robots.txt sitemap.xml \
             tabela.json resultados.json jogos.json membros.json \
@@ -69,15 +82,10 @@ jobs:
             fi
           done
 
-          # Pastas publicas
           if [[ -d copa2026 ]]; then cp -a copa2026 _site/; fi
           if [[ -d docs ]]; then cp -a docs _site/; fi
 
-          # GitHub Pages nao deve processar Jekyll.
           touch _site/.nojekyll
-
-          echo "Conteudo publicado em _site:"
-          find _site -maxdepth 2 -type f | sort | head -200
 
       - name: Validar pacote estatico antes do upload
         shell: bash
@@ -89,7 +97,6 @@ jobs:
             exit 1
           fi
 
-          # GitHub Pages artifact nao deve conter symlinks/hardlinks.
           if find _site -type l | grep -q .; then
             echo "ERRO: existem symlinks dentro de _site."
             find _site -type l
@@ -103,9 +110,6 @@ jobs:
           du -sh _site
 
           echo "Maiores arquivos:"
-          # Com set -o pipefail, a combinação "sort | head" pode falhar com Broken pipe
-          # porque o head fecha o pipe depois das primeiras linhas. Portanto, ordenamos
-          # primeiro em arquivo temporário e só depois lemos o topo.
           find _site -type f -printf '%s %p\n' > /tmp/site-files.txt
           sort -nr /tmp/site-files.txt > /tmp/site-files-sorted.txt
           head -20 /tmp/site-files-sorted.txt | awk '{printf "%.2f MB  %s\n", $1/1024/1024, $2}'
