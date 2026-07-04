@@ -59,6 +59,44 @@
   }
   const fateDe = vivoNoTorneio;
 
+  function chaveAtualDoPareo(o) {
+    if (!o || !o.classificados32 || !o.classificados32.length) return null;
+    if (faseCompleta(o, "final")) return "campeao";
+    if (faseCompleta(o, "semis")) return "finalistas";
+    if (faseCompleta(o, "quartas")) return "semifinalistas";
+    if (faseCompleta(o, "oitavas")) return "avancam_quartas";
+    if (faseCompleta(o, "r32")) return "avancam_oitavas";
+    return "classificados32";
+  }
+  function listaOficialDoPareo(o, key) {
+    if (!o || !key) return [];
+    if (key === "campeao") return o.campeao ? [o.campeao] : [];
+    return Array.isArray(o[key]) ? o[key] : [];
+  }
+  function listaPalpiteDoPareo(p, key) {
+    if (!p || !key) return [];
+    if (key === "campeao") return p.campeao ? [p.campeao] : [];
+    return Array.isArray(p[key]) ? p[key] : [];
+  }
+  function statusNoPareo(team, p, o) {
+    // Status dos ícones das 32 do participante:
+    // - wrong: ele colocou entre as 32, mas a seleção nem classificou.
+    // - alive: segue viva NO CAMINHO QUE ELE CRAVOU para a fase atual.
+    // - out: classificou, mas caiu do caminho do palpite dele em alguma fase.
+    if (!o || !o.classificados32 || !o.classificados32.length) return "pend";
+    if (o.classificados32.indexOf(team) === -1) return "wrong";
+    const key = chaveAtualDoPareo(o);
+    const real = new Set(listaOficialDoPareo(o, key));
+    const palpite = new Set(listaPalpiteDoPareo(p, key));
+    return real.has(team) && palpite.has(team) ? "alive" : "out";
+  }
+  function qtdAindaNoPareo(p, o) {
+    if (!o || !o.classificados32 || !o.classificados32.length) return 0;
+    const key = chaveAtualDoPareo(o);
+    const real = new Set(listaOficialDoPareo(o, key));
+    return listaPalpiteDoPareo(p, key).filter(t => real.has(t)).length;
+  }
+
   async function init() {
     try {
       const [s, e, t, pm, fp] = await Promise.all([
@@ -438,9 +476,9 @@
       }).join("");
       const decidiu = o.classificados32 && o.classificados32.length;
       const picks32 = x.d.classificados32 || [];
-      const vivos = picks32.filter(t => fateDe(t, o) === "alive").length;
-      const funil = picks32.map(t => `<span class="${fateDe(t, o)}">${flag(t)}</span>`).join("");
-      const f32lab = decidiu ? `As 32 de ${x.nome} — <b>${vivos} ainda vivas no torneio</b>:` : `As 32 que ${x.nome} classificou no palpite:`;
+      const vivos = qtdAindaNoPareo(x.d, o);
+      const funil = picks32.map(t => `<span class="${statusNoPareo(t, x.d, o)}">${flag(t)}</span>`).join("");
+      const f32lab = decidiu ? `As 32 de ${x.nome} — <b>${vivos} ainda no páreo</b>:` : `As 32 que ${x.nome} classificou no palpite:`;
       const f32leg = decidiu ? '<div class="f32leg"><span><i class="lg-a"></i>na disputa</span><span><i class="lg-o"></i>caiu</span><span><i class="lg-w"></i>não classificou</span></div>' : "";
       return `<div class="card${cls}">
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
