@@ -92,7 +92,7 @@
     }
     ((RANKING_DESEMPENHO && RANKING_DESEMPENHO.ranking) || []).forEach(function (x) {
       var eq = siglaSelecao(x.equipe);
-      if (eq) equipes[eq] = true;
+      if (eq) mapa[eq] = true;
     });
     (JOGOS || []).forEach(function (j) {
       var home = j.home && siglaSelecao(j.home.sigla);
@@ -174,7 +174,7 @@
       { tit: "Artilheiro", item: gols, val: gols ? gols.gols : 0, suf: "gols", ico: "⚽", tipo: "jogador" },
       { tit: "Garçom", item: ass, val: ass ? ass.assistencias : 0, suf: "assist.", ico: "🎯", tipo: "jogador" },
       { tit: "Melhor ataque", item: ataque, val: ataque ? ataque.gols : 0, suf: "gols", ico: "🥅", tipo: "selecao" },
-      { tit: "Top desempenho", item: topRank, val: topRank ? topRank.indice_final : 0, suf: "pts", ico: "⚡", tipo: "ranking" }
+      { tit: "Ranking de Desempenho", item: topRank, val: topRank ? topRank.indice_final : 0, suf: "pts", ico: "⚡", tipo: "ranking" }
     ];
     $("#stats-resumo").innerHTML = cards.map(function (c) {
       if (!c.item) return '<div class="stat-res-card"><div class="stat-res-ico">' + c.ico + '</div><div><b>' + c.tit + '</b><span>Aguardando dados</span></div></div>';
@@ -182,7 +182,7 @@
       var detalhe = c.tipo === "selecao"
         ? (flag(c.item.equipe) + esc(c.item.equipe || "") + ' · ' + c.val + ' ' + esc(c.suf))
         : (c.tipo === "ranking" ? (flag(c.item.equipe) + esc(c.item.equipe || "") + ' · índice ' + esc(c.val)) : (flag(c.item.equipe) + esc(nomeSelecao(c.item.equipe)) + ' · ' + c.val + ' ' + esc(c.suf)));
-      return '<div class="stat-res-card">' +
+      return '<div class="stat-res-card' + (c.tipo === "ranking" ? ' stat-res-card-rank' : '') + '">' +
         '<div class="stat-res-ico">' + c.ico + '</div>' +
         '<div class="stat-res-info"><b>' + esc(c.tit) + '</b>' +
         '<strong>' + esc(nome) + '</strong>' +
@@ -291,6 +291,10 @@
         var eq = siglaSelecao(x.equipe);
         if (eq) equipes[eq] = true;
       });
+    });
+    ((RANKING_DESEMPENHO && RANKING_DESEMPENHO.ranking) || []).forEach(function (x) {
+      var eq = siglaSelecao(x.equipe);
+      if (eq) equipes[eq] = true;
     });
     (JOGOS || []).forEach(function (j) {
       var home = j.home && siglaSelecao(j.home.sigla);
@@ -432,18 +436,6 @@
     '</article>';
   }
   function filtrar(arr) {
-    if (ABA === "desempenho") {
-      pararMonitorAoVivo();
-      atualizarStatusLive([]);
-      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões") + " · " + (SITUACAO_RANK === "TODAS" ? "todas" : SITUACAO_RANK.toLowerCase()) + " · " + (MIN_JOGOS_RANK || 1) + "+ jogos") : "sem dados";
-      if (!arr.length) {
-        $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há dados suficientes para o Ranking de Desempenho.</div>';
-        return;
-      }
-      $("#stats-lista").innerHTML = desempenhoMetodoHTML() + arr.map(desempenhoCard).join("");
-      return;
-    }
-
     if (ABA === 'jogos') {
       return arr.filter(function (j) {
         var okTime = (FILTRO === 'TODAS') || (j.home && j.home.sigla === FILTRO) || (j.away && j.away.sigla === FILTRO);
@@ -455,8 +447,9 @@
     if (ABA === "desempenho") {
       var campo = ORDEM_RANK || "indice_final";
       var dir = DIRECAO_RANK === "asc" ? 1 : -1;
-      return arr.filter(function (x) {
-        var okTime = (FILTRO === "TODAS") || x.equipe === FILTRO;
+      return (arr || []).filter(function (x) {
+        var eq = siglaSelecao(x.equipe);
+        var okTime = (FILTRO === "TODAS") || eq === FILTRO;
         var okSit = (SITUACAO_RANK === "TODAS") || String(x.situacao || "") === SITUACAO_RANK;
         var okJogos = (x.jogos || 0) >= (MIN_JOGOS_RANK || 1);
         return okTime && okSit && okJogos;
@@ -649,7 +642,7 @@
       atualizarStatusLive([]);
       $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões") + " · " + (SITUACAO_RANK === "TODAS" ? "todas" : SITUACAO_RANK.toLowerCase()) + " · " + (MIN_JOGOS_RANK || 1) + "+ jogos") : "sem dados";
       if (!arr.length) {
-        $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há dados suficientes para o Ranking de Desempenho.</div>';
+        $("#stats-lista").innerHTML = '<div class="stat-vazio">Nenhuma seleção encontrada para este filtro no Ranking de Desempenho.</div>';
         return;
       }
       $("#stats-lista").innerHTML = desempenhoMetodoHTML() + arr.map(desempenhoCard).join("");

@@ -2607,3 +2607,67 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
     font-size:22px;
   }
 }
+
+/* ==========================================================
+   Ranking de Desempenho — ajustes v18
+   ========================================================== */
+.stat-resumo{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.stat-res-card-rank{
+  grid-column:1 / -1;
+  border-color:rgba(255,204,41,.35);
+  background:
+    radial-gradient(circle at 100% 0%,rgba(255,204,41,.12),transparent 28%),
+    var(--navy-2);
+  align-items:center;
+}
+.stat-res-card-rank .stat-res-ico{
+  width:42px;
+  height:42px;
+  border-color:rgba(255,204,41,.30);
+}
+.stat-res-card-rank b{
+  font-size:12px;
+}
+.stat-res-card-rank strong{
+  font-size:16px;
+}
+.stat-res-card-rank span{
+  font-size:12px;
+}
+@media(max-width:520px){
+  .stat-resumo{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .stat-res-card{
+    padding:10px;
+    gap:8px;
+  }
+  .stat-res-ico{
+    width:30px;
+    height:30px;
+    border-radius:9px;
+  }
+  .stat-res-card b{
+    font-size:9.8px;
+    letter-spacing:.7px;
+  }
+  .stat-res-card strong{
+    font-size:12.5px;
+  }
+  .stat-res-card span{
+    font-size:10px;
+  }
+  .stat-res-card-rank{
+    padding:12px;
+  }
+  .stat-res-card-rank .stat-res-ico{
+    width:38px;
+    height:38px;
+  }
+  .stat-res-card-rank strong{
+    font-size:15px;
+  }
+}
