@@ -669,7 +669,7 @@
     });
   }
 
-  Promise.all([getJSON("dados/selecoes.json"), getJSON("dados/paises.json"), getJSON("dados/elencos.json"), getJSON("dados/correcoes-jogadores.json?v=20260703brfix-v1")])
+  Promise.all([getJSON("dados/selecoes.json"), getJSON("dados/paises.json"), getJSON("dados/elencos.json"), getJSON("dados/correcoes-jogadores.json?v=20260704clubes-bra-v1")])
     .then(function (res) {
       var sj = res[0] || {}, pj = res[1] || {}, ej = res[2] || {}, cj = res[3] || {};
       SEL = ((sj.selecoes) || []).map(function (s) { return { id: s.id, nome: s.nome, grupo: s.grupo, seed: s.seed, iso2: s.iso2 }; });
