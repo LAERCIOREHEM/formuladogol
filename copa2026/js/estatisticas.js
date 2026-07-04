@@ -13,9 +13,14 @@
   var DADOS = { atualizado_em: null, jogos_processados: 0, artilheiros: [], assistencias: [], por_selecao: [] };
   var ROSTOS = {};
   var JOGOS = [];
+  var RANKING_DESEMPENHO = { ranking: [] };
   var ABA = "artilheiros";
   var FILTRO = "TODAS";
   var FASE = "TODAS";
+  var SITUACAO_RANK = "TODAS";
+  var MIN_JOGOS_RANK = 1;
+  var ORDEM_RANK = "indice_final";
+  var DIRECAO_RANK = "desc";
   var LIVE_REFRESH_MS = 30000;
   var LIVE_TIMER = null;
   var LIVE_TICKING = false;
@@ -85,6 +90,10 @@
         });
       });
     }
+    ((RANKING_DESEMPENHO && RANKING_DESEMPENHO.ranking) || []).forEach(function (x) {
+      var eq = siglaSelecao(x.equipe);
+      if (eq) equipes[eq] = true;
+    });
     (JOGOS || []).forEach(function (j) {
       var home = j.home && siglaSelecao(j.home.sigla);
       var away = j.away && siglaSelecao(j.away.sigla);
@@ -139,6 +148,7 @@
       });
     }
     if (ABA === "jogos") return JOGOS.slice();
+    if (ABA === "desempenho") return ((RANKING_DESEMPENHO && RANKING_DESEMPENHO.ranking) || []).slice();
     return (DADOS.artilheiros || []).map(normalizarItemEquipe).filter(function (x) { return !!x.equipe; });
   }
   function valorPrincipal(item) {
@@ -159,17 +169,19 @@
     var gols = (DADOS.artilheiros || [])[0];
     var ass = (DADOS.assistencias || [])[0];
     var ataque = melhorAtaque();
+    var topRank = ((RANKING_DESEMPENHO && RANKING_DESEMPENHO.ranking) || [])[0];
     var cards = [
       { tit: "Artilheiro", item: gols, val: gols ? gols.gols : 0, suf: "gols", ico: "⚽", tipo: "jogador" },
       { tit: "Garçom", item: ass, val: ass ? ass.assistencias : 0, suf: "assist.", ico: "🎯", tipo: "jogador" },
-      { tit: "Melhor ataque", item: ataque, val: ataque ? ataque.gols : 0, suf: "gols", ico: "🥅", tipo: "selecao" }
+      { tit: "Melhor ataque", item: ataque, val: ataque ? ataque.gols : 0, suf: "gols", ico: "🥅", tipo: "selecao" },
+      { tit: "Top desempenho", item: topRank, val: topRank ? topRank.indice_final : 0, suf: "pts", ico: "⚡", tipo: "ranking" }
     ];
     $("#stats-resumo").innerHTML = cards.map(function (c) {
       if (!c.item) return '<div class="stat-res-card"><div class="stat-res-ico">' + c.ico + '</div><div><b>' + c.tit + '</b><span>Aguardando dados</span></div></div>';
-      var nome = c.tipo === "selecao" ? nomeSelecao(c.item.equipe) : c.item.nome;
+      var nome = c.tipo === "selecao" ? nomeSelecao(c.item.equipe) : (c.tipo === "ranking" ? nomeSelecao(c.item.equipe) : c.item.nome);
       var detalhe = c.tipo === "selecao"
         ? (flag(c.item.equipe) + esc(c.item.equipe || "") + ' · ' + c.val + ' ' + esc(c.suf))
-        : (flag(c.item.equipe) + esc(nomeSelecao(c.item.equipe)) + ' · ' + c.val + ' ' + esc(c.suf));
+        : (c.tipo === "ranking" ? (flag(c.item.equipe) + esc(c.item.equipe || "") + ' · índice ' + esc(c.val)) : (flag(c.item.equipe) + esc(nomeSelecao(c.item.equipe)) + ' · ' + c.val + ' ' + esc(c.suf)));
       return '<div class="stat-res-card">' +
         '<div class="stat-res-ico">' + c.ico + '</div>' +
         '<div class="stat-res-info"><b>' + esc(c.tit) + '</b>' +
@@ -312,6 +324,32 @@
       faseSel.onchange = function () { FASE = faseSel.value; renderLista(); };
     }
     if (faseWrap) faseWrap.hidden = ABA !== 'jogos';
+
+    var situacaoWrap = $("#stat-situacao-wrap"), situacaoSel = $("#stat-situacao");
+    var minWrap = $("#stat-min-jogos-wrap"), minSel = $("#stat-min-jogos");
+    var ordemWrap = $("#stat-ordem-wrap"), ordemSel = $("#stat-ordem");
+    var dirWrap = $("#stat-direcao-wrap"), dirSel = $("#stat-direcao");
+    var rankAtivo = ABA === "desempenho";
+    if (situacaoWrap) situacaoWrap.hidden = !rankAtivo;
+    if (minWrap) minWrap.hidden = !rankAtivo;
+    if (ordemWrap) ordemWrap.hidden = !rankAtivo;
+    if (dirWrap) dirWrap.hidden = !rankAtivo;
+    if (situacaoSel) {
+      situacaoSel.value = SITUACAO_RANK;
+      situacaoSel.onchange = function () { SITUACAO_RANK = situacaoSel.value || "TODAS"; renderLista(); };
+    }
+    if (minSel) {
+      minSel.value = String(MIN_JOGOS_RANK || 1);
+      minSel.onchange = function () { MIN_JOGOS_RANK = parseInt(minSel.value || "1", 10) || 1; renderLista(); };
+    }
+    if (ordemSel) {
+      ordemSel.value = ORDEM_RANK;
+      ordemSel.onchange = function () { ORDEM_RANK = ordemSel.value || "indice_final"; renderLista(); };
+    }
+    if (dirSel) {
+      dirSel.value = DIRECAO_RANK;
+      dirSel.onchange = function () { DIRECAO_RANK = dirSel.value || "desc"; renderLista(); };
+    }
   }
 
   function marcadoresDaSelecao(item) {
@@ -394,6 +432,18 @@
     '</article>';
   }
   function filtrar(arr) {
+    if (ABA === "desempenho") {
+      pararMonitorAoVivo();
+      atualizarStatusLive([]);
+      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões")) : "sem dados";
+      if (!arr.length) {
+        $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há dados suficientes para o Ranking de Desempenho.</div>';
+        return;
+      }
+      $("#stats-lista").innerHTML = desempenhoMetodoHTML() + arr.map(desempenhoCard).join("");
+      return;
+    }
+
     if (ABA === 'jogos') {
       return arr.filter(function (j) {
         var okTime = (FILTRO === 'TODAS') || (j.home && j.home.sigla === FILTRO) || (j.away && j.away.sigla === FILTRO);
@@ -402,9 +452,90 @@
         return okTime && okFase && okStatus;
       });
     }
+    if (ABA === "desempenho") {
+      var campo = ORDEM_RANK || "indice_final";
+      var dir = DIRECAO_RANK === "asc" ? 1 : -1;
+      return arr.filter(function (x) {
+        var okTime = (FILTRO === "TODAS") || x.equipe === FILTRO;
+        var okSit = (SITUACAO_RANK === "TODAS") || String(x.situacao || "") === SITUACAO_RANK;
+        var okJogos = (x.jogos || 0) >= (MIN_JOGOS_RANK || 1);
+        return okTime && okSit && okJogos;
+      }).sort(function (a, b) {
+        var av = a[campo], bv = b[campo];
+        if (av == null && bv == null) return (a.nome || "").localeCompare(b.nome || "", "pt-BR");
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        return (Number(av) - Number(bv)) * dir || (a.nome || "").localeCompare(b.nome || "", "pt-BR");
+      });
+    }
     if (FILTRO === 'TODAS') return arr;
     return arr.filter(function (x) { return x.equipe === FILTRO; });
   }
+  function fmtRankNum(v, casas) {
+    if (v == null || v === "" || isNaN(Number(v))) return "—";
+    return Number(v).toLocaleString("pt-BR", { minimumFractionDigits: casas || 0, maximumFractionDigits: casas || 0 });
+  }
+  function fmtRankDec(v) {
+    if (v == null || v === "" || isNaN(Number(v))) return "—";
+    return Number(v).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+  function desempenhoCard(item, idx) {
+    var pos = item.posicao || (idx + 1);
+    var situ = item.situacao || "Em disputa";
+    var situCls = situ === "Eliminada" ? "elim" : (situ === "Classificada" ? "class" : "disp");
+    var posse = fmtRankDec(item.posse_media);
+    var fin = fmtRankDec(item.finalizacoes_jogo);
+    var chgol = fmtRankDec(item.chutes_gol_jogo);
+    var gols = fmtRankDec(item.gols_jogo);
+    return '<article class="rank-card">' +
+      '<div class="rank-head">' +
+        '<div class="rank-pos">' + esc(pos) + 'º</div>' +
+        '<div class="rank-team">' + flag(item.equipe) + '<div><strong>' + esc(nomeSelecao(item.equipe)) + '</strong><span>' + esc(item.equipe || "—") + ' · ' + esc(item.jogos || 0) + ' jogo' + ((item.jogos || 0) === 1 ? '' : 's') + '</span></div></div>' +
+        '<div class="rank-score"><b>' + fmtRankDec(item.indice_final) + '</b><small>índice</small></div>' +
+      '</div>' +
+      '<div class="rank-bars">' +
+        rankBar("Ataque", item.ataque) +
+        rankBar("Domínio", item.dominio) +
+        rankBar("Defesa", item.defesa) +
+        rankBar("Eficiência", item.eficiencia) +
+      '</div>' +
+      '<div class="rank-mini">' +
+        '<span>Posse <b>' + posse + '%</b></span>' +
+        '<span>Fin./jogo <b>' + fin + '</b></span>' +
+        '<span>Chutes gol <b>' + chgol + '</b></span>' +
+        '<span>Gols/jogo <b>' + gols + '</b></span>' +
+      '</div>' +
+      '<details class="rank-details">' +
+        '<summary>Ver metodologia e detalhes ▾</summary>' +
+        '<div class="rank-detail-grid">' +
+          '<span>Ataque <b>' + fmtRankDec(item.ataque) + '</b></span>' +
+          '<span>Domínio <b>' + fmtRankDec(item.dominio) + '</b></span>' +
+          '<span>Defesa <b>' + fmtRankDec(item.defesa) + '</b></span>' +
+          '<span>Eficiência <b>' + fmtRankDec(item.eficiencia) + '</b></span>' +
+          '<span>Disciplina <b>' + fmtRankDec(item.disciplina) + '</b></span>' +
+          '<span>Gols pró <b>' + esc(item.gols_pro == null ? "—" : item.gols_pro) + '</b></span>' +
+          '<span>Gols contra <b>' + esc(item.gols_contra == null ? "—" : item.gols_contra) + '</b></span>' +
+          '<span>Jogos c/ stats <b>' + esc(item.jogos_com_estatisticas || 0) + '</b></span>' +
+        '</div>' +
+        '<p>Índice próprio do site: médias por jogo, normalização pelo torneio, corte de extremos e ajuste para amostras pequenas. Situação não entra no cálculo.</p>' +
+      '</details>' +
+      '<div class="rank-foot"><span class="rank-situacao ' + situCls + '">' + esc(situ) + '</span><span>Ranking de Desempenho · não oficial</span></div>' +
+    '</article>';
+  }
+  function rankBar(label, val) {
+    var n = Math.max(0, Math.min(100, Number(val || 0)));
+    return '<div class="rank-bar"><span><b>' + esc(label) + '</b><em>' + fmtRankDec(val) + '</em></span><i><u style="width:' + n.toFixed(1) + '%"></u></i></div>';
+  }
+  function desempenhoMetodoHTML() {
+    var d = RANKING_DESEMPENHO || {};
+    var obs = (d.observacoes || []).slice(0, 4).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join("");
+    return '<section class="rank-metodo">' +
+      '<b>Ranking de Desempenho</b>' +
+      '<p>Índice de 0 a 100 baseado em produção ofensiva, domínio, solidez defensiva, eficiência e disciplina. Atualiza pelo workflow; não há cálculo pesado no navegador.</p>' +
+      (obs ? '<ul>' + obs + '</ul>' : '') +
+    '</section>';
+  }
+
   function jogoCard(j) {
     var bloco = (window.COPA_JOGO_STATS && COPA_JOGO_STATS.bloco)
       ? COPA_JOGO_STATS.bloco({ eventId: j.id, homeId: j.home.sigla, awayId: j.away.sigla, homeName: j.home.nome, awayName: j.away.nome, live: j.state === "in" })
@@ -494,8 +625,20 @@
     $$(".stat-tab").forEach(function (b) { b.classList.toggle("ativa", b.dataset.aba === ABA); });
     renderFiltro();
     var arr = filtrar(listaDaAba());
-    var titulo = ABA === 'assistencias' ? 'Assistências' : (ABA === 'gols_selecao' ? 'Gols por seleção' : (ABA === 'jogos' ? 'Estatísticas por jogo' : 'Artilheiros'));
+    var titulo = ABA === 'assistencias' ? 'Assistências' : (ABA === 'gols_selecao' ? 'Gols por seleção' : (ABA === 'jogos' ? 'Estatísticas por jogo' : (ABA === 'desempenho' ? 'Ranking de Desempenho' : 'Artilheiros')));
     $("#stats-titulo-lista").textContent = titulo;
+
+    if (ABA === "desempenho") {
+      pararMonitorAoVivo();
+      atualizarStatusLive([]);
+      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões")) : "sem dados";
+      if (!arr.length) {
+        $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há dados suficientes para o Ranking de Desempenho.</div>';
+        return;
+      }
+      $("#stats-lista").innerHTML = desempenhoMetodoHTML() + arr.map(desempenhoCard).join("");
+      return;
+    }
 
     if (ABA === 'jogos') {
       $("#stats-contagem").textContent = arr.length ? (arr.length + ' ' + (arr.length > 1 ? 'jogos' : 'jogo')) : 'sem jogos';
@@ -561,10 +704,16 @@
       return r.json();
     }).catch(function () { return {}; });
 
-    var ambos = await Promise.all([dadosReq, jogosReq, rostosReq]);
+    var rankingReq = fetch('dados/ranking-desempenho.json?v=' + Date.now()).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).catch(function () { return { ranking: [] }; });
+
+    var ambos = await Promise.all([dadosReq, jogosReq, rostosReq, rankingReq]);
     DADOS = ambos[0] || DADOS;
     JOGOS = ambos[1] || [];
     ROSTOS = ambos[2] || {};
+    RANKING_DESEMPENHO = ambos[3] || { ranking: [] };
     renderTudo();
   }
   document.addEventListener('visibilitychange', function () {

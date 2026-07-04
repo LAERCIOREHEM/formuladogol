@@ -25,7 +25,7 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0PPWGP93FD');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css?v=20260703stats-live-v14">
+<link rel="stylesheet" href="css/copa.css?v=20260704ranking-v16">
 <style>
   .wrap{max-width:580px;margin:0 auto;padding:16px 12px 60px}
   .stat-hero{margin-top:14px}
@@ -260,6 +260,7 @@
     <button class="stat-tab" type="button" data-aba="assistencias">🎯 Assistências</button>
     <button class="stat-tab" type="button" data-aba="gols_selecao">🥅 Gols/seleção</button>
     <button class="stat-tab" type="button" data-aba="jogos">📋 Por jogo</button>
+    <button class="stat-tab" type="button" data-aba="desempenho">⚡ Desempenho</button>
   </div>
 
   <div class="stat-filtros-linha">
@@ -270,6 +271,44 @@
     <div class="stat-filtro stat-filtro-extra" id="stat-fase-wrap" hidden>
       <label for="stat-fase">Fase</label>
       <select id="stat-fase"><option value="TODAS">Todas as fases</option></select>
+    </div>
+    <div class="stat-filtro stat-filtro-extra" id="stat-situacao-wrap" hidden>
+      <label for="stat-situacao">Situação</label>
+      <select id="stat-situacao">
+        <option value="TODAS">Todas</option>
+        <option value="Em disputa">Em disputa</option>
+        <option value="Classificada">Classificada</option>
+        <option value="Eliminada">Eliminada</option>
+      </select>
+    </div>
+    <div class="stat-filtro stat-filtro-extra" id="stat-min-jogos-wrap" hidden>
+      <label for="stat-min-jogos">Mín. jogos</label>
+      <select id="stat-min-jogos">
+        <option value="1">1+</option>
+        <option value="2">2+</option>
+        <option value="3">3+</option>
+      </select>
+    </div>
+    <div class="stat-filtro stat-filtro-extra" id="stat-ordem-wrap" hidden>
+      <label for="stat-ordem">Ordenar</label>
+      <select id="stat-ordem">
+        <option value="indice_final">Índice final</option>
+        <option value="ataque">Ataque</option>
+        <option value="dominio">Domínio</option>
+        <option value="defesa">Defesa</option>
+        <option value="eficiencia">Eficiência</option>
+        <option value="disciplina">Disciplina</option>
+        <option value="posse_media">Posse</option>
+        <option value="gols_jogo">Gols/jogo</option>
+        <option value="chutes_gol_jogo">Chutes no gol</option>
+      </select>
+    </div>
+    <div class="stat-filtro stat-filtro-extra" id="stat-direcao-wrap" hidden>
+      <label for="stat-direcao">Ordem</label>
+      <select id="stat-direcao">
+        <option value="desc">Maior primeiro</option>
+        <option value="asc">Menor primeiro</option>
+      </select>
     </div>
   </div>
 
@@ -284,7 +323,7 @@
     <div class="stat-vazio">Carregando estatísticas…</div>
   </main>
 
-  <p class="stat-nota"><b>Nota:</b> assistências aparecem conforme disponibilidade no feed da ESPN. Quando a fonte não informa a assistência de um lance, o site não inventa nem estima. Cartões seguem coletados no arquivo de dados para fair play/desempates, mas saíram do destaque principal.</p>
+  <p class="stat-nota"><b>Nota:</b> assistências e estatísticas avançadas aparecem conforme disponibilidade no feed da ESPN. Quando a fonte não informa assistência, xG, grandes chances ou qualquer métrica, o site não inventa nem estima. O Ranking de Desempenho é metodologia própria, não oficial, e usa médias por jogo com ajuste estatístico para amostras pequenas.</p>
 </div>
 
 <footer class="rodape">
@@ -300,7 +339,7 @@
 
 <script src="js/times.js?v=20260623e2"></script>
 <script src="js/jogo-stats.js?v=20260703stats-live-v14"></script>
-<script src="js/estatisticas.js?v=20260703stats-live-v14"></script>
+<script src="js/estatisticas.js?v=20260704ranking-v16"></script>
   <script src="js/config.js?v=20260621f"></script>
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
 </body>
