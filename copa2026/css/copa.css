@@ -2780,3 +2780,23 @@ body .rank-metodo{
   border-color:rgba(255,224,118,.85) !important;
   box-shadow:0 8px 18px rgba(244,197,66,.12), inset 0 0 0 1px rgba(255,255,255,.12);
 }
+
+/* ==========================================================
+   Correção v21 — botão ativo das Estatísticas
+   ========================================================== */
+.stat-abas .stat-tab.ativa{
+  background:var(--gold) !important;
+  color:#302300 !important;
+  border-color:rgba(255,224,118,.95) !important;
+  box-shadow:0 8px 18px rgba(244,197,66,.18), inset 0 0 0 1px rgba(255,255,255,.18) !important;
+}
+.stat-abas .stat-tab.ativa:hover{
+  background:var(--gold) !important;
+  color:#302300 !important;
+}
+.stat-abas .stat-tab:not(.ativa){
+  color:#d9e5f4 !important;
+}
+.stat-abas .stat-tab:not(.ativa):hover{
+  color:#fff !important;
+}
