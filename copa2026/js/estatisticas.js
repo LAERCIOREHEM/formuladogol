@@ -630,8 +630,16 @@
     }
   }
 
+
+  function atualizarAtalhoMetodologiaRanking() {
+    var el = $("#ranking-metodo-atalho");
+    if (!el) return;
+    el.hidden = ABA !== "desempenho";
+  }
+
   function renderLista() {
     $$(".stat-tab").forEach(function (b) { b.classList.toggle("ativa", b.dataset.aba === ABA); });
+    atualizarAtalhoMetodologiaRanking();
     renderFiltro();
     var arr = filtrar(listaDaAba());
     var titulo = ABA === 'assistencias' ? 'Assistências' : (ABA === 'gols_selecao' ? 'Gols por seleção' : (ABA === 'jogos' ? 'Estatísticas por jogo' : (ABA === 'desempenho' ? 'Ranking de Desempenho' : 'Artilheiros')));

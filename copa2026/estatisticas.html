@@ -25,7 +25,7 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0PPWGP93FD');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css?v=20260704botoes-v21">
+<link rel="stylesheet" href="css/copa.css?v=20260704metodologia-ranking-v25">
 <style>
   .wrap{max-width:580px;margin:0 auto;padding:16px 12px 60px}
   .stat-hero{margin-top:14px}
@@ -230,7 +230,7 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="topo-estatisticas">
   <div class="hdr"><img class="hdr-img" src="img/header-copa26.jpg" width="920" height="236" alt="COPA 26 — Bolão Brasileirão Almoço"></div>
 
   <nav class="menu">
@@ -261,6 +261,10 @@
     <button class="stat-tab" type="button" data-aba="gols_selecao">🥅 Gols/seleção</button>
     <button class="stat-tab" type="button" data-aba="jogos">📋 Por jogo</button>
     <button class="stat-tab stat-tab-rank" type="button" data-aba="desempenho">⚡ Ranking de Desempenho</button>
+  </div>
+
+  <div id="ranking-metodo-atalho" class="ranking-metodo-atalho" hidden>
+    <a href="#metodologia-ranking">ℹ️ Como o Ranking de Desempenho é calculado?</a>
   </div>
 
   <div class="stat-filtros-linha">
@@ -323,6 +327,55 @@
     <div class="stat-vazio">Carregando estatísticas…</div>
   </main>
 
+
+  <section id="metodologia-ranking" class="metodologia-ranking" aria-labelledby="metodologia-ranking-titulo">
+    <div class="metodologia-ranking-head">
+      <span>⚡</span>
+      <div>
+        <h3 id="metodologia-ranking-titulo">Metodologia do Ranking de Desempenho</h3>
+        <p>Índice próprio do site, de 0 a 100, calculado pelo workflow a partir dos dados estatísticos disponíveis por jogo.</p>
+      </div>
+    </div>
+
+    <div class="metodologia-pesos" aria-label="Pesos do índice">
+      <span>Ataque <b>35%</b></span>
+      <span>Domínio <b>25%</b></span>
+      <span>Defesa <b>25%</b></span>
+      <span>Eficiência <b>10%</b></span>
+      <span>Disciplina <b>5%</b></span>
+    </div>
+
+    <div class="metodologia-blocos">
+      <div>
+        <h4>1. Médias por jogo</h4>
+        <p>O ranking não usa soma bruta. As estatísticas são transformadas em médias por partida, para que uma seleção com mais jogos não seja favorecida apenas por ter jogado mais.</p>
+      </div>
+      <div>
+        <h4>2. Normalização</h4>
+        <p>Cada métrica é comparada com o desempenho das demais seleções no torneio e convertida para uma escala comum de 0 a 100. Assim, gols, posse, chutes, defesa e disciplina podem ser combinados sem distorção.</p>
+      </div>
+      <div>
+        <h4>3. Corte de extremos</h4>
+        <p>Resultados muito fora da curva recebem controle estatístico para evitar que uma partida isolada ou um número atípico pese demais no índice final.</p>
+      </div>
+      <div>
+        <h4>4. Amostras pequenas</h4>
+        <p>Seleções com poucos jogos recebem ajuste de amostra, reduzindo exageros de desempenho causados por apenas uma ou duas partidas.</p>
+      </div>
+    </div>
+
+    <p class="metodologia-ranking-texto">
+      As dimensões do índice agrupam métricas ofensivas, controle de jogo, solidez defensiva, aproveitamento e disciplina. A situação da seleção — classificada, eliminada ou em disputa — aparece apenas como contexto visual e <b>não entra no cálculo</b>, porque no futebol o resultado também envolve chaveamento, pênaltis, detalhes pontuais e sorte.
+    </p>
+
+    <p class="metodologia-ranking-texto menor">
+      Quando alguma estatística não está disponível no feed, o site não inventa nem estima o dado. O ranking é recreativo, informativo e não oficial.
+    </p>
+
+    <a class="metodologia-voltar" href="#topo-estatisticas">↑ Voltar ao topo</a>
+  </section>
+
+
   <p class="stat-nota"><b>Nota:</b> assistências e estatísticas avançadas aparecem conforme disponibilidade no feed da ESPN. Quando a fonte não informa assistência, xG, grandes chances ou qualquer métrica, o site não inventa nem estima. O Ranking de Desempenho é metodologia própria, não oficial, e usa médias por jogo com ajuste estatístico para amostras pequenas.</p>
 </div>
 
@@ -339,7 +392,7 @@
 
 <script src="js/times.js?v=20260623e2"></script>
 <script src="js/jogo-stats.js?v=20260703stats-live-v14"></script>
-<script src="js/estatisticas.js?v=20260704fixes-v20"></script>
+<script src="js/estatisticas.js?v=20260704metodologia-ranking-v25"></script>
   <script src="js/config.js?v=20260621f"></script>
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
 </body>

@@ -2902,3 +2902,164 @@ body .rank-metodo{
 .mp-extrato .mp-ex-sec b{
   color:#fff;
 }
+
+/* ==========================================================
+   Estatísticas — metodologia do Ranking de Desempenho v25
+   ========================================================== */
+html{
+  scroll-behavior:smooth;
+}
+.ranking-metodo-atalho{
+  margin:10px 2px 14px;
+  text-align:center;
+}
+.ranking-metodo-atalho[hidden]{
+  display:none !important;
+}
+.ranking-metodo-atalho a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:7px 12px;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:999px;
+  color:#cfe0f7;
+  background:rgba(255,255,255,.035);
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+}
+.ranking-metodo-atalho a:hover{
+  color:#fff;
+  border-color:rgba(255,204,41,.55);
+  background:rgba(255,204,41,.08);
+}
+.metodologia-ranking{
+  margin:22px 0 12px;
+  padding:16px;
+  border:1px solid rgba(255,204,41,.48);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(255,204,41,.10),transparent 32%),
+    rgba(15,42,78,.92);
+  box-shadow:0 12px 26px rgba(0,0,0,.20);
+  scroll-margin-top:18px;
+}
+.metodologia-ranking-head{
+  display:flex;
+  gap:11px;
+  align-items:flex-start;
+  margin-bottom:12px;
+}
+.metodologia-ranking-head > span{
+  width:34px;
+  height:34px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,204,41,.40);
+  background:rgba(255,204,41,.09);
+  flex:0 0 auto;
+}
+.metodologia-ranking h3{
+  margin:0 0 4px;
+  color:var(--gold);
+  font-size:18px;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.metodologia-ranking p{
+  margin:0;
+  color:#c7d5e8;
+  line-height:1.45;
+}
+.metodologia-pesos{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+  margin:12px 0;
+}
+.metodologia-pesos span{
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:13px;
+  background:rgba(255,255,255,.045);
+  padding:9px 6px;
+  text-align:center;
+  color:#b8c9de;
+  font-size:11px;
+  font-weight:900;
+}
+.metodologia-pesos b{
+  display:block;
+  color:#fff;
+  font-size:17px;
+  margin-top:3px;
+}
+.metodologia-blocos{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  margin:12px 0;
+}
+.metodologia-blocos div{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  background:rgba(0,0,0,.13);
+  padding:11px;
+}
+.metodologia-blocos h4{
+  margin:0 0 5px;
+  color:#fff;
+  font-size:13px;
+}
+.metodologia-blocos p,
+.metodologia-ranking-texto{
+  font-size:12.5px;
+}
+.metodologia-ranking-texto{
+  margin-top:10px !important;
+}
+.metodologia-ranking-texto.menor{
+  font-size:11.5px;
+  color:#aebfda;
+}
+.metodologia-voltar{
+  display:inline-flex;
+  margin-top:13px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  color:#fff;
+  background:rgba(255,255,255,.045);
+  text-decoration:none;
+  font-size:12px;
+  font-weight:900;
+}
+.metodologia-voltar:hover{
+  border-color:rgba(255,204,41,.55);
+  color:var(--gold);
+}
+@media(max-width:620px){
+  .metodologia-ranking{
+    padding:14px;
+    border-radius:18px;
+  }
+  .metodologia-ranking h3{
+    font-size:16px;
+  }
+  .metodologia-pesos{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .metodologia-pesos span:last-child{
+    grid-column:1 / -1;
+  }
+  .metodologia-blocos{
+    grid-template-columns:1fr;
+  }
+  .ranking-metodo-atalho a{
+    width:100%;
+    max-width:360px;
+  }
+}
