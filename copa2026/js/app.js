@@ -28,6 +28,7 @@
   const TRAVA_MS = Date.parse("2026-06-11T03:00:00Z"); // 10/06 23h59 Brasília
   let faseAtual = "grupos", grupoAberto = null, saveTimer = null;
   let atualizarFeedbackFase = null;
+  let oficialTimer = null;
 
   const $ = s => document.querySelector(s);
   const el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; };
@@ -71,6 +72,7 @@
       DADOS.nomeDe = {}; DADOS.isoDe = {};
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
       carregarOficialAtual(); // assíncrono: alimenta os ✓/✗ dos palpites sem travar o login
+      if (!oficialTimer) oficialTimer = setInterval(carregarOficialAtual, 120000); // espelha a atualização do Bolão
     } catch (err) {
       $("#tela-login").innerHTML = '<div class="cartao-login"><h2>Erro ao carregar dados</h2>' +
         '<p class="prazo">Abra o módulo por um servidor (ex.: <code>python -m http.server</code>) ' +
@@ -867,13 +869,120 @@ async function carregarOficialAtual() {
       `<b>Atenção:</b> a combinação de terceiros (grupos <b>${chave}</b>) não está na tabela do Anexo C. ` +
       `Com o arquivo completo isso não deve acontecer — confira o <code>terceiros_map.json</code>.`);
   }
+
+  function nomeTime(id) {
+    return (DADOS.nomeDe && DADOS.nomeDe[id]) || id || "—";
+  }
+  function interPts(a, b) {
+    const sb = new Set(b || []);
+    return (a || []).filter(x => sb.has(x));
+  }
+  function fasePontuacaoAtiva(key, o) {
+    const ap = (o && o._apurarMata) || {};
+    if (key === "classificados32" || key === "melhores_terceiros") return true;
+    if (key === "avancam_oitavas") return !!ap.oitavas;
+    if (key === "avancam_quartas") return !!ap.quartas;
+    if (key === "semifinalistas") return !!ap.semis;
+    if (key === "finalistas") return !!ap.final;
+    return true;
+  }
+  function linhaExtratoMP(label, pts, tipo) {
+    const sinal = pts > 0 ? "+" : "";
+    return `<div class="mp-ex-row ${tipo || ""}"><span>${label}</span><b>${sinal}${pts}</b></div>`;
+  }
+  function extratoPontuacaoMeuPalpite(p, o, r) {
+    if (!o || !o._meta) {
+      return '<div class="mp-extrato"><div class="mp-ex-sec">Carregando resultados oficiais…</div><div class="mp-ex-row"><span>A pontuação será recalculada assim que o feed de resultados carregar.</span><b>—</b></div></div>';
+    }
+    const PTS = COPA_PONTUACAO.PESOS;
+    const det = COPA_PONTUACAO.calcularAtuais(p, o);
+    const eliminados = new Set(o.eliminados || []);
+    const classificados = new Set(o.classificados32 || []);
+    const linhasOk = [];
+    const linhasNo = [];
+
+    function ok(label, pts) { if (pts) linhasOk.push(linhaExtratoMP(label, pts, "ok")); }
+    function no(label, pts) { if (pts) linhasNo.push(linhaExtratoMP(label, -pts, "err")); }
+
+    const nClassif = interPts(p.classificados32, o.classificados32 || []).length;
+    ok(`${nClassif} seleções entre as 32 classificadas (×${PTS.classificado32})`, nClassif * PTS.classificado32);
+
+    const nTer = interPts(p.melhores_terceiros, o.melhores_terceiros || []).length;
+    ok(`${nTer} melhores terceiros (×${PTS.melhorTerceiro})`, nTer * PTS.melhorTerceiro);
+
+    const oc = o.classificacao || {};
+    let a1 = 0, a2 = 0, a3 = 0, a4 = 0, e1 = 0, e2 = 0, e3 = 0, e4 = 0;
+    Object.keys(oc).forEach(g => {
+      const pg = (p.classificacao || {})[g];
+      if (!pg) return;
+      if (pg[0] && oc[g][0]) { if (pg[0].id === oc[g][0].id) a1++; else e1++; }
+      if (pg[1] && oc[g][1]) { if (pg[1].id === oc[g][1].id) a2++; else e2++; }
+      if (pg[2] && oc[g][2]) { if (pg[2].id === oc[g][2].id) a3++; else e3++; }
+      if (pg[3] && oc[g][3]) { if (pg[3].id === oc[g][3].id) a4++; else e4++; }
+    });
+    ok(`${a1} campeões de grupo certos (×${PTS.campGrupo})`, a1 * PTS.campGrupo);
+    ok(`${a2} vices de grupo certos (×${PTS.viceGrupo})`, a2 * PTS.viceGrupo);
+    ok(`${a3} terceiros de grupo certos (×${PTS.terGrupo})`, a3 * PTS.terGrupo);
+    ok(`${a4} quartos de grupo certos (×${PTS.ultGrupo})`, a4 * PTS.ultGrupo);
+
+    const nOit = interPts(p.avancam_oitavas, o.avancam_oitavas || []).length;
+    const nQua = interPts(p.avancam_quartas, o.avancam_quartas || []).length;
+    const nSemi = interPts(p.semifinalistas, o.semifinalistas || []).length;
+    const nFin = interPts(p.finalistas, o.finalistas || []).length;
+    ok(`${nOit} seleções nas oitavas (×${PTS.oitavas})`, nOit * PTS.oitavas);
+    ok(`${nQua} seleções nas quartas (×${PTS.quartas})`, nQua * PTS.quartas);
+    ok(`${nSemi} semifinalistas (×${PTS.semi})`, nSemi * PTS.semi);
+    ok(`${nFin} finalistas (×${PTS.final})`, nFin * PTS.final);
+    ok(`Campeão certo`, det.campeao || 0);
+    ok(`Vice certo`, det.vice || 0);
+    ok(`3º lugar certo`, det.terceiro || 0);
+    ok(`4º lugar certo`, det.quarto || 0);
+
+    const fora32 = (p.classificados32 || []).filter(id => o.classificados32 && o.classificados32.length && !classificados.has(id));
+    no(`${fora32.length} seleções fora das 32 (×${PTS.classificado32})${fora32.length ? ": " + fora32.map(nomeTime).join(", ") : ""}`, fora32.length * PTS.classificado32);
+
+    const mtSet = new Set(o.melhores_terceiros || []);
+    const mtErr = (p.melhores_terceiros || []).filter(id => o.melhores_terceiros && o.melhores_terceiros.length && !mtSet.has(id));
+    no(`${mtErr.length} melhores terceiros errados (×${PTS.melhorTerceiro})`, mtErr.length * PTS.melhorTerceiro);
+
+    no(`${e1} campeões de grupo errados (×${PTS.campGrupo})`, e1 * PTS.campGrupo);
+    no(`${e2} vices de grupo errados (×${PTS.viceGrupo})`, e2 * PTS.viceGrupo);
+    no(`${e3} terceiros de grupo errados (×${PTS.terGrupo})`, e3 * PTS.terGrupo);
+    no(`${e4} quartos de grupo errados (×${PTS.ultGrupo})`, e4 * PTS.ultGrupo);
+
+    function perdMata(key, oficiais, peso, rotulo) {
+      if (!fasePontuacaoAtiva(key, o)) return;
+      const conf = new Set(oficiais || []);
+      const ids = (p[key] || []).filter(id => eliminados.has(id) && !conf.has(id));
+      if (ids.length) no(`${ids.length} ${rotulo} (×${peso}): ${ids.map(nomeTime).join(", ")}`, ids.length * peso);
+    }
+    perdMata("avancam_oitavas", o.avancam_oitavas, PTS.oitavas, "seleções não avançaram às oitavas");
+    perdMata("avancam_quartas", o.avancam_quartas, PTS.quartas, "seleções não avançaram às quartas");
+    perdMata("semifinalistas", o.semifinalistas, PTS.semi, "semifinalistas perdidos");
+    perdMata("finalistas", o.finalistas, PTS.final, "finalistas perdidos");
+
+    if (o.decididos && o.decididos.campeao && p.campeao && p.campeao !== o.campeao) no(`Campeão errado: ${nomeTime(p.campeao)}`, PTS.campeao);
+    if (o.decididos && o.decididos.vice && p.vice && p.vice !== o.vice) no(`Vice errado: ${nomeTime(p.vice)}`, PTS.vice);
+    if (o.decididos && o.decididos.terceiro && p.terceiro && p.terceiro !== o.terceiro) no(`3º lugar errado: ${nomeTime(p.terceiro)}`, PTS.terceiro);
+    if (o.decididos && o.decididos.quarto && p.quarto && p.quarto !== o.quarto) no(`4º lugar errado: ${nomeTime(p.quarto)}`, PTS.quarto);
+
+    const okHTML = linhasOk.length ? linhasOk.join("") : linhaExtratoMP("Ainda sem pontos conquistados", 0, "");
+    const noHTML = linhasNo.length ? linhasNo.join("") : linhaExtratoMP("Nenhum ponto perdido até agora", 0, "");
+
+    return `<div class="mp-extrato">
+      <div class="mp-ex-sec">✅ Conquistados (${r.atuais} pts)</div>${okHTML}
+      <div class="mp-ex-sec">❌ Perdidos (${r.perdidos} pts)</div>${noHTML}
+      <div class="mp-ex-sec">⏳ Ainda possíveis: <b>${r.possiveis} pts</b> · Teto: <b>${r.teto} pts</b></div>
+      <div class="mp-ex-nota">Espelhado da aba Bolão: mesmo motor, mesmos pesos e mesma leitura dos resultados oficiais.</div>
+    </div>`;
+  }
+
   function blocoRevisao() {
     recomputar();
     const box = el("div", "revisao");
     box.innerHTML = "<h4 style='margin-bottom:10px;color:var(--cinza);font-size:13px;letter-spacing:1px;text-transform:uppercase'>Revisão do palpite</h4>";
-    // Campeão/Vice/3º/4º: usa a lista CANÔNICA auditada quando disponível (fiel ao que foi
-    // cravado), em vez da propagação por posição do chaveamento — que mudava de seleção com
-    // a correção do desempate da FIFA (ex.: vice aparecia como Arábia em vez de Espanha).
+
+    // Campeão/Vice/3º/4º: usa a lista CANÔNICA auditada quando disponível.
     const can = meuCanonico();
     const pod = can
       ? { campeao: can.campeao, vice: can.vice, terceiro: can.terceiro, quarto: can.quarto }
@@ -881,14 +990,39 @@ async function carregarOficialAtual() {
     [["Campeão", pod.campeao], ["Vice", pod.vice], ["3º lugar", pod.terceiro], ["4º lugar", pod.quarto]].forEach(([l, id]) => {
       box.appendChild(el("div", "linha", `<span>${l}</span><b>${id ? bandeira(id) + " " + (DADOS.nomeDe[id] || id) : "—"}</b>`));
     });
-    const teto = COPA_PONTUACAO.teto(derivado);
-    const pb = el("div", "pontos-box");
+
+    const dPont = aplicarMataCanonico(JSON.parse(JSON.stringify(derivado || {})), USER && USER.nome ? USER.nome : "");
+    const teto = COPA_PONTUACAO.teto(dPont);
+    const oficial = DADOS.oficial || null;
+    const r = oficial
+      ? COPA_PONTUACAO.calcular(dPont, oficial)
+      : { atuais:0, perdidos:0, possiveis:teto, teto:teto };
+
+    const pb = el("div", "pontos-box mp-pontos-box");
     pb.innerHTML =
-      `<div class="pt"><div class="n">0</div><div class="l">Pontos atuais</div></div>` +
-      `<div class="pt"><div class="n">${teto}</div><div class="l">Ainda possíveis</div></div>` +
-      `<div class="pt"><div class="n">${teto}</div><div class="l">Teto máximo</div></div>`;
+      `<div class="pt"><div class="n">${r.atuais}</div><div class="l">Pontos atuais</div></div>` +
+      `<div class="pt"><div class="n">${r.perdidos}</div><div class="l">Perdidos</div></div>` +
+      `<div class="pt"><div class="n">${r.possiveis}</div><div class="l">Ainda possíveis</div></div>` +
+      `<div class="pt"><div class="n">${r.teto}</div><div class="l">Teto máximo</div></div>`;
     box.appendChild(pb);
-    box.appendChild(el("div", "linha", `<span style='color:var(--cinza);font-size:13px'>Atuais e perdidos passam a contar quando os resultados oficiais entrarem.</span><span></span>`));
+
+    const nota = oficial
+      ? "Pontuação espelhada da aba Bolão, usando os resultados oficiais atuais."
+      : "Carregando resultados oficiais para espelhar a pontuação da aba Bolão…";
+    box.appendChild(el("div", "linha", `<span style='color:var(--cinza);font-size:13px'>${nota}</span><span></span>`));
+
+    const btn = el("button", "vermais mp-vermais", "Ver extrato dos pontos ▾");
+    const ext = el("div", "extbox mp-extbox");
+    ext.style.display = "none";
+    ext.innerHTML = extratoPontuacaoMeuPalpite(dPont, oficial, r);
+    btn.onclick = () => {
+      const aberto = ext.style.display === "none";
+      ext.style.display = aberto ? "block" : "none";
+      btn.innerHTML = aberto ? "Ocultar extrato ▴" : "Ver extrato dos pontos ▾";
+    };
+    box.appendChild(btn);
+    box.appendChild(ext);
+
     return box;
   }
 
