@@ -685,6 +685,61 @@
       };
     });
   }
+  function estadoJogoRank(j) {
+    return String((j && j.state) || "").toLowerCase();
+  }
+  function faseEhMataRank(j) {
+    return !!(j && j.fase && j.fase !== "group-stage");
+  }
+  function timesJogoRank(j) {
+    var out = [];
+    if (j && j.home && j.home.sigla) out.push(siglaSelecao(j.home.sigla));
+    if (j && j.away && j.away.sigla) out.push(siglaSelecao(j.away.sigla));
+    return out.filter(Boolean);
+  }
+  function vencedorPerdedorRank(j) {
+    if (!j || !j.home || !j.away) return null;
+    var h = siglaSelecao(j.home.sigla), a = siglaSelecao(j.away.sigla);
+    var hs = parseInt(String(j.home.score || "").replace(/[^0-9-]/g, ""), 10);
+    var as = parseInt(String(j.away.score || "").replace(/[^0-9-]/g, ""), 10);
+    if (!h || !a || isNaN(hs) || isNaN(as) || hs === as) return null;
+    return hs > as ? { vencedor:h, perdedor:a } : { vencedor:a, perdedor:h };
+  }
+  function corrigirSituacaoRankingComJogos() {
+    var ranking = (RANKING_DESEMPENHO && RANKING_DESEMPENHO.ranking) || [];
+    if (!ranking.length || !JOGOS || !JOGOS.length) return;
+
+    var temMata = JOGOS.some(faseEhMataRank);
+    if (!temMata) return; // antes do mata-mata, não força eliminação por falta de jogos futuros.
+
+    var situ = {};
+    ranking.forEach(function (x) {
+      var eq = siglaSelecao(x.equipe);
+      if (eq) situ[eq] = "Eliminada";
+    });
+
+    // Perdedor de mata encerrado é eliminado; vencedor fica classificado salvo se tiver jogo em andamento/futuro.
+    JOGOS.forEach(function (j) {
+      if (!faseEhMataRank(j) || estadoJogoRank(j) !== "post") return;
+      var vp = vencedorPerdedorRank(j);
+      if (!vp) return;
+      situ[vp.perdedor] = "Eliminada";
+      if (situ[vp.vencedor] !== "Em disputa") situ[vp.vencedor] = "Classificada";
+    });
+
+    // Quem tem jogo futuro ou ao vivo ainda está em disputa.
+    JOGOS.forEach(function (j) {
+      var st = estadoJogoRank(j);
+      if (st !== "pre" && st !== "in") return;
+      timesJogoRank(j).forEach(function (eq) { situ[eq] = "Em disputa"; });
+    });
+
+    ranking.forEach(function (x) {
+      var eq = siglaSelecao(x.equipe);
+      if (eq && situ[eq]) x.situacao = situ[eq];
+    });
+  }
+
   function renderTudo() {
     $("#stat-atualizado").textContent = fmtData(DADOS.atualizado_em);
     $("#stat-processados").textContent = String(DADOS.jogos_processados || 0);
@@ -724,6 +779,7 @@
     JOGOS = ambos[1] || [];
     ROSTOS = ambos[2] || {};
     RANKING_DESEMPENHO = ambos[3] || { ranking: [] };
+    corrigirSituacaoRankingComJogos();
     renderTudo();
   }
   document.addEventListener('visibilitychange', function () {

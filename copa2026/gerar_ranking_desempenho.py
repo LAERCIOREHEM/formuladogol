@@ -219,9 +219,13 @@ def score_num(v: Any) -> Optional[int]:
 
 def extrair_scoreboard(events: List[Dict[str, Any]]) -> Tuple[Dict[str, Dict[str, int]], Dict[str, str], Dict[str, float]]:
     gols = defaultdict(lambda: {"pro": 0, "contra": 0, "jogos": 0, "vitorias": 0, "empates": 0, "derrotas": 0, "pontos": 0})
+    event_teams = set()
+    ativos = set()
+    vencedores_mata = set()
+    perdedores_mata = set()
     situacao: Dict[str, str] = {}
     ultimo_ts: Dict[str, float] = {}
-    tem_jogo_futuro = set()
+    tem_mata = False
 
     for ev in events:
         comp = (ev.get("competitions") or [{}])[0]
@@ -233,8 +237,13 @@ def extrair_scoreboard(events: List[Dict[str, Any]]) -> Tuple[Dict[str, Dict[str
         h, a = team_sig(home), team_sig(away)
         if not h or not a:
             continue
+
+        event_teams.update([h, a])
         st = (((comp.get("status") or {}).get("type") or {}).get("state") or "pre").lower()
         slug = ((ev.get("season") or {}).get("slug") or "").lower()
+        if slug and slug != "group-stage":
+            tem_mata = True
+
         dt = ev.get("date") or ""
         try:
             ts = datetime.fromisoformat(dt.replace("Z", "+00:00")).timestamp()
@@ -244,9 +253,7 @@ def extrair_scoreboard(events: List[Dict[str, Any]]) -> Tuple[Dict[str, Dict[str
             ultimo_ts[sig] = max(ultimo_ts.get(sig, 0), ts)
 
         if st in {"pre", "in"}:
-            tem_jogo_futuro.update([h, a])
-            situacao[h] = "Em disputa"
-            situacao[a] = "Em disputa"
+            ativos.update([h, a])
 
         if st == "post":
             hs, ass = score_num(home.get("score")), score_num(away.get("score"))
@@ -263,7 +270,6 @@ def extrair_scoreboard(events: List[Dict[str, Any]]) -> Tuple[Dict[str, Dict[str
                     gols[h]["empates"] += 1; gols[a]["empates"] += 1
                     gols[h]["pontos"] += 1; gols[a]["pontos"] += 1
 
-            # Situação contextual: mata-mata pós-jogo define eliminação do perdedor.
             if slug and slug != "group-stage":
                 winner = ""
                 if home.get("winner"): winner = h
@@ -272,10 +278,22 @@ def extrair_scoreboard(events: List[Dict[str, Any]]) -> Tuple[Dict[str, Dict[str
                     winner = h if hs > ass else a
                 if winner:
                     loser = a if winner == h else h
-                    if loser not in tem_jogo_futuro:
-                        situacao[loser] = "Eliminada"
-                    if winner not in tem_jogo_futuro:
-                        situacao[winner] = "Classificada"
+                    vencedores_mata.add(winner)
+                    perdedores_mata.add(loser)
+
+    # Situação contextual:
+    # - Se o mata-mata já começou, quem não está ativo nem venceu o último mata fica eliminado.
+    # - Perdedor de mata encerrado é eliminado.
+    # - Vencedor de mata encerrado fica classificado até ter próximo jogo.
+    # - Quem tem jogo futuro/ao vivo fica em disputa.
+    for sig in event_teams:
+        situacao[sig] = "Eliminada" if tem_mata else "Em disputa"
+    for sig in vencedores_mata:
+        situacao[sig] = "Classificada"
+    for sig in perdedores_mata:
+        situacao[sig] = "Eliminada"
+    for sig in ativos:
+        situacao[sig] = "Em disputa"
 
     return dict(gols), situacao, ultimo_ts
 

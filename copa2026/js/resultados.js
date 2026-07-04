@@ -1350,6 +1350,8 @@
         MATA_EVENTS_TS = Date.now();
       } catch (e) { /* mantém cache anterior */ }
     }
+    const jogosAuto = montarJogosMata(d);
+    FASE_MATA = escolherFaseMataAtual(jogosAuto);
     pintarFaseMata();
   }
 
@@ -1514,6 +1516,32 @@
     Object.values(fases).forEach(lista => (lista || []).forEach(j => { if (j && j.id) MATA_JOGOS_BY_ID[j.id] = j; }));
     return fases;
   }
+
+  function estadoJogoMataAutomatico(j) {
+    const ev = eventoMataDeOuSlot(j, MATA_EVENTS);
+    const st = ev && ev.competitions && ev.competitions[0] && ev.competitions[0].status && ev.competitions[0].status.type
+      ? ev.competitions[0].status.type.state
+      : "";
+    return String(st || "").toLowerCase();
+  }
+  function faseMataCompleta(lista) {
+    lista = lista || [];
+    if (!lista.length) return false;
+    return lista.every(function (j) { return estadoJogoMataAutomatico(j) === "post"; });
+  }
+  function escolherFaseMataAtual(jogosPorFase) {
+    const ordem = ["16-avos", "Oitavas", "Quartas", "Semis", "Final"];
+    for (let i = 0; i < ordem.length; i++) {
+      const fase = ordem[i];
+      const lista = (jogosPorFase && jogosPorFase[fase]) || [];
+      if (!faseMataCompleta(lista)) return fase;
+      if (i < ordem.length - 1) continue;
+      return "Final";
+    }
+    return "16-avos";
+  }
+
+
 
   function siglaHTMLMata(id) {
     const sig = dpSigla(id);
