@@ -435,7 +435,7 @@
     if (ABA === "desempenho") {
       pararMonitorAoVivo();
       atualizarStatusLive([]);
-      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões")) : "sem dados";
+      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões") + " · " + (SITUACAO_RANK === "TODAS" ? "todas" : SITUACAO_RANK.toLowerCase()) + " · " + (MIN_JOGOS_RANK || 1) + "+ jogos") : "sem dados";
       if (!arr.length) {
         $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há dados suficientes para o Ranking de Desempenho.</div>';
         return;
@@ -487,9 +487,9 @@
     var fin = fmtRankDec(item.finalizacoes_jogo);
     var chgol = fmtRankDec(item.chutes_gol_jogo);
     var gols = fmtRankDec(item.gols_jogo);
-    return '<article class="rank-card">' +
+    return '<article class="rank-card' + (idx === 0 ? ' rank-top' : '') + '">' +
       '<div class="rank-head">' +
-        '<div class="rank-pos">' + esc(pos) + 'º</div>' +
+        '<div class="rank-pos rank-pos-' + Math.min(Number(pos) || 0, 3) + '">' + esc(pos) + 'º</div>' +
         '<div class="rank-team">' + flag(item.equipe) + '<div><strong>' + esc(nomeSelecao(item.equipe)) + '</strong><span>' + esc(item.equipe || "—") + ' · ' + esc(item.jogos || 0) + ' jogo' + ((item.jogos || 0) === 1 ? '' : 's') + '</span></div></div>' +
         '<div class="rank-score"><b>' + fmtRankDec(item.indice_final) + '</b><small>índice</small></div>' +
       '</div>' +
@@ -528,11 +528,27 @@
   }
   function desempenhoMetodoHTML() {
     var d = RANKING_DESEMPENHO || {};
-    var obs = (d.observacoes || []).slice(0, 4).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join("");
+    var top = ((d.ranking || [])[0]) || null;
+    var atual = d.atualizado_em ? fmtData(d.atualizado_em) : "aguardando atualização";
+    var pesos = d.pesos || {};
+    var obs = (d.observacoes || []).slice(0, 3).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join("");
+    var topHtml = top
+      ? '<div class="rank-metodo-top">' + flag(top.equipe) + '<span>Líder atual</span><b>' + esc(nomeSelecao(top.equipe)) + '</b><em>' + fmtRankDec(top.indice_final) + '</em></div>'
+      : '';
     return '<section class="rank-metodo">' +
-      '<b>Ranking de Desempenho</b>' +
-      '<p>Índice de 0 a 100 baseado em produção ofensiva, domínio, solidez defensiva, eficiência e disciplina. Atualiza pelo workflow; não há cálculo pesado no navegador.</p>' +
-      (obs ? '<ul>' + obs + '</ul>' : '') +
+      '<div class="rank-metodo-head">' +
+        '<div><b>Ranking de Desempenho</b><p>Índice próprio do site, de 0 a 100, calculado pelo workflow e leve no navegador.</p></div>' +
+        topHtml +
+      '</div>' +
+      '<div class="rank-pesos">' +
+        '<span>Ataque <b>' + esc(pesos.ataque || "35%") + '</b></span>' +
+        '<span>Domínio <b>' + esc(pesos.dominio || "25%") + '</b></span>' +
+        '<span>Defesa <b>' + esc(pesos.defesa || "25%") + '</b></span>' +
+        '<span>Eficiência <b>' + esc(pesos.eficiencia || "10%") + '</b></span>' +
+        '<span>Disciplina <b>' + esc(pesos.disciplina || "5%") + '</b></span>' +
+      '</div>' +
+      '<div class="rank-update">Atualizado pelo workflow: <b>' + esc(atual) + '</b></div>' +
+      (obs ? '<details class="rank-metodo-details"><summary>Como o índice é calculado ▾</summary><ul>' + obs + '</ul></details>' : '') +
     '</section>';
   }
 
@@ -631,7 +647,7 @@
     if (ABA === "desempenho") {
       pararMonitorAoVivo();
       atualizarStatusLive([]);
-      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões")) : "sem dados";
+      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões") + " · " + (SITUACAO_RANK === "TODAS" ? "todas" : SITUACAO_RANK.toLowerCase()) + " · " + (MIN_JOGOS_RANK || 1) + "+ jogos") : "sem dados";
       if (!arr.length) {
         $("#stats-lista").innerHTML = '<div class="stat-vazio">Ainda não há dados suficientes para o Ranking de Desempenho.</div>';
         return;
@@ -671,6 +687,7 @@
     $$(".stat-tab").forEach(function (b) {
       b.onclick = function () {
         ABA = b.dataset.aba || 'artilheiros';
+        try { b.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); } catch (e) {}
         renderLista();
       };
     });

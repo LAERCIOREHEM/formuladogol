@@ -2216,7 +2216,7 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   padding:13px;
   box-shadow:0 10px 24px rgba(0,0,0,.20);
 }
-.rank-card:nth-of-type(2){
+.rank-card.rank-top{
   border-color:rgba(255,204,41,.45);
   background:
     radial-gradient(circle at 100% 0%,rgba(255,204,41,.11),transparent 28%),
@@ -2439,5 +2439,171 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .rank-foot{
     align-items:flex-start;
     flex-direction:column;
+  }
+}
+
+/* ==========================================================
+   Ranking de Desempenho — acabamento visual v17
+   ========================================================== */
+.stat-filtros-linha{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0 10px;
+  align-items:end;
+}
+.stat-filtros-linha .stat-filtro{
+  min-width:0;
+}
+.stat-filtros-linha .stat-filtro[hidden]{
+  display:none !important;
+}
+.stat-abas{
+  scroll-snap-type:x proximity;
+}
+.stat-abas .stat-tab{
+  scroll-snap-align:center;
+}
+.rank-metodo{
+  padding:14px;
+}
+.rank-metodo-head{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 156px;
+  gap:12px;
+  align-items:stretch;
+}
+.rank-metodo-head p{
+  margin:0;
+  color:#cbd8ea;
+}
+.rank-metodo-top{
+  display:grid;
+  grid-template-columns:30px 1fr auto;
+  align-items:center;
+  gap:6px 8px;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:14px;
+  padding:8px;
+}
+.rank-metodo-top .stat-flag{
+  width:30px;
+  height:20px;
+  object-fit:cover;
+  grid-row:1 / span 2;
+}
+.rank-metodo-top span{
+  color:#9fb0c7;
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+.rank-metodo-top b{
+  color:#fff;
+  font-size:12px;
+  text-transform:none;
+  letter-spacing:0;
+  margin:0;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.rank-metodo-top em{
+  grid-row:1 / span 2;
+  font-family:'Anton',sans-serif;
+  color:var(--gold);
+  font-style:normal;
+  font-size:24px;
+}
+.rank-pesos{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:6px;
+  margin-top:10px;
+}
+.rank-pesos span{
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.055);
+  border-radius:11px;
+  padding:7px 6px;
+  color:#aebfda;
+  font-size:10.5px;
+  font-weight:900;
+  text-align:center;
+}
+.rank-pesos b{
+  display:block;
+  color:#fff;
+  margin-top:2px;
+}
+.rank-update{
+  margin-top:9px;
+  color:#aebfda;
+  font-size:11.5px;
+}
+.rank-update b{
+  color:#fff;
+}
+.rank-metodo-details{
+  margin-top:8px;
+}
+.rank-metodo-details summary{
+  cursor:pointer;
+  color:var(--gold);
+  font-weight:900;
+}
+.rank-top{
+  border-color:rgba(255,204,41,.55) !important;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(255,204,41,.18),transparent 30%),
+    linear-gradient(180deg,rgba(22,47,85,.98),rgba(11,31,58,.98)) !important;
+}
+.rank-pos-1{
+  text-shadow:0 0 18px rgba(255,204,41,.35);
+}
+.rank-pos-2,
+.rank-pos-3{
+  color:#ffe176;
+}
+.rank-card:hover{
+  border-color:rgba(255,204,41,.34);
+  transform:translateY(-1px);
+  transition:border-color .18s ease, transform .18s ease;
+}
+.rank-details[open] summary{
+  color:#ffe176;
+}
+@media(max-width:760px){
+  .stat-filtros-linha{
+    grid-template-columns:1fr;
+    gap:0;
+  }
+  .rank-metodo-head{
+    grid-template-columns:1fr;
+  }
+  .rank-metodo-top{
+    grid-template-columns:32px 1fr auto;
+  }
+  .rank-pesos{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .rank-pesos span:last-child{
+    grid-column:1 / -1;
+  }
+}
+@media(max-width:380px){
+  .rank-head{
+    grid-template-columns:34px minmax(0,1fr) 60px;
+  }
+  .rank-team .stat-flag{
+    width:24px;
+    height:16px;
+  }
+  .rank-team strong{
+    font-size:13px;
+  }
+  .rank-score b{
+    font-size:22px;
   }
 }
