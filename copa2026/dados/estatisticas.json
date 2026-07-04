@@ -1,13 +1,29 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-04T22:42:38.693659Z",
+  "atualizado_em": "2026-07-04T23:12:38.189908Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 90,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
+    {
+      "nome": "Kylian Mbappé",
+      "equipe": "FRA",
+      "gols": 7,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760457",
+        "760475",
+        "760492",
+        "760503"
+      ],
+      "total_cartoes": 0
+    },
     {
       "nome": "Lionel Messi",
       "equipe": "ARG",
@@ -20,21 +36,6 @@
         "760456",
         "760483",
         "760500"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Kylian Mbappé",
-      "equipe": "FRA",
-      "gols": 6,
-      "assistencias": 2,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760432",
-        "760457",
-        "760475",
-        "760492"
       ],
       "total_cartoes": 0
     },
@@ -2079,14 +2080,15 @@
       "equipe": "FRA",
       "gols": 0,
       "assistencias": 5,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760432",
         "760457",
-        "760492"
+        "760492",
+        "760503"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Brahim Díaz",
@@ -2356,7 +2358,7 @@
     {
       "nome": "Kylian Mbappé",
       "equipe": "FRA",
-      "gols": 6,
+      "gols": 7,
       "assistencias": 2,
       "amarelos": 0,
       "vermelhos": 0,
@@ -2364,7 +2366,8 @@
         "760432",
         "760457",
         "760475",
-        "760492"
+        "760492",
+        "760503"
       ],
       "total_cartoes": 0
     },
@@ -5779,6 +5782,18 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Manu Koné",
+      "equipe": "FRA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760503"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Marcel Sabitzer",
       "equipe": "AUT",
       "gols": 1,
@@ -5874,6 +5889,21 @@
       "vermelhos": 0,
       "jogos": [
         "760474"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Michael Olise",
+      "equipe": "FRA",
+      "gols": 0,
+      "assistencias": 5,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760457",
+        "760492",
+        "760503"
       ],
       "total_cartoes": 1
     },
@@ -6553,12 +6583,12 @@
   "por_selecao": [
     {
       "equipe": "FRA",
-      "gols": 13,
+      "gols": 14,
       "assistencias": 12,
-      "amarelos": 2,
+      "amarelos": 4,
       "vermelhos": 0,
       "jogos": 5,
-      "media_gols": 2.6
+      "media_gols": 2.8
     },
     {
       "equipe": "ARG",
