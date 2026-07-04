@@ -35,12 +35,29 @@
   const flag = id => { const c = iso(id); return c ? `<img src="https://flagcdn.com/w40/${c}.png" title="${nome(id)}" alt="" onerror="this.style.visibility='hidden'">` : ""; };
   const norm = ab => ESPN_OVR[ab] || ab;
   const inter = (a, b) => { const s = new Set(b || []); return (a || []).filter(x => s.has(x)); };
-  const fateDe = (team, o) => {
-    if (!o.classificados32 || !o.classificados32.length) return "pend";
+  function faseCompleta(o, fase) {
+    return !!(o && o._faseCompleta && o._faseCompleta[fase]);
+  }
+  function emLista(o, key, team) {
+    return !!(o && Array.isArray(o[key]) && o[key].indexOf(team) !== -1);
+  }
+  function vivoNoTorneio(team, o) {
+    // Auditoria de "ainda vivo": precisa bater com a fase atual do mata-mata,
+    // não apenas com "entrou nas 32". Depois que uma fase fecha, quem não
+    // aparece na fase seguinte está fora do páreo, mesmo se o feed não marcar loser.
+    if (!o || !o.classificados32 || !o.classificados32.length) return "pend";
     if (o.classificados32.indexOf(team) === -1) return "wrong";
     if ((o.eliminados || []).indexOf(team) !== -1) return "out";
+
+    if (faseCompleta(o, "r32") && !emLista(o, "avancam_oitavas", team)) return "out";
+    if (faseCompleta(o, "oitavas") && !emLista(o, "avancam_quartas", team)) return "out";
+    if (faseCompleta(o, "quartas") && !emLista(o, "semifinalistas", team)) return "out";
+    if (faseCompleta(o, "semis") && !emLista(o, "finalistas", team)) return "out";
+    if (faseCompleta(o, "final") && o.campeao && team !== o.campeao) return "out";
+
     return "alive";
-  };
+  }
+  const fateDe = vivoNoTorneio;
 
   async function init() {
     try {
@@ -149,6 +166,14 @@
   function buildOficial(events) {
     const o = { decididos: {} };
     const slugTeams = slug => [...new Set(events.filter(e => phaseOf(e) === slug).flatMap(teamsOf))];
+    const postCount = slug => events.filter(e => phaseOf(e) === slug && isPost(e)).length;
+    const faseCompletaOficial = {
+      r32: postCount("round-of-32") >= 16,
+      oitavas: postCount("round-of-16") >= 8,
+      quartas: postCount("quarterfinals") >= 4,
+      semis: postCount("semifinals") >= 2,
+      final: postCount("final") >= 1
+    };
 
     // --- mata-mata: quem ALCANÇOU cada fase ---
     // 1) usa os times que já aparecem nos confrontos da fase;
@@ -237,12 +262,28 @@
       DADOS.selecoes.forEach(s => { if (!passou.has(s.id)) elim.add(s.id); });
     } else if (o._simulado && o.classificados32) {
       // SIMULADO (foto de HOJE): se a Copa acabasse agora, quem está fora dos 32 já era.
-      // Marca como eliminado todo mundo que não está nos classificados de hoje.
       const passou = new Set(o.classificados32);
       DADOS.selecoes.forEach(s => {
         if (!passou.has(s.id)) elim.add(s.id);
       });
     }
+
+    // Auditoria completa do mata-mata: quando uma fase encerrou,
+    // a lista da fase seguinte passa a ser a fonte da verdade para quem segue vivo.
+    function eliminarQuemNaoAvancou(origem, destino, completa) {
+      if (!completa || !origem || !origem.length || !destino || !destino.length) return;
+      const ok = new Set(destino);
+      origem.forEach(id => { if (id && !ok.has(id)) elim.add(id); });
+    }
+    eliminarQuemNaoAvancou(o.classificados32 || [], o.avancam_oitavas || [], faseCompletaOficial.r32);
+    eliminarQuemNaoAvancou(o.avancam_oitavas || [], o.avancam_quartas || [], faseCompletaOficial.oitavas);
+    eliminarQuemNaoAvancou(o.avancam_quartas || [], o.semifinalistas || [], faseCompletaOficial.quartas);
+    eliminarQuemNaoAvancou(o.semifinalistas || [], o.finalistas || [], faseCompletaOficial.semis);
+    if (faseCompletaOficial.final && o.finalistas && o.campeao) {
+      o.finalistas.forEach(id => { if (id && id !== o.campeao) elim.add(id); });
+    }
+
+    o._faseCompleta = faseCompletaOficial;
     o.eliminados = [...elim];
 
     o._realGrupos = {}; realG.forEach(x => o._realGrupos[x.jogo_id] = { ga: x.ga, gb: x.gb, inv: x.inv, homeId: x.homeId, awayId: x.awayId });
@@ -399,7 +440,7 @@
       const picks32 = x.d.classificados32 || [];
       const vivos = picks32.filter(t => fateDe(t, o) === "alive").length;
       const funil = picks32.map(t => `<span class="${fateDe(t, o)}">${flag(t)}</span>`).join("");
-      const f32lab = decidiu ? `As 32 de ${x.nome} — <b>${vivos} ainda vivas</b>:` : `As 32 que ${x.nome} classificou no palpite:`;
+      const f32lab = decidiu ? `As 32 de ${x.nome} — <b>${vivos} ainda vivas no torneio</b>:` : `As 32 que ${x.nome} classificou no palpite:`;
       const f32leg = decidiu ? '<div class="f32leg"><span><i class="lg-a"></i>na disputa</span><span><i class="lg-o"></i>caiu</span><span><i class="lg-w"></i>não classificou</span></div>' : "";
       return `<div class="card${cls}">
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
