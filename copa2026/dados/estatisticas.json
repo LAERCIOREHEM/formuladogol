@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-04T02:12:47.619440Z",
+  "atualizado_em": "2026-07-04T02:42:44.530819Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 87,
+  "jogos_processados": 88,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -1211,6 +1211,18 @@
         "760472"
       ],
       "total_cartoes": 0
+    },
+    {
+      "nome": "Jhon Arias",
+      "equipe": "COL",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760501"
+      ],
+      "total_cartoes": 1
     },
     {
       "nome": "John McGinn",
@@ -3207,6 +3219,18 @@
       "jogos": [
         "760441",
         "760467"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Luis Suárez",
+      "equipe": "COL",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760501"
       ],
       "total_cartoes": 0
     },
@@ -5209,6 +5233,18 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Jhon Arias",
+      "equipe": "COL",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760501"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Jhon Lucumí",
       "equipe": "COL",
       "gols": 0,
@@ -6592,12 +6628,12 @@
     },
     {
       "equipe": "COL",
-      "gols": 4,
-      "assistencias": 4,
-      "amarelos": 4,
+      "gols": 5,
+      "assistencias": 5,
+      "amarelos": 5,
       "vermelhos": 0,
-      "jogos": 3,
-      "media_gols": 1.33
+      "jogos": 4,
+      "media_gols": 1.25
     },
     {
       "equipe": "NZL",
@@ -6681,15 +6717,6 @@
       "media_gols": 0.67
     },
     {
-      "equipe": "GHA",
-      "gols": 2,
-      "assistencias": 2,
-      "amarelos": 3,
-      "vermelhos": 0,
-      "jogos": 3,
-      "media_gols": 0.67
-    },
-    {
       "equipe": "HAI",
       "gols": 2,
       "assistencias": 1,
@@ -6740,6 +6767,15 @@
       "assistencias": 2,
       "amarelos": 8,
       "vermelhos": 1,
+      "jogos": 4,
+      "media_gols": 0.5
+    },
+    {
+      "equipe": "GHA",
+      "gols": 2,
+      "assistencias": 2,
+      "amarelos": 3,
+      "vermelhos": 0,
       "jogos": 4,
       "media_gols": 0.5
     },
