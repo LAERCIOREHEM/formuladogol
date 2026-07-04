@@ -682,8 +682,10 @@ def extrair_video_ids_de_url_ou_html(final_url, html):
 
 def resolver_caze_live_generico(api_key):
     """Tenta resolver https://www.youtube.com/@CazeTV/live para o videoId real.
-    Só serve como candidato. A aceitação final ainda valida o título contra o
-    confronto esperado; se /live estiver apontando para outro jogo, será descartado."""
+    Regra normal: a aceitação final valida o título contra o confronto esperado.
+    Fallback v27: se houver exatamente um jogo da Copa ao vivo no feed ESPN e
+    o /live resolver para vídeo live no canal oficial, o robô pode aceitar esse
+    vídeo para esse jogo mesmo quando o título não está no padrão esperado."""
     url = "https://www.youtube.com/@CazeTV/live"
     req = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
@@ -874,6 +876,46 @@ def parse_jogo_live_ou_generico(titulo):
     return parse_confronto_por_presenca(titulo)
 
 
+
+
+def aceitar_live_principal_caze_para_jogo(video, jogo, total_jogos_ao_vivo=0):
+    """Fallback controlado para @CazeTV/live.
+
+    Usado apenas quando:
+    - o feed ESPN tem exatamente um jogo da Copa ao vivo;
+    - esse jogo é o confronto analisado;
+    - @CazeTV/live resolveu para um vídeo com estado "live";
+    - o vídeo pertence ao canal oficial da CazéTV, quando a API informar channelId.
+
+    Isso evita voltar a depender cegamente de /live quando há risco de outro evento
+    no canal, mas permite funcionar quando a Cazé coloca o jogo principal da Copa
+    no link padrão.
+    """
+    if not video or not jogo:
+        return None
+    if total_jogos_ao_vivo != 1 or jogo.get("estado_espn") != "in":
+        return None
+    if (video.get("origem") or "") != "caze-live-resolvido":
+        return None
+    if (video.get("estado") or "").lower() != "live":
+        return None
+    canal = video.get("channelId") or ""
+    if canal and canal != CAZE_CHANNEL_ID:
+        return None
+    titulo = video.get("titulo") or "CazéTV ao vivo"
+    if titulo_ruim_para_live(titulo):
+        return None
+    return {
+        "a": jogo["a"],
+        "b": jogo["b"],
+        "videoId": video["videoId"],
+        "titulo": titulo,
+        "estado": "live",
+        "origem": "caze-live-principal-unico-jogo-ao-vivo",
+        "validado_confronto": True,
+        "validacao_relaxada": True,
+    }
+
 def buscar_lives_exatas_por_espn(api_key):
     """Busca/valida transmissões exatas para a aba AO VIVO.
 
@@ -894,13 +936,17 @@ def buscar_lives_exatas_por_espn(api_key):
     globais.extend(listar_caze_streams_page(api_key))
     globais.extend(yt_search_caze(api_key, "ao vivo", max_results=25))
 
-    # Resolve o /live genérico só para descobrir o videoId real. Se esse vídeo
-    # for de outro confronto, será descartado em aceitar_live_para_jogo().
+    # Resolve o /live genérico só para descobrir o videoId real.
+    # Primeiro tenta a validação rigorosa pelo título; se ela falhar, o fallback
+    # relaxado só é permitido quando houver exatamente UM jogo da Copa ao vivo.
     live_generica = resolver_caze_live_generico(api_key)
     if live_generica:
         globais.append(live_generica)
 
     globais = dedupe_videos(globais)
+
+    jogos_ao_vivo = [j for j in jogos if j.get("estado_espn") == "in"]
+    total_jogos_ao_vivo = len(jogos_ao_vivo)
 
     achados, vistos_video_jogo = [], set()
     for j in jogos:
@@ -933,7 +979,11 @@ def buscar_lives_exatas_por_espn(api_key):
                 vv["estado"] = d["estado"]
             enriquecidos.append(vv)
 
+        aceitou_jogo = False
+        live_generica_enriquecida = None
         for v in enriquecidos:
+            if v.get("videoId") == (live_generica or {}).get("videoId"):
+                live_generica_enriquecida = v
             aceito = aceitar_live_para_jogo(v, j, origem=v.get("origem") or "search-exata-caze")
             if not aceito:
                 continue
@@ -942,7 +992,24 @@ def buscar_lives_exatas_por_espn(api_key):
                 continue
             vistos_video_jogo.add(vk)
             achados.append(aceito)
+            aceitou_jogo = True
             print(f"  + (live validada Cazé) {j['chave']}: {aceito['titulo'][:75]} [{aceito['estado']}]")
+
+        # Fallback v27: se a validação pelo título falhou, mas há exatamente
+        # um jogo da Copa ao vivo e @CazeTV/live aponta para uma live oficial,
+        # aceita esse vídeo para o jogo ao vivo.
+        if not aceitou_jogo and live_generica_enriquecida:
+            aceito = aceitar_live_principal_caze_para_jogo(
+                live_generica_enriquecida,
+                j,
+                total_jogos_ao_vivo=total_jogos_ao_vivo
+            )
+            if aceito:
+                vk = (aceito["videoId"], j["chave"])
+                if vk not in vistos_video_jogo:
+                    vistos_video_jogo.add(vk)
+                    achados.append(aceito)
+                    print(f"  + (fallback /live CazéTV) {j['chave']}: {aceito['titulo'][:75]} [{aceito['estado']}]")
 
     return achados
 
@@ -1271,6 +1338,7 @@ def atualizar_lives(api_key):
                 "origem": c.get("origem", "auto"),
                 "scheduledStartTime": c.get("scheduledStartTime"),
                 "validado_confronto": bool(c.get("validado_confronto", True)),
+                "validacao_relaxada": bool(c.get("validacao_relaxada", False)),
             }
 
     # 7) grava (respeitando correções manuais 'admin')
@@ -1286,6 +1354,7 @@ def atualizar_lives(api_key):
             "origem": m.get("origem", "auto"),
             "scheduledStartTime": m.get("scheduledStartTime"),
             "validado_confronto": True,
+            "validacao_relaxada": bool(m.get("validacao_relaxada", False)),
             "atualizado_em": agora_sp().isoformat(timespec="seconds")
         }
         if m["estado"] == "live":

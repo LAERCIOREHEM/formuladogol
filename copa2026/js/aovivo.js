@@ -718,7 +718,10 @@
   }
 
   // acha a live certa pro jogo no lives.json (gerado pelo robô).
-  // Regra: só usa link validado para aquele confronto. Não chuta @CazeTV/live.
+  // Regra preferencial: usa link validado por confronto.
+  // Fallback v27: durante a Copa, se o robô ainda não achou o link exato,
+  // abre a live principal da CazéTV. Isso resolve casos em que o /live aponta
+  // para o jogo da Copa, mas o título/YouTube API não permitiu validação exata.
   function chaveJogoCaze(aAb, bAb) {
     var sa = dpSigla(aAb) || aAb, sb = dpSigla(bAb) || bAb;
     return [sa, sb].sort().join("-");
@@ -739,10 +742,10 @@
     if (linkCazeValidado(L)) {
       return `<a class="btn-caze" href="${L.url}" target="_blank" rel="noopener">▶️ Assistir ao vivo na CazéTV</a>`;
     }
-    // Sem link exato validado, não abre mais @CazeTV/live, porque pode cair
-    // na transmissão principal de outro jogo. O cron deve preencher
-    // dados/lives.json com watch?v=... quando validar o confronto.
-    return `<div class="btn-caze wait" title="O robô ainda não validou uma live da CazéTV exatamente para este confronto.">⏳ Aguardando link exato da CazéTV</div>`;
+    // Fallback operacional até o fim da Copa: a CazéTV tende a usar o /live
+    // como transmissão principal dos jogos. Se o link exato ainda não foi
+    // validado pelo robô, ainda assim oferecemos o atalho principal.
+    return `<a class="btn-caze fallback" href="https://www.youtube.com/@CazeTV/live" target="_blank" rel="noopener" title="Fallback: abre a transmissão principal atual da CazéTV.">▶️ Abrir CazéTV ao vivo</a>`;
   }
 
   function faseLabel(ev) {
