@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-04T18:12:46.527197Z",
+  "atualizado_em": "2026-07-04T18:42:44.217794Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 89,
@@ -380,14 +380,15 @@
       "equipe": "CAN",
       "gols": 2,
       "assistencias": 0,
-      "amarelos": 1,
+      "amarelos": 2,
       "vermelhos": 0,
       "jogos": [
         "760416",
         "760440",
-        "760463"
+        "760463",
+        "760502"
       ],
-      "total_cartoes": 1
+      "total_cartoes": 2
     },
     {
       "nome": "Daichi Kamada",
@@ -4163,6 +4164,21 @@
       "total_cartoes": 2
     },
     {
+      "nome": "Cyle Larin",
+      "equipe": "CAN",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760416",
+        "760440",
+        "760463",
+        "760502"
+      ],
+      "total_cartoes": 2
+    },
+    {
       "nome": "Danilo",
       "equipe": "BRA",
       "gols": 0,
@@ -4238,6 +4254,19 @@
       "jogos": [
         "760446",
         "760473"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Luc De Fougerolles",
+      "equipe": "CAN",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760416",
+        "760502"
       ],
       "total_cartoes": 2
     },
@@ -4731,20 +4760,6 @@
         "760425",
         "760447",
         "760488"
-      ],
-      "total_cartoes": 1
-    },
-    {
-      "nome": "Cyle Larin",
-      "equipe": "CAN",
-      "gols": 2,
-      "assistencias": 0,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760416",
-        "760440",
-        "760463"
       ],
       "total_cartoes": 1
     },
@@ -5682,18 +5697,6 @@
       "total_cartoes": 1
     },
     {
-      "nome": "Luc De Fougerolles",
-      "equipe": "CAN",
-      "gols": 0,
-      "assistencias": 0,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760416"
-      ],
-      "total_cartoes": 1
-    },
-    {
       "nome": "Lucas Bergvall",
       "equipe": "SWE",
       "gols": 0,
@@ -6610,7 +6613,7 @@
       "equipe": "CAN",
       "gols": 9,
       "assistencias": 3,
-      "amarelos": 9,
+      "amarelos": 11,
       "vermelhos": 0,
       "jogos": 5,
       "media_gols": 1.8
