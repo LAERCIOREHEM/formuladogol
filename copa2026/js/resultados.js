@@ -1098,7 +1098,7 @@
       const lockCls = lock ? " mm-definido" : "";
       const lockMark = lock
         ? `<span class="mm-lockmark" title="Vaga confirmada">✓</span>`
-        : `<span class="mm-pendmark" title="Projeção ao vivo — ainda pode mudar">⌛</span>`;
+        : "";
       return `<div class="mm-time ${vcls}${lockCls}">${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span><span class="mm-score">${score}</span>${lockMark}</div>`;
     };
     travado = travado || {};
@@ -1572,6 +1572,20 @@
     return { status, cls, scoreA:aScore, scoreB:bScore, vA, vB, info:linha };
   }
 
+  function slotConfirmadoPorJogoEncerrado(valor, slot) {
+    // Só confirma visualmente quando o lado veio de um token WM/LM
+    // e o jogo de origem já tem vencedor/perdedor resolvido.
+    // Jogo agendado ou ao vivo não recebe ampulheta nem check automático.
+    const id = dpSigla(valor);
+    if (!id) return false;
+    const ref = refSlotMataVisual(valor, slot);
+    if (!ref) return false;
+    const src = jogoMataPorIdOuEvento(ref.srcId);
+    const ev = eventoMataPorJogoOuId(src, ref.srcId);
+    const definido = vencedorPerdedorDoEventoMata(ev, ref.tipo);
+    return !!definido && definido === id;
+  }
+
   function montarJogosMata(d) {
     const r32ById = {};
     const tokensR32 = tokensDosJogosR32(d);
@@ -1582,7 +1596,16 @@
     const arvById = {};
     (ESTRUT.arvore || []).forEach(m => {
       const t = (d.timeDe && d.timeDe[m.id]) || {};
-      arvById[m.id] = { id:m.id, fase:faseLabelPorEstrutura(m.fase), a:t.a, b:t.b, slotA:m.a, slotB:m.b, travA:false, travB:false };
+      arvById[m.id] = {
+        id:m.id,
+        fase:faseLabelPorEstrutura(m.fase),
+        a:t.a,
+        b:t.b,
+        slotA:m.a,
+        slotB:m.b,
+        travA:slotConfirmadoPorJogoEncerrado(t.a, m.a),
+        travB:slotConfirmadoPorJogoEncerrado(t.b, m.b)
+      };
     });
     const get = id => r32ById[id] || arvById[id] || { id, fase:"Mata-mata" };
     const fases = {
@@ -1747,6 +1770,8 @@
     return `<div class="mm-equipe mm-tbd"><span class="mm-slot">${escTxt(txt)}</span></div>`;
   }
 
+  // Correção v29: ampulheta removida como estado padrão. Time concreto limpo;
+  // check apenas quando a vaga veio de jogo anterior já encerrado.
   function linhaEquipeMata(valor, slot, score, vcls, travado) {
     const id = dpSigla(valor);
     if (id) {
@@ -1754,7 +1779,7 @@
       const lockCls = travado ? " mm-definido" : "";
       const lockMark = travado
         ? `<span class="mm-lockmark" title="Vaga confirmada">✓</span>`
-        : `<span class="mm-pendmark" title="Projeção ao vivo — ainda pode mudar">⌛</span>`;
+        : "";
       const identidade = `${fl ? `<img src="${fl}" alt="">` : ""}<span class="mm-nome">${dpNome(id)}</span>`;
       return `<div class="mm-equipe ${vcls || ""}${lockCls}">${selecaoLinkHTML(id, identidade, "team-link-mm")}${score !== "" && score != null ? `<span class="mm-score">${score}</span>` : ""}${lockMark}</div>`;
     }
