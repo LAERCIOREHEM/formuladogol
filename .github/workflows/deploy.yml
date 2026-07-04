@@ -3,7 +3,11 @@ name: Deploy site (GitHub Pages)
 on:
   workflow_dispatch:
 
-  # Quando voce subir arquivos manualmente no GitHub, este deploy publica o site.
+  # Publica quando houver push no main.
+  # Observação importante:
+  # Os workflows de dados já fazem commit/push no main. Portanto, o próprio push
+  # já dispara o deploy. Não usamos workflow_run aqui para evitar deploy duplicado
+  # e corrida na etapa "syncing_files" do GitHub Pages.
   push:
     branches: [main]
     paths:
@@ -21,44 +25,23 @@ on:
       - 'docs/**'
       - '.github/workflows/deploy.yml'
 
-  # Quando um workflow que altera dados terminar com sucesso, publica o site.
-  # IMPORTANTE: nomes precisam bater exatamente com o campo name: dos workflows.
-  workflow_run:
-    workflows:
-      - 'Atualizar tudo (tabela, resultados e jogos)'
-      - 'Buscar melhores momentos (CazéTV)'
-      - 'Atualiza fair play (cartões)'
-      - 'Atualizar próximos jogos'
-      - 'Atualizar resultados do Brasileirão'
-      - 'Atualizar tabela do Brasileirão'
-    types:
-      - completed
-
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Deploy do Pages precisa ser serializado.
+# Não cancelar deploy em andamento: cancelamento no meio do "syncing_files"
+# pode deixar uma publicação criada no GitHub Pages e a próxima batendo por cima.
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
     name: Publicar GitHub Pages
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    # Publica somente se:
-    # - for execucao manual; ou
-    # - for push manual no main; ou
-    # - workflow observado terminou com sucesso no main.
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.head_branch == 'main')
+    timeout-minutes: 20
 
     environment:
       name: github-pages
@@ -93,8 +76,34 @@ jobs:
           # GitHub Pages nao deve processar Jekyll.
           touch _site/.nojekyll
 
-          echo "Conteudo publicado em _site:" 
+          echo "Conteudo publicado em _site:"
           find _site -maxdepth 2 -type f | sort | head -200
+
+      - name: Validar pacote estatico antes do upload
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ ! -f _site/index.html ]]; then
+            echo "ERRO: _site/index.html nao encontrado."
+            exit 1
+          fi
+
+          # GitHub Pages artifact nao deve conter symlinks/hardlinks.
+          if find _site -type l | grep -q .; then
+            echo "ERRO: existem symlinks dentro de _site."
+            find _site -type l
+            exit 1
+          fi
+
+          echo "Total de arquivos:"
+          find _site -type f | wc -l
+
+          echo "Tamanho total:"
+          du -sh _site
+
+          echo "Maiores arquivos:"
+          find _site -type f -printf '%s %p\n' | sort -nr | head -20 | awk '{printf "%.2f MB  %s\n", $1/1024/1024, $2}'
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
@@ -107,4 +116,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        timeout-minutes: 10
+        timeout-minutes: 15
