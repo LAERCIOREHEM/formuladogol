@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-04T01:12:53.045742Z",
+  "atualizado_em": "2026-07-04T01:42:40.881642Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 87,
@@ -1890,6 +1890,20 @@
         "760470"
       ],
       "total_cartoes": 1
+    },
+    {
+      "nome": "Sidny Cabral",
+      "equipe": "CPV",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760428",
+        "760450",
+        "760500"
+      ],
+      "total_cartoes": 2
     },
     {
       "nome": "Soufiane Rahimi",
@@ -3854,6 +3868,18 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Yannick Semedo",
+      "equipe": "CPV",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760500"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Álex Baena",
       "equipe": "ESP",
       "gols": 1,
@@ -4229,13 +4255,14 @@
     {
       "nome": "Sidny Cabral",
       "equipe": "CPV",
-      "gols": 0,
+      "gols": 1,
       "assistencias": 0,
       "amarelos": 2,
       "vermelhos": 0,
       "jogos": [
         "760428",
-        "760450"
+        "760450",
+        "760500"
       ],
       "total_cartoes": 2
     },
@@ -6348,6 +6375,15 @@
       "media_gols": 3.25
     },
     {
+      "equipe": "ARG",
+      "gols": 11,
+      "assistencias": 5,
+      "amarelos": 3,
+      "vermelhos": 0,
+      "jogos": 4,
+      "media_gols": 2.75
+    },
+    {
       "equipe": "GER",
       "gols": 11,
       "assistencias": 10,
@@ -6364,15 +6400,6 @@
       "vermelhos": 0,
       "jogos": 4,
       "media_gols": 2.75
-    },
-    {
-      "equipe": "ARG",
-      "gols": 10,
-      "assistencias": 5,
-      "amarelos": 3,
-      "vermelhos": 0,
-      "jogos": 4,
-      "media_gols": 2.5
     },
     {
       "equipe": "NOR",
@@ -6582,6 +6609,15 @@
       "media_gols": 1.33
     },
     {
+      "equipe": "CPV",
+      "gols": 4,
+      "assistencias": 2,
+      "amarelos": 5,
+      "vermelhos": 0,
+      "jogos": 4,
+      "media_gols": 1.0
+    },
+    {
       "equipe": "IRN",
       "gols": 3,
       "assistencias": 1,
@@ -6619,15 +6655,6 @@
     },
     {
       "equipe": "AUS",
-      "gols": 3,
-      "assistencias": 1,
-      "amarelos": 5,
-      "vermelhos": 0,
-      "jogos": 4,
-      "media_gols": 0.75
-    },
-    {
-      "equipe": "CPV",
       "gols": 3,
       "assistencias": 1,
       "amarelos": 5,
