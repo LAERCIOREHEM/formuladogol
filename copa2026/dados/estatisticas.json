@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-04T17:12:46.779861Z",
+  "atualizado_em": "2026-07-04T17:42:59.247236Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 89,
@@ -652,12 +652,13 @@
       "equipe": "MAR",
       "gols": 1,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760464"
+        "760464",
+        "760502"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Agustín Canobbio",
@@ -2446,12 +2447,13 @@
       "equipe": "MAR",
       "gols": 1,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760464"
+        "760464",
+        "760502"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Adrien Rabiot",
@@ -4392,6 +4394,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Achraf Hakimi",
+      "equipe": "MAR",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760464",
+        "760502"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Ahmed Fatouh",
       "equipe": "EGY",
       "gols": 0,
@@ -6073,6 +6088,18 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Redouane Halhal",
+      "equipe": "MAR",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760502"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Renato Veiga",
       "equipe": "POR",
       "gols": 0,
@@ -6093,6 +6120,18 @@
       "vermelhos": 0,
       "jogos": [
         "760501"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Richie Laryea",
+      "equipe": "CAN",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760502"
       ],
       "total_cartoes": 1
     },
@@ -6533,7 +6572,7 @@
       "equipe": "CAN",
       "gols": 9,
       "assistencias": 3,
-      "amarelos": 7,
+      "amarelos": 8,
       "vermelhos": 0,
       "jogos": 5,
       "media_gols": 1.8
@@ -6596,7 +6635,7 @@
       "equipe": "MAR",
       "gols": 7,
       "assistencias": 6,
-      "amarelos": 2,
+      "amarelos": 4,
       "vermelhos": 0,
       "jogos": 5,
       "media_gols": 1.4
