@@ -29,6 +29,7 @@
   let faseAtual = "grupos", grupoAberto = null, saveTimer = null;
   let atualizarFeedbackFase = null;
   let oficialTimer = null;
+  let OFICIAL_CARREGANDO = false;
 
   const $ = s => document.querySelector(s);
   const el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; };
@@ -71,8 +72,8 @@
       DADOS.fairplay = (fp && fp.fairplay) || {};
       DADOS.nomeDe = {}; DADOS.isoDe = {};
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
-      carregarOficialAtual(); // assíncrono: alimenta os ✓/✗ dos palpites sem travar o login
-      if (!oficialTimer) oficialTimer = setInterval(carregarOficialAtual, 120000); // espelha a atualização do Bolão
+      carregarOficialAtual(true); // assíncrono: alimenta pontuação/✓/✗ sem travar o login
+      if (!oficialTimer) oficialTimer = setInterval(function(){ carregarOficialAtual(false); }, 120000); // espelha a atualização do Bolão
     } catch (err) {
       $("#tela-login").innerHTML = '<div class="cartao-login"><h2>Erro ao carregar dados</h2>' +
         '<p class="prazo">Abra o módulo por um servidor (ex.: <code>python -m http.server</code>) ' +
@@ -550,6 +551,14 @@
     const JOGOS = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes || []);
     const GRUPOS = [...new Set(JOGOS.map(j => j.grupo))].sort();
     const slugTeams = slug => [...new Set((events || []).filter(e => phaseOf(e) === slug).flatMap(teamsOf))];
+    const postCount = slug => (events || []).filter(e => phaseOf(e) === slug && isPost(e)).length;
+    const faseCompletaOficial = {
+      r32: postCount("round-of-32") >= 16,
+      oitavas: postCount("round-of-16") >= 8,
+      quartas: postCount("quarterfinals") >= 4,
+      semis: postCount("semifinals") >= 2,
+      final: postCount("final") >= 1
+    };
     const addUnico = (arr, id) => { if (id && arr.indexOf(id) === -1) arr.push(id); };
 
     const r32 = slugTeams("round-of-32");
@@ -628,22 +637,52 @@
       const passou = new Set(o.classificados32);
       (DADOS.selecoes || []).forEach(s => { if (!passou.has(s.id)) elim.add(s.id); });
     }
+
+    // Auditoria igual à aba Bolão: fase encerrada define quem continua vivo.
+    function eliminarQuemNaoAvancou(origem, destino, completa) {
+      if (!completa || !origem || !origem.length || !destino || !destino.length) return;
+      const ok = new Set(destino);
+      origem.forEach(id => { if (id && !ok.has(id)) elim.add(id); });
+    }
+    eliminarQuemNaoAvancou(o.classificados32 || [], o.avancam_oitavas || [], faseCompletaOficial.r32);
+    eliminarQuemNaoAvancou(o.avancam_oitavas || [], o.avancam_quartas || [], faseCompletaOficial.oitavas);
+    eliminarQuemNaoAvancou(o.avancam_quartas || [], o.semifinalistas || [], faseCompletaOficial.quartas);
+    eliminarQuemNaoAvancou(o.semifinalistas || [], o.finalistas || [], faseCompletaOficial.semis);
+    if (faseCompletaOficial.final && o.finalistas && o.campeao) {
+      o.finalistas.forEach(id => { if (id && id !== o.campeao) elim.add(id); });
+    }
+
+    o._faseCompleta = faseCompletaOficial;
     o.eliminados = [...elim];
     o._realGrupos = {}; realG.forEach(x => o._realGrupos[x.jogo_id] = { ga:x.ga, gb:x.gb, homeId:x.homeId, awayId:x.awayId });
     o._meta = { todosGrupos, segundaFase: !!(o.classificados32 && o.classificados32.length), nGruposCompletos: GRUPOS.filter(g => completos[g]).length, simulado: !!o._simulado };
     return o;
   }
 
-async function carregarOficialAtual() {
+async function carregarOficialAtual(force) {
+    if (OFICIAL_CARREGANDO && !force) return;
+    OFICIAL_CARREGANDO = true;
     try {
-      const lotes = await Promise.all(JANELAS_ESPN.map(d => fetch(`${API_ESPN}?dates=${d}&limit=120`).then(r => r.json()).catch(() => ({ events: [] }))));
+      const stamp = Date.now();
+      const lotes = await Promise.all(JANELAS_ESPN.map(d =>
+        fetch(`${API_ESPN}?dates=${d}&limit=120&_=${stamp}`)
+          .then(r => r.json())
+          .catch(() => ({ events: [] }))
+      ));
       const vistos = new Set(); const events = [];
-      lotes.forEach(l => (l.events || []).forEach(ev => { if (!vistos.has(ev.id)) { vistos.add(ev.id); events.push(ev); } }));
+      lotes.forEach(l => (l.events || []).forEach(ev => {
+        const id = String(ev.id || (ev.competitions && ev.competitions[0] && ev.competitions[0].id) || "");
+        if (!id || vistos.has(id)) return;
+        vistos.add(id); events.push(ev);
+      }));
       DADOS.oficial = buildOficial(events);
       const tela = document.querySelector("#tela-palpite:not(.oculto)");
       if (tela && faseAtual !== "grupos") renderPalpite();
     } catch (e) {
-      DADOS.oficial = null;
+      // Não apaga o último oficial válido; evita voltar a zero se uma atualização falhar.
+      if (!DADOS.oficial) DADOS.oficial = null;
+    } finally {
+      OFICIAL_CARREGANDO = false;
     }
   }
   function statusPalpiteFase(id, fase) {
@@ -996,7 +1035,8 @@ async function carregarOficialAtual() {
     const oficial = DADOS.oficial || null;
     const r = oficial
       ? COPA_PONTUACAO.calcular(dPont, oficial)
-      : { atuais:0, perdidos:0, possiveis:teto, teto:teto };
+      : { atuais:"…", perdidos:"…", possiveis:teto, teto:teto };
+    if (!oficial) carregarOficialAtual(true);
 
     const pb = el("div", "pontos-box mp-pontos-box");
     pb.innerHTML =
