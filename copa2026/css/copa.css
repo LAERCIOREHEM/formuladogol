@@ -2944,7 +2944,7 @@ html{
     radial-gradient(circle at 100% 0%,rgba(255,204,41,.10),transparent 32%),
     rgba(15,42,78,.92);
   box-shadow:0 12px 26px rgba(0,0,0,.20);
-  scroll-margin-top:18px;
+  scroll-margin-top: 104px;
 }
 .metodologia-ranking-head{
   display:flex;
@@ -3061,5 +3061,15 @@ html{
   .ranking-metodo-atalho a{
     width:100%;
     max-width:360px;
+  }
+}
+
+/* Correção v26 — alinhamento da âncora da metodologia abaixo do menu fixo */
+.metodologia-ranking{
+  scroll-margin-top:104px;
+}
+@media(max-width:620px){
+  .metodologia-ranking{
+    scroll-margin-top:112px;
   }
 }
