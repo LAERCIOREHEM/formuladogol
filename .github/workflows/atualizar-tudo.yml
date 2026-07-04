@@ -16,6 +16,9 @@ on:
       - 'atualizar.py'
       - 'atualizar_resultados.py'
       - 'atualizar_jogos.py'
+      - 'copa2026/gerar_ranking_desempenho.py'
+      - 'copa2026/dados/jogos-detalhes.json'
+      - 'copa2026/dados/estatisticas.json'
       - '.github/workflows/atualizar-tudo.yml'
 
 permissions:
@@ -75,11 +78,17 @@ jobs:
         id: jogos
         run: python atualizar_jogos.py
 
+      # --- 4. RANKING DE DESEMPENHO DA COPA ---
+      # Leve: não bate no navegador do usuário. Usa os JSONs já consolidados.
+      - name: Gerar Ranking de Desempenho
+        id: ranking_desempenho
+        run: python3 copa2026/gerar_ranking_desempenho.py
+
       - name: Conferir e validar JSONs gerados
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json resultados.json jogos.json; do
+          for arq in tabela.json resultados.json jogos.json copa2026/dados/ranking-desempenho.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -105,6 +114,7 @@ jobs:
             "tabela.json"
             "resultados.json"
             "jogos.json"
+            "copa2026/dados/ranking-desempenho.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then

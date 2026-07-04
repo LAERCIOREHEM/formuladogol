@@ -76,6 +76,10 @@ jobs:
         if: env.RUN_COPA == 'true'
         run: python3 copa2026/buscar_detalhes_jogos.py
 
+      - name: Rodar Ranking de Desempenho
+        if: env.RUN_COPA == 'true'
+        run: python3 copa2026/gerar_ranking_desempenho.py
+
       - name: Validar JSONs gerados
         if: env.RUN_COPA == 'true'
         shell: bash
@@ -90,6 +94,7 @@ jobs:
             "copa2026/dados/estatisticas.json"
             "copa2026/dados/jogos-detalhes.json"
             "copa2026/dados/workflow_copa_estado.json"
+            "copa2026/dados/ranking-desempenho.json"
           )
 
           for f in "${FILES[@]}"; do
@@ -118,6 +123,7 @@ jobs:
             "copa2026/dados/estatisticas.json"
             "copa2026/dados/jogos-detalhes.json"
             "copa2026/dados/workflow_copa_estado.json"
+            "copa2026/dados/ranking-desempenho.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
