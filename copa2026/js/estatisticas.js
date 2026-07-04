@@ -174,7 +174,7 @@
       { tit: "Artilheiro", item: gols, val: gols ? gols.gols : 0, suf: "gols", ico: "⚽", tipo: "jogador" },
       { tit: "Garçom", item: ass, val: ass ? ass.assistencias : 0, suf: "assist.", ico: "🎯", tipo: "jogador" },
       { tit: "Melhor ataque", item: ataque, val: ataque ? ataque.gols : 0, suf: "gols", ico: "🥅", tipo: "selecao" },
-      { tit: "Ranking de Desempenho", item: topRank, val: topRank ? topRank.indice_final : 0, suf: "pts", ico: "⚡", tipo: "ranking" }
+      { tit: "Ranking", item: topRank, val: topRank ? topRank.indice_final : 0, suf: "pts", ico: "⚡", tipo: "ranking" }
     ];
     $("#stats-resumo").innerHTML = cards.map(function (c) {
       if (!c.item) return '<div class="stat-res-card"><div class="stat-res-ico">' + c.ico + '</div><div><b>' + c.tit + '</b><span>Aguardando dados</span></div></div>';
@@ -645,7 +645,7 @@
         $("#stats-lista").innerHTML = '<div class="stat-vazio">Nenhuma seleção encontrada para este filtro no Ranking de Desempenho.</div>';
         return;
       }
-      $("#stats-lista").innerHTML = desempenhoMetodoHTML() + arr.map(desempenhoCard).join("");
+      $("#stats-lista").innerHTML = arr.map(desempenhoCard).join("");
       return;
     }
 
