@@ -19,6 +19,7 @@ on:
   push:
     paths:
       - 'atualizar_espn.py'
+      - 'scripts/gerar_estatisticas_brasileirao.py'
       - '.github/workflows/atualizar-brasileirao.yml'
 
 permissions:
@@ -62,11 +63,14 @@ jobs:
         id: espn
         run: python atualizar_espn.py
 
+      - name: Gerar estatísticas e ranking de desempenho
+        run: python scripts/gerar_estatisticas_brasileirao.py
+
       - name: Conferir e validar JSONs gerados
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -88,13 +92,18 @@ jobs:
           r = json.load(open('resultados.json', encoding='utf-8'))
           assert isinstance(r.get('resultados'), list), 'resultados.json sem lista resultados'
           print('  OK   JSONs principais: fonte ESPN; tabela com 20 times')
+          stats = json.load(open('dados-br/estatisticas.json', encoding='utf-8'))
+          rank = json.load(open('dados-br/ranking-desempenho.json', encoding='utf-8'))
+          assert len(stats.get('clubes') or []) == 20, 'estatisticas.json sem 20 clubes'
+          assert len(rank.get('ranking') or []) == 20, 'ranking-desempenho.json sem 20 clubes'
+          print('  OK   Estatísticas: 20 clubes e ranking de desempenho gerados')
           PY
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
       # guarda os artefatos gerados -> fetch + reset --hard origin/main ->
       # reaplica os arquivos -> commit -> push. Nunca gera conflito artificial
       # de rebase em arquivos-artefato, mesmo sob concorrencia real.
-      - name: Commitar os 4 JSONs juntos com push robusto
+      - name: Commitar JSONs juntos com push robusto
         shell: bash
         run: |
           set -euo pipefail
@@ -108,6 +117,8 @@ jobs:
             "espn_eventos.json"
             "jogos.json"
             "resultados.json"
+            "dados-br/estatisticas.json"
+            "dados-br/ranking-desempenho.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
@@ -143,7 +154,7 @@ jobs:
             fi
 
             git add -- "${FILES[@]}"
-            git commit -m "Atualizar dados Brasileirao (ESPN) - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            git commit -m "Atualizar dados e estatisticas Brasileirao (ESPN) - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
 
             if git push origin HEAD:main; then
               echo "Push OK na tentativa $i."
