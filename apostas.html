@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apostas da Rodada — Bolão Brasileirão 2026</title>
+<meta name="theme-color" content="#10b981">
+<meta name="description" content="Apostas por rodada do Bolão Brasileirão 2026 — Almoço de Sexta.">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="stylesheet" href="css/br-apostas.css">
+</head>
+<body>
+  <main class="container">
+    <section class="hero" aria-label="Bolão Brasileirão 2026">
+      <img src="img/header-br.jpg" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
+    </section>
+
+    <div class="topbar">
+      <div>
+        <div class="brand-mini">Bolão Brasileirão 2026</div>
+        <h1>Apostas da Rodada</h1>
+        <p>Palpites de placar por rodada, com janela quinta-feira → sábado 10h.</p>
+      </div>
+      <nav class="nav" aria-label="Navegação">
+        <a href="?brasileirao=1">⚽ Jogos</a>
+        <a href="apostas.html" class="active">🎯 Apostas</a>
+        <a href="?brasileirao=1">🏆 Bolão</a>
+        <a href="regras.html">ℹ️ Regras</a>
+        <a href="copa2026/">🏆 Copa 26</a>
+      </nav>
+    </div>
+
+    <div id="status" class="status warn">Inicializando...</div>
+
+    <section class="grid-head" aria-label="Resumo da rodada">
+      <article class="panel"><div class="panel-inner">
+        <div class="kicker">Rodada</div>
+        <div class="big-number" id="numero-rodada">—</div>
+        <p><span id="total-jogos">0</span> jogos disponíveis para apostar.</p>
+      </div></article>
+      <article class="panel"><div class="panel-inner">
+        <div class="kicker">Janela</div>
+        <h2 id="texto-janela">—</h2>
+        <p><span id="badge-janela" class="badge">verificando</span></p>
+      </div></article>
+      <article class="panel"><div class="panel-inner">
+        <div class="kicker">Palpites salvos</div>
+        <div class="big-number" id="total-salvos">0</div>
+        <p>Registros desta rodada no Supabase.</p>
+      </div></article>
+    </section>
+
+    <section class="panel" style="margin-bottom:12px"><div class="panel-inner">
+      <div class="kicker">Participante</div>
+      <div class="form-line">
+        <select id="membro" aria-label="Selecione seu nome">
+          <option value="">Carregando nomes...</option>
+        </select>
+        <div class="actions" style="margin:0">
+          <button type="button" class="btn secondary" data-aba="apostas">🎯 Apostar</button>
+          <button type="button" class="btn secondary" data-aba="meus">👤 Meus palpites</button>
+          <button type="button" class="btn secondary" data-aba="ranking">🏆 Ranking da rodada</button>
+          <button type="button" class="btn secondary" data-aba="regras">ℹ️ Regras</button>
+        </div>
+      </div>
+    </div></section>
+
+    <div class="round-tabs" id="rodadas" aria-label="Selecionar rodada"></div>
+    <section id="conteudo" aria-live="polite"></section>
+
+    <footer class="footer">
+      <strong>Uso privado do grupo Almoço de Sexta.</strong> O bolão é recreativo e sem exploração comercial. Dados esportivos via ESPN/JSON local; transmissões podem mudar conforme programação das emissoras.
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/br-config.js"></script>
+  <script src="js/br-pontuacao.js"></script>
+  <script src="js/br-apostas.js"></script>
+</body>
+</html>
