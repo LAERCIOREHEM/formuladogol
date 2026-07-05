@@ -62,6 +62,7 @@
   }
 
   var SEL = [], PAISES = {}, ELENCOS = {}, DADOS = {}, JOGOS = [];
+  var RANKING_DESEMPENHO = { ranking: [] };
   var CORRECOES_JOGADORES = {};
   var STATS_CARREGADAS = false;
   var ID_ATUAL = "";
@@ -485,6 +486,61 @@
     '</section>';
     return html;
   }
+
+  function fmtRankingDecimal(v) {
+    var n = Number(v);
+    if (!isFinite(n)) return "—";
+    return n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+  function rankingItemSelecao(id) {
+    var lista = (RANKING_DESEMPENHO && RANKING_DESEMPENHO.ranking) || [];
+    return lista.find(function (x) { return String(x.equipe || "").toUpperCase() === String(id || "").toUpperCase(); }) || null;
+  }
+  function rankingBar(label, valor) {
+    var n = Number(valor);
+    var pct = isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
+    return '<div class="sel-rank-line">' +
+      '<div class="sel-rank-line-top"><span>' + esc(label) + '</span><b>' + esc(fmtRankingDecimal(valor)) + '</b></div>' +
+      '<div class="sel-rank-bar"><i style="width:' + pct.toFixed(1) + '%"></i></div>' +
+    '</div>';
+  }
+  function rankingDesempenhoHTML(id) {
+    if (!STATS_CARREGADAS) {
+      return '<section class="sel-ranking-desempenho sel-ranking-loading" aria-label="Ranking de desempenho da seleção">' +
+        '<div class="sel-rank-head"><div><b>Ranking de Desempenho</b><span>Carregando índice da seleção…</span></div></div>' +
+      '</section>';
+    }
+    var r = rankingItemSelecao(id);
+    if (!r) return "";
+    var pos = r.posicao ? (r.posicao + "º") : "—";
+    var situ = r.situacao || "";
+    var jogos = r.jogos || r.jogos_com_estatisticas || 0;
+    return '<section class="sel-ranking-desempenho" aria-label="Ranking de desempenho da seleção">' +
+      '<div class="sel-rank-head">' +
+        '<div><b>Ranking de Desempenho</b><span>Índice próprio do site · não oficial</span></div>' +
+        '<div class="sel-rank-score"><strong>' + esc(fmtRankingDecimal(r.indice_final)) + '</strong><small>índice</small></div>' +
+      '</div>' +
+      '<div class="sel-rank-main">' +
+        '<div class="sel-rank-pos"><span>' + esc(pos) + '</span><small>posição geral</small></div>' +
+        '<div class="sel-rank-meta"><b>' + esc(r.nome || nomeSelecao(id)) + '</b><span>' + esc(id) + (jogos ? ' · ' + esc(jogos) + ' jogo' + (jogos === 1 ? '' : 's') : '') + '</span></div>' +
+        (situ ? '<div class="sel-rank-situacao">' + esc(situ) + '</div>' : '') +
+      '</div>' +
+      '<div class="sel-rank-bars">' +
+        rankingBar("Ataque", r.ataque) +
+        rankingBar("Domínio", r.dominio) +
+        rankingBar("Defesa", r.defesa) +
+        rankingBar("Eficiência", r.eficiencia) +
+        rankingBar("Disciplina", r.disciplina) +
+      '</div>' +
+      '<div class="sel-rank-mini">' +
+        '<div><span>Posse</span><b>' + esc(fmtRankingDecimal(r.posse_media)) + '%</b></div>' +
+        '<div><span>Fin./jogo</span><b>' + esc(fmtRankingDecimal(r.finalizacoes_jogo)) + '</b></div>' +
+        '<div><span>Chutes gol</span><b>' + esc(fmtRankingDecimal(r.chutes_gol_jogo)) + '</b></div>' +
+        '<div><span>Gols/jogo</span><b>' + esc(fmtRankingDecimal(r.gols_jogo)) + '</b></div>' +
+      '</div>' +
+    '</section>';
+  }
+
   function marcadoresHTML(id) {
     var stats = statsSelecao(id), lista = stats.artilheiros || [], total = stats.por.gols || 0;
     var soma = lista.reduce(function (acc, x) { return acc + (x.gols || 0); }, 0);
@@ -562,6 +618,7 @@
       marcadoresHTML(id) +
       squadHTML(id) +
       desempenhoHTML(id) +
+      rankingDesempenhoHTML(id) +
       jogosHTML(id);
     var det = $("#sel-detalhe");
     det.innerHTML = html; det.hidden = false;
@@ -657,10 +714,13 @@
     var dadosReq = getJSON("dados/estatisticas.json?v=" + Date.now()).then(function (j) {
       DADOS = j || { artilheiros: [], assistencias: [], cartoes: [], por_selecao: [] };
     });
+    var rankingReq = getJSON("dados/ranking-desempenho.json?v=" + Date.now()).then(function (j) {
+      RANKING_DESEMPENHO = j || { ranking: [] };
+    });
     var jogosReq = getJSONTimeout(API_SCOREBOARD + "&_=" + Date.now(), 8000).then(function (j) {
       JOGOS = j && j.events ? j.events.map(normalizarJogo) : [];
     });
-    return Promise.all([dadosReq, jogosReq]).then(function () {
+    return Promise.all([dadosReq, rankingReq, jogosReq]).then(function () {
       STATS_CARREGADAS = true;
       reabreFichaAtual();
     }).catch(function () {

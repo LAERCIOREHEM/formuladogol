@@ -3073,3 +3073,199 @@ html{
     scroll-margin-top:112px;
   }
 }
+
+/* ==========================================================
+   Seleções — card Ranking de Desempenho v28
+   ========================================================== */
+.sel-ranking-desempenho{
+  margin:0 0 16px;
+  background:
+    radial-gradient(circle at 100% 0%,rgba(255,204,41,.10),transparent 34%),
+    rgba(19,41,75,.76);
+  border:1px solid rgba(244,197,66,.30);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 10px 28px rgba(0,0,0,.15);
+}
+.sel-ranking-desempenho.sel-ranking-loading{
+  border-color:var(--linha);
+  background:rgba(19,41,75,.58);
+}
+.sel-rank-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:11px;
+}
+.sel-rank-head b{
+  display:block;
+  font-family:'Anton',sans-serif;
+  font-weight:400;
+  font-size:17px;
+  color:var(--gold);
+  text-transform:uppercase;
+  letter-spacing:.65px;
+  line-height:1.05;
+}
+.sel-rank-head span{
+  display:block;
+  color:#cbd8ea;
+  font-size:11.5px;
+  line-height:1.35;
+  margin-top:3px;
+}
+.sel-rank-score{
+  flex:0 0 auto;
+  text-align:right;
+}
+.sel-rank-score strong{
+  display:block;
+  color:#fff;
+  font-family:'Anton',sans-serif;
+  font-weight:400;
+  font-size:34px;
+  line-height:.95;
+  letter-spacing:.4px;
+}
+.sel-rank-score small{
+  display:block;
+  color:var(--gold);
+  font-size:9.5px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.55px;
+}
+.sel-rank-main{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:14px;
+  background:rgba(7,27,51,.42);
+  margin-bottom:10px;
+}
+.sel-rank-pos{
+  min-width:54px;
+  text-align:center;
+}
+.sel-rank-pos span{
+  display:block;
+  color:var(--gold);
+  font-family:'Anton',sans-serif;
+  font-size:30px;
+  line-height:1;
+}
+.sel-rank-pos small,
+.sel-rank-meta span{
+  color:#b7c5d9;
+  font-size:10px;
+}
+.sel-rank-meta{
+  min-width:0;
+}
+.sel-rank-meta b{
+  display:block;
+  color:#fff;
+  font-size:14px;
+  line-height:1.15;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.sel-rank-meta span{
+  display:block;
+  margin-top:2px;
+}
+.sel-rank-situacao{
+  justify-self:end;
+  color:#dcecff;
+  background:rgba(47,125,223,.18);
+  border:1px solid rgba(72,146,244,.32);
+  border-radius:999px;
+  padding:5px 9px;
+  font-size:10.5px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.sel-rank-bars{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 10px;
+}
+.sel-rank-line-top{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  color:#dce7f5;
+  font-size:11px;
+  font-weight:900;
+  margin-bottom:4px;
+}
+.sel-rank-line-top b{
+  color:#fff;
+}
+.sel-rank-bar{
+  height:8px;
+  border-radius:999px;
+  overflow:hidden;
+  background:rgba(255,255,255,.09);
+}
+.sel-rank-bar i{
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--gold),#ffe789);
+}
+.sel-rank-mini{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-top:11px;
+}
+.sel-rank-mini div{
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  padding:8px 7px;
+  text-align:center;
+  min-width:0;
+}
+.sel-rank-mini span{
+  display:block;
+  color:var(--cinza);
+  font-size:9.5px;
+  margin-bottom:3px;
+}
+.sel-rank-mini b{
+  display:block;
+  color:#fff;
+  font-size:13px;
+  line-height:1.1;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+@media(max-width:620px){
+  .sel-rank-head{
+    align-items:flex-start;
+  }
+  .sel-rank-score strong{
+    font-size:31px;
+  }
+  .sel-rank-main{
+    grid-template-columns:auto minmax(0,1fr);
+  }
+  .sel-rank-situacao{
+    grid-column:1 / -1;
+    justify-self:start;
+  }
+  .sel-rank-bars{
+    grid-template-columns:1fr;
+  }
+  .sel-rank-mini{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
