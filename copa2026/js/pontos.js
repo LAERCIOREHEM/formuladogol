@@ -35,6 +35,14 @@
   const flag = id => { const c = iso(id); return c ? `<img src="https://flagcdn.com/w40/${c}.png" title="${nome(id)}" alt="" onerror="this.style.visibility='hidden'">` : ""; };
   const norm = ab => ESPN_OVR[ab] || ab;
   const inter = (a, b) => { const s = new Set(b || []); return (a || []).filter(x => s.has(x)); };
+  function eficienciaPct(r) {
+    const a = Number(r && r.atuais);
+    const p = Number(r && r.perdidos);
+    if (!Number.isFinite(a) || !Number.isFinite(p)) return "…";
+    const decidido = a + p;
+    if (decidido <= 0) return "—";
+    return (a / decidido * 100).toLocaleString("pt-BR", { minimumFractionDigits:1, maximumFractionDigits:1 }) + "%";
+  }
   function faseCompleta(o, fase) {
     return !!(o && o._faseCompleta && o._faseCompleta[fase]);
   }
@@ -458,12 +466,13 @@
     if (o._meta.simulado) {
       banner = `<div class="aviso">⚠️ <b>Ranking SIMULADO</b>: como ficaria se a fase de grupos acabasse <b>agora</b>. Muda a cada jogo — <b>nada está definido!</b> ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
     } else if (!o._meta.segundaFase) {
-      banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>teto</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
+      banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>potencial máximo</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
     }
 
     const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯</p>';
     $("#app").innerHTML = toggleHTML() + controles + banner + tbnote + visiveis.map((x, i) => {
       const pos = x.posReal, r = x.r;
+      const eficiencia = eficienciaPct(r);
       const tot = r.atuais + r.perdidos + r.possiveis || 1;
       const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
       const cls = pos <= 3 ? " p" + pos : "";
@@ -483,7 +492,7 @@
       return `<div class="card${cls}">
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
         <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
-        <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">teto <b>${r.teto}</b></span></div>
+        <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">eficiência <b>${eficiencia}</b></span></div>
         <div class="fases">${fasesHTML}<span class="ph">🎯 <b>${x.cr}</b> cravados</span></div>
         <div class="podiodet">${detalheFinal(x.d, o)}</div>
         <div class="f32lab">${f32lab}</div>${f32leg}
@@ -638,7 +647,7 @@
     return `<div class="exb">
       <div class="exb-sec">✅ Conquistados (${x.r.atuais} pts)</div>${conqHTML}
       <div class="exb-sec">❌ Perdidos (${x.r.perdidos} pts)</div>${perdHTML}
-      <div class="exb-sec">⏳ Ainda possíveis: <b>${x.r.possiveis} pts</b> · Teto: <b>${x.r.teto} pts</b></div>
+      <div class="exb-sec">⏳ Ainda possíveis: <b>${x.r.possiveis} pts</b> · Eficiência: <b>${eficienciaPct(x.r)}</b></div>
       ${detalheGrupos}
     </div>`;
   }

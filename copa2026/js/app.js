@@ -34,6 +34,15 @@
   const $ = s => document.querySelector(s);
   const el = (t, c, h) => { const e = document.createElement(t); if (c) e.className = c; if (h != null) e.innerHTML = h; return e; };
 
+  function eficienciaPct(r) {
+    const a = Number(r && r.atuais);
+    const p = Number(r && r.perdidos);
+    if (!Number.isFinite(a) || !Number.isFinite(p)) return "…";
+    const decidido = a + p;
+    if (decidido <= 0) return "—";
+    return (a / decidido * 100).toLocaleString("pt-BR", { minimumFractionDigits:1, maximumFractionDigits:1 }) + "%";
+  }
+
   function bandeira(id) {
     const iso = DADOS.isoDe[id];
     if (!iso) return "";
@@ -1011,7 +1020,7 @@ async function carregarOficialAtual(force) {
     return `<div class="mp-extrato">
       <div class="mp-ex-sec">✅ Conquistados (${r.atuais} pts)</div>${okHTML}
       <div class="mp-ex-sec">❌ Perdidos (${r.perdidos} pts)</div>${noHTML}
-      <div class="mp-ex-sec">⏳ Ainda possíveis: <b>${r.possiveis} pts</b> · Teto: <b>${r.teto} pts</b></div>
+      <div class="mp-ex-sec">⏳ Ainda possíveis: <b>${r.possiveis} pts</b> · Eficiência: <b>${eficienciaPct(r)}</b></div>
       <div class="mp-ex-nota">Espelhado da aba Bolão: mesmo motor, mesmos pesos e mesma leitura dos resultados oficiais.</div>
     </div>`;
   }
@@ -1038,16 +1047,17 @@ async function carregarOficialAtual(force) {
       : { atuais:"…", perdidos:"…", possiveis:teto, teto:teto };
     if (!oficial) carregarOficialAtual(true);
 
+    const eficiencia = eficienciaPct(r);
     const pb = el("div", "pontos-box mp-pontos-box");
     pb.innerHTML =
       `<div class="pt"><div class="n">${r.atuais}</div><div class="l">Pontos atuais</div></div>` +
       `<div class="pt"><div class="n">${r.perdidos}</div><div class="l">Perdidos</div></div>` +
       `<div class="pt"><div class="n">${r.possiveis}</div><div class="l">Ainda possíveis</div></div>` +
-      `<div class="pt"><div class="n">${r.teto}</div><div class="l">Teto máximo</div></div>`;
+      `<div class="pt"><div class="n">${eficiencia}</div><div class="l">Eficiência</div></div>`;
     box.appendChild(pb);
 
     const nota = oficial
-      ? "Pontuação espelhada da aba Bolão, usando os resultados oficiais atuais."
+      ? "Pontuação espelhada da aba Bolão. Eficiência = conquistados ÷ (conquistados + perdidos)."
       : "Carregando resultados oficiais para espelhar a pontuação da aba Bolão…";
     box.appendChild(el("div", "linha", `<span style='color:var(--cinza);font-size:13px'>${nota}</span><span></span>`));
 
@@ -1309,7 +1319,7 @@ async function carregarOficialAtual(force) {
       <div class="aud-card"><b>${item.atuais}</b><span>conquistados</span></div>
       <div class="aud-card"><b>${item.perdidos}</b><span>perdidos</span></div>
       <div class="aud-card"><b>${item.possiveis}</b><span>possíveis</span></div>
-      <div class="aud-card"><b>${item.teto}</b><span>teto</span></div>
+      <div class="aud-card"><b>${eficienciaPct(item)}</b><span>eficiência</span></div>
     </div>${notaConsistencia}
     <div class="aud-section-title">1. Extrato dos pontos</div>
     <div class="aud-grid">
@@ -1329,7 +1339,7 @@ async function carregarOficialAtual(force) {
     const lines = [
       `DOSSIÊ DE AUDITORIA — ${item.nome}`,
       `Hash calculado: ${item.hash}`,
-      `Conquistados=${item.atuais} | Perdidos=${item.perdidos} | Possíveis=${item.possiveis} | Teto=${item.teto}`,
+      `Conquistados=${item.atuais} | Perdidos=${item.perdidos} | Possíveis=${item.possiveis} | Eficiência=${eficienciaPct(item)} | Teto técnico=${item.teto}`,
       "",
       "PLACARES DA FASE DE GRUPOS"
     ];
