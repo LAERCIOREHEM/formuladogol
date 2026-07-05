@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Estatísticas — Bolão Brasileirão 2026</title>
+  <meta name="description" content="Artilharia, assistências, melhor ataque, melhor defesa e ranking de desempenho do Brasileirão 2026 do Bolão Almoço de Sexta.">
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="css/br-estatisticas.css">
+</head>
+<body>
+  <div class="container">
+    <header class="hero" aria-label="Bolão Brasileirão 2026 — Almoço de Sexta">
+      <img src="img/header-br.jpg" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
+    </header>
+
+    <nav class="nav" aria-label="Menu principal">
+      <a href="./?brasileirao=1">⚽ Jogos</a>
+      <a href="apostas.html">🎯 Apostas</a>
+      <a href="./?brasileirao=1" data-anchor="rank">🏆 Bolão</a>
+      <a href="./?brasileirao=1" data-anchor="tabela">📊 Tabela</a>
+      <a href="./?brasileirao=1" data-anchor="resultados">✅ Resultados</a>
+      <a class="active" href="estatisticas.html">📈 Estatísticas</a>
+      <a class="disabled" aria-disabled="true">🛡️ Clubes</a>
+      <a class="disabled" aria-disabled="true">🏛️ Museu</a>
+      <a href="regras.html">ℹ️ Regras</a>
+    </nav>
+
+    <main>
+      <section class="page-title panel">
+        <div class="panel-inner">
+          <div class="kicker">Brasileirão 2026 · Execução 4</div>
+          <h1>Estatísticas e desempenho</h1>
+          <p>Artilharia, garçons, força ofensiva/defensiva e ranking técnico dos clubes, alimentados pelos JSONs da ESPN e pelo robô de estatísticas.</p>
+          <div class="meta-line" id="meta-line">Carregando estatísticas...</div>
+        </div>
+      </section>
+
+      <section class="cards-resumo" id="cards-resumo" aria-live="polite"></section>
+
+      <section class="filter-row panel" aria-label="Filtro por clube">
+        <div class="panel-inner">
+          <div class="filter-head">
+            <div>
+              <div class="kicker">Filtro</div>
+              <h2>Ver por clube</h2>
+            </div>
+            <button class="btn secondary" id="btn-limpar-filtro" type="button">Todos</button>
+          </div>
+          <div class="chips" id="club-chips"></div>
+        </div>
+      </section>
+
+      <section class="grid-main">
+        <article class="panel stat-panel" id="panel-artilharia">
+          <div class="panel-inner">
+            <div class="section-head">
+              <div>
+                <div class="kicker">⚽ Gols</div>
+                <h2>Artilharia</h2>
+              </div>
+              <span class="badge" id="badge-artilharia">ESPN summary</span>
+            </div>
+            <div id="lista-artilharia"></div>
+          </div>
+        </article>
+
+        <article class="panel stat-panel" id="panel-garcons">
+          <div class="panel-inner">
+            <div class="section-head">
+              <div>
+                <div class="kicker">🅰️ Assistências</div>
+                <h2>Garçons</h2>
+              </div>
+              <span class="badge" id="badge-garcons">ESPN summary</span>
+            </div>
+            <div id="lista-garcons"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="grid-main wide-left">
+        <article class="panel">
+          <div class="panel-inner">
+            <div class="section-head">
+              <div>
+                <div class="kicker">📈 Forma, tabela e momento</div>
+                <h2>Ranking de desempenho</h2>
+              </div>
+              <span class="badge live-soft">Atualizado por robô</span>
+            </div>
+            <div id="ranking-desempenho"></div>
+          </div>
+        </article>
+
+        <aside class="panel">
+          <div class="panel-inner">
+            <div class="section-head compact">
+              <div>
+                <div class="kicker">🔥 / 🧱</div>
+                <h2>Ataque e defesa</h2>
+              </div>
+            </div>
+            <div id="ataque-defesa"></div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="section-head">
+            <div>
+              <div class="kicker">🧪 Auditoria visual</div>
+              <h2>Clubes — forma e splits</h2>
+            </div>
+            <span class="badge">últimos 5 · casa · fora</span>
+          </div>
+          <div id="clubes-detalhes" class="clubes-detalhes"></div>
+        </div>
+      </section>
+
+      <section class="panel avisos-panel" id="avisos-panel" hidden>
+        <div class="panel-inner">
+          <div class="kicker">Observações da coleta</div>
+          <div id="avisos"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Estatísticas meramente informativas, sem fins comerciais.</div>
+      <div>Dados esportivos: ESPN + snapshots locais do repositório. Escudos e marcas pertencem aos respectivos clubes.</div>
+      <div>Artilharia e assistências dependem do detalhe de cada partida na ESPN; se o detail/summary não estiver disponível, a página preserva as demais estatísticas e mostra aviso.</div>
+    </footer>
+  </div>
+
+  <script src="js/br-estatisticas.js"></script>
+</body>
+</html>

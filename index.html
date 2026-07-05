@@ -1661,14 +1661,14 @@
   </header>
   <nav class="nav" aria-label="Menu principal">
     <button onclick="setView('jogos')" id="btn-jogos" class="active">⚽ Jogos</button>
-    <button onclick="abrirEmBreve('apostas')" id="btn-apostas" class="nav-future">🎯 Apostas</button>
+    <button onclick="location.href='apostas.html'" id="btn-apostas">🎯 Apostas</button>
     <button onclick="setView('rank')" id="btn-rank">🏆 Bolão</button>
     <button onclick="setView('tabela')" id="btn-tabela">📊 Tabela</button>
     <button onclick="setView('resultados')" id="btn-resultados">✅ Resultados</button>
-    <button onclick="abrirEmBreve('estatisticas')" id="btn-estatisticas" class="nav-future">📈 Estatísticas</button>
+    <button onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
     <button onclick="abrirEmBreve('clubes')" id="btn-clubes" class="nav-future">🛡️ Clubes</button>
     <button onclick="abrirEmBreve('museu')" id="btn-museu" class="nav-future">🏛️ Museu</button>
-    <button onclick="abrirEmBreve('regras')" id="btn-regras" class="nav-future">ℹ️ Regras</button>
+    <button onclick="location.href='regras.html'" id="btn-regras">ℹ️ Regras</button>
     <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversários</button>
     <button onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
     <button onclick="adminAction()" id="btn-admin">⚙️ Admin</button>
@@ -2015,6 +2015,15 @@ async function inicializar() {
   }
   // Carregamento assíncrono dos JSONs do servidor (atualiza se for mais novo)
   carregarMembrosDoServidor();
+
+  // Permite que páginas separadas (Apostas/Estatísticas/Regras) voltem para uma aba específica.
+  const viewInicial = sessionStorage.getItem('brViewInicial');
+  if (viewInicial) {
+    sessionStorage.removeItem('brViewInicial');
+    if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes'].includes(viewInicial)) {
+      state.view = viewInicial;
+    }
+  }
 
   // 2. Fonte de verdade: sempre buscar os JSONs do servidor ao abrir a página.
   // O cache local só é usado como plano B se a tabela falhar.

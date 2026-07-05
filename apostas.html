@@ -23,9 +23,10 @@
         <p>Palpites de placar por rodada, com janela quinta-feira → sábado 10h.</p>
       </div>
       <nav class="nav" aria-label="Navegação">
-        <a href="?brasileirao=1">⚽ Jogos</a>
+        <a href="./?brasileirao=1">⚽ Jogos</a>
         <a href="apostas.html" class="active">🎯 Apostas</a>
-        <a href="?brasileirao=1">🏆 Bolão</a>
+        <a href="./?brasileirao=1" data-br-view="rank">🏆 Bolão</a>
+        <a href="estatisticas.html">📈 Estatísticas</a>
         <a href="regras.html">ℹ️ Regras</a>
         <a href="copa2026/">🏆 Copa 26</a>
       </nav>
@@ -78,5 +79,11 @@
   <script src="js/br-config.js"></script>
   <script src="js/br-pontuacao.js"></script>
   <script src="js/br-apostas.js"></script>
+
+  <script>
+    document.querySelectorAll('[data-br-view]').forEach(function(a){
+      a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-br-view')); });
+    });
+  </script>
 </body>
 </html>
