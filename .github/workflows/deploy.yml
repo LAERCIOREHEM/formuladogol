@@ -16,6 +16,7 @@ on:
       - '*.ico'
       - 'favicon*'
       - 'apple-touch-icon.png'
+      - 'img/**'
       - 'copa2026/**'
       - 'docs/**'
       - '.github/workflows/deploy.yml'
@@ -25,12 +26,10 @@ on:
   # workflow por "push" usando GITHUB_TOKEN.
   workflow_run:
     workflows:
-      - 'Atualizar tudo (tabela, resultados e jogos)'
+      - 'Atualizar Brasileirao (ESPN + jogos/resultados)'
+      - 'Atualizar tudo (agora somente Copa - ranking de desempenho)'
       - 'Buscar melhores momentos (CazéTV)'
       - 'Atualiza fair play (cartões)'
-      - 'Atualizar próximos jogos'
-      - 'Atualizar resultados do Brasileirão'
-      - 'Atualizar tabela do Brasileirão'
     types: [completed]
 
 permissions:
@@ -75,6 +74,7 @@ jobs:
           for item in \
             index.html CNAME robots.txt sitemap.xml \
             tabela.json resultados.json jogos.json membros.json \
+            espn_eventos.json transmissoes.json \
             favicon.ico favicon-16.png favicon-32.png favicon-96.png favicon-192.png favicon-512.png \
             apple-touch-icon.png og-image.png; do
             if [[ -e "$item" ]]; then
@@ -82,6 +82,7 @@ jobs:
             fi
           done
 
+          if [[ -d img ]]; then cp -a img _site/; fi
           if [[ -d copa2026 ]]; then cp -a copa2026 _site/; fi
           if [[ -d docs ]]; then cp -a docs _site/; fi
 
