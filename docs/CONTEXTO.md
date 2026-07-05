@@ -1,6 +1,6 @@
 # CONTEXTO.md — Site Bolão Brasileirão Almoço
 
-> **Estado:** EM PRODUÇÃO. Última atualização: 16/06/2026.
+> **Estado:** EM PRODUÇÃO. Última atualização: 05/07/2026 (Brasileirão v2 — fonte ESPN, AO VIVO, novo visual).
 > Leia este arquivo antes de qualquer alteração no site.
 
 ## Finalidade
@@ -12,14 +12,19 @@ Site estático hospedado no **GitHub Pages** (domínio próprio via `CNAME`: bra
 O público são ~27 amigos do grupo "Almoço de Sexta". O site mostra o ranking do bolão do Campeonato Brasileiro, a tabela, próximos jogos, resultados e aniversariantes do grupo.
 
 ## Estrutura (raiz do repositório)
-- `index.html` — o site inteiro (abas: Ranking, Brasileirão, Próximos Jogos, Resultados, Aniversariantes, Admin).
+- `index.html` — o site inteiro (abas: **Jogos** [página de entrada], Ranking, Brasileirão, Resultados, Aniversariantes, Admin). Visual v2: logo `img/header-br.jpg`, menu com rolagem lateral, pódio no Ranking, tabela com escudos/forma, jogos com filtro por clube e **placar AO VIVO via ESPN (30s)**.
 - `membros.json` — os 27 membros do grupo e suas datas de aniversário.
-- `tabela.json` — classificação do Brasileirão (gerada por `atualizar.py`).
+- `tabela.json` — classificação do Brasileirão (gerada por `atualizar_espn.py`, **fonte ESPN**). Os 20 nomes de time são CANÔNICOS — o Ranking depende deles; o robô falha sem gravar se algum nome não mapear.
+- `espn_eventos.json` — de-para de jogos da ESPN (id, times canônicos, transmissão), gerado por `atualizar_espn.py`.
+- `transmissoes.json` — ajuste MANUAL de "onde assistir" (prioridade sobre Globo/ESPN).
 - `jogos.json` — próximos jogos (gerada por `atualizar_jogos.py`).
 - `resultados.json` — jogos já realizados (gerada por `atualizar_resultados.py`).
-- `atualizar.py`, `atualizar_jogos.py`, `atualizar_resultados.py` — scripts que buscam dados de fontes públicas e gravam os JSON.
+- `atualizar_espn.py` — busca classificação + eventos na **ESPN** (`bra.1`); substitui o antigo `atualizar.py` (Terra), que permanece no repositório apenas como rollback (nenhum workflow o executa).
+- `atualizar_jogos.py`, `atualizar_resultados.py` — continuam no Globo (têm nº da rodada e escudos).
 - `verificar_aniversarios.py` — verifica aniversariante do dia e envia e-mail (Resend.com).
-- `.github/workflows/` — agendam os scripts (cron) e fazem commit dos JSON atualizados.
+- `.github/workflows/atualizar-brasileirao.yml` — **workflow principal do Brasileirão** (cron a cada 10 min + dispatch): roda `atualizar_espn.py` + jogos + resultados e publica os 4 JSONs num commit só.
+- `.github/workflows/atualizar-tudo.yml` — hoje cuida SOMENTE do ranking de desempenho da Copa (disparado pelo cron-job.org a cada 5 min). Remover junto com o job do cron-job.org após 20/07/2026.
+- Os antigos `atualizar-tabela.yml`, `atualizar-jogos.yml` e `atualizar-resultados.yml` foram descontinuados (deletar).
 - `copa2026/` — **módulo independente** do Bolão da Copa (tem o seu próprio `docs/`). Não misturar a lógica dos dois.
 
 ## Período da Copa (módulo temporário)

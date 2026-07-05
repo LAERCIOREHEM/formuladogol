@@ -989,6 +989,211 @@
     opacity: 0;
     transform: translateX(-50%) translateY(10px);
   }
+
+  /* ======================================================================
+     BRASILEIRÃO V2 — cabeçalho com logo, menu rolável, pódio, filtros,
+     AO VIVO (ESPN) e rodapé. Nada abaixo altera cálculos do Ranking.
+     ====================================================================== */
+
+  /* --- Cabeçalho com a logo nova --- */
+  .hero-header {
+    background: #010814; /* mesma cor de fundo da arte */
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+  }
+  .hero-header img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  /* --- Menu com rolagem lateral (padrão do módulo da Copa) --- */
+  .nav {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    padding: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .nav::-webkit-scrollbar { height: 6px; }
+  .nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .nav button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    background: transparent;
+  }
+  .nav button:hover { background: var(--card-hover); }
+  .nav button.active {
+    background: rgba(163,230,53,0.12);
+    border-color: #a3e635;
+    color: #a3e635;
+    font-weight: 600;
+  }
+
+  /* --- Pódio do Ranking (top 3) --- */
+  .podio {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 10px;
+    margin: 4px 0 18px;
+  }
+  .podio-col {
+    flex: 1 1 0;
+    max-width: 190px;
+    text-align: center;
+  }
+  .podio-avatar {
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 20px; color: #0b0f16;
+    border: 3px solid var(--border);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  }
+  .podio-col.p1 .podio-avatar { width: 72px; height: 72px; font-size: 26px; border-color: var(--gold); }
+  .podio-col.p2 .podio-avatar { border-color: var(--silver); }
+  .podio-col.p3 .podio-avatar { border-color: var(--bronze); }
+  .podio-medalha { font-size: 22px; line-height: 1; }
+  .podio-col.p1 .podio-medalha { font-size: 30px; }
+  .podio-nome {
+    font-size: 12px; font-weight: 600; margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .podio-pts { font-size: 12px; color: var(--text-secondary); }
+  .podio-col.p1 .podio-pts { color: var(--gold); font-weight: 700; }
+  .podio-base {
+    margin-top: 8px;
+    border-radius: 8px 8px 0 0;
+    background: linear-gradient(180deg, rgba(163,230,53,0.16), rgba(163,230,53,0.03));
+    border: 1px solid var(--border);
+    border-bottom: none;
+  }
+  .podio-col.p1 .podio-base { height: 64px; background: linear-gradient(180deg, rgba(251,191,36,0.22), rgba(251,191,36,0.04)); }
+  .podio-col.p2 .podio-base { height: 44px; background: linear-gradient(180deg, rgba(203,213,225,0.18), rgba(203,213,225,0.03)); }
+  .podio-col.p3 .podio-base { height: 32px; background: linear-gradient(180deg, rgba(245,158,11,0.18), rgba(245,158,11,0.03)); }
+
+  /* --- Tabela do Brasileirão v2 --- */
+  .tabela-time-cel { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .tabela-escudo { width: 20px; height: 20px; flex: 0 0 auto; object-fit: contain; }
+  .zona-prelibertadores td:first-child { box-shadow: inset 3px 0 0 rgba(74,222,128,0.35); }
+  .forma-dots { display: inline-flex; gap: 3px; }
+  .forma-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    font-size: 9px; font-weight: 700; color: #0b0f16;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .forma-v { background: #4ade80; }
+  .forma-e { background: #94a3b8; }
+  .forma-d { background: #f87171; }
+
+  /* --- Filtro por clube (chips roláveis) --- */
+  .chips-filtro {
+    display: flex; gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px 2px 8px;
+    margin-bottom: 8px;
+  }
+  .chips-filtro::-webkit-scrollbar { display: none; }
+  .chip-clube {
+    flex: 0 0 auto;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .chip-clube img { width: 16px; height: 16px; object-fit: contain; }
+  .chip-clube.ativo {
+    background: rgba(163,230,53,0.12);
+    border-color: #a3e635;
+    color: #a3e635;
+    font-weight: 600;
+  }
+
+  /* --- AO VIVO (ESPN, 30 em 30s) --- */
+  .badge-aovivo {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(248,113,113,0.12);
+    border: 1px solid rgba(248,113,113,0.5);
+    color: #f87171;
+    font-size: 10px; font-weight: 700;
+    border-radius: 999px;
+    padding: 2px 8px;
+    letter-spacing: 0.4px;
+  }
+  .badge-aovivo::before {
+    content: '';
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #f87171;
+    animation: pulsar 1.2s ease-in-out infinite;
+  }
+  @keyframes pulsar { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .jogo-placar-live {
+    font-size: 22px; font-weight: 800;
+    color: var(--text);
+    min-width: 54px; text-align: center;
+  }
+  .jogo-status-live { font-size: 11px; color: #f87171; font-weight: 600; }
+  .jogo-status-fim { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
+  .jogo-gols {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    border-top: 1px dashed var(--border);
+    padding-top: 6px;
+  }
+  .live-info-bar {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text-tertiary);
+  }
+
+  /* --- Rodapé com disclaimers --- */
+  .site-footer {
+    margin-top: 28px;
+    padding: 16px 4px 6px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-tertiary);
+    line-height: 1.7;
+    text-align: center;
+  }
+  .site-footer strong { color: var(--text-secondary); }
+
+  /* --- Responsivo (celular) --- */
+  @media (max-width: 560px) {
+    .col-oculta-mobile { display: none; }
+    th, td { padding: 8px 8px; }
+    .podio-nome { font-size: 11px; }
+    .podio-avatar { width: 48px; height: 48px; font-size: 17px; }
+    .podio-col.p1 .podio-avatar { width: 60px; height: 60px; font-size: 22px; }
+    .jogo-placar-live { font-size: 19px; }
+  }
 </style>
 </head>
   <script>
@@ -1009,31 +1214,37 @@
 <body>
 <div class="container">
   <header>
-    <div>
-      <h1>Bolão Brasileirão 2026</h1>
-      <p class="subtitle">Almoço de Sexta</p>
-    </div>
-    <div class="nav">
-      <button onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
-      <button onclick="setView('rank')" id="btn-rank" class="active">Ranking</button>
-      <button onclick="setView('tabela')" id="btn-tabela">Brasileirão</button>
-      <button onclick="setView('jogos')" id="btn-jogos">Próximos Jogos</button>
-      <button onclick="setView('resultados')" id="btn-resultados">Resultados</button>
-      <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversariantes</button>
-      <button onclick="adminAction()" id="btn-admin">Admin</button>
+    <h1 class="sr-only">Bolão Brasileirão 2026 — Almoço de Sexta</h1>
+    <div class="hero-header">
+      <img src="img/header-br.jpg" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
     </div>
   </header>
+  <nav class="nav" aria-label="Menu principal">
+    <button onclick="setView('jogos')" id="btn-jogos" class="active">⚽ Jogos</button>
+    <button onclick="setView('rank')" id="btn-rank">🏆 Ranking</button>
+    <button onclick="setView('tabela')" id="btn-tabela">📊 Brasileirão</button>
+    <button onclick="setView('resultados')" id="btn-resultados">✅ Resultados</button>
+    <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversariantes</button>
+    <button onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
+    <button onclick="adminAction()" id="btn-admin">⚙️ Admin</button>
+  </nav>
 
   <div class="status-bar" id="status-bar">
     <span id="status-text">Carregando...</span>
   </div>
 
-  <div id="view-rank"></div>
+  <div id="view-rank" style="display: none;"></div>
   <div id="view-tabela" style="display: none;"></div>
-  <div id="view-jogos" style="display: none;"></div>
+  <div id="view-jogos"></div>
   <div id="view-resultados" style="display: none;"></div>
   <div id="view-aniversariantes" style="display: none;"></div>
   <div id="view-participantes" style="display: none;"></div>
+
+  <footer class="site-footer">
+    <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Site sem fins lucrativos, feito por amigos, para amigos. O bolão não envolve dinheiro: o "prêmio" é simbólico (os últimos colocados pagam o almoço de fim de ano).</div>
+    <div>Dados de classificação e placares: ESPN. Próximos jogos e resultados: GloboEsporte. Uso meramente informativo e não oficial; escudos e marcas pertencem aos respectivos clubes. Informações de "onde assistir" podem mudar sem aviso — confirme na programação da emissora.</div>
+    <div>Brasileirão v2 · atualização automática de dados a cada 10 min · placar ao vivo via ESPN a cada 30s durante os jogos.</div>
+  </footer>
 </div>
 
 <div id="modal-container"></div>
@@ -1077,6 +1288,76 @@ const PARTICIPANTES_INICIAIS = [
 ];
 
 const TIMES_LISTA = ["Athletico-PR","Atlético-MG","Bahia","Botafogo","Bragantino","Chapecoense","Corinthians","Coritiba","Cruzeiro","Flamengo","Fluminense","Grêmio","Internacional","Mirassol","Palmeiras","Remo","Santos","São Paulo","Vasco da Gama","Vitória"];
+
+// ========================================================================
+// ESCUDOS + DE-PARA DE NOMES (v2)
+// Os nomes CANÔNICOS são os da TIMES_LISTA (mesmos dos palpites/tabela).
+// A ESPN e o Globo usam variações; tudo converge pra cá.
+// ========================================================================
+const ESCUDOS_TIMES = {
+  "Athletico-PR":  { escudo: "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg", sigla: "CAP" },
+  "Atlético-MG":   { escudo: "https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg", sigla: "CAM" },
+  "Bahia":         { escudo: "https://s.sde.globo.com/media/organizations/2018/03/11/bahia.svg", sigla: "BAH" },
+  "Botafogo":      { escudo: "https://s.sde.globo.com/media/organizations/2019/02/04/botafogo-svg.svg", sigla: "BOT" },
+  "Bragantino":    { escudo: "https://s.sde.globo.com/media/organizations/2021/06/28/bragantino.svg", sigla: "RBB" },
+  "Chapecoense":   { escudo: "https://s.sde.globo.com/media/organizations/2021/06/21/CHAPECOENSE-2018.svg", sigla: "CHA" },
+  "Corinthians":   { escudo: "https://s.sde.globo.com/media/organizations/2024/10/09/Corinthians_2024_Q4ahot4.svg", sigla: "COR" },
+  "Coritiba":      { escudo: "https://s.sde.globo.com/media/organizations/2018/03/11/coritiba.svg", sigla: "CFC" },
+  "Cruzeiro":      { escudo: "https://s.sde.globo.com/media/organizations/2021/02/13/cruzeiro_2021.svg", sigla: "CRU" },
+  "Flamengo":      { escudo: "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg", sigla: "FLA" },
+  "Fluminense":    { escudo: "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg", sigla: "FLU" },
+  "Grêmio":        { escudo: "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg", sigla: "GRE" },
+  "Internacional": { escudo: "https://s.sde.globo.com/media/organizations/2018/03/11/internacional.svg", sigla: "INT" },
+  "Mirassol":      { escudo: "https://s.sde.globo.com/media/organizations/2024/08/20/mirassol-novo-svg-71690.svg", sigla: "MIR" },
+  "Palmeiras":     { escudo: "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg", sigla: "PAL" },
+  "Remo":          { escudo: "https://s.sde.globo.com/media/organizations/2021/02/25/Remo-PA.svg", sigla: "REM" },
+  "Santos":        { escudo: "https://s.sde.globo.com/media/organizations/2018/03/12/santos.svg", sigla: "SAN" },
+  "São Paulo":     { escudo: "https://s.sde.globo.com/media/organizations/2018/03/11/sao-paulo.svg", sigla: "SAO" },
+  "Vasco da Gama": { escudo: "https://s.sde.globo.com/media/organizations/2021/09/04/vasco_SVG.svg", sigla: "VAS" },
+  "Vitória":       { escudo: "https://s.sde.globo.com/media/organizations/2025/12/18/Vitoria_2025.svg", sigla: "VIT" }
+};
+
+function normalizarNome(nome) {
+  return String(nome || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9\- ]/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+const _ALIASES_JS = {
+  "athletico paranaense": "Athletico-PR", "athletico": "Athletico-PR", "atletico paranaense": "Athletico-PR",
+  "atletico mineiro": "Atlético-MG", "atletico mg": "Atlético-MG",
+  "red bull bragantino": "Bragantino", "rb bragantino": "Bragantino",
+  "vasco": "Vasco da Gama", "cr vasco da gama": "Vasco da Gama",
+  "ec bahia": "Bahia", "ec vitoria": "Vitória", "sc internacional": "Internacional",
+  "se palmeiras": "Palmeiras", "cr flamengo": "Flamengo", "clube do remo": "Remo",
+  "sao paulo fc": "São Paulo", "santos fc": "Santos", "mirassol fc": "Mirassol",
+  "coritiba fc": "Coritiba", "chapecoense-sc": "Chapecoense",
+  "sc corinthians paulista": "Corinthians", "gremio fbpa": "Grêmio",
+  "botafogo rj": "Botafogo", "fluminense fc": "Fluminense", "cruzeiro ec": "Cruzeiro"
+};
+const _TOKENS_JS = [
+  ["paranaense","Athletico-PR"],["athletico","Athletico-PR"],["mineiro","Atlético-MG"],
+  ["bragantino","Bragantino"],["chapecoense","Chapecoense"],["corinthians","Corinthians"],
+  ["coritiba","Coritiba"],["cruzeiro","Cruzeiro"],["flamengo","Flamengo"],
+  ["fluminense","Fluminense"],["gremio","Grêmio"],["internacional","Internacional"],
+  ["mirassol","Mirassol"],["palmeiras","Palmeiras"],["remo","Remo"],["santos","Santos"],
+  ["vasco","Vasco da Gama"],["botafogo","Botafogo"],["bahia","Bahia"],["vitoria","Vitória"]
+];
+// Converte QUALQUER variação de nome (Globo, ESPN, Terra) no canônico do site.
+function nomeCanonico(nome) {
+  const n = normalizarNome(nome);
+  if (!n) return null;
+  if (_ALIASES_JS[n]) return _ALIASES_JS[n];
+  for (const c of TIMES_LISTA) if (n === normalizarNome(c)) return c;
+  for (const [tok, c] of _TOKENS_JS) {
+    if (new RegExp('\\b' + tok + '\\b').test(n)) return c;
+  }
+  return null;
+}
+function escudoDe(nome) {
+  const c = nomeCanonico(nome);
+  return (c && ESCUDOS_TIMES[c]) ? ESCUDOS_TIMES[c] : null;
+}
 
 // ========================================================================
 // MEMBROS DO GRUPO — 27 pessoas, com data de aniversário (dia/mês)
@@ -1123,7 +1404,7 @@ let state = {
   membros: [],         // 27 membros do grupo Almoço de Sexta
   ultimaAtualizacao: null,
   ehAdmin: false,
-  view: 'rank',
+  view: 'jogos',
   expandido: null,
   editIdx: null,
   editMembroIdx: null,
@@ -1289,6 +1570,10 @@ async function inicializar() {
   }
   // Carregamento assíncrono dos JSONs do servidor (atualiza se for mais novo)
   carregarMembrosDoServidor();
+
+  // JOGOS agora é a página de entrada: carrega já na abertura (em paralelo
+  // com a tabela). O AO VIVO (ESPN) é armado dentro de carregarJogos().
+  carregarJogos();
 
   // 2. Fonte de verdade: sempre buscar o tabela.json do servidor ao abrir a página.
   // O cache local só é usado como plano B se a busca falhar.
@@ -1528,10 +1813,29 @@ function setView(v) {
   if (v === 'jogos' && !state.jogosCarregados) {
     carregarJogos();
   }
+  if (v === 'jogos') {
+    espnLiveArmar(); // rearma o AO VIVO (dorme quando sai da aba/da janela)
+  }
   if (v === 'resultados' && !state.resultadosCarregados) {
     carregarResultados();
   }
   render();
+}
+
+// Avatar determinístico de iniciais (mesma técnica do módulo da Copa):
+// cor derivada de um hash do nome — estável entre visitas e dispositivos.
+function iniciaisNome(nome) {
+  const partes = String(nome || '?').trim().split(/\s+/);
+  const a = (partes[0] || '?')[0] || '?';
+  const b = partes.length > 1 ? (partes[partes.length - 1][0] || '') : '';
+  return (a + b).toUpperCase();
+}
+function corAvatar(nome) {
+  let h = 0;
+  const s = String(nome || '');
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  const cores = ['#a3e635', '#4ade80', '#60a5fa', '#fbbf24', '#f472b6', '#c084fc', '#fb923c', '#2dd4bf'];
+  return cores[Math.abs(h) % cores.length];
 }
 
 function renderRank() {
@@ -1556,6 +1860,24 @@ function renderRank() {
   html += '<div class="leg-item"><div class="leg-dot" style="background:rgba(251,191,36,0.5);"></div>Time que cai (+6)</div>';
   html += '<div class="leg-item"><div class="leg-dot" style="background:rgba(74,222,128,0.5);"></div>Acertou posição</div>';
   html += '</div></div>';
+
+  // ---- PÓDIO (top 3) — apenas visual; a fonte é o mesmo array `ranking` ----
+  if (ranking.length >= 3) {
+    const medalhas = ['🥇', '🥈', '🥉'];
+    const ordemVisual = [1, 0, 2]; // 2º | 1º | 3º
+    html += '<div class="podio">';
+    for (const pos of ordemVisual) {
+      const r = ranking[pos];
+      html += `<div class="podio-col p${pos + 1}">
+        <div class="podio-medalha">${medalhas[pos]}</div>
+        <div class="podio-avatar" style="background:${corAvatar(r.nome)}">${iniciaisNome(r.nome)}</div>
+        <div class="podio-nome" title="${r.nome}">${r.nome}</div>
+        <div class="podio-pts">${r.total} pts</div>
+        <div class="podio-base"></div>
+      </div>`;
+    }
+    html += '</div>';
+  }
 
   html += '<div class="ranking-wrapper"><table class="ranking-table">';
 
@@ -1660,17 +1982,77 @@ function renderTabela() {
   const snap = gerenciarSnapshotTabela();
   const posBase = (snap && snap.posicoesBase) || {};
 
-  let html = '<div class="card"><table><thead><tr><th style="width:60px;">Pos</th><th>Time</th><th style="text-align:center;">P</th><th style="text-align:center;">J</th><th style="text-align:center;">V</th><th style="text-align:center;">E</th><th style="text-align:center;">D</th><th style="text-align:center;">SG</th><th style="text-align:center;">%</th></tr></thead><tbody>';
+  // Forma (últimos 5 jogos) — calculada de resultados.json quando disponível.
+  // Se ainda não carregou, dispara o carregamento em segundo plano e a
+  // coluna aparece sozinha quando os dados chegarem.
+  const forma = calcularFormaTimes();
+  if (!state.resultadosCarregados) carregarResultados();
+
+  let html = '<div class="card"><table><thead><tr>' +
+    '<th style="width:60px;">Pos</th><th>Time</th>' +
+    '<th style="text-align:center;">P</th>' +
+    '<th style="text-align:center;">J</th>' +
+    '<th style="text-align:center;" class="col-oculta-mobile">V</th>' +
+    '<th style="text-align:center;" class="col-oculta-mobile">E</th>' +
+    '<th style="text-align:center;" class="col-oculta-mobile">D</th>' +
+    '<th style="text-align:center;" class="col-oculta-mobile">GP</th>' +
+    '<th style="text-align:center;" class="col-oculta-mobile">GC</th>' +
+    '<th style="text-align:center;">SG</th>' +
+    '<th style="text-align:center;" class="col-oculta-mobile">%</th>' +
+    (forma ? '<th style="text-align:center;" class="col-oculta-mobile">Últimos 5</th>' : '') +
+    '</tr></thead><tbody>';
   state.tabela.forEach(t => {
     let cls = '';
     if (t.pos >= 17) cls = 'zona-rebaixamento';
     else if (t.pos <= 4) cls = 'zona-libertadores';
+    else if (t.pos <= 6) cls = 'zona-prelibertadores';
     const seta = htmlSetaMovimento(posBase[t.time], t.pos);
-    html += `<tr class="${cls}"><td><strong>${t.pos}</strong>${seta}</td><td>${t.time}</td><td style="text-align:center; font-weight:600;">${t.pontos}</td><td style="text-align:center;">${t.jogos}</td><td style="text-align:center;">${t.vitorias}</td><td style="text-align:center;">${t.empates}</td><td style="text-align:center;">${t.derrotas}</td><td style="text-align:center;">${t.sg > 0 ? '+' : ''}${t.sg}</td><td style="text-align:center;">${t.aproveitamento}%</td></tr>`;
+    const esc = escudoDe(t.time);
+    const celTime = `<div class="tabela-time-cel">${esc ? `<img class="tabela-escudo" src="${esc.escudo}" alt="" loading="lazy">` : ''}<span>${t.time}</span></div>`;
+    let celForma = '';
+    if (forma) {
+      const f5 = forma[t.time] || [];
+      celForma = '<td style="text-align:center;" class="col-oculta-mobile"><span class="forma-dots">' +
+        f5.map(r => `<span class="forma-dot forma-${r.toLowerCase()}">${r}</span>`).join('') +
+        '</span></td>';
+    }
+    html += `<tr class="${cls}"><td><strong>${t.pos}</strong>${seta}</td><td>${celTime}</td>` +
+      `<td style="text-align:center; font-weight:600;">${t.pontos}</td>` +
+      `<td style="text-align:center;">${t.jogos}</td>` +
+      `<td style="text-align:center;" class="col-oculta-mobile">${t.vitorias}</td>` +
+      `<td style="text-align:center;" class="col-oculta-mobile">${t.empates}</td>` +
+      `<td style="text-align:center;" class="col-oculta-mobile">${t.derrotas}</td>` +
+      `<td style="text-align:center;" class="col-oculta-mobile">${t.gp}</td>` +
+      `<td style="text-align:center;" class="col-oculta-mobile">${t.gc}</td>` +
+      `<td style="text-align:center;">${t.sg > 0 ? '+' : ''}${t.sg}</td>` +
+      `<td style="text-align:center;" class="col-oculta-mobile">${t.aproveitamento}%</td>` +
+      celForma + `</tr>`;
   });
   html += '</tbody></table></div>';
-  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:rgba(74,222,128,0.4);"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:rgba(248,113,113,0.4);"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu de posição</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu de posição</div></div>';
+  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:rgba(74,222,128,0.4);"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:rgba(74,222,128,0.18);"></div>Pré-Libertadores (5º–6º)</div><div class="legenda-item"><div class="legenda-dot" style="background:rgba(248,113,113,0.4);"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu de posição</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu de posição</div></div>';
   document.getElementById('view-tabela').innerHTML = html;
+}
+
+// Forma dos últimos 5 jogos de cada time (V/E/D), a partir de resultados.json.
+// Devolve null se os resultados ainda não estiverem carregados.
+function calcularFormaTimes() {
+  if (!state.resultadosCarregados || !Array.isArray(state.resultados) || state.resultados.length === 0) return null;
+  const porTime = {};
+  const ordenados = state.resultados.slice().sort((a, b) => String(a.data_iso).localeCompare(String(b.data_iso)));
+  for (const r of ordenados) {
+    if (r.placar_mandante == null || r.placar_visitante == null) continue;
+    const m = nomeCanonico((r.mandante || {}).nome);
+    const v = nomeCanonico((r.visitante || {}).nome);
+    if (!m || !v) continue;
+    const pm = Number(r.placar_mandante), pv = Number(r.placar_visitante);
+    const resM = pm > pv ? 'V' : pm < pv ? 'D' : 'E';
+    const resV = pv > pm ? 'V' : pv < pm ? 'D' : 'E';
+    (porTime[m] = porTime[m] || []).push(resM);
+    (porTime[v] = porTime[v] || []).push(resV);
+  }
+  const forma = {};
+  for (const t in porTime) forma[t] = porTime[t].slice(-5);
+  return forma;
 }
 
 // ========================================================================
@@ -1697,7 +2079,44 @@ async function carregarJogos() {
     state.jogosErro = e.message;
     state.jogosCarregados = true;
   }
+
+  // Acessórios (tolerantes a 404 — se não existirem, o site segue normal):
+  // espn_eventos.json  -> transmissão/ONDE ASSISTIR vinda da ESPN (robô)
+  // transmissoes.json  -> ajuste MANUAL de "onde assistir" (prioridade máxima)
+  try {
+    const r = await fetch('espn_eventos.json?t=' + Date.now());
+    if (r.ok) {
+      const d = await r.json();
+      state.espnEventos = Array.isArray(d.eventos) ? d.eventos : [];
+    }
+  } catch (e) { /* opcional */ }
+  try {
+    const r = await fetch('transmissoes.json?t=' + Date.now());
+    if (r.ok) {
+      const d = await r.json();
+      state.transmissoesManuais = Array.isArray(d.transmissoes) ? d.transmissoes : [];
+    }
+  } catch (e) { /* opcional */ }
+
   if (state.view === 'jogos') renderJogos();
+  espnLiveArmar(); // liga o AO VIVO (ESPN) se houver janela de jogo
+}
+
+// "Onde assistir" de um jogo: manual (transmissoes.json) > Globo > ESPN.
+function ondeAssistir(j) {
+  const m = nomeCanonico((j.mandante || {}).nome);
+  const v = nomeCanonico((j.visitante || {}).nome);
+  for (const t of (state.transmissoesManuais || [])) {
+    if (nomeCanonico(t.mandante) === m && nomeCanonico(t.visitante) === v &&
+        (!t.rodada || t.rodada === j.rodada)) {
+      return t.transmissao || '';
+    }
+  }
+  if (j.transmissao) return j.transmissao;
+  for (const e of (state.espnEventos || [])) {
+    if (e.mandante === m && e.visitante === v && e.transmissao) return e.transmissao;
+  }
+  return '';
 }
 
 // Helper: extrai a data calendário no fuso de Brasília a partir de um ISO.
@@ -1790,9 +2209,25 @@ function renderJogos() {
     return;
   }
 
+  // ---- FILTRO POR CLUBE (chips com escudo, rolagem lateral) ----
+  const clubesPresentes = [];
+  for (const j of state.jogos) {
+    for (const lado of ['mandante', 'visitante']) {
+      const c = nomeCanonico((j[lado] || {}).nome);
+      if (c && !clubesPresentes.includes(c)) clubesPresentes.push(c);
+    }
+  }
+  clubesPresentes.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+  const filtro = state.jogosFiltroTime || '';
+  const jogosVisiveis = !filtro ? state.jogos : state.jogos.filter(j =>
+    nomeCanonico((j.mandante || {}).nome) === filtro ||
+    nomeCanonico((j.visitante || {}).nome) === filtro
+  );
+
   // Agrupa por dia
   const grupos = {};
-  for (const j of state.jogos) {
+  for (const j of jogosVisiveis) {
     const chave = chaveDataAgrupada(j.data_iso);
     if (!grupos[chave]) grupos[chave] = [];
     grupos[chave].push(j);
@@ -1801,12 +2236,29 @@ function renderJogos() {
 
   // Cabeçalho
   const meta = state.jogosMeta || {};
-  let html = '<div class="secao-header" style="display: flex; justify-content: space-between; align-items: center;">';
-  html += `<h2>Próximos jogos${meta.rodada_atual ? ' · Rodada ' + meta.rodada_atual : ''}</h2>`;
-  if (meta.atualizado_em_br) {
+  let html = '<div class="secao-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">';
+  html += `<h2>Jogos${meta.rodada_atual ? ' · Rodada ' + meta.rodada_atual : ''}</h2>`;
+  const temLive = espnLiveTemJogoRolando();
+  if (temLive) {
+    html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> placar ESPN a cada 30s${state._espnLiveUltima ? ' · atualizado ' + formatarSomenteHora(state._espnLiveUltima) : ''}</span>`;
+  } else if (meta.atualizado_em_br) {
     html += `<span style="font-size: 11px; color: var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
   }
   html += '</div>';
+
+  // Chips de filtro
+  html += '<div class="chips-filtro">';
+  html += `<button class="chip-clube ${!filtro ? 'ativo' : ''}" onclick="setFiltroJogos('')">Todos</button>`;
+  for (const c of clubesPresentes) {
+    const esc = ESCUDOS_TIMES[c];
+    html += `<button class="chip-clube ${filtro === c ? 'ativo' : ''}" onclick="setFiltroJogos('${c.replace(/'/g, "\\'")}')">` +
+      (esc ? `<img src="${esc.escudo}" alt="" loading="lazy">` : '') + `${c}</button>`;
+  }
+  html += '</div>';
+
+  if (jogosVisiveis.length === 0) {
+    html += '<div class="card empty">Nenhum jogo encontrado para este filtro.</div>';
+  }
 
   for (const chave of chavesOrdenadas) {
     const jogos = grupos[chave];
@@ -1827,14 +2279,32 @@ function renderJogos() {
 
       const horario = formatarHorarioJogo(j.data_iso);
 
+      // AO VIVO: se a ESPN tiver este jogo em andamento/encerrado hoje,
+      // troca o horário pelo placar + status (30 em 30s, sem F5).
+      const live = espnLiveDoJogo(j);
+      let topo;
+      if (live && (live.estado === 'in' || live.estado === 'post')) {
+        const statusHtml = live.estado === 'in'
+          ? `<span class="badge-aovivo">AO VIVO</span> <span class="jogo-status-live">${live.status || ''}</span>`
+          : `<span class="jogo-status-fim">Encerrado</span>`;
+        topo = `<div class="jogo-horario" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span>${horario}</span>${statusHtml}</div>`;
+      } else {
+        topo = `<div class="jogo-horario">${horario}</div>`;
+      }
+
+      const placarCentro = (live && (live.estado === 'in' || live.estado === 'post'))
+        ? `<div class="jogo-placar-live">${live.placarMandante} × ${live.placarVisitante}</div>`
+        : '<div class="jogo-vs">×</div>';
+
       html += `<div class="jogo-card">
-        <div class="jogo-horario">${horario}</div>
+        ${topo}
         <div class="jogo-times">
           <div class="jogo-time">
             <span class="jogo-escudo">${escudoMandante}</span>
             <span class="jogo-nome">${m.nome || '?'}</span>
           </div>
-          <div class="jogo-vs">×</div>
+          ${placarCentro}
           <div class="jogo-time">
             <span class="jogo-escudo">${escudoVisitante}</span>
             <span class="jogo-nome">${v.nome || '?'}</span>
@@ -1843,9 +2313,15 @@ function renderJogos() {
 
       const detalhes = [];
       if (j.estadio) detalhes.push(`<span class="jogo-detalhe">📍 ${j.estadio}</span>`);
-      if (j.transmissao) detalhes.push(`<span class="jogo-detalhe">📺 ${j.transmissao}</span>`);
+      const tx = ondeAssistir(j);
+      if (tx) detalhes.push(`<span class="jogo-detalhe">📺 ${tx}</span>`);
       if (detalhes.length > 0) {
         html += `<div class="jogo-detalhes">${detalhes.join('')}</div>`;
+      }
+
+      // Gols (autor + minuto), quando a ESPN informa
+      if (live && live.gols && live.gols.length > 0) {
+        html += `<div class="jogo-gols">⚽ ${live.gols.join(' · ')}</div>`;
       }
 
       html += '</div>';
@@ -1855,12 +2331,133 @@ function renderJogos() {
   }
 
   // Rodapé com info de fonte
-  if (meta.fonte) {
-    html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
+  const fontes = [meta.fonte, 'ESPN (placar ao vivo)'].filter(Boolean).join(' + ');
+  if (fontes) {
+    html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${fontes}</div>`;
   }
 
   container.innerHTML = html;
 }
+
+function setFiltroJogos(time) {
+  state.jogosFiltroTime = time || '';
+  renderJogos();
+}
+
+// ========================================================================
+// AO VIVO — ESPN (bra.1), direto do navegador, a cada 30 segundos.
+// Mesma técnica do módulo da Copa (aovivo.js): a API da ESPN aceita CORS,
+// então o placar em tempo real NÃO depende do GitHub Actions.
+// Fora da janela de jogo o motor dorme (zero requisições).
+// ========================================================================
+const ESPN_SCOREBOARD_BR = 'https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard';
+const ESPN_LIVE_MS = 30000;          // durante jogo: 30s
+const ESPN_JANELA_ANTES_MIN = 20;    // começa a olhar 20 min antes do 1º jogo
+const ESPN_JANELA_DEPOIS_MIN = 150;  // considera "janela" até 150 min após o início
+
+function espnLiveTemJogoRolando() {
+  const lv = state.espnLive || {};
+  return Object.keys(lv).some(k => lv[k].estado === 'in');
+}
+
+// Existe jogo do Brasileirão em janela ativa (agora)?
+function espnJanelaAtiva() {
+  const agora = Date.now();
+  for (const j of (state.jogos || [])) {
+    const t = new Date(j.data_iso + (String(j.data_iso).length <= 16 ? ':00-03:00' : '')).getTime();
+    if (isNaN(t)) continue;
+    if (agora >= t - ESPN_JANELA_ANTES_MIN * 60000 &&
+        agora <= t + ESPN_JANELA_DEPOIS_MIN * 60000) return true;
+  }
+  return espnLiveTemJogoRolando();
+}
+
+function espnChaveJogo(nomeM, nomeV) {
+  const m = nomeCanonico(nomeM), v = nomeCanonico(nomeV);
+  return (m && v) ? m + '|' + v : null;
+}
+
+function espnLiveDoJogo(j) {
+  const k = espnChaveJogo((j.mandante || {}).nome, (j.visitante || {}).nome);
+  return k ? (state.espnLive || {})[k] : null;
+}
+
+async function espnLiveBuscar() {
+  // datas em UTC (ontem..amanhã) para cobrir jogos noturnos que viram o dia
+  const fmt = d => d.toISOString().slice(0, 10).replace(/-/g, '');
+  const hoje = new Date();
+  const ini = fmt(new Date(hoje.getTime() - 86400000));
+  const fim = fmt(new Date(hoje.getTime() + 86400000));
+  const url = `${ESPN_SCOREBOARD_BR}?dates=${ini}-${fim}&limit=60&_=${Date.now()}`;
+  const resp = await fetch(url, { cache: 'no-store' });
+  if (!resp.ok) throw new Error('ESPN HTTP ' + resp.status);
+  const data = await resp.json();
+
+  const novo = {};
+  for (const ev of (data.events || [])) {
+    try {
+      const comp = (ev.competitions || [])[0] || {};
+      const cs = comp.competitors || [];
+      const casa = cs.find(c => c.homeAway === 'home');
+      const fora = cs.find(c => c.homeAway === 'away');
+      if (!casa || !fora) continue;
+      const k = espnChaveJogo(
+        (casa.team || {}).displayName || (casa.team || {}).name,
+        (fora.team || {}).displayName || (fora.team || {}).name
+      );
+      if (!k) continue;
+
+      const st = (comp.status || {}) || {};
+      const tipo = st.type || {};
+      // gols: a ESPN traz em competitions[0].details (scoringPlay = true)
+      const gols = [];
+      for (const d of (comp.details || [])) {
+        if (!d || d.scoringPlay !== true) continue;
+        const quem = ((d.athletesInvolved || [])[0] || {}).displayName || '';
+        const min = ((d.clock || {}).displayValue || '').trim();
+        const timeGol = String((d.team || {}).id || '') === String((casa.team || {}).id || '')
+          ? (casa.team || {}).abbreviation : (fora.team || {}).abbreviation;
+        if (quem) gols.push(`${quem}${min ? ' ' + min : ''}${timeGol ? ' (' + timeGol + ')' : ''}`);
+      }
+
+      novo[k] = {
+        estado: tipo.state || 'pre',                       // pre | in | post
+        status: st.displayClock || tipo.shortDetail || tipo.detail || '',
+        placarMandante: casa.score != null ? casa.score : '-',
+        placarVisitante: fora.score != null ? fora.score : '-',
+        gols: gols
+      };
+    } catch (e) { /* evento malformado: ignora */ }
+  }
+  state.espnLive = novo;
+  state._espnLiveUltima = new Date();
+}
+
+let _espnTimer = null;
+async function espnLiveTick() {
+  _espnTimer = null;
+  // Só trabalha quando a aba Jogos está visível e há janela de jogo.
+  if (document.hidden || state.view !== 'jogos' || !espnJanelaAtiva()) {
+    return; // dorme; será rearmado por setView/visibilitychange
+  }
+  try {
+    await espnLiveBuscar();
+    if (state.view === 'jogos') renderJogos();
+  } catch (e) {
+    console.warn('AO VIVO ESPN indisponível agora:', e.message);
+    // silencioso: o site continua com jogos.json/resultados.json (robô 10 min)
+  }
+  _espnTimer = setTimeout(espnLiveTick, ESPN_LIVE_MS);
+}
+
+function espnLiveArmar() {
+  if (_espnTimer) return;
+  espnLiveTick();
+}
+
+document.addEventListener('visibilitychange', function () {
+  if (!document.hidden) espnLiveArmar();
+});
 
 // ========================================================================
 // RESULTADOS
@@ -1888,6 +2485,9 @@ async function carregarResultados() {
     state.resultadosCarregados = true;
   }
   if (state.view === 'resultados') renderResultados();
+  // A coluna "Últimos 5" da tabela depende dos resultados; se o usuário
+  // estiver na tabela, redesenha para a forma aparecer.
+  if (state.view === 'tabela') renderTabela();
 }
 
 function setFiltroResultados(time) {

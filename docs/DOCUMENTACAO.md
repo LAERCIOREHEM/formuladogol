@@ -80,3 +80,18 @@ Documentação e manutenção próprias em `copa2026/docs/`. Não misturar com o
 - Não comitar segredos (tokens/chaves). Token do Admin vive só no navegador do organizador.
 - Grupo TUPAL foi migrado para site próprio e removido — não reintroduzir.
 - Ao alterar o site, atualizar `docs/CONTEXTO.md` e este arquivo.
+
+
+---
+
+## Brasileirão v2 (05/07/2026) — fonte ESPN + AO VIVO
+
+**O que mudou**
+1. **Fonte da tabela: Terra → ESPN.** `atualizar_espn.py` lê `https://site.api.espn.com/apis/v2/sports/soccer/bra.1/standings` e grava `tabela.json` no MESMO formato de sempre (`fonte: "ESPN"`). Regra de ouro: os 20 times saem com os nomes canônicos do site (os mesmos dos palpites do Ranking). Se qualquer time da ESPN não mapear (dicionário `ALIASES` no script), o robô **falha sem gravar** e o `tabela.json` anterior permanece — o Ranking nunca quebra.
+2. **AO VIVO no navegador (sem F5).** Durante a janela de jogo (20 min antes até ~150 min depois), a aba Jogos consulta o scoreboard da ESPN a cada **30s** (mesma técnica do módulo da Copa — a API aceita CORS) e mostra placar, minuto, badge AO VIVO e gols (autor/minuto). Fora da janela, zero requisições. Se a ESPN cair, o site segue com os JSONs do robô.
+3. **Workflow novo:** `atualizar-brasileirao.yml` (cron `*/10` + dispatch) roda ESPN + jogos + resultados e publica `tabela.json`, `espn_eventos.json`, `jogos.json`, `resultados.json` juntos (push robusto, grupo `repo-write-main`). O cron do GitHub é melhor-esforço; opcionalmente cadastrar o dispatch no cron-job.org.
+4. **`atualizar-tudo.yml` virou Copa-only** (ranking de desempenho, 5 min via cron-job.org). Após 20/07: deletar workflow + job do cron-job.org.
+5. **Visual v2 do `index.html`:** logo nova no topo (`img/header-br.jpg`), menu rolável estilo Copa, página de entrada = **Jogos**, pódio top-3 no Ranking, tabela com escudos + GP/GC + zona pré-Libertadores (5º–6º) + forma dos últimos 5 (de `resultados.json`), filtro por clube em Jogos, "onde assistir" (prioridade: `transmissoes.json` manual > Globo > ESPN) e rodapé com disclaimers.
+6. **Intocados:** redirect da Copa, `calcular()`/`dadosTime()` (validados byte a byte), Admin, Aniversariantes, `copa2026/` inteiro.
+
+**Módulos planejados (próximas sessões):** Apostas de placar por rodada (início na rodada 20, 25/07; janela quinta → sábado 10h; Supabase, regras 5/3/2 estilo Copa), apuração/bolão por rodada, Museu, Estatísticas e páginas de Clubes — ver `PROJETO-BRASILEIRAO-V2.md`.
