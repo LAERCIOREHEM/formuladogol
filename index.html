@@ -1194,6 +1194,446 @@
     .podio-col.p1 .podio-avatar { width: 60px; height: 60px; font-size: 22px; }
     .jogo-placar-live { font-size: 19px; }
   }
+
+
+  /* ======================================================================
+     EXECUÇÃO 2 — Visual definitivo do módulo Brasileirão
+     Camada apenas visual/UX: não altera cálculo do Ranking nem regras atuais.
+     ====================================================================== */
+  :root {
+    --bg: #07110f;
+    --bg-2: #0b1715;
+    --card: rgba(14, 24, 28, 0.88);
+    --card-hover: rgba(25, 39, 45, 0.96);
+    --border: rgba(148, 163, 184, 0.18);
+    --border-strong: rgba(190, 242, 100, 0.28);
+    --text: #f4f7fb;
+    --text-secondary: #a9b6c7;
+    --text-tertiary: #728196;
+    --accent: #a3e635;
+    --accent-2: #22c55e;
+    --accent-dim: rgba(163, 230, 53, 0.13);
+    --warning: #facc15;
+    --warning-dim: rgba(250, 204, 21, 0.13);
+    --info: #38bdf8;
+    --info-dim: rgba(56, 189, 248, 0.12);
+    --danger: #fb7185;
+    --danger-dim: rgba(251, 113, 133, 0.12);
+    --gold: #facc15;
+    --silver: #dbeafe;
+    --bronze: #fb923c;
+    --radius-xl: 18px;
+    --shadow-soft: 0 18px 45px rgba(0,0,0,.32);
+    --shadow-glow: 0 0 0 1px rgba(163,230,53,.12), 0 18px 50px rgba(34,197,94,.10);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    padding: 18px;
+    background:
+      radial-gradient(circle at 14% 0%, rgba(163,230,53,.16), transparent 32%),
+      radial-gradient(circle at 92% 18%, rgba(56,189,248,.10), transparent 28%),
+      linear-gradient(180deg, #060d12 0%, var(--bg) 48%, #05090d 100%);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: .33;
+    background-image:
+      linear-gradient(120deg, transparent 0 44%, rgba(163,230,53,.06) 45%, transparent 46% 100%),
+      linear-gradient(60deg, transparent 0 50%, rgba(148,163,184,.05) 51%, transparent 52% 100%);
+    background-size: 760px 760px, 520px 520px;
+    z-index: -1;
+  }
+  .container { max-width: 1210px; }
+  header { display: block; margin-bottom: 14px; }
+  .hero-header {
+    position: relative;
+    border-radius: 22px;
+    border-color: rgba(163,230,53,.24);
+    background: linear-gradient(135deg, rgba(3,11,18,.98), rgba(10,20,25,.96));
+    box-shadow: var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .hero-header::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(163,230,53,.13), transparent 28%, transparent 72%, rgba(56,189,248,.08));
+    mix-blend-mode: screen;
+  }
+  .hero-header img { min-height: 124px; object-fit: cover; }
+
+  .nav {
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    padding: 8px;
+    gap: 8px;
+    background: rgba(9, 17, 22, .84);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-color: rgba(163,230,53,.16);
+    box-shadow: 0 12px 35px rgba(0,0,0,.22);
+  }
+  .nav button {
+    border-radius: 999px;
+    padding: 9px 14px;
+    color: #d9e6f2;
+  }
+  .nav button.active {
+    background: linear-gradient(135deg, rgba(163,230,53,.24), rgba(34,197,94,.12));
+    border-color: rgba(190,242,100,.75);
+    color: #d9ff76;
+    box-shadow: 0 0 18px rgba(163,230,53,.12);
+  }
+  .nav button.nav-future { color: #91a0b3; }
+  .nav button.nav-future::after {
+    content: 'em breve';
+    margin-left: 6px;
+    font-size: 9px;
+    color: #0d1217;
+    background: #a3e635;
+    padding: 1px 5px;
+    border-radius: 999px;
+    vertical-align: 1px;
+  }
+
+  .status-bar {
+    border-radius: 14px;
+    background: rgba(15, 23, 30, .76);
+    border-color: rgba(163,230,53,.16);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+
+  .section-title-row, .br-panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 16px 0 10px;
+    flex-wrap: wrap;
+  }
+  .section-title-row h2, .br-panel-title h2 {
+    margin: 0;
+    color: #dfffb0;
+    font-size: 14px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+  .br-kicker {
+    color: var(--text-tertiary);
+    font-size: 11px;
+    letter-spacing: .7px;
+    text-transform: uppercase;
+  }
+
+  .br-overview {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin: 10px 0 14px;
+  }
+  .br-stat-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 82px;
+    padding: 14px;
+    border: 1px solid rgba(163,230,53,.14);
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(14,24,28,.90), rgba(9,17,24,.78));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .br-stat-card::after {
+    content: '';
+    position: absolute;
+    right: -28px;
+    top: -28px;
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    background: rgba(163,230,53,.08);
+  }
+  .br-stat-label {
+    position: relative;
+    z-index: 1;
+    color: var(--text-tertiary);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .75px;
+  }
+  .br-stat-value {
+    position: relative;
+    z-index: 1;
+    margin-top: 6px;
+    color: var(--text);
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 800;
+  }
+  .br-stat-note {
+    position: relative;
+    z-index: 1;
+    margin-top: 4px;
+    color: var(--text-secondary);
+    font-size: 11px;
+  }
+
+  .card, .ranking-wrapper, .aniv-mes, .resultado-card, .jogo-card {
+    border-color: rgba(148,163,184,.17);
+    background: rgba(14, 24, 31, .84);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  }
+  .card { border-radius: var(--radius-xl); }
+  .empty { border-radius: var(--radius-xl); }
+
+  .dia-header {
+    border-left: 0;
+    padding: 9px 13px;
+    border-radius: 999px;
+    color: #d9ff76;
+    background: linear-gradient(90deg, rgba(163,230,53,.16), rgba(163,230,53,.03));
+    border: 1px solid rgba(163,230,53,.18);
+    display: inline-flex;
+    align-items: center;
+    margin-top: 20px;
+  }
+  .dia-header::before { content: '📅'; margin-right: 8px; }
+  .jogos-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .jogo-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 18px;
+    padding: 0;
+    transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+  }
+  .jogo-card:hover { transform: translateY(-2px); border-color: rgba(163,230,53,.34); box-shadow: var(--shadow-glow); }
+  .jogo-card.live { border-color: rgba(251,113,133,.44); box-shadow: 0 0 0 1px rgba(251,113,133,.08), 0 16px 40px rgba(251,113,133,.08); }
+  .jogo-card.post { border-color: rgba(148,163,184,.20); opacity: .96; }
+  .jogo-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(148,163,184,.12);
+    background: linear-gradient(90deg, rgba(255,255,255,.045), transparent);
+  }
+  .jogo-round-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+  .jogo-hora-pill {
+    color: #06120d;
+    background: linear-gradient(135deg, #d9ff76, #7de24e);
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-weight: 900;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 8px 20px rgba(163,230,53,.12);
+  }
+  .jogo-main {
+    padding: 16px 14px 12px;
+  }
+  .jogo-times-v2 {
+    grid-template-columns: minmax(0, 1fr) minmax(58px, auto) minmax(0, 1fr);
+    gap: 12px;
+  }
+  .jogo-team-side {
+    gap: 8px;
+  }
+  .jogo-escudo {
+    width: 58px;
+    height: 58px;
+    padding: 6px;
+    border-radius: 18px;
+    background: radial-gradient(circle at 50% 35%, rgba(255,255,255,.10), rgba(255,255,255,.02));
+    border: 1px solid rgba(148,163,184,.15);
+  }
+  .escudo-fallback { width: 58px; height: 58px; border-radius: 18px; }
+  .jogo-nome { font-weight: 800; font-size: 14px; color: #f7fbff; }
+  .jogo-vs {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    border: 1px solid rgba(148,163,184,.16);
+    background: rgba(255,255,255,.03);
+  }
+  .jogo-placar-live {
+    min-width: 68px;
+    padding: 5px 8px;
+    border-radius: 13px;
+    color: #f8fafc;
+    background: rgba(3,7,12,.64);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .jogo-detalhes {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(148,163,184,.12);
+    background: rgba(2,6,12,.25);
+  }
+  .jogo-detalhe { display: block; font-size: 12px; }
+  .jogo-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px 12px;
+  }
+  .jogo-source-pill, .jogo-future-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 11px;
+    color: var(--text-tertiary);
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(148,163,184,.12);
+  }
+  .jogo-future-pill { color: #d9ff76; background: rgba(163,230,53,.08); border-color: rgba(163,230,53,.18); }
+  .chips-filtro { margin-bottom: 12px; }
+  .chip-clube { padding: 7px 13px; background: rgba(10,18,24,.72); }
+  .chip-clube:hover { border-color: rgba(163,230,53,.35); color: var(--text); }
+
+  .tabela-shell {
+    border: 1px solid rgba(163,230,53,.14);
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(10,18,24,.82);
+    box-shadow: var(--shadow-soft);
+  }
+  .tabela-scroll { overflow-x: auto; }
+  .tabela-br { min-width: 860px; }
+  .tabela-br thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: rgba(20,31,37,.96);
+    color: #aabbd0;
+  }
+  .tabela-br tbody tr:nth-child(even) { background: rgba(255,255,255,.015); }
+  .tabela-br tbody tr:hover { background: rgba(163,230,53,.045); }
+  .tabela-pos-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    font-weight: 900;
+    color: #e8f2ff;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .zona-libertadores .tabela-pos-badge { color: #052e16; background: #4ade80; }
+  .zona-prelibertadores .tabela-pos-badge { color: #13280a; background: #bef264; }
+  .zona-rebaixamento .tabela-pos-badge { color: #fff1f2; background: #e11d48; }
+  .tabela-time-cel { gap: 10px; font-weight: 800; }
+  .tabela-escudo { width: 26px; height: 26px; }
+  .tabela-pontos { color: #d9ff76; font-size: 16px; font-weight: 900; }
+  .tabela-mini-label { display: none; }
+  .zona-libertadores td:first-child { box-shadow: inset 4px 0 0 #22c55e; }
+  .zona-prelibertadores td:first-child { box-shadow: inset 4px 0 0 #a3e635; }
+  .zona-rebaixamento td:first-child { box-shadow: inset 4px 0 0 #e11d48; }
+  .forma-dot { box-shadow: 0 0 0 1px rgba(0,0,0,.15); }
+
+  .future-panel {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(163,230,53,.18);
+    border-radius: 22px;
+    background:
+      radial-gradient(circle at 18% 0%, rgba(163,230,53,.18), transparent 36%),
+      linear-gradient(135deg, rgba(14,24,31,.92), rgba(6,13,18,.92));
+    box-shadow: var(--shadow-soft);
+    padding: 22px;
+  }
+  .future-panel h2 { margin: 0 0 8px; font-size: 22px; color: #f7fbff; }
+  .future-panel p { color: var(--text-secondary); max-width: 720px; }
+  .future-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .future-item {
+    border: 1px solid rgba(148,163,184,.14);
+    background: rgba(255,255,255,.035);
+    border-radius: 14px;
+    padding: 12px;
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+  .future-item strong { display: block; color: #d9ff76; margin-bottom: 4px; }
+
+  .site-footer {
+    margin-top: 32px;
+    padding: 18px 16px;
+    border: 1px solid rgba(148,163,184,.12);
+    border-radius: 18px;
+    background: rgba(5,10,15,.54);
+  }
+
+  @media (max-width: 820px) {
+    body { padding: 10px; }
+    .br-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .jogos-grid { grid-template-columns: 1fr; }
+    .hero-header img { min-height: 108px; }
+    .future-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    body { padding: 8px; }
+    .container { max-width: 100%; }
+    .hero-header { border-radius: 16px; margin-left: -2px; margin-right: -2px; }
+    .hero-header img { min-height: 96px; object-position: 18% 50%; }
+    .nav { top: 4px; margin-left: -2px; margin-right: -2px; border-radius: 14px; }
+    .nav button { padding: 8px 12px; font-size: 12px; }
+    .status-bar { font-size: 11px; align-items: flex-start; }
+    .br-overview { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .br-stat-card { min-height: 70px; padding: 11px; }
+    .br-stat-value { font-size: 20px; }
+    .jogo-card { border-radius: 16px; }
+    .jogo-main { padding: 14px 10px 10px; }
+    .jogo-times-v2 { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; }
+    .jogo-escudo, .escudo-fallback { width: 48px; height: 48px; border-radius: 15px; }
+    .jogo-nome { font-size: 12px; }
+    .jogo-actions { flex-direction: column; align-items: stretch; }
+    .jogo-source-pill, .jogo-future-pill { justify-content: center; }
+    .tabela-shell { border-radius: 16px; }
+    .tabela-br { min-width: 0; width: 100%; }
+    .tabela-br .col-oculta-mobile { display: none; }
+    .tabela-br th:nth-child(2), .tabela-br td:nth-child(2) { width: 46%; }
+    .tabela-br th, .tabela-br td { padding: 8px 6px; font-size: 12px; }
+    .tabela-pos-badge { min-width: 26px; height: 26px; border-radius: 9px; }
+    .tabela-escudo { width: 22px; height: 22px; }
+    .tabela-time-cel span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .legenda { gap: 8px; font-size: 10px; }
+    .podio { gap: 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+  }
+
 </style>
 </head>
   <script>
@@ -1221,10 +1661,15 @@
   </header>
   <nav class="nav" aria-label="Menu principal">
     <button onclick="setView('jogos')" id="btn-jogos" class="active">⚽ Jogos</button>
-    <button onclick="setView('rank')" id="btn-rank">🏆 Ranking</button>
-    <button onclick="setView('tabela')" id="btn-tabela">📊 Brasileirão</button>
+    <button onclick="abrirEmBreve('apostas')" id="btn-apostas" class="nav-future">🎯 Apostas</button>
+    <button onclick="setView('rank')" id="btn-rank">🏆 Bolão</button>
+    <button onclick="setView('tabela')" id="btn-tabela">📊 Tabela</button>
     <button onclick="setView('resultados')" id="btn-resultados">✅ Resultados</button>
-    <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversariantes</button>
+    <button onclick="abrirEmBreve('estatisticas')" id="btn-estatisticas" class="nav-future">📈 Estatísticas</button>
+    <button onclick="abrirEmBreve('clubes')" id="btn-clubes" class="nav-future">🛡️ Clubes</button>
+    <button onclick="abrirEmBreve('museu')" id="btn-museu" class="nav-future">🏛️ Museu</button>
+    <button onclick="abrirEmBreve('regras')" id="btn-regras" class="nav-future">ℹ️ Regras</button>
+    <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversários</button>
     <button onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
     <button onclick="adminAction()" id="btn-admin">⚙️ Admin</button>
   </nav>
@@ -1236,6 +1681,7 @@
   <div id="view-rank" style="display: none;"></div>
   <div id="view-tabela" style="display: none;"></div>
   <div id="view-jogos"></div>
+  <div id="view-em-breve" style="display: none;"></div>
   <div id="view-resultados" style="display: none;"></div>
   <div id="view-aniversariantes" style="display: none;"></div>
   <div id="view-participantes" style="display: none;"></div>
@@ -1404,6 +1850,7 @@ let state = {
   ultimaAtualizacao: null,
   ehAdmin: false,
   view: 'jogos',
+  futuroModulo: null,
   expandido: null,
   editIdx: null,
   editMembroIdx: null,
@@ -1784,12 +2231,14 @@ function render() {
   document.getElementById('view-rank').style.display = v === 'rank' ? 'block' : 'none';
   document.getElementById('view-tabela').style.display = v === 'tabela' ? 'block' : 'none';
   document.getElementById('view-jogos').style.display = v === 'jogos' ? 'block' : 'none';
+  document.getElementById('view-em-breve').style.display = v === 'em-breve' ? 'block' : 'none';
   document.getElementById('view-resultados').style.display = v === 'resultados' ? 'block' : 'none';
   document.getElementById('view-aniversariantes').style.display = v === 'aniversariantes' ? 'block' : 'none';
   document.getElementById('view-participantes').style.display = v === 'participantes' ? 'block' : 'none';
-  ['rank','tabela','jogos','resultados','aniversariantes','admin'].forEach(k => {
+  ['rank','tabela','jogos','resultados','aniversariantes','admin','apostas','estatisticas','clubes','museu','regras'].forEach(k => {
     const b = document.getElementById('btn-' + k);
-    if (b) b.classList.toggle('active', v === k);
+    const ativo = v === k || (v === 'em-breve' && state.futuroModulo === k);
+    if (b) b.classList.toggle('active', ativo);
   });
   if (v === 'rank') renderRank();
   else if (v === 'tabela') renderTabela();
@@ -1797,6 +2246,7 @@ function render() {
   else if (v === 'resultados') renderResultados();
   else if (v === 'aniversariantes') renderAniversariantes();
   else if (v === 'participantes') renderParticipantes();
+  else if (v === 'em-breve') renderEmBreve();
   // Botão de admin
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = state.ehAdmin ? 'Sair do admin' : 'Admin';
@@ -1804,6 +2254,7 @@ function render() {
 
 function setView(v) {
   state.view = v;
+  if (v !== 'em-breve') state.futuroModulo = null;
   if (v === 'jogos' && !state.jogosCarregados) {
     carregarJogos();
   }
@@ -1814,6 +2265,52 @@ function setView(v) {
     carregarResultados();
   }
   render();
+}
+
+function abrirEmBreve(modulo) {
+  state.futuroModulo = modulo;
+  state.view = 'em-breve';
+  render();
+}
+
+function renderEmBreve() {
+  const modulos = {
+    apostas: {
+      titulo: '🎯 Apostas da Rodada',
+      texto: 'Entra na Execução 3: janela de quinta-feira até sábado às 10h, placares por jogo, trava automática e apuração da rodada 20.',
+      itens: ['Palpites por jogo da rodada', 'Trava antes do início', 'Campeão parcial da rodada']
+    },
+    estatisticas: {
+      titulo: '📈 Estatísticas',
+      texto: 'Entra na Execução 4: artilharia, garçons, melhor ataque, melhor defesa e ranking de desempenho dos clubes.',
+      itens: ['Artilheiros e assistências', 'Melhor ataque/defesa', 'Forma e desempenho']
+    },
+    clubes: {
+      titulo: '🛡️ Clubes',
+      texto: 'Entra na Execução 5: página dos 20 clubes com curiosidades, estádio, títulos, elenco, escudos e jogos do clube.',
+      itens: ['Curiosidades por clube', 'Elenco com fotos', 'Jogos e desempenho']
+    },
+    museu: {
+      titulo: '🏛️ Museu do Brasileirão',
+      texto: 'Entra na Execução 5: linha do tempo dos campeões, recordes históricos e hall de grandes marcas do campeonato.',
+      itens: ['Campeões ano a ano', 'Recordes históricos', 'Linha do tempo visual']
+    },
+    regras: {
+      titulo: 'ℹ️ Regras do Bolão',
+      texto: 'Entra junto com as Apostas: pontuação, critérios de desempate, janela de envio e regras de apuração.',
+      itens: ['Pontuação 5/3/2/0', 'Critérios de desempate', 'Trava e auditoria']
+    }
+  };
+  const m = modulos[state.futuroModulo] || modulos.apostas;
+  document.getElementById('view-em-breve').innerHTML = `
+    <div class="future-panel">
+      <div class="br-kicker">Módulo planejado</div>
+      <h2>${m.titulo}</h2>
+      <p>${m.texto}</p>
+      <div class="future-grid">
+        ${m.itens.map(i => `<div class="future-item"><strong>${i}</strong><span>Será entregue em fase própria, sem quebrar o Ranking atual nem o módulo da Copa.</span></div>`).join('')}
+      </div>
+    </div>`;
 }
 
 // Avatar determinístico de iniciais (mesma técnica do módulo da Copa):
@@ -1972,18 +2469,27 @@ function renderTabela() {
     return;
   }
 
-  // Atualiza/lê o snapshot de posições base (congelado na última terça)
   const snap = gerenciarSnapshotTabela();
   const posBase = (snap && snap.posicoesBase) || {};
-
-  // Forma (últimos 5 jogos) — calculada de resultados.json quando disponível.
-  // Se ainda não carregou, dispara o carregamento em segundo plano e a
-  // coluna aparece sozinha quando os dados chegarem.
   const forma = calcularFormaTimes();
   if (!state.resultadosCarregados) carregarResultados();
 
-  let html = '<div class="card"><table><thead><tr>' +
-    '<th style="width:60px;">Pos</th><th>Time</th>' +
+  const lider = state.tabela[0] || {};
+  const z4 = state.tabela.filter(t => t.pos >= 17).map(t => t.time).join(', ');
+  const melhorAtaque = state.tabela.slice().sort((a,b) => (b.gp || 0) - (a.gp || 0))[0] || {};
+  const melhorDefesa = state.tabela.slice().sort((a,b) => (a.gc || 999) - (b.gc || 999))[0] || {};
+
+  let html = '<div class="br-panel-title"><div><div class="br-kicker">Classificação oficial</div><h2>Tabela do Brasileirão 2026</h2></div>';
+  html += `<span style="font-size:11px;color:var(--text-tertiary);">${state.ultimaAtualizacao ? 'Atualizada ' + formatarHora(state.ultimaAtualizacao) : 'Fonte: ESPN'}</span></div>`;
+  html += '<div class="br-overview">';
+  html += `<div class="br-stat-card"><div class="br-stat-label">Líder</div><div class="br-stat-value">${lider.time || '-'}</div><div class="br-stat-note">${lider.pontos != null ? lider.pontos + ' pontos' : ''}</div></div>`;
+  html += `<div class="br-stat-card"><div class="br-stat-label">Melhor ataque</div><div class="br-stat-value">${melhorAtaque.time || '-'}</div><div class="br-stat-note">${melhorAtaque.gp != null ? melhorAtaque.gp + ' gols pró' : ''}</div></div>`;
+  html += `<div class="br-stat-card"><div class="br-stat-label">Melhor defesa</div><div class="br-stat-value">${melhorDefesa.time || '-'}</div><div class="br-stat-note">${melhorDefesa.gc != null ? melhorDefesa.gc + ' gols sofridos' : ''}</div></div>`;
+  html += `<div class="br-stat-card"><div class="br-stat-label">Z4 atual</div><div class="br-stat-value" style="font-size:16px;line-height:1.2;">${z4 || '-'}</div><div class="br-stat-note">zona de rebaixamento</div></div>`;
+  html += '</div>';
+
+  html += '<div class="tabela-shell"><div class="tabela-scroll"><table class="tabela-br"><thead><tr>' +
+    '<th style="width:64px;">Pos</th><th>Time</th>' +
     '<th style="text-align:center;">P</th>' +
     '<th style="text-align:center;">J</th>' +
     '<th style="text-align:center;" class="col-oculta-mobile">V</th>' +
@@ -1995,6 +2501,7 @@ function renderTabela() {
     '<th style="text-align:center;" class="col-oculta-mobile">%</th>' +
     (forma ? '<th style="text-align:center;" class="col-oculta-mobile">Últimos 5</th>' : '') +
     '</tr></thead><tbody>';
+
   state.tabela.forEach(t => {
     let cls = '';
     if (t.pos >= 17) cls = 'zona-rebaixamento';
@@ -2010,8 +2517,8 @@ function renderTabela() {
         f5.map(r => `<span class="forma-dot forma-${r.toLowerCase()}">${r}</span>`).join('') +
         '</span></td>';
     }
-    html += `<tr class="${cls}"><td><strong>${t.pos}</strong>${seta}</td><td>${celTime}</td>` +
-      `<td style="text-align:center; font-weight:600;">${t.pontos}</td>` +
+    html += `<tr class="${cls}"><td><span class="tabela-pos-badge">${t.pos}</span>${seta}</td><td>${celTime}</td>` +
+      `<td style="text-align:center;"><span class="tabela-pontos">${t.pontos}</span></td>` +
       `<td style="text-align:center;">${t.jogos}</td>` +
       `<td style="text-align:center;" class="col-oculta-mobile">${t.vitorias}</td>` +
       `<td style="text-align:center;" class="col-oculta-mobile">${t.empates}</td>` +
@@ -2022,8 +2529,8 @@ function renderTabela() {
       `<td style="text-align:center;" class="col-oculta-mobile">${t.aproveitamento}%</td>` +
       celForma + `</tr>`;
   });
-  html += '</tbody></table></div>';
-  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:rgba(74,222,128,0.4);"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:rgba(74,222,128,0.18);"></div>Pré-Libertadores (5º–6º)</div><div class="legenda-item"><div class="legenda-dot" style="background:rgba(248,113,113,0.4);"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu de posição</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu de posição</div></div>';
+  html += '</tbody></table></div></div>';
+  html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:#22c55e;"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:#a3e635;"></div>Pré-Libertadores (5º–6º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#e11d48;"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu</div></div>';
   document.getElementById('view-tabela').innerHTML = html;
 }
 
@@ -2208,7 +2715,6 @@ function renderJogos() {
     return;
   }
 
-  // ---- FILTRO POR CLUBE (chips com escudo, rolagem lateral) ----
   const clubesPresentes = [];
   for (const j of state.jogos) {
     for (const lado of ['mandante', 'visitante']) {
@@ -2224,7 +2730,6 @@ function renderJogos() {
     nomeCanonico((j.visitante || {}).nome) === filtro
   );
 
-  // Agrupa por dia
   const grupos = {};
   for (const j of jogosVisiveis) {
     const chave = chaveDataAgrupada(j.data_iso);
@@ -2232,20 +2737,28 @@ function renderJogos() {
     grupos[chave].push(j);
   }
   const chavesOrdenadas = Object.keys(grupos).sort();
-
-  // Cabeçalho
   const meta = state.jogosMeta || {};
-  let html = '<div class="secao-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">';
-  html += `<h2>Jogos${meta.rodada_atual ? ' · Rodada ' + meta.rodada_atual : ''}</h2>`;
   const temLive = espnLiveTemJogoRolando();
+  const datas = jogosVisiveis.map(j => j.data_iso).filter(Boolean).sort();
+  const primeiraData = datas[0] ? formatarDataAgrupada(datas[0]) : '-';
+  const qtdeClubes = clubesPresentes.length;
+
+  let html = '<div class="section-title-row">';
+  html += `<div><div class="br-kicker">Agenda e transmissão</div><h2>Jogos${meta.rodada_atual ? ' · Rodada ' + meta.rodada_atual : ''}</h2></div>`;
   if (temLive) {
-    html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> placar ESPN a cada 30s${state._espnLiveUltima ? ' · atualizado ' + formatarSomenteHora(state._espnLiveUltima) : ''}</span>`;
+    html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> ESPN a cada 30s${state._espnLiveUltima ? ' · ' + formatarSomenteHora(state._espnLiveUltima) : ''}</span>`;
   } else if (meta.atualizado_em_br) {
-    html += `<span style="font-size: 11px; color: var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
+    html += `<span style="font-size:11px;color:var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
   }
   html += '</div>';
 
-  // Chips de filtro
+  html += '<div class="br-overview">';
+  html += `<div class="br-stat-card"><div class="br-stat-label">Jogos listados</div><div class="br-stat-value">${jogosVisiveis.length}</div><div class="br-stat-note">${filtro ? 'filtrados por ' + filtro : 'próximos jogos'}</div></div>`;
+  html += `<div class="br-stat-card"><div class="br-stat-label">Primeira data</div><div class="br-stat-value" style="font-size:17px;line-height:1.2;">${primeiraData}</div><div class="br-stat-note">fuso de Brasília</div></div>`;
+  html += `<div class="br-stat-card"><div class="br-stat-label">Clubes no filtro</div><div class="br-stat-value">${qtdeClubes}</div><div class="br-stat-note">chips roláveis abaixo</div></div>`;
+  html += `<div class="br-stat-card"><div class="br-stat-label">Fonte viva</div><div class="br-stat-value" style="font-size:18px;">ESPN</div><div class="br-stat-note">fallback local se oscilar</div></div>`;
+  html += '</div>';
+
   html += '<div class="chips-filtro">';
   html += `<button class="chip-clube ${!filtro ? 'ativo' : ''}" onclick="setFiltroJogos('')">Todos</button>`;
   for (const c of clubesPresentes) {
@@ -2262,7 +2775,6 @@ function renderJogos() {
   for (const chave of chavesOrdenadas) {
     const jogos = grupos[chave];
     const labelData = formatarDataAgrupada(jogos[0].data_iso);
-
     html += `<div class="dia-header">${labelData}</div>`;
     html += '<div class="jogos-grid">';
 
@@ -2277,62 +2789,54 @@ function renderJogos() {
         : `<div class="escudo-fallback">${(v.sigla || (v.nome || '?').slice(0,3)).toUpperCase()}</div>`;
 
       const horario = formatarHorarioJogo(j.data_iso);
-
-      // AO VIVO: se a ESPN tiver este jogo em andamento/encerrado hoje,
-      // troca o horário pelo placar + status (30 em 30s, sem F5).
       const live = espnLiveDoJogo(j);
-      let topo;
-      if (live && (live.estado === 'in' || live.estado === 'post')) {
-        const statusHtml = live.estado === 'in'
-          ? `<span class="badge-aovivo">AO VIVO</span> <span class="jogo-status-live">${live.status || ''}</span>`
-          : `<span class="jogo-status-fim">Encerrado</span>`;
-        topo = `<div class="jogo-horario" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <span>${horario}</span>${statusHtml}</div>`;
-      } else {
-        topo = `<div class="jogo-horario">${horario}</div>`;
-      }
-
-      const placarCentro = (live && (live.estado === 'in' || live.estado === 'post'))
+      const temPlacar = live && (live.estado === 'in' || live.estado === 'post');
+      const clsEstado = live && live.estado === 'in' ? 'live' : (live && live.estado === 'post' ? 'post' : 'pre');
+      const statusHtml = live && live.estado === 'in'
+        ? `<span class="badge-aovivo">AO VIVO</span><span class="jogo-status-live">${live.status || ''}</span>`
+        : (live && live.estado === 'post' ? `<span class="jogo-status-fim">Encerrado</span>` : `<span class="jogo-source-pill">pré-jogo</span>`);
+      const placarCentro = temPlacar
         ? `<div class="jogo-placar-live">${live.placarMandante} × ${live.placarVisitante}</div>`
         : '<div class="jogo-vs">×</div>';
+      const tx = ondeAssistir(j);
 
-      html += `<div class="jogo-card">
-        ${topo}
-        <div class="jogo-times">
-          <div class="jogo-time">
-            <span class="jogo-escudo">${escudoMandante}</span>
-            <span class="jogo-nome">${m.nome || '?'}</span>
-          </div>
-          ${placarCentro}
-          <div class="jogo-time">
-            <span class="jogo-escudo">${escudoVisitante}</span>
-            <span class="jogo-nome">${v.nome || '?'}</span>
-          </div>
-        </div>`;
+      html += `<div class="jogo-card ${clsEstado}">
+        <div class="jogo-card-top">
+          <span class="jogo-round-badge">${meta.rodada_atual ? 'Rodada ' + meta.rodada_atual : 'Brasileirão'}</span>
+          <span class="jogo-hora-pill">${horario}</span>
+        </div>
+        <div class="jogo-main">
+          <div class="jogo-times jogo-times-v2">
+            <div class="jogo-time jogo-team-side">
+              <span class="jogo-escudo">${escudoMandante}</span>
+              <span class="jogo-nome">${m.nome || '?'}</span>
+            </div>
+            ${placarCentro}
+            <div class="jogo-time jogo-team-side">
+              <span class="jogo-escudo">${escudoVisitante}</span>
+              <span class="jogo-nome">${v.nome || '?'}</span>
+            </div>
+          </div>`;
 
       const detalhes = [];
+      detalhes.push(`<span class="jogo-detalhe">${statusHtml}</span>`);
       if (j.estadio) detalhes.push(`<span class="jogo-detalhe">📍 ${j.estadio}</span>`);
-      const tx = ondeAssistir(j);
       if (tx) detalhes.push(`<span class="jogo-detalhe">📺 ${tx}</span>`);
-      if (detalhes.length > 0) {
-        html += `<div class="jogo-detalhes">${detalhes.join('')}</div>`;
-      }
+      html += `<div class="jogo-detalhes">${detalhes.join('')}</div>`;
 
-      // Gols (autor + minuto), quando a ESPN informa
       if (live && live.gols && live.gols.length > 0) {
         html += `<div class="jogo-gols">⚽ ${live.gols.join(' · ')}</div>`;
       }
-
+      html += '</div>';
+      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span><span class="jogo-future-pill">🎯 Apostas na Execução 3</span></div>`;
       html += '</div>';
     }
-
     html += '</div>';
   }
 
-  // Rodapé com info de fonte
-  const fontes = [meta.fonte, 'ESPN (placar ao vivo)'].filter(Boolean).join(' + ');
+  const fontes = [meta.fonte, 'ESPN ao vivo'].filter(Boolean).join(' + ');
   if (fontes) {
-    html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${fontes}</div>`;
+    html += `<div style="text-align:center;font-size:11px;color:var(--text-tertiary);margin-top:16px;">Fonte: ${fontes}</div>`;
   }
 
   container.innerHTML = html;
