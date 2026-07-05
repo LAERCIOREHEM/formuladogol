@@ -3277,3 +3277,35 @@ html{
 #stat-min-jogos{
   display:none !important;
 }
+
+/* ==========================================================
+   Museu — recorde seleção com mais vitórias v30
+   ========================================================== */
+.museu-record-grid{
+  align-items:stretch;
+}
+.museu-record{
+  min-height:116px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-start;
+}
+.museu-record strong{
+  overflow-wrap:anywhere;
+}
+@media (max-width:520px){
+  .museu-record{
+    min-height:132px;
+    padding:12px;
+  }
+  .museu-record b{
+    font-size:14px;
+  }
+  .museu-record strong{
+    font-size:15px;
+    line-height:1.18;
+  }
+  .museu-record small{
+    font-size:11.5px;
+  }
+}
