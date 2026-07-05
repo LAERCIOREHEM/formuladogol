@@ -1242,8 +1242,8 @@
 
   <footer class="site-footer">
     <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Site sem fins lucrativos, feito por amigos, para amigos. O bolão não envolve dinheiro: o "prêmio" é simbólico (os últimos colocados pagam o almoço de fim de ano).</div>
-    <div>Dados de classificação e placares: ESPN. Próximos jogos e resultados: GloboEsporte. Uso meramente informativo e não oficial; escudos e marcas pertencem aos respectivos clubes. Informações de "onde assistir" podem mudar sem aviso — confirme na programação da emissora.</div>
-    <div>Brasileirão v2 · atualização automática de dados a cada 10 min · placar ao vivo via ESPN a cada 30s durante os jogos.</div>
+    <div>Dados esportivos: ESPN, com fallback local pelos JSONs publicados no repositório. Uso meramente informativo e não oficial; escudos e marcas pertencem aos respectivos clubes. Informações de "onde assistir" podem mudar sem aviso — confirme na programação da emissora.</div>
+    <div>Brasileirão v2 · atualização automática dos JSONs a cada 10 min · placar ao vivo via ESPN a cada 30s durante os jogos.</div>
   </footer>
 </div>
 
@@ -1255,12 +1255,11 @@
 // ========================================================================
 const ADMIN_SENHA = "almocosexta2026";
 
-// O index.html não gera a tabela; ele apenas lê o tabela.json publicado pelo GitHub Actions.
-// A verificação automática abaixo faz o navegador buscar o tabela.json nos minutos 07 e 37
-// de cada hora, além de buscar imediatamente quando a página abre.
+// O index.html não gera dados; ele apenas lê os JSONs publicados pelo GitHub Actions.
+// O workflow do Brasileirão roda de 10 em 10 minutos. No navegador, fazemos
+// uma nova leitura dos JSONs na mesma cadência, sem depender de minuto fixo.
 const URL_TABELA_LOCAL = "tabela.json";
-const MINUTOS_ATUALIZACAO = [7, 37];
-const SEGUNDO_ATUALIZACAO = 10; // dentro do minuto 07/37, dá alguns segundos para o workflow concluir
+const INTERVALO_ATUALIZACAO_MS = 10 * 60 * 1000;
 
 let timerAtualizacao = null;
 let refreshEmAndamento = false;
@@ -1493,20 +1492,7 @@ async function buscarTabelaTerra() {
 }
 
 function proximaAtualizacaoProgramada(base = new Date()) {
-  const agora = new Date(base);
-  const candidatos = [];
-
-  // Gera candidatos para a hora atual e a próxima hora.
-  for (let acrescimoHora = 0; acrescimoHora <= 1; acrescimoHora++) {
-    for (const minuto of MINUTOS_ATUALIZACAO) {
-      const d = new Date(agora);
-      d.setHours(agora.getHours() + acrescimoHora, minuto, SEGUNDO_ATUALIZACAO, 0);
-      if (d > agora) candidatos.push(d);
-    }
-  }
-
-  candidatos.sort((a, b) => a - b);
-  return candidatos[0];
+  return new Date(base.getTime() + INTERVALO_ATUALIZACAO_MS);
 }
 
 function formatarSomenteHora(d) {
@@ -1548,9 +1534,21 @@ function agendarProximaAtualizacao() {
 
   const atraso = Math.max(1000, proxima.getTime() - Date.now());
   timerAtualizacao = setTimeout(async () => {
-    await refresh(true);
+    await atualizarDadosDoServidor(true);
     agendarProximaAtualizacao();
   }, atraso);
+}
+
+async function atualizarDadosDoServidor(silencioso = false) {
+  const tarefas = [refresh(silencioso)];
+
+  // A Execução 1 migrou jogos/resultados para o mesmo workflow ESPN de 10 min.
+  // Portanto, quando a aba está aberta, recarregamos também esses JSONs; não
+  // apenas a tabela. Isso evita a tela ficar presa em dados antigos.
+  tarefas.push(carregarJogos({ silencioso: true }));
+  tarefas.push(carregarResultados({ silencioso: true }));
+
+  await Promise.allSettled(tarefas);
 }
 
 // ========================================================================
@@ -1571,18 +1569,14 @@ async function inicializar() {
   // Carregamento assíncrono dos JSONs do servidor (atualiza se for mais novo)
   carregarMembrosDoServidor();
 
-  // JOGOS agora é a página de entrada: carrega já na abertura (em paralelo
-  // com a tabela). O AO VIVO (ESPN) é armado dentro de carregarJogos().
-  carregarJogos();
-
-  // 2. Fonte de verdade: sempre buscar o tabela.json do servidor ao abrir a página.
-  // O cache local só é usado como plano B se a busca falhar.
+  // 2. Fonte de verdade: sempre buscar os JSONs do servidor ao abrir a página.
+  // O cache local só é usado como plano B se a tabela falhar.
   const cache = carregarCache();
   if (cache) {
     state._cacheBackup = cache;
   }
 
-  await refresh();
+  await atualizarDadosDoServidor(false);
   agendarProximaAtualizacao();
 }
 
@@ -2058,7 +2052,7 @@ function calcularFormaTimes() {
 // ========================================================================
 // PRÓXIMOS JOGOS
 // ========================================================================
-async function carregarJogos() {
+async function carregarJogos(opcoes = {}) {
   try {
     const url = 'jogos.json?t=' + Date.now();
     const resp = await fetch(url);
@@ -2075,7 +2069,12 @@ async function carregarJogos() {
     state.jogosCarregados = true;
     state.jogosErro = null;
   } catch (e) {
-    console.error('Erro ao carregar jogos.json:', e);
+    if (!opcoes.silencioso) console.error('Erro ao carregar jogos.json:', e);
+    // Em recarga silenciosa, preserva a última lista boa para não trocar
+    // uma tela funcional por um erro temporário de rede/cache.
+    if (opcoes.silencioso && Array.isArray(state.jogos) && state.jogos.length) {
+      return;
+    }
     state.jogosErro = e.message;
     state.jogosCarregados = true;
   }
@@ -2102,7 +2101,7 @@ async function carregarJogos() {
   espnLiveArmar(); // liga o AO VIVO (ESPN) se houver janela de jogo
 }
 
-// "Onde assistir" de um jogo: manual (transmissoes.json) > Globo > ESPN.
+// "Onde assistir" de um jogo: manual (transmissoes.json) > JSON principal > índice ESPN.
 function ondeAssistir(j) {
   const m = nomeCanonico((j.mandante || {}).nome);
   const v = nomeCanonico((j.visitante || {}).nome);
@@ -2462,7 +2461,7 @@ document.addEventListener('visibilitychange', function () {
 // ========================================================================
 // RESULTADOS
 // ========================================================================
-async function carregarResultados() {
+async function carregarResultados(opcoes = {}) {
   try {
     const url = 'resultados.json?t=' + Date.now();
     const resp = await fetch(url);
@@ -2480,7 +2479,12 @@ async function carregarResultados() {
     state.resultadosCarregados = true;
     state.resultadosErro = null;
   } catch (e) {
-    console.error('Erro ao carregar resultados.json:', e);
+    if (!opcoes.silencioso) console.error('Erro ao carregar resultados.json:', e);
+    // Mesma regra dos jogos: recarga silenciosa não apaga dados bons já
+    // carregados em caso de oscilação momentânea.
+    if (opcoes.silencioso && Array.isArray(state.resultados) && state.resultados.length) {
+      return;
+    }
     state.resultadosErro = e.message;
     state.resultadosCarregados = true;
   }
