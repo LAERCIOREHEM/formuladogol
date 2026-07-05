@@ -1,12 +1,12 @@
-name: Atualizar Brasileirao (ESPN + jogos/resultados)
+name: Atualizar Brasileirao (ESPN)
 
 on:
   # NOVO workflow do modulo Brasileirao (v2, pos-Copa).
-  # Roda a cada 10 minutos e substitui a antiga cadeia Terra:
-  #   - tabela.json         -> agora vem da ESPN (atualizar_espn.py)
-  #   - espn_eventos.json   -> de-para de jogos p/ o AO VIVO do site (ESPN)
-  #   - jogos.json          -> proximos jogos (atualizar_jogos.py, com rodada)
-  #   - resultados.json     -> jogos realizados (atualizar_resultados.py)
+  # Roda a cada 10 minutos e substitui a antiga cadeia Terra/Globo:
+  #   - tabela.json         -> classificacao via ESPN standings
+  #   - jogos.json          -> proximos jogos via ESPN scoreboard
+  #   - resultados.json     -> resultados via ESPN scoreboard
+  #   - espn_eventos.json   -> indice ESPN para AO VIVO/ONDE ASSISTIR
   #
   # OBS 1: o cron do GitHub e "melhor esforco" (pode atrasar alguns minutos
   #        em horario de pico). O placar EM TEMPO REAL nao depende dele:
@@ -19,8 +19,6 @@ on:
   push:
     paths:
       - 'atualizar_espn.py'
-      - 'atualizar_jogos.py'
-      - 'atualizar_resultados.py'
       - '.github/workflows/atualizar-brasileirao.yml'
 
 permissions:
@@ -34,7 +32,7 @@ concurrency:
 
 jobs:
   atualizar:
-    name: Buscar dados (ESPN + Globo) e publicar JSONs
+    name: Buscar dados ESPN e publicar JSONs
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -57,23 +55,12 @@ jobs:
           echo "Horario Brasilia:"
           TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
 
-      # --- 1. TABELA + EVENTOS (ESPN) ---
-      # Regra de seguranca do script: se algum dos 20 times nao mapear
-      # para o nome canonico do site, ele FALHA sem gravar nada — o
-      # tabela.json anterior permanece e o Ranking nunca quebra.
-      - name: Atualizar tabela.json e espn_eventos.json (ESPN)
+      # --- DADOS DO BRASILEIRAO (100% ESPN) ---
+      # O script grava os quatro JSONs de uma vez e falha antes de publicar
+      # se a tabela nao preservar exatamente os 20 nomes canonicos do Ranking.
+      - name: Atualizar tabela, jogos, resultados e eventos (ESPN)
         id: espn
         run: python atualizar_espn.py
-
-      # --- 2. PROXIMOS JOGOS (mantem rodada + escudos) ---
-      - name: Atualizar jogos.json
-        id: jogos
-        run: python atualizar_jogos.py
-
-      # --- 3. RESULTADOS ---
-      - name: Atualizar resultados.json
-        id: resultados
-        run: python atualizar_resultados.py
 
       - name: Conferir e validar JSONs gerados
         run: |
@@ -87,13 +74,20 @@ jobs:
             python -m json.tool "$arq" > /dev/null
             echo "  OK   $arq"
           done
-          # Trava extra: a tabela publicada tem que ter fonte ESPN e 20 times.
+          # Travas extras: todos os JSONs principais precisam vir da ESPN
+          # e a tabela precisa preservar os 20 times do Ranking.
           python - <<'PY'
-          import json, sys
-          d = json.load(open('tabela.json'))
-          assert d.get('fonte') == 'ESPN', 'fonte da tabela nao e ESPN'
-          assert len(d.get('tabela') or []) == 20, 'tabela sem 20 times'
-          print('  OK   tabela.json: fonte ESPN, 20 times')
+          import json
+          for arq in ['tabela.json', 'jogos.json', 'resultados.json']:
+              d = json.load(open(arq, encoding='utf-8'))
+              assert d.get('fonte') == 'ESPN', f'{arq}: fonte nao e ESPN'
+          t = json.load(open('tabela.json', encoding='utf-8'))
+          assert len(t.get('tabela') or []) == 20, 'tabela sem 20 times'
+          j = json.load(open('jogos.json', encoding='utf-8'))
+          assert isinstance(j.get('jogos'), list), 'jogos.json sem lista jogos'
+          r = json.load(open('resultados.json', encoding='utf-8'))
+          assert isinstance(r.get('resultados'), list), 'resultados.json sem lista resultados'
+          print('  OK   JSONs principais: fonte ESPN; tabela com 20 times')
           PY
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
