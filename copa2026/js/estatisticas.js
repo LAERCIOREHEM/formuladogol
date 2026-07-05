@@ -330,12 +330,10 @@
     if (faseWrap) faseWrap.hidden = ABA !== 'jogos';
 
     var situacaoWrap = $("#stat-situacao-wrap"), situacaoSel = $("#stat-situacao");
-    var minWrap = $("#stat-min-jogos-wrap"), minSel = $("#stat-min-jogos");
     var ordemWrap = $("#stat-ordem-wrap"), ordemSel = $("#stat-ordem");
     var dirWrap = $("#stat-direcao-wrap"), dirSel = $("#stat-direcao");
     var rankAtivo = ABA === "desempenho";
     if (situacaoWrap) situacaoWrap.hidden = !rankAtivo;
-    if (minWrap) minWrap.hidden = !rankAtivo;
     if (ordemWrap) ordemWrap.hidden = !rankAtivo;
     if (dirWrap) dirWrap.hidden = !rankAtivo;
     if (situacaoSel) {
@@ -648,7 +646,7 @@
     if (ABA === "desempenho") {
       pararMonitorAoVivo();
       atualizarStatusLive([]);
-      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões") + " · " + (SITUACAO_RANK === "TODAS" ? "todas" : SITUACAO_RANK.toLowerCase()) + " · " + (MIN_JOGOS_RANK || 1) + "+ jogos") : "sem dados";
+      $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões") + " · " + (SITUACAO_RANK === "TODAS" ? "todas" : SITUACAO_RANK.toLowerCase())) : "sem dados";
       if (!arr.length) {
         $("#stats-lista").innerHTML = '<div class="stat-vazio">Nenhuma seleção encontrada para este filtro no Ranking de Desempenho.</div>';
         return;
