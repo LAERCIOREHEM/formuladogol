@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-05T21:42:35.934849Z",
+  "atualizado_em": "2026-07-05T22:12:38.171736Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 91,
@@ -42,14 +42,15 @@
     {
       "nome": "Erling Haaland",
       "equipe": "NOR",
-      "gols": 5,
+      "gols": 6,
       "assistencias": 0,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
         "760430",
         "760454",
-        "760490"
+        "760490",
+        "760504"
       ],
       "total_cartoes": 0
     },
@@ -2187,6 +2188,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Andreas Schjelderup",
+      "equipe": "NOR",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760475",
+        "760504"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Anthony Gordon",
       "equipe": "ENG",
       "gols": 0,
@@ -2549,18 +2563,6 @@
         "760474"
       ],
       "total_cartoes": 2
-    },
-    {
-      "nome": "Andreas Schjelderup",
-      "equipe": "NOR",
-      "gols": 0,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760475"
-      ],
-      "total_cartoes": 0
     },
     {
       "nome": "Arthur Masuaku",
@@ -6006,6 +6008,18 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Neymar",
+      "equipe": "BRA",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760504"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Nico Elvedi",
       "equipe": "SUI",
       "gols": 0,
@@ -6618,6 +6632,15 @@
       "media_gols": 2.75
     },
     {
+      "equipe": "NOR",
+      "gols": 11,
+      "assistencias": 8,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": 5,
+      "media_gols": 2.2
+    },
+    {
       "equipe": "SEN",
       "gols": 10,
       "assistencias": 9,
@@ -6645,15 +6668,6 @@
       "media_gols": 2.0
     },
     {
-      "equipe": "NOR",
-      "gols": 10,
-      "assistencias": 7,
-      "amarelos": 2,
-      "vermelhos": 0,
-      "jogos": 5,
-      "media_gols": 2.0
-    },
-    {
       "equipe": "BEL",
       "gols": 9,
       "assistencias": 5,
@@ -6675,7 +6689,7 @@
       "equipe": "BRA",
       "gols": 9,
       "assistencias": 8,
-      "amarelos": 7,
+      "amarelos": 8,
       "vermelhos": 0,
       "jogos": 5,
       "media_gols": 1.8
