@@ -1,358 +1,753 @@
-/* Bolão Copa 2026 — estilo wallchart esportivo (navy + dourado), mobile-first */
-:root{
-  --navy:#0b1f3a;
-  --navy-2:#13294b;
-  --navy-3:#1c3a63;
-  --gold:#f4c542;
-  --gold-2:#e0a82e;
-  --verde:#1db954;
-  --vermelho:#e0473e;
-  --branco:#f7f8fb;
-  --cinza:#9fb0c7;
-  --linha:rgba(255,255,255,.10);
-  --raio:14px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'Archivo',system-ui,sans-serif;
-  background:
-    radial-gradient(1200px 500px at 80% -10%, rgba(244,197,66,.10), transparent 60%),
-    radial-gradient(900px 600px at -10% 110%, rgba(29,185,84,.08), transparent 55%),
-    var(--navy);
-  color:var(--branco);
-  min-height:100vh;
-  -webkit-font-smoothing:antialiased;
-}
-#app{max-width:560px;margin:0 auto;padding:16px 12px 60px}
-.oculto{display:none !important}
+/* =========================================================================
+   pontos.js — Classificação do bolão por PONTOS (Copa 2026)
+   Cruza o palpite de cada um (derivado pela engine) com o resultado OFICIAL
+   (montado a partir do feed da ESPN) usando COPA_PONTUACAO.calcular.
+   Pontuação só começa na 2ª fase (quando as 32 são definidas).
+   ========================================================================= */
+(function () {
+  "use strict";
+  const CFG = window.COPA_CFG || { url: "", key: "" };
+  const $ = s => document.querySelector(s);
+  const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
+  const ESPN_OVR = {};
+  // janelas de data por fase (calendário oficial da ESPN)
+  const JANELAS = ["20260611-20260627", "20260628-20260703", "20260704-20260707", "20260709-20260711", "20260714-20260715", "20260718-20260718", "20260719-20260719"];
+  let DADOS = {}, JOGOS = [], GRUPOS = [], PART = [], timer = null;
+  let FILTRO = "", ORDEM = "atuais", ULTIMO_O = null;
+  let ABA = (new URLSearchParams(location.search).get("aba") === "placares") ? "placares" : "bolao";
+  let ORDEM_P = "pts";
+  // Até esta data/hora (Brasília), o Ranking mostra a PRÉVIA SIMULADA (foto de hoje).
+  // Depois, vira o Ranking normal (pontuação real da 2ª fase).
+  const VIRADA_SIMULADO = new Date("2026-06-28T02:00:00-03:00");
+  function modoSimulado() { return Date.now() < VIRADA_SIMULADO.getTime(); }
 
-/* TOPO */
-.topo{display:flex;align-items:center;justify-content:space-between;
-  padding:18px 4px 14px;border-bottom:1px solid var(--linha)}
-.topo-marca{display:flex;align-items:center;gap:12px}
-.trofeu{font-size:30px;color:var(--gold);line-height:1;filter:drop-shadow(0 2px 6px rgba(244,197,66,.4))}
-.topo h1{font-family:'Anton',sans-serif;font-size:26px;letter-spacing:.5px;font-weight:400;line-height:.95}
-.topo h1 b{color:var(--gold)}
-.sub{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--cinza);margin-top:2px}
-.topo-usuario{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
-.btn-mini{background:transparent;border:1px solid var(--linha);color:var(--cinza);
-  padding:5px 10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px}
-.btn-mini:hover{color:var(--branco);border-color:var(--cinza)}
+  async function rpc(fn, body) {
+    const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": CFG.key, "Authorization": "Bearer " + CFG.key },
+      body: JSON.stringify(body || {})
+    });
+    if (!r.ok) throw new Error("RPC " + fn);
+    return r.json();
+  }
+  const nome = id => (DADOS.nomeDe && DADOS.nomeDe[id]) || id || "—";
+  const iso = id => (DADOS.isoDe && DADOS.isoDe[id]) || "";
+  const flag = id => { const c = iso(id); return c ? `<img src="https://flagcdn.com/w40/${c}.png" title="${nome(id)}" alt="" onerror="this.style.visibility='hidden'">` : ""; };
+  const norm = ab => ESPN_OVR[ab] || ab;
+  const inter = (a, b) => { const s = new Set(b || []); return (a || []).filter(x => s.has(x)); };
+  function eficienciaPct(r) {
+    const a = Number(r && r.atuais);
+    const p = Number(r && r.perdidos);
+    if (!Number.isFinite(a) || !Number.isFinite(p)) return "…";
+    const decidido = a + p;
+    if (decidido <= 0) return "—";
+    return (a / decidido * 100).toLocaleString("pt-BR", { minimumFractionDigits:1, maximumFractionDigits:1 }) + "%";
+  }
+  function faseCompleta(o, fase) {
+    return !!(o && o._faseCompleta && o._faseCompleta[fase]);
+  }
+  function emLista(o, key, team) {
+    return !!(o && Array.isArray(o[key]) && o[key].indexOf(team) !== -1);
+  }
+  function vivoNoTorneio(team, o) {
+    // Auditoria de "ainda vivo": precisa bater com a fase atual do mata-mata,
+    // não apenas com "entrou nas 32". Depois que uma fase fecha, quem não
+    // aparece na fase seguinte está fora do páreo, mesmo se o feed não marcar loser.
+    if (!o || !o.classificados32 || !o.classificados32.length) return "pend";
+    if (o.classificados32.indexOf(team) === -1) return "wrong";
+    if ((o.eliminados || []).indexOf(team) !== -1) return "out";
 
-/* TELAS */
-.tela{padding-top:18px}
-h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:.5px;margin-bottom:14px}
+    if (faseCompleta(o, "r32") && !emLista(o, "avancam_oitavas", team)) return "out";
+    if (faseCompleta(o, "oitavas") && !emLista(o, "avancam_quartas", team)) return "out";
+    if (faseCompleta(o, "quartas") && !emLista(o, "semifinalistas", team)) return "out";
+    if (faseCompleta(o, "semis") && !emLista(o, "finalistas", team)) return "out";
+    if (faseCompleta(o, "final") && o.campeao && team !== o.campeao) return "out";
 
-/* LOGIN */
-.cartao-login{background:var(--navy-2);border:1px solid var(--linha);border-radius:var(--raio);
-  padding:24px;margin-top:30px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
-.cartao-login h2{margin-bottom:8px}
-.prazo{color:var(--cinza);font-size:14px;line-height:1.5;margin-bottom:18px}
-.prazo b{color:var(--gold)}
-.cartao-login label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:1px;
-  color:var(--cinza);margin:14px 0 6px}
-.cartao-login input{width:100%;background:var(--navy);border:1px solid var(--linha);
-  color:var(--branco);padding:13px 14px;border-radius:10px;font-size:16px;font-family:inherit}
-.cartao-login input:focus{outline:none;border-color:var(--gold)}
-#in-pin{letter-spacing:8px;text-align:center;font-weight:700}
-.btn-primario{width:100%;margin-top:18px;background:var(--gold);color:#3a2a00;border:none;
-  padding:14px;border-radius:10px;font-weight:700;font-size:16px;cursor:pointer;font-family:inherit;
-  transition:transform .08s,box-shadow .2s}
-.btn-primario:hover{box-shadow:0 8px 24px rgba(244,197,66,.35)}
-.btn-primario:active{transform:translateY(1px)}
-.aviso-pin{margin-top:14px;font-size:12px;color:var(--cinza);text-align:center}
-.erro{margin-top:12px;color:var(--vermelho);font-size:14px;font-weight:600;text-align:center}
+    return "alive";
+  }
+  const fateDe = vivoNoTorneio;
 
-/* ABAS */
-.abas{display:flex;gap:6px;margin-top:16px;background:var(--navy-2);border:1px solid var(--linha);
-  border-radius:12px;padding:5px}
-.aba{flex:1;background:transparent;border:none;color:var(--cinza);padding:11px;border-radius:8px;
-  font-family:inherit;font-weight:600;font-size:14px;cursor:pointer}
-.aba.ativa{background:var(--gold);color:#3a2a00}
+  function chaveAtualDoPareo(o) {
+    if (!o || !o.classificados32 || !o.classificados32.length) return null;
+    if (faseCompleta(o, "final")) return "campeao";
+    if (faseCompleta(o, "semis")) return "finalistas";
+    if (faseCompleta(o, "quartas")) return "semifinalistas";
+    if (faseCompleta(o, "oitavas")) return "avancam_quartas";
+    if (faseCompleta(o, "r32")) return "avancam_oitavas";
+    return "classificados32";
+  }
+  function listaOficialDoPareo(o, key) {
+    if (!o || !key) return [];
+    if (key === "campeao") return o.campeao ? [o.campeao] : [];
+    return Array.isArray(o[key]) ? o[key] : [];
+  }
+  function listaPalpiteDoPareo(p, key) {
+    if (!p || !key) return [];
+    if (key === "campeao") return p.campeao ? [p.campeao] : [];
+    return Array.isArray(p[key]) ? p[key] : [];
+  }
+  function statusNoPareo(team, p, o) {
+    // Status dos ícones das 32 do participante:
+    // - wrong: ele colocou entre as 32, mas a seleção nem classificou.
+    // - alive: segue viva NO CAMINHO QUE ELE CRAVOU para a fase atual.
+    // - out: classificou, mas caiu do caminho do palpite dele em alguma fase.
+    if (!o || !o.classificados32 || !o.classificados32.length) return "pend";
+    if (o.classificados32.indexOf(team) === -1) return "wrong";
+    const key = chaveAtualDoPareo(o);
+    const real = new Set(listaOficialDoPareo(o, key));
+    const palpite = new Set(listaPalpiteDoPareo(p, key));
+    return real.has(team) && palpite.has(team) ? "alive" : "out";
+  }
+  function qtdAindaNoPareo(p, o) {
+    if (!o || !o.classificados32 || !o.classificados32.length) return 0;
+    const key = chaveAtualDoPareo(o);
+    const real = new Set(listaOficialDoPareo(o, key));
+    return listaPalpiteDoPareo(p, key).filter(t => real.has(t)).length;
+  }
 
-/* PROGRESSO */
-.progresso-geral{margin:18px 0 10px}
-.barra{height:9px;background:var(--navy-3);border-radius:99px;overflow:hidden}
-.barra-fill{height:100%;width:0;background:linear-gradient(90deg,var(--verde),var(--gold));
-  border-radius:99px;transition:width .3s}
-#progresso-texto{font-size:13px;color:var(--cinza);margin-top:7px}
-.salvo{font-size:12px;color:var(--verde);margin-top:2px;min-height:16px}
+  async function init() {
+    try {
+      const [s, e, t, pm, fp] = await Promise.all([
+        fetch("dados/selecoes.json").then(r => r.json()),
+        fetch("dados/estrutura_mata_mata.json").then(r => r.json()),
+        fetch("dados/terceiros_map.json").then(r => r.json()),
+        fetch("dados/palpites_mata.json").then(r => r.json()).catch(() => ({ apostadores: {} })),
+        // Fair play OFICIAL, gerado pelo robô em dados/fairplay.json.
+        // Usado apenas para classificar os resultados reais/atuais da Copa.
+        // Não é aplicado nos palpites lacrados, porque o apostador não informou cartões.
+        fetch("dados/fairplay.json?t=" + Date.now()).then(r => r.json()).catch(() => ({ fairplay: {} }))
+      ]);
+      DADOS.selecoes = s.selecoes; DADOS.estrutura = e; DADOS.terceirosMap = t;
+      DADOS.palpitesMata = (pm && pm.apostadores) || {};
+      DADOS.fairplay = (fp && fp.fairplay) || {};
+      DADOS.nomeDe = {}; DADOS.isoDe = {};
+      s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
+    } catch (err) { $("#app").innerHTML = '<p class="vazio">Erro ao carregar os dados da Copa.</p>'; return; }
+    JOGOS = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes);
+    GRUPOS = [...new Set(JOGOS.map(j => j.grupo))].sort();
 
-/* ETAPAS */
-.etapas{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 18px}
-.etapa{font-size:12px;font-weight:600;padding:7px 11px;border-radius:99px;border:1px solid var(--linha);
-  color:var(--cinza);cursor:pointer;white-space:nowrap}
-.etapa.ok{color:var(--verde);border-color:rgba(29,185,84,.4)}
-.etapa.atual{background:var(--navy-3);color:var(--branco);border-color:var(--gold)}
-.etapa.travada{opacity:.45;cursor:not-allowed}
+    try {
+      const rows = await rpc("copa_revelados", {});
+      PART = (rows || []).map(r => {
+        const pl = r.payload || {};
+        const g = Object.keys(pl.placaresGrupos || {}).map(id => ({ jogo_id: id, ga: pl.placaresGrupos[id].ga, gb: pl.placaresGrupos[id].gb }));
+        let d = null;
+        try { d = COPA_ENGINE.derivar(DADOS.selecoes, g, pl.placaresMata || {}, DADOS.estrutura, DADOS.terceirosMap); } catch (e) {}
+        // PALPITE DE MATA-MATA: usa as listas FIÉIS do relatório de auditoria (12/jun),
+        // não a propagação por posição (que mudava com a correção do desempate).
+        // O que cada um CRAVOU que avança em cada fase é fixo e foi auditado com hash.
+        if (d) {
+          const pm = DADOS.palpitesMata[r.nome];
+          if (pm) {
+            d.classificados32  = pm.classificados32 || d.classificados32;
+            d.avancam_oitavas  = pm.avancam_oitavas  || d.avancam_oitavas;
+            d.avancam_quartas  = pm.avancam_quartas  || d.avancam_quartas;
+            d.semifinalistas   = pm.semifinalistas   || d.semifinalistas;
+            d.finalistas       = pm.finalistas       || d.finalistas;
+            d.campeao  = pm.campeao  || d.campeao;
+            d.vice     = pm.vice     || d.vice;
+            d.terceiro = pm.terceiro || d.terceiro;
+            d.quarto   = pm.quarto   || d.quarto;
+          }
+        }
+        return { nome: r.nome, d, pg: pl.placaresGrupos || {} };
+      }).filter(p => p.d);
+    } catch (e) { PART = []; }
 
-/* CARDS DE GRUPO */
-.grid-grupos{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.card-grupo{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:14px;cursor:pointer;
-  transition:border-color .2s,transform .08s}
-.card-grupo:hover{border-color:var(--gold)}
-.card-grupo:active{transform:scale(.99)}
-.card-grupo h3{font-family:'Anton',sans-serif;font-weight:400;font-size:20px}
-.card-grupo .estado{font-size:12px;color:var(--cinza);margin-top:4px}
-.card-grupo.completo{border-color:rgba(29,185,84,.5)}
-.card-grupo.completo .estado{color:var(--verde)}
+    if (!PART.length) { $("#app").innerHTML = '<div class="bloq"><div class="cad">🔒</div><h2>Aguardando a trava</h2><p>A classificação aparece depois que as apostas travarem (10/06 23h59) e os palpites forem liberados.</p></div>'; return; }
 
-/* JOGO */
-.lista-jogos{display:flex;flex-direction:column;gap:10px}
-.jogo{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
-  background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:12px}
-.jogo .time{font-weight:600;font-size:15px;display:flex;align-items:center;gap:9px;min-width:0}
-.jogo .time.dir{justify-content:flex-end;text-align:right}
-.jogo .time>div{min-width:0}
-/* BANDEIRAS (imagens flagcdn; emoji de bandeira não renderiza no Windows) */
-.flag{width:26px;height:auto;border-radius:3px;flex:0 0 auto;
-  box-shadow:0 0 0 1px rgba(255,255,255,.14);display:inline-block}
-.classif .flag,.vencedor .flag,.revisao .flag{width:18px;vertical-align:middle;margin-right:3px}
-.jogo .sigla{font-size:11px;color:var(--cinza);letter-spacing:1px}
-.placar{display:flex;align-items:center;gap:6px}
-.placar input{width:46px;height:46px;text-align:center;font-size:20px;font-weight:700;
-  background:var(--navy);border:1px solid var(--linha);color:var(--branco);border-radius:10px;font-family:inherit}
-.placar input:focus{outline:none;border-color:var(--gold)}
-.placar .x{color:var(--cinza);font-weight:700}
-.vencedor{font-size:11px;color:var(--gold);text-align:center;margin-top:4px;font-weight:700;min-height:14px}
+    atualizar(); timer = setInterval(atualizar, 120000); // recalcula a cada 2 min
+  }
 
-/* CLASSIFICAÇÃO */
-.classif{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:14px;margin-top:14px}
-.classif h4{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--cinza);margin-bottom:10px}
-.classif ol{list-style:none;counter-reset:pos}
-.classif li{counter-increment:pos;display:flex;justify-content:space-between;padding:7px 0;
-  border-bottom:1px solid var(--linha);font-size:14px}
-.classif li:last-child{border:none}
-.classif li::before{content:counter(pos)"º";color:var(--gold);font-weight:700;margin-right:10px;width:26px;display:inline-block}
-.classif li.passa span:first-child::after{content:" ✓";color:var(--verde)}
+  // ---- monta o resultado OFICIAL a partir da ESPN ----
+  function ymdEventoBR(iso) {
+    try {
+      const parts = new Intl.DateTimeFormat("en-CA", { timeZone:"America/Sao_Paulo", year:"numeric", month:"2-digit", day:"2-digit" }).formatToParts(new Date(iso));
+      const get = t => (parts.find(p => p.type === t) || {}).value || "";
+      return `${get("year")}${get("month")}${get("day")}`;
+    } catch (e) { return ""; }
+  }
+  function phaseOf(ev) {
+    const comp = ev && ev.competitions && ev.competitions[0] ? ev.competitions[0] : {};
+    const raw = [
+      ev && ev.season && ev.season.slug,
+      ev && ev.name,
+      ev && ev.shortName,
+      comp.name,
+      comp.shortName,
+      comp.note,
+      comp.notes
+    ].filter(Boolean).join(" ").toLowerCase();
 
-/* BOTÕES DE NAVEGAÇÃO */
-.acoes{display:flex;gap:10px;margin-top:18px}
-.acoes .btn-primario{margin-top:0}
-.btn-sec{flex:1;background:var(--navy-3);color:var(--branco);border:1px solid var(--linha);
-  padding:14px;border-radius:10px;font-weight:600;cursor:pointer;font-family:inherit;font-size:15px}
-.btn-sec:hover{border-color:var(--gold)}
-.titulo-fase{font-family:'Anton',sans-serif;font-weight:400;font-size:22px;margin:6px 0 14px}
+    // Primeiro tenta pelo texto/slug da ESPN. A ESPN pode variar o slug conforme a fase.
+    if (/group/.test(raw)) return "group-stage";
+    if (/third|3rd|bronze|terceiro/.test(raw)) return "third-place";
+    if (/round[-\s_]*of[-\s_]*32|round32|\br32\b|\b32\b/.test(raw)) return "round-of-32";
+    if (/round[-\s_]*of[-\s_]*16|round16|\br16\b|\b16\b|oitava|octav/.test(raw)) return "round-of-16";
+    if (/quarter|quartas|quarterfinal/.test(raw)) return "quarterfinals";
+    if (/semi|semifinal/.test(raw)) return "semifinals";
+    if (/final/.test(raw)) return "final";
 
-/* PAINEL CANÔNICO (seleções que avançam — fiel ao palpite auditado) */
-.canon-fase{background:rgba(244,197,66,.07);border:1px solid var(--gold-2,rgba(244,197,66,.35));border-radius:12px;padding:14px 16px;margin:0 0 16px}
-.canon-fase .cn-tit{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px}
-.canon-fase .cn-chips{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
-.canon-fase .cn-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.22);border:1px solid var(--linha);border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--branco);line-height:1.2;max-width:100%}
-.canon-fase .cn-chip img,.canon-fase .cn-chip .flag{width:18px;height:auto;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}
-.canon-fase .cn-chip span{white-space:normal}
-.canon-fase .cn-nota{margin-top:10px;font-size:11.5px;color:var(--cinza);line-height:1.55}
-.canon-fase .cn-nota b{color:var(--branco)}
+    // Fallback por calendário oficial da Copa 2026, em Brasília.
+    // Isso garante a apuração mesmo se a ESPN trocar slug/nome da fase.
+    const d = ymdEventoBR(ev && ev.date);
+    if (d >= "20260611" && d <= "20260627") return "group-stage";
+    if (d >= "20260628" && d <= "20260703") return "round-of-32";
+    if (d >= "20260704" && d <= "20260707") return "round-of-16";
+    if (d >= "20260709" && d <= "20260711") return "quarterfinals";
+    if (d >= "20260714" && d <= "20260715") return "semifinals";
+    if (d === "20260718") return "third-place";
+    if (d === "20260719") return "final";
+    return "";
+  }
+  function teamsOf(ev) { return (ev.competitions[0].competitors || []).map(c => norm((c.team || {}).abbreviation)).filter(t => DADOS.nomeDe && DADOS.nomeDe[t]); }
+  function isPost(ev) { return ev.competitions[0].status.type.state === "post"; }
+  function winLoseOf(ev) {
+    const cs = ev.competitions[0].competitors || [];
+    const w = cs.find(c => c.winner), l = cs.find(c => !c.winner);
+    const W = w ? norm((w.team || {}).abbreviation) : null, L = l ? norm((l.team || {}).abbreviation) : null;
+    return { w: (W && DADOS.nomeDe[W]) ? W : null, l: (L && DADOS.nomeDe[L]) ? L : null };
+  }
 
-/* REVISÃO */
-.revisao{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:18px;margin-top:8px}
-.revisao .linha{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--linha);font-size:15px}
-.revisao .linha b{color:var(--gold)}
-.pontos-box{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-.pt{background:var(--navy-3);border:1px solid var(--linha);border-radius:12px;padding:14px;text-align:center}
-.pt .n{font-family:'Anton',sans-serif;font-size:28px;color:var(--gold)}
-.pt .l{font-size:11px;color:var(--cinza);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+  function buildOficial(events) {
+    const o = { decididos: {} };
+    const slugTeams = slug => [...new Set(events.filter(e => phaseOf(e) === slug).flatMap(teamsOf))];
+    const postCount = slug => events.filter(e => phaseOf(e) === slug && isPost(e)).length;
+    const faseCompletaOficial = {
+      r32: postCount("round-of-32") >= 16,
+      oitavas: postCount("round-of-16") >= 8,
+      quartas: postCount("quarterfinals") >= 4,
+      semis: postCount("semifinals") >= 2,
+      final: postCount("final") >= 1
+    };
 
-/* AVISO ANEXO C */
-.aviso-anexo{background:rgba(224,71,62,.12);border:1px solid rgba(224,71,62,.4);
-  border-radius:12px;padding:14px;margin-top:14px;font-size:14px;line-height:1.5}
-.aviso-anexo b{color:var(--gold)}
+    // --- mata-mata: quem ALCANÇOU cada fase ---
+    // 1) usa os times que já aparecem nos confrontos da fase;
+    // 2) soma os vencedores dos jogos encerrados da fase anterior.
+    // Isso evita o bug clássico: Canadá venceu os 16-avos, mas ainda não apareceu
+    // no card ESPN das oitavas; mesmo assim, já conquistou os +4.
+    const addUnico = (arr, id) => { if (id && arr.indexOf(id) === -1) arr.push(id); };
+    const faseComecou = slug => events.some(e => phaseOf(e) === slug && e.competitions && e.competitions[0] && e.competitions[0].status && e.competitions[0].status.type && e.competitions[0].status.type.state !== "pre");
+    const r32 = slugTeams("round-of-32");
+    o._apurarMata = {
+      oitavas: faseComecou("round-of-32"),
+      quartas: faseComecou("round-of-16"),
+      semis: faseComecou("quarterfinals"),
+      final: faseComecou("semifinals")
+    };
+    o.avancam_oitavas = slugTeams("round-of-16");
+    o.avancam_quartas = slugTeams("quarterfinals");
+    o.semifinalistas = slugTeams("semifinals");
+    o.finalistas = slugTeams("final");
+    const semiLosers = [];
+    events.filter(e => phaseOf(e) !== "group-stage" && isPost(e)).forEach(ev => {
+      const wl = winLoseOf(ev);
+      if (!wl.w) return;
+      const ph = phaseOf(ev);
+      if (ph === "round-of-32") addUnico(o.avancam_oitavas, wl.w);
+      else if (ph === "round-of-16") addUnico(o.avancam_quartas, wl.w);
+      else if (ph === "quarterfinals") addUnico(o.semifinalistas, wl.w);
+      else if (ph === "semifinals") {
+        addUnico(o.finalistas, wl.w);
+        if (wl.l) addUnico(semiLosers, wl.l);
+      }
+    });
+    o._semiLosers = semiLosers;
 
-/* PLACEHOLDER */
-.placeholder{background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:20px;
-  color:var(--cinza);font-size:14px;line-height:1.6}
-.placeholder code{background:var(--navy);padding:2px 6px;border-radius:5px;color:var(--gold);font-size:13px}
+    // --- grupos: posições + melhores terceiros, derivados com a própria engine ---
+    const realG = [];
+    events.filter(e => phaseOf(e) === "group-stage" && isPost(e)).forEach(ev => {
+      const cs = ev.competitions[0].competitors;
+      const home = cs.find(c => c.homeAway === "home") || cs[0], away = cs.find(c => c.homeAway === "away") || cs[1];
+      const hId = norm(home.team.abbreviation), aId = norm(away.team.abbreviation);
+      const j = JOGOS.find(x => (x.a === hId && x.b === aId) || (x.a === aId && x.b === hId));
+      if (!j) return;
+      const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
+      const ga = j.a === hId ? hs : as, gb = j.a === hId ? as : hs;
+      const inv = (j.a !== hId); // ESPN mostra invertido vs engine?
+      realG.push({ jogo_id: j.jogo_id, ga, gb, inv: inv, homeId: hId, awayId: aId });
+    });
+    const completos = {}; GRUPOS.forEach(g => completos[g] = realG.filter(p => p.jogo_id.startsWith("G_" + g + "_")).length === 6);
+    const todosGrupos = GRUPOS.every(g => completos[g]);
 
-/* POPUP */
-.popup{position:fixed;inset:0;background:rgba(5,12,24,.7);display:flex;align-items:center;
-  justify-content:center;padding:20px;z-index:50}
-.popup-caixa{background:var(--navy-2);border:1px solid var(--gold);border-radius:14px;padding:24px;
-  max-width:340px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.popup-caixa p{font-size:15px;line-height:1.5;margin-bottom:16px}
+    if (realG.length) {
+      let dg = null;
+      try {
+        // Resultado oficial: aqui SIM precisa considerar fair play antes do ranking FIFA.
+        // Mantém a aba Pontos alinhada com Resultados/chaveamento oficial.
+        dg = COPA_ENGINE.derivar(DADOS.selecoes, realG, {}, DADOS.estrutura, DADOS.terceirosMap, DADOS.fairplay || {});
+      } catch (e) {}
+      if (dg) {
+        o.classificacao = {};
+        GRUPOS.forEach(g => { if (completos[g]) o.classificacao[g] = dg.classificacao[g]; });
+        if (todosGrupos) { o.classificados32 = dg.classificados32; o.melhores_terceiros = dg.melhores_terceiros; }
+        else if (modoSimulado()) {
+          // PRÉVIA (foto de hoje): usa a classificação SIMULADA COMPLETA de todos os grupos,
+          // para pontuar 1º/2º/3º/4º e os 8 melhores terceiros como se a fase acabasse agora.
+          o.classificacao = {};
+          GRUPOS.forEach(g => { if (dg.classificacao[g]) o.classificacao[g] = dg.classificacao[g]; });
+          o.classificados32 = dg.classificados32;
+          o.melhores_terceiros = dg.melhores_terceiros;
+          o._simulado = true;
+        }
+      }
+    }
+    if (r32.length === 32) o.classificados32 = r32; // so vale com os 32 REAIS definidos (ignora placeholders 'a definir' da ESPN)
 
-@media(max-width:420px){
-  .grid-grupos{grid-template-columns:1fr}
-  .placar input{width:42px;height:42px;font-size:18px}
-}
+    // --- 1º a 4º ---
+    const fin = events.find(e => phaseOf(e) === "final" && isPost(e));
+    if (fin) { const wl = winLoseOf(fin); o.campeao = wl.w; o.vice = wl.l; o.decididos.campeao = true; o.decididos.vice = true; }
+    const ter = events.find(e => (phaseOf(e) === "third-place") && isPost(e));
+    if (ter) { const wl = winLoseOf(ter); o.terceiro = wl.w; o.quarto = wl.l; o.decididos.terceiro = true; o.decididos.quarto = true; }
 
-/* ---- Ajustes UX: rótulos da final, ranking por % ---- */
-.rotulo-jogo{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.5px;font-size:13px;
-  text-transform:uppercase;color:var(--gold);margin:16px 2px 6px}
-.lista-jogos .rotulo-jogo:first-child{margin-top:4px}
+    // --- eliminados (para os "perdidos") ---
+    const elim = new Set();
+    events.forEach(ev => { if (phaseOf(ev) !== "group-stage" && isPost(ev)) { const wl = winLoseOf(ev); if (wl.l) elim.add(wl.l); } });
+    if (todosGrupos && o.classificados32) {
+      const passou = new Set(o.classificados32);
+      DADOS.selecoes.forEach(s => { if (!passou.has(s.id)) elim.add(s.id); });
+    } else if (o._simulado && o.classificados32) {
+      // SIMULADO (foto de HOJE): se a Copa acabasse agora, quem está fora dos 32 já era.
+      const passou = new Set(o.classificados32);
+      DADOS.selecoes.forEach(s => {
+        if (!passou.has(s.id)) elim.add(s.id);
+      });
+    }
 
-.rank-pct{margin-top:4px}
-.rank-linha{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--linha)}
-.rank-linha:last-child{border-bottom:none}
-.rank-nome{flex:0 0 32%;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rank-barra{flex:1;height:10px;background:var(--navy);border:1px solid var(--linha);border-radius:99px;overflow:hidden}
-.rank-fill{display:block;height:100%;width:0;background:var(--gold);border-radius:99px;transition:width .35s ease}
-.rank-num{flex:0 0 46px;text-align:right;font-family:'Anton',sans-serif;font-size:16px;color:var(--branco)}
-.rank-linha.completo .rank-fill{background:var(--verde)}
-.rank-linha.completo .rank-num{color:var(--verde)}
+    // Auditoria completa do mata-mata: quando uma fase encerrou,
+    // a lista da fase seguinte passa a ser a fonte da verdade para quem segue vivo.
+    function eliminarQuemNaoAvancou(origem, destino, completa) {
+      if (!completa || !origem || !origem.length || !destino || !destino.length) return;
+      const ok = new Set(destino);
+      origem.forEach(id => { if (id && !ok.has(id)) elim.add(id); });
+    }
+    eliminarQuemNaoAvancou(o.classificados32 || [], o.avancam_oitavas || [], faseCompletaOficial.r32);
+    eliminarQuemNaoAvancou(o.avancam_oitavas || [], o.avancam_quartas || [], faseCompletaOficial.oitavas);
+    eliminarQuemNaoAvancou(o.avancam_quartas || [], o.semifinalistas || [], faseCompletaOficial.quartas);
+    eliminarQuemNaoAvancou(o.semifinalistas || [], o.finalistas || [], faseCompletaOficial.semis);
+    if (faseCompletaOficial.final && o.finalistas && o.campeao) {
+      o.finalistas.forEach(id => { if (id && id !== o.campeao) elim.add(id); });
+    }
 
-/* ---- Empate inválido no mata-mata ---- */
-.jogo.empate{border-color:var(--vermelho);box-shadow:0 0 0 1px var(--vermelho) inset}
-.vencedor.erro{color:var(--vermelho);font-weight:600}
-.aviso-anexo.erro-box{border-color:var(--vermelho);color:var(--vermelho)}
+    o._faseCompleta = faseCompletaOficial;
+    o.eliminados = [...elim];
 
-/* Botão de avançar desabilitado (fase com empate/pendência) */
-.btn-primario.desabilitado, .btn-primario:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.35)}
+    o._realGrupos = {}; realG.forEach(x => o._realGrupos[x.jogo_id] = { ga: x.ga, gb: x.gb, inv: x.inv, homeId: x.homeId, awayId: x.awayId });
+    o._meta = { todosGrupos, segundaFase: !!(o.classificados32 && o.classificados32.length), nGruposCompletos: GRUPOS.filter(g => completos[g]).length, simulado: !!o._simulado };
+    return o;
+  }
 
-/* ===== MENU UNIFICADO (todas as páginas) ===== */
-.menu{display:flex;gap:6px;margin-top:14px;background:var(--navy-2);border:1px solid var(--linha);
-  border-radius:12px;padding:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
-  position:sticky;top:8px;z-index:60;box-shadow:0 6px 20px rgba(0,0,0,.35)}
-.menu::-webkit-scrollbar{display:none}
-.menu a{flex:1 0 auto;text-align:center;white-space:nowrap;color:var(--cinza);text-decoration:none;
-  font-weight:600;font-size:14px;padding:10px 14px;border-radius:8px;transition:background .15s,color .15s}
-.menu a:hover{color:var(--branco)}
-.menu a.ativo{background:var(--gold);color:#3a2a00}
+  async function atualizar() {
+    let events = [];
+    try {
+      const lotes = await Promise.all(JANELAS.map(d => fetch(`${API}?dates=${d}&limit=120`).then(r => r.json()).catch(() => ({ events: [] }))));
+      const vistos = new Set();
+      lotes.forEach(l => (l.events || []).forEach(ev => { if (!vistos.has(ev.id)) { vistos.add(ev.id); events.push(ev); } }));
+    } catch (e) {}
+    const o = buildOficial(events);
+    ULTIMO_O = o;
+    render(o);
+  }
 
-/* ===== RODAPÉ APARTADO (regras/admin/brasileirão) ===== */
-.rodape{max-width:760px;margin:30px auto 0;padding:16px 14px 34px;border-top:1px solid var(--linha);
-  display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:center;align-items:center}
-.rodape a{color:var(--cinza);text-decoration:none;font-size:13px}
-.rodape a:hover{color:var(--branco)}
-.rodape a.adm{opacity:.65}
-.rodape .sep{color:var(--linha);font-size:13px}
+  function cravadosDe(pg, real) { let n = 0; for (const id in real) { const a = pg[id]; if (a && a.ga === real[id].ga && a.gb === real[id].gb) n++; } return n; }
 
+  // ---- render ----
+  const FASES = [
+    { k: "classificados32", n: 32, lab: "2ª fase" },
+    { k: "avancam_oitavas", n: 16, lab: "Oitavas" },
+    { k: "avancam_quartas", n: 8, lab: "Quartas" },
+    { k: "semifinalistas", n: 4, lab: "Semifinal" }
+  ];
+  function detalheFinal(p, o) {
+    const labs = [["campeao", "Campeão", 40], ["vice", "Vice", 25], ["terceiro", "3º lugar", 15], ["quarto", "4º lugar", 10]];
+    return labs.map(([k, lab]) => {
+      const pick = p[k]; if (!pick) return "";
+      let st = "", cls = "pend";
+      if (o.decididos && o.decididos[k]) { if (o[k] === pick) { st = "✓ acertou"; cls = "ok"; } else { st = "✗ errou"; cls = "err"; } }
+      else st = "aguardando";
+      return `<div class="fp"><span>${lab}: ${flag(pick)} ${nome(pick)}</span><span class="${cls}">${st}</span></div>`;
+    }).join("");
+  }
 
-/* ===== PALPITE FINALIZADO (lacre individual) ===== */
-.lacrado .placar input{pointer-events:none;opacity:.7;border-color:transparent}
-.banner-lacre{background:rgba(244,197,66,.10);border:1px solid var(--gold-2);border-radius:12px;
-  padding:11px 13px;margin:12px 0;font-size:13px;line-height:1.55;color:#f3dea6}
-.banner-lacre b{color:var(--gold)}
+  function fasePalpiteAtiva(key, o) {
+    const ap = (o && o._apurarMata) || {};
+    if (key === "classificados32") return true;
+    if (key === "avancam_oitavas") return !!ap.oitavas;
+    if (key === "avancam_quartas") return !!ap.quartas;
+    if (key === "semifinalistas") return !!ap.semis;
+    if (key === "finalistas") return !!ap.final;
+    return true;
+  }
+  function statusFasePalpite(id, key, o) {
+    const oficiais = new Set(o[key] || []);
+    if (oficiais.has(id)) return "ok";
+    // Visual alinhado ao motor: fases futuras ainda ficam possíveis até entrarem em apuração.
+    if (key === "classificados32" && o.classificados32 && o.classificados32.length && o.classificados32.indexOf(id) === -1) return "no";
+    if (fasePalpiteAtiva(key, o) && (o.eliminados || []).indexOf(id) !== -1) return "no";
+    return "pend";
+  }
+  function chipFasePalpite(id, key, o) {
+    const st = statusFasePalpite(id, key, o);
+    const ico = st === "ok" ? "✅" : (st === "no" ? "❌" : "⏳");
+    const cls = st === "ok" ? "gg-ok" : (st === "no" ? "gg-no" : "gg-pend");
+    return `<span class="gg-cel ${cls}">${flag(id)} ${id} ${ico}</span>`;
+  }
+  function fasesDoPalpiteHTML(p, o, apostador) {
+    const fases = [
+      ["classificados32", "2ª fase", 32],
+      ["avancam_oitavas", "Oitavas", 16],
+      ["avancam_quartas", "Quartas", 8],
+      ["semifinalistas", "Semis", 4],
+      ["finalistas", "Final", 2]
+    ];
+    const linhas = fases.map(([key, lab, total]) => {
+      const ids = p[key] || [];
+      if (!ids.length) return "";
+      const ok = ids.filter(id => statusFasePalpite(id, key, o) === "ok").length;
+      const no = ids.filter(id => statusFasePalpite(id, key, o) === "no").length;
+      const pend = ids.length - ok - no;
+      return `<div class="gg-lin"><span class="gg-g">${lab}<small>${ok}/${total}</small></span><div class="gg-cels">${ids.map(id => chipFasePalpite(id, key, o)).join("")}</div></div>`;
+    }).join("");
+    const podio = [["campeao","Campeão"],["vice","Vice"],["terceiro","3º"],["quarto","4º"]]
+      .map(([key, lab]) => {
+        const id = p[key]; if (!id) return "";
+        let cls = "gg-pend", ico = "⏳";
+        if (o.decididos && o.decididos[key]) {
+          const ok = o[key] === id; cls = ok ? "gg-ok" : "gg-no"; ico = ok ? "✅" : "❌";
+        } else if ((o.eliminados || []).indexOf(id) !== -1 && key !== "terceiro" && key !== "quarto") {
+          cls = "gg-no"; ico = "❌";
+        }
+        return `<span class="gg-cel ${cls}"><i>${lab}</i> ${flag(id)} ${id} ${ico}</span>`;
+      }).join("");
+    const podioBloco = podio ? `<div class="gg-lin"><span class="gg-g">Pódio</span><div class="gg-cels">${podio}</div></div>` : "";
+    return `<button class="vermais2" data-fases="${apostador}">🧭 Fases do palpite ▾</button>
+      <div class="ggbox" id="fases-${cssId(apostador)}" style="display:none">
+        <div class="gg-leg">✅ conquistou · ⏳ ainda possível · ❌ perdeu nesta fase</div>
+        ${linhas}${podioBloco}
+      </div>`;
+  }
 
+  function toggleHTML() {
+    return `<div class="vistog">
+      <button class="vbtn ${ABA === "bolao" ? "on" : ""}" data-v="bolao">🏆 ${modoSimulado() ? "Ranking Simulado" : "Ranking"}</button>
+      <button class="vbtn ${ABA === "placares" ? "on" : ""}" data-v="placares">🎯 Reis do Cravo</button>
+    </div>`;
+  }
+  function wireToggle() {
+    document.querySelectorAll(".vbtn").forEach(b => b.onclick = () => {
+      if (ABA === b.dataset.v) return;
+      ABA = b.dataset.v; FILTRO = "";
+      if (ULTIMO_O) render(ULTIMO_O);
+    });
+  }
+  function render(o) { if (ABA === "placares") renderPlacares(o); else renderBolao(o); }
 
-/* ===== Cabeçalho único (marca COPA 26) ===== */
-  .hdr{margin:0 0 14px;text-align:center}
-  .hdr-img{display:block;width:100%;max-width:460px;height:auto;margin:0 auto;border-radius:10px;box-sizing:border-box}
+  function renderBolao(o) {
+    const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos };
+    const kf = KEY[ORDEM] || KEY.atuais;
+    const lin = PART.map(p => {
+      const r = COPA_PONTUACAO.calcular(p.d, o);
+      const cr = cravadosDe(p.pg, o._realGrupos || {});
+      return { nome: p.nome, d: p.d, r, cr };
+    }).sort((a, b) => kf(b) - kf(a) || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+    lin.forEach((x, i) => x.posReal = i + 1);
+    const visiveis = FILTRO ? lin.filter(x => x.nome === FILTRO) : lin;
 
-.topo.bar-user{justify-content:flex-end;margin-top:-4px;margin-bottom:10px}
-@media(max-width:520px){.topo.bar-user{justify-content:flex-start}}
+    const opts = PART.map(p => p.nome).sort((a, b) => a.localeCompare(b))
+      .map(n => `<option value="${n}" ${n === FILTRO ? "selected" : ""}>${n}</option>`).join("");
+    const ROT = { atuais: "conquistados", possiveis: "possíveis", perdidos: "perdidos" };
+    const pills = Object.keys(ROT).map(k => `<button class="ordbtn ${ORDEM === k ? "on" : ""}" data-ord="${k}">${ROT[k]}</button>`).join("");
+    const controles = `<div class="ctrlbar">
+      <select id="filtro-part"><option value="">👥 Todos os participantes</option>${opts}</select>
+      <div class="ordwrap"><span class="ordlab">ordenar:</span>${pills}</div>
+    </div>`;
 
+    let banner = "";
+    if (o._meta.simulado) {
+      banner = `<div class="aviso">⚠️ <b>Ranking SIMULADO</b>: como ficaria se a fase de grupos acabasse <b>agora</b>. Muda a cada jogo — <b>nada está definido!</b> ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
+    } else if (!o._meta.segundaFase) {
+      banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>potencial máximo</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
+    }
 
-/* ===== Banner/Pop-up de aniversário (vindo do Brasileirão) ===== */
-.banner-aniv-copa{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
-  background:linear-gradient(90deg,rgba(244,114,182,.14),rgba(244,197,66,.10));
-  border-bottom:1px solid rgba(244,114,182,.4);color:#f7d7e8;font-size:13px;padding:9px 14px}
-.banner-aniv-copa strong{color:#f9a8d4}
-.bac-link{background:rgba(244,114,182,.25);border:1px solid rgba(244,114,182,.5);color:#fff;
-  border-radius:99px;padding:5px 13px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;font-family:inherit}
-.bac-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px}
-.bac-modal{background:var(--navy-2,#12233f);border:1px solid var(--linha,#1f3a5f);border-radius:16px;
-  padding:24px 20px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.bac-card{background:rgba(244,114,182,.12);border:1px solid rgba(244,114,182,.4);border-radius:12px;padding:14px;margin-bottom:10px}
-.bac-nome{font-size:19px;font-weight:700;color:#f9a8d4;margin-bottom:10px}
-.bac-btn{display:inline-block;background:#25d366;color:#063b1e;font-weight:700;text-decoration:none;
-  padding:9px 16px;border-radius:10px;font-size:14px}
-.bac-fechar{margin-top:6px;background:var(--navy-3,#0b1f3a);border:1px solid var(--linha,#1f3a5f);
-  color:var(--branco,#e8edf4);border-radius:10px;padding:9px 22px;font-size:14px;cursor:pointer;font-family:inherit}
+    const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯</p>';
+    $("#app").innerHTML = toggleHTML() + controles + banner + tbnote + visiveis.map((x, i) => {
+      const pos = x.posReal, r = x.r;
+      const eficiencia = eficienciaPct(r);
+      const tot = r.atuais + r.perdidos + r.possiveis || 1;
+      const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
+      const cls = pos <= 3 ? " p" + pos : "";
+      const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
+      const fasesHTML = FASES.map(f => {
+        const real = o[f.k] || [];
+        if (!real.length) return `<span class="ph">${f.lab}: <b>—</b></span>`;
+        const ac = inter(x.d[f.k], real).length;
+        return `<span class="ph">${f.lab}: <b>${ac}/${f.n}</b></span>`;
+      }).join("");
+      const decidiu = o.classificados32 && o.classificados32.length;
+      const picks32 = x.d.classificados32 || [];
+      const vivos = qtdAindaNoPareo(x.d, o);
+      const funil = picks32.map(t => `<span class="${statusNoPareo(t, x.d, o)}">${flag(t)}</span>`).join("");
+      const f32lab = decidiu ? `As 32 de ${x.nome} — <b>${vivos} ainda no páreo</b>:` : `As 32 que ${x.nome} classificou no palpite:`;
+      const f32leg = decidiu ? '<div class="f32leg"><span><i class="lg-a"></i>na disputa</span><span><i class="lg-o"></i>caiu</span><span><i class="lg-w"></i>não classificou</span></div>' : "";
+      return `<div class="card${cls}">
+        <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
+        <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
+        <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">eficiência <b>${eficiencia}</b></span></div>
+        <div class="fases">${fasesHTML}<span class="ph">🎯 <b>${x.cr}</b> cravados</span></div>
+        <div class="podiodet">${detalheFinal(x.d, o)}</div>
+        <div class="f32lab">${f32lab}</div>${f32leg}
+        <div class="f32">${funil}</div>
+        ${fasesDoPalpiteHTML(x.d, o, x.nome)}
+        <button class="vermais" data-ext="${x.nome}">Ver extrato dos pontos ▾</button>
+        <div class="extbox" id="ext-${cssId(x.nome)}" style="display:none">${extratoBolao(x.d, o, x)}</div>
+      </div>`;
+    }).join("");
+    const fp = $("#filtro-part");
+    if (fp) fp.onchange = e => { FILTRO = e.target.value; if (ULTIMO_O) render(ULTIMO_O); };
+    document.querySelectorAll(".ordbtn[data-ord]").forEach(b => b.onclick = () => { ORDEM = b.dataset.ord; if (ULTIMO_O) render(ULTIMO_O); });
+    document.querySelectorAll(".vermais[data-ext]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("ext-" + cssId(b.dataset.ext)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "Ocultar extrato ▴" : "Ver extrato dos pontos ▾";
+    });
+    document.querySelectorAll(".vermais2[data-fases]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("fases-" + cssId(b.dataset.fases)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "🧭 Ocultar fases do palpite ▴" : "🧭 Fases do palpite ▾";
+    });
+    document.querySelectorAll(".vermais2[data-gg]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("gg-" + cssId(b.dataset.gg)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "Ocultar quem você acertou ▴" : "QUEM VOCÊ ACERTOU ▾";
+    });
+    wireToggle();
+  }
 
+  // ===== Extrato da pontuação do Bolão (detalhe de onde vem cada ponto) =====
+  function extratoBolao(p, o, x) {
+    const P = COPA_PONTUACAO.PESOS;
+    const det = COPA_PONTUACAO.calcularAtuais(p, o);
+    const elim = new Set(o.eliminados || []);
+    const passou = new Set(o.classificados32 || []);
+    const linhas = [];
+    function row(lab, qtd, peso, pts, tipo) {
+      linhas.push(`<div class="exb-row ${tipo}"><span class="exb-d">${lab}</span><span class="exb-p">${pts >= 0 ? "+" : ""}${pts}</span></div>`);
+    }
+    // CONQUISTADOS
+    const nClassif = inter(p.classificados32, o.classificados32 || []).length;
+    if (nClassif) row(`${nClassif} seleções entre as 32 classificadas (×${P.classificado32})`, nClassif, P.classificado32, nClassif * P.classificado32, "ok");
+    const nTer = inter(p.melhores_terceiros, o.melhores_terceiros || []).length;
+    if (nTer) row(`${nTer} melhores terceiros (×${P.melhorTerceiro})`, nTer, P.melhorTerceiro, nTer * P.melhorTerceiro, "ok");
+    // posições de grupo detalhadas (1º/2º/3º/4º)
+    if (det.posGrupos) {
+      const oc = o.classificacao || {};
+      let a1 = 0, a2 = 0, a3 = 0, a4 = 0;
+      Object.keys(oc).forEach(g => {
+        const pg = (p.classificacao || {})[g];
+        if (!pg) return;
+        if (pg[0] && oc[g][0] && pg[0].id === oc[g][0].id) a1++;
+        if (pg[1] && oc[g][1] && pg[1].id === oc[g][1].id) a2++;
+        if (pg[2] && oc[g][2] && pg[2].id === oc[g][2].id) a3++;
+        if (pg[3] && oc[g][3] && pg[3].id === oc[g][3].id) a4++;
+      });
+      if (a1) row(`${a1} campeões de grupo (1º) certos (×${P.campGrupo})`, a1, P.campGrupo, a1 * P.campGrupo, "ok");
+      if (a2) row(`${a2} vices de grupo (2º) certos (×${P.viceGrupo})`, a2, P.viceGrupo, a2 * P.viceGrupo, "ok");
+      if (a3) row(`${a3} terceiros de grupo certos (×${P.terGrupo})`, a3, P.terGrupo, a3 * P.terGrupo, "ok");
+      if (a4) row(`${a4} quartos de grupo certos (×${P.ultGrupo})`, a4, P.ultGrupo, a4 * P.ultGrupo, "ok");
+    }
+    const nOit = inter(p.avancam_oitavas, o.avancam_oitavas || []).length;
+    if (nOit) row(`${nOit} seleções nas oitavas (×${P.oitavas})`, nOit, P.oitavas, nOit * P.oitavas, "ok");
+    const nQua = inter(p.avancam_quartas, o.avancam_quartas || []).length;
+    if (nQua) row(`${nQua} seleções nas quartas (×${P.quartas})`, nQua, P.quartas, nQua * P.quartas, "ok");
+    const nSemi = inter(p.semifinalistas, o.semifinalistas || []).length;
+    if (nSemi) row(`${nSemi} semifinalistas (×${P.semi})`, nSemi, P.semi, nSemi * P.semi, "ok");
+    const nFin = inter(p.finalistas, o.finalistas || []).length;
+    if (nFin) row(`${nFin} finalistas (×${P.final})`, nFin, P.final, nFin * P.final, "ok");
+    if (det.campeao) row(`Campeão certo`, 1, P.campeao, det.campeao, "ok");
+    if (det.vice) row(`Vice certo`, 1, P.vice, det.vice, "ok");
+    if (det.terceiro) row(`3º lugar certo`, 1, P.terceiro, det.terceiro, "ok");
+    if (det.quarto) row(`4º lugar certo`, 1, P.quarto, det.quarto, "ok");
+    const conqHTML = linhas.length ? linhas.join("") : '<div class="exb-row"><span class="exb-d">Ainda sem pontos conquistados</span><span class="exb-p">0</span></div>';
 
-/* ===== Rodapé do site (SEO + Pix + disclaimer) ===== */
-.rodape-site{max-width:560px;margin:32px auto 0;padding:18px 14px 30px;border-top:1px solid var(--linha);text-align:center}
-.rs-pix{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:16px}
-.rs-pix span{font-size:13px;color:var(--cinza)}
-.rs-pix-btn{background:rgba(244,197,66,.12);border:1px solid var(--gold-2);color:var(--gold);
-  border-radius:99px;padding:8px 16px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
-.rs-pix-btn:active{transform:scale(.98)}
-.rs-legal{font-size:12px;color:var(--cinza);margin:0 0 6px}
-.rs-disc{font-size:10.5px;line-height:1.5;color:#5f7088;margin:0;max-width:480px;margin-left:auto;margin-right:auto}
+    // PERDIDOS (na foto de hoje) — detalhado por categoria
+    const perd = [];
+    function prow(lab, pts) { perd.push(`<div class="exb-row err"><span class="exb-d">${lab}</span><span class="exb-p">-${pts}</span></div>`); }
+    // seleções fora dos 32
+    const classFora = (p.classificados32 || []).filter(id => !passou.has(id));
+    if (classFora.length) prow(`${classFora.length} seleções fora dos 32 (×${P.classificado32}): ${classFora.map(id => nome(id)).join(", ")}`, classFora.length * P.classificado32);
+    // melhores terceiros errados
+    const t8 = new Set(o.melhores_terceiros || []);
+    const terErr = (p.melhores_terceiros || []).filter(id => !t8.has(id)).length;
+    if (terErr) prow(`${terErr} melhores terceiros errados (×${P.melhorTerceiro})`, terErr * P.melhorTerceiro);
+    // posições de grupo erradas (1º/2º/3º/4º)
+    const oc3 = o.classificacao || {};
+    let e1 = 0, e2 = 0, e3 = 0, e4 = 0;
+    Object.keys(oc3).forEach(g => {
+      const pg = (p.classificacao || {})[g]; if (!pg) return;
+      if (pg[0] && oc3[g][0] && pg[0].id !== oc3[g][0].id) e1++;
+      if (pg[1] && oc3[g][1] && pg[1].id !== oc3[g][1].id) e2++;
+      if (pg[2] && oc3[g][2] && pg[2].id !== oc3[g][2].id) e3++;
+      if (pg[3] && oc3[g][3] && pg[3].id !== oc3[g][3].id) e4++;
+    });
+    if (e1) prow(`${e1} campeões de grupo (1º) errados (×${P.campGrupo})`, e1 * P.campGrupo);
+    if (e2) prow(`${e2} vices de grupo (2º) errados (×${P.viceGrupo})`, e2 * P.viceGrupo);
+    if (e3) prow(`${e3} terceiros de grupo errados (×${P.terGrupo})`, e3 * P.terGrupo);
+    if (e4) prow(`${e4} quartos de grupo errados (×${P.ultGrupo})`, e4 * P.ultGrupo);
+    // mata-mata perdido (só no oficial, quando fases já decididas):
+    // cada seleção apostada para uma fase que já caiu antes dela debita o peso daquela fase.
+    const perdMata = (key, oficiais, peso, rotulo) => {
+      if (!fasePalpiteAtiva(key, o)) return;
+      const conf = new Set(oficiais || []);
+      const ids = (p[key] || []).filter(id => elim.has(id) && !conf.has(id));
+      if (ids.length) prow(`${ids.length} ${rotulo} (×${peso}): ${ids.map(id => nome(id)).join(", ")}`, ids.length * peso);
+    };
+    perdMata("avancam_oitavas", o.avancam_oitavas, P.oitavas, "seleções não avançaram às oitavas");
+    perdMata("avancam_quartas", o.avancam_quartas, P.quartas, "seleções não avançaram às quartas");
+    perdMata("semifinalistas", o.semifinalistas, P.semi, "seleções não chegaram à semifinal");
+    perdMata("finalistas", o.finalistas, P.final, "seleções não chegaram à final");
+    // títulos cuja seleção já caiu
+    if (p.campeao && elim.has(p.campeao)) prow(`Campeão (${nome(p.campeao)}) já caiu`, P.campeao);
+    if (p.vice && elim.has(p.vice)) prow(`Vice (${nome(p.vice)}) já caiu`, P.vice);
+    if (p.terceiro && elim.has(p.terceiro)) prow(`3º lugar (${nome(p.terceiro)}) já caiu`, P.terceiro);
+    if (p.quarto && elim.has(p.quarto)) prow(`4º lugar (${nome(p.quarto)}) já caiu`, P.quarto);
+    const perdHTML = perd.length ? perd.join("") : '<div class="exb-row"><span class="exb-d">Nada perdido na foto de hoje 🎉</span><span class="exb-p">0</span></div>';
 
-.rs-nav{font-size:12px;color:var(--cinza);margin-bottom:14px;line-height:1.9}
-.rs-nav a{color:var(--gold);text-decoration:none}
+    // SEGUNDO NÍVEL: detalhe por grupo (1º/2º/3º/4º com ✅/❌)
+    const oc2 = o.classificacao || {};
+    const pc = p.classificacao || {};
+    const ter = new Set(o.melhores_terceiros || []);
+    const pter = new Set(p.melhores_terceiros || []);
+    const POS = ["1º", "2º", "3º", "4º"];
+    const gradeGrupos = GRUPOS.map(g => {
+      const og = oc2[g], pgg = pc[g];
+      if (!og) return "";
+      const cels = POS.map((lab, i) => {
+        const real = og[i] ? og[i].id : null;
+        if (!real) return `<span class="gg-cel"><i>${lab}</i> —</span>`;
+        const acertou = pgg && pgg[i] && pgg[i].id === real;
+        return `<span class="gg-cel ${acertou ? "gg-ok" : "gg-no"}"><i>${lab}</i> ${flag(real)} ${real} ${acertou ? "✅" : "❌"}</span>`;
+      }).join("");
+      return `<div class="gg-lin"><span class="gg-g">Grupo ${g}</span><div class="gg-cels">${cels}</div></div>`;
+    }).join("");
 
-.oa-destaque{display:block;text-align:center;background:linear-gradient(90deg,#1db954,#0a7cff);
-  border:none;color:#fff;text-decoration:none;border-radius:12px;padding:13px 14px;margin:12px 0;
-  font-size:14px;font-weight:800;box-shadow:0 6px 20px rgba(10,124,255,.28);letter-spacing:.2px}
-.oa-destaque:active{transform:scale(.99)}
+    // melhores terceiros: quais ele acertou
+    const terReais = (o.melhores_terceiros || []);
+    const terCels = terReais.map(id => {
+      const acertou = pter.has(id);
+      return `<span class="gg-cel ${acertou ? "gg-ok" : "gg-no"}">${flag(id)} ${id} ${acertou ? "✅" : "❌"}</span>`;
+    }).join("");
+    const terBloco = terReais.length ? `<div class="gg-lin"><span class="gg-g">Melhores 3ºs</span><div class="gg-cels">${terCels}</div></div>` : "";
 
-/* ===== ESTATÍSTICAS DA COPA ===== */
-.stat-wrap{max-width:760px;margin:0 auto;padding:16px 12px 60px}
-.stat-hero{background:linear-gradient(135deg,rgba(244,197,66,.12),rgba(29,185,84,.06));border:1px solid var(--linha);border-radius:16px;padding:16px;margin:14px 0 12px;box-shadow:0 12px 34px rgba(0,0,0,.22)}
-.stat-hero h2{margin:0 0 6px;font-size:24px}
-.stat-hero p{color:var(--cinza);font-size:13px;line-height:1.55;margin:0}
-.stat-info{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
-.stat-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.20);border:1px solid var(--linha);border-radius:999px;padding:6px 10px;font-size:11px;color:var(--cinza)}
-.stat-pill b{color:var(--branco)}
-.stat-resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:12px 0}
-.stat-res-card{min-width:0;background:var(--navy-2);border:1px solid var(--linha);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:flex-start}
-.stat-res-ico{width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.22);border:1px solid var(--linha);border-radius:10px;flex:0 0 auto}
-.stat-res-card b{display:block;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px}
-.stat-res-card strong{display:block;font-size:14px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stat-res-card span{display:flex;align-items:center;gap:5px;color:var(--cinza);font-size:11px;line-height:1.4;margin-top:3px;min-width:0}
-.stat-abas{display:flex;gap:7px;background:var(--navy-2);border:1px solid var(--linha);border-radius:12px;padding:5px;margin:12px 0}
-.stat-tab{flex:1;background:transparent;border:none;color:var(--cinza);font-family:inherit;font-weight:700;font-size:13px;padding:11px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
-.stat-tab:hover{color:var(--branco)}
-.stat-tab.ativa{background:var(--gold);color:#3a2a00}
-.stat-bar{display:flex;gap:9px;align-items:center;justify-content:space-between;margin:10px 0 9px}
-.stat-bar h3{font-family:'Anton',sans-serif;font-size:18px;font-weight:400;letter-spacing:.5px;margin:0}
-.stat-bar span{font-size:12px;color:var(--cinza)}
-.stat-filtro{display:flex;align-items:center;gap:8px;margin:0 0 12px}
-.stat-filtro label{font-size:12px;color:var(--cinza);font-weight:700;text-transform:uppercase;letter-spacing:.8px}
-.stat-filtro select{min-width:0;flex:1;background:var(--navy-2);border:1px solid var(--linha);color:var(--branco);border-radius:10px;padding:10px 11px;font-family:inherit;font-weight:600}
-.stat-lista{display:flex;flex-direction:column;gap:7px}
-.stat-row{display:grid;grid-template-columns:44px 1fr auto 76px;align-items:center;gap:10px;background:var(--navy-2);border:1px solid var(--linha);border-radius:13px;padding:10px 11px}
-.stat-row:nth-child(1){border-color:rgba(244,197,66,.55);background:linear-gradient(90deg,rgba(244,197,66,.10),var(--navy-2))}
-.stat-pos{font-family:'Anton',sans-serif;color:var(--gold);font-size:18px;text-align:center}
-.stat-player{min-width:0}
-.stat-player strong{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stat-player span{display:flex;align-items:center;gap:5px;margin-top:3px;color:var(--cinza);font-size:11.5px;min-width:0}
-.stat-flag{width:20px;border-radius:3px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}
-.stat-meta{font-size:12px;color:var(--cinza);white-space:nowrap}
-.stat-mobile-meta{display:none;margin-top:6px;font-size:11px;color:var(--cinza)}
-.stat-num{text-align:center;background:rgba(0,0,0,.24);border:1px solid var(--linha);border-radius:10px;padding:6px 6px;min-width:64px}
-.stat-num b{display:block;font-family:'Anton',sans-serif;font-size:24px;line-height:1;color:var(--branco)}
-.stat-num small{display:block;font-size:9.5px;color:var(--cinza);margin-top:2px;white-space:nowrap}
-.stat-cardtag{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:3px 7px;font-size:10.5px;font-weight:700;margin-left:3px}
-.stat-cardtag.amarelo{background:rgba(244,197,66,.13);border:1px solid rgba(244,197,66,.35);color:var(--gold)}
-.stat-cardtag.vermelho{background:rgba(224,71,62,.13);border:1px solid rgba(224,71,62,.38);color:#ff918a}
-.stat-muted{color:var(--cinza)}
-.stat-vazio{background:var(--navy-2);border:1px dashed var(--linha);border-radius:13px;color:var(--cinza);padding:22px 16px;text-align:center;font-size:13px;line-height:1.55}
-.stat-vazio.erro{border-color:rgba(224,71,62,.45);color:#ffada7}
-.stat-nota{margin-top:12px;color:var(--cinza);font-size:11.5px;line-height:1.55;text-align:center}
-.stat-nota b{color:var(--gold)}
-@media(max-width:680px){
-  .stat-wrap{max-width:580px}
-  .stat-resumo{grid-template-columns:1fr}
-  .stat-res-card strong{white-space:normal}
-  .stat-abas{overflow-x:hidden;scrollbar-width:none;gap:4px;padding:4px}
-  .stat-abas::-webkit-scrollbar{display:none}
-  .stat-tab{flex:1 1 0;min-width:0;font-size:12px;padding:10px 4px;letter-spacing:-.15px}
-  .stat-row{grid-template-columns:36px 1fr 64px;gap:7px;padding:10px 9px}
-  .stat-meta{display:none}
-  .stat-mobile-meta{display:block}
-  .stat-player strong{font-size:13.5px}
-  .stat-num{min-width:58px;padding:5px}
-  .stat-num b{font-size:22px}
-  .stat-bar{align-items:flex-end}
-}
+    const detalheGrupos = `<button class="vermais2" data-gg="${x.nome}">QUEM VOCÊ ACERTOU ▾</button>
+      <div class="ggbox" id="gg-${cssId(x.nome)}" style="display:none">
+        <div class="gg-leg">✅ você cravou esta posição · ❌ ERROU!</div>
+        ${gradeGrupos}${terBloco}
+      </div>`;
 
-/* Situação atual dos palpites no mata-mata (Meus Palpites) */
-.canon-fase .cn-chip{position:relative;padding-right:6px}
-.canon-fase .cn-chip-ok{border-color:rgba(42,211,111,.45);background:rgba(42,211,111,.10)}
-.canon-fase .cn-chip-err{border-color:rgba(255,75,91,.45);background:rgba(255,75,91,.10)}
-.canon-fase .cn-status{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:5px;margin-left:1px;font-size:11px;font-weight:900;line-height:1;color:#fff}
-.canon-fase .cn-ok{background:#2ad36f}
-.canon-fase .cn-err{background:#ff4b5b}
-@media (max-width:640px){.canon-fase .cn-chip{font-size:11.5px;padding:3px 7px}.canon-fase .cn-status{width:14px;height:14px;font-size:10px}}
+    return `<div class="exb">
+      <div class="exb-sec">✅ Conquistados (${x.r.atuais} pts)</div>${conqHTML}
+      <div class="exb-sec">❌ Perdidos (${x.r.perdidos} pts)</div>${perdHTML}
+      <div class="exb-sec">⏳ Ainda possíveis: <b>${x.r.possiveis} pts</b> · Eficiência: <b>${eficienciaPct(x.r)}</b></div>
+      ${detalheGrupos}
+    </div>`;
+  }
 
-/* Resumo recolhível dos acertos no painel "Meus Palpites" */
-.canon-fase .cn-resumo{margin-top:10px;border:1px solid rgba(244,197,66,.28);border-radius:12px;background:rgba(0,0,0,.16);overflow:hidden}
-.canon-fase .cn-resumo summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 12px;color:var(--gold);font-weight:800;font-size:12px;letter-spacing:.15px;text-align:center;user-select:none}
-.canon-fase .cn-resumo summary::-webkit-details-marker{display:none}
-.canon-fase .cn-resumo summary::after{content:"▾";font-size:11px;margin-left:2px;color:var(--gold)}
-.canon-fase .cn-resumo[open] summary::after{content:"▴"}
-.canon-fase .cn-resumo-body{border-top:1px solid rgba(255,255,255,.08);padding:11px 12px 12px;display:grid;gap:10px}
-.canon-fase .cn-resumo-label{font-size:11px;font-weight:900;letter-spacing:.35px;text-transform:uppercase;margin-bottom:6px}
-.canon-fase .cn-ok-label{color:#5ff08f}
-.canon-fase .cn-err-label{color:#ff7885}
-.canon-fase .cn-pend-label{color:var(--cinza)}
-.canon-fase .cn-resumo-chips{display:flex;flex-wrap:wrap;gap:6px}
-.canon-fase .cn-mini-chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:11.5px;font-weight:700;line-height:1.15;background:rgba(0,0,0,.20);border:1px solid var(--linha);color:var(--branco)}
-.canon-fase .cn-mini-chip img,.canon-fase .cn-mini-chip .flag{width:16px;height:auto;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.12);flex:0 0 auto}
-.canon-fase .cn-mini-ok{border-color:rgba(42,211,111,.35);background:rgba(42,211,111,.09)}
-.canon-fase .cn-mini-err{border-color:rgba(255,75,91,.36);background:rgba(255,75,91,.10)}
-.canon-fase .cn-vazio{font-size:11.5px;color:var(--cinza);font-style:italic}
-@media (max-width:640px){.canon-fase .cn-resumo summary{font-size:11.5px;padding:9px 8px}.canon-fase .cn-resumo-body{padding:10px 9px}.canon-fase .cn-mini-chip{font-size:11px;padding:3px 7px}}
+  // ===== 🎯 PLACARES (Reis do Cravo) — fase de grupos, 5/3/2/0 =====
+  function tierDe(g, R) { // retorna [pontos, simbolo]
+    if (!g || g.ga == null || g.gb == null) return [0, "—"];
+    const sg = Math.sign(g.ga - g.gb), sR = Math.sign(R.ga - R.gb);
+    if (g.ga === R.ga && g.gb === R.gb) return [5, "🎯"];
+    if (sg === sR && sR !== 0 && (g.ga - g.gb) === (R.ga - R.gb)) return [3, "📐"];
+    if (sg === sR) return [2, "✅"];
+    return [0, "❌"];
+  }
+  function calcPlacares(o) {
+    const real = o._realGrupos || {};
+    const ids = Object.keys(real);
+    const lin = PART.map(p => {
+      let pts = 0, cr = 0, sal = 0, res = 0;
+      ids.forEach(id => {
+        const [v] = tierDe(p.pg[id], real[id]);
+        pts += v;
+        if (v === 5) cr++; else if (v === 3) sal++; else if (v === 2) res++;
+      });
+      return { nome: p.nome, pts, cr, sal, res };
+    });
+    return { lin, n: ids.length };
+  }
+  const SELO = { 5: "CRAVOU", 3: "acertou saldo", 2: "acertou resultado", 0: "errou" };
+  function extrato(p, o) {
+    const real = o._realGrupos || {};
+    const ids = Object.keys(real).sort();
+    if (!ids.length) return '<p class="pend" style="padding:4px 2px">Nenhum jogo encerrado ainda.</p>';
+    return ids.map(id => {
+      const j = JOGOS.find(x => x.jogo_id === id); if (!j) return "";
+      const R = real[id], g = p.pg[id];
+      const [pts, tag] = tierDe(g, R); // pontuação SEMPRE na ordem da engine (não muda)
+      // exibição na ordem da ESPN (mandante na frente):
+      const inv = R.inv;
+      const ladoA = inv ? j.b : j.a, ladoB = inv ? j.a : j.b;
+      const rGa = inv ? R.gb : R.ga, rGb = inv ? R.ga : R.gb;
+      const pGa = (g && g.ga != null) ? (inv ? g.gb : g.ga) : null;
+      const pGb = (g && g.ga != null) ? (inv ? g.ga : g.gb) : null;
+      const pal = (pGa != null) ? `${pGa}×${pGb}` : "—";
+      const cls = pts === 5 ? "s5" : pts === 3 ? "s3" : pts === 2 ? "s2" : "s0";
+      return `<div class="extrow">
+        <span class="extj"><i>${j.grupo}</i> ${flag(ladoA)} ${ladoA} <b>${rGa}×${rGb}</b> ${ladoB} ${flag(ladoB)}</span>
+        <span class="extp">palpite ${pal}</span>
+        <span class="extpts ${cls}">${tag} ${SELO[pts]} · ${pts}pt</span></div>`;
+    }).join("");
+  }
+  const cssId = nm => nm.replace(/[^a-zA-Z0-9]/g, "_");
+
+  function renderPlacares(o) {
+    const { lin, n } = calcPlacares(o);
+    const cmpN = (a, b) => a.nome.localeCompare(b.nome);
+    lin.sort(ORDEM_P === "cr"
+      ? (a, b) => b.cr - a.cr || b.pts - a.pts || b.sal - a.sal || cmpN(a, b)
+      : (a, b) => b.pts - a.pts || b.cr - a.cr || b.sal - a.sal || cmpN(a, b));
+    lin.forEach((x, i) => x.posReal = i + 1);
+    const vis = FILTRO ? lin.filter(x => x.nome === FILTRO) : lin;
+
+    const opts = PART.map(p => p.nome).sort((a, b) => a.localeCompare(b))
+      .map(x => `<option value="${x}" ${x === FILTRO ? "selected" : ""}>${x}</option>`).join("");
+    const pills = [["pts", "pontos"], ["cr", "cravadas"]]
+      .map(([k, lab]) => `<button class="ordbtn ${ORDEM_P === k ? "on" : ""}" data-ordp="${k}">${lab}</button>`).join("");
+    const controles = `<div class="ctrlbar">
+      <select id="filtro-part"><option value="">👥 Todos os participantes</option>${opts}</select>
+      <div class="ordwrap"><span class="ordlab">ordenar:</span>${pills}</div></div>`;
+    const banner = `<div class="aviso">🍷 <b>Reis do Cravo</b> — desafio apartado da fase de grupos:
+      placar cravado <b>5</b> · vencedor + saldo de gols <b>3</b> · só o resultado <b>2</b> · errou <b>0</b>
+      (empate vale 5 ou 2). Prêmio do organizador ao 1º no fim dos grupos: <b>duas garrafas de vinho</b> 🍷🍷.
+      Pontua só jogo <b>encerrado</b> — <b>${n} de 72</b> computados.
+      Regra completa em <a href="regras.html" style="color:var(--gold)">Regras</a>.</div>`;
+    const cards = vis.map(x => {
+      const pos = x.posReal, medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
+      const campeaoDefinido = n >= 72 && pos === 1;
+      const cls = (pos <= 3 ? " p" + pos : "") + (campeaoDefinido ? " cravo-campeao" : "");
+      const seloCampeao = campeaoDefinido ? '<div class="cravo-campeao-selo">CAMPEÃO!</div>' : "";
+      const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
+      const p = PART.find(pp => pp.nome === x.nome);
+      const aberto = FILTRO === x.nome; // ao filtrar 1 pessoa, já abre
+      return `<div class="card${cls}">
+        ${seloCampeao}
+        <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${x.pts}<small>pontos</small></span></div>
+        <div class="fases"><span class="ph">🎯 cravadas <b>${x.cr}</b></span><span class="ph">📐 no saldo <b>${x.sal}</b></span><span class="ph">✅ resultados <b>${x.res}</b></span></div>
+        <button class="vermais" data-jg="${x.nome}">${aberto ? "Ocultar jogos ▴" : "Ver jogos ▾"}</button>
+        <div class="extbox" id="jg-${cssId(x.nome)}" style="display:${aberto ? "block" : "none"}">${extrato(p, o)}</div>
+      </div>`;
+    }).join("");
+    $("#app").innerHTML = toggleHTML() + controles + banner + cards;
+    wireToggle();
+    const fp = $("#filtro-part");
+    if (fp) fp.onchange = e => { FILTRO = e.target.value; if (ULTIMO_O) render(ULTIMO_O); };
+    document.querySelectorAll(".ordbtn[data-ordp]").forEach(b => b.onclick = () => { ORDEM_P = b.dataset.ordp; if (ULTIMO_O) render(ULTIMO_O); });
+    document.querySelectorAll(".vermais[data-jg]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("jg-" + cssId(b.dataset.jg)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "Ocultar jogos ▴" : "Ver jogos ▾";
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
