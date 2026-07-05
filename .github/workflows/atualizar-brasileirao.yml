@@ -1,0 +1,164 @@
+name: Atualizar Brasileirao (ESPN + jogos/resultados)
+
+on:
+  # NOVO workflow do modulo Brasileirao (v2, pos-Copa).
+  # Roda a cada 10 minutos e substitui a antiga cadeia Terra:
+  #   - tabela.json         -> agora vem da ESPN (atualizar_espn.py)
+  #   - espn_eventos.json   -> de-para de jogos p/ o AO VIVO do site (ESPN)
+  #   - jogos.json          -> proximos jogos (atualizar_jogos.py, com rodada)
+  #   - resultados.json     -> jogos realizados (atualizar_resultados.py)
+  #
+  # OBS 1: o cron do GitHub e "melhor esforco" (pode atrasar alguns minutos
+  #        em horario de pico). O placar EM TEMPO REAL nao depende dele:
+  #        o proprio site consulta a ESPN a cada 30s durante os jogos.
+  # OBS 2: este workflow NAO toca em nada do modulo copa2026/.
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+  push:
+    paths:
+      - 'atualizar_espn.py'
+      - 'atualizar_jogos.py'
+      - 'atualizar_resultados.py'
+      - '.github/workflows/atualizar-brasileirao.yml'
+
+permissions:
+  contents: write
+
+# GRUPO GLOBAL DE ESCRITA (repo-write-main) — o mesmo dos demais workflows
+# que dao git push no main. Serializa as escritas -> zero corrida de push.
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+
+jobs:
+  atualizar:
+    name: Buscar dados (ESPN + Globo) e publicar JSONs
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Mostrar horario da execucao
+        run: |
+          echo "Horario UTC:"
+          date -u '+%d/%m/%Y %H:%M:%S UTC'
+          echo "Horario Brasilia:"
+          TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
+
+      # --- 1. TABELA + EVENTOS (ESPN) ---
+      # Regra de seguranca do script: se algum dos 20 times nao mapear
+      # para o nome canonico do site, ele FALHA sem gravar nada — o
+      # tabela.json anterior permanece e o Ranking nunca quebra.
+      - name: Atualizar tabela.json e espn_eventos.json (ESPN)
+        id: espn
+        run: python atualizar_espn.py
+
+      # --- 2. PROXIMOS JOGOS (mantem rodada + escudos) ---
+      - name: Atualizar jogos.json
+        id: jogos
+        run: python atualizar_jogos.py
+
+      # --- 3. RESULTADOS ---
+      - name: Atualizar resultados.json
+        id: resultados
+        run: python atualizar_resultados.py
+
+      - name: Conferir e validar JSONs gerados
+        run: |
+          set -euo pipefail
+          echo "Arquivos JSON presentes e validos:"
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json; do
+            if [ ! -f "$arq" ]; then
+              echo "ERRO: $arq nao foi gerado."
+              exit 1
+            fi
+            python -m json.tool "$arq" > /dev/null
+            echo "  OK   $arq"
+          done
+          # Trava extra: a tabela publicada tem que ter fonte ESPN e 20 times.
+          python - <<'PY'
+          import json, sys
+          d = json.load(open('tabela.json'))
+          assert d.get('fonte') == 'ESPN', 'fonte da tabela nao e ESPN'
+          assert len(d.get('tabela') or []) == 20, 'tabela sem 20 times'
+          print('  OK   tabela.json: fonte ESPN, 20 times')
+          PY
+
+      # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
+      # guarda os artefatos gerados -> fetch + reset --hard origin/main ->
+      # reaplica os arquivos -> commit -> push. Nunca gera conflito artificial
+      # de rebase em arquivos-artefato, mesmo sob concorrencia real.
+      - name: Commitar os 4 JSONs juntos com push robusto
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=(
+            "tabela.json"
+            "espn_eventos.json"
+            "jogos.json"
+            "resultados.json"
+          )
+
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+            echo "Sem mudancas nos JSONs - nada a commitar."
+            exit 0
+          fi
+
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            if [[ -e "$f" ]]; then
+              mkdir -p "$TMP_DIR/$(dirname "$f")"
+              cp -a "$f" "$TMP_DIR/$f"
+            fi
+          done
+
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              if [[ -e "$TMP_DIR/$f" ]]; then
+                rm -rf "$f"
+                mkdir -p "$(dirname "$f")"
+                cp -a "$TMP_DIR/$f" "$f"
+              fi
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Apos atualizar com origin/main, nada mudou - sem commit."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar dados Brasileirao (ESPN) - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+            if git push origin HEAD:main; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+
+            echo "Push rejeitado na tentativa $i; recalculando sobre origin/main mais recente..."
+            sleep 3
+          done
+
+          echo "ERRO: Push falhou apos 5 tentativas."
+          exit 1
