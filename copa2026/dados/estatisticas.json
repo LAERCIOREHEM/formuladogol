@@ -1,13 +1,28 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-05T23:12:48.603603Z",
+  "atualizado_em": "2026-07-05T23:42:36.201824Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 91,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
+    {
+      "nome": "Erling Haaland",
+      "equipe": "NOR",
+      "gols": 7,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760430",
+        "760454",
+        "760490",
+        "760504"
+      ],
+      "total_cartoes": 0
+    },
     {
       "nome": "Kylian Mbappé",
       "equipe": "FRA",
@@ -36,20 +51,6 @@
         "760456",
         "760483",
         "760500"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Erling Haaland",
-      "equipe": "NOR",
-      "gols": 5,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760430",
-        "760454",
-        "760490"
       ],
       "total_cartoes": 0
     },
@@ -1739,6 +1740,18 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Neymar",
+      "equipe": "BRA",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760504"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Nico Schlotterbeck",
       "equipe": "GER",
       "gols": 1,
@@ -2128,6 +2141,19 @@
       "jogos": [
         "760424",
         "760447"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Andreas Schjelderup",
+      "equipe": "NOR",
+      "gols": 0,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760475",
+        "760504"
       ],
       "total_cartoes": 0
     },
@@ -2549,18 +2575,6 @@
         "760474"
       ],
       "total_cartoes": 2
-    },
-    {
-      "nome": "Andreas Schjelderup",
-      "equipe": "NOR",
-      "gols": 0,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760475"
-      ],
-      "total_cartoes": 0
     },
     {
       "nome": "Arthur Masuaku",
@@ -6008,7 +6022,7 @@
     {
       "nome": "Neymar",
       "equipe": "BRA",
-      "gols": 0,
+      "gols": 1,
       "assistencias": 0,
       "amarelos": 1,
       "vermelhos": 0,
@@ -6603,6 +6617,15 @@
       "media_gols": 2.8
     },
     {
+      "equipe": "NOR",
+      "gols": 12,
+      "assistencias": 9,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": 5,
+      "media_gols": 2.4
+    },
+    {
       "equipe": "ARG",
       "gols": 11,
       "assistencias": 5,
@@ -6648,19 +6671,19 @@
       "media_gols": 2.5
     },
     {
-      "equipe": "MAR",
+      "equipe": "BRA",
       "gols": 10,
-      "assistencias": 9,
-      "amarelos": 6,
+      "assistencias": 8,
+      "amarelos": 8,
       "vermelhos": 0,
       "jogos": 5,
       "media_gols": 2.0
     },
     {
-      "equipe": "NOR",
+      "equipe": "MAR",
       "gols": 10,
-      "assistencias": 7,
-      "amarelos": 2,
+      "assistencias": 9,
+      "amarelos": 6,
       "vermelhos": 0,
       "jogos": 5,
       "media_gols": 2.0
@@ -6682,15 +6705,6 @@
       "vermelhos": 0,
       "jogos": 4,
       "media_gols": 2.25
-    },
-    {
-      "equipe": "BRA",
-      "gols": 9,
-      "assistencias": 8,
-      "amarelos": 8,
-      "vermelhos": 0,
-      "jogos": 5,
-      "media_gols": 1.8
     },
     {
       "equipe": "CAN",
