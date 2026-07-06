@@ -1,8 +1,16 @@
 {
   "temporada": 2026,
-  "atualizado_em": "2026-07-06T19:04:37.088075-03:00",
+  "atualizado_em": "2026-07-06T19:21:45.036038-03:00",
   "fonte": "Supabase br_palpites + JSONs ESPN locais",
   "politica_sigilo": "Rodadas não publicadas não expõem palpites nem ranking no JSON público.",
+  "ligas": [
+    {
+      "id": "d42fd0f4-b035-4243-bf3e-50719e342b20",
+      "nome": "Liga Geral",
+      "slug": "liga-geral",
+      "descricao": "Liga padrão com todos os participantes ativos."
+    }
+  ],
   "rodadas": [
     {
       "rodada": 20,
@@ -14,10 +22,16 @@
       "jogos_apurados": 0,
       "palpites_descartados_fora_do_prazo": 0,
       "vencedores": [],
+      "vencedores_por_liga": {},
       "ranking": [],
+      "rankings_por_liga": {},
       "jogos": [],
       "auditoria_resumo": []
     }
   ],
-  "ranking_geral": []
+  "ranking_geral": [],
+  "rankings_por_liga": {
+    "d42fd0f4-b035-4243-bf3e-50719e342b20": [],
+    "liga-geral": []
+  }
 }

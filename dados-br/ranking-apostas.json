@@ -1,7 +1,19 @@
 {
   "temporada": 2026,
-  "atualizado_em": "2026-07-06T19:04:37.088075-03:00",
+  "atualizado_em": "2026-07-06T19:21:45.036038-03:00",
   "fonte": "Supabase br_palpites + JSONs ESPN locais",
   "politica_sigilo": "Rodadas não publicadas não expõem palpites nem ranking no JSON público.",
-  "ranking_geral": []
+  "ligas": [
+    {
+      "id": "d42fd0f4-b035-4243-bf3e-50719e342b20",
+      "nome": "Liga Geral",
+      "slug": "liga-geral",
+      "descricao": "Liga padrão com todos os participantes ativos."
+    }
+  ],
+  "ranking_geral": [],
+  "rankings_por_liga": {
+    "d42fd0f4-b035-4243-bf3e-50719e342b20": [],
+    "liga-geral": []
+  }
 }
