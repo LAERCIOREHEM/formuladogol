@@ -90,9 +90,12 @@
     // Status dos ícones das 32 do participante:
     // - wrong: ele colocou entre as 32, mas a seleção nem classificou.
     // - alive: segue viva NO CAMINHO QUE ELE CRAVOU para a fase atual.
-    // - out: classificou, mas caiu do caminho do palpite dele em alguma fase.
+    // - out: classificou, mas caiu ou já foi eliminada do caminho do palpite.
     if (!o || !o.classificados32 || !o.classificados32.length) return "pend";
     if (o.classificados32.indexOf(team) === -1) return "wrong";
+    // Regra crítica: eliminado é fora do páreo imediatamente, mesmo que a fase
+    // inteira ainda não tenha terminado e a seleção ainda apareça na lista da fase atual.
+    if ((o.eliminados || []).indexOf(team) !== -1) return "out";
     const key = chaveAtualDoPareo(o);
     const real = new Set(listaOficialDoPareo(o, key));
     const palpite = new Set(listaPalpiteDoPareo(p, key));
@@ -102,7 +105,8 @@
     if (!o || !o.classificados32 || !o.classificados32.length) return 0;
     const key = chaveAtualDoPareo(o);
     const real = new Set(listaOficialDoPareo(o, key));
-    return listaPalpiteDoPareo(p, key).filter(t => real.has(t)).length;
+    const elim = new Set(o.eliminados || []);
+    return listaPalpiteDoPareo(p, key).filter(t => real.has(t) && !elim.has(t)).length;
   }
 
   async function init() {
@@ -358,14 +362,29 @@
     { k: "avancam_quartas", n: 8, lab: "Quartas" },
     { k: "semifinalistas", n: 4, lab: "Semifinal" }
   ];
+  function posicaoFinalStatus(key, id, o) {
+    if (!id) return { cls:"pend", txt:"aguardando", ico:"⏳", perdido:false };
+    const dec = (o && o.decididos) || {};
+    const elim = new Set((o && o.eliminados) || []);
+    const semiLosers = new Set((o && o._semiLosers) || []);
+    if (dec[key]) {
+      const ok = o[key] === id;
+      return { cls: ok ? "ok" : "err", txt: ok ? "✓ acertou" : "✗ errou", ico: ok ? "✅" : "❌", perdido: !ok };
+    }
+    if (elim.has(id)) {
+      if ((key === "terceiro" || key === "quarto") && semiLosers.has(id) && !dec.terceiro && !dec.quarto) {
+        return { cls:"pend", txt:"ainda pode", ico:"⏳", perdido:false };
+      }
+      return { cls:"err", txt:"já caiu", ico:"❌", perdido:true };
+    }
+    return { cls:"pend", txt:"aguardando", ico:"⏳", perdido:false };
+  }
   function detalheFinal(p, o) {
     const labs = [["campeao", "Campeão", 40], ["vice", "Vice", 25], ["terceiro", "3º lugar", 15], ["quarto", "4º lugar", 10]];
     return labs.map(([k, lab]) => {
       const pick = p[k]; if (!pick) return "";
-      let st = "", cls = "pend";
-      if (o.decididos && o.decididos[k]) { if (o[k] === pick) { st = "✓ acertou"; cls = "ok"; } else { st = "✗ errou"; cls = "err"; } }
-      else st = "aguardando";
-      return `<div class="fp"><span>${lab}: ${flag(pick)} ${nome(pick)}</span><span class="${cls}">${st}</span></div>`;
+      const st = posicaoFinalStatus(k, pick, o);
+      return `<div class="fp"><span>${lab}: ${flag(pick)} ${nome(pick)}</span><span class="${st.cls}">${st.txt}</span></div>`;
     }).join("");
   }
 
@@ -381,9 +400,9 @@
   function statusFasePalpite(id, key, o) {
     const oficiais = new Set(o[key] || []);
     if (oficiais.has(id)) return "ok";
-    // Visual alinhado ao motor: fases futuras ainda ficam possíveis até entrarem em apuração.
     if (key === "classificados32" && o.classificados32 && o.classificados32.length && o.classificados32.indexOf(id) === -1) return "no";
-    if (fasePalpiteAtiva(key, o) && (o.eliminados || []).indexOf(id) !== -1) return "no";
+    // Caiu: tudo que dependia dessa seleção nas fases futuras já está perdido.
+    if ((o.eliminados || []).indexOf(id) !== -1) return "no";
     return "pend";
   }
   function chipFasePalpite(id, key, o) {
@@ -411,12 +430,9 @@
     const podio = [["campeao","Campeão"],["vice","Vice"],["terceiro","3º"],["quarto","4º"]]
       .map(([key, lab]) => {
         const id = p[key]; if (!id) return "";
-        let cls = "gg-pend", ico = "⏳";
-        if (o.decididos && o.decididos[key]) {
-          const ok = o[key] === id; cls = ok ? "gg-ok" : "gg-no"; ico = ok ? "✅" : "❌";
-        } else if ((o.eliminados || []).indexOf(id) !== -1 && key !== "terceiro" && key !== "quarto") {
-          cls = "gg-no"; ico = "❌";
-        }
+        const st = posicaoFinalStatus(key, id, o);
+        let cls = st.cls === "ok" ? "gg-ok" : (st.cls === "err" ? "gg-no" : "gg-pend");
+        let ico = st.ico;
         return `<span class="gg-cel ${cls}"><i>${lab}</i> ${flag(id)} ${id} ${ico}</span>`;
       }).join("");
     const podioBloco = podio ? `<div class="gg-lin"><span class="gg-g">Pódio</span><div class="gg-cels">${podio}</div></div>` : "";
@@ -596,7 +612,6 @@
     // mata-mata perdido (só no oficial, quando fases já decididas):
     // cada seleção apostada para uma fase que já caiu antes dela debita o peso daquela fase.
     const perdMata = (key, oficiais, peso, rotulo) => {
-      if (!fasePalpiteAtiva(key, o)) return;
       const conf = new Set(oficiais || []);
       const ids = (p[key] || []).filter(id => elim.has(id) && !conf.has(id));
       if (ids.length) prow(`${ids.length} ${rotulo} (×${peso}): ${ids.map(id => nome(id)).join(", ")}`, ids.length * peso);
@@ -605,11 +620,13 @@
     perdMata("avancam_quartas", o.avancam_quartas, P.quartas, "seleções não avançaram às quartas");
     perdMata("semifinalistas", o.semifinalistas, P.semi, "seleções não chegaram à semifinal");
     perdMata("finalistas", o.finalistas, P.final, "seleções não chegaram à final");
-    // títulos cuja seleção já caiu
-    if (p.campeao && elim.has(p.campeao)) prow(`Campeão (${nome(p.campeao)}) já caiu`, P.campeao);
-    if (p.vice && elim.has(p.vice)) prow(`Vice (${nome(p.vice)}) já caiu`, P.vice);
-    if (p.terceiro && elim.has(p.terceiro)) prow(`3º lugar (${nome(p.terceiro)}) já caiu`, P.terceiro);
-    if (p.quarto && elim.has(p.quarto)) prow(`4º lugar (${nome(p.quarto)}) já caiu`, P.quarto);
+    // títulos cuja seleção já caiu ou posição final já ficou impossível
+    [["campeao", "Campeão", P.campeao], ["vice", "Vice", P.vice], ["terceiro", "3º lugar", P.terceiro], ["quarto", "4º lugar", P.quarto]].forEach(([key, lab, pts]) => {
+      const id = p[key];
+      if (!id) return;
+      const st = posicaoFinalStatus(key, id, o);
+      if (st.perdido) prow(`${lab} (${nome(id)}) ${st.txt}`, pts);
+    });
     const perdHTML = perd.length ? perd.join("") : '<div class="exb-row"><span class="exb-d">Nada perdido na foto de hoje 🎉</span><span class="exb-p">0</span></div>';
 
     // SEGUNDO NÍVEL: detalhe por grupo (1º/2º/3º/4º com ✅/❌)

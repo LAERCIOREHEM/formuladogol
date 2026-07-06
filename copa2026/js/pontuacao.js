@@ -124,6 +124,43 @@
     return d;
   }
 
+  function perdidosMatamataImediato(p, o, atuais) {
+    o = o || {};
+    atuais = atuais || {};
+    const elim = new Set(o.eliminados || []);
+    const semiLosers = new Set(o._semiLosers || []);
+    const dec = o.decididos || {};
+    let total = 0;
+
+    // A regra correta do bolão: caiu, perdeu imediatamente tudo que dependia
+    // daquela seleção em fases FUTURAS. Não espera a fase acabar.
+    const fase = (pset, oset, peso) => {
+      const conf = new Set(oset || []);
+      return lista(p, pset).filter(id => elim.has(id) && !conf.has(id)).length * peso;
+    };
+    total += fase("avancam_oitavas", o.avancam_oitavas, PESOS.oitavas);
+    total += fase("avancam_quartas", o.avancam_quartas, PESOS.quartas);
+    total += fase("semifinalistas", o.semifinalistas, PESOS.semi);
+    total += fase("finalistas", o.finalistas, PESOS.final);
+
+    const finalPerdido = (key) => {
+      const id = p && p[key];
+      if (!id) return false;
+      if (dec[key]) return o[key] !== id;
+      if (!elim.has(id)) return false;
+      // 3º/4º lugar: quem perdeu a semifinal ainda pode disputar o 3º lugar.
+      // Só perde antes disso se caiu ANTES da semifinal. Depois do jogo de 3º,
+      // a regra volta a ser decidida pelo placar oficial acima.
+      if ((key === "terceiro" || key === "quarto") && semiLosers.has(id) && !dec.terceiro && !dec.quarto) return false;
+      return true;
+    };
+    if (finalPerdido("campeao")) total += PESOS.campeao;
+    if (finalPerdido("vice")) total += PESOS.vice;
+    if (finalPerdido("terceiro")) total += PESOS.terceiro;
+    if (finalPerdido("quarto")) total += PESOS.quarto;
+    return total;
+  }
+
   // Visão completa. o pode incluir o.eliminados (array de ids já fora) e
   // o.decididos = {campeao:bool, vice:bool, terceiro:bool, quarto:bool}.
   function calcular(p, o) {
@@ -131,56 +168,33 @@
     const atuais = calcularAtuais(p, o);
     const tetoMax = teto(p);
 
-    // PERDIDOS (aproximação honesta a partir dos times já eliminados)
-    let perdidos = 0;
-    const elim = new Set(o.eliminados || []);
-    // seleção prevista numa fase mas já eliminada e que NÃO está no oficial daquela fase.
-    // Para mata-mata, só debita fases já abertas/apuradas.
-    const naoConfirmados = (pset, oset, peso) => {
-      const conf = new Set(oset || []);
-      return lista(p, pset).filter(id => elim.has(id) && !conf.has(id)).length * peso;
-    };
-    perdidos += naoConfirmados("classificados32", o.classificados32, PESOS.classificado32);
-    perdidos += naoConfirmados("melhores_terceiros", o.melhores_terceiros, PESOS.melhorTerceiro);
-    if (faseMataAtiva(o, "avancam_oitavas")) perdidos += naoConfirmados("avancam_oitavas", o.avancam_oitavas, PESOS.oitavas);
-    if (faseMataAtiva(o, "avancam_quartas")) perdidos += naoConfirmados("avancam_quartas", o.avancam_quartas, PESOS.quartas);
-    if (faseMataAtiva(o, "semifinalistas")) perdidos += naoConfirmados("semifinalistas", o.semifinalistas, PESOS.semi);
-    if (faseMataAtiva(o, "finalistas")) perdidos += naoConfirmados("finalistas", o.finalistas, PESOS.final);
-    const dec = o.decididos || {};
-    // Títulos/pódio só entram como perdidos quando a posição estiver decidida.
-    if (dec.campeao  && atuais.campeao  === 0) perdidos += PESOS.campeao;
-    if (dec.vice     && atuais.vice     === 0) perdidos += PESOS.vice;
-    if (dec.terceiro && atuais.terceiro === 0) perdidos += PESOS.terceiro;
-    if (dec.quarto   && atuais.quarto   === 0) perdidos += PESOS.quarto;
-
-    let detPerdidos = null;
-    // Sempre que há classificação de grupos (simulado parcial OU oficial encerrado),
-    // os perdidos da FASE DE GRUPOS são tudo que está errado na foto atual.
-    // Isso garante que posições/terceiros errados sejam debitados nos dois modos.
+    // PERDIDOS: grupos pelo retrato oficial/simulado; mata-mata por eliminação
+    // imediata. Se uma seleção caiu, tudo que o palpite dependia dela no futuro
+    // já é ponto perdido agora (quartas, semi, final, campeão etc.).
     const temGrupos = o.classificacao && Object.keys(o.classificacao).length > 0;
+    let detPerdidos = null;
+    let perdidosGrupos = 0;
     if (o._simulado || temGrupos) {
       detPerdidos = perdidosSimulado(p, o);
-      // no oficial, soma também os perdidos de mata-mata (fases já decididas) do cálculo padrão
-      if (!o._simulado) {
-        const dec = o.decididos || {};
-        let pmm = 0;
-        const naoConf = (pset, oset, peso) => {
-          const conf = new Set(oset || []);
-          return (p[pset] || []).filter(id => elim.has(id) && !conf.has(id)).length * peso;
-        };
-        if (faseMataAtiva(o, "avancam_oitavas")) pmm += naoConf("avancam_oitavas", o.avancam_oitavas, PESOS.oitavas);
-        if (faseMataAtiva(o, "avancam_quartas")) pmm += naoConf("avancam_quartas", o.avancam_quartas, PESOS.quartas);
-        if (faseMataAtiva(o, "semifinalistas")) pmm += naoConf("semifinalistas", o.semifinalistas, PESOS.semi);
-        if (faseMataAtiva(o, "finalistas")) pmm += naoConf("finalistas", o.finalistas, PESOS.final);
-        if (dec.campeao  && atuais.campeao  === 0) pmm += PESOS.campeao;
-        if (dec.vice     && atuais.vice     === 0) pmm += PESOS.vice;
-        if (dec.terceiro && atuais.terceiro === 0) pmm += PESOS.terceiro;
-        if (dec.quarto   && atuais.quarto   === 0) pmm += PESOS.quarto;
-        detPerdidos.matamata = pmm;
-        detPerdidos.total += pmm;
-      }
-      perdidos = detPerdidos.total;
+      perdidosGrupos = detPerdidos.total;
+    } else {
+      // Antes da definição dos grupos, só dá para perder matematicamente quem
+      // já consta como eliminado sem confirmação naquela categoria.
+      const elim = new Set(o.eliminados || []);
+      const naoConfirmados = (pset, oset, peso) => {
+        const conf = new Set(oset || []);
+        return lista(p, pset).filter(id => elim.has(id) && !conf.has(id)).length * peso;
+      };
+      perdidosGrupos += naoConfirmados("classificados32", o.classificados32, PESOS.classificado32);
+      perdidosGrupos += naoConfirmados("melhores_terceiros", o.melhores_terceiros, PESOS.melhorTerceiro);
     }
+
+    const perdidosMata = perdidosMatamataImediato(p, o, atuais);
+    if (detPerdidos) {
+      detPerdidos.matamata = perdidosMata;
+      detPerdidos.total = perdidosGrupos + perdidosMata;
+    }
+    const perdidos = perdidosGrupos + perdidosMata;
 
     const possiveis = Math.max(0, tetoMax - atuais.total - perdidos);
 
@@ -194,5 +208,5 @@
     };
   }
 
-  global.COPA_PONTUACAO = { PESOS, calcular, calcularAtuais, teto, perdidosSimulado, faseMataAtiva };
+  global.COPA_PONTUACAO = { PESOS, calcular, calcularAtuais, teto, perdidosSimulado, perdidosMatamataImediato, faseMataAtiva };
 })(typeof window !== "undefined" ? window : globalThis);
