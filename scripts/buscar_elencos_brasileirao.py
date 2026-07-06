@@ -190,12 +190,39 @@ def texto_posicao(pos: Any) -> str:
     return str(pos or "")
 
 
+def procurar_url_foto(no: Any) -> str:
+    """Procura headshot em formatos variados que a ESPN pode devolver."""
+    if isinstance(no, str):
+        s = no.strip()
+        if s.startswith("https://") and ("headshot" in s.lower() or "headshots" in s.lower() or "/i/" in s.lower()):
+            return s
+        return ""
+    if isinstance(no, dict):
+        for chave in ("href", "url", "src"):
+            val = no.get(chave)
+            if isinstance(val, str) and val.startswith("https://"):
+                return val
+        for chave in ("headshot", "headshots", "image", "images", "photo", "photos"):
+            val = no.get(chave)
+            achado = procurar_url_foto(val)
+            if achado:
+                return achado
+        for val in no.values():
+            achado = procurar_url_foto(val)
+            if achado:
+                return achado
+    if isinstance(no, list):
+        for val in no:
+            achado = procurar_url_foto(val)
+            if achado:
+                return achado
+    return ""
+
+
 def foto_atleta(a: dict[str, Any]) -> str:
-    head = a.get("headshot")
-    if isinstance(head, dict) and head.get("href"):
-        return str(head.get("href"))
-    if isinstance(head, str):
-        return head
+    achada = procurar_url_foto(a)
+    if achada:
+        return achada
     aid = a.get("id")
     if aid:
         return f"https://a.espncdn.com/i/headshots/soccer/players/full/{aid}.png"

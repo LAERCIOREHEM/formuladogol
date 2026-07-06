@@ -6,6 +6,7 @@
    - 3 pontos: vencedor + saldo de gols.
    - 2 pontos: apenas resultado V/E/D; empate errado também vale 2.
    - 0 pontos: errou o resultado.
+   Desempate: pontos > cravadas > saldos > resultados > menos erros.
    ========================================================================== */
 (function (global) {
   "use strict";
@@ -116,6 +117,7 @@
       (b.cravadas - a.cravadas) ||
       (b.saldos - a.saldos) ||
       (b.resultados - a.resultados) ||
+      ((a.erros || 0) - (b.erros || 0)) ||
       String(a.membro).localeCompare(String(b.membro), "pt-BR")
     ).map((r, i) => ({ pos: i + 1, ...r }));
   }

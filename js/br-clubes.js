@@ -39,11 +39,41 @@
     if (c && c.escudo) return `<img class="${cls}" src="${escapeAttr(c.escudo)}" alt="" loading="lazy" onerror="this.style.display='none'">`;
     return `<span class="${cls} logo-fallback" aria-hidden="true">${escapeHtml((c && (c.sigla || c.nome) || "?").slice(0,3).toUpperCase())}</span>`;
   }
+  function playerPhotoUrl(j){
+    const local = String(j.foto_local || j.photo_local || "").trim();
+    if (local && !/^https?:\/\//i.test(local)) return local;
+    const remoto = safeUrl(j.foto || j.headshot || j.headshot_href || j.imagem || j.image);
+    if (remoto) return remoto;
+    const id = j.id || j.athlete_id || j.espn_id;
+    if (id) return `https://a.espncdn.com/i/headshots/soccer/players/full/${encodeURIComponent(String(id))}.png`;
+    return "";
+  }
   function playerPhotoHtml(j){
     const nome = j.nome || j.displayName || j.fullName || j.name || "Jogador";
-    const foto = safeUrl(j.foto || j.headshot || j.headshot_href || j.imagem);
+    const foto = playerPhotoUrl(j);
     if (foto) return `<img class="player-photo" src="${escapeAttr(foto)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'player-photo player-fallback',textContent:'${escapeAttr(iniciais(nome))}'}))">`;
     return `<span class="player-photo player-fallback" aria-hidden="true">${escapeHtml(iniciais(nome))}</span>`;
+  }
+  function abrirModalJogador(j){
+    const nome = j.nome || j.displayName || j.fullName || j.name || "Jogador";
+    const pos = posicaoNormalizada(j);
+    const num = j.numero || j.jersey || j.number || "";
+    const idade = j.idade || j.age || "";
+    const foto = playerPhotoUrl(j);
+    const fotoHtml = foto
+      ? `<img class="player-modal-photo" src="${escapeAttr(foto)}" alt="Foto de ${escapeAttr(nome)}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'player-modal-fallback',textContent:'${escapeAttr(iniciais(nome))}'}))">`
+      : `<span class="player-modal-fallback">${escapeHtml(iniciais(nome))}</span>`;
+    const wrap = document.createElement("div");
+    wrap.className = "player-modal-backdrop";
+    wrap.innerHTML = `<article class="player-modal" role="dialog" aria-modal="true" aria-label="Jogador ${escapeAttr(nome)}">
+      ${fotoHtml}
+      <h3>${escapeHtml(nome)}</h3>
+      <p>${escapeHtml(pos)}${num ? ` · nº ${escapeHtml(num)}` : ""}${idade ? ` · ${escapeHtml(idade)} anos` : ""}</p>
+      <button class="action-btn player-modal-close" type="button">Fechar</button>
+    </article>`;
+    wrap.addEventListener("click", (ev) => { if (ev.target === wrap || ev.target.classList.contains("player-modal-close")) wrap.remove(); });
+    document.addEventListener("keydown", function esc(ev){ if (ev.key === "Escape") { wrap.remove(); document.removeEventListener("keydown", esc); } });
+    document.body.appendChild(wrap);
   }
   function iniciais(nome){
     return String(nome || "?").trim().split(/\s+/).filter(Boolean).slice(0,2).map(p => p[0]).join("").toUpperCase() || "?";
@@ -281,11 +311,16 @@
       const pos = posicaoNormalizada(j);
       const num = j.numero || j.jersey || j.number || "";
       const idade = j.idade || j.age || "";
-      return `<article class="player-card">
+      const foto = playerPhotoUrl({...j, nome:nomeJog});
+      return `<article class="player-card" data-player-index="${jogadores.indexOf(j)}" title="Abrir foto de ${escapeAttr(nomeJog)}">
         ${playerPhotoHtml({...j, nome:nomeJog})}
-        <div class="player-info"><strong>${escapeHtml(nomeJog)}</strong><span>${escapeHtml(pos)}${num ? ` · nº ${escapeHtml(num)}` : ""}${idade ? ` · ${escapeHtml(idade)} anos` : ""}</span></div>
+        <div class="player-info"><strong>${escapeHtml(nomeJog)}</strong><span>${escapeHtml(pos)}${num ? ` · nº ${escapeHtml(num)}` : ""}${idade ? ` · ${escapeHtml(idade)} anos` : ""}</span>${foto ? `<small>clique para ampliar</small>` : ""}</div>
       </article>`;
     }).join("");
+    const exibidos = jogadores.slice(0, 36);
+    document.querySelectorAll("#elenco-clube .player-card").forEach((card, idx) => {
+      card.addEventListener("click", () => abrirModalJogador(exibidos[idx] || {}));
+    });
   }
   function renderMeta(){
     const meta = $("#meta-line");

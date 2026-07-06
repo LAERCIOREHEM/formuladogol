@@ -487,3 +487,39 @@ p { margin: 7px 0 0; color: var(--muted); }
     border-radius: 12px;
   }
 }
+
+/* AJUSTE FINO 02 — clique no jogador e modal com foto ampliada */
+.player-row.rich { cursor: pointer; }
+.player-row.rich:hover { border-color: rgba(163,230,53,.32); background: rgba(163,230,53,.055); }
+.player-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(8px);
+}
+.player-modal {
+  width: min(420px, 100%);
+  border: 1px solid rgba(163,230,53,.22);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(6,17,26,.96), rgba(4,12,10,.95));
+  box-shadow: 0 24px 80px rgba(0,0,0,.55);
+  padding: 16px;
+  color: #f8fafc;
+}
+.player-modal-photo, .player-modal-fallback {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,.18);
+  background: rgba(163,230,53,.10);
+}
+.player-modal-fallback { display:grid; place-items:center; font-size:64px; font-weight:950; color:#efffc3; }
+.player-modal h3 { margin: 12px 0 4px; font-size: 24px; }
+.player-modal p { margin: 0; color: rgba(226,232,240,.78); }
+.player-modal-close { margin-top: 13px; width: 100%; }

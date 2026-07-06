@@ -172,3 +172,55 @@ p { margin: 7px 0 0; color: var(--muted); line-height: 1.45; }
 @media (max-width:1100px) { .grid-clubes.premium { grid-template-columns:repeat(3,minmax(0,1fr)); } .roster-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:820px) { .club-detail-grid { grid-template-columns:1fr; } .club-toolbar { grid-template-columns:1fr; } .summary-card.wide { grid-column:auto; } }
 @media (max-width:640px) { .club-page-title { grid-template-columns:1fr; } .club-title-orb { display:none; } .grid-clubes.premium { grid-template-columns:1fr; } .club-card.premium { min-height:210px; } .detail-hero-main { align-items:flex-start; gap:12px; } .detail-logo { width:70px; height:70px; } .detail-hero-main h2 { font-size:30px; } .club-actions { gap:6px; } .action-btn { width:100%; justify-content:center; } .club-kpis { grid-template-columns:repeat(2,minmax(0,1fr)); } .premium-info { grid-template-columns:1fr; } .roster-grid { grid-template-columns:1fr; } .jogos-list .game-row { grid-template-columns:58px 1fr auto; } }
+
+/* AJUSTE FINO 02 — elenco, forma e modal de jogador */
+.info-card .form-line {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  flex-wrap: wrap !important;
+}
+.info-card .form-line .form-dot,
+.info-card .form-dot {
+  display: inline-grid !important;
+  place-items: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  flex: 0 0 auto !important;
+}
+.player-card { cursor: pointer; }
+.player-card:hover { border-color: rgba(163,230,53,.32); background: rgba(163,230,53,.055); }
+.player-photo { background-size: cover; background-position: center; }
+.player-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(8px);
+}
+.player-modal {
+  width: min(420px, 100%);
+  border: 1px solid rgba(163,230,53,.22);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(6,17,26,.96), rgba(4,12,10,.95));
+  box-shadow: 0 24px 80px rgba(0,0,0,.55);
+  padding: 16px;
+  color: #f8fafc;
+}
+.player-modal-photo, .player-modal-fallback {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  max-height: 360px;
+  object-fit: cover;
+  border-radius: 18px;
+  border: 1px solid rgba(148,163,184,.18);
+  background: rgba(163,230,53,.10);
+}
+.player-modal-fallback { display:grid; place-items:center; font-size:64px; font-weight:950; color:#efffc3; }
+.player-modal h3 { margin: 12px 0 4px; font-size: 24px; }
+.player-modal p { margin: 0; color: rgba(226,232,240,.78); }
+.player-modal-close { margin-top: 13px; width: 100%; }
+.player-info small { display:block; color:#d9ff76; font-size:10px; margin-top:3px; font-weight:800; opacity:.86; }

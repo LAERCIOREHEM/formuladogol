@@ -11,8 +11,12 @@ O script usa apenas biblioteca padrão do Python. Ele consulta a ESPN, gera/atua
 
     dados-br/elencos.json
 
-Depois disso, faça commit desse JSON no GitHub. O workflow de madrugada também existe,
-mas esta execução local é a melhor para a primeira carga completa com fotos dos jogadores.
+Depois rode, se quiser baixar as fotos localmente:
+
+    python scripts/baixar_fotos_elencos_local.py
+
+Depois disso, faça commit dos JSONs e da pasta img/jogadores-br/ no GitHub. O workflow de madrugada também existe,
+mas esta execução local é a melhor para a primeira carga completa.
 """
 from __future__ import annotations
 
@@ -31,4 +35,5 @@ if __name__ == "__main__":
     print("== CARGA LOCAL DE ELENCOS DO BRASILEIRÃO ==")
     print("Gerando dados-br/elencos.json a partir do roster ESPN...")
     main()
-    print("OK. Agora suba dados-br/elencos.json para o GitHub.")
+    print("OK. Para baixar fotos locais, rode: py scripts\\baixar_fotos_elencos_local.py")
+    print("Depois suba dados-br/elencos.json e a pasta img/jogadores-br/ para o GitHub.")

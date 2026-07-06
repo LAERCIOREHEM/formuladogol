@@ -397,7 +397,7 @@ def apurar(palpites: list[dict[str, Any]], configs: list[dict[str, Any]], compro
                 "atualizado_em": p.get("atualizado_em"),
             })
 
-        ranking = sorted(acumulado.values(), key=lambda x: (-x["pontos"], -x["cravadas"], -x["saldos"], -x["resultados"], x["membro"]))
+        ranking = sorted(acumulado.values(), key=lambda x: (-x["pontos"], -x["cravadas"], -x["saldos"], -x["resultados"], x.get("erros", 0), x["membro"]))
         for pos, row in enumerate(ranking, 1):
             row["pos"] = pos
             if row["palpites_validos"]:
@@ -406,7 +406,14 @@ def apurar(palpites: list[dict[str, Any]], configs: list[dict[str, Any]], compro
         vencedores: list[str] = []
         if ranking:
             top = ranking[0]
-            vencedores = [r["membro"] for r in ranking if r["pontos"] == top["pontos"] and r["cravadas"] == top["cravadas"] and r["saldos"] == top["saldos"]]
+            vencedores = [
+                r["membro"] for r in ranking
+                if r["pontos"] == top["pontos"]
+                and r["cravadas"] == top["cravadas"]
+                and r["saldos"] == top["saldos"]
+                and r["resultados"] == top["resultados"]
+                and r.get("erros", 0) == top.get("erros", 0)
+            ]
             for nome in vencedores:
                 if nome in geral:
                     geral[nome]["vitorias_rodada"] += 1
@@ -420,7 +427,7 @@ def apurar(palpites: list[dict[str, Any]], configs: list[dict[str, Any]], compro
         })
         saida_rodadas.append(base_rodada)
 
-    ranking_geral = sorted(geral.values(), key=lambda x: (-x["pontos"], -x["cravadas"], -x["saldos"], -x["resultados"], x["membro"]))
+    ranking_geral = sorted(geral.values(), key=lambda x: (-x["pontos"], -x["cravadas"], -x["saldos"], -x["resultados"], x.get("erros", 0), x["membro"]))
     for pos, row in enumerate(ranking_geral, 1):
         row["pos"] = pos
 
