@@ -268,3 +268,77 @@ input:focus, select:focus, textarea:focus { border-color: rgba(163,230,53,.65); 
   .inline-add-member { grid-template-columns: 1fr; }
   .action-cell { min-width: 0; }
 }
+
+/* ========================================================================== 
+   Execução 14 — permissões por liga, exportação e polimento mobile
+   ========================================================================== */
+.export-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 10px 0 12px;
+}
+.liga-panel {
+  position: relative;
+  overflow: hidden;
+}
+.liga-panel::after {
+  content: "";
+  position: absolute;
+  inset: auto -60px -80px auto;
+  width: 180px;
+  height: 180px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(250,204,21,.16), transparent 65%);
+  pointer-events: none;
+}
+.liga-box-inner {
+  gap: 14px;
+}
+.action-cell {
+  min-width: 180px;
+}
+.action-cell .btn {
+  margin: 2px;
+}
+.league-admin-grid {
+  align-items: start;
+}
+.inline-add-member {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(140px, .6fr) auto;
+  gap: 10px;
+  align-items: end;
+  width: 100%;
+}
+.table-wrap {
+  -webkit-overflow-scrolling: touch;
+}
+.data-table th,
+.data-table td {
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .export-row {
+    justify-content: stretch;
+  }
+  .export-row .btn,
+  .audit-actions .btn {
+    width: 100%;
+  }
+  .inline-add-member {
+    grid-template-columns: 1fr;
+  }
+  .action-cell {
+    min-width: 150px;
+  }
+  .league-admin-grid,
+  .league-members-box .form-line.wide {
+    gap: 12px;
+  }
+  .data-table, .rank-table {
+    min-width: 760px;
+  }
+}

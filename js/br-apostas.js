@@ -1,6 +1,6 @@
 /* ========================================================================== 
    br-apostas.js — Apostas logadas do Brasileirão 2026
-   Execução 13: rankings, palpites públicos, progresso e auditoria filtrados por liga.
+   Execução 14: permissões por liga, exportação CSV e polimento mobile.
    ========================================================================== */
 (function (global, document) {
   "use strict";
@@ -380,6 +380,43 @@
     return l ? l.nome : "Liga Geral";
   }
 
+  function ligaRelatorioObj() {
+    return (state.ligasAdmin || []).find(l => String(l.liga_id) === String(state.adminLigaSelecionada)) || ligaAtualObj();
+  }
+
+  function nomeLigaRelatorio() {
+    const l = ligaRelatorioObj();
+    return l ? l.nome : nomeLigaAtual();
+  }
+
+  function slugLigaRelatorio() {
+    const l = ligaRelatorioObj();
+    return l ? (l.slug || l.liga_id || ligaSlugAtual()) : ligaSlugAtual();
+  }
+
+  function isAdminGlobal() {
+    return Boolean(state.usuario && state.usuario.admin);
+  }
+
+  function isAdminLiga() {
+    return Boolean((state.ligas || []).some(l => String(l.papel || "") === "admin_liga"));
+  }
+
+  function canAdminAny() {
+    return isAdminGlobal() || isAdminLiga();
+  }
+
+  function canEditLiga(ligaId) {
+    if (isAdminGlobal()) return true;
+    return Boolean((state.ligasAdmin || state.ligas || []).some(l => String(l.liga_id) === String(ligaId) && String(l.papel || "") === "admin_liga"));
+  }
+
+  function adminPerfilTexto() {
+    if (isAdminGlobal()) return "administrador global";
+    if (isAdminLiga()) return "administrador de liga";
+    return "participante";
+  }
+
   function ligaSlugAtual() {
     const l = ligaAtualObj();
     return l ? (l.slug || l.liga_id || "liga-geral") : "liga-geral";
@@ -431,7 +468,7 @@
       <div>
         <div class="kicker">Liga ativa</div>
         <h2>${escapeHtml(nomeLigaAtual())}</h2>
-        <p>O palpite é único por rodada. A liga filtra ranking, auditoria e visualização dos participantes.</p>
+        <p>O palpite é único por rodada. A liga selecionada filtra ranking, palpites públicos, progresso e auditoria.</p>
       </div>
       <label>Selecionar liga
         <select id="liga-select">${ligas.map(l => `<option value="${escapeAttr(l.liga_id)}" ${String(l.liga_id) === String(state.ligaAtual) ? "selected" : ""}>${escapeHtml(l.nome)}${l.papel === "admin_liga" ? " · admin" : ""}</option>`).join("")}</select>
@@ -505,9 +542,9 @@
     const chip = $("#usuario-chip");
     if (!state.usuario) { chip.hidden = true; return; }
     chip.hidden = false;
-    chip.innerHTML = `${state.usuario.admin ? "🛠️ " : "👤 "}${state.usuario.nome}<br><small>${escapeHtml(nomeLigaAtual())}</small><br><button class="btn ghost" type="button" id="sair">sair</button>`;
+    chip.innerHTML = `${canAdminAny() ? "🛠️ " : "👤 "}${escapeHtml(state.usuario.nome)}<br><small>${escapeHtml(nomeLigaAtual())} · ${escapeHtml(adminPerfilTexto())}</small><br><button class="btn ghost" type="button" id="sair">sair</button>`;
     $("#sair")?.addEventListener("click", () => { clearSession(); renderLogin(); status("Sessão encerrada.", "warn"); });
-    $$(".admin-only").forEach(el => { el.hidden = !state.usuario.admin; });
+    $$(".admin-only").forEach(el => { el.hidden = !canAdminAny(); });
   }
 
   function renderLogin() {
@@ -647,7 +684,7 @@
     const ap = apuracaoRodada(state.rodada);
     const geral = rankingPorLigaPayload(state.rankingApostas, state.ligaAtual) || rankingPorLigaPayload(state.apuracao, state.ligaAtual) || (state.rankingApostas && state.rankingApostas.ranking_geral) || (state.apuracao && state.apuracao.ranking_geral) || [];
     if (!ap || ap.sigilosa) {
-      root.innerHTML = `<section class="panel"><div class="panel-inner empty"><strong>Ranking da rodada ainda não publicado.</strong><p>A apuração só aparece aqui depois que a rodada tiver resultados e for marcada como apurada/publicada. Enquanto isso, os palpites seguem sigilosos.</p>${state.usuario?.admin ? `<p class="muted-note">Admin: rode o workflow <strong>Apurar Apostas Brasileirão</strong> após os jogos e depois publique a rodada quando quiser liberar para todos.</p>` : ""}</div></section>${renderRankingGeral(geral)}`;
+      root.innerHTML = `<section class="panel"><div class="panel-inner empty"><strong>Ranking da rodada ainda não publicado.</strong><p>A apuração só aparece aqui depois que a rodada tiver resultados e for marcada como apurada/publicada. Enquanto isso, os palpites seguem sigilosos.</p>${canAdminAny() ? `<p class="muted-note">Admin: rode o workflow <strong>Apurar Apostas Brasileirão</strong> após os jogos e depois publique a rodada quando quiser liberar para todos.</p>` : ""}</div></section>${renderRankingGeral(geral)}`;
       return;
     }
     const ranking = rankingRodadaPorLiga(ap, state.ligaAtual);
@@ -656,7 +693,7 @@
       <article class="panel"><div class="panel-inner">
         <div class="kicker">Ranking da rodada</div><h2>Rodada ${state.rodada} · ${escapeHtml(nomeLigaAtual())}</h2>
         <p>${vencedoresLiga.length ? `🏆 Vencedor(es) da liga: <strong>${vencedoresLiga.map(escapeHtml).join(", ")}</strong>` : "Aguardando jogos apurados nesta liga."}</p>
-        ${ranking.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Participante</th><th>Pontos</th><th>Cravadas</th><th>Saldo</th><th>Resultado</th><th>Erros</th></tr></thead><tbody>${ranking.map(r => `<tr><td>${r.pos}</td><td>${escapeHtml(r.membro)}</td><td class="num gold-num">${r.pontos}</td><td>${r.cravadas}</td><td>${r.saldos}</td><td>${r.resultados}</td><td>${r.erros}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Nenhum jogo apurado nesta rodada.</div>`}
+        ${ranking.length ? `<div class="export-row"><button class="btn secondary" type="button" id="export-ranking">⬇️ Exportar ranking CSV</button></div><div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Participante</th><th>Pontos</th><th>Cravadas</th><th>Saldo</th><th>Resultado</th><th>Erros</th></tr></thead><tbody>${ranking.map(r => `<tr><td>${r.pos}</td><td>${escapeHtml(r.membro)}</td><td class="num gold-num">${r.pontos}</td><td>${r.cravadas}</td><td>${r.saldos}</td><td>${r.resultados}</td><td>${r.erros}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Nenhum jogo apurado nesta rodada.</div>`}
       </div></article>
       <article class="panel"><div class="panel-inner">
         <div class="kicker">Resumo técnico</div><h2>Apuração</h2>
@@ -664,6 +701,7 @@
         <p class="muted-note">Atualizado em ${fmtDataLonga((state.apuracao || {}).atualizado_em)}.</p>
       </div></article>
     </section>${renderRankingGeral(geral)}`;
+    $("#export-ranking")?.addEventListener("click", exportarRankingCsv);
   }
 
   function renderRankingGeral(geral) {
@@ -689,6 +727,7 @@
       <div class="kicker">Palpites públicos</div><h2>Rodada ${state.rodada} · ${escapeHtml(nomeLigaAtual())}</h2>
       <p>Lista aberta após publicação da rodada. Quando a apuração já estiver disponível, a tabela mostra pontos e tipo de acerto jogo a jogo.</p>
       ${ap && !ap.sigilosa ? `<div class="status ok">Apuração publicada · ${ap.jogos_apurados || 0} jogos apurados.</div>` : `<div class="status warn">Palpites publicados; pontos aparecem após o workflow de apuração.</div>`}
+      <div class="export-row"><button class="btn secondary" type="button" id="export-publicos">⬇️ Exportar palpites CSV</button></div>
       <div class="table-wrap" style="margin-top:12px"><table class="data-table"><thead><tr><th>Participante</th><th>Jogo</th><th>Palpite</th><th>Pontos</th><th>Tipo</th><th>Hash</th></tr></thead><tbody>
         ${state.publicos.map(p => {
           const det = pontosMap.get(`${p.membro || ""}::${p.event_id || ""}`) || {};
@@ -696,10 +735,11 @@
         }).join("")}
       </tbody></table></div>
     </div></section>`;
+    $("#export-publicos")?.addEventListener("click", exportarPublicosCsv);
   }
 
   async function carregarAdmin() {
-    if (!state.usuario?.admin) return;
+    if (!canAdminAny()) return;
     try {
       const total = jogosDaRodada(state.rodada).length;
       const [participantes, ligas] = await Promise.all([
@@ -739,7 +779,7 @@
   }
 
   async function carregarAuditoria() {
-    if (!state.usuario?.admin) return;
+    if (!canAdminAny()) return;
     try {
       const [rel, eventos] = await Promise.all([
         rpcRows("br_admin_relatorio_auditoria_liga", {
@@ -778,14 +818,15 @@
 
   async function renderAuditoria() {
     const root = $("#conteudo");
-    if (!state.usuario?.admin) {
+    if (!canAdminAny()) {
       root.innerHTML = `<section class="panel"><div class="panel-inner empty">Área restrita ao administrador.</div></section>`;
       return;
     }
     await carregarAuditoria();
     root.innerHTML = `<section class="panel"><div class="panel-inner">
-      <div class="kicker">Relatório de auditoria por liga</div><h2>Rodada ${state.rodada} · ${escapeHtml(nomeLigaAtual())}</h2>
+      <div class="kicker">Relatório de auditoria por liga</div><h2>Rodada ${state.rodada} · ${escapeHtml(nomeLigaRelatorio())}</h2>
       <p>Conferência administrativa filtrada pela liga selecionada: preenchimento, hashes, primeira/última gravação e quantidade de alterações. Os placares continuam preservados pelas regras de publicação.</p>
+      <div class="export-row"><button class="btn secondary" type="button" id="export-auditoria">⬇️ Exportar auditoria CSV</button></div>
       <div class="table-wrap"><table class="data-table"><thead><tr><th>Participante</th><th>Login</th><th>Preenchido</th><th>%</th><th>Hash</th><th>Primeiro envio</th><th>Última alteração</th><th>Alterações</th></tr></thead><tbody>
         ${state.auditoria.map(r => `<tr><td>${escapeHtml(r.nome)}</td><td>${escapeHtml(r.login)}</td><td>${r.total_palpites}/${r.total_jogos}</td><td>${Number(r.percentual || 0).toFixed(0)}%</td><td class="hash">${escapeHtml(r.hash_fechamento || "—")}</td><td>${fmtDataLonga(r.primeiro_envio)}</td><td>${fmtDataLonga(r.ultimo_envio)}</td><td>${r.alteracoes || 0}</td></tr>`).join("")}
       </tbody></table></div>
@@ -795,6 +836,56 @@
       ${state.auditoriaEventos.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Quando</th><th>Participante</th><th>Jogo</th><th>Ação</th><th>Hash</th></tr></thead><tbody>${state.auditoriaEventos.map(e => `<tr><td>${fmtDataLonga(e.criado_em)}</td><td>${escapeHtml(e.membro)}</td><td>${escapeHtml(e.event_id)}</td><td>${escapeHtml(e.acao)}</td><td class="hash">${escapeHtml(e.hash_fechamento || "—")}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Ainda não há eventos de auditoria para esta rodada.</div>`}
     </div></section>`;
     $("#copiar-auditoria")?.addEventListener("click", copiarResumoAuditoria);
+    $("#export-auditoria")?.addEventListener("click", exportarAuditoriaCsv);
+  }
+
+  function csvEscape(valor) {
+    const s = String(valor ?? "");
+    return /[";\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }
+
+  function baixarCsv(nomeArquivo, linhas) {
+    const csv = linhas.map(row => row.map(csvEscape).join(";")).join("\n") + "\n";
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+  function exportarRankingCsv() {
+    const ap = apuracaoRodada(state.rodada);
+    const rankingRodada = ap ? rankingRodadaPorLiga(ap, state.ligaAtual) : [];
+    const geral = rankingPorLigaPayload(state.rankingApostas, state.ligaAtual) || rankingPorLigaPayload(state.apuracao, state.ligaAtual) || [];
+    const linhas = [["tipo", "liga", "rodada", "pos", "participante", "pontos", "cravadas", "saldo", "resultado", "erros", "vitorias_rodada"]];
+    rankingRodada.forEach(r => linhas.push(["rodada", nomeLigaAtual(), state.rodada, r.pos, r.membro, r.pontos, r.cravadas, r.saldos, r.resultados, r.erros, ""]));
+    geral.forEach(r => linhas.push(["acumulado", nomeLigaAtual(), "", r.pos, r.membro, r.pontos, r.cravadas, r.saldos, r.resultados, r.erros || 0, r.vitorias_rodada || 0]));
+    baixarCsv(`ranking-${ligaSlugAtual()}-rodada-${state.rodada}.csv`, linhas);
+  }
+
+  function exportarPublicosCsv() {
+    const pontosMap = mapaPontosRodada(state.rodada);
+    const linhas = [["liga", "rodada", "participante", "jogo", "palpite", "pontos", "tipo", "hash", "atualizado_em"]];
+    state.publicos.forEach(p => {
+      const det = pontosMap.get(`${p.membro || ""}::${p.event_id || ""}`) || {};
+      linhas.push([nomeLigaAtual(), state.rodada, p.membro, `${p.mandante} x ${p.visitante}`, `${p.placar_mandante} x ${p.placar_visitante}`, det.pontos ?? "", tipoLabel(det.tipo), p.hash_fechamento || "", p.atualizado_em || ""]);
+    });
+    baixarCsv(`palpites-publicos-${ligaSlugAtual()}-rodada-${state.rodada}.csv`, linhas);
+  }
+
+  function exportarAuditoriaCsv() {
+    const linhas = [["liga", "rodada", "participante", "login", "preenchido", "total_jogos", "percentual", "hash", "primeiro_envio", "ultimo_envio", "alteracoes"]];
+    state.auditoria.forEach(r => linhas.push([nomeLigaRelatorio(), state.rodada, r.nome, r.login, r.total_palpites, r.total_jogos, r.percentual, r.hash_fechamento || "", r.primeiro_envio || "", r.ultimo_envio || "", r.alteracoes || 0]));
+    baixarCsv(`auditoria-${slugLigaRelatorio()}-rodada-${state.rodada}.csv`, linhas);
+  }
+
+  function exportarProgressoCsv() {
+    const linhas = [["liga", "rodada", "participante", "login", "status", "preenchido", "total_jogos", "percentual"]];
+    state.progresso.forEach(p => linhas.push([nomeLigaRelatorio(), state.rodada, p.nome, p.login, p.ativo ? "ativo" : "inativo", p.total_palpites, p.total_jogos, p.percentual]));
+    baixarCsv(`progresso-${slugLigaRelatorio()}-rodada-${state.rodada}.csv`, linhas);
   }
 
   async function copiarResumoAuditoria() {
@@ -823,23 +914,28 @@
     const ligas = state.ligasAdmin || [];
     const membros = membrosDaLiga(state.adminLigaSelecionada);
     const selecionada = ligaAdminSelecionadaObj();
+    const globalAdmin = isAdminGlobal();
     const participantesOptions = (state.participantes || [])
       .filter(p => p.ativo)
       .map(p => `<option value="${escapeAttr(p.participante_id)}">${escapeHtml(p.nome)} · ${escapeHtml(p.login)}</option>`).join("");
-    return `<article class="panel" style="grid-column:1/-1"><div class="panel-inner">
-      <div class="kicker">Ligas</div><h2>Gerenciar ligas e participantes</h2>
-      <p>O palpite continua único por participante/rodada. A liga agrupa pessoas para ranking, progresso e auditoria separados.</p>
-      <div class="league-admin-grid">
-        <form id="admin-liga-form" class="admin-form league-form">
+    const formLiga = globalAdmin ? `<form id="admin-liga-form" class="admin-form league-form">
           <input type="hidden" id="admin-liga-id">
           <div class="two"><label>Nome da liga <input id="admin-liga-nome" placeholder="Ex.: Almoço de Sexta" required></label><label>Slug <input id="admin-liga-slug" placeholder="almoco-sexta"></label></div>
           <label>Descrição <input id="admin-liga-desc" placeholder="Descrição curta da liga"></label>
           <div class="switch-row"><label><input type="checkbox" id="admin-liga-ativa" checked> liga ativa</label></div>
           <div class="actions"><button class="btn" type="submit">salvar liga</button><button class="btn ghost" type="button" id="limpar-liga">limpar</button></div>
-        </form>
+        </form>` : `<div class="empty"><strong>Admin de liga</strong><p>Você gerencia apenas as ligas em que recebeu papel de administrador. Criação de novas ligas, alteração de janela e criação de usuários ficam restritas ao admin global.</p></div>`;
+    const papelOptions = globalAdmin
+      ? `<option value="participante">participante</option><option value="admin_liga">admin da liga</option><option value="observador">observador</option>`
+      : `<option value="participante">participante</option><option value="observador">observador</option>`;
+    return `<article class="panel" style="grid-column:1/-1"><div class="panel-inner">
+      <div class="kicker">Ligas</div><h2>Gerenciar ligas e participantes</h2>
+      <p>O palpite continua único por participante/rodada. A liga agrupa pessoas para ranking, progresso e auditoria separados.</p>
+      <div class="league-admin-grid">
+        ${formLiga}
         <div class="league-list">
-          <div class="table-wrap"><table class="data-table"><thead><tr><th>Liga</th><th>Status</th><th>Participantes</th><th>Ação</th></tr></thead><tbody>
-            ${ligas.map(l => `<tr><td><strong>${escapeHtml(l.nome)}</strong><br><small>${escapeHtml(l.slug || "")}</small></td><td>${l.ativa ? "ativa" : "inativa"}</td><td>${l.participantes_ativos || 0}/${l.total_participantes || 0}</td><td><button class="btn secondary" type="button" data-edit-liga="${escapeAttr(l.liga_id)}">editar</button></td></tr>`).join("") || `<tr><td colspan="4">Nenhuma liga cadastrada.</td></tr>`}
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>Liga</th><th>Status</th><th>Participantes</th><th>Permissão</th><th>Ação</th></tr></thead><tbody>
+            ${ligas.map(l => `<tr><td><strong>${escapeHtml(l.nome)}</strong><br><small>${escapeHtml(l.slug || "")}</small></td><td>${l.ativa ? "ativa" : "inativa"}</td><td>${l.participantes_ativos || 0}/${l.total_participantes || 0}</td><td>${l.pode_gerir || globalAdmin ? "gerencia" : "visualiza"}</td><td>${globalAdmin ? `<button class="btn secondary" type="button" data-edit-liga="${escapeAttr(l.liga_id)}">editar</button>` : "—"}</td></tr>`).join("") || `<tr><td colspan="5">Nenhuma liga cadastrada.</td></tr>`}
           </tbody></table></div>
         </div>
       </div>
@@ -853,7 +949,7 @@
               <select id="admin-add-participante">${participantesOptions}</select>
             </label>
             <label>Papel
-              <select id="admin-add-papel"><option value="participante">participante</option><option value="admin_liga">admin da liga</option><option value="observador">observador</option></select>
+              <select id="admin-add-papel">${papelOptions}</select>
             </label>
             <button class="btn secondary" type="submit">adicionar à liga</button>
           </form>
@@ -870,12 +966,12 @@
     await carregarAdmin();
     const cfg = configEfetiva(state.rodada);
     const root = $("#conteudo");
-    if (!state.usuario?.admin) {
+    if (!canAdminAny()) {
       root.innerHTML = `<section class="panel"><div class="panel-inner empty">Área restrita ao administrador.</div></section>`;
       return;
     }
-    root.innerHTML = `<section class="admin-grid">
-      <article class="panel"><div class="panel-inner">
+    const globalAdmin = isAdminGlobal();
+    const painelParticipantes = globalAdmin ? `<article class="panel"><div class="panel-inner">
         <div class="kicker">Participantes</div><h2>Criar/alterar acesso</h2>
         <form id="admin-participante" class="admin-form">
           <input type="hidden" id="admin-participante-id">
@@ -886,8 +982,8 @@
           <div class="switch-row"><label><input type="checkbox" id="admin-e-admin"> administrador global</label><label><input type="checkbox" id="admin-ativo" checked> ativo</label></div>
           <p class="muted-note">Para remover alguém sem apagar histórico, deixe inativo ou remova da liga. Os palpites e hashes antigos permanecem preservados.</p>
         </form>
-      </div></article>
-      <article class="panel"><div class="panel-inner">
+      </div></article>` : `<article class="panel"><div class="panel-inner empty"><strong>Perfil: admin de liga</strong><p>Você pode acompanhar e gerenciar participantes somente das suas ligas. Criar usuários, resetar PIN, inativar participantes globais e alterar janelas fica com o admin global.</p></div></article>`;
+    const painelRodada = globalAdmin ? `<article class="panel"><div class="panel-inner">
         <div class="kicker">Janela da rodada</div><h2>Rodada ${state.rodada}</h2>
         <form id="admin-rodada" class="admin-form">
           <div class="two"><label>Abre em <input id="cfg-abre" type="datetime-local" value="${toDatetimeLocal(cfg.abre_em)}"></label><label>Fecha em <input id="cfg-fecha" type="datetime-local" value="${toDatetimeLocal(cfg.fecha_em)}"></label></div>
@@ -895,32 +991,39 @@
           <label>Observação <input id="cfg-obs" value="${escapeAttr(cfg.observacao || "")}"></label>
           <div class="actions"><button class="btn" type="submit">salvar janela</button><button class="btn secondary" type="button" id="publicar-rodada">publicar agora</button><button class="btn secondary" type="button" id="apurar-rodada">marcar apurada</button><button class="btn danger" type="button" id="fechar-rodada">fechar rodada</button></div><p class="muted-note">Depois dos jogos, rode o workflow <strong>Apurar Apostas Brasileirão</strong>. Em seguida, marque como apurada/publicada para liberar ranking e palpites públicos.</p>
         </form>
-      </div></article>
+      </div></article>` : `<article class="panel"><div class="panel-inner"><div class="kicker">Janela da rodada</div><h2>Rodada ${state.rodada}</h2><p class="muted-note">Janela e publicação são globais para todas as ligas e somente o admin global altera esses dados.</p><p><span class="badge ${statusJanela(state.rodada).classe}">${escapeHtml(statusJanela(state.rodada).detalhe)}</span></p></div></article>`;
+    root.innerHTML = `<section class="admin-grid">
+      ${painelParticipantes}
+      ${painelRodada}
       ${renderLigasAdminHtml()}
       <article class="panel" style="grid-column:1/-1"><div class="panel-inner">
         <div class="kicker">Percentual preenchido</div><h2>Admin vê percentual, não placares</h2>
-        <p>O percentual abaixo já considera a liga selecionada. O admin acompanha preenchimento por liga sem ver placares antes da publicação.</p>
+        <p>O percentual abaixo considera a liga selecionada. O admin acompanha preenchimento por liga sem ver placares antes da publicação.</p>
+        <div class="export-row"><button class="btn secondary" type="button" id="export-progresso">⬇️ Exportar progresso CSV</button></div>
         <div class="table-wrap" style="margin-top:12px"><table class="data-table"><thead><tr><th>Participante</th><th>Login</th><th>Status</th><th>Ligas</th><th>Preenchido</th><th>%</th><th>Ações</th></tr></thead><tbody>
-          ${state.progresso.map(p => `<tr><td>${escapeHtml(p.nome)}</td><td>${escapeHtml(p.login)}</td><td>${p.ativo ? "ativo" : "inativo"}${p.admin ? " · admin" : ""}</td><td>${ligasDoParticipante(p.participante_id).map(escapeHtml).join(", ") || "—"}</td><td>${p.total_palpites}/${p.total_jogos}</td><td><div class="progress-wrap"><div class="progress-bar" style="width:${Math.max(0, Math.min(100, Number(p.percentual || 0)))}%"></div></div></td><td class="action-cell"><button class="btn secondary" type="button" data-edit="${escapeAttr(p.participante_id)}">editar</button>${p.ativo ? `<button class="btn danger" type="button" data-inativar="${escapeAttr(p.participante_id)}">inativar</button>` : `<button class="btn secondary" type="button" data-reativar="${escapeAttr(p.participante_id)}">reativar</button>`}</td></tr>`).join("")}
+          ${state.progresso.map(p => `<tr><td>${escapeHtml(p.nome)}</td><td>${escapeHtml(p.login)}</td><td>${p.ativo ? "ativo" : "inativo"}${p.admin ? " · admin" : ""}</td><td>${ligasDoParticipante(p.participante_id).map(escapeHtml).join(", ") || "—"}</td><td>${p.total_palpites}/${p.total_jogos}</td><td><div class="progress-wrap"><div class="progress-bar" style="width:${Math.max(0, Math.min(100, Number(p.percentual || 0)))}%"></div></div></td><td class="action-cell">${globalAdmin ? `<button class="btn secondary" type="button" data-edit="${escapeAttr(p.participante_id)}">editar</button>${p.ativo ? `<button class="btn danger" type="button" data-inativar="${escapeAttr(p.participante_id)}">inativar</button>` : `<button class="btn secondary" type="button" data-reativar="${escapeAttr(p.participante_id)}">reativar</button>`}` : `<span class="muted-note">gerencie pela liga</span>`}</td></tr>`).join("")}
         </tbody></table></div>
       </div></article>
     </section>`;
-    $("#cfg-status").value = cfg.status || "programada";
-    $("#gerar-pin").addEventListener("click", () => { $("#admin-pin").value = pinAleatorio(); });
-    $("#limpar-admin").addEventListener("click", limparFormParticipante);
-    $("#admin-participante").addEventListener("submit", salvarParticipanteAdmin);
-    $("#admin-rodada").addEventListener("submit", salvarRodadaAdmin);
-    $("#publicar-rodada").addEventListener("click", () => alterarStatusRodada("publicada"));
-    $("#apurar-rodada")?.addEventListener("click", () => alterarStatusRodada("apurada"));
-    $("#fechar-rodada").addEventListener("click", () => alterarStatusRodada("fechada"));
-    $$('[data-edit]').forEach(btn => btn.addEventListener("click", () => preencherParticipante(btn.dataset.edit)));
-    $$('[data-inativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.inativar, false)));
-    $$('[data-reativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.reativar, true)));
-    $("#admin-liga-form")?.addEventListener("submit", salvarLigaAdmin);
-    $("#limpar-liga")?.addEventListener("click", limparFormLiga);
+    if (globalAdmin) {
+      $("#cfg-status").value = cfg.status || "programada";
+      $("#gerar-pin")?.addEventListener("click", () => { $("#admin-pin").value = pinAleatorio(); });
+      $("#limpar-admin")?.addEventListener("click", limparFormParticipante);
+      $("#admin-participante")?.addEventListener("submit", salvarParticipanteAdmin);
+      $("#admin-rodada")?.addEventListener("submit", salvarRodadaAdmin);
+      $("#publicar-rodada")?.addEventListener("click", () => alterarStatusRodada("publicada"));
+      $("#apurar-rodada")?.addEventListener("click", () => alterarStatusRodada("apurada"));
+      $("#fechar-rodada")?.addEventListener("click", () => alterarStatusRodada("fechada"));
+      $$('[data-edit]').forEach(btn => btn.addEventListener("click", () => preencherParticipante(btn.dataset.edit)));
+      $$('[data-inativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.inativar, false)));
+      $$('[data-reativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.reativar, true)));
+      $("#admin-liga-form")?.addEventListener("submit", salvarLigaAdmin);
+      $("#limpar-liga")?.addEventListener("click", limparFormLiga);
+      $$('[data-edit-liga]').forEach(btn => btn.addEventListener("click", () => preencherLiga(btn.dataset.editLiga)));
+    }
+    $("#export-progresso")?.addEventListener("click", exportarProgressoCsv);
     $("#admin-liga-selecionada")?.addEventListener("change", async ev => { state.adminLigaSelecionada = ev.target.value; await renderAdmin(); });
     $("#admin-add-membro")?.addEventListener("submit", adicionarParticipanteLiga);
-    $$('[data-edit-liga]').forEach(btn => btn.addEventListener("click", () => preencherLiga(btn.dataset.editLiga)));
     $$('[data-remover-liga]').forEach(btn => btn.addEventListener("click", () => removerParticipanteLiga(btn.dataset.removerLiga, btn.dataset.removerPart, false)));
     $$('[data-reativar-liga]').forEach(btn => btn.addEventListener("click", () => removerParticipanteLiga(btn.dataset.reativarLiga, btn.dataset.reativarPart, true)));
   }
