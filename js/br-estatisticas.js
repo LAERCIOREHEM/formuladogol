@@ -4,6 +4,7 @@
   const ARQUIVOS = {
     estatisticas: "dados-br/estatisticas.json",
     ranking: "dados-br/ranking-desempenho.json",
+    jogadores: "dados-br/jogadores.json",
     tabela: "tabela.json",
     resultados: "resultados.json",
   };
@@ -11,6 +12,7 @@
   const state = {
     estatisticas: null,
     ranking: null,
+    jogadores: null,
     tabela: null,
     resultados: null,
     filtro: "",
@@ -122,8 +124,12 @@
     const defesa = resumo.melhor_defesa || (e.melhor_defesa || [])[0] || {};
     const alta = resumo.time_em_alta || (state.ranking?.ranking || [])[0] || {};
     const lider = resumo.lider_geral || (clubeLista().find((c) => Number(c.pos) === 1) || clubeLista()[0] || {});
-    const artilheiro = (e.artilharia || [])[0] || {};
-    const garcom = (e.garcons || [])[0] || {};
+    const artilharia = listaArtilharia();
+    const assistencias = listaAssistencias();
+    const participacoes = state.jogadores?.participacoes_gol || [];
+    const artilheiro = artilharia[0] || {};
+    const garcom = assistencias[0] || {};
+    const destaquePart = participacoes[0] || {};
 
     const cards = [
       resumoCard("Líder", escapeHtml(lider.time || "—"), `${numero(lider.pontos)} pts · ${numero(lider.aproveitamento, "%")}`),
@@ -131,11 +137,12 @@
       resumoCard("Melhor defesa", escapeHtml(defesa.time || "—"), `${numero(defesa.gc)} gols contra`),
       resumoCard("Time em alta", escapeHtml(alta.time || "—"), `${numero(alta.score)} pts no índice`),
       resumoCard("Artilheiro", escapeHtml(artilheiro.nome || "em coleta"), artilheiro.time ? `${artilheiro.time} · ${numero(artilheiro.gols)} gols` : "aguardando summaries ESPN"),
+      resumoCard("Garçom", escapeHtml(garcom.nome || "em coleta"), garcom.time ? `${garcom.time} · ${numero(garcom.assistencias)} assist.` : "aguardando summaries ESPN"),
     ];
     $("cards-resumo").innerHTML = cards.join("");
 
     const atualizado = e.atualizado_em || state.ranking?.atualizado_em || state.tabela?.atualizado_em;
-    const eventos = e.eventos_processados?.length || e.total_eventos_processados || 0;
+    const eventos = state.jogadores?.total_summaries_processados || e.eventos_processados?.length || e.total_eventos_processados || 0;
     $("meta-line").innerHTML = [
       `<span class="meta-pill">Atualizado: ${escapeHtml(dataHoraBR(atualizado))}</span>`,
       `<span class="meta-pill">Fonte: ${escapeHtml(e.fonte || "JSON local")}</span>`,
@@ -206,25 +213,54 @@
     }
   }
 
+  function listaArtilharia() {
+    return state.jogadores?.artilharia?.length ? state.jogadores.artilharia : (state.estatisticas?.artilharia || []);
+  }
+
+  function listaAssistencias() {
+    return state.jogadores?.assistencias?.length ? state.jogadores.assistencias : (state.estatisticas?.garcons || []);
+  }
+
+  function playerFoto(p) {
+    const foto = p?.foto || p?.headshot || "";
+    if (foto) {
+      return `<img class="player-photo" src="${escapeAttr(foto)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'player-photo-fallback',textContent:'${escapeAttr(iniciaisPessoa(p?.nome || '?'))}'}))">`;
+    }
+    return `<span class="player-photo-fallback" aria-hidden="true">${escapeHtml(iniciaisPessoa(p?.nome || "?"))}</span>`;
+  }
+
+  function iniciaisPessoa(nome) {
+    return String(nome || "?")
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0])
+      .join("")
+      .toUpperCase() || "?";
+  }
+
   function renderListaJogadores(id, lista, tipo) {
     const filtrada = filtrarPorClube(lista || []);
+    const fonte = state.jogadores?.fonte || state.estatisticas?.fonte || "ESPN";
     if (!filtrada.length) {
       const msg = tipo === "gols"
-        ? "A artilharia detalhada depende do summary/event detail da ESPN para jogos já encerrados. Enquanto a ESPN não entregar esses detalhes no JSON, a página mantém ataque, defesa, forma e desempenho normalmente."
-        : "As assistências dependem do detalhe de cada partida. Se a ESPN não listar assistências no summary, o robô preserva a coleta e mostra este aviso sem quebrar a página.";
-      $(id).innerHTML = `<div class="empty-state">${escapeHtml(msg)}</div>`;
+        ? "Artilharia sem jogadores publicados ainda. Rode o workflow Atualizar Brasileirao (ESPN): ele busca o summary de cada jogo encerrado e preenche este ranking automaticamente quando a ESPN entregar os eventos de gol."
+        : "Assistências sem jogadores publicados ainda. O robô da Execução 8 procura assistências nos summaries da ESPN; quando a fonte não informa, a página mantém aviso claro e não inventa dados.";
+      $(id).innerHTML = `<div class="empty-state"><strong>${tipo === "gols" ? "Coleta de artilharia" : "Coleta de assistências"}</strong><br>${escapeHtml(msg)}<br><span class="mini-source">Fonte configurada: ${escapeHtml(fonte)}</span></div>`;
       return;
     }
-    $(id).innerHTML = `<div class="stat-list">${filtrada.slice(0, 20).map((p, i) => `
-      <div class="player-row">
+    $(id).innerHTML = `<div class="stat-list player-stat-list">${filtrada.slice(0, 25).map((p, i) => {
+      const valor = tipo === "gols" ? p.gols : p.assistencias;
+      return `<div class="player-row rich">
         <div class="player-rank">${i + 1}</div>
+        ${playerFoto(p)}
         <div class="player-main">
           <div class="player-name">${escapeHtml(p.nome || p.name || "—")}</div>
-          <div class="player-sub">${imgEscudo(p)}<span>${escapeHtml(p.time || "—")}</span>${p.eventos ? `<span>${numero(p.eventos)} jogo(s) com participação</span>` : ""}</div>
+          <div class="player-sub">${imgEscudo(p)}<span>${escapeHtml(p.time || "—")}</span>${p.eventos ? `<span>${numero(p.eventos)} jogo(s) com participação</span>` : ""}${p.athlete_id ? `<span>ID ESPN ${escapeHtml(p.athlete_id)}</span>` : ""}</div>
         </div>
-        <div class="player-value">${numero(tipo === "gols" ? p.gols : p.assistencias)}<small>${tipo === "gols" ? "gols" : "assist."}</small></div>
-      </div>
-    `).join("")}</div>`;
+        <div class="player-value">${numero(valor)}<small>${tipo === "gols" ? "gols" : "assist."}</small></div>
+      </div>`;
+    }).join("")}</div>`;
   }
 
   function formaHtml(forma) {
@@ -299,7 +335,7 @@
   }
 
   function renderAvisos() {
-    const avisos = state.estatisticas?.avisos || [];
+    const avisos = [].concat(state.estatisticas?.avisos || [], state.jogadores?.avisos || []);
     if (!avisos.length) {
       $("avisos-panel").hidden = true;
       return;
@@ -311,8 +347,8 @@
   function renderTudo() {
     renderResumo();
     renderChips();
-    renderListaJogadores("lista-artilharia", state.estatisticas?.artilharia || [], "gols");
-    renderListaJogadores("lista-garcons", state.estatisticas?.garcons || [], "assistencias");
+    renderListaJogadores("lista-artilharia", listaArtilharia(), "gols");
+    renderListaJogadores("lista-garcons", listaAssistencias(), "assistencias");
     renderRankingDesempenho();
     renderAtaqueDefesa();
     renderClubesDetalhes();
@@ -339,14 +375,16 @@
   async function carregar() {
     configurarBotoes();
     try {
-      const [estatisticas, ranking, tabela, resultados] = await Promise.all([
+      const [estatisticas, ranking, jogadores, tabela, resultados] = await Promise.all([
         fetchJson(ARQUIVOS.estatisticas, { clubes: [], artilharia: [], garcons: [], avisos: ["dados-br/estatisticas.json ainda não foi publicado."] }),
         fetchJson(ARQUIVOS.ranking, { ranking: [] }),
+        fetchJson(ARQUIVOS.jogadores, { artilharia: [], assistencias: [], participacoes_gol: [], avisos: ["dados-br/jogadores.json ainda não foi publicado."] }),
         fetchJson(ARQUIVOS.tabela, { tabela: [] }),
         fetchJson(ARQUIVOS.resultados, { resultados: [] }),
       ]);
       state.estatisticas = estatisticas;
       state.ranking = ranking;
+      state.jogadores = jogadores;
       state.tabela = tabela;
       state.resultados = resultados;
       renderTudo();

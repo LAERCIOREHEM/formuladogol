@@ -108,7 +108,7 @@ p { margin: 7px 0 0; color: var(--muted); }
 .badge.live-soft { color: #d9ff76; border-color: rgba(163,230,53,.28); background: rgba(163,230,53,.10); }
 .cards-resumo {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   margin: 14px 0;
 }
@@ -436,4 +436,54 @@ p { margin: 7px 0 0; color: var(--muted); }
   .stats-filter-shield-img,
   .stats-filter-fallback { width: 40px; height: 40px; border-radius: 13px; }
   .stats-filter-title { font-size: 15px; }
+}
+
+/* EXECUÇÃO 8 — jogadores reais via ESPN summary */
+.player-row.rich {
+  grid-template-columns: 42px 44px 1fr auto;
+}
+.player-photo,
+.player-photo-fallback {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,.18);
+  background: rgba(255,255,255,.05);
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+.player-photo-fallback {
+  display: inline-grid;
+  place-items: center;
+  color: #efffc3;
+  font-size: 12px;
+  font-weight: 950;
+  background: radial-gradient(circle at 30% 20%, rgba(163,230,53,.18), rgba(255,255,255,.045));
+}
+.player-stat-list .player-sub span:last-child {
+  opacity: .88;
+}
+.mini-source {
+  display: inline-block;
+  margin-top: 8px;
+  color: #d9ff76;
+  font-weight: 800;
+  font-size: 12px;
+}
+@media (max-width: 560px) {
+  .player-row.rich {
+    grid-template-columns: 30px 38px 1fr;
+    align-items: start;
+  }
+  .player-row.rich .player-value {
+    grid-column: 3;
+    text-align: left;
+    font-size: 18px;
+  }
+  .player-photo,
+  .player-photo-fallback {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+  }
 }

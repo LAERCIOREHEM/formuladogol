@@ -6,6 +6,7 @@ gerar_estatisticas_brasileirao.py — Estatísticas do Brasileirão v2.
 Gera:
   - dados-br/estatisticas.json
   - dados-br/ranking-desempenho.json
+  - dados-br/jogadores.json
 
 Fontes:
   - tabela.json         (classificação ESPN, já normalizada)
@@ -15,7 +16,7 @@ Fontes:
 
 Importante:
   - Não altera módulo copa2026/.
-  - Se a ESPN summary não trouxer gols/assistências, o script NÃO quebra:
+  - Se a ESPN summary não trouxer gols/assistências, o script NÃO quebra nem inventa dados:
     ele publica ataque, defesa, forma e desempenho e deixa aviso editorial.
   - Só usa biblioteca padrão.
 """
@@ -389,121 +390,316 @@ def procurar_dicts(no: Any, pred, achados: list[dict[str, Any]]) -> None:
             procurar_dicts(v, pred, achados)
 
 
-def nome_atleta(no: Any) -> str | None:
+
+def atleta_info(no: Any) -> dict[str, str] | None:
+    """Retorna nome/id/foto de atleta em formatos variados da ESPN."""
     if not isinstance(no, dict):
         return None
+    base = no
+    for chave in ("athlete", "player", "participant", "scorer"):
+        if isinstance(no.get(chave), dict):
+            base = no[chave]
+            break
     candidatos = [
+        base.get("displayName"), base.get("fullName"), base.get("name"), base.get("shortName"),
         no.get("displayName"), no.get("fullName"), no.get("name"), no.get("shortName"),
-        (no.get("athlete") or {}).get("displayName") if isinstance(no.get("athlete"), dict) else None,
-        (no.get("player") or {}).get("displayName") if isinstance(no.get("player"), dict) else None,
     ]
-    for c in candidatos:
-        if c and len(str(c).strip()) > 1:
-            return str(c).strip()
-    return None
+    nome = next((str(c).strip() for c in candidatos if c and len(str(c).strip()) > 1), "")
+    if not nome:
+        return None
+    aid = str(base.get("id") or base.get("athleteId") or no.get("id") or no.get("athleteId") or "").strip()
+    foto = ""
+    headshot = base.get("headshot") or no.get("headshot")
+    if isinstance(headshot, dict):
+        foto = str(headshot.get("href") or headshot.get("url") or "").strip()
+    elif isinstance(headshot, str):
+        foto = headshot.strip()
+    if not foto and aid.isdigit():
+        foto = f"https://a.espncdn.com/i/headshots/soccer/players/full/{aid}.png"
+    return {"nome": nome, "athlete_id": aid, "foto": foto}
 
 
-def time_de_no(no: dict[str, Any]) -> str | None:
+def nome_atleta(no: Any) -> str | None:
+    info = atleta_info(no)
+    return info.get("nome") if info else None
+
+
+def mapa_times_summary(data: dict[str, Any]) -> dict[str, str]:
+    """Mapeia id/sigla/nomes ESPN -> nome canônico a partir do próprio summary."""
+    mapa: dict[str, str] = {}
+
+    def registrar(team: Any) -> None:
+        if not isinstance(team, dict):
+            return
+        canonico = para_canonico(
+            team.get("displayName"), team.get("shortDisplayName"), team.get("name"),
+            team.get("location"), team.get("abbreviation"), team.get("slug"), team.get("id"),
+        )
+        if not canonico:
+            return
+        for k in ("id", "uid", "guid", "abbreviation", "displayName", "shortDisplayName", "name", "location", "slug"):
+            v = str(team.get(k) or "").strip()
+            if v:
+                mapa[normalizar(v)] = canonico
+                mapa[v] = canonico
+
+    def andar(no: Any) -> None:
+        if isinstance(no, dict):
+            if isinstance(no.get("team"), dict):
+                registrar(no["team"])
+            # Alguns nós são o próprio time.
+            if any(k in no for k in ("displayName", "abbreviation", "location")) and any(k in no for k in ("id", "uid", "slug", "name")):
+                registrar(no)
+            for v in no.values():
+                andar(v)
+        elif isinstance(no, list):
+            for v in no:
+                andar(v)
+
+    andar(data.get("header") or {})
+    andar(data.get("boxscore") or {})
+    return mapa
+
+
+def time_de_no(no: dict[str, Any], mapa_times: dict[str, str] | None = None) -> str | None:
     candidatos: list[Any] = []
+    mapa_times = mapa_times or {}
     for chave in ("team", "club", "competitor"):
         obj = no.get(chave)
         if isinstance(obj, dict):
-            candidatos.extend([obj.get("displayName"), obj.get("shortDisplayName"), obj.get("name"), obj.get("abbreviation"), obj.get("slug")])
-    candidatos.extend([no.get("teamName"), no.get("teamAbbreviation")])
+            candidatos.extend([
+                obj.get("displayName"), obj.get("shortDisplayName"), obj.get("name"),
+                obj.get("abbreviation"), obj.get("slug"), obj.get("location"), obj.get("id"), obj.get("uid"),
+            ])
+        elif obj:
+            candidatos.append(obj)
+    candidatos.extend([no.get("teamName"), no.get("teamAbbreviation"), no.get("teamId"), no.get("teamID")])
+    for c in candidatos:
+        if c is None or c == "":
+            continue
+        chave = str(c).strip()
+        if chave in mapa_times:
+            return mapa_times[chave]
+        n = normalizar(chave)
+        if n in mapa_times:
+            return mapa_times[n]
     return para_canonico(*candidatos)
 
 
+def procurar_listas_eventos(data: dict[str, Any]) -> list[dict[str, Any]]:
+    """Coleta apenas listas que costumam conter eventos, sem varrer estatísticas soltas."""
+    chaves_evento = {
+        "scoringplays", "scoringPlays", "commentary", "plays", "details",
+        "incidents", "events", "matchEvents", "keyEvents", "allPlays",
+    }
+    saida: list[dict[str, Any]] = []
+    vistos: set[int] = set()
+
+    def andar(no: Any, chave_pai: str = "") -> None:
+        if isinstance(no, dict):
+            for k, v in no.items():
+                if isinstance(v, list) and (k in chaves_evento or normalizar(k) in {normalizar(x) for x in chaves_evento}):
+                    for item in v:
+                        if isinstance(item, dict) and id(item) not in vistos:
+                            vistos.add(id(item))
+                            saida.append(item)
+                # Só desce em áreas de jogo/evento; evita pegar tabelas de standings/estatísticas.
+                if k in ("header", "competitions", "competition", "gamepackageJSON", "gameInfo") or k in chaves_evento:
+                    andar(v, k)
+        elif isinstance(no, list):
+            for v in no:
+                andar(v, chave_pai)
+
+    andar(data)
+    return saida
+
+
+def texto_tipo_evento(no: dict[str, Any]) -> str:
+    partes: list[str] = []
+    tipo = no.get("type")
+    if isinstance(tipo, dict):
+        for k in ("text", "name", "displayName", "shortDisplayName", "description", "abbreviation", "id"):
+            partes.append(str(tipo.get(k) or ""))
+    elif tipo:
+        partes.append(str(tipo))
+    for k in ("playType", "scoringType", "eventType", "typeText", "headline"):
+        partes.append(str(no.get(k) or ""))
+    return " ".join(partes)
+
+
+def texto_evento(no: dict[str, Any]) -> str:
+    return " ".join(str(no.get(k) or "") for k in ("text", "description", "displayValue", "shortText", "note"))
+
+
+def eh_evento_gol(no: dict[str, Any]) -> bool:
+    tipo = normalizar(texto_tipo_evento(no))
+    texto = normalizar(texto_evento(no))
+    combinado = f"{tipo} {texto}".strip()
+    if not combinado:
+        return False
+    rejeitar = [
+        "goal difference", "goal differential", "goals for", "goals against", "expected goals",
+        "shot on goal", "shots on goal", "yellow card", "red card", "substitution",
+        "corner", "offside", "foul", "save", "attempt", "possession", "summary", "statistic",
+    ]
+    if any(x in combinado for x in rejeitar):
+        return False
+    tipo_tem_gol = bool(re.search(r"\b(goal|gol|own goal|penalty goal|gol contra)\b", tipo))
+    texto_tem_gol = bool(re.search(r"\b(goal!|gol!|goal\s*-|gol\s*-|own goal|gol contra)\b", texto))
+    # scoringPlays às vezes não traz texto rico, mas traz scoreValue/period/clock.
+    score_value = no.get("scoreValue") or no.get("score_value") or no.get("scoringValue")
+    return tipo_tem_gol or texto_tem_gol or (score_value not in (None, "") and "goal" in tipo)
+
+
+def minuto_evento(no: dict[str, Any]) -> str:
+    candidatos: list[Any] = [no.get("clock"), no.get("time"), no.get("displayClock"), no.get("timeDisplayValue"), no.get("minute")]
+    for c in candidatos:
+        if isinstance(c, dict):
+            for k in ("displayValue", "displayClock", "value", "text"):
+                if c.get(k) not in (None, ""):
+                    return str(c.get(k))
+        elif c not in (None, ""):
+            return str(c)
+    return ""
+
+
+def atletas_do_evento(no: dict[str, Any]) -> list[dict[str, str]]:
+    atletas: list[dict[str, str]] = []
+    for chave in ("athletes", "athletesInvolved", "participants", "players"):
+        if isinstance(no.get(chave), list):
+            for a in no[chave]:
+                info = atleta_info(a)
+                if info:
+                    info["papel"] = normalizar((a or {}).get("type") or (a or {}).get("role") or (a or {}).get("position") or "") if isinstance(a, dict) else ""
+                    atletas.append(info)
+    for chave in ("athlete", "player", "scorer"):
+        if isinstance(no.get(chave), dict):
+            info = atleta_info(no[chave])
+            if info:
+                info["papel"] = "scorer"
+                atletas.append(info)
+    # Dedup preservando ordem.
+    dedup: list[dict[str, str]] = []
+    vistos: set[str] = set()
+    for a in atletas:
+        chave = normalizar(a.get("nome")) + "|" + str(a.get("athlete_id") or "")
+        if chave not in vistos:
+            vistos.add(chave)
+            dedup.append(a)
+    return dedup
+
+
+def parse_textual_scorer_assist(texto_original: str) -> tuple[str | None, list[str]]:
+    texto = str(texto_original or "").strip()
+    scorer: str | None = None
+    assists: list[str] = []
+    # Inglês ESPN: "Goal! Team 1, Team 0. Player (Team) right footed shot... Assisted by X."
+    m = re.search(r"(?:Goal!|GOAL!|Gol!|GOL!)\s*.*?\.\s*([^.(,;]+?)(?:\s*\(|\s+(?:right|left|header|converte|marca|finaliza)|,|\.|$)", texto)
+    if m:
+        cand = m.group(1).strip()
+        if 1 <= len(cand.split()) <= 5 and not re.search(r"\d", cand):
+            scorer = cand
+    # Formatos curtos: "Player - Goal".
+    if not scorer:
+        m = re.match(r"\s*([^,()\-–—]+?)\s*(?:\(|,|\-|–|—|$)", texto)
+        if m:
+            cand = m.group(1).strip()
+            if 1 <= len(cand.split()) <= 5 and not re.search(r"\b(goal|gol|team|time)\b", normalizar(cand)):
+                scorer = cand
+    for padrao in (
+        r"Assisted by\s+([^.,;()]+)",
+        r"assist(?:ed|ência|encia)?\s+(?:by|de|por)\s+([^.,;()]+)",
+        r"com assistência de\s+([^.,;()]+)",
+    ):
+        for m in re.finditer(padrao, texto, flags=re.I):
+            nome = m.group(1).strip()
+            if nome and 1 <= len(nome.split()) <= 5:
+                assists.append(nome)
+    return scorer, assists
+
+
 def extrair_gols_summary(data: dict[str, Any], event_id: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Extrai gols/assistências de forma tolerante a variações da ESPN."""
-    plays: list[dict[str, Any]] = []
-
-    # Caminho principal em vários esportes da ESPN.
-    for chave in ("scoringPlays", "scoringplays"):
-        if isinstance(data.get(chave), list):
-            plays.extend([p for p in data[chave] if isinstance(p, dict)])
-
-    # Caminhos alternativos: drives/competitions/details/comentary.
-    def parece_gol(no: dict[str, Any]) -> bool:
-        texto = " ".join(str(no.get(k) or "") for k in ("type", "text", "description", "displayName", "shortDisplayName"))
-        n = normalizar(texto)
-        return any(tok in n.split() or tok in n for tok in ("goal", "gol", "penalty goal", "own goal")) and not any(x in n for x in ("yellow", "red card", "substitution"))
-
-    procurar_dicts(data, parece_gol, plays)
+    """Extrai gols/assistências do summary ESPN sem confundir estatística de tabela com gol."""
+    mapa_times = mapa_times_summary(data)
+    plays = [p for p in procurar_listas_eventos(data) if eh_evento_gol(p)]
 
     gols: list[dict[str, Any]] = []
     assistencias: list[dict[str, Any]] = []
     vistos: set[str] = set()
 
     for p in plays:
-        texto = str(p.get("text") or p.get("description") or p.get("displayName") or "")
-        minuto = p.get("clock") or p.get("time") or p.get("displayClock") or ""
-        equipe = time_de_no(p)
+        texto = str(p.get("text") or p.get("description") or p.get("displayValue") or p.get("shortText") or "")
+        minuto = minuto_evento(p)
+        equipe = time_de_no(p, mapa_times)
+        atletas = atletas_do_evento(p)
 
-        atletas: list[dict[str, Any]] = []
-        for chave in ("athletes", "participants", "players"):
-            if isinstance(p.get(chave), list):
-                atletas.extend([a for a in p[chave] if isinstance(a, dict)])
-        for chave in ("athlete", "player", "scorer"):
-            if isinstance(p.get(chave), dict):
-                atletas.append(p[chave])
-
-        scorer = None
-        assists: list[str] = []
+        scorer_info: dict[str, str] | None = None
+        assist_infos: list[dict[str, str]] = []
         for a in atletas:
-            papel = normalizar(a.get("type") or a.get("role") or a.get("position") or a.get("displayName") or "")
-            nome = nome_atleta(a)
-            if not nome:
-                continue
+            papel = normalizar(a.get("papel") or "")
             if any(tok in papel for tok in ("assist", "assistance")):
-                assists.append(nome)
-            elif scorer is None:
-                scorer = nome
+                assist_infos.append(a)
+            elif scorer_info is None:
+                scorer_info = a
 
-        # Algumas respostas trazem assistAthletes/assistants.
         for chave in ("assistAthletes", "assists", "assistants"):
             if isinstance(p.get(chave), list):
                 for a in p[chave]:
-                    nome = nome_atleta(a)
-                    if nome:
-                        assists.append(nome)
+                    info = atleta_info(a)
+                    if info:
+                        assist_infos.append(info)
 
-        # Fallback textual bem conservador para padrões "Nome (assistência de X)".
-        if not scorer and texto:
-            m = re.match(r"\s*([^,()\-–—]+?)\s*(?:\(|,|\-|–|—|$)", texto)
-            if m and len(m.group(1).strip().split()) <= 4:
-                scorer = m.group(1).strip()
+        scorer_txt, assists_txt = parse_textual_scorer_assist(texto)
+        if not scorer_info and scorer_txt:
+            scorer_info = {"nome": scorer_txt, "athlete_id": "", "foto": ""}
+        for nome in assists_txt:
+            assist_infos.append({"nome": nome, "athlete_id": "", "foto": ""})
 
-        if not scorer:
+        if not scorer_info or not scorer_info.get("nome"):
             continue
 
+        scorer = scorer_info["nome"].strip()
         chave_visto = f"{event_id}|{normalizar(scorer)}|{normalizar(str(minuto))}|{normalizar(texto)}"
         if chave_visto in vistos:
             continue
         vistos.add(chave_visto)
 
-        gols.append({
+        gol_obj = {
             "event_id": event_id,
             "nome": scorer,
+            "athlete_id": scorer_info.get("athlete_id", ""),
+            "foto": scorer_info.get("foto", ""),
             "time": equipe or "",
+            "escudo": escudo_time(equipe or "") if equipe else "",
             "minuto": str(minuto or ""),
             "descricao": texto,
-        })
-        for a in dict.fromkeys(assists):
-            if normalizar(a) != normalizar(scorer):
-                assistencias.append({
-                    "event_id": event_id,
-                    "nome": a,
-                    "time": equipe or "",
-                    "minuto": str(minuto or ""),
-                    "descricao": texto,
-                })
+        }
+        gols.append(gol_obj)
+
+        assist_dedup: dict[str, dict[str, str]] = {}
+        for a in assist_infos:
+            nome = str(a.get("nome") or "").strip()
+            if nome and normalizar(nome) != normalizar(scorer):
+                assist_dedup[normalizar(nome)] = a
+        for a in assist_dedup.values():
+            assistencias.append({
+                "event_id": event_id,
+                "nome": a.get("nome", ""),
+                "athlete_id": a.get("athlete_id", ""),
+                "foto": a.get("foto", ""),
+                "time": equipe or "",
+                "escudo": escudo_time(equipe or "") if equipe else "",
+                "minuto": str(minuto or ""),
+                "descricao": texto,
+            })
 
     return gols, assistencias
 
 
+
 def agregar_jogadores(eventos: list[dict[str, Any]], campo: str) -> list[dict[str, Any]]:
-    cont = Counter()
-    times: dict[tuple[str, str], str] = {}
+    cont: Counter[tuple[str, str]] = Counter()
+    dados: dict[tuple[str, str], dict[str, str]] = {}
     eventos_por: dict[tuple[str, str], set[str]] = defaultdict(set)
     for e in eventos:
         nome = str(e.get("nome") or "").strip()
@@ -512,58 +708,156 @@ def agregar_jogadores(eventos: list[dict[str, Any]], campo: str) -> list[dict[st
             continue
         chave = (normalizar(nome), normalizar(time_nome))
         cont[chave] += 1
-        times[chave] = time_nome
+        if chave not in dados:
+            dados[chave] = {
+                "nome": nome,
+                "time": time_nome,
+                "athlete_id": str(e.get("athlete_id") or ""),
+                "foto": str(e.get("foto") or ""),
+            }
+        elif not dados[chave].get("foto") and e.get("foto"):
+            dados[chave]["foto"] = str(e.get("foto"))
         eventos_por[chave].add(str(e.get("event_id") or ""))
-    saida = []
-    for (nome_norm, _time_norm), qtd in cont.most_common():
-        # Reusa primeira grafia que apareceu no evento.
-        nome_real = next((str(e.get("nome")) for e in eventos if normalizar(e.get("nome")) == nome_norm), nome_norm.title())
-        time_nome = times.get((nome_norm, _time_norm), "")
+
+    saida: list[dict[str, Any]] = []
+    for chave, qtd in cont.most_common():
+        info = dados.get(chave, {})
+        time_nome = info.get("time", "")
+        foto = info.get("foto", "")
+        aid = info.get("athlete_id", "")
+        if not foto and aid.isdigit():
+            foto = f"https://a.espncdn.com/i/headshots/soccer/players/full/{aid}.png"
         saida.append({
-            "nome": nome_real,
+            "nome": info.get("nome") or chave[0].title(),
             "time": time_nome,
             "escudo": escudo_time(time_nome),
+            "athlete_id": aid,
+            "foto": foto,
             campo: qtd,
-            "eventos": len(eventos_por[(nome_norm, _time_norm)]),
+            "eventos": len(eventos_por[chave]),
         })
     saida.sort(key=lambda x: (-int(x.get(campo, 0)), normalizar(x.get("time")), normalizar(x.get("nome"))))
     return saida
 
 
-def coletar_artilharia_assistencias(resultados: list[dict[str, Any]], avisos: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+def combinar_participacoes(artilharia: list[dict[str, Any]], garcons: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    mapa: dict[tuple[str, str], dict[str, Any]] = {}
+    for lista, campo in ((artilharia, "gols"), (garcons, "assistencias")):
+        for p in lista:
+            chave = (normalizar(p.get("nome")), normalizar(p.get("time")))
+            item = mapa.setdefault(chave, {
+                "nome": p.get("nome", ""),
+                "time": p.get("time", ""),
+                "escudo": p.get("escudo", ""),
+                "athlete_id": p.get("athlete_id", ""),
+                "foto": p.get("foto", ""),
+                "gols": 0,
+                "assistencias": 0,
+            })
+            item[campo] = int(p.get(campo) or 0)
+            if not item.get("foto") and p.get("foto"):
+                item["foto"] = p.get("foto")
+            if not item.get("athlete_id") and p.get("athlete_id"):
+                item["athlete_id"] = p.get("athlete_id")
+    saida = []
+    for item in mapa.values():
+        item["participacoes"] = int(item.get("gols") or 0) + int(item.get("assistencias") or 0)
+        saida.append(item)
+    saida.sort(key=lambda x: (-int(x.get("participacoes") or 0), -int(x.get("gols") or 0), normalizar(x.get("time")), normalizar(x.get("nome"))))
+    return saida
+
+
+
+
+def cache_jogadores_anterior() -> tuple[dict[str, dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    antigo = ler_json("dados-br/jogadores.json", {})
+    if not isinstance(antigo, dict):
+        return {}, [], []
+    processados = {}
+    for p in antigo.get("summaries_processados") or []:
+        eid = str((p or {}).get("event_id") or "").strip()
+        if eid:
+            processados[eid] = dict(p)
+    gols = [dict(x) for x in antigo.get("eventos_gols") or [] if isinstance(x, dict)]
+    assists = [dict(x) for x in antigo.get("eventos_assistencias") or [] if isinstance(x, dict)]
+    return processados, gols, assists
+
+
+def dedup_eventos_jogador(eventos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    saida: list[dict[str, Any]] = []
+    vistos: set[str] = set()
+    for e in eventos:
+        chave = "|".join([
+            str(e.get("event_id") or ""),
+            normalizar(e.get("nome")),
+            normalizar(e.get("time")),
+            normalizar(e.get("minuto")),
+            normalizar(e.get("descricao")),
+        ])
+        if chave in vistos:
+            continue
+        vistos.add(chave)
+        saida.append(e)
+    return saida
+
+
+def coletar_artilharia_assistencias(
+    resultados: list[dict[str, Any]],
+    avisos: list[str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     ids = event_ids_resultados(resultados)
     if not ids:
         avisos.append("Nenhum event_id ESPN encontrado ainda em resultados.json/espn_eventos.json; artilharia e assistências ficam em espera até o próximo snapshot ESPN completo.")
-        return [], [], []
+        return [], [], [], [], []
 
-    limite = int(os.environ.get("BR_STATS_MAX_SUMMARIES", "80"))
-    if len(ids) > limite:
-        avisos.append(f"Coleta de summaries limitada a {limite} eventos nesta execução para evitar excesso de chamadas à ESPN.")
-        ids = ids[-limite:]
+    cache_proc, cache_gols, cache_assists = cache_jogadores_anterior()
+    eventos_gols: list[dict[str, Any]] = [e for e in cache_gols if str(e.get("event_id") or "") in set(ids)]
+    eventos_assist: list[dict[str, Any]] = [e for e in cache_assists if str(e.get("event_id") or "") in set(ids)]
+    processados_mapa: dict[str, dict[str, Any]] = {eid: p for eid, p in cache_proc.items() if eid in set(ids)}
 
-    eventos_gols: list[dict[str, Any]] = []
-    eventos_assist: list[dict[str, Any]] = []
-    processados: list[dict[str, Any]] = []
+    faltantes = [eid for eid in ids if eid not in processados_mapa]
+    limite = int(os.environ.get("BR_STATS_MAX_SUMMARIES", "90"))
+    if len(faltantes) > limite:
+        avisos.append(f"Coleta incremental: {len(faltantes)} summaries pendentes; esta execução buscará {limite}. O restante entra nos próximos workflows.")
+        faltantes = faltantes[:limite]
 
-    for i, eid in enumerate(ids, 1):
+    falhas = 0
+    for i, eid in enumerate(faltantes, 1):
         url = URL_SUMMARY.format(event_id=urllib.parse.quote(eid))
-        data = fetch_json(url, timeout=22, tentativas=2)
+        data = fetch_json(url, timeout=12, tentativas=1)
         if not data:
+            falhas += 1
             continue
         gols, assists = extrair_gols_summary(data, eid)
         eventos_gols.extend(gols)
         eventos_assist.extend(assists)
-        processados.append({"event_id": eid, "gols": len(gols), "assistencias": len(assists)})
+        processados_mapa[eid] = {"event_id": eid, "gols": len(gols), "assistencias": len(assists)}
         if i % 10 == 0:
-            print(f"  summaries processados: {i}/{len(ids)}")
-        time.sleep(0.18)
+            print(f"  summaries novos processados: {i}/{len(faltantes)}")
+        time.sleep(0.14)
 
-    if not eventos_gols:
-        avisos.append("A ESPN respondeu aos summaries, mas o robô não encontrou eventos de gol em formato reconhecível. A página continua exibindo ataque/defesa/desempenho.")
-    if not eventos_assist:
-        avisos.append("Assistências podem não estar disponíveis nos summaries da ESPN para todos os jogos; quando vierem, o ranking de garçons será preenchido automaticamente.")
+    eventos_gols = dedup_eventos_jogador(eventos_gols)
+    eventos_assist = dedup_eventos_jogador(eventos_assist)
+    processados = [processados_mapa[eid] for eid in ids if eid in processados_mapa]
 
-    return agregar_jogadores(eventos_gols, "gols"), agregar_jogadores(eventos_assist, "assistencias"), processados
+    if falhas:
+        avisos.append(f"{falhas} summary/s da ESPN não responderam nesta execução; o robô manteve o cache anterior e tentará novamente no próximo workflow.")
+    if processados and not eventos_gols:
+        avisos.append("Summaries processados, mas nenhum evento de gol foi reconhecido com segurança. O robô evita inferências arriscadas e não confunde Goal Difference/Gols Pró com gols de jogador.")
+    if processados and eventos_gols and not eventos_assist:
+        avisos.append("Gols foram coletados, mas as assistências podem não estar disponíveis nos summaries da ESPN para todos os jogos.")
+    if not processados:
+        avisos.append("Nenhum summary foi processado nesta execução. Rode novamente o workflow quando a ESPN estiver respondendo.")
+    if cache_proc:
+        avisos.append(f"Cache preservado: {len(processados)} summaries já consolidados em dados-br/jogadores.json.")
+
+    return (
+        agregar_jogadores(eventos_gols, "gols"),
+        agregar_jogadores(eventos_assist, "assistencias"),
+        processados,
+        eventos_gols,
+        eventos_assist,
+    )
 
 
 def main() -> None:
@@ -576,7 +870,8 @@ def main() -> None:
 
     clubes = montar_clubes(tabela, resultados)
     ranking = gerar_ranking_desempenho(clubes)
-    artilharia, garcons, eventos_processados = coletar_artilharia_assistencias(resultados, avisos)
+    artilharia, garcons, eventos_processados, eventos_gols, eventos_assistencias = coletar_artilharia_assistencias(resultados, avisos)
+    participacoes = combinar_participacoes(artilharia, garcons)
 
     melhor_ataque = sorted(clubes, key=lambda c: (-int(c.get("gp") or 0), int(c.get("jogos") or 99), normalizar(c["time"])))
     melhor_defesa = sorted(clubes, key=lambda c: (int(c.get("gc") or 999), -int(c.get("sg") or 0), normalizar(c["time"])))
@@ -602,6 +897,9 @@ def main() -> None:
         "clubes": clubes,
         "ranking_desempenho": ranking,
         "eventos_processados": eventos_processados,
+        "eventos_gols": eventos_gols[-200:],
+        "eventos_assistencias": eventos_assistencias[-200:],
+        "jogadores_arquivo": "dados-br/jogadores.json",
         "avisos": avisos,
     }
 
@@ -613,8 +911,24 @@ def main() -> None:
         "ranking": ranking,
     }
 
+    payload_jogadores = {
+        "atualizado_em": payload_stats["atualizado_em"],
+        "temporada": TEMPORADA,
+        "fonte": "ESPN summary/event detail + snapshots locais",
+        "metodologia": "Coleta evento a evento por summary ESPN; evita inferir artilharia a partir de estatísticas agregadas para não confundir Goal Difference/Gols Pró com gols de jogador.",
+        "total_summaries_processados": len(eventos_processados),
+        "artilharia": artilharia,
+        "assistencias": garcons,
+        "participacoes_gol": participacoes,
+        "eventos_gols": eventos_gols[-300:],
+        "eventos_assistencias": eventos_assistencias[-300:],
+        "summaries_processados": eventos_processados,
+        "avisos": avisos,
+    }
+
     gravar_json_atomico("dados-br/estatisticas.json", payload_stats)
     gravar_json_atomico("dados-br/ranking-desempenho.json", payload_ranking)
+    gravar_json_atomico("dados-br/jogadores.json", payload_jogadores)
 
     print("== ESTATÍSTICAS GERADAS ==")
     print(f"  clubes: {len(clubes)}")
@@ -622,6 +936,8 @@ def main() -> None:
     print(f"  artilharia: {len(artilharia)} jogadores")
     print(f"  garçons: {len(garcons)} jogadores")
     print(f"  summaries processados: {len(eventos_processados)}")
+    print(f"  participações em gols: {len(participacoes)} jogadores")
+    print("  arquivo: dados-br/jogadores.json")
     if avisos:
         print("Avisos:")
         for a in avisos:
