@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-06T01:42:43.085633Z",
+  "atualizado_em": "2026-07-06T02:12:49.164642Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 91,
+  "jogos_processados": 92,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -2790,13 +2790,14 @@
       "equipe": "ENG",
       "gols": 0,
       "assistencias": 1,
-      "amarelos": 1,
+      "amarelos": 2,
       "vermelhos": 0,
       "jogos": [
         "760437",
-        "760458"
+        "760458",
+        "760505"
       ],
-      "total_cartoes": 1
+      "total_cartoes": 2
     },
     {
       "nome": "Dennis Hadzikadunic",
@@ -4226,6 +4227,20 @@
       "total_cartoes": 2
     },
     {
+      "nome": "Declan Rice",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760437",
+        "760458",
+        "760505"
+      ],
+      "total_cartoes": 2
+    },
+    {
       "nome": "Diego Gómez",
       "equipe": "PAR",
       "gols": 0,
@@ -4847,19 +4862,6 @@
       "vermelhos": 0,
       "jogos": [
         "760444"
-      ],
-      "total_cartoes": 1
-    },
-    {
-      "nome": "Declan Rice",
-      "equipe": "ENG",
-      "gols": 0,
-      "assistencias": 1,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760437",
-        "760458"
       ],
       "total_cartoes": 1
     },
@@ -6716,15 +6718,6 @@
       "media_gols": 1.8
     },
     {
-      "equipe": "ENG",
-      "gols": 8,
-      "assistencias": 7,
-      "amarelos": 3,
-      "vermelhos": 0,
-      "jogos": 4,
-      "media_gols": 2.0
-    },
-    {
       "equipe": "ESP",
       "gols": 8,
       "assistencias": 7,
@@ -6743,15 +6736,6 @@
       "media_gols": 2.0
     },
     {
-      "equipe": "MEX",
-      "gols": 8,
-      "assistencias": 7,
-      "amarelos": 2,
-      "vermelhos": 1,
-      "jogos": 4,
-      "media_gols": 2.0
-    },
-    {
       "equipe": "POR",
       "gols": 8,
       "assistencias": 4,
@@ -6759,6 +6743,24 @@
       "vermelhos": 0,
       "jogos": 4,
       "media_gols": 2.0
+    },
+    {
+      "equipe": "ENG",
+      "gols": 8,
+      "assistencias": 7,
+      "amarelos": 4,
+      "vermelhos": 0,
+      "jogos": 5,
+      "media_gols": 1.6
+    },
+    {
+      "equipe": "MEX",
+      "gols": 8,
+      "assistencias": 7,
+      "amarelos": 2,
+      "vermelhos": 1,
+      "jogos": 5,
+      "media_gols": 1.6
     },
     {
       "equipe": "SWE",
