@@ -1007,7 +1007,9 @@
   .hero-header img {
     display: block;
     width: 100%;
-    height: auto;
+    height: clamp(150px, 17vw, 248px);
+    object-fit: cover;
+    object-position: center 50%;
   }
   .sr-only {
     position: absolute; width: 1px; height: 1px;
@@ -1266,7 +1268,13 @@
     background: linear-gradient(90deg, rgba(163,230,53,.13), transparent 28%, transparent 72%, rgba(56,189,248,.08));
     mix-blend-mode: screen;
   }
-  .hero-header img { min-height: 124px; object-fit: cover; }
+  .hero-header img {
+    height: clamp(150px, 17vw, 248px);
+    min-height: 0;
+    max-height: 248px;
+    object-fit: cover;
+    object-position: center 50%;
+  }
 
   .nav {
     position: sticky;
@@ -1598,14 +1606,14 @@
     body { padding: 10px; }
     .br-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .jogos-grid { grid-template-columns: 1fr; }
-    .hero-header img { min-height: 108px; }
+    .hero-header img { height: clamp(118px, 22vw, 160px); max-height: 160px; min-height: 0; }
     .future-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 560px) {
     body { padding: 8px; }
     .container { max-width: 100%; }
     .hero-header { border-radius: 16px; margin-left: -2px; margin-right: -2px; }
-    .hero-header img { min-height: 96px; object-position: 18% 50%; }
+    .hero-header img { height: 112px; max-height: 112px; min-height: 0; object-position: 18% 50%; }
     .nav { top: 4px; margin-left: -2px; margin-right: -2px; border-radius: 14px; }
     .nav button { padding: 8px 12px; font-size: 12px; }
     .status-bar { font-size: 11px; align-items: flex-start; }

@@ -39,7 +39,7 @@ a { color: inherit; }
   background: #07111a;
   box-shadow: var(--shadow);
 }
-.hero img { display: block; width: 100%; max-height: 250px; object-fit: cover; }
+.hero img { display: block; width: 100%; height: clamp(132px, 18vw, 230px); max-height: 230px; object-fit: cover; object-position: center 50%; }
 .nav {
   position: sticky;
   top: 8px;
@@ -265,7 +265,7 @@ p { margin: 7px 0 0; color: var(--muted); }
 @media (max-width: 560px) {
   .container { width: min(100% - 16px, 1180px); padding-top: 8px; }
   .hero { border-radius: 16px; }
-  .hero img { min-height: 96px; object-position: 18% 50%; }
+  .hero img { height: 112px; max-height: 112px; min-height: 0; object-position: 18% 50%; }
   .nav { top: 4px; padding: 7px; border-radius: 14px; }
   .nav a { padding: 8px 11px; font-size: 12px; }
   .panel-inner { padding: 12px; }

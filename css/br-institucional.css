@@ -33,7 +33,7 @@ body {
 a { color: inherit; }
 .container { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 16px 0 34px; }
 .hero { border: 1px solid rgba(163, 230, 53, .16); border-radius: 22px; overflow: hidden; background: #07111a; box-shadow: var(--shadow); }
-.hero img { display: block; width: 100%; max-height: 250px; object-fit: cover; }
+.hero img { display: block; width: 100%; height: clamp(132px, 18vw, 230px); max-height: 230px; object-fit: cover; object-position: center 50%; }
 .nav { position: sticky; top: 8px; z-index: 10; display: flex; gap: 8px; overflow-x: auto; padding: 9px; margin: 12px 0; border: 1px solid rgba(148,163,184,.13); border-radius: 16px; background: rgba(3, 8, 12, .72); backdrop-filter: blur(14px); scrollbar-width: thin; scrollbar-color: rgba(163, 230, 53, .35) transparent; }
 .nav a { flex: 0 0 auto; border: 1px solid var(--border); background: rgba(255,255,255,.035); color: var(--text); text-decoration: none; border-radius: 12px; padding: 9px 13px; font-size: 13px; font-weight: 850; white-space: nowrap; }
 .nav a.active { border-color: rgba(163,230,53,.56); background: rgba(163,230,53,.18); color: #efffc3; }
@@ -104,5 +104,5 @@ p { margin: 7px 0 0; color: var(--muted); line-height: 1.45; }
 .site-footer { margin-top: 16px; padding: 16px; border: 1px solid rgba(148,163,184,.14); border-radius: 18px; color: var(--muted); background: rgba(3,8,12,.56); font-size: 12px; line-height: 1.45; }
 .site-footer div + div { margin-top: 5px; }
 @media (max-width: 980px) { .cards-resumo { grid-template-columns: repeat(2,minmax(0,1fr)); } .grid-clubes { grid-template-columns: repeat(3,minmax(0,1fr)); } .detail-grid { grid-template-columns: 1fr; } .record-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 640px) { .container { width: min(100% - 20px, 1180px); padding-top: 10px; } .hero { border-radius: 16px; } .hero img { max-height: 160px; } .nav { top: 4px; padding: 7px; border-radius: 14px; } .nav a { padding: 8px 11px; font-size: 12px; } .cards-resumo, .grid-clubes, .record-grid, .info-grid { grid-template-columns: 1fr; } .toolbar { grid-template-columns: 1fr; } .club-card { min-height: 150px; } .detail-hero img { width: 70px; height: 70px; } .timeline-item { grid-template-columns: 58px 1fr; gap: 8px; } .title-bar { grid-template-columns: 105px 1fr 28px; font-size: 12px; } }
+@media (max-width: 640px) { .container { width: min(100% - 20px, 1180px); padding-top: 10px; } .hero { border-radius: 16px; } .hero img { height: 112px; max-height: 112px; min-height: 0; object-position: 18% 50%; } .nav { top: 4px; padding: 7px; border-radius: 14px; } .nav a { padding: 8px 11px; font-size: 12px; } .cards-resumo, .grid-clubes, .record-grid, .info-grid { grid-template-columns: 1fr; } .toolbar { grid-template-columns: 1fr; } .club-card { min-height: 150px; } .detail-hero img { width: 70px; height: 70px; } .timeline-item { grid-template-columns: 58px 1fr; gap: 8px; } .title-bar { grid-template-columns: 105px 1fr 28px; font-size: 12px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
