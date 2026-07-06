@@ -145,16 +145,65 @@
 
   function renderChips() {
     const clubes = clubeLista().slice().sort((a, b) => normalizarNome(a.time).localeCompare(normalizarNome(b.time)));
-    $("club-chips").innerHTML = clubes.map((c) => {
-      const ativo = normalizarNome(c.time) === normalizarNome(state.filtro);
-      return `<button class="chip ${ativo ? "active" : ""}" type="button" data-time="${escapeAttr(c.time)}">${imgEscudo(c)}<span>${escapeHtml(c.time)}</span></button>`;
-    }).join("");
-    $("club-chips").querySelectorAll(".chip").forEach((btn) => {
+    const atual = state.filtro ? clubes.find((c) => normalizarNome(c.time) === normalizarNome(state.filtro)) : null;
+    const descricao = atual
+      ? `${numero(atual.pontos)} pts · ${numero(atual.jogos)} jogos · SG ${numero(atual.sg)} · ${numero(atual.aproveitamento, "%")}`
+      : "Mostrando artilharia, assistências, ataque/defesa e desempenho de todos os clubes.";
+
+    const options = [`<option value="" ${!state.filtro ? "selected" : ""}>Todos os clubes</option>`]
+      .concat(clubes.map((c) => `<option value="${escapeAttr(c.time)}" ${normalizarNome(c.time) === normalizarNome(state.filtro) ? "selected" : ""}>${escapeHtml(c.time)}</option>`))
+      .join("");
+
+    const currentShield = atual
+      ? imgEscudo(atual, "stats-filter-shield-img")
+      : `<span class="stats-filter-fallback">BR</span>`;
+
+    $("club-chips").innerHTML = `
+      <div class="stats-filter-panel">
+        <div class="stats-filter-select-card">
+          <label class="stats-filter-label" for="select-filtro-estatisticas">Selecionar clube</label>
+          <select id="select-filtro-estatisticas" class="stats-filter-select">${options}</select>
+        </div>
+        <div class="stats-filter-current-card">
+          <div class="stats-filter-team">
+            ${currentShield}
+            <div>
+              <div class="stats-filter-title">${escapeHtml(atual?.time || "Todos os clubes")}</div>
+              <div class="stats-filter-note">${escapeHtml(descricao)}</div>
+            </div>
+          </div>
+          ${state.filtro ? `<button class="btn secondary stats-filter-clear" type="button" data-clear="1">Limpar</button>` : ""}
+        </div>
+      </div>
+      <div class="stats-mini-strip" aria-label="Atalhos rápidos de clubes">
+        <button class="stats-mini-club ${!state.filtro ? "active" : ""}" type="button" data-time="" title="Todos">BR</button>
+        ${clubes.map((c) => `<button class="stats-mini-club ${normalizarNome(c.time) === normalizarNome(state.filtro) ? "active" : ""}" type="button" data-time="${escapeAttr(c.time)}" title="${escapeAttr(c.time)}">${imgEscudo(c)}</button>`).join("")}
+      </div>
+    `;
+
+    const select = $("select-filtro-estatisticas");
+    if (select) {
+      select.addEventListener("change", () => {
+        state.filtro = select.value || "";
+        renderTudo();
+      });
+    }
+    $("club-chips").querySelectorAll("[data-time]").forEach((btn) => {
       btn.addEventListener("click", () => {
         state.filtro = btn.getAttribute("data-time") || "";
         renderTudo();
       });
     });
+    $("club-chips").querySelector("[data-clear]")?.addEventListener("click", () => {
+      state.filtro = "";
+      renderTudo();
+    });
+
+    const limpar = $("btn-limpar-filtro");
+    if (limpar) {
+      limpar.textContent = state.filtro ? "Limpar filtro" : "Todos";
+      limpar.disabled = !state.filtro;
+    }
   }
 
   function renderListaJogadores(id, lista, tipo) {

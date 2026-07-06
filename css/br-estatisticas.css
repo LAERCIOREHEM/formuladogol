@@ -304,3 +304,136 @@ p { margin: 7px 0 0; color: var(--muted); }
 @media (max-width: 640px) {
   .topbar { display: block; }
 }
+
+/* EXECUÇÃO 7 — filtro de clube profissional em Estatísticas */
+.stats-filter-panel {
+  display: grid;
+  grid-template-columns: minmax(260px, 360px) 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+.stats-filter-select-card,
+.stats-filter-current-card {
+  border: 1px solid rgba(163,230,53,.14);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(14,24,32,.92), rgba(5,12,18,.82));
+  padding: 13px;
+  min-width: 0;
+}
+.stats-filter-label {
+  display: block;
+  margin: 0 0 7px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+}
+.stats-filter-select {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 13px;
+  border: 1px solid rgba(148,163,184,.22);
+  background: rgba(2,7,12,.78);
+  color: #f8fafc;
+  font-weight: 900;
+  padding: 0 12px;
+  outline: none;
+}
+.stats-filter-select:focus {
+  border-color: rgba(163,230,53,.60);
+  box-shadow: 0 0 0 3px rgba(163,230,53,.12);
+}
+.stats-filter-current-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.stats-filter-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.stats-filter-shield-img,
+.stats-filter-fallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  object-fit: contain;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(148,163,184,.16);
+  padding: 6px;
+  flex: 0 0 auto;
+}
+.stats-filter-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #d9ff76;
+  font-weight: 950;
+}
+.stats-filter-title {
+  font-size: 16px;
+  font-weight: 950;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stats-filter-note {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.stats-filter-clear:disabled { opacity: .55; cursor: default; }
+.stats-mini-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 8px 2px 4px;
+}
+.stats-mini-strip::-webkit-scrollbar { display: none; }
+.stats-mini-club {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,.16);
+  background: rgba(255,255,255,.035);
+  color: #d9e6f2;
+  cursor: pointer;
+  font-weight: 950;
+}
+.stats-mini-club img,
+.stats-mini-club .escudo-fallback {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  object-fit: contain;
+  padding: 2px;
+}
+.stats-mini-club.active {
+  border-color: rgba(250,204,21,.95);
+  background: rgba(250,204,21,.14);
+  color: #facc15;
+  box-shadow: 0 0 0 1px rgba(250,204,21,.18);
+}
+.stats-mini-club:hover { border-color: rgba(163,230,53,.35); }
+@media (max-width: 760px) {
+  .stats-filter-panel { grid-template-columns: 1fr; gap: 9px; }
+  .stats-filter-select-card,
+  .stats-filter-current-card { border-radius: 16px; padding: 11px; }
+  .stats-filter-current-card { align-items: flex-start; }
+  .stats-filter-shield-img,
+  .stats-filter-fallback { width: 40px; height: 40px; border-radius: 13px; }
+  .stats-filter-title { font-size: 15px; }
+}
