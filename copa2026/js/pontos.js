@@ -506,20 +506,12 @@
         const ac = inter(x.d[f.k], real).length;
         return `<span class="ph">${f.lab}: <b>${ac}/${f.n}</b></span>`;
       }).join("");
-      const decidiu = o.classificados32 && o.classificados32.length;
-      const picks32 = x.d.classificados32 || [];
-      const vivos = qtdAindaNoPareo(x.d, o);
-      const funil = picks32.map(t => `<span class="${statusNoPareo(t, x.d, o)}">${flag(t)}</span>`).join("");
-      const f32lab = decidiu ? `As 32 de ${x.nome} — <b>${vivos} ainda no páreo</b>:` : `As 32 que ${x.nome} classificou no palpite:`;
-      const f32leg = decidiu ? '<div class="f32leg"><span><i class="lg-a"></i>na disputa</span><span><i class="lg-o"></i>caiu</span><span><i class="lg-w"></i>não classificou</span></div>' : "";
       return `<div class="card${cls}">
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
         <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
         <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">eficiência <b>${eficiencia}</b></span></div>
         <div class="fases">${fasesHTML}<span class="ph">🎯 <b>${x.cr}</b> cravados</span></div>
         <div class="podiodet">${detalheFinal(x.d, o)}</div>
-        <div class="f32lab">${f32lab}</div>${f32leg}
-        <div class="f32">${funil}</div>
         ${fasesDoPalpiteHTML(x.d, o, x.nome)}
         <button class="vermais" data-ext="${x.nome}">Ver extrato dos pontos ▾</button>
         <div class="extbox" id="ext-${cssId(x.nome)}" style="display:none">${extratoBolao(x.d, o, x)}</div>
