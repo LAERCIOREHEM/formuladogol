@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Clubes — Bolão Brasileirão 2026</title>
-  <meta name="description" content="Página dos 20 clubes do Brasileirão 2026 no Bolão Almoço de Sexta: curiosidades, estádio, títulos, momento, jogos e estrutura preparada para elencos.">
+  <meta name="description" content="Página premium dos 20 clubes do Brasileirão 2026 no Bolão Almoço de Sexta: estádio, mascote, torcida, hino, elenco, desempenho e jogos.">
   <meta name="theme-color" content="#10b981">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-  <link rel="stylesheet" href="css/br-institucional.css">
-<link rel="stylesheet" href="css/br-global.css?v=20260706-exec6">
+  <link rel="stylesheet" href="css/br-institucional.css?v=20260706-exec9">
+  <link rel="stylesheet" href="css/br-global.css?v=20260706-exec6">
 </head>
 <body>
   <div class="container">
@@ -31,34 +31,50 @@
     </nav>
 
     <main>
-      <section class="page-title panel">
-        <div class="panel-inner">
-          <div class="kicker">Brasileirão 2026</div>
-          <h1>Clubes do Brasileirão</h1>
-          <p>Os 20 clubes em uma página de referência: escudos, estádio, UF, títulos, curiosidades, momento na temporada e jogos recentes/futuros.</p>
-          <div class="meta-line" id="meta-line">Carregando clubes...</div>
+      <section class="page-title panel br-page-title">
+        <div class="panel-inner club-page-title">
+          <div>
+            <div class="kicker">Brasileirão 2026</div>
+            <h1>Clubes do Brasileirão</h1>
+            <p>Uma página de referência para cada clube: escudo, mascote, UF, estádio, torcida, hino, momento na tabela, desempenho, jogos e elenco quando o robô ESPN preencher os dados.</p>
+            <div class="meta-line" id="meta-line">Carregando clubes...</div>
+          </div>
+          <div class="club-title-orb" aria-hidden="true">🛡️</div>
         </div>
       </section>
 
       <section class="cards-resumo" id="cards-resumo" aria-live="polite"></section>
 
-      <section class="panel" style="margin-bottom:14px">
+      <section class="panel club-filter-panel" style="margin-bottom:14px">
         <div class="panel-inner">
-          <div class="kicker">Filtro rápido</div>
-          <div class="toolbar">
-            <input id="busca-clube" class="input" type="search" placeholder="Buscar clube, cidade, UF, estádio, mascote..." autocomplete="off">
-            <div class="chips" id="chips-regiao" aria-label="Filtro por região"></div>
+          <div class="section-head compact">
+            <div>
+              <div class="kicker">Filtro rápido</div>
+              <h2>Escolha um clube</h2>
+            </div>
+            <span class="badge ok">visual premium</span>
           </div>
+          <div class="club-toolbar">
+            <label class="select-wrap" for="select-clube">
+              <span>Selecionar clube</span>
+              <select id="select-clube" class="input" autocomplete="off"></select>
+            </label>
+            <label class="select-wrap" for="busca-clube">
+              <span>Busca livre</span>
+              <input id="busca-clube" class="input" type="search" placeholder="Buscar clube, cidade, UF, estádio, mascote..." autocomplete="off">
+            </label>
+          </div>
+          <div class="chips" id="chips-regiao" aria-label="Filtro por região"></div>
         </div>
       </section>
 
-      <section class="grid-clubes" id="grid-clubes" aria-live="polite"></section>
+      <section class="grid-clubes premium" id="grid-clubes" aria-live="polite"></section>
 
-      <section class="detail-grid" id="detalhe-wrapper" hidden>
-        <article class="panel">
+      <section class="detail-grid club-detail-grid" id="detalhe-wrapper" hidden>
+        <article class="panel club-detail-panel">
           <div class="panel-inner" id="detalhe-clube"></div>
         </article>
-        <article class="panel">
+        <article class="panel club-side-panel">
           <div class="panel-inner">
             <div class="section-head">
               <div>
@@ -67,38 +83,32 @@
               </div>
               <span class="badge ok">ESPN snapshot</span>
             </div>
-            <div id="jogos-clube" class="list"></div>
+            <div id="jogos-clube" class="list jogos-list"></div>
           </div>
         </article>
-      </section>
-
-      <section class="panel" style="margin-top:14px">
-        <div class="panel-inner">
-          <div class="section-head">
-            <div>
-              <div class="kicker">Elencos</div>
-              <h2>Estrutura pronta para jogadores</h2>
+        <article class="panel club-roster-panel">
+          <div class="panel-inner">
+            <div class="section-head">
+              <div>
+                <div class="kicker">Elenco</div>
+                <h2>Jogadores do clube</h2>
+              </div>
+              <span class="badge" id="elenco-status">ESPN roster</span>
             </div>
-            <span class="badge">próxima automação</span>
+            <div id="elenco-clube" class="empty-state">Selecione um clube acima. A área exibirá jogadores, fotos e posições quando <code>dados-br/elencos.json</code> estiver preenchido pelo workflow.</div>
           </div>
-          <div id="elenco-clube" class="empty-state">Selecione um clube acima. Quando o robô de elencos for ligado, esta área exibirá jogadores, fotos e posições sem alterar a página.</div>
-        </div>
+        </article>
       </section>
     </main>
 
     <footer class="site-footer">
       <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Página institucional dos clubes, sem fins comerciais.</div>
       <div>Dados esportivos: ESPN + snapshots locais do repositório. Escudos e marcas pertencem aos respectivos clubes.</div>
-      <div>Curiosidades e dados de estádio/títulos são curadoria editorial inicial e podem ser ajustados manualmente em <code>dados-br/clubes.json</code>.</div>
+      <div>Curiosidades, torcida, mascote, hinos e dados de estádio/títulos são curadoria editorial em <code>dados-br/clubes.json</code> e podem ser ajustados manualmente.</div>
     </footer>
   </div>
 
-  <script src="js/br-clubes.js"></script>
-  <script>
-    document.querySelectorAll('[data-anchor]').forEach(function(a){
-      a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-anchor')); });
-    });
-  </script>
-<script src="js/br-menu.js?v=20260706-exec6"></script>
+  <script src="js/br-clubes.js?v=20260706-exec9"></script>
+  <script src="js/br-menu.js?v=20260706-exec6"></script>
 </body>
 </html>

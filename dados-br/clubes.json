@@ -1,7 +1,7 @@
 {
-  "atualizado_em": "2026-07-06T00:05:00-03:00",
+  "atualizado_em": "2026-07-06T11:45:00-03:00",
   "fonte": "Curadoria inicial + snapshots ESPN do repositório",
-  "observacao": "Quantidades de torcida são apresentadas em faixas descritivas para evitar falsa precisão. Estatísticas de desempenho são lidas dinamicamente de tabela.json, espn_eventos.json e ranking-desempenho.json.",
+  "observacao": "Quantidades de torcida são apresentadas em faixas descritivas para evitar falsa precisão. Estatísticas de desempenho são lidas dinamicamente de tabela.json, espn_eventos.json e ranking-desempenho.json. Execução 9: adicionados metadados visuais de clubes, link de busca de hino no Spotify, UF por extenso e suporte premium a elenco.",
   "clubes": [
     {
       "id": "palmeiras",
@@ -26,8 +26,14 @@
       "curiosidade": "É o maior campeão nacional na contagem unificada e costuma ser referência de regularidade na era recente.",
       "momento": "Força de topo na temporada 2026.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Sociedade%20Esportiva%20Palmeiras",
+        "hino_busca": "hino Sociedade Esportiva Palmeiras"
+      },
+      "uf_nome": "São Paulo",
+      "mascote_emoji": "🐷",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida nacional de grande porte"
     },
     {
       "id": "flamengo",
@@ -52,8 +58,14 @@
       "curiosidade": "Tem presença nacional muito forte e protagonismo recorrente em pontos corridos e mata-matas.",
       "momento": "Ataque entre os mais fortes da tabela.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Clube%20de%20Regatas%20do%20Flamengo",
+        "hino_busca": "hino Clube de Regatas do Flamengo"
+      },
+      "uf_nome": "Rio de Janeiro",
+      "mascote_emoji": "🦅",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "uma das maiores torcidas do país"
     },
     {
       "id": "fluminense",
@@ -79,8 +91,14 @@
       "curiosidade": "É um dos clubes fundadores do futebol carioca e tem forte identidade técnica/histórica.",
       "momento": "Campanha firme no G4/G6.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Fluminense%20Football%20Club",
+        "hino_busca": "hino Fluminense Football Club"
+      },
+      "uf_nome": "Rio de Janeiro",
+      "mascote_emoji": "🛡️",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida tradicional nacional"
     },
     {
       "id": "athletico-pr",
@@ -105,8 +123,14 @@
       "curiosidade": "Foi pioneiro no Brasil em arena moderna e tem cultura recente de competitividade internacional.",
       "momento": "Briga na parte alta.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Club%20Athletico%20Paranaense",
+        "hino_busca": "hino Club Athletico Paranaense"
+      },
+      "uf_nome": "Paraná",
+      "mascote_emoji": "🌪️",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida regional forte"
     },
     {
       "id": "bragantino",
@@ -131,8 +155,14 @@
       "curiosidade": "Projeto recente de alto investimento e perfil de elenco jovem/vertical.",
       "momento": "Time em alta pelo ranking de desempenho.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Red%20Bull%20Bragantino",
+        "hino_busca": "hino Red Bull Bragantino"
+      },
+      "uf_nome": "São Paulo",
+      "mascote_emoji": "🦁",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida local em crescimento"
     },
     {
       "id": "bahia",
@@ -158,8 +188,14 @@
       "curiosidade": "Foi o primeiro campeão brasileiro da história, em 1959.",
       "momento": "Campanha competitiva na zona intermediária-alta.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Esporte%20Clube%20Bahia",
+        "hino_busca": "hino Esporte Clube Bahia"
+      },
+      "uf_nome": "Bahia",
+      "mascote_emoji": "🦸",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "uma das maiores torcidas do Nordeste"
     },
     {
       "id": "coritiba",
@@ -184,8 +220,14 @@
       "curiosidade": "Campeão brasileiro de 1985, símbolo de força histórica do futebol paranaense.",
       "momento": "Na faixa intermediária da tabela.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Coritiba%20Foot%20Ball%20Club",
+        "hino_busca": "hino Coritiba Foot Ball Club"
+      },
+      "uf_nome": "Paraná",
+      "mascote_emoji": "👴",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida tradicional paranaense"
     },
     {
       "id": "sao-paulo",
@@ -211,8 +253,14 @@
       "curiosidade": "Único tricampeão consecutivo dos pontos corridos: 2006, 2007 e 2008.",
       "momento": "Oscilando em busca de aproximação do bloco de cima.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20S%C3%A3o%20Paulo%20Futebol%20Clube",
+        "hino_busca": "hino São Paulo Futebol Clube"
+      },
+      "uf_nome": "São Paulo",
+      "mascote_emoji": "🔴",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "uma das maiores torcidas nacionais"
     },
     {
       "id": "atletico-mg",
@@ -237,8 +285,14 @@
       "curiosidade": "Tem a conquista de 1937 homologada pela CBF como título nacional.",
       "momento": "Campanha de meio para cima.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Clube%20Atl%C3%A9tico%20Mineiro",
+        "hino_busca": "hino Clube Atlético Mineiro"
+      },
+      "uf_nome": "Minas Gerais",
+      "mascote_emoji": "🐓",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "grande torcida em Minas e nacional"
     },
     {
       "id": "corinthians",
@@ -263,8 +317,14 @@
       "curiosidade": "Clube de enorme apelo popular, com títulos em diferentes formatos do Brasileirão.",
       "momento": "Campanha de reconstrução na temporada.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Sport%20Club%20Corinthians%20Paulista",
+        "hino_busca": "hino Sport Club Corinthians Paulista"
+      },
+      "uf_nome": "São Paulo",
+      "mascote_emoji": "⚔️",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "uma das maiores torcidas do Brasil"
     },
     {
       "id": "cruzeiro",
@@ -289,8 +349,14 @@
       "curiosidade": "Foi o primeiro campeão da era dos pontos corridos, em 2003, com campanha histórica.",
       "momento": "Briga na metade superior da tabela.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Cruzeiro%20Esporte%20Clube",
+        "hino_busca": "hino Cruzeiro Esporte Clube"
+      },
+      "uf_nome": "Minas Gerais",
+      "mascote_emoji": "🦊",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "grande torcida em Minas e nacional"
     },
     {
       "id": "botafogo",
@@ -315,8 +381,14 @@
       "curiosidade": "Campeão em 2024, marcou retomada de protagonismo nacional.",
       "momento": "Campanha de oscilação, mas com elenco competitivo.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Botafogo%20de%20Futebol%20e%20Regatas",
+        "hino_busca": "hino Botafogo de Futebol e Regatas"
+      },
+      "uf_nome": "Rio de Janeiro",
+      "mascote_emoji": "⭐",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida tradicional nacional"
     },
     {
       "id": "vitoria",
@@ -341,8 +413,14 @@
       "curiosidade": "Clube de base historicamente relevante, com grandes revelações para o futebol brasileiro.",
       "momento": "Busca estabilidade para se afastar do Z4.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Esporte%20Clube%20Vit%C3%B3ria",
+        "hino_busca": "hino Esporte Clube Vitória"
+      },
+      "uf_nome": "Bahia",
+      "mascote_emoji": "🦁",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida muito forte na Bahia"
     },
     {
       "id": "internacional",
@@ -367,8 +445,14 @@
       "curiosidade": "Campeão brasileiro invicto em 1979.",
       "momento": "Campanha intermediária, olhando para recuperação.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Sport%20Club%20Internacional",
+        "hino_busca": "hino Sport Club Internacional"
+      },
+      "uf_nome": "Rio Grande do Sul",
+      "mascote_emoji": "🧢",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "uma das maiores torcidas do Sul"
     },
     {
       "id": "santos",
@@ -393,8 +477,14 @@
       "curiosidade": "Clube de Pelé, símbolo histórico de futebol ofensivo e formação de talentos.",
       "momento": "Procura regularidade no retorno à elite.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Santos%20Futebol%20Clube",
+        "hino_busca": "hino Santos Futebol Clube"
+      },
+      "uf_nome": "São Paulo",
+      "mascote_emoji": "🐳",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida tradicional nacional"
     },
     {
       "id": "gr-mio",
@@ -420,8 +510,14 @@
       "curiosidade": "Tem forte tradição copeira e duas conquistas nacionais na Série A.",
       "momento": "Campanha abaixo do potencial histórico.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Gr%C3%AAmio%20Foot-Ball%20Porto%20Alegrense",
+        "hino_busca": "hino Grêmio Foot-Ball Porto Alegrense"
+      },
+      "uf_nome": "Rio Grande do Sul",
+      "mascote_emoji": "⚔️",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "uma das maiores torcidas do Sul"
     },
     {
       "id": "vasco-da-gama",
@@ -446,8 +542,14 @@
       "curiosidade": "Tem história marcada pela luta contra a exclusão social no futebol brasileiro.",
       "momento": "Luta por recuperação na tabela.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Club%20de%20Regatas%20Vasco%20da%20Gama",
+        "hino_busca": "hino Club de Regatas Vasco da Gama"
+      },
+      "uf_nome": "Rio de Janeiro",
+      "mascote_emoji": "⛵",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida nacional muito tradicional"
     },
     {
       "id": "remo",
@@ -472,8 +574,14 @@
       "curiosidade": "Presença paraense na Série A dá alcance nacional ao futebol do Norte.",
       "momento": "Tem campanha de sobrevivência, mas competitiva em jogos-chave.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Clube%20do%20Remo",
+        "hino_busca": "hino Clube do Remo"
+      },
+      "uf_nome": "Pará",
+      "mascote_emoji": "🦁",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "uma das torcidas mais fortes do Norte"
     },
     {
       "id": "mirassol",
@@ -498,8 +606,14 @@
       "curiosidade": "É símbolo de ascensão recente e organização no interior paulista.",
       "momento": "Primeira experiência de maior exposição na elite.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Mirassol%20Futebol%20Clube",
+        "hino_busca": "hino Mirassol Futebol Clube"
+      },
+      "uf_nome": "São Paulo",
+      "mascote_emoji": "🦁",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida local em crescimento"
     },
     {
       "id": "chapecoense",
@@ -524,8 +638,14 @@
       "curiosidade": "A reconstrução do clube após 2016 virou símbolo mundial de solidariedade no futebol.",
       "momento": "Briga contra a parte de baixo da tabela.",
       "links": {
-        "jogos_hash": "#"
-      }
+        "jogos_hash": "#",
+        "hino_spotify": "https://open.spotify.com/search/hino%20Associa%C3%A7%C3%A3o%20Chapecoense%20de%20Futebol",
+        "hino_busca": "hino Associação Chapecoense de Futebol"
+      },
+      "uf_nome": "Santa Catarina",
+      "mascote_emoji": "🏹",
+      "hino_observacao": "Link de busca no Spotify para localizar o hino do clube; pode ser substituído por URL direta se o grupo preferir.",
+      "torcida_resumo": "torcida regional muito engajada"
     }
   ]
 }

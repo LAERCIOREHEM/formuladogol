@@ -1,6 +1,32 @@
 {
-  "atualizado_em": "2026-07-06T00:05:00-03:00",
-  "fonte": "placeholder preparado para integração ESPN roster",
-  "observacao": "Estrutura preparada; o robô de elenco pode preencher jogadores futuramente sem alteração na página.",
-  "elencos": {}
+  "atualizado_em": "2026-07-06T11:45:00-03:00",
+  "fonte": "ESPN roster endpoint + fallback local",
+  "metodologia": "Estrutura preparada pela Execução 9. O workflow Atualizar Brasileirao (ESPN) chamará scripts/buscar_elencos_brasileirao.py para preencher jogadores, fotos, posições e números quando a ESPN entregar roster.",
+  "total_clubes_com_elenco": 0,
+  "total_jogadores": 0,
+  "elencos": {
+    "Palmeiras": [],
+    "Flamengo": [],
+    "Fluminense": [],
+    "Athletico-PR": [],
+    "Bragantino": [],
+    "Bahia": [],
+    "Coritiba": [],
+    "São Paulo": [],
+    "Atlético-MG": [],
+    "Corinthians": [],
+    "Cruzeiro": [],
+    "Botafogo": [],
+    "Vitória": [],
+    "Internacional": [],
+    "Santos": [],
+    "Grêmio": [],
+    "Vasco da Gama": [],
+    "Remo": [],
+    "Mirassol": [],
+    "Chapecoense": []
+  },
+  "avisos": [
+    "Aguardando a primeira execução online do workflow Atualizar Brasileirao (ESPN) após a Execução 9 para tentar preencher elencos via ESPN roster."
+  ]
 }
