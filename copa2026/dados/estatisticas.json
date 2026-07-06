@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-06T02:42:44.128278Z",
+  "atualizado_em": "2026-07-06T18:13:17.085075Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 92,
@@ -57,7 +57,7 @@
     {
       "nome": "Harry Kane",
       "equipe": "ENG",
-      "gols": 5,
+      "gols": 6,
       "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
@@ -97,6 +97,21 @@
         "760505"
       ],
       "total_cartoes": 1
+    },
+    {
+      "nome": "Julián Quiñones",
+      "equipe": "MEX",
+      "gols": 4,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760415",
+        "760467",
+        "760491",
+        "760505"
+      ],
+      "total_cartoes": 0
     },
     {
       "nome": "Mikel Oyarzabal",
@@ -260,20 +275,6 @@
       "total_cartoes": 1
     },
     {
-      "nome": "Julián Quiñones",
-      "equipe": "MEX",
-      "gols": 3,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760415",
-        "760467",
-        "760491"
-      ],
-      "total_cartoes": 0
-    },
-    {
       "nome": "Kai Havertz",
       "equipe": "GER",
       "gols": 3,
@@ -296,6 +297,20 @@
       "jogos": [
         "760444",
         "760465"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Raúl Jiménez",
+      "equipe": "MEX",
+      "gols": 3,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760415",
+        "760491",
+        "760505"
       ],
       "total_cartoes": 0
     },
@@ -561,19 +576,6 @@
       "jogos": [
         "760427",
         "760476"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Raúl Jiménez",
-      "equipe": "MEX",
-      "gols": 2,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760415",
-        "760491"
       ],
       "total_cartoes": 0
     },
@@ -2927,7 +2929,7 @@
     {
       "nome": "Harry Kane",
       "equipe": "ENG",
-      "gols": 5,
+      "gols": 6,
       "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
@@ -3082,14 +3084,15 @@
     {
       "nome": "Julián Quiñones",
       "equipe": "MEX",
-      "gols": 3,
+      "gols": 4,
       "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
         "760415",
         "760467",
-        "760491"
+        "760491",
+        "760505"
       ],
       "total_cartoes": 0
     },
@@ -5422,6 +5425,18 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Johan Vásquez",
+      "equipe": "MEX",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760505"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Johny Placide",
       "equipe": "HAI",
       "gols": 0,
@@ -5455,6 +5470,18 @@
       "vermelhos": 0,
       "jogos": [
         "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Jordan Henderson",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760505"
       ],
       "total_cartoes": 1
     },
@@ -6714,6 +6741,15 @@
       "media_gols": 2.75
     },
     {
+      "equipe": "ENG",
+      "gols": 11,
+      "assistencias": 9,
+      "amarelos": 7,
+      "vermelhos": 1,
+      "jogos": 5,
+      "media_gols": 2.2
+    },
+    {
       "equipe": "SEN",
       "gols": 10,
       "assistencias": 9,
@@ -6741,20 +6777,20 @@
       "media_gols": 2.0
     },
     {
-      "equipe": "ENG",
-      "gols": 10,
-      "assistencias": 9,
-      "amarelos": 6,
-      "vermelhos": 1,
-      "jogos": 5,
-      "media_gols": 2.0
-    },
-    {
       "equipe": "MAR",
       "gols": 10,
       "assistencias": 9,
       "amarelos": 6,
       "vermelhos": 0,
+      "jogos": 5,
+      "media_gols": 2.0
+    },
+    {
+      "equipe": "MEX",
+      "gols": 10,
+      "assistencias": 7,
+      "amarelos": 4,
+      "vermelhos": 1,
       "jogos": 5,
       "media_gols": 2.0
     },
@@ -6811,15 +6847,6 @@
       "vermelhos": 0,
       "jogos": 4,
       "media_gols": 2.0
-    },
-    {
-      "equipe": "MEX",
-      "gols": 8,
-      "assistencias": 7,
-      "amarelos": 3,
-      "vermelhos": 1,
-      "jogos": 5,
-      "media_gols": 1.6
     },
     {
       "equipe": "SWE",
