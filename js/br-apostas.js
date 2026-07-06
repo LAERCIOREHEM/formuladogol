@@ -1,6 +1,6 @@
 /* ========================================================================== 
    br-apostas.js — Apostas logadas do Brasileirão 2026
-   Execução 10: usuário/PIN, admin, janela por rodada, sigilo e comprovante.
+   Execução 13: rankings, palpites públicos, progresso e auditoria filtrados por liga.
    ========================================================================== */
 (function (global, document) {
   "use strict";
@@ -380,6 +380,48 @@
     return l ? l.nome : "Liga Geral";
   }
 
+  function ligaSlugAtual() {
+    const l = ligaAtualObj();
+    return l ? (l.slug || l.liga_id || "liga-geral") : "liga-geral";
+  }
+
+  function rankingPorLigaPayload(payload, ligaId) {
+    const porLiga = (payload && (payload.rankings_por_liga || payload.ranking_por_liga)) || {};
+    const liga = state.ligas.find(l => String(l.liga_id) === String(ligaId)) || ligaAtualObj();
+    const chaves = [
+      liga?.liga_id,
+      liga?.slug,
+      normalizarTexto(liga?.nome || ""),
+      "liga-geral"
+    ].filter(Boolean).map(String);
+    for (const k of chaves) {
+      if (Array.isArray(porLiga[k])) return porLiga[k];
+    }
+    return null;
+  }
+
+  function rankingRodadaPorLiga(ap, ligaId) {
+    if (!ap) return [];
+    const porLiga = (ap.rankings_por_liga || ap.ranking_por_liga || {});
+    const liga = state.ligas.find(l => String(l.liga_id) === String(ligaId)) || ligaAtualObj();
+    const chaves = [liga?.liga_id, liga?.slug, normalizarTexto(liga?.nome || ""), "liga-geral"].filter(Boolean).map(String);
+    for (const k of chaves) {
+      if (Array.isArray(porLiga[k])) return porLiga[k];
+    }
+    return Array.isArray(ap.ranking) ? ap.ranking : [];
+  }
+
+  function vencedoresRodadaPorLiga(ap, ligaId) {
+    if (!ap) return [];
+    const porLiga = (ap.vencedores_por_liga || {});
+    const liga = state.ligas.find(l => String(l.liga_id) === String(ligaId)) || ligaAtualObj();
+    const chaves = [liga?.liga_id, liga?.slug, normalizarTexto(liga?.nome || ""), "liga-geral"].filter(Boolean).map(String);
+    for (const k of chaves) {
+      if (Array.isArray(porLiga[k])) return porLiga[k];
+    }
+    return Array.isArray(ap.vencedores) ? ap.vencedores : [];
+  }
+
   function renderLigaBox() {
     const box = $("#liga-box");
     if (!box || !state.usuario) return;
@@ -405,11 +447,22 @@
 
   async function carregarPublicos() {
     try {
-      state.publicos = await rpcRows("br_listar_palpites_publicos", {
-        p_rodada: state.rodada,
-        p_temporada: CFG.temporada || 2026
-      });
+      if (state.usuario && state.ligaAtual) {
+        state.publicos = await rpcRows("br_listar_palpites_publicos_liga", {
+          p_participante_id: state.usuario.id,
+          p_token: state.token,
+          p_liga_id: state.ligaAtual,
+          p_rodada: state.rodada,
+          p_temporada: CFG.temporada || 2026
+        });
+      } else {
+        state.publicos = await rpcRows("br_listar_palpites_publicos", {
+          p_rodada: state.rodada,
+          p_temporada: CFG.temporada || 2026
+        });
+      }
     } catch (err) {
+      console.warn("Palpites públicos por liga indisponíveis", err);
       state.publicos = [];
     }
   }
@@ -592,16 +645,17 @@
   function renderRanking() {
     const root = $("#conteudo");
     const ap = apuracaoRodada(state.rodada);
-    const geral = (state.rankingApostas && state.rankingApostas.ranking_geral) || (state.apuracao && state.apuracao.ranking_geral) || [];
+    const geral = rankingPorLigaPayload(state.rankingApostas, state.ligaAtual) || rankingPorLigaPayload(state.apuracao, state.ligaAtual) || (state.rankingApostas && state.rankingApostas.ranking_geral) || (state.apuracao && state.apuracao.ranking_geral) || [];
     if (!ap || ap.sigilosa) {
       root.innerHTML = `<section class="panel"><div class="panel-inner empty"><strong>Ranking da rodada ainda não publicado.</strong><p>A apuração só aparece aqui depois que a rodada tiver resultados e for marcada como apurada/publicada. Enquanto isso, os palpites seguem sigilosos.</p>${state.usuario?.admin ? `<p class="muted-note">Admin: rode o workflow <strong>Apurar Apostas Brasileirão</strong> após os jogos e depois publique a rodada quando quiser liberar para todos.</p>` : ""}</div></section>${renderRankingGeral(geral)}`;
       return;
     }
-    const ranking = ap.ranking || [];
+    const ranking = rankingRodadaPorLiga(ap, state.ligaAtual);
+    const vencedoresLiga = vencedoresRodadaPorLiga(ap, state.ligaAtual);
     root.innerHTML = `<section class="ranking-grid">
       <article class="panel"><div class="panel-inner">
         <div class="kicker">Ranking da rodada</div><h2>Rodada ${state.rodada} · ${escapeHtml(nomeLigaAtual())}</h2>
-        <p>${(ap.vencedores || []).length ? `🏆 Vencedor(es): <strong>${(ap.vencedores || []).map(escapeHtml).join(", ")}</strong>` : "Aguardando jogos apurados."}</p>
+        <p>${vencedoresLiga.length ? `🏆 Vencedor(es) da liga: <strong>${vencedoresLiga.map(escapeHtml).join(", ")}</strong>` : "Aguardando jogos apurados nesta liga."}</p>
         ${ranking.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Participante</th><th>Pontos</th><th>Cravadas</th><th>Saldo</th><th>Resultado</th><th>Erros</th></tr></thead><tbody>${ranking.map(r => `<tr><td>${r.pos}</td><td>${escapeHtml(r.membro)}</td><td class="num gold-num">${r.pontos}</td><td>${r.cravadas}</td><td>${r.saldos}</td><td>${r.resultados}</td><td>${r.erros}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Nenhum jogo apurado nesta rodada.</div>`}
       </div></article>
       <article class="panel"><div class="panel-inner">
@@ -615,7 +669,7 @@
   function renderRankingGeral(geral) {
     const lista = Array.isArray(geral) ? geral : [];
     if (!lista.length) return `<section class="panel"><div class="panel-inner empty">Ranking acumulado ainda sem rodadas publicadas.</div></section>`;
-    return `<section class="panel"><div class="panel-inner"><div class="kicker">Ranking acumulado</div><h2>Bolão de placares</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Participante</th><th>Pontos</th><th>Cravadas</th><th>Saldo</th><th>Resultado</th><th>Vitórias de rodada</th></tr></thead><tbody>${lista.map(r => `<tr><td>${r.pos}</td><td>${escapeHtml(r.membro)}</td><td class="num gold-num">${r.pontos}</td><td>${r.cravadas}</td><td>${r.saldos}</td><td>${r.resultados}</td><td>${r.vitorias_rodada || 0}</td></tr>`).join("")}</tbody></table></div></div></section>`;
+    return `<section class="panel"><div class="panel-inner"><div class="kicker">Ranking acumulado</div><h2>Bolão de placares · ${escapeHtml(nomeLigaAtual())}</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Participante</th><th>Pontos</th><th>Cravadas</th><th>Saldo</th><th>Resultado</th><th>Vitórias de rodada</th></tr></thead><tbody>${lista.map(r => `<tr><td>${r.pos}</td><td>${escapeHtml(r.membro)}</td><td class="num gold-num">${r.pontos}</td><td>${r.cravadas}</td><td>${r.saldos}</td><td>${r.resultados}</td><td>${r.vitorias_rodada || 0}</td></tr>`).join("")}</tbody></table></div></div></section>`;
   }
 
   async function renderPublico() {
@@ -648,23 +702,35 @@
     if (!state.usuario?.admin) return;
     try {
       const total = jogosDaRodada(state.rodada).length;
-      const [participantes, progresso, ligas, ligaMembros] = await Promise.all([
+      const [participantes, ligas] = await Promise.all([
         rpcRows("br_admin_listar_participantes", { p_admin_id: state.usuario.id, p_token: state.token }),
-        rpcRows("br_admin_progresso_rodada", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada, p_total_jogos: total }),
-        rpcRows("br_admin_listar_ligas", { p_admin_id: state.usuario.id, p_token: state.token }),
-        rpcRows("br_admin_listar_liga_participantes", { p_admin_id: state.usuario.id, p_token: state.token, p_liga_id: null })
+        rpcRows("br_admin_listar_ligas", { p_admin_id: state.usuario.id, p_token: state.token })
       ]);
       state.participantes = participantes;
-      state.progresso = progresso;
       state.ligasAdmin = ligas;
-      state.ligaMembros = ligaMembros;
       if (!state.adminLigaSelecionada && ligas.length) state.adminLigaSelecionada = ligas[0].liga_id;
+      const [progresso, ligaMembros] = await Promise.all([
+        rpcRows("br_admin_progresso_rodada_liga", {
+          p_admin_id: state.usuario.id,
+          p_token: state.token,
+          p_temporada: CFG.temporada || 2026,
+          p_rodada: state.rodada,
+          p_total_jogos: total,
+          p_liga_id: state.adminLigaSelecionada || null
+        }),
+        rpcRows("br_admin_listar_liga_participantes", { p_admin_id: state.usuario.id, p_token: state.token, p_liga_id: null })
+      ]);
+      state.progresso = progresso;
+      state.ligaMembros = ligaMembros;
     } catch (err) {
-      console.warn("Admin indisponível", err);
-      state.participantes = [];
-      state.progresso = [];
-      state.ligasAdmin = [];
-      state.ligaMembros = [];
+      console.warn("Admin por liga indisponível; tentando fallback geral", err);
+      try {
+        const total = jogosDaRodada(state.rodada).length;
+        state.progresso = await rpcRows("br_admin_progresso_rodada", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada, p_total_jogos: total });
+      } catch (_) { state.progresso = []; }
+      state.participantes = state.participantes || [];
+      state.ligasAdmin = state.ligasAdmin || [];
+      state.ligaMembros = state.ligaMembros || [];
     }
   }
 
@@ -676,15 +742,37 @@
     if (!state.usuario?.admin) return;
     try {
       const [rel, eventos] = await Promise.all([
-        rpcRows("br_admin_relatorio_auditoria", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada, p_total_jogos: jogosDaRodada(state.rodada).length }),
-        rpcRows("br_admin_auditoria_eventos", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada })
+        rpcRows("br_admin_relatorio_auditoria_liga", {
+          p_admin_id: state.usuario.id,
+          p_token: state.token,
+          p_temporada: CFG.temporada || 2026,
+          p_rodada: state.rodada,
+          p_total_jogos: jogosDaRodada(state.rodada).length,
+          p_liga_id: state.adminLigaSelecionada || state.ligaAtual || null
+        }),
+        rpcRows("br_admin_auditoria_eventos_liga", {
+          p_admin_id: state.usuario.id,
+          p_token: state.token,
+          p_temporada: CFG.temporada || 2026,
+          p_rodada: state.rodada,
+          p_liga_id: state.adminLigaSelecionada || state.ligaAtual || null
+        })
       ]);
       state.auditoria = rel;
       state.auditoriaEventos = eventos;
     } catch (err) {
-      console.warn("Auditoria indisponível", err);
-      state.auditoria = [];
-      state.auditoriaEventos = [];
+      console.warn("Auditoria por liga indisponível; usando fallback geral", err);
+      try {
+        const [rel, eventos] = await Promise.all([
+          rpcRows("br_admin_relatorio_auditoria", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada, p_total_jogos: jogosDaRodada(state.rodada).length }),
+          rpcRows("br_admin_auditoria_eventos", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada })
+        ]);
+        state.auditoria = rel;
+        state.auditoriaEventos = eventos;
+      } catch (_) {
+        state.auditoria = [];
+        state.auditoriaEventos = [];
+      }
     }
   }
 
@@ -696,8 +784,8 @@
     }
     await carregarAuditoria();
     root.innerHTML = `<section class="panel"><div class="panel-inner">
-      <div class="kicker">Relatório de auditoria</div><h2>Rodada ${state.rodada}</h2>
-      <p>Conferência administrativa: preenchimento, hashes, primeira/última gravação e quantidade de alterações. Os placares continuam preservados pelas regras de publicação.</p>
+      <div class="kicker">Relatório de auditoria por liga</div><h2>Rodada ${state.rodada} · ${escapeHtml(nomeLigaAtual())}</h2>
+      <p>Conferência administrativa filtrada pela liga selecionada: preenchimento, hashes, primeira/última gravação e quantidade de alterações. Os placares continuam preservados pelas regras de publicação.</p>
       <div class="table-wrap"><table class="data-table"><thead><tr><th>Participante</th><th>Login</th><th>Preenchido</th><th>%</th><th>Hash</th><th>Primeiro envio</th><th>Última alteração</th><th>Alterações</th></tr></thead><tbody>
         ${state.auditoria.map(r => `<tr><td>${escapeHtml(r.nome)}</td><td>${escapeHtml(r.login)}</td><td>${r.total_palpites}/${r.total_jogos}</td><td>${Number(r.percentual || 0).toFixed(0)}%</td><td class="hash">${escapeHtml(r.hash_fechamento || "—")}</td><td>${fmtDataLonga(r.primeiro_envio)}</td><td>${fmtDataLonga(r.ultimo_envio)}</td><td>${r.alteracoes || 0}</td></tr>`).join("")}
       </tbody></table></div>
@@ -811,7 +899,7 @@
       ${renderLigasAdminHtml()}
       <article class="panel" style="grid-column:1/-1"><div class="panel-inner">
         <div class="kicker">Percentual preenchido</div><h2>Admin vê percentual, não placares</h2>
-        <p>Use a seção de ligas para organizar grupos. Nesta execução, o percentual abaixo continua geral; na próxima etapa ele será filtrado por liga no ranking e na auditoria.</p>
+        <p>O percentual abaixo já considera a liga selecionada. O admin acompanha preenchimento por liga sem ver placares antes da publicação.</p>
         <div class="table-wrap" style="margin-top:12px"><table class="data-table"><thead><tr><th>Participante</th><th>Login</th><th>Status</th><th>Ligas</th><th>Preenchido</th><th>%</th><th>Ações</th></tr></thead><tbody>
           ${state.progresso.map(p => `<tr><td>${escapeHtml(p.nome)}</td><td>${escapeHtml(p.login)}</td><td>${p.ativo ? "ativo" : "inativo"}${p.admin ? " · admin" : ""}</td><td>${ligasDoParticipante(p.participante_id).map(escapeHtml).join(", ") || "—"}</td><td>${p.total_palpites}/${p.total_jogos}</td><td><div class="progress-wrap"><div class="progress-bar" style="width:${Math.max(0, Math.min(100, Number(p.percentual || 0)))}%"></div></div></td><td class="action-cell"><button class="btn secondary" type="button" data-edit="${escapeAttr(p.participante_id)}">editar</button>${p.ativo ? `<button class="btn danger" type="button" data-inativar="${escapeAttr(p.participante_id)}">inativar</button>` : `<button class="btn secondary" type="button" data-reativar="${escapeAttr(p.participante_id)}">reativar</button>`}</td></tr>`).join("")}
         </tbody></table></div>

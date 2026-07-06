@@ -3,14 +3,11 @@
 """
 apurar_rodada.py — Apuração auditável das apostas do Brasileirão 2026.
 
-Gera JSONs públicos SEM quebrar o sigilo:
-  - dados-br/apuracao.json
-  - dados-br/ranking-apostas.json
-
-Regra de sigilo:
-  - rodadas com status diferente de 'apurada'/'publicada' e sem publica_em vencido
-    NÃO expõem palpites, pontos ou ranking no JSON público.
-  - o admin acompanha auditoria via RPC no Supabase; o público só vê após publicação.
+Execução 13:
+  - mantém sigilo das rodadas não publicadas;
+  - gera ranking geral;
+  - gera rankings acumulados e por rodada também por liga;
+  - a aposta continua única por participante/rodada.
 """
 from __future__ import annotations
 
@@ -189,28 +186,19 @@ def rest_get(tabela: str, params: dict[str, str]) -> list[dict[str, Any]]:
     return data
 
 
-def buscar_supabase() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
-    palpites = rest_get("br_palpites", {
-        "temporada": f"eq.{TEMPORADA}",
-        "select": "*",
-        "order": "rodada.asc,membro.asc,kickoff.asc",
-    })
-    configs = rest_get("br_config_rodadas", {
-        "temporada": f"eq.{TEMPORADA}",
-        "select": "*",
-        "order": "rodada.asc",
-    })
-    comprovantes = rest_get("br_comprovantes", {
-        "temporada": f"eq.{TEMPORADA}",
-        "select": "*",
-        "order": "rodada.asc,atualizado_em.desc",
-    })
-    auditoria = rest_get("br_palpites_auditoria", {
-        "temporada": f"eq.{TEMPORADA}",
-        "select": "*",
-        "order": "rodada.asc,criado_em.desc",
-    })
-    return palpites, configs, comprovantes, auditoria
+def buscar_supabase() -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    palpites = rest_get("br_palpites", {"temporada": f"eq.{TEMPORADA}", "select": "*", "order": "rodada.asc,membro.asc,kickoff.asc"})
+    configs = rest_get("br_config_rodadas", {"temporada": f"eq.{TEMPORADA}", "select": "*", "order": "rodada.asc"})
+    comprovantes = rest_get("br_comprovantes", {"temporada": f"eq.{TEMPORADA}", "select": "*", "order": "rodada.asc,atualizado_em.desc"})
+    auditoria = rest_get("br_palpites_auditoria", {"temporada": f"eq.{TEMPORADA}", "select": "*", "order": "rodada.asc,criado_em.desc"})
+    participantes = rest_get("br_participantes", {"select": "id,nome,login,ativo,admin", "order": "nome.asc"})
+    try:
+        ligas = rest_get("br_ligas", {"select": "id,nome,slug,descricao,ativa", "order": "nome.asc"})
+        liga_participantes = rest_get("br_liga_participantes", {"select": "liga_id,participante_id,papel,ativo", "order": "liga_id.asc"})
+    except Exception as exc:  # noqa: BLE001
+        print(f"Aviso: tabelas de liga indisponíveis; ranking por liga não será gerado: {exc}")
+        ligas, liga_participantes = [], []
+    return palpites, configs, comprovantes, auditoria, participantes, ligas, liga_participantes
 
 
 def config_publica(cfg: dict[str, Any] | None) -> bool:
@@ -246,15 +234,7 @@ def resumo_auditoria(rodada: int, palpites: list[dict[str, Any]], comprovantes: 
         key = str(p.get("participante_id") or p.get("membro") or "")
         if not key:
             continue
-        item = por_part.setdefault(key, {
-            "membro": p.get("membro") or "—",
-            "total_jogos": total_jogos,
-            "total_palpites": 0,
-            "primeiro_envio": None,
-            "ultimo_envio": None,
-            "hash_fechamento": p.get("hash_fechamento"),
-            "alteracoes": 0,
-        })
+        item = por_part.setdefault(key, {"participante_id": p.get("participante_id"), "membro": p.get("membro") or "—", "total_jogos": total_jogos, "total_palpites": 0, "primeiro_envio": None, "ultimo_envio": None, "hash_fechamento": p.get("hash_fechamento"), "alteracoes": 0})
         item["total_palpites"] += 1
         for campo in ("criado_em", "atualizado_em"):
             dt = parse_dt(p.get(campo))
@@ -270,21 +250,13 @@ def resumo_auditoria(rodada: int, palpites: list[dict[str, Any]], comprovantes: 
         if int(c.get("rodada") or 0) != rodada:
             continue
         key = str(c.get("participante_id") or "")
-        item = por_part.setdefault(key, {
-            "membro": key,
-            "total_jogos": total_jogos,
-            "total_palpites": int(c.get("total_palpites") or 0),
-            "primeiro_envio": c.get("criado_em"),
-            "ultimo_envio": c.get("atualizado_em"),
-            "hash_fechamento": c.get("hash_fechamento"),
-            "alteracoes": 0,
-        })
+        item = por_part.setdefault(key, {"participante_id": c.get("participante_id"), "membro": key, "total_jogos": total_jogos, "total_palpites": int(c.get("total_palpites") or 0), "primeiro_envio": c.get("criado_em"), "ultimo_envio": c.get("atualizado_em"), "hash_fechamento": c.get("hash_fechamento"), "alteracoes": 0})
         item["hash_fechamento"] = c.get("hash_fechamento") or item.get("hash_fechamento")
     for a in auditoria:
         if int(a.get("rodada") or 0) != rodada:
             continue
         key = str(a.get("participante_id") or a.get("membro") or "")
-        item = por_part.setdefault(key, {"membro": a.get("membro") or key, "total_jogos": total_jogos, "total_palpites": 0, "alteracoes": 0})
+        item = por_part.setdefault(key, {"participante_id": a.get("participante_id"), "membro": a.get("membro") or key, "total_jogos": total_jogos, "total_palpites": 0, "alteracoes": 0})
         item["alteracoes"] = int(item.get("alteracoes") or 0) + 1
     for item in por_part.values():
         total = int(item.get("total_jogos") or 0)
@@ -293,11 +265,64 @@ def resumo_auditoria(rodada: int, palpites: list[dict[str, Any]], comprovantes: 
     return sorted(por_part.values(), key=lambda x: str(x.get("membro") or ""))
 
 
-def apurar(palpites: list[dict[str, Any]], configs: list[dict[str, Any]], comprovantes: list[dict[str, Any]], auditoria: list[dict[str, Any]], jogos: list[dict[str, Any]], resultados: dict[str, dict[str, Any]]) -> dict[str, Any]:
+def ordenar_ranking(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    out = sorted(rows, key=lambda x: (-int(x.get("pontos") or 0), -int(x.get("cravadas") or 0), -int(x.get("saldos") or 0), -int(x.get("resultados") or 0), int(x.get("erros") or 0), str(x.get("membro") or "")))
+    for pos, row in enumerate(out, 1):
+        row["pos"] = pos
+    return out
+
+
+def gerar_indices_ligas(ligas: list[dict[str, Any]], liga_participantes: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], dict[str, set[str]]]:
+    ligas_map: dict[str, dict[str, Any]] = {}
+    membros_por_liga: dict[str, set[str]] = defaultdict(set)
+    for l in ligas:
+        if not l.get("ativa", True):
+            continue
+        lid = str(l.get("id") or "")
+        if not lid:
+            continue
+        slug = str(l.get("slug") or normalizar(l.get("nome")) or lid)
+        ligas_map[lid] = {"id": lid, "nome": l.get("nome"), "slug": slug, "descricao": l.get("descricao")}
+    for lp in liga_participantes:
+        if not lp.get("ativo", True):
+            continue
+        lid = str(lp.get("liga_id") or "")
+        pid = str(lp.get("participante_id") or "")
+        if lid in ligas_map and pid:
+            membros_por_liga[lid].add(pid)
+    return ligas_map, membros_por_liga
+
+
+def ranking_ligas(ranking: list[dict[str, Any]], ligas_map: dict[str, dict[str, Any]], membros_por_liga: dict[str, set[str]]) -> dict[str, list[dict[str, Any]]]:
+    saida: dict[str, list[dict[str, Any]]] = {}
+    for lid, liga in ligas_map.items():
+        membros = membros_por_liga.get(lid, set())
+        rows = [dict(r) for r in ranking if str(r.get("participante_id") or "") in membros]
+        rows = ordenar_ranking(rows)
+        # Publica tanto por id quanto por slug para o front encontrar com segurança.
+        saida[lid] = rows
+        if liga.get("slug"):
+            saida[str(liga["slug"])] = rows
+    return saida
+
+
+def vencedores_ligas(rankings_por_liga: dict[str, list[dict[str, Any]]]) -> dict[str, list[str]]:
+    out: dict[str, list[str]] = {}
+    for chave, ranking in rankings_por_liga.items():
+        if not ranking:
+            out[chave] = []
+            continue
+        top = ranking[0]
+        out[chave] = [r["membro"] for r in ranking if r.get("pontos") == top.get("pontos") and r.get("cravadas") == top.get("cravadas") and r.get("saldos") == top.get("saldos")]
+    return out
+
+
+def apurar(palpites: list[dict[str, Any]], configs: list[dict[str, Any]], comprovantes: list[dict[str, Any]], auditoria: list[dict[str, Any]], jogos: list[dict[str, Any]], resultados: dict[str, dict[str, Any]], ligas: list[dict[str, Any]], liga_participantes: list[dict[str, Any]]) -> dict[str, Any]:
     cfgs = por_rodada_config(configs)
     rodadas = sorted({int(p.get("rodada") or 0) for p in palpites if int(p.get("rodada") or 0) > 0} | set(cfgs.keys()))
     saida_rodadas: list[dict[str, Any]] = []
     geral: dict[str, dict[str, Any]] = {}
+    ligas_map, membros_por_liga = gerar_indices_ligas(ligas, liga_participantes)
 
     for rodada in rodadas:
         if rodada < 20:
@@ -306,20 +331,7 @@ def apurar(palpites: list[dict[str, Any]], configs: list[dict[str, Any]], compro
         publica = config_publica(cfg)
         total_jogos = total_jogos_rodada(jogos, rodada)
         palp_rodada = [p for p in palpites if int(p.get("rodada") or 0) == rodada]
-        base_rodada = {
-            "rodada": rodada,
-            "status": (cfg or {}).get("status") or "sem_configuracao",
-            "publicada": publica,
-            "sigilosa": not publica,
-            "participantes": len({p.get("participante_id") or p.get("membro") for p in palp_rodada}),
-            "total_jogos": total_jogos,
-            "jogos_apurados": 0,
-            "palpites_descartados_fora_do_prazo": 0,
-            "vencedores": [],
-            "ranking": [],
-            "jogos": [],
-            "auditoria_resumo": resumo_auditoria(rodada, palpites, comprovantes, auditoria, total_jogos),
-        }
+        base_rodada = {"rodada": rodada, "status": (cfg or {}).get("status") or "sem_configuracao", "publicada": publica, "sigilosa": not publica, "participantes": len({p.get("participante_id") or p.get("membro") for p in palp_rodada}), "total_jogos": total_jogos, "jogos_apurados": 0, "palpites_descartados_fora_do_prazo": 0, "vencedores": [], "vencedores_por_liga": {}, "ranking": [], "rankings_por_liga": {}, "jogos": [], "auditoria_resumo": resumo_auditoria(rodada, palpites, comprovantes, auditoria, total_jogos)}
         if not publica:
             saida_rodadas.append(base_rodada)
             continue
@@ -331,6 +343,7 @@ def apurar(palpites: list[dict[str, Any]], configs: list[dict[str, Any]], compro
 
         for p in palp_rodada:
             membro = str(p.get("membro") or "").strip()
+            participante_id = str(p.get("participante_id") or membro)
             if not membro:
                 continue
             eid = str(p.get("event_id") or p.get("jogo_chave") or "")
@@ -343,102 +356,47 @@ def apurar(palpites: list[dict[str, Any]], configs: list[dict[str, Any]], compro
             det = calcular(p, r)
             jogos_apurados.add(eid)
 
-            row = acumulado.setdefault(membro, {
-                "membro": membro,
-                "pontos": 0,
-                "cravadas": 0,
-                "saldos": 0,
-                "resultados": 0,
-                "erros": 0,
-                "palpites_validos": 0,
-            })
+            row = acumulado.setdefault(participante_id, {"participante_id": participante_id, "membro": membro, "pontos": 0, "cravadas": 0, "saldos": 0, "resultados": 0, "erros": 0, "palpites_validos": 0})
             row["pontos"] += det["pontos"]
             row["palpites_validos"] += 1
-            if det["tipo"] == "exato":
-                row["cravadas"] += 1
-            elif det["tipo"] == "saldo":
-                row["saldos"] += 1
-            elif det["tipo"] == "resultado":
-                row["resultados"] += 1
-            else:
-                row["erros"] += 1
+            if det["tipo"] == "exato": row["cravadas"] += 1
+            elif det["tipo"] == "saldo": row["saldos"] += 1
+            elif det["tipo"] == "resultado": row["resultados"] += 1
+            else: row["erros"] += 1
 
-            g = geral.setdefault(membro, {
-                "membro": membro,
-                "pontos": 0,
-                "cravadas": 0,
-                "saldos": 0,
-                "resultados": 0,
-                "erros": 0,
-                "palpites_validos": 0,
-                "rodadas_pontuadas": 0,
-                "vitorias_rodada": 0,
-            })
+            g = geral.setdefault(participante_id, {"participante_id": participante_id, "membro": membro, "pontos": 0, "cravadas": 0, "saldos": 0, "resultados": 0, "erros": 0, "palpites_validos": 0, "rodadas_pontuadas": 0, "vitorias_rodada": 0})
             g["pontos"] += det["pontos"]
             g["palpites_validos"] += 1
-            if det["tipo"] == "exato":
-                g["cravadas"] += 1
-            elif det["tipo"] == "saldo":
-                g["saldos"] += 1
-            elif det["tipo"] == "resultado":
-                g["resultados"] += 1
-            else:
-                g["erros"] += 1
+            if det["tipo"] == "exato": g["cravadas"] += 1
+            elif det["tipo"] == "saldo": g["saldos"] += 1
+            elif det["tipo"] == "resultado": g["resultados"] += 1
+            else: g["erros"] += 1
 
             jogo = detalhes_jogos.setdefault(eid, {"event_id": eid, "resultado": r, "palpites": []})
-            jogo["palpites"].append({
-                "membro": membro,
-                "palpite": f"{p.get('placar_mandante')}×{p.get('placar_visitante')}",
-                "placar_mandante": int(p.get("placar_mandante")),
-                "placar_visitante": int(p.get("placar_visitante")),
-                "pontos": det["pontos"],
-                "tipo": det["tipo"],
-                "hash_fechamento": p.get("hash_fechamento"),
-                "atualizado_em": p.get("atualizado_em"),
-            })
+            jogo["palpites"].append({"participante_id": participante_id, "membro": membro, "palpite": f"{p.get('placar_mandante')}×{p.get('placar_visitante')}", "placar_mandante": int(p.get("placar_mandante")), "placar_visitante": int(p.get("placar_visitante")), "pontos": det["pontos"], "tipo": det["tipo"], "hash_fechamento": p.get("hash_fechamento"), "atualizado_em": p.get("atualizado_em")})
 
-        ranking = sorted(acumulado.values(), key=lambda x: (-x["pontos"], -x["cravadas"], -x["saldos"], -x["resultados"], x.get("erros", 0), x["membro"]))
-        for pos, row in enumerate(ranking, 1):
-            row["pos"] = pos
-            if row["palpites_validos"]:
-                geral[row["membro"]]["rodadas_pontuadas"] += 1
+        ranking = ordenar_ranking(list(acumulado.values()))
+        for row in ranking:
+            if row["palpites_validos"] and row["participante_id"] in geral:
+                geral[row["participante_id"]]["rodadas_pontuadas"] += 1
 
         vencedores: list[str] = []
         if ranking:
             top = ranking[0]
-            vencedores = [
-                r["membro"] for r in ranking
-                if r["pontos"] == top["pontos"]
-                and r["cravadas"] == top["cravadas"]
-                and r["saldos"] == top["saldos"]
-                and r["resultados"] == top["resultados"]
-                and r.get("erros", 0) == top.get("erros", 0)
-            ]
+            vencedores = [r["membro"] for r in ranking if r["pontos"] == top["pontos"] and r["cravadas"] == top["cravadas"] and r["saldos"] == top["saldos"]]
             for nome in vencedores:
-                if nome in geral:
-                    geral[nome]["vitorias_rodada"] += 1
+                for g in geral.values():
+                    if g["membro"] == nome:
+                        g["vitorias_rodada"] += 1
 
-        base_rodada.update({
-            "jogos_apurados": len(jogos_apurados),
-            "palpites_descartados_fora_do_prazo": descartados,
-            "vencedores": vencedores,
-            "ranking": ranking,
-            "jogos": sorted(detalhes_jogos.values(), key=lambda x: str((x.get("resultado") or {}).get("data_iso") or "")),
-        })
+        rankings_por_liga = ranking_ligas(ranking, ligas_map, membros_por_liga)
+        base_rodada.update({"jogos_apurados": len(jogos_apurados), "palpites_descartados_fora_do_prazo": descartados, "vencedores": vencedores, "vencedores_por_liga": vencedores_ligas(rankings_por_liga), "ranking": ranking, "rankings_por_liga": rankings_por_liga, "jogos": sorted(detalhes_jogos.values(), key=lambda x: str((x.get("resultado") or {}).get("data_iso") or ""))})
         saida_rodadas.append(base_rodada)
 
-    ranking_geral = sorted(geral.values(), key=lambda x: (-x["pontos"], -x["cravadas"], -x["saldos"], -x["resultados"], x.get("erros", 0), x["membro"]))
-    for pos, row in enumerate(ranking_geral, 1):
-        row["pos"] = pos
+    ranking_geral = ordenar_ranking(list(geral.values()))
+    rankings_por_liga = ranking_ligas(ranking_geral, ligas_map, membros_por_liga)
 
-    return {
-        "temporada": TEMPORADA,
-        "atualizado_em": iso_agora(),
-        "fonte": "Supabase br_palpites + JSONs ESPN locais",
-        "politica_sigilo": "Rodadas não publicadas não expõem palpites nem ranking no JSON público.",
-        "rodadas": saida_rodadas,
-        "ranking_geral": ranking_geral,
-    }
+    return {"temporada": TEMPORADA, "atualizado_em": iso_agora(), "fonte": "Supabase br_palpites + JSONs ESPN locais", "politica_sigilo": "Rodadas não publicadas não expõem palpites nem ranking no JSON público.", "ligas": list(ligas_map.values()), "rodadas": saida_rodadas, "ranking_geral": ranking_geral, "rankings_por_liga": rankings_por_liga}
 
 
 def gravar(path: Path, payload: dict[str, Any]) -> None:
@@ -450,26 +408,21 @@ def gravar(path: Path, payload: dict[str, Any]) -> None:
 
 def main() -> int:
     try:
-        palpites, configs, comprovantes, auditoria = buscar_supabase()
+        palpites, configs, comprovantes, auditoria, participantes, ligas, liga_participantes = buscar_supabase()
     except Exception as exc:  # noqa: BLE001
         print(f"ERRO: {exc}")
         return 1
 
     jogos = carregar_todos_jogos()
     resultados = resultado_mapa(jogos)
-    payload = apurar(palpites, configs, comprovantes, auditoria, jogos, resultados)
+    payload = apurar(palpites, configs, comprovantes, auditoria, jogos, resultados, ligas, liga_participantes)
     gravar(ROOT / "dados-br" / "apuracao.json", payload)
-    gravar(ROOT / "dados-br" / "ranking-apostas.json", {
-        "temporada": TEMPORADA,
-        "atualizado_em": payload["atualizado_em"],
-        "fonte": payload["fonte"],
-        "politica_sigilo": payload["politica_sigilo"],
-        "ranking_geral": payload["ranking_geral"],
-    })
+    gravar(ROOT / "dados-br" / "ranking-apostas.json", {"temporada": TEMPORADA, "atualizado_em": payload["atualizado_em"], "fonte": payload["fonte"], "politica_sigilo": payload["politica_sigilo"], "ligas": payload.get("ligas", []), "ranking_geral": payload["ranking_geral"], "rankings_por_liga": payload.get("rankings_por_liga", {})})
 
-    print("Apuração concluída com política de sigilo.")
+    print("Apuração concluída com política de sigilo e rankings por liga.")
     print(f"Rodadas no arquivo: {len(payload['rodadas'])}")
     print(f"Participantes no ranking geral publicado: {len(payload['ranking_geral'])}")
+    print(f"Ligas publicadas: {len(payload.get('ligas', []))}")
     return 0
 
 
