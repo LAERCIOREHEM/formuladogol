@@ -459,7 +459,14 @@
   function render(o) { if (ABA === "placares") renderPlacares(o); else renderBolao(o); }
 
   function renderBolao(o) {
-    const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos };
+    const eficienciaNum = r => {
+      const a = Number(r && r.atuais);
+      const p = Number(r && r.perdidos);
+      if (!Number.isFinite(a) || !Number.isFinite(p)) return -1;
+      const decidido = a + p;
+      return decidido > 0 ? a / decidido : -1;
+    };
+    const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos, eficiencia: x => eficienciaNum(x.r) };
     const kf = KEY[ORDEM] || KEY.atuais;
     const lin = PART.map(p => {
       const r = COPA_PONTUACAO.calcular(p.d, o);
@@ -471,7 +478,7 @@
 
     const opts = PART.map(p => p.nome).sort((a, b) => a.localeCompare(b))
       .map(n => `<option value="${n}" ${n === FILTRO ? "selected" : ""}>${n}</option>`).join("");
-    const ROT = { atuais: "conquistados", possiveis: "possíveis", perdidos: "perdidos" };
+    const ROT = { atuais: "conquistados", possiveis: "possíveis", perdidos: "perdidos", eficiencia: "eficiência" };
     const pills = Object.keys(ROT).map(k => `<button class="ordbtn ${ORDEM === k ? "on" : ""}" data-ord="${k}">${ROT[k]}</button>`).join("");
     const controles = `<div class="ctrlbar">
       <select id="filtro-part"><option value="">👥 Todos os participantes</option>${opts}</select>
