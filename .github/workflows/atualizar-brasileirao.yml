@@ -20,6 +20,7 @@ on:
     paths:
       - 'atualizar_espn.py'
       - 'scripts/gerar_estatisticas_brasileirao.py'
+      - 'scripts/buscar_elencos_brasileirao.py'
       - '.github/workflows/atualizar-brasileirao.yml'
 
 permissions:
@@ -66,11 +67,14 @@ jobs:
       - name: Gerar estatísticas e ranking de desempenho
         run: python scripts/gerar_estatisticas_brasileirao.py
 
+      - name: Buscar elencos dos clubes (ESPN roster)
+        run: python scripts/buscar_elencos_brasileirao.py
+
       - name: Conferir e validar JSONs gerados
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/jogadores.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/jogadores.json dados-br/elencos.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -100,7 +104,10 @@ jobs:
           assert isinstance(jogadores.get('artilharia'), list), 'jogadores.json sem artilharia'
           assert isinstance(jogadores.get('assistencias'), list), 'jogadores.json sem assistencias'
           assert isinstance(jogadores.get('participacoes_gol'), list), 'jogadores.json sem participacoes_gol'
-          print('  OK   Estatísticas: 20 clubes, ranking e jogadores.json gerados')
+          elencos = json.load(open('dados-br/elencos.json', encoding='utf-8'))
+          assert isinstance(elencos.get('elencos'), dict), 'elencos.json sem objeto elencos'
+          assert len(elencos.get('elencos') or {}) == 20, 'elencos.json sem 20 clubes'
+          print('  OK   Estatísticas: 20 clubes, ranking, jogadores.json e elencos.json gerados')
           PY
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
@@ -124,6 +131,7 @@ jobs:
             "dados-br/estatisticas.json"
             "dados-br/ranking-desempenho.json"
             "dados-br/jogadores.json"
+            "dados-br/elencos.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
