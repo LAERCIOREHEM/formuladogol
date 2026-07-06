@@ -70,7 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/jogadores.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -96,7 +96,11 @@ jobs:
           rank = json.load(open('dados-br/ranking-desempenho.json', encoding='utf-8'))
           assert len(stats.get('clubes') or []) == 20, 'estatisticas.json sem 20 clubes'
           assert len(rank.get('ranking') or []) == 20, 'ranking-desempenho.json sem 20 clubes'
-          print('  OK   Estatísticas: 20 clubes e ranking de desempenho gerados')
+          jogadores = json.load(open('dados-br/jogadores.json', encoding='utf-8'))
+          assert isinstance(jogadores.get('artilharia'), list), 'jogadores.json sem artilharia'
+          assert isinstance(jogadores.get('assistencias'), list), 'jogadores.json sem assistencias'
+          assert isinstance(jogadores.get('participacoes_gol'), list), 'jogadores.json sem participacoes_gol'
+          print('  OK   Estatísticas: 20 clubes, ranking e jogadores.json gerados')
           PY
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
@@ -119,6 +123,7 @@ jobs:
             "resultados.json"
             "dados-br/estatisticas.json"
             "dados-br/ranking-desempenho.json"
+            "dados-br/jogadores.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
