@@ -1,0 +1,193 @@
+(function(){
+  "use strict";
+
+  const $ = (sel) => document.querySelector(sel);
+  const fmtData = new Intl.DateTimeFormat("pt-BR", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
+  const cacheBust = () => "?v=" + Date.now();
+  const state = { clubes: [], tabela: [], ranking: [], eventos: [], elencos: {}, filtroTexto: "", filtroRegiao: "Todas", selecionado: "" };
+
+  function escapeHtml(value){
+    return String(value ?? "").replace(/[&<>'"]/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch]));
+  }
+  function escapeAttr(value){ return escapeHtml(value); }
+  function slug(value){
+    return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+  async function fetchJson(path, fallback){
+    try {
+      const res = await fetch(path + cacheBust(), { cache: "no-store" });
+      if (!res.ok) throw new Error(path + " HTTP " + res.status);
+      return await res.json();
+    } catch (err) {
+      console.warn("Falha ao carregar", path, err);
+      return fallback;
+    }
+  }
+  function escudoHtml(c, cls="club-logo"){
+    if (c && c.escudo) return `<img class="${cls}" src="${escapeAttr(c.escudo)}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+    return `<span class="${cls}" aria-hidden="true">${escapeHtml((c && (c.sigla || c.nome) || "?").slice(0,3).toUpperCase())}</span>`;
+  }
+  function tabelaDo(nome){ return state.tabela.find(t => t.time === nome) || {}; }
+  function rankingDo(nome){ return state.ranking.find(r => r.time === nome) || {}; }
+  function eventosDo(nome){
+    return state.eventos.filter(e => e.mandante === nome || e.visitante === nome)
+      .sort((a,b) => String(a.data_iso||"").localeCompare(String(b.data_iso||"")));
+  }
+  function isPost(e){ return String(e.estado || "").toLowerCase() === "post" || (e.placar_mandante !== null && e.placar_mandante !== undefined && e.placar_visitante !== null && e.placar_visitante !== undefined); }
+  function dataCurta(iso){
+    try { return fmtData.format(new Date(iso)); } catch { return "—"; }
+  }
+  function renderResumo(){
+    const estados = [...new Set(state.clubes.map(c => c.uf))].length;
+    const lider = state.tabela[0];
+    const numeroTitulos = (c) => parseInt(String(c.titulos_brasileiros || "0"), 10) || 0;
+    const maisTitulos = state.clubes.slice().sort((a,b) => numeroTitulos(b) - numeroTitulos(a))[0];
+    const regioes = [...new Set(state.clubes.map(c => c.regiao))].length;
+    $("#cards-resumo").innerHTML = `
+      <article class="summary-card"><div class="summary-label">Clubes</div><div class="summary-value">${state.clubes.length}</div><div class="summary-sub">Série A 2026 mapeada</div></article>
+      <article class="summary-card"><div class="summary-label">UFs</div><div class="summary-value">${estados}</div><div class="summary-sub">presença nacional no torneio</div></article>
+      <article class="summary-card"><div class="summary-label">Líder atual</div><div class="summary-value">${escapeHtml(lider?.time || "—")}</div><div class="summary-sub">${lider ? `${lider.pontos} pts · ${lider.aproveitamento}%` : "aguardando tabela"}</div></article>
+      <article class="summary-card"><div class="summary-label">Maior campeão</div><div class="summary-value">${escapeHtml(maisTitulos?.nome || "—")}</div><div class="summary-sub">${escapeHtml(maisTitulos?.titulos_brasileiros || "—")} títulos brasileiros</div></article>
+    `;
+  }
+  function renderChips(){
+    const regioes = ["Todas", ...new Set(state.clubes.map(c => c.regiao).filter(Boolean).sort())];
+    $("#chips-regiao").innerHTML = regioes.map(r => `<button class="chip ${state.filtroRegiao === r ? "active" : ""}" type="button" data-regiao="${escapeAttr(r)}">${escapeHtml(r)}</button>`).join("");
+    $("#chips-regiao").querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => {
+      state.filtroRegiao = btn.dataset.regiao || "Todas";
+      render();
+    }));
+  }
+  function clubesFiltrados(){
+    const termo = slug(state.filtroTexto);
+    return state.clubes.filter(c => {
+      if (state.filtroRegiao !== "Todas" && c.regiao !== state.filtroRegiao) return false;
+      if (!termo) return true;
+      const hay = slug([c.nome, c.nome_completo, c.cidade, c.uf, c.estadio, c.mascote, c.apelido].join(" "));
+      return hay.includes(termo);
+    });
+  }
+  function renderGrid(){
+    const lista = clubesFiltrados();
+    if (!lista.length) {
+      $("#grid-clubes").innerHTML = `<div class="empty-state">Nenhum clube encontrado para o filtro atual.</div>`;
+      return;
+    }
+    $("#grid-clubes").innerHTML = lista.map(c => {
+      const t = tabelaDo(c.nome);
+      const r = rankingDo(c.nome);
+      return `<article class="club-card ${state.selecionado === c.nome ? "active" : ""}" tabindex="0" role="button" data-clube="${escapeAttr(c.nome)}">
+        <div class="club-head">
+          ${escudoHtml(c)}
+          <div><div class="club-name">${escapeHtml(c.nome)}</div><div class="club-sub">${escapeHtml(c.cidade)}-${escapeHtml(c.uf)} · ${escapeHtml(c.apelido)}</div></div>
+        </div>
+        <p>${escapeHtml(c.curiosidade)}</p>
+        <div class="club-kpis">
+          <div class="kpi"><strong>${t.pos || "—"}º</strong><span>posição</span></div>
+          <div class="kpi"><strong>${t.pontos ?? "—"}</strong><span>pontos</span></div>
+          <div class="kpi"><strong>${r.score ?? "—"}</strong><span>índice</span></div>
+        </div>
+      </article>`;
+    }).join("");
+    $("#grid-clubes").querySelectorAll(".club-card").forEach(card => {
+      const select = () => selecionar(card.dataset.clube);
+      card.addEventListener("click", select);
+      card.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(); } });
+    });
+  }
+  function selecionar(nome){
+    state.selecionado = nome;
+    location.hash = slug(nome);
+    renderGrid();
+    renderDetalhe();
+    document.getElementById("detalhe-wrapper")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function renderDetalhe(){
+    const c = state.clubes.find(x => x.nome === state.selecionado) || state.clubes[0];
+    if (!c) return;
+    state.selecionado = c.nome;
+    const t = tabelaDo(c.nome);
+    const r = rankingDo(c.nome);
+    $("#detalhe-wrapper").hidden = false;
+    $("#detalhe-clube").innerHTML = `
+      <div class="detail-hero">
+        ${escudoHtml(c)}
+        <div>
+          <div class="kicker">${escapeHtml(c.nome_completo)}</div>
+          <h2>${escapeHtml(c.nome)}</h2>
+          <p>${escapeHtml(c.momento)}</p>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div class="info-card"><span>Cidade / UF</span><strong>${escapeHtml(c.cidade)}-${escapeHtml(c.uf)}</strong></div>
+        <div class="info-card"><span>Estádio</span><strong>${escapeHtml(c.estadio)}</strong></div>
+        <div class="info-card"><span>Capacidade</span><strong>${escapeHtml(c.capacidade)}</strong></div>
+        <div class="info-card"><span>Fundação</span><strong>${escapeHtml(c.fundacao)}</strong></div>
+        <div class="info-card"><span>Mascote</span><strong>${escapeHtml(c.mascote)}</strong></div>
+        <div class="info-card"><span>Títulos BR</span><strong>${escapeHtml(c.titulos_brasileiros)}</strong></div>
+        <div class="info-card"><span>Torcida</span><strong>${escapeHtml(c.torcida)}</strong></div>
+        <div class="info-card"><span>Tabela atual</span><strong>${t.pos ? `${t.pos}º · ${t.pontos} pts · SG ${t.sg}` : "aguardando"}</strong></div>
+      </div>
+      <p><strong>Curiosidade:</strong> ${escapeHtml(c.curiosidade)}</p>
+      <p><strong>Desempenho:</strong> ${escapeHtml(r.justificativa || "Ranking de desempenho será exibido após geração do robô.")}</p>
+    `;
+    renderJogos(c.nome);
+    renderElenco(c.nome);
+  }
+  function renderJogos(nome){
+    const eventos = eventosDo(nome);
+    const agora = new Date();
+    const ultimos = eventos.filter(isPost).slice(-4).reverse();
+    const proximos = eventos.filter(e => !isPost(e) && new Date(e.data_iso) >= agora).slice(0,4);
+    const bloco = [];
+    if (proximos.length) {
+      bloco.push(`<div class="kicker">Próximos</div>`);
+      proximos.forEach(e => bloco.push(rowJogo(e, false)));
+    }
+    if (ultimos.length) {
+      bloco.push(`<div class="kicker" style="margin-top:${proximos.length ? 12 : 0}px">Últimos</div>`);
+      ultimos.forEach(e => bloco.push(rowJogo(e, true)));
+    }
+    $("#jogos-clube").innerHTML = bloco.join("") || `<div class="empty-state">Ainda não há jogos mapeados para este clube nos snapshots locais.</div>`;
+  }
+  function rowJogo(e, finalizado){
+    const placar = finalizado ? `${e.placar_mandante ?? "—"} × ${e.placar_visitante ?? "—"}` : "vs";
+    return `<div class="row"><span class="date">${escapeHtml(dataCurta(e.data_iso))}</span><span>${escapeHtml(e.mandante)} × ${escapeHtml(e.visitante)}<br><small>${escapeHtml(e.estadio || "estádio a confirmar")}</small></span><span class="score">${escapeHtml(placar)}</span></div>`;
+  }
+  function renderElenco(nome){
+    const jogadores = state.elencos[nome] || [];
+    if (!jogadores.length) {
+      $("#elenco-clube").className = "empty-state";
+      $("#elenco-clube").innerHTML = `Elenco de <strong>${escapeHtml(nome)}</strong> ainda não está preenchido. A página já está preparada para receber <code>dados-br/elencos.json</code> com foto, posição e número do jogador.`;
+      return;
+    }
+    $("#elenco-clube").className = "list";
+    $("#elenco-clube").innerHTML = jogadores.slice(0, 18).map(j => `<div class="row"><span class="date">${escapeHtml(j.numero || "")}</span><span><strong>${escapeHtml(j.nome)}</strong><br><small>${escapeHtml(j.posicao || "")}</small></span><span class="score">${escapeHtml(j.idade || "")}</span></div>`).join("");
+  }
+  function renderMeta(){
+    $("#meta-line").innerHTML = `<span class="meta-pill">${state.clubes.length} clubes</span><span class="meta-pill">tabela ESPN integrada</span><span class="meta-pill">jogos por clube</span>`;
+  }
+  function render(){
+    renderResumo(); renderChips(); renderGrid(); renderMeta(); renderDetalhe();
+  }
+  async function init(){
+    const [clubesData, tabelaData, rankingData, eventosData, elencosData] = await Promise.all([
+      fetchJson("dados-br/clubes.json", { clubes: [] }),
+      fetchJson("tabela.json", { tabela: [] }),
+      fetchJson("dados-br/ranking-desempenho.json", { ranking: [] }),
+      fetchJson("espn_eventos.json", { eventos: [] }),
+      fetchJson("dados-br/elencos.json", { elencos: {} })
+    ]);
+    state.clubes = (clubesData.clubes || []).sort((a,b) => a.nome.localeCompare(b.nome, "pt-BR"));
+    state.tabela = tabelaData.tabela || [];
+    state.ranking = rankingData.ranking || [];
+    state.eventos = eventosData.eventos || [];
+    state.elencos = elencosData.elencos || {};
+    const hash = decodeURIComponent(location.hash.replace("#", ""));
+    const inicial = state.clubes.find(c => slug(c.nome) === hash)?.nome || state.tabela[0]?.time || state.clubes[0]?.nome || "";
+    state.selecionado = inicial;
+    $("#busca-clube")?.addEventListener("input", ev => { state.filtroTexto = ev.target.value; renderGrid(); });
+    render();
+  }
+  document.addEventListener("DOMContentLoaded", init);
+})();

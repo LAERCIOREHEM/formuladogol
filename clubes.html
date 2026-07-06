@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Clubes — Bolão Brasileirão 2026</title>
+  <meta name="description" content="Página dos 20 clubes do Brasileirão 2026 no Bolão Almoço de Sexta: curiosidades, estádio, títulos, momento, jogos e estrutura preparada para elencos.">
+  <meta name="theme-color" content="#10b981">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="stylesheet" href="css/br-institucional.css">
+</head>
+<body>
+  <div class="container">
+    <header class="hero" aria-label="Bolão Brasileirão 2026 — Almoço de Sexta">
+      <img src="img/header-br.jpg" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
+    </header>
+
+    <nav class="nav" aria-label="Menu principal">
+      <a href="./?brasileirao=1">⚽ Jogos</a>
+      <a href="./?brasileirao=1" data-anchor="rank">🏆 Bolão</a>
+      <a href="./?brasileirao=1" data-anchor="tabela">📊 Tabela</a>
+      <a href="./?brasileirao=1" data-anchor="resultados">✅ Resultados</a>
+      <a href="estatisticas.html">📈 Estatísticas</a>
+      <a class="active" href="clubes.html">🛡️ Clubes</a>
+      <a href="museu.html">🏛️ Museu</a>
+      <a href="regras.html">ℹ️ Regras</a>
+    </nav>
+
+    <main>
+      <section class="page-title panel">
+        <div class="panel-inner">
+          <div class="kicker">Brasileirão 2026 · Execução 5</div>
+          <h1>Clubes do Brasileirão</h1>
+          <p>Os 20 clubes em uma página de referência: escudos, estádio, UF, títulos, curiosidades, momento na temporada e jogos recentes/futuros.</p>
+          <div class="meta-line" id="meta-line">Carregando clubes...</div>
+        </div>
+      </section>
+
+      <section class="cards-resumo" id="cards-resumo" aria-live="polite"></section>
+
+      <section class="panel" style="margin-bottom:14px">
+        <div class="panel-inner">
+          <div class="kicker">Filtro rápido</div>
+          <div class="toolbar">
+            <input id="busca-clube" class="input" type="search" placeholder="Buscar clube, cidade, UF, estádio, mascote..." autocomplete="off">
+            <div class="chips" id="chips-regiao" aria-label="Filtro por região"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid-clubes" id="grid-clubes" aria-live="polite"></section>
+
+      <section class="detail-grid" id="detalhe-wrapper" hidden>
+        <article class="panel">
+          <div class="panel-inner" id="detalhe-clube"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-inner">
+            <div class="section-head">
+              <div>
+                <div class="kicker">Agenda e resultados</div>
+                <h2>Jogos do clube</h2>
+              </div>
+              <span class="badge ok">ESPN snapshot</span>
+            </div>
+            <div id="jogos-clube" class="list"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" style="margin-top:14px">
+        <div class="panel-inner">
+          <div class="section-head">
+            <div>
+              <div class="kicker">Elencos</div>
+              <h2>Estrutura pronta para jogadores</h2>
+            </div>
+            <span class="badge">próxima automação</span>
+          </div>
+          <div id="elenco-clube" class="empty-state">Selecione um clube acima. Quando o robô de elencos for ligado, esta área exibirá jogadores, fotos e posições sem alterar a página.</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Página institucional dos clubes, sem fins comerciais.</div>
+      <div>Dados esportivos: ESPN + snapshots locais do repositório. Escudos e marcas pertencem aos respectivos clubes.</div>
+      <div>Curiosidades e dados de estádio/títulos são curadoria editorial inicial e podem ser ajustados manualmente em <code>dados-br/clubes.json</code>.</div>
+    </footer>
+  </div>
+
+  <script src="js/br-clubes.js"></script>
+  <script>
+    document.querySelectorAll('[data-anchor]').forEach(function(a){
+      a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-anchor')); });
+    });
+  </script>
+</body>
+</html>

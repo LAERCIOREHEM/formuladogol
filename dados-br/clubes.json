@@ -1,0 +1,531 @@
+{
+  "atualizado_em": "2026-07-06T00:05:00-03:00",
+  "fonte": "Curadoria inicial + snapshots ESPN do repositório",
+  "observacao": "Quantidades de torcida são apresentadas em faixas descritivas para evitar falsa precisão. Estatísticas de desempenho são lidas dinamicamente de tabela.json, espn_eventos.json e ranking-desempenho.json.",
+  "clubes": [
+    {
+      "id": "palmeiras",
+      "nome": "Palmeiras",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "sigla": "PAL",
+      "nome_completo": "Sociedade Esportiva Palmeiras",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "fundacao": "1914",
+      "estadio": "Allianz Parque",
+      "capacidade": "~43 mil",
+      "mascote": "Porco / Periquito",
+      "cores": [
+        "verde",
+        "branco"
+      ],
+      "titulos_brasileiros": "12",
+      "torcida": "torcida nacional de grande porte",
+      "apelido": "Verdão",
+      "curiosidade": "É o maior campeão nacional na contagem unificada e costuma ser referência de regularidade na era recente.",
+      "momento": "Força de topo na temporada 2026.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "flamengo",
+      "nome": "Flamengo",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
+      "sigla": "FLA",
+      "nome_completo": "Clube de Regatas do Flamengo",
+      "cidade": "Rio de Janeiro",
+      "uf": "RJ",
+      "regiao": "Sudeste",
+      "fundacao": "1895",
+      "estadio": "Maracanã",
+      "capacidade": "~78 mil",
+      "mascote": "Urubu",
+      "cores": [
+        "vermelho",
+        "preto"
+      ],
+      "titulos_brasileiros": "8",
+      "torcida": "uma das maiores torcidas do país",
+      "apelido": "Mengão",
+      "curiosidade": "Tem presença nacional muito forte e protagonismo recorrente em pontos corridos e mata-matas.",
+      "momento": "Ataque entre os mais fortes da tabela.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "fluminense",
+      "nome": "Fluminense",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
+      "sigla": "FLU",
+      "nome_completo": "Fluminense Football Club",
+      "cidade": "Rio de Janeiro",
+      "uf": "RJ",
+      "regiao": "Sudeste",
+      "fundacao": "1902",
+      "estadio": "Maracanã / Laranjeiras",
+      "capacidade": "~78 mil no Maracanã",
+      "mascote": "Guerreiro Tricolor",
+      "cores": [
+        "grená",
+        "verde",
+        "branco"
+      ],
+      "titulos_brasileiros": "4",
+      "torcida": "torcida tradicional nacional",
+      "apelido": "Flu",
+      "curiosidade": "É um dos clubes fundadores do futebol carioca e tem forte identidade técnica/histórica.",
+      "momento": "Campanha firme no G4/G6.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "athletico-pr",
+      "nome": "Athletico-PR",
+      "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg",
+      "sigla": "CAP",
+      "nome_completo": "Club Athletico Paranaense",
+      "cidade": "Curitiba",
+      "uf": "PR",
+      "regiao": "Sul",
+      "fundacao": "1924",
+      "estadio": "Ligga Arena",
+      "capacidade": "~42 mil",
+      "mascote": "Furacão",
+      "cores": [
+        "vermelho",
+        "preto"
+      ],
+      "titulos_brasileiros": "1",
+      "torcida": "torcida regional forte",
+      "apelido": "Furacão",
+      "curiosidade": "Foi pioneiro no Brasil em arena moderna e tem cultura recente de competitividade internacional.",
+      "momento": "Briga na parte alta.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "bragantino",
+      "nome": "Bragantino",
+      "escudo": "https://s.sde.globo.com/media/organizations/2021/06/28/bragantino.svg",
+      "sigla": "RBB",
+      "nome_completo": "Red Bull Bragantino",
+      "cidade": "Bragança Paulista",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "fundacao": "1928",
+      "estadio": "Nabi Abi Chedid",
+      "capacidade": "~15 mil",
+      "mascote": "Leão / Massa Bruta",
+      "cores": [
+        "branco",
+        "vermelho"
+      ],
+      "titulos_brasileiros": "0",
+      "torcida": "torcida local em crescimento",
+      "apelido": "Massa Bruta",
+      "curiosidade": "Projeto recente de alto investimento e perfil de elenco jovem/vertical.",
+      "momento": "Time em alta pelo ranking de desempenho.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "bahia",
+      "nome": "Bahia",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/bahia.svg",
+      "sigla": "BAH",
+      "nome_completo": "Esporte Clube Bahia",
+      "cidade": "Salvador",
+      "uf": "BA",
+      "regiao": "Nordeste",
+      "fundacao": "1931",
+      "estadio": "Arena Fonte Nova",
+      "capacidade": "~48 mil",
+      "mascote": "Super-Homem Tricolor",
+      "cores": [
+        "azul",
+        "vermelho",
+        "branco"
+      ],
+      "titulos_brasileiros": "2",
+      "torcida": "uma das maiores torcidas do Nordeste",
+      "apelido": "Esquadrão",
+      "curiosidade": "Foi o primeiro campeão brasileiro da história, em 1959.",
+      "momento": "Campanha competitiva na zona intermediária-alta.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "coritiba",
+      "nome": "Coritiba",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/coritiba.svg",
+      "sigla": "CFC",
+      "nome_completo": "Coritiba Foot Ball Club",
+      "cidade": "Curitiba",
+      "uf": "PR",
+      "regiao": "Sul",
+      "fundacao": "1909",
+      "estadio": "Couto Pereira",
+      "capacidade": "~40 mil",
+      "mascote": "Vovô Coxa",
+      "cores": [
+        "verde",
+        "branco"
+      ],
+      "titulos_brasileiros": "1",
+      "torcida": "torcida tradicional paranaense",
+      "apelido": "Coxa",
+      "curiosidade": "Campeão brasileiro de 1985, símbolo de força histórica do futebol paranaense.",
+      "momento": "Na faixa intermediária da tabela.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "sao-paulo",
+      "nome": "São Paulo",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/sao-paulo.svg",
+      "sigla": "SAO",
+      "nome_completo": "São Paulo Futebol Clube",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "fundacao": "1930",
+      "estadio": "MorumBIS",
+      "capacidade": "~66 mil",
+      "mascote": "Santo Paulo",
+      "cores": [
+        "vermelho",
+        "preto",
+        "branco"
+      ],
+      "titulos_brasileiros": "6",
+      "torcida": "uma das maiores torcidas nacionais",
+      "apelido": "Tricolor Paulista",
+      "curiosidade": "Único tricampeão consecutivo dos pontos corridos: 2006, 2007 e 2008.",
+      "momento": "Oscilando em busca de aproximação do bloco de cima.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "atletico-mg",
+      "nome": "Atlético-MG",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg",
+      "sigla": "CAM",
+      "nome_completo": "Clube Atlético Mineiro",
+      "cidade": "Belo Horizonte",
+      "uf": "MG",
+      "regiao": "Sudeste",
+      "fundacao": "1908",
+      "estadio": "Arena MRV",
+      "capacidade": "~46 mil",
+      "mascote": "Galo",
+      "cores": [
+        "preto",
+        "branco"
+      ],
+      "titulos_brasileiros": "3 oficiais, incluindo 1937",
+      "torcida": "grande torcida em Minas e nacional",
+      "apelido": "Galo",
+      "curiosidade": "Tem a conquista de 1937 homologada pela CBF como título nacional.",
+      "momento": "Campanha de meio para cima.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "corinthians",
+      "nome": "Corinthians",
+      "escudo": "https://s.sde.globo.com/media/organizations/2024/10/09/Corinthians_2024_Q4ahot4.svg",
+      "sigla": "COR",
+      "nome_completo": "Sport Club Corinthians Paulista",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "fundacao": "1910",
+      "estadio": "Neo Química Arena",
+      "capacidade": "~49 mil",
+      "mascote": "Mosqueteiro",
+      "cores": [
+        "preto",
+        "branco"
+      ],
+      "titulos_brasileiros": "7",
+      "torcida": "uma das maiores torcidas do Brasil",
+      "apelido": "Timão",
+      "curiosidade": "Clube de enorme apelo popular, com títulos em diferentes formatos do Brasileirão.",
+      "momento": "Campanha de reconstrução na temporada.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "cruzeiro",
+      "nome": "Cruzeiro",
+      "escudo": "https://s.sde.globo.com/media/organizations/2021/02/13/cruzeiro_2021.svg",
+      "sigla": "CRU",
+      "nome_completo": "Cruzeiro Esporte Clube",
+      "cidade": "Belo Horizonte",
+      "uf": "MG",
+      "regiao": "Sudeste",
+      "fundacao": "1921",
+      "estadio": "Mineirão",
+      "capacidade": "~62 mil",
+      "mascote": "Raposa",
+      "cores": [
+        "azul",
+        "branco"
+      ],
+      "titulos_brasileiros": "4",
+      "torcida": "grande torcida em Minas e nacional",
+      "apelido": "CabuloSO",
+      "curiosidade": "Foi o primeiro campeão da era dos pontos corridos, em 2003, com campanha histórica.",
+      "momento": "Briga na metade superior da tabela.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "botafogo",
+      "nome": "Botafogo",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/02/04/botafogo-svg.svg",
+      "sigla": "BOT",
+      "nome_completo": "Botafogo de Futebol e Regatas",
+      "cidade": "Rio de Janeiro",
+      "uf": "RJ",
+      "regiao": "Sudeste",
+      "fundacao": "1904 no futebol",
+      "estadio": "Nilton Santos",
+      "capacidade": "~44 mil",
+      "mascote": "Manequinho / Estrela Solitária",
+      "cores": [
+        "preto",
+        "branco"
+      ],
+      "titulos_brasileiros": "3",
+      "torcida": "torcida tradicional nacional",
+      "apelido": "Fogão",
+      "curiosidade": "Campeão em 2024, marcou retomada de protagonismo nacional.",
+      "momento": "Campanha de oscilação, mas com elenco competitivo.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "vitoria",
+      "nome": "Vitória",
+      "escudo": "https://s.sde.globo.com/media/organizations/2025/12/18/Vitoria_2025.svg",
+      "sigla": "VIT",
+      "nome_completo": "Esporte Clube Vitória",
+      "cidade": "Salvador",
+      "uf": "BA",
+      "regiao": "Nordeste",
+      "fundacao": "1899",
+      "estadio": "Barradão",
+      "capacidade": "~30 mil",
+      "mascote": "Leão",
+      "cores": [
+        "vermelho",
+        "preto"
+      ],
+      "titulos_brasileiros": "0",
+      "torcida": "torcida muito forte na Bahia",
+      "apelido": "Leão da Barra",
+      "curiosidade": "Clube de base historicamente relevante, com grandes revelações para o futebol brasileiro.",
+      "momento": "Busca estabilidade para se afastar do Z4.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "internacional",
+      "nome": "Internacional",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/internacional.svg",
+      "sigla": "INT",
+      "nome_completo": "Sport Club Internacional",
+      "cidade": "Porto Alegre",
+      "uf": "RS",
+      "regiao": "Sul",
+      "fundacao": "1909",
+      "estadio": "Beira-Rio",
+      "capacidade": "~50 mil",
+      "mascote": "Saci",
+      "cores": [
+        "vermelho",
+        "branco"
+      ],
+      "titulos_brasileiros": "3",
+      "torcida": "uma das maiores torcidas do Sul",
+      "apelido": "Colorado",
+      "curiosidade": "Campeão brasileiro invicto em 1979.",
+      "momento": "Campanha intermediária, olhando para recuperação.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "santos",
+      "nome": "Santos",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/santos.svg",
+      "sigla": "SAN",
+      "nome_completo": "Santos Futebol Clube",
+      "cidade": "Santos",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "fundacao": "1912",
+      "estadio": "Vila Belmiro",
+      "capacidade": "~16 mil",
+      "mascote": "Baleia / Peixe",
+      "cores": [
+        "preto",
+        "branco"
+      ],
+      "titulos_brasileiros": "8",
+      "torcida": "torcida tradicional nacional",
+      "apelido": "Peixe",
+      "curiosidade": "Clube de Pelé, símbolo histórico de futebol ofensivo e formação de talentos.",
+      "momento": "Procura regularidade no retorno à elite.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "gr-mio",
+      "nome": "Grêmio",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg",
+      "sigla": "GRE",
+      "nome_completo": "Grêmio Foot-Ball Porto Alegrense",
+      "cidade": "Porto Alegre",
+      "uf": "RS",
+      "regiao": "Sul",
+      "fundacao": "1903",
+      "estadio": "Arena do Grêmio",
+      "capacidade": "~55 mil",
+      "mascote": "Mosqueteiro",
+      "cores": [
+        "azul",
+        "preto",
+        "branco"
+      ],
+      "titulos_brasileiros": "2",
+      "torcida": "uma das maiores torcidas do Sul",
+      "apelido": "Tricolor Gaúcho",
+      "curiosidade": "Tem forte tradição copeira e duas conquistas nacionais na Série A.",
+      "momento": "Campanha abaixo do potencial histórico.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "vasco-da-gama",
+      "nome": "Vasco da Gama",
+      "escudo": "https://s.sde.globo.com/media/organizations/2021/09/04/vasco_SVG.svg",
+      "sigla": "VAS",
+      "nome_completo": "Club de Regatas Vasco da Gama",
+      "cidade": "Rio de Janeiro",
+      "uf": "RJ",
+      "regiao": "Sudeste",
+      "fundacao": "1898",
+      "estadio": "São Januário",
+      "capacidade": "~22 mil",
+      "mascote": "Almirante",
+      "cores": [
+        "preto",
+        "branco"
+      ],
+      "titulos_brasileiros": "4",
+      "torcida": "torcida nacional muito tradicional",
+      "apelido": "Gigante da Colina",
+      "curiosidade": "Tem história marcada pela luta contra a exclusão social no futebol brasileiro.",
+      "momento": "Luta por recuperação na tabela.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "remo",
+      "nome": "Remo",
+      "escudo": "https://s.sde.globo.com/media/organizations/2021/02/25/Remo-PA.svg",
+      "sigla": "REM",
+      "nome_completo": "Clube do Remo",
+      "cidade": "Belém",
+      "uf": "PA",
+      "regiao": "Norte",
+      "fundacao": "1905",
+      "estadio": "Baenão / Mangueirão",
+      "capacidade": "~13 mil no Baenão; Mangueirão maior",
+      "mascote": "Leão Azul",
+      "cores": [
+        "azul",
+        "branco"
+      ],
+      "titulos_brasileiros": "0",
+      "torcida": "uma das torcidas mais fortes do Norte",
+      "apelido": "Leão Azul",
+      "curiosidade": "Presença paraense na Série A dá alcance nacional ao futebol do Norte.",
+      "momento": "Tem campanha de sobrevivência, mas competitiva em jogos-chave.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "mirassol",
+      "nome": "Mirassol",
+      "escudo": "https://s.sde.globo.com/media/organizations/2024/08/20/mirassol-novo-svg-71690.svg",
+      "sigla": "MIR",
+      "nome_completo": "Mirassol Futebol Clube",
+      "cidade": "Mirassol",
+      "uf": "SP",
+      "regiao": "Sudeste",
+      "fundacao": "1925",
+      "estadio": "José Maria de Campos Maia",
+      "capacidade": "~15 mil",
+      "mascote": "Leão",
+      "cores": [
+        "amarelo",
+        "verde"
+      ],
+      "titulos_brasileiros": "0",
+      "torcida": "torcida local em crescimento",
+      "apelido": "Leão Caipira",
+      "curiosidade": "É símbolo de ascensão recente e organização no interior paulista.",
+      "momento": "Primeira experiência de maior exposição na elite.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    },
+    {
+      "id": "chapecoense",
+      "nome": "Chapecoense",
+      "escudo": "https://s.sde.globo.com/media/organizations/2021/06/21/CHAPECOENSE-2018.svg",
+      "sigla": "CHA",
+      "nome_completo": "Associação Chapecoense de Futebol",
+      "cidade": "Chapecó",
+      "uf": "SC",
+      "regiao": "Sul",
+      "fundacao": "1973",
+      "estadio": "Arena Condá",
+      "capacidade": "~20 mil",
+      "mascote": "Índio Condá",
+      "cores": [
+        "verde",
+        "branco"
+      ],
+      "titulos_brasileiros": "0",
+      "torcida": "torcida regional muito engajada",
+      "apelido": "Chape",
+      "curiosidade": "A reconstrução do clube após 2016 virou símbolo mundial de solidariedade no futebol.",
+      "momento": "Briga contra a parte de baixo da tabela.",
+      "links": {
+        "jogos_hash": "#"
+      }
+    }
+  ]
+}

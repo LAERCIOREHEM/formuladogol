@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Museu do Brasileirão — Bolão Brasileirão 2026</title>
+  <meta name="description" content="Museu do Brasileirão no Bolão Almoço de Sexta: campeões, eras, recordes, linha do tempo e maiores vencedores.">
+  <meta name="theme-color" content="#10b981">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="stylesheet" href="css/br-institucional.css">
+</head>
+<body>
+  <div class="container">
+    <header class="hero" aria-label="Bolão Brasileirão 2026 — Almoço de Sexta">
+      <img src="img/header-br.jpg" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
+    </header>
+
+    <nav class="nav" aria-label="Menu principal">
+      <a href="./?brasileirao=1">⚽ Jogos</a>
+      <a href="./?brasileirao=1" data-anchor="rank">🏆 Bolão</a>
+      <a href="./?brasileirao=1" data-anchor="tabela">📊 Tabela</a>
+      <a href="./?brasileirao=1" data-anchor="resultados">✅ Resultados</a>
+      <a href="estatisticas.html">📈 Estatísticas</a>
+      <a href="clubes.html">🛡️ Clubes</a>
+      <a class="active" href="museu.html">🏛️ Museu</a>
+      <a href="regras.html">ℹ️ Regras</a>
+    </nav>
+
+    <main>
+      <section class="page-title panel">
+        <div class="panel-inner">
+          <div class="kicker">História · Campeões · Recordes</div>
+          <h1>Museu do Brasileirão</h1>
+          <p>Linha do tempo dos campeões, marcos históricos e maiores vencedores em uma página leve, visual e pronta para crescer.</p>
+          <div class="meta-line" id="meta-line">Carregando museu...</div>
+        </div>
+      </section>
+
+      <section class="cards-resumo" id="cards-resumo" aria-live="polite"></section>
+
+      <section class="panel">
+        <div class="panel-inner">
+          <div class="section-head">
+            <div>
+              <div class="kicker">Hall de recordes</div>
+              <h2>Marcas históricas</h2>
+            </div>
+            <span class="badge gold">curadoria</span>
+          </div>
+          <div class="record-grid" id="recordes"></div>
+        </div>
+      </section>
+
+      <section class="detail-grid">
+        <article class="panel">
+          <div class="panel-inner">
+            <div class="section-head">
+              <div>
+                <div class="kicker">Maiores campeões</div>
+                <h2>Contagem de títulos</h2>
+              </div>
+              <span class="badge ok">oficial / unificada</span>
+            </div>
+            <div id="barras-titulos" class="title-bars"></div>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="panel-inner">
+            <div class="section-head">
+              <div>
+                <div class="kicker">Marcos</div>
+                <h2>Eras do campeonato</h2>
+              </div>
+            </div>
+            <div id="marcos" class="list"></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel" style="margin-top:14px">
+        <div class="panel-inner">
+          <div class="section-head">
+            <div>
+              <div class="kicker">Linha do tempo</div>
+              <h2>Campeões ano a ano</h2>
+            </div>
+            <span class="badge">1959–2025</span>
+          </div>
+          <div class="toolbar">
+            <input id="busca-museu" class="input" type="search" placeholder="Buscar ano, campeão ou formato..." autocomplete="off">
+            <div class="chips" id="chips-museu"></div>
+          </div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Museu editorial sem fins comerciais.</div>
+      <div>Escudos e marcas pertencem aos respectivos clubes. A contagem segue a linha unificada apresentada nas fontes públicas; anos com dupla competição aparecem separados para transparência.</div>
+      <div>O arquivo editável é <code>dados-br/museu-brasileirao.json</code>.</div>
+    </footer>
+  </div>
+
+  <script src="js/br-museu.js"></script>
+  <script>
+    document.querySelectorAll('[data-anchor]').forEach(function(a){
+      a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-anchor')); });
+    });
+  </script>
+</body>
+</html>
