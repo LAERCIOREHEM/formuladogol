@@ -3,7 +3,7 @@ name: Apurar Apostas Brasileirão
 on:
   workflow_dispatch:
   schedule:
-    # Apuração leve: a cada 30 minutos. O placar/tabela continuam no workflow ESPN de 10 em 10 min.
+    # A cada 30 minutos. O JSON público mantém sigilo até a rodada ser marcada como apurada/publicada.
     - cron: '*/30 * * * *'
 
 permissions:
@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Apurar apostas por rodada
+      - name: Apurar apostas com sigilo
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -36,6 +36,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nenhuma alteração de apuração."
           else
-            git commit -m "Atualiza apuração das apostas do Brasileirão"
+            git commit -m "Apura apostas do Brasileirão com sigilo"
             git push
           fi
