@@ -26,6 +26,78 @@
   var LIVE_TICKING = false;
   var LIVE_ULTIMA_ATUALIZACAO = "";
 
+  var FETCH_LOCAL_TIMEOUT_MS = 7000;
+  var FETCH_ESPN_TIMEOUT_MS = 4500;
+
+  function atraso(ms, valor) {
+    return new Promise(function (resolve) { setTimeout(function () { resolve(valor); }, ms); });
+  }
+
+  function fetchJsonComTimeout(url, ms) {
+    ms = ms || FETCH_LOCAL_TIMEOUT_MS;
+    var ctrl = (typeof AbortController !== "undefined") ? new AbortController() : null;
+    var timer = null;
+    var opts = {};
+    if (ctrl) {
+      opts.signal = ctrl.signal;
+      timer = setTimeout(function () {
+        try { ctrl.abort(); } catch (e) {}
+      }, ms);
+    }
+    return fetch(url, opts).then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }).finally(function () {
+      if (timer) clearTimeout(timer);
+    });
+  }
+
+  function carregarTimesSeguro() {
+    if (!(window.COPA_TIMES && COPA_TIMES.carregar)) return Promise.resolve();
+    return Promise.race([
+      window.COPA_TIMES.carregar(),
+      atraso(3500, null)
+    ]).catch(function () { return null; });
+  }
+
+  function normalizarJogoDetalheLocal(x, id) {
+    x = x || {};
+    var homeSigla = siglaSelecao(x.home || (x.home_team && (x.home_team.abbreviation || x.home_team.id || x.home_team.name))) || String(x.home || "").toUpperCase();
+    var awaySigla = siglaSelecao(x.away || (x.away_team && (x.away_team.abbreviation || x.away_team.id || x.away_team.name))) || String(x.away || "").toUpperCase();
+    if (!homeSigla || !awaySigla) return null;
+    return {
+      id: String(x.event_id || x.eventId || x.id || id || ""),
+      date: x.date || x.data || "",
+      fase: x.fase || x.season_slug || "",
+      fase_nome: faseLabel(x.fase || x.season_slug || "") || (x.fase_nome || ""),
+      state: x.state || "post",
+      shortDetail: x.shortDetail || "",
+      home: { sigla: homeSigla, nome: nomeSelecao(homeSigla), score: x.home_score != null ? String(x.home_score) : (x.score_home != null ? String(x.score_home) : "") },
+      away: { sigla: awaySigla, nome: nomeSelecao(awaySigla), score: x.away_score != null ? String(x.away_score) : (x.score_away != null ? String(x.score_away) : "") },
+      penA: x.penA == null ? null : x.penA,
+      penB: x.penB == null ? null : x.penB,
+      vencedor: x.vencedor || "",
+      venue: x.venue || x.local || ""
+    };
+  }
+
+  function jogosDetalhesParaLista(data) {
+    var src = (data && data.jogos) || data || {};
+    var out = [];
+    if (Array.isArray(src)) {
+      src.forEach(function (x, i) {
+        var j = normalizarJogoDetalheLocal(x, x && (x.event_id || x.id) || i);
+        if (j) out.push(j);
+      });
+    } else {
+      Object.keys(src).forEach(function (id) {
+        var j = normalizarJogoDetalheLocal(src[id], id);
+        if (j) out.push(j);
+      });
+    }
+    return out;
+  }
+
   var $ = function (s) { return document.querySelector(s); };
   var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
 
@@ -330,10 +402,12 @@
     if (faseWrap) faseWrap.hidden = ABA !== 'jogos';
 
     var situacaoWrap = $("#stat-situacao-wrap"), situacaoSel = $("#stat-situacao");
+    var minWrap = $("#stat-min-jogos-wrap"), minSel = $("#stat-min-jogos");
     var ordemWrap = $("#stat-ordem-wrap"), ordemSel = $("#stat-ordem");
     var dirWrap = $("#stat-direcao-wrap"), dirSel = $("#stat-direcao");
     var rankAtivo = ABA === "desempenho";
     if (situacaoWrap) situacaoWrap.hidden = !rankAtivo;
+    if (minWrap) minWrap.hidden = !rankAtivo;
     if (ordemWrap) ordemWrap.hidden = !rankAtivo;
     if (dirWrap) dirWrap.hidden = !rankAtivo;
     if (situacaoSel) {
@@ -611,12 +685,9 @@
     if (LIVE_TICKING || ABA !== "jogos" || document.hidden) return;
     LIVE_TICKING = true;
     try {
-      var r = await fetch(API_SCOREBOARD + "&_=" + Date.now());
-      if (r.ok) {
-        var j = await r.json();
-        var novos = (j.events || []).map(normalizarJogo);
-        if (novos.length) JOGOS = novos;
-      }
+      var j = await fetchJsonComTimeout(API_SCOREBOARD + "&_=" + Date.now(), FETCH_ESPN_TIMEOUT_MS);
+      var novos = (j.events || []).map(normalizarJogo);
+      if (novos.length) JOGOS = novos;
       LIVE_ULTIMA_ATUALIZACAO = new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       renderLista();
     } catch (e) {
@@ -754,39 +825,46 @@
     renderLista();
   }
   async function carregar() {
-    try { if (window.COPA_TIMES && COPA_TIMES.carregar) await COPA_TIMES.carregar(); } catch (e) {}
+    try { await carregarTimesSeguro(); } catch (e) {}
 
-    var dadosReq = fetch('dados/estatisticas.json?v=' + Date.now()).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    }).catch(function () {
+    var dadosReq = fetchJsonComTimeout('dados/estatisticas.json?v=' + Date.now(), FETCH_LOCAL_TIMEOUT_MS).catch(function () {
       return { atualizado_em: null, jogos_processados: 0, artilheiros: [], assistencias: [], por_selecao: [] };
     });
 
-    var jogosReq = fetch(API_SCOREBOARD + '&_=' + Date.now()).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    }).then(function (j) {
-      return (j.events || []).map(normalizarJogo);
-    }).catch(function () { return []; });
+    var rostosReq = fetchJsonComTimeout('dados/rostos.json?v=' + Date.now(), FETCH_LOCAL_TIMEOUT_MS).catch(function () { return {}; });
 
-    var rostosReq = fetch('dados/rostos.json?v=' + Date.now()).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    }).catch(function () { return {}; });
+    var rankingReq = fetchJsonComTimeout('dados/ranking-desempenho.json?v=' + Date.now(), FETCH_LOCAL_TIMEOUT_MS).catch(function () { return { ranking: [] }; });
 
-    var rankingReq = fetch('dados/ranking-desempenho.json?v=' + Date.now()).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    }).catch(function () { return { ranking: [] }; });
+    var jogosLocalReq = fetchJsonComTimeout('dados/jogos-detalhes.json?v=' + Date.now(), FETCH_LOCAL_TIMEOUT_MS)
+      .then(jogosDetalhesParaLista)
+      .catch(function () { return []; });
 
-    var ambos = await Promise.all([dadosReq, jogosReq, rostosReq, rankingReq]);
-    DADOS = ambos[0] || DADOS;
-    JOGOS = ambos[1] || [];
-    ROSTOS = ambos[2] || {};
-    RANKING_DESEMPENHO = ambos[3] || { ranking: [] };
+    var jogosEspnReq = fetchJsonComTimeout(API_SCOREBOARD + '&_=' + Date.now(), FETCH_ESPN_TIMEOUT_MS)
+      .then(function (j) { return (j.events || []).map(normalizarJogo); })
+      .catch(function () { return []; });
+
+    var basicos = await Promise.all([dadosReq, rostosReq, rankingReq]);
+    DADOS = basicos[0] || DADOS;
+    ROSTOS = basicos[1] || {};
+    RANKING_DESEMPENHO = basicos[2] || { ranking: [] };
+
+    // A página de estatísticas NÃO pode depender da ESPN ao vivo para sair do carregando.
+    // Primeiro renderiza com os JSONs locais do repositório; depois melhora a aba "Por jogo"
+    // quando a ESPN responder. Se a ESPN estiver lenta/fora, artilheiros, assistências,
+    // gols por seleção e ranking continuam funcionando normalmente.
+    JOGOS = await Promise.race([jogosLocalReq, atraso(1200, [])]).catch(function () { return []; });
     corrigirSituacaoRankingComJogos();
     renderTudo();
+
+    Promise.all([jogosEspnReq, jogosLocalReq]).then(function (res) {
+      var espn = res[0] || [];
+      var local = res[1] || [];
+      var novos = espn.length ? espn : local;
+      if (!novos.length) return;
+      JOGOS = novos;
+      corrigirSituacaoRankingComJogos();
+      renderTudo();
+    }).catch(function () {});
   }
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) pararMonitorAoVivo();
