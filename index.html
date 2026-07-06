@@ -1645,16 +1645,18 @@
 </style>
 </head>
   <script>
-  /* MODO COPA: durante o período, o site abre DIRETO no Bolão da Copa.
-     As outras abas ficam quietas. Para ver o Brasileirão (pausado),
-     acesse com ?brasileirao=1 (há um link de volta dentro da Copa). */
+  /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
+     O Brasileirão fica "dormindo" e só abre por link explícito com ?brasileirao=1.
+     Importante: NÃO grava essa escolha em sessionStorage, para não contaminar
+     visitas futuras à raiz. */
   (function () {
-    var ini = new Date('2026-06-04T00:00:00-03:00'); // início do modo Copa
-    var fim = new Date('2026-07-20T23:59:59-03:00'); // fim do modo Copa
+    var ini = new Date('2026-06-04T00:00:00-03:00');
+    var fim = new Date('2026-07-20T23:59:59-03:00');
     var agora = new Date();
+    var params = new URLSearchParams(location.search || '');
+    var pediuBrasileirao = params.has('brasileirao');
     var emCopa = agora >= ini && agora <= fim;
-    if (location.search.indexOf('brasileirao') > -1) sessionStorage.setItem('verBrasileirao', '1');
-    if (emCopa && sessionStorage.getItem('verBrasileirao') !== '1') {
+    if (emCopa && !pediuBrasileirao) {
       location.replace('copa2026/');
     }
   })();
