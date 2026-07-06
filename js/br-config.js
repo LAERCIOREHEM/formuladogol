@@ -14,11 +14,13 @@
     supabase: {
       url: "https://pdetjrsvmnuglskvytro.supabase.co",
       key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBkZXRqcnN2bW51Z2xza3Z5dHJvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1Mjk0MzIsImV4cCI6MjA5NjEwNTQzMn0.KdlwR_BR4z4gQxlGn_b-GpzW1if0BKLf_T4EzDTkd8g",
-      tabelaPalpites: "br_palpites"
+      tabelaPalpites: "br_palpites",
+      versaoApostas: 2
     },
     arquivos: {
       jogos: "jogos.json",
       resultados: "resultados.json",
+      eventos: "espn_eventos.json",
       membros: "membros.json",
       apuracao: "dados-br/apuracao.json",
       configRodadas: "dados-br/apostas-config.json"

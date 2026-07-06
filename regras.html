@@ -6,7 +6,7 @@
 <title>Regras — Bolão Brasileirão 2026</title>
 <meta name="theme-color" content="#10b981">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="stylesheet" href="css/br-apostas.css">
+<link rel="stylesheet" href="css/br-apostas.css?v=20260706-exec10">
 <link rel="stylesheet" href="css/br-global.css?v=20260706-exec6">
 </head>
 <body>
@@ -26,19 +26,30 @@
       <a href="copa2026/">🏆 Bolão Copa 2026</a>
     </nav>
 
-    <section class="panel br-page-title">
-      <div class="panel-inner">
-        <div class="kicker">Bolão Brasileirão 2026</div>
-        <h1>Regras das Apostas</h1>
-        <p>Regulamento inicial para o bolão de placares por rodada, começando na 20ª rodada.</p>
-      </div>
-    </section>
+    <section class="panel br-page-title"><div class="panel-inner">
+      <div class="kicker">Bolão Brasileirão 2026</div>
+      <h1>Regras das Apostas</h1>
+      <p>Regulamento do bolão de placares por rodada, começando na 20ª rodada.</p>
+    </div></section>
 
     <section class="panel"><div class="panel-inner">
+      <div class="kicker">Acesso</div>
+      <h2>Usuário e PIN individual</h2>
+      <p>Cada participante entra em <strong>Apostas</strong> com usuário e PIN de 6 números. O administrador gera o acesso e envia o PIN individualmente.</p>
+      <p>O participante pode consultar seus próprios palpites e comprovantes, mas não vê os placares dos outros antes da publicação da rodada.</p>
+    </div></section>
+
+    <section class="panel" style="margin-top:12px"><div class="panel-inner">
+      <div class="kicker">Sigilo</div>
+      <h2>Palpites fechados até a publicação</h2>
+      <p>Antes do fechamento/publicação, o administrador enxerga apenas o percentual preenchido de cada participante. Os placares ficam ocultos para todos.</p>
+      <p>Após a rodada ser publicada, os palpites ficam visíveis para conferência do grupo.</p>
+    </div></section>
+
+    <section class="panel" style="margin-top:12px"><div class="panel-inner">
       <div class="kicker">Janela de envio</div>
       <h2>Quinta-feira até sábado às 10h</h2>
-      <p>A cada rodada, a página de apostas ficará disponível normalmente a partir da quinta-feira. O fechamento padrão é sábado às 10h da manhã, antes do primeiro jogo do sábado.</p>
-      <p>Após o fechamento, a rodada fica travada. O robô de apuração também descarta qualquer registro que tenha sido atualizado depois do horário de fechamento salvo no banco.</p>
+      <p>A janela padrão abre na quinta-feira e fecha no sábado às 10h da manhã. O administrador pode ajustar datas e horários no painel da página de Apostas.</p>
     </div></section>
 
     <section class="panel" style="margin-top:12px"><div class="panel-inner">
@@ -52,15 +63,9 @@
     </div></section>
 
     <section class="panel" style="margin-top:12px"><div class="panel-inner">
-      <div class="kicker">Desempate</div>
-      <h2>Critérios da rodada</h2>
-      <p>O ranking da rodada ordena por: pontos totais, quantidade de cravadas, quantidade de acertos de saldo, quantidade de acertos de resultado e, por fim, ordem alfabética.</p>
-    </div></section>
-
-    <section class="panel" style="margin-top:12px"><div class="panel-inner">
-      <div class="kicker">Observação</div>
-      <h2>Bolão recreativo</h2>
-      <p>Este é um site privado, sem fins lucrativos, criado para organização entre amigos. Não é casa de apostas, não vende prognósticos e não explora apostas de quota fixa.</p>
+      <div class="kicker">Auditoria</div>
+      <h2>Comprovante com hash</h2>
+      <p>Cada envio gera um hash de fechamento. Esse hash ajuda a comprovar que o conjunto de palpites salvo naquela rodada não foi alterado depois sem deixar rastro.</p>
       <div class="actions"><a class="btn" href="apostas.html">Ir para Apostas</a></div>
     </div></section>
   </main>
