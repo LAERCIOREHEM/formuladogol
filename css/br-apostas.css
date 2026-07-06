@@ -225,3 +225,46 @@ input:focus, select:focus, textarea:focus { border-color: rgba(163,230,53,.65); 
   .tab-actions { overflow-x: auto; flex-wrap: nowrap; justify-content: flex-start; padding-bottom: 4px; }
   .tab-actions .btn { white-space: nowrap; }
 }
+
+/* ========================================================================== 
+   Execução 12 — Ligas e gestão de participantes
+   ========================================================================== */
+.liga-box { margin: 12px 0 8px; }
+.liga-panel { border-color: rgba(250, 204, 21, .20); }
+.liga-box-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 320px);
+  gap: 14px;
+  align-items: center;
+}
+.league-admin-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, .95fr) minmax(0, 1.05fr);
+  gap: 14px;
+  margin-top: 14px;
+}
+.league-members-box {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(148, 163, 184, .14);
+}
+.inline-add-member {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(130px, 180px) auto;
+  gap: 10px;
+  align-items: end;
+}
+.action-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 180px;
+}
+.league-list small,
+.data-table small { color: var(--muted-2); }
+@media (max-width: 760px) {
+  .liga-box-inner,
+  .league-admin-grid,
+  .inline-add-member { grid-template-columns: 1fr; }
+  .action-cell { min-width: 0; }
+}

@@ -31,7 +31,12 @@
     auditoria: [],
     auditoriaEventos: [],
     participantes: [],
-    progresso: []
+    progresso: [],
+    ligas: [],
+    ligaAtual: null,
+    ligasAdmin: [],
+    ligaMembros: [],
+    adminLigaSelecionada: null
   };
 
   function status(msg, tipo = "warn") {
@@ -347,6 +352,57 @@
     }
   }
 
+  async function carregarLigas() {
+    if (!state.usuario) return;
+    try {
+      const rows = await rpcRows("br_listar_minhas_ligas", {
+        p_participante_id: state.usuario.id,
+        p_token: state.token
+      });
+      state.ligas = Array.isArray(rows) ? rows : [];
+    } catch (err) {
+      console.warn("Ligas indisponíveis; usando Liga Geral virtual", err);
+      state.ligas = [{ liga_id: "geral", nome: "Liga Geral", slug: "liga-geral", descricao: "Ranking geral", ativa: true, papel: "participante" }];
+    }
+    if (!state.ligas.length) {
+      state.ligas = [{ liga_id: "geral", nome: "Liga Geral", slug: "liga-geral", descricao: "Ranking geral", ativa: true, papel: "participante" }];
+    }
+    const existe = state.ligas.some(l => String(l.liga_id) === String(state.ligaAtual));
+    if (!state.ligaAtual || !existe) state.ligaAtual = state.ligas[0].liga_id;
+  }
+
+  function ligaAtualObj() {
+    return state.ligas.find(l => String(l.liga_id) === String(state.ligaAtual)) || state.ligas[0] || null;
+  }
+
+  function nomeLigaAtual() {
+    const l = ligaAtualObj();
+    return l ? l.nome : "Liga Geral";
+  }
+
+  function renderLigaBox() {
+    const box = $("#liga-box");
+    if (!box || !state.usuario) return;
+    const ligas = state.ligas || [];
+    if (!ligas.length) { box.innerHTML = ""; return; }
+    box.innerHTML = `<section class="panel liga-panel"><div class="panel-inner liga-box-inner">
+      <div>
+        <div class="kicker">Liga ativa</div>
+        <h2>${escapeHtml(nomeLigaAtual())}</h2>
+        <p>O palpite é único por rodada. A liga filtra ranking, auditoria e visualização dos participantes.</p>
+      </div>
+      <label>Selecionar liga
+        <select id="liga-select">${ligas.map(l => `<option value="${escapeAttr(l.liga_id)}" ${String(l.liga_id) === String(state.ligaAtual) ? "selected" : ""}>${escapeHtml(l.nome)}${l.papel === "admin_liga" ? " · admin" : ""}</option>`).join("")}</select>
+      </label>
+    </div></section>`;
+    $("#liga-select")?.addEventListener("change", async ev => {
+      state.ligaAtual = ev.target.value;
+      status(`Liga ativa: ${nomeLigaAtual()}.`, "ok");
+      renderLigaBox();
+      renderConteudo();
+    });
+  }
+
   async function carregarPublicos() {
     try {
       state.publicos = await rpcRows("br_listar_palpites_publicos", {
@@ -396,7 +452,7 @@
     const chip = $("#usuario-chip");
     if (!state.usuario) { chip.hidden = true; return; }
     chip.hidden = false;
-    chip.innerHTML = `${state.usuario.admin ? "🛠️ " : "👤 "}${state.usuario.nome}<br><button class="btn ghost" type="button" id="sair">sair</button>`;
+    chip.innerHTML = `${state.usuario.admin ? "🛠️ " : "👤 "}${state.usuario.nome}<br><small>${escapeHtml(nomeLigaAtual())}</small><br><button class="btn ghost" type="button" id="sair">sair</button>`;
     $("#sair")?.addEventListener("click", () => { clearSession(); renderLogin(); status("Sessão encerrada.", "warn"); });
     $$(".admin-only").forEach(el => { el.hidden = !state.usuario.admin; });
   }
@@ -544,7 +600,7 @@
     const ranking = ap.ranking || [];
     root.innerHTML = `<section class="ranking-grid">
       <article class="panel"><div class="panel-inner">
-        <div class="kicker">Ranking da rodada</div><h2>Rodada ${state.rodada}</h2>
+        <div class="kicker">Ranking da rodada</div><h2>Rodada ${state.rodada} · ${escapeHtml(nomeLigaAtual())}</h2>
         <p>${(ap.vencedores || []).length ? `🏆 Vencedor(es): <strong>${(ap.vencedores || []).map(escapeHtml).join(", ")}</strong>` : "Aguardando jogos apurados."}</p>
         ${ranking.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Participante</th><th>Pontos</th><th>Cravadas</th><th>Saldo</th><th>Resultado</th><th>Erros</th></tr></thead><tbody>${ranking.map(r => `<tr><td>${r.pos}</td><td>${escapeHtml(r.membro)}</td><td class="num gold-num">${r.pontos}</td><td>${r.cravadas}</td><td>${r.saldos}</td><td>${r.resultados}</td><td>${r.erros}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Nenhum jogo apurado nesta rodada.</div>`}
       </div></article>
@@ -576,7 +632,7 @@
       return;
     }
     root.innerHTML = `<section class="panel"><div class="panel-inner">
-      <div class="kicker">Palpites públicos</div><h2>Rodada ${state.rodada}</h2>
+      <div class="kicker">Palpites públicos</div><h2>Rodada ${state.rodada} · ${escapeHtml(nomeLigaAtual())}</h2>
       <p>Lista aberta após publicação da rodada. Quando a apuração já estiver disponível, a tabela mostra pontos e tipo de acerto jogo a jogo.</p>
       ${ap && !ap.sigilosa ? `<div class="status ok">Apuração publicada · ${ap.jogos_apurados || 0} jogos apurados.</div>` : `<div class="status warn">Palpites publicados; pontos aparecem após o workflow de apuração.</div>`}
       <div class="table-wrap" style="margin-top:12px"><table class="data-table"><thead><tr><th>Participante</th><th>Jogo</th><th>Palpite</th><th>Pontos</th><th>Tipo</th><th>Hash</th></tr></thead><tbody>
@@ -592,16 +648,23 @@
     if (!state.usuario?.admin) return;
     try {
       const total = jogosDaRodada(state.rodada).length;
-      const [participantes, progresso] = await Promise.all([
+      const [participantes, progresso, ligas, ligaMembros] = await Promise.all([
         rpcRows("br_admin_listar_participantes", { p_admin_id: state.usuario.id, p_token: state.token }),
-        rpcRows("br_admin_progresso_rodada", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada, p_total_jogos: total })
+        rpcRows("br_admin_progresso_rodada", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada, p_total_jogos: total }),
+        rpcRows("br_admin_listar_ligas", { p_admin_id: state.usuario.id, p_token: state.token }),
+        rpcRows("br_admin_listar_liga_participantes", { p_admin_id: state.usuario.id, p_token: state.token, p_liga_id: null })
       ]);
       state.participantes = participantes;
       state.progresso = progresso;
+      state.ligasAdmin = ligas;
+      state.ligaMembros = ligaMembros;
+      if (!state.adminLigaSelecionada && ligas.length) state.adminLigaSelecionada = ligas[0].liga_id;
     } catch (err) {
       console.warn("Admin indisponível", err);
       state.participantes = [];
       state.progresso = [];
+      state.ligasAdmin = [];
+      state.ligaMembros = [];
     }
   }
 
@@ -653,6 +716,68 @@
     catch (_) { status("Não consegui copiar automaticamente; selecione a tabela manualmente.", "warn"); }
   }
 
+  function ligasDoParticipante(participanteId) {
+    return (state.ligaMembros || [])
+      .filter(m => String(m.participante_id) === String(participanteId) && m.membro_ativo)
+      .map(m => m.nome_liga)
+      .filter(Boolean);
+  }
+
+  function membrosDaLiga(ligaId) {
+    return (state.ligaMembros || []).filter(m => String(m.liga_id) === String(ligaId));
+  }
+
+  function ligaAdminSelecionadaObj() {
+    return (state.ligasAdmin || []).find(l => String(l.liga_id) === String(state.adminLigaSelecionada)) || (state.ligasAdmin || [])[0] || null;
+  }
+
+  function renderLigasAdminHtml() {
+    const ligas = state.ligasAdmin || [];
+    const membros = membrosDaLiga(state.adminLigaSelecionada);
+    const selecionada = ligaAdminSelecionadaObj();
+    const participantesOptions = (state.participantes || [])
+      .filter(p => p.ativo)
+      .map(p => `<option value="${escapeAttr(p.participante_id)}">${escapeHtml(p.nome)} · ${escapeHtml(p.login)}</option>`).join("");
+    return `<article class="panel" style="grid-column:1/-1"><div class="panel-inner">
+      <div class="kicker">Ligas</div><h2>Gerenciar ligas e participantes</h2>
+      <p>O palpite continua único por participante/rodada. A liga agrupa pessoas para ranking, progresso e auditoria separados.</p>
+      <div class="league-admin-grid">
+        <form id="admin-liga-form" class="admin-form league-form">
+          <input type="hidden" id="admin-liga-id">
+          <div class="two"><label>Nome da liga <input id="admin-liga-nome" placeholder="Ex.: Almoço de Sexta" required></label><label>Slug <input id="admin-liga-slug" placeholder="almoco-sexta"></label></div>
+          <label>Descrição <input id="admin-liga-desc" placeholder="Descrição curta da liga"></label>
+          <div class="switch-row"><label><input type="checkbox" id="admin-liga-ativa" checked> liga ativa</label></div>
+          <div class="actions"><button class="btn" type="submit">salvar liga</button><button class="btn ghost" type="button" id="limpar-liga">limpar</button></div>
+        </form>
+        <div class="league-list">
+          <div class="table-wrap"><table class="data-table"><thead><tr><th>Liga</th><th>Status</th><th>Participantes</th><th>Ação</th></tr></thead><tbody>
+            ${ligas.map(l => `<tr><td><strong>${escapeHtml(l.nome)}</strong><br><small>${escapeHtml(l.slug || "")}</small></td><td>${l.ativa ? "ativa" : "inativa"}</td><td>${l.participantes_ativos || 0}/${l.total_participantes || 0}</td><td><button class="btn secondary" type="button" data-edit-liga="${escapeAttr(l.liga_id)}">editar</button></td></tr>`).join("") || `<tr><td colspan="4">Nenhuma liga cadastrada.</td></tr>`}
+          </tbody></table></div>
+        </div>
+      </div>
+      <div class="league-members-box">
+        <div class="form-line wide">
+          <label>Liga para administrar
+            <select id="admin-liga-selecionada">${ligas.map(l => `<option value="${escapeAttr(l.liga_id)}" ${String(l.liga_id) === String(state.adminLigaSelecionada) ? "selected" : ""}>${escapeHtml(l.nome)}</option>`).join("")}</select>
+          </label>
+          <form id="admin-add-membro" class="inline-add-member">
+            <label>Adicionar participante
+              <select id="admin-add-participante">${participantesOptions}</select>
+            </label>
+            <label>Papel
+              <select id="admin-add-papel"><option value="participante">participante</option><option value="admin_liga">admin da liga</option><option value="observador">observador</option></select>
+            </label>
+            <button class="btn secondary" type="submit">adicionar à liga</button>
+          </form>
+        </div>
+        <h3>${selecionada ? `Participantes da liga ${escapeHtml(selecionada.nome)}` : "Participantes da liga"}</h3>
+        <div class="table-wrap"><table class="data-table"><thead><tr><th>Participante</th><th>Login</th><th>Papel</th><th>Status</th><th>Ação</th></tr></thead><tbody>
+          ${membros.length ? membros.map(m => `<tr><td>${escapeHtml(m.nome)}</td><td>${escapeHtml(m.login)}</td><td>${escapeHtml(m.papel)}</td><td>${m.membro_ativo ? "na liga" : "removido"}${m.participante_ativo ? "" : " · usuário inativo"}</td><td>${m.membro_ativo ? `<button class="btn danger" type="button" data-remover-liga="${escapeAttr(m.liga_id)}" data-remover-part="${escapeAttr(m.participante_id)}">remover da liga</button>` : `<button class="btn secondary" type="button" data-reativar-liga="${escapeAttr(m.liga_id)}" data-reativar-part="${escapeAttr(m.participante_id)}">reativar na liga</button>`}</td></tr>`).join("") : `<tr><td colspan="5">Nenhum participante nesta liga.</td></tr>`}
+        </tbody></table></div>
+      </div>
+    </div></article>`;
+  }
+
   async function renderAdmin() {
     await carregarAdmin();
     const cfg = configEfetiva(state.rodada);
@@ -670,7 +795,8 @@
           <label>Usuário/login <input id="admin-login" required placeholder="ex.: laercio"></label>
           <label>Novo PIN <input id="admin-pin" inputmode="numeric" placeholder="6 números"></label>
           <div class="actions"><button class="btn secondary" type="button" id="gerar-pin">gerar PIN</button><button class="btn" type="submit">salvar participante</button><button class="btn ghost" type="button" id="limpar-admin">limpar</button></div>
-          <div class="switch-row"><label><input type="checkbox" id="admin-e-admin"> administrador</label><label><input type="checkbox" id="admin-ativo" checked> ativo</label></div>
+          <div class="switch-row"><label><input type="checkbox" id="admin-e-admin"> administrador global</label><label><input type="checkbox" id="admin-ativo" checked> ativo</label></div>
+          <p class="muted-note">Para remover alguém sem apagar histórico, deixe inativo ou remova da liga. Os palpites e hashes antigos permanecem preservados.</p>
         </form>
       </div></article>
       <article class="panel"><div class="panel-inner">
@@ -682,10 +808,12 @@
           <div class="actions"><button class="btn" type="submit">salvar janela</button><button class="btn secondary" type="button" id="publicar-rodada">publicar agora</button><button class="btn secondary" type="button" id="apurar-rodada">marcar apurada</button><button class="btn danger" type="button" id="fechar-rodada">fechar rodada</button></div><p class="muted-note">Depois dos jogos, rode o workflow <strong>Apurar Apostas Brasileirão</strong>. Em seguida, marque como apurada/publicada para liberar ranking e palpites públicos.</p>
         </form>
       </div></article>
+      ${renderLigasAdminHtml()}
       <article class="panel" style="grid-column:1/-1"><div class="panel-inner">
         <div class="kicker">Percentual preenchido</div><h2>Admin vê percentual, não placares</h2>
-        <div class="table-wrap" style="margin-top:12px"><table class="data-table"><thead><tr><th>Participante</th><th>Login</th><th>Status</th><th>Preenchido</th><th>%</th><th>Ação</th></tr></thead><tbody>
-          ${state.progresso.map(p => `<tr><td>${p.nome}</td><td>${p.login}</td><td>${p.ativo ? "ativo" : "inativo"}${p.admin ? " · admin" : ""}</td><td>${p.total_palpites}/${p.total_jogos}</td><td><div class="progress-wrap"><div class="progress-bar" style="width:${Math.max(0, Math.min(100, Number(p.percentual || 0)))}%"></div></div></td><td><button class="btn secondary" type="button" data-edit="${p.participante_id}">editar</button></td></tr>`).join("")}
+        <p>Use a seção de ligas para organizar grupos. Nesta execução, o percentual abaixo continua geral; na próxima etapa ele será filtrado por liga no ranking e na auditoria.</p>
+        <div class="table-wrap" style="margin-top:12px"><table class="data-table"><thead><tr><th>Participante</th><th>Login</th><th>Status</th><th>Ligas</th><th>Preenchido</th><th>%</th><th>Ações</th></tr></thead><tbody>
+          ${state.progresso.map(p => `<tr><td>${escapeHtml(p.nome)}</td><td>${escapeHtml(p.login)}</td><td>${p.ativo ? "ativo" : "inativo"}${p.admin ? " · admin" : ""}</td><td>${ligasDoParticipante(p.participante_id).map(escapeHtml).join(", ") || "—"}</td><td>${p.total_palpites}/${p.total_jogos}</td><td><div class="progress-wrap"><div class="progress-bar" style="width:${Math.max(0, Math.min(100, Number(p.percentual || 0)))}%"></div></div></td><td class="action-cell"><button class="btn secondary" type="button" data-edit="${escapeAttr(p.participante_id)}">editar</button>${p.ativo ? `<button class="btn danger" type="button" data-inativar="${escapeAttr(p.participante_id)}">inativar</button>` : `<button class="btn secondary" type="button" data-reativar="${escapeAttr(p.participante_id)}">reativar</button>`}</td></tr>`).join("")}
         </tbody></table></div>
       </div></article>
     </section>`;
@@ -698,6 +826,106 @@
     $("#apurar-rodada")?.addEventListener("click", () => alterarStatusRodada("apurada"));
     $("#fechar-rodada").addEventListener("click", () => alterarStatusRodada("fechada"));
     $$('[data-edit]').forEach(btn => btn.addEventListener("click", () => preencherParticipante(btn.dataset.edit)));
+    $$('[data-inativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.inativar, false)));
+    $$('[data-reativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.reativar, true)));
+    $("#admin-liga-form")?.addEventListener("submit", salvarLigaAdmin);
+    $("#limpar-liga")?.addEventListener("click", limparFormLiga);
+    $("#admin-liga-selecionada")?.addEventListener("change", async ev => { state.adminLigaSelecionada = ev.target.value; await renderAdmin(); });
+    $("#admin-add-membro")?.addEventListener("submit", adicionarParticipanteLiga);
+    $$('[data-edit-liga]').forEach(btn => btn.addEventListener("click", () => preencherLiga(btn.dataset.editLiga)));
+    $$('[data-remover-liga]').forEach(btn => btn.addEventListener("click", () => removerParticipanteLiga(btn.dataset.removerLiga, btn.dataset.removerPart, false)));
+    $$('[data-reativar-liga]').forEach(btn => btn.addEventListener("click", () => removerParticipanteLiga(btn.dataset.reativarLiga, btn.dataset.reativarPart, true)));
+  }
+
+  function limparFormLiga() {
+    $("#admin-liga-id").value = "";
+    $("#admin-liga-nome").value = "";
+    $("#admin-liga-slug").value = "";
+    $("#admin-liga-desc").value = "";
+    $("#admin-liga-ativa").checked = true;
+  }
+
+  function preencherLiga(id) {
+    const l = (state.ligasAdmin || []).find(x => String(x.liga_id) === String(id));
+    if (!l) return;
+    state.adminLigaSelecionada = l.liga_id;
+    $("#admin-liga-id").value = l.liga_id;
+    $("#admin-liga-nome").value = l.nome || "";
+    $("#admin-liga-slug").value = l.slug || "";
+    $("#admin-liga-desc").value = l.descricao || "";
+    $("#admin-liga-ativa").checked = Boolean(l.ativa);
+    $("#admin-liga-nome").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  async function salvarLigaAdmin(ev) {
+    ev.preventDefault();
+    try {
+      status("Salvando liga...", "warn");
+      const rows = await rpcRows("br_admin_salvar_liga", {
+        p_admin_id: state.usuario.id,
+        p_token: state.token,
+        p_liga_id: $("#admin-liga-id").value || null,
+        p_nome: $("#admin-liga-nome").value.trim(),
+        p_slug: $("#admin-liga-slug").value.trim() || null,
+        p_descricao: $("#admin-liga-desc").value.trim() || null,
+        p_ativa: $("#admin-liga-ativa").checked
+      });
+      const liga = rows[0];
+      if (liga?.liga_id) state.adminLigaSelecionada = liga.liga_id;
+      status("Liga salva.", "ok");
+      await renderAdmin();
+    } catch (err) { status(err.message || "Falha ao salvar liga.", "err"); }
+  }
+
+  async function adicionarParticipanteLiga(ev) {
+    ev.preventDefault();
+    try {
+      const ligaId = $("#admin-liga-selecionada").value;
+      const participanteId = $("#admin-add-participante").value;
+      if (!ligaId || !participanteId) throw new Error("Selecione liga e participante.");
+      await rpcRows("br_admin_vincular_participante_liga", {
+        p_admin_id: state.usuario.id,
+        p_token: state.token,
+        p_liga_id: ligaId,
+        p_participante_id: participanteId,
+        p_papel: $("#admin-add-papel").value || "participante",
+        p_ativo: true
+      });
+      status("Participante adicionado à liga.", "ok");
+      await renderAdmin();
+    } catch (err) { status(err.message || "Falha ao adicionar participante à liga.", "err"); }
+  }
+
+  async function removerParticipanteLiga(ligaId, participanteId, reativar) {
+    try {
+      const msg = reativar ? "Reativar participante nesta liga?" : "Remover participante desta liga? O histórico antigo será preservado.";
+      if (!confirm(msg)) return;
+      await rpcRows("br_admin_vincular_participante_liga", {
+        p_admin_id: state.usuario.id,
+        p_token: state.token,
+        p_liga_id: ligaId,
+        p_participante_id: participanteId,
+        p_papel: "participante",
+        p_ativo: Boolean(reativar)
+      });
+      status(reativar ? "Participante reativado na liga." : "Participante removido da liga.", "ok");
+      await renderAdmin();
+    } catch (err) { status(err.message || "Falha ao alterar participante na liga.", "err"); }
+  }
+
+  async function alterarAtivoParticipante(participanteId, ativo) {
+    try {
+      const pergunta = ativo ? "Reativar este participante?" : "Inativar este participante? Ele não conseguirá mais entrar, mas o histórico será preservado.";
+      if (!confirm(pergunta)) return;
+      await rpcRows("br_admin_alterar_status_participante", {
+        p_admin_id: state.usuario.id,
+        p_token: state.token,
+        p_participante_id: participanteId,
+        p_ativo: Boolean(ativo)
+      });
+      status(ativo ? "Participante reativado." : "Participante inativado.", "ok");
+      await renderAdmin();
+    } catch (err) { status(err.message || "Falha ao alterar status do participante.", "err"); }
   }
 
   function toDatetimeLocal(iso) {
@@ -794,8 +1022,12 @@
 
   async function refresh() {
     await carregarConfigsSupabase();
-    if (state.usuario) await carregarMeusPalpites();
+    if (state.usuario) {
+      await carregarLigas();
+      await carregarMeusPalpites();
+    }
     renderLogin();
+    renderLigaBox();
     renderConteudo();
   }
 
