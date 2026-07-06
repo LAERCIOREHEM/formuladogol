@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'index.html'
+      - '*.html'
       - 'CNAME'
       - '*.json'
       - '*.png'
@@ -17,6 +17,9 @@ on:
       - 'favicon*'
       - 'apple-touch-icon.png'
       - 'img/**'
+      - 'css/**'
+      - 'js/**'
+      - 'dados-br/**'
       - 'copa2026/**'
       - 'docs/**'
       - '.github/workflows/deploy.yml'
@@ -26,10 +29,11 @@ on:
   # workflow por "push" usando GITHUB_TOKEN.
   workflow_run:
     workflows:
-      - 'Atualizar Brasileirao (ESPN + jogos/resultados)'
+      - 'Atualizar Brasileirao (ESPN)'
       - 'Atualizar tudo (agora somente Copa - ranking de desempenho)'
       - 'Buscar melhores momentos (CazéTV)'
       - 'Atualiza fair play (cartões)'
+      - 'Apurar Apostas Brasileirão'
     types: [completed]
 
 permissions:
@@ -71,8 +75,10 @@ jobs:
           rm -rf _site
           mkdir -p _site
 
-          for item in \
-            index.html CNAME robots.txt sitemap.xml \
+          # Arquivos de raiz que precisam ser publicados.
+          # IMPORTANTE: apos o Brasileirão v2, as paginas apostas/estatisticas/clubes/museu/regras
+          # tambem ficam na raiz. Antes o deploy copiava só index.html, causando 404 nessas paginas.
+          for item in *.html CNAME robots.txt sitemap.xml \
             tabela.json resultados.json jogos.json membros.json \
             espn_eventos.json transmissoes.json \
             favicon.ico favicon-16.png favicon-32.png favicon-96.png favicon-192.png favicon-512.png \
@@ -82,9 +88,12 @@ jobs:
             fi
           done
 
-          if [[ -d img ]]; then cp -a img _site/; fi
-          if [[ -d copa2026 ]]; then cp -a copa2026 _site/; fi
-          if [[ -d docs ]]; then cp -a docs _site/; fi
+          # Assets e dados usados pelas paginas novas do Brasileirão.
+          for dir in img css js dados-br copa2026 docs; do
+            if [[ -d "$dir" ]]; then
+              cp -a "$dir" _site/
+            fi
+          done
 
           touch _site/.nojekyll
 
@@ -97,6 +106,34 @@ jobs:
             echo "ERRO: _site/index.html nao encontrado."
             exit 1
           fi
+
+          # Trava especifica do Brasileirao v2: estas paginas e assets precisam
+          # entrar no artefato publicado; se ficarem fora, o site abre a home,
+          # mas /apostas.html, /estatisticas.html, /clubes.html e /museu.html dao 404.
+          REQUIRED_BR=(
+            "_site/apostas.html"
+            "_site/estatisticas.html"
+            "_site/clubes.html"
+            "_site/museu.html"
+            "_site/regras.html"
+            "_site/css/br-apostas.css"
+            "_site/css/br-estatisticas.css"
+            "_site/css/br-institucional.css"
+            "_site/js/br-apostas.js"
+            "_site/js/br-estatisticas.js"
+            "_site/js/br-clubes.js"
+            "_site/js/br-museu.js"
+            "_site/dados-br/apostas-config.json"
+            "_site/dados-br/clubes.json"
+            "_site/dados-br/museu-brasileirao.json"
+          )
+          for f in "${REQUIRED_BR[@]}"; do
+            if [[ ! -e "$f" ]]; then
+              echo "ERRO: arquivo obrigatório do Brasileirão v2 fora do deploy: $f"
+              exit 1
+            fi
+          done
+          echo "OK: paginas e assets do Brasileirao v2 incluidos no pacote estatico."
 
           if find _site -type l | grep -q .; then
             echo "ERRO: existem symlinks dentro de _site."
