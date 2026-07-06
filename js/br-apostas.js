@@ -26,6 +26,10 @@
     aba: "apostas",
     meusPalpites: [],
     publicos: [],
+    apuracao: { rodadas: [], ranking_geral: [] },
+    rankingApostas: { ranking_geral: [] },
+    auditoria: [],
+    auditoriaEventos: [],
     participantes: [],
     progresso: []
   };
@@ -98,6 +102,22 @@
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "");
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[ch] || ch));
+  }
+
+  function tipoLabel(tipo) {
+    return ({ exato: "cravou", saldo: "saldo", resultado: "resultado", erro: "errou", descartado: "fora do prazo" }[tipo] || tipo || "—");
+  }
+
+  function pontosClasse(pontos) {
+    const n = Number(pontos || 0);
+    if (n >= 5) return "score-max";
+    if (n >= 3) return "score-mid";
+    if (n >= 2) return "score-low";
+    return "score-zero";
   }
 
   function timeNome(time) { return (time && time.nome) || String(time || ""); }
@@ -236,16 +256,20 @@
 
   async function carregarBase() {
     const arq = CFG.arquivos || {};
-    const [jogosJson, resultadosJson, espnEventosJson, configLocal] = await Promise.all([
+    const [jogosJson, resultadosJson, espnEventosJson, configLocal, apuracao, rankingApostas] = await Promise.all([
       fetchJson(arq.jogos || "jogos.json", { jogos: [] }),
       fetchJson(arq.resultados || "resultados.json", { resultados: [] }),
       fetchJson(arq.eventos || "espn_eventos.json", { eventos: [] }),
-      fetchJson(arq.configRodadas || "dados-br/apostas-config.json", { rodadas: [] })
+      fetchJson(arq.configRodadas || "dados-br/apostas-config.json", { rodadas: [] }),
+      fetchJson("dados-br/apuracao.json", { rodadas: [], ranking_geral: [] }),
+      fetchJson("dados-br/ranking-apostas.json", { ranking_geral: [] })
     ]);
     state.jogosJson = jogosJson;
     state.resultadosJson = resultadosJson;
     state.espnEventosJson = espnEventosJson;
     state.configLocal = configLocal;
+    state.apuracao = apuracao || { rodadas: [], ranking_geral: [] };
+    state.rankingApostas = rankingApostas || { ranking_geral: [] };
     state.jogos = todosJogos();
     const set = new Set();
     for (let r = Number(CFG.rodadaInicialApostas || 20); r <= 38; r += 1) set.add(r);
@@ -448,9 +472,57 @@
     </div></section>`;
   }
 
+  function apuracaoRodada(rodada) {
+    const lista = (state.apuracao && state.apuracao.rodadas) || [];
+    return lista.find(r => Number(r.rodada) === Number(rodada)) || null;
+  }
+
+  function mapaPontosRodada(rodada) {
+    const ap = apuracaoRodada(rodada);
+    const mapa = new Map();
+    if (!ap || !Array.isArray(ap.jogos)) return mapa;
+    ap.jogos.forEach(j => {
+      (j.palpites || []).forEach(p => {
+        mapa.set(`${p.membro || ""}::${j.resultado?.event_id || j.event_id || ""}`, p);
+      });
+    });
+    return mapa;
+  }
+
+  function renderRanking() {
+    const root = $("#conteudo");
+    const ap = apuracaoRodada(state.rodada);
+    const geral = (state.rankingApostas && state.rankingApostas.ranking_geral) || (state.apuracao && state.apuracao.ranking_geral) || [];
+    if (!ap || ap.sigilosa) {
+      root.innerHTML = `<section class="panel"><div class="panel-inner empty"><strong>Ranking da rodada ainda não publicado.</strong><p>A apuração só aparece aqui depois que a rodada tiver resultados e for marcada como apurada/publicada. Enquanto isso, os palpites seguem sigilosos.</p>${state.usuario?.admin ? `<p class="muted-note">Admin: rode o workflow <strong>Apurar Apostas Brasileirão</strong> após os jogos e depois publique a rodada quando quiser liberar para todos.</p>` : ""}</div></section>${renderRankingGeral(geral)}`;
+      return;
+    }
+    const ranking = ap.ranking || [];
+    root.innerHTML = `<section class="ranking-grid">
+      <article class="panel"><div class="panel-inner">
+        <div class="kicker">Ranking da rodada</div><h2>Rodada ${state.rodada}</h2>
+        <p>${(ap.vencedores || []).length ? `🏆 Vencedor(es): <strong>${(ap.vencedores || []).map(escapeHtml).join(", ")}</strong>` : "Aguardando jogos apurados."}</p>
+        ${ranking.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Participante</th><th>Pontos</th><th>Cravadas</th><th>Saldo</th><th>Resultado</th><th>Erros</th></tr></thead><tbody>${ranking.map(r => `<tr><td>${r.pos}</td><td>${escapeHtml(r.membro)}</td><td class="num gold-num">${r.pontos}</td><td>${r.cravadas}</td><td>${r.saldos}</td><td>${r.resultados}</td><td>${r.erros}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Nenhum jogo apurado nesta rodada.</div>`}
+      </div></article>
+      <article class="panel"><div class="panel-inner">
+        <div class="kicker">Resumo técnico</div><h2>Apuração</h2>
+        <div class="audit-kpis"><span><strong>${ap.participantes || 0}</strong><small>participantes</small></span><span><strong>${ap.jogos_apurados || 0}</strong><small>jogos apurados</small></span><span><strong>${ap.palpites_descartados_fora_do_prazo || 0}</strong><small>descartados</small></span></div>
+        <p class="muted-note">Atualizado em ${fmtDataLonga((state.apuracao || {}).atualizado_em)}.</p>
+      </div></article>
+    </section>${renderRankingGeral(geral)}`;
+  }
+
+  function renderRankingGeral(geral) {
+    const lista = Array.isArray(geral) ? geral : [];
+    if (!lista.length) return `<section class="panel"><div class="panel-inner empty">Ranking acumulado ainda sem rodadas publicadas.</div></section>`;
+    return `<section class="panel"><div class="panel-inner"><div class="kicker">Ranking acumulado</div><h2>Bolão de placares</h2><div class="table-wrap"><table class="data-table"><thead><tr><th>#</th><th>Participante</th><th>Pontos</th><th>Cravadas</th><th>Saldo</th><th>Resultado</th><th>Vitórias de rodada</th></tr></thead><tbody>${lista.map(r => `<tr><td>${r.pos}</td><td>${escapeHtml(r.membro)}</td><td class="num gold-num">${r.pontos}</td><td>${r.cravadas}</td><td>${r.saldos}</td><td>${r.resultados}</td><td>${r.vitorias_rodada || 0}</td></tr>`).join("")}</tbody></table></div></div></section>`;
+  }
+
   async function renderPublico() {
     await carregarPublicos();
     const root = $("#conteudo");
+    const ap = apuracaoRodada(state.rodada);
+    const pontosMap = mapaPontosRodada(state.rodada);
     if (!rodadaPublica(state.rodada) && !state.publicos.length) {
       root.innerHTML = `<section class="panel"><div class="panel-inner empty"><strong>Palpites ainda sigilosos.</strong><p>A rodada ${state.rodada} só abre para todos após o fechamento/publicação feita pelo administrador.</p></div></section>`;
       return;
@@ -461,9 +533,13 @@
     }
     root.innerHTML = `<section class="panel"><div class="panel-inner">
       <div class="kicker">Palpites públicos</div><h2>Rodada ${state.rodada}</h2>
-      <p>Lista aberta após publicação da rodada.</p>
-      <div class="table-wrap" style="margin-top:12px"><table class="data-table"><thead><tr><th>Participante</th><th>Jogo</th><th>Palpite</th><th>Hash</th></tr></thead><tbody>
-        ${state.publicos.map(p => `<tr><td>${p.membro}</td><td>${p.mandante} x ${p.visitante}</td><td class="num">${p.placar_mandante} x ${p.placar_visitante}</td><td class="hash">${p.hash_fechamento || "—"}</td></tr>`).join("")}
+      <p>Lista aberta após publicação da rodada. Quando a apuração já estiver disponível, a tabela mostra pontos e tipo de acerto jogo a jogo.</p>
+      ${ap && !ap.sigilosa ? `<div class="status ok">Apuração publicada · ${ap.jogos_apurados || 0} jogos apurados.</div>` : `<div class="status warn">Palpites publicados; pontos aparecem após o workflow de apuração.</div>`}
+      <div class="table-wrap" style="margin-top:12px"><table class="data-table"><thead><tr><th>Participante</th><th>Jogo</th><th>Palpite</th><th>Pontos</th><th>Tipo</th><th>Hash</th></tr></thead><tbody>
+        ${state.publicos.map(p => {
+          const det = pontosMap.get(`${p.membro || ""}::${p.event_id || ""}`) || {};
+          return `<tr><td>${escapeHtml(p.membro)}</td><td>${escapeHtml(p.mandante)} x ${escapeHtml(p.visitante)}</td><td class="num">${p.placar_mandante} x ${p.placar_visitante}</td><td class="num ${pontosClasse(det.pontos)}">${det.pontos ?? "—"}</td><td>${escapeHtml(tipoLabel(det.tipo))}</td><td class="hash">${escapeHtml(p.hash_fechamento || "—")}</td></tr>`;
+        }).join("")}
       </tbody></table></div>
     </div></section>`;
   }
@@ -487,6 +563,50 @@
 
   function pinAleatorio() {
     return String(Math.floor(100000 + Math.random() * 900000));
+  }
+
+  async function carregarAuditoria() {
+    if (!state.usuario?.admin) return;
+    try {
+      const [rel, eventos] = await Promise.all([
+        rpcRows("br_admin_relatorio_auditoria", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada, p_total_jogos: jogosDaRodada(state.rodada).length }),
+        rpcRows("br_admin_auditoria_eventos", { p_admin_id: state.usuario.id, p_token: state.token, p_temporada: CFG.temporada || 2026, p_rodada: state.rodada })
+      ]);
+      state.auditoria = rel;
+      state.auditoriaEventos = eventos;
+    } catch (err) {
+      console.warn("Auditoria indisponível", err);
+      state.auditoria = [];
+      state.auditoriaEventos = [];
+    }
+  }
+
+  async function renderAuditoria() {
+    const root = $("#conteudo");
+    if (!state.usuario?.admin) {
+      root.innerHTML = `<section class="panel"><div class="panel-inner empty">Área restrita ao administrador.</div></section>`;
+      return;
+    }
+    await carregarAuditoria();
+    root.innerHTML = `<section class="panel"><div class="panel-inner">
+      <div class="kicker">Relatório de auditoria</div><h2>Rodada ${state.rodada}</h2>
+      <p>Conferência administrativa: preenchimento, hashes, primeira/última gravação e quantidade de alterações. Os placares continuam preservados pelas regras de publicação.</p>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Participante</th><th>Login</th><th>Preenchido</th><th>%</th><th>Hash</th><th>Primeiro envio</th><th>Última alteração</th><th>Alterações</th></tr></thead><tbody>
+        ${state.auditoria.map(r => `<tr><td>${escapeHtml(r.nome)}</td><td>${escapeHtml(r.login)}</td><td>${r.total_palpites}/${r.total_jogos}</td><td>${Number(r.percentual || 0).toFixed(0)}%</td><td class="hash">${escapeHtml(r.hash_fechamento || "—")}</td><td>${fmtDataLonga(r.primeiro_envio)}</td><td>${fmtDataLonga(r.ultimo_envio)}</td><td>${r.alteracoes || 0}</td></tr>`).join("")}
+      </tbody></table></div>
+      <div class="audit-actions"><button class="btn secondary" type="button" id="copiar-auditoria">copiar resumo</button></div>
+    </div></section>
+    <section class="panel"><div class="panel-inner"><div class="kicker">Eventos de auditoria</div><h2>Últimas alterações</h2>
+      ${state.auditoriaEventos.length ? `<div class="table-wrap"><table class="data-table"><thead><tr><th>Quando</th><th>Participante</th><th>Jogo</th><th>Ação</th><th>Hash</th></tr></thead><tbody>${state.auditoriaEventos.map(e => `<tr><td>${fmtDataLonga(e.criado_em)}</td><td>${escapeHtml(e.membro)}</td><td>${escapeHtml(e.event_id)}</td><td>${escapeHtml(e.acao)}</td><td class="hash">${escapeHtml(e.hash_fechamento || "—")}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Ainda não há eventos de auditoria para esta rodada.</div>`}
+    </div></section>`;
+    $("#copiar-auditoria")?.addEventListener("click", copiarResumoAuditoria);
+  }
+
+  async function copiarResumoAuditoria() {
+    const linhas = state.auditoria.map(r => `${r.nome}: ${r.total_palpites}/${r.total_jogos} (${Number(r.percentual || 0).toFixed(0)}%) · hash ${r.hash_fechamento || "—"}`);
+    const texto = `Auditoria Rodada ${state.rodada}\n` + linhas.join("\n");
+    try { await navigator.clipboard.writeText(texto); status("Resumo de auditoria copiado.", "ok"); }
+    catch (_) { status("Não consegui copiar automaticamente; selecione a tabela manualmente.", "warn"); }
   }
 
   async function renderAdmin() {
@@ -515,7 +635,7 @@
           <div class="two"><label>Abre em <input id="cfg-abre" type="datetime-local" value="${toDatetimeLocal(cfg.abre_em)}"></label><label>Fecha em <input id="cfg-fecha" type="datetime-local" value="${toDatetimeLocal(cfg.fecha_em)}"></label></div>
           <div class="two"><label>Publica em <input id="cfg-publica" type="datetime-local" value="${toDatetimeLocal(cfg.publica_em)}"></label><label>Status <select id="cfg-status"><option value="programada">programada</option><option value="aberta">aberta</option><option value="fechada">fechada</option><option value="apurada">apurada</option><option value="publicada">publicada</option><option value="bloqueada">bloqueada</option></select></label></div>
           <label>Observação <input id="cfg-obs" value="${escapeAttr(cfg.observacao || "")}"></label>
-          <div class="actions"><button class="btn" type="submit">salvar janela</button><button class="btn secondary" type="button" id="publicar-rodada">publicar agora</button><button class="btn danger" type="button" id="fechar-rodada">fechar rodada</button></div>
+          <div class="actions"><button class="btn" type="submit">salvar janela</button><button class="btn secondary" type="button" id="publicar-rodada">publicar agora</button><button class="btn secondary" type="button" id="apurar-rodada">marcar apurada</button><button class="btn danger" type="button" id="fechar-rodada">fechar rodada</button></div><p class="muted-note">Depois dos jogos, rode o workflow <strong>Apurar Apostas Brasileirão</strong>. Em seguida, marque como apurada/publicada para liberar ranking e palpites públicos.</p>
         </form>
       </div></article>
       <article class="panel" style="grid-column:1/-1"><div class="panel-inner">
@@ -531,6 +651,7 @@
     $("#admin-participante").addEventListener("submit", salvarParticipanteAdmin);
     $("#admin-rodada").addEventListener("submit", salvarRodadaAdmin);
     $("#publicar-rodada").addEventListener("click", () => alterarStatusRodada("publicada"));
+    $("#apurar-rodada")?.addEventListener("click", () => alterarStatusRodada("apurada"));
     $("#fechar-rodada").addEventListener("click", () => alterarStatusRodada("fechada"));
     $$('[data-edit]').forEach(btn => btn.addEventListener("click", () => preencherParticipante(btn.dataset.edit)));
   }
@@ -620,7 +741,9 @@
     renderRodadas();
     $$("[data-aba]").forEach(btn => btn.classList.toggle("active", btn.dataset.aba === state.aba));
     if (state.aba === "meus") return renderMeus();
+    if (state.aba === "ranking") return renderRanking();
     if (state.aba === "publico") return renderPublico();
+    if (state.aba === "auditoria") return renderAuditoria();
     if (state.aba === "admin") return renderAdmin();
     return renderApostas();
   }
