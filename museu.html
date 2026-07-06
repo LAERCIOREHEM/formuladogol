@@ -8,6 +8,7 @@
   <meta name="theme-color" content="#10b981">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="stylesheet" href="css/br-institucional.css">
+<link rel="stylesheet" href="css/br-global.css?v=20260706-exec6">
 </head>
 <body>
   <div class="container">
@@ -16,14 +17,17 @@
     </header>
 
     <nav class="nav" aria-label="Menu principal">
-      <a href="./?brasileirao=1">⚽ Jogos</a>
-      <a href="./?brasileirao=1" data-anchor="rank">🏆 Bolão</a>
-      <a href="./?brasileirao=1" data-anchor="tabela">📊 Tabela</a>
-      <a href="./?brasileirao=1" data-anchor="resultados">✅ Resultados</a>
+      <a href="./?brasileirao=1&view=jogos" data-br-view="jogos">⚽ Jogos</a>
+      <a href="apostas.html">🎯 Apostas</a>
+      <a href="./?brasileirao=1&view=rank" data-br-view="rank">🏆 Bolão</a>
+      <a href="./?brasileirao=1&view=tabela" data-br-view="tabela">📊 Tabela</a>
+      <a href="./?brasileirao=1&view=resultados" data-br-view="resultados">✅ Resultados</a>
       <a href="estatisticas.html">📈 Estatísticas</a>
       <a href="clubes.html">🛡️ Clubes</a>
-      <a class="active" href="museu.html">🏛️ Museu</a>
+      <a href="museu.html" class="active">🏛️ Museu</a>
       <a href="regras.html">ℹ️ Regras</a>
+      <a href="./?brasileirao=1&view=aniversariantes" data-br-view="aniversariantes">🎂 Aniversariantes</a>
+      <a href="copa2026/">🏆 Bolão Copa 2026</a>
     </nav>
 
     <main>
@@ -108,5 +112,6 @@
       a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-anchor')); });
     });
   </script>
+<script src="js/br-menu.js?v=20260706-exec6"></script>
 </body>
 </html>

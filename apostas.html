@@ -9,6 +9,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="css/br-apostas.css">
+<link rel="stylesheet" href="css/br-global.css?v=20260706-exec6">
 </head>
 <body>
   <main class="container">
@@ -16,21 +17,27 @@
       <img src="img/header-br.jpg" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
     </section>
 
-    <div class="topbar">
-      <div>
-        <div class="brand-mini">Bolão Brasileirão 2026</div>
+    <nav class="nav" aria-label="Menu principal">
+      <a href="./?brasileirao=1&view=jogos" data-br-view="jogos">⚽ Jogos</a>
+      <a href="apostas.html" class="active">🎯 Apostas</a>
+      <a href="./?brasileirao=1&view=rank" data-br-view="rank">🏆 Bolão</a>
+      <a href="./?brasileirao=1&view=tabela" data-br-view="tabela">📊 Tabela</a>
+      <a href="./?brasileirao=1&view=resultados" data-br-view="resultados">✅ Resultados</a>
+      <a href="estatisticas.html">📈 Estatísticas</a>
+      <a href="clubes.html">🛡️ Clubes</a>
+      <a href="museu.html">🏛️ Museu</a>
+      <a href="regras.html">ℹ️ Regras</a>
+      <a href="./?brasileirao=1&view=aniversariantes" data-br-view="aniversariantes">🎂 Aniversariantes</a>
+      <a href="copa2026/">🏆 Bolão Copa 2026</a>
+    </nav>
+
+    <section class="panel br-page-title">
+      <div class="panel-inner">
+        <div class="kicker">Bolão Brasileirão 2026</div>
         <h1>Apostas da Rodada</h1>
         <p>Palpites de placar por rodada, com janela quinta-feira → sábado 10h.</p>
       </div>
-      <nav class="nav" aria-label="Navegação">
-        <a href="./?brasileirao=1">⚽ Jogos</a>
-        <a href="apostas.html" class="active">🎯 Apostas</a>
-        <a href="./?brasileirao=1" data-br-view="rank">🏆 Bolão</a>
-        <a href="estatisticas.html">📈 Estatísticas</a>
-        <a href="regras.html">ℹ️ Regras</a>
-        <a href="copa2026/">🏆 Copa 26</a>
-      </nav>
-    </div>
+    </section>
 
     <div id="status" class="status warn">Inicializando...</div>
 
@@ -85,5 +92,6 @@
       a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-br-view')); });
     });
   </script>
+<script src="js/br-menu.js?v=20260706-exec6"></script>
 </body>
 </html>

@@ -273,3 +273,12 @@ select:focus, input[type="number"]:focus { border-color: rgba(163,230,53,.65); b
 @media (prefers-reduced-motion: reduce) {
   * { transition-duration: .001ms !important; animation-duration: .001ms !important; }
 }
+
+
+/* EXECUCAO 6 - compatibilidade visual */
+.topbar { display: block; margin: 0 0 12px; }
+.topbar .nav { margin-top: 12px; }
+.br-page-title { margin-bottom: 14px; }
+@media (max-width: 640px) {
+  .topbar { display: block; }
+}

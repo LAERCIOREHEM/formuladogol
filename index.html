@@ -1643,6 +1643,7 @@
   }
 
 </style>
+<link rel="stylesheet" href="css/br-global.css?v=20260706-exec6">
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
@@ -1670,18 +1671,18 @@
     </div>
   </header>
   <nav class="nav" aria-label="Menu principal">
-    <button onclick="setView('jogos')" id="btn-jogos" class="active">⚽ Jogos</button>
-    <button onclick="location.href='apostas.html'" id="btn-apostas">🎯 Apostas</button>
-    <button onclick="setView('rank')" id="btn-rank">🏆 Bolão</button>
-    <button onclick="setView('tabela')" id="btn-tabela">📊 Tabela</button>
-    <button onclick="setView('resultados')" id="btn-resultados">✅ Resultados</button>
-    <button onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
-    <button onclick="location.href='clubes.html'" id="btn-clubes">🛡️ Clubes</button>
-    <button onclick="location.href='museu.html'" id="btn-museu">🏛️ Museu</button>
-    <button onclick="location.href='regras.html'" id="btn-regras">ℹ️ Regras</button>
-    <button onclick="setView('aniversariantes')" id="btn-aniversariantes">🎂 Aniversários</button>
-    <button onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
-    <button onclick="adminAction()" id="btn-admin">⚙️ Admin</button>
+    <button type="button" onclick="setView('jogos')" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</button>
+    <button type="button" onclick="location.href='apostas.html'" id="btn-apostas">🎯 Apostas</button>
+    <button type="button" onclick="setView('rank')" id="btn-rank" data-br-view="rank">🏆 Bolão</button>
+    <button type="button" onclick="setView('tabela')" id="btn-tabela" data-br-view="tabela">📊 Tabela</button>
+    <button type="button" onclick="setView('resultados')" id="btn-resultados" data-br-view="resultados">✅ Resultados</button>
+    <button type="button" onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
+    <button type="button" onclick="location.href='clubes.html'" id="btn-clubes">🛡️ Clubes</button>
+    <button type="button" onclick="location.href='museu.html'" id="btn-museu">🏛️ Museu</button>
+    <button type="button" onclick="location.href='regras.html'" id="btn-regras">ℹ️ Regras</button>
+    <button type="button" onclick="setView('aniversariantes')" id="btn-aniversariantes" data-br-view="aniversariantes">🎂 Aniversariantes</button>
+    <button type="button" onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
+    <button type="button" onclick="adminAction()" id="btn-admin">⚙️ Admin</button>
   </nav>
 
   <div class="status-bar" id="status-bar">
@@ -2026,8 +2027,11 @@ async function inicializar() {
   // Carregamento assíncrono dos JSONs do servidor (atualiza se for mais novo)
   carregarMembrosDoServidor();
 
-  // Permite que páginas separadas (Apostas/Estatísticas/Regras) voltem para uma aba específica.
-  const viewInicial = sessionStorage.getItem('brViewInicial');
+  // Permite que páginas separadas voltem para uma aba específica por query string
+  // (?brasileirao=1&view=tabela) ou por sessionStorage (fallback para links antigos).
+  const paramsInit = new URLSearchParams(location.search || '');
+  const viewParam = paramsInit.get('view');
+  const viewInicial = viewParam || sessionStorage.getItem('brViewInicial');
   if (viewInicial) {
     sessionStorage.removeItem('brViewInicial');
     if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes'].includes(viewInicial)) {
@@ -2269,6 +2273,7 @@ function render() {
   // Botão de admin
   const btnAdmin = document.getElementById('btn-admin');
   btnAdmin.textContent = state.ehAdmin ? 'Sair do admin' : 'Admin';
+  if (window.BR_CENTER_ACTIVE_NAV) setTimeout(window.BR_CENTER_ACTIVE_NAV, 40);
 }
 
 function setView(v) {
@@ -2284,6 +2289,7 @@ function setView(v) {
     carregarResultados();
   }
   render();
+  if (window.BR_CENTER_ACTIVE_NAV) setTimeout(window.BR_CENTER_ACTIVE_NAV, 40);
 }
 
 function abrirEmBreve(modulo) {
@@ -2507,7 +2513,8 @@ function renderTabela() {
   html += `<div class="br-stat-card"><div class="br-stat-label">Z4 atual</div><div class="br-stat-value" style="font-size:16px;line-height:1.2;">${z4 || '-'}</div><div class="br-stat-note">zona de rebaixamento</div></div>`;
   html += '</div>';
 
-  html += '<div class="tabela-shell"><div class="tabela-scroll"><table class="tabela-br"><thead><tr>' +
+  html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
+  html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><thead><tr>' +
     '<th style="width:64px;">Pos</th><th>Time</th>' +
     '<th style="text-align:center;">P</th>' +
     '<th style="text-align:center;">J</th>' +
@@ -3941,5 +3948,6 @@ setTimeout(() => {
     }
   })();
 </script>
+<script src="js/br-menu.js?v=20260706-exec6"></script>
 </body>
 </html>

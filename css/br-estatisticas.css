@@ -295,3 +295,12 @@ p { margin: 7px 0 0; color: var(--muted); }
   font-weight: 950;
 }
 .club-detail-head .escudo-fallback { width: 36px; height: 36px; border-radius: 13px; }
+
+
+/* EXECUCAO 6 - compatibilidade visual */
+.topbar { display: block; margin: 0 0 12px; }
+.topbar .nav { margin-top: 12px; }
+.br-page-title { margin-bottom: 14px; }
+@media (max-width: 640px) {
+  .topbar { display: block; }
+}

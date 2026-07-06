@@ -7,6 +7,7 @@
   <meta name="description" content="Artilharia, assistências, melhor ataque, melhor defesa e ranking de desempenho do Brasileirão 2026 do Bolão Almoço de Sexta.">
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="css/br-estatisticas.css">
+<link rel="stylesheet" href="css/br-global.css?v=20260706-exec6">
 </head>
 <body>
   <div class="container">
@@ -15,21 +16,23 @@
     </header>
 
     <nav class="nav" aria-label="Menu principal">
-      <a href="./?brasileirao=1">⚽ Jogos</a>
+      <a href="./?brasileirao=1&view=jogos" data-br-view="jogos">⚽ Jogos</a>
       <a href="apostas.html">🎯 Apostas</a>
-      <a href="./?brasileirao=1" data-anchor="rank">🏆 Bolão</a>
-      <a href="./?brasileirao=1" data-anchor="tabela">📊 Tabela</a>
-      <a href="./?brasileirao=1" data-anchor="resultados">✅ Resultados</a>
-      <a class="active" href="estatisticas.html">📈 Estatísticas</a>
+      <a href="./?brasileirao=1&view=rank" data-br-view="rank">🏆 Bolão</a>
+      <a href="./?brasileirao=1&view=tabela" data-br-view="tabela">📊 Tabela</a>
+      <a href="./?brasileirao=1&view=resultados" data-br-view="resultados">✅ Resultados</a>
+      <a href="estatisticas.html" class="active">📈 Estatísticas</a>
       <a href="clubes.html">🛡️ Clubes</a>
       <a href="museu.html">🏛️ Museu</a>
       <a href="regras.html">ℹ️ Regras</a>
+      <a href="./?brasileirao=1&view=aniversariantes" data-br-view="aniversariantes">🎂 Aniversariantes</a>
+      <a href="copa2026/">🏆 Bolão Copa 2026</a>
     </nav>
 
     <main>
       <section class="page-title panel">
         <div class="panel-inner">
-          <div class="kicker">Brasileirão 2026 · Execução 4</div>
+          <div class="kicker">Brasileirão 2026</div>
           <h1>Estatísticas e desempenho</h1>
           <p>Artilharia, garçons, força ofensiva/defensiva e ranking técnico dos clubes, alimentados pelos JSONs da ESPN e pelo robô de estatísticas.</p>
           <div class="meta-line" id="meta-line">Carregando estatísticas...</div>
@@ -135,5 +138,6 @@
   </div>
 
   <script src="js/br-estatisticas.js"></script>
+<script src="js/br-menu.js?v=20260706-exec6"></script>
 </body>
 </html>
