@@ -335,13 +335,9 @@
   }
 
   function renderAvisos() {
-    const avisos = [].concat(state.estatisticas?.avisos || [], state.jogadores?.avisos || []);
-    if (!avisos.length) {
-      $("avisos-panel").hidden = true;
-      return;
-    }
-    $("avisos-panel").hidden = false;
-    $("avisos").innerHTML = avisos.map((a) => `<div class="aviso">${escapeHtml(a)}</div>`).join("");
+    // Ajuste fino: avisos técnicos da coleta ficam apenas no console/JSON,
+    // não na interface do usuário final. A página deve parecer produto, não log.
+    return;
   }
 
   function renderTudo() {

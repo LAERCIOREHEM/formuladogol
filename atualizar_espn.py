@@ -561,6 +561,7 @@ def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[st
 
     normalizados.sort(key=lambda e: e["_sort"])
     inferir_rodadas_faltantes(normalizados)
+    normalizados = sanear_eventos_por_rodada(normalizados)
     return normalizados
 
 
@@ -573,6 +574,77 @@ def inferir_rodadas_faltantes(eventos: list[dict[str, Any]]) -> None:
         # plano B para não quebrar visual. Quando a ESPN/JSON legado traz rodada,
         # essa inferência não entra.
         e["rodada"] = max(1, min(38, (i // 10) + 1))
+
+
+def prefixo_evento_espn(event_id: Any) -> str:
+    s = str(event_id or "")
+    return s[:6] if len(s) >= 6 else s
+
+
+def sanear_eventos_por_rodada(eventos: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Garante a regra estrutural do Brasileirão: no máximo 10 jogos por rodada.
+
+    A ESPN eventualmente inclui jogos isolados/reagendados com o mesmo número de
+    rodada do calendário regular. Isso gerou rodadas com 11 jogos e até clube
+    repetido na mesma rodada. Para o site e para as apostas, isso é inviável.
+
+    Critério conservador:
+      1. se a rodada tem até 10 jogos, não muda nada;
+      2. se tem mais de 10, prioriza o prefixo dominante de event_id ESPN
+         (normalmente o bloco regular da competição);
+      3. se ainda sobrar mais de 10, escolhe 10 jogos sem clube duplicado;
+      4. em último caso, corta nos 10 primeiros ordenados por data.
+    """
+    por_rodada: dict[int, list[dict[str, Any]]] = {}
+    sem_rodada: list[dict[str, Any]] = []
+    for e in eventos:
+        r = int(e.get("rodada") or 0)
+        if not r:
+            sem_rodada.append(e)
+            continue
+        por_rodada.setdefault(r, []).append(e)
+
+    saneados: list[dict[str, Any]] = []
+    for rodada in sorted(por_rodada):
+        arr = sorted(por_rodada[rodada], key=lambda x: x.get("_sort") or 0)
+        original = len(arr)
+        if original > 10:
+            cont: dict[str, int] = {}
+            for e in arr:
+                pref = prefixo_evento_espn(e.get("event_id"))
+                if pref:
+                    cont[pref] = cont.get(pref, 0) + 1
+            dominante = max(cont.items(), key=lambda kv: kv[1])[0] if cont else ""
+            filtrada = [e for e in arr if prefixo_evento_espn(e.get("event_id")) == dominante]
+            if len(filtrada) >= 10:
+                arr = filtrada
+
+        if len(arr) > 10:
+            usados: set[str] = set()
+            sem_duplicar: list[dict[str, Any]] = []
+            for e in arr:
+                mand = str(e.get("mandante_nome") or "")
+                vis = str(e.get("visitante_nome") or "")
+                if not mand or not vis or mand in usados or vis in usados:
+                    continue
+                usados.add(mand)
+                usados.add(vis)
+                sem_duplicar.append(e)
+                if len(sem_duplicar) == 10:
+                    break
+            if len(sem_duplicar) == 10:
+                arr = sem_duplicar
+
+        if original > 10:
+            removidos = original - min(len(arr), 10)
+            print(f"Rodada {rodada}: ESPN retornou {original} jogos; publicando {min(len(arr), 10)} e removendo {max(0, removidos)} extra(s).")
+            for e in arr[10:]:
+                print(f"  - extra ignorado: {e.get('mandante_nome')} x {e.get('visitante_nome')} ({e.get('data_iso')}, {e.get('event_id')})")
+        saneados.extend(arr[:10])
+
+    saneados.extend(sem_rodada)
+    saneados.sort(key=lambda e: e.get("_sort") or 0)
+    return saneados
 
 
 def carregar_transmissoes_manuais() -> list[dict[str, Any]]:

@@ -1007,7 +1007,7 @@
   .hero-header img {
     display: block;
     width: 100%;
-    height: clamp(150px, 17vw, 248px);
+    height: clamp(92px, 10vw, 132px);
     object-fit: cover;
     object-position: center 50%;
   }
@@ -1269,7 +1269,7 @@
     mix-blend-mode: screen;
   }
   .hero-header img {
-    height: clamp(150px, 17vw, 248px);
+    height: clamp(92px, 10vw, 132px);
     min-height: 0;
     max-height: 248px;
     object-fit: cover;
@@ -1729,14 +1729,14 @@
     body { padding: 10px; }
     .br-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .jogos-grid { grid-template-columns: 1fr; }
-    .hero-header img { height: clamp(118px, 22vw, 160px); max-height: 160px; min-height: 0; }
+    .hero-header img { height: clamp(82px, 18vw, 112px); max-height: 112px; min-height: 0; object-position: 22% 44%; }
     .future-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 560px) {
     body { padding: 8px; }
     .container { max-width: 100%; }
     .hero-header { border-radius: 16px; margin-left: -2px; margin-right: -2px; }
-    .hero-header img { height: 112px; max-height: 112px; min-height: 0; object-position: 18% 50%; }
+    .hero-header img { height: 84px; max-height: 84px; min-height: 0; object-position: 18% 44%; }
     .nav { top: 4px; margin-left: -2px; margin-right: -2px; border-radius: 14px; }
     .nav button { padding: 8px 12px; font-size: 12px; }
     .status-bar { font-size: 11px; align-items: flex-start; }
@@ -1775,7 +1775,7 @@
 }
 
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260706-exec7">
+<link rel="stylesheet" href="css/br-global.css?v=20260706-ajustesfinos1">
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
@@ -2723,7 +2723,7 @@ async function carregarJogos(opcoes = {}) {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
-    state.jogos = Array.isArray(data.jogos) ? data.jogos : [];
+    state.jogos = jogosCanônicosPorRodada(Array.isArray(data.jogos) ? data.jogos : []);
     state.jogosMeta = {
       atualizado_em: data.atualizado_em,
       atualizado_em_br: data.atualizado_em_br,
@@ -2853,6 +2853,46 @@ function chaveDataAgrupada(dataIso) {
   const d = dataLocalBR(dataIso);
   if (!d) return 'zzz';
   return `${d.ano}-${String(d.mes).padStart(2,'0')}-${String(d.dia).padStart(2,'0')}`;
+}
+
+
+function prefixoEventoBrasileirao(eventId) {
+  const s = String(eventId || "");
+  return s.length >= 6 ? s.slice(0, 6) : s;
+}
+
+function jogosCanônicosPorRodada(lista) {
+  const porRodada = {};
+  for (const j of (lista || [])) {
+    const r = Number(j && j.rodada || 0);
+    if (!r) continue;
+    (porRodada[r] = porRodada[r] || []).push(j);
+  }
+  const saida = [];
+  for (const r of Object.keys(porRodada).sort((a, b) => Number(a) - Number(b))) {
+    let arr = porRodada[r].slice().sort((a, b) => String(a.data_iso || "").localeCompare(String(b.data_iso || "")));
+    if (arr.length > 10) {
+      const cont = {};
+      arr.forEach(j => { const p = prefixoEventoBrasileirao(j.event_id || j.id); if (p) cont[p] = (cont[p] || 0) + 1; });
+      const dominante = Object.entries(cont).sort((a, b) => b[1] - a[1])[0]?.[0] || "";
+      const filtrada = arr.filter(j => prefixoEventoBrasileirao(j.event_id || j.id) === dominante);
+      if (filtrada.length >= 10) arr = filtrada;
+    }
+    if (arr.length > 10) {
+      const usados = new Set();
+      const semDuplicar = [];
+      for (const j of arr) {
+        const m = nomeCanonico((j.mandante || {}).nome);
+        const v = nomeCanonico((j.visitante || {}).nome);
+        if (!m || !v || usados.has(m) || usados.has(v)) continue;
+        usados.add(m); usados.add(v); semDuplicar.push(j);
+        if (semDuplicar.length === 10) break;
+      }
+      if (semDuplicar.length === 10) arr = semDuplicar;
+    }
+    saida.push(...arr.slice(0, 10));
+  }
+  return saida;
 }
 
 function renderJogos() {

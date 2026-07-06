@@ -126,6 +126,50 @@
   function jogoId(j) { return String(j.event_id || j.id || j.jogo_chave || `${timeNome(j.mandante)}-${timeNome(j.visitante)}-${j.data_iso || ""}`); }
   function jogoChave(j) { return `${normalizarTexto(timeNome(j.mandante))}-${normalizarTexto(timeNome(j.visitante))}-${String(j.data_iso || "").slice(0, 10)}`; }
 
+
+  function prefixoEventoBrasileirao(eventId) {
+    const s = String(eventId || "");
+    return s.length >= 6 ? s.slice(0, 6) : s;
+  }
+
+  function sanearJogosPorRodada(lista) {
+    const grupos = new Map();
+    for (const j of (lista || [])) {
+      const r = Number(j && j.rodada || 0);
+      if (!r) continue;
+      if (!grupos.has(r)) grupos.set(r, []);
+      grupos.get(r).push(j);
+    }
+    const saida = [];
+    for (const [rodada, jogos] of Array.from(grupos.entries()).sort((a, b) => a[0] - b[0])) {
+      let arr = jogos.slice().sort((a, b) => String(a.data_iso || "").localeCompare(String(b.data_iso || "")));
+      if (arr.length > 10) {
+        const cont = {};
+        arr.forEach(j => { const p = prefixoEventoBrasileirao(j.event_id || j.id); if (p) cont[p] = (cont[p] || 0) + 1; });
+        const dominante = Object.entries(cont).sort((a, b) => b[1] - a[1])[0]?.[0] || "";
+        const filtrada = arr.filter(j => prefixoEventoBrasileirao(j.event_id || j.id) === dominante);
+        if (filtrada.length >= 10) arr = filtrada;
+      }
+      if (arr.length > 10) {
+        const usados = new Set();
+        const semDuplicar = [];
+        for (const j of arr) {
+          const m = timeNome(j.mandante);
+          const v = timeNome(j.visitante);
+          const cm = normalizarTexto(m);
+          const cv = normalizarTexto(v);
+          if (!cm || !cv || usados.has(cm) || usados.has(cv)) continue;
+          usados.add(cm); usados.add(cv); semDuplicar.push(j);
+          if (semDuplicar.length === 10) break;
+        }
+        if (semDuplicar.length === 10) arr = semDuplicar;
+      }
+      if (jogos.length > 10 && arr.length > 10) console.warn(`Rodada ${rodada} veio com ${jogos.length} jogos; exibindo os 10 primeiros saneados.`);
+      saida.push(...arr.slice(0, 10));
+    }
+    return saida.sort((x, y) => String(x.data_iso || "").localeCompare(String(y.data_iso || "")));
+  }
+
   function todosJogos() {
     const a = (state.jogosJson && state.jogosJson.jogos) || [];
     const b = (state.resultadosJson && state.resultadosJson.resultados) || [];
@@ -147,7 +191,7 @@
       const id = jogoId(j);
       if (!map.has(id)) map.set(id, j);
     });
-    return Array.from(map.values()).sort((x, y) => String(x.data_iso || "").localeCompare(String(y.data_iso || "")));
+    return sanearJogosPorRodada(Array.from(map.values()).sort((x, y) => String(x.data_iso || "").localeCompare(String(y.data_iso || ""))));
   }
 
   function jogosDaRodada(rodada) {

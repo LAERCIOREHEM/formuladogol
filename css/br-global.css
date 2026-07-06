@@ -10,11 +10,11 @@ body { overflow-x: hidden; }
   margin-bottom: 14px;
 }
 .hero img, .hero-header img {
-  height: clamp(112px, 13vw, 172px) !important;
-  max-height: 172px !important;
+  height: clamp(92px, 10vw, 132px) !important;
+  max-height: 132px !important;
   min-height: 0 !important;
   object-fit: cover !important;
-  object-position: center 50% !important;
+  object-position: center 44% !important;
 }
 
 .nav {
@@ -105,9 +105,9 @@ body { overflow-x: hidden; }
 
 @media (max-width: 820px) {
   .hero img, .hero-header img {
-    height: clamp(96px, 22vw, 138px) !important;
-    max-height: 138px !important;
-    object-position: 22% 50% !important;
+    height: clamp(82px, 18vw, 112px) !important;
+    max-height: 112px !important;
+    object-position: 22% 44% !important;
   }
   .nav {
     top: 4px !important;
@@ -138,9 +138,9 @@ body { overflow-x: hidden; }
 @media (max-width: 560px) {
   .hero, .hero-header { border-radius: 15px !important; }
   .hero img, .hero-header img {
-    height: 104px !important;
-    max-height: 104px !important;
-    object-position: 18% 50% !important;
+    height: 84px !important;
+    max-height: 84px !important;
+    object-position: 18% 44% !important;
   }
   .nav {
     margin-left: -1px !important;
