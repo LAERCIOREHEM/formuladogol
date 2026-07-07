@@ -1,13 +1,29 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-07T18:08:14.942897Z",
+  "atualizado_em": "2026-07-07T18:12:48.974389Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 95,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
+    {
+      "nome": "Lionel Messi",
+      "equipe": "ARG",
+      "gols": 8,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760433",
+        "760456",
+        "760483",
+        "760500",
+        "760509"
+      ],
+      "total_cartoes": 0
+    },
     {
       "nome": "Erling Haaland",
       "equipe": "NOR",
@@ -36,21 +52,6 @@
         "760475",
         "760492",
         "760503"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Lionel Messi",
-      "equipe": "ARG",
-      "gols": 7,
-      "assistencias": 0,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760433",
-        "760456",
-        "760483",
-        "760500"
       ],
       "total_cartoes": 0
     },
@@ -933,6 +934,18 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Cristian Romero",
+      "equipe": "ARG",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760509"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Daizen Maeda",
       "equipe": "JPN",
       "gols": 1,
@@ -1001,6 +1014,18 @@
       "vermelhos": 0,
       "jogos": [
         "760482"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Enzo Fernández",
+      "equipe": "ARG",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760509"
       ],
       "total_cartoes": 0
     },
@@ -1480,11 +1505,12 @@
       "nome": "Lautaro Martínez",
       "equipe": "ARG",
       "gols": 1,
-      "assistencias": 0,
+      "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
-        "760483"
+        "760483",
+        "760509"
       ],
       "total_cartoes": 0
     },
@@ -3021,6 +3047,19 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Gonzalo Montiel",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760500",
+        "760509"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Gustavo Puerta",
       "equipe": "COL",
       "gols": 0,
@@ -3317,6 +3356,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Lautaro Martínez",
+      "equipe": "ARG",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760483",
+        "760509"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Lee Kang-In",
       "equipe": "KOR",
       "gols": 0,
@@ -3328,6 +3380,22 @@
         "760441"
       ],
       "total_cartoes": 1
+    },
+    {
+      "nome": "Lionel Messi",
+      "equipe": "ARG",
+      "gols": 8,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760433",
+        "760456",
+        "760483",
+        "760500",
+        "760509"
+      ],
+      "total_cartoes": 0
     },
     {
       "nome": "Lisandro Martínez",
@@ -5312,11 +5380,12 @@
       "nome": "Gonzalo Montiel",
       "equipe": "ARG",
       "gols": 0,
-      "assistencias": 0,
+      "assistencias": 1,
       "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760500"
+        "760500",
+        "760509"
       ],
       "total_cartoes": 1
     },
@@ -6875,6 +6944,15 @@
   ],
   "por_selecao": [
     {
+      "equipe": "ARG",
+      "gols": 14,
+      "assistencias": 8,
+      "amarelos": 3,
+      "vermelhos": 0,
+      "jogos": 5,
+      "media_gols": 2.8
+    },
+    {
       "equipe": "FRA",
       "gols": 14,
       "assistencias": 12,
@@ -6918,15 +6996,6 @@
       "vermelhos": 0,
       "jogos": 4,
       "media_gols": 2.75
-    },
-    {
-      "equipe": "ARG",
-      "gols": 11,
-      "assistencias": 5,
-      "amarelos": 3,
-      "vermelhos": 0,
-      "jogos": 5,
-      "media_gols": 2.2
     },
     {
       "equipe": "ENG",
