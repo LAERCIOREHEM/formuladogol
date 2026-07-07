@@ -437,3 +437,68 @@ body > .container > section.hero > img {
     object-position: center center !important;
   }
 }
+
+
+/* HOTFIX 20260707 — jogadores sem fotos.
+   As imagens de atletas foram desativadas para evitar fotos erradas, quebradas ou gigantes. */
+.player-row.rich {
+  grid-template-columns: 42px 44px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  min-height: 72px !important;
+}
+.player-photo,
+.player-modal-photo {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  object-fit: contain !important;
+}
+.player-photo-fallback {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(163, 230, 53, .28) !important;
+  background: rgba(163, 230, 53, .10) !important;
+  color: #d9ff76 !important;
+  font-size: 14px !important;
+  font-weight: 950 !important;
+  letter-spacing: .02em !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+.player-modal-no-photo {
+  text-align: center !important;
+}
+.player-modal-fallback {
+  width: 82px !important;
+  height: 82px !important;
+  margin: 0 auto 12px !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(163, 230, 53, .32) !important;
+  background: rgba(163, 230, 53, .11) !important;
+  color: #d9ff76 !important;
+  font-size: 28px !important;
+  font-weight: 950 !important;
+}
+@media (max-width: 640px) {
+  .player-row.rich {
+    grid-template-columns: 34px 38px minmax(0, 1fr) auto !important;
+    min-height: 64px !important;
+  }
+  .player-photo-fallback {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    border-radius: 12px !important;
+    font-size: 12px !important;
+  }
+  .player-value {
+    font-size: 20px !important;
+  }
+}

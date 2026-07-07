@@ -180,7 +180,7 @@
     const jogadores = state.elencos[nome] || [];
     if (!jogadores.length) {
       $("#elenco-clube").className = "empty-state";
-      $("#elenco-clube").innerHTML = `Elenco de <strong>${escapeHtml(nome)}</strong> ainda não está preenchido. A página já está preparada para receber <code>dados-br/elencos.json</code> com foto, posição e número do jogador.`;
+      $("#elenco-clube").innerHTML = `Elenco de <strong>${escapeHtml(nome)}</strong> ainda não está preenchido. A página já está preparada para receber <code>dados-br/elencos.json</code> com posição e número do jogador.`;
       return;
     }
     $("#elenco-clube").className = "list";

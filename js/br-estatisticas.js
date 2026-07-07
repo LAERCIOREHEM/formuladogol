@@ -221,36 +221,24 @@
     return state.jogadores?.assistencias?.length ? state.jogadores.assistencias : (state.estatisticas?.garcons || []);
   }
 
-  function playerFotoUrl(p) {
-    const local = String(p?.foto_local || p?.photo_local || "").trim();
-    if (local && !/^https?:\/\//i.test(local)) return local;
-    const foto = p?.foto || p?.headshot || p?.headshot_href || p?.imagem || p?.image || "";
-    if (/^https:\/\//i.test(String(foto))) return String(foto);
-    const id = p?.athlete_id || p?.id || p?.espn_id;
-    if (id) return `https://a.espncdn.com/i/headshots/soccer/players/full/${encodeURIComponent(String(id))}.png`;
+  // Fotos de jogadores desativadas propositalmente.
+  // Motivo: as fontes traziam imagens erradas/quebradas e isso estava deformando a tela.
+  function playerFotoUrl(_p) {
     return "";
   }
   function playerFoto(p) {
-    const foto = playerFotoUrl(p);
-    if (foto) {
-      return `<img class="player-photo" src="${escapeAttr(foto)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'player-photo-fallback',textContent:'${escapeAttr(iniciaisPessoa(p?.nome || '?'))}'}))">`;
-    }
-    return `<span class="player-photo-fallback" aria-hidden="true">${escapeHtml(iniciaisPessoa(p?.nome || "?"))}</span>`;
+    return `<span class="player-photo-fallback" aria-hidden="true">${escapeHtml(iniciaisPessoa(p?.nome || p?.name || "?"))}</span>`;
   }
   function abrirModalJogador(p, tipo) {
     const nome = p?.nome || p?.name || "Jogador";
-    const foto = playerFotoUrl(p);
     const valor = tipo === "gols" ? p?.gols : p?.assistencias;
     const rotulo = tipo === "gols" ? "gols" : "assistências";
-    const fotoHtml = foto
-      ? `<img class="player-modal-photo" src="${escapeAttr(foto)}" alt="Foto de ${escapeAttr(nome)}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'player-modal-fallback',textContent:'${escapeAttr(iniciaisPessoa(nome))}'}))">`
-      : `<span class="player-modal-fallback">${escapeHtml(iniciaisPessoa(nome))}</span>`;
     const wrap = document.createElement("div");
     wrap.className = "player-modal-backdrop";
-    wrap.innerHTML = `<article class="player-modal" role="dialog" aria-modal="true" aria-label="Jogador ${escapeAttr(nome)}">
-      ${fotoHtml}
+    wrap.innerHTML = `<article class="player-modal player-modal-no-photo" role="dialog" aria-modal="true" aria-label="Jogador ${escapeAttr(nome)}">
+      <span class="player-modal-fallback">${escapeHtml(iniciaisPessoa(nome))}</span>
       <h3>${escapeHtml(nome)}</h3>
-      <p>${escapeHtml(p?.time || "—")} · ${numero(valor)} ${escapeHtml(rotulo)}${p?.athlete_id ? ` · ESPN ${escapeHtml(p.athlete_id)}` : ""}</p>
+      <p>${escapeHtml(p?.time || "—")} · ${numero(valor)} ${escapeHtml(rotulo)}</p>
       <button class="btn player-modal-close" type="button">Fechar</button>
     </article>`;
     wrap.addEventListener("click", (ev) => { if (ev.target === wrap || ev.target.classList.contains("player-modal-close")) wrap.remove(); });
@@ -281,12 +269,12 @@
     const exibidos = filtrada.slice(0, 25);
     $(id).innerHTML = `<div class="stat-list player-stat-list">${exibidos.map((p, i) => {
       const valor = tipo === "gols" ? p.gols : p.assistencias;
-      return `<div class="player-row rich" data-player-idx="${i}" data-player-kind="${escapeAttr(tipo)}" title="Abrir foto de ${escapeAttr(p.nome || p.name || 'jogador')}">
+      return `<div class="player-row rich" data-player-idx="${i}" data-player-kind="${escapeAttr(tipo)}" title="Ver detalhes de ${escapeAttr(p.nome || p.name || 'jogador')}">
         <div class="player-rank">${i + 1}</div>
         ${playerFoto(p)}
         <div class="player-main">
           <div class="player-name">${escapeHtml(p.nome || p.name || "—")}</div>
-          <div class="player-sub">${imgEscudo(p)}<span>${escapeHtml(p.time || "—")}</span>${p.eventos ? `<span>${numero(p.eventos)} jogo(s) com participação</span>` : ""}${p.athlete_id ? `<span>ID ESPN ${escapeHtml(p.athlete_id)}</span>` : ""}</div>
+          <div class="player-sub">${imgEscudo(p)}<span>${escapeHtml(p.time || "—")}</span>${p.eventos ? `<span>${numero(p.eventos)} jogo(s) com participação</span>` : ""}</div>
         </div>
         <div class="player-value">${numero(valor)}<small>${tipo === "gols" ? "gols" : "assist."}</small></div>
       </div>`;

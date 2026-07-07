@@ -4,7 +4,7 @@
 buscar_elencos_brasileirao.py — coleta elencos dos clubes do Brasileirão pela ESPN.
 
 Objetivo da Execução 9:
-  - preencher dados-br/elencos.json com jogadores, posições, números, idade e foto;
+  - preencher dados-br/elencos.json com jogadores, posições, números e idade;
   - não quebrar o workflow caso a ESPN não entregue roster para algum clube;
   - preservar nomes canônicos usados pelo Ranking/Clubes.
 
@@ -191,41 +191,10 @@ def texto_posicao(pos: Any) -> str:
 
 
 def procurar_url_foto(no: Any) -> str:
-    """Procura headshot em formatos variados que a ESPN pode devolver."""
-    if isinstance(no, str):
-        s = no.strip()
-        if s.startswith("https://") and ("headshot" in s.lower() or "headshots" in s.lower() or "/i/" in s.lower()):
-            return s
-        return ""
-    if isinstance(no, dict):
-        for chave in ("href", "url", "src"):
-            val = no.get(chave)
-            if isinstance(val, str) and val.startswith("https://"):
-                return val
-        for chave in ("headshot", "headshots", "image", "images", "photo", "photos"):
-            val = no.get(chave)
-            achado = procurar_url_foto(val)
-            if achado:
-                return achado
-        for val in no.values():
-            achado = procurar_url_foto(val)
-            if achado:
-                return achado
-    if isinstance(no, list):
-        for val in no:
-            achado = procurar_url_foto(val)
-            if achado:
-                return achado
+    # Fotos de jogadores desativadas no site.
     return ""
 
-
 def foto_atleta(a: dict[str, Any]) -> str:
-    achada = procurar_url_foto(a)
-    if achada:
-        return achada
-    aid = a.get("id")
-    if aid:
-        return f"https://a.espncdn.com/i/headshots/soccer/players/full/{aid}.png"
     return ""
 
 
@@ -239,7 +208,6 @@ def normalizar_atleta(a: dict[str, Any]) -> dict[str, Any] | None:
         "posicao": texto_posicao(a.get("position")),
         "numero": str(a.get("jersey") or a.get("number") or ""),
         "idade": a.get("age") or "",
-        "foto": foto_atleta(a),
     }
     return out
 

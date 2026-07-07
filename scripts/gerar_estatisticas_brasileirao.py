@@ -392,7 +392,7 @@ def procurar_dicts(no: Any, pred, achados: list[dict[str, Any]]) -> None:
 
 
 def atleta_info(no: Any) -> dict[str, str] | None:
-    """Retorna nome/id/foto de atleta em formatos variados da ESPN."""
+    """Retorna nome/id de atleta em formatos variados da ESPN. Fotos foram desativadas no site."""
     if not isinstance(no, dict):
         return None
     base = no
@@ -408,15 +408,7 @@ def atleta_info(no: Any) -> dict[str, str] | None:
     if not nome:
         return None
     aid = str(base.get("id") or base.get("athleteId") or no.get("id") or no.get("athleteId") or "").strip()
-    foto = ""
-    headshot = base.get("headshot") or no.get("headshot")
-    if isinstance(headshot, dict):
-        foto = str(headshot.get("href") or headshot.get("url") or "").strip()
-    elif isinstance(headshot, str):
-        foto = headshot.strip()
-    if not foto and aid.isdigit():
-        foto = f"https://a.espncdn.com/i/headshots/soccer/players/full/{aid}.png"
-    return {"nome": nome, "athlete_id": aid, "foto": foto}
+    return {"nome": nome, "athlete_id": aid}
 
 
 def nome_atleta(no: Any) -> str | None:
@@ -651,9 +643,9 @@ def extrair_gols_summary(data: dict[str, Any], event_id: str) -> tuple[list[dict
 
         scorer_txt, assists_txt = parse_textual_scorer_assist(texto)
         if not scorer_info and scorer_txt:
-            scorer_info = {"nome": scorer_txt, "athlete_id": "", "foto": ""}
+            scorer_info = {"nome": scorer_txt, "athlete_id": ""}
         for nome in assists_txt:
-            assist_infos.append({"nome": nome, "athlete_id": "", "foto": ""})
+            assist_infos.append({"nome": nome, "athlete_id": ""})
 
         if not scorer_info or not scorer_info.get("nome"):
             continue
@@ -668,7 +660,6 @@ def extrair_gols_summary(data: dict[str, Any], event_id: str) -> tuple[list[dict
             "event_id": event_id,
             "nome": scorer,
             "athlete_id": scorer_info.get("athlete_id", ""),
-            "foto": scorer_info.get("foto", ""),
             "time": equipe or "",
             "escudo": escudo_time(equipe or "") if equipe else "",
             "minuto": str(minuto or ""),
@@ -686,7 +677,6 @@ def extrair_gols_summary(data: dict[str, Any], event_id: str) -> tuple[list[dict
                 "event_id": event_id,
                 "nome": a.get("nome", ""),
                 "athlete_id": a.get("athlete_id", ""),
-                "foto": a.get("foto", ""),
                 "time": equipe or "",
                 "escudo": escudo_time(equipe or "") if equipe else "",
                 "minuto": str(minuto or ""),
@@ -713,26 +703,19 @@ def agregar_jogadores(eventos: list[dict[str, Any]], campo: str) -> list[dict[st
                 "nome": nome,
                 "time": time_nome,
                 "athlete_id": str(e.get("athlete_id") or ""),
-                "foto": str(e.get("foto") or ""),
             }
-        elif not dados[chave].get("foto") and e.get("foto"):
-            dados[chave]["foto"] = str(e.get("foto"))
         eventos_por[chave].add(str(e.get("event_id") or ""))
 
     saida: list[dict[str, Any]] = []
     for chave, qtd in cont.most_common():
         info = dados.get(chave, {})
         time_nome = info.get("time", "")
-        foto = info.get("foto", "")
         aid = info.get("athlete_id", "")
-        if not foto and aid.isdigit():
-            foto = f"https://a.espncdn.com/i/headshots/soccer/players/full/{aid}.png"
         saida.append({
             "nome": info.get("nome") or chave[0].title(),
             "time": time_nome,
             "escudo": escudo_time(time_nome),
             "athlete_id": aid,
-            "foto": foto,
             campo: qtd,
             "eventos": len(eventos_por[chave]),
         })
@@ -750,13 +733,10 @@ def combinar_participacoes(artilharia: list[dict[str, Any]], garcons: list[dict[
                 "time": p.get("time", ""),
                 "escudo": p.get("escudo", ""),
                 "athlete_id": p.get("athlete_id", ""),
-                "foto": p.get("foto", ""),
                 "gols": 0,
                 "assistencias": 0,
             })
             item[campo] = int(p.get(campo) or 0)
-            if not item.get("foto") and p.get("foto"):
-                item["foto"] = p.get("foto")
             if not item.get("athlete_id") and p.get("athlete_id"):
                 item["athlete_id"] = p.get("athlete_id")
     saida = []
