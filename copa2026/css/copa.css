@@ -3531,3 +3531,15 @@ html{
   .hist-insights{grid-template-columns:1fr}
   .hist-timeline{grid-template-columns:1fr}
 }
+
+
+/* HOTFIX UX v3 — centralização estável da fase ativa */
+.hist-phase-buttons{
+  position:relative;
+  scroll-padding-left:50%;
+  scroll-padding-right:50%;
+  overscroll-behavior-x:contain;
+}
+.hist-phase-btn{
+  scroll-snap-align:center;
+}

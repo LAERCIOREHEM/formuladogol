@@ -795,11 +795,28 @@
     var scroller = document.querySelector(".hist-phase-buttons");
     var active = document.querySelector(".hist-phase-btn.active");
     if (!scroller || !active) return;
+
+    // Não usa offsetLeft: em alguns navegadores ele é calculado em relação
+    // a outro ancestral e empurra a barra toda para a direita. O cálculo por
+    // getBoundingClientRect centraliza o botão ativo de forma estável.
+    function aplicar(behavior) {
+      var sr = scroller.getBoundingClientRect();
+      var ar = active.getBoundingClientRect();
+      var atual = scroller.scrollLeft || 0;
+      var alvo = atual + (ar.left - sr.left) - (sr.width / 2) + (ar.width / 2);
+      var max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+      alvo = Math.min(max, Math.max(0, alvo));
+      scroller.scrollTo({ left: alvo, behavior: behavior || "auto" });
+    }
+
     try {
-      var target = active.offsetLeft - (scroller.clientWidth / 2) + (active.clientWidth / 2);
-      scroller.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
+      aplicar("auto");
+      requestAnimationFrame(function () {
+        aplicar("auto");
+        setTimeout(function () { aplicar("smooth"); }, 70);
+      });
     } catch (e) {
-      active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      try { active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); } catch (_) {}
     }
   }
 
@@ -850,7 +867,9 @@
     $$(".hist-phase-btn").forEach(function (btn) {
       btn.onclick = function () {
         HIST_SNAPSHOT = btn.getAttribute("data-hist-snap") || HIST_SNAPSHOT;
-        // Mantém a seleção travada ao alternar entre as fases.
+        // Mantém a seleção travada ao alternar entre as fases e evita que
+        // o foco do navegador force a barra para a ponta errada.
+        try { btn.blur(); } catch (e) {}
         renderLista();
       };
     });
