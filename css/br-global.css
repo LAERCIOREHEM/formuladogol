@@ -363,3 +363,84 @@ html, body {
     max-width: 100% !important;
   }
 }
+
+
+/* ======================================================================
+   HOTFIX 20260707 — CABEÇALHO REALMENTE COMPACTO
+   Pedido: reduzir o cabeçalho em todas as páginas, sem esticar a imagem.
+   Esta regra fica no fim do arquivo para vencer os ajustes anteriores.
+   ====================================================================== */
+:root {
+  --br-header-h-desktop: 92px;
+  --br-header-h-tablet: 78px;
+  --br-header-h-phone: 68px;
+}
+.hero,
+.hero-header,
+.br-hero,
+.header-hero {
+  height: var(--br-header-h-desktop) !important;
+  min-height: var(--br-header-h-desktop) !important;
+  max-height: var(--br-header-h-desktop) !important;
+  width: 100% !important;
+  margin: 10px auto 12px !important;
+  padding: 0 !important;
+  border-radius: 16px !important;
+  overflow: hidden !important;
+  display: block !important;
+  background: #06111a !important;
+}
+.hero img,
+.hero-header img,
+.br-hero img,
+.header-hero img {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+  transform: none !important;
+  aspect-ratio: auto !important;
+}
+
+@media (max-width: 820px) {
+  .hero,
+  .hero-header,
+  .br-hero,
+  .header-hero {
+    height: var(--br-header-h-tablet) !important;
+    min-height: var(--br-header-h-tablet) !important;
+    max-height: var(--br-header-h-tablet) !important;
+    margin: 8px auto 10px !important;
+    border-radius: 14px !important;
+  }
+  .hero img,
+  .hero-header img,
+  .br-hero img,
+  .header-hero img {
+    height: 100% !important;
+    object-position: center center !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero,
+  .hero-header,
+  .br-hero,
+  .header-hero {
+    height: var(--br-header-h-phone) !important;
+    min-height: var(--br-header-h-phone) !important;
+    max-height: var(--br-header-h-phone) !important;
+    margin: 7px auto 9px !important;
+    border-radius: 13px !important;
+  }
+  .hero img,
+  .hero-header img,
+  .br-hero img,
+  .header-hero img {
+    height: 100% !important;
+    object-position: center center !important;
+  }
+}
