@@ -3309,3 +3309,72 @@ html{
     font-size:11.5px;
   }
 }
+
+
+/* ===== Ranking de Desempenho — evolução por fase — visual final ===== */
+.hist-launch{
+  margin:18px 0 2px;
+  border-radius:22px;
+  padding:1px;
+  background:linear-gradient(135deg,rgba(255,204,41,.75),rgba(53,139,255,.25),rgba(255,255,255,.08));
+  box-shadow:0 18px 34px rgba(0,0,0,.24);
+}
+.hist-toggle-btn{
+  width:100%;
+  border:0;
+  cursor:pointer;
+  border-radius:21px;
+  padding:15px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  color:#fff;
+  text-align:left;
+  background:linear-gradient(135deg,rgba(22,50,92,.98),rgba(12,31,62,.98));
+  font-family:inherit;
+}
+.hist-toggle-btn strong{display:block;color:var(--gold);font-size:15px;font-weight:950;letter-spacing:.02em;line-height:1.15}
+.hist-toggle-btn span{display:block;margin-top:4px;color:#b7cae5;font-size:12px;font-weight:750;line-height:1.35}
+.hist-toggle-btn i{flex:0 0 auto;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:rgba(255,204,41,.16);border:1px solid rgba(255,204,41,.36);color:var(--gold);font-style:normal;font-weight:950;font-size:18px}
+.hist-toggle-btn:hover{filter:brightness(1.06)}
+.hist-rank-box{
+  margin-top:14px;
+  background:linear-gradient(180deg,rgba(18,43,82,.98),rgba(8,25,50,.98));
+  border:1px solid rgba(255,204,41,.30);
+  border-radius:22px;
+  padding:14px;
+  box-shadow:0 18px 40px rgba(0,0,0,.30);
+  overflow:hidden;
+}
+.hist-rank-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.hist-rank-head .hist-kicker{display:block;color:var(--gold);font-size:11px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
+.hist-rank-head h3{margin:0;color:#fff;font-family:'Anton',system-ui,sans-serif;font-weight:400;font-size:25px;line-height:1.05;letter-spacing:.4px}
+.hist-rank-head p{margin:6px 0 0;color:#b7cae5;font-size:12px;line-height:1.42;max-width:520px}
+.hist-rank-status{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.04em;border:1px solid rgba(255,255,255,.14);white-space:nowrap}
+.hist-rank-status.fechado{background:rgba(29,185,84,.15);border-color:rgba(29,185,84,.42);color:#90f5b2}
+.hist-rank-status.parcial{background:rgba(255,204,41,.13);border-color:rgba(255,204,41,.50);color:var(--gold)}
+.hist-rank-meta{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 13px}
+.hist-rank-meta span{display:inline-flex;align-items:center;border-radius:999px;padding:6px 9px;background:rgba(5,18,36,.72);border:1px solid rgba(255,255,255,.10);color:#d4e2f5;font-size:11px;font-weight:800}
+.hist-phase-buttons{display:flex;gap:7px;overflow-x:auto;padding:2px 0 10px;margin-bottom:8px;scrollbar-width:thin;scrollbar-color:rgba(255,204,41,.55) transparent}
+.hist-phase-btn{flex:0 0 auto;border:1px solid rgba(255,255,255,.13);background:rgba(5,18,36,.76);color:#e5eefc;border-radius:999px;padding:8px 11px;font-family:inherit;font-size:12px;font-weight:950;cursor:pointer;white-space:nowrap}
+.hist-phase-btn.active{background:var(--gold);border-color:var(--gold);color:#07142a;box-shadow:0 8px 18px rgba(255,204,41,.22)}
+.hist-phase-btn.parcial:not(.active)::after{content:' ao vivo';color:var(--gold);font-weight:950;font-size:10px;text-transform:uppercase;margin-left:5px}
+.hist-rank-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.hist-rank-controls label{min-width:0;display:flex;flex-direction:column;gap:5px;color:#9fb4d2;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.08em}
+.hist-rank-controls select{width:100%;min-width:0;appearance:none;-webkit-appearance:none;border:1px solid rgba(255,255,255,.14);border-radius:13px;background:linear-gradient(180deg,rgba(11,31,62,.98),rgba(6,20,42,.98));color:#fff;padding:10px 30px 10px 10px;font-family:inherit;font-size:12.5px;font-weight:850;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.hist-rank-controls label{position:relative}.hist-rank-controls label::after{content:'▾';position:absolute;right:10px;bottom:10px;color:var(--gold);font-size:11px;pointer-events:none}
+.hist-rank-count{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#c5d8f1;font-size:12px;font-weight:850;margin:0 0 9px}
+.hist-card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.hist-team-card{position:relative;border:1px solid rgba(255,255,255,.10);border-radius:17px;background:linear-gradient(180deg,rgba(10,29,58,.86),rgba(5,18,36,.92));padding:11px;overflow:hidden;box-shadow:0 10px 22px rgba(0,0,0,.20)}
+.hist-team-card::after{content:'';position:absolute;right:-42px;top:-48px;width:110px;height:110px;border-radius:50%;background:rgba(255,204,41,.08);pointer-events:none}
+.hist-card-top{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}
+.hist-card-team{min-width:0;display:flex;align-items:center;gap:9px}.hist-card-team img{width:30px;height:21px;object-fit:cover;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+.hist-card-team b{display:block;color:#fff;font-size:14px;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hist-card-team span{display:block;margin-top:2px;color:#9fb4d2;font-size:11px;font-weight:750}
+.hist-pos{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:12px;background:rgba(255,204,41,.16);border:1px solid rgba(255,204,41,.36);color:var(--gold);font-family:'Anton',system-ui,sans-serif;font-size:18px;line-height:1}
+.hist-card-main{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:4px}.hist-score b{display:block;color:#fff;font-family:'Anton',system-ui,sans-serif;font-size:32px;line-height:.95;letter-spacing:.02em}.hist-score span{display:block;margin-top:3px;color:#9fb4d2;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.hist-situacao{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 9px;font-size:10.5px;font-weight:950;line-height:1.05;text-align:center;border:1px solid rgba(255,255,255,.12);color:#dce8f8;background:rgba(255,255,255,.06);white-space:nowrap}
+.hist-situacao-class{color:#91f7b5;border-color:rgba(29,185,84,.38);background:rgba(29,185,84,.12)}.hist-situacao-elim{color:#ffaaa5;border-color:rgba(224,71,62,.42);background:rgba(224,71,62,.12)}.hist-situacao-aguard{color:#f7d568;border-color:rgba(255,204,41,.42);background:rgba(255,204,41,.10)}.hist-situacao-live{color:#ffd0d0;border-color:rgba(255,91,99,.48);background:rgba(255,91,99,.13)}
+.hist-mini{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}.hist-mini span{display:block;border-radius:10px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);padding:7px 6px;color:#9fb4d2;font-size:9.5px;font-weight:900;text-transform:uppercase;text-align:center}.hist-mini b{display:block;color:#fff;font-size:12px;margin-top:2px;text-transform:none}
+.hist-team-card.hist-class{border-color:rgba(29,185,84,.28)}.hist-team-card.hist-elim{opacity:.84}.hist-team-card.hist-aguard{border-color:rgba(255,204,41,.24)}.hist-team-card.hist-live{border-color:rgba(255,91,99,.30)}
+@media(max-width:720px){.hist-rank-head{flex-direction:column}.hist-rank-controls{grid-template-columns:1fr 1fr}.hist-card-grid{grid-template-columns:1fr}.hist-toggle-btn{padding:14px 13px}.hist-toggle-btn strong{font-size:14px}.hist-rank-box{padding:12px;border-radius:19px}.hist-rank-head h3{font-size:23px}}
+@media(max-width:420px){.hist-rank-controls{grid-template-columns:1fr}.hist-card-team b{font-size:13px}.hist-score b{font-size:30px}.hist-mini{grid-template-columns:repeat(3,1fr);gap:5px}.hist-mini span{padding:6px 4px;font-size:9px}.hist-situacao{font-size:10px;padding:6px 8px}}

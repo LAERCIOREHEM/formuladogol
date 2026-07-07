@@ -27,6 +27,7 @@
   var HIST_SITUACAO = "TODAS";
   var HIST_ORDEM = "indice_final";
   var HIST_DIRECAO = "desc";
+  var HIST_ABERTO = false;
   var LIVE_REFRESH_MS = 30000;
   var LIVE_TIMER = null;
   var LIVE_TICKING = false;
@@ -692,44 +693,68 @@
     var situ = item.situacao || "Em disputa";
     var cls = situacaoHistClass(situ);
     var pos = idx + 1;
-    return '<article class="hist-rank-row hist-' + cls + '">' +
-      '<div class="hist-pos">' + esc(pos) + '</div>' +
-      '<div class="hist-team">' + flag(item.equipe) + '<div><b>' + esc(nomeSelecao(item.equipe)) + '</b><span>' + esc(item.equipe || "") + ' · ' + esc(item.jogos || 0) + ' jogo' + ((item.jogos || 0) === 1 ? '' : 's') + '</span></div></div>' +
-      '<div class="hist-score"><b>' + fmtRankDec(item.indice_final) + '</b><span>índice</span></div>' +
-      '<div class="hist-situacao hist-situacao-' + cls + '">' + esc(situ) + '</div>' +
+    var jogosTxt = esc(item.jogos || 0) + ' jogo' + ((item.jogos || 0) === 1 ? '' : 's');
+    return '<article class="hist-team-card hist-' + cls + '">' +
+      '<div class="hist-card-top">' +
+        '<div class="hist-card-team">' + flag(item.equipe) + '<div><b>' + esc(nomeSelecao(item.equipe)) + '</b><span>' + esc(item.equipe || "") + ' · ' + jogosTxt + '</span></div></div>' +
+        '<div class="hist-pos">' + esc(pos) + '</div>' +
+      '</div>' +
+      '<div class="hist-card-main">' +
+        '<div class="hist-score"><b>' + fmtRankDec(item.indice_final) + '</b><span>índice</span></div>' +
+        '<div class="hist-situacao hist-situacao-' + cls + '">' + esc(situ) + '</div>' +
+      '</div>' +
+      '<div class="hist-mini">' +
+        '<span>Ataque <b>' + fmtRankDec(item.ataque) + '</b></span>' +
+        '<span>Defesa <b>' + fmtRankDec(item.defesa) + '</b></span>' +
+        '<span>Eficiência <b>' + fmtRankDec(item.eficiencia) + '</b></span>' +
+      '</div>' +
     '</article>';
   }
   function renderHistoricoRanking() {
     var snaps = snapshotsHistorico();
     if (!snaps.length) {
-      return '<section class="hist-rank-box"><div class="hist-rank-head"><div><span>📈 Evolução por fase</span><h3>Histórico indisponível</h3><p>O arquivo de histórico será criado na próxima atualização do ranking.</p></div></div></section>';
+      return '<section class="hist-launch"><button class="hist-toggle-btn" id="hist-toggle-ranking" type="button"><span><strong>📈 Evolução do ranking por fase</strong><span>Histórico ainda indisponível. O arquivo será criado na próxima atualização.</span></span><i>›</i></button></section>';
     }
     initHistoricoPadrao();
     var snap = snaps.find(function (s) { return s.id === HIST_SNAPSHOT; }) || snaps[snaps.length - 1];
     var lista = filtrarHistorico(snap);
     var atualizado = RANKING_HISTORICO.atualizado_em ? fmtData(RANKING_HISTORICO.atualizado_em) : "aguardando";
     var statusTxt = snap.status === "fechado" ? "fechado" : "parcial/vivo";
-    return '<section class="hist-rank-box" id="hist-ranking-fase">' +
+    var launch = '<section class="hist-launch">' +
+      '<button class="hist-toggle-btn" id="hist-toggle-ranking" type="button" aria-expanded="' + (HIST_ABERTO ? 'true' : 'false') + '">' +
+        '<span><strong>📈 Evolução do ranking por fase</strong><span>Abra para comparar a foto do Ranking de Desempenho em cada marco da Copa.</span></span>' +
+        '<i>' + (HIST_ABERTO ? '−' : '+') + '</i>' +
+      '</button>' +
+    '</section>';
+    if (!HIST_ABERTO) return launch;
+    var phaseButtons = snaps.map(function (s) {
+      return '<button type="button" class="hist-phase-btn ' + (s.id === snap.id ? 'active ' : '') + (s.status === 'parcial' ? 'parcial' : '') + '" data-hist-snap="' + esc(s.id) + '">' + esc(s.nome) + '</button>';
+    }).join("");
+    return launch + '<section class="hist-rank-box" id="hist-ranking-fase">' +
       '<div class="hist-rank-head">' +
-        '<div><span>📈 Evolução do ranking por fase</span><h3>' + esc(snap.nome || "Snapshot") + '</h3><p>Foto do mesmo Ranking de Desempenho, atualizada jogo a jogo quando a fase ainda está em andamento.</p></div>' +
+        '<div><span class="hist-kicker">Snapshot do desempenho</span><h3>' + esc(snap.nome || "Snapshot") + '</h3><p>Mesma metodologia do Ranking de Desempenho. Durante a fase, a foto é atualizada jogo a jogo e fica marcada como parcial/vivo.</p></div>' +
         '<div class="hist-rank-status ' + (snap.status === "fechado" ? "fechado" : "parcial") + '">' + esc(statusTxt) + '</div>' +
       '</div>' +
       '<div class="hist-rank-meta"><span>' + esc(snap.descricao || "") + '</span><span>Atualizado: ' + esc(atualizado) + '</span></div>' +
+      '<div class="hist-phase-buttons" aria-label="Selecionar fase do histórico">' + phaseButtons + '</div>' +
       '<div class="hist-rank-controls">' +
-        '<label>Marco/fase<select id="hist-snapshot">' + snaps.map(function (s) { return '<option value="' + esc(s.id) + '"' + (s.id === snap.id ? ' selected' : '') + '>' + esc(s.nome) + (s.status === "parcial" ? " · parcial" : "") + '</option>'; }).join("") + '</select></label>' +
         '<label>Seleção<select id="hist-selecao">' + historicoSelecoesOptions(snap) + '</select></label>' +
         '<label>Situação<select id="hist-situacao"><option value="TODAS">Todas</option><option value="Em disputa">Em disputa</option><option value="Classificada">Classificada</option><option value="Eliminada">Eliminada</option><option value="Aguardando jogo">Aguardando jogo</option><option value="Em jogo">Em jogo</option></select></label>' +
         '<label>Ordenar<select id="hist-ordem"><option value="indice_final">Índice</option><option value="selecao">Seleção</option><option value="situacao">Situação</option><option value="fase">Jogos disputados</option><option value="ataque">Ataque</option><option value="defesa">Defesa</option></select></label>' +
         '<label>Ordem<select id="hist-direcao"><option value="desc">Maior primeiro</option><option value="asc">Menor primeiro</option></select></label>' +
       '</div>' +
-      '<div class="hist-rank-count">' + esc(lista.length) + ' seleção' + (lista.length === 1 ? '' : 'ões') + ' neste filtro</div>' +
-      '<div class="hist-rank-list">' + (lista.length ? lista.map(historicoLinha).join("") : '<div class="stat-vazio">Nenhuma seleção encontrada para os filtros escolhidos.</div>') + '</div>' +
+      '<div class="hist-rank-count"><span>' + esc(lista.length) + ' seleção' + (lista.length === 1 ? '' : 'ões') + ' neste filtro</span></div>' +
+      '<div class="hist-card-grid">' + (lista.length ? lista.map(historicoLinha).join("") : '<div class="stat-vazio">Nenhuma seleção encontrada para os filtros escolhidos.</div>') + '</div>' +
     '</section>';
   }
   function bindHistoricoControls() {
+    var toggle = $("#hist-toggle-ranking");
+    if (toggle) toggle.onclick = function () { HIST_ABERTO = !HIST_ABERTO; renderLista(); };
     var box = $("#hist-ranking-fase");
     if (!box) return;
-    var snapSel = $("#hist-snapshot");
+    $$(".hist-phase-btn").forEach(function (btn) {
+      btn.onclick = function () { HIST_SNAPSHOT = btn.getAttribute("data-hist-snap") || HIST_SNAPSHOT; HIST_SELECAO = "TODAS"; renderLista(); };
+    });
     var selSel = $("#hist-selecao");
     var sitSel = $("#hist-situacao");
     var ordSel = $("#hist-ordem");
@@ -737,7 +762,6 @@
     if (sitSel) sitSel.value = HIST_SITUACAO;
     if (ordSel) ordSel.value = HIST_ORDEM;
     if (dirSel) dirSel.value = HIST_DIRECAO;
-    if (snapSel) snapSel.onchange = function () { HIST_SNAPSHOT = this.value; HIST_SELECAO = "TODAS"; renderLista(); };
     if (selSel) selSel.onchange = function () { HIST_SELECAO = this.value; renderLista(); };
     if (sitSel) sitSel.onchange = function () { HIST_SITUACAO = this.value; renderLista(); };
     if (ordSel) ordSel.onchange = function () { HIST_ORDEM = this.value; renderLista(); };
