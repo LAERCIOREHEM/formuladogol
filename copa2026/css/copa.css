@@ -3385,3 +3385,149 @@ html{
 .ranking-historico-slot .hist-launch{margin:0}
 .ranking-historico-slot .hist-rank-box{margin-top:10px;margin-bottom:14px}
 @media(max-width:520px){.ranking-historico-slot{margin:8px 0 10px}.ranking-historico-slot .hist-rank-box{margin-top:9px}}
+
+
+/* HOTFIX UX v2 — Evolução do Ranking por Fase */
+.hist-rank-controls select option{
+  background:#ffffff !important;
+  color:#08162b !important;
+}
+.hist-rank-controls select:focus{
+  outline:2px solid rgba(255,204,41,.55);
+  outline-offset:2px;
+}
+.hist-phase-btn.active{
+  background:linear-gradient(180deg,#ffd94a,#ffc400) !important;
+  border-color:#ffd94a !important;
+  color:#06142b !important;
+  box-shadow:0 8px 18px rgba(255,204,41,.25), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.hist-phase-buttons{
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+}
+.hist-selection-summary{
+  margin:2px 0 12px;
+  border:1px solid rgba(255,204,41,.28);
+  border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,204,41,.10),rgba(5,18,36,.42));
+  padding:12px;
+}
+.hist-selection-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.hist-selection-title span{
+  color:#9fb4d2;
+  font-size:10px;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.10em;
+}
+.hist-selection-title strong{
+  color:#fff;
+  font-size:15px;
+  font-weight:950;
+}
+.hist-timeline{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+.hist-timeline-step{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:13px;
+  background:rgba(5,18,36,.66);
+  padding:9px;
+  min-height:76px;
+}
+.hist-timeline-step span{
+  display:block;
+  color:#9fb4d2;
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  line-height:1.15;
+}
+.hist-timeline-step b{
+  display:block;
+  margin-top:7px;
+  color:var(--gold);
+  font-size:15px;
+  line-height:1.1;
+}
+.hist-timeline-step small{
+  display:block;
+  margin-top:5px;
+  color:#d4e2f5;
+  font-size:10.5px;
+  font-weight:750;
+}
+.hist-timeline-step.muted{
+  opacity:.58;
+}
+.hist-insights{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:0 0 12px;
+}
+.hist-insight-card{
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:16px;
+  background:rgba(5,18,36,.62);
+  padding:11px;
+}
+.hist-insight-card span{
+  display:block;
+  color:#9fb4d2;
+  font-size:10px;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.hist-insight-card strong{
+  display:block;
+  margin-top:6px;
+  color:#fff;
+  font-size:14px;
+}
+.hist-insight-card b{
+  display:block;
+  margin-top:4px;
+  font-family:'Anton',system-ui,sans-serif;
+  font-size:25px;
+  line-height:1;
+  color:var(--gold);
+}
+.hist-insight-card small{
+  display:block;
+  margin-top:4px;
+  color:#b7cae5;
+  font-size:11px;
+  font-weight:750;
+}
+.hist-insight-card.up{
+  border-color:rgba(29,185,84,.28);
+}
+.hist-insight-card.up b{
+  color:#7cff9e;
+}
+.hist-insight-card.down{
+  border-color:rgba(255,91,99,.30);
+}
+.hist-insight-card.down b{
+  color:#ff9a9a;
+}
+@media(max-width:760px){
+  .hist-timeline{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hist-selection-title{align-items:flex-start;flex-direction:column;gap:4px}
+}
+@media(max-width:520px){
+  .hist-insights{grid-template-columns:1fr}
+  .hist-timeline{grid-template-columns:1fr}
+}

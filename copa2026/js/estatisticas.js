@@ -710,6 +710,99 @@
       '</div>' +
     '</article>';
   }
+
+  function rankingHistoricoOrdenado(snap) {
+    return (snap && snap.ranking || []).slice().sort(function (a, b) {
+      return Number(b.indice_final || 0) - Number(a.indice_final || 0) ||
+        nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
+    });
+  }
+  function posicaoNoSnapshot(snap, equipe) {
+    var eq = siglaSelecao(equipe);
+    var arr = rankingHistoricoOrdenado(snap);
+    for (var i = 0; i < arr.length; i++) {
+      if (siglaSelecao(arr[i].equipe) === eq) return i + 1;
+    }
+    return null;
+  }
+  function itemNoSnapshot(snap, equipe) {
+    var eq = siglaSelecao(equipe);
+    return (snap && snap.ranking || []).find(function (x) { return siglaSelecao(x.equipe) === eq; }) || null;
+  }
+  function deltaHistorico(eq, snapAtual) {
+    var snaps = snapshotsHistorico();
+    var primeiro = snaps[0];
+    var ini = itemNoSnapshot(primeiro, eq);
+    var fim = itemNoSnapshot(snapAtual, eq);
+    if (!ini || !fim) return null;
+    return {
+      inicio: Number(ini.indice_final || 0),
+      fim: Number(fim.indice_final || 0),
+      delta: Number(fim.indice_final || 0) - Number(ini.indice_final || 0),
+      posInicio: posicaoNoSnapshot(primeiro, eq),
+      posFim: posicaoNoSnapshot(snapAtual, eq)
+    };
+  }
+  function historicoInsights(snap) {
+    var snaps = snapshotsHistorico();
+    var primeiro = snaps[0];
+    if (!primeiro || !snap || primeiro.id === snap.id) return "";
+    var deltas = (snap.ranking || []).map(function (x) {
+      var eq = siglaSelecao(x.equipe);
+      var d = deltaHistorico(eq, snap);
+      if (!d) return null;
+      return { equipe: eq, delta: d.delta, inicio: d.inicio, fim: d.fim, posInicio: d.posInicio, posFim: d.posFim };
+    }).filter(Boolean);
+    if (!deltas.length) return "";
+    var subida = deltas.slice().sort(function (a,b) { return b.delta - a.delta; })[0];
+    var queda = deltas.slice().sort(function (a,b) { return a.delta - b.delta; })[0];
+    function card(tipo, item) {
+      var positivo = item.delta >= 0;
+      return '<div class="hist-insight-card ' + tipo + '">' +
+        '<span>' + (tipo === "up" ? "Maior evolução" : "Maior queda") + '</span>' +
+        '<strong>' + flag(item.equipe) + ' ' + esc(nomeSelecao(item.equipe)) + '</strong>' +
+        '<b>' + (positivo ? '+' : '') + fmtRankDec(item.delta) + '</b>' +
+        '<small>' + esc(fmtRankDec(item.inicio)) + ' → ' + esc(fmtRankDec(item.fim)) + ' · ' + esc(item.posInicio || "—") + 'º → ' + esc(item.posFim || "—") + 'º</small>' +
+      '</div>';
+    }
+    return '<div class="hist-insights">' + card("up", subida) + card("down", queda) + '</div>';
+  }
+  function historicoSelecaoResumo(eqSelecionada) {
+    if (!eqSelecionada || eqSelecionada === "TODAS") return "";
+    var snaps = snapshotsHistorico();
+    var linhas = snaps.map(function (s) {
+      var item = itemNoSnapshot(s, eqSelecionada);
+      if (!item) {
+        return '<div class="hist-timeline-step muted"><span>' + esc(s.nome) + '</span><b>—</b><small>sem dados</small></div>';
+      }
+      var pos = posicaoNoSnapshot(s, eqSelecionada);
+      var status = item.situacao || "Em disputa";
+      return '<div class="hist-timeline-step">' +
+        '<span>' + esc(s.nome) + '</span>' +
+        '<b>' + esc(pos || "—") + 'º · ' + esc(fmtRankDec(item.indice_final)) + '</b>' +
+        '<small>' + esc(status) + '</small>' +
+      '</div>';
+    }).join("");
+    return '<section class="hist-selection-summary">' +
+      '<div class="hist-selection-title">' +
+        '<span>Evolução da seleção</span>' +
+        '<strong>' + flag(eqSelecionada) + ' ' + esc(nomeSelecao(eqSelecionada)) + '</strong>' +
+      '</div>' +
+      '<div class="hist-timeline">' + linhas + '</div>' +
+    '</section>';
+  }
+  function centralizarFaseHistorico() {
+    var scroller = document.querySelector(".hist-phase-buttons");
+    var active = document.querySelector(".hist-phase-btn.active");
+    if (!scroller || !active) return;
+    try {
+      var target = active.offsetLeft - (scroller.clientWidth / 2) + (active.clientWidth / 2);
+      scroller.scrollTo({ left: Math.max(0, target), behavior: "smooth" });
+    } catch (e) {
+      active.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }
+
   function renderHistoricoRanking() {
     var snaps = snapshotsHistorico();
     if (!snaps.length) {
@@ -743,6 +836,8 @@
         '<label>Ordenar<select id="hist-ordem"><option value="indice_final">Índice</option><option value="selecao">Seleção</option><option value="situacao">Situação</option><option value="fase">Jogos disputados</option><option value="ataque">Ataque</option><option value="defesa">Defesa</option></select></label>' +
         '<label>Ordem<select id="hist-direcao"><option value="desc">Maior primeiro</option><option value="asc">Menor primeiro</option></select></label>' +
       '</div>' +
+      historicoSelecaoResumo(HIST_SELECAO) +
+      historicoInsights(snap) +
       '<div class="hist-rank-count"><span>' + esc(lista.length) + ' seleção' + (lista.length === 1 ? '' : 'ões') + ' neste filtro</span></div>' +
       '<div class="hist-card-grid">' + (lista.length ? lista.map(historicoLinha).join("") : '<div class="stat-vazio">Nenhuma seleção encontrada para os filtros escolhidos.</div>') + '</div>' +
     '</section>';
@@ -753,12 +848,17 @@
     var box = $("#hist-ranking-fase");
     if (!box) return;
     $$(".hist-phase-btn").forEach(function (btn) {
-      btn.onclick = function () { HIST_SNAPSHOT = btn.getAttribute("data-hist-snap") || HIST_SNAPSHOT; HIST_SELECAO = "TODAS"; renderLista(); };
+      btn.onclick = function () {
+        HIST_SNAPSHOT = btn.getAttribute("data-hist-snap") || HIST_SNAPSHOT;
+        // Mantém a seleção travada ao alternar entre as fases.
+        renderLista();
+      };
     });
     var selSel = $("#hist-selecao");
     var sitSel = $("#hist-situacao");
     var ordSel = $("#hist-ordem");
     var dirSel = $("#hist-direcao");
+    if (selSel) selSel.value = HIST_SELECAO;
     if (sitSel) sitSel.value = HIST_SITUACAO;
     if (ordSel) ordSel.value = HIST_ORDEM;
     if (dirSel) dirSel.value = HIST_DIRECAO;
@@ -766,6 +866,7 @@
     if (sitSel) sitSel.onchange = function () { HIST_SITUACAO = this.value; renderLista(); };
     if (ordSel) ordSel.onchange = function () { HIST_ORDEM = this.value; renderLista(); };
     if (dirSel) dirSel.onchange = function () { HIST_DIRECAO = this.value; renderLista(); };
+    setTimeout(centralizarFaseHistorico, 40);
   }
 
 
