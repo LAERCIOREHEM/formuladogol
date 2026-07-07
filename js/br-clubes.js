@@ -31,21 +31,21 @@
   function mascotInfo(clube){
     if (!clube) return { nome: "", arquivo: "" };
     const direto = state.mascotes?.[clube.nome];
-    if (typeof direto === "string") return { nome: clube.mascote || "Mascote oficial", arquivo: direto };
-    if (direto && typeof direto === "object") return { nome: direto.nome || clube.mascote || "Mascote oficial", arquivo: direto.arquivo || "" };
+    if (typeof direto === "string") return { nome: clube.mascote || "Mascote", arquivo: direto };
+    if (direto && typeof direto === "object") return { nome: direto.nome || clube.mascote || "Mascote", arquivo: direto.arquivo || "" };
     const fallback = `img/mascotes/${clube.nome}.png`;
-    return { nome: clube.mascote || "Mascote oficial", arquivo: fallback };
+    return { nome: clube.mascote || "Mascote", arquivo: fallback };
   }
   function mascotCardHtml(clube){
     const info = mascotInfo(clube);
-    const nomeMascote = escapeHtml(info.nome || clube?.mascote || "Mascote oficial");
+    const nomeMascote = escapeHtml(info.nome || clube?.mascote || "Mascote");
     const src = escapeAttr(info.arquivo || `img/mascotes/${clube?.nome || ""}.png`);
     return `<div class="info-card mascot-card">
       <span>Mascote</span>
-      <div class="mascot-frame">
+      <button type="button" class="mascot-frame mascot-zoom-trigger" data-mascote-src="${src}" data-mascote-clube="${escapeAttr(clube?.nome || '')}" aria-label="Abrir mascote do ${escapeAttr(clube?.nome || '')} em tamanho maior">
         <img class="mascot-figure" src="${src}" alt="Mascote do ${escapeAttr(clube?.nome || '')}" loading="lazy" onerror="this.closest('.mascot-card').classList.add('is-fallback'); this.remove();">
         <div class="mascot-fallback" aria-hidden="true">🦁</div>
-      </div>
+      </button>
       <strong class="mascot-caption">${nomeMascote}</strong>
     </div>`;
   }
@@ -55,10 +55,57 @@
     return state.eventos.filter(e => e.mandante === nome || e.visitante === nome)
       .sort((a,b) => String(a.data_iso||"").localeCompare(String(b.data_iso||"")));
   }
-  function isPost(e){ return String(e.estado || "").toLowerCase() === "post" || (e.placar_mandante !== null && e.placar_mandante !== undefined && e.placar_visitante !== null && e.placar_visitante !== undefined); }
+  function isPost(e){
+    const d = new Date(String(e.data_iso || '').length <= 16 ? `${e.data_iso}:00-03:00` : e.data_iso);
+    if (Number.isNaN(d.getTime()) || d.getTime() > Date.now() - (90 * 60 * 1000)) return false;
+    const status = String(e.status || '').trim().toLowerCase();
+    if (String(e.estado || '').toLowerCase() === 'pre' || status === "0'" || status === '0') return false;
+    return String(e.estado || "").toLowerCase() === "post" || (e.placar_mandante !== null && e.placar_mandante !== undefined && e.placar_visitante !== null && e.placar_visitante !== undefined);
+  }
   function dataCurta(iso){
     try { return fmtData.format(new Date(iso)); } catch { return "—"; }
   }
+
+  function garantirMascoteModal(){
+    let modal = document.getElementById("mascote-modal");
+    if (modal) return modal;
+    modal = document.createElement("div");
+    modal.id = "mascote-modal";
+    modal.className = "mascote-modal";
+    modal.hidden = true;
+    modal.innerHTML = `<div class="mascote-modal-backdrop" data-close="1"></div>
+      <div class="mascote-modal-card" role="dialog" aria-modal="true" aria-label="Mascote em tamanho ampliado">
+        <button type="button" class="mascote-modal-close" data-close="1" aria-label="Fechar mascote">×</button>
+        <img class="mascote-modal-img" alt="">
+        <div class="mascote-modal-title"></div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener("click", ev => { if (ev.target?.dataset?.close) fecharMascoteModal(); });
+    document.addEventListener("keydown", ev => { if (ev.key === "Escape") fecharMascoteModal(); });
+    return modal;
+  }
+  function abrirMascoteModal(src, clube){
+    const modal = garantirMascoteModal();
+    const img = modal.querySelector(".mascote-modal-img");
+    const title = modal.querySelector(".mascote-modal-title");
+    img.src = src;
+    img.alt = `Mascote do ${clube}`;
+    title.textContent = clube ? `Mascote — ${clube}` : "Mascote";
+    modal.hidden = false;
+    document.body.classList.add("modal-open");
+  }
+  function fecharMascoteModal(){
+    const modal = document.getElementById("mascote-modal");
+    if (!modal) return;
+    modal.hidden = true;
+    document.body.classList.remove("modal-open");
+  }
+  function ativarZoomMascote(){
+    document.querySelectorAll(".mascot-zoom-trigger").forEach(btn => {
+      btn.addEventListener("click", () => abrirMascoteModal(btn.dataset.mascoteSrc || "", btn.dataset.mascoteClube || ""));
+    });
+  }
+
   function renderResumo(){
     const estados = [...new Set(state.clubes.map(c => c.uf))].length;
     const lider = state.tabela[0];
@@ -153,6 +200,7 @@
       <p><strong>Curiosidade:</strong> ${escapeHtml(c.curiosidade)}</p>
       <p><strong>Desempenho:</strong> ${escapeHtml(r.justificativa || "Ranking de desempenho será exibido após geração do robô.")}</p>
     `;
+    ativarZoomMascote();
     renderJogos(c.nome);
     renderElenco(c.nome);
   }
@@ -180,7 +228,7 @@
     const jogadores = state.elencos[nome] || [];
     if (!jogadores.length) {
       $("#elenco-clube").className = "empty-state";
-      $("#elenco-clube").innerHTML = `Elenco de <strong>${escapeHtml(nome)}</strong> ainda não está preenchido. A página já está preparada para receber <code>dados-br/elencos.json</code> com posição e número do jogador.`;
+      $("#elenco-clube").innerHTML = `Elenco de <strong>${escapeHtml(nome)}</strong> ainda não está preenchido.`;
       return;
     }
     $("#elenco-clube").className = "list";

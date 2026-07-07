@@ -27,8 +27,8 @@
 <!-- Open Graph (preview no WhatsApp, Facebook, LinkedIn, Telegram) -->
 <meta property="og:title" content="Bolão Brasileirão 2026 — Almoço de Sexta">
 <meta property="og:description" content="Acompanhe ranking, palpites, classificação, estatísticas e ligas do Bolão Brasileirão 2026.">
-<meta property="og:image" content="https://brasileirao2026almoco.com.br/img/og-brasileirao-2026.png">
-<meta property="og:image:secure_url" content="https://brasileirao2026almoco.com.br/img/og-brasileirao-2026.png">
+<meta property="og:image" content="https://brasileirao2026almoco.com.br/og-image.png">
+<meta property="og:image:secure_url" content="https://brasileirao2026almoco.com.br/og-image.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -37,13 +37,13 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:site_name" content="Bolão Brasileirão 2026">
-<link rel="image_src" href="https://brasileirao2026almoco.com.br/img/og-brasileirao-2026.png">
+<link rel="image_src" href="https://brasileirao2026almoco.com.br/og-image.png">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Bolão Brasileirão 2026 — Almoço de Sexta">
 <meta name="twitter:description" content="Acompanhe ranking, palpites, classificação, estatísticas e ligas do Bolão Brasileirão 2026.">
-<meta name="twitter:image" content="https://brasileirao2026almoco.com.br/img/og-brasileirao-2026.png">
+<meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image.png">
 <meta name="twitter:image:alt" content="Bolão Brasileirão 2026 — Almoço de Sexta">
 
 <!-- Descrição geral para SEO -->
@@ -1779,8 +1779,61 @@
   .br-select-clube { min-height: 42px; }
 }
 
+
+
+/* HOTFIX FINAL 20260707: cabeçalho realmente compacto e sem expansão.
+   Mantém o banner largo, mas com altura controlada em todas as páginas. */
+.hero-header,
+header.hero,
+section.hero,
+.container > .hero,
+.container > header.hero,
+.container > section.hero,
+body > .container > header.hero,
+body > .container > section.hero {
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  border-radius: 13px !important;
+  overflow: hidden !important;
+  margin-top: 0 !important;
+  margin-bottom: 10px !important;
+}
+.hero-header img,
+header.hero > img,
+section.hero > img,
+.container > .hero > img,
+.container > header.hero > img,
+.container > section.hero > img,
+body > .container > header.hero > img,
+body > .container > section.hero > img {
+  display: block !important;
+  width: 100% !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  max-height: 56px !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+@media (max-width: 980px) {
+  .hero-header, header.hero, section.hero, .container > .hero, .container > header.hero, .container > section.hero {
+    height: 50px !important; min-height: 50px !important; max-height: 50px !important; border-radius: 12px !important; margin-bottom: 8px !important;
+  }
+  .hero-header img, header.hero > img, section.hero > img, .container > .hero > img, .container > header.hero > img, .container > section.hero > img {
+    height: 50px !important; min-height: 50px !important; max-height: 50px !important; object-position: center center !important;
+  }
+}
+@media (max-width: 640px) {
+  .hero-header, header.hero, section.hero, .container > .hero, .container > header.hero, .container > section.hero {
+    height: 44px !important; min-height: 44px !important; max-height: 44px !important; border-radius: 11px !important; margin-bottom: 7px !important;
+  }
+  .hero-header img, header.hero > img, section.hero > img, .container > .hero > img, .container > header.hero > img, .container > section.hero > img {
+    height: 44px !important; min-height: 44px !important; max-height: 44px !important; object-position: center center !important;
+  }
+}
+
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260707-header-ultra-compact-v4">
+<link rel="stylesheet" href="css/br-global.css?v=20260707-ajustes-finais-v1">
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
@@ -1836,9 +1889,7 @@
 
   <footer class="site-footer">
     <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Site sem fins lucrativos, feito por amigos, para amigos. O bolão não envolve dinheiro: o "prêmio" é simbólico (os últimos colocados pagam o almoço de fim de ano).</div>
-    <div>Dados esportivos: ESPN, com fallback local pelos JSONs publicados no repositório. Uso meramente informativo e não oficial; escudos e marcas pertencem aos respectivos clubes. Informações de "onde assistir" podem mudar sem aviso — confirme na programação da emissora.</div>
-    <div>Brasileirão v2 · atualização automática dos JSONs a cada 10 min · placar ao vivo via ESPN a cada 30s durante os jogos.</div>
-  </footer>
+          </footer>
 </div>
 
 <div id="modal-container"></div>
@@ -2959,7 +3010,7 @@ function renderJogos() {
   html += `<div class="br-stat-card"><div class="br-stat-label">Jogos listados</div><div class="br-stat-value">${jogosVisiveis.length}</div><div class="br-stat-note">${filtro ? 'filtrados por ' + filtro : 'próximos jogos'}</div></div>`;
   html += `<div class="br-stat-card"><div class="br-stat-label">Primeira data</div><div class="br-stat-value" style="font-size:17px;line-height:1.2;">${primeiraData}</div><div class="br-stat-note">fuso de Brasília</div></div>`;
   html += `<div class="br-stat-card"><div class="br-stat-label">Clubes filtráveis</div><div class="br-stat-value">${qtdeClubes}</div><div class="br-stat-note">selecione pelo menu abaixo</div></div>`;
-  html += `<div class="br-stat-card"><div class="br-stat-label">Fonte viva</div><div class="br-stat-value" style="font-size:18px;">ESPN</div><div class="br-stat-note">fallback local se oscilar</div></div>`;
+  html += `<div class="br-stat-card"><div class="br-stat-label">Fonte viva</div><div class="br-stat-value" style="font-size:18px;">ESPN</div><div class="br-stat-note">dados ESPN</div></div>`;
   html += '</div>';
 
   const filtroEsc = filtro ? ESCUDOS_TIMES[filtro] : null;
@@ -3051,7 +3102,7 @@ function renderJogos() {
         html += `<div class="jogo-gols">⚽ ${live.gols.join(' · ')}</div>`;
       }
       html += '</div>';
-      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span><span class="jogo-future-pill">🎯 Apostas na Execução 3</span></div>`;
+      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span></div>`;
       html += '</div>';
     }
     html += '</div>';
@@ -3188,20 +3239,45 @@ document.addEventListener('visibilitychange', function () {
 // ========================================================================
 // RESULTADOS
 // ========================================================================
+
+function parseDataBRT(iso) {
+  if (!iso) return null;
+  const s = String(iso);
+  const normalizado = s.length <= 16 ? `${s}:00-03:00` : s;
+  const d = new Date(normalizado);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+function resultadoJaAconteceu(r) {
+  const d = parseDataBRT(r && r.data_iso);
+  if (!d) return false;
+  const agora = new Date();
+  if (d.getTime() > agora.getTime() - (90 * 60 * 1000)) return false;
+  const pm = r && r.placar_mandante;
+  const pv = r && r.placar_visitante;
+  if (pm === null || pm === undefined || pv === null || pv === undefined) return false;
+  const status = String((r && r.status) || '').trim().toLowerCase();
+  const estado = String((r && r.estado) || '').trim().toLowerCase();
+  if (estado === 'pre' || status === "0'" || status === '0') return false;
+  return true;
+}
+function filtrarResultadosValidos(lista) {
+  return (Array.isArray(lista) ? lista : []).filter(resultadoJaAconteceu);
+}
+
 async function carregarResultados(opcoes = {}) {
   try {
     const url = 'resultados.json?t=' + Date.now();
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
-    state.resultados = Array.isArray(data.resultados) ? data.resultados : [];
-    state.resultadosTimes = Array.isArray(data.times) ? data.times : [];
+    state.resultados = filtrarResultadosValidos(data.resultados);
+    state.resultadosTimes = [...new Set(state.resultados.flatMap(r => [(r.mandante || {}).nome, (r.visitante || {}).nome]).filter(Boolean))].sort((a,b) => a.localeCompare(b, "pt-BR"));
     state.resultadosMeta = {
       atualizado_em: data.atualizado_em,
       atualizado_em_br: data.atualizado_em_br,
       fonte: data.fonte,
       ultima_rodada_disputada: data.ultima_rodada_disputada,
-      total_resultados: data.total_resultados
+      total_resultados: state.resultados.length
     };
     state.resultadosCarregados = true;
     state.resultadosErro = null;
@@ -4145,6 +4221,6 @@ setTimeout(() => {
     }
   })();
 </script>
-<script src="js/br-menu.js?v=20260706-exec7"></script>
+<script src="js/br-menu.js?v=20260707-ajustes-finais-v1"></script>
 </body>
 </html>

@@ -549,6 +549,7 @@ def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[st
             "transmissao": transmissao_evento(ev),
             "status": status_evento(ev).get("displayClock") or st.get("shortDetail") or st.get("detail") or "",
             "estado": estado,
+            "concluido": bool(st.get("completed") is True),
             "placar_mandante": placar_competidor(casa),
             "placar_visitante": placar_competidor(fora),
             "_sort": dt_brt.timestamp(),
@@ -689,6 +690,26 @@ def payload_jogo(e: dict[str, Any], incluir_placar: bool = True) -> dict[str, An
     return obj
 
 
+
+def evento_realmente_finalizado(e: dict[str, Any], agora: datetime) -> bool:
+    """Resultado só entra no resultados.json depois que o jogo já aconteceu.
+
+    A ESPN às vezes devolve placar 0x0 e estado/status inconsistentes para jogo
+    futuro. Por isso a data também precisa estar no passado com margem de segurança.
+    """
+    if e.get("placar_mandante") is None or e.get("placar_visitante") is None:
+        return False
+    dt = e.get("data_dt")
+    if not isinstance(dt, datetime):
+        return False
+    if dt > agora - timedelta(minutes=90):
+        return False
+    status = str(e.get("status") or "").strip().lower()
+    estado = str(e.get("estado") or "").strip().lower()
+    if estado == "pre" or status in {"0'", "0", "0:00"}:
+        return False
+    return bool(e.get("concluido") is True or estado == "post" or dt < agora - timedelta(hours=2))
+
 def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]]) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     eventos = normalizar_eventos_scoreboard(eventos_brutos)
     aplicar_transmissoes_manuais(eventos)
@@ -697,7 +718,7 @@ def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]]) -> tupl
 
     agora = agora_brt()
     futuros = [e for e in eventos if e["data_dt"] >= agora - timedelta(hours=3) and e.get("estado") != "post"]
-    finalizados = [e for e in eventos if e.get("estado") == "post" or (e.get("placar_mandante") is not None and e.get("placar_visitante") is not None and e["data_dt"] < agora - timedelta(hours=2))]
+    finalizados = [e for e in eventos if evento_realmente_finalizado(e, agora)]
 
     # Próximos jogos: mantém leve para a página, mas com pelo menos 2 rodadas
     # quando possível. Nunca corta no meio da rodada vigente.
@@ -756,6 +777,7 @@ def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]]) -> tupl
                 "estadio": e.get("estadio", ""),
                 "transmissao": e.get("transmissao", ""),
                 "estado": e.get("estado", ""),
+                "concluido": bool(e.get("concluido") is True),
                 "placar_mandante": e.get("placar_mandante"),
                 "placar_visitante": e.get("placar_visitante"),
             }

@@ -7,7 +7,7 @@
   <meta name="description" content="Página dos 20 clubes do Brasileirão 2026 no Bolão Almoço de Sexta: curiosidades, estádio, títulos, momento, jogos e estrutura preparada para elencos.">
   <meta name="theme-color" content="#10b981">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-  <link rel="stylesheet" href="css/br-institucional.css?v=20260707-header-ultra-compact-v4">
+  <link rel="stylesheet" href="css/br-institucional.css?v=20260707-ajustes-finais-v1">
 </head>
 <body>
   <div class="container">
@@ -73,23 +73,21 @@
           <div class="section-head">
             <div>
               <div class="kicker">Elencos</div>
-              <h2>Estrutura pronta para jogadores</h2>
+              
             </div>
-            <span class="badge">próxima automação</span>
+            
           </div>
-          <div id="elenco-clube" class="empty-state">Selecione um clube acima. Quando o robô de elencos for ligado, esta área exibirá jogadores, fotos e posições sem alterar a página.</div>
+          <div id="elenco-clube" class="empty-state">Selecione um clube acima. Esta área exibe os jogadores cadastrados do clube quando houver dados disponíveis.</div>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
       <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Página institucional dos clubes, sem fins comerciais.</div>
-      <div>Dados esportivos: ESPN + snapshots locais do repositório. Escudos e marcas pertencem aos respectivos clubes.</div>
-      <div>Curiosidades e dados de estádio/títulos são curadoria editorial inicial e podem ser ajustados manualmente em <code>dados-br/clubes.json</code>.</div>
     </footer>
   </div>
 
-  <script src="js/br-clubes.js?v=20260707-header-ultra-compact-v4"></script>
+  <script src="js/br-clubes.js?v=20260707-ajustes-finais-v1"></script>
   <script>
     document.querySelectorAll('[data-anchor]').forEach(function(a){
       a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-anchor')); });
