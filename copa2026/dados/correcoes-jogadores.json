@@ -1,6 +1,6 @@
 {
   "_nota": "Correções manuais pontuais aplicadas no front-end para preservar o elencos.json atual sem sobrescrever os dados de clubes já publicados.",
-  "atualizado_em": "2026-07-04T14:43:00Z",
+  "atualizado_em": "2026-07-07T20:45:00Z",
   "jogadores": [
     {
       "selecao": "BRA",
@@ -322,6 +322,23 @@
       "clube_confianca": 0.99,
       "clube_atualizado_em": "2026-07-04T14:43:00Z",
       "clube_auditoria": "Correção manual de alta confiança a partir da página Brazil - Detailed squad 2026 do Transfermarkt."
+    },
+    {
+      "selecao": "COL",
+      "id": "272722",
+      "nome": "Luis Suárez",
+      "foto": "https://a.espncdn.com/i/headshots/soccer/players/full/272722.png",
+      "foto_fonte": "ESPN",
+      "foto_credito": "ESPN Soccer Player Profile",
+      "foto_url_origem": "https://www.espn.com/soccer/player/_/id/272722/luis-suarez",
+      "foto_confianca": 1.0,
+      "clube": "Sporting CP",
+      "clube_nome_fonte": "Sporting CP",
+      "clube_fonte": "ESPN / perfil do jogador",
+      "clube_fonte_url": "https://www.espn.com/soccer/player/_/id/272722/luis-suarez",
+      "clube_confianca": 0.98,
+      "clube_atualizado_em": "2026-07-07T20:45:00Z",
+      "auditoria": "Correção manual: o elencos.json estava associando Luis Suárez (COL, id ESPN 272722) ao Luis Suárez uruguaio do Inter Miami/Wikidata Q26517. Esta correção força foto e clube do atacante colombiano Luis Javier Suárez Charris."
     }
   ],
   "creditos": [
@@ -332,6 +349,14 @@
       "autor": "Bryan Berlin / WikiPortraits",
       "licenca": "CC BY-SA 4.0",
       "url": "https://commons.wikimedia.org/wiki/File:Danilo_Santos_Brazil_V_Morocco_13_June_2026-140.jpg"
+    },
+    {
+      "nome": "Luis Suárez",
+      "selecao": "COL",
+      "fonte": "ESPN",
+      "autor": "ESPN",
+      "licenca": "Imagem de perfil esportivo exibida por URL externa da ESPN",
+      "url": "https://www.espn.com/soccer/player/_/id/272722/luis-suarez"
     }
   ],
   "_auditoria_clubes_brasil": {
@@ -340,5 +365,8 @@
     "url": "https://www.transfermarkt.com/brazil/kader/verein/3439",
     "total_brasil_corrigidos_ou_confirmados": 26,
     "observacao": "Aplicadas apenas correções do Brasil com verificação manual de alta confiança. Demais seleções não foram alteradas porque a auditoria automática não retornou confiança alta."
+  },
+  "_correcoes_pontuais": {
+    "COL_272722_luis_suarez": "Foto/clube corrigidos para Luis Javier Suárez Charris (Colômbia), evitando imagem do Luis Suárez uruguaio."
   }
 }
