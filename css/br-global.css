@@ -498,45 +498,48 @@ body > .container > section.hero > img {
 }
 
 
-/* HOTFIX 20260707 — cabeçalho com a NOVA PNG inteira, sem corte e sem distorção.
-   Esta regra deve ficar no fim do CSS para neutralizar os overrides antigos de 44/50/56px. */
-.hero-header,
-header.hero,
-section.hero,
-.container > .hero,
-.container > header.hero,
-.container > section.hero,
-body > .container > header.hero,
-body > .container > section.hero {
-  display: block !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  aspect-ratio: auto !important;
-  padding: 0 !important;
-  line-height: 0 !important;
-  border-radius: 16px !important;
-  overflow: hidden !important;
-  background: #06101d !important;
-  margin: 0 0 12px !important;
-}
-.hero-header img,
-header.hero > img,
-section.hero > img,
-.container > .hero > img,
-.container > header.hero > img,
-.container > section.hero > img,
-body > .container > header.hero > img,
-body > .container > section.hero > img {
-  display: block !important;
-  width: 100% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  max-height: none !important;
-  object-fit: contain !important;
-  object-position: center center !important;
-  transform: none !important;
+/* HOTFIX 20260707 — cabeçalho web compacto + mobile preservado.
+   Desktop estava ficando alto porque a PNG nova era exibida na proporção natural.
+   No web, a imagem ocupa o card inteiro em altura controlada; no celular permanece inteira como estava. */
+@media (min-width: 641px) {
+  .hero-header,
+  header.hero,
+  section.hero,
+  .container > .hero,
+  .container > header.hero,
+  .container > section.hero,
+  body > .container > header.hero,
+  body > .container > section.hero {
+    display: block !important;
+    width: 100% !important;
+    height: clamp(112px, 9.4vw, 138px) !important;
+    min-height: 112px !important;
+    max-height: 138px !important;
+    aspect-ratio: auto !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    background: #06101d !important;
+    margin: 0 0 12px !important;
+  }
+  .hero-header img,
+  header.hero > img,
+  section.hero > img,
+  .container > .hero > img,
+  .container > header.hero > img,
+  .container > section.hero > img,
+  body > .container > header.hero > img,
+  body > .container > section.hero > img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    object-fit: fill !important;
+    object-position: center center !important;
+    transform: none !important;
+  }
 }
 @media (max-width: 640px) {
   .hero-header,
@@ -544,8 +547,34 @@ body > .container > section.hero > img {
   section.hero,
   .container > .hero,
   .container > header.hero,
-  .container > section.hero {
+  .container > section.hero,
+  body > .container > header.hero,
+  body > .container > section.hero {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     border-radius: 12px !important;
-    margin-bottom: 8px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+    margin: 0 0 8px !important;
+  }
+  .hero-header img,
+  header.hero > img,
+  section.hero > img,
+  .container > .hero > img,
+  .container > header.hero > img,
+  .container > section.hero > img,
+  body > .container > header.hero > img,
+  body > .container > section.hero > img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    object-fit: contain !important;
+    object-position: center center !important;
   }
 }

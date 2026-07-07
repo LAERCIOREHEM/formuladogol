@@ -7,7 +7,7 @@
   <meta name="description" content="Página dos 20 clubes do Brasileirão 2026 no Bolão Almoço de Sexta: curiosidades, estádio, títulos, momento, jogos e estrutura preparada para elencos.">
   <meta name="theme-color" content="#10b981">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-  <link rel="stylesheet" href="css/br-institucional.css?v=20260707-header-fit-png-v1">
+  <link rel="stylesheet" href="css/br-institucional.css?v=20260707-header-web-menu-final">
 </head>
 <body>
   <div class="container">
@@ -16,10 +16,10 @@
     </header>
 
     <nav class="nav" aria-label="Menu principal">
-      <a href="./?brasileirao=1">⚽ Jogos</a>
-      <a href="./?brasileirao=1" data-anchor="rank">🏆 Bolão</a>
-      <a href="./?brasileirao=1" data-anchor="tabela">📊 Tabela</a>
-      <a href="./?brasileirao=1" data-anchor="resultados">✅ Resultados</a>
+      <a href="./?brasileirao=1&view=jogos" data-br-view="jogos">⚽ Jogos</a>
+      <a href="./?brasileirao=1&view=rank" data-br-view="rank">🏆 Bolão</a>
+      <a href="./?brasileirao=1&view=tabela" data-br-view="tabela">📊 Tabela</a>
+      <a href="./?brasileirao=1&view=resultados" data-br-view="resultados">✅ Resultados</a>
       <a href="estatisticas.html">📈 Estatísticas</a>
       <a class="active" href="clubes.html">🛡️ Clubes</a>
       <a href="museu.html">🏛️ Museu</a>
@@ -87,7 +87,8 @@
     </footer>
   </div>
 
-  <script src="js/br-clubes.js?v=20260707-ajustes-finais-v1"></script>
+  <script src="js/br-menu.js?v=20260707-header-web-menu-final"></script>
+  <script src="js/br-clubes.js?v=20260707-header-web-menu-final"></script>
   <script>
     document.querySelectorAll('[data-anchor]').forEach(function(a){
       a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-anchor')); });
