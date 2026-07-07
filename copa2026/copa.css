@@ -1306,3 +1306,203 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   .museu-visual-imgbox{height:82px;margin-bottom:8px;padding:7px}
   .museu-visual-com-img:not(.sem-img)::after{width:22px;height:22px;font-size:11px}
 }
+
+
+/* ===== Ranking de Desempenho — histórico vivo por fase ===== */
+.hist-rank-box{
+  margin-top:18px;
+  background:linear-gradient(180deg,rgba(19,41,75,.96),rgba(11,31,58,.96));
+  border:1px solid rgba(244,197,66,.26);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 12px 28px rgba(0,0,0,.24);
+}
+.hist-rank-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:10px;
+}
+.hist-rank-head span{
+  display:block;
+  color:var(--gold);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.hist-rank-head h3{
+  margin:0;
+  font-family:'Anton',system-ui,sans-serif;
+  font-weight:400;
+  letter-spacing:.5px;
+  font-size:24px;
+  color:#fff;
+}
+.hist-rank-head p{
+  margin:5px 0 0;
+  color:var(--cinza);
+  font-size:12px;
+  line-height:1.45;
+}
+.hist-rank-status{
+  flex:0 0 auto;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  border:1px solid rgba(255,255,255,.14);
+}
+.hist-rank-status.fechado{background:rgba(29,185,84,.14);border-color:rgba(29,185,84,.38);color:#8ff3b1}
+.hist-rank-status.parcial{background:rgba(244,197,66,.12);border-color:rgba(244,197,66,.42);color:var(--gold)}
+.hist-rank-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin:8px 0 12px;
+}
+.hist-rank-meta span{
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:999px;
+  padding:5px 9px;
+  color:#c9d7ea;
+  font-size:11px;
+  font-weight:700;
+}
+.hist-rank-controls{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+.hist-rank-controls label{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  color:var(--cinza);
+  font-size:10.5px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.07em;
+}
+.hist-rank-controls select{
+  width:100%;
+  min-width:0;
+  background:rgba(5,18,36,.92);
+  border:1px solid rgba(255,255,255,.13);
+  color:#fff;
+  border-radius:10px;
+  padding:9px 9px;
+  font-family:inherit;
+  font-weight:800;
+  font-size:12px;
+}
+.hist-rank-count{
+  color:var(--cinza);
+  font-size:11.5px;
+  margin:2px 0 8px;
+}
+.hist-rank-list{
+  display:grid;
+  gap:7px;
+}
+.hist-rank-row{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) 74px 112px;
+  gap:9px;
+  align-items:center;
+  background:rgba(5,18,36,.68);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:13px;
+  padding:9px;
+}
+.hist-rank-row:nth-child(1){
+  border-color:rgba(244,197,66,.42);
+  background:linear-gradient(90deg,rgba(244,197,66,.10),rgba(5,18,36,.68));
+}
+.hist-pos{
+  width:28px;height:28px;
+  display:grid;place-items:center;
+  border-radius:10px;
+  background:rgba(244,197,66,.14);
+  border:1px solid rgba(244,197,66,.32);
+  color:var(--gold);
+  font-family:'Anton',system-ui,sans-serif;
+  font-size:16px;
+}
+.hist-team{
+  min-width:0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.hist-team b{
+  display:block;
+  color:#fff;
+  font-size:13.5px;
+  line-height:1.15;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.hist-team span{
+  display:block;
+  margin-top:2px;
+  color:var(--cinza);
+  font-size:11px;
+}
+.hist-score{text-align:right}
+.hist-score b{
+  display:block;
+  color:#fff;
+  font-family:'Anton',system-ui,sans-serif;
+  font-size:23px;
+  line-height:1;
+}
+.hist-score span{
+  display:block;
+  color:var(--cinza);
+  font-size:9.5px;
+  text-transform:uppercase;
+  margin-top:2px;
+}
+.hist-situacao{
+  justify-self:end;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:10.5px;
+  font-weight:900;
+  line-height:1.1;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.12);
+  color:#dce8f8;
+  background:rgba(255,255,255,.06);
+}
+.hist-situacao-class{color:#8ff3b1;border-color:rgba(29,185,84,.35);background:rgba(29,185,84,.10)}
+.hist-situacao-elim{color:#ffaaa5;border-color:rgba(224,71,62,.38);background:rgba(224,71,62,.10)}
+.hist-situacao-aguard{color:#f7d568;border-color:rgba(244,197,66,.36);background:rgba(244,197,66,.10)}
+.hist-situacao-live{color:#ffd0d0;border-color:rgba(255,91,99,.45);background:rgba(255,91,99,.13)}
+@media(max-width:720px){
+  .hist-rank-controls{grid-template-columns:1fr 1fr}
+  .hist-rank-controls label:first-child{grid-column:1 / -1}
+  .hist-rank-row{grid-template-columns:30px minmax(0,1fr) 62px;align-items:start}
+  .hist-situacao{grid-column:2 / 4;justify-self:start;margin-top:-2px}
+  .hist-rank-head{flex-direction:column}
+}
+@media(max-width:420px){
+  .hist-rank-box{padding:12px;border-radius:16px}
+  .hist-rank-head h3{font-size:22px}
+  .hist-rank-controls{grid-template-columns:1fr}
+  .hist-rank-row{grid-template-columns:28px minmax(0,1fr) 58px;gap:7px;padding:8px}
+  .hist-team b{font-size:12.5px}
+  .hist-score b{font-size:21px}
+}

@@ -14,6 +14,7 @@
   var ROSTOS = {};
   var JOGOS = [];
   var RANKING_DESEMPENHO = { ranking: [] };
+  var RANKING_HISTORICO = { snapshots: [] };
   var ABA = "artilheiros";
   var FILTRO = "TODAS";
   var FASE = "TODAS";
@@ -21,6 +22,11 @@
   var MIN_JOGOS_RANK = 1;
   var ORDEM_RANK = "indice_final";
   var DIRECAO_RANK = "desc";
+  var HIST_SNAPSHOT = "";
+  var HIST_SELECAO = "TODAS";
+  var HIST_SITUACAO = "TODAS";
+  var HIST_ORDEM = "indice_final";
+  var HIST_DIRECAO = "desc";
   var LIVE_REFRESH_MS = 30000;
   var LIVE_TIMER = null;
   var LIVE_TICKING = false;
@@ -617,6 +623,128 @@
     '</section>';
   }
 
+
+  function snapshotsHistorico() {
+    return (RANKING_HISTORICO && RANKING_HISTORICO.snapshots || []).filter(function (s) {
+      return s && Array.isArray(s.ranking) && s.ranking.length;
+    }).sort(function (a, b) { return (a.ordem || 0) - (b.ordem || 0); });
+  }
+  function situacaoHistClass(s) {
+    s = String(s || "").toLowerCase();
+    if (s.indexOf("elimin") >= 0) return "elim";
+    if (s.indexOf("aguard") >= 0) return "aguard";
+    if (s.indexOf("jogo") >= 0) return "live";
+    if (s.indexOf("class") >= 0) return "class";
+    return "disp";
+  }
+  function initHistoricoPadrao() {
+    var snaps = snapshotsHistorico();
+    if (!snaps.length) return;
+    if (!HIST_SNAPSHOT || !snaps.some(function (s) { return s.id === HIST_SNAPSHOT; })) {
+      var parcial = snaps.filter(function (s) { return s.status === "parcial"; }).pop();
+      HIST_SNAPSHOT = (parcial || snaps[snaps.length - 1]).id;
+    }
+  }
+  function historicoSelecoesOptions(snap) {
+    var arr = (snap && snap.ranking || []).slice().sort(function (a, b) {
+      return nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
+    });
+    return '<option value="TODAS">Todas as seleções</option>' + arr.map(function (x) {
+      var eq = siglaSelecao(x.equipe);
+      return '<option value="' + esc(eq) + '"' + (HIST_SELECAO === eq ? ' selected' : '') + '>' + flag(eq) + ' ' + esc(nomeSelecao(eq)) + '</option>';
+    }).join("");
+  }
+  function filtrarHistorico(snap) {
+    var arr = (snap && snap.ranking || []).slice();
+    arr = arr.filter(function (x) {
+      var eq = siglaSelecao(x.equipe);
+      var okSel = HIST_SELECAO === "TODAS" || eq === HIST_SELECAO;
+      var sit = String(x.situacao || "Em disputa");
+      var okSit = HIST_SITUACAO === "TODAS" || sit === HIST_SITUACAO;
+      return okSel && okSit;
+    });
+    var campo = HIST_ORDEM || "indice_final";
+    var dir = HIST_DIRECAO === "asc" ? 1 : -1;
+    arr.sort(function (a, b) {
+      var av, bv;
+      if (campo === "selecao") {
+        av = nomeSelecao(a.equipe);
+        bv = nomeSelecao(b.equipe);
+        return av.localeCompare(bv, "pt-BR") * dir;
+      }
+      if (campo === "situacao") {
+        av = String(a.situacao || "");
+        bv = String(b.situacao || "");
+        return av.localeCompare(bv, "pt-BR") * dir || ((b.indice_final || 0) - (a.indice_final || 0));
+      }
+      if (campo === "fase") {
+        av = Number(a.jogos || 0);
+        bv = Number(b.jogos || 0);
+      } else {
+        av = Number(a[campo] || 0);
+        bv = Number(b[campo] || 0);
+      }
+      return (av - bv) * dir || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
+    });
+    return arr;
+  }
+  function historicoLinha(item, idx) {
+    var situ = item.situacao || "Em disputa";
+    var cls = situacaoHistClass(situ);
+    var pos = idx + 1;
+    return '<article class="hist-rank-row hist-' + cls + '">' +
+      '<div class="hist-pos">' + esc(pos) + '</div>' +
+      '<div class="hist-team">' + flag(item.equipe) + '<div><b>' + esc(nomeSelecao(item.equipe)) + '</b><span>' + esc(item.equipe || "") + ' · ' + esc(item.jogos || 0) + ' jogo' + ((item.jogos || 0) === 1 ? '' : 's') + '</span></div></div>' +
+      '<div class="hist-score"><b>' + fmtRankDec(item.indice_final) + '</b><span>índice</span></div>' +
+      '<div class="hist-situacao hist-situacao-' + cls + '">' + esc(situ) + '</div>' +
+    '</article>';
+  }
+  function renderHistoricoRanking() {
+    var snaps = snapshotsHistorico();
+    if (!snaps.length) {
+      return '<section class="hist-rank-box"><div class="hist-rank-head"><div><span>📈 Evolução por fase</span><h3>Histórico indisponível</h3><p>O arquivo de histórico será criado na próxima atualização do ranking.</p></div></div></section>';
+    }
+    initHistoricoPadrao();
+    var snap = snaps.find(function (s) { return s.id === HIST_SNAPSHOT; }) || snaps[snaps.length - 1];
+    var lista = filtrarHistorico(snap);
+    var atualizado = RANKING_HISTORICO.atualizado_em ? fmtData(RANKING_HISTORICO.atualizado_em) : "aguardando";
+    var statusTxt = snap.status === "fechado" ? "fechado" : "parcial/vivo";
+    return '<section class="hist-rank-box" id="hist-ranking-fase">' +
+      '<div class="hist-rank-head">' +
+        '<div><span>📈 Evolução do ranking por fase</span><h3>' + esc(snap.nome || "Snapshot") + '</h3><p>Foto do mesmo Ranking de Desempenho, atualizada jogo a jogo quando a fase ainda está em andamento.</p></div>' +
+        '<div class="hist-rank-status ' + (snap.status === "fechado" ? "fechado" : "parcial") + '">' + esc(statusTxt) + '</div>' +
+      '</div>' +
+      '<div class="hist-rank-meta"><span>' + esc(snap.descricao || "") + '</span><span>Atualizado: ' + esc(atualizado) + '</span></div>' +
+      '<div class="hist-rank-controls">' +
+        '<label>Marco/fase<select id="hist-snapshot">' + snaps.map(function (s) { return '<option value="' + esc(s.id) + '"' + (s.id === snap.id ? ' selected' : '') + '>' + esc(s.nome) + (s.status === "parcial" ? " · parcial" : "") + '</option>'; }).join("") + '</select></label>' +
+        '<label>Seleção<select id="hist-selecao">' + historicoSelecoesOptions(snap) + '</select></label>' +
+        '<label>Situação<select id="hist-situacao"><option value="TODAS">Todas</option><option value="Em disputa">Em disputa</option><option value="Classificada">Classificada</option><option value="Eliminada">Eliminada</option><option value="Aguardando jogo">Aguardando jogo</option><option value="Em jogo">Em jogo</option></select></label>' +
+        '<label>Ordenar<select id="hist-ordem"><option value="indice_final">Índice</option><option value="selecao">Seleção</option><option value="situacao">Situação</option><option value="fase">Jogos disputados</option><option value="ataque">Ataque</option><option value="defesa">Defesa</option></select></label>' +
+        '<label>Ordem<select id="hist-direcao"><option value="desc">Maior primeiro</option><option value="asc">Menor primeiro</option></select></label>' +
+      '</div>' +
+      '<div class="hist-rank-count">' + esc(lista.length) + ' seleção' + (lista.length === 1 ? '' : 'ões') + ' neste filtro</div>' +
+      '<div class="hist-rank-list">' + (lista.length ? lista.map(historicoLinha).join("") : '<div class="stat-vazio">Nenhuma seleção encontrada para os filtros escolhidos.</div>') + '</div>' +
+    '</section>';
+  }
+  function bindHistoricoControls() {
+    var box = $("#hist-ranking-fase");
+    if (!box) return;
+    var snapSel = $("#hist-snapshot");
+    var selSel = $("#hist-selecao");
+    var sitSel = $("#hist-situacao");
+    var ordSel = $("#hist-ordem");
+    var dirSel = $("#hist-direcao");
+    if (sitSel) sitSel.value = HIST_SITUACAO;
+    if (ordSel) ordSel.value = HIST_ORDEM;
+    if (dirSel) dirSel.value = HIST_DIRECAO;
+    if (snapSel) snapSel.onchange = function () { HIST_SNAPSHOT = this.value; HIST_SELECAO = "TODAS"; renderLista(); };
+    if (selSel) selSel.onchange = function () { HIST_SELECAO = this.value; renderLista(); };
+    if (sitSel) sitSel.onchange = function () { HIST_SITUACAO = this.value; renderLista(); };
+    if (ordSel) ordSel.onchange = function () { HIST_ORDEM = this.value; renderLista(); };
+    if (dirSel) dirSel.onchange = function () { HIST_DIRECAO = this.value; renderLista(); };
+  }
+
+
   function jogoCard(j) {
     var bloco = (window.COPA_JOGO_STATS && COPA_JOGO_STATS.bloco)
       ? COPA_JOGO_STATS.bloco({ eventId: j.id, homeId: j.home.sigla, awayId: j.away.sigla, homeName: j.home.nome, awayName: j.away.nome, live: j.state === "in" })
@@ -722,7 +850,8 @@
         $("#stats-lista").innerHTML = '<div class="stat-vazio">Nenhuma seleção encontrada para este filtro no Ranking de Desempenho.</div>';
         return;
       }
-      $("#stats-lista").innerHTML = arr.map(desempenhoCard).join("");
+      $("#stats-lista").innerHTML = arr.map(desempenhoCard).join("") + renderHistoricoRanking();
+      bindHistoricoControls();
       return;
     }
 
@@ -835,6 +964,8 @@
 
     var rankingReq = fetchJsonComTimeout('dados/ranking-desempenho.json?v=' + Date.now(), FETCH_LOCAL_TIMEOUT_MS).catch(function () { return { ranking: [] }; });
 
+    var historicoReq = fetchJsonComTimeout('dados/ranking-selecoes-historico.json?v=' + Date.now(), FETCH_LOCAL_TIMEOUT_MS).catch(function () { return { snapshots: [] }; });
+
     var jogosLocalReq = fetchJsonComTimeout('dados/jogos-detalhes.json?v=' + Date.now(), FETCH_LOCAL_TIMEOUT_MS)
       .then(jogosDetalhesParaLista)
       .catch(function () { return []; });
@@ -843,10 +974,11 @@
       .then(function (j) { return (j.events || []).map(normalizarJogo); })
       .catch(function () { return []; });
 
-    var basicos = await Promise.all([dadosReq, rostosReq, rankingReq]);
+    var basicos = await Promise.all([dadosReq, rostosReq, rankingReq, historicoReq]);
     DADOS = basicos[0] || DADOS;
     ROSTOS = basicos[1] || {};
     RANKING_DESEMPENHO = basicos[2] || { ranking: [] };
+    RANKING_HISTORICO = basicos[3] || { snapshots: [] };
 
     // A página de estatísticas NÃO pode depender da ESPN ao vivo para sair do carregando.
     // Primeiro renderiza com os JSONs locais do repositório; depois melhora a aba "Por jogo"
