@@ -17,6 +17,7 @@ on:
   push:
     paths:
       - 'copa2026/gerar_ranking_desempenho.py'
+      - 'copa2026/gerar_ranking_historico.py'
       - 'copa2026/dados/jogos-detalhes.json'
       - 'copa2026/dados/estatisticas.json'
       - '.github/workflows/atualizar-tudo.yml'
@@ -60,18 +61,21 @@ jobs:
       # Leve: nao bate no navegador do usuario. Usa os JSONs ja consolidados.
       - name: Gerar Ranking de Desempenho
         id: ranking_desempenho
-        run: python3 copa2026/gerar_ranking_desempenho.py
+        run: |
+          python3 copa2026/gerar_ranking_desempenho.py
+          python3 copa2026/gerar_ranking_historico.py
 
       - name: Conferir e validar JSON gerado
         run: |
           set -euo pipefail
-          arq="copa2026/dados/ranking-desempenho.json"
-          if [ ! -f "$arq" ]; then
-            echo "ERRO: $arq nao foi gerado."
-            exit 1
-          fi
-          python -m json.tool "$arq" > /dev/null
-          echo "  OK   $arq"
+          for arq in "copa2026/dados/ranking-desempenho.json" "copa2026/dados/ranking-selecoes-historico.json"; do
+            if [ ! -f "$arq" ]; then
+              echo "ERRO: $arq nao foi gerado."
+              exit 1
+            fi
+            python -m json.tool "$arq" > /dev/null
+            echo "  OK   $arq"
+          done
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos).
       - name: Commitar o ranking com push robusto
@@ -85,6 +89,7 @@ jobs:
 
           FILES=(
             "copa2026/dados/ranking-desempenho.json"
+            "copa2026/dados/ranking-selecoes-historico.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
