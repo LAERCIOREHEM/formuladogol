@@ -415,3 +415,84 @@ body > .container > section.hero > img {
     object-position: center center !important;
   }
 }
+
+/* ========================================================================== 
+   HOTFIX 20260707 — Ligas visíveis e administração amigável
+   Mantém a tela de apostas e só melhora a área de ligas/admin.
+   ========================================================================== */
+:root { --green2: var(--green-2); --cyan: #38bdf8; }
+label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; }
+input, select, textarea {
+  width: 100%;
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 13px;
+  background: rgba(4, 12, 18, .82);
+  color: var(--text);
+  padding: 11px 12px;
+  font: inherit;
+  outline: none;
+  min-height: 42px;
+}
+input:focus, select:focus, textarea:focus { border-color: rgba(163,230,53,.65); box-shadow: 0 0 0 3px rgba(163,230,53,.10); }
+.btn.secondary.active { color: #132008; border-color: transparent; background: linear-gradient(180deg, #facc15, #a3e635); }
+.btn.ghost { background: transparent; border-color: rgba(255,255,255,.10); color: var(--muted); }
+.muted-note { color: var(--muted); font-size: .9rem; line-height: 1.45; }
+.table-wrap { overflow-x: auto; border: 1px solid rgba(255,255,255,.08); border-radius: 18px; background: rgba(3, 11, 8, .46); -webkit-overflow-scrolling: touch; }
+.data-table, .rank-table { width: 100%; border-collapse: collapse; min-width: 680px; font-size: 14px; }
+.data-table th, .data-table td, .rank-table th, .rank-table td { padding: 10px 12px; border-top: 1px solid rgba(148,163,184,.12); text-align: left; vertical-align: middle; }
+.data-table thead th, .rank-table thead th { border-top: 0; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
+.data-table .num { text-align: right; font-weight: 950; }
+.data-table th, .data-table td { white-space: nowrap; }
+.data-table small { color: var(--muted-2); }
+.progress-wrap { height: 10px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; border:1px solid rgba(255,255,255,.08); }
+.progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--green2), var(--green), var(--gold)); border-radius: inherit; transition: width .25s ease; }
+.hash { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; word-break: break-all; color: #fde68a; }
+.gold-num { color: var(--gold); font-weight: 900; }
+.score-max { color: var(--gold); font-weight: 900; }
+.score-mid { color: var(--green); font-weight: 800; }
+.score-low { color: var(--cyan); font-weight: 800; }
+.score-zero { color: var(--danger); font-weight: 800; }
+.export-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; margin: 10px 0 12px; }
+.admin-grid { display: grid; grid-template-columns: minmax(280px, .85fr) minmax(0, 1.15fr); gap: 12px; align-items: start; }
+.admin-form { display: grid; gap: 10px; margin-top: 12px; }
+.admin-form .two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.switch-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.switch-row label { display: flex; align-items: center; gap: 6px; text-transform: none; letter-spacing: 0; font-size: 13px; }
+.switch-row input { width: auto; min-height: 0; }
+.audit-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+.audit-kpis span { display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: 16px; background: rgba(163, 230, 53, .08); border: 1px solid rgba(163, 230, 53, .18); }
+.audit-kpis strong { font-size: 1.8rem; color: var(--gold); line-height: 1; }
+.audit-kpis small { color: var(--muted); font-size: .9rem; }
+.audit-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.data-table .hash { max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.liga-box { margin: 12px 0 8px; }
+.liga-panel { position: relative; overflow: hidden; border-color: rgba(250, 204, 21, .24); }
+.liga-panel::after { content: ""; position: absolute; inset: auto -60px -80px auto; width: 180px; height: 180px; border-radius: 999px; background: radial-gradient(circle, rgba(250,204,21,.16), transparent 65%); pointer-events: none; }
+.liga-box-inner { display: grid; grid-template-columns: minmax(0, 1fr) minmax(270px, 390px); gap: 16px; align-items: center; }
+.liga-select-actions { display: grid; gap: 10px; align-items: end; }
+.liga-admin-cta { display: grid; gap: 7px; padding: 10px; border: 1px solid rgba(250,204,21,.20); border-radius: 14px; background: rgba(250,204,21,.06); }
+.liga-admin-cta small { color: var(--muted); line-height: 1.35; }
+.league-admin-grid { display: grid; grid-template-columns: minmax(280px, .95fr) minmax(0, 1.05fr); gap: 14px; margin-top: 14px; align-items: start; }
+.league-form { border: 1px solid rgba(250,204,21,.20); border-radius: 16px; padding: 13px; background: rgba(250,204,21,.05); }
+.league-form-head { display: grid; gap: 4px; margin-bottom: 2px; }
+.league-form-head strong { color: #fef9c3; font-size: 16px; }
+.league-form-head span { color: var(--muted); font-size: 13px; line-height: 1.35; }
+.league-members-box { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(148, 163, 184, .14); }
+.inline-add-member { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(140px, .6fr) auto; gap: 10px; align-items: end; width: 100%; }
+.action-cell { display: flex; flex-wrap: wrap; gap: 7px; min-width: 180px; }
+.action-cell .btn { margin: 2px; }
+.league-list small { color: var(--muted-2); }
+@media (max-width: 760px) {
+  .liga-box-inner,
+  .league-admin-grid,
+  .inline-add-member,
+  .admin-form .two { grid-template-columns: 1fr; }
+  .export-row { justify-content: stretch; }
+  .export-row .btn,
+  .audit-actions .btn { width: 100%; }
+  .action-cell { min-width: 150px; }
+  .league-admin-grid,
+  .league-members-box .form-line.wide { gap: 12px; }
+  .data-table, .rank-table { min-width: 760px; }
+  .audit-kpis { grid-template-columns: 1fr; }
+}

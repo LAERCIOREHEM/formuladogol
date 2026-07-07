@@ -368,7 +368,10 @@
       state.ligas = [{ liga_id: "geral", nome: "Liga Geral", slug: "liga-geral", descricao: "Ranking geral", ativa: true, papel: "participante" }];
     }
     const existe = state.ligas.some(l => String(l.liga_id) === String(state.ligaAtual));
-    if (!state.ligaAtual || !existe) state.ligaAtual = state.ligas[0].liga_id;
+    if (!state.ligaAtual || !existe) {
+      const preferida = ligaPreferida(state.ligas);
+      state.ligaAtual = preferida ? preferida.liga_id : null;
+    }
   }
 
   function ligaAtualObj() {
@@ -422,6 +425,21 @@
     return l ? (l.slug || l.liga_id || "liga-geral") : "liga-geral";
   }
 
+  function isLigaAlmoco(liga) {
+    const slug = normalizarTexto(liga?.slug || liga?.nome || "");
+    return slug === "almoco-de-sexta" || slug === "almoco-sexta" || slug === "almoco";
+  }
+
+  function isLigaGeral(liga) {
+    const slug = normalizarTexto(liga?.slug || liga?.nome || "");
+    return slug === "liga-geral" || slug === "geral";
+  }
+
+  function ligaPreferida(ligas) {
+    const lista = Array.isArray(ligas) ? ligas : [];
+    return lista.find(isLigaAlmoco) || lista.find(l => !isLigaGeral(l)) || lista[0] || null;
+  }
+
   function rankingPorLigaPayload(payload, ligaId) {
     const porLiga = (payload && (payload.rankings_por_liga || payload.ranking_por_liga)) || {};
     const liga = state.ligas.find(l => String(l.liga_id) === String(ligaId)) || ligaAtualObj();
@@ -464,21 +482,39 @@
     if (!box || !state.usuario) return;
     const ligas = state.ligas || [];
     if (!ligas.length) { box.innerHTML = ""; return; }
+    const atual = ligaAtualObj();
+    const adminCta = canAdminAny() ? `<div class="liga-admin-cta">
+        <button class="btn" type="button" id="abrir-admin-ligas">➕ Criar/gerenciar ligas</button>
+        <small>Use esta área para criar ligas de outros grupos, colocar participantes e definir admin da liga.</small>
+      </div>` : "";
+    const avisoGeral = atual && isLigaGeral(atual) ? `<p class="muted-note"><strong>Liga Geral</strong> é a visão consolidada de todos. A liga padrão do grupo é <strong>Almoço de Sexta</strong>; outras ligas podem ser criadas no Admin.</p>` : "";
     box.innerHTML = `<section class="panel liga-panel"><div class="panel-inner liga-box-inner">
       <div>
         <div class="kicker">Liga ativa</div>
         <h2>${escapeHtml(nomeLigaAtual())}</h2>
         <p>O palpite é único por rodada. A liga selecionada filtra ranking, palpites públicos, progresso e auditoria.</p>
+        ${avisoGeral}
       </div>
-      <label>Selecionar liga
-        <select id="liga-select">${ligas.map(l => `<option value="${escapeAttr(l.liga_id)}" ${String(l.liga_id) === String(state.ligaAtual) ? "selected" : ""}>${escapeHtml(l.nome)}${l.papel === "admin_liga" ? " · admin" : ""}</option>`).join("")}</select>
-      </label>
+      <div class="liga-select-actions">
+        <label>Selecionar liga
+          <select id="liga-select">${ligas.map(l => {
+            const sufixo = isLigaAlmoco(l) ? " · padrão" : (l.papel === "admin_liga" || l.pode_gerir ? " · admin" : "");
+            return `<option value="${escapeAttr(l.liga_id)}" ${String(l.liga_id) === String(state.ligaAtual) ? "selected" : ""}>${escapeHtml(l.nome)}${sufixo}</option>`;
+          }).join("")}</select>
+        </label>
+        ${adminCta}
+      </div>
     </div></section>`;
     $("#liga-select")?.addEventListener("change", async ev => {
       state.ligaAtual = ev.target.value;
       status(`Liga ativa: ${nomeLigaAtual()}.`, "ok");
       renderLigaBox();
       renderConteudo();
+    });
+    $("#abrir-admin-ligas")?.addEventListener("click", async () => {
+      state.aba = "admin";
+      await refresh();
+      document.getElementById("conteudo")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
@@ -920,17 +956,19 @@
       .map(p => `<option value="${escapeAttr(p.participante_id)}">${escapeHtml(p.nome)} · ${escapeHtml(p.login)}</option>`).join("");
     const formLiga = globalAdmin ? `<form id="admin-liga-form" class="admin-form league-form">
           <input type="hidden" id="admin-liga-id">
-          <div class="two"><label>Nome da liga <input id="admin-liga-nome" placeholder="Ex.: Almoço de Sexta" required></label><label>Slug <input id="admin-liga-slug" placeholder="almoco-sexta"></label></div>
+          <div class="league-form-head"><strong>Criar nova liga</strong><span>Ex.: amigos da F1, família, pessoal da Caixa, pelada etc.</span></div>
+          <div class="two"><label>Nome da liga <input id="admin-liga-nome" placeholder="Ex.: Amigos da F1" required></label><label>Slug <input id="admin-liga-slug" placeholder="amigos-f1"></label></div>
           <label>Descrição <input id="admin-liga-desc" placeholder="Descrição curta da liga"></label>
           <div class="switch-row"><label><input type="checkbox" id="admin-liga-ativa" checked> liga ativa</label></div>
-          <div class="actions"><button class="btn" type="submit">salvar liga</button><button class="btn ghost" type="button" id="limpar-liga">limpar</button></div>
+          <div class="actions"><button class="btn" type="submit">➕ criar/salvar liga</button><button class="btn ghost" type="button" id="limpar-liga">nova/limpar</button></div>
+          <p class="muted-note">Após salvar, escolha a liga abaixo e adicione os participantes. O ranking será separado por liga.</p>
         </form>` : `<div class="empty"><strong>Admin de liga</strong><p>Você gerencia apenas as ligas em que recebeu papel de administrador. Criação de novas ligas, alteração de janela e criação de usuários ficam restritas ao admin global.</p></div>`;
     const papelOptions = globalAdmin
       ? `<option value="participante">participante</option><option value="admin_liga">admin da liga</option><option value="observador">observador</option>`
       : `<option value="participante">participante</option><option value="observador">observador</option>`;
     return `<article class="panel" style="grid-column:1/-1"><div class="panel-inner">
-      <div class="kicker">Ligas</div><h2>Gerenciar ligas e participantes</h2>
-      <p>O palpite continua único por participante/rodada. A liga agrupa pessoas para ranking, progresso e auditoria separados.</p>
+      <div class="kicker">Ligas</div><h2>Criar e gerenciar ligas</h2>
+      <p><strong>Almoço de Sexta</strong> é a liga padrão do grupo. Use esta área para criar outras ligas, adicionar participantes e definir quem é admin de cada uma.</p>
       <div class="league-admin-grid">
         ${formLiga}
         <div class="league-list">
@@ -993,9 +1031,9 @@
         </form>
       </div></article>` : `<article class="panel"><div class="panel-inner"><div class="kicker">Janela da rodada</div><h2>Rodada ${state.rodada}</h2><p class="muted-note">Janela e publicação são globais para todas as ligas e somente o admin global altera esses dados.</p><p><span class="badge ${statusJanela(state.rodada).classe}">${escapeHtml(statusJanela(state.rodada).detalhe)}</span></p></div></article>`;
     root.innerHTML = `<section class="admin-grid">
+      ${renderLigasAdminHtml()}
       ${painelParticipantes}
       ${painelRodada}
-      ${renderLigasAdminHtml()}
       <article class="panel" style="grid-column:1/-1"><div class="panel-inner">
         <div class="kicker">Percentual preenchido</div><h2>Admin vê percentual, não placares</h2>
         <p>O percentual abaixo considera a liga selecionada. O admin acompanha preenchimento por liga sem ver placares antes da publicação.</p>
@@ -1018,7 +1056,7 @@
       $$('[data-inativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.inativar, false)));
       $$('[data-reativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.reativar, true)));
       $("#admin-liga-form")?.addEventListener("submit", salvarLigaAdmin);
-      $("#limpar-liga")?.addEventListener("click", limparFormLiga);
+      $("#limpar-liga")?.addEventListener("click", () => { limparFormLiga(); $("#admin-liga-nome")?.focus(); });
       $$('[data-edit-liga]').forEach(btn => btn.addEventListener("click", () => preencherLiga(btn.dataset.editLiga)));
     }
     $("#export-progresso")?.addEventListener("click", exportarProgressoCsv);
@@ -1062,8 +1100,13 @@
         p_ativa: $("#admin-liga-ativa").checked
       });
       const liga = rows[0];
-      if (liga?.liga_id) state.adminLigaSelecionada = liga.liga_id;
-      status("Liga salva.", "ok");
+      if (liga?.liga_id) {
+        state.adminLigaSelecionada = liga.liga_id;
+        state.ligaAtual = liga.liga_id;
+      }
+      await carregarLigas();
+      renderLigaBox();
+      status("Liga salva. Agora adicione os participantes abaixo.", "ok");
       await renderAdmin();
     } catch (err) { status(err.message || "Falha ao salvar liga.", "err"); }
   }
