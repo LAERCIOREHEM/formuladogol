@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-07T21:12:37.075670Z",
+  "atualizado_em": "2026-07-07T21:42:46.922382Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 96,
+  "jogos_processados": 95,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -1156,14 +1156,13 @@
       "equipe": "SUI",
       "gols": 1,
       "assistencias": 0,
-      "amarelos": 2,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760439",
-        "760463",
-        "760508"
+        "760463"
       ],
-      "total_cartoes": 2
+      "total_cartoes": 1
     },
     {
       "nome": "Hans Vanaken",
@@ -4496,20 +4495,6 @@
       "total_cartoes": 2
     },
     {
-      "nome": "Granit Xhaka",
-      "equipe": "SUI",
-      "gols": 1,
-      "assistencias": 0,
-      "amarelos": 2,
-      "vermelhos": 0,
-      "jogos": [
-        "760439",
-        "760463",
-        "760508"
-      ],
-      "total_cartoes": 2
-    },
-    {
       "nome": "Haissem Hassan",
       "equipe": "EGY",
       "gols": 0,
@@ -5413,6 +5398,19 @@
       "vermelhos": 0,
       "jogos": [
         "760468"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Granit Xhaka",
+      "equipe": "SUI",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760439",
+        "760463"
       ],
       "total_cartoes": 1
     },
@@ -7054,6 +7052,15 @@
       "media_gols": 2.0
     },
     {
+      "equipe": "SUI",
+      "gols": 9,
+      "assistencias": 5,
+      "amarelos": 3,
+      "vermelhos": 0,
+      "jogos": 4,
+      "media_gols": 2.25
+    },
+    {
       "equipe": "CAN",
       "gols": 9,
       "assistencias": 3,
@@ -7067,15 +7074,6 @@
       "gols": 9,
       "assistencias": 8,
       "amarelos": 3,
-      "vermelhos": 0,
-      "jogos": 5,
-      "media_gols": 1.8
-    },
-    {
-      "equipe": "SUI",
-      "gols": 9,
-      "assistencias": 5,
-      "amarelos": 4,
       "vermelhos": 0,
       "jogos": 5,
       "media_gols": 1.8
@@ -7176,8 +7174,8 @@
       "assistencias": 5,
       "amarelos": 6,
       "vermelhos": 0,
-      "jogos": 5,
-      "media_gols": 1.0
+      "jogos": 4,
+      "media_gols": 1.25
     },
     {
       "equipe": "NZL",
