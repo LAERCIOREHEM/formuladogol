@@ -858,10 +858,24 @@
     el.hidden = ABA !== "desempenho";
   }
 
+  function atualizarSlotHistoricoRanking(conteudo) {
+    var slot = $("#ranking-historico-slot");
+    if (!slot) return;
+    if (ABA !== "desempenho") {
+      slot.hidden = true;
+      slot.innerHTML = "";
+      return;
+    }
+    slot.hidden = false;
+    slot.innerHTML = conteudo || renderHistoricoRanking();
+    bindHistoricoControls();
+  }
+
   function renderLista() {
     $$(".stat-tab").forEach(function (b) { b.classList.toggle("ativa", b.dataset.aba === ABA); });
     atualizarAtalhoMetodologiaRanking();
     renderFiltro();
+    if (ABA !== "desempenho") atualizarSlotHistoricoRanking("");
     var arr = filtrar(listaDaAba());
     var titulo = ABA === 'assistencias' ? 'Assistências' : (ABA === 'gols_selecao' ? 'Gols por seleção' : (ABA === 'jogos' ? 'Estatísticas por jogo' : (ABA === 'desempenho' ? 'Ranking de Desempenho' : 'Artilheiros')));
     $("#stats-titulo-lista").textContent = titulo;
@@ -870,12 +884,12 @@
       pararMonitorAoVivo();
       atualizarStatusLive([]);
       $("#stats-contagem").textContent = arr.length ? (arr.length + " seleç" + (arr.length === 1 ? "ão" : "ões") + " · " + (SITUACAO_RANK === "TODAS" ? "todas" : SITUACAO_RANK.toLowerCase())) : "sem dados";
+      atualizarSlotHistoricoRanking();
       if (!arr.length) {
         $("#stats-lista").innerHTML = '<div class="stat-vazio">Nenhuma seleção encontrada para este filtro no Ranking de Desempenho.</div>';
         return;
       }
-      $("#stats-lista").innerHTML = arr.map(desempenhoCard).join("") + renderHistoricoRanking();
-      bindHistoricoControls();
+      $("#stats-lista").innerHTML = arr.map(desempenhoCard).join("");
       return;
     }
 

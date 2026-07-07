@@ -3378,3 +3378,10 @@ html{
 .hist-team-card.hist-class{border-color:rgba(29,185,84,.28)}.hist-team-card.hist-elim{opacity:.84}.hist-team-card.hist-aguard{border-color:rgba(255,204,41,.24)}.hist-team-card.hist-live{border-color:rgba(255,91,99,.30)}
 @media(max-width:720px){.hist-rank-head{flex-direction:column}.hist-rank-controls{grid-template-columns:1fr 1fr}.hist-card-grid{grid-template-columns:1fr}.hist-toggle-btn{padding:14px 13px}.hist-toggle-btn strong{font-size:14px}.hist-rank-box{padding:12px;border-radius:19px}.hist-rank-head h3{font-size:23px}}
 @media(max-width:420px){.hist-rank-controls{grid-template-columns:1fr}.hist-card-team b{font-size:13px}.hist-score b{font-size:30px}.hist-mini{grid-template-columns:repeat(3,1fr);gap:5px}.hist-mini span{padding:6px 4px;font-size:9px}.hist-situacao{font-size:10px;padding:6px 8px}}
+
+/* HOTFIX UX — coloca o botão de evolução logo abaixo da aba Ranking de Desempenho */
+.ranking-historico-slot[hidden]{display:none !important}
+.ranking-historico-slot{margin:10px 0 12px}
+.ranking-historico-slot .hist-launch{margin:0}
+.ranking-historico-slot .hist-rank-box{margin-top:10px;margin-bottom:14px}
+@media(max-width:520px){.ranking-historico-slot{margin:8px 0 10px}.ranking-historico-slot .hist-rank-box{margin-top:9px}}
