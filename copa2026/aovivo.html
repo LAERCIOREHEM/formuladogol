@@ -156,6 +156,13 @@
   .palp-live-fold[open] .sum-closed{display:none}
   .palp-live-fold[open] summary{margin-bottom:10px;background:rgba(244,197,66,.14)}
 
+
+  /* Ranking discreto do site no card Ao Vivo */
+  .live-team-rank{display:inline-flex;align-items:center;justify-content:center;min-height:18px;padding:2px 7px;border-radius:999px;background:rgba(8,25,50,.74);border:1px solid rgba(244,197,66,.34);color:#ffd84d;font-size:10px;font-weight:900;line-height:1;letter-spacing:.02em;white-space:nowrap;box-shadow:0 4px 10px rgba(0,0,0,.16)}
+  .team-link-live .live-team-rank{margin-bottom:-1px}
+  .sel .live-team-rank{max-width:96px}
+  @media(max-width:420px){.live-team-rank{font-size:9px;padding:2px 6px;min-height:17px}.sel .live-team-rank{max-width:84px}}
+
   @media(max-width:560px){
     .live-gols-jogo{grid-template-columns:minmax(0,1fr) 24px minmax(0,1fr);gap:5px;margin-top:9px;padding:0 2px}
     .live-gols-time{font-size:10.5px;gap:2px}
@@ -184,7 +191,7 @@
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
 <script src="js/engine.js?v=20260704mata-v28"></script>
 <script src="js/jogo-stats.js?v=20260703liveall-v15"></script>
-<script src="js/aovivo.js?v=20260703liveall-v15"></script>
+<script src="js/aovivo.js?v=20260707-rank-live-v1"></script>
 <footer class="rodape">
   <a href="regras.html">📘 Regras</a><span class="sep">·</span>
   <a href="#" data-feedback>💬 Sugestões</a><span class="sep">·</span>

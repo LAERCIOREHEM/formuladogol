@@ -39,6 +39,7 @@
   const ESPN_OVR = {};               // se alguma sigla da ESPN diferir do nosso id, mapear aqui (ex.: {"GER":"ALE"})
   let DADOS = {}, JOGOS = [], PART = [], timer = null;
   let TVS = {};
+  let RANKING_SITE = {}; // sigla -> {pos, indice}; usado só no card Ao vivo
   let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols ao vivo exibidos no card
   let LIVES = {};
   let AGENDA_COPA = [];
@@ -72,6 +73,30 @@
     const extras = (TVS.jogos && TVS.jogos[k]) || [];
     const lista = Object.keys(TV_CAT).filter(c => c === "caze" || extras.indexOf(c) !== -1);
     return `<div class="tvs">📺 ${lista.map(c => `<span class="tvchip" style="background:${TV_CAT[c][1]};color:${TV_CAT[c][2]}">${TV_CAT[c][0]}</span>`).join("")}</div>`;
+  }
+
+  function fmtIndiceRank(v) {
+    const n = Number(v);
+    if (!isFinite(n)) return "";
+    return n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+  function montarRankingAoVivo(dados) {
+    const arr = ((dados && dados.ranking) || []).slice().sort((a, b) =>
+      Number(b.indice_final || 0) - Number(a.indice_final || 0) || String(a.nome || a.equipe || "").localeCompare(String(b.nome || b.equipe || ""), "pt-BR")
+    );
+    const map = {};
+    arr.forEach((item, idx) => {
+      const sig = dpSigla(item.equipe || item.sigla || item.nome);
+      const indice = Number(item.indice_final);
+      if (sig && isFinite(indice)) map[sig] = { pos: Number(item.posicao || idx + 1), indice };
+    });
+    return map;
+  }
+  function rankBadgeAoVivo(id) {
+    const sig = dpSigla(id);
+    const r = sig && RANKING_SITE[sig];
+    if (!r || !r.pos || !isFinite(Number(r.indice))) return "";
+    return `<div class="live-team-rank" title="Ranking de Desempenho: ${escTxt(r.pos)}º · índice ${escTxt(fmtIndiceRank(r.indice))}">${escTxt(r.pos)}º · ${escTxt(fmtIndiceRank(r.indice))}</div>`;
   }
 
 
@@ -133,6 +158,7 @@
     try { TVS = await fetch("dados/transmissoes.json").then(r => r.json()); } catch (e) { TVS = {}; }
     try { LIVES = (await fetch("dados/lives.json?t=" + Date.now()).then(r => r.json())).jogos || {}; } catch (e) { LIVES = {}; }
     try { AGENDA_COPA = (await fetch("dados/agenda_workflow_copa.json?t=" + Date.now()).then(r => r.json())).jogos || []; } catch (e) { AGENDA_COPA = []; }
+    try { RANKING_SITE = montarRankingAoVivo(await fetch("dados/ranking-desempenho.json?t=" + Date.now()).then(r => r.json())); } catch (e) { RANKING_SITE = {}; }
     try {
       const [s, e, t] = await Promise.all([
         fetch("dados/selecoes.json").then(r => r.json()),
@@ -660,7 +686,10 @@
       return src ? `<img src="${src}" alt="" title="${dpNome(ab)}" onerror="this.style.visibility='hidden'">` : "";
     };
     const tNome = c => dpNome(timeId(c));
-    const timeAoVivoHTML = c => selecaoLinkHTML(timeId(c), `${escudo(c)}<div class="nm">${escTxt(tNome(c))}</div>`, "team-link-live");
+    const timeAoVivoHTML = c => {
+      const id = timeId(c);
+      return selecaoLinkHTML(id, `${rankBadgeAoVivo(id)}${escudo(c)}<div class="nm">${escTxt(tNome(c))}</div>`, "team-link-live");
+    };
 
     // palpites (só fase de grupos e se já houver palpites revelados)
     const j = ourGame(ev);
