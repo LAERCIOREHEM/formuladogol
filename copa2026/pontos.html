@@ -137,6 +137,12 @@
   .gg-pend{background:rgba(244,197,66,.08);border:1px solid rgba(244,197,66,.18)}
   .gg-g small{display:block;color:var(--cinza);font-size:10px;margin-top:2px;font-weight:700}
 
+  .card.sem-podio{border-color:rgba(148,163,184,.18);background:linear-gradient(90deg,rgba(22,31,45,.80),rgba(22,31,45,.58));box-shadow:none;filter:grayscale(.35);opacity:.66}
+  .card.sem-podio .barra,.card.sem-podio .f32,.card.sem-podio .podiodet{opacity:.72}
+  .selo-sem-podio{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:-3px 0 9px;padding:6px 9px;border-radius:10px;background:rgba(224,71,62,.12);border:1px solid rgba(224,71,62,.32);color:#ffd0d0;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.5px}
+  .selo-sem-podio small{color:#b7c2d4;font-size:10.5px;font-weight:800;text-transform:none;letter-spacing:0;text-align:right}
+  @media(max-width:480px){.selo-sem-podio{display:block;line-height:1.35}.selo-sem-podio small{display:block;margin-top:3px;text-align:left}}
+
   .card.cravo-campeao{border-color:rgba(86,232,141,.72);background:linear-gradient(90deg,rgba(29,185,84,.22),rgba(18,83,58,.18),var(--navy-2));box-shadow:0 10px 26px rgba(29,185,84,.16)}
   .cravo-campeao-selo{display:block;text-align:center;margin:-2px 0 9px;padding:5px 10px;border-radius:999px;
     background:rgba(29,185,84,.18);border:1px solid rgba(86,232,141,.58);color:#a8ffc4;
@@ -165,8 +171,8 @@
 <script src="js/config.js?v=20260620c"></script>
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
 <script src="js/engine.js?v=20260622b"></script>
-<script src="js/pontuacao.js?v=20260706-eficiencia-v32"></script>
-<script src="js/pontos.js?v=20260706-remove-as32-v33"></script>
+<script src="js/pontuacao.js?v=20260628teto-fix"></script>
+<script src="js/pontos.js?v=20260707-sem-podio-v1"></script>
 <footer class="rodape">
   <a href="regras.html">📘 Regras</a><span class="sep">·</span>
   <a href="#" data-feedback>💬 Sugestões</a><span class="sep">·</span>

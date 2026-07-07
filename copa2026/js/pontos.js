@@ -90,12 +90,9 @@
     // Status dos ícones das 32 do participante:
     // - wrong: ele colocou entre as 32, mas a seleção nem classificou.
     // - alive: segue viva NO CAMINHO QUE ELE CRAVOU para a fase atual.
-    // - out: classificou, mas caiu ou já foi eliminada do caminho do palpite.
+    // - out: classificou, mas caiu do caminho do palpite dele em alguma fase.
     if (!o || !o.classificados32 || !o.classificados32.length) return "pend";
     if (o.classificados32.indexOf(team) === -1) return "wrong";
-    // Regra crítica: eliminado é fora do páreo imediatamente, mesmo que a fase
-    // inteira ainda não tenha terminado e a seleção ainda apareça na lista da fase atual.
-    if ((o.eliminados || []).indexOf(team) !== -1) return "out";
     const key = chaveAtualDoPareo(o);
     const real = new Set(listaOficialDoPareo(o, key));
     const palpite = new Set(listaPalpiteDoPareo(p, key));
@@ -105,8 +102,7 @@
     if (!o || !o.classificados32 || !o.classificados32.length) return 0;
     const key = chaveAtualDoPareo(o);
     const real = new Set(listaOficialDoPareo(o, key));
-    const elim = new Set(o.eliminados || []);
-    return listaPalpiteDoPareo(p, key).filter(t => real.has(t) && !elim.has(t)).length;
+    return listaPalpiteDoPareo(p, key).filter(t => real.has(t)).length;
   }
 
   async function init() {
@@ -362,29 +358,14 @@
     { k: "avancam_quartas", n: 8, lab: "Quartas" },
     { k: "semifinalistas", n: 4, lab: "Semifinal" }
   ];
-  function posicaoFinalStatus(key, id, o) {
-    if (!id) return { cls:"pend", txt:"aguardando", ico:"⏳", perdido:false };
-    const dec = (o && o.decididos) || {};
-    const elim = new Set((o && o.eliminados) || []);
-    const semiLosers = new Set((o && o._semiLosers) || []);
-    if (dec[key]) {
-      const ok = o[key] === id;
-      return { cls: ok ? "ok" : "err", txt: ok ? "✓ acertou" : "✗ errou", ico: ok ? "✅" : "❌", perdido: !ok };
-    }
-    if (elim.has(id)) {
-      if ((key === "terceiro" || key === "quarto") && semiLosers.has(id) && !dec.terceiro && !dec.quarto) {
-        return { cls:"pend", txt:"ainda pode", ico:"⏳", perdido:false };
-      }
-      return { cls:"err", txt:"já caiu", ico:"❌", perdido:true };
-    }
-    return { cls:"pend", txt:"aguardando", ico:"⏳", perdido:false };
-  }
   function detalheFinal(p, o) {
     const labs = [["campeao", "Campeão", 40], ["vice", "Vice", 25], ["terceiro", "3º lugar", 15], ["quarto", "4º lugar", 10]];
     return labs.map(([k, lab]) => {
       const pick = p[k]; if (!pick) return "";
-      const st = posicaoFinalStatus(k, pick, o);
-      return `<div class="fp"><span>${lab}: ${flag(pick)} ${nome(pick)}</span><span class="${st.cls}">${st.txt}</span></div>`;
+      let st = "", cls = "pend";
+      if (o.decididos && o.decididos[k]) { if (o[k] === pick) { st = "✓ acertou"; cls = "ok"; } else { st = "✗ errou"; cls = "err"; } }
+      else st = "aguardando";
+      return `<div class="fp"><span>${lab}: ${flag(pick)} ${nome(pick)}</span><span class="${cls}">${st}</span></div>`;
     }).join("");
   }
 
@@ -400,9 +381,9 @@
   function statusFasePalpite(id, key, o) {
     const oficiais = new Set(o[key] || []);
     if (oficiais.has(id)) return "ok";
+    // Visual alinhado ao motor: fases futuras ainda ficam possíveis até entrarem em apuração.
     if (key === "classificados32" && o.classificados32 && o.classificados32.length && o.classificados32.indexOf(id) === -1) return "no";
-    // Caiu: tudo que dependia dessa seleção nas fases futuras já está perdido.
-    if ((o.eliminados || []).indexOf(id) !== -1) return "no";
+    if (fasePalpiteAtiva(key, o) && (o.eliminados || []).indexOf(id) !== -1) return "no";
     return "pend";
   }
   function chipFasePalpite(id, key, o) {
@@ -430,9 +411,12 @@
     const podio = [["campeao","Campeão"],["vice","Vice"],["terceiro","3º"],["quarto","4º"]]
       .map(([key, lab]) => {
         const id = p[key]; if (!id) return "";
-        const st = posicaoFinalStatus(key, id, o);
-        let cls = st.cls === "ok" ? "gg-ok" : (st.cls === "err" ? "gg-no" : "gg-pend");
-        let ico = st.ico;
+        let cls = "gg-pend", ico = "⏳";
+        if (o.decididos && o.decididos[key]) {
+          const ok = o[key] === id; cls = ok ? "gg-ok" : "gg-no"; ico = ok ? "✅" : "❌";
+        } else if ((o.eliminados || []).indexOf(id) !== -1 && key !== "terceiro" && key !== "quarto") {
+          cls = "gg-no"; ico = "❌";
+        }
         return `<span class="gg-cel ${cls}"><i>${lab}</i> ${flag(id)} ${id} ${ico}</span>`;
       }).join("");
     const podioBloco = podio ? `<div class="gg-lin"><span class="gg-g">Pódio</span><div class="gg-cels">${podio}</div></div>` : "";
@@ -459,26 +443,29 @@
   function render(o) { if (ABA === "placares") renderPlacares(o); else renderBolao(o); }
 
   function renderBolao(o) {
-    const eficienciaNum = r => {
-      const a = Number(r && r.atuais);
-      const p = Number(r && r.perdidos);
-      if (!Number.isFinite(a) || !Number.isFinite(p)) return -1;
-      const decidido = a + p;
-      return decidido > 0 ? a / decidido : -1;
-    };
-    const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos, eficiencia: x => eficienciaNum(x.r) };
+    const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos };
     const kf = KEY[ORDEM] || KEY.atuais;
     const lin = PART.map(p => {
       const r = COPA_PONTUACAO.calcular(p.d, o);
       const cr = cravadosDe(p.pg, o._realGrupos || {});
       return { nome: p.nome, d: p.d, r, cr };
-    }).sort((a, b) => kf(b) - kf(a) || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+    });
+
+    // Corte matemático do pódio: usa sempre o ranking por pontos conquistados,
+    // independentemente da ordenação visual escolhida pelo usuário.
+    // Quem está fora do top 3 e não consegue mais alcançar os pontos atuais
+    // do 3º colocado é marcado como "sem chance de pódio".
+    const rankingAtual = lin.slice().sort((a, b) => b.r.atuais - a.r.atuais || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+    rankingAtual.forEach((x, i) => x.posPodio = i + 1);
+    const cortePodio = rankingAtual[2] ? Number(rankingAtual[2].r.atuais) : null;
+
+    lin.sort((a, b) => kf(b) - kf(a) || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
     lin.forEach((x, i) => x.posReal = i + 1);
     const visiveis = FILTRO ? lin.filter(x => x.nome === FILTRO) : lin;
 
     const opts = PART.map(p => p.nome).sort((a, b) => a.localeCompare(b))
       .map(n => `<option value="${n}" ${n === FILTRO ? "selected" : ""}>${n}</option>`).join("");
-    const ROT = { atuais: "conquistados", possiveis: "possíveis", perdidos: "perdidos", eficiencia: "eficiência" };
+    const ROT = { atuais: "conquistados", possiveis: "possíveis", perdidos: "perdidos" };
     const pills = Object.keys(ROT).map(k => `<button class="ordbtn ${ORDEM === k ? "on" : ""}" data-ord="${k}">${ROT[k]}</button>`).join("");
     const controles = `<div class="ctrlbar">
       <select id="filtro-part"><option value="">👥 Todos os participantes</option>${opts}</select>
@@ -492,26 +479,38 @@
       banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>potencial máximo</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
     }
 
-    const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯</p>';
+    const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯 · Cards sombreados indicam participante sem chance matemática de pódio.</p>';
     $("#app").innerHTML = toggleHTML() + controles + banner + tbnote + visiveis.map((x, i) => {
       const pos = x.posReal, r = x.r;
       const eficiencia = eficienciaPct(r);
       const tot = r.atuais + r.perdidos + r.possiveis || 1;
       const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
-      const cls = pos <= 3 ? " p" + pos : "";
+      const maximoPodio = Number(r.atuais || 0) + Number(r.possiveis || 0);
+      const semPodio = cortePodio !== null && x.posPodio > 3 && maximoPodio < cortePodio;
+      const cls = (pos <= 3 ? " p" + pos : "") + (semPodio ? " sem-podio" : "");
       const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
+      const seloSemPodio = semPodio ? `<div class="selo-sem-podio">⚠️ Sem chance matemática de pódio <small>máximo possível: ${maximoPodio} · corte atual do 3º: ${cortePodio}</small></div>` : "";
       const fasesHTML = FASES.map(f => {
         const real = o[f.k] || [];
         if (!real.length) return `<span class="ph">${f.lab}: <b>—</b></span>`;
         const ac = inter(x.d[f.k], real).length;
         return `<span class="ph">${f.lab}: <b>${ac}/${f.n}</b></span>`;
       }).join("");
+      const decidiu = o.classificados32 && o.classificados32.length;
+      const picks32 = x.d.classificados32 || [];
+      const vivos = qtdAindaNoPareo(x.d, o);
+      const funil = picks32.map(t => `<span class="${statusNoPareo(t, x.d, o)}">${flag(t)}</span>`).join("");
+      const f32lab = decidiu ? `As 32 de ${x.nome} — <b>${vivos} ainda no páreo</b>:` : `As 32 que ${x.nome} classificou no palpite:`;
+      const f32leg = decidiu ? '<div class="f32leg"><span><i class="lg-a"></i>na disputa</span><span><i class="lg-o"></i>caiu</span><span><i class="lg-w"></i>não classificou</span></div>' : "";
       return `<div class="card${cls}">
+        ${seloSemPodio}
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
         <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
         <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">eficiência <b>${eficiencia}</b></span></div>
         <div class="fases">${fasesHTML}<span class="ph">🎯 <b>${x.cr}</b> cravados</span></div>
         <div class="podiodet">${detalheFinal(x.d, o)}</div>
+        <div class="f32lab">${f32lab}</div>${f32leg}
+        <div class="f32">${funil}</div>
         ${fasesDoPalpiteHTML(x.d, o, x.nome)}
         <button class="vermais" data-ext="${x.nome}">Ver extrato dos pontos ▾</button>
         <div class="extbox" id="ext-${cssId(x.nome)}" style="display:none">${extratoBolao(x.d, o, x)}</div>
@@ -611,6 +610,7 @@
     // mata-mata perdido (só no oficial, quando fases já decididas):
     // cada seleção apostada para uma fase que já caiu antes dela debita o peso daquela fase.
     const perdMata = (key, oficiais, peso, rotulo) => {
+      if (!fasePalpiteAtiva(key, o)) return;
       const conf = new Set(oficiais || []);
       const ids = (p[key] || []).filter(id => elim.has(id) && !conf.has(id));
       if (ids.length) prow(`${ids.length} ${rotulo} (×${peso}): ${ids.map(id => nome(id)).join(", ")}`, ids.length * peso);
@@ -619,13 +619,11 @@
     perdMata("avancam_quartas", o.avancam_quartas, P.quartas, "seleções não avançaram às quartas");
     perdMata("semifinalistas", o.semifinalistas, P.semi, "seleções não chegaram à semifinal");
     perdMata("finalistas", o.finalistas, P.final, "seleções não chegaram à final");
-    // títulos cuja seleção já caiu ou posição final já ficou impossível
-    [["campeao", "Campeão", P.campeao], ["vice", "Vice", P.vice], ["terceiro", "3º lugar", P.terceiro], ["quarto", "4º lugar", P.quarto]].forEach(([key, lab, pts]) => {
-      const id = p[key];
-      if (!id) return;
-      const st = posicaoFinalStatus(key, id, o);
-      if (st.perdido) prow(`${lab} (${nome(id)}) ${st.txt}`, pts);
-    });
+    // títulos cuja seleção já caiu
+    if (p.campeao && elim.has(p.campeao)) prow(`Campeão (${nome(p.campeao)}) já caiu`, P.campeao);
+    if (p.vice && elim.has(p.vice)) prow(`Vice (${nome(p.vice)}) já caiu`, P.vice);
+    if (p.terceiro && elim.has(p.terceiro)) prow(`3º lugar (${nome(p.terceiro)}) já caiu`, P.terceiro);
+    if (p.quarto && elim.has(p.quarto)) prow(`4º lugar (${nome(p.quarto)}) já caiu`, P.quarto);
     const perdHTML = perd.length ? perd.join("") : '<div class="exb-row"><span class="exb-d">Nada perdido na foto de hoje 🎉</span><span class="exb-p">0</span></div>';
 
     // SEGUNDO NÍVEL: detalhe por grupo (1º/2º/3º/4º com ✅/❌)
