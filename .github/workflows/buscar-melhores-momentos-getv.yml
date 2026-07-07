@@ -1,0 +1,93 @@
+name: Buscar melhores momentos GE TV
+
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "Tipo de execução"
+        required: true
+        default: "backfill"
+        type: choice
+        options:
+          - backfill
+          - incremental
+      rodada_inicio:
+        description: "Rodada inicial. Deixe vazio para usar config."
+        required: false
+        default: ""
+      rodada_fim:
+        description: "Rodada final. Deixe vazio para usar config."
+        required: false
+        default: ""
+  # Incremental agressivo: a cada 30 min, 07h–23h30 BRT.
+  # GitHub Actions usa UTC: 10–23 UTC = 07–20 BRT; 00–02 UTC = 21–23 BRT.
+  schedule:
+    - cron: '*/30 10-23 * * *'
+    - cron: '*/30 0-2 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validar script
+        run: |
+          python -m py_compile scripts/buscar_melhores_momentos_getv.py
+          python scripts/buscar_melhores_momentos_getv.py --dry-run --modo incremental
+
+      - name: Buscar vídeos da GE TV
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_MODO: ${{ inputs.modo }}
+          INPUT_RODADA_INICIO: ${{ inputs.rodada_inicio }}
+          INPUT_RODADA_FIM: ${{ inputs.rodada_fim }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODO="${INPUT_MODO:-incremental}"
+          if [ "${EVENT_NAME}" = "schedule" ]; then
+            MODO="incremental"
+          fi
+
+          CMD=(python scripts/buscar_melhores_momentos_getv.py --modo "$MODO")
+
+          if [ -n "${INPUT_RODADA_INICIO:-}" ]; then
+            CMD+=(--rodada-inicio "${INPUT_RODADA_INICIO}")
+          fi
+          if [ -n "${INPUT_RODADA_FIM:-}" ]; then
+            CMD+=(--rodada-fim "${INPUT_RODADA_FIM}")
+          fi
+
+          echo "Executando: ${CMD[*]}"
+          "${CMD[@]}"
+
+      - name: Commitar JSONs se mudaram
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git add dados-br/melhores-momentos.json dados-br/getv-playlists.json dados-br/auditoria-melhores-momentos.json
+
+          if git diff --cached --quiet; then
+            echo "Nenhuma mudança nos JSONs de melhores momentos. Nada para commitar."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Atualiza melhores momentos GE TV"
+          git push
