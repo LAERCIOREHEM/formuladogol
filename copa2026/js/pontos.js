@@ -358,13 +358,35 @@
     { k: "avancam_quartas", n: 8, lab: "Quartas" },
     { k: "semifinalistas", n: 4, lab: "Semifinal" }
   ];
+  function podioJaCaiu(p, o, key) {
+    // Visual da tela principal alinhado ao motor de pontos perdidos:
+    // se a seleção apostada já foi eliminada, o item do pódio deixa de ficar
+    // como "aguardando" e passa a mostrar "já caiu" imediatamente.
+    const id = p && p[key];
+    if (!id || !o) return false;
+    const dec = o.decididos || {};
+    if (dec[key]) return false;
+    const elim = new Set(o.eliminados || []);
+    if (!elim.has(id)) return false;
+    const semiLosers = new Set(o._semiLosers || []);
+    // Quem perdeu a semifinal ainda pode terminar em 3º/4º até o jogo de terceiro lugar.
+    if ((key === "terceiro" || key === "quarto") && semiLosers.has(id) && !dec.terceiro && !dec.quarto) return false;
+    return true;
+  }
+
   function detalheFinal(p, o) {
     const labs = [["campeao", "Campeão", 40], ["vice", "Vice", 25], ["terceiro", "3º lugar", 15], ["quarto", "4º lugar", 10]];
     return labs.map(([k, lab]) => {
       const pick = p[k]; if (!pick) return "";
       let st = "", cls = "pend";
-      if (o.decididos && o.decididos[k]) { if (o[k] === pick) { st = "✓ acertou"; cls = "ok"; } else { st = "✗ errou"; cls = "err"; } }
-      else st = "aguardando";
+      if (o.decididos && o.decididos[k]) {
+        if (o[k] === pick) { st = "✓ acertou"; cls = "ok"; }
+        else { st = "✗ errou"; cls = "err"; }
+      } else if (podioJaCaiu(p, o, k)) {
+        st = "já caiu"; cls = "err";
+      } else {
+        st = "aguardando";
+      }
       return `<div class="fp"><span>${lab}: ${flag(pick)} ${nome(pick)}</span><span class="${cls}">${st}</span></div>`;
     }).join("");
   }
