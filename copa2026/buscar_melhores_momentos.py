@@ -768,8 +768,8 @@ def buscar_lives_agendadas_por_streams(api_key):
         return []
 
     candidatos = []
-    candidatos.extend(yt_search_caze_evento(api_key, "live", max_results=50))
-    candidatos.extend(yt_search_caze_evento(api_key, "upcoming", max_results=50))
+    candidatos.extend(yt_search_caze_evento(api_key, "live", max_results=25))
+    candidatos.extend(yt_search_caze_evento(api_key, "upcoming", max_results=25))
     candidatos.extend(listar_caze_streams_page(api_key))
     candidatos = dedupe_videos(candidatos)
 
@@ -931,10 +931,10 @@ def buscar_lives_exatas_por_espn(api_key):
     # Candidatos globais do canal: lives/upcoming + busca ampla por "ao vivo".
     # Eles são filtrados jogo a jogo pela validação central.
     globais = []
-    globais.extend(yt_search_caze_evento(api_key, "live", max_results=25))
-    globais.extend(yt_search_caze_evento(api_key, "upcoming", max_results=25))
+    globais.extend(yt_search_caze_evento(api_key, "live", max_results=15))
+    globais.extend(yt_search_caze_evento(api_key, "upcoming", max_results=15))
     globais.extend(listar_caze_streams_page(api_key))
-    globais.extend(yt_search_caze(api_key, "ao vivo", max_results=25))
+    globais.extend(yt_search_caze(api_key, "ao vivo", max_results=10))
 
     # Resolve o /live genérico só para descobrir o videoId real.
     # Primeiro tenta a validação rigorosa pelo título; se ela falhar, o fallback
@@ -953,18 +953,12 @@ def buscar_lives_exatas_por_espn(api_key):
         na, nb = nomes.get(j["a"], j["a"]), nomes.get(j["b"], j["b"])
 
         candidatos_jogo = list(globais)
-        consultas = [
-            f"{na} x {nb} ao vivo",
-            f"{nb} x {na} ao vivo",
-            f"{na} {nb} ao vivo",
-            f"{nb} {na} ao vivo",
-            f"{na} x {nb}",
-            f"{nb} x {na}",
-            f"{j['a']} x {j['b']} ao vivo",
-            f"{j['b']} x {j['a']} ao vivo",
-        ]
-        for q in consultas:
-            candidatos_jogo.extend(yt_search_caze(api_key, q, max_results=12))
+        # ECONOMIA DE COTA: antes eram 8 buscas por jogo (800 unidades cada).
+        # Agora é 1 busca por jogo com os dois nomes (100 unidades).
+        # Os candidatos globais já cobrem a maioria dos casos; a busca específica
+        # só serve de complemento quando o jogo não aparece nos globais.
+        q_unica = f"{na} x {nb} ao vivo"
+        candidatos_jogo.extend(yt_search_caze(api_key, q_unica, max_results=10))
 
         # Confirma estado/título atual via videos.list antes de validar.
         candidatos_jogo = dedupe_videos(candidatos_jogo)
@@ -1306,9 +1300,13 @@ def atualizar_lives(api_key):
                 candidatos.append(aceito)
 
     # 3) Pré-mapeia lives publicadas em @CazeTV/streams e eventType=upcoming.
-    # Isso preenche lives.json ANTES do jogo começar, desde que o título da
-    # live agendada cite exatamente as duas seleções do confronto.
-    candidatos.extend(buscar_lives_agendadas_por_streams(api_key))
+    # ECONOMIA DE COTA: só roda se houver jogos futuros nas próximas 48h.
+    # No mata-mata com apenas 1-2 jogos por dia, economiza 200 unid/execução.
+    jogos_proximos = jogos_espn_para_mapear_streams(dias_futuros=2)
+    if jogos_proximos:
+        candidatos.extend(buscar_lives_agendadas_por_streams(api_key))
+    else:
+        print("  sem jogos nas próximas 48h — pulando busca de lives agendadas (economia de cota)")
 
     # 4) Fallback dinâmico: se a live ainda não estava prevista em /streams,
     # busca o confronto exato no canal oficial da CazéTV com base no jogo
