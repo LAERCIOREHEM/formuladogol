@@ -1203,24 +1203,53 @@
     $("#admin-nome").scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
+  function mensagemErroParticipante(err) {
+    const msg = String(err?.message || err || "");
+    if (/duplicate|unique|br_participantes_login|login/i.test(msg) && /existe|duplicate|unique|duplic/i.test(msg)) {
+      return "Já existe participante com esse usuário/login. Use outro login ou edite o participante existente.";
+    }
+    if (/pin/i.test(msg)) {
+      return "PIN obrigatório para novo participante. Clique em gerar PIN ou deixe o sistema gerar automaticamente.";
+    }
+    if (/Acesso admin inválido|Sessão inválida|JWT|token/i.test(msg)) {
+      return "Sessão de administrador inválida ou expirada. Saia e entre novamente antes de salvar.";
+    }
+    return msg || "Falha ao salvar participante.";
+  }
+
   async function salvarParticipanteAdmin(ev) {
     ev.preventDefault();
     try {
+      const participanteId = $("#admin-participante-id").value || null;
+      const novoParticipante = !participanteId;
+      const nome = $("#admin-nome").value.trim();
+      const login = $("#admin-login").value.trim();
+      let pin = $("#admin-pin").value.trim();
+
+      if (!nome || !login) throw new Error("Informe nome e usuário/login antes de salvar.");
+      if (novoParticipante && !pin) {
+        pin = pinAleatorio();
+        $("#admin-pin").value = pin;
+      }
+
       status("Salvando participante...", "warn");
       await rpcRows("br_admin_salvar_participante", {
         p_admin_id: state.usuario.id,
         p_token: state.token,
-        p_participante_id: $("#admin-participante-id").value || null,
-        p_nome: $("#admin-nome").value.trim(),
-        p_login: $("#admin-login").value.trim(),
-        p_pin: $("#admin-pin").value.trim() || null,
+        p_participante_id: participanteId,
+        p_nome: nome,
+        p_login: login,
+        p_pin: pin || null,
         p_admin: $("#admin-e-admin").checked,
         p_ativo: $("#admin-ativo").checked
       });
+
       limparFormParticipante();
-      status("Participante salvo. Envie o PIN por WhatsApp apenas para a pessoa.", "ok");
       await renderAdmin();
-    } catch (err) { status(err.message || "Falha ao salvar participante.", "err"); }
+      status(novoParticipante
+        ? `Participante salvo. PIN: ${pin}. Envie esse PIN por WhatsApp apenas para a pessoa.`
+        : "Participante atualizado. Se você informou novo PIN, envie apenas para a pessoa.", "ok");
+    } catch (err) { status(mensagemErroParticipante(err), "err"); }
   }
 
   async function salvarRodadaAdmin(ev) {

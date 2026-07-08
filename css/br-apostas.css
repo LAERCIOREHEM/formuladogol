@@ -630,3 +630,60 @@ body > .container > section.hero > img {
     object-position: center center !important;
   }
 }
+
+
+/* HOTFIX 20260708 — Admin mobile: evita quebra lateral entre Participantes e Janela da rodada.
+   A área administrativa passa a empilhar os cards no celular, mantendo tabelas com scroll interno. */
+@media (max-width: 900px) {
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  .br-app-shell,
+  #app-area,
+  #conteudo,
+  .admin-grid,
+  .panel,
+  .panel-inner {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .admin-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  .admin-grid > .panel {
+    grid-column: 1 / -1 !important;
+    width: 100%;
+  }
+  .admin-form .two,
+  .admin-form,
+  .form-line,
+  .form-line.wide,
+  .inline-add-member,
+  .league-admin-grid,
+  .liga-box-inner {
+    grid-template-columns: 1fr !important;
+    width: 100%;
+  }
+  .admin-form input,
+  .admin-form select,
+  .admin-form textarea {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .admin-form .actions,
+  .inline-add-member .actions {
+    width: 100%;
+  }
+  .admin-form .actions .btn,
+  .inline-add-member .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+  .table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
