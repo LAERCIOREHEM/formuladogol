@@ -1,39 +1,55 @@
 {
-  "atualizado_em": "2026-07-06T17:49:30-03:00",
-  "fonte": "ESPN roster/team/core API + páginas de elenco ESPN",
-  "temporada": "2026",
-  "liga": "bra.1",
-  "metodologia": "Coleta IDs dos 20 clubes, busca rosters por endpoints JSON e HTML, deduplica por ESPN ID/nome e grava uma estrutura estável para o site.",
-  "total_clubes": 20,
+  "atualizado_em": "2026-07-08T05:46:25.041884-03:00",
+  "fonte": "ESPN roster endpoint + fallback local",
+  "metodologia": "Mapeia os 20 clubes canônicos pelo endpoint de times da ESPN e busca roster por equipe. Falhas individuais não quebram o site.",
   "total_clubes_com_elenco": 20,
-  "total_jogadores": 907,
-  "ids_espn_clubes": {
-    "Athletico-PR": "3458",
-    "Atlético-MG": "7632",
-    "Bahia": "9967",
-    "Botafogo": "6086",
-    "Bragantino": "6079",
-    "Chapecoense": "9318",
-    "Corinthians": "874",
-    "Coritiba": "3456",
-    "Cruzeiro": "2022",
-    "Flamengo": "819",
-    "Fluminense": "3445",
-    "Grêmio": "6273",
-    "Internacional": "1936",
-    "Mirassol": "9169",
-    "Palmeiras": "2029",
-    "Remo": "4936",
-    "Santos": "2674",
-    "São Paulo": "2026",
-    "Vasco da Gama": "3454",
-    "Vitória": "3457"
-  },
+  "total_jogadores": 1023,
   "elencos": {
     "Athletico-PR": [
       {
+        "id": "3458",
+        "nome": "Athletico Paranaense",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "381170",
-        "espn_id": "381170",
         "nome": "Arthur Dias",
         "posicao": "Defender",
         "numero": "65",
@@ -41,7 +57,6 @@
       },
       {
         "id": "422534",
-        "espn_id": "422534",
         "nome": "Arthur Monteiro",
         "posicao": "Defender",
         "numero": "36",
@@ -49,7 +64,6 @@
       },
       {
         "id": "192080",
-        "espn_id": "192080",
         "nome": "Carlos Terán",
         "posicao": "Defender",
         "numero": "13",
@@ -57,7 +71,6 @@
       },
       {
         "id": "417345",
-        "espn_id": "417345",
         "nome": "Claudinho",
         "posicao": "Defender",
         "numero": "26",
@@ -65,7 +78,6 @@
       },
       {
         "id": "249088",
-        "espn_id": "249088",
         "nome": "Dudu",
         "posicao": "Defender",
         "numero": "",
@@ -73,7 +85,6 @@
       },
       {
         "id": "315789",
-        "espn_id": "315789",
         "nome": "Filipinho",
         "posicao": "Defender",
         "numero": "5",
@@ -81,7 +92,6 @@
       },
       {
         "id": "287688",
-        "espn_id": "287688",
         "nome": "Gastón Benavídez",
         "posicao": "Defender",
         "numero": "29",
@@ -89,7 +99,6 @@
       },
       {
         "id": "361454",
-        "espn_id": "361454",
         "nome": "Gilberto Junior",
         "posicao": "Defender",
         "numero": "2",
@@ -97,7 +106,6 @@
       },
       {
         "id": "417346",
-        "espn_id": "417346",
         "nome": "Gustavo Veiga",
         "posicao": "Defender",
         "numero": "15",
@@ -105,7 +113,6 @@
       },
       {
         "id": "272240",
-        "espn_id": "272240",
         "nome": "Hayen Palacios",
         "posicao": "Defender",
         "numero": "",
@@ -113,7 +120,6 @@
       },
       {
         "id": "270242",
-        "espn_id": "270242",
         "nome": "Juan Felipe Aguirre",
         "posicao": "Defender",
         "numero": "33",
@@ -121,7 +127,6 @@
       },
       {
         "id": "200660",
-        "espn_id": "200660",
         "nome": "Léo",
         "posicao": "Defender",
         "numero": "3",
@@ -129,7 +134,6 @@
       },
       {
         "id": "338881",
-        "espn_id": "338881",
         "nome": "Leonardo Derik",
         "posicao": "Defender",
         "numero": "61",
@@ -137,7 +141,6 @@
       },
       {
         "id": "309499",
-        "espn_id": "309499",
         "nome": "Lucas Esquivel",
         "posicao": "Defender",
         "numero": "37",
@@ -145,7 +148,6 @@
       },
       {
         "id": "417506",
-        "espn_id": "417506",
         "nome": "Murilo Camargo",
         "posicao": "Defender",
         "numero": "",
@@ -153,7 +155,6 @@
       },
       {
         "id": "405455",
-        "espn_id": "405455",
         "nome": "Victor Vinicius Teodoro Ferraz",
         "posicao": "Defender",
         "numero": "32",
@@ -161,7 +162,6 @@
       },
       {
         "id": "357482",
-        "espn_id": "357482",
         "nome": "Isaac",
         "posicao": "Forward",
         "numero": "11",
@@ -169,7 +169,6 @@
       },
       {
         "id": "418051",
-        "espn_id": "418051",
         "nome": "Juliano Santini",
         "posicao": "Forward",
         "numero": "",
@@ -177,7 +176,6 @@
       },
       {
         "id": "274442",
-        "espn_id": "274442",
         "nome": "Julimar",
         "posicao": "Forward",
         "numero": "20",
@@ -185,7 +183,6 @@
       },
       {
         "id": "268476",
-        "espn_id": "268476",
         "nome": "Kevin Viveros",
         "posicao": "Forward",
         "numero": "9",
@@ -193,7 +190,6 @@
       },
       {
         "id": "380327",
-        "espn_id": "380327",
         "nome": "Leozinho",
         "posicao": "Forward",
         "numero": "21",
@@ -201,7 +197,6 @@
       },
       {
         "id": "380149",
-        "espn_id": "380149",
         "nome": "Lucas Amorim",
         "posicao": "Forward",
         "numero": "22",
@@ -209,7 +204,6 @@
       },
       {
         "id": "315283",
-        "espn_id": "315283",
         "nome": "Renan",
         "posicao": "Forward",
         "numero": "70",
@@ -217,7 +211,6 @@
       },
       {
         "id": "318152",
-        "espn_id": "318152",
         "nome": "Renan",
         "posicao": "Forward",
         "numero": "50",
@@ -225,7 +218,6 @@
       },
       {
         "id": "382869",
-        "espn_id": "382869",
         "nome": "Sorriso",
         "posicao": "Forward",
         "numero": "19",
@@ -233,7 +225,6 @@
       },
       {
         "id": "197049",
-        "espn_id": "197049",
         "nome": "Stiven Mendoza",
         "posicao": "Forward",
         "numero": "7",
@@ -241,7 +232,6 @@
       },
       {
         "id": "403290",
-        "espn_id": "403290",
         "nome": "Carlos Eduardo Souza De Barros",
         "posicao": "Goalkeeper",
         "numero": "80",
@@ -249,7 +239,6 @@
       },
       {
         "id": "382868",
-        "espn_id": "382868",
         "nome": "Maksym Voronov",
         "posicao": "Goalkeeper",
         "numero": "76",
@@ -257,7 +246,6 @@
       },
       {
         "id": "361393",
-        "espn_id": "361393",
         "nome": "Matheus Rocha",
         "posicao": "Goalkeeper",
         "numero": "42",
@@ -265,7 +253,6 @@
       },
       {
         "id": "322655",
-        "espn_id": "322655",
         "nome": "Mycael",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -273,7 +260,6 @@
       },
       {
         "id": "153754",
-        "espn_id": "153754",
         "nome": "Santos",
         "posicao": "Goalkeeper",
         "numero": "23",
@@ -281,7 +267,6 @@
       },
       {
         "id": "268187",
-        "espn_id": "268187",
         "nome": "Alejandro García",
         "posicao": "Midfielder",
         "numero": "17",
@@ -289,7 +274,6 @@
       },
       {
         "id": "418052",
-        "espn_id": "418052",
         "nome": "Benjamín Brito",
         "posicao": "Midfielder",
         "numero": "",
@@ -297,7 +281,6 @@
       },
       {
         "id": "417344",
-        "espn_id": "417344",
         "nome": "Bruninho",
         "posicao": "Midfielder",
         "numero": "48",
@@ -305,7 +288,6 @@
       },
       {
         "id": "296574",
-        "espn_id": "296574",
         "nome": "Bruno Zapelli",
         "posicao": "Midfielder",
         "numero": "10",
@@ -313,7 +295,6 @@
       },
       {
         "id": "361383",
-        "espn_id": "361383",
         "nome": "Chiqueti",
         "posicao": "Midfielder",
         "numero": "47",
@@ -321,7 +302,6 @@
       },
       {
         "id": "382858",
-        "espn_id": "382858",
         "nome": "Diogo Riquelme",
         "posicao": "Midfielder",
         "numero": "63",
@@ -329,7 +309,6 @@
       },
       {
         "id": "361357",
-        "espn_id": "361357",
         "nome": "Eduardo",
         "posicao": "Midfielder",
         "numero": "53",
@@ -337,7 +316,6 @@
       },
       {
         "id": "382862",
-        "espn_id": "382862",
         "nome": "Guilherme Back",
         "posicao": "Midfielder",
         "numero": "71",
@@ -345,7 +323,6 @@
       },
       {
         "id": "173351",
-        "espn_id": "173351",
         "nome": "Jádson",
         "posicao": "Midfielder",
         "numero": "16",
@@ -353,7 +330,6 @@
       },
       {
         "id": "361359",
-        "espn_id": "361359",
         "nome": "João Cruz",
         "posicao": "Midfielder",
         "numero": "57",
@@ -361,7 +337,6 @@
       },
       {
         "id": "94976",
-        "espn_id": "94976",
         "nome": "Juan Portilla",
         "posicao": "Midfielder",
         "numero": "27",
@@ -369,7 +344,6 @@
       },
       {
         "id": "417347",
-        "espn_id": "417347",
         "nome": "Kauan Stabelini",
         "posicao": "Midfielder",
         "numero": "",
@@ -377,7 +351,6 @@
       },
       {
         "id": "417348",
-        "espn_id": "417348",
         "nome": "Lucas Marezi",
         "posicao": "Midfielder",
         "numero": "18",
@@ -385,7 +358,6 @@
       },
       {
         "id": "113352",
-        "espn_id": "113352",
         "nome": "Luiz Gustavo",
         "posicao": "Midfielder",
         "numero": "14",
@@ -394,8 +366,49 @@
     ],
     "Atlético-MG": [
       {
+        "id": "7632",
+        "nome": "Atlético-MG",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "256560",
-        "espn_id": "256560",
         "nome": "Ángelo Preciado",
         "posicao": "Defender",
         "numero": "23",
@@ -403,7 +416,6 @@
       },
       {
         "id": "357697",
-        "espn_id": "357697",
         "nome": "Iván Román",
         "posicao": "Defender",
         "numero": "3",
@@ -411,7 +423,6 @@
       },
       {
         "id": "337868",
-        "espn_id": "337868",
         "nome": "Julio Vargas",
         "posicao": "Defender",
         "numero": "37",
@@ -419,7 +430,6 @@
       },
       {
         "id": "181657",
-        "espn_id": "181657",
         "nome": "Júnior Alonso",
         "posicao": "Defender",
         "numero": "6",
@@ -427,7 +437,6 @@
       },
       {
         "id": "417569",
-        "espn_id": "417569",
         "nome": "Kauã Pascini",
         "posicao": "Defender",
         "numero": "36",
@@ -435,7 +444,6 @@
       },
       {
         "id": "407412",
-        "espn_id": "407412",
         "nome": "Lucas Souza",
         "posicao": "Defender",
         "numero": "50",
@@ -443,7 +451,6 @@
       },
       {
         "id": "417567",
-        "espn_id": "417567",
         "nome": "Luís Gustavo",
         "posicao": "Defender",
         "numero": "32",
@@ -451,7 +458,6 @@
       },
       {
         "id": "220747",
-        "espn_id": "220747",
         "nome": "Lyanco",
         "posicao": "Defender",
         "numero": "13",
@@ -459,7 +465,6 @@
       },
       {
         "id": "304699",
-        "espn_id": "304699",
         "nome": "Natanael",
         "posicao": "Defender",
         "numero": "2",
@@ -467,7 +472,6 @@
       },
       {
         "id": "415445",
-        "espn_id": "415445",
         "nome": "Pedro Francisco Fachinetti Dos Santos",
         "posicao": "Defender",
         "numero": "44",
@@ -475,7 +479,6 @@
       },
       {
         "id": "245858",
-        "espn_id": "245858",
         "nome": "Renan Lodi",
         "posicao": "Defender",
         "numero": "16",
@@ -483,7 +486,6 @@
       },
       {
         "id": "318189",
-        "espn_id": "318189",
         "nome": "Rômulo",
         "posicao": "Defender",
         "numero": "",
@@ -491,7 +493,6 @@
       },
       {
         "id": "379721",
-        "espn_id": "379721",
         "nome": "Samuel Barros",
         "posicao": "Defender",
         "numero": "34",
@@ -499,7 +500,6 @@
       },
       {
         "id": "398934",
-        "espn_id": "398934",
         "nome": "Vitão",
         "posicao": "Defender",
         "numero": "40",
@@ -507,7 +507,6 @@
       },
       {
         "id": "191995",
-        "espn_id": "191995",
         "nome": "Vitor Hugo",
         "posicao": "Defender",
         "numero": "14",
@@ -515,7 +514,6 @@
       },
       {
         "id": "401051",
-        "espn_id": "401051",
         "nome": "Wanderson Junior De Souza Vaz",
         "posicao": "Defender",
         "numero": "42",
@@ -523,7 +521,6 @@
       },
       {
         "id": "319422",
-        "espn_id": "319422",
         "nome": "Alan Minda",
         "posicao": "Forward",
         "numero": "27",
@@ -531,7 +528,6 @@
       },
       {
         "id": "417568",
-        "espn_id": "417568",
         "nome": "Cauã Soares",
         "posicao": "Forward",
         "numero": "29",
@@ -539,7 +535,6 @@
       },
       {
         "id": "178349",
-        "espn_id": "178349",
         "nome": "Dudu",
         "posicao": "Forward",
         "numero": "92",
@@ -547,7 +542,6 @@
       },
       {
         "id": "410939",
-        "espn_id": "410939",
         "nome": "Gabriel Veneno",
         "posicao": "Forward",
         "numero": "59",
@@ -555,7 +549,6 @@
       },
       {
         "id": "421542",
-        "espn_id": "421542",
         "nome": "João Teixeira",
         "posicao": "Forward",
         "numero": "49",
@@ -563,7 +556,6 @@
       },
       {
         "id": "383035",
-        "espn_id": "383035",
         "nome": "Lucas Louback",
         "posicao": "Forward",
         "numero": "57",
@@ -571,7 +563,6 @@
       },
       {
         "id": "215934",
-        "espn_id": "215934",
         "nome": "Mateo Casierra",
         "posicao": "Forward",
         "numero": "9",
@@ -579,7 +570,6 @@
       },
       {
         "id": "417574",
-        "espn_id": "417574",
         "nome": "Murillo Fernandes",
         "posicao": "Forward",
         "numero": "41",
@@ -587,7 +577,6 @@
       },
       {
         "id": "421540",
-        "espn_id": "421540",
         "nome": "Riquelme Henrique",
         "posicao": "Forward",
         "numero": "47",
@@ -595,7 +584,6 @@
       },
       {
         "id": "252197",
-        "espn_id": "252197",
         "nome": "Tomás Cuello",
         "posicao": "Forward",
         "numero": "28",
@@ -603,7 +591,6 @@
       },
       {
         "id": "413673",
-        "espn_id": "413673",
         "nome": "Wallysson Da Silva",
         "posicao": "Forward",
         "numero": "26",
@@ -611,7 +598,6 @@
       },
       {
         "id": "223953",
-        "espn_id": "223953",
         "nome": "Éverson",
         "posicao": "Goalkeeper",
         "numero": "22",
@@ -619,7 +605,6 @@
       },
       {
         "id": "318191",
-        "espn_id": "318191",
         "nome": "Gabriel Delfim",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -627,7 +612,6 @@
       },
       {
         "id": "398930",
-        "espn_id": "398930",
         "nome": "Kaio",
         "posicao": "Goalkeeper",
         "numero": "43",
@@ -635,7 +619,6 @@
       },
       {
         "id": "376488",
-        "espn_id": "376488",
         "nome": "Pedro Cobra",
         "posicao": "Goalkeeper",
         "numero": "46",
@@ -643,7 +626,6 @@
       },
       {
         "id": "383039",
-        "espn_id": "383039",
         "nome": "Robert",
         "posicao": "Goalkeeper",
         "numero": "31",
@@ -651,7 +633,6 @@
       },
       {
         "id": "262111",
-        "espn_id": "262111",
         "nome": "Alan Franco",
         "posicao": "Midfielder",
         "numero": "21",
@@ -659,7 +640,6 @@
       },
       {
         "id": "336386",
-        "espn_id": "336386",
         "nome": "Alexsander",
         "posicao": "Midfielder",
         "numero": "5",
@@ -667,7 +647,6 @@
       },
       {
         "id": "158272",
-        "espn_id": "158272",
         "nome": "Bernard",
         "posicao": "Midfielder",
         "numero": "11",
@@ -675,7 +654,6 @@
       },
       {
         "id": "398929",
-        "espn_id": "398929",
         "nome": "Eric",
         "posicao": "Midfielder",
         "numero": "58",
@@ -683,7 +661,6 @@
       },
       {
         "id": "205074",
-        "espn_id": "205074",
         "nome": "Gustavo Scarpa",
         "posicao": "Midfielder",
         "numero": "10",
@@ -691,7 +668,6 @@
       },
       {
         "id": "398946",
-        "espn_id": "398946",
         "nome": "Hendel Dos Santos",
         "posicao": "Midfielder",
         "numero": "38",
@@ -699,7 +675,6 @@
       },
       {
         "id": "268472",
-        "espn_id": "268472",
         "nome": "Igor Gomes",
         "posicao": "Midfielder",
         "numero": "17",
@@ -707,7 +682,6 @@
       },
       {
         "id": "379501",
-        "espn_id": "379501",
         "nome": "Igor Toledo",
         "posicao": "Midfielder",
         "numero": "35",
@@ -715,7 +689,6 @@
       },
       {
         "id": "417570",
-        "espn_id": "417570",
         "nome": "Mamady Cissé",
         "posicao": "Midfielder",
         "numero": "39",
@@ -723,7 +696,6 @@
       },
       {
         "id": "421541",
-        "espn_id": "421541",
         "nome": "Mateus Romero",
         "posicao": "Midfielder",
         "numero": "45",
@@ -731,7 +703,6 @@
       },
       {
         "id": "233416",
-        "espn_id": "233416",
         "nome": "Maycon",
         "posicao": "Midfielder",
         "numero": "8",
@@ -739,7 +710,6 @@
       },
       {
         "id": "361460",
-        "espn_id": "361460",
         "nome": "Patrick Silva",
         "posicao": "Midfielder",
         "numero": "20",
@@ -747,7 +717,6 @@
       },
       {
         "id": "286703",
-        "espn_id": "286703",
         "nome": "Reiner",
         "posicao": "Midfielder",
         "numero": "19",
@@ -755,7 +724,6 @@
       },
       {
         "id": "361299",
-        "espn_id": "361299",
         "nome": "Tomás Pérez",
         "posicao": "Midfielder",
         "numero": "25",
@@ -763,7 +731,6 @@
       },
       {
         "id": "334382",
-        "espn_id": "334382",
         "nome": "Victor Hugo",
         "posicao": "Midfielder",
         "numero": "30",
@@ -772,8 +739,49 @@
     ],
     "Bahia": [
       {
+        "id": "9967",
+        "nome": "Bahia",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "219090",
-        "espn_id": "219090",
         "nome": "David Duarte",
         "posicao": "Defender",
         "numero": "33",
@@ -781,7 +789,6 @@
       },
       {
         "id": "400316",
-        "espn_id": "400316",
         "nome": "Dodô",
         "posicao": "Defender",
         "numero": "53",
@@ -789,7 +796,6 @@
       },
       {
         "id": "400318",
-        "espn_id": "400318",
         "nome": "Fredi Lippert",
         "posicao": "Defender",
         "numero": "83",
@@ -797,7 +803,6 @@
       },
       {
         "id": "418962",
-        "espn_id": "418962",
         "nome": "Gerald",
         "posicao": "Defender",
         "numero": "54",
@@ -805,7 +810,6 @@
       },
       {
         "id": "198761",
-        "espn_id": "198761",
         "nome": "Gilberto",
         "posicao": "Defender",
         "numero": "2",
@@ -813,7 +817,6 @@
       },
       {
         "id": "252800",
-        "espn_id": "252800",
         "nome": "Iago",
         "posicao": "Defender",
         "numero": "25",
@@ -821,7 +824,6 @@
       },
       {
         "id": "252973",
-        "espn_id": "252973",
         "nome": "Kanu",
         "posicao": "Defender",
         "numero": "4",
@@ -829,7 +831,6 @@
       },
       {
         "id": "304757",
-        "espn_id": "304757",
         "nome": "Luciano Juba",
         "posicao": "Defender",
         "numero": "46",
@@ -837,7 +838,6 @@
       },
       {
         "id": "379502",
-        "espn_id": "379502",
         "nome": "Luiz Gustavo",
         "posicao": "Defender",
         "numero": "43",
@@ -845,7 +845,6 @@
       },
       {
         "id": "334243",
-        "espn_id": "334243",
         "nome": "Marcos Victor",
         "posicao": "Defender",
         "numero": "44",
@@ -853,7 +852,6 @@
       },
       {
         "id": "381149",
-        "espn_id": "381149",
         "nome": "Román Gómez",
         "posicao": "Defender",
         "numero": "31",
@@ -861,7 +859,6 @@
       },
       {
         "id": "82782",
-        "espn_id": "82782",
         "nome": "Santiago Ramos",
         "posicao": "Defender",
         "numero": "21",
@@ -869,7 +866,6 @@
       },
       {
         "id": "360186",
-        "espn_id": "360186",
         "nome": "Zé Guilherme",
         "posicao": "Defender",
         "numero": "66",
@@ -877,7 +873,6 @@
       },
       {
         "id": "269675",
-        "espn_id": "269675",
         "nome": "Ademir",
         "posicao": "Forward",
         "numero": "7",
@@ -885,7 +880,6 @@
       },
       {
         "id": "417809",
-        "espn_id": "417809",
         "nome": "Caio Suassuna",
         "posicao": "Forward",
         "numero": "90",
@@ -893,7 +887,6 @@
       },
       {
         "id": "124439",
-        "espn_id": "124439",
         "nome": "Cristian Olivera",
         "posicao": "Forward",
         "numero": "99",
@@ -901,7 +894,6 @@
       },
       {
         "id": "400315",
-        "espn_id": "400315",
         "nome": "Dell",
         "posicao": "Forward",
         "numero": "89",
@@ -909,7 +901,6 @@
       },
       {
         "id": "333907",
-        "espn_id": "333907",
         "nome": "Erick Pulga",
         "posicao": "Forward",
         "numero": "16",
@@ -917,7 +908,6 @@
       },
       {
         "id": "167845",
-        "espn_id": "167845",
         "nome": "Everaldo",
         "posicao": "Forward",
         "numero": "27",
@@ -925,7 +915,6 @@
       },
       {
         "id": "400320",
-        "espn_id": "400320",
         "nome": "João Coni",
         "posicao": "Forward",
         "numero": "78",
@@ -933,7 +922,6 @@
       },
       {
         "id": "410922",
-        "espn_id": "410922",
         "nome": "Lyan Araujo Santos",
         "posicao": "Forward",
         "numero": "71",
@@ -941,7 +929,6 @@
       },
       {
         "id": "335673",
-        "espn_id": "335673",
         "nome": "Mateo Sanabria",
         "posicao": "Forward",
         "numero": "23",
@@ -949,7 +936,6 @@
       },
       {
         "id": "387949",
-        "espn_id": "387949",
         "nome": "Ruan Pablo",
         "posicao": "Forward",
         "numero": "77",
@@ -957,7 +943,6 @@
       },
       {
         "id": "418963",
-        "espn_id": "418963",
         "nome": "Ryan Nascimento",
         "posicao": "Forward",
         "numero": "72",
@@ -965,7 +950,6 @@
       },
       {
         "id": "198360",
-        "espn_id": "198360",
         "nome": "Willian José",
         "posicao": "Forward",
         "numero": "12",
@@ -973,7 +957,6 @@
       },
       {
         "id": "417982",
-        "espn_id": "417982",
         "nome": "Fabio",
         "posicao": "Goalkeeper",
         "numero": "81",
@@ -981,7 +964,6 @@
       },
       {
         "id": "422022",
-        "espn_id": "422022",
         "nome": "Iuri Jean Carlo Neres Dos Santos",
         "posicao": "Goalkeeper",
         "numero": "91",
@@ -989,7 +971,6 @@
       },
       {
         "id": "134627",
-        "espn_id": "134627",
         "nome": "Léo",
         "posicao": "Goalkeeper",
         "numero": "22",
@@ -997,7 +978,6 @@
       },
       {
         "id": "224106",
-        "espn_id": "224106",
         "nome": "Ronaldo",
         "posicao": "Goalkeeper",
         "numero": "96",
@@ -1005,7 +985,6 @@
       },
       {
         "id": "417810",
-        "espn_id": "417810",
         "nome": "Victor",
         "posicao": "Goalkeeper",
         "numero": "61",
@@ -1013,7 +992,6 @@
       },
       {
         "id": "299932",
-        "espn_id": "299932",
         "nome": "Caio Alexandre",
         "posicao": "Midfielder",
         "numero": "19",
@@ -1021,7 +999,6 @@
       },
       {
         "id": "400314",
-        "espn_id": "400314",
         "nome": "David Martins",
         "posicao": "Midfielder",
         "numero": "63",
@@ -1029,7 +1006,6 @@
       },
       {
         "id": "253796",
-        "espn_id": "253796",
         "nome": "Erick",
         "posicao": "Midfielder",
         "numero": "14",
@@ -1037,7 +1013,6 @@
       },
       {
         "id": "199017",
-        "espn_id": "199017",
         "nome": "Éverton Ribeiro",
         "posicao": "Midfielder",
         "numero": "10",
@@ -1045,7 +1020,6 @@
       },
       {
         "id": "269910",
-        "espn_id": "269910",
         "nome": "Jean Lucas",
         "posicao": "Midfielder",
         "numero": "6",
@@ -1053,7 +1027,6 @@
       },
       {
         "id": "407479",
-        "espn_id": "407479",
         "nome": "Kaue Furquim",
         "posicao": "Midfielder",
         "numero": "57",
@@ -1061,7 +1034,6 @@
       },
       {
         "id": "227241",
-        "espn_id": "227241",
         "nome": "Michel Araújo",
         "posicao": "Midfielder",
         "numero": "15",
@@ -1069,7 +1041,6 @@
       },
       {
         "id": "285757",
-        "espn_id": "285757",
         "nome": "Nicolás Acevedo",
         "posicao": "Midfielder",
         "numero": "26",
@@ -1077,7 +1048,6 @@
       },
       {
         "id": "400322",
-        "espn_id": "400322",
         "nome": "Pedrinho",
         "posicao": "Midfielder",
         "numero": "58",
@@ -1085,7 +1055,6 @@
       },
       {
         "id": "266664",
-        "espn_id": "266664",
         "nome": "Rodrigo Nestor",
         "posicao": "Midfielder",
         "numero": "11",
@@ -1093,7 +1062,6 @@
       },
       {
         "id": "360136",
-        "espn_id": "360136",
         "nome": "Roger Gabriel",
         "posicao": "Midfielder",
         "numero": "80",
@@ -1101,7 +1069,6 @@
       },
       {
         "id": "376490",
-        "espn_id": "376490",
         "nome": "Sidney",
         "posicao": "Midfielder",
         "numero": "55",
@@ -1109,7 +1076,6 @@
       },
       {
         "id": "417811",
-        "espn_id": "417811",
         "nome": "Victor Hugo",
         "posicao": "Midfielder",
         "numero": "86",
@@ -1117,7 +1083,6 @@
       },
       {
         "id": "400328",
-        "espn_id": "400328",
         "nome": "Wendel Passos",
         "posicao": "Midfielder",
         "numero": "67",
@@ -1126,8 +1091,49 @@
     ],
     "Botafogo": [
       {
+        "id": "1",
+        "nome": "Active",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "6086",
+        "nome": "Botafogo",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "199734",
-        "espn_id": "199734",
         "nome": "Alex Telles",
         "posicao": "Defender",
         "numero": "13",
@@ -1135,7 +1141,6 @@
       },
       {
         "id": "380536",
-        "espn_id": "380536",
         "nome": "Anthony",
         "posicao": "Defender",
         "numero": "26",
@@ -1143,7 +1148,6 @@
       },
       {
         "id": "204602",
-        "espn_id": "204602",
         "nome": "Bastos",
         "posicao": "Defender",
         "numero": "15",
@@ -1151,7 +1155,6 @@
       },
       {
         "id": "367088",
-        "espn_id": "367088",
         "nome": "Caio Roque",
         "posicao": "Defender",
         "numero": "27",
@@ -1159,7 +1162,6 @@
       },
       {
         "id": "170362",
-        "espn_id": "170362",
         "nome": "Fernando Marçal",
         "posicao": "Defender",
         "numero": "21",
@@ -1167,7 +1169,6 @@
       },
       {
         "id": "411889",
-        "espn_id": "411889",
         "nome": "Gabriel Da Silva Abdias",
         "posicao": "Defender",
         "numero": "36",
@@ -1175,7 +1176,6 @@
       },
       {
         "id": "411648",
-        "espn_id": "411648",
         "nome": "Gabriel Pereira Justino",
         "posicao": "Defender",
         "numero": "34",
@@ -1183,7 +1183,6 @@
       },
       {
         "id": "362496",
-        "espn_id": "362496",
         "nome": "Jhoan Hernández",
         "posicao": "Defender",
         "numero": "67",
@@ -1191,7 +1190,6 @@
       },
       {
         "id": "236098",
-        "espn_id": "236098",
         "nome": "Kaio",
         "posicao": "Defender",
         "numero": "31",
@@ -1199,7 +1197,6 @@
       },
       {
         "id": "419140",
-        "espn_id": "419140",
         "nome": "Kauã Serafim",
         "posicao": "Defender",
         "numero": "54",
@@ -1207,7 +1204,6 @@
       },
       {
         "id": "402669",
-        "espn_id": "402669",
         "nome": "Marcos Vinagre",
         "posicao": "Defender",
         "numero": "64",
@@ -1215,7 +1211,6 @@
       },
       {
         "id": "359977",
-        "espn_id": "359977",
         "nome": "Mateo Ponte",
         "posicao": "Defender",
         "numero": "4",
@@ -1223,7 +1218,6 @@
       },
       {
         "id": "245291",
-        "espn_id": "245291",
         "nome": "Nahuel Ferraresi",
         "posicao": "Defender",
         "numero": "5",
@@ -1231,7 +1225,6 @@
       },
       {
         "id": "407245",
-        "espn_id": "407245",
         "nome": "Riquelme Felipe",
         "posicao": "Defender",
         "numero": "44",
@@ -1239,7 +1232,6 @@
       },
       {
         "id": "268700",
-        "espn_id": "268700",
         "nome": "Vitinho",
         "posicao": "Defender",
         "numero": "2",
@@ -1247,7 +1239,6 @@
       },
       {
         "id": "365558",
-        "espn_id": "365558",
         "nome": "Ythallo",
         "posicao": "Defender",
         "numero": "3",
@@ -1255,7 +1246,6 @@
       },
       {
         "id": "224103",
-        "espn_id": "224103",
         "nome": "Arthur Cabral",
         "posicao": "Forward",
         "numero": "19",
@@ -1263,7 +1253,6 @@
       },
       {
         "id": "417806",
-        "espn_id": "417806",
         "nome": "Arthur Izaque",
         "posicao": "Forward",
         "numero": "39",
@@ -1271,7 +1260,6 @@
       },
       {
         "id": "307660",
-        "espn_id": "307660",
         "nome": "Elias Manoel",
         "posicao": "Forward",
         "numero": "",
@@ -1279,7 +1267,6 @@
       },
       {
         "id": "417805",
-        "espn_id": "417805",
         "nome": "Felipe Januário",
         "posicao": "Forward",
         "numero": "49",
@@ -1287,7 +1274,6 @@
       },
       {
         "id": "195638",
-        "espn_id": "195638",
         "nome": "Joaquín Correa",
         "posicao": "Forward",
         "numero": "30",
@@ -1295,7 +1281,6 @@
       },
       {
         "id": "411290",
-        "espn_id": "411290",
         "nome": "José Kadir",
         "posicao": "Forward",
         "numero": "37",
@@ -1303,7 +1288,6 @@
       },
       {
         "id": "269843",
-        "espn_id": "269843",
         "nome": "Júnior Santos",
         "posicao": "Forward",
         "numero": "17",
@@ -1311,7 +1295,6 @@
       },
       {
         "id": "381279",
-        "espn_id": "381279",
         "nome": "Kayke",
         "posicao": "Forward",
         "numero": "",
@@ -1319,7 +1302,6 @@
       },
       {
         "id": "314841",
-        "espn_id": "314841",
         "nome": "Matheus Martins",
         "posicao": "Forward",
         "numero": "11",
@@ -1327,7 +1309,6 @@
       },
       {
         "id": "304659",
-        "espn_id": "304659",
         "nome": "Matheus Nascimento",
         "posicao": "Forward",
         "numero": "",
@@ -1335,7 +1316,6 @@
       },
       {
         "id": "417955",
-        "espn_id": "417955",
         "nome": "Matheusinho",
         "posicao": "Forward",
         "numero": "57",
@@ -1343,7 +1323,6 @@
       },
       {
         "id": "362784",
-        "espn_id": "362784",
         "nome": "Nathan Fernandes",
         "posicao": "Forward",
         "numero": "16",
@@ -1351,7 +1330,6 @@
       },
       {
         "id": "414541",
-        "espn_id": "414541",
         "nome": "Cleber Lucas Chieppe Chagas",
         "posicao": "Goalkeeper",
         "numero": "62",
@@ -1359,7 +1337,6 @@
       },
       {
         "id": "361362",
-        "espn_id": "361362",
         "nome": "Cristian Loor",
         "posicao": "Goalkeeper",
         "numero": "12",
@@ -1367,7 +1344,6 @@
       },
       {
         "id": "310822",
-        "espn_id": "310822",
         "nome": "Leo Linck",
         "posicao": "Goalkeeper",
         "numero": "24",
@@ -1375,7 +1351,6 @@
       },
       {
         "id": "233826",
-        "espn_id": "233826",
         "nome": "Raul",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -1383,7 +1358,6 @@
       },
       {
         "id": "143883",
-        "espn_id": "143883",
         "nome": "Allan",
         "posicao": "Midfielder",
         "numero": "25",
@@ -1391,7 +1365,6 @@
       },
       {
         "id": "379785",
-        "espn_id": "379785",
         "nome": "Álvaro Montoro",
         "posicao": "Midfielder",
         "numero": "8",
@@ -1399,7 +1372,6 @@
       },
       {
         "id": "417755",
-        "espn_id": "417755",
         "nome": "Arthur Novaes",
         "posicao": "Midfielder",
         "numero": "48",
@@ -1407,7 +1379,6 @@
       },
       {
         "id": "355366",
-        "espn_id": "355366",
         "nome": "Bernardo Valim",
         "posicao": "Midfielder",
         "numero": "80",
@@ -1415,7 +1386,6 @@
       },
       {
         "id": "399182",
-        "espn_id": "399182",
         "nome": "Caio Valle",
         "posicao": "Midfielder",
         "numero": "45",
@@ -1423,7 +1393,6 @@
       },
       {
         "id": "399181",
-        "espn_id": "399181",
         "nome": "Cauã Zappelini",
         "posicao": "Midfielder",
         "numero": "58",
@@ -1431,7 +1400,6 @@
       },
       {
         "id": "297056",
-        "espn_id": "297056",
         "nome": "Cristian Medina",
         "posicao": "Midfielder",
         "numero": "6",
@@ -1439,7 +1407,6 @@
       },
       {
         "id": "306764",
-        "espn_id": "306764",
         "nome": "Danilo Santos",
         "posicao": "Midfielder",
         "numero": "35",
@@ -1447,7 +1414,6 @@
       },
       {
         "id": "196849",
-        "espn_id": "196849",
         "nome": "Edenilson",
         "posicao": "Midfielder",
         "numero": "88",
@@ -1455,7 +1421,6 @@
       },
       {
         "id": "360063",
-        "espn_id": "360063",
         "nome": "Jordan Barrera",
         "posicao": "Midfielder",
         "numero": "14",
@@ -1463,7 +1428,6 @@
       },
       {
         "id": "400067",
-        "espn_id": "400067",
         "nome": "Kauan Toledo",
         "posicao": "Midfielder",
         "numero": "49",
@@ -1471,7 +1435,6 @@
       },
       {
         "id": "417757",
-        "espn_id": "417757",
         "nome": "Miguel Caldas",
         "posicao": "Midfielder",
         "numero": "47",
@@ -1479,7 +1442,6 @@
       },
       {
         "id": "357362",
-        "espn_id": "357362",
         "nome": "Newton",
         "posicao": "Midfielder",
         "numero": "28",
@@ -1487,7 +1449,6 @@
       },
       {
         "id": "83178",
-        "espn_id": "83178",
         "nome": "Santiago Rodríguez",
         "posicao": "Midfielder",
         "numero": "23",
@@ -1495,7 +1456,6 @@
       },
       {
         "id": "398719",
-        "espn_id": "398719",
         "nome": "Victor Hugo",
         "posicao": "Midfielder",
         "numero": "75",
@@ -1503,7 +1463,6 @@
       },
       {
         "id": "382972",
-        "espn_id": "382972",
         "nome": "Wallace Davi",
         "posicao": "Midfielder",
         "numero": "55",
@@ -1512,8 +1471,49 @@
     ],
     "Bragantino": [
       {
+        "id": "1",
+        "nome": "Active",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "6079",
+        "nome": "Red Bull Bragantino",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "253486",
-        "espn_id": "253486",
         "nome": "Agustín Sant'Anna",
         "posicao": "Defender",
         "numero": "23",
@@ -1521,7 +1521,6 @@
       },
       {
         "id": "257335",
-        "espn_id": "257335",
         "nome": "Alix Vinicius",
         "posicao": "Defender",
         "numero": "4",
@@ -1529,7 +1528,6 @@
       },
       {
         "id": "421626",
-        "espn_id": "421626",
         "nome": "Breno de Moraes",
         "posicao": "Defender",
         "numero": "46",
@@ -1537,7 +1535,6 @@
       },
       {
         "id": "407650",
-        "espn_id": "407650",
         "nome": "Caue Nascimento Santos",
         "posicao": "Defender",
         "numero": "51",
@@ -1545,7 +1542,6 @@
       },
       {
         "id": "296900",
-        "espn_id": "296900",
         "nome": "Eduardo Santos",
         "posicao": "Defender",
         "numero": "3",
@@ -1553,7 +1549,6 @@
       },
       {
         "id": "302225",
-        "espn_id": "302225",
         "nome": "Guzmán Rodríguez",
         "posicao": "Defender",
         "numero": "2",
@@ -1561,7 +1556,6 @@
       },
       {
         "id": "311087",
-        "espn_id": "311087",
         "nome": "José Hurtado",
         "posicao": "Defender",
         "numero": "34",
@@ -1569,7 +1563,6 @@
       },
       {
         "id": "229555",
-        "espn_id": "229555",
         "nome": "Juninho Capixaba",
         "posicao": "Defender",
         "numero": "29",
@@ -1577,7 +1570,6 @@
       },
       {
         "id": "202485",
-        "espn_id": "202485",
         "nome": "Pedro Henrique",
         "posicao": "Defender",
         "numero": "14",
@@ -1585,7 +1577,6 @@
       },
       {
         "id": "418512",
-        "espn_id": "418512",
         "nome": "Ryan Augusto",
         "posicao": "Defender",
         "numero": "52",
@@ -1593,7 +1584,6 @@
       },
       {
         "id": "307933",
-        "espn_id": "307933",
         "nome": "Vanderlan",
         "posicao": "Defender",
         "numero": "12",
@@ -1601,7 +1591,6 @@
       },
       {
         "id": "405498",
-        "espn_id": "405498",
         "nome": "Weimar Vivas",
         "posicao": "Defender",
         "numero": "54",
@@ -1609,7 +1598,6 @@
       },
       {
         "id": "319950",
-        "espn_id": "319950",
         "nome": "Bruno Gonçalves",
         "posicao": "Forward",
         "numero": "19",
@@ -1617,7 +1605,6 @@
       },
       {
         "id": "199680",
-        "espn_id": "199680",
         "nome": "Eduardo Sasha",
         "posicao": "Forward",
         "numero": "8",
@@ -1625,7 +1612,6 @@
       },
       {
         "id": "267902",
-        "espn_id": "267902",
         "nome": "Fernando",
         "posicao": "Forward",
         "numero": "11",
@@ -1633,7 +1619,6 @@
       },
       {
         "id": "381283",
-        "espn_id": "381283",
         "nome": "Filipe",
         "posicao": "Forward",
         "numero": "59",
@@ -1641,7 +1626,6 @@
       },
       {
         "id": "333314",
-        "espn_id": "333314",
         "nome": "Henry Mosquera",
         "posicao": "Forward",
         "numero": "30",
@@ -1649,7 +1633,6 @@
       },
       {
         "id": "317370",
-        "espn_id": "317370",
         "nome": "Ignacio Sosa",
         "posicao": "Forward",
         "numero": "15",
@@ -1657,7 +1640,6 @@
       },
       {
         "id": "287035",
-        "espn_id": "287035",
         "nome": "Isidro Pitta",
         "posicao": "Forward",
         "numero": "9",
@@ -1665,7 +1647,6 @@
       },
       {
         "id": "421416",
-        "espn_id": "421416",
         "nome": "Jhuan Nunes",
         "posicao": "Forward",
         "numero": "67",
@@ -1673,7 +1654,6 @@
       },
       {
         "id": "335360",
-        "espn_id": "335360",
         "nome": "José Herrera",
         "posicao": "Forward",
         "numero": "32",
@@ -1681,7 +1661,6 @@
       },
       {
         "id": "302628",
-        "espn_id": "302628",
         "nome": "Thiago Borbas",
         "posicao": "Forward",
         "numero": "",
@@ -1689,7 +1668,6 @@
       },
       {
         "id": "383987",
-        "espn_id": "383987",
         "nome": "Vinicinho",
         "posicao": "Forward",
         "numero": "17",
@@ -1697,7 +1675,6 @@
       },
       {
         "id": "239368",
-        "espn_id": "239368",
         "nome": "Cleiton",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -1705,7 +1682,6 @@
       },
       {
         "id": "287767",
-        "espn_id": "287767",
         "nome": "Fabrício",
         "posicao": "Goalkeeper",
         "numero": "37",
@@ -1713,7 +1689,6 @@
       },
       {
         "id": "361620",
-        "espn_id": "361620",
         "nome": "Fernando Costa",
         "posicao": "Goalkeeper",
         "numero": "24",
@@ -1721,7 +1696,6 @@
       },
       {
         "id": "386191",
-        "espn_id": "386191",
         "nome": "Gustavo Reis",
         "posicao": "Goalkeeper",
         "numero": "56",
@@ -1729,7 +1703,6 @@
       },
       {
         "id": "421628",
-        "espn_id": "421628",
         "nome": "Rafael Monteiro",
         "posicao": "Goalkeeper",
         "numero": "50",
@@ -1737,7 +1710,6 @@
       },
       {
         "id": "145092",
-        "espn_id": "145092",
         "nome": "Tiago Volpi",
         "posicao": "Goalkeeper",
         "numero": "18",
@@ -1745,7 +1717,6 @@
       },
       {
         "id": "289910",
-        "espn_id": "289910",
         "nome": "Bruno Conceicão",
         "posicao": "Midfielder",
         "numero": "25",
@@ -1753,7 +1724,6 @@
       },
       {
         "id": "421627",
-        "espn_id": "421627",
         "nome": "Chrystian Delfino",
         "posicao": "Midfielder",
         "numero": "55",
@@ -1761,7 +1731,6 @@
       },
       {
         "id": "398850",
-        "espn_id": "398850",
         "nome": "Davi Gomes",
         "posicao": "Midfielder",
         "numero": "27",
@@ -1769,7 +1738,6 @@
       },
       {
         "id": "307934",
-        "espn_id": "307934",
         "nome": "Fabinho",
         "posicao": "Midfielder",
         "numero": "5",
@@ -1777,7 +1745,6 @@
       },
       {
         "id": "171993",
-        "espn_id": "171993",
         "nome": "Gabriel",
         "posicao": "Midfielder",
         "numero": "6",
@@ -1785,7 +1752,6 @@
       },
       {
         "id": "381282",
-        "espn_id": "381282",
         "nome": "Gabriel Lopes",
         "posicao": "Midfielder",
         "numero": "58",
@@ -1793,7 +1759,6 @@
       },
       {
         "id": "357358",
-        "espn_id": "357358",
         "nome": "Gustavinho",
         "posicao": "Midfielder",
         "numero": "22",
@@ -1801,7 +1766,6 @@
       },
       {
         "id": "285233",
-        "espn_id": "285233",
         "nome": "Ignacio Laquintana",
         "posicao": "Midfielder",
         "numero": "",
@@ -1809,7 +1773,6 @@
       },
       {
         "id": "291053",
-        "espn_id": "291053",
         "nome": "João Neto",
         "posicao": "Midfielder",
         "numero": "80",
@@ -1817,7 +1780,6 @@
       },
       {
         "id": "248584",
-        "espn_id": "248584",
         "nome": "Lucas Barbosa",
         "posicao": "Midfielder",
         "numero": "21",
@@ -1825,7 +1787,6 @@
       },
       {
         "id": "404204",
-        "espn_id": "404204",
         "nome": "Luis Gustavo",
         "posicao": "Midfielder",
         "numero": "49",
@@ -1833,7 +1794,6 @@
       },
       {
         "id": "361621",
-        "espn_id": "361621",
         "nome": "Marcelinho Braz",
         "posicao": "Midfielder",
         "numero": "57",
@@ -1841,7 +1801,6 @@
       },
       {
         "id": "225538",
-        "espn_id": "225538",
         "nome": "Matheus Fernandes",
         "posicao": "Midfielder",
         "numero": "35",
@@ -1849,7 +1808,6 @@
       },
       {
         "id": "381277",
-        "espn_id": "381277",
         "nome": "Rafael Lima",
         "posicao": "Midfielder",
         "numero": "61",
@@ -1857,7 +1815,6 @@
       },
       {
         "id": "279941",
-        "espn_id": "279941",
         "nome": "Ramires",
         "posicao": "Midfielder",
         "numero": "7",
@@ -1865,7 +1822,6 @@
       },
       {
         "id": "339001",
-        "espn_id": "339001",
         "nome": "Rodriguinho",
         "posicao": "Midfielder",
         "numero": "20",
@@ -1873,7 +1829,6 @@
       },
       {
         "id": "421629",
-        "espn_id": "421629",
         "nome": "Vini Krygsman",
         "posicao": "Midfielder",
         "numero": "62",
@@ -1881,7 +1836,6 @@
       },
       {
         "id": "400891",
-        "espn_id": "400891",
         "nome": "Yuri",
         "posicao": "Midfielder",
         "numero": "41",
@@ -1889,7 +1843,6 @@
       },
       {
         "id": "381273",
-        "espn_id": "381273",
         "nome": "Yuri Leles",
         "posicao": "Midfielder",
         "numero": "28",
@@ -1898,8 +1851,49 @@
     ],
     "Chapecoense": [
       {
+        "id": "9318",
+        "nome": "Chapecoense",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "236212",
-        "espn_id": "236212",
         "nome": "Bruno Leonardo",
         "posicao": "Defender",
         "numero": "33",
@@ -1907,7 +1901,6 @@
       },
       {
         "id": "236283",
-        "espn_id": "236283",
         "nome": "Bruno Pacheco",
         "posicao": "Defender",
         "numero": "91",
@@ -1915,7 +1908,6 @@
       },
       {
         "id": "421897",
-        "espn_id": "421897",
         "nome": "Da Silva",
         "posicao": "Defender",
         "numero": "",
@@ -1923,7 +1915,6 @@
       },
       {
         "id": "421901",
-        "espn_id": "421901",
         "nome": "Eduardo",
         "posicao": "Defender",
         "numero": "",
@@ -1931,7 +1922,6 @@
       },
       {
         "id": "319649",
-        "espn_id": "319649",
         "nome": "Eduardo Doma",
         "posicao": "Defender",
         "numero": "3",
@@ -1939,7 +1929,6 @@
       },
       {
         "id": "314590",
-        "espn_id": "314590",
         "nome": "Everton",
         "posicao": "Defender",
         "numero": "26",
@@ -1947,7 +1936,6 @@
       },
       {
         "id": "421902",
-        "espn_id": "421902",
         "nome": "Felipe",
         "posicao": "Defender",
         "numero": "14",
@@ -1955,7 +1943,6 @@
       },
       {
         "id": "357180",
-        "espn_id": "357180",
         "nome": "Gustavo Talles",
         "posicao": "Defender",
         "numero": "23",
@@ -1963,7 +1950,6 @@
       },
       {
         "id": "421903",
-        "espn_id": "421903",
         "nome": "Iago",
         "posicao": "Defender",
         "numero": "",
@@ -1971,7 +1957,6 @@
       },
       {
         "id": "302533",
-        "espn_id": "302533",
         "nome": "João Paulo",
         "posicao": "Defender",
         "numero": "4",
@@ -1979,7 +1964,6 @@
       },
       {
         "id": "338663",
-        "espn_id": "338663",
         "nome": "Kauan",
         "posicao": "Defender",
         "numero": "21",
@@ -1987,7 +1971,6 @@
       },
       {
         "id": "319505",
-        "espn_id": "319505",
         "nome": "Mancha",
         "posicao": "Defender",
         "numero": "6",
@@ -1995,7 +1978,6 @@
       },
       {
         "id": "421906",
-        "espn_id": "421906",
         "nome": "Márcio Kalebe",
         "posicao": "Defender",
         "numero": "",
@@ -2003,7 +1985,6 @@
       },
       {
         "id": "276216",
-        "espn_id": "276216",
         "nome": "Marcos Vinicius",
         "posicao": "Defender",
         "numero": "2",
@@ -2011,7 +1992,6 @@
       },
       {
         "id": "199068",
-        "espn_id": "199068",
         "nome": "Rafael Thyere",
         "posicao": "Defender",
         "numero": "15",
@@ -2019,7 +1999,6 @@
       },
       {
         "id": "250918",
-        "espn_id": "250918",
         "nome": "Victor Caetano",
         "posicao": "Defender",
         "numero": "25",
@@ -2027,7 +2006,6 @@
       },
       {
         "id": "418723",
-        "espn_id": "418723",
         "nome": "Vinicius Eduardo De Almeida Gomes Da Silva",
         "posicao": "Defender",
         "numero": "35",
@@ -2035,7 +2013,6 @@
       },
       {
         "id": "188034",
-        "espn_id": "188034",
         "nome": "Walter Clar",
         "posicao": "Defender",
         "numero": "37",
@@ -2043,7 +2020,6 @@
       },
       {
         "id": "421909",
-        "espn_id": "421909",
         "nome": "Yago",
         "posicao": "Defender",
         "numero": "",
@@ -2051,7 +2027,6 @@
       },
       {
         "id": "421899",
-        "espn_id": "421899",
         "nome": "Alberto",
         "posicao": "Forward",
         "numero": "",
@@ -2059,7 +2034,6 @@
       },
       {
         "id": "400910",
-        "espn_id": "400910",
         "nome": "Gleidson",
         "posicao": "Forward",
         "numero": "",
@@ -2067,7 +2041,6 @@
       },
       {
         "id": "360105",
-        "espn_id": "360105",
         "nome": "Italo",
         "posicao": "Forward",
         "numero": "77",
@@ -2075,7 +2048,6 @@
       },
       {
         "id": "414741",
-        "espn_id": "414741",
         "nome": "João Henrique Araújo Bom",
         "posicao": "Forward",
         "numero": "40",
@@ -2083,7 +2055,6 @@
       },
       {
         "id": "199933",
-        "espn_id": "199933",
         "nome": "Kevin Ramírez",
         "posicao": "Forward",
         "numero": "94",
@@ -2091,7 +2062,6 @@
       },
       {
         "id": "421905",
-        "espn_id": "421905",
         "nome": "Luizão",
         "posicao": "Forward",
         "numero": "",
@@ -2099,7 +2069,6 @@
       },
       {
         "id": "64671",
-        "espn_id": "64671",
         "nome": "Marcinho",
         "posicao": "Forward",
         "numero": "7",
@@ -2107,7 +2076,6 @@
       },
       {
         "id": "421898",
-        "espn_id": "421898",
         "nome": "Matheus Milani",
         "posicao": "Forward",
         "numero": "",
@@ -2115,7 +2083,6 @@
       },
       {
         "id": "307717",
-        "espn_id": "307717",
         "nome": "Maurício Garcez",
         "posicao": "Forward",
         "numero": "31",
@@ -2123,7 +2090,6 @@
       },
       {
         "id": "270674",
-        "espn_id": "270674",
         "nome": "Neto",
         "posicao": "Forward",
         "numero": "18",
@@ -2131,7 +2097,6 @@
       },
       {
         "id": "319739",
-        "espn_id": "319739",
         "nome": "Rafael Cavalheira",
         "posicao": "Forward",
         "numero": "99",
@@ -2139,7 +2104,6 @@
       },
       {
         "id": "379742",
-        "espn_id": "379742",
         "nome": "Robert Santos",
         "posicao": "Forward",
         "numero": "8",
@@ -2147,7 +2111,6 @@
       },
       {
         "id": "385180",
-        "espn_id": "385180",
         "nome": "Rodrigo Endrio Azevedo Tiago",
         "posicao": "Forward",
         "numero": "",
@@ -2155,7 +2118,6 @@
       },
       {
         "id": "421908",
-        "espn_id": "421908",
         "nome": "Talison",
         "posicao": "Forward",
         "numero": "",
@@ -2163,7 +2125,6 @@
       },
       {
         "id": "121921",
-        "espn_id": "121921",
         "nome": "Yannick Bolasie",
         "posicao": "Forward",
         "numero": "11",
@@ -2171,7 +2132,6 @@
       },
       {
         "id": "276217",
-        "espn_id": "276217",
         "nome": "Anderson Paixão",
         "posicao": "Goalkeeper",
         "numero": "98",
@@ -2179,7 +2139,6 @@
       },
       {
         "id": "358786",
-        "espn_id": "358786",
         "nome": "Kainã",
         "posicao": "Goalkeeper",
         "numero": "34",
@@ -2187,7 +2146,6 @@
       },
       {
         "id": "269645",
-        "espn_id": "269645",
         "nome": "Matheus",
         "posicao": "Goalkeeper",
         "numero": "",
@@ -2195,7 +2153,6 @@
       },
       {
         "id": "171811",
-        "espn_id": "171811",
         "nome": "Rafael Santos",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -2203,7 +2160,6 @@
       },
       {
         "id": "417361",
-        "espn_id": "417361",
         "nome": "Wellington",
         "posicao": "Goalkeeper",
         "numero": "",
@@ -2211,7 +2167,6 @@
       },
       {
         "id": "421900",
-        "espn_id": "421900",
         "nome": "Bernardo",
         "posicao": "Midfielder",
         "numero": "",
@@ -2219,7 +2174,6 @@
       },
       {
         "id": "157066",
-        "espn_id": "157066",
         "nome": "Bruno Matias",
         "posicao": "Midfielder",
         "numero": "16",
@@ -2227,7 +2181,6 @@
       },
       {
         "id": "285089",
-        "espn_id": "285089",
         "nome": "Camilo",
         "posicao": "Midfielder",
         "numero": "27",
@@ -2235,7 +2188,6 @@
       },
       {
         "id": "396967",
-        "espn_id": "396967",
         "nome": "David",
         "posicao": "Midfielder",
         "numero": "19",
@@ -2243,7 +2195,6 @@
       },
       {
         "id": "301592",
-        "espn_id": "301592",
         "nome": "Ênio",
         "posicao": "Midfielder",
         "numero": "97",
@@ -2251,7 +2202,6 @@
       },
       {
         "id": "140012",
-        "espn_id": "140012",
         "nome": "Giovanni Augusto",
         "posicao": "Midfielder",
         "numero": "10",
@@ -2259,7 +2209,6 @@
       },
       {
         "id": "285000",
-        "espn_id": "285000",
         "nome": "Higor Matheus Meritão",
         "posicao": "Midfielder",
         "numero": "22",
@@ -2267,7 +2216,6 @@
       },
       {
         "id": "198580",
-        "espn_id": "198580",
         "nome": "Jean",
         "posicao": "Midfielder",
         "numero": "20",
@@ -2275,7 +2223,6 @@
       },
       {
         "id": "357706",
-        "espn_id": "357706",
         "nome": "João Vitor",
         "posicao": "Midfielder",
         "numero": "5",
@@ -2283,7 +2230,6 @@
       },
       {
         "id": "421904",
-        "espn_id": "421904",
         "nome": "Kauan Godoy",
         "posicao": "Midfielder",
         "numero": "",
@@ -2291,7 +2237,6 @@
       },
       {
         "id": "417350",
-        "espn_id": "417350",
         "nome": "Kauê Arno",
         "posicao": "Midfielder",
         "numero": "",
@@ -2299,7 +2244,6 @@
       },
       {
         "id": "421907",
-        "espn_id": "421907",
         "nome": "Miguel",
         "posicao": "Midfielder",
         "numero": "",
@@ -2307,7 +2251,6 @@
       },
       {
         "id": "359385",
-        "espn_id": "359385",
         "nome": "Rubens Tadeu Hartmann Ricoldi",
         "posicao": "Midfielder",
         "numero": "70",
@@ -2315,7 +2258,6 @@
       },
       {
         "id": "307476",
-        "espn_id": "307476",
         "nome": "Vinicius",
         "posicao": "Midfielder",
         "numero": "17",
@@ -2323,7 +2265,6 @@
       },
       {
         "id": "302240",
-        "espn_id": "302240",
         "nome": "Wemerson Do Carmo Silva",
         "posicao": "Midfielder",
         "numero": "38",
@@ -2332,8 +2273,49 @@
     ],
     "Corinthians": [
       {
+        "id": "874",
+        "nome": "Corinthians",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "194090",
-        "espn_id": "194090",
         "nome": "André Ramalho",
         "posicao": "Defender",
         "numero": "5",
@@ -2341,7 +2323,6 @@
       },
       {
         "id": "421614",
-        "espn_id": "421614",
         "nome": "Caua Ribeiro",
         "posicao": "Defender",
         "numero": "72",
@@ -2349,7 +2330,6 @@
       },
       {
         "id": "195756",
-        "espn_id": "195756",
         "nome": "Fabrizio Angileri",
         "posicao": "Defender",
         "numero": "26",
@@ -2357,7 +2337,6 @@
       },
       {
         "id": "192226",
-        "espn_id": "192226",
         "nome": "Gabriel Paulista",
         "posicao": "Defender",
         "numero": "3",
@@ -2365,7 +2344,6 @@
       },
       {
         "id": "379516",
-        "espn_id": "379516",
         "nome": "Guilherme Pellegrin Almeida",
         "posicao": "Defender",
         "numero": "62",
@@ -2373,7 +2351,6 @@
       },
       {
         "id": "168981",
-        "espn_id": "168981",
         "nome": "Gustavo Henrique",
         "posicao": "Defender",
         "numero": "13",
@@ -2381,7 +2358,6 @@
       },
       {
         "id": "303591",
-        "espn_id": "303591",
         "nome": "Hugo",
         "posicao": "Defender",
         "numero": "46",
@@ -2389,7 +2365,6 @@
       },
       {
         "id": "421414",
-        "espn_id": "421414",
         "nome": "Iago Machado",
         "posicao": "Defender",
         "numero": "55",
@@ -2397,7 +2372,6 @@
       },
       {
         "id": "399414",
-        "espn_id": "399414",
         "nome": "Jacaré",
         "posicao": "Defender",
         "numero": "59",
@@ -2405,7 +2379,6 @@
       },
       {
         "id": "361471",
-        "espn_id": "361471",
         "nome": "João Pedro",
         "posicao": "Defender",
         "numero": "47",
@@ -2413,7 +2386,6 @@
       },
       {
         "id": "421619",
-        "espn_id": "421619",
         "nome": "João Vitor",
         "posicao": "Defender",
         "numero": "86",
@@ -2421,7 +2393,6 @@
       },
       {
         "id": "421618",
-        "espn_id": "421618",
         "nome": "Levi Dias",
         "posicao": "Defender",
         "numero": "85",
@@ -2429,7 +2400,6 @@
       },
       {
         "id": "272533",
-        "espn_id": "272533",
         "nome": "Mateuzinho",
         "posicao": "Defender",
         "numero": "2",
@@ -2437,7 +2407,6 @@
       },
       {
         "id": "287774",
-        "espn_id": "287774",
         "nome": "Matheus Bidu",
         "posicao": "Defender",
         "numero": "21",
@@ -2445,7 +2414,6 @@
       },
       {
         "id": "359849",
-        "espn_id": "359849",
         "nome": "Pedro Milans",
         "posicao": "Defender",
         "numero": "20",
@@ -2453,7 +2421,6 @@
       },
       {
         "id": "415446",
-        "espn_id": "415446",
         "nome": "Yago Veloso",
         "posicao": "Defender",
         "numero": "84",
@@ -2461,7 +2428,6 @@
       },
       {
         "id": "421609",
-        "espn_id": "421609",
         "nome": "Christian Santos",
         "posicao": "Forward",
         "numero": "78",
@@ -2469,7 +2435,6 @@
       },
       {
         "id": "382959",
-        "espn_id": "382959",
         "nome": "Gui Negão",
         "posicao": "Forward",
         "numero": "56",
@@ -2477,7 +2442,6 @@
       },
       {
         "id": "347456",
-        "espn_id": "347456",
         "nome": "Kaio",
         "posicao": "Forward",
         "numero": "37",
@@ -2485,7 +2449,6 @@
       },
       {
         "id": "361467",
-        "espn_id": "361467",
         "nome": "Kayke Ferrari",
         "posicao": "Forward",
         "numero": "31",
@@ -2493,7 +2456,6 @@
       },
       {
         "id": "421617",
-        "espn_id": "421617",
         "nome": "Kayque",
         "posicao": "Forward",
         "numero": "79",
@@ -2501,7 +2463,6 @@
       },
       {
         "id": "382961",
-        "espn_id": "382961",
         "nome": "Luiz Fernando",
         "posicao": "Forward",
         "numero": "64",
@@ -2509,7 +2470,6 @@
       },
       {
         "id": "159255",
-        "espn_id": "159255",
         "nome": "Memphis Depay",
         "posicao": "Forward",
         "numero": "10",
@@ -2517,7 +2477,6 @@
       },
       {
         "id": "400447",
-        "espn_id": "400447",
         "nome": "Nicolas Araújo",
         "posicao": "Forward",
         "numero": "57",
@@ -2525,7 +2484,6 @@
       },
       {
         "id": "400429",
-        "espn_id": "400429",
         "nome": "Nícollas",
         "posicao": "Forward",
         "numero": "67",
@@ -2533,7 +2491,6 @@
       },
       {
         "id": "234070",
-        "espn_id": "234070",
         "nome": "Pedro Raúl",
         "posicao": "Forward",
         "numero": "18",
@@ -2541,7 +2498,6 @@
       },
       {
         "id": "171652",
-        "espn_id": "171652",
         "nome": "Vitinho",
         "posicao": "Forward",
         "numero": "11",
@@ -2549,7 +2505,6 @@
       },
       {
         "id": "266666",
-        "espn_id": "266666",
         "nome": "Yuri Alberto",
         "posicao": "Forward",
         "numero": "9",
@@ -2557,7 +2512,6 @@
       },
       {
         "id": "144324",
-        "espn_id": "144324",
         "nome": "Zakaria Labyad",
         "posicao": "Forward",
         "numero": "52",
@@ -2565,7 +2519,6 @@
       },
       {
         "id": "361463",
-        "espn_id": "361463",
         "nome": "Felipe Longo",
         "posicao": "Goalkeeper",
         "numero": "40",
@@ -2573,7 +2526,6 @@
       },
       {
         "id": "421612",
-        "espn_id": "421612",
         "nome": "Gustavo Milani",
         "posicao": "Goalkeeper",
         "numero": "71",
@@ -2581,7 +2533,6 @@
       },
       {
         "id": "257051",
-        "espn_id": "257051",
         "nome": "Hugo Souza",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -2589,7 +2540,6 @@
       },
       {
         "id": "361442",
-        "espn_id": "361442",
         "nome": "Kauê Camargo",
         "posicao": "Goalkeeper",
         "numero": "51",
@@ -2597,7 +2547,6 @@
       },
       {
         "id": "376482",
-        "espn_id": "376482",
         "nome": "Matheus Corrêa",
         "posicao": "Goalkeeper",
         "numero": "50",
@@ -2605,7 +2554,6 @@
       },
       {
         "id": "284998",
-        "espn_id": "284998",
         "nome": "Matheus Donelli",
         "posicao": "Goalkeeper",
         "numero": "",
@@ -2613,7 +2561,6 @@
       },
       {
         "id": "196879",
-        "espn_id": "196879",
         "nome": "Alex Santana",
         "posicao": "Midfielder",
         "numero": "80",
@@ -2621,7 +2568,6 @@
       },
       {
         "id": "223437",
-        "espn_id": "223437",
         "nome": "Allan",
         "posicao": "Midfielder",
         "numero": "29",
@@ -2629,7 +2575,6 @@
       },
       {
         "id": "409662",
-        "espn_id": "409662",
         "nome": "André",
         "posicao": "Midfielder",
         "numero": "49",
@@ -2637,7 +2582,6 @@
       },
       {
         "id": "148189",
-        "espn_id": "148189",
         "nome": "André Carrillo",
         "posicao": "Midfielder",
         "numero": "19",
@@ -2645,7 +2589,6 @@
       },
       {
         "id": "338898",
-        "espn_id": "338898",
         "nome": "Breno Bidon",
         "posicao": "Midfielder",
         "numero": "7",
@@ -2653,7 +2596,6 @@
       },
       {
         "id": "240557",
-        "espn_id": "240557",
         "nome": "Charles",
         "posicao": "Midfielder",
         "numero": "35",
@@ -2661,7 +2603,6 @@
       },
       {
         "id": "382944",
-        "espn_id": "382944",
         "nome": "Dieguinho",
         "posicao": "Midfielder",
         "numero": "61",
@@ -2669,7 +2610,6 @@
       },
       {
         "id": "421615",
-        "espn_id": "421615",
         "nome": "Guilherme Caraguá",
         "posicao": "Midfielder",
         "numero": "75",
@@ -2677,7 +2617,6 @@
       },
       {
         "id": "421616",
-        "espn_id": "421616",
         "nome": "Guilherme Pires",
         "posicao": "Midfielder",
         "numero": "76",
@@ -2685,7 +2624,6 @@
       },
       {
         "id": "169136",
-        "espn_id": "169136",
         "nome": "Jesse Lingard",
         "posicao": "Midfielder",
         "numero": "77",
@@ -2693,7 +2631,6 @@
       },
       {
         "id": "379848",
-        "espn_id": "379848",
         "nome": "Luiz Eduardo",
         "posicao": "Midfielder",
         "numero": "63",
@@ -2701,7 +2638,6 @@
       },
       {
         "id": "417419",
-        "espn_id": "417419",
         "nome": "Luiz Fabio",
         "posicao": "Midfielder",
         "numero": "89",
@@ -2709,7 +2645,6 @@
       },
       {
         "id": "371496",
-        "espn_id": "371496",
         "nome": "Luiz Gustavo",
         "posicao": "Midfielder",
         "numero": "54",
@@ -2717,7 +2652,6 @@
       },
       {
         "id": "421613",
-        "espn_id": "421613",
         "nome": "Pedro Thomas",
         "posicao": "Midfielder",
         "numero": "65",
@@ -2725,7 +2659,6 @@
       },
       {
         "id": "236099",
-        "espn_id": "236099",
         "nome": "Raniele",
         "posicao": "Midfielder",
         "numero": "14",
@@ -2733,7 +2666,6 @@
       },
       {
         "id": "270562",
-        "espn_id": "270562",
         "nome": "Rodrigo Garro",
         "posicao": "Midfielder",
         "numero": "8",
@@ -2741,7 +2673,6 @@
       },
       {
         "id": "382962",
-        "espn_id": "382962",
         "nome": "Vitinho",
         "posicao": "Midfielder",
         "numero": "68",
@@ -2750,8 +2681,49 @@
     ],
     "Coritiba": [
       {
+        "id": "1",
+        "nome": "Active",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "3456",
+        "nome": "Coritiba",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "243831",
-        "espn_id": "243831",
         "nome": "Bruno Melo",
         "posicao": "Defender",
         "numero": "26",
@@ -2759,7 +2731,6 @@
       },
       {
         "id": "272437",
-        "espn_id": "272437",
         "nome": "Felipe Jonatan",
         "posicao": "Defender",
         "numero": "6",
@@ -2767,7 +2738,6 @@
       },
       {
         "id": "256018",
-        "espn_id": "256018",
         "nome": "Jacy Maranhão",
         "posicao": "Defender",
         "numero": "55",
@@ -2775,7 +2745,6 @@
       },
       {
         "id": "402816",
-        "espn_id": "402816",
         "nome": "João Almeida",
         "posicao": "Defender",
         "numero": "16",
@@ -2783,7 +2752,6 @@
       },
       {
         "id": "371527",
-        "espn_id": "371527",
         "nome": "João Pedro Chermont",
         "posicao": "Defender",
         "numero": "44",
@@ -2791,7 +2759,6 @@
       },
       {
         "id": "403736",
-        "espn_id": "403736",
         "nome": "Lucas Taverna",
         "posicao": "Defender",
         "numero": "86",
@@ -2799,7 +2766,6 @@
       },
       {
         "id": "124025",
-        "espn_id": "124025",
         "nome": "Maicon",
         "posicao": "Defender",
         "numero": "3",
@@ -2807,7 +2773,6 @@
       },
       {
         "id": "155268",
-        "espn_id": "155268",
         "nome": "Rodrigo Moledo",
         "posicao": "Defender",
         "numero": "4",
@@ -2815,7 +2780,6 @@
       },
       {
         "id": "319507",
-        "espn_id": "319507",
         "nome": "Tiago",
         "posicao": "Defender",
         "numero": "23",
@@ -2823,7 +2787,6 @@
       },
       {
         "id": "200826",
-        "espn_id": "200826",
         "nome": "Tinga",
         "posicao": "Defender",
         "numero": "2",
@@ -2831,7 +2794,6 @@
       },
       {
         "id": "236324",
-        "espn_id": "236324",
         "nome": "Breno",
         "posicao": "Forward",
         "numero": "77",
@@ -2839,7 +2801,6 @@
       },
       {
         "id": "421314",
-        "espn_id": "421314",
         "nome": "David Alves",
         "posicao": "Forward",
         "numero": "33",
@@ -2847,7 +2808,6 @@
       },
       {
         "id": "377787",
-        "espn_id": "377787",
         "nome": "Éberth",
         "posicao": "Forward",
         "numero": "",
@@ -2855,7 +2815,6 @@
       },
       {
         "id": "417822",
-        "espn_id": "417822",
         "nome": "Enzo Vágner",
         "posicao": "Forward",
         "numero": "14",
@@ -2863,7 +2822,6 @@
       },
       {
         "id": "295072",
-        "espn_id": "295072",
         "nome": "Fabinho",
         "posicao": "Forward",
         "numero": "28",
@@ -2871,7 +2829,6 @@
       },
       {
         "id": "333306",
-        "espn_id": "333306",
         "nome": "Joaquín Lavega",
         "posicao": "Forward",
         "numero": "7",
@@ -2879,7 +2836,6 @@
       },
       {
         "id": "203693",
-        "espn_id": "203693",
         "nome": "Keno",
         "posicao": "Forward",
         "numero": "20",
@@ -2887,7 +2843,6 @@
       },
       {
         "id": "360137",
-        "espn_id": "360137",
         "nome": "Lucas Ronier",
         "posicao": "Forward",
         "numero": "11",
@@ -2895,7 +2850,6 @@
       },
       {
         "id": "384025",
-        "espn_id": "384025",
         "nome": "Matheus Dias",
         "posicao": "Forward",
         "numero": "80",
@@ -2903,7 +2857,6 @@
       },
       {
         "id": "216846",
-        "espn_id": "216846",
         "nome": "Pedro Rocha",
         "posicao": "Forward",
         "numero": "32",
@@ -2911,7 +2864,6 @@
       },
       {
         "id": "338053",
-        "espn_id": "338053",
         "nome": "Renato Marques",
         "posicao": "Forward",
         "numero": "78",
@@ -2919,7 +2871,6 @@
       },
       {
         "id": "236410",
-        "espn_id": "236410",
         "nome": "Rodrigo Rodrigues",
         "posicao": "Forward",
         "numero": "99",
@@ -2927,7 +2878,6 @@
       },
       {
         "id": "316781",
-        "espn_id": "316781",
         "nome": "Vini Paulista",
         "posicao": "Forward",
         "numero": "36",
@@ -2935,7 +2885,6 @@
       },
       {
         "id": "334277",
-        "espn_id": "334277",
         "nome": "Benassi",
         "posicao": "Goalkeeper",
         "numero": "67",
@@ -2943,7 +2892,6 @@
       },
       {
         "id": "203222",
-        "espn_id": "203222",
         "nome": "Gabriel Leite",
         "posicao": "Goalkeeper",
         "numero": "87",
@@ -2951,7 +2899,6 @@
       },
       {
         "id": "234080",
-        "espn_id": "234080",
         "nome": "Keiller",
         "posicao": "Goalkeeper",
         "numero": "13",
@@ -2959,7 +2906,6 @@
       },
       {
         "id": "364880",
-        "espn_id": "364880",
         "nome": "Pedro Luccas",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -2967,7 +2913,6 @@
       },
       {
         "id": "311037",
-        "espn_id": "311037",
         "nome": "Pedro Rangel",
         "posicao": "Goalkeeper",
         "numero": "12",
@@ -2975,7 +2920,6 @@
       },
       {
         "id": "404711",
-        "espn_id": "404711",
         "nome": "Alejandro Ararat",
         "posicao": "Midfielder",
         "numero": "15",
@@ -2983,7 +2927,6 @@
       },
       {
         "id": "201942",
-        "espn_id": "201942",
         "nome": "Fernando Sobral",
         "posicao": "Midfielder",
         "numero": "88",
@@ -2991,7 +2934,6 @@
       },
       {
         "id": "349559",
-        "espn_id": "349559",
         "nome": "Geovane Santana Meurer",
         "posicao": "Midfielder",
         "numero": "",
@@ -2999,7 +2941,6 @@
       },
       {
         "id": "303474",
-        "espn_id": "303474",
         "nome": "Gustavo",
         "posicao": "Midfielder",
         "numero": "39",
@@ -3007,7 +2948,6 @@
       },
       {
         "id": "150215",
-        "espn_id": "150215",
         "nome": "Josué Pesqueira",
         "posicao": "Midfielder",
         "numero": "10",
@@ -3015,7 +2955,6 @@
       },
       {
         "id": "417362",
-        "espn_id": "417362",
         "nome": "Miguel Silva",
         "posicao": "Midfielder",
         "numero": "",
@@ -3023,7 +2962,6 @@
       },
       {
         "id": "128368",
-        "espn_id": "128368",
         "nome": "Sebastián Gómez",
         "posicao": "Midfielder",
         "numero": "19",
@@ -3031,7 +2969,6 @@
       },
       {
         "id": "384026",
-        "espn_id": "384026",
         "nome": "Thiago Azaf",
         "posicao": "Midfielder",
         "numero": "9",
@@ -3039,7 +2976,6 @@
       },
       {
         "id": "188143",
-        "espn_id": "188143",
         "nome": "Thiago Santos",
         "posicao": "Midfielder",
         "numero": "21",
@@ -3047,7 +2983,6 @@
       },
       {
         "id": "402818",
-        "espn_id": "402818",
         "nome": "Tissi",
         "posicao": "Midfielder",
         "numero": "5",
@@ -3055,7 +2990,6 @@
       },
       {
         "id": "269848",
-        "espn_id": "269848",
         "nome": "Wallison Luiz",
         "posicao": "Midfielder",
         "numero": "70",
@@ -3063,7 +2997,6 @@
       },
       {
         "id": "186589",
-        "espn_id": "186589",
         "nome": "Willian",
         "posicao": "Midfielder",
         "numero": "29",
@@ -3072,8 +3005,49 @@
     ],
     "Cruzeiro": [
       {
+        "id": "2022",
+        "nome": "Cruzeiro",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "236111",
-        "espn_id": "236111",
         "nome": "Fabrício Bruno",
         "posicao": "Defender",
         "numero": "15",
@@ -3081,7 +3055,6 @@
       },
       {
         "id": "108342",
-        "espn_id": "108342",
         "nome": "Fagner",
         "posicao": "Defender",
         "numero": "23",
@@ -3089,7 +3062,6 @@
       },
       {
         "id": "421405",
-        "espn_id": "421405",
         "nome": "Gustavo Carvalho",
         "posicao": "Defender",
         "numero": "60",
@@ -3097,7 +3069,6 @@
       },
       {
         "id": "286558",
-        "espn_id": "286558",
         "nome": "João Marcelo",
         "posicao": "Defender",
         "numero": "43",
@@ -3105,7 +3076,6 @@
       },
       {
         "id": "363020",
-        "espn_id": "363020",
         "nome": "Jonathan Jesus",
         "posicao": "Defender",
         "numero": "34",
@@ -3113,7 +3083,6 @@
       },
       {
         "id": "417437",
-        "espn_id": "417437",
         "nome": "Kaiquy Luiz",
         "posicao": "Defender",
         "numero": "48",
@@ -3121,7 +3090,6 @@
       },
       {
         "id": "403572",
-        "espn_id": "403572",
         "nome": "Kauã Moraes Silva",
         "posicao": "Defender",
         "numero": "2",
@@ -3129,7 +3097,6 @@
       },
       {
         "id": "421406",
-        "espn_id": "421406",
         "nome": "Kelvin Coutinho",
         "posicao": "Defender",
         "numero": "84",
@@ -3137,7 +3104,6 @@
       },
       {
         "id": "176810",
-        "espn_id": "176810",
         "nome": "Lucas Villalba",
         "posicao": "Defender",
         "numero": "25",
@@ -3145,7 +3111,6 @@
       },
       {
         "id": "383098",
-        "espn_id": "383098",
         "nome": "Nicolas Pontes",
         "posicao": "Defender",
         "numero": "42",
@@ -3153,7 +3118,6 @@
       },
       {
         "id": "341413",
-        "espn_id": "341413",
         "nome": "Pedro Henrique Franklim Martins",
         "posicao": "Defender",
         "numero": "",
@@ -3161,7 +3125,6 @@
       },
       {
         "id": "404207",
-        "espn_id": "404207",
         "nome": "Vitor Hugo",
         "posicao": "Defender",
         "numero": "64",
@@ -3169,7 +3132,6 @@
       },
       {
         "id": "212077",
-        "espn_id": "212077",
         "nome": "William",
         "posicao": "Defender",
         "numero": "12",
@@ -3177,7 +3139,6 @@
       },
       {
         "id": "227737",
-        "espn_id": "227737",
         "nome": "Bruno Rodrigues",
         "posicao": "Forward",
         "numero": "20",
@@ -3185,7 +3146,6 @@
       },
       {
         "id": "205444",
-        "espn_id": "205444",
         "nome": "Chico",
         "posicao": "Forward",
         "numero": "91",
@@ -3193,7 +3153,6 @@
       },
       {
         "id": "421404",
-        "espn_id": "421404",
         "nome": "Danilo Gimenes",
         "posicao": "Forward",
         "numero": "59",
@@ -3201,7 +3160,6 @@
       },
       {
         "id": "280978",
-        "espn_id": "280978",
         "nome": "Kaio Jorge",
         "posicao": "Forward",
         "numero": "19",
@@ -3209,7 +3167,6 @@
       },
       {
         "id": "383096",
-        "espn_id": "383096",
         "nome": "Kaique Kenji",
         "posicao": "Forward",
         "numero": "70",
@@ -3217,7 +3174,6 @@
       },
       {
         "id": "371534",
-        "espn_id": "371534",
         "nome": "Keny Arroyo",
         "posicao": "Forward",
         "numero": "99",
@@ -3225,7 +3181,6 @@
       },
       {
         "id": "297070",
-        "espn_id": "297070",
         "nome": "Marquinhos",
         "posicao": "Forward",
         "numero": "7",
@@ -3233,7 +3188,6 @@
       },
       {
         "id": "421407",
-        "espn_id": "421407",
         "nome": "Pablo",
         "posicao": "Forward",
         "numero": "80",
@@ -3241,7 +3195,6 @@
       },
       {
         "id": "413768",
-        "espn_id": "413768",
         "nome": "Pietro Tavares",
         "posicao": "Forward",
         "numero": "79",
@@ -3249,7 +3202,6 @@
       },
       {
         "id": "414352",
-        "espn_id": "414352",
         "nome": "Rayan Lelis",
         "posicao": "Forward",
         "numero": "57",
@@ -3257,7 +3209,6 @@
       },
       {
         "id": "374514",
-        "espn_id": "374514",
         "nome": "Ruan Silva Fonseca",
         "posicao": "Forward",
         "numero": "49",
@@ -3265,7 +3216,6 @@
       },
       {
         "id": "11632",
-        "espn_id": "11632",
         "nome": "Wanderson",
         "posicao": "Forward",
         "numero": "94",
@@ -3273,7 +3223,6 @@
       },
       {
         "id": "108347",
-        "espn_id": "108347",
         "nome": "Cássio",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -3281,7 +3230,6 @@
       },
       {
         "id": "383087",
-        "espn_id": "383087",
         "nome": "Marcelo",
         "posicao": "Goalkeeper",
         "numero": "24",
@@ -3289,7 +3237,6 @@
       },
       {
         "id": "315201",
-        "espn_id": "315201",
         "nome": "Matheus Cunha Queiroz",
         "posicao": "Goalkeeper",
         "numero": "31",
@@ -3297,7 +3244,6 @@
       },
       {
         "id": "337996",
-        "espn_id": "337996",
         "nome": "Otávio Costa",
         "posicao": "Goalkeeper",
         "numero": "81",
@@ -3305,7 +3251,6 @@
       },
       {
         "id": "404611",
-        "espn_id": "404611",
         "nome": "Vitor Lamounier",
         "posicao": "Goalkeeper",
         "numero": "51",
@@ -3313,7 +3258,6 @@
       },
       {
         "id": "383088",
-        "espn_id": "383088",
         "nome": "Alessandro",
         "posicao": "Midfielder",
         "numero": "50",
@@ -3321,7 +3265,6 @@
       },
       {
         "id": "421403",
-        "espn_id": "421403",
         "nome": "André Balbino",
         "posicao": "Midfielder",
         "numero": "55",
@@ -3329,7 +3272,6 @@
       },
       {
         "id": "287788",
-        "espn_id": "287788",
         "nome": "Christian",
         "posicao": "Midfielder",
         "numero": "88",
@@ -3337,7 +3279,6 @@
       },
       {
         "id": "421402",
-        "espn_id": "421402",
         "nome": "Eduardo Pape",
         "posicao": "Midfielder",
         "numero": "58",
@@ -3345,7 +3286,6 @@
       },
       {
         "id": "404202",
-        "espn_id": "404202",
         "nome": "Felipe Morais",
         "posicao": "Midfielder",
         "numero": "38",
@@ -3353,7 +3293,6 @@
       },
       {
         "id": "210135",
-        "espn_id": "210135",
         "nome": "Gerson",
         "posicao": "Midfielder",
         "numero": "11",
@@ -3361,7 +3300,6 @@
       },
       {
         "id": "358337",
-        "espn_id": "358337",
         "nome": "João Wellington",
         "posicao": "Midfielder",
         "numero": "77",
@@ -3369,7 +3307,6 @@
       },
       {
         "id": "77577",
-        "espn_id": "77577",
         "nome": "Lucas Romero",
         "posicao": "Midfielder",
         "numero": "29",
@@ -3377,7 +3314,6 @@
       },
       {
         "id": "108103",
-        "espn_id": "108103",
         "nome": "Lucas Silva",
         "posicao": "Midfielder",
         "numero": "16",
@@ -3385,7 +3321,6 @@
       },
       {
         "id": "268221",
-        "espn_id": "268221",
         "nome": "Matheus Henrique",
         "posicao": "Midfielder",
         "numero": "8",
@@ -3393,7 +3328,6 @@
       },
       {
         "id": "216098",
-        "espn_id": "216098",
         "nome": "Matheus Pereira",
         "posicao": "Midfielder",
         "numero": "10",
@@ -3401,7 +3335,6 @@
       },
       {
         "id": "383097",
-        "espn_id": "383097",
         "nome": "Murilo Rhikman",
         "posicao": "Midfielder",
         "numero": "35",
@@ -3409,7 +3342,6 @@
       },
       {
         "id": "370814",
-        "espn_id": "370814",
         "nome": "Neyser Villareal",
         "posicao": "Midfielder",
         "numero": "22",
@@ -3417,7 +3349,6 @@
       },
       {
         "id": "371530",
-        "espn_id": "371530",
         "nome": "Rhuan Gabriel",
         "posicao": "Midfielder",
         "numero": "40",
@@ -3425,7 +3356,6 @@
       },
       {
         "id": "204113",
-        "espn_id": "204113",
         "nome": "Walace",
         "posicao": "Midfielder",
         "numero": "5",
@@ -3434,8 +3364,49 @@
     ],
     "Flamengo": [
       {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "819",
+        "nome": "Flamengo",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "125514",
-        "espn_id": "125514",
         "nome": "Alex Sandro",
         "posicao": "Defender",
         "numero": "26",
@@ -3443,7 +3414,6 @@
       },
       {
         "id": "203077",
-        "espn_id": "203077",
         "nome": "Ayrton Lucas",
         "posicao": "Defender",
         "numero": "6",
@@ -3451,7 +3421,6 @@
       },
       {
         "id": "371495",
-        "espn_id": "371495",
         "nome": "Da Mata",
         "posicao": "Defender",
         "numero": "41",
@@ -3459,7 +3428,6 @@
       },
       {
         "id": "417897",
-        "espn_id": "417897",
         "nome": "Daniel Carvalho Marinho Da Silva",
         "posicao": "Defender",
         "numero": "87",
@@ -3467,7 +3435,6 @@
       },
       {
         "id": "357115",
-        "espn_id": "357115",
         "nome": "Daniel Sales",
         "posicao": "Defender",
         "numero": "51",
@@ -3475,7 +3442,6 @@
       },
       {
         "id": "170369",
-        "espn_id": "170369",
         "nome": "Danilo",
         "posicao": "Defender",
         "numero": "13",
@@ -3483,7 +3449,6 @@
       },
       {
         "id": "246844",
-        "espn_id": "246844",
         "nome": "Emerson Royal",
         "posicao": "Defender",
         "numero": "22",
@@ -3491,7 +3456,6 @@
       },
       {
         "id": "421502",
-        "espn_id": "421502",
         "nome": "Ernest Muñoz",
         "posicao": "Defender",
         "numero": "57",
@@ -3499,7 +3463,6 @@
       },
       {
         "id": "188368",
-        "espn_id": "188368",
         "nome": "Guillermo Varela",
         "posicao": "Defender",
         "numero": "2",
@@ -3507,7 +3470,6 @@
       },
       {
         "id": "389773",
-        "espn_id": "389773",
         "nome": "Gusttavo Sousa",
         "posicao": "Defender",
         "numero": "74",
@@ -3515,7 +3477,6 @@
       },
       {
         "id": "376479",
-        "espn_id": "376479",
         "nome": "João Victor",
         "posicao": "Defender",
         "numero": "71",
@@ -3523,7 +3484,6 @@
       },
       {
         "id": "401309",
-        "espn_id": "401309",
         "nome": "Johnny Monteiro Góes",
         "posicao": "Defender",
         "numero": "77",
@@ -3531,7 +3491,6 @@
       },
       {
         "id": "252316",
-        "espn_id": "252316",
         "nome": "Léo Ortiz",
         "posicao": "Defender",
         "numero": "3",
@@ -3539,7 +3498,6 @@
       },
       {
         "id": "145405",
-        "espn_id": "145405",
         "nome": "Léo Pereira",
         "posicao": "Defender",
         "numero": "4",
@@ -3547,7 +3505,6 @@
       },
       {
         "id": "254145",
-        "espn_id": "254145",
         "nome": "Vitão",
         "posicao": "Defender",
         "numero": "44",
@@ -3555,7 +3512,6 @@
       },
       {
         "id": "417653",
-        "espn_id": "417653",
         "nome": "Alan Santos",
         "posicao": "Forward",
         "numero": "59",
@@ -3563,7 +3519,6 @@
       },
       {
         "id": "201683",
-        "espn_id": "201683",
         "nome": "Bruno Henrique",
         "posicao": "Forward",
         "numero": "27",
@@ -3571,7 +3526,6 @@
       },
       {
         "id": "402703",
-        "espn_id": "402703",
         "nome": "Douglas Telles",
         "posicao": "Forward",
         "numero": "81",
@@ -3579,7 +3533,6 @@
       },
       {
         "id": "198940",
-        "espn_id": "198940",
         "nome": "Everton",
         "posicao": "Forward",
         "numero": "11",
@@ -3587,7 +3540,6 @@
       },
       {
         "id": "277352",
-        "espn_id": "277352",
         "nome": "Gonzalo Plata",
         "posicao": "Forward",
         "numero": "19",
@@ -3595,7 +3547,6 @@
       },
       {
         "id": "415443",
-        "espn_id": "415443",
         "nome": "Gustavo Rodrigues Nunes",
         "posicao": "Forward",
         "numero": "66",
@@ -3603,7 +3554,6 @@
       },
       {
         "id": "402708",
-        "espn_id": "402708",
         "nome": "João",
         "posicao": "Forward",
         "numero": "80",
@@ -3611,7 +3561,6 @@
       },
       {
         "id": "414359",
-        "espn_id": "414359",
         "nome": "Josmar",
         "posicao": "Forward",
         "numero": "39",
@@ -3619,7 +3568,6 @@
       },
       {
         "id": "234765",
-        "espn_id": "234765",
         "nome": "Luiz Araújo",
         "posicao": "Forward",
         "numero": "7",
@@ -3627,7 +3575,6 @@
       },
       {
         "id": "235017",
-        "espn_id": "235017",
         "nome": "Pedro",
         "posicao": "Forward",
         "numero": "9",
@@ -3635,7 +3582,6 @@
       },
       {
         "id": "358167",
-        "espn_id": "358167",
         "nome": "Wallace Yan",
         "posicao": "Forward",
         "numero": "64",
@@ -3643,7 +3589,6 @@
       },
       {
         "id": "215388",
-        "espn_id": "215388",
         "nome": "Agustín Rossi",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -3651,7 +3596,6 @@
       },
       {
         "id": "278802",
-        "espn_id": "278802",
         "nome": "Andrew",
         "posicao": "Goalkeeper",
         "numero": "42",
@@ -3659,7 +3603,6 @@
       },
       {
         "id": "343843",
-        "espn_id": "343843",
         "nome": "Dyogo Alves",
         "posicao": "Goalkeeper",
         "numero": "49",
@@ -3667,7 +3610,6 @@
       },
       {
         "id": "415444",
-        "espn_id": "415444",
         "nome": "Gabriel Laizo  Werneck",
         "posicao": "Goalkeeper",
         "numero": "84",
@@ -3675,7 +3617,6 @@
       },
       {
         "id": "399456",
-        "espn_id": "399456",
         "nome": "Leó Nannetti",
         "posicao": "Goalkeeper",
         "numero": "58",
@@ -3683,7 +3624,6 @@
       },
       {
         "id": "202533",
-        "espn_id": "202533",
         "nome": "Erick Pulgar",
         "posicao": "Midfielder",
         "numero": "5",
@@ -3691,7 +3631,6 @@
       },
       {
         "id": "334752",
-        "espn_id": "334752",
         "nome": "Evertton",
         "posicao": "Midfielder",
         "numero": "52",
@@ -3699,7 +3638,6 @@
       },
       {
         "id": "419154",
-        "espn_id": "419154",
         "nome": "Gabriel Amancio",
         "posicao": "Midfielder",
         "numero": "76",
@@ -3707,7 +3645,6 @@
       },
       {
         "id": "179767",
-        "espn_id": "179767",
         "nome": "Giorgian de Arrascaeta",
         "posicao": "Midfielder",
         "numero": "10",
@@ -3715,7 +3652,6 @@
       },
       {
         "id": "379497",
-        "espn_id": "379497",
         "nome": "Guilherme Gomes",
         "posicao": "Midfielder",
         "numero": "47",
@@ -3723,7 +3659,6 @@
       },
       {
         "id": "402709",
-        "espn_id": "402709",
         "nome": "Jhefinho",
         "posicao": "Midfielder",
         "numero": "82",
@@ -3731,7 +3666,6 @@
       },
       {
         "id": "208700",
-        "espn_id": "208700",
         "nome": "Jorge Carrascal",
         "posicao": "Midfielder",
         "numero": "15",
@@ -3739,7 +3673,6 @@
       },
       {
         "id": "165778",
-        "espn_id": "165778",
         "nome": "Jorginho",
         "posicao": "Midfielder",
         "numero": "21",
@@ -3747,7 +3680,6 @@
       },
       {
         "id": "402494",
-        "espn_id": "402494",
         "nome": "Joshua",
         "posicao": "Midfielder",
         "numero": "79",
@@ -3755,7 +3687,6 @@
       },
       {
         "id": "421508",
-        "espn_id": "421508",
         "nome": "Juan Sayago",
         "posicao": "Midfielder",
         "numero": "50",
@@ -3763,7 +3694,6 @@
       },
       {
         "id": "409577",
-        "espn_id": "409577",
         "nome": "Kaio Nóbrega",
         "posicao": "Midfielder",
         "numero": "69",
@@ -3771,7 +3701,6 @@
       },
       {
         "id": "357117",
-        "espn_id": "357117",
         "nome": "Lorran",
         "posicao": "Midfielder",
         "numero": "",
@@ -3779,7 +3708,6 @@
       },
       {
         "id": "234715",
-        "espn_id": "234715",
         "nome": "Lucas Paquetá",
         "posicao": "Midfielder",
         "numero": "20",
@@ -3787,7 +3715,6 @@
       },
       {
         "id": "399720",
-        "espn_id": "399720",
         "nome": "Lucas Santos",
         "posicao": "Midfielder",
         "numero": "72",
@@ -3795,7 +3722,6 @@
       },
       {
         "id": "400275",
-        "espn_id": "400275",
         "nome": "Luiz Felipe",
         "posicao": "Midfielder",
         "numero": "75",
@@ -3803,7 +3729,6 @@
       },
       {
         "id": "251889",
-        "espn_id": "251889",
         "nome": "Nicolás de la Cruz",
         "posicao": "Midfielder",
         "numero": "18",
@@ -3811,7 +3736,6 @@
       },
       {
         "id": "398646",
-        "espn_id": "398646",
         "nome": "Pablo Lucio",
         "posicao": "Midfielder",
         "numero": "56",
@@ -3819,7 +3743,6 @@
       },
       {
         "id": "359450",
-        "espn_id": "359450",
         "nome": "Rayan Lucas",
         "posicao": "Midfielder",
         "numero": "",
@@ -3827,7 +3750,6 @@
       },
       {
         "id": "253937",
-        "espn_id": "253937",
         "nome": "Samuel Lino",
         "posicao": "Midfielder",
         "numero": "16",
@@ -3835,7 +3757,6 @@
       },
       {
         "id": "172269",
-        "espn_id": "172269",
         "nome": "Saúl Ñíguez",
         "posicao": "Midfielder",
         "numero": "8",
@@ -3844,8 +3765,49 @@
     ],
     "Fluminense": [
       {
+        "id": "1",
+        "nome": "Active",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "3445",
+        "nome": "Fluminense",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "398657",
-        "espn_id": "398657",
         "nome": "Breno",
         "posicao": "Defender",
         "numero": "37",
@@ -3853,7 +3815,6 @@
       },
       {
         "id": "398660",
-        "espn_id": "398660",
         "nome": "Davi Schuindt",
         "posicao": "Defender",
         "numero": "40",
@@ -3861,7 +3822,6 @@
       },
       {
         "id": "421388",
-        "espn_id": "421388",
         "nome": "Gorgulho",
         "posicao": "Defender",
         "numero": "33",
@@ -3869,7 +3829,6 @@
       },
       {
         "id": "271557",
-        "espn_id": "271557",
         "nome": "Guga",
         "posicao": "Defender",
         "numero": "23",
@@ -3877,7 +3836,6 @@
       },
       {
         "id": "207269",
-        "espn_id": "207269",
         "nome": "Guilherme Arana",
         "posicao": "Defender",
         "numero": "13",
@@ -3885,7 +3843,6 @@
       },
       {
         "id": "281559",
-        "espn_id": "281559",
         "nome": "Ignácio",
         "posicao": "Defender",
         "numero": "4",
@@ -3893,7 +3850,6 @@
       },
       {
         "id": "212879",
-        "espn_id": "212879",
         "nome": "Igor Rabello",
         "posicao": "Defender",
         "numero": "21",
@@ -3901,7 +3857,6 @@
       },
       {
         "id": "384032",
-        "espn_id": "384032",
         "nome": "Jemmes",
         "posicao": "Defender",
         "numero": "3",
@@ -3909,7 +3864,6 @@
       },
       {
         "id": "276023",
-        "espn_id": "276023",
         "nome": "Juan Freytes",
         "posicao": "Defender",
         "numero": "22",
@@ -3917,7 +3871,6 @@
       },
       {
         "id": "235941",
-        "espn_id": "235941",
         "nome": "Julian Millan",
         "posicao": "Defender",
         "numero": "29",
@@ -3925,7 +3878,6 @@
       },
       {
         "id": "373775",
-        "espn_id": "373775",
         "nome": "Julio Fidelis",
         "posicao": "Defender",
         "numero": "46",
@@ -3933,7 +3885,6 @@
       },
       {
         "id": "398663",
-        "espn_id": "398663",
         "nome": "Kaio Borges",
         "posicao": "Defender",
         "numero": "31",
@@ -3941,7 +3892,6 @@
       },
       {
         "id": "173588",
-        "espn_id": "173588",
         "nome": "René",
         "posicao": "Defender",
         "numero": "6",
@@ -3949,7 +3899,6 @@
       },
       {
         "id": "146162",
-        "espn_id": "146162",
         "nome": "Samuel Xavier",
         "posicao": "Defender",
         "numero": "2",
@@ -3957,7 +3906,6 @@
       },
       {
         "id": "241466",
-        "espn_id": "241466",
         "nome": "Agustín Canobbio",
         "posicao": "Forward",
         "numero": "17",
@@ -3965,7 +3913,6 @@
       },
       {
         "id": "421387",
-        "espn_id": "421387",
         "nome": "Enzo",
         "posicao": "Forward",
         "numero": "49",
@@ -3973,7 +3920,6 @@
       },
       {
         "id": "165749",
-        "espn_id": "165749",
         "nome": "Germán Cano",
         "posicao": "Forward",
         "numero": "14",
@@ -3981,7 +3927,6 @@
       },
       {
         "id": "124068",
-        "espn_id": "124068",
         "nome": "Hulk",
         "posicao": "Forward",
         "numero": "",
@@ -3989,7 +3934,6 @@
       },
       {
         "id": "379485",
-        "espn_id": "379485",
         "nome": "Isack Pelé",
         "posicao": "Forward",
         "numero": "38",
@@ -3997,7 +3941,6 @@
       },
       {
         "id": "177219",
-        "espn_id": "177219",
         "nome": "Jefferson Savarino",
         "posicao": "Forward",
         "numero": "11",
@@ -4005,7 +3948,6 @@
       },
       {
         "id": "357484",
-        "espn_id": "357484",
         "nome": "João Pedro Silverio Lourenco",
         "posicao": "Forward",
         "numero": "42",
@@ -4013,7 +3955,6 @@
       },
       {
         "id": "312741",
-        "espn_id": "312741",
         "nome": "John Kennedy",
         "posicao": "Forward",
         "numero": "9",
@@ -4021,7 +3962,6 @@
       },
       {
         "id": "403162",
-        "espn_id": "403162",
         "nome": "Keven Samuel",
         "posicao": "Forward",
         "numero": "39",
@@ -4029,7 +3969,6 @@
       },
       {
         "id": "287633",
-        "espn_id": "287633",
         "nome": "Kevin Serna",
         "posicao": "Forward",
         "numero": "90",
@@ -4037,7 +3976,6 @@
       },
       {
         "id": "333936",
-        "espn_id": "333936",
         "nome": "Lelê",
         "posicao": "Forward",
         "numero": "",
@@ -4045,7 +3983,6 @@
       },
       {
         "id": "371529",
-        "espn_id": "371529",
         "nome": "Matheus Reis",
         "posicao": "Forward",
         "numero": "15",
@@ -4053,7 +3990,6 @@
       },
       {
         "id": "397260",
-        "espn_id": "397260",
         "nome": "Riquelme",
         "posicao": "Forward",
         "numero": "28",
@@ -4061,7 +3997,6 @@
       },
       {
         "id": "116395",
-        "espn_id": "116395",
         "nome": "Rodrigo Castillo",
         "posicao": "Forward",
         "numero": "19",
@@ -4069,7 +4004,6 @@
       },
       {
         "id": "403159",
-        "espn_id": "403159",
         "nome": "Wesley Natã",
         "posicao": "Forward",
         "numero": "34",
@@ -4077,7 +4011,6 @@
       },
       {
         "id": "194039",
-        "espn_id": "194039",
         "nome": "Yeferson Soteldo",
         "posicao": "Forward",
         "numero": "7",
@@ -4085,7 +4018,6 @@
       },
       {
         "id": "421386",
-        "espn_id": "421386",
         "nome": "Antônio Carlos",
         "posicao": "Goalkeeper",
         "numero": "24",
@@ -4093,7 +4025,6 @@
       },
       {
         "id": "158382",
-        "espn_id": "158382",
         "nome": "Fábio",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -4101,7 +4032,6 @@
       },
       {
         "id": "398661",
-        "espn_id": "398661",
         "nome": "Gustavo Felix",
         "posicao": "Goalkeeper",
         "numero": "50",
@@ -4109,7 +4039,6 @@
       },
       {
         "id": "315456",
-        "espn_id": "315456",
         "nome": "Gustavo Ramalho",
         "posicao": "Goalkeeper",
         "numero": "",
@@ -4117,7 +4046,6 @@
       },
       {
         "id": "269546",
-        "espn_id": "269546",
         "nome": "Marcelo Pitaluga",
         "posicao": "Goalkeeper",
         "numero": "27",
@@ -4125,7 +4053,6 @@
       },
       {
         "id": "255327",
-        "espn_id": "255327",
         "nome": "Vitor Eudes",
         "posicao": "Goalkeeper",
         "numero": "98",
@@ -4133,7 +4060,6 @@
       },
       {
         "id": "358065",
-        "espn_id": "358065",
         "nome": "Agner",
         "posicao": "Midfielder",
         "numero": "43",
@@ -4141,7 +4067,6 @@
       },
       {
         "id": "199012",
-        "espn_id": "199012",
         "nome": "Alisson",
         "posicao": "Midfielder",
         "numero": "25",
@@ -4149,7 +4074,6 @@
       },
       {
         "id": "207912",
-        "espn_id": "207912",
         "nome": "David Terans",
         "posicao": "Midfielder",
         "numero": "80",
@@ -4157,7 +4081,6 @@
       },
       {
         "id": "359912",
-        "espn_id": "359912",
         "nome": "Facundo Bernal",
         "posicao": "Midfielder",
         "numero": "5",
@@ -4165,7 +4088,6 @@
       },
       {
         "id": "175902",
-        "espn_id": "175902",
         "nome": "Ganso",
         "posicao": "Midfielder",
         "numero": "10",
@@ -4173,7 +4095,6 @@
       },
       {
         "id": "336622",
-        "espn_id": "336622",
         "nome": "Hércules",
         "posicao": "Midfielder",
         "numero": "35",
@@ -4181,7 +4102,6 @@
       },
       {
         "id": "199958",
-        "espn_id": "199958",
         "nome": "Luciano Acosta",
         "posicao": "Midfielder",
         "numero": "32",
@@ -4189,7 +4109,6 @@
       },
       {
         "id": "307946",
-        "espn_id": "307946",
         "nome": "Martinelli",
         "posicao": "Midfielder",
         "numero": "8",
@@ -4197,7 +4116,6 @@
       },
       {
         "id": "404205",
-        "espn_id": "404205",
         "nome": "Naarã",
         "posicao": "Midfielder",
         "numero": "58",
@@ -4205,7 +4123,6 @@
       },
       {
         "id": "238342",
-        "espn_id": "238342",
         "nome": "Nonato",
         "posicao": "Midfielder",
         "numero": "16",
@@ -4213,7 +4130,6 @@
       },
       {
         "id": "201547",
-        "espn_id": "201547",
         "nome": "Otávio",
         "posicao": "Midfielder",
         "numero": "94",
@@ -4221,7 +4137,6 @@
       },
       {
         "id": "421389",
-        "espn_id": "421389",
         "nome": "Paulo Guilherme",
         "posicao": "Midfielder",
         "numero": "47",
@@ -4229,7 +4144,6 @@
       },
       {
         "id": "421385",
-        "espn_id": "421385",
         "nome": "Peter",
         "posicao": "Midfielder",
         "numero": "48",
@@ -4237,7 +4151,6 @@
       },
       {
         "id": "421390",
-        "espn_id": "421390",
         "nome": "Ruan Sales",
         "posicao": "Midfielder",
         "numero": "51",
@@ -4245,7 +4158,6 @@
       },
       {
         "id": "403160",
-        "espn_id": "403160",
         "nome": "Vagno",
         "posicao": "Midfielder",
         "numero": "36",
@@ -4254,8 +4166,49 @@
     ],
     "Grêmio": [
       {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "6273",
+        "nome": "Grêmio",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "95558",
-        "espn_id": "95558",
         "nome": "Caio Paulista",
         "posicao": "Defender",
         "numero": "38",
@@ -4263,7 +4216,6 @@
       },
       {
         "id": "421526",
-        "espn_id": "421526",
         "nome": "Emanuel Mariano",
         "posicao": "Defender",
         "numero": "58",
@@ -4271,7 +4223,6 @@
       },
       {
         "id": "199101",
-        "espn_id": "199101",
         "nome": "Fabián Balbuena",
         "posicao": "Defender",
         "numero": "2",
@@ -4279,7 +4230,6 @@
       },
       {
         "id": "314603",
-        "espn_id": "314603",
         "nome": "Gustavo Martins",
         "posicao": "Defender",
         "numero": "53",
@@ -4287,7 +4237,6 @@
       },
       {
         "id": "213260",
-        "espn_id": "213260",
         "nome": "João Pedro",
         "posicao": "Defender",
         "numero": "18",
@@ -4295,7 +4244,6 @@
       },
       {
         "id": "400263",
-        "espn_id": "400263",
         "nome": "Luis Eduardo",
         "posicao": "Defender",
         "numero": "43",
@@ -4303,7 +4251,6 @@
       },
       {
         "id": "185994",
-        "espn_id": "185994",
         "nome": "Marcos Rocha",
         "posicao": "Defender",
         "numero": "14",
@@ -4311,7 +4258,6 @@
       },
       {
         "id": "229121",
-        "espn_id": "229121",
         "nome": "Marlon",
         "posicao": "Defender",
         "numero": "23",
@@ -4319,7 +4265,6 @@
       },
       {
         "id": "399092",
-        "espn_id": "399092",
         "nome": "Pedro Gabriel",
         "posicao": "Defender",
         "numero": "54",
@@ -4327,7 +4272,6 @@
       },
       {
         "id": "421523",
-        "espn_id": "421523",
         "nome": "Vagner",
         "posicao": "Defender",
         "numero": "52",
@@ -4335,7 +4279,6 @@
       },
       {
         "id": "402662",
-        "espn_id": "402662",
         "nome": "Vitor Ramon",
         "posicao": "Defender",
         "numero": "32",
@@ -4343,7 +4286,6 @@
       },
       {
         "id": "286201",
-        "espn_id": "286201",
         "nome": "Wagner Leonardo",
         "posicao": "Defender",
         "numero": "3",
@@ -4351,7 +4293,6 @@
       },
       {
         "id": "146109",
-        "espn_id": "146109",
         "nome": "Wálter Kannemann",
         "posicao": "Defender",
         "numero": "4",
@@ -4359,7 +4300,6 @@
       },
       {
         "id": "402657",
-        "espn_id": "402657",
         "nome": "Arnaldo",
         "posicao": "Forward",
         "numero": "63",
@@ -4367,7 +4307,6 @@
       },
       {
         "id": "421525",
-        "espn_id": "421525",
         "nome": "Benjamin",
         "posicao": "Forward",
         "numero": "57",
@@ -4375,7 +4314,6 @@
       },
       {
         "id": "252576",
-        "espn_id": "252576",
         "nome": "Carlos Vinícius",
         "posicao": "Forward",
         "numero": "95",
@@ -4383,7 +4321,6 @@
       },
       {
         "id": "24388",
-        "espn_id": "24388",
         "nome": "Cristian Pavón",
         "posicao": "Forward",
         "numero": "7",
@@ -4391,7 +4328,6 @@
       },
       {
         "id": "421530",
-        "espn_id": "421530",
         "nome": "Fellipe Magalhães",
         "posicao": "Forward",
         "numero": "62",
@@ -4399,7 +4335,6 @@
       },
       {
         "id": "269079",
-        "espn_id": "269079",
         "nome": "Francis Amuzu",
         "posicao": "Forward",
         "numero": "9",
@@ -4407,7 +4342,6 @@
       },
       {
         "id": "399421",
-        "espn_id": "399421",
         "nome": "Gabriel Mec",
         "posicao": "Forward",
         "numero": "37",
@@ -4415,7 +4349,6 @@
       },
       {
         "id": "286714",
-        "espn_id": "286714",
         "nome": "José Enamorado",
         "posicao": "Forward",
         "numero": "99",
@@ -4423,7 +4356,6 @@
       },
       {
         "id": "421522",
-        "espn_id": "421522",
         "nome": "Lucca",
         "posicao": "Forward",
         "numero": "49",
@@ -4431,7 +4363,6 @@
       },
       {
         "id": "187100",
-        "espn_id": "187100",
         "nome": "Martin Braithwaite",
         "posicao": "Forward",
         "numero": "22",
@@ -4439,7 +4370,6 @@
       },
       {
         "id": "287664",
-        "espn_id": "287664",
         "nome": "Mateus Tetê",
         "posicao": "Forward",
         "numero": "21",
@@ -4447,7 +4377,6 @@
       },
       {
         "id": "315681",
-        "espn_id": "315681",
         "nome": "Adriel",
         "posicao": "Goalkeeper",
         "numero": "",
@@ -4455,7 +4384,6 @@
       },
       {
         "id": "317014",
-        "espn_id": "317014",
         "nome": "Gabriel Grando",
         "posicao": "Goalkeeper",
         "numero": "12",
@@ -4463,7 +4391,6 @@
       },
       {
         "id": "417483",
-        "espn_id": "417483",
         "nome": "Gabriel Menegon",
         "posicao": "Goalkeeper",
         "numero": "31",
@@ -4471,7 +4398,6 @@
       },
       {
         "id": "402659",
-        "espn_id": "402659",
         "nome": "João Victor Castelo",
         "posicao": "Goalkeeper",
         "numero": "51",
@@ -4479,7 +4405,6 @@
       },
       {
         "id": "379334",
-        "espn_id": "379334",
         "nome": "Thiago Stallbaum",
         "posicao": "Goalkeeper",
         "numero": "24",
@@ -4487,7 +4412,6 @@
       },
       {
         "id": "198983",
-        "espn_id": "198983",
         "nome": "Weverton",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -4495,7 +4419,6 @@
       },
       {
         "id": "421531",
-        "espn_id": "421531",
         "nome": "Adrielson",
         "posicao": "Midfielder",
         "numero": "64",
@@ -4503,7 +4426,6 @@
       },
       {
         "id": "421528",
-        "espn_id": "421528",
         "nome": "Artur Junior",
         "posicao": "Midfielder",
         "numero": "60",
@@ -4511,7 +4433,6 @@
       },
       {
         "id": "400264",
-        "espn_id": "400264",
         "nome": "Bernardo Zortea",
         "posicao": "Midfielder",
         "numero": "50",
@@ -4519,7 +4440,6 @@
       },
       {
         "id": "421524",
-        "espn_id": "421524",
         "nome": "Danillo",
         "posicao": "Midfielder",
         "numero": "55",
@@ -4527,7 +4447,6 @@
       },
       {
         "id": "213879",
-        "espn_id": "213879",
         "nome": "Dodi",
         "posicao": "Midfielder",
         "numero": "17",
@@ -4535,7 +4454,6 @@
       },
       {
         "id": "303030",
-        "espn_id": "303030",
         "nome": "Erick Noriega",
         "posicao": "Midfielder",
         "numero": "19",
@@ -4543,7 +4461,6 @@
       },
       {
         "id": "421527",
-        "espn_id": "421527",
         "nome": "Harlley",
         "posicao": "Midfielder",
         "numero": "59",
@@ -4551,7 +4468,6 @@
       },
       {
         "id": "417484",
-        "espn_id": "417484",
         "nome": "Jeferson Forneck",
         "posicao": "Midfielder",
         "numero": "40",
@@ -4559,7 +4475,6 @@
       },
       {
         "id": "421521",
-        "espn_id": "421521",
         "nome": "João Borne",
         "posicao": "Midfielder",
         "numero": "48",
@@ -4567,7 +4482,6 @@
       },
       {
         "id": "290594",
-        "espn_id": "290594",
         "nome": "Juan Nardoni",
         "posicao": "Midfielder",
         "numero": "5",
@@ -4575,7 +4489,6 @@
       },
       {
         "id": "421529",
-        "espn_id": "421529",
         "nome": "Lago Menezes",
         "posicao": "Midfielder",
         "numero": "61",
@@ -4583,7 +4496,6 @@
       },
       {
         "id": "359439",
-        "espn_id": "359439",
         "nome": "Leonel Pérez",
         "posicao": "Midfielder",
         "numero": "33",
@@ -4591,7 +4503,6 @@
       },
       {
         "id": "238449",
-        "espn_id": "238449",
         "nome": "Mathías Villasanti",
         "posicao": "Midfielder",
         "numero": "20",
@@ -4599,7 +4510,6 @@
       },
       {
         "id": "307659",
-        "espn_id": "307659",
         "nome": "Miguel Monsalve",
         "posicao": "Midfielder",
         "numero": "11",
@@ -4607,7 +4517,6 @@
       },
       {
         "id": "380443",
-        "espn_id": "380443",
         "nome": "Riquelme Freitas",
         "posicao": "Midfielder",
         "numero": "65",
@@ -4615,7 +4524,6 @@
       },
       {
         "id": "417485",
-        "espn_id": "417485",
         "nome": "Roger",
         "posicao": "Midfielder",
         "numero": "47",
@@ -4623,7 +4531,6 @@
       },
       {
         "id": "397420",
-        "espn_id": "397420",
         "nome": "Tiaguinho",
         "posicao": "Midfielder",
         "numero": "39",
@@ -4631,7 +4538,6 @@
       },
       {
         "id": "178487",
-        "espn_id": "178487",
         "nome": "Willian",
         "posicao": "Midfielder",
         "numero": "88",
@@ -4640,8 +4546,49 @@
     ],
     "Internacional": [
       {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1936",
+        "nome": "Internacional",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "285029",
-        "espn_id": "285029",
         "nome": "Alexander Bernabei",
         "posicao": "Defender",
         "numero": "26",
@@ -4649,7 +4596,6 @@
       },
       {
         "id": "412558",
-        "espn_id": "412558",
         "nome": "Alisson",
         "posicao": "Defender",
         "numero": "30",
@@ -4657,7 +4603,6 @@
       },
       {
         "id": "351447",
-        "espn_id": "351447",
         "nome": "Clayton",
         "posicao": "Defender",
         "numero": "20",
@@ -4665,7 +4610,6 @@
       },
       {
         "id": "417351",
-        "espn_id": "417351",
         "nome": "Denis Marfo",
         "posicao": "Defender",
         "numero": "43",
@@ -4673,7 +4617,6 @@
       },
       {
         "id": "251963",
-        "espn_id": "251963",
         "nome": "Félix Torres",
         "posicao": "Defender",
         "numero": "4",
@@ -4681,7 +4624,6 @@
       },
       {
         "id": "76818",
-        "espn_id": "76818",
         "nome": "Gabriel Mercado",
         "posicao": "Defender",
         "numero": "25",
@@ -4689,7 +4631,6 @@
       },
       {
         "id": "222664",
-        "espn_id": "222664",
         "nome": "Juninho",
         "posicao": "Defender",
         "numero": "18",
@@ -4697,7 +4638,6 @@
       },
       {
         "id": "422157",
-        "espn_id": "422157",
         "nome": "Luiz Felipe De Morais Francisco",
         "posicao": "Defender",
         "numero": "53",
@@ -4705,7 +4645,6 @@
       },
       {
         "id": "304656",
-        "espn_id": "304656",
         "nome": "Matheus Bahia",
         "posicao": "Defender",
         "numero": "6",
@@ -4713,7 +4652,6 @@
       },
       {
         "id": "382898",
-        "espn_id": "382898",
         "nome": "Pedro Kauã",
         "posicao": "Defender",
         "numero": "46",
@@ -4721,7 +4659,6 @@
       },
       {
         "id": "319790",
-        "espn_id": "319790",
         "nome": "Victor Gabriel",
         "posicao": "Defender",
         "numero": "41",
@@ -4729,7 +4666,6 @@
       },
       {
         "id": "270260",
-        "espn_id": "270260",
         "nome": "Alerrando",
         "posicao": "Forward",
         "numero": "9",
@@ -4737,7 +4673,6 @@
       },
       {
         "id": "309131",
-        "espn_id": "309131",
         "nome": "Brian Aguirre",
         "posicao": "Forward",
         "numero": "35",
@@ -4745,7 +4680,6 @@
       },
       {
         "id": "260059",
-        "espn_id": "260059",
         "nome": "Bruno Tabata",
         "posicao": "Forward",
         "numero": "17",
@@ -4753,7 +4687,6 @@
       },
       {
         "id": "422159",
-        "espn_id": "422159",
         "nome": "Fabricio Prado",
         "posicao": "Forward",
         "numero": "54",
@@ -4761,7 +4694,6 @@
       },
       {
         "id": "417352",
-        "espn_id": "417352",
         "nome": "João Bezerra",
         "posicao": "Forward",
         "numero": "49",
@@ -4769,7 +4701,6 @@
       },
       {
         "id": "401055",
-        "espn_id": "401055",
         "nome": "João Victor",
         "posicao": "Forward",
         "numero": "44",
@@ -4777,7 +4708,6 @@
       },
       {
         "id": "270246",
-        "espn_id": "270246",
         "nome": "Johan Carbonero",
         "posicao": "Forward",
         "numero": "7",
@@ -4785,7 +4715,6 @@
       },
       {
         "id": "314846",
-        "espn_id": "314846",
         "nome": "Kayky Chagas",
         "posicao": "Forward",
         "numero": "11",
@@ -4793,7 +4722,6 @@
       },
       {
         "id": "197052",
-        "espn_id": "197052",
         "nome": "Rafael Borré",
         "posicao": "Forward",
         "numero": "19",
@@ -4801,7 +4729,6 @@
       },
       {
         "id": "403283",
-        "espn_id": "403283",
         "nome": "Raykkonen",
         "posicao": "Forward",
         "numero": "48",
@@ -4809,7 +4736,6 @@
       },
       {
         "id": "382900",
-        "espn_id": "382900",
         "nome": "Yago",
         "posicao": "Forward",
         "numero": "37",
@@ -4817,7 +4743,6 @@
       },
       {
         "id": "315428",
-        "espn_id": "315428",
         "nome": "Anthoni",
         "posicao": "Goalkeeper",
         "numero": "24",
@@ -4825,7 +4750,6 @@
       },
       {
         "id": "379787",
-        "espn_id": "379787",
         "nome": "Diego Esser",
         "posicao": "Goalkeeper",
         "numero": "32",
@@ -4833,7 +4757,6 @@
       },
       {
         "id": "361392",
-        "espn_id": "361392",
         "nome": "Kauan",
         "posicao": "Goalkeeper",
         "numero": "22",
@@ -4841,7 +4764,6 @@
       },
       {
         "id": "184206",
-        "espn_id": "184206",
         "nome": "Sergio Rochet",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -4849,7 +4771,6 @@
       },
       {
         "id": "165232",
-        "espn_id": "165232",
         "nome": "Alan Patrick",
         "posicao": "Midfielder",
         "numero": "10",
@@ -4857,7 +4778,6 @@
       },
       {
         "id": "363477",
-        "espn_id": "363477",
         "nome": "Alan Rodríguez",
         "posicao": "Midfielder",
         "numero": "14",
@@ -4865,7 +4785,6 @@
       },
       {
         "id": "361374",
-        "espn_id": "361374",
         "nome": "Allex",
         "posicao": "Midfielder",
         "numero": "31",
@@ -4873,7 +4792,6 @@
       },
       {
         "id": "413248",
-        "espn_id": "413248",
         "nome": "Benjamin Arhin",
         "posicao": "Midfielder",
         "numero": "33",
@@ -4881,7 +4799,6 @@
       },
       {
         "id": "295006",
-        "espn_id": "295006",
         "nome": "Bruno Gomes",
         "posicao": "Midfielder",
         "numero": "15",
@@ -4889,7 +4806,6 @@
       },
       {
         "id": "188485",
-        "espn_id": "188485",
         "nome": "Bruno Henrique",
         "posicao": "Midfielder",
         "numero": "8",
@@ -4897,7 +4813,6 @@
       },
       {
         "id": "422158",
-        "espn_id": "422158",
         "nome": "Gabriel Vinicius Oliveira Da Silva",
         "posicao": "Midfielder",
         "numero": "52",
@@ -4905,7 +4820,6 @@
       },
       {
         "id": "417353",
-        "espn_id": "417353",
         "nome": "João Kempes",
         "posicao": "Midfielder",
         "numero": "51",
@@ -4913,7 +4827,6 @@
       },
       {
         "id": "402688",
-        "espn_id": "402688",
         "nome": "Kauan Alves",
         "posicao": "Midfielder",
         "numero": "50",
@@ -4921,7 +4834,6 @@
       },
       {
         "id": "289499",
-        "espn_id": "289499",
         "nome": "Paulinho",
         "posicao": "Midfielder",
         "numero": "27",
@@ -4929,7 +4841,6 @@
       },
       {
         "id": "198346",
-        "espn_id": "198346",
         "nome": "Richard",
         "posicao": "Midfielder",
         "numero": "36",
@@ -4937,7 +4848,6 @@
       },
       {
         "id": "286704",
-        "espn_id": "286704",
         "nome": "Rodrigo Villagra",
         "posicao": "Midfielder",
         "numero": "5",
@@ -4945,7 +4855,6 @@
       },
       {
         "id": "229574",
-        "espn_id": "229574",
         "nome": "Ronaldo",
         "posicao": "Midfielder",
         "numero": "16",
@@ -4953,7 +4862,6 @@
       },
       {
         "id": "213239",
-        "espn_id": "213239",
         "nome": "Thiago Maia",
         "posicao": "Midfielder",
         "numero": "29",
@@ -4962,8 +4870,49 @@
     ],
     "Mirassol": [
       {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "9169",
+        "nome": "Mirassol",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "418795",
-        "espn_id": "418795",
         "nome": "Cauã Victor Soares Da Silva",
         "posicao": "Defender",
         "numero": "45",
@@ -4971,7 +4920,6 @@
       },
       {
         "id": "156502",
-        "espn_id": "156502",
         "nome": "Daniel Borges",
         "posicao": "Defender",
         "numero": "20",
@@ -4979,7 +4927,6 @@
       },
       {
         "id": "73678",
-        "espn_id": "73678",
         "nome": "Gabriel",
         "posicao": "Defender",
         "numero": "46",
@@ -4987,7 +4934,6 @@
       },
       {
         "id": "299967",
-        "espn_id": "299967",
         "nome": "Igor Marques",
         "posicao": "Defender",
         "numero": "32",
@@ -4995,7 +4941,6 @@
       },
       {
         "id": "250899",
-        "espn_id": "250899",
         "nome": "João Victor Carroll",
         "posicao": "Defender",
         "numero": "34",
@@ -5003,7 +4948,6 @@
       },
       {
         "id": "233888",
-        "espn_id": "233888",
         "nome": "Lucas Oliveira",
         "posicao": "Defender",
         "numero": "2",
@@ -5011,7 +4955,6 @@
       },
       {
         "id": "418509",
-        "espn_id": "418509",
         "nome": "Luiz Fernando",
         "posicao": "Defender",
         "numero": "35",
@@ -5019,7 +4962,6 @@
       },
       {
         "id": "418796",
-        "espn_id": "418796",
         "nome": "Marcelo Barbosa De Santos",
         "posicao": "Defender",
         "numero": "53",
@@ -5027,7 +4969,6 @@
       },
       {
         "id": "115379",
-        "espn_id": "115379",
         "nome": "Reinaldo",
         "posicao": "Defender",
         "numero": "6",
@@ -5035,7 +4976,6 @@
       },
       {
         "id": "236882",
-        "espn_id": "236882",
         "nome": "Rodrigues",
         "posicao": "Defender",
         "numero": "97",
@@ -5043,7 +4983,6 @@
       },
       {
         "id": "198108",
-        "espn_id": "198108",
         "nome": "Victor Luis",
         "posicao": "Defender",
         "numero": "12",
@@ -5051,7 +4990,6 @@
       },
       {
         "id": "270797",
-        "espn_id": "270797",
         "nome": "Willian Machado",
         "posicao": "Defender",
         "numero": "3",
@@ -5059,7 +4997,6 @@
       },
       {
         "id": "250388",
-        "espn_id": "250388",
         "nome": "Alesson",
         "posicao": "Forward",
         "numero": "77",
@@ -5067,7 +5004,6 @@
       },
       {
         "id": "205448",
-        "espn_id": "205448",
         "nome": "André Luis",
         "posicao": "Forward",
         "numero": "99",
@@ -5075,7 +5011,6 @@
       },
       {
         "id": "254464",
-        "espn_id": "254464",
         "nome": "Antonio Galeano",
         "posicao": "Forward",
         "numero": "27",
@@ -5083,7 +5018,6 @@
       },
       {
         "id": "218974",
-        "espn_id": "218974",
         "nome": "Carlos Eduardo",
         "posicao": "Forward",
         "numero": "96",
@@ -5091,7 +5025,6 @@
       },
       {
         "id": "94310",
-        "espn_id": "94310",
         "nome": "Edson Carioca",
         "posicao": "Forward",
         "numero": "95",
@@ -5099,7 +5032,6 @@
       },
       {
         "id": "214192",
-        "espn_id": "214192",
         "nome": "Everton",
         "posicao": "Forward",
         "numero": "17",
@@ -5107,7 +5039,6 @@
       },
       {
         "id": "421444",
-        "espn_id": "421444",
         "nome": "Felipe Pereira dos",
         "posicao": "Forward",
         "numero": "48",
@@ -5115,7 +5046,6 @@
       },
       {
         "id": "421446",
-        "espn_id": "421446",
         "nome": "Glaucon",
         "posicao": "Forward",
         "numero": "",
@@ -5123,7 +5053,6 @@
       },
       {
         "id": "273399",
-        "espn_id": "273399",
         "nome": "Nathan Fogaça",
         "posicao": "Forward",
         "numero": "9",
@@ -5131,7 +5060,6 @@
       },
       {
         "id": "153646",
-        "espn_id": "153646",
         "nome": "Negueba",
         "posicao": "Forward",
         "numero": "11",
@@ -5139,7 +5067,6 @@
       },
       {
         "id": "202374",
-        "espn_id": "202374",
         "nome": "Tiquinho Soares",
         "posicao": "Forward",
         "numero": "29",
@@ -5147,7 +5074,6 @@
       },
       {
         "id": "418797",
-        "espn_id": "418797",
         "nome": "Vinicius Bacchi De Castro",
         "posicao": "Forward",
         "numero": "47",
@@ -5155,7 +5081,6 @@
       },
       {
         "id": "204095",
-        "espn_id": "204095",
         "nome": "Alex Muralha",
         "posicao": "Goalkeeper",
         "numero": "23",
@@ -5163,7 +5088,6 @@
       },
       {
         "id": "199011",
-        "espn_id": "199011",
         "nome": "Georgemy",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -5171,7 +5095,6 @@
       },
       {
         "id": "203754",
-        "espn_id": "203754",
         "nome": "Thomazella",
         "posicao": "Goalkeeper",
         "numero": "90",
@@ -5179,7 +5102,6 @@
       },
       {
         "id": "196851",
-        "espn_id": "196851",
         "nome": "Walter",
         "posicao": "Goalkeeper",
         "numero": "22",
@@ -5187,7 +5109,6 @@
       },
       {
         "id": "174782",
-        "espn_id": "174782",
         "nome": "Carlos Eduardo",
         "posicao": "Midfielder",
         "numero": "33",
@@ -5195,7 +5116,6 @@
       },
       {
         "id": "198273",
-        "espn_id": "198273",
         "nome": "Chico",
         "posicao": "Midfielder",
         "numero": "10",
@@ -5203,7 +5123,6 @@
       },
       {
         "id": "325101",
-        "espn_id": "325101",
         "nome": "Denilson",
         "posicao": "Midfielder",
         "numero": "8",
@@ -5211,7 +5130,6 @@
       },
       {
         "id": "155466",
-        "espn_id": "155466",
         "nome": "Gabriel",
         "posicao": "Midfielder",
         "numero": "18",
@@ -5219,7 +5137,6 @@
       },
       {
         "id": "421445",
-        "espn_id": "421445",
         "nome": "Giovanni Pacheco",
         "posicao": "Midfielder",
         "numero": "",
@@ -5227,7 +5144,6 @@
       },
       {
         "id": "290092",
-        "espn_id": "290092",
         "nome": "José Aldo",
         "posicao": "Midfielder",
         "numero": "21",
@@ -5235,7 +5151,6 @@
       },
       {
         "id": "203715",
-        "espn_id": "203715",
         "nome": "Neto Moura",
         "posicao": "Midfielder",
         "numero": "25",
@@ -5243,7 +5158,6 @@
       },
       {
         "id": "252610",
-        "espn_id": "252610",
         "nome": "Shaylon",
         "posicao": "Midfielder",
         "numero": "7",
@@ -5252,8 +5166,49 @@
     ],
     "Palmeiras": [
       {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2029",
+        "nome": "Palmeiras",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "315619",
-        "espn_id": "315619",
         "nome": "Agustín Giay",
         "posicao": "Defender",
         "numero": "4",
@@ -5261,7 +5216,6 @@
       },
       {
         "id": "421503",
-        "espn_id": "421503",
         "nome": "André Lucas",
         "posicao": "Defender",
         "numero": "66",
@@ -5269,7 +5223,6 @@
       },
       {
         "id": "382965",
-        "espn_id": "382965",
         "nome": "Arthur Gabriel",
         "posicao": "Defender",
         "numero": "56",
@@ -5277,7 +5230,6 @@
       },
       {
         "id": "257050",
-        "espn_id": "257050",
         "nome": "Bruno Fuchs",
         "posicao": "Defender",
         "numero": "3",
@@ -5285,7 +5237,6 @@
       },
       {
         "id": "413749",
-        "espn_id": "413749",
         "nome": "Derick",
         "posicao": "Defender",
         "numero": "46",
@@ -5293,7 +5244,6 @@
       },
       {
         "id": "118395",
-        "espn_id": "118395",
         "nome": "Gustavo Gómez",
         "posicao": "Defender",
         "numero": "15",
@@ -5301,7 +5251,6 @@
       },
       {
         "id": "318136",
-        "espn_id": "318136",
         "nome": "Jefté",
         "posicao": "Defender",
         "numero": "6",
@@ -5309,7 +5258,6 @@
       },
       {
         "id": "254007",
-        "espn_id": "254007",
         "nome": "Joaquín Piquerez",
         "posicao": "Defender",
         "numero": "22",
@@ -5317,7 +5265,6 @@
       },
       {
         "id": "332351",
-        "espn_id": "332351",
         "nome": "Kaiky Naves",
         "posicao": "Defender",
         "numero": "",
@@ -5325,7 +5272,6 @@
       },
       {
         "id": "288669",
-        "espn_id": "288669",
         "nome": "Khellven",
         "posicao": "Defender",
         "numero": "12",
@@ -5333,7 +5279,6 @@
       },
       {
         "id": "413761",
-        "espn_id": "413761",
         "nome": "Luccas Ramon",
         "posicao": "Defender",
         "numero": "53",
@@ -5341,7 +5286,6 @@
       },
       {
         "id": "421486",
-        "espn_id": "421486",
         "nome": "Luis Saboia",
         "posicao": "Defender",
         "numero": "52",
@@ -5349,7 +5293,6 @@
       },
       {
         "id": "361457",
-        "espn_id": "361457",
         "nome": "Luiz Benedetti",
         "posicao": "Defender",
         "numero": "43",
@@ -5357,7 +5300,6 @@
       },
       {
         "id": "421487",
-        "espn_id": "421487",
         "nome": "Mohamed Kone",
         "posicao": "Defender",
         "numero": "44",
@@ -5365,7 +5307,6 @@
       },
       {
         "id": "252609",
-        "espn_id": "252609",
         "nome": "Murilo",
         "posicao": "Defender",
         "numero": "26",
@@ -5373,7 +5314,6 @@
       },
       {
         "id": "402698",
-        "espn_id": "402698",
         "nome": "Thiago Soares",
         "posicao": "Defender",
         "numero": "54",
@@ -5381,7 +5321,6 @@
       },
       {
         "id": "382966",
-        "espn_id": "382966",
         "nome": "Allan Andrade",
         "posicao": "Forward",
         "numero": "40",
@@ -5389,7 +5328,6 @@
       },
       {
         "id": "421488",
-        "espn_id": "421488",
         "nome": "Eduardo",
         "posicao": "Forward",
         "numero": "41",
@@ -5397,7 +5335,6 @@
       },
       {
         "id": "412292",
-        "espn_id": "412292",
         "nome": "Heittor",
         "posicao": "Forward",
         "numero": "39",
@@ -5405,7 +5342,6 @@
       },
       {
         "id": "311743",
-        "espn_id": "311743",
         "nome": "José Manuel López",
         "posicao": "Forward",
         "numero": "42",
@@ -5413,7 +5349,6 @@
       },
       {
         "id": "421498",
-        "espn_id": "421498",
         "nome": "Juan Gabriel",
         "posicao": "Forward",
         "numero": "49",
@@ -5421,7 +5356,6 @@
       },
       {
         "id": "387779",
-        "espn_id": "387779",
         "nome": "Juliano Viana Papille",
         "posicao": "Forward",
         "numero": "59",
@@ -5429,7 +5363,6 @@
       },
       {
         "id": "421538",
-        "espn_id": "421538",
         "nome": "Kauã",
         "posicao": "Forward",
         "numero": "61",
@@ -5437,7 +5370,6 @@
       },
       {
         "id": "376480",
-        "espn_id": "376480",
         "nome": "Luighi Hanri",
         "posicao": "Forward",
         "numero": "31",
@@ -5445,7 +5377,6 @@
       },
       {
         "id": "258271",
-        "espn_id": "258271",
         "nome": "Paulinho",
         "posicao": "Forward",
         "numero": "10",
@@ -5453,7 +5384,6 @@
       },
       {
         "id": "301653",
-        "espn_id": "301653",
         "nome": "Ramón Sosa",
         "posicao": "Forward",
         "numero": "19",
@@ -5461,7 +5391,6 @@
       },
       {
         "id": "361433",
-        "espn_id": "361433",
         "nome": "Riquelme",
         "posicao": "Forward",
         "numero": "37",
@@ -5469,7 +5398,6 @@
       },
       {
         "id": "329383",
-        "espn_id": "329383",
         "nome": "Vitor Roque",
         "posicao": "Forward",
         "numero": "9",
@@ -5477,7 +5405,6 @@
       },
       {
         "id": "276741",
-        "espn_id": "276741",
         "nome": "Carlos Miguel",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -5485,7 +5412,6 @@
       },
       {
         "id": "332352",
-        "espn_id": "332352",
         "nome": "Kaique",
         "posicao": "Goalkeeper",
         "numero": "",
@@ -5493,7 +5419,6 @@
       },
       {
         "id": "412904",
-        "espn_id": "412904",
         "nome": "Kauan Lima",
         "posicao": "Goalkeeper",
         "numero": "72",
@@ -5501,7 +5426,6 @@
       },
       {
         "id": "402694",
-        "espn_id": "402694",
         "nome": "Luiz Felipe",
         "posicao": "Goalkeeper",
         "numero": "51",
@@ -5509,7 +5433,6 @@
       },
       {
         "id": "421505",
-        "espn_id": "421505",
         "nome": "Luiz Fernando",
         "posicao": "Goalkeeper",
         "numero": "73",
@@ -5517,7 +5440,6 @@
       },
       {
         "id": "201622",
-        "espn_id": "201622",
         "nome": "Marcelo Lomba",
         "posicao": "Goalkeeper",
         "numero": "14",
@@ -5525,7 +5447,6 @@
       },
       {
         "id": "210143",
-        "espn_id": "210143",
         "nome": "Andreas Pereira",
         "posicao": "Midfielder",
         "numero": "8",
@@ -5533,7 +5454,6 @@
       },
       {
         "id": "109962",
-        "espn_id": "109962",
         "nome": "Emiliano Martínez",
         "posicao": "Midfielder",
         "numero": "32",
@@ -5541,7 +5461,6 @@
       },
       {
         "id": "402695",
-        "espn_id": "402695",
         "nome": "Erick Machado",
         "posicao": "Midfielder",
         "numero": "45",
@@ -5549,7 +5468,6 @@
       },
       {
         "id": "152812",
-        "espn_id": "152812",
         "nome": "Felipe Anderson",
         "posicao": "Midfielder",
         "numero": "7",
@@ -5557,7 +5475,6 @@
       },
       {
         "id": "408185",
-        "espn_id": "408185",
         "nome": "Guilherme Nogueira",
         "posicao": "Midfielder",
         "numero": "60",
@@ -5565,7 +5482,6 @@
       },
       {
         "id": "421506",
-        "espn_id": "421506",
         "nome": "Isaac",
         "posicao": "Midfielder",
         "numero": "55",
@@ -5573,7 +5489,6 @@
       },
       {
         "id": "239566",
-        "espn_id": "239566",
         "nome": "Jhon Arias",
         "posicao": "Midfielder",
         "numero": "11",
@@ -5581,7 +5496,6 @@
       },
       {
         "id": "421507",
-        "espn_id": "421507",
         "nome": "João Paulo",
         "posicao": "Midfielder",
         "numero": "57",
@@ -5589,7 +5503,6 @@
       },
       {
         "id": "387989",
-        "espn_id": "387989",
         "nome": "Larson",
         "posicao": "Midfielder",
         "numero": "48",
@@ -5597,7 +5510,6 @@
       },
       {
         "id": "186776",
-        "espn_id": "186776",
         "nome": "Lucas Evangelista",
         "posicao": "Midfielder",
         "numero": "30",
@@ -5605,7 +5517,6 @@
       },
       {
         "id": "402701",
-        "espn_id": "402701",
         "nome": "Luis Felipe",
         "posicao": "Midfielder",
         "numero": "50",
@@ -5613,7 +5524,6 @@
       },
       {
         "id": "234016",
-        "espn_id": "234016",
         "nome": "Marlon Freitas",
         "posicao": "Midfielder",
         "numero": "17",
@@ -5621,7 +5531,6 @@
       },
       {
         "id": "289046",
-        "espn_id": "289046",
         "nome": "Maurício",
         "posicao": "Midfielder",
         "numero": "18",
@@ -5629,7 +5538,6 @@
       },
       {
         "id": "382963",
-        "espn_id": "382963",
         "nome": "Rafael Coutinho",
         "posicao": "Midfielder",
         "numero": "55",
@@ -5637,7 +5545,6 @@
       },
       {
         "id": "421504",
-        "espn_id": "421504",
         "nome": "Ruan Yago",
         "posicao": "Midfielder",
         "numero": "58",
@@ -5645,7 +5552,6 @@
       },
       {
         "id": "405272",
-        "espn_id": "405272",
         "nome": "Victor Gabriel",
         "posicao": "Midfielder",
         "numero": "47",
@@ -5654,8 +5560,28 @@
     ],
     "Remo": [
       {
+        "id": "1",
+        "nome": "Active",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "4936",
+        "nome": "Remo",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "3096158",
-        "espn_id": "3096158",
         "nome": "Kerlon Ormerode Brito Da Cruz",
         "posicao": "Defender",
         "numero": "",
@@ -5664,8 +5590,49 @@
     ],
     "Santos": [
       {
+        "id": "1",
+        "nome": "Active",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2674",
+        "nome": "Santos",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "234447",
-        "espn_id": "234447",
         "nome": "Adonis Frias",
         "posicao": "Defender",
         "numero": "98",
@@ -5673,7 +5640,6 @@
       },
       {
         "id": "236353",
-        "espn_id": "236353",
         "nome": "Gonzalo Escobar",
         "posicao": "Defender",
         "numero": "31",
@@ -5681,7 +5647,6 @@
       },
       {
         "id": "235894",
-        "espn_id": "235894",
         "nome": "Igor",
         "posicao": "Defender",
         "numero": "18",
@@ -5689,7 +5654,6 @@
       },
       {
         "id": "403721",
-        "espn_id": "403721",
         "nome": "João Alencar",
         "posicao": "Defender",
         "numero": "42",
@@ -5697,7 +5661,6 @@
       },
       {
         "id": "408862",
-        "espn_id": "408862",
         "nome": "João Ananias",
         "posicao": "Defender",
         "numero": "26",
@@ -5705,7 +5668,6 @@
       },
       {
         "id": "198546",
-        "espn_id": "198546",
         "nome": "Luan Peres",
         "posicao": "Defender",
         "numero": "14",
@@ -5713,7 +5675,6 @@
       },
       {
         "id": "231324",
-        "espn_id": "231324",
         "nome": "Lucas Verissimo",
         "posicao": "Defender",
         "numero": "4",
@@ -5721,15 +5682,13 @@
       },
       {
         "id": "390968",
-        "espn_id": "390968",
         "nome": "Marcelo Tórrez",
         "posicao": "Defender",
         "numero": "99",
-        "idade": 19
+        "idade": 20
       },
       {
         "id": "178927",
-        "espn_id": "178927",
         "nome": "Mayke",
         "posicao": "Defender",
         "numero": "12",
@@ -5737,7 +5696,6 @@
       },
       {
         "id": "404206",
-        "espn_id": "404206",
         "nome": "Rafael Gonzaga",
         "posicao": "Defender",
         "numero": "38",
@@ -5745,7 +5703,6 @@
       },
       {
         "id": "399409",
-        "espn_id": "399409",
         "nome": "Vinicius Lira",
         "posicao": "Defender",
         "numero": "3",
@@ -5753,7 +5710,6 @@
       },
       {
         "id": "319270",
-        "espn_id": "319270",
         "nome": "Zé Ivaldo",
         "posicao": "Defender",
         "numero": "2",
@@ -5761,7 +5717,6 @@
       },
       {
         "id": "269813",
-        "espn_id": "269813",
         "nome": "Benjamín Rollheiser",
         "posicao": "Forward",
         "numero": "32",
@@ -5769,7 +5724,6 @@
       },
       {
         "id": "421474",
-        "espn_id": "421474",
         "nome": "David Nogueira",
         "posicao": "Forward",
         "numero": "59",
@@ -5777,7 +5731,6 @@
       },
       {
         "id": "422922",
-        "espn_id": "422922",
         "nome": "Davizinho",
         "posicao": "Forward",
         "numero": "27",
@@ -5785,7 +5738,6 @@
       },
       {
         "id": "418214",
-        "espn_id": "418214",
         "nome": "Fernando Pradella Rocha",
         "posicao": "Forward",
         "numero": "55",
@@ -5793,7 +5745,6 @@
       },
       {
         "id": "182522",
-        "espn_id": "182522",
         "nome": "Gabriel Barbosa",
         "posicao": "Forward",
         "numero": "9",
@@ -5801,7 +5752,6 @@
       },
       {
         "id": "421475",
-        "espn_id": "421475",
         "nome": "Gabriel Follmer",
         "posicao": "Forward",
         "numero": "66",
@@ -5809,7 +5759,6 @@
       },
       {
         "id": "154853",
-        "espn_id": "154853",
         "nome": "Gustavo Caballero",
         "posicao": "Forward",
         "numero": "",
@@ -5817,7 +5766,6 @@
       },
       {
         "id": "380360",
-        "espn_id": "380360",
         "nome": "João Victor Dos Santos Alves",
         "posicao": "Forward",
         "numero": "27",
@@ -5825,7 +5773,6 @@
       },
       {
         "id": "399724",
-        "espn_id": "399724",
         "nome": "Kaio Ganga",
         "posicao": "Forward",
         "numero": "29",
@@ -5833,7 +5780,6 @@
       },
       {
         "id": "292041",
-        "espn_id": "292041",
         "nome": "Lautaro Díaz",
         "posicao": "Forward",
         "numero": "19",
@@ -5841,7 +5787,6 @@
       },
       {
         "id": "386311",
-        "espn_id": "386311",
         "nome": "Mateus Xavier",
         "posicao": "Forward",
         "numero": "47",
@@ -5849,7 +5794,6 @@
       },
       {
         "id": "304365",
-        "espn_id": "304365",
         "nome": "Moisés",
         "posicao": "Forward",
         "numero": "21",
@@ -5857,7 +5801,6 @@
       },
       {
         "id": "400876",
-        "espn_id": "400876",
         "nome": "Nadson",
         "posicao": "Forward",
         "numero": "57",
@@ -5865,7 +5808,6 @@
       },
       {
         "id": "132948",
-        "espn_id": "132948",
         "nome": "Neymar",
         "posicao": "Forward",
         "numero": "10",
@@ -5873,7 +5815,6 @@
       },
       {
         "id": "417953",
-        "espn_id": "417953",
         "nome": "Pedro Assis",
         "posicao": "Forward",
         "numero": "37",
@@ -5881,7 +5822,6 @@
       },
       {
         "id": "407480",
-        "espn_id": "407480",
         "nome": "Robinho Junior",
         "posicao": "Forward",
         "numero": "7",
@@ -5889,7 +5829,6 @@
       },
       {
         "id": "236314",
-        "espn_id": "236314",
         "nome": "Rony",
         "posicao": "Forward",
         "numero": "11",
@@ -5897,7 +5836,6 @@
       },
       {
         "id": "421473",
-        "espn_id": "421473",
         "nome": "Arthur Vale",
         "posicao": "Goalkeeper",
         "numero": "88",
@@ -5905,7 +5843,6 @@
       },
       {
         "id": "322630",
-        "espn_id": "322630",
         "nome": "Diogenes",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -5913,7 +5850,6 @@
       },
       {
         "id": "266665",
-        "espn_id": "266665",
         "nome": "Gabriel Brazão",
         "posicao": "Goalkeeper",
         "numero": "77",
@@ -5921,7 +5857,6 @@
       },
       {
         "id": "198561",
-        "espn_id": "198561",
         "nome": "João Paulo",
         "posicao": "Goalkeeper",
         "numero": "",
@@ -5929,7 +5864,6 @@
       },
       {
         "id": "384395",
-        "espn_id": "384395",
         "nome": "João Pedro",
         "posicao": "Goalkeeper",
         "numero": "79",
@@ -5937,7 +5871,6 @@
       },
       {
         "id": "379464",
-        "espn_id": "379464",
         "nome": "Rodrigo Falcão",
         "posicao": "Goalkeeper",
         "numero": "67",
@@ -5945,23 +5878,13 @@
       },
       {
         "id": "279454",
-        "espn_id": "279454",
         "nome": "Álvaro Barreal",
         "posicao": "Midfielder",
         "numero": "22",
         "idade": 25
       },
       {
-        "id": "279137",
-        "espn_id": "279137",
-        "nome": "Bilal Brahimi",
-        "posicao": "Midfielder",
-        "numero": "",
-        "idade": 26
-      },
-      {
         "id": "270486",
-        "espn_id": "270486",
         "nome": "Christian Oliva",
         "posicao": "Midfielder",
         "numero": "28",
@@ -5969,7 +5892,6 @@
       },
       {
         "id": "399179",
-        "espn_id": "399179",
         "nome": "Gabriel Bontempo",
         "posicao": "Midfielder",
         "numero": "49",
@@ -5977,7 +5899,6 @@
       },
       {
         "id": "301544",
-        "espn_id": "301544",
         "nome": "Gabriel Menino",
         "posicao": "Midfielder",
         "numero": "25",
@@ -5985,7 +5906,6 @@
       },
       {
         "id": "399297",
-        "espn_id": "399297",
         "nome": "Gustavo Henrique",
         "posicao": "Midfielder",
         "numero": "48",
@@ -5993,7 +5913,6 @@
       },
       {
         "id": "196856",
-        "espn_id": "196856",
         "nome": "João Schmidt",
         "posicao": "Midfielder",
         "numero": "5",
@@ -6001,7 +5920,6 @@
       },
       {
         "id": "421476",
-        "espn_id": "421476",
         "nome": "Kauan Barreto",
         "posicao": "Midfielder",
         "numero": "80",
@@ -6009,7 +5927,6 @@
       },
       {
         "id": "421477",
-        "espn_id": "421477",
         "nome": "Kenay",
         "posicao": "Midfielder",
         "numero": "37",
@@ -6017,7 +5934,6 @@
       },
       {
         "id": "330665",
-        "espn_id": "330665",
         "nome": "Miguel Terceros",
         "posicao": "Midfielder",
         "numero": "30",
@@ -6025,7 +5941,6 @@
       },
       {
         "id": "374817",
-        "espn_id": "374817",
         "nome": "Nicola Profeta",
         "posicao": "Midfielder",
         "numero": "17",
@@ -6033,7 +5948,6 @@
       },
       {
         "id": "417617",
-        "espn_id": "417617",
         "nome": "Pepê Fermino",
         "posicao": "Midfielder",
         "numero": "20",
@@ -6041,7 +5955,6 @@
       },
       {
         "id": "421478",
-        "espn_id": "421478",
         "nome": "Samuel Mendes",
         "posicao": "Midfielder",
         "numero": "81",
@@ -6049,7 +5962,6 @@
       },
       {
         "id": "218938",
-        "espn_id": "218938",
         "nome": "Thaciano",
         "posicao": "Midfielder",
         "numero": "16",
@@ -6057,7 +5969,6 @@
       },
       {
         "id": "421479",
-        "espn_id": "421479",
         "nome": "Vinicius Fabri",
         "posicao": "Midfielder",
         "numero": "76",
@@ -6065,7 +5976,6 @@
       },
       {
         "id": "413770",
-        "espn_id": "413770",
         "nome": "Vinícius Rocha",
         "posicao": "Midfielder",
         "numero": "58",
@@ -6073,7 +5983,6 @@
       },
       {
         "id": "173621",
-        "espn_id": "173621",
         "nome": "Willian Arão",
         "posicao": "Midfielder",
         "numero": "15",
@@ -6081,7 +5990,6 @@
       },
       {
         "id": "201660",
-        "espn_id": "201660",
         "nome": "Zé Rafael",
         "posicao": "Midfielder",
         "numero": "6",
@@ -6090,8 +5998,49 @@
     ],
     "São Paulo": [
       {
+        "id": "1",
+        "nome": "Active",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2026",
+        "nome": "São Paulo",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "228493",
-        "espn_id": "228493",
         "nome": "Alan Franco",
         "posicao": "Defender",
         "numero": "28",
@@ -6099,7 +6048,6 @@
       },
       {
         "id": "129722",
-        "espn_id": "129722",
         "nome": "Cédric",
         "posicao": "Defender",
         "numero": "6",
@@ -6107,7 +6055,6 @@
       },
       {
         "id": "264814",
-        "espn_id": "264814",
         "nome": "Enzo Díaz",
         "posicao": "Defender",
         "numero": "13",
@@ -6115,7 +6062,6 @@
       },
       {
         "id": "421413",
-        "espn_id": "421413",
         "nome": "Felipe Oliveira",
         "posicao": "Defender",
         "numero": "60",
@@ -6123,7 +6069,6 @@
       },
       {
         "id": "383052",
-        "espn_id": "383052",
         "nome": "Guilherme Reis",
         "posicao": "Defender",
         "numero": "43",
@@ -6131,7 +6076,6 @@
       },
       {
         "id": "399074",
-        "espn_id": "399074",
         "nome": "Hugo",
         "posicao": "Defender",
         "numero": "38",
@@ -6139,7 +6083,6 @@
       },
       {
         "id": "386050",
-        "espn_id": "386050",
         "nome": "Igão",
         "posicao": "Defender",
         "numero": "51",
@@ -6147,7 +6090,6 @@
       },
       {
         "id": "379484",
-        "espn_id": "379484",
         "nome": "Igor Felisberto",
         "posicao": "Defender",
         "numero": "40",
@@ -6155,7 +6097,6 @@
       },
       {
         "id": "371525",
-        "espn_id": "371525",
         "nome": "Isac",
         "posicao": "Defender",
         "numero": "53",
@@ -6163,7 +6104,6 @@
       },
       {
         "id": "334787",
-        "espn_id": "334787",
         "nome": "João Moreira",
         "posicao": "Defender",
         "numero": "15",
@@ -6171,7 +6111,6 @@
       },
       {
         "id": "206953",
-        "espn_id": "206953",
         "nome": "Lucas Ramon",
         "posicao": "Defender",
         "numero": "19",
@@ -6179,7 +6118,6 @@
       },
       {
         "id": "383055",
-        "espn_id": "383055",
         "nome": "Luis Osorio",
         "posicao": "Defender",
         "numero": "54",
@@ -6187,7 +6125,6 @@
       },
       {
         "id": "399078",
-        "espn_id": "399078",
         "nome": "Maik",
         "posicao": "Defender",
         "numero": "42",
@@ -6195,7 +6132,6 @@
       },
       {
         "id": "358242",
-        "espn_id": "358242",
         "nome": "Matheus Souza",
         "posicao": "Defender",
         "numero": "44",
@@ -6203,7 +6139,6 @@
       },
       {
         "id": "402685",
-        "espn_id": "402685",
         "nome": "Nicolas",
         "posicao": "Defender",
         "numero": "56",
@@ -6211,7 +6146,6 @@
       },
       {
         "id": "196855",
-        "espn_id": "196855",
         "nome": "Rafael Tolói",
         "posicao": "Defender",
         "numero": "2",
@@ -6219,7 +6153,6 @@
       },
       {
         "id": "201531",
-        "espn_id": "201531",
         "nome": "Robert Arboleda",
         "posicao": "Defender",
         "numero": "5",
@@ -6227,7 +6160,6 @@
       },
       {
         "id": "285010",
-        "espn_id": "285010",
         "nome": "Sabino",
         "posicao": "Defender",
         "numero": "35",
@@ -6235,7 +6167,6 @@
       },
       {
         "id": "199065",
-        "espn_id": "199065",
         "nome": "Wendell",
         "posicao": "Defender",
         "numero": "18",
@@ -6243,7 +6174,6 @@
       },
       {
         "id": "270578",
-        "espn_id": "270578",
         "nome": "André Silva",
         "posicao": "Forward",
         "numero": "17",
@@ -6251,7 +6181,6 @@
       },
       {
         "id": "236596",
-        "espn_id": "236596",
         "nome": "Artur",
         "posicao": "Forward",
         "numero": "37",
@@ -6259,7 +6188,6 @@
       },
       {
         "id": "421415",
-        "espn_id": "421415",
         "nome": "Brenno",
         "posicao": "Forward",
         "numero": "47",
@@ -6267,7 +6195,6 @@
       },
       {
         "id": "296573",
-        "espn_id": "296573",
         "nome": "Ferreira",
         "posicao": "Forward",
         "numero": "11",
@@ -6275,7 +6202,6 @@
       },
       {
         "id": "297128",
-        "espn_id": "297128",
         "nome": "Gonzalo Tapia",
         "posicao": "Forward",
         "numero": "14",
@@ -6283,7 +6209,6 @@
       },
       {
         "id": "162558",
-        "espn_id": "162558",
         "nome": "Jonathan Calleri",
         "posicao": "Forward",
         "numero": "9",
@@ -6291,7 +6216,6 @@
       },
       {
         "id": "380969",
-        "espn_id": "380969",
         "nome": "Juan Potes",
         "posicao": "Forward",
         "numero": "57",
@@ -6299,7 +6223,6 @@
       },
       {
         "id": "130711",
-        "espn_id": "130711",
         "nome": "Lucas Moura",
         "posicao": "Forward",
         "numero": "7",
@@ -6307,7 +6230,6 @@
       },
       {
         "id": "399076",
-        "espn_id": "399076",
         "nome": "Lucca Marques",
         "posicao": "Forward",
         "numero": "45",
@@ -6315,7 +6237,6 @@
       },
       {
         "id": "190483",
-        "espn_id": "190483",
         "nome": "Luciano",
         "posicao": "Forward",
         "numero": "10",
@@ -6323,7 +6244,6 @@
       },
       {
         "id": "383041",
-        "espn_id": "383041",
         "nome": "Paulo Sérgio",
         "posicao": "Forward",
         "numero": "39",
@@ -6331,7 +6251,6 @@
       },
       {
         "id": "383042",
-        "espn_id": "383042",
         "nome": "Ryan Francisco",
         "posicao": "Forward",
         "numero": "49",
@@ -6339,7 +6258,6 @@
       },
       {
         "id": "402684",
-        "espn_id": "402684",
         "nome": "Tetê",
         "posicao": "Forward",
         "numero": "34",
@@ -6347,7 +6265,6 @@
       },
       {
         "id": "215961",
-        "espn_id": "215961",
         "nome": "Carlos Coronel",
         "posicao": "Goalkeeper",
         "numero": "31",
@@ -6355,7 +6272,6 @@
       },
       {
         "id": "380459",
-        "espn_id": "380459",
         "nome": "Felipe Preis",
         "posicao": "Goalkeeper",
         "numero": "52",
@@ -6363,7 +6279,6 @@
       },
       {
         "id": "383059",
-        "espn_id": "383059",
         "nome": "João Pedro",
         "posicao": "Goalkeeper",
         "numero": "41",
@@ -6371,7 +6286,6 @@
       },
       {
         "id": "199013",
-        "espn_id": "199013",
         "nome": "Rafael",
         "posicao": "Goalkeeper",
         "numero": "23",
@@ -6379,7 +6293,6 @@
       },
       {
         "id": "318176",
-        "espn_id": "318176",
         "nome": "Young",
         "posicao": "Goalkeeper",
         "numero": "50",
@@ -6387,7 +6300,6 @@
       },
       {
         "id": "399079",
-        "espn_id": "399079",
         "nome": "Bezerra",
         "posicao": "Midfielder",
         "numero": "58",
@@ -6395,7 +6307,6 @@
       },
       {
         "id": "260392",
-        "espn_id": "260392",
         "nome": "Cauly",
         "posicao": "Midfielder",
         "numero": "80",
@@ -6403,7 +6314,6 @@
       },
       {
         "id": "301516",
-        "espn_id": "301516",
         "nome": "Damián Bobadilla",
         "posicao": "Midfielder",
         "numero": "21",
@@ -6411,7 +6321,6 @@
       },
       {
         "id": "196824",
-        "espn_id": "196824",
         "nome": "Danielzinho",
         "posicao": "Midfielder",
         "numero": "94",
@@ -6419,7 +6328,6 @@
       },
       {
         "id": "402686",
-        "espn_id": "402686",
         "nome": "Djhordney Ferreira",
         "posicao": "Midfielder",
         "numero": "48",
@@ -6427,7 +6335,6 @@
       },
       {
         "id": "361627",
-        "espn_id": "361627",
         "nome": "Felipe Negrucci",
         "posicao": "Midfielder",
         "numero": "30",
@@ -6435,7 +6342,6 @@
       },
       {
         "id": "402683",
-        "espn_id": "402683",
         "nome": "Gustavo Santana",
         "posicao": "Midfielder",
         "numero": "43",
@@ -6443,7 +6349,6 @@
       },
       {
         "id": "276387",
-        "espn_id": "276387",
         "nome": "Luan",
         "posicao": "Midfielder",
         "numero": "33",
@@ -6451,7 +6356,6 @@
       },
       {
         "id": "266282",
-        "espn_id": "266282",
         "nome": "Marcos Antonio",
         "posicao": "Midfielder",
         "numero": "20",
@@ -6459,7 +6363,6 @@
       },
       {
         "id": "371433",
-        "espn_id": "371433",
         "nome": "Matheus Ferreira",
         "posicao": "Midfielder",
         "numero": "55",
@@ -6467,7 +6370,6 @@
       },
       {
         "id": "319168",
-        "espn_id": "319168",
         "nome": "Pablo Maia",
         "posicao": "Midfielder",
         "numero": "29",
@@ -6475,7 +6377,6 @@
       },
       {
         "id": "399075",
-        "espn_id": "399075",
         "nome": "Pedro Ferreira",
         "posicao": "Midfielder",
         "numero": "46",
@@ -6483,7 +6384,6 @@
       },
       {
         "id": "421412",
-        "espn_id": "421412",
         "nome": "Robert William",
         "posicao": "Midfielder",
         "numero": "59",
@@ -6492,8 +6392,49 @@
     ],
     "Vasco da Gama": [
       {
+        "id": "1",
+        "nome": "Active",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "3454",
+        "nome": "Vasco da Gama",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "317383",
-        "espn_id": "317383",
         "nome": "Alan Saldivia",
         "posicao": "Defender",
         "numero": "4",
@@ -6501,7 +6442,6 @@
       },
       {
         "id": "398510",
-        "espn_id": "398510",
         "nome": "Alison",
         "posicao": "Defender",
         "numero": "54",
@@ -6509,7 +6449,6 @@
       },
       {
         "id": "421395",
-        "espn_id": "421395",
         "nome": "Breno Sales",
         "posicao": "Defender",
         "numero": "91",
@@ -6517,7 +6456,6 @@
       },
       {
         "id": "402621",
-        "espn_id": "402621",
         "nome": "Breno Vereza",
         "posicao": "Defender",
         "numero": "87",
@@ -6525,7 +6463,6 @@
       },
       {
         "id": "409768",
-        "espn_id": "409768",
         "nome": "Bruno André Azevedo Ribeiro",
         "posicao": "Defender",
         "numero": "80",
@@ -6533,7 +6470,6 @@
       },
       {
         "id": "235940",
-        "espn_id": "235940",
         "nome": "Carlos Cuesta",
         "posicao": "Defender",
         "numero": "46",
@@ -6541,7 +6477,6 @@
       },
       {
         "id": "334756",
-        "espn_id": "334756",
         "nome": "Cuiabano",
         "posicao": "Defender",
         "numero": "66",
@@ -6549,7 +6484,6 @@
       },
       {
         "id": "43711",
-        "espn_id": "43711",
         "nome": "José Luis Rodríguez",
         "posicao": "Defender",
         "numero": "2",
@@ -6557,7 +6491,6 @@
       },
       {
         "id": "417752",
-        "espn_id": "417752",
         "nome": "Jotavve Fonseca",
         "posicao": "Defender",
         "numero": "60",
@@ -6565,7 +6498,6 @@
       },
       {
         "id": "312657",
-        "espn_id": "312657",
         "nome": "Lucas Freitas",
         "posicao": "Defender",
         "numero": "43",
@@ -6573,7 +6505,6 @@
       },
       {
         "id": "287862",
-        "espn_id": "287862",
         "nome": "Lucas Piton",
         "posicao": "Defender",
         "numero": "6",
@@ -6581,7 +6512,6 @@
       },
       {
         "id": "398524",
-        "espn_id": "398524",
         "nome": "Melim",
         "posicao": "Defender",
         "numero": "81",
@@ -6589,7 +6519,6 @@
       },
       {
         "id": "234842",
-        "espn_id": "234842",
         "nome": "Paulo Henrique",
         "posicao": "Defender",
         "numero": "96",
@@ -6597,7 +6526,6 @@
       },
       {
         "id": "301860",
-        "espn_id": "301860",
         "nome": "Riquelme",
         "posicao": "Defender",
         "numero": "",
@@ -6605,7 +6533,6 @@
       },
       {
         "id": "398722",
-        "espn_id": "398722",
         "nome": "Riquelme Avellar",
         "posicao": "Defender",
         "numero": "82",
@@ -6613,7 +6540,6 @@
       },
       {
         "id": "337099",
-        "espn_id": "337099",
         "nome": "Robert",
         "posicao": "Defender",
         "numero": "30",
@@ -6621,7 +6547,6 @@
       },
       {
         "id": "398521",
-        "espn_id": "398521",
         "nome": "Walace",
         "posicao": "Defender",
         "numero": "64",
@@ -6629,7 +6554,6 @@
       },
       {
         "id": "421394",
-        "espn_id": "421394",
         "nome": "Wanyson Nogueira",
         "posicao": "Defender",
         "numero": "63",
@@ -6637,7 +6561,6 @@
       },
       {
         "id": "315293",
-        "espn_id": "315293",
         "nome": "Adson",
         "posicao": "Forward",
         "numero": "28",
@@ -6645,7 +6568,6 @@
       },
       {
         "id": "417750",
-        "espn_id": "417750",
         "nome": "Alex Bruno",
         "posicao": "Forward",
         "numero": "61",
@@ -6653,7 +6575,6 @@
       },
       {
         "id": "402639",
-        "espn_id": "402639",
         "nome": "Anderson Felix",
         "posicao": "Forward",
         "numero": "84",
@@ -6661,7 +6582,6 @@
       },
       {
         "id": "330924",
-        "espn_id": "330924",
         "nome": "Andrés Gómez",
         "posicao": "Forward",
         "numero": "11",
@@ -6669,7 +6589,6 @@
       },
       {
         "id": "402620",
-        "espn_id": "402620",
         "nome": "Andrey Fernandes",
         "posicao": "Forward",
         "numero": "74",
@@ -6677,7 +6596,6 @@
       },
       {
         "id": "257744",
-        "espn_id": "257744",
         "nome": "Brenner",
         "posicao": "Forward",
         "numero": "20",
@@ -6685,7 +6603,6 @@
       },
       {
         "id": "379267",
-        "espn_id": "379267",
         "nome": "Bruno Lopes",
         "posicao": "Forward",
         "numero": "72",
@@ -6693,7 +6610,6 @@
       },
       {
         "id": "250733",
-        "espn_id": "250733",
         "nome": "Claudio Spinelli",
         "posicao": "Forward",
         "numero": "77",
@@ -6701,7 +6617,6 @@
       },
       {
         "id": "219005",
-        "espn_id": "219005",
         "nome": "David",
         "posicao": "Forward",
         "numero": "7",
@@ -6709,7 +6624,6 @@
       },
       {
         "id": "407363",
-        "espn_id": "407363",
         "nome": "Diego Minete",
         "posicao": "Forward",
         "numero": "90",
@@ -6717,7 +6631,6 @@
       },
       {
         "id": "417751",
-        "espn_id": "417751",
         "nome": "João Vitor",
         "posicao": "Forward",
         "numero": "",
@@ -6725,7 +6638,6 @@
       },
       {
         "id": "334065",
-        "espn_id": "334065",
         "nome": "Johan Rojas",
         "posicao": "Forward",
         "numero": "29",
@@ -6733,7 +6645,6 @@
       },
       {
         "id": "318606",
-        "espn_id": "318606",
         "nome": "Loide",
         "posicao": "Forward",
         "numero": "",
@@ -6741,7 +6652,6 @@
       },
       {
         "id": "421397",
-        "espn_id": "421397",
         "nome": "Luiz Lócio",
         "posicao": "Forward",
         "numero": "55",
@@ -6749,15 +6659,13 @@
       },
       {
         "id": "285203",
-        "espn_id": "285203",
         "nome": "Marino Hinestroza",
         "posicao": "Forward",
         "numero": "18",
-        "idade": 23
+        "idade": 24
       },
       {
         "id": "252052",
-        "espn_id": "252052",
         "nome": "Daniel Fuzato",
         "posicao": "Goalkeeper",
         "numero": "13",
@@ -6765,7 +6673,6 @@
       },
       {
         "id": "205464",
-        "espn_id": "205464",
         "nome": "Léo Jardim",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -6773,7 +6680,6 @@
       },
       {
         "id": "421401",
-        "espn_id": "421401",
         "nome": "Marcão",
         "posicao": "Goalkeeper",
         "numero": "79",
@@ -6781,7 +6687,6 @@
       },
       {
         "id": "379269",
-        "espn_id": "379269",
         "nome": "Pablo",
         "posicao": "Goalkeeper",
         "numero": "37",
@@ -6789,7 +6694,6 @@
       },
       {
         "id": "371432",
-        "espn_id": "371432",
         "nome": "Phillipe Gabriel",
         "posicao": "Goalkeeper",
         "numero": "40",
@@ -6797,7 +6701,6 @@
       },
       {
         "id": "357720",
-        "espn_id": "357720",
         "nome": "Cauan Barros",
         "posicao": "Midfielder",
         "numero": "88",
@@ -6805,7 +6708,6 @@
       },
       {
         "id": "421396",
-        "espn_id": "421396",
         "nome": "Gustavo Guimarães",
         "posicao": "Midfielder",
         "numero": "50",
@@ -6813,7 +6715,6 @@
       },
       {
         "id": "269924",
-        "espn_id": "269924",
         "nome": "Hugo Moura",
         "posicao": "Midfielder",
         "numero": "25",
@@ -6821,7 +6722,6 @@
       },
       {
         "id": "196873",
-        "espn_id": "196873",
         "nome": "Jair",
         "posicao": "Midfielder",
         "numero": "8",
@@ -6829,7 +6729,6 @@
       },
       {
         "id": "379268",
-        "espn_id": "379268",
         "nome": "JP",
         "posicao": "Midfielder",
         "numero": "98",
@@ -6837,7 +6736,6 @@
       },
       {
         "id": "421399",
-        "espn_id": "421399",
         "nome": "Léo Félix",
         "posicao": "Midfielder",
         "numero": "65",
@@ -6845,7 +6743,6 @@
       },
       {
         "id": "421398",
-        "espn_id": "421398",
         "nome": "Lucca Guima",
         "posicao": "Midfielder",
         "numero": "62",
@@ -6853,7 +6750,6 @@
       },
       {
         "id": "379379",
-        "espn_id": "379379",
         "nome": "Lukas Zuccarello",
         "posicao": "Midfielder",
         "numero": "86",
@@ -6861,7 +6757,6 @@
       },
       {
         "id": "346179",
-        "espn_id": "346179",
         "nome": "Matheus Carvalho",
         "posicao": "Midfielder",
         "numero": "85",
@@ -6869,7 +6764,6 @@
       },
       {
         "id": "323815",
-        "espn_id": "323815",
         "nome": "Nuno Moreira",
         "posicao": "Midfielder",
         "numero": "17",
@@ -6877,7 +6771,6 @@
       },
       {
         "id": "402641",
-        "espn_id": "402641",
         "nome": "Ramon Rique",
         "posicao": "Midfielder",
         "numero": "83",
@@ -6885,7 +6778,6 @@
       },
       {
         "id": "421400",
-        "espn_id": "421400",
         "nome": "Samuel de Jesus",
         "posicao": "Midfielder",
         "numero": "67",
@@ -6893,7 +6785,6 @@
       },
       {
         "id": "198302",
-        "espn_id": "198302",
         "nome": "Tchê Tchê",
         "posicao": "Midfielder",
         "numero": "3",
@@ -6901,7 +6792,6 @@
       },
       {
         "id": "201717",
-        "espn_id": "201717",
         "nome": "Thiago Mendes",
         "posicao": "Midfielder",
         "numero": "23",
@@ -6910,8 +6800,49 @@
     ],
     "Vitória": [
       {
+        "id": "2",
+        "nome": "Defender",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "19",
+        "nome": "Forward",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "1",
+        "nome": "Goalkeeper",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "10",
+        "nome": "Midfielder",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "0",
+        "nome": "Total",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
+        "id": "3457",
+        "nome": "Vitória",
+        "posicao": "",
+        "numero": "",
+        "idade": ""
+      },
+      {
         "id": "271773",
-        "espn_id": "271773",
         "nome": "Cacá",
         "posicao": "Defender",
         "numero": "25",
@@ -6919,7 +6850,6 @@
       },
       {
         "id": "272576",
-        "espn_id": "272576",
         "nome": "Camutanga",
         "posicao": "Defender",
         "numero": "4",
@@ -6927,7 +6857,6 @@
       },
       {
         "id": "292396",
-        "espn_id": "292396",
         "nome": "Claudinho",
         "posicao": "Defender",
         "numero": "2",
@@ -6935,7 +6864,6 @@
       },
       {
         "id": "379661",
-        "espn_id": "379661",
         "nome": "Diego Tarzia",
         "posicao": "Defender",
         "numero": "12",
@@ -6943,15 +6871,20 @@
       },
       {
         "id": "293047",
-        "espn_id": "293047",
         "nome": "Edu",
         "posicao": "Defender",
         "numero": "43",
         "idade": 26
       },
       {
+        "id": "304065",
+        "nome": "Fabiano",
+        "posicao": "Defender",
+        "numero": "",
+        "idade": 26
+      },
+      {
         "id": "402660",
-        "espn_id": "402660",
         "nome": "Gean",
         "posicao": "Defender",
         "numero": "59",
@@ -6959,7 +6892,6 @@
       },
       {
         "id": "419116",
-        "espn_id": "419116",
         "nome": "Guilherme Inácio",
         "posicao": "Defender",
         "numero": "15",
@@ -6967,7 +6899,6 @@
       },
       {
         "id": "417834",
-        "espn_id": "417834",
         "nome": "Ivan",
         "posicao": "Defender",
         "numero": "48",
@@ -6975,7 +6906,6 @@
       },
       {
         "id": "284450",
-        "espn_id": "284450",
         "nome": "Jamerson",
         "posicao": "Defender",
         "numero": "83",
@@ -6983,7 +6913,6 @@
       },
       {
         "id": "402428",
-        "espn_id": "402428",
         "nome": "Kauan Santos",
         "posicao": "Defender",
         "numero": "18",
@@ -6991,7 +6920,6 @@
       },
       {
         "id": "266676",
-        "espn_id": "266676",
         "nome": "Luan Cândido",
         "posicao": "Defender",
         "numero": "36",
@@ -6999,7 +6927,6 @@
       },
       {
         "id": "315766",
-        "espn_id": "315766",
         "nome": "Matheusinho",
         "posicao": "Defender",
         "numero": "98",
@@ -7007,7 +6934,6 @@
       },
       {
         "id": "318174",
-        "espn_id": "318174",
         "nome": "Nathan",
         "posicao": "Defender",
         "numero": "45",
@@ -7015,7 +6941,6 @@
       },
       {
         "id": "203887",
-        "espn_id": "203887",
         "nome": "Neris",
         "posicao": "Defender",
         "numero": "77",
@@ -7023,7 +6948,6 @@
       },
       {
         "id": "269915",
-        "espn_id": "269915",
         "nome": "Ramon",
         "posicao": "Defender",
         "numero": "13",
@@ -7031,7 +6955,6 @@
       },
       {
         "id": "253010",
-        "espn_id": "253010",
         "nome": "Riccieli",
         "posicao": "Defender",
         "numero": "5",
@@ -7039,7 +6962,6 @@
       },
       {
         "id": "421952",
-        "espn_id": "421952",
         "nome": "Wanderson",
         "posicao": "Defender",
         "numero": "69",
@@ -7047,7 +6969,6 @@
       },
       {
         "id": "229392",
-        "espn_id": "229392",
         "nome": "Aitor Cantalapiedra",
         "posicao": "Forward",
         "numero": "17",
@@ -7055,7 +6976,6 @@
       },
       {
         "id": "420159",
-        "espn_id": "420159",
         "nome": "Anderson Bispo Dos Santos",
         "posicao": "Forward",
         "numero": "28",
@@ -7063,7 +6983,6 @@
       },
       {
         "id": "256044",
-        "espn_id": "256044",
         "nome": "Erick",
         "posicao": "Forward",
         "numero": "33",
@@ -7071,7 +6990,6 @@
       },
       {
         "id": "285395",
-        "espn_id": "285395",
         "nome": "Fabrício Santos",
         "posicao": "Forward",
         "numero": "23",
@@ -7079,7 +6997,6 @@
       },
       {
         "id": "402654",
-        "espn_id": "402654",
         "nome": "Kauan Vitor",
         "posicao": "Forward",
         "numero": "56",
@@ -7087,7 +7004,6 @@
       },
       {
         "id": "253009",
-        "espn_id": "253009",
         "nome": "Lucas",
         "posicao": "Forward",
         "numero": "20",
@@ -7095,7 +7011,6 @@
       },
       {
         "id": "402661",
-        "espn_id": "402661",
         "nome": "Marcos Vinicius",
         "posicao": "Forward",
         "numero": "49",
@@ -7103,7 +7018,6 @@
       },
       {
         "id": "198392",
-        "espn_id": "198392",
         "nome": "Marinho",
         "posicao": "Forward",
         "numero": "7",
@@ -7111,7 +7025,6 @@
       },
       {
         "id": "141626",
-        "espn_id": "141626",
         "nome": "Osvaldo",
         "posicao": "Forward",
         "numero": "11",
@@ -7119,7 +7032,6 @@
       },
       {
         "id": "227314",
-        "espn_id": "227314",
         "nome": "Renato Kayzer",
         "posicao": "Forward",
         "numero": "79",
@@ -7127,7 +7039,6 @@
       },
       {
         "id": "379359",
-        "espn_id": "379359",
         "nome": "Renê",
         "posicao": "Forward",
         "numero": "91",
@@ -7135,7 +7046,6 @@
       },
       {
         "id": "199789",
-        "espn_id": "199789",
         "nome": "Renzo López",
         "posicao": "Forward",
         "numero": "31",
@@ -7143,23 +7053,13 @@
       },
       {
         "id": "421951",
-        "espn_id": "421951",
         "nome": "Ruan Gabriel",
         "posicao": "Forward",
         "numero": "68",
         "idade": 18
       },
       {
-        "id": "321370",
-        "espn_id": "321370",
-        "nome": "Ruben Ramos",
-        "posicao": "Forward",
-        "numero": "16",
-        "idade": 19
-      },
-      {
         "id": "418064",
-        "espn_id": "418064",
         "nome": "Ezequiel",
         "posicao": "Goalkeeper",
         "numero": "57",
@@ -7167,7 +7067,6 @@
       },
       {
         "id": "302124",
-        "espn_id": "302124",
         "nome": "Fintelman",
         "posicao": "Goalkeeper",
         "numero": "35",
@@ -7175,7 +7074,6 @@
       },
       {
         "id": "155156",
-        "espn_id": "155156",
         "nome": "Gabriel",
         "posicao": "Goalkeeper",
         "numero": "12",
@@ -7183,7 +7081,6 @@
       },
       {
         "id": "287941",
-        "espn_id": "287941",
         "nome": "Lucas Arcanjo",
         "posicao": "Goalkeeper",
         "numero": "1",
@@ -7191,7 +7088,6 @@
       },
       {
         "id": "266662",
-        "espn_id": "266662",
         "nome": "Yuri Sena",
         "posicao": "Goalkeeper",
         "numero": "71",
@@ -7199,7 +7095,6 @@
       },
       {
         "id": "251843",
-        "espn_id": "251843",
         "nome": "Alejandro Almaraz",
         "posicao": "Midfielder",
         "numero": "46",
@@ -7207,7 +7102,6 @@
       },
       {
         "id": "252315",
-        "espn_id": "252315",
         "nome": "Caique",
         "posicao": "Midfielder",
         "numero": "95",
@@ -7215,7 +7109,6 @@
       },
       {
         "id": "402655",
-        "espn_id": "402655",
         "nome": "Cauan De Jesus",
         "posicao": "Midfielder",
         "numero": "70",
@@ -7223,7 +7116,6 @@
       },
       {
         "id": "339115",
-        "espn_id": "339115",
         "nome": "Dudu",
         "posicao": "Midfielder",
         "numero": "21",
@@ -7231,7 +7123,6 @@
       },
       {
         "id": "402426",
-        "espn_id": "402426",
         "nome": "Edenilson",
         "posicao": "Midfielder",
         "numero": "26",
@@ -7239,7 +7130,6 @@
       },
       {
         "id": "218649",
-        "espn_id": "218649",
         "nome": "Emmanuel Martínez",
         "posicao": "Midfielder",
         "numero": "32",
@@ -7247,7 +7137,6 @@
       },
       {
         "id": "286694",
-        "espn_id": "286694",
         "nome": "Enrique Saverio",
         "posicao": "Midfielder",
         "numero": "19",
@@ -7255,7 +7144,6 @@
       },
       {
         "id": "269852",
-        "espn_id": "269852",
         "nome": "Gabriel Baralhas",
         "posicao": "Midfielder",
         "numero": "44",
@@ -7263,7 +7151,6 @@
       },
       {
         "id": "387948",
-        "espn_id": "387948",
         "nome": "José Breno",
         "posicao": "Midfielder",
         "numero": "55",
@@ -7271,7 +7158,6 @@
       },
       {
         "id": "405566",
-        "espn_id": "405566",
         "nome": "Lucas Lohan",
         "posicao": "Midfielder",
         "numero": "52",
@@ -7279,7 +7165,6 @@
       },
       {
         "id": "218972",
-        "espn_id": "218972",
         "nome": "Matheus",
         "posicao": "Midfielder",
         "numero": "10",
@@ -7287,7 +7172,6 @@
       },
       {
         "id": "131954",
-        "espn_id": "131954",
         "nome": "Nicolas Celis",
         "posicao": "Midfielder",
         "numero": "65",
@@ -7295,23 +7179,20 @@
       },
       {
         "id": "383898",
-        "espn_id": "383898",
         "nome": "Pablo",
         "posicao": "Midfielder",
         "numero": "62",
         "idade": 22
       },
       {
-        "id": "253276",
-        "espn_id": "253276",
-        "nome": "Ronald",
+        "id": "321370",
+        "nome": "Rúben Ismael",
         "posicao": "Midfielder",
-        "numero": "8",
-        "idade": 29
+        "numero": "16",
+        "idade": 27
       },
       {
         "id": "382969",
-        "espn_id": "382969",
         "nome": "Wendell Sacramento",
         "posicao": "Midfielder",
         "numero": "41",
@@ -7319,7 +7200,6 @@
       },
       {
         "id": "383950",
-        "espn_id": "383950",
         "nome": "Zé Vitor",
         "posicao": "Midfielder",
         "numero": "88",
@@ -7327,52 +7207,5 @@
       }
     ]
   },
-  "avisos": [
-    "Execução: 2026-07-06T17:38:28-03:00",
-    "Raiz: C:\\Users\\laerc\\Documents\\Site_Apostas\\ELENCO",
-    "IDs após ESPN /teams: 20",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/3458/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/3458/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/7632/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/7632/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/9967/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/9967/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/6086/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/6086/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/6079/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/6079/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/9318/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/9318/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/874/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/874/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/3456/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/3456/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/2022/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/2022/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/819/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/819/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/3445/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/3445/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/6273/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/6273/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/1936/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/1936/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/9169/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/9169/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/2029/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/2029/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/4936/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/4936/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "ATENÇÃO: Remo ficou com só 1 jogadores; verificar manualmente",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/2674/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/2674/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/2026/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/2026/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/3454/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/3454/roster?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/teams/3457/athletes?limit=200&lang=pt&region=br: RuntimeError",
-    "  core api falhou https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/teams/3457/roster?limit=200&lang=pt&region=br: RuntimeError"
-  ],
-  "observacao_fotos": "Fotos de jogadores foram removidas/desativadas para evitar imagens quebradas ou incorretas no site.",
-  "fotos_jogadores_desativadas": true
+  "avisos": []
 }
