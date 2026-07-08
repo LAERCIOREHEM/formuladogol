@@ -109,13 +109,15 @@ def video_do_jogo(jogo: Dict[str, Any], por_id: Dict[str, Dict[str, Any]], por_c
 
 
 def texto_fonte(video: Dict[str, Any]) -> str:
+    # IMPORTANTE: a classificação da fonte NÃO usa título nem URL.
+    # Alguns vídeos de canais aleatórios colocam "ge.globo" ou "ge tv" no título,
+    # e isso gerava falso positivo como GE. A fonte deve vir do canal/origem
+    # ou de vínculo manual informado pelo administrador.
     partes = [
         video.get("fonte"),
         video.get("fonte_busca"),
         video.get("channel_title"),
         video.get("channel_id"),
-        video.get("titulo"),
-        video.get("url"),
     ]
     return norm(" ".join(str(p or "") for p in partes))
 
@@ -222,6 +224,7 @@ def main() -> int:
             "regra": "Manter links já existentes enquanto não houver GE/Globo equivalente, mas novas publicações automáticas pelo POWER só podem usar GE/Globo, Amazon Prime Video ou CazéTV.",
             "preferenciais": ["GE TV/ge.globo/sportv", "Amazon Prime Video", "CazéTV"],
             "outros": "Aparecem no site somente se já estavam vinculados antes ou se forem informados manualmente pelo administrador.",
+            "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais.",
         },
         "resumo": resumo,
         "outros_sites_ainda_em_uso": sorted(por_categoria["outros"], key=lambda x: (x.get("rodada") or 999, x.get("mandante") or "")),
