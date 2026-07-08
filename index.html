@@ -1832,6 +1832,106 @@ body > .container > section.hero > img {
   }
 }
 
+
+
+  /* EXECUÇÃO 2 — GE TV: melhores momentos por jogo */
+  .mm-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    min-width: 0;
+    text-decoration: none;
+    color: #f9fbff;
+    border: 1px solid rgba(251,191,36,.28);
+    background: linear-gradient(135deg, rgba(251,191,36,.16), rgba(163,230,53,.08));
+    border-radius: 14px;
+    padding: 6px 8px;
+    transition: transform .14s ease, border-color .14s ease, background .14s ease;
+  }
+  .mm-link:hover {
+    transform: translateY(-1px);
+    border-color: rgba(251,191,36,.55);
+    background: linear-gradient(135deg, rgba(251,191,36,.24), rgba(163,230,53,.12));
+  }
+  .mm-thumb {
+    flex: 0 0 auto;
+    width: 54px;
+    height: 32px;
+    border-radius: 9px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    background: rgba(2,6,12,.58);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+  }
+  .mm-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .mm-thumb .mm-play {
+    color: #fbbf24;
+    font-size: 15px;
+    font-weight: 900;
+  }
+  .mm-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+  .mm-text strong {
+    color: #ffe78b;
+    font-size: 12px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .mm-text span {
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 10.5px;
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 210px;
+  }
+  .mm-link.mm-jogo { margin-left: auto; }
+  .mm-link.mm-resultado {
+    margin: 10px auto 0;
+    width: min(100%, 520px);
+    justify-content: flex-start;
+  }
+  .mm-link.mm-resultado .mm-text span { max-width: 390px; }
+  .mm-audit-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #d9ff76;
+    border: 1px solid rgba(163,230,53,.18);
+    background: rgba(163,230,53,.08);
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  @media (max-width: 720px) {
+    .jogo-actions { align-items: stretch; flex-direction: column; }
+    .mm-link.mm-jogo { margin-left: 0; width: 100%; }
+    .mm-text span { max-width: 100%; }
+    .mm-link.mm-resultado { width: 100%; }
+    .resultado-card .mm-link { margin-top: 9px; }
+  }
+  @media (max-width: 420px) {
+    .mm-thumb { width: 48px; height: 30px; }
+    .mm-link { padding: 6px 7px; border-radius: 13px; }
+    .mm-text strong { font-size: 11.5px; }
+    .mm-text span { font-size: 10px; }
+  }
+
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260707-header-web-menu-final">
 </head>
@@ -2003,6 +2103,79 @@ function escudoDe(nome) {
   return (c && ESCUDOS_TIMES[c]) ? ESCUDOS_TIMES[c] : null;
 }
 
+function brEscapeHtml(valor) {
+  return String(valor ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+function brEscapeAttr(valor) { return brEscapeHtml(valor); }
+function normalizarChaveJogoTexto(valor) {
+  return normalizarNome(valor || '').replace(/\s+/g, '-');
+}
+function chaveMelhoresMomentos(j) {
+  const rodada = Number(j && j.rodada || 0);
+  const m = nomeCanonico((j && j.mandante || {}).nome) || ((j && j.mandante || {}).nome || '');
+  const v = nomeCanonico((j && j.visitante || {}).nome) || ((j && j.visitante || {}).nome || '');
+  return rodada ? `rodada-${rodada}-${normalizarChaveJogoTexto(m)}-${normalizarChaveJogoTexto(v)}` : '';
+}
+async function carregarMelhoresMomentos(opcoes = {}) {
+  try {
+    const resp = await fetch('dados-br/melhores-momentos.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    state.melhoresMomentos = data && data.jogos && typeof data.jogos === 'object' ? data.jogos : {};
+    state.melhoresMomentosMeta = {
+      atualizado_em: data.atualizado_em || null,
+      fonte: data.fonte || 'GE TV / YouTube',
+      total_vinculados: data.total_vinculados || Object.keys(state.melhoresMomentos).length || 0
+    };
+    state.melhoresMomentosCarregados = true;
+    state.melhoresMomentosErro = null;
+  } catch (e) {
+    if (!opcoes.silencioso) console.warn('Melhores momentos indisponíveis:', e);
+    if (opcoes.silencioso && state.melhoresMomentosCarregados) return;
+    state.melhoresMomentos = state.melhoresMomentos || {};
+    state.melhoresMomentosErro = e.message;
+    state.melhoresMomentosCarregados = true;
+  }
+}
+function melhoresMomentosDoJogo(j) {
+  const mapa = state.melhoresMomentos || {};
+  const id = String((j && (j.event_id || j.id)) || '');
+  if (id && mapa[id]) return mapa[id];
+  const chave = chaveMelhoresMomentos(j);
+  if (chave && mapa[chave]) return mapa[chave];
+  const rodada = Number(j && j.rodada || 0);
+  const mand = nomeCanonico((j && j.mandante || {}).nome) || ((j && j.mandante || {}).nome || '');
+  const vist = nomeCanonico((j && j.visitante || {}).nome) || ((j && j.visitante || {}).nome || '');
+  const valores = Object.values(mapa);
+  for (const mm of valores) {
+    if (!mm) continue;
+    if (id && String(mm.event_id || '') === id) return mm;
+  }
+  for (const mm of valores) {
+    if (!mm || Number(mm.rodada || 0) !== rodada) continue;
+    const mmM = nomeCanonico(mm.mandante) || mm.mandante || '';
+    const mmV = nomeCanonico(mm.visitante) || mm.visitante || '';
+    if ((mmM === mand && mmV === vist) || (mmM === vist && mmV === mand)) return mm;
+  }
+  return null;
+}
+function htmlMelhoresMomentos(j, contexto = 'jogo') {
+  const mm = melhoresMomentosDoJogo(j);
+  if (!mm) return '';
+  const url = mm.url || (mm.video_id ? `https://www.youtube.com/watch?v=${encodeURIComponent(mm.video_id)}` : '');
+  if (!url) return '';
+  const titulo = mm.titulo || `Melhores momentos: ${(j.mandante || {}).nome || '?'} x ${(j.visitante || {}).nome || '?'}`;
+  const thumb = mm.thumbnail ? `<img src="${brEscapeAttr(mm.thumbnail)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=&quot;mm-play&quot;>▶</span>'">` : '<span class="mm-play">▶</span>';
+  const conf = Number(mm.confianca || 0);
+  const titleAttr = conf ? `${titulo} · confiança ${(conf * 100).toFixed(0)}%` : titulo;
+  return `<a class="mm-link mm-${contexto}" href="${brEscapeAttr(url)}" target="_blank" rel="noopener noreferrer" title="${brEscapeAttr(titleAttr)}">
+    <span class="mm-thumb">${thumb}</span>
+    <span class="mm-text"><strong>▶️ Melhores momentos</strong><span>${brEscapeHtml(titulo)}</span></span>
+  </a>`;
+}
+
 // ========================================================================
 // MEMBROS DO GRUPO — 27 pessoas, com data de aniversário (dia/mês)
 // Lista pré-cadastrada. As datas serão preenchidas no Admin pelo usuário.
@@ -2064,7 +2237,12 @@ let state = {
   resultadosTimes: [],     // lista de times disponíveis pro filtro
   resultadosCarregados: false,
   resultadosErro: null,
-  resultadosFiltroTime: ''  // time atualmente filtrado (vazio = todos)
+  resultadosFiltroTime: '',  // time atualmente filtrado (vazio = todos)
+  // GE TV / YouTube — melhores momentos por jogo
+  melhoresMomentos: {},
+  melhoresMomentosMeta: null,
+  melhoresMomentosCarregados: false,
+  melhoresMomentosErro: null
 };
 
 // ========================================================================
@@ -2193,7 +2371,6 @@ async function atualizarDadosDoServidor(silencioso = false) {
   // apenas a tabela. Isso evita a tela ficar presa em dados antigos.
   tarefas.push(carregarJogos({ silencioso: true }));
   tarefas.push(carregarResultados({ silencioso: true }));
-
   await Promise.allSettled(tarefas);
 }
 
@@ -2818,6 +2995,8 @@ async function carregarJogos(opcoes = {}) {
     }
   } catch (e) { /* opcional */ }
 
+  await carregarMelhoresMomentos({ silencioso: true });
+
   if (state.view === 'jogos') renderJogos();
   espnLiveArmar(); // liga o AO VIVO (ESPN) se houver janela de jogo
 }
@@ -3102,7 +3281,8 @@ function renderJogos() {
         html += `<div class="jogo-gols">⚽ ${live.gols.join(' · ')}</div>`;
       }
       html += '</div>';
-      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span></div>`;
+      const mmJogo = htmlMelhoresMomentos(j, 'jogo');
+      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span>${mmJogo}</div>`;
       html += '</div>';
     }
     html += '</div>';
@@ -3111,6 +3291,9 @@ function renderJogos() {
   const fontes = [meta.fonte, 'ESPN ao vivo'].filter(Boolean).join(' + ');
   if (fontes) {
     html += `<div style="text-align:center;font-size:11px;color:var(--text-tertiary);margin-top:16px;">Fonte: ${fontes}</div>`;
+  }
+  if (state.melhoresMomentosMeta && state.melhoresMomentosMeta.total_vinculados) {
+    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos GE TV mapeados</span></div>`;
   }
 
   container.innerHTML = html;
@@ -3291,6 +3474,7 @@ async function carregarResultados(opcoes = {}) {
     state.resultadosErro = e.message;
     state.resultadosCarregados = true;
   }
+  await carregarMelhoresMomentos({ silencioso: true });
   if (state.view === 'resultados') renderResultados();
   // A coluna "Últimos 5" da tabela depende dos resultados; se o usuário
   // estiver na tabela, redesenha para a forma aparecer.
@@ -3436,6 +3620,7 @@ function renderResultados() {
           </div>
         </div>
         ${r.estadio ? `<div class="resultado-estadio">📍 ${r.estadio}</div>` : ''}
+        ${htmlMelhoresMomentos(r, 'resultado')}
       </div>`;
     }
     html += '</div>';
@@ -3443,6 +3628,9 @@ function renderResultados() {
 
   if (meta.fonte) {
     html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
+  }
+  if (state.melhoresMomentosMeta && state.melhoresMomentosMeta.total_vinculados) {
+    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos GE TV mapeados</span></div>`;
   }
 
   container.innerHTML = html;
