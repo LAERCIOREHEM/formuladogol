@@ -464,6 +464,63 @@
   }
   function render(o) { if (ABA === "placares") renderPlacares(o); else renderBolao(o); }
 
+
+  // ---- Chance matemática de título / pódio ----
+  function fmtPctChance(v) {
+    const n = Number(v || 0);
+    return n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "%";
+  }
+  function dadoChance(chances, nome) {
+    return chances && chances.por_nome ? chances.por_nome[nome] : null;
+  }
+  function chanceResumoHTML(chances, x) {
+    const c = dadoChance(chances, x.nome);
+    if (!c) return "";
+    const pct = fmtPctChance(c.chance_titulo_pct_exata ?? c.chance_titulo_pct);
+    const vivos = Number(c.cenarios_titulo || 0);
+    const total = Number(chances.total_cenarios || 0);
+    const cls = vivos > 0 ? "chance-viva" : "chance-zero";
+    return `<div class="chance-card ${cls}">
+      <span class="chance-label">Chance de título</span>
+      <b>${pct}</b>
+      <small>${vivos}/${total} cenários</small>
+    </div>`;
+  }
+  function caminhoCurto(c) {
+    if (!c) return "";
+    const fmt = id => id ? `${flag(id)} ${nome(id)}` : "—";
+    const semi = (c.semifinais || []).map(s => `${fmt(s.vencedor)} passa`).join(" · ");
+    const final = c.final ? `${fmt(c.final.campeao)} campeão · ${fmt(c.final.vice)} vice` : "";
+    const terc = c.terceiro_lugar ? `${fmt(c.terceiro_lugar.terceiro)} 3º · ${fmt(c.terceiro_lugar.quarto)} 4º` : "";
+    return [semi, final, terc].filter(Boolean).join("<br>");
+  }
+  function chanceDetalheHTML(chances, x) {
+    const c = dadoChance(chances, x.nome);
+    if (!c) return "";
+    const total = Number(chances.total_cenarios || 0);
+    const linhas = [
+      ["1º lugar", c.chance_titulo_pct_exata ?? c.chance_titulo_pct, c.cenarios_titulo],
+      ["2º lugar", c.chance_segundo_pct_exata ?? c.chance_segundo_pct, c.cenarios_segundo],
+      ["3º lugar", c.chance_terceiro_pct_exata ?? c.chance_terceiro_pct, c.cenarios_terceiro],
+      ["Pódio", c.chance_podio_pct_exata ?? c.chance_podio_pct, c.cenarios_podio]
+    ].map(([lab, pct, cen]) => `<div class="chance-row"><span>${lab}</span><b>${fmtPctChance(pct)}</b><em>${Number(cen || 0)}/${total}</em></div>`).join("");
+    const melhor = Number(c.melhor_pontuacao || 0);
+    const pior = Number(c.pior_pontuacao || 0);
+    const media = Number(c.pontuacao_media_simulada || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const caminho = caminhoCurto(c.melhor_cenario);
+    return `<button class="vermais2" data-chance="${x.nome}">🧮 Detalhar chances ▾</button>
+      <div class="chancebox" id="chance-${cssId(x.nome)}" style="display:none">
+        <div class="chance-metodo">Cálculo cru: ${total} cenários restantes, sem favoritismo. Cada jogo vale 50/50.</div>
+        <div class="chance-grid">${linhas}</div>
+        <div class="chance-extra">
+          <span>Melhor pontuação: <b>${melhor}</b></span>
+          <span>Pior pontuação: <b>${pior}</b></span>
+          <span>Média simulada: <b>${media}</b></span>
+        </div>
+        ${caminho ? `<div class="chance-caminho"><b>Melhor caminho:</b><br>${caminho}</div>` : ""}
+      </div>`;
+  }
+
   function renderBolao(o) {
     const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos };
     const kf = KEY[ORDEM] || KEY.atuais;
@@ -472,6 +529,15 @@
       const cr = cravadosDe(p.pg, o._realGrupos || {});
       return { nome: p.nome, d: p.d, r, cr };
     });
+
+    let CHANCES = null;
+    if (window.COPA_CHANCES && typeof window.COPA_CHANCES.calcular === "function") {
+      try {
+        CHANCES = window.COPA_CHANCES.calcular(lin, o);
+      } catch (err) {
+        console.warn("Falha ao calcular chances matemáticas do bolão", err);
+      }
+    }
 
     // Corte matemático do pódio: usa sempre o ranking por pontos conquistados,
     // independentemente da ordenação visual escolhida pelo usuário.
@@ -524,9 +590,11 @@
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
         <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
         <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">eficiência <b>${eficiencia}</b></span></div>
+        ${chanceResumoHTML(CHANCES, x)}
         <div class="fases">${fasesHTML}<span class="ph">🎯 <b>${x.cr}</b> cravados</span></div>
         <div class="podiodet">${detalheFinal(x.d, o)}</div>
         ${fasesDoPalpiteHTML(x.d, o, x.nome)}
+        ${chanceDetalheHTML(CHANCES, x)}
         <button class="vermais" data-ext="${x.nome}">Ver extrato dos pontos ▾</button>
         <div class="extbox" id="ext-${cssId(x.nome)}" style="display:none">${extratoBolao(x.d, o, x)}</div>
       </div>`;
@@ -543,6 +611,11 @@
       const d = document.getElementById("fases-" + cssId(b.dataset.fases)), ab = d.style.display === "none";
       d.style.display = ab ? "block" : "none";
       b.innerHTML = ab ? "🧭 Ocultar fases do palpite ▴" : "🧭 Fases do palpite ▾";
+    });
+    document.querySelectorAll(".vermais2[data-chance]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("chance-" + cssId(b.dataset.chance)), ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "🧮 Ocultar chances ▴" : "🧮 Detalhar chances ▾";
     });
     document.querySelectorAll(".vermais2[data-gg]").forEach(b => b.onclick = () => {
       const d = document.getElementById("gg-" + cssId(b.dataset.gg)), ab = d.style.display === "none";
