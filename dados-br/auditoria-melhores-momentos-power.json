@@ -1,612 +1,702 @@
 {
-  "atualizado_em": "2026-07-07T21:42:25-03:00",
-  "fonte": "YouTube Search reforçado",
+  "atualizado_em": "2026-07-08T07:23:53-03:00",
+  "fonte": "YouTube Search POWER com controle de quota/cache",
   "rodadas_processadas": {
-    "inicio": 1,
+    "inicio": 17,
     "fim": 18
   },
-  "youtube_search_requests": 70,
+  "youtube_search_requests": 20,
+  "quota_excedida": false,
   "min_confianca_publicar": 0.82,
-  "resumo": {
-    "jogos_ja_vinculados_antes": 131,
-    "jogos_sem_video_antes": 49,
-    "jogos_vinculados_nesta_execucao": 0,
-    "jogos_vinculados_total": 131,
-    "candidatos_duvidosos": 70,
-    "jogos_ainda_sem_video": 49
+  "cache": {
+    "ttl_dias": 21,
+    "consultas_puladas_por_cache": 0
   },
-  "vinculados_nesta_execucao": [],
-  "candidatos_duvidosos": [
-    {
-      "query": "\"Bragantino 1 x 0 Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"service\": \"youtu"
-    },
-    {
-      "query": "\"Bragantino x Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"Santos 1 x 1 São Paulo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit\": \"default"
-    },
-    {
-      "query": "\"Santos x São Paulo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"consumer\": \"projects/5"
-    },
-    {
-      "query": "\"Vasco da Gama 1 x 1 Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          "
-    },
-    {
-      "query": "\"Vasco da Gama x Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.google"
-    },
-    {
-      "query": "\"Bahia 0 x 0 Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit_value\": \"1"
-    },
-    {
-      "query": "\"Bahia x Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"quota_metric\": \"youtube.g"
-    },
-    {
-      "query": "\"Botafogo 0 x 0 Vitória\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"quota_unit\": \"1/d/{projec"
-    },
-    {
-      "query": "\"Botafogo x Vitória\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtub"
-    },
-    {
-      "query": "\"Flamengo 0 x 0 Mirassol\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"Flamengo x Mirassol\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"consumer\": \"projects/5660"
-    },
-    {
-      "query": "\"Bragantino 1 x 1 Athletico-PR\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit\": \"default"
-    },
-    {
-      "query": "\"Bragantino x Athletico-PR\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit\": \"default"
-    },
-    {
-      "query": "\"Remo 1 x 1 Internacional\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          "
-    },
-    {
-      "query": "\"Remo x Internacional\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"service\": \"youtu"
-    },
-    {
-      "query": "\"Coritiba 0 x 1 São Paulo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"service\": \"youtube.google"
-    },
-    {
-      "query": "\"Coritiba x São Paulo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"Cruzeiro 1 x 1 Corinthians\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_unit\": \"1/"
-    },
-    {
-      "query": "\"Cruzeiro x Corinthians\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"quota_metric\": \"youtube.g"
-    },
-    {
-      "query": "\"Grêmio 2 x 1 Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtub"
-    },
-    {
-      "query": "\"Grêmio x Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"Palmeiras 2 x 1 Fluminense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_limit_valu"
-    },
-    {
-      "query": "\"Palmeiras x Fluminense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          "
-    },
-    {
-      "query": "\"Santos 2 x 1 Vasco da Gama\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_location\": \"glob"
-    },
-    {
-      "query": "\"Santos x Vasco da Gama\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"consumer\": \"projects/5"
-    },
-    {
-      "query": "\"Mirassol 2 x 2 Santos\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"consumer\": \"projects/5660"
-    },
-    {
-      "query": "\"Mirassol x Santos\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"Bragantino 1 x 2 Botafogo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_metric\": \""
-    },
-    {
-      "query": "\"Bragantino x Botafogo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit\": \"defaultSearchListPerDayPerProject\",\n          \"s"
-    },
-    {
-      "query": "\"Fluminense 1 x 0 Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          "
-    },
-    {
-      "query": "\"Fluminense x Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"São Paulo 0 x 1 Palmeiras\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"quota_unit\": \"1/d/{projec"
-    },
-    {
-      "query": "\"São Paulo x Palmeiras\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.google"
-    },
-    {
-      "query": "\"Athletico-PR 2 x 0 Coritiba\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"consumer\": \"projects/5660"
-    },
-    {
-      "query": "\"Athletico-PR x Coritiba\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"consumer\": \"projects/5"
-    },
-    {
-      "query": "\"Internacional 2 x 0 Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"quota_unit\": \"1/"
-    },
-    {
-      "query": "\"Internacional x Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit\": \"defaultSearchListPerDayPerProject\",\n          \"q"
-    },
-    {
-      "query": "\"Vitória 1 x 0 Mirassol\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_location\":"
-    },
-    {
-      "query": "\"Vitória x Mirassol\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit_valu"
-    },
-    {
-      "query": "\"Chapecoense 1 x 1 Vitória\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          "
-    },
-    {
-      "query": "\"Chapecoense x Vitória\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit\": \"defaultSearchListPerDayPerProject\",\n          \"q"
-    },
-    {
-      "query": "\"Mirassol 0 x 1 Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"consumer\": \"proj"
-    },
-    {
-      "query": "\"Mirassol x Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"consumer\": \"projects/5660"
-    },
-    {
-      "query": "\"Palmeiras 1 x 0 Athletico-PR\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtub"
-    },
-    {
-      "query": "\"Palmeiras x Athletico-PR\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit\": \"default"
-    },
-    {
-      "query": "\"Santos 2 x 0 Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.google"
-    },
-    {
-      "query": "\"Santos x Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"service\": \"youtube.google"
-    },
-    {
-      "query": "\"Atlético-MG 3 x 1 Mirassol\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          "
-    },
-    {
-      "query": "\"Atlético-MG x Mirassol\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"consumer\": \"projects/5"
-    },
-    {
-      "query": "\"Fluminense 2 x 1 São Paulo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit\": \"defaultSearchListPerDayPerProject\",\n          \"q"
-    },
-    {
-      "query": "\"Fluminense x São Paulo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"consumer\": \"projects/5660"
-    },
-    {
-      "query": "\"Santos 0 x 3 Coritiba\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"consumer\": \"projects/5"
-    },
-    {
-      "query": "\"Santos x Coritiba\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"quota_metric\": \"youtube.g"
-    },
-    {
-      "query": "\"Bahia 1 x 1 Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_location\": \"glob"
-    },
-    {
-      "query": "\"Bahia x Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"Athletico-PR 1 x 1 Flamengo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtub"
-    },
-    {
-      "query": "\"Athletico-PR x Flamengo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"São Paulo 1 x 1 Botafogo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"consumer\": \"projects/5660"
-    },
-    {
-      "query": "\"São Paulo x Botafogo\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_unit\": \"1/"
-    },
-    {
-      "query": "\"Vitória 2 x 0 Internacional\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"consumer\": \"projects/5"
-    },
-    {
-      "query": "\"Vitória x Internacional\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.google"
-    },
-    {
-      "query": "\"Grêmio 3 x 2 Santos\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_limit\": \"d"
-    },
-    {
-      "query": "\"Grêmio x Santos\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"consumer\": \"projects/5660"
-    },
-    {
-      "query": "\"Mirassol 1 x 0 Fluminense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.google"
-    },
-    {
-      "query": "\"Mirassol x Fluminense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"consumer\": \"projects/5660"
-    },
-    {
-      "query": "\"Flamengo 0 x 3 Palmeiras\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"consumer\": \"projects/5"
-    },
-    {
-      "query": "\"Flamengo x Palmeiras\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"consumer\": \"projects/566098724493\",\n          \"quota_unit\": \"1/"
-    },
-    {
-      "query": "\"Cruzeiro 2 x 1 Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit\": \"defaultSearchListPerDayPerProject\",\n          \"q"
-    },
-    {
-      "query": "\"Cruzeiro x Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "erro": "YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_unit\": \"1/"
-    }
-  ],
-  "jogos_ainda_sem_video": [
-    {
-      "event_id": "401840984",
-      "rodada": 2,
-      "mandante": "Bragantino",
-      "visitante": "Atlético-MG"
-    },
-    {
-      "event_id": "401840986",
-      "rodada": 2,
-      "mandante": "Santos",
-      "visitante": "São Paulo"
-    },
-    {
-      "event_id": "401840982",
-      "rodada": 2,
-      "mandante": "Vasco da Gama",
-      "visitante": "Chapecoense"
-    },
-    {
-      "event_id": "401840998",
-      "rodada": 4,
-      "mandante": "Bahia",
-      "visitante": "Chapecoense"
-    },
-    {
-      "event_id": "401840999",
-      "rodada": 4,
-      "mandante": "Botafogo",
-      "visitante": "Vitória"
-    },
-    {
-      "event_id": "401841006",
-      "rodada": 4,
-      "mandante": "Flamengo",
-      "visitante": "Mirassol"
-    },
-    {
-      "event_id": "401841003",
-      "rodada": 4,
-      "mandante": "Bragantino",
-      "visitante": "Athletico-PR"
-    },
-    {
-      "event_id": "401841007",
-      "rodada": 4,
-      "mandante": "Remo",
-      "visitante": "Internacional"
-    },
-    {
-      "event_id": "401841000",
-      "rodada": 4,
-      "mandante": "Coritiba",
-      "visitante": "São Paulo"
-    },
-    {
-      "event_id": "401841001",
-      "rodada": 4,
-      "mandante": "Cruzeiro",
-      "visitante": "Corinthians"
-    },
-    {
-      "event_id": "401841005",
-      "rodada": 4,
-      "mandante": "Grêmio",
-      "visitante": "Atlético-MG"
-    },
-    {
-      "event_id": "401841004",
-      "rodada": 4,
-      "mandante": "Palmeiras",
-      "visitante": "Fluminense"
-    },
-    {
-      "event_id": "401841002",
-      "rodada": 4,
-      "mandante": "Santos",
-      "visitante": "Vasco da Gama"
-    },
-    {
-      "event_id": "401841010",
-      "rodada": 5,
-      "mandante": "Mirassol",
-      "visitante": "Santos"
-    },
-    {
-      "event_id": "401841047",
-      "rodada": 8,
-      "mandante": "Bragantino",
-      "visitante": "Botafogo"
-    },
-    {
-      "event_id": "401841044",
-      "rodada": 8,
-      "mandante": "Fluminense",
-      "visitante": "Atlético-MG"
-    },
-    {
-      "event_id": "401841040",
-      "rodada": 8,
-      "mandante": "São Paulo",
-      "visitante": "Palmeiras"
-    },
-    {
-      "event_id": "401841038",
-      "rodada": 8,
-      "mandante": "Athletico-PR",
-      "visitante": "Coritiba"
-    },
-    {
-      "event_id": "401841043",
-      "rodada": 8,
-      "mandante": "Internacional",
-      "visitante": "Chapecoense"
-    },
-    {
-      "event_id": "401841042",
-      "rodada": 8,
-      "mandante": "Vitória",
-      "visitante": "Mirassol"
-    },
-    {
-      "event_id": "401841065",
-      "rodada": 10,
-      "mandante": "Chapecoense",
-      "visitante": "Vitória"
-    },
-    {
-      "event_id": "401841060",
-      "rodada": 10,
-      "mandante": "Mirassol",
-      "visitante": "Bragantino"
-    },
-    {
-      "event_id": "401841084",
-      "rodada": 12,
-      "mandante": "Palmeiras",
-      "visitante": "Athletico-PR"
-    },
-    {
-      "event_id": "401841109",
-      "rodada": 15,
-      "mandante": "Santos",
-      "visitante": "Bragantino"
-    },
-    {
-      "event_id": "401841120",
-      "rodada": 16,
-      "mandante": "Atlético-MG",
-      "visitante": "Mirassol"
-    },
-    {
-      "event_id": "401841127",
-      "rodada": 16,
-      "mandante": "Fluminense",
-      "visitante": "São Paulo"
-    },
-    {
-      "event_id": "401841123",
-      "rodada": 16,
-      "mandante": "Santos",
-      "visitante": "Coritiba"
-    },
-    {
-      "event_id": "401841119",
-      "rodada": 16,
-      "mandante": "Bahia",
-      "visitante": "Grêmio"
-    },
-    {
-      "event_id": "401841121",
-      "rodada": 16,
-      "mandante": "Athletico-PR",
-      "visitante": "Flamengo"
-    },
+  "resumo": {
+    "jogos_ja_vinculados_antes_automatico_ou_manual": 131,
+    "jogos_sem_video_antes": 20,
+    "jogos_vinculados_nesta_execucao": 17,
+    "jogos_vinculados_total_automatico": 148,
+    "candidatos_duvidosos": 0,
+    "jogos_ainda_sem_video_na_janela": 3,
+    "erros": 0
+  },
+  "vinculados_nesta_execucao": [
     {
       "event_id": "401841132",
+      "chave": "401841132",
       "rodada": 17,
       "mandante": "São Paulo",
-      "visitante": "Botafogo"
+      "visitante": "Botafogo",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "video_id": "F7tAIKLZKWA",
+      "titulo": "MELHORES MOMENTOS DE SÃO PAULO 1 X 1 BOTAFOGO | 17° RODADA BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=F7tAIKLZKWA",
+      "thumbnail": "https://i.ytimg.com/vi/F7tAIKLZKWA/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-23T23:56:39Z",
+      "channel_id": "UCn2GTvHvAHPNV7oBjevQniw",
+      "channel_title": "Futebol Prime",
+      "fonte": "Futebol Prime",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"São Paulo 1 x 1 Botafogo\" \"melhores momentos\" \"Brasileirão 2026\""
     },
     {
       "event_id": "401841130",
+      "chave": "401841130",
       "rodada": 17,
       "mandante": "Vitória",
-      "visitante": "Internacional"
+      "visitante": "Internacional",
+      "placar_mandante": 2,
+      "placar_visitante": 0,
+      "video_id": "SkEfUr_59r8",
+      "titulo": "MELHORES MOMENTOS DE VITÓRIA 2 X 0 INTERNACIONAL | 17° RODADA BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=SkEfUr_59r8",
+      "thumbnail": "https://i.ytimg.com/vi/SkEfUr_59r8/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-24T00:53:04Z",
+      "channel_id": "UCn2GTvHvAHPNV7oBjevQniw",
+      "channel_title": "Futebol Prime",
+      "fonte": "Futebol Prime",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Vitória 2 x 0 Internacional\" \"melhores momentos\" \"Brasileirão 2026\""
     },
     {
       "event_id": "401841135",
+      "chave": "401841135",
       "rodada": 17,
       "mandante": "Grêmio",
-      "visitante": "Santos"
+      "visitante": "Santos",
+      "placar_mandante": 3,
+      "placar_visitante": 2,
+      "video_id": "4K58ka8HcVU",
+      "titulo": "Grêmio 3 X 2 Santos - Melhores momentos (COMPLETOS) da 17° rodada do Brasileirão 2026",
+      "url": "https://www.youtube.com/watch?v=4K58ka8HcVU",
+      "thumbnail": "https://i.ytimg.com/vi/4K58ka8HcVU/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-24T02:09:05Z",
+      "channel_id": "UCaEnMyIzJogHgBBRi4pH-kQ",
+      "channel_title": "Altas Aventuras Ldg",
+      "fonte": "Altas Aventuras Ldg",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Grêmio 3 x 2 Santos\" \"melhores momentos\" \"Brasileirão 2026\""
     },
     {
       "event_id": "401841134",
+      "chave": "401841134",
       "rodada": 17,
       "mandante": "Mirassol",
-      "visitante": "Fluminense"
+      "visitante": "Fluminense",
+      "placar_mandante": 1,
+      "placar_visitante": 0,
+      "video_id": "vsQvAd4U9T4",
+      "titulo": "MELHORES MOMENTOS DE MIRASSOL 1 X 0 FLUMINENSE | 17° RODADA BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=vsQvAd4U9T4",
+      "thumbnail": "https://i.ytimg.com/vi/vsQvAd4U9T4/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-24T02:24:14Z",
+      "channel_id": "UCn2GTvHvAHPNV7oBjevQniw",
+      "channel_title": "Futebol Prime",
+      "fonte": "Futebol Prime",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Mirassol 1 x 0 Fluminense\" \"melhores momentos\" \"Brasileirão 2026\""
     },
     {
       "event_id": "401841136",
+      "chave": "401841136",
       "rodada": 17,
       "mandante": "Flamengo",
-      "visitante": "Palmeiras"
+      "visitante": "Palmeiras",
+      "placar_mandante": 0,
+      "placar_visitante": 3,
+      "video_id": "CVufmdxKQyM",
+      "titulo": "MELHORES MOMENTOS DE FLAMENGO 0 X 3 PALMEIRAS | 17° RODADA BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=CVufmdxKQyM",
+      "thumbnail": "https://i.ytimg.com/vi/CVufmdxKQyM/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-24T18:08:47Z",
+      "channel_id": "UCn2GTvHvAHPNV7oBjevQniw",
+      "channel_title": "Futebol Prime",
+      "fonte": "Futebol Prime",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Flamengo 0 x 3 Palmeiras\" \"melhores momentos\" \"Brasileirão 2026\""
     },
     {
       "event_id": "401841137",
+      "chave": "401841137",
       "rodada": 17,
       "mandante": "Cruzeiro",
-      "visitante": "Chapecoense"
+      "visitante": "Chapecoense",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "video_id": "c11zw6LsHmA",
+      "titulo": "CRUZEIRO 2 X 1 CHAPECOENSE &amp; Bom Humor  98 FM 🤪😂⚽  MELHORES MOMENTOS BRASILEIRÃO 2026 17ª Rodada",
+      "url": "https://www.youtube.com/watch?v=c11zw6LsHmA",
+      "thumbnail": "https://i.ytimg.com/vi/c11zw6LsHmA/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-25T05:05:52Z",
+      "channel_id": "UCwIJJLybOU0gqJ1tVt8A4mw",
+      "channel_title": "CANAL CAVEIRA AZUL CRUZEIRO 98 Futebol Clube 98FM",
+      "fonte": "CANAL CAVEIRA AZUL CRUZEIRO 98 Futebol Clube 98FM",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Cruzeiro 2 x 1 Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\""
     },
+    {
+      "event_id": "401841128",
+      "chave": "401841128",
+      "rodada": 17,
+      "mandante": "Corinthians",
+      "visitante": "Atlético-MG",
+      "placar_mandante": 1,
+      "placar_visitante": 0,
+      "video_id": "TmWPKl4mkPI",
+      "titulo": "MELHORES MOMENTOS: CORINTHIANS 1 X 0 ATLÉTICO-MG | BRASILEIRÃO 2026 | 17ª RODADA",
+      "url": "https://www.youtube.com/watch?v=TmWPKl4mkPI",
+      "thumbnail": "https://i.ytimg.com/vi/TmWPKl4mkPI/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-25T00:20:53Z",
+      "channel_id": "UCqRraVICLr0asn90cAvkIZQ",
+      "channel_title": "Corinthians TV",
+      "fonte": "Corinthians TV",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Corinthians 1 x 0 Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841129",
+      "chave": "401841129",
+      "rodada": 17,
+      "mandante": "Coritiba",
+      "visitante": "Bahia",
+      "placar_mandante": 3,
+      "placar_visitante": 2,
+      "video_id": "gzLL2EHHeQM",
+      "titulo": "MELHORES MOMENTOS DE CORITIBA 3 X 2 BAHIA | 17° RODADA BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=gzLL2EHHeQM",
+      "thumbnail": "https://i.ytimg.com/vi/gzLL2EHHeQM/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-26T23:35:53Z",
+      "channel_id": "UCn2GTvHvAHPNV7oBjevQniw",
+      "channel_title": "Futebol Prime",
+      "fonte": "Futebol Prime",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Coritiba 3 x 2 Bahia\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841138",
+      "chave": "401841138",
+      "rodada": 18,
+      "mandante": "Athletico-PR",
+      "visitante": "Mirassol",
+      "placar_mandante": 1,
+      "placar_visitante": 0,
+      "video_id": "2AyeGyTv8d4",
+      "titulo": "Athletico PR 1 X 0 Mirassol | Melhores Momentos | Brasileirão 2026",
+      "url": "https://www.youtube.com/watch?v=2AyeGyTv8d4",
+      "thumbnail": "https://i.ytimg.com/vi/2AyeGyTv8d4/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-30T23:23:15Z",
+      "channel_id": "UC8RrjoT8ovQ43Le7qvHuoMA",
+      "channel_title": "Metrópoles Esportes",
+      "fonte": "Metrópoles Esportes",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.84,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Athletico-PR 1 x 0 Mirassol\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841144",
+      "chave": "401841144",
+      "rodada": 18,
+      "mandante": "Flamengo",
+      "visitante": "Coritiba",
+      "placar_mandante": 3,
+      "placar_visitante": 0,
+      "video_id": "SWf5MQVboQI",
+      "titulo": "MELHORES MOMENTOS DE FLAMENGO 3 X 0 CORITIBA | 18° RODADA BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=SWf5MQVboQI",
+      "thumbnail": "https://i.ytimg.com/vi/SWf5MQVboQI/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-31T22:51:53Z",
+      "channel_id": "UCn2GTvHvAHPNV7oBjevQniw",
+      "channel_title": "Futebol Prime",
+      "fonte": "Futebol Prime",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Flamengo 3 x 0 Coritiba\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841146",
+      "chave": "401841146",
+      "rodada": 18,
+      "mandante": "Bahia",
+      "visitante": "Botafogo",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "video_id": "83lpjv_jxaM",
+      "titulo": "Bahia 2 x 1 Botafogo | Melhores Momentos | Brasileirão 2026",
+      "url": "https://www.youtube.com/watch?v=83lpjv_jxaM",
+      "thumbnail": "https://i.ytimg.com/vi/83lpjv_jxaM/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-31T02:03:08Z",
+      "channel_id": "UC8RrjoT8ovQ43Le7qvHuoMA",
+      "channel_title": "Metrópoles Esportes",
+      "fonte": "Metrópoles Esportes",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.84,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Bahia 2 x 1 Botafogo\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841139",
+      "chave": "401841139",
+      "rodada": 18,
+      "mandante": "Grêmio",
+      "visitante": "Corinthians",
+      "placar_mandante": 1,
+      "placar_visitante": 3,
+      "video_id": "Lw31pn-5YbU",
+      "titulo": "MELHORES MOMENTOS | GRÊMIO 1 X 3 CORINTHIANS | 18ª RODADA BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=Lw31pn-5YbU",
+      "thumbnail": "https://i.ytimg.com/vi/Lw31pn-5YbU/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-06-01T02:20:05Z",
+      "channel_id": "UCpHSkedq6intt-JtirNerAQ",
+      "channel_title": "Habilidade de Ouro",
+      "fonte": "Habilidade de Ouro",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Grêmio 1 x 3 Corinthians\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841143",
+      "chave": "401841143",
+      "rodada": 18,
+      "mandante": "Santos",
+      "visitante": "Vitória",
+      "placar_mandante": 3,
+      "placar_visitante": 1,
+      "video_id": "Ll6ZdH81lnw",
+      "titulo": "Santos 3 X 1 Vitória Melhores Momentos | Brasileirão 2026 Completo ",
+      "url": "https://www.youtube.com/watch?v=Ll6ZdH81lnw",
+      "thumbnail": "https://i.ytimg.com/vi/Ll6ZdH81lnw/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-31T01:21:25Z",
+      "channel_id": "UCoFaxPada6oxV2xEs-mHvWA",
+      "channel_title": "DAVID CRF",
+      "fonte": "DAVID CRF",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.84,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Santos 3 x 1 Vitória\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841141",
+      "chave": "401841141",
+      "rodada": 18,
+      "mandante": "Bragantino",
+      "visitante": "Internacional",
+      "placar_mandante": 3,
+      "placar_visitante": 1,
+      "video_id": "5ppe_wY2Qf0",
+      "titulo": "RB BRAGANTINO 3 X 1 INTERNACIONAL | MELHORES MOMENTOS | BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=5ppe_wY2Qf0",
+      "thumbnail": "https://i.ytimg.com/vi/5ppe_wY2Qf0/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-31T23:57:18Z",
+      "channel_id": "UC8RrjoT8ovQ43Le7qvHuoMA",
+      "channel_title": "Metrópoles Esportes",
+      "fonte": "Metrópoles Esportes",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.84,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Bragantino 3 x 1 Internacional\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841140",
+      "chave": "401841140",
+      "rodada": 18,
+      "mandante": "Palmeiras",
+      "visitante": "Chapecoense",
+      "placar_mandante": 1,
+      "placar_visitante": 0,
+      "video_id": "c-qN4OeAfs4",
+      "titulo": "PALMEIRAS 1 X 0 CHAPECOENSE | MELHORES MOMENTOS | BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=c-qN4OeAfs4",
+      "thumbnail": "https://i.ytimg.com/vi/c-qN4OeAfs4/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-05-31T22:11:54Z",
+      "channel_id": "UC3KHYFWeB0WimMBfm3NEahQ",
+      "channel_title": "UOL Esporte",
+      "fonte": "UOL Esporte",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.84,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Palmeiras 1 x 0 Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841145",
+      "chave": "401841145",
+      "rodada": 18,
+      "mandante": "Cruzeiro",
+      "visitante": "Fluminense",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "video_id": "zRf6CaUzRW8",
+      "titulo": "CRUZEIRO 1 X 1 FLUMINENSE  🤪😂😂 &amp; Bom Humor 98 FM ⚽Melhores Momentos BRASILEIRÃO 2026 18ª Rodada",
+      "url": "https://www.youtube.com/watch?v=zRf6CaUzRW8",
+      "thumbnail": "https://i.ytimg.com/vi/zRf6CaUzRW8/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-06-01T16:08:35Z",
+      "channel_id": "UCwIJJLybOU0gqJ1tVt8A4mw",
+      "channel_title": "CANAL CAVEIRA AZUL CRUZEIRO 98 Futebol Clube 98FM",
+      "fonte": "CANAL CAVEIRA AZUL CRUZEIRO 98 Futebol Clube 98FM",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Cruzeiro 1 x 1 Fluminense\" \"melhores momentos\" \"Brasileirão 2026\""
+    },
+    {
+      "event_id": "401841147",
+      "chave": "401841147",
+      "rodada": 18,
+      "mandante": "Remo",
+      "visitante": "São Paulo",
+      "placar_mandante": 1,
+      "placar_visitante": 0,
+      "video_id": "QiN6mZFyym4",
+      "titulo": "REMO 1 X 0 SÃO PAULO MELHORES MOMENTOS 18ª RODADA BRASILEIRÃO 2026 ge globo",
+      "url": "https://www.youtube.com/watch?v=QiN6mZFyym4",
+      "thumbnail": "https://i.ytimg.com/vi/QiN6mZFyym4/hqdefault.jpg",
+      "playlist_id": null,
+      "published_at": "2026-06-05T15:38:09Z",
+      "channel_id": "UCICkAxGDqaonrofouvXpZlw",
+      "channel_title": "Futebol Raiz TV",
+      "fonte": "Futebol Raiz TV",
+      "fonte_busca": "YouTube Search POWER",
+      "confianca": 0.96,
+      "motivos": [
+        "mandante e visitante no título",
+        "título compatível com melhores momentos",
+        "placar confere",
+        "rodada no título confere",
+        "título indica Brasileirão/Campeonato Brasileiro",
+        "query exata com placar"
+      ],
+      "query": "\"Remo 1 x 0 São Paulo\" \"melhores momentos\" \"Brasileirão 2026\""
+    }
+  ],
+  "candidatos_duvidosos": [],
+  "jogos_ainda_sem_video": [
     {
       "event_id": "401841133",
       "rodada": 17,
       "mandante": "Remo",
       "visitante": "Athletico-PR",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841128",
-      "rodada": 17,
-      "mandante": "Corinthians",
-      "visitante": "Atlético-MG",
-      "motivo": "limite de buscas atingido"
+      "motivo": "sem vínculo com confiança suficiente"
     },
     {
       "event_id": "401841131",
       "rodada": 17,
       "mandante": "Vasco da Gama",
       "visitante": "Bragantino",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841129",
-      "rodada": 17,
-      "mandante": "Coritiba",
-      "visitante": "Bahia",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841138",
-      "rodada": 18,
-      "mandante": "Athletico-PR",
-      "visitante": "Mirassol",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841144",
-      "rodada": 18,
-      "mandante": "Flamengo",
-      "visitante": "Coritiba",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841146",
-      "rodada": 18,
-      "mandante": "Bahia",
-      "visitante": "Botafogo",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841139",
-      "rodada": 18,
-      "mandante": "Grêmio",
-      "visitante": "Corinthians",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841143",
-      "rodada": 18,
-      "mandante": "Santos",
-      "visitante": "Vitória",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841141",
-      "rodada": 18,
-      "mandante": "Bragantino",
-      "visitante": "Internacional",
-      "motivo": "limite de buscas atingido"
-    },
-    {
-      "event_id": "401841140",
-      "rodada": 18,
-      "mandante": "Palmeiras",
-      "visitante": "Chapecoense",
-      "motivo": "limite de buscas atingido"
+      "motivo": "sem vínculo com confiança suficiente"
     },
     {
       "event_id": "401841142",
       "rodada": 18,
       "mandante": "Vasco da Gama",
       "visitante": "Atlético-MG",
-      "motivo": "limite de buscas atingido"
+      "motivo": "sem vínculo com confiança suficiente"
+    }
+  ],
+  "erros": [],
+  "buscas_executadas": [
+    {
+      "event_id": "401841132",
+      "rodada": 17,
+      "mandante": "São Paulo",
+      "visitante": "Botafogo",
+      "query": "\"São Paulo 1 x 1 Botafogo\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841130",
+      "rodada": 17,
+      "mandante": "Vitória",
+      "visitante": "Internacional",
+      "query": "\"Vitória 2 x 0 Internacional\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 5
+    },
+    {
+      "event_id": "401841135",
+      "rodada": 17,
+      "mandante": "Grêmio",
+      "visitante": "Santos",
+      "query": "\"Grêmio 3 x 2 Santos\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841134",
+      "rodada": 17,
+      "mandante": "Mirassol",
+      "visitante": "Fluminense",
+      "query": "\"Mirassol 1 x 0 Fluminense\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 4
+    },
+    {
+      "event_id": "401841136",
+      "rodada": 17,
+      "mandante": "Flamengo",
+      "visitante": "Palmeiras",
+      "query": "\"Flamengo 0 x 3 Palmeiras\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841137",
+      "rodada": 17,
+      "mandante": "Cruzeiro",
+      "visitante": "Chapecoense",
+      "query": "\"Cruzeiro 2 x 1 Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841133",
+      "rodada": 17,
+      "mandante": "Remo",
+      "visitante": "Athletico-PR",
+      "query": "\"Remo 1 x 2 Athletico-PR\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 1
+    },
+    {
+      "event_id": "401841128",
+      "rodada": 17,
+      "mandante": "Corinthians",
+      "visitante": "Atlético-MG",
+      "query": "\"Corinthians 1 x 0 Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 5
+    },
+    {
+      "event_id": "401841131",
+      "rodada": 17,
+      "mandante": "Vasco da Gama",
+      "visitante": "Bragantino",
+      "query": "\"Vasco da Gama 0 x 3 Bragantino\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 1
+    },
+    {
+      "event_id": "401841129",
+      "rodada": 17,
+      "mandante": "Coritiba",
+      "visitante": "Bahia",
+      "query": "\"Coritiba 3 x 2 Bahia\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 5
+    },
+    {
+      "event_id": "401841138",
+      "rodada": 18,
+      "mandante": "Athletico-PR",
+      "visitante": "Mirassol",
+      "query": "\"Athletico-PR 1 x 0 Mirassol\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 1
+    },
+    {
+      "event_id": "401841144",
+      "rodada": 18,
+      "mandante": "Flamengo",
+      "visitante": "Coritiba",
+      "query": "\"Flamengo 3 x 0 Coritiba\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841146",
+      "rodada": 18,
+      "mandante": "Bahia",
+      "visitante": "Botafogo",
+      "query": "\"Bahia 2 x 1 Botafogo\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841139",
+      "rodada": 18,
+      "mandante": "Grêmio",
+      "visitante": "Corinthians",
+      "query": "\"Grêmio 1 x 3 Corinthians\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 5
+    },
+    {
+      "event_id": "401841143",
+      "rodada": 18,
+      "mandante": "Santos",
+      "visitante": "Vitória",
+      "query": "\"Santos 3 x 1 Vitória\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841141",
+      "rodada": 18,
+      "mandante": "Bragantino",
+      "visitante": "Internacional",
+      "query": "\"Bragantino 3 x 1 Internacional\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 5
+    },
+    {
+      "event_id": "401841140",
+      "rodada": 18,
+      "mandante": "Palmeiras",
+      "visitante": "Chapecoense",
+      "query": "\"Palmeiras 1 x 0 Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841142",
+      "rodada": 18,
+      "mandante": "Vasco da Gama",
+      "visitante": "Atlético-MG",
+      "query": "\"Vasco da Gama 0 x 1 Atlético-MG\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 0
     },
     {
       "event_id": "401841145",
       "rodada": 18,
       "mandante": "Cruzeiro",
       "visitante": "Fluminense",
-      "motivo": "limite de buscas atingido"
+      "query": "\"Cruzeiro 1 x 1 Fluminense\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
     },
     {
       "event_id": "401841147",
       "rodada": 18,
       "mandante": "Remo",
       "visitante": "São Paulo",
-      "motivo": "limite de buscas atingido"
+      "query": "\"Remo 1 x 0 São Paulo\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 4
     }
   ],
-  "buscas_executadas": []
+  "buscas_puladas_por_cache": []
 }
