@@ -2237,16 +2237,33 @@ function chaveMelhoresMomentos(j) {
   const v = nomeCanonico((j && j.visitante || {}).nome) || ((j && j.visitante || {}).nome || '');
   return rodada ? `rodada-${rodada}-${normalizarChaveJogoTexto(m)}-${normalizarChaveJogoTexto(v)}` : '';
 }
+async function carregarJsonOpcionalBr(url) {
+  try {
+    const resp = await fetch(url + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) return null;
+    return await resp.json();
+  } catch (e) {
+    return null;
+  }
+}
 async function carregarMelhoresMomentos(opcoes = {}) {
   try {
-    const resp = await fetch('dados-br/melhores-momentos.json?t=' + Date.now(), { cache: 'no-store' });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const data = await resp.json();
-    state.melhoresMomentos = data && data.jogos && typeof data.jogos === 'object' ? data.jogos : {};
+    const auto = await carregarJsonOpcionalBr('dados-br/melhores-momentos.json');
+    const manual = await carregarJsonOpcionalBr('dados-br/melhores-momentos-manual.json');
+    const autoJogos = auto && auto.jogos && typeof auto.jogos === 'object' ? auto.jogos : {};
+    const manualJogos = manual && manual.jogos && typeof manual.jogos === 'object' ? manual.jogos : {};
+
+    // Fallback manual tem prioridade. Assim um link corrigido manualmente substitui
+    // qualquer vínculo automático fraco sem precisar alterar o robô.
+    state.melhoresMomentos = { ...autoJogos, ...manualJogos };
+    const totalAuto = auto && auto.total_vinculados ? Number(auto.total_vinculados) : Object.keys(autoJogos).length;
+    const totalManual = Object.keys(manualJogos).length;
     state.melhoresMomentosMeta = {
-      atualizado_em: data.atualizado_em || null,
-      fonte: data.fonte || 'GE TV / YouTube',
-      total_vinculados: data.total_vinculados || Object.keys(state.melhoresMomentos).length || 0
+      atualizado_em: (manual && manual.atualizado_em) || (auto && auto.atualizado_em) || null,
+      fonte: totalManual ? 'GE TV / YouTube + fallback manual' : ((auto && auto.fonte) || 'GE TV / YouTube'),
+      total_vinculados: Object.keys(state.melhoresMomentos).length || totalAuto || 0,
+      total_automaticos: totalAuto || 0,
+      total_manuais: totalManual || 0
     };
     state.melhoresMomentosCarregados = true;
     state.melhoresMomentosErro = null;
@@ -3505,7 +3522,7 @@ function renderJogos() {
     html += `<div style="text-align:center;font-size:11px;color:var(--text-tertiary);margin-top:16px;">Fonte: ${fontes}</div>`;
   }
   if (state.melhoresMomentosMeta && state.melhoresMomentosMeta.total_vinculados) {
-    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos GE TV mapeados</span></div>`;
+    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos mapeados</span></div>`;
   }
 
   container.innerHTML = html;
@@ -3844,7 +3861,7 @@ function renderResultados() {
     html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
   }
   if (state.melhoresMomentosMeta && state.melhoresMomentosMeta.total_vinculados) {
-    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos GE TV mapeados</span></div>`;
+    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos mapeados</span></div>`;
   }
   if (state.jogosDetalhesMeta && state.jogosDetalhesMeta.total_com_estatisticas) {
     html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">📊 ${state.jogosDetalhesMeta.total_com_estatisticas} jogos com estatísticas ESPN</span></div>`;
