@@ -1932,6 +1932,125 @@ body > .container > section.hero > img {
     .mm-text span { font-size: 10px; }
   }
 
+
+  /* EXECUÇÃO 3 — Resultados enriquecidos: estatísticas por jogo ESPN */
+  .resultado-extra {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .match-stats-block {
+    width: min(100%, 720px);
+    margin: 0 auto;
+    border: 1px solid rgba(96,165,250,.22);
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(96,165,250,.10), rgba(74,222,128,.05));
+    overflow: hidden;
+  }
+  .match-stats-block summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: #dbeafe;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: .2px;
+  }
+  .match-stats-block summary::-webkit-details-marker { display: none; }
+  .match-stats-block summary::after {
+    content: 'abrir';
+    color: var(--text-tertiary);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+  }
+  .match-stats-block[open] summary::after { content: 'fechar'; }
+  .match-stats-inner {
+    padding: 0 12px 12px;
+    border-top: 1px solid rgba(255,255,255,.08);
+  }
+  .match-stats-head {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 10px 0 8px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .match-stats-head .home { text-align: left; }
+  .match-stats-head .away { text-align: right; }
+  .match-stats-head .vs { color: var(--text-tertiary); font-size: 10px; }
+  .match-stat-row {
+    display: grid;
+    grid-template-columns: 56px minmax(120px, 1fr) 56px;
+    gap: 8px;
+    align-items: center;
+    padding: 7px 0;
+    border-top: 1px solid rgba(255,255,255,.055);
+  }
+  .match-stat-row:first-of-type { border-top: 0; }
+  .match-stat-value {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+  }
+  .match-stat-value.home { text-align: left; }
+  .match-stat-value.away { text-align: right; }
+  .match-stat-mid { min-width: 0; }
+  .match-stat-label {
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    line-height: 1.15;
+    margin-bottom: 5px;
+  }
+  .match-stat-bars {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    height: 5px;
+  }
+  .match-stat-bar-box {
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+  }
+  .match-stat-bar-box.home { transform: rotate(180deg); }
+  .match-stat-bar {
+    height: 100%;
+    min-width: 2px;
+    border-radius: 999px;
+  }
+  .match-stat-bar.home { background: rgba(74,222,128,.78); }
+  .match-stat-bar.away { background: rgba(96,165,250,.78); }
+  .match-stats-source {
+    margin-top: 8px;
+    color: var(--text-tertiary);
+    font-size: 10px;
+    text-align: center;
+  }
+  @media (max-width: 720px) {
+    .resultado-extra { gap: 7px; }
+    .match-stats-block { width: 100%; border-radius: 13px; }
+    .match-stats-block summary { padding: 8px 10px; font-size: 11.5px; }
+    .match-stats-inner { padding: 0 10px 10px; }
+    .match-stat-row { grid-template-columns: 48px minmax(96px, 1fr) 48px; gap: 6px; padding: 6px 0; }
+    .match-stat-value { font-size: 12px; }
+    .match-stat-label { font-size: 10.5px; }
+    .match-stats-head { font-size: 10.5px; }
+  }
+
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260707-header-web-menu-final">
 </head>
@@ -2176,6 +2295,90 @@ function htmlMelhoresMomentos(j, contexto = 'jogo') {
   </a>`;
 }
 
+async function carregarJogosDetalhes(opcoes = {}) {
+  try {
+    const resp = await fetch('dados-br/jogos-detalhes.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    state.jogosDetalhes = data && data.jogos && typeof data.jogos === 'object' ? data.jogos : {};
+    state.jogosDetalhesMeta = {
+      gerado_em: data.gerado_em || null,
+      fonte: data.fonte || 'ESPN summary',
+      total_jogos: data.total_jogos || Object.keys(state.jogosDetalhes).length || 0,
+      total_com_estatisticas: data.total_com_estatisticas || 0
+    };
+    state.jogosDetalhesCarregados = true;
+    state.jogosDetalhesErro = null;
+  } catch (e) {
+    if (!opcoes.silencioso) console.warn('Estatísticas por jogo indisponíveis:', e);
+    if (opcoes.silencioso && state.jogosDetalhesCarregados) return;
+    state.jogosDetalhes = state.jogosDetalhes || {};
+    state.jogosDetalhesErro = e.message;
+    state.jogosDetalhesCarregados = true;
+  }
+}
+
+function detalhesDoJogo(j) {
+  const mapa = state.jogosDetalhes || {};
+  const id = String((j && (j.event_id || j.id)) || '');
+  if (id && mapa[id]) return mapa[id];
+  for (const det of Object.values(mapa)) {
+    if (det && id && String(det.event_id || '') === id) return det;
+  }
+  return null;
+}
+
+function estatisticasDoJogo(j) {
+  const det = detalhesDoJogo(j);
+  const stats = det ? (det.stats || det.estatisticas || []) : [];
+  return Array.isArray(stats) ? stats.filter(s => s && (s.home !== '' || s.away !== '')) : [];
+}
+
+function brNumeroEstatistica(valor) {
+  const texto = String(valor ?? '').replace(',', '.');
+  const m = texto.match(/-?\d+(?:\.\d+)?/);
+  return m ? Number(m[0]) : null;
+}
+
+function htmlBarrasEstatistica(home, away) {
+  const h = brNumeroEstatistica(home);
+  const a = brNumeroEstatistica(away);
+  if (!Number.isFinite(h) || !Number.isFinite(a) || h < 0 || a < 0 || (h + a) <= 0) {
+    return '<div class="match-stat-bars"><div class="match-stat-bar-box home"></div><div class="match-stat-bar-box away"></div></div>';
+  }
+  const total = h + a;
+  const ph = Math.max(4, Math.min(100, (h / total) * 100));
+  const pa = Math.max(4, Math.min(100, (a / total) * 100));
+  return `<div class="match-stat-bars"><div class="match-stat-bar-box home"><div class="match-stat-bar home" style="width:${ph.toFixed(1)}%"></div></div><div class="match-stat-bar-box away"><div class="match-stat-bar away" style="width:${pa.toFixed(1)}%"></div></div></div>`;
+}
+
+function htmlEstatisticasJogo(j) {
+  const stats = estatisticasDoJogo(j);
+  if (!stats.length) return '';
+  const m = (j.mandante || {}).nome || 'Mandante';
+  const v = (j.visitante || {}).nome || 'Visitante';
+  const eventId = brEscapeAttr((j.event_id || '').toString());
+  const linhas = stats.map(s => {
+    const home = s.home ?? s.mandante ?? '';
+    const away = s.away ?? s.visitante ?? '';
+    const nome = s.nome || s.label || 'Estatística';
+    return `<div class="match-stat-row">
+      <div class="match-stat-value home">${brEscapeHtml(home)}</div>
+      <div class="match-stat-mid"><div class="match-stat-label">${brEscapeHtml(nome)}</div>${htmlBarrasEstatistica(home, away)}</div>
+      <div class="match-stat-value away">${brEscapeHtml(away)}</div>
+    </div>`;
+  }).join('');
+  return `<details class="match-stats-block" data-event-id="${eventId}">
+    <summary>📊 Estatísticas do jogo</summary>
+    <div class="match-stats-inner">
+      <div class="match-stats-head"><span class="home">${brEscapeHtml(m)}</span><span class="vs">mandante × visitante</span><span class="away">${brEscapeHtml(v)}</span></div>
+      ${linhas}
+      <div class="match-stats-source">Fonte: ESPN summary · exibido somente quando a ESPN disponibiliza o boxscore do jogo.</div>
+    </div>
+  </details>`;
+}
+
+
 // ========================================================================
 // MEMBROS DO GRUPO — 27 pessoas, com data de aniversário (dia/mês)
 // Lista pré-cadastrada. As datas serão preenchidas no Admin pelo usuário.
@@ -2242,7 +2445,12 @@ let state = {
   melhoresMomentos: {},
   melhoresMomentosMeta: null,
   melhoresMomentosCarregados: false,
-  melhoresMomentosErro: null
+  melhoresMomentosErro: null,
+  // ESPN summary — estatísticas por jogo na aba Resultados
+  jogosDetalhes: {},
+  jogosDetalhesMeta: null,
+  jogosDetalhesCarregados: false,
+  jogosDetalhesErro: null
 };
 
 // ========================================================================
@@ -2652,6 +2860,10 @@ function setView(v) {
   }
   if (v === 'resultados' && !state.resultadosCarregados) {
     carregarResultados();
+  } else if (v === 'resultados' && !state.jogosDetalhesCarregados) {
+    carregarJogosDetalhes({ silencioso: true }).then(() => {
+      if (state.view === 'resultados') renderResultados();
+    });
   }
   render();
   if (window.BR_CENTER_ACTIVE_NAV) setTimeout(window.BR_CENTER_ACTIVE_NAV, 40);
@@ -3475,6 +3687,7 @@ async function carregarResultados(opcoes = {}) {
     state.resultadosCarregados = true;
   }
   await carregarMelhoresMomentos({ silencioso: true });
+  await carregarJogosDetalhes({ silencioso: true });
   if (state.view === 'resultados') renderResultados();
   // A coluna "Últimos 5" da tabela depende dos resultados; se o usuário
   // estiver na tabela, redesenha para a forma aparecer.
@@ -3602,6 +3815,7 @@ function renderResultados() {
         : `<div class="escudo-fallback-pequeno">${(v.sigla || (v.nome || '?').slice(0,3)).toUpperCase()}</div>`;
 
       const dataFmt = formatarDataResultado(r.data_iso);
+      const extrasResultado = [htmlMelhoresMomentos(r, 'resultado'), htmlEstatisticasJogo(r)].filter(Boolean).join('');
 
       html += `<div class="resultado-card ${classeJogo}">
         <div class="resultado-meta">
@@ -3620,7 +3834,7 @@ function renderResultados() {
           </div>
         </div>
         ${r.estadio ? `<div class="resultado-estadio">📍 ${r.estadio}</div>` : ''}
-        ${htmlMelhoresMomentos(r, 'resultado')}
+        ${extrasResultado ? `<div class="resultado-extra">${extrasResultado}</div>` : ''}
       </div>`;
     }
     html += '</div>';
@@ -3631,6 +3845,9 @@ function renderResultados() {
   }
   if (state.melhoresMomentosMeta && state.melhoresMomentosMeta.total_vinculados) {
     html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos GE TV mapeados</span></div>`;
+  }
+  if (state.jogosDetalhesMeta && state.jogosDetalhesMeta.total_com_estatisticas) {
+    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">📊 ${state.jogosDetalhesMeta.total_com_estatisticas} jogos com estatísticas ESPN</span></div>`;
   }
 
   container.innerHTML = html;
