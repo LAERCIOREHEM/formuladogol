@@ -521,6 +521,39 @@
       </div>`;
   }
 
+  function chancePainelHTML(chances) {
+    if (!chances || !Array.isArray(chances.participantes) || !chances.participantes.length) return "";
+    const total = Number(chances.total_cenarios || 0);
+    const cada = Number(chances.cada_cenario_pct || 0);
+    const vivosTitulo = chances.participantes.filter(p => Number(p.cenarios_titulo || 0) > 0);
+    const top = vivosTitulo.slice(0, 5);
+    const semTitulo = chances.participantes.length - vivosTitulo.length;
+    const cenTxt = total === 1 ? "1 cenário restante" : `${total} cenários restantes`;
+    const cadaTxt = total ? `Cada cenário vale ${fmtPctChance(cada)}.` : "";
+    const linhas = top.length ? top.map((p, i) => {
+      const pct = fmtPctChance(p.chance_titulo_pct_exata ?? p.chance_titulo_pct);
+      const podio = fmtPctChance(p.chance_podio_pct_exata ?? p.chance_podio_pct);
+      return `<div class="chance-top-row">
+        <span class="chance-top-pos">${i + 1}</span>
+        <span class="chance-top-nome">${p.nome}</span>
+        <b>${pct}</b>
+        <small>${Number(p.cenarios_titulo || 0)}/${total} · pódio ${podio}</small>
+      </div>`;
+    }).join("") : `<div class="chance-top-empty">Nenhum participante tem caminho matemático isolado para o título neste momento.</div>`;
+    return `<section class="chance-topbox" aria-label="Chance matemática de título do bolão">
+      <div class="chance-top-head">
+        <div>
+          <span class="chance-kicker">🧮 Simulação crua do bolão</span>
+          <h2>Chance matemática de título</h2>
+        </div>
+        <div class="chance-top-total"><b>${cenTxt}</b><small>${cadaTxt}</small></div>
+      </div>
+      <p class="chance-top-desc">Sem favoritismo: todos os jogos restantes são tratados como 50/50. O cálculo respeita a chave real, a pontuação atual, os pontos futuros de semifinalistas, finalistas e pódio, e o desempate por cravados.</p>
+      <div class="chance-top-list">${linhas}</div>
+      <div class="chance-top-foot">${vivosTitulo.length} participante(s) ainda têm chance de título · ${semTitulo} sem caminho matemático para 1º neste momento.</div>
+    </section>`;
+  }
+
   function renderBolao(o) {
     const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos };
     const kf = KEY[ORDEM] || KEY.atuais;
@@ -568,7 +601,8 @@
     }
 
     const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯 · Cards sombreados indicam participante sem chance matemática de pódio.</p>';
-    $("#app").innerHTML = toggleHTML() + controles + banner + tbnote + visiveis.map((x, i) => {
+    const painelChances = ABA === "bolao" ? chancePainelHTML(CHANCES) : "";
+    $("#app").innerHTML = toggleHTML() + controles + banner + painelChances + tbnote + visiveis.map((x, i) => {
       const pos = x.posReal, r = x.r;
       const eficiencia = eficienciaPct(r);
       const tot = r.atuais + r.perdidos + r.possiveis || 1;
