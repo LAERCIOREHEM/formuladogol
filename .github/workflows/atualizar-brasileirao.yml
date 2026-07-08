@@ -65,11 +65,11 @@ jobs:
         id: espn
         run: python atualizar_espn.py
 
-      - name: Gerar estatísticas e ranking de desempenho
-        run: python scripts/gerar_estatisticas_brasileirao.py
-
       - name: Buscar estatísticas por jogo finalizado
         run: python scripts/buscar_detalhes_jogos_brasileirao.py
+
+      - name: Gerar estatísticas e Ranking Vivo de desempenho
+        run: python scripts/gerar_estatisticas_brasileirao.py
 
       - name: Gerar auditoria de cobertura da aba Resultados
         run: python scripts/gerar_auditoria_cobertura_resultados.py
@@ -78,7 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/auditoria-cobertura-resultados.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/auditoria-cobertura-resultados.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -104,6 +104,11 @@ jobs:
           rank = json.load(open('dados-br/ranking-desempenho.json', encoding='utf-8'))
           assert len(stats.get('clubes') or []) == 20, 'estatisticas.json sem 20 clubes'
           assert len(rank.get('ranking') or []) == 20, 'ranking-desempenho.json sem 20 clubes'
+          for item in rank.get('ranking') or []:
+              for campo in ['indice_final', 'ataque', 'defesa', 'dominio', 'eficiencia', 'disciplina']:
+                  assert campo in item, f'ranking sem campo {campo}'
+          aud_rank = json.load(open('dados-br/auditoria-ranking-desempenho.json', encoding='utf-8'))
+          assert aud_rank.get('clubes_no_ranking') == 20, 'auditoria-ranking sem 20 clubes'
           jogadores = json.load(open('dados-br/jogadores.json', encoding='utf-8'))
           assert isinstance(jogadores.get('artilharia'), list), 'jogadores.json sem artilharia'
           assert isinstance(jogadores.get('assistencias'), list), 'jogadores.json sem assistencias'
@@ -137,6 +142,7 @@ jobs:
             "resultados.json"
             "dados-br/estatisticas.json"
             "dados-br/ranking-desempenho.json"
+            "dados-br/auditoria-ranking-desempenho.json"
             "dados-br/jogadores.json"
             "dados-br/jogos-detalhes.json"
             "dados-br/auditoria-jogos-detalhes.json"
