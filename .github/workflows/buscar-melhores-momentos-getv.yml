@@ -19,14 +19,20 @@ on:
         description: "Rodada final. Deixe vazio para usar config."
         required: false
         default: ""
-  # Incremental agressivo: a cada 30 min, 07h–23h30 BRT.
-  # GitHub Actions usa UTC: 10–23 UTC = 07–20 BRT; 00–02 UTC = 21–23 BRT.
+  # Incremental reduzido: 3 vezes ao dia para economizar cota/commits.
+  # GitHub Actions usa UTC; abaixo equivale aprox. a 23h20, 08h20 e 14h20 BRT.
+  # Para backfill ou rodadas específicas, use Run workflow manualmente.
   schedule:
-    - cron: '*/30 10-23 * * *'
-    - cron: '*/30 0-2 * * *'
+    - cron: '20 2,11,17 * * *'
 
 permissions:
   contents: write
+
+# Este workflow também faz git push no main.
+# Usa a mesma fila dos demais workflows para evitar corrida de push.
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
 
 jobs:
   buscar:
@@ -36,6 +42,9 @@ jobs:
     steps:
       - name: Baixar repositório
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Preparar Python
         uses: actions/setup-python@v5
@@ -83,15 +92,61 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
 
-          git add dados-br/melhores-momentos.json dados-br/getv-playlists.json dados-br/auditoria-melhores-momentos.json dados-br/auditoria-cobertura-resultados.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          if git diff --cached --quiet; then
+          FILES=(
+            "dados-br/melhores-momentos.json"
+            "dados-br/getv-playlists.json"
+            "dados-br/auditoria-melhores-momentos.json"
+            "dados-br/auditoria-cobertura-resultados.json"
+          )
+
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Nenhuma mudança nos JSONs de melhores momentos. Nada para commitar."
             exit 0
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Atualiza melhores momentos GE TV"
-          git push
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            if [[ -e "$f" ]]; then
+              mkdir -p "$TMP_DIR/$(dirname "$f")"
+              cp -a "$f" "$TMP_DIR/$f"
+            fi
+          done
+
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              if [[ -e "$TMP_DIR/$f" ]]; then
+                rm -rf "$f"
+                mkdir -p "$(dirname "$f")"
+                cp -a "$TMP_DIR/$f" "$f"
+              fi
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Após atualizar com origin/main, nada mudou — sem commit."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar melhores momentos GE TV - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+            if git push origin HEAD:main; then
+              echo "Push OK na tentativa $i."
+              exit 0
+            fi
+
+            echo "Push rejeitado na tentativa $i; tentando novamente sobre origin/main mais recente..."
+            sleep 3
+          done
+
+          echo "ERRO: Push falhou após 5 tentativas."
+          exit 1
