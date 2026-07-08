@@ -20,6 +20,7 @@ on:
     paths:
       - 'atualizar_espn.py'
       - 'scripts/gerar_estatisticas_brasileirao.py'
+      - 'scripts/buscar_detalhes_jogos_brasileirao.py'
       - '.github/workflows/atualizar-brasileirao.yml'
 
 permissions:
@@ -35,7 +36,7 @@ jobs:
   atualizar:
     name: Buscar dados ESPN e publicar JSONs
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Baixar repositorio
@@ -66,12 +67,14 @@ jobs:
       - name: Gerar estatísticas e ranking de desempenho
         run: python scripts/gerar_estatisticas_brasileirao.py
 
+      - name: Buscar estatísticas por jogo finalizado
+        run: python scripts/buscar_detalhes_jogos_brasileirao.py
 
       - name: Conferir e validar JSONs gerados
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/jogadores.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -101,7 +104,11 @@ jobs:
           assert isinstance(jogadores.get('artilharia'), list), 'jogadores.json sem artilharia'
           assert isinstance(jogadores.get('assistencias'), list), 'jogadores.json sem assistencias'
           assert isinstance(jogadores.get('participacoes_gol'), list), 'jogadores.json sem participacoes_gol'
-          print('  OK   Estatísticas: 20 clubes, ranking e jogadores.json gerados')
+          detalhes = json.load(open('dados-br/jogos-detalhes.json', encoding='utf-8'))
+          assert isinstance(detalhes.get('jogos'), dict), 'jogos-detalhes.json sem objeto jogos'
+          auditoria = json.load(open('dados-br/auditoria-jogos-detalhes.json', encoding='utf-8'))
+          assert isinstance(auditoria.get('falhas'), list), 'auditoria-jogos-detalhes.json sem lista falhas'
+          print('  OK   Estatísticas: 20 clubes, ranking, jogadores e detalhes por jogo gerados')
           PY
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
@@ -125,6 +132,8 @@ jobs:
             "dados-br/estatisticas.json"
             "dados-br/ranking-desempenho.json"
             "dados-br/jogadores.json"
+            "dados-br/jogos-detalhes.json"
+            "dados-br/auditoria-jogos-detalhes.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
