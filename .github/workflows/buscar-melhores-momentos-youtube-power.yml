@@ -4,28 +4,40 @@ on:
   workflow_dispatch:
     inputs:
       rodada_inicio:
-        description: "Rodada inicial"
+        description: "Rodada inicial. Padrão: 17 para rodar leve nas recentes."
         required: true
-        default: "1"
+        default: "17"
       rodada_fim:
-        description: "Rodada final"
+        description: "Rodada final. Padrão: 18."
         required: true
         default: "18"
       max_buscas_total:
-        description: "Limite de chamadas YouTube search.list. Use com controle para não esgotar a cota diária."
+        description: "Limite de chamadas YouTube search.list. Use baixo para não estourar quota."
         required: true
-        default: "70"
+        default: "20"
       max_consultas_por_jogo:
-        description: "Consultas por jogo sem vídeo. Use 1 ou 2; 3 só se necessário."
+        description: "Consultas por jogo sem vídeo. Recomendado: 1."
         required: true
-        default: "2"
+        default: "1"
       min_confianca:
         description: "Confiança mínima para publicar automaticamente"
         required: true
         default: "0.82"
+      ignorar_cache:
+        description: "Ignorar cache de buscas sem resultado? Use false quase sempre."
+        required: true
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 permissions:
   contents: write
+
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
 
 jobs:
   power:
@@ -35,6 +47,9 @@ jobs:
     steps:
       - name: Baixar repositório
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Preparar Python
         uses: actions/setup-python@v5
@@ -45,32 +60,50 @@ jobs:
         run: |
           python -m py_compile scripts/buscar_melhores_momentos_getv.py
           python -m py_compile scripts/buscar_melhores_momentos_youtube_power.py
+          python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
           python scripts/buscar_melhores_momentos_youtube_power.py --dry-run --rodada-inicio "${{ inputs.rodada_inicio }}" --rodada-fim "${{ inputs.rodada_fim }}"
 
       - name: Busca reforçada fora das playlists
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        shell: bash
         run: |
+          set -euo pipefail
+
+          EXTRA=()
+          if [ "${{ inputs.ignorar_cache }}" = "true" ]; then
+            EXTRA+=(--ignorar-cache)
+          fi
+
           python scripts/buscar_melhores_momentos_youtube_power.py \
             --rodada-inicio "${{ inputs.rodada_inicio }}" \
             --rodada-fim "${{ inputs.rodada_fim }}" \
             --max-buscas-total "${{ inputs.max_buscas_total }}" \
             --max-consultas-por-jogo "${{ inputs.max_consultas_por_jogo }}" \
-            --min-confianca "${{ inputs.min_confianca }}"
+            --min-confianca "${{ inputs.min_confianca }}" \
+            "${EXTRA[@]}"
+
+      - name: Gerar auditoria de cobertura da aba Resultados
+        run: python scripts/gerar_auditoria_cobertura_resultados.py
 
       - name: Commitar JSONs se mudaram
         shell: bash
         run: |
           set -euo pipefail
 
-          git add dados-br/melhores-momentos.json dados-br/auditoria-melhores-momentos-power.json || true
+          git add \
+            dados-br/melhores-momentos.json \
+            dados-br/melhores-momentos-manual.json \
+            dados-br/auditoria-melhores-momentos-power.json \
+            dados-br/auditoria-melhores-momentos-power-cache.json \
+            dados-br/auditoria-cobertura-resultados.json || true
 
           if git diff --cached --quiet; then
-            echo "Nenhum vídeo novo encontrado com confiança suficiente. Nada para commitar."
+            echo "Nenhum vídeo novo ou auditoria nova. Nada para commitar."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "Busca reforçada de melhores momentos no YouTube"
+          git commit -m "Busca POWER de melhores momentos com controle de quota"
           git push

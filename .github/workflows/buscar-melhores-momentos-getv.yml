@@ -45,6 +45,7 @@ jobs:
       - name: Validar script
         run: |
           python -m py_compile scripts/buscar_melhores_momentos_getv.py
+          python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
           python scripts/buscar_melhores_momentos_getv.py --dry-run --modo incremental
 
       - name: Buscar vídeos da GE TV
@@ -75,12 +76,15 @@ jobs:
           echo "Executando: ${CMD[*]}"
           "${CMD[@]}"
 
+      - name: Gerar auditoria de cobertura da aba Resultados
+        run: python scripts/gerar_auditoria_cobertura_resultados.py
+
       - name: Commitar JSONs se mudaram
         shell: bash
         run: |
           set -euo pipefail
 
-          git add dados-br/melhores-momentos.json dados-br/getv-playlists.json dados-br/auditoria-melhores-momentos.json
+          git add dados-br/melhores-momentos.json dados-br/getv-playlists.json dados-br/auditoria-melhores-momentos.json dados-br/auditoria-cobertura-resultados.json
 
           if git diff --cached --quiet; then
             echo "Nenhuma mudança nos JSONs de melhores momentos. Nada para commitar."

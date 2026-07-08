@@ -21,6 +21,7 @@ on:
       - 'atualizar_espn.py'
       - 'scripts/gerar_estatisticas_brasileirao.py'
       - 'scripts/buscar_detalhes_jogos_brasileirao.py'
+      - 'scripts/gerar_auditoria_cobertura_resultados.py'
       - '.github/workflows/atualizar-brasileirao.yml'
 
 permissions:
@@ -70,11 +71,14 @@ jobs:
       - name: Buscar estatísticas por jogo finalizado
         run: python scripts/buscar_detalhes_jogos_brasileirao.py
 
+      - name: Gerar auditoria de cobertura da aba Resultados
+        run: python scripts/gerar_auditoria_cobertura_resultados.py
+
       - name: Conferir e validar JSONs gerados
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/auditoria-cobertura-resultados.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -108,7 +112,9 @@ jobs:
           assert isinstance(detalhes.get('jogos'), dict), 'jogos-detalhes.json sem objeto jogos'
           auditoria = json.load(open('dados-br/auditoria-jogos-detalhes.json', encoding='utf-8'))
           assert isinstance(auditoria.get('falhas'), list), 'auditoria-jogos-detalhes.json sem lista falhas'
-          print('  OK   Estatísticas: 20 clubes, ranking, jogadores e detalhes por jogo gerados')
+          cobertura = json.load(open('dados-br/auditoria-cobertura-resultados.json', encoding='utf-8'))
+          assert isinstance(cobertura.get('resumo'), dict), 'auditoria-cobertura-resultados.json sem resumo'
+          print('  OK   Estatísticas: 20 clubes, ranking, jogadores, detalhes por jogo e cobertura gerados')
           PY
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
@@ -134,6 +140,7 @@ jobs:
             "dados-br/jogadores.json"
             "dados-br/jogos-detalhes.json"
             "dados-br/auditoria-jogos-detalhes.json"
+            "dados-br/auditoria-cobertura-resultados.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
