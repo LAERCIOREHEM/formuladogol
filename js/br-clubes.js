@@ -51,7 +51,7 @@
   }
   function tabelaDo(nome){ return state.tabela.find(t => t.time === nome) || {}; }
   function rankingDo(nome){ return state.ranking.find(r => r.time === nome) || {}; }
-  function numeroRanking(v){ const n = Number(v); return Number.isFinite(n) ? Math.round(n) : "—"; }
+  function numeroRanking(v){ const n = Number(v); return Number.isFinite(n) ? n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "—"; }
   function rankingResumoHtml(r){
     if (!r || !r.time) return `<span class="club-ranking-pill muted">⚡ Ranking desempenho: aguardando</span>`;
     return `<span class="club-ranking-pill">⚡ Ranking desempenho: <strong>${escapeHtml(r.pos || "—")}º</strong> · índice <strong>${escapeHtml(numeroRanking(r.indice_final ?? r.score))}</strong></span>`;

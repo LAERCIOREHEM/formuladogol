@@ -297,12 +297,18 @@
 
   function scoreNumber(v) {
     const n = Number(v);
-    return Number.isFinite(n) ? Math.max(0, Math.min(100, Math.round(n))) : 0;
+    return Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
+  }
+
+  function numeroIndice(v) {
+    const n = scoreNumber(v);
+    return n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
 
   function metricBar(label, valor) {
     const n = scoreNumber(valor);
-    return `<div class="perf-metric"><span>${escapeHtml(label)}</span><div class="perf-bar" aria-hidden="true"><i style="width:${n}%"></i></div><strong>${n}</strong></div>`;
+    const largura = Math.max(0, Math.min(100, n));
+    return `<div class="perf-metric"><span>${escapeHtml(label)}</span><div class="perf-bar" aria-hidden="true"><i style="width:${largura}%"></i></div><strong>${numeroIndice(n)}</strong></div>`;
   }
 
   function rankingMetricasResumo(c) {
@@ -341,7 +347,7 @@
           <div class="performance-raw">${rankingMetricasResumo(c)}</div>
           <div class="justificativa">${escapeHtml(c.justificativa || "Índice pondera ataque, defesa, domínio, eficiência e disciplina.")}</div>
         </div>
-        <div class="club-score performance-score">${numero(indice)}<small>índice</small></div>
+        <div class="club-score performance-score">${numeroIndice(indice)}<small>índice</small></div>
       </article>`;
     }).join("")}</div>`;
   }

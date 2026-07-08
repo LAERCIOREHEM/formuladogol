@@ -472,32 +472,37 @@ def componentes_desempenho(c: dict[str, Any], avancadas: dict[str, Any]) -> dict
         normalizar_faixa(gols_pro_pj, 0.60, 2.20) * 0.40
         + normalizar_faixa(chutes_gol, 2.0, 6.2) * 0.25
         + normalizar_faixa(finalizacoes, 8.0, 18.0) * 0.20
-        + normalizar_faixa(aproveitamento_chutes, 22.0, 46.0) * 0.15
+        + normalizar_faixa(aproveitamento_chutes, 22.0, 46.0) * 0.15,
+        1,
     )
     defesa = round(
         normalizar_faixa(gols_contra_pj, 0.55, 2.15, inverter=True) * 0.45
         + normalizar_faixa(chutes_gol_contra, 2.0, 6.2, inverter=True) * 0.25
         + normalizar_faixa(finalizacoes_contra, 8.0, 18.0, inverter=True) * 0.20
-        + normalizar_faixa(saldo_pj, -1.10, 1.30) * 0.10
+        + normalizar_faixa(saldo_pj, -1.10, 1.30) * 0.10,
+        1,
     )
     dominio = round(
         normalizar_faixa(posse, 42.0, 60.0) * 0.35
         + normalizar_faixa(precisao_passe, 74.0, 90.0) * 0.25
         + normalizar_faixa(passes, 280.0, 570.0) * 0.20
-        + normalizar_faixa(escanteios_saldo, -2.2, 3.2) * 0.20
+        + normalizar_faixa(escanteios_saldo, -2.2, 3.2) * 0.20,
+        1,
     )
     eficiencia = round(
         aproveitamento * 0.44
         + normalizar_faixa(aproveitamento_ult5, 20.0, 85.0) * 0.22
         + normalizar_faixa(aproveitamento_chutes, 22.0, 46.0) * 0.20
-        + normalizar_faixa(saldo_pj, -1.10, 1.30) * 0.14
+        + normalizar_faixa(saldo_pj, -1.10, 1.30) * 0.14,
+        1,
     )
     disciplina = round(
         normalizar_faixa(cartoes, 1.0, 4.1, inverter=True) * 0.46
         + normalizar_faixa(faltas, 8.0, 18.5, inverter=True) * 0.34
-        + normalizar_faixa(vermelhos, 0.0, 0.28, inverter=True) * 0.20
+        + normalizar_faixa(vermelhos, 0.0, 0.28, inverter=True) * 0.20,
+        1,
     )
-    indice = round(ataque * 0.23 + defesa * 0.23 + dominio * 0.18 + eficiencia * 0.26 + disciplina * 0.10)
+    indice = round(ataque * 0.23 + defesa * 0.23 + dominio * 0.18 + eficiencia * 0.26 + disciplina * 0.10, 1)
 
     return {
         "ataque": max(0, min(100, ataque)),
@@ -561,7 +566,7 @@ def gerar_ranking_desempenho(clubes: list[dict[str, Any]]) -> tuple[list[dict[st
             "forma_ultimos5": c.get("forma_ultimos5"),
             "justificativa": justificativa,
         })
-    ranking.sort(key=lambda x: (-int(x["indice_final"]), int(x.get("pos_tabela") or 99), normalizar(x["time"])))
+    ranking.sort(key=lambda x: (-float(x["indice_final"]), int(x.get("pos_tabela") or 99), normalizar(x["time"])))
     for i, item in enumerate(ranking, 1):
         item["pos"] = i
     auditoria["clubes_no_ranking"] = len(ranking)

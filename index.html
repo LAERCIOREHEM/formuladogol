@@ -2409,11 +2409,16 @@ function rankingDesempenhoDoTime(nome) {
   return canonico ? (state.rankingDesempenho || {})[canonico] : null;
 }
 
+function formatarIndiceDesempenho(valor) {
+  const n = Number(valor);
+  return Number.isFinite(n) ? n.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '—';
+}
+
 function htmlRankingMiniTime(nome, contexto = '') {
   const r = rankingDesempenhoDoTime(nome);
   if (!r) return '';
   const pos = r.pos || r.pos_ranking || '—';
-  const indice = Math.round(Number(r.indice_final ?? r.score ?? 0));
+  const indice = formatarIndiceDesempenho(r.indice_final ?? r.score);
   const titulo = `${nomeCanonico(nome) || nome}: ${pos}º no ranking de desempenho · índice ${indice}`;
   return `<span class="br-team-rank-mini ${contexto === 'resultado' ? 'br-team-rank-result' : ''}" title="${brEscapeAttr(titulo)}">${brEscapeHtml(pos)}º · ${brEscapeHtml(indice)}</span>`;
 }
