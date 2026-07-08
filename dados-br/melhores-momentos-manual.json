@@ -1,6 +1,6 @@
 {
-  "atualizado_em": "2026-07-08T00:00:00-03:00",
-  "fonte": "manual",
+  "atualizado_em": "2026-07-08T11:03:00-03:00",
+  "fonte": "manual / YouTube",
   "observacao": "Fallback manual opcional. Use o event_id do jogo como chave e informe url/video_id/titulo. O site dá prioridade a este arquivo quando existir vínculo manual.",
   "exemplo_comentado": {
     "401841145": {
@@ -14,5 +14,78 @@
       "confianca": 1.0
     }
   },
-  "jogos": {}
+  "jogos": {
+    "401841133": {
+      "event_id": "401841133",
+      "chave": "401841133",
+      "rodada": 17,
+      "mandante": "Remo",
+      "visitante": "Athletico-PR",
+      "placar_mandante": 1,
+      "placar_visitante": 2,
+      "video_id": "GolF2cvoBJ8",
+      "titulo": "REMO 1 X 2 ATHLETICO-PR | MELHORES MOMENTOS | 17ª RODADA BRASILEIRÃO 2026 | ge.globo",
+      "url": "https://www.youtube.com/watch?v=GolF2cvoBJ8",
+      "thumbnail": "https://i.ytimg.com/vi/GolF2cvoBJ8/hqdefault.jpg",
+      "playlist_id": null,
+      "fonte": "Manual / GE TV / YouTube",
+      "fonte_busca": "manual",
+      "confianca": 1.0,
+      "motivos": [
+        "link informado manualmente pelo administrador",
+        "event_id conferido em resultados.json",
+        "mandante e visitante conferem",
+        "placar confere",
+        "rodada confere"
+      ]
+    },
+    "401841142": {
+      "event_id": "401841142",
+      "chave": "401841142",
+      "rodada": 18,
+      "mandante": "Vasco da Gama",
+      "visitante": "Atlético-MG",
+      "placar_mandante": 0,
+      "placar_visitante": 1,
+      "video_id": "O3_2NqTJoAs",
+      "titulo": "VASCO 0 X 1 ATLÉTICO-MG | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026 | ge.globo",
+      "url": "https://www.youtube.com/watch?v=O3_2NqTJoAs",
+      "thumbnail": "https://i.ytimg.com/vi/O3_2NqTJoAs/hqdefault.jpg",
+      "playlist_id": null,
+      "fonte": "Manual / GE TV / YouTube",
+      "fonte_busca": "manual",
+      "confianca": 1.0,
+      "motivos": [
+        "link informado manualmente pelo administrador",
+        "event_id conferido em resultados.json",
+        "mandante e visitante conferem",
+        "placar confere",
+        "rodada confere"
+      ]
+    },
+    "401841131": {
+      "event_id": "401841131",
+      "chave": "401841131",
+      "rodada": 17,
+      "mandante": "Vasco da Gama",
+      "visitante": "Bragantino",
+      "placar_mandante": 0,
+      "placar_visitante": 3,
+      "video_id": "bkd8yda04fc",
+      "titulo": "VASCO 0 X 3 BRAGANTINO | MELHORES MOMENTOS | 17ª RODADA DO BRASILEIRÃO 2026",
+      "url": "https://www.youtube.com/watch?v=bkd8yda04fc",
+      "thumbnail": "https://i.ytimg.com/vi/bkd8yda04fc/hqdefault.jpg",
+      "playlist_id": null,
+      "fonte": "Manual / YouTube",
+      "fonte_busca": "manual",
+      "confianca": 1.0,
+      "motivos": [
+        "link informado manualmente pelo administrador",
+        "event_id conferido em resultados.json",
+        "mandante e visitante conferem",
+        "placar confere",
+        "rodada confere"
+      ]
+    }
+  }
 }
