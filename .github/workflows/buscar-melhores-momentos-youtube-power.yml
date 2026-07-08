@@ -1,0 +1,76 @@
+name: Buscar melhores momentos YouTube POWER
+
+on:
+  workflow_dispatch:
+    inputs:
+      rodada_inicio:
+        description: "Rodada inicial"
+        required: true
+        default: "1"
+      rodada_fim:
+        description: "Rodada final"
+        required: true
+        default: "18"
+      max_buscas_total:
+        description: "Limite de chamadas YouTube search.list. Use com controle para não esgotar a cota diária."
+        required: true
+        default: "70"
+      max_consultas_por_jogo:
+        description: "Consultas por jogo sem vídeo. Use 1 ou 2; 3 só se necessário."
+        required: true
+        default: "2"
+      min_confianca:
+        description: "Confiança mínima para publicar automaticamente"
+        required: true
+        default: "0.82"
+
+permissions:
+  contents: write
+
+jobs:
+  power:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validar scripts
+        run: |
+          python -m py_compile scripts/buscar_melhores_momentos_getv.py
+          python -m py_compile scripts/buscar_melhores_momentos_youtube_power.py
+          python scripts/buscar_melhores_momentos_youtube_power.py --dry-run --rodada-inicio "${{ inputs.rodada_inicio }}" --rodada-fim "${{ inputs.rodada_fim }}"
+
+      - name: Busca reforçada fora das playlists
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: |
+          python scripts/buscar_melhores_momentos_youtube_power.py \
+            --rodada-inicio "${{ inputs.rodada_inicio }}" \
+            --rodada-fim "${{ inputs.rodada_fim }}" \
+            --max-buscas-total "${{ inputs.max_buscas_total }}" \
+            --max-consultas-por-jogo "${{ inputs.max_consultas_por_jogo }}" \
+            --min-confianca "${{ inputs.min_confianca }}"
+
+      - name: Commitar JSONs se mudaram
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git add dados-br/melhores-momentos.json dados-br/auditoria-melhores-momentos-power.json || true
+
+          if git diff --cached --quiet; then
+            echo "Nenhum vídeo novo encontrado com confiança suficiente. Nada para commitar."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "Busca reforçada de melhores momentos no YouTube"
+          git push
