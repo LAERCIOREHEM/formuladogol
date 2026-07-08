@@ -295,23 +295,55 @@
     }).join("")}</span>`;
   }
 
+  function scoreNumber(v) {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(0, Math.min(100, Math.round(n))) : 0;
+  }
+
+  function metricBar(label, valor) {
+    const n = scoreNumber(valor);
+    return `<div class="perf-metric"><span>${escapeHtml(label)}</span><div class="perf-bar" aria-hidden="true"><i style="width:${n}%"></i></div><strong>${n}</strong></div>`;
+  }
+
+  function rankingMetricasResumo(c) {
+    const m = c.metricas || {};
+    const partes = [];
+    if (m.posse_media !== undefined) partes.push(`posse ${numero(m.posse_media, "%")}`);
+    if (m.finalizacoes_media !== undefined) partes.push(`${numero(m.finalizacoes_media)} finaliz./j`);
+    if (m.chutes_gol_media !== undefined) partes.push(`${numero(m.chutes_gol_media)} no gol/j`);
+    if (m.gols_contra_jogo !== undefined) partes.push(`${numero(m.gols_contra_jogo)} GC/j`);
+    if (m.cartoes_media !== undefined) partes.push(`${numero(m.cartoes_media)} cartões/j`);
+    return partes.slice(0, 5).map(p => `<span>${escapeHtml(p)}</span>`).join("");
+  }
+
   function renderRankingDesempenho() {
     const ranking = filtrarPorClube(state.ranking?.ranking || state.estatisticas?.ranking_desempenho || []);
     if (!ranking.length) {
       $("ranking-desempenho").innerHTML = `<div class="empty-state">Ranking de desempenho ainda não gerado. Rode o workflow do Brasileirão ou o script <strong>scripts/gerar_estatisticas_brasileirao.py</strong>.</div>`;
       return;
     }
-    $("ranking-desempenho").innerHTML = ranking.slice(0, state.filtro ? 20 : 10).map((c) => `
-      <div class="club-row">
-        <div class="club-rank">${numero(c.pos)}</div>
-        <div class="club-main">
-          <div class="club-name">${imgEscudo(c)} ${escapeHtml(c.time)}</div>
-          <div class="club-sub">${formaHtml(c.forma_ultimos5 || c.forma)}<span>${numero(c.pontos)} pts</span><span>${numero(c.aproveitamento, "%")}</span><span>SG ${numero(c.sg)}</span></div>
-          <div class="justificativa">${escapeHtml(c.justificativa || "Índice pondera tabela, aproveitamento, saldo e forma recente.")}</div>
+    const limite = state.filtro ? 20 : 20;
+    $("ranking-desempenho").innerHTML = `<div class="performance-list">${ranking.slice(0, limite).map((c) => {
+      const indice = scoreNumber(c.indice_final ?? c.score);
+      const pos = c.pos || c.pos_ranking || "—";
+      return `<article class="club-row performance-row">
+        <div class="club-rank">${numero(pos)}</div>
+        <div class="club-main performance-main">
+          <div class="club-name performance-title">${imgEscudo(c)} <span>${escapeHtml(c.time)}</span></div>
+          <div class="club-sub performance-sub">${formaHtml(c.forma_ultimos5 || c.forma)}<span>${numero(c.pontos)} pts</span><span>${numero(c.aproveitamento, "%")} aprov.</span><span>SG ${numero(c.sg)}</span><span>${numero(c.pos_tabela)}º na tabela</span></div>
+          <div class="performance-metrics">
+            ${metricBar("Ataque", c.ataque)}
+            ${metricBar("Defesa", c.defesa)}
+            ${metricBar("Domínio", c.dominio)}
+            ${metricBar("Eficiência", c.eficiencia)}
+            ${metricBar("Disciplina", c.disciplina)}
+          </div>
+          <div class="performance-raw">${rankingMetricasResumo(c)}</div>
+          <div class="justificativa">${escapeHtml(c.justificativa || "Índice pondera ataque, defesa, domínio, eficiência e disciplina.")}</div>
         </div>
-        <div class="club-score">${numero(c.score)}<small>índice</small></div>
-      </div>
-    `).join("");
+        <div class="club-score performance-score">${numero(indice)}<small>índice</small></div>
+      </article>`;
+    }).join("")}</div>`;
   }
 
   function renderAtaqueDefesa() {

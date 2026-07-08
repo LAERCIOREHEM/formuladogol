@@ -39,6 +39,17 @@
     adminLigaSelecionada: null
   };
 
+
+  function abaInicialPorUrl() {
+    try {
+      const params = new URLSearchParams(global.location.search || "");
+      const aba = (params.get("aba") || global.location.hash.replace("#", "") || "").toLowerCase();
+      return ["apostas", "meus", "ranking", "publico", "auditoria", "admin"].includes(aba) ? aba : "";
+    } catch (err) {
+      return "";
+    }
+  }
+
   function status(msg, tipo = "warn") {
     const el = $("#status");
     if (!el) return;
@@ -1300,6 +1311,8 @@
   }
 
   async function init() {
+    const abaUrl = abaInicialPorUrl();
+    if (abaUrl) state.aba = abaUrl;
     state.supabase = initSupabase();
     bindBaseEvents();
     await carregarBase();

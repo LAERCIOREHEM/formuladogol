@@ -405,3 +405,37 @@ body.modal-open { overflow: hidden; }
     object-position: center center !important;
   }
 }
+
+/* EXECUÇÃO 5 — resumo discreto do Ranking Vivo nos cards de Clubes */
+.club-ranking-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  border: 1px solid rgba(163,230,53,.20);
+  border-radius: 999px;
+  background: rgba(163,230,53,.08);
+  color: #eaffb5;
+  padding: 6px 9px;
+  font-size: 11px;
+  font-weight: 900;
+}
+.club-ranking-pill.muted { color: var(--muted); border-color: rgba(148,163,184,.14); background: rgba(255,255,255,.03); }
+.club-ranking-pill strong { color: #fff4aa; }
+.club-performance-mini {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 12px 0 2px;
+}
+.club-performance-mini span {
+  border: 1px solid rgba(148,163,184,.13);
+  border-radius: 999px;
+  background: rgba(255,255,255,.035);
+  color: var(--muted);
+  padding: 6px 9px;
+  font-size: 11px;
+  font-weight: 900;
+}
+.club-performance-mini strong { color: #efffc3; }

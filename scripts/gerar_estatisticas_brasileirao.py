@@ -291,40 +291,266 @@ def montar_clubes(tabela: list[dict[str, Any]], resultados: list[dict[str, Any]]
     return clubes
 
 
-def score_desempenho(c: dict[str, Any]) -> int:
+
+def carregar_jogos_detalhes() -> dict[str, Any]:
+    payload = ler_json("dados-br/jogos-detalhes.json", {"jogos": {}})
+    return payload if isinstance(payload, dict) else {"jogos": {}}
+
+
+def numero_estatistica(valor: Any) -> float | None:
+    if valor is None or valor == "":
+        return None
+    s = str(valor).strip().replace("%", "").replace(",", ".")
+    s = re.sub(r"[^0-9.\-]", "", s)
+    if not s or s in {".", "-", "-."}:
+        return None
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def clamp01(v: float) -> float:
+    return max(0.0, min(1.0, v))
+
+
+def normalizar_faixa(valor: float | None, minimo: float, maximo: float, inverter: bool = False) -> float:
+    if valor is None or not math.isfinite(float(valor)) or maximo == minimo:
+        base = 0.50
+    else:
+        base = clamp01((float(valor) - minimo) / (maximo - minimo))
+    if inverter:
+        base = 1.0 - base
+    return base * 100.0
+
+
+def stat_por_nome(stats: list[dict[str, Any]], nome: str, lado: str) -> float | None:
+    alvo = normalizar(nome)
+    for st in stats or []:
+        if normalizar(st.get("nome")) == alvo:
+            return numero_estatistica(st.get(lado))
+    return None
+
+
+def soma_segura(valores: list[float | None]) -> float:
+    return sum(float(v) for v in valores if v is not None and math.isfinite(float(v)))
+
+
+def media_segura(total: float, jogos: int) -> float:
+    return round(total / jogos, 3) if jogos else 0.0
+
+
+def agregar_metricas_avancadas(clubes: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+    """Agrega boxscore ESPN por clube para o Ranking Vivo.
+
+    Usa dados-br/jogos-detalhes.json quando disponível. Se ainda não houver o
+    arquivo, o ranking continua funcionando com os dados de tabela/resultados.
+    """
+    detalhes = carregar_jogos_detalhes()
+    jogos = detalhes.get("jogos") if isinstance(detalhes.get("jogos"), dict) else {}
+
+    base: dict[str, dict[str, Any]] = {}
+    for c in clubes:
+        nome = c["time"]
+        base[nome] = {
+            "time": nome,
+            "jogos_com_boxscore": 0,
+            "posse_total": 0.0,
+            "finalizacoes": 0.0,
+            "finalizacoes_contra": 0.0,
+            "chutes_gol": 0.0,
+            "chutes_gol_contra": 0.0,
+            "bloqueados": 0.0,
+            "escanteios": 0.0,
+            "escanteios_contra": 0.0,
+            "faltas": 0.0,
+            "amarelos": 0.0,
+            "vermelhos": 0.0,
+            "impedimentos": 0.0,
+            "defesas": 0.0,
+            "passes_certos": 0.0,
+            "precisao_passe_total": 0.0,
+            "aproveitamento_chutes_total": 0.0,
+        }
+
+    for det in (jogos or {}).values():
+        if not isinstance(det, dict):
+            continue
+        mand = para_canonico(det.get("mandante")) or str(det.get("mandante") or "")
+        vist = para_canonico(det.get("visitante")) or str(det.get("visitante") or "")
+        stats = det.get("stats") or det.get("estatisticas") or []
+        if not mand or not vist or not isinstance(stats, list):
+            continue
+        for time_nome, lado, lado_adv in ((mand, "home", "away"), (vist, "away", "home")):
+            if time_nome not in base:
+                continue
+            b = base[time_nome]
+            b["jogos_com_boxscore"] += 1
+            b["posse_total"] += stat_por_nome(stats, "Posse", lado) or 0
+            b["finalizacoes"] += stat_por_nome(stats, "Finalizações", lado) or 0
+            b["finalizacoes_contra"] += stat_por_nome(stats, "Finalizações", lado_adv) or 0
+            b["chutes_gol"] += stat_por_nome(stats, "Chutes no gol", lado) or 0
+            b["chutes_gol_contra"] += stat_por_nome(stats, "Chutes no gol", lado_adv) or 0
+            b["bloqueados"] += stat_por_nome(stats, "Chutes bloqueados", lado) or 0
+            b["escanteios"] += stat_por_nome(stats, "Escanteios", lado) or 0
+            b["escanteios_contra"] += stat_por_nome(stats, "Escanteios", lado_adv) or 0
+            b["faltas"] += stat_por_nome(stats, "Faltas", lado) or 0
+            b["amarelos"] += stat_por_nome(stats, "Amarelos", lado) or 0
+            b["vermelhos"] += stat_por_nome(stats, "Vermelhos", lado) or 0
+            b["impedimentos"] += stat_por_nome(stats, "Impedimentos", lado) or 0
+            b["defesas"] += stat_por_nome(stats, "Defesas", lado) or 0
+            b["passes_certos"] += stat_por_nome(stats, "Passes certos", lado) or 0
+            b["precisao_passe_total"] += stat_por_nome(stats, "Precisão de passe", lado) or 0
+            b["aproveitamento_chutes_total"] += stat_por_nome(stats, "Aproveitamento dos chutes", lado) or 0
+
+    for nome, b in base.items():
+        j = int(b.get("jogos_com_boxscore") or 0)
+        b["posse_media"] = media_segura(b["posse_total"], j)
+        b["finalizacoes_media"] = media_segura(b["finalizacoes"], j)
+        b["finalizacoes_contra_media"] = media_segura(b["finalizacoes_contra"], j)
+        b["chutes_gol_media"] = media_segura(b["chutes_gol"], j)
+        b["chutes_gol_contra_media"] = media_segura(b["chutes_gol_contra"], j)
+        b["escanteios_media"] = media_segura(b["escanteios"], j)
+        b["escanteios_saldo_media"] = media_segura(b["escanteios"] - b["escanteios_contra"], j)
+        b["faltas_media"] = media_segura(b["faltas"], j)
+        b["amarelos_media"] = media_segura(b["amarelos"], j)
+        b["vermelhos_media"] = media_segura(b["vermelhos"], j)
+        b["cartoes_media"] = media_segura(b["amarelos"] + 3 * b["vermelhos"], j)
+        b["passes_certos_media"] = media_segura(b["passes_certos"], j)
+        b["precisao_passe_media"] = media_segura(b["precisao_passe_total"], j)
+        b["aproveitamento_chutes_media"] = media_segura(b["aproveitamento_chutes_total"], j)
+
+    auditoria = {
+        "fonte_boxscore": detalhes.get("fonte") or "dados-br/jogos-detalhes.json",
+        "total_jogos_detalhados": len(jogos or {}),
+        "total_com_estatisticas": detalhes.get("total_com_estatisticas") or len(jogos or {}),
+        "clubes_com_boxscore": sum(1 for b in base.values() if int(b.get("jogos_com_boxscore") or 0) > 0),
+    }
+    return base, auditoria
+
+
+def componentes_desempenho(c: dict[str, Any], avancadas: dict[str, Any]) -> dict[str, Any]:
+    jogos = max(1, int(c.get("jogos") or avancadas.get("jogos_com_boxscore") or 1))
+    gp = float(c.get("gp") or 0)
+    gc = float(c.get("gc") or 0)
+    sg = float(c.get("sg") or 0)
     aproveitamento = float(c.get("aproveitamento") or 0)
-    forma = float(c.get("aproveitamento_ultimos5") or 0)
-    jogos = max(1, int(c.get("jogos") or 1))
-    saldo_por_jogo = float(c.get("sg") or 0) / jogos
-    ataque_por_jogo = float(c.get("gp") or 0) / jogos
-    defesa_por_jogo = float(c.get("gc") or 0) / jogos
-    pos = int(c.get("pos") or 20)
-    bonus_posicao = max(0, 21 - pos) * 0.7
-    bruto = (
-        aproveitamento * 0.50
-        + forma * 0.22
-        + min(18, max(-10, saldo_por_jogo * 8))
-        + min(8, ataque_por_jogo * 3)
-        - min(7, defesa_por_jogo * 2)
-        + bonus_posicao
+    aproveitamento_ult5 = float(c.get("aproveitamento_ultimos5") or 0)
+    jogos_sem_sofrer = 0
+
+    # A contagem de jogos sem sofrer gol vem da tabela agregada quando possível:
+    # usa GC/J apenas como proxy defensivo se o detalhe do jogo ainda não estiver completo.
+    gols_pro_pj = gp / jogos
+    gols_contra_pj = gc / jogos
+    saldo_pj = sg / jogos
+    finalizacoes = float(avancadas.get("finalizacoes_media") or 0)
+    finalizacoes_contra = float(avancadas.get("finalizacoes_contra_media") or 0)
+    chutes_gol = float(avancadas.get("chutes_gol_media") or 0)
+    chutes_gol_contra = float(avancadas.get("chutes_gol_contra_media") or 0)
+    posse = float(avancadas.get("posse_media") or 50)
+    passes = float(avancadas.get("passes_certos_media") or 0)
+    precisao_passe = float(avancadas.get("precisao_passe_media") or 80)
+    escanteios_saldo = float(avancadas.get("escanteios_saldo_media") or 0)
+    aproveitamento_chutes = float(avancadas.get("aproveitamento_chutes_media") or 0)
+    faltas = float(avancadas.get("faltas_media") or 0)
+    cartoes = float(avancadas.get("cartoes_media") or 0)
+    vermelhos = float(avancadas.get("vermelhos_media") or 0)
+
+    # Se a ESPN ainda não tiver boxscore, usa proxies para não deixar o índice vazio.
+    if not int(avancadas.get("jogos_com_boxscore") or 0):
+        finalizacoes = 9 + gols_pro_pj * 4
+        finalizacoes_contra = 9 + gols_contra_pj * 4
+        chutes_gol = 2 + gols_pro_pj * 1.7
+        chutes_gol_contra = 2 + gols_contra_pj * 1.7
+        aproveitamento_chutes = max(8, min(35, gols_pro_pj * 12))
+        passes = 360
+        precisao_passe = 80
+        faltas = 12
+        cartoes = 2.0
+
+    ataque = round(
+        normalizar_faixa(gols_pro_pj, 0.60, 2.20) * 0.40
+        + normalizar_faixa(chutes_gol, 2.0, 6.2) * 0.25
+        + normalizar_faixa(finalizacoes, 8.0, 18.0) * 0.20
+        + normalizar_faixa(aproveitamento_chutes, 22.0, 46.0) * 0.15
     )
-    return max(0, min(100, int(round(bruto))))
+    defesa = round(
+        normalizar_faixa(gols_contra_pj, 0.55, 2.15, inverter=True) * 0.45
+        + normalizar_faixa(chutes_gol_contra, 2.0, 6.2, inverter=True) * 0.25
+        + normalizar_faixa(finalizacoes_contra, 8.0, 18.0, inverter=True) * 0.20
+        + normalizar_faixa(saldo_pj, -1.10, 1.30) * 0.10
+    )
+    dominio = round(
+        normalizar_faixa(posse, 42.0, 60.0) * 0.35
+        + normalizar_faixa(precisao_passe, 74.0, 90.0) * 0.25
+        + normalizar_faixa(passes, 280.0, 570.0) * 0.20
+        + normalizar_faixa(escanteios_saldo, -2.2, 3.2) * 0.20
+    )
+    eficiencia = round(
+        aproveitamento * 0.44
+        + normalizar_faixa(aproveitamento_ult5, 20.0, 85.0) * 0.22
+        + normalizar_faixa(aproveitamento_chutes, 22.0, 46.0) * 0.20
+        + normalizar_faixa(saldo_pj, -1.10, 1.30) * 0.14
+    )
+    disciplina = round(
+        normalizar_faixa(cartoes, 1.0, 4.1, inverter=True) * 0.46
+        + normalizar_faixa(faltas, 8.0, 18.5, inverter=True) * 0.34
+        + normalizar_faixa(vermelhos, 0.0, 0.28, inverter=True) * 0.20
+    )
+    indice = round(ataque * 0.23 + defesa * 0.23 + dominio * 0.18 + eficiencia * 0.26 + disciplina * 0.10)
+
+    return {
+        "ataque": max(0, min(100, ataque)),
+        "defesa": max(0, min(100, defesa)),
+        "dominio": max(0, min(100, dominio)),
+        "eficiencia": max(0, min(100, eficiencia)),
+        "disciplina": max(0, min(100, disciplina)),
+        "indice_final": max(0, min(100, indice)),
+        "metricas": {
+            "gols_pro_jogo": round(gols_pro_pj, 2),
+            "gols_contra_jogo": round(gols_contra_pj, 2),
+            "saldo_por_jogo": round(saldo_pj, 2),
+            "posse_media": round(posse, 1),
+            "finalizacoes_media": round(finalizacoes, 1),
+            "finalizacoes_contra_media": round(finalizacoes_contra, 1),
+            "chutes_gol_media": round(chutes_gol, 1),
+            "chutes_gol_contra_media": round(chutes_gol_contra, 1),
+            "passes_certos_media": round(passes, 1),
+            "precisao_passe_media": round(precisao_passe, 1),
+            "escanteios_saldo_media": round(escanteios_saldo, 1),
+            "aproveitamento_chutes_media": round(aproveitamento_chutes, 1),
+            "faltas_media": round(faltas, 1),
+            "cartoes_media": round(cartoes, 2),
+            "jogos_com_boxscore": int(avancadas.get("jogos_com_boxscore") or 0),
+        },
+    }
 
 
-def gerar_ranking_desempenho(clubes: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def gerar_ranking_desempenho(clubes: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    avancadas_por_time, auditoria = agregar_metricas_avancadas(clubes)
     ranking = []
     for c in clubes:
-        score = score_desempenho(c)
+        av = avancadas_por_time.get(c["time"], {})
+        comp = componentes_desempenho(c, av)
         forma_txt = "".join(c.get("forma_ultimos5") or []) or "sem forma recente"
+        metricas = comp.get("metricas") or {}
         justificativa = (
-            f"{c.get('aproveitamento', 0)}% de aproveitamento, saldo {c.get('sg', 0)}, "
-            f"forma {forma_txt} e {c.get('pontos_ultimos5', 0)} ponto(s) nos últimos {len(c.get('forma_ultimos5') or [])} jogos."
+            f"Índice {comp['indice_final']}: ataque {comp['ataque']}, defesa {comp['defesa']}, "
+            f"domínio {comp['dominio']}, eficiência {comp['eficiencia']} e disciplina {comp['disciplina']}. "
+            f"Tabela: {c.get('aproveitamento', 0)}% de aproveitamento, SG {c.get('sg', 0)} e forma {forma_txt}."
         )
         ranking.append({
             "time": c["time"],
             "escudo": c.get("escudo", ""),
             "sigla": c.get("sigla", ""),
-            "score": score,
+            "score": comp["indice_final"],
+            "indice_final": comp["indice_final"],
+            "ataque": comp["ataque"],
+            "defesa": comp["defesa"],
+            "dominio": comp["dominio"],
+            "eficiencia": comp["eficiencia"],
+            "disciplina": comp["disciplina"],
+            "metricas": metricas,
             "pos_tabela": c.get("pos"),
             "pontos": c.get("pontos"),
             "jogos": c.get("jogos"),
@@ -335,11 +561,12 @@ def gerar_ranking_desempenho(clubes: list[dict[str, Any]]) -> list[dict[str, Any
             "forma_ultimos5": c.get("forma_ultimos5"),
             "justificativa": justificativa,
         })
-    ranking.sort(key=lambda x: (-x["score"], int(x.get("pos_tabela") or 99), normalizar(x["time"])))
+    ranking.sort(key=lambda x: (-int(x["indice_final"]), int(x.get("pos_tabela") or 99), normalizar(x["time"])))
     for i, item in enumerate(ranking, 1):
         item["pos"] = i
-    return ranking
-
+    auditoria["clubes_no_ranking"] = len(ranking)
+    auditoria["metodologia"] = "Ataque 23%, defesa 23%, domínio 18%, eficiência 26% e disciplina 10%. Boxscore ESPN quando disponível; tabela/resultados como fallback."
+    return ranking, auditoria
 
 def fetch_json(url: str, timeout: int = 25, tentativas: int = 2) -> dict[str, Any] | None:
     ultimo: Exception | None = None
@@ -849,7 +1076,7 @@ def main() -> None:
         raise RuntimeError("tabela.json sem dados; rode atualizar_espn.py antes das estatísticas.")
 
     clubes = montar_clubes(tabela, resultados)
-    ranking = gerar_ranking_desempenho(clubes)
+    ranking, auditoria_ranking = gerar_ranking_desempenho(clubes)
     artilharia, garcons, eventos_processados, eventos_gols, eventos_assistencias = coletar_artilharia_assistencias(resultados, avisos)
     participacoes = combinar_participacoes(artilharia, garcons)
 
@@ -887,7 +1114,9 @@ def main() -> None:
         "atualizado_em": payload_stats["atualizado_em"],
         "temporada": TEMPORADA,
         "fonte": "ESPN + tabela/resultados locais",
-        "metodologia": "Índice de 0 a 100 ponderando aproveitamento geral, forma recente, saldo de gols, ataque, defesa e posição na tabela.",
+        "metodologia": "Índice de 0 a 100 com cinco dimensões: ataque (23%), defesa (23%), domínio (18%), eficiência (26%) e disciplina (10%). Usa boxscore ESPN por jogo quando disponível e tabela/resultados como fallback seguro.",
+        "categorias": {"ataque": 23, "defesa": 23, "dominio": 18, "eficiencia": 26, "disciplina": 10},
+        "auditoria_arquivo": "dados-br/auditoria-ranking-desempenho.json",
         "ranking": ranking,
     }
 
@@ -908,6 +1137,7 @@ def main() -> None:
 
     gravar_json_atomico("dados-br/estatisticas.json", payload_stats)
     gravar_json_atomico("dados-br/ranking-desempenho.json", payload_ranking)
+    gravar_json_atomico("dados-br/auditoria-ranking-desempenho.json", {"gerado_em": payload_stats["atualizado_em"], **auditoria_ranking})
     gravar_json_atomico("dados-br/jogadores.json", payload_jogadores)
 
     print("== ESTATÍSTICAS GERADAS ==")

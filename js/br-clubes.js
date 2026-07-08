@@ -51,6 +51,16 @@
   }
   function tabelaDo(nome){ return state.tabela.find(t => t.time === nome) || {}; }
   function rankingDo(nome){ return state.ranking.find(r => r.time === nome) || {}; }
+  function numeroRanking(v){ const n = Number(v); return Number.isFinite(n) ? Math.round(n) : "—"; }
+  function rankingResumoHtml(r){
+    if (!r || !r.time) return `<span class="club-ranking-pill muted">⚡ Ranking desempenho: aguardando</span>`;
+    return `<span class="club-ranking-pill">⚡ Ranking desempenho: <strong>${escapeHtml(r.pos || "—")}º</strong> · índice <strong>${escapeHtml(numeroRanking(r.indice_final ?? r.score))}</strong></span>`;
+  }
+  function rankingComponentesHtml(r){
+    if (!r || !r.time) return "";
+    const comps = [["Ataque", r.ataque], ["Defesa", r.defesa], ["Domínio", r.dominio], ["Eficiência", r.eficiencia], ["Disciplina", r.disciplina]];
+    return `<div class="club-performance-mini">${comps.map(([label, valor]) => `<span>${escapeHtml(label)} <strong>${escapeHtml(numeroRanking(valor))}</strong></span>`).join("")}</div>`;
+  }
   function eventosDo(nome){
     return state.eventos.filter(e => e.mandante === nome || e.visitante === nome)
       .sort((a,b) => String(a.data_iso||"").localeCompare(String(b.data_iso||"")));
@@ -154,8 +164,9 @@
         <div class="club-kpis">
           <div class="kpi"><strong>${t.pos || "—"}º</strong><span>posição</span></div>
           <div class="kpi"><strong>${t.pontos ?? "—"}</strong><span>pontos</span></div>
-          <div class="kpi"><strong>${r.score ?? "—"}</strong><span>índice</span></div>
+          <div class="kpi"><strong>${r.pos || "—"}º</strong><span>desemp.</span></div>
         </div>
+        ${rankingResumoHtml(r)}
       </article>`;
     }).join("");
     $("#grid-clubes").querySelectorAll(".club-card").forEach(card => {
@@ -196,7 +207,9 @@
         <div class="info-card"><span>Títulos BR</span><strong>${escapeHtml(c.titulos_brasileiros)}</strong></div>
         <div class="info-card"><span>Torcida</span><strong>${escapeHtml(c.torcida)}</strong></div>
         <div class="info-card"><span>Tabela atual</span><strong>${t.pos ? `${t.pos}º · ${t.pontos} pts · SG ${t.sg}` : "aguardando"}</strong></div>
+        <div class="info-card"><span>Ranking desempenho</span><strong>${r.pos ? `${r.pos}º · índice ${numeroRanking(r.indice_final ?? r.score)}` : "aguardando"}</strong></div>
       </div>
+      ${rankingComponentesHtml(r)}
       <p><strong>Curiosidade:</strong> ${escapeHtml(c.curiosidade)}</p>
       <p><strong>Desempenho:</strong> ${escapeHtml(r.justificativa || "Ranking de desempenho será exibido após geração do robô.")}</p>
     `;

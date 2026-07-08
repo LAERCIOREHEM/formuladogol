@@ -636,3 +636,80 @@ body > .container > section.hero > img {
     object-position: center center !important;
   }
 }
+
+/* EXECUÇÃO 5 — Ranking vivo de desempenho do Brasileirão */
+.performance-list { display: grid; gap: 10px; }
+.performance-row {
+  grid-template-columns: 42px minmax(0, 1fr) 86px;
+  align-items: stretch;
+}
+.performance-main { display: grid; gap: 7px; }
+.performance-title { display: inline-flex; align-items: center; gap: 8px; }
+.performance-sub { row-gap: 5px; }
+.performance-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 2px;
+}
+.perf-metric {
+  border: 1px solid rgba(148,163,184,.12);
+  border-radius: 12px;
+  background: rgba(255,255,255,.026);
+  padding: 7px;
+  min-width: 0;
+}
+.perf-metric span {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  font-weight: 950;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.perf-metric strong {
+  display: block;
+  margin-top: 4px;
+  color: #efffc3;
+  font-size: 13px;
+  font-weight: 950;
+}
+.perf-bar {
+  height: 5px;
+  margin-top: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(148,163,184,.16);
+}
+.perf-bar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--green), var(--gold));
+}
+.performance-raw {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.performance-raw span {
+  border: 1px solid rgba(148,163,184,.10);
+  border-radius: 999px;
+  padding: 3px 7px;
+  background: rgba(255,255,255,.025);
+}
+.performance-score { min-width: 78px; align-self: center; }
+@media (max-width: 920px) {
+  .performance-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 620px) {
+  .performance-row { grid-template-columns: 36px minmax(0, 1fr); }
+  .performance-score { grid-column: 2; justify-self: start; text-align: left; font-size: 20px; }
+  .performance-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

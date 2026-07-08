@@ -2051,6 +2051,33 @@ body > .container > section.hero > img {
     .match-stats-head { font-size: 10.5px; }
   }
 
+
+  /* EXECUÇÃO 5 — ranking vivo discreto nos cards de jogos/resultados */
+  .br-team-rank-mini {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    max-width: 100%;
+    margin-top: 4px;
+    border: 1px solid rgba(163,230,53,.20);
+    border-radius: 999px;
+    background: rgba(163,230,53,.08);
+    color: #eaffb5;
+    padding: 3px 7px;
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+  .br-team-rank-result { margin-top: 0; font-size: 9px; padding: 2px 6px; }
+  .resultado-time.mandante .br-team-rank-result { margin-left: 2px; }
+  .resultado-time.visitante .br-team-rank-result { margin-right: 2px; }
+  @media (max-width: 720px) {
+    .br-team-rank-mini { font-size: 9px; padding: 2px 6px; }
+    .br-team-rank-result { display: none; }
+  }
+
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260707-header-web-menu-final">
 </head>
@@ -2090,7 +2117,7 @@ body > .container > section.hero > img {
     <button type="button" onclick="location.href='museu.html'" id="btn-museu">🏛️ Museu</button>
     <button type="button" onclick="location.href='regras.html'" id="btn-regras">ℹ️ Regras</button>
     <button type="button" onclick="setView('aniversariantes')" id="btn-aniversariantes" data-br-view="aniversariantes">🎂 Aniversariantes</button>
-    <button type="button" onclick="location.href='copa2026/'" id="btn-copa" style="display:none">🏆 Bolão Copa 2026</button>
+    <button type="button" onclick="location.href='copa2026/'" id="btn-copa">🏆 Bolão Copa 2026</button>
     <button type="button" onclick="adminAction()" id="btn-admin">⚙️ Admin</button>
   </nav>
 
@@ -2351,6 +2378,46 @@ function estatisticasDoJogo(j) {
   return Array.isArray(stats) ? stats.filter(s => s && (s.home !== '' || s.away !== '')) : [];
 }
 
+
+async function carregarRankingDesempenhoBr(opcoes = {}) {
+  try {
+    const data = await carregarJsonOpcionalBr('dados-br/ranking-desempenho.json');
+    const lista = data && Array.isArray(data.ranking) ? data.ranking : [];
+    const mapa = {};
+    for (const item of lista) {
+      const nome = nomeCanonico(item.time) || item.time;
+      if (nome) mapa[nome] = item;
+    }
+    state.rankingDesempenho = mapa;
+    state.rankingDesempenhoMeta = {
+      atualizado_em: data && data.atualizado_em || null,
+      fonte: data && data.fonte || 'ESPN + ranking local',
+      total: lista.length
+    };
+    state.rankingDesempenhoCarregado = true;
+  } catch (e) {
+    if (!opcoes.silencioso) console.warn('Ranking de desempenho indisponível:', e);
+    if (opcoes.silencioso && state.rankingDesempenhoCarregado) return;
+    state.rankingDesempenho = state.rankingDesempenho || {};
+    state.rankingDesempenhoMeta = state.rankingDesempenhoMeta || null;
+    state.rankingDesempenhoCarregado = true;
+  }
+}
+
+function rankingDesempenhoDoTime(nome) {
+  const canonico = nomeCanonico(nome) || nome;
+  return canonico ? (state.rankingDesempenho || {})[canonico] : null;
+}
+
+function htmlRankingMiniTime(nome, contexto = '') {
+  const r = rankingDesempenhoDoTime(nome);
+  if (!r) return '';
+  const pos = r.pos || r.pos_ranking || '—';
+  const indice = Math.round(Number(r.indice_final ?? r.score ?? 0));
+  const titulo = `${nomeCanonico(nome) || nome}: ${pos}º no ranking de desempenho · índice ${indice}`;
+  return `<span class="br-team-rank-mini ${contexto === 'resultado' ? 'br-team-rank-result' : ''}" title="${brEscapeAttr(titulo)}">${brEscapeHtml(pos)}º · ${brEscapeHtml(indice)}</span>`;
+}
+
 function brNumeroEstatistica(valor) {
   const texto = String(valor ?? '').replace(',', '.');
   const m = texto.match(/-?\d+(?:\.\d+)?/);
@@ -2467,7 +2534,11 @@ let state = {
   jogosDetalhes: {},
   jogosDetalhesMeta: null,
   jogosDetalhesCarregados: false,
-  jogosDetalhesErro: null
+  jogosDetalhesErro: null,
+  // Ranking Vivo de desempenho dos clubes
+  rankingDesempenho: {},
+  rankingDesempenhoMeta: null,
+  rankingDesempenhoCarregado: false
 };
 
 // ========================================================================
@@ -2596,6 +2667,7 @@ async function atualizarDadosDoServidor(silencioso = false) {
   // apenas a tabela. Isso evita a tela ficar presa em dados antigos.
   tarefas.push(carregarJogos({ silencioso: true }));
   tarefas.push(carregarResultados({ silencioso: true }));
+  tarefas.push(carregarRankingDesempenhoBr({ silencioso: true }));
   await Promise.allSettled(tarefas);
 }
 
@@ -3491,12 +3563,12 @@ function renderJogos() {
           <div class="jogo-times jogo-times-v2">
             <div class="jogo-time jogo-team-side">
               <span class="jogo-escudo">${escudoMandante}</span>
-              <span class="jogo-nome">${m.nome || '?'}</span>
+              <span class="jogo-nome">${m.nome || '?'}</span>${htmlRankingMiniTime(m.nome, 'jogo')}
             </div>
             ${placarCentro}
             <div class="jogo-time jogo-team-side">
               <span class="jogo-escudo">${escudoVisitante}</span>
-              <span class="jogo-nome">${v.nome || '?'}</span>
+              <span class="jogo-nome">${v.nome || '?'}</span>${htmlRankingMiniTime(v.nome, 'jogo')}
             </div>
           </div>`;
 
@@ -3841,13 +3913,13 @@ function renderResultados() {
         </div>
         <div class="resultado-jogo">
           <div class="resultado-time mandante">
-            <span class="resultado-nome">${m.nome || '?'}</span>
+            <span class="resultado-nome">${m.nome || '?'}</span>${htmlRankingMiniTime(m.nome, 'resultado')}
             <span class="resultado-escudo">${escudoMandante}</span>
           </div>
           <div class="resultado-placar">${pm} <span class="placar-x">×</span> ${pv}</div>
           <div class="resultado-time visitante">
             <span class="resultado-escudo">${escudoVisitante}</span>
-            <span class="resultado-nome">${v.nome || '?'}</span>
+            ${htmlRankingMiniTime(v.nome, 'resultado')}<span class="resultado-nome">${v.nome || '?'}</span>
           </div>
         </div>
         ${r.estadio ? `<div class="resultado-estadio">📍 ${r.estadio}</div>` : ''}
