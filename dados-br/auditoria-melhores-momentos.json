@@ -1,854 +1,215 @@
 {
-  "atualizado_em": "2026-07-07T20:56:00-03:00",
+  "atualizado_em": "2026-07-07T23:40:26-03:00",
   "fonte": "GE TV / YouTube",
-  "modo": "backfill",
+  "modo": "incremental",
   "rodadas_processadas": {
-    "inicio": 1,
-    "fim": 18
+    "inicio": 24,
+    "fim": 27
   },
-  "youtube_requests": 26,
+  "youtube_requests": 10,
   "resumo": {
-    "playlists_encontradas": 16,
-    "videos_lidos": 142,
-    "jogos_processados": 180,
-    "jogos_vinculados_nesta_execucao": 131,
+    "playlists_encontradas": 0,
+    "videos_lidos": 0,
+    "jogos_processados": 32,
+    "jogos_vinculados_nesta_execucao": 0,
     "jogos_vinculados_total": 131,
-    "candidatos_duvidosos": 19,
-    "jogos_sem_video": 49
+    "candidatos_duvidosos": 0,
+    "jogos_sem_video": 32
   },
-  "playlists": [
-    {
-      "playlist_id": "PLZuM_Kl1KELmKWcCBDslAdRtk_RtndR0V",
-      "titulo": "1ª Rodada - Brasileirão 2026",
-      "rodada": 1,
-      "published_at": "2026-01-29T00:21:59.402753Z",
-      "item_count": 11,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELmKWcCBDslAdRtk_RtndR0V"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELnZSmybHIFfpsP1_DbjbAHC",
-      "titulo": "2ª rodada - Brasileirão 2026",
-      "rodada": 2,
-      "published_at": "2026-02-05T00:10:35.171727Z",
-      "item_count": 8,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELnZSmybHIFfpsP1_DbjbAHC"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELlnMekagd6eYNzZm0j7d7Sw",
-      "titulo": "3ª Rodada - Brasileirão 2026",
-      "rodada": 3,
-      "published_at": "2026-02-12T00:15:00.165708Z",
-      "item_count": 10,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELlnMekagd6eYNzZm0j7d7Sw"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELlZggq9VeciHL_M3wuixvtc",
-      "titulo": "5ª rodada do Brasileirão 2026",
-      "rodada": 5,
-      "published_at": "2026-03-12T00:08:41.398771Z",
-      "item_count": 10,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELlZggq9VeciHL_M3wuixvtc"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELk-vjr1piR8GMaJwP8P_1QA",
-      "titulo": "6ª rodada do Brasileirão 2026",
-      "rodada": 6,
-      "published_at": "2026-03-14T23:39:45.457791Z",
-      "item_count": 11,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELk-vjr1piR8GMaJwP8P_1QA"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELkcUEhDRG_887PCKpnNmJS0",
-      "titulo": "7ª rodada do Brasileirão 2026",
-      "rodada": 7,
-      "published_at": "2026-03-19T00:13:26.878614Z",
-      "item_count": 11,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELkcUEhDRG_887PCKpnNmJS0"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELnkAhwDg2SBmOhBQ9Wys4AO",
-      "titulo": "8ª rodada do Brasileirão 2026",
-      "rodada": 8,
-      "published_at": "2026-03-22T21:18:58.601792Z",
-      "item_count": 4,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELnkAhwDg2SBmOhBQ9Wys4AO"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELn6tEblhDHZMAd-usuw-Y7v",
-      "titulo": "9ª rodada do Brasileirão 2026",
-      "rodada": 9,
-      "published_at": "2026-04-02T00:38:31.640569Z",
-      "item_count": 11,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELn6tEblhDHZMAd-usuw-Y7v"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELlrV3OJ35OkVwsDR-sYHfVl",
-      "titulo": "10ª rodada do Brasileirão 2026",
-      "rodada": 10,
-      "published_at": "2026-04-02T00:38:39.676247Z",
-      "item_count": 9,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELlrV3OJ35OkVwsDR-sYHfVl"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELk7ttMpZWfr2_ZWOZ12cdn8",
-      "titulo": "11ª rodada do Brasileirão 2026",
-      "rodada": 11,
-      "published_at": "2026-04-02T00:38:49.298449Z",
-      "item_count": 11,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELk7ttMpZWfr2_ZWOZ12cdn8"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELkijdm7S9u3nyFNAnQjiDb-",
-      "titulo": "12ª RODADA BRASILEIRÃO 2026",
-      "rodada": 12,
-      "published_at": "2026-04-18T23:35:00.619754Z",
-      "item_count": 10,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELkijdm7S9u3nyFNAnQjiDb-"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELmpk5N5XYhEvGRgh7yzE2jo",
-      "titulo": "13ª rodada do Brasileirão 2026",
-      "rodada": 13,
-      "published_at": "2026-04-25T23:33:18.337695Z",
-      "item_count": 11,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELmpk5N5XYhEvGRgh7yzE2jo"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELnlkdHvv6S4SZ-OQ80C4mzO",
-      "titulo": "14ª RODADA BRASILEIRÃO 2026",
-      "rodada": 14,
-      "published_at": "2026-05-02T21:07:50.603583Z",
-      "item_count": 10,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELnlkdHvv6S4SZ-OQ80C4mzO"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELmZ9ycAgqnbLoIGh1KsIyoS",
-      "titulo": "14ª rodada do Brasileirão 2026",
-      "rodada": 14,
-      "published_at": "2026-04-25T23:33:24.741251Z",
-      "item_count": 0,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELmZ9ycAgqnbLoIGh1KsIyoS"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELmU_RfkzjXTzkBUqzjLpCFs",
-      "titulo": "15ª rodada do Brasileirão 2026",
-      "rodada": 15,
-      "published_at": "2026-04-25T23:33:30.433025Z",
-      "item_count": 9,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELmU_RfkzjXTzkBUqzjLpCFs"
-    },
-    {
-      "playlist_id": "PLZuM_Kl1KELlzyXHcfn2nmhFLIs7719eQ",
-      "titulo": "16ª rodada do Brasileirão 2026",
-      "rodada": 16,
-      "published_at": "2026-04-25T23:33:35.52578Z",
-      "item_count": 7,
-      "url": "https://www.youtube.com/playlist?list=PLZuM_Kl1KELlzyXHcfn2nmhFLIs7719eQ"
-    }
-  ],
-  "candidatos_duvidosos": [
-    {
-      "event_id": "401840984",
-      "chave": "401840984",
-      "rodada": 2,
-      "mandante": "Bragantino",
-      "visitante": "Atlético-MG",
-      "placar_mandante": 1,
-      "placar_visitante": 0,
-      "video_id": "y6mvjj5fLOc",
-      "titulo": "ATHLETICO-PR 0 X 1 CORINTHIANS | MELHORES MOMENTOS | 2ª RODADA BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=y6mvjj5fLOc",
-      "thumbnail": "https://i.ytimg.com/vi/y6mvjj5fLOc/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnZSmybHIFfpsP1_DbjbAHC",
-      "published_at": "2026-02-20T02:32:02Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401840986",
-      "chave": "401840986",
-      "rodada": 2,
-      "mandante": "Santos",
-      "visitante": "São Paulo",
-      "placar_mandante": 1,
-      "placar_visitante": 1,
-      "video_id": "O0IawqkArEY",
-      "titulo": "BAHIA 1 X 1 FLUMINENSE | MELHORES MOMENTOS | 2ª RODADA BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=O0IawqkArEY",
-      "thumbnail": "https://i.ytimg.com/vi/O0IawqkArEY/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnZSmybHIFfpsP1_DbjbAHC",
-      "published_at": "2026-02-06T00:13:11Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.46,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos",
-        "placar confere"
-      ]
-    },
-    {
-      "event_id": "401840982",
-      "chave": "401840982",
-      "rodada": 2,
-      "mandante": "Vasco da Gama",
-      "visitante": "Chapecoense",
-      "placar_mandante": 1,
-      "placar_visitante": 1,
-      "video_id": "O0IawqkArEY",
-      "titulo": "BAHIA 1 X 1 FLUMINENSE | MELHORES MOMENTOS | 2ª RODADA BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=O0IawqkArEY",
-      "thumbnail": "https://i.ytimg.com/vi/O0IawqkArEY/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnZSmybHIFfpsP1_DbjbAHC",
-      "published_at": "2026-02-06T00:13:11Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.46,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos",
-        "placar confere"
-      ]
-    },
-    {
-      "event_id": "401841010",
-      "chave": "401841010",
-      "rodada": 5,
-      "mandante": "Mirassol",
-      "visitante": "Santos",
-      "placar_mandante": 2,
-      "placar_visitante": 2,
-      "video_id": "4kog4z5qiMc",
-      "titulo": "ATHLETICO-PR 4 X 1 BOTAFOGO | MELHORES MOMENTOS | 5ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=4kog4z5qiMc",
-      "thumbnail": "https://i.ytimg.com/vi/4kog4z5qiMc/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELlZggq9VeciHL_M3wuixvtc",
-      "published_at": "2026-03-30T00:38:39Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841047",
-      "chave": "401841047",
-      "rodada": 8,
-      "mandante": "Bragantino",
-      "visitante": "Botafogo",
-      "placar_mandante": 1,
-      "placar_visitante": 2,
-      "video_id": "6qi41mARq3k",
-      "titulo": "CORINTHIANS 1 X 1 FLAMENGO | MELHORES MOMENTOS | 8ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=6qi41mARq3k",
-      "thumbnail": "https://i.ytimg.com/vi/6qi41mARq3k/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnkAhwDg2SBmOhBQ9Wys4AO",
-      "published_at": "2026-03-23T02:47:20Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841044",
-      "chave": "401841044",
-      "rodada": 8,
-      "mandante": "Fluminense",
-      "visitante": "Atlético-MG",
-      "placar_mandante": 1,
-      "placar_visitante": 0,
-      "video_id": "6qi41mARq3k",
-      "titulo": "CORINTHIANS 1 X 1 FLAMENGO | MELHORES MOMENTOS | 8ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=6qi41mARq3k",
-      "thumbnail": "https://i.ytimg.com/vi/6qi41mARq3k/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnkAhwDg2SBmOhBQ9Wys4AO",
-      "published_at": "2026-03-23T02:47:20Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841040",
-      "chave": "401841040",
-      "rodada": 8,
-      "mandante": "São Paulo",
-      "visitante": "Palmeiras",
-      "placar_mandante": 0,
-      "placar_visitante": 1,
-      "video_id": "6qi41mARq3k",
-      "titulo": "CORINTHIANS 1 X 1 FLAMENGO | MELHORES MOMENTOS | 8ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=6qi41mARq3k",
-      "thumbnail": "https://i.ytimg.com/vi/6qi41mARq3k/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnkAhwDg2SBmOhBQ9Wys4AO",
-      "published_at": "2026-03-23T02:47:20Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841038",
-      "chave": "401841038",
-      "rodada": 8,
-      "mandante": "Athletico-PR",
-      "visitante": "Coritiba",
-      "placar_mandante": 2,
-      "placar_visitante": 0,
-      "video_id": "6qi41mARq3k",
-      "titulo": "CORINTHIANS 1 X 1 FLAMENGO | MELHORES MOMENTOS | 8ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=6qi41mARq3k",
-      "thumbnail": "https://i.ytimg.com/vi/6qi41mARq3k/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnkAhwDg2SBmOhBQ9Wys4AO",
-      "published_at": "2026-03-23T02:47:20Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841043",
-      "chave": "401841043",
-      "rodada": 8,
-      "mandante": "Internacional",
-      "visitante": "Chapecoense",
-      "placar_mandante": 2,
-      "placar_visitante": 0,
-      "video_id": "6qi41mARq3k",
-      "titulo": "CORINTHIANS 1 X 1 FLAMENGO | MELHORES MOMENTOS | 8ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=6qi41mARq3k",
-      "thumbnail": "https://i.ytimg.com/vi/6qi41mARq3k/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnkAhwDg2SBmOhBQ9Wys4AO",
-      "published_at": "2026-03-23T02:47:20Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841042",
-      "chave": "401841042",
-      "rodada": 8,
-      "mandante": "Vitória",
-      "visitante": "Mirassol",
-      "placar_mandante": 1,
-      "placar_visitante": 0,
-      "video_id": "6qi41mARq3k",
-      "titulo": "CORINTHIANS 1 X 1 FLAMENGO | MELHORES MOMENTOS | 8ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=6qi41mARq3k",
-      "thumbnail": "https://i.ytimg.com/vi/6qi41mARq3k/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELnkAhwDg2SBmOhBQ9Wys4AO",
-      "published_at": "2026-03-23T02:47:20Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841065",
-      "chave": "401841065",
-      "rodada": 10,
-      "mandante": "Chapecoense",
-      "visitante": "Vitória",
-      "placar_mandante": 1,
-      "placar_visitante": 1,
-      "video_id": "ifSUyNaqEKI",
-      "titulo": "CORITIBA 1 X 1 FLUMINENSE | MELHORES MOMENTOS | 10ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=ifSUyNaqEKI",
-      "thumbnail": "https://i.ytimg.com/vi/ifSUyNaqEKI/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELlrV3OJ35OkVwsDR-sYHfVl",
-      "published_at": "2026-04-05T03:29:21Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.46,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos",
-        "placar confere"
-      ]
-    },
-    {
-      "event_id": "401841060",
-      "chave": "401841060",
-      "rodada": 10,
-      "mandante": "Mirassol",
-      "visitante": "Bragantino",
-      "placar_mandante": 0,
-      "placar_visitante": 1,
-      "video_id": "52iMcP983Cs",
-      "titulo": "CORINTHIANS 0 X 1 INTERNACIONAL | MELHORES MOMENTOS | 10ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=52iMcP983Cs",
-      "thumbnail": "https://i.ytimg.com/vi/52iMcP983Cs/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELlrV3OJ35OkVwsDR-sYHfVl",
-      "published_at": "2026-04-06T02:08:41Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.46,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos",
-        "placar confere"
-      ]
-    },
-    {
-      "event_id": "401841084",
-      "chave": "401841084",
-      "rodada": 12,
-      "mandante": "Palmeiras",
-      "visitante": "Athletico-PR",
-      "placar_mandante": 1,
-      "placar_visitante": 0,
-      "video_id": "vOYsDet-tdw",
-      "titulo": "FLAMENGO 2 X 0 BAHIA | MELHORES MOMENTOS | 12ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=vOYsDet-tdw",
-      "thumbnail": "https://i.ytimg.com/vi/vOYsDet-tdw/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELkijdm7S9u3nyFNAnQjiDb-",
-      "published_at": "2026-04-20T00:28:21Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841109",
-      "chave": "401841109",
-      "rodada": 15,
-      "mandante": "Santos",
-      "visitante": "Bragantino",
-      "placar_mandante": 2,
-      "placar_visitante": 0,
-      "video_id": "NAl-AiA99qM",
-      "titulo": "VASCO 1 X 0 ATHLETICO-PR | MELHORES MOMENTOS | 15ª RODADA BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=NAl-AiA99qM",
-      "thumbnail": "https://i.ytimg.com/vi/NAl-AiA99qM/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELmU_RfkzjXTzkBUqzjLpCFs",
-      "published_at": "2026-05-11T03:18:12Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841120",
-      "chave": "401841120",
-      "rodada": 16,
-      "mandante": "Atlético-MG",
-      "visitante": "Mirassol",
-      "placar_mandante": 3,
-      "placar_visitante": 1,
-      "video_id": "tLE4ZPBQMO4",
-      "titulo": "BOTAFOGO 3 X 1 CORINTHIANS | MELHORES MOMENTOS | 16ª RODADA BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=tLE4ZPBQMO4",
-      "thumbnail": "https://i.ytimg.com/vi/tLE4ZPBQMO4/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELlzyXHcfn2nmhFLIs7719eQ",
-      "published_at": "2026-05-17T21:08:06Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.46,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos",
-        "placar confere"
-      ]
-    },
-    {
-      "event_id": "401841127",
-      "chave": "401841127",
-      "rodada": 16,
-      "mandante": "Fluminense",
-      "visitante": "São Paulo",
-      "placar_mandante": 2,
-      "placar_visitante": 1,
-      "video_id": "wRrJQH7gIIw",
-      "titulo": "AHLETICO-PR 1 X 1 FLAMENGO | MELHORES MOMENTOS | 16ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=wRrJQH7gIIw",
-      "thumbnail": "https://i.ytimg.com/vi/wRrJQH7gIIw/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELlzyXHcfn2nmhFLIs7719eQ",
-      "published_at": "2026-05-18T00:50:02Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841123",
-      "chave": "401841123",
-      "rodada": 16,
-      "mandante": "Santos",
-      "visitante": "Coritiba",
-      "placar_mandante": 0,
-      "placar_visitante": 3,
-      "video_id": "wRrJQH7gIIw",
-      "titulo": "AHLETICO-PR 1 X 1 FLAMENGO | MELHORES MOMENTOS | 16ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=wRrJQH7gIIw",
-      "thumbnail": "https://i.ytimg.com/vi/wRrJQH7gIIw/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELlzyXHcfn2nmhFLIs7719eQ",
-      "published_at": "2026-05-18T00:50:02Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.38,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos"
-      ]
-    },
-    {
-      "event_id": "401841119",
-      "chave": "401841119",
-      "rodada": 16,
-      "mandante": "Bahia",
-      "visitante": "Grêmio",
-      "placar_mandante": 1,
-      "placar_visitante": 1,
-      "video_id": "wRrJQH7gIIw",
-      "titulo": "AHLETICO-PR 1 X 1 FLAMENGO | MELHORES MOMENTOS | 16ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=wRrJQH7gIIw",
-      "thumbnail": "https://i.ytimg.com/vi/wRrJQH7gIIw/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELlzyXHcfn2nmhFLIs7719eQ",
-      "published_at": "2026-05-18T00:50:02Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.46,
-      "motivos": [
-        "rodada da playlist confere",
-        "título compatível com melhores momentos",
-        "placar confere"
-      ]
-    },
-    {
-      "event_id": "401841121",
-      "chave": "401841121",
-      "rodada": 16,
-      "mandante": "Athletico-PR",
-      "visitante": "Flamengo",
-      "placar_mandante": 1,
-      "placar_visitante": 1,
-      "video_id": "wRrJQH7gIIw",
-      "titulo": "AHLETICO-PR 1 X 1 FLAMENGO | MELHORES MOMENTOS | 16ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url": "https://www.youtube.com/watch?v=wRrJQH7gIIw",
-      "thumbnail": "https://i.ytimg.com/vi/wRrJQH7gIIw/maxresdefault.jpg",
-      "playlist_id": "PLZuM_Kl1KELlzyXHcfn2nmhFLIs7719eQ",
-      "published_at": "2026-05-18T00:50:02Z",
-      "fonte": "GE TV / YouTube",
-      "confianca": 0.74,
-      "motivos": [
-        "rodada da playlist confere",
-        "visitante no título",
-        "título compatível com melhores momentos",
-        "placar confere"
-      ]
-    }
-  ],
+  "playlists": [],
+  "candidatos_duvidosos": [],
   "jogos_sem_video": [
     {
-      "event_id": "401840984",
-      "rodada": 2,
-      "mandante": "Bragantino",
-      "visitante": "Atlético-MG"
+      "event_id": "401841193",
+      "rodada": 24,
+      "mandante": "Corinthians",
+      "visitante": "Cruzeiro"
     },
     {
-      "event_id": "401840986",
-      "rodada": 2,
-      "mandante": "Santos",
-      "visitante": "São Paulo"
-    },
-    {
-      "event_id": "401840982",
-      "rodada": 2,
-      "mandante": "Vasco da Gama",
-      "visitante": "Chapecoense"
-    },
-    {
-      "event_id": "401840998",
-      "rodada": 4,
-      "mandante": "Bahia",
-      "visitante": "Chapecoense"
-    },
-    {
-      "event_id": "401840999",
-      "rodada": 4,
-      "mandante": "Botafogo",
-      "visitante": "Vitória"
-    },
-    {
-      "event_id": "401841006",
-      "rodada": 4,
-      "mandante": "Flamengo",
-      "visitante": "Mirassol"
-    },
-    {
-      "event_id": "401841003",
-      "rodada": 4,
-      "mandante": "Bragantino",
-      "visitante": "Athletico-PR"
-    },
-    {
-      "event_id": "401841007",
-      "rodada": 4,
-      "mandante": "Remo",
-      "visitante": "Internacional"
-    },
-    {
-      "event_id": "401841000",
-      "rodada": 4,
-      "mandante": "Coritiba",
-      "visitante": "São Paulo"
-    },
-    {
-      "event_id": "401841001",
-      "rodada": 4,
-      "mandante": "Cruzeiro",
-      "visitante": "Corinthians"
-    },
-    {
-      "event_id": "401841005",
-      "rodada": 4,
-      "mandante": "Grêmio",
-      "visitante": "Atlético-MG"
-    },
-    {
-      "event_id": "401841004",
-      "rodada": 4,
-      "mandante": "Palmeiras",
-      "visitante": "Fluminense"
-    },
-    {
-      "event_id": "401841002",
-      "rodada": 4,
-      "mandante": "Santos",
-      "visitante": "Vasco da Gama"
-    },
-    {
-      "event_id": "401841010",
-      "rodada": 5,
-      "mandante": "Mirassol",
-      "visitante": "Santos"
-    },
-    {
-      "event_id": "401841047",
-      "rodada": 8,
-      "mandante": "Bragantino",
-      "visitante": "Botafogo"
-    },
-    {
-      "event_id": "401841044",
-      "rodada": 8,
-      "mandante": "Fluminense",
-      "visitante": "Atlético-MG"
-    },
-    {
-      "event_id": "401841040",
-      "rodada": 8,
-      "mandante": "São Paulo",
-      "visitante": "Palmeiras"
-    },
-    {
-      "event_id": "401841038",
-      "rodada": 8,
-      "mandante": "Athletico-PR",
-      "visitante": "Coritiba"
-    },
-    {
-      "event_id": "401841043",
-      "rodada": 8,
+      "event_id": "401841191",
+      "rodada": 24,
       "mandante": "Internacional",
-      "visitante": "Chapecoense"
+      "visitante": "Remo"
     },
     {
-      "event_id": "401841042",
-      "rodada": 8,
-      "mandante": "Vitória",
-      "visitante": "Mirassol"
-    },
-    {
-      "event_id": "401841065",
-      "rodada": 10,
-      "mandante": "Chapecoense",
-      "visitante": "Vitória"
-    },
-    {
-      "event_id": "401841060",
-      "rodada": 10,
-      "mandante": "Mirassol",
-      "visitante": "Bragantino"
-    },
-    {
-      "event_id": "401841084",
-      "rodada": 12,
-      "mandante": "Palmeiras",
-      "visitante": "Athletico-PR"
-    },
-    {
-      "event_id": "401841109",
-      "rodada": 15,
-      "mandante": "Santos",
-      "visitante": "Bragantino"
-    },
-    {
-      "event_id": "401841120",
-      "rodada": 16,
-      "mandante": "Atlético-MG",
-      "visitante": "Mirassol"
-    },
-    {
-      "event_id": "401841127",
-      "rodada": 16,
+      "event_id": "401841205",
+      "rodada": 24,
       "mandante": "Fluminense",
-      "visitante": "São Paulo"
+      "visitante": "Remo"
     },
     {
-      "event_id": "401841123",
-      "rodada": 16,
-      "mandante": "Santos",
-      "visitante": "Coritiba"
+      "event_id": "401841204",
+      "rodada": 24,
+      "mandante": "Internacional",
+      "visitante": "Atlético-MG"
     },
     {
-      "event_id": "401841119",
-      "rodada": 16,
-      "mandante": "Bahia",
-      "visitante": "Grêmio"
-    },
-    {
-      "event_id": "401841121",
-      "rodada": 16,
-      "mandante": "Athletico-PR",
+      "event_id": "401841206",
+      "rodada": 24,
+      "mandante": "Cruzeiro",
       "visitante": "Flamengo"
     },
     {
-      "event_id": "401841132",
-      "rodada": 17,
-      "mandante": "São Paulo",
-      "visitante": "Botafogo"
+      "event_id": "401841202",
+      "rodada": 24,
+      "mandante": "Bragantino",
+      "visitante": "Grêmio"
     },
     {
-      "event_id": "401841130",
-      "rodada": 17,
+      "event_id": "401841203",
+      "rodada": 24,
+      "mandante": "Palmeiras",
+      "visitante": "Vasco da Gama"
+    },
+    {
+      "event_id": "401841200",
+      "rodada": 24,
       "mandante": "Vitória",
-      "visitante": "Internacional"
-    },
-    {
-      "event_id": "401841135",
-      "rodada": 17,
-      "mandante": "Grêmio",
-      "visitante": "Santos"
-    },
-    {
-      "event_id": "401841134",
-      "rodada": 17,
-      "mandante": "Mirassol",
-      "visitante": "Fluminense"
-    },
-    {
-      "event_id": "401841136",
-      "rodada": 17,
-      "mandante": "Flamengo",
-      "visitante": "Palmeiras"
-    },
-    {
-      "event_id": "401841137",
-      "rodada": 17,
-      "mandante": "Cruzeiro",
-      "visitante": "Chapecoense"
-    },
-    {
-      "event_id": "401841133",
-      "rodada": 17,
-      "mandante": "Remo",
-      "visitante": "Athletico-PR"
-    },
-    {
-      "event_id": "401841128",
-      "rodada": 17,
-      "mandante": "Corinthians",
-      "visitante": "Atlético-MG"
-    },
-    {
-      "event_id": "401841131",
-      "rodada": 17,
-      "mandante": "Vasco da Gama",
-      "visitante": "Bragantino"
-    },
-    {
-      "event_id": "401841129",
-      "rodada": 17,
-      "mandante": "Coritiba",
       "visitante": "Bahia"
     },
     {
-      "event_id": "401841138",
-      "rodada": 18,
-      "mandante": "Athletico-PR",
+      "event_id": "401841199",
+      "rodada": 24,
+      "mandante": "Chapecoense",
+      "visitante": "São Paulo"
+    },
+    {
+      "event_id": "401841201",
+      "rodada": 24,
+      "mandante": "Santos",
       "visitante": "Mirassol"
     },
     {
-      "event_id": "401841144",
-      "rodada": 18,
-      "mandante": "Flamengo",
-      "visitante": "Coritiba"
-    },
-    {
-      "event_id": "401841146",
-      "rodada": 18,
-      "mandante": "Bahia",
-      "visitante": "Botafogo"
-    },
-    {
-      "event_id": "401841139",
-      "rodada": 18,
-      "mandante": "Grêmio",
+      "event_id": "401841207",
+      "rodada": 25,
+      "mandante": "Coritiba",
       "visitante": "Corinthians"
     },
     {
-      "event_id": "401841143",
-      "rodada": 18,
-      "mandante": "Santos",
-      "visitante": "Vitória"
+      "event_id": "401841198",
+      "rodada": 25,
+      "mandante": "Botafogo",
+      "visitante": "Athletico-PR"
     },
     {
-      "event_id": "401841141",
-      "rodada": 18,
-      "mandante": "Bragantino",
-      "visitante": "Internacional"
-    },
-    {
-      "event_id": "401841140",
-      "rodada": 18,
-      "mandante": "Palmeiras",
-      "visitante": "Chapecoense"
-    },
-    {
-      "event_id": "401841142",
-      "rodada": 18,
-      "mandante": "Vasco da Gama",
-      "visitante": "Atlético-MG"
-    },
-    {
-      "event_id": "401841145",
-      "rodada": 18,
-      "mandante": "Cruzeiro",
+      "event_id": "401841208",
+      "rodada": 25,
+      "mandante": "Athletico-PR",
       "visitante": "Fluminense"
     },
     {
-      "event_id": "401841147",
-      "rodada": 18,
+      "event_id": "401841216",
+      "rodada": 25,
+      "mandante": "Atlético-MG",
+      "visitante": "Vitória"
+    },
+    {
+      "event_id": "401841215",
+      "rodada": 25,
+      "mandante": "Bahia",
+      "visitante": "Internacional"
+    },
+    {
+      "event_id": "401841214",
+      "rodada": 25,
+      "mandante": "Corinthians",
+      "visitante": "Santos"
+    },
+    {
+      "event_id": "401841213",
+      "rodada": 25,
+      "mandante": "Flamengo",
+      "visitante": "Botafogo"
+    },
+    {
+      "event_id": "401841217",
+      "rodada": 25,
+      "mandante": "Grêmio",
+      "visitante": "Chapecoense"
+    },
+    {
+      "event_id": "401841211",
+      "rodada": 25,
+      "mandante": "Mirassol",
+      "visitante": "Palmeiras"
+    },
+    {
+      "event_id": "401841210",
+      "rodada": 25,
       "mandante": "Remo",
-      "visitante": "São Paulo"
+      "visitante": "Coritiba"
+    },
+    {
+      "event_id": "401841209",
+      "rodada": 26,
+      "mandante": "São Paulo",
+      "visitante": "Bragantino"
+    },
+    {
+      "event_id": "401841212",
+      "rodada": 26,
+      "mandante": "Vasco da Gama",
+      "visitante": "Cruzeiro"
+    },
+    {
+      "event_id": "401841221",
+      "rodada": 26,
+      "mandante": "Botafogo",
+      "visitante": "Palmeiras"
+    },
+    {
+      "event_id": "401841224",
+      "rodada": 26,
+      "mandante": "Bragantino",
+      "visitante": "Bahia"
+    },
+    {
+      "event_id": "401841220",
+      "rodada": 26,
+      "mandante": "Corinthians",
+      "visitante": "Chapecoense"
+    },
+    {
+      "event_id": "401841219",
+      "rodada": 26,
+      "mandante": "Coritiba",
+      "visitante": "Mirassol"
+    },
+    {
+      "event_id": "401841218",
+      "rodada": 26,
+      "mandante": "Cruzeiro",
+      "visitante": "Athletico-PR"
+    },
+    {
+      "event_id": "401841227",
+      "rodada": 26,
+      "mandante": "Fluminense",
+      "visitante": "Vasco da Gama"
+    },
+    {
+      "event_id": "401841223",
+      "rodada": 26,
+      "mandante": "Internacional",
+      "visitante": "Santos"
+    },
+    {
+      "event_id": "401841225",
+      "rodada": 26,
+      "mandante": "Remo",
+      "visitante": "Flamengo"
+    },
+    {
+      "event_id": "401841226",
+      "rodada": 27,
+      "mandante": "São Paulo",
+      "visitante": "Atlético-MG"
+    },
+    {
+      "event_id": "401841222",
+      "rodada": 27,
+      "mandante": "Vitória",
+      "visitante": "Grêmio"
     }
   ]
 }
