@@ -58,11 +58,38 @@ def contem_alias(texto_norm: str, clube: str, config: Dict[str, Any]) -> bool:
     return time_no_titulo(texto_norm, clube, config)
 
 
-def canal_oficial(channel_title: str, config: Dict[str, Any]) -> bool:
+def canais_publicacao_automatica(config: Dict[str, Any]) -> List[str]:
+    """Lista rígida de canais permitidos para publicação automática pelo POWER.
+
+    Regra do projeto: novos vínculos vindos de YouTube Search só podem entrar
+    automaticamente se forem GE/Globo, CazéTV ou Amazon Prime Video.
+    Outros canais podem aparecer na auditoria, mas não são publicados.
+    """
+    busca_cfg = config.get("busca_extra", {}) if isinstance(config.get("busca_extra"), dict) else {}
+    termos = busca_cfg.get("canais_publicacao_automatica")
+    if not termos:
+        termos = busca_cfg.get("canais_oficiais_ou_confiaveis", [])
+    return [norm(t) for t in termos if norm(t)]
+
+
+def canal_publicavel(channel_title: str, config: Dict[str, Any]) -> bool:
     ch = norm(channel_title)
-    termos = config.get("busca_extra", {}).get("canais_oficiais_ou_confiaveis", [])
-    termos_norm = [norm(t) for t in termos]
+    termos_norm = canais_publicacao_automatica(config)
     return any(t and t in ch for t in termos_norm)
+
+
+def canal_publicavel_video(video: Dict[str, Any], config: Dict[str, Any]) -> bool:
+    busca_cfg = config.get("busca_extra", {}) if isinstance(config.get("busca_extra"), dict) else {}
+    ids = {str(x).strip() for x in busca_cfg.get("channel_ids_publicacao_automatica", []) if str(x).strip()}
+    channel_id = str(video.get("channel_id") or "").strip()
+    if channel_id and channel_id in ids:
+        return True
+    return canal_publicavel(video.get("channel_title") or "", config)
+
+
+def canal_oficial(channel_title: str, config: Dict[str, Any]) -> bool:
+    # Mantido por compatibilidade interna, mas agora usa a whitelist rígida.
+    return canal_publicavel(channel_title, config)
 
 
 def erro_quota(exc: Exception | str) -> bool:
@@ -156,6 +183,14 @@ def pontuar_busca_extra(jogo: Any, video: Dict[str, Any], config: Dict[str, Any]
 
     if tem_termo_ruim(titulo_norm):
         return 0.0, ["título tem termo ruim para melhores momentos"]
+
+    if not canal_publicavel_video(video, config):
+        # Não remove o que já existe no JSON, mas impede NOVAS publicações
+        # automáticas de canais fora da curadoria: GE/Globo, CazéTV e Amazon.
+        return 0.31, [
+            f"canal fora da whitelist de publicação automática: {video.get('channel_title') or 'YouTube'}",
+            "manter apenas na auditoria; não publicar automaticamente"
+        ]
 
     mand_titulo = contem_alias(titulo_norm, jogo.mandante, config)
     vist_titulo = contem_alias(titulo_norm, jogo.visitante, config)

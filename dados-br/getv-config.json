@@ -142,27 +142,47 @@
     "canais_oficiais_ou_confiaveis": [
       "ge tv",
       "ge.globo",
+      "ge globo",
+      "globoesporte",
+      "globo esporte",
       "sportv",
       "premiere",
       "globoplay",
-      "espn brasil",
-      "espn",
       "cazetv",
       "caze tv",
-      "canal goat",
-      "record",
-      "r7 esportes",
-      "band sports",
-      "ge",
-      "ge globo",
-      "globoesporte",
-      "canal premiere",
-      "goat",
-      "youtube esporte"
+      "cazé tv",
+      "amazon prime video",
+      "prime video",
+      "prime video sport brasil",
+      "prime video brasil",
+      "amazon brasil"
     ],
-    "observacao": "A publicação automática exige os dois clubes no título. Candidatos fracos ficam em auditoria-melhores-momentos-power.json.",
+    "observacao": "A publicação automática exige dois clubes no título e canal dentro da whitelist GE/Globo, CazéTV ou Amazon Prime Video. Outros candidatos ficam em auditoria-melhores-momentos-power.json.",
     "ttl_cache_dias": 21,
     "prioridade_execucao": "rodadas recentes primeiro; para backfill antigo, rode uma rodada por vez",
-    "fallback_manual": "dados-br/melhores-momentos-manual.json"
+    "fallback_manual": "dados-br/melhores-momentos-manual.json",
+    "canais_publicacao_automatica": [
+      "ge tv",
+      "ge.globo",
+      "ge globo",
+      "globoesporte",
+      "globo esporte",
+      "sportv",
+      "premiere",
+      "globoplay",
+      "cazetv",
+      "caze tv",
+      "cazé tv",
+      "amazon prime video",
+      "prime video",
+      "prime video sport brasil",
+      "prime video brasil",
+      "amazon brasil"
+    ],
+    "permitir_publicacao_automatica_de_outros_canais": false,
+    "politica_publicacao": "Novos vínculos automáticos do POWER só podem ser publicados se o canal for GE/Globo, CazéTV ou Amazon Prime Video. Vídeos de outros canais ficam na auditoria e não entram no site automaticamente. Links já existentes são preservados até haver substituição por fonte preferencial.",
+    "channel_ids_publicacao_automatica": [
+      "UCgCKagVhzGnZcuP9bSMgMCg"
+    ]
   }
 }
