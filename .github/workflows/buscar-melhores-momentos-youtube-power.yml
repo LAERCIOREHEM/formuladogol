@@ -61,7 +61,9 @@ jobs:
           python -m py_compile scripts/buscar_melhores_momentos_getv.py
           python -m py_compile scripts/buscar_melhores_momentos_youtube_power.py
           python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
+          python -m py_compile scripts/gerar_relatorio_fontes_melhores_momentos.py
           python scripts/buscar_melhores_momentos_youtube_power.py --dry-run --rodada-inicio "${{ inputs.rodada_inicio }}" --rodada-fim "${{ inputs.rodada_fim }}"
+          python scripts/gerar_relatorio_fontes_melhores_momentos.py --dry-run
 
       - name: Busca reforçada fora das playlists
         env:
@@ -83,8 +85,10 @@ jobs:
             --min-confianca "${{ inputs.min_confianca }}" \
             "${EXTRA[@]}"
 
-      - name: Gerar auditoria de cobertura da aba Resultados
-        run: python scripts/gerar_auditoria_cobertura_resultados.py
+      - name: Gerar auditorias da aba Resultados e das fontes
+        run: |
+          python scripts/gerar_auditoria_cobertura_resultados.py
+          python scripts/gerar_relatorio_fontes_melhores_momentos.py
 
       - name: Commitar JSONs se mudaram
         shell: bash
@@ -96,7 +100,9 @@ jobs:
             dados-br/melhores-momentos-manual.json \
             dados-br/auditoria-melhores-momentos-power.json \
             dados-br/auditoria-melhores-momentos-power-cache.json \
-            dados-br/auditoria-cobertura-resultados.json || true
+            dados-br/auditoria-cobertura-resultados.json \
+            dados-br/auditoria-fontes-melhores-momentos.json \
+            dados-br/getv-config.json || true
 
           if git diff --cached --quiet; then
             echo "Nenhum vídeo novo ou auditoria nova. Nada para commitar."
