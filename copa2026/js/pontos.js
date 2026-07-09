@@ -480,10 +480,11 @@
     const vivos = Number(c.cenarios_titulo || 0);
     const total = Number(chances.total_cenarios || 0);
     const cls = vivos > 0 ? "chance-viva" : "chance-zero";
+    const sub = vivos > 0 ? `${vivos}/${total} cenários` : "sem caminho matemático para 1º";
     return `<div class="chance-card ${cls}">
       <span class="chance-label">Chance de título</span>
       <b>${pct}</b>
-      <small>${vivos}/${total} cenários</small>
+      <small>${sub}</small>
     </div>`;
   }
   function caminhoCurto(c) {
@@ -549,6 +550,12 @@
         <div class="chance-top-total"><b>${cenTxt}</b><small>${cadaTxt}</small></div>
       </div>
       <p class="chance-top-desc">Sem favoritismo: todos os jogos restantes são tratados como 50/50. O cálculo respeita a chave real, a pontuação atual, os pontos futuros de semifinalistas, finalistas e pódio, e o desempate por cravados.</p>
+      <button class="chance-help-btn" type="button" data-chance-help>Como é calculado? ▾</button>
+      <div class="chance-helpbox" id="chance-helpbox" style="display:none">
+        <p><b>Chance de título</b> não é previsão de futebol. É a porcentagem de caminhos restantes em que o participante termina em 1º no bolão.</p>
+        <p>O motor simula todos os cenários possíveis da chave a partir do estado atual. Em cada cenário, soma a pontuação atual com os pontos futuros de semifinalistas, finalistas, campeão, vice, 3º e 4º lugar.</p>
+        <p>Cada jogo restante é tratado como 50/50. Não usa índice, favoritismo, odds, ranking de seleção ou força histórica.</p>
+      </div>
       <div class="chance-top-list">${linhas}</div>
       <div class="chance-top-foot">${vivosTitulo.length} participante(s) ainda têm chance de título · ${semTitulo} sem caminho matemático para 1º neste momento.</div>
     </section>`;
@@ -556,7 +563,6 @@
 
   function renderBolao(o) {
     const KEY = { atuais: x => x.r.atuais, possiveis: x => x.r.possiveis, perdidos: x => x.r.perdidos };
-    const kf = KEY[ORDEM] || KEY.atuais;
     const lin = PART.map(p => {
       const r = COPA_PONTUACAO.calcular(p.d, o);
       const cr = cravadosDe(p.pg, o._realGrupos || {});
@@ -580,13 +586,22 @@
     rankingAtual.forEach((x, i) => x.posPodio = i + 1);
     const cortePodio = rankingAtual[2] ? Number(rankingAtual[2].r.atuais) : null;
 
-    lin.sort((a, b) => kf(b) - kf(a) || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+    const chanceOrdem = x => {
+      const c = dadoChance(CHANCES, x.nome);
+      return c ? Number(c.cenarios_titulo || 0) : -1;
+    };
+    if (ORDEM === "chance") {
+      lin.sort((a, b) => chanceOrdem(b) - chanceOrdem(a) || b.r.atuais - a.r.atuais || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+    } else {
+      const kf = KEY[ORDEM] || KEY.atuais;
+      lin.sort((a, b) => kf(b) - kf(a) || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+    }
     lin.forEach((x, i) => x.posReal = i + 1);
     const visiveis = FILTRO ? lin.filter(x => x.nome === FILTRO) : lin;
 
     const opts = PART.map(p => p.nome).sort((a, b) => a.localeCompare(b))
       .map(n => `<option value="${n}" ${n === FILTRO ? "selected" : ""}>${n}</option>`).join("");
-    const ROT = { atuais: "conquistados", possiveis: "possíveis", perdidos: "perdidos" };
+    const ROT = { atuais: "conquistados", chance: "Chance de título", possiveis: "possíveis", perdidos: "perdidos" };
     const pills = Object.keys(ROT).map(k => `<button class="ordbtn ${ORDEM === k ? "on" : ""}" data-ord="${k}">${ROT[k]}</button>`).join("");
     const controles = `<div class="ctrlbar">
       <select id="filtro-part"><option value="">👥 Todos os participantes</option>${opts}</select>
@@ -655,6 +670,13 @@
       const d = document.getElementById("gg-" + cssId(b.dataset.gg)), ab = d.style.display === "none";
       d.style.display = ab ? "block" : "none";
       b.innerHTML = ab ? "Ocultar quem você acertou ▴" : "QUEM VOCÊ ACERTOU ▾";
+    });
+    document.querySelectorAll("[data-chance-help]").forEach(b => b.onclick = () => {
+      const d = document.getElementById("chance-helpbox");
+      if (!d) return;
+      const ab = d.style.display === "none";
+      d.style.display = ab ? "block" : "none";
+      b.innerHTML = ab ? "Como é calculado? ▴" : "Como é calculado? ▾";
     });
     wireToggle();
   }
