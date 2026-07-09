@@ -254,9 +254,11 @@
     const abre = parseData(cfg.abre_em);
     const fecha = parseData(cfg.fecha_em);
     const status = String(cfg.status || "programada").toLowerCase();
+    if (Number(rodada) < Number(CFG.rodadaInicialApostas || 20)) return false;
     if (["fechada", "apurada", "publicada", "bloqueada", "encerrada"].includes(status)) return false;
+    if (status === "aberta") return true; // abertura manual pelo admin ignora o horário
     if (!abre || !fecha) return false;
-    return Number(rodada) >= Number(CFG.rodadaInicialApostas || 20) && agora >= abre && agora < fecha;
+    return agora >= abre && agora < fecha;
   }
 
   function rodadaPublica(rodada) {
@@ -274,6 +276,7 @@
     const agora = new Date();
     const status = String(cfg.status || "programada").toLowerCase();
     if (rodadaPublica(rodada)) return { classe: "done", texto: "Palpites publicados", detalhe: `Rodada ${rodada} publicada` };
+    if (status === "aberta") return { classe: "open", texto: "Apostas abertas", detalhe: fecha ? `Aberta pelo admin · até ${fmtDataLonga(fecha)}` : "Aberta pelo admin" };
     if (["fechada", "apurada", "bloqueada", "encerrada"].includes(status)) return { classe: "lock", texto: "Rodada fechada", detalhe: `Fechada em ${fmtDataLonga(fecha)}` };
     if (abre && agora < abre) return { classe: "warn", texto: "Aguardando abertura", detalhe: `Abre em ${fmtDataLonga(abre)}` };
     if (fecha && agora >= fecha) return { classe: "lock", texto: "Janela encerrada", detalhe: `Fechou em ${fmtDataLonga(fecha)}` };
@@ -635,7 +638,7 @@
     <div class="actions"><button class="btn" type="submit" ${aberta ? "" : "disabled"}>💾 Salvar palpites da rodada</button><button class="btn secondary" type="button" id="limpar-campos" ${aberta ? "" : "disabled"}>limpar campos</button></div>
     </form>`;
     $("#form-palpites")?.addEventListener("submit", salvarPalpites);
-    $("#limpar-campos")?.addEventListener("click", () => $$("#form-palpites input").forEach(i => { i.value = ""; }));
+    $("#limpar-campos")?.addEventListener("click", () => { $$("#form-palpites input").forEach(i => { i.value = ""; }); status("🧹 Campos limpos. Nenhum palpite foi enviado ainda.", "ok"); });
   }
 
   function coletarPalpitesFormulario() {
@@ -685,7 +688,7 @@
       renderApostas();
       const root = $("#conteudo");
       root.insertAdjacentHTML("afterbegin", `<div class="comprovante"><strong>🧾 Comprovante gerado</strong><p>Rodada ${state.rodada} · ${payload.length} palpites enviados.</p><p class="hash">${comprovante.hash_fechamento || comprovante.hash || "hash indisponível"}</p></div>`);
-      status("Palpites salvos com sucesso.", "ok");
+      status(`✅ PALPITES GRAVADOS COM SUCESSO! Comprovante da rodada ${state.rodada} gerado.`, "ok");
     } catch (err) {
       console.error(err);
       status(err.message || "Falha ao salvar palpites.", "err");
@@ -902,6 +905,7 @@
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+    status(`✅ CSV GERADO COM SUCESSO! Arquivo ${nomeArquivo} baixado.`, "ok");
   }
   function exportarRankingCsv() {
     const ap = apuracaoRodada(state.rodada);
@@ -1037,7 +1041,7 @@
           <div class="two"><label>Abre em <input id="cfg-abre" type="datetime-local" value="${toDatetimeLocal(cfg.abre_em)}"></label><label>Fecha em <input id="cfg-fecha" type="datetime-local" value="${toDatetimeLocal(cfg.fecha_em)}"></label></div>
           <div class="two"><label>Publica em <input id="cfg-publica" type="datetime-local" value="${toDatetimeLocal(cfg.publica_em)}"></label><label>Status <select id="cfg-status"><option value="programada">programada</option><option value="aberta">aberta</option><option value="fechada">fechada</option><option value="apurada">apurada</option><option value="publicada">publicada</option><option value="bloqueada">bloqueada</option></select></label></div>
           <label>Observação <input id="cfg-obs" value="${escapeAttr(cfg.observacao || "")}"></label>
-          <div class="actions"><button class="btn" type="submit">salvar janela</button><button class="btn secondary" type="button" id="publicar-rodada">publicar agora</button><button class="btn secondary" type="button" id="apurar-rodada">marcar apurada</button><button class="btn danger" type="button" id="fechar-rodada">fechar rodada</button></div><p class="muted-note">Depois dos jogos, rode o workflow <strong>Apurar Apostas Brasileirão</strong>. Em seguida, marque como apurada/publicada para liberar ranking e palpites públicos.</p>
+          <div class="actions"><button class="btn" type="submit">salvar janela</button><button class="btn secondary" type="button" id="abrir-rodada">🔓 abrir agora</button><button class="btn secondary" type="button" id="publicar-rodada">publicar agora</button><button class="btn secondary" type="button" id="apurar-rodada">marcar apurada</button><button class="btn danger" type="button" id="fechar-rodada">fechar rodada</button></div><p class="muted-note">"Abrir agora" libera as apostas imediatamente, mesmo antes do horário de abertura. Depois dos jogos, rode o workflow <strong>Apurar Apostas Brasileirão</strong>. Em seguida, marque como apurada/publicada para liberar ranking e palpites públicos.</p>
         </form>
       </div></article>` : `<article class="panel"><div class="panel-inner"><div class="kicker">Janela da rodada</div><h2>Rodada ${state.rodada}</h2><p class="muted-note">Janela e publicação são globais para todas as ligas e somente o admin global altera esses dados.</p><p><span class="badge ${statusJanela(state.rodada).classe}">${escapeHtml(statusJanela(state.rodada).detalhe)}</span></p></div></article>`;
     root.innerHTML = `<section class="admin-grid">
@@ -1055,9 +1059,10 @@
     </section>`;
     if (globalAdmin) {
       $("#cfg-status").value = cfg.status || "programada";
-      $("#limpar-admin")?.addEventListener("click", limparFormParticipante);
+      $("#limpar-admin")?.addEventListener("click", () => { limparFormParticipante(); status("🧹 Formulário de participante limpo.", "ok"); });
       $("#admin-participante")?.addEventListener("submit", salvarParticipanteAdmin);
       $("#admin-rodada")?.addEventListener("submit", salvarRodadaAdmin);
+      $("#abrir-rodada")?.addEventListener("click", abrirRodadaAgora);
       $("#publicar-rodada")?.addEventListener("click", () => alterarStatusRodada("publicada"));
       $("#apurar-rodada")?.addEventListener("click", () => alterarStatusRodada("apurada"));
       $("#fechar-rodada")?.addEventListener("click", () => alterarStatusRodada("fechada"));
@@ -1065,7 +1070,7 @@
       $$('[data-inativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.inativar, false)));
       $$('[data-reativar]').forEach(btn => btn.addEventListener("click", () => alterarAtivoParticipante(btn.dataset.reativar, true)));
       $("#admin-liga-form")?.addEventListener("submit", salvarLigaAdmin);
-      $("#limpar-liga")?.addEventListener("click", () => { limparFormLiga(); $("#admin-liga-nome")?.focus(); });
+      $("#limpar-liga")?.addEventListener("click", () => { limparFormLiga(); $("#admin-liga-nome")?.focus(); status("🧹 Formulário de liga limpo.", "ok"); });
       $$('[data-edit-liga]').forEach(btn => btn.addEventListener("click", () => preencherLiga(btn.dataset.editLiga)));
     }
     $("#export-progresso")?.addEventListener("click", exportarProgressoCsv);
@@ -1093,6 +1098,7 @@
     $("#admin-liga-desc").value = l.descricao || "";
     $("#admin-liga-ativa").checked = Boolean(l.ativa);
     $("#admin-liga-nome").scrollIntoView({ behavior: "smooth", block: "center" });
+    status(`✏️ Editando a liga ${l.nome || ""}. Ajuste os campos e clique em salvar.`, "warn");
   }
 
   async function salvarLigaAdmin(ev) {
@@ -1115,7 +1121,7 @@
       }
       await carregarLigas();
       renderLigaBox();
-      status("Liga salva. Agora adicione os participantes abaixo.", "ok");
+      status("✅ LIGA GRAVADA COM SUCESSO! Agora adicione os participantes abaixo.", "ok");
       await renderAdmin();
     } catch (err) { status(err.message || "Falha ao salvar liga.", "err"); }
   }
@@ -1134,7 +1140,7 @@
         p_papel: $("#admin-add-papel").value || "participante",
         p_ativo: true
       });
-      status("Participante adicionado à liga.", "ok");
+      status("✅ PARTICIPANTE ADICIONADO À LIGA COM SUCESSO!", "ok");
       await renderAdmin();
     } catch (err) { status(err.message || "Falha ao adicionar participante à liga.", "err"); }
   }
@@ -1151,7 +1157,7 @@
         p_papel: "participante",
         p_ativo: Boolean(reativar)
       });
-      status(reativar ? "Participante reativado na liga." : "Participante removido da liga.", "ok");
+      status(reativar ? "✅ REATIVADO NA LIGA COM SUCESSO!" : "✅ REMOVIDO DA LIGA COM SUCESSO! Histórico preservado.", "ok");
       await renderAdmin();
     } catch (err) { status(err.message || "Falha ao alterar participante na liga.", "err"); }
   }
@@ -1166,7 +1172,7 @@
         p_participante_id: participanteId,
         p_ativo: Boolean(ativo)
       });
-      status(ativo ? "Participante reativado." : "Participante inativado.", "ok");
+      status(ativo ? "✅ PARTICIPANTE REATIVADO COM SUCESSO!" : "✅ PARTICIPANTE INATIVADO COM SUCESSO! Histórico preservado.", "ok");
       await renderAdmin();
     } catch (err) { status(err.message || "Falha ao alterar status do participante.", "err"); }
   }
@@ -1198,6 +1204,7 @@
     $("#admin-ativo").checked = Boolean(p.ativo);
     $("#admin-login").scrollIntoView({ behavior: "smooth", block: "center" });
     $("#admin-login").focus();
+    status(`✏️ Editando ${p.nome || p.login}. Ao salvar, um PIN novo será gerado.`, "warn");
   }
 
   function nomeAPartirDoLogin(login) {
@@ -1285,7 +1292,7 @@
 
       limparFormParticipante();
       await renderAdmin();
-      status(`Participante ${atualizado ? "alterado" : "criado"}. Usuário: ${login} · PIN: ${pin}. Envie apenas para a pessoa.`, "ok");
+      status(`✅ PARTICIPANTE ${atualizado ? "ALTERADO" : "CRIADO"} COM SUCESSO! Usuário: ${login} · PIN: ${pin}. Envie apenas para a pessoa.`, "ok");
 
       const enviarWhats = confirm(
         `PARTICIPANTE ${atualizado ? "ALTERADO" : "CRIADO"}!\n` +
@@ -1306,6 +1313,30 @@
     await salvarConfigRodada(statusNovo);
   }
 
+  async function abrirRodadaAgora() {
+    const abreEl = $("#cfg-abre");
+    if (abreEl) {
+      const abre = abreEl.value ? new Date(abreEl.value) : null;
+      if (!abre || abre > new Date()) abreEl.value = toDatetimeLocal(new Date().toISOString());
+    }
+    $("#cfg-status").value = "aberta";
+    await salvarConfigRodada("aberta");
+  }
+
+  function mensagemStatusRodada(statusNovo) {
+    const r = state.rodada;
+    const mapa = {
+      aberta: `🔓 RODADA ${r} ABERTA COM SUCESSO! Apostas liberadas para os participantes agora.`,
+      publicada: `📣 RODADA ${r} PUBLICADA COM SUCESSO! Ranking e palpites liberados para todos.`,
+      apurada: `🧮 RODADA ${r} MARCADA COMO APURADA COM SUCESSO!`,
+      fechada: `🔒 RODADA ${r} FECHADA COM SUCESSO! Ninguém mais envia palpites.`,
+      bloqueada: `🔒 RODADA ${r} BLOQUEADA COM SUCESSO!`,
+      programada: `✅ JANELA GRAVADA COM SUCESSO! Rodada ${r} programada.`,
+      futura: `✅ JANELA GRAVADA COM SUCESSO! Rodada ${r} marcada como futura.`
+    };
+    return mapa[String(statusNovo || "").toLowerCase()] || `✅ JANELA DA RODADA ${r} GRAVADA COM SUCESSO!`;
+  }
+
   async function salvarConfigRodada(statusNovo) {
     try {
       status("Salvando janela da rodada...", "warn");
@@ -1321,9 +1352,16 @@
         p_observacao: $("#cfg-obs").value || null
       });
       await carregarConfigsSupabase();
-      status("Janela da rodada salva.", "ok");
+      status(mensagemStatusRodada(statusNovo), "ok");
       await refresh();
-    } catch (err) { status(err.message || "Falha ao salvar janela.", "err"); }
+    } catch (err) {
+      const msg = String(err?.message || err || "");
+      if (/ambiguous|ambígua|42702/i.test(msg)) {
+        status("O banco ainda está com a função antiga da janela. Rode supabase/brasileirao_apostas_exec17_janela_rodada.sql no SQL Editor do Supabase e tente de novo.", "err");
+      } else {
+        status(msg || "Falha ao salvar janela.", "err");
+      }
+    }
   }
 
   function renderConteudo() {
