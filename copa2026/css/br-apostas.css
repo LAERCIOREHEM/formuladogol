@@ -724,3 +724,56 @@ body > .container > section.hero > img {
     overflow-x: auto;
   }
 }
+
+/* HOTFIX 20260709 — Admin apostas: campo único + WhatsApp e correção mobile das ligas.
+   Mantém o desktop alinhado e impede que o formulário "Criar nova liga" estoure no celular. */
+@media (max-width: 900px) {
+  .league-form,
+  .league-admin-grid,
+  .league-members-box,
+  .liga-panel,
+  .panel,
+  .panel-inner {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .league-form *,
+  .admin-form *,
+  .liga-box-inner *,
+  .inline-add-member * {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .actions,
+  .league-form .actions,
+  .admin-form .actions,
+  .inline-add-member {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+  }
+
+  .actions .btn,
+  .league-form .btn,
+  .admin-form .btn,
+  .inline-add-member .btn {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+
+  .league-form-head span,
+  .muted-note,
+  .liga-admin-cta small,
+  .panel-inner p {
+    overflow-wrap: anywhere;
+  }
+}
