@@ -1,6 +1,6 @@
 {
   "temporada": 2026,
-  "atualizado_em": "2026-07-09T07:04:15.166198-03:00",
+  "atualizado_em": "2026-07-09T12:50:02.025409-03:00",
   "fonte": "Supabase br_palpites + JSONs ESPN locais",
   "politica_sigilo": "Rodadas não publicadas não expõem palpites nem ranking no JSON público.",
   "ligas": [
@@ -20,10 +20,10 @@
   "rodadas": [
     {
       "rodada": 20,
-      "status": "programada",
+      "status": "aberta",
       "publicada": false,
       "sigilosa": true,
-      "participantes": 0,
+      "participantes": 2,
       "total_jogos": 10,
       "jogos_apurados": 0,
       "palpites_descartados_fora_do_prazo": 0,
@@ -32,7 +32,30 @@
       "ranking": [],
       "rankings_por_liga": {},
       "jogos": [],
-      "auditoria_resumo": []
+      "auditoria_resumo": [
+        {
+          "participante_id": "8482faaf-e5ef-4e1d-a050-c92a8a9c196b",
+          "membro": "Jardim",
+          "total_jogos": 10,
+          "total_palpites": 10,
+          "primeiro_envio": "2026-07-09T15:44:14.299634+00:00",
+          "ultimo_envio": "2026-07-09T15:44:14.299634+00:00",
+          "hash_fechamento": "f359abf371c307892330895372100df6f52da924eafb09022b889be45e5ef265",
+          "alteracoes": 10,
+          "percentual": 100.0
+        },
+        {
+          "participante_id": "997627ce-b721-487d-9729-7680753fc4ae",
+          "membro": "Max",
+          "total_jogos": 10,
+          "total_palpites": 10,
+          "primeiro_envio": "2026-07-09T15:28:27.759368+00:00",
+          "ultimo_envio": "2026-07-09T15:28:27.759368+00:00",
+          "hash_fechamento": "c6c364bfae78b162e5c98795c9e72c67b9edd1bdc1951eb216011f7536cf26e2",
+          "alteracoes": 10,
+          "percentual": 100.0
+        }
+      ]
     }
   ],
   "ranking_geral": [],
