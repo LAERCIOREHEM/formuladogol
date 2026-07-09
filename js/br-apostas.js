@@ -1024,12 +1024,11 @@
         <div class="kicker">Participantes</div><h2>Criar/alterar acesso</h2>
         <form id="admin-participante" class="admin-form">
           <input type="hidden" id="admin-participante-id">
-          <label>Nome <input id="admin-nome" required placeholder="Nome exibido"></label>
-          <label>Usuário/login <input id="admin-login" required placeholder="ex.: laercio"></label>
-          <label>Novo PIN <input id="admin-pin" inputmode="numeric" placeholder="6 números"></label>
-          <div class="actions"><button class="btn secondary" type="button" id="gerar-pin">gerar PIN</button><button class="btn" type="submit">salvar participante</button><button class="btn ghost" type="button" id="limpar-admin">limpar</button></div>
+          <input type="hidden" id="admin-nome-atual">
+          <label>Usuário/login <input id="admin-login" required placeholder="ex.: laercio" autocomplete="off"></label>
+          <div class="actions"><button class="btn" type="submit">salvar participante</button><button class="btn ghost" type="button" id="limpar-admin">limpar</button></div>
           <div class="switch-row"><label><input type="checkbox" id="admin-e-admin"> administrador global</label><label><input type="checkbox" id="admin-ativo" checked> ativo</label></div>
-          <p class="muted-note">Para remover alguém sem apagar histórico, deixe inativo ou remova da liga. Os palpites e hashes antigos permanecem preservados.</p>
+          <p class="muted-note">Ao salvar, o sistema gera automaticamente um PIN novo de 6 números e pergunta se você quer enviar o acesso por WhatsApp. Se o login já existir, o participante é alterado e o PIN é renovado. Para remover alguém sem apagar histórico, deixe inativo ou remova da liga.</p>
         </form>
       </div></article>` : `<article class="panel"><div class="panel-inner empty"><strong>Perfil: admin de liga</strong><p>Você pode acompanhar e gerenciar participantes somente das suas ligas. Criar usuários, resetar PIN, inativar participantes globais e alterar janelas fica com o admin global.</p></div></article>`;
     const painelRodada = globalAdmin ? `<article class="panel"><div class="panel-inner">
@@ -1056,7 +1055,6 @@
     </section>`;
     if (globalAdmin) {
       $("#cfg-status").value = cfg.status || "programada";
-      $("#gerar-pin")?.addEventListener("click", () => { $("#admin-pin").value = pinAleatorio(); });
       $("#limpar-admin")?.addEventListener("click", limparFormParticipante);
       $("#admin-participante")?.addEventListener("submit", salvarParticipanteAdmin);
       $("#admin-rodada")?.addEventListener("submit", salvarRodadaAdmin);
@@ -1184,9 +1182,8 @@
 
   function limparFormParticipante() {
     $("#admin-participante-id").value = "";
-    $("#admin-nome").value = "";
+    $("#admin-nome-atual").value = "";
     $("#admin-login").value = "";
-    $("#admin-pin").value = "";
     $("#admin-e-admin").checked = false;
     $("#admin-ativo").checked = true;
   }
@@ -1195,21 +1192,51 @@
     const p = state.participantes.find(x => String(x.participante_id || x.id) === String(id));
     if (!p) return;
     $("#admin-participante-id").value = p.participante_id || p.id;
-    $("#admin-nome").value = p.nome || "";
+    $("#admin-nome-atual").value = p.nome || "";
     $("#admin-login").value = p.login || "";
-    $("#admin-pin").value = "";
     $("#admin-e-admin").checked = Boolean(p.admin);
     $("#admin-ativo").checked = Boolean(p.ativo);
-    $("#admin-nome").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("#admin-login").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("#admin-login").focus();
+  }
+
+  function nomeAPartirDoLogin(login) {
+    return String(login || "")
+      .replace(/[._-]+/g, " ")
+      .trim()
+      .split(/\s+/)
+      .map(parte => parte ? parte.charAt(0).toUpperCase() + parte.slice(1) : parte)
+      .join(" ");
+  }
+
+  function mensagemWhatsappAcesso(nome, login, pin) {
+    return [
+      "🏆 Bolão Brasileirão 2026 — Almoço de Sexta",
+      "",
+      `Fala, ${nome}! Seu acesso está pronto:`,
+      `👤 Usuário: ${login}`,
+      `🔑 PIN: ${pin}`,
+      "",
+      "Acesse o site: https://brasileirao2026almoco.com.br/apostas.html e faça suas apostas! ⚽🍀"
+    ].join("\n");
+  }
+
+  function abrirWhatsappComMensagem(texto) {
+    const url = "https://wa.me/?text=" + encodeURIComponent(texto);
+    const win = global.open(url, "_blank", "noopener");
+    if (!win) global.location.href = url;
   }
 
   function mensagemErroParticipante(err) {
     const msg = String(err?.message || err || "");
     if (/duplicate|unique|br_participantes_login|login/i.test(msg) && /existe|duplicate|unique|duplic/i.test(msg)) {
-      return "Já existe participante com esse usuário/login. Use outro login ou edite o participante existente.";
+      return "Já existe participante com esse usuário/login. Atualize a lista e salve de novo para renovar o PIN dele.";
+    }
+    if (/ambiguous|ambígua|42702/i.test(msg)) {
+      return "O banco ainda está com a função antiga. Rode o script supabase/brasileirao_apostas_exec16_hotfix_participantes.sql no SQL Editor do Supabase e tente de novo.";
     }
     if (/pin/i.test(msg)) {
-      return "PIN obrigatório para novo participante. Clique em gerar PIN ou deixe o sistema gerar automaticamente.";
+      return "Não foi possível gerar/salvar o PIN. Tente novamente.";
     }
     if (/Acesso admin inválido|Sessão inválida|JWT|token/i.test(msg)) {
       return "Sessão de administrador inválida ou expirada. Saia e entre novamente antes de salvar.";
@@ -1220,35 +1247,52 @@
   async function salvarParticipanteAdmin(ev) {
     ev.preventDefault();
     try {
-      const participanteId = $("#admin-participante-id").value || null;
-      const novoParticipante = !participanteId;
-      const nome = $("#admin-nome").value.trim();
-      const login = $("#admin-login").value.trim();
-      let pin = $("#admin-pin").value.trim();
+      const login = String($("#admin-login").value || "").trim().toLowerCase();
+      if (!login) throw new Error("Informe o usuário/login antes de salvar.");
 
-      if (!nome || !login) throw new Error("Informe nome e usuário/login antes de salvar.");
-      if (novoParticipante && !pin) {
-        pin = pinAleatorio();
-        $("#admin-pin").value = pin;
-      }
+      const idInformado = $("#admin-participante-id").value || null;
+      const existente = (state.participantes || []).find(p =>
+        idInformado
+          ? String(p.participante_id || p.id) === String(idInformado)
+          : String(p.login || "").trim().toLowerCase() === login
+      ) || null;
+      const participanteId = idInformado || (existente ? (existente.participante_id || existente.id) : null);
+      const atualizado = Boolean(participanteId);
+      const veioDoEditar = Boolean(idInformado);
 
-      status("Salvando participante...", "warn");
+      const nome = String($("#admin-nome-atual").value || "").trim()
+        || (existente && existente.nome)
+        || nomeAPartirDoLogin(login);
+      const pin = pinAleatorio();
+
+      // Via botão "editar" as caixas refletem o participante e mandam a palavra final.
+      // Digitando só o login de alguém que já existe, preserva admin/ativo atuais
+      // para não rebaixar nem inativar ninguém sem querer.
+      const adminFlag = veioDoEditar ? $("#admin-e-admin").checked : (existente ? Boolean(existente.admin) : $("#admin-e-admin").checked);
+      const ativoFlag = veioDoEditar ? $("#admin-ativo").checked : (existente ? true : $("#admin-ativo").checked);
+
+      status(atualizado ? "Alterando participante e gerando novo PIN..." : "Criando participante e gerando PIN...", "warn");
       await rpcRows("br_admin_salvar_participante", {
         p_admin_id: state.usuario.id,
         p_token: state.token,
         p_participante_id: participanteId,
         p_nome: nome,
         p_login: login,
-        p_pin: pin || null,
-        p_admin: $("#admin-e-admin").checked,
-        p_ativo: $("#admin-ativo").checked
+        p_pin: pin,
+        p_admin: adminFlag,
+        p_ativo: ativoFlag
       });
 
       limparFormParticipante();
       await renderAdmin();
-      status(novoParticipante
-        ? `Participante salvo. PIN: ${pin}. Envie esse PIN por WhatsApp apenas para a pessoa.`
-        : "Participante atualizado. Se você informou novo PIN, envie apenas para a pessoa.", "ok");
+      status(`Participante ${atualizado ? "alterado" : "criado"}. Usuário: ${login} · PIN: ${pin}. Envie apenas para a pessoa.`, "ok");
+
+      const enviarWhats = confirm(
+        `PARTICIPANTE ${atualizado ? "ALTERADO" : "CRIADO"}!\n` +
+        `Usuário: ${login}\nPIN: ${pin}\n\n` +
+        "Deseja mandar msg pra ele pelo WhatsApp?"
+      );
+      if (enviarWhats) abrirWhatsappComMensagem(mensagemWhatsappAcesso(nome, login, pin));
     } catch (err) { status(mensagemErroParticipante(err), "err"); }
   }
 
