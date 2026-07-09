@@ -1,20 +1,23 @@
 {
-  "versao": 1,
+  "versao": 2,
   "temporada": 2026,
-  "observacao": "Configuração do bolão de placares do Brasileirão. Datas em ISO com fuso -03:00.",
-  "padrao": {
-    "abre_dia_semana": "quinta-feira",
-    "abre_hora": "00:00",
-    "fecha_dia_semana": "sábado",
-    "fecha_hora": "10:00"
+  "observacao": "Configuração do bolão de placares do Brasileirão 2026. Rodadas 20–38. Datas em ISO com fuso -03:00. A janelaPadrao é usada pelo front para pré-calcular a janela de rodadas ainda sem config explícita no Supabase.",
+  "rodadaInicialApostas": 20,
+  "janelaPadrao": {
+    "abreDiaSemana": 4,
+    "abreHora": 0,
+    "fechaDiaSemana": 6,
+    "fechaHora": 10,
+    "fechaMinuto": 0,
+    "observacao": "Abre quinta 00:00 BRT, fecha sábado 10:00 BRT (regra padrão do grupo)"
   },
   "rodadas": [
     {
       "rodada": 20,
       "abre_em": "2026-07-23T00:00:00-03:00",
       "fecha_em": "2026-07-25T10:00:00-03:00",
-      "status": "programada",
-      "observacao": "Primeira rodada do bolão de placares após a Copa."
+      "status": "aberta",
+      "observacao": "Primeira rodada do bolão de placares após a Copa. Aberta manualmente pelo admin."
     }
   ]
 }
