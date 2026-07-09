@@ -578,13 +578,15 @@
       }
     }
 
-    // Corte matemático do pódio: usa sempre o ranking por pontos conquistados,
-    // independentemente da ordenação visual escolhida pelo usuário.
-    // Quem está fora do top 3 e não consegue mais alcançar os pontos atuais
-    // do 3º colocado é marcado como "sem chance de pódio".
-    const rankingAtual = lin.slice().sort((a, b) => b.r.atuais - a.r.atuais || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
-    rankingAtual.forEach((x, i) => x.posPodio = i + 1);
-    const cortePodio = rankingAtual[2] ? Number(rankingAtual[2].r.atuais) : null;
+    // Sombreamento do pódio: usa a simulação real dos cenários restantes.
+    // O card só fica sombreado quando o participante tem 0 caminhos matemáticos
+    // para terminar em 1º, 2º ou 3º. Não usa mais a conta antiga de
+    // "conquistados + possíveis" contra a pontuação atual do 3º colocado.
+    const semChancePodio = x => {
+      const c = dadoChance(CHANCES, x.nome);
+      if (!c || !CHANCES || !Number(CHANCES.total_cenarios || 0)) return false;
+      return Number(c.cenarios_podio || 0) <= 0;
+    };
 
     const chanceOrdem = x => {
       const c = dadoChance(CHANCES, x.nome);
@@ -615,18 +617,21 @@
       banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>potencial máximo</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
     }
 
-    const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯 · Cards sombreados indicam participante sem chance matemática de pódio.</p>';
+    const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯 · Cards sombreados indicam 0 cenários matemáticos de pódio.</p>';
     const painelChances = ABA === "bolao" ? chancePainelHTML(CHANCES) : "";
     $("#app").innerHTML = toggleHTML() + controles + banner + painelChances + tbnote + visiveis.map((x, i) => {
       const pos = x.posReal, r = x.r;
       const eficiencia = eficienciaPct(r);
       const tot = r.atuais + r.perdidos + r.possiveis || 1;
       const medal = pos === 1 ? "🥇" : pos === 2 ? "🥈" : pos === 3 ? "🥉" : "";
-      const maximoPodio = Number(r.atuais || 0) + Number(r.possiveis || 0);
-      const semPodio = cortePodio !== null && x.posPodio > 3 && maximoPodio < cortePodio;
+      const chanceDoCard = dadoChance(CHANCES, x.nome);
+      const totalCenarios = Number(CHANCES && CHANCES.total_cenarios || 0);
+      const cenariosPodio = Number(chanceDoCard && chanceDoCard.cenarios_podio || 0);
+      const semPodio = semChancePodio(x);
       const cls = (pos <= 3 ? " p" + pos : "") + (semPodio ? " sem-podio" : "");
       const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
-      const seloSemPodio = semPodio ? `<div class="selo-sem-podio">⚠️ Sem chance matemática de pódio <small>máximo possível: ${maximoPodio} · corte atual do 3º: ${cortePodio}</small></div>` : "";
+      const motivoSemPodio = `${cenariosPodio}/${totalCenarios} cenários de pódio: não termina em 1º, 2º ou 3º em nenhuma simulação restante`;
+      const seloSemPodio = semPodio ? `<div class="selo-sem-podio">⚠️ Sem chance matemática de pódio <small>${motivoSemPodio}</small></div>` : "";
       const fasesHTML = FASES.map(f => {
         const real = o[f.k] || [];
         if (!real.length) return `<span class="ph">${f.lab}: <b>—</b></span>`;
