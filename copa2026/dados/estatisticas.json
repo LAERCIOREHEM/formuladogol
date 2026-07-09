@@ -1,30 +1,13 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-09T22:42:38.122031Z",
+  "atualizado_em": "2026-07-09T23:12:43.487574Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 97,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
-    {
-      "nome": "Kylian Mbappé",
-      "equipe": "FRA",
-      "gols": 8,
-      "assistencias": 3,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760432",
-        "760457",
-        "760475",
-        "760492",
-        "760503",
-        "760510"
-      ],
-      "total_cartoes": 0
-    },
     {
       "nome": "Lionel Messi",
       "equipe": "ARG",
@@ -57,6 +40,22 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Kylian Mbappé",
+      "equipe": "FRA",
+      "gols": 7,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760457",
+        "760475",
+        "760492",
+        "760503"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Harry Kane",
       "equipe": "ENG",
       "gols": 6,
@@ -68,21 +67,6 @@
         "760485",
         "760495",
         "760505"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Ousmane Dembélé",
-      "equipe": "FRA",
-      "gols": 5,
-      "assistencias": 2,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760457",
-        "760475",
-        "760492",
-        "760510"
       ],
       "total_cartoes": 0
     },
@@ -140,6 +124,20 @@
       "jogos": [
         "760453",
         "760497"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Ousmane Dembélé",
+      "equipe": "FRA",
+      "gols": 4,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760457",
+        "760475",
+        "760492"
       ],
       "total_cartoes": 0
     },
@@ -999,12 +997,11 @@
       "nome": "Désiré Doué",
       "equipe": "FRA",
       "gols": 1,
-      "assistencias": 1,
+      "assistencias": 0,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
-        "760475",
-        "760510"
+        "760475"
       ],
       "total_cartoes": 0
     },
@@ -2276,23 +2273,6 @@
       "total_cartoes": 0
     },
     {
-      "nome": "Kylian Mbappé",
-      "equipe": "FRA",
-      "gols": 8,
-      "assistencias": 3,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760432",
-        "760457",
-        "760475",
-        "760492",
-        "760503",
-        "760510"
-      ],
-      "total_cartoes": 0
-    },
-    {
       "nome": "Martin Ødegaard",
       "equipe": "NOR",
       "gols": 0,
@@ -2503,6 +2483,22 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Kylian Mbappé",
+      "equipe": "FRA",
+      "gols": 7,
+      "assistencias": 2,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760457",
+        "760475",
+        "760492",
+        "760503"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Leandro Trossard",
       "equipe": "BEL",
       "gols": 2,
@@ -2571,15 +2567,14 @@
     {
       "nome": "Ousmane Dembélé",
       "equipe": "FRA",
-      "gols": 5,
+      "gols": 4,
       "assistencias": 2,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
         "760457",
         "760475",
-        "760492",
-        "760510"
+        "760492"
       ],
       "total_cartoes": 0
     },
@@ -2953,19 +2948,6 @@
       "vermelhos": 0,
       "jogos": [
         "760462"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Désiré Doué",
-      "equipe": "FRA",
-      "gols": 1,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760475",
-        "760510"
       ],
       "total_cartoes": 0
     },
@@ -7005,15 +6987,6 @@
   ],
   "por_selecao": [
     {
-      "equipe": "FRA",
-      "gols": 16,
-      "assistencias": 14,
-      "amarelos": 4,
-      "vermelhos": 0,
-      "jogos": 6,
-      "media_gols": 2.67
-    },
-    {
       "equipe": "ARG",
       "gols": 14,
       "assistencias": 8,
@@ -7021,6 +6994,15 @@
       "vermelhos": 0,
       "jogos": 5,
       "media_gols": 2.8
+    },
+    {
+      "equipe": "FRA",
+      "gols": 14,
+      "assistencias": 12,
+      "amarelos": 4,
+      "vermelhos": 0,
+      "jogos": 6,
+      "media_gols": 2.33
     },
     {
       "equipe": "BEL",
