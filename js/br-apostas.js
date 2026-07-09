@@ -28,6 +28,7 @@
     publicos: [],
     apuracao: { rodadas: [], ranking_geral: [] },
     rankingApostas: { ranking_geral: [] },
+    _autoRefreshTimer: null,
     auditoria: [],
     auditoriaEventos: [],
     participantes: [],
@@ -315,6 +316,36 @@
     return global.supabase.createClient(supa.url, supa.key, {
       auth: { persistSession: false, autoRefreshToken: false }
     });
+  }
+
+  // ── Auto-refresh do ranking e apuração (a cada 5 min quando rodada ativa) ──
+  async function recarregarApuracao() {
+    try {
+      const [apuracao, rankingApostas] = await Promise.all([
+        fetchJson("dados-br/apuracao.json?_=" + Date.now(), { rodadas: [], ranking_geral: [] }),
+        fetchJson("dados-br/ranking-apostas.json?_=" + Date.now(), { ranking_geral: [] })
+      ]);
+      state.apuracao = apuracao || { rodadas: [], ranking_geral: [] };
+      state.rankingApostas = rankingApostas || { ranking_geral: [] };
+      if (["ranking", "publico"].includes(state.aba)) renderConteudo();
+    } catch (_) { /* silencioso — nao interrompe a experiencia */ }
+  }
+
+  function rodadaAtiva() {
+    return state.rodadas.some(r => rodadaAberta(r) || rodadaPublica(r));
+  }
+
+  function iniciarAutoRefresh() {
+    pararAutoRefresh();
+    if (!rodadaAtiva()) return;
+    state._autoRefreshTimer = setInterval(recarregarApuracao, 5 * 60 * 1000);
+  }
+
+  function pararAutoRefresh() {
+    if (state._autoRefreshTimer) {
+      clearInterval(state._autoRefreshTimer);
+      state._autoRefreshTimer = null;
+    }
   }
 
   async function carregarBase() {
@@ -1443,6 +1474,7 @@
       status("Entre com usuário e PIN para apostar.", "warn");
     }
     await refresh();
+    iniciarAutoRefresh();
   }
 
   document.addEventListener("DOMContentLoaded", init);
