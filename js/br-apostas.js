@@ -193,8 +193,8 @@
       event_id: e.event_id,
       rodada: e.rodada,
       data_iso: e.data_iso,
-      mandante: { nome: e.mandante },
-      visitante: { nome: e.visitante },
+      mandante: { nome: e.mandante, escudo: (state.clubesPorNome && state.clubesPorNome[e.mandante] && state.clubesPorNome[e.mandante].escudo) || "", sigla: (state.clubesPorNome && state.clubesPorNome[e.mandante] && state.clubesPorNome[e.mandante].sigla) || "" },
+      visitante: { nome: e.visitante, escudo: (state.clubesPorNome && state.clubesPorNome[e.visitante] && state.clubesPorNome[e.visitante].escudo) || "", sigla: (state.clubesPorNome && state.clubesPorNome[e.visitante] && state.clubesPorNome[e.visitante].sigla) || "" },
       estadio: e.estadio || "",
       transmissao: e.transmissao || "",
       estado: e.estado || "pre",
@@ -319,13 +319,14 @@
 
   async function carregarBase() {
     const arq = CFG.arquivos || {};
-    const [jogosJson, resultadosJson, espnEventosJson, configLocal, apuracao, rankingApostas] = await Promise.all([
+    const [jogosJson, resultadosJson, espnEventosJson, configLocal, apuracao, rankingApostas, clubesJson] = await Promise.all([
       fetchJson(arq.jogos || "jogos.json", { jogos: [] }),
       fetchJson(arq.resultados || "resultados.json", { resultados: [] }),
       fetchJson(arq.eventos || "espn_eventos.json", { eventos: [] }),
       fetchJson(arq.configRodadas || "dados-br/apostas-config.json", { rodadas: [] }),
       fetchJson("dados-br/apuracao.json", { rodadas: [], ranking_geral: [] }),
-      fetchJson("dados-br/ranking-apostas.json", { ranking_geral: [] })
+      fetchJson("dados-br/ranking-apostas.json", { ranking_geral: [] }),
+      fetchJson("dados-br/clubes.json", { clubes: [] })
     ]);
     state.jogosJson = jogosJson;
     state.resultadosJson = resultadosJson;
@@ -333,6 +334,10 @@
     state.configLocal = configLocal;
     state.apuracao = apuracao || { rodadas: [], ranking_geral: [] };
     state.rankingApostas = rankingApostas || { ranking_geral: [] };
+    // Mapa nome -> {escudo, sigla} para enriquecer eventos ESPN (R21+ chegam so com string)
+    const clubeLista = (clubesJson && clubesJson.clubes) || [];
+    state.clubesPorNome = {};
+    clubeLista.forEach(c => { if (c && c.nome) state.clubesPorNome[c.nome] = c; });
     state.jogos = todosJogos();
     const set = new Set();
     for (let r = Number(CFG.rodadaInicialApostas || 20); r <= 38; r += 1) set.add(r);
