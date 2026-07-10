@@ -129,6 +129,7 @@
   .chance-top-total b{display:block;color:var(--gold);font-family:'Anton',sans-serif;font-weight:400;font-size:18px;letter-spacing:.5px;line-height:1}
   .chance-top-total small{display:block;color:var(--cinza);font-size:10.5px;line-height:1.3;margin-top:3px}
   .chance-top-desc{font-size:11.5px;line-height:1.45;color:#cbd7e8;margin:0 0 10px}
+  .chance-top-subtitle{font-size:11px;text-transform:uppercase;letter-spacing:1.1px;color:#f4c542;font-weight:900;margin:0 0 7px;text-align:center}
   .chance-top-list{display:grid;gap:6px}
   .chance-top-row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:7px;align-items:center;border:1px solid rgba(255,255,255,.075);background:rgba(0,0,0,.16);border-radius:10px;padding:7px 8px}
   .chance-top-pos{font-family:'Anton',sans-serif;color:#f4c542;text-align:center;font-size:17px;line-height:1}
@@ -140,7 +141,12 @@
   .chance-help-btn{width:100%;margin:0 0 9px;padding:7px 10px;border-radius:10px;border:1px solid rgba(244,197,66,.30);background:rgba(0,0,0,.16);color:var(--gold);font-family:inherit;font-size:12px;font-weight:900;cursor:pointer}
   .chance-helpbox{margin:-2px 0 10px;padding:10px 11px;border-radius:11px;border:1px dashed rgba(244,197,66,.30);background:rgba(0,0,0,.16);color:#d4deef;font-size:11.5px;line-height:1.5}
   .chance-helpbox p{margin:0 0 7px}.chance-helpbox p:last-child{margin-bottom:0}.chance-helpbox b{color:var(--gold)}
-  @media(max-width:430px){.chance-topbox{padding:11px}.chance-top-head{display:block}.chance-top-total{text-align:left;margin-top:7px}.chance-top-row{grid-template-columns:22px minmax(0,1fr) auto}.chance-top-row b{font-size:17px}.chance-top-row small{text-align:left}.chance-topbox h2{font-size:18px}}
+  .chance-campeao-box{border-color:rgba(244,197,66,.65);background:linear-gradient(135deg,rgba(244,197,66,.22),rgba(12,31,58,.82));box-shadow:0 12px 28px rgba(244,197,66,.12)}
+  .chance-campeao-card{display:flex;align-items:center;gap:12px;margin:10px 0;padding:12px;border-radius:13px;border:1px solid rgba(244,197,66,.38);background:rgba(244,197,66,.12)}
+  .chance-campeao-ico{font-size:34px;line-height:1;filter:drop-shadow(0 3px 8px rgba(0,0,0,.25))}
+  .chance-campeao-card b{display:block;font-size:22px;font-weight:900;color:#fff;letter-spacing:.5px}
+  .chance-campeao-card small{display:block;color:#d5dfef;font-size:11.5px;line-height:1.45;margin-top:2px}
+  @media(max-width:430px){.chance-topbox{padding:11px}.chance-top-head{display:block}.chance-top-total{text-align:left;margin-top:7px}.chance-top-row{grid-template-columns:22px minmax(0,1fr) auto}.chance-top-row b{font-size:17px}.chance-top-row small{text-align:left}.chance-topbox h2{font-size:18px}.chance-campeao-card{align-items:flex-start}.chance-campeao-card b{font-size:20px}}
 
   .chance-card{margin-top:9px;border:1px solid rgba(244,197,66,.28);background:rgba(244,197,66,.075);border-radius:11px;padding:9px 10px;display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 10px}
   .chance-card .chance-label{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:#f4c542;font-weight:800}
@@ -149,6 +155,8 @@
   .chance-card.chance-zero{border-color:rgba(159,176,199,.16);background:rgba(159,176,199,.045);padding:7px 9px;opacity:.82}
   .chance-card.chance-zero .chance-label,.chance-card.chance-zero b{color:var(--cinza)}
   .chance-card.chance-zero b{font-size:18px}.chance-card.chance-zero small{font-size:9.8px}
+  .chance-card.chance-definida{border-color:rgba(244,197,66,.55);background:linear-gradient(90deg,rgba(244,197,66,.18),rgba(244,197,66,.08));box-shadow:0 8px 18px rgba(244,197,66,.08)}
+  .chance-card.chance-definida .chance-label{color:#ffe18a}.chance-card.chance-definida b{font-size:18px;color:#ffe18a}.chance-card.chance-definida small{color:#d7e0ef}
   .chancebox{margin-top:8px;background:rgba(0,0,0,.18);border:1px solid var(--linha);border-radius:10px;padding:10px}
   .chance-metodo{font-size:11px;line-height:1.45;color:var(--cinza);margin-bottom:8px}
   .chance-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
@@ -178,6 +186,16 @@
   .gg-no{background:rgba(224,71,62,.10);opacity:.85}
   .gg-pend{background:rgba(244,197,66,.08);border:1px solid rgba(244,197,66,.18)}
   .gg-g small{display:block;color:var(--cinza);font-size:10px;margin-top:2px;font-weight:700}
+
+  .card.podio-ouro{border-color:rgba(244,197,66,.75);background:linear-gradient(90deg,rgba(244,197,66,.20),rgba(244,197,66,.08),var(--navy-2));box-shadow:0 10px 28px rgba(244,197,66,.12)}
+  .card.podio-prata{border-color:rgba(210,220,235,.70);background:linear-gradient(90deg,rgba(210,220,235,.16),rgba(210,220,235,.06),var(--navy-2));box-shadow:0 10px 24px rgba(210,220,235,.08)}
+  .card.podio-bronze{border-color:rgba(205,127,77,.68);background:linear-gradient(90deg,rgba(205,127,77,.17),rgba(205,127,77,.06),var(--navy-2));box-shadow:0 10px 24px rgba(205,127,77,.08)}
+  .selo-podio-garantido{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:-3px 0 9px;padding:7px 10px;border-radius:10px;font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.7px}
+  .selo-podio-garantido small{font-size:10.5px;font-weight:800;text-transform:none;letter-spacing:0;text-align:right;flex:1;min-width:210px;color:#dce6f4}
+  .selo-podio-garantido.selo-ouro{background:rgba(244,197,66,.16);border:1px solid rgba(244,197,66,.46);color:#ffe18a}
+  .selo-podio-garantido.selo-prata{background:rgba(210,220,235,.13);border:1px solid rgba(210,220,235,.40);color:#e9f0fb}
+  .selo-podio-garantido.selo-bronze{background:rgba(205,127,77,.15);border:1px solid rgba(205,127,77,.42);color:#ffc08a}
+  @media(max-width:480px){.selo-podio-garantido{display:block;line-height:1.35}.selo-podio-garantido small{display:block;margin-top:3px;text-align:left}}
 
   .card.sem-podio{border-color:rgba(148,163,184,.18);background:linear-gradient(90deg,rgba(22,31,45,.80),rgba(22,31,45,.58));box-shadow:none;filter:grayscale(.35);opacity:.66}
   .card.sem-podio .barra,.card.sem-podio .f32,.card.sem-podio .podiodet{opacity:.72}
@@ -214,8 +232,8 @@
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
 <script src="js/engine.js?v=20260622b"></script>
 <script src="js/pontuacao.js?v=20260628teto-fix"></script>
-<script src="js/chances-bolao.js?v=20260709-podio-zero-motivo"></script>
-<script src="js/pontos.js?v=20260709-podio-zero-motivo"></script>
+<script src="js/chances-bolao.js?v=20260710-vivos-campeao-podio"></script>
+<script src="js/pontos.js?v=20260710-vivos-campeao-podio"></script>
 <footer class="rodape">
   <a href="regras.html">📘 Regras</a><span class="sep">·</span>
   <a href="#" data-feedback>💬 Sugestões</a><span class="sep">·</span>

@@ -476,9 +476,17 @@
   function chanceResumoHTML(chances, x) {
     const c = dadoChance(chances, x.nome);
     if (!c) return "";
-    const pct = fmtPctChance(c.chance_titulo_pct_exata ?? c.chance_titulo_pct);
     const vivos = Number(c.cenarios_titulo || 0);
     const total = Number(chances.total_cenarios || 0);
+    const tituloGarantido = total > 0 && vivos === total;
+    if (tituloGarantido) {
+      return `<div class="chance-card chance-definida">
+        <span class="chance-label">Campeão do Bolão</span>
+        <b>🏆 definido</b>
+        <small>${vivos}/${total} cenários: ninguém mais alcança o 1º lugar</small>
+      </div>`;
+    }
+    const pct = fmtPctChance(c.chance_titulo_pct_exata ?? c.chance_titulo_pct);
     const cls = vivos > 0 ? "chance-viva" : "chance-zero";
     const sub = vivos > 0 ? `${vivos}/${total} cenários` : "sem caminho matemático para 1º";
     return `<div class="chance-card ${cls}">
@@ -527,11 +535,35 @@
     const total = Number(chances.total_cenarios || 0);
     const cada = Number(chances.cada_cenario_pct || 0);
     const vivosTitulo = chances.participantes.filter(p => Number(p.cenarios_titulo || 0) > 0);
-    const top = vivosTitulo.slice(0, 5);
     const semTitulo = chances.participantes.length - vivosTitulo.length;
     const cenTxt = total === 1 ? "1 cenário restante" : `${total} cenários restantes`;
     const cadaTxt = total ? `Cada cenário vale ${fmtPctChance(cada)}.` : "";
-    const linhas = top.length ? top.map((p, i) => {
+    const campeaoMatematico = total > 0 && vivosTitulo.length === 1 && Number(vivosTitulo[0].cenarios_titulo || 0) === total;
+
+    if (campeaoMatematico) {
+      const c = vivosTitulo[0];
+      return `<section class="chance-topbox chance-campeao-box" aria-label="Campeão matemático do bolão">
+        <div class="chance-top-head">
+          <div>
+            <span class="chance-kicker">🏆 Bolão definido matematicamente</span>
+            <h2>Campeão do Bolão</h2>
+          </div>
+          <div class="chance-top-total"><b>${cenTxt}</b><small>O título já está definido.</small></div>
+        </div>
+        <div class="chance-campeao-card">
+          <span class="chance-campeao-ico">🏆</span>
+          <div><b>${c.nome}</b><small>Não há mais cenários matemáticos em que outro participante termine em 1º lugar.</small></div>
+        </div>
+        <button class="chance-help-btn" type="button" data-chance-help>Como foi definido? ▾</button>
+        <div class="chance-helpbox" id="chance-helpbox" style="display:none">
+          <p>O motor simulou todos os caminhos restantes da chave, somando a pontuação atual com os pontos futuros possíveis de cada participante.</p>
+          <p><b>${c.nome}</b> termina em 1º lugar em ${Number(c.cenarios_titulo || 0)}/${total} cenários restantes. Por isso, a página deixa de tratar como chance e passa a indicar campeão matemático.</p>
+          <p>O cálculo segue sem favoritismo: cada jogo restante é tratado como 50/50 e o desempate é por placares cravados.</p>
+        </div>
+      </section>`;
+    }
+
+    const linhas = vivosTitulo.length ? vivosTitulo.map((p, i) => {
       const pct = fmtPctChance(p.chance_titulo_pct_exata ?? p.chance_titulo_pct);
       const podio = fmtPctChance(p.chance_podio_pct_exata ?? p.chance_podio_pct);
       return `<div class="chance-top-row">
@@ -541,6 +573,7 @@
         <small>${Number(p.cenarios_titulo || 0)}/${total} · pódio ${podio}</small>
       </div>`;
     }).join("") : `<div class="chance-top-empty">Nenhum participante tem caminho matemático isolado para o título neste momento.</div>`;
+    const tituloLista = vivosTitulo.length === 1 ? "Participante ainda vivo pelo título" : "Participantes ainda vivos pelo título";
     return `<section class="chance-topbox" aria-label="Chance matemática de título do bolão">
       <div class="chance-top-head">
         <div>
@@ -556,6 +589,7 @@
         <p>O motor simula todos os cenários possíveis da chave a partir do estado atual. Em cada cenário, soma a pontuação atual com os pontos futuros de semifinalistas, finalistas, campeão, vice, 3º e 4º lugar.</p>
         <p>Cada jogo restante é tratado como 50/50. Não usa índice, favoritismo, odds, ranking de seleção ou força histórica.</p>
       </div>
+      <div class="chance-top-subtitle">${tituloLista}</div>
       <div class="chance-top-list">${linhas}</div>
       <div class="chance-top-foot">${vivosTitulo.length} participante(s) ainda têm chance de título · ${semTitulo} sem caminho matemático para 1º neste momento.</div>
     </section>`;
@@ -617,7 +651,7 @@
       banner = `<div class="aviso">A pontuação <b>começa na 2ª fase</b> (quando as 32 forem definidas, no fim dos grupos). Por enquanto mostramos o <b>potencial máximo</b> de cada palpite — o máximo que dá pra fazer. ${o._meta.nGruposCompletos ? `(${o._meta.nGruposCompletos}/12 grupos encerrados)` : ""}</div>`;
     }
 
-    const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯 · Cards sombreados indicam 0 cenários matemáticos de pódio.</p>';
+    const tbnote = '<p class="tbnote">Desempate: mais placares <b>cravados</b> na fase de grupos 🎯 · Cards sombreados indicam 0 cenários matemáticos de pódio. Cards em ouro, prata e bronze indicam posição de pódio matematicamente garantida.</p>';
     const painelChances = ABA === "bolao" ? chancePainelHTML(CHANCES) : "";
     $("#app").innerHTML = toggleHTML() + controles + banner + painelChances + tbnote + visiveis.map((x, i) => {
       const pos = x.posReal, r = x.r;
@@ -627,11 +661,19 @@
       const chanceDoCard = dadoChance(CHANCES, x.nome);
       const totalCenarios = Number(CHANCES && CHANCES.total_cenarios || 0);
       const cenariosPodio = Number(chanceDoCard && chanceDoCard.cenarios_podio || 0);
+      const tituloGarantido = totalCenarios > 0 && Number(chanceDoCard && chanceDoCard.cenarios_titulo || 0) === totalCenarios;
+      const segundoGarantido = totalCenarios > 0 && Number(chanceDoCard && chanceDoCard.cenarios_segundo || 0) === totalCenarios;
+      const terceiroGarantido = totalCenarios > 0 && Number(chanceDoCard && chanceDoCard.cenarios_terceiro || 0) === totalCenarios;
+      const podioGarantidoClasse = tituloGarantido ? " podio-ouro" : segundoGarantido ? " podio-prata" : terceiroGarantido ? " podio-bronze" : "";
       const semPodio = semChancePodio(x);
-      const cls = (pos <= 3 ? " p" + pos : "") + (semPodio ? " sem-podio" : "");
+      const cls = (pos <= 3 ? " p" + pos : "") + podioGarantidoClasse + (semPodio ? " sem-podio" : "");
       const left = medal ? `<span class="medal">${medal}</span>` : `<span class="pos">${pos}</span>`;
       const motivoSemPodio = `${cenariosPodio}/${totalCenarios} cenários de pódio: não termina em 1º, 2º ou 3º em nenhuma simulação restante`;
       const seloSemPodio = semPodio ? `<div class="selo-sem-podio">⚠️ Sem chance matemática de pódio <small>${motivoSemPodio}</small></div>` : "";
+      let seloPodioGarantido = "";
+      if (tituloGarantido) seloPodioGarantido = `<div class="selo-podio-garantido selo-ouro">🏆 Campeão do Bolão <small>1º lugar garantido em ${totalCenarios}/${totalCenarios} cenários restantes</small></div>`;
+      else if (segundoGarantido) seloPodioGarantido = `<div class="selo-podio-garantido selo-prata">🥈 Vice-campeão matemático <small>2º lugar garantido em ${totalCenarios}/${totalCenarios} cenários restantes</small></div>`;
+      else if (terceiroGarantido) seloPodioGarantido = `<div class="selo-podio-garantido selo-bronze">🥉 3º lugar matemático <small>3º lugar garantido em ${totalCenarios}/${totalCenarios} cenários restantes</small></div>`;
       const fasesHTML = FASES.map(f => {
         const real = o[f.k] || [];
         if (!real.length) return `<span class="ph">${f.lab}: <b>—</b></span>`;
@@ -640,7 +682,7 @@
       }).join("");
       // Bloco visual redundante removido: detalhes ficam apenas em 'Fases do palpite'.
       return `<div class="card${cls}">
-        ${seloSemPodio}
+        ${seloPodioGarantido}${seloSemPodio}
         <div class="head">${left}<span class="nm">${x.nome}</span><span class="conq">${r.atuais}<small>conquistados</small></span></div>
         <div class="barra"><span class="b v" style="width:${r.atuais / tot * 100}%"></span><span class="b r" style="width:${r.perdidos / tot * 100}%"></span><span class="b g" style="width:${r.possiveis / tot * 100}%"></span></div>
         <div class="nums"><span class="cn">conquistados <b>${r.atuais}</b></span><span class="pn">perdidos <b>${r.perdidos}</b></span><span class="sn">possíveis <b>${r.possiveis}</b></span><span class="tn">eficiência <b>${eficiencia}</b></span></div>
