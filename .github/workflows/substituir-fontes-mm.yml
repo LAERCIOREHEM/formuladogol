@@ -1,4 +1,4 @@
-name: Substituir fontes dos melhores momentos (GE/Cazé/Prime)
+name: Revisar melhores momentos Brasileirão oficiais
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       dry_run:
         description: "Só simular (true) ou aplicar de verdade (false)?"
         required: true
-        default: "true"
+        default: "false"
         type: choice
         options:
           - "true"
@@ -19,10 +19,22 @@ on:
         description: "Rodada final (vazio = todas)"
         required: false
         default: ""
+      max_search_total:
+        description: "Limite de search.list em canais oficiais"
+        required: true
+        default: "60"
+      max_consultas_por_jogo:
+        description: "Consultas por jogo em cada canal oficial"
+        required: true
+        default: "2"
       paginas_caze:
         description: "Páginas de uploads da CazéTV a varrer (50 vídeos/página)"
         required: true
         default: "12"
+      paginas_prime:
+        description: "Páginas de uploads do Prime Video a varrer (50 vídeos/página)"
+        required: true
+        default: "8"
 
 permissions:
   contents: write
@@ -32,9 +44,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  substituir:
+  revisar:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Baixar repositório
@@ -48,18 +60,26 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Validar script (offline)
+      - name: Validar scripts offline
         run: |
           python -m py_compile scripts/substituir_fontes_preferidas_mm.py
+          python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
+          python -m py_compile scripts/gerar_relatorio_fontes_melhores_momentos.py
           python scripts/substituir_fontes_preferidas_mm.py --selftest
 
-      - name: Executar substituição de fontes
+      - name: Revisar fontes e buscar somente em canais preferidos
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         shell: bash
         run: |
           set -euo pipefail
-          CMD=(python scripts/substituir_fontes_preferidas_mm.py --paginas-caze "${{ inputs.paginas_caze }}")
+
+          CMD=(python scripts/substituir_fontes_preferidas_mm.py \
+            --max-search-total "${{ inputs.max_search_total }}" \
+            --max-consultas-por-jogo "${{ inputs.max_consultas_por_jogo }}" \
+            --paginas-caze "${{ inputs.paginas_caze }}" \
+            --paginas-prime "${{ inputs.paginas_prime }}")
+
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             CMD+=(--dry-run)
           fi
@@ -69,6 +89,7 @@ jobs:
           if [ -n "${{ inputs.rodada_fim }}" ]; then
             CMD+=(--rodada-fim "${{ inputs.rodada_fim }}")
           fi
+
           echo "Executando: ${CMD[*]}"
           "${CMD[@]}"
 
@@ -128,7 +149,7 @@ jobs:
             fi
 
             git add -- "${FILES[@]}"
-            git commit -m "Substitui fontes dos melhores momentos por GE/Cazé/Prime - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            git commit -m "Revisar fontes dos melhores momentos Brasileirão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
 
             if git push origin HEAD:main; then
               echo "Push OK na tentativa $i."

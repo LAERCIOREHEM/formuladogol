@@ -1,35 +1,40 @@
-name: Buscar melhores momentos GE TV
+name: Buscar melhores momentos Brasileirão oficiais
 
 on:
   workflow_dispatch:
     inputs:
       modo:
-        description: "Tipo de execução"
+        description: "Tipo de execução GE TV"
         required: true
-        default: "backfill"
+        default: "incremental"
         type: choice
         options:
           - backfill
           - incremental
       rodada_inicio:
-        description: "Rodada inicial. Deixe vazio para usar config."
+        description: "Rodada inicial. Vazio = usar config/rodadas recentes."
         required: false
         default: ""
       rodada_fim:
-        description: "Rodada final. Deixe vazio para usar config."
+        description: "Rodada final. Vazio = usar config/rodadas recentes."
         required: false
         default: ""
-  # Incremental reduzido: 3 vezes ao dia para economizar cota/commits.
-  # GitHub Actions usa UTC; abaixo equivale aprox. a 23h20, 08h20 e 14h20 BRT.
-  # Para backfill ou rodadas específicas, use Run workflow manualmente.
+      max_search_total:
+        description: "Limite de search.list em canais oficiais na etapa reforçada"
+        required: true
+        default: "25"
+      max_consultas_por_jogo:
+        description: "Consultas por jogo em cada canal oficial"
+        required: true
+        default: "2"
+  # 3 vezes ao dia. GitHub Actions usa UTC: 02:20, 11:20 e 17:20 UTC
+  # equivale aproximadamente a 23:20, 08:20 e 14:20 BRT.
   schedule:
     - cron: '20 2,11,17 * * *'
 
 permissions:
   contents: write
 
-# Este workflow também faz git push no main.
-# Usa a mesma fila dos demais workflows para evitar corrida de push.
 concurrency:
   group: repo-write-main
   cancel-in-progress: false
@@ -37,7 +42,7 @@ concurrency:
 jobs:
   buscar:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
 
     steps:
       - name: Baixar repositório
@@ -51,15 +56,17 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Validar script
+      - name: Validar scripts offline
         run: |
           python -m py_compile scripts/buscar_melhores_momentos_getv.py
+          python -m py_compile scripts/substituir_fontes_preferidas_mm.py
           python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
           python -m py_compile scripts/gerar_relatorio_fontes_melhores_momentos.py
           python scripts/buscar_melhores_momentos_getv.py --dry-run --modo incremental
+          python scripts/substituir_fontes_preferidas_mm.py --selftest
           python scripts/gerar_relatorio_fontes_melhores_momentos.py --dry-run
 
-      - name: Buscar vídeos da GE TV
+      - name: Buscar vídeos na GE TV por playlists
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}
@@ -76,6 +83,37 @@ jobs:
           fi
 
           CMD=(python scripts/buscar_melhores_momentos_getv.py --modo "$MODO")
+          if [ -n "${INPUT_RODADA_INICIO:-}" ]; then
+            CMD+=(--rodada-inicio "${INPUT_RODADA_INICIO}")
+          fi
+          if [ -n "${INPUT_RODADA_FIM:-}" ]; then
+            CMD+=(--rodada-fim "${INPUT_RODADA_FIM}")
+          fi
+
+          echo "Executando: ${CMD[*]}"
+          "${CMD[@]}"
+
+      - name: Sanear e buscar somente fontes preferidas
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_RODADA_INICIO: ${{ inputs.rodada_inicio }}
+          INPUT_RODADA_FIM: ${{ inputs.rodada_fim }}
+          INPUT_MAX_SEARCH_TOTAL: ${{ inputs.max_search_total }}
+          INPUT_MAX_CONSULTAS_POR_JOGO: ${{ inputs.max_consultas_por_jogo }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX_SEARCH="${INPUT_MAX_SEARCH_TOTAL:-25}"
+          MAX_POR_JOGO="${INPUT_MAX_CONSULTAS_POR_JOGO:-2}"
+
+          CMD=(python scripts/substituir_fontes_preferidas_mm.py \
+            --max-search-total "$MAX_SEARCH" \
+            --max-consultas-por-jogo "$MAX_POR_JOGO" \
+            --paginas-getv 2 \
+            --paginas-caze 12 \
+            --paginas-prime 8)
 
           if [ -n "${INPUT_RODADA_INICIO:-}" ]; then
             CMD+=(--rodada-inicio "${INPUT_RODADA_INICIO}")
@@ -103,10 +141,12 @@ jobs:
 
           FILES=(
             "dados-br/melhores-momentos.json"
+            "dados-br/melhores-momentos-manual.json"
             "dados-br/getv-playlists.json"
             "dados-br/auditoria-melhores-momentos.json"
             "dados-br/auditoria-cobertura-resultados.json"
             "dados-br/auditoria-fontes-melhores-momentos.json"
+            "dados-br/relatorio-substituicao-fontes.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
@@ -142,7 +182,7 @@ jobs:
             fi
 
             git add -- "${FILES[@]}"
-            git commit -m "Atualizar melhores momentos GE TV - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            git commit -m "Atualizar melhores momentos Brasileirão oficiais - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
 
             if git push origin HEAD:main; then
               echo "Push OK na tentativa $i."
