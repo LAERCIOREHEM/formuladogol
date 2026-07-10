@@ -157,7 +157,7 @@
       "prime video brasil",
       "amazon brasil"
     ],
-    "observacao": "A publicação automática exige dois clubes no título e canal dentro da whitelist GE/Globo, CazéTV ou Amazon Prime Video. Outros candidatos ficam em auditoria-melhores-momentos-power.json.",
+    "observacao": "A publicação automática e a exibição no site aceitam somente GE/Globo/sportv/Premiere/Globoplay, CazéTV ou Amazon Prime Video. Outros canais são rejeitados e o jogo fica sem vídeo.",
     "ttl_cache_dias": 21,
     "prioridade_execucao": "rodadas recentes primeiro; para backfill antigo, rode uma rodada por vez",
     "fallback_manual": "dados-br/melhores-momentos-manual.json",
@@ -180,9 +180,10 @@
       "amazon brasil"
     ],
     "permitir_publicacao_automatica_de_outros_canais": false,
-    "politica_publicacao": "Novos vínculos automáticos do POWER só podem ser publicados se o canal for GE/Globo, CazéTV ou Amazon Prime Video. Vídeos de outros canais ficam na auditoria e não entram no site automaticamente. Links já existentes são preservados até haver substituição por fonte preferencial.",
+    "politica_publicacao": "Somente fontes preferidas podem entrar no site. Vídeos de outros canais não são preservados nem publicados automaticamente, mesmo que o título cite ge.globo.",
     "channel_ids_publicacao_automatica": [
-      "UCgCKagVhzGnZcuP9bSMgMCg"
+      "UCgCKagVhzGnZcuP9bSMgMCg",
+      "UCZiYbVptd3PVPf4f6eR6UaQ"
     ]
   }
 }

@@ -1,7 +1,7 @@
 {
-  "atualizado_em": "2026-07-08T14:05:00-03:00",
+  "atualizado_em": "2026-07-10T08:57:51-03:00",
   "fonte": "manual",
-  "observacao": "Fallback manual opcional. Use o event_id do jogo como chave e informe url/video_id/titulo. O site dá prioridade a este arquivo quando existir vínculo manual.",
+  "observacao": "Fallback manual prioritário. Links fora de GE/Globo, CazéTV ou Prime Video são removidos pela auditoria de fontes.",
   "exemplo_comentado": {
     "401841145": {
       "event_id": "401841145",
@@ -598,28 +598,6 @@
       "playlist_id": null,
       "published_at": null,
       "fonte": "GE TV / YouTube",
-      "fonte_busca": "Manual / usuário",
-      "confianca": 1.0,
-      "motivos": [
-        "vínculo informado manualmente pelo administrador",
-        "event_id conferido em resultados.json"
-      ]
-    },
-    "401841131": {
-      "event_id": "401841131",
-      "chave": "401841131",
-      "rodada": 17,
-      "mandante": "Vasco da Gama",
-      "visitante": "Bragantino",
-      "placar_mandante": 0,
-      "placar_visitante": 3,
-      "video_id": "bkd8yda04fc",
-      "titulo": "VASCO 0 X 3 BRAGANTINO | MELHORES MOMENTOS | 17ª RODADA DO BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=bkd8yda04fc",
-      "thumbnail": "https://i.ytimg.com/vi/bkd8yda04fc/hqdefault.jpg",
-      "playlist_id": null,
-      "published_at": null,
-      "fonte": "Manual / YouTube",
       "fonte_busca": "Manual / usuário",
       "confianca": 1.0,
       "motivos": [

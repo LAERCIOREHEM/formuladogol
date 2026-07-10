@@ -1,35 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-substituir_fontes_preferidas_mm.py — troca os melhores momentos do Brasileirão
-para as FONTES PREFERIDAS: GE TV, CazéTV e Prime Video (nesta ordem).
+substituir_fontes_preferidas_mm.py
 
-COMO FUNCIONA (e por que não erra de canal):
-  1) Descobre o canal ATUAL de cada vídeo vinculado (videos.list em lote,
-     1 unidade a cada 50 vídeos). Quem já é GE/Cazé/Prime não é tocado.
-  2) Para os demais ("outros", ex.: Corinthians TV), VARRE apenas os 3 canais:
-       - GE TV: playlists por rodada (dados-br/getv-playlists.json)
-       - CazéTV: playlist de uploads do canal (UU...)
-       - Prime Video: playlist de uploads do canal (UU...)
-     Tudo via playlistItems (1 unidade por página de 50) — ZERO search.list.
-  3) Um vídeo só substitui o link se: é de um dos 3 canais (por construção),
-     o título cita OS DOIS clubes do jogo e, se houver placar no título,
-     o placar confere. Determinístico, sem "confiança 0.8".
-  4) Quem não for encontrado nos 3 canais fica exatamente como está.
-  5) Gera dados-br/relatorio-substituicao-fontes.json com a contagem
-     assertiva: quantos GE, quantos Cazé, quantos Prime, quantos outros,
-     antes e depois, e a lista do que foi trocado.
+Sanitiza e atualiza os melhores momentos do Brasileirão usando SOMENTE fontes
+preferidas:
+  - GE TV / ge.globo / sportv / Premiere / Globoplay
+  - CazéTV
+  - Amazon Prime Video / Prime Video
 
-Custo típico de cota: ~30 a 60 unidades por execução (contra 100 por UMA
-única busca do search.list). Dá pra rodar o dia inteiro sem estourar.
+Regra editorial atual:
+  - canal aleatório NÃO entra no site, mesmo que o título diga "ge.globo";
+  - se não achar vídeo em fonte preferida, o jogo fica SEM link;
+  - a auditoria informa exatamente quais jogos seguem sem link preferido.
 
-Uso:
-  python scripts/substituir_fontes_preferidas_mm.py                 # executa
-  python scripts/substituir_fontes_preferidas_mm.py --dry-run       # só mostra
-  python scripts/substituir_fontes_preferidas_mm.py --selftest      # valida offline
-Opções: --paginas-caze N (padrão 12) | --paginas-prime N (padrão 8)
-        | --rodada-inicio N --rodada-fim N (limita o alvo)
+O script não toca em Copa 2026 e não altera layout.
 """
+from __future__ import annotations
 
 import argparse
 import json
@@ -41,34 +28,52 @@ import unicodedata
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone, timedelta
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MM_AUTO = os.path.join(RAIZ, "dados-br", "melhores-momentos.json")
-MM_MANUAL = os.path.join(RAIZ, "dados-br", "melhores-momentos-manual.json")
-GETV_PLAYLISTS = os.path.join(RAIZ, "dados-br", "getv-playlists.json")
-RELATORIO = os.path.join(RAIZ, "dados-br", "relatorio-substituicao-fontes.json")
+BRT = timezone(timedelta(hours=-3), name="BRT")
+RAIZ = Path(__file__).resolve().parents[1]
+API = "https://www.googleapis.com/youtube/v3"
 
-API_KEY = os.environ.get("YOUTUBE_API_KEY", "").strip()
-API = "https://www.googleapis.com/youtube/v3/"
+MM_AUTO = RAIZ / "dados-br" / "melhores-momentos.json"
+MM_MANUAL = RAIZ / "dados-br" / "melhores-momentos-manual.json"
+GETV_PLAYLISTS = RAIZ / "dados-br" / "getv-playlists.json"
+RELATORIO = RAIZ / "dados-br" / "relatorio-substituicao-fontes.json"
+RESULTADOS = RAIZ / "resultados.json"
 
-# Canais preferidos (ordem = prioridade na escolha).
-GE_CHANNEL_ID = "UCgCKagVhzGnZcuP9bSMgMCg"      # confirmado no getv-playlists.json do repo
-CAZE_CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"    # canal oficial CazéTV (mesmo do robô da Copa)
-# O ID do Prime é resolvido em tempo de execução pelos handles abaixo (channels.list = 1 unidade).
+# Channel IDs usados como trava dura quando o vídeo vem da API.
+GE_CHANNEL_ID = "UCgCKagVhzGnZcuP9bSMgMCg"
+CAZE_CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"
 PRIME_HANDLES = ["@primevideosportbr", "@PrimeVideoSportBR", "@primevideobr", "@primevideobrasil"]
 
-ROTULOS = {"ge": "GE TV / YouTube", "caze": "CazéTV / YouTube", "prime": "Prime Video / YouTube"}
+ROTULOS = {
+    "ge": "GE TV / YouTube",
+    "caze": "CazéTV / YouTube",
+    "prime": "Prime Video / YouTube",
+}
+ORDEM = {"ge": 0, "caze": 1, "prime": 2}
 
-def agora_iso():
-    return datetime.now(timezone(timedelta(hours=-3))).isoformat(timespec="seconds")
+QUOTA = {"unidades": 0, "playlist_items": 0, "search": 0, "channels": 0, "videos": 0}
 
-# ---------------------------------------------------------------- nomes/títulos
-def norm(s):
+
+def agora_iso() -> str:
+    return datetime.now(BRT).replace(microsecond=0).isoformat()
+
+
+def norm(s: Any) -> str:
     s = unicodedata.normalize("NFKD", str(s or "")).encode("ASCII", "ignore").decode("ASCII")
     s = re.sub(r"[^A-Za-z0-9 ]", " ", s).upper()
     return re.sub(r"\s+", " ", s).strip()
 
-# Apelidos que os 3 canais usam nos títulos -> nome canônico do site.
+
+def norm_min(s: Any) -> str:
+    s = str(s or "").strip().lower()
+    s = unicodedata.normalize("NFD", s)
+    s = "".join(ch for ch in s if unicodedata.category(ch) != "Mn")
+    s = re.sub(r"[^a-z0-9]+", " ", s)
+    return re.sub(r"\s+", " ", s).strip()
+
+
 ALIASES = {
     "Atlético-MG": ["ATLETICO MG", "ATLETICO MINEIRO", "GALO"],
     "Athletico-PR": ["ATHLETICO PR", "ATHLETICO PARANAENSE", "ATHLETICO"],
@@ -76,29 +81,178 @@ ALIASES = {
     "Botafogo": ["BOTAFOGO"],
     "Bragantino": ["BRAGANTINO", "RED BULL BRAGANTINO", "RB BRAGANTINO"],
     "Chapecoense": ["CHAPECOENSE", "CHAPE"],
-    "Corinthians": ["CORINTHIANS"],
+    "Corinthians": ["CORINTHIANS", "CORINTHIANS PAULISTA"],
     "Coritiba": ["CORITIBA", "COXA"],
     "Cruzeiro": ["CRUZEIRO"],
-    "Flamengo": ["FLAMENGO"],
-    "Fluminense": ["FLUMINENSE"],
+    "Flamengo": ["FLAMENGO", "FLA"],
+    "Fluminense": ["FLUMINENSE", "FLU"],
     "Grêmio": ["GREMIO"],
     "Internacional": ["INTERNACIONAL", "INTER"],
     "Mirassol": ["MIRASSOL"],
     "Palmeiras": ["PALMEIRAS"],
     "Remo": ["REMO", "CLUBE DO REMO"],
     "Santos": ["SANTOS"],
-    "São Paulo": ["SAO PAULO", "TRICOLOR PAULISTA"],
+    "São Paulo": ["SAO PAULO", "SPFC", "TRICOLOR PAULISTA"],
     "Vasco da Gama": ["VASCO DA GAMA", "VASCO"],
     "Vitória": ["VITORIA"],
 }
-# lista (apelido_norm, canonico) do apelido mais longo para o mais curto
-_APELIDOS = sorted(((norm(a), c) for c, lst in ALIASES.items() for a in lst),
-                   key=lambda x: -len(x[0]))
+_APELIDOS = sorted(((norm(a), c) for c, lst in ALIASES.items() for a in lst), key=lambda x: -len(x[0]))
+PLACAR_RE = re.compile(r"\b(\d+)\s*[xX]\s*(\d+)\b")
 
-def clubes_no_titulo(titulo):
-    """Retorna o conjunto de clubes canônicos citados no título (casamento por palavra)."""
+
+def carregar(path: Path, fallback: Any) -> Any:
+    try:
+        if not path.exists():
+            return fallback
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise SystemExit(f"JSON inválido em {path}: {exc}") from exc
+
+
+def gravar(path: Path, obj: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(obj, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def nome_time(obj: Any) -> str:
+    if isinstance(obj, dict):
+        return str(obj.get("nome") or obj.get("name") or obj.get("displayName") or "")
+    return str(obj or "")
+
+
+def chave_texto(valor: Any) -> str:
+    return norm_min(valor).replace(" ", "-")
+
+
+def chave_jogo_dict(jogo: Dict[str, Any]) -> str:
+    rodada = jogo.get("rodada") or ""
+    mand = nome_time(jogo.get("mandante"))
+    vist = nome_time(jogo.get("visitante"))
+    return f"rodada-{rodada}-{chave_texto(mand)}-{chave_texto(vist)}"
+
+
+def uploads_de(channel_id: str) -> str:
+    # uploads playlist = UU + channel_id sem UC
+    return "UU" + channel_id[2:] if channel_id.startswith("UC") else channel_id
+
+
+def yt_get(resource: str, api_key: str, **params: Any) -> Dict[str, Any]:
+    params = {k: v for k, v in params.items() if v not in (None, "", [])}
+    params["key"] = api_key
+    url = f"{API}/{resource}?" + urllib.parse.urlencode(params, doseq=True)
+    req = urllib.request.Request(url, headers={"User-Agent": "bolao-brasileirao-mm-preferidos/2.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="ignore")
+        raise RuntimeError(f"YouTube API HTTP {exc.code} em {resource}: {body[:800]}") from exc
+    if resource == "playlistItems":
+        QUOTA["playlist_items"] += 1
+        QUOTA["unidades"] += 1
+    elif resource == "search":
+        QUOTA["search"] += 1
+        QUOTA["unidades"] += 100
+    elif resource == "channels":
+        QUOTA["channels"] += 1
+        QUOTA["unidades"] += 1
+    elif resource == "videos":
+        QUOTA["videos"] += 1
+        QUOTA["unidades"] += 1
+    else:
+        QUOTA["unidades"] += 1
+    time.sleep(0.03)
+    return data
+
+
+def resolver_prime_channel_id(api_key: str) -> str:
+    for h in PRIME_HANDLES:
+        try:
+            data = yt_get("channels", api_key, part="id,snippet", forHandle=h, maxResults=1)
+        except Exception:
+            continue
+        items = data.get("items") or []
+        if items:
+            return items[0].get("id") or ""
+    return ""
+
+
+def listar_playlist(api_key: str, playlist_id: str, max_paginas: int, canal: str) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    token = None
+    paginas = 0
+    while True:
+        paginas += 1
+        data = yt_get("playlistItems", api_key, part="snippet,contentDetails", playlistId=playlist_id, maxResults=50, pageToken=token)
+        for item in data.get("items") or []:
+            sn = item.get("snippet") or {}
+            cd = item.get("contentDetails") or {}
+            vid = cd.get("videoId") or (sn.get("resourceId") or {}).get("videoId")
+            if not vid:
+                continue
+            thumbs = sn.get("thumbnails") or {}
+            thumb = (thumbs.get("maxres") or thumbs.get("standard") or thumbs.get("high") or thumbs.get("medium") or thumbs.get("default") or {}).get("url")
+            out.append({
+                "video_id": vid,
+                "titulo": sn.get("title") or "",
+                "descricao": sn.get("description") or "",
+                "published_at": cd.get("videoPublishedAt") or sn.get("publishedAt"),
+                "thumbnail": thumb,
+                "playlist_id": playlist_id if canal == "ge" else None,
+                "canal": canal,
+                "channel_id": sn.get("channelId"),
+                "channel_title": sn.get("channelTitle") or ROTULOS.get(canal, canal),
+                "metodo": "playlistItems",
+            })
+        token = data.get("nextPageToken")
+        if not token or paginas >= max_paginas:
+            break
+    return out
+
+
+def search_no_canal(api_key: str, channel_id: str, canal: str, query: str, max_results: int) -> List[Dict[str, Any]]:
+    data = yt_get(
+        "search",
+        api_key,
+        part="snippet",
+        type="video",
+        channelId=channel_id,
+        q=query,
+        maxResults=max_results,
+        order="relevance",
+        safeSearch="none",
+        videoEmbeddable="any",
+    )
+    out: List[Dict[str, Any]] = []
+    for item in data.get("items") or []:
+        sn = item.get("snippet") or {}
+        vid = (item.get("id") or {}).get("videoId")
+        if not vid:
+            continue
+        thumbs = sn.get("thumbnails") or {}
+        thumb = (thumbs.get("maxres") or thumbs.get("standard") or thumbs.get("high") or thumbs.get("medium") or thumbs.get("default") or {}).get("url")
+        out.append({
+            "video_id": vid,
+            "titulo": sn.get("title") or "",
+            "descricao": sn.get("description") or "",
+            "published_at": sn.get("publishedAt"),
+            "thumbnail": thumb,
+            "playlist_id": None,
+            "canal": canal,
+            "channel_id": sn.get("channelId"),
+            "channel_title": sn.get("channelTitle") or ROTULOS.get(canal, canal),
+            "metodo": "search.list oficial por channelId",
+            "query": query,
+        })
+    return out
+
+
+def clubes_no_titulo(titulo: Any) -> set[str]:
     t = " " + norm(titulo) + " "
-    achados, usado = set(), t
+    achados: set[str] = set()
+    usado = t
     for ape, canon in _APELIDOS:
         if canon in achados:
             continue
@@ -107,333 +261,491 @@ def clubes_no_titulo(titulo):
             usado = re.sub(r"(^| )" + re.escape(ape) + r"($| )", " ", usado, count=1)
     return achados
 
-PLACAR_RE = re.compile(r"\b(\d+)\s*[xX]\s*(\d+)\b")
 
-def placar_do_titulo(titulo):
+def placar_do_titulo(titulo: Any) -> Optional[Tuple[int, int]]:
     m = PLACAR_RE.search(norm(titulo))
-    return (int(m.group(1)), int(m.group(2))) if m else None
+    if not m:
+        return None
+    return int(m.group(1)), int(m.group(2))
 
-def rodada_do_titulo(titulo):
-    m = re.search(r"\b(\d{1,2})\s*(?:ª|A)?\s*RODADA\b", norm(titulo))
-    return int(m.group(1)) if m else None
 
-def titulo_parece_mm(titulo):
+def rodada_do_titulo(titulo: Any) -> Optional[int]:
     t = norm(titulo)
-    if any(x in t for x in ("AO VIVO", "PRE JOGO", "POS JOGO", "REACT", "PODCAST",
-                            "BASTIDORES", "ENTREVISTA", "COLETIVA", "SHORTS")):
-        return False
-    return ("MELHORES MOMENTOS" in t) or bool(PLACAR_RE.search(t))
+    for pat in [r"\b(\d{1,2})\s*(?:A|O)?\s*RODADA\b", r"\bRODADA\s*(\d{1,2})\b"]:
+        m = re.search(pat, t)
+        if m:
+            r = int(m.group(1))
+            if 1 <= r <= 38:
+                return r
+    return None
 
-def video_serve_para_jogo(titulo, jogo, exigir_rodada=False):
-    """Determinístico: os DOIS clubes no título; placar (se houver) confere; rodada idem."""
-    clubes = clubes_no_titulo(titulo)
-    if not (jogo["mandante"] in clubes and jogo["visitante"] in clubes):
+
+def titulo_parece_mm(titulo: Any) -> bool:
+    t = norm(titulo)
+    bons = ["MELHORES MOMENTOS", "MELHORES MOMENTO", "HIGHLIGHTS", "LANCES", "GOLS E MELHORES"]
+    return any(b in t for b in bons)
+
+
+def titulo_tem_termo_ruim(titulo: Any) -> bool:
+    t = norm(titulo)
+    ruins = [
+        "AO VIVO", "LIVE", "POS JOGO", "PRE JOGO", "COLETIVA", "ENTREVISTA", "TREINO",
+        "BASTIDORES", "NOTICIAS", "PALPITE", "PROGNOSTICO", "SIMULACAO", "SIMULADOR",
+        "PES 2026", "FIFA 26", "EFOOTBALL", "FOOTBALL MANAGER", "SHORTS",
+    ]
+    return any(r in t for r in ruins)
+
+
+def video_serve_para_jogo(titulo: Any, jogo: Dict[str, Any]) -> bool:
+    if titulo_tem_termo_ruim(titulo):
         return False
     if not titulo_parece_mm(titulo):
         return False
-    pt = placar_do_titulo(titulo)
-    pm, pv = jogo.get("placar_mandante"), jogo.get("placar_visitante")
-    if pt and pm is not None and pv is not None:
-        if set(pt) != {pm, pv} and pt not in ((pm, pv), (pv, pm)):
+    clubs = clubes_no_titulo(titulo)
+    mand = nome_time(jogo.get("mandante"))
+    vist = nome_time(jogo.get("visitante"))
+    if not ({mand, vist} <= clubs):
+        return False
+    placar = placar_do_titulo(titulo)
+    if placar is not None:
+        try:
+            pm, pv = int(jogo.get("placar_mandante")), int(jogo.get("placar_visitante"))
+            if placar != (pm, pv):
+                return False
+        except Exception:
             return False
-    rt = rodada_do_titulo(titulo)
-    if rt and jogo.get("rodada") and rt != jogo["rodada"]:
-        return False
-    if exigir_rodada and not rt:
-        return False
+    rodada_tit = rodada_do_titulo(titulo)
+    if rodada_tit is not None:
+        try:
+            if rodada_tit != int(jogo.get("rodada") or 0):
+                return False
+        except Exception:
+            return False
     return True
 
-# ---------------------------------------------------------------- YouTube API
-def yt_get(recurso, **params):
-    params["key"] = API_KEY
-    url = API + recurso + "?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url, headers={"User-Agent": "bolao-brasileirao/fontes-1.0"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read().decode("utf-8"))
 
-QUOTA = {"unidades": 0}
-def q(custo):
-    QUOTA["unidades"] += custo
+def score_candidato(cand: Dict[str, Any], jogo: Dict[str, Any]) -> int:
+    score = 0
+    placar = placar_do_titulo(cand.get("titulo"))
+    if placar is not None:
+        score += 30
+    if rodada_do_titulo(cand.get("titulo")) == int(jogo.get("rodada") or 0):
+        score += 20
+    if "BRASILEIR" in norm(cand.get("titulo")) or "CAMPEONATO BRASILEIRO" in norm(cand.get("titulo")):
+        score += 10
+    if cand.get("metodo") == "playlistItems":
+        score += 5
+    return score
 
-def canais_dos_videos(video_ids):
-    """{videoId: channelId} em lote (videos.list, 1 unidade / 50 ids)."""
-    out = {}
-    ids = [v for v in video_ids if v]
-    for i in range(0, len(ids), 50):
-        lote = ids[i:i + 50]
-        try:
-            data = yt_get("videos", part="snippet", id=",".join(lote), maxResults="50")
-            q(1)
-        except Exception as e:
-            print("  ! videos.list falhou:", e)
-            continue
-        for it in data.get("items", []):
-            sn = it.get("snippet") or {}
-            out[it["id"]] = sn.get("channelId", "")
-        time.sleep(0.2)
-    return out
 
-def resolver_prime_channel_id():
-    for h in PRIME_HANDLES:
-        try:
-            data = yt_get("channels", part="id", forHandle=h)
-            q(1)
-            items = data.get("items") or []
-            if items:
-                cid = items[0]["id"]
-                print(f"  Prime Video resolvido: {h} -> {cid}")
-                return cid
-        except Exception:
-            continue
-        time.sleep(0.2)
-    print("  ! não resolvi o canal do Prime Video (handles testados: %s) — sigo só com GE+Cazé" % ", ".join(PRIME_HANDLES))
-    return None
+def escolher_candidato(jogo: Dict[str, Any], cands: Iterable[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    aptos = [c for c in cands if video_serve_para_jogo(c.get("titulo"), jogo)]
+    if not aptos:
+        return None
+    aptos.sort(key=lambda c: (ORDEM.get(c.get("canal"), 99), -score_candidato(c, jogo), c.get("published_at") or ""))
+    return aptos[0]
 
-def listar_playlist(playlist_id, max_paginas=10):
-    """[(videoId, titulo, publishedAt)] via playlistItems (1 unidade/página)."""
-    out, token = [], None
-    for _ in range(max_paginas):
-        params = {"part": "snippet", "playlistId": playlist_id, "maxResults": "50"}
-        if token:
-            params["pageToken"] = token
-        try:
-            data = yt_get("playlistItems", **params)
-            q(1)
-        except Exception as e:
-            print(f"  ! playlistItems {playlist_id[:20]}… falhou:", e)
-            break
-        for it in data.get("items", []):
-            sn = it.get("snippet") or {}
-            vid = ((sn.get("resourceId") or {}).get("videoId")) or ""
-            if vid:
-                out.append((vid, sn.get("title", ""), sn.get("publishedAt", "")))
-        token = data.get("nextPageToken")
-        if not token:
-            break
-        time.sleep(0.2)
-    return out
 
-def uploads_de(channel_id):
-    return "UU" + channel_id[2:]
+def texto_fonte(video: Dict[str, Any]) -> str:
+    return norm_min(" ".join(str(video.get(k) or "") for k in ["fonte", "fonte_busca", "channel_title", "channel_id"]))
 
-# ---------------------------------------------------------------- núcleo
-def carregar(caminho, padrao):
-    if not os.path.exists(caminho):
-        return padrao
-    with open(caminho, encoding="utf-8") as f:
-        return json.load(f)
 
-def gravar(caminho, obj):
-    tmp = caminho + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, indent=2)
-        f.write("\n")
-    os.replace(tmp, caminho)
-
-def categoria_por_canal(channel_id, prime_id):
+def classificar_video(video: Optional[Dict[str, Any]], prime_id: str = "") -> str:
+    if not video:
+        return "sem_video"
+    channel_id = str(video.get("channel_id") or "").strip()
     if channel_id == GE_CHANNEL_ID:
         return "ge"
     if channel_id == CAZE_CHANNEL_ID:
         return "caze"
     if prime_id and channel_id == prime_id:
         return "prime"
+    t = texto_fonte(video)
+    if any(x in t for x in ["cazetv", "caze tv", "caze"]):
+        return "caze"
+    if any(x in t for x in ["amazon prime video", "prime video", "amazon"]):
+        return "prime"
+    if any(x in t for x in ["ge tv", "ge globo", "geglobo", "globoesporte", "globo esporte", "sportv", "premiere", "globoplay"]):
+        return "ge"
     return "outros"
 
-def montar_candidatos(rodadas_alvo, paginas_caze, paginas_prime, prime_id):
-    """Varre os 3 canais e devolve lista de candidatos {video_id, titulo, canal, playlist_id, published_at}."""
-    cands = []
 
-    # GE: playlists por rodada (só as rodadas que precisamos)
-    getv = carregar(GETV_PLAYLISTS, {})
-    for pl in getv.get("playlists", []):
-        if rodadas_alvo and pl.get("rodada") not in rodadas_alvo:
-            continue
-        for vid, tit, pub in listar_playlist(pl["playlist_id"], max_paginas=2):
-            cands.append({"video_id": vid, "titulo": tit, "canal": "ge",
-                          "playlist_id": pl["playlist_id"], "published_at": pub})
+def preferido(video: Optional[Dict[str, Any]], prime_id: str = "") -> bool:
+    return classificar_video(video, prime_id) in {"ge", "caze", "prime"}
 
-    # Cazé: uploads do canal
-    for vid, tit, pub in listar_playlist(uploads_de(CAZE_CHANNEL_ID), max_paginas=paginas_caze):
-        cands.append({"video_id": vid, "titulo": tit, "canal": "caze",
-                      "playlist_id": None, "published_at": pub})
 
-    # Prime: uploads do canal (se resolvido)
-    if prime_id:
-        for vid, tit, pub in listar_playlist(uploads_de(prime_id), max_paginas=paginas_prime):
-            cands.append({"video_id": vid, "titulo": tit, "canal": "prime",
-                          "playlist_id": None, "published_at": pub})
-    return cands
+def iter_videos(data: Dict[str, Any]) -> Iterable[Tuple[str, Dict[str, Any]]]:
+    jogos = data.get("jogos") or {}
+    if isinstance(jogos, dict):
+        for k, v in jogos.items():
+            if isinstance(v, dict):
+                yield str(k), v
 
-def escolher_candidato(jogo, cands):
-    """Melhor candidato para o jogo, priorizando GE > Cazé > Prime; exige validação determinística."""
-    ordem = {"ge": 0, "caze": 1, "prime": 2}
-    aptos = [c for c in cands if video_serve_para_jogo(c["titulo"], jogo)]
-    if not aptos:
-        return None
-    aptos.sort(key=lambda c: (ordem.get(c["canal"], 9), c.get("published_at") or ""))
-    return aptos[0]
 
-def aplicar(entrada, cand):
-    entrada.update({
-        "video_id": cand["video_id"],
-        "titulo": cand["titulo"],
-        "url": "https://www.youtube.com/watch?v=" + cand["video_id"],
-        "thumbnail": f"https://i.ytimg.com/vi/{cand['video_id']}/maxresdefault.jpg",
+def indexar_videos(auto: Dict[str, Any], manual: Dict[str, Any]) -> Tuple[Dict[str, Tuple[str, str, Dict[str, Any]]], Dict[str, Tuple[str, str, Dict[str, Any]]]]:
+    por_id: Dict[str, Tuple[str, str, Dict[str, Any]]] = {}
+    por_chave: Dict[str, Tuple[str, str, Dict[str, Any]]] = {}
+    for origem, fonte in [("auto", auto), ("manual", manual)]:
+        for key, reg in iter_videos(fonte):
+            event_id = str(reg.get("event_id") or key or "").strip()
+            item = (origem, key, reg)
+            if event_id:
+                por_id[event_id] = item
+            ch = str(reg.get("chave") or "").strip()
+            if ch:
+                por_chave[ch] = item
+            if reg.get("rodada") and reg.get("mandante") and reg.get("visitante"):
+                fake = {"rodada": reg.get("rodada"), "mandante": {"nome": reg.get("mandante")}, "visitante": {"nome": reg.get("visitante")}}
+                por_chave[chave_jogo_dict(fake)] = item
+    return por_id, por_chave
+
+
+def video_do_jogo(jogo: Dict[str, Any], por_id: Dict[str, Tuple[str, str, Dict[str, Any]]], por_chave: Dict[str, Tuple[str, str, Dict[str, Any]]]) -> Optional[Tuple[str, str, Dict[str, Any]]]:
+    event_id = str(jogo.get("event_id") or jogo.get("id") or "").strip()
+    if event_id and event_id in por_id:
+        return por_id[event_id]
+    ch = chave_jogo_dict(jogo)
+    return por_chave.get(ch)
+
+
+def resumo_jogo(jogo: Dict[str, Any], motivo: str = "", video: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    item = {
+        "event_id": str(jogo.get("event_id") or jogo.get("id") or ""),
+        "rodada": jogo.get("rodada"),
+        "mandante": nome_time(jogo.get("mandante")),
+        "visitante": nome_time(jogo.get("visitante")),
+        "placar_mandante": jogo.get("placar_mandante"),
+        "placar_visitante": jogo.get("placar_visitante"),
+    }
+    if motivo:
+        item["motivo"] = motivo
+    if video:
+        item.update({
+            "fonte_anterior": video.get("fonte") or video.get("channel_title") or "",
+            "channel_title": video.get("channel_title") or "",
+            "titulo_anterior": video.get("titulo") or "",
+            "url_anterior": video.get("url") or "",
+        })
+    return item
+
+
+def montar_entrada(jogo: Dict[str, Any], cand: Dict[str, Any]) -> Dict[str, Any]:
+    event_id = str(jogo.get("event_id") or jogo.get("id") or "")
+    rodada = int(jogo.get("rodada") or 0)
+    mand = nome_time(jogo.get("mandante"))
+    vist = nome_time(jogo.get("visitante"))
+    pm = jogo.get("placar_mandante")
+    pv = jogo.get("placar_visitante")
+    canal = cand.get("canal") or "ge"
+    video_id = cand.get("video_id") or ""
+    return {
+        "event_id": event_id,
+        "chave": event_id,
+        "rodada": rodada,
+        "mandante": mand,
+        "visitante": vist,
+        "placar_mandante": pm,
+        "placar_visitante": pv,
+        "video_id": video_id,
+        "titulo": cand.get("titulo") or "",
+        "url": f"https://www.youtube.com/watch?v={video_id}" if video_id else cand.get("url"),
+        "thumbnail": cand.get("thumbnail") or (f"https://i.ytimg.com/vi/{video_id}/maxresdefault.jpg" if video_id else None),
         "playlist_id": cand.get("playlist_id"),
         "published_at": cand.get("published_at"),
-        "fonte": ROTULOS[cand["canal"]],
+        "channel_id": cand.get("channel_id"),
+        "channel_title": cand.get("channel_title") or ROTULOS.get(canal, canal),
+        "fonte": ROTULOS.get(canal, canal),
+        "fonte_busca": cand.get("metodo") or "fonte preferida",
         "confianca": 1.0,
-        "motivos": ["substituição para fonte preferida (varredura de canal)",
-                    "dois clubes no título", "canal verificado por channelId"],
-        "substituido_em": agora_iso(),
-    })
+        "motivos": [
+            "fonte preferida verificada por channelId/playlist oficial",
+            "mandante e visitante no título",
+            "título compatível com melhores momentos",
+        ],
+        "atualizado_em": agora_iso(),
+    }
 
-def rodar(args):
-    if not API_KEY:
-        print("ERRO: defina YOUTUBE_API_KEY no ambiente."); return 2
+
+def consultas_para_jogo(jogo: Dict[str, Any], max_consultas: int) -> List[str]:
+    mand = nome_time(jogo.get("mandante"))
+    vist = nome_time(jogo.get("visitante"))
+    pm = jogo.get("placar_mandante")
+    pv = jogo.get("placar_visitante")
+    rodada = jogo.get("rodada")
+    base = [
+        f'"{mand} {pm} x {pv} {vist}" "melhores momentos" "Brasileirão 2026"',
+        f'"{mand} x {vist}" "melhores momentos" "Brasileirão 2026"',
+        f'{mand} {vist} melhores momentos {rodada}ª rodada Brasileirão 2026',
+        f'{mand} {vist} melhores momentos Campeonato Brasileiro 2026',
+    ]
+    vistos = set()
+    out = []
+    for q in base:
+        qn = q.strip()
+        if qn and qn not in vistos:
+            out.append(qn)
+            vistos.add(qn)
+    return out[: max(1, max_consultas)]
+
+
+def remover_chave(data: Dict[str, Any], key: str, event_id: str = "") -> bool:
+    jogos = data.setdefault("jogos", {})
+    removeu = False
+    for k in list(jogos.keys()):
+        v = jogos.get(k)
+        if k == key or (event_id and str((v or {}).get("event_id") or "") == event_id):
+            del jogos[k]
+            removeu = True
+    return removeu
+
+
+def calcular_resumo(jogos_resultados: List[Dict[str, Any]], auto: Dict[str, Any], manual: Dict[str, Any], prime_id: str = "") -> Dict[str, int]:
+    por_id, por_chave = indexar_videos(auto, manual)
+    r = {"jogos_resultados": len(jogos_resultados), "ge": 0, "caze": 0, "prime": 0, "outros": 0, "sem_video": 0, "com_fonte_preferida": 0}
+    for jogo in jogos_resultados:
+        item = video_do_jogo(jogo, por_id, por_chave)
+        video = item[2] if item else None
+        cat = classificar_video(video, prime_id)
+        if cat == "sem_video":
+            r["sem_video"] += 1
+        elif cat in {"ge", "caze", "prime"}:
+            r[cat] += 1
+            r["com_fonte_preferida"] += 1
+        else:
+            r["outros"] += 1
+    return r
+
+
+def rodar(args: argparse.Namespace) -> int:
+    api_key = os.environ.get("YOUTUBE_API_KEY", "").strip()
+    youtube_ativo = bool(api_key) and not args.sem_youtube
+
+    resultados = carregar(RESULTADOS, {"resultados": []})
+    jogos_resultados = resultados.get("resultados") or []
+    if not isinstance(jogos_resultados, list):
+        jogos_resultados = []
     auto = carregar(MM_AUTO, {"jogos": {}})
     manual = carregar(MM_MANUAL, {"jogos": {}})
-    jga, jgm = auto.get("jogos", {}), manual.get("jogos", {})
+    auto.setdefault("jogos", {})
+    manual.setdefault("jogos", {})
 
-    # visão efetiva: manual vence
-    efetivos = {}
-    for eid, e in jga.items():
-        efetivos[eid] = ("auto", e)
-    for eid, e in jgm.items():
-        efetivos[eid] = ("manual", e)
+    prime_id = resolver_prime_channel_id(api_key) if youtube_ativo else ""
 
-    universo = {eid: e for eid, (org, e) in efetivos.items()
-                if (not args.rodada_inicio or e.get("rodada", 0) >= args.rodada_inicio)
-                and (not args.rodada_fim or e.get("rodada", 99) <= args.rodada_fim)}
-    print(f"→ {len(universo)} jogos no universo (rodadas {args.rodada_inicio or 'todas'}–{args.rodada_fim or ''})")
+    def na_janela(j: Dict[str, Any]) -> bool:
+        r = int(j.get("rodada") or 0)
+        if args.rodada_inicio and r < args.rodada_inicio:
+            return False
+        if args.rodada_fim and r > args.rodada_fim:
+            return False
+        return True
 
-    # 1) canal atual de cada vídeo
-    prime_id = resolver_prime_channel_id()
-    canais = canais_dos_videos([e.get("video_id") for e in universo.values()])
-    antes = {"ge": 0, "caze": 0, "prime": 0, "outros": 0, "sem_video": 0}
-    alvos = []
-    for eid, e in universo.items():
-        vid = e.get("video_id")
-        if not vid:
-            antes["sem_video"] += 1
-            alvos.append(eid)
-            continue
-        cat = categoria_por_canal(canais.get(vid, ""), prime_id)
-        antes[cat] += 1
-        if cat == "outros":
-            alvos.append(eid)
-    print("ANTES:", antes, f"| alvos p/ substituição: {len(alvos)}")
+    universo = [j for j in jogos_resultados if na_janela(j)]
+    antes = calcular_resumo(jogos_resultados, auto, manual, prime_id)
+    antes_janela = calcular_resumo(universo, auto, manual, prime_id)
 
-    substituidos, mantidos = [], []
-    if alvos:
-        rodadas_alvo = {universo[eid].get("rodada") for eid in alvos if universo[eid].get("rodada")}
-        cands = montar_candidatos(rodadas_alvo, args.paginas_caze, args.paginas_prime, prime_id)
-        print(f"  candidatos varridos nos 3 canais: {len(cands)}")
-        for eid in alvos:
-            org, e = efetivos[eid]
-            cand = escolher_candidato(e, cands)
-            jogo_txt = f"R{e.get('rodada','?')} {e.get('mandante')} x {e.get('visitante')}"
-            if not cand:
-                mantidos.append({"event_id": eid, "jogo": jogo_txt,
-                                 "fonte_atual": e.get("fonte") or "(sem vídeo)"})
-                print(f"  = mantido (não achei nos 3 canais): {jogo_txt}")
-                continue
-            de = e.get("fonte") or "(sem vídeo)"
+    por_id, por_chave = indexar_videos(auto, manual)
+    alvos: List[Tuple[Dict[str, Any], str, Optional[Tuple[str, str, Dict[str, Any]]]]] = []
+    mantidos_preferidos: List[Dict[str, Any]] = []
+    for jogo in universo:
+        item = video_do_jogo(jogo, por_id, por_chave)
+        video = item[2] if item else None
+        cat = classificar_video(video, prime_id)
+        if cat == "sem_video":
+            alvos.append((jogo, "sem_link_preferido", item))
+        elif cat in {"ge", "caze", "prime"}:
+            mantidos_preferidos.append(resumo_jogo(jogo, f"mantido: fonte preferida ({cat})", video))
+        else:
+            alvos.append((jogo, "fonte_nao_preferida_removida", item))
+
+    rodadas_alvo = {int(j.get("rodada") or 0) for j, _, _ in alvos if j.get("rodada")}
+    candidatos: List[Dict[str, Any]] = []
+    erros: List[str] = []
+
+    if youtube_ativo and alvos:
+        try:
+            getv = carregar(GETV_PLAYLISTS, {"playlists": []})
+            for pl in getv.get("playlists") or []:
+                if rodadas_alvo and int(pl.get("rodada") or 0) not in rodadas_alvo:
+                    continue
+                pid = pl.get("playlist_id")
+                if pid:
+                    candidatos.extend(listar_playlist(api_key, pid, args.paginas_getv, "ge"))
+        except Exception as exc:
+            erros.append(f"Falha ao varrer playlists GE: {exc}")
+        try:
+            candidatos.extend(listar_playlist(api_key, uploads_de(CAZE_CHANNEL_ID), args.paginas_caze, "caze"))
+        except Exception as exc:
+            erros.append(f"Falha ao varrer uploads CazéTV: {exc}")
+        if prime_id:
+            try:
+                candidatos.extend(listar_playlist(api_key, uploads_de(prime_id), args.paginas_prime, "prime"))
+            except Exception as exc:
+                erros.append(f"Falha ao varrer uploads Prime Video: {exc}")
+
+    substituidos: List[Dict[str, Any]] = []
+    removidos: List[Dict[str, Any]] = []
+    ainda_sem_link: List[Dict[str, Any]] = []
+    buscas_executadas: List[Dict[str, Any]] = []
+
+    for jogo, motivo, item in alvos:
+        event_id = str(jogo.get("event_id") or jogo.get("id") or "")
+        atual = item[2] if item else None
+        cand = escolher_candidato(jogo, candidatos)
+
+        # Se a varredura por playlists não achou, tenta search.list SOMENTE dentro dos canais permitidos.
+        if not cand and youtube_ativo and QUOTA["search"] < args.max_search_total:
+            canais = [(GE_CHANNEL_ID, "ge"), (CAZE_CHANNEL_ID, "caze")]
+            if prime_id:
+                canais.append((prime_id, "prime"))
+            for q in consultas_para_jogo(jogo, args.max_consultas_por_jogo):
+                for channel_id, canal in canais:
+                    if QUOTA["search"] >= args.max_search_total:
+                        break
+                    try:
+                        achados = search_no_canal(api_key, channel_id, canal, q, args.max_results_search)
+                        buscas_executadas.append({
+                            "event_id": event_id,
+                            "rodada": jogo.get("rodada"),
+                            "jogo": f"{nome_time(jogo.get('mandante'))} x {nome_time(jogo.get('visitante'))}",
+                            "canal": canal,
+                            "query": q,
+                            "resultados": len(achados),
+                        })
+                        candidatos.extend(achados)
+                        cand = escolher_candidato(jogo, achados)
+                        if cand:
+                            break
+                    except Exception as exc:
+                        erros.append(f"Falha no search oficial {canal} para {event_id}: {exc}")
+                if cand or QUOTA["search"] >= args.max_search_total:
+                    break
+
+        if cand:
+            entrada = montar_entrada(jogo, cand)
             if not args.dry_run:
-                aplicar(e, cand)
-            substituidos.append({"event_id": eid, "jogo": jogo_txt, "de": de,
-                                 "para": ROTULOS[cand["canal"]], "video_novo": cand["video_id"],
-                                 "titulo_novo": cand["titulo"], "onde": org})
-            print(f"  ✓ trocado ({cand['canal'].upper()}): {jogo_txt}  [{de} → {ROTULOS[cand['canal']]}]")
+                if item:
+                    origem, key, _ = item
+                    remover_chave(auto, key, event_id)
+                    remover_chave(manual, key, event_id)
+                auto["jogos"][event_id] = entrada
+            substituidos.append({
+                **resumo_jogo(jogo, motivo, atual),
+                "fonte_nova": entrada["fonte"],
+                "channel_title_novo": entrada.get("channel_title") or "",
+                "titulo_novo": entrada["titulo"],
+                "url_nova": entrada["url"],
+                "metodo": cand.get("metodo"),
+            })
+            continue
 
-    # 2) contagem DEPOIS (recalcula localmente: quem foi trocado virou preferido)
-    depois = dict(antes)
-    for s in substituidos:
-        depois["outros"] = max(0, depois["outros"] - (0 if s["de"] == "(sem vídeo)" else 1))
-        if s["de"] == "(sem vídeo)":
-            depois["sem_video"] = max(0, depois["sem_video"] - 1)
-        chave = [k for k, v in ROTULOS.items() if v == s["para"]][0]
-        depois[chave] += 1
+        # Sem candidato preferido: remove qualquer link ruim, ou mantém sem vídeo.
+        if item and atual and not preferido(atual, prime_id):
+            if not args.dry_run:
+                origem, key, _ = item
+                remover_chave(auto, key, event_id)
+                remover_chave(manual, key, event_id)
+            removidos.append(resumo_jogo(jogo, motivo, atual))
+        ainda_sem_link.append(resumo_jogo(jogo, "sem link em GE/Globo, CazéTV ou Prime Video", atual))
+
+    if not args.dry_run:
+        auto["atualizado_em"] = agora_iso()
+        auto["fonte"] = "GE/Globo, CazéTV e Prime Video / YouTube"
+        auto["politica_publicacao"] = "Somente fontes preferidas. Canais não preferidos são removidos; se não houver fonte confiável, o jogo fica sem link."
+        auto["total_vinculados"] = len(auto.get("jogos") or {})
+        manual["atualizado_em"] = agora_iso()
+        manual["observacao"] = "Fallback manual prioritário. Links fora de GE/Globo, CazéTV ou Prime Video são removidos pela auditoria de fontes."
+        gravar(MM_AUTO, auto)
+        gravar(MM_MANUAL, manual)
+
+    depois = calcular_resumo(jogos_resultados, auto, manual, prime_id)
+    depois_janela = calcular_resumo(universo, auto, manual, prime_id)
 
     rel = {
         "atualizado_em": agora_iso(),
-        "politica": "Fontes preferidas: GE TV > CazéTV > Prime Video. Varredura de playlists (sem search.list). "
-                    "Só substitui com os dois clubes no título e placar/rodada conferindo. Quem não é achado, permanece.",
-        "quota_gasta_nesta_execucao": QUOTA["unidades"],
-        "resumo_antes": antes,
-        "resumo_depois": depois,
-        "substituidos": substituidos,
-        "mantidos_de_outros_canais": mantidos,
+        "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
+        "politica": {
+            "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, CazéTV ou Amazon Prime Video. Se não achar nessas fontes, fica sem vídeo.",
+            "criterio": "A validação usa fonte/canal real e channelId quando disponível. Título com 'ge.globo' em canal aleatório não é aceito.",
+            "escopo": "Apenas módulo Brasileirão. Nada em copa2026 é alterado.",
+        },
         "dry_run": bool(args.dry_run),
+        "youtube_ativo": bool(youtube_ativo),
+        "quota_estimada_youtube": dict(QUOTA),
+        "rodadas_processadas": {"inicio": args.rodada_inicio or None, "fim": args.rodada_fim or None},
+        "resumo_geral_antes": antes,
+        "resumo_geral_depois": depois,
+        "resumo_janela_antes": antes_janela,
+        "resumo_janela_depois": depois_janela,
+        "mantidos_preferidos_na_janela": mantidos_preferidos,
+        "substituidos_para_fontes_preferidas": substituidos,
+        "removidos_por_fonte_nao_preferida": removidos,
+        "ainda_sem_link_preferido": sorted(ainda_sem_link, key=lambda x: (x.get("rodada") or 999, x.get("mandante") or "")),
+        "buscas_executadas_em_canais_preferidos": buscas_executadas,
+        "erros": erros,
     }
-    if not args.dry_run:
-        auto["atualizado_em"] = agora_iso()
-        gravar(MM_AUTO, auto)
-        manual["atualizado_em"] = agora_iso()
-        gravar(MM_MANUAL, manual)
     gravar(RELATORIO, rel)
-    print(f"\n✓ FIM. Trocados: {len(substituidos)} | Mantidos (não achados nos 3): {len(mantidos)} | "
-          f"Cota gasta: {QUOTA['unidades']} unidades")
-    print(f"Relatório: dados-br/relatorio-substituicao-fontes.json")
+
+    print("Relatório:", RELATORIO.relative_to(RAIZ))
+    print(json.dumps({
+        "dry_run": bool(args.dry_run),
+        "youtube_ativo": bool(youtube_ativo),
+        "alvos": len(alvos),
+        "substituidos": len(substituidos),
+        "removidos": len(removidos),
+        "ainda_sem_link_preferido": len(ainda_sem_link),
+        "resumo_geral_depois": depois,
+        "quota_estimada_youtube": QUOTA,
+    }, ensure_ascii=False, indent=2))
     return 0
 
-# ---------------------------------------------------------------- selftest
-def selftest():
+
+def selftest() -> int:
     ok = True
-    def c(cond, msg):
+
+    def c(cond: bool, msg: str) -> None:
         nonlocal ok
-        print(("  ok  " if cond else "  ERRO ") + msg); ok = ok and cond
+        print(("  ok  " if cond else "  ERRO ") + msg)
+        ok = ok and bool(cond)
 
-    c(clubes_no_titulo("RED BULL BRAGANTINO 1 X 0 ATLÉTICO-MG | MELHORES MOMENTOS") ==
-      {"Bragantino", "Atlético-MG"}, "aliases: Red Bull Bragantino + Atlético-MG")
-    c(clubes_no_titulo("INTER 2 X 2 VASCO | MELHORES MOMENTOS | 9ª RODADA") ==
-      {"Internacional", "Vasco da Gama"}, "aliases: Inter + Vasco")
-    c(clubes_no_titulo("ATHLETICO-PR 3 X 1 ATLETICO-MG") == {"Athletico-PR", "Atlético-MG"},
-      "Athletico-PR não colide com Atlético-MG")
+    jogo = {"rodada": 18, "mandante": {"nome": "Remo"}, "visitante": {"nome": "São Paulo"}, "placar_mandante": 1, "placar_visitante": 0}
+    c(video_serve_para_jogo("REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026 | ge.globo", jogo), "aceita título correto se vier de canal permitido")
+    c(not video_serve_para_jogo("REMO 2 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA", jogo), "rejeita placar errado")
+    c(not video_serve_para_jogo("REMO 1 X 0 SÃO PAULO AO VIVO", jogo), "rejeita ao vivo")
+    c(not video_serve_para_jogo("REMO 1 X 0 SÃO PAULO | COLETIVA", jogo), "rejeita conteúdo que não é melhores momentos")
+    c(not preferido({"channel_title": "Futebol Raiz TV", "titulo": "REMO 1 X 0 SÃO PAULO ge.globo"}), "não aceita falso ge.globo por título")
+    c(preferido({"channel_id": GE_CHANNEL_ID, "channel_title": "ge"}), "aceita GE por channelId")
+    c(preferido({"fonte": "sportv / YouTube"}), "aceita sportv por fonte manual")
+    c(classificar_video({"channel_id": CAZE_CHANNEL_ID}) == "caze", "classifica CazéTV por channelId")
+    c(uploads_de(GE_CHANNEL_ID).startswith("UU"), "gera playlist de uploads")
 
-    jogo = {"mandante": "Corinthians", "visitante": "Atlético-MG",
-            "placar_mandante": 1, "placar_visitante": 0, "rodada": 17}
-    c(video_serve_para_jogo("CORINTHIANS 1 X 0 ATLÉTICO-MG | MELHORES MOMENTOS | 17ª RODADA BRASILEIRÃO 2026 | ge.globo", jogo),
-      "valida título GE padrão")
-    c(not video_serve_para_jogo("CORINTHIANS 2 X 0 ATLÉTICO-MG | MELHORES MOMENTOS", jogo),
-      "rejeita placar errado")
-    c(not video_serve_para_jogo("CORINTHIANS 1 X 0 ATLÉTICO-MG | MELHORES MOMENTOS | 16ª RODADA", jogo),
-      "rejeita rodada errada")
-    c(not video_serve_para_jogo("PÓS-JOGO: CORINTHIANS 1 X 0 ATLÉTICO-MG AO VIVO", jogo),
-      "rejeita live/pós-jogo")
-    c(not video_serve_para_jogo("CORINTHIANS 1 X 0 GALO | MELHORES MOMENTOS", {**jogo, "visitante": "Palmeiras"}),
-      "rejeita quando o 2º clube não é o do jogo")
-
-    cands = [
-        {"video_id": "b", "titulo": "CORINTHIANS 1 X 0 ATLÉTICO-MG | MELHORES MOMENTOS | 17ª RODADA", "canal": "caze", "published_at": "2026-07-01"},
-        {"video_id": "a", "titulo": "CORINTHIANS 1 X 0 ATLÉTICO-MG | MELHORES MOMENTOS | 17ª RODADA BRASILEIRÃO 2026 | ge.globo", "canal": "ge", "playlist_id": "PL1", "published_at": "2026-07-02"},
-    ]
-    esc = escolher_candidato(jogo, cands)
-    c(esc and esc["canal"] == "ge", "prioridade GE > Cazé quando ambos servem")
-
-    e = {"event_id": "x", "rodada": 17, "mandante": "Corinthians", "visitante": "Atlético-MG",
-         "placar_mandante": 1, "placar_visitante": 0, "video_id": "velho", "fonte": "Corinthians TV"}
-    aplicar(e, esc)
-    c(e["video_id"] == "a" and e["fonte"] == "GE TV / YouTube" and e["url"].endswith("v=a") and e["confianca"] == 1.0,
-      "aplicar() preserva formato e troca os campos certos")
-    c(categoria_por_canal(GE_CHANNEL_ID, None) == "ge" and categoria_por_canal("UCoutro", None) == "outros",
-      "categoria por channelId")
-    c(uploads_de("UCZiYbVptd3PVPf4f6eR6UaQ") == "UUZiYbVptd3PVPf4f6eR6UaQ", "uploads UU do canal")
+    cand_ge = {"video_id": "a", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "ge", "metodo": "playlistItems"}
+    cand_caze = {"video_id": "b", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "caze", "metodo": "search.list"}
+    esc = escolher_candidato(jogo, [cand_caze, cand_ge])
+    c(esc and esc["video_id"] == "a", "prioridade GE > Cazé")
+    entrada = montar_entrada(jogo, cand_ge)
+    c(entrada["fonte"] == "GE TV / YouTube" and entrada["url"].endswith("v=a"), "monta entrada no formato do site")
     print("\nSELFTEST:", "PASSOU ✅" if ok else "FALHOU ❌")
     return 0 if ok else 1
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--dry-run", action="store_true", help="mostra o que faria; grava só o relatório")
-    ap.add_argument("--paginas-caze", type=int, default=12, help="páginas de uploads da Cazé (50 vídeos/página)")
-    ap.add_argument("--paginas-prime", type=int, default=8)
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description="Sanitiza e busca melhores momentos somente em GE/Globo, CazéTV e Prime Video.")
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--sem-youtube", action="store_true", help="não consulta YouTube; apenas remove fontes não preferidas e gera relatório")
     ap.add_argument("--rodada-inicio", type=int, default=0)
     ap.add_argument("--rodada-fim", type=int, default=0)
-    ap.add_argument("--selftest", action="store_true")
+    ap.add_argument("--paginas-getv", type=int, default=2)
+    ap.add_argument("--paginas-caze", type=int, default=12)
+    ap.add_argument("--paginas-prime", type=int, default=8)
+    ap.add_argument("--max-search-total", type=int, default=20, help="limite de chamadas search.list somente em canais preferidos")
+    ap.add_argument("--max-consultas-por-jogo", type=int, default=2)
+    ap.add_argument("--max-results-search", type=int, default=6)
     args = ap.parse_args()
     if args.selftest:
         return selftest()
     return rodar(args)
+
 
 if __name__ == "__main__":
     sys.exit(main())

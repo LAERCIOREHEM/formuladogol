@@ -1,42 +1,35 @@
 {
-  "atualizado_em": "2026-07-10T03:16:56-03:00",
+  "atualizado_em": "2026-07-10T08:58:10-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
-    "regra": "Manter links já existentes enquanto não houver GE/Globo equivalente, mas novas publicações automáticas pelo POWER só podem usar GE/Globo, Amazon Prime Video ou CazéTV.",
+    "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video ou CazéTV podem aparecer no site. Se não houver fonte preferida, o jogo fica sem vídeo.",
     "preferenciais": [
-      "GE TV/ge.globo/sportv",
+      "GE TV/ge.globo/sportv/Premiere/Globoplay",
       "Amazon Prime Video",
       "CazéTV"
     ],
-    "outros": "Aparecem no site somente se já estavam vinculados antes ou se forem informados manualmente pelo administrador.",
+    "outros": "Não devem aparecer no site. Se houver algum item nesta lista, é problema de saneamento.",
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
     "jogos_resultados": 177,
-    "jogos_com_video": 177,
+    "jogos_com_video": 159,
     "ge_globo": 158,
     "amazon_prime_video": 1,
     "cazetv": 0,
-    "outros": 18,
-    "sem_video": 0,
-    "percentual_fontes_preferidas": 89.8
+    "outros": 0,
+    "sem_video": 18,
+    "percentual_fontes_preferidas": 100.0
   },
-  "outros_sites_ainda_em_uso": [
+  "outros_sites_ainda_em_uso": [],
+  "sem_video": [
     {
       "event_id": "401841128",
       "rodada": 17,
       "mandante": "Corinthians",
       "visitante": "Atlético-MG",
       "placar_mandante": 1,
-      "placar_visitante": 0,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Corinthians TV",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Corinthians TV",
-      "titulo": "MELHORES MOMENTOS: CORINTHIANS 1 X 0 ATLÉTICO-MG | BRASILEIRÃO 2026 | 17ª RODADA",
-      "url": "https://www.youtube.com/watch?v=TmWPKl4mkPI",
-      "confianca": 0.96
+      "placar_visitante": 0
     },
     {
       "event_id": "401841129",
@@ -44,15 +37,7 @@
       "mandante": "Coritiba",
       "visitante": "Bahia",
       "placar_mandante": 3,
-      "placar_visitante": 2,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Futebol Prime",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Futebol Prime",
-      "titulo": "MELHORES MOMENTOS DE CORITIBA 3 X 2 BAHIA | 17° RODADA BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=gzLL2EHHeQM",
-      "confianca": 0.96
+      "placar_visitante": 2
     },
     {
       "event_id": "401841137",
@@ -60,15 +45,7 @@
       "mandante": "Cruzeiro",
       "visitante": "Chapecoense",
       "placar_mandante": 2,
-      "placar_visitante": 1,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "CANAL CAVEIRA AZUL CRUZEIRO 98 Futebol Clube 98FM",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "CANAL CAVEIRA AZUL CRUZEIRO 98 Futebol Clube 98FM",
-      "titulo": "CRUZEIRO 2 X 1 CHAPECOENSE &amp; Bom Humor  98 FM 🤪😂⚽  MELHORES MOMENTOS BRASILEIRÃO 2026 17ª Rodada",
-      "url": "https://www.youtube.com/watch?v=c11zw6LsHmA",
-      "confianca": 0.96
+      "placar_visitante": 1
     },
     {
       "event_id": "401841136",
@@ -76,15 +53,7 @@
       "mandante": "Flamengo",
       "visitante": "Palmeiras",
       "placar_mandante": 0,
-      "placar_visitante": 3,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Futebol Prime",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Futebol Prime",
-      "titulo": "MELHORES MOMENTOS DE FLAMENGO 0 X 3 PALMEIRAS | 17° RODADA BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=CVufmdxKQyM",
-      "confianca": 0.96
+      "placar_visitante": 3
     },
     {
       "event_id": "401841135",
@@ -92,15 +61,7 @@
       "mandante": "Grêmio",
       "visitante": "Santos",
       "placar_mandante": 3,
-      "placar_visitante": 2,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Altas Aventuras Ldg",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Altas Aventuras Ldg",
-      "titulo": "Grêmio 3 X 2 Santos - Melhores momentos (COMPLETOS) da 17° rodada do Brasileirão 2026",
-      "url": "https://www.youtube.com/watch?v=4K58ka8HcVU",
-      "confianca": 0.96
+      "placar_visitante": 2
     },
     {
       "event_id": "401841134",
@@ -108,15 +69,7 @@
       "mandante": "Mirassol",
       "visitante": "Fluminense",
       "placar_mandante": 1,
-      "placar_visitante": 0,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Futebol Prime",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Futebol Prime",
-      "titulo": "MELHORES MOMENTOS DE MIRASSOL 1 X 0 FLUMINENSE | 17° RODADA BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=vsQvAd4U9T4",
-      "confianca": 0.96
+      "placar_visitante": 0
     },
     {
       "event_id": "401841132",
@@ -124,15 +77,7 @@
       "mandante": "São Paulo",
       "visitante": "Botafogo",
       "placar_mandante": 1,
-      "placar_visitante": 1,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Futebol Prime",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Futebol Prime",
-      "titulo": "MELHORES MOMENTOS DE SÃO PAULO 1 X 1 BOTAFOGO | 17° RODADA BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=F7tAIKLZKWA",
-      "confianca": 0.96
+      "placar_visitante": 1
     },
     {
       "event_id": "401841131",
@@ -140,15 +85,7 @@
       "mandante": "Vasco da Gama",
       "visitante": "Bragantino",
       "placar_mandante": 0,
-      "placar_visitante": 3,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "manual",
-      "fonte": "Manual / YouTube",
-      "fonte_busca": "Manual / usuário",
-      "channel_title": "",
-      "titulo": "VASCO 0 X 3 BRAGANTINO | MELHORES MOMENTOS | 17ª RODADA DO BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=bkd8yda04fc",
-      "confianca": 1.0
+      "placar_visitante": 3
     },
     {
       "event_id": "401841130",
@@ -156,15 +93,7 @@
       "mandante": "Vitória",
       "visitante": "Internacional",
       "placar_mandante": 2,
-      "placar_visitante": 0,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Futebol Prime",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Futebol Prime",
-      "titulo": "MELHORES MOMENTOS DE VITÓRIA 2 X 0 INTERNACIONAL | 17° RODADA BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=SkEfUr_59r8",
-      "confianca": 0.96
+      "placar_visitante": 0
     },
     {
       "event_id": "401841138",
@@ -172,15 +101,7 @@
       "mandante": "Athletico-PR",
       "visitante": "Mirassol",
       "placar_mandante": 1,
-      "placar_visitante": 0,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Metrópoles Esportes",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Metrópoles Esportes",
-      "titulo": "Athletico PR 1 X 0 Mirassol | Melhores Momentos | Brasileirão 2026",
-      "url": "https://www.youtube.com/watch?v=2AyeGyTv8d4",
-      "confianca": 0.84
+      "placar_visitante": 0
     },
     {
       "event_id": "401841146",
@@ -188,15 +109,7 @@
       "mandante": "Bahia",
       "visitante": "Botafogo",
       "placar_mandante": 2,
-      "placar_visitante": 1,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Metrópoles Esportes",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Metrópoles Esportes",
-      "titulo": "Bahia 2 x 1 Botafogo | Melhores Momentos | Brasileirão 2026",
-      "url": "https://www.youtube.com/watch?v=83lpjv_jxaM",
-      "confianca": 0.84
+      "placar_visitante": 1
     },
     {
       "event_id": "401841141",
@@ -204,15 +117,7 @@
       "mandante": "Bragantino",
       "visitante": "Internacional",
       "placar_mandante": 3,
-      "placar_visitante": 1,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Metrópoles Esportes",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Metrópoles Esportes",
-      "titulo": "RB BRAGANTINO 3 X 1 INTERNACIONAL | MELHORES MOMENTOS | BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=5ppe_wY2Qf0",
-      "confianca": 0.84
+      "placar_visitante": 1
     },
     {
       "event_id": "401841145",
@@ -220,15 +125,7 @@
       "mandante": "Cruzeiro",
       "visitante": "Fluminense",
       "placar_mandante": 1,
-      "placar_visitante": 1,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "CANAL CAVEIRA AZUL CRUZEIRO 98 Futebol Clube 98FM",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "CANAL CAVEIRA AZUL CRUZEIRO 98 Futebol Clube 98FM",
-      "titulo": "CRUZEIRO 1 X 1 FLUMINENSE  🤪😂😂 &amp; Bom Humor 98 FM ⚽Melhores Momentos BRASILEIRÃO 2026 18ª Rodada",
-      "url": "https://www.youtube.com/watch?v=zRf6CaUzRW8",
-      "confianca": 0.96
+      "placar_visitante": 1
     },
     {
       "event_id": "401841144",
@@ -236,15 +133,7 @@
       "mandante": "Flamengo",
       "visitante": "Coritiba",
       "placar_mandante": 3,
-      "placar_visitante": 0,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Futebol Prime",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Futebol Prime",
-      "titulo": "MELHORES MOMENTOS DE FLAMENGO 3 X 0 CORITIBA | 18° RODADA BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=SWf5MQVboQI",
-      "confianca": 0.96
+      "placar_visitante": 0
     },
     {
       "event_id": "401841139",
@@ -252,15 +141,7 @@
       "mandante": "Grêmio",
       "visitante": "Corinthians",
       "placar_mandante": 1,
-      "placar_visitante": 3,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Habilidade de Ouro",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Habilidade de Ouro",
-      "titulo": "MELHORES MOMENTOS | GRÊMIO 1 X 3 CORINTHIANS | 18ª RODADA BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=Lw31pn-5YbU",
-      "confianca": 0.96
+      "placar_visitante": 3
     },
     {
       "event_id": "401841140",
@@ -268,15 +149,7 @@
       "mandante": "Palmeiras",
       "visitante": "Chapecoense",
       "placar_mandante": 1,
-      "placar_visitante": 0,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "UOL Esporte",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "UOL Esporte",
-      "titulo": "PALMEIRAS 1 X 0 CHAPECOENSE | MELHORES MOMENTOS | BRASILEIRÃO 2026",
-      "url": "https://www.youtube.com/watch?v=c-qN4OeAfs4",
-      "confianca": 0.84
+      "placar_visitante": 0
     },
     {
       "event_id": "401841147",
@@ -284,15 +157,7 @@
       "mandante": "Remo",
       "visitante": "São Paulo",
       "placar_mandante": 1,
-      "placar_visitante": 0,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "Futebol Raiz TV",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "Futebol Raiz TV",
-      "titulo": "REMO 1 X 0 SÃO PAULO MELHORES MOMENTOS 18ª RODADA BRASILEIRÃO 2026 ge globo",
-      "url": "https://www.youtube.com/watch?v=QiN6mZFyym4",
-      "confianca": 0.96
+      "placar_visitante": 0
     },
     {
       "event_id": "401841143",
@@ -300,18 +165,9 @@
       "mandante": "Santos",
       "visitante": "Vitória",
       "placar_mandante": 3,
-      "placar_visitante": 1,
-      "categoria_fonte": "outros",
-      "origem_vinculo": "automatico",
-      "fonte": "DAVID CRF",
-      "fonte_busca": "YouTube Search POWER",
-      "channel_title": "DAVID CRF",
-      "titulo": "Santos 3 X 1 Vitória Melhores Momentos | Brasileirão 2026 Completo ",
-      "url": "https://www.youtube.com/watch?v=Ll6ZdH81lnw",
-      "confianca": 0.84
+      "placar_visitante": 1
     }
   ],
-  "sem_video": [],
   "detalhamento": {
     "ge_globo": [
       {

@@ -3,10 +3,10 @@
 """Audita as fontes dos melhores momentos exibidos na aba Resultados.
 
 Objetivo:
-- manter vídeos já cadastrados, mesmo quando não forem GE/Globo;
+- confirmar que só fontes preferidas aparecem no site;
 - informar quantos links efetivos vêm de GE/Globo, Amazon Prime Video,
   CazéTV e Outros;
-- listar exatamente quais jogos ainda estão usando fontes "Outros";
+- listar exatamente quais jogos ainda estão sem vídeo por falta de fonte preferida;
 - não acessar internet e não alterar os vínculos de vídeos.
 
 A ordem de prioridade do site é respeitada: manual substitui automático.
@@ -221,9 +221,9 @@ def main() -> int:
         "atualizado_em": agora_iso(),
         "fonte": "auditoria local das fontes dos melhores momentos",
         "politica": {
-            "regra": "Manter links já existentes enquanto não houver GE/Globo equivalente, mas novas publicações automáticas pelo POWER só podem usar GE/Globo, Amazon Prime Video ou CazéTV.",
-            "preferenciais": ["GE TV/ge.globo/sportv", "Amazon Prime Video", "CazéTV"],
-            "outros": "Aparecem no site somente se já estavam vinculados antes ou se forem informados manualmente pelo administrador.",
+            "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video ou CazéTV podem aparecer no site. Se não houver fonte preferida, o jogo fica sem vídeo.",
+            "preferenciais": ["GE TV/ge.globo/sportv/Premiere/Globoplay", "Amazon Prime Video", "CazéTV"],
+            "outros": "Não devem aparecer no site. Se houver algum item nesta lista, é problema de saneamento.",
             "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais.",
         },
         "resumo": resumo,
