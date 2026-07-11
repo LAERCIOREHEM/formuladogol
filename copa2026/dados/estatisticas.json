@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-11T22:12:46.639928Z",
+  "atualizado_em": "2026-07-11T22:42:45.486738Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 99,
@@ -72,6 +72,22 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Jude Bellingham",
+      "equipe": "ENG",
+      "gols": 5,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760437",
+        "760485",
+        "760495",
+        "760505",
+        "760512"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Ousmane Dembélé",
       "equipe": "FRA",
       "gols": 5,
@@ -99,21 +115,6 @@
         "760493"
       ],
       "total_cartoes": 0
-    },
-    {
-      "nome": "Jude Bellingham",
-      "equipe": "ENG",
-      "gols": 4,
-      "assistencias": 1,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760437",
-        "760485",
-        "760495",
-        "760505"
-      ],
-      "total_cartoes": 1
     },
     {
       "nome": "Julián Quiñones",
@@ -2293,6 +2294,19 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Anthony Gordon",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760495",
+        "760512"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Bukayo Saka",
       "equipe": "ENG",
       "gols": 0,
@@ -2363,18 +2377,6 @@
         "760502"
       ],
       "total_cartoes": 1
-    },
-    {
-      "nome": "Anthony Gordon",
-      "equipe": "ENG",
-      "gols": 0,
-      "assistencias": 2,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760495"
-      ],
-      "total_cartoes": 0
     },
     {
       "nome": "Breel Embolo",
@@ -3281,7 +3283,7 @@
     {
       "nome": "Jude Bellingham",
       "equipe": "ENG",
-      "gols": 4,
+      "gols": 5,
       "assistencias": 1,
       "amarelos": 1,
       "vermelhos": 0,
@@ -3289,7 +3291,8 @@
         "760437",
         "760485",
         "760495",
-        "760505"
+        "760505",
+        "760512"
       ],
       "total_cartoes": 1
     },
@@ -5913,7 +5916,7 @@
     {
       "nome": "Jude Bellingham",
       "equipe": "ENG",
-      "gols": 4,
+      "gols": 5,
       "assistencias": 1,
       "amarelos": 1,
       "vermelhos": 0,
@@ -5921,7 +5924,8 @@
         "760437",
         "760485",
         "760495",
-        "760505"
+        "760505",
+        "760512"
       ],
       "total_cartoes": 1
     },
@@ -7138,6 +7142,15 @@
       "media_gols": 2.17
     },
     {
+      "equipe": "ENG",
+      "gols": 12,
+      "assistencias": 10,
+      "amarelos": 7,
+      "vermelhos": 1,
+      "jogos": 6,
+      "media_gols": 2.0
+    },
+    {
       "equipe": "GER",
       "gols": 11,
       "assistencias": 10,
@@ -7163,15 +7176,6 @@
       "vermelhos": 1,
       "jogos": 5,
       "media_gols": 2.2
-    },
-    {
-      "equipe": "ENG",
-      "gols": 11,
-      "assistencias": 9,
-      "amarelos": 7,
-      "vermelhos": 1,
-      "jogos": 6,
-      "media_gols": 1.83
     },
     {
       "equipe": "ESP",
