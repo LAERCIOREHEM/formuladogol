@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-11T21:12:53.357558Z",
+  "atualizado_em": "2026-07-11T21:42:44.623291Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 98,
+  "jogos_processados": 99,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -824,6 +824,20 @@
       "vermelhos": 0,
       "jogos": [
         "760455"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Andreas Schjelderup",
+      "equipe": "NOR",
+      "gols": 1,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760475",
+        "760504",
+        "760512"
       ],
       "total_cartoes": 0
     },
@@ -2237,6 +2251,21 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Martin Ødegaard",
+      "equipe": "NOR",
+      "gols": 0,
+      "assistencias": 4,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760430",
+        "760454",
+        "760490",
+        "760512"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Alexander Isak",
       "equipe": "SWE",
       "gols": 1,
@@ -2252,13 +2281,14 @@
     {
       "nome": "Andreas Schjelderup",
       "equipe": "NOR",
-      "gols": 0,
+      "gols": 1,
       "assistencias": 3,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
         "760475",
-        "760504"
+        "760504",
+        "760512"
       ],
       "total_cartoes": 0
     },
@@ -2304,20 +2334,6 @@
         "760492",
         "760503",
         "760510"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Martin Ødegaard",
-      "equipe": "NOR",
-      "gols": 0,
-      "assistencias": 3,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760430",
-        "760454",
-        "760490"
       ],
       "total_cartoes": 0
     },
@@ -7114,12 +7130,12 @@
     },
     {
       "equipe": "NOR",
-      "gols": 12,
-      "assistencias": 9,
+      "gols": 13,
+      "assistencias": 10,
       "amarelos": 2,
       "vermelhos": 0,
-      "jogos": 5,
-      "media_gols": 2.4
+      "jogos": 6,
+      "media_gols": 2.17
     },
     {
       "equipe": "GER",
@@ -7140,15 +7156,6 @@
       "media_gols": 2.75
     },
     {
-      "equipe": "ENG",
-      "gols": 11,
-      "assistencias": 9,
-      "amarelos": 7,
-      "vermelhos": 1,
-      "jogos": 5,
-      "media_gols": 2.2
-    },
-    {
       "equipe": "USA",
       "gols": 11,
       "assistencias": 4,
@@ -7156,6 +7163,15 @@
       "vermelhos": 1,
       "jogos": 5,
       "media_gols": 2.2
+    },
+    {
+      "equipe": "ENG",
+      "gols": 11,
+      "assistencias": 9,
+      "amarelos": 7,
+      "vermelhos": 1,
+      "jogos": 6,
+      "media_gols": 1.83
     },
     {
       "equipe": "ESP",
