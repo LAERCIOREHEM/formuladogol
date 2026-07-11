@@ -217,12 +217,21 @@ def score_num(v: Any) -> Optional[int]:
         return None
     return int(n)
 
+def penalty_num(c: Dict[str, Any]) -> Optional[int]:
+    for key in ("shootoutScore", "shootoutDisplayScore", "penaltyScore", "penalties", "shootout"):
+        if key in c:
+            n = score_num(c.get(key))
+            if n is not None:
+                return n
+    return None
+
 def extrair_scoreboard(events: List[Dict[str, Any]]) -> Tuple[Dict[str, Dict[str, int]], Dict[str, str], Dict[str, float]]:
     gols = defaultdict(lambda: {"pro": 0, "contra": 0, "jogos": 0, "vitorias": 0, "empates": 0, "derrotas": 0, "pontos": 0})
     event_teams = set()
     ativos = set()
     vencedores_mata = set()
     perdedores_mata = set()
+    campeao_final = ""
     situacao: Dict[str, str] = {}
     ultimo_ts: Dict[str, float] = {}
     tem_mata = False
@@ -276,24 +285,31 @@ def extrair_scoreboard(events: List[Dict[str, Any]]) -> Tuple[Dict[str, Dict[str
                 elif away.get("winner"): winner = a
                 elif hs is not None and ass is not None and hs != ass:
                     winner = h if hs > ass else a
+                elif hs is not None and ass is not None and hs == ass:
+                    pen_h, pen_a = penalty_num(home), penalty_num(away)
+                    if pen_h is not None and pen_a is not None and pen_h != pen_a:
+                        winner = h if pen_h > pen_a else a
                 if winner:
                     loser = a if winner == h else h
                     vencedores_mata.add(winner)
                     perdedores_mata.add(loser)
+                    if slug == "final":
+                        campeao_final = winner
 
-    # Situação contextual:
-    # - Se o mata-mata já começou, quem não está ativo nem venceu o último mata fica eliminado.
-    # - Perdedor de mata encerrado é eliminado.
-    # - Vencedor de mata encerrado fica classificado até ter próximo jogo.
-    # - Quem tem jogo futuro/ao vivo fica em disputa.
+    # Situação contextual simplificada para o site:
+    # - Em disputa: seleção ainda viva no mata-mata ou com jogo futuro/ao vivo.
+    # - Eliminada: seleção derrotada ou fora da fase viva.
+    # - Campeã: somente a seleção vencedora da final encerrada.
     for sig in event_teams:
         situacao[sig] = "Eliminada" if tem_mata else "Em disputa"
     for sig in vencedores_mata:
-        situacao[sig] = "Classificada"
+        situacao[sig] = "Em disputa"
     for sig in perdedores_mata:
         situacao[sig] = "Eliminada"
     for sig in ativos:
         situacao[sig] = "Em disputa"
+    if campeao_final:
+        situacao[campeao_final] = "Campeã"
 
     return dict(gols), situacao, ultimo_ts
 

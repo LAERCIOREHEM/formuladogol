@@ -529,7 +529,7 @@
       return (arr || []).filter(function (x) {
         var eq = siglaSelecao(x.equipe);
         var okTime = (FILTRO === "TODAS") || eq === FILTRO;
-        var okSit = (SITUACAO_RANK === "TODAS") || String(x.situacao || "") === SITUACAO_RANK;
+        var okSit = (SITUACAO_RANK === "TODAS") || normalizarSituacaoRanking(x.situacao) === SITUACAO_RANK;
         var okJogos = (x.jogos || 0) >= (MIN_JOGOS_RANK || 1);
         return okTime && okSit && okJogos;
       }).sort(function (a, b) {
@@ -551,10 +551,22 @@
     if (v == null || v === "" || isNaN(Number(v))) return "—";
     return Number(v).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   }
+  function normalizarSituacaoRanking(s) {
+    var t = String(s || "Em disputa").toLowerCase();
+    if (t.indexOf("campe") >= 0) return "Campeã";
+    if (t.indexOf("elimin") >= 0) return "Eliminada";
+    return "Em disputa";
+  }
+  function classeSituacaoRanking(s) {
+    var t = normalizarSituacaoRanking(s);
+    if (t === "Campeã") return "campea";
+    if (t === "Eliminada") return "elim";
+    return "disp";
+  }
   function desempenhoCard(item, idx) {
     var pos = item.posicao || (idx + 1);
-    var situ = item.situacao || "Em disputa";
-    var situCls = situ === "Eliminada" ? "elim" : (situ === "Classificada" ? "class" : "disp");
+    var situ = normalizarSituacaoRanking(item.situacao);
+    var situCls = classeSituacaoRanking(situ);
     var posse = fmtRankDec(item.posse_media);
     var fin = fmtRankDec(item.finalizacoes_jogo);
     var chgol = fmtRankDec(item.chutes_gol_jogo);
@@ -631,12 +643,7 @@
     }).sort(function (a, b) { return (a.ordem || 0) - (b.ordem || 0); });
   }
   function situacaoHistClass(s) {
-    s = String(s || "").toLowerCase();
-    if (s.indexOf("elimin") >= 0) return "elim";
-    if (s.indexOf("aguard") >= 0) return "aguard";
-    if (s.indexOf("jogo") >= 0) return "live";
-    if (s.indexOf("class") >= 0) return "class";
-    return "disp";
+    return classeSituacaoRanking(s);
   }
   function initHistoricoPadrao() {
     var snaps = snapshotsHistorico();
@@ -660,7 +667,7 @@
     arr = arr.filter(function (x) {
       var eq = siglaSelecao(x.equipe);
       var okSel = HIST_SELECAO === "TODAS" || eq === HIST_SELECAO;
-      var sit = String(x.situacao || "Em disputa");
+      var sit = normalizarSituacaoRanking(x.situacao);
       var okSit = HIST_SITUACAO === "TODAS" || sit === HIST_SITUACAO;
       return okSel && okSit;
     });
@@ -674,8 +681,8 @@
         return av.localeCompare(bv, "pt-BR") * dir;
       }
       if (campo === "situacao") {
-        av = String(a.situacao || "");
-        bv = String(b.situacao || "");
+        av = normalizarSituacaoRanking(a.situacao);
+        bv = normalizarSituacaoRanking(b.situacao);
         return av.localeCompare(bv, "pt-BR") * dir || ((b.indice_final || 0) - (a.indice_final || 0));
       }
       if (campo === "fase") {
@@ -690,7 +697,7 @@
     return arr;
   }
   function historicoLinha(item, idx) {
-    var situ = item.situacao || "Em disputa";
+    var situ = normalizarSituacaoRanking(item.situacao);
     var cls = situacaoHistClass(situ);
     var pos = idx + 1;
     var jogosTxt = esc(item.jogos || 0) + ' jogo' + ((item.jogos || 0) === 1 ? '' : 's');
@@ -849,7 +856,7 @@
       '<div class="hist-phase-buttons" aria-label="Selecionar fase do histórico">' + phaseButtons + '</div>' +
       '<div class="hist-rank-controls">' +
         '<label>Seleção<select id="hist-selecao">' + historicoSelecoesOptions(snap) + '</select></label>' +
-        '<label>Situação<select id="hist-situacao"><option value="TODAS">Todas</option><option value="Em disputa">Em disputa</option><option value="Classificada">Classificada</option><option value="Eliminada">Eliminada</option><option value="Aguardando jogo">Aguardando jogo</option><option value="Em jogo">Em jogo</option></select></label>' +
+        '<label>Situação<select id="hist-situacao"><option value="TODAS">Todas</option><option value="Em disputa">Em disputa</option><option value="Eliminada">Eliminada</option><option value="Campeã">Campeã</option></select></label>' +
         '<label>Ordenar<select id="hist-ordem"><option value="indice_final">Índice</option><option value="selecao">Seleção</option><option value="situacao">Situação</option><option value="fase">Jogos disputados</option><option value="ataque">Ataque</option><option value="defesa">Defesa</option></select></label>' +
         '<label>Ordem<select id="hist-direcao"><option value="desc">Maior primeiro</option><option value="asc">Menor primeiro</option></select></label>' +
       '</div>' +
@@ -1064,10 +1071,20 @@
   function vencedorPerdedorRank(j) {
     if (!j || !j.home || !j.away) return null;
     var h = siglaSelecao(j.home.sigla), a = siglaSelecao(j.away.sigla);
+    var vencedorDeclarado = siglaSelecao(j.vencedor || "");
+    if (vencedorDeclarado && (vencedorDeclarado === h || vencedorDeclarado === a)) {
+      return { vencedor: vencedorDeclarado, perdedor: vencedorDeclarado === h ? a : h };
+    }
     var hs = parseInt(String(j.home.score || "").replace(/[^0-9-]/g, ""), 10);
     var as = parseInt(String(j.away.score || "").replace(/[^0-9-]/g, ""), 10);
-    if (!h || !a || isNaN(hs) || isNaN(as) || hs === as) return null;
-    return hs > as ? { vencedor:h, perdedor:a } : { vencedor:a, perdedor:h };
+    if (!h || !a || isNaN(hs) || isNaN(as)) return null;
+    if (hs !== as) return hs > as ? { vencedor:h, perdedor:a } : { vencedor:a, perdedor:h };
+    var penH = j.penA == null ? null : Number(j.penA);
+    var penA = j.penB == null ? null : Number(j.penB);
+    if (penH != null && penA != null && !isNaN(penH) && !isNaN(penA) && penH !== penA) {
+      return penH > penA ? { vencedor:h, perdedor:a } : { vencedor:a, perdedor:h };
+    }
+    return null;
   }
   function corrigirSituacaoRankingComJogos() {
     var ranking = (RANKING_DESEMPENHO && RANKING_DESEMPENHO.ranking) || [];
@@ -1082,13 +1099,16 @@
       if (eq) situ[eq] = "Eliminada";
     });
 
-    // Perdedor de mata encerrado é eliminado; vencedor fica classificado salvo se tiver jogo em andamento/futuro.
+    // Status simplificado do Ranking de Desempenho:
+    // - quem perdeu mata-mata encerrado fica Eliminada, inclusive em derrota nos pênaltis;
+    // - quem segue vivo fica Em disputa;
+    // - somente o vencedor da final encerrada vira Campeã.
     JOGOS.forEach(function (j) {
       if (!faseEhMataRank(j) || estadoJogoRank(j) !== "post") return;
       var vp = vencedorPerdedorRank(j);
       if (!vp) return;
       situ[vp.perdedor] = "Eliminada";
-      if (situ[vp.vencedor] !== "Em disputa") situ[vp.vencedor] = "Classificada";
+      situ[vp.vencedor] = String(j.fase || "").toLowerCase() === "final" ? "Campeã" : "Em disputa";
     });
 
     // Quem tem jogo futuro ou ao vivo ainda está em disputa.
@@ -1100,7 +1120,8 @@
 
     ranking.forEach(function (x) {
       var eq = siglaSelecao(x.equipe);
-      if (eq && situ[eq]) x.situacao = situ[eq];
+      if (eq && situ[eq]) x.situacao = normalizarSituacaoRanking(situ[eq]);
+      else x.situacao = normalizarSituacaoRanking(x.situacao);
     });
   }
 

@@ -107,6 +107,15 @@ def score_pair(ev: Dict[str, Any]) -> Tuple[Optional[int], Optional[int]]:
     away = next((c for c in cs if c.get("homeAway") == "away"), cs[1])
     return gr.score_num(home.get("score")), gr.score_num(away.get("score"))
 
+def penalty_pair(ev: Dict[str, Any]) -> Tuple[Optional[int], Optional[int]]:
+    comp = (ev.get("competitions") or [{}])[0]
+    cs = comp.get("competitors") or []
+    if len(cs) < 2:
+        return None, None
+    home = next((c for c in cs if c.get("homeAway") == "home"), cs[0])
+    away = next((c for c in cs if c.get("homeAway") == "away"), cs[1])
+    return gr.penalty_num(home), gr.penalty_num(away)
+
 def winner_loser(ev: Dict[str, Any]) -> Tuple[str, str]:
     h, a = event_teams(ev)
     if not h or not a:
@@ -122,6 +131,10 @@ def winner_loser(ev: Dict[str, Any]) -> Tuple[str, str]:
     hs, ass = score_pair(ev)
     if hs is not None and ass is not None and hs != ass:
         return (h, a) if hs > ass else (a, h)
+    if hs is not None and ass is not None and hs == ass:
+        pen_h, pen_a = penalty_pair(ev)
+        if pen_h is not None and pen_a is not None and pen_h != pen_a:
+            return ((h, a) if pen_h > pen_a else (a, h))
     return "", ""
 
 def detalhes_iter(detalhes: Dict[str, Any]) -> List[Dict[str, Any]]:
@@ -151,7 +164,7 @@ def compute_status(selecoes_ids: List[str], events: List[Dict[str, Any]], target
         if lose:
             status[lose] = "Eliminada"
         if win and status.get(win) != "Eliminada":
-            status[win] = "Classificada"
+            status[win] = "Campeã" if slug == "final" else "Em disputa"
 
     # Jogos pendentes/ao vivo da fase selecionada sinalizam disputa viva.
     for ev in eventos_ordenados(events):
@@ -163,7 +176,7 @@ def compute_status(selecoes_ids: List[str], events: List[Dict[str, Any]], target
         for sig in event_teams(ev):
             if not sig:
                 continue
-            status[sig] = "Em jogo" if st == "in" else "Aguardando jogo"
+            status[sig] = "Em disputa"
 
     # Em fases de mata-mata, quem não está na fase atual e não está classificado
     # depois de um mata anterior fica como eliminado para contexto visual.

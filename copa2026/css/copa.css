@@ -2395,6 +2395,12 @@ h2{font-family:'Anton',sans-serif;font-weight:400;font-size:24px;letter-spacing:
   background:rgba(38,166,91,.18);
   border:1px solid rgba(38,166,91,.38);
 }
+.rank-situacao.campea{
+  color:#1b1300;
+  background:linear-gradient(135deg,#ffd84f,#ffb300);
+  border:1px solid rgba(255,216,79,.72);
+  box-shadow:0 0 0 1px rgba(255,255,255,.08) inset,0 8px 20px rgba(255,194,31,.12);
+}
 .rank-situacao.elim{
   background:rgba(238,94,97,.16);
   border:1px solid rgba(238,94,97,.36);
@@ -3373,7 +3379,7 @@ html{
 .hist-card-team b{display:block;color:#fff;font-size:14px;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hist-card-team span{display:block;margin-top:2px;color:#9fb4d2;font-size:11px;font-weight:750}
 .hist-pos{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border-radius:12px;background:rgba(255,204,41,.16);border:1px solid rgba(255,204,41,.36);color:var(--gold);font-family:'Anton',system-ui,sans-serif;font-size:18px;line-height:1}
 .hist-card-main{position:relative;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin-top:4px}.hist-score b{display:block;color:#fff;font-family:'Anton',system-ui,sans-serif;font-size:32px;line-height:.95;letter-spacing:.02em}.hist-score span{display:block;margin-top:3px;color:#9fb4d2;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.hist-situacao{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:6px 9px;font-size:10.5px;font-weight:950;line-height:1.05;text-align:center;border:1px solid rgba(255,255,255,.12);color:#dce8f8;background:rgba(255,255,255,.06);white-space:nowrap}
-.hist-situacao-class{color:#91f7b5;border-color:rgba(29,185,84,.38);background:rgba(29,185,84,.12)}.hist-situacao-elim{color:#ffaaa5;border-color:rgba(224,71,62,.42);background:rgba(224,71,62,.12)}.hist-situacao-aguard{color:#f7d568;border-color:rgba(255,204,41,.42);background:rgba(255,204,41,.10)}.hist-situacao-live{color:#ffd0d0;border-color:rgba(255,91,99,.48);background:rgba(255,91,99,.13)}
+.hist-situacao-class{color:#91f7b5;border-color:rgba(29,185,84,.38);background:rgba(29,185,84,.12)}.hist-situacao-campea{color:#1b1300;border-color:rgba(255,216,79,.72);background:linear-gradient(135deg,#ffd84f,#ffb300)}.hist-situacao-elim{color:#ffaaa5;border-color:rgba(224,71,62,.42);background:rgba(224,71,62,.12)}.hist-situacao-aguard{color:#f7d568;border-color:rgba(255,204,41,.42);background:rgba(255,204,41,.10)}.hist-situacao-live{color:#ffd0d0;border-color:rgba(255,91,99,.48);background:rgba(255,91,99,.13)}
 .hist-mini{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px}.hist-mini span{display:block;border-radius:10px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);padding:7px 6px;color:#9fb4d2;font-size:9.5px;font-weight:900;text-transform:uppercase;text-align:center}.hist-mini b{display:block;color:#fff;font-size:12px;margin-top:2px;text-transform:none}
 .hist-team-card.hist-class{border-color:rgba(29,185,84,.28)}.hist-team-card.hist-elim{opacity:.84}.hist-team-card.hist-aguard{border-color:rgba(255,204,41,.24)}.hist-team-card.hist-live{border-color:rgba(255,91,99,.30)}
 @media(max-width:720px){.hist-rank-head{flex-direction:column}.hist-rank-controls{grid-template-columns:1fr 1fr}.hist-card-grid{grid-template-columns:1fr}.hist-toggle-btn{padding:14px 13px}.hist-toggle-btn strong{font-size:14px}.hist-rank-box{padding:12px;border-radius:19px}.hist-rank-head h3{font-size:23px}}
