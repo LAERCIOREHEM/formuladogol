@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ao vivo — Brasileirão 2026</title>
+  <meta name="description" content="Acompanhe placar, cronômetro, gols, cartões e estatísticas dos jogos do Brasileirão 2026, com atualização automática a cada 30 segundos.">
+  <link rel="icon" href="favicon.ico">
+  <meta name="theme-color" content="#0a161e">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260712-aovivo-v1">
+  <link rel="stylesheet" href="css/br-global.css?v=20260712-aovivo-v1">
+  <link rel="stylesheet" href="css/br-aovivo.css?v=20260712-aovivo-v1">
+</head>
+<body>
+  <div class="container">
+    <header class="hero" aria-label="Bolão Brasileirão 2026 — Almoço de Sexta">
+      <img src="img/header-br-wide.png" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
+    </header>
+
+    <nav class="nav nav-live-center" aria-label="Menu principal">
+      <a href="./?brasileirao=1&view=jogos" data-br-view="jogos">⚽ Jogos</a>
+      <a href="aovivo.html" class="active" aria-current="page">🔴 Ao vivo</a>
+      <a href="apostas.html">🎯 Apostas</a>
+      <a href="./?brasileirao=1&view=rank" data-br-view="rank">🏆 Bolão</a>
+      <a href="./?brasileirao=1&view=tabela" data-br-view="tabela">📊 Tabela</a>
+      <a href="./?brasileirao=1&view=resultados" data-br-view="resultados">✅ Resultados</a>
+      <a href="estatisticas.html">📈 Estatísticas</a>
+      <a href="clubes.html">🛡️ Clubes</a>
+      <a href="museu.html">🏛️ Museu</a>
+      <a href="regras.html">ℹ️ Regras</a>
+      <a href="./?brasileirao=1&view=aniversariantes" data-br-view="aniversariantes">🎂 Aniversariantes</a>
+      <a href="copa2026/">🏆 Bolão Copa 2026</a>
+      <a href="apostas.html?aba=admin" data-br-admin-link="1">⚙️ Admin</a>
+    </nav>
+
+    <main>
+      <section class="br-live-heading panel">
+        <div class="panel-inner">
+          <div>
+            <div class="kicker">Brasileirão 2026</div>
+            <h1>Ao vivo</h1>
+            <p>Placar, cronômetro, gols, cartões e estatísticas. Consulta direta à ESPN a cada 30 segundos enquanto esta página estiver aberta.</p>
+          </div>
+          <div id="live-update-badge" class="live-update-badge" aria-live="polite">Conectando…</div>
+        </div>
+      </section>
+
+      <div id="live-alert" class="live-alert" role="status" aria-live="polite"></div>
+      <section id="live-switcher" class="live-switcher" aria-label="Escolher partida" hidden></section>
+      <section id="live-app" aria-live="polite">
+        <div class="live-loading panel"><div class="panel-inner">Carregando agenda e dados da partida…</div></div>
+      </section>
+    </main>
+
+    <footer class="site-footer br-disclaimer">
+      <div><span class="footer-title">Bolão Brasileirão 2026 — Almoço de Sexta.</span> Página informativa, privada e sem fins lucrativos. Dados de partidas e estatísticas: ESPN. Escudos, nomes e marcas pertencem aos respectivos titulares.</div>
+      <div class="footer-sugestoes">🔄 A página atualiza sozinha. Em caso de indisponibilidade temporária da fonte, mantém a última informação válida e tenta novamente.</div>
+    </footer>
+  </div>
+
+  <script src="js/br-aovivo.js?v=20260712-aovivo-v1"></script>
+  <script src="js/br-menu.js?v=20260712-aovivo-v1"></script>
+</body>
+</html>

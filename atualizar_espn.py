@@ -46,6 +46,7 @@ URLS_STANDINGS = [
     f"https://site.web.api.espn.com/apis/v2/sports/soccer/bra.1/standings?season={TEMPORADA}",
 ]
 URL_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard"
+ARQ_AJUSTES_CALENDARIO = Path("dados-br/ajustes-calendario.json")
 
 HEADERS = {
     "User-Agent": (
@@ -510,6 +511,122 @@ def carregar_rodadas_legadas() -> dict[tuple[str, str, str], int]:
     return mapa
 
 
+
+def carregar_ajustes_calendario() -> list[dict[str, Any]]:
+    """Lê correções manuais para partidas adiadas/reagendadas.
+
+    O arquivo é deliberadamente pequeno e versionado. Ele só altera jogos cujo
+    event_id ou confronto coincida; qualquer entrada inválida é ignorada com aviso.
+    """
+    if not ARQ_AJUSTES_CALENDARIO.exists():
+        return []
+    try:
+        dados = json.loads(ARQ_AJUSTES_CALENDARIO.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise RuntimeError(f"Falha ao ler {ARQ_AJUSTES_CALENDARIO}: {exc}") from exc
+    ajustes = dados.get("ajustes") or []
+    if not isinstance(ajustes, list):
+        raise RuntimeError(f"{ARQ_AJUSTES_CALENDARIO}: campo ajustes deve ser lista")
+    return [a for a in ajustes if isinstance(a, dict)]
+
+
+def _parse_data_manual_brt(valor: Any) -> datetime | None:
+    if not valor:
+        return None
+    texto = str(valor).strip()
+    try:
+        dt = datetime.fromisoformat(texto.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=FUSO_BRASILIA)
+    return dt.astimezone(FUSO_BRASILIA)
+
+
+def aplicar_ajustes_calendario(eventos: list[dict[str, Any]]) -> None:
+    ajustes = carregar_ajustes_calendario()
+    if not ajustes:
+        return
+    aplicados = 0
+    for ajuste in ajustes:
+        event_id = str(ajuste.get("event_id") or "").strip()
+        mand = para_canonico(ajuste.get("mandante"))
+        vis = para_canonico(ajuste.get("visitante"))
+        alvo = None
+        for e in eventos:
+            bate_id = bool(event_id and str(e.get("event_id") or "") == event_id)
+            bate_jogo = bool(mand and vis and e.get("mandante_nome") == mand and e.get("visitante_nome") == vis)
+            if bate_id or bate_jogo:
+                alvo = e
+                break
+        if alvo is None:
+            print(f"Aviso: ajuste de calendário não encontrou evento: {event_id or (mand + ' x ' + vis if mand and vis else '?')}")
+            continue
+
+        fonte_finalizada = bool(alvo.get("concluido") is True)
+        rodada = ajuste.get("rodada")
+        if rodada not in (None, ""):
+            alvo["rodada"] = int(rodada)
+        alvo["adiado"] = True
+        alvo["ajuste_calendario"] = True
+        alvo["motivo_ajuste"] = str(ajuste.get("motivo") or "").strip()
+
+        if ajuste.get("data_definir") is True:
+            alvo["data_definir"] = True
+            alvo["data_iso"] = None
+            alvo["data_dt"] = None
+            alvo["_sort"] = float("inf")
+        elif ajuste.get("data_iso"):
+            dt = _parse_data_manual_brt(ajuste.get("data_iso"))
+            if not dt:
+                raise RuntimeError(f"Data manual inválida no ajuste {event_id}: {ajuste.get('data_iso')}")
+            alvo["data_definir"] = False
+            alvo["data_dt"] = dt
+            alvo["data_iso"] = dt.strftime("%Y-%m-%dT%H:%M")
+            alvo["_sort"] = dt.timestamp()
+
+        # Depois que a ESPN confirmar o jogo como concluído, preserva placar e
+        # status oficiais. O ajuste continua valendo apenas para rodada/data.
+        campos_estado = ("estado", "status", "placar_mandante", "placar_visitante", "concluido")
+        for campo in ("estadio", "transmissao"):
+            if campo in ajuste and ajuste[campo]:
+                alvo[campo] = ajuste[campo]
+        if not fonte_finalizada:
+            for campo in campos_estado:
+                if campo in ajuste:
+                    alvo[campo] = ajuste[campo]
+        aplicados += 1
+    print(f"Ajustes de calendário aplicados: {aplicados}/{len(ajustes)}")
+
+
+def corrigir_rodadas_segundo_turno(eventos: list[dict[str, Any]]) -> None:
+    """Corrige rodada do returno pela inversão obrigatória do primeiro turno.
+
+    Se A x B ocorreu na rodada N (1..19), B x A deve ocorrer na rodada N+19.
+    Isso elimina deslocamentos ocasionais da ESPN sem inventar confrontos.
+    """
+    ida: dict[tuple[str, str], int] = {}
+    for e in eventos:
+        r = int(e.get("rodada") or 0)
+        if 1 <= r <= 19:
+            ida[(str(e.get("mandante_nome") or ""), str(e.get("visitante_nome") or ""))] = r
+
+    corrigidos = 0
+    for e in eventos:
+        mand = str(e.get("mandante_nome") or "")
+        vis = str(e.get("visitante_nome") or "")
+        r_ida = ida.get((vis, mand))
+        if not r_ida:
+            continue
+        esperado = r_ida + 19
+        atual = int(e.get("rodada") or 0)
+        if atual != esperado and esperado <= 38:
+            e["rodada_corrigida_de"] = atual or None
+            e["rodada"] = esperado
+            corrigidos += 1
+            print(f"Rodada corrigida: {mand} x {vis}: {atual or '?'} -> {esperado}")
+    print(f"Rodadas do segundo turno corrigidas: {corrigidos}")
+
 def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[str, Any]]:
     legadas = carregar_rodadas_legadas()
     normalizados: list[dict[str, Any]] = []
@@ -562,6 +679,8 @@ def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[st
 
     normalizados.sort(key=lambda e: e["_sort"])
     inferir_rodadas_faltantes(normalizados)
+    aplicar_ajustes_calendario(normalizados)
+    corrigir_rodadas_segundo_turno(normalizados)
     normalizados = sanear_eventos_por_rodada(normalizados)
     return normalizados
 
@@ -683,6 +802,8 @@ def payload_jogo(e: dict[str, Any], incluir_placar: bool = True) -> dict[str, An
         "transmissao": e.get("transmissao", ""),
         "status": e.get("status", ""),
         "estado": e.get("estado", "pre"),
+        "adiado": bool(e.get("adiado") is True),
+        "data_definir": bool(e.get("data_definir") is True),
     }
     if incluir_placar:
         obj["placar_mandante"] = e.get("placar_mandante")
@@ -717,21 +838,24 @@ def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]]) -> tupl
         raise RuntimeError("Nenhum evento ESPN foi normalizado; abortando para não publicar JSON vazio.")
 
     agora = agora_brt()
-    futuros = [e for e in eventos if e["data_dt"] >= agora - timedelta(hours=3) and e.get("estado") != "post"]
+    futuros = [
+        e for e in eventos
+        if isinstance(e.get("data_dt"), datetime)
+        and e["data_dt"] >= agora - timedelta(hours=3)
+        and e.get("estado") != "post"
+        and e.get("data_definir") is not True
+    ]
     finalizados = [e for e in eventos if evento_realmente_finalizado(e, agora)]
 
-    # Próximos jogos: mantém leve para a página, mas com pelo menos 2 rodadas
-    # quando possível. Nunca corta no meio da rodada vigente.
+    # Agenda pública por DATA REAL, não por duas rodadas numéricas. Assim jogos
+    # adiados da rodada 4 aparecem no meio da rodada 19 na ordem correta.
     futuros.sort(key=lambda e: e["_sort"])
     proximos: list[dict[str, Any]] = []
     rodadas_usadas: list[int] = []
     if futuros:
-        primeira_rodada = int(futuros[0].get("rodada") or 0)
-        rodadas_alvo = [r for r in sorted({int(e.get("rodada") or 0) for e in futuros}) if r >= primeira_rodada][:2]
-        for e in futuros:
-            if int(e.get("rodada") or 0) in rodadas_alvo:
-                proximos.append(e)
-        if len(proximos) < 10:
+        limite_data = futuros[0]["data_dt"] + timedelta(days=28)
+        proximos = [e for e in futuros if e["data_dt"] <= limite_data][:60]
+        if len(proximos) < min(20, len(futuros)):
             proximos = futuros[:20]
         rodadas_usadas = sorted({int(e.get("rodada") or 0) for e in proximos if e.get("rodada")})
 
@@ -780,6 +904,10 @@ def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]]) -> tupl
                 "concluido": bool(e.get("concluido") is True),
                 "placar_mandante": e.get("placar_mandante"),
                 "placar_visitante": e.get("placar_visitante"),
+                "adiado": bool(e.get("adiado") is True),
+                "data_definir": bool(e.get("data_definir") is True),
+                "rodada_corrigida_de": e.get("rodada_corrigida_de"),
+                "motivo_ajuste": e.get("motivo_ajuste", ""),
             }
             for e in eventos
         ],

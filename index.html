@@ -2108,6 +2108,7 @@ body > .container > section.hero > img {
   </header>
   <nav class="nav" aria-label="Menu principal">
     <button type="button" onclick="setView('jogos')" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</button>
+    <button type="button" onclick="location.href='aovivo.html'" id="btn-aovivo">🔴 Ao vivo</button>
     <button type="button" onclick="location.href='apostas.html'" id="btn-apostas">🎯 Apostas</button>
     <button type="button" onclick="setView('rank')" id="btn-rank" data-br-view="rank">🏆 Bolão</button>
     <button type="button" onclick="setView('tabela')" id="btn-tabela" data-br-view="tabela">📊 Tabela</button>
@@ -3483,7 +3484,7 @@ function renderJogos() {
   const qtdeClubes = clubesPresentes.length;
 
   let html = '<div class="section-title-row">';
-  html += `<div><div class="br-kicker">Agenda e transmissão</div><h2>Jogos${meta.rodada_atual ? ' · Rodada ' + meta.rodada_atual : ''}</h2></div>`;
+  html += `<div><div class="br-kicker">Agenda e transmissão</div><h2>Próximos jogos</h2></div>`;
   if (temLive) {
     html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> ESPN a cada 30s${state._espnLiveUltima ? ' · ' + formatarSomenteHora(state._espnLiveUltima) : ''}</span>`;
   } else if (meta.atualizado_em_br) {
@@ -3561,7 +3562,7 @@ function renderJogos() {
 
       html += `<div class="jogo-card ${clsEstado}">
         <div class="jogo-card-top">
-          <span class="jogo-round-badge">${meta.rodada_atual ? 'Rodada ' + meta.rodada_atual : 'Brasileirão'}</span>
+          <span class="jogo-round-badge">${j.rodada ? 'Rodada ' + j.rodada + (j.adiado ? ' · adiado' : '') : 'Brasileirão'}</span>
           <span class="jogo-hora-pill">${horario}</span>
         </div>
         <div class="jogo-main">
