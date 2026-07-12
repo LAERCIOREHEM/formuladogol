@@ -22,6 +22,8 @@ on:
       - 'scripts/gerar_estatisticas_brasileirao.py'
       - 'scripts/buscar_detalhes_jogos_brasileirao.py'
       - 'scripts/gerar_auditoria_cobertura_resultados.py'
+      - 'scripts/gerar_auditoria_calendario.py'
+      - 'dados-br/ajustes-calendario.json'
       - '.github/workflows/atualizar-brasileirao.yml'
 
 permissions:
@@ -65,6 +67,9 @@ jobs:
         id: espn
         run: python atualizar_espn.py
 
+      - name: Gerar auditoria estrutural do calendário
+        run: python scripts/gerar_auditoria_calendario.py
+
       - name: Buscar estatísticas por jogo finalizado
         run: python scripts/buscar_detalhes_jogos_brasileirao.py
 
@@ -78,7 +83,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/auditoria-cobertura-resultados.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/auditoria-cobertura-resultados.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -119,7 +124,18 @@ jobs:
           assert isinstance(auditoria.get('falhas'), list), 'auditoria-jogos-detalhes.json sem lista falhas'
           cobertura = json.load(open('dados-br/auditoria-cobertura-resultados.json', encoding='utf-8'))
           assert isinstance(cobertura.get('resumo'), dict), 'auditoria-cobertura-resultados.json sem resumo'
-          print('  OK   Estatísticas: 20 clubes, ranking, jogadores, detalhes por jogo e cobertura gerados')
+          calendario = json.load(open('dados-br/auditoria-calendario.json', encoding='utf-8'))
+          assert isinstance(calendario.get('resumo'), dict), 'auditoria-calendario.json sem resumo'
+          resumo_cal = calendario['resumo']
+          assert resumo_cal.get('partidas_mapeadas_calendario_completo') == 380, 'calendário não tem 380 partidas'
+          assert resumo_cal.get('rodadas_com_10_jogos') == 38, 'calendário não tem 38 rodadas íntegras'
+          assert resumo_cal.get('clubes_com_38_jogos') == 20, 'há clube sem 38 jogos'
+          assert resumo_cal.get('confrontos_com_ida_e_volta') == 190, 'ida e volta incompletas'
+          assert resumo_cal.get('rodadas_espn_com_clube_repetido') == 0, 'calendário ESPN com clube repetido na rodada'
+          assert resumo_cal.get('rodadas_returno_incorretas') == 0, 'calendário com rodada incorreta no returno'
+          completo = json.load(open('dados-br/calendario-completo.json', encoding='utf-8'))
+          assert completo.get('total_partidas') == 380, 'calendario-completo.json sem 380 partidas'
+          print('  OK   Estatísticas e auditoria estrutural do calendário geradas')
           PY
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
@@ -147,6 +163,8 @@ jobs:
             "dados-br/jogos-detalhes.json"
             "dados-br/auditoria-jogos-detalhes.json"
             "dados-br/auditoria-cobertura-resultados.json"
+            "dados-br/calendario-completo.json"
+            "dados-br/auditoria-calendario.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
