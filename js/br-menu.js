@@ -1,52 +1,340 @@
+/* ========================================================================== 
+   br-menu.js — menu público/logado e proteção de rotas do Brasileirão 2026
+   --------------------------------------------------------------------------
+   - Visitante: Jogos, Ao vivo, Tabela, Resultados, Estatísticas, Clubes,
+     Museu, Copa 2026, Login e Admin.
+   - Participante validado: acrescenta Apostas, Bolão, Regras e Aniversariantes;
+     o item Login passa a exibir o nome do participante e permite sair.
+   - A sessão local é sempre validada no Supabase antes de liberar área privada.
+   ========================================================================== */
+(function (global, document) {
+  "use strict";
 
-(function () {
-  function centerActive(nav) {
+  var STORAGE_KEY = "brApostasSessaoV2";
+  var PRIVATE_VIEWS = { rank: true, aniversariantes: true };
+  var authState = {
+    pending: true,
+    authenticated: false,
+    usuario: null,
+    token: "",
+    validationError: ""
+  };
+  var readyResolve;
+
+  global.BR_AUTH_READY = new Promise(function (resolve) { readyResolve = resolve; });
+
+  function safeJson(value) {
+    try { return JSON.parse(value || "null"); }
+    catch (_) { return null; }
+  }
+
+  function sessionPayload() {
+    try { return safeJson(global.localStorage.getItem(STORAGE_KEY)); }
+    catch (_) { return null; }
+  }
+
+  function clearStoredSession() {
+    try { global.localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+  }
+
+  function basename() {
+    var path = String(global.location.pathname || "");
+    var last = path.split("/").filter(Boolean).pop() || "";
+    return last.toLowerCase();
+  }
+
+  function currentView() {
+    try { return String(new URLSearchParams(global.location.search || "").get("view") || "").toLowerCase(); }
+    catch (_) { return ""; }
+  }
+
+  function isPrivateRoute() {
+    if (document.body && document.body.getAttribute("data-br-private-page") === "1") return true;
+    var file = basename();
+    if (file === "regras.html") return true;
+    if (file === "" || file === "index.html") return Boolean(PRIVATE_VIEWS[currentView()]);
+    return false;
+  }
+
+  function returnTarget() {
+    var file = basename();
+    if (file === "" || file === "index.html") {
+      var query = global.location.search || "?brasileirao=1&view=jogos";
+      return "./" + query + (global.location.hash || "");
+    }
+    return file + (global.location.search || "") + (global.location.hash || "");
+  }
+
+  function loginUrl(target) {
+    var url = "apostas.html";
+    if (target) url += "?retorno=" + encodeURIComponent(target);
+    return url;
+  }
+
+  function redirectToLogin() {
+    var target = returnTarget();
+    try { global.sessionStorage.setItem("brLoginRetorno", target); } catch (_) {}
+    global.location.replace(loginUrl(target));
+  }
+
+  function supabaseConfig() {
+    var cfg = global.BR_CFG && global.BR_CFG.supabase ? global.BR_CFG.supabase : {};
+    return { url: String(cfg.url || "").replace(/\/$/, ""), key: String(cfg.key || "") };
+  }
+
+  async function validateRemote(sess) {
+    if (!sess || !sess.usuario || !sess.usuario.id || !sess.token) return { valid: false, definitive: true };
+    var cfg = supabaseConfig();
+    if (!cfg.url || !cfg.key) return { valid: false, definitive: false, error: "Configuração do Supabase indisponível." };
+
+    var controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    var timer = controller ? global.setTimeout(function () { controller.abort(); }, 8000) : null;
+    try {
+      var res = await global.fetch(cfg.url + "/rest/v1/rpc/br_validar_sessao", {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+          "apikey": cfg.key,
+          "Authorization": "Bearer " + cfg.key,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          p_participante_id: sess.usuario.id,
+          p_token: sess.token,
+          p_exige_admin: false
+        }),
+        signal: controller ? controller.signal : undefined
+      });
+      if (!res.ok) {
+        var body = "";
+        try { body = await res.text(); } catch (_) {}
+        return { valid: false, definitive: res.status >= 400 && res.status < 500, error: "HTTP " + res.status + (body ? "" : "") };
+      }
+      var data = await res.json();
+      var valid = data === true || (data && data.br_validar_sessao === true);
+      return { valid: Boolean(valid), definitive: true };
+    } catch (err) {
+      return { valid: false, definitive: false, error: err && err.message ? err.message : "Falha ao validar sessão." };
+    } finally {
+      if (timer) global.clearTimeout(timer);
+    }
+  }
+
+  function displayName(usuario) {
+    var nome = String(usuario && (usuario.nome || usuario.login) || "Participante").trim();
+    if (!nome) return "Participante";
+    if (nome.length <= 18) return nome;
+    return nome.split(/\s+/)[0] || nome.slice(0, 18);
+  }
+
+  function centerActive(nav, behavior) {
     if (!nav) return;
-    var active = nav.querySelector('.active');
+    var active = nav.querySelector(".active:not([hidden])");
     if (!active) return;
     var left = active.offsetLeft - (nav.clientWidth / 2) + (active.offsetWidth / 2);
     if (!Number.isFinite(left)) return;
-    try { nav.scrollTo({ left: Math.max(0, left), behavior: 'smooth' }); }
-    catch (e) { nav.scrollLeft = Math.max(0, left); }
+    try { nav.scrollTo({ left: Math.max(0, left), behavior: behavior || "smooth" }); }
+    catch (_) { nav.scrollLeft = Math.max(0, left); }
+  }
+
+  function updateAuthItem(item) {
+    if (!item) return;
+    if (authState.authenticated) {
+      var nome = displayName(authState.usuario);
+      item.textContent = "👤 " + nome;
+      item.setAttribute("title", "Participante: " + String(authState.usuario.nome || nome) + " — clique para sair");
+      item.setAttribute("aria-label", "Participante " + nome + ". Clique para sair");
+      item.setAttribute("href", "#sair");
+      item.classList.remove("active");
+      item.removeAttribute("aria-current");
+      item.dataset.brLogged = "1";
+    } else {
+      item.textContent = "🔐 Login";
+      item.setAttribute("title", "Entrar na área do participante");
+      item.setAttribute("aria-label", "Login da área do participante");
+      item.setAttribute("href", "apostas.html");
+      delete item.dataset.brLogged;
+      if (basename() === "apostas.html") {
+        item.classList.add("active");
+        item.setAttribute("aria-current", "page");
+      } else {
+        item.classList.remove("active");
+        item.removeAttribute("aria-current");
+      }
+    }
+  }
+
+  function applyMenu(nav) {
+    if (!nav) return;
+    Array.prototype.forEach.call(nav.querySelectorAll("[data-br-private]"), function (item) {
+      item.hidden = !authState.authenticated;
+      item.setAttribute("aria-hidden", authState.authenticated ? "false" : "true");
+      if (!authState.authenticated) item.classList.remove("active");
+    });
+
+    updateAuthItem(nav.querySelector("[data-br-auth-link]"));
+    nav.dataset.brAuthReady = "1";
+    nav.style.visibility = "visible";
+    global.setTimeout(function () { centerActive(nav, "auto"); }, 20);
+    global.setTimeout(function () { centerActive(nav, "smooth"); }, 180);
+  }
+
+  function applyAllMenus() {
+    Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), applyMenu);
+  }
+
+  function revealPage() {
+    document.documentElement.classList.remove("br-private-pending");
+  }
+
+  function publishState() {
+    global.BR_AUTH.pending = authState.pending;
+    global.BR_AUTH.authenticated = authState.authenticated;
+    global.BR_AUTH.usuario = authState.usuario;
+    global.BR_AUTH.validationError = authState.validationError;
+  }
+
+  function dispatchReady() {
+    try {
+      document.dispatchEvent(new CustomEvent("br:auth-ready", { detail: {
+        authenticated: authState.authenticated,
+        usuario: authState.usuario,
+        validationError: authState.validationError
+      }}));
+    } catch (_) {}
+  }
+
+  function finishAuth(next) {
+    authState.pending = false;
+    authState.authenticated = Boolean(next && next.authenticated);
+    authState.usuario = authState.authenticated ? next.usuario : null;
+    authState.token = authState.authenticated ? next.token : "";
+    authState.validationError = String(next && next.validationError || "");
+    publishState();
+
+    if (!authState.authenticated && isPrivateRoute()) {
+      redirectToLogin();
+      return;
+    }
+
+    applyAllMenus();
+    revealPage();
+    dispatchReady();
+    if (readyResolve) {
+      readyResolve({ authenticated: authState.authenticated, usuario: authState.usuario, validationError: authState.validationError });
+      readyResolve = null;
+    }
+  }
+
+  async function refreshAuth() {
+    authState.pending = true;
+    publishState();
+    var sess = sessionPayload();
+    if (!sess || !sess.usuario || !sess.token) {
+      finishAuth({ authenticated: false });
+      return false;
+    }
+
+    var result = await validateRemote(sess);
+    if (result.valid) {
+      finishAuth({ authenticated: true, usuario: sess.usuario, token: sess.token });
+      return true;
+    }
+
+    if (result.definitive) clearStoredSession();
+    finishAuth({ authenticated: false, validationError: result.error || "Sessão inválida ou expirada." });
+    return false;
+  }
+
+  function logout() {
+    var sair = true;
+    try { sair = global.confirm("Sair da área do participante?"); } catch (_) {}
+    if (!sair) return;
+    clearStoredSession();
+    authState.pending = false;
+    authState.authenticated = false;
+    authState.usuario = null;
+    authState.token = "";
+    authState.validationError = "";
+    publishState();
+    try { document.dispatchEvent(new CustomEvent("br:session-changed", { detail: { authenticated: false } })); } catch (_) {}
+
+    if (isPrivateRoute()) {
+      global.location.replace("./?brasileirao=1&view=jogos");
+      return;
+    }
+    if (basename() === "apostas.html") {
+      global.location.replace("apostas.html");
+      return;
+    }
+    applyAllMenus();
   }
 
   function wireNav(nav) {
-    if (!nav || nav.dataset.brMenuReady === '1') return;
-    nav.dataset.brMenuReady = '1';
-    setTimeout(function () { centerActive(nav); }, 80);
-    setTimeout(function () { centerActive(nav); }, 450);
+    if (!nav || nav.dataset.brMenuReady === "1") return;
+    nav.dataset.brMenuReady = "1";
 
-    nav.addEventListener('click', function (ev) {
-      var el = ev.target && ev.target.closest ? ev.target.closest('a,button') : null;
+    nav.addEventListener("click", function (ev) {
+      var el = ev.target && ev.target.closest ? ev.target.closest("a,button") : null;
       if (!el) return;
-      var view = el.getAttribute('data-br-view');
-      if (view) {
-        try { sessionStorage.setItem('brViewInicial', view); } catch (e) {}
+
+      if (el.hasAttribute("data-br-auth-link")) {
+        if (authState.authenticated) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          logout();
+        } else if (String(el.tagName || "").toLowerCase() === "button") {
+          ev.preventDefault();
+          global.location.href = el.getAttribute("href") || "apostas.html";
+        }
+        return;
       }
-      setTimeout(function () { centerActive(nav); }, 120);
+
+      var view = el.getAttribute("data-br-view");
+      if (view) {
+        try { global.sessionStorage.setItem("brViewInicial", view); } catch (_) {}
+      }
+      global.setTimeout(function () { centerActive(nav); }, 100);
     });
 
     var obs = new MutationObserver(function (mutations) {
-      for (var i = 0; i < mutations.length; i++) {
-        if (mutations[i].attributeName === 'class') {
-          setTimeout(function () { centerActive(nav); }, 30);
+      for (var i = 0; i < mutations.length; i += 1) {
+        if (mutations[i].attributeName === "class" || mutations[i].attributeName === "hidden") {
+          global.setTimeout(function () { centerActive(nav); }, 30);
           break;
         }
       }
     });
-    Array.prototype.forEach.call(nav.querySelectorAll('a,button'), function (item) {
-      obs.observe(item, { attributes: true, attributeFilter: ['class'] });
+    Array.prototype.forEach.call(nav.querySelectorAll("a,button"), function (item) {
+      obs.observe(item, { attributes: true, attributeFilter: ["class", "hidden"] });
     });
   }
 
-  function init() {
-    Array.prototype.forEach.call(document.querySelectorAll('.nav'), wireNav);
+  function wireAllMenus() {
+    Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), wireNav);
   }
 
-  window.BR_CENTER_ACTIVE_NAV = function () {
-    Array.prototype.forEach.call(document.querySelectorAll('.nav'), centerActive);
+  global.BR_AUTH = {
+    pending: true,
+    authenticated: false,
+    usuario: null,
+    validationError: "",
+    refresh: refreshAuth,
+    logout: logout,
+    requireLogin: function (target) { global.location.href = loginUrl(target || returnTarget()); },
+    isPrivateView: function (view) { return Boolean(PRIVATE_VIEWS[String(view || "").toLowerCase()]); }
   };
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  global.BR_CENTER_ACTIVE_NAV = function () {
+    Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), function (nav) { centerActive(nav); });
+  };
+
+  function init() {
+    wireAllMenus();
+    refreshAuth();
+  }
+
+  document.addEventListener("br:session-changed", function () { refreshAuth(); });
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();
-})();
+})(window, document);

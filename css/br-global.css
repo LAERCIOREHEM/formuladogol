@@ -578,3 +578,30 @@ body > .container > section.hero > img {
     object-position: center center !important;
   }
 }
+
+/* ======================================================================
+   MENU PÚBLICO / PARTICIPANTE — 20260712
+   O menu só aparece depois de a sessão local ser validada no Supabase.
+   Rotas privadas ficam invisíveis até a validação terminar, evitando flash
+   de ranking, regras ou aniversariantes antes do redirecionamento ao login.
+   ====================================================================== */
+.nav[data-br-auth-menu] {
+  visibility: hidden;
+}
+.nav[data-br-auth-menu][data-br-auth-ready="1"] {
+  visibility: visible;
+}
+html.br-private-pending body {
+  visibility: hidden !important;
+}
+.nav [hidden] {
+  display: none !important;
+}
+.nav [data-br-auth-link] {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 560px) {
+  .nav [data-br-auth-link] { max-width: 155px; }
+}

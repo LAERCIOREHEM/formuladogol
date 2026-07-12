@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="br-private-pending">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,24 +7,25 @@
 <meta name="theme-color" content="#10b981">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="stylesheet" href="css/br-apostas.css?v=20260707-header-web-menu-final">
-<link rel="stylesheet" href="css/br-global.css?v=20260707-header-web-menu-final">
+<link rel="stylesheet" href="css/br-global.css?v=20260712-menu-publico-login-v1">
 </head>
-<body>
+<body data-br-private-page="1">
   <main class="container">
     <section class="hero"><img src="img/header-br-wide.png" alt="Brasileirão 2026 — Bolão Almoço de Sexta"></section>
-    <nav class="nav" aria-label="Menu principal">
+    <nav class="nav" data-br-auth-menu aria-label="Menu principal">
       <a href="./?brasileirao=1&view=jogos" data-br-view="jogos">⚽ Jogos</a>
       <a href="aovivo.html">🔴 Ao vivo</a>
-      <a href="apostas.html">🎯 Apostas</a>
-      <a href="./?brasileirao=1&view=rank" data-br-view="rank">🏆 Bolão</a>
+      <a href="apostas.html" data-br-private hidden>🎯 Apostas</a>
+      <a href="./?brasileirao=1&view=rank" data-br-view="rank" data-br-private hidden>🏆 Bolão</a>
       <a href="./?brasileirao=1&view=tabela" data-br-view="tabela">📊 Tabela</a>
       <a href="./?brasileirao=1&view=resultados" data-br-view="resultados">✅ Resultados</a>
       <a href="estatisticas.html">📈 Estatísticas</a>
       <a href="clubes.html">🛡️ Clubes</a>
       <a href="museu.html">🏛️ Museu</a>
-      <a href="regras.html" class="active">ℹ️ Regras</a>
-      <a href="./?brasileirao=1&view=aniversariantes" data-br-view="aniversariantes">🎂 Aniversariantes</a>
-      <a href="copa2026/">🏆 Bolão Copa 2026</a>
+      <a href="regras.html" data-br-private hidden class="active" aria-current="page">ℹ️ Regras</a>
+      <a href="./?brasileirao=1&view=aniversariantes" data-br-view="aniversariantes" data-br-private hidden>🎂 Aniversariantes</a>
+      <a href="copa2026/">🌎 Copa 2026</a>
+      <a href="apostas.html" data-br-auth-link>🔐 Login</a>
       <a href="apostas.html?aba=admin" data-br-admin-link="1">⚙️ Admin</a>
     </nav>
 
@@ -112,6 +113,7 @@
       <div class="footer-sugestoes">💬 Sugestões, correções, pedidos de remoção de foto, reclamações de propriedade intelectual ou qualquer reivindicação sobre imagem/conteúdo: fale com o administrador do grupo pelo WhatsApp. A análise será feita de boa-fé e o conteúdo poderá ser ajustado ou removido.</div>
     </footer>
   </main>
-<script src="js/br-menu.js?v=20260707-header-web-menu-final"></script>
+<script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
+<script src="js/br-menu.js?v=20260712-menu-publico-login-v1"></script>
 </body>
 </html>

@@ -49,6 +49,16 @@
 <!-- Descrição geral para SEO -->
 <meta name="description" content="Site do bolão do Campeonato Brasileiro 2026 entre amigos. Veja ranking, classificação, próximos jogos e resultados.">
 
+<script>
+  (function () {
+    try {
+      var view = String(new URLSearchParams(location.search || '').get('view') || '').toLowerCase();
+      if (view === 'rank' || view === 'aniversariantes') {
+        document.documentElement.classList.add('br-private-pending');
+      }
+    } catch (_) {}
+  })();
+</script>
 <style>
   :root {
     --bg: #0f1419;
@@ -2079,7 +2089,7 @@ body > .container > section.hero > img {
   }
 
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260707-header-web-menu-final">
+<link rel="stylesheet" href="css/br-global.css?v=20260712-menu-publico-login-v1">
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
@@ -2106,19 +2116,20 @@ body > .container > section.hero > img {
       <img src="img/header-br-wide.png" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
     </div>
   </header>
-  <nav class="nav" aria-label="Menu principal">
+  <nav class="nav" data-br-auth-menu aria-label="Menu principal">
     <button type="button" onclick="setView('jogos')" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</button>
     <button type="button" onclick="location.href='aovivo.html'" id="btn-aovivo">🔴 Ao vivo</button>
-    <button type="button" onclick="location.href='apostas.html'" id="btn-apostas">🎯 Apostas</button>
-    <button type="button" onclick="setView('rank')" id="btn-rank" data-br-view="rank">🏆 Bolão</button>
+    <button type="button" onclick="location.href='apostas.html'" id="btn-apostas" data-br-private hidden>🎯 Apostas</button>
+    <button type="button" onclick="setView('rank')" id="btn-rank" data-br-view="rank" data-br-private hidden>🏆 Bolão</button>
     <button type="button" onclick="setView('tabela')" id="btn-tabela" data-br-view="tabela">📊 Tabela</button>
     <button type="button" onclick="setView('resultados')" id="btn-resultados" data-br-view="resultados">✅ Resultados</button>
     <button type="button" onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
     <button type="button" onclick="location.href='clubes.html'" id="btn-clubes">🛡️ Clubes</button>
     <button type="button" onclick="location.href='museu.html'" id="btn-museu">🏛️ Museu</button>
-    <button type="button" onclick="location.href='regras.html'" id="btn-regras">ℹ️ Regras</button>
-    <button type="button" onclick="setView('aniversariantes')" id="btn-aniversariantes" data-br-view="aniversariantes">🎂 Aniversariantes</button>
-    <button type="button" onclick="location.href='copa2026/'" id="btn-copa">🏆 Bolão Copa 2026</button>
+    <button type="button" onclick="location.href='regras.html'" id="btn-regras" data-br-private hidden>ℹ️ Regras</button>
+    <button type="button" onclick="setView('aniversariantes')" id="btn-aniversariantes" data-br-view="aniversariantes" data-br-private hidden>🎂 Aniversariantes</button>
+    <button type="button" onclick="location.href='copa2026/'" id="btn-copa">🌎 Copa 2026</button>
+    <button type="button" id="btn-login" data-br-auth-link>🔐 Login</button>
     <button type="button" onclick="adminAction()" id="btn-admin">⚙️ Admin</button>
   </nav>
 
@@ -2699,10 +2710,15 @@ async function inicializar() {
   // (?brasileirao=1&view=tabela) ou por sessionStorage (fallback para links antigos).
   const paramsInit = new URLSearchParams(location.search || '');
   const viewParam = paramsInit.get('view');
-  const viewInicial = viewParam || sessionStorage.getItem('brViewInicial');
+  const viewSessao = sessionStorage.getItem('brViewInicial');
+  const viewInicial = viewParam || viewSessao;
   if (viewInicial) {
     sessionStorage.removeItem('brViewInicial');
-    if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes'].includes(viewInicial)) {
+    const privada = viewInicial === 'rank' || viewInicial === 'aniversariantes';
+    // Views privadas só podem ser abertas por URL explícita, que passa pelo
+    // guard de sessão. Isso impede que um valor antigo/manipulado no
+    // sessionStorage exponha ranking ou aniversariantes no carregamento.
+    if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes'].includes(viewInicial) && (!privada || Boolean(viewParam))) {
       state.view = viewInicial;
     }
   }
@@ -2945,6 +2961,15 @@ function render() {
 }
 
 function setView(v) {
+  if ((v === 'rank' || v === 'aniversariantes') && !(window.BR_AUTH && window.BR_AUTH.authenticated)) {
+    const alvo = `./?brasileirao=1&view=${encodeURIComponent(v)}`;
+    if (window.BR_AUTH && typeof window.BR_AUTH.requireLogin === 'function') {
+      window.BR_AUTH.requireLogin(alvo);
+    } else {
+      location.href = `apostas.html?retorno=${encodeURIComponent(alvo)}`;
+    }
+    return;
+  }
   state.view = v;
   if (v !== 'em-breve') state.futuroModulo = null;
   if (v === 'jogos' && !state.jogosCarregados) {
@@ -4699,10 +4724,11 @@ function fecharEditorToken() {
 // ========================================================================
 inicializar();
 
-// Verifica aniversariantes do dia após inicialização
-setTimeout(() => {
+// Verifica aniversariantes somente para participante com sessão validada.
+setTimeout(async () => {
   try {
-    mostrarPopupAniversario();
+    const auth = window.BR_AUTH_READY ? await window.BR_AUTH_READY : { authenticated: false };
+    if (auth && auth.authenticated) mostrarPopupAniversario();
   } catch (e) {
     console.error('Erro ao verificar aniversariantes:', e);
   }
@@ -4721,6 +4747,7 @@ setTimeout(() => {
     }
   })();
 </script>
-<script src="js/br-menu.js?v=20260707-header-web-menu-final"></script>
+<script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
+<script src="js/br-menu.js?v=20260712-menu-publico-login-v1"></script>
 </body>
 </html>

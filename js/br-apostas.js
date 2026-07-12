@@ -289,16 +289,62 @@
     catch (_) { return null; }
   }
 
+  function notifySessionChanged(authenticated) {
+    try {
+      document.dispatchEvent(new CustomEvent("br:session-changed", {
+        detail: { authenticated: Boolean(authenticated), usuario: authenticated ? state.usuario : null }
+      }));
+    } catch (_) {}
+  }
+
   function saveSession(usuario, token) {
     state.usuario = usuario;
     state.token = token;
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ usuario, token, salvo_em: new Date().toISOString() }));
+    notifySessionChanged(true);
   }
 
   function clearSession() {
     state.usuario = null;
     state.token = "";
     localStorage.removeItem(STORAGE_KEY);
+    notifySessionChanged(false);
+  }
+
+  async function validarSessaoAtual() {
+    if (!state.usuario || !state.usuario.id || !state.token || !state.supabase) return false;
+    try {
+      const rows = await rpcRows("br_validar_sessao", {
+        p_participante_id: state.usuario.id,
+        p_token: state.token,
+        p_exige_admin: false
+      });
+      const ok = rows[0] === true || Boolean(rows[0] && rows[0].br_validar_sessao === true);
+      if (!ok) clearSession();
+      return ok;
+    } catch (err) {
+      console.warn("Não foi possível validar a sessão salva.", err);
+      clearSession();
+      return false;
+    }
+  }
+
+  function retornoSeguroAposLogin() {
+    try {
+      const params = new URLSearchParams(global.location.search || "");
+      const raw = params.get("retorno") || sessionStorage.getItem("brLoginRetorno") || "";
+      if (!raw) return "";
+      const url = new URL(raw, global.location.href);
+      if (url.origin !== global.location.origin) return "";
+      const file = url.pathname.split("/").filter(Boolean).pop() || "";
+      const view = String(url.searchParams.get("view") || "").toLowerCase();
+      const permitido = file === "regras.html" || ((file === "" || file === "index.html") && ["rank", "aniversariantes"].includes(view));
+      if (!permitido) return "";
+      sessionStorage.removeItem("brLoginRetorno");
+      return url.pathname + url.search + url.hash;
+    } catch (_) {
+      return "";
+    }
   }
 
   function rpcRows(name, args) {
@@ -1440,6 +1486,11 @@
       if (!u || !u.token) throw new Error("Login não retornou sessão válida.");
       saveSession({ id: u.id || u.participante_id, nome: u.nome, login: u.login, admin: Boolean(u.admin) }, u.token);
       status(`Bem-vindo, ${u.nome}.`, "ok");
+      const retorno = retornoSeguroAposLogin();
+      if (retorno) {
+        global.location.replace(retorno);
+        return;
+      }
       await refresh();
     } catch (err) {
       console.error(err);
@@ -1469,8 +1520,13 @@
       state.token = sess.token;
     }
     if (!state.supabase) {
+      clearSession();
       status("Supabase não inicializado. Confira js/br-config.js.", "err");
-    } else if (!state.usuario) {
+    } else if (state.usuario) {
+      status("Validando sessão salva...", "warn");
+      await validarSessaoAtual();
+    }
+    if (!state.usuario && state.supabase) {
       status("Entre com usuário e PIN para apostar.", "warn");
     }
     await refresh();
