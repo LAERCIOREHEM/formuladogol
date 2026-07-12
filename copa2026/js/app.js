@@ -925,18 +925,21 @@ async function carregarOficialAtual(force) {
     const sb = new Set(b || []);
     return (a || []).filter(x => sb.has(x));
   }
-  function fasePontuacaoAtiva(key, o) {
-    const ap = (o && o._apurarMata) || {};
-    if (key === "classificados32" || key === "melhores_terceiros") return true;
-    if (key === "avancam_oitavas") return !!ap.oitavas;
-    if (key === "avancam_quartas") return !!ap.quartas;
-    if (key === "semifinalistas") return !!ap.semis;
-    if (key === "finalistas") return !!ap.final;
-    return true;
-  }
   function linhaExtratoMP(label, pts, tipo) {
     const sinal = pts > 0 ? "+" : "";
     return `<div class="mp-ex-row ${tipo || ""}"><span>${label}</span><b>${sinal}${pts}</b></div>`;
+  }
+  function podioPerdidoMeuPalpite(p, o, key) {
+    const id = p && p[key];
+    if (!id || !o) return false;
+    const dec = o.decididos || {};
+    if (dec[key]) return o[key] !== id;
+    const eliminados = new Set(o.eliminados || []);
+    if (!eliminados.has(id)) return false;
+    const semiLosers = new Set(o._semiLosers || []);
+    // Perdedor da semifinal segue vivo para 3º/4º até o jogo de terceiro lugar.
+    if ((key === "terceiro" || key === "quarto") && semiLosers.has(id) && !dec.terceiro && !dec.quarto) return false;
+    return true;
   }
   function extratoPontuacaoMeuPalpite(p, o, r) {
     if (!o || !o._meta) {
@@ -999,7 +1002,6 @@ async function carregarOficialAtual(force) {
     no(`${e4} quartos de grupo errados (×${PTS.ultGrupo})`, e4 * PTS.ultGrupo);
 
     function perdMata(key, oficiais, peso, rotulo) {
-      if (!fasePontuacaoAtiva(key, o)) return;
       const conf = new Set(oficiais || []);
       const ids = (p[key] || []).filter(id => eliminados.has(id) && !conf.has(id));
       if (ids.length) no(`${ids.length} ${rotulo} (×${peso}): ${ids.map(nomeTime).join(", ")}`, ids.length * peso);
@@ -1009,10 +1011,10 @@ async function carregarOficialAtual(force) {
     perdMata("semifinalistas", o.semifinalistas, PTS.semi, "semifinalistas perdidos");
     perdMata("finalistas", o.finalistas, PTS.final, "finalistas perdidos");
 
-    if (o.decididos && o.decididos.campeao && p.campeao && p.campeao !== o.campeao) no(`Campeão errado: ${nomeTime(p.campeao)}`, PTS.campeao);
-    if (o.decididos && o.decididos.vice && p.vice && p.vice !== o.vice) no(`Vice errado: ${nomeTime(p.vice)}`, PTS.vice);
-    if (o.decididos && o.decididos.terceiro && p.terceiro && p.terceiro !== o.terceiro) no(`3º lugar errado: ${nomeTime(p.terceiro)}`, PTS.terceiro);
-    if (o.decididos && o.decididos.quarto && p.quarto && p.quarto !== o.quarto) no(`4º lugar errado: ${nomeTime(p.quarto)}`, PTS.quarto);
+    if (podioPerdidoMeuPalpite(p, o, "campeao")) no(`Campeão já caiu: ${nomeTime(p.campeao)}`, PTS.campeao);
+    if (podioPerdidoMeuPalpite(p, o, "vice")) no(`Vice já caiu: ${nomeTime(p.vice)}`, PTS.vice);
+    if (podioPerdidoMeuPalpite(p, o, "terceiro")) no(`3º lugar já caiu: ${nomeTime(p.terceiro)}`, PTS.terceiro);
+    if (podioPerdidoMeuPalpite(p, o, "quarto")) no(`4º lugar já caiu: ${nomeTime(p.quarto)}`, PTS.quarto);
 
     const okHTML = linhasOk.length ? linhasOk.join("") : linhaExtratoMP("Ainda sem pontos conquistados", 0, "");
     const noHTML = linhasNo.length ? linhasNo.join("") : linhaExtratoMP("Nenhum ponto perdido até agora", 0, "");

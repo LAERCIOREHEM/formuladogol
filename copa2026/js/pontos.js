@@ -391,21 +391,13 @@
     }).join("");
   }
 
-  function fasePalpiteAtiva(key, o) {
-    const ap = (o && o._apurarMata) || {};
-    if (key === "classificados32") return true;
-    if (key === "avancam_oitavas") return !!ap.oitavas;
-    if (key === "avancam_quartas") return !!ap.quartas;
-    if (key === "semifinalistas") return !!ap.semis;
-    if (key === "finalistas") return !!ap.final;
-    return true;
-  }
   function statusFasePalpite(id, key, o) {
     const oficiais = new Set(o[key] || []);
     if (oficiais.has(id)) return "ok";
-    // Visual alinhado ao motor: fases futuras ainda ficam possíveis até entrarem em apuração.
+    // Caiu em campo, perdeu imediatamente qualquer fase futura que dependia dela.
+    // A ampulheta é reservada somente a seleções que ainda estão vivas no torneio.
+    if ((o.eliminados || []).indexOf(id) !== -1) return "no";
     if (key === "classificados32" && o.classificados32 && o.classificados32.length && o.classificados32.indexOf(id) === -1) return "no";
-    if (fasePalpiteAtiva(key, o) && (o.eliminados || []).indexOf(id) !== -1) return "no";
     return "pend";
   }
   function chipFasePalpite(id, key, o) {
@@ -436,7 +428,7 @@
         let cls = "gg-pend", ico = "⏳";
         if (o.decididos && o.decididos[key]) {
           const ok = o[key] === id; cls = ok ? "gg-ok" : "gg-no"; ico = ok ? "✅" : "❌";
-        } else if ((o.eliminados || []).indexOf(id) !== -1 && key !== "terceiro" && key !== "quarto") {
+        } else if (podioJaCaiu(p, o, key)) {
           cls = "gg-no"; ico = "❌";
         }
         return `<span class="gg-cel ${cls}"><i>${lab}</i> ${flag(id)} ${id} ${ico}</span>`;
@@ -801,7 +793,6 @@
     // mata-mata perdido (só no oficial, quando fases já decididas):
     // cada seleção apostada para uma fase que já caiu antes dela debita o peso daquela fase.
     const perdMata = (key, oficiais, peso, rotulo) => {
-      if (!fasePalpiteAtiva(key, o)) return;
       const conf = new Set(oficiais || []);
       const ids = (p[key] || []).filter(id => elim.has(id) && !conf.has(id));
       if (ids.length) prow(`${ids.length} ${rotulo} (×${peso}): ${ids.map(id => nome(id)).join(", ")}`, ids.length * peso);
@@ -811,10 +802,10 @@
     perdMata("semifinalistas", o.semifinalistas, P.semi, "seleções não chegaram à semifinal");
     perdMata("finalistas", o.finalistas, P.final, "seleções não chegaram à final");
     // títulos cuja seleção já caiu
-    if (p.campeao && elim.has(p.campeao)) prow(`Campeão (${nome(p.campeao)}) já caiu`, P.campeao);
-    if (p.vice && elim.has(p.vice)) prow(`Vice (${nome(p.vice)}) já caiu`, P.vice);
-    if (p.terceiro && elim.has(p.terceiro)) prow(`3º lugar (${nome(p.terceiro)}) já caiu`, P.terceiro);
-    if (p.quarto && elim.has(p.quarto)) prow(`4º lugar (${nome(p.quarto)}) já caiu`, P.quarto);
+    if (podioJaCaiu(p, o, "campeao")) prow(`Campeão (${nome(p.campeao)}) já caiu`, P.campeao);
+    if (podioJaCaiu(p, o, "vice")) prow(`Vice (${nome(p.vice)}) já caiu`, P.vice);
+    if (podioJaCaiu(p, o, "terceiro")) prow(`3º lugar (${nome(p.terceiro)}) já caiu`, P.terceiro);
+    if (podioJaCaiu(p, o, "quarto")) prow(`4º lugar (${nome(p.quarto)}) já caiu`, P.quarto);
     const perdHTML = perd.length ? perd.join("") : '<div class="exb-row"><span class="exb-d">Nada perdido na foto de hoje 🎉</span><span class="exb-p">0</span></div>';
 
     // SEGUNDO NÍVEL: detalhe por grupo (1º/2º/3º/4º com ✅/❌)
