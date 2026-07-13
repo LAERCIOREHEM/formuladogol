@@ -4283,6 +4283,20 @@ function fecharEditor() {
 // ========================================================================
 // ANIVERSÁRIOS — pop-up e banner do dia
 // ========================================================================
+function participanteBrasileiraoLogado() {
+  return Boolean(window.BR_AUTH && window.BR_AUTH.authenticated);
+}
+
+function limparAvisosAniversario() {
+  const banner = document.getElementById('banner-aniversario');
+  if (banner) banner.remove();
+
+  const modalContainer = document.getElementById('modal-container');
+  if (modalContainer && modalContainer.querySelector('[data-modal-aniversario="1"]')) {
+    modalContainer.innerHTML = '';
+  }
+}
+
 async function carregarMembrosDoServidor() {
   // Tenta baixar membros.json do servidor.
   // Se sucesso e for diferente do localStorage, atualiza.
@@ -4296,9 +4310,10 @@ async function carregarMembrosDoServidor() {
     if (JSON.stringify(membros) !== JSON.stringify(state.membros)) {
       state.membros = membros;
       salvarMembros();
-      // Re-renderiza banner e pop-up se aplicável
+      // Re-renderiza somente para participante com sessão validada.
       try {
-        mostrarPopupAniversario();
+        if (participanteBrasileiraoLogado()) mostrarPopupAniversario();
+        else limparAvisosAniversario();
       } catch (e) {}
     }
   } catch (e) {
@@ -4331,6 +4346,11 @@ function linkWhatsAppParabens(nome) {
 
 
 function mostrarPopupAniversario() {
+  if (!participanteBrasileiraoLogado()) {
+    limparAvisosAniversario();
+    return;
+  }
+
   const anivAlmoco = aniversariantesDeHoje();
   if (anivAlmoco.length === 0) return;
 
@@ -4372,7 +4392,7 @@ function mostrarPopupAniversario() {
   conteudo += '<button class="btn" onclick="fecharPopupAniversario()" style="margin-top: 4px; padding: 8px 20px;">Fechar</button>';
   conteudo += '</div>';
 
-  const html = `<div class="modal-backdrop" onclick="if(event.target===this)fecharPopupAniversario()">
+  const html = `<div class="modal-backdrop" data-modal-aniversario="1" onclick="if(event.target===this)fecharPopupAniversario()">
     <div class="modal" style="max-width: 460px;">${conteudo}</div>
   </div>`;
   document.getElementById('modal-container').innerHTML = html;
@@ -4389,6 +4409,11 @@ function fecharPopupAniversario() {
 }
 
 function renderBannerAniversario(anivAlmoco) {
+  if (!participanteBrasileiraoLogado()) {
+    limparAvisosAniversario();
+    return;
+  }
+
   // Renderiza banner permanente no topo do site (acima da status-bar)
   const containerExistente = document.getElementById('banner-aniversario');
   if (containerExistente) containerExistente.remove();
@@ -4420,6 +4445,10 @@ function renderBannerAniversario(anivAlmoco) {
 }
 
 function abrirPopupAniversarioForcado() {
+  if (!participanteBrasileiraoLogado()) {
+    limparAvisosAniversario();
+    return;
+  }
   // Força a abertura do pop-up mesmo já tendo sido fechado hoje
   localStorage.removeItem('popup_aniv_data');
   mostrarPopupAniversario();
@@ -4862,15 +4891,25 @@ function fecharEditorToken() {
 // ========================================================================
 inicializar();
 
-// Verifica aniversariantes somente para participante com sessão validada.
-setTimeout(async () => {
+// Aniversários são informação privada: só aparecem após sessão remota validada.
+async function sincronizarAvisosAniversarioComSessao() {
   try {
-    const auth = window.BR_AUTH_READY ? await window.BR_AUTH_READY : { authenticated: false };
+    const auth = window.BR_AUTH_READY ? await window.BR_AUTH_READY : window.BR_AUTH;
     if (auth && auth.authenticated) mostrarPopupAniversario();
+    else limparAvisosAniversario();
   } catch (e) {
+    limparAvisosAniversario();
     console.error('Erro ao verificar aniversariantes:', e);
   }
-}, 800);
+}
+
+document.addEventListener('br:auth-ready', sincronizarAvisosAniversarioComSessao);
+document.addEventListener('br:session-changed', (event) => {
+  const autenticado = Boolean(event && event.detail && event.detail.authenticated);
+  if (autenticado) mostrarPopupAniversario();
+  else limparAvisosAniversario();
+});
+setTimeout(sincronizarAvisosAniversarioComSessao, 800);
 </script>
 <script>
   /* Mostra o botão da Copa no menu durante o período (quando você está
