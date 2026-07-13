@@ -3,15 +3,9 @@
    Atualização direta da ESPN a cada 30s, sem tocar no módulo copa2026.
    ====================================================================== */
 
-/* Espaço de borda apenas nesta página: permite centralizar até o 2º item
-   sem alterar o overflow, o toque ou o scroll dos menus das demais páginas. */
-.nav.nav-live-center::before,
-.nav.nav-live-center::after {
-  content: "";
-  flex: 0 0 50%;
-  width: 50%;
-  pointer-events: none;
-}
+/* O menu usa a mesma estrutura das demais páginas.
+   A centralização do item ativo é feita somente pelo scroll compartilhado
+   em js/br-menu.js, sem margens, padding ou elementos vazios artificiais. */
 
 .br-live-heading { margin-bottom: 14px; }
 .br-live-heading .panel-inner {
