@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bolão Brasileirão 2026 — Almoço de Sexta</title>
+<title>Brasileirão 2026 — Almoço de Sexta</title>
 
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-0PPWGP93FD"></script>
@@ -25,35 +25,36 @@
 <meta name="theme-color" content="#10b981">
 
 <!-- Open Graph (preview no WhatsApp, Facebook, LinkedIn, Telegram) -->
-<meta property="og:title" content="Bolão Brasileirão 2026 — Almoço de Sexta">
-<meta property="og:description" content="Acompanhe ranking, palpites, classificação, estatísticas e ligas do Bolão Brasileirão 2026.">
-<meta property="og:image" content="https://brasileirao2026almoco.com.br/og-image-whatsapp-v2.png">
-<meta property="og:image:secure_url" content="https://brasileirao2026almoco.com.br/og-image-whatsapp-v2.png">
+<meta property="og:title" content="Brasileirão 2026 — Almoço de Sexta">
+<meta property="og:description" content="Acompanhe jogos, tabela, resultados, estatísticas, clubes e história do Brasileirão 2026.">
+<meta property="og:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
+<meta property="og:image:secure_url" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Bolão Brasileirão 2026 — Almoço de Sexta">
-<meta property="og:url" content="https://brasileirao2026almoco.com.br/?brasileirao=1">
+<meta property="og:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
+<meta property="og:url" content="https://brasileirao2026almoco.com.br/">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
-<meta property="og:site_name" content="Bolão Brasileirão 2026">
-<link rel="image_src" href="https://brasileirao2026almoco.com.br/og-image-whatsapp-v2.png">
+<meta property="og:site_name" content="Brasileirão 2026 — Almoço de Sexta">
+<link rel="canonical" href="https://brasileirao2026almoco.com.br/">
+<link rel="image_src" href="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Bolão Brasileirão 2026 — Almoço de Sexta">
-<meta name="twitter:description" content="Acompanhe ranking, palpites, classificação, estatísticas e ligas do Bolão Brasileirão 2026.">
-<meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-whatsapp-v2.png">
-<meta name="twitter:image:alt" content="Bolão Brasileirão 2026 — Almoço de Sexta">
+<meta name="twitter:title" content="Brasileirão 2026 — Almoço de Sexta">
+<meta name="twitter:description" content="Acompanhe jogos, tabela, resultados, estatísticas, clubes e história do Brasileirão 2026.">
+<meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
+<meta name="twitter:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
 
 <!-- Descrição geral para SEO -->
-<meta name="description" content="Site do bolão do Campeonato Brasileiro 2026 entre amigos. Veja ranking, classificação, próximos jogos e resultados.">
+<meta name="description" content="Acompanhe jogos, tabela, resultados, estatísticas, clubes e história do Brasileirão 2026.">
 
 <script>
   (function () {
     try {
       var view = String(new URLSearchParams(location.search || '').get('view') || '').toLowerCase();
-      if (view === 'rank' || view === 'aniversariantes') {
+      if (view === 'rank' || view === 'aniversariantes' || view === 'participantes') {
         document.documentElement.classList.add('br-private-pending');
       }
     } catch (_) {}
@@ -2189,9 +2190,9 @@ body > .container > section.hero > img {
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
-     O Brasileirão fica "dormindo" e só abre por link explícito com ?brasileirao=1.
-     Importante: NÃO grava essa escolha em sessionStorage, para não contaminar
-     visitas futuras à raiz. */
+     O Brasileirão abre por link explícito com ?brasileirao=1. A partir de
+     21/07/2026, a raiz volta ao Brasileirão e o parâmetro provisório é
+     removido da URL sem apagar view, hash ou outros parâmetros. */
   (function () {
     var ini = new Date('2026-06-04T00:00:00-03:00');
     var fim = new Date('2026-07-20T23:59:59-03:00');
@@ -2201,15 +2202,22 @@ body > .container > section.hero > img {
     var emCopa = agora >= ini && agora <= fim;
     if (emCopa && !pediuBrasileirao) {
       location.replace('copa2026/');
+      return;
+    }
+    if (!emCopa && pediuBrasileirao) {
+      params.delete('brasileirao');
+      var query = params.toString();
+      var limpa = location.pathname + (query ? '?' + query : '') + (location.hash || '');
+      history.replaceState(null, '', limpa);
     }
   })();
 </script>
 <body>
 <div class="container">
   <header>
-    <h1 class="sr-only">Bolão Brasileirão 2026 — Almoço de Sexta</h1>
+    <h1 class="sr-only">Brasileirão 2026 — Almoço de Sexta</h1>
     <div class="hero-header">
-      <img src="img/header-br-wide.png" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
+      <img src="img/header-br-wide.png" alt="Brasileirão 2026 — Almoço de Sexta" fetchpriority="high">
     </div>
   </header>
   <nav class="nav" data-br-auth-menu aria-label="Menu principal">
@@ -2226,7 +2234,6 @@ body > .container > section.hero > img {
     <button type="button" onclick="setView('aniversariantes')" id="btn-aniversariantes" data-br-view="aniversariantes" data-br-private hidden>🎂 Aniversariantes</button>
     <button type="button" onclick="location.href='copa2026/'" id="btn-copa">🌎 Copa 2026</button>
     <button type="button" id="btn-login" data-br-auth-link>🔐 Login</button>
-    <button type="button" onclick="adminAction()" id="btn-admin">⚙️ Admin</button>
   </nav>
 
   <div class="status-bar" id="status-bar">
@@ -2257,9 +2264,8 @@ body > .container > section.hero > img {
 
 <script>
 // ========================================================================
-// CONFIGURAÇÃO — você pode mudar a senha de admin aqui
+// ADMINISTRAÇÃO — acesso centralizado na área autenticada
 // ========================================================================
-const ADMIN_SENHA = "almocosexta2026";
 
 // O index.html não gera dados; ele apenas lê os JSONs publicados pelo GitHub Actions.
 // O workflow do Brasileirão roda de 10 em 10 minutos. No navegador, fazemos
@@ -2908,11 +2914,11 @@ async function inicializar() {
   const viewInicial = viewParam || viewSessao;
   if (viewInicial) {
     sessionStorage.removeItem('brViewInicial');
-    const privada = viewInicial === 'rank' || viewInicial === 'aniversariantes';
+    const privada = viewInicial === 'rank' || viewInicial === 'aniversariantes' || viewInicial === 'participantes';
     // Views privadas só podem ser abertas por URL explícita, que passa pelo
     // guard de sessão. Isso impede que um valor antigo/manipulado no
     // sessionStorage exponha ranking ou aniversariantes no carregamento.
-    if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes'].includes(viewInicial) && (!privada || Boolean(viewParam))) {
+    if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes', 'participantes'].includes(viewInicial) && (!privada || Boolean(viewParam))) {
       state.view = viewInicial;
     }
   }
@@ -3183,21 +3189,31 @@ function render() {
   else if (v === 'aniversariantes') renderAniversariantes();
   else if (v === 'participantes') renderParticipantes();
   else if (v === 'em-breve') renderEmBreve();
-  // Botão de admin
+  // O antigo botão público de Admin foi removido. A área administrativa
+  // permanece disponível somente após login de administrador.
   const btnAdmin = document.getElementById('btn-admin');
-  btnAdmin.textContent = state.ehAdmin ? 'Sair do admin' : 'Admin';
+  if (btnAdmin) btnAdmin.textContent = state.ehAdmin ? 'Sair do admin' : 'Admin';
   if (window.BR_CENTER_ACTIVE_NAV) setTimeout(window.BR_CENTER_ACTIVE_NAV, 40);
 }
 
 function setView(v) {
-  if ((v === 'rank' || v === 'aniversariantes') && !(window.BR_AUTH && window.BR_AUTH.authenticated)) {
-    const alvo = `./?brasileirao=1&view=${encodeURIComponent(v)}`;
+  if ((v === 'rank' || v === 'aniversariantes' || v === 'participantes') && !(window.BR_AUTH && window.BR_AUTH.authenticated)) {
+    const sufixoAdmin = v === 'participantes' ? '&admin=1' : '';
+    const alvo = `./?brasileirao=1&view=${encodeURIComponent(v)}${sufixoAdmin}`;
     if (window.BR_AUTH && typeof window.BR_AUTH.requireLogin === 'function') {
       window.BR_AUTH.requireLogin(alvo);
     } else {
       location.href = `apostas.html?retorno=${encodeURIComponent(alvo)}`;
     }
     return;
+  }
+  if (v === 'participantes') {
+    const usuario = window.BR_AUTH && window.BR_AUTH.usuario;
+    if (!usuario || !usuario.admin) {
+      location.href = 'apostas.html?aba=admin';
+      return;
+    }
+    state.ehAdmin = true;
   }
   state.view = v;
   if (v !== 'em-breve') state.futuroModulo = null;
@@ -4231,21 +4247,7 @@ function renderParticipantes() {
 // ADMIN E EDIÇÃO
 // ========================================================================
 function adminAction() {
-  if (state.ehAdmin) {
-    state.ehAdmin = false;
-    state.view = 'rank';
-    render();
-    return;
-  }
-  const senha = prompt('Senha de admin:');
-  if (senha === null) return;
-  if (senha === ADMIN_SENHA) {
-    state.ehAdmin = true;
-    state.view = 'participantes';
-    render();
-  } else {
-    alert('Senha incorreta');
-  }
+  location.href = 'apostas.html?aba=admin';
 }
 
 function novoParticipante() {
@@ -4983,6 +4985,25 @@ function fecharEditorToken() {
 // ========================================================================
 // INICIALIZAÇÃO
 // ========================================================================
+function abrirAdministracaoLegadaAposLogin(evento) {
+  try {
+    const params = new URLSearchParams(location.search || '');
+    if (params.get('view') !== 'participantes' || params.get('admin') !== '1') return;
+    const detalhe = evento && evento.detail ? evento.detail : (window.BR_AUTH || {});
+    const usuario = detalhe && detalhe.usuario;
+    if (!detalhe.authenticated || !usuario || !usuario.admin) {
+      location.replace('apostas.html?aba=admin');
+      return;
+    }
+    state.ehAdmin = true;
+    state.view = 'participantes';
+    render();
+  } catch (e) {
+    console.error('Falha ao abrir administração autenticada:', e);
+  }
+}
+
+document.addEventListener('br:auth-ready', abrirAdministracaoLegadaAposLogin);
 inicializar();
 
 // Aniversários são informação privada: só aparecem após sessão remota validada.
@@ -5019,7 +5040,7 @@ setTimeout(sincronizarAvisosAniversarioComSessao, 800);
   })();
 </script>
 <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
-<script src="js/br-menu.js?v=20260712-menu-publico-login-v1"></script>
+<script src="js/br-menu.js?v=20260713-publico-login-admin-v1"></script>
 <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

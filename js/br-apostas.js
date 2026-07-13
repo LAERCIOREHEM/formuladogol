@@ -338,7 +338,8 @@
       if (url.origin !== global.location.origin) return "";
       const file = url.pathname.split("/").filter(Boolean).pop() || "";
       const view = String(url.searchParams.get("view") || "").toLowerCase();
-      const permitido = file === "regras.html" || ((file === "" || file === "index.html") && ["rank", "aniversariantes"].includes(view));
+      const adminLegado = view === "participantes" && url.searchParams.get("admin") === "1";
+      const permitido = file === "regras.html" || ((file === "" || file === "index.html") && (["rank", "aniversariantes"].includes(view) || adminLegado));
       if (!permitido) return "";
       sessionStorage.removeItem("brLoginRetorno");
       return url.pathname + url.search + url.hash;
@@ -680,8 +681,17 @@
   }
 
   function renderLogin() {
-    $("#login-area").hidden = Boolean(state.usuario);
-    $("#app-area").hidden = !state.usuario;
+    const autenticado = Boolean(state.usuario);
+    $("#login-area").hidden = autenticado;
+    $("#app-area").hidden = !autenticado;
+    const kicker = $("#area-kicker");
+    const titulo = $("#area-titulo");
+    const descricao = $("#area-descricao");
+    if (kicker) kicker.textContent = autenticado ? "Bolão Brasileirão 2026" : "Área restrita";
+    if (titulo) titulo.textContent = autenticado ? "Apostas logadas da rodada" : "Acesso do participante";
+    if (descricao) descricao.textContent = autenticado
+      ? "Os placares ficam sigilosos até a publicação. Depois, a rodada ganha ranking, comprovantes e auditoria."
+      : "Entre com seu usuário e PIN para acessar as funcionalidades privadas.";
     renderUsuario();
   }
 
@@ -1106,6 +1116,11 @@
       return;
     }
     const globalAdmin = isAdminGlobal();
+    const painelAdministracaoAnual = globalAdmin ? `<article class="panel" style="grid-column:1/-1"><div class="panel-inner">
+        <div class="kicker">Administração integrada</div><h2>Ranking anual e aniversários</h2>
+        <p>As ferramentas históricas de participantes, palpites anuais, membros e aniversários continuam protegidas e são abertas somente para administrador global autenticado.</p>
+        <div class="actions"><a class="btn secondary" href="./?brasileirao=1&view=participantes&admin=1">⚙️ Abrir administração anual</a></div>
+      </div></article>` : "";
     const painelParticipantes = globalAdmin ? `<article class="panel"><div class="panel-inner">
         <div class="kicker">Participantes</div><h2>Criar/alterar acesso</h2>
         <form id="admin-participante" class="admin-form">
@@ -1127,6 +1142,7 @@
         </form>
       </div></article>` : `<article class="panel"><div class="panel-inner"><div class="kicker">Janela da rodada</div><h2>Rodada ${state.rodada}</h2><p class="muted-note">Janela e publicação são globais para todas as ligas e somente o admin global altera esses dados.</p><p><span class="badge ${statusJanela(state.rodada).classe}">${escapeHtml(statusJanela(state.rodada).detalhe)}</span></p></div></article>`;
     root.innerHTML = `<section class="admin-grid">
+      ${painelAdministracaoAnual}
       ${renderLigasAdminHtml()}
       ${painelParticipantes}
       ${painelRodada}
@@ -1491,6 +1507,8 @@
         global.location.replace(retorno);
         return;
       }
+      await carregarLigas();
+      state.aba = canAdminAny() ? "admin" : "apostas";
       await refresh();
     } catch (err) {
       console.error(err);
@@ -1526,8 +1544,12 @@
       status("Validando sessão salva...", "warn");
       await validarSessaoAtual();
     }
+    if (state.usuario && !abaUrl) {
+      await carregarLigas();
+      if (canAdminAny()) state.aba = "admin";
+    }
     if (!state.usuario && state.supabase) {
-      status("Entre com usuário e PIN para apostar.", "warn");
+      status("Entre com usuário e PIN para acessar a área restrita.", "warn");
     }
     await refresh();
     iniciarAutoRefresh();

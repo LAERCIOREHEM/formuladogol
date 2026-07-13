@@ -2,7 +2,7 @@
    br-menu.js — menu público/logado e proteção de rotas do Brasileirão 2026
    --------------------------------------------------------------------------
    - Visitante: Jogos, Ao vivo, Tabela, Resultados, Estatísticas, Clubes,
-     Museu, Copa 2026, Login e Admin.
+     Museu, Copa 2026 e Login.
    - Participante validado: acrescenta Apostas, Bolão, Regras e Aniversariantes;
      o item Login passa a exibir o nome do participante e permite sair.
    - A sessão local é sempre validada no Supabase antes de liberar área privada.
@@ -11,7 +11,7 @@
   "use strict";
 
   var STORAGE_KEY = "brApostasSessaoV2";
-  var PRIVATE_VIEWS = { rank: true, aniversariantes: true };
+  var PRIVATE_VIEWS = { rank: true, aniversariantes: true, participantes: true };
   var authState = {
     pending: true,
     authenticated: false,
@@ -54,6 +54,14 @@
     if (file === "regras.html") return true;
     if (file === "" || file === "index.html") return Boolean(PRIVATE_VIEWS[currentView()]);
     return false;
+  }
+
+  function isAdminRoute() {
+    var file = basename();
+    if (file !== "" && file !== "index.html") return false;
+    if (currentView() !== "participantes") return false;
+    try { return String(new URLSearchParams(global.location.search || "").get("admin") || "") === "1"; }
+    catch (_) { return false; }
   }
 
   function returnTarget() {
@@ -214,6 +222,10 @@
 
     if (!authState.authenticated && isPrivateRoute()) {
       redirectToLogin();
+      return;
+    }
+    if (isAdminRoute() && !(authState.usuario && authState.usuario.admin)) {
+      global.location.replace("apostas.html?aba=admin");
       return;
     }
 

@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Apostas Logadas e Apuração — Bolão Brasileirão 2026</title>
+<title>Área restrita — Brasileirão 2026</title>
 <meta name="theme-color" content="#10b981">
-<meta name="description" content="Área logada das apostas por rodada do Bolão Brasileirão 2026 — Almoço de Sexta.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="description" content="Acesso reservado aos participantes autorizados do site Brasileirão 2026 — Almoço de Sexta.">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="css/br-apostas.css?v=20260708-admin-mobile-participantes">
@@ -13,8 +14,8 @@
 </head>
 <body>
   <main class="container br-app-shell">
-    <section class="hero" aria-label="Bolão Brasileirão 2026">
-      <img src="img/header-br-wide.png" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
+    <section class="hero" aria-label="Brasileirão 2026 — Almoço de Sexta">
+      <img src="img/header-br-wide.png" alt="Brasileirão 2026 — Almoço de Sexta" fetchpriority="high">
     </section>
     <nav class="nav" data-br-auth-menu aria-label="Menu principal">
       <a href="./?brasileirao=1&view=jogos" data-br-view="jogos">⚽ Jogos</a>
@@ -30,15 +31,14 @@
       <a href="./?brasileirao=1&view=aniversariantes" data-br-view="aniversariantes" data-br-private hidden>🎂 Aniversariantes</a>
       <a href="copa2026/">🌎 Copa 2026</a>
       <a href="apostas.html" data-br-auth-link>🔐 Login</a>
-      <a href="apostas.html?aba=admin" data-br-admin-link="1">⚙️ Admin</a>
     </nav>
 
     <section class="panel br-page-title">
       <div class="panel-inner br-title-row">
         <div>
-          <div class="kicker">Bolão Brasileirão 2026</div>
-          <h1>Apostas logadas da rodada</h1>
-          <p>Entre com usuário e PIN. Os placares ficam sigilosos até a publicação. Depois, a rodada ganha ranking, comprovantes e auditoria.</p>
+          <div class="kicker" id="area-kicker">Área restrita</div>
+          <h1 id="area-titulo">Acesso do participante</h1>
+          <p id="area-descricao">Entre com seu usuário e PIN para acessar as funcionalidades privadas.</p>
         </div>
         <div class="login-chip" id="usuario-chip" hidden></div>
       </div>
@@ -46,11 +46,11 @@
 
     <div id="status" class="status warn" role="status">Inicializando área logada...</div>
 
-    <section id="login-area" class="login-grid" aria-label="Login das apostas">
+    <section id="login-area" class="login-grid" aria-label="Login da área restrita">
       <article class="panel login-card"><div class="panel-inner">
         <div class="kicker">Acesso do participante</div>
         <h2>Entrar com usuário e PIN</h2>
-        <p>O PIN é individual. O administrador gera e envia no grupo/WhatsApp.</p>
+        <p>Use as credenciais individuais fornecidas pela administração.</p>
         <form id="form-login" class="login-form" autocomplete="off">
           <label>Usuário
             <input id="login-usuario" name="login" inputmode="text" autocomplete="username" placeholder="ex.: laercio" required>
@@ -63,11 +63,11 @@
       </div></article>
 
       <article class="panel login-card info-card"><div class="panel-inner">
-        <div class="kicker">Como funciona</div>
+        <div class="kicker">Acesso reservado</div>
         <div class="rules-list compact">
-          <div class="rule-card"><strong>🔒 Sigilo</strong><span>Antes da publicação, ninguém vê os placares dos outros; depois todos conferem ranking e hashes.</span></div>
-          <div class="rule-card"><strong>📊 Admin</strong><span>O administrador vê apenas o percentual preenchido.</span></div>
-          <div class="rule-card"><strong>🧾 Comprovante</strong><span>Cada envio gera hash e alimenta o relatório de auditoria da rodada.</span></div>
+          <div class="rule-card"><strong>🔐 Credencial individual</strong><span>O acesso depende de usuário e PIN válidos.</span></div>
+          <div class="rule-card"><strong>✅ Sessão verificada</strong><span>A autorização é confirmada antes de liberar qualquer funcionalidade privada.</span></div>
+          <div class="rule-card"><strong>🛡️ Área protegida</strong><span>Participantes e administradores recebem apenas os recursos correspondentes ao seu perfil.</span></div>
         </div>
       </div></article>
     </section>
@@ -114,20 +114,20 @@
     </section>
 
     <footer class="site-footer br-disclaimer">
-      <div><span class="footer-title">Bolão Brasileirão 2026 — Almoço de Sexta.</span> Site privado, recreativo, sem fins lucrativos e sem exploração comercial. O bolão é uma brincadeira entre amigos; marcas, escudos, nomes, imagens de atletas e demais sinais distintivos pertencem aos respectivos clubes, atletas, entidades e titulares.</div>
-      <div class="footer-sugestoes">💬 Sugestões, correções, pedidos de remoção de foto, reclamações de propriedade intelectual ou qualquer reivindicação sobre imagem/conteúdo: fale com o administrador do grupo pelo WhatsApp. A análise será feita de boa-fé e o conteúdo poderá ser ajustado ou removido.</div>
+      <div><span class="footer-title">Brasileirão 2026 — Almoço de Sexta.</span> Área de acesso reservado. O site é independente, informativo e sem fins lucrativos. Nomes, escudos e marcas pertencem aos respectivos titulares.</div>
+      <div class="footer-sugestoes">Problemas de acesso ou solicitações relacionadas ao conteúdo devem ser encaminhados à administração.</div>
     </footer>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-pontuacao.js?v=20260707-ajustes-finais-v1"></script>
-  <script src="js/br-apostas.js?v=20260712-menu-publico-login-v1"></script>
+  <script src="js/br-apostas.js?v=20260713-publico-login-admin-v1"></script>
   <script>
     document.querySelectorAll('[data-br-view]').forEach(function(a){
       a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-br-view')); });
     });
   </script>
-  <script src="js/br-menu.js?v=20260712-menu-publico-login-v1"></script>
+  <script src="js/br-menu.js?v=20260713-publico-login-admin-v1"></script>
 </body>
 </html>
