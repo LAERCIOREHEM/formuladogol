@@ -129,7 +129,24 @@ def candidate_urls(stat: str) -> list[str]:
         "sort": f"{sort_key}:desc",
         "season": str(TEMPORADA),
     })
+    category = "goals" if stat == "gols" else "assists"
+    common_q = urllib.parse.urlencode({
+        "region": "br",
+        "lang": "pt",
+        "contentorigin": "espn",
+        "isqualified": "true",
+        "season": str(TEMPORADA),
+        "limit": "200",
+        "category": category,
+        "sort": f"{sort_key}:desc",
+    })
+    # A ordem privilegia os endpoints Core API de líderes, que são mais
+    # estáveis para futebol do que a antiga rota fittwo/athletes.
     return [
+        f"https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/{TEMPORADA}/leaders?limit=200",
+        "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/leaders?limit=200",
+        f"https://sports.core.api.espn.com/v3/sports/soccer/bra.1/leaders?season={TEMPORADA}&limit=200",
+        f"https://site.web.api.espn.com/apis/common/v3/sports/soccer/bra.1/statistics/byathlete?{common_q}",
         f"https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?{q}",
         f"https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?{q_en}",
         f"https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/athletes?season={TEMPORADA}&limit=200&sort={urllib.parse.quote(sort_key + ':desc')}",
@@ -167,6 +184,70 @@ def fetch_document(url: str, timeout: int = 30, attempts: int = 2) -> tuple[Any,
             if attempt < attempts:
                 time.sleep(1.5 * attempt)
     raise RuntimeError(f"{type(last).__name__}: {last}")
+
+
+
+def _espn_ref_permitida(url: str) -> bool:
+    try:
+        host = (urllib.parse.urlparse(url).hostname or "").lower()
+    except Exception:
+        return False
+    return host == "espn.com" or host.endswith(".espn.com")
+
+
+def resolver_refs_espn(
+    node: Any,
+    cache: dict[str, Any] | None = None,
+    limite: list[int] | None = None,
+    profundidade: int = 0,
+    chave_pai: str = "",
+) -> Any:
+    """Resolve apenas as referências necessárias do Core API da ESPN.
+
+    As respostas de líderes normalmente trazem as categorias em ``items`` e
+    os nomes de atleta/equipe por ``$ref``. Estatísticas secundárias também
+    podem vir referenciadas; elas não são hidratadas para evitar dezenas de
+    chamadas desnecessárias.
+    """
+    if cache is None:
+        cache = {}
+    if limite is None:
+        limite = [0]
+    if profundidade > 8:
+        return node
+
+    if isinstance(node, dict):
+        ref = str(node.get("$ref") or "").strip()
+        pode_resolver = (
+            chave_pai in {"items", "leaders", "athlete", "player", "team", "club", "currentTeam"}
+            or profundidade <= 2
+        )
+        if (
+            ref
+            and pode_resolver
+            and _espn_ref_permitida(ref)
+            and set(node).issubset({"$ref", "uid", "id"})
+        ):
+            if ref in cache:
+                return cache[ref]
+            if limite[0] >= 80:
+                return node
+            limite[0] += 1
+            try:
+                payload, _ = fetch_document(ref, timeout=12, attempts=1)
+                cache[ref] = payload
+                return resolver_refs_espn(payload, cache, limite, profundidade + 1, chave_pai)
+            except Exception as exc:  # noqa: BLE001
+                cache[ref] = {"$ref": ref, "_erro_ref": str(exc)[:180]}
+                return cache[ref]
+
+        return {
+            key: resolver_refs_espn(value, cache, limite, profundidade + 1, key)
+            for key, value in node.items()
+        }
+    if isinstance(node, list):
+        return [resolver_refs_espn(v, cache, limite, profundidade + 1, chave_pai) for v in node]
+    return node
 
 
 def extract_embedded_json(text: str) -> dict[str, Any] | list[Any] | None:
@@ -406,9 +487,17 @@ def collect_one(stat: str, fixture: Path | None = None) -> tuple[list[dict[str, 
 
     for url in candidate_urls(stat):
         try:
-            payload, ctype = fetch_document(url)
-            ranking = extract_ranking(payload, stat)
-            attempts_log.append({"url": url, "status": "ok", "content_type": ctype, "itens_extraidos": len(ranking)})
+            payload, ctype = fetch_document(url, timeout=14, attempts=1)
+            refs_resolvidas = [0]
+            payload_hidratado = resolver_refs_espn(payload, cache={}, limite=refs_resolvidas)
+            ranking = extract_ranking(payload_hidratado, stat)
+            attempts_log.append({
+                "url": url,
+                "status": "ok",
+                "content_type": ctype,
+                "itens_extraidos": len(ranking),
+                "refs_espn_resolvidas": refs_resolvidas[0],
+            })
             if len(ranking) >= 5:
                 return ranking, attempts_log, url
         except Exception as exc:  # noqa: BLE001
@@ -464,6 +553,11 @@ def main() -> None:
     parser.add_argument("--fixture-gols", type=Path)
     parser.add_argument("--fixture-assistencias", type=Path)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--nao-falhar-sem-snapshot",
+        action="store_true",
+        help="Grava a auditoria e encerra com código 0 quando a ESPN estiver indisponível e ainda não houver snapshot válido.",
+    )
     args = parser.parse_args()
 
     if args.self_test:
@@ -519,6 +613,10 @@ def main() -> None:
 
     write_json_atomic(AUDITORIA, audit)
     if final_errors:
+        if args.nao_falhar_sem_snapshot:
+            print("AVISO: coleta de líderes ainda inválida; auditoria gravada e snapshot anterior preservado.")
+            print(" | ".join(final_errors))
+            return
         raise RuntimeError("Coleta de líderes inválida: " + " | ".join(final_errors))
 
     payload = {

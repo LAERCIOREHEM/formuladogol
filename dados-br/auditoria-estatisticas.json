@@ -1,9 +1,91 @@
 {
-  "gerado_em": null,
-  "status": "aguardando_workflow",
-  "resumo": {},
+  "gerado_em": "2026-07-13T08:12:34.727504-03:00",
+  "status": "ok",
+  "resumo": {
+    "clubes": 20,
+    "jogos_finalizados": 177,
+    "jogos_com_detalhes": 177,
+    "jogos_com_estatisticas": 177,
+    "jogos_com_publico": 0,
+    "artilheiros": 15,
+    "assistentes": 5,
+    "lider_gols": {
+      "posicao": 1,
+      "athlete_id": "",
+      "nome": "Kevin Viveros",
+      "time": "Athletico-PR",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg",
+      "jogos": 17,
+      "gols": 11,
+      "media_por_jogo": 0.647
+    },
+    "lider_assistencias": {
+      "posicao": 1,
+      "athlete_id": "",
+      "nome": "Andreas Pereira",
+      "time": "Palmeiras",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "jogos": 17,
+      "assistencias": 9,
+      "media_por_jogo": 0.529
+    },
+    "erros_criticos": 0,
+    "avisos": 1
+  },
+  "fontes": {
+    "lideres": "ESPN · snapshot oficial de segurança validado em 13/07/2026",
+    "lideres_aceitas": {
+      "artilharia": "https://www.espn.com.br/futebol/estatisticas/_/liga/bra.1",
+      "assistencias": "https://www.espn.com.br/futebol/estatisticas/_/liga/bra.1/vista/assists"
+    },
+    "detalhes": "ESPN summary",
+    "competicao": "ESPN · tabela, resultados, summaries e rankings oficiais"
+  },
+  "auditorias_relacionadas": {
+    "lideres": {
+      "artilheiros": 15,
+      "assistentes": 5,
+      "lider_gols": {
+        "posicao": 1,
+        "athlete_id": "",
+        "nome": "Kevin Viveros",
+        "time": "Athletico-PR",
+        "team_id": "",
+        "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg",
+        "jogos": 17,
+        "gols": 11,
+        "media_por_jogo": 0.647
+      },
+      "lider_assistencias": {
+        "posicao": 1,
+        "athlete_id": "",
+        "nome": "Andreas Pereira",
+        "time": "Palmeiras",
+        "team_id": "",
+        "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+        "jogos": 17,
+        "assistencias": 9,
+        "media_por_jogo": 0.529
+      },
+      "preservado_de_execucao_anterior": {
+        "artilharia": false,
+        "assistencias": false
+      },
+      "observacao": "Snapshot inicial válido incluído para impedir que uma oscilação da ESPN bloqueie todo o workflow."
+    },
+    "detalhes": {
+      "total_processados": 177,
+      "total_com_estatisticas": 177,
+      "total_com_publico": null,
+      "total_falhas": 0
+    }
+  },
+  "jogos_sem_detalhes": [],
+  "nomes_suspeitos": [],
   "erros_criticos": [],
   "avisos": [
-    "Execute o workflow Atualizar Brasileirao (ESPN) após enviar este hotfix."
+    "nenhum público coletado ainda; conferir retorno da ESPN summary"
   ]
 }
