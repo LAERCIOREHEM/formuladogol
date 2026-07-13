@@ -48,6 +48,56 @@
       .trim();
   }
 
+  function eventText(value) {
+    if (value && typeof value === "object") {
+      return String(value.displayValue ?? value.displayClock ?? value.text ?? value.name ?? value.value ?? "").trim();
+    }
+    const text = String(value ?? "").trim();
+    if (!text) return "";
+    const display = text.match(/displayValue['"\s:]+([^,}\]]+)/i);
+    return display ? display[1].replace(/^['"\s]+|['"\s]+$/g, "") : text;
+  }
+
+  function eventMinute(event) {
+    return eventText(event?.minuto ?? event?.clock ?? event?.displayClock ?? event?.time);
+  }
+
+  function eventTeam(event) {
+    const raw = event?.time;
+    let text = "";
+    if (raw && typeof raw === "object") {
+      text = String(raw.displayName ?? raw.shortDisplayName ?? raw.fullName ?? raw.name ?? raw.abbreviation ?? "").trim();
+    } else {
+      text = String(raw ?? "").trim();
+    }
+    if (!text || /^[{[]/.test(text) || /displayValue|['"]value['"]\s*:/i.test(text)) return "";
+    return text;
+  }
+
+  function minuteKey(value) {
+    const nums = eventText(value).match(/\d+/g) || [];
+    return nums.length ? `${Number(nums[0])}+${Number(nums[1] || 0)}` : normalize(value);
+  }
+
+  function uniqueEvents(list, kind) {
+    const best = new Map();
+    for (const original of (Array.isArray(list) ? list : [])) {
+      if (!original || typeof original !== "object") continue;
+      const item = {
+        ...original,
+        minuto: eventMinute(original),
+        jogador: String(original.jogador || "").trim(),
+        time: eventTeam(original),
+      };
+      const identity = normalize(item.jogador) || normalize(item.descricao || "");
+      const key = [kind, normalize(item.tipo || ""), minuteKey(item.minuto), identity].join("|");
+      const quality = (item.jogador ? 20 : 0) + (item.time ? 10 : 0) + (item.descricao ? 2 : 0);
+      const previous = best.get(key);
+      if (!previous || quality > previous.quality) best.set(key, { item, quality });
+    }
+    return Array.from(best.values(), (entry) => entry.item);
+  }
+
   function clubSlug(value) {
     return String(value || "")
       .normalize("NFD")
@@ -331,8 +381,8 @@
     const home = game.mandante || teamInfo(detail.mandante);
     const away = game.visitante || teamInfo(detail.visitante);
     const crowd = Number(detail.publico);
-    const goals = Array.isArray(detail.gols) ? detail.gols : [];
-    const cards = Array.isArray(detail.cartoes) ? detail.cartoes : [];
+    const goals = uniqueEvents(detail.gols, "goal");
+    const cards = uniqueEvents(detail.cartoes, "card");
     return `<details class="stats-game-card" data-game-id="${escapeAttr(game.event_id || game.id || "")}">
       <summary>
         <span class="stats-game-round">R${escapeHtml(game.rodada || detail.rodada || "—")}</span>

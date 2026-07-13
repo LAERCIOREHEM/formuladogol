@@ -464,6 +464,24 @@ def _event_minute(ev: dict[str, Any]) -> str:
     return ""
 
 
+def _minute_key(value: Any) -> str:
+    """Normaliza minuto inclusive quando chega como objeto/string de objeto."""
+    if isinstance(value, dict):
+        value = _first_text(value, "displayValue", "displayClock", "text", "value")
+    raw = str(value or "").strip()
+    if not raw:
+        return ""
+    # Algumas execuções antigas serializaram o objeto do relógio dentro de uma
+    # string. Aproveite apenas o displayValue; nunca use o objeto como equipe.
+    m = re.search(r"displayValue['\"\s:]+([^,}\]]+)", raw, flags=re.I)
+    if m:
+        raw = m.group(1).strip(" '\"")
+    nums = re.findall(r"\d+", raw)
+    if not nums:
+        return normalizar(raw)
+    return f"{int(nums[0])}+{int(nums[1]) if len(nums) > 1 else 0}"
+
+
 def _athletes_event(ev: dict[str, Any]) -> list[tuple[str, str]]:
     out: list[tuple[str, str]] = []
     for key in ("athletes", "athletesInvolved", "participants", "players"):
@@ -533,6 +551,39 @@ def _canonical_team(raw: Any, jogo: dict[str, Any] | None) -> str:
     return best if best_score else text
 
 
+def _event_team(ev: dict[str, Any], jogo: dict[str, Any] | None) -> str:
+    """Extrai somente uma equipe válida do evento.
+
+    A ESPN usa ``time`` também para o relógio do lance. O código antigo fazia
+    ``str(ev['time'])`` como fallback de equipe, o que gerava textos como
+    ``{'value': 1237.0, 'displayValue': "21'"}`` e impedia a deduplicação.
+    """
+    raw: Any = ""
+    for key in ("team", "competitor", "club"):
+        value = ev.get(key)
+        if isinstance(value, dict):
+            raw = _first_text(value, "displayName", "shortDisplayName", "fullName", "name", "abbreviation")
+        elif value not in (None, ""):
+            raw = value
+        if raw:
+            break
+
+    # Compatibilidade com registros legados em português: aceite ``time``
+    # somente quando for texto e corresponder de fato a um dos dois clubes.
+    if not raw and isinstance(ev.get("time"), str):
+        raw = ev.get("time")
+
+    text = str(raw or "").strip()
+    if not text or text.startswith(("{", "[")) or "displayvalue" in text.lower():
+        return ""
+    canonical = _canonical_team(text, jogo)
+    if not jogo:
+        return canonical
+    home = str((jogo.get("mandante") or {}).get("nome") or jogo.get("mandante") or "")
+    away = str((jogo.get("visitante") or {}).get("nome") or jogo.get("visitante") or "")
+    return canonical if canonical in (home, away) else ""
+
+
 def _extract_goal_actor(text: str) -> tuple[str, str]:
     # ESPN: "Goal! Time A 0, Time B 1. Jogador (Time B) ..."
     m = re.search(r"(?:goal|gol)!.*?\.\s*([^().]+?)\s*\(([^)]+)\)", text, flags=re.I)
@@ -544,6 +595,9 @@ def _extract_goal_actor(text: str) -> tuple[str, str]:
 def _extract_card_actor(text: str) -> tuple[str, str]:
     patterns = [
         r"([^().]+?)\s*\(([^)]+)\)\s+is shown (?:the|a) (?:second )?(?:yellow|red) card",
+        r"second yellow card to\s+([^().]+?)\s*\(([^)]+)\)",
+        r"(?:var decision:\s*)?red card(?:\s+to)?\s+([^().]+?)\s*\(([^)]+)\)",
+        r"yellow card(?:\s+to)?\s+([^().]+?)\s*\(([^)]+)\)",
         r"cart[aã]o (?:amarelo|vermelho).*?para\s+([^().]+?)\s*\(([^)]+)\)",
     ]
     for pattern in patterns:
@@ -627,12 +681,16 @@ def _event_narrative_signature(item: dict[str, Any], kind: str) -> str:
 def _dedupe_events(items: list[dict[str, Any]], kind: str) -> list[dict[str, Any]]:
     best: dict[str, dict[str, Any]] = {}
     for item in items:
+        player = normalizar(item.get("jogador"))
+        narrative = _event_narrative_signature(item, kind)
+        # O mesmo lance pode vir em keyEvents e commentary. A equipe de uma das
+        # cópias pode estar ausente/malformada; por isso jogador+minuto+tipo é a
+        # identidade principal. Sem jogador, use a narrativa do lance.
         key = "|".join([
             kind,
             normalizar(item.get("tipo")),
-            normalizar(item.get("minuto")),
-            normalizar(item.get("jogador")),
-            normalizar(item.get("time")),
+            _minute_key(item.get("minuto")),
+            player or narrative,
         ])
         previous = best.get(key)
         if previous is None or _event_quality(item) > _event_quality(previous):
@@ -646,12 +704,15 @@ def _dedupe_events(items: list[dict[str, Any]], kind: str) -> list[dict[str, Any
         ndesc = _event_narrative_signature(item, kind)
         duplicate_index = None
         for idx, previous in enumerate(merged):
-            if normalizar(previous.get("minuto")) != normalizar(item.get("minuto")):
-                continue
-            if normalizar(previous.get("time")) != normalizar(item.get("time")):
+            if _minute_key(previous.get("minuto")) != _minute_key(item.get("minuto")):
                 continue
             if normalizar(previous.get("tipo")) != normalizar(item.get("tipo")):
                 continue
+            pplayer = normalizar(previous.get("jogador"))
+            iplayer = normalizar(item.get("jogador"))
+            if pplayer and iplayer and pplayer == iplayer:
+                duplicate_index = idx
+                break
             pdesc = _event_narrative_signature(previous, kind)
             # Use a frase do lance, não apenas o nome, para não unir cartões distintos
             # aplicados ao mesmo time no mesmo minuto.
@@ -698,9 +759,11 @@ def _limit_cards(cartoes: list[dict[str, Any]], jogo: dict[str, Any] | None, sta
     side_of = {home: "home", away: "away"}
     selected: list[dict[str, Any]] = []
     accounted: set[int] = set()
+    expected_by_type: dict[str, list[int | None]] = {"amarelo": [], "vermelho": []}
     for team in (home, away):
         for tipo, label in (("amarelo", "Amarelos"), ("vermelho", "Vermelhos")):
             expected = _metric_int(stats, label, side_of[team])
+            expected_by_type[tipo].append(expected)
             candidates = [
                 (idx, c) for idx, c in enumerate(cartoes)
                 if c.get("tipo") == tipo and _canonical_team(c.get("time"), jogo) == team
@@ -710,15 +773,24 @@ def _limit_cards(cartoes: list[dict[str, Any]], jogo: dict[str, Any] | None, sta
             for idx, item in candidates[:take]:
                 selected.append(item)
                 accounted.add(idx)
-    # Quando o boxscore não contém uma métrica, não descarte evento estruturado.
-    for idx, item in enumerate(cartoes):
-        if idx in accounted:
-            continue
-        team = _canonical_team(item.get("time"), jogo)
-        side = side_of.get(team)
-        label = "Amarelos" if item.get("tipo") == "amarelo" else "Vermelhos"
-        if not side or _metric_int(stats, label, side) is None:
+    # Eventos sem equipe só podem completar uma lacuna real do boxscore. Se os
+    # totais conhecidos já foram preenchidos, trata-se de cópia redundante e é
+    # descartada. Isso impede a duplicação provocada pelo campo ``time``-relógio.
+    for tipo in ("amarelo", "vermelho"):
+        pending = [
+            (idx, item) for idx, item in enumerate(cartoes)
+            if idx not in accounted and item.get("tipo") == tipo
+        ]
+        pending.sort(key=lambda pair: (-_event_quality(pair[1]), _minute_sort(pair[1].get("minuto"))))
+        expected_values = expected_by_type[tipo]
+        if all(v is not None for v in expected_values):
+            expected_total = sum(int(v or 0) for v in expected_values)
+            already = sum(1 for item in selected if item.get("tipo") == tipo)
+            take = max(0, expected_total - already)
+            pending = pending[:take]
+        for idx, item in pending:
             selected.append(item)
+            accounted.add(idx)
     selected.sort(key=lambda x: _minute_sort(x.get("minuto")))
     return selected
 
@@ -749,7 +821,24 @@ def validar_eventos(jogo: dict[str, Any], stats: list[dict[str, Any]], gols: lis
         for team in (home, away)
         for tipo, exp in expected_cards[team].items()
     )
+    valid_teams = {home, away}
+    unknown_cards = [c for c in cartoes if _canonical_team(c.get("time"), jogo) not in valid_teams]
+    seen_cards: set[tuple[str, str, str]] = set()
+    duplicate_cards = 0
+    for card in cartoes:
+        signature = (
+            normalizar(card.get("tipo")),
+            _minute_key(card.get("minuto")),
+            normalizar(card.get("jogador")) or _event_narrative_signature(card, "cartao"),
+        )
+        if signature in seen_cards:
+            duplicate_cards += 1
+        seen_cards.add(signature)
     goals_ok = found_goals == expected_goals
+    # A ESPN pode informar no boxscore mais cartões do que os eventos nominais
+    # disponibilizados no feed. Não inventamos atletas para completar a lista;
+    # a trava crítica é impedir excesso, duplicidade e equipe inválida.
+    cards_ok = cards_no_excess and not unknown_cards and duplicate_cards == 0
     return {
         "gols_esperados": expected_goals,
         "gols_extraidos": found_goals,
@@ -758,8 +847,10 @@ def validar_eventos(jogo: dict[str, Any], stats: list[dict[str, Any]], gols: lis
         "cartoes_extraidos": found_cards,
         "cartoes_completos": cards_complete,
         "cartoes_sem_excesso": cards_no_excess,
-        "cartoes_ok": cards_no_excess,
-        "ok": goals_ok and cards_no_excess,
+        "cartoes_time_desconhecido": len(unknown_cards),
+        "cartoes_duplicados": duplicate_cards,
+        "cartoes_ok": cards_ok,
+        "ok": goals_ok and cards_ok,
     }
 
 
@@ -777,13 +868,7 @@ def parse_eventos(
         athletes = _athletes_event(ev)
         player = next((n for n, role in athletes if "assist" not in role), "")
         assists = [n for n, role in athletes if "assist" in role]
-        team = ""
-        t = ev.get("team") or ev.get("competitor")
-        if isinstance(t, dict):
-            team = _first_text(t, "displayName", "shortDisplayName", "name", "abbreviation")
-        elif t:
-            team = str(t)
-        team = team or str(ev.get("time") or "")
+        team = _event_team(ev, jogo)
         minuto = _event_minute(ev)
 
         if _is_goal_event(ev, text):
@@ -792,7 +877,7 @@ def parse_eventos(
             team = team or t_text
             if not assists:
                 assists = _extract_assists(text)
-            team = _canonical_team(team, jogo)
+            team = _event_team({"team": team or t_text}, jogo)
             gols_raw.append({
                 "minuto": minuto,
                 "jogador": limpar_nome_jogador(player),
@@ -806,7 +891,7 @@ def parse_eventos(
         if card:
             p_text, t_text = _extract_card_actor(text)
             card_player = player or p_text
-            card_team = _canonical_team(team or t_text, jogo)
+            card_team = _event_team({"team": team or t_text}, jogo)
             cartoes_raw.append({
                 "tipo": card,
                 "minuto": minuto,
@@ -984,7 +1069,9 @@ def self_test() -> None:
             "text": "Jogador X (Palmeiras) is shown the yellow card.",
         }],
         "commentary": [{
-            "clock": {"displayValue": "31'"},
+            # ``time`` aqui é o relógio, não a equipe. Esta forma reproduz o
+            # payload que causava cartões duplicados no site.
+            "time": {"value": 1860.0, "displayValue": "31'"},
             "text": "Jogador X (Palmeiras) is shown the yellow card.",
         }],
     }
@@ -1003,6 +1090,9 @@ def self_test() -> None:
     assert gols[0]["assistencias"] == ["Samuel Lino"]
     assert len(cartoes) == 1, cartoes
     assert cartoes[0]["jogador"] == "Jogador X"
+    assert cartoes[0]["time"] == "Palmeiras"
+    assert _extract_card_actor("Second yellow card to Fulano (Palmeiras) for a bad foul.") == ("Fulano", "Palmeiras")
+    assert _extract_card_actor("VAR Decision: Red Card Sicrano (Flamengo).") == ("Sicrano", "Flamengo")
     validation = validar_eventos(jogo, stats, gols, cartoes)
     assert validation["ok"], validation
     print("SELF-TEST OK: público com milhar, eventos explícitos, deduplicação, placar e cartões.")

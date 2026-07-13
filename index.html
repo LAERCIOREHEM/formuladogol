@@ -2546,6 +2546,58 @@ function brNumeroEstatistica(valor) {
   return m ? Number(m[0]) : null;
 }
 
+function brTextoEvento(valor) {
+  if (valor && typeof valor === 'object') {
+    return String(valor.displayValue ?? valor.displayClock ?? valor.text ?? valor.name ?? valor.value ?? '').trim();
+  }
+  const texto = String(valor ?? '').trim();
+  if (!texto) return '';
+  // Compatibilidade defensiva com JSONs antigos que serializaram o objeto do
+  // relógio da ESPN dentro de uma string.
+  const display = texto.match(/displayValue['"\s:]+([^,}\]]+)/i);
+  return display ? display[1].replace(/^['"\s]+|['"\s]+$/g, '') : texto;
+}
+
+function brMinutoEvento(evento) {
+  return brTextoEvento(evento && (evento.minuto ?? evento.clock ?? evento.displayClock ?? evento.time));
+}
+
+function brTimeEvento(evento) {
+  const bruto = evento && evento.time;
+  let texto = '';
+  if (bruto && typeof bruto === 'object') {
+    texto = String(bruto.displayName ?? bruto.shortDisplayName ?? bruto.fullName ?? bruto.name ?? bruto.abbreviation ?? '').trim();
+  } else {
+    texto = String(bruto ?? '').trim();
+  }
+  if (!texto || /^[{[]/.test(texto) || /displayValue|['"]value['"]\s*:/i.test(texto)) return '';
+  return nomeCanonico(texto) || texto;
+}
+
+function brChaveMinutoEvento(valor) {
+  const nums = brTextoEvento(valor).match(/\d+/g) || [];
+  return nums.length ? `${Number(nums[0])}+${Number(nums[1] || 0)}` : normalizarNome(valor);
+}
+
+function brEventosUnicos(lista, tipo) {
+  const melhores = new Map();
+  for (const original of (Array.isArray(lista) ? lista : [])) {
+    if (!original || typeof original !== 'object') continue;
+    const item = {
+      ...original,
+      minuto: brMinutoEvento(original),
+      jogador: String(original.jogador || '').trim(),
+      time: brTimeEvento(original),
+    };
+    const identidade = normalizarNome(item.jogador) || normalizarNome(item.descricao || '');
+    const chave = [tipo, normalizarNome(item.tipo || ''), brChaveMinutoEvento(item.minuto), identidade].join('|');
+    const qualidade = (item.jogador ? 20 : 0) + (item.time ? 10 : 0) + (item.descricao ? 2 : 0);
+    const anterior = melhores.get(chave);
+    if (!anterior || qualidade > anterior.qualidade) melhores.set(chave, { item, qualidade });
+  }
+  return Array.from(melhores.values(), x => x.item);
+}
+
 function htmlBarrasEstatistica(home, away) {
   const h = brNumeroEstatistica(home);
   const a = brNumeroEstatistica(away);
@@ -2583,8 +2635,8 @@ function htmlEventoCartaoResultado(cartao) {
 function htmlEstatisticasJogo(j) {
   const det = detalhesDoJogo(j) || {};
   const stats = estatisticasDoJogo(j);
-  const gols = Array.isArray(det.gols) ? det.gols : [];
-  const cartoes = Array.isArray(det.cartoes) ? det.cartoes : [];
+  const gols = brEventosUnicos(det.gols, 'gol');
+  const cartoes = brEventosUnicos(det.cartoes, 'cartao');
   const publico = Number(det.publico);
   const temInfo = stats.length || gols.length || cartoes.length || det.estadio || det.arbitro || (Number.isFinite(publico) && publico > 0);
   if (!temInfo) return '';
