@@ -47,6 +47,7 @@
     agenda: [],
     eventosLocais: [],
     diretos: [],
+    transmissoes: {},
     selecionado: "",
     resumoPorId: {},
     ultimaAtualizacao: null,
@@ -249,6 +250,54 @@
     const r = await fetch(url, { cache: "no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status);
     return r.json();
+  }
+
+  function safeYouTubeUrl(value) {
+    try {
+      const url = new URL(String(value || ""), window.location.href);
+      const host = url.hostname.toLowerCase();
+      if (host !== "youtube.com" && host !== "www.youtube.com" && host !== "youtu.be") return "";
+      if (host === "youtu.be") return /^[A-Za-z0-9_-]{11}$/.test(url.pathname.replace(/^\//, "")) ? url.href : "";
+      const id = url.searchParams.get("v");
+      return /^[A-Za-z0-9_-]{11}$/.test(id || "") ? url.href : "";
+    } catch (_) {
+      return "";
+    }
+  }
+
+  async function loadTransmissions() {
+    const data = await fetchJson("dados-br/transmissoes-aovivo.json?t=" + Date.now()).catch(() => ({ jogos: {} }));
+    state.transmissoes = data && data.jogos && typeof data.jogos === "object" ? data.jogos : {};
+  }
+
+  function transmissionForGame(game) {
+    if (!game) return null;
+    const direct = game.id && state.transmissoes[String(game.id)];
+    if (direct) return direct;
+    const wanted = teamKey(game.home && game.home.nome, game.away && game.away.nome);
+    const gameDate = game.date ? dateKey(game.date) : "";
+    for (const item of Object.values(state.transmissoes)) {
+      if (!item || typeof item !== "object") continue;
+      if (teamKey(item.mandante, item.visitante) !== wanted) continue;
+      const itemDate = parseDate(item.data_iso);
+      if (!gameDate || !itemDate || dateKey(itemDate) === gameDate) return item;
+    }
+    return null;
+  }
+
+  function renderTransmission(game) {
+    const entry = transmissionForGame(game);
+    const principal = entry && entry.principal;
+    const url = principal && safeYouTubeUrl(principal.url);
+    if (!url) return "";
+    const sourceName = principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
+    const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
+    const label = liveNow ? "🔴 Assistir ao vivo na " + sourceName : "▶ Assistir na " + sourceName;
+    const note = liveNow ? "Transmissão oficial ao vivo no YouTube" : "Transmissão oficial programada no YouTube";
+    const alternatives = Array.isArray(entry.alternativas) ? entry.alternativas : [];
+    const alt = alternatives.find((item) => item && safeYouTubeUrl(item.url));
+    const altHtml = alt ? '<a class="live-stream-alt" href="' + esc(safeYouTubeUrl(alt.url)) + '" target="_blank" rel="noopener noreferrer">Também disponível na ' + esc(alt.nome || "GE TV") + '</a>' : "";
+    return '<div class="live-stream-area"><a class="live-stream-button ' + (liveNow ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + '</div>' + altHtml + '</div>';
   }
 
   async function loadLocal() {
@@ -588,6 +637,7 @@
       (countdown ? '<div class="live-countdown" data-countdown-game="' + esc(g.id) + '">' + esc(countdown) + '</div>' : "") + '</div>' +
       '<div class="live-team">' + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div><div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div></div>' +
       '<div class="live-meta">' + venue + transmission + '</div>' +
+      renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +
       '<div class="live-content-grid"><section class="panel live-subpanel"><div class="panel-inner"><div class="live-section-head"><h2>⚽ Gols e cartões</h2><span class="live-section-note">lances oficiais</span></div>' + renderEvents(g, summary) + '</div></section>' +
       '<section class="panel live-subpanel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">durante o jogo</span></div>' + renderStats(g, summary) + '</div></section></div>' +
@@ -631,7 +681,7 @@
     state.carregando = true;
     try {
       if (state.primeiraCarga) await loadLocal();
-      await loadScoreboard();
+      await Promise.all([loadScoreboard(), loadTransmissions()]);
       state.ultimaAtualizacao = new Date();
       state.ultimaFalha = "";
       state.primeiraCarga = false;
@@ -646,7 +696,7 @@
       showAlert("A ESPN não respondeu nesta tentativa. A última informação válida permanece na tela e uma nova tentativa ocorrerá automaticamente.");
       if (state.primeiraCarga) {
         try {
-          await loadLocal();
+          await Promise.all([loadLocal(), loadTransmissions()]);
           state.primeiraCarga = false;
           await renderPage();
         } catch (_) {

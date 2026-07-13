@@ -1,0 +1,55 @@
+{
+  "fonte": "YouTube oficial",
+  "competicao": "Brasileirão Série A 2026",
+  "prioridade": [
+    "cazetv",
+    "getv"
+  ],
+  "canais": [
+    {
+      "chave": "cazetv",
+      "nome": "CazéTV",
+      "handle": "@CazeTV",
+      "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+      "prioridade": 1,
+      "streams_url": "https://www.youtube.com/@CazeTV/streams"
+    },
+    {
+      "chave": "getv",
+      "nome": "GE TV",
+      "handle": "@getv",
+      "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+      "prioridade": 2,
+      "streams_url": "https://www.youtube.com/@getv/streams"
+    }
+  ],
+  "janela_antes_horas": 24,
+  "janela_depois_inicio_minutos": 90,
+  "manter_apos_inicio_horas": 3,
+  "uploads_max_itens": 50,
+  "tolerancia_horario_minutos": 180,
+  "confianca_minima": 0.72,
+  "termos_competicao": [
+    "brasileirão",
+    "brasileirao",
+    "brasileirão série a",
+    "brasileirao serie a"
+  ],
+  "palavras_rejeitadas": [
+    "melhores momentos",
+    "pré-jogo",
+    "pre jogo",
+    "pós-jogo",
+    "pos jogo",
+    "react",
+    "rádio",
+    "radio",
+    "narração",
+    "narracao",
+    "coletiva",
+    "programa esportivo",
+    "compacto"
+  ],
+  "agenda_ge_referencia": "https://ge.globo.com/agenda/#/futebol",
+  "observacao": "A agenda do GE é apenas referência humana. O botão só é publicado quando existe vídeo oficial validado pelo channelId do YouTube."
+}
