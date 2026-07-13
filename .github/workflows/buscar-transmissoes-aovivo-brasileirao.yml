@@ -1,0 +1,176 @@
+name: Buscar transmissões ao vivo do Brasileirão
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+    inputs:
+      event_id:
+        description: 'Opcional: pesquisar apenas um event_id da ESPN'
+        required: false
+        default: ''
+        type: string
+      force_search:
+        description: 'Forçar search.list agora, ignorando a cadência de 2h'
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Somente auditar, sem gravar nem publicar'
+        required: false
+        default: false
+        type: boolean
+  push:
+    paths:
+      - 'scripts/buscar_transmissoes_aovivo_brasileirao.py'
+      - 'dados-br/config-transmissoes-aovivo.json'
+      - 'dados-br/transmissoes-aovivo-manual.json'
+      - '.github/workflows/buscar-transmissoes-aovivo-brasileirao.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+
+jobs:
+  buscar:
+    name: Procurar CazéTV e GE TV oficiais
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validar script e configuração
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/buscar_transmissoes_aovivo_brasileirao.py
+          python scripts/buscar_transmissoes_aovivo_brasileirao.py --selftest
+          python -m json.tool dados-br/config-transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/transmissoes-aovivo-manual.json > /dev/null
+          python -m json.tool dados-br/auditoria-transmissoes-aovivo.json > /dev/null
+
+      - name: Buscar transmissões oficiais
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_EVENT_ID: ${{ inputs.event_id }}
+          INPUT_FORCE_SEARCH: ${{ inputs.force_search }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CMD=(python scripts/buscar_transmissoes_aovivo_brasileirao.py)
+
+          if [[ -n "${INPUT_EVENT_ID:-}" ]]; then
+            CMD+=(--event-id "${INPUT_EVENT_ID}")
+          fi
+          if [[ "${INPUT_FORCE_SEARCH:-false}" == "true" ]]; then
+            CMD+=(--force-search)
+          fi
+          if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+            CMD+=(--dry-run)
+          fi
+
+          echo "Executando: ${CMD[*]}"
+          "${CMD[@]}"
+
+      - name: Validar relatórios gerados
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != true }}
+        run: |
+          set -euo pipefail
+          python -m json.tool dados-br/transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/auditoria-transmissoes-aovivo.json > /dev/null
+          python - <<'PY'
+          import json
+          from urllib.parse import urlparse, parse_qs
+
+          out = json.load(open('dados-br/transmissoes-aovivo.json', encoding='utf-8'))
+          assert isinstance(out.get('jogos'), dict), 'transmissoes-aovivo.json sem objeto jogos'
+          for event_id, jogo in out['jogos'].items():
+              assert str(jogo.get('event_id')) == str(event_id), f'event_id divergente em {event_id}'
+              principal = jogo.get('principal')
+              assert isinstance(principal, dict), f'{event_id}: sem principal válido'
+              assert principal.get('fonte') in {'cazetv', 'getv'}, f'{event_id}: fonte não permitida'
+              url = principal.get('url', '')
+              parsed = urlparse(url)
+              assert parsed.netloc.lower() in {'www.youtube.com', 'youtube.com'}, f'{event_id}: URL fora do YouTube'
+              assert parse_qs(parsed.query).get('v'), f'{event_id}: URL sem video_id'
+              if jogo.get('alternativas'):
+                  assert principal.get('fonte') == 'cazetv', f'{event_id}: com duas fontes, CazéTV deve ser principal'
+          aud = json.load(open('dados-br/auditoria-transmissoes-aovivo.json', encoding='utf-8'))
+          assert isinstance(aud.get('resumo'), dict), 'auditoria sem resumo'
+          assert isinstance(aud.get('rejeitados'), list), 'auditoria sem rejeitados'
+          assert isinstance(aud.get('sem_transmissao'), list), 'auditoria sem sem_transmissao'
+          print('JSONs e prioridade CazéTV > GE TV validados')
+          PY
+
+      - name: Commitar somente quando houver mudança real
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != true }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=(
+            "dados-br/transmissoes-aovivo.json"
+            "dados-br/auditoria-transmissoes-aovivo.json"
+          )
+
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+            echo "Nenhuma transmissão nova ou mudança de auditoria. Nada para commitar."
+            exit 0
+          fi
+
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            mkdir -p "$TMP_DIR/$(dirname "$f")"
+            cp -a "$f" "$TMP_DIR/$f"
+          done
+
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              mkdir -p "$(dirname "$f")"
+              cp -a "$TMP_DIR/$f" "$f"
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Origin/main já possui o mesmo conteúdo. Sem commit."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar transmissões ao vivo Brasileirão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+            if git push origin HEAD:main; then
+              echo "Push concluído na tentativa $i."
+              exit 0
+            fi
+
+            echo "Push rejeitado; tentando novamente sobre origin/main atualizado..."
+            sleep 3
+          done
+
+          echo "ERRO: push falhou após 5 tentativas."
+          exit 1
