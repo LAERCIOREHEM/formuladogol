@@ -1087,14 +1087,16 @@ def carregar_lideres_oficiais(avisos: list[str]) -> tuple[list[dict[str, Any]], 
         )
     artilharia = [dict(x) for x in data.get("artilharia") or [] if isinstance(x, dict)]
     assistencias = [dict(x) for x in data.get("assistencias") or [] if isinstance(x, dict)]
-    if len(artilharia) < 5 or len(assistencias) < 5:
+    min_gols = 40 if len(ler_json("resultados.json", {}).get("resultados") or []) >= 50 else 10
+    min_assist = 20 if len(ler_json("resultados.json", {}).get("resultados") or []) >= 50 else 5
+    if len(artilharia) < min_gols or len(assistencias) < min_assist:
         raise RuntimeError(
-            f"ranking oficial incompleto: {len(artilharia)} artilheiros e "
-            f"{len(assistencias)} assistentes"
+            f"ranking de jogadores incompleto: {len(artilharia)} artilheiros e "
+            f"{len(assistencias)} assistentes; mínimos esperados {min_gols}/{min_assist}"
         )
     avisos.append(
-        "Artilharia e assistências carregadas dos rankings oficiais da ESPN; "
-        "summaries ficam restritos aos detalhes de partidas."
+        "Artilharia e assistências carregadas do ranking ESPN completado por eventos "
+        "validados de todas as partidas; listas incluem jogadores com um gol/assistência."
     )
     return artilharia, assistencias
 
@@ -1110,12 +1112,36 @@ def main() -> None:
     clubes = montar_clubes(tabela, resultados)
     ranking, auditoria_ranking = gerar_ranking_desempenho(clubes)
     artilharia, garcons = carregar_lideres_oficiais(avisos)
+    detalhes_data = ler_json("dados-br/jogos-detalhes.json", {})
+    detalhes_jogos = detalhes_data.get("jogos") or {} if isinstance(detalhes_data, dict) else {}
     eventos_processados = [
-        {"event_id": str(r.get("event_id") or ""), "fonte": "resultados.json"}
+        {"event_id": str(r.get("event_id") or ""), "fonte": "dados-br/jogos-detalhes.json"}
         for r in resultados if str(r.get("event_id") or "")
     ]
     eventos_gols: list[dict[str, Any]] = []
     eventos_assistencias: list[dict[str, Any]] = []
+    if isinstance(detalhes_jogos, dict):
+        for event_id, game in detalhes_jogos.items():
+            if not isinstance(game, dict):
+                continue
+            for goal in game.get("gols") or []:
+                if not isinstance(goal, dict):
+                    continue
+                event = {
+                    "event_id": str(event_id), "rodada": game.get("rodada"),
+                    "data_iso": game.get("data_iso"), "minuto": goal.get("minuto"),
+                    "jogador": goal.get("jogador"), "time": goal.get("time"),
+                    "assistencias": list(goal.get("assistencias") or []),
+                    "descricao": goal.get("descricao"),
+                }
+                eventos_gols.append(event)
+                for assistant in goal.get("assistencias") or []:
+                    eventos_assistencias.append({
+                        "event_id": str(event_id), "rodada": game.get("rodada"),
+                        "data_iso": game.get("data_iso"), "minuto": goal.get("minuto"),
+                        "jogador": assistant, "time": goal.get("time"),
+                        "autor_gol": goal.get("jogador"),
+                    })
     participacoes = combinar_participacoes(artilharia, garcons)
 
     melhor_ataque = sorted(clubes, key=lambda c: (-int(c.get("gp") or 0), int(c.get("jogos") or 99), normalizar(c["time"])))
@@ -1126,7 +1152,7 @@ def main() -> None:
     payload_stats = {
         "atualizado_em": iso_agora_brt(),
         "temporada": TEMPORADA,
-        "fonte": "ESPN · rankings oficiais + snapshots de partidas",
+        "fonte": "ESPN · ranking oficial completado + eventos validados das partidas",
         "total_resultados_lidos": len(resultados),
         "total_eventos_processados": len(eventos_processados),
         "resumo": {
@@ -1161,8 +1187,8 @@ def main() -> None:
     payload_jogadores = {
         "atualizado_em": payload_stats["atualizado_em"],
         "temporada": TEMPORADA,
-        "fonte": "ESPN · rankings oficiais da competição",
-        "metodologia": "Artilharia e assistências vêm diretamente dos rankings oficiais da temporada na ESPN. Summaries são usados apenas em detalhes de cada jogo.",
+        "fonte": "ESPN · ranking oficial + eventos validados das partidas",
+        "metodologia": "Líderes oficiais preservam nomes e totais do topo; eventos validados completam todos os jogadores com gols e assistências.",
         "total_summaries_processados": 0,
         "total_jogos_finalizados": len(resultados),
         "artilharia": artilharia,

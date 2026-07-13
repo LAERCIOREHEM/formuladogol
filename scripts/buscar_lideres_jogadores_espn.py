@@ -29,6 +29,8 @@ import re
 import sys
 import time
 import unicodedata
+from difflib import SequenceMatcher
+from collections import defaultdict
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -485,6 +487,10 @@ def collect_one(stat: str, fixture: Path | None = None) -> tuple[list[dict[str, 
         ranking = extract_ranking(payload, stat)
         return ranking, [{"url": str(fixture), "status": "fixture", "itens": len(ranking)}], str(fixture)
 
+    best: list[dict[str, Any]] = []
+    best_url = ""
+    field = "gols" if stat == "gols" else "assistencias"
+    target = 50 if stat == "gols" else 30
     for url in candidate_urls(stat):
         try:
             payload, ctype = fetch_document(url, timeout=14, attempts=1)
@@ -498,12 +504,178 @@ def collect_one(stat: str, fixture: Path | None = None) -> tuple[list[dict[str, 
                 "itens_extraidos": len(ranking),
                 "refs_espn_resolvidas": refs_resolvidas[0],
             })
-            if len(ranking) >= 5:
-                return ranking, attempts_log, url
+            current_score = (len(ranking), sum(int(x.get(field) or 0) for x in ranking))
+            best_score = (len(best), sum(int(x.get(field) or 0) for x in best))
+            if current_score > best_score:
+                best, best_url = ranking, url
+            # Não aceita mais uma lista de apenas cinco como suficiente. Uma
+            # fonte realmente extensa encerra a busca; caso contrário, compara
+            # todas as rotas e conserva a melhor resposta.
+            if len(best) >= target:
+                break
         except Exception as exc:  # noqa: BLE001
             attempts_log.append({"url": url, "status": "erro", "erro": str(exc)[:300]})
-    return [], attempts_log, ""
+    return best, attempts_log, best_url
 
+
+def _name_compatible(a: Any, b: Any) -> bool:
+    na, nb = norm(a), norm(b)
+    if not na or not nb:
+        return False
+    if na == nb:
+        return True
+    ta, tb = set(na.split()), set(nb.split())
+    if ta <= tb or tb <= ta:
+        return True
+    return SequenceMatcher(None, na, nb).ratio() >= 0.88
+
+
+def _details_payload() -> dict[str, Any]:
+    data = read_json(ROOT / "dados-br" / "jogos-detalhes.json", {})
+    return data if isinstance(data, dict) else {}
+
+
+def aggregate_from_details(stat: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Reconstrói a lista completa a partir de eventos de jogos já validados."""
+    data = _details_payload()
+    games = data.get("jogos") or {}
+    if not isinstance(games, dict):
+        games = {}
+    field = "gols" if stat == "gols" else "assistencias"
+    counts: dict[tuple[str, str], int] = defaultdict(int)
+    display: dict[tuple[str, str], tuple[str, str]] = {}
+    match_ids: dict[tuple[str, str], set[str]] = defaultdict(set)
+    ignored_own_goals = 0
+    invalid_games = 0
+
+    for event_id, game in games.items():
+        if not isinstance(game, dict):
+            continue
+        if not (game.get("validacao_eventos") or {}).get("gols_ok", True):
+            invalid_games += 1
+            continue
+        for goal in game.get("gols") or []:
+            if not isinstance(goal, dict):
+                continue
+            description = str(goal.get("descricao") or "")
+            team = para_canonico(goal.get("time")) or str(goal.get("time") or "").strip()
+            if not team:
+                continue
+            if stat == "gols":
+                if "own goal" in description.lower() or "gol contra" in norm(description):
+                    ignored_own_goals += 1
+                    continue
+                names = [str(goal.get("jogador") or "").strip()]
+            else:
+                names = [str(x or "").strip() for x in goal.get("assistencias") or []]
+            for name in names:
+                if not name or suspicious_name(name):
+                    continue
+                key = (norm(name), norm(team))
+                counts[key] += 1
+                display.setdefault(key, (name, team))
+                match_ids[key].add(str(event_id))
+
+    ranking: list[dict[str, Any]] = []
+    for key, value in counts.items():
+        name, team = display[key]
+        ranking.append({
+            "athlete_id": "",
+            "nome": name,
+            "time": team,
+            "team_id": "",
+            "escudo": (ESCUDOS_TIMES.get(team) or {}).get("escudo", ""),
+            "jogos": 0,
+            field: int(value),
+            "jogos_com_participacao": len(match_ids[key]),
+            "origem_complementar": "eventos validados das partidas",
+        })
+    ranking.sort(key=lambda x: (-int(x[field]), norm(x["nome"]), norm(x["time"])))
+    for pos, item in enumerate(ranking, 1):
+        item["posicao"] = pos
+    audit = {
+        "jogos_lidos": len(games),
+        "jogos_invalidos_ignorados": invalid_games,
+        "jogadores": len(ranking),
+        "total_eventos_contabilizados": sum(counts.values()),
+        "gols_contra_ignorados": ignored_own_goals if stat == "gols" else 0,
+    }
+    return ranking, audit
+
+
+def merge_official_and_local(
+    official: list[dict[str, Any]], local: list[dict[str, Any]], stat: str
+) -> list[dict[str, Any]]:
+    field = "gols" if stat == "gols" else "assistencias"
+    used_local: set[int] = set()
+    merged: list[dict[str, Any]] = []
+
+    for off in official:
+        team = para_canonico(off.get("time")) or str(off.get("time") or "")
+        candidates = [
+            (idx, row) for idx, row in enumerate(local)
+            if idx not in used_local
+            and norm(para_canonico(row.get("time")) or row.get("time")) == norm(team)
+            and _name_compatible(off.get("nome"), row.get("nome"))
+        ]
+        candidates.sort(key=lambda pair: (
+            0 if norm(pair[1].get("nome")) == norm(off.get("nome")) else 1,
+            -int(pair[1].get(field) or 0),
+        ))
+        row = dict(off)
+        if candidates:
+            idx, local_row = candidates[0]
+            used_local.add(idx)
+            # O ranking oficial define nome canônico/quantidade; os eventos
+            # garantem que o jogador continue na lista completa.
+            row["jogos_com_participacao"] = local_row.get("jogos_com_participacao", 0)
+            row["origem_complementar"] = "ranking ESPN conferido nos eventos"
+        row["time"] = team
+        row["escudo"] = row.get("escudo") or (ESCUDOS_TIMES.get(team) or {}).get("escudo", "")
+        merged.append(row)
+
+    for idx, row in enumerate(local):
+        if idx in used_local:
+            continue
+        merged.append(dict(row))
+
+    # Deduplicação defensiva após aliases oficiais/local.
+    dedup: list[dict[str, Any]] = []
+    for row in sorted(merged, key=lambda x: (-int(x.get(field) or 0), norm(x.get("nome")), norm(x.get("time")))):
+        duplicate = next((x for x in dedup if norm(x.get("time")) == norm(row.get("time")) and _name_compatible(x.get("nome"), row.get("nome"))), None)
+        if duplicate is None:
+            dedup.append(row)
+        elif int(row.get(field) or 0) > int(duplicate.get(field) or 0):
+            duplicate.update(row)
+
+    dedup.sort(key=lambda x: (-int(x.get(field) or 0), norm(x.get("nome")), norm(x.get("time"))))
+    for pos, item in enumerate(dedup, 1):
+        item["posicao"] = pos
+        games = int(item.get("jogos") or 0)
+        if games > 0:
+            item["media_por_jogo"] = round(int(item.get(field) or 0) / games, 3)
+        else:
+            item.pop("media_por_jogo", None)
+    return dedup
+
+
+def validate_completeness(ranking: list[dict[str, Any]], stat: str, local_audit: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    games = int(local_audit.get("jogos_lidos") or 0)
+    min_len = 5
+    if games >= 50:
+        min_len = 40 if stat == "gols" else 20
+    elif games >= 15:
+        min_len = 15 if stat == "gols" else 8
+    if len(ranking) < min_len:
+        errors.append(f"{stat}: lista completa tem apenas {len(ranking)} nomes; esperado ao menos {min_len} para {games} jogos")
+    if stat == "gols":
+        local_total = int(local_audit.get("total_eventos_contabilizados") or 0)
+        merged_total = sum(int(x.get("gols") or 0) for x in ranking)
+        # O total oficial pode variar por aliases, mas não pode sofrer truncamento maciço.
+        if local_total and merged_total < int(local_total * 0.90):
+            errors.append(f"gols: cobertura insuficiente ({merged_total}/{local_total})")
+    return errors
 
 def self_test() -> None:
     fixture = {
@@ -548,15 +720,15 @@ def self_test() -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Busca artilharia e assistências oficiais da ESPN.")
+    parser = argparse.ArgumentParser(description="Busca e completa artilharia e assistências da ESPN.")
     parser.add_argument("--self-test", action="store_true")
     parser.add_argument("--fixture-gols", type=Path)
     parser.add_argument("--fixture-assistencias", type=Path)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--reconstruir-local", action="store_true", help="Completa os rankings usando o snapshot atual e eventos locais, sem rede.")
     parser.add_argument(
-        "--nao-falhar-sem-snapshot",
-        action="store_true",
-        help="Grava a auditoria e encerra com código 0 quando a ESPN estiver indisponível e ainda não houver snapshot válido.",
+        "--nao-falhar-sem-snapshot", action="store_true",
+        help="Grava a auditoria e encerra com código 0 quando ainda não houver base válida.",
     )
     args = parser.parse_args()
 
@@ -568,41 +740,52 @@ def main() -> None:
     prev_goals = list(previous.get("artilharia") or [])
     prev_assists = list(previous.get("assistencias") or [])
 
-    goals, log_goals, source_goals = collect_one("gols", args.fixture_gols)
-    assists, log_assists, source_assists = collect_one("assistencias", args.fixture_assistencias)
+    if args.reconstruir_local:
+        collected_goals, log_goals, source_goals = prev_goals, [{"status": "snapshot-local", "itens": len(prev_goals)}], "snapshot anterior"
+        collected_assists, log_assists, source_assists = prev_assists, [{"status": "snapshot-local", "itens": len(prev_assists)}], "snapshot anterior"
+    else:
+        collected_goals, log_goals, source_goals = collect_one("gols", args.fixture_gols)
+        collected_assists, log_assists, source_assists = collect_one("assistencias", args.fixture_assistencias)
 
-    errors_goals = validate_ranking(goals, "gols", prev_goals)
-    errors_assists = validate_ranking(assists, "assistencias", prev_assists)
-    used_previous: dict[str, bool] = {"artilharia": False, "assistencias": False}
+    errors_new_goals = validate_ranking(collected_goals, "gols", prev_goals) if collected_goals else ["gols: nenhuma lista oficial coletada"]
+    errors_new_assists = validate_ranking(collected_assists, "assistencias", prev_assists) if collected_assists else ["assistencias: nenhuma lista oficial coletada"]
+    official_goals = collected_goals if not errors_new_goals else prev_goals
+    official_assists = collected_assists if not errors_new_assists else prev_assists
+    used_previous = {
+        "artilharia": official_goals is prev_goals or args.reconstruir_local,
+        "assistencias": official_assists is prev_assists or args.reconstruir_local,
+    }
 
-    if errors_goals and prev_goals and not validate_ranking(prev_goals, "gols"):
-        goals = prev_goals
-        used_previous["artilharia"] = True
-    if errors_assists and prev_assists and not validate_ranking(prev_assists, "assistencias"):
-        assists = prev_assists
-        used_previous["assistencias"] = True
+    local_goals, local_audit_goals = aggregate_from_details("gols")
+    local_assists, local_audit_assists = aggregate_from_details("assistencias")
+    goals = merge_official_and_local(official_goals, local_goals, "gols")
+    assists = merge_official_and_local(official_assists, local_assists, "assistencias")
 
-    final_errors = validate_ranking(goals, "gols") + validate_ranking(assists, "assistencias")
+    final_errors = (
+        validate_ranking(goals, "gols") + validate_ranking(assists, "assistencias")
+        + validate_completeness(goals, "gols", local_audit_goals)
+        + validate_completeness(assists, "assistencias", local_audit_assists)
+    )
     status = "valido" if not final_errors else "invalido"
+    completeness = {
+        "artilharia": {**local_audit_goals, "jogadores_publicados": len(goals)},
+        "assistencias": {**local_audit_assists, "jogadores_publicados": len(assists)},
+    }
 
     audit = {
-        "gerado_em": iso_agora_brt(),
-        "temporada": TEMPORADA,
-        "status": status,
+        "gerado_em": iso_agora_brt(), "temporada": TEMPORADA, "status": status,
         "resumo": {
-            "artilheiros": len(goals),
-            "assistentes": len(assists),
+            "artilheiros": len(goals), "assistentes": len(assists),
             "lider_gols": goals[0] if goals else None,
             "lider_assistencias": assists[0] if assists else None,
             "preservado_de_execucao_anterior": used_previous,
+            "completude": completeness,
         },
         "fonte_aceita": {"artilharia": source_goals, "assistencias": source_assists},
         "tentativas": {"artilharia": log_goals, "assistencias": log_assists},
-        "erros_nova_coleta": {"artilharia": errors_goals, "assistencias": errors_assists},
+        "erros_nova_coleta": {"artilharia": errors_new_goals, "assistencias": errors_new_assists},
         "erros_finais": final_errors,
-        "nomes_suspeitos": [
-            x.get("nome") for x in goals + assists if suspicious_name(str(x.get("nome") or ""))
-        ],
+        "nomes_suspeitos": [x.get("nome") for x in goals + assists if suspicious_name(str(x.get("nome") or ""))],
     }
 
     if args.dry_run:
@@ -614,20 +797,19 @@ def main() -> None:
     write_json_atomic(AUDITORIA, audit)
     if final_errors:
         if args.nao_falhar_sem_snapshot:
-            print("AVISO: coleta de líderes ainda inválida; auditoria gravada e snapshot anterior preservado.")
+            print("AVISO: coleta de líderes ainda inválida; auditoria gravada.")
             print(" | ".join(final_errors))
             return
         raise RuntimeError("Coleta de líderes inválida: " + " | ".join(final_errors))
 
     payload = {
-        "atualizado_em": iso_agora_brt(),
-        "temporada": TEMPORADA,
-        "fonte": "ESPN · rankings oficiais da competição",
-        "status": "valido",
-        "preservado_de_execucao_anterior": used_previous,
+        "atualizado_em": iso_agora_brt(), "temporada": TEMPORADA,
+        "fonte": "ESPN · ranking oficial + eventos validados das partidas",
+        "metodologia": "Preserva os líderes oficiais da ESPN e completa a lista com todos os jogadores identificados nos gols e assistências validados jogo a jogo.",
+        "status": "valido", "preservado_de_execucao_anterior": used_previous,
         "fonte_aceita": {"artilharia": source_goals, "assistencias": source_assists},
-        "artilharia": goals,
-        "assistencias": assists,
+        "completude": completeness,
+        "artilharia": goals, "assistencias": assists,
     }
     write_json_atomic(SAIDA, payload)
     print(f"OK: {len(goals)} artilheiros e {len(assists)} assistentes em {SAIDA.relative_to(ROOT)}")

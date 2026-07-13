@@ -1,14 +1,14 @@
 {
-  "gerado_em": "2026-07-13T09:56:29.661355-03:00",
+  "gerado_em": "2026-07-13T12:07:31.553105-03:00",
   "status": "ok",
   "resumo": {
     "clubes": 20,
     "jogos_finalizados": 177,
     "jogos_com_detalhes": 177,
     "jogos_com_estatisticas": 177,
-    "jogos_com_publico": 166,
-    "artilheiros": 15,
-    "assistentes": 5,
+    "jogos_com_publico": 177,
+    "artilheiros": 208,
+    "assistentes": 193,
     "lider_gols": {
       "posicao": 1,
       "athlete_id": "",
@@ -18,7 +18,9 @@
       "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg",
       "jogos": 17,
       "gols": 11,
-      "media_por_jogo": 0.647
+      "media_por_jogo": 0.647,
+      "jogos_com_participacao": 8,
+      "origem_complementar": "ranking ESPN conferido nos eventos"
     },
     "lider_assistencias": {
       "posicao": 1,
@@ -29,24 +31,26 @@
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
       "jogos": 17,
       "assistencias": 9,
-      "media_por_jogo": 0.529
+      "media_por_jogo": 0.529,
+      "jogos_com_participacao": 6,
+      "origem_complementar": "ranking ESPN conferido nos eventos"
     },
     "erros_criticos": 0,
     "avisos": 0
   },
   "fontes": {
-    "lideres": "ESPN · rankings oficiais da competição",
+    "lideres": "ESPN · ranking oficial + eventos validados das partidas",
     "lideres_aceitas": {
-      "artilharia": "",
-      "assistencias": ""
+      "artilharia": "snapshot anterior",
+      "assistencias": "snapshot anterior"
     },
     "detalhes": "ESPN summary",
     "competicao": "ESPN · tabela, resultados, summaries e rankings oficiais"
   },
   "auditorias_relacionadas": {
     "lideres": {
-      "artilheiros": 15,
-      "assistentes": 5,
+      "artilheiros": 208,
+      "assistentes": 193,
       "lider_gols": {
         "posicao": 1,
         "athlete_id": "",
@@ -56,7 +60,9 @@
         "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg",
         "jogos": 17,
         "gols": 11,
-        "media_por_jogo": 0.647
+        "media_por_jogo": 0.647,
+        "jogos_com_participacao": 8,
+        "origem_complementar": "ranking ESPN conferido nos eventos"
       },
       "lider_assistencias": {
         "posicao": 1,
@@ -67,21 +73,45 @@
         "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
         "jogos": 17,
         "assistencias": 9,
-        "media_por_jogo": 0.529
+        "media_por_jogo": 0.529,
+        "jogos_com_participacao": 6,
+        "origem_complementar": "ranking ESPN conferido nos eventos"
       },
       "preservado_de_execucao_anterior": {
         "artilharia": true,
         "assistencias": true
+      },
+      "completude": {
+        "artilharia": {
+          "jogos_lidos": 177,
+          "jogos_invalidos_ignorados": 0,
+          "jogadores": 209,
+          "total_eventos_contabilizados": 457,
+          "gols_contra_ignorados": 14,
+          "jogadores_publicados": 208
+        },
+        "assistencias": {
+          "jogos_lidos": 177,
+          "jogos_invalidos_ignorados": 0,
+          "jogadores": 193,
+          "total_eventos_contabilizados": 312,
+          "gols_contra_ignorados": 0,
+          "jogadores_publicados": 193
+        }
       }
     },
     "detalhes": {
       "total_processados": 177,
       "total_com_estatisticas": 177,
-      "total_com_publico": 166,
+      "total_com_publico": 177,
       "total_falhas": 0
     }
   },
   "jogos_sem_detalhes": [],
+  "eventos_inconsistentes": [],
+  "eventos_duplicados": [],
+  "falsos_gols_de_narracao": [],
+  "elencos_incompletos": [],
   "nomes_suspeitos": [],
   "erros_criticos": [],
   "avisos": []

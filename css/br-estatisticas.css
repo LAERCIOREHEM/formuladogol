@@ -957,3 +957,28 @@ body > .container > section.hero > img {
   .stats-performance-head > b { font-size: 21px; }
   .stats-performance-metric { grid-template-columns: 62px minmax(0,1fr) 36px; gap: 6px; }
 }
+
+/* CORREÇÃO 20260713 — navegação por clube e listas completas de marcadores. */
+.stats-club-shield-link,
+.stats-performance-club-link,
+.stats-performance-name-link,
+.stats-club-goals-main > a {
+  color: inherit;
+  text-decoration: none;
+}
+.stats-club-shield-link,
+.stats-performance-club-link { display: inline-grid; place-items: center; border-radius: 12px; }
+.stats-club-shield-link:focus-visible,
+.stats-performance-club-link:focus-visible,
+.stats-performance-name-link:focus-visible,
+.stats-club-goals-main > a:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+}
+.stats-performance-club-link:hover .stats-performance-shield,
+.stats-club-shield-link:hover .stats-club-shield { transform: scale(1.06); }
+.stats-performance-shield,
+.stats-club-shield { transition: transform .16s ease; }
+.stats-performance-name-link:hover strong,
+.stats-club-goals-main > a:hover strong { color: var(--green); }
+.stats-marker-expand { margin-top: 9px; }

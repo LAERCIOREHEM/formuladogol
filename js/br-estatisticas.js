@@ -21,6 +21,7 @@
     audit: null,
     tab: "artilheiros",
     expanded: { artilheiros: false, assistencias: false, publico: false },
+    expandedClubGoals: {},
     clubFilter: "",
     gamesLimit: 10,
   };
@@ -45,6 +46,19 @@
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, " ")
       .trim();
+  }
+
+  function clubSlug(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  function clubHref(name) {
+    return `clubes.html#${encodeURIComponent(clubSlug(name))}`;
   }
 
   function number(value, digits = 0) {
@@ -344,7 +358,7 @@
           ${cards.length ? `<section><h4>Cartões</h4><ul>${cards.map(cardLine).join("")}</ul></section>` : ""}
         </div>` : ""}
         ${statisticRows(detail)}
-        <div class="stats-source-note">Fonte: ESPN summary. Campos ausentes não são estimados.</div>
+        <div class="stats-source-note">Fonte: ESPN; público complementado por fonte documental quando ausente. Nenhum campo é estimado.</div>
       </div>
     </details>`;
   }
@@ -368,27 +382,41 @@
     const target = $("lista-gols-clube");
     const list = Array.isArray(state.competition?.gols_por_clube) ? state.competition.gols_por_clube : [];
     if (!list.length) {
-      target.innerHTML = emptyState("Consolidado de gols por clube ainda não disponível.", "Aguarde a conclusão do workflow da Execução 1.");
+      target.innerHTML = emptyState("Consolidado de gols por clube ainda não disponível.", "Aguarde a atualização automática dos dados.");
       return;
     }
     target.innerHTML = `<div class="stats-club-goals-list">${list.map((club, index) => {
       const markers = Array.isArray(club.marcadores) ? club.marcadores : [];
+      const key = clubSlug(club.time);
+      const expanded = Boolean(state.expandedClubGoals[key]);
+      const shown = expanded ? markers : markers.slice(0, 5);
       const unknown = Number(club.gols_nao_individualizados || 0);
       return `<details class="stats-club-goals-card">
         <summary>
           <span class="stats-rank">${integer(club.posicao || index + 1)}</span>
-          ${shield(club, "stats-club-shield")}
-          <div class="stats-club-goals-main"><strong>${escapeHtml(club.time)}</strong><span>${integer(club.jogos)} jogos · média ${number(club.media_gols, 2)}</span></div>
+          <a class="stats-club-shield-link" href="${escapeAttr(clubHref(club.time))}" title="Abrir página de ${escapeAttr(club.time)}" aria-label="Abrir página de ${escapeAttr(club.time)}" onclick="event.stopPropagation()">${shield(club, "stats-club-shield")}</a>
+          <div class="stats-club-goals-main"><a href="${escapeAttr(clubHref(club.time))}" onclick="event.stopPropagation()"><strong>${escapeHtml(club.time)}</strong></a><span>${integer(club.jogos)} jogos · média ${number(club.media_gols, 2)}</span></div>
           <div class="stats-club-goals-value"><strong>${integer(club.gols_pro)}</strong><span>gols</span></div>
           <span class="stats-game-chevron">⌄</span>
         </summary>
         <div class="stats-club-markers">
           <h4>Marcadores do clube</h4>
-          ${markers.length ? `<div class="stats-marker-list">${markers.map((player) => `<div><span>${escapeHtml(player.nome)}</span><strong>${integer(player.gols)}</strong></div>`).join("")}${unknown > 0 ? `<div class="stats-marker-other"><span>Outros gols ainda não individualizados no ranking</span><strong>${integer(unknown)}</strong></div>` : ""}</div>` : emptyState("Nenhum marcador individualizado na fonte de líderes.")}
+          ${markers.length ? `<div class="stats-marker-list">${shown.map((player) => `<div><span>${escapeHtml(player.nome)}</span><strong>${integer(player.gols)}</strong></div>`).join("")}${unknown > 0 ? `<div class="stats-marker-other"><span>Gols contra ou ainda sem autoria individualizada</span><strong>${integer(unknown)}</strong></div>` : ""}</div>${markers.length > 5 ? `<button class="stats-expand-btn stats-marker-expand" type="button" data-expand-club-goals="${escapeAttr(key)}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${markers.length}) ↓`}</button>` : ""}` : emptyState("Nenhum marcador individualizado na base consolidada.")}
           <div class="stats-club-balance"><span>Gols sofridos: <b>${integer(club.gols_contra)}</b></span><span>Saldo: <b>${integer(club.saldo)}</b></span></div>
         </div>
       </details>`;
     }).join("")}</div>`;
+    target.querySelectorAll("[data-expand-club-goals]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const key = button.dataset.expandClubGoals || "";
+        state.expandedClubGoals[key] = !state.expandedClubGoals[key];
+        renderClubGoals();
+        const card = target.querySelector(`[data-expand-club-goals="${key}"]`)?.closest("details");
+        if (card) card.open = true;
+      });
+    });
   }
 
   function performanceCard(record) {
@@ -456,7 +484,7 @@
         <div><span>Total</span><strong>${integer(attendance.total_publico)}</strong></div>
         <div><span>Jogos informados</span><strong>${integer(attendance.jogos_com_publico)}</strong></div>
       </div>
-      ${attendanceShown.length ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 maiores ↑" : `Ver todos os públicos (${ranking.length}) ↓`}</button>` : ""}` : emptyState("A ESPN ainda não disponibilizou público para os jogos processados.")}
+      ${attendanceShown.length ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 maiores ↑" : `Ver todos os públicos (${ranking.length}) ↓`}</button>` : ""}` : emptyState("As fontes consultadas ainda não disponibilizaram público para os jogos processados.")}
       <p class="stats-source-note">${escapeHtml(attendance.observacao || "Média calculada somente sobre partidas com público informado.")}</p>
     </div></section>`;
   }
@@ -476,8 +504,8 @@
     target.innerHTML = `<div class="stats-performance-list">${ranking.map((club, index) => `<article class="stats-performance-card">
       <div class="stats-performance-head">
         <span class="stats-rank">${integer(club.pos || club.pos_ranking || index + 1)}</span>
-        ${shield(club, "stats-performance-shield")}
-        <div><strong>${escapeHtml(club.time)}</strong><span>${integer(club.pontos)} pts · ${integer(club.pos_tabela)}º na tabela · SG ${integer(club.sg)}</span></div>
+        <a class="stats-performance-club-link" href="${escapeAttr(clubHref(club.time))}" title="Abrir página de ${escapeAttr(club.time)}" aria-label="Abrir página de ${escapeAttr(club.time)}">${shield(club, "stats-performance-shield")}</a>
+        <div><a class="stats-performance-name-link" href="${escapeAttr(clubHref(club.time))}"><strong>${escapeHtml(club.time)}</strong></a><span>${integer(club.pontos)} pts · ${integer(club.pos_tabela)}º na tabela · SG ${integer(club.sg)}</span></div>
         <b>${number(club.indice_final ?? club.score, 1)}<small>índice</small></b>
       </div>
       <div class="stats-performance-bars">

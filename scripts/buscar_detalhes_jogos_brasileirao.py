@@ -33,6 +33,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RESULTADOS = ROOT / "resultados.json"
 SAIDA = ROOT / "dados-br" / "jogos-detalhes.json"
 AUDITORIA = ROOT / "dados-br" / "auditoria-jogos-detalhes.json"
+PUBLICOS_COMPLEMENTARES = ROOT / "dados-br" / "publicos-complementares.json"
 
 HEADERS = {
     "User-Agent": (
@@ -280,16 +281,59 @@ def _first_text(no: Any, *keys: str) -> str:
     return ""
 
 
+def _attendance_number(value: Any) -> int | None:
+    """Converte público sem confundir separador de milhar com decimal."""
+    if isinstance(value, dict):
+        for key in ("value", "displayValue", "formattedValue", "text", "shortText", "name"):
+            found = _attendance_number(value.get(key))
+            if found is not None:
+                return found
+        return None
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        n = int(round(float(value)))
+        return n if 100 <= n <= 250000 else None
+    raw = str(value or "").strip()
+    if not raw:
+        return None
+    # Público é inteiro. "43,210", "43.210" e "43 210" devem virar 43210.
+    digits = re.sub(r"\D", "", raw)
+    if not digits:
+        return None
+    try:
+        n = int(digits)
+    except ValueError:
+        return None
+    return n if 100 <= n <= 250000 else None
+
+
 def parse_publico(summary: dict[str, Any]) -> int | None:
     candidatos: list[int] = []
+    nomes = {"attendance", "crowd", "publico", "spectators", "attendancevalue"}
     for no in _walk(summary):
         for key, value in no.items():
-            if normalizar(key) not in {"attendance", "crowd", "publico", "spectators"}:
+            nk = compacto(key)
+            if nk not in nomes and not any(token in nk for token in ("attendance", "spectator", "publico")):
                 continue
-            n = numero(value.get("value") if isinstance(value, dict) else value)
-            if n is not None and 100 <= n <= 250000:
-                candidatos.append(int(round(n)))
+            n = _attendance_number(value)
+            if n is not None:
+                candidatos.append(n)
     return max(candidatos) if candidatos else None
+
+
+
+
+def carregar_publicos_complementares() -> dict[str, dict[str, Any]]:
+    payload = carregar_json(PUBLICOS_COMPLEMENTARES, {})
+    jogos = payload.get("jogos") if isinstance(payload, dict) else {}
+    return jogos if isinstance(jogos, dict) else {}
+
+
+def publico_complementar(event_id: str, mapa: dict[str, dict[str, Any]]) -> tuple[int | None, str, str]:
+    item = mapa.get(str(event_id)) if isinstance(mapa, dict) else None
+    if not isinstance(item, dict):
+        return None, "", ""
+    valor = _attendance_number(item.get("publico"))
+    return valor, str(item.get("fonte") or ""), str(item.get("tipo") or "presente")
 
 
 def parse_estadio(summary: dict[str, Any], jogo: dict[str, Any]) -> str:
@@ -330,47 +374,86 @@ def limpar_nome_jogador(nome: Any) -> str:
     s = str(nome or "").strip()
     if not s:
         return ""
-    s = re.sub(r"\s+(?:with a|with the)\s+(?:cross|pass|header|shot).*?$", "", s, flags=re.I)
+    s = re.sub(r"\s+(?:with a|with the)\s+(?:cross|pass|headed pass|header|shot|through ball).*?$", "", s, flags=re.I)
+    s = re.sub(r"\s+(?:following|after)\s+.*?$", "", s, flags=re.I)
     s = re.sub(r"\s+(?:right|left)-?footed.*?$", "", s, flags=re.I)
     s = re.sub(r"\s+(?:assisted by|from the centre|from outside).*?$", "", s, flags=re.I)
     s = re.sub(r"\s*\([^)]*\)\s*$", "", s).strip(" -.,;")
     return s
 
 
-def _event_nodes(summary: dict[str, Any]) -> list[dict[str, Any]]:
-    keys = {"scoringplays", "keyevents", "plays", "commentary", "incidents", "matchevents", "details"}
-    out: list[dict[str, Any]] = []
-    seen: set[int] = set()
-    def walk(no: Any, parent_key: str = "") -> None:
+_EVENT_KEYS = {
+    "scoringplays": 100,
+    "keyevents": 90,
+    "incidents": 80,
+    "matchevents": 75,
+    "plays": 50,
+    "commentary": 40,
+    "details": 30,
+}
+
+
+def _event_nodes(summary: dict[str, Any]) -> list[tuple[dict[str, Any], str, int]]:
+    """Retorna eventos com origem/prioridade e evita percorrer a mesma lista duas vezes."""
+    out: list[tuple[dict[str, Any], str, int]] = []
+    seen_lists: set[int] = set()
+    seen_items: set[tuple[int, str]] = set()
+
+    def walk(no: Any) -> None:
         if isinstance(no, dict):
-            for k, v in no.items():
-                nk = normalizar(k).replace(" ", "")
-                if isinstance(v, list) and nk in keys:
-                    for item in v:
-                        if isinstance(item, dict) and id(item) not in seen:
-                            seen.add(id(item)); out.append(item)
-                if nk in keys or k in ("header", "competitions", "competition", "gameInfo"):
-                    walk(v, k)
+            for key, value in no.items():
+                nk = compacto(key)
+                if isinstance(value, list) and nk in _EVENT_KEYS and id(value) not in seen_lists:
+                    seen_lists.add(id(value))
+                    for item in value:
+                        if not isinstance(item, dict):
+                            continue
+                        marker = (id(item), nk)
+                        if marker in seen_items:
+                            continue
+                        seen_items.add(marker)
+                        out.append((item, nk, _EVENT_KEYS[nk]))
+                if isinstance(value, (dict, list)):
+                    walk(value)
         elif isinstance(no, list):
             for item in no:
-                walk(item, parent_key)
+                walk(item)
+
     walk(summary)
+    out.sort(key=lambda x: -x[2])
     return out
 
 
 def _event_text(ev: dict[str, Any]) -> str:
     tipo = ev.get("type")
-    parts = []
+    parts: list[str] = []
     if isinstance(tipo, dict):
         parts.extend(str(tipo.get(k) or "") for k in ("text", "name", "displayName", "description", "id"))
     elif tipo:
         parts.append(str(tipo))
-    parts.extend(str(ev.get(k) or "") for k in ("text", "description", "shortText", "headline", "eventType", "playType"))
-    return " ".join(parts).strip()
+    parts.extend(str(ev.get(k) or "") for k in ("text", "description", "descricao", "shortText", "headline", "eventType", "playType"))
+    # A mesma frase aparece em vários campos da ESPN; remova repetições exatas.
+    unique: list[str] = []
+    for part in parts:
+        part = re.sub(r"\s+", " ", part).strip()
+        if part and part not in unique:
+            unique.append(part)
+    return " ".join(unique).strip()
+
+
+def _event_type_text(ev: dict[str, Any]) -> str:
+    tipo = ev.get("type")
+    parts: list[str] = []
+    if isinstance(tipo, dict):
+        parts.extend(str(tipo.get(k) or "") for k in ("text", "name", "displayName", "description", "id"))
+    elif tipo:
+        parts.append(str(tipo))
+    parts.extend(str(ev.get(k) or "") for k in ("eventType", "playType"))
+    return " ".join(parts)
 
 
 def _event_minute(ev: dict[str, Any]) -> str:
-    for key in ("clock", "time", "displayClock", "timeDisplayValue", "minute"):
+    for key in ("clock", "time", "displayClock", "timeDisplayValue", "minute", "minuto"):
         v = ev.get(key)
         if isinstance(v, dict):
             text = _first_text(v, "displayValue", "displayClock", "value", "text")
@@ -395,50 +478,383 @@ def _athletes_event(ev: dict[str, Any]) -> list[tuple[str, str]]:
     for key in ("athlete", "player", "scorer"):
         if isinstance(ev.get(key), dict):
             nome = limpar_nome_jogador(_first_text(ev[key], "displayName", "fullName", "name", "shortName"))
-            if nome and not any(n == nome for n, _ in out):
+            if nome and not any(normalizar(n) == normalizar(nome) for n, _ in out):
                 out.append((nome, "scorer" if key == "scorer" else ""))
+    # Compatibilidade com o JSON local já normalizado.
+    if ev.get("jogador"):
+        nome = limpar_nome_jogador(ev.get("jogador"))
+        if nome and not any(normalizar(n) == normalizar(nome) for n, _ in out):
+            out.append((nome, "scorer"))
+    for nome in ev.get("assistencias") or []:
+        nome = limpar_nome_jogador(nome)
+        if nome and not any(normalizar(n) == normalizar(nome) for n, _ in out):
+            out.append((nome, "assist"))
     return out
 
 
-def parse_eventos(summary: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    gols: list[dict[str, Any]] = []
-    cartoes: list[dict[str, Any]] = []
-    vistos: set[str] = set()
-    for ev in _event_nodes(summary):
+def _team_alias(value: Any) -> str:
+    n = normalizar(value)
+    replacements = {
+        "atletico mineiro": "atletico mg",
+        "clube atletico mineiro": "atletico mg",
+        "athletico paranaense": "athletico pr",
+        "club athletico paranaense": "athletico pr",
+        "red bull bragantino": "bragantino",
+        "rb bragantino": "bragantino",
+        "gremio porto alegrense": "gremio",
+        "sport club internacional": "internacional",
+        "sao paulo fc": "sao paulo",
+        "vasco": "vasco da gama",
+    }
+    return replacements.get(n, n)
+
+
+def _canonical_team(raw: Any, jogo: dict[str, Any] | None) -> str:
+    text = str(raw or "").strip()
+    if not jogo:
+        return text
+    home = str((jogo.get("mandante") or {}).get("nome") or jogo.get("mandante") or "")
+    away = str((jogo.get("visitante") or {}).get("nome") or jogo.get("visitante") or "")
+    n = _team_alias(text)
+    for candidate in (home, away):
+        nc = _team_alias(candidate)
+        if n and (n == nc or n in nc or nc in n):
+            return candidate
+    # Comparação por palavra distintiva para nomes longos.
+    stop = {"clube", "club", "esporte", "sport", "futebol", "football", "fc", "ec", "sc", "da", "do", "de"}
+    tokens = set(n.split()) - stop
+    best = ""
+    best_score = 0
+    for candidate in (home, away):
+        ctokens = set(_team_alias(candidate).split()) - stop
+        score = len(tokens & ctokens)
+        if score > best_score:
+            best, best_score = candidate, score
+    return best if best_score else text
+
+
+def _extract_goal_actor(text: str) -> tuple[str, str]:
+    # ESPN: "Goal! Time A 0, Time B 1. Jogador (Time B) ..."
+    m = re.search(r"(?:goal|gol)!.*?\.\s*([^().]+?)\s*\(([^)]+)\)", text, flags=re.I)
+    if not m:
+        return "", ""
+    return limpar_nome_jogador(m.group(1)), m.group(2).strip()
+
+
+def _extract_card_actor(text: str) -> tuple[str, str]:
+    patterns = [
+        r"([^().]+?)\s*\(([^)]+)\)\s+is shown (?:the|a) (?:second )?(?:yellow|red) card",
+        r"cart[aã]o (?:amarelo|vermelho).*?para\s+([^().]+?)\s*\(([^)]+)\)",
+    ]
+    for pattern in patterns:
+        m = re.search(pattern, text, flags=re.I)
+        if m:
+            return limpar_nome_jogador(m.group(1)), m.group(2).strip()
+    return "", ""
+
+
+def _extract_assists(text: str) -> list[str]:
+    out: list[str] = []
+    for m in re.finditer(r"assist(?:ed|ência|encia)?\s+(?:by|de|por)\s+([^.;()]+)", text, flags=re.I):
+        nome = limpar_nome_jogador(m.group(1))
+        if nome and normalizar(nome) not in {normalizar(x) for x in out}:
+            out.append(nome)
+    return out
+
+
+def _is_goal_event(ev: dict[str, Any], text: str) -> bool:
+    ntype = normalizar(_event_type_text(ev))
+    ntext = normalizar(text)
+    reject = (
+        "attempt saved", "shot saved", "save made", "shots on goal", "shots on target",
+        "centre of the goal", "center of the goal", "expected goals", "goal difference",
+        "goals for", "goalkeeper", "missed", "blocked",
+    )
+    if any(x in ntext for x in reject) and not re.search(r"\b(?:goal|gol)!", text, flags=re.I):
+        return False
+    explicit_type = bool(re.search(r"\b(?:own goal|penalty goal|goal|gol)\b", ntype)) and not any(
+        x in ntype for x in ("attempt", "save", "shot", "miss")
+    )
+    explicit_text = bool(re.search(r"\b(?:goal|gol)!", text, flags=re.I))
+    own_goal_text = bool(re.search(r"(?:^|\s)own goal by\s+", text, flags=re.I))
+    return explicit_type or explicit_text or own_goal_text
+
+
+def _card_type(ev: dict[str, Any], text: str) -> str:
+    n = normalizar(_event_type_text(ev) + " " + text)
+    if "no red card" in n or "sem cartao vermelho" in n:
+        return ""
+    if "red card" in n or "cartao vermelho" in n:
+        return "vermelho"
+    if "yellow card" in n or "cartao amarelo" in n:
+        return "amarelo"
+    return ""
+
+
+def _minute_sort(value: Any) -> tuple[int, int, str]:
+    nums = [int(x) for x in re.findall(r"\d+", str(value or ""))]
+    return (nums[0] if nums else 999, nums[1] if len(nums) > 1 else 0, str(value or ""))
+
+
+def _metric_int(stats: list[dict[str, Any]] | None, label: str, side: str) -> int | None:
+    for item in stats or []:
+        if normalizar(item.get("nome")) == normalizar(label):
+            n = numero(item.get(side))
+            return int(round(n)) if n is not None else None
+    return None
+
+
+def _event_quality(item: dict[str, Any]) -> int:
+    return int(item.get("_prioridade") or 0) + (20 if item.get("jogador") else 0) + (10 if item.get("time") else 0) + (3 if item.get("assistencias") else 0)
+
+
+def _event_narrative_signature(item: dict[str, Any], kind: str) -> str:
+    text = str(item.get("descricao") or "")
+    lower = text.lower()
+    if kind == "gol":
+        indexes = [i for marker in ("goal!", "gol!", "own goal by") if (i := lower.find(marker)) >= 0]
+        if indexes:
+            return normalizar(text[min(indexes):])
+    else:
+        # A frase após o clube entre parênteses é idêntica nas duplicatas,
+        # mesmo quando a ESPN alterna apelido e nome completo do atleta.
+        m = re.search(r"\([^)]+\)\s+is shown\s+(?:the|a)\s+(?:second\s+)?(?:yellow|red)\s+card[^.]*", text, flags=re.I)
+        if m:
+            return normalizar(m.group(0))
+    return normalizar(text)
+
+
+def _dedupe_events(items: list[dict[str, Any]], kind: str) -> list[dict[str, Any]]:
+    best: dict[str, dict[str, Any]] = {}
+    for item in items:
+        key = "|".join([
+            kind,
+            normalizar(item.get("tipo")),
+            normalizar(item.get("minuto")),
+            normalizar(item.get("jogador")),
+            normalizar(item.get("time")),
+        ])
+        previous = best.get(key)
+        if previous is None or _event_quality(item) > _event_quality(previous):
+            best[key] = item
+
+    # ESPN costuma repetir o mesmo lance em keyEvents/scoringPlays e commentary.
+    # Quando o nome exibido varia (apelido x nome completo), a descrição narrativa
+    # ainda é a mesma. Nessa situação, considere minuto+time+tipo+texto equivalente.
+    merged: list[dict[str, Any]] = []
+    for item in sorted(best.values(), key=lambda x: (-_event_quality(x), _minute_sort(x.get("minuto")))):
+        ndesc = _event_narrative_signature(item, kind)
+        duplicate_index = None
+        for idx, previous in enumerate(merged):
+            if normalizar(previous.get("minuto")) != normalizar(item.get("minuto")):
+                continue
+            if normalizar(previous.get("time")) != normalizar(item.get("time")):
+                continue
+            if normalizar(previous.get("tipo")) != normalizar(item.get("tipo")):
+                continue
+            pdesc = _event_narrative_signature(previous, kind)
+            # Use a frase do lance, não apenas o nome, para não unir cartões distintos
+            # aplicados ao mesmo time no mesmo minuto.
+            if ndesc and pdesc and (ndesc in pdesc or pdesc in ndesc):
+                duplicate_index = idx
+                break
+        if duplicate_index is None:
+            merged.append(item)
+        elif _event_quality(item) > _event_quality(merged[duplicate_index]):
+            merged[duplicate_index] = item
+
+    merged.sort(key=lambda x: _minute_sort(x.get("minuto")))
+    return merged
+
+def _limit_by_score(gols: list[dict[str, Any]], jogo: dict[str, Any] | None) -> list[dict[str, Any]]:
+    if not jogo:
+        return gols
+    home = str((jogo.get("mandante") or {}).get("nome") or jogo.get("mandante") or "")
+    away = str((jogo.get("visitante") or {}).get("nome") or jogo.get("visitante") or "")
+    expected = {
+        home: int(jogo.get("placar_mandante") or 0),
+        away: int(jogo.get("placar_visitante") or 0),
+    }
+    selected: list[dict[str, Any]] = []
+    unknown: list[dict[str, Any]] = []
+    for team in (home, away):
+        candidates = [g for g in gols if _canonical_team(g.get("time"), jogo) == team]
+        candidates.sort(key=lambda x: (-_event_quality(x), _minute_sort(x.get("minuto"))))
+        selected.extend(candidates[: expected[team]])
+    unknown = [g for g in gols if _canonical_team(g.get("time"), jogo) not in (home, away)]
+    remaining = sum(expected.values()) - len(selected)
+    if remaining > 0:
+        unknown.sort(key=lambda x: (-_event_quality(x), _minute_sort(x.get("minuto"))))
+        selected.extend(unknown[:remaining])
+    selected.sort(key=lambda x: _minute_sort(x.get("minuto")))
+    return selected
+
+
+def _limit_cards(cartoes: list[dict[str, Any]], jogo: dict[str, Any] | None, stats: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+    if not jogo or not stats:
+        return cartoes
+    home = str((jogo.get("mandante") or {}).get("nome") or jogo.get("mandante") or "")
+    away = str((jogo.get("visitante") or {}).get("nome") or jogo.get("visitante") or "")
+    side_of = {home: "home", away: "away"}
+    selected: list[dict[str, Any]] = []
+    accounted: set[int] = set()
+    for team in (home, away):
+        for tipo, label in (("amarelo", "Amarelos"), ("vermelho", "Vermelhos")):
+            expected = _metric_int(stats, label, side_of[team])
+            candidates = [
+                (idx, c) for idx, c in enumerate(cartoes)
+                if c.get("tipo") == tipo and _canonical_team(c.get("time"), jogo) == team
+            ]
+            candidates.sort(key=lambda pair: (-_event_quality(pair[1]), _minute_sort(pair[1].get("minuto"))))
+            take = len(candidates) if expected is None else max(0, expected)
+            for idx, item in candidates[:take]:
+                selected.append(item)
+                accounted.add(idx)
+    # Quando o boxscore não contém uma métrica, não descarte evento estruturado.
+    for idx, item in enumerate(cartoes):
+        if idx in accounted:
+            continue
+        team = _canonical_team(item.get("time"), jogo)
+        side = side_of.get(team)
+        label = "Amarelos" if item.get("tipo") == "amarelo" else "Vermelhos"
+        if not side or _metric_int(stats, label, side) is None:
+            selected.append(item)
+    selected.sort(key=lambda x: _minute_sort(x.get("minuto")))
+    return selected
+
+
+def validar_eventos(jogo: dict[str, Any], stats: list[dict[str, Any]], gols: list[dict[str, Any]], cartoes: list[dict[str, Any]]) -> dict[str, Any]:
+    home = str((jogo.get("mandante") or {}).get("nome") or jogo.get("mandante") or "")
+    away = str((jogo.get("visitante") or {}).get("nome") or jogo.get("visitante") or "")
+    expected_goals = {home: int(jogo.get("placar_mandante") or 0), away: int(jogo.get("placar_visitante") or 0)}
+    found_goals = {team: sum(1 for g in gols if _canonical_team(g.get("time"), jogo) == team) for team in (home, away)}
+    expected_cards: dict[str, dict[str, int | None]] = {}
+    found_cards: dict[str, dict[str, int]] = {}
+    for team, side in ((home, "home"), (away, "away")):
+        expected_cards[team] = {
+            "amarelo": _metric_int(stats, "Amarelos", side),
+            "vermelho": _metric_int(stats, "Vermelhos", side),
+        }
+        found_cards[team] = {
+            tipo: sum(1 for c in cartoes if c.get("tipo") == tipo and _canonical_team(c.get("time"), jogo) == team)
+            for tipo in ("amarelo", "vermelho")
+        }
+    cards_complete = all(
+        exp is None or found_cards[team][tipo] == exp
+        for team in (home, away)
+        for tipo, exp in expected_cards[team].items()
+    )
+    cards_no_excess = all(
+        exp is None or found_cards[team][tipo] <= exp
+        for team in (home, away)
+        for tipo, exp in expected_cards[team].items()
+    )
+    goals_ok = found_goals == expected_goals
+    return {
+        "gols_esperados": expected_goals,
+        "gols_extraidos": found_goals,
+        "gols_ok": goals_ok,
+        "cartoes_esperados": expected_cards,
+        "cartoes_extraidos": found_cards,
+        "cartoes_completos": cards_complete,
+        "cartoes_sem_excesso": cards_no_excess,
+        "cartoes_ok": cards_no_excess,
+        "ok": goals_ok and cards_no_excess,
+    }
+
+
+def parse_eventos(
+    summary: dict[str, Any],
+    jogo: dict[str, Any] | None = None,
+    stats: list[dict[str, Any]] | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    gols_raw: list[dict[str, Any]] = []
+    cartoes_raw: list[dict[str, Any]] = []
+    for ev, _source, prioridade in _event_nodes(summary):
         text = _event_text(ev)
-        ntext = normalizar(text)
+        if not text:
+            continue
         athletes = _athletes_event(ev)
-        player = next((n for n, role in athletes if "assist" not in role), athletes[0][0] if athletes else "")
+        player = next((n for n, role in athletes if "assist" not in role), "")
         assists = [n for n, role in athletes if "assist" in role]
-        if not assists:
-            m = re.search(r"assist(?:ed|encia|ência)?\s+(?:by|de|por)\s+([^.,;()]+)", text, flags=re.I)
-            if m:
-                nome = limpar_nome_jogador(m.group(1))
-                if nome:
-                    assists = [nome]
         team = ""
         t = ev.get("team") or ev.get("competitor")
         if isinstance(t, dict):
             team = _first_text(t, "displayName", "shortDisplayName", "name", "abbreviation")
+        elif t:
+            team = str(t)
+        team = team or str(ev.get("time") or "")
         minuto = _event_minute(ev)
-        is_goal = bool(re.search(r"\b(goal|gol|own goal|gol contra|penalty goal)\b", ntext)) and not any(x in ntext for x in ("shots on goal", "goal difference", "goals for", "expected goals"))
-        card = ""
-        if "red card" in ntext or "cartao vermelho" in ntext:
-            card = "vermelho"
-        elif "yellow card" in ntext or "cartao amarelo" in ntext:
-            card = "amarelo"
-        if is_goal:
-            key = f"g|{minuto}|{normalizar(player)}|{normalizar(team)}"
-            if key not in vistos:
-                vistos.add(key)
-                gols.append({"minuto": minuto, "jogador": player, "time": team, "assistencias": assists, "descricao": text})
+
+        if _is_goal_event(ev, text):
+            p_text, t_text = _extract_goal_actor(text)
+            player = player or p_text
+            team = team or t_text
+            if not assists:
+                assists = _extract_assists(text)
+            team = _canonical_team(team, jogo)
+            gols_raw.append({
+                "minuto": minuto,
+                "jogador": limpar_nome_jogador(player),
+                "time": team,
+                "assistencias": [limpar_nome_jogador(x) for x in assists if limpar_nome_jogador(x)],
+                "descricao": text,
+                "_prioridade": prioridade,
+            })
+
+        card = _card_type(ev, text)
         if card:
-            key = f"c|{card}|{minuto}|{normalizar(player)}|{normalizar(team)}"
-            if key not in vistos:
-                vistos.add(key)
-                cartoes.append({"tipo": card, "minuto": minuto, "jogador": player, "time": team, "descricao": text})
+            p_text, t_text = _extract_card_actor(text)
+            card_player = player or p_text
+            card_team = _canonical_team(team or t_text, jogo)
+            cartoes_raw.append({
+                "tipo": card,
+                "minuto": minuto,
+                "jogador": limpar_nome_jogador(card_player),
+                "time": card_team,
+                "descricao": text,
+                "_prioridade": prioridade,
+            })
+
+    gols = _dedupe_events(gols_raw, "gol")
+    cartoes = _dedupe_events(cartoes_raw, "cartao")
+    gols = _limit_by_score(gols, jogo)
+    cartoes = _limit_cards(cartoes, jogo, stats)
+    for item in gols + cartoes:
+        item.pop("_prioridade", None)
     return gols, cartoes
 
+
+def _pseudo_summary_from_record(record: dict[str, Any]) -> dict[str, Any]:
+    goals: list[dict[str, Any]] = []
+    cards: list[dict[str, Any]] = []
+    for raw in record.get("gols") or []:
+        desc = str(raw.get("descricao") or "")
+        ev: dict[str, Any] = {
+            "text": desc,
+            "clock": {"displayValue": raw.get("minuto") or ""},
+            "team": {"displayName": raw.get("time") or ""},
+            "jogador": raw.get("jogador") or "",
+            "assistencias": raw.get("assistencias") or [],
+        }
+        if re.search(r"\b(?:goal|gol)!|^\s*(?:own goal|goal|gol)\b", desc, flags=re.I) and "attempt saved" not in desc.lower():
+            ev["type"] = {"text": "Own Goal" if re.search(r"^\s*own goal", desc, flags=re.I) else "Goal"}
+        goals.append(ev)
+    for raw in record.get("cartoes") or []:
+        cards.append({
+            "text": raw.get("descricao") or "",
+            "clock": {"displayValue": raw.get("minuto") or ""},
+            "team": {"displayName": raw.get("time") or ""},
+            "jogador": raw.get("jogador") or "",
+        })
+    return {"scoringPlays": goals, "keyEvents": cards}
+
+
+def sanitizar_registro_local(jogo: dict[str, Any], record: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, Any]]:
+    stats = list(record.get("stats") or record.get("estatisticas") or [])
+    summary = _pseudo_summary_from_record(record)
+    gols, cartoes = parse_eventos(summary, jogo, stats)
+    return gols, cartoes, validar_eventos(jogo, stats, gols, cartoes)
 
 def fetch_json(url: str, timeout: int = 20, tentativas: int = 2) -> dict[str, Any]:
     ultimo: Exception | None = None
@@ -494,6 +910,9 @@ def montar_registro(
     gols: list[dict[str, Any]] | None = None,
     cartoes: list[dict[str, Any]] | None = None,
     preservado: bool = False,
+    validacao: dict[str, Any] | None = None,
+    publico_fonte: str = "",
+    publico_tipo: str = "",
 ) -> dict[str, Any]:
     return {
         "event_id": event_id,
@@ -505,11 +924,14 @@ def montar_registro(
         "placar_visitante": jogo.get("placar_visitante"),
         "estadio": estadio or str(jogo.get("estadio") or ""),
         "publico": publico,
+        "publico_tipo": publico_tipo or ("presente" if publico not in (None, "") else ""),
+        "publico_fonte": publico_fonte,
         "arbitro": arbitro,
         "stats": stats,
         "estatisticas": stats,
         "gols": gols or [],
         "cartoes": cartoes or [],
+        "validacao_eventos": validacao or validar_eventos(jogo, stats, gols or [], cartoes or []),
         "fonte": "ESPN summary",
         "preservado_de_execucao_anterior": bool(preservado),
         "atualizado_em": iso_agora_brt(),
@@ -520,7 +942,7 @@ def montar_registro(
 def self_test() -> None:
     summary = {
         "gameInfo": {
-            "attendance": 43210,
+            "attendance": {"displayValue": "43,210"},
             "venue": {"fullName": "Estádio Teste"},
             "officials": [{"displayName": "Árbitro Teste", "position": {"displayName": "Referee"}}],
         },
@@ -532,10 +954,14 @@ def self_test() -> None:
             {"homeAway": "home", "team": {"id": "1", "displayName": "Flamengo"}, "statistics": [
                 {"name": "possessionPct", "displayValue": "60%"},
                 {"name": "totalShots", "displayValue": "10"},
+                {"name": "yellowCards", "displayValue": "0"},
+                {"name": "redCards", "displayValue": "0"},
             ]},
             {"homeAway": "away", "team": {"id": "2", "displayName": "Palmeiras"}, "statistics": [
                 {"name": "possessionPct", "displayValue": "40%"},
                 {"name": "totalShots", "displayValue": "7"},
+                {"name": "yellowCards", "displayValue": "1"},
+                {"name": "redCards", "displayValue": "0"},
             ]},
         ]},
         "scoringPlays": [{
@@ -545,31 +971,88 @@ def self_test() -> None:
                 {"athlete": {"displayName": "Samuel Lino"}, "role": "assist"},
             ],
             "team": {"displayName": "Flamengo"},
-            "text": "Goal! Pedro. Assisted by Samuel Lino with a cross.",
+            "text": "Goal! Flamengo 1, Palmeiras 0. Pedro (Flamengo). Assisted by Samuel Lino with a cross.",
         }],
+        "plays": [
+            {"clock": {"displayValue": "23'"}, "text": "Goal! Flamengo 1, Palmeiras 0. Pedro (Flamengo). Assisted by Samuel Lino with a cross."},
+            {"clock": {"displayValue": "44'"}, "text": "Attempt saved. Jogador Y shot is saved in the centre of the goal."},
+        ],
         "keyEvents": [{
             "type": {"text": "Yellow Card"}, "clock": {"displayValue": "31'"},
             "athletes": [{"athlete": {"displayName": "Jogador X"}}],
-            "team": {"displayName": "Palmeiras"}, "text": "Yellow card",
+            "team": {"displayName": "Palmeiras"},
+            "text": "Jogador X (Palmeiras) is shown the yellow card.",
+        }],
+        "commentary": [{
+            "clock": {"displayValue": "31'"},
+            "text": "Jogador X (Palmeiras) is shown the yellow card.",
         }],
     }
-    jogo = {"mandante": {"nome": "Flamengo"}, "visitante": {"nome": "Palmeiras"}, "estadio": ""}
+    jogo = {
+        "mandante": {"nome": "Flamengo"}, "visitante": {"nome": "Palmeiras"},
+        "placar_mandante": 1, "placar_visitante": 0, "estadio": "",
+    }
     assert parse_publico(summary) == 43210
     assert parse_estadio(summary, jogo) == "Estádio Teste"
     assert parse_arbitro(summary) == "Árbitro Teste"
     stats = parse_summary(summary, jogo)
     assert any(x["nome"] == "Posse" and x["home"] == "60%" and x["away"] == "40%" for x in stats)
-    gols, cartoes = parse_eventos(summary)
-    assert gols and gols[0]["jogador"] == "Pedro"
+    gols, cartoes = parse_eventos(summary, jogo, stats)
+    assert len(gols) == 1, gols
+    assert gols[0]["jogador"] == "Pedro"
     assert gols[0]["assistencias"] == ["Samuel Lino"]
-    assert cartoes and cartoes[0]["tipo"] == "amarelo"
-    print("SELF-TEST OK: público, estádio, árbitro, boxscore, gol, assistência e cartão.")
+    assert len(cartoes) == 1, cartoes
+    assert cartoes[0]["jogador"] == "Jogador X"
+    validation = validar_eventos(jogo, stats, gols, cartoes)
+    assert validation["ok"], validation
+    print("SELF-TEST OK: público com milhar, eventos explícitos, deduplicação, placar e cartões.")
+
+
+def _build_payload(jogos_saida: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    total_com = sum(1 for j in jogos_saida.values() if j.get("stats"))
+    return {
+        "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
+        "gerado_em": iso_agora_brt(),
+        "fonte": "ESPN summary",
+        "total_jogos": len(jogos_saida),
+        "total_com_estatisticas": total_com,
+        "total_com_publico": sum(1 for j in jogos_saida.values() if j.get("publico") not in (None, "")),
+        "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
+        "total_eventos_validados": sum(1 for j in jogos_saida.values() if (j.get("validacao_eventos") or {}).get("ok")),
+        "jogos": jogos_saida,
+    }
+
+
+def _build_audit(
+    base_resultados: dict[str, Any], resultados: list[dict[str, Any]], jogos_saida: dict[str, dict[str, Any]],
+    *, buscados: int, preservados: int, falhas: list[dict[str, Any]], sem_estatisticas: list[dict[str, Any]], modo: str,
+) -> dict[str, Any]:
+    inconsistencias = [
+        {"event_id": eid, "jogo": f"{j.get('mandante')} x {j.get('visitante')}", "validacao": j.get("validacao_eventos")}
+        for eid, j in jogos_saida.items() if not (j.get("validacao_eventos") or {}).get("ok")
+    ]
+    return {
+        "gerado_em": iso_agora_brt(), "fonte": "ESPN summary", "modo": modo,
+        "total_resultados_lidos": len(base_resultados.get("resultados") or []),
+        "total_processados": len(resultados), "total_buscados_na_espn": buscados,
+        "total_com_estatisticas": sum(1 for j in jogos_saida.values() if j.get("stats")),
+        "total_com_publico": sum(1 for j in jogos_saida.values() if j.get("publico") not in (None, "")),
+        "total_sem_publico": sum(1 for j in jogos_saida.values() if j.get("publico") in (None, "")),
+        "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
+        "total_eventos_validados": sum(1 for j in jogos_saida.values() if (j.get("validacao_eventos") or {}).get("ok")),
+        "total_inconsistencias_eventos": len(inconsistencias),
+        "inconsistencias_eventos": inconsistencias,
+        "total_sem_estatisticas": len(sem_estatisticas),
+        "total_preservados_de_execucao_anterior": preservados,
+        "total_falhas": len(falhas), "sem_estatisticas": sem_estatisticas, "falhas": falhas,
+    }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Busca estatísticas por jogo do Brasileirão na ESPN.")
     parser.add_argument("--dry-run", action="store_true", help="Só valida entradas, sem rede e sem gravar arquivos.")
     parser.add_argument("--self-test", action="store_true", help="Executa testes internos do parser sem usar rede.")
+    parser.add_argument("--reparar-local", action="store_true", help="Sanitiza o JSON atual sem acessar a rede.")
     parser.add_argument("--max-jogos", type=int, default=0, help="Limite opcional de jogos processados nesta execução.")
     parser.add_argument("--sleep", type=float, default=0.08, help="Pausa entre chamadas ESPN.")
     args = parser.parse_args()
@@ -580,10 +1063,8 @@ def main() -> None:
 
     base_resultados = carregar_json(RESULTADOS, {})
     resultados = [j for j in (base_resultados.get("resultados") or []) if jogo_finalizado(j)]
-
     if args.max_jogos and args.max_jogos > 0:
         resultados = resultados[: args.max_jogos]
-
     if args.dry_run:
         print(f"DRY-RUN OK: {len(resultados)} jogo(s) finalizado(s) elegível(is) em resultados.json")
         return
@@ -592,6 +1073,8 @@ def main() -> None:
     jogos_anteriores = anterior.get("jogos") if isinstance(anterior, dict) else {}
     if not isinstance(jogos_anteriores, dict):
         jogos_anteriores = {}
+
+    publicos_complementares = carregar_publicos_complementares()
 
     jogos_saida: dict[str, dict[str, Any]] = {}
     falhas: list[dict[str, Any]] = []
@@ -604,31 +1087,59 @@ def main() -> None:
         if not event_id:
             continue
         label = f"R{jogo.get('rodada')} · {(jogo.get('mandante') or {}).get('nome')} x {(jogo.get('visitante') or {}).get('nome')} · {event_id}"
+        antigo = jogos_anteriores.get(event_id) if isinstance(jogos_anteriores, dict) else None
+
+        if args.reparar_local:
+            stats = list((antigo or {}).get("stats") or (antigo or {}).get("estatisticas") or [])
+            gols, cartoes, validacao = sanitizar_registro_local(jogo, antigo or {})
+            manual_publico, manual_fonte, manual_tipo = publico_complementar(event_id, publicos_complementares)
+            valor_publico = (antigo or {}).get("publico")
+            fonte_publico = str((antigo or {}).get("publico_fonte") or "")
+            tipo_publico = str((antigo or {}).get("publico_tipo") or "")
+            if valor_publico in (None, "", 0, "0") and manual_publico is not None:
+                valor_publico, fonte_publico, tipo_publico = manual_publico, manual_fonte, manual_tipo
+            jogos_saida[event_id] = montar_registro(
+                event_id, jogo, stats, publico=valor_publico,
+                estadio=str((antigo or {}).get("estadio") or jogo.get("estadio") or ""),
+                arbitro=str((antigo or {}).get("arbitro") or ""), gols=gols, cartoes=cartoes,
+                preservado=True, validacao=validacao, publico_fonte=fonte_publico, publico_tipo=tipo_publico,
+            )
+            print(f"[{i:03d}/{len(resultados):03d}] LOCAL {label}: gols={len(gols)} · cartões={len(cartoes)} · ok={validacao['ok']}")
+            continue
+
         try:
             summary = fetch_json(BASE_SUMMARY.format(event_id=event_id))
             stats = parse_summary(summary, jogo)
             publico = parse_publico(summary)
+            publico_fonte = "ESPN summary" if publico is not None else ""
+            publico_tipo = "presente" if publico is not None else ""
+            if publico is None:
+                publico, publico_fonte, publico_tipo = publico_complementar(event_id, publicos_complementares)
             estadio = parse_estadio(summary, jogo)
             arbitro = parse_arbitro(summary)
-            gols, cartoes = parse_eventos(summary)
+            gols, cartoes = parse_eventos(summary, jogo, stats)
+            validacao = validar_eventos(jogo, stats, gols, cartoes)
             buscados += 1
         except Exception as exc:  # noqa: BLE001
-            antigo = jogos_anteriores.get(event_id) if isinstance(jogos_anteriores, dict) else None
             stats = list((antigo or {}).get("stats") or (antigo or {}).get("estatisticas") or [])
             if antigo:
+                gols, cartoes, validacao = sanitizar_registro_local(jogo, antigo)
                 preservados += 1
+                manual_publico, manual_fonte, manual_tipo = publico_complementar(event_id, publicos_complementares)
+                valor_publico = (antigo or {}).get("publico")
+                fonte_publico = str((antigo or {}).get("publico_fonte") or "")
+                tipo_publico = str((antigo or {}).get("publico_tipo") or "")
+                if valor_publico in (None, "", 0, "0") and manual_publico is not None:
+                    valor_publico, fonte_publico, tipo_publico = manual_publico, manual_fonte, manual_tipo
                 jogos_saida[event_id] = montar_registro(
-                    event_id, jogo, stats,
-                    publico=(antigo or {}).get("publico"),
+                    event_id, jogo, stats, publico=valor_publico,
                     estadio=str((antigo or {}).get("estadio") or jogo.get("estadio") or ""),
-                    arbitro=str((antigo or {}).get("arbitro") or ""),
-                    gols=list((antigo or {}).get("gols") or []),
-                    cartoes=list((antigo or {}).get("cartoes") or []),
-                    preservado=True,
+                    arbitro=str((antigo or {}).get("arbitro") or ""), gols=gols, cartoes=cartoes,
+                    preservado=True, validacao=validacao, publico_fonte=fonte_publico, publico_tipo=tipo_publico,
                 )
             else:
                 falhas.append({"event_id": event_id, "jogo": label, "erro": str(exc)[:300]})
-                jogos_saida[event_id] = montar_registro(event_id, jogo, [])
+                jogos_saida[event_id] = montar_registro(event_id, jogo, [], validacao=validar_eventos(jogo, [], [], []))
             print(f"[WARN] {label}: {exc}")
             time.sleep(max(0.0, args.sleep))
             continue
@@ -637,45 +1148,23 @@ def main() -> None:
             sem_estatisticas.append({"event_id": event_id, "jogo": label})
         jogos_saida[event_id] = montar_registro(
             event_id, jogo, stats, publico=publico, estadio=estadio, arbitro=arbitro,
-            gols=gols, cartoes=cartoes,
+            gols=gols, cartoes=cartoes, validacao=validacao, publico_fonte=publico_fonte, publico_tipo=publico_tipo,
         )
         print(
             f"[{i:03d}/{len(resultados):03d}] {label}: {len(stats)} estatística(s) · "
-            f"público={publico if publico is not None else 'n/d'} · gols={len(gols)} · cartões={len(cartoes)}"
+            f"público={publico if publico is not None else 'n/d'} · gols={len(gols)} · cartões={len(cartoes)} · ok={validacao['ok']}"
         )
         time.sleep(max(0.0, args.sleep))
 
-    total_com = sum(1 for j in jogos_saida.values() if j.get("stats"))
-    payload = {
-        "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Estatísticas aparecem apenas quando a ESPN disponibiliza summary/boxscore para o jogo.",
-        "gerado_em": iso_agora_brt(),
-        "fonte": "ESPN summary",
-        "total_jogos": len(jogos_saida),
-        "total_com_estatisticas": total_com,
-        "total_com_publico": sum(1 for j in jogos_saida.values() if j.get("publico") not in (None, "")),
-        "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
-        "jogos": jogos_saida,
-    }
-    auditoria = {
-        "gerado_em": iso_agora_brt(),
-        "fonte": "ESPN summary",
-        "total_resultados_lidos": len(base_resultados.get("resultados") or []),
-        "total_processados": len(resultados),
-        "total_buscados_na_espn": buscados,
-        "total_com_estatisticas": total_com,
-        "total_com_publico": sum(1 for j in jogos_saida.values() if j.get("publico") not in (None, "")),
-        "total_sem_publico": sum(1 for j in jogos_saida.values() if j.get("publico") in (None, "")),
-        "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
-        "total_sem_estatisticas": len(sem_estatisticas),
-        "total_preservados_de_execucao_anterior": preservados,
-        "total_falhas": len(falhas),
-        "sem_estatisticas": sem_estatisticas,
-        "falhas": falhas,
-    }
-
+    payload = _build_payload(jogos_saida)
+    auditoria = _build_audit(
+        base_resultados, resultados, jogos_saida, buscados=buscados, preservados=preservados,
+        falhas=falhas, sem_estatisticas=sem_estatisticas, modo="reparo-local" if args.reparar_local else "rede",
+    )
     gravar_json(SAIDA, payload)
     gravar_json(AUDITORIA, auditoria)
-    print(f"OK: {len(jogos_saida)} jogos em {SAIDA.relative_to(ROOT)}; {total_com} com estatísticas.")
+    print(f"OK: {len(jogos_saida)} jogos em {SAIDA.relative_to(ROOT)}; {payload['total_com_estatisticas']} com estatísticas.")
+    print(f"OK: {auditoria['total_eventos_validados']} jogos com eventos integralmente validados; {auditoria['total_inconsistencias_eventos']} inconsistência(s).")
     print(f"OK: auditoria em {AUDITORIA.relative_to(ROOT)}")
 
 

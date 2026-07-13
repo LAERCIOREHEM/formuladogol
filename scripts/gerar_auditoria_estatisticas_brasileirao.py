@@ -77,10 +77,10 @@ def main() -> None:
     assists = leaders.get("assistencias") or []
     if leaders.get("status") != "valido":
         critical.append("lideres-jogadores.json não está marcado como válido")
-    if len(goals) < 5:
-        critical.append(f"artilharia com apenas {len(goals)} jogadores")
-    if len(assists) < 5:
-        critical.append(f"assistências com apenas {len(assists)} jogadores")
+    if len(goals) < 40:
+        critical.append(f"artilharia completa com apenas {len(goals)} jogadores; esperado ao menos 40")
+    if len(assists) < 20:
+        critical.append(f"assistências completas com apenas {len(assists)} jogadores; esperado ao menos 20")
     if goals and int(goals[0].get("gols") or 0) <= 0:
         critical.append("artilheiro líder sem gols positivos")
     if assists and int(assists[0].get("assistencias") or 0) <= 0:
@@ -117,12 +117,58 @@ def main() -> None:
     elif missing_details:
         warnings.append(f"detalhes ausentes para {len(missing_details)} jogos")
 
+    event_errors: list[str] = []
+    duplicate_events: list[str] = []
+    narrative_false_positives: list[str] = []
+    for event_id, game in detail_games.items():
+        if not isinstance(game, dict):
+            event_errors.append(f"{event_id}: registro inválido")
+            continue
+        validation = game.get("validacao_eventos") or {}
+        if not validation.get("ok"):
+            event_errors.append(f"{event_id}: validação de eventos reprovada")
+        home, away = str(game.get("mandante") or ""), str(game.get("visitante") or "")
+        expected = {home: int(game.get("placar_mandante") or 0), away: int(game.get("placar_visitante") or 0)}
+        extracted = {home: 0, away: 0}
+        seen_goals: set[tuple[str, str, str, str]] = set()
+        for goal in game.get("gols") or []:
+            if not isinstance(goal, dict):
+                continue
+            team = str(goal.get("time") or "")
+            if team in extracted:
+                extracted[team] += 1
+            key = (norm(goal.get("minuto")), norm(team), norm(goal.get("jogador")), norm(goal.get("descricao")))
+            if key in seen_goals:
+                duplicate_events.append(f"{event_id}: gol duplicado {goal.get('minuto')} {goal.get('jogador')}")
+            seen_goals.add(key)
+            desc = norm(goal.get("descricao"))
+            if "attempt saved" in desc or "shot is saved" in desc:
+                narrative_false_positives.append(f"{event_id}: {goal.get('jogador')}")
+        if extracted != expected:
+            event_errors.append(f"{event_id}: gols extraídos {extracted} != placar {expected}")
+        seen_cards: set[tuple[str, str, str, str]] = set()
+        for card in game.get("cartoes") or []:
+            if not isinstance(card, dict):
+                continue
+            key = (norm(card.get("tipo")), norm(card.get("minuto")), norm(card.get("time")), norm(card.get("jogador")))
+            if key in seen_cards:
+                duplicate_events.append(f"{event_id}: cartão duplicado {card.get('minuto')} {card.get('jogador')}")
+            seen_cards.add(key)
+    if event_errors:
+        critical.append(f"{len(event_errors)} jogo(s) com gols/cartões incompatíveis")
+    if duplicate_events:
+        critical.append(f"{len(duplicate_events)} evento(s) duplicado(s)")
+    if narrative_false_positives:
+        critical.append(f"{len(narrative_false_positives)} falso(s) gol(s) originado(s) de finalização/defesa")
+
     with_public = sum(1 for g in detail_games.values() if (g or {}).get("publico") not in (None, "", 0, "0"))
     with_stats = sum(1 for g in detail_games.values() if (g or {}).get("stats") or (g or {}).get("estatisticas"))
     if with_stats == 0:
         critical.append("nenhum jogo com estatísticas detalhadas")
     if with_public == 0:
         warnings.append("nenhum público coletado ainda; conferir retorno da ESPN summary")
+    elif detail_games and with_public < int(len(detail_games) * 0.80):
+        warnings.append(f"público disponível em somente {with_public}/{len(detail_games)} jogos")
 
     comp_summary = competition.get("resumo") or {}
     if int(comp_summary.get("clubes") or 0) != 20:
@@ -130,14 +176,32 @@ def main() -> None:
     club_goals = competition.get("gols_por_clube") or []
     if len(club_goals) != 20:
         critical.append(f"gols por clube com {len(club_goals)} itens, esperado 20")
+    short_club_scorers = [
+        f"{item.get('time')}: {len(item.get('marcadores') or [])}"
+        for item in club_goals if int(item.get("gols_pro") or 0) > 0 and len(item.get("marcadores") or []) < 5
+    ]
+    if short_club_scorers:
+        critical.append("clubes com menos de cinco marcadores individualizados: " + ", ".join(short_club_scorers))
     attendance = competition.get("publico") or {}
     if int(attendance.get("jogos_com_publico") or 0) != with_public:
         critical.append("contagem de jogos com público diverge entre detalhes e competição")
 
     if len(players.get("artilharia") or []) < 5 or len(players.get("assistencias") or []) < 5:
         critical.append("dados-br/jogadores.json não recebeu os rankings oficiais")
-    if len(stats.get("artilharia") or []) < 5 or len(stats.get("garcons") or []) < 5:
-        critical.append("dados-br/estatisticas.json não recebeu os rankings oficiais")
+    if len(stats.get("artilharia") or []) < 40 or len(stats.get("garcons") or []) < 20:
+        critical.append("dados-br/estatisticas.json não recebeu os rankings completos")
+
+    rosters = read(ROOT / "dados-br" / "elencos.json", {})
+    roster_audit = read(ROOT / "dados-br" / "auditoria-elencos.json", {})
+    roster_map = rosters.get("elencos") or {}
+    if not isinstance(roster_map, dict) or len(roster_map) != 20:
+        critical.append("elencos.json sem os 20 clubes")
+        roster_map = {}
+    incomplete_rosters = [f"{club}: {len(rows or [])}" for club, rows in roster_map.items() if not isinstance(rows, list) or len(rows) < 15]
+    if incomplete_rosters:
+        critical.append("elencos incompletos: " + ", ".join(incomplete_rosters))
+    if roster_audit and roster_audit.get("status") != "ok":
+        critical.append("auditoria-elencos.json não está OK")
 
     status = "ok" if not critical else "erro"
     payload = {
@@ -172,6 +236,10 @@ def main() -> None:
             },
         },
         "jogos_sem_detalhes": missing_details,
+        "eventos_inconsistentes": event_errors,
+        "eventos_duplicados": duplicate_events,
+        "falsos_gols_de_narracao": narrative_false_positives,
+        "elencos_incompletos": incomplete_rosters,
         "nomes_suspeitos": suspicious_names,
         "erros_criticos": critical,
         "avisos": warnings,

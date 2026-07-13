@@ -237,18 +237,38 @@
     const placar = finalizado ? `${e.placar_mandante ?? "—"} × ${e.placar_visitante ?? "—"}` : "vs";
     return `<div class="row"><span class="date">${escapeHtml(dataCurta(e.data_iso))}</span><span>${escapeHtml(e.mandante)} × ${escapeHtml(e.visitante)}<br><small>${escapeHtml(e.estadio || "estádio a confirmar")}</small></span><span class="score">${escapeHtml(placar)}</span></div>`;
   }
+  function grupoPosicao(posicao){
+    const p = slug(posicao);
+    if (p.includes("goleir")) return "Goleiros";
+    if (p.includes("zagueir") || p.includes("lateral") || p.includes("defensor")) return "Defensores";
+    if (p.includes("volante") || p.includes("meia") || p.includes("meio-campista")) return "Meio-campistas";
+    if (p.includes("atacante") || p.includes("ponta")) return "Atacantes";
+    return "Outros";
+  }
   function renderElenco(nome){
-    const jogadores = state.elencos[nome] || [];
+    const jogadores = Array.isArray(state.elencos[nome]) ? state.elencos[nome] : [];
     if (!jogadores.length) {
       $("#elenco-clube").className = "empty-state";
       $("#elenco-clube").innerHTML = `Elenco de <strong>${escapeHtml(nome)}</strong> ainda não está preenchido.`;
       return;
     }
-    $("#elenco-clube").className = "list";
-    $("#elenco-clube").innerHTML = jogadores.slice(0, 18).map(j => `<div class="row"><span class="date">${escapeHtml(j.numero || "")}</span><span><strong>${escapeHtml(j.nome)}</strong><br><small>${escapeHtml(j.posicao || "")}</small></span><span class="score">${escapeHtml(j.idade || "")}</span></div>`).join("");
+    const ordem = ["Goleiros", "Defensores", "Meio-campistas", "Atacantes", "Outros"];
+    const grupos = Object.fromEntries(ordem.map(grupo => [grupo, []]));
+    jogadores.forEach(jogador => grupos[grupoPosicao(jogador.posicao)].push(jogador));
+    $("#elenco-clube").className = "squad-list";
+    $("#elenco-clube").innerHTML = `<div class="squad-summary"><strong>${jogadores.length}</strong><span>jogadores cadastrados</span></div>${ordem.filter(grupo => grupos[grupo].length).map(grupo => `
+      <section class="squad-group">
+        <div class="squad-group-title"><span>${escapeHtml(grupo)}</span><b>${grupos[grupo].length}</b></div>
+        <div class="squad-rows">${grupos[grupo].map(j => `<div class="squad-row">
+          <div class="squad-number"><span>Camisa</span><strong>${escapeHtml(j.numero || "—")}</strong></div>
+          <div class="squad-player"><strong>${escapeHtml(j.nome)}</strong><small>${escapeHtml(j.posicao || "Posição não informada")}</small></div>
+          <div class="squad-age"><span>Idade</span><strong>${escapeHtml(j.idade || "—")}</strong></div>
+        </div>`).join("")}</div>
+      </section>`).join("")}`;
   }
   function renderMeta(){
-    $("#meta-line").innerHTML = `<span class="meta-pill">${state.clubes.length} clubes</span><span class="meta-pill">tabela ESPN integrada</span><span class="meta-pill">jogos por clube</span>`;
+    const totalElencos = Object.values(state.elencos).reduce((acc, jogadores) => acc + (Array.isArray(jogadores) ? jogadores.length : 0), 0);
+    $("#meta-line").innerHTML = `<span class="meta-pill">${state.clubes.length} clubes</span><span class="meta-pill">${totalElencos.toLocaleString("pt-BR")} jogadores</span><span class="meta-pill">tabela ESPN integrada</span><span class="meta-pill">jogos por clube</span>`;
   }
   function render(){
     renderResumo(); renderChips(); renderGrid(); renderMeta(); renderDetalhe();

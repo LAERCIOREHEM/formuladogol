@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-07-13T09:56:29.167478-03:00",
+  "gerado_em": "2026-07-13T12:05:13.738813-03:00",
   "temporada": 2026,
   "status": "valido",
   "resumo": {
-    "artilheiros": 15,
-    "assistentes": 5,
+    "artilheiros": 208,
+    "assistentes": 193,
     "lider_gols": {
       "posicao": 1,
       "athlete_id": "",
@@ -14,7 +14,9 @@
       "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg",
       "jogos": 17,
       "gols": 11,
-      "media_por_jogo": 0.647
+      "media_por_jogo": 0.647,
+      "jogos_com_participacao": 8,
+      "origem_complementar": "ranking ESPN conferido nos eventos"
     },
     "lider_assistencias": {
       "posicao": 1,
@@ -25,147 +27,54 @@
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
       "jogos": 17,
       "assistencias": 9,
-      "media_por_jogo": 0.529
+      "media_por_jogo": 0.529,
+      "jogos_com_participacao": 6,
+      "origem_complementar": "ranking ESPN conferido nos eventos"
     },
     "preservado_de_execucao_anterior": {
       "artilharia": true,
       "assistencias": true
+    },
+    "completude": {
+      "artilharia": {
+        "jogos_lidos": 177,
+        "jogos_invalidos_ignorados": 0,
+        "jogadores": 209,
+        "total_eventos_contabilizados": 457,
+        "gols_contra_ignorados": 14,
+        "jogadores_publicados": 208
+      },
+      "assistencias": {
+        "jogos_lidos": 177,
+        "jogos_invalidos_ignorados": 0,
+        "jogadores": 193,
+        "total_eventos_contabilizados": 312,
+        "gols_contra_ignorados": 0,
+        "jogadores_publicados": 193
+      }
     }
   },
   "fonte_aceita": {
-    "artilharia": "",
-    "assistencias": ""
+    "artilharia": "snapshot anterior",
+    "assistencias": "snapshot anterior"
   },
   "tentativas": {
     "artilharia": [
       {
-        "url": "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/leaders?limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/leaders?limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 400: Bad Request"
-      },
-      {
-        "url": "https://sports.core.api.espn.com/v3/sports/soccer/bra.1/leaders?season=2026&limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.web.api.espn.com/apis/common/v3/sports/soccer/bra.1/statistics/byathlete?region=br&lang=pt&contentorigin=espn&isqualified=true&season=2026&limit=200&category=goals&sort=goals%3Adesc",
-        "status": "ok",
-        "content_type": "application/json;charset=utf-8",
-        "itens_extraidos": 0,
-        "refs_espn_resolvidas": 0
-      },
-      {
-        "url": "https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?region=br&lang=pt&contentorigin=espn&isqualified=true&limit=200&sort=goals%3Adesc&season=2026",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?region=us&lang=en&contentorigin=espn&isqualified=true&limit=200&sort=goals%3Adesc&season=2026",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/athletes?season=2026&limit=200&sort=goals%3Adesc",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/leaders?season=2026&limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.web.api.espn.com/apis/v2/sports/soccer/bra.1/leaders?region=br&lang=pt&season=2026&limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://www.espn.com.br/futebol/estatisticas/_/liga/bra.1/temporada/2026?xhr=1",
-        "status": "erro",
-        "erro": "ValueError: HTML sem JSON incorporado utilizável"
-      },
-      {
-        "url": "https://www.espn.com/soccer/stats/_/league/bra.1/season/2026?xhr=1",
-        "status": "erro",
-        "erro": "ValueError: HTML sem JSON incorporado utilizável"
+        "status": "snapshot-local",
+        "itens": 208
       }
     ],
     "assistencias": [
       {
-        "url": "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/leaders?limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/leaders?limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 400: Bad Request"
-      },
-      {
-        "url": "https://sports.core.api.espn.com/v3/sports/soccer/bra.1/leaders?season=2026&limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.web.api.espn.com/apis/common/v3/sports/soccer/bra.1/statistics/byathlete?region=br&lang=pt&contentorigin=espn&isqualified=true&season=2026&limit=200&category=assists&sort=assists%3Adesc",
-        "status": "ok",
-        "content_type": "application/json;charset=utf-8",
-        "itens_extraidos": 0,
-        "refs_espn_resolvidas": 0
-      },
-      {
-        "url": "https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?region=br&lang=pt&contentorigin=espn&isqualified=true&limit=200&sort=assists%3Adesc&season=2026",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?region=us&lang=en&contentorigin=espn&isqualified=true&limit=200&sort=assists%3Adesc&season=2026",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/athletes?season=2026&limit=200&sort=assists%3Adesc",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/leaders?season=2026&limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://site.web.api.espn.com/apis/v2/sports/soccer/bra.1/leaders?region=br&lang=pt&season=2026&limit=200",
-        "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
-      },
-      {
-        "url": "https://www.espn.com.br/futebol/estatisticas/_/liga/bra.1/temporada/2026?xhr=1",
-        "status": "erro",
-        "erro": "ValueError: HTML sem JSON incorporado utilizável"
-      },
-      {
-        "url": "https://www.espn.com/soccer/stats/_/league/bra.1/season/2026?xhr=1",
-        "status": "erro",
-        "erro": "ValueError: HTML sem JSON incorporado utilizável"
+        "status": "snapshot-local",
+        "itens": 193
       }
     ]
   },
   "erros_nova_coleta": {
-    "artilharia": [
-      "gols: apenas 0 jogador(es); mínimo 5",
-      "gols: regressão catastrófica do líder (11 -> 0)",
-      "gols: lista caiu de 15 para 0"
-    ],
-    "assistencias": [
-      "assistencias: apenas 0 jogador(es); mínimo 5",
-      "assistencias: regressão catastrófica do líder (9 -> 0)"
-    ]
+    "artilharia": [],
+    "assistencias": []
   },
   "erros_finais": [],
   "nomes_suspeitos": []
