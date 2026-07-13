@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Estatísticas — Bolão Brasileirão 2026</title>
-  <meta name="description" content="Artilharia, assistências, melhor ataque, melhor defesa e ranking de desempenho do Brasileirão 2026 do Bolão Almoço de Sexta.">
+  <title>Estatísticas do Brasileirão 2026 — Almoço de Sexta</title>
+  <meta name="description" content="Artilheiros, assistências, estatísticas por partida, gols por clube, público, sequências e ranking de desempenho do Brasileirão 2026.">
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260707-header-web-menu-final">
-<link rel="stylesheet" href="css/br-global.css?v=20260712-menu-publico-login-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260713-estatisticas-exec2-v1">
+  <link rel="stylesheet" href="css/br-global.css?v=20260712-menu-publico-login-v1">
 </head>
 <body>
   <div class="container">
-    <header class="hero" aria-label="Bolão Brasileirão 2026 — Almoço de Sexta">
-      <img src="img/header-br-wide.png" alt="Brasileirão 2026 — Bolão Almoço de Sexta" fetchpriority="high">
+    <header class="hero" aria-label="Brasileirão 2026 — Almoço de Sexta">
+      <img src="img/header-br-wide.png" alt="Brasileirão 2026 — Almoço de Sexta" fetchpriority="high">
     </header>
+
     <nav class="nav" data-br-auth-menu aria-label="Menu principal">
       <a href="./?brasileirao=1&view=jogos" data-br-view="jogos">⚽ Jogos</a>
       <a href="aovivo.html">🔴 Ao vivo</a>
@@ -32,108 +33,100 @@
     </nav>
 
     <main>
-      <section class="page-title panel">
+      <section class="stats-intro panel">
         <div class="panel-inner">
           <div class="kicker">Brasileirão 2026</div>
-          <h1>Estatísticas e desempenho</h1>
-          <p>Artilharia, garçons, força ofensiva/defensiva e ranking técnico dos clubes, alimentados pelos JSONs da ESPN e pelo robô de estatísticas.</p>
-          <div class="meta-line" id="meta-line">Carregando estatísticas...</div>
+          <h1>Estatísticas do campeonato</h1>
+          <p>Artilheiros e assistências oficiais, raio-x de cada partida, gols por clube, performance, sequências, público e Ranking de Desempenho. Quando a ESPN não informa um dado, o site não inventa nem estima.</p>
+          <div class="meta-line" id="meta-line" aria-live="polite">Carregando estatísticas...</div>
         </div>
       </section>
 
-      <section class="cards-resumo" id="cards-resumo" aria-live="polite"></section>
+      <section class="stats-summary-grid" id="cards-resumo" aria-label="Destaques do campeonato" aria-live="polite"></section>
 
-      <section class="filter-row panel" aria-label="Filtro por clube">
-        <div class="panel-inner">
-          <div class="filter-head">
-            <div>
-              <div class="kicker">Filtro</div>
-              <h2>Ver por clube</h2>
-            </div>
-            <button class="btn secondary" id="btn-limpar-filtro" type="button">Todos</button>
-          </div>
-          <div class="chips" id="club-chips"></div>
+      <section class="stats-tabs-panel panel" aria-label="Seções de estatísticas">
+        <div class="stats-tabs" role="tablist" aria-label="Escolha uma estatística">
+          <button class="stats-tab active" type="button" role="tab" aria-selected="true" data-tab="artilheiros">⚽ Artilheiros</button>
+          <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="jogos">📋 Por jogo</button>
+          <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="assistencias">🎯 Assistências</button>
+          <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="gols-clube">🥅 Gols/clube</button>
+          <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="campeonato">📊 Campeonato</button>
+          <button class="stats-tab stats-tab-wide" type="button" role="tab" aria-selected="false" data-tab="desempenho">⚡ Ranking de Desempenho</button>
         </div>
       </section>
 
-      <section class="grid-main">
-        <article class="panel stat-panel" id="panel-artilharia">
-          <div class="panel-inner">
+      <section class="stats-content">
+        <article class="stats-view active" id="view-artilheiros" data-view="artilheiros" role="tabpanel">
+          <div class="panel"><div class="panel-inner">
             <div class="section-head">
-              <div>
-                <div class="kicker">⚽ Gols</div>
-                <h2>Artilharia</h2>
-              </div>
-              <span class="badge" id="badge-artilharia">ESPN summary</span>
+              <div><div class="kicker">⚽ Gols</div><h2>Artilheiros</h2></div>
+              <span class="badge">Ranking oficial ESPN</span>
             </div>
             <div id="lista-artilharia"></div>
-          </div>
+          </div></div>
         </article>
 
-        <article class="panel stat-panel" id="panel-garcons">
-          <div class="panel-inner">
-            <div class="section-head">
-              <div>
-                <div class="kicker">🅰️ Assistências</div>
-                <h2>Garçons</h2>
-              </div>
-              <span class="badge" id="badge-garcons">ESPN summary</span>
+        <article class="stats-view" id="view-jogos" data-view="jogos" role="tabpanel" hidden>
+          <div class="panel"><div class="panel-inner">
+            <div class="section-head stats-game-head">
+              <div><div class="kicker">📋 Partida por partida</div><h2>Raio-x dos jogos</h2></div>
+              <span class="badge">ESPN summary</span>
             </div>
-            <div id="lista-garcons"></div>
-          </div>
+            <div id="filtro-jogos"></div>
+            <div id="lista-jogos-estatisticas"></div>
+          </div></div>
         </article>
-      </section>
 
-      <section class="grid-main wide-left">
-        <article class="panel">
-          <div class="panel-inner">
+        <article class="stats-view" id="view-assistencias" data-view="assistencias" role="tabpanel" hidden>
+          <div class="panel"><div class="panel-inner">
             <div class="section-head">
-              <div>
-                <div class="kicker">📈 Forma, tabela e momento</div>
-                <h2>Ranking de desempenho</h2>
-              </div>
-              <span class="badge live-soft">Atualizado por robô</span>
+              <div><div class="kicker">🎯 Passes para gol</div><h2>Garçons</h2></div>
+              <span class="badge">Ranking oficial ESPN</span>
+            </div>
+            <div id="lista-assistencias"></div>
+          </div></div>
+        </article>
+
+        <article class="stats-view" id="view-gols-clube" data-view="gols-clube" role="tabpanel" hidden>
+          <div class="panel"><div class="panel-inner">
+            <div class="section-head">
+              <div><div class="kicker">🥅 Produção ofensiva</div><h2>Gols por clube</h2></div>
+              <span class="badge">20 clubes</span>
+            </div>
+            <div id="lista-gols-clube"></div>
+          </div></div>
+        </article>
+
+        <article class="stats-view" id="view-campeonato" data-view="campeonato" role="tabpanel" hidden>
+          <div id="campeonato-conteudo"></div>
+        </article>
+
+        <article class="stats-view" id="view-desempenho" data-view="desempenho" role="tabpanel" hidden>
+          <div class="panel"><div class="panel-inner">
+            <div class="section-head">
+              <div><div class="kicker">⚡ Índice próprio</div><h2>Ranking de Desempenho</h2></div>
+              <span class="badge live-soft">Não oficial</span>
             </div>
             <div id="ranking-desempenho"></div>
-          </div>
+            <details class="methodology-box">
+              <summary>Como o Ranking de Desempenho é calculado?</summary>
+              <p>O índice combina ataque, defesa, domínio, eficiência e disciplina com médias por jogo. Ele é uma metodologia própria do site e não substitui a classificação oficial do Brasileirão.</p>
+            </details>
+          </div></div>
         </article>
-
-        <aside class="panel">
-          <div class="panel-inner">
-            <div class="section-head compact">
-              <div>
-                <div class="kicker">🔥 / 🧱</div>
-                <h2>Ataque e defesa</h2>
-              </div>
-            </div>
-            <div id="ataque-defesa"></div>
-          </div>
-        </aside>
       </section>
 
-      <section class="panel">
-        <div class="panel-inner">
-          <div class="section-head">
-            <div>
-              <div class="kicker">🧪 Auditoria visual</div>
-              <h2>Clubes — forma e splits</h2>
-            </div>
-            <span class="badge">últimos 5 · casa · fora</span>
-          </div>
-          <div id="clubes-detalhes" class="clubes-detalhes"></div>
-        </div>
-      </section>
-
+      <p class="stats-note"><b>Nota:</b> dados de jogadores, partidas e público aparecem conforme disponibilidade nas fontes ESPN. Rankings oficiais de gols e assistências ficam separados dos eventos extraídos jogo a jogo para evitar contagens incompletas.</p>
     </main>
 
     <footer class="site-footer br-disclaimer">
-      <div><span class="footer-title">Bolão Brasileirão 2026 — Almoço de Sexta.</span> Site privado, recreativo, sem fins lucrativos e sem exploração comercial. O bolão é uma brincadeira entre amigos; marcas, escudos, nomes, imagens de atletas e demais sinais distintivos pertencem aos respectivos clubes, atletas, entidades e titulares.</div>
-      <div class="footer-sugestoes">💬 Sugestões, correções, pedidos de remoção de foto, reclamações de propriedade intelectual ou qualquer reivindicação sobre imagem/conteúdo: fale com o administrador do grupo pelo WhatsApp. A análise será feita de boa-fé e o conteúdo poderá ser ajustado ou removido.</div>
+      <div><span class="footer-title">Brasileirão 2026 — Almoço de Sexta.</span> Site privado, recreativo, sem fins lucrativos e sem exploração comercial. Marcas, escudos, nomes e demais sinais distintivos pertencem aos respectivos titulares.</div>
+      <div class="footer-sugestoes">💬 Sugestões ou correções: fale com o administrador do grupo pelo WhatsApp.</div>
     </footer>
   </div>
 
-  <script src="js/br-estatisticas.js?v=20260707-ajustes-finais-v1"></script>
-<script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
-<script src="js/br-menu.js?v=20260712-menu-publico-login-v1"></script>
+  <script src="js/br-estatisticas.js?v=20260713-estatisticas-exec2-v1"></script>
+  <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
+  <script src="js/br-menu.js?v=20260712-menu-publico-login-v1"></script>
 </body>
 </html>

@@ -2088,6 +2088,102 @@ body > .container > section.hero > img {
     .br-team-rank-result { display: none; }
   }
 
+
+
+  /* EXECUÇÃO 2 ESTATÍSTICAS 20260713 — público, árbitro e eventos nos Resultados */
+  .resultado-info-compacta {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  .resultado-info-compacta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .match-info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    margin: 9px 0;
+  }
+  .match-info-grid > div {
+    min-width: 0;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.06);
+    background: rgba(255,255,255,.025);
+  }
+  .match-info-grid span,
+  .match-info-grid strong { display: block; }
+  .match-info-grid span {
+    color: var(--text-tertiary);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+  }
+  .match-info-grid strong {
+    margin-top: 3px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+  .match-event-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 9px 0;
+  }
+  .match-event-grid section {
+    padding: 9px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 11px;
+    background: rgba(255,255,255,.025);
+  }
+  .match-event-grid h4 {
+    margin: 0 0 7px;
+    color: #fde68a;
+    font-size: 11px;
+  }
+  .match-event-grid ul {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .match-event-grid li {
+    display: grid;
+    grid-template-columns: auto minmax(0,1fr);
+    column-gap: 7px;
+  }
+  .match-event-grid li span {
+    grid-row: 1 / span 2;
+    color: var(--text-tertiary);
+    font-size: 10px;
+  }
+  .match-event-grid li strong { color: var(--text-secondary); font-size: 11px; }
+  .match-event-grid li small { color: var(--text-tertiary); font-size: 9px; }
+  .match-no-stats {
+    margin: 9px 0;
+    padding: 9px;
+    border: 1px dashed rgba(255,255,255,.09);
+    border-radius: 10px;
+    color: var(--text-tertiary);
+    font-size: 10.5px;
+    text-align: center;
+  }
+  .match-stat-list { display: block; }
+  @media (max-width: 720px) {
+    .match-info-grid { grid-template-columns: 1fr; }
+    .match-event-grid { grid-template-columns: 1fr; }
+  }
+
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260712-menu-publico-login-v1">
 </head>
@@ -2361,7 +2457,9 @@ async function carregarJogosDetalhes(opcoes = {}) {
       gerado_em: data.gerado_em || null,
       fonte: data.fonte || 'ESPN summary',
       total_jogos: data.total_jogos || Object.keys(state.jogosDetalhes).length || 0,
-      total_com_estatisticas: data.total_com_estatisticas || 0
+      total_com_estatisticas: data.total_com_estatisticas || 0,
+      total_com_publico: data.total_com_publico || 0,
+      total_com_eventos: data.total_com_eventos || 0
     };
     state.jogosDetalhesCarregados = true;
     state.jogosDetalhesErro = null;
@@ -2453,11 +2551,38 @@ function htmlBarrasEstatistica(home, away) {
   return `<div class="match-stat-bars"><div class="match-stat-bar-box home"><div class="match-stat-bar home" style="width:${ph.toFixed(1)}%"></div></div><div class="match-stat-bar-box away"><div class="match-stat-bar away" style="width:${pa.toFixed(1)}%"></div></div></div>`;
 }
 
+function htmlResumoResultadoDetalhes(j) {
+  const det = detalhesDoJogo(j) || {};
+  const estadio = det.estadio || j.estadio || '';
+  const publico = Number(det.publico);
+  const partes = [];
+  if (estadio) partes.push(`<span>📍 ${brEscapeHtml(estadio)}</span>`);
+  if (Number.isFinite(publico) && publico > 0) partes.push(`<span>👥 ${publico.toLocaleString('pt-BR')}</span>`);
+  if (!partes.length) return '';
+  return `<div class="resultado-info-compacta">${partes.join('')}</div>`;
+}
+
+function htmlEventoGolResultado(gol) {
+  const assists = Array.isArray(gol && gol.assistencias) && gol.assistencias.length
+    ? ` · assistência: ${gol.assistencias.join(', ')}` : '';
+  return `<li><span>⚽ ${brEscapeHtml(gol && gol.minuto || '')}</span><strong>${brEscapeHtml(gol && gol.jogador || 'Gol')}</strong><small>${brEscapeHtml(gol && gol.time || '')}${brEscapeHtml(assists)}</small></li>`;
+}
+
+function htmlEventoCartaoResultado(cartao) {
+  const icon = cartao && cartao.tipo === 'vermelho' ? '🟥' : '🟨';
+  return `<li><span>${icon} ${brEscapeHtml(cartao && cartao.minuto || '')}</span><strong>${brEscapeHtml(cartao && cartao.jogador || 'Cartão')}</strong><small>${brEscapeHtml(cartao && cartao.time || '')}</small></li>`;
+}
+
 function htmlEstatisticasJogo(j) {
+  const det = detalhesDoJogo(j) || {};
   const stats = estatisticasDoJogo(j);
-  if (!stats.length) return '';
-  const m = (j.mandante || {}).nome || 'Mandante';
-  const v = (j.visitante || {}).nome || 'Visitante';
+  const gols = Array.isArray(det.gols) ? det.gols : [];
+  const cartoes = Array.isArray(det.cartoes) ? det.cartoes : [];
+  const publico = Number(det.publico);
+  const temInfo = stats.length || gols.length || cartoes.length || det.estadio || det.arbitro || (Number.isFinite(publico) && publico > 0);
+  if (!temInfo) return '';
+  const m = (j.mandante || {}).nome || det.mandante || 'Mandante';
+  const v = (j.visitante || {}).nome || det.visitante || 'Visitante';
   const eventId = brEscapeAttr((j.event_id || '').toString());
   const linhas = stats.map(s => {
     const home = s.home ?? s.mandante ?? '';
@@ -2469,12 +2594,22 @@ function htmlEstatisticasJogo(j) {
       <div class="match-stat-value away">${brEscapeHtml(away)}</div>
     </div>`;
   }).join('');
+  const info = `<div class="match-info-grid">
+    <div><span>Estádio</span><strong>${brEscapeHtml(det.estadio || j.estadio || 'Não informado')}</strong></div>
+    <div><span>Público</span><strong>${Number.isFinite(publico) && publico > 0 ? publico.toLocaleString('pt-BR') : 'Não informado'}</strong></div>
+    <div><span>Árbitro</span><strong>${brEscapeHtml(det.arbitro || 'Não informado')}</strong></div>
+  </div>`;
+  const events = (gols.length || cartoes.length) ? `<div class="match-event-grid">
+    ${gols.length ? `<section><h4>Gols</h4><ul>${gols.map(htmlEventoGolResultado).join('')}</ul></section>` : ''}
+    ${cartoes.length ? `<section><h4>Cartões</h4><ul>${cartoes.map(htmlEventoCartaoResultado).join('')}</ul></section>` : ''}
+  </div>` : '';
+  const statsHtml = linhas ? `<div class="match-stat-list">${linhas}</div>` : `<div class="match-no-stats">Estatísticas avançadas não disponibilizadas pela ESPN para esta partida.</div>`;
   return `<details class="match-stats-block" data-event-id="${eventId}">
-    <summary>📊 Estatísticas do jogo</summary>
+    <summary>📊 Estatísticas e público do jogo</summary>
     <div class="match-stats-inner">
       <div class="match-stats-head"><span class="home">${brEscapeHtml(m)}</span><span class="vs">mandante × visitante</span><span class="away">${brEscapeHtml(v)}</span></div>
-      ${linhas}
-      <div class="match-stats-source">Fonte: ESPN summary · exibido somente quando a ESPN disponibiliza o boxscore do jogo.</div>
+      ${info}${events}${statsHtml}
+      <div class="match-stats-source">Fonte: ESPN summary · campos ausentes não são inventados nem estimados.</div>
     </div>
   </details>`;
 }
@@ -3953,7 +4088,7 @@ function renderResultados() {
             ${htmlRankingMiniTime(v.nome, 'resultado')}<span class="resultado-nome">${v.nome || '?'}</span>
           </div>
         </div>
-        ${r.estadio ? `<div class="resultado-estadio">📍 ${r.estadio}</div>` : ''}
+        ${htmlResumoResultadoDetalhes(r)}
         ${extrasResultado ? `<div class="resultado-extra">${extrasResultado}</div>` : ''}
       </div>`;
     }
@@ -3968,6 +4103,9 @@ function renderResultados() {
   }
   if (state.jogosDetalhesMeta && state.jogosDetalhesMeta.total_com_estatisticas) {
     html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">📊 ${state.jogosDetalhesMeta.total_com_estatisticas} jogos com estatísticas ESPN</span></div>`;
+  }
+  if (state.jogosDetalhesMeta && state.jogosDetalhesMeta.total_com_publico) {
+    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">👥 ${state.jogosDetalhesMeta.total_com_publico} jogos com público informado</span></div>`;
   }
 
   container.innerHTML = html;

@@ -713,3 +713,247 @@ body > .container > section.hero > img {
   .performance-score { grid-column: 2; justify-self: start; text-align: left; font-size: 20px; }
   .performance-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ======================================================================
+   EXECUÇÃO 2 — Estatísticas do Brasileirão (13/07/2026)
+   Interface em abas inspirada no módulo da Copa, sem alterar o menu.
+   ====================================================================== */
+.stats-intro { margin-bottom: 14px; }
+.stats-intro p { max-width: 900px; line-height: 1.55; }
+.meta-ok { color: #d9ff76; border-color: rgba(163,230,53,.32); background: rgba(163,230,53,.09); }
+.meta-wait { color: #fde68a; border-color: rgba(251,191,36,.30); background: rgba(251,191,36,.08); }
+
+.stats-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 14px 0;
+}
+.stats-summary-card {
+  min-width: 0;
+  min-height: 126px;
+  padding: 16px;
+  border: 1px solid rgba(148,163,184,.17);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(20,44,42,.88), rgba(5,15,22,.93));
+  box-shadow: 0 16px 42px rgba(0,0,0,.22);
+}
+.stats-summary-label { display: flex; align-items: center; gap: 9px; color: var(--green); font-size: 11px; font-weight: 950; letter-spacing: .09em; text-transform: uppercase; }
+.summary-icon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid rgba(148,163,184,.13); font-size: 21px; }
+.summary-shield { width: 38px; height: 38px; object-fit: contain; }
+.stats-summary-primary { margin-top: 12px; color: #fff; font-size: clamp(19px, 2.1vw, 28px); line-height: 1.03; font-weight: 950; overflow-wrap: anywhere; }
+.stats-summary-secondary { margin-top: 7px; color: var(--muted); font-size: 13px; line-height: 1.35; }
+
+.stats-tabs-panel { margin: 14px 0; }
+.stats-tabs { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 12px; }
+.stats-tab {
+  min-height: 70px;
+  padding: 12px;
+  border: 1px solid rgba(148,163,184,.20);
+  border-radius: 14px;
+  background: rgba(22,47,85,.72);
+  color: #dbe7f3;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+}
+.stats-tab:hover { transform: translateY(-1px); border-color: rgba(251,191,36,.44); }
+.stats-tab.active { color: #17202b; border-color: #fcd34d; background: linear-gradient(180deg, #ffd452, #f8c43e); box-shadow: inset 0 0 0 2px rgba(255,255,255,.20), 0 8px 22px rgba(251,191,36,.15); }
+.stats-tab-wide { grid-column: 1 / -1; }
+.stats-view[hidden] { display: none !important; }
+.stats-view { animation: brStatsFade .18s ease; }
+@keyframes brStatsFade { from { opacity: .35; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+.stats-empty { display: grid; gap: 5px; padding: 18px; border: 1px dashed rgba(148,163,184,.24); border-radius: 15px; color: var(--text); background: rgba(255,255,255,.025); }
+.stats-empty span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.stats-player-list { display: grid; gap: 10px; }
+.stats-player-row {
+  display: grid;
+  grid-template-columns: 46px 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(148,163,184,.13);
+  border-radius: 18px;
+  background: rgba(5,15,22,.68);
+}
+.stats-rank { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; color: #edffc0; border: 1px solid rgba(163,230,53,.28); background: rgba(163,230,53,.10); font-size: 19px; font-weight: 950; }
+.stats-avatar { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 15px; border: 1px solid rgba(163,230,53,.24); color: #dfff8c; background: linear-gradient(145deg, rgba(163,230,53,.15), rgba(255,255,255,.025)); font-weight: 950; letter-spacing: .04em; }
+.stats-player-main { min-width: 0; }
+.stats-player-name { color: #fff; font-size: 20px; font-weight: 950; overflow-wrap: anywhere; }
+.stats-player-club { display: flex; align-items: center; gap: 7px; margin-top: 4px; color: var(--muted); }
+.stats-player-meta { margin-top: 6px; color: var(--muted-2); font-size: 12px; }
+.stats-player-value { min-width: 74px; text-align: right; }
+.stats-player-value strong { display: block; color: var(--green); font-size: 29px; line-height: 1; }
+.stats-player-value span { color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+.stats-mini-shield { width: 20px; height: 20px; object-fit: contain; }
+.stats-shield-fallback { display: inline-grid; place-items: center; border-radius: 9px; color: #dfff8c; background: rgba(163,230,53,.12); border: 1px solid rgba(163,230,53,.22); font-size: 9px; font-weight: 950; }
+.stats-shield-fallback.stats-mini-shield { width: 20px; height: 20px; }
+.stats-expand-btn { display: block; width: 100%; margin-top: 12px; padding: 13px 15px; border: 1px solid rgba(251,191,36,.36); border-radius: 14px; color: #ffd452; background: rgba(251,191,36,.055); font: inherit; font-weight: 950; cursor: pointer; }
+.stats-expand-btn:hover { background: rgba(251,191,36,.10); }
+
+.stats-game-filter { display: grid; grid-template-columns: minmax(230px, .75fr) minmax(0, 1.25fr); gap: 12px; margin-bottom: 14px; }
+.stats-filter-control, .stats-filter-current { border: 1px solid rgba(148,163,184,.14); border-radius: 16px; background: rgba(5,15,22,.52); padding: 12px; }
+.stats-filter-control label { display: block; margin-bottom: 7px; color: var(--green); font-size: 11px; font-weight: 950; letter-spacing: .08em; text-transform: uppercase; }
+.stats-filter-control select { width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid rgba(148,163,184,.18); border-radius: 12px; background: #102238; color: #fff; font: inherit; font-weight: 800; }
+.stats-filter-current { display: flex; align-items: center; gap: 11px; }
+.stats-filter-current > div { min-width: 0; flex: 1; }
+.stats-filter-current strong, .stats-filter-current span { display: block; }
+.stats-filter-current strong { color: #fff; }
+.stats-filter-current span { margin-top: 3px; color: var(--muted); font-size: 12px; }
+.stats-filter-current button { border: 0; border-radius: 10px; padding: 8px 10px; color: #ffd452; background: rgba(251,191,36,.10); font-weight: 900; cursor: pointer; }
+.stats-filter-shield { width: 40px; height: 40px; object-fit: contain; }
+.stats-filter-all { display: grid !important; place-items: center; flex: 0 0 auto !important; width: 40px; height: 40px; margin: 0 !important; border-radius: 12px; color: #dfff8c !important; background: rgba(163,230,53,.11); border: 1px solid rgba(163,230,53,.22); font-weight: 950; }
+.stats-games-list { display: grid; gap: 10px; }
+.stats-game-card { border: 1px solid rgba(148,163,184,.14); border-radius: 17px; background: rgba(4,14,21,.62); overflow: hidden; }
+.stats-game-card > summary { display: grid; grid-template-columns: 45px minmax(0, 1fr) 24px; align-items: center; gap: 10px; padding: 13px; cursor: pointer; list-style: none; }
+.stats-game-card > summary::-webkit-details-marker { display: none; }
+.stats-game-card[open] > summary { border-bottom: 1px solid rgba(148,163,184,.13); background: rgba(163,230,53,.035); }
+.stats-game-round { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: rgba(251,191,36,.10); color: #ffd452; border: 1px solid rgba(251,191,36,.25); font-weight: 950; }
+.stats-game-summary-main { min-width: 0; }
+.stats-game-date { margin-bottom: 7px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+.stats-game-teams { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 8px; }
+.stats-game-teams > span { display: flex; align-items: center; gap: 6px; min-width: 0; font-weight: 900; }
+.stats-game-teams > span:last-of-type { justify-content: flex-end; text-align: right; }
+.stats-game-teams b { color: #fff; font-size: 18px; white-space: nowrap; }
+.stats-game-shield { width: 24px; height: 24px; object-fit: contain; }
+.stats-game-quick { margin-top: 7px; color: var(--muted-2); font-size: 11px; }
+.stats-game-chevron { color: #ffd452; font-size: 20px; transition: transform .15s ease; }
+.stats-game-card[open] .stats-game-chevron, .stats-club-goals-card[open] .stats-game-chevron { transform: rotate(180deg); }
+.stats-game-body { padding: 14px; }
+.stats-game-info-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
+.stats-game-info-grid > div { padding: 10px; border-radius: 12px; background: rgba(255,255,255,.025); border: 1px solid rgba(148,163,184,.10); }
+.stats-game-info-grid span, .stats-game-info-grid strong { display: block; }
+.stats-game-info-grid span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+.stats-game-info-grid strong { margin-top: 4px; overflow-wrap: anywhere; }
+.stats-match-events { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-bottom: 12px; }
+.stats-match-events section { padding: 11px; border-radius: 13px; background: rgba(255,255,255,.025); border: 1px solid rgba(148,163,184,.10); }
+.stats-match-events h4 { margin: 0 0 8px; color: #ffd452; }
+.stats-match-events ul { display: grid; gap: 7px; padding: 0; margin: 0; list-style: none; }
+.stats-match-events li { display: grid; grid-template-columns: auto minmax(0,1fr); column-gap: 8px; }
+.stats-match-events li span { grid-row: 1 / span 2; color: var(--muted); font-size: 11px; }
+.stats-match-events li small { color: var(--muted-2); }
+.stats-match-stat-list { display: grid; gap: 6px; }
+.stats-match-stat-row { display: grid; grid-template-columns: minmax(55px,.5fr) minmax(120px,1fr) minmax(55px,.5fr); align-items: center; gap: 10px; padding: 9px 10px; border-radius: 11px; background: rgba(255,255,255,.025); }
+.stats-match-stat-row strong:first-child { text-align: left; }
+.stats-match-stat-row strong:last-child { text-align: right; }
+.stats-match-stat-row span { color: var(--muted); text-align: center; font-size: 12px; }
+.stats-source-note { margin: 11px 0 0; color: var(--muted-2); font-size: 11px; line-height: 1.4; }
+
+.stats-club-goals-list { display: grid; gap: 9px; }
+.stats-club-goals-card { border: 1px solid rgba(148,163,184,.13); border-radius: 17px; background: rgba(5,15,22,.62); overflow: hidden; }
+.stats-club-goals-card > summary { display: grid; grid-template-columns: 46px 46px minmax(0,1fr) auto 22px; align-items: center; gap: 10px; padding: 12px; cursor: pointer; list-style: none; }
+.stats-club-goals-card > summary::-webkit-details-marker { display: none; }
+.stats-club-shield { width: 42px; height: 42px; object-fit: contain; }
+.stats-club-goals-main { min-width: 0; }
+.stats-club-goals-main strong, .stats-club-goals-main span { display: block; }
+.stats-club-goals-main strong { color: #fff; font-size: 17px; }
+.stats-club-goals-main span { margin-top: 4px; color: var(--muted); font-size: 12px; }
+.stats-club-goals-value { min-width: 66px; text-align: right; }
+.stats-club-goals-value strong, .stats-club-goals-value span { display: block; }
+.stats-club-goals-value strong { color: var(--green); font-size: 26px; }
+.stats-club-goals-value span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+.stats-club-markers { padding: 0 13px 13px; border-top: 1px solid rgba(148,163,184,.10); }
+.stats-club-markers h4 { margin: 13px 0 9px; color: #ffd452; }
+.stats-marker-list { display: grid; gap: 5px; }
+.stats-marker-list > div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.025); }
+.stats-marker-other { color: var(--muted); font-style: italic; }
+.stats-club-balance { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; color: var(--muted); font-size: 12px; }
+
+.stats-champ-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.stats-record-grid { display: grid; gap: 8px; }
+.stats-record-card { display: grid; gap: 5px; width: 100%; padding: 12px; border: 1px solid rgba(148,163,184,.12); border-radius: 13px; color: var(--text); background: rgba(5,15,22,.56); text-align: left; font: inherit; cursor: pointer; }
+.stats-record-card:hover { border-color: rgba(251,191,36,.35); }
+.stats-record-card span { color: var(--green); font-size: 10px; font-weight: 950; letter-spacing: .07em; text-transform: uppercase; }
+.stats-record-card strong { color: #fff; }
+.stats-record-card small { color: var(--muted); }
+.stats-sequence-list { display: grid; gap: 6px; }
+.stats-sequence-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(110px,.7fr) auto; align-items: center; gap: 10px; padding: 10px; border-radius: 11px; background: rgba(255,255,255,.025); }
+.stats-sequence-row span { color: var(--muted); font-size: 12px; }
+.stats-sequence-row strong { color: #fff; }
+.stats-sequence-row b { color: var(--green); font-size: 18px; }
+.stats-attendance-panel { margin-top: 14px; }
+.stats-attendance-summary { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 8px; margin-bottom: 12px; }
+.stats-attendance-summary > div { padding: 11px; border-radius: 13px; background: rgba(255,255,255,.025); border: 1px solid rgba(148,163,184,.10); }
+.stats-attendance-summary span, .stats-attendance-summary strong { display: block; }
+.stats-attendance-summary span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
+.stats-attendance-summary strong { margin-top: 5px; color: #fff; font-size: 20px; }
+.stats-attendance-list { display: grid; gap: 6px; }
+.stats-attendance-row { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 10px; border: 0; border-radius: 11px; background: rgba(5,15,22,.58); color: var(--text); text-align: left; font: inherit; cursor: pointer; }
+.stats-attendance-row > span { color: var(--muted); text-align: center; }
+.stats-attendance-row div { min-width: 0; }
+.stats-attendance-row strong, .stats-attendance-row small { display: block; }
+.stats-attendance-row small { margin-top: 3px; color: var(--muted); }
+.stats-attendance-row > b { color: var(--green); font-size: 18px; }
+
+.stats-performance-list { display: grid; gap: 11px; }
+.stats-performance-card { padding: 14px; border: 1px solid rgba(148,163,184,.13); border-radius: 17px; background: rgba(5,15,22,.62); }
+.stats-performance-head { display: grid; grid-template-columns: 46px 48px minmax(0,1fr) auto; align-items: center; gap: 10px; }
+.stats-performance-shield { width: 44px; height: 44px; object-fit: contain; }
+.stats-performance-head > div strong, .stats-performance-head > div span { display: block; }
+.stats-performance-head > div strong { color: #fff; font-size: 18px; }
+.stats-performance-head > div span { margin-top: 4px; color: var(--muted); font-size: 12px; }
+.stats-performance-head > b { color: var(--green); font-size: 26px; text-align: right; }
+.stats-performance-head > b small { display: block; color: var(--muted); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+.stats-performance-bars { display: grid; gap: 7px; margin-top: 12px; }
+.stats-performance-metric { display: grid; grid-template-columns: 74px minmax(0,1fr) 42px; align-items: center; gap: 8px; }
+.stats-performance-metric span { color: var(--muted); font-size: 12px; }
+.stats-performance-metric > div { height: 8px; border-radius: 999px; background: rgba(96,165,250,.13); overflow: hidden; }
+.stats-performance-metric i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #fbbf24, #a3e635); }
+.stats-performance-metric strong { text-align: right; }
+.stats-performance-card p { font-size: 12px; line-height: 1.45; }
+.methodology-box { margin-top: 13px; border: 1px solid rgba(251,191,36,.25); border-radius: 14px; background: rgba(251,191,36,.04); }
+.methodology-box summary { padding: 12px; color: #ffd452; font-weight: 950; cursor: pointer; }
+.methodology-box p { padding: 0 12px 12px; margin: 0; }
+.stats-note { margin: 16px 2px 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+
+@media (min-width: 850px) {
+  .stats-tabs { grid-template-columns: repeat(5, minmax(0,1fr)); }
+  .stats-tab-wide { grid-column: auto; }
+}
+@media (max-width: 920px) {
+  .stats-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .stats-champ-grid { grid-template-columns: 1fr; }
+  .stats-attendance-summary { grid-template-columns: repeat(3,minmax(0,1fr)); }
+}
+@media (max-width: 640px) {
+  .stats-summary-grid { gap: 8px; }
+  .stats-summary-card { min-height: 112px; padding: 12px; }
+  .stats-summary-primary { font-size: 18px; }
+  .stats-summary-secondary { font-size: 11px; }
+  .stats-tabs { gap: 8px; padding: 10px; }
+  .stats-tab { min-height: 84px; padding: 10px 6px; font-size: 15px; }
+  .stats-player-row { grid-template-columns: 42px 48px minmax(0,1fr) 57px; gap: 8px; padding: 11px 9px; }
+  .stats-rank { width: 40px; height: 40px; font-size: 16px; }
+  .stats-avatar { width: 46px; height: 46px; font-size: 13px; }
+  .stats-player-name { font-size: 17px; }
+  .stats-player-meta { font-size: 10px; }
+  .stats-player-value { min-width: 52px; }
+  .stats-player-value strong { font-size: 24px; }
+  .stats-game-filter { grid-template-columns: 1fr; }
+  .stats-game-card > summary { grid-template-columns: 39px minmax(0,1fr) 20px; padding: 10px 8px; }
+  .stats-game-round { width: 37px; height: 37px; font-size: 12px; }
+  .stats-game-teams { gap: 4px; }
+  .stats-game-teams > span { font-size: 12px; }
+  .stats-game-teams b { font-size: 15px; }
+  .stats-game-shield { width: 20px; height: 20px; }
+  .stats-game-info-grid { grid-template-columns: 1fr; }
+  .stats-match-events { grid-template-columns: 1fr; }
+  .stats-match-stat-row { grid-template-columns: 48px minmax(100px,1fr) 48px; gap: 5px; padding: 8px 6px; }
+  .stats-club-goals-card > summary { grid-template-columns: 40px 38px minmax(0,1fr) 50px 16px; gap: 6px; padding: 10px 7px; }
+  .stats-club-shield { width: 34px; height: 34px; }
+  .stats-club-goals-main strong { font-size: 14px; }
+  .stats-club-goals-main span { font-size: 10px; }
+  .stats-club-goals-value strong { font-size: 21px; }
+  .stats-sequence-row { grid-template-columns: minmax(0,1fr) auto 30px; gap: 6px; }
+  .stats-sequence-row strong { font-size: 12px; }
+  .stats-attendance-summary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .stats-performance-head { grid-template-columns: 40px 40px minmax(0,1fr) 54px; gap: 7px; }
+  .stats-performance-shield { width: 36px; height: 36px; }
+  .stats-performance-head > div strong { font-size: 15px; }
+  .stats-performance-head > div span { font-size: 10px; }
+  .stats-performance-head > b { font-size: 21px; }
+  .stats-performance-metric { grid-template-columns: 62px minmax(0,1fr) 36px; gap: 6px; }
+}

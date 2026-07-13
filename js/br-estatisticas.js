@@ -1,28 +1,45 @@
 (function () {
   "use strict";
 
-  const ARQUIVOS = {
-    estatisticas: "dados-br/estatisticas.json",
+  const FILES = {
+    leaders: "dados-br/lideres-jogadores.json",
+    competition: "dados-br/estatisticas-competicao.json",
+    details: "dados-br/jogos-detalhes.json",
     ranking: "dados-br/ranking-desempenho.json",
-    jogadores: "dados-br/jogadores.json",
-    tabela: "tabela.json",
-    resultados: "resultados.json",
+    table: "tabela.json",
+    results: "resultados.json",
+    audit: "dados-br/auditoria-estatisticas.json",
   };
 
   const state = {
-    estatisticas: null,
+    leaders: null,
+    competition: null,
+    details: null,
     ranking: null,
-    jogadores: null,
-    tabela: null,
-    resultados: null,
-    filtro: "",
+    table: null,
+    results: null,
+    audit: null,
+    tab: "artilheiros",
+    expanded: { artilheiros: false, assistencias: false, publico: false },
+    clubFilter: "",
+    gamesLimit: 10,
   };
 
   const $ = (id) => document.getElementById(id);
-  const cacheBust = () => `v=${Date.now()}`;
+  const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
-  function normalizarNome(nome) {
-    return String(nome || "")
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>'"]/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;",
+    }[c]));
+  }
+
+  function escapeAttr(value) {
+    return escapeHtml(value).replace(/`/g, "&#96;");
+  }
+
+  function normalize(value) {
+    return String(value || "")
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
@@ -30,426 +47,547 @@
       .trim();
   }
 
-  function escudoFallback(nome) {
-    const iniciais = String(nome || "?")
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0])
-      .join("")
-      .toUpperCase() || "?";
-    return `<span class="escudo-fallback" aria-hidden="true">${escapeHtml(iniciais)}</span>`;
+  function number(value, digits = 0) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return "—";
+    return n.toLocaleString("pt-BR", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    });
   }
 
-  function imgEscudo(time, cls = "escudo-inline") {
-    if (!time) return "";
-    const nome = typeof time === "string" ? time : (time.time || time.nome || "");
-    const escudo = typeof time === "object" ? (time.escudo || "") : "";
-    if (!escudo) return escudoFallback(nome);
-    return `<img class="${cls}" src="${escapeAttr(escudo)}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+  function integer(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n.toLocaleString("pt-BR") : "—";
   }
 
-  function escapeHtml(v) {
-    return String(v ?? "").replace(/[&<>'"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c]));
+  function dateTimeBR(value) {
+    if (!value) return "—";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      dateStyle: "short",
+      timeStyle: "short",
+    });
   }
 
-  function escapeAttr(v) {
-    return escapeHtml(v).replace(/`/g, "&#96;");
+  function dateBR(value) {
+    if (!value) return "Data não informada";
+    const s = String(value);
+    const d = new Date(s.length <= 16 ? `${s}:00-03:00` : s);
+    if (Number.isNaN(d.getTime())) return s;
+    return d.toLocaleDateString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      weekday: "short",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   }
 
-  async function fetchJson(url, fallback = null) {
-    const sep = url.includes("?") ? "&" : "?";
+  async function fetchJson(path, fallback) {
     try {
-      const resp = await fetch(`${url}${sep}${cacheBust()}`, { cache: "no-store" });
-      if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
-      return await resp.json();
-    } catch (err) {
-      console.warn("Falha ao carregar", url, err);
-      if (fallback !== null) return fallback;
-      throw err;
+      const response = await fetch(`${path}${path.includes("?") ? "&" : "?"}t=${Date.now()}`, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      console.warn(`Falha ao carregar ${path}:`, error);
+      return fallback;
     }
   }
 
-  function dataHoraBR(iso) {
-    if (!iso) return "—";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return String(iso);
-    return d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+  function tableRows() {
+    return Array.isArray(state.table?.tabela) ? state.table.tabela : [];
   }
 
-  function numero(n, sufixo = "") {
-    if (n === null || n === undefined || n === "") return "—";
-    const val = Number(n);
-    if (!Number.isFinite(val)) return String(n);
-    return `${val.toLocaleString("pt-BR")}${sufixo}`;
+  function resultsRows() {
+    return Array.isArray(state.results?.resultados) ? state.results.resultados : [];
   }
 
-  function clubeLista() {
-    const clubes = (state.estatisticas?.clubes || []).slice();
-    if (clubes.length) return clubes;
-    return (state.tabela?.tabela || []).map((t) => ({
-      time: t.time,
-      escudo: t.escudo || "",
-      sigla: t.sigla || "",
-      pos: t.pos,
-      pontos: t.pontos,
-      jogos: t.jogos,
-      gp: t.gp,
-      gc: t.gc,
-      sg: t.sg,
-      aproveitamento: t.aproveitamento,
-      forma_ultimos5: [],
-    }));
+  function teamMap() {
+    const map = new Map();
+    tableRows().forEach((team) => map.set(normalize(team.time), team));
+    resultsRows().forEach((game) => {
+      [game.mandante, game.visitante].forEach((team) => {
+        if (team?.nome && !map.has(normalize(team.nome))) map.set(normalize(team.nome), team);
+      });
+    });
+    return map;
   }
 
-  function timeSelecionado(item) {
-    if (!state.filtro) return true;
-    const time = item?.time || item?.clube || item?.nome || item?.equipe || "";
-    return normalizarNome(time) === normalizarNome(state.filtro);
+  function teamInfo(name) {
+    return teamMap().get(normalize(name)) || { time: name || "", nome: name || "", escudo: "", sigla: "" };
   }
 
-  function filtrarPorClube(lista) {
-    if (!state.filtro) return lista || [];
-    return (lista || []).filter(timeSelecionado);
+  function teamName(obj) {
+    return String(obj?.time || obj?.nome || obj || "");
   }
 
-  function resumoCard(label, value, sub) {
-    return `<div class="summary-card"><div class="summary-label">${escapeHtml(label)}</div><div class="summary-value">${value || "—"}</div><div class="summary-sub">${escapeHtml(sub || "")}</div></div>`;
+  function initials(name) {
+    return String(name || "?")
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase() || "?";
   }
 
-  function renderResumo() {
-    const e = state.estatisticas || {};
-    const resumo = e.resumo || {};
-    const ataque = resumo.melhor_ataque || (e.melhor_ataque || [])[0] || {};
-    const defesa = resumo.melhor_defesa || (e.melhor_defesa || [])[0] || {};
-    const alta = resumo.time_em_alta || (state.ranking?.ranking || [])[0] || {};
-    const lider = resumo.lider_geral || (clubeLista().find((c) => Number(c.pos) === 1) || clubeLista()[0] || {});
-    const artilharia = listaArtilharia();
-    const assistencias = listaAssistencias();
-    const participacoes = state.jogadores?.participacoes_gol || [];
-    const artilheiro = artilharia[0] || {};
-    const garcom = assistencias[0] || {};
-    const destaquePart = participacoes[0] || {};
+  function shield(obj, cls = "stats-shield") {
+    const name = teamName(obj);
+    const src = typeof obj === "object" ? String(obj?.escudo || "") : String(teamInfo(name)?.escudo || "");
+    if (!src) return `<span class="stats-shield-fallback ${escapeAttr(cls)}">${escapeHtml(initials(name))}</span>`;
+    return `<img class="${escapeAttr(cls)}" src="${escapeAttr(src)}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+  }
 
-    const cards = [
-      resumoCard("Líder", escapeHtml(lider.time || "—"), `${numero(lider.pontos)} pts · ${numero(lider.aproveitamento, "%")}`),
-      resumoCard("Melhor ataque", escapeHtml(ataque.time || "—"), `${numero(ataque.gp)} gols pró`),
-      resumoCard("Melhor defesa", escapeHtml(defesa.time || "—"), `${numero(defesa.gc)} gols contra`),
-      resumoCard("Time em alta", escapeHtml(alta.time || "—"), `${numero(alta.score)} pts no índice`),
-      resumoCard("Artilheiro", escapeHtml(artilheiro.nome || "em coleta"), artilheiro.time ? `${artilheiro.time} · ${numero(artilheiro.gols)} gols` : "aguardando summaries ESPN"),
-      resumoCard("Garçom", escapeHtml(garcom.nome || "em coleta"), garcom.time ? `${garcom.time} · ${numero(garcom.assistencias)} assist.` : "aguardando summaries ESPN"),
-    ];
-    $("cards-resumo").innerHTML = cards.join("");
+  function leadersValid() {
+    return state.leaders?.status === "valido" && Array.isArray(state.leaders?.artilharia) && Array.isArray(state.leaders?.assistencias);
+  }
 
-    const atualizado = e.atualizado_em || state.ranking?.atualizado_em || state.tabela?.atualizado_em;
-    const eventos = state.jogadores?.total_summaries_processados || e.eventos_processados?.length || e.total_eventos_processados || 0;
-    $("meta-line").innerHTML = [
-      `<span class="meta-pill">Atualizado: ${escapeHtml(dataHoraBR(atualizado))}</span>`,
-      `<span class="meta-pill">Fonte: ${escapeHtml(e.fonte || "JSON local")}</span>`,
-      `<span class="meta-pill">Eventos detalhados: ${numero(eventos)}</span>`,
+  function detailMap() {
+    return state.details?.jogos && typeof state.details.jogos === "object" ? state.details.jogos : {};
+  }
+
+  function gameDetail(game) {
+    const id = String(game?.event_id || game?.id || "");
+    if (id && detailMap()[id]) return detailMap()[id];
+    return Object.values(detailMap()).find((item) => item && String(item.event_id || "") === id) || null;
+  }
+
+  function gameById(eventId) {
+    return resultsRows().find((game) => String(game.event_id || game.id || "") === String(eventId || "")) || null;
+  }
+
+  function sortedResults() {
+    return resultsRows().slice().sort((a, b) => String(b.data_iso || "").localeCompare(String(a.data_iso || "")));
+  }
+
+  function emptyState(message, extra = "") {
+    return `<div class="stats-empty"><strong>${escapeHtml(message)}</strong>${extra ? `<span>${escapeHtml(extra)}</span>` : ""}</div>`;
+  }
+
+  function renderMeta() {
+    const updated = state.leaders?.atualizado_em || state.competition?.atualizado_em || state.ranking?.atualizado_em || state.table?.atualizado_em;
+    const games = state.competition?.resumo?.jogos_finalizados ?? resultsRows().length;
+    const publicGames = state.competition?.resumo?.jogos_com_publico ?? state.details?.total_com_publico;
+    const status = state.audit?.status || state.leaders?.status || "indisponível";
+    const pills = [
+      `<span class="meta-pill">Atualizado: <b>${escapeHtml(dateTimeBR(updated))}</b></span>`,
+      `<span class="meta-pill">Jogos processados: <b>${escapeHtml(integer(games))}</b></span>`,
+      Number.isFinite(Number(publicGames)) ? `<span class="meta-pill">Com público: <b>${escapeHtml(integer(publicGames))}</b></span>` : "",
+      `<span class="meta-pill ${status === "ok" || status === "valido" ? "meta-ok" : "meta-wait"}">${status === "ok" || status === "valido" ? "Dados auditados" : "Aguardando atualização completa"}</span>`,
+    ].filter(Boolean);
+    $("meta-line").innerHTML = pills.join("");
+  }
+
+  function summaryCard(icon, label, primary, secondary, team) {
+    const logo = team ? shield(team, "summary-shield") : `<span class="summary-icon">${icon}</span>`;
+    return `<article class="stats-summary-card">
+      <div class="stats-summary-label">${logo}<span>${escapeHtml(label)}</span></div>
+      <div class="stats-summary-primary">${escapeHtml(primary || "Aguardando dados")}</div>
+      <div class="stats-summary-secondary">${escapeHtml(secondary || "")}</div>
+    </article>`;
+  }
+
+  function renderSummary() {
+    const scorer = leadersValid() ? state.leaders.artilharia[0] : null;
+    const assistant = leadersValid() ? state.leaders.assistencias[0] : null;
+    const attacks = Array.isArray(state.competition?.gols_por_clube) && state.competition.gols_por_clube.length
+      ? state.competition.gols_por_clube
+      : tableRows().slice().sort((a, b) => Number(b.gp || 0) - Number(a.gp || 0));
+    const attack = attacks[0] || null;
+    const rank = Array.isArray(state.ranking?.ranking) ? state.ranking.ranking[0] : null;
+
+    $("cards-resumo").innerHTML = [
+      summaryCard("⚽", "Artilheiro", scorer?.nome, scorer ? `${scorer.time} · ${integer(scorer.gols)} gols` : "Ranking oficial ainda não atualizado", scorer),
+      summaryCard("🎯", "Garçom", assistant?.nome, assistant ? `${assistant.time} · ${integer(assistant.assistencias)} assist.` : "Ranking oficial ainda não atualizado", assistant),
+      summaryCard("🥅", "Melhor ataque", attack?.time, attack ? `${integer(attack.gols_pro ?? attack.gp)} gols` : "Aguardando consolidado", attack),
+      summaryCard("⚡", "Ranking", rank?.time, rank ? `Índice ${number(rank.indice_final ?? rank.score, 1)}` : "Aguardando ranking", rank),
     ].join("");
   }
 
-  function renderChips() {
-    const clubes = clubeLista().slice().sort((a, b) => normalizarNome(a.time).localeCompare(normalizarNome(b.time)));
-    const atual = state.filtro ? clubes.find((c) => normalizarNome(c.time) === normalizarNome(state.filtro)) : null;
-    const descricao = atual
-      ? `${numero(atual.pontos)} pts · ${numero(atual.jogos)} jogos · SG ${numero(atual.sg)} · ${numero(atual.aproveitamento, "%")}`
-      : "Mostrando artilharia, assistências, ataque/defesa e desempenho de todos os clubes.";
-
-    const options = [`<option value="" ${!state.filtro ? "selected" : ""}>Todos os clubes</option>`]
-      .concat(clubes.map((c) => `<option value="${escapeAttr(c.time)}" ${normalizarNome(c.time) === normalizarNome(state.filtro) ? "selected" : ""}>${escapeHtml(c.time)}</option>`))
-      .join("");
-
-    const currentShield = atual
-      ? imgEscudo(atual, "stats-filter-shield-img")
-      : `<span class="stats-filter-fallback">BR</span>`;
-
-    $("club-chips").innerHTML = `
-      <div class="stats-filter-panel">
-        <div class="stats-filter-select-card">
-          <label class="stats-filter-label" for="select-filtro-estatisticas">Selecionar clube</label>
-          <select id="select-filtro-estatisticas" class="stats-filter-select">${options}</select>
-        </div>
-        <div class="stats-filter-current-card">
-          <div class="stats-filter-team">
-            ${currentShield}
-            <div>
-              <div class="stats-filter-title">${escapeHtml(atual?.time || "Todos os clubes")}</div>
-              <div class="stats-filter-note">${escapeHtml(descricao)}</div>
-            </div>
-          </div>
-          ${state.filtro ? `<button class="btn secondary stats-filter-clear" type="button" data-clear="1">Limpar</button>` : ""}
-        </div>
-      </div>
-      <div class="stats-mini-strip" aria-label="Atalhos rápidos de clubes">
-        <button class="stats-mini-club ${!state.filtro ? "active" : ""}" type="button" data-time="" title="Todos">BR</button>
-        ${clubes.map((c) => `<button class="stats-mini-club ${normalizarNome(c.time) === normalizarNome(state.filtro) ? "active" : ""}" type="button" data-time="${escapeAttr(c.time)}" title="${escapeAttr(c.time)}">${imgEscudo(c)}</button>`).join("")}
-      </div>
-    `;
-
-    const select = $("select-filtro-estatisticas");
-    if (select) {
-      select.addEventListener("change", () => {
-        state.filtro = select.value || "";
-        renderTudo();
-      });
-    }
-    $("club-chips").querySelectorAll("[data-time]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        state.filtro = btn.getAttribute("data-time") || "";
-        renderTudo();
-      });
-    });
-    $("club-chips").querySelector("[data-clear]")?.addEventListener("click", () => {
-      state.filtro = "";
-      renderTudo();
-    });
-
-    const limpar = $("btn-limpar-filtro");
-    if (limpar) {
-      limpar.textContent = state.filtro ? "Limpar filtro" : "Todos";
-      limpar.disabled = !state.filtro;
-    }
+  function playerRows(type) {
+    if (!leadersValid()) return [];
+    return type === "artilheiros" ? state.leaders.artilharia : state.leaders.assistencias;
   }
 
-  function listaArtilharia() {
-    return state.jogadores?.artilharia?.length ? state.jogadores.artilharia : (state.estatisticas?.artilharia || []);
-  }
-
-  function listaAssistencias() {
-    return state.jogadores?.assistencias?.length ? state.jogadores.assistencias : (state.estatisticas?.garcons || []);
-  }
-
-  // Fotos de jogadores desativadas propositalmente.
-  // Motivo: as fontes traziam imagens erradas/quebradas e isso estava deformando a tela.
-  function playerFotoUrl(_p) {
-    return "";
-  }
-  function playerFoto(p) {
-    return `<span class="player-photo-fallback" aria-hidden="true">${escapeHtml(iniciaisPessoa(p?.nome || p?.name || "?"))}</span>`;
-  }
-  function abrirModalJogador(p, tipo) {
-    const nome = p?.nome || p?.name || "Jogador";
-    const valor = tipo === "gols" ? p?.gols : p?.assistencias;
-    const rotulo = tipo === "gols" ? "gols" : "assistências";
-    const wrap = document.createElement("div");
-    wrap.className = "player-modal-backdrop";
-    wrap.innerHTML = `<article class="player-modal player-modal-no-photo" role="dialog" aria-modal="true" aria-label="Jogador ${escapeAttr(nome)}">
-      <span class="player-modal-fallback">${escapeHtml(iniciaisPessoa(nome))}</span>
-      <h3>${escapeHtml(nome)}</h3>
-      <p>${escapeHtml(p?.time || "—")} · ${numero(valor)} ${escapeHtml(rotulo)}</p>
-      <button class="btn player-modal-close" type="button">Fechar</button>
-    </article>`;
-    wrap.addEventListener("click", (ev) => { if (ev.target === wrap || ev.target.classList.contains("player-modal-close")) wrap.remove(); });
-    document.addEventListener("keydown", function esc(ev){ if (ev.key === "Escape") { wrap.remove(); document.removeEventListener("keydown", esc); } });
-    document.body.appendChild(wrap);
-  }
-
-  function iniciaisPessoa(nome) {
-    return String(nome || "?")
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0])
-      .join("")
-      .toUpperCase() || "?";
-  }
-
-  function renderListaJogadores(id, lista, tipo) {
-    const filtrada = filtrarPorClube(lista || []);
-    const fonte = state.jogadores?.fonte || state.estatisticas?.fonte || "ESPN";
-    if (!filtrada.length) {
-      const msg = tipo === "gols"
-        ? "Artilharia sem jogadores publicados ainda. Rode o workflow Atualizar Brasileirao (ESPN): ele busca o summary de cada jogo encerrado e preenche este ranking automaticamente quando a ESPN entregar os eventos de gol."
-        : "Assistências sem jogadores publicados ainda. O robô da Execução 8 procura assistências nos summaries da ESPN; quando a fonte não informa, a página mantém aviso claro e não inventa dados.";
-      $(id).innerHTML = `<div class="empty-state"><strong>${tipo === "gols" ? "Coleta de artilharia" : "Coleta de assistências"}</strong><br>${escapeHtml(msg)}<br><span class="mini-source">Fonte configurada: ${escapeHtml(fonte)}</span></div>`;
+  function renderPlayers(type) {
+    const target = type === "artilheiros" ? $("lista-artilharia") : $("lista-assistencias");
+    const list = playerRows(type);
+    const field = type === "artilheiros" ? "gols" : "assistencias";
+    const unit = type === "artilheiros" ? "gols" : "assist.";
+    if (!list.length) {
+      target.innerHTML = emptyState("Ranking oficial ainda não disponível.", "Execute o workflow Atualizar Brasileirao (ESPN) e aguarde a coleta validada.");
       return;
     }
-    const exibidos = filtrada.slice(0, 25);
-    $(id).innerHTML = `<div class="stat-list player-stat-list">${exibidos.map((p, i) => {
-      const valor = tipo === "gols" ? p.gols : p.assistencias;
-      return `<div class="player-row rich" data-player-idx="${i}" data-player-kind="${escapeAttr(tipo)}" title="Ver detalhes de ${escapeAttr(p.nome || p.name || 'jogador')}">
-        <div class="player-rank">${i + 1}</div>
-        ${playerFoto(p)}
-        <div class="player-main">
-          <div class="player-name">${escapeHtml(p.nome || p.name || "—")}</div>
-          <div class="player-sub">${imgEscudo(p)}<span>${escapeHtml(p.time || "—")}</span>${p.eventos ? `<span>${numero(p.eventos)} jogo(s) com participação</span>` : ""}</div>
+    const expanded = state.expanded[type];
+    const shown = expanded ? list : list.slice(0, 5);
+    target.innerHTML = `<div class="stats-player-list">${shown.map((player, index) => {
+      const games = Number(player.jogos);
+      const value = Number(player[field] || 0);
+      const average = Number.isFinite(games) && games > 0 ? `${number(value / games, 2)} por jogo` : "Jogos não informados";
+      return `<article class="stats-player-row">
+        <div class="stats-rank">${integer(player.posicao || index + 1)}</div>
+        <div class="stats-avatar">${escapeHtml(initials(player.nome))}</div>
+        <div class="stats-player-main">
+          <div class="stats-player-name">${escapeHtml(player.nome)}</div>
+          <div class="stats-player-club">${shield(player, "stats-mini-shield")}<span>${escapeHtml(player.time)}</span></div>
+          <div class="stats-player-meta">${Number.isFinite(games) ? `${integer(games)} jogos · ` : ""}${escapeHtml(average)}</div>
         </div>
-        <div class="player-value">${numero(valor)}<small>${tipo === "gols" ? "gols" : "assist."}</small></div>
-      </div>`;
-    }).join("")}</div>`;
-    $(id).querySelectorAll(".player-row.rich").forEach((row) => {
-      const idx = Number(row.getAttribute("data-player-idx"));
-      row.addEventListener("click", () => abrirModalJogador(exibidos[idx] || {}, tipo));
+        <div class="stats-player-value"><strong>${integer(value)}</strong><span>${unit}</span></div>
+      </article>`;
+    }).join("")}</div>${list.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-list="${type}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${list.length}) ↓`}</button>` : ""}`;
+  }
+
+  function clubOptions() {
+    return tableRows().slice().sort((a, b) => String(a.time || "").localeCompare(String(b.time || ""), "pt-BR"));
+  }
+
+  function filteredGames() {
+    const filter = normalize(state.clubFilter);
+    return sortedResults().filter((game) => {
+      if (!filter) return true;
+      return normalize(game?.mandante?.nome) === filter || normalize(game?.visitante?.nome) === filter;
     });
   }
 
-  function formaHtml(forma) {
-    const f = Array.isArray(forma) ? forma : [];
-    if (!f.length) return `<span class="forma"><span class="meta-pill">sem dados</span></span>`;
-    return `<span class="forma">${f.slice(-5).map((x) => {
-      const l = String(x || "").toUpperCase()[0];
-      const cls = l === "V" ? "v" : l === "E" ? "e" : "d";
-      return `<span class="form-dot ${cls}">${escapeHtml(l)}</span>`;
-    }).join("")}</span>`;
+  function renderGameFilter() {
+    const clubs = clubOptions();
+    const selected = state.clubFilter;
+    const info = selected ? teamInfo(selected) : null;
+    const games = filteredGames();
+    $("filtro-jogos").innerHTML = `<div class="stats-game-filter">
+      <div class="stats-filter-control">
+        <label for="stats-club-filter">Clube</label>
+        <select id="stats-club-filter">
+          <option value="">Todos os clubes</option>
+          ${clubs.map((club) => `<option value="${escapeAttr(club.time)}" ${normalize(club.time) === normalize(selected) ? "selected" : ""}>${escapeHtml(club.time)}</option>`).join("")}
+        </select>
+      </div>
+      <div class="stats-filter-current">
+        ${selected ? shield(info, "stats-filter-shield") : `<span class="stats-filter-all">BR</span>`}
+        <div><strong>${escapeHtml(selected || "Todos os clubes")}</strong><span>${integer(games.length)} partida(s) encontrada(s)</span></div>
+        ${selected ? `<button type="button" data-clear-game-filter>Limpar</button>` : ""}
+      </div>
+    </div>`;
+    const select = $("stats-club-filter");
+    select?.addEventListener("change", () => {
+      state.clubFilter = select.value || "";
+      state.gamesLimit = 10;
+      renderGameFilter();
+      renderGames();
+    });
+    $("filtro-jogos").querySelector("[data-clear-game-filter]")?.addEventListener("click", () => {
+      state.clubFilter = "";
+      state.gamesLimit = 10;
+      renderGameFilter();
+      renderGames();
+    });
   }
 
-  function scoreNumber(v) {
-    const n = Number(v);
-    return Number.isFinite(n) ? Math.max(0, Math.min(100, n)) : 0;
+  function matchScore(game) {
+    return `${integer(game.placar_mandante)} × ${integer(game.placar_visitante)}`;
   }
 
-  function numeroIndice(v) {
-    const n = scoreNumber(v);
-    return n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  function eventLine(goal) {
+    const assists = Array.isArray(goal?.assistencias) && goal.assistencias.length
+      ? ` · assistência: ${goal.assistencias.join(", ")}`
+      : "";
+    return `<li><span>⚽ ${escapeHtml(goal?.minuto || "")}</span><strong>${escapeHtml(goal?.jogador || "Gol")}</strong><small>${escapeHtml(goal?.time || "")}${escapeHtml(assists)}</small></li>`;
   }
 
-  function metricBar(label, valor) {
-    const n = scoreNumber(valor);
-    const largura = Math.max(0, Math.min(100, n));
-    return `<div class="perf-metric"><span>${escapeHtml(label)}</span><div class="perf-bar" aria-hidden="true"><i style="width:${largura}%"></i></div><strong>${numeroIndice(n)}</strong></div>`;
+  function cardLine(card) {
+    const icon = card?.tipo === "vermelho" ? "🟥" : "🟨";
+    return `<li><span>${icon} ${escapeHtml(card?.minuto || "")}</span><strong>${escapeHtml(card?.jogador || "Cartão")}</strong><small>${escapeHtml(card?.time || "")}</small></li>`;
   }
 
-  function rankingMetricasResumo(c) {
-    const m = c.metricas || {};
-    const partes = [];
-    if (m.posse_media !== undefined) partes.push(`posse ${numero(m.posse_media, "%")}`);
-    if (m.finalizacoes_media !== undefined) partes.push(`${numero(m.finalizacoes_media)} finaliz./j`);
-    if (m.chutes_gol_media !== undefined) partes.push(`${numero(m.chutes_gol_media)} no gol/j`);
-    if (m.gols_contra_jogo !== undefined) partes.push(`${numero(m.gols_contra_jogo)} GC/j`);
-    if (m.cartoes_media !== undefined) partes.push(`${numero(m.cartoes_media)} cartões/j`);
-    return partes.slice(0, 5).map(p => `<span>${escapeHtml(p)}</span>`).join("");
+  function statisticRows(detail) {
+    const stats = Array.isArray(detail?.stats) ? detail.stats : (Array.isArray(detail?.estatisticas) ? detail.estatisticas : []);
+    if (!stats.length) return emptyState("Estatísticas avançadas não disponibilizadas para esta partida.");
+    return `<div class="stats-match-stat-list">${stats.map((stat) => `<div class="stats-match-stat-row">
+      <strong>${escapeHtml(stat.home ?? stat.mandante ?? "—")}</strong>
+      <span>${escapeHtml(stat.nome || stat.label || "Estatística")}</span>
+      <strong>${escapeHtml(stat.away ?? stat.visitante ?? "—")}</strong>
+    </div>`).join("")}</div>`;
   }
 
-  function renderRankingDesempenho() {
-    const ranking = filtrarPorClube(state.ranking?.ranking || state.estatisticas?.ranking_desempenho || []);
+  function gameCard(game) {
+    const detail = gameDetail(game) || {};
+    const home = game.mandante || teamInfo(detail.mandante);
+    const away = game.visitante || teamInfo(detail.visitante);
+    const crowd = Number(detail.publico);
+    const goals = Array.isArray(detail.gols) ? detail.gols : [];
+    const cards = Array.isArray(detail.cartoes) ? detail.cartoes : [];
+    return `<details class="stats-game-card" data-game-id="${escapeAttr(game.event_id || game.id || "")}">
+      <summary>
+        <span class="stats-game-round">R${escapeHtml(game.rodada || detail.rodada || "—")}</span>
+        <div class="stats-game-summary-main">
+          <div class="stats-game-date">${escapeHtml(dateBR(game.data_iso || detail.data_iso))}</div>
+          <div class="stats-game-teams">
+            <span>${shield(home, "stats-game-shield")} ${escapeHtml(teamName(home))}</span>
+            <b>${escapeHtml(matchScore(game))}</b>
+            <span>${escapeHtml(teamName(away))} ${shield(away, "stats-game-shield")}</span>
+          </div>
+          <div class="stats-game-quick">${detail.estadio ? `📍 ${escapeHtml(detail.estadio)}` : ""}${Number.isFinite(crowd) && crowd > 0 ? ` · 👥 ${integer(crowd)}` : ""}</div>
+        </div>
+        <span class="stats-game-chevron">⌄</span>
+      </summary>
+      <div class="stats-game-body">
+        <div class="stats-game-info-grid">
+          <div><span>Estádio</span><strong>${escapeHtml(detail.estadio || game.estadio || "Não informado")}</strong></div>
+          <div><span>Público</span><strong>${Number.isFinite(crowd) && crowd > 0 ? integer(crowd) : "Não informado"}</strong></div>
+          <div><span>Árbitro</span><strong>${escapeHtml(detail.arbitro || "Não informado")}</strong></div>
+        </div>
+        ${(goals.length || cards.length) ? `<div class="stats-match-events">
+          ${goals.length ? `<section><h4>Gols</h4><ul>${goals.map(eventLine).join("")}</ul></section>` : ""}
+          ${cards.length ? `<section><h4>Cartões</h4><ul>${cards.map(cardLine).join("")}</ul></section>` : ""}
+        </div>` : ""}
+        ${statisticRows(detail)}
+        <div class="stats-source-note">Fonte: ESPN summary. Campos ausentes não são estimados.</div>
+      </div>
+    </details>`;
+  }
+
+  function renderGames() {
+    const target = $("lista-jogos-estatisticas");
+    const games = filteredGames();
+    if (!games.length) {
+      target.innerHTML = emptyState("Nenhuma partida encontrada para o filtro selecionado.");
+      return;
+    }
+    const shown = games.slice(0, state.gamesLimit);
+    target.innerHTML = `<div class="stats-games-list">${shown.map(gameCard).join("")}</div>${games.length > shown.length ? `<button type="button" class="stats-expand-btn" data-more-games>Mostrar mais ${Math.min(10, games.length - shown.length)} jogos ↓</button>` : ""}`;
+    target.querySelector("[data-more-games]")?.addEventListener("click", () => {
+      state.gamesLimit += 10;
+      renderGames();
+    });
+  }
+
+  function renderClubGoals() {
+    const target = $("lista-gols-clube");
+    const list = Array.isArray(state.competition?.gols_por_clube) ? state.competition.gols_por_clube : [];
+    if (!list.length) {
+      target.innerHTML = emptyState("Consolidado de gols por clube ainda não disponível.", "Aguarde a conclusão do workflow da Execução 1.");
+      return;
+    }
+    target.innerHTML = `<div class="stats-club-goals-list">${list.map((club, index) => {
+      const markers = Array.isArray(club.marcadores) ? club.marcadores : [];
+      const unknown = Number(club.gols_nao_individualizados || 0);
+      return `<details class="stats-club-goals-card">
+        <summary>
+          <span class="stats-rank">${integer(club.posicao || index + 1)}</span>
+          ${shield(club, "stats-club-shield")}
+          <div class="stats-club-goals-main"><strong>${escapeHtml(club.time)}</strong><span>${integer(club.jogos)} jogos · média ${number(club.media_gols, 2)}</span></div>
+          <div class="stats-club-goals-value"><strong>${integer(club.gols_pro)}</strong><span>gols</span></div>
+          <span class="stats-game-chevron">⌄</span>
+        </summary>
+        <div class="stats-club-markers">
+          <h4>Marcadores do clube</h4>
+          ${markers.length ? `<div class="stats-marker-list">${markers.map((player) => `<div><span>${escapeHtml(player.nome)}</span><strong>${integer(player.gols)}</strong></div>`).join("")}${unknown > 0 ? `<div class="stats-marker-other"><span>Outros gols ainda não individualizados no ranking</span><strong>${integer(unknown)}</strong></div>` : ""}</div>` : emptyState("Nenhum marcador individualizado na fonte de líderes.")}
+          <div class="stats-club-balance"><span>Gols sofridos: <b>${integer(club.gols_contra)}</b></span><span>Saldo: <b>${integer(club.saldo)}</b></span></div>
+        </div>
+      </details>`;
+    }).join("")}</div>`;
+  }
+
+  function performanceCard(record) {
+    if (!record) return "";
+    const home = record.mandante || "?";
+    const away = record.visitante || "?";
+    const score = `${integer(record.placar_mandante)} × ${integer(record.placar_visitante)}`;
+    return `<button class="stats-record-card" type="button" data-open-game="${escapeAttr(record.event_id || "")}">
+      <span>${escapeHtml(record.categoria || "Destaque")}</span>
+      <strong>${escapeHtml(home)} ${escapeHtml(score)} ${escapeHtml(away)}</strong>
+      <small>Rodada ${escapeHtml(record.rodada || "—")} · ${escapeHtml(dateBR(record.data_iso))}</small>
+    </button>`;
+  }
+
+  function sequenceRows() {
+    const data = state.competition?.sequencias || {};
+    const definitions = [
+      ["vitorias", "Vitórias"],
+      ["invencibilidade", "Invencibilidade"],
+      ["derrotas", "Derrotas"],
+      ["sem_vencer", "Sem vencer"],
+    ];
+    const rows = definitions.flatMap(([key, label]) => {
+      const item = data[key] || {};
+      return [
+        { label: `Maior sequência de ${label.toLowerCase()}`, data: item.maior },
+        { label: `Sequência atual de ${label.toLowerCase()}`, data: item.atual },
+      ];
+    });
+    if (!rows.some((row) => row.data)) return emptyState("Sequências ainda não consolidadas.");
+    return `<div class="stats-sequence-list">${rows.map((row) => `<div class="stats-sequence-row"><span>${escapeHtml(row.label)}</span><strong>${escapeHtml(row.data?.time || "—")}</strong><b>${integer(row.data?.quantidade)}</b></div>`).join("")}</div>`;
+  }
+
+  function attendanceGameRow(game, index) {
+    return `<button type="button" class="stats-attendance-row" data-open-game="${escapeAttr(game.event_id || "")}">
+      <span>${integer(index + 1)}</span>
+      <div><strong>${escapeHtml(game.mandante)} × ${escapeHtml(game.visitante)}</strong><small>R${escapeHtml(game.rodada || "—")} · ${escapeHtml(dateBR(game.data_iso))}</small></div>
+      <b>${integer(game.publico)}</b>
+    </button>`;
+  }
+
+  function renderChampionship() {
+    const target = $("campeonato-conteudo");
+    const performance = state.competition?.performance_por_partida || {};
+    const attendance = state.competition?.publico || {};
+    const ranking = Array.isArray(attendance.ranking) ? attendance.ranking : [];
+    const attendanceShown = state.expanded.publico ? ranking : ranking.slice(0, 5);
+    const performanceHtml = [
+      performance.mais_gols_mandante,
+      performance.mais_gols_visitante,
+      performance.maior_margem_vitoria,
+      performance.jogo_com_mais_gols,
+    ].filter(Boolean).map(performanceCard).join("");
+
+    target.innerHTML = `<div class="stats-champ-grid">
+      <section class="panel"><div class="panel-inner"><div class="section-head"><div><div class="kicker">📈 Recordes</div><h2>Performance por partida</h2></div></div>${performanceHtml ? `<div class="stats-record-grid">${performanceHtml}</div>` : emptyState("Performance por partida ainda não consolidada.")}</div></section>
+      <section class="panel"><div class="panel-inner"><div class="section-head"><div><div class="kicker">🔁 Momento</div><h2>Sequências</h2></div></div>${sequenceRows()}</div></section>
+    </div>
+    <section class="panel stats-attendance-panel"><div class="panel-inner">
+      <div class="section-head"><div><div class="kicker">👥 Torcida</div><h2>Público</h2></div><span class="badge">Jogos com dado oficial</span></div>
+      <div class="stats-attendance-summary">
+        <div><span>Maior público</span><strong>${integer(attendance.maior_publico?.publico)}</strong></div>
+        <div><span>Menor público</span><strong>${integer(attendance.menor_publico?.publico)}</strong></div>
+        <div><span>Média</span><strong>${integer(attendance.media_publico)}</strong></div>
+        <div><span>Total</span><strong>${integer(attendance.total_publico)}</strong></div>
+        <div><span>Jogos informados</span><strong>${integer(attendance.jogos_com_publico)}</strong></div>
+      </div>
+      ${attendanceShown.length ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 maiores ↑" : `Ver todos os públicos (${ranking.length}) ↓`}</button>` : ""}` : emptyState("A ESPN ainda não disponibilizou público para os jogos processados.")}
+      <p class="stats-source-note">${escapeHtml(attendance.observacao || "Média calculada somente sobre partidas com público informado.")}</p>
+    </div></section>`;
+  }
+
+  function metricBar(label, value) {
+    const n = Math.max(0, Math.min(100, Number(value) || 0));
+    return `<div class="stats-performance-metric"><span>${escapeHtml(label)}</span><div><i style="width:${n.toFixed(1)}%"></i></div><strong>${number(n, 1)}</strong></div>`;
+  }
+
+  function renderRanking() {
+    const target = $("ranking-desempenho");
+    const ranking = Array.isArray(state.ranking?.ranking) ? state.ranking.ranking : [];
     if (!ranking.length) {
-      $("ranking-desempenho").innerHTML = `<div class="empty-state">Ranking de desempenho ainda não gerado. Rode o workflow do Brasileirão ou o script <strong>scripts/gerar_estatisticas_brasileirao.py</strong>.</div>`;
+      target.innerHTML = emptyState("Ranking de desempenho ainda não disponível.");
       return;
     }
-    const limite = state.filtro ? 20 : 20;
-    $("ranking-desempenho").innerHTML = `<div class="performance-list">${ranking.slice(0, limite).map((c) => {
-      const indice = scoreNumber(c.indice_final ?? c.score);
-      const pos = c.pos || c.pos_ranking || "—";
-      return `<article class="club-row performance-row">
-        <div class="club-rank">${numero(pos)}</div>
-        <div class="club-main performance-main">
-          <div class="club-name performance-title">${imgEscudo(c)} <span>${escapeHtml(c.time)}</span></div>
-          <div class="club-sub performance-sub">${formaHtml(c.forma_ultimos5 || c.forma)}<span>${numero(c.pontos)} pts</span><span>${numero(c.aproveitamento, "%")} aprov.</span><span>SG ${numero(c.sg)}</span><span>${numero(c.pos_tabela)}º na tabela</span></div>
-          <div class="performance-metrics">
-            ${metricBar("Ataque", c.ataque)}
-            ${metricBar("Defesa", c.defesa)}
-            ${metricBar("Domínio", c.dominio)}
-            ${metricBar("Eficiência", c.eficiencia)}
-            ${metricBar("Disciplina", c.disciplina)}
-          </div>
-          <div class="performance-raw">${rankingMetricasResumo(c)}</div>
-          <div class="justificativa">${escapeHtml(c.justificativa || "Índice pondera ataque, defesa, domínio, eficiência e disciplina.")}</div>
-        </div>
-        <div class="club-score performance-score">${numeroIndice(indice)}<small>índice</small></div>
-      </article>`;
-    }).join("")}</div>`;
+    target.innerHTML = `<div class="stats-performance-list">${ranking.map((club, index) => `<article class="stats-performance-card">
+      <div class="stats-performance-head">
+        <span class="stats-rank">${integer(club.pos || club.pos_ranking || index + 1)}</span>
+        ${shield(club, "stats-performance-shield")}
+        <div><strong>${escapeHtml(club.time)}</strong><span>${integer(club.pontos)} pts · ${integer(club.pos_tabela)}º na tabela · SG ${integer(club.sg)}</span></div>
+        <b>${number(club.indice_final ?? club.score, 1)}<small>índice</small></b>
+      </div>
+      <div class="stats-performance-bars">
+        ${metricBar("Ataque", club.ataque)}
+        ${metricBar("Defesa", club.defesa)}
+        ${metricBar("Domínio", club.dominio)}
+        ${metricBar("Eficiência", club.eficiencia)}
+        ${metricBar("Disciplina", club.disciplina)}
+      </div>
+      <p>${escapeHtml(club.justificativa || "Índice calculado pelo site.")}</p>
+    </article>`).join("")}</div>`;
   }
 
-  function renderAtaqueDefesa() {
-    const e = state.estatisticas || {};
-    const ataque = filtrarPorClube(e.melhor_ataque || clubeLista().slice().sort((a, b) => Number(b.gp || 0) - Number(a.gp || 0)));
-    const defesa = filtrarPorClube(e.melhor_defesa || clubeLista().slice().sort((a, b) => Number(a.gc || 0) - Number(b.gc || 0)));
-    const linhas = (titulo, lista, campo, sufixo) => `
-      <h3>${titulo}</h3>
-      <table class="table-mini"><thead><tr><th>Time</th><th>J</th><th class="num">${sufixo}</th><th class="num">Média</th></tr></thead><tbody>
-        ${lista.slice(0, 8).map((c) => {
-          const jogos = Number(c.jogos || 0);
-          const val = Number(c[campo] || 0);
-          return `<tr><td>${imgEscudo(c)} ${escapeHtml(c.time)}</td><td>${numero(jogos)}</td><td class="num">${numero(val)}</td><td class="num">${jogos ? (val / jogos).toFixed(2).replace(".", ",") : "—"}</td></tr>`;
-        }).join("")}
-      </tbody></table>`;
-    $("ataque-defesa").innerHTML = `${linhas("Melhor ataque", ataque, "gp", "GP")}${linhas("Melhor defesa", defesa, "gc", "GC")}`;
-  }
-
-  function renderClubesDetalhes() {
-    const clubes = filtrarPorClube(clubeLista());
-    if (!clubes.length) {
-      $("clubes-detalhes").innerHTML = `<div class="empty-state">Nenhum clube encontrado para o filtro atual.</div>`;
-      return;
-    }
-    $("clubes-detalhes").innerHTML = clubes.map((c) => {
-      const mand = c.mandante || {};
-      const vis = c.visitante || {};
-      const seq = c.sequencia?.texto || "sequência em apuração";
-      return `<article class="club-detail">
-        <div class="club-detail-head">${imgEscudo(c, "escudo-inline")}<div><div class="club-detail-title">${escapeHtml(c.time)}</div><div class="club-sub">${formaHtml(c.forma_ultimos5)} <span>${escapeHtml(seq)}</span></div></div></div>
-        <div class="metrics-grid">
-          <div class="metric"><strong>${numero(c.pos)}º</strong><span>posição</span></div>
-          <div class="metric"><strong>${numero(c.pontos)}</strong><span>pontos</span></div>
-          <div class="metric"><strong>${numero(c.aproveitamento, "%")}</strong><span>aproveit.</span></div>
-          <div class="metric"><strong>${numero(c.sg)}</strong><span>saldo</span></div>
-          <div class="metric"><strong>${numero(mand.aproveitamento, "%")}</strong><span>casa</span></div>
-          <div class="metric"><strong>${numero(vis.aproveitamento, "%")}</strong><span>fora</span></div>
-          <div class="metric"><strong>${numero(c.gp)}</strong><span>gols pró</span></div>
-          <div class="metric"><strong>${numero(c.gc)}</strong><span>gols contra</span></div>
-        </div>
-      </article>`;
-    }).join("");
-  }
-
-  function renderAvisos() {
-    // Ajuste fino: avisos técnicos da coleta ficam apenas no console/JSON,
-    // não na interface do usuário final. A página deve parecer produto, não log.
-    return;
-  }
-
-  function renderTudo() {
-    renderResumo();
-    renderChips();
-    renderListaJogadores("lista-artilharia", listaArtilharia(), "gols");
-    renderListaJogadores("lista-garcons", listaAssistencias(), "assistencias");
-    renderRankingDesempenho();
-    renderAtaqueDefesa();
-    renderClubesDetalhes();
-    renderAvisos();
-  }
-
-  function configurarBotoes() {
-    $("btn-limpar-filtro").addEventListener("click", () => {
-      state.filtro = "";
-      renderTudo();
+  function activateTab(tab, updateHash = true) {
+    state.tab = tab;
+    qsa("[data-tab]").forEach((button) => {
+      const active = button.dataset.tab === tab;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-selected", active ? "true" : "false");
     });
-    document.querySelectorAll("a[data-anchor]").forEach((a) => {
-      a.addEventListener("click", (ev) => {
-        const anchor = a.getAttribute("data-anchor");
-        if (!anchor) return;
-        ev.preventDefault();
-        const mapa = { rank: "rank", tabela: "tabela", resultados: "resultados" };
-        sessionStorage.setItem("brViewInicial", mapa[anchor] || anchor);
-        location.href = "./?brasileirao=1";
-      });
+    qsa("[data-view]").forEach((view) => {
+      const active = view.dataset.view === tab;
+      view.classList.toggle("active", active);
+      view.hidden = !active;
+    });
+    if (updateHash) history.replaceState(null, "", `#${tab}`);
+    if (tab === "jogos") {
+      renderGameFilter();
+      renderGames();
+    } else if (tab === "campeonato") {
+      renderChampionship();
+    } else if (tab === "desempenho") {
+      renderRanking();
+    }
+  }
+
+  function openGame(eventId) {
+    const game = gameById(eventId);
+    if (!game) return;
+    state.clubFilter = "";
+    state.gamesLimit = Math.max(10, sortedResults().findIndex((row) => String(row.event_id || row.id || "") === String(eventId)) + 1);
+    activateTab("jogos");
+    requestAnimationFrame(() => {
+      const safeId = String(eventId).replace(/[^a-zA-Z0-9_-]/g, "");
+      const element = document.querySelector(`[data-game-id="${safeId}"]`);
+      if (element) {
+        element.open = true;
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     });
   }
 
-  async function carregar() {
-    configurarBotoes();
-    try {
-      const [estatisticas, ranking, jogadores, tabela, resultados] = await Promise.all([
-        fetchJson(ARQUIVOS.estatisticas, { clubes: [], artilharia: [], garcons: [], avisos: ["dados-br/estatisticas.json ainda não foi publicado."] }),
-        fetchJson(ARQUIVOS.ranking, { ranking: [] }),
-        fetchJson(ARQUIVOS.jogadores, { artilharia: [], assistencias: [], participacoes_gol: [], avisos: ["dados-br/jogadores.json ainda não foi publicado."] }),
-        fetchJson(ARQUIVOS.tabela, { tabela: [] }),
-        fetchJson(ARQUIVOS.resultados, { resultados: [] }),
-      ]);
-      state.estatisticas = estatisticas;
-      state.ranking = ranking;
-      state.jogadores = jogadores;
-      state.tabela = tabela;
-      state.resultados = resultados;
-      renderTudo();
-    } catch (err) {
-      console.error(err);
-      $("meta-line").innerHTML = `<span class="meta-pill">Erro ao carregar estatísticas</span>`;
-      $("cards-resumo").innerHTML = `<div class="empty-state">Não foi possível carregar os JSONs de estatísticas. Confira se os arquivos da Execução 4 foram enviados e se o workflow do Brasileirão rodou.</div>`;
-    }
+  function bindEvents() {
+    qsa("[data-tab]").forEach((button) => button.addEventListener("click", () => activateTab(button.dataset.tab)));
+    document.addEventListener("click", (event) => {
+      const expand = event.target.closest("[data-expand-list]");
+      if (expand) {
+        const type = expand.dataset.expandList;
+        state.expanded[type] = !state.expanded[type];
+        renderPlayers(type);
+        return;
+      }
+      const attendance = event.target.closest("[data-expand-attendance]");
+      if (attendance) {
+        state.expanded.publico = !state.expanded.publico;
+        renderChampionship();
+        return;
+      }
+      const game = event.target.closest("[data-open-game]");
+      if (game) openGame(game.dataset.openGame);
+    });
   }
 
-  document.addEventListener("DOMContentLoaded", carregar);
+  function renderAll() {
+    renderMeta();
+    renderSummary();
+    renderPlayers("artilheiros");
+    renderPlayers("assistencias");
+    renderClubGoals();
+    renderRanking();
+    renderChampionship();
+    renderGameFilter();
+    renderGames();
+    activateTab(state.tab, false);
+  }
+
+  async function load() {
+    bindEvents();
+    const hashTab = location.hash.replace(/^#/, "");
+    if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "desempenho"].includes(hashTab)) state.tab = hashTab;
+
+    const [leaders, competition, details, ranking, table, results, audit] = await Promise.all([
+      fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
+      fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
+      fetchJson(FILES.details, { jogos: {} }),
+      fetchJson(FILES.ranking, { ranking: [] }),
+      fetchJson(FILES.table, { tabela: [] }),
+      fetchJson(FILES.results, { resultados: [] }),
+      fetchJson(FILES.audit, { status: "aguardando_workflow" }),
+    ]);
+
+    state.leaders = leaders;
+    state.competition = competition;
+    state.details = details;
+    state.ranking = ranking;
+    state.table = table;
+    state.results = results;
+    state.audit = audit;
+    renderAll();
+  }
+
+  document.addEventListener("DOMContentLoaded", load);
 })();
