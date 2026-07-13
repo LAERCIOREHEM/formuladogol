@@ -33,6 +33,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Validar coletor de elencos
+        run: |
+          python -m py_compile scripts/buscar_elencos_brasileirao.py
+          python scripts/buscar_elencos_brasileirao.py --self-test
+
       - name: Buscar elencos dos clubes (ESPN roster)
         run: python scripts/buscar_elencos_brasileirao.py
 
@@ -40,12 +45,23 @@ jobs:
         run: |
           set -euo pipefail
           python -m json.tool dados-br/elencos.json > /dev/null
+          python -m json.tool dados-br/auditoria-elencos.json > /dev/null
           python - <<'PY'
-          import json
+          import json, re, unicodedata
           d = json.load(open('dados-br/elencos.json', encoding='utf-8'))
-          assert isinstance(d.get('elencos'), dict), 'elencos.json sem objeto elencos'
-          assert len(d.get('elencos') or {}) == 20, 'elencos.json sem 20 clubes'
-          print('OK elencos:', d.get('total_clubes_com_elenco'), 'clubes,', d.get('total_jogadores'), 'jogadores')
+          a = json.load(open('dados-br/auditoria-elencos.json', encoding='utf-8'))
+          elencos = d.get('elencos') or {}
+          assert isinstance(elencos, dict), 'elencos.json sem objeto elencos'
+          assert len(elencos) == 20, 'elencos.json sem 20 clubes'
+          assert all(isinstance(rows, list) and len(rows) >= 15 for rows in elencos.values()), 'há elenco com menos de 15 jogadores'
+          proibidos = {'active','total','defender','forward','goalkeeper','midfielder'}
+          def norm(v):
+              s = unicodedata.normalize('NFD', str(v or ''))
+              s = ''.join(c for c in s if unicodedata.category(c) != 'Mn')
+              return re.sub(r'[^a-z0-9]+', ' ', s.lower()).strip()
+          assert not [(club, row.get('nome')) for club, rows in elencos.items() for row in rows if norm(row.get('nome')) in proibidos], 'cabeçalho tratado como jogador'
+          assert a.get('status') == 'ok', 'auditoria de elencos falhou'
+          print('OK elencos:', d.get('total_clubes_com_elenco'), 'clubes,', d.get('total_jogadores'), 'jogadores válidos')
           PY
 
       - name: Commitar elencos se mudou
@@ -54,11 +70,11 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if [[ -z "$(git status --porcelain -- dados-br/elencos.json)" ]]; then
-            echo "Sem mudanças em dados-br/elencos.json."
+          if [[ -z "$(git status --porcelain -- dados-br/elencos.json dados-br/auditoria-elencos.json)" ]]; then
+            echo "Sem mudanças nos arquivos de elencos."
             exit 0
           fi
-          git add dados-br/elencos.json
+          git add dados-br/elencos.json dados-br/auditoria-elencos.json
           git commit -m "Atualizar elencos Brasileirao (ESPN roster) - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
           git pull --rebase origin main
           git push origin HEAD:main
