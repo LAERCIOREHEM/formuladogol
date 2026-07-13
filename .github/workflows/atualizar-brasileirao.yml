@@ -20,6 +20,9 @@ on:
     paths:
       - 'atualizar_espn.py'
       - 'scripts/gerar_estatisticas_brasileirao.py'
+      - 'scripts/buscar_lideres_jogadores_espn.py'
+      - 'scripts/gerar_estatisticas_competicao_brasileirao.py'
+      - 'scripts/gerar_auditoria_estatisticas_brasileirao.py'
       - 'scripts/buscar_detalhes_jogos_brasileirao.py'
       - 'scripts/gerar_auditoria_cobertura_resultados.py'
       - 'scripts/gerar_auditoria_calendario.py'
@@ -60,6 +63,17 @@ jobs:
           echo "Horario Brasilia:"
           TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M:%S BRT'
 
+      - name: Validar sintaxe e parsers estatísticos
+        run: |
+          python -m py_compile \
+            scripts/buscar_lideres_jogadores_espn.py \
+            scripts/buscar_detalhes_jogos_brasileirao.py \
+            scripts/gerar_estatisticas_brasileirao.py \
+            scripts/gerar_estatisticas_competicao_brasileirao.py \
+            scripts/gerar_auditoria_estatisticas_brasileirao.py
+          python scripts/buscar_lideres_jogadores_espn.py --self-test
+          python scripts/buscar_detalhes_jogos_brasileirao.py --self-test
+
       # --- DADOS DO BRASILEIRAO (100% ESPN) ---
       # O script grava os quatro JSONs de uma vez e falha antes de publicar
       # se a tabela nao preservar exatamente os 20 nomes canonicos do Ranking.
@@ -73,8 +87,17 @@ jobs:
       - name: Buscar estatísticas por jogo finalizado
         run: python scripts/buscar_detalhes_jogos_brasileirao.py
 
+      - name: Buscar líderes oficiais de gols e assistências
+        run: python scripts/buscar_lideres_jogadores_espn.py
+
       - name: Gerar estatísticas e Ranking Vivo de desempenho
         run: python scripts/gerar_estatisticas_brasileirao.py
+
+      - name: Gerar estatísticas gerais da competição
+        run: python scripts/gerar_estatisticas_competicao_brasileirao.py
+
+      - name: Auditar estatísticas do Brasileirão
+        run: python scripts/gerar_auditoria_estatisticas_brasileirao.py
 
       - name: Gerar auditoria de cobertura da aba Resultados
         run: python scripts/gerar_auditoria_cobertura_resultados.py
@@ -83,7 +106,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/auditoria-cobertura-resultados.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -118,10 +141,25 @@ jobs:
           assert isinstance(jogadores.get('artilharia'), list), 'jogadores.json sem artilharia'
           assert isinstance(jogadores.get('assistencias'), list), 'jogadores.json sem assistencias'
           assert isinstance(jogadores.get('participacoes_gol'), list), 'jogadores.json sem participacoes_gol'
+          lideres = json.load(open('dados-br/lideres-jogadores.json', encoding='utf-8'))
+          assert lideres.get('status') == 'valido', 'lideres-jogadores.json inválido'
+          assert len(lideres.get('artilharia') or []) >= 5, 'artilharia oficial incompleta'
+          assert len(lideres.get('assistencias') or []) >= 5, 'assistências oficiais incompletas'
+          assert int(lideres['artilharia'][0].get('gols') or 0) > 0, 'líder de gols inválido'
+          assert int(lideres['assistencias'][0].get('assistencias') or 0) > 0, 'líder de assistências inválido'
+          assert len(jogadores.get('artilharia') or []) >= 5, 'jogadores.json sem artilharia oficial'
+          assert len(jogadores.get('assistencias') or []) >= 5, 'jogadores.json sem assistências oficiais'
           detalhes = json.load(open('dados-br/jogos-detalhes.json', encoding='utf-8'))
           assert isinstance(detalhes.get('jogos'), dict), 'jogos-detalhes.json sem objeto jogos'
           auditoria = json.load(open('dados-br/auditoria-jogos-detalhes.json', encoding='utf-8'))
           assert isinstance(auditoria.get('falhas'), list), 'auditoria-jogos-detalhes.json sem lista falhas'
+          assert 'total_com_publico' in auditoria, 'auditoria-jogos-detalhes sem contagem de público'
+          competicao = json.load(open('dados-br/estatisticas-competicao.json', encoding='utf-8'))
+          assert len(competicao.get('gols_por_clube') or []) == 20, 'estatísticas da competição sem 20 clubes'
+          assert isinstance(competicao.get('sequencias'), dict), 'estatísticas da competição sem sequências'
+          assert isinstance(competicao.get('performance_por_partida'), dict), 'estatísticas da competição sem performance'
+          auditoria_stats = json.load(open('dados-br/auditoria-estatisticas.json', encoding='utf-8'))
+          assert auditoria_stats.get('status') == 'ok', 'auditoria de estatísticas falhou'
           cobertura = json.load(open('dados-br/auditoria-cobertura-resultados.json', encoding='utf-8'))
           assert isinstance(cobertura.get('resumo'), dict), 'auditoria-cobertura-resultados.json sem resumo'
           calendario = json.load(open('dados-br/auditoria-calendario.json', encoding='utf-8'))
@@ -160,8 +198,12 @@ jobs:
             "dados-br/ranking-desempenho.json"
             "dados-br/auditoria-ranking-desempenho.json"
             "dados-br/jogadores.json"
+            "dados-br/lideres-jogadores.json"
+            "dados-br/auditoria-lideres-jogadores.json"
             "dados-br/jogos-detalhes.json"
             "dados-br/auditoria-jogos-detalhes.json"
+            "dados-br/estatisticas-competicao.json"
+            "dados-br/auditoria-estatisticas.json"
             "dados-br/auditoria-cobertura-resultados.json"
             "dados-br/calendario-completo.json"
             "dados-br/auditoria-calendario.json"
