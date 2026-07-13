@@ -9,15 +9,15 @@ Gera:
   - dados-br/jogadores.json
 
 Fontes:
-  - tabela.json         (classificação ESPN, já normalizada)
-  - resultados.json     (resultados finalizados ESPN)
-  - espn_eventos.json   (índice de event_id ESPN)
-  - ESPN summary/event detail, quando houver event_id
+  - tabela.json                       (classificação ESPN normalizada)
+  - resultados.json                   (resultados finalizados ESPN)
+  - dados-br/jogos-detalhes.json      (boxscores/summaries por partida)
+  - dados-br/lideres-jogadores.json   (rankings oficiais de gols/assistências)
 
 Importante:
   - Não altera módulo copa2026/.
-  - Se a ESPN summary não trouxer gols/assistências, o script NÃO quebra nem inventa dados:
-    ele publica ataque, defesa, forma e desempenho e deixa aviso editorial.
+  - Artilharia e assistências NÃO são reconstruídas por narração/summaries.
+  - Summaries ficam restritos a métricas e detalhes de cada partida.
   - Só usa biblioteca padrão.
 """
 from __future__ import annotations
@@ -1072,6 +1072,33 @@ def coletar_artilharia_assistencias(
     )
 
 
+
+def carregar_lideres_oficiais(avisos: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Carrega rankings oficiais de temporada produzidos pelo coletor ESPN.
+
+    Esta função substitui a antiga tentativa de reconstruir a classificação
+    geral a partir dos summaries de cada partida.
+    """
+    data = ler_json("dados-br/lideres-jogadores.json", {})
+    if not isinstance(data, dict) or data.get("status") != "valido":
+        raise RuntimeError(
+            "dados-br/lideres-jogadores.json ausente ou inválido; "
+            "rode scripts/buscar_lideres_jogadores_espn.py antes."
+        )
+    artilharia = [dict(x) for x in data.get("artilharia") or [] if isinstance(x, dict)]
+    assistencias = [dict(x) for x in data.get("assistencias") or [] if isinstance(x, dict)]
+    if len(artilharia) < 5 or len(assistencias) < 5:
+        raise RuntimeError(
+            f"ranking oficial incompleto: {len(artilharia)} artilheiros e "
+            f"{len(assistencias)} assistentes"
+        )
+    avisos.append(
+        "Artilharia e assistências carregadas dos rankings oficiais da ESPN; "
+        "summaries ficam restritos aos detalhes de partidas."
+    )
+    return artilharia, assistencias
+
+
 def main() -> None:
     tabela = carregar_tabela()
     resultados = carregar_resultados()
@@ -1082,7 +1109,13 @@ def main() -> None:
 
     clubes = montar_clubes(tabela, resultados)
     ranking, auditoria_ranking = gerar_ranking_desempenho(clubes)
-    artilharia, garcons, eventos_processados, eventos_gols, eventos_assistencias = coletar_artilharia_assistencias(resultados, avisos)
+    artilharia, garcons = carregar_lideres_oficiais(avisos)
+    eventos_processados = [
+        {"event_id": str(r.get("event_id") or ""), "fonte": "resultados.json"}
+        for r in resultados if str(r.get("event_id") or "")
+    ]
+    eventos_gols: list[dict[str, Any]] = []
+    eventos_assistencias: list[dict[str, Any]] = []
     participacoes = combinar_participacoes(artilharia, garcons)
 
     melhor_ataque = sorted(clubes, key=lambda c: (-int(c.get("gp") or 0), int(c.get("jogos") or 99), normalizar(c["time"])))
@@ -1093,7 +1126,7 @@ def main() -> None:
     payload_stats = {
         "atualizado_em": iso_agora_brt(),
         "temporada": TEMPORADA,
-        "fonte": "ESPN + snapshots locais",
+        "fonte": "ESPN · rankings oficiais + snapshots de partidas",
         "total_resultados_lidos": len(resultados),
         "total_eventos_processados": len(eventos_processados),
         "resumo": {
@@ -1128,15 +1161,18 @@ def main() -> None:
     payload_jogadores = {
         "atualizado_em": payload_stats["atualizado_em"],
         "temporada": TEMPORADA,
-        "fonte": "ESPN summary/event detail + snapshots locais",
-        "metodologia": "Coleta evento a evento por summary ESPN; evita inferir artilharia a partir de estatísticas agregadas para não confundir Goal Difference/Gols Pró com gols de jogador.",
-        "total_summaries_processados": len(eventos_processados),
+        "fonte": "ESPN · rankings oficiais da competição",
+        "metodologia": "Artilharia e assistências vêm diretamente dos rankings oficiais da temporada na ESPN. Summaries são usados apenas em detalhes de cada jogo.",
+        "total_summaries_processados": 0,
+        "total_jogos_finalizados": len(resultados),
         "artilharia": artilharia,
         "assistencias": garcons,
         "participacoes_gol": participacoes,
         "eventos_gols": eventos_gols[-300:],
         "eventos_assistencias": eventos_assistencias[-300:],
-        "summaries_processados": eventos_processados,
+        "summaries_processados": [],
+        "jogos_finalizados": eventos_processados,
+        "lideres_arquivo": "dados-br/lideres-jogadores.json",
         "avisos": avisos,
     }
 
@@ -1150,7 +1186,7 @@ def main() -> None:
     print(f"  resultados lidos: {len(resultados)}")
     print(f"  artilharia: {len(artilharia)} jogadores")
     print(f"  garçons: {len(garcons)} jogadores")
-    print(f"  summaries processados: {len(eventos_processados)}")
+    print(f"  jogos finalizados referenciados: {len(eventos_processados)}")
     print(f"  participações em gols: {len(participacoes)} jogadores")
     print("  arquivo: dados-br/jogadores.json")
     if avisos:

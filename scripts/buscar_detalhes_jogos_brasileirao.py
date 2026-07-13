@@ -255,6 +255,191 @@ def parse_summary(summary: dict[str, Any], jogo: dict[str, Any]) -> list[dict[st
     return saida
 
 
+
+def _walk(no: Any):
+    if isinstance(no, dict):
+        yield no
+        for v in no.values():
+            yield from _walk(v)
+    elif isinstance(no, list):
+        for v in no:
+            yield from _walk(v)
+
+
+def _first_text(no: Any, *keys: str) -> str:
+    if not isinstance(no, dict):
+        return ""
+    for key in keys:
+        v = no.get(key)
+        if isinstance(v, dict):
+            text = _first_text(v, "displayName", "fullName", "name", "shortDisplayName", "text")
+            if text:
+                return text
+        elif v not in (None, ""):
+            return str(v).strip()
+    return ""
+
+
+def parse_publico(summary: dict[str, Any]) -> int | None:
+    candidatos: list[int] = []
+    for no in _walk(summary):
+        for key, value in no.items():
+            if normalizar(key) not in {"attendance", "crowd", "publico", "spectators"}:
+                continue
+            n = numero(value.get("value") if isinstance(value, dict) else value)
+            if n is not None and 100 <= n <= 250000:
+                candidatos.append(int(round(n)))
+    return max(candidatos) if candidatos else None
+
+
+def parse_estadio(summary: dict[str, Any], jogo: dict[str, Any]) -> str:
+    paths = [
+        ((summary.get("gameInfo") or {}).get("venue") or {}),
+        ((((summary.get("header") or {}).get("competitions") or [{}])[0]).get("venue") or {}),
+    ]
+    for venue in paths:
+        text = _first_text(venue, "fullName", "displayName", "name", "shortName")
+        if text:
+            return text
+    return str(jogo.get("estadio") or "").strip()
+
+
+def parse_arbitro(summary: dict[str, Any]) -> str:
+    officials = (summary.get("gameInfo") or {}).get("officials") or []
+    if not isinstance(officials, list):
+        officials = []
+    preferidos: list[str] = []
+    outros: list[str] = []
+    for item in officials:
+        if not isinstance(item, dict):
+            continue
+        nome = _first_text(item, "displayName", "fullName", "name")
+        if not nome and isinstance(item.get("official"), dict):
+            nome = _first_text(item["official"], "displayName", "fullName", "name")
+        if not nome:
+            continue
+        papel = normalizar(" ".join(str(item.get(k) or "") for k in ("position", "type", "role", "order")))
+        if "referee" in papel or "arbitro" in papel:
+            preferidos.append(nome)
+        else:
+            outros.append(nome)
+    return (preferidos or outros or [""])[0]
+
+
+def limpar_nome_jogador(nome: Any) -> str:
+    s = str(nome or "").strip()
+    if not s:
+        return ""
+    s = re.sub(r"\s+(?:with a|with the)\s+(?:cross|pass|header|shot).*?$", "", s, flags=re.I)
+    s = re.sub(r"\s+(?:right|left)-?footed.*?$", "", s, flags=re.I)
+    s = re.sub(r"\s+(?:assisted by|from the centre|from outside).*?$", "", s, flags=re.I)
+    s = re.sub(r"\s*\([^)]*\)\s*$", "", s).strip(" -.,;")
+    return s
+
+
+def _event_nodes(summary: dict[str, Any]) -> list[dict[str, Any]]:
+    keys = {"scoringplays", "keyevents", "plays", "commentary", "incidents", "matchevents", "details"}
+    out: list[dict[str, Any]] = []
+    seen: set[int] = set()
+    def walk(no: Any, parent_key: str = "") -> None:
+        if isinstance(no, dict):
+            for k, v in no.items():
+                nk = normalizar(k).replace(" ", "")
+                if isinstance(v, list) and nk in keys:
+                    for item in v:
+                        if isinstance(item, dict) and id(item) not in seen:
+                            seen.add(id(item)); out.append(item)
+                if nk in keys or k in ("header", "competitions", "competition", "gameInfo"):
+                    walk(v, k)
+        elif isinstance(no, list):
+            for item in no:
+                walk(item, parent_key)
+    walk(summary)
+    return out
+
+
+def _event_text(ev: dict[str, Any]) -> str:
+    tipo = ev.get("type")
+    parts = []
+    if isinstance(tipo, dict):
+        parts.extend(str(tipo.get(k) or "") for k in ("text", "name", "displayName", "description", "id"))
+    elif tipo:
+        parts.append(str(tipo))
+    parts.extend(str(ev.get(k) or "") for k in ("text", "description", "shortText", "headline", "eventType", "playType"))
+    return " ".join(parts).strip()
+
+
+def _event_minute(ev: dict[str, Any]) -> str:
+    for key in ("clock", "time", "displayClock", "timeDisplayValue", "minute"):
+        v = ev.get(key)
+        if isinstance(v, dict):
+            text = _first_text(v, "displayValue", "displayClock", "value", "text")
+            if text:
+                return text
+        elif v not in (None, ""):
+            return str(v)
+    return ""
+
+
+def _athletes_event(ev: dict[str, Any]) -> list[tuple[str, str]]:
+    out: list[tuple[str, str]] = []
+    for key in ("athletes", "athletesInvolved", "participants", "players"):
+        for item in ev.get(key) or []:
+            if not isinstance(item, dict):
+                continue
+            base = item.get("athlete") if isinstance(item.get("athlete"), dict) else item
+            nome = limpar_nome_jogador(_first_text(base, "displayName", "fullName", "name", "shortName"))
+            papel = normalizar(" ".join(str(item.get(k) or "") for k in ("type", "role", "position")))
+            if nome:
+                out.append((nome, papel))
+    for key in ("athlete", "player", "scorer"):
+        if isinstance(ev.get(key), dict):
+            nome = limpar_nome_jogador(_first_text(ev[key], "displayName", "fullName", "name", "shortName"))
+            if nome and not any(n == nome for n, _ in out):
+                out.append((nome, "scorer" if key == "scorer" else ""))
+    return out
+
+
+def parse_eventos(summary: dict[str, Any]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    gols: list[dict[str, Any]] = []
+    cartoes: list[dict[str, Any]] = []
+    vistos: set[str] = set()
+    for ev in _event_nodes(summary):
+        text = _event_text(ev)
+        ntext = normalizar(text)
+        athletes = _athletes_event(ev)
+        player = next((n for n, role in athletes if "assist" not in role), athletes[0][0] if athletes else "")
+        assists = [n for n, role in athletes if "assist" in role]
+        if not assists:
+            m = re.search(r"assist(?:ed|encia|ência)?\s+(?:by|de|por)\s+([^.,;()]+)", text, flags=re.I)
+            if m:
+                nome = limpar_nome_jogador(m.group(1))
+                if nome:
+                    assists = [nome]
+        team = ""
+        t = ev.get("team") or ev.get("competitor")
+        if isinstance(t, dict):
+            team = _first_text(t, "displayName", "shortDisplayName", "name", "abbreviation")
+        minuto = _event_minute(ev)
+        is_goal = bool(re.search(r"\b(goal|gol|own goal|gol contra|penalty goal)\b", ntext)) and not any(x in ntext for x in ("shots on goal", "goal difference", "goals for", "expected goals"))
+        card = ""
+        if "red card" in ntext or "cartao vermelho" in ntext:
+            card = "vermelho"
+        elif "yellow card" in ntext or "cartao amarelo" in ntext:
+            card = "amarelo"
+        if is_goal:
+            key = f"g|{minuto}|{normalizar(player)}|{normalizar(team)}"
+            if key not in vistos:
+                vistos.add(key)
+                gols.append({"minuto": minuto, "jogador": player, "time": team, "assistencias": assists, "descricao": text})
+        if card:
+            key = f"c|{card}|{minuto}|{normalizar(player)}|{normalizar(team)}"
+            if key not in vistos:
+                vistos.add(key)
+                cartoes.append({"tipo": card, "minuto": minuto, "jogador": player, "time": team, "descricao": text})
+    return gols, cartoes
+
+
 def fetch_json(url: str, timeout: int = 20, tentativas: int = 2) -> dict[str, Any]:
     ultimo: Exception | None = None
     for i in range(1, tentativas + 1):
@@ -298,7 +483,18 @@ def jogo_finalizado(jogo: dict[str, Any]) -> bool:
     return True
 
 
-def montar_registro(event_id: str, jogo: dict[str, Any], stats: list[dict[str, Any]], preservado: bool = False) -> dict[str, Any]:
+def montar_registro(
+    event_id: str,
+    jogo: dict[str, Any],
+    stats: list[dict[str, Any]],
+    *,
+    publico: int | None = None,
+    estadio: str = "",
+    arbitro: str = "",
+    gols: list[dict[str, Any]] | None = None,
+    cartoes: list[dict[str, Any]] | None = None,
+    preservado: bool = False,
+) -> dict[str, Any]:
     return {
         "event_id": event_id,
         "rodada": int(jogo.get("rodada") or 0),
@@ -307,20 +503,80 @@ def montar_registro(event_id: str, jogo: dict[str, Any], stats: list[dict[str, A
         "visitante": (jogo.get("visitante") or {}).get("nome") or "",
         "placar_mandante": jogo.get("placar_mandante"),
         "placar_visitante": jogo.get("placar_visitante"),
+        "estadio": estadio or str(jogo.get("estadio") or ""),
+        "publico": publico,
+        "arbitro": arbitro,
         "stats": stats,
         "estatisticas": stats,
+        "gols": gols or [],
+        "cartoes": cartoes or [],
         "fonte": "ESPN summary",
         "preservado_de_execucao_anterior": bool(preservado),
         "atualizado_em": iso_agora_brt(),
     }
 
 
+
+def self_test() -> None:
+    summary = {
+        "gameInfo": {
+            "attendance": 43210,
+            "venue": {"fullName": "Estádio Teste"},
+            "officials": [{"displayName": "Árbitro Teste", "position": {"displayName": "Referee"}}],
+        },
+        "header": {"competitions": [{"competitors": [
+            {"homeAway": "home", "team": {"id": "1"}},
+            {"homeAway": "away", "team": {"id": "2"}},
+        ]}]},
+        "boxscore": {"teams": [
+            {"homeAway": "home", "team": {"id": "1", "displayName": "Flamengo"}, "statistics": [
+                {"name": "possessionPct", "displayValue": "60%"},
+                {"name": "totalShots", "displayValue": "10"},
+            ]},
+            {"homeAway": "away", "team": {"id": "2", "displayName": "Palmeiras"}, "statistics": [
+                {"name": "possessionPct", "displayValue": "40%"},
+                {"name": "totalShots", "displayValue": "7"},
+            ]},
+        ]},
+        "scoringPlays": [{
+            "type": {"text": "Goal"}, "clock": {"displayValue": "23'"},
+            "athletes": [
+                {"athlete": {"displayName": "Pedro"}, "role": "scorer"},
+                {"athlete": {"displayName": "Samuel Lino"}, "role": "assist"},
+            ],
+            "team": {"displayName": "Flamengo"},
+            "text": "Goal! Pedro. Assisted by Samuel Lino with a cross.",
+        }],
+        "keyEvents": [{
+            "type": {"text": "Yellow Card"}, "clock": {"displayValue": "31'"},
+            "athletes": [{"athlete": {"displayName": "Jogador X"}}],
+            "team": {"displayName": "Palmeiras"}, "text": "Yellow card",
+        }],
+    }
+    jogo = {"mandante": {"nome": "Flamengo"}, "visitante": {"nome": "Palmeiras"}, "estadio": ""}
+    assert parse_publico(summary) == 43210
+    assert parse_estadio(summary, jogo) == "Estádio Teste"
+    assert parse_arbitro(summary) == "Árbitro Teste"
+    stats = parse_summary(summary, jogo)
+    assert any(x["nome"] == "Posse" and x["home"] == "60%" and x["away"] == "40%" for x in stats)
+    gols, cartoes = parse_eventos(summary)
+    assert gols and gols[0]["jogador"] == "Pedro"
+    assert gols[0]["assistencias"] == ["Samuel Lino"]
+    assert cartoes and cartoes[0]["tipo"] == "amarelo"
+    print("SELF-TEST OK: público, estádio, árbitro, boxscore, gol, assistência e cartão.")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Busca estatísticas por jogo do Brasileirão na ESPN.")
     parser.add_argument("--dry-run", action="store_true", help="Só valida entradas, sem rede e sem gravar arquivos.")
+    parser.add_argument("--self-test", action="store_true", help="Executa testes internos do parser sem usar rede.")
     parser.add_argument("--max-jogos", type=int, default=0, help="Limite opcional de jogos processados nesta execução.")
     parser.add_argument("--sleep", type=float, default=0.08, help="Pausa entre chamadas ESPN.")
     args = parser.parse_args()
+
+    if args.self_test:
+        self_test()
+        return
 
     base_resultados = carregar_json(RESULTADOS, {})
     resultados = [j for j in (base_resultados.get("resultados") or []) if jogo_finalizado(j)]
@@ -351,13 +607,25 @@ def main() -> None:
         try:
             summary = fetch_json(BASE_SUMMARY.format(event_id=event_id))
             stats = parse_summary(summary, jogo)
+            publico = parse_publico(summary)
+            estadio = parse_estadio(summary, jogo)
+            arbitro = parse_arbitro(summary)
+            gols, cartoes = parse_eventos(summary)
             buscados += 1
         except Exception as exc:  # noqa: BLE001
             antigo = jogos_anteriores.get(event_id) if isinstance(jogos_anteriores, dict) else None
             stats = list((antigo or {}).get("stats") or (antigo or {}).get("estatisticas") or [])
-            if stats:
+            if antigo:
                 preservados += 1
-                jogos_saida[event_id] = montar_registro(event_id, jogo, stats, preservado=True)
+                jogos_saida[event_id] = montar_registro(
+                    event_id, jogo, stats,
+                    publico=(antigo or {}).get("publico"),
+                    estadio=str((antigo or {}).get("estadio") or jogo.get("estadio") or ""),
+                    arbitro=str((antigo or {}).get("arbitro") or ""),
+                    gols=list((antigo or {}).get("gols") or []),
+                    cartoes=list((antigo or {}).get("cartoes") or []),
+                    preservado=True,
+                )
             else:
                 falhas.append({"event_id": event_id, "jogo": label, "erro": str(exc)[:300]})
                 jogos_saida[event_id] = montar_registro(event_id, jogo, [])
@@ -367,8 +635,14 @@ def main() -> None:
 
         if not stats:
             sem_estatisticas.append({"event_id": event_id, "jogo": label})
-        jogos_saida[event_id] = montar_registro(event_id, jogo, stats)
-        print(f"[{i:03d}/{len(resultados):03d}] {label}: {len(stats)} estatística(s)")
+        jogos_saida[event_id] = montar_registro(
+            event_id, jogo, stats, publico=publico, estadio=estadio, arbitro=arbitro,
+            gols=gols, cartoes=cartoes,
+        )
+        print(
+            f"[{i:03d}/{len(resultados):03d}] {label}: {len(stats)} estatística(s) · "
+            f"público={publico if publico is not None else 'n/d'} · gols={len(gols)} · cartões={len(cartoes)}"
+        )
         time.sleep(max(0.0, args.sleep))
 
     total_com = sum(1 for j in jogos_saida.values() if j.get("stats"))
@@ -378,6 +652,8 @@ def main() -> None:
         "fonte": "ESPN summary",
         "total_jogos": len(jogos_saida),
         "total_com_estatisticas": total_com,
+        "total_com_publico": sum(1 for j in jogos_saida.values() if j.get("publico") not in (None, "")),
+        "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
         "jogos": jogos_saida,
     }
     auditoria = {
@@ -387,6 +663,9 @@ def main() -> None:
         "total_processados": len(resultados),
         "total_buscados_na_espn": buscados,
         "total_com_estatisticas": total_com,
+        "total_com_publico": sum(1 for j in jogos_saida.values() if j.get("publico") not in (None, "")),
+        "total_sem_publico": sum(1 for j in jogos_saida.values() if j.get("publico") in (None, "")),
+        "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
         "total_sem_estatisticas": len(sem_estatisticas),
         "total_preservados_de_execucao_anterior": preservados,
         "total_falhas": len(falhas),
