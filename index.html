@@ -2185,7 +2185,7 @@ body > .container > section.hero > img {
   }
 
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260712-menu-publico-login-v1">
+<link rel="stylesheet" href="css/br-global.css?v=20260713-disclaimers-publicos-v1">
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
@@ -2241,9 +2241,16 @@ body > .container > section.hero > img {
   <div id="view-aniversariantes" style="display: none;"></div>
   <div id="view-participantes" style="display: none;"></div>
 
-  <footer class="site-footer">
-    <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Site sem fins lucrativos, feito por amigos, para amigos. O bolão não envolve dinheiro: o "prêmio" é simbólico (os últimos colocados pagam o almoço de fim de ano).</div>
-          </footer>
+  <section id="br-context-disclaimer" class="br-legal-context" aria-label="Informações legais desta página" hidden></section>
+
+  <footer class="site-footer br-disclaimer">
+    <div class="br-footer-copy"><span class="footer-title">Brasileirão 2026 · Almoço de Sexta</span> — Site independente, informativo e sem fins lucrativos, mantido por um grupo de amigos. Não é afiliado, patrocinado ou endossado pela CBF, clubes, ESPN ou qualquer titular de direitos. Dados de jogos e resultados provêm da API pública da ESPN. Escudos, nomes e marcas dos clubes pertencem aos seus respectivos titulares e são exibidos exclusivamente para identificação e contexto esportivo. Os mascotes do site são criações originais inspiradas na identidade visual dos clubes — não reproduzem artes, personagens ou marcas protegidas.</div>
+    <div class="footer-sugestoes">Solicitações de remoção ou crédito: <button type="button" class="br-feedback-button" data-feedback>💬 Sugestões</button></div>
+    <details class="br-source-note">
+      <summary>ⓘ De onde vêm os dados?</summary>
+      <p>Os dados de jogos, resultados, tabela e estatísticas do Brasileirão 2026 são obtidos via API pública da ESPN (site.api.espn.com). A ESPN é a fonte original; este site apenas organiza e apresenta as informações com fins informativos e recreativos. Não há relação comercial ou editorial com a ESPN.</p>
+    </details>
+  </footer>
 </div>
 
 <div id="modal-container"></div>
@@ -3066,10 +3073,45 @@ function calcular(participante) {
 }
 
 // ========================================================================
+// AVISOS LEGAIS DAS ABAS PÚBLICAS
+// ========================================================================
+function atualizarAvisoLegalDaView(view) {
+  const aviso = document.getElementById('br-context-disclaimer');
+  if (!aviso) return;
+
+  const avisoDados = `
+    <div class="br-legal-context-icon" aria-hidden="true">ℹ️</div>
+    <div>
+      <strong>Sobre os dados:</strong>
+      <p>placares, datas, horários, escalações e estatísticas exibidos nesta página provêm da API pública da ESPN e são atualizados automaticamente. Este site não produz nem garante a exatidão das informações — para dados oficiais, consulte o site da CBF. Nomes, escudos e marcas dos clubes pertencem aos seus titulares e são usados apenas para identificação esportiva.</p>
+    </div>`;
+
+  const avisoVideos = `
+    <div class="br-legal-context-divider" aria-hidden="true"></div>
+    <div class="br-legal-context-icon" aria-hidden="true">▶️</div>
+    <div>
+      <strong>Sobre os vídeos:</strong>
+      <p>os links de melhores momentos direcionam para conteúdo publicado nos canais oficiais GE TV, CazéTV e Prime Video no YouTube. Este site não hospeda, reproduz nem redistribui nenhum vídeo — funciona apenas como agregador de links públicos. Os vídeos e todos os direitos relacionados pertencem aos canais e produtoras responsáveis.</p>
+    </div>`;
+
+  if (view === 'jogos' || view === 'tabela') {
+    aviso.innerHTML = avisoDados;
+    aviso.hidden = false;
+  } else if (view === 'resultados') {
+    aviso.innerHTML = avisoDados + avisoVideos;
+    aviso.hidden = false;
+  } else {
+    aviso.innerHTML = '';
+    aviso.hidden = true;
+  }
+}
+
+// ========================================================================
 // RENDERIZAÇÃO
 // ========================================================================
 function render() {
   const v = state.view;
+  atualizarAvisoLegalDaView(v);
   document.getElementById('view-rank').style.display = v === 'rank' ? 'block' : 'none';
   document.getElementById('view-tabela').style.display = v === 'tabela' ? 'block' : 'none';
   document.getElementById('view-jogos').style.display = v === 'jogos' ? 'block' : 'none';
@@ -4926,5 +4968,6 @@ setTimeout(sincronizarAvisosAniversarioComSessao, 800);
 </script>
 <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
 <script src="js/br-menu.js?v=20260712-menu-publico-login-v1"></script>
+<script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

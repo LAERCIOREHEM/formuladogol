@@ -87,8 +87,21 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <div><strong>Bolão Brasileirão 2026 — Almoço de Sexta.</strong> Página institucional dos clubes, sem fins comerciais.</div>
+    <section class="br-legal-context" aria-label="Informações sobre escudos e mascotes">
+      <div class="br-legal-context-icon" aria-hidden="true">🛡️</div>
+      <div>
+        <strong>Sobre escudos e mascotes:</strong>
+        <p>os escudos exibidos são propriedade dos respectivos clubes e são usados exclusivamente para identificação editorial. Os mascotes são criações originais deste site, inspirados na identidade e nas cores dos clubes — não reproduzem, derivam nem substituem personagens, artes ou marcas registradas de terceiros. Toda a arte dos mascotes pertence ao site.</p>
+      </div>
+    </section>
+
+    <footer class="site-footer br-disclaimer">
+      <div class="br-footer-copy"><span class="footer-title">Brasileirão 2026 · Almoço de Sexta</span> — Site independente, informativo e sem fins lucrativos, mantido por um grupo de amigos. Não é afiliado, patrocinado ou endossado pela CBF, clubes, ESPN ou qualquer titular de direitos. Dados de jogos e resultados provêm da API pública da ESPN. Escudos, nomes e marcas dos clubes pertencem aos seus respectivos titulares e são exibidos exclusivamente para identificação e contexto esportivo. Os mascotes do site são criações originais inspiradas na identidade visual dos clubes — não reproduzem artes, personagens ou marcas protegidas.</div>
+      <div class="footer-sugestoes">Solicitações de remoção ou crédito: <button type="button" class="br-feedback-button" data-feedback>💬 Sugestões</button></div>
+      <details class="br-source-note">
+        <summary>ⓘ De onde vêm os dados?</summary>
+        <p>Os dados de jogos, resultados, tabela e estatísticas do Brasileirão 2026 são obtidos via API pública da ESPN (site.api.espn.com). A ESPN é a fonte original; este site apenas organiza e apresenta as informações com fins informativos e recreativos. Não há relação comercial ou editorial com a ESPN.</p>
+      </details>
     </footer>
   </div>
 
@@ -100,5 +113,6 @@
       a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-anchor')); });
     });
   </script>
+  <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

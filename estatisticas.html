@@ -7,7 +7,7 @@
   <meta name="description" content="Artilheiros, assistências, estatísticas por partida, gols por clube, público, sequências e ranking de desempenho do Brasileirão 2026.">
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="css/br-estatisticas.css?v=20260713-estatisticas-exec2-v1">
-  <link rel="stylesheet" href="css/br-global.css?v=20260712-menu-publico-login-v1">
+  <link rel="stylesheet" href="css/br-global.css?v=20260713-disclaimers-publicos-v1">
 </head>
 <body>
   <div class="container">
@@ -119,14 +119,27 @@
       <p class="stats-note"><b>Nota:</b> dados de jogadores, partidas e público aparecem conforme disponibilidade nas fontes ESPN. Rankings oficiais de gols e assistências ficam separados dos eventos extraídos jogo a jogo para evitar contagens incompletas.</p>
     </main>
 
+    <section class="br-legal-context" aria-label="Informações sobre as estatísticas">
+      <div class="br-legal-context-icon" aria-hidden="true">📈</div>
+      <div>
+        <strong>Sobre as estatísticas:</strong>
+        <p>os índices e rankings exibidos são calculados a partir dos dados públicos da API da ESPN (posse de bola, finalizações, passes, cartões etc.). Trata-se de análise editorial própria, não de métrica oficial da CBF ou da ESPN. Nomes, escudos e marcas dos clubes pertencem aos seus titulares.</p>
+      </div>
+    </section>
+
     <footer class="site-footer br-disclaimer">
-      <div><span class="footer-title">Brasileirão 2026 — Almoço de Sexta.</span> Site privado, recreativo, sem fins lucrativos e sem exploração comercial. Marcas, escudos, nomes e demais sinais distintivos pertencem aos respectivos titulares.</div>
-      <div class="footer-sugestoes">💬 Sugestões ou correções: fale com o administrador do grupo pelo WhatsApp.</div>
+      <div class="br-footer-copy"><span class="footer-title">Brasileirão 2026 · Almoço de Sexta</span> — Site independente, informativo e sem fins lucrativos, mantido por um grupo de amigos. Não é afiliado, patrocinado ou endossado pela CBF, clubes, ESPN ou qualquer titular de direitos. Dados de jogos e resultados provêm da API pública da ESPN. Escudos, nomes e marcas dos clubes pertencem aos seus respectivos titulares e são exibidos exclusivamente para identificação e contexto esportivo. Os mascotes do site são criações originais inspiradas na identidade visual dos clubes — não reproduzem artes, personagens ou marcas protegidas.</div>
+      <div class="footer-sugestoes">Solicitações de remoção ou crédito: <button type="button" class="br-feedback-button" data-feedback>💬 Sugestões</button></div>
+      <details class="br-source-note">
+        <summary>ⓘ De onde vêm os dados?</summary>
+        <p>Os dados de jogos, resultados, tabela e estatísticas do Brasileirão 2026 são obtidos via API pública da ESPN (site.api.espn.com). A ESPN é a fonte original; este site apenas organiza e apresenta as informações com fins informativos e recreativos. Não há relação comercial ou editorial com a ESPN.</p>
+      </details>
     </footer>
   </div>
 
   <script src="js/br-estatisticas.js?v=20260713-estatisticas-exec2-v1"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260712-menu-publico-login-v1"></script>
+  <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

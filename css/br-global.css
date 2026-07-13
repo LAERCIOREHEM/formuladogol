@@ -605,3 +605,125 @@ html.br-private-pending body {
 @media (max-width: 560px) {
   .nav [data-br-auth-link] { max-width: 155px; }
 }
+
+
+/* ======================================================================
+   AVISOS LEGAIS PÚBLICOS — 2026-07-13
+   Blocos contextuais, rodapé global, nota de fonte e botão de sugestões.
+   ====================================================================== */
+.br-legal-context {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px 12px;
+  align-items: start;
+  margin-top: 18px;
+  padding: 15px 16px;
+  border: 1px solid rgba(96, 165, 250, .24);
+  border-radius: 17px;
+  background:
+    linear-gradient(135deg, rgba(13, 31, 45, .86), rgba(7, 22, 25, .76));
+  color: rgba(226, 232, 240, .86);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .14);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.br-legal-context[hidden] { display: none !important; }
+.br-legal-context-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(147, 197, 253, .22);
+  border-radius: 11px;
+  background: rgba(96, 165, 250, .10);
+  font-size: 16px;
+  line-height: 1;
+}
+.br-legal-context strong {
+  display: inline;
+  color: #dbeafe;
+  font-weight: 950;
+}
+.br-legal-context p {
+  display: inline;
+  margin: 0;
+  color: rgba(226, 232, 240, .84);
+}
+.br-legal-context-divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  margin: 2px 0;
+  background: rgba(148, 163, 184, .14);
+}
+.site-footer.br-disclaimer {
+  text-align: left !important;
+}
+.br-footer-copy {
+  color: rgba(226, 232, 240, .82);
+}
+.br-feedback-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  margin-left: 4px;
+  padding: 5px 11px;
+  border: 1px solid rgba(217, 255, 118, .34);
+  border-radius: 999px;
+  background: rgba(163, 230, 53, .10);
+  color: #eaffad;
+  font: inherit;
+  font-weight: 950;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: transform .15s ease, border-color .15s ease, background .15s ease;
+}
+.br-feedback-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(217, 255, 118, .58);
+  background: rgba(163, 230, 53, .17);
+}
+.br-feedback-button:focus-visible {
+  outline: 3px solid rgba(96, 165, 250, .34);
+  outline-offset: 2px;
+}
+.br-source-note {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, .14);
+}
+.br-source-note summary {
+  width: fit-content;
+  color: #bfdbfe;
+  font-weight: 900;
+  cursor: pointer;
+  user-select: none;
+}
+.br-source-note p {
+  margin: 8px 0 0;
+  max-width: 1040px;
+  color: rgba(203, 213, 225, .78);
+}
+@media (max-width: 560px) {
+  .br-legal-context {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 9px 10px;
+    padding: 13px;
+    border-radius: 15px;
+    font-size: 11.5px;
+  }
+  .br-legal-context-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+  .br-feedback-button {
+    margin-top: 6px;
+    margin-left: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .br-feedback-button { transition: none; }
+}
