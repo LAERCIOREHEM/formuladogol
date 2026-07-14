@@ -7,7 +7,7 @@
 <title>Admin — Bolão Copa 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css?v=20260702sedes-v1">
+<link rel="stylesheet" href="css/copa.css?v=20260714-nav-footer-v1">
 <style>
   .wrap{max-width:760px;margin:0 auto;padding:0 14px 60px}
   .painel{background:var(--navy-2);border:1px solid var(--linha);border-radius:14px;padding:18px;margin-top:16px}
@@ -84,6 +84,18 @@
 <!-- PAINEL -->
 <div class="wrap" id="painel-admin" style="display:none">
   <div class="hdr"><img class="hdr-img" src="img/header-copa26.jpg" width="920" height="236" alt="COPA 26 — Bolão Brasileirão Almoço"></div>
+  <nav class="menu" aria-label="Navegação principal da Copa 2026">
+    <a href="index.html"><span class="mi" aria-hidden="true">⚽</span> Jogos</a>
+    <a href="aovivo.html"><span class="mi" aria-hidden="true">🔴</span> Ao vivo</a>
+    <a href="estatisticas.html"><span class="mi" aria-hidden="true">📊</span> Estatísticas</a>
+    <a href="selecoes.html"><span class="mi" aria-hidden="true">🌎</span> Seleções</a>
+    <a href="palcos.html"><span class="mi" aria-hidden="true">🏟️</span> Sedes</a>
+    <a href="museu.html"><span class="mi" aria-hidden="true">🏛️</span> Museu</a>
+    <a href="pontos.html"><span class="mi" aria-hidden="true">🏆</span> Bolão</a>
+    <a href="palpites.html"><span class="mi" aria-hidden="true">👥</span> Palpites</a>
+    <a href="palpite.html"><span class="mi" aria-hidden="true">📝</span> Meus Palpites</a>
+    <a href="/?brasileirao=1"><span class="mi" aria-hidden="true">🇧🇷</span> Brasileirão</a>
+  </nav>
   <div class="admin-bar">
     <a href="index.html" class="btn-mini" style="text-decoration:none">← Voltar ao bolão</a>
     <button id="btn-sair-admin" class="btn-mini">Sair</button>
@@ -177,7 +189,15 @@
     <button id="btn-senha" class="btn-primario">Trocar senha</button>
   </div>
 
-  <p class="rodape">Almoço 2026 — Todos os direitos reservados.</p>
+  <footer class="copa-footer">
+  <nav class="copa-footer-nav" aria-label="Links utilitários da Copa 2026">
+    <a href="onde-assistir.html"><span aria-hidden="true">📋</span> Resultados</a>
+    <a href="regras.html"><span aria-hidden="true">📘</span> Regras</a>
+    <a href="#" data-feedback><span aria-hidden="true">💬</span> Sugestões</a>
+    <a href="admin.html" class="adm" aria-current="page"><span aria-hidden="true">🔐</span> Área do administrador</a>
+    <a href="/?brasileirao=1"><span aria-hidden="true">🇧🇷</span> Brasileirão</a>
+  </nav>
+</footer>
 </div>
 
 <script src="js/config.js?v=20260618b"></script>

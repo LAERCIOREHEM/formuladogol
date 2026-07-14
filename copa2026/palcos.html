@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://flagcdn.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css?v=20260702sedes-v1">
+<link rel="stylesheet" href="css/copa.css?v=20260714-nav-footer-v1">
 <style>
   .wrap{max-width:600px;margin:0 auto;padding:16px 12px 60px}
 </style>
@@ -35,16 +35,17 @@
 <div class="wrap">
   <div class="hdr"><img class="hdr-img" src="img/header-copa26.jpg" width="920" height="236" alt="COPA 26 — Bolão Brasileirão Almoço"></div>
 
-  <nav class="menu">
+    <nav class="menu" aria-label="Navegação principal da Copa 2026">
     <a href="index.html"><span class="mi" aria-hidden="true">⚽</span> Jogos</a>
     <a href="aovivo.html"><span class="mi" aria-hidden="true">🔴</span> Ao vivo</a>
     <a href="estatisticas.html"><span class="mi" aria-hidden="true">📊</span> Estatísticas</a>
     <a href="selecoes.html"><span class="mi" aria-hidden="true">🌎</span> Seleções</a>
-    <a href="palcos.html" class="ativo"><span class="mi" aria-hidden="true">🏟️</span> Sedes</a>
+    <a href="palcos.html" class="ativo" aria-current="page"><span class="mi" aria-hidden="true">🏟️</span> Sedes</a>
     <a href="museu.html"><span class="mi" aria-hidden="true">🏛️</span> Museu</a>
     <a href="pontos.html"><span class="mi" aria-hidden="true">🏆</span> Bolão</a>
     <a href="palpites.html"><span class="mi" aria-hidden="true">👥</span> Palpites</a>
     <a href="palpite.html"><span class="mi" aria-hidden="true">📝</span> Meus Palpites</a>
+    <a href="/?brasileirao=1"><span class="mi" aria-hidden="true">🇧🇷</span> Brasileirão</a>
   </nav>
 
   <section class="pal-hero">
@@ -102,16 +103,14 @@
   <section id="pal-creditos" class="sel-creditos" hidden></section>
 </div>
 
-<footer class="rodape">
-  <a href="index.html">⚽ Jogos</a><span class="sep">•</span>
-  <a href="aovivo.html">🔴 Ao vivo</a><span class="sep">•</span>
-  <a href="estatisticas.html">📊 Estatísticas</a><span class="sep">•</span>
-  <a href="selecoes.html">🌎 Seleções</a><span class="sep">•</span>
-  <a href="palcos.html">🏟️ Sedes</a><span class="sep">•</span>
-  <a href="museu.html">🏛️ Museu</a><span class="sep">•</span>
-  <a href="onde-assistir.html">📺 Onde assistir</a><span class="sep">•</span>
-  <a href="pontos.html">🏆 Bolão</a><span class="sep">•</span>
-  <a href="regras.html">📘 Regras</a> · <a href="#" data-feedback>💬 Sugestões</a>
+<footer class="copa-footer">
+  <nav class="copa-footer-nav" aria-label="Links utilitários da Copa 2026">
+    <a href="onde-assistir.html"><span aria-hidden="true">📋</span> Resultados</a>
+    <a href="regras.html"><span aria-hidden="true">📘</span> Regras</a>
+    <a href="#" data-feedback><span aria-hidden="true">💬</span> Sugestões</a>
+    <a href="admin.html" class="adm"><span aria-hidden="true">🔐</span> Área do administrador</a>
+    <a href="/?brasileirao=1"><span aria-hidden="true">🇧🇷</span> Brasileirão</a>
+  </nav>
   <p class="rodape-disclaimer-global">Site independente, privado, recreativo e 100% gratuito, sem anúncios ou monetização. Não é afiliado, patrocinado ou endossado pela FIFA, CBF, confederações, clubes, emissoras, agências ou fabricantes. Imagens (em baixa resolução, com créditos preservados quando disponíveis — fontes: ESPN e Wikipedia/Wikimedia), nomes, marcas, mascotes, bolas e escudos pertencem aos respectivos titulares e são exibidos apenas em contexto informativo e editorial. Solicitações legítimas de remoção ou crédito: canal “💬 Sugestões”.</p>
 </footer>
 

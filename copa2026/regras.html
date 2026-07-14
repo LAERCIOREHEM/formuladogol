@@ -25,7 +25,7 @@
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-0PPWGP93FD');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/copa.css?v=20260702sedes-v1">
+<link rel="stylesheet" href="css/copa.css?v=20260714-nav-footer-v1">
 <style>.conteudo{max-width:620px;margin:0 auto;padding:0 14px}.conteudo h2{font-family:'Anton',sans-serif;font-weight:400;font-size:22px;letter-spacing:.5px;margin:18px 0 12px}  .hdr{margin:0 0 14px}
   .hdr-svg{display:block;width:100%;height:auto;max-width:520px}
   .hdr{margin:0 0 14px;text-align:center}
@@ -35,17 +35,18 @@
 <body>
   <div id="app">
     <div class="hdr"><img class="hdr-img" src="img/header-copa26.jpg" width="920" height="236" alt="COPA 26 — Bolão Brasileirão Almoço"></div>
-    <nav class="menu">
-      <a href="index.html"><span class="mi" aria-hidden="true">⚽</span> Jogos</a>
-      <a href="aovivo.html"><span class="mi" aria-hidden="true">🔴</span> Ao vivo</a>
-      <a href="estatisticas.html"><span class="mi" aria-hidden="true">📊</span> Estatísticas</a>
-      <a href="selecoes.html"><span class="mi" aria-hidden="true">🌎</span> Seleções</a>
-      <a href="palcos.html"><span class="mi" aria-hidden="true">🏟️</span> Sedes</a>
+      <nav class="menu" aria-label="Navegação principal da Copa 2026">
+    <a href="index.html"><span class="mi" aria-hidden="true">⚽</span> Jogos</a>
+    <a href="aovivo.html"><span class="mi" aria-hidden="true">🔴</span> Ao vivo</a>
+    <a href="estatisticas.html"><span class="mi" aria-hidden="true">📊</span> Estatísticas</a>
+    <a href="selecoes.html"><span class="mi" aria-hidden="true">🌎</span> Seleções</a>
+    <a href="palcos.html"><span class="mi" aria-hidden="true">🏟️</span> Sedes</a>
     <a href="museu.html"><span class="mi" aria-hidden="true">🏛️</span> Museu</a>
-      <a href="pontos.html"><span class="mi" aria-hidden="true">🏆</span> Bolão</a>
-      <a href="palpites.html"><span class="mi" aria-hidden="true">👥</span> Palpites</a>
-      <a href="palpite.html"><span class="mi" aria-hidden="true">📝</span> Meus Palpites</a>
-    </nav>
+    <a href="pontos.html"><span class="mi" aria-hidden="true">🏆</span> Bolão</a>
+    <a href="palpites.html"><span class="mi" aria-hidden="true">👥</span> Palpites</a>
+    <a href="palpite.html"><span class="mi" aria-hidden="true">📝</span> Meus Palpites</a>
+    <a href="/?brasileirao=1"><span class="mi" aria-hidden="true">🇧🇷</span> Brasileirão</a>
+  </nav>
 
   <main class="conteudo">
     <h2>Regras do Bolão</h2>
@@ -139,20 +140,18 @@
   <p><b>Política de remoção:</b> qualquer titular de direitos (fotógrafo, agência, entidade, licenciado) ou seu representante que entenda que algum conteúdo foi exibido de forma inadequada pode solicitar remoção, substituição ou ajuste de crédito pelo canal “💬 Sugestões”, presente em todas as páginas, informando a URL, o material questionado e sua identificação/comprovação de titularidade. O mantenedor fará contato e atenderá solicitações legítimas com urgência e boa-fé, sem que isso represente admissão de infração ou renúncia a direitos.</p>
 </section>
 
-<footer class="rodape">
-    <a href="regras.html">📘 Regras</a><span class="sep">·</span>
-  <a href="#" data-feedback>💬 Sugestões</a><span class="sep">·</span>
-    <a href="admin.html" class="adm">🔐 Área do administrador</a><span class="sep">·</span>
-    <a href="/?brasileirao=1">⚽ ← Brasileirão</a>
-  </footer>
-  <footer class="rodape-site">
-    <nav class="rs-nav" aria-label="Links do site">
-      <a href="index.html">⚽ Jogos</a> · <a href="onde-assistir.html">📺 Onde assistir</a> · <a href="pontos.html">🏆 Bolão</a> · <a href="aovivo.html">🔴 Ao vivo</a>
-        <a href="estatisticas.html">📊 Estatísticas</a> · <a href="palpites.html">👥 Palpites</a> · <a href="regras.html">📘 Regras</a>
-    </nav>
-    <p class="rs-legal">Bolão Brasileirão Almoço · Brasília-DF · © 2026 — Todos os direitos reservados.</p>
-    <p class="rs-disc">Site independente, privado, recreativo e 100% gratuito, sem anúncios ou monetização. Não é afiliado, patrocinado ou endossado pela FIFA, CBF, confederações, clubes, emissoras, agências ou fabricantes. Imagens (em baixa resolução, com créditos preservados quando disponíveis — fontes: ESPN e Wikipedia/Wikimedia), nomes, marcas, mascotes, bolas e escudos pertencem aos respectivos titulares e são exibidos apenas em contexto informativo e editorial. Solicitações legítimas de remoção ou crédito: canal “💬 Sugestões”.</p>
-  </footer>
+<footer class="copa-footer">
+  <nav class="copa-footer-nav" aria-label="Links utilitários da Copa 2026">
+    <a href="onde-assistir.html"><span aria-hidden="true">📋</span> Resultados</a>
+    <a href="regras.html" aria-current="page"><span aria-hidden="true">📘</span> Regras</a>
+    <a href="#" data-feedback><span aria-hidden="true">💬</span> Sugestões</a>
+    <a href="admin.html" class="adm"><span aria-hidden="true">🔐</span> Área do administrador</a>
+    <a href="/?brasileirao=1"><span aria-hidden="true">🇧🇷</span> Brasileirão</a>
+  </nav>
+  <p class="rs-legal">Copa 2026 · Almoço de Sexta · Brasília-DF · © 2026 — Todos os direitos reservados.</p>
+  <p class="rs-disc">Site independente, privado, recreativo e 100% gratuito, sem anúncios ou monetização. Não é afiliado, patrocinado ou endossado pela FIFA, CBF, confederações, clubes, emissoras, agências ou fabricantes. Imagens (em baixa resolução, com créditos preservados quando disponíveis — fontes: ESPN e Wikipedia/Wikimedia), nomes, marcas, mascotes, bolas e escudos pertencem aos respectivos titulares e são exibidos apenas em contexto informativo e editorial. Solicitações legítimas de remoção ou crédito: canal “💬 Sugestões”.</p>
+</footer>
+  
   <script src="js/config.js?v=20260621f"></script>
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
 </body>

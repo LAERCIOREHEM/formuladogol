@@ -3549,3 +3549,79 @@ html{
 .hist-phase-btn{
   scroll-snap-align:center;
 }
+
+
+/* ===== NAVEGAÇÃO E RODAPÉ PADRONIZADOS — 14/07/2026 ===== */
+.menu a[href="/?brasileirao=1"]{
+  color:#dbe8f7;
+}
+.menu a[href="/?brasileirao=1"]:hover{
+  color:var(--branco);
+}
+
+.copa-footer{
+  width:min(760px,calc(100% - 24px));
+  margin:34px auto 0;
+  padding:18px 14px 32px;
+  border-top:1px solid var(--linha);
+  text-align:center;
+}
+.copa-footer-nav{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  gap:7px 18px;
+  margin:0 auto 14px;
+}
+.copa-footer-nav a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  min-height:34px;
+  padding:5px 2px;
+  color:var(--cinza);
+  text-decoration:none;
+  font-size:13px;
+  font-weight:600;
+  line-height:1.25;
+  white-space:nowrap;
+}
+.copa-footer-nav a:hover,
+.copa-footer-nav a:focus-visible{
+  color:var(--gold);
+}
+.copa-footer-nav a[aria-current="page"]{
+  color:var(--gold);
+  font-weight:800;
+}
+.copa-footer-nav a.adm{
+  opacity:.78;
+}
+.copa-footer .rs-legal{
+  margin:0 0 7px;
+  color:var(--cinza);
+  font-size:12px;
+}
+.copa-footer .rs-disc,
+.copa-footer .rodape-disclaimer-global{
+  margin-top:10px;
+}
+
+@media(max-width:520px){
+  .copa-footer{
+    width:calc(100% - 20px);
+    margin-top:28px;
+    padding:16px 10px 26px;
+  }
+  .copa-footer-nav{
+    gap:5px 12px;
+    margin-bottom:12px;
+  }
+  .copa-footer-nav a{
+    min-height:32px;
+    padding:4px 1px;
+    font-size:12.5px;
+  }
+}

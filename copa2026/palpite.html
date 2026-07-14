@@ -26,7 +26,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/copa.css?v=20260704meus-pontos-v24" />
+  <link rel="stylesheet" href="css/copa.css?v=20260714-nav-footer-v1" />
 
 
   <style>
@@ -87,17 +87,18 @@
       </div>
     </header>
 
-    <nav class="menu">
-      <a href="index.html"><span class="mi" aria-hidden="true">⚽</span> Jogos</a>
-      <a href="aovivo.html"><span class="mi" aria-hidden="true">🔴</span> Ao vivo</a>
-      <a href="estatisticas.html"><span class="mi" aria-hidden="true">📊</span> Estatísticas</a>
-      <a href="selecoes.html"><span class="mi" aria-hidden="true">🌎</span> Seleções</a>
-      <a href="palcos.html"><span class="mi" aria-hidden="true">🏟️</span> Sedes</a>
+      <nav class="menu" aria-label="Navegação principal da Copa 2026">
+    <a href="index.html"><span class="mi" aria-hidden="true">⚽</span> Jogos</a>
+    <a href="aovivo.html"><span class="mi" aria-hidden="true">🔴</span> Ao vivo</a>
+    <a href="estatisticas.html"><span class="mi" aria-hidden="true">📊</span> Estatísticas</a>
+    <a href="selecoes.html"><span class="mi" aria-hidden="true">🌎</span> Seleções</a>
+    <a href="palcos.html"><span class="mi" aria-hidden="true">🏟️</span> Sedes</a>
     <a href="museu.html"><span class="mi" aria-hidden="true">🏛️</span> Museu</a>
-      <a href="pontos.html"><span class="mi" aria-hidden="true">🏆</span> Bolão</a>
-      <a href="palpites.html"><span class="mi" aria-hidden="true">👥</span> Palpites</a>
-      <a href="palpite.html" class="ativo"><span class="mi" aria-hidden="true">📝</span> Meus Palpites</a>
-    </nav>
+    <a href="pontos.html"><span class="mi" aria-hidden="true">🏆</span> Bolão</a>
+    <a href="palpites.html"><span class="mi" aria-hidden="true">👥</span> Palpites</a>
+    <a href="palpite.html" class="ativo" aria-current="page"><span class="mi" aria-hidden="true">📝</span> Meus Palpites</a>
+    <a href="/?brasileirao=1"><span class="mi" aria-hidden="true">🇧🇷</span> Brasileirão</a>
+  </nav>
 
     <!-- LOGIN -->
     <section id="tela-login" class="tela">
@@ -131,12 +132,17 @@
 
   </div>
 
-  <footer class="rodape">
-    <a href="regras.html">📘 Regras</a><span class="sep">·</span>
-  <a href="#" data-feedback>💬 Sugestões</a><span class="sep">·</span>
-    <a href="admin.html" class="adm">🔐 Área do administrador</a><span class="sep">·</span>
-    <a href="/?brasileirao=1">⚽ ← Brasileirão</a>
-  </footer>
+  <footer class="copa-footer">
+  <nav class="copa-footer-nav" aria-label="Links utilitários da Copa 2026">
+    <a href="onde-assistir.html"><span aria-hidden="true">📋</span> Resultados</a>
+    <a href="regras.html"><span aria-hidden="true">📘</span> Regras</a>
+    <a href="#" data-feedback><span aria-hidden="true">💬</span> Sugestões</a>
+    <a href="admin.html" class="adm"><span aria-hidden="true">🔐</span> Área do administrador</a>
+    <a href="/?brasileirao=1"><span aria-hidden="true">🇧🇷</span> Brasileirão</a>
+  </nav>
+  <p class="rs-legal">Copa 2026 · Almoço de Sexta · Brasília-DF · © 2026 — Todos os direitos reservados.</p>
+  <p class="rs-disc">Site independente, privado, recreativo e 100% gratuito, sem anúncios ou monetização. Não é afiliado, patrocinado ou endossado pela FIFA, CBF, confederações, clubes, emissoras, agências ou fabricantes. Imagens (em baixa resolução, com créditos preservados quando disponíveis — fontes: ESPN e Wikipedia/Wikimedia), nomes, marcas, mascotes, bolas e escudos pertencem aos respectivos titulares e são exibidos apenas em contexto informativo e editorial. Solicitações legítimas de remoção ou crédito: canal “💬 Sugestões”.</p>
+</footer>
 
   <!-- POPUP -->
   <div id="popup" class="popup oculto">
@@ -151,14 +157,7 @@
   <script src="js/config.js?v=20260618b"></script>
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
   <script src="js/app.js?v=20260711-extrato-eliminados-v1"></script>
-  <footer class="rodape-site">
-    <nav class="rs-nav" aria-label="Links do site">
-      <a href="index.html">⚽ Jogos</a> · <a href="onde-assistir.html">📺 Onde assistir</a> · <a href="pontos.html">🏆 Bolão</a> · <a href="aovivo.html">🔴 Ao vivo</a>
-        <a href="estatisticas.html">📊 Estatísticas</a> · <a href="palpites.html">👥 Palpites</a> · <a href="regras.html">📘 Regras</a>
-    </nav>
-    <p class="rs-legal">Bolão Brasileirão Almoço · Brasília-DF · © 2026 — Todos os direitos reservados.</p>
-    <p class="rs-disc">Site independente, privado, recreativo e 100% gratuito, sem anúncios ou monetização. Não é afiliado, patrocinado ou endossado pela FIFA, CBF, confederações, clubes, emissoras, agências ou fabricantes. Imagens (em baixa resolução, com créditos preservados quando disponíveis — fontes: ESPN e Wikipedia/Wikimedia), nomes, marcas, mascotes, bolas e escudos pertencem aos respectivos titulares e são exibidos apenas em contexto informativo e editorial. Solicitações legítimas de remoção ou crédito: canal “💬 Sugestões”.</p>
-  </footer>
+  
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"f0f03d0605bf45f1a3b17cf7d5e6861f","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
