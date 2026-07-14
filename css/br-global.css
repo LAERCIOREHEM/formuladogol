@@ -727,3 +727,104 @@ html.br-private-pending body {
 @media (prefers-reduced-motion: reduce) {
   .br-feedback-button { transition: none; }
 }
+
+
+/* ======================================================================
+   TABELA MOBILE — PAINÉIS CONGELADOS (2026-07-14)
+   Somente em telas pequenas: fixa POS/TIME na rolagem horizontal e dá
+   suporte ao cabeçalho flutuante criado pelo index.html na rolagem vertical.
+   A versão desktop permanece inalterada.
+   ====================================================================== */
+.tabela-mobile-frozen-head {
+  display: none;
+}
+
+@media (max-width: 820px) {
+  .tabela-br tbody tr {
+    --br-tabela-row-bg: #08141b;
+    background: var(--br-tabela-row-bg) !important;
+  }
+  .tabela-br tbody tr:nth-child(even) {
+    --br-tabela-row-bg: #0a171f;
+  }
+  .tabela-br tbody tr.zona-libertadores {
+    --br-tabela-row-bg: #0a1a18;
+  }
+  .tabela-br tbody tr.zona-prelibertadores {
+    --br-tabela-row-bg: #111c18;
+  }
+  .tabela-br tbody tr.zona-rebaixamento {
+    --br-tabela-row-bg: #18151b;
+  }
+
+  .tabela-br th:nth-child(1),
+  .tabela-br td:nth-child(1),
+  .tabela-br th:nth-child(2),
+  .tabela-br td:nth-child(2) {
+    position: sticky !important;
+    background: var(--br-tabela-row-bg, #142027) !important;
+    background-clip: padding-box !important;
+  }
+  .tabela-br th:nth-child(1),
+  .tabela-br td:nth-child(1) {
+    left: 0 !important;
+    z-index: 7 !important;
+  }
+  .tabela-br th:nth-child(2),
+  .tabela-br td:nth-child(2) {
+    left: 54px !important;
+    z-index: 6 !important;
+    box-shadow: 10px 0 14px -13px rgba(0, 0, 0, .95) !important;
+  }
+  .tabela-br thead th:nth-child(1),
+  .tabela-br thead th:nth-child(2) {
+    z-index: 12 !important;
+    background: #142027 !important;
+  }
+  .tabela-br tbody td:nth-child(1),
+  .tabela-br tbody td:nth-child(2) {
+    background: var(--br-tabela-row-bg) !important;
+  }
+
+  .tabela-mobile-frozen-head {
+    position: fixed;
+    z-index: 480;
+    overflow: hidden;
+    pointer-events: none;
+    border: 1px solid rgba(163, 230, 53, .18);
+    border-top: 0;
+    border-radius: 0 0 11px 11px;
+    background: #142027;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .38);
+    opacity: 0;
+    visibility: hidden;
+  }
+  .tabela-mobile-frozen-head.is-visible {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+  }
+  .tabela-mobile-frozen-head-scroll {
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    pointer-events: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .tabela-mobile-frozen-head-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  .tabela-br-frozen-head-table {
+    margin: 0 !important;
+    table-layout: fixed !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+  }
+  .tabela-br-frozen-head-table thead th {
+    top: auto !important;
+    height: 100% !important;
+    background: #142027 !important;
+  }
+}

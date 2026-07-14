@@ -2185,7 +2185,7 @@ body > .container > section.hero > img {
   }
 
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260713-disclaimers-publicos-v1">
+<link rel="stylesheet" href="css/br-global.css?v=20260714-tabela-congelada-mobile-v1">
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
@@ -3487,6 +3487,128 @@ function renderTabela() {
   html += '</tbody></table></div></div>';
   html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:#22c55e;"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:#a3e635;"></div>Pré-Libertadores (5º–6º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#e11d48;"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu</div></div>';
   document.getElementById('view-tabela').innerHTML = html;
+  requestAnimationFrame(ativarTabelaCongeladaMobile);
+}
+
+/* Congelar painéis da classificação no celular.
+   - POS e TIME permanecem visíveis durante a rolagem horizontal.
+   - Um clone somente visual do cabeçalho acompanha a rolagem vertical,
+     sempre abaixo do menu sticky. A tabela e os dados originais não mudam. */
+function destruirTabelaCongeladaMobile() {
+  const controle = window.__brTabelaCongeladaMobile;
+  if (!controle || typeof controle.destroy !== 'function') return;
+  controle.destroy();
+  delete window.__brTabelaCongeladaMobile;
+}
+
+function ativarTabelaCongeladaMobile() {
+  destruirTabelaCongeladaMobile();
+
+  const shell = document.querySelector('#view-tabela .tabela-shell');
+  const scroll = shell && shell.querySelector('.tabela-scroll');
+  const tabela = scroll && scroll.querySelector('.tabela-br');
+  const cabecalho = tabela && tabela.tHead;
+  if (!shell || !scroll || !tabela || !cabecalho) return;
+
+  const mediaMobile = window.matchMedia('(max-width: 820px)');
+  const flutuante = document.createElement('div');
+  flutuante.className = 'tabela-mobile-frozen-head';
+  flutuante.setAttribute('aria-hidden', 'true');
+
+  const viewport = document.createElement('div');
+  viewport.className = 'tabela-mobile-frozen-head-scroll';
+
+  const tabelaClone = document.createElement('table');
+  tabelaClone.className = 'tabela-br tabela-br-frozen-head-table';
+  tabelaClone.appendChild(cabecalho.cloneNode(true));
+  viewport.appendChild(tabelaClone);
+  flutuante.appendChild(viewport);
+  document.body.appendChild(flutuante);
+
+  let quadro = 0;
+  let observador = null;
+  let observadorVisibilidade = null;
+
+  const sincronizarHorizontal = () => {
+    if (viewport.scrollLeft !== scroll.scrollLeft) viewport.scrollLeft = scroll.scrollLeft;
+  };
+
+  const atualizar = () => {
+    quadro = 0;
+
+    if (!mediaMobile.matches || !document.body.contains(shell) || shell.offsetParent === null) {
+      flutuante.classList.remove('is-visible');
+      return;
+    }
+
+    const shellRect = shell.getBoundingClientRect();
+    const scrollRect = scroll.getBoundingClientRect();
+    const nav = document.querySelector('.nav');
+    const navRect = nav ? nav.getBoundingClientRect() : null;
+    const topo = Math.max(4, navRect && navRect.bottom > 0 ? Math.ceil(navRect.bottom + 6) : 4);
+    const alturaCabecalho = Math.max(34, Math.ceil(cabecalho.getBoundingClientRect().height));
+    const tabelaRect = tabela.getBoundingClientRect();
+    const deveExibir = shellRect.top < topo && shellRect.bottom > topo + alturaCabecalho + 2 && scrollRect.width > 0;
+
+    if (!deveExibir) {
+      flutuante.classList.remove('is-visible');
+      return;
+    }
+
+    flutuante.style.left = Math.round(scrollRect.left) + 'px';
+    flutuante.style.top = topo + 'px';
+    flutuante.style.width = Math.round(scrollRect.width) + 'px';
+    flutuante.style.height = alturaCabecalho + 'px';
+    tabelaClone.style.width = Math.round(tabelaRect.width) + 'px';
+    tabelaClone.style.minWidth = Math.round(tabelaRect.width) + 'px';
+    flutuante.classList.add('is-visible');
+    sincronizarHorizontal();
+  };
+
+  const agendarAtualizacao = () => {
+    if (!quadro) quadro = requestAnimationFrame(atualizar);
+  };
+
+  const aoRolarTabela = () => {
+    sincronizarHorizontal();
+    agendarAtualizacao();
+  };
+
+  scroll.addEventListener('scroll', aoRolarTabela, { passive: true });
+  window.addEventListener('scroll', agendarAtualizacao, { passive: true });
+  window.addEventListener('resize', agendarAtualizacao, { passive: true });
+  window.addEventListener('orientationchange', agendarAtualizacao, { passive: true });
+  if (typeof mediaMobile.addEventListener === 'function') mediaMobile.addEventListener('change', agendarAtualizacao);
+  else if (typeof mediaMobile.addListener === 'function') mediaMobile.addListener(agendarAtualizacao);
+
+  if (typeof ResizeObserver !== 'undefined') {
+    observador = new ResizeObserver(agendarAtualizacao);
+    observador.observe(shell);
+    observador.observe(tabela);
+  }
+
+  const viewTabela = document.getElementById('view-tabela');
+  if (viewTabela && typeof MutationObserver !== 'undefined') {
+    observadorVisibilidade = new MutationObserver(agendarAtualizacao);
+    observadorVisibilidade.observe(viewTabela, { attributes: true, attributeFilter: ['style', 'class', 'hidden'] });
+  }
+
+  window.__brTabelaCongeladaMobile = {
+    destroy() {
+      if (quadro) cancelAnimationFrame(quadro);
+      scroll.removeEventListener('scroll', aoRolarTabela);
+      window.removeEventListener('scroll', agendarAtualizacao);
+      window.removeEventListener('resize', agendarAtualizacao);
+      window.removeEventListener('orientationchange', agendarAtualizacao);
+      if (typeof mediaMobile.removeEventListener === 'function') mediaMobile.removeEventListener('change', agendarAtualizacao);
+      else if (typeof mediaMobile.removeListener === 'function') mediaMobile.removeListener(agendarAtualizacao);
+      if (observador) observador.disconnect();
+      if (observadorVisibilidade) observadorVisibilidade.disconnect();
+      flutuante.remove();
+    }
+  };
+
+  atualizar();
 }
 
 // Forma dos últimos 5 jogos de cada time (V/E/D), a partir de resultados.json.
