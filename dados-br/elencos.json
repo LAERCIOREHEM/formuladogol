@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-07-13T12:05:19.079496-03:00",
+  "atualizado_em": "2026-07-14T05:29:47.678528-03:00",
   "fonte": "ESPN roster endpoint + base local sanitizada + complemento documental quando necessário",
   "metodologia": "Aceita somente registros identificáveis como atletas, remove cabeçalhos/metadados, traduz posições, deduplica por id/nome e preserva o último elenco íntegro quando a coleta oscila.",
   "fontes_complementares": {
@@ -760,7 +760,7 @@
         "nome": "Román Gómez",
         "posicao": "Defensor",
         "numero": "31",
-        "idade": 21
+        "idade": 22
       },
       {
         "id": "82782",
@@ -1725,7 +1725,7 @@
         "nome": "Gustavo Talles",
         "posicao": "Defensor",
         "numero": "23",
-        "idade": 22
+        "idade": 23
       },
       {
         "id": "421903",
@@ -3900,7 +3900,7 @@
         "nome": "Juan Nardoni",
         "posicao": "Meio-campista",
         "numero": "5",
-        "idade": 23
+        "idade": 24
       },
       {
         "id": "421529",
@@ -3970,7 +3970,7 @@
         "nome": "Benjamin",
         "posicao": "Atacante",
         "numero": "57",
-        "idade": 16
+        "idade": 17
       },
       {
         "id": "252576",
@@ -6630,7 +6630,9 @@
     "total_jogadores": 935,
     "registros_rejeitados": 0,
     "clubes_com_complemento": 0,
-    "clubes_preservados": 0
+    "clubes_preservados": 1
   },
-  "avisos": []
+  "avisos": [
+    "Remo: roster ESPN incompleto (1 válidos); base íntegra preservada"
+  ]
 }
