@@ -280,8 +280,8 @@ html, body {
     overflow: hidden !important;
   }
   .tabela-br {
-    width: 736px !important;
-    min-width: 736px !important;
+    width: 702px !important;
+    min-width: 702px !important;
     max-width: none !important;
     table-layout: fixed !important;
     border-collapse: separate !important;
@@ -298,15 +298,25 @@ html, body {
   }
   .tabela-br th:nth-child(1),
   .tabela-br td:nth-child(1) {
-    width: 46px !important;
-    min-width: 46px !important;
-    max-width: 46px !important;
+    padding-left: 3px !important;
+    padding-right: 3px !important;
   }
   .tabela-br th:nth-child(2),
   .tabela-br td:nth-child(2) {
-    width: 148px !important;
-    min-width: 148px !important;
-    max-width: 148px !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .tabela-br th:nth-child(1),
+  .tabela-br td:nth-child(1) {
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+  }
+  .tabela-br th:nth-child(2),
+  .tabela-br td:nth-child(2) {
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
   }
   .tabela-br th:nth-child(3),
   .tabela-br td:nth-child(3) { width: 50px !important; min-width: 50px !important; max-width: 50px !important; }
@@ -330,7 +340,7 @@ html, body {
   .tabela-br td:nth-child(12) { width: 120px !important; min-width: 120px !important; max-width: 120px !important; }
 
   .tabela-time-cel {
-    gap: 5px !important;
+    gap: 4px !important;
     min-width: 0 !important;
     max-width: 100% !important;
   }
@@ -730,7 +740,7 @@ html.br-private-pending body {
 
 
 /* ======================================================================
-   TABELA MOBILE — COMPACTAÇÃO DAS COLUNAS FIXAS (2026-07-14)
+   TABELA MOBILE — COMPACTAÇÃO NO LIMITE DAS COLUNAS FIXAS (2026-07-14)
    Reduz somente no celular a largura de POS/TIME e os espaçamentos internos,
    mantendo nomes como "Vasco da Gama" inteiros e a tabela desktop intacta.
    ====================================================================== */
@@ -778,7 +788,7 @@ html.br-private-pending body {
   }
   .tabela-br th:nth-child(2),
   .tabela-br td:nth-child(2) {
-    left: 46px !important;
+    left: 38px !important;
     z-index: 6 !important;
     box-shadow: 10px 0 14px -13px rgba(0, 0, 0, .95) !important;
   }
