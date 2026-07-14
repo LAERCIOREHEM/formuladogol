@@ -3440,20 +3440,8 @@ function renderTabela() {
   const forma = calcularFormaTimes();
   if (!state.resultadosCarregados) carregarResultados();
 
-  const lider = state.tabela[0] || {};
-  const z4 = state.tabela.filter(t => t.pos >= 17).map(t => t.time).join(', ');
-  const melhorAtaque = state.tabela.slice().sort((a,b) => (b.gp || 0) - (a.gp || 0))[0] || {};
-  const melhorDefesa = state.tabela.slice().sort((a,b) => (a.gc || 999) - (b.gc || 999))[0] || {};
-
   let html = '<div class="br-panel-title"><div><div class="br-kicker">Classificação oficial</div><h2>Tabela do Brasileirão 2026</h2></div>';
   html += `<span style="font-size:11px;color:var(--text-tertiary);">${state.ultimaAtualizacao ? 'Atualizada ' + formatarHora(state.ultimaAtualizacao) : 'Fonte: ESPN'}</span></div>`;
-  html += '<div class="br-overview">';
-  html += `<div class="br-stat-card"><div class="br-stat-label">Líder</div><div class="br-stat-value">${lider.time || '-'}</div><div class="br-stat-note">${lider.pontos != null ? lider.pontos + ' pontos' : ''}</div></div>`;
-  html += `<div class="br-stat-card"><div class="br-stat-label">Melhor ataque</div><div class="br-stat-value">${melhorAtaque.time || '-'}</div><div class="br-stat-note">${melhorAtaque.gp != null ? melhorAtaque.gp + ' gols pró' : ''}</div></div>`;
-  html += `<div class="br-stat-card"><div class="br-stat-label">Melhor defesa</div><div class="br-stat-value">${melhorDefesa.time || '-'}</div><div class="br-stat-note">${melhorDefesa.gc != null ? melhorDefesa.gc + ' gols sofridos' : ''}</div></div>`;
-  html += `<div class="br-stat-card"><div class="br-stat-label">Z4 atual</div><div class="br-stat-value" style="font-size:16px;line-height:1.2;">${z4 || '-'}</div><div class="br-stat-note">zona de rebaixamento</div></div>`;
-  html += '</div>';
-
   html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
   html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><thead><tr>' +
     '<th style="width:64px;">Pos</th><th>Time</th>' +
@@ -3748,10 +3736,6 @@ function renderJogos() {
   const chavesOrdenadas = Object.keys(grupos).sort();
   const meta = state.jogosMeta || {};
   const temLive = espnLiveTemJogoRolando();
-  const datas = jogosVisiveis.map(j => j.data_iso).filter(Boolean).sort();
-  const primeiraData = datas[0] ? formatarDataAgrupada(datas[0]) : '-';
-  const qtdeClubes = clubesPresentes.length;
-
   let html = '<div class="section-title-row">';
   html += `<div><div class="br-kicker">Agenda e transmissão</div><h2>Próximos jogos</h2></div>`;
   if (temLive) {
@@ -3759,13 +3743,6 @@ function renderJogos() {
   } else if (meta.atualizado_em_br) {
     html += `<span style="font-size:11px;color:var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
   }
-  html += '</div>';
-
-  html += '<div class="br-overview">';
-  html += `<div class="br-stat-card"><div class="br-stat-label">Jogos listados</div><div class="br-stat-value">${jogosVisiveis.length}</div><div class="br-stat-note">${filtro ? 'filtrados por ' + filtro : 'próximos jogos'}</div></div>`;
-  html += `<div class="br-stat-card"><div class="br-stat-label">Primeira data</div><div class="br-stat-value" style="font-size:17px;line-height:1.2;">${primeiraData}</div><div class="br-stat-note">fuso de Brasília</div></div>`;
-  html += `<div class="br-stat-card"><div class="br-stat-label">Clubes filtráveis</div><div class="br-stat-value">${qtdeClubes}</div><div class="br-stat-note">selecione pelo menu abaixo</div></div>`;
-  html += `<div class="br-stat-card"><div class="br-stat-label">Fonte viva</div><div class="br-stat-value" style="font-size:18px;">ESPN</div><div class="br-stat-note">dados ESPN</div></div>`;
   html += '</div>';
 
   const filtroEsc = filtro ? ESCUDOS_TIMES[filtro] : null;

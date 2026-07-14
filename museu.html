@@ -51,17 +51,6 @@
     </nav>
 
     <main>
-      <section class="page-title panel">
-        <div class="panel-inner">
-          <div class="kicker">História · Campeões · Recordes</div>
-          <h1>Museu do Brasileirão</h1>
-          <p>Linha do tempo dos campeões, marcos históricos e maiores vencedores em uma página leve, visual e pronta para crescer.</p>
-          <div class="meta-line" id="meta-line">Carregando museu...</div>
-        </div>
-      </section>
-
-      <section class="cards-resumo" id="cards-resumo" aria-live="polite"></section>
-
       <section class="panel">
         <div class="panel-inner">
           <div class="section-head">
@@ -137,7 +126,7 @@
     </footer>
   </div>
 
-  <script src="js/br-museu.js?v=20260707-ajustes-finais-v1"></script>
+  <script src="js/br-museu.js?v=20260714-remocao-intro-v1"></script>
   <script>
     document.querySelectorAll('[data-anchor]').forEach(function(a){
       a.addEventListener('click', function(){ sessionStorage.setItem('brViewInicial', a.getAttribute('data-anchor')); });
