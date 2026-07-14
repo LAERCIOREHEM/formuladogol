@@ -652,9 +652,11 @@
     const summary = await loadSummary(selected);
     renderMain(selected, summary, all);
     updateCountdowns();
-    badge.classList.toggle("is-live", Boolean(selected && selected.state === "in"));
-    badge.classList.remove("is-error");
-    badge.textContent = state.ultimaAtualizacao ? "Atualizado " + formatClockTime(state.ultimaAtualizacao) + " · 30s" : "Atualizando a cada 30s";
+    if (badge) {
+      badge.classList.toggle("is-live", Boolean(selected && selected.state === "in"));
+      badge.classList.remove("is-error");
+      badge.textContent = state.ultimaAtualizacao ? "Atualizado " + formatClockTime(state.ultimaAtualizacao) + " · 30s" : "Atualizando a cada 30s";
+    }
   }
 
   function updateCountdowns() {
@@ -690,9 +692,11 @@
     } catch (e) {
       console.warn("Ao vivo indisponível:", e);
       state.ultimaFalha = e && e.message ? e.message : String(e);
-      badge.classList.add("is-error");
-      badge.classList.remove("is-live");
-      badge.textContent = "Fonte temporariamente indisponível";
+      if (badge) {
+        badge.classList.add("is-error");
+        badge.classList.remove("is-live");
+        badge.textContent = "Fonte temporariamente indisponível";
+      }
       showAlert("A ESPN não respondeu nesta tentativa. A última informação válida permanece na tela e uma nova tentativa ocorrerá automaticamente.");
       if (state.primeiraCarga) {
         try {

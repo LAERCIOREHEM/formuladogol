@@ -231,20 +231,6 @@
     return `<div class="stats-empty"><strong>${escapeHtml(message)}</strong>${extra ? `<span>${escapeHtml(extra)}</span>` : ""}</div>`;
   }
 
-  function renderMeta() {
-    const updated = state.leaders?.atualizado_em || state.competition?.atualizado_em || state.ranking?.atualizado_em || state.table?.atualizado_em;
-    const games = state.competition?.resumo?.jogos_finalizados ?? resultsRows().length;
-    const publicGames = state.competition?.resumo?.jogos_com_publico ?? state.details?.total_com_publico;
-    const status = state.audit?.status || state.leaders?.status || "indisponível";
-    const pills = [
-      `<span class="meta-pill">Atualizado: <b>${escapeHtml(dateTimeBR(updated))}</b></span>`,
-      `<span class="meta-pill">Jogos processados: <b>${escapeHtml(integer(games))}</b></span>`,
-      Number.isFinite(Number(publicGames)) ? `<span class="meta-pill">Com público: <b>${escapeHtml(integer(publicGames))}</b></span>` : "",
-      `<span class="meta-pill ${status === "ok" || status === "valido" ? "meta-ok" : "meta-wait"}">${status === "ok" || status === "valido" ? "Dados auditados" : "Aguardando atualização completa"}</span>`,
-    ].filter(Boolean);
-    $("meta-line").innerHTML = pills.join("");
-  }
-
   function summaryCard(icon, label, primary, secondary, team) {
     const logo = team ? shield(team, "summary-shield") : `<span class="summary-icon">${icon}</span>`;
     return `<article class="stats-summary-card">
@@ -630,7 +616,6 @@
   }
 
   function renderAll() {
-    renderMeta();
     renderSummary();
     renderPlayers("artilheiros");
     renderPlayers("assistencias");

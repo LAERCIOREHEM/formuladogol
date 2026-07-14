@@ -116,19 +116,6 @@
     });
   }
 
-  function renderResumo(){
-    const estados = [...new Set(state.clubes.map(c => c.uf))].length;
-    const lider = state.tabela[0];
-    const numeroTitulos = (c) => parseInt(String(c.titulos_brasileiros || "0"), 10) || 0;
-    const maisTitulos = state.clubes.slice().sort((a,b) => numeroTitulos(b) - numeroTitulos(a))[0];
-    const regioes = [...new Set(state.clubes.map(c => c.regiao))].length;
-    $("#cards-resumo").innerHTML = `
-      <article class="summary-card"><div class="summary-label">Clubes</div><div class="summary-value">${state.clubes.length}</div><div class="summary-sub">Série A 2026 mapeada</div></article>
-      <article class="summary-card"><div class="summary-label">UFs</div><div class="summary-value">${estados}</div><div class="summary-sub">presença nacional no torneio</div></article>
-      <article class="summary-card"><div class="summary-label">Líder atual</div><div class="summary-value">${escapeHtml(lider?.time || "—")}</div><div class="summary-sub">${lider ? `${lider.pontos} pts · ${lider.aproveitamento}%` : "aguardando tabela"}</div></article>
-      <article class="summary-card"><div class="summary-label">Maior campeão</div><div class="summary-value">${escapeHtml(maisTitulos?.nome || "—")}</div><div class="summary-sub">${escapeHtml(maisTitulos?.titulos_brasileiros || "—")} títulos brasileiros</div></article>
-    `;
-  }
   function renderChips(){
     const regioes = ["Todas", ...new Set(state.clubes.map(c => c.regiao).filter(Boolean).sort())];
     $("#chips-regiao").innerHTML = regioes.map(r => `<button class="chip ${state.filtroRegiao === r ? "active" : ""}" type="button" data-regiao="${escapeAttr(r)}">${escapeHtml(r)}</button>`).join("");
@@ -266,12 +253,8 @@
         </div>`).join("")}</div>
       </section>`).join("")}`;
   }
-  function renderMeta(){
-    const totalElencos = Object.values(state.elencos).reduce((acc, jogadores) => acc + (Array.isArray(jogadores) ? jogadores.length : 0), 0);
-    $("#meta-line").innerHTML = `<span class="meta-pill">${state.clubes.length} clubes</span><span class="meta-pill">${totalElencos.toLocaleString("pt-BR")} jogadores</span><span class="meta-pill">tabela ESPN integrada</span><span class="meta-pill">jogos por clube</span>`;
-  }
   function render(){
-    renderResumo(); renderChips(); renderGrid(); renderMeta(); renderDetalhe();
+    renderChips(); renderGrid(); renderDetalhe();
   }
   async function init(){
     const [clubesData, tabelaData, rankingData, eventosData, elencosData, mascotesData] = await Promise.all([

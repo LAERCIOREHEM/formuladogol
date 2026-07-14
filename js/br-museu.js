@@ -15,19 +15,6 @@
     return c.escudo ? `<img src="${escapeAttr(c.escudo)}" alt="" loading="lazy" onerror="this.style.display='none'">` : "";
   }
   function decada(ano){ return Math.floor(Number(ano)/10)*10 + "s"; }
-  function renderResumo(){
-    const d = state.data;
-    const total = d.campeoes.length;
-    const clubes = new Set(d.campeoes.map(c => c.campeao)).size;
-    const maior = d.contagem_titulos[0];
-    const pontosCorridos = d.campeoes.filter(c => c.formato === "Pontos corridos").length;
-    $("#cards-resumo").innerHTML = `
-      <article class="summary-card"><div class="summary-label">Conquistas listadas</div><div class="summary-value">${total}</div><div class="summary-sub">inclui anos com dois torneios nacionais</div></article>
-      <article class="summary-card"><div class="summary-label">Clubes campeões</div><div class="summary-value">${clubes}</div><div class="summary-sub">linha principal 1959–2025</div></article>
-      <article class="summary-card"><div class="summary-label">Maior campeão</div><div class="summary-value">${escapeHtml(maior.clube)}</div><div class="summary-sub">${maior.titulos} títulos nacionais</div></article>
-      <article class="summary-card"><div class="summary-label">Pontos corridos</div><div class="summary-value">${pontosCorridos}</div><div class="summary-sub">desde 2003</div></article>
-    `;
-  }
   function renderRecordes(){
     $("#recordes").innerHTML = state.data.records.map(r => `<article class="record-card"><div class="kicker">${escapeHtml(r.titulo)}</div><strong>${escapeHtml(r.valor)}</strong><p>${escapeHtml(r.detalhe)}</p></article>`).join("");
   }
@@ -68,10 +55,7 @@
       </div>
     </article>`).join("");
   }
-  function renderMeta(){
-    $("#meta-line").innerHTML = `<span class="meta-pill">${escapeHtml(state.data.nota_oficial)}</span>`;
-  }
-  function render(){ renderResumo(); renderRecordes(); renderBarras(); renderMarcos(); renderChips(); renderTimeline(); renderMeta(); }
+  function render(){ renderRecordes(); renderBarras(); renderMarcos(); renderChips(); renderTimeline(); }
   async function init(){
     try {
       state.data = await fetchJson("dados-br/museu-brasileirao.json");
@@ -79,7 +63,6 @@
       render();
     } catch (err) {
       console.error(err);
-      $("#meta-line").innerHTML = `<span class="meta-pill">Não foi possível carregar o museu. Confira dados-br/museu-brasileirao.json.</span>`;
       $("#timeline").innerHTML = `<div class="empty-state">Falha ao carregar dados do Museu do Brasileirão.</div>`;
     }
   }
