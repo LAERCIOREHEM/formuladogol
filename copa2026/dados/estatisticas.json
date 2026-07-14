@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-14T19:12:46.591351Z",
+  "atualizado_em": "2026-07-14T19:42:39.226856Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 100,
+  "jogos_processados": 101,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -89,6 +89,20 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Mikel Oyarzabal",
+      "equipe": "ESP",
+      "gols": 5,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760453",
+        "760497",
+        "760514"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Ousmane Dembélé",
       "equipe": "FRA",
       "gols": 5,
@@ -129,19 +143,6 @@
         "760467",
         "760491",
         "760505"
-      ],
-      "total_cartoes": 0
-    },
-    {
-      "nome": "Mikel Oyarzabal",
-      "equipe": "ESP",
-      "gols": 4,
-      "assistencias": 1,
-      "amarelos": 0,
-      "vermelhos": 0,
-      "jogos": [
-        "760453",
-        "760497"
       ],
       "total_cartoes": 0
     },
@@ -2601,12 +2602,13 @@
       "equipe": "ESP",
       "gols": 0,
       "assistencias": 2,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760497"
+        "760497",
+        "760514"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Mohamed Salah",
@@ -2719,12 +2721,13 @@
       "equipe": "FRA",
       "gols": 0,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760432"
+        "760432",
+        "760514"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Akmal Mozgovoy",
@@ -3703,13 +3706,14 @@
     {
       "nome": "Mikel Oyarzabal",
       "equipe": "ESP",
-      "gols": 4,
+      "gols": 5,
       "assistencias": 1,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
         "760453",
-        "760497"
+        "760497",
+        "760514"
       ],
       "total_cartoes": 0
     },
@@ -4921,6 +4925,19 @@
       "jogos": [
         "760464",
         "760502"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Adrien Rabiot",
+      "equipe": "FRA",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760432",
+        "760514"
       ],
       "total_cartoes": 1
     },
@@ -6367,6 +6384,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Marc Cucurella",
+      "equipe": "ESP",
+      "gols": 0,
+      "assistencias": 2,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760497",
+        "760514"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Marc Guéhi",
       "equipe": "ENG",
       "gols": 0,
@@ -7241,10 +7271,10 @@
       "equipe": "FRA",
       "gols": 16,
       "assistencias": 14,
-      "amarelos": 4,
+      "amarelos": 5,
       "vermelhos": 0,
-      "jogos": 6,
-      "media_gols": 2.67
+      "jogos": 7,
+      "media_gols": 2.29
     },
     {
       "equipe": "BEL",
@@ -7274,6 +7304,15 @@
       "media_gols": 2.17
     },
     {
+      "equipe": "ESP",
+      "gols": 12,
+      "assistencias": 8,
+      "amarelos": 6,
+      "vermelhos": 0,
+      "jogos": 7,
+      "media_gols": 1.71
+    },
+    {
       "equipe": "GER",
       "gols": 11,
       "assistencias": 10,
@@ -7299,15 +7338,6 @@
       "vermelhos": 1,
       "jogos": 5,
       "media_gols": 2.2
-    },
-    {
-      "equipe": "ESP",
-      "gols": 11,
-      "assistencias": 8,
-      "amarelos": 5,
-      "vermelhos": 0,
-      "jogos": 6,
-      "media_gols": 1.83
     },
     {
       "equipe": "SEN",
