@@ -490,7 +490,13 @@
   function caminhoCurto(c) {
     if (!c) return "";
     const fmt = id => id ? `${flag(id)} ${nome(id)}` : "—";
-    const semi = (c.semifinais || []).map(s => `${fmt(s.vencedor)} passa`).join(" · ");
+    // Mostra apenas confrontos ainda abertos no estado atual da Copa.
+    // Ex.: se a Espanha já está classificada para a final, não faz sentido
+    // repetir "Espanha passa" em todos os cenários.
+    const semi = (c.semifinais || [])
+      .filter(s => !s.fixo)
+      .map(s => `${fmt(s.vencedor)} passa`)
+      .join(" · ");
     const final = c.final ? `${fmt(c.final.campeao)} campeão · ${fmt(c.final.vice)} vice` : "";
     const terc = c.terceiro_lugar ? `${fmt(c.terceiro_lugar.terceiro)} 3º · ${fmt(c.terceiro_lugar.quarto)} 4º` : "";
     return [semi, final, terc].filter(Boolean).join("<br>");
