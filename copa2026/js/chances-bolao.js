@@ -10,7 +10,7 @@
 (function (global) {
   "use strict";
 
-  const VERSAO = "20260715-terceiro-lugar-8-cenarios";
+  const VERSAO = "20260715-terceiro-lugar-8-cenarios-v2";
 
   // Chave real das quartas de final informada/confirmada no site.
   // M97/M98 formam o caminho M101; M99/M100 formam o caminho M102.
@@ -254,7 +254,7 @@
       terceiro: c.terceiro,
       quarto: c.quarto,
       quartas: c.quartas.map(x => ({ jogo: x.jogo, vencedor: x.vencedor, perdedor: x.perdedor })),
-      semifinais: c.semifinais.map(x => ({ jogo: x.jogo, times: x.times.slice(), vencedor: x.vencedor, perdedor: x.perdedor })),
+      semifinais: c.semifinais.map(x => ({ jogo: x.jogo, times: x.times.slice(), vencedor: x.vencedor, perdedor: x.perdedor, fixo: !!x.fixo })),
       final: Object.assign({}, c.final),
       terceiro_lugar: Object.assign({}, c.terceiro_lugar)
     };
