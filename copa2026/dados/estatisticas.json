@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-15T20:42:43.454465Z",
+  "atualizado_em": "2026-07-15T21:12:44.483627Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 102,
@@ -908,6 +908,20 @@
       "vermelhos": 0,
       "jogos": [
         "760460"
+      ],
+      "total_cartoes": 0
+    },
+    {
+      "nome": "Anthony Gordon",
+      "equipe": "ENG",
+      "gols": 1,
+      "assistencias": 3,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760495",
+        "760512",
+        "760515"
       ],
       "total_cartoes": 0
     },
@@ -2330,13 +2344,14 @@
     {
       "nome": "Anthony Gordon",
       "equipe": "ENG",
-      "gols": 0,
+      "gols": 1,
       "assistencias": 3,
       "amarelos": 0,
       "vermelhos": 0,
       "jogos": [
         "760495",
-        "760512"
+        "760512",
+        "760515"
       ],
       "total_cartoes": 0
     },
@@ -3738,6 +3753,18 @@
       "total_cartoes": 0
     },
     {
+      "nome": "Morgan Rogers",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 0,
+      "vermelhos": 0,
+      "jogos": [
+        "760515"
+      ],
+      "total_cartoes": 0
+    },
+    {
       "nome": "Mostafa Zico",
       "equipe": "EGY",
       "gols": 2,
@@ -4015,12 +4042,13 @@
       "equipe": "ARG",
       "gols": 0,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760433"
+        "760433",
+        "760515"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Romelu Lukaku",
@@ -6967,6 +6995,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Rodrigo De Paul",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760433",
+        "760515"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Roger Ibañez",
       "equipe": "BRA",
       "gols": 0,
@@ -7327,7 +7368,7 @@
       "equipe": "ARG",
       "gols": 17,
       "assistencias": 10,
-      "amarelos": 8,
+      "amarelos": 9,
       "vermelhos": 0,
       "jogos": 7,
       "media_gols": 2.43
@@ -7351,6 +7392,15 @@
       "media_gols": 2.33
     },
     {
+      "equipe": "ENG",
+      "gols": 14,
+      "assistencias": 11,
+      "amarelos": 8,
+      "vermelhos": 1,
+      "jogos": 7,
+      "media_gols": 2.0
+    },
+    {
       "equipe": "NOR",
       "gols": 13,
       "assistencias": 10,
@@ -7358,15 +7408,6 @@
       "vermelhos": 0,
       "jogos": 6,
       "media_gols": 2.17
-    },
-    {
-      "equipe": "ENG",
-      "gols": 13,
-      "assistencias": 10,
-      "amarelos": 8,
-      "vermelhos": 1,
-      "jogos": 7,
-      "media_gols": 1.86
     },
     {
       "equipe": "ESP",
