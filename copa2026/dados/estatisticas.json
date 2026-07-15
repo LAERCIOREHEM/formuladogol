@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-15T19:12:50.435532Z",
+  "atualizado_em": "2026-07-15T19:42:54.784963Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 101,
+  "jogos_processados": 102,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -1634,12 +1634,13 @@
       "equipe": "ARG",
       "gols": 1,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760500"
+        "760500",
+        "760515"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Livano Comenencia",
@@ -3088,12 +3089,13 @@
       "equipe": "ENG",
       "gols": 0,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760437"
+        "760437",
+        "760515"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Ernest Nuamah",
@@ -3510,12 +3512,13 @@
       "equipe": "ARG",
       "gols": 1,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760500"
+        "760500",
+        "760515"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Lucas Bergvall",
@@ -5448,6 +5451,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Elliot Anderson",
+      "equipe": "ENG",
+      "gols": 0,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760437",
+        "760515"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Eren Elmali",
       "equipe": "TUR",
       "gols": 0,
@@ -6300,6 +6316,19 @@
       "vermelhos": 0,
       "jogos": [
         "760463"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Lisandro Martínez",
+      "equipe": "ARG",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760500",
+        "760515"
       ],
       "total_cartoes": 1
     },
@@ -7284,10 +7313,10 @@
       "equipe": "ARG",
       "gols": 17,
       "assistencias": 10,
-      "amarelos": 6,
+      "amarelos": 7,
       "vermelhos": 0,
-      "jogos": 6,
-      "media_gols": 2.83
+      "jogos": 7,
+      "media_gols": 2.43
     },
     {
       "equipe": "FRA",
@@ -7308,15 +7337,6 @@
       "media_gols": 2.33
     },
     {
-      "equipe": "ENG",
-      "gols": 13,
-      "assistencias": 10,
-      "amarelos": 7,
-      "vermelhos": 1,
-      "jogos": 6,
-      "media_gols": 2.17
-    },
-    {
       "equipe": "NOR",
       "gols": 13,
       "assistencias": 10,
@@ -7324,6 +7344,15 @@
       "vermelhos": 0,
       "jogos": 6,
       "media_gols": 2.17
+    },
+    {
+      "equipe": "ENG",
+      "gols": 13,
+      "assistencias": 10,
+      "amarelos": 8,
+      "vermelhos": 1,
+      "jogos": 7,
+      "media_gols": 1.86
     },
     {
       "equipe": "ESP",
