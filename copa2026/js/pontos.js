@@ -504,7 +504,7 @@
     if (!lista.length) return "";
     const melhorId = c.melhor_cenario && c.melhor_cenario.id;
     return `<div class="chance-cenarios">
-      <div class="chance-cenarios-titulo">Todos os ${total} cenários restantes</div>
+      <div class="chance-cenarios-titulo">Todos os ${total} cenários</div>
       ${lista.map((r, i) => {
         const rc = r.cenario || {};
         const caminho = caminhoCurto(rc);
@@ -533,18 +533,16 @@
     const melhor = Number(c.melhor_pontuacao || 0);
     const pior = Number(c.pior_pontuacao || 0);
     const media = Number(c.pontuacao_media_simulada || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const caminho = caminhoCurto(c.melhor_cenario);
     const cenariosHTML = cenariosDoParticipanteHTML(c, total);
     return `<button class="vermais2" data-chance="${x.nome}">🧮 Detalhar chances ▾</button>
       <div class="chancebox" id="chance-${cssId(x.nome)}" style="display:none">
-        <div class="chance-metodo">Cálculo cru: ${total} cenários restantes, sem favoritismo. Cada combinação de resultados tem o mesmo peso (${fmtPctChance(chances.cada_cenario_pct || 0)}).</div>
+        <div class="chance-metodo">Cálculo cru: ${total} cenários possíveis, sem favoritismo. Cada combinação de resultados tem o mesmo peso (${fmtPctChance(chances.cada_cenario_pct || 0)}).</div>
         <div class="chance-grid">${linhas}</div>
         <div class="chance-extra">
           <span>Melhor pontuação: <b>${melhor}</b></span>
           <span>Pior pontuação: <b>${pior}</b></span>
           <span>Média simulada: <b>${media}</b></span>
         </div>
-        ${caminho ? `<div class="chance-caminho"><b>Melhor caminho:</b><br>${caminho}</div>` : ""}
         ${cenariosHTML}
       </div>`;
   }
