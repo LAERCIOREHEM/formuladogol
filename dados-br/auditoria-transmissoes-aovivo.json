@@ -1,20 +1,170 @@
 {
   "fonte": "YouTube oficial — CazéTV e GE TV",
+  "politica": {
+    "prioridade": [
+      "cazetv",
+      "getv"
+    ],
+    "regra": "Somente canais oficiais configurados; CazéTV tem prioridade sobre GE TV.",
+    "janela": "de 24h antes até 90 min após o início",
+    "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
+  },
   "resumo": {
-    "jogos_na_janela": 0,
+    "jogos_na_janela": 2,
     "busca_pesada_executada": false,
+    "candidatos_oficiais_encontrados": 8,
     "transmissoes_publicadas": 0,
-    "sem_transmissao": 0,
+    "sem_transmissao": 2,
     "erros": 0
   },
-  "jogos_analisados": [],
+  "canais_resolvidos": {
+    "cazetv": {
+      "chave": "cazetv",
+      "nome": "CazéTV",
+      "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+      "channel_title": "CazéTV",
+      "uploads_playlist": "UUZiYbVptd3PVPf4f6eR6UaQ",
+      "handle": "@CazeTV",
+      "prioridade": "1"
+    },
+    "getv": {
+      "chave": "getv",
+      "nome": "GE TV",
+      "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+      "channel_title": "ge tv",
+      "uploads_playlist": "UUgCKagVhzGnZcuP9bSMgMCg",
+      "handle": "@getv",
+      "prioridade": "2"
+    }
+  },
+  "jogos_analisados": [
+    {
+      "event_id": "401841149",
+      "rodada": 19,
+      "jogo": "Botafogo x Santos",
+      "data_iso": "2026-07-16T19:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false
+    },
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "jogo": "Vitória x Vasco da Gama",
+      "data_iso": "2026-07-16T19:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false
+    }
+  ],
   "aceitos": [],
-  "rejeitados": [],
-  "sem_transmissao": [],
+  "rejeitados": [
+    {
+      "video_id": "-1cDeHPSklA",
+      "url": "https://www.youtube.com/watch?v=-1cDeHPSklA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "RESUMO DA COPA! RELEMBRE A TRAJETÓRIA DOS FINALISTAS DA COPA DO MUNDO FIFA™ 2026!",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-16T23:30:00-03:00",
+      "motivo": "conteúdo rejeitado: melhores momentos"
+    },
+    {
+      "video_id": "0WPkG7TlAjY",
+      "url": "https://www.youtube.com/watch?v=0WPkG7TlAjY",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "ESPANHA X ARGENTINA! RELEMBRE A TRAJETÓRIA DOS FINALISTAS DA COPA DO MUNDO FIFA™ 2026!",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-15T23:00:00-03:00",
+      "motivo": "conteúdo rejeitado: melhores momentos"
+    },
+    {
+      "video_id": "K1clU87yTrc",
+      "url": "https://www.youtube.com/watch?v=K1clU87yTrc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ESPANHA X ARGENTINA! QUEM CHEGA MAIS FORTE PARA A GRANDE FINAL DA COPA? | AQUI É COPA",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-16T15:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "QcmQ_zCf8vc",
+      "url": "https://www.youtube.com/watch?v=QcmQ_zCf8vc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "TEMOS UMA FINAL! ESPANHA E ARGENTINA DECIDEM QUEM SERÁ CAMPEÃO DA COPA DO MUNDO | LIVE DA MADRUGADA",
+      "status": "live",
+      "inicio_programado": "2026-07-15T13:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "gYmefEKDXIA",
+      "url": "https://www.youtube.com/watch?v=gYmefEKDXIA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ESPECIAL FINAL DA COPA COPA DO MUNDO! ESPANHA X ARGENTINA, TEM FAVORITO NA GRANDE FINAL?",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-16T16:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "rt8ljQWON14",
+      "url": "https://www.youtube.com/watch?v=rt8ljQWON14",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: FINAL DEFINIDA! ARGENTINA VIRA NO FINAL DE NOVO E ENCARA A ESPANHA | GERAL CAZÉTV",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-16T13:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "dzOHvJuGh8k",
+      "url": "https://www.youtube.com/watch?v=dzOHvJuGh8k",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: MESSI BRILHA EM VIRADA ESPETACULAR DA ARGENTINA SOBRE A INGLATERRA NA COPA! | Radar | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-07-15T20:00:00-03:00",
+      "motivo": "conteúdo rejeitado: pos jogo"
+    },
+    {
+      "video_id": "gveLSATN5rQ",
+      "url": "https://www.youtube.com/watch?v=gveLSATN5rQ",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "FLUMINENSE X BRAGANTINO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-17T19:00:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
+    }
+  ],
+  "sem_transmissao": [
+    {
+      "event_id": "401841149",
+      "rodada": 19,
+      "jogo": "Botafogo x Santos",
+      "data_iso": "2026-07-16T19:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
+    },
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "jogo": "Vitória x Vasco da Gama",
+      "data_iso": "2026-07-16T19:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 0,
-    "requisicoes": {}
+    "unidades": 6,
+    "requisicoes": {
+      "channels": 2,
+      "playlistItems": 2,
+      "videos": 2
+    },
+    "observacao": "search.list custa 100 unidades; canais/playlists/vídeos custam 1 unidade por chamada."
   },
-  "atualizado_em": "2026-07-12T21:20:47-03:00"
+  "atualizado_em": "2026-07-15T20:32:23-03:00"
 }
