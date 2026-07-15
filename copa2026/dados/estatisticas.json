@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-15T20:12:57.444091Z",
+  "atualizado_em": "2026-07-15T20:42:43.454465Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 102,
@@ -1026,12 +1026,13 @@
       "equipe": "ARG",
       "gols": 1,
       "assistencias": 0,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
-        "760509"
+        "760509",
+        "760515"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Daizen Maeda",
@@ -5290,6 +5291,19 @@
       "total_cartoes": 1
     },
     {
+      "nome": "Cristian Romero",
+      "equipe": "ARG",
+      "gols": 1,
+      "assistencias": 0,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760509",
+        "760515"
+      ],
+      "total_cartoes": 1
+    },
+    {
       "nome": "Crysencio Summerville",
       "equipe": "NED",
       "gols": 2,
@@ -7313,7 +7327,7 @@
       "equipe": "ARG",
       "gols": 17,
       "assistencias": 10,
-      "amarelos": 7,
+      "amarelos": 8,
       "vermelhos": 0,
       "jogos": 7,
       "media_gols": 2.43
