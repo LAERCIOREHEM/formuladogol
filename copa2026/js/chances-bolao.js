@@ -10,7 +10,7 @@
 (function (global) {
   "use strict";
 
-  const VERSAO = "20260708-etapa1b";
+  const VERSAO = "20260715-terceiro-lugar-8-cenarios";
 
   // Chave real das quartas de final informada/confirmada no site.
   // M97/M98 formam o caminho M101; M99/M100 formam o caminho M102.
@@ -66,6 +66,18 @@
 
   function opcoesVencedor(a, b, proximaLista, oficial, opcoes) {
     opcoes = opcoes || {};
+
+    // A disputa de 3º lugar é formada justamente pelos dois perdedores das
+    // semifinais. Portanto, estar em _semiLosers ou em eliminados NÃO fixa o
+    // resultado desse jogo. Enquanto 3º/4º não estiverem oficialmente decididos,
+    // os dois resultados precisam permanecer na simulação.
+    if (opcoes.terceiro) {
+      return [
+        { vencedor: a, perdedor: b, fixo: false },
+        { vencedor: b, perdedor: a, fixo: false }
+      ];
+    }
+
     const proxima = setDe(proximaLista || []);
     const eliminados = setDe(oficial && oficial.eliminados);
     const semiLosers = setDe(oficial && oficial._semiLosers);
@@ -272,7 +284,10 @@
         pior_pontuacao: Infinity,
         melhor_cenario: null,
         pior_cenario: null,
-        soma_pontuacao_final: 0
+        melhor_colocacao: Infinity,
+        pior_colocacao: -Infinity,
+        soma_pontuacao_final: 0,
+        resultados_cenarios: []
       };
     });
 
@@ -289,27 +304,43 @@
           cravados: Number(l.cr || l.cravados || 0) || 0,
           teto: Number(l.r && l.r.teto) || Number(l.teto || 0) || 0
         };
-        if (st) {
-          st.soma_pontuacao_final += pontosFinal;
-          if (pontosFinal > st.melhor_pontuacao) {
-            st.melhor_pontuacao = pontosFinal;
-            st.melhor_cenario = resumoCenario(cenario);
-          }
-          if (pontosFinal < st.pior_pontuacao) {
-            st.pior_pontuacao = pontosFinal;
-            st.pior_cenario = resumoCenario(cenario);
-          }
-        }
+        if (st) st.soma_pontuacao_final += pontosFinal;
         return item;
       }).sort(compararRanking);
 
       ranking.forEach((item, idx) => {
         const st = stats[item.nome];
         if (!st) return;
+        const colocacao = idx + 1;
+        const resumo = resumoCenario(cenario);
         if (idx === 0) st.cenarios_titulo += 1;
         if (idx === 1) st.cenarios_segundo += 1;
         if (idx === 2) st.cenarios_terceiro += 1;
         if (idx <= 2) st.cenarios_podio += 1;
+
+        st.resultados_cenarios.push({
+          id: cenario.id,
+          pontos_final: item.pontos_final,
+          colocacao,
+          campeao_bolao: idx === 0,
+          podio_bolao: idx <= 2,
+          cenario: resumo
+        });
+
+        // Melhor/pior caminho: pontuação é o critério principal; em empate,
+        // usa a melhor/pior colocação final no bolão para escolher a descrição.
+        if (item.pontos_final > st.melhor_pontuacao
+            || (item.pontos_final === st.melhor_pontuacao && colocacao < st.melhor_colocacao)) {
+          st.melhor_pontuacao = item.pontos_final;
+          st.melhor_colocacao = colocacao;
+          st.melhor_cenario = resumo;
+        }
+        if (item.pontos_final < st.pior_pontuacao
+            || (item.pontos_final === st.pior_pontuacao && colocacao > st.pior_colocacao)) {
+          st.pior_pontuacao = item.pontos_final;
+          st.pior_colocacao = colocacao;
+          st.pior_cenario = resumo;
+        }
       });
 
       if (opts.incluirRankingsPorCenario) {
@@ -347,7 +378,10 @@
         situacao_titulo: st.cenarios_titulo > 0 ? "vivo" : "sem_chance_matematica_de_titulo",
         situacao_podio: st.cenarios_podio > 0 ? "vivo" : "sem_chance_matematica_de_podio",
         melhor_cenario: st.melhor_cenario,
-        pior_cenario: st.pior_cenario
+        pior_cenario: st.pior_cenario,
+        melhor_colocacao: Number.isFinite(st.melhor_colocacao) ? st.melhor_colocacao : null,
+        pior_colocacao: Number.isFinite(st.pior_colocacao) ? st.pior_colocacao : null,
+        resultados_cenarios: st.resultados_cenarios.slice().sort((a, b) => String(a.id).localeCompare(String(b.id)))
       };
     }).sort((a, b) =>
       b.chance_titulo_pct_exata - a.chance_titulo_pct_exata
@@ -389,10 +423,12 @@
         soma_chance_titulo_pct_exata: soma("chance_titulo_pct_exata"),
         soma_chance_segundo_pct_exata: soma("chance_segundo_pct_exata"),
         soma_chance_terceiro_pct_exata: soma("chance_terceiro_pct_exata"),
+        soma_chance_podio_pct_exata: soma("chance_podio_pct_exata"),
         ok: total >= 1
           && Math.abs(soma("chance_titulo_pct_exata") - 100) < 0.00001
           && Math.abs(soma("chance_segundo_pct_exata") - 100) < 0.00001
           && Math.abs(soma("chance_terceiro_pct_exata") - 100) < 0.00001
+          && Math.abs(soma("chance_podio_pct_exata") - 300) < 0.00001
       },
       rankings_por_cenario: opts.incluirRankingsPorCenario ? rankingsPorCenario : undefined
     };

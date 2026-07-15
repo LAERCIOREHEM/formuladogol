@@ -168,7 +168,16 @@
   .chance-extra b{color:var(--branco)}
   .chance-caminho{margin-top:9px;border-top:1px dashed var(--linha);padding-top:8px;font-size:11.5px;line-height:1.55;color:#d8e2f3}
   .chance-caminho b{color:var(--gold)}
-  @media(max-width:420px){.chance-grid{grid-template-columns:1fr}.chance-card{grid-template-columns:1fr}.chance-card b,.chance-card small{text-align:left}.chance-card small{grid-column:1}}
+  .chance-cenarios{margin-top:10px;border-top:1px dashed var(--linha);padding-top:9px}
+  .chance-cenarios-titulo{font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;font-weight:900;color:var(--gold);margin-bottom:6px}
+  .chance-cenario{border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:8px;margin-top:6px;background:rgba(255,255,255,.025)}
+  .chance-cenario.melhor{border-color:rgba(244,197,66,.42);background:rgba(244,197,66,.07)}
+  .chance-cenario-head{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:10.5px;color:var(--cinza)}
+  .chance-cenario-head>b{color:var(--branco);font-size:11px}
+  .chance-cenario-head>span:last-child{margin-left:auto}.chance-cenario-head strong{color:var(--gold)}
+  .chance-cenario-selo{font-size:9px!important;text-transform:uppercase;letter-spacing:.5px;color:#3a2a00!important;background:var(--gold);border-radius:999px;padding:2px 6px;font-weight:900}
+  .chance-cenario-caminho{font-size:10.5px;line-height:1.45;color:#cbd7e8;margin-top:5px}
+  @media(max-width:420px){.chance-grid{grid-template-columns:1fr}.chance-card{grid-template-columns:1fr}.chance-card b,.chance-card small{text-align:left}.chance-card small{grid-column:1}.chance-cenario-head>span:last-child{margin-left:0;flex-basis:100%}}
 
   .vermais2{margin-top:10px;background:none;border:1px solid var(--linha);color:var(--gold);
     font-family:inherit;font-weight:700;font-size:12.5px;padding:7px 10px;border-radius:8px;cursor:pointer;width:100%}
@@ -233,8 +242,8 @@
 <script src="js/feedback.js?v=20260630menu-centro-v1"></script>
 <script src="js/engine.js?v=20260622b"></script>
 <script src="js/pontuacao.js?v=20260628teto-fix"></script>
-<script src="js/chances-bolao.js?v=20260710-vivos-campeao-podio"></script>
-<script src="js/pontos.js?v=20260711-eliminados-sem-ampulheta-v1"></script>
+<script src="js/chances-bolao.js?v=20260715-terceiro-lugar-8-cenarios"></script>
+<script src="js/pontos.js?v=20260715-cenarios-completos-v1"></script>
 <footer class="copa-footer">
   <nav class="copa-footer-nav" aria-label="Links utilitários da Copa 2026">
     <a href="onde-assistir.html"><span aria-hidden="true">📋</span> Resultados</a>

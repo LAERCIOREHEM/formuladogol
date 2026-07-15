@@ -495,6 +495,31 @@
     const terc = c.terceiro_lugar ? `${fmt(c.terceiro_lugar.terceiro)} 3º · ${fmt(c.terceiro_lugar.quarto)} 4º` : "";
     return [semi, final, terc].filter(Boolean).join("<br>");
   }
+  function ordinal(n) {
+    n = Number(n || 0);
+    return n > 0 ? `${n}º` : "—";
+  }
+  function cenariosDoParticipanteHTML(c, total) {
+    const lista = Array.isArray(c && c.resultados_cenarios) ? c.resultados_cenarios : [];
+    if (!lista.length) return "";
+    const melhorId = c.melhor_cenario && c.melhor_cenario.id;
+    return `<div class="chance-cenarios">
+      <div class="chance-cenarios-titulo">Todos os ${total} cenários restantes</div>
+      ${lista.map((r, i) => {
+        const rc = r.cenario || {};
+        const caminho = caminhoCurto(rc);
+        const destaque = melhorId && rc.id === melhorId ? " melhor" : "";
+        const selo = destaque ? '<span class="chance-cenario-selo">melhor caminho</span>' : "";
+        return `<div class="chance-cenario${destaque}">
+          <div class="chance-cenario-head">
+            <b>Cenário ${i + 1}</b>${selo}
+            <span>${ordinal(r.colocacao)} no bolão · <strong>${Number(r.pontos_final || 0)} pts</strong></span>
+          </div>
+          <div class="chance-cenario-caminho">${caminho}</div>
+        </div>`;
+      }).join("")}
+    </div>`;
+  }
   function chanceDetalheHTML(chances, x) {
     const c = dadoChance(chances, x.nome);
     if (!c) return "";
@@ -509,9 +534,10 @@
     const pior = Number(c.pior_pontuacao || 0);
     const media = Number(c.pontuacao_media_simulada || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const caminho = caminhoCurto(c.melhor_cenario);
+    const cenariosHTML = cenariosDoParticipanteHTML(c, total);
     return `<button class="vermais2" data-chance="${x.nome}">🧮 Detalhar chances ▾</button>
       <div class="chancebox" id="chance-${cssId(x.nome)}" style="display:none">
-        <div class="chance-metodo">Cálculo cru: ${total} cenários restantes, sem favoritismo. Cada jogo vale 50/50.</div>
+        <div class="chance-metodo">Cálculo cru: ${total} cenários restantes, sem favoritismo. Cada combinação de resultados tem o mesmo peso (${fmtPctChance(chances.cada_cenario_pct || 0)}).</div>
         <div class="chance-grid">${linhas}</div>
         <div class="chance-extra">
           <span>Melhor pontuação: <b>${melhor}</b></span>
@@ -519,6 +545,7 @@
           <span>Média simulada: <b>${media}</b></span>
         </div>
         ${caminho ? `<div class="chance-caminho"><b>Melhor caminho:</b><br>${caminho}</div>` : ""}
+        ${cenariosHTML}
       </div>`;
   }
 
@@ -619,10 +646,10 @@
       return c ? Number(c.cenarios_titulo || 0) : -1;
     };
     if (ORDEM === "chance") {
-      lin.sort((a, b) => chanceOrdem(b) - chanceOrdem(a) || b.r.atuais - a.r.atuais || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+      lin.sort((a, b) => chanceOrdem(b) - chanceOrdem(a) || b.r.atuais - a.r.atuais || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome, "pt-BR"));
     } else {
       const kf = KEY[ORDEM] || KEY.atuais;
-      lin.sort((a, b) => kf(b) - kf(a) || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome));
+      lin.sort((a, b) => kf(b) - kf(a) || b.cr - a.cr || b.r.teto - a.r.teto || a.nome.localeCompare(b.nome, "pt-BR"));
     }
     lin.forEach((x, i) => x.posReal = i + 1);
     const visiveis = FILTRO ? lin.filter(x => x.nome === FILTRO) : lin;
