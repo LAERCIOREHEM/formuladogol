@@ -292,12 +292,18 @@
     if (!url) return "";
     const sourceName = principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
     const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
-    const label = liveNow ? "🔴 Assistir ao vivo na " + sourceName : "▶ Assistir na " + sourceName;
-    const note = liveNow ? "Transmissão oficial ao vivo no YouTube" : "Transmissão oficial programada no YouTube";
-    const alternatives = Array.isArray(entry.alternativas) ? entry.alternativas : [];
-    const alt = alternatives.find((item) => item && safeYouTubeUrl(item.url));
-    const altHtml = alt ? '<a class="live-stream-alt" href="' + esc(safeYouTubeUrl(alt.url)) + '" target="_blank" rel="noopener noreferrer">Também disponível na ' + esc(alt.nome || "GE TV") + '</a>' : "";
-    return '<div class="live-stream-area"><a class="live-stream-button ' + (liveNow ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + '</div>' + altHtml + '</div>';
+    const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
+    const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
+    const liveStyle = liveNow || preLive;
+    const label = liveNow
+      ? "🔴 AO VIVO na " + sourceName
+      : (preLive ? "🔴 AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName);
+    const note = liveNow
+      ? "Transmissão oficial ao vivo no YouTube"
+      : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube");
+    // Regra do bolão: exibir SEMPRE um único link (CazéTV tem prioridade sobre GE TV).
+    // O robô já garante que "principal" respeita essa prioridade; alternativas não são exibidas.
+    return '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + '</div></div>';
   }
 
   async function loadLocal() {
