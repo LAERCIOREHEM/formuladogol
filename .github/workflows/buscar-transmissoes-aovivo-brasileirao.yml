@@ -10,11 +10,6 @@ on:
         required: false
         default: ''
         type: string
-      force_search:
-        description: 'Forçar search.list agora, ignorando a cadência de 2h (padrão: sim em execução manual)'
-        required: false
-        default: true
-        type: boolean
       dry_run:
         description: 'Somente auditar, sem gravar nem publicar'
         required: false
@@ -72,7 +67,6 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}
           INPUT_EVENT_ID: ${{ inputs.event_id }}
-          INPUT_FORCE_SEARCH: ${{ inputs.force_search }}
           INPUT_DRY_RUN: ${{ inputs.dry_run }}
         shell: bash
         run: |
@@ -82,9 +76,6 @@ jobs:
 
           if [[ -n "${INPUT_EVENT_ID:-}" ]]; then
             CMD+=(--event-id "${INPUT_EVENT_ID}")
-          fi
-          if [[ "${INPUT_FORCE_SEARCH:-false}" == "true" ]]; then
-            CMD+=(--force-search)
           fi
           if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
             CMD+=(--dry-run)
