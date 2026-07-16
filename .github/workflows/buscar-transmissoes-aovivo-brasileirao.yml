@@ -11,9 +11,9 @@ on:
         default: ''
         type: string
       force_search:
-        description: 'Forçar search.list agora, ignorando a cadência de 2h'
+        description: 'Forçar search.list agora, ignorando a cadência de 2h (padrão: sim em execução manual)'
         required: false
-        default: false
+        default: true
         type: boolean
       dry_run:
         description: 'Somente auditar, sem gravar nem publicar'
