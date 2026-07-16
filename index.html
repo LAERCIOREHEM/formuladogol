@@ -133,6 +133,7 @@
   .status-ok { color: var(--accent); }
   .status-loading { color: var(--warning); }
   .status-error { color: var(--danger); }
+  .status-bar.is-context-hidden { display: none !important; }
   .card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -2841,9 +2842,24 @@ function formatarHora(d) {
   return d.toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
 }
 
+function atualizarVisibilidadeStatusBar() {
+  const barra = document.getElementById('status-bar');
+  if (!barra) return;
+  const tipo = barra.dataset.status || 'loading';
+  const view = state.view;
+  // Nessas telas a própria seção já informa a atualização no lugar correto.
+  // Mantemos a barra apenas para carregamento/erro; em Aniversariantes ela
+  // nunca é pertinente, pois a página não depende da tabela ESPN.
+  const ocultarSempre = view === 'aniversariantes';
+  const ocultarQuandoOk = ['jogos', 'tabela', 'resultados'].includes(view) && tipo === 'ok';
+  barra.classList.toggle('is-context-hidden', ocultarSempre || ocultarQuandoOk);
+}
+
 function setStatus(tipo, msg) {
   const el = document.getElementById('status-text');
+  const barra = document.getElementById('status-bar');
   if (!el) return;
+  if (barra) barra.dataset.status = tipo;
   el.className = 'status-' + tipo;
   if (tipo === 'loading') {
     el.innerHTML = '<span class="spinner"></span>' + msg;
@@ -2852,6 +2868,7 @@ function setStatus(tipo, msg) {
   } else {
     el.innerHTML = '⚠ ' + msg;
   }
+  atualizarVisibilidadeStatusBar();
 }
 
 function mensagemStatusAtualizacao() {
@@ -3176,6 +3193,7 @@ function render() {
   document.getElementById('view-resultados').style.display = v === 'resultados' ? 'block' : 'none';
   document.getElementById('view-aniversariantes').style.display = v === 'aniversariantes' ? 'block' : 'none';
   document.getElementById('view-participantes').style.display = v === 'participantes' ? 'block' : 'none';
+  atualizarVisibilidadeStatusBar();
   ['rank','tabela','jogos','resultados','aniversariantes','admin','apostas','estatisticas','clubes','museu','regras'].forEach(k => {
     const b = document.getElementById('btn-' + k);
     const ativo = v === k || (v === 'em-breve' && state.futuroModulo === k);
@@ -3441,7 +3459,8 @@ function renderTabela() {
   if (!state.resultadosCarregados) carregarResultados();
 
   let html = '<div class="br-panel-title"><div><div class="br-kicker">Classificação oficial</div><h2>Tabela do Brasileirão 2026</h2></div>';
-  html += `<span style="font-size:11px;color:var(--text-tertiary);">${state.ultimaAtualizacao ? 'Atualizada ' + formatarHora(state.ultimaAtualizacao) : 'Fonte: ESPN'}</span></div>`;
+  const dataTabela = state._atualizadoEmServidor ? new Date(state._atualizadoEmServidor) : state.ultimaAtualizacao;
+  html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${dataTabela ? 'Atualizada em ' + formatarHora(dataTabela) + ' · Fonte ESPN' : 'Fonte ESPN'}</span></div>`;
   html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
   html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><thead><tr>' +
     '<th style="width:64px;">Pos</th><th>Time</th>' +
@@ -3863,7 +3882,7 @@ function renderJogos() {
   if (temLive) {
     html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> ESPN a cada 30s${state._espnLiveUltima ? ' · ' + formatarSomenteHora(state._espnLiveUltima) : ''}</span>`;
   } else if (meta.atualizado_em_br) {
-    html += `<span style="font-size:11px;color:var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
+    html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">Atualizado em ${meta.atualizado_em_br} · Fonte ESPN</span>`;
   }
   html += '</div>';
 
@@ -3961,14 +3980,6 @@ function renderJogos() {
       html += '</div>';
     }
     html += '</div>';
-  }
-
-  const fontes = [meta.fonte, 'ESPN ao vivo'].filter(Boolean).join(' + ');
-  if (fontes) {
-    html += `<div style="text-align:center;font-size:11px;color:var(--text-tertiary);margin-top:16px;">Fonte: ${fontes}</div>`;
-  }
-  if (state.melhoresMomentosMeta && state.melhoresMomentosMeta.total_vinculados) {
-    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos mapeados</span></div>`;
   }
 
   container.innerHTML = html;
@@ -4207,7 +4218,7 @@ function renderResultados() {
   html += '<div class="resultados-titulo-area">';
   html += `<h2 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; margin: 0;">Resultados${filtroTime ? ' · ' + filtroTime : ''}</h2>`;
   if (meta.atualizado_em_br) {
-    html += `<span style="font-size: 11px; color: var(--text-tertiary);">Atualizado em ${meta.atualizado_em_br}</span>`;
+    html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">Atualizado em ${meta.atualizado_em_br} · Fonte ESPN</span>`;
   }
   html += '</div>';
 
@@ -4303,11 +4314,9 @@ function renderResultados() {
     html += '</div>';
   }
 
-  if (meta.fonte) {
-    html += `<div style="text-align: center; font-size: 11px; color: var(--text-tertiary); margin-top: 16px;">Fonte: ${meta.fonte}</div>`;
-  }
-  if (state.melhoresMomentosMeta && state.melhoresMomentosMeta.total_vinculados) {
-    html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">▶️ ${state.melhoresMomentosMeta.total_vinculados} melhores momentos mapeados</span></div>`;
+  const jogosComMelhoresMomentos = (state.resultados || []).filter(r => Boolean(melhoresMomentosDoJogo(r))).length;
+  if (jogosComMelhoresMomentos) {
+    html += `<div style="text-align:center;margin-top:16px;"><span class="mm-audit-pill">▶️ ${jogosComMelhoresMomentos} jogos com melhores momentos</span></div>`;
   }
   if (state.jogosDetalhesMeta && state.jogosDetalhesMeta.total_com_estatisticas) {
     html += `<div style="text-align:center;margin-top:8px;"><span class="mm-audit-pill">📊 ${state.jogosDetalhesMeta.total_com_estatisticas} jogos com estatísticas ESPN</span></div>`;

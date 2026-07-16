@@ -651,7 +651,7 @@
     const next = all.filter((g) => g.date && g.date.getTime() > now && (!selected || !sameFixture(g, selected)))
       .sort((a, b) => a.date - b.date).slice(0, 6);
     if (!next.length) return "";
-    return '<section class="panel live-subpanel"><div class="panel-inner"><div class="live-section-head"><h2>Próximos jogos</h2><span class="live-section-note">agenda corrigida</span></div>' +
+    return '<section class="panel live-subpanel"><div class="panel-inner"><div class="live-section-head"><h2>Próximos jogos</h2></div>' +
       '<div class="live-next-list">' + next.map((g) => '<div class="live-next-item"><div class="live-next-teams">' +
         esc(g.home.nome) + ' × ' + esc(g.away.nome) + '</div><div class="live-next-meta">Rodada ' + esc(g.rodada || "—") + '<br>' + esc(formatShort(g.date)) + '</div></div>').join("") +
       '</div></div></section>';
