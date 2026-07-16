@@ -272,7 +272,7 @@
       dataIso: date ? date.toISOString() : "",
       state: String(type.state || (type.completed ? "post" : "pre")).toLowerCase(),
       completed: type.completed === true,
-      detail: status.displayClock || type.shortDetail || type.detail || status.type && status.type.detail || "",
+      detail: type.shortDetail || type.detail || status.displayClock || (status.type && status.type.detail) || "",
       clock: status.displayClock || "",
       period: Number(status.period || comp.period || 0),
       venue: venueFromCompetition(comp),
@@ -581,31 +581,62 @@
     return match ? Number(match[1]) : NaN;
   }
 
+  // Detecta intervalo APENAS quando a ESPN confirma isso pelo shortDetail
+  // ("HT"/"Halftime"/"Intervalo"), que é o campo canônico. STATUS_HALFTIME no
+  // type.name só é aceito quando o shortDetail é vazio/genérico — assim um
+  // STATUS_HALFTIME residual da ESPN não sobrescreve um minuto de jogo válido.
+  function isHalftime(statusType, shortDetail) {
+    const sd = String(shortDetail || "").trim();
+    if (/^HT$/i.test(sd)) return true;
+    if (/^half\s*time$/i.test(sd)) return true;
+    if (/^intervalo$/i.test(sd)) return true;
+    const name = String((statusType && statusType.name) || "").toUpperCase();
+    if (name === "STATUS_HALFTIME") {
+      // Aceita STATUS_HALFTIME só se o shortDetail não indica jogo rolando.
+      // Se o shortDetail tem um minuto ("30'", "45+2'"), o jogo está andando.
+      if (!sd) return true;
+      if (/^\d+/.test(sd)) return false;
+      return true;
+    }
+    return false;
+  }
+
+  // Detecta fim de jogo com precisão. type.completed é o sinal canônico da ESPN.
+  function isFinished(g, statusType, shortDetail) {
+    if (g && (g.state === "post" || g.completed)) return true;
+    if (statusType && statusType.completed === true) return true;
+    const name = String((statusType && statusType.name) || "").toUpperCase();
+    if (name === "STATUS_FULL_TIME" || name === "STATUS_FINAL" || name === "STATUS_END_OF_PERIOD" && (g && g.state === "post")) return true;
+    const sd = String(shortDetail || "").trim();
+    if (/^FT$/i.test(sd)) return true;
+    if (/^full\s*time$/i.test(sd)) return true;
+    return false;
+  }
+
   function gameState(g) {
     const statusType = g && g.raw && g.raw.status && g.raw.status.type;
-    const text = [g && g.detail, statusType && statusType.name, statusType && statusType.description, statusType && statusType.detail, statusType && statusType.shortDetail].join(" ");
+    const shortDetail = statusType && statusType.shortDetail;
+    const text = [g && g.detail, statusType && statusType.name, statusType && statusType.description, statusType && statusType.detail, shortDetail].join(" ");
     if (/postpon|adiad/i.test(text)) return { key: "postponed", label: "Adiado" };
     if (/suspend/i.test(text)) return { key: "postponed", label: "Suspenso" };
     if (/cancel/i.test(text)) return { key: "postponed", label: "Cancelado" };
+    // Fim de jogo tem prioridade sobre qualquer outra classificação.
+    if (isFinished(g, statusType, shortDetail)) return { key: "post", label: "Encerrado" };
     if (g.state === "in") {
-      const minute = clockMinute(g);
-      const halftimeMarker = /half|interval/i.test(text);
-      // A ESPN às vezes mantém STATUS_HALFTIME por alguns ciclos mesmo com o
-      // cronômetro correndo. Um minuto válido diferente de 45 prevalece sobre
-      // esse marcador residual e evita a oscilação Ao vivo ↔ Intervalo.
-      const clockClearlyRunning = Number.isFinite(minute) && minute > 0 && minute !== 45;
-      if (halftimeMarker && !clockClearlyRunning) return { key: "live", label: "Intervalo" };
+      if (isHalftime(statusType, shortDetail)) return { key: "live", label: "Intervalo" };
       return { key: "live", label: "Ao vivo" };
     }
-    if (g.state === "post" || g.completed) return { key: "post", label: "Encerrado" };
     return { key: "pre", label: "Próximo jogo" };
   }
 
+  // Igual ao Copa2026: confia no shortDetail da ESPN, que já entrega "30'",
+  // "45+2'", "HT", "FT" prontos. g.detail = displayClock || shortDetail (ver
+  // normalizeEvent), então já é a fonte certa para exibir.
   function statusText(g) {
     const s = gameState(g);
     if (s.key === "live") {
       if (s.label === "Intervalo") return "Intervalo";
-      return g.clock || g.detail || "Bola rolando";
+      return g.detail || g.clock || "Ao vivo";
     }
     if (s.key === "post") return "Fim de jogo";
     if (s.key === "postponed") return s.label;
