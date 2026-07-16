@@ -85,7 +85,7 @@ jobs:
             tabela.json resultados.json jogos.json membros.json \
             espn_eventos.json transmissoes.json \
             favicon.ico favicon-16.png favicon-32.png favicon-96.png favicon-192.png favicon-512.png \
-            apple-touch-icon.png og-image.png; do
+            apple-touch-icon.png og-image.png og-image-publico-v3.png og-image-whatsapp-v2.png og-image-aovivo-v2.jpg; do
             if [[ -e "$item" ]]; then
               cp -a "$item" _site/
             fi
