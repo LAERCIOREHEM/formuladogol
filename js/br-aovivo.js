@@ -43,11 +43,61 @@
     "Santos": "SAN", "São Paulo": "SAO", "Vasco da Gama": "VAS", "Vitória": "VIT"
   };
 
+  const PROVIDERS = {
+    premiere: {
+      label: "Premiere",
+      aliases: ["premiere"],
+      links: [
+        { label: "Globoplay", url: "https://globoplay.globo.com/categorias/premiere/" },
+        { label: "Claro tv+", url: "https://www.clarotvmais.com.br/ao-vivo" },
+        { label: "Prime Video", url: "https://www.primevideo.com/-/pt/channel/65837b7c-1c81-4f8a-80f5-d1bba5cde8f1" }
+      ]
+    },
+    sportv: {
+      label: "SporTV",
+      aliases: ["sportv", "sport tv"],
+      links: [
+        { label: "Globoplay", url: "https://globoplay.globo.com/" },
+        { label: "Claro tv+", url: "https://www.clarotvmais.com.br/ao-vivo" }
+      ]
+    },
+    disney: {
+      label: "Disney+ / ESPN",
+      aliases: ["disney+", "disney plus", "espn"],
+      links: [
+        { label: "Disney+", url: "https://www.disneyplus.com/pt-br" }
+      ]
+    },
+    prime: {
+      label: "Prime Video",
+      aliases: ["prime video", "amazon prime", "amazon prime video"],
+      links: [
+        { label: "Prime Video", url: "https://www.primevideo.com/-/pt/store" }
+      ]
+    },
+    globo: {
+      label: "Globo",
+      aliases: ["globo", "tv globo"],
+      links: [
+        { label: "Globoplay", url: "https://globoplay.globo.com/" }
+      ]
+    }
+  };
+
+  const OFFICIAL_HOSTS = new Set([
+    "globoplay.globo.com", "www.globoplay.globo.com",
+    "clarotvmais.com.br", "www.clarotvmais.com.br",
+    "claro.com.br", "www.claro.com.br",
+    "primevideo.com", "www.primevideo.com",
+    "disneyplus.com", "www.disneyplus.com"
+  ]);
+
   const state = {
     agenda: [],
     eventosLocais: [],
     diretos: [],
     transmissoes: {},
+    transmissoesTv: {},
     selecionado: "",
     resumoPorId: {},
     ultimaAtualizacao: null,
@@ -184,6 +234,24 @@
     return 0;
   }
 
+  function broadcastNames(ev, comp) {
+    const out = [];
+    const add = (value) => {
+      const name = String(value || "").trim();
+      if (!name || out.some((x) => norm(x) === norm(name))) return;
+      out.push(name);
+    };
+    const lists = [comp && comp.broadcasts, ev && ev.broadcasts];
+    for (const list of lists) {
+      for (const item of (Array.isArray(list) ? list : [])) {
+        if (Array.isArray(item.names)) item.names.forEach(add);
+        add(item.name || item.shortName || item.displayName || item.network);
+        if (item.media && Array.isArray(item.media.shortName)) item.media.shortName.forEach(add);
+      }
+    }
+    return out;
+  }
+
   function normalizeEvent(ev) {
     const comp = getCompetition(ev);
     const competitors = comp.competitors || [];
@@ -208,7 +276,7 @@
       clock: status.displayClock || "",
       period: Number(status.period || comp.period || 0),
       venue: venueFromCompetition(comp),
-      transmissao: "",
+      transmissao: broadcastNames(ev, comp).join(" / "),
       adiado: /postpon|adiad|suspend|cancel/i.test([type.name, type.description, type.detail, type.shortDetail].join(" ")),
       dataDefinir: false,
       home,
@@ -265,18 +333,32 @@
     }
   }
 
-  async function loadTransmissions() {
-    const data = await fetchJson("dados-br/transmissoes-aovivo.json?t=" + Date.now()).catch(() => ({ jogos: {} }));
-    state.transmissoes = data && data.jogos && typeof data.jogos === "object" ? data.jogos : {};
+  function safeOfficialUrl(value) {
+    try {
+      const url = new URL(String(value || ""), window.location.href);
+      if (url.protocol !== "https:" || !OFFICIAL_HOSTS.has(url.hostname.toLowerCase())) return "";
+      return url.href;
+    } catch (_) {
+      return "";
+    }
   }
 
-  function transmissionForGame(game) {
-    if (!game) return null;
-    const direct = game.id && state.transmissoes[String(game.id)];
+  async function loadTransmissions() {
+    const [youtube, tv] = await Promise.all([
+      fetchJson("dados-br/transmissoes-aovivo.json?t=" + Date.now()).catch(() => ({ jogos: {} })),
+      fetchJson("dados-br/transmissoes-tv.json?t=" + Date.now()).catch(() => ({ jogos: {} }))
+    ]);
+    state.transmissoes = youtube && youtube.jogos && typeof youtube.jogos === "object" ? youtube.jogos : {};
+    state.transmissoesTv = tv && tv.jogos && typeof tv.jogos === "object" ? tv.jogos : {};
+  }
+
+  function transmissionEntryForGame(game, source) {
+    if (!game || !source) return null;
+    const direct = game.id && source[String(game.id)];
     if (direct) return direct;
     const wanted = teamKey(game.home && game.home.nome, game.away && game.away.nome);
     const gameDate = game.date ? dateKey(game.date) : "";
-    for (const item of Object.values(state.transmissoes)) {
+    for (const item of Object.values(source)) {
       if (!item || typeof item !== "object") continue;
       if (teamKey(item.mandante, item.visitante) !== wanted) continue;
       const itemDate = parseDate(item.data_iso);
@@ -285,25 +367,98 @@
     return null;
   }
 
+  function transmissionForGame(game) {
+    return transmissionEntryForGame(game, state.transmissoes);
+  }
+
+  function providerForChannel(channel) {
+    const wanted = norm(channel);
+    if (!wanted) return null;
+    for (const [key, provider] of Object.entries(PROVIDERS)) {
+      if (provider.aliases.some((alias) => wanted.includes(norm(alias)) || norm(alias).includes(wanted))) {
+        return { key, ...provider };
+      }
+    }
+    return null;
+  }
+
+  function channelsFromText(value) {
+    const text = String(value || "").trim();
+    if (!text) return [];
+    const found = [];
+    for (const provider of Object.values(PROVIDERS)) {
+      if (provider.aliases.some((alias) => norm(text).includes(norm(alias)))) found.push(provider.label);
+    }
+    if (found.length) return Array.from(new Set(found));
+    return Array.from(new Set(text.split(/\s*(?:\/|,|;|\be\b)\s*/i).map((x) => x.trim()).filter(Boolean)));
+  }
+
+  function closedTransmissionForGame(game) {
+    const manual = transmissionEntryForGame(game, state.transmissoesTv);
+    if (manual) return manual;
+    const canais = channelsFromText(game && game.transmissao);
+    return canais.length ? { canais, origem: "ESPN" } : null;
+  }
+
+  function transmissionLabel(game) {
+    const yt = transmissionForGame(game);
+    const principal = yt && yt.principal;
+    if (principal && safeYouTubeUrl(principal.url)) return principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
+    const closed = closedTransmissionForGame(game);
+    const canais = closed && Array.isArray(closed.canais) ? closed.canais.filter(Boolean) : [];
+    return canais.join(" / ");
+  }
+
+  function renderClosedTransmission(game) {
+    const entry = closedTransmissionForGame(game);
+    if (!entry) return "";
+    const canais = Array.isArray(entry.canais) ? entry.canais.filter(Boolean) : [];
+    if (!canais.length) return "";
+
+    const links = [];
+    const seen = new Set();
+    const addLink = (label, value) => {
+      const url = safeOfficialUrl(value);
+      const key = norm(label) + "|" + url;
+      if (!url || seen.has(key) || links.length >= 3) return;
+      seen.add(key);
+      links.push({ label: String(label || "Acessar"), url });
+    };
+
+    for (const item of (Array.isArray(entry.links) ? entry.links : [])) addLink(item.label, item.url);
+    for (const canal of canais) {
+      const provider = providerForChannel(canal);
+      for (const item of ((provider && provider.links) || [])) addLink(item.label, item.url);
+    }
+
+    const buttons = links.length
+      ? '<div class="live-provider-actions">' + links.map((item) => '<a class="live-provider-button" href="' + esc(item.url) + '" target="_blank" rel="noopener noreferrer">' + esc(item.label) + '</a>').join("") + '</div>'
+      : '<div class="live-provider-no-link">Consulte o aplicativo ou a operadora da sua assinatura.</div>';
+
+    return '<aside class="live-provider-card" aria-label="Onde assistir"><div class="live-provider-heading"><span class="live-provider-icon">📺</span><div><span class="live-provider-kicker">Onde assistir</span><strong>' + esc(canais.join(" / ")) + '</strong></div></div>' +
+      '<p>Acesso sujeito à assinatura do serviço escolhido.</p>' + buttons + '</aside>';
+  }
+
   function renderTransmission(game) {
     const entry = transmissionForGame(game);
     const principal = entry && entry.principal;
     const url = principal && safeYouTubeUrl(principal.url);
-    if (!url) return "";
-    const sourceName = principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
-    const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
-    const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
-    const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
-    const liveStyle = liveNow || preLive;
-    const label = liveNow
-      ? "🔴 AO VIVO na " + sourceName
-      : (preLive ? "🔴 AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName);
-    const note = liveNow
-      ? "Transmissão oficial ao vivo no YouTube"
-      : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube");
-    // Regra do bolão: exibir SEMPRE um único link (CazéTV tem prioridade sobre GE TV).
-    // O robô já garante que "principal" respeita essa prioridade; alternativas não são exibidas.
-    return '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + '</div></div>';
+    let youtube = "";
+    if (url) {
+      const sourceName = principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
+      const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
+      const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
+      const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
+      const liveStyle = liveNow || preLive;
+      const label = liveNow
+        ? "AO VIVO na " + sourceName
+        : (preLive ? "AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName);
+      const note = liveNow
+        ? "Transmissão oficial ao vivo no YouTube"
+        : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube");
+      youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + '</div></div>';
+    }
+    return youtube + renderClosedTransmission(game);
   }
 
   async function loadLocal() {
@@ -639,7 +794,8 @@
   function renderStats(g, summary) {
     const rows = collectStats(g, summary);
     if (!rows.length) return '<div class="live-empty">As estatísticas serão exibidas quando estiverem disponíveis para esta partida.</div>';
-    return '<div class="live-stats">' + rows.map((r) => '<div class="live-stat-row">' +
+    const names = '<div class="live-stats-teams"><span title="' + esc(g.home.nome) + '">' + esc(g.home.nome) + '</span><span title="' + esc(g.away.nome) + '">' + esc(g.away.nome) + '</span></div>';
+    return '<div class="live-stats">' + names + rows.map((r) => '<div class="live-stat-row">' +
       '<div class="live-stat-value">' + esc(r.home) + '</div><div class="live-stat-mid">' +
       '<div class="live-stat-label">' + esc(r.label) + '</div>' +
       '<div class="live-stat-track" style="--home:' + r.pct.toFixed(1) + '%"></div></div>' +
@@ -652,9 +808,11 @@
       .sort((a, b) => a.date - b.date).slice(0, 6);
     if (!next.length) return "";
     return '<section class="panel live-subpanel"><div class="panel-inner"><div class="live-section-head"><h2>Próximos jogos</h2></div>' +
-      '<div class="live-next-list">' + next.map((g) => '<div class="live-next-item"><div class="live-next-teams">' +
-        esc(g.home.nome) + ' × ' + esc(g.away.nome) + '</div><div class="live-next-meta">Rodada ' + esc(g.rodada || "—") + '<br>' + esc(formatShort(g.date)) + '</div></div>').join("") +
-      '</div></div></section>';
+      '<div class="live-next-list">' + next.map((g) => {
+        const canal = transmissionLabel(g);
+        return '<div class="live-next-item"><div><div class="live-next-teams">' + esc(g.home.nome) + ' × ' + esc(g.away.nome) + '</div>' +
+          (canal ? '<span class="live-next-channel">📺 ' + esc(canal) + '</span>' : '') + '</div><div class="live-next-meta">Rodada ' + esc(g.rodada || "—") + '<br>' + esc(formatShort(g.date)) + '</div></div>';
+      }).join("") + '</div></div></section>';
   }
 
   function renderMain(g, summary, all) {
@@ -671,7 +829,7 @@
     const delayed = g.adiado ? " · jogo adiado" : "";
     const countdown = countdownText(g);
     const venue = g.venue ? '<span>🏟️ <strong>' + esc(g.venue) + '</strong></span>' : "";
-    const transmission = g.transmissao ? '<span>📺 ' + esc(g.transmissao) + '</span>' : "";
+    const transmission = "";
 
     app.innerHTML = '<section class="live-main-card"><div class="live-card-inner">' +
       '<div class="live-round-row"><span class="live-round-badge">' + esc(roundText + delayed) + '</span>' +
