@@ -1,14 +1,46 @@
 {
-  "atualizado_em": "",
   "fonte": "YouTube oficial — CazéTV e GE TV",
   "politica": {
     "prioridade": [
       "cazetv",
       "getv"
     ],
-    "regra": "Somente canais oficiais configurados; CazéTV tem prioridade sobre GE TV.",
+    "regra": "Somente canais oficiais configurados; CazéTV tem prioridade sobre GE TV; link único.",
     "janela": "de 24h antes até 90 min após o início",
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
-  "jogos": {}
+  "jogos": {
+    "401841149": {
+      "event_id": "401841149",
+      "rodada": 19,
+      "mandante": "Botafogo",
+      "visitante": "Santos",
+      "data_iso": "2026-07-16T19:30:00-03:00",
+      "estadio": "Joao Havelange Stadium",
+      "origem": "automático",
+      "principal": {
+        "fonte": "cazetv",
+        "nome": "CazéTV",
+        "video_id": "Cih-UxYNCSs",
+        "url": "https://www.youtube.com/watch?v=Cih-UxYNCSs",
+        "status": "upcoming",
+        "inicio_programado": "2026-07-16T18:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "AO VIVO: BOTAFOGO X SANTOS | BRASILEIRÃO 2026 | 19ª RODADA",
+        "canal": "CazéTV",
+        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+        "thumbnail": "https://i.ytimg.com/vi/Cih-UxYNCSs/maxresdefault_live.jpg",
+        "confianca": 0.8833,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (60 min de diferença)"
+        ],
+        "origem_busca": "uploads"
+      },
+      "alternativas": []
+    }
+  },
+  "atualizado_em": "2026-07-15T23:08:09-03:00"
 }

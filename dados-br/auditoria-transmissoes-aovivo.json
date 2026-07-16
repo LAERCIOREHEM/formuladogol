@@ -5,17 +5,17 @@
       "cazetv",
       "getv"
     ],
-    "regra": "Somente canais oficiais configurados; CazéTV tem prioridade sobre GE TV.",
+    "regra": "Somente canais oficiais configurados; CazéTV tem prioridade sobre GE TV; link único.",
     "janela": "de 24h antes até 90 min após o início",
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
     "jogos_na_janela": 2,
-    "busca_pesada_executada": true,
-    "candidatos_oficiais_encontrados": 12,
-    "transmissoes_publicadas": 0,
-    "sem_transmissao": 2,
-    "erros": 4
+    "busca_streams_executada": true,
+    "candidatos_oficiais_encontrados": 16,
+    "transmissoes_publicadas": 1,
+    "sem_transmissao": 1,
+    "erros": 0
   },
   "canais_resolvidos": {
     "cazetv": {
@@ -25,7 +25,8 @@
       "channel_title": "CazéTV",
       "uploads_playlist": "UUZiYbVptd3PVPf4f6eR6UaQ",
       "handle": "@CazeTV",
-      "prioridade": "1"
+      "prioridade": "1",
+      "streams_url": "https://www.youtube.com/@CazeTV/streams"
     },
     "getv": {
       "chave": "getv",
@@ -34,7 +35,8 @@
       "channel_title": "ge tv",
       "uploads_playlist": "UUgCKagVhzGnZcuP9bSMgMCg",
       "handle": "@getv",
-      "prioridade": "2"
+      "prioridade": "2",
+      "streams_url": "https://www.youtube.com/@getv/streams"
     }
   },
   "jogos_analisados": [
@@ -43,8 +45,10 @@
       "rodada": 19,
       "jogo": "Botafogo x Santos",
       "data_iso": "2026-07-16T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
       "manual": false
     },
     {
@@ -57,7 +61,24 @@
       "manual": false
     }
   ],
-  "aceitos": [],
+  "aceitos": [
+    {
+      "event_id": "401841149",
+      "jogo": "Botafogo x Santos",
+      "fonte": "cazetv",
+      "video_id": "Cih-UxYNCSs",
+      "url": "https://www.youtube.com/watch?v=Cih-UxYNCSs",
+      "titulo": "AO VIVO: BOTAFOGO X SANTOS | BRASILEIRÃO 2026 | 19ª RODADA",
+      "status": "upcoming",
+      "confianca": 0.8833,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (60 min de diferença)"
+      ]
+    }
+  ],
   "rejeitados": [
     {
       "video_id": "-1cDeHPSklA",
@@ -75,7 +96,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "ESPANHA X ARGENTINA! RELEMBRE A TRAJETÓRIA DOS FINALISTAS DA COPA DO MUNDO FIFA™ 2026!",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-07-15T23:00:00-03:00",
       "motivo": "conteúdo rejeitado: melhores momentos"
     },
@@ -87,16 +108,6 @@
       "titulo": "AO VIVO: ESPANHA X ARGENTINA! QUEM CHEGA MAIS FORTE PARA A GRANDE FINAL DA COPA? | AQUI É COPA",
       "status": "upcoming",
       "inicio_programado": "2026-07-16T15:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "QcmQ_zCf8vc",
-      "url": "https://www.youtube.com/watch?v=QcmQ_zCf8vc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "TEMOS UMA FINAL! ESPANHA E ARGENTINA DECIDEM QUEM SERÁ CAMPEÃO DA COPA DO MUNDO | LIVE DA MADRUGADA",
-      "status": "live",
-      "inicio_programado": "2026-07-15T13:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -130,6 +141,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "8cKmzV4riv8",
+      "url": "https://www.youtube.com/watch?v=8cKmzV4riv8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: GUTO MIGUEL NO UTS RIO 2026 | TÊNIS | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-16T17:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "J_b8bOVwRgE",
       "url": "https://www.youtube.com/watch?v=J_b8bOVwRgE",
       "fonte": "getv",
@@ -160,6 +181,26 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
+      "video_id": "hY_qSy-1fWI",
+      "url": "https://www.youtube.com/watch?v=hY_qSy-1fWI",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: JOÃO FONSECA E GUTO MIGUEL NO UTS RIO 2026 | TÊNIS | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-17T18:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "ih3fla-e6rk",
+      "url": "https://www.youtube.com/watch?v=ih3fla-e6rk",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: BRASIL X POLÔNIA | LIGA DAS NAÇÕES MASCULINA DE VÔLEI 2026 | FASE DE GRUPOS | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-17T21:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "peF4pxnYcec",
       "url": "https://www.youtube.com/watch?v=peF4pxnYcec",
       "fonte": "getv",
@@ -167,6 +208,16 @@
       "titulo": "SÃO PAULO X ATHLETICO PR | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-07-22T20:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "pjajoWOGqgc",
+      "url": "https://www.youtube.com/watch?v=pjajoWOGqgc",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: BRASIL X EUA | LIGA DAS NAÇÕES MASCULINA DE VÔLEI 2026 | FASE DE GRUPOS | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-16T21:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -182,13 +233,6 @@
   ],
   "sem_transmissao": [
     {
-      "event_id": "401841149",
-      "rodada": 19,
-      "jogo": "Botafogo x Santos",
-      "data_iso": "2026-07-16T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
       "event_id": "401841157",
       "rodada": 19,
       "jogo": "Vitória x Vasco da Gama",
@@ -196,20 +240,15 @@
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     }
   ],
-  "erros": [
-    "Falha no search upcoming de CazéTV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",",
-    "Falha no search live de CazéTV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit_value\": \"100\",\n          \"quota_limit\": \"defaultSear",
-    "Falha no search upcoming de GE TV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_location\": \"global\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",",
-    "Falha no search live de GE TV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\","
-  ],
+  "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 14,
+    "unidades": 42,
     "requisicoes": {
       "channels": 2,
-      "playlistItems": 6,
-      "videos": 6
+      "playlistItems": 20,
+      "videos": 20
     },
-    "observacao": "search.list custa 100 unidades; canais/playlists/vídeos custam 1 unidade por chamada."
+    "observacao": "search.list não é mais usado. Custo: ~2 unidades (channels) + ~20 (playlistItems 500 itens) + ~10 (videos) por execução ≈ 32 unidades. Cabe 300+ execuções/dia dentro das 10.000 gratuitas."
   },
-  "atualizado_em": "2026-07-15T22:41:40-03:00"
+  "atualizado_em": "2026-07-15T23:08:09-03:00"
 }
