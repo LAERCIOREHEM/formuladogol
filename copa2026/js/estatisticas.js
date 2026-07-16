@@ -514,6 +514,48 @@
       '<div class="stat-num"><b>' + val + '</b><small>' + esc(rotuloValor(val)) + '</small></div>' +
     '</article>';
   }
+  function nomeOrdemRanking(item) {
+    return String((item && (item.nome || nomeSelecao(item.equipe) || item.equipe)) || "");
+  }
+  function numeroRanking(valor) {
+    if (valor == null || valor === "" || isNaN(Number(valor))) return null;
+    return Number(valor);
+  }
+  function compararRankingOficial(a, b, dir) {
+    // A posição gravada pelo gerador é a fonte de verdade do ranking oficial.
+    // No modo "maior primeiro", 1º, 2º, 3º... devem aparecer nessa ordem.
+    var pa = numeroRanking(a && a.posicao);
+    var pb = numeroRanking(b && b.posicao);
+    if (pa != null && pb != null && pa !== pb) return (pa - pb) * -dir;
+
+    // Fallback idêntico ao gerar_ranking_desempenho.py para dados antigos
+    // ou snapshots sem o campo posicao.
+    var criterios = ["indice_final", "ataque", "dominio"];
+    for (var i = 0; i < criterios.length; i++) {
+      var campo = criterios[i];
+      var av = numeroRanking(a && a[campo]);
+      var bv = numeroRanking(b && b[campo]);
+      if (av == null && bv == null) continue;
+      if (av == null) return 1;
+      if (bv == null) return -1;
+      if (av !== bv) return (av - bv) * dir;
+    }
+    return nomeOrdemRanking(a).localeCompare(nomeOrdemRanking(b), "pt-BR");
+  }
+  function compararRankingPorCampo(a, b, campo, dir) {
+    if (campo === "indice_final") return compararRankingOficial(a, b, dir);
+
+    var av = numeroRanking(a && a[campo]);
+    var bv = numeroRanking(b && b[campo]);
+    if (av == null && bv == null) return compararRankingOficial(a, b, -1);
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    if (av !== bv) return (av - bv) * dir;
+
+    // Empates nas demais métricas preservam a precedência do índice oficial,
+    // evitando mudanças arbitrárias apenas por ordem alfabética.
+    return compararRankingOficial(a, b, -1);
+  }
   function filtrar(arr) {
     if (ABA === 'jogos') {
       return arr.filter(function (j) {
@@ -533,11 +575,7 @@
         var okJogos = (x.jogos || 0) >= (MIN_JOGOS_RANK || 1);
         return okTime && okSit && okJogos;
       }).sort(function (a, b) {
-        var av = a[campo], bv = b[campo];
-        if (av == null && bv == null) return (a.nome || "").localeCompare(b.nome || "", "pt-BR");
-        if (av == null) return 1;
-        if (bv == null) return -1;
-        return (Number(av) - Number(bv)) * dir || (a.nome || "").localeCompare(b.nome || "", "pt-BR");
+        return compararRankingPorCampo(a, b, campo, dir);
       });
     }
     if (FILTRO === 'TODAS') return arr;
@@ -685,6 +723,9 @@
         bv = normalizarSituacaoRanking(b.situacao);
         return av.localeCompare(bv, "pt-BR") * dir || ((b.indice_final || 0) - (a.indice_final || 0));
       }
+      if (campo === "indice_final") {
+        return compararRankingOficial(a, b, dir);
+      }
       if (campo === "fase") {
         av = Number(a.jogos || 0);
         bv = Number(b.jogos || 0);
@@ -692,7 +733,7 @@
         av = Number(a[campo] || 0);
         bv = Number(b[campo] || 0);
       }
-      return (av - bv) * dir || nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
+      return (av - bv) * dir || compararRankingOficial(a, b, -1);
     });
     return arr;
   }
@@ -720,8 +761,7 @@
 
   function rankingHistoricoOrdenado(snap) {
     return (snap && snap.ranking || []).slice().sort(function (a, b) {
-      return Number(b.indice_final || 0) - Number(a.indice_final || 0) ||
-        nomeSelecao(a.equipe).localeCompare(nomeSelecao(b.equipe), "pt-BR");
+      return compararRankingOficial(a, b, -1);
     });
   }
   function posicaoNoSnapshot(snap, equipe) {
