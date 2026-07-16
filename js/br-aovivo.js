@@ -575,13 +575,26 @@
     return '<div class="live-logo-fallback">' + esc((team.sigla || team.nome || "?").slice(0, 3)) + "</div>";
   }
 
+  function clockMinute(g) {
+    const raw = String((g && (g.clock || g.detail)) || "").trim();
+    const match = raw.match(/^(\d{1,3})(?::\d{2})?(?:\+\d+)?(?:['’])?$/);
+    return match ? Number(match[1]) : NaN;
+  }
+
   function gameState(g) {
-    const text = [g.detail, g.raw && g.raw.status && g.raw.status.type && g.raw.status.type.name].join(" ");
+    const statusType = g && g.raw && g.raw.status && g.raw.status.type;
+    const text = [g && g.detail, statusType && statusType.name, statusType && statusType.description, statusType && statusType.detail, statusType && statusType.shortDetail].join(" ");
     if (/postpon|adiad/i.test(text)) return { key: "postponed", label: "Adiado" };
     if (/suspend/i.test(text)) return { key: "postponed", label: "Suspenso" };
     if (/cancel/i.test(text)) return { key: "postponed", label: "Cancelado" };
     if (g.state === "in") {
-      if (/half/i.test(text) || /interval/i.test(text)) return { key: "live", label: "Intervalo" };
+      const minute = clockMinute(g);
+      const halftimeMarker = /half|interval/i.test(text);
+      // A ESPN às vezes mantém STATUS_HALFTIME por alguns ciclos mesmo com o
+      // cronômetro correndo. Um minuto válido diferente de 45 prevalece sobre
+      // esse marcador residual e evita a oscilação Ao vivo ↔ Intervalo.
+      const clockClearlyRunning = Number.isFinite(minute) && minute > 0 && minute !== 45;
+      if (halftimeMarker && !clockClearlyRunning) return { key: "live", label: "Intervalo" };
       return { key: "live", label: "Ao vivo" };
     }
     if (g.state === "post" || g.completed) return { key: "post", label: "Encerrado" };
