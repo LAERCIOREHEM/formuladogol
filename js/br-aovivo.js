@@ -324,17 +324,56 @@
     state.diretos = (data.events || []).map(normalizeEvent).filter(Boolean).map(mergeLocal);
   }
 
+  function sameFixture(a, b) {
+    if (!a || !b || !a.home || !a.away || !b.home || !b.away) return false;
+    if (a.id && b.id && String(a.id) === String(b.id)) return true;
+    if (teamKey(a.home.nome, a.away.nome) !== teamKey(b.home.nome, b.away.nome)) return false;
+
+    // A ESPN e a agenda local podem usar IDs diferentes para o mesmo jogo,
+    // especialmente em partidas adiadas/remarcadas. Nesses casos, a combinação
+    // clubes + data/rodada é a identidade mais confiável.
+    if (a.date instanceof Date && b.date instanceof Date) {
+      const diff = Math.abs(a.date.getTime() - b.date.getTime());
+      if (dateKey(a.date) === dateKey(b.date) || diff <= 12 * 3600000) return true;
+    }
+    if (a.rodada && b.rodada && Number(a.rodada) === Number(b.rodada)) return true;
+    return false;
+  }
+
+  function mergeGameRecords(a, b) {
+    const espn = a && a.source === "espn" ? a : (b && b.source === "espn" ? b : null);
+    const primary = espn || b || a;
+    const secondary = primary === a ? b : a;
+    if (!secondary) return primary;
+
+    return {
+      ...secondary,
+      ...primary,
+      id: primary.id || secondary.id,
+      rodada: primary.rodada || secondary.rodada,
+      date: primary.date || secondary.date,
+      dataIso: primary.dataIso || secondary.dataIso,
+      detail: primary.detail || secondary.detail,
+      clock: primary.clock || secondary.clock,
+      venue: primary.venue || secondary.venue,
+      transmissao: primary.transmissao || secondary.transmissao,
+      home: { ...secondary.home, ...primary.home, escudo: primary.home.escudo || secondary.home.escudo },
+      away: { ...secondary.away, ...primary.away, escudo: primary.away.escudo || secondary.away.escudo }
+    };
+  }
+
   function allGames() {
-    const map = new Map();
-    for (const g of state.agenda) {
-      const k = g.id || teamKey(g.home.nome, g.away.nome) + "|" + (g.dataIso || "");
-      map.set(k, g);
-    }
-    for (const g of state.diretos) {
-      const k = g.id || teamKey(g.home.nome, g.away.nome) + "|" + (g.dataIso || "");
-      map.set(k, mergeLocal({ ...(map.get(k) || {}), ...g }));
-    }
-    return Array.from(map.values()).filter((g) => g.home && g.away);
+    const merged = [];
+    const upsert = (game) => {
+      if (!game || !game.home || !game.away) return;
+      const index = merged.findIndex((item) => sameFixture(item, game));
+      if (index < 0) merged.push(game);
+      else merged[index] = mergeGameRecords(merged[index], game);
+    };
+
+    state.agenda.forEach(upsert);
+    state.diretos.forEach((g) => upsert(mergeLocal(g)));
+    return merged;
   }
 
   function isPostponed(g) {
@@ -609,7 +648,7 @@
 
   function renderNextList(all, selected) {
     const now = Date.now();
-    const next = all.filter((g) => g.date && g.date.getTime() > now && (!selected || g.id !== selected.id))
+    const next = all.filter((g) => g.date && g.date.getTime() > now && (!selected || !sameFixture(g, selected)))
       .sort((a, b) => a.date - b.date).slice(0, 6);
     if (!next.length) return "";
     return '<section class="panel live-subpanel"><div class="panel-inner"><div class="live-section-head"><h2>Próximos jogos</h2><span class="live-section-note">agenda corrigida</span></div>' +
