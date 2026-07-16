@@ -25,6 +25,8 @@ on:
       - 'scripts/buscar_transmissoes_aovivo_brasileirao.py'
       - 'dados-br/config-transmissoes-aovivo.json'
       - 'dados-br/transmissoes-aovivo-manual.json'
+      - 'dados-br/transmissoes-tv.json'
+      - 'scripts/atualizar_transmissoes_tv_brasileirao.py'
       - '.github/workflows/buscar-transmissoes-aovivo-brasileirao.yml'
 
 permissions:
@@ -57,10 +59,13 @@ jobs:
           set -euo pipefail
           python -m py_compile scripts/buscar_transmissoes_aovivo_brasileirao.py
           python scripts/buscar_transmissoes_aovivo_brasileirao.py --selftest
+          python -m py_compile scripts/atualizar_transmissoes_tv_brasileirao.py
+          python scripts/atualizar_transmissoes_tv_brasileirao.py --selftest
           python -m json.tool dados-br/config-transmissoes-aovivo.json > /dev/null
           python -m json.tool dados-br/transmissoes-aovivo.json > /dev/null
           python -m json.tool dados-br/transmissoes-aovivo-manual.json > /dev/null
           python -m json.tool dados-br/auditoria-transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/transmissoes-tv.json > /dev/null
 
       - name: Buscar transmissões oficiais
         env:
@@ -88,12 +93,20 @@ jobs:
           echo "Executando: ${CMD[*]}"
           "${CMD[@]}"
 
+          TV_CMD=(python scripts/atualizar_transmissoes_tv_brasileirao.py)
+          if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+            TV_CMD+=(--dry-run)
+          fi
+          echo "Executando: ${TV_CMD[*]}"
+          "${TV_CMD[@]}"
+
       - name: Validar relatórios gerados
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != true }}
         run: |
           set -euo pipefail
           python -m json.tool dados-br/transmissoes-aovivo.json > /dev/null
           python -m json.tool dados-br/auditoria-transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/transmissoes-tv.json > /dev/null
           python - <<'PY'
           import json
           from urllib.parse import urlparse, parse_qs
@@ -115,7 +128,14 @@ jobs:
           assert isinstance(aud.get('resumo'), dict), 'auditoria sem resumo'
           assert isinstance(aud.get('rejeitados'), list), 'auditoria sem rejeitados'
           assert isinstance(aud.get('sem_transmissao'), list), 'auditoria sem sem_transmissao'
-          print('JSONs e prioridade CazéTV > GE TV validados')
+          tv = json.load(open('dados-br/transmissoes-tv.json', encoding='utf-8'))
+          assert isinstance(tv.get('jogos'), dict), 'transmissoes-tv.json sem objeto jogos'
+          permitidos = {'Premiere', 'SporTV', 'Disney+ / ESPN', 'Prime Video', 'Globo'}
+          for event_id, jogo in tv['jogos'].items():
+              assert str(jogo.get('event_id')) == str(event_id), f'TV: event_id divergente em {event_id}'
+              assert jogo.get('canais'), f'TV: {event_id} sem canais'
+              assert set(jogo['canais']).issubset(permitidos), f'TV: canal não permitido em {event_id}'
+          print('YouTube e transmissões TV validados')
           PY
 
       - name: Commitar somente quando houver mudança real
@@ -131,6 +151,7 @@ jobs:
           FILES=(
             "dados-br/transmissoes-aovivo.json"
             "dados-br/auditoria-transmissoes-aovivo.json"
+            "dados-br/transmissoes-tv.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
