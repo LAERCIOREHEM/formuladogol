@@ -11,11 +11,11 @@
   },
   "resumo": {
     "jogos_na_janela": 2,
-    "busca_pesada_executada": false,
+    "busca_pesada_executada": true,
     "candidatos_oficiais_encontrados": 12,
     "transmissoes_publicadas": 0,
     "sem_transmissao": 2,
-    "erros": 0
+    "erros": 4
   },
   "canais_resolvidos": {
     "cazetv": {
@@ -196,7 +196,12 @@
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     }
   ],
-  "erros": [],
+  "erros": [
+    "Falha no search upcoming de CazéTV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",",
+    "Falha no search live de CazéTV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"service\": \"youtube.googleapis.com\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit_value\": \"100\",\n          \"quota_limit\": \"defaultSear",
+    "Falha no search upcoming de GE TV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_location\": \"global\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",",
+    "Falha no search live de GE TV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_location\": \"global\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\","
+  ],
   "quota_estimada_youtube": {
     "unidades": 14,
     "requisicoes": {
@@ -206,5 +211,5 @@
     },
     "observacao": "search.list custa 100 unidades; canais/playlists/vídeos custam 1 unidade por chamada."
   },
-  "atualizado_em": "2026-07-15T22:39:34-03:00"
+  "atualizado_em": "2026-07-15T22:41:40-03:00"
 }
