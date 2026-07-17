@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-07-16T15:35:59-03:00",
+  "atualizado_em": "2026-07-16T22:27:49-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video ou CazéTV podem aparecer no site. Se não houver fonte preferida, o jogo fica sem vídeo.",
@@ -12,17 +12,26 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 177,
-    "jogos_com_video": 177,
+    "jogos_resultados": 179,
+    "jogos_com_video": 178,
     "ge_globo": 176,
     "amazon_prime_video": 1,
-    "cazetv": 0,
+    "cazetv": 1,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [],
+  "sem_video": [
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "mandante": "Vitória",
+      "visitante": "Vasco da Gama",
+      "placar_mandante": 1,
+      "placar_visitante": 0
+    }
+  ],
   "detalhamento": {
     "ge_globo": [
       {
@@ -2860,6 +2869,23 @@
         "confianca": 1.0
       }
     ],
-    "cazetv": []
+    "cazetv": [
+      {
+        "event_id": "401841149",
+        "rodada": 19,
+        "mandante": "Botafogo",
+        "visitante": "Santos",
+        "placar_mandante": 2,
+        "placar_visitante": 1,
+        "categoria_fonte": "cazetv",
+        "origem_vinculo": "automatico",
+        "fonte": "CazéTV / YouTube",
+        "fonte_busca": "playlistItems",
+        "channel_title": "CazéTV",
+        "titulo": "MELHORES MOMENTOS: BOTAFOGO 2 X 1 SANTOS | BRASILEIRÃO 2026 | 19ª RODADA",
+        "url": "https://www.youtube.com/watch?v=laU3IwtR_Ls",
+        "confianca": 1.0
+      }
+    ]
   }
 }

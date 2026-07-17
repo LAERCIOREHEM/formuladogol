@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-07-16T15:35:59-03:00",
+  "atualizado_em": "2026-07-16T22:27:49-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, CazéTV ou Amazon Prime Video. Se não achar nessas fontes, fica sem vídeo.",
@@ -9,9 +9,9 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 1,
-    "playlist_items": 0,
-    "search": 0,
+    "unidades": 613,
+    "playlist_items": 12,
+    "search": 6,
     "channels": 1,
     "videos": 0
   },
@@ -20,40 +20,40 @@
     "fim": null
   },
   "resumo_geral_antes": {
-    "jogos_resultados": 177,
+    "jogos_resultados": 179,
     "ge": 176,
     "caze": 0,
     "prime": 1,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 2,
     "com_fonte_preferida": 177
   },
   "resumo_geral_depois": {
-    "jogos_resultados": 177,
+    "jogos_resultados": 179,
     "ge": 176,
-    "caze": 0,
+    "caze": 1,
     "prime": 1,
     "outros": 0,
-    "sem_video": 0,
-    "com_fonte_preferida": 177
+    "sem_video": 1,
+    "com_fonte_preferida": 178
   },
   "resumo_janela_antes": {
-    "jogos_resultados": 177,
+    "jogos_resultados": 179,
     "ge": 176,
     "caze": 0,
     "prime": 1,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 2,
     "com_fonte_preferida": 177
   },
   "resumo_janela_depois": {
-    "jogos_resultados": 177,
+    "jogos_resultados": 179,
     "ge": 176,
-    "caze": 0,
+    "caze": 1,
     "prime": 1,
     "outros": 0,
-    "sem_video": 0,
-    "com_fonte_preferida": 177
+    "sem_video": 1,
+    "com_fonte_preferida": 178
   },
   "mantidos_preferidos_na_janela": [
     {
@@ -2358,9 +2358,85 @@
       "url_anterior": "https://www.youtube.com/watch?v=vDrdK3uyIt0"
     }
   ],
-  "substituidos_para_fontes_preferidas": [],
+  "substituidos_para_fontes_preferidas": [
+    {
+      "event_id": "401841149",
+      "rodada": 19,
+      "mandante": "Botafogo",
+      "visitante": "Santos",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "motivo": "sem_link_preferido",
+      "fonte_nova": "CazéTV / YouTube",
+      "channel_title_novo": "CazéTV",
+      "titulo_novo": "MELHORES MOMENTOS: BOTAFOGO 2 X 1 SANTOS | BRASILEIRÃO 2026 | 19ª RODADA",
+      "url_nova": "https://www.youtube.com/watch?v=laU3IwtR_Ls",
+      "metodo": "playlistItems"
+    }
+  ],
   "removidos_por_fonte_nao_preferida": [],
-  "ainda_sem_link_preferido": [],
-  "buscas_executadas_em_canais_preferidos": [],
-  "erros": []
+  "ainda_sem_link_preferido": [
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "mandante": "Vitória",
+      "visitante": "Vasco da Gama",
+      "placar_mandante": 1,
+      "placar_visitante": 0,
+      "motivo": "sem link em GE/Globo, CazéTV ou Prime Video"
+    }
+  ],
+  "buscas_executadas_em_canais_preferidos": [
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "jogo": "Vitória x Vasco da Gama",
+      "canal": "ge",
+      "query": "\"Vitória 1 x 0 Vasco da Gama\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "jogo": "Vitória x Vasco da Gama",
+      "canal": "caze",
+      "query": "\"Vitória 1 x 0 Vasco da Gama\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 4
+    },
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "jogo": "Vitória x Vasco da Gama",
+      "canal": "prime",
+      "query": "\"Vitória 1 x 0 Vasco da Gama\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 0
+    },
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "jogo": "Vitória x Vasco da Gama",
+      "canal": "ge",
+      "query": "\"Vitória x Vasco da Gama\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "jogo": "Vitória x Vasco da Gama",
+      "canal": "caze",
+      "query": "\"Vitória x Vasco da Gama\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 5
+    },
+    {
+      "event_id": "401841157",
+      "rodada": 19,
+      "jogo": "Vitória x Vasco da Gama",
+      "canal": "prime",
+      "query": "\"Vitória x Vasco da Gama\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 0
+    }
+  ],
+  "erros": [
+    "Falha ao varrer uploads Prime Video: YouTube API HTTP 404 em playlistItems: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"The playlist identified with the request's \\u003ccode\\u003eplaylistId\\u003c/code\\u003e parameter cannot be found.\",\n    \"errors\": [\n      {\n        \"message\": \"The playlist identified with the request's \\u003ccode\\u003eplaylistId\\u003c/code\\u003e parameter cannot be found.\",\n        \"domain\": \"youtube.playlistItem\",\n        \"reason\": \"playlistNotFound\",\n        \"location\": \"playlistId\",\n        \"locationType\": \"parameter\"\n      }\n    ]\n  }\n}\n"
+  ]
 }
