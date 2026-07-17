@@ -982,3 +982,23 @@ body > .container > section.hero > img {
 .stats-performance-name-link:hover strong,
 .stats-club-goals-main > a:hover strong { color: var(--green); }
 .stats-marker-expand { margin-top: 9px; }
+
+/* Metodologia detalhada do Ranking de Desempenho */
+.ranking-method-link { display:inline-flex; align-items:center; margin:2px 0 15px; color:#d9ff76; font-size:13px; font-weight:950; text-decoration:none; }
+.ranking-method-link:hover, .ranking-method-link:focus-visible { text-decoration:underline; outline:none; }
+.ranking-methodology { scroll-margin-top:110px; margin-top:24px; padding:clamp(18px,3vw,28px); border:1px solid rgba(251,191,36,.30); border-radius:22px; background:radial-gradient(circle at 100% 0, rgba(251,191,36,.11), transparent 32%), linear-gradient(145deg, rgba(17,35,42,.96), rgba(5,14,21,.98)); }
+.ranking-methodology h3 { margin:5px 0 10px; color:#fff4aa; font-size:clamp(22px,3vw,30px); line-height:1.15; }
+.ranking-method-intro { max-width:930px; color:#d9e3ec; font-size:15px; line-height:1.65; }
+.ranking-method-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; margin-top:18px; }
+.ranking-method-grid article { min-width:0; padding:15px; border:1px solid rgba(148,163,184,.14); border-radius:16px; background:rgba(255,255,255,.035); }
+.ranking-method-grid b { display:block; color:#a3e635; font-size:24px; line-height:1; }
+.ranking-method-grid h4 { margin:8px 0 6px; color:#fff; font-size:15px; }
+.ranking-method-grid p, .ranking-method-notes p { margin:0; color:var(--muted); font-size:12px; line-height:1.5; }
+.ranking-method-notes { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-top:14px; }
+.ranking-method-notes p { padding:12px; border-left:3px solid rgba(163,230,53,.55); border-radius:0 12px 12px 0; background:rgba(163,230,53,.045); }
+.ranking-method-notes strong { color:#eaffb5; }
+.ranking-method-disclaimer { margin:15px 0 0; color:#91a3b5; font-size:11px; }
+.ranking-back-top { display:inline-flex; margin-top:16px; padding:10px 14px; border:1px solid rgba(163,230,53,.28); border-radius:999px; background:rgba(163,230,53,.08); color:#eaffb5; font-size:12px; font-weight:950; text-decoration:none; }
+.ranking-back-top:hover, .ranking-back-top:focus-visible { background:rgba(163,230,53,.14); outline:none; }
+@media (max-width:900px) { .ranking-method-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .ranking-method-grid article:last-child { grid-column:1/-1; } }
+@media (max-width:560px) { .ranking-methodology { padding:16px; } .ranking-method-grid, .ranking-method-notes { grid-template-columns:1fr; } .ranking-method-grid article:last-child { grid-column:auto; } }

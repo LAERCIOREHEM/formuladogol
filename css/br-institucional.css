@@ -461,3 +461,22 @@ body.modal-open { overflow: hidden; }
   .squad-row { grid-template-columns: 50px minmax(0,1fr) 44px; gap: 7px; padding: 9px 7px; }
   .squad-player strong { font-size: 13px; }
 }
+
+/* Card visual do AF-Score na página do clube */
+.club-performance-card { margin: 16px 0 14px; padding: 16px; border: 1px solid rgba(163,230,53,.24); border-radius: 20px; background: radial-gradient(circle at 100% 0, rgba(163,230,53,.13), transparent 34%), linear-gradient(145deg, rgba(18,40,38,.96), rgba(5,15,22,.98)); box-shadow: 0 18px 42px rgba(0,0,0,.22); }
+.club-performance-card.muted { color: var(--muted); }
+.club-performance-header { display:flex; align-items:center; justify-content:space-between; gap:14px; padding-bottom:13px; border-bottom:1px solid rgba(148,163,184,.12); }
+.club-performance-header > div:first-child span { display:block; color:var(--green); font-size:10px; font-weight:950; letter-spacing:.12em; text-transform:uppercase; }
+.club-performance-header > div:first-child strong { display:block; margin-top:4px; color:#fff; font-size:18px; }
+.club-performance-score { min-width:88px; text-align:right; }
+.club-performance-score b { display:block; color:#d9ff76; font-size:31px; line-height:1; }
+.club-performance-score small { display:block; margin-top:5px; color:#fff4aa; font-size:11px; font-weight:900; text-transform:uppercase; letter-spacing:.06em; }
+.club-performance-bars { display:grid; gap:10px; margin-top:14px; }
+.club-performance-row { display:grid; grid-template-columns:78px minmax(0,1fr) 42px; align-items:center; gap:10px; }
+.club-performance-row > span { color:var(--muted); font-size:12px; font-weight:850; }
+.club-performance-row > div { height:8px; overflow:hidden; border-radius:999px; background:rgba(59,91,126,.35); }
+.club-performance-row i { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#fbbf24,#a3e635); }
+.club-performance-row > strong { color:#f4f8fb; font-size:13px; text-align:right; }
+.club-performance-method { display:inline-flex; margin-top:15px; color:#d9ff76; font-size:12px; font-weight:900; text-decoration:none; }
+.club-performance-method:hover, .club-performance-method:focus-visible { text-decoration:underline; outline:none; }
+@media (max-width:640px) { .club-performance-card { padding:14px; } .club-performance-header > div:first-child strong { font-size:16px; } .club-performance-score b { font-size:27px; } .club-performance-row { grid-template-columns:70px minmax(0,1fr) 39px; gap:8px; } }
