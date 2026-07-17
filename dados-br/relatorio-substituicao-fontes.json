@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-07-16T22:27:49-03:00",
+  "atualizado_em": "2026-07-16T22:48:25-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, CazéTV ou Amazon Prime Video. Se não achar nessas fontes, fica sem vídeo.",
@@ -22,11 +22,11 @@
   "resumo_geral_antes": {
     "jogos_resultados": 179,
     "ge": 176,
-    "caze": 0,
+    "caze": 1,
     "prime": 1,
     "outros": 0,
-    "sem_video": 2,
-    "com_fonte_preferida": 177
+    "sem_video": 1,
+    "com_fonte_preferida": 178
   },
   "resumo_geral_depois": {
     "jogos_resultados": 179,
@@ -40,11 +40,11 @@
   "resumo_janela_antes": {
     "jogos_resultados": 179,
     "ge": 176,
-    "caze": 0,
+    "caze": 1,
     "prime": 1,
     "outros": 0,
-    "sem_video": 2,
-    "com_fonte_preferida": 177
+    "sem_video": 1,
+    "com_fonte_preferida": 178
   },
   "resumo_janela_depois": {
     "jogos_resultados": 179,
@@ -56,6 +56,19 @@
     "com_fonte_preferida": 178
   },
   "mantidos_preferidos_na_janela": [
+    {
+      "event_id": "401841149",
+      "rodada": 19,
+      "mandante": "Botafogo",
+      "visitante": "Santos",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "motivo": "mantido: fonte preferida (caze)",
+      "fonte_anterior": "CazéTV / YouTube",
+      "channel_title": "CazéTV",
+      "titulo_anterior": "MELHORES MOMENTOS: BOTAFOGO 2 X 1 SANTOS | BRASILEIRÃO 2026 | 19ª RODADA",
+      "url_anterior": "https://www.youtube.com/watch?v=laU3IwtR_Ls"
+    },
     {
       "event_id": "401841145",
       "rodada": 18,
@@ -2358,22 +2371,7 @@
       "url_anterior": "https://www.youtube.com/watch?v=vDrdK3uyIt0"
     }
   ],
-  "substituidos_para_fontes_preferidas": [
-    {
-      "event_id": "401841149",
-      "rodada": 19,
-      "mandante": "Botafogo",
-      "visitante": "Santos",
-      "placar_mandante": 2,
-      "placar_visitante": 1,
-      "motivo": "sem_link_preferido",
-      "fonte_nova": "CazéTV / YouTube",
-      "channel_title_novo": "CazéTV",
-      "titulo_novo": "MELHORES MOMENTOS: BOTAFOGO 2 X 1 SANTOS | BRASILEIRÃO 2026 | 19ª RODADA",
-      "url_nova": "https://www.youtube.com/watch?v=laU3IwtR_Ls",
-      "metodo": "playlistItems"
-    }
-  ],
+  "substituidos_para_fontes_preferidas": [],
   "removidos_por_fonte_nao_preferida": [],
   "ainda_sem_link_preferido": [
     {
