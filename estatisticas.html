@@ -25,7 +25,7 @@
   <meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
   <meta name="twitter:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260713-estatisticas-exec2-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260717-metodologia-afscore-v1&old=20260713-estatisticas-exec2-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260713-disclaimers-publicos-v1">
 </head>
 <body>
@@ -116,11 +116,28 @@
               <div><div class="kicker">⚡ Índice próprio</div><h2>Ranking de Desempenho</h2></div>
               <span class="badge live-soft">Não oficial</span>
             </div>
+            <a class="ranking-method-link" href="#metodologia-ranking">Como é calculado o ranking? ↓</a>
             <div id="ranking-desempenho"></div>
-            <details class="methodology-box">
-              <summary>Como o Ranking de Desempenho é calculado?</summary>
-              <p>O índice combina ataque, defesa, domínio, eficiência e disciplina com médias por jogo. Ele é uma metodologia própria do site e não substitui a classificação oficial do Brasileirão.</p>
-            </details>
+            <section class="ranking-methodology" id="metodologia-ranking" aria-labelledby="titulo-metodologia-ranking">
+              <div class="kicker">Metodologia transparente</div>
+              <h3 id="titulo-metodologia-ranking">Como o Ranking de Desempenho é calculado?</h3>
+              <p class="ranking-method-intro">O AF-Score mede o desempenho produzido em campo, não apenas os pontos conquistados. Por isso, a ordem pode ser diferente da classificação oficial: um clube pode criar mais, controlar melhor e defender bem, mas perder pontos por um lance isolado; outro pode vencer mesmo produzindo menos.</p>
+              <div class="ranking-method-grid">
+                <article><b>28%</b><h4>Ataque</h4><p>Gols, finalizações, chutes no gol, escanteios e volume ofensivo disponível por partida.</p></article>
+                <article><b>24%</b><h4>Defesa</h4><p>Gols e finalizações sofridas, defesas, desarmes, interceptações, bloqueios e cortes.</p></article>
+                <article><b>20%</b><h4>Domínio</h4><p>Posse, passes certos, precisão, volume de passes e capacidade de sustentar o controle do jogo.</p></article>
+                <article><b>18%</b><h4>Eficiência</h4><p>Relação entre criação e resultado: conversão das chances, precisão dos chutes e saldo produzido.</p></article>
+                <article><b>10%</b><h4>Disciplina</h4><p>Faltas e cartões, com penalização maior para expulsões e impacto moderado para advertências.</p></article>
+              </div>
+              <div class="ranking-method-notes">
+                <p><strong>Comparação justa:</strong> as métricas são transformadas para uma escala comum de 0 a 100 e comparadas entre os 20 clubes.</p>
+                <p><strong>Médias por jogo:</strong> o cálculo reduz distorções quando os clubes têm quantidades diferentes de partidas disputadas.</p>
+                <p><strong>Disponibilidade:</strong> cada indicador só entra quando a ESPN o fornece de forma utilizável. O modelo não inventa valores ausentes.</p>
+                <p><strong>Leitura correta:</strong> a tabela define o campeão; o AF-Score ajuda a enxergar processo, força e desempenho além do placar.</p>
+              </div>
+              <p class="ranking-method-disclaimer">Índice editorial próprio e não oficial. Não representa avaliação da CBF, da ESPN ou dos clubes.</p>
+              <a class="ranking-back-top" href="#view-desempenho">↑ Voltar ao topo do ranking</a>
+            </section>
           </div></div>
         </article>
       </section>

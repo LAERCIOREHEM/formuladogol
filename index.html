@@ -2262,6 +2262,15 @@ body > .container > section.hero > img {
     .match-event-grid { grid-template-columns: 1fr; }
   }
 
+
+  /* Clubes clicáveis em Jogos e Resultados */
+  .br-club-link { color: inherit; text-decoration: none; border-radius: 14px; transition: background .16s ease, transform .16s ease, box-shadow .16s ease; }
+  .br-club-link:hover, .br-club-link:focus-visible { background: rgba(163,230,53,.07); box-shadow: 0 0 0 1px rgba(163,230,53,.22); outline: none; transform: translateY(-1px); }
+  .jogo-time.br-club-link { padding: 7px 5px; }
+  .resultado-time.br-club-link { padding: 6px; }
+  @media (max-width: 640px) {
+    .jogo-time.br-club-link, .resultado-time.br-club-link { padding: 4px 2px; }
+  }
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260714-tabela-compacta-limite-v3">
 </head>
@@ -4097,6 +4106,13 @@ function jogosCanônicosPorRodada(lista) {
   return saida;
 }
 
+function linkClubeBrasileirao(nome, conteudo, classe = "") {
+  const canonico = nomeCanonico(nome) || String(nome || "").trim();
+  const slug = canonico.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const cls = classe ? ` class="${classe}"` : "";
+  return `<a${cls} href="clubes.html#${encodeURIComponent(slug)}" aria-label="Abrir página de ${canonico}">${conteudo}</a>`;
+}
+
 function renderJogos() {
   const container = document.getElementById('view-jogos');
 
@@ -4216,15 +4232,9 @@ function renderJogos() {
         </div>
         <div class="jogo-main">
           <div class="jogo-times jogo-times-v2">
-            <div class="jogo-time jogo-team-side">
-              <span class="jogo-escudo">${escudoMandante}</span>
-              <span class="jogo-nome">${m.nome || '?'}</span>${htmlRankingMiniTime(m.nome, 'jogo')}
-            </div>
+            ${linkClubeBrasileirao(m.nome, `<span class="jogo-escudo">${escudoMandante}</span><span class="jogo-nome">${m.nome || '?'}</span>`, 'jogo-time jogo-team-side br-club-link')}
             ${placarCentro}
-            <div class="jogo-time jogo-team-side">
-              <span class="jogo-escudo">${escudoVisitante}</span>
-              <span class="jogo-nome">${v.nome || '?'}</span>${htmlRankingMiniTime(v.nome, 'jogo')}
-            </div>
+            ${linkClubeBrasileirao(v.nome, `<span class="jogo-escudo">${escudoVisitante}</span><span class="jogo-nome">${v.nome || '?'}</span>`, 'jogo-time jogo-team-side br-club-link')}
           </div>`;
 
       const detalhes = [];
@@ -4609,15 +4619,9 @@ function renderResultados() {
           <span class="resultado-data">${dataFmt}${r._provisorioESPN ? ' · <strong style="color:var(--accent)">ESPN ao vivo</strong>' : ''}</span>
         </div>
         <div class="resultado-jogo">
-          <div class="resultado-time mandante">
-            <span class="resultado-team-text"><span class="resultado-nome">${m.nome || '?'}</span>${htmlRankingMiniTime(m.nome, 'resultado')}</span>
-            <span class="resultado-escudo">${escudoMandante}</span>
-          </div>
+          ${linkClubeBrasileirao(m.nome, `<span class="resultado-team-text"><span class="resultado-nome">${m.nome || '?'}</span></span><span class="resultado-escudo">${escudoMandante}</span>`, 'resultado-time mandante br-club-link')}
           <div class="resultado-placar">${pm} <span class="placar-x">×</span> ${pv}</div>
-          <div class="resultado-time visitante">
-            <span class="resultado-escudo">${escudoVisitante}</span>
-            <span class="resultado-team-text"><span class="resultado-nome">${v.nome || '?'}</span>${htmlRankingMiniTime(v.nome, 'resultado')}</span>
-          </div>
+          ${linkClubeBrasileirao(v.nome, `<span class="resultado-escudo">${escudoVisitante}</span><span class="resultado-team-text"><span class="resultado-nome">${v.nome || '?'}</span></span>`, 'resultado-time visitante br-club-link')}
         </div>
         ${htmlResumoResultadoDetalhes(r)}
         ${extrasResultado ? `<div class="resultado-extra">${extrasResultado}</div>` : ''}
