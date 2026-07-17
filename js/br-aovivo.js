@@ -343,19 +343,68 @@
     }
   }
 
+  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v1";
+  const TRANSMISSION_CACHE_TV = "br2026_transmissoes_tv_v1";
+
+  function cachedTransmissionMap(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveTransmissionMap(key, value) {
+    try {
+      if (value && typeof value === "object" && Object.keys(value).length) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+    } catch (_) {}
+  }
+
   async function loadTransmissions() {
-    const [youtube, tv] = await Promise.all([
-      fetchJson("dados-br/transmissoes-aovivo.json?t=" + Date.now()).catch(() => ({ jogos: {} })),
-      fetchJson("dados-br/transmissoes-tv.json?t=" + Date.now()).catch(() => ({ jogos: {} }))
+    const previousYoutube = state.transmissoes && Object.keys(state.transmissoes).length
+      ? state.transmissoes
+      : cachedTransmissionMap(TRANSMISSION_CACHE_YT);
+    const previousTv = state.transmissoesTv && Object.keys(state.transmissoesTv).length
+      ? state.transmissoesTv
+      : cachedTransmissionMap(TRANSMISSION_CACHE_TV);
+
+    const [youtubeResult, manualResult, tvResult] = await Promise.allSettled([
+      fetchJson("dados-br/transmissoes-aovivo.json?t=" + Date.now()),
+      fetchJson("dados-br/transmissoes-aovivo-manual.json?t=" + Date.now()),
+      fetchJson("dados-br/transmissoes-tv.json?t=" + Date.now())
     ]);
-    state.transmissoes = youtube && youtube.jogos && typeof youtube.jogos === "object" ? youtube.jogos : {};
-    state.transmissoesTv = tv && tv.jogos && typeof tv.jogos === "object" ? tv.jogos : {};
+
+    const automatic = youtubeResult.status === "fulfilled" && youtubeResult.value && youtubeResult.value.jogos && typeof youtubeResult.value.jogos === "object"
+      ? youtubeResult.value.jogos
+      : {};
+    const manual = manualResult.status === "fulfilled" && manualResult.value && manualResult.value.jogos && typeof manualResult.value.jogos === "object"
+      ? manualResult.value.jogos
+      : {};
+    const tv = tvResult.status === "fulfilled" && tvResult.value && tvResult.value.jogos && typeof tvResult.value.jogos === "object"
+      ? tvResult.value.jogos
+      : {};
+
+    // Nunca apaga um link válido por causa de uma falha transitória, 404 durante
+    // deploy ou resposta vazia em um único ciclo. O manual prevalece sobre o robô.
+    const mergedYoutube = Object.assign({}, previousYoutube, automatic, manual);
+    state.transmissoes = Object.keys(mergedYoutube).length ? mergedYoutube : previousYoutube;
+    state.transmissoesTv = Object.keys(tv).length ? Object.assign({}, previousTv, tv) : previousTv;
+    saveTransmissionMap(TRANSMISSION_CACHE_YT, state.transmissoes);
+    saveTransmissionMap(TRANSMISSION_CACHE_TV, state.transmissoesTv);
   }
 
   function transmissionEntryForGame(game, source) {
     if (!game || !source) return null;
     const direct = game.id && source[String(game.id)];
     if (direct) return direct;
+    if (game.id) {
+      const byEventId = Object.values(source).find((item) => item && String(item.event_id || "") === String(game.id));
+      if (byEventId) return byEventId;
+    }
     const wanted = teamKey(game.home && game.home.nome, game.away && game.away.nome);
     const gameDate = game.date ? dateKey(game.date) : "";
     for (const item of Object.values(source)) {
