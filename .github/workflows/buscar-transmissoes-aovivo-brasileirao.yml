@@ -101,6 +101,7 @@ jobs:
           python - <<'PY'
           import json
           from urllib.parse import urlparse, parse_qs
+          from scripts.atualizar_transmissoes_tv_brasileirao import ALLOWED_CHANNELS
 
           out = json.load(open('dados-br/transmissoes-aovivo.json', encoding='utf-8'))
           assert isinstance(out.get('jogos'), dict), 'transmissoes-aovivo.json sem objeto jogos'
@@ -121,11 +122,12 @@ jobs:
           assert isinstance(aud.get('sem_transmissao'), list), 'auditoria sem sem_transmissao'
           tv = json.load(open('dados-br/transmissoes-tv.json', encoding='utf-8'))
           assert isinstance(tv.get('jogos'), dict), 'transmissoes-tv.json sem objeto jogos'
-          permitidos = {'Premiere', 'SporTV', 'Disney+ / ESPN', 'Prime Video', 'Globo'}
+          permitidos = ALLOWED_CHANNELS
           for event_id, jogo in tv['jogos'].items():
               assert str(jogo.get('event_id')) == str(event_id), f'TV: event_id divergente em {event_id}'
               assert jogo.get('canais'), f'TV: {event_id} sem canais'
-              assert set(jogo['canais']).issubset(permitidos), f'TV: canal não permitido em {event_id}'
+              invalidos = set(jogo['canais']) - permitidos
+              assert not invalidos, f'TV: canal não permitido em {event_id}: {sorted(invalidos)}'
           print('YouTube e transmissões TV validados')
           PY
 
