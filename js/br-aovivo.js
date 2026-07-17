@@ -603,13 +603,13 @@
     const live = games.filter((g) => g.state === "in").sort((a, b) => (a.date || 0) - (b.date || 0));
     if (live.length) return live;
 
-    // Mantém jogos encerrados em destaque por cinco minutos contados da
+    // Mantém jogos encerrados em destaque por quinze minutos contados da
     // primeira resposta em que a ESPN os marcou como post/finalizados.
     const recent = games.filter((g) => {
       if (g.state !== "post") return false;
       const key = String(g.id || teamKey(g.home && g.home.nome, g.away && g.away.nome));
       const endedAt = Number(state.finalizadosEm[key] || 0);
-      return endedAt > 0 && now - endedAt <= 5 * 60000;
+      return endedAt > 0 && now - endedAt <= 15 * 60000;
     }).sort((a, b) => {
       const ka = String(a.id || teamKey(a.home && a.home.nome, a.away && a.away.nome));
       const kb = String(b.id || teamKey(b.home && b.home.nome, b.away && b.away.nome));
@@ -635,12 +635,15 @@
 
   function chooseGame(games) {
     const priorities = priorityGames(games);
-    const eligible = priorities.length ? priorities : games.slice().sort((a, b) => (a.date || 0) - (b.date || 0));
+    // A seleção principal deve vir SOMENTE dos jogos prioritários: ao vivo,
+    // encerrados há no máximo 15 minutos ou próximos jogos. O fallback antigo
+    // usava todos os jogos — inclusive encerrados — e fazia uma partida finalizada
+    // reaparecer indefinidamente depois que a janela pós-jogo expirava.
+    const eligible = priorities;
     let selected = eligible.find((g) => g.id && g.id === state.selecionado);
-    // Não mantém à força um jogo encerrado fora da janela de cinco minutos.
-    // Depois desse período, o destaque migra naturalmente ao próximo jogo.
     if (!selected) selected = eligible[0] || null;
     if (selected && selected.id) state.selecionado = selected.id;
+    else state.selecionado = null;
     return { selected, priorities };
   }
 
