@@ -2755,7 +2755,10 @@ let state = {
   // Ranking Vivo de desempenho dos clubes
   rankingDesempenho: {},
   rankingDesempenhoMeta: null,
-  rankingDesempenhoCarregado: false
+  rankingDesempenhoCarregado: false,
+  // Placar ESPN usado também para a classificação provisória ao vivo.
+  espnLive: {},
+  _espnLiveUltima: null
 };
 
 // ========================================================================
@@ -3237,7 +3240,7 @@ function setView(v) {
   if (v === 'jogos' && !state.jogosCarregados) {
     carregarJogos();
   }
-  if (v === 'jogos') {
+  if (v === 'jogos' || v === 'tabela') {
     espnLiveArmar(); // rearma o AO VIVO (dorme quando sai da aba/da janela)
   }
   if (v === 'resultados' && !state.resultadosCarregados) {
@@ -3447,12 +3450,99 @@ function toggleExpand(idx) {
   renderRank();
 }
 
+function numeroPlacarLive(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function contagemResultadosPorTime() {
+  const mapa = {};
+  for (const r of (state.resultados || [])) {
+    const m = nomeCanonico((r.mandante || {}).nome);
+    const v = nomeCanonico((r.visitante || {}).nome);
+    if (m) mapa[m] = (mapa[m] || 0) + 1;
+    if (v) mapa[v] = (mapa[v] || 0) + 1;
+  }
+  return mapa;
+}
+
+function resultadoLiveJaEstaNoJson(live) {
+  if (!live) return false;
+  const m = live.mandante, v = live.visitante;
+  const pm = numeroPlacarLive(live.placarMandante);
+  const pv = numeroPlacarLive(live.placarVisitante);
+  return (state.resultados || []).some(r =>
+    nomeCanonico((r.mandante || {}).nome) === m &&
+    nomeCanonico((r.visitante || {}).nome) === v &&
+    Number(r.placar_mandante) === pm && Number(r.placar_visitante) === pv
+  );
+}
+
+function jogosLiveAplicaveisNaTabela() {
+  const oficiais = Object.fromEntries((state.tabela || []).map(t => [t.time, t]));
+  const contagem = contagemResultadosPorTime();
+  const vistos = new Set();
+  const saida = [];
+  for (const live of Object.values(state.espnLive || {})) {
+    if (!live || !['in','post'].includes(live.estado)) continue;
+    const m = nomeCanonico(live.mandante), v = nomeCanonico(live.visitante);
+    const pm = numeroPlacarLive(live.placarMandante), pv = numeroPlacarLive(live.placarVisitante);
+    if (!m || !v || pm === null || pv === null || !oficiais[m] || !oficiais[v]) continue;
+    const chave = `${m}|${v}`;
+    if (vistos.has(chave)) continue;
+    vistos.add(chave);
+
+    if (live.estado === 'post') {
+      const jaNoResultados = resultadoLiveJaEstaNoJson(live);
+      const esperadoM = (contagem[m] || 0) + (jaNoResultados ? 0 : 1);
+      const esperadoV = (contagem[v] || 0) + (jaNoResultados ? 0 : 1);
+      // Assim que a tabela oficial alcançar a quantidade de partidas concluídas,
+      // a projeção é retirada e a ESPN volta a ser a única fonte da classificação.
+      if (Number(oficiais[m].jogos) >= esperadoM && Number(oficiais[v].jogos) >= esperadoV) continue;
+    }
+    saida.push({ ...live, mandante: m, visitante: v, placarMandante: pm, placarVisitante: pv });
+  }
+  return saida;
+}
+
+function tabelaComJogosAoVivo() {
+  const base = (state.tabela || []).map(t => ({ ...t, _aoVivo: false }));
+  const porTime = Object.fromEntries(base.map(t => [t.time, t]));
+  const jogos = jogosLiveAplicaveisNaTabela();
+  for (const j of jogos) {
+    const m = porTime[j.mandante], v = porTime[j.visitante];
+    if (!m || !v) continue;
+    const pm = j.placarMandante, pv = j.placarVisitante;
+    for (const t of [m, v]) { t.jogos = Number(t.jogos || 0) + 1; t._aoVivo = true; }
+    m.gp = Number(m.gp || 0) + pm; m.gc = Number(m.gc || 0) + pv;
+    v.gp = Number(v.gp || 0) + pv; v.gc = Number(v.gc || 0) + pm;
+    if (pm > pv) { m.vitorias++; v.derrotas++; m.pontos += 3; }
+    else if (pm < pv) { v.vitorias++; m.derrotas++; v.pontos += 3; }
+    else { m.empates++; v.empates++; m.pontos++; v.pontos++; }
+  }
+  for (const t of base) {
+    t.sg = Number(t.gp || 0) - Number(t.gc || 0);
+    t.aproveitamento = t.jogos ? Math.round((Number(t.pontos || 0) / (Number(t.jogos) * 3)) * 100) : 0;
+  }
+  base.sort((a,b) =>
+    Number(b.pontos)-Number(a.pontos) ||
+    Number(b.vitorias)-Number(a.vitorias) ||
+    Number(b.sg)-Number(a.sg) ||
+    Number(b.gp)-Number(a.gp) ||
+    String(a.time).localeCompare(String(b.time), 'pt-BR')
+  );
+  base.forEach((t,i) => { t.pos = i + 1; });
+  return { tabela: base, jogos };
+}
+
 function renderTabela() {
   if (state.tabela.length === 0) {
     document.getElementById('view-tabela').innerHTML = '<div class="card empty">Carregando...</div>';
     return;
   }
 
+  const projecaoAoVivo = tabelaComJogosAoVivo();
+  const tabelaRender = projecaoAoVivo.tabela;
   const snap = gerenciarSnapshotTabela();
   const posBase = (snap && snap.posicoesBase) || {};
   const forma = calcularFormaTimes();
@@ -3460,7 +3550,8 @@ function renderTabela() {
 
   let html = '<div class="br-panel-title"><div><div class="br-kicker">Classificação oficial</div><h2>Tabela do Brasileirão 2026</h2></div>';
   const dataTabela = state._atualizadoEmServidor ? new Date(state._atualizadoEmServidor) : state.ultimaAtualizacao;
-  html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${dataTabela ? 'Atualizada em ' + formatarHora(dataTabela) + ' · Fonte ESPN' : 'Fonte ESPN'}</span></div>`;
+  const temTabelaAoVivo = projecaoAoVivo.jogos.length > 0;
+  html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${temTabelaAoVivo ? '🔴 Classificação ao vivo · inclui jogos em andamento' : (dataTabela ? 'Atualizada em ' + formatarHora(dataTabela) + ' · Fonte ESPN' : 'Fonte ESPN')}</span></div>`;
   html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
   html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><thead><tr>' +
     '<th style="width:64px;">Pos</th><th>Time</th>' +
@@ -3476,14 +3567,14 @@ function renderTabela() {
     (forma ? '<th style="text-align:center;" class="col-oculta-mobile">Últimos 5</th>' : '') +
     '</tr></thead><tbody>';
 
-  state.tabela.forEach(t => {
+  tabelaRender.forEach(t => {
     let cls = '';
     if (t.pos >= 17) cls = 'zona-rebaixamento';
     else if (t.pos <= 4) cls = 'zona-libertadores';
     else if (t.pos <= 6) cls = 'zona-prelibertadores';
     const seta = htmlSetaMovimento(posBase[t.time], t.pos);
     const esc = escudoDe(t.time);
-    const celTime = `<div class="tabela-time-cel">${esc ? `<img class="tabela-escudo" src="${esc.escudo}" alt="" loading="lazy">` : ''}<span>${t.time}</span></div>`;
+    const celTime = `<div class="tabela-time-cel">${esc ? `<img class="tabela-escudo" src="${esc.escudo}" alt="" loading="lazy">` : ''}<span>${t.time}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : ''}</div>`;
     let celForma = '';
     if (forma) {
       const f5 = forma[t.time] || [];
@@ -3990,6 +4081,24 @@ function setFiltroJogos(time) {
   renderJogos();
 }
 
+// Nome esportivo compacto para autores de gols da ESPN.
+// Prioriza shortName; como fallback evita nomes civis excessivamente longos.
+function nomeJogadorCurtoESPN(atleta) {
+  if (!atleta) return '';
+  const curto = String(atleta.shortName || atleta.shortDisplayName || atleta.name || '').trim();
+  if (curto && curto.length <= 28) return curto;
+  const completo = String(atleta.displayName || atleta.fullName || curto || '').trim();
+  if (!completo) return '';
+  const partes = completo.split(/\s+/).filter(Boolean);
+  if (partes.length <= 3) return completo;
+  const conectores = new Set(['da','das','de','do','dos','e']);
+  const relevantes = partes.filter(x => !conectores.has(x.toLocaleLowerCase('pt-BR')));
+  if (relevantes.length <= 3) return relevantes.join(' ');
+  // Em nomes brasileiros longos, o penúltimo termo significativo costuma ser
+  // o nome esportivo usado pela transmissão (ex.: Lucas ... Jales do Nascimento).
+  return `${relevantes[0]} ${relevantes[relevantes.length - 2]}`;
+}
+
 // ========================================================================
 // AO VIVO — ESPN (bra.1), direto do navegador, a cada 30 segundos.
 // Mesma técnica do módulo da Copa (aovivo.js): a API da ESPN aceita CORS,
@@ -4059,7 +4168,8 @@ async function espnLiveBuscar() {
       const gols = [];
       for (const d of (comp.details || [])) {
         if (!d || d.scoringPlay !== true) continue;
-        const quem = ((d.athletesInvolved || [])[0] || {}).displayName || '';
+        const atletaGol = ((d.athletesInvolved || [])[0] || {});
+        const quem = nomeJogadorCurtoESPN(atletaGol);
         const min = ((d.clock || {}).displayValue || '').trim();
         const timeGol = String((d.team || {}).id || '') === String((casa.team || {}).id || '')
           ? (casa.team || {}).abbreviation : (fora.team || {}).abbreviation;
@@ -4071,6 +4181,10 @@ async function espnLiveBuscar() {
         status: st.displayClock || tipo.shortDetail || tipo.detail || '',
         placarMandante: casa.score != null ? casa.score : '-',
         placarVisitante: fora.score != null ? fora.score : '-',
+        mandante: nomeCanonico((casa.team || {}).displayName || (casa.team || {}).name),
+        visitante: nomeCanonico((fora.team || {}).displayName || (fora.team || {}).name),
+        dataIso: ev.date || comp.date || null,
+        eventId: ev.id || comp.id || null,
         gols: gols
       };
     } catch (e) { /* evento malformado: ignora */ }
@@ -4083,12 +4197,13 @@ let _espnTimer = null;
 async function espnLiveTick() {
   _espnTimer = null;
   // Só trabalha quando a aba Jogos está visível e há janela de jogo.
-  if (document.hidden || state.view !== 'jogos' || !espnJanelaAtiva()) {
+  if (document.hidden || !['jogos', 'tabela'].includes(state.view) || !espnJanelaAtiva()) {
     return; // dorme; será rearmado por setView/visibilitychange
   }
   try {
     await espnLiveBuscar();
     if (state.view === 'jogos') renderJogos();
+    if (state.view === 'tabela') renderTabela();
   } catch (e) {
     console.warn('AO VIVO ESPN indisponível agora:', e.message);
     // silencioso: o site continua com jogos.json/resultados.json (robô 10 min)
