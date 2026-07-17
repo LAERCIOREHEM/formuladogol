@@ -70,13 +70,34 @@ def load_json(path: Path, fallback: Any) -> Any:
 def broadcasts(event: Mapping[str, Any]) -> List[str]:
     comp = ((event.get("competitions") or [{}])[0]) or {}
     values: List[str] = []
-    for source in (comp.get("broadcasts") or [], event.get("broadcasts") or []):
-        for item in source if isinstance(source, list) else []:
-            if isinstance(item.get("names"), list):
-                values.extend(str(x) for x in item["names"] if x)
-            for key in ("name", "shortName", "displayName", "network"):
-                if item.get(key):
-                    values.append(str(item[key]))
+
+    def walk(node: Any) -> None:
+        if node is None:
+            return
+        if isinstance(node, list):
+            for item in node:
+                walk(item)
+            return
+        if not isinstance(node, Mapping):
+            return
+        names = node.get("names")
+        if isinstance(names, list):
+            values.extend(str(x) for x in names if x)
+        for key in ("name", "shortName", "displayName", "network", "callLetters"):
+            if node.get(key):
+                values.append(str(node[key]))
+        if node.get("media"):
+            walk(node["media"])
+
+    # A ESPN costuma usar broadcasts em alguns jogos e geoBroadcasts em outros.
+    # O parser anterior ignorava geoBroadcasts, por isso muitos canais próximos
+    # nunca entravam no JSON mesmo após o workflow rodar.
+    for source in (
+        comp.get("broadcasts"), comp.get("geoBroadcasts"),
+        event.get("broadcasts"), event.get("geoBroadcasts")
+    ):
+        walk(source)
+
     out: List[str] = []
     for raw in values:
         n = norm(raw)
@@ -142,7 +163,7 @@ def build(existing: Mapping[str, Any], agenda: Mapping[str, Any], scoreboard: Ma
 
 def selftest() -> None:
     agenda = {"jogos": [{"event_id": "1", "rodada": 19, "mandante": "Vitória", "visitante": "Vasco", "data_iso": "2026-07-16T19:30:00-03:00"}]}
-    score = {"events": [{"id": "1", "date": "2026-07-16T22:30:00Z", "competitions": [{"broadcasts": [{"names": ["Premiere", "SporTV"]}], "competitors": [{"homeAway": "home", "team": {"displayName": "Vitória"}}, {"homeAway": "away", "team": {"displayName": "Vasco da Gama"}}]}]}]}
+    score = {"events": [{"id": "1", "date": "2026-07-16T22:30:00Z", "competitions": [{"geoBroadcasts": [{"media": {"shortName": "Premiere"}}, {"media": {"shortName": "SporTV"}}], "competitors": [{"homeAway": "home", "team": {"displayName": "Vitória"}}, {"homeAway": "away", "team": {"displayName": "Vasco da Gama"}}]}]}]}
     existing = {"jogos": {"2": {"event_id": "2", "origem": "manual confirmado", "canais": ["Prime Video"]}}}
     result = build(existing, agenda, score, dt.datetime(2026, 7, 16, 20, 0, tzinfo=TZ))
     assert result["jogos"]["1"]["canais"] == ["Premiere", "SporTV"]

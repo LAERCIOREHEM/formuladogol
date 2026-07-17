@@ -92,6 +92,27 @@
     "disneyplus.com", "www.disneyplus.com"
   ]);
 
+  const FINAL_CACHE_KEY = "br2026_finais_reais_v2";
+
+  function cachedFinalTimes() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(FINAL_CACHE_KEY) || "{}");
+      const now = Date.now();
+      const out = {};
+      for (const [key, value] of Object.entries(parsed || {})) {
+        const ts = Number(value || 0);
+        if (ts > 0 && now - ts <= 12 * 3600000) out[key] = ts;
+      }
+      return out;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveFinalTimes() {
+    try { localStorage.setItem(FINAL_CACHE_KEY, JSON.stringify(state.finalizadosEm || {})); } catch (_) {}
+  }
+
   const state = {
     agenda: [],
     eventosLocais: [],
@@ -106,7 +127,7 @@
     tickTimer: null,
     carregando: false,
     primeiraCarga: true,
-    finalizadosEm: {}
+    finalizadosEm: cachedFinalTimes()
   };
 
   function esc(v) {
@@ -197,6 +218,7 @@
       transmissao: j.transmissao || "",
       adiado: j.adiado === true,
       dataDefinir: j.data_definir === true,
+      finalizadoEm: parseDate(j.finalizado_em),
       home: { ...localTeam(j.mandante), score: j.placar_mandante },
       away: { ...localTeam(j.visitante), score: j.placar_visitante },
       raw: null,
@@ -238,18 +260,25 @@
   function broadcastNames(ev, comp) {
     const out = [];
     const add = (value) => {
+      if (Array.isArray(value)) return value.forEach(add);
       const name = String(value || "").trim();
       if (!name || out.some((x) => norm(x) === norm(name))) return;
       out.push(name);
     };
-    const lists = [comp && comp.broadcasts, ev && ev.broadcasts];
-    for (const list of lists) {
-      for (const item of (Array.isArray(list) ? list : [])) {
-        if (Array.isArray(item.names)) item.names.forEach(add);
-        add(item.name || item.shortName || item.displayName || item.network);
-        if (item.media && Array.isArray(item.media.shortName)) item.media.shortName.forEach(add);
-      }
-    }
+    const walk = (node) => {
+      if (!node) return;
+      if (Array.isArray(node)) return node.forEach(walk);
+      if (typeof node !== "object") return;
+      if (Array.isArray(node.names)) node.names.forEach(add);
+      for (const key of ["name", "shortName", "displayName", "network", "callLetters"]) add(node[key]);
+      if (node.media) walk(node.media);
+    };
+    [
+      comp && comp.broadcasts,
+      comp && comp.geoBroadcasts,
+      ev && ev.broadcasts,
+      ev && ev.geoBroadcasts
+    ].forEach(walk);
     return out;
   }
 
@@ -280,6 +309,7 @@
       transmissao: broadcastNames(ev, comp).join(" / "),
       adiado: /postpon|adiad|suspend|cancel/i.test([type.name, type.description, type.detail, type.shortDetail].join(" ")),
       dataDefinir: false,
+      finalizadoEm: parseDate(ev.finalizado_em || ev.finalizedAt || ev.completedAt),
       home,
       away,
       raw: ev,
@@ -310,6 +340,7 @@
       venue: game.venue || loc.venue,
       transmissao: loc.transmissao || game.transmissao,
       adiado: loc.adiado || game.adiado,
+      finalizadoEm: game.finalizadoEm || loc.finalizadoEm || null,
       home: { ...loc.home, ...game.home, nome: loc.home.nome || game.home.nome, escudo: loc.home.escudo || game.home.escudo },
       away: { ...loc.away, ...game.away, nome: loc.away.nome || game.away.nome, escudo: loc.away.escudo || game.away.escudo }
     };
@@ -519,6 +550,35 @@
     ]);
     state.agenda = localGamesFromJson(jogos).filter((g) => !g.dataDefinir && g.date);
     state.eventosLocais = (eventos.eventos || []).slice();
+    for (const item of state.eventosLocais) {
+      const key = String(item && item.event_id || "");
+      const finalizado = parseDate(item && item.finalizado_em);
+      if (key && finalizado) state.finalizadosEm[key] = finalizado.getTime();
+    }
+    saveFinalTimes();
+  }
+
+  function finalizadoLocalParaJogo(game) {
+    if (!game) return 0;
+    const direct = state.eventosLocais.find((item) => String(item && item.event_id || "") === String(game.id || ""));
+    if (direct) {
+      const parsed = parseDate(direct.finalizado_em);
+      if (parsed) return parsed.getTime();
+    }
+    return game.finalizadoEm instanceof Date ? game.finalizadoEm.getTime() : 0;
+  }
+
+  function estimarFinalizadoEm(game, now) {
+    const inicio = game && game.date instanceof Date ? game.date.getTime() : NaN;
+    if (!Number.isFinite(inicio)) return now;
+    const raw = String((game && (game.detail || game.clock)) || "");
+    const m = raw.match(/(\d{1,3})\s*['’]?\s*(?:\+\s*(\d+))?/);
+    const duracaoMin = m
+      ? Math.max(90, Number(m[1] || 90)) + Number(m[2] || 0) + 18
+      : 115;
+    // Tempo jogado + intervalo + pequena margem operacional. É estável entre
+    // reloads e impede que um deploy dê nova sobrevida a uma partida antiga.
+    return Math.min(now, inicio + duracaoMin * 60000);
   }
 
   async function loadScoreboard() {
@@ -533,12 +593,18 @@
       const key = String(game.id || teamKey(game.home && game.home.nome, game.away && game.away.nome));
       if (!key) continue;
       seen.add(key);
-      if (game.state === "post" && !state.finalizadosEm[key]) state.finalizadosEm[key] = Date.now();
-      if (game.state !== "post") delete state.finalizadosEm[key];
+      if (game.state === "post") {
+        const stable = finalizadoLocalParaJogo(game);
+        if (stable > 0) state.finalizadosEm[key] = stable;
+        else if (!state.finalizadosEm[key]) state.finalizadosEm[key] = estimarFinalizadoEm(game, Date.now());
+      } else {
+        delete state.finalizadosEm[key];
+      }
     }
     for (const key of Object.keys(state.finalizadosEm)) {
-      if (!seen.has(key) || Date.now() - state.finalizadosEm[key] > 6 * 3600000) delete state.finalizadosEm[key];
+      if (Date.now() - state.finalizadosEm[key] > 12 * 3600000) delete state.finalizadosEm[key];
     }
+    saveFinalTimes();
     state.diretos = normalized;
   }
 
@@ -575,6 +641,7 @@
       clock: primary.clock || secondary.clock,
       venue: primary.venue || secondary.venue,
       transmissao: primary.transmissao || secondary.transmissao,
+      finalizadoEm: primary.finalizadoEm || secondary.finalizadoEm || null,
       home: { ...secondary.home, ...primary.home, escudo: primary.home.escudo || secondary.home.escudo },
       away: { ...secondary.away, ...primary.away, escudo: primary.away.escudo || secondary.away.escudo }
     };

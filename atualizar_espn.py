@@ -791,6 +791,79 @@ def aplicar_transmissoes_manuais(eventos: list[dict[str, Any]]) -> None:
                     e["transmissao"] = str(t["transmissao"])
 
 
+
+def parse_iso_brt(valor: Any) -> datetime | None:
+    if not valor:
+        return None
+    try:
+        obj = datetime.fromisoformat(str(valor).replace("Z", "+00:00"))
+        if obj.tzinfo is None:
+            obj = obj.replace(tzinfo=FUSO_BRASILIA)
+        return obj.astimezone(FUSO_BRASILIA)
+    except (TypeError, ValueError):
+        return None
+
+
+def carregar_snapshot_eventos_anterior() -> tuple[dict[str, dict[str, Any]], datetime | None]:
+    caminho = Path("espn_eventos.json")
+    if not caminho.exists():
+        return {}, None
+    try:
+        payload = json.loads(caminho.read_text(encoding="utf-8"))
+    except Exception:
+        return {}, None
+    eventos = {
+        str(item.get("event_id") or ""): item
+        for item in (payload.get("eventos") or [])
+        if item.get("event_id")
+    }
+    return eventos, parse_iso_brt(payload.get("atualizado_em"))
+
+
+def estimar_finalizado_em(e: dict[str, Any], agora: datetime, anterior: dict[str, Any] | None = None,
+                          snapshot_anterior_em: datetime | None = None) -> datetime:
+    """Estima o apito final sem reiniciar a janela a cada deploy/reload.
+
+    A API de scoreboard não publica um timestamp explícito de encerramento. O
+    melhor sinal estável é o horário de início somado ao tempo efetivamente
+    jogado, ao intervalo e a uma pequena margem operacional. Quando o snapshot
+    anterior ainda mostrava o jogo em andamento, ele também funciona como piso.
+    """
+    inicio = e.get("data_dt")
+    status = str(e.get("status") or "")
+    m = re.search(r"(\d{1,3})\s*['’]?\s*(?:\+\s*(\d+))?", status)
+    if m:
+        minutos_totais = max(90, int(m.group(1))) + int(m.group(2) or 0) + 18
+    else:
+        # FT sem relógio: duração conservadora de 1h55 desde o horário oficial.
+        minutos_totais = 115
+    if isinstance(inicio, datetime):
+        estimado = inicio + timedelta(minutes=minutos_totais)
+    else:
+        estimado = agora
+
+    anterior = anterior or {}
+    anterior_era_ao_vivo = str(anterior.get("estado") or "").lower() != "post" and not bool(anterior.get("concluido"))
+    if anterior_era_ao_vivo and snapshot_anterior_em and estimado < snapshot_anterior_em:
+        estimado = snapshot_anterior_em
+    if estimado > agora:
+        estimado = agora
+    return estimado.astimezone(FUSO_BRASILIA)
+
+
+def aplicar_finalizados_em(eventos: list[dict[str, Any]], anteriores: dict[str, dict[str, Any]],
+                            snapshot_anterior_em: datetime | None, agora: datetime) -> None:
+    for e in eventos:
+        if not (e.get("estado") == "post" or e.get("concluido") is True):
+            e.pop("finalizado_em", None)
+            continue
+        event_id = str(e.get("event_id") or "")
+        anterior = anteriores.get(event_id) or {}
+        preservado = parse_iso_brt(anterior.get("finalizado_em"))
+        finalizado = preservado or estimar_finalizado_em(e, agora, anterior, snapshot_anterior_em)
+        e["finalizado_em"] = finalizado.replace(microsecond=0).isoformat()
+
+
 def payload_jogo(e: dict[str, Any], incluir_placar: bool = True) -> dict[str, Any]:
     obj = {
         "event_id": e.get("event_id", ""),
@@ -805,6 +878,8 @@ def payload_jogo(e: dict[str, Any], incluir_placar: bool = True) -> dict[str, An
         "adiado": bool(e.get("adiado") is True),
         "data_definir": bool(e.get("data_definir") is True),
     }
+    if e.get("finalizado_em"):
+        obj["finalizado_em"] = e["finalizado_em"]
     if incluir_placar:
         obj["placar_mandante"] = e.get("placar_mandante")
         obj["placar_visitante"] = e.get("placar_visitante")
@@ -831,13 +906,16 @@ def evento_realmente_finalizado(e: dict[str, Any], agora: datetime) -> bool:
         return False
     return bool(e.get("concluido") is True or estado == "post" or dt < agora - timedelta(hours=2))
 
-def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]]) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]],
+                                     anteriores: dict[str, dict[str, Any]] | None = None,
+                                     snapshot_anterior_em: datetime | None = None) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     eventos = normalizar_eventos_scoreboard(eventos_brutos)
     aplicar_transmissoes_manuais(eventos)
     if not eventos:
         raise RuntimeError("Nenhum evento ESPN foi normalizado; abortando para não publicar JSON vazio.")
 
     agora = agora_brt()
+    aplicar_finalizados_em(eventos, anteriores or {}, snapshot_anterior_em, agora)
     futuros = [
         e for e in eventos
         if isinstance(e.get("data_dt"), datetime)
@@ -906,6 +984,7 @@ def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]]) -> tupl
                 "placar_visitante": e.get("placar_visitante"),
                 "adiado": bool(e.get("adiado") is True),
                 "data_definir": bool(e.get("data_definir") is True),
+                "finalizado_em": e.get("finalizado_em", ""),
                 "rodada_corrigida_de": e.get("rodada_corrigida_de"),
                 "motivo_ajuste": e.get("motivo_ajuste", ""),
             }
@@ -941,7 +1020,10 @@ def main() -> None:
         tabela = gerar_tabela()
         validar_contra_ranking(tabela)
         eventos_brutos = buscar_eventos_scoreboard()
-        jogos, resultados, eventos = gerar_jogos_resultados_eventos(eventos_brutos)
+        anteriores, snapshot_anterior_em = carregar_snapshot_eventos_anterior()
+        jogos, resultados, eventos = gerar_jogos_resultados_eventos(
+            eventos_brutos, anteriores, snapshot_anterior_em
+        )
     except Exception as e:  # noqa: BLE001
         print(f"ERRO FATAL: {e}")
         sys.exit(1)
