@@ -690,16 +690,57 @@
     return String((obj && obj.clock && obj.clock.displayValue) || (obj && obj.displayClock) || "").trim();
   }
 
-  function eventAthlete(obj) {
+  function compactPlayerName(raw) {
+    let s = String(raw || "").trim().replace(/\s+/g, " ");
+    if (!s) return "";
+    // Remove sufixos geracionais e partículas que não ajudam no nome esportivo.
+    const parts = s.split(" ").filter(Boolean);
+    const suffixes = new Set(["junior", "júnior", "neto", "filho", "sobrinho", "ii", "iii", "iv"]);
+    while (parts.length > 1 && suffixes.has(norm(parts[parts.length - 1]))) parts.pop();
+    if (parts.length <= 2) return parts.join(" ");
+    // Para nomes extensos, mantém o primeiro nome e o último sobrenome útil.
+    const particles = new Set(["da", "de", "do", "das", "dos", "e"]);
+    const genericSurnames = new Set(["silva", "santos", "souza", "sousa", "oliveira", "pereira", "costa", "lima", "alves", "rocha", "nascimento", "ferreira", "gomes", "ribeiro", "martins", "carvalho"]);
+    let last = parts.length - 1;
+    while (last > 1 && (particles.has(norm(parts[last])) || genericSurnames.has(norm(parts[last])))) last--;
+    while (last > 1 && particles.has(norm(parts[last]))) last--;
+    return parts[0] + " " + parts[last];
+  }
+
+  function rosterNameMap(summary) {
+    const out = {};
+    const add = (athlete) => {
+      if (!athlete) return;
+      const id = athlete.id != null ? String(athlete.id) : "";
+      const short = athlete.shortName || athlete.displayName || athlete.fullName || athlete.name || "";
+      if (id && short) out[id] = compactPlayerName(short);
+    };
+    for (const roster of ((summary && summary.rosters) || [])) {
+      for (const entry of (roster.roster || roster.athletes || [])) add(entry.athlete || entry);
+    }
+    for (const team of (((summary || {}).boxscore || {}).players || [])) {
+      for (const statGroup of (team.statistics || [])) {
+        for (const athlete of (statGroup.athletes || [])) add(athlete.athlete || athlete);
+      }
+    }
+    return out;
+  }
+
+  function eventAthlete(obj, summary) {
+    const roster = rosterNameMap(summary);
     const involved = obj && obj.athletesInvolved;
-    if (Array.isArray(involved) && involved[0]) return involved[0].displayName || involved[0].shortName || involved[0].name || "";
-    return (obj && obj.athlete && (obj.athlete.displayName || obj.athlete.name)) || "";
+    const athlete = Array.isArray(involved) && involved[0] ? involved[0] : (obj && obj.athlete) || null;
+    if (!athlete) return "";
+    const id = athlete.id != null ? String(athlete.id) : "";
+    const raw = (id && roster[id]) || athlete.shortName || athlete.displayName || athlete.fullName || athlete.name || "";
+    return compactPlayerName(raw);
   }
 
   function eventRows(g, summary) {
     const candidates = [];
     const comp = g.competition || getCompetition(g.raw || {});
     for (const d of (comp.details || [])) candidates.push(d);
+    for (const d of ((summary && summary.scoringPlays) || [])) candidates.push(d);
     for (const p of ((summary && summary.plays) || [])) candidates.push(p);
     const teamMap = teamIdMap(g);
     const out = [];
@@ -708,7 +749,7 @@
       const type = eventType(item);
       if (!type) continue;
       const min = eventMinute(item);
-      const athlete = eventAthlete(item);
+      const athlete = eventAthlete(item, summary);
       const teamId = String((item.team && item.team.id) || item.teamId || "");
       const team = teamMap[teamId];
       const fallbackText = String(item.text || item.description || type.label);
@@ -717,20 +758,69 @@
       const key = [type.key, min, identity, teamId].join("|");
       if (seen.has(key)) continue;
       seen.add(key);
-      out.push({ type, min, text, team: team ? team.nome : "", sort: Number((min.match(/\d+/) || [999])[0]) });
+      out.push({ type, min, athlete, text, teamId, team: team ? team.nome : "", sort: Number((min.match(/\d+/) || [999])[0]) });
     }
     out.sort((a, b) => a.sort - b.sort || a.text.localeCompare(b.text, "pt-BR"));
     return out;
   }
 
-  function statsMapFromList(list) {
-    const map = {};
-    for (const s of (list || [])) {
-      const key = norm(s.name || s.abbreviation || s.label || s.displayName);
-      if (!key) continue;
-      map[key] = s.displayValue != null ? String(s.displayValue) : String(s.value != null ? s.value : "");
+  const LIVE_METRIC_RULES = [
+    { keys:["expected goals","expectedgoals","xg"], label:"xG", order:1 },
+    { keys:["possession pct","possession percent","possession percentage","possessionpct","possession","posse"], label:"Posse", order:2, percent:true },
+    { keys:["total shots","totalshots","shots total","shots","shot attempts","finalizacoes","finalizações"], label:"Finalizações", order:3 },
+    { keys:["shots on goal","shots on target","shotsongoal","shotsontarget","chutes no gol"], label:"Chutes no gol", order:4 },
+    { keys:["shots off target","shotsofftarget"], label:"Chutes para fora", order:5 },
+    { keys:["blocked shots","blockedshots"], label:"Chutes bloqueados", order:6 },
+    { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage","aproveitamento dos chutes"], label:"Aproveitamento dos chutes", order:7, percent01:true, derived:"shotPct" },
+    { keys:["big chances created","bigchancescreated"], label:"Grandes chances", order:8 },
+    { keys:["big chances missed","bigchancesmissed"], label:"Chances perdidas", order:9 },
+    { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:10 },
+    { keys:["fouls committed","foulscommitted","fouls"], label:"Faltas", order:11 },
+    { keys:["yellow cards","yellowcards"], label:"Amarelos", order:12 },
+    { keys:["red cards","redcards"], label:"Vermelhos", order:13 },
+    { keys:["offsides","offside"], label:"Impedimentos", order:14 },
+    { keys:["saves","goalkeeper saves"], label:"Defesas", order:15 },
+    { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:16 },
+    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:17, percent01:true },
+    { keys:["total passes","totalpasses","passes"], label:"Passes", order:18 },
+    { keys:["duels won","duelswon"], label:"Duelos vencidos", order:19 },
+    { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:20 },
+    { keys:["interceptions"], label:"Interceptações", order:21 },
+    { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:22 }
+  ];
+
+  function metricKey(s) {
+    return norm(String(s || "").replace(/([a-z])([A-Z])/g, "$1 $2")).replace(/\s+/g, " ").trim();
+  }
+  function ruleForMetric(name) {
+    const key = metricKey(name), compact = key.replace(/\s+/g, "");
+    for (const r of LIVE_METRIC_RULES) {
+      const label = norm(r.label), lc = label.replace(/\s+/g, "");
+      if (key === label || compact === lc) return r;
+      if (r.keys.some(k => key === norm(k) || compact === norm(k).replace(/\s+/g, ""))) return r;
     }
-    return map;
+    for (const r of LIVE_METRIC_RULES) {
+      if (r.label === "Finalizações") continue;
+      if (r.keys.some(k => key.includes(norm(k)) || compact.includes(norm(k).replace(/\s+/g, "")))) return r;
+    }
+    return null;
+  }
+  function rawStatValue(s) {
+    return s && s.displayValue != null ? String(s.displayValue) : String(s && s.value != null ? s.value : "");
+  }
+  function numericStat(v) {
+    const m = String(v == null ? "" : v).replace(",", ".").replace("%", "").match(/-?\d+(?:\.\d+)?/);
+    return m ? Number(m[0]) : NaN;
+  }
+  function formatStatValue(rule, raw) {
+    if (raw == null || raw === "") return "";
+    const s = String(raw).trim();
+    const n = numericStat(s);
+    if ((rule.percent || rule.percent01) && !/%/.test(s) && Number.isFinite(n)) {
+      const value = rule.percent01 && n >= 0 && n <= 1 ? n * 100 : n;
+      return (Math.round(value * 10) / 10).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%";
+    }
+    return s;
   }
 
   function collectStats(g, summary) {
@@ -740,51 +830,67 @@
       const id = String(team.id || "");
       const name = canon(team.displayName || team.name || team.shortDisplayName || team.abbreviation);
       const key = id || name;
-      if (key) byTeam[key] = { ...(byTeam[key] || {}), ...statsMapFromList(stats) };
+      if (!key) return;
+      const current = byTeam[key] || {};
+      for (const stat of (stats || [])) {
+        const rule = ruleForMetric(stat.displayName || stat.shortDisplayName || stat.name || stat.label || stat.abbreviation || "");
+        if (!rule) continue;
+        const value = formatStatValue(rule, rawStatValue(stat));
+        if (value !== "") current[rule.label] = value;
+      }
+      byTeam[key] = current;
     };
 
     const comp = g.competition || getCompetition(g.raw || {});
     for (const c of (comp.competitors || [])) add(c.team || {}, c.statistics || []);
-    const boxTeams = summary && summary.boxscore && summary.boxscore.teams;
-    for (const t of (boxTeams || [])) add(t.team || {}, t.statistics || []);
+    for (const t of (((summary || {}).boxscore || {}).teams || [])) add(t.team || {}, t.statistics || t.stats || []);
 
-    function forSide(side) {
-      const team = g[side];
+    const side = (which) => {
+      const team = g[which];
       return byTeam[String(team.id || "")] || byTeam[canon(team.nome)] || {};
-    }
-    const h = forSide("home"), a = forSide("away");
-    const defs = [
-      ["Posse de bola", ["possession", "possessionpct", "possession percentage"]],
-      ["Finalizações", ["shots", "total shots", "totalshots", "shot attempts"]],
-      ["Finalizações no gol", ["shots on target", "shotsontarget", "shots on goal", "shotsongoal"]],
-      ["Escanteios", ["corner kicks", "cornerkicks", "corners"]],
-      ["Faltas", ["fouls committed", "foulscommitted", "fouls"]],
-      ["Impedimentos", ["offsides", "offside"]]
-    ];
-    const pick = (obj, keys) => {
-      for (const k of keys) {
-        const nk = norm(k);
-        if (obj[nk] != null && obj[nk] !== "") return obj[nk];
-      }
-      for (const [k, v] of Object.entries(obj)) {
-        if (keys.some((x) => k.includes(norm(x)) || norm(x).includes(k))) return v;
-      }
-      return "";
     };
-    const num = (v) => {
-      const m = String(v || "").replace(",", ".").match(/-?\d+(?:\.\d+)?/);
-      return m ? Number(m[0]) : NaN;
+    const home = side("home"), away = side("away");
+
+    // Se a ESPN não trouxer aproveitamento, calcula chutes no gol ÷ finalizações.
+    const deriveShotPct = (obj) => {
+      if (obj["Aproveitamento dos chutes"] != null) return;
+      const shots = numericStat(obj["Finalizações"]), on = numericStat(obj["Chutes no gol"]);
+      if (Number.isFinite(shots) && shots > 0 && Number.isFinite(on)) obj["Aproveitamento dos chutes"] = (Math.round((on / shots) * 1000) / 10).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) + "%";
     };
+    deriveShotPct(home); deriveShotPct(away);
+
     const rows = [];
-    for (const [label, keys] of defs) {
-      const hv = pick(h, keys), av = pick(a, keys);
+    for (const rule of LIVE_METRIC_RULES) {
+      const hv = home[rule.label] != null ? home[rule.label] : "";
+      const av = away[rule.label] != null ? away[rule.label] : "";
+      // Só exibe quando a fonte trouxe a métrica para os dois lados.
       if (hv === "" || av === "") continue;
-      const hn = num(hv), an = num(av);
+      const hn = numericStat(hv), an = numericStat(av);
       let pct = 50;
       if (Number.isFinite(hn) && Number.isFinite(an) && hn + an > 0) pct = Math.max(4, Math.min(96, hn / (hn + an) * 100));
-      rows.push({ label, home: hv, away: av, pct });
+      rows.push({ label: rule.label, home: hv, away: av, pct, order: rule.order });
     }
-    return rows;
+    return rows.sort((a,b) => a.order - b.order);
+  }
+
+  function goalsBySide(g, summary) {
+    const rows = eventRows(g, summary).filter(r => r.type.key === "goal");
+    const home = [], away = [];
+    const homeId = String(g.home.id || ""), awayId = String(g.away.id || "");
+    for (const row of rows) {
+      const item = { min: row.min, athlete: row.athlete || compactPlayerName(row.text.replace(/^Gol\s*[—-]?\s*/i, "")) || "Gol" };
+      if (row.teamId && row.teamId === homeId) home.push(item);
+      else if (row.teamId && row.teamId === awayId) away.push(item);
+      else if (row.team === g.home.nome) home.push(item);
+      else if (row.team === g.away.nome) away.push(item);
+    }
+    return { home, away };
+  }
+
+  function renderGoalsUnderTeams(g, summary) {
+    const goals = goalsBySide(g, summary);
+    const side = (items) => items.length ? '<div class="live-team-goals">' + items.map(x => '<div><span>' + esc(x.min || "") + '</span> ' + esc(x.athlete) + '</div>').join("") + '</div>' : '';
+    return { home: side(goals.home), away: side(goals.away) };
   }
 
   async function loadSummary(g) {
@@ -825,25 +931,15 @@
     });
   }
 
-  function renderEvents(g, summary) {
-    const rows = eventRows(g, summary);
-    if (!rows.length) return '<div class="live-empty">Gols e cartões aparecerão aqui assim que a fonte disponibilizar os lances.</div>';
-    return '<div class="live-events">' + rows.map((r) => '<div class="live-event">' +
-      '<div class="live-event-minute">' + esc(r.min || "—") + '</div>' +
-      '<div class="live-event-icon">' + r.type.icon + '</div>' +
-      '<div><div class="live-event-text">' + esc(r.text) + '</div>' +
-      (r.team ? '<div class="live-event-team">' + esc(r.team) + '</div>' : "") + '</div></div>').join("") + '</div>';
-  }
-
   function renderStats(g, summary) {
     const rows = collectStats(g, summary);
     if (!rows.length) return '<div class="live-empty">As estatísticas serão exibidas quando estiverem disponíveis para esta partida.</div>';
-    const names = '<div class="live-stats-teams"><span title="' + esc(g.home.nome) + '">' + esc(g.home.nome) + '</span><span title="' + esc(g.away.nome) + '">' + esc(g.away.nome) + '</span></div>';
-    return '<div class="live-stats">' + names + rows.map((r) => '<div class="live-stat-row">' +
-      '<div class="live-stat-value">' + esc(r.home) + '</div><div class="live-stat-mid">' +
-      '<div class="live-stat-label">' + esc(r.label) + '</div>' +
-      '<div class="live-stat-track" style="--home:' + r.pct.toFixed(1) + '%"></div></div>' +
-      '<div class="live-stat-value">' + esc(r.away) + '</div></div>').join("") + '</div>';
+    const names = '<div class="live-stats-head"><div>' + esc(g.home.nome) + '</div><div>comparativo</div><div>' + esc(g.away.nome) + '</div></div>';
+    return '<div class="live-stats live-stats-complete">' + names + rows.map((r) => '<div class="live-stat-row">' +
+      '<div class="live-stat-value"><strong>' + esc(r.home) + '</strong><div class="live-stat-mini"><span style="width:' + r.pct.toFixed(1) + '%"></span></div></div>' +
+      '<div class="live-stat-label">' + esc(r.label) + (r.label === "Aproveitamento dos chutes" ? ' <small title="Chutes no gol ÷ finalizações">ⓘ</small>' : '') + '</div>' +
+      '<div class="live-stat-value right"><strong>' + esc(r.away) + '</strong><div class="live-stat-mini"><span style="width:' + (100-r.pct).toFixed(1) + '%"></span></div></div>' +
+      '</div>').join("") + '<div class="live-stats-note">Mostramos somente métricas disponibilizadas pela ESPN. O site não inventa dados ausentes.</div></div>';
   }
 
   function renderNextList(all, selected) {
@@ -874,20 +970,20 @@
     const countdown = countdownText(g);
     const venue = g.venue ? '<span>🏟️ <strong>' + esc(g.venue) + '</strong></span>' : "";
     const transmission = "";
+    const goalLines = renderGoalsUnderTeams(g, summary);
 
     app.innerHTML = '<section class="live-main-card"><div class="live-card-inner">' +
       '<div class="live-round-row"><span class="live-round-badge">' + esc(roundText + delayed) + '</span>' +
       '<span class="live-state-badge ' + esc(s.key) + '">' + esc(s.label) + '</span></div>' +
-      '<div class="live-score-grid"><div class="live-team">' + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div><div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>' +
+      '<div class="live-score-grid"><div class="live-team">' + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>' +
       '<div class="live-score-center">' + score + '<div class="live-clock">' + esc(statusText(g)) + '</div>' +
       (s.key === "pre" ? '<div class="live-kickoff">Horário de Brasília</div>' : "") +
       (countdown ? '<div class="live-countdown" data-countdown-game="' + esc(g.id) + '">' + esc(countdown) + '</div>' : "") + '</div>' +
-      '<div class="live-team">' + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div><div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div></div>' +
+      '<div class="live-team">' + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div></div>' +
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +
-      '<div class="live-content-grid"><section class="panel live-subpanel"><div class="panel-inner"><div class="live-section-head"><h2>⚽ Gols e cartões</h2><span class="live-section-note">lances oficiais</span></div>' + renderEvents(g, summary) + '</div></section>' +
-      '<section class="panel live-subpanel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">durante o jogo</span></div>' + renderStats(g, summary) + '</div></section></div>' +
+      '<section class="panel live-subpanel live-stats-panel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">ESPN summary</span></div>' + renderStats(g, summary) + '</div></section>' +
       renderNextList(all, g);
   }
 
