@@ -105,7 +105,8 @@
     timer: null,
     tickTimer: null,
     carregando: false,
-    primeiraCarga: true
+    primeiraCarga: true,
+    finalizadosEm: {}
   };
 
   function esc(v) {
@@ -499,12 +500,13 @@
       const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
       const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
       const liveStyle = liveNow || preLive;
-      const label = liveNow
-        ? "AO VIVO na " + sourceName
-        : (preLive ? "AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName);
-      const note = liveNow
-        ? "Transmissão oficial ao vivo no YouTube"
-        : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube");
+      const finished = game.state === "post";
+      const label = finished
+        ? "▶ Rever na " + sourceName
+        : (liveNow ? "AO VIVO na " + sourceName : (preLive ? "AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName));
+      const note = finished
+        ? "Transmissão oficial encerrada no YouTube"
+        : (liveNow ? "Transmissão oficial ao vivo no YouTube" : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube"));
       youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + '</div></div>';
     }
     return youtube + renderClosedTransmission(game);
@@ -525,7 +527,19 @@
     const fim = compactDate(new Date(now.getTime() + 2 * 24 * 3600 * 1000));
     const url = SCOREBOARD_API + "?dates=" + ini + "-" + fim + "&limit=80&_=" + Date.now();
     const data = await fetchJson(url);
-    state.diretos = (data.events || []).map(normalizeEvent).filter(Boolean).map(mergeLocal);
+    const normalized = (data.events || []).map(normalizeEvent).filter(Boolean).map(mergeLocal);
+    const seen = new Set();
+    for (const game of normalized) {
+      const key = String(game.id || teamKey(game.home && game.home.nome, game.away && game.away.nome));
+      if (!key) continue;
+      seen.add(key);
+      if (game.state === "post" && !state.finalizadosEm[key]) state.finalizadosEm[key] = Date.now();
+      if (game.state !== "post") delete state.finalizadosEm[key];
+    }
+    for (const key of Object.keys(state.finalizadosEm)) {
+      if (!seen.has(key) || Date.now() - state.finalizadosEm[key] > 6 * 3600000) delete state.finalizadosEm[key];
+    }
+    state.diretos = normalized;
   }
 
   function sameFixture(a, b) {
@@ -589,16 +603,28 @@
     const live = games.filter((g) => g.state === "in").sort((a, b) => (a.date || 0) - (b.date || 0));
     if (live.length) return live;
 
-    const recent = games.filter((g) => g.state === "post" && g.date && now - g.date.getTime() >= 0 && now - g.date.getTime() < 150 * 60000)
-      .sort((a, b) => b.date - a.date);
+    // Mantém jogos encerrados em destaque por cinco minutos contados da
+    // primeira resposta em que a ESPN os marcou como post/finalizados.
+    const recent = games.filter((g) => {
+      if (g.state !== "post") return false;
+      const key = String(g.id || teamKey(g.home && g.home.nome, g.away && g.away.nome));
+      const endedAt = Number(state.finalizadosEm[key] || 0);
+      return endedAt > 0 && now - endedAt <= 5 * 60000;
+    }).sort((a, b) => {
+      const ka = String(a.id || teamKey(a.home && a.home.nome, a.away && a.away.nome));
+      const kb = String(b.id || teamKey(b.home && b.home.nome, b.away && b.away.nome));
+      return Number(state.finalizadosEm[kb] || 0) - Number(state.finalizadosEm[ka] || 0);
+    });
     const future = games.filter((g) => g.state !== "post" && !isPostponed(g) && g.date && g.date.getTime() >= now - 30 * 60000)
       .sort((a, b) => a.date - b.date);
 
-    // Depois do apito final, mantém o resultado mais recente por até 2h30.
-    // Só então a página migra automaticamente para o próximo compromisso.
     if (recent.length) {
-      const latest = recent[0].date.getTime();
-      return recent.filter((g) => Math.abs(g.date.getTime() - latest) <= 2 * 60000).slice(0, 8);
+      const latestKey = String(recent[0].id || teamKey(recent[0].home.nome, recent[0].away.nome));
+      const latest = Number(state.finalizadosEm[latestKey] || 0);
+      return recent.filter((g) => {
+        const key = String(g.id || teamKey(g.home.nome, g.away.nome));
+        return Math.abs(Number(state.finalizadosEm[key] || 0) - latest) <= 2 * 60000;
+      }).slice(0, 8);
     }
     if (future.length) {
       const first = future[0].date.getTime();
@@ -611,9 +637,8 @@
     const priorities = priorityGames(games);
     const eligible = priorities.length ? priorities : games.slice().sort((a, b) => (a.date || 0) - (b.date || 0));
     let selected = eligible.find((g) => g.id && g.id === state.selecionado);
-    if (!selected && state.selecionado) {
-      selected = games.find((g) => g.id === state.selecionado);
-    }
+    // Não mantém à força um jogo encerrado fora da janela de cinco minutos.
+    // Depois desse período, o destaque migra naturalmente ao próximo jogo.
     if (!selected) selected = eligible[0] || null;
     if (selected && selected.id) state.selecionado = selected.id;
     return { selected, priorities };

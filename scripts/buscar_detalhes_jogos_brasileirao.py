@@ -65,7 +65,12 @@ METRIC_RULES = [
     {"keys": ["saves", "goalkeeper saves"], "label": "Defesas", "order": 15},
     {"keys": ["accurate passes", "accuratepasses", "completed passes"], "label": "Passes certos", "order": 16},
     {"keys": ["pass pct", "pass percent", "pass percentage", "pass accuracy", "passpct", "passaccuracy"], "label": "Precisão de passe", "order": 17, "percent01": True},
-    {"keys": ["duels won", "duelswon"], "label": "Duelos vencidos", "order": 18},
+    {"keys": ["total passes", "totalpasses", "passes", "pass attempts", "passattempts"], "label": "Passes", "order": 18},
+    {"keys": ["duels won", "duelswon", "total duels won", "totalduelswon"], "label": "Duelos vencidos", "order": 19},
+    {"keys": ["tackles won", "tackleswon", "successful tackles", "successfultackles", "tackles"], "label": "Desarmes", "order": 20},
+    {"keys": ["interceptions", "interception"], "label": "Interceptações", "order": 21},
+    {"keys": ["accurate crosses", "accuratecrosses", "crosses", "cross attempts", "crossattempts"], "label": "Cruzamentos", "order": 22},
+    {"keys": ["clearances", "clearance"], "label": "Cortes", "order": 23},
 ]
 
 
@@ -1041,12 +1046,20 @@ def self_test() -> None:
                 {"name": "totalShots", "displayValue": "10"},
                 {"name": "yellowCards", "displayValue": "0"},
                 {"name": "redCards", "displayValue": "0"},
+                {"name": "totalPasses", "displayValue": "500"},
+                {"name": "tacklesWon", "displayValue": "18"},
+                {"name": "interceptions", "displayValue": "11"},
+                {"name": "crosses", "displayValue": "22"},
             ]},
             {"homeAway": "away", "team": {"id": "2", "displayName": "Palmeiras"}, "statistics": [
                 {"name": "possessionPct", "displayValue": "40%"},
                 {"name": "totalShots", "displayValue": "7"},
                 {"name": "yellowCards", "displayValue": "1"},
                 {"name": "redCards", "displayValue": "0"},
+                {"name": "totalPasses", "displayValue": "410"},
+                {"name": "tacklesWon", "displayValue": "20"},
+                {"name": "interceptions", "displayValue": "9"},
+                {"name": "crosses", "displayValue": "15"},
             ]},
         ]},
         "scoringPlays": [{
@@ -1084,6 +1097,10 @@ def self_test() -> None:
     assert parse_arbitro(summary) == "Árbitro Teste"
     stats = parse_summary(summary, jogo)
     assert any(x["nome"] == "Posse" and x["home"] == "60%" and x["away"] == "40%" for x in stats)
+    assert any(x["nome"] == "Passes" and x["home"] == "500" and x["away"] == "410" for x in stats)
+    assert any(x["nome"] == "Desarmes" and x["home"] == "18" and x["away"] == "20" for x in stats)
+    assert any(x["nome"] == "Interceptações" and x["home"] == "11" and x["away"] == "9" for x in stats)
+    assert any(x["nome"] == "Cruzamentos" and x["home"] == "22" and x["away"] == "15" for x in stats)
     gols, cartoes = parse_eventos(summary, jogo, stats)
     assert len(gols) == 1, gols
     assert gols[0]["jogador"] == "Pedro"

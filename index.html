@@ -3506,14 +3506,18 @@ function jogosLiveAplicaveisNaTabela() {
 }
 
 function tabelaComJogosAoVivo() {
-  const base = (state.tabela || []).map(t => ({ ...t, _aoVivo: false }));
+  const base = (state.tabela || []).map(t => ({ ...t, _aoVivo: false, _provisorioFinal: false }));
   const porTime = Object.fromEntries(base.map(t => [t.time, t]));
   const jogos = jogosLiveAplicaveisNaTabela();
   for (const j of jogos) {
     const m = porTime[j.mandante], v = porTime[j.visitante];
     if (!m || !v) continue;
     const pm = j.placarMandante, pv = j.placarVisitante;
-    for (const t of [m, v]) { t.jogos = Number(t.jogos || 0) + 1; t._aoVivo = true; }
+    for (const t of [m, v]) {
+      t.jogos = Number(t.jogos || 0) + 1;
+      t._aoVivo = j.estado === 'in';
+      t._provisorioFinal = j.estado === 'post';
+    }
     m.gp = Number(m.gp || 0) + pm; m.gc = Number(m.gc || 0) + pv;
     v.gp = Number(v.gp || 0) + pv; v.gc = Number(v.gc || 0) + pm;
     if (pm > pv) { m.vitorias++; v.derrotas++; m.pontos += 3; }
@@ -3550,8 +3554,12 @@ function renderTabela() {
 
   let html = '<div class="br-panel-title"><div><div class="br-kicker">Classificação oficial</div><h2>Tabela do Brasileirão 2026</h2></div>';
   const dataTabela = state._atualizadoEmServidor ? new Date(state._atualizadoEmServidor) : state.ultimaAtualizacao;
-  const temTabelaAoVivo = projecaoAoVivo.jogos.length > 0;
-  html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${temTabelaAoVivo ? '🔴 Classificação ao vivo · inclui jogos em andamento' : (dataTabela ? 'Atualizada em ' + formatarHora(dataTabela) + ' · Fonte ESPN' : 'Fonte ESPN')}</span></div>`;
+  const temTabelaAoVivo = projecaoAoVivo.jogos.some(j => j.estado === 'in');
+  const temFinalPendente = projecaoAoVivo.jogos.some(j => j.estado === 'post');
+  const statusTabela = temTabelaAoVivo
+    ? '🔴 Classificação ao vivo · inclui jogos em andamento'
+    : (temFinalPendente ? '✓ Classificação provisória · resultado final aguardando tabela ESPN' : (dataTabela ? 'Atualizada em ' + formatarHora(dataTabela) + ' · Fonte ESPN' : 'Fonte ESPN'));
+  html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${statusTabela}</span></div>`;
   html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
   html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><thead><tr>' +
     '<th style="width:64px;">Pos</th><th>Time</th>' +
@@ -3574,7 +3582,7 @@ function renderTabela() {
     else if (t.pos <= 6) cls = 'zona-prelibertadores';
     const seta = htmlSetaMovimento(posBase[t.time], t.pos);
     const esc = escudoDe(t.time);
-    const celTime = `<div class="tabela-time-cel">${esc ? `<img class="tabela-escudo" src="${esc.escudo}" alt="" loading="lazy">` : ''}<span>${t.time}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : ''}</div>`;
+    const celTime = `<div class="tabela-time-cel">${esc ? `<img class="tabela-escudo" src="${esc.escudo}" alt="" loading="lazy">` : ''}<span>${t.time}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
     let celForma = '';
     if (forma) {
       const f5 = forma[t.time] || [];
@@ -4185,6 +4193,7 @@ async function espnLiveBuscar() {
         visitante: nomeCanonico((fora.team || {}).displayName || (fora.team || {}).name),
         dataIso: ev.date || comp.date || null,
         eventId: ev.id || comp.id || null,
+        rodada: Number((((ev.seasonType || {}).name || '').match(/\d+/) || [])[0] || ((comp.notes || []).map(n => n && n.headline).join(' ').match(/\d+/) || [])[0] || 0),
         gols: gols
       };
     } catch (e) { /* evento malformado: ignora */ }
@@ -4197,13 +4206,15 @@ let _espnTimer = null;
 async function espnLiveTick() {
   _espnTimer = null;
   // Só trabalha quando a aba Jogos está visível e há janela de jogo.
-  if (document.hidden || !['jogos', 'tabela'].includes(state.view) || !espnJanelaAtiva()) {
+  const deveConsultar = state.view === 'resultados' || espnJanelaAtiva();
+  if (document.hidden || !['jogos', 'tabela', 'resultados'].includes(state.view) || !deveConsultar) {
     return; // dorme; será rearmado por setView/visibilitychange
   }
   try {
     await espnLiveBuscar();
     if (state.view === 'jogos') renderJogos();
     if (state.view === 'tabela') renderTabela();
+    if (state.view === 'resultados') renderResultados();
   } catch (e) {
     console.warn('AO VIVO ESPN indisponível agora:', e.message);
     // silencioso: o site continua com jogos.json/resultados.json (robô 10 min)
@@ -4298,6 +4309,28 @@ function formatarDataResultado(dataIso) {
   return `${dias[d.diaSemana]} ${dia}/${mes}`;
 }
 
+function resultadosComFinaisRecentesESPN(listaBase) {
+  const lista = Array.isArray(listaBase) ? listaBase.slice() : [];
+  const chaves = new Set(lista.map(r => espnChaveJogo((r.mandante || {}).nome, (r.visitante || {}).nome)));
+  for (const live of Object.values(state.espnLive || {})) {
+    if (!live || live.estado !== 'post') continue;
+    const chave = espnChaveJogo(live.mandante, live.visitante);
+    if (!chave || chaves.has(chave)) continue;
+    const pm = numeroPlacarLive(live.placarMandante), pv = numeroPlacarLive(live.placarVisitante);
+    if (pm === null || pv === null) continue;
+    const data = live.dataIso || new Date().toISOString();
+    lista.unshift({
+      event_id: live.eventId || '', rodada: live.rodada || '', data_iso: data,
+      status: 'Encerrado', estado: 'post', placar_mandante: pm, placar_visitante: pv,
+      mandante: { nome: live.mandante, escudo: (escudoDe(live.mandante) || {}).escudo || '', sigla: (escudoDe(live.mandante) || {}).sigla || '' },
+      visitante: { nome: live.visitante, escudo: (escudoDe(live.visitante) || {}).escudo || '', sigla: (escudoDe(live.visitante) || {}).sigla || '' },
+      _provisorioESPN: true
+    });
+    chaves.add(chave);
+  }
+  return lista.sort((a,b) => String(b.data_iso || '').localeCompare(String(a.data_iso || '')));
+}
+
 function renderResultados() {
   const container = document.getElementById('view-resultados');
 
@@ -4320,9 +4353,10 @@ function renderResultados() {
   const filtroTime = state.resultadosFiltroTime;
 
   // Filtra resultados se houver um time selecionado
-  let resultadosFiltrados = state.resultados;
+  const resultadosDisponiveis = resultadosComFinaisRecentesESPN(state.resultados);
+  let resultadosFiltrados = resultadosDisponiveis;
   if (filtroTime) {
-    resultadosFiltrados = state.resultados.filter(r =>
+    resultadosFiltrados = resultadosDisponiveis.filter(r =>
       (r.mandante && r.mandante.nome === filtroTime) ||
       (r.visitante && r.visitante.nome === filtroTime)
     );
@@ -4409,7 +4443,7 @@ function renderResultados() {
       html += `<div class="resultado-card ${classeJogo}">
         <div class="resultado-meta">
           <span class="resultado-rodada">R${r.rodada}</span>
-          <span class="resultado-data">${dataFmt}</span>
+          <span class="resultado-data">${dataFmt}${r._provisorioESPN ? ' · <strong style="color:var(--accent)">ESPN ao vivo</strong>' : ''}</span>
         </div>
         <div class="resultado-jogo">
           <div class="resultado-time mandante">
