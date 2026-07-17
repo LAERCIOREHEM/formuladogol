@@ -2758,7 +2758,11 @@ let state = {
   rankingDesempenhoCarregado: false,
   // Placar ESPN usado também para a classificação provisória ao vivo.
   espnLive: {},
-  _espnLiveUltima: null
+  _espnLiveUltima: null,
+  // Transmissões do módulo Ao vivo usadas também na aba Jogos.
+  transmissoesTv: {},
+  transmissoesAovivo: {},
+  transmissoesAovivoManual: {}
 };
 
 // ========================================================================
@@ -3782,8 +3786,10 @@ async function carregarJogos(opcoes = {}) {
   }
 
   // Acessórios (tolerantes a 404 — se não existirem, o site segue normal):
-  // espn_eventos.json  -> transmissão/ONDE ASSISTIR vinda da ESPN (robô)
-  // transmissoes.json  -> ajuste MANUAL de "onde assistir" (prioridade máxima)
+  // espn_eventos.json                    -> transmissão/ONDE ASSISTIR vinda da ESPN (robô)
+  // transmissoes.json                    -> ajuste manual legado de "onde assistir"
+  // dados-br/transmissoes-aovivo*.json   -> links oficiais de YouTube CazéTV/GE TV
+  // dados-br/transmissoes-tv.json        -> TV/streaming fechado com minicards no Ao vivo
   try {
     const r = await fetch('espn_eventos.json?t=' + Date.now());
     if (r.ok) {
@@ -3798,6 +3804,27 @@ async function carregarJogos(opcoes = {}) {
       state.transmissoesManuais = Array.isArray(d.transmissoes) ? d.transmissoes : [];
     }
   } catch (e) { /* opcional */ }
+  try {
+    const r = await fetch('dados-br/transmissoes-tv.json?t=' + Date.now());
+    if (r.ok) {
+      const d = await r.json();
+      state.transmissoesTv = d && d.jogos && typeof d.jogos === 'object' ? d.jogos : {};
+    }
+  } catch (e) { /* opcional */ }
+  try {
+    const r = await fetch('dados-br/transmissoes-aovivo.json?t=' + Date.now());
+    if (r.ok) {
+      const d = await r.json();
+      state.transmissoesAovivo = d && d.jogos && typeof d.jogos === 'object' ? d.jogos : {};
+    }
+  } catch (e) { /* opcional */ }
+  try {
+    const r = await fetch('dados-br/transmissoes-aovivo-manual.json?t=' + Date.now());
+    if (r.ok) {
+      const d = await r.json();
+      state.transmissoesAovivoManual = d && d.jogos && typeof d.jogos === 'object' ? d.jogos : {};
+    }
+  } catch (e) { /* opcional */ }
 
   await carregarMelhoresMomentos({ silencioso: true });
 
@@ -3805,16 +3832,75 @@ async function carregarJogos(opcoes = {}) {
   espnLiveArmar(); // liga o AO VIVO (ESPN) se houver janela de jogo
 }
 
-// "Onde assistir" de um jogo: manual (transmissoes.json) > JSON principal > índice ESPN.
+function chaveTimesJogo(mandante, visitante) {
+  return nomeCanonico(mandante) + '|' + nomeCanonico(visitante);
+}
+function dataIsoDia(v) {
+  if (!v) return '';
+  const d = new Date(v);
+  if (isNaN(d.getTime())) return String(v).slice(0, 10);
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+}
+function entradaTransmissaoPorJogo(j, fonte) {
+  if (!j || !fonte) return null;
+  const id = String(j.id || j.event_id || '');
+  if (id && fonte[id]) return fonte[id];
+  const alvo = chaveTimesJogo((j.mandante || {}).nome, (j.visitante || {}).nome);
+  const dia = dataIsoDia(j.data_iso);
+  for (const item of Object.values(fonte || {})) {
+    if (!item || typeof item !== 'object') continue;
+    if (String(item.event_id || '') === id && id) return item;
+    if (chaveTimesJogo(item.mandante, item.visitante) !== alvo) continue;
+    const itemDia = dataIsoDia(item.data_iso);
+    if (!dia || !itemDia || dia === itemDia) return item;
+  }
+  return null;
+}
+function nomesCanaisEntrada(entry) {
+  if (!entry) return [];
+  if (entry.principal && entry.principal.nome) return [entry.principal.nome];
+  if (Array.isArray(entry.canais)) return entry.canais.filter(Boolean);
+  if (entry.transmissao) return [entry.transmissao];
+  return [];
+}
+function juntarCanais(canais) {
+  const out = [];
+  const vistos = new Set();
+  for (const c of canais.flatMap(x => String(x || '').split(/\s*(?:\/|,|;|\be\b)\s*/i))) {
+    const nome = c.trim();
+    if (!nome) continue;
+    const key = nomeCanonico(nome);
+    if (!key || vistos.has(key)) continue;
+    vistos.add(key);
+    out.push(nome);
+  }
+  return out.join(' / ');
+}
+
+// "Onde assistir" de um jogo: YouTube oficial prevalece, depois TV/streaming fechado e fontes legadas.
 function ondeAssistir(j) {
   const m = nomeCanonico((j.mandante || {}).nome);
   const v = nomeCanonico((j.visitante || {}).nome);
+
   for (const t of (state.transmissoesManuais || [])) {
     if (nomeCanonico(t.mandante) === m && nomeCanonico(t.visitante) === v &&
-        (!t.rodada || t.rodada === j.rodada)) {
+        (!t.rodada || Number(t.rodada) === Number(j.rodada))) {
       return t.transmissao || '';
     }
   }
+
+  // Manual de YouTube primeiro, depois robô: se houver GE TV/CazéTV, mostra isso
+  // no card da aba Jogos em vez de manter uma transmissão fechada redundante.
+  const ytManual = entradaTransmissaoPorJogo(j, state.transmissoesAovivoManual);
+  const ytAuto = entradaTransmissaoPorJogo(j, state.transmissoesAovivo);
+  const yt = ytManual || ytAuto;
+  const ytNomes = nomesCanaisEntrada(yt);
+  if (ytNomes.length) return juntarCanais(ytNomes);
+
+  const tv = entradaTransmissaoPorJogo(j, state.transmissoesTv);
+  const tvNomes = nomesCanaisEntrada(tv);
+  if (tvNomes.length) return juntarCanais(tvNomes);
+
   if (j.transmissao) return j.transmissao;
   for (const e of (state.espnEventos || [])) {
     if (e.mandante === m && e.visitante === v && e.transmissao) return e.transmissao;
