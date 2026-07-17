@@ -396,14 +396,36 @@ def escolher_videos(jogos: List[Jogo], videos: List[Dict[str, Any]], config: Dic
     return vinculados, duvidosos, sem_video
 
 
+def _ultima_rodada_disputada(jogos: List[Jogo]) -> Optional[int]:
+    """Retorna a maior rodada com jogo em andamento (in) ou encerrado (post).
+    É a "rodada corrente" real — não a última rodada só agendada no calendário.
+    Retorna None quando nenhum jogo se enquadrar (início da temporada)."""
+    rodadas = [j.rodada for j in jogos if j.estado in ("post", "in") and j.rodada > 0]
+    return max(rodadas) if rodadas else None
+
+
 def rodadas_alvo(args: argparse.Namespace, jogos: List[Jogo], config: Dict[str, Any]) -> Tuple[int, int]:
     if args.rodada_inicio and args.rodada_fim:
         return int(args.rodada_inicio), int(args.rodada_fim)
+
+    ultima_disputada = _ultima_rodada_disputada(jogos)
+
     if args.modo == "backfill":
         rb = config.get("rodadas_backfill") or {}
-        return int(args.rodada_inicio or rb.get("inicio") or 1), int(args.rodada_fim or rb.get("fim") or 18)
-    # incremental: últimas N rodadas encerradas/atuais conhecidas
-    max_rodada = max([j.rodada for j in jogos], default=1)
+        inicio_cfg = args.rodada_inicio or rb.get("inicio") or 1
+        # Fim dinâmico: cobre até a rodada atualmente disputada. Se nada foi
+        # disputado ainda (raro), usa o valor de config; se este também não
+        # existir, cai em 1 para não estourar range.
+        fim_cfg = args.rodada_fim or ultima_disputada or rb.get("fim") or 1
+        return int(inicio_cfg), int(fim_cfg)
+
+    # incremental: as N rodadas mais recentes que já foram disputadas.
+    # Fallback: se nenhuma rodada foi disputada, usa a última do calendário
+    # (comportamento antigo) para não zerar a janela.
+    if ultima_disputada is None:
+        max_rodada = max([j.rodada for j in jogos], default=1)
+    else:
+        max_rodada = ultima_disputada
     recentes = int((config.get("incremental") or {}).get("rodadas_recentes") or 4)
     return max(1, max_rodada - recentes + 1), max_rodada
 
