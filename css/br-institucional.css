@@ -480,3 +480,62 @@ body.modal-open { overflow: hidden; }
 .club-performance-method { display:inline-flex; margin-top:15px; color:#d9ff76; font-size:12px; font-weight:900; text-decoration:none; }
 .club-performance-method:hover, .club-performance-method:focus-visible { text-decoration:underline; outline:none; }
 @media (max-width:640px) { .club-performance-card { padding:14px; } .club-performance-header > div:first-child strong { font-size:16px; } .club-performance-score b { font-size:27px; } .club-performance-row { grid-template-columns:70px minmax(0,1fr) 39px; gap:8px; } }
+
+/* Retorno contextual da ficha do clube para o ponto exato de origem. */
+.club-return-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 2px 2px 0;
+}
+.club-return-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 10px 15px;
+  border: 1px solid rgba(163,230,53,.34);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(163,230,53,.18), rgba(96,165,250,.09));
+  color: #efffc3;
+  box-shadow: 0 10px 26px rgba(0,0,0,.20);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 850;
+  white-space: nowrap;
+  transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+.club-return-button:hover,
+.club-return-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(190,242,100,.68);
+  background: linear-gradient(135deg, rgba(163,230,53,.25), rgba(96,165,250,.13));
+  outline: none;
+}
+.club-return-button:active { transform: translateY(0); }
+.club-return-arrow {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  color: #07120d;
+  background: var(--green);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 950;
+}
+.club-return-hint {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+@media (max-width: 640px) {
+  .club-return-bar { align-items: stretch; padding-top: 0; }
+  .club-return-button { width: 100%; min-height: 44px; }
+  .club-return-hint { display: none; }
+}
