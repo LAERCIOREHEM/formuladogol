@@ -630,7 +630,9 @@
   async function load() {
     bindEvents();
     const hashTab = location.hash.replace(/^#/, "");
-    if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "desempenho"].includes(hashTab)) state.tab = hashTab;
+    const abrirMetodologia = hashTab === "metodologia-ranking";
+    if (abrirMetodologia) state.tab = "desempenho";
+    else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "desempenho"].includes(hashTab)) state.tab = hashTab;
 
     const [leaders, competition, details, ranking, table, results, audit] = await Promise.all([
       fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
@@ -650,6 +652,7 @@
     state.results = results;
     state.audit = audit;
     renderAll();
+    if (abrirMetodologia) requestAnimationFrame(() => document.getElementById("metodologia-ranking")?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 
   document.addEventListener("DOMContentLoaded", load);

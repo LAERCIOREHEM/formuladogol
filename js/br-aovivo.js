@@ -714,6 +714,16 @@
     return { selected, priorities };
   }
 
+  function clubHref(name) {
+    const canonical = canon(name) || String(name || "").trim();
+    const clubSlug = norm(canonical).replace(/\s+/g, "-");
+    return "clubes.html#" + encodeURIComponent(clubSlug);
+  }
+
+  function teamLink(team, inner) {
+    return '<a class="live-team-link" href="' + esc(clubHref(team.nome)) + '" aria-label="Abrir página de ' + esc(team.nome) + '">' + inner + '</a>';
+  }
+
   function teamLogo(team) {
     if (team.escudo) return '<img src="' + esc(team.escudo) + '" alt="" loading="eager">';
     return '<div class="live-logo-fallback">' + esc((team.sigla || team.nome || "?").slice(0, 3)) + "</div>";
@@ -1119,11 +1129,11 @@
     app.innerHTML = '<section class="live-main-card"><div class="live-card-inner">' +
       '<div class="live-round-row"><span class="live-round-badge">' + esc(roundText + delayed) + '</span>' +
       '<span class="live-state-badge ' + esc(s.key) + '">' + esc(s.label) + '</span></div>' +
-      '<div class="live-score-grid"><div class="live-team">' + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>' +
+      '<div class="live-score-grid">' + teamLink(g.home, '<div class="live-team">' + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>') +
       '<div class="live-score-center">' + score + '<div class="live-clock">' + esc(statusText(g)) + '</div>' +
       (s.key === "pre" ? '<div class="live-kickoff">Horário de Brasília</div>' : "") +
       (countdown ? '<div class="live-countdown" data-countdown-game="' + esc(g.id) + '">' + esc(countdown) + '</div>' : "") + '</div>' +
-      '<div class="live-team">' + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div></div>' +
+      teamLink(g.away, '<div class="live-team">' + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +

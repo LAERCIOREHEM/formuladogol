@@ -57,9 +57,14 @@
     return `<span class="club-ranking-pill">⚡ Ranking desempenho: <strong>${escapeHtml(r.pos || "—")}º</strong> · índice <strong>${escapeHtml(numeroRanking(r.indice_final ?? r.score))}</strong></span>`;
   }
   function rankingComponentesHtml(r){
-    if (!r || !r.time) return "";
+    if (!r || !r.time) return `<section class="club-performance-card muted"><div class="club-performance-title">Ranking de desempenho</div><p>Aguardando dados suficientes.</p></section>`;
     const comps = [["Ataque", r.ataque], ["Defesa", r.defesa], ["Domínio", r.dominio], ["Eficiência", r.eficiencia], ["Disciplina", r.disciplina]];
-    return `<div class="club-performance-mini">${comps.map(([label, valor]) => `<span>${escapeHtml(label)} <strong>${escapeHtml(numeroRanking(valor))}</strong></span>`).join("")}</div>`;
+    const score = numeroRanking(r.indice_final ?? r.score);
+    return `<section class="club-performance-card" aria-label="Desempenho do ${escapeAttr(r.time)}">
+      <div class="club-performance-header"><div><span>AF-Score</span><strong>Ranking de desempenho</strong></div><div class="club-performance-score"><b>${escapeHtml(score)}</b><small>${escapeHtml(r.pos || "—")}º lugar</small></div></div>
+      <div class="club-performance-bars">${comps.map(([label, valor]) => { const n = Math.max(0, Math.min(100, Number(valor) || 0)); return `<div class="club-performance-row"><span>${escapeHtml(label)}</span><div><i style="width:${n.toFixed(1)}%"></i></div><strong>${escapeHtml(numeroRanking(valor))}</strong></div>`; }).join("")}</div>
+      <a class="club-performance-method" href="estatisticas.html#metodologia-ranking">Entenda como o ranking é calculado →</a>
+    </section>`;
   }
   function eventosDo(nome){
     return state.eventos.filter(e => e.mandante === nome || e.visitante === nome)
@@ -194,11 +199,9 @@
         <div class="info-card"><span>Títulos BR</span><strong>${escapeHtml(c.titulos_brasileiros)}</strong></div>
         <div class="info-card"><span>Torcida</span><strong>${escapeHtml(c.torcida)}</strong></div>
         <div class="info-card"><span>Tabela atual</span><strong>${t.pos ? `${t.pos}º · ${t.pontos} pts · SG ${t.sg}` : "aguardando"}</strong></div>
-        <div class="info-card"><span>Ranking desempenho</span><strong>${r.pos ? `${r.pos}º · índice ${numeroRanking(r.indice_final ?? r.score)}` : "aguardando"}</strong></div>
       </div>
       ${rankingComponentesHtml(r)}
       <p><strong>Curiosidade:</strong> ${escapeHtml(c.curiosidade)}</p>
-      <p><strong>Desempenho:</strong> ${escapeHtml(r.justificativa || "Ranking de desempenho será exibido após geração do robô.")}</p>
     `;
     ativarZoomMascote();
     renderJogos(c.nome);
