@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 38,
+    "jogos_na_janela": 36,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 16,
-    "transmissoes_publicadas": 4,
-    "sem_transmissao": 34,
+    "transmissoes_publicadas": 3,
+    "sem_transmissao": 33,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,26 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841149",
-      "rodada": 19,
-      "jogo": "Botafogo x Santos",
-      "data_iso": "2026-07-16T19:30:00-03:00",
-      "principal": "CazéTV",
-      "fontes_encontradas": [
-        "CazéTV"
-      ],
-      "manual": false
-    },
-    {
-      "event_id": "401841157",
-      "rodada": 19,
-      "jogo": "Vitória x Vasco da Gama",
-      "data_iso": "2026-07-16T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401840998",
       "rodada": 4,
@@ -393,23 +373,6 @@
   ],
   "aceitos": [
     {
-      "event_id": "401841149",
-      "jogo": "Botafogo x Santos",
-      "fonte": "cazetv",
-      "video_id": "Cih-UxYNCSs",
-      "url": "https://www.youtube.com/watch?v=Cih-UxYNCSs",
-      "titulo": "AO VIVO: BOTAFOGO X SANTOS | BRASILEIRÃO 2026 | 19ª RODADA",
-      "status": "live",
-      "confianca": 0.9333,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (60 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841159",
       "jogo": "Bahia x Corinthians",
       "fonte": "getv",
@@ -468,6 +431,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-07-16T23:30:00-03:00",
       "motivo": "conteúdo rejeitado: melhores momentos"
+    },
+    {
+      "video_id": "Cih-UxYNCSs",
+      "url": "https://www.youtube.com/watch?v=Cih-UxYNCSs",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: BOTAFOGO X SANTOS | BRASILEIRÃO 2026 | 19ª RODADA",
+      "status": "live",
+      "inicio_programado": "2026-07-16T18:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "D-Q5H1HJq00",
@@ -581,13 +554,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401841157",
-      "rodada": 19,
-      "jogo": "Vitória x Vasco da Gama",
-      "data_iso": "2026-07-16T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401840998",
       "rodada": 4,
@@ -830,5 +796,5 @@
     },
     "observacao": "search.list não é mais usado. Custo: ~2 unidades (channels) + ~20 (playlistItems 500 itens) + ~10 (videos) por execução ≈ 32 unidades. Cabe 300+ execuções/dia dentro das 10.000 gratuitas."
   },
-  "atualizado_em": "2026-07-16T20:29:57-03:00"
+  "atualizado_em": "2026-07-16T21:04:47-03:00"
 }
