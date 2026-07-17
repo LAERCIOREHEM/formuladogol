@@ -167,12 +167,27 @@
       card.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(); } });
     });
   }
-  function selecionar(nome){
+  function clubeDoHash(){
+    const hash = decodeURIComponent(location.hash.replace("#", ""));
+    if (!hash) return null;
+    return state.clubes.find(c => slug(c.nome) === hash) || null;
+  }
+  function rolarParaDetalhe(behavior="auto"){
+    const detalhe = document.getElementById("detalhe-wrapper");
+    if (!detalhe || detalhe.hidden) return;
+    const executar = () => detalhe.scrollIntoView({ behavior, block: "start", inline: "nearest" });
+    executar();
+    requestAnimationFrame(() => requestAnimationFrame(executar));
+    window.setTimeout(executar, 120);
+    window.setTimeout(executar, 420);
+  }
+  function selecionar(nome, { atualizarHash=true, behavior="smooth" } = {}){
     state.selecionado = nome;
-    location.hash = slug(nome);
+    const novoHash = `#${slug(nome)}`;
+    if (atualizarHash && location.hash !== novoHash) history.pushState(null, "", novoHash);
     renderGrid();
     renderDetalhe();
-    document.getElementById("detalhe-wrapper")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    rolarParaDetalhe(behavior);
   }
   function renderDetalhe(){
     const c = state.clubes.find(x => x.nome === state.selecionado) || state.clubes[0];
@@ -274,11 +289,20 @@
     state.eventos = eventosData.eventos || [];
     state.elencos = elencosData.elencos || {};
     state.mascotes = mascotesData.mascotes || {};
-    const hash = decodeURIComponent(location.hash.replace("#", ""));
-    const inicial = state.clubes.find(c => slug(c.nome) === hash)?.nome || state.tabela[0]?.time || state.clubes[0]?.nome || "";
+    const clubeInicialHash = clubeDoHash();
+    const inicial = clubeInicialHash?.nome || state.tabela[0]?.time || state.clubes[0]?.nome || "";
     state.selecionado = inicial;
     $("#busca-clube")?.addEventListener("input", ev => { state.filtroTexto = ev.target.value; renderGrid(); });
+    window.addEventListener("hashchange", () => {
+      const clube = clubeDoHash();
+      if (!clube) return;
+      selecionar(clube.nome, { atualizarHash:false, behavior:"auto" });
+    });
     render();
+    if (clubeInicialHash) {
+      rolarParaDetalhe("auto");
+      window.addEventListener("load", () => rolarParaDetalhe("auto"), { once:true });
+    }
   }
   document.addEventListener("DOMContentLoaded", init);
 })();
