@@ -859,6 +859,55 @@ def validar_eventos(jogo: dict[str, Any], stats: list[dict[str, Any]], gols: lis
     }
 
 
+def validacao_resultado_manual_pendente(jogo: dict[str, Any], motivo: str) -> dict[str, Any]:
+    """Representa um placar final confirmado sem inventar autores de gols/cartões.
+
+    O resultado manual só existe para reconciliar um evento que a fonte principal
+    manteve em estado incorreto. Enquanto o summary da ESPN não disponibiliza os
+    eventos, o jogo permanece contabilizado como resultado final, mas seus
+    detalhes são explicitamente marcados como pendentes — nunca como validados.
+    """
+    home = str((jogo.get("mandante") or {}).get("nome") or jogo.get("mandante") or "")
+    away = str((jogo.get("visitante") or {}).get("nome") or jogo.get("visitante") or "")
+    return {
+        "gols_esperados": {
+            home: int(jogo.get("placar_mandante") or 0),
+            away: int(jogo.get("placar_visitante") or 0),
+        },
+        "gols_extraidos": {home: 0, away: 0},
+        "gols_ok": False,
+        "cartoes_esperados": {},
+        "cartoes_extraidos": {},
+        "cartoes_completos": False,
+        "cartoes_sem_excesso": True,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_ok": True,
+        "ok": False,
+        "resultado_confirmado": True,
+        "pendente_detalhes": True,
+        "motivo": motivo[:300],
+    }
+
+
+def _ajustar_validacao_manual_sem_eventos(
+    jogo: dict[str, Any],
+    validacao: dict[str, Any],
+    gols: list[dict[str, Any]],
+    cartoes: list[dict[str, Any]],
+    motivo: str,
+) -> dict[str, Any]:
+    """Converte somente ausência total de eventos de um resultado manual em pendência.
+
+    Eventos parciais ou contraditórios continuam sendo inconsistência crítica.
+    """
+    if jogo.get("resultado_manual") is not True or validacao.get("ok"):
+        return validacao
+    if gols or cartoes:
+        return validacao
+    return validacao_resultado_manual_pendente(jogo, motivo)
+
+
 def parse_eventos(
     summary: dict[str, Any],
     jogo: dict[str, Any] | None = None,
@@ -1022,7 +1071,10 @@ def montar_registro(
         "gols": gols or [],
         "cartoes": cartoes or [],
         "validacao_eventos": validacao or validar_eventos(jogo, stats, gols or [], cartoes or []),
-        "fonte": "ESPN summary",
+        "fonte": "ESPN summary" if not jogo.get("resultado_manual") else "Resultado confirmado; detalhes ESPN",
+        "resultado_manual": bool(jogo.get("resultado_manual") is True),
+        "origem_resultado": str(jogo.get("origem_resultado") or ""),
+        "motivo_resultado_manual": str(jogo.get("motivo_resultado_manual") or ""),
         "preservado_de_execucao_anterior": bool(preservado),
         "atualizado_em": iso_agora_brt(),
     }
@@ -1112,7 +1164,15 @@ def self_test() -> None:
     assert _extract_card_actor("VAR Decision: Red Card Sicrano (Flamengo).") == ("Sicrano", "Flamengo")
     validation = validar_eventos(jogo, stats, gols, cartoes)
     assert validation["ok"], validation
-    print("SELF-TEST OK: público com milhar, eventos explícitos, deduplicação, placar e cartões.")
+    manual = {**jogo, "resultado_manual": True}
+    pendente = _ajustar_validacao_manual_sem_eventos(
+        manual, validar_eventos(manual, [], [], []), [], [], "teste offline"
+    )
+    assert pendente.get("pendente_detalhes") is True and pendente.get("ok") is False, pendente
+    assert _ajustar_validacao_manual_sem_eventos(
+        manual, validar_eventos(manual, [], gols, []), gols, [], "não deve mascarar evento parcial"
+    ).get("pendente_detalhes") is not True
+    print("SELF-TEST OK: público, eventos, deduplicação e fallback manual sem inventar detalhes.")
 
 
 def _build_payload(jogos_saida: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -1126,6 +1186,9 @@ def _build_payload(jogos_saida: dict[str, dict[str, Any]]) -> dict[str, Any]:
         "total_com_publico": sum(1 for j in jogos_saida.values() if j.get("publico") not in (None, "")),
         "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
         "total_eventos_validados": sum(1 for j in jogos_saida.values() if (j.get("validacao_eventos") or {}).get("ok")),
+        "total_eventos_pendentes_detalhes": sum(
+            1 for j in jogos_saida.values() if (j.get("validacao_eventos") or {}).get("pendente_detalhes") is True
+        ),
         "jogos": jogos_saida,
     }
 
@@ -1134,9 +1197,16 @@ def _build_audit(
     base_resultados: dict[str, Any], resultados: list[dict[str, Any]], jogos_saida: dict[str, dict[str, Any]],
     *, buscados: int, preservados: int, falhas: list[dict[str, Any]], sem_estatisticas: list[dict[str, Any]], modo: str,
 ) -> dict[str, Any]:
+    pendentes_detalhes = [
+        {"event_id": eid, "jogo": f"{j.get('mandante')} x {j.get('visitante')}", "validacao": j.get("validacao_eventos")}
+        for eid, j in jogos_saida.items()
+        if (j.get("validacao_eventos") or {}).get("pendente_detalhes") is True
+    ]
     inconsistencias = [
         {"event_id": eid, "jogo": f"{j.get('mandante')} x {j.get('visitante')}", "validacao": j.get("validacao_eventos")}
-        for eid, j in jogos_saida.items() if not (j.get("validacao_eventos") or {}).get("ok")
+        for eid, j in jogos_saida.items()
+        if not (j.get("validacao_eventos") or {}).get("ok")
+        and not (j.get("validacao_eventos") or {}).get("pendente_detalhes")
     ]
     return {
         "gerado_em": iso_agora_brt(), "fonte": "ESPN summary", "modo": modo,
@@ -1147,6 +1217,8 @@ def _build_audit(
         "total_sem_publico": sum(1 for j in jogos_saida.values() if j.get("publico") in (None, "")),
         "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
         "total_eventos_validados": sum(1 for j in jogos_saida.values() if (j.get("validacao_eventos") or {}).get("ok")),
+        "total_eventos_pendentes_detalhes": len(pendentes_detalhes),
+        "eventos_pendentes_detalhes": pendentes_detalhes,
         "total_inconsistencias_eventos": len(inconsistencias),
         "inconsistencias_eventos": inconsistencias,
         "total_sem_estatisticas": len(sem_estatisticas),
@@ -1199,6 +1271,9 @@ def main() -> None:
         if args.reparar_local:
             stats = list((antigo or {}).get("stats") or (antigo or {}).get("estatisticas") or [])
             gols, cartoes, validacao = sanitizar_registro_local(jogo, antigo or {})
+            validacao = _ajustar_validacao_manual_sem_eventos(
+                jogo, validacao, gols, cartoes, "Summary ESPN ainda não disponível; resultado manual preservado."
+            )
             manual_publico, manual_fonte, manual_tipo = publico_complementar(event_id, publicos_complementares)
             valor_publico = (antigo or {}).get("publico")
             fonte_publico = str((antigo or {}).get("publico_fonte") or "")
@@ -1226,11 +1301,17 @@ def main() -> None:
             arbitro = parse_arbitro(summary)
             gols, cartoes = parse_eventos(summary, jogo, stats)
             validacao = validar_eventos(jogo, stats, gols, cartoes)
+            validacao = _ajustar_validacao_manual_sem_eventos(
+                jogo, validacao, gols, cartoes, "Summary ESPN respondeu sem eventos compatíveis com o placar confirmado."
+            )
             buscados += 1
         except Exception as exc:  # noqa: BLE001
             stats = list((antigo or {}).get("stats") or (antigo or {}).get("estatisticas") or [])
             if antigo:
                 gols, cartoes, validacao = sanitizar_registro_local(jogo, antigo)
+                validacao = _ajustar_validacao_manual_sem_eventos(
+                    jogo, validacao, gols, cartoes, f"Falha ao atualizar summary ESPN: {exc}"
+                )
                 preservados += 1
                 manual_publico, manual_fonte, manual_tipo = publico_complementar(event_id, publicos_complementares)
                 valor_publico = (antigo or {}).get("publico")
@@ -1245,8 +1326,15 @@ def main() -> None:
                     preservado=True, validacao=validacao, publico_fonte=fonte_publico, publico_tipo=tipo_publico,
                 )
             else:
-                falhas.append({"event_id": event_id, "jogo": label, "erro": str(exc)[:300]})
-                jogos_saida[event_id] = montar_registro(event_id, jogo, [], validacao=validar_eventos(jogo, [], [], []))
+                if jogo.get("resultado_manual") is True:
+                    sem_estatisticas.append({"event_id": event_id, "jogo": label, "motivo": "detalhes ESPN pendentes"})
+                    validacao = validacao_resultado_manual_pendente(
+                        jogo, f"Falha ao buscar summary ESPN: {exc}"
+                    )
+                    jogos_saida[event_id] = montar_registro(event_id, jogo, [], validacao=validacao)
+                else:
+                    falhas.append({"event_id": event_id, "jogo": label, "erro": str(exc)[:300]})
+                    jogos_saida[event_id] = montar_registro(event_id, jogo, [], validacao=validar_eventos(jogo, [], [], []))
             print(f"[WARN] {label}: {exc}")
             time.sleep(max(0.0, args.sleep))
             continue
@@ -1271,7 +1359,11 @@ def main() -> None:
     gravar_json(SAIDA, payload)
     gravar_json(AUDITORIA, auditoria)
     print(f"OK: {len(jogos_saida)} jogos em {SAIDA.relative_to(ROOT)}; {payload['total_com_estatisticas']} com estatísticas.")
-    print(f"OK: {auditoria['total_eventos_validados']} jogos com eventos integralmente validados; {auditoria['total_inconsistencias_eventos']} inconsistência(s).")
+    print(
+        f"OK: {auditoria['total_eventos_validados']} jogos com eventos integralmente validados; "
+        f"{auditoria['total_eventos_pendentes_detalhes']} com detalhes pendentes; "
+        f"{auditoria['total_inconsistencias_eventos']} inconsistência(s)."
+    )
     print(f"OK: auditoria em {AUDITORIA.relative_to(ROOT)}")
 
 

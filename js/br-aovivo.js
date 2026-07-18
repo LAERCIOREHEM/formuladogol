@@ -81,6 +81,27 @@
       links: [
         { label: "Globoplay", url: "https://globoplay.globo.com/" }
       ]
+    },
+    record: {
+      label: "Record",
+      aliases: ["record", "record tv", "recordtv"],
+      links: [
+        { label: "Record", url: "https://record.r7.com/" }
+      ]
+    },
+    getv: {
+      label: "GE TV",
+      aliases: ["ge tv", "getv"],
+      links: [
+        { label: "Canal GE TV", url: "https://www.youtube.com/@getv" }
+      ]
+    },
+    cazetv: {
+      label: "CazéTV",
+      aliases: ["cazetv", "caze tv"],
+      links: [
+        { label: "Canal CazéTV", url: "https://www.youtube.com/@CazeTV" }
+      ]
     }
   };
 
@@ -89,7 +110,9 @@
     "clarotvmais.com.br", "www.clarotvmais.com.br",
     "claro.com.br", "www.claro.com.br",
     "primevideo.com", "www.primevideo.com",
-    "disneyplus.com", "www.disneyplus.com"
+    "disneyplus.com", "www.disneyplus.com",
+    "record.r7.com", "www.record.r7.com", "r7.com", "www.r7.com",
+    "youtube.com", "www.youtube.com"
   ]);
 
   const FINAL_CACHE_KEY = "br2026_finais_reais_v2";

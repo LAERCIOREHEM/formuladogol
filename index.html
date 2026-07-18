@@ -1924,6 +1924,9 @@ body > .container > section.hero > img {
     text-decoration: none;
     color: #f9fbff;
     border: 1px solid rgba(251,191,36,.28);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
     background: linear-gradient(135deg, rgba(251,191,36,.16), rgba(163,230,53,.08));
     border-radius: 14px;
     padding: 6px 8px;
@@ -2013,6 +2016,99 @@ body > .container > section.hero > img {
     .mm-link { padding: 6px 7px; border-radius: 13px; }
     .mm-text strong { font-size: 11.5px; }
     .mm-text span { font-size: 10px; }
+  }
+
+  /* EXECUÇÃO 6 — player incorporado dos melhores momentos */
+  .mm-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(0, 5, 10, .86);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .mm-modal-card {
+    width: min(960px, 100%);
+    max-height: calc(100vh - 36px);
+    overflow: auto;
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 18px;
+    background: #07131b;
+    box-shadow: 0 28px 80px rgba(0,0,0,.58);
+  }
+  .mm-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 14px 11px 16px;
+    border-bottom: 1px solid rgba(255,255,255,.10);
+  }
+  .mm-modal-header strong {
+    min-width: 0;
+    color: #f8fafc;
+    font-size: 14px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .mm-modal-close {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.16);
+    background: rgba(255,255,255,.08);
+    color: #fff;
+    font: 900 22px/1 system-ui, sans-serif;
+    cursor: pointer;
+  }
+  .mm-modal-close:hover,
+  .mm-modal-close:focus-visible {
+    background: rgba(248,113,113,.18);
+    border-color: rgba(248,113,113,.55);
+    outline: none;
+  }
+  .mm-modal-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+  }
+  .mm-modal-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .mm-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 16px 14px;
+    color: var(--text-secondary);
+    font-size: 11px;
+  }
+  .mm-modal-footer a {
+    flex: 0 0 auto;
+    color: #ffe78b;
+    font-weight: 850;
+    text-decoration: none;
+  }
+  .mm-modal-footer a:hover { text-decoration: underline; }
+  @media (max-width: 640px) {
+    .mm-modal-backdrop { padding: 8px; }
+    .mm-modal-card { max-height: calc(100vh - 16px); border-radius: 14px; }
+    .mm-modal-header { padding: 10px 10px 9px 12px; }
+    .mm-modal-header strong { font-size: 12px; }
+    .mm-modal-close { width: 36px; height: 36px; }
+    .mm-modal-footer { align-items: flex-start; flex-direction: column; padding: 10px 12px 12px; }
   }
 
 
@@ -2506,7 +2602,7 @@ async function carregarMelhoresMomentos(opcoes = {}) {
     const totalManual = Object.keys(manualJogos).length;
     state.melhoresMomentosMeta = {
       atualizado_em: (manual && manual.atualizado_em) || (auto && auto.atualizado_em) || null,
-      fonte: totalManual ? 'GE TV / YouTube + fallback manual' : ((auto && auto.fonte) || 'GE TV / YouTube'),
+      fonte: totalManual ? 'Fontes oficiais no YouTube + fallback manual' : ((auto && auto.fonte) || 'Fontes oficiais no YouTube'),
       total_vinculados: Object.keys(state.melhoresMomentos).length || totalAuto || 0,
       total_automaticos: totalAuto || 0,
       total_manuais: totalManual || 0
@@ -2543,19 +2639,108 @@ function melhoresMomentosDoJogo(j) {
   }
   return null;
 }
+function youtubeVideoIdBr(valor) {
+  const direto = String(valor || '').trim();
+  if (/^[A-Za-z0-9_-]{6,20}$/.test(direto)) return direto;
+  try {
+    const u = new URL(direto, window.location.href);
+    const host = u.hostname.toLowerCase().replace(/^www\./, '');
+    let id = '';
+    if (host === 'youtu.be') id = u.pathname.split('/').filter(Boolean)[0] || '';
+    else if (host.endsWith('youtube.com')) {
+      id = u.searchParams.get('v') || '';
+      if (!id && /^\/(?:embed|shorts)\//.test(u.pathname)) id = u.pathname.split('/')[2] || '';
+    }
+    return /^[A-Za-z0-9_-]{6,20}$/.test(id) ? id : '';
+  } catch (_) {
+    return '';
+  }
+}
+let mmModalOverflowAnterior = '';
+function fecharModalMelhoresMomentos() {
+  const modal = document.getElementById('mm-modal-player');
+  if (!modal) return;
+  const iframe = modal.querySelector('iframe');
+  if (iframe) iframe.src = 'about:blank';
+  modal.remove();
+  document.body.style.overflow = mmModalOverflowAnterior;
+  document.removeEventListener('keydown', teclaModalMelhoresMomentos);
+}
+function teclaModalMelhoresMomentos(evento) {
+  if (evento.key === 'Escape') fecharModalMelhoresMomentos();
+}
+function abrirModalMelhoresMomentos(videoId, titulo, urlOriginal, fonte) {
+  const id = youtubeVideoIdBr(videoId || urlOriginal);
+  if (!id) {
+    if (urlOriginal) window.open(urlOriginal, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  fecharModalMelhoresMomentos();
+  const urlYoutube = urlOriginal || `https://www.youtube.com/watch?v=${encodeURIComponent(id)}`;
+  const modal = document.createElement('div');
+  modal.id = 'mm-modal-player';
+  modal.className = 'mm-modal-backdrop';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  modal.setAttribute('aria-label', titulo || 'Melhores momentos');
+  modal.innerHTML = `<section class="mm-modal-card">
+    <header class="mm-modal-header">
+      <strong>${brEscapeHtml(titulo || 'Melhores momentos')}</strong>
+      <button type="button" class="mm-modal-close" aria-label="Fechar vídeo">×</button>
+    </header>
+    <div class="mm-modal-frame">
+      <iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&playsinline=1"
+        title="${brEscapeAttr(titulo || 'Melhores momentos')}" loading="eager"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <footer class="mm-modal-footer">
+      <span>${brEscapeHtml(fonte || 'Vídeo publicado no YouTube')}. Caso o canal bloqueie a incorporação, use o link oficial.</span>
+      <a href="${brEscapeAttr(urlYoutube)}" target="_blank" rel="noopener noreferrer">Abrir no YouTube ↗</a>
+    </footer>
+  </section>`;
+  modal.addEventListener('click', evento => {
+    if (evento.target === modal || evento.target.closest('.mm-modal-close')) fecharModalMelhoresMomentos();
+  });
+  mmModalOverflowAnterior = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+  document.body.appendChild(modal);
+  document.addEventListener('keydown', teclaModalMelhoresMomentos);
+  modal.querySelector('.mm-modal-close')?.focus();
+}
+function abrirMelhoresMomentosDoBotao(botao) {
+  if (!botao) return;
+  abrirModalMelhoresMomentos(
+    botao.dataset.mmVideo || '',
+    botao.dataset.mmTitulo || '',
+    botao.dataset.mmUrl || '',
+    botao.dataset.mmFonte || ''
+  );
+}
 function htmlMelhoresMomentos(j, contexto = 'jogo') {
   const mm = melhoresMomentosDoJogo(j);
   if (!mm) return '';
   const url = mm.url || (mm.video_id ? `https://www.youtube.com/watch?v=${encodeURIComponent(mm.video_id)}` : '');
   if (!url) return '';
+  const videoId = youtubeVideoIdBr(mm.video_id || url);
   const titulo = mm.titulo || `Melhores momentos: ${(j.mandante || {}).nome || '?'} x ${(j.visitante || {}).nome || '?'}`;
+  const fonte = mm.fonte || mm.channel_title || 'YouTube';
   const thumb = mm.thumbnail ? `<img src="${brEscapeAttr(mm.thumbnail)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=&quot;mm-play&quot;>▶</span>'">` : '<span class="mm-play">▶</span>';
   const conf = Number(mm.confianca || 0);
   const titleAttr = conf ? `${titulo} · confiança ${(conf * 100).toFixed(0)}%` : titulo;
-  return `<a class="mm-link mm-${contexto}" href="${brEscapeAttr(url)}" target="_blank" rel="noopener noreferrer" title="${brEscapeAttr(titleAttr)}">
+  if (!videoId) {
+    return `<a class="mm-link mm-${contexto}" href="${brEscapeAttr(url)}" target="_blank" rel="noopener noreferrer" title="${brEscapeAttr(titleAttr)}">
+      <span class="mm-thumb">${thumb}</span>
+      <span class="mm-text"><strong>▶️ Melhores momentos</strong><span>${brEscapeHtml(titulo)}</span></span>
+    </a>`;
+  }
+  return `<button type="button" class="mm-link mm-${contexto}"
+    data-mm-video="${brEscapeAttr(videoId)}" data-mm-url="${brEscapeAttr(url)}"
+    data-mm-titulo="${brEscapeAttr(titulo)}" data-mm-fonte="${brEscapeAttr(fonte)}"
+    onclick="abrirMelhoresMomentosDoBotao(this)" title="${brEscapeAttr(titleAttr)}">
     <span class="mm-thumb">${thumb}</span>
     <span class="mm-text"><strong>▶️ Melhores momentos</strong><span>${brEscapeHtml(titulo)}</span></span>
-  </a>`;
+  </button>`;
 }
 
 async function carregarJogosDetalhes(opcoes = {}) {
@@ -3270,7 +3455,7 @@ function atualizarAvisoLegalDaView(view) {
     <div class="br-legal-context-icon" aria-hidden="true">▶️</div>
     <div>
       <strong>Sobre os vídeos:</strong>
-      <p>os links de melhores momentos direcionam para conteúdo publicado nos canais oficiais GE TV, CazéTV e Prime Video no YouTube. Este site não hospeda, reproduz nem redistribui nenhum vídeo — funciona apenas como agregador de links públicos. Os vídeos e todos os direitos relacionados pertencem aos canais e produtoras responsáveis.</p>
+      <p>os melhores momentos são exibidos em player incorporado do YouTube, a partir de publicações de GE/Globo, CazéTV, Prime Video e, após 48 horas sem fonte primária, UOL Esporte. Este site não hospeda, reproduz nem redistribui os arquivos — apenas incorpora ou direciona para o conteúdo público. Os vídeos e todos os direitos relacionados pertencem aos canais e produtoras responsáveis.</p>
     </div>`;
 
   if (view === 'jogos' || view === 'tabela') {
@@ -3967,7 +4152,7 @@ function juntarCanais(canais) {
   for (const c of canais.flatMap(x => String(x || '').split(/\s*(?:\/|,|;|\be\b)\s*/i))) {
     const nome = c.trim();
     if (!nome) continue;
-    const key = nomeCanonico(nome);
+    const key = normalizarNome(nome);
     if (!key || vistos.has(key)) continue;
     vistos.add(key);
     out.push(nome);

@@ -1,9 +1,9 @@
 {
-  "descricao": "Transmissões oficiais por TV ou streaming com assinatura. CazéTV e GE TV ficam no arquivo de transmissões oficiais do YouTube.",
+  "descricao": "Transmissões oficiais por TV ou streaming, inclusive GE TV e CazéTV quando publicadas na programação.",
   "politica": {
-    "origem": "ESPN automática com prioridade para cadastro manual; YouTube oficial mantido separadamente",
+    "origem": "ESPN automática com prioridade para transmissoes.json e cadastros manuais; o vídeo exato do YouTube é mantido separadamente",
     "limite_links": 3,
-    "regra": "Somente páginas oficiais dos serviços; os links podem exigir assinatura e login."
+    "regra": "Somente páginas oficiais dos serviços; alguns acessos podem exigir assinatura e login."
   },
   "jogos": {
     "401841157": {
@@ -60,11 +60,12 @@
       "mandante": "Coritiba",
       "visitante": "Palmeiras",
       "data_iso": "2026-07-22T19:30",
-      "tipo": "assinatura",
+      "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Prime Video"
       ],
-      "origem": "manual confirmado — Máquina do Esporte"
+      "origem": "manual confirmado — transmissoes.json",
+      "fonte_editorial": "ge — guia da 19ª rodada, 16/07/2026"
     },
     "401841150": {
       "event_id": "401841150",
@@ -72,12 +73,13 @@
       "mandante": "Chapecoense",
       "visitante": "Flamengo",
       "data_iso": "2026-07-22T21:30",
-      "tipo": "assinatura",
+      "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Globo",
         "Premiere"
       ],
-      "origem": "manual confirmado — Máquina do Esporte"
+      "origem": "manual confirmado — transmissoes.json",
+      "fonte_editorial": "ge — guia da 19ª rodada, 16/07/2026"
     },
     "401841154": {
       "event_id": "401841154",
@@ -85,12 +87,13 @@
       "mandante": "Internacional",
       "visitante": "Cruzeiro",
       "data_iso": "2026-07-22T21:30",
-      "tipo": "assinatura",
+      "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Globo",
         "Premiere"
       ],
-      "origem": "manual confirmado — Máquina do Esporte"
+      "origem": "manual confirmado — transmissoes.json",
+      "fonte_editorial": "ge — guia da 19ª rodada, 16/07/2026"
     },
     "401841156": {
       "event_id": "401841156",
@@ -98,12 +101,14 @@
       "mandante": "São Paulo",
       "visitante": "Athletico-PR",
       "data_iso": "2026-07-22T21:30",
-      "tipo": "assinatura",
+      "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "GE TV",
         "Globo",
         "Premiere"
       ],
-      "origem": "manual confirmado — Máquina do Esporte; GE TV mantida no arquivo de YouTube oficial"
+      "origem": "manual confirmado — transmissoes.json",
+      "fonte_editorial": "ge — guia da 19ª rodada, 16/07/2026"
     },
     "401841151": {
       "event_id": "401841151",
@@ -111,13 +116,54 @@
       "mandante": "Corinthians",
       "visitante": "Remo",
       "data_iso": "2026-07-23T19:30",
-      "tipo": "assinatura",
+      "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "SporTV",
         "Premiere"
       ],
-      "origem": "manual confirmado — Máquina do Esporte"
+      "origem": "manual confirmado — transmissoes.json",
+      "fonte_editorial": "ge — guia da 19ª rodada, 16/07/2026"
+    },
+    "401841148": {
+      "event_id": "401841148",
+      "rodada": 19,
+      "mandante": "Atlético-MG",
+      "visitante": "Bahia",
+      "data_iso": "2026-07-21T19:30",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "SporTV",
+        "Premiere"
+      ],
+      "origem": "manual confirmado — transmissoes.json",
+      "fonte_editorial": "ge — guia da 19ª rodada, 16/07/2026"
+    },
+    "401841159": {
+      "event_id": "401841159",
+      "rodada": 20,
+      "mandante": "Bahia",
+      "visitante": "Corinthians",
+      "data_iso": "2026-07-26T16:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "GE TV"
+      ],
+      "origem": "manual confirmado — transmissoes.json",
+      "fonte_editorial": "programação oficial publicada"
+    },
+    "401841172": {
+      "event_id": "401841172",
+      "rodada": 21,
+      "mandante": "Vitória",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-07-29T21:30",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "GE TV"
+      ],
+      "origem": "manual confirmado — transmissoes.json",
+      "fonte_editorial": "programação oficial publicada"
     }
   },
-  "atualizado_em": "2026-07-18T12:02:55-03:00"
+  "atualizado_em": "2026-07-18T09:00:00-03:00"
 }

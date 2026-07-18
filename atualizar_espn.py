@@ -47,6 +47,7 @@ URLS_STANDINGS = [
 ]
 URL_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard"
 ARQ_AJUSTES_CALENDARIO = Path("dados-br/ajustes-calendario.json")
+ARQ_RESULTADOS_MANUAIS = Path("dados-br/resultados-manuais.json")
 
 HEADERS = {
     "User-Agent": (
@@ -586,12 +587,17 @@ def aplicar_ajustes_calendario(eventos: list[dict[str, Any]]) -> None:
             alvo["_sort"] = dt.timestamp()
 
         # Depois que a ESPN confirmar o jogo como concluído, preserva placar e
-        # status oficiais. O ajuste continua valendo apenas para rodada/data.
+        # status oficiais. Campos de estado do ajuste só valem até pouco antes
+        # do novo horário: depois disso a fonte esportiva volta a ser soberana.
+        # Isso evita que um reagendamento antigo mantenha eternamente um jogo
+        # já disputado como "Agendado/AO VIVO".
         campos_estado = ("estado", "status", "placar_mandante", "placar_visitante", "concluido")
         for campo in ("estadio", "transmissao"):
             if campo in ajuste and ajuste[campo]:
                 alvo[campo] = ajuste[campo]
-        if not fonte_finalizada:
+        inicio_ajustado = alvo.get("data_dt")
+        estado_manual_ainda_valido = not isinstance(inicio_ajustado, datetime) or agora_brt() < inicio_ajustado - timedelta(minutes=15)
+        if not fonte_finalizada and estado_manual_ainda_valido:
             for campo in campos_estado:
                 if campo in ajuste:
                     alvo[campo] = ajuste[campo]
@@ -808,6 +814,123 @@ def sanear_eventos_por_rodada(eventos: list[dict[str, Any]]) -> list[dict[str, A
     return saneados
 
 
+def carregar_resultados_manuais() -> list[dict[str, Any]]:
+    """Lê correções pontuais de resultados quando a ESPN mantém um evento
+    reagendado em estado antigo. O arquivo é transparente, versionado e só
+    aceita placares finais completos.
+    """
+    if not ARQ_RESULTADOS_MANUAIS.exists():
+        return []
+    try:
+        dados = json.loads(ARQ_RESULTADOS_MANUAIS.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise RuntimeError(f"Falha ao ler {ARQ_RESULTADOS_MANUAIS}: {exc}") from exc
+    jogos = dados.get("jogos") or {}
+    if isinstance(jogos, dict):
+        itens = []
+        for chave, valor in jogos.items():
+            if isinstance(valor, dict):
+                item = dict(valor)
+                item.setdefault("event_id", str(chave))
+                itens.append(item)
+        return itens
+    if isinstance(jogos, list):
+        return [dict(x) for x in jogos if isinstance(x, dict)]
+    raise RuntimeError(f"{ARQ_RESULTADOS_MANUAIS}: campo jogos deve ser objeto ou lista")
+
+
+def _placar_manual(valor: Any, campo: str) -> int:
+    try:
+        numero = int(valor)
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError(f"Resultado manual com {campo} inválido: {valor!r}") from exc
+    if numero < 0 or numero > 30:
+        raise RuntimeError(f"Resultado manual com {campo} fora do intervalo: {numero}")
+    return numero
+
+
+def aplicar_resultados_manuais(eventos: list[dict[str, Any]]) -> int:
+    """Aplica fallback final somente quando a fonte ainda não encerrou o jogo.
+
+    Se a ESPN já publicou o resultado, o placar oficial é preservado. Qualquer
+    divergência entre ESPN finalizada e o cadastro manual interrompe a geração,
+    evitando que uma correção antiga sobrescreva um resultado oficial.
+    """
+    aplicados = 0
+    for ajuste in carregar_resultados_manuais():
+        if ajuste.get("ativo") is False:
+            continue
+        event_id = str(ajuste.get("event_id") or "").strip()
+        mand = para_canonico(ajuste.get("mandante"))
+        vis = para_canonico(ajuste.get("visitante"))
+        alvo = None
+        for evento in eventos:
+            bate_id = bool(event_id and str(evento.get("event_id") or "") == event_id)
+            bate_jogo = bool(mand and vis and evento.get("mandante_nome") == mand and evento.get("visitante_nome") == vis)
+            if bate_id or bate_jogo:
+                alvo = evento
+                break
+        if alvo is None:
+            if not (event_id and mand and vis and ajuste.get("data_iso")):
+                raise RuntimeError(f"Resultado manual não encontrou evento e não possui dados para criá-lo: {event_id or '?'}")
+            data_dt = _parse_data_manual_brt(ajuste.get("data_iso"))
+            if not data_dt:
+                raise RuntimeError(f"Resultado manual com data inválida: {ajuste.get('data_iso')}")
+            alvo = {
+                "event_id": event_id,
+                "rodada": int(ajuste.get("rodada") or 0),
+                "data_dt": data_dt,
+                "data_iso": data_dt.strftime("%Y-%m-%dT%H:%M"),
+                "mandante_nome": mand,
+                "visitante_nome": vis,
+                "mandante": info_time(mand),
+                "visitante": info_time(vis),
+                "estadio": str(ajuste.get("estadio") or ""),
+                "transmissao": str(ajuste.get("transmissao") or ""),
+                "adiado": bool(ajuste.get("adiado") is True),
+                "data_definir": False,
+                "_sort": data_dt.timestamp(),
+            }
+            eventos.append(alvo)
+
+        pm = _placar_manual(ajuste.get("placar_mandante"), "placar_mandante")
+        pv = _placar_manual(ajuste.get("placar_visitante"), "placar_visitante")
+        oficial_final = bool(alvo.get("concluido") is True or str(alvo.get("estado") or "").lower() == "post")
+        if oficial_final:
+            oficial_pm = alvo.get("placar_mandante")
+            oficial_pv = alvo.get("placar_visitante")
+            if oficial_pm is not None and oficial_pv is not None and (int(oficial_pm), int(oficial_pv)) != (pm, pv):
+                raise RuntimeError(
+                    f"Resultado manual diverge da ESPN finalizada em {event_id or mand + ' x ' + vis}: "
+                    f"ESPN {oficial_pm}x{oficial_pv}, manual {pm}x{pv}"
+                )
+            continue
+
+        if ajuste.get("data_iso"):
+            data_dt = _parse_data_manual_brt(ajuste.get("data_iso"))
+            if not data_dt:
+                raise RuntimeError(f"Resultado manual com data inválida: {ajuste.get('data_iso')}")
+            alvo["data_dt"] = data_dt
+            alvo["data_iso"] = data_dt.strftime("%Y-%m-%dT%H:%M")
+            alvo["_sort"] = data_dt.timestamp()
+        if ajuste.get("rodada") not in (None, ""):
+            alvo["rodada"] = int(ajuste.get("rodada"))
+        alvo["placar_mandante"] = pm
+        alvo["placar_visitante"] = pv
+        alvo["estado"] = "post"
+        alvo["concluido"] = True
+        alvo["status"] = str(ajuste.get("status") or "Encerrado")
+        alvo["resultado_manual"] = True
+        alvo["origem_resultado"] = str(ajuste.get("origem") or "fallback manual versionado")
+        alvo["motivo_resultado_manual"] = str(ajuste.get("motivo") or "Fonte principal manteve estado inconsistente")
+        alvo["adiado"] = bool(ajuste.get("adiado", alvo.get("adiado") is True))
+        aplicados += 1
+    eventos.sort(key=lambda e: e.get("_sort") or 0)
+    if aplicados:
+        print(f"Resultados manuais aplicados: {aplicados}")
+    return aplicados
+
+
 def carregar_transmissoes_manuais() -> list[dict[str, Any]]:
     p = Path("transmissoes.json")
     if not p.exists():
@@ -921,6 +1044,10 @@ def payload_jogo(e: dict[str, Any], incluir_placar: bool = True) -> dict[str, An
     }
     if e.get("finalizado_em"):
         obj["finalizado_em"] = e["finalizado_em"]
+    if e.get("resultado_manual") is True:
+        obj["resultado_manual"] = True
+        obj["origem_resultado"] = e.get("origem_resultado", "fallback manual versionado")
+        obj["motivo_resultado_manual"] = e.get("motivo_resultado_manual", "")
     if incluir_placar:
         obj["placar_mandante"] = e.get("placar_mandante")
         obj["placar_visitante"] = e.get("placar_visitante")
@@ -951,6 +1078,7 @@ def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]],
                                      anteriores: dict[str, dict[str, Any]] | None = None,
                                      snapshot_anterior_em: datetime | None = None) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
     eventos = normalizar_eventos_scoreboard(eventos_brutos)
+    aplicar_resultados_manuais(eventos)
     aplicar_transmissoes_manuais(eventos)
     if not eventos:
         raise RuntimeError("Nenhum evento ESPN foi normalizado; abortando para não publicar JSON vazio.")
@@ -1028,6 +1156,9 @@ def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]],
                 "finalizado_em": e.get("finalizado_em", ""),
                 "rodada_corrigida_de": e.get("rodada_corrigida_de"),
                 "motivo_ajuste": e.get("motivo_ajuste", ""),
+                "resultado_manual": bool(e.get("resultado_manual") is True),
+                "origem_resultado": e.get("origem_resultado", ""),
+                "motivo_resultado_manual": e.get("motivo_resultado_manual", ""),
             }
             for e in eventos
         ],
@@ -1054,6 +1185,59 @@ def validar_contra_ranking(tabela_payload: dict[str, Any]) -> None:
         faltando = obrig - set(linha)
         if faltando:
             raise RuntimeError(f"Linha de tabela sem campos obrigatórios {faltando}: {linha}")
+
+
+def selftest_execucao_6() -> None:
+    global ARQ_RESULTADOS_MANUAIS
+    import tempfile
+
+    original = ARQ_RESULTADOS_MANUAIS
+    with tempfile.TemporaryDirectory() as tmp:
+        ARQ_RESULTADOS_MANUAIS = Path(tmp) / "resultados-manuais.json"
+        ARQ_RESULTADOS_MANUAIS.write_text(json.dumps({
+            "jogos": {
+                "x1": {
+                    "ativo": True,
+                    "event_id": "x1",
+                    "rodada": 4,
+                    "mandante": "Bahia",
+                    "visitante": "Chapecoense",
+                    "data_iso": "2026-07-17T19:30",
+                    "placar_mandante": 2,
+                    "placar_visitante": 0,
+                    "status": "Encerrado",
+                }
+            }
+        }), encoding="utf-8")
+        dt = datetime(2026, 7, 17, 19, 30, tzinfo=FUSO_BRASILIA)
+        evento = {
+            "event_id": "x1", "rodada": 4, "data_dt": dt, "data_iso": "2026-07-17T19:30",
+            "mandante_nome": "Bahia", "visitante_nome": "Chapecoense",
+            "mandante": info_time("Bahia"), "visitante": info_time("Chapecoense"),
+            "estado": "pre", "concluido": False, "status": "Agendado",
+            "placar_mandante": None, "placar_visitante": None, "_sort": dt.timestamp(),
+        }
+        eventos = [evento]
+        assert aplicar_resultados_manuais(eventos) == 1
+        assert evento["estado"] == "post" and evento["concluido"] is True
+        assert (evento["placar_mandante"], evento["placar_visitante"]) == (2, 0)
+        assert evento_realmente_finalizado(evento, datetime(2026, 7, 18, 0, 0, tzinfo=FUSO_BRASILIA))
+
+        evento_oficial = dict(evento)
+        evento_oficial["resultado_manual"] = False
+        evento_oficial["origem_resultado"] = ""
+        assert aplicar_resultados_manuais([evento_oficial]) == 0
+
+        evento_divergente = dict(evento_oficial)
+        evento_divergente["placar_mandante"] = 1
+        try:
+            aplicar_resultados_manuais([evento_divergente])
+        except RuntimeError as exc:
+            assert "diverge da ESPN" in str(exc)
+        else:
+            raise AssertionError("divergência entre ESPN e manual não foi bloqueada")
+    ARQ_RESULTADOS_MANUAIS = original
+    print("Selftest Execução 6 OK")
 
 
 def main() -> None:
@@ -1083,4 +1267,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    if "--selftest" in sys.argv:
+        selftest_execucao_6()
+    else:
+        main()

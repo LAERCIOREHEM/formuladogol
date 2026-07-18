@@ -5,7 +5,7 @@
 Objetivo:
 - confirmar que só fontes preferidas aparecem no site;
 - informar quantos links efetivos vêm de GE/Globo, Amazon Prime Video,
-  CazéTV e Outros;
+  CazéTV, UOL Esporte e Outros;
 - listar exatamente quais jogos ainda estão sem vídeo por falta de fonte preferida;
 - não acessar internet e não alterar os vínculos de vídeos.
 
@@ -130,6 +130,8 @@ def classificar_fonte(video: Dict[str, Any]) -> str:
         return "cazetv"
     if any(x in t for x in ["amazon prime video", "prime video", "amazon"]):
         return "amazon_prime_video"
+    if any(x in t for x in ["uol esporte", "uolesporte", "uol / youtube", "uol youtube"]):
+        return "uol_esporte"
 
     # GE/Globo aqui inclui GE TV, ge.globo e marcas Globo usadas nos títulos/canais.
     if any(x in t for x in [
@@ -192,6 +194,7 @@ def main() -> int:
         "ge_globo": [],
         "amazon_prime_video": [],
         "cazetv": [],
+        "uol_esporte": [],
         "outros": [],
         "sem_video": [],
     }
@@ -212,17 +215,18 @@ def main() -> int:
         "ge_globo": len(por_categoria["ge_globo"]),
         "amazon_prime_video": len(por_categoria["amazon_prime_video"]),
         "cazetv": len(por_categoria["cazetv"]),
+        "uol_esporte": len(por_categoria["uol_esporte"]),
         "outros": len(por_categoria["outros"]),
         "sem_video": len(por_categoria["sem_video"]),
-        "percentual_fontes_preferidas": round(((len(por_categoria["ge_globo"]) + len(por_categoria["amazon_prime_video"]) + len(por_categoria["cazetv"])) / total_com_video * 100), 1) if total_com_video else 0,
+        "percentual_fontes_preferidas": round(((len(por_categoria["ge_globo"]) + len(por_categoria["amazon_prime_video"]) + len(por_categoria["cazetv"]) + len(por_categoria["uol_esporte"])) / total_com_video * 100), 1) if total_com_video else 0,
     }
 
     saida = {
         "atualizado_em": agora_iso(),
         "fonte": "auditoria local das fontes dos melhores momentos",
         "politica": {
-            "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video ou CazéTV podem aparecer no site. Se não houver fonte preferida, o jogo fica sem vídeo.",
-            "preferenciais": ["GE TV/ge.globo/sportv/Premiere/Globoplay", "Amazon Prime Video", "CazéTV"],
+            "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
+            "preferenciais": ["GE TV/ge.globo/sportv/Premiere/Globoplay", "Amazon Prime Video", "CazéTV", "UOL Esporte (fallback)"],
             "outros": "Não devem aparecer no site. Se houver algum item nesta lista, é problema de saneamento.",
             "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais.",
         },
@@ -233,6 +237,7 @@ def main() -> int:
             "ge_globo": sorted(por_categoria["ge_globo"], key=lambda x: (x.get("rodada") or 999, x.get("mandante") or "")),
             "amazon_prime_video": sorted(por_categoria["amazon_prime_video"], key=lambda x: (x.get("rodada") or 999, x.get("mandante") or "")),
             "cazetv": sorted(por_categoria["cazetv"], key=lambda x: (x.get("rodada") or 999, x.get("mandante") or "")),
+            "uol_esporte": sorted(por_categoria["uol_esporte"], key=lambda x: (x.get("rodada") or 999, x.get("mandante") or "")),
         },
     }
 

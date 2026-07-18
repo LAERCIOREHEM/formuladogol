@@ -4,11 +4,11 @@
 
 - Lê a agenda local em jogos.json.
 - Consulta o scoreboard público da ESPN para os próximos jogos.
-- Extrai apenas provedores fechados conhecidos (Premiere, SporTV,
-  Disney+/ESPN, Prime Video e Globo).
-- Preserva os cadastros manuais, normalizando o campo ``canais`` para que
-  fontes de YouTube (CazéTV/GE TV) permaneçam exclusivamente no arquivo
-  dados-br/transmissoes-aovivo.json, onde há URL oficial e prioridade visual.
+- Extrai provedores oficiais conhecidos de TV e streaming (Premiere, SporTV,
+  Disney+/ESPN, Prime Video, Globo, Record, GE TV e CazéTV).
+- Preserva os cadastros manuais e mantém GE TV/CazéTV também na grade de
+  "onde assistir"; quando o vídeo exato é localizado,
+  dados-br/transmissoes-aovivo.json continua tendo prioridade visual.
 - Não cria links de terceiros; a página usa apenas destinos oficiais já
   definidos no JavaScript.
 """
@@ -32,6 +32,7 @@ API = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard"
 ROOT = Path(__file__).resolve().parents[1]
 AGENDA = ROOT / "jogos.json"
 OUTPUT = ROOT / "dados-br" / "transmissoes-tv.json"
+MANUAL = ROOT / "transmissoes.json"
 
 PROVIDERS = [
     ("Premiere", ("premiere",)),
@@ -39,6 +40,9 @@ PROVIDERS = [
     ("Disney+ / ESPN", ("disney+", "disney plus", "espn")),
     ("Prime Video", ("prime video", "amazon prime", "amazon prime video")),
     ("Globo", ("tv globo", "globo")),
+    ("Record", ("record", "record tv", "recordtv")),
+    ("GE TV", ("ge tv", "getv")),
+    ("CazéTV", ("cazetv", "caze tv")),
 ]
 ALLOWED_CHANNELS = {label for label, _aliases in PROVIDERS}
 
@@ -51,11 +55,7 @@ def norm(value: Any) -> str:
 
 
 def canonical_closed_channel(value: Any) -> Optional[str]:
-    """Retorna o nome canônico de um canal fechado aceito pelo site.
-
-    CazéTV e GE TV não pertencem a este arquivo: quando há transmissão oficial
-    no YouTube, elas ficam em ``transmissoes-aovivo.json`` acompanhadas da URL.
-    """
+    """Retorna o nome canônico de um canal/plataforma oficial aceito pelo site."""
     wanted = norm(value)
     if not wanted:
         return None
@@ -67,7 +67,9 @@ def canonical_closed_channel(value: Any) -> Optional[str]:
 
 
 def sanitize_closed_channels(values: Any) -> List[str]:
-    """Normaliza, remove duplicatas e descarta fontes fora da TV fechada."""
+    """Normaliza e remove duplicatas dos canais oficiais aceitos."""
+    if isinstance(values, str):
+        values = re.split(r"\s*(?:/|,|;|\be\b)\s*", values, flags=re.IGNORECASE)
     if not isinstance(values, list):
         return []
     out: List[str] = []
@@ -79,12 +81,78 @@ def sanitize_closed_channels(values: Any) -> List[str]:
 
 
 def sanitize_manual_entry(item: Mapping[str, Any]) -> Optional[Dict[str, Any]]:
-    """Preserva o cadastro manual, mas separa corretamente TV de YouTube."""
+    """Preserva o cadastro manual e normaliza todos os provedores oficiais."""
     cleaned = copy.deepcopy(dict(item))
     cleaned["canais"] = sanitize_closed_channels(cleaned.get("canais"))
     if not cleaned["canais"]:
         return None
     return cleaned
+
+
+TEAM_ALIASES = {
+    "athletico": "athletico pr", "athletico paranaense": "athletico pr", "atletico pr": "athletico pr",
+    "atletico mineiro": "atletico mg", "clube atletico mineiro": "atletico mg",
+    "red bull bragantino": "bragantino", "rb bragantino": "bragantino",
+    "vasco": "vasco da gama", "cr vasco da gama": "vasco da gama",
+    "ec bahia": "bahia", "ec vitoria": "vitoria", "sao paulo fc": "sao paulo",
+    "gremio fbpa": "gremio", "sc internacional": "internacional", "clube do remo": "remo",
+}
+
+
+def team_key(value: Any) -> str:
+    key = norm(value)
+    return TEAM_ALIASES.get(key, key)
+
+
+def manual_entries(manual: Mapping[str, Any], agenda: Mapping[str, Any]) -> Dict[str, Dict[str, Any]]:
+    """Converte transmissoes.json em registros duráveis ligados à agenda atual.
+
+    O arquivo manual é a fonte editorial oficial das rodadas publicadas. Ele
+    prevalece sobre a ESPN, que frequentemente divulga os canais muito tarde.
+    """
+    jogos = agenda.get("jogos") or []
+    if not isinstance(jogos, list):
+        jogos = []
+    out: Dict[str, Dict[str, Any]] = {}
+    for raw in manual.get("transmissoes") or []:
+        if not isinstance(raw, Mapping):
+            continue
+        canais = sanitize_closed_channels(raw.get("canais") or raw.get("transmissao"))
+        if not canais:
+            continue
+        mand = team_key(raw.get("mandante"))
+        vist = team_key(raw.get("visitante"))
+        rodada = int(raw.get("rodada") or 0)
+        event_id = str(raw.get("event_id") or "").strip()
+        jogo = None
+        for cand in jogos:
+            cand_id = str(cand.get("event_id") or cand.get("id") or "")
+            if event_id and cand_id == event_id:
+                jogo = cand
+                break
+            if mand and vist and team_key((cand.get("mandante") or {}).get("nome") if isinstance(cand.get("mandante"), Mapping) else cand.get("mandante")) == mand and team_key((cand.get("visitante") or {}).get("nome") if isinstance(cand.get("visitante"), Mapping) else cand.get("visitante")) == vist:
+                if not rodada or int(cand.get("rodada") or 0) == rodada:
+                    jogo = cand
+                    break
+        if not jogo:
+            continue
+        event_id = str(jogo.get("event_id") or jogo.get("id") or "")
+        if not event_id:
+            continue
+        nome_m = (jogo.get("mandante") or {}).get("nome") if isinstance(jogo.get("mandante"), Mapping) else jogo.get("mandante")
+        nome_v = (jogo.get("visitante") or {}).get("nome") if isinstance(jogo.get("visitante"), Mapping) else jogo.get("visitante")
+        out[event_id] = {
+            "event_id": event_id,
+            "rodada": int(jogo.get("rodada") or rodada or 0),
+            "mandante": nome_m or raw.get("mandante") or "",
+            "visitante": nome_v or raw.get("visitante") or "",
+            "data_iso": jogo.get("data_iso") or raw.get("data_iso") or "",
+            "tipo": "tv_ou_streaming_oficial",
+            "canais": canais,
+            "origem": "manual confirmado — transmissoes.json",
+            "fonte_editorial": raw.get("fonte") or "programação oficial publicada",
+        }
+    return out
 
 
 def parse_dt(value: Any) -> Optional[dt.datetime]:
@@ -184,19 +252,23 @@ def auto_entries(agenda: Mapping[str, Any], scoreboard: Mapping[str, Any]) -> Di
     return out
 
 
-def build(existing: Mapping[str, Any], agenda: Mapping[str, Any], scoreboard: Mapping[str, Any], now: dt.datetime) -> Dict[str, Any]:
+def build(existing: Mapping[str, Any], agenda: Mapping[str, Any], scoreboard: Mapping[str, Any], now: dt.datetime, manual: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
     generated = auto_entries(agenda, scoreboard)
+    # Preserva cadastros manuais já publicados, inclusive entre execuções em que
+    # a ESPN ainda não informou os canais.
     for event_id, item in (existing.get("jogos") or {}).items():
         if str(item.get("origem") or "").lower().startswith("manual"):
             cleaned = sanitize_manual_entry(item)
             if cleaned is not None:
                 generated[str(event_id)] = cleaned
+    # transmissoes.json é o cadastro editorial durável e tem prioridade final.
+    generated.update(manual_entries(manual or {}, agenda))
     return {
-        "descricao": "Transmissões oficiais por TV ou streaming com assinatura. CazéTV e GE TV ficam no arquivo de transmissões oficiais do YouTube.",
+        "descricao": "Transmissões oficiais por TV ou streaming, inclusive GE TV e CazéTV quando publicadas na programação.",
         "politica": {
-            "origem": "ESPN automática com prioridade para cadastro manual; YouTube oficial mantido separadamente",
+            "origem": "ESPN automática com prioridade para transmissoes.json e cadastros manuais; o vídeo exato do YouTube é mantido separadamente",
             "limite_links": 3,
-            "regra": "Somente páginas oficiais dos serviços; os links podem exigir assinatura e login.",
+            "regra": "Somente páginas oficiais dos serviços; alguns acessos podem exigir assinatura e login.",
         },
         "jogos": generated,
         "atualizado_em": now.astimezone(TZ).replace(microsecond=0).isoformat(),
@@ -220,10 +292,12 @@ def selftest() -> None:
             },
         }
     }
-    result = build(existing, agenda, score, dt.datetime(2026, 7, 16, 20, 0, tzinfo=TZ))
-    assert result["jogos"]["1"]["canais"] == ["Premiere", "SporTV"]
-    assert result["jogos"]["2"]["canais"] == ["Prime Video"]
-    assert "3" not in result["jogos"]
+    manual = {"transmissoes": [{"rodada": 19, "mandante": "Vitória", "visitante": "Vasco da Gama", "transmissao": "Record / Premiere"}]}
+    result = build(existing, agenda, score, dt.datetime(2026, 7, 16, 20, 0, tzinfo=TZ), manual)
+    assert result["jogos"]["1"]["canais"] == ["Record", "Premiere"]
+    assert result["jogos"]["1"]["origem"].startswith("manual confirmado")
+    assert result["jogos"]["2"]["canais"] == ["GE TV", "Prime Video"]
+    assert result["jogos"]["3"]["canais"] == ["CazéTV"]
     assert all(
         set(item.get("canais") or []).issubset(ALLOWED_CHANNELS)
         for item in result["jogos"].values()
@@ -242,8 +316,9 @@ def main() -> int:
     now = dt.datetime.now(TZ)
     agenda = load_json(AGENDA, {"jogos": []})
     existing = load_json(OUTPUT, {"jogos": {}})
+    manual = load_json(MANUAL, {"transmissoes": []})
     score = fetch_scoreboard(now.date() - dt.timedelta(days=1), now.date() + dt.timedelta(days=21))
-    payload = build(existing, agenda, score, now)
+    payload = build(existing, agenda, score, now, manual)
     if args.dry_run:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0

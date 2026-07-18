@@ -8,9 +8,12 @@ preferidas:
   - GE TV / ge.globo / sportv / Premiere / Globoplay
   - CazéTV
   - Amazon Prime Video / Prime Video
+  - UOL Esporte, apenas como fallback automático após 48 horas
 
 Regra editorial atual:
   - canal aleatório NÃO entra no site, mesmo que o título diga "ge.globo";
+  - nas primeiras 48 horas, prioriza GE/Globo, CazéTV e Prime Video;
+  - depois de 48 horas sem publicação primária, aceita UOL Esporte;
   - se não achar vídeo em fonte preferida, o jogo fica SEM link;
   - a auditoria informa exatamente quais jogos seguem sem link preferido.
 
@@ -45,13 +48,16 @@ RESULTADOS = RAIZ / "resultados.json"
 GE_CHANNEL_ID = "UCgCKagVhzGnZcuP9bSMgMCg"
 CAZE_CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"
 PRIME_HANDLES = ["@primevideosportbr", "@PrimeVideoSportBR", "@primevideobr", "@primevideobrasil"]
+UOL_HANDLES = ["@uolesporte", "@UOLEsporte"]
+UOL_FALLBACK_HORAS = 48
 
 ROTULOS = {
     "ge": "GE TV / YouTube",
     "caze": "CazéTV / YouTube",
     "prime": "Prime Video / YouTube",
+    "uol": "UOL Esporte / YouTube",
 }
-ORDEM = {"ge": 0, "caze": 1, "prime": 2}
+ORDEM = {"ge": 0, "caze": 1, "prime": 2, "uol": 3}
 
 QUOTA = {"unidades": 0, "playlist_items": 0, "search": 0, "channels": 0, "videos": 0}
 
@@ -167,8 +173,8 @@ def yt_get(resource: str, api_key: str, **params: Any) -> Dict[str, Any]:
     return data
 
 
-def resolver_prime_channel_id(api_key: str) -> str:
-    for h in PRIME_HANDLES:
+def resolver_channel_id(api_key: str, handles: Iterable[str]) -> str:
+    for h in handles:
         try:
             data = yt_get("channels", api_key, part="id,snippet", forHandle=h, maxResults=1)
         except Exception:
@@ -177,6 +183,14 @@ def resolver_prime_channel_id(api_key: str) -> str:
         if items:
             return items[0].get("id") or ""
     return ""
+
+
+def resolver_prime_channel_id(api_key: str) -> str:
+    return resolver_channel_id(api_key, PRIME_HANDLES)
+
+
+def resolver_uol_channel_id(api_key: str) -> str:
+    return resolver_channel_id(api_key, UOL_HANDLES)
 
 
 def listar_playlist(api_key: str, playlist_id: str, max_paginas: int, canal: str) -> List[Dict[str, Any]]:
@@ -223,7 +237,7 @@ def search_no_canal(api_key: str, channel_id: str, canal: str, query: str, max_r
         maxResults=max_results,
         order="relevance",
         safeSearch="none",
-        videoEmbeddable="any",
+        videoEmbeddable="true",
     )
     out: List[Dict[str, Any]] = []
     for item in data.get("items") or []:
@@ -296,6 +310,28 @@ def titulo_tem_termo_ruim(titulo: Any) -> bool:
     return any(r in t for r in ruins)
 
 
+def data_jogo(jogo: Dict[str, Any]) -> Optional[datetime]:
+    valor = jogo.get("finalizado_em") or jogo.get("data_iso")
+    texto = str(valor or "").strip()
+    if not texto:
+        return None
+    try:
+        obj = datetime.fromisoformat(texto.replace("Z", "+00:00"))
+        if obj.tzinfo is None:
+            obj = obj.replace(tzinfo=BRT)
+        return obj.astimezone(BRT)
+    except ValueError:
+        return None
+
+
+def uol_fallback_liberado(jogo: Dict[str, Any], agora: Optional[datetime] = None) -> bool:
+    inicio = data_jogo(jogo)
+    if not inicio:
+        return False
+    ref = (agora or datetime.now(BRT)).astimezone(BRT)
+    return ref - inicio >= timedelta(hours=UOL_FALLBACK_HORAS)
+
+
 def video_serve_para_jogo(titulo: Any, jogo: Dict[str, Any]) -> bool:
     if titulo_tem_termo_ruim(titulo):
         return False
@@ -350,7 +386,7 @@ def texto_fonte(video: Dict[str, Any]) -> str:
     return norm_min(" ".join(str(video.get(k) or "") for k in ["fonte", "fonte_busca", "channel_title", "channel_id"]))
 
 
-def classificar_video(video: Optional[Dict[str, Any]], prime_id: str = "") -> str:
+def classificar_video(video: Optional[Dict[str, Any]], prime_id: str = "", uol_id: str = "") -> str:
     if not video:
         return "sem_video"
     channel_id = str(video.get("channel_id") or "").strip()
@@ -360,18 +396,22 @@ def classificar_video(video: Optional[Dict[str, Any]], prime_id: str = "") -> st
         return "caze"
     if prime_id and channel_id == prime_id:
         return "prime"
+    if uol_id and channel_id == uol_id:
+        return "uol"
     t = texto_fonte(video)
     if any(x in t for x in ["cazetv", "caze tv", "caze"]):
         return "caze"
     if any(x in t for x in ["amazon prime video", "prime video", "amazon"]):
         return "prime"
+    if any(x in t for x in ["uol esporte", "uolesporte", "uol / youtube", "uol youtube"]):
+        return "uol"
     if any(x in t for x in ["ge tv", "ge globo", "geglobo", "globoesporte", "globo esporte", "sportv", "premiere", "globoplay"]):
         return "ge"
     return "outros"
 
 
-def preferido(video: Optional[Dict[str, Any]], prime_id: str = "") -> bool:
-    return classificar_video(video, prime_id) in {"ge", "caze", "prime"}
+def preferido(video: Optional[Dict[str, Any]], prime_id: str = "", uol_id: str = "") -> bool:
+    return classificar_video(video, prime_id, uol_id) in {"ge", "caze", "prime", "uol"}
 
 
 def iter_videos(data: Dict[str, Any]) -> Iterable[Tuple[str, Dict[str, Any]]]:
@@ -499,16 +539,16 @@ def remover_chave(data: Dict[str, Any], key: str, event_id: str = "") -> bool:
     return removeu
 
 
-def calcular_resumo(jogos_resultados: List[Dict[str, Any]], auto: Dict[str, Any], manual: Dict[str, Any], prime_id: str = "") -> Dict[str, int]:
+def calcular_resumo(jogos_resultados: List[Dict[str, Any]], auto: Dict[str, Any], manual: Dict[str, Any], prime_id: str = "", uol_id: str = "") -> Dict[str, int]:
     por_id, por_chave = indexar_videos(auto, manual)
-    r = {"jogos_resultados": len(jogos_resultados), "ge": 0, "caze": 0, "prime": 0, "outros": 0, "sem_video": 0, "com_fonte_preferida": 0}
+    r = {"jogos_resultados": len(jogos_resultados), "ge": 0, "caze": 0, "prime": 0, "uol": 0, "outros": 0, "sem_video": 0, "com_fonte_preferida": 0}
     for jogo in jogos_resultados:
         item = video_do_jogo(jogo, por_id, por_chave)
         video = item[2] if item else None
-        cat = classificar_video(video, prime_id)
+        cat = classificar_video(video, prime_id, uol_id)
         if cat == "sem_video":
             r["sem_video"] += 1
-        elif cat in {"ge", "caze", "prime"}:
+        elif cat in {"ge", "caze", "prime", "uol"}:
             r[cat] += 1
             r["com_fonte_preferida"] += 1
         else:
@@ -530,6 +570,7 @@ def rodar(args: argparse.Namespace) -> int:
     manual.setdefault("jogos", {})
 
     prime_id = resolver_prime_channel_id(api_key) if youtube_ativo else ""
+    uol_id = resolver_uol_channel_id(api_key) if youtube_ativo else ""
 
     def na_janela(j: Dict[str, Any]) -> bool:
         r = int(j.get("rodada") or 0)
@@ -540,8 +581,8 @@ def rodar(args: argparse.Namespace) -> int:
         return True
 
     universo = [j for j in jogos_resultados if na_janela(j)]
-    antes = calcular_resumo(jogos_resultados, auto, manual, prime_id)
-    antes_janela = calcular_resumo(universo, auto, manual, prime_id)
+    antes = calcular_resumo(jogos_resultados, auto, manual, prime_id, uol_id)
+    antes_janela = calcular_resumo(universo, auto, manual, prime_id, uol_id)
 
     por_id, por_chave = indexar_videos(auto, manual)
     alvos: List[Tuple[Dict[str, Any], str, Optional[Tuple[str, str, Dict[str, Any]]]]] = []
@@ -549,10 +590,10 @@ def rodar(args: argparse.Namespace) -> int:
     for jogo in universo:
         item = video_do_jogo(jogo, por_id, por_chave)
         video = item[2] if item else None
-        cat = classificar_video(video, prime_id)
+        cat = classificar_video(video, prime_id, uol_id)
         if cat == "sem_video":
             alvos.append((jogo, "sem_link_preferido", item))
-        elif cat in {"ge", "caze", "prime"}:
+        elif cat in {"ge", "caze", "prime", "uol"}:
             mantidos_preferidos.append(resumo_jogo(jogo, f"mantido: fonte preferida ({cat})", video))
         else:
             alvos.append((jogo, "fonte_nao_preferida_removida", item))
@@ -597,6 +638,11 @@ def rodar(args: argparse.Namespace) -> int:
             canais = [(GE_CHANNEL_ID, "ge"), (CAZE_CHANNEL_ID, "caze")]
             if prime_id:
                 canais.append((prime_id, "prime"))
+            # UOL só participa do search.list depois de 48h sem fonte primária.
+            # Vínculos manuais informados pelo administrador continuam válidos
+            # imediatamente, pois já foram individualmente conferidos.
+            if uol_id and uol_fallback_liberado(jogo):
+                canais.append((uol_id, "uol"))
             for q in consultas_para_jogo(jogo, args.max_consultas_por_jogo):
                 for channel_id, canal in canais:
                     if QUOTA["search"] >= args.max_search_total:
@@ -639,33 +685,33 @@ def rodar(args: argparse.Namespace) -> int:
             continue
 
         # Sem candidato preferido: remove qualquer link ruim, ou mantém sem vídeo.
-        if item and atual and not preferido(atual, prime_id):
+        if item and atual and not preferido(atual, prime_id, uol_id):
             if not args.dry_run:
                 origem, key, _ = item
                 remover_chave(auto, key, event_id)
                 remover_chave(manual, key, event_id)
             removidos.append(resumo_jogo(jogo, motivo, atual))
-        ainda_sem_link.append(resumo_jogo(jogo, "sem link em GE/Globo, CazéTV ou Prime Video", atual))
+        ainda_sem_link.append(resumo_jogo(jogo, "sem link em GE/Globo, CazéTV, Prime Video ou UOL após 48h", atual))
 
     if not args.dry_run:
         auto["atualizado_em"] = agora_iso()
-        auto["fonte"] = "GE/Globo, CazéTV e Prime Video / YouTube"
-        auto["politica_publicacao"] = "Somente fontes preferidas. Canais não preferidos são removidos; se não houver fonte confiável, o jogo fica sem link."
+        auto["fonte"] = "GE/Globo, CazéTV, Prime Video e fallback UOL Esporte / YouTube"
+        auto["politica_publicacao"] = "GE/Globo, CazéTV e Prime Video têm prioridade; após 48 horas sem publicação, UOL Esporte é aceito como fallback. Outros canais são removidos."
         auto["total_vinculados"] = len(auto.get("jogos") or {})
         manual["atualizado_em"] = agora_iso()
-        manual["observacao"] = "Fallback manual prioritário. Links fora de GE/Globo, CazéTV ou Prime Video são removidos pela auditoria de fontes."
+        manual["observacao"] = "Fallback manual prioritário. GE/Globo, CazéTV e Prime Video são fontes primárias; UOL Esporte é permitido manualmente e como fallback automático após 48 horas."
         gravar(MM_AUTO, auto)
         gravar(MM_MANUAL, manual)
 
-    depois = calcular_resumo(jogos_resultados, auto, manual, prime_id)
-    depois_janela = calcular_resumo(universo, auto, manual, prime_id)
+    depois = calcular_resumo(jogos_resultados, auto, manual, prime_id, uol_id)
+    depois_janela = calcular_resumo(universo, auto, manual, prime_id, uol_id)
 
     rel = {
         "atualizado_em": agora_iso(),
         "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
         "politica": {
-            "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, CazéTV ou Amazon Prime Video. Se não achar nessas fontes, fica sem vídeo.",
-            "criterio": "A validação usa fonte/canal real e channelId quando disponível. Título com 'ge.globo' em canal aleatório não é aceito.",
+            "regra": "GE/Globo/sportv/Premiere/Globoplay, CazéTV e Amazon Prime Video são prioritários. Após 48 horas sem vídeo, UOL Esporte é aceito como fallback.",
+            "criterio": "A validação usa fonte/canal real e channelId quando disponível. Título com 'ge.globo' em canal aleatório não é aceito; UOL automático respeita carência de 48 horas.",
             "escopo": "Apenas módulo Brasileirão. Nada em copa2026 é alterado.",
         },
         "dry_run": bool(args.dry_run),
@@ -716,7 +762,13 @@ def selftest() -> int:
     c(preferido({"channel_id": GE_CHANNEL_ID, "channel_title": "ge"}), "aceita GE por channelId")
     c(preferido({"fonte": "sportv / YouTube"}), "aceita sportv por fonte manual")
     c(classificar_video({"channel_id": CAZE_CHANNEL_ID}) == "caze", "classifica CazéTV por channelId")
+    c(preferido({"fonte": "UOL Esporte / YouTube"}), "aceita UOL Esporte como fonte de fallback")
     c(uploads_de(GE_CHANNEL_ID).startswith("UU"), "gera playlist de uploads")
+    antigo = {**jogo, "data_iso": "2026-07-15T20:00:00-03:00"}
+    recente = {**jogo, "data_iso": "2026-07-18T20:00:00-03:00"}
+    agora_teste = datetime(2026, 7, 18, 21, 0, tzinfo=BRT)
+    c(uol_fallback_liberado(antigo, agora_teste), "libera UOL após 48 horas")
+    c(not uol_fallback_liberado(recente, agora_teste), "bloqueia UOL automático antes de 48 horas")
 
     cand_ge = {"video_id": "a", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "ge", "metodo": "playlistItems"}
     cand_caze = {"video_id": "b", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "caze", "metodo": "search.list"}
@@ -729,7 +781,7 @@ def selftest() -> int:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Sanitiza e busca melhores momentos somente em GE/Globo, CazéTV e Prime Video.")
+    ap = argparse.ArgumentParser(description="Sanitiza e busca melhores momentos em fontes primárias e UOL após 48 horas.")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--sem-youtube", action="store_true", help="não consulta YouTube; apenas remove fontes não preferidas e gera relatório")

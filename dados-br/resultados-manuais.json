@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "descricao": "Fallback versionado para resultados pontuais quando a ESPN mantém um evento reagendado em estado antigo. O robô nunca substitui um placar oficial já encerrado; divergências bloqueiam a publicação.",
+  "jogos": {
+    "401840998": {
+      "ativo": true,
+      "event_id": "401840998",
+      "rodada": 4,
+      "mandante": "Bahia",
+      "visitante": "Chapecoense",
+      "data_iso": "2026-07-17T19:30",
+      "placar_mandante": 2,
+      "placar_visitante": 0,
+      "estado": "post",
+      "concluido": true,
+      "status": "Encerrado",
+      "adiado": true,
+      "origem": "manual confirmado — resultado público e vídeo publicado pelo UOL Esporte",
+      "motivo": "A ESPN manteve o event_id reagendado como pré-jogo mesmo após o encerramento da partida."
+    }
+  }
+}
