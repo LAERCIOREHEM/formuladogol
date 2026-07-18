@@ -539,3 +539,103 @@ body.modal-open { overflow: hidden; }
   .club-return-button { width: 100%; min-height: 44px; }
   .club-return-hint { display: none; }
 }
+
+/* EXECUÇÃO 8 — Projeção AF compacta na página Clubes */
+.club-probability-pill {
+  display: grid;
+  gap: 3px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(96,165,250,.22);
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(96,165,250,.09), rgba(163,230,53,.055));
+  color: #dbeafe;
+  font-size: 11px;
+  line-height: 1.25;
+}
+.club-probability-pill strong {
+  color: #efffc3;
+  font-size: 12px;
+  font-weight: 950;
+}
+.club-probability-pill small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+.club-probability-pill.muted {
+  color: var(--muted);
+  background: rgba(255,255,255,.025);
+  border-color: rgba(148,163,184,.13);
+}
+.club-probability-card {
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid rgba(96,165,250,.22);
+  border-radius: 18px;
+  background: radial-gradient(circle at 0 0, rgba(96,165,250,.13), transparent 35%), linear-gradient(145deg, rgba(11,27,38,.96), rgba(5,15,22,.98));
+  box-shadow: 0 14px 34px rgba(0,0,0,.18);
+}
+.club-probability-card.muted { color: var(--muted); }
+.club-probability-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(148,163,184,.12);
+}
+.club-probability-header span,
+.club-probability-title {
+  display: block;
+  color: #93c5fd;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.club-probability-header strong {
+  display: block;
+  margin-top: 4px;
+  color: #fff;
+  font-size: 19px;
+  line-height: 1.05;
+}
+.club-probability-header small {
+  color: #bfdbfe;
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.club-probability-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 12px;
+}
+.club-probability-metrics div {
+  min-width: 0;
+  padding: 9px 8px;
+  border: 1px solid rgba(148,163,184,.12);
+  border-radius: 13px;
+  background: rgba(255,255,255,.035);
+}
+.club-probability-metrics span {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.club-probability-metrics strong {
+  display: block;
+  margin-top: 5px;
+  color: #efffc3;
+  font-size: 15px;
+}
+@media (max-width:640px) {
+  .club-probability-header { flex-direction: column; gap: 5px; }
+  .club-probability-header small { white-space: normal; }
+  .club-probability-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

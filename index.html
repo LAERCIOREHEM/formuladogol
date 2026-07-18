@@ -2410,7 +2410,7 @@ body > .container > section.hero > img {
     .jogo-time.br-club-link, .resultado-time.br-club-link { padding: 4px 2px; }
   }
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260714-tabela-compacta-limite-v3">
+<link rel="stylesheet" href="css/br-global.css?v=20260718-menu-flutuante-v1">
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
@@ -2647,6 +2647,72 @@ async function carregarMelhoresMomentos(opcoes = {}) {
     state.melhoresMomentosCarregados = true;
   }
 }
+async function carregarResultadosManuais() {
+  const manual = await carregarJsonOpcionalBr('dados-br/resultados-manuais.json');
+  const raw = manual && manual.jogos && typeof manual.jogos === 'object' ? manual.jogos : {};
+  const mapa = {};
+  for (const item of Object.values(raw)) {
+    if (!item || item.ativo === false) continue;
+    const id = String(item.event_id || '');
+    if (id) mapa[id] = item;
+    const key = `${normalizarChaveJogoTexto(item.mandante)}|${normalizarChaveJogoTexto(item.visitante)}|${String(item.data_iso || '').slice(0,10)}`;
+    if (key !== '||') mapa[key] = item;
+  }
+  state.resultadosManuais = mapa;
+  return mapa;
+}
+function resultadoManualDoJogo(j) {
+  const mapa = state.resultadosManuais || {};
+  const id = String((j && (j.event_id || j.id)) || '');
+  if (id && mapa[id]) return mapa[id];
+  const mand = nomeCanonico((j && j.mandante || {}).nome) || ((j && j.mandante || {}).nome || j?.mandante || '');
+  const vist = nomeCanonico((j && j.visitante || {}).nome) || ((j && j.visitante || {}).nome || j?.visitante || '');
+  const key = `${normalizarChaveJogoTexto(mand)}|${normalizarChaveJogoTexto(vist)}|${String((j && j.data_iso) || '').slice(0,10)}`;
+  return mapa[key] || null;
+}
+function resultadoManualNormalizado(item) {
+  if (!item || item.ativo === false) return null;
+  const mandante = nomeCanonico(item.mandante) || item.mandante || '';
+  const visitante = nomeCanonico(item.visitante) || item.visitante || '';
+  if (!mandante || !visitante) return null;
+  const escM = ESCUDOS_TIMES[mandante] || {};
+  const escV = ESCUDOS_TIMES[visitante] || {};
+  return {
+    event_id: String(item.event_id || ''),
+    rodada: Number(item.rodada || 0),
+    data_iso: item.data_iso || '',
+    mandante: { nome: mandante, escudo: escM.escudo || '', sigla: escM.sigla || mandante.slice(0,3).toUpperCase() },
+    visitante: { nome: visitante, escudo: escV.escudo || '', sigla: escV.sigla || visitante.slice(0,3).toUpperCase() },
+    estadio: item.estadio || '',
+    transmissao: item.transmissao || '',
+    status: item.status || 'Encerrado',
+    estado: 'post',
+    concluido: true,
+    adiado: item.adiado === true,
+    placar_mandante: item.placar_mandante,
+    placar_visitante: item.placar_visitante,
+    resultado_manual: true,
+    origem_resultado: item.origem || 'fallback manual versionado',
+    motivo_resultado_manual: item.motivo || ''
+  };
+}
+function mesclarResultadosManuais(lista) {
+  const base = Array.isArray(lista) ? lista.slice() : [];
+  const vistos = new Set(base.map(r => String(r.event_id || '')).filter(Boolean));
+  const chaves = new Set(base.map(r => espnChaveJogo((r.mandante || {}).nome, (r.visitante || {}).nome) + '|' + String(r.data_iso || '').slice(0,10)));
+  for (const item of Object.values(state.resultadosManuais || {})) {
+    const r = resultadoManualNormalizado(item);
+    if (!r || !resultadoJaAconteceu(r)) continue;
+    const id = String(r.event_id || '');
+    const key = espnChaveJogo(r.mandante.nome, r.visitante.nome) + '|' + String(r.data_iso || '').slice(0,10);
+    if ((id && vistos.has(id)) || chaves.has(key)) continue;
+    base.push(r);
+    if (id) vistos.add(id);
+    chaves.add(key);
+  }
+  return base.sort((a,b) => String(b.data_iso || '').localeCompare(String(a.data_iso || '')));
+}
+
 function melhoresMomentosDoJogo(j) {
   const mapa = state.melhoresMomentos || {};
   const id = String((j && (j.event_id || j.id)) || '');
@@ -3055,6 +3121,7 @@ let state = {
   resultadosCarregados: false,
   resultadosErro: null,
   resultadosFiltroTime: '',  // time atualmente filtrado (vazio = todos)
+  resultadosManuais: {},     // fallback versionado para resultado encerrado que a ESPN ainda não publicou
   // GE TV / YouTube — melhores momentos por jogo
   melhoresMomentos: {},
   melhoresMomentosMeta: null,
@@ -4140,6 +4207,7 @@ async function carregarJogos(opcoes = {}) {
   } catch (e) { /* opcional */ }
 
   await carregarMelhoresMomentos({ silencioso: true });
+  await carregarResultadosManuais();
 
   if (state.view === 'jogos') renderJogos();
   espnLiveArmar(); // liga o AO VIVO (ESPN) se houver janela de jogo
@@ -4376,6 +4444,9 @@ function renderJogos() {
     if (estadoLocal === 'post' || j.concluido === true) return false;
     const live = state.espnLive && state.espnLive[espnChaveJogo((j.mandante || {}).nome, (j.visitante || {}).nome)];
     if (live && live.estado === 'post') return false;
+    const manual = resultadoManualDoJogo(j);
+    const manualNormalizado = resultadoManualNormalizado(manual);
+    if (manualNormalizado && resultadoJaAconteceu(manualNormalizado)) return false;
     return true;
   });
   const filtro = state.jogosFiltroTime || '';
@@ -4676,7 +4747,8 @@ async function carregarResultados(opcoes = {}) {
     const resp = await fetch(url);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
-    state.resultados = filtrarResultadosValidos(data.resultados);
+    await carregarResultadosManuais();
+    state.resultados = mesclarResultadosManuais(filtrarResultadosValidos(data.resultados));
     state.resultadosTimes = [...new Set(state.resultados.flatMap(r => [(r.mandante || {}).nome, (r.visitante || {}).nome]).filter(Boolean))].sort((a,b) => a.localeCompare(b, "pt-BR"));
     state.resultadosMeta = {
       atualizado_em: data.atualizado_em,
@@ -5702,7 +5774,7 @@ setTimeout(sincronizarAvisosAniversarioComSessao, 800);
 </script>
 <script src="js/br-clube-retorno.js?v=20260717-retorno-exato-v1"></script>
 <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
-<script src="js/br-menu.js?v=20260713-publico-login-admin-v1"></script>
+<script src="js/br-menu.js?v=20260718-menu-flutuante-v1"></script>
 <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

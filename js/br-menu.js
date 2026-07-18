@@ -145,6 +145,82 @@
     catch (_) { nav.scrollLeft = Math.max(0, left); }
   }
 
+
+  var floatingNavsReady = false;
+  var floatingNavRaf = 0;
+
+  function floatingTopOffset() {
+    var safe = 0;
+    try {
+      safe = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sat")) || 0;
+    } catch (_) {}
+    return (global.matchMedia && global.matchMedia("(max-width: 820px)").matches ? 4 : 8) + safe;
+  }
+
+  function ensureFloatingNav(nav) {
+    if (!nav || nav.dataset.brFloatingReady === "1") return;
+    var marker = document.createElement("div");
+    marker.className = "br-nav-placeholder";
+    marker.setAttribute("aria-hidden", "true");
+    nav.parentNode.insertBefore(marker, nav);
+    nav.dataset.brFloatingReady = "1";
+    nav._brFloatingMarker = marker;
+  }
+
+  function outerHeight(el) {
+    var rect = el.getBoundingClientRect();
+    var cs = global.getComputedStyle ? global.getComputedStyle(el) : null;
+    var mb = cs ? parseFloat(cs.marginBottom || "0") || 0 : 0;
+    return Math.ceil(rect.height + mb);
+  }
+
+  function updateFloatingNavs() {
+    floatingNavRaf = 0;
+    var navs = Array.prototype.slice.call(document.querySelectorAll(".nav[data-br-auth-menu]"));
+    navs.forEach(function (nav) {
+      ensureFloatingNav(nav);
+      var marker = nav._brFloatingMarker;
+      if (!marker || nav.hidden || nav.offsetParent === null) return;
+
+      var fixed = nav.classList.contains("br-nav-floating");
+      var referenceRect = (fixed ? marker : nav).getBoundingClientRect();
+      var top = floatingTopOffset();
+      var shouldFloat = referenceRect.top <= top;
+
+      if (shouldFloat) {
+        var rect = marker.getBoundingClientRect();
+        var width = rect.width || nav.getBoundingClientRect().width;
+        marker.style.height = outerHeight(nav) + "px";
+        marker.classList.add("is-active");
+        nav.style.setProperty("--br-nav-fixed-left", Math.round(rect.left) + "px");
+        nav.style.setProperty("--br-nav-fixed-width", Math.round(width) + "px");
+        nav.classList.add("br-nav-floating");
+      } else {
+        nav.classList.remove("br-nav-floating");
+        nav.style.removeProperty("--br-nav-fixed-left");
+        nav.style.removeProperty("--br-nav-fixed-width");
+        marker.classList.remove("is-active");
+        marker.style.height = "0px";
+      }
+    });
+  }
+
+  function requestFloatingNavUpdate() {
+    if (floatingNavRaf) return;
+    floatingNavRaf = global.requestAnimationFrame ? global.requestAnimationFrame(updateFloatingNavs) : global.setTimeout(updateFloatingNavs, 16);
+  }
+
+  function initFloatingNavs() {
+    if (floatingNavsReady) { requestFloatingNavUpdate(); return; }
+    floatingNavsReady = true;
+    Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), ensureFloatingNav);
+    global.addEventListener("scroll", requestFloatingNavUpdate, { passive: true });
+    global.addEventListener("resize", requestFloatingNavUpdate);
+    global.addEventListener("orientationchange", function () { global.setTimeout(requestFloatingNavUpdate, 120); });
+    requestFloatingNavUpdate();
+    global.setTimeout(requestFloatingNavUpdate, 250);
+  }
+
   function updateAuthItem(item) {
     if (!item) return;
     if (authState.authenticated) {
@@ -183,8 +259,9 @@
     updateAuthItem(nav.querySelector("[data-br-auth-link]"));
     nav.dataset.brAuthReady = "1";
     nav.style.visibility = "visible";
-    global.setTimeout(function () { centerActive(nav, "auto"); }, 20);
-    global.setTimeout(function () { centerActive(nav, "smooth"); }, 180);
+    global.setTimeout(function () { centerActive(nav, "auto"); requestFloatingNavUpdate(); }, 20);
+    global.setTimeout(function () { centerActive(nav, "smooth"); requestFloatingNavUpdate(); }, 180);
+    initFloatingNavs();
   }
 
   function applyAllMenus() {
@@ -347,6 +424,11 @@
   }
 
   document.addEventListener("br:session-changed", function () { refreshAuth(); });
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", initFloatingNavs);
+  } else {
+    init();
+    initFloatingNavs();
+  }
 })(window, document);

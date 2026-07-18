@@ -4,7 +4,7 @@
   const $ = (sel) => document.querySelector(sel);
   const fmtData = new Intl.DateTimeFormat("pt-BR", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
   const cacheBust = () => "?v=" + Date.now();
-  const state = { clubes: [], tabela: [], ranking: [], eventos: [], elencos: {}, mascotes: {}, filtroTexto: "", filtroRegiao: "Todas", selecionado: "" };
+  const state = { clubes: [], tabela: [], ranking: [], probabilidades: {}, resultadosManuais: {}, eventos: [], elencos: {}, mascotes: {}, filtroTexto: "", filtroRegiao: "Todas", selecionado: "" };
 
   function escapeHtml(value){
     return String(value ?? "").replace(/[&<>'"]/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch]));
@@ -52,6 +52,85 @@
   function tabelaDo(nome){ return state.tabela.find(t => t.time === nome) || {}; }
   function rankingDo(nome){ return state.ranking.find(r => r.time === nome) || {}; }
   function numeroRanking(v){ const n = Number(v); return Number.isFinite(n) ? n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : "—"; }
+  function numeroInteiro(v){ const n = Number(v); return Number.isFinite(n) ? String(Math.round(n)) : "—"; }
+  function probabilidadeDo(nome){ return state.probabilidades[slug(nome)] || null; }
+  function probValor(p, campo){
+    const probs = p && p.probabilidades_pct ? p.probabilidades_pct : {};
+    if (campo === "libertadores") return Number(probs.libertadores ?? probs.libertadores_base ?? probs.g6);
+    if (campo === "sul_americana") return Number(probs.sul_americana ?? probs.sul_americana_base);
+    return Number(probs[campo]);
+  }
+  function pctCompacto(valor){
+    const n = Number(valor);
+    if (!Number.isFinite(n)) return "—";
+    if (n > 0 && n < 0.1) return "<0,1%";
+    if (n === 0) return "0%";
+    if (n >= 99.95) return "100%";
+    if (n >= 10) return `${Math.round(n)}%`;
+    return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+  }
+  function posicaoProjetada(p){
+    const n = Number(p && (p.posicao_projetada ?? p.posicao_projetada_mediana ?? p.posicao_projetada_media));
+    return Number.isFinite(n) ? Math.max(1, Math.min(20, Math.round(n))) : null;
+  }
+  function pontosProjetados(p){
+    const pontos = p && p.pontos_projetados;
+    const n = Number(typeof pontos === "object" && pontos !== null ? (pontos.mediana ?? pontos.media ?? pontos.media_estimada) : pontos);
+    return Number.isFinite(n) ? Math.round(n) : null;
+  }
+  function probabilidadeResumoHtml(p){
+    if (!p) return `<span class="club-probability-pill muted">🎲 Projeção AF: aguardando</span>`;
+    const pos = posicaoProjetada(p);
+    const pts = pontosProjetados(p);
+    const campeao = probValor(p, "campeao");
+    const lib = probValor(p, "libertadores");
+    const sula = probValor(p, "sul_americana");
+    const queda = probValor(p, "rebaixamento");
+    const chips = [];
+    if (Number.isFinite(campeao) && campeao >= 5) chips.push(`Título ${pctCompacto(campeao)}`);
+    if (Number.isFinite(lib)) chips.push(`Lib ${pctCompacto(lib)}`);
+    if (Number.isFinite(sula)) chips.push(`Sula ${pctCompacto(sula)}`);
+    if (Number.isFinite(queda)) chips.push(`Queda ${pctCompacto(queda)}`);
+    return `<span class="club-probability-pill"><strong>🎲 Projeção AF: ${pos ? `${pos}º` : "—"}${pts ? ` · ${pts} pts` : ""}</strong><small>${escapeHtml(chips.slice(0, 3).join(" · ") || "probabilidades em atualização")}</small></span>`;
+  }
+  function probabilidadeCardHtml(p){
+    if (!p) return `<section class="club-probability-card muted"><div class="club-probability-title">Projeção AF</div><p>Probabilidades ainda não publicadas para este clube.</p></section>`;
+    const pos = posicaoProjetada(p);
+    const pts = pontosProjetados(p);
+    const faixa = p.faixa_posicao_80 || {};
+    const faixaTxt = Number.isFinite(Number(faixa.melhor)) && Number.isFinite(Number(faixa.pior)) ? `${Math.min(Number(faixa.melhor), Number(faixa.pior))}º–${Math.max(Number(faixa.melhor), Number(faixa.pior))}º` : "—";
+    const metrics = [
+      ["Título", probValor(p, "campeao")],
+      ["Libertadores", probValor(p, "libertadores")],
+      ["Sul-Americana", probValor(p, "sul_americana")],
+      ["Queda", probValor(p, "rebaixamento")]
+    ];
+    return `<section class="club-probability-card" aria-label="Probabilidades do ${escapeAttr(p.clube || '')}">
+      <div class="club-probability-header"><div><span>Projeção AF</span><strong>${pos ? `${pos}º` : "—"}${pts ? ` · ${pts} pts` : ""}</strong></div><small>faixa provável ${escapeHtml(faixaTxt)}</small></div>
+      <div class="club-probability-metrics">${metrics.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(pctCompacto(value))}</strong></div>`).join("")}</div>
+      <a class="club-performance-method" href="estatisticas.html#probabilidades">Ver previsão completa →</a>
+    </section>`;
+  }
+  function manualResultMap(dados){
+    const raw = dados && dados.jogos && typeof dados.jogos === "object" ? dados.jogos : {};
+    const mapa = {};
+    Object.values(raw).forEach(item => {
+      if (!item || item.ativo === false) return;
+      const id = String(item.event_id || "");
+      if (id) mapa[id] = item;
+      const key = `${slug(item.mandante)}|${slug(item.visitante)}|${String(item.data_iso || '').slice(0,10)}`;
+      if (key !== "||") mapa[key] = item;
+    });
+    return mapa;
+  }
+  function aplicarResultadoManualEvento(e){
+    if (!e) return e;
+    const id = String(e.event_id || "");
+    const key = `${slug(e.mandante)}|${slug(e.visitante)}|${String(e.data_iso || '').slice(0,10)}`;
+    const manual = state.resultadosManuais[id] || state.resultadosManuais[key];
+    if (!manual) return e;
+    return { ...e, estado: "post", concluido: true, status: manual.status || "Encerrado", placar_mandante: manual.placar_mandante, placar_visitante: manual.placar_visitante, resultado_manual: true };
+  }
   function rankingResumoHtml(r){
     if (!r || !r.time) return `<span class="club-ranking-pill muted">⚡ Ranking desempenho: aguardando</span>`;
     return `<span class="club-ranking-pill">⚡ Ranking desempenho: <strong>${escapeHtml(r.pos || "—")}º</strong> · índice <strong>${escapeHtml(numeroRanking(r.indice_final ?? r.score))}</strong></span>`;
@@ -68,6 +147,7 @@
   }
   function eventosDo(nome){
     return state.eventos.filter(e => e.mandante === nome || e.visitante === nome)
+      .map(aplicarResultadoManualEvento)
       .sort((a,b) => String(a.data_iso||"").localeCompare(String(b.data_iso||"")));
   }
   function isPost(e){
@@ -147,6 +227,7 @@
     $("#grid-clubes").innerHTML = lista.map(c => {
       const t = tabelaDo(c.nome);
       const r = rankingDo(c.nome);
+      const p = probabilidadeDo(c.nome);
       return `<article class="club-card ${state.selecionado === c.nome ? "active" : ""}" tabindex="0" role="button" data-clube="${escapeAttr(c.nome)}">
         <div class="club-head">
           ${escudoHtml(c)}
@@ -158,6 +239,7 @@
           <div class="kpi"><strong>${t.pontos ?? "—"}</strong><span>pontos</span></div>
           <div class="kpi"><strong>${r.pos || "—"}º</strong><span>desemp.</span></div>
         </div>
+        ${probabilidadeResumoHtml(p)}
         ${rankingResumoHtml(r)}
       </article>`;
     }).join("");
@@ -195,6 +277,7 @@
     state.selecionado = c.nome;
     const t = tabelaDo(c.nome);
     const r = rankingDo(c.nome);
+    const p = probabilidadeDo(c.nome);
     $("#detalhe-wrapper").hidden = false;
     $("#detalhe-clube").innerHTML = `
       <div class="detail-hero">
@@ -216,6 +299,7 @@
         <div class="info-card"><span>Tabela atual</span><strong>${t.pos ? `${t.pos}º · ${t.pontos} pts · SG ${t.sg}` : "aguardando"}</strong></div>
       </div>
       ${rankingComponentesHtml(r)}
+      ${probabilidadeCardHtml(p)}
       <p><strong>Curiosidade:</strong> ${escapeHtml(c.curiosidade)}</p>
     `;
     ativarZoomMascote();
@@ -275,20 +359,24 @@
     renderChips(); renderGrid(); renderDetalhe();
   }
   async function init(){
-    const [clubesData, tabelaData, rankingData, eventosData, elencosData, mascotesData] = await Promise.all([
+    const [clubesData, tabelaData, rankingData, probabilidadesData, eventosData, elencosData, mascotesData, resultadosManuaisData] = await Promise.all([
       fetchJson("dados-br/clubes.json", { clubes: [] }),
       fetchJson("tabela.json", { tabela: [] }),
       fetchJson("dados-br/ranking-desempenho.json", { ranking: [] }),
+      fetchJson("dados-br/probabilidades-brasileirao.json", { clubes: [] }),
       fetchJson("espn_eventos.json", { eventos: [] }),
       fetchJson("dados-br/elencos.json", { elencos: {} }),
-      fetchJson("dados-br/mascotes.json", { mascotes: {} })
+      fetchJson("dados-br/mascotes.json", { mascotes: {} }),
+      fetchJson("dados-br/resultados-manuais.json", { jogos: {} })
     ]);
     state.clubes = (clubesData.clubes || []).sort((a,b) => a.nome.localeCompare(b.nome, "pt-BR"));
     state.tabela = tabelaData.tabela || [];
     state.ranking = rankingData.ranking || [];
+    state.probabilidades = Object.fromEntries((probabilidadesData.clubes || []).map(item => [slug(item.clube), item]));
     state.eventos = eventosData.eventos || [];
     state.elencos = elencosData.elencos || {};
     state.mascotes = mascotesData.mascotes || {};
+    state.resultadosManuais = manualResultMap(resultadosManuaisData);
     const clubeInicialHash = clubeDoHash();
     const inicial = clubeInicialHash?.nome || state.tabela[0]?.time || state.clubes[0]?.nome || "";
     state.selecionado = inicial;
