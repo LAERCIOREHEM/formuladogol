@@ -5,6 +5,12 @@ on:
   schedule:
     # A cada 30 minutos. O JSON público mantém sigilo até a rodada ser marcada como apurada/publicada.
     - cron: '*/30 * * * *'
+  # Dispara imediatamente após o workflow principal atualizar tabela e resultados.
+  # O cron acima permanece como rede de segurança caso o principal não rode
+  # (janela silenciosa, falha transitória, etc.).
+  workflow_run:
+    workflows: ['Atualizar Brasileirao (ESPN)']
+    types: [completed]
 
 permissions:
   contents: write
@@ -12,6 +18,11 @@ permissions:
 jobs:
   apurar:
     runs-on: ubuntu-latest
+    # Quando o disparo vem de workflow_run, só executa se o workflow principal
+    # terminou com sucesso. Cron e dispatch manual sempre rodam.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
