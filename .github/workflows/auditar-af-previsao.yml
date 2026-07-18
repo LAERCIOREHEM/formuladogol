@@ -1,0 +1,178 @@
+name: Auditar modelos AF-Previsão
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/af_previsao_base_historica.py'
+      - 'scripts/af_previsao_backtest.py'
+      - 'requirements-af-previsao.txt'
+      - 'dados-br/config-af-previsao.json'
+      - 'dados-br/historico-af-previsao/**'
+      - '.github/workflows/auditar-af-previsao.yml'
+
+permissions:
+  contents: write
+
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  NUMEXPR_NUM_THREADS: '1'
+
+# Usa o mesmo grupo dos workflows que publicam artefatos no branch principal.
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+
+jobs:
+  auditar:
+    name: Validar base histórica e executar backtesting
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements-af-previsao.txt
+
+      - name: Instalar dependência numérica reproduzível
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+
+      - name: Validar sintaxe e testes internos
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            scripts/af_previsao_base_historica.py \
+            scripts/af_previsao_backtest.py
+          python scripts/af_previsao_base_historica.py --self-test
+          python scripts/af_previsao_backtest.py --self-test
+
+      - name: Auditar as temporadas históricas
+        run: python scripts/af_previsao_base_historica.py
+
+      - name: Comparar modelos fora da amostra
+        run: python scripts/af_previsao_backtest.py
+
+      - name: Validar artefatos científicos
+        run: |
+          set -euo pipefail
+          FILES=(
+            "dados-br/config-af-previsao.json"
+            "dados-br/historico-af-previsao/brasileirao-2023.json"
+            "dados-br/historico-af-previsao/brasileirao-2024.json"
+            "dados-br/historico-af-previsao/brasileirao-2025.json"
+            "dados-br/auditoria-base-historica-af-previsao.json"
+            "dados-br/auditoria-modelos-af-previsao.json"
+          )
+          for file in "${FILES[@]}"; do
+            test -s "$file"
+            python -m json.tool "$file" > /dev/null
+            echo "OK $file"
+          done
+          test -s docs/af-previsao-execucao-1.md
+
+          python - <<'PY'
+          import json
+          import math
+          from pathlib import Path
+
+          root = Path('.')
+          base = json.load(open(root / 'dados-br/auditoria-base-historica-af-previsao.json', encoding='utf-8'))
+          audit = json.load(open(root / 'dados-br/auditoria-modelos-af-previsao.json', encoding='utf-8'))
+          report = (root / 'docs/af-previsao-execucao-1.md').read_text(encoding='utf-8')
+
+          assert base.get('status') == 'ok', base.get('erros')
+          assert base['escopo']['partidas_historicas'] == 1140
+          assert [item['temporada'] for item in base['temporadas']] == [2023, 2024, 2025]
+          assert all(item['partidas'] == 380 for item in base['temporadas'])
+          assert all(item['clubes'] == 20 for item in base['temporadas'])
+          assert all(item['rodadas'] == 38 for item in base['temporadas'])
+          assert all(not item['erros'] for item in base['temporadas'])
+
+          assert audit.get('status') == 'ok'
+          assert audit['base']['partidas'] == 1140
+          assert len(audit['folds']) == 2
+          assert {fold['temporada_teste'] for fold in audit['folds']} == {2024, 2025}
+          assert audit['selecao_modelo']['vencedor']['id'] in audit['metricas_agregadas']
+          assert len(audit['selecao_modelo']['ranking']) == 6
+          assert audit['protocolo']['deterministico'] is True
+          assert audit['protocolo']['semente_aleatoria'] is None
+
+          for model, metrics in audit['metricas_agregadas'].items():
+              assert metrics['partidas'] == 760, model
+              for field in ('log_loss', 'brier_multiclasse', 'rps', 'acuracia_resultado', 'ece_10_faixas'):
+                  value = metrics[field]
+                  assert isinstance(value, (int, float)) and math.isfinite(value), (model, field, value)
+
+          assert 'Laércio Rehem' in report
+          assert 'Universidade Federal da Bahia (UFBA)' in report
+          assert 'botão **SUGESTÕES**' in report
+          assert 'Monte Carlo' in report
+          assert 'Dixon–Coles' in report
+          assert 'Poisson log-linear MAP' in report
+          assert not (root / 'dados-br/probabilidades-brasileirao.json').exists(), 'Execução 1 não deve publicar probabilidades correntes'
+          print('AF-Previsão: base, backtesting e relatório validados')
+          PY
+
+      - name: Commitar auditorias se houver mudança
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=(
+            "dados-br/auditoria-base-historica-af-previsao.json"
+            "dados-br/auditoria-modelos-af-previsao.json"
+            "docs/af-previsao-execucao-1.md"
+          )
+
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+            echo "Sem mudanças nas auditorias."
+            exit 0
+          fi
+
+          TMP_DIR="$(mktemp -d)"
+          trap 'rm -rf "$TMP_DIR"' EXIT
+          for file in "${FILES[@]}"; do
+            mkdir -p "$TMP_DIR/$(dirname "$file")"
+            cp -a "$file" "$TMP_DIR/$file"
+          done
+
+          for attempt in 1 2 3 4 5; do
+            echo "Tentativa de push $attempt/5"
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for file in "${FILES[@]}"; do
+              mkdir -p "$(dirname "$file")"
+              cp -a "$TMP_DIR/$file" "$file"
+            done
+
+            git add -- "${FILES[@]}"
+            if git diff --cached --quiet; then
+              echo "O branch remoto já contém os mesmos artefatos."
+              exit 0
+            fi
+            git commit -m "Atualizar auditoria científica do AF-Previsão"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            sleep $((attempt * 3))
+          done
+
+          echo "Não foi possível publicar após cinco tentativas."
+          exit 1
