@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "projeto": "AF-Previsão",
+  "versao_modelo": "AF-Previsão 1.0",
+  "etapa": "Execução 2 — motor probabilístico e Monte Carlo",
+  "gerado_em": "2026-07-16T21:24:00-03:00",
+  "status": "ok",
+  "hash_entrada": "b46114e32776fb8827ff6d18b2312dc48a5ff6424448a162633da1752a37dc5f",
+  "responsavel": {
+    "nome": "Laércio Rehem",
+    "formacao": "Matemático pela Universidade Federal da Bahia (UFBA)",
+    "contato": "Sugestões, elogios e dúvidas: utilize o botão SUGESTÕES do site."
+  },
+  "integridade": {
+    "base_historica_partidas": 1140,
+    "temporadas_historicas": [
+      2023,
+      2024,
+      2025
+    ],
+    "partidas_2026_concluidas": 179,
+    "partidas_2026_restantes": 201,
+    "partidas_calendario": 380,
+    "concluidos_reconhecidos_no_calendario": 179,
+    "comparacao_resultados_tabela": {
+      "partidas_concluidas": 179,
+      "soma_jogos_tabela": 358,
+      "resultado": "íntegro"
+    }
+  },
+  "modelo": {
+    "selecionado_execucao_1": "poisson_map_bayesiano",
+    "data_ajuste": "2026-07-17",
+    "desvio_prior": 0.4,
+    "meia_vida_dias": 365.0,
+    "intercepto_log": 0.02042565,
+    "vantagem_mando_log": 0.36412012,
+    "multiplicador_mando": 1.43924709,
+    "forcas_clubes": [
+      {
+        "clube": "Palmeiras",
+        "ataque_log": 0.30096401,
+        "defesa_log": 0.39386106,
+        "multiplicador_ataque": 1.35116071,
+        "multiplicador_protecao_defensiva": 1.48269453
+      },
+      {
+        "clube": "Flamengo",
+        "ataque_log": 0.38888602,
+        "defesa_log": 0.30849893,
+        "multiplicador_ataque": 1.47533638,
+        "multiplicador_protecao_defensiva": 1.36138005
+      },
+      {
+        "clube": "Fluminense",
+        "ataque_log": 0.07027723,
+        "defesa_log": 0.16296434,
+        "multiplicador_ataque": 1.07280555,
+        "multiplicador_protecao_defensiva": 1.17699471
+      },
+      {
+        "clube": "Athletico-PR",
+        "ataque_log": 0.00385866,
+        "defesa_log": 0.1561038,
+        "multiplicador_ataque": 1.00386611,
+        "multiplicador_protecao_defensiva": 1.16894754
+      },
+      {
+        "clube": "Bragantino",
+        "ataque_log": 0.04013919,
+        "defesa_log": 0.0297546,
+        "multiplicador_ataque": 1.04095565,
+        "multiplicador_protecao_defensiva": 1.03020169
+      },
+      {
+        "clube": "Bahia",
+        "ataque_log": 0.11227302,
+        "defesa_log": 0.00292151,
+        "multiplicador_ataque": 1.11881828,
+        "multiplicador_protecao_defensiva": 1.00292578
+      },
+      {
+        "clube": "Coritiba",
+        "ataque_log": 0.05837468,
+        "defesa_log": -0.08149621,
+        "multiplicador_ataque": 1.06011213,
+        "multiplicador_protecao_defensiva": 0.9217362
+      },
+      {
+        "clube": "São Paulo",
+        "ataque_log": 0.01388541,
+        "defesa_log": 0.10658078,
+        "multiplicador_ataque": 1.01398226,
+        "multiplicador_protecao_defensiva": 1.11246779
+      },
+      {
+        "clube": "Botafogo",
+        "ataque_log": 0.28108827,
+        "defesa_log": 0.08108014,
+        "multiplicador_ataque": 1.32457051,
+        "multiplicador_protecao_defensiva": 1.0844578
+      },
+      {
+        "clube": "Vitória",
+        "ataque_log": -0.08921338,
+        "defesa_log": -0.02479647,
+        "multiplicador_ataque": 0.91465039,
+        "multiplicador_protecao_defensiva": 0.97550844
+      },
+      {
+        "clube": "Atlético-MG",
+        "ataque_log": 0.00865605,
+        "defesa_log": 0.07903661,
+        "multiplicador_ataque": 1.00869362,
+        "multiplicador_protecao_defensiva": 1.08224394
+      },
+      {
+        "clube": "Corinthians",
+        "ataque_log": -0.0152251,
+        "defesa_log": 0.10483431,
+        "multiplicador_ataque": 0.98489022,
+        "multiplicador_protecao_defensiva": 1.11052659
+      },
+      {
+        "clube": "Cruzeiro",
+        "ataque_log": 0.04483542,
+        "defesa_log": 0.17234936,
+        "multiplicador_ataque": 1.04585572,
+        "multiplicador_protecao_defensiva": 1.18809283
+      },
+      {
+        "clube": "Internacional",
+        "ataque_log": 0.02033091,
+        "defesa_log": 0.02129359,
+        "multiplicador_ataque": 1.02053899,
+        "multiplicador_protecao_defensiva": 1.02152191
+      },
+      {
+        "clube": "Grêmio",
+        "ataque_log": 0.03075521,
+        "defesa_log": -0.00275026,
+        "multiplicador_ataque": 1.03123304,
+        "multiplicador_protecao_defensiva": 0.99725352
+      },
+      {
+        "clube": "Santos",
+        "ataque_log": 0.05288447,
+        "defesa_log": -0.09471451,
+        "multiplicador_ataque": 1.05430783,
+        "multiplicador_protecao_defensiva": 0.90963259
+      },
+      {
+        "clube": "Vasco da Gama",
+        "ataque_log": 0.04910814,
+        "defesa_log": -0.14680984,
+        "multiplicador_ataque": 1.05033393,
+        "multiplicador_protecao_defensiva": 0.86345816
+      },
+      {
+        "clube": "Remo",
+        "ataque_log": -0.00914355,
+        "defesa_log": -0.12861977,
+        "multiplicador_ataque": 0.99089812,
+        "multiplicador_protecao_defensiva": 0.87930824
+      },
+      {
+        "clube": "Mirassol",
+        "ataque_log": 0.12267356,
+        "defesa_log": 0.09052943,
+        "multiplicador_ataque": 1.13051532,
+        "multiplicador_protecao_defensiva": 1.09475373
+      },
+      {
+        "clube": "Chapecoense",
+        "ataque_log": -0.1489931,
+        "defesa_log": -0.31072728,
+        "multiplicador_ataque": 0.86157506,
+        "multiplicador_protecao_defensiva": 0.73291373
+      }
+    ]
+  },
+  "simulacao": {
+    "quantidade": 200000,
+    "semente": 20260717,
+    "rho_producao": 0.0,
+    "convergencia": {
+      "erro_padrao_maximo_pontos_percentuais": 0.111803,
+      "margem_95_maxima_pontos_percentuais": 0.219135,
+      "maior_diferenca_entre_metades_pontos_percentuais": 0.379
+    },
+    "desempate_residual": {
+      "simulacoes_com_empate_apos_pontos_vitorias_saldo_gols": 1261,
+      "percentual_simulacoes": 0.6305,
+      "pares_residuais": 1263
+    }
+  },
+  "sensibilidade_dixon_coles": {
+    "rho_testado": 0.08,
+    "aplicado_na_producao": false,
+    "motivo": "A Execução 1 mostrou melhora de calibração, mas piora nas três regras próprias de pontuação. A versão 1.0 mantém rho=0 e publica esta sensibilidade para reavaliação versionada.",
+    "diferenca_media_absoluta_1x2_pontos_percentuais": 1.248612,
+    "diferenca_maxima_1x2_pontos_percentuais": 2.140857,
+    "alteracao_media_massa_placares_baixos_pontos_percentuais": 0.0
+  },
+  "diagnostico_af_score": {
+    "disponivel": true,
+    "cobertura_clubes": 20,
+    "correlacao_pearson_com_forca_map": 0.77605,
+    "aplicado_na_producao": false,
+    "motivo": "O AF-Score não possui série histórica homogênea em 2023–2025. Incluí-lo agora impediria backtesting temporal equivalente e poderia introduzir vazamento."
+  },
+  "validacoes": {
+    "clubes": 20,
+    "soma_campeao_pct": 100.0,
+    "soma_g4_pct": 400.0,
+    "soma_g6_pct": 600.0,
+    "soma_sul_americana_pct": 600.0,
+    "soma_rebaixamento_pct": 400.0,
+    "todas_distribuicoes_posicao_somam_100": true,
+    "sem_nan_ou_infinity": true
+  },
+  "limites_conhecidos": [
+    "O ajuste é MAP regularizado, não amostragem MCMC da posterior completa.",
+    "A incerteza publicada vem dos resultados futuros simulados; a versão 1.0 não amostra incerteza dos parâmetros.",
+    "Vagas continentais são cenários-base e podem mudar após títulos em copas.",
+    "Confronto direto e cartões não são simulados; empates residuais após pontos, vitórias, saldo e gols pró usam chave reproduzível.",
+    "AF-Score não altera a previsão enquanto não houver backtesting histórico comparável."
+  ],
+  "arquivos": {
+    "probabilidades": "dados-br/probabilidades-brasileirao.json",
+    "historico": "dados-br/historico-probabilidades.json",
+    "auditoria": "dados-br/auditoria-probabilidades.json"
+  }
+}

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "projeto": "AF-Previsão",
-  "versao": "0.1-execucao-1",
-  "status": "calibracao_historica",
+  "versao": "0.2-execucao-2",
+  "status": "motor_probabilistico_ativo",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA)",
@@ -46,7 +46,50 @@
     "base_historica": "dados-br/historico-af-previsao/",
     "auditoria_base": "dados-br/auditoria-base-historica-af-previsao.json",
     "auditoria_modelos": "dados-br/auditoria-modelos-af-previsao.json",
-    "relatorio": "docs/af-previsao-execucao-1.md"
+    "relatorio": "docs/af-previsao-execucao-1.md",
+    "probabilidades": "dados-br/probabilidades-brasileirao.json",
+    "auditoria_probabilidades": "dados-br/auditoria-probabilidades.json",
+    "historico_probabilidades": "dados-br/historico-probabilidades.json",
+    "relatorio_execucao_2": "docs/af-previsao-execucao-2.md"
   },
-  "data_referencia_execucao_1": "2026-07-17T20:30:00-03:00"
+  "data_referencia_execucao_1": "2026-07-17T20:30:00-03:00",
+  "versao_modelo": "AF-Previsão 1.0",
+  "execucao_2": {
+    "arquitetura_producao": "poisson_map_bayesiano",
+    "desvio_prior": 0.4,
+    "meia_vida_dias": 365.0,
+    "simulacoes_monte_carlo": 200000,
+    "semente": 20260717,
+    "rho_dixon_coles_producao": 0.0,
+    "rho_dixon_coles_sensibilidade": 0.08,
+    "zonas_base": {
+      "g4": [
+        1,
+        4
+      ],
+      "g6": [
+        1,
+        6
+      ],
+      "libertadores_base": [
+        1,
+        6
+      ],
+      "sul_americana_base": [
+        7,
+        12
+      ],
+      "rebaixamento": [
+        17,
+        20
+      ]
+    },
+    "historico_max_snapshots": 300,
+    "publicar_probabilidades_2026": true,
+    "usar_af_score_na_producao": false,
+    "motivo_af_score": "Sem série histórica homogênea do AF-Score em 2023–2025 para backtesting temporal equivalente.",
+    "regra_dixon_coles": "A correção está implementada e auditada, mas rho=0 permanece em produção enquanto não houver ganho nas regras próprias fora da amostra.",
+    "regra_hiperparametros": "Usar os hiperparâmetros selecionados no fold temporal mais recente (teste em 2025), evitando médias de configurações não testadas."
+  },
+  "data_referencia_execucao_2": "2026-07-17T21:00:00-03:00"
 }
