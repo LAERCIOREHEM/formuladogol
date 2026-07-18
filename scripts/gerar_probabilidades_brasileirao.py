@@ -61,6 +61,7 @@ AUDIT_MODELS_PATH = ROOT / "dados-br" / "auditoria-modelos-af-previsao.json"
 HIST_DIR = ROOT / "dados-br" / "historico-af-previsao"
 TABLE_PATH = ROOT / "tabela.json"
 EVENTS_PATH = ROOT / "espn_eventos.json"
+RESULTS_PATH = ROOT / "resultados.json"
 CALENDAR_PATH = ROOT / "dados-br" / "calendario-completo.json"
 AF_SCORE_PATH = ROOT / "dados-br" / "ranking-desempenho.json"
 OUTPUT_PATH = ROOT / "dados-br" / "probabilidades-brasileirao.json"
@@ -91,6 +92,10 @@ class CurrentState:
     goals_for: np.ndarray
     goals_against: np.ndarray
     played: np.ndarray
+
+
+class CurrentDataNotSynchronized(ValueError):
+    """Tabela e feeds de partidas ainda não foram atualizados pela ESPN no mesmo instante."""
 
 
 @dataclass(frozen=True)
@@ -264,15 +269,46 @@ def load_historical_matches() -> list[Match]:
     return matches
 
 
-def load_current_matches(events: dict[str, Any], allowed_teams: set[str]) -> list[Match]:
-    matches: list[Match] = []
-    seen: set[str] = set()
+def load_current_matches(
+    events: dict[str, Any],
+    allowed_teams: set[str],
+    results: dict[str, Any] | None = None,
+) -> list[Match]:
+    """Une os concluídos de espn_eventos.json e resultados.json.
+
+    Os endpoints da ESPN podem ficar alguns minutos fora de sincronia. O merge
+    evita perder uma partida que já apareceu em um dos dois feeds, sem aceitar
+    placares conflitantes silenciosamente.
+    """
+    merged: dict[str, Match] = {}
+
+    def add_match(match: Match, origin: str) -> None:
+        key = str(match.source_id)
+        previous = merged.get(key)
+        if previous is None:
+            merged[key] = match
+            return
+        comparable_previous = (
+            previous.round_no, previous.played_on, previous.home, previous.away,
+            previous.home_goals, previous.away_goals,
+        )
+        comparable_new = (
+            match.round_no, match.played_on, match.home, match.away,
+            match.home_goals, match.away_goals,
+        )
+        if comparable_previous != comparable_new:
+            raise ValueError(
+                f"evento {key}: dados conflitantes entre feeds ao incorporar {origin}: "
+                f"{previous.home} {previous.home_goals}x{previous.away_goals} {previous.away} / "
+                f"{match.home} {match.home_goals}x{match.away_goals} {match.away}"
+            )
+
     for item in events.get("eventos") or []:
         if item.get("concluido") is not True:
             continue
         event_id = str(item.get("event_id") or "").strip()
-        if not event_id or event_id in seen:
-            raise ValueError(f"evento concluído inválido ou duplicado: {event_id!r}")
+        if not event_id:
+            raise ValueError("evento concluído sem event_id em espn_eventos.json")
         home = str(item.get("mandante") or "").strip()
         away = str(item.get("visitante") or "").strip()
         if home not in allowed_teams or away not in allowed_teams:
@@ -280,20 +316,42 @@ def load_current_matches(events: dict[str, Any], allowed_teams: set[str]) -> lis
         played_on = parse_date(item.get("data_iso"))
         if played_on is None:
             raise ValueError(f"evento {event_id}: data inválida")
-        matches.append(
+        add_match(
             Match(
-                season=2026,
-                source_id=int(event_id),
-                round_no=int(item.get("rodada") or 0),
-                played_on=played_on,
-                home=home,
-                away=away,
+                season=2026, source_id=int(event_id), round_no=int(item.get("rodada") or 0),
+                played_on=played_on, home=home, away=away,
                 home_goals=int(item.get("placar_mandante") or 0),
                 away_goals=int(item.get("placar_visitante") or 0),
-            )
+            ),
+            "espn_eventos.json",
         )
-        seen.add(event_id)
-    matches.sort(key=lambda match: (match.played_on, match.source_id))
+
+    for item in (results or {}).get("resultados") or []:
+        if str(item.get("estado") or "").lower() != "post":
+            continue
+        event_id = str(item.get("event_id") or "").strip()
+        if not event_id:
+            raise ValueError("resultado concluído sem event_id em resultados.json")
+        raw_home = item.get("mandante")
+        raw_away = item.get("visitante")
+        home = str(raw_home.get("nome") if isinstance(raw_home, dict) else raw_home or "").strip()
+        away = str(raw_away.get("nome") if isinstance(raw_away, dict) else raw_away or "").strip()
+        if home not in allowed_teams or away not in allowed_teams:
+            raise ValueError(f"resultado {event_id}: clube fora da tabela atual ({home} x {away})")
+        played_on = parse_date(item.get("data_iso"))
+        if played_on is None:
+            raise ValueError(f"resultado {event_id}: data inválida")
+        add_match(
+            Match(
+                season=2026, source_id=int(event_id), round_no=int(item.get("rodada") or 0),
+                played_on=played_on, home=home, away=away,
+                home_goals=int(item.get("placar_mandante") or 0),
+                away_goals=int(item.get("placar_visitante") or 0),
+            ),
+            "resultados.json",
+        )
+
+    matches = sorted(merged.values(), key=lambda match: (match.played_on, match.source_id))
     return matches
 
 
@@ -380,7 +438,10 @@ def validate_current_results_against_table(matches: Sequence[Match], state: Curr
             f"{item['clube']} {item['campo']}={item['reconstruido']}/{item['oficial']}"
             for item in discrepancies[:5]
         )
-        raise ValueError(f"resultados concluídos divergem da tabela oficial: {sample}")
+        raise CurrentDataNotSynchronized(
+            "feeds da ESPN temporariamente fora de sincronia; "
+            f"resultados concluídos divergem da tabela oficial: {sample}"
+        )
     return {
         "partidas_concluidas": len(matches),
         "soma_jogos_tabela": int(state.played.sum()),
@@ -828,11 +889,12 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     audit_models = load_json(AUDIT_MODELS_PATH)
     table = load_json(TABLE_PATH)
     events = load_json(EVENTS_PATH)
+    results = load_json(RESULTS_PATH) if RESULTS_PATH.exists() else {"resultados": []}
     calendar = load_json(CALENDAR_PATH)
     state = load_current_state(table)
     allowed_teams = set(state.teams)
     historical = load_historical_matches()
-    current = load_current_matches(events, allowed_teams)
+    current = load_current_matches(events, allowed_teams, results)
     integrity = validate_current_results_against_table(current, state)
     concluded_ids = {str(match.source_id) for match in current}
     fixtures, concluded_in_calendar = load_fixtures(calendar, concluded_ids, allowed_teams)
@@ -1105,7 +1167,31 @@ def main() -> int:
     if args.self_test:
         self_test()
         return 0
-    probabilities, audit, history = generate(args.simulacoes, args.semente)
+    try:
+        probabilities, audit, history = generate(args.simulacoes, args.semente)
+    except CurrentDataNotSynchronized as exc:
+        previous_files = (OUTPUT_PATH, AUDIT_PATH, HISTORY_PATH)
+        previous_valid = all(path.exists() for path in previous_files)
+        if previous_valid:
+            try:
+                previous_output = load_json(OUTPUT_PATH)
+                previous_audit = load_json(AUDIT_PATH)
+                previous_history = load_json(HISTORY_PATH)
+                previous_valid = (
+                    previous_output.get("status") == "ok"
+                    and previous_audit.get("status") == "ok"
+                    and bool(previous_history.get("snapshots"))
+                    and previous_output.get("hash_entrada") == previous_audit.get("hash_entrada")
+                )
+            except (OSError, ValueError, json.JSONDecodeError):
+                previous_valid = False
+        if not previous_valid:
+            raise
+        print(
+            "::warning title=AF-Previsão aguardando sincronização da ESPN::"
+            f"{exc}. A previsão anterior íntegra foi preservada; a próxima execução tentará atualizar novamente."
+        )
+        return 0
     write_json(OUTPUT_PATH, probabilities)
     write_json(AUDIT_PATH, audit)
     write_json(HISTORY_PATH, history)
