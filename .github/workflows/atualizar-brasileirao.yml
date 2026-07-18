@@ -26,6 +26,12 @@ on:
       - 'scripts/buscar_detalhes_jogos_brasileirao.py'
       - 'scripts/gerar_auditoria_cobertura_resultados.py'
       - 'scripts/gerar_auditoria_calendario.py'
+      - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/af_previsao_backtest.py'
+      - 'dados-br/config-af-previsao.json'
+      - 'dados-br/auditoria-modelos-af-previsao.json'
+      - 'dados-br/historico-af-previsao/**'
+      - 'requirements-af-previsao.txt'
       - 'dados-br/ajustes-calendario.json'
       - 'dados-br/publicos-complementares.json'
       - '.github/workflows/atualizar-brasileirao.yml'
@@ -56,6 +62,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements-af-previsao.txt
+
+      - name: Instalar dependências do AF-Previsão
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
 
       - name: Mostrar horario da execucao
         run: |
@@ -71,9 +82,12 @@ jobs:
             scripts/buscar_detalhes_jogos_brasileirao.py \
             scripts/gerar_estatisticas_brasileirao.py \
             scripts/gerar_estatisticas_competicao_brasileirao.py \
-            scripts/gerar_auditoria_estatisticas_brasileirao.py
+            scripts/gerar_auditoria_estatisticas_brasileirao.py \
+            scripts/af_previsao_backtest.py \
+            scripts/gerar_probabilidades_brasileirao.py
           python scripts/buscar_lideres_jogadores_espn.py --self-test
           python scripts/buscar_detalhes_jogos_brasileirao.py --self-test
+          python scripts/gerar_probabilidades_brasileirao.py --self-test
 
       # --- DADOS DO BRASILEIRAO (100% ESPN) ---
       # O script grava os quatro JSONs de uma vez e falha antes de publicar
@@ -94,6 +108,9 @@ jobs:
       - name: Gerar estatísticas e Ranking Vivo de desempenho
         run: python scripts/gerar_estatisticas_brasileirao.py
 
+      - name: Gerar AF-Previsão e simular o restante do campeonato
+        run: python scripts/gerar_probabilidades_brasileirao.py
+
       - name: Gerar estatísticas gerais da competição
         run: python scripts/gerar_estatisticas_competicao_brasileirao.py
 
@@ -107,7 +124,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/probabilidades-brasileirao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -177,7 +194,27 @@ jobs:
           assert resumo_cal.get('rodadas_returno_incorretas') == 0, 'calendário com rodada incorreta no returno'
           completo = json.load(open('dados-br/calendario-completo.json', encoding='utf-8'))
           assert completo.get('total_partidas') == 380, 'calendario-completo.json sem 380 partidas'
-          print('  OK   Estatísticas e auditoria estrutural do calendário geradas')
+          previsao = json.load(open('dados-br/probabilidades-brasileirao.json', encoding='utf-8'))
+          assert previsao.get('status') == 'ok', 'AF-Previsão com status inválido'
+          assert previsao.get('base_corrente', {}).get('partidas_totais') == 380, 'AF-Previsão sem 380 partidas'
+          assert previsao.get('base_corrente', {}).get('partidas_concluidas') + previsao.get('base_corrente', {}).get('partidas_restantes') == 380, 'AF-Previsão com partição inválida'
+          clubes_prev = previsao.get('clubes') or []
+          assert len(clubes_prev) == 20, 'AF-Previsão sem 20 clubes'
+          assert previsao.get('total_previsoes_partidas') == previsao.get('base_corrente', {}).get('partidas_restantes'), 'AF-Previsão sem previsão para todos os jogos restantes'
+          assert len(previsao.get('partidas_restantes') or []) == previsao.get('base_corrente', {}).get('partidas_restantes'), 'lista de partidas previstas incompleta'
+          for campo, esperado in [('campeao', 100), ('g4', 400), ('g6', 600), ('libertadores_base', 600), ('sul_americana_base', 600), ('rebaixamento', 400)]:
+              total = sum(float(item['probabilidades_pct'][campo]) for item in clubes_prev)
+              assert abs(total - esperado) <= 0.02, f'AF-Previsão: soma inválida em {campo}: {total}'
+          assert all(abs(sum(item.get('distribuicao_posicoes_pct') or []) - 100) <= 0.02 for item in clubes_prev), 'AF-Previsão: distribuição de posições inválida'
+          aud_prev = json.load(open('dados-br/auditoria-probabilidades.json', encoding='utf-8'))
+          assert aud_prev.get('status') == 'ok', 'auditoria do AF-Previsão falhou'
+          assert aud_prev.get('simulacao', {}).get('quantidade', 0) >= 200000, 'AF-Previsão com poucas simulações'
+          assert aud_prev.get('simulacao', {}).get('convergencia', {}).get('maior_diferenca_entre_metades_pontos_percentuais', 99) <= 1.0, 'AF-Previsão sem convergência suficiente'
+          assert aud_prev.get('hash_entrada') == previsao.get('hash_entrada'), 'hash divergente entre previsão e auditoria'
+          hist_prev = json.load(open('dados-br/historico-probabilidades.json', encoding='utf-8'))
+          assert hist_prev.get('total_snapshots', 0) >= 1, 'histórico do AF-Previsão vazio'
+          assert (hist_prev.get('snapshots') or [])[-1].get('hash_entrada') == previsao.get('hash_entrada'), 'histórico não termina no estado publicado'
+          print('  OK   Estatísticas, calendário e AF-Previsão gerados')
           PY
 
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
@@ -211,6 +248,9 @@ jobs:
             "dados-br/auditoria-cobertura-resultados.json"
             "dados-br/calendario-completo.json"
             "dados-br/auditoria-calendario.json"
+            "dados-br/probabilidades-brasileirao.json"
+            "dados-br/auditoria-probabilidades.json"
+            "dados-br/historico-probabilidades.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
