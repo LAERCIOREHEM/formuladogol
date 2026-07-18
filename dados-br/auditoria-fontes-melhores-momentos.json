@@ -1,12 +1,13 @@
 {
-  "atualizado_em": "2026-07-18T09:10:16-03:00",
+  "atualizado_em": "2026-07-18T12:16:00-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
-    "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video ou CazéTV podem aparecer no site. Se não houver fonte preferida, o jogo fica sem vídeo.",
+    "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
     "preferenciais": [
       "GE TV/ge.globo/sportv/Premiere/Globoplay",
       "Amazon Prime Video",
-      "CazéTV"
+      "CazéTV",
+      "UOL Esporte (fallback)"
     ],
     "outros": "Não devem aparecer no site. Se houver algum item nesta lista, é problema de saneamento.",
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
@@ -14,9 +15,10 @@
   "resumo": {
     "jogos_resultados": 181,
     "jogos_com_video": 181,
-    "ge_globo": 180,
+    "ge_globo": 179,
     "amazon_prime_video": 1,
     "cazetv": 0,
+    "uol_esporte": 1,
     "outros": 0,
     "sem_video": 0,
     "percentual_fontes_preferidas": 100.0
@@ -2874,22 +2876,6 @@
         "confianca": 1.0
       },
       {
-        "event_id": "401841155",
-        "rodada": 19,
-        "mandante": "Mirassol",
-        "visitante": "Grêmio",
-        "placar_mandante": 2,
-        "placar_visitante": 1,
-        "categoria_fonte": "ge_globo",
-        "origem_vinculo": "automatico",
-        "fonte": "GE TV / YouTube",
-        "fonte_busca": "",
-        "channel_title": "",
-        "titulo": "MIRASSOL 2 X 1 GRÊMIO | MELHORES MOMENTOS | 19ª RODADA BRASILEIRÃO 2026 | ge.globo",
-        "url": "https://www.youtube.com/watch?v=15Tnr4zxa44",
-        "confianca": 1.0
-      },
-      {
         "event_id": "401841157",
         "rodada": 19,
         "mandante": "Vitória",
@@ -2924,6 +2910,24 @@
         "confianca": 1.0
       }
     ],
-    "cazetv": []
+    "cazetv": [],
+    "uol_esporte": [
+      {
+        "event_id": "401841155",
+        "rodada": 19,
+        "mandante": "Mirassol",
+        "visitante": "Grêmio",
+        "placar_mandante": 2,
+        "placar_visitante": 1,
+        "categoria_fonte": "uol_esporte",
+        "origem_vinculo": "manual",
+        "fonte": "UOL Esporte / YouTube",
+        "fonte_busca": "Manual / usuário",
+        "channel_title": "UOL Esporte",
+        "titulo": "MIRASSOL 2 X 1 GRÊMIO | MELHORES MOMENTOS | BRASILEIRÃO 2026",
+        "url": "https://www.youtube.com/watch?v=D_qYFxrgQqI",
+        "confianca": 1.0
+      }
+    ]
   }
 }
