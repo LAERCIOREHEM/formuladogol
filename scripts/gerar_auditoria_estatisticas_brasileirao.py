@@ -118,6 +118,7 @@ def main() -> None:
         warnings.append(f"detalhes ausentes para {len(missing_details)} jogos")
 
     event_errors: list[str] = []
+    pending_manual_details: list[str] = []
     duplicate_events: list[str] = []
     narrative_false_positives: list[str] = []
     for event_id, game in detail_games.items():
@@ -125,6 +126,19 @@ def main() -> None:
             event_errors.append(f"{event_id}: registro inválido")
             continue
         validation = game.get("validacao_eventos") or {}
+        is_pending_manual = (
+            game.get("resultado_manual") is True
+            and validation.get("resultado_confirmado") is True
+            and validation.get("pendente_detalhes") is True
+        )
+        if is_pending_manual:
+            # O placar foi confirmado por exceção editorial auditável, mas a ESPN
+            # ainda não publicou eventos compatíveis. Não inventamos autores dos
+            # gols/cartões e não tratamos essa pendência declarada como corrupção.
+            pending_manual_details.append(
+                f"{event_id}: resultado manual confirmado; eventos nominais aguardando ESPN"
+            )
+            continue
         if not validation.get("ok"):
             event_errors.append(f"{event_id}: validação de eventos reprovada")
         home, away = str(game.get("mandante") or ""), str(game.get("visitante") or "")
@@ -154,6 +168,10 @@ def main() -> None:
             if key in seen_cards:
                 duplicate_events.append(f"{event_id}: cartão duplicado {card.get('minuto')} {card.get('jogador')}")
             seen_cards.add(key)
+    if pending_manual_details:
+        warnings.append(
+            f"{len(pending_manual_details)} resultado(s) manual(is) confirmado(s) aguardando detalhes nominais da ESPN"
+        )
     if event_errors:
         critical.append(f"{len(event_errors)} jogo(s) com gols/cartões incompatíveis")
     if duplicate_events:
@@ -237,6 +255,7 @@ def main() -> None:
         },
         "jogos_sem_detalhes": missing_details,
         "eventos_inconsistentes": event_errors,
+        "resultados_manuais_pendentes_detalhes": pending_manual_details,
         "eventos_duplicados": duplicate_events,
         "falsos_gols_de_narracao": narrative_false_positives,
         "elencos_incompletos": incomplete_rosters,
