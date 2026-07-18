@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-07-17T23:47:42.651945-03:00",
+  "gerado_em": "2026-07-18T00:30:37.085002-03:00",
   "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
@@ -9,16 +9,15 @@
     "rodadas_com_10_jogos": 38,
     "clubes_com_38_jogos": 20,
     "confrontos_com_ida_e_volta": 190,
-    "partidas_com_data_confirmada": 268,
-    "partidas_com_data_a_definir": 112,
+    "partidas_com_data_confirmada": 260,
+    "partidas_com_data_a_definir": 120,
     "resultados_publicados": 181,
     "proximos_publicados": 43,
     "eventos_espn_na_janela": 270,
     "ajustes_calendario_configurados": 3,
     "jogos_adiados_sem_data": 1,
-    "rodadas_espn_com_clube_repetido": 0,
-    "rodadas_returno_incorretas": 1,
-    "falhas_graves": 1
+    "rodadas_espn_com_clube_repetido": 3,
+    "falhas_graves": 3
   },
   "distribuicao_jogos_disputados": {
     "19": 5,
@@ -551,31 +550,69 @@
     },
     {
       "rodada": 24,
-      "jogos_mapeados": 10,
+      "jogos_mapeados": 8,
       "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": true
+      "clubes_ausentes": [
+        "Athletico-PR",
+        "Botafogo",
+        "Corinthians",
+        "Coritiba"
+      ],
+      "integra": false
     },
     {
       "rodada": 25,
       "jogos_mapeados": 10,
-      "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": true
+      "clubes_repetidos": [
+        "Athletico-PR",
+        "Botafogo",
+        "Corinthians",
+        "Coritiba"
+      ],
+      "clubes_ausentes": [
+        "Bragantino",
+        "Cruzeiro",
+        "São Paulo",
+        "Vasco da Gama"
+      ],
+      "integra": false
     },
     {
       "rodada": 26,
       "jogos_mapeados": 10,
-      "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": true
+      "clubes_repetidos": [
+        "Bragantino",
+        "Cruzeiro",
+        "Vasco da Gama"
+      ],
+      "clubes_ausentes": [
+        "Atlético-MG",
+        "Grêmio",
+        "Vitória"
+      ],
+      "integra": false
     },
     {
       "rodada": 27,
       "jogos_mapeados": 10,
+      "clubes_repetidos": [
+        "Atlético-MG",
+        "Grêmio",
+        "Vitória"
+      ],
+      "clubes_ausentes": [
+        "Cruzeiro",
+        "Palmeiras",
+        "Santos"
+      ],
+      "integra": false
+    },
+    {
+      "rodada": 28,
+      "jogos_mapeados": 2,
       "clubes_repetidos": [],
       "clubes_ausentes": [],
-      "integra": true
+      "integra": false
     },
     {
       "rodada": 38,
@@ -585,20 +622,57 @@
       "integra": false
     }
   ],
-  "returno_incorreto": [
-    {
-      "event_id": "401841194",
-      "mandante": "Chapecoense",
-      "visitante": "Bahia",
-      "rodada_atual": 38,
-      "rodada_esperada": 23
-    }
-  ],
   "duplicados_entre_resultados_e_proximos": [],
   "falhas": [
     {
-      "tipo": "rodadas_returno_incorretas",
-      "total": 1
+      "tipo": "rodada_espn_inconsistente",
+      "rodada": 25,
+      "jogos_mapeados": 10,
+      "clubes_repetidos": [
+        "Athletico-PR",
+        "Botafogo",
+        "Corinthians",
+        "Coritiba"
+      ],
+      "clubes_ausentes": [
+        "Bragantino",
+        "Cruzeiro",
+        "São Paulo",
+        "Vasco da Gama"
+      ],
+      "integra": false
+    },
+    {
+      "tipo": "rodada_espn_inconsistente",
+      "rodada": 26,
+      "jogos_mapeados": 10,
+      "clubes_repetidos": [
+        "Bragantino",
+        "Cruzeiro",
+        "Vasco da Gama"
+      ],
+      "clubes_ausentes": [
+        "Atlético-MG",
+        "Grêmio",
+        "Vitória"
+      ],
+      "integra": false
+    },
+    {
+      "tipo": "rodada_espn_inconsistente",
+      "rodada": 27,
+      "jogos_mapeados": 10,
+      "clubes_repetidos": [
+        "Atlético-MG",
+        "Grêmio",
+        "Vitória"
+      ],
+      "clubes_ausentes": [
+        "Cruzeiro",
+        "Palmeiras",
+        "Santos"
+      ],
+      "integra": false
     }
   ],
   "observacao": "A ESPN é consultada de 1º de janeiro até 60 dias à frente. O calendario-completo.json preserva datas conhecidas e completa os 380 confrontos pela inversão obrigatória dos mandos do primeiro turno."
