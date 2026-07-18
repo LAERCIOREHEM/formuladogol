@@ -899,12 +899,23 @@ def aplicar_resultados_manuais(eventos: list[dict[str, Any]]) -> int:
         if oficial_final:
             oficial_pm = alvo.get("placar_mandante")
             oficial_pv = alvo.get("placar_visitante")
-            if oficial_pm is not None and oficial_pv is not None and (int(oficial_pm), int(oficial_pv)) != (pm, pv):
+            placar_oficial_presente = oficial_pm is not None and oficial_pv is not None
+            placar_divergente = placar_oficial_presente and (int(oficial_pm), int(oficial_pv)) != (pm, pv)
+            sobrescrever_finalizada = bool(
+                ajuste.get("permitir_sobrescrever_espn_finalizada") is True
+                or ajuste.get("sobrescrever_espn_finalizada") is True
+            )
+            if placar_divergente and not sobrescrever_finalizada:
                 raise RuntimeError(
                     f"Resultado manual diverge da ESPN finalizada em {event_id or mand + ' x ' + vis}: "
                     f"ESPN {oficial_pm}x{oficial_pv}, manual {pm}x{pv}"
                 )
-            continue
+            if not placar_divergente:
+                continue
+            print(
+                "::warning::Resultado manual autorizado sobrepôs placar ESPN finalizado "
+                f"em {event_id or mand + ' x ' + vis}: ESPN {oficial_pm}x{oficial_pv}, manual {pm}x{pv}"
+            )
 
         if ajuste.get("data_iso"):
             data_dt = _parse_data_manual_brt(ajuste.get("data_iso"))
