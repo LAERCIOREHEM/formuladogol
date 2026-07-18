@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Gera as probabilidades do AF-Previsão para o Brasileirão 2026.
 
-Execução 2.5 do projeto:
+Execução 4 do projeto:
   * mantém a arquitetura Poisson log-linear MAP selecionada no backtesting;
+  * aplica um ajuste conservador de forma recente por EWMA, sem sazonalidade artificial;
   * prevê placares e resultados das partidas restantes do Brasileirão;
   * simula Copa do Brasil, Libertadores e Sul-Americana;
   * aloca, em cada universo Monte Carlo, vagas e repasses regulamentares;
   * publica chances continentais consolidadas e decompostas por via exclusiva;
-  * registra ocorrências brutas, limites de resolução e histórico versionado.
+  * publica posição e pontos projetados em inteiros, preservando as médias brutas para auditoria;
+  * registra ocorrências brutas, limites de resolução e histórico versionado por rodada.
 
 O modelo publicado usa a arquitetura vencedora da Execução 1. A correção
 Dixon–Coles permanece implementada e auditada como análise de sensibilidade;
@@ -113,6 +115,22 @@ class MatchForecast:
     probabilities: tuple[float, float, float]
     modal: tuple[int, int]
     score_probabilities: tuple[tuple[int, int, float], ...]
+    base_home_rate: float | None = None
+    base_away_rate: float | None = None
+    trend_home_pct: float = 0.0
+    trend_away_pct: float = 0.0
+
+
+@dataclass(frozen=True)
+class RecentTrend:
+    team: str
+    matches_used: int
+    attack_log_adjustment: float
+    defence_log_adjustment: float
+    attack_adjustment_pct: float
+    defence_adjustment_pct: float
+    strength_adjustment_pct: float
+    label: str
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -243,6 +261,8 @@ def build_model_state_hash(
         "schema": 1,
         "versao_modelo": config.get("versao_modelo"),
         "execucao_2": config.get("execucao_2"),
+        "execucao_2_5": config.get("execucao_2_5"),
+        "execucao_4": config.get("execucao_4"),
         "historico": historical_hashes,
         "modelo_vencedor": winner,
         "tabela": table_rows,
@@ -535,14 +555,112 @@ def top_scores(matrix: Sequence[Sequence[float]], limit: int = 5) -> tuple[tuple
     return tuple((home, away, probability) for probability, home, away in values[:limit])
 
 
+def _bounded_log_multiplier(value: float, limit_pct: float) -> float:
+    limit = max(0.0, min(95.0, float(limit_pct))) / 100.0
+    return min(math.log1p(limit), max(math.log1p(-limit), float(value)))
+
+
+def _ewma_recent(values: Sequence[float], alpha: float) -> float:
+    if not values:
+        return 0.0
+    alpha = min(1.0, max(0.01, float(alpha)))
+    weights = np.asarray([(1.0 - alpha) ** lag for lag in range(len(values) - 1, -1, -1)], dtype=np.float64)
+    observations = np.asarray(values, dtype=np.float64)
+    return float(np.dot(weights, observations) / max(EPS, float(weights.sum())))
+
+
+def _round_half_up(value: float) -> int:
+    return int(math.floor(float(value) + 0.5))
+
+
+def calculate_recent_trends(
+    current_matches: Sequence[Match],
+    model: dict[str, Any],
+    teams: Sequence[str],
+    settings: dict[str, Any],
+) -> dict[str, RecentTrend]:
+    """Calcula um ajuste leve de forma recente, sem componente sazonal.
+
+    Cada observação mede o resíduo do placar em relação à taxa esperada pelo
+    modelo MAP. Ataque e defesa são suavizados separadamente por EWMA. A
+    contribuição final é reduzida por confiabilidade, multiplicada por um peso
+    pequeno e limitada para impedir que uma sequência curta domine a projeção.
+    """
+    window = max(1, int(settings.get("janela_jogos") or 12))
+    alpha = float(settings.get("alpha") or 0.18)
+    model_weight = max(0.0, min(1.0, float(settings.get("peso_no_modelo") or 0.08)))
+    minimum_matches = max(1, int(settings.get("minimo_jogos_ativacao") or 6))
+    full_confidence_matches = max(minimum_matches, int(settings.get("jogos_para_confianca_total") or window))
+    pseudo = max(0.05, float(settings.get("pseudo_contagem_gols") or 0.75))
+    residual_limit = max(0.05, float(settings.get("limite_residuo_log") or 0.8))
+    component_limit_pct = max(0.0, float(settings.get("limite_ajuste_componente_pct") or 6.0))
+    observations: dict[str, dict[str, list[float]]] = {team: {"attack": [], "defence": []} for team in teams}
+
+    for match in sorted(current_matches, key=lambda item: (item.played_on, item.source_id)):
+        home_rate, away_rate = map_rates(model, match.home, match.away)
+        home_attack = math.log((match.home_goals + pseudo) / (home_rate + pseudo))
+        away_attack = math.log((match.away_goals + pseudo) / (away_rate + pseudo))
+        home_defence = math.log((away_rate + pseudo) / (match.away_goals + pseudo))
+        away_defence = math.log((home_rate + pseudo) / (match.home_goals + pseudo))
+        observations[match.home]["attack"].append(max(-residual_limit, min(residual_limit, home_attack)))
+        observations[match.home]["defence"].append(max(-residual_limit, min(residual_limit, home_defence)))
+        observations[match.away]["attack"].append(max(-residual_limit, min(residual_limit, away_attack)))
+        observations[match.away]["defence"].append(max(-residual_limit, min(residual_limit, away_defence)))
+
+    output: dict[str, RecentTrend] = {}
+    for team in teams:
+        attack_values = observations[team]["attack"][-window:]
+        defence_values = observations[team]["defence"][-window:]
+        used = min(len(attack_values), len(defence_values))
+        if used < minimum_matches:
+            attack_adjustment = defence_adjustment = 0.0
+        else:
+            reliability = min(1.0, used / float(full_confidence_matches))
+            attack_adjustment = _ewma_recent(attack_values, alpha) * model_weight * reliability
+            defence_adjustment = _ewma_recent(defence_values, alpha) * model_weight * reliability
+            attack_adjustment = _bounded_log_multiplier(attack_adjustment, component_limit_pct)
+            defence_adjustment = _bounded_log_multiplier(defence_adjustment, component_limit_pct)
+        attack_pct = 100.0 * math.expm1(attack_adjustment)
+        defence_pct = 100.0 * math.expm1(defence_adjustment)
+        strength_pct = 100.0 * math.expm1((attack_adjustment + defence_adjustment) / 2.0)
+        if strength_pct >= 1.5:
+            label = "leve melhora"
+        elif strength_pct <= -1.5:
+            label = "leve queda"
+        else:
+            label = "estável"
+        output[team] = RecentTrend(
+            team=team,
+            matches_used=used,
+            attack_log_adjustment=attack_adjustment,
+            defence_log_adjustment=defence_adjustment,
+            attack_adjustment_pct=round(attack_pct, 4),
+            defence_adjustment_pct=round(defence_pct, 4),
+            strength_adjustment_pct=round(strength_pct, 4),
+            label=label,
+        )
+    return output
+
+
 def build_forecasts(
     fixtures: Sequence[Fixture],
     model: dict[str, Any],
     rho_production: float,
+    recent_trends: dict[str, RecentTrend] | None = None,
+    max_fixture_adjustment_pct: float = 10.0,
 ) -> list[MatchForecast]:
     forecasts: list[MatchForecast] = []
+    trends = recent_trends or {}
     for fixture in fixtures:
-        home_rate, away_rate = map_rates(model, fixture.home, fixture.away)
+        base_home_rate, base_away_rate = map_rates(model, fixture.home, fixture.away)
+        home_trend = trends.get(fixture.home)
+        away_trend = trends.get(fixture.away)
+        home_log_adjustment = (home_trend.attack_log_adjustment if home_trend else 0.0) - (away_trend.defence_log_adjustment if away_trend else 0.0)
+        away_log_adjustment = (away_trend.attack_log_adjustment if away_trend else 0.0) - (home_trend.defence_log_adjustment if home_trend else 0.0)
+        home_log_adjustment = _bounded_log_multiplier(home_log_adjustment, max_fixture_adjustment_pct)
+        away_log_adjustment = _bounded_log_multiplier(away_log_adjustment, max_fixture_adjustment_pct)
+        home_rate = min(5.5, max(0.08, base_home_rate * math.exp(home_log_adjustment)))
+        away_rate = min(5.0, max(0.06, base_away_rate * math.exp(away_log_adjustment)))
         matrix = score_matrix(home_rate, away_rate, rho_production)
         probabilities = outcome_from_matrix(matrix)
         if abs(sum(probabilities) - 1.0) > 1e-9:
@@ -555,6 +673,10 @@ def build_forecasts(
                 probabilities=probabilities,
                 modal=modal_score(matrix),
                 score_probabilities=top_scores(matrix),
+                base_home_rate=base_home_rate,
+                base_away_rate=base_away_rate,
+                trend_home_pct=round(100.0 * math.expm1(home_log_adjustment), 4),
+                trend_away_pct=round(100.0 * math.expm1(away_log_adjustment), 4),
             )
         )
     return forecasts
@@ -585,9 +707,13 @@ def run_monte_carlo(
     rho: float,
     return_samples: bool = False,
     display_threshold_pct: float = 0.1,
+    position_interval_percentiles: tuple[int, int] = (10, 90),
 ) -> dict[str, Any]:
     if simulations < 10_000:
         raise ValueError("produção exige pelo menos 10.000 simulações")
+    lower_position_pct, upper_position_pct = (int(position_interval_percentiles[0]), int(position_interval_percentiles[1]))
+    if not 0 <= lower_position_pct < upper_position_pct <= 100:
+        raise ValueError("percentis da faixa de posição precisam satisfazer 0 <= inferior < superior <= 100")
     team_index = {team: index for index, team in enumerate(state.teams)}
     points = np.broadcast_to(state.points, (simulations, 20)).copy()
     wins = np.broadcast_to(state.wins, (simulations, 20)).copy()
@@ -672,6 +798,10 @@ def run_monte_carlo(
             delta = abs(float(np.mean(predicate(first_half))) - float(np.mean(predicate(second_half))))
             convergence_deltas.append(delta)
         points_team = points[:, index]
+        position_mean = float(np.mean(team_positions))
+        points_mean = float(np.mean(points_team))
+        position_lower = int(np.percentile(team_positions, lower_position_pct, method="nearest"))
+        position_upper = int(np.percentile(team_positions, upper_position_pct, method="nearest"))
         team_results.append(
             {
                 "clube": team,
@@ -685,10 +815,18 @@ def run_monte_carlo(
                     key: display_probability(count, simulations, display_threshold_pct)
                     for key, count in criterion_counts.items()
                 },
-                "posicao_projetada_media": round(float(np.mean(team_positions)), 4),
+                "posicao_projetada": _round_half_up(position_mean),
+                "posicao_projetada_media": round(position_mean, 4),
                 "posicao_projetada_mediana": int(np.median(team_positions)),
+                "faixa_posicao_80": {
+                    "melhor": min(position_lower, position_upper),
+                    "pior": max(position_lower, position_upper),
+                    "percentil_inferior": lower_position_pct,
+                    "percentil_superior": upper_position_pct,
+                },
                 "pontos_projetados": {
-                    "media": round(float(np.mean(points_team)), 3),
+                    "media": _round_half_up(points_mean),
+                    "media_estimada": round(points_mean, 3),
                     "mediana": int(np.median(points_team)),
                     "percentil_10": int(np.percentile(points_team, 10, method="nearest")),
                     "percentil_90": int(np.percentile(points_team, 90, method="nearest")),
@@ -806,6 +944,12 @@ def serialize_match_forecasts(
                     "mandante": round(forecast.home_rate, 4),
                     "visitante": round(forecast.away_rate, 4),
                 },
+                "tendencia_recente": {
+                    "taxa_base_mandante": round(forecast.base_home_rate if forecast.base_home_rate is not None else forecast.home_rate, 4),
+                    "taxa_base_visitante": round(forecast.base_away_rate if forecast.base_away_rate is not None else forecast.away_rate, 4),
+                    "ajuste_taxa_mandante_pct": round(forecast.trend_home_pct, 4),
+                    "ajuste_taxa_visitante_pct": round(forecast.trend_away_pct, 4),
+                },
                 "probabilidades_pct": {
                     "mandante": round(100.0 * forecast.probabilities[0], 4),
                     "empate": round(100.0 * forecast.probabilities[1], 4),
@@ -846,6 +990,8 @@ def update_history(
     input_hash: str,
     teams: Sequence[dict[str, Any]],
     model_version: str,
+    round_reference: int,
+    simulations: int,
     max_snapshots: int = 300,
 ) -> dict[str, Any]:
     snapshots = list((existing or {}).get("snapshots") or [])
@@ -853,12 +999,22 @@ def update_history(
         snapshots.append(
             {
                 "gerado_em": generated_at,
+                "rodada_referencia": int(round_reference),
                 "hash_entrada": input_hash,
                 "versao_modelo": model_version,
-                "metodologia": "AF-Previsão Integrada",
+                "metodologia": "AF-Previsão Integrada com tendência controlada",
+                "simulacoes": int(simulations),
                 "clubes": [
                     {
                         "clube": item["clube"],
+                        "posicao_atual": item.get("posicao_atual"),
+                        "pontos_atuais": item.get("pontos_atuais"),
+                        "jogos_atuais": item.get("jogos_atuais"),
+                        "posicao_projetada": item.get("posicao_projetada"),
+                        "posicao_media_estimada": item.get("posicao_projetada_media"),
+                        "faixa_posicao_80": item.get("faixa_posicao_80"),
+                        "pontos_projetados": item["pontos_projetados"].get("media"),
+                        "pontos_media_estimada": item["pontos_projetados"].get("media_estimada", item["pontos_projetados"].get("media")),
                         "campeao_pct": item["probabilidades_pct"]["campeao"],
                         "libertadores_pct": item["probabilidades_pct"].get("libertadores"),
                         "sul_americana_pct": item["probabilidades_pct"].get("sul_americana"),
@@ -874,7 +1030,9 @@ def update_history(
                             for key, detail in (item.get("probabilidades_detalhes") or {}).items()
                         },
                         "decomposicao_chances": item.get("decomposicao_chances"),
-                        "pontos_medios": item["pontos_projetados"]["media"],
+                        "tendencia_recente": item.get("tendencia_recente"),
+                        # Compatibilidade com snapshots das versões anteriores.
+                        "pontos_medios": item["pontos_projetados"].get("media_estimada", item["pontos_projetados"].get("media")),
                     }
                     for item in teams
                 ],
@@ -884,7 +1042,7 @@ def update_history(
     return {
         "schema_version": 2,
         "projeto": "AF-Previsão",
-        "descricao": "Histórico versionado das probabilidades; um snapshot por alteração dos dados de entrada.",
+        "descricao": "Histórico versionado das probabilidades; um snapshot por alteração dos dados de entrada, identificado por rodada de referência.",
         "total_snapshots": len(snapshots),
         "snapshots": snapshots,
     }
@@ -964,9 +1122,21 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     seed = int(seed_override if seed_override is not None else execution.get("semente") or 20260717)
     rho_production = float(execution.get("rho_dixon_coles_producao") or 0.0)
     rho_sensitivity = float(execution.get("rho_dixon_coles_sensibilidade") or 0.08)
-    forecasts = build_forecasts(fixtures, model, rho_production)
+    execution_4 = config.get("execucao_4") or {}
+    trend_settings = execution_4.get("tendencia_recente") or {}
+    recent_trends = calculate_recent_trends(current, model, state.teams, trend_settings)
+    forecasts = build_forecasts(
+        fixtures,
+        model,
+        rho_production,
+        recent_trends=recent_trends,
+        max_fixture_adjustment_pct=float(trend_settings.get("limite_ajuste_taxa_partida_pct") or 10.0),
+    )
     execution_25 = config.get("execucao_2_5") or {}
     display_threshold = float(execution_25.get("limiar_exibicao_percentual", 0.1))
+    projection_settings = execution_4.get("projecoes_exibicao") or {}
+    raw_position_percentiles = projection_settings.get("faixa_posicao_percentis") or [10, 90]
+    position_percentiles = (int(raw_position_percentiles[0]), int(raw_position_percentiles[1]))
     simulation = run_monte_carlo(
         state,
         forecasts,
@@ -975,6 +1145,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         rho_production,
         return_samples=True,
         display_threshold_pct=display_threshold,
+        position_interval_percentiles=position_percentiles,
     )
     league_order = simulation.pop("_league_order")
     try:
@@ -999,6 +1170,16 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     validate_probabilities(teams)
     continental_by_team = continental["clubes"]
     for item in teams:
+        trend = recent_trends[item["clube"]]
+        item["tendencia_recente"] = {
+            "metodo": "EWMA sem sazonalidade",
+            "jogos_considerados": trend.matches_used,
+            "ajuste_ataque_pct": trend.attack_adjustment_pct,
+            "ajuste_defesa_pct": trend.defence_adjustment_pct,
+            "ajuste_forca_pct": trend.strength_adjustment_pct,
+            "classificacao": trend.label,
+            "peso_no_modelo": float(trend_settings.get("peso_no_modelo") or 0.08),
+        }
         integrated = continental_by_team[item["clube"]]
         item["probabilidades_pct"]["libertadores"] = integrated["libertadores"]["total"]["percentual_estimado"]
         item["probabilidades_pct"]["sul_americana"] = integrated["sul_americana"]["total"]["percentual_estimado"]
@@ -1026,6 +1207,13 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         "arquitetura": "Poisson log-linear ajustado por MAP com priors gaussianos e partial pooling",
         "modelo_de_gols": "Poisson duplo com parâmetros de ataque, defesa e vantagem de mando",
         "regularizacao": "aproximação bayesiana MAP; clubes com menos evidência regridem à média",
+        "tendencia_recente": {
+            "metodo": "EWMA de resíduos de gols sem componente sazonal",
+            "janela_jogos": int(trend_settings.get("janela_jogos") or 12),
+            "peso_no_modelo": float(trend_settings.get("peso_no_modelo") or 0.08),
+            "limite_ajuste_taxa_partida_pct": float(trend_settings.get("limite_ajuste_taxa_partida_pct") or 10.0),
+            "regra": "ajuste marginal e limitado; não substitui a força acumulada nem a simulação da tabela restante",
+        },
         "decaimento_temporal_meia_vida_dias": map_config.half_life_days,
         "desvio_prior": map_config.prior_sd,
         "dixon_coles": {
@@ -1050,7 +1238,10 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "libertadores": "chance consolidada por Brasileirão, Copa do Brasil, Libertadores, Sul-Americana e repasses",
             "sul_americana": "seis vagas alocadas após a definição de todos os classificados à Libertadores",
             "rebaixamento": "17º ao 20º",
+            "posicao_projetada": "média das posições simuladas arredondada para o inteiro mais próximo",
+            "faixa_posicao_80": "intervalo entre os percentis 10 e 90 das posições simuladas",
         },
+        "projecoes_exibicao": "pontos e posição aparecem como inteiros; médias sem arredondamento permanecem no JSON para auditoria",
         "af_score": "auditado como diagnóstico, não aplicado sem backtesting histórico homogêneo",
     }
     probabilities = {
@@ -1110,6 +1301,13 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
                 "defesa_log": round(defence, 8),
                 "multiplicador_ataque": round(math.exp(attack), 8),
                 "multiplicador_protecao_defensiva": round(math.exp(defence), 8),
+                "tendencia_recente": {
+                    "jogos_considerados": recent_trends[team].matches_used,
+                    "ajuste_ataque_pct": recent_trends[team].attack_adjustment_pct,
+                    "ajuste_defesa_pct": recent_trends[team].defence_adjustment_pct,
+                    "ajuste_forca_pct": recent_trends[team].strength_adjustment_pct,
+                    "classificacao": recent_trends[team].label,
+                },
             }
         )
     dc_audit = dixon_coles_sensitivity(forecasts, rho_sensitivity)
@@ -1118,7 +1316,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         "schema_version": 2,
         "projeto": "AF-Previsão",
         "versao_modelo": model_version,
-        "etapa": "Execução 2.5 — probabilidades continentais integradas",
+        "etapa": "Execução 4 — tendência controlada, projeções inteiras e histórico compacto",
         "gerado_em": generated_at,
         "status": "ok",
         "hash_entrada": input_hash,
@@ -1149,6 +1347,12 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "convergencia": simulation["convergencia"],
             "desempate_residual": simulation["desempate_residual"],
         },
+        "tendencia_recente": {
+            "configuracao": trend_settings,
+            "maior_ajuste_absoluto_forca_pct": round(max((abs(item.strength_adjustment_pct) for item in recent_trends.values()), default=0.0), 4),
+            "maior_ajuste_absoluto_taxa_partida_pct": round(max((max(abs(forecast.trend_home_pct), abs(forecast.trend_away_pct)) for forecast in forecasts), default=0.0), 4),
+            "observacao": "Ajuste complementar sem sazonalidade, limitado e separado entre ataque e defesa.",
+        },
         "sensibilidade_dixon_coles": dc_audit,
         "diagnostico_af_score": af_audit,
         "integracao_continental": continental["auditoria"],
@@ -1174,7 +1378,8 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         },
         "limites_conhecidos": [
             "O ajuste é MAP regularizado, não amostragem MCMC da posterior completa.",
-            "A incerteza publicada vem dos resultados futuros simulados; a versão 1.0 não amostra incerteza dos parâmetros.",
+            "A incerteza publicada vem dos resultados futuros simulados; a versão atual não amostra incerteza dos parâmetros.",
+            "A tendência recente usa placares, não xG, e por isso recebe peso pequeno e limites rígidos para reduzir o efeito de jogos atípicos.",
             "Clubes brasileiros fora da Série A 2026 continuam elegíveis por Copa do Brasil ou títulos continentais; estrangeiros não alteram a alocação brasileira.",
             "O pareamento de fases futuras é inferido da chave ESPN; na Copa do Brasil, sorteios ainda não realizados são simulados.",
             "Confronto direto e cartões não são simulados; empates residuais após pontos, vitórias, saldo e gols pró usam chave reproduzível.",
@@ -1190,6 +1395,8 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     existing_history = load_json(HISTORY_PATH) if HISTORY_PATH.exists() else None
     history = update_history(
         existing_history, generated_at, input_hash, teams, model_version,
+        round_reference=max((match.round_no for match in current), default=0),
+        simulations=simulations_final,
         max_snapshots=int(execution.get("historico_max_snapshots") or 300),
     )
     return probabilities, audit, history
@@ -1255,6 +1462,44 @@ def self_test() -> None:
         )
         for fixture in fixtures
     ]
+    trend_model = {
+        "mu": math.log(1.10),
+        "home_adv": math.log(1.20),
+        "attack": {team: 0.0 for team in teams},
+        "defence": {team: 0.0 for team in teams},
+    }
+    trend_settings = {
+        "janela_jogos": 12,
+        "alpha": 0.18,
+        "peso_no_modelo": 0.08,
+        "minimo_jogos_ativacao": 6,
+        "jogos_para_confianca_total": 12,
+        "pseudo_contagem_gols": 0.75,
+        "limite_residuo_log": 0.8,
+        "limite_ajuste_componente_pct": 6.0,
+    }
+    trend_matches = [
+        Match(2026, 9000 + index, index + 1, date(2026, 1, 1) + timedelta(days=index), teams[0], teams[1], 4, 0)
+        for index in range(12)
+    ]
+    recent = calculate_recent_trends(trend_matches, trend_model, teams, trend_settings)
+    if recent[teams[0]].strength_adjustment_pct <= 0:
+        raise AssertionError("EWMA não reconheceu melhora ofensiva/defensiva sintética")
+    if abs(recent[teams[0]].attack_adjustment_pct) > 6.0001 or abs(recent[teams[0]].defence_adjustment_pct) > 6.0001:
+        raise AssertionError("ajuste recente ultrapassou a trava por componente")
+    short_recent = calculate_recent_trends(trend_matches[:5], trend_model, teams, trend_settings)
+    if short_recent[teams[0]].strength_adjustment_pct != 0.0:
+        raise AssertionError("tendência não deveria ativar antes do mínimo de jogos")
+    adjusted_forecast = build_forecasts(
+        [Fixture("trend", 13, teams[0], teams[1], None, "")],
+        trend_model,
+        0.0,
+        recent_trends=recent,
+        max_fixture_adjustment_pct=10.0,
+    )[0]
+    if abs(adjusted_forecast.trend_home_pct) > 10.0001 or abs(adjusted_forecast.trend_away_pct) > 10.0001:
+        raise AssertionError("ajuste recente ultrapassou a trava da taxa da partida")
+
     result_a = run_monte_carlo(state, forecasts, 10_000, 12345, 0.0)
     result_b = run_monte_carlo(state, forecasts, 10_000, 12345, 0.0)
     if json.dumps(result_a, sort_keys=True) != json.dumps(result_b, sort_keys=True):
@@ -1262,6 +1507,29 @@ def self_test() -> None:
     validate_probabilities(result_a["clubes"])
     if result_a["simulacoes"] != 10_000:
         raise AssertionError("quantidade de simulações incorreta")
+    for team_row in result_a["clubes"]:
+        if not isinstance(team_row.get("posicao_projetada"), int):
+            raise AssertionError("posição projetada precisa ser inteira na publicação")
+        if not isinstance((team_row.get("pontos_projetados") or {}).get("media"), int):
+            raise AssertionError("pontos projetados precisam ser inteiros na publicação")
+        if not isinstance((team_row.get("pontos_projetados") or {}).get("media_estimada"), float):
+            raise AssertionError("média bruta de pontos precisa permanecer auditável")
+        interval = team_row.get("faixa_posicao_80") or {}
+        if not 1 <= int(interval.get("melhor") or 0) <= int(interval.get("pior") or 0) <= 20:
+            raise AssertionError("faixa de posição de 80% inválida")
+    synthetic_history = update_history(
+        None, "2026-07-18T08:00:00-03:00", "hash-teste", result_a["clubes"],
+        "AF-Previsão teste", round_reference=19, simulations=10_000, max_snapshots=10,
+    )
+    repeated_history = update_history(
+        synthetic_history, "2026-07-18T09:00:00-03:00", "hash-teste", result_a["clubes"],
+        "AF-Previsão teste", round_reference=19, simulations=10_000, max_snapshots=10,
+    )
+    if synthetic_history["total_snapshots"] != 1 or repeated_history["total_snapshots"] != 1:
+        raise AssertionError("histórico criou snapshot artificial sem mudança esportiva")
+    saved = synthetic_history["snapshots"][0]
+    if saved.get("rodada_referencia") != 19 or saved["clubes"][0].get("posicao_projetada") is None:
+        raise AssertionError("histórico não guardou rodada e projeção final")
     snapshot_a = {
         "copa_do_brasil": {"status": "ok", "temporada": 2026, "competicao": {"chave": "copa_do_brasil"}, "fase_atual": {}, "eventos": [], "gerado_em": "2026-07-18T00:00:00-03:00"}
     }
@@ -1272,7 +1540,7 @@ def self_test() -> None:
     snapshot_b["copa_do_brasil"]["eventos"] = [{"event_id": "novo"}]
     if continental_snapshots_state_hash(snapshot_a) == continental_snapshots_state_hash(snapshot_b):
         raise AssertionError("mudança esportiva precisa alterar o hash continental")
-    print("Self-test AF-Previsão Execução 2.5: OK")
+    print("Self-test AF-Previsão Execução 4: OK")
 
 
 def main() -> int:

@@ -25,7 +25,7 @@
   <meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
   <meta name="twitter:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260718-afprevisao-interface-v2">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260718-afprevisao-execucao-4">
   <link rel="stylesheet" href="css/br-global.css?v=20260713-disclaimers-publicos-v1">
 </head>
 <body>
@@ -127,16 +127,15 @@
             <div id="probabilidades-destaques"></div>
             <div id="probabilidades-controles"></div>
             <div id="probabilidades-ranking"></div>
-            <div id="probabilidades-evolucao"></div>
 
             <section class="probability-methodology" id="metodologia-probabilidades" aria-labelledby="titulo-metodologia-probabilidades">
               <div class="kicker">Metodologia pública, versionada e auditável</div>
               <h3 id="titulo-metodologia-probabilidades">Como o AF-Previsão calcula o Brasileirão?</h3>
-              <p class="probability-method-lead">A explicação abaixo tem dois níveis: primeiro, uma leitura direta para qualquer torcedor; depois, uma nota técnica completa com modelo de gols, regularização, mata-matas, Monte Carlo, validação e referências.</p>
+              <p class="probability-method-lead">A explicação abaixo tem dois níveis: primeiro, uma leitura direta para qualquer torcedor; depois, uma nota técnica completa com modelo de gols, tendência recente controlada, mata-matas, Monte Carlo, validação e referências.</p>
 
               <div class="probability-plain-grid" aria-label="Explicação resumida do modelo">
                 <article><span>1</span><h4>O que o modelo observa?</h4><p>Resultados, mandos, placares e calendário do Brasileirão, além do estado factual das três copas que podem alterar as vagas continentais.</p></article>
-                <article><span>2</span><h4>O que ele projeta?</h4><p>A força ofensiva e defensiva de cada clube transforma cada jogo restante em probabilidades de placares e resultados.</p></article>
+                <article><span>2</span><h4>O que ele projeta?</h4><p>A força ofensiva e defensiva transforma cada jogo restante em probabilidades. A forma dos últimos 12 jogos entra apenas como ajuste leve e limitado.</p></article>
                 <article><span>3</span><h4>Como nasce o percentual?</h4><p>O campeonato e os mata-matas são simulados 200.000 vezes. A chance publicada é a frequência do desfecho nesses universos.</p></article>
                 <article><span>4</span><h4>Como interpretar?</h4><p>Um número alto não é garantia. Um valor abaixo de 0,1% não é zero absoluto. Cada novo resultado pode alterar toda a projeção.</p></article>
               </div>
@@ -149,7 +148,8 @@
                   <p><strong>Chance consolidada:</strong> Libertadores e Sul-Americana consideram Brasileirão, títulos, Copa do Brasil e repasses aplicáveis.</p>
                   <p><strong>Vias exclusivas:</strong> o detalhamento não conta o mesmo universo duas vezes; a soma dos caminhos fecha com a chance total.</p>
                   <p><strong>&lt;0,1% não é impossível:</strong> significa que o evento foi raríssimo ou não apareceu nas simulações realizadas.</p>
-                  <p><strong>Faixa de pontos:</strong> os percentis mostram incerteza; a média projetada não deve ser lida como destino exato.</p>
+                  <p><strong>Posição e pontos:</strong> aparecem como inteiros para facilitar a leitura; as médias decimais permanecem guardadas no JSON para auditoria.</p>
+                  <p><strong>Histórico compacto:</strong> cada clube guarda, no próprio card, a evolução de posição, pontos e probabilidades por estado esportivo.</p>
                 </div>
               </div>
 
@@ -160,10 +160,11 @@
                     <a href="#metodo-dados">1. Dados</a>
                     <a href="#metodo-poisson">2. Poisson</a>
                     <a href="#metodo-bayes">3. Regularização</a>
-                    <a href="#metodo-copas">4. Copas e vagas</a>
-                    <a href="#metodo-monte-carlo">5. Monte Carlo</a>
-                    <a href="#metodo-residuais">6. Resolução</a>
-                    <a href="#metodo-validacao">7. Validação</a>
+                    <a href="#metodo-tendencia">4. Tendência</a>
+                    <a href="#metodo-copas">5. Copas e vagas</a>
+                    <a href="#metodo-monte-carlo">6. Monte Carlo</a>
+                    <a href="#metodo-residuais">7. Resolução</a>
+                    <a href="#metodo-validacao">8. Validação</a>
                   </div>
 
                   <div class="probability-method-sections">
@@ -179,20 +180,24 @@
                       <span class="probability-method-step">03</span>
                       <div><h4>Regularização de natureza bayesiana</h4><p>Os parâmetros são ajustados por máxima a posteriori (MAP) com priors gaussianos e <em>partial pooling</em>. A regularização reduz estimativas extremas em amostras pequenas e permite que os dados próprios de cada clube superem gradualmente o prior. Partidas antigas recebem peso decrescente.</p><p>A versão atual não executa MCMC da posterior completa; a incerteza publicada decorre principalmente dos resultados futuros simulados. Essa limitação é declarada, não ocultada.</p></div>
                     </article>
-                    <article id="metodo-copas">
+                    <article id="metodo-tendencia">
                       <span class="probability-method-step">04</span>
+                      <div><h4>Tendência recente controlada, sem Holt-Winters sazonal</h4><p>O futebol não apresenta uma sazonalidade regular por rodada. Por isso, o modelo não usa Holt-Winters completo. Ele calcula uma EWMA dos resíduos de gols dos últimos 12 jogos, separando ataque e defesa e comparando o placar observado com o que o modelo-base esperava.</p><p>Esse componente tem somente 8% de peso, exige ao menos seis partidas e é limitado: a taxa de gols prevista para uma partida não pode variar mais de 10% por causa da tendência. Assim, uma boa ou má sequência recente é reconhecida, mas não domina a campanha acumulada, o mando, a força estrutural nem a tabela restante.</p></div>
+                    </article>
+                    <article id="metodo-copas">
+                      <span class="probability-method-step">05</span>
                       <div><h4>Mata-matas e alocação integrada de vagas</h4><p>Placares já ocorridos ficam fixos; partidas futuras são simuladas. Confrontos de ida e volta respeitam o agregado, empates podem ser resolvidos por pênaltis e finais em jogo único são tratadas como campo neutro. Sorteios futuros só são simulados quando a chave ainda não existe na fonte.</p><p>Em cada universo, o sistema combina classificação final do Brasileirão, campeão e vice da Copa do Brasil, campeão da Libertadores e campeão da Sul-Americana. As vias são atribuídas de forma exclusiva: Brasileirão, Copa do Brasil, título da Libertadores, título da Sul-Americana ou repasse. Assim, a soma das vias coincide com a chance consolidada.</p></div>
                     </article>
                     <article id="metodo-monte-carlo">
-                      <span class="probability-method-step">05</span>
+                      <span class="probability-method-step">06</span>
                       <div><h4>Simulação Monte Carlo completa</h4><p>Cada partida restante é sorteada segundo sua distribuição de placares. Em seguida são aplicados pontos, vitórias, saldo de gols e gols pró. O procedimento é repetido 200.000 vezes por atualização, preservando os resultados já disputados e integrando as três copas no mesmo universo simulado.</p><p>A chance de título, por exemplo, é a proporção de simulações em que o clube termina em primeiro. A chance de Libertadores é a proporção em que obtém a vaga por qualquer uma das vias configuradas.</p></div>
                     </article>
                     <article id="metodo-residuais">
-                      <span class="probability-method-step">06</span>
-                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,1%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico cria um novo snapshot apenas quando o estado esportivo muda. Isso permite acompanhar a evolução das probabilidades e avaliar o modelo posteriormente, sem registros artificiais gerados apenas por mudança de horário.</p></div>
+                      <span class="probability-method-step">07</span>
+                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,1%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico cria um novo snapshot apenas quando o estado esportivo muda e registra a rodada de referência, posição projetada, pontos e probabilidades. Ele aparece de forma compacta dentro do card de cada clube. Após o campeonato, essa base permitirá medir erro de posição, erro de pontos, calibração e Brier Score em uma avaliação própria, sem ocupar permanentemente a página com uma seção extensa.</p></div>
                     </article>
                     <article id="metodo-validacao">
-                      <span class="probability-method-step">07</span>
+                      <span class="probability-method-step">08</span>
                       <div><h4>Backtesting, calibração e escolha do modelo</h4><p>Seis arquiteturas foram comparadas em validação temporal: frequência histórica regularizada, Poisson regularizado, Poisson MAP, Dixon–Coles temporal, Elo dinâmico e híbrido Dixon–Coles + Elo. O protocolo treinou em 2023 para prever 2024 e em 2023–2024 para prever 2025, mantendo as partidas testadas fora da amostra.</p><p>A seleção usa Log Loss, Brier Score multiclasse e Ranked Probability Score, com calibração como diagnóstico. A correção Dixon–Coles está implementada e auditada, mas não é ativada por prestígio: só entra em produção quando demonstrar ganho fora da amostra. O AF-Score também permanece fora das probabilidades enquanto não houver cobertura histórica homogênea.</p></div>
                     </article>
                   </div>
@@ -213,7 +218,7 @@
               </details>
 
               <div class="probability-authorship">
-                <div><span>Desenvolvimento e supervisão matemática</span><strong>Laércio Rehem</strong><p>Matemático pela Universidade Federal da Bahia (UFBA) e responsável pelo projeto Brasileirão 2026 — Almoço de Sexta.</p></div>
+                <div><span>Desenvolvimento e supervisão matemática</span><strong>Laércio Rehem</strong><p>Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas e responsável pelo projeto Brasileirão 2026 — Almoço de Sexta.</p></div>
                 <button type="button" class="br-feedback-button probability-feedback" data-feedback>💬 Sugestões, elogios e dúvidas</button>
               </div>
 
@@ -275,7 +280,7 @@
     </footer>
   </div>
 
-  <script src="js/br-estatisticas.js?v=20260718-afprevisao-interface-v2"></script>
+  <script src="js/br-estatisticas.js?v=20260718-afprevisao-execucao-4"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260713-publico-login-admin-v1"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>

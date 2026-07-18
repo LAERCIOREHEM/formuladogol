@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "projeto": "AF-Previsão",
-  "versao": "0.25-execucao-2-5",
-  "status": "motor_integrado_continental_ativo",
+  "versao": "0.4-execucao-4",
+  "status": "motor_hibrido_com_tendencia_controlada_ativo",
   "responsavel": {
     "nome": "Laércio Rehem",
-    "formacao": "Matemático pela Universidade Federal da Bahia (UFBA)",
+    "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
     "contato": "Sugestões, elogios e dúvidas: utilize o botão SUGESTÕES do site."
   },
   "temporadas_historicas": [
@@ -53,10 +53,11 @@
     "relatorio_execucao_2": "docs/af-previsao-execucao-2.md",
     "competicoes": "dados-br/competicoes-af-previsao/",
     "auditoria_competicoes": "dados-br/auditoria-competicoes-af-previsao.json",
-    "relatorio_execucao_2_5": "docs/af-previsao-execucao-2-5.md"
+    "relatorio_execucao_2_5": "docs/af-previsao-execucao-2-5.md",
+    "relatorio_execucao_4": "docs/af-previsao-execucao-4.md"
   },
   "data_referencia_execucao_1": "2026-07-17T20:30:00-03:00",
-  "versao_modelo": "AF-Previsão 1.1",
+  "versao_modelo": "AF-Previsão 1.2",
   "execucao_2": {
     "arquitetura_producao": "poisson_map_bayesiano",
     "desvio_prior": 0.4,
@@ -132,5 +133,37 @@
     "guardar_decomposicao_por_via": true,
     "guardar_subdecomposicao_copa_do_brasil": true
   },
-  "data_referencia_execucao_2_5": "2026-07-18T00:30:00-03:00"
+  "data_referencia_execucao_2_5": "2026-07-18T00:30:00-03:00",
+  "execucao_4": {
+    "status": "ativo",
+    "tendencia_recente": {
+      "metodo": "EWMA de resíduos logarítmicos de gols, separados em ataque e defesa",
+      "janela_jogos": 12,
+      "alpha": 0.18,
+      "peso_no_modelo": 0.08,
+      "minimo_jogos_ativacao": 6,
+      "jogos_para_confianca_total": 12,
+      "pseudo_contagem_gols": 0.75,
+      "limite_residuo_log": 0.8,
+      "limite_ajuste_componente_pct": 6.0,
+      "limite_ajuste_taxa_partida_pct": 10.0,
+      "regra": "A forma recente é apenas um ajuste conservador sobre o modelo MAP; nunca substitui campanha acumulada, mando, força ofensiva/defensiva ou tabela restante."
+    },
+    "projecoes_exibicao": {
+      "pontos_inteiros": true,
+      "posicao_inteira": true,
+      "faixa_posicao_percentis": [
+        10,
+        90
+      ],
+      "manter_medias_brutas_no_json": true
+    },
+    "historico": {
+      "salvar_rodada_referencia": true,
+      "salvar_posicao_e_pontos_projetados": true,
+      "exibir_compacto_no_detalhe_do_clube": true,
+      "avaliacao_final_pos_campeonato": true
+    }
+  },
+  "data_referencia_execucao_4": "2026-07-18T07:56:00-03:00"
 }

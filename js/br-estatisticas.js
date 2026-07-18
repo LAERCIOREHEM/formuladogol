@@ -626,6 +626,89 @@
     </a>`;
   }
 
+  function projectedPosition(club) {
+    const explicit = Number(club?.posicao_projetada);
+    if (Number.isFinite(explicit)) return Math.max(1, Math.min(20, Math.round(explicit)));
+    const mean = Number(club?.posicao_projetada_media);
+    return Number.isFinite(mean) ? Math.max(1, Math.min(20, Math.round(mean))) : null;
+  }
+
+  function projectedPoints(club) {
+    const points = club?.pontos_projetados || {};
+    const value = Number(points.media ?? points.media_estimada);
+    return Number.isFinite(value) ? Math.round(value) : null;
+  }
+
+  function probabilityPositionRange(club) {
+    const explicit = club?.faixa_posicao_80 || {};
+    const best = Number(explicit.melhor);
+    const worst = Number(explicit.pior);
+    if (Number.isFinite(best) && Number.isFinite(worst)) {
+      return { best: Math.min(best, worst), worst: Math.max(best, worst) };
+    }
+    const values = Array.isArray(club?.distribuicao_posicoes_pct) ? club.distribuicao_posicoes_pct : [];
+    if (!values.length) return null;
+    let cumulative = 0;
+    let lower = null;
+    let upper = null;
+    values.forEach((value, index) => {
+      cumulative += Math.max(0, Number(value) || 0);
+      if (lower === null && cumulative >= 10) lower = index + 1;
+      if (upper === null && cumulative >= 90) upper = index + 1;
+    });
+    return { best: lower || 1, worst: upper || 20 };
+  }
+
+  function probabilityProjectionMetric(label, value, tone = "position", help = "") {
+    return `<div class="probability-metric probability-projection-metric probability-tone-${escapeAttr(tone)}"${help ? ` title="${escapeAttr(help)}"` : ""}>
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value || "—")}</strong>
+      <small>${escapeHtml(help)}</small>
+    </div>`;
+  }
+
+  function probabilityTrendNote(club) {
+    const trend = club?.tendencia_recente;
+    if (!trend) return "";
+    const games = Number(trend.jogos_considerados);
+    const adjustment = Number(trend.ajuste_forca_pct);
+    const label = String(trend.classificacao || "estável");
+    const adjustmentText = Number.isFinite(adjustment) ? `${adjustment >= 0 ? "+" : ""}${number(adjustment, 1)}%` : "—";
+    return `<p class="probability-trend-note"><span>Tendência recente</span><strong>${escapeHtml(label)}</strong><small>${Number.isFinite(games) ? `${integer(games)} jogos` : "janela recente"} · ajuste limitado ${escapeHtml(adjustmentText)}</small></p>`;
+  }
+
+  function probabilityHistoryClubRow(snapshot, clubName) {
+    const row = (Array.isArray(snapshot?.clubes) ? snapshot.clubes : []).find((item) => normalize(item?.clube) === normalize(clubName));
+    if (!row) return null;
+    const positionRaw = Number(row.posicao_projetada ?? row.posicao_media_estimada);
+    const pointsRaw = Number(row.pontos_projetados ?? row.pontos_media_estimada ?? row.pontos_medios);
+    return {
+      snapshot,
+      row,
+      position: Number.isFinite(positionRaw) ? Math.round(positionRaw) : null,
+      points: Number.isFinite(pointsRaw) ? Math.round(pointsRaw) : null,
+    };
+  }
+
+  function probabilityClubHistoryDetails(club) {
+    const snapshots = Array.isArray(state.probabilitiesHistory?.snapshots) ? state.probabilitiesHistory.snapshots : [];
+    const historyRows = snapshots.map((snapshot) => probabilityHistoryClubRow(snapshot, club?.clube)).filter(Boolean).slice(-10);
+    if (!historyRows.length) return "";
+    const body = historyRows.map(({ snapshot, row, position, points }) => {
+      const reference = Number(snapshot?.rodada_referencia) > 0 ? `R${integer(snapshot.rodada_referencia)}` : dateBR(snapshot?.gerado_em);
+      const title = probabilityDisplayText(null, Number(row?.campeao_pct));
+      const lib = probabilityDisplayText(null, probabilityHistoryValue(row, "libertadores_pct"));
+      const sula = probabilityDisplayText(null, probabilityHistoryValue(row, "sul_americana_pct"));
+      const relegation = probabilityDisplayText(null, Number(row?.rebaixamento_pct));
+      return `<tr><th scope="row"><span>${escapeHtml(reference)}</span><small>${escapeHtml(dateBR(snapshot?.gerado_em))}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(title)}</td><td>${escapeHtml(lib)}</td><td>${escapeHtml(sula)}</td><td>${escapeHtml(relegation)}</td></tr>`;
+    }).join("");
+    return `<details class="probability-history-details">
+      <summary>Evolução da previsão <span>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado salvo" : "estados salvos"}</span></summary>
+      <div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${body}</tbody></table></div>
+      <p>O histórico só ganha um registro quando o estado esportivo muda. Ele será usado depois para medir erro de posição, erro de pontos, calibração e Brier Score.</p>
+    </details>`;
+  }
+
   function probabilityPositionDistribution(club) {
     const values = Array.isArray(club?.distribuicao_posicoes_pct) ? club.distribuicao_posicoes_pct : [];
     if (!values.length) return emptyState("Distribuição de posições ainda não disponível.");
@@ -654,7 +737,8 @@
       rebaixamento: "rebaixamento",
     }[sort];
     sorted.sort((a, b) => {
-      if (sort === "pontos") return Number(b?.pontos_projetados?.media || 0) - Number(a?.pontos_projetados?.media || 0);
+      if (sort === "posicao") return (projectedPosition(a) || 99) - (projectedPosition(b) || 99);
+      if (sort === "pontos") return (projectedPoints(b) || 0) - (projectedPoints(a) || 0);
       return probabilityFieldValue(b, probabilityKey) - probabilityFieldValue(a, probabilityKey);
     });
     return sorted;
@@ -711,11 +795,13 @@
     const points = club?.pontos_projetados || {};
     const info = teamInfo(club?.clube);
     const titleValue = probabilityFieldValue(club, "campeao");
-    const g4Value = probabilityFieldValue(club, "g4");
-    const g6Value = probabilityFieldValue(club, "g6");
     const libValue = probabilityFieldValue(club, "libertadores");
     const sulaValue = probabilityFieldValue(club, "sul_americana");
     const relegationValue = probabilityFieldValue(club, "rebaixamento");
+    const position = projectedPosition(club);
+    const projected = projectedPoints(club);
+    const range = probabilityPositionRange(club);
+    const rangeText = range ? `${integer(range.best)}º–${integer(range.worst)}º` : "—";
     return `<article class="probability-club-card">
       <div class="probability-club-head">
         <span class="probability-order">${integer(order)}</span>
@@ -725,25 +811,28 @@
           <span>${integer(club?.posicao_atual)}º na tabela · ${integer(club?.pontos_atuais)} pts · ${integer(club?.jogos_atuais)} jogos</span>
         </div>
         <div class="probability-points">
-          <strong>${number(points.media, 1)}</strong><span>pontos projetados</span>
+          <strong>${projected ?? "—"}</strong><span>pontos projetados</span>
           <small>faixa central de 80%: ${integer(points.percentil_10)}–${integer(points.percentil_90)}</small>
         </div>
       </div>
       <div class="probability-metric-grid">
         ${probabilityMetric("Campeão", titleValue, "title", probabilityFieldDetail(club, "campeao"))}
-        ${probabilityMetric("G4", g4Value, "g4", probabilityFieldDetail(club, "g4"))}
-        ${probabilityMetric("G6", g6Value, "g6", probabilityFieldDetail(club, "g6"))}
+        ${probabilityProjectionMetric("Posição projetada", position ? `${integer(position)}º` : "—", "position", "Média das posições simuladas, exibida como inteiro.")}
+        ${probabilityProjectionMetric("Faixa provável", rangeText, "range", "Faixa central de 80% das posições simuladas.")}
         ${probabilityMetric("Libertadores", libValue, "libertadores", probabilityFieldDetail(club, "libertadores"), "Chance consolidada por Brasileirão, copas, títulos continentais e repasses.")}
         ${probabilityMetric("Sul-Americana", sulaValue, "sulamericana", probabilityFieldDetail(club, "sul_americana"), "Chance consolidada após a alocação de todas as vagas de Libertadores.")}
         ${probabilityMetric("Rebaixamento", relegationValue, "relegation", probabilityFieldDetail(club, "rebaixamento"))}
       </div>
+      ${probabilityTrendNote(club)}
       ${probabilityQualificationRoutes(club)}
       <details class="probability-position-details">
-        <summary>Distribuição das 20 posições <span>média: ${number(club?.posicao_projetada_media, 1)}º · mediana: ${integer(club?.posicao_projetada_mediana)}º</span></summary>
+        <summary>Distribuição das 20 posições <span>projeção: ${position ? `${integer(position)}º` : "—"} · mediana: ${integer(club?.posicao_projetada_mediana)}º</span></summary>
         ${probabilityPositionDistribution(club)}
       </details>
+      ${probabilityClubHistoryDetails(club)}
     </article>`;
   }
+
 
   function renderProbabilityStatus() {
     const target = $("probabilidades-status");
@@ -789,6 +878,7 @@
       ["libertadores", "🌎 Libertadores"],
       ["sulamericana", "🟦 Sul-Americana"],
       ["rebaixamento", "🔻 Rebaixamento"],
+      ["posicao", "📍 Posição projetada"],
       ["pontos", "📈 Pontos projetados"],
     ];
     target.innerHTML = `<div class="probability-controls">
@@ -805,7 +895,7 @@
       target.innerHTML = "";
       return;
     }
-    target.innerHTML = `<section class="probability-ranking-section"><div class="probability-section-head"><div><div class="kicker">20 clubes</div><h3>Tabela de probabilidades por clube</h3></div><span>chances continentais consolidadas</span></div><div class="probability-club-list">${rows.map((club, index) => probabilityClubCard(club, index + 1)).join("")}</div></section>`;
+    target.innerHTML = `<section class="probability-ranking-section"><div class="probability-section-head"><div><div class="kicker">20 clubes</div><h3>Tabela de probabilidades por clube</h3></div><span>posição, pontos e chances consolidadas</span></div><div class="probability-club-list">${rows.map((club, index) => probabilityClubCard(club, index + 1)).join("")}</div></section>`;
   }
 
   const PROBABILITY_HISTORY_METRICS = {
@@ -877,13 +967,17 @@
     const margin = Number(sim?.convergencia?.margem_95_maxima_pontos_percentuais ?? sim?.margem_95_maxima_pontos_percentuais ?? data?.simulacao?.margem_95_maxima_pontos_percentuais);
     const threshold = Number(integrated?.limiar_exibicao_percentual ?? 0.1);
     const competitions = Array.isArray(integrated?.competicoes) ? integrated.competicoes.length : 0;
+    const trend = data?.metodologia_resumida?.tendencia_recente || audit?.tendencia_recente?.configuracao || {};
+    const trendWindow = Number(trend?.janela_jogos);
+    const trendWeight = Number(trend?.peso_no_modelo);
+    const trendLimit = Number(trend?.limite_ajuste_taxa_partida_pct);
     target.innerHTML = `<article><span>Base histórica</span><strong>${integer(base.partidas || 1140)} partidas</strong><small>${Array.isArray(base.temporadas) ? base.temporadas.join(" · ") : "2023 · 2024 · 2025"}</small></article>
       <article><span>Validação temporal</span><strong>${integer(metrics.partidas || 760)} previsões</strong><small>integralmente fora da amostra</small></article>
       <article><span>Log Loss</span><strong>${number(metrics.log_loss, 4)}</strong><small>menor é melhor</small></article>
       <article><span>Brier multiclasse</span><strong>${number(metrics.brier_multiclasse, 4)}</strong><small>menor é melhor</small></article>
       <article><span>Monte Carlo</span><strong>${integer(sim.quantidade || data?.simulacao?.quantidade)}</strong><small>semente ${integer(sim.semente || data?.simulacao?.semente)}</small></article>
       <article><span>Margem numérica</span><strong>${Number.isFinite(margin) ? `±${number(margin, 3)} p.p.` : "—"}</strong><small>pior caso aproximado, 95%</small></article>
-      <article><span>Integração continental</span><strong>${competitions ? `${integer(competitions)} competições` : "Aguardando"}</strong><small>vias exclusivas e repasses</small></article>
+      <article><span>Forma recente</span><strong>${Number.isFinite(trendWindow) ? `${integer(trendWindow)} jogos` : "Aguardando"}</strong><small>${Number.isFinite(trendWeight) ? `${number(trendWeight * 100, 0)}% de peso` : "peso controlado"}${Number.isFinite(trendLimit) ? ` · limite ±${number(trendLimit, 0)}%` : ""}</small></article>
       <article><span>Resolução visual</span><strong>&lt;${number(threshold, 1)}%</strong><small>zero observado não vira impossibilidade</small></article>`;
   }
 
@@ -892,7 +986,6 @@
     renderProbabilityHighlights();
     renderProbabilityControls();
     renderProbabilityRanking();
-    renderProbabilityEvolution();
     renderProbabilityAudit();
   }
 
