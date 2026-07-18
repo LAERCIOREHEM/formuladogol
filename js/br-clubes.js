@@ -60,13 +60,19 @@
     if (campo === "sul_americana") return Number(probs.sul_americana ?? probs.sul_americana_base);
     return Number(probs[campo]);
   }
-  function pctCompacto(valor){
+  function probDetalhe(p, campo){
+    const detalhes = p && p.probabilidades_detalhes ? p.probabilidades_detalhes : {};
+    if (campo === "libertadores") return detalhes.libertadores || detalhes.libertadores_base || null;
+    if (campo === "sul_americana") return detalhes.sul_americana || detalhes.sul_americana_base || null;
+    return detalhes[campo] || null;
+  }
+  function pctCompacto(valor, detalhe=null){
+    const explicito = String(detalhe && detalhe.exibicao || "").trim();
+    if (explicito) return explicito;
     const n = Number(valor);
     if (!Number.isFinite(n)) return "—";
-    if (n > 0 && n < 0.1) return "<0,1%";
-    if (n === 0) return "0%";
-    if (n >= 99.95) return "100%";
-    if (n >= 10) return `${Math.round(n)}%`;
+    if (n >= 0 && n < 0.1) return "<0,1%";
+    if (n > 99.9 && n < 100) return ">99,9%";
     return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
   }
   function posicaoProjetada(p){
@@ -87,10 +93,10 @@
     const sula = probValor(p, "sul_americana");
     const queda = probValor(p, "rebaixamento");
     const chips = [];
-    if (Number.isFinite(campeao) && campeao >= 5) chips.push(`Título ${pctCompacto(campeao)}`);
-    if (Number.isFinite(lib)) chips.push(`Lib ${pctCompacto(lib)}`);
-    if (Number.isFinite(sula)) chips.push(`Sula ${pctCompacto(sula)}`);
-    if (Number.isFinite(queda)) chips.push(`Queda ${pctCompacto(queda)}`);
+    if (Number.isFinite(campeao) && campeao >= 5) chips.push(`Título ${pctCompacto(campeao, probDetalhe(p, "campeao"))}`);
+    if (Number.isFinite(lib)) chips.push(`Lib ${pctCompacto(lib, probDetalhe(p, "libertadores"))}`);
+    if (Number.isFinite(sula)) chips.push(`Sula ${pctCompacto(sula, probDetalhe(p, "sul_americana"))}`);
+    if (Number.isFinite(queda)) chips.push(`Queda ${pctCompacto(queda, probDetalhe(p, "rebaixamento"))}`);
     return `<span class="club-probability-pill"><strong>🎲 Projeção AF: ${pos ? `${pos}º` : "—"}${pts ? ` · ${pts} pts` : ""}</strong><small>${escapeHtml(chips.slice(0, 3).join(" · ") || "probabilidades em atualização")}</small></span>`;
   }
   function probabilidadeCardHtml(p){
@@ -107,7 +113,10 @@
     ];
     return `<section class="club-probability-card" aria-label="Probabilidades do ${escapeAttr(p.clube || '')}">
       <div class="club-probability-header"><div><span>Projeção AF</span><strong>${pos ? `${pos}º` : "—"}${pts ? ` · ${pts} pts` : ""}</strong></div><small>faixa provável ${escapeHtml(faixaTxt)}</small></div>
-      <div class="club-probability-metrics">${metrics.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(pctCompacto(value))}</strong></div>`).join("")}</div>
+      <div class="club-probability-metrics">${metrics.map(([label, value]) => {
+        const campo = label === "Título" ? "campeao" : label === "Libertadores" ? "libertadores" : label === "Sul-Americana" ? "sul_americana" : "rebaixamento";
+        return `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(pctCompacto(value, probDetalhe(p, campo)))}</strong></div>`;
+      }).join("")}</div>
       <a class="club-performance-method" href="estatisticas.html#probabilidades">Ver previsão completa →</a>
     </section>`;
   }

@@ -2713,7 +2713,22 @@ function mesclarResultadosManuais(lista) {
   return base.sort((a,b) => String(b.data_iso || '').localeCompare(String(a.data_iso || '')));
 }
 
+function jogoFinalizadoParaMelhoresMomentos(j) {
+  if (!j) return false;
+  const estado = String(j.estado || '').toLowerCase();
+  const status = String(j.status || '').toLowerCase();
+  if (j.concluido === true || estado === 'post' || /encerrado|finalizado|fim de jogo/.test(status)) return true;
+  const manual = resultadoManualDoJogo(j);
+  if (manual && manual.ativo !== false && resultadoJaAconteceu(resultadoManualNormalizado(manual))) return true;
+  try {
+    const live = espnLiveDoJogo(j);
+    if (live && live.estado === 'post') return true;
+  } catch (_) {}
+  return false;
+}
+
 function melhoresMomentosDoJogo(j) {
+  if (!jogoFinalizadoParaMelhoresMomentos(j)) return null;
   const mapa = state.melhoresMomentos || {};
   const id = String((j && (j.event_id || j.id)) || '');
   if (id && mapa[id]) return mapa[id];
@@ -5774,7 +5789,7 @@ setTimeout(sincronizarAvisosAniversarioComSessao, 800);
 </script>
 <script src="js/br-clube-retorno.js?v=20260717-retorno-exato-v1"></script>
 <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
-<script src="js/br-menu.js?v=20260718-menu-flutuante-v1"></script>
+<script src="js/br-menu.js?v=20260718-menu-retorno-origem-v2"></script>
 <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

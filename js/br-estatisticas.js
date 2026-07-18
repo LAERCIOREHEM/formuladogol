@@ -184,12 +184,34 @@
 
   function teamMap() {
     const map = new Map();
-    tableRows().forEach((team) => map.set(normalize(team.time), team));
-    resultsRows().forEach((game) => {
-      [game.mandante, game.visitante].forEach((team) => {
-        if (team?.nome && !map.has(normalize(team.nome))) map.set(normalize(team.nome), team);
+    const add = (team) => {
+      if (!team || typeof team !== "object") return;
+      const name = String(team.time || team.nome || "").trim();
+      if (!name) return;
+      const key = normalize(name);
+      const previous = map.get(key) || {};
+      map.set(key, {
+        ...previous,
+        ...team,
+        time: String(team.time || previous.time || team.nome || previous.nome || name),
+        nome: String(team.nome || previous.nome || team.time || previous.time || name),
+        escudo: String(team.escudo || previous.escudo || ""),
+        sigla: String(team.sigla || previous.sigla || ""),
       });
-    });
+    };
+
+    tableRows().forEach(add);
+    resultsRows().forEach((game) => [game?.mandante, game?.visitante].forEach(add));
+    (Array.isArray(state.competition?.gols_por_clube) ? state.competition.gols_por_clube : []).forEach(add);
+    (Array.isArray(state.ranking?.ranking) ? state.ranking.ranking : []).forEach(add);
+    if (leadersValid()) {
+      [...state.leaders.artilharia, ...state.leaders.assistencias].forEach((player) => add({
+        time: player?.time,
+        nome: player?.time,
+        escudo: player?.escudo,
+        sigla: player?.sigla,
+      }));
+    }
     return map;
   }
 
@@ -213,9 +235,10 @@
 
   function shield(obj, cls = "stats-shield") {
     const name = teamName(obj);
-    const src = typeof obj === "object" ? String(obj?.escudo || "") : String(teamInfo(name)?.escudo || "");
+    const fallback = teamInfo(name);
+    const src = String((obj && typeof obj === "object" ? obj.escudo : "") || fallback?.escudo || "");
     if (!src) return `<span class="stats-shield-fallback ${escapeAttr(cls)}">${escapeHtml(initials(name))}</span>`;
-    return `<img class="${escapeAttr(cls)}" src="${escapeAttr(src)}" alt="" loading="lazy" onerror="this.style.display='none'">`;
+    return `<img class="${escapeAttr(cls)}" src="${escapeAttr(src)}" alt="" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling && (this.nextElementSibling.hidden=false)"><span class="stats-shield-fallback ${escapeAttr(cls)}" hidden>${escapeHtml(initials(name))}</span>`;
   }
 
   function leadersValid() {

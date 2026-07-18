@@ -231,6 +231,7 @@ class Jogo:
     placar_mandante: Any = None
     placar_visitante: Any = None
     estado: str = ""
+    concluido: bool = False
 
 
 def nome_time(obj: Any) -> str:
@@ -240,10 +241,13 @@ def nome_time(obj: Any) -> str:
 
 
 def carregar_jogos(root: Path) -> List[Jogo]:
+    # A ordem é deliberada: calendário primeiro, snapshot ESPN depois e
+    # resultados por último. Assim, um registro finalizado nunca é
+    # sobrescrito por uma cópia pré-jogo do mesmo event_id.
     fontes = [
+        (root / "jogos.json", "jogos"),
         (root / "espn_eventos.json", "eventos"),
         (root / "resultados.json", "resultados"),
-        (root / "jogos.json", "jogos"),
     ]
     por_chave: Dict[str, Jogo] = {}
     for path, key in fontes:
@@ -270,6 +274,7 @@ def carregar_jogos(root: Path) -> List[Jogo]:
                 placar_mandante=x.get("placar_mandante"),
                 placar_visitante=x.get("placar_visitante"),
                 estado=str(x.get("estado") or ""),
+                concluido=bool(x.get("concluido") is True or str(x.get("estado") or "").lower() == "post"),
             )
     return sorted(por_chave.values(), key=lambda j: (j.rodada, j.data_iso, j.mandante, j.visitante))
 
@@ -444,10 +449,29 @@ def main() -> int:
     config_path = root / "dados-br" / "getv-config.json"
     config = load_json(config_path, {})
     jogos_all = carregar_jogos(root)
+    resultados_publicados = load_json(root / "resultados.json", {"resultados": []}).get("resultados") or []
+    ids_resultados = {
+        str(j.get("event_id") or j.get("id") or "").strip()
+        for j in resultados_publicados
+        if str(j.get("event_id") or j.get("id") or "").strip()
+    }
+    chaves_resultados = {
+        f"rodada-{int(j.get('rodada') or 0)}-{norm(nome_time(j.get('mandante'))).replace(' ', '-')}-{norm(nome_time(j.get('visitante'))).replace(' ', '-')}"
+        for j in resultados_publicados
+        if int(j.get("rodada") or 0) > 0 and nome_time(j.get("mandante")) and nome_time(j.get("visitante"))
+    }
+
+    def consta_em_resultados(jogo: Jogo) -> bool:
+        if jogo.event_id and jogo.event_id in ids_resultados:
+            return True
+        chave = f"rodada-{jogo.rodada}-{norm(jogo.mandante).replace(' ', '-')}-{norm(jogo.visitante).replace(' ', '-')}"
+        return chave in chaves_resultados
+
+    jogos_publicados = [j for j in jogos_all if consta_em_resultados(j)]
     ri, rf = rodadas_alvo(args, jogos_all, config)
-    jogos = [j for j in jogos_all if ri <= j.rodada <= rf]
+    jogos = [j for j in jogos_publicados if ri <= j.rodada <= rf]
     if not jogos:
-        raise SystemExit(f"Nenhum jogo encontrado para rodadas {ri}-{rf}.")
+        raise SystemExit(f"Nenhum jogo publicado em resultados.json encontrado para rodadas {ri}-{rf}.")
 
     api_key = os.environ.get("YOUTUBE_API_KEY", "").strip()
     if args.dry_run:
@@ -495,7 +519,19 @@ def main() -> int:
     vinculados, duvidosos, sem_video = escolher_videos(jogos, videos, config)
     prev = load_json(root / "dados-br" / "melhores-momentos.json", {"jogos": {}})
     prev_playlists = load_json(root / "dados-br" / "getv-playlists.json", {"playlists": []})
-    merged_jogos = dict(prev.get("jogos") or {})
+
+    # Saneia vínculos antigos: melhores momentos só podem existir para jogos
+    # efetivamente encerrados. Isso remove automaticamente qualquer vídeo
+    # associado a partida futura, adiada ou ainda em andamento.
+    finais_all = jogos_publicados
+    ids_finais = {j.event_id for j in finais_all if j.event_id}
+    chaves_finais = {j.chave for j in finais_all if j.chave}
+    merged_jogos = {}
+    for key, registro in dict(prev.get("jogos") or {}).items():
+        event_id = str((registro or {}).get("event_id") or "")
+        chave = str((registro or {}).get("chave") or key or "")
+        if (event_id and event_id in ids_finais) or chave in chaves_finais:
+            merged_jogos[str(key)] = registro
     merged_jogos.update(vinculados)
 
     saida = {

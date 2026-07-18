@@ -539,6 +539,78 @@ def remover_chave(data: Dict[str, Any], key: str, event_id: str = "") -> bool:
     return removeu
 
 
+def sanear_vinculos_sem_resultado(data: Dict[str, Any], jogos_resultados: List[Dict[str, Any]], origem: str) -> List[Dict[str, Any]]:
+    """Remove vídeos associados a jogos que ainda não constam em Resultados.
+
+    A aba de melhores momentos só pode receber partidas efetivamente
+    encerradas. O saneamento usa event_id como chave principal e o confronto
+    canônico como fallback, evitando que partidas futuras/adiadas recebam
+    vídeos de jogos antigos ou de canais aleatórios com título semelhante.
+    """
+    ids_validos = {
+        str(j.get("event_id") or j.get("id") or "").strip()
+        for j in jogos_resultados
+        if str(j.get("event_id") or j.get("id") or "").strip()
+    }
+    chaves_validas = {chave_jogo_dict(j) for j in jogos_resultados}
+    jogos = data.setdefault("jogos", {})
+    removidos: List[Dict[str, Any]] = []
+    for key in list(jogos.keys()):
+        reg = jogos.get(key) or {}
+        event_id = str(reg.get("event_id") or "").strip()
+        chave = str(reg.get("chave") or "").strip()
+        if not chave and reg.get("rodada") and reg.get("mandante") and reg.get("visitante"):
+            chave = chave_jogo_dict({
+                "rodada": reg.get("rodada"),
+                "mandante": {"nome": reg.get("mandante")},
+                "visitante": {"nome": reg.get("visitante")},
+            })
+        if (event_id and event_id in ids_validos) or (chave and chave in chaves_validas):
+            continue
+        removidos.append({
+            "origem": origem,
+            "chave_arquivo": str(key),
+            "event_id": event_id,
+            "rodada": reg.get("rodada"),
+            "mandante": reg.get("mandante"),
+            "visitante": reg.get("visitante"),
+            "titulo": reg.get("titulo"),
+            "url": reg.get("url"),
+            "motivo": "partida ainda não consta em resultados finalizados",
+        })
+        del jogos[key]
+    return removidos
+
+
+def sanear_fontes_nao_preferidas(data: Dict[str, Any], origem: str, prime_id: str = "", uol_id: str = "") -> List[Dict[str, Any]]:
+    """Remove fontes não autorizadas mesmo quando existe fallback manual.
+
+    A limpeza é feita em cada arquivo individualmente para impedir que um
+    vínculo manual válido masque uma entrada automática antiga de canal
+    aleatório com o mesmo event_id.
+    """
+    jogos = data.setdefault("jogos", {})
+    removidos: List[Dict[str, Any]] = []
+    for key in list(jogos.keys()):
+        reg = jogos.get(key) or {}
+        if preferido(reg, prime_id, uol_id):
+            continue
+        removidos.append({
+            "origem": origem,
+            "chave_arquivo": str(key),
+            "event_id": str(reg.get("event_id") or ""),
+            "rodada": reg.get("rodada"),
+            "mandante": reg.get("mandante"),
+            "visitante": reg.get("visitante"),
+            "titulo": reg.get("titulo"),
+            "url": reg.get("url"),
+            "fonte": reg.get("fonte") or reg.get("channel_title") or "",
+            "motivo": "fonte/canal fora da política editorial autorizada",
+        })
+        del jogos[key]
+    return removidos
+
+
 def calcular_resumo(jogos_resultados: List[Dict[str, Any]], auto: Dict[str, Any], manual: Dict[str, Any], prime_id: str = "", uol_id: str = "") -> Dict[str, int]:
     por_id, por_chave = indexar_videos(auto, manual)
     r = {"jogos_resultados": len(jogos_resultados), "ge": 0, "caze": 0, "prime": 0, "uol": 0, "outros": 0, "sem_video": 0, "com_fonte_preferida": 0}
@@ -568,9 +640,20 @@ def rodar(args: argparse.Namespace) -> int:
     manual = carregar(MM_MANUAL, {"jogos": {}})
     auto.setdefault("jogos", {})
     manual.setdefault("jogos", {})
+    auto_jogos_originais = json.loads(json.dumps(auto.get("jogos") or {}))
+    manual_jogos_originais = json.loads(json.dumps(manual.get("jogos") or {}))
+
+    removidos_fora_resultados = (
+        sanear_vinculos_sem_resultado(auto, jogos_resultados, "automático")
+        + sanear_vinculos_sem_resultado(manual, jogos_resultados, "manual")
+    )
 
     prime_id = resolver_prime_channel_id(api_key) if youtube_ativo else ""
     uol_id = resolver_uol_channel_id(api_key) if youtube_ativo else ""
+    removidos_fontes_globais = (
+        sanear_fontes_nao_preferidas(auto, "automático", prime_id, uol_id)
+        + sanear_fontes_nao_preferidas(manual, "manual", prime_id, uol_id)
+    )
 
     def na_janela(j: Dict[str, Any]) -> bool:
         r = int(j.get("rodada") or 0)
@@ -694,14 +777,29 @@ def rodar(args: argparse.Namespace) -> int:
         ainda_sem_link.append(resumo_jogo(jogo, "sem link em GE/Globo, CazéTV, Prime Video ou UOL após 48h", atual))
 
     if not args.dry_run:
-        auto["atualizado_em"] = agora_iso()
-        auto["fonte"] = "GE/Globo, CazéTV, Prime Video e fallback UOL Esporte / YouTube"
-        auto["politica_publicacao"] = "GE/Globo, CazéTV e Prime Video têm prioridade; após 48 horas sem publicação, UOL Esporte é aceito como fallback. Outros canais são removidos."
-        auto["total_vinculados"] = len(auto.get("jogos") or {})
-        manual["atualizado_em"] = agora_iso()
-        manual["observacao"] = "Fallback manual prioritário. GE/Globo, CazéTV e Prime Video são fontes primárias; UOL Esporte é permitido manualmente e como fallback automático após 48 horas."
-        gravar(MM_AUTO, auto)
-        gravar(MM_MANUAL, manual)
+        fonte_auto = "GE/Globo, CazéTV, Prime Video e fallback UOL Esporte / YouTube"
+        politica_auto = "GE/Globo, CazéTV e Prime Video têm prioridade; após 48 horas sem publicação, UOL Esporte é aceito como fallback. Outros canais são removidos."
+        observacao_manual = "Fallback manual prioritário. GE/Globo, CazéTV e Prime Video são fontes primárias; UOL Esporte é permitido manualmente e como fallback automático após 48 horas."
+        auto_mudou = (
+            auto.get("jogos") != auto_jogos_originais
+            or auto.get("fonte") != fonte_auto
+            or auto.get("politica_publicacao") != politica_auto
+            or int(auto.get("total_vinculados") or 0) != len(auto.get("jogos") or {})
+        )
+        manual_mudou = (
+            manual.get("jogos") != manual_jogos_originais
+            or manual.get("observacao") != observacao_manual
+        )
+        if auto_mudou:
+            auto["atualizado_em"] = agora_iso()
+            auto["fonte"] = fonte_auto
+            auto["politica_publicacao"] = politica_auto
+            auto["total_vinculados"] = len(auto.get("jogos") or {})
+            gravar(MM_AUTO, auto)
+        if manual_mudou:
+            manual["atualizado_em"] = agora_iso()
+            manual["observacao"] = observacao_manual
+            gravar(MM_MANUAL, manual)
 
     depois = calcular_resumo(jogos_resultados, auto, manual, prime_id, uol_id)
     depois_janela = calcular_resumo(universo, auto, manual, prime_id, uol_id)
@@ -724,7 +822,8 @@ def rodar(args: argparse.Namespace) -> int:
         "resumo_janela_depois": depois_janela,
         "mantidos_preferidos_na_janela": mantidos_preferidos,
         "substituidos_para_fontes_preferidas": substituidos,
-        "removidos_por_fonte_nao_preferida": removidos,
+        "removidos_por_fonte_nao_preferida": removidos_fontes_globais + removidos,
+        "removidos_por_jogo_nao_finalizado": removidos_fora_resultados,
         "ainda_sem_link_preferido": sorted(ainda_sem_link, key=lambda x: (x.get("rodada") or 999, x.get("mandante") or "")),
         "buscas_executadas_em_canais_preferidos": buscas_executadas,
         "erros": erros,
@@ -737,7 +836,8 @@ def rodar(args: argparse.Namespace) -> int:
         "youtube_ativo": bool(youtube_ativo),
         "alvos": len(alvos),
         "substituidos": len(substituidos),
-        "removidos": len(removidos),
+        "removidos": len(removidos_fontes_globais) + len(removidos),
+        "removidos_por_jogo_nao_finalizado": len(removidos_fora_resultados),
         "ainda_sem_link_preferido": len(ainda_sem_link),
         "resumo_geral_depois": depois,
         "quota_estimada_youtube": QUOTA,
@@ -769,6 +869,21 @@ def selftest() -> int:
     agora_teste = datetime(2026, 7, 18, 21, 0, tzinfo=BRT)
     c(uol_fallback_liberado(antigo, agora_teste), "libera UOL após 48 horas")
     c(not uol_fallback_liberado(recente, agora_teste), "bloqueia UOL automático antes de 48 horas")
+
+    base_teste = {"jogos": {
+        "final": {"event_id": "1", "rodada": 18, "mandante": "Remo", "visitante": "São Paulo"},
+        "futuro": {"event_id": "2", "rodada": 19, "mandante": "Botafogo", "visitante": "Vitória"},
+    }}
+    removidos_teste = sanear_vinculos_sem_resultado(base_teste, [{**jogo, "event_id": "1"}], "teste")
+    c("final" in base_teste["jogos"] and "futuro" not in base_teste["jogos"], "remove vídeo de jogo não finalizado")
+    c(len(removidos_teste) == 1 and removidos_teste[0]["event_id"] == "2", "audita vínculo futuro removido")
+    fontes_teste = {"jogos": {
+        "ok": {"event_id": "1", "fonte": "GE TV / YouTube"},
+        "ruim": {"event_id": "2", "fonte": "VÁRZEA TV"},
+    }}
+    removidos_fonte_teste = sanear_fontes_nao_preferidas(fontes_teste, "teste")
+    c("ok" in fontes_teste["jogos"] and "ruim" not in fontes_teste["jogos"], "remove canal não autorizado mesmo fora do índice mesclado")
+    c(len(removidos_fonte_teste) == 1, "audita fonte não autorizada removida")
 
     cand_ge = {"video_id": "a", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "ge", "metodo": "playlistItems"}
     cand_caze = {"video_id": "b", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "caze", "metodo": "search.list"}

@@ -157,6 +157,10 @@
     return (global.matchMedia && global.matchMedia("(max-width: 820px)").matches ? 4 : 8) + safe;
   }
 
+  function pageScrollY() {
+    return Number(global.scrollY || global.pageYOffset || document.documentElement.scrollTop || 0);
+  }
+
   function ensureFloatingNav(nav) {
     if (!nav || nav.dataset.brFloatingReady === "1") return;
     var marker = document.createElement("div");
@@ -165,17 +169,25 @@
     nav.parentNode.insertBefore(marker, nav);
     nav.dataset.brFloatingReady = "1";
     nav._brFloatingMarker = marker;
+    nav._brFloatingOriginY = null;
   }
 
   function outerHeight(el) {
     var rect = el.getBoundingClientRect();
     var cs = global.getComputedStyle ? global.getComputedStyle(el) : null;
+    var mt = cs ? parseFloat(cs.marginTop || "0") || 0 : 0;
     var mb = cs ? parseFloat(cs.marginBottom || "0") || 0 : 0;
-    return Math.ceil(rect.height + mb);
+    return Math.ceil(rect.height + mt + mb);
+  }
+
+  function setMarkerHeight(marker, value) {
+    if (!marker) return;
+    marker.style.setProperty("height", Math.max(0, Math.ceil(value || 0)) + "px", "important");
   }
 
   function updateFloatingNavs() {
     floatingNavRaf = 0;
+    var scrollY = pageScrollY();
     var navs = Array.prototype.slice.call(document.querySelectorAll(".nav[data-br-auth-menu]"));
     navs.forEach(function (nav) {
       ensureFloatingNav(nav);
@@ -183,15 +195,27 @@
       if (!marker || nav.hidden || nav.offsetParent === null) return;
 
       var fixed = nav.classList.contains("br-nav-floating");
-      var referenceRect = (fixed ? marker : nav).getBoundingClientRect();
       var top = floatingTopOffset();
-      var shouldFloat = referenceRect.top <= top;
+
+      // Enquanto a navegação está no fluxo normal, registra sua posição real
+      // no documento. Ao flutuar, usa esse ponto fixo para saber exatamente
+      // quando deve voltar ao lugar de origem — sem depender da geometria do
+      // placeholder ou do cabeçalho durante a rolagem.
+      if (!fixed || !Number.isFinite(Number(nav._brFloatingOriginY))) {
+        nav._brFloatingOriginY = nav.getBoundingClientRect().top + scrollY;
+      }
+      var originY = Number(nav._brFloatingOriginY);
+      var threshold = originY - top;
+      var shouldFloat = fixed ? scrollY >= threshold - 2 : scrollY >= threshold;
 
       if (shouldFloat) {
+        if (!fixed || !Number.isFinite(Number(nav._brFloatingPlaceholderHeight))) {
+          nav._brFloatingPlaceholderHeight = outerHeight(nav);
+        }
+        marker.classList.add("is-active");
+        setMarkerHeight(marker, nav._brFloatingPlaceholderHeight);
         var rect = marker.getBoundingClientRect();
         var width = rect.width || nav.getBoundingClientRect().width;
-        marker.style.height = outerHeight(nav) + "px";
-        marker.classList.add("is-active");
         nav.style.setProperty("--br-nav-fixed-left", Math.round(rect.left) + "px");
         nav.style.setProperty("--br-nav-fixed-width", Math.round(width) + "px");
         nav.classList.add("br-nav-floating");
@@ -200,7 +224,11 @@
         nav.style.removeProperty("--br-nav-fixed-left");
         nav.style.removeProperty("--br-nav-fixed-width");
         marker.classList.remove("is-active");
-        marker.style.height = "0px";
+        setMarkerHeight(marker, 0);
+        // A navegação voltou ao fluxo. Recalcula a origem no próximo frame,
+        // já com o cabeçalho e o conteúdo em suas posições naturais.
+        nav._brFloatingOriginY = null;
+        nav._brFloatingPlaceholderHeight = null;
       }
     });
   }
@@ -210,15 +238,26 @@
     floatingNavRaf = global.requestAnimationFrame ? global.requestAnimationFrame(updateFloatingNavs) : global.setTimeout(updateFloatingNavs, 16);
   }
 
+  function resetFloatingOrigins() {
+    Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), function (nav) {
+      if (!nav.classList.contains("br-nav-floating")) nav._brFloatingOriginY = null;
+    });
+    requestFloatingNavUpdate();
+  }
+
   function initFloatingNavs() {
     if (floatingNavsReady) { requestFloatingNavUpdate(); return; }
     floatingNavsReady = true;
     Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), ensureFloatingNav);
     global.addEventListener("scroll", requestFloatingNavUpdate, { passive: true });
-    global.addEventListener("resize", requestFloatingNavUpdate);
-    global.addEventListener("orientationchange", function () { global.setTimeout(requestFloatingNavUpdate, 120); });
+    global.addEventListener("resize", resetFloatingOrigins);
+    global.addEventListener("load", resetFloatingOrigins);
+    global.addEventListener("orientationchange", function () { global.setTimeout(resetFloatingOrigins, 120); });
+    Array.prototype.forEach.call(document.querySelectorAll(".hero img, .hero-header img"), function (img) {
+      if (!img.complete) img.addEventListener("load", resetFloatingOrigins, { once: true });
+    });
     requestFloatingNavUpdate();
-    global.setTimeout(requestFloatingNavUpdate, 250);
+    global.setTimeout(resetFloatingOrigins, 250);
   }
 
   function updateAuthItem(item) {
