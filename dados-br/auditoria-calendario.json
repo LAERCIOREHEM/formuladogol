@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-07-17T23:02:07.415969-03:00",
+  "gerado_em": "2026-07-17T23:47:42.651945-03:00",
   "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
@@ -9,16 +9,16 @@
     "rodadas_com_10_jogos": 38,
     "clubes_com_38_jogos": 20,
     "confrontos_com_ida_e_volta": 190,
-    "partidas_com_data_confirmada": 269,
-    "partidas_com_data_a_definir": 111,
+    "partidas_com_data_confirmada": 268,
+    "partidas_com_data_a_definir": 112,
     "resultados_publicados": 181,
     "proximos_publicados": 43,
     "eventos_espn_na_janela": 270,
     "ajustes_calendario_configurados": 3,
     "jogos_adiados_sem_data": 1,
     "rodadas_espn_com_clube_repetido": 0,
-    "rodadas_returno_incorretas": 0,
-    "falhas_graves": 0
+    "rodadas_returno_incorretas": 1,
+    "falhas_graves": 1
   },
   "distribuicao_jogos_disputados": {
     "19": 5,
@@ -541,10 +541,13 @@
     },
     {
       "rodada": 23,
-      "jogos_mapeados": 10,
+      "jogos_mapeados": 9,
       "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": true
+      "clubes_ausentes": [
+        "Bahia",
+        "Chapecoense"
+      ],
+      "integra": false
     },
     {
       "rodada": 24,
@@ -573,10 +576,30 @@
       "clubes_repetidos": [],
       "clubes_ausentes": [],
       "integra": true
+    },
+    {
+      "rodada": 38,
+      "jogos_mapeados": 1,
+      "clubes_repetidos": [],
+      "clubes_ausentes": [],
+      "integra": false
     }
   ],
-  "returno_incorreto": [],
+  "returno_incorreto": [
+    {
+      "event_id": "401841194",
+      "mandante": "Chapecoense",
+      "visitante": "Bahia",
+      "rodada_atual": 38,
+      "rodada_esperada": 23
+    }
+  ],
   "duplicados_entre_resultados_e_proximos": [],
-  "falhas": [],
+  "falhas": [
+    {
+      "tipo": "rodadas_returno_incorretas",
+      "total": 1
+    }
+  ],
   "observacao": "A ESPN é consultada de 1º de janeiro até 60 dias à frente. O calendario-completo.json preserva datas conhecidas e completa os 380 confrontos pela inversão obrigatória dos mandos do primeiro turno."
 }
