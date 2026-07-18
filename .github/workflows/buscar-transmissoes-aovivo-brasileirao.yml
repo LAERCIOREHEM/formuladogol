@@ -21,6 +21,7 @@ on:
       - 'dados-br/config-transmissoes-aovivo.json'
       - 'dados-br/transmissoes-aovivo-manual.json'
       - 'dados-br/transmissoes-tv.json'
+      - 'transmissoes.json'
       - 'scripts/atualizar_transmissoes_tv_brasileirao.py'
       - '.github/workflows/buscar-transmissoes-aovivo-brasileirao.yml'
 
@@ -33,7 +34,7 @@ concurrency:
 
 jobs:
   buscar:
-    name: Procurar CazéTV e GE TV oficiais
+    name: Procurar transmissões oficiais
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -61,6 +62,7 @@ jobs:
           python -m json.tool dados-br/transmissoes-aovivo-manual.json > /dev/null
           python -m json.tool dados-br/auditoria-transmissoes-aovivo.json > /dev/null
           python -m json.tool dados-br/transmissoes-tv.json > /dev/null
+          python -m json.tool transmissoes.json > /dev/null
 
       - name: Buscar transmissões oficiais
         env:

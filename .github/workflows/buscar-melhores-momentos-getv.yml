@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: "Tipo de execução GE TV"
+        description: "Tipo de execução dos melhores momentos oficiais"
         required: true
         default: "incremental"
         type: choice
@@ -66,7 +66,7 @@ jobs:
           python scripts/substituir_fontes_preferidas_mm.py --selftest
           python scripts/gerar_relatorio_fontes_melhores_momentos.py --dry-run
 
-      - name: Buscar vídeos na GE TV por playlists
+      - name: Buscar vídeos prioritários na GE TV por playlists
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}
@@ -93,7 +93,7 @@ jobs:
           echo "Executando: ${CMD[*]}"
           "${CMD[@]}"
 
-      - name: Sanear e buscar somente fontes preferidas
+      - name: Sanear e buscar fontes preferidas com fallback UOL após 48h
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}

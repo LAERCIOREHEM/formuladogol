@@ -38,6 +38,7 @@ on:
       - 'dados-br/auditoria-competicoes-af-previsao.json'
       - 'requirements-af-previsao.txt'
       - 'dados-br/ajustes-calendario.json'
+      - 'dados-br/resultados-manuais.json'
       - 'dados-br/publicos-complementares.json'
       - '.github/workflows/atualizar-brasileirao.yml'
 
@@ -83,6 +84,7 @@ jobs:
       - name: Validar sintaxe e parsers estatísticos
         run: |
           python -m py_compile \
+            atualizar_espn.py \
             scripts/buscar_lideres_jogadores_espn.py \
             scripts/buscar_detalhes_jogos_brasileirao.py \
             scripts/gerar_estatisticas_brasileirao.py \
@@ -93,6 +95,7 @@ jobs:
             scripts/atualizar_competicoes_af_previsao.py \
             scripts/gerar_probabilidades_brasileirao.py \
             scripts/avaliar_af_previsao.py
+          python atualizar_espn.py --selftest
           python scripts/buscar_lideres_jogadores_espn.py --self-test
           python scripts/buscar_detalhes_jogos_brasileirao.py --self-test
           python scripts/atualizar_competicoes_af_previsao.py --self-test
@@ -141,7 +144,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -190,7 +193,13 @@ jobs:
           assert isinstance(auditoria.get('falhas'), list), 'auditoria-jogos-detalhes.json sem lista falhas'
           assert 'total_com_publico' in auditoria, 'auditoria-jogos-detalhes sem contagem de público'
           assert auditoria.get('total_inconsistencias_eventos') == 0, 'há gols/cartões inconsistentes'
-          assert detalhes.get('total_eventos_validados') == detalhes.get('total_jogos'), 'nem todos os jogos tiveram eventos validados'
+          validados = int(detalhes.get('total_eventos_validados') or 0)
+          pendentes = int(detalhes.get('total_eventos_pendentes_detalhes') or 0)
+          assert validados + pendentes == detalhes.get('total_jogos'), 'há jogo sem eventos validados ou pendência manual declarada'
+          for item in (detalhes.get('jogos') or {}).values():
+              validacao = item.get('validacao_eventos') or {}
+              if validacao.get('pendente_detalhes') is True:
+                  assert item.get('resultado_manual') is True, 'pendência de detalhes permitida apenas para resultado manual confirmado'
           competicao = json.load(open('dados-br/estatisticas-competicao.json', encoding='utf-8'))
           assert len(competicao.get('gols_por_clube') or []) == 20, 'estatísticas da competição sem 20 clubes'
           assert all(len(item.get('marcadores') or []) >= 5 for item in competicao.get('gols_por_clube') or []), 'há clube com menos de cinco marcadores'
@@ -229,9 +238,38 @@ jobs:
           assert len(clubes_prev) == 20, 'AF-Previsão sem 20 clubes'
           assert previsao.get('total_previsoes_partidas') == previsao.get('base_corrente', {}).get('partidas_restantes'), 'AF-Previsão sem previsão para todos os jogos restantes'
           assert len(previsao.get('partidas_restantes') or []) == previsao.get('base_corrente', {}).get('partidas_restantes'), 'lista de partidas previstas incompleta'
-          for campo, esperado in [('campeao', 100), ('g4', 400), ('g6', 600), ('libertadores_base', 500), ('sul_americana_base', 600), ('rebaixamento', 400)]:
+          # Validação compatível com o schema publicado. O schema legado usa
+          # Libertadores-base G6 (600%); o modelo continental usa a faixa definida
+          # no config (atualmente G5 = 500%). Em caso de coleta inconsistente, o
+          # gerador preserva o snapshot anterior e a trava deve validar a versão
+          # preservada — não aplicar a regra de outro schema.
+          schema_prev = int(previsao.get('schema_version') or 1)
+          config_prev = json.load(open('dados-br/config-af-previsao.json', encoding='utf-8'))
+          zonas_cfg = ((config_prev.get('execucao_2') or {}).get('zonas_base') or {})
+
+          def tamanho_faixa(chave, legado):
+              faixa = zonas_cfg.get(chave)
+              if schema_prev < 2 or not isinstance(faixa, list) or len(faixa) != 2:
+                  return legado
+              inicio, fim = (int(faixa[0]), int(faixa[1]))
+              assert 1 <= inicio <= fim <= 20, f'config AF inválida em {chave}: {faixa}'
+              return fim - inicio + 1
+
+          esperados = {
+              'campeao': 100,
+              'g4': 400,
+              'g6': 600,
+              'libertadores_base': 100 * tamanho_faixa('libertadores', 6),
+              'sul_americana_base': 100 * tamanho_faixa('sul_americana', 6),
+              'rebaixamento': 400,
+          }
+          for campo, esperado in esperados.items():
               total = sum(float(item['probabilidades_pct'][campo]) for item in clubes_prev)
-              assert abs(total - esperado) <= 0.02, f'AF-Previsão: soma inválida em {campo}: {total}'
+              assert abs(total - esperado) <= 0.02, (
+                  f'AF-Previsão schema {schema_prev}: soma inválida em {campo}: '
+                  f'{total}; esperado {esperado}'
+              )
+          print(f'  OK   Somas AF-Previsão validadas conforme schema {schema_prev}: {esperados}')
           assert all(abs(sum(item.get('distribuicao_posicoes_pct') or []) - 100) <= 0.02 for item in clubes_prev), 'AF-Previsão: distribuição de posições inválida'
 
           integrado = previsao.get('schema_version', 0) >= 2 and (previsao.get('integracao_continental') or {}).get('status') == 'ok'
