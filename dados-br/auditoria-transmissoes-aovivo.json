@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 42,
+    "jogos_na_janela": 43,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 14,
+    "candidatos_oficiais_encontrados": 15,
     "transmissoes_publicadas": 3,
-    "sem_transmissao": 39,
+    "sem_transmissao": 40,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -423,6 +423,15 @@
       "principal": "",
       "fontes_encontradas": [],
       "manual": false
+    },
+    {
+      "event_id": "401841191",
+      "rodada": 23,
+      "jogo": "Internacional x Remo",
+      "data_iso": "2026-08-17T20:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false
     }
   ],
   "aceitos": [
@@ -575,6 +584,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-07-23T18:00:00-03:00",
       "motivo": "conteúdo rejeitado: pre jogo"
+    },
+    {
+      "video_id": "epxpf5-6zhw",
+      "url": "https://www.youtube.com/watch?v=epxpf5-6zhw",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE BOTAFOGO ANALISA VITÓRIA CONTRA O SANTOS PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-20T12:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "wdDX4ucFIZo",
@@ -860,6 +879,13 @@
       "jogo": "Corinthians x Cruzeiro",
       "data_iso": "2026-08-16T19:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
+    },
+    {
+      "event_id": "401841191",
+      "rodada": 23,
+      "jogo": "Internacional x Remo",
+      "data_iso": "2026-08-17T20:00:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     }
   ],
   "erros": [],
@@ -872,5 +898,5 @@
     },
     "observacao": "search.list não é mais usado. Custo: ~2 unidades (channels) + ~20 (playlistItems 500 itens) + ~10 (videos) por execução ≈ 32 unidades. Cabe 300+ execuções/dia dentro das 10.000 gratuitas."
   },
-  "atualizado_em": "2026-07-18T19:26:49-03:00"
+  "atualizado_em": "2026-07-18T20:31:37-03:00"
 }
