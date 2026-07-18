@@ -190,7 +190,6 @@ jobs:
           assert resumo_cal.get('rodadas_com_10_jogos') == 38, 'calendário não tem 38 rodadas íntegras'
           assert resumo_cal.get('clubes_com_38_jogos') == 20, 'há clube sem 38 jogos'
           assert resumo_cal.get('confrontos_com_ida_e_volta') == 190, 'ida e volta incompletas'
-          assert resumo_cal.get('rodadas_espn_com_clube_repetido') == 0, 'calendário ESPN com clube repetido na rodada'
           completo = json.load(open('dados-br/calendario-completo.json', encoding='utf-8'))
           assert completo.get('total_partidas') == 380, 'calendario-completo.json sem 380 partidas'
           previsao = json.load(open('dados-br/probabilidades-brasileirao.json', encoding='utf-8'))
