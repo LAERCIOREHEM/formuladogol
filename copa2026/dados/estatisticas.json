@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-18T21:12:40.133317Z",
+  "atualizado_em": "2026-07-18T21:42:39.970341Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 102,
+  "jogos_processados": 103,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -1074,6 +1074,21 @@
         "760471"
       ],
       "total_cartoes": 0
+    },
+    {
+      "nome": "Declan Rice",
+      "equipe": "ENG",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760437",
+        "760458",
+        "760505",
+        "760516"
+      ],
+      "total_cartoes": 2
     },
     {
       "nome": "Deroy Duarte",
@@ -3044,14 +3059,15 @@
     {
       "nome": "Declan Rice",
       "equipe": "ENG",
-      "gols": 0,
+      "gols": 1,
       "assistencias": 1,
       "amarelos": 2,
       "vermelhos": 0,
       "jogos": [
         "760437",
         "760458",
-        "760505"
+        "760505",
+        "760516"
       ],
       "total_cartoes": 2
     },
@@ -4659,14 +4675,15 @@
     {
       "nome": "Declan Rice",
       "equipe": "ENG",
-      "gols": 0,
+      "gols": 1,
       "assistencias": 1,
       "amarelos": 2,
       "vermelhos": 0,
       "jogos": [
         "760437",
         "760458",
-        "760505"
+        "760505",
+        "760516"
       ],
       "total_cartoes": 2
     },
@@ -7385,8 +7402,17 @@
       "assistencias": 14,
       "amarelos": 6,
       "vermelhos": 0,
-      "jogos": 7,
-      "media_gols": 2.29
+      "jogos": 8,
+      "media_gols": 2.0
+    },
+    {
+      "equipe": "ENG",
+      "gols": 15,
+      "assistencias": 11,
+      "amarelos": 8,
+      "vermelhos": 1,
+      "jogos": 8,
+      "media_gols": 1.88
     },
     {
       "equipe": "BEL",
@@ -7396,15 +7422,6 @@
       "vermelhos": 1,
       "jogos": 6,
       "media_gols": 2.33
-    },
-    {
-      "equipe": "ENG",
-      "gols": 14,
-      "assistencias": 11,
-      "amarelos": 8,
-      "vermelhos": 1,
-      "jogos": 7,
-      "media_gols": 2.0
     },
     {
       "equipe": "NOR",
