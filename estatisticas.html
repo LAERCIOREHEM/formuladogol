@@ -25,7 +25,7 @@
   <meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
   <meta name="twitter:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260718-afprevisao-interface-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260718-afprevisao-interface-v2">
   <link rel="stylesheet" href="css/br-global.css?v=20260713-disclaimers-publicos-v1">
 </head>
 <body>
@@ -117,8 +117,12 @@
               <div><div class="kicker">🔮 AF-Previsão</div><h2>Probabilidades do Brasileirão</h2></div>
               <span class="badge live-soft">Modelo estatístico próprio</span>
             </div>
-            <p class="probability-intro">Estimativas atualizadas para título, zonas continentais e rebaixamento, produzidas a partir dos resultados já disputados e da simulação integral das partidas restantes. Probabilidade não é certeza e não representa cotação de aposta.</p>
-            <a class="probability-method-link" href="#metodologia-probabilidades" data-probability-method>Como são calculadas as probabilidades? ↓</a>
+            <p class="probability-intro">Estimativas atualizadas para título, classificação continental e rebaixamento. O AF-Previsão combina o Brasileirão com os possíveis desfechos da Copa do Brasil, da CONMEBOL Libertadores e da CONMEBOL Sudamericana, incluindo sobreposições e repasses de vagas. Probabilidade não é certeza nem cotação de aposta.</p>
+            <div class="probability-notice" role="note">
+              <span aria-hidden="true">ⓘ</span>
+              <p><strong>Leitura importante:</strong> valores como <b>&lt;0,1%</b> indicam um cenário residual, não impossibilidade matemática. As chances de Libertadores e Sul-Americana abaixo já são <strong>consolidadas</strong> pelas diferentes vias de classificação.</p>
+            </div>
+            <a class="probability-method-link" href="#metodologia-probabilidades" data-probability-method>Entenda o modelo e consulte a nota técnica ↓</a>
             <div id="probabilidades-status" aria-live="polite"></div>
             <div id="probabilidades-destaques"></div>
             <div id="probabilidades-controles"></div>
@@ -128,67 +132,91 @@
             <section class="probability-methodology" id="metodologia-probabilidades" aria-labelledby="titulo-metodologia-probabilidades">
               <div class="kicker">Metodologia pública, versionada e auditável</div>
               <h3 id="titulo-metodologia-probabilidades">Como o AF-Previsão calcula o Brasileirão?</h3>
-              <p class="probability-method-lead">O AF-Previsão transforma a força ofensiva e defensiva estimada de cada clube em probabilidades de placar, projeta cada partida ainda não disputada e repete o campeonato completo centenas de milhares de vezes. O percentual final é a frequência com que cada desfecho ocorreu nas simulações.</p>
+              <p class="probability-method-lead">A explicação abaixo tem dois níveis: primeiro, uma leitura direta para qualquer torcedor; depois, uma nota técnica completa com modelo de gols, regularização, mata-matas, Monte Carlo, validação e referências.</p>
 
-              <div class="probability-method-nav" aria-label="Etapas da metodologia">
-                <a href="#metodo-dados">1. Dados</a>
-                <a href="#metodo-poisson">2. Poisson</a>
-                <a href="#metodo-bayes">3. Regularização</a>
-                <a href="#metodo-dixon-coles">4. Dixon–Coles</a>
-                <a href="#metodo-monte-carlo">5. Monte Carlo</a>
-                <a href="#metodo-validacao">6. Validação</a>
-              </div>
-
-              <div class="probability-method-sections">
-                <article id="metodo-dados">
-                  <span class="probability-method-step">01</span>
-                  <div><h4>Base histórica e informação disponível</h4><p>O ajuste usa os 1.140 jogos completos dos Brasileirões de 2023, 2024 e 2025, combinados com os resultados concluídos de 2026. Datas, mandos, placares, calendário e classificação corrente são auditados antes da publicação. Clubes promovidos ou com pouca evidência recente não recebem força artificial: começam mais próximos da média da Série A e se individualizam conforme acumulam jogos.</p></div>
-                </article>
-                <article id="metodo-poisson">
-                  <span class="probability-method-step">02</span>
-                  <div><h4>Modelo de gols de Poisson</h4><p>Os gols esperados de mandante e visitante são estimados separadamente por um modelo log-linear com força de ataque, força de defesa e vantagem de mando. Em forma simplificada:</p><div class="probability-formula" role="img" aria-label="Fórmulas das intensidades de gols"><code>λ<sub>casa</sub> = exp(μ + γ + ataque<sub>casa</sub> − defesa<sub>fora</sub>)</code><code>λ<sub>fora</sub> = exp(μ + ataque<sub>fora</sub> − defesa<sub>casa</sub>)</code></div><p>A distribuição de Poisson converte essas intensidades em uma matriz de probabilidades para 0, 1, 2, 3 ou mais gols e, por soma, nas probabilidades de vitória, empate e derrota.</p></div>
-                </article>
-                <article id="metodo-bayes">
-                  <span class="probability-method-step">03</span>
-                  <div><h4>Regularização de natureza bayesiana</h4><p>Os parâmetros são ajustados por máxima a posteriori (MAP) com priors gaussianos. Esse mecanismo de <em>partial pooling</em> reduz estimativas extremas quando a amostra é pequena e permite que os dados superem gradualmente o prior. Partidas antigas recebem peso decrescente, com meia-vida temporal atualmente fixada em 365 dias.</p></div>
-                </article>
-                <article id="metodo-dixon-coles">
-                  <span class="probability-method-step">04</span>
-                  <div><h4>Correção Dixon–Coles: implementada, mas não forçada</h4><p>A correção de Dixon–Coles ajusta a dependência de placares baixos, especialmente 0–0, 1–0, 0–1 e 1–1. Ela está implementada e é recalculada como análise de sensibilidade. Na versão atual, o parâmetro de produção é ρ = 0 porque o backtesting fora da amostra não demonstrou ganho conjunto em Log Loss, Brier Score e RPS. A metodologia privilegia evidência preditiva, não sofisticação aparente.</p></div>
-                </article>
-                <article id="metodo-monte-carlo">
-                  <span class="probability-method-step">05</span>
-                  <div><h4>Simulação Monte Carlo do campeonato inteiro</h4><p>Cada partida restante é sorteada segundo sua distribuição de placares. Em seguida são aplicados pontos, vitórias, saldo de gols e gols pró. O procedimento é repetido 200.000 vezes por atualização. A chance de título, por exemplo, é a proporção das simulações em que o clube terminou em primeiro lugar.</p><p>As zonas continentais são cenários-base: G4, G6/Libertadores-base, 7º ao 12º para Sul-Americana-base e 17º ao 20º para rebaixamento. Vagas extraordinárias decorrentes de copas não são antecipadas antes de estarem definidas.</p></div>
-                </article>
-                <article id="metodo-validacao">
-                  <span class="probability-method-step">06</span>
-                  <div><h4>Backtesting, calibração e escolha do modelo</h4><p>Seis arquiteturas foram comparadas em validação temporal: frequência histórica regularizada, Poisson regularizado, Poisson MAP, Dixon–Coles temporal, Elo dinâmico e híbrido Dixon–Coles + Elo. O protocolo treinou em 2023 para prever 2024 e treinou em 2023–2024 para prever 2025, totalizando 760 partidas totalmente fora da amostra.</p><p>A seleção considera Log Loss, Brier Score multiclasse, Ranked Probability Score e calibração. O modelo de produção foi escolhido pelo desempenho agregado, não pela taxa bruta de acerto. O AF-Score é auditado como diagnóstico, mas não entra na previsão enquanto não existir série histórica homogênea para backtesting equivalente.</p></div>
-                </article>
+              <div class="probability-plain-grid" aria-label="Explicação resumida do modelo">
+                <article><span>1</span><h4>O que o modelo observa?</h4><p>Resultados, mandos, placares e calendário do Brasileirão, além do estado factual das três copas que podem alterar as vagas continentais.</p></article>
+                <article><span>2</span><h4>O que ele projeta?</h4><p>A força ofensiva e defensiva de cada clube transforma cada jogo restante em probabilidades de placares e resultados.</p></article>
+                <article><span>3</span><h4>Como nasce o percentual?</h4><p>O campeonato e os mata-matas são simulados 200.000 vezes. A chance publicada é a frequência do desfecho nesses universos.</p></article>
+                <article><span>4</span><h4>Como interpretar?</h4><p>Um número alto não é garantia. Um valor abaixo de 0,1% não é zero absoluto. Cada novo resultado pode alterar toda a projeção.</p></article>
               </div>
 
               <div class="probability-audit-grid" id="probabilidades-auditoria-metodo" aria-live="polite"></div>
 
               <div class="probability-reading-guide">
-                <h4>Como interpretar corretamente</h4>
-                <div><p><strong>30% não significa certeza:</strong> significa que, em condições equivalentes às modeladas, o desfecho apareceu em aproximadamente 30 de cada 100 simulações.</p><p><strong>Percentuais mudam:</strong> um resultado novo altera pontos, calendário restante e estimativas de força.</p><p><strong>Intervalos importam:</strong> a projeção de pontos é acompanhada por percentis, não por um único número tratado como destino.</p><p><strong>Modelo não é tabela:</strong> a classificação oficial registra o que aconteceu; a previsão estima o que ainda pode acontecer.</p></div>
+                <h4>Leitura correta dos números</h4>
+                <div>
+                  <p><strong>Chance consolidada:</strong> Libertadores e Sul-Americana consideram Brasileirão, títulos, Copa do Brasil e repasses aplicáveis.</p>
+                  <p><strong>Vias exclusivas:</strong> o detalhamento não conta o mesmo universo duas vezes; a soma dos caminhos fecha com a chance total.</p>
+                  <p><strong>&lt;0,1% não é impossível:</strong> significa que o evento foi raríssimo ou não apareceu nas simulações realizadas.</p>
+                  <p><strong>Faixa de pontos:</strong> os percentis mostram incerteza; a média projetada não deve ser lida como destino exato.</p>
+                </div>
               </div>
+
+              <details class="probability-technical-details">
+                <summary><span><b>Nota técnica completa</b><small>Modelo, equações, vagas, validação e limitações</small></span><strong>Abrir ↓</strong></summary>
+                <div class="probability-technical-body">
+                  <div class="probability-method-nav" aria-label="Etapas da metodologia técnica">
+                    <a href="#metodo-dados">1. Dados</a>
+                    <a href="#metodo-poisson">2. Poisson</a>
+                    <a href="#metodo-bayes">3. Regularização</a>
+                    <a href="#metodo-copas">4. Copas e vagas</a>
+                    <a href="#metodo-monte-carlo">5. Monte Carlo</a>
+                    <a href="#metodo-residuais">6. Resolução</a>
+                    <a href="#metodo-validacao">7. Validação</a>
+                  </div>
+
+                  <div class="probability-method-sections">
+                    <article id="metodo-dados">
+                      <span class="probability-method-step">01</span>
+                      <div><h4>Base histórica e estado corrente</h4><p>O ajuste doméstico utiliza os 1.140 jogos completos dos Brasileirões de 2023, 2024 e 2025, combinados com os resultados concluídos de 2026. Datas, mandos, placares, calendário e classificação são auditados antes da publicação. Os snapshots da Copa do Brasil, Libertadores e Sul-Americana são mantidos separadamente e só alimentam o modelo quando passam pelas verificações de integridade.</p><p>Clubes promovidos ou com pouca evidência não recebem uma força arbitrária: começam mais próximos da média da competição e se individualizam conforme acumulam informação.</p></div>
+                    </article>
+                    <article id="metodo-poisson">
+                      <span class="probability-method-step">02</span>
+                      <div><h4>Modelo log-linear de gols</h4><p>Os gols esperados de mandante e visitante são estimados separadamente por parâmetros de ataque, defesa e vantagem de mando:</p><div class="probability-formula" role="img" aria-label="Fórmulas simplificadas das intensidades de gols"><code>λ<sub>casa</sub> = exp(μ + γ + ataque<sub>casa</sub> − defesa<sub>fora</sub>)</code><code>λ<sub>fora</sub> = exp(μ + ataque<sub>fora</sub> − defesa<sub>casa</sub>)</code></div><p>A distribuição de Poisson converte essas intensidades em probabilidades de placares. A matriz resultante também fornece vitória do mandante, empate e vitória do visitante.</p></div>
+                    </article>
+                    <article id="metodo-bayes">
+                      <span class="probability-method-step">03</span>
+                      <div><h4>Regularização de natureza bayesiana</h4><p>Os parâmetros são ajustados por máxima a posteriori (MAP) com priors gaussianos e <em>partial pooling</em>. A regularização reduz estimativas extremas em amostras pequenas e permite que os dados próprios de cada clube superem gradualmente o prior. Partidas antigas recebem peso decrescente.</p><p>A versão atual não executa MCMC da posterior completa; a incerteza publicada decorre principalmente dos resultados futuros simulados. Essa limitação é declarada, não ocultada.</p></div>
+                    </article>
+                    <article id="metodo-copas">
+                      <span class="probability-method-step">04</span>
+                      <div><h4>Mata-matas e alocação integrada de vagas</h4><p>Placares já ocorridos ficam fixos; partidas futuras são simuladas. Confrontos de ida e volta respeitam o agregado, empates podem ser resolvidos por pênaltis e finais em jogo único são tratadas como campo neutro. Sorteios futuros só são simulados quando a chave ainda não existe na fonte.</p><p>Em cada universo, o sistema combina classificação final do Brasileirão, campeão e vice da Copa do Brasil, campeão da Libertadores e campeão da Sul-Americana. As vias são atribuídas de forma exclusiva: Brasileirão, Copa do Brasil, título da Libertadores, título da Sul-Americana ou repasse. Assim, a soma das vias coincide com a chance consolidada.</p></div>
+                    </article>
+                    <article id="metodo-monte-carlo">
+                      <span class="probability-method-step">05</span>
+                      <div><h4>Simulação Monte Carlo completa</h4><p>Cada partida restante é sorteada segundo sua distribuição de placares. Em seguida são aplicados pontos, vitórias, saldo de gols e gols pró. O procedimento é repetido 200.000 vezes por atualização, preservando os resultados já disputados e integrando as três copas no mesmo universo simulado.</p><p>A chance de título, por exemplo, é a proporção de simulações em que o clube termina em primeiro. A chance de Libertadores é a proporção em que obtém a vaga por qualquer uma das vias configuradas.</p></div>
+                    </article>
+                    <article id="metodo-residuais">
+                      <span class="probability-method-step">06</span>
+                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,1%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico cria um novo snapshot apenas quando o estado esportivo muda. Isso permite acompanhar a evolução das probabilidades e avaliar o modelo posteriormente, sem registros artificiais gerados apenas por mudança de horário.</p></div>
+                    </article>
+                    <article id="metodo-validacao">
+                      <span class="probability-method-step">07</span>
+                      <div><h4>Backtesting, calibração e escolha do modelo</h4><p>Seis arquiteturas foram comparadas em validação temporal: frequência histórica regularizada, Poisson regularizado, Poisson MAP, Dixon–Coles temporal, Elo dinâmico e híbrido Dixon–Coles + Elo. O protocolo treinou em 2023 para prever 2024 e em 2023–2024 para prever 2025, mantendo as partidas testadas fora da amostra.</p><p>A seleção usa Log Loss, Brier Score multiclasse e Ranked Probability Score, com calibração como diagnóstico. A correção Dixon–Coles está implementada e auditada, mas não é ativada por prestígio: só entra em produção quando demonstrar ganho fora da amostra. O AF-Score também permanece fora das probabilidades enquanto não houver cobertura histórica homogênea.</p></div>
+                    </article>
+                  </div>
+
+                  <div class="probability-references">
+                    <h4>Referências bibliográficas e inspiração</h4>
+                    <ol>
+                      <li>Dixon, M. J.; Coles, S. G. (1997). <em>Modelling Association Football Scores and Inefficiencies in the Football Betting Market</em>. Journal of the Royal Statistical Society: Series C, 46(2), 265–280. <a href="https://doi.org/10.1111/1467-9876.00065" target="_blank" rel="noopener noreferrer">DOI</a>.</li>
+                      <li>Baio, G.; Blangiardo, M. (2010). <em>Bayesian hierarchical model for the prediction of football results</em>. Journal of Applied Statistics, 37(2), 253–264. <a href="https://doi.org/10.1080/02664760802684177" target="_blank" rel="noopener noreferrer">DOI</a>.</li>
+                      <li>Gneiting, T.; Raftery, A. E. (2007). <em>Strictly Proper Scoring Rules, Prediction, and Estimation</em>. Journal of the American Statistical Association, 102(477), 359–378. <a href="https://doi.org/10.1198/016214506000001437" target="_blank" rel="noopener noreferrer">DOI</a>.</li>
+                      <li>Robert, C. P.; Casella, G. (2004). <em>Monte Carlo Statistical Methods</em>. Springer.</li>
+                      <li>Universidade Federal de Minas Gerais. Projeto de extensão <em>Probabilidades no Futebol</em>, referência brasileira de divulgação matemática aplicada ao esporte. <a href="https://www.mat.ufmg.br/extensao/probabilidade-no-futebol/" target="_blank" rel="noopener noreferrer">Projeto oficial</a>.</li>
+                    </ol>
+                  </div>
+
+                  <p class="probability-method-disclaimer">Metodologia própria, independente e sem finalidade de aposta. As probabilidades são estimativas condicionais sujeitas à qualidade dos dados, às premissas do modelo e a acontecimentos futuros não observáveis, como escalações, lesões, suspensões e mudanças técnicas. Mudanças regulamentares exigem atualização da configuração e nova auditoria.</p>
+                </div>
+              </details>
 
               <div class="probability-authorship">
                 <div><span>Desenvolvimento e supervisão matemática</span><strong>Laércio Rehem</strong><p>Matemático pela Universidade Federal da Bahia (UFBA) e responsável pelo projeto Brasileirão 2026 — Almoço de Sexta.</p></div>
                 <button type="button" class="br-feedback-button probability-feedback" data-feedback>💬 Sugestões, elogios e dúvidas</button>
               </div>
 
-              <div class="probability-references">
-                <h4>Referências bibliográficas e inspiração</h4>
-                <ol>
-                  <li>Dixon, M. J.; Coles, S. G. (1997). <em>Modelling Association Football Scores and Inefficiencies in the Football Betting Market</em>. Journal of the Royal Statistical Society: Series C, 46(2), 265–280. <a href="https://doi.org/10.1111/1467-9876.00065" target="_blank" rel="noopener noreferrer">DOI</a>.</li>
-                  <li>Baio, G.; Blangiardo, M. (2010). <em>Bayesian hierarchical model for the prediction of football results</em>. Journal of Applied Statistics, 37(2), 253–264. <a href="https://doi.org/10.1080/02664760802684177" target="_blank" rel="noopener noreferrer">DOI</a>.</li>
-                  <li>Gneiting, T.; Raftery, A. E. (2007). <em>Strictly Proper Scoring Rules, Prediction, and Estimation</em>. Journal of the American Statistical Association, 102(477), 359–378. <a href="https://doi.org/10.1198/016214506000001437" target="_blank" rel="noopener noreferrer">DOI</a>.</li>
-                  <li>Universidade Federal de Minas Gerais. Projeto de extensão <em>Probabilidades no Futebol</em>, referência brasileira de divulgação matemática aplicada ao esporte. <a href="https://www.mat.ufmg.br/futebol/" target="_blank" rel="noopener noreferrer">Projeto oficial</a>.</li>
-                </ol>
-              </div>
-
-              <p class="probability-method-disclaimer">Metodologia própria, independente e sem finalidade de aposta. As probabilidades são estimativas condicionais sujeitas à qualidade dos dados, às premissas do modelo e a acontecimentos futuros não observáveis, como escalações, lesões, suspensões e mudanças técnicas.</p>
               <a class="probability-back-top" href="#topo-probabilidades" data-probability-top>↑ Voltar ao topo das probabilidades</a>
             </section>
           </div></div>
@@ -233,7 +261,7 @@
       <div class="br-legal-context-icon" aria-hidden="true">📈</div>
       <div>
         <strong>Sobre as estatísticas:</strong>
-        <p>os índices, rankings e probabilidades exibidos são calculados a partir dos dados públicos da API da ESPN (posse de bola, finalizações, passes, cartões etc.). Trata-se de análise editorial própria, não de métrica oficial da CBF ou da ESPN. Nomes, escudos e marcas dos clubes pertencem aos seus titulares.</p>
+        <p>os índices e rankings utilizam estatísticas públicas da ESPN; as probabilidades utilizam resultados, calendários e o estado das competições consultadas, processados por metodologia própria e auditável. Trata-se de análise editorial própria, não de métrica oficial da CBF ou da ESPN. Nomes, escudos e marcas dos clubes pertencem aos seus titulares.</p>
       </div>
     </section>
 
@@ -247,7 +275,7 @@
     </footer>
   </div>
 
-  <script src="js/br-estatisticas.js?v=20260718-afprevisao-interface-v1"></script>
+  <script src="js/br-estatisticas.js?v=20260718-afprevisao-interface-v2"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260713-publico-login-admin-v1"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
