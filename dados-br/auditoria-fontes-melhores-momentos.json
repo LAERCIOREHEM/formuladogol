@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-07-18T12:16:00-03:00",
+  "atualizado_em": "2026-07-18T15:12:45-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,12 +13,12 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 181,
-    "jogos_com_video": 181,
+    "jogos_resultados": 182,
+    "jogos_com_video": 182,
     "ge_globo": 179,
     "amazon_prime_video": 1,
     "cazetv": 0,
-    "uol_esporte": 1,
+    "uol_esporte": 2,
     "outros": 0,
     "sem_video": 0,
     "percentual_fontes_preferidas": 100.0
@@ -2912,6 +2912,22 @@
     ],
     "cazetv": [],
     "uol_esporte": [
+      {
+        "event_id": "401840998",
+        "rodada": 4,
+        "mandante": "Bahia",
+        "visitante": "Chapecoense",
+        "placar_mandante": 2,
+        "placar_visitante": 0,
+        "categoria_fonte": "uol_esporte",
+        "origem_vinculo": "manual",
+        "fonte": "UOL Esporte / YouTube",
+        "fonte_busca": "Manual / usuário",
+        "channel_title": "UOL Esporte",
+        "titulo": "BAHIA 2 X 0 CHAPECOENSE | MELHORES MOMENTOS | BRASILEIRÃO 2026",
+        "url": "https://www.youtube.com/watch?v=bQOiH-8ShZE",
+        "confianca": 1.0
+      },
       {
         "event_id": "401841155",
         "rodada": 19,
