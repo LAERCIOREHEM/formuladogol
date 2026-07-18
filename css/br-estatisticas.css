@@ -1002,3 +1002,459 @@ body > .container > section.hero > img {
 .ranking-back-top:hover, .ranking-back-top:focus-visible { background:rgba(163,230,53,.14); outline:none; }
 @media (max-width:900px) { .ranking-method-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .ranking-method-grid article:last-child { grid-column:1/-1; } }
 @media (max-width:560px) { .ranking-methodology { padding:16px; } .ranking-method-grid, .ranking-method-notes { grid-template-columns:1fr; } .ranking-method-grid article:last-child { grid-column:auto; } }
+
+/* ======================================================================
+   AF-PREVISÃO — Execução 3: interface, leitura e metodologia científica.
+   ====================================================================== */
+.probability-panel { overflow: visible; }
+.probability-intro {
+  max-width: 940px;
+  margin: -2px 0 4px;
+  color: #c7d4df;
+  font-size: 14px;
+  line-height: 1.62;
+}
+.probability-method-link {
+  display: inline-flex;
+  align-items: center;
+  margin: 8px 0 16px;
+  color: #d9ff76;
+  font-size: 13px;
+  font-weight: 950;
+  text-decoration: none;
+}
+.probability-method-link:hover,
+.probability-method-link:focus-visible { text-decoration: underline; outline: none; }
+
+.probability-status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 9px;
+  margin-bottom: 14px;
+}
+.probability-status-grid > div {
+  min-width: 0;
+  padding: 12px 13px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 14px;
+  background: rgba(5,15,22,.56);
+}
+.probability-status-grid span,
+.probability-status-grid strong { display: block; }
+.probability-status-grid span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.probability-status-grid strong {
+  margin-top: 5px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.probability-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.probability-highlight {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 150px;
+  padding: 14px;
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 18px;
+  color: inherit;
+  background: linear-gradient(145deg, rgba(17,37,46,.92), rgba(5,14,21,.97));
+  box-shadow: 0 14px 38px rgba(0,0,0,.19);
+  text-decoration: none;
+  overflow: hidden;
+}
+.probability-highlight::after {
+  content: "";
+  position: absolute;
+  width: 116px;
+  height: 116px;
+  right: -44px;
+  bottom: -52px;
+  border-radius: 50%;
+  background: var(--probability-tone, rgba(163,230,53,.12));
+  pointer-events: none;
+}
+.probability-highlight:hover,
+.probability-highlight:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(251,191,36,.40);
+  outline: none;
+}
+.probability-highlight-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.probability-highlight-main {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+  margin-top: 14px;
+}
+.probability-highlight-main strong {
+  min-width: 0;
+  color: #fff;
+  font-size: 17px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.probability-highlight-shield {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+.probability-highlight > b {
+  position: relative;
+  z-index: 1;
+  align-self: end;
+  margin-top: 13px;
+  color: #efffc3;
+  font-size: clamp(27px, 3.2vw, 40px);
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.probability-tone-title { --probability-tone: rgba(251,191,36,.18); }
+.probability-tone-g4 { --probability-tone: rgba(74,222,128,.15); }
+.probability-tone-g6 { --probability-tone: rgba(96,165,250,.15); }
+.probability-tone-libertadores { --probability-tone: rgba(163,230,53,.15); }
+.probability-tone-sulamericana { --probability-tone: rgba(56,189,248,.15); }
+.probability-tone-relegation { --probability-tone: rgba(251,113,133,.17); }
+
+.probability-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 14px 0;
+  padding: 13px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 16px;
+  background: rgba(5,15,22,.55);
+}
+.probability-controls > div:first-child span,
+.probability-controls > div:first-child strong { display: block; }
+.probability-controls > div:first-child span {
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.probability-controls > div:first-child strong { margin-top: 3px; color: #fff; }
+.probability-sort-buttons {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 2px;
+  scrollbar-width: thin;
+}
+.probability-sort-buttons button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius: 999px;
+  color: #dce8f2;
+  background: rgba(255,255,255,.035);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.probability-sort-buttons button.active {
+  color: #101820;
+  border-color: #fcd34d;
+  background: linear-gradient(180deg,#ffd452,#f8c43e);
+}
+.probability-sort-buttons button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+.probability-ranking-section,
+.probability-matches-section,
+.probability-evolution-section {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148,163,184,.13);
+}
+.probability-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 11px;
+}
+.probability-section-head h3 { margin-top: 3px; color: #fff; font-size: 20px; }
+.probability-section-head > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.probability-club-list { display: grid; gap: 10px; }
+.probability-club-card {
+  padding: 13px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(6,17,25,.78), rgba(9,24,31,.74));
+}
+.probability-club-head {
+  display: grid;
+  grid-template-columns: 42px 48px minmax(0,1fr) minmax(128px,auto);
+  align-items: center;
+  gap: 10px;
+}
+.probability-order {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(163,230,53,.27);
+  border-radius: 12px;
+  color: #efffc3;
+  background: rgba(163,230,53,.09);
+  font-size: 16px;
+  font-weight: 950;
+}
+.probability-club-link { display: grid; place-items: center; border-radius: 12px; text-decoration: none; }
+.probability-club-link:focus-visible,
+.probability-club-title a:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.probability-club-shield { width: 44px; height: 44px; object-fit: contain; }
+.probability-club-title { min-width: 0; }
+.probability-club-title a { color: #fff; text-decoration: none; }
+.probability-club-title a:hover strong { color: var(--green); }
+.probability-club-title strong,
+.probability-club-title span { display: block; }
+.probability-club-title strong { font-size: 18px; overflow-wrap: anywhere; }
+.probability-club-title span { margin-top: 4px; color: var(--muted); font-size: 11px; }
+.probability-points { min-width: 128px; text-align: right; }
+.probability-points strong,
+.probability-points span,
+.probability-points small { display: block; }
+.probability-points strong { color: #d9ff76; font-size: 25px; line-height: 1; }
+.probability-points span { margin-top: 3px; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.probability-points small { margin-top: 4px; color: #aebdca; font-size: 10px; }
+.probability-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(6,minmax(0,1fr));
+  gap: 7px;
+  margin-top: 11px;
+}
+.probability-metric {
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid rgba(148,163,184,.10);
+  border-radius: 12px;
+  background: rgba(255,255,255,.022);
+}
+.probability-metric span,
+.probability-metric strong { display: block; }
+.probability-metric span { color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+.probability-metric strong { margin-top: 5px; color: #fff; font-size: 17px; }
+.probability-metric > div {
+  height: 5px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: rgba(96,165,250,.12);
+  overflow: hidden;
+}
+.probability-metric i {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg,#fbbf24,#a3e635);
+}
+.probability-tone-sulamericana i { background: linear-gradient(90deg,#60a5fa,#38bdf8); }
+.probability-tone-relegation i { background: linear-gradient(90deg,#fb7185,#ef4444); }
+.probability-position-details {
+  margin-top: 10px;
+  border-top: 1px solid rgba(148,163,184,.10);
+}
+.probability-position-details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 2px 0;
+  color: #d9ff76;
+  font-size: 11px;
+  font-weight: 950;
+  cursor: pointer;
+}
+.probability-position-details > summary span { color: var(--muted); font-weight: 700; }
+.probability-position-grid {
+  display: grid;
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+.probability-position-cell {
+  display: grid;
+  grid-template-columns: 25px minmax(0,1fr) 45px;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  padding: 6px 7px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.025);
+}
+.probability-position-cell span,
+.probability-position-cell strong { font-size: 9px; }
+.probability-position-cell span { color: var(--muted); }
+.probability-position-cell strong { color: #dbe7f2; text-align: right; }
+.probability-position-cell > div { height: 4px; border-radius: 999px; background: rgba(96,165,250,.11); overflow: hidden; }
+.probability-position-cell i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#60a5fa,#a3e635); }
+
+.probability-evolution-empty {
+  padding: 15px;
+  border: 1px dashed rgba(148,163,184,.20);
+  border-radius: 14px;
+  background: rgba(255,255,255,.022);
+}
+.probability-evolution-empty strong { color: #fff; }
+.probability-evolution-empty p { font-size: 12px; line-height: 1.5; }
+.probability-evolution-list { display: grid; gap: 6px; }
+.probability-evolution-list > div { display: grid; grid-template-columns: minmax(130px,.7fr) minmax(0,1fr) auto; gap: 10px; padding: 10px; border-radius: 11px; background: rgba(255,255,255,.025); }
+.probability-evolution-list time { color: var(--muted); font-size: 11px; }
+.probability-evolution-list strong { color: #fff; }
+.probability-evolution-list b { color: var(--green); }
+
+.probability-methodology {
+  scroll-margin-top: 110px;
+  margin-top: 28px;
+  padding: clamp(18px,3vw,30px);
+  border: 1px solid rgba(251,191,36,.31);
+  border-radius: 23px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(251,191,36,.12), transparent 30%),
+    radial-gradient(circle at 0 100%, rgba(96,165,250,.08), transparent 30%),
+    linear-gradient(145deg, rgba(17,35,42,.98), rgba(5,14,21,.99));
+}
+.probability-methodology h3 { margin: 5px 0 10px; color: #fff4aa; font-size: clamp(24px,3.2vw,34px); line-height: 1.12; }
+.probability-method-lead { max-width: 980px; color: #d9e3ec; font-size: 15px; line-height: 1.7; }
+.probability-method-nav { display: flex; gap: 7px; overflow-x: auto; margin: 18px 0; padding-bottom: 4px; scrollbar-width: thin; }
+.probability-method-nav a { flex: 0 0 auto; padding: 8px 10px; border: 1px solid rgba(148,163,184,.16); border-radius: 999px; color: #dce8f2; background: rgba(255,255,255,.035); font-size: 10px; font-weight: 900; text-decoration: none; }
+.probability-method-nav a:hover { border-color: rgba(163,230,53,.38); color: #eaffb5; }
+.probability-method-sections { display: grid; gap: 10px; }
+.probability-method-sections > article {
+  scroll-margin-top: 108px;
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr);
+  gap: 13px;
+  padding: 16px;
+  border: 1px solid rgba(148,163,184,.13);
+  border-radius: 17px;
+  background: rgba(255,255,255,.026);
+}
+.probability-method-step { display: grid; place-items: center; width: 43px; height: 43px; border: 1px solid rgba(163,230,53,.27); border-radius: 13px; color: #dfff8c; background: rgba(163,230,53,.08); font-size: 13px; font-weight: 950; }
+.probability-method-sections h4 { margin: 0 0 6px; color: #fff; font-size: 17px; }
+.probability-method-sections p { margin: 5px 0 0; color: #aebdca; font-size: 13px; line-height: 1.62; }
+.probability-formula { display: grid; gap: 7px; margin: 11px 0; }
+.probability-formula code { display: block; padding: 11px 12px; border: 1px solid rgba(96,165,250,.18); border-radius: 12px; color: #e8f4ff; background: rgba(7,18,32,.82); font-family: "SFMono-Regular",Consolas,"Liberation Mono",monospace; font-size: 12px; overflow-x: auto; }
+.probability-audit-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; margin-top: 14px; }
+.probability-audit-grid article { min-width: 0; padding: 12px; border: 1px solid rgba(148,163,184,.13); border-radius: 14px; background: rgba(5,15,22,.54); }
+.probability-audit-grid span,
+.probability-audit-grid strong,
+.probability-audit-grid small { display: block; }
+.probability-audit-grid span { color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.probability-audit-grid strong { margin-top: 5px; color: #d9ff76; font-size: 17px; overflow-wrap: anywhere; }
+.probability-audit-grid small { margin-top: 4px; color: var(--muted-2); font-size: 9px; line-height: 1.35; }
+.probability-reading-guide { margin-top: 14px; padding: 16px; border-left: 4px solid #fbbf24; border-radius: 0 16px 16px 0; background: rgba(251,191,36,.055); }
+.probability-reading-guide h4 { margin: 0 0 10px; color: #fff4aa; }
+.probability-reading-guide > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.probability-reading-guide p { margin: 0; color: #b7c5d1; font-size: 12px; line-height: 1.5; }
+.probability-reading-guide strong { color: #fff; }
+.probability-authorship { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 14px; padding: 16px; border: 1px solid rgba(163,230,53,.20); border-radius: 17px; background: rgba(163,230,53,.045); }
+.probability-authorship span,
+.probability-authorship strong { display: block; }
+.probability-authorship span { color: var(--green); font-size: 9px; font-weight: 950; letter-spacing: .07em; text-transform: uppercase; }
+.probability-authorship strong { margin-top: 5px; color: #fff; font-size: 19px; }
+.probability-authorship p { font-size: 12px; line-height: 1.45; }
+.probability-feedback { flex: 0 0 auto; min-height: 43px; padding: 10px 13px; border-radius: 13px; }
+.probability-references { margin-top: 14px; padding: 16px; border: 1px solid rgba(148,163,184,.13); border-radius: 17px; background: rgba(5,15,22,.52); }
+.probability-references h4 { margin: 0 0 9px; color: #fff; }
+.probability-references ol { display: grid; gap: 8px; margin: 0; padding-left: 20px; }
+.probability-references li { color: #aebdca; font-size: 11px; line-height: 1.5; }
+.probability-references a { color: #d9ff76; font-weight: 900; }
+.probability-method-disclaimer { margin-top: 14px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.probability-back-top { display: inline-flex; margin-top: 15px; padding: 10px 14px; border: 1px solid rgba(163,230,53,.28); border-radius: 999px; color: #eaffb5; background: rgba(163,230,53,.08); font-size: 12px; font-weight: 950; text-decoration: none; }
+.probability-back-top:hover,
+.probability-back-top:focus-visible { background: rgba(163,230,53,.14); outline: none; }
+
+@media (min-width: 850px) {
+  .stats-tabs { grid-template-columns: repeat(6,minmax(0,1fr)); }
+  .stats-tab-wide { grid-column: 1 / -1; }
+}
+@media (max-width: 920px) {
+  .probability-status-grid,
+  .probability-highlight-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .probability-metric-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+  .probability-position-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .probability-audit-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 700px) {
+  .probability-controls { display: block; }
+  .probability-sort-buttons { margin-top: 10px; }
+  .probability-club-head { grid-template-columns: 38px 42px minmax(0,1fr); }
+  .probability-order { width: 36px; height: 36px; font-size: 14px; }
+  .probability-club-shield { width: 39px; height: 39px; }
+  .probability-points { grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: baseline; gap: 8px; min-width: 0; margin-top: 2px; padding-top: 9px; border-top: 1px solid rgba(148,163,184,.10); text-align: left; }
+  .probability-points span { margin: 0; }
+  .probability-points small { margin: 0; text-align: right; }
+  .probability-reading-guide > div { grid-template-columns: 1fr; }
+  .probability-authorship { display: block; }
+  .probability-feedback { width: 100%; margin-top: 12px; }
+}
+@media (max-width: 560px) {
+  .probability-intro { font-size: 13px; }
+  .probability-status-grid,
+  .probability-highlight-grid { grid-template-columns: 1fr 1fr; gap: 7px; }
+  .probability-status-grid > div { padding: 10px; }
+  .probability-status-grid strong { font-size: 11px; }
+  .probability-highlight { min-height: 130px; padding: 11px; }
+  .probability-highlight-label { font-size: 8px; }
+  .probability-highlight-main { gap: 6px; margin-top: 10px; }
+  .probability-highlight-main strong { font-size: 14px; }
+  .probability-highlight-shield { width: 34px; height: 34px; }
+  .probability-highlight > b { font-size: 25px; }
+  .probability-section-head { align-items: flex-start; }
+  .probability-section-head h3 { font-size: 17px; }
+  .probability-club-card { padding: 10px; }
+  .probability-club-title strong { font-size: 15px; }
+  .probability-club-title span { font-size: 9px; }
+  .probability-metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; }
+  .probability-metric { padding: 8px; }
+  .probability-metric strong { font-size: 15px; }
+  .probability-position-details > summary { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .probability-position-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .probability-methodology { padding: 15px; }
+  .probability-method-sections > article { grid-template-columns: 38px minmax(0,1fr); gap: 9px; padding: 12px; }
+  .probability-method-step { width: 35px; height: 35px; font-size: 11px; }
+  .probability-method-sections h4 { font-size: 15px; }
+  .probability-method-sections p { font-size: 12px; }
+  .probability-audit-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; }
+  .probability-audit-grid article { padding: 9px; }
+  .probability-audit-grid strong { font-size: 14px; }
+  .probability-evolution-list > div { grid-template-columns: 1fr auto; }
+  .probability-evolution-list time { grid-column: 1 / -1; }
+}
