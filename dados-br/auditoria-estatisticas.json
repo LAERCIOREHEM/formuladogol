@@ -1,10 +1,10 @@
 {
-  "gerado_em": "2026-07-18T04:18:31.768033-03:00",
+  "gerado_em": "2026-07-18T14:18:13.242145-03:00",
   "status": "ok",
   "resumo": {
     "clubes": 20,
-    "jogos_finalizados": 181,
-    "jogos_com_detalhes": 181,
+    "jogos_finalizados": 182,
+    "jogos_com_detalhes": 182,
     "jogos_com_estatisticas": 181,
     "jogos_com_publico": 177,
     "artilheiros": 213,
@@ -36,7 +36,7 @@
       "origem_complementar": "ranking ESPN conferido nos eventos"
     },
     "erros_criticos": 0,
-    "avisos": 0
+    "avisos": 1
   },
   "fontes": {
     "lideres": "ESPN · ranking oficial + eventos validados das partidas",
@@ -83,16 +83,16 @@
       },
       "completude": {
         "artilharia": {
-          "jogos_lidos": 181,
-          "jogos_invalidos_ignorados": 0,
+          "jogos_lidos": 182,
+          "jogos_invalidos_ignorados": 1,
           "jogadores": 214,
           "total_eventos_contabilizados": 466,
           "gols_contra_ignorados": 14,
           "jogadores_publicados": 213
         },
         "assistencias": {
-          "jogos_lidos": 181,
-          "jogos_invalidos_ignorados": 0,
+          "jogos_lidos": 182,
+          "jogos_invalidos_ignorados": 1,
           "jogadores": 196,
           "total_eventos_contabilizados": 319,
           "gols_contra_ignorados": 0,
@@ -101,7 +101,7 @@
       }
     },
     "detalhes": {
-      "total_processados": 181,
+      "total_processados": 182,
       "total_com_estatisticas": 181,
       "total_com_publico": 177,
       "total_falhas": 0
@@ -109,10 +109,15 @@
   },
   "jogos_sem_detalhes": [],
   "eventos_inconsistentes": [],
+  "resultados_manuais_pendentes_detalhes": [
+    "401840998: resultado manual confirmado; eventos nominais aguardando ESPN"
+  ],
   "eventos_duplicados": [],
   "falsos_gols_de_narracao": [],
   "elencos_incompletos": [],
   "nomes_suspeitos": [],
   "erros_criticos": [],
-  "avisos": []
+  "avisos": [
+    "1 resultado(s) manual(is) confirmado(s) aguardando detalhes nominais da ESPN"
+  ]
 }

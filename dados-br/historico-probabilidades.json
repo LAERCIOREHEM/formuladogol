@@ -1,8 +1,16 @@
 {
-  "schema_version": 1,
+  "schema_version": 3,
   "projeto": "AF-Previsão",
-  "descricao": "Histórico versionado das probabilidades; um snapshot por alteração dos dados de entrada.",
+  "descricao": "Histórico público e encadeado das probabilidades; um snapshot por alteração do estado esportivo, identificado por rodada e hash da entrada.",
   "total_snapshots": 1,
+  "integridade": {
+    "algoritmo": "SHA-256",
+    "regra": "cada hash inclui todo o snapshot e o hash do elo anterior",
+    "quantidade_snapshots": 1,
+    "hash_inicial": "102ff233747de8e714b7c37493d033b270209d84a08007ddbf5eef3258e49c9b",
+    "hash_final": "102ff233747de8e714b7c37493d033b270209d84a08007ddbf5eef3258e49c9b",
+    "encadeamento_valido": true
+  },
   "snapshots": [
     {
       "gerado_em": "2026-07-16T21:24:00-03:00",
@@ -169,7 +177,9 @@
           "rebaixamento_pct": 99.7825,
           "pontos_medios": 26.473
         }
-      ]
+      ],
+      "hash_anterior": null,
+      "hash_snapshot": "102ff233747de8e714b7c37493d033b270209d84a08007ddbf5eef3258e49c9b"
     }
   ]
 }

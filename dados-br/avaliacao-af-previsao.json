@@ -2,23 +2,21 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-07-18T08:53:24-03:00",
+  "gerado_em": "2026-07-18T14:18:12-03:00",
   "versao_avaliacao": "AF-Avaliação 1.0",
   "integridade_historico": {
     "valido": true,
-    "encadeado": false,
-    "algoritmo": null,
+    "encadeado": true,
+    "algoritmo": "SHA-256",
     "quantidade_snapshots": 1,
-    "hash_inicial": null,
-    "hash_final": null,
+    "hash_inicial": "102ff233747de8e714b7c37493d033b270209d84a08007ddbf5eef3258e49c9b",
+    "hash_final": "102ff233747de8e714b7c37493d033b270209d84a08007ddbf5eef3258e49c9b",
     "rodadas_distintas": [],
     "modelos_registrados": [
       "AF-Previsão 1.0"
     ],
     "erros": [],
-    "avisos": [
-      "histórico estruturalmente válido, mas ainda sem cadeia SHA-256 da Execução 5"
-    ]
+    "avisos": []
   },
   "cobertura": {
     "snapshots": 1,
