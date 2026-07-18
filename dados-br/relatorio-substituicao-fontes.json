@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-07-18T02:06:53-03:00",
+  "atualizado_em": "2026-07-18T09:10:15-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, CazéTV ou Amazon Prime Video. Se não achar nessas fontes, fica sem vídeo.",
@@ -9,9 +9,9 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 614,
-    "playlist_items": 13,
-    "search": 6,
+    "unidades": 1,
+    "playlist_items": 0,
+    "search": 0,
     "channels": 1,
     "videos": 0
   },
@@ -21,39 +21,39 @@
   },
   "resumo_geral_antes": {
     "jogos_resultados": 181,
-    "ge": 179,
+    "ge": 180,
     "caze": 0,
     "prime": 1,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 180
+    "sem_video": 0,
+    "com_fonte_preferida": 181
   },
   "resumo_geral_depois": {
     "jogos_resultados": 181,
-    "ge": 179,
+    "ge": 180,
     "caze": 0,
     "prime": 1,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 180
+    "sem_video": 0,
+    "com_fonte_preferida": 181
   },
   "resumo_janela_antes": {
     "jogos_resultados": 181,
-    "ge": 179,
+    "ge": 180,
     "caze": 0,
     "prime": 1,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 180
+    "sem_video": 0,
+    "com_fonte_preferida": 181
   },
   "resumo_janela_depois": {
     "jogos_resultados": 181,
-    "ge": 179,
+    "ge": 180,
     "caze": 0,
     "prime": 1,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 180
+    "sem_video": 0,
+    "com_fonte_preferida": 181
   },
   "mantidos_preferidos_na_janela": [
     {
@@ -68,6 +68,19 @@
       "channel_title": "",
       "titulo_anterior": "FLUMINENSE 1 X 1 BRAGANTINO | MELHORES MOMENTOS | 19ª RODADA BRASILEIRÃO 2026 | ge.globo",
       "url_anterior": "https://www.youtube.com/watch?v=ZFeyRKdy_zM"
+    },
+    {
+      "event_id": "401841155",
+      "rodada": 19,
+      "mandante": "Mirassol",
+      "visitante": "Grêmio",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "motivo": "mantido: fonte preferida (ge)",
+      "fonte_anterior": "GE TV / YouTube",
+      "channel_title": "",
+      "titulo_anterior": "MIRASSOL 2 X 1 GRÊMIO | MELHORES MOMENTOS | 19ª RODADA BRASILEIRÃO 2026 | ge.globo",
+      "url_anterior": "https://www.youtube.com/watch?v=15Tnr4zxa44"
     },
     {
       "event_id": "401841149",
@@ -2399,68 +2412,7 @@
   ],
   "substituidos_para_fontes_preferidas": [],
   "removidos_por_fonte_nao_preferida": [],
-  "ainda_sem_link_preferido": [
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "mandante": "Mirassol",
-      "visitante": "Grêmio",
-      "placar_mandante": 2,
-      "placar_visitante": 1,
-      "motivo": "sem link em GE/Globo, CazéTV ou Prime Video"
-    }
-  ],
-  "buscas_executadas_em_canais_preferidos": [
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "jogo": "Mirassol x Grêmio",
-      "canal": "ge",
-      "query": "\"Mirassol 2 x 1 Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 6
-    },
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "jogo": "Mirassol x Grêmio",
-      "canal": "caze",
-      "query": "\"Mirassol 2 x 1 Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 4
-    },
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "jogo": "Mirassol x Grêmio",
-      "canal": "prime",
-      "query": "\"Mirassol 2 x 1 Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 0
-    },
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "jogo": "Mirassol x Grêmio",
-      "canal": "ge",
-      "query": "\"Mirassol x Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 6
-    },
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "jogo": "Mirassol x Grêmio",
-      "canal": "caze",
-      "query": "\"Mirassol x Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 4
-    },
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "jogo": "Mirassol x Grêmio",
-      "canal": "prime",
-      "query": "\"Mirassol x Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 0
-    }
-  ],
-  "erros": [
-    "Falha ao varrer uploads Prime Video: YouTube API HTTP 404 em playlistItems: {\n  \"error\": {\n    \"code\": 404,\n    \"message\": \"The playlist identified with the request's \\u003ccode\\u003eplaylistId\\u003c/code\\u003e parameter cannot be found.\",\n    \"errors\": [\n      {\n        \"message\": \"The playlist identified with the request's \\u003ccode\\u003eplaylistId\\u003c/code\\u003e parameter cannot be found.\",\n        \"domain\": \"youtube.playlistItem\",\n        \"reason\": \"playlistNotFound\",\n        \"location\": \"playlistId\",\n        \"locationType\": \"parameter\"\n      }\n    ]\n  }\n}\n"
-  ]
+  "ainda_sem_link_preferido": [],
+  "buscas_executadas_em_canais_preferidos": [],
+  "erros": []
 }
