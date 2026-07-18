@@ -1749,6 +1749,24 @@
   }
   .tabela-br tbody tr:nth-child(even) { background: rgba(255,255,255,.015); }
   .tabela-br tbody tr:hover { background: rgba(163,230,53,.045); }
+  .tabela-pos-cell {
+    width: 86px;
+    min-width: 86px;
+    white-space: nowrap;
+  }
+  .tabela-pos-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    max-width: 100%;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .tabela-pos-wrap .seta-mov {
+    flex: 0 0 auto;
+    margin: 0;
+  }
   .tabela-pos-badge {
     display: inline-flex;
     align-items: center;
@@ -1760,6 +1778,7 @@
     color: #e8f2ff;
     background: rgba(255,255,255,.06);
     border: 1px solid rgba(255,255,255,.08);
+    flex: 0 0 auto;
   }
   .zona-libertadores .tabela-pos-badge { color: #052e16; background: #4ade80; }
   .zona-prelibertadores .tabela-pos-badge { color: #13280a; background: #bef264; }
@@ -1838,8 +1857,19 @@
     .tabela-shell { border-radius: 16px; }
     .tabela-br { min-width: 0; width: 100%; }
     .tabela-br .col-oculta-mobile { display: none; }
-    .tabela-br th:nth-child(2), .tabela-br td:nth-child(2) { width: 46%; }
+    .tabela-br th:first-child, .tabela-br td:first-child {
+      width: 84px;
+      min-width: 84px;
+      max-width: 84px;
+      padding-left: 6px;
+      padding-right: 4px;
+      overflow: hidden;
+    }
+    .tabela-br th:nth-child(2), .tabela-br td:nth-child(2) { width: auto; }
     .tabela-br th, .tabela-br td { padding: 8px 6px; font-size: 12px; }
+    .tabela-pos-cell { width: 84px; min-width: 84px; }
+    .tabela-pos-wrap { gap: 4px; }
+    .tabela-pos-wrap .seta-mov { font-size: 9px; padding: 2px 3px; }
     .tabela-pos-badge { min-width: 26px; height: 26px; border-radius: 9px; }
     .tabela-escudo { width: 22px; height: 22px; }
     .tabela-time-cel span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -3849,7 +3879,7 @@ function renderTabela() {
   html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">${statusTabela}</span></div>`;
   html += '<div class="mobile-table-hint">↔ Arraste a tabela para os lados no celular para ver pontos, jogos, vitórias, empates, derrotas, gols, saldo, aproveitamento e forma.</div>';
   html += '<div class="tabela-shell"><div class="tabela-scroll" tabindex="0" aria-label="Tabela completa com rolagem horizontal"><table class="tabela-br"><thead><tr>' +
-    '<th style="width:64px;">Pos</th><th>Time</th>' +
+    '<th style="width:86px;">Pos</th><th>Time</th>' +
     '<th style="text-align:center;">P</th>' +
     '<th style="text-align:center;">J</th>' +
     '<th style="text-align:center;" class="col-oculta-mobile">V</th>' +
@@ -3877,7 +3907,7 @@ function renderTabela() {
         f5.map(r => `<span class="forma-dot forma-${r.toLowerCase()}">${r}</span>`).join('') +
         '</span></td>';
     }
-    html += `<tr class="${cls}"><td><span class="tabela-pos-badge">${t.pos}</span>${seta}</td><td>${celTime}</td>` +
+    html += `<tr class="${cls}"><td class="tabela-pos-cell"><span class="tabela-pos-wrap"><span class="tabela-pos-badge">${t.pos}</span>${seta}</span></td><td>${celTime}</td>` +
       `<td style="text-align:center;"><span class="tabela-pontos">${t.pontos}</span></td>` +
       `<td style="text-align:center;">${t.jogos}</td>` +
       `<td style="text-align:center;" class="col-oculta-mobile">${t.vitorias}</td>` +

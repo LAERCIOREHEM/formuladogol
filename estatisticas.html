@@ -149,7 +149,8 @@
                   <p><strong>Vias exclusivas:</strong> o detalhamento não conta o mesmo universo duas vezes; a soma dos caminhos fecha com a chance total.</p>
                   <p><strong>&lt;0,1% não é impossível:</strong> significa que o evento foi raríssimo ou não apareceu nas simulações realizadas.</p>
                   <p><strong>Posição e pontos:</strong> aparecem como inteiros para facilitar a leitura; as médias decimais permanecem guardadas no JSON para auditoria.</p>
-                  <p><strong>Histórico compacto:</strong> cada clube guarda, no próprio card, a evolução de posição, pontos e probabilidades por estado esportivo.</p>
+                  <p><strong>Tendência recente:</strong> os últimos 12 jogos entram por suavização exponencial apenas como ajuste conservador. Esse componente pesa 8% e não pode alterar em mais de 10% a taxa de gols prevista para uma partida.</p>
+                  <p><strong>Histórico auditável:</strong> cada clube guarda, no próprio card, a evolução de posição, pontos e probabilidades. Os snapshots só são criados quando o estado esportivo muda e ficam encadeados por SHA-256 para permitir a avaliação posterior do modelo.</p>
                 </div>
               </div>
 
