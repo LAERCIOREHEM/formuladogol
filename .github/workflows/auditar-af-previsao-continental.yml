@@ -7,6 +7,7 @@ on:
       - 'scripts/atualizar_competicoes_af_previsao.py'
       - 'scripts/af_previsao_continental.py'
       - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/avaliar_af_previsao.py'
       - 'scripts/af_previsao_backtest.py'
       - 'dados-br/config-af-previsao.json'
       - 'dados-br/historico-af-previsao/**'
@@ -54,10 +55,12 @@ jobs:
             scripts/af_previsao_backtest.py \
             scripts/atualizar_competicoes_af_previsao.py \
             scripts/af_previsao_continental.py \
-            scripts/gerar_probabilidades_brasileirao.py
+            scripts/gerar_probabilidades_brasileirao.py \
+            scripts/avaliar_af_previsao.py
           python scripts/atualizar_competicoes_af_previsao.py --self-test
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
+          python scripts/avaliar_af_previsao.py --self-test
 
       - name: Sincronizar o estado corrente do Brasileirão
         run: |
@@ -71,6 +74,9 @@ jobs:
       - name: Executar integração continental de auditoria
         run: python scripts/gerar_probabilidades_brasileirao.py --simulacoes 200000 --semente 20260718
 
+      - name: Auditar histórico encadeado e avaliação futura
+        run: python scripts/avaliar_af_previsao.py --strict
+
       - name: Validar artefatos integrados
         run: |
           set -euo pipefail
@@ -81,7 +87,8 @@ jobs:
             dados-br/auditoria-competicoes-af-previsao.json \
             dados-br/probabilidades-brasileirao.json \
             dados-br/auditoria-probabilidades.json \
-            dados-br/historico-probabilidades.json; do
+            dados-br/historico-probabilidades.json \
+            dados-br/avaliacao-af-previsao.json; do
             test -s "$arquivo"
             python -m json.tool "$arquivo" > /dev/null
             echo "OK $arquivo"
@@ -110,14 +117,20 @@ jobs:
           previsao = json.load(open('dados-br/probabilidades-brasileirao.json', encoding='utf-8'))
           auditoria = json.load(open('dados-br/auditoria-probabilidades.json', encoding='utf-8'))
           historico = json.load(open('dados-br/historico-probabilidades.json', encoding='utf-8'))
+          avaliacao = json.load(open('dados-br/avaliacao-af-previsao.json', encoding='utf-8'))
           assert previsao.get('schema_version', 0) >= 2
           assert previsao.get('status') == 'ok'
           assert previsao.get('integracao_continental', {}).get('status') == 'ok'
           assert auditoria.get('schema_version', 0) >= 2
           assert auditoria.get('hash_entrada') == previsao.get('hash_entrada')
           assert len(previsao.get('clubes') or []) == 20
-          assert historico.get('schema_version', 0) >= 2
+          assert historico.get('schema_version', 0) >= 3
           assert (historico.get('snapshots') or [])[-1].get('hash_entrada') == previsao.get('hash_entrada')
+          assert (historico.get('integridade') or {}).get('encadeamento_valido') is True
+          assert (historico.get('integridade') or {}).get('hash_final') == (historico.get('snapshots') or [])[-1].get('hash_snapshot')
+          assert avaliacao.get('status') in {'coletando_historico', 'aguardando_resultados_continentais', 'avaliacao_concluida', 'avaliacao_concluida_amostra_reduzida'}
+          assert (avaliacao.get('integridade_historico') or {}).get('valido') is True
+          assert (avaliacao.get('integridade_historico') or {}).get('encadeado') is True
 
           total_sula = 0.0
           for clube in previsao['clubes']:

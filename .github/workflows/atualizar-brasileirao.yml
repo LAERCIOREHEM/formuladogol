@@ -27,6 +27,7 @@ on:
       - 'scripts/gerar_auditoria_cobertura_resultados.py'
       - 'scripts/gerar_auditoria_calendario.py'
       - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/avaliar_af_previsao.py'
       - 'scripts/af_previsao_continental.py'
       - 'scripts/atualizar_competicoes_af_previsao.py'
       - 'scripts/af_previsao_backtest.py'
@@ -90,12 +91,14 @@ jobs:
             scripts/af_previsao_backtest.py \
             scripts/af_previsao_continental.py \
             scripts/atualizar_competicoes_af_previsao.py \
-            scripts/gerar_probabilidades_brasileirao.py
+            scripts/gerar_probabilidades_brasileirao.py \
+            scripts/avaliar_af_previsao.py
           python scripts/buscar_lideres_jogadores_espn.py --self-test
           python scripts/buscar_detalhes_jogos_brasileirao.py --self-test
           python scripts/atualizar_competicoes_af_previsao.py --self-test
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
+          python scripts/avaliar_af_previsao.py --self-test
 
       # --- DADOS DO BRASILEIRAO (100% ESPN) ---
       # O script grava os quatro JSONs de uma vez e falha antes de publicar
@@ -122,6 +125,9 @@ jobs:
       - name: Gerar AF-Previsão integrado e simular o restante do campeonato
         run: python scripts/gerar_probabilidades_brasileirao.py
 
+      - name: Auditar histórico e preparar avaliação final do AF-Previsão
+        run: python scripts/avaliar_af_previsao.py --strict
+
       - name: Gerar estatísticas gerais da competição
         run: python scripts/gerar_estatisticas_competicao_brasileirao.py
 
@@ -135,7 +141,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -259,6 +265,14 @@ jobs:
           hist_prev = json.load(open('dados-br/historico-probabilidades.json', encoding='utf-8'))
           assert hist_prev.get('total_snapshots', 0) >= 1, 'histórico do AF-Previsão vazio'
           assert (hist_prev.get('snapshots') or [])[-1].get('hash_entrada') == previsao.get('hash_entrada'), 'histórico não termina no estado publicado'
+          assert hist_prev.get('schema_version', 0) >= 3, 'histórico sem encadeamento da Execução 5'
+          integridade_hist = hist_prev.get('integridade') or {}
+          assert integridade_hist.get('encadeamento_valido') is True, 'histórico sem integridade declarada'
+          assert integridade_hist.get('hash_final') == (hist_prev.get('snapshots') or [])[-1].get('hash_snapshot'), 'hash final do histórico divergente'
+          avaliacao = json.load(open('dados-br/avaliacao-af-previsao.json', encoding='utf-8'))
+          assert avaliacao.get('status') in {'coletando_historico', 'aguardando_resultados_continentais', 'avaliacao_concluida', 'avaliacao_concluida_amostra_reduzida'}, 'status inválido da avaliação AF'
+          assert (avaliacao.get('integridade_historico') or {}).get('valido') is True, 'avaliação detectou histórico inválido'
+          assert (avaliacao.get('integridade_historico') or {}).get('encadeado') is True, 'avaliação não reconheceu a cadeia do histórico'
           print('  OK   Estatísticas, calendário e AF-Previsão gerados')
           PY
 
@@ -300,6 +314,7 @@ jobs:
             "dados-br/probabilidades-brasileirao.json"
             "dados-br/auditoria-probabilidades.json"
             "dados-br/historico-probabilidades.json"
+            "dados-br/avaliacao-af-previsao.json"
           )
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
