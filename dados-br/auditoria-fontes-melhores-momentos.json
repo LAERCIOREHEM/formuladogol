@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-07-17T15:30:12-03:00",
+  "atualizado_em": "2026-07-18T00:45:09-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "Somente GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video ou CazéTV podem aparecer no site. Se não houver fonte preferida, o jogo fica sem vídeo.",
@@ -12,17 +12,26 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 179,
-    "jogos_com_video": 179,
-    "ge_globo": 178,
+    "jogos_resultados": 181,
+    "jogos_com_video": 180,
+    "ge_globo": 179,
     "amazon_prime_video": 1,
     "cazetv": 0,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [],
+  "sem_video": [
+    {
+      "event_id": "401841155",
+      "rodada": 19,
+      "mandante": "Mirassol",
+      "visitante": "Grêmio",
+      "placar_mandante": 2,
+      "placar_visitante": 1
+    }
+  ],
   "detalhamento": {
     "ge_globo": [
       {
@@ -2855,6 +2864,22 @@
         "channel_title": "",
         "titulo": "BOTAFOGO 2 X 1 SANTOS | MELHORES MOMENTOS | 19ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=VFzOlR_6Y2M",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841153",
+        "rodada": 19,
+        "mandante": "Fluminense",
+        "visitante": "Bragantino",
+        "placar_mandante": 1,
+        "placar_visitante": 1,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "",
+        "channel_title": "",
+        "titulo": "FLUMINENSE 1 X 1 BRAGANTINO | MELHORES MOMENTOS | 19ª RODADA BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=ZFeyRKdy_zM",
         "confianca": 1.0
       },
       {
