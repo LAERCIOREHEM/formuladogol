@@ -1,16 +1,17 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-07-18T18:23:30.609456-03:00",
+  "gerado_em": "2026-07-18T18:54:35.606942-03:00",
   "fonte": "ESPN summary",
   "total_jogos": 182,
-  "total_com_estatisticas": 181,
+  "total_com_estatisticas": 182,
   "total_com_publico": 177,
-  "total_com_eventos": 181,
-  "total_eventos_validados": 181,
-  "total_eventos_pendentes_detalhes": 1,
+  "total_com_eventos": 182,
+  "total_eventos_validados": 182,
+  "total_eventos_pendentes_detalhes": 0,
   "jogos": {
     "401841153": {
       "event_id": "401841153",
+      "event_id_fonte_detalhes": "401841153",
       "rodada": 19,
       "data_iso": "2026-07-17T20:00",
       "mandante": "Fluminense",
@@ -328,10 +329,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:17.605612-03:00"
+      "atualizado_em": "2026-07-18T18:53:19.964824-03:00"
     },
     "401841155": {
       "event_id": "401841155",
+      "event_id_fonte_detalhes": "401841155",
       "rodada": 19,
       "data_iso": "2026-07-17T20:00",
       "mandante": "Mirassol",
@@ -630,10 +632,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:18.012993-03:00"
+      "atualizado_em": "2026-07-18T18:53:20.331648-03:00"
     },
     "401840998": {
       "event_id": "401840998",
+      "event_id_fonte_detalhes": "401879459",
       "rodada": 4,
       "data_iso": "2026-07-17T19:30",
       "mandante": "Bahia",
@@ -644,42 +647,274 @@
       "publico": null,
       "publico_tipo": "",
       "publico_fonte": "",
-      "arbitro": "",
-      "stats": [],
-      "estatisticas": [],
-      "gols": [],
-      "cartoes": [],
+      "arbitro": "Paulo Cezar Zanovelli Da Silva",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "64.9%",
+          "away": "35.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "17",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "10",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "17",
+          "away": "17"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "461",
+          "away": "221"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "506",
+          "away": "266"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "9",
+          "away": "17"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "6"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "4",
+          "away": "19"
+        },
+        {
+          "nome": "Cortes",
+          "home": "13",
+          "away": "37"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "64.9%",
+          "away": "35.1%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "17",
+          "away": "10"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "10",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "17",
+          "away": "17"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "461",
+          "away": "221"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "506",
+          "away": "266"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "9",
+          "away": "17"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "6"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "4",
+          "away": "19"
+        },
+        {
+          "nome": "Cortes",
+          "home": "13",
+          "away": "37"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "12'",
+          "jogador": "Rodrigo Nestor",
+          "time": "Bahia",
+          "assistencias": [],
+          "descricao": "Penalty - Scored 98 Goal! Bahia 1, Chapecoense 0. Rodrigo Nestor (Bahia) converts the penalty with a left footed shot to the centre of the goal. Rodrigo Nestor Penalty - Scored"
+        },
+        {
+          "minuto": "34'",
+          "jogador": "Román Gómez",
+          "time": "Bahia",
+          "assistencias": [
+            "David Duarte"
+          ],
+          "descricao": "Goal - Header 137 Goal! Bahia 2, Chapecoense 0. Román Gómez (Bahia) header from the centre of the box to the bottom right corner. Assisted by David Duarte with a headed pass following a corner. Román Gómez Goal - Header"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "64'",
+          "jogador": "Zé Guilherme",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Zé Guilherme (Bahia) is shown the yellow card. Zé Guilherme Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "83'",
+          "jogador": "Luciano Juba",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Luciano Juba (Bahia) is shown the yellow card. Luciano Juba Yellow Card"
+        }
+      ],
       "validacao_eventos": {
         "gols_esperados": {
           "Bahia": 2,
           "Chapecoense": 0
         },
         "gols_extraidos": {
-          "Bahia": 0,
+          "Bahia": 2,
           "Chapecoense": 0
         },
-        "gols_ok": false,
-        "cartoes_esperados": {},
-        "cartoes_extraidos": {},
-        "cartoes_completos": false,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Bahia": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Chapecoense": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Bahia": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Chapecoense": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
         "cartoes_sem_excesso": true,
         "cartoes_time_desconhecido": 0,
         "cartoes_duplicados": 0,
         "cartoes_ok": true,
-        "ok": false,
-        "resultado_confirmado": true,
-        "pendente_detalhes": true,
-        "motivo": "Summary ESPN respondeu sem eventos compatíveis com o placar confirmado."
+        "ok": true
       },
       "fonte": "Resultado confirmado; detalhes ESPN",
       "resultado_manual": true,
       "origem_resultado": "manual confirmado — resultado público e vídeo publicado pelo UOL Esporte",
       "motivo_resultado_manual": "A ESPN manteve o event_id reagendado com placar/status incompatível com o resultado público confirmado.",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:18.200560-03:00"
+      "atualizado_em": "2026-07-18T18:53:20.723503-03:00"
     },
     "401841149": {
       "event_id": "401841149",
+      "event_id_fonte_detalhes": "401841149",
       "rodada": 19,
       "data_iso": "2026-07-16T19:30",
       "mandante": "Botafogo",
@@ -988,10 +1223,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:18.828039-03:00"
+      "atualizado_em": "2026-07-18T18:53:21.102400-03:00"
     },
     "401841157": {
       "event_id": "401841157",
+      "event_id_fonte_detalhes": "401841157",
       "rodada": 19,
       "data_iso": "2026-07-16T19:30",
       "mandante": "Vitória",
@@ -1243,10 +1479,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:19.184853-03:00"
+      "atualizado_em": "2026-07-18T18:53:21.489729-03:00"
     },
     "401841145": {
       "event_id": "401841145",
+      "event_id_fonte_detalhes": "401841145",
       "rodada": 18,
       "data_iso": "2026-05-31T20:30",
       "mandante": "Cruzeiro",
@@ -1532,10 +1769,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:19.557873-03:00"
+      "atualizado_em": "2026-07-18T18:53:21.889751-03:00"
     },
     "401841147": {
       "event_id": "401841147",
+      "event_id_fonte_detalhes": "401841147",
       "rodada": 18,
       "data_iso": "2026-05-31T20:30",
       "mandante": "Remo",
@@ -1809,10 +2047,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:19.901226-03:00"
+      "atualizado_em": "2026-07-18T18:53:22.257612-03:00"
     },
     "401841140": {
       "event_id": "401841140",
+      "event_id_fonte_detalhes": "401841140",
       "rodada": 18,
       "data_iso": "2026-05-31T16:00",
       "mandante": "Palmeiras",
@@ -2086,10 +2325,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:20.249930-03:00"
+      "atualizado_em": "2026-07-18T18:53:22.666613-03:00"
     },
     "401841142": {
       "event_id": "401841142",
+      "event_id_fonte_detalhes": "401841142",
       "rodada": 18,
       "data_iso": "2026-05-31T16:00",
       "mandante": "Vasco da Gama",
@@ -2356,10 +2596,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:20.623081-03:00"
+      "atualizado_em": "2026-07-18T18:53:23.047846-03:00"
     },
     "401841141": {
       "event_id": "401841141",
+      "event_id_fonte_detalhes": "401841141",
       "rodada": 18,
       "data_iso": "2026-05-31T11:00",
       "mandante": "Bragantino",
@@ -2677,10 +2918,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:20.996075-03:00"
+      "atualizado_em": "2026-07-18T18:53:23.438219-03:00"
     },
     "401841143": {
       "event_id": "401841143",
+      "event_id_fonte_detalhes": "401841143",
       "rodada": 18,
       "data_iso": "2026-05-30T20:00",
       "mandante": "Santos",
@@ -3014,10 +3256,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:21.384604-03:00"
+      "atualizado_em": "2026-07-18T18:53:23.832632-03:00"
     },
     "401841146": {
       "event_id": "401841146",
+      "event_id_fonte_detalhes": "401841146",
       "rodada": 18,
       "data_iso": "2026-05-30T17:30",
       "mandante": "Bahia",
@@ -3354,10 +3597,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:21.755092-03:00"
+      "atualizado_em": "2026-07-18T18:53:24.237624-03:00"
     },
     "401841139": {
       "event_id": "401841139",
+      "event_id_fonte_detalhes": "401841139",
       "rodada": 18,
       "data_iso": "2026-05-30T17:30",
       "mandante": "Grêmio",
@@ -3675,10 +3919,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:22.153277-03:00"
+      "atualizado_em": "2026-07-18T18:53:24.653584-03:00"
     },
     "401841138": {
       "event_id": "401841138",
+      "event_id_fonte_detalhes": "401841138",
       "rodada": 18,
       "data_iso": "2026-05-30T16:00",
       "mandante": "Athletico-PR",
@@ -3966,10 +4211,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:22.526098-03:00"
+      "atualizado_em": "2026-07-18T18:53:25.018550-03:00"
     },
     "401841144": {
       "event_id": "401841144",
+      "event_id_fonte_detalhes": "401841144",
       "rodada": 18,
       "data_iso": "2026-05-30T16:00",
       "mandante": "Flamengo",
@@ -4268,10 +4514,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:22.871141-03:00"
+      "atualizado_em": "2026-07-18T18:53:25.401098-03:00"
     },
     "401841129": {
       "event_id": "401841129",
+      "event_id_fonte_detalhes": "401841129",
       "rodada": 17,
       "data_iso": "2026-05-25T20:00",
       "mandante": "Coritiba",
@@ -4577,10 +4824,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:23.235776-03:00"
+      "atualizado_em": "2026-07-18T18:53:25.864607-03:00"
     },
     "401841131": {
       "event_id": "401841131",
+      "event_id_fonte_detalhes": "401841131",
       "rodada": 17,
       "data_iso": "2026-05-24T20:30",
       "mandante": "Vasco da Gama",
@@ -4884,10 +5132,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:23.661149-03:00"
+      "atualizado_em": "2026-07-18T18:53:26.243106-03:00"
     },
     "401841128": {
       "event_id": "401841128",
+      "event_id_fonte_detalhes": "401841128",
       "rodada": 17,
       "data_iso": "2026-05-24T18:30",
       "mandante": "Corinthians",
@@ -5161,10 +5410,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:24.163763-03:00"
+      "atualizado_em": "2026-07-18T18:53:26.649207-03:00"
     },
     "401841137": {
       "event_id": "401841137",
+      "event_id_fonte_detalhes": "401841137",
       "rodada": 17,
       "data_iso": "2026-05-24T16:00",
       "mandante": "Cruzeiro",
@@ -5461,10 +5711,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:24.530615-03:00"
+      "atualizado_em": "2026-07-18T18:53:27.059858-03:00"
     },
     "401841133": {
       "event_id": "401841133",
+      "event_id_fonte_detalhes": "401841133",
       "rodada": 17,
       "data_iso": "2026-05-24T16:00",
       "mandante": "Remo",
@@ -5775,10 +6026,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:25.014934-03:00"
+      "atualizado_em": "2026-07-18T18:53:27.500697-03:00"
     },
     "401841136": {
       "event_id": "401841136",
+      "event_id_fonte_detalhes": "401841136",
       "rodada": 17,
       "data_iso": "2026-05-23T21:00",
       "mandante": "Flamengo",
@@ -6124,10 +6376,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:25.377256-03:00"
+      "atualizado_em": "2026-07-18T18:53:28.000947-03:00"
     },
     "401841135": {
       "event_id": "401841135",
+      "event_id_fonte_detalhes": "401841135",
       "rodada": 17,
       "data_iso": "2026-05-23T19:00",
       "mandante": "Grêmio",
@@ -6437,10 +6690,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:25.753407-03:00"
+      "atualizado_em": "2026-07-18T18:53:28.405459-03:00"
     },
     "401841134": {
       "event_id": "401841134",
+      "event_id_fonte_detalhes": "401841134",
       "rodada": 17,
       "data_iso": "2026-05-23T19:00",
       "mandante": "Mirassol",
@@ -6733,10 +6987,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:26.143169-03:00"
+      "atualizado_em": "2026-07-18T18:53:28.796733-03:00"
     },
     "401841132": {
       "event_id": "401841132",
+      "event_id_fonte_detalhes": "401841132",
       "rodada": 17,
       "data_iso": "2026-05-23T17:00",
       "mandante": "São Paulo",
@@ -7050,10 +7305,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:26.516824-03:00"
+      "atualizado_em": "2026-07-18T18:53:29.254044-03:00"
     },
     "401841130": {
       "event_id": "401841130",
+      "event_id_fonte_detalhes": "401841130",
       "rodada": 17,
       "data_iso": "2026-05-23T17:00",
       "mandante": "Vitória",
@@ -7343,10 +7599,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:26.901499-03:00"
+      "atualizado_em": "2026-07-18T18:53:29.729553-03:00"
     },
     "401841121": {
       "event_id": "401841121",
+      "event_id_fonte_detalhes": "401841121",
       "rodada": 16,
       "data_iso": "2026-05-17T19:30",
       "mandante": "Athletico-PR",
@@ -7636,10 +7893,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:27.278772-03:00"
+      "atualizado_em": "2026-07-18T18:53:30.118599-03:00"
     },
     "401841122": {
       "event_id": "401841122",
+      "event_id_fonte_detalhes": "401841122",
       "rodada": 16,
       "data_iso": "2026-05-17T18:30",
       "mandante": "Chapecoense",
@@ -7945,10 +8203,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:27.642133-03:00"
+      "atualizado_em": "2026-07-18T18:53:30.531176-03:00"
     },
     "401841124": {
       "event_id": "401841124",
+      "event_id_fonte_detalhes": "401841124",
       "rodada": 16,
       "data_iso": "2026-05-17T18:30",
       "mandante": "Bragantino",
@@ -8250,10 +8509,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:28.030212-03:00"
+      "atualizado_em": "2026-07-18T18:53:30.969697-03:00"
     },
     "401841119": {
       "event_id": "401841119",
+      "event_id_fonte_detalhes": "401841119",
       "rodada": 16,
       "data_iso": "2026-05-17T16:00",
       "mandante": "Bahia",
@@ -8576,10 +8836,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:28.422844-03:00"
+      "atualizado_em": "2026-07-18T18:53:31.462671-03:00"
     },
     "401841118": {
       "event_id": "401841118",
+      "event_id_fonte_detalhes": "401841118",
       "rodada": 16,
       "data_iso": "2026-05-17T16:00",
       "mandante": "Botafogo",
@@ -8908,10 +9169,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:28.796377-03:00"
+      "atualizado_em": "2026-07-18T18:53:31.866841-03:00"
     },
     "401841123": {
       "event_id": "401841123",
+      "event_id_fonte_detalhes": "401841123",
       "rodada": 16,
       "data_iso": "2026-05-17T11:00",
       "mandante": "Santos",
@@ -9229,10 +9491,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:29.158411-03:00"
+      "atualizado_em": "2026-07-18T18:53:32.245604-03:00"
     },
     "401841125": {
       "event_id": "401841125",
+      "event_id_fonte_detalhes": "401841125",
       "rodada": 16,
       "data_iso": "2026-05-16T21:00",
       "mandante": "Palmeiras",
@@ -9534,10 +9797,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:29.524071-03:00"
+      "atualizado_em": "2026-07-18T18:53:32.763949-03:00"
     },
     "401841127": {
       "event_id": "401841127",
+      "event_id_fonte_detalhes": "401841127",
       "rodada": 16,
       "data_iso": "2026-05-16T19:00",
       "mandante": "Fluminense",
@@ -9857,10 +10121,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:29.891877-03:00"
+      "atualizado_em": "2026-07-18T18:53:33.125920-03:00"
     },
     "401841120": {
       "event_id": "401841120",
+      "event_id_fonte_detalhes": "401841120",
       "rodada": 16,
       "data_iso": "2026-05-16T18:30",
       "mandante": "Atlético-MG",
@@ -10143,10 +10408,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:30.257408-03:00"
+      "atualizado_em": "2026-07-18T18:53:33.530219-03:00"
     },
     "401841126": {
       "event_id": "401841126",
+      "event_id_fonte_detalhes": "401841126",
       "rodada": 16,
       "data_iso": "2026-05-16T18:30",
       "mandante": "Internacional",
@@ -10470,10 +10736,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:30.625726-03:00"
+      "atualizado_em": "2026-07-18T18:53:33.908781-03:00"
     },
     "401841112": {
       "event_id": "401841112",
+      "event_id_fonte_detalhes": "401841112",
       "rodada": 15,
       "data_iso": "2026-05-10T20:30",
       "mandante": "Vasco da Gama",
@@ -10761,10 +11028,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:30.994347-03:00"
+      "atualizado_em": "2026-07-18T18:53:34.299929-03:00"
     },
     "401841117": {
       "event_id": "401841117",
+      "event_id_fonte_detalhes": "401841117",
       "rodada": 15,
       "data_iso": "2026-05-10T19:30",
       "mandante": "Grêmio",
@@ -11045,10 +11313,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:31.384479-03:00"
+      "atualizado_em": "2026-07-18T18:53:34.677717-03:00"
     },
     "401841115": {
       "event_id": "401841115",
+      "event_id_fonte_detalhes": "401841115",
       "rodada": 15,
       "data_iso": "2026-05-10T18:30",
       "mandante": "Corinthians",
@@ -11377,10 +11646,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:31.848398-03:00"
+      "atualizado_em": "2026-07-18T18:53:35.061415-03:00"
     },
     "401841111": {
       "event_id": "401841111",
+      "event_id_fonte_detalhes": "401841111",
       "rodada": 15,
       "data_iso": "2026-05-10T18:30",
       "mandante": "Mirassol",
@@ -11675,10 +11945,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:32.251545-03:00"
+      "atualizado_em": "2026-07-18T18:53:35.465397-03:00"
     },
     "401841109": {
       "event_id": "401841109",
+      "event_id_fonte_detalhes": "401841109",
       "rodada": 15,
       "data_iso": "2026-05-10T18:30",
       "mandante": "Santos",
@@ -11973,10 +12244,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:32.636894-03:00"
+      "atualizado_em": "2026-07-18T18:53:35.855157-03:00"
     },
     "401841108": {
       "event_id": "401841108",
+      "event_id_fonte_detalhes": "401841108",
       "rodada": 15,
       "data_iso": "2026-05-10T16:00",
       "mandante": "Atlético-MG",
@@ -12248,10 +12520,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:33.101492-03:00"
+      "atualizado_em": "2026-07-18T18:53:36.235690-03:00"
     },
     "401841110": {
       "event_id": "401841110",
+      "event_id_fonte_detalhes": "401841110",
       "rodada": 15,
       "data_iso": "2026-05-10T16:00",
       "mandante": "Remo",
@@ -12541,10 +12814,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:33.450709-03:00"
+      "atualizado_em": "2026-07-18T18:53:36.645964-03:00"
     },
     "401841116": {
       "event_id": "401841116",
+      "event_id_fonte_detalhes": "401841116",
       "rodada": 15,
       "data_iso": "2026-05-09T21:00",
       "mandante": "Bahia",
@@ -12862,10 +13136,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:33.834134-03:00"
+      "atualizado_em": "2026-07-18T18:53:37.088502-03:00"
     },
     "401841113": {
       "event_id": "401841113",
+      "event_id_fonte_detalhes": "401841113",
       "rodada": 15,
       "data_iso": "2026-05-09T18:00",
       "mandante": "Fluminense",
@@ -13183,10 +13458,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:34.220624-03:00"
+      "atualizado_em": "2026-07-18T18:53:37.485368-03:00"
     },
     "401841114": {
       "event_id": "401841114",
+      "event_id_fonte_detalhes": "401841114",
       "rodada": 15,
       "data_iso": "2026-05-09T16:00",
       "mandante": "Coritiba",
@@ -13490,10 +13766,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:34.581955-03:00"
+      "atualizado_em": "2026-07-18T18:53:37.843500-03:00"
     },
     "401841103": {
       "event_id": "401841103",
+      "event_id_fonte_detalhes": "401841103",
       "rodada": 14,
       "data_iso": "2026-05-03T20:30",
       "mandante": "Mirassol",
@@ -13811,10 +14088,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:34.948406-03:00"
+      "atualizado_em": "2026-07-18T18:53:38.340440-03:00"
     },
     "401841099": {
       "event_id": "401841099",
+      "event_id_fonte_detalhes": "401841099",
       "rodada": 14,
       "data_iso": "2026-05-03T18:30",
       "mandante": "Chapecoense",
@@ -14111,10 +14389,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:35.290349-03:00"
+      "atualizado_em": "2026-07-18T18:53:38.913817-03:00"
     },
     "401841104": {
       "event_id": "401841104",
+      "event_id_fonte_detalhes": "401841104",
       "rodada": 14,
       "data_iso": "2026-05-03T18:30",
       "mandante": "Internacional",
@@ -14423,10 +14702,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:35.669458-03:00"
+      "atualizado_em": "2026-07-18T18:53:39.345111-03:00"
     },
     "401841105": {
       "event_id": "401841105",
+      "event_id_fonte_detalhes": "401841105",
       "rodada": 14,
       "data_iso": "2026-05-03T16:00",
       "mandante": "Flamengo",
@@ -14746,10 +15026,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:36.038208-03:00"
+      "atualizado_em": "2026-07-18T18:53:39.747718-03:00"
     },
     "401841101": {
       "event_id": "401841101",
+      "event_id_fonte_detalhes": "401841101",
       "rodada": 14,
       "data_iso": "2026-05-03T16:00",
       "mandante": "São Paulo",
@@ -15076,10 +15357,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:36.513408-03:00"
+      "atualizado_em": "2026-07-18T18:53:40.141148-03:00"
     },
     "401841098": {
       "event_id": "401841098",
+      "event_id_fonte_detalhes": "401841098",
       "rodada": 14,
       "data_iso": "2026-05-02T21:00",
       "mandante": "Cruzeiro",
@@ -15425,10 +15707,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:36.901533-03:00"
+      "atualizado_em": "2026-07-18T18:53:40.572504-03:00"
     },
     "401841106": {
       "event_id": "401841106",
+      "event_id_fonte_detalhes": "401841106",
       "rodada": 14,
       "data_iso": "2026-05-02T20:30",
       "mandante": "Athletico-PR",
@@ -15699,10 +15982,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:37.268753-03:00"
+      "atualizado_em": "2026-07-18T18:53:40.930771-03:00"
     },
     "401841102": {
       "event_id": "401841102",
+      "event_id_fonte_detalhes": "401841102",
       "rodada": 14,
       "data_iso": "2026-05-02T18:30",
       "mandante": "Palmeiras",
@@ -15976,10 +16260,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:37.734143-03:00"
+      "atualizado_em": "2026-07-18T18:53:41.325914-03:00"
     },
     "401841100": {
       "event_id": "401841100",
+      "event_id_fonte_detalhes": "401841100",
       "rodada": 14,
       "data_iso": "2026-05-02T18:30",
       "mandante": "Vitória",
@@ -16299,10 +16584,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:38.081373-03:00"
+      "atualizado_em": "2026-07-18T18:53:41.695619-03:00"
     },
     "401841107": {
       "event_id": "401841107",
+      "event_id_fonte_detalhes": "401841107",
       "rodada": 14,
       "data_iso": "2026-05-02T16:00",
       "mandante": "Botafogo",
@@ -16597,10 +16883,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:38.463123-03:00"
+      "atualizado_em": "2026-07-18T18:53:42.144673-03:00"
     },
     "401841096": {
       "event_id": "401841096",
+      "event_id_fonte_detalhes": "401841096",
       "rodada": 13,
       "data_iso": "2026-04-26T20:30",
       "mandante": "Atlético-MG",
@@ -16901,10 +17188,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:38.891563-03:00"
+      "atualizado_em": "2026-07-18T18:53:42.670608-03:00"
     },
     "401841090": {
       "event_id": "401841090",
+      "event_id_fonte_detalhes": "401841090",
       "rodada": 13,
       "data_iso": "2026-04-26T20:30",
       "mandante": "Fluminense",
@@ -17215,10 +17503,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:39.274702-03:00"
+      "atualizado_em": "2026-07-18T18:53:43.050598-03:00"
     },
     "401841088": {
       "event_id": "401841088",
+      "event_id_fonte_detalhes": "401841088",
       "rodada": 13,
       "data_iso": "2026-04-26T18:30",
       "mandante": "Athletico-PR",
@@ -17564,10 +17853,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:39.656684-03:00"
+      "atualizado_em": "2026-07-18T18:53:43.437790-03:00"
     },
     "401841097": {
       "event_id": "401841097",
+      "event_id_fonte_detalhes": "401841097",
       "rodada": 13,
       "data_iso": "2026-04-26T18:30",
       "mandante": "Bragantino",
@@ -17841,10 +18131,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:40.010670-03:00"
+      "atualizado_em": "2026-07-18T18:53:43.829450-03:00"
     },
     "401841089": {
       "event_id": "401841089",
+      "event_id_fonte_detalhes": "401841089",
       "rodada": 13,
       "data_iso": "2026-04-26T16:00",
       "mandante": "Corinthians",
@@ -18146,10 +18437,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:40.383424-03:00"
+      "atualizado_em": "2026-07-18T18:53:44.230157-03:00"
     },
     "401841091": {
       "event_id": "401841091",
+      "event_id_fonte_detalhes": "401841091",
       "rodada": 13,
       "data_iso": "2026-04-26T16:00",
       "mandante": "Grêmio",
@@ -18444,10 +18736,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:40.753837-03:00"
+      "atualizado_em": "2026-07-18T18:53:44.648449-03:00"
     },
     "401841092": {
       "event_id": "401841092",
+      "event_id_fonte_detalhes": "401841092",
       "rodada": 13,
       "data_iso": "2026-04-25T21:00",
       "mandante": "São Paulo",
@@ -18721,10 +19014,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:41.122676-03:00"
+      "atualizado_em": "2026-07-18T18:53:45.064872-03:00"
     },
     "401841095": {
       "event_id": "401841095",
+      "event_id_fonte_detalhes": "401841095",
       "rodada": 13,
       "data_iso": "2026-04-25T18:30",
       "mandante": "Bahia",
@@ -19047,10 +19341,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:41.555596-03:00"
+      "atualizado_em": "2026-07-18T18:53:45.482695-03:00"
     },
     "401841094": {
       "event_id": "401841094",
+      "event_id_fonte_detalhes": "401841094",
       "rodada": 13,
       "data_iso": "2026-04-25T18:30",
       "mandante": "Botafogo",
@@ -19361,10 +19656,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:41.912849-03:00"
+      "atualizado_em": "2026-07-18T18:53:45.887791-03:00"
     },
     "401841093": {
       "event_id": "401841093",
+      "event_id_fonte_detalhes": "401841093",
       "rodada": 13,
       "data_iso": "2026-04-25T18:30",
       "mandante": "Remo",
@@ -19645,10 +19941,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:42.279373-03:00"
+      "atualizado_em": "2026-07-18T18:53:46.295882-03:00"
     },
     "401841086": {
       "event_id": "401841086",
+      "event_id_fonte_detalhes": "401841086",
       "rodada": 12,
       "data_iso": "2026-04-19T19:30",
       "mandante": "Flamengo",
@@ -19924,10 +20221,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:42.643049-03:00"
+      "atualizado_em": "2026-07-18T18:53:46.736359-03:00"
     },
     "401841084": {
       "event_id": "401841084",
+      "event_id_fonte_detalhes": "401841084",
       "rodada": 12,
       "data_iso": "2026-04-19T18:30",
       "mandante": "Palmeiras",
@@ -20220,10 +20518,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:43.015287-03:00"
+      "atualizado_em": "2026-07-18T18:53:47.149409-03:00"
     },
     "401841083": {
       "event_id": "401841083",
+      "event_id_fonte_detalhes": "401841083",
       "rodada": 12,
       "data_iso": "2026-04-19T18:30",
       "mandante": "Bragantino",
@@ -20527,10 +20826,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:43.385113-03:00"
+      "atualizado_em": "2026-07-18T18:53:47.580748-03:00"
     },
     "401841079": {
       "event_id": "401841079",
+      "event_id_fonte_detalhes": "401841079",
       "rodada": 12,
       "data_iso": "2026-04-19T16:00",
       "mandante": "Coritiba",
@@ -20823,10 +21123,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:43.794837-03:00"
+      "atualizado_em": "2026-07-18T18:53:47.991424-03:00"
     },
     "401841082": {
       "event_id": "401841082",
+      "event_id_fonte_detalhes": "401841082",
       "rodada": 12,
       "data_iso": "2026-04-19T16:00",
       "mandante": "Santos",
@@ -21169,10 +21470,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:44.189786-03:00"
+      "atualizado_em": "2026-07-18T18:53:48.407965-03:00"
     },
     "401841085": {
       "event_id": "401841085",
+      "event_id_fonte_detalhes": "401841085",
       "rodada": 12,
       "data_iso": "2026-04-19T11:00",
       "mandante": "Internacional",
@@ -21471,10 +21773,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:44.636706-03:00"
+      "atualizado_em": "2026-07-18T18:53:48.783734-03:00"
     },
     "401841087": {
       "event_id": "401841087",
+      "event_id_fonte_detalhes": "401841087",
       "rodada": 12,
       "data_iso": "2026-04-18T20:30",
       "mandante": "Cruzeiro",
@@ -21778,10 +22081,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:45.056794-03:00"
+      "atualizado_em": "2026-07-18T18:53:49.181995-03:00"
     },
     "401841080": {
       "event_id": "401841080",
+      "event_id_fonte_detalhes": "401841080",
       "rodada": 12,
       "data_iso": "2026-04-18T20:00",
       "mandante": "Vitória",
@@ -22045,10 +22349,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:45.458743-03:00"
+      "atualizado_em": "2026-07-18T18:53:49.561980-03:00"
     },
     "401841078": {
       "event_id": "401841078",
+      "event_id_fonte_detalhes": "401841078",
       "rodada": 12,
       "data_iso": "2026-04-18T18:30",
       "mandante": "Chapecoense",
@@ -22336,10 +22641,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:45.831396-03:00"
+      "atualizado_em": "2026-07-18T18:53:49.931244-03:00"
     },
     "401841081": {
       "event_id": "401841081",
+      "event_id_fonte_detalhes": "401841081",
       "rodada": 12,
       "data_iso": "2026-04-18T18:30",
       "mandante": "Vasco da Gama",
@@ -22627,10 +22933,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:46.242817-03:00"
+      "atualizado_em": "2026-07-18T18:53:50.313424-03:00"
     },
     "401841069": {
       "event_id": "401841069",
+      "event_id_fonte_detalhes": "401841069",
       "rodada": 11,
       "data_iso": "2026-04-12T18:30",
       "mandante": "Corinthians",
@@ -22908,10 +23215,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:46.599232-03:00"
+      "atualizado_em": "2026-07-18T18:53:50.711123-03:00"
     },
     "401841068": {
       "event_id": "401841068",
+      "event_id_fonte_detalhes": "401841068",
       "rodada": 11,
       "data_iso": "2026-04-12T18:30",
       "mandante": "Cruzeiro",
@@ -23196,10 +23504,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:47.018235-03:00"
+      "atualizado_em": "2026-07-18T18:53:51.137496-03:00"
     },
     "401841072": {
       "event_id": "401841072",
+      "event_id_fonte_detalhes": "401841072",
       "rodada": 11,
       "data_iso": "2026-04-12T18:00",
       "mandante": "Fluminense",
@@ -23510,10 +23819,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:47.407392-03:00"
+      "atualizado_em": "2026-07-18T18:53:51.556654-03:00"
     },
     "401841070": {
       "event_id": "401841070",
+      "event_id_fonte_detalhes": "401841070",
       "rodada": 11,
       "data_iso": "2026-04-12T16:00",
       "mandante": "Botafogo",
@@ -23833,10 +24143,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:47.897863-03:00"
+      "atualizado_em": "2026-07-18T18:53:51.941391-03:00"
     },
     "401841071": {
       "event_id": "401841071",
+      "event_id_fonte_detalhes": "401841071",
       "rodada": 11,
       "data_iso": "2026-04-12T11:00",
       "mandante": "Athletico-PR",
@@ -24138,10 +24449,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:48.267602-03:00"
+      "atualizado_em": "2026-07-18T18:53:52.331323-03:00"
     },
     "401841077": {
       "event_id": "401841077",
+      "event_id_fonte_detalhes": "401841077",
       "rodada": 11,
       "data_iso": "2026-04-11T20:30",
       "mandante": "Internacional",
@@ -24440,10 +24752,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:48.631199-03:00"
+      "atualizado_em": "2026-07-18T18:53:52.747125-03:00"
     },
     "401841074": {
       "event_id": "401841074",
+      "event_id_fonte_detalhes": "401841074",
       "rodada": 11,
       "data_iso": "2026-04-11T20:00",
       "mandante": "Santos",
@@ -24724,10 +25037,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:49.009790-03:00"
+      "atualizado_em": "2026-07-18T18:53:53.127893-03:00"
     },
     "401841076": {
       "event_id": "401841076",
+      "event_id_fonte_detalhes": "401841076",
       "rodada": 11,
       "data_iso": "2026-04-11T18:30",
       "mandante": "Mirassol",
@@ -25041,10 +25355,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:49.414707-03:00"
+      "atualizado_em": "2026-07-18T18:53:53.511328-03:00"
     },
     "401841075": {
       "event_id": "401841075",
+      "event_id_fonte_detalhes": "401841075",
       "rodada": 11,
       "data_iso": "2026-04-11T16:30",
       "mandante": "Remo",
@@ -25320,10 +25635,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:49.773409-03:00"
+      "atualizado_em": "2026-07-18T18:53:53.984707-03:00"
     },
     "401841073": {
       "event_id": "401841073",
+      "event_id_fonte_detalhes": "401841073",
       "rodada": 11,
       "data_iso": "2026-04-11T16:30",
       "mandante": "Vitória",
@@ -25627,10 +25943,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:50.143305-03:00"
+      "atualizado_em": "2026-07-18T18:53:54.470501-03:00"
     },
     "401841061": {
       "event_id": "401841061",
+      "event_id_fonte_detalhes": "401841061",
       "rodada": 10,
       "data_iso": "2026-04-05T20:30",
       "mandante": "Grêmio",
@@ -25901,10 +26218,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:50.494052-03:00"
+      "atualizado_em": "2026-07-18T18:53:54.843888-03:00"
     },
     "401841060": {
       "event_id": "401841060",
+      "event_id_fonte_detalhes": "401841060",
       "rodada": 10,
       "data_iso": "2026-04-05T20:00",
       "mandante": "Mirassol",
@@ -26192,10 +26510,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:50.857115-03:00"
+      "atualizado_em": "2026-07-18T18:53:55.236557-03:00"
     },
     "401841066": {
       "event_id": "401841066",
+      "event_id_fonte_detalhes": "401841066",
       "rodada": 10,
       "data_iso": "2026-04-05T19:30",
       "mandante": "Bahia",
@@ -26506,10 +26825,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:51.559738-03:00"
+      "atualizado_em": "2026-07-18T18:53:55.832529-03:00"
     },
     "401841064": {
       "event_id": "401841064",
+      "event_id_fonte_detalhes": "401841064",
       "rodada": 10,
       "data_iso": "2026-04-05T19:30",
       "mandante": "Corinthians",
@@ -26797,10 +27117,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:51.943155-03:00"
+      "atualizado_em": "2026-07-18T18:53:56.216689-03:00"
     },
     "401841058": {
       "event_id": "401841058",
+      "event_id_fonte_detalhes": "401841058",
       "rodada": 10,
       "data_iso": "2026-04-05T17:30",
       "mandante": "Atlético-MG",
@@ -27076,10 +27397,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:52.313230-03:00"
+      "atualizado_em": "2026-07-18T18:53:56.705698-03:00"
     },
     "401841067": {
       "event_id": "401841067",
+      "event_id_fonte_detalhes": "401841067",
       "rodada": 10,
       "data_iso": "2026-04-05T17:30",
       "mandante": "Flamengo",
@@ -27371,10 +27693,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:52.705316-03:00"
+      "atualizado_em": "2026-07-18T18:53:57.174734-03:00"
     },
     "401841065": {
       "event_id": "401841065",
+      "event_id_fonte_detalhes": "401841065",
       "rodada": 10,
       "data_iso": "2026-04-05T16:00",
       "mandante": "Chapecoense",
@@ -27676,10 +27999,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:53.112254-03:00"
+      "atualizado_em": "2026-07-18T18:53:57.568128-03:00"
     },
     "401841062": {
       "event_id": "401841062",
+      "event_id_fonte_detalhes": "401841062",
       "rodada": 10,
       "data_iso": "2026-04-04T21:00",
       "mandante": "Vasco da Gama",
@@ -27990,10 +28314,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:53.508824-03:00"
+      "atualizado_em": "2026-07-18T18:53:57.955233-03:00"
     },
     "401841063": {
       "event_id": "401841063",
+      "event_id_fonte_detalhes": "401841063",
       "rodada": 10,
       "data_iso": "2026-04-04T20:30",
       "mandante": "Coritiba",
@@ -28262,10 +28587,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:53.908108-03:00"
+      "atualizado_em": "2026-07-18T18:53:58.473857-03:00"
     },
     "401841059": {
       "event_id": "401841059",
+      "event_id_fonte_detalhes": "401841059",
       "rodada": 10,
       "data_iso": "2026-04-04T18:30",
       "mandante": "São Paulo",
@@ -28564,10 +28890,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:54.283859-03:00"
+      "atualizado_em": "2026-07-18T18:53:58.927309-03:00"
     },
     "401841052": {
       "event_id": "401841052",
+      "event_id_fonte_detalhes": "401841052",
       "rodada": 9,
       "data_iso": "2026-04-02T21:30",
       "mandante": "Palmeiras",
@@ -28857,10 +29184,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:54.642745-03:00"
+      "atualizado_em": "2026-07-18T18:53:59.336466-03:00"
     },
     "401841051": {
       "event_id": "401841051",
+      "event_id_fonte_detalhes": "401841051",
       "rodada": 9,
       "data_iso": "2026-04-02T21:30",
       "mandante": "Bragantino",
@@ -29173,10 +29501,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:54.996125-03:00"
+      "atualizado_em": "2026-07-18T18:53:59.780173-03:00"
     },
     "401841049": {
       "event_id": "401841049",
+      "event_id_fonte_detalhes": "401841049",
       "rodada": 9,
       "data_iso": "2026-04-02T19:00",
       "mandante": "Chapecoense",
@@ -29461,10 +29790,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:55.357752-03:00"
+      "atualizado_em": "2026-07-18T18:54:00.177282-03:00"
     },
     "401841050": {
       "event_id": "401841050",
+      "event_id_fonte_detalhes": "401841050",
       "rodada": 9,
       "data_iso": "2026-04-02T19:00",
       "mandante": "Santos",
@@ -29768,10 +30098,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:55.728709-03:00"
+      "atualizado_em": "2026-07-18T18:54:00.543696-03:00"
     },
     "401841054": {
       "event_id": "401841054",
+      "event_id_fonte_detalhes": "401841054",
       "rodada": 9,
       "data_iso": "2026-04-01T21:30",
       "mandante": "Fluminense",
@@ -30089,10 +30420,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:56.092147-03:00"
+      "atualizado_em": "2026-07-18T18:54:00.960284-03:00"
     },
     "401841048": {
       "event_id": "401841048",
+      "event_id_fonte_detalhes": "401841048",
       "rodada": 9,
       "data_iso": "2026-04-01T20:30",
       "mandante": "Coritiba",
@@ -30373,10 +30705,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:56.498417-03:00"
+      "atualizado_em": "2026-07-18T18:54:01.338257-03:00"
     },
     "401841056": {
       "event_id": "401841056",
+      "event_id_fonte_detalhes": "401841056",
       "rodada": 9,
       "data_iso": "2026-04-01T20:00",
       "mandante": "Bahia",
@@ -30673,10 +31006,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:56.976485-03:00"
+      "atualizado_em": "2026-07-18T18:54:01.765079-03:00"
     },
     "401841055": {
       "event_id": "401841055",
+      "event_id_fonte_detalhes": "401841055",
       "rodada": 9,
       "data_iso": "2026-04-01T20:00",
       "mandante": "Cruzeiro",
@@ -30975,10 +31309,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:57.333140-03:00"
+      "atualizado_em": "2026-07-18T18:54:02.145893-03:00"
     },
     "401841057": {
       "event_id": "401841057",
+      "event_id_fonte_detalhes": "401841057",
       "rodada": 9,
       "data_iso": "2026-04-01T19:30",
       "mandante": "Botafogo",
@@ -31303,10 +31638,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:57.753660-03:00"
+      "atualizado_em": "2026-07-18T18:54:02.535213-03:00"
     },
     "401841053": {
       "event_id": "401841053",
+      "event_id_fonte_detalhes": "401841053",
       "rodada": 9,
       "data_iso": "2026-04-01T19:30",
       "mandante": "Internacional",
@@ -31582,10 +31918,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:58.210694-03:00"
+      "atualizado_em": "2026-07-18T18:54:02.921406-03:00"
     },
     "401841016": {
       "event_id": "401841016",
+      "event_id_fonte_detalhes": "401841016",
       "rodada": 5,
       "data_iso": "2026-03-29T19:30",
       "mandante": "Athletico-PR",
@@ -31905,10 +32242,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:58.612846-03:00"
+      "atualizado_em": "2026-07-18T18:54:03.359976-03:00"
     },
     "401841046": {
       "event_id": "401841046",
+      "event_id_fonte_detalhes": "401841046",
       "rodada": 8,
       "data_iso": "2026-03-22T20:30",
       "mandante": "Corinthians",
@@ -32212,10 +32550,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:58.969816-03:00"
+      "atualizado_em": "2026-07-18T18:54:03.740381-03:00"
     },
     "401841043": {
       "event_id": "401841043",
+      "event_id_fonte_detalhes": "401841043",
       "rodada": 8,
       "data_iso": "2026-03-22T18:30",
       "mandante": "Internacional",
@@ -32503,10 +32842,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:59.326655-03:00"
+      "atualizado_em": "2026-07-18T18:54:04.128809-03:00"
     },
     "401841042": {
       "event_id": "401841042",
+      "event_id_fonte_detalhes": "401841042",
       "rodada": 8,
       "data_iso": "2026-03-22T18:30",
       "mandante": "Vitória",
@@ -32799,10 +33139,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:22:59.691228-03:00"
+      "atualizado_em": "2026-07-18T18:54:04.525466-03:00"
     },
     "401841038": {
       "event_id": "401841038",
+      "event_id_fonte_detalhes": "401841038",
       "rodada": 8,
       "data_iso": "2026-03-22T16:00",
       "mandante": "Athletico-PR",
@@ -33085,10 +33426,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:00.049070-03:00"
+      "atualizado_em": "2026-07-18T18:54:04.953737-03:00"
     },
     "401841045": {
       "event_id": "401841045",
+      "event_id_fonte_detalhes": "401841045",
       "rodada": 8,
       "data_iso": "2026-03-22T16:00",
       "mandante": "Cruzeiro",
@@ -33373,10 +33715,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:00.416495-03:00"
+      "atualizado_em": "2026-07-18T18:54:05.330209-03:00"
     },
     "401841041": {
       "event_id": "401841041",
+      "event_id_fonte_detalhes": "401841041",
       "rodada": 8,
       "data_iso": "2026-03-22T16:00",
       "mandante": "Remo",
@@ -33689,10 +34032,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:00.871879-03:00"
+      "atualizado_em": "2026-07-18T18:54:05.766612-03:00"
     },
     "401841039": {
       "event_id": "401841039",
+      "event_id_fonte_detalhes": "401841039",
       "rodada": 8,
       "data_iso": "2026-03-22T16:00",
       "mandante": "Vasco da Gama",
@@ -33991,10 +34335,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:01.230229-03:00"
+      "atualizado_em": "2026-07-18T18:54:06.147397-03:00"
     },
     "401841040": {
       "event_id": "401841040",
+      "event_id_fonte_detalhes": "401841040",
       "rodada": 8,
       "data_iso": "2026-03-21T21:00",
       "mandante": "São Paulo",
@@ -34303,10 +34648,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:01.618603-03:00"
+      "atualizado_em": "2026-07-18T18:54:06.526222-03:00"
     },
     "401841044": {
       "event_id": "401841044",
+      "event_id_fonte_detalhes": "401841044",
       "rodada": 8,
       "data_iso": "2026-03-21T18:30",
       "mandante": "Fluminense",
@@ -34629,10 +34975,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:02.006839-03:00"
+      "atualizado_em": "2026-07-18T18:54:06.935617-03:00"
     },
     "401841047": {
       "event_id": "401841047",
+      "event_id_fonte_detalhes": "401841047",
       "rodada": 8,
       "data_iso": "2026-03-21T16:00",
       "mandante": "Bragantino",
@@ -34936,10 +35283,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:02.388335-03:00"
+      "atualizado_em": "2026-07-18T18:54:07.320548-03:00"
     },
     "401841036": {
       "event_id": "401841036",
+      "event_id_fonte_detalhes": "401841036",
       "rodada": 7,
       "data_iso": "2026-03-19T21:30",
       "mandante": "Chapecoense",
@@ -35231,10 +35579,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:02.768363-03:00"
+      "atualizado_em": "2026-07-18T18:54:07.739950-03:00"
     },
     "401841035": {
       "event_id": "401841035",
+      "event_id_fonte_detalhes": "401841035",
       "rodada": 7,
       "data_iso": "2026-03-19T20:00",
       "mandante": "Flamengo",
@@ -35531,10 +35880,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:03.150980-03:00"
+      "atualizado_em": "2026-07-18T18:54:08.179842-03:00"
     },
     "401841034": {
       "event_id": "401841034",
+      "event_id_fonte_detalhes": "401841034",
       "rodada": 7,
       "data_iso": "2026-03-19T19:00",
       "mandante": "Grêmio",
@@ -35822,10 +36172,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:03.528144-03:00"
+      "atualizado_em": "2026-07-18T18:54:08.563117-03:00"
     },
     "401841031": {
       "event_id": "401841031",
+      "event_id_fonte_detalhes": "401841031",
       "rodada": 7,
       "data_iso": "2026-03-18T21:30",
       "mandante": "Santos",
@@ -36139,10 +36490,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:03.921952-03:00"
+      "atualizado_em": "2026-07-18T18:54:08.949780-03:00"
     },
     "401841030": {
       "event_id": "401841030",
+      "event_id_fonte_detalhes": "401841030",
       "rodada": 7,
       "data_iso": "2026-03-18T21:30",
       "mandante": "Vasco da Gama",
@@ -36443,10 +36795,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:05.217252-03:00"
+      "atualizado_em": "2026-07-18T18:54:09.337357-03:00"
     },
     "401841029": {
       "event_id": "401841029",
+      "event_id_fonte_detalhes": "401841029",
       "rodada": 7,
       "data_iso": "2026-03-18T20:00",
       "mandante": "Atlético-MG",
@@ -36713,10 +37066,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:05.633772-03:00"
+      "atualizado_em": "2026-07-18T18:54:09.725881-03:00"
     },
     "401841033": {
       "event_id": "401841033",
+      "event_id_fonte_detalhes": "401841033",
       "rodada": 7,
       "data_iso": "2026-03-18T20:00",
       "mandante": "Mirassol",
@@ -36995,10 +37349,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:06.018028-03:00"
+      "atualizado_em": "2026-07-18T18:54:10.168649-03:00"
     },
     "401841028": {
       "event_id": "401841028",
+      "event_id_fonte_detalhes": "401841028",
       "rodada": 7,
       "data_iso": "2026-03-18T19:30",
       "mandante": "Athletico-PR",
@@ -37300,10 +37655,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:06.415755-03:00"
+      "atualizado_em": "2026-07-18T18:54:10.571362-03:00"
     },
     "401841037": {
       "event_id": "401841037",
+      "event_id_fonte_detalhes": "401841037",
       "rodada": 7,
       "data_iso": "2026-03-18T19:00",
       "mandante": "Bahia",
@@ -37591,10 +37947,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:06.813113-03:00"
+      "atualizado_em": "2026-07-18T18:54:11.039919-03:00"
     },
     "401841032": {
       "event_id": "401841032",
+      "event_id_fonte_detalhes": "401841032",
       "rodada": 7,
       "data_iso": "2026-03-18T19:00",
       "mandante": "Palmeiras",
@@ -37898,10 +38255,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:07.220210-03:00"
+      "atualizado_em": "2026-07-18T18:54:11.438099-03:00"
     },
     "401841025": {
       "event_id": "401841025",
+      "event_id_fonte_detalhes": "401841025",
       "rodada": 6,
       "data_iso": "2026-03-16T20:00",
       "mandante": "Chapecoense",
@@ -38201,10 +38559,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:07.634698-03:00"
+      "atualizado_em": "2026-07-18T18:54:11.888245-03:00"
     },
     "401841023": {
       "event_id": "401841023",
+      "event_id_fonte_detalhes": "401841023",
       "rodada": 6,
       "data_iso": "2026-03-15T20:30",
       "mandante": "Cruzeiro",
@@ -38542,10 +38901,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:08.032576-03:00"
+      "atualizado_em": "2026-07-18T18:54:12.286851-03:00"
     },
     "401841019": {
       "event_id": "401841019",
+      "event_id_fonte_detalhes": "401841019",
       "rodada": 6,
       "data_iso": "2026-03-15T20:30",
       "mandante": "Bragantino",
@@ -38870,10 +39230,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:08.495534-03:00"
+      "atualizado_em": "2026-07-18T18:54:12.772521-03:00"
     },
     "401841024": {
       "event_id": "401841024",
+      "event_id_fonte_detalhes": "401841024",
       "rodada": 6,
       "data_iso": "2026-03-15T18:30",
       "mandante": "Coritiba",
@@ -39161,10 +39522,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:08.998181-03:00"
+      "atualizado_em": "2026-07-18T18:54:13.149694-03:00"
     },
     "401841020": {
       "event_id": "401841020",
+      "event_id_fonte_detalhes": "401841020",
       "rodada": 6,
       "data_iso": "2026-03-15T18:30",
       "mandante": "Palmeiras",
@@ -39445,10 +39807,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:09.538681-03:00"
+      "atualizado_em": "2026-07-18T18:54:13.738217-03:00"
     },
     "401841022": {
       "event_id": "401841022",
+      "event_id_fonte_detalhes": "401841022",
       "rodada": 6,
       "data_iso": "2026-03-15T16:00",
       "mandante": "Fluminense",
@@ -39777,10 +40140,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:09.931706-03:00"
+      "atualizado_em": "2026-07-18T18:54:14.129631-03:00"
     },
     "401841021": {
       "event_id": "401841021",
+      "event_id_fonte_detalhes": "401841021",
       "rodada": 6,
       "data_iso": "2026-03-15T16:00",
       "mandante": "Internacional",
@@ -40066,10 +40430,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:10.354483-03:00"
+      "atualizado_em": "2026-07-18T18:54:14.599749-03:00"
     },
     "401841018": {
       "event_id": "401841018",
+      "event_id_fonte_detalhes": "401841018",
       "rodada": 6,
       "data_iso": "2026-03-15T16:00",
       "mandante": "Santos",
@@ -40380,10 +40745,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:10.762676-03:00"
+      "atualizado_em": "2026-07-18T18:54:15.024159-03:00"
     },
     "401841026": {
       "event_id": "401841026",
+      "event_id_fonte_detalhes": "401841026",
       "rodada": 6,
       "data_iso": "2026-03-14T20:30",
       "mandante": "Botafogo",
@@ -40694,10 +41060,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:11.131695-03:00"
+      "atualizado_em": "2026-07-18T18:54:15.432502-03:00"
     },
     "401841027": {
       "event_id": "401841027",
+      "event_id_fonte_detalhes": "401841027",
       "rodada": 6,
       "data_iso": "2026-03-14T18:30",
       "mandante": "Vitória",
@@ -40992,10 +41359,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:11.616820-03:00"
+      "atualizado_em": "2026-07-18T18:54:15.871574-03:00"
     },
     "401841011": {
       "event_id": "401841011",
+      "event_id_fonte_detalhes": "401841011",
       "rodada": 5,
       "data_iso": "2026-03-12T21:30",
       "mandante": "Grêmio",
@@ -41299,10 +41667,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:12.044905-03:00"
+      "atualizado_em": "2026-07-18T18:54:16.265591-03:00"
     },
     "401841008": {
       "event_id": "401841008",
+      "event_id_fonte_detalhes": "401841008",
       "rodada": 5,
       "data_iso": "2026-03-12T20:00",
       "mandante": "São Paulo",
@@ -41571,10 +41940,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:12.414452-03:00"
+      "atualizado_em": "2026-07-18T18:54:16.736549-03:00"
     },
     "401841012": {
       "event_id": "401841012",
+      "event_id_fonte_detalhes": "401841012",
       "rodada": 5,
       "data_iso": "2026-03-12T19:30",
       "mandante": "Vasco da Gama",
@@ -41873,10 +42243,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:12.973871-03:00"
+      "atualizado_em": "2026-07-18T18:54:17.269634-03:00"
     },
     "401841009": {
       "event_id": "401841009",
+      "event_id_fonte_detalhes": "401841009",
       "rodada": 5,
       "data_iso": "2026-03-12T19:00",
       "mandante": "Remo",
@@ -42159,10 +42530,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:13.407760-03:00"
+      "atualizado_em": "2026-07-18T18:54:17.684109-03:00"
     },
     "401841013": {
       "event_id": "401841013",
+      "event_id_fonte_detalhes": "401841013",
       "rodada": 5,
       "data_iso": "2026-03-11T21:30",
       "mandante": "Corinthians",
@@ -42452,10 +42824,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:13.781131-03:00"
+      "atualizado_em": "2026-07-18T18:54:18.093827-03:00"
     },
     "401841017": {
       "event_id": "401841017",
+      "event_id_fonte_detalhes": "401841017",
       "rodada": 5,
       "data_iso": "2026-03-11T21:30",
       "mandante": "Flamengo",
@@ -42743,10 +43116,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:14.237866-03:00"
+      "atualizado_em": "2026-07-18T18:54:18.530670-03:00"
     },
     "401841014": {
       "event_id": "401841014",
+      "event_id_fonte_detalhes": "401841014",
       "rodada": 5,
       "data_iso": "2026-03-11T20:00",
       "mandante": "Bahia",
@@ -43020,10 +43394,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:14.629691-03:00"
+      "atualizado_em": "2026-07-18T18:54:18.921453-03:00"
     },
     "401841015": {
       "event_id": "401841015",
+      "event_id_fonte_detalhes": "401841015",
       "rodada": 5,
       "data_iso": "2026-03-11T19:00",
       "mandante": "Atlético-MG",
@@ -43304,10 +43679,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:14.998720-03:00"
+      "atualizado_em": "2026-07-18T18:54:19.404816-03:00"
     },
     "401841010": {
       "event_id": "401841010",
+      "event_id_fonte_detalhes": "401841010",
       "rodada": 5,
       "data_iso": "2026-03-10T21:30",
       "mandante": "Mirassol",
@@ -43611,10 +43987,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:15.351178-03:00"
+      "atualizado_em": "2026-07-18T18:54:19.814975-03:00"
     },
     "401841002": {
       "event_id": "401841002",
+      "event_id_fonte_detalhes": "401841002",
       "rodada": 4,
       "data_iso": "2026-02-26T19:00",
       "mandante": "Santos",
@@ -43902,10 +44279,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:15.748181-03:00"
+      "atualizado_em": "2026-07-18T18:54:20.274527-03:00"
     },
     "401841005": {
       "event_id": "401841005",
+      "event_id_fonte_detalhes": "401841005",
       "rodada": 4,
       "data_iso": "2026-02-25T21:30",
       "mandante": "Grêmio",
@@ -44211,10 +44589,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:16.130004-03:00"
+      "atualizado_em": "2026-07-18T18:54:20.647905-03:00"
     },
     "401841004": {
       "event_id": "401841004",
+      "event_id_fonte_detalhes": "401841004",
       "rodada": 4,
       "data_iso": "2026-02-25T21:30",
       "mandante": "Palmeiras",
@@ -44530,10 +44909,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:16.602787-03:00"
+      "atualizado_em": "2026-07-18T18:54:21.086731-03:00"
     },
     "401841001": {
       "event_id": "401841001",
+      "event_id_fonte_detalhes": "401841001",
       "rodada": 4,
       "data_iso": "2026-02-25T20:00",
       "mandante": "Cruzeiro",
@@ -44828,10 +45208,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:16.974054-03:00"
+      "atualizado_em": "2026-07-18T18:54:21.472194-03:00"
     },
     "401841000": {
       "event_id": "401841000",
+      "event_id_fonte_detalhes": "401841000",
       "rodada": 4,
       "data_iso": "2026-02-25T19:30",
       "mandante": "Coritiba",
@@ -45131,10 +45512,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:17.338977-03:00"
+      "atualizado_em": "2026-07-18T18:54:21.883961-03:00"
     },
     "401841003": {
       "event_id": "401841003",
+      "event_id_fonte_detalhes": "401841003",
       "rodada": 4,
       "data_iso": "2026-02-25T19:00",
       "mandante": "Bragantino",
@@ -45429,10 +45811,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:17.833266-03:00"
+      "atualizado_em": "2026-07-18T18:54:22.288668-03:00"
     },
     "401841007": {
       "event_id": "401841007",
+      "event_id_fonte_detalhes": "401841007",
       "rodada": 4,
       "data_iso": "2026-02-25T19:00",
       "mandante": "Remo",
@@ -45736,10 +46119,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:18.210541-03:00"
+      "atualizado_em": "2026-07-18T18:54:22.677404-03:00"
     },
     "401840981": {
       "event_id": "401840981",
+      "event_id_fonte_detalhes": "401840981",
       "rodada": 2,
       "data_iso": "2026-02-19T19:30",
       "mandante": "Athletico-PR",
@@ -46039,10 +46423,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:18.565914-03:00"
+      "atualizado_em": "2026-07-18T18:54:23.049265-03:00"
     },
     "401840997": {
       "event_id": "401840997",
+      "event_id_fonte_detalhes": "401840997",
       "rodada": 3,
       "data_iso": "2026-02-12T21:30",
       "mandante": "Internacional",
@@ -46332,10 +46717,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:19.002199-03:00"
+      "atualizado_em": "2026-07-18T18:54:23.483100-03:00"
     },
     "401840988": {
       "event_id": "401840988",
+      "event_id_fonte_detalhes": "401840988",
       "rodada": 3,
       "data_iso": "2026-02-12T20:00",
       "mandante": "Corinthians",
@@ -46644,10 +47030,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:19.405905-03:00"
+      "atualizado_em": "2026-07-18T18:54:23.896754-03:00"
     },
     "401840992": {
       "event_id": "401840992",
+      "event_id_fonte_detalhes": "401840992",
       "rodada": 3,
       "data_iso": "2026-02-12T19:30",
       "mandante": "Fluminense",
@@ -46961,10 +47348,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:19.801828-03:00"
+      "atualizado_em": "2026-07-18T18:54:24.298079-03:00"
     },
     "401840991": {
       "event_id": "401840991",
+      "event_id_fonte_detalhes": "401840991",
       "rodada": 3,
       "data_iso": "2026-02-12T19:00",
       "mandante": "Athletico-PR",
@@ -47259,10 +47647,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:20.340343-03:00"
+      "atualizado_em": "2026-07-18T18:54:24.692149-03:00"
     },
     "401840995": {
       "event_id": "401840995",
+      "event_id_fonte_detalhes": "401840995",
       "rodada": 3,
       "data_iso": "2026-02-11T21:30",
       "mandante": "São Paulo",
@@ -47564,10 +47953,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:20.701937-03:00"
+      "atualizado_em": "2026-07-18T18:54:25.106330-03:00"
     },
     "401840994": {
       "event_id": "401840994",
+      "event_id_fonte_detalhes": "401840994",
       "rodada": 3,
       "data_iso": "2026-02-11T21:30",
       "mandante": "Vasco da Gama",
@@ -47890,10 +48280,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:21.076226-03:00"
+      "atualizado_em": "2026-07-18T18:54:25.516220-03:00"
     },
     "401840990": {
       "event_id": "401840990",
+      "event_id_fonte_detalhes": "401840990",
       "rodada": 3,
       "data_iso": "2026-02-11T20:00",
       "mandante": "Atlético-MG",
@@ -48201,10 +48592,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:21.454710-03:00"
+      "atualizado_em": "2026-07-18T18:54:25.895560-03:00"
     },
     "401840989": {
       "event_id": "401840989",
+      "event_id_fonte_detalhes": "401840989",
       "rodada": 3,
       "data_iso": "2026-02-11T19:00",
       "mandante": "Chapecoense",
@@ -48521,10 +48913,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:21.823336-03:00"
+      "atualizado_em": "2026-07-18T18:54:26.288827-03:00"
     },
     "401840996": {
       "event_id": "401840996",
+      "event_id_fonte_detalhes": "401840996",
       "rodada": 3,
       "data_iso": "2026-02-11T19:00",
       "mandante": "Mirassol",
@@ -48840,10 +49233,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:22.211584-03:00"
+      "atualizado_em": "2026-07-18T18:54:26.725180-03:00"
     },
     "401840993": {
       "event_id": "401840993",
+      "event_id_fonte_detalhes": "401840993",
       "rodada": 3,
       "data_iso": "2026-02-10T21:30",
       "mandante": "Vitória",
@@ -49163,10 +49557,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:22.589350-03:00"
+      "atualizado_em": "2026-07-18T18:54:27.158019-03:00"
     },
     "401840979": {
       "event_id": "401840979",
+      "event_id_fonte_detalhes": "401840979",
       "rodada": 2,
       "data_iso": "2026-02-05T21:30",
       "mandante": "Cruzeiro",
@@ -49470,10 +49865,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:22.969796-03:00"
+      "atualizado_em": "2026-07-18T18:54:27.632943-03:00"
     },
     "401840982": {
       "event_id": "401840982",
+      "event_id_fonte_detalhes": "401840982",
       "rodada": 2,
       "data_iso": "2026-02-05T20:00",
       "mandante": "Vasco da Gama",
@@ -49732,10 +50128,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:23.335813-03:00"
+      "atualizado_em": "2026-07-18T18:54:28.038643-03:00"
     },
     "401840980": {
       "event_id": "401840980",
+      "event_id_fonte_detalhes": "401840980",
       "rodada": 2,
       "data_iso": "2026-02-05T19:00",
       "mandante": "Bahia",
@@ -50023,10 +50420,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:23.729258-03:00"
+      "atualizado_em": "2026-07-18T18:54:28.461144-03:00"
     },
     "401840987": {
       "event_id": "401840987",
+      "event_id_fonte_detalhes": "401840987",
       "rodada": 2,
       "data_iso": "2026-02-04T21:30",
       "mandante": "Grêmio",
@@ -50357,10 +50755,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:24.100650-03:00"
+      "atualizado_em": "2026-07-18T18:54:28.855584-03:00"
     },
     "401840983": {
       "event_id": "401840983",
+      "event_id_fonte_detalhes": "401840983",
       "rodada": 2,
       "data_iso": "2026-02-04T21:30",
       "mandante": "Palmeiras",
@@ -50693,10 +51092,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:24.976913-03:00"
+      "atualizado_em": "2026-07-18T18:54:29.308352-03:00"
     },
     "401840985": {
       "event_id": "401840985",
+      "event_id_fonte_detalhes": "401840985",
       "rodada": 2,
       "data_iso": "2026-02-04T20:00",
       "mandante": "Remo",
@@ -51002,10 +51402,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:25.373646-03:00"
+      "atualizado_em": "2026-07-18T18:54:29.704421-03:00"
     },
     "401840986": {
       "event_id": "401840986",
+      "event_id_fonte_detalhes": "401840986",
       "rodada": 2,
       "data_iso": "2026-02-04T20:00",
       "mandante": "Santos",
@@ -51307,10 +51708,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:25.768088-03:00"
+      "atualizado_em": "2026-07-18T18:54:30.087917-03:00"
     },
     "401840978": {
       "event_id": "401840978",
+      "event_id_fonte_detalhes": "401840978",
       "rodada": 2,
       "data_iso": "2026-02-04T19:00",
       "mandante": "Flamengo",
@@ -51619,10 +52021,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:26.189591-03:00"
+      "atualizado_em": "2026-07-18T18:54:30.653774-03:00"
     },
     "401840984": {
       "event_id": "401840984",
+      "event_id_fonte_detalhes": "401840984",
       "rodada": 2,
       "data_iso": "2026-02-04T19:00",
       "mandante": "Bragantino",
@@ -51908,10 +52311,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:26.558047-03:00"
+      "atualizado_em": "2026-07-18T18:54:31.092003-03:00"
     },
     "401840809": {
       "event_id": "401840809",
+      "event_id_fonte_detalhes": "401840809",
       "rodada": 1,
       "data_iso": "2026-01-29T21:30",
       "mandante": "Botafogo",
@@ -52210,10 +52614,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:26.923718-03:00"
+      "atualizado_em": "2026-07-18T18:54:31.467480-03:00"
     },
     "401840975": {
       "event_id": "401840975",
+      "event_id_fonte_detalhes": "401840975",
       "rodada": 1,
       "data_iso": "2026-01-29T20:00",
       "mandante": "Mirassol",
@@ -52503,10 +52908,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:27.284559-03:00"
+      "atualizado_em": "2026-07-18T18:54:31.867418-03:00"
     },
     "401840976": {
       "event_id": "401840976",
+      "event_id_fonte_detalhes": "401840976",
       "rodada": 1,
       "data_iso": "2026-01-28T21:30",
       "mandante": "São Paulo",
@@ -52782,10 +53188,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:27.660572-03:00"
+      "atualizado_em": "2026-07-18T18:54:32.244191-03:00"
     },
     "401840810": {
       "event_id": "401840810",
+      "event_id_fonte_detalhes": "401840810",
       "rodada": 1,
       "data_iso": "2026-01-28T20:00",
       "mandante": "Chapecoense",
@@ -53119,10 +53526,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:28.070171-03:00"
+      "atualizado_em": "2026-07-18T18:54:32.915885-03:00"
     },
     "401840811": {
       "event_id": "401840811",
+      "event_id_fonte_detalhes": "401840811",
       "rodada": 1,
       "data_iso": "2026-01-28T20:00",
       "mandante": "Corinthians",
@@ -53440,10 +53848,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:28.442211-03:00"
+      "atualizado_em": "2026-07-18T18:54:33.307233-03:00"
     },
     "401840813": {
       "event_id": "401840813",
+      "event_id_fonte_detalhes": "401840813",
       "rodada": 1,
       "data_iso": "2026-01-28T19:30",
       "mandante": "Fluminense",
@@ -53733,10 +54142,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:28.847845-03:00"
+      "atualizado_em": "2026-07-18T18:54:33.743925-03:00"
     },
     "401840808": {
       "event_id": "401840808",
+      "event_id_fonte_detalhes": "401840808",
       "rodada": 1,
       "data_iso": "2026-01-28T19:00",
       "mandante": "Atlético-MG",
@@ -54054,10 +54464,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:29.249173-03:00"
+      "atualizado_em": "2026-07-18T18:54:34.177740-03:00"
     },
     "401840977": {
       "event_id": "401840977",
+      "event_id_fonte_detalhes": "401840977",
       "rodada": 1,
       "data_iso": "2026-01-28T19:00",
       "mandante": "Coritiba",
@@ -54366,10 +54777,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:29.612425-03:00"
+      "atualizado_em": "2026-07-18T18:54:34.563899-03:00"
     },
     "401840814": {
       "event_id": "401840814",
+      "event_id_fonte_detalhes": "401840814",
       "rodada": 1,
       "data_iso": "2026-01-28T19:00",
       "mandante": "Internacional",
@@ -54643,10 +55055,11 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:29.981330-03:00"
+      "atualizado_em": "2026-07-18T18:54:35.060912-03:00"
     },
     "401840812": {
       "event_id": "401840812",
+      "event_id_fonte_detalhes": "401840812",
       "rodada": 1,
       "data_iso": "2026-01-28T19:00",
       "mandante": "Vitória",
@@ -54950,7 +55363,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-18T18:23:30.529187-03:00"
+      "atualizado_em": "2026-07-18T18:54:35.526700-03:00"
     }
   }
 }
