@@ -1,0 +1,144 @@
+name: Auditar AF-Previsão Continental
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/atualizar_competicoes_af_previsao.py'
+      - 'scripts/af_previsao_continental.py'
+      - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/af_previsao_backtest.py'
+      - 'dados-br/config-af-previsao.json'
+      - 'dados-br/historico-af-previsao/**'
+      - 'requirements-af-previsao.txt'
+      - '.github/workflows/auditar-af-previsao-continental.yml'
+
+permissions:
+  contents: read
+
+env:
+  OPENBLAS_NUM_THREADS: '1'
+  OMP_NUM_THREADS: '1'
+  MKL_NUM_THREADS: '1'
+  NUMEXPR_NUM_THREADS: '1'
+
+concurrency:
+  group: af-previsao-continental-audit
+  cancel-in-progress: true
+
+jobs:
+  auditar:
+    name: Validar coleta, simulação e alocação de vagas
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements-af-previsao.txt
+
+      - name: Instalar dependência numérica
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
+
+      - name: Validar sintaxe e testes determinísticos
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            atualizar_espn.py \
+            scripts/af_previsao_backtest.py \
+            scripts/atualizar_competicoes_af_previsao.py \
+            scripts/af_previsao_continental.py \
+            scripts/gerar_probabilidades_brasileirao.py
+          python scripts/atualizar_competicoes_af_previsao.py --self-test
+          python scripts/af_previsao_continental.py --self-test
+          python scripts/gerar_probabilidades_brasileirao.py --self-test
+
+      - name: Sincronizar o estado corrente do Brasileirão
+        run: |
+          set -euo pipefail
+          python atualizar_espn.py
+          python scripts/gerar_auditoria_calendario.py
+
+      - name: Buscar ao vivo as três competições relacionadas às vagas
+        run: python scripts/atualizar_competicoes_af_previsao.py --strict --force --max-age-minutes 0
+
+      - name: Executar integração continental de auditoria
+        run: python scripts/gerar_probabilidades_brasileirao.py --simulacoes 200000 --semente 20260718
+
+      - name: Validar artefatos integrados
+        run: |
+          set -euo pipefail
+          for arquivo in \
+            dados-br/competicoes-af-previsao/copa-do-brasil.json \
+            dados-br/competicoes-af-previsao/libertadores.json \
+            dados-br/competicoes-af-previsao/sul-americana.json \
+            dados-br/auditoria-competicoes-af-previsao.json \
+            dados-br/probabilidades-brasileirao.json \
+            dados-br/auditoria-probabilidades.json \
+            dados-br/historico-probabilidades.json; do
+            test -s "$arquivo"
+            python -m json.tool "$arquivo" > /dev/null
+            echo "OK $arquivo"
+          done
+
+          python - <<'PY'
+          import json
+          import math
+
+          snapshots = {}
+          for chave, arquivo in {
+              'copa_do_brasil': 'dados-br/competicoes-af-previsao/copa-do-brasil.json',
+              'libertadores': 'dados-br/competicoes-af-previsao/libertadores.json',
+              'sul_americana': 'dados-br/competicoes-af-previsao/sul-americana.json',
+          }.items():
+              data = json.load(open(arquivo, encoding='utf-8'))
+              assert data.get('status') == 'ok', (chave, data.get('status'))
+              assert (data.get('competicao') or {}).get('chave') == chave
+              assert len(data.get('eventos') or []) > 0, f'{chave}: sem eventos'
+              snapshots[chave] = data
+
+          coleta = json.load(open('dados-br/auditoria-competicoes-af-previsao.json', encoding='utf-8'))
+          assert coleta.get('status') == 'ok', coleta.get('falhas')
+          assert len(coleta.get('competicoes') or []) == 3
+
+          previsao = json.load(open('dados-br/probabilidades-brasileirao.json', encoding='utf-8'))
+          auditoria = json.load(open('dados-br/auditoria-probabilidades.json', encoding='utf-8'))
+          historico = json.load(open('dados-br/historico-probabilidades.json', encoding='utf-8'))
+          assert previsao.get('schema_version', 0) >= 2
+          assert previsao.get('status') == 'ok'
+          assert previsao.get('integracao_continental', {}).get('status') == 'ok'
+          assert auditoria.get('schema_version', 0) >= 2
+          assert auditoria.get('hash_entrada') == previsao.get('hash_entrada')
+          assert len(previsao.get('clubes') or []) == 20
+          assert historico.get('schema_version', 0) >= 2
+          assert (historico.get('snapshots') or [])[-1].get('hash_entrada') == previsao.get('hash_entrada')
+
+          total_sula = 0.0
+          for clube in previsao['clubes']:
+              probs = clube['probabilidades_pct']
+              for campo in ('campeao', 'libertadores', 'sul_americana', 'rebaixamento'):
+                  valor = float(probs[campo])
+                  assert math.isfinite(valor) and 0 <= valor <= 100, (clube['clube'], campo, valor)
+              total_sula += float(probs['sul_americana'])
+              detalhes = clube.get('probabilidades_detalhes') or {}
+              for campo in ('libertadores', 'sul_americana', 'rebaixamento'):
+                  detalhe = detalhes[campo]
+                  assert detalhe['simulacoes'] == 200000
+                  assert isinstance(detalhe['exibicao'], str)
+                  assert detalhe['ocorrencias'] >= 0
+                  if detalhe['ocorrencias'] == 0:
+                      assert detalhe['exibicao'].startswith('<')
+                      assert detalhe['limite_superior_95_regra_dos_tres_pct'] is not None
+              decomposicao = clube['decomposicao_chances']
+              for campo in ('libertadores', 'sul_americana'):
+                  bloco = decomposicao[campo]
+                  assert abs(float(bloco['soma_vias_pct']) - float(probs[campo])) <= 0.002
+          assert abs(total_sula - 600.0) <= 0.02, total_sula
+          print('AF-Previsão Continental: coleta, simulação, decomposição e histórico validados')
+          PY

@@ -27,10 +27,14 @@ on:
       - 'scripts/gerar_auditoria_cobertura_resultados.py'
       - 'scripts/gerar_auditoria_calendario.py'
       - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/af_previsao_continental.py'
+      - 'scripts/atualizar_competicoes_af_previsao.py'
       - 'scripts/af_previsao_backtest.py'
       - 'dados-br/config-af-previsao.json'
       - 'dados-br/auditoria-modelos-af-previsao.json'
       - 'dados-br/historico-af-previsao/**'
+      - 'dados-br/competicoes-af-previsao/**'
+      - 'dados-br/auditoria-competicoes-af-previsao.json'
       - 'requirements-af-previsao.txt'
       - 'dados-br/ajustes-calendario.json'
       - 'dados-br/publicos-complementares.json'
@@ -84,9 +88,13 @@ jobs:
             scripts/gerar_estatisticas_competicao_brasileirao.py \
             scripts/gerar_auditoria_estatisticas_brasileirao.py \
             scripts/af_previsao_backtest.py \
+            scripts/af_previsao_continental.py \
+            scripts/atualizar_competicoes_af_previsao.py \
             scripts/gerar_probabilidades_brasileirao.py
           python scripts/buscar_lideres_jogadores_espn.py --self-test
           python scripts/buscar_detalhes_jogos_brasileirao.py --self-test
+          python scripts/atualizar_competicoes_af_previsao.py --self-test
+          python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
 
       # --- DADOS DO BRASILEIRAO (100% ESPN) ---
@@ -108,7 +116,10 @@ jobs:
       - name: Gerar estatísticas e Ranking Vivo de desempenho
         run: python scripts/gerar_estatisticas_brasileirao.py
 
-      - name: Gerar AF-Previsão e simular o restante do campeonato
+      - name: Atualizar competições que alteram as vagas continentais
+        run: python scripts/atualizar_competicoes_af_previsao.py --max-age-minutes 45
+
+      - name: Gerar AF-Previsão integrado e simular o restante do campeonato
         run: python scripts/gerar_probabilidades_brasileirao.py
 
       - name: Gerar estatísticas gerais da competição
@@ -124,7 +135,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/probabilidades-brasileirao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -192,6 +203,18 @@ jobs:
           assert resumo_cal.get('confrontos_com_ida_e_volta') == 190, 'ida e volta incompletas'
           completo = json.load(open('dados-br/calendario-completo.json', encoding='utf-8'))
           assert completo.get('total_partidas') == 380, 'calendario-completo.json sem 380 partidas'
+          competicoes = {}
+          for chave, arquivo in {
+              'copa_do_brasil': 'dados-br/competicoes-af-previsao/copa-do-brasil.json',
+              'libertadores': 'dados-br/competicoes-af-previsao/libertadores.json',
+              'sul_americana': 'dados-br/competicoes-af-previsao/sul-americana.json',
+          }.items():
+              snapshot = json.load(open(arquivo, encoding='utf-8'))
+              assert (snapshot.get('competicao') or {}).get('chave') == chave, f'{arquivo}: competição divergente'
+              competicoes[chave] = snapshot
+          aud_copas = json.load(open('dados-br/auditoria-competicoes-af-previsao.json', encoding='utf-8'))
+          assert isinstance(aud_copas.get('competicoes'), list), 'auditoria continental sem competições'
+
           previsao = json.load(open('dados-br/probabilidades-brasileirao.json', encoding='utf-8'))
           assert previsao.get('status') == 'ok', 'AF-Previsão com status inválido'
           assert previsao.get('base_corrente', {}).get('partidas_totais') == 380, 'AF-Previsão sem 380 partidas'
@@ -200,15 +223,39 @@ jobs:
           assert len(clubes_prev) == 20, 'AF-Previsão sem 20 clubes'
           assert previsao.get('total_previsoes_partidas') == previsao.get('base_corrente', {}).get('partidas_restantes'), 'AF-Previsão sem previsão para todos os jogos restantes'
           assert len(previsao.get('partidas_restantes') or []) == previsao.get('base_corrente', {}).get('partidas_restantes'), 'lista de partidas previstas incompleta'
-          for campo, esperado in [('campeao', 100), ('g4', 400), ('g6', 600), ('libertadores_base', 600), ('sul_americana_base', 600), ('rebaixamento', 400)]:
+          for campo, esperado in [('campeao', 100), ('g4', 400), ('g6', 600), ('libertadores_base', 500), ('sul_americana_base', 600), ('rebaixamento', 400)]:
               total = sum(float(item['probabilidades_pct'][campo]) for item in clubes_prev)
               assert abs(total - esperado) <= 0.02, f'AF-Previsão: soma inválida em {campo}: {total}'
           assert all(abs(sum(item.get('distribuicao_posicoes_pct') or []) - 100) <= 0.02 for item in clubes_prev), 'AF-Previsão: distribuição de posições inválida'
+
+          integrado = previsao.get('schema_version', 0) >= 2 and (previsao.get('integracao_continental') or {}).get('status') == 'ok'
+          snapshots_prontos = all(snapshot.get('status') == 'ok' and snapshot.get('eventos') for snapshot in competicoes.values())
+          if integrado:
+              assert snapshots_prontos, 'previsão integrada publicada com snapshots continentais inválidos'
+              total_sula = sum(float(item['probabilidades_pct']['sul_americana']) for item in clubes_prev)
+              assert abs(total_sula - 600) <= 0.02, f'Sul-Americana integrada não soma 600%: {total_sula}'
+              for item in clubes_prev:
+                  for campo in ('libertadores', 'sul_americana'):
+                      detalhe = (item.get('probabilidades_detalhes') or {}).get(campo) or {}
+                      assert detalhe.get('simulacoes', 0) >= 200000, f'{item["clube"]}: detalhe sem simulações em {campo}'
+                      assert isinstance(detalhe.get('exibicao'), str), f'{item["clube"]}: exibição ausente em {campo}'
+                  decomposicao = item.get('decomposicao_chances') or {}
+                  lib = decomposicao.get('libertadores') or {}
+                  sula = decomposicao.get('sul_americana') or {}
+                  assert abs(float(lib.get('soma_vias_pct', -1)) - float(item['probabilidades_pct']['libertadores'])) <= 0.002, f'{item["clube"]}: vias da Libertadores não fecham'
+                  assert abs(float(sula.get('soma_vias_pct', -1)) - float(item['probabilidades_pct']['sul_americana'])) <= 0.002, f'{item["clube"]}: vias da Sul-Americana não fecham'
+              print('  OK   AF-Previsão continental integrado e decomposto por via')
+          else:
+              assert not snapshots_prontos or aud_copas.get('status') != 'ok', 'snapshots prontos sem publicação integrada'
+              print('::warning::AF-Previsão anterior preservado porque a coleta continental ainda não ficou íntegra')
           aud_prev = json.load(open('dados-br/auditoria-probabilidades.json', encoding='utf-8'))
           assert aud_prev.get('status') == 'ok', 'auditoria do AF-Previsão falhou'
           assert aud_prev.get('simulacao', {}).get('quantidade', 0) >= 200000, 'AF-Previsão com poucas simulações'
           assert aud_prev.get('simulacao', {}).get('convergencia', {}).get('maior_diferenca_entre_metades_pontos_percentuais', 99) <= 1.0, 'AF-Previsão sem convergência suficiente'
           assert aud_prev.get('hash_entrada') == previsao.get('hash_entrada'), 'hash divergente entre previsão e auditoria'
+          if integrado:
+              assert aud_prev.get('schema_version', 0) >= 2, 'auditoria integrada em schema antigo'
+              assert isinstance(aud_prev.get('integracao_continental'), dict), 'auditoria sem integração continental'
           hist_prev = json.load(open('dados-br/historico-probabilidades.json', encoding='utf-8'))
           assert hist_prev.get('total_snapshots', 0) >= 1, 'histórico do AF-Previsão vazio'
           assert (hist_prev.get('snapshots') or [])[-1].get('hash_entrada') == previsao.get('hash_entrada'), 'histórico não termina no estado publicado'
@@ -246,6 +293,10 @@ jobs:
             "dados-br/auditoria-cobertura-resultados.json"
             "dados-br/calendario-completo.json"
             "dados-br/auditoria-calendario.json"
+            "dados-br/competicoes-af-previsao/copa-do-brasil.json"
+            "dados-br/competicoes-af-previsao/libertadores.json"
+            "dados-br/competicoes-af-previsao/sul-americana.json"
+            "dados-br/auditoria-competicoes-af-previsao.json"
             "dados-br/probabilidades-brasileirao.json"
             "dados-br/auditoria-probabilidades.json"
             "dados-br/historico-probabilidades.json"
