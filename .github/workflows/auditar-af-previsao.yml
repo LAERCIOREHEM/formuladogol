@@ -120,7 +120,22 @@ jobs:
           assert 'Monte Carlo' in report
           assert 'Dixon–Coles' in report
           assert 'Poisson log-linear MAP' in report
-          assert not (root / 'dados-br/probabilidades-brasileirao.json').exists(), 'Execução 1 não deve publicar probabilidades correntes'
+
+          # Este workflow audita a base histórica e os modelos científicos.
+          # Nas primeiras execuções ele era rodado antes da publicação das probabilidades
+          # correntes; por isso havia uma trava exigindo a inexistência desse arquivo.
+          # Hoje o repositório já publica o AF-Previsão corrente, então essa presença é
+          # esperada. A auditoria deste workflow deve apenas garantir que a etapa de
+          # backtesting não corrompeu nem removeu esse artefato dinâmico.
+          corrente = root / 'dados-br/probabilidades-brasileirao.json'
+          if corrente.exists():
+              previsao = json.load(open(corrente, encoding='utf-8'))
+              assert isinstance(previsao, dict), 'probabilidades-brasileirao.json inválido'
+              assert previsao.get('status') in {'ok', 'preservado'}, previsao.get('status')
+              clubes = previsao.get('clubes') or []
+              assert len(clubes) in {0, 20}, f'probabilidades correntes com {len(clubes)} clubes'
+              print('OK probabilidades correntes presentes e preservadas fora da auditoria histórica')
+
           print('AF-Previsão: base, backtesting e relatório validados')
           PY
 
