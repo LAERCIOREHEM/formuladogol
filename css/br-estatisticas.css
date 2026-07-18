@@ -1478,3 +1478,111 @@ body > .container > section.hero > img {
   .probability-history-details > summary { align-items: flex-start; flex-direction: column; gap: 3px; }
   .probability-projection-metric small { min-height: 0; }
 }
+
+/* Execução 5 — avaliação final invisível durante a temporada */
+#probabilidades-avaliacao-final[hidden] {
+  display: none !important;
+}
+
+.probability-final-evaluation {
+  margin-top: 24px;
+  padding: 22px;
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.12));
+  border-radius: 18px;
+  background: rgba(8, 18, 32, 0.72);
+}
+
+.probability-final-evaluation > p,
+.probability-final-evaluation-details > p {
+  margin: 10px 0 0;
+  line-height: 1.65;
+  color: var(--muted, #aeb8c5);
+}
+
+.probability-final-evaluation-summary,
+.probability-final-evaluation-events {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.probability-final-evaluation-events {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.probability-final-evaluation-summary article,
+.probability-final-evaluation-events article {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.probability-final-evaluation-summary span,
+.probability-final-evaluation-events span,
+.probability-final-evaluation-summary small,
+.probability-final-evaluation-events small {
+  display: block;
+}
+
+.probability-final-evaluation-summary span,
+.probability-final-evaluation-events span {
+  font-size: 0.78rem;
+  color: var(--muted, #aeb8c5);
+}
+
+.probability-final-evaluation-summary strong,
+.probability-final-evaluation-events strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 1.45rem;
+}
+
+.probability-final-evaluation-summary small,
+.probability-final-evaluation-events small {
+  margin-top: 4px;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--muted, #aeb8c5);
+}
+
+.probability-final-evaluation-details {
+  margin-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 14px;
+}
+
+.probability-final-evaluation-details summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.probability-final-evaluation-details summary span {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--muted, #aeb8c5);
+}
+
+@media (max-width: 820px) {
+  .probability-final-evaluation-summary,
+  .probability-final-evaluation-events {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .probability-final-evaluation {
+    padding: 17px;
+  }
+
+  .probability-final-evaluation-summary,
+  .probability-final-evaluation-events {
+    grid-template-columns: 1fr;
+  }
+}

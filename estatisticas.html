@@ -25,7 +25,7 @@
   <meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
   <meta name="twitter:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260718-afprevisao-execucao-4">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260718-afprevisao-execucao-5">
   <link rel="stylesheet" href="css/br-global.css?v=20260713-disclaimers-publicos-v1">
 </head>
 <body>
@@ -194,7 +194,7 @@
                     </article>
                     <article id="metodo-residuais">
                       <span class="probability-method-step">07</span>
-                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,1%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico cria um novo snapshot apenas quando o estado esportivo muda e registra a rodada de referência, posição projetada, pontos e probabilidades. Ele aparece de forma compacta dentro do card de cada clube. Após o campeonato, essa base permitirá medir erro de posição, erro de pontos, calibração e Brier Score em uma avaliação própria, sem ocupar permanentemente a página com uma seção extensa.</p></div>
+                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,1%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico cria um novo snapshot apenas quando o estado esportivo muda e registra rodada, projeções, distribuição completa das posições e probabilidades. Os registros são encadeados por SHA-256, permitindo detectar alterações retroativas, e aparecem de forma compacta dentro do card de cada clube. A avaliação final só será exibida nesta própria aba depois da conclusão do Brasileirão e das competições que alteram as vagas continentais; até lá, nenhum bloco vazio ocupa a página.</p></div>
                     </article>
                     <article id="metodo-validacao">
                       <span class="probability-method-step">08</span>
@@ -216,6 +216,8 @@
                   <p class="probability-method-disclaimer">Metodologia própria, independente e sem finalidade de aposta. As probabilidades são estimativas condicionais sujeitas à qualidade dos dados, às premissas do modelo e a acontecimentos futuros não observáveis, como escalações, lesões, suspensões e mudanças técnicas. Mudanças regulamentares exigem atualização da configuração e nova auditoria.</p>
                 </div>
               </details>
+
+              <div id="probabilidades-avaliacao-final" hidden aria-live="polite"></div>
 
               <div class="probability-authorship">
                 <div><span>Desenvolvimento e supervisão matemática</span><strong>Laércio Rehem</strong><p>Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas e responsável pelo projeto Brasileirão 2026 — Almoço de Sexta.</p></div>
@@ -280,7 +282,7 @@
     </footer>
   </div>
 
-  <script src="js/br-estatisticas.js?v=20260718-afprevisao-execucao-4"></script>
+  <script src="js/br-estatisticas.js?v=20260718-afprevisao-execucao-5"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260713-publico-login-admin-v1"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>

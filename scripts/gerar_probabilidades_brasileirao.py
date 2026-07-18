@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Gera as probabilidades do AF-Previsão para o Brasileirão 2026.
 
-Execução 4 do projeto:
+Execução 5 do projeto:
   * mantém a arquitetura Poisson log-linear MAP selecionada no backtesting;
   * aplica um ajuste conservador de forma recente por EWMA, sem sazonalidade artificial;
   * prevê placares e resultados das partidas restantes do Brasileirão;
@@ -9,7 +9,8 @@ Execução 4 do projeto:
   * aloca, em cada universo Monte Carlo, vagas e repasses regulamentares;
   * publica chances continentais consolidadas e decompostas por via exclusiva;
   * publica posição e pontos projetados em inteiros, preservando as médias brutas para auditoria;
-  * registra ocorrências brutas, limites de resolução e histórico versionado por rodada.
+  * registra ocorrências brutas, limites de resolução e histórico encadeado por rodada;
+  * preserva a distribuição completa necessária à avaliação científica pós-campeonato.
 
 O modelo publicado usa a arquitetura vencedora da Execução 1. A correção
 Dixon–Coles permanece implementada e auditada como análise de sensibilidade;
@@ -984,6 +985,83 @@ def highlight(teams: Sequence[dict[str, Any]], field: str, reverse: bool = True)
     }
 
 
+def history_snapshot_hash(snapshot: dict[str, Any]) -> str:
+    """Calcula o hash canônico do snapshot, incluindo o elo anterior."""
+    payload = dict(snapshot)
+    payload.pop("hash_snapshot", None)
+    serialized = json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    return hashlib.sha256(serialized).hexdigest()
+
+
+def chain_history_snapshots(snapshots: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Recalcula uma cadeia SHA-256 determinística sobre os snapshots retidos."""
+    chained: list[dict[str, Any]] = []
+    previous_hash: str | None = None
+    for original in snapshots:
+        snapshot = json.loads(json.dumps(original, ensure_ascii=False))
+        snapshot["hash_anterior"] = previous_hash
+        snapshot.pop("hash_snapshot", None)
+        snapshot["hash_snapshot"] = history_snapshot_hash(snapshot)
+        previous_hash = snapshot["hash_snapshot"]
+        chained.append(snapshot)
+    return chained
+
+
+def validate_history_chain(history: dict[str, Any]) -> None:
+    snapshots = list(history.get("snapshots") or [])
+    previous_hash: str | None = None
+    seen_inputs: set[str] = set()
+    for index, snapshot in enumerate(snapshots, start=1):
+        input_hash = str(snapshot.get("hash_entrada") or "")
+        if not input_hash or input_hash in seen_inputs:
+            raise ValueError(f"histórico inválido no snapshot {index}: hash_entrada ausente ou duplicado")
+        seen_inputs.add(input_hash)
+        if snapshot.get("hash_anterior") != previous_hash:
+            raise ValueError(f"histórico inválido no snapshot {index}: elo anterior divergente")
+        computed = history_snapshot_hash(snapshot)
+        if snapshot.get("hash_snapshot") != computed:
+            raise ValueError(f"histórico inválido no snapshot {index}: hash do conteúdo divergente")
+        clubs = list(snapshot.get("clubes") or [])
+        if len(clubs) != 20 or len({str(item.get("clube") or "") for item in clubs}) != 20:
+            raise ValueError(f"histórico inválido no snapshot {index}: clubes incompletos")
+        previous_hash = computed
+    integrity = history.get("integridade") or {}
+    if integrity.get("quantidade_snapshots") != len(snapshots):
+        raise ValueError("histórico inválido: quantidade declarada diverge da lista")
+    if integrity.get("hash_final") != previous_hash:
+        raise ValueError("histórico inválido: hash final diverge da cadeia")
+
+
+def build_history_document(snapshots: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    chained = chain_history_snapshots(snapshots)
+    history = {
+        "schema_version": 3,
+        "projeto": "AF-Previsão",
+        "descricao": (
+            "Histórico público e encadeado das probabilidades; um snapshot por alteração "
+            "do estado esportivo, identificado por rodada e hash da entrada."
+        ),
+        "total_snapshots": len(chained),
+        "integridade": {
+            "algoritmo": "SHA-256",
+            "regra": "cada hash inclui todo o snapshot e o hash do elo anterior",
+            "quantidade_snapshots": len(chained),
+            "hash_inicial": chained[0].get("hash_snapshot") if chained else None,
+            "hash_final": chained[-1].get("hash_snapshot") if chained else None,
+            "encadeamento_valido": True,
+        },
+        "snapshots": chained,
+    }
+    validate_history_chain(history)
+    return history
+
+
 def update_history(
     existing: dict[str, Any] | None,
     generated_at: str,
@@ -994,6 +1072,10 @@ def update_history(
     simulations: int,
     max_snapshots: int = 300,
 ) -> dict[str, Any]:
+    if existing and int(existing.get("schema_version") or 0) >= 3:
+        # Não recalcula silenciosamente uma cadeia já publicada: primeiro
+        # verifica se o conteúdo ainda corresponde aos hashes registrados.
+        validate_history_chain(existing)
     snapshots = list((existing or {}).get("snapshots") or [])
     if not snapshots or snapshots[-1].get("hash_entrada") != input_hash:
         snapshots.append(
@@ -1012,9 +1094,18 @@ def update_history(
                         "jogos_atuais": item.get("jogos_atuais"),
                         "posicao_projetada": item.get("posicao_projetada"),
                         "posicao_media_estimada": item.get("posicao_projetada_media"),
+                        "posicao_mediana": item.get("posicao_projetada_mediana"),
                         "faixa_posicao_80": item.get("faixa_posicao_80"),
+                        "distribuicao_posicoes_pct": item.get("distribuicao_posicoes_pct"),
                         "pontos_projetados": item["pontos_projetados"].get("media"),
-                        "pontos_media_estimada": item["pontos_projetados"].get("media_estimada", item["pontos_projetados"].get("media")),
+                        "pontos_media_estimada": item["pontos_projetados"].get(
+                            "media_estimada", item["pontos_projetados"].get("media")
+                        ),
+                        "pontos_percentis": {
+                            "p10": item["pontos_projetados"].get("percentil_10"),
+                            "p50": item["pontos_projetados"].get("percentil_50"),
+                            "p90": item["pontos_projetados"].get("percentil_90"),
+                        },
                         "campeao_pct": item["probabilidades_pct"]["campeao"],
                         "libertadores_pct": item["probabilidades_pct"].get("libertadores"),
                         "sul_americana_pct": item["probabilidades_pct"].get("sul_americana"),
@@ -1032,21 +1123,16 @@ def update_history(
                         "decomposicao_chances": item.get("decomposicao_chances"),
                         "tendencia_recente": item.get("tendencia_recente"),
                         # Compatibilidade com snapshots das versões anteriores.
-                        "pontos_medios": item["pontos_projetados"].get("media_estimada", item["pontos_projetados"].get("media")),
+                        "pontos_medios": item["pontos_projetados"].get(
+                            "media_estimada", item["pontos_projetados"].get("media")
+                        ),
                     }
                     for item in teams
                 ],
             }
         )
     snapshots = snapshots[-max(1, int(max_snapshots)) :]
-    return {
-        "schema_version": 2,
-        "projeto": "AF-Previsão",
-        "descricao": "Histórico versionado das probabilidades; um snapshot por alteração dos dados de entrada, identificado por rodada de referência.",
-        "total_snapshots": len(snapshots),
-        "snapshots": snapshots,
-    }
-
+    return build_history_document(snapshots)
 
 def continental_snapshots_state_hash(snapshots: dict[str, dict[str, Any]]) -> str:
     """Hash apenas do estado esportivo, sem timestamps de coleta/cache."""
@@ -1316,7 +1402,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         "schema_version": 2,
         "projeto": "AF-Previsão",
         "versao_modelo": model_version,
-        "etapa": "Execução 4 — tendência controlada, projeções inteiras e histórico compacto",
+        "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
         "gerado_em": generated_at,
         "status": "ok",
         "hash_entrada": input_hash,
@@ -1530,6 +1616,20 @@ def self_test() -> None:
     saved = synthetic_history["snapshots"][0]
     if saved.get("rodada_referencia") != 19 or saved["clubes"][0].get("posicao_projetada") is None:
         raise AssertionError("histórico não guardou rodada e projeção final")
+    if len(saved["clubes"][0].get("distribuicao_posicoes_pct") or []) != 20:
+        raise AssertionError("histórico não guardou a distribuição completa das posições")
+    validate_history_chain(synthetic_history)
+    tampered_history = json.loads(json.dumps(synthetic_history))
+    tampered_history["snapshots"][0]["clubes"][0]["campeao_pct"] = 99.0
+    try:
+        update_history(
+            tampered_history, "2026-07-18T10:00:00-03:00", "hash-teste-2", result_a["clubes"],
+            "AF-Previsão teste", round_reference=20, simulations=10_000, max_snapshots=10,
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("alteração retroativa em cadeia publicada não foi bloqueada")
     snapshot_a = {
         "copa_do_brasil": {"status": "ok", "temporada": 2026, "competicao": {"chave": "copa_do_brasil"}, "fase_atual": {}, "eventos": [], "gerado_em": "2026-07-18T00:00:00-03:00"}
     }
@@ -1540,7 +1640,7 @@ def self_test() -> None:
     snapshot_b["copa_do_brasil"]["eventos"] = [{"event_id": "novo"}]
     if continental_snapshots_state_hash(snapshot_a) == continental_snapshots_state_hash(snapshot_b):
         raise AssertionError("mudança esportiva precisa alterar o hash continental")
-    print("Self-test AF-Previsão Execução 4: OK")
+    print("Self-test AF-Previsão Execução 5: OK")
 
 
 def main() -> int:
@@ -1572,9 +1672,16 @@ def main() -> int:
                 previous_valid = False
         if not previous_valid:
             raise
+        # A Execução 5 pode migrar o histórico legado para a cadeia SHA-256
+        # sem criar snapshot novo nem alterar as probabilidades preservadas.
+        if int(previous_history.get("schema_version") or 0) >= 3:
+            validate_history_chain(previous_history)
+        upgraded_history = build_history_document(list(previous_history.get("snapshots") or []))
+        write_json(HISTORY_PATH, upgraded_history)
         print(
             "::warning title=AF-Previsão aguardando sincronização da ESPN::"
-            f"{exc}. A previsão anterior íntegra foi preservada; a próxima execução tentará atualizar novamente."
+            f"{exc}. Probabilidades e auditoria anteriores foram preservadas; "
+            "o histórico foi apenas encadeado, sem criar novo estado esportivo."
         )
         return 0
     write_json(OUTPUT_PATH, probabilities)

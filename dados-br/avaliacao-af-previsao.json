@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "projeto": "AF-Previsão",
+  "temporada": 2026,
+  "gerado_em": "2026-07-18T08:53:24-03:00",
+  "versao_avaliacao": "AF-Avaliação 1.0",
+  "integridade_historico": {
+    "valido": true,
+    "encadeado": false,
+    "algoritmo": null,
+    "quantidade_snapshots": 1,
+    "hash_inicial": null,
+    "hash_final": null,
+    "rodadas_distintas": [],
+    "modelos_registrados": [
+      "AF-Previsão 1.0"
+    ],
+    "erros": [],
+    "avisos": [
+      "histórico estruturalmente válido, mas ainda sem cadeia SHA-256 da Execução 5"
+    ]
+  },
+  "cobertura": {
+    "snapshots": 1,
+    "rodadas_distintas": 0,
+    "primeira_rodada": null,
+    "ultima_rodada": null,
+    "primeiro_registro": "2026-07-16T21:24:00-03:00",
+    "ultimo_registro": "2026-07-16T21:24:00-03:00",
+    "minimo_snapshots_publicacao": 5
+  },
+  "metricas_planejadas": {
+    "posicao": [
+      "MAE",
+      "RMSE",
+      "RPS da distribuição de posições",
+      "acerto exato e faixas"
+    ],
+    "pontos": [
+      "MAE",
+      "RMSE",
+      "viés médio"
+    ],
+    "eventos": [
+      "Brier Score",
+      "Log Loss",
+      "calibração em dez faixas"
+    ],
+    "eventos_avaliados": [
+      "campeão",
+      "Libertadores",
+      "Sul-Americana",
+      "rebaixamento"
+    ]
+  },
+  "publicar_na_interface": false,
+  "status": "coletando_historico",
+  "mensagem": "Campeonato em andamento: maior número de jogos por clube é 19/38.",
+  "campeonato": {
+    "concluido": false,
+    "detalhe": "Campeonato em andamento: maior número de jogos por clube é 19/38."
+  },
+  "avaliacao_final": null
+}

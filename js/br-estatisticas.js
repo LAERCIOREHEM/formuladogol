@@ -13,6 +13,7 @@
     probabilitiesAudit: "dados-br/auditoria-probabilidades.json",
     probabilitiesHistory: "dados-br/historico-probabilidades.json",
     probabilityModelsAudit: "dados-br/auditoria-modelos-af-previsao.json",
+    probabilityEvaluation: "dados-br/avaliacao-af-previsao.json",
   };
 
   const state = {
@@ -27,6 +28,7 @@
     probabilitiesAudit: null,
     probabilitiesHistory: null,
     probabilityModelsAudit: null,
+    probabilityEvaluation: null,
     probabilitySort: "campeao",
     probabilityHistoryClub: "",
     probabilityHistoryMetric: "campeao_pct",
@@ -978,7 +980,41 @@
       <article><span>Monte Carlo</span><strong>${integer(sim.quantidade || data?.simulacao?.quantidade)}</strong><small>semente ${integer(sim.semente || data?.simulacao?.semente)}</small></article>
       <article><span>Margem numérica</span><strong>${Number.isFinite(margin) ? `±${number(margin, 3)} p.p.` : "—"}</strong><small>pior caso aproximado, 95%</small></article>
       <article><span>Forma recente</span><strong>${Number.isFinite(trendWindow) ? `${integer(trendWindow)} jogos` : "Aguardando"}</strong><small>${Number.isFinite(trendWeight) ? `${number(trendWeight * 100, 0)}% de peso` : "peso controlado"}${Number.isFinite(trendLimit) ? ` · limite ±${number(trendLimit, 0)}%` : ""}</small></article>
-      <article><span>Resolução visual</span><strong>&lt;${number(threshold, 1)}%</strong><small>zero observado não vira impossibilidade</small></article>`;
+      <article><span>Resolução visual</span><strong>&lt;${number(threshold, 1)}%</strong><small>zero observado não vira impossibilidade</small></article>
+      <article><span>Histórico público</span><strong>${integer(state.probabilityEvaluation?.cobertura?.snapshots ?? state.probabilitiesHistory?.total_snapshots)}</strong><small>${state.probabilityEvaluation?.integridade_historico?.encadeado ? "cadeia SHA-256 íntegra" : "encadeamento após a próxima atualização"}</small></article>`;
+  }
+
+  function renderProbabilityEvaluation() {
+    const target = $("probabilidades-avaliacao-final");
+    if (!target) return;
+    const data = state.probabilityEvaluation || {};
+    const ready = data.publicar_na_interface === true && data.avaliacao_final?.agregado;
+    target.hidden = !ready;
+    if (!ready) {
+      target.innerHTML = "";
+      return;
+    }
+    const aggregate = data.avaliacao_final.agregado || {};
+    const position = aggregate.posicao || {};
+    const points = aggregate.pontos || {};
+    const events = aggregate.eventos || {};
+    const snapshots = Number(aggregate.snapshots_avaliados || data.cobertura?.snapshots);
+    const eventCards = [
+      ["Título", events.campeao],
+      ["Libertadores", events.libertadores],
+      ["Sul-Americana", events.sul_americana],
+      ["Rebaixamento", events.rebaixamento],
+    ].map(([label, metric]) => `<article><span>${escapeHtml(label)}</span><strong>${number(metric?.brier, 4)}</strong><small>Brier · Log Loss ${number(metric?.log_loss, 4)}</small></article>`).join("");
+    target.innerHTML = `<section class="probability-final-evaluation" aria-labelledby="titulo-avaliacao-af">
+      <div class="probability-section-head"><div><div class="kicker">Avaliação pós-campeonato</div><h3 id="titulo-avaliacao-af">Avaliação do AF-Previsão 2026</h3></div><span>${integer(snapshots)} ${snapshots === 1 ? "snapshot" : "snapshots"}</span></div>
+      <p>As previsões registradas durante a temporada foram comparadas com a classificação e as vagas efetivamente observadas. A avaliação só é publicada depois da conclusão do Brasileirão e das competições que alteram as vagas continentais.</p>
+      <div class="probability-final-evaluation-summary">
+        <article><span>Erro médio de posição</span><strong>${number(position.mae_posicoes, 2)}</strong><small>posições por clube e snapshot</small></article>
+        <article><span>Erro médio de pontos</span><strong>${number(points.mae_pontos, 2)}</strong><small>pontos por clube e snapshot</small></article>
+        <article><span>RPS das posições</span><strong>${number(position.rps_posicao, 4)}</strong><small>menor é melhor</small></article>
+      </div>
+      <details class="probability-final-evaluation-details"><summary>Ver métricas probabilísticas <span>Brier e Log Loss</span></summary><div class="probability-final-evaluation-events">${eventCards}</div><p>O Brier Score mede a distância entre a probabilidade publicada e o desfecho observado. O Log Loss pune previsões excessivamente confiantes que terminam erradas. Em ambos, valores menores indicam melhor desempenho.</p></details>
+    </section>`;
   }
 
   function renderProbabilities() {
@@ -987,6 +1023,7 @@
     renderProbabilityControls();
     renderProbabilityRanking();
     renderProbabilityAudit();
+    renderProbabilityEvaluation();
   }
 
   function activateTab(tab, updateHash = true) {
@@ -1107,7 +1144,7 @@
     else if (abrirMetodologia) state.tab = "desempenho";
     else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "probabilidades", "desempenho"].includes(hashTab)) state.tab = hashTab;
 
-    const [leaders, competition, details, ranking, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit] = await Promise.all([
+    const [leaders, competition, details, ranking, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation] = await Promise.all([
       fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
       fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
       fetchJson(FILES.details, { jogos: {} }),
@@ -1119,6 +1156,7 @@
       fetchJson(FILES.probabilitiesAudit, { status: "aguardando_workflow" }),
       fetchJson(FILES.probabilitiesHistory, { total_snapshots: 0, snapshots: [] }),
       fetchJson(FILES.probabilityModelsAudit, { status: "aguardando_workflow" }),
+      fetchJson(FILES.probabilityEvaluation, { status: "aguardando_primeira_execucao", publicar_na_interface: false }),
     ]);
 
     state.leaders = leaders;
@@ -1132,6 +1170,7 @@
     state.probabilitiesAudit = probabilitiesAudit;
     state.probabilitiesHistory = probabilitiesHistory;
     state.probabilityModelsAudit = probabilityModelsAudit;
+    state.probabilityEvaluation = probabilityEvaluation;
     renderAll();
     if (openProbabilityMethod) {
       requestAnimationFrame(() => $("metodologia-probabilidades")?.scrollIntoView({ behavior: "auto", block: "start" }));
