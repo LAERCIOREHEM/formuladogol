@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 36,
+    "jogos_na_janela": 33,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 12,
+    "candidatos_oficiais_encontrados": 11,
     "transmissoes_publicadas": 3,
-    "sem_transmissao": 33,
+    "sem_transmissao": 30,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,33 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401840998",
-      "rodada": 4,
-      "jogo": "Bahia x Chapecoense",
-      "data_iso": "2026-07-17T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401841153",
-      "rodada": 19,
-      "jogo": "Fluminense x Bragantino",
-      "data_iso": "2026-07-17T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "jogo": "Mirassol x Grêmio",
-      "data_iso": "2026-07-17T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401841148",
       "rodada": 19,
@@ -469,7 +442,7 @@
       "canal": "CazéTV",
       "titulo": "ESPANHA X ARGENTINA! RELEMBRE A TRAJETÓRIA DOS FINALISTAS DA COPA DO MUNDO FIFA™ 2026!",
       "status": "upcoming",
-      "inicio_programado": "2026-07-17T23:00:00-03:00",
+      "inicio_programado": "2026-07-17T22:30:00-03:00",
       "motivo": "conteúdo rejeitado: melhores momentos"
     },
     {
@@ -477,7 +450,7 @@
       "url": "https://www.youtube.com/watch?v=_qnQ-zc6qDg",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: CORINTHIANS X FERROVIÁRIA | PAULISTÃO F 2026 | 4ª RODADA",
+      "titulo": "AO VIVO: ESPECIAL FINAL DA COPA COPA DO MUNDO! ESPANHA X ARGENTINA: O DUELO DO O COLETIVO X A GARRA",
       "status": "live",
       "inicio_programado": "2026-07-17T18:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -493,48 +466,17 @@
       "motivo": "conteúdo rejeitado: melhores momentos"
     },
     {
-      "video_id": "hY_qSy-1fWI",
-      "url": "https://www.youtube.com/watch?v=hY_qSy-1fWI",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: JOÃO FONSECA E GUTO MIGUEL NO UTS RIO 2026 | TÊNIS | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-07-17T18:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "ih3fla-e6rk",
       "url": "https://www.youtube.com/watch?v=ih3fla-e6rk",
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO: BRASIL X POLÔNIA | LIGA DAS NAÇÕES MASCULINA DE VÔLEI 2026 | SEMANA 3 | ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-07-17T21:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401840998",
-      "rodada": 4,
-      "jogo": "Bahia x Chapecoense",
-      "data_iso": "2026-07-17T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401841153",
-      "rodada": 19,
-      "jogo": "Fluminense x Bragantino",
-      "data_iso": "2026-07-17T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401841155",
-      "rodada": 19,
-      "jogo": "Mirassol x Grêmio",
-      "data_iso": "2026-07-17T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401841148",
       "rodada": 19,
@@ -756,5 +698,5 @@
     },
     "observacao": "search.list não é mais usado. Custo: ~2 unidades (channels) + ~20 (playlistItems 500 itens) + ~10 (videos) por execução ≈ 32 unidades. Cabe 300+ execuções/dia dentro das 10.000 gratuitas."
   },
-  "atualizado_em": "2026-07-17T20:27:52-03:00"
+  "atualizado_em": "2026-07-17T22:01:34-03:00"
 }
