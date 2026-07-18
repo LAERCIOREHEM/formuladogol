@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "projeto": "AF-Previsão Continental",
+  "etapa": "Execução 2.5 — coleta das competições que alteram vagas",
+  "gerado_em": null,
+  "status": "aguardando_primeira_atualizacao",
+  "fonte": "ESPN",
+  "temporada": 2026,
+  "competicoes": [
+    {
+      "competicao": "copa_do_brasil",
+      "status": "aguardando",
+      "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json"
+    },
+    {
+      "competicao": "libertadores",
+      "status": "aguardando",
+      "arquivo": "dados-br/competicoes-af-previsao/libertadores.json"
+    },
+    {
+      "competicao": "sul_americana",
+      "status": "aguardando",
+      "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json"
+    }
+  ],
+  "falhas": [],
+  "regras_operacionais": {
+    "cache_minutos": 45,
+    "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
+    "nenhum_json_vazio": true
+  }
+}

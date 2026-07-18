@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Gera as probabilidades do AF-Previsão para o Brasileirão 2026.
 
-Execução 2 do projeto:
-  * ajusta a arquitetura Poisson log-linear MAP selecionada no backtesting;
-  * prevê placares e resultados das partidas restantes;
-  * simula o campeonato por Monte Carlo;
-  * produz probabilidades de título, zonas continentais e rebaixamento;
-  * registra auditoria, convergência, sensibilidades e histórico versionado.
+Execução 2.5 do projeto:
+  * mantém a arquitetura Poisson log-linear MAP selecionada no backtesting;
+  * prevê placares e resultados das partidas restantes do Brasileirão;
+  * simula Copa do Brasil, Libertadores e Sul-Americana;
+  * aloca, em cada universo Monte Carlo, vagas e repasses regulamentares;
+  * publica chances continentais consolidadas e decompostas por via exclusiva;
+  * registra ocorrências brutas, limites de resolução e histórico versionado.
 
 O modelo publicado usa a arquitetura vencedora da Execução 1. A correção
 Dixon–Coles permanece implementada e auditada como análise de sensibilidade;
@@ -54,6 +55,12 @@ from af_previsao_backtest import (  # noqa: E402
     modal_score,
     outcome_from_matrix,
     score_matrix,
+)
+from af_previsao_continental import (  # noqa: E402
+    ContinentalDataNotReady,
+    display_probability,
+    integrate_continental_probabilities,
+    load_snapshots as load_continental_snapshots,
 )
 
 CONFIG_PATH = ROOT / "dados-br" / "config-af-previsao.json"
@@ -576,6 +583,8 @@ def run_monte_carlo(
     simulations: int,
     seed: int,
     rho: float,
+    return_samples: bool = False,
+    display_threshold_pct: float = 0.1,
 ) -> dict[str, Any]:
     if simulations < 10_000:
         raise ValueError("produção exige pelo menos 10.000 simulações")
@@ -642,14 +651,16 @@ def run_monte_carlo(
         counts = np.bincount(team_positions, minlength=21)[1:21]
         distribution = counts / simulations
         position_matrix[team] = [round(float(value * 100.0), 6) for value in distribution]
-        probabilities = {
-            "campeao": float(np.mean(team_positions == 1)),
-            "g4": float(np.mean(team_positions <= 4)),
-            "g6": float(np.mean(team_positions <= 6)),
-            "libertadores_base": float(np.mean(team_positions <= 6)),
-            "sul_americana_base": float(np.mean((team_positions >= 7) & (team_positions <= 12))),
-            "rebaixamento": float(np.mean(team_positions >= 17)),
+        criterion_masks = {
+            "campeao": team_positions == 1,
+            "g4": team_positions <= 4,
+            "g6": team_positions <= 6,
+            "libertadores_base": team_positions <= 5,
+            "sul_americana_base": (team_positions >= 6) & (team_positions <= 11),
+            "rebaixamento": team_positions >= 17,
         }
+        criterion_counts = {key: int(np.sum(mask)) for key, mask in criterion_masks.items()}
+        probabilities = {key: count / simulations for key, count in criterion_counts.items()}
         first_half = positions[:half, index]
         second_half = positions[half : 2 * half, index]
         for criterion, predicate in (
@@ -670,6 +681,10 @@ def run_monte_carlo(
                 "probabilidades_pct": {
                     key: round(value * 100.0, 6) for key, value in probabilities.items()
                 },
+                "probabilidades_detalhes": {
+                    key: display_probability(count, simulations, display_threshold_pct)
+                    for key, count in criterion_counts.items()
+                },
                 "posicao_projetada_media": round(float(np.mean(team_positions)), 4),
                 "posicao_projetada_mediana": int(np.median(team_positions)),
                 "pontos_projetados": {
@@ -686,7 +701,7 @@ def run_monte_carlo(
 
     team_results.sort(key=lambda item: (-item["probabilidades_pct"]["campeao"], item["posicao_projetada_media"]))
     standard_error_max = 100.0 * math.sqrt(0.25 / simulations)
-    return {
+    output: dict[str, Any] = {
         "clubes": team_results,
         "simulacoes": simulations,
         "semente": seed,
@@ -703,6 +718,9 @@ def run_monte_carlo(
             "pares_residuais": total_residual_pairs,
         },
     }
+    if return_samples:
+        output["_league_order"] = order
+    return output
 
 
 def dixon_coles_sensitivity(forecasts: Sequence[MatchForecast], rho: float) -> dict[str, Any]:
@@ -837,13 +855,25 @@ def update_history(
                 "gerado_em": generated_at,
                 "hash_entrada": input_hash,
                 "versao_modelo": model_version,
+                "metodologia": "AF-Previsão Integrada",
                 "clubes": [
                     {
                         "clube": item["clube"],
                         "campeao_pct": item["probabilidades_pct"]["campeao"],
+                        "libertadores_pct": item["probabilidades_pct"].get("libertadores"),
+                        "sul_americana_pct": item["probabilidades_pct"].get("sul_americana"),
                         "libertadores_base_pct": item["probabilidades_pct"]["libertadores_base"],
                         "sul_americana_base_pct": item["probabilidades_pct"]["sul_americana_base"],
                         "rebaixamento_pct": item["probabilidades_pct"]["rebaixamento"],
+                        "exibicao": {
+                            key: detail.get("exibicao")
+                            for key, detail in (item.get("probabilidades_detalhes") or {}).items()
+                        },
+                        "ocorrencias": {
+                            key: detail.get("ocorrencias")
+                            for key, detail in (item.get("probabilidades_detalhes") or {}).items()
+                        },
+                        "decomposicao_chances": item.get("decomposicao_chances"),
                         "pontos_medios": item["pontos_projetados"]["media"],
                     }
                     for item in teams
@@ -852,12 +882,26 @@ def update_history(
         )
     snapshots = snapshots[-max(1, int(max_snapshots)) :]
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "projeto": "AF-Previsão",
         "descricao": "Histórico versionado das probabilidades; um snapshot por alteração dos dados de entrada.",
         "total_snapshots": len(snapshots),
         "snapshots": snapshots,
     }
+
+
+def continental_snapshots_state_hash(snapshots: dict[str, dict[str, Any]]) -> str:
+    """Hash apenas do estado esportivo, sem timestamps de coleta/cache."""
+    stable: dict[str, Any] = {}
+    for key, snapshot in sorted(snapshots.items()):
+        stable[key] = {
+            "status": snapshot.get("status"),
+            "temporada": snapshot.get("temporada"),
+            "competicao": snapshot.get("competicao"),
+            "fase_atual": snapshot.get("fase_atual"),
+            "eventos": snapshot.get("eventos") or [],
+        }
+    return canonical_hash_payload(stable)
 
 
 def validate_probabilities(teams: Sequence[dict[str, Any]]) -> None:
@@ -867,7 +911,7 @@ def validate_probabilities(teams: Sequence[dict[str, Any]]) -> None:
         "campeao": 100.0,
         "g4": 400.0,
         "g6": 600.0,
-        "libertadores_base": 600.0,
+        "libertadores_base": 500.0,
         "sul_americana_base": 600.0,
         "rebaixamento": 400.0,
     }
@@ -921,7 +965,31 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     rho_production = float(execution.get("rho_dixon_coles_producao") or 0.0)
     rho_sensitivity = float(execution.get("rho_dixon_coles_sensibilidade") or 0.08)
     forecasts = build_forecasts(fixtures, model, rho_production)
-    simulation = run_monte_carlo(state, forecasts, simulations_final, seed, rho_production)
+    execution_25 = config.get("execucao_2_5") or {}
+    display_threshold = float(execution_25.get("limiar_exibicao_percentual", 0.1))
+    simulation = run_monte_carlo(
+        state,
+        forecasts,
+        simulations_final,
+        seed,
+        rho_production,
+        return_samples=True,
+        display_threshold_pct=display_threshold,
+    )
+    league_order = simulation.pop("_league_order")
+    try:
+        continental_snapshots = load_continental_snapshots()
+        continental = integrate_continental_probabilities(
+            continental_snapshots,
+            model,
+            league_order,
+            state.teams,
+            simulations_final,
+            seed,
+            execution_25,
+        )
+    except ContinentalDataNotReady as exc:
+        raise CurrentDataNotSynchronized(f"AF-Previsão Continental aguardando dados: {exc}") from exc
     max_half_delta = float(simulation["convergencia"]["maior_diferenca_entre_metades_pontos_percentuais"])
     if max_half_delta > 1.0:
         raise ValueError(
@@ -929,8 +997,29 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         )
     teams = simulation["clubes"]
     validate_probabilities(teams)
+    continental_by_team = continental["clubes"]
+    for item in teams:
+        integrated = continental_by_team[item["clube"]]
+        item["probabilidades_pct"]["libertadores"] = integrated["libertadores"]["total"]["percentual_estimado"]
+        item["probabilidades_pct"]["sul_americana"] = integrated["sul_americana"]["total"]["percentual_estimado"]
+        item["probabilidades_detalhes"]["libertadores"] = integrated["libertadores"]["total"]
+        item["probabilidades_detalhes"]["sul_americana"] = integrated["sul_americana"]["total"]
+        item["decomposicao_chances"] = {
+            "libertadores": integrated["libertadores"],
+            "sul_americana": integrated["sul_americana"],
+        }
+    total_sul_integrada = sum(item["probabilidades_pct"]["sul_americana"] for item in teams)
+    if abs(total_sul_integrada - 600.0) > 0.02:
+        raise ValueError(f"soma integrada da Sul-Americana inválida: {total_sul_integrada:.6f}")
+    for item in teams:
+        for field in ("libertadores", "sul_americana"):
+            value = float(item["probabilidades_pct"][field])
+            if not math.isfinite(value) or not 0.0 <= value <= 100.0:
+                raise ValueError(f"probabilidade integrada inválida para {item['clube']}: {field}")
 
     input_hash = build_model_state_hash(config, audit_models, state, current, fixtures)
+    continental_hash = continental_snapshots_state_hash(continental_snapshots)
+    input_hash = canonical_hash_payload({"brasileirao": input_hash, "competicoes": continental_hash})
     generated_at = reference.replace(microsecond=0).isoformat()
     model_version = str(config.get("versao_modelo") or "AF-Previsão 1.0")
     methodology = {
@@ -956,14 +1045,16 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "campeao": "1º lugar",
             "g4": "1º ao 4º",
             "g6": "1º ao 6º",
-            "libertadores_base": "1º ao 6º; vagas extraordinárias de copas não são antecipadas",
-            "sul_americana_base": "7º ao 12º; cenário-base antes de redistribuições por copas",
+            "libertadores_base": "1º ao 5º (quatro vagas diretas e uma preliminar)",
+            "sul_americana_base": "6º ao 11º antes dos repasses",
+            "libertadores": "chance consolidada por Brasileirão, Copa do Brasil, Libertadores, Sul-Americana e repasses",
+            "sul_americana": "seis vagas alocadas após a definição de todos os classificados à Libertadores",
             "rebaixamento": "17º ao 20º",
         },
         "af_score": "auditado como diagnóstico, não aplicado sem backtesting histórico homogêneo",
     }
     probabilities = {
-        "schema_version": 1,
+        "schema_version": 2,
         "projeto": "AF-Previsão",
         "versao_modelo": model_version,
         "temporada": 2026,
@@ -986,16 +1077,24 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         },
         "destaques": {
             "maior_chance_titulo": highlight(teams, "campeao"),
-            "maior_chance_libertadores": highlight(teams, "libertadores_base"),
-            "maior_chance_sul_americana": highlight(teams, "sul_americana_base"),
+            "maior_chance_libertadores": highlight(teams, "libertadores"),
+            "maior_chance_sul_americana": highlight(teams, "sul_americana"),
             "maior_risco_rebaixamento": highlight(teams, "rebaixamento"),
         },
         "clubes": teams,
+        "integracao_continental": {
+            "status": "ok",
+            "competicoes": ["Copa do Brasil", "CONMEBOL Libertadores", "CONMEBOL Sudamericana"],
+            "decomposicao_exclusiva_por_via": True,
+            "limiar_exibicao_percentual": float(execution_25.get("limiar_exibicao_percentual", 0.1)),
+            "hash_snapshots": continental_hash,
+        },
         "total_previsoes_partidas": len(forecasts),
         "partidas_restantes": serialize_match_forecasts(forecasts),
         "avisos": [
             "Probabilidades não são certezas e mudam quando novos jogos são concluídos.",
-            "Libertadores e Sul-Americana usam zonas-base; vagas adicionais por copas serão tratadas por cenário quando confirmadas.",
+            "Libertadores e Sul-Americana são probabilidades consolidadas e incluem os caminhos por copas e repasses regulamentares.",
+            "Valores exibidos como <0,1% não significam impossibilidade matemática; indicam evento abaixo da resolução visual escolhida.",
             "O modelo não utiliza cotações de apostas.",
         ],
     }
@@ -1016,10 +1115,10 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     dc_audit = dixon_coles_sensitivity(forecasts, rho_sensitivity)
     af_audit = af_score_diagnostic(model, state)
     audit = {
-        "schema_version": 1,
+        "schema_version": 2,
         "projeto": "AF-Previsão",
         "versao_modelo": model_version,
-        "etapa": "Execução 2 — motor probabilístico e Monte Carlo",
+        "etapa": "Execução 2.5 — probabilidades continentais integradas",
         "gerado_em": generated_at,
         "status": "ok",
         "hash_entrada": input_hash,
@@ -1052,13 +1151,20 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         },
         "sensibilidade_dixon_coles": dc_audit,
         "diagnostico_af_score": af_audit,
+        "integracao_continental": continental["auditoria"],
         "validacoes": {
             "clubes": len(teams),
             "soma_campeao_pct": round(sum(item["probabilidades_pct"]["campeao"] for item in teams), 6),
             "soma_g4_pct": round(sum(item["probabilidades_pct"]["g4"] for item in teams), 6),
             "soma_g6_pct": round(sum(item["probabilidades_pct"]["g6"] for item in teams), 6),
-            "soma_sul_americana_pct": round(
+            "soma_libertadores_consolidada_pct": round(
+                sum(item["probabilidades_pct"]["libertadores"] for item in teams), 6
+            ),
+            "soma_sul_americana_base_pct": round(
                 sum(item["probabilidades_pct"]["sul_americana_base"] for item in teams), 6
+            ),
+            "soma_sul_americana_consolidada_pct": round(
+                sum(item["probabilidades_pct"]["sul_americana"] for item in teams), 6
             ),
             "soma_rebaixamento_pct": round(
                 sum(item["probabilidades_pct"]["rebaixamento"] for item in teams), 6
@@ -1069,7 +1175,8 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         "limites_conhecidos": [
             "O ajuste é MAP regularizado, não amostragem MCMC da posterior completa.",
             "A incerteza publicada vem dos resultados futuros simulados; a versão 1.0 não amostra incerteza dos parâmetros.",
-            "Vagas continentais são cenários-base e podem mudar após títulos em copas.",
+            "Clubes brasileiros fora da Série A 2026 continuam elegíveis por Copa do Brasil ou títulos continentais; estrangeiros não alteram a alocação brasileira.",
+            "O pareamento de fases futuras é inferido da chave ESPN; na Copa do Brasil, sorteios ainda não realizados são simulados.",
             "Confronto direto e cartões não são simulados; empates residuais após pontos, vitórias, saldo e gols pró usam chave reproduzível.",
             "AF-Score não altera a previsão enquanto não houver backtesting histórico comparável.",
         ],
@@ -1155,7 +1262,17 @@ def self_test() -> None:
     validate_probabilities(result_a["clubes"])
     if result_a["simulacoes"] != 10_000:
         raise AssertionError("quantidade de simulações incorreta")
-    print("Self-test AF-Previsão Execução 2: OK")
+    snapshot_a = {
+        "copa_do_brasil": {"status": "ok", "temporada": 2026, "competicao": {"chave": "copa_do_brasil"}, "fase_atual": {}, "eventos": [], "gerado_em": "2026-07-18T00:00:00-03:00"}
+    }
+    snapshot_b = json.loads(json.dumps(snapshot_a))
+    snapshot_b["copa_do_brasil"]["gerado_em"] = "2026-07-18T01:00:00-03:00"
+    if continental_snapshots_state_hash(snapshot_a) != continental_snapshots_state_hash(snapshot_b):
+        raise AssertionError("timestamp de coleta não pode criar snapshot histórico artificial")
+    snapshot_b["copa_do_brasil"]["eventos"] = [{"event_id": "novo"}]
+    if continental_snapshots_state_hash(snapshot_a) == continental_snapshots_state_hash(snapshot_b):
+        raise AssertionError("mudança esportiva precisa alterar o hash continental")
+    print("Self-test AF-Previsão Execução 2.5: OK")
 
 
 def main() -> int:

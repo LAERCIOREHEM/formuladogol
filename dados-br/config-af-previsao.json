@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "projeto": "AF-Previsão",
-  "versao": "0.2-execucao-2",
-  "status": "motor_probabilistico_ativo",
+  "versao": "0.25-execucao-2-5",
+  "status": "motor_integrado_continental_ativo",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA)",
@@ -50,10 +50,13 @@
     "probabilidades": "dados-br/probabilidades-brasileirao.json",
     "auditoria_probabilidades": "dados-br/auditoria-probabilidades.json",
     "historico_probabilidades": "dados-br/historico-probabilidades.json",
-    "relatorio_execucao_2": "docs/af-previsao-execucao-2.md"
+    "relatorio_execucao_2": "docs/af-previsao-execucao-2.md",
+    "competicoes": "dados-br/competicoes-af-previsao/",
+    "auditoria_competicoes": "dados-br/auditoria-competicoes-af-previsao.json",
+    "relatorio_execucao_2_5": "docs/af-previsao-execucao-2-5.md"
   },
   "data_referencia_execucao_1": "2026-07-17T20:30:00-03:00",
-  "versao_modelo": "AF-Previsão 1.0",
+  "versao_modelo": "AF-Previsão 1.1",
   "execucao_2": {
     "arquitetura_producao": "poisson_map_bayesiano",
     "desvio_prior": 0.4,
@@ -73,11 +76,11 @@
       ],
       "libertadores_base": [
         1,
-        6
+        5
       ],
       "sul_americana_base": [
-        7,
-        12
+        6,
+        11
       ],
       "rebaixamento": [
         17,
@@ -91,5 +94,43 @@
     "regra_dixon_coles": "A correção está implementada e auditada, mas rho=0 permanece em produção enquanto não houver ganho nas regras próprias fora da amostra.",
     "regra_hiperparametros": "Usar os hiperparâmetros selecionados no fold temporal mais recente (teste em 2025), evitando médias de configurações não testadas."
   },
-  "data_referencia_execucao_2": "2026-07-17T21:00:00-03:00"
+  "data_referencia_execucao_2": "2026-07-17T21:00:00-03:00",
+  "execucao_2_5": {
+    "status": "ativo",
+    "competicoes_espn": {
+      "copa_do_brasil": "bra.copa_do_brazil",
+      "libertadores": "conmebol.libertadores",
+      "sul_americana": "conmebol.sudamericana"
+    },
+    "brasileirao_vagas_diretas": 4,
+    "brasileirao_vagas_preliminares": 1,
+    "copa_do_brasil_vaga_campeao": "fase de grupos",
+    "copa_do_brasil_vaga_vice": "fase preliminar",
+    "sul_americana_vagas": 6,
+    "rebaixamento_a_partir_da_posicao": 17,
+    "desvio_prior_copas": 0.65,
+    "meia_vida_copas_dias": 240.0,
+    "peso_modelo_brasileirao_para_serie_a": 0.65,
+    "limiar_exibicao_percentual": 0.1,
+    "regra_probabilidade_zero": "Zero ocorrências não é impossibilidade; publicar <0,1% e registrar limite superior de 95% pela regra dos três.",
+    "regra_decomposicao": "Vias exclusivas e causais: as cinco vagas-base do Brasileirão são atribuídas primeiro; títulos e Copa do Brasil entram apenas quando necessários; sobreposições descem como repasse.",
+    "prioridade_vias": [
+      "Brasileirão (cinco vagas-base)",
+      "título da Libertadores quando fora da zona-base",
+      "título da Sul-Americana quando fora da zona-base",
+      "Copa do Brasil quando necessária",
+      "repasse regulamentar"
+    ],
+    "elegibilidade_2027": {
+      "titulos_e_copa": "a vaga conquistada por título independe de eventual rebaixamento no Brasileirão",
+      "vagas_pelo_brasileirao": "atribuídas pela posição final; repasses descem na classificação",
+      "clubes_externos": "clubes brasileiros fora da Série A 2026 consomem a vaga quando campeões/vice e a sobreposição é detectada pelo nome normalizado"
+    },
+    "atualizacao_competicoes_minutos": 45,
+    "historico_publico": true,
+    "guardar_ocorrencias_brutas": true,
+    "guardar_decomposicao_por_via": true,
+    "guardar_subdecomposicao_copa_do_brasil": true
+  },
+  "data_referencia_execucao_2_5": "2026-07-18T00:30:00-03:00"
 }
