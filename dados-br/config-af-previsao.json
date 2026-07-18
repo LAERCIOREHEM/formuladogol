@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "projeto": "AF-Previsão",
+  "versao": "0.1-execucao-1",
+  "status": "calibracao_historica",
+  "responsavel": {
+    "nome": "Laércio Rehem",
+    "formacao": "Matemático pela Universidade Federal da Bahia (UFBA)",
+    "contato": "Sugestões, elogios e dúvidas: utilize o botão SUGESTÕES do site."
+  },
+  "temporadas_historicas": [
+    2023,
+    2024,
+    2025
+  ],
+  "temporada_corrente": 2026,
+  "principios": {
+    "sem_vazamento_temporal": true,
+    "validacao_fora_da_amostra": true,
+    "probabilidades_calibradas": true,
+    "regressao_a_media_para_promovidos": true,
+    "dados_de_apostas": false,
+    "metodologia_versionada": true
+  },
+  "modelos_candidatos": [
+    "frequencia_historica",
+    "poisson_regularizado",
+    "poisson_map_bayesiano",
+    "dixon_coles_temporal",
+    "elo_dinamico",
+    "hibrido_dc_elo"
+  ],
+  "metricas_de_selecao": {
+    "log_loss": 0.5,
+    "brier_multiclasse": 0.3,
+    "rps": 0.2,
+    "ece_10_faixas": "diagnóstico; alerta acima de 0,05"
+  },
+  "regras_execucao_1": {
+    "publicar_probabilidades_2026": false,
+    "executar_monte_carlo": false,
+    "usar_af_score_no_backtesting": false,
+    "motivo_af_score": "Cobertura histórica detalhada não é homogênea em 2023–2025; a contribuição será testada sem vazamento na Execução 2."
+  },
+  "arquivos": {
+    "base_historica": "dados-br/historico-af-previsao/",
+    "auditoria_base": "dados-br/auditoria-base-historica-af-previsao.json",
+    "auditoria_modelos": "dados-br/auditoria-modelos-af-previsao.json",
+    "relatorio": "docs/af-previsao-execucao-1.md"
+  },
+  "data_referencia_execucao_1": "2026-07-17T20:30:00-03:00"
+}

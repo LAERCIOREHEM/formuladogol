@@ -1,0 +1,2269 @@
+{
+  "schema_version": 1,
+  "projeto": "AF-Previsão",
+  "versao_modelo": "AF-Previsão 0.1 — protocolo de seleção",
+  "etapa": "Execução 1 — base histórica e backtesting",
+  "gerado_em": "2026-07-17T20:30:00-03:00",
+  "status": "ok",
+  "responsavel": {
+    "nome": "Laércio Rehem",
+    "formacao": "Matemático pela Universidade Federal da Bahia (UFBA)",
+    "contato": "Sugestões, elogios e dúvidas: utilize o botão SUGESTÕES do site."
+  },
+  "base": {
+    "temporadas": [
+      2023,
+      2024,
+      2025
+    ],
+    "partidas": 1140,
+    "auditoria": "dados-br/auditoria-base-historica-af-previsao.json",
+    "status": "ok"
+  },
+  "protocolo": {
+    "tipo": "validação temporal aninhada fora da amostra",
+    "folds": [
+      "treina em 2023 e testa as 380 partidas de 2024",
+      "treina em 2023–2024 e testa as 380 partidas de 2025"
+    ],
+    "lote_temporal": "partidas da mesma data são previstas antes de qualquer atualização desse dia",
+    "score_selecao": {
+      "log_loss": 0.5,
+      "brier_multiclasse": 0.3,
+      "rps": 0.2,
+      "ece_10_faixas": "diagnóstico; alerta acima de 0,05"
+    },
+    "semente_aleatoria": null,
+    "deterministico": true,
+    "observacao": "A Execução 1 não utiliza Monte Carlo; a simulação entra somente na Execução 2."
+  },
+  "modelos": {
+    "frequencia_historica": "baseline Dirichlet para mandante/empate/visitante",
+    "poisson_regularizado": "forças ataque/defesa com shrinkage empírico-bayesiano",
+    "poisson_map_bayesiano": "modelo log-linear ajustado pelo modo posterior (MAP), com priors gaussianos",
+    "dixon_coles_temporal": "Poisson regularizado + decaimento temporal + correção de placares baixos",
+    "elo_dinamico": "rating sequencial com mando, empate e margem do resultado",
+    "hibrido_dc_elo": "combinação convexa calibrada sem consultar a temporada de teste"
+  },
+  "folds": [
+    {
+      "temporada_teste": 2024,
+      "temporadas_treinamento": [
+        2023
+      ],
+      "partidas_treinamento": 380,
+      "partidas_teste": 380,
+      "validacao_interna": {
+        "temporada": 2023,
+        "data_corte": "2023-09-25",
+        "partidas_base": 239,
+        "partidas_calibracao": 141,
+        "regra": "corte cronológico de aproximadamente 63% da última temporada de treinamento"
+      },
+      "hiperparametros": {
+        "poisson_regularizado": {
+          "selecionado": {
+            "prior_partidas": 20.0,
+            "meia_vida_dias": null,
+            "rho_dixon_coles": 0.0
+          },
+          "objetivo": 1.33288399,
+          "tentativas": [
+            {
+              "config": {
+                "prior_partidas": 4.0,
+                "meia_vida_dias": null,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.35008238,
+              "log_loss": 1.08214259,
+              "brier_multiclasse": 0.65252097
+            },
+            {
+              "config": {
+                "prior_partidas": 8.0,
+                "meia_vida_dias": null,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.34290423,
+              "log_loss": 1.07601002,
+              "brier_multiclasse": 0.64912876
+            },
+            {
+              "config": {
+                "prior_partidas": 12.0,
+                "meia_vida_dias": null,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.33879305,
+              "log_loss": 1.07210871,
+              "brier_multiclasse": 0.64694308
+            },
+            {
+              "config": {
+                "prior_partidas": 20.0,
+                "meia_vida_dias": null,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.33288399,
+              "log_loss": 1.06791698,
+              "brier_multiclasse": 0.64460658
+            }
+          ]
+        },
+        "poisson_map_bayesiano": {
+          "selecionado": {
+            "desvio_prior": 0.25,
+            "meia_vida_dias": 730.0,
+            "reajuste_a_cada_dias": 21
+          },
+          "objetivo": 1.33029173,
+          "tentativas": [
+            {
+              "config": {
+                "desvio_prior": 0.25,
+                "meia_vida_dias": 730.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.33029173,
+              "log_loss": 1.06682309,
+              "brier_multiclasse": 0.64324433
+            },
+            {
+              "config": {
+                "desvio_prior": 0.25,
+                "meia_vida_dias": null,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.33094237,
+              "log_loss": 1.06677695,
+              "brier_multiclasse": 0.64316046
+            },
+            {
+              "config": {
+                "desvio_prior": 0.25,
+                "meia_vida_dias": 365.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.33109707,
+              "log_loss": 1.06696948,
+              "brier_multiclasse": 0.64340414
+            },
+            {
+              "config": {
+                "desvio_prior": 0.4,
+                "meia_vida_dias": 730.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.3401742,
+              "log_loss": 1.0744803,
+              "brier_multiclasse": 0.64710783
+            },
+            {
+              "config": {
+                "desvio_prior": 0.4,
+                "meia_vida_dias": null,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.34037245,
+              "log_loss": 1.07455236,
+              "brier_multiclasse": 0.64712885
+            },
+            {
+              "config": {
+                "desvio_prior": 0.4,
+                "meia_vida_dias": 365.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.34062284,
+              "log_loss": 1.07448767,
+              "brier_multiclasse": 0.6471495
+            },
+            {
+              "config": {
+                "desvio_prior": 0.6,
+                "meia_vida_dias": null,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.34757957,
+              "log_loss": 1.07978938,
+              "brier_multiclasse": 0.64972303
+            },
+            {
+              "config": {
+                "desvio_prior": 0.6,
+                "meia_vida_dias": 730.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.34782659,
+              "log_loss": 1.07991173,
+              "brier_multiclasse": 0.64978456
+            },
+            {
+              "config": {
+                "desvio_prior": 0.6,
+                "meia_vida_dias": 365.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.34789772,
+              "log_loss": 1.08010928,
+              "brier_multiclasse": 0.64990612
+            }
+          ]
+        },
+        "dixon_coles_temporal": {
+          "selecionado": {
+            "prior_partidas": 16.0,
+            "meia_vida_dias": 730.0,
+            "rho_dixon_coles": 0.08
+          },
+          "objetivo": 1.33331864,
+          "melhores_tentativas": [
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 730.0,
+                "rho_dixon_coles": 0.08
+              },
+              "objetivo": 1.33331864,
+              "log_loss": 1.0681229,
+              "brier_multiclasse": 0.64539317
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 365.0,
+                "rho_dixon_coles": 0.08
+              },
+              "objetivo": 1.33372488,
+              "log_loss": 1.06849344,
+              "brier_multiclasse": 0.64568723
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 730.0,
+                "rho_dixon_coles": 0.06
+              },
+              "objetivo": 1.33384254,
+              "log_loss": 1.06835844,
+              "brier_multiclasse": 0.64538446
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 730.0,
+                "rho_dixon_coles": 0.1
+              },
+              "objetivo": 1.33399494,
+              "log_loss": 1.06802269,
+              "brier_multiclasse": 0.64547062
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 365.0,
+                "rho_dixon_coles": 0.06
+              },
+              "objetivo": 1.33401916,
+              "log_loss": 1.06873285,
+              "brier_multiclasse": 0.64568785
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 365.0,
+                "rho_dixon_coles": 0.1
+              },
+              "objetivo": 1.3341624,
+              "log_loss": 1.06838929,
+              "brier_multiclasse": 0.64575574
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 730.0,
+                "rho_dixon_coles": 0.04
+              },
+              "objetivo": 1.33456081,
+              "log_loss": 1.06872618,
+              "brier_multiclasse": 0.64544449
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 730.0,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.33479083,
+              "log_loss": 1.06984694,
+              "brier_multiclasse": 0.64577075
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 365.0,
+                "rho_dixon_coles": 0.04
+              },
+              "objetivo": 1.33480341,
+              "log_loss": 1.06910438,
+              "brier_multiclasse": 0.64575761
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 730.0,
+                "rho_dixon_coles": 0.02
+              },
+              "objetivo": 1.33521933,
+              "log_loss": 1.06922324,
+              "brier_multiclasse": 0.64557325
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 365.0,
+                "rho_dixon_coles": 0.02
+              },
+              "objetivo": 1.33526989,
+              "log_loss": 1.06960512,
+              "brier_multiclasse": 0.64589649
+            },
+            {
+              "config": {
+                "prior_partidas": 16.0,
+                "meia_vida_dias": 730.0,
+                "rho_dixon_coles": -0.02
+              },
+              "objetivo": 1.33555302,
+              "log_loss": 1.07059482,
+              "brier_multiclasse": 0.64603699
+            }
+          ],
+          "total_tentativas_validas": 144
+        },
+        "elo_dinamico": {
+          "selecionado": {
+            "fator_k": 18.0,
+            "vantagem_mando_pontos": 45.0,
+            "empate_base": 0.28,
+            "escala_empate": 420.0
+          },
+          "objetivo": 1.32640581,
+          "melhores_tentativas": [
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.28,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.32640581,
+              "log_loss": 1.06342731,
+              "brier_multiclasse": 0.64241342
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.32875859,
+              "log_loss": 1.06582985,
+              "brier_multiclasse": 0.64355968
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.32,
+                "escala_empate": 260.0
+              },
+              "objetivo": 1.32881841,
+              "log_loss": 1.06522176,
+              "brier_multiclasse": 0.64342524
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 70.0,
+                "empate_base": 0.28,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.32964508,
+              "log_loss": 1.06608853,
+              "brier_multiclasse": 0.64440588
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 70.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.33039403,
+              "log_loss": 1.0670406,
+              "brier_multiclasse": 0.64453201
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.28,
+                "escala_empate": 260.0
+              },
+              "objetivo": 1.33166901,
+              "log_loss": 1.06673017,
+              "brier_multiclasse": 0.64426556
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.24,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.33250822,
+              "log_loss": 1.06753992,
+              "brier_multiclasse": 0.64481371
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 70.0,
+                "empate_base": 0.32,
+                "escala_empate": 260.0
+              },
+              "objetivo": 1.33271252,
+              "log_loss": 1.06888484,
+              "brier_multiclasse": 0.64611535
+            },
+            {
+              "config": {
+                "fator_k": 26.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.33350948,
+              "log_loss": 1.0698253,
+              "brier_multiclasse": 0.6464218
+            },
+            {
+              "config": {
+                "fator_k": 26.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.28,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.33579284,
+              "log_loss": 1.06854827,
+              "brier_multiclasse": 0.64627981
+            }
+          ],
+          "total_tentativas": 54
+        },
+        "hibrido_dc_elo": {
+          "peso_poisson_dc": 0.3,
+          "peso_elo": 0.7,
+          "objetivo": 1.32507713,
+          "tentativas": [
+            {
+              "peso_poisson_dc": 0.0,
+              "peso_elo": 1.0,
+              "objetivo": 1.32640581
+            },
+            {
+              "peso_poisson_dc": 0.05,
+              "peso_elo": 0.95,
+              "objetivo": 1.32646128
+            },
+            {
+              "peso_poisson_dc": 0.1,
+              "peso_elo": 0.9,
+              "objetivo": 1.32653099
+            },
+            {
+              "peso_poisson_dc": 0.15,
+              "peso_elo": 0.85,
+              "objetivo": 1.32620009
+            },
+            {
+              "peso_poisson_dc": 0.2,
+              "peso_elo": 0.8,
+              "objetivo": 1.32597605
+            },
+            {
+              "peso_poisson_dc": 0.25,
+              "peso_elo": 0.75,
+              "objetivo": 1.32522982
+            },
+            {
+              "peso_poisson_dc": 0.3,
+              "peso_elo": 0.7,
+              "objetivo": 1.32507713
+            },
+            {
+              "peso_poisson_dc": 0.35,
+              "peso_elo": 0.65,
+              "objetivo": 1.32570028
+            },
+            {
+              "peso_poisson_dc": 0.4,
+              "peso_elo": 0.6,
+              "objetivo": 1.32562941
+            },
+            {
+              "peso_poisson_dc": 0.45,
+              "peso_elo": 0.55,
+              "objetivo": 1.32619531
+            },
+            {
+              "peso_poisson_dc": 0.5,
+              "peso_elo": 0.5,
+              "objetivo": 1.32560174
+            },
+            {
+              "peso_poisson_dc": 0.55,
+              "peso_elo": 0.45,
+              "objetivo": 1.32649836
+            },
+            {
+              "peso_poisson_dc": 0.6,
+              "peso_elo": 0.4,
+              "objetivo": 1.32727886
+            },
+            {
+              "peso_poisson_dc": 0.65,
+              "peso_elo": 0.35,
+              "objetivo": 1.3284654
+            },
+            {
+              "peso_poisson_dc": 0.7,
+              "peso_elo": 0.3,
+              "objetivo": 1.32844459
+            },
+            {
+              "peso_poisson_dc": 0.75,
+              "peso_elo": 0.25,
+              "objetivo": 1.32901838
+            },
+            {
+              "peso_poisson_dc": 0.8,
+              "peso_elo": 0.2,
+              "objetivo": 1.33009509
+            },
+            {
+              "peso_poisson_dc": 0.85,
+              "peso_elo": 0.15,
+              "objetivo": 1.33091686
+            },
+            {
+              "peso_poisson_dc": 0.9,
+              "peso_elo": 0.1,
+              "objetivo": 1.33134183
+            },
+            {
+              "peso_poisson_dc": 0.95,
+              "peso_elo": 0.05,
+              "objetivo": 1.33297651
+            },
+            {
+              "peso_poisson_dc": 1.0,
+              "peso_elo": 0.0,
+              "objetivo": 1.33331864
+            }
+          ]
+        }
+      },
+      "metricas": {
+        "frequencia_historica": {
+          "partidas": 380,
+          "log_loss": 1.05859444,
+          "brier_multiclasse": 0.63839694,
+          "rps": 0.2214348,
+          "acuracia_resultado": 0.47368421,
+          "ece_10_faixas": 0.001943,
+          "mae_gols_mandante": null,
+          "mae_gols_visitante": null,
+          "acerto_placar_exato": null,
+          "oscilacao_media_vetor_rodada": 0.00119061,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 760,
+              "probabilidade_media": 0.264615,
+              "frequencia_observada": 0.263158
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 380,
+              "probabilidade_media": 0.47077,
+              "frequencia_observada": 0.473684
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "poisson_regularizado": {
+          "partidas": 380,
+          "log_loss": 1.03465005,
+          "brier_multiclasse": 0.62140944,
+          "rps": 0.21366321,
+          "acuracia_resultado": 0.49473684,
+          "ece_10_faixas": 0.02078234,
+          "mae_gols_mandante": 0.85051728,
+          "mae_gols_visitante": 0.73330952,
+          "acerto_placar_exato": 0.13157895,
+          "oscilacao_media_vetor_rodada": 0.04218174,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 36,
+              "probabilidade_media": 0.17734,
+              "frequencia_observada": 0.111111
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 560,
+              "probabilidade_media": 0.261188,
+              "frequencia_observada": 0.260714
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 243,
+              "probabilidade_media": 0.342373,
+              "frequencia_observada": 0.304527
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 197,
+              "probabilidade_media": 0.443655,
+              "frequencia_observada": 0.472081
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 94,
+              "probabilidade_media": 0.537006,
+              "frequencia_observada": 0.595745
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 10,
+              "probabilidade_media": 0.627553,
+              "frequencia_observada": 0.7
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "poisson_map_bayesiano": {
+          "partidas": 380,
+          "log_loss": 1.03681194,
+          "brier_multiclasse": 0.62282002,
+          "rps": 0.21416739,
+          "acuracia_resultado": 0.49473684,
+          "ece_10_faixas": 0.01848964,
+          "mae_gols_mandante": 0.848997,
+          "mae_gols_visitante": 0.7375776,
+          "acerto_placar_exato": 0.13157895,
+          "oscilacao_media_vetor_rodada": 0.04439192,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 37,
+              "probabilidade_media": 0.175165,
+              "frequencia_observada": 0.135135
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 556,
+              "probabilidade_media": 0.260588,
+              "frequencia_observada": 0.257194
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 251,
+              "probabilidade_media": 0.342859,
+              "frequencia_observada": 0.314741
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 193,
+              "probabilidade_media": 0.445383,
+              "frequencia_observada": 0.471503
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 90,
+              "probabilidade_media": 0.538912,
+              "frequencia_observada": 0.6
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 13,
+              "probabilidade_media": 0.624095,
+              "frequencia_observada": 0.615385
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "dixon_coles_temporal": {
+          "partidas": 380,
+          "log_loss": 1.03576227,
+          "brier_multiclasse": 0.62171181,
+          "rps": 0.21360696,
+          "acuracia_resultado": 0.49736842,
+          "ece_10_faixas": 0.01699836,
+          "mae_gols_mandante": 0.8498542,
+          "mae_gols_visitante": 0.7346004,
+          "acerto_placar_exato": 0.14210526,
+          "oscilacao_media_vetor_rodada": 0.04238398,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 28,
+              "probabilidade_media": 0.17836,
+              "frequencia_observada": 0.142857
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 569,
+              "probabilidade_media": 0.250657,
+              "frequencia_observada": 0.249561
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 220,
+              "probabilidade_media": 0.346723,
+              "frequencia_observada": 0.313636
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 206,
+              "probabilidade_media": 0.44522,
+              "frequencia_observada": 0.456311
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 103,
+              "probabilidade_media": 0.539764,
+              "frequencia_observada": 0.61165
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 14,
+              "probabilidade_media": 0.628007,
+              "frequencia_observada": 0.571429
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "elo_dinamico": {
+          "partidas": 380,
+          "log_loss": 1.03905823,
+          "brier_multiclasse": 0.62321258,
+          "rps": 0.21456945,
+          "acuracia_resultado": 0.47631579,
+          "ece_10_faixas": 0.01969838,
+          "mae_gols_mandante": null,
+          "mae_gols_visitante": null,
+          "acerto_placar_exato": null,
+          "oscilacao_media_vetor_rodada": 0.04899097,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 41,
+              "probabilidade_media": 0.184666,
+              "frequencia_observada": 0.219512
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 484,
+              "probabilidade_media": 0.249958,
+              "frequencia_observada": 0.247934
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 331,
+              "probabilidade_media": 0.346364,
+              "frequencia_observada": 0.320242
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 177,
+              "probabilidade_media": 0.441978,
+              "frequencia_observada": 0.435028
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 92,
+              "probabilidade_media": 0.534789,
+              "frequencia_observada": 0.641304
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 15,
+              "probabilidade_media": 0.624796,
+              "frequencia_observada": 0.6
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "hibrido_dc_elo": {
+          "partidas": 380,
+          "log_loss": 1.03650592,
+          "brier_multiclasse": 0.62162431,
+          "rps": 0.21378565,
+          "acuracia_resultado": 0.48157895,
+          "ece_10_faixas": 0.02314809,
+          "mae_gols_mandante": 0.8498542,
+          "mae_gols_visitante": 0.7346004,
+          "acerto_placar_exato": 0.14210526,
+          "oscilacao_media_vetor_rodada": 0.04546104,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 30,
+              "probabilidade_media": 0.188386,
+              "frequencia_observada": 0.233333
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 514,
+              "probabilidade_media": 0.24982,
+              "frequencia_observada": 0.241245
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 308,
+              "probabilidade_media": 0.348308,
+              "frequencia_observada": 0.321429
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 180,
+              "probabilidade_media": 0.442608,
+              "frequencia_observada": 0.466667
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 96,
+              "probabilidade_media": 0.536297,
+              "frequencia_observada": 0.614583
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 12,
+              "probabilidade_media": 0.625684,
+              "frequencia_observada": 0.583333
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        }
+      }
+    },
+    {
+      "temporada_teste": 2025,
+      "temporadas_treinamento": [
+        2023,
+        2024
+      ],
+      "partidas_treinamento": 760,
+      "partidas_teste": 380,
+      "validacao_interna": {
+        "temporada": 2024,
+        "data_corte": "2024-09-01",
+        "partidas_base": 619,
+        "partidas_calibracao": 141,
+        "regra": "corte cronológico de aproximadamente 63% da última temporada de treinamento"
+      },
+      "hiperparametros": {
+        "poisson_regularizado": {
+          "selecionado": {
+            "prior_partidas": 8.0,
+            "meia_vida_dias": null,
+            "rho_dixon_coles": 0.0
+          },
+          "objetivo": 1.30513273,
+          "tentativas": [
+            {
+              "config": {
+                "prior_partidas": 4.0,
+                "meia_vida_dias": null,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.30587327,
+              "log_loss": 1.04971603,
+              "brier_multiclasse": 0.63445325
+            },
+            {
+              "config": {
+                "prior_partidas": 8.0,
+                "meia_vida_dias": null,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.30513273,
+              "log_loss": 1.04954069,
+              "brier_multiclasse": 0.63418478
+            },
+            {
+              "config": {
+                "prior_partidas": 12.0,
+                "meia_vida_dias": null,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.30553625,
+              "log_loss": 1.04964497,
+              "brier_multiclasse": 0.63412708
+            },
+            {
+              "config": {
+                "prior_partidas": 20.0,
+                "meia_vida_dias": null,
+                "rho_dixon_coles": 0.0
+              },
+              "objetivo": 1.30648828,
+              "log_loss": 1.05032215,
+              "brier_multiclasse": 0.63438457
+            }
+          ]
+        },
+        "poisson_map_bayesiano": {
+          "selecionado": {
+            "desvio_prior": 0.4,
+            "meia_vida_dias": 365.0,
+            "reajuste_a_cada_dias": 21
+          },
+          "objetivo": 1.29905003,
+          "tentativas": [
+            {
+              "config": {
+                "desvio_prior": 0.4,
+                "meia_vida_dias": 365.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.29905003,
+              "log_loss": 1.04547688,
+              "brier_multiclasse": 0.63103427
+            },
+            {
+              "config": {
+                "desvio_prior": 0.6,
+                "meia_vida_dias": 365.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.29953464,
+              "log_loss": 1.04520986,
+              "brier_multiclasse": 0.63096492
+            },
+            {
+              "config": {
+                "desvio_prior": 0.25,
+                "meia_vida_dias": 365.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.30251662,
+              "log_loss": 1.0470911,
+              "brier_multiclasse": 0.63188283
+            },
+            {
+              "config": {
+                "desvio_prior": 0.4,
+                "meia_vida_dias": 730.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.30337652,
+              "log_loss": 1.04847934,
+              "brier_multiclasse": 0.6331918
+            },
+            {
+              "config": {
+                "desvio_prior": 0.6,
+                "meia_vida_dias": 730.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.30368175,
+              "log_loss": 1.04849287,
+              "brier_multiclasse": 0.63330339
+            },
+            {
+              "config": {
+                "desvio_prior": 0.25,
+                "meia_vida_dias": 730.0,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.30468582,
+              "log_loss": 1.04928283,
+              "brier_multiclasse": 0.63350043
+            },
+            {
+              "config": {
+                "desvio_prior": 0.4,
+                "meia_vida_dias": null,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.30857375,
+              "log_loss": 1.0516383,
+              "brier_multiclasse": 0.63551059
+            },
+            {
+              "config": {
+                "desvio_prior": 0.25,
+                "meia_vida_dias": null,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.30859308,
+              "log_loss": 1.05173183,
+              "brier_multiclasse": 0.63534466
+            },
+            {
+              "config": {
+                "desvio_prior": 0.6,
+                "meia_vida_dias": null,
+                "reajuste_a_cada_dias": 21
+              },
+              "objetivo": 1.30898213,
+              "log_loss": 1.05188645,
+              "brier_multiclasse": 0.63577498
+            }
+          ]
+        },
+        "dixon_coles_temporal": {
+          "selecionado": {
+            "prior_partidas": 6.0,
+            "meia_vida_dias": 180.0,
+            "rho_dixon_coles": -0.14
+          },
+          "objetivo": 1.28586775,
+          "melhores_tentativas": [
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.14
+              },
+              "objetivo": 1.28586775,
+              "log_loss": 1.0334241,
+              "brier_multiclasse": 0.6244632
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.16
+              },
+              "objetivo": 1.28604193,
+              "log_loss": 1.03335505,
+              "brier_multiclasse": 0.62454374
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.18
+              },
+              "objetivo": 1.28643492,
+              "log_loss": 1.03340061,
+              "brier_multiclasse": 0.62469623
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.12
+              },
+              "objetivo": 1.28654291,
+              "log_loss": 1.03360969,
+              "brier_multiclasse": 0.62445462
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.1
+              },
+              "objetivo": 1.28712597,
+              "log_loss": 1.03391386,
+              "brier_multiclasse": 0.624518
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.2
+              },
+              "objetivo": 1.28727825,
+              "log_loss": 1.03355901,
+              "brier_multiclasse": 0.62492068
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.04
+              },
+              "objetivo": 1.28774258,
+              "log_loss": 1.03556101,
+              "brier_multiclasse": 0.62513987
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.08
+              },
+              "objetivo": 1.28799819,
+              "log_loss": 1.03433886,
+              "brier_multiclasse": 0.62465333
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.06
+              },
+              "objetivo": 1.28835939,
+              "log_loss": 1.03488705,
+              "brier_multiclasse": 0.62486062
+            },
+            {
+              "config": {
+                "prior_partidas": 6.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.02
+              },
+              "objetivo": 1.28836844,
+              "log_loss": 1.03636347,
+              "brier_multiclasse": 0.62549107
+            },
+            {
+              "config": {
+                "prior_partidas": 10.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.14
+              },
+              "objetivo": 1.28899975,
+              "log_loss": 1.03533512,
+              "brier_multiclasse": 0.62551684
+            },
+            {
+              "config": {
+                "prior_partidas": 10.0,
+                "meia_vida_dias": 180.0,
+                "rho_dixon_coles": -0.18
+              },
+              "objetivo": 1.28918611,
+              "log_loss": 1.03532904,
+              "brier_multiclasse": 0.6257727
+            }
+          ],
+          "total_tentativas_validas": 144
+        },
+        "elo_dinamico": {
+          "selecionado": {
+            "fator_k": 34.0,
+            "vantagem_mando_pontos": 45.0,
+            "empate_base": 0.32,
+            "escala_empate": 420.0
+          },
+          "objetivo": 1.27821295,
+          "melhores_tentativas": [
+            {
+              "config": {
+                "fator_k": 34.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.27821295,
+              "log_loss": 1.02987058,
+              "brier_multiclasse": 0.61723551
+            },
+            {
+              "config": {
+                "fator_k": 34.0,
+                "vantagem_mando_pontos": 70.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.28204461,
+              "log_loss": 1.03079464,
+              "brier_multiclasse": 0.61811972
+            },
+            {
+              "config": {
+                "fator_k": 26.0,
+                "vantagem_mando_pontos": 70.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.28402808,
+              "log_loss": 1.03316842,
+              "brier_multiclasse": 0.61957922
+            },
+            {
+              "config": {
+                "fator_k": 26.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.28424088,
+              "log_loss": 1.03390995,
+              "brier_multiclasse": 0.61983937
+            },
+            {
+              "config": {
+                "fator_k": 26.0,
+                "vantagem_mando_pontos": 95.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.28807662,
+              "log_loss": 1.03600471,
+              "brier_multiclasse": 0.62222644
+            },
+            {
+              "config": {
+                "fator_k": 34.0,
+                "vantagem_mando_pontos": 95.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.28819931,
+              "log_loss": 1.03447294,
+              "brier_multiclasse": 0.62140007
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 70.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.28885666,
+              "log_loss": 1.03710389,
+              "brier_multiclasse": 0.6224085
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.29147021,
+              "log_loss": 1.03890057,
+              "brier_multiclasse": 0.62343957
+            },
+            {
+              "config": {
+                "fator_k": 34.0,
+                "vantagem_mando_pontos": 45.0,
+                "empate_base": 0.28,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.29149579,
+              "log_loss": 1.04014379,
+              "brier_multiclasse": 0.62206138
+            },
+            {
+              "config": {
+                "fator_k": 18.0,
+                "vantagem_mando_pontos": 95.0,
+                "empate_base": 0.32,
+                "escala_empate": 420.0
+              },
+              "objetivo": 1.29267281,
+              "log_loss": 1.03989308,
+              "brier_multiclasse": 0.62489203
+            }
+          ],
+          "total_tentativas": 54
+        },
+        "hibrido_dc_elo": {
+          "peso_poisson_dc": 0.55,
+          "peso_elo": 0.45,
+          "objetivo": 1.2747171,
+          "tentativas": [
+            {
+              "peso_poisson_dc": 0.0,
+              "peso_elo": 1.0,
+              "objetivo": 1.27821295
+            },
+            {
+              "peso_poisson_dc": 0.05,
+              "peso_elo": 0.95,
+              "objetivo": 1.27689376
+            },
+            {
+              "peso_poisson_dc": 0.1,
+              "peso_elo": 0.9,
+              "objetivo": 1.2764972
+            },
+            {
+              "peso_poisson_dc": 0.15,
+              "peso_elo": 0.85,
+              "objetivo": 1.27570084
+            },
+            {
+              "peso_poisson_dc": 0.2,
+              "peso_elo": 0.8,
+              "objetivo": 1.27583074
+            },
+            {
+              "peso_poisson_dc": 0.25,
+              "peso_elo": 0.75,
+              "objetivo": 1.27675625
+            },
+            {
+              "peso_poisson_dc": 0.3,
+              "peso_elo": 0.7,
+              "objetivo": 1.27642078
+            },
+            {
+              "peso_poisson_dc": 0.35,
+              "peso_elo": 0.65,
+              "objetivo": 1.27644261
+            },
+            {
+              "peso_poisson_dc": 0.4,
+              "peso_elo": 0.6,
+              "objetivo": 1.27597413
+            },
+            {
+              "peso_poisson_dc": 0.45,
+              "peso_elo": 0.55,
+              "objetivo": 1.27528042
+            },
+            {
+              "peso_poisson_dc": 0.5,
+              "peso_elo": 0.5,
+              "objetivo": 1.27487642
+            },
+            {
+              "peso_poisson_dc": 0.55,
+              "peso_elo": 0.45,
+              "objetivo": 1.2747171
+            },
+            {
+              "peso_poisson_dc": 0.6,
+              "peso_elo": 0.4,
+              "objetivo": 1.27537506
+            },
+            {
+              "peso_poisson_dc": 0.65,
+              "peso_elo": 0.35,
+              "objetivo": 1.2759874
+            },
+            {
+              "peso_poisson_dc": 0.7,
+              "peso_elo": 0.3,
+              "objetivo": 1.27722429
+            },
+            {
+              "peso_poisson_dc": 0.75,
+              "peso_elo": 0.25,
+              "objetivo": 1.27859326
+            },
+            {
+              "peso_poisson_dc": 0.8,
+              "peso_elo": 0.2,
+              "objetivo": 1.2804016
+            },
+            {
+              "peso_poisson_dc": 0.85,
+              "peso_elo": 0.15,
+              "objetivo": 1.28176967
+            },
+            {
+              "peso_poisson_dc": 0.9,
+              "peso_elo": 0.1,
+              "objetivo": 1.28276155
+            },
+            {
+              "peso_poisson_dc": 0.95,
+              "peso_elo": 0.05,
+              "objetivo": 1.28445088
+            },
+            {
+              "peso_poisson_dc": 1.0,
+              "peso_elo": 0.0,
+              "objetivo": 1.28586775
+            }
+          ]
+        }
+      },
+      "metricas": {
+        "frequencia_historica": {
+          "partidas": 380,
+          "log_loss": 1.04050661,
+          "brier_multiclasse": 0.62551326,
+          "rps": 0.21631088,
+          "acuracia_resultado": 0.50263158,
+          "ece_10_faixas": 0.0192,
+          "mae_gols_mandante": null,
+          "mae_gols_visitante": null,
+          "acerto_placar_exato": null,
+          "oscilacao_media_vetor_rodada": 0.00074402,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 760,
+              "probabilidade_media": 0.263084,
+              "frequencia_observada": 0.248684
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 380,
+              "probabilidade_media": 0.473832,
+              "frequencia_observada": 0.502632
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "poisson_regularizado": {
+          "partidas": 380,
+          "log_loss": 0.99367577,
+          "brier_multiclasse": 0.59348307,
+          "rps": 0.20085346,
+          "acuracia_resultado": 0.51578947,
+          "ece_10_faixas": 0.02839964,
+          "mae_gols_mandante": 0.93239373,
+          "mae_gols_visitante": 0.79785177,
+          "acerto_placar_exato": 0.13947368,
+          "oscilacao_media_vetor_rodada": 0.06186736,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 7,
+              "probabilidade_media": 0.083866,
+              "frequencia_observada": 0.0
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 100,
+              "probabilidade_media": 0.166367,
+              "frequencia_observada": 0.13
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 520,
+              "probabilidade_media": 0.257634,
+              "frequencia_observada": 0.242308
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 200,
+              "probabilidade_media": 0.344972,
+              "frequencia_observada": 0.325
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 174,
+              "probabilidade_media": 0.448444,
+              "frequencia_observada": 0.465517
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 83,
+              "probabilidade_media": 0.548561,
+              "frequencia_observada": 0.686747
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 46,
+              "probabilidade_media": 0.626378,
+              "frequencia_observada": 0.652174
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 10,
+              "probabilidade_media": 0.7439,
+              "frequencia_observada": 0.8
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "poisson_map_bayesiano": {
+          "partidas": 380,
+          "log_loss": 0.99133485,
+          "brier_multiclasse": 0.5918839,
+          "rps": 0.20026366,
+          "acuracia_resultado": 0.52368421,
+          "ece_10_faixas": 0.02767977,
+          "mae_gols_mandante": 0.93031108,
+          "mae_gols_visitante": 0.79369203,
+          "acerto_placar_exato": 0.13947368,
+          "oscilacao_media_vetor_rodada": 0.06281641,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 9,
+              "probabilidade_media": 0.082521,
+              "frequencia_observada": 0.0
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 104,
+              "probabilidade_media": 0.16469,
+              "frequencia_observada": 0.086538
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 524,
+              "probabilidade_media": 0.258707,
+              "frequencia_observada": 0.253817
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 184,
+              "probabilidade_media": 0.343451,
+              "frequencia_observada": 0.353261
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 175,
+              "probabilidade_media": 0.447682,
+              "frequencia_observada": 0.422857
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 84,
+              "probabilidade_media": 0.546343,
+              "frequencia_observada": 0.630952
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 49,
+              "probabilidade_media": 0.630629,
+              "frequencia_observada": 0.755102
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 11,
+              "probabilidade_media": 0.748542,
+              "frequencia_observada": 0.818182
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "dixon_coles_temporal": {
+          "partidas": 380,
+          "log_loss": 0.99418551,
+          "brier_multiclasse": 0.59449148,
+          "rps": 0.20126352,
+          "acuracia_resultado": 0.5,
+          "ece_10_faixas": 0.0207037,
+          "mae_gols_mandante": 0.93342431,
+          "mae_gols_visitante": 0.80212131,
+          "acerto_placar_exato": 0.11315789,
+          "oscilacao_media_vetor_rodada": 0.06814348,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 16,
+              "probabilidade_media": 0.079983,
+              "frequencia_observada": 0.0
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 125,
+              "probabilidade_media": 0.160207,
+              "frequencia_observada": 0.136
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 384,
+              "probabilidade_media": 0.261771,
+              "frequencia_observada": 0.244792
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 324,
+              "probabilidade_media": 0.333258,
+              "frequencia_observada": 0.330247
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 149,
+              "probabilidade_media": 0.447046,
+              "frequencia_observada": 0.463087
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 85,
+              "probabilidade_media": 0.540775,
+              "frequencia_observada": 0.564706
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 45,
+              "probabilidade_media": 0.636108,
+              "frequencia_observada": 0.8
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 12,
+              "probabilidade_media": 0.749866,
+              "frequencia_observada": 0.75
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "elo_dinamico": {
+          "partidas": 380,
+          "log_loss": 1.02439371,
+          "brier_multiclasse": 0.61387395,
+          "rps": 0.21097378,
+          "acuracia_resultado": 0.49736842,
+          "ece_10_faixas": 0.01400037,
+          "mae_gols_mandante": null,
+          "mae_gols_visitante": null,
+          "acerto_placar_exato": null,
+          "oscilacao_media_vetor_rodada": 0.0729263,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 2,
+              "probabilidade_media": 0.091385,
+              "frequencia_observada": 0.0
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 115,
+              "probabilidade_media": 0.167257,
+              "frequencia_observada": 0.13913
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 479,
+              "probabilidade_media": 0.258085,
+              "frequencia_observada": 0.258873
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 255,
+              "probabilidade_media": 0.337373,
+              "frequencia_observada": 0.341176
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 141,
+              "probabilidade_media": 0.449559,
+              "frequencia_observada": 0.475177
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 88,
+              "probabilidade_media": 0.540488,
+              "frequencia_observada": 0.488636
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 45,
+              "probabilidade_media": 0.643853,
+              "frequencia_observada": 0.688889
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 15,
+              "probabilidade_media": 0.733725,
+              "frequencia_observada": 0.8
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        },
+        "hibrido_dc_elo": {
+          "partidas": 380,
+          "log_loss": 1.00278727,
+          "brier_multiclasse": 0.59965975,
+          "rps": 0.20420392,
+          "acuracia_resultado": 0.51842105,
+          "ece_10_faixas": 0.0200143,
+          "mae_gols_mandante": 0.93342431,
+          "mae_gols_visitante": 0.80212131,
+          "acerto_placar_exato": 0.11315789,
+          "oscilacao_media_vetor_rodada": 0.06714356,
+          "calibracao": [
+            {
+              "faixa": "0.0–0.1",
+              "n": 6,
+              "probabilidade_media": 0.08454,
+              "frequencia_observada": 0.0
+            },
+            {
+              "faixa": "0.1–0.2",
+              "n": 99,
+              "probabilidade_media": 0.162204,
+              "frequencia_observada": 0.131313
+            },
+            {
+              "faixa": "0.2–0.3",
+              "n": 481,
+              "probabilidade_media": 0.261512,
+              "frequencia_observada": 0.245322
+            },
+            {
+              "faixa": "0.3–0.4",
+              "n": 269,
+              "probabilidade_media": 0.337715,
+              "frequencia_observada": 0.342007
+            },
+            {
+              "faixa": "0.4–0.5",
+              "n": 152,
+              "probabilidade_media": 0.449161,
+              "frequencia_observada": 0.480263
+            },
+            {
+              "faixa": "0.5–0.6",
+              "n": 81,
+              "probabilidade_media": 0.543896,
+              "frequencia_observada": 0.54321
+            },
+            {
+              "faixa": "0.6–0.7",
+              "n": 40,
+              "probabilidade_media": 0.641121,
+              "frequencia_observada": 0.75
+            },
+            {
+              "faixa": "0.7–0.8",
+              "n": 12,
+              "probabilidade_media": 0.735767,
+              "frequencia_observada": 0.833333
+            },
+            {
+              "faixa": "0.8–0.9",
+              "n": 0,
+              "probabilidade_media": null,
+              "frequencia_observada": null
+            },
+            {
+              "faixa": "0.9–1.0",
+              "n": 1140,
+              "probabilidade_media": 0.333333,
+              "frequencia_observada": 0.333333
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "metricas_agregadas": {
+    "dixon_coles_temporal": {
+      "partidas": 760,
+      "log_loss": 1.01497389,
+      "brier_multiclasse": 0.60810165,
+      "rps": 0.20743524,
+      "acuracia_resultado": 0.49868421,
+      "ece_10_faixas": 0.01885103,
+      "mae_gols_mandante": 0.89163925,
+      "mae_gols_visitante": 0.76836086,
+      "acerto_placar_exato": 0.12763157,
+      "oscilacao_media_vetor_rodada": 0.05526373
+    },
+    "elo_dinamico": {
+      "partidas": 760,
+      "log_loss": 1.03172597,
+      "brier_multiclasse": 0.61854327,
+      "rps": 0.21277161,
+      "acuracia_resultado": 0.48684211,
+      "ece_10_faixas": 0.01684938,
+      "mae_gols_mandante": null,
+      "mae_gols_visitante": null,
+      "acerto_placar_exato": null,
+      "oscilacao_media_vetor_rodada": 0.06095863
+    },
+    "frequencia_historica": {
+      "partidas": 760,
+      "log_loss": 1.04955053,
+      "brier_multiclasse": 0.6319551,
+      "rps": 0.21887284,
+      "acuracia_resultado": 0.4881579,
+      "ece_10_faixas": 0.0105715,
+      "mae_gols_mandante": null,
+      "mae_gols_visitante": null,
+      "acerto_placar_exato": null,
+      "oscilacao_media_vetor_rodada": 0.00096731
+    },
+    "hibrido_dc_elo": {
+      "partidas": 760,
+      "log_loss": 1.01964659,
+      "brier_multiclasse": 0.61064203,
+      "rps": 0.20899478,
+      "acuracia_resultado": 0.5,
+      "ece_10_faixas": 0.02158119,
+      "mae_gols_mandante": 0.89163925,
+      "mae_gols_visitante": 0.76836086,
+      "acerto_placar_exato": 0.12763157,
+      "oscilacao_media_vetor_rodada": 0.0563023
+    },
+    "poisson_map_bayesiano": {
+      "partidas": 760,
+      "log_loss": 1.01407339,
+      "brier_multiclasse": 0.60735196,
+      "rps": 0.20721553,
+      "acuracia_resultado": 0.50921052,
+      "ece_10_faixas": 0.02308471,
+      "mae_gols_mandante": 0.88965404,
+      "mae_gols_visitante": 0.76563481,
+      "acerto_placar_exato": 0.13552631,
+      "oscilacao_media_vetor_rodada": 0.05360417
+    },
+    "poisson_regularizado": {
+      "partidas": 760,
+      "log_loss": 1.01416291,
+      "brier_multiclasse": 0.60744626,
+      "rps": 0.20725833,
+      "acuracia_resultado": 0.50526315,
+      "ece_10_faixas": 0.02459099,
+      "mae_gols_mandante": 0.89145551,
+      "mae_gols_visitante": 0.76558065,
+      "acerto_placar_exato": 0.13552631,
+      "oscilacao_media_vetor_rodada": 0.05202455
+    }
+  },
+  "selecao_modelo": {
+    "vencedor": {
+      "id": "poisson_map_bayesiano",
+      "rotulo": "Poisson log-linear MAP com priors gaussianos",
+      "justificativa": "Obteve o menor score composto do protocolo, com Log Loss 1.0141, Brier 0.6074, RPS 0.2072 e ECE 0.0231. O ganho de Log Loss sobre o segundo colocado foi de 0.01% no conjunto agregado. O resultado é um empate prático com o Poisson regularizado por pseudo-observações, mas o MAP obteve vantagem pequena e consistente no agregado de Log Loss, Brier e RPS. Ele foi escolhido por representar diretamente ataque e defesa na escala log, com priors gaussianos e partial pooling. A correção Dixon–Coles apresentou ECE menor, porém não superou o MAP nas três regras de pontuação próprias; seguirá como análise de sensibilidade.",
+      "empate_pratico": true,
+      "uso_na_execucao_2": "arquitetura-base; parâmetros serão recalibrados com todas as temporadas concluídas"
+    },
+    "ranking": [
+      {
+        "modelo": "poisson_map_bayesiano",
+        "score_selecao": 0.0,
+        "componentes_normalizados": {
+          "log_loss": 0.0,
+          "brier_multiclasse": 0.0,
+          "rps": 0.0
+        },
+        "metricas": {
+          "partidas": 760,
+          "log_loss": 1.01407339,
+          "brier_multiclasse": 0.60735196,
+          "rps": 0.20721553,
+          "acuracia_resultado": 0.50921052,
+          "ece_10_faixas": 0.02308471,
+          "mae_gols_mandante": 0.88965404,
+          "mae_gols_visitante": 0.76563481,
+          "acerto_placar_exato": 0.13552631,
+          "oscilacao_media_vetor_rodada": 0.05360417
+        },
+        "posicao": 1
+      },
+      {
+        "modelo": "poisson_regularizado",
+        "score_selecao": 0.00314581,
+        "componentes_normalizados": {
+          "log_loss": 0.00252332,
+          "brier_multiclasse": 0.00383284,
+          "rps": 0.00367152
+        },
+        "metricas": {
+          "partidas": 760,
+          "log_loss": 1.01416291,
+          "brier_multiclasse": 0.60744626,
+          "rps": 0.20725833,
+          "acuracia_resultado": 0.50526315,
+          "ece_10_faixas": 0.02459099,
+          "mae_gols_mandante": 0.89145551,
+          "mae_gols_visitante": 0.76558065,
+          "acerto_placar_exato": 0.13552631,
+          "oscilacao_media_vetor_rodada": 0.05202455
+        },
+        "posicao": 2
+      },
+      {
+        "modelo": "dixon_coles_temporal",
+        "score_selecao": 0.02560215,
+        "componentes_normalizados": {
+          "log_loss": 0.02538254,
+          "brier_multiclasse": 0.03047131,
+          "rps": 0.0188474
+        },
+        "metricas": {
+          "partidas": 760,
+          "log_loss": 1.01497389,
+          "brier_multiclasse": 0.60810165,
+          "rps": 0.20743524,
+          "acuracia_resultado": 0.49868421,
+          "ece_10_faixas": 0.01885103,
+          "mae_gols_mandante": 0.89163925,
+          "mae_gols_visitante": 0.76836086,
+          "acerto_placar_exato": 0.12763157,
+          "oscilacao_media_vetor_rodada": 0.05526373
+        },
+        "posicao": 3
+      },
+      {
+        "modelo": "hibrido_dc_elo",
+        "score_selecao": 0.14918995,
+        "componentes_normalizados": {
+          "log_loss": 0.15709271,
+          "brier_multiclasse": 0.13372561,
+          "rps": 0.15262955
+        },
+        "metricas": {
+          "partidas": 760,
+          "log_loss": 1.01964659,
+          "brier_multiclasse": 0.61064203,
+          "rps": 0.20899478,
+          "acuracia_resultado": 0.5,
+          "ece_10_faixas": 0.02158119,
+          "mae_gols_mandante": 0.89163925,
+          "mae_gols_visitante": 0.76836086,
+          "acerto_placar_exato": 0.12763157,
+          "oscilacao_media_vetor_rodada": 0.0563023
+        },
+        "posicao": 4
+      },
+      {
+        "modelo": "elo_dinamico",
+        "score_selecao": 0.4805736,
+        "componentes_normalizados": {
+          "log_loss": 0.49757619,
+          "brier_multiclasse": 0.45487324,
+          "rps": 0.47661768
+        },
+        "metricas": {
+          "partidas": 760,
+          "log_loss": 1.03172597,
+          "brier_multiclasse": 0.61854327,
+          "rps": 0.21277161,
+          "acuracia_resultado": 0.48684211,
+          "ece_10_faixas": 0.01684938,
+          "mae_gols_mandante": null,
+          "mae_gols_visitante": null,
+          "acerto_placar_exato": null,
+          "oscilacao_media_vetor_rodada": 0.06095863
+        },
+        "posicao": 5
+      },
+      {
+        "modelo": "frequencia_historica",
+        "score_selecao": 1.0,
+        "componentes_normalizados": {
+          "log_loss": 1.0,
+          "brier_multiclasse": 1.0,
+          "rps": 1.0
+        },
+        "metricas": {
+          "partidas": 760,
+          "log_loss": 1.04955053,
+          "brier_multiclasse": 0.6319551,
+          "rps": 0.21887284,
+          "acuracia_resultado": 0.4881579,
+          "ece_10_faixas": 0.0105715,
+          "mae_gols_mandante": null,
+          "mae_gols_visitante": null,
+          "acerto_placar_exato": null,
+          "oscilacao_media_vetor_rodada": 0.00096731
+        },
+        "posicao": 6
+      }
+    ]
+  },
+  "af_score": {
+    "usado_no_backtesting": false,
+    "motivo": "não há cobertura histórica homogênea das estatísticas detalhadas de 2023–2025",
+    "decisao": "testar contribuição incremental apenas na Execução 2, com trava contra dupla contagem e vazamento"
+  },
+  "promovidos": {
+    "tratamento": "regressão à média / partial pooling",
+    "serie_b_incorporada": false,
+    "justificativa": "resultados de outra divisão não são diretamente comparáveis; a incerteza inicial é explicitamente maior"
+  },
+  "referencias": [
+    {
+      "citacao": "Dixon, M. J.; Coles, S. G. (1997). Artigo de modelagem probabilística de placares de futebol, JRSS Series C 46(2), 265–280.",
+      "doi": "10.1111/1467-9876.00065",
+      "uso": "correção de dependência em placares baixos"
+    },
+    {
+      "citacao": "Baio, G.; Blangiardo, M. (2010). Bayesian hierarchical model for the prediction of football results.",
+      "doi": "10.1080/02664760802684177",
+      "uso": "regularização hierárquica e compartilhamento parcial de informação"
+    },
+    {
+      "citacao": "Constantinou, A. C.; Fenton, N. E. (2012). Solving the problem of inadequate scoring rules for assessing probabilistic football forecast models.",
+      "doi": "10.1515/1559-0410.1418",
+      "uso": "avaliação probabilística além da acurácia simples"
+    },
+    {
+      "citacao": "UFMG — Departamento de Matemática. Probabilidades no Futebol.",
+      "url": "https://www.mat.ufmg.br/extensao/probabilidade-no-futebol/",
+      "uso": "referência brasileira de divulgação e simulação do campeonato"
+    }
+  ],
+  "limites": [
+    "sem xG histórico homogêneo",
+    "sem escalações, lesões ou suspensões como variáveis explícitas",
+    "sem probabilidades comerciais ou dados de apostas",
+    "regulamento de vagas continentais será parametrizado na Execução 2"
+  ],
+  "proxima_execucao": [
+    "recalibrar a arquitetura vencedora com 2023–2025 completos",
+    "incorporar o estado atual de 2026 sem vazamento",
+    "calcular probabilidades de cada partida restante",
+    "simular a classificação final por Monte Carlo com critérios oficiais de desempate",
+    "gerar probabilidades de título, zonas continentais e rebaixamento com intervalos de incerteza"
+  ]
+}
