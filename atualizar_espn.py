@@ -673,19 +673,36 @@ def prefixo_evento_espn(event_id: Any) -> str:
 
 
 def sanear_eventos_por_rodada(eventos: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Garante a regra estrutural do Brasileirão: no máximo 10 jogos por rodada.
+    """Garante a regra estrutural do Brasileirão: no máximo 10 jogos por rodada,
+    e nenhum clube duplicado dentro da mesma rodada.
 
     A ESPN eventualmente inclui jogos isolados/reagendados com o mesmo número de
-    rodada do calendário regular. Isso gerou rodadas com 11 jogos e até clube
-    repetido na mesma rodada. Para o site e para as apostas, isso é inviável.
+    rodada do calendário regular. Isso gera rodadas com 11 jogos e às vezes com
+    o mesmo clube em dois confrontos da mesma rodada — inviável para o site e o
+    bolão.
 
-    Critério conservador:
-      1. se a rodada tem até 10 jogos, não muda nada;
-      2. se tem mais de 10, prioriza o prefixo dominante de event_id ESPN
-         (normalmente o bloco regular da competição);
-      3. se ainda sobrar mais de 10, escolhe 10 jogos sem clube duplicado;
-      4. em último caso, corta nos 10 primeiros ordenados por data.
+    Ordem de prioridade dentro da rodada (nada é descartado sem passar por ela):
+      1. jogos com ajuste manual do calendário (ajuste_calendario=True) — nunca
+         são cortados; se cortarmos um, perdemos placar/estado importantes;
+      2. jogos concluídos com placar válido — segundo em prioridade para não
+         perder resultado que já aconteceu;
+      3. jogos por data crescente — critério neutro para os demais.
+
+    A dedup por clube roda em toda rodada — mesmo com 10 jogos exatos — se
+    detectar duplicata. Se um jogo for "sobrando" na rodada, ele volta para o
+    balde 'sem rodada' (por dedução, pertence a outra rodada) para não sumir do
+    site; se for realmente inconsistente, é logado como aviso.
     """
+    def _prioridade(e: dict[str, Any]) -> tuple[int, int, float]:
+        # Menor tupla = maior prioridade.
+        ajuste = 0 if e.get("ajuste_calendario") else 1
+        concluido = 0 if (e.get("concluido") is True or e.get("estado") == "post") else 1
+        return (ajuste, concluido, float(e.get("_sort") or 0))
+
+    def _placar_valido(e: dict[str, Any]) -> bool:
+        pm, pv = e.get("placar_mandante"), e.get("placar_visitante")
+        return (e.get("concluido") is True or e.get("estado") == "post") and isinstance(pm, int) and isinstance(pv, int)
+
     por_rodada: dict[int, list[dict[str, Any]]] = {}
     sem_rodada: list[dict[str, Any]] = []
     for e in eventos:
@@ -697,8 +714,25 @@ def sanear_eventos_por_rodada(eventos: list[dict[str, Any]]) -> list[dict[str, A
 
     saneados: list[dict[str, Any]] = []
     for rodada in sorted(por_rodada):
-        arr = sorted(por_rodada[rodada], key=lambda x: x.get("_sort") or 0)
+        arr = sorted(por_rodada[rodada], key=_prioridade)
         original = len(arr)
+
+        # Detecta duplicata de clube na rodada.
+        contagem: dict[str, int] = {}
+        for e in arr:
+            for nome in (str(e.get("mandante_nome") or ""), str(e.get("visitante_nome") or "")):
+                if nome:
+                    contagem[nome] = contagem.get(nome, 0) + 1
+        tem_duplicata = any(n > 1 for n in contagem.values())
+
+        # Se a rodada está limpa (≤ 10 jogos e sem duplicata), não mexe em nada.
+        if original <= 10 and not tem_duplicata:
+            saneados.extend(arr)
+            continue
+
+        # Passo 1 (só se > 10): prioriza prefixo dominante de event_id da ESPN
+        # (bloco regular do campeonato). Preserva ajustes manuais mesmo que
+        # tenham prefixo minoritário.
         if original > 10:
             cont: dict[str, int] = {}
             for e in arr:
@@ -706,32 +740,68 @@ def sanear_eventos_por_rodada(eventos: list[dict[str, Any]]) -> list[dict[str, A
                 if pref:
                     cont[pref] = cont.get(pref, 0) + 1
             dominante = max(cont.items(), key=lambda kv: kv[1])[0] if cont else ""
-            filtrada = [e for e in arr if prefixo_evento_espn(e.get("event_id")) == dominante]
+            filtrada = [
+                e for e in arr
+                if e.get("ajuste_calendario") or prefixo_evento_espn(e.get("event_id")) == dominante
+            ]
             if len(filtrada) >= 10:
                 arr = filtrada
 
-        if len(arr) > 10:
-            usados: set[str] = set()
-            sem_duplicar: list[dict[str, Any]] = []
-            for e in arr:
-                mand = str(e.get("mandante_nome") or "")
-                vis = str(e.get("visitante_nome") or "")
-                if not mand or not vis or mand in usados or vis in usados:
-                    continue
-                usados.add(mand)
-                usados.add(vis)
-                sem_duplicar.append(e)
-                if len(sem_duplicar) == 10:
-                    break
-            if len(sem_duplicar) == 10:
-                arr = sem_duplicar
+        # Passo 2: dedup por clube preservando a ordem de prioridade acima.
+        # Nunca cortamos um jogo com ajuste manual. Se um jogo cair fora,
+        # tenta reencaixá-lo no balde 'sem rodada' — ele vai sobrar como
+        # anomalia registrada.
+        usados: set[str] = set()
+        selecionados: list[dict[str, Any]] = []
+        excedentes: list[dict[str, Any]] = []
+        for e in arr:
+            mand = str(e.get("mandante_nome") or "")
+            vis = str(e.get("visitante_nome") or "")
+            if not mand or not vis:
+                excedentes.append(e)
+                continue
+            colisao = mand in usados or vis in usados
+            if colisao:
+                # Nunca descarta ajuste manual e nunca descarta jogo com placar
+                # válido — se algum deles bate com uso anterior, é indício de
+                # inconsistência da ESPN; segurar o extra em 'sem_rodada' para
+                # não sumir do site.
+                if e.get("ajuste_calendario") or _placar_valido(e):
+                    print(
+                        f"  ATENÇÃO: rodada {rodada}: jogo prioritário colidiu "
+                        f"com {mand} x {vis} (event {e.get('event_id')}); "
+                        f"mantido fora da rodada para inspeção."
+                    )
+                    excedentes.append(e)
+                else:
+                    print(
+                        f"  extra ignorado: rodada {rodada}: {mand} x {vis} "
+                        f"({e.get('data_iso')}, {e.get('event_id')})"
+                    )
+                continue
+            if len(selecionados) >= 10:
+                excedentes.append(e)
+                continue
+            usados.add(mand)
+            usados.add(vis)
+            selecionados.append(e)
 
-        if original > 10:
-            removidos = original - min(len(arr), 10)
-            print(f"Rodada {rodada}: ESPN retornou {original} jogos; publicando {min(len(arr), 10)} e removendo {max(0, removidos)} extra(s).")
-            for e in arr[10:]:
-                print(f"  - extra ignorado: {e.get('mandante_nome')} x {e.get('visitante_nome')} ({e.get('data_iso')}, {e.get('event_id')})")
-        saneados.extend(arr[:10])
+        if original != len(selecionados):
+            print(
+                f"Rodada {rodada}: ESPN retornou {original} jogos; publicando "
+                f"{len(selecionados)} (dedup ativo)."
+            )
+        saneados.extend(selecionados)
+        # Excedentes com ajuste ou placar viram anomalias visíveis em 'sem_rodada'
+        # para o AF-Previsão / auditoria detectar. Extras neutros são descartados
+        # com log acima. A rodada é limpa (0) para não contar duas vezes.
+        for e in excedentes:
+            if e.get("ajuste_calendario") or _placar_valido(e):
+                anomalia = dict(e)
+                anomalia["rodada"] = 0
+                anomalia["rodada_original_espn"] = int(e.get("rodada") or 0)
+                anomalia["excedente_sanear"] = True
+                sem_rodada.append(anomalia)
 
     saneados.extend(sem_rodada)
     saneados.sort(key=lambda e: e.get("_sort") or 0)
