@@ -34,6 +34,7 @@ RESULTADOS = ROOT / "resultados.json"
 SAIDA = ROOT / "dados-br" / "jogos-detalhes.json"
 AUDITORIA = ROOT / "dados-br" / "auditoria-jogos-detalhes.json"
 PUBLICOS_COMPLEMENTARES = ROOT / "dados-br" / "publicos-complementares.json"
+RESULTADOS_MANUAIS = ROOT / "dados-br" / "resultados-manuais.json"
 
 HEADERS = {
     "User-Agent": (
@@ -1020,6 +1021,28 @@ def carregar_json(path: Path, padrao: Any) -> Any:
         return padrao
 
 
+def carregar_event_ids_detalhes() -> dict[str, str]:
+    """Mapeia o ID canônico do jogo para o ID ESPN que contém os detalhes.
+
+    A ESPN pode criar um novo evento quando uma partida é adiada. O site
+    preserva o ID canônico no calendário/resultados, mas consulta o novo ID
+    apenas para boxscore, gols, cartões, público, estádio e arbitragem.
+    """
+    payload = carregar_json(RESULTADOS_MANUAIS, {})
+    jogos = payload.get("jogos") if isinstance(payload, dict) else {}
+    if not isinstance(jogos, dict):
+        return {}
+    mapa: dict[str, str] = {}
+    for chave, item in jogos.items():
+        if not isinstance(item, dict) or item.get("ativo") is False:
+            continue
+        canonico = str(item.get("event_id") or chave or "").strip()
+        detalhes = str(item.get("event_id_detalhes") or "").strip()
+        if canonico.isdigit() and detalhes.isdigit() and canonico != detalhes:
+            mapa[canonico] = detalhes
+    return mapa
+
+
 def gravar_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
@@ -1052,9 +1075,11 @@ def montar_registro(
     validacao: dict[str, Any] | None = None,
     publico_fonte: str = "",
     publico_tipo: str = "",
+    event_id_fonte_detalhes: str = "",
 ) -> dict[str, Any]:
     return {
         "event_id": event_id,
+        "event_id_fonte_detalhes": str(event_id_fonte_detalhes or event_id),
         "rodada": int(jogo.get("rodada") or 0),
         "data_iso": jogo.get("data_iso") or "",
         "mandante": (jogo.get("mandante") or {}).get("nome") or "",
@@ -1172,7 +1197,10 @@ def self_test() -> None:
     assert _ajustar_validacao_manual_sem_eventos(
         manual, validar_eventos(manual, [], gols, []), gols, [], "não deve mascarar evento parcial"
     ).get("pendente_detalhes") is not True
-    print("SELF-TEST OK: público, eventos, deduplicação e fallback manual sem inventar detalhes.")
+    mapa_ids = carregar_event_ids_detalhes()
+    if RESULTADOS_MANUAIS.exists():
+        assert mapa_ids.get("401840998") == "401879459", mapa_ids
+    print("SELF-TEST OK: público, eventos, deduplicação, ID alternativo e fallback manual sem inventar detalhes.")
 
 
 def _build_payload(jogos_saida: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -1254,6 +1282,7 @@ def main() -> None:
         jogos_anteriores = {}
 
     publicos_complementares = carregar_publicos_complementares()
+    event_ids_detalhes = carregar_event_ids_detalhes()
 
     jogos_saida: dict[str, dict[str, Any]] = {}
     falhas: list[dict[str, Any]] = []
@@ -1265,7 +1294,9 @@ def main() -> None:
         event_id = str(jogo.get("event_id") or "")
         if not event_id:
             continue
-        label = f"R{jogo.get('rodada')} · {(jogo.get('mandante') or {}).get('nome')} x {(jogo.get('visitante') or {}).get('nome')} · {event_id}"
+        event_id_fonte = event_ids_detalhes.get(event_id, event_id)
+        sufixo_fonte = f" · detalhes ESPN {event_id_fonte}" if event_id_fonte != event_id else ""
+        label = f"R{jogo.get('rodada')} · {(jogo.get('mandante') or {}).get('nome')} x {(jogo.get('visitante') or {}).get('nome')} · {event_id}{sufixo_fonte}"
         antigo = jogos_anteriores.get(event_id) if isinstance(jogos_anteriores, dict) else None
 
         if args.reparar_local:
@@ -1285,12 +1316,13 @@ def main() -> None:
                 estadio=str((antigo or {}).get("estadio") or jogo.get("estadio") or ""),
                 arbitro=str((antigo or {}).get("arbitro") or ""), gols=gols, cartoes=cartoes,
                 preservado=True, validacao=validacao, publico_fonte=fonte_publico, publico_tipo=tipo_publico,
+                event_id_fonte_detalhes=event_id_fonte,
             )
             print(f"[{i:03d}/{len(resultados):03d}] LOCAL {label}: gols={len(gols)} · cartões={len(cartoes)} · ok={validacao['ok']}")
             continue
 
         try:
-            summary = fetch_json(BASE_SUMMARY.format(event_id=event_id))
+            summary = fetch_json(BASE_SUMMARY.format(event_id=event_id_fonte))
             stats = parse_summary(summary, jogo)
             publico = parse_publico(summary)
             publico_fonte = "ESPN summary" if publico is not None else ""
@@ -1324,6 +1356,7 @@ def main() -> None:
                     estadio=str((antigo or {}).get("estadio") or jogo.get("estadio") or ""),
                     arbitro=str((antigo or {}).get("arbitro") or ""), gols=gols, cartoes=cartoes,
                     preservado=True, validacao=validacao, publico_fonte=fonte_publico, publico_tipo=tipo_publico,
+                    event_id_fonte_detalhes=event_id_fonte,
                 )
             else:
                 if jogo.get("resultado_manual") is True:
@@ -1331,10 +1364,15 @@ def main() -> None:
                     validacao = validacao_resultado_manual_pendente(
                         jogo, f"Falha ao buscar summary ESPN: {exc}"
                     )
-                    jogos_saida[event_id] = montar_registro(event_id, jogo, [], validacao=validacao)
+                    jogos_saida[event_id] = montar_registro(
+                        event_id, jogo, [], validacao=validacao, event_id_fonte_detalhes=event_id_fonte
+                    )
                 else:
                     falhas.append({"event_id": event_id, "jogo": label, "erro": str(exc)[:300]})
-                    jogos_saida[event_id] = montar_registro(event_id, jogo, [], validacao=validar_eventos(jogo, [], [], []))
+                    jogos_saida[event_id] = montar_registro(
+                        event_id, jogo, [], validacao=validar_eventos(jogo, [], [], []),
+                        event_id_fonte_detalhes=event_id_fonte,
+                    )
             print(f"[WARN] {label}: {exc}")
             time.sleep(max(0.0, args.sleep))
             continue
@@ -1344,6 +1382,7 @@ def main() -> None:
         jogos_saida[event_id] = montar_registro(
             event_id, jogo, stats, publico=publico, estadio=estadio, arbitro=arbitro,
             gols=gols, cartoes=cartoes, validacao=validacao, publico_fonte=publico_fonte, publico_tipo=publico_tipo,
+            event_id_fonte_detalhes=event_id_fonte,
         )
         print(
             f"[{i:03d}/{len(resultados):03d}] {label}: {len(stats)} estatística(s) · "

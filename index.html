@@ -1858,16 +1858,16 @@
     .tabela-br { min-width: 0; width: 100%; }
     .tabela-br .col-oculta-mobile { display: none; }
     .tabela-br th:first-child, .tabela-br td:first-child {
-      width: 84px;
-      min-width: 84px;
-      max-width: 84px;
+      width: 96px;
+      min-width: 96px;
+      max-width: 96px;
       padding-left: 6px;
       padding-right: 4px;
-      overflow: hidden;
+      overflow: visible;
     }
     .tabela-br th:nth-child(2), .tabela-br td:nth-child(2) { width: auto; }
     .tabela-br th, .tabela-br td { padding: 8px 6px; font-size: 12px; }
-    .tabela-pos-cell { width: 84px; min-width: 84px; }
+    .tabela-pos-cell { width: 96px; min-width: 96px; overflow: visible; }
     .tabela-pos-wrap { gap: 4px; }
     .tabela-pos-wrap .seta-mov { font-size: 9px; padding: 2px 3px; }
     .tabela-pos-badge { min-width: 26px; height: 26px; border-radius: 9px; }
@@ -2410,7 +2410,7 @@ body > .container > section.hero > img {
     .jogo-time.br-club-link, .resultado-time.br-club-link { padding: 4px 2px; }
   }
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260718-menu-flutuante-v1">
+<link rel="stylesheet" href="css/br-global.css?v=20260718-ajustes-mobile-escudos-v3">
 </head>
   <script>
   /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
@@ -2600,6 +2600,12 @@ function brEscapeHtml(valor) {
   }[ch]));
 }
 function brEscapeAttr(valor) { return brEscapeHtml(valor); }
+const BR_ESCUDO_NEUTRO = 'img/escudo-neutro.svg';
+function brEscudoImg(src, nome, classe = '', loading = 'lazy') {
+  const origem = String(src || '').trim();
+  const classes = `${classe || ''}${origem ? '' : ' is-neutral-shield'}`.trim();
+  return `<img${classes ? ` class="${brEscapeAttr(classes)}"` : ''} src="${brEscapeAttr(origem || BR_ESCUDO_NEUTRO)}" alt="${brEscapeAttr(nome || '')}" loading="${brEscapeAttr(loading)}" onerror="this.onerror=null;this.src='${BR_ESCUDO_NEUTRO}';this.classList.add('is-neutral-shield')">`;
+}
 function normalizarChaveJogoTexto(valor) {
   return normalizarNome(valor || '').replace(/\s+/g, '-');
 }
@@ -3981,7 +3987,7 @@ function renderTabela() {
     else if (t.pos <= 6) cls = 'zona-prelibertadores';
     const seta = htmlSetaMovimento(posBase[t.time], t.pos);
     const esc = escudoDe(t.time);
-    const celTime = `<div class="tabela-time-cel">${esc ? `<img class="tabela-escudo" src="${esc.escudo}" alt="" loading="lazy">` : ''}<span>${t.time}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
+    const celTime = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${t.time}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
     let celForma = '';
     if (forma) {
       const f5 = forma[t.time] || [];
@@ -4494,7 +4500,7 @@ function renderJogos() {
     ? `${jogosVisiveis.length} jogo(s) encontrado(s)${proximoDoFiltro ? ' · próximo: ' + formatarDataAgrupada(proximoDoFiltro.data_iso) + ' às ' + formatarHorarioJogo(proximoDoFiltro.data_iso) : ''}`
     : 'Mostrando todos os clubes e jogos disponíveis no snapshot ESPN.';
   const filtroShield = filtro
-    ? (filtroEsc ? `<img src="${filtroEsc.escudo}" alt="" loading="lazy">` : `<span class="br-filter-shield-fallback">${filtro.slice(0,3).toUpperCase()}</span>`)
+    ? brEscudoImg(filtroEsc?.escudo || '', filtro, 'br-filter-shield-img')
     : `<span class="br-filter-shield-fallback">BR</span>`;
   html += '<div class="br-filter-panel" aria-label="Filtro de jogos por clube">';
   html += '<div class="br-filter-select-card">';
@@ -4513,7 +4519,7 @@ function renderJogos() {
     const esc = ESCUDOS_TIMES[c];
     const cSafe = c.replace(/'/g, "\\'");
     html += `<button class="br-mini-club ${filtro === c ? 'ativo' : ''}" type="button" title="${c}" onclick="setFiltroJogos('${cSafe}')">` +
-      (esc ? `<img src="${esc.escudo}" alt="" loading="lazy">` : c.slice(0,3).toUpperCase()) + `</button>`;
+      brEscudoImg(esc?.escudo || '', c, 'br-mini-club-shield') + `</button>`;
   }
   html += '</div>';
 
@@ -4530,12 +4536,8 @@ function renderJogos() {
     for (const j of jogos) {
       const m = j.mandante || {};
       const v = j.visitante || {};
-      const escudoMandante = m.escudo
-        ? `<img src="${m.escudo}" alt="${m.nome || ''}" loading="lazy">`
-        : `<div class="escudo-fallback">${(m.sigla || (m.nome || '?').slice(0,3)).toUpperCase()}</div>`;
-      const escudoVisitante = v.escudo
-        ? `<img src="${v.escudo}" alt="${v.nome || ''}" loading="lazy">`
-        : `<div class="escudo-fallback">${(v.sigla || (v.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+      const escudoMandante = brEscudoImg(m.escudo || '', m.nome || '', 'jogo-escudo-img');
+      const escudoVisitante = brEscudoImg(v.escudo || '', v.nome || '', 'jogo-escudo-img');
 
       const horario = formatarHorarioJogo(j.data_iso);
       const live = espnLiveDoJogo(j);
@@ -4928,12 +4930,8 @@ function renderResultados() {
         else classeJogo = 'resultado-derrota';
       }
 
-      const escudoMandante = m.escudo
-        ? `<img src="${m.escudo}" alt="${m.nome || ''}" loading="lazy">`
-        : `<div class="escudo-fallback-pequeno">${(m.sigla || (m.nome || '?').slice(0,3)).toUpperCase()}</div>`;
-      const escudoVisitante = v.escudo
-        ? `<img src="${v.escudo}" alt="${v.nome || ''}" loading="lazy">`
-        : `<div class="escudo-fallback-pequeno">${(v.sigla || (v.nome || '?').slice(0,3)).toUpperCase()}</div>`;
+      const escudoMandante = brEscudoImg(m.escudo || '', m.nome || '', 'resultado-escudo-img');
+      const escudoVisitante = brEscudoImg(v.escudo || '', v.nome || '', 'resultado-escudo-img');
 
       const dataFmt = formatarDataResultado(r.data_iso);
       const extrasResultado = [htmlMelhoresMomentos(r, 'resultado'), htmlEstatisticasJogo(r)].filter(Boolean).join('');
@@ -5789,7 +5787,7 @@ setTimeout(sincronizarAvisosAniversarioComSessao, 800);
 </script>
 <script src="js/br-clube-retorno.js?v=20260717-retorno-exato-v1"></script>
 <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
-<script src="js/br-menu.js?v=20260718-menu-retorno-origem-v2"></script>
+<script src="js/br-menu.js?v=20260718-retorno-origem-v3"></script>
 <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

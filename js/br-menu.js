@@ -192,24 +192,22 @@
     navs.forEach(function (nav) {
       ensureFloatingNav(nav);
       var marker = nav._brFloatingMarker;
-      if (!marker || nav.hidden || nav.offsetParent === null) return;
-
       var fixed = nav.classList.contains("br-nav-floating");
-      var top = floatingTopOffset();
+      // Elementos position:fixed podem ter offsetParent nulo. Não interrompa
+      // a atualização nesse estado, pois é justamente ela que remove a classe
+      // quando o usuário volta ao ponto original do menu.
+      if (!marker || nav.hidden || (!fixed && nav.offsetParent === null)) return;
 
-      // Enquanto a navegação está no fluxo normal, registra sua posição real
-      // no documento. Ao flutuar, usa esse ponto fixo para saber exatamente
-      // quando deve voltar ao lugar de origem — sem depender da geometria do
-      // placeholder ou do cabeçalho durante a rolagem.
-      if (!fixed || !Number.isFinite(Number(nav._brFloatingOriginY))) {
-        nav._brFloatingOriginY = nav.getBoundingClientRect().top + scrollY;
+      var top = floatingTopOffset();
+      if (!Number.isFinite(nav._brFloatingOriginY)) {
+        var anchor = fixed ? marker : nav;
+        nav._brFloatingOriginY = anchor.getBoundingClientRect().top + scrollY;
       }
       var originY = Number(nav._brFloatingOriginY);
-      var threshold = originY - top;
-      var shouldFloat = fixed ? scrollY >= threshold - 2 : scrollY >= threshold;
+      var shouldFloat = scrollY + top >= originY;
 
       if (shouldFloat) {
-        if (!fixed || !Number.isFinite(Number(nav._brFloatingPlaceholderHeight))) {
+        if (!fixed || !Number.isFinite(nav._brFloatingPlaceholderHeight)) {
           nav._brFloatingPlaceholderHeight = outerHeight(nav);
         }
         marker.classList.add("is-active");
@@ -225,9 +223,6 @@
         nav.style.removeProperty("--br-nav-fixed-width");
         marker.classList.remove("is-active");
         setMarkerHeight(marker, 0);
-        // A navegação voltou ao fluxo. Recalcula a origem no próximo frame,
-        // já com o cabeçalho e o conteúdo em suas posições naturais.
-        nav._brFloatingOriginY = null;
         nav._brFloatingPlaceholderHeight = null;
       }
     });
@@ -240,7 +235,8 @@
 
   function resetFloatingOrigins() {
     Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), function (nav) {
-      if (!nav.classList.contains("br-nav-floating")) nav._brFloatingOriginY = null;
+      nav._brFloatingOriginY = null;
+      nav._brFloatingPlaceholderHeight = null;
     });
     requestFloatingNavUpdate();
   }

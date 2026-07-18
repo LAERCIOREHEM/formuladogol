@@ -748,8 +748,9 @@
   }
 
   function teamLogo(team) {
-    if (team.escudo) return '<img src="' + esc(team.escudo) + '" alt="" loading="eager">';
-    return '<div class="live-logo-fallback">' + esc((team.sigla || team.nome || "?").slice(0, 3)) + "</div>";
+    const fallback = "img/escudo-neutro.svg";
+    const src = String(team && team.escudo || "");
+    return '<img class="' + (src ? '' : 'is-neutral-shield') + '" src="' + esc(src || fallback) + '" alt="" loading="eager" onerror="this.onerror=null; this.src=\'img/escudo-neutro.svg\'; this.classList.add(\'is-neutral-shield\')">';
   }
 
   function clockMinute(g) {

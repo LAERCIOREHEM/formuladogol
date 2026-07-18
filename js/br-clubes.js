@@ -24,8 +24,9 @@
     }
   }
   function escudoHtml(c, cls="club-logo"){
-    if (c && c.escudo) return `<img class="${cls}" src="${escapeAttr(c.escudo)}" alt="" loading="lazy" onerror="this.style.display='none'">`;
-    return `<span class="${cls}" aria-hidden="true">${escapeHtml((c && (c.sigla || c.nome) || "?").slice(0,3).toUpperCase())}</span>`;
+    const fallback = "img/escudo-neutro.svg";
+    const src = String(c && c.escudo || "");
+    return `<img class="${escapeAttr(cls)}${src ? "" : " is-neutral-shield"}" src="${escapeAttr(src || fallback)}" alt="" loading="lazy" onerror="this.onerror=null; this.src='${fallback}'; this.classList.add('is-neutral-shield')">`;
   }
 
   function mascotInfo(clube){

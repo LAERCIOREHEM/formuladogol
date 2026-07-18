@@ -235,10 +235,10 @@
 
   function shield(obj, cls = "stats-shield") {
     const name = teamName(obj);
-    const fallback = teamInfo(name);
-    const src = String((obj && typeof obj === "object" ? obj.escudo : "") || fallback?.escudo || "");
-    if (!src) return `<span class="stats-shield-fallback ${escapeAttr(cls)}">${escapeHtml(initials(name))}</span>`;
-    return `<img class="${escapeAttr(cls)}" src="${escapeAttr(src)}" alt="" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling && (this.nextElementSibling.hidden=false)"><span class="stats-shield-fallback ${escapeAttr(cls)}" hidden>${escapeHtml(initials(name))}</span>`;
+    const info = teamInfo(name);
+    const src = String((obj && typeof obj === "object" ? obj.escudo : "") || info?.escudo || "");
+    const fallback = "img/escudo-neutro.svg";
+    return `<img class="${escapeAttr(cls)}${src ? "" : " is-neutral-shield"}" src="${escapeAttr(src || fallback)}" alt="" loading="lazy" onerror="this.onerror=null; this.src='${fallback}'; this.classList.add('is-neutral-shield')">`;
   }
 
   function leadersValid() {
