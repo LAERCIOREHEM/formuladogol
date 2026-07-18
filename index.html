@@ -605,9 +605,21 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    white-space: nowrap;
+    line-height: 1;
   }
   @media (max-width: 720px) {
     .seta-mov { font-size: 9px; padding: 1px 3px; margin: 0 2px; }
+    /* No celular a coluna 'posição' precisa comportar medalha + seta + número
+       na mesma linha. overflow: visible evita corte quando a linha reduz. */
+    .pos-com-seta { gap: 3px; }
+    .ranking-table tbody td:first-child,
+    .ranking-table thead th:first-child {
+      overflow: visible;
+      white-space: nowrap;
+      padding-left: 4px;
+      padding-right: 4px;
+    }
   }
 
   /* RESULTADOS */
@@ -4140,8 +4152,19 @@ function renderJogos() {
   }
   clubesPresentes.sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
+  // Defesa em profundidade: mesmo se o backend estiver atrasado e um jogo
+  // encerrado ainda aparecer aqui, a aba Jogos NUNCA renderiza estado 'post'.
+  // Também respeita o sinal live da ESPN — se o navegador já detectou fim
+  // de partida, o jogo some daqui imediatamente e reaparece em Resultados.
+  const jogosBase = (state.jogos || []).filter(j => {
+    const estadoLocal = String(j && j.estado || '').toLowerCase();
+    if (estadoLocal === 'post' || j.concluido === true) return false;
+    const live = state.espnLive && state.espnLive[espnChaveJogo((j.mandante || {}).nome, (j.visitante || {}).nome)];
+    if (live && live.estado === 'post') return false;
+    return true;
+  });
   const filtro = state.jogosFiltroTime || '';
-  const jogosVisiveis = !filtro ? state.jogos : state.jogos.filter(j =>
+  const jogosVisiveis = !filtro ? jogosBase : jogosBase.filter(j =>
     nomeCanonico((j.mandante || {}).nome) === filtro ||
     nomeCanonico((j.visitante || {}).nome) === filtro
   );

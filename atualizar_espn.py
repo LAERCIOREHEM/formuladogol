@@ -599,34 +599,6 @@ def aplicar_ajustes_calendario(eventos: list[dict[str, Any]]) -> None:
     print(f"Ajustes de calendário aplicados: {aplicados}/{len(ajustes)}")
 
 
-def corrigir_rodadas_segundo_turno(eventos: list[dict[str, Any]]) -> None:
-    """Corrige rodada do returno pela inversão obrigatória do primeiro turno.
-
-    Se A x B ocorreu na rodada N (1..19), B x A deve ocorrer na rodada N+19.
-    Isso elimina deslocamentos ocasionais da ESPN sem inventar confrontos.
-    """
-    ida: dict[tuple[str, str], int] = {}
-    for e in eventos:
-        r = int(e.get("rodada") or 0)
-        if 1 <= r <= 19:
-            ida[(str(e.get("mandante_nome") or ""), str(e.get("visitante_nome") or ""))] = r
-
-    corrigidos = 0
-    for e in eventos:
-        mand = str(e.get("mandante_nome") or "")
-        vis = str(e.get("visitante_nome") or "")
-        r_ida = ida.get((vis, mand))
-        if not r_ida:
-            continue
-        esperado = r_ida + 19
-        atual = int(e.get("rodada") or 0)
-        if atual != esperado and esperado <= 38:
-            e["rodada_corrigida_de"] = atual or None
-            e["rodada"] = esperado
-            corrigidos += 1
-            print(f"Rodada corrigida: {mand} x {vis}: {atual or '?'} -> {esperado}")
-    print(f"Rodadas do segundo turno corrigidas: {corrigidos}")
-
 def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[str, Any]]:
     legadas = carregar_rodadas_legadas()
     normalizados: list[dict[str, Any]] = []
@@ -680,7 +652,6 @@ def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[st
     normalizados.sort(key=lambda e: e["_sort"])
     inferir_rodadas_faltantes(normalizados)
     aplicar_ajustes_calendario(normalizados)
-    corrigir_rodadas_segundo_turno(normalizados)
     normalizados = sanear_eventos_por_rodada(normalizados)
     return normalizados
 

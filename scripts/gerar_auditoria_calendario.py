@@ -254,27 +254,6 @@ def main() -> None:
         if len(arr) > 10 or repetidos:
             falhas.append({"tipo": "rodada_espn_inconsistente", **item})
 
-    ida: dict[tuple[str, str], int] = {}
-    for e in eventos:
-        r = int(e.get("rodada") or 0)
-        if 1 <= r <= 19:
-            ida[(nome_time(e.get("mandante")), nome_time(e.get("visitante")))] = r
-    retorno_incorreto = []
-    for e in eventos:
-        m, v = nome_time(e.get("mandante")), nome_time(e.get("visitante"))
-        r_ida = ida.get((v, m))
-        if not r_ida:
-            continue
-        esperado = r_ida + 19
-        atual = int(e.get("rodada") or 0)
-        if atual != esperado:
-            retorno_incorreto.append({
-                "event_id": e.get("event_id"), "mandante": m, "visitante": v,
-                "rodada_atual": atual, "rodada_esperada": esperado,
-            })
-    if retorno_incorreto:
-        falhas.append({"tipo": "rodadas_returno_incorretas", "total": len(retorno_incorreto)})
-
     jogos_sem_data = [
         {
             "event_id": e.get("event_id"), "rodada": e.get("rodada"),
@@ -311,7 +290,6 @@ def main() -> None:
         "ajustes_calendario_configurados": len(ajustes),
         "jogos_adiados_sem_data": len(jogos_sem_data),
         "rodadas_espn_com_clube_repetido": sum(1 for r in rodadas_espn if r["clubes_repetidos"]),
-        "rodadas_returno_incorretas": len(retorno_incorreto),
         "falhas_graves": len(falhas),
     }
 
@@ -327,7 +305,6 @@ def main() -> None:
         "jogos_adiados_sem_data": jogos_sem_data,
         "rodadas_calendario_completo": rodadas_completas,
         "rodadas_presentes_na_janela_espn": rodadas_espn,
-        "returno_incorreto": retorno_incorreto,
         "duplicados_entre_resultados_e_proximos": [
             {"rodada": r, "mandante": m, "visitante": v}
             for r, m, v in duplicados_publicos
