@@ -158,24 +158,20 @@
                 <summary><span><b>Nota técnica completa</b><small>Modelo, equações, vagas, validação e limitações</small></span><strong>Abrir ↓</strong></summary>
                 <div class="probability-technical-body">
                   <div class="probability-method-nav" aria-label="Etapas da metodologia técnica">
-                    <a href="#metodo-dados">1. Dados</a>
-                    <a href="#metodo-poisson">2. Poisson</a>
+                    <a href="#metodo-monte-carlo">6. Monte Carlo</a>
                     <a href="#metodo-bayes">3. Regularização</a>
                     <a href="#metodo-tendencia">4. Tendência</a>
+                    <a href="#metodo-poisson">2. Poisson</a>
+                    <a href="#metodo-dados">1. Dados</a>
                     <a href="#metodo-copas">5. Copas e vagas</a>
-                    <a href="#metodo-monte-carlo">6. Monte Carlo</a>
                     <a href="#metodo-residuais">7. Resolução</a>
                     <a href="#metodo-validacao">8. Validação</a>
                   </div>
 
                   <div class="probability-method-sections">
-                    <article id="metodo-dados">
-                      <span class="probability-method-step">01</span>
-                      <div><h4>Base histórica e estado corrente</h4><p>O ajuste doméstico utiliza os 1.140 jogos completos dos Brasileirões de 2023, 2024 e 2025, combinados com os resultados concluídos de 2026. Datas, mandos, placares, calendário e classificação são auditados antes da publicação. Os snapshots da Copa do Brasil, Libertadores e Sul-Americana são mantidos separadamente e só alimentam o modelo quando passam pelas verificações de integridade.</p><p>Clubes promovidos ou com pouca evidência não recebem uma força arbitrária: começam mais próximos da média da competição e se individualizam conforme acumulam informação.</p></div>
-                    </article>
-                    <article id="metodo-poisson">
-                      <span class="probability-method-step">02</span>
-                      <div><h4>Modelo log-linear de gols</h4><p>Os gols esperados de mandante e visitante são estimados separadamente por parâmetros de ataque, defesa e vantagem de mando:</p><div class="probability-formula" role="img" aria-label="Fórmulas simplificadas das intensidades de gols"><code>λ<sub>casa</sub> = exp(μ + γ + ataque<sub>casa</sub> − defesa<sub>fora</sub>)</code><code>λ<sub>fora</sub> = exp(μ + ataque<sub>fora</sub> − defesa<sub>casa</sub>)</code></div><p>A distribuição de Poisson converte essas intensidades em probabilidades de placares. A matriz resultante também fornece vitória do mandante, empate e vitória do visitante.</p></div>
+                    <article id="metodo-monte-carlo">
+                      <span class="probability-method-step">06</span>
+                      <div><h4>Simulação Monte Carlo completa</h4><p>Cada partida restante é sorteada segundo sua distribuição de placares. Em seguida são aplicados pontos, vitórias, saldo de gols e gols pró. O procedimento é repetido 200.000 vezes por atualização, preservando os resultados já disputados e integrando as três copas no mesmo universo simulado.</p><p>A chance de título, por exemplo, é a proporção de simulações em que o clube termina em primeiro. A chance de Libertadores é a proporção em que obtém a vaga por qualquer uma das vias configuradas.</p></div>
                     </article>
                     <article id="metodo-bayes">
                       <span class="probability-method-step">03</span>
@@ -185,13 +181,17 @@
                       <span class="probability-method-step">04</span>
                       <div><h4>Tendência recente com suavização exponencial</h4><p>O AF-Previsão também incorpora uma camada de tendência recente por suavização exponencial, inspirada na lógica de Holt-Winters, para captar melhora ou queda de desempenho dos clubes ao longo do campeonato.</p><p>Como o futebol tem alto grau de imprevisibilidade e não apresenta uma sazonalidade regular por rodada, essa camada é usada de forma parcimoniosa e controlada. O modelo analisa os resíduos de gols dos últimos 12 jogos — ou seja, compara o que aconteceu em campo com o que o modelo-base esperava — separando tendência ofensiva e defensiva.</p><p>Esse ajuste tem peso limitado no cálculo final: representa apenas 8% da força estimada, exige ao menos seis partidas recentes e não permite que a taxa de gols prevista para uma partida varie mais de 10% por causa da tendência.</p><p>Assim, o modelo reconhece quando um time está em evolução ou queda, mas sem deixar que uma sequência curta distorça a projeção. A previsão continua baseada principalmente na campanha acumulada, força ofensiva e defensiva, mando de campo, tabela restante e nas simulações completas do campeonato.</p></div>
                     </article>
+                    <article id="metodo-poisson">
+                      <span class="probability-method-step">02</span>
+                      <div><h4>Modelo log-linear de gols</h4><p>Os gols esperados de mandante e visitante são estimados separadamente por parâmetros de ataque, defesa e vantagem de mando:</p><div class="probability-formula" role="img" aria-label="Fórmulas simplificadas das intensidades de gols"><code>λ<sub>casa</sub> = exp(μ + γ + ataque<sub>casa</sub> − defesa<sub>fora</sub>)</code><code>λ<sub>fora</sub> = exp(μ + ataque<sub>fora</sub> − defesa<sub>casa</sub>)</code></div><p>A distribuição de Poisson converte essas intensidades em probabilidades de placares. A matriz resultante também fornece vitória do mandante, empate e vitória do visitante.</p></div>
+                    </article>
+                    <article id="metodo-dados">
+                      <span class="probability-method-step">01</span>
+                      <div><h4>Base histórica e estado corrente</h4><p>O ajuste doméstico utiliza os 1.140 jogos completos dos Brasileirões de 2023, 2024 e 2025, combinados com os resultados concluídos de 2026. Datas, mandos, placares, calendário e classificação são auditados antes da publicação. Os snapshots da Copa do Brasil, Libertadores e Sul-Americana são mantidos separadamente e só alimentam o modelo quando passam pelas verificações de integridade.</p><p>Clubes promovidos ou com pouca evidência não recebem uma força arbitrária: começam mais próximos da média da competição e se individualizam conforme acumulam informação.</p></div>
+                    </article>
                     <article id="metodo-copas">
                       <span class="probability-method-step">05</span>
                       <div><h4>Mata-matas e alocação integrada de vagas</h4><p>Placares já ocorridos ficam fixos; partidas futuras são simuladas. Confrontos de ida e volta respeitam o agregado, empates podem ser resolvidos por pênaltis e finais em jogo único são tratadas como campo neutro. Sorteios futuros só são simulados quando a chave ainda não existe na fonte.</p><p>Em cada universo, o sistema combina classificação final do Brasileirão, campeão e vice da Copa do Brasil, campeão da Libertadores e campeão da Sul-Americana. As vias são atribuídas de forma exclusiva: Brasileirão, Copa do Brasil, título da Libertadores, título da Sul-Americana ou repasse. Assim, a soma das vias coincide com a chance consolidada.</p></div>
-                    </article>
-                    <article id="metodo-monte-carlo">
-                      <span class="probability-method-step">06</span>
-                      <div><h4>Simulação Monte Carlo completa</h4><p>Cada partida restante é sorteada segundo sua distribuição de placares. Em seguida são aplicados pontos, vitórias, saldo de gols e gols pró. O procedimento é repetido 200.000 vezes por atualização, preservando os resultados já disputados e integrando as três copas no mesmo universo simulado.</p><p>A chance de título, por exemplo, é a proporção de simulações em que o clube termina em primeiro. A chance de Libertadores é a proporção em que obtém a vaga por qualquer uma das vias configuradas.</p></div>
                     </article>
                     <article id="metodo-residuais">
                       <span class="probability-method-step">07</span>
