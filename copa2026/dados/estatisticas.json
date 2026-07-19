@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-19T20:42:42.073705Z",
+  "atualizado_em": "2026-07-19T21:12:45.051229Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 104,
@@ -565,13 +565,14 @@
       "equipe": "ARG",
       "gols": 2,
       "assistencias": 0,
-      "amarelos": 0,
+      "amarelos": 2,
       "vermelhos": 0,
       "jogos": [
         "760509",
-        "760515"
+        "760515",
+        "760517"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 2
     },
     {
       "nome": "Ermin Mahmic",
@@ -4791,6 +4792,20 @@
       "total_cartoes": 2
     },
     {
+      "nome": "Enzo Fernández",
+      "equipe": "ARG",
+      "gols": 2,
+      "assistencias": 0,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760509",
+        "760515",
+        "760517"
+      ],
+      "total_cartoes": 2
+    },
+    {
       "nome": "Gervane Kastaneer",
       "equipe": "CUW",
       "gols": 0,
@@ -7492,7 +7507,7 @@
       "equipe": "ARG",
       "gols": 19,
       "assistencias": 12,
-      "amarelos": 11,
+      "amarelos": 13,
       "vermelhos": 0,
       "jogos": 8,
       "media_gols": 2.38
