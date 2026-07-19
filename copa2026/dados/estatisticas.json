@@ -1,10 +1,10 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-19T20:12:44.752669Z",
+  "atualizado_em": "2026-07-19T20:42:42.073705Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
-  "jogos_processados": 103,
+  "jogos_processados": 104,
   "falhas_summary": [],
   "alertas_consistencia": [],
   "artilheiros": [
@@ -1698,13 +1698,14 @@
       "equipe": "ARG",
       "gols": 1,
       "assistencias": 1,
-      "amarelos": 1,
+      "amarelos": 2,
       "vermelhos": 0,
       "jogos": [
         "760500",
-        "760515"
+        "760515",
+        "760517"
       ],
-      "total_cartoes": 1
+      "total_cartoes": 2
     },
     {
       "nome": "Livano Comenencia",
@@ -3611,13 +3612,14 @@
       "equipe": "ARG",
       "gols": 1,
       "assistencias": 1,
-      "amarelos": 1,
+      "amarelos": 2,
       "vermelhos": 0,
       "jogos": [
         "760500",
-        "760515"
+        "760515",
+        "760517"
       ],
-      "total_cartoes": 1
+      "total_cartoes": 2
     },
     {
       "nome": "Lucas Bergvall",
@@ -4852,6 +4854,33 @@
       "jogos": [
         "760446",
         "760473"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Leandro Paredes",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760456",
+        "760517"
+      ],
+      "total_cartoes": 2
+    },
+    {
+      "nome": "Lisandro Martínez",
+      "equipe": "ARG",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 2,
+      "vermelhos": 0,
+      "jogos": [
+        "760500",
+        "760515",
+        "760517"
       ],
       "total_cartoes": 2
     },
@@ -6414,18 +6443,6 @@
       "total_cartoes": 1
     },
     {
-      "nome": "Leandro Paredes",
-      "equipe": "ARG",
-      "gols": 0,
-      "assistencias": 0,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760456"
-      ],
-      "total_cartoes": 1
-    },
-    {
       "nome": "Lee Gi-Hyuk",
       "equipe": "KOR",
       "gols": 0,
@@ -6459,19 +6476,6 @@
       "vermelhos": 0,
       "jogos": [
         "760463"
-      ],
-      "total_cartoes": 1
-    },
-    {
-      "nome": "Lisandro Martínez",
-      "equipe": "ARG",
-      "gols": 1,
-      "assistencias": 1,
-      "amarelos": 1,
-      "vermelhos": 0,
-      "jogos": [
-        "760500",
-        "760515"
       ],
       "total_cartoes": 1
     },
@@ -7488,10 +7492,10 @@
       "equipe": "ARG",
       "gols": 19,
       "assistencias": 12,
-      "amarelos": 9,
+      "amarelos": 11,
       "vermelhos": 0,
-      "jogos": 7,
-      "media_gols": 2.71
+      "jogos": 8,
+      "media_gols": 2.38
     },
     {
       "equipe": "BEL",
@@ -7517,8 +7521,8 @@
       "assistencias": 9,
       "amarelos": 6,
       "vermelhos": 0,
-      "jogos": 7,
-      "media_gols": 1.86
+      "jogos": 8,
+      "media_gols": 1.62
     },
     {
       "equipe": "GER",
