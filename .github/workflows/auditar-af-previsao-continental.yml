@@ -72,7 +72,7 @@ jobs:
         run: python scripts/atualizar_competicoes_af_previsao.py --strict --force --max-age-minutes 0
 
       - name: Executar integração continental de auditoria
-        run: python scripts/gerar_probabilidades_brasileirao.py --simulacoes 200000 --semente 20260718
+        run: python scripts/gerar_probabilidades_brasileirao.py --simulacoes 2000000 --semente 20260718
 
       - name: Auditar histórico encadeado e avaliação futura
         run: python scripts/avaliar_af_previsao.py --strict
@@ -129,6 +129,8 @@ jobs:
 
           previsao = load('dados-br/probabilidades-brasileirao.json')
           auditoria = load('dados-br/auditoria-probabilidades.json')
+          config = load('dados-br/config-af-previsao.json')
+          simulacoes_configuradas = int(((config.get('execucao_2') or {}).get('simulacoes_monte_carlo')) or 2000000)
           historico = load('dados-br/historico-probabilidades.json')
           avaliacao = load('dados-br/avaliacao-af-previsao.json')
 
@@ -199,7 +201,9 @@ jobs:
               })
               simulacoes = int((auditoria.get('simulacao') or {}).get('quantidade') or 0)
               if simulacoes < 200000:
-                  fail(f'AF-Previsão preservado com poucas simulações na auditoria: {simulacoes}')
+                  fail(f'AF-Previsão preservado sem amostra probabilística válida: {simulacoes}')
+              if simulacoes < simulacoes_configuradas:
+                  print(f'::warning::Último JSON válido preservado com {simulacoes} simulações; alvo configurado atual: {simulacoes_configuradas}.')
               print('::warning::AF-Previsão continental não foi republicado nesta execução; último JSON válido foi preservado com histórico encadeado porque a base corrente ainda não está apta à publicação integrada.')
               print('AF-Previsão: preservação segura, histórico e avaliação validados')
               sys.exit(0)
@@ -229,8 +233,8 @@ jobs:
                   if campo not in detalhes:
                       fail(f'{clube["clube"]}: detalhe ausente em {campo}')
                   detalhe = detalhes[campo]
-                  if int(detalhe.get('simulacoes') or 0) != 200000:
-                      fail(f'{clube["clube"]}: detalhe {campo} sem 200000 simulações')
+                  if int(detalhe.get('simulacoes') or 0) != simulacoes_configuradas:
+                      fail(f'{clube["clube"]}: detalhe {campo} sem {simulacoes_configuradas} simulações')
                   if not isinstance(detalhe.get('exibicao'), str):
                       fail(f'{clube["clube"]}: exibição textual ausente em {campo}')
                   if int(detalhe.get('ocorrencias') or 0) < 0:

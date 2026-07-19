@@ -245,7 +245,9 @@ jobs:
           # preservada — não aplicar a regra de outro schema.
           schema_prev = int(previsao.get('schema_version') or 1)
           config_prev = json.load(open('dados-br/config-af-previsao.json', encoding='utf-8'))
-          zonas_cfg = ((config_prev.get('execucao_2') or {}).get('zonas_base') or {})
+          execucao_cfg = config_prev.get('execucao_2') or {}
+          simulacoes_configuradas = int(execucao_cfg.get('simulacoes_monte_carlo') or 2000000)
+          zonas_cfg = (execucao_cfg.get('zonas_base') or {})
 
           def tamanho_faixa(chave, legado):
               faixa = zonas_cfg.get(chave)
@@ -281,7 +283,10 @@ jobs:
               for item in clubes_prev:
                   for campo in ('libertadores', 'sul_americana'):
                       detalhe = (item.get('probabilidades_detalhes') or {}).get(campo) or {}
-                      assert detalhe.get('simulacoes', 0) >= 200000, f'{item["clube"]}: detalhe sem simulações em {campo}'
+                      simulacoes_detalhe = int(detalhe.get('simulacoes') or 0)
+                      assert simulacoes_detalhe >= 200000, f'{item["clube"]}: detalhe sem amostra probabilística válida em {campo}'
+                      if simulacoes_detalhe < simulacoes_configuradas:
+                          print(f'::warning::{item["clube"]}: previsão preservada com {simulacoes_detalhe} simulações; a próxima publicação íntegra usará {simulacoes_configuradas}.')
                       assert isinstance(detalhe.get('exibicao'), str), f'{item["clube"]}: exibição ausente em {campo}'
                   decomposicao = item.get('decomposicao_chances') or {}
                   lib = decomposicao.get('libertadores') or {}
@@ -304,7 +309,12 @@ jobs:
                   print('::warning::AF-Previsão anterior preservado porque a coleta continental ainda não ficou íntegra')
           aud_prev = json.load(open('dados-br/auditoria-probabilidades.json', encoding='utf-8'))
           assert aud_prev.get('status') == 'ok', 'auditoria do AF-Previsão falhou'
-          assert aud_prev.get('simulacao', {}).get('quantidade', 0) >= 200000, 'AF-Previsão com poucas simulações'
+          simulacoes_publicadas = int(aud_prev.get('simulacao', {}).get('quantidade') or 0)
+          assert simulacoes_publicadas >= 200000, 'AF-Previsão sem amostra probabilística válida'
+          if simulacoes_publicadas < simulacoes_configuradas:
+              print(f'::warning::Último AF-Previsão válido preservado com {simulacoes_publicadas} simulações; alvo configurado atual: {simulacoes_configuradas}.')
+          else:
+              assert simulacoes_publicadas >= simulacoes_configuradas, 'AF-Previsão abaixo da quantidade configurada'
           assert aud_prev.get('simulacao', {}).get('convergencia', {}).get('maior_diferenca_entre_metades_pontos_percentuais', 99) <= 1.0, 'AF-Previsão sem convergência suficiente'
           assert aud_prev.get('hash_entrada') == previsao.get('hash_entrada'), 'hash divergente entre previsão e auditoria'
           if integrado:
