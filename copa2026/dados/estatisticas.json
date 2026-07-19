@@ -1,7 +1,7 @@
 {
   "_comentario": "Estatísticas consolidadas automaticamente a partir do feed ESPN/API. Assistências só são publicadas quando vinculadas a lance de gol real; cobranças de disputa de pênaltis pós-jogo não entram na artilharia; gols por seleção usam o placar oficial/momentâneo e incluem gols contra.",
   "fonte": "ESPN API pública/oculta usada pelo site.api.espn.com",
-  "atualizado_em": "2026-07-19T21:42:42.668307Z",
+  "atualizado_em": "2026-07-19T22:12:46.628058Z",
   "periodo": "20260611-20260719",
   "jogos_encontrados": 104,
   "jogos_processados": 104,
@@ -876,13 +876,14 @@
       "equipe": "ARG",
       "gols": 1,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760500",
-        "760513"
+        "760513",
+        "760517"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Alexis Saelemaekers",
@@ -2877,13 +2878,14 @@
       "equipe": "ARG",
       "gols": 1,
       "assistencias": 1,
-      "amarelos": 0,
+      "amarelos": 1,
       "vermelhos": 0,
       "jogos": [
         "760500",
-        "760513"
+        "760513",
+        "760517"
       ],
-      "total_cartoes": 0
+      "total_cartoes": 1
     },
     {
       "nome": "Amir Al Ammari",
@@ -4440,6 +4442,19 @@
   ],
   "cartoes": [
     {
+      "nome": "Leandro Paredes",
+      "equipe": "ARG",
+      "gols": 0,
+      "assistencias": 0,
+      "amarelos": 2,
+      "vermelhos": 1,
+      "jogos": [
+        "760456",
+        "760517"
+      ],
+      "total_cartoes": 3
+    },
+    {
       "nome": "Folarin Balogun",
       "equipe": "USA",
       "gols": 3,
@@ -4888,19 +4903,6 @@
       "total_cartoes": 2
     },
     {
-      "nome": "Leandro Paredes",
-      "equipe": "ARG",
-      "gols": 0,
-      "assistencias": 0,
-      "amarelos": 2,
-      "vermelhos": 0,
-      "jogos": [
-        "760456",
-        "760517"
-      ],
-      "total_cartoes": 2
-    },
-    {
       "nome": "Lisandro Martínez",
       "equipe": "ARG",
       "gols": 1,
@@ -5166,6 +5168,20 @@
       "vermelhos": 0,
       "jogos": [
         "760442"
+      ],
+      "total_cartoes": 1
+    },
+    {
+      "nome": "Alexis Mac Allister",
+      "equipe": "ARG",
+      "gols": 1,
+      "assistencias": 1,
+      "amarelos": 1,
+      "vermelhos": 0,
+      "jogos": [
+        "760500",
+        "760513",
+        "760517"
       ],
       "total_cartoes": 1
     },
@@ -7509,8 +7525,8 @@
       "equipe": "ARG",
       "gols": 19,
       "assistencias": 12,
-      "amarelos": 14,
-      "vermelhos": 0,
+      "amarelos": 15,
+      "vermelhos": 1,
       "jogos": 8,
       "media_gols": 2.38
     },
