@@ -20,7 +20,7 @@ cobertura histórica homogênea para backtesting sem vazamento temporal.
 
 Uso:
     python scripts/gerar_probabilidades_brasileirao.py
-    python scripts/gerar_probabilidades_brasileirao.py --simulacoes 200000
+    python scripts/gerar_probabilidades_brasileirao.py --simulacoes 2000000
     python scripts/gerar_probabilidades_brasileirao.py --self-test
 """
 from __future__ import annotations
@@ -1204,7 +1204,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         )
     model = fit_poisson_map([*historical, *current], as_of, map_config)
 
-    simulations_final = int(simulations or execution.get("simulacoes_monte_carlo") or 200_000)
+    simulations_final = int(simulations or execution.get("simulacoes_monte_carlo") or 2_000_000)
     seed = int(seed_override if seed_override is not None else execution.get("semente") or 20260717)
     rho_production = float(execution.get("rho_dixon_coles_producao") or 0.0)
     rho_sensitivity = float(execution.get("rho_dixon_coles_sensibilidade") or 0.08)

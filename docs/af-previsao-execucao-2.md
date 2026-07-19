@@ -8,7 +8,7 @@ Foram implementados:
 
 - ajuste do modelo vencedor com 2023–2025 e todos os jogos concluídos de 2026;
 - previsão probabilística de todas as partidas restantes;
-- 200.000 simulações completas do campeonato;
+- 2.000.000 simulações completas do campeonato;
 - probabilidades de título, G4, G6, Libertadores-base, Sul-Americana-base e rebaixamento;
 - distribuição das 20 posições e intervalo projetado de pontos para cada clube;
 - histórico versionado por hash dos dados de entrada;
@@ -48,7 +48,7 @@ O AF-Score atual foi comparado ao vetor de força do modelo MAP. A correlação 
 
 ## Simulação Monte Carlo
 
-Cada uma das 201 partidas restantes recebe uma distribuição de placares. O campeonato completo é então simulado **200.000 vezes**, preservando a tabela oficial já realizada e aplicando, em cada universo simulado:
+Cada uma das 201 partidas restantes recebe uma distribuição de placares. O campeonato completo é então simulado **2.000.000 vezes**, preservando a tabela oficial já realizada e aplicando, em cada universo simulado:
 
 1. três pontos por vitória e um por empate;
 2. pontos;
@@ -82,7 +82,7 @@ As expressões “Libertadores-base” e “Sul-Americana-base” são intencion
 - jogos concluídos: **179**;
 - jogos restantes: **201**;
 - previsões individuais geradas: **201**;
-- simulações: **200.000**.
+- simulações: **2.000.000**.
 
 ### Maiores chances de título no snapshot
 
@@ -131,7 +131,7 @@ O workflow interrompe a publicação quando:
 - existem NaN, infinito ou probabilidades fora de 0–100%;
 - a diferença entre as metades da simulação ultrapassa 1,0 p.p.;
 - o histórico está vazio;
-- o número de simulações cai abaixo de 200.000 no workflow de produção.
+- o número de simulações cai abaixo de 2.000.000 no workflow de produção.
 
 ## Limitações assumidas
 

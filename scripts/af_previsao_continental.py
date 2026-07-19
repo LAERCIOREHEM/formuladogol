@@ -1044,9 +1044,9 @@ def self_test() -> None:
         assert abs(lib["total"]["percentual_estimado"] - lib["soma_vias_pct"]) < 0.002, team
         sula = item["sul_americana"]
         assert abs(sula["total"]["percentual_estimado"] - sula["soma_vias_pct"]) < 0.002, team
-    zero = display_probability(0, 200_000, 0.1)
+    zero = display_probability(0, 2_000_000, 0.1)
     assert zero["exibicao"] == "<0,1%"
-    assert zero["limite_superior_95_regra_dos_tres_pct"] == 0.0015
+    assert zero["limite_superior_95_regra_dos_tres_pct"] == 0.00015
 
     # Cenários determinísticos de alocação e repasse. Inclui campeões em G5,
     # finalistas da Copa já classificados e campeões continentais rebaixados.

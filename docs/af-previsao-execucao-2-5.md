@@ -146,10 +146,10 @@ O JSON preserva:
 - indicação de zero ocorrências observadas;
 - limite superior aproximado de 95% pela **regra dos três**, quando o evento não aparece em nenhuma simulação.
 
-Com 200.000 simulações e zero ocorrências, a regra dos três produz um limite superior aproximado de:
+Com 2.000.000 simulações e zero ocorrências, a regra dos três produz um limite superior aproximado de:
 
 \[
-\frac{3}{200000} = 0{,}0015\%
+\frac{3}{2000000} = 0{,}00015\%
 \]
 
 Isso significa que o evento não foi observado no experimento Monte Carlo — não que seja logicamente impossível.
@@ -158,7 +158,7 @@ Isso significa que o evento não foi observado no experimento Monte Carlo — n�
 
 ## 6. Simulação Monte Carlo
 
-A produção utiliza 200.000 universos completos e reproduzíveis. Em cada universo são simulados:
+A produção utiliza 2.000.000 universos completos e reproduzíveis. Em cada universo são simulados:
 
 - todos os jogos restantes do Brasileirão;
 - todos os confrontos restantes das três copas;
@@ -218,7 +218,7 @@ Foram criadas duas camadas de segurança:
 
 ### Workflow científico independente
 
-`Auditar AF-Previsão Continental` executa coleta estrita, testes determinísticos, 200.000 simulações e validação das decomposições. Ele é somente leitura e não publica artefatos no branch principal.
+`Auditar AF-Previsão Continental` executa coleta estrita, testes determinísticos, 2.000.000 simulações e validação das decomposições. Ele é somente leitura e não publica artefatos no branch principal.
 
 ---
 
