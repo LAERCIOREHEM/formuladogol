@@ -29,18 +29,34 @@
     return `<img class="${escapeAttr(cls)}${src ? "" : " is-neutral-shield"}" src="${escapeAttr(src || fallback)}" alt="" loading="lazy" onerror="this.onerror=null; this.src='${fallback}'; this.classList.add('is-neutral-shield')">`;
   }
 
+  // Nomes de clubes com acento resolvem para arquivos de mascote SEM acento,
+  // que existem no repositório. Acentos em nomes de arquivo servidos por URL
+  // (GitHub Pages) causam falha de encoding (Grêmio -> Gr%C3%AAmio.png não
+  // bate). Este mapa garante o caminho ASCII correto.
+  const MASCOTE_ARQUIVO = {
+    "Grêmio": "img/mascotes/Gremio.png",
+    "Vitória": "img/mascotes/Vitoria.png",
+    "Atlético-MG": "img/mascotes/Atletico-MG.png",
+    "São Paulo": "img/mascotes/Sao Paulo.png",
+  };
+
+  function mascoteSrc(clube){
+    const nome = clube && clube.nome ? clube.nome : "";
+    if (MASCOTE_ARQUIVO[nome]) return MASCOTE_ARQUIVO[nome];
+    return `img/mascotes/${nome}.png`;
+  }
+
   function mascotInfo(clube){
     if (!clube) return { nome: "", arquivo: "" };
     const direto = state.mascotes?.[clube.nome];
     if (typeof direto === "string") return { nome: clube.mascote || "Mascote", arquivo: direto };
     if (direto && typeof direto === "object") return { nome: direto.nome || clube.mascote || "Mascote", arquivo: direto.arquivo || "" };
-    const fallback = `img/mascotes/${clube.nome}.png`;
-    return { nome: clube.mascote || "Mascote", arquivo: fallback };
+    return { nome: clube.mascote || "Mascote", arquivo: mascoteSrc(clube) };
   }
   function mascotCardHtml(clube){
     const info = mascotInfo(clube);
     const nomeMascote = escapeHtml(info.nome || clube?.mascote || "Mascote");
-    const src = escapeAttr(info.arquivo || `img/mascotes/${clube?.nome || ""}.png`);
+    const src = escapeAttr(info.arquivo || mascoteSrc(clube));
     return `<div class="info-card mascot-card">
       <span>Mascote</span>
       <button type="button" class="mascot-frame mascot-zoom-trigger" data-mascote-src="${src}" data-mascote-clube="${escapeAttr(clube?.nome || '')}" aria-label="Abrir mascote do ${escapeAttr(clube?.nome || '')} em tamanho maior">

@@ -897,21 +897,11 @@
   }
 
   function renderProbabilityControls() {
+    // Card "Ordenar tabela por / Compare os 20 clubes" removido a pedido:
+    // poluía o layout. A tabela de probabilidades usa ordenação fixa por
+    // classificação atual. Mantida a função vazia para não quebrar chamadas.
     const target = $("probabilidades-controles");
-    if (!target) return;
-    const options = [
-      ["classificacao", "📊 Classificação atual"],
-      ["campeao", "🏆 Título"],
-      ["libertadores", "🌎 Libertadores"],
-      ["sulamericana", "🟦 Sul-Americana"],
-      ["rebaixamento", "🔻 Rebaixamento"],
-      ["posicao", "📍 Posição projetada"],
-      ["pontos", "📈 Pontos projetados"],
-    ];
-    target.innerHTML = `<div class="probability-controls">
-      <div><span>Ordenar tabela por</span><strong>Compare os 20 clubes</strong></div>
-      <div class="probability-sort-buttons" role="group" aria-label="Ordenação das probabilidades">${options.map(([key, label]) => `<button type="button" data-probability-sort="${key}" class="${state.probabilitySort === key ? "active" : ""}" aria-pressed="${state.probabilitySort === key ? "true" : "false"}">${label}</button>`).join("")}</div>
-    </div>`;
+    if (target) target.innerHTML = "";
   }
 
   function probabilityComparisonRow(club) {
@@ -1157,14 +1147,6 @@
         renderChampionship();
         return;
       }
-      const probabilitySort = event.target.closest("[data-probability-sort]");
-      if (probabilitySort) {
-        state.probabilitySort = probabilitySort.dataset.probabilitySort || "classificacao";
-        renderProbabilityControls();
-        renderProbabilityRanking();
-        renderProbabilityDetails();
-        return;
-      }
       const probabilityMethod = event.target.closest("[data-probability-method]");
       if (probabilityMethod) {
         event.preventDefault();
@@ -1199,12 +1181,6 @@
 
   async function load() {
     bindEvents();
-    const params = new URLSearchParams(location.search || "");
-    const retornoBolao = params.get("retorno") === "bolao";
-    const voltarBolao = $("voltar-bolao");
-    const metodologiaBolao = $("metodologia-bolao");
-    if (voltarBolao) voltarBolao.hidden = !retornoBolao;
-    if (metodologiaBolao) metodologiaBolao.hidden = !retornoBolao;
     const hashTab = location.hash.replace(/^#/, "");
     const openProbabilityMethod = hashTab === "metodologia-probabilidades";
     const abrirMetodologia = hashTab === "metodologia-ranking";

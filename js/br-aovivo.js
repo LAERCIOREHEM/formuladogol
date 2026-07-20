@@ -151,7 +151,7 @@
     carregando: false,
     primeiraCarga: true,
     finalizadosEm: cachedFinalTimes(),
-    probabilidadesJogos: null
+    taxasGol: {}
   };
 
   function esc(v) {
@@ -428,11 +428,25 @@
       ? state.transmissoesTv
       : cachedTransmissionMap(TRANSMISSION_CACHE_TV);
 
-    const [youtubeResult, manualResult, tvResult] = await Promise.allSettled([
+    const [youtubeResult, manualResult, tvResult, probResult] = await Promise.allSettled([
       fetchJson("dados-br/transmissoes-aovivo.json?t=" + Date.now()),
       fetchJson("dados-br/transmissoes-aovivo-manual.json?t=" + Date.now()),
-      fetchJson("dados-br/transmissoes-tv.json?t=" + Date.now())
+      fetchJson("dados-br/transmissoes-tv.json?t=" + Date.now()),
+      fetchJson("dados-br/probabilidades-brasileirao.json?t=" + Date.now()).catch(() => null)
     ]);
+
+    // Taxas de gol esperadas do modelo pré-jogo, indexadas por event_id.
+    // Alimentam a probabilidade dinâmica ao vivo (Poisson condicional).
+    if (probResult.status === "fulfilled" && probResult.value && Array.isArray(probResult.value.partidas_restantes)) {
+      const mapa = {};
+      for (const p of probResult.value.partidas_restantes) {
+        const ge = p && p.gols_esperados;
+        if (p && p.event_id && ge && typeof ge.mandante === "number" && typeof ge.visitante === "number") {
+          mapa[String(p.event_id)] = { home: ge.mandante, away: ge.visitante };
+        }
+      }
+      if (Object.keys(mapa).length) state.taxasGol = mapa;
+    }
 
     const automatic = youtubeResult.status === "fulfilled" && youtubeResult.value && youtubeResult.value.jogos && typeof youtubeResult.value.jogos === "object"
       ? youtubeResult.value.jogos
@@ -568,16 +582,12 @@
   }
 
   async function loadLocal() {
-    const [jogos, eventos, probabilidades] = await Promise.all([
+    const [jogos, eventos] = await Promise.all([
       fetchJson("jogos.json?t=" + Date.now()),
-      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] })),
-      fetchJson("dados-br/probabilidades-jogos.json?t=" + Date.now()).catch(() => null)
+      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] }))
     ]);
     state.agenda = localGamesFromJson(jogos).filter((g) => !g.dataDefinir && g.date);
     state.eventosLocais = (eventos.eventos || []).slice();
-    state.probabilidadesJogos = probabilidades && probabilidades.status === "ok" && Array.isArray(probabilidades.jogos)
-      ? probabilidades
-      : null;
     for (const item of state.eventosLocais) {
       const key = String(item && item.event_id || "");
       const finalizado = parseDate(item && item.finalizado_em);
@@ -824,6 +834,165 @@
     if (s.key === "post") return "Fim de jogo";
     if (s.key === "postponed") return s.label;
     return g.date ? formatDateTime(g.date) : "Horário a definir";
+  }
+
+  // ===== Probabilidade dinâmica (Poisson condicional) =====
+  // Recalcula P(vitória mandante / empate / vitória visitante) DURANTE o jogo,
+  // a partir de: placar atual, minutos restantes, taxas de gol pré-jogo do
+  // modelo AF-Previsão, e expulsões. É estatística pura (não é odd/aposta).
+  //
+  // Fundamento: gols em futebol seguem Poisson. Os gols do RESTANTE do jogo
+  // são independentes do que já aconteceu e têm média = taxa_por_minuto ×
+  // minutos_restantes. Somando o placar atual às simulações do restante,
+  // obtém-se a probabilidade de cada desfecho. Um placar de 4×0 aos 85' dá
+  // ~100% para quem vence, exatamente como esperado.
+
+  function contarVermelhos(g, summary) {
+    try {
+      const rows = eventRows(g, summary).filter(r => r.type && r.type.key === "red");
+      let vh = 0, va = 0;
+      const homeNome = norm((g.home && g.home.nome) || "");
+      const awayNome = norm((g.away && g.away.nome) || "");
+      for (const r of rows) {
+        const t = norm(r.team || "");
+        if (t && t === homeNome) vh++;
+        else if (t && t === awayNome) va++;
+      }
+      if (g.home) g.home.vermelhos = vh;
+      if (g.away) g.away.vermelhos = va;
+    } catch (e) {
+      if (g.home) g.home.vermelhos = g.home.vermelhos || 0;
+      if (g.away) g.away.vermelhos = g.away.vermelhos || 0;
+    }
+  }
+
+  function poissonPMF(k, lambda) {
+    if (lambda <= 0) return k === 0 ? 1 : 0;
+    // P(X=k) = e^-λ * λ^k / k!
+    let p = Math.exp(-lambda);
+    for (let i = 1; i <= k; i++) p *= lambda / i;
+    return p;
+  }
+
+  function minutoAtual(g) {
+    // Minuto decorrido; robusto a "45+2", intervalo e 2º tempo.
+    const raw = String((g && (g.clock || g.detail)) || "").trim();
+    const m = raw.match(/^(\d{1,3})(?:\+(\d+))?/);
+    let base = m ? Number(m[1]) : NaN;
+    const acr = m && m[2] ? Number(m[2]) : 0;
+    if (!isFinite(base)) {
+      // Sem relógio: usa o período (1=1ºT, 2=2ºT) como aproximação grosseira.
+      if (g.period >= 2) return 60;
+      if (g.period === 1) return 25;
+      return 0;
+    }
+    // No intervalo a ESPN pode mandar 45; trata como 45 cheio.
+    return Math.min(base + acr, 95);
+  }
+
+  function taxasAoVivo(g) {
+    const base = state.taxasGol && state.taxasGol[String(g.id)];
+    if (base && base.home > 0 && base.away > 0) return base;
+    return null;
+  }
+
+  // Distribuição de probabilidade do nº de gols restantes de um time (0..8),
+  // com massa da cauda agregada no último índice.
+  function distribuicaoGolsRestantes(lambda, maxGols) {
+    const dist = [];
+    let acumulado = 0;
+    for (let k = 0; k < maxGols; k++) {
+      const p = poissonPMF(k, lambda);
+      dist.push(p);
+      acumulado += p;
+    }
+    dist.push(Math.max(0, 1 - acumulado)); // cauda: >= maxGols
+    return dist;
+  }
+
+  function probabilidadeDinamica(g) {
+    const s = gameState(g);
+    if (s.key !== "live") return null;
+    const taxas = taxasAoVivo(g);
+    if (!taxas) return null;
+
+    const golsHome = Number(g.home && g.home.score);
+    const golsAway = Number(g.away && g.away.score);
+    if (!isFinite(golsHome) || !isFinite(golsAway)) return null;
+
+    const DURACAO = 90;
+    const minuto = minutoAtual(g);
+    const restanteMin = Math.max(0, DURACAO - minuto);
+    const fracao = restanteMin / DURACAO;
+
+    // Ajuste por expulsão: um time com um jogador a menos perde força
+    // ofensiva e concede mais. Fatores conservadores da literatura.
+    let fatorHome = 1, fatorAway = 1;
+    const vermelhosHome = Number(g.home && g.home.vermelhos) || 0;
+    const vermelhosAway = Number(g.away && g.away.vermelhos) || 0;
+    if (vermelhosHome > 0) { fatorHome *= Math.pow(0.75, vermelhosHome); fatorAway *= Math.pow(1.15, vermelhosHome); }
+    if (vermelhosAway > 0) { fatorAway *= Math.pow(0.75, vermelhosAway); fatorHome *= Math.pow(1.15, vermelhosAway); }
+
+    // Taxa esperada de gols no tempo restante.
+    const lambdaHome = taxas.home * fracao * fatorHome;
+    const lambdaAway = taxas.away * fracao * fatorAway;
+
+    // Se o jogo essencialmente acabou (restante ~0), o placar atual decide.
+    if (restanteMin <= 0 || (lambdaHome < 1e-4 && lambdaAway < 1e-4)) {
+      if (golsHome > golsAway) return { home: 100, empate: 0, away: 0, minuto, restanteMin };
+      if (golsHome < golsAway) return { home: 0, empate: 0, away: 100, minuto, restanteMin };
+      return { home: 0, empate: 100, away: 0, minuto, restanteMin };
+    }
+
+    const MAXG = 8;
+    const distH = distribuicaoGolsRestantes(lambdaHome, MAXG);
+    const distA = distribuicaoGolsRestantes(lambdaAway, MAXG);
+
+    let pHome = 0, pEmpate = 0, pAway = 0;
+    for (let gh = 0; gh <= MAXG; gh++) {
+      for (let ga = 0; ga <= MAXG; ga++) {
+        const prob = distH[gh] * distA[ga];
+        const finalH = golsHome + gh;
+        const finalA = golsAway + ga;
+        if (finalH > finalA) pHome += prob;
+        else if (finalH < finalA) pAway += prob;
+        else pEmpate += prob;
+      }
+    }
+    const total = pHome + pEmpate + pAway || 1;
+    return {
+      home: (pHome / total) * 100,
+      empate: (pEmpate / total) * 100,
+      away: (pAway / total) * 100,
+      minuto,
+      restanteMin
+    };
+  }
+
+  function renderProbabilidadeDinamica(g) {
+    const pd = probabilidadeDinamica(g);
+    if (!pd) return "";
+    const fmt = (v) => {
+      if (v >= 99.5) return ">99%";
+      if (v <= 0.5) return "<1%";
+      return Math.round(v) + "%";
+    };
+    const homeNome = esc((g.home && g.home.nome) || "Mandante");
+    const awayNome = esc((g.away && g.away.nome) || "Visitante");
+    return '<div class="live-winprob" aria-label="Probabilidade dinâmica ao vivo">' +
+      '<div class="live-winprob-title">Chance de vitória agora</div>' +
+      '<div class="live-winprob-bar">' +
+        '<span class="live-winprob-seg home" style="width:' + pd.home.toFixed(1) + '%"></span>' +
+        '<span class="live-winprob-seg draw" style="width:' + pd.empate.toFixed(1) + '%"></span>' +
+        '<span class="live-winprob-seg away" style="width:' + pd.away.toFixed(1) + '%"></span>' +
+      '</div>' +
+      '<div class="live-winprob-legend">' +
+        '<span><strong>' + fmt(pd.home) + '</strong> ' + homeNome + '</span>' +
+        '<span><strong>' + fmt(pd.empate) + '</strong> Empate</span>' +
+        '<span><strong>' + fmt(pd.away) + '</strong> ' + awayNome + '</span>' +
+      '</div>' +
+      '<div class="live-winprob-note">Estimativa estatística do nosso modelo · não é aposta</div>' +
+    '</div>';
   }
 
   function simpleMessage(g) {
@@ -1138,55 +1307,6 @@
       }).join("") + '</div></div></section>';
   }
 
-  function probabilityForGame(game) {
-    const data = state.probabilidadesJogos;
-    const rows = data && Array.isArray(data.jogos) ? data.jogos : [];
-    if (!game || !rows.length) return null;
-    const id = String(game.id || '');
-    let row = id ? rows.find((item) => String(item && item.event_id || '') === id) : null;
-    if (!row) {
-      const key = teamKey(game.home && game.home.nome, game.away && game.away.nome);
-      const day = game.date instanceof Date ? dateKey(game.date) : '';
-      row = rows.find((item) => {
-        if (!item || teamKey(item.mandante, item.visitante) !== key) return false;
-        const itemDate = parseDate(item.data_iso);
-        const itemDay = itemDate ? dateKey(itemDate) : '';
-        return !day || !itemDay || day === itemDay;
-      }) || null;
-    }
-    if (!row || row.status !== 'pre_jogo') return null;
-    const display = row.exibicao || {};
-    const values = row.probabilidades_exibicao_pct || row.probabilidades_pct || {};
-    const text = (field) => {
-      const ready = String(display[field] || '').trim();
-      if (ready) return ready;
-      const n = Number(values[field]);
-      return Number.isFinite(n) ? n.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '';
-    };
-    const home = text('mandante');
-    const draw = text('empate');
-    const away = text('visitante');
-    return home && draw && away ? { home, draw, away } : null;
-  }
-
-  function renderPregameProbability(game, mode) {
-    const p = probabilityForGame(game);
-    if (!p) return '';
-    const home = String(game.home && game.home.nome || 'Mandante');
-    const away = String(game.away && game.away.nome || 'Visitante');
-    if (mode === 'mobile') {
-      return '<div class="live-prob-mobile" aria-label="Probabilidades pré-jogo: ' + esc(home) + ' ' + esc(p.home) + ', empate ' + esc(p.draw) + ', ' + esc(away) + ' ' + esc(p.away) + '">' +
-        '<span><small>' + esc(home) + '</small><strong>' + esc(p.home) + '</strong></span>' +
-        '<span class="draw"><small>Empate</small><strong>' + esc(p.draw) + '</strong></span>' +
-        '<span><small>' + esc(away) + '</small><strong>' + esc(p.away) + '</strong></span></div>';
-    }
-    return {
-      home: '<span class="live-prob-badge" title="Chance pré-jogo de vitória do ' + esc(home) + '"><small>Vitória</small><strong>' + esc(p.home) + '</strong></span>',
-      draw: '<span class="live-prob-badge draw" title="Chance pré-jogo de empate"><small>Empate</small><strong>' + esc(p.draw) + '</strong></span>',
-      away: '<span class="live-prob-badge" title="Chance pré-jogo de vitória do ' + esc(away) + '"><small>Vitória</small><strong>' + esc(p.away) + '</strong></span>'
-    };
-  }
-
   function renderMain(g, summary, all) {
     if (!g) {
       app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Nenhuma partida futura foi encontrada na agenda publicada. O robô continuará tentando atualizar os dados.</div></div></div>';
@@ -1203,24 +1323,18 @@
     const venue = g.venue ? '<span>🏟️ <strong>' + esc(g.venue) + '</strong></span>' : "";
     const transmission = "";
     const goalLines = renderGoalsUnderTeams(g, summary);
-    // A Execução 2 exibe somente a previsão anterior ao início. Assim que o
-    // placar da ESPN muda para jogo em andamento, o bloco desaparece.
-    const probabilityDesktop = s.key === "pre" ? renderPregameProbability(g, "desktop") : "";
-    const probabilityMobile = s.key === "pre" ? renderPregameProbability(g, "mobile") : "";
-    const probabilityHome = probabilityDesktop && probabilityDesktop.home ? probabilityDesktop.home : "";
-    const probabilityDraw = probabilityDesktop && probabilityDesktop.draw ? probabilityDesktop.draw : "";
-    const probabilityAway = probabilityDesktop && probabilityDesktop.away ? probabilityDesktop.away : "";
+    // Conta expulsões por lado para alimentar a probabilidade dinâmica.
+    contarVermelhos(g, summary);
 
     app.innerHTML = '<section class="live-main-card"><div class="live-card-inner">' +
       '<div class="live-round-row"><span class="live-round-badge">' + esc(roundText + delayed) + '</span>' +
       '<span class="live-state-badge ' + esc(s.key) + '">' + esc(s.label) + '</span></div>' +
-      (probabilityDesktop ? '<div class="live-prob-kicker">Probabilidades pré-jogo · AF-Previsão</div>' : '') +
-      '<div class="live-score-grid">' + teamLink(g.home, '<div class="live-team">' + probabilityHome + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>') +
-      '<div class="live-score-center">' + probabilityDraw + score + '<div class="live-clock">' + esc(statusText(g)) + '</div>' +
+      '<div class="live-score-grid">' + teamLink(g.home, '<div class="live-team">' + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>') +
+      '<div class="live-score-center">' + score + '<div class="live-clock">' + esc(statusText(g)) + '</div>' +
       (s.key === "pre" ? '<div class="live-kickoff">Horário de Brasília</div>' : "") +
       (countdown ? '<div class="live-countdown" data-countdown-game="' + esc(g.id) + '">' + esc(countdown) + '</div>' : "") + '</div>' +
-      teamLink(g.away, '<div class="live-team">' + probabilityAway + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
-      probabilityMobile +
+      teamLink(g.away, '<div class="live-team">' + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
+      renderProbabilidadeDinamica(g) +
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +
