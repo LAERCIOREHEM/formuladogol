@@ -588,6 +588,55 @@
     font-weight: 600;
     padding: 0 4px;
   }
+  .jogo-prob-kicker {
+    margin: -2px 0 9px;
+    color: #9fb0bf;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: .11em;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .jogo-center-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 58px;
+  }
+  .jogo-prob-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 58px;
+    min-height: 34px;
+    padding: 4px 8px;
+    border: 1px solid rgba(163,230,53,.24);
+    border-radius: 11px;
+    color: #eaffb2;
+    background: linear-gradient(145deg, rgba(163,230,53,.13), rgba(163,230,53,.035));
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .jogo-prob-badge.empate {
+    border-color: rgba(251,191,36,.25);
+    color: #ffe29a;
+    background: linear-gradient(145deg, rgba(251,191,36,.13), rgba(251,191,36,.035));
+  }
+  .jogo-prob-badge small {
+    margin-bottom: 3px;
+    color: currentColor;
+    font-size: 7px;
+    font-weight: 900;
+    letter-spacing: .08em;
+    opacity: .72;
+    text-transform: uppercase;
+  }
+  .jogo-prob-badge strong { font-size: 13px; font-weight: 950; }
+  .jogo-team-side .jogo-prob-badge { margin-bottom: 1px; }
+  .jogo-prob-mobile { display: none; }
   .jogo-detalhes {
     display: flex;
     flex-direction: column;
@@ -1881,6 +1930,34 @@
     .jogo-times-v2 { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; }
     .jogo-escudo, .escudo-fallback { width: 48px; height: 48px; border-radius: 15px; }
     .jogo-nome { font-size: 12px; }
+    .jogo-prob-kicker { display: none; }
+    .jogo-team-side .jogo-prob-badge,
+    .jogo-center-stack > .jogo-prob-badge { display: none; }
+    .jogo-center-stack { gap: 0; min-width: auto; }
+    .jogo-prob-mobile {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(68px,.76fr) minmax(0,1fr);
+      gap: 5px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(148,163,184,.12);
+    }
+    .jogo-prob-mobile span {
+      display: flex;
+      min-width: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 5px;
+      border: 1px solid rgba(163,230,53,.20);
+      border-radius: 10px;
+      color: #eaffb2;
+      background: rgba(163,230,53,.07);
+      font-variant-numeric: tabular-nums;
+    }
+    .jogo-prob-mobile span.empate { border-color: rgba(251,191,36,.22); color: #ffe29a; background: rgba(251,191,36,.07); }
+    .jogo-prob-mobile small { width: 100%; overflow: hidden; color: currentColor; font-size: 8px; font-weight: 850; line-height: 1.15; opacity: .75; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+    .jogo-prob-mobile strong { margin-top: 4px; font-size: 13px; font-weight: 950; }
     .jogo-actions { flex-direction: column; align-items: stretch; }
     .jogo-source-pill, .jogo-future-pill { justify-content: center; }
     .tabela-shell { border-radius: 16px; }
@@ -3195,7 +3272,10 @@ let state = {
   transmissoesAovivo: {},
   transmissoesAovivoManual: {},
   probabilidadesBolao: null,
-  probabilidadesBolaoErro: null
+  probabilidadesBolaoErro: null,
+  // AF-Previsão — chances pré-jogo de vitória, empate e derrota.
+  probabilidadesJogos: null,
+  probabilidadesJogosErro: null
 };
 
 // ========================================================================
@@ -4317,6 +4397,21 @@ async function carregarJogos(opcoes = {}) {
       state.transmissoesAovivoManual = d && d.jogos && typeof d.jogos === 'object' ? d.jogos : {};
     }
   } catch (e) { /* opcional */ }
+  try {
+    const r = await fetch('dados-br/probabilidades-jogos.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    if (d && d.status === 'ok' && Array.isArray(d.jogos)) {
+      state.probabilidadesJogos = d;
+      state.probabilidadesJogosErro = null;
+    } else {
+      throw new Error('Arquivo de probabilidades pré-jogo inválido');
+    }
+  } catch (e) {
+    // Recurso complementar: a agenda continua funcional se o AF-Previsão
+    // ainda não tiver publicado o arquivo desta rodada.
+    state.probabilidadesJogosErro = e && e.message ? e.message : String(e || 'indisponível');
+  }
 
   await carregarMelhoresMomentos({ silencioso: true });
   await carregarResultadosManuais();
@@ -4520,6 +4615,57 @@ function linkClubeBrasileirao(nome, conteudo, classe = "") {
   return `<a${cls} href="clubes.html#${encodeURIComponent(slug)}" aria-label="Abrir página de ${canonico}">${conteudo}</a>`;
 }
 
+function probabilidadesPreJogoDoJogo(j) {
+  const arquivo = state.probabilidadesJogos;
+  const lista = arquivo && Array.isArray(arquivo.jogos) ? arquivo.jogos : [];
+  if (!j || !lista.length) return null;
+
+  const id = String(j.event_id || j.id || '');
+  let item = id ? lista.find(p => String(p && p.event_id || '') === id) : null;
+  if (!item) {
+    const alvo = chaveTimesJogo((j.mandante || {}).nome, (j.visitante || {}).nome);
+    const dia = dataIsoDia(j.data_iso);
+    item = lista.find(p => {
+      if (!p || chaveTimesJogo(p.mandante, p.visitante) !== alvo) return false;
+      const diaProb = dataIsoDia(p.data_iso);
+      return !dia || !diaProb || dia === diaProb;
+    }) || null;
+  }
+  if (!item || item.status !== 'pre_jogo') return null;
+  const ex = item.exibicao || {};
+  const valores = item.probabilidades_exibicao_pct || item.probabilidades_pct || {};
+  const texto = (campo) => {
+    const pronto = String(ex[campo] || '').trim();
+    if (pronto) return pronto;
+    const n = Number(valores[campo]);
+    return Number.isFinite(n) ? n.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '';
+  };
+  const mandante = texto('mandante');
+  const empate = texto('empate');
+  const visitante = texto('visitante');
+  if (!mandante || !empate || !visitante) return null;
+  return { item, mandante, empate, visitante };
+}
+
+function htmlProbabilidadesPreJogo(j, modo = 'desktop') {
+  const p = probabilidadesPreJogoDoJogo(j);
+  if (!p) return '';
+  const m = String((j.mandante || {}).nome || 'Mandante');
+  const v = String((j.visitante || {}).nome || 'Visitante');
+  if (modo === 'mobile') {
+    return `<div class="jogo-prob-mobile" aria-label="Probabilidades pré-jogo: ${m} ${p.mandante}, empate ${p.empate}, ${v} ${p.visitante}">
+      <span><small>${m}</small><strong>${p.mandante}</strong></span>
+      <span class="empate"><small>Empate</small><strong>${p.empate}</strong></span>
+      <span><small>${v}</small><strong>${p.visitante}</strong></span>
+    </div>`;
+  }
+  return {
+    mandante: `<span class="jogo-prob-badge" title="Chance pré-jogo de vitória do ${m}"><small>Vitória</small><strong>${p.mandante}</strong></span>`,
+    empate: `<span class="jogo-prob-badge empate" title="Chance pré-jogo de empate"><small>Empate</small><strong>${p.empate}</strong></span>`,
+    visitante: `<span class="jogo-prob-badge" title="Chance pré-jogo de vitória do ${v}"><small>Vitória</small><strong>${p.visitante}</strong></span>`
+  };
+}
+
 function renderJogos() {
   const container = document.getElementById('view-jogos');
 
@@ -4641,6 +4787,11 @@ function renderJogos() {
         ? `<div class="jogo-placar-live">${live.placarMandante} × ${live.placarVisitante}</div>`
         : '<div class="jogo-vs">×</div>';
       const tx = ondeAssistir(j);
+      const probabilidadesDesktop = htmlProbabilidadesPreJogo(j, 'desktop');
+      const probabilidadesMobile = htmlProbabilidadesPreJogo(j, 'mobile');
+      const probMandante = probabilidadesDesktop && probabilidadesDesktop.mandante ? probabilidadesDesktop.mandante : '';
+      const probEmpate = probabilidadesDesktop && probabilidadesDesktop.empate ? probabilidadesDesktop.empate : '';
+      const probVisitante = probabilidadesDesktop && probabilidadesDesktop.visitante ? probabilidadesDesktop.visitante : '';
 
       html += `<div class="jogo-card ${clsEstado}">
         <div class="jogo-card-top">
@@ -4648,11 +4799,13 @@ function renderJogos() {
           <span class="jogo-hora-pill">${horario}</span>
         </div>
         <div class="jogo-main">
+          ${probabilidadesDesktop ? '<div class="jogo-prob-kicker">Probabilidades pré-jogo · AF-Previsão</div>' : ''}
           <div class="jogo-times jogo-times-v2">
-            ${linkClubeBrasileirao(m.nome, `<span class="jogo-escudo">${escudoMandante}</span><span class="jogo-nome">${m.nome || '?'}</span>`, 'jogo-time jogo-team-side br-club-link')}
-            ${placarCentro}
-            ${linkClubeBrasileirao(v.nome, `<span class="jogo-escudo">${escudoVisitante}</span><span class="jogo-nome">${v.nome || '?'}</span>`, 'jogo-time jogo-team-side br-club-link')}
-          </div>`;
+            ${linkClubeBrasileirao(m.nome, `${probMandante}<span class="jogo-escudo">${escudoMandante}</span><span class="jogo-nome">${m.nome || '?'}</span>`, 'jogo-time jogo-team-side br-club-link')}
+            <div class="jogo-center-stack">${probEmpate}${placarCentro}</div>
+            ${linkClubeBrasileirao(v.nome, `${probVisitante}<span class="jogo-escudo">${escudoVisitante}</span><span class="jogo-nome">${v.nome || '?'}</span>`, 'jogo-time jogo-team-side br-club-link')}
+          </div>
+          ${probabilidadesMobile}`;
 
       const detalhes = [];
       detalhes.push(`<span class="jogo-detalhe">${statusHtml}</span>`);

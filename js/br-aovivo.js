@@ -150,7 +150,8 @@
     tickTimer: null,
     carregando: false,
     primeiraCarga: true,
-    finalizadosEm: cachedFinalTimes()
+    finalizadosEm: cachedFinalTimes(),
+    probabilidadesJogos: null
   };
 
   function esc(v) {
@@ -567,12 +568,16 @@
   }
 
   async function loadLocal() {
-    const [jogos, eventos] = await Promise.all([
+    const [jogos, eventos, probabilidades] = await Promise.all([
       fetchJson("jogos.json?t=" + Date.now()),
-      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] }))
+      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] })),
+      fetchJson("dados-br/probabilidades-jogos.json?t=" + Date.now()).catch(() => null)
     ]);
     state.agenda = localGamesFromJson(jogos).filter((g) => !g.dataDefinir && g.date);
     state.eventosLocais = (eventos.eventos || []).slice();
+    state.probabilidadesJogos = probabilidades && probabilidades.status === "ok" && Array.isArray(probabilidades.jogos)
+      ? probabilidades
+      : null;
     for (const item of state.eventosLocais) {
       const key = String(item && item.event_id || "");
       const finalizado = parseDate(item && item.finalizado_em);
@@ -1133,6 +1138,55 @@
       }).join("") + '</div></div></section>';
   }
 
+  function probabilityForGame(game) {
+    const data = state.probabilidadesJogos;
+    const rows = data && Array.isArray(data.jogos) ? data.jogos : [];
+    if (!game || !rows.length) return null;
+    const id = String(game.id || '');
+    let row = id ? rows.find((item) => String(item && item.event_id || '') === id) : null;
+    if (!row) {
+      const key = teamKey(game.home && game.home.nome, game.away && game.away.nome);
+      const day = game.date instanceof Date ? dateKey(game.date) : '';
+      row = rows.find((item) => {
+        if (!item || teamKey(item.mandante, item.visitante) !== key) return false;
+        const itemDate = parseDate(item.data_iso);
+        const itemDay = itemDate ? dateKey(itemDate) : '';
+        return !day || !itemDay || day === itemDay;
+      }) || null;
+    }
+    if (!row || row.status !== 'pre_jogo') return null;
+    const display = row.exibicao || {};
+    const values = row.probabilidades_exibicao_pct || row.probabilidades_pct || {};
+    const text = (field) => {
+      const ready = String(display[field] || '').trim();
+      if (ready) return ready;
+      const n = Number(values[field]);
+      return Number.isFinite(n) ? n.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%' : '';
+    };
+    const home = text('mandante');
+    const draw = text('empate');
+    const away = text('visitante');
+    return home && draw && away ? { home, draw, away } : null;
+  }
+
+  function renderPregameProbability(game, mode) {
+    const p = probabilityForGame(game);
+    if (!p) return '';
+    const home = String(game.home && game.home.nome || 'Mandante');
+    const away = String(game.away && game.away.nome || 'Visitante');
+    if (mode === 'mobile') {
+      return '<div class="live-prob-mobile" aria-label="Probabilidades pré-jogo: ' + esc(home) + ' ' + esc(p.home) + ', empate ' + esc(p.draw) + ', ' + esc(away) + ' ' + esc(p.away) + '">' +
+        '<span><small>' + esc(home) + '</small><strong>' + esc(p.home) + '</strong></span>' +
+        '<span class="draw"><small>Empate</small><strong>' + esc(p.draw) + '</strong></span>' +
+        '<span><small>' + esc(away) + '</small><strong>' + esc(p.away) + '</strong></span></div>';
+    }
+    return {
+      home: '<span class="live-prob-badge" title="Chance pré-jogo de vitória do ' + esc(home) + '"><small>Vitória</small><strong>' + esc(p.home) + '</strong></span>',
+      draw: '<span class="live-prob-badge draw" title="Chance pré-jogo de empate"><small>Empate</small><strong>' + esc(p.draw) + '</strong></span>',
+      away: '<span class="live-prob-badge" title="Chance pré-jogo de vitória do ' + esc(away) + '"><small>Vitória</small><strong>' + esc(p.away) + '</strong></span>'
+    };
+  }
+
   function renderMain(g, summary, all) {
     if (!g) {
       app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Nenhuma partida futura foi encontrada na agenda publicada. O robô continuará tentando atualizar os dados.</div></div></div>';
@@ -1149,15 +1203,24 @@
     const venue = g.venue ? '<span>🏟️ <strong>' + esc(g.venue) + '</strong></span>' : "";
     const transmission = "";
     const goalLines = renderGoalsUnderTeams(g, summary);
+    // A Execução 2 exibe somente a previsão anterior ao início. Assim que o
+    // placar da ESPN muda para jogo em andamento, o bloco desaparece.
+    const probabilityDesktop = s.key === "pre" ? renderPregameProbability(g, "desktop") : "";
+    const probabilityMobile = s.key === "pre" ? renderPregameProbability(g, "mobile") : "";
+    const probabilityHome = probabilityDesktop && probabilityDesktop.home ? probabilityDesktop.home : "";
+    const probabilityDraw = probabilityDesktop && probabilityDesktop.draw ? probabilityDesktop.draw : "";
+    const probabilityAway = probabilityDesktop && probabilityDesktop.away ? probabilityDesktop.away : "";
 
     app.innerHTML = '<section class="live-main-card"><div class="live-card-inner">' +
       '<div class="live-round-row"><span class="live-round-badge">' + esc(roundText + delayed) + '</span>' +
       '<span class="live-state-badge ' + esc(s.key) + '">' + esc(s.label) + '</span></div>' +
-      '<div class="live-score-grid">' + teamLink(g.home, '<div class="live-team">' + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>') +
-      '<div class="live-score-center">' + score + '<div class="live-clock">' + esc(statusText(g)) + '</div>' +
+      (probabilityDesktop ? '<div class="live-prob-kicker">Probabilidades pré-jogo · AF-Previsão</div>' : '') +
+      '<div class="live-score-grid">' + teamLink(g.home, '<div class="live-team">' + probabilityHome + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>') +
+      '<div class="live-score-center">' + probabilityDraw + score + '<div class="live-clock">' + esc(statusText(g)) + '</div>' +
       (s.key === "pre" ? '<div class="live-kickoff">Horário de Brasília</div>' : "") +
       (countdown ? '<div class="live-countdown" data-countdown-game="' + esc(g.id) + '">' + esc(countdown) + '</div>' : "") + '</div>' +
-      teamLink(g.away, '<div class="live-team">' + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
+      teamLink(g.away, '<div class="live-team">' + probabilityAway + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
+      probabilityMobile +
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +
