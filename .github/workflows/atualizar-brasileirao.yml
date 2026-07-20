@@ -27,6 +27,7 @@ on:
       - 'scripts/gerar_auditoria_cobertura_resultados.py'
       - 'scripts/gerar_auditoria_calendario.py'
       - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/gerar_probabilidades_jogos.py'
       - 'scripts/avaliar_af_previsao.py'
       - 'scripts/af_previsao_continental.py'
       - 'scripts/atualizar_competicoes_af_previsao.py'
@@ -95,6 +96,7 @@ jobs:
             scripts/af_previsao_continental.py \
             scripts/atualizar_competicoes_af_previsao.py \
             scripts/gerar_probabilidades_brasileirao.py \
+            scripts/gerar_probabilidades_jogos.py \
             scripts/avaliar_af_previsao.py
           python atualizar_espn.py --selftest
           python scripts/buscar_lideres_jogadores_espn.py --self-test
@@ -102,6 +104,7 @@ jobs:
           python scripts/atualizar_competicoes_af_previsao.py --self-test
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
+          python scripts/gerar_probabilidades_jogos.py --self-test
           python scripts/avaliar_af_previsao.py --self-test
 
       # --- DADOS DO BRASILEIRAO (100% ESPN) ---
@@ -113,6 +116,9 @@ jobs:
 
       - name: Gerar auditoria estrutural do calendário
         run: python scripts/gerar_auditoria_calendario.py
+
+      - name: Gerar probabilidades pré-jogo de vitória, empate e derrota
+        run: python scripts/gerar_probabilidades_jogos.py
 
       - name: Buscar estatísticas por jogo finalizado
         run: python scripts/buscar_detalhes_jogos_brasileirao.py
@@ -145,7 +151,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -157,6 +163,7 @@ jobs:
           # e a tabela precisa preservar os 20 times do Ranking.
           python - <<'PY'
           import json
+          import math
           for arq in ['tabela.json', 'jogos.json', 'resultados.json']:
               d = json.load(open(arq, encoding='utf-8'))
               assert d.get('fonte') == 'ESPN', f'{arq}: fonte nao e ESPN'
@@ -165,6 +172,7 @@ jobs:
           j = json.load(open('jogos.json', encoding='utf-8'))
           assert isinstance(j.get('jogos'), list), 'jogos.json sem lista jogos'
           r = json.load(open('resultados.json', encoding='utf-8'))
+          e = json.load(open('espn_eventos.json', encoding='utf-8'))
           assert isinstance(r.get('resultados'), list), 'resultados.json sem lista resultados'
           print('  OK   JSONs principais: fonte ESPN; tabela com 20 times')
           stats = json.load(open('dados-br/estatisticas.json', encoding='utf-8'))
@@ -321,6 +329,59 @@ jobs:
           if integrado:
               assert aud_prev.get('schema_version', 0) >= 2, 'auditoria integrada em schema antigo'
               assert isinstance(aud_prev.get('integracao_continental'), dict), 'auditoria sem integração continental'
+          probabilidades_jogos = json.load(open('dados-br/probabilidades-jogos.json', encoding='utf-8'))
+          auditoria_jogos = json.load(open('dados-br/auditoria-probabilidades-jogos.json', encoding='utf-8'))
+          assert probabilidades_jogos.get('schema_version') == 1, 'probabilidades por jogo em schema inesperado'
+          assert probabilidades_jogos.get('status') == 'ok', 'probabilidades por jogo com status inválido'
+          assert probabilidades_jogos.get('tipo') == 'probabilidades_pre_jogo', 'tipo inválido nas probabilidades por jogo'
+          assert isinstance(probabilidades_jogos.get('hash_entrada'), str) and probabilidades_jogos.get('hash_entrada'), 'hash de entrada ausente nas probabilidades por jogo'
+          jogos_previstos = probabilidades_jogos.get('jogos') or []
+          base_jogos = probabilidades_jogos.get('base_corrente') or {}
+          assert int(probabilidades_jogos.get('total_jogos') or -1) == len(jogos_previstos), 'total divergente nas probabilidades por jogo'
+          assert int(base_jogos.get('partidas_concluidas') or -1) + len(jogos_previstos) == 380, 'partição inválida nas probabilidades por jogo'
+          assert int(base_jogos.get('partidas_restantes') or -1) == len(jogos_previstos), 'base corrente divergente nas probabilidades por jogo'
+          ids_concluidos = {str(item.get('event_id') or item.get('id') or '') for item in (r.get('resultados') or [])}
+          ids_espn_por_confronto = {}
+          for item in (e.get('eventos') or []):
+              event_id_espn = str(item.get('event_id') or '').strip()
+              chave = (str(item.get('mandante') or ''), str(item.get('visitante') or ''))
+              if event_id_espn and chave[0] and chave[1]:
+                  assert chave not in ids_espn_por_confronto or ids_espn_por_confronto[chave] == event_id_espn, f'mais de um event_id ESPN para {chave}'
+                  ids_espn_por_confronto[chave] = event_id_espn
+          mapa_calendario = {}
+          for item in (completo.get('jogos') or []):
+              mandante = str(item.get('mandante') or '')
+              visitante = str(item.get('visitante') or '')
+              rodada = int(item.get('rodada') or 0)
+              chave = (mandante, visitante)
+              event_id = str(item.get('event_id') or '').strip() or ids_espn_por_confronto.get(chave) or f'AF-{rodada:02d}-{mandante}-{visitante}'
+              assert event_id not in mapa_calendario, f'event_id duplicado no calendário: {event_id}'
+              mapa_calendario[event_id] = (mandante, visitante)
+          assert len(mapa_calendario) == 380, 'calendário sem 380 event_ids únicos/canônicos'
+          ids_esperados = set(mapa_calendario) - ids_concluidos
+          ids_jogos = [str(item.get('event_id') or '') for item in jogos_previstos]
+          assert len(ids_jogos) == len(set(ids_jogos)), 'event_id duplicado nas probabilidades por jogo'
+          assert set(ids_jogos) == ids_esperados, 'cobertura das probabilidades por jogo diverge do calendário restante'
+          for item in jogos_previstos:
+              event_id = str(item.get('event_id') or '')
+              assert (str(item.get('mandante') or ''), str(item.get('visitante') or '')) == mapa_calendario[event_id], f'{event_id}: clubes divergentes do calendário'
+              assert item.get('status') == 'pre_jogo', f'{event_id}: status não é pré-jogo'
+              assert item.get('valido_ate') == 'inicio_da_partida', f'{event_id}: validade ausente'
+              for bloco_nome in ('probabilidades_pct', 'probabilidades_exibicao_pct'):
+                  bloco = item.get(bloco_nome) or {}
+                  valores = [float(bloco.get(campo)) for campo in ('mandante', 'empate', 'visitante')]
+                  assert all(math.isfinite(valor) and 0 <= valor <= 100 for valor in valores), f'{event_id}: probabilidade inválida em {bloco_nome}'
+                  assert abs(sum(valores) - 100.0) <= 1e-9, f'{event_id}: {bloco_nome} não soma 100%'
+              taxas = item.get('gols_esperados') or {}
+              assert all(math.isfinite(float(taxas.get(campo))) and float(taxas.get(campo)) > 0 for campo in ('mandante', 'visitante')), f'{event_id}: taxa de gols inválida'
+          assert auditoria_jogos.get('status') == 'ok', 'auditoria das probabilidades por jogo falhou'
+          assert auditoria_jogos.get('hash_entrada') == probabilidades_jogos.get('hash_entrada'), 'hash de entrada divergente na auditoria por jogo'
+          import hashlib
+          payload_hash = hashlib.sha256(json.dumps(probabilidades_jogos, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False).encode('utf-8')).hexdigest()
+          assert auditoria_jogos.get('hash_saida') == payload_hash, 'hash de saída divergente na auditoria por jogo'
+          assert int((auditoria_jogos.get('validacoes') or {}).get('jogos') or -1) == len(jogos_previstos), 'auditoria por jogo com cobertura divergente'
+          print(f'  OK   Probabilidades pré-jogo: {len(jogos_previstos)} partidas; V/E/D fecham 100%')
+
           bolao = json.load(open('dados-br/probabilidades-bolao.json', encoding='utf-8'))
           participantes_bolao = json.load(open('dados-br/participantes-bolao-classificacao.json', encoding='utf-8'))
           assert bolao.get('status') == 'ok', 'projeção do bolão com status inválido'
@@ -384,6 +445,8 @@ jobs:
             "dados-br/competicoes-af-previsao/sul-americana.json"
             "dados-br/auditoria-competicoes-af-previsao.json"
             "dados-br/probabilidades-brasileirao.json"
+            "dados-br/probabilidades-jogos.json"
+            "dados-br/auditoria-probabilidades-jogos.json"
             "dados-br/probabilidades-bolao.json"
             "dados-br/auditoria-probabilidades.json"
             "dados-br/historico-probabilidades.json"
