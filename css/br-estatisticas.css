@@ -1586,3 +1586,63 @@ body > .container > section.hero > img {
     grid-template-columns: 1fr;
   }
 }
+
+/* AF-Previsão: hierarquia principal e tabela comparativa */
+.stats-tab-featured { grid-column: 1 / -1 !important; min-height: 76px; font-size: 18px; }
+.probability-compact-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
+.probability-compact-hero h2 { margin-top: 3px; color: #fff; }
+.probability-compact-hero p { max-width: 760px; margin: 0; color: #b8c7d4; font-size: 13px; line-height: 1.55; text-align: right; }
+.probability-compact-hero strong { color: #efffc3; }
+.probability-overview-card { margin-top: 20px; padding: 18px; border: 1px solid rgba(96,165,250,.20); border-radius: 18px; background: linear-gradient(145deg, rgba(8,28,36,.84), rgba(17,39,43,.76)); }
+.probability-overview-card .probability-status-grid { margin-top: 14px; }
+.probability-details-section { margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(148,163,184,.14); }
+.probability-comparison-section { margin-top: 18px; }
+.probability-table-hint { margin: -2px 0 10px; color: var(--muted); font-size: 11px; }
+.probability-table-shell { position: relative; width: 100%; overflow-x: auto; border: 1px solid rgba(148,163,184,.18); border-radius: 17px; background: rgba(4,16,23,.72); scrollbar-width: thin; }
+.probability-comparison-table { width: 100%; min-width: 1040px; border-collapse: separate; border-spacing: 0; color: #e8f1f7; font-size: 12px; }
+.probability-comparison-table th,
+.probability-comparison-table td { height: 54px; padding: 9px 11px; border-bottom: 1px solid rgba(148,163,184,.10); white-space: nowrap; text-align: center; }
+.probability-comparison-table thead th { position: sticky; top: 0; z-index: 5; height: 46px; color: #aebdca; background: #12212b; font-size: 10px; font-weight: 950; letter-spacing: .06em; text-transform: uppercase; }
+.probability-comparison-table tbody tr:last-child > * { border-bottom: 0; }
+.probability-comparison-table tbody tr:hover > * { background-color: rgba(163,230,53,.045); }
+.probability-comparison-table thead th:first-child,
+.probability-comparison-table tbody td:first-child { position: sticky; left: 0; z-index: 4; width: 58px; min-width: 58px; background: #0a1b23; }
+.probability-comparison-table thead th:nth-child(2),
+.probability-comparison-table tbody th:nth-child(2) { position: sticky; left: 58px; z-index: 4; width: 205px; min-width: 205px; background: #0a1b23; box-shadow: 8px 0 14px rgba(0,0,0,.18); }
+.probability-comparison-table thead th:first-child,
+.probability-comparison-table thead th:nth-child(2) { z-index: 7; background: #12212b; }
+.probability-table-position span { display: grid; place-items: center; width: 34px; height: 34px; margin: auto; border: 1px solid rgba(163,230,53,.27); border-radius: 11px; color: #efffc3; background: rgba(163,230,53,.09); font-weight: 950; }
+.probability-table-club { text-align: left !important; }
+.probability-table-club a { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
+.probability-table-club a:hover strong { color: var(--green); }
+.probability-table-shield { flex: 0 0 auto; width: 32px; height: 32px; object-fit: contain; }
+.probability-table-number strong { color: #dfff8c; font-size: 15px; }
+.probability-table-percent { font-weight: 950; font-variant-numeric: tabular-nums; }
+.probability-cell-title { color: #ffe47a; }
+.probability-cell-lib { color: #cfff86; }
+.probability-cell-sula { color: #7dd3fc; }
+.probability-cell-drop { color: #fda4af; }
+.probability-table-projection strong { color: #ddd6fe; font-size: 15px; }
+.probability-table-range { color: #fde68a; font-weight: 900; }
+
+@media (min-width: 850px) {
+  .stats-tabs { grid-template-columns: repeat(6,minmax(0,1fr)); }
+  .stats-tab-featured { grid-column: 1 / -1 !important; }
+}
+
+@media (max-width: 700px) {
+  .probability-compact-hero { display: block; }
+  .probability-compact-hero p { margin-top: 8px; font-size: 12px; text-align: left; }
+  .probability-overview-card { padding: 13px; }
+  .probability-comparison-table { min-width: 930px; font-size: 11px; }
+  .probability-comparison-table th,
+  .probability-comparison-table td { height: 50px; padding: 8px 9px; }
+  .probability-comparison-table thead th:first-child,
+  .probability-comparison-table tbody td:first-child { width: 48px; min-width: 48px; }
+  .probability-comparison-table thead th:nth-child(2),
+  .probability-comparison-table tbody th:nth-child(2) { left: 48px; width: 158px; min-width: 158px; }
+  .probability-table-position span { width: 31px; height: 31px; }
+  .probability-table-shield { width: 28px; height: 28px; }
+  .probability-table-club a { gap: 7px; }
+  .probability-table-club strong { max-width: 112px; overflow: hidden; text-overflow: ellipsis; }
+}

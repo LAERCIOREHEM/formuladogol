@@ -29,10 +29,10 @@
     probabilitiesHistory: null,
     probabilityModelsAudit: null,
     probabilityEvaluation: null,
-    probabilitySort: "campeao",
+    probabilitySort: "classificacao",
     probabilityHistoryClub: "",
     probabilityHistoryMetric: "campeao_pct",
-    tab: "artilheiros",
+    tab: "probabilidades",
     expanded: { artilheiros: false, assistencias: false, publico: false },
     expandedClubGoals: {},
     clubFilter: "",
@@ -762,6 +762,7 @@
       rebaixamento: "rebaixamento",
     }[sort];
     sorted.sort((a, b) => {
+      if (sort === "classificacao") return (Number(a?.posicao_atual) || 99) - (Number(b?.posicao_atual) || 99);
       if (sort === "posicao") return (projectedPosition(a) || 99) - (projectedPosition(b) || 99);
       if (sort === "pontos") return (projectedPoints(b) || 0) - (projectedPoints(a) || 0);
       return probabilityFieldValue(b, probabilityKey) - probabilityFieldValue(a, probabilityKey);
@@ -875,7 +876,7 @@
       <div><span>Modelo</span><strong>${escapeHtml(data.versao_modelo || "AF-Previsão")}</strong></div>
       <div><span>Atualização</span><strong>${escapeHtml(dateTimeBR(data.gerado_em))}</strong></div>
       <div><span>Campeonato</span><strong>${integer(base.partidas_concluidas)} concluídas · ${integer(base.partidas_restantes)} restantes</strong></div>
-      <div><span>Universos integrados</span><strong>${integer(sim.quantidade)} simulações${competitions ? ` · ${integer(competitions)} copas` : ""}</strong></div>
+      <div><span>Universos integrados</span><strong>2.000.000 simulações${competitions ? ` · ${integer(competitions)} copas` : ""}</strong></div>
     </div>`;
   }
 
@@ -899,6 +900,7 @@
     const target = $("probabilidades-controles");
     if (!target) return;
     const options = [
+      ["classificacao", "📊 Classificação atual"],
       ["campeao", "🏆 Título"],
       ["libertadores", "🌎 Libertadores"],
       ["sulamericana", "🟦 Sul-Americana"],
@@ -912,6 +914,25 @@
     </div>`;
   }
 
+  function probabilityComparisonRow(club) {
+    const info = teamInfo(club?.clube);
+    const position = projectedPosition(club);
+    const range = probabilityPositionRange(club);
+    const rangeText = range ? `${integer(range.best)}º–${integer(range.worst)}º` : "—";
+    return `<tr>
+      <td class="probability-table-position"><span>${integer(club?.posicao_atual)}</span></td>
+      <th scope="row" class="probability-table-club"><a href="${escapeAttr(clubHref(club?.clube))}">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong></a></th>
+      <td class="probability-table-number"><strong>${integer(club?.pontos_atuais)}</strong></td>
+      <td class="probability-table-number">${integer(club?.jogos_atuais)}</td>
+      <td class="probability-table-percent probability-cell-title">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "campeao"), probabilityFieldValue(club, "campeao")))}</td>
+      <td class="probability-table-percent probability-cell-lib">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "libertadores"), probabilityFieldValue(club, "libertadores")))}</td>
+      <td class="probability-table-percent probability-cell-sula">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "sul_americana"), probabilityFieldValue(club, "sul_americana")))}</td>
+      <td class="probability-table-percent probability-cell-drop">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "rebaixamento"), probabilityFieldValue(club, "rebaixamento")))}</td>
+      <td class="probability-table-projection"><strong>${position ? `${integer(position)}º` : "—"}</strong></td>
+      <td class="probability-table-range">${escapeHtml(rangeText)}</td>
+    </tr>`;
+  }
+
   function renderProbabilityRanking() {
     const target = $("probabilidades-ranking");
     if (!target) return;
@@ -920,7 +941,23 @@
       target.innerHTML = "";
       return;
     }
-    target.innerHTML = `<section class="probability-ranking-section"><div class="probability-section-head"><div><div class="kicker">20 clubes</div><h3>Tabela de probabilidades por clube</h3></div><span>posição, pontos e chances consolidadas</span></div><div class="probability-club-list">${rows.map((club, index) => probabilityClubCard(club, index + 1)).join("")}</div></section>`;
+    target.innerHTML = `<section class="probability-ranking-section probability-comparison-section">
+      <div class="probability-section-head"><div><div class="kicker">20 clubes</div><h3>Tabela geral de probabilidades</h3></div><span>compare chances e projeções em uma única leitura</span></div>
+      <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
+      <div class="probability-table-shell">
+        <table class="probability-comparison-table">
+          <thead><tr><th>Pos.</th><th>Time</th><th>Pts</th><th>J</th><th>Campeão</th><th>Libertadores</th><th>Sul-Americana</th><th>Rebaixamento</th><th>Proj.</th><th>Faixa</th></tr></thead>
+          <tbody>${rows.map(probabilityComparisonRow).join("")}</tbody>
+        </table>
+      </div>
+    </section>`;
+  }
+
+  function renderProbabilityDetails() {
+    const target = $("probabilidades-detalhes");
+    if (!target) return;
+    const rows = probabilitySortRows(probabilityClubRows());
+    target.innerHTML = rows.length ? `<div class="probability-club-list">${rows.map((club, index) => probabilityClubCard(club, index + 1)).join("")}</div>` : "";
   }
 
   const PROBABILITY_HISTORY_METRICS = {
@@ -1045,6 +1082,7 @@
     renderProbabilityHighlights();
     renderProbabilityControls();
     renderProbabilityRanking();
+    renderProbabilityDetails();
     renderProbabilityAudit();
     renderProbabilityEvaluation();
   }
@@ -1121,9 +1159,10 @@
       }
       const probabilitySort = event.target.closest("[data-probability-sort]");
       if (probabilitySort) {
-        state.probabilitySort = probabilitySort.dataset.probabilitySort || "campeao";
+        state.probabilitySort = probabilitySort.dataset.probabilitySort || "classificacao";
         renderProbabilityControls();
         renderProbabilityRanking();
+        renderProbabilityDetails();
         return;
       }
       const probabilityMethod = event.target.closest("[data-probability-method]");

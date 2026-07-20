@@ -25,7 +25,7 @@
   <meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
   <meta name="twitter:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260718-prob-shield-cleanup-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260720-probability-table-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260718-ajustes-mobile-escudos-v3">
 </head>
 <body>
@@ -55,18 +55,18 @@
 
       <section class="stats-tabs-panel panel" aria-label="Seções de estatísticas">
         <div class="stats-tabs" role="tablist" aria-label="Escolha uma estatística">
-          <button class="stats-tab active" type="button" role="tab" aria-selected="true" data-tab="artilheiros">⚽ Artilheiros</button>
+          <button class="stats-tab stats-tab-wide stats-tab-featured active" type="button" role="tab" aria-selected="true" data-tab="probabilidades">🔮 Probabilidades</button>
+          <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="artilheiros">⚽ Artilheiros</button>
           <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="jogos">📋 Por jogo</button>
           <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="assistencias">🎯 Assistências</button>
           <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="gols-clube">🥅 Gols/clube</button>
           <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="campeonato">📊 Campeonato</button>
           <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="desempenho">⚡ Ranking de Desempenho</button>
-          <button class="stats-tab stats-tab-wide" type="button" role="tab" aria-selected="false" data-tab="probabilidades">🔮 Probabilidades</button>
         </div>
       </section>
 
       <section class="stats-content">
-        <article class="stats-view active" id="view-artilheiros" data-view="artilheiros" role="tabpanel">
+        <article class="stats-view" id="view-artilheiros" data-view="artilheiros" role="tabpanel" hidden>
           <div class="panel"><div class="panel-inner">
             <div class="section-head">
               <div><div class="kicker">⚽ Gols</div><h2>Artilheiros</h2></div>
@@ -111,22 +111,35 @@
           <div id="campeonato-conteudo"></div>
         </article>
 
-        <article class="stats-view" id="view-probabilidades" data-view="probabilidades" role="tabpanel" hidden>
+        <article class="stats-view active" id="view-probabilidades" data-view="probabilidades" role="tabpanel">
           <div class="panel probability-panel"><div class="panel-inner">
-            <div class="section-head" id="topo-probabilidades">
+            <header class="probability-compact-hero" id="topo-probabilidades">
               <div><div class="kicker">🔮 AF-Previsão</div><h2>Probabilidades do Brasileirão</h2></div>
-              <span class="badge live-soft">Modelo estatístico próprio</span>
-            </div>
-            <p class="probability-intro">Estimativas atualizadas para título, classificação continental e rebaixamento. O AF-Previsão combina o Brasileirão com os possíveis desfechos da Copa do Brasil, da CONMEBOL Libertadores e da CONMEBOL Sudamericana, incluindo sobreposições e repasses de vagas. Probabilidade não é certeza nem cotação de aposta.</p>
-            <div class="probability-notice" role="note">
-              <span aria-hidden="true">ⓘ</span>
-              <p><strong>Leitura importante:</strong> valores como <b>&lt;0,1%</b> indicam um cenário residual, não impossibilidade matemática. As chances de Libertadores e Sul-Americana abaixo já são <strong>consolidadas</strong> pelas diferentes vias de classificação.</p>
-            </div>
-            <a class="probability-method-link" href="#metodologia-probabilidades" data-probability-method>Entenda o modelo e consulte a nota técnica ↓</a>
-            <div id="probabilidades-status" aria-live="polite"></div>
+              <p>Compare os 20 clubes em uma leitura direta, com chances consolidadas e projeção final produzidas por <strong>2 milhões de simulações</strong> a cada atualização íntegra.</p>
+            </header>
+
             <div id="probabilidades-destaques"></div>
             <div id="probabilidades-controles"></div>
             <div id="probabilidades-ranking"></div>
+
+            <section class="probability-overview-card" aria-labelledby="titulo-visao-af">
+              <div class="section-head">
+                <div><div class="kicker">Modelo estatístico próprio</div><h3 id="titulo-visao-af">Como ler o AF-Previsão</h3></div>
+                <span class="badge live-soft">2 milhões de simulações</span>
+              </div>
+              <p class="probability-intro">O AF-Previsão combina o Brasileirão com os possíveis desfechos da Copa do Brasil, da CONMEBOL Libertadores e da CONMEBOL Sudamericana, incluindo sobreposições e repasses de vagas. Probabilidade não é certeza nem cotação de aposta.</p>
+              <div class="probability-notice" role="note">
+                <span aria-hidden="true">ⓘ</span>
+                <p><strong>Leitura importante:</strong> valores como <b>&lt;0,1%</b> indicam um cenário residual, não impossibilidade matemática. As chances de Libertadores e Sul-Americana são <strong>consolidadas</strong> pelas diferentes vias de classificação.</p>
+              </div>
+              <div id="probabilidades-status" aria-live="polite"></div>
+              <a class="probability-method-link" href="#metodologia-probabilidades" data-probability-method>Entenda o modelo e consulte a nota técnica ↓</a>
+            </section>
+
+            <section class="probability-details-section" aria-labelledby="titulo-detalhamento-clubes">
+              <div class="probability-section-head"><div><div class="kicker">Análise aprofundada</div><h3 id="titulo-detalhamento-clubes">Detalhamento clube a clube</h3></div><span>distribuição das 20 posições e evolução histórica</span></div>
+              <div id="probabilidades-detalhes"></div>
+            </section>
 
             <section class="probability-methodology" id="metodologia-probabilidades" aria-labelledby="titulo-metodologia-probabilidades">
               <div class="kicker">Metodologia pública, versionada e auditável</div>
@@ -283,7 +296,7 @@
     </footer>
   </div>
 
-  <script src="js/br-estatisticas.js?v=20260718-sem-siglas-v3"></script>
+  <script src="js/br-estatisticas.js?v=20260720-probability-table-v1"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260718-retorno-origem-v3"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
