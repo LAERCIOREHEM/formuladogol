@@ -151,7 +151,7 @@
     carregando: false,
     primeiraCarga: true,
     finalizadosEm: cachedFinalTimes(),
-    taxasGol: {}
+    probabilidadesJogos: null
   };
 
   function esc(v) {
@@ -428,25 +428,11 @@
       ? state.transmissoesTv
       : cachedTransmissionMap(TRANSMISSION_CACHE_TV);
 
-    const [youtubeResult, manualResult, tvResult, probResult] = await Promise.allSettled([
+    const [youtubeResult, manualResult, tvResult] = await Promise.allSettled([
       fetchJson("dados-br/transmissoes-aovivo.json?t=" + Date.now()),
       fetchJson("dados-br/transmissoes-aovivo-manual.json?t=" + Date.now()),
-      fetchJson("dados-br/transmissoes-tv.json?t=" + Date.now()),
-      fetchJson("dados-br/probabilidades-brasileirao.json?t=" + Date.now()).catch(() => null)
+      fetchJson("dados-br/transmissoes-tv.json?t=" + Date.now())
     ]);
-
-    // Taxas de gol esperadas do modelo pré-jogo, indexadas por event_id.
-    // Alimentam a probabilidade dinâmica ao vivo (Poisson condicional).
-    if (probResult.status === "fulfilled" && probResult.value && Array.isArray(probResult.value.partidas_restantes)) {
-      const mapa = {};
-      for (const p of probResult.value.partidas_restantes) {
-        const ge = p && p.gols_esperados;
-        if (p && p.event_id && ge && typeof ge.mandante === "number" && typeof ge.visitante === "number") {
-          mapa[String(p.event_id)] = { home: ge.mandante, away: ge.visitante };
-        }
-      }
-      if (Object.keys(mapa).length) state.taxasGol = mapa;
-    }
 
     const automatic = youtubeResult.status === "fulfilled" && youtubeResult.value && youtubeResult.value.jogos && typeof youtubeResult.value.jogos === "object"
       ? youtubeResult.value.jogos
@@ -581,13 +567,29 @@
     return youtube + renderClosedTransmission(game);
   }
 
+  async function loadProbabilityDataset() {
+    // Fonte canônica da Execução 1: contém V/E/D e taxas de gols por partida.
+    const primary = await fetchJson("dados-br/probabilidades-jogos.json?t=" + Date.now()).catch(() => null);
+    if (primary && primary.status === "ok" && Array.isArray(primary.jogos)) return primary;
+
+    // Fallback operacional: evita perder a informação durante uma publicação
+    // parcial, usando o arquivo geral do AF-Previsão no mesmo formato básico.
+    const fallback = await fetchJson("dados-br/probabilidades-brasileirao.json?t=" + Date.now()).catch(() => null);
+    if (fallback && Array.isArray(fallback.partidas_restantes)) {
+      return { status: "ok", jogos: fallback.partidas_restantes };
+    }
+    return null;
+  }
+
   async function loadLocal() {
-    const [jogos, eventos] = await Promise.all([
+    const [jogos, eventos, probabilidades] = await Promise.all([
       fetchJson("jogos.json?t=" + Date.now()),
-      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] }))
+      fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] })),
+      loadProbabilityDataset()
     ]);
     state.agenda = localGamesFromJson(jogos).filter((g) => !g.dataDefinir && g.date);
     state.eventosLocais = (eventos.eventos || []).slice();
+    state.probabilidadesJogos = probabilidades;
     for (const item of state.eventosLocais) {
       const key = String(item && item.event_id || "");
       const finalizado = parseDate(item && item.finalizado_em);
@@ -836,6 +838,63 @@
     return g.date ? formatDateTime(g.date) : "Horário a definir";
   }
 
+  function probabilityRowForGame(game) {
+    const data = state.probabilidadesJogos;
+    const rows = data && Array.isArray(data.jogos) ? data.jogos : [];
+    if (!game || !rows.length) return null;
+
+    const id = String(game.id || "");
+    let row = id ? rows.find((item) => String(item && item.event_id || "") === id) : null;
+    if (!row) {
+      const key = teamKey(game.home && game.home.nome, game.away && game.away.nome);
+      const day = game.date instanceof Date ? dateKey(game.date) : "";
+      row = rows.find((item) => {
+        if (!item || teamKey(item.mandante, item.visitante) !== key) return false;
+        const itemDate = parseDate(item.data_iso);
+        const itemDay = itemDate ? dateKey(itemDate) : "";
+        return !day || !itemDay || day === itemDay;
+      }) || null;
+    }
+    return row;
+  }
+
+  function probabilityForGame(game) {
+    const row = probabilityRowForGame(game);
+    if (!row) return null;
+    const display = row.exibicao || {};
+    const values = row.probabilidades_exibicao_pct || row.probabilidades_pct || {};
+    const text = (field) => {
+      const ready = String(display[field] || "").trim();
+      if (ready) return ready;
+      const n = Number(values[field]);
+      return Number.isFinite(n)
+        ? n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%"
+        : "";
+    };
+    const home = text("mandante");
+    const draw = text("empate");
+    const away = text("visitante");
+    return home && draw && away ? { home, draw, away } : null;
+  }
+
+  function renderPregameProbability(game, mode) {
+    const p = probabilityForGame(game);
+    if (!p) return "";
+    const home = String(game.home && game.home.nome || "Mandante");
+    const away = String(game.away && game.away.nome || "Visitante");
+    if (mode === "mobile") {
+      return '<div class="live-prob-mobile" aria-label="Probabilidades pré-jogo: ' + esc(home) + ' ' + esc(p.home) + ', empate ' + esc(p.draw) + ', ' + esc(away) + ' ' + esc(p.away) + '">' +
+        '<span><small>' + esc(home) + '</small><strong>' + esc(p.home) + '</strong></span>' +
+        '<span class="draw"><small>Empate</small><strong>' + esc(p.draw) + '</strong></span>' +
+        '<span><small>' + esc(away) + '</small><strong>' + esc(p.away) + '</strong></span></div>';
+    }
+    return {
+      home: '<span class="live-prob-badge" title="Chance pré-jogo de vitória do ' + esc(home) + '"><small>Vitória</small><strong>' + esc(p.home) + '</strong></span>',
+      draw: '<span class="live-prob-badge draw" title="Chance pré-jogo de empate"><small>Empate</small><strong>' + esc(p.draw) + '</strong></span>',
+      away: '<span class="live-prob-badge" title="Chance pré-jogo de vitória do ' + esc(away) + '"><small>Vitória</small><strong>' + esc(p.away) + '</strong></span>'
+    };
+  }
+
   // ===== Probabilidade dinâmica (Poisson condicional) =====
   // Recalcula P(vitória mandante / empate / vitória visitante) DURANTE o jogo,
   // a partir de: placar atual, minutos restantes, taxas de gol pré-jogo do
@@ -891,9 +950,11 @@
   }
 
   function taxasAoVivo(g) {
-    const base = state.taxasGol && state.taxasGol[String(g.id)];
-    if (base && base.home > 0 && base.away > 0) return base;
-    return null;
+    const row = probabilityRowForGame(g);
+    const ge = row && row.gols_esperados;
+    const home = Number(ge && ge.mandante);
+    const away = Number(ge && ge.visitante);
+    return home > 0 && away > 0 ? { home, away } : null;
   }
 
   // Distribuição de probabilidade do nº de gols restantes de um time (0..8),
@@ -1323,17 +1384,25 @@
     const venue = g.venue ? '<span>🏟️ <strong>' + esc(g.venue) + '</strong></span>' : "";
     const transmission = "";
     const goalLines = renderGoalsUnderTeams(g, summary);
-    // Conta expulsões por lado para alimentar a probabilidade dinâmica.
+    // A previsão pré-jogo permanece visível até a bola rolar. Durante a partida,
+    // o mesmo conjunto de taxas alimenta a atualização Poisson condicional.
+    const probabilityDesktop = s.key === "pre" ? renderPregameProbability(g, "desktop") : "";
+    const probabilityMobile = s.key === "pre" ? renderPregameProbability(g, "mobile") : "";
+    const probabilityHome = probabilityDesktop && probabilityDesktop.home ? probabilityDesktop.home : "";
+    const probabilityDraw = probabilityDesktop && probabilityDesktop.draw ? probabilityDesktop.draw : "";
+    const probabilityAway = probabilityDesktop && probabilityDesktop.away ? probabilityDesktop.away : "";
     contarVermelhos(g, summary);
 
     app.innerHTML = '<section class="live-main-card"><div class="live-card-inner">' +
       '<div class="live-round-row"><span class="live-round-badge">' + esc(roundText + delayed) + '</span>' +
       '<span class="live-state-badge ' + esc(s.key) + '">' + esc(s.label) + '</span></div>' +
-      '<div class="live-score-grid">' + teamLink(g.home, '<div class="live-team">' + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>') +
-      '<div class="live-score-center">' + score + '<div class="live-clock">' + esc(statusText(g)) + '</div>' +
+      (probabilityDesktop ? '<div class="live-prob-kicker">Probabilidades pré-jogo · AF-Previsão</div>' : '') +
+      '<div class="live-score-grid">' + teamLink(g.home, '<div class="live-team">' + probabilityHome + teamLogo(g.home) + '<div class="live-team-name">' + esc(g.home.nome) + '</div>' + goalLines.home + '<div class="live-team-abbr">' + esc(g.home.sigla || SIGLAS[g.home.nome] || "") + '</div></div>') +
+      '<div class="live-score-center">' + probabilityDraw + score + '<div class="live-clock">' + esc(statusText(g)) + '</div>' +
       (s.key === "pre" ? '<div class="live-kickoff">Horário de Brasília</div>' : "") +
       (countdown ? '<div class="live-countdown" data-countdown-game="' + esc(g.id) + '">' + esc(countdown) + '</div>' : "") + '</div>' +
-      teamLink(g.away, '<div class="live-team">' + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
+      teamLink(g.away, '<div class="live-team">' + probabilityAway + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
+      probabilityMobile +
       renderProbabilidadeDinamica(g) +
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
