@@ -2519,30 +2519,6 @@ body > .container > section.hero > img {
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260718-ajustes-mobile-escudos-v3">
 </head>
-  <script>
-  /* MODO COPA: até 20/07/2026, a raiz do site abre DIRETO na Copa.
-     O Brasileirão abre por link explícito com ?brasileirao=1. A partir de
-     21/07/2026, a raiz volta ao Brasileirão e o parâmetro provisório é
-     removido da URL sem apagar view, hash ou outros parâmetros. */
-  (function () {
-    var ini = new Date('2026-06-04T00:00:00-03:00');
-    var fim = new Date('2026-07-20T23:59:59-03:00');
-    var agora = new Date();
-    var params = new URLSearchParams(location.search || '');
-    var pediuBrasileirao = params.has('brasileirao');
-    var emCopa = agora >= ini && agora <= fim;
-    if (emCopa && !pediuBrasileirao) {
-      location.replace('copa2026/');
-      return;
-    }
-    if (!emCopa && pediuBrasileirao) {
-      params.delete('brasileirao');
-      var query = params.toString();
-      var limpa = location.pathname + (query ? '?' + query : '') + (location.hash || '');
-      history.replaceState(null, '', limpa);
-    }
-  })();
-</script>
 <body>
 <div class="container">
   <header>
@@ -6024,19 +6000,6 @@ document.addEventListener('br:session-changed', (event) => {
   else limparAvisosAniversario();
 });
 setTimeout(sincronizarAvisosAniversarioComSessao, 800);
-</script>
-<script>
-  /* Mostra o botão da Copa no menu durante o período (quando você está
-     vendo o Brasileirão pausado, dá pra pular pra Copa pelo botão). */
-  (function () {
-    var ini = new Date('2026-06-04T00:00:00-03:00');
-    var fim = new Date('2026-07-20T23:59:59-03:00');
-    var agora = new Date();
-    if (agora >= ini && agora <= fim) {
-      var b = document.getElementById('btn-copa');
-      if (b) b.style.display = '';
-    }
-  })();
 </script>
 <script src="js/br-clube-retorno.js?v=20260717-retorno-exato-v1"></script>
 <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
