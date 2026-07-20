@@ -878,18 +878,7 @@
   function renderProbabilityControls() {
     const target = $("probabilidades-controles");
     if (!target) return;
-    const options = [
-      ["campeao", "🏆 Título"],
-      ["libertadores", "🌎 Libertadores"],
-      ["sulamericana", "🟦 Sul-Americana"],
-      ["rebaixamento", "🔻 Rebaixamento"],
-      ["posicao", "📍 Posição projetada"],
-      ["pontos", "📈 Pontos projetados"],
-    ];
-    target.innerHTML = `<div class="probability-controls">
-      <div><span>Ordenar tabela por</span><strong>Compare os 20 clubes</strong></div>
-      <div class="probability-sort-buttons" role="group" aria-label="Ordenação das probabilidades">${options.map(([key, label]) => `<button type="button" data-probability-sort="${key}" class="${state.probabilitySort === key ? "active" : ""}" aria-pressed="${state.probabilitySort === key ? "true" : "false"}">${label}</button>`).join("")}</div>
-    </div>`;
+    target.innerHTML = "";
   }
 
   function renderProbabilityRanking() {
