@@ -317,10 +317,10 @@ body > .container > section.hero > img {
 .mascote-modal[hidden] { display: none !important; }
 .mascote-modal { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; padding: 22px; }
 .mascote-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.78); backdrop-filter: blur(8px); }
-.mascote-modal-card { position: relative; width: min(92vw, 760px); max-height: 90vh; border: 1px solid rgba(163,230,53,.25); border-radius: 24px; background: linear-gradient(180deg, rgba(9,20,29,.98), rgba(3,8,12,.98)); box-shadow: 0 30px 90px rgba(0,0,0,.62); padding: 26px; display: grid; place-items: center; }
-.mascote-modal-img { max-width: 100%; max-height: min(72vh, 680px); object-fit: contain; filter: drop-shadow(0 22px 32px rgba(0,0,0,.42)); }
-.mascote-modal-title { margin-top: 12px; color: #efffc3; font-weight: 950; text-align: center; }
-.mascote-modal-close { position: absolute; top: 10px; right: 12px; width: 38px; height: 38px; border-radius: 999px; border: 1px solid rgba(148,163,184,.25); background: rgba(255,255,255,.07); color: #fff; cursor: pointer; font-size: 24px; line-height: 1; }
+.mascote-modal-card { position: relative; z-index: 1; width: min(92vw, 760px); max-height: 90vh; border: 1px solid rgba(163,230,53,.25); border-radius: 24px; background: linear-gradient(180deg, rgba(9,20,29,.98), rgba(3,8,12,.98)); box-shadow: 0 30px 90px rgba(0,0,0,.62); padding: 26px; display: grid; place-items: center; }
+.mascote-modal-img { position: relative; z-index: 1; max-width: 100%; max-height: min(72vh, 680px); object-fit: contain; filter: drop-shadow(0 22px 32px rgba(0,0,0,.42)); }
+.mascote-modal-title { position: relative; z-index: 1; margin-top: 12px; color: #efffc3; font-weight: 950; text-align: center; }
+.mascote-modal-close { position: absolute; top: 10px; right: 12px; z-index: 5; width: 42px; height: 42px; border-radius: 999px; border: 1px solid rgba(148,163,184,.25); background: rgba(255,255,255,.10); color: #fff; cursor: pointer; font-size: 25px; line-height: 1; display: grid; place-items: center; touch-action: manipulation; -webkit-tap-highlight-color: transparent; pointer-events: auto; }
 body.modal-open { overflow: hidden; }
 @media (max-width: 640px) { .mascote-modal { padding: 12px; } .mascote-modal-card { border-radius: 18px; padding: 18px; } .mascote-modal-img { max-height: 72vh; } }
 

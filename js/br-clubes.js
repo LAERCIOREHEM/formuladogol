@@ -201,7 +201,16 @@
         <div class="mascote-modal-title"></div>
       </div>`;
     document.body.appendChild(modal);
-    modal.addEventListener("click", ev => { if (ev.target?.dataset?.close) fecharMascoteModal(); });
+    const fecharPeloControle = ev => {
+      const alvo = ev.target && ev.target.closest ? ev.target.closest("[data-close]") : null;
+      if (!alvo || !modal.contains(alvo)) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      fecharMascoteModal();
+    };
+    modal.addEventListener("click", fecharPeloControle);
+    modal.addEventListener("pointerup", fecharPeloControle);
+    modal.addEventListener("touchend", fecharPeloControle, { passive: false });
     document.addEventListener("keydown", ev => { if (ev.key === "Escape") fecharMascoteModal(); });
     return modal;
   }
