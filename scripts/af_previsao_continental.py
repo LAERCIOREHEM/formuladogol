@@ -654,6 +654,7 @@ def allocate_integrated_qualification(
     sulamericana: CupSimulation,
     simulations: int,
     config: Mapping[str, Any],
+    league_points: np.ndarray | None = None,
 ) -> dict[str, Any]:
     """Aloca vagas continentais e atribui uma via exclusiva a cada clube.
 
@@ -709,6 +710,8 @@ def allocate_integrated_qualification(
     per_sim_lib_counts = np.zeros(simulations, dtype=np.int16)
     per_sim_total_brazil_slots = np.zeros(simulations, dtype=np.int16)
     external_qualified_counts = np.zeros(simulations, dtype=np.int16)
+    lib_by_points = np.zeros(115, dtype=np.int64)
+    continental_by_points = np.zeros(115, dtype=np.int64)
 
     def current_index(team_name: str) -> int:
         return int(team_index.get(team_name, -1))
@@ -808,6 +811,9 @@ def allocate_integrated_qualification(
 
         for team, route in qualified.items():
             lib_total[team] += 1
+            if league_points is not None:
+                lib_by_points[int(league_points[row, team])] += 1
+                continental_by_points[int(league_points[row, team])] += 1
             route_counts[route][team] += 1
         per_sim_lib_counts[row] = len(qualified)
         external_qualified_counts[row] = len(external_qualified)
@@ -827,6 +833,8 @@ def allocate_integrated_qualification(
             raise ValueError("não foi possível alocar seis vagas da Sul-Americana")
         for team in selected_sula:
             sula_total[team] += 1
+            if league_points is not None:
+                continental_by_points[int(league_points[row, team])] += 1
             if base_league_slots < int(position[team]) <= base_league_slots + sula_slots:
                 sula_base[team] += 1
             else:
@@ -877,6 +885,10 @@ def allocate_integrated_qualification(
 
     return {
         "clubes": results,
+        "pontuacao_objetivos": {
+            "libertadores": lib_by_points.tolist(),
+            "sul_americana_ou_melhor": continental_by_points.tolist(),
+        },
         "auditoria": {
             "vagas_brasileirao_base": base_league_slots,
             "vagas_sul_americana": sula_slots,
@@ -925,6 +937,7 @@ def integrate_continental_probabilities(
     simulations: int,
     seed: int,
     config: Mapping[str, Any],
+    league_points: np.ndarray | None = None,
 ) -> dict[str, Any]:
     cup_simulations: dict[str, CupSimulation] = {}
     seed_offsets = {"copa_do_brasil": 101, "libertadores": 211, "sul_americana": 307}
@@ -947,9 +960,11 @@ def integrate_continental_probabilities(
         cup_simulations["sul_americana"],
         simulations,
         config,
+        league_points=league_points,
     )
     return {
         "clubes": allocated["clubes"],
+        "pontuacao_objetivos": allocated["pontuacao_objetivos"],
         "auditoria": {
             "competicoes": {key: value.audit for key, value in cup_simulations.items()},
             "alocacao_vagas": allocated["auditoria"],
@@ -1129,6 +1144,7 @@ def self_test() -> None:
     else:
         raise AssertionError("mata-mata incompleto deveria bloquear publicação")
 
+    deterministic_points = np.full((deterministic_sims, 20), 60, dtype=np.int16)
     fixed = allocate_integrated_qualification(
         deterministic_order,
         teams,
@@ -1137,6 +1153,7 @@ def self_test() -> None:
         sulamericana_fixed,
         deterministic_sims,
         config,
+        league_points=deterministic_points,
     )
     # Linha 0: campeão da Copa no G5; vice herda a vaga e há um repasse.
     assert fixed["clubes"][teams[0]]["libertadores"]["vias"]["via_brasileirao"]["ocorrencias"] >= 1
@@ -1150,6 +1167,8 @@ def self_test() -> None:
     assert fixed["clubes"][teams[18]]["libertadores"]["vias"]["via_titulo_sul_americana"]["ocorrencias"] == 1
     assert fixed["auditoria"]["maximo_total_clubes_brasileiros_na_libertadores"] == 9
     assert abs(fixed["auditoria"]["soma_probabilidades_sul_americana_pct"] - 600.0) < 0.02
+    assert sum(fixed["pontuacao_objetivos"]["libertadores"]) == sum(fixed["auditoria"]["media_clubes_serie_a_2026_na_libertadores"] for _ in range(deterministic_sims))
+    assert sum(fixed["pontuacao_objetivos"]["sul_americana_ou_melhor"]) == sum(fixed["pontuacao_objetivos"]["libertadores"]) + deterministic_sims * int(config["sul_americana_vagas"])
 
     print("Self-test AF-Previsão Continental Execução 2.5: OK")
 

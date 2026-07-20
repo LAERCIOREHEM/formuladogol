@@ -25,7 +25,7 @@
   <meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
   <meta name="twitter:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260720-card-probabilidades-br-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260720-pontos-objetivos-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260718-ajustes-mobile-escudos-v3">
 </head>
 <body>
@@ -55,7 +55,7 @@
 
       <section class="stats-tabs-panel panel" aria-label="Seções de estatísticas">
         <div class="stats-tabs" role="tablist" aria-label="Escolha uma estatística">
-          <button class="stats-tab stats-tab-wide stats-tab-featured active" type="button" role="tab" aria-selected="true" data-tab="probabilidades">🔮 PROBABILIDADES DO BRASILEIRÃO</button>
+          <button class="stats-tab stats-tab-wide stats-tab-featured active" type="button" role="tab" aria-selected="true" data-tab="probabilidades">🔮 Probabilidades</button>
           <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="artilheiros">⚽ Artilheiros</button>
           <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="jogos">📋 Por jogo</button>
           <button class="stats-tab" type="button" role="tab" aria-selected="false" data-tab="assistencias">🎯 Assistências</button>
@@ -122,6 +122,14 @@
                 <p>Compare os 20 clubes em uma leitura direta, com chances consolidadas e projeção final produzidas por <strong>2 milhões de simulações</strong> a cada atualização íntegra.</p>
               </header>
               <div id="probabilidades-destaques"></div>
+              <section class="probability-points-card" aria-labelledby="titulo-pontos-objetivos">
+                <div class="probability-points-card-head">
+                  <div><div class="kicker">🎯 Pontuação final</div><h3 id="titulo-pontos-objetivos">Quantos pontos para cada objetivo?</h3></div>
+                  <span class="badge">AF-Previsão</span>
+                </div>
+                <p>Menor pontuação final associada a cada nível de probabilidade, calculada nos mesmos universos do modelo.</p>
+                <div id="probabilidades-por-pontuacao" aria-live="polite"></div>
+              </section>
               <div class="section-head">
                 <div><div class="kicker">Modelo estatístico próprio</div><h3 id="titulo-visao-af">Como ler o AF-Previsão</h3></div>
                 <span class="badge live-soft">2 milhões de simulações</span>
@@ -295,7 +303,7 @@
     </footer>
   </div>
 
-  <script src="js/br-estatisticas.js?v=20260720-sem-card-ordenar-v2"></script>
+  <script src="js/br-estatisticas.js?v=20260720-pontos-objetivos-v1"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260718-retorno-origem-v3"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>

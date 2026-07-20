@@ -1588,7 +1588,7 @@ body > .container > section.hero > img {
 }
 
 /* AF-Previsão: hierarquia principal e tabela comparativa */
-.stats-tab-featured { grid-column: 1 / -1 !important; min-height: 76px; font-size: clamp(15px, 4.2vw, 18px); line-height: 1.18; white-space: normal; text-wrap: balance; }
+.stats-tab-featured { grid-column: 1 / -1 !important; min-height: 76px; font-size: 18px; }
 .probability-compact-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
 .probability-compact-hero h2 { margin-top: 3px; color: #fff; }
 .probability-compact-hero p { max-width: 760px; margin: 0; color: #b8c7d4; font-size: 13px; line-height: 1.55; text-align: right; }
@@ -1655,3 +1655,53 @@ body > .container > section.hero > img {
 .probability-pool-method h3 { margin:4px 0 8px; color:#fff; }
 .probability-pool-method p { margin:7px 0 0; color:var(--muted); line-height:1.65; }
 .probability-pool-method strong { color:#efffc3; }
+
+/* AF-Previsão: pontos necessários por objetivo */
+.probability-points-card {
+  margin-top: 18px;
+  padding: clamp(15px, 2vw, 22px);
+  border: 1px solid rgba(163,230,53,.20);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(7,24,29,.92), rgba(8,20,29,.88));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+.probability-points-card-head { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; }
+.probability-points-card-head h3 { margin-top:4px; color:#fff; font-size:clamp(20px,2.2vw,28px); }
+.probability-points-card > p { margin:10px 0 14px; color:#b8c8d5; font-size:13px; line-height:1.5; }
+.probability-points-scroll { overflow-x:auto; border:1px solid rgba(56,189,248,.22); border-radius:15px; scrollbar-width:thin; }
+.probability-points-scroll:focus-visible { outline:2px solid var(--green); outline-offset:3px; }
+.probability-points-table { width:100%; min-width:700px; border-collapse:separate; border-spacing:0; background:rgba(3,14,21,.58); }
+.probability-points-table th,
+.probability-points-table td { padding:11px 12px; border-right:1px solid rgba(56,189,248,.20); border-bottom:1px solid rgba(56,189,248,.18); text-align:center; }
+.probability-points-table tr:last-child > * { border-bottom:0; }
+.probability-points-table tr > *:last-child { border-right:0; }
+.probability-points-table thead th { position:sticky; top:0; z-index:2; color:#dce8f2; background:#10232d; font-size:11px; font-weight:950; letter-spacing:.035em; text-transform:uppercase; }
+.probability-points-table thead th:first-child,
+.probability-points-table tbody th { position:sticky; left:0; z-index:3; }
+.probability-points-table thead th:first-child { background:#10232d; }
+.probability-points-table tbody th { color:#efffc3; background:#0b1b23; font-size:13px; font-weight:950; white-space:nowrap; }
+.probability-points-table tbody tr:nth-child(even) td { background:rgba(255,255,255,.018); }
+.probability-points-table td strong { color:#fff; font-size:18px; }
+.probability-points-table td small { margin-left:3px; color:#8fa2b2; font-size:9px; font-weight:900; text-transform:uppercase; }
+.probability-points-table td > span { color:#718392; }
+.probability-points-more { margin-top:10px; }
+.probability-points-more > summary { display:flex; justify-content:space-between; gap:10px; cursor:pointer; color:#d9ff76; font-size:12px; font-weight:950; }
+.probability-points-more > summary span { color:#8fa2b2; font-size:10px; font-weight:800; }
+.probability-points-more[open] > summary { margin-bottom:10px; }
+.probability-points-notes { display:grid; gap:4px; margin-top:11px; }
+.probability-points-notes p { margin:0; color:#91a5b5; font-size:10px; line-height:1.45; }
+.probability-points-notes strong { color:#dbe7f2; }
+.probability-points-empty { padding:14px; border:1px dashed rgba(148,163,184,.22); border-radius:13px; color:#9eb0bf; text-align:center; }
+@media (max-width: 640px) {
+  .probability-points-card { margin-inline:-2px; padding:14px 10px; }
+  .probability-points-card-head { align-items:flex-start; }
+  .probability-points-card-head .badge { font-size:9px; }
+  .probability-points-card > p { font-size:11px; }
+  .probability-points-scroll::before { content:"↔ Arraste para comparar todos os objetivos"; display:block; position:sticky; left:0; width:max-content; padding:8px 10px 5px; color:#90a4b4; font-size:9px; font-weight:850; letter-spacing:.03em; text-transform:uppercase; }
+  .probability-points-table { min-width:640px; }
+  .probability-points-table th,
+  .probability-points-table td { padding:9px 9px; }
+  .probability-points-table td strong { font-size:16px; }
+  .probability-points-more > summary { display:block; }
+  .probability-points-more > summary span { display:block; margin-top:3px; }
+}

@@ -79,6 +79,7 @@ AUDIT_PATH = ROOT / "dados-br" / "auditoria-probabilidades.json"
 HISTORY_PATH = ROOT / "dados-br" / "historico-probabilidades.json"
 BOLAO_PARTICIPANTS_PATH = ROOT / "dados-br" / "participantes-bolao-classificacao.json"
 BOLAO_OUTPUT_PATH = ROOT / "dados-br" / "probabilidades-bolao.json"
+POINT_THRESHOLDS_OUTPUT_PATH = ROOT / "dados-br" / "probabilidades-por-pontuacao.json"
 BRT = ZoneInfo("America/Sao_Paulo")
 EPS = 1e-12
 MAX_GOALS_OUTPUT = 7
@@ -1001,9 +1002,138 @@ def run_monte_carlo(
     if bolao is not None:
         output["_bolao"] = bolao
     if return_samples:
+        point_counts = np.bincount(points.ravel(), minlength=115).astype(np.int64)
+        champion_points = points[rows[:, 0], order[:, 0]]
+        title_counts = np.bincount(champion_points, minlength=115).astype(np.int64)
+        permanence_counts = np.zeros(115, dtype=np.int64)
+        for team_index_value in range(20):
+            safe_points = points[positions[:, team_index_value] <= 16, team_index_value]
+            permanence_counts += np.bincount(safe_points, minlength=115).astype(np.int64)
         output["_league_order"] = order
+        output["_league_points"] = points
+        output["_point_objectives"] = {
+            "total": point_counts.tolist(),
+            "titulo": title_counts.tolist(),
+            "permanencia": permanence_counts.tolist(),
+        }
     return output
 
+
+
+def _weighted_isotonic(values: Sequence[float], weights: Sequence[int]) -> list[float]:
+    """Regressão isotônica crescente (PAVA), sem dependência externa."""
+    blocks: list[list[float]] = []
+    for index, (value, weight) in enumerate(zip(values, weights)):
+        w = max(1, int(weight))
+        blocks.append([float(index), float(index), float(value) * w, float(w)])
+        while len(blocks) >= 2:
+            prev = blocks[-2]
+            curr = blocks[-1]
+            if prev[2] / prev[3] <= curr[2] / curr[3] + 1e-15:
+                break
+            merged = [prev[0], curr[1], prev[2] + curr[2], prev[3] + curr[3]]
+            blocks[-2:] = [merged]
+    result = [0.0] * len(values)
+    for start, end, weighted_sum, total_weight in blocks:
+        fitted = min(1.0, max(0.0, weighted_sum / total_weight))
+        for index in range(int(start), int(end) + 1):
+            result[index] = fitted
+    return result
+
+
+def build_points_thresholds(
+    point_objectives: dict[str, Any],
+    continental_points: dict[str, Any],
+    simulations: int,
+    generated_at: str,
+    model_version: str,
+    input_hash: str,
+) -> dict[str, Any]:
+    totals = np.asarray(point_objectives["total"], dtype=np.int64)
+    objective_counts = {
+        "titulo": np.asarray(point_objectives["titulo"], dtype=np.int64),
+        "libertadores": np.asarray(continental_points["libertadores"], dtype=np.int64),
+        "sul_americana_ou_melhor": np.asarray(continental_points["sul_americana_ou_melhor"], dtype=np.int64),
+        "permanencia": np.asarray(point_objectives["permanencia"], dtype=np.int64),
+    }
+    active_points = np.flatnonzero(totals > 0)
+    if active_points.size == 0:
+        raise ValueError("sem amostras para calcular cortes por pontuação")
+    min_point, max_point = int(active_points.min()), int(active_points.max())
+    points = list(range(min_point, max_point + 1))
+    weights = [int(totals[p]) if totals[p] > 0 else 1 for p in points]
+    curves: dict[str, list[float]] = {}
+    raw_curves: dict[str, list[float | None]] = {}
+    for key, counts in objective_counts.items():
+        raw = [None if totals[p] == 0 else float(counts[p] / totals[p]) for p in points]
+        # Preenche lacunas raras com o último valor conhecido antes da PAVA.
+        filled: list[float] = []
+        last = 0.0
+        for value in raw:
+            if value is not None:
+                last = value
+            filled.append(last)
+        curves[key] = _weighted_isotonic(filled, weights)
+        raw_curves[key] = raw
+
+    targets = [50.0, 60.0, 70.0, 80.0, 90.0, 95.0, 97.0, 99.0, 99.5, 99.9, 100.0]
+    rows = []
+    for target in targets:
+        target_fraction = target / 100.0
+        row: dict[str, Any] = {
+            "probabilidade_pct": target,
+            "rotulo": "100% nos cenários" if target == 100.0 else (f"{target:g}%".replace(".", ",")),
+        }
+        for key, curve in curves.items():
+            threshold = next((point for point, probability in zip(points, curve) if probability + 1e-12 >= target_fraction), None)
+            row[key] = threshold
+        rows.append(row)
+
+    detailed = []
+    for offset, point in enumerate(points):
+        if totals[point] <= 0:
+            continue
+        detailed.append({
+            "pontos": point,
+            "amostras": int(totals[point]),
+            **{
+                key: {
+                    "bruta_pct": round(float((raw_curves[key][offset] or 0.0) * 100.0), 6),
+                    "calibrada_pct": round(float(curves[key][offset] * 100.0), 6),
+                }
+                for key in curves
+            },
+        })
+
+    for key in objective_counts:
+        values = [row[key] for row in rows if row[key] is not None]
+        if values != sorted(values):
+            raise ValueError(f"cortes não monotônicos para {key}: {values}")
+    return {
+        "schema_version": 1,
+        "projeto": "AF-Previsão — Probabilidades por pontuação final",
+        "temporada": 2026,
+        "status": "ok",
+        "gerado_em": generated_at,
+        "versao_modelo": model_version,
+        "hash_entrada": input_hash,
+        "simulacoes": simulations,
+        "metodo": {
+            "definicao": "menor pontuação final cuja probabilidade calibrada é igual ou superior ao nível indicado",
+            "calibracao": "regressão isotônica crescente ponderada pela quantidade de observações em cada pontuação",
+            "sul_americana_ou_melhor": "classificação à Sul-Americana ou à Libertadores; a união evita o paradoxo de uma pontuação maior reduzir a chance de objetivo continental",
+            "percentual_100": "ocorreu em todos os universos simulados disponíveis para aquela faixa; não é prova de impossibilidade matemática do cenário contrário",
+        },
+        "niveis": rows,
+        "curva_por_pontuacao": detailed,
+        "auditoria": {
+            "observacoes_clube_universo": int(np.sum(totals)),
+            "pontos_minimos_observados": min_point,
+            "pontos_maximos_observados": max_point,
+            "objetivos": list(objective_counts),
+            "curvas_monotonicas": True,
+        },
+    }
 
 def dixon_coles_sensitivity(forecasts: Sequence[MatchForecast], rho: float) -> dict[str, Any]:
     deltas: list[float] = []
@@ -1315,7 +1445,7 @@ def validate_probabilities(teams: Sequence[dict[str, Any]]) -> None:
                 raise ValueError(f"probabilidade fora do intervalo para {item['clube']}")
 
 
-def generate(simulations: int | None = None, seed_override: int | None = None) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+def generate(simulations: int | None = None, seed_override: int | None = None) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
     config = load_json(CONFIG_PATH)
     audit_models = load_json(AUDIT_MODELS_PATH)
     table = load_json(TABLE_PATH)
@@ -1380,6 +1510,8 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         position_interval_percentiles=position_percentiles,
     )
     league_order = simulation.pop("_league_order")
+    league_points = simulation.pop("_league_points")
+    point_objectives = simulation.pop("_point_objectives")
     bolao = simulation.pop("_bolao")
     try:
         continental_snapshots = load_continental_snapshots()
@@ -1391,9 +1523,19 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             simulations_final,
             seed,
             execution_25,
+            league_points=league_points,
         )
     except ContinentalDataNotReady as exc:
         raise CurrentDataNotSynchronized(f"AF-Previsão Continental aguardando dados: {exc}") from exc
+    points_thresholds = build_points_thresholds(
+        point_objectives,
+        continental["pontuacao_objetivos"],
+        simulations_final,
+        generated_at,
+        model_version,
+        input_hash,
+    )
+    del league_points
     max_half_delta = float(simulation["convergencia"]["maior_diferenca_entre_metades_pontos_percentuais"])
     if max_half_delta > 1.0:
         raise ValueError(
@@ -1636,7 +1778,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         simulations=simulations_final,
         max_snapshots=int(execution.get("historico_max_snapshots") or 300),
     )
-    return probabilities, audit, history, bolao
+    return probabilities, audit, history, bolao, points_thresholds
 
 
 def self_test() -> None:
@@ -1810,6 +1952,27 @@ def self_test() -> None:
     snapshot_b["copa_do_brasil"]["eventos"] = [{"event_id": "novo"}]
     if continental_snapshots_state_hash(snapshot_a) == continental_snapshots_state_hash(snapshot_b):
         raise AssertionError("mudança esportiva precisa alterar o hash continental")
+    total_counts = [0] * 115
+    title_counts = [0] * 115
+    permanence_counts = [0] * 115
+    lib_counts = [0] * 115
+    continental_counts = [0] * 115
+    for point in range(30, 81):
+        total_counts[point] = 100
+        title_counts[point] = max(0, min(100, (point - 60) * 5))
+        lib_counts[point] = max(0, min(100, (point - 45) * 4))
+        continental_counts[point] = max(0, min(100, (point - 35) * 4))
+        permanence_counts[point] = max(0, min(100, (point - 30) * 5))
+    threshold_test = build_points_thresholds(
+        {"total": total_counts, "titulo": title_counts, "permanencia": permanence_counts},
+        {"libertadores": lib_counts, "sul_americana_ou_melhor": continental_counts},
+        100, "2026-07-20T00:00:00-03:00", "teste", "hash-teste",
+    )
+    assert threshold_test["auditoria"]["curvas_monotonicas"] is True
+    for key in ("titulo", "libertadores", "sul_americana_ou_melhor", "permanencia"):
+        cuts = [row[key] for row in threshold_test["niveis"] if row[key] is not None]
+        assert cuts == sorted(cuts), (key, cuts)
+
     print("Self-test AF-Previsão Execução 5: OK")
 
 
@@ -1823,9 +1986,9 @@ def main() -> int:
         self_test()
         return 0
     try:
-        probabilities, audit, history, bolao = generate(args.simulacoes, args.semente)
+        probabilities, audit, history, bolao, points_thresholds = generate(args.simulacoes, args.semente)
     except CurrentDataNotSynchronized as exc:
-        previous_files = (OUTPUT_PATH, AUDIT_PATH, HISTORY_PATH, BOLAO_OUTPUT_PATH)
+        previous_files = (OUTPUT_PATH, AUDIT_PATH, HISTORY_PATH, BOLAO_OUTPUT_PATH, POINT_THRESHOLDS_OUTPUT_PATH)
         previous_valid = all(path.exists() for path in previous_files)
         if previous_valid:
             try:
@@ -1833,12 +1996,14 @@ def main() -> int:
                 previous_audit = load_json(AUDIT_PATH)
                 previous_history = load_json(HISTORY_PATH)
                 previous_bolao = load_json(BOLAO_OUTPUT_PATH)
+                previous_points_thresholds = load_json(POINT_THRESHOLDS_OUTPUT_PATH)
                 previous_valid = (
                     previous_output.get("status") == "ok"
                     and previous_audit.get("status") == "ok"
                     and bool(previous_history.get("snapshots"))
                     and previous_output.get("hash_entrada") == previous_audit.get("hash_entrada")
                     and previous_bolao.get("status") == "ok"
+                    and previous_points_thresholds.get("status") == "ok"
                 )
             except (OSError, ValueError, json.JSONDecodeError):
                 previous_valid = False
@@ -1860,6 +2025,7 @@ def main() -> int:
     write_json(AUDIT_PATH, audit)
     write_json(HISTORY_PATH, history)
     write_json(BOLAO_OUTPUT_PATH, bolao)
+    write_json(POINT_THRESHOLDS_OUTPUT_PATH, points_thresholds)
     print(
         "AF-Previsão gerado: "
         f"{probabilities['base_corrente']['partidas_concluidas']} concluídos, "

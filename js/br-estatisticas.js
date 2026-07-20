@@ -14,6 +14,7 @@
     probabilitiesHistory: "dados-br/historico-probabilidades.json",
     probabilityModelsAudit: "dados-br/auditoria-modelos-af-previsao.json",
     probabilityEvaluation: "dados-br/avaliacao-af-previsao.json",
+    pointsThresholds: "dados-br/probabilidades-por-pontuacao.json",
   };
 
   const state = {
@@ -29,6 +30,7 @@
     probabilitiesHistory: null,
     probabilityModelsAudit: null,
     probabilityEvaluation: null,
+    pointsThresholds: null,
     probabilitySort: "classificacao",
     probabilityHistoryClub: "",
     probabilityHistoryMetric: "campeao_pct",
@@ -896,6 +898,52 @@
     </div>`;
   }
 
+
+  function pointsThresholdCell(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? `<strong>${integer(n)}</strong><small>pts</small>` : `<span aria-label="nível não atingido">—</span>`;
+  }
+
+  function pointsThresholdRows(rows) {
+    return rows.map((row) => `<tr>
+      <th scope="row">${escapeHtml(row.rotulo || `${number(row.probabilidade_pct, 1)}%`)}</th>
+      <td>${pointsThresholdCell(row.titulo)}</td>
+      <td>${pointsThresholdCell(row.libertadores)}</td>
+      <td>${pointsThresholdCell(row.sul_americana_ou_melhor)}</td>
+      <td>${pointsThresholdCell(row.permanencia)}</td>
+    </tr>`).join("");
+  }
+
+  function renderPointsThresholds() {
+    const target = $("probabilidades-por-pontuacao");
+    if (!target) return;
+    const data = state.pointsThresholds;
+    const rows = Array.isArray(data?.niveis) ? data.niveis : [];
+    if (!data || data.status !== "ok" || !rows.length) {
+      target.innerHTML = `<div class="probability-points-empty">Aguardando a próxima atualização íntegra do AF-Previsão.</div>`;
+      return;
+    }
+    const mainLevels = new Set([50, 70, 80, 90, 95, 99, 99.9]);
+    const mainRows = rows.filter((row) => mainLevels.has(Number(row.probabilidade_pct)));
+    const extraRows = rows.filter((row) => !mainLevels.has(Number(row.probabilidade_pct)));
+    const tableHead = `<thead><tr>
+      <th scope="col">Chance</th>
+      <th scope="col"><span>🏆</span> Título</th>
+      <th scope="col"><span>🌎</span> Libertadores</th>
+      <th scope="col"><span>🟦</span> Sul-Americana+</th>
+      <th scope="col"><span>🛡️</span> Permanência</th>
+    </tr></thead>`;
+    target.innerHTML = `<div class="probability-points-scroll" tabindex="0" aria-label="Tabela de pontos necessários por objetivo">
+      <table class="probability-points-table">${tableHead}<tbody>${pointsThresholdRows(mainRows)}</tbody></table>
+    </div>
+    ${extraRows.length ? `<details class="probability-points-more"><summary>Ver níveis detalhados <span>60%, 97%, 99,5% e 100% simulados</span></summary><div class="probability-points-scroll" tabindex="0"><table class="probability-points-table probability-points-table-extra">${tableHead}<tbody>${pointsThresholdRows(extraRows)}</tbody></table></div></details>` : ""}
+    <div class="probability-points-notes">
+      <p><strong>Sul-Americana+:</strong> significa alcançar ao menos uma vaga continental, seja na Sul-Americana ou na Libertadores.</p>
+      <p><strong>100% nos cenários:</strong> ocorreu em todos os universos simulados daquela faixa; não representa impossibilidade matemática do cenário contrário.</p>
+      <p>Atualizado em ${escapeHtml(dateTimeBR(data.gerado_em))} · ${integer(data.simulacoes)} simulações.</p>
+    </div>`;
+  }
+
   function renderProbabilityControls() {
     // Card "Ordenar tabela por / Compare os 20 clubes" removido a pedido:
     // poluía o layout. A tabela de probabilidades usa ordenação fixa por
@@ -1070,6 +1118,7 @@
   function renderProbabilities() {
     renderProbabilityStatus();
     renderProbabilityHighlights();
+    renderPointsThresholds();
     renderProbabilityControls();
     renderProbabilityRanking();
     renderProbabilityDetails();
@@ -1188,7 +1237,7 @@
     else if (abrirMetodologia) state.tab = "desempenho";
     else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "probabilidades", "desempenho"].includes(hashTab)) state.tab = hashTab;
 
-    const [leaders, competition, details, ranking, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation] = await Promise.all([
+    const [leaders, competition, details, ranking, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation, pointsThresholds] = await Promise.all([
       fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
       fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
       fetchJson(FILES.details, { jogos: {} }),
@@ -1201,6 +1250,7 @@
       fetchJson(FILES.probabilitiesHistory, { total_snapshots: 0, snapshots: [] }),
       fetchJson(FILES.probabilityModelsAudit, { status: "aguardando_workflow" }),
       fetchJson(FILES.probabilityEvaluation, { status: "aguardando_primeira_execucao", publicar_na_interface: false }),
+      fetchJson(FILES.pointsThresholds, { status: "aguardando_workflow", niveis: [] }),
     ]);
 
     state.leaders = leaders;
@@ -1215,6 +1265,7 @@
     state.probabilitiesHistory = probabilitiesHistory;
     state.probabilityModelsAudit = probabilityModelsAudit;
     state.probabilityEvaluation = probabilityEvaluation;
+    state.pointsThresholds = pointsThresholds;
     renderAll();
     if (openProbabilityMethod) {
       requestAnimationFrame(() => $("metodologia-probabilidades")?.scrollIntoView({ behavior: "auto", block: "start" }));
