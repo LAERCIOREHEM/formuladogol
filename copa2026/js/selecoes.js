@@ -320,7 +320,7 @@
   function jogosDaSelecao(id) {
     return (JOGOS || []).filter(function (j) {
       return (j.home && j.home.sigla === id) || (j.away && j.away.sigla === id);
-    }).sort(function (a, b) { return new Date(a.date).getTime() - new Date(b.date).getTime(); });
+    }).sort(function (a, b) { return new Date(b.date).getTime() - new Date(a.date).getTime(); });
   }
   function jogoCard(j, id) {
     var pre = j.state === "pre";

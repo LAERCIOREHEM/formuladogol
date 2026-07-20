@@ -13,7 +13,7 @@
   };
   var SEL = {}, ISO = {}, SELECOES = [], TVS = {}, MM = {}, JC = {}, JOGOS = [], LANCES_CACHE = {};
   var ESTRUT = null, TERMAP = null, FAIRPLAY = {}, PROJ_EVENT = {};
-  var FILTROS = { selecao: "", data: "", campo: "data", direcao: "asc" };
+  var FILTROS = { selecao: "", data: "", campo: "data", direcao: "desc" };
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (ch) {
@@ -607,7 +607,7 @@
     FILTROS.selecao = sel ? sel.value : "";
     FILTROS.data = dt ? dt.value : "";
     FILTROS.campo = campo ? campo.value : "data";
-    FILTROS.direcao = dir ? dir.value : "asc";
+    FILTROS.direcao = dir ? dir.value : "desc";
   }
 
   function jogosFiltradosOrdenados() {
@@ -659,7 +659,7 @@
         if (s) s.value = "";
         if (d) d.value = "";
         if (c) c.value = "data";
-        if (o) o.value = "asc";
+        if (o) o.value = "desc";
         render();
       });
     }
