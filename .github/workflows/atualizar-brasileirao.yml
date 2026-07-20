@@ -151,7 +151,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -243,6 +243,16 @@ jobs:
           assert previsao.get('status') == 'ok', 'AF-Previsão com status inválido'
           assert previsao.get('base_corrente', {}).get('partidas_totais') == 380, 'AF-Previsão sem 380 partidas'
           assert previsao.get('base_corrente', {}).get('partidas_concluidas') + previsao.get('base_corrente', {}).get('partidas_restantes') == 380, 'AF-Previsão com partição inválida'
+          pontos_obj = json.load(open('dados-br/probabilidades-por-pontuacao.json', encoding='utf-8'))
+          assert pontos_obj.get('status') == 'ok', 'probabilidades por pontuação inválidas'
+          assert pontos_obj.get('simulacoes') == previsao.get('simulacao', {}).get('quantidade'), 'simulações divergentes na tabela por pontuação'
+          niveis_pontos = pontos_obj.get('niveis') or []
+          assert len(niveis_pontos) >= 7, 'níveis de pontuação insuficientes'
+          assert pontos_obj.get('auditoria', {}).get('curvas_monotonicas') is True, 'curvas por pontuação não monotônicas'
+          for campo in ['titulo', 'libertadores', 'sul_americana_ou_melhor', 'permanencia']:
+              valores = [n.get(campo) for n in niveis_pontos if n.get(campo) is not None]
+              assert valores == sorted(valores), f'cortes não monotônicos: {campo}'
+              assert all(0 <= int(v) <= 114 for v in valores), f'corte fora da faixa: {campo}'
           clubes_prev = previsao.get('clubes') or []
           assert len(clubes_prev) == 20, 'AF-Previsão sem 20 clubes'
           assert previsao.get('total_previsoes_partidas') == previsao.get('base_corrente', {}).get('partidas_restantes'), 'AF-Previsão sem previsão para todos os jogos restantes'
@@ -445,6 +455,7 @@ jobs:
             "dados-br/competicoes-af-previsao/sul-americana.json"
             "dados-br/auditoria-competicoes-af-previsao.json"
             "dados-br/probabilidades-brasileirao.json"
+            "dados-br/probabilidades-por-pontuacao.json"
             "dados-br/probabilidades-jogos.json"
             "dados-br/auditoria-probabilidades-jogos.json"
             "dados-br/probabilidades-bolao.json"
