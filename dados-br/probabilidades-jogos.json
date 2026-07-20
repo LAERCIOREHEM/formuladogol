@@ -1,0 +1,6572 @@
+{
+  "schema_version": 1,
+  "projeto": "AF-Previsão",
+  "tipo": "probabilidades_pre_jogo",
+  "temporada": 2026,
+  "status": "ok",
+  "gerado_em": "2026-07-17T22:05:00-03:00",
+  "hash_entrada": "754cdd792558293e782b561656e6ad1ad35b95dc57e8a3f5b4683b5dc25d4f0a",
+  "versao_modelo": "AF-Previsão 1.3",
+  "responsavel": {
+    "nome": "Laércio Rehem",
+    "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
+    "contato": "Sugestões, elogios e dúvidas: utilize o botão SUGESTÕES do site."
+  },
+  "metodologia": {
+    "calculo": "soma analítica da matriz de placares Poisson do AF-Previsão",
+    "componentes": [
+      "força ofensiva e defensiva regularizada",
+      "vantagem de mando",
+      "decaimento temporal",
+      "tendência recente por suavização exponencial controlada"
+    ],
+    "simulacoes_monte_carlo_do_campeonato": 2000000,
+    "observacao": "As probabilidades V/E/D são obtidas diretamente da matriz de placares; as simulações Monte Carlo são usadas nas projeções do campeonato e não adicionam ruído a esta soma."
+  },
+  "base_corrente": {
+    "partidas_concluidas": 182,
+    "partidas_restantes": 198,
+    "partidas_totais": 380
+  },
+  "total_jogos": 198,
+  "jogos": [
+    {
+      "event_id": "401841148",
+      "rodada": 19,
+      "data_iso": "2026-07-21T19:30",
+      "mandante": "Atlético-MG",
+      "visitante": "Bahia",
+      "estadio": "Arena MRV",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.2765,
+        "empate": 26.5056,
+        "visitante": 27.2179
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.3,
+        "empate": 26.5,
+        "visitante": 27.2
+      },
+      "exibicao": {
+        "mandante": "46,3%",
+        "empate": "26,5%",
+        "visitante": "27,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4373,
+        "visitante": 1.0365
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841152",
+      "rodada": 19,
+      "data_iso": "2026-07-22T19:30",
+      "mandante": "Coritiba",
+      "visitante": "Palmeiras",
+      "estadio": "Couto Pereira",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 26.1671,
+        "empate": 26.1975,
+        "visitante": 47.6354
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 26.2,
+        "empate": 26.2,
+        "visitante": 47.6
+      },
+      "exibicao": {
+        "mandante": "26,2%",
+        "empate": "26,2%",
+        "visitante": "47,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.02,
+        "visitante": 1.474
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841150",
+      "rodada": 19,
+      "data_iso": "2026-07-22T21:30",
+      "mandante": "Chapecoense",
+      "visitante": "Flamengo",
+      "estadio": "Arena Condá",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 15.2775,
+        "empate": 20.6039,
+        "visitante": 64.1186
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 15.3,
+        "empate": 20.6,
+        "visitante": 64.1
+      },
+      "exibicao": {
+        "mandante": "15,3%",
+        "empate": "20,6%",
+        "visitante": "64,1%"
+      },
+      "gols_esperados": {
+        "mandante": 0.8642,
+        "visitante": 2.0126
+      },
+      "placar_modal": {
+        "mandante": 0,
+        "visitante": 2
+      }
+    },
+    {
+      "event_id": "401841154",
+      "rodada": 19,
+      "data_iso": "2026-07-22T21:30",
+      "mandante": "Internacional",
+      "visitante": "Cruzeiro",
+      "estadio": "Estadio Beira-Rio",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 41.099,
+        "empate": 28.1196,
+        "visitante": 30.7814
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 41.1,
+        "empate": 28.1,
+        "visitante": 30.8
+      },
+      "exibicao": {
+        "mandante": "41,1%",
+        "empate": "28,1%",
+        "visitante": "30,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2582,
+        "visitante": 1.0487
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841156",
+      "rodada": 19,
+      "data_iso": "2026-07-22T21:30",
+      "mandante": "São Paulo",
+      "visitante": "Athletico-PR",
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.3486,
+        "empate": 29.1339,
+        "visitante": 27.5175
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.4,
+        "empate": 29.1,
+        "visitante": 27.5
+      },
+      "exibicao": {
+        "mandante": "43,4%",
+        "empate": "29,1%",
+        "visitante": "27,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2262,
+        "visitante": 0.9139
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401840999",
+      "rodada": 4,
+      "data_iso": "2026-07-23T19:30",
+      "mandante": "Botafogo",
+      "visitante": "Vitória",
+      "estadio": "Joao Havelange Stadium",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 63.0277,
+        "empate": 21.1301,
+        "visitante": 15.8422
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 63.0,
+        "empate": 21.1,
+        "visitante": 15.9
+      },
+      "exibicao": {
+        "mandante": "63,0%",
+        "empate": "21,1%",
+        "visitante": "15,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9611,
+        "visitante": 0.8648
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841151",
+      "rodada": 19,
+      "data_iso": "2026-07-23T19:30",
+      "mandante": "Corinthians",
+      "visitante": "Remo",
+      "estadio": "Neo Química Arena",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 54.7939,
+        "empate": 24.6579,
+        "visitante": 20.5482
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 54.8,
+        "empate": 24.7,
+        "visitante": 20.5
+      },
+      "exibicao": {
+        "mandante": "54,8%",
+        "empate": "24,7%",
+        "visitante": "20,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.634,
+        "visitante": 0.8947
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841158",
+      "rodada": 20,
+      "data_iso": "2026-07-25T18:30",
+      "mandante": "Athletico-PR",
+      "visitante": "Internacional",
+      "estadio": "Arena da Baixada",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 50.1784,
+        "empate": 26.9532,
+        "visitante": 22.8684
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 50.2,
+        "empate": 26.9,
+        "visitante": 22.9
+      },
+      "exibicao": {
+        "mandante": "50,2%",
+        "empate": "26,9%",
+        "visitante": "22,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4305,
+        "visitante": 0.8697
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841161",
+      "rodada": 20,
+      "data_iso": "2026-07-25T18:30",
+      "mandante": "Santos",
+      "visitante": "Chapecoense",
+      "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 64.9288,
+        "empate": 19.87,
+        "visitante": 15.2012
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 64.9,
+        "empate": 19.9,
+        "visitante": 15.2
+      },
+      "exibicao": {
+        "mandante": "64,9%",
+        "empate": "19,9%",
+        "visitante": "15,2%"
+      },
+      "gols_esperados": {
+        "mandante": 2.1053,
+        "visitante": 0.9081
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841160",
+      "rodada": 20,
+      "data_iso": "2026-07-25T20:30",
+      "mandante": "Vasco da Gama",
+      "visitante": "Mirassol",
+      "estadio": "Estádio São Januário",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 38.1282,
+        "empate": 25.9536,
+        "visitante": 35.9182
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 38.1,
+        "empate": 26.0,
+        "visitante": 35.9
+      },
+      "exibicao": {
+        "mandante": "38,1%",
+        "empate": "26,0%",
+        "visitante": "35,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.361,
+        "visitante": 1.3132
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841159",
+      "rodada": 20,
+      "data_iso": "2026-07-26T16:00",
+      "mandante": "Bahia",
+      "visitante": "Corinthians",
+      "estadio": "Arena Fonte Nova",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.9349,
+        "empate": 26.4279,
+        "visitante": 25.6372
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.9,
+        "empate": 26.4,
+        "visitante": 25.7
+      },
+      "exibicao": {
+        "mandante": "47,9%",
+        "empate": "26,4%",
+        "visitante": "25,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4576,
+        "visitante": 0.9896
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841167",
+      "rodada": 20,
+      "data_iso": "2026-07-26T16:00",
+      "mandante": "Cruzeiro",
+      "visitante": "Botafogo",
+      "estadio": "Estadio Mineirão",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.9357,
+        "empate": 26.2531,
+        "visitante": 29.8112
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.9,
+        "empate": 26.3,
+        "visitante": 29.8
+      },
+      "exibicao": {
+        "mandante": "43,9%",
+        "empate": "26,3%",
+        "visitante": "29,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4318,
+        "visitante": 1.1311
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841163",
+      "rodada": 20,
+      "data_iso": "2026-07-26T18:30",
+      "mandante": "Bragantino",
+      "visitante": "Coritiba",
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.8834,
+        "empate": 24.1937,
+        "visitante": 22.9229
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.9,
+        "empate": 24.2,
+        "visitante": 22.9
+      },
+      "exibicao": {
+        "mandante": "52,9%",
+        "empate": "24,2%",
+        "visitante": "22,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6825,
+        "visitante": 1.0202
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841165",
+      "rodada": 20,
+      "data_iso": "2026-07-26T18:30",
+      "mandante": "Grêmio",
+      "visitante": "Fluminense",
+      "estadio": "Arena do Grêmio",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.7773,
+        "empate": 27.7966,
+        "visitante": 31.4261
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.8,
+        "empate": 27.8,
+        "visitante": 31.4
+      },
+      "exibicao": {
+        "mandante": "40,8%",
+        "empate": "27,8%",
+        "visitante": "31,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2743,
+        "visitante": 1.0827
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841166",
+      "rodada": 20,
+      "data_iso": "2026-07-26T18:30",
+      "mandante": "Flamengo",
+      "visitante": "São Paulo",
+      "estadio": "Estadio do Maracana",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 65.7197,
+        "empate": 20.8429,
+        "visitante": 13.4374
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 65.7,
+        "empate": 20.9,
+        "visitante": 13.4
+      },
+      "exibicao": {
+        "mandante": "65,7%",
+        "empate": "20,9%",
+        "visitante": "13,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9406,
+        "visitante": 0.7402
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841162",
+      "rodada": 20,
+      "data_iso": "2026-07-26T19:30",
+      "mandante": "Remo",
+      "visitante": "Vitória",
+      "estadio": "Mangueirão",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.7647,
+        "empate": 26.2174,
+        "visitante": 27.0179
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.8,
+        "empate": 26.2,
+        "visitante": 27.0
+      },
+      "exibicao": {
+        "mandante": "46,8%",
+        "empate": "26,2%",
+        "visitante": "27,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4651,
+        "visitante": 1.0468
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841164",
+      "rodada": 20,
+      "data_iso": "2026-07-26T19:30",
+      "mandante": "Palmeiras",
+      "visitante": "Atlético-MG",
+      "estadio": "Allianz Parque",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 64.0896,
+        "empate": 22.4542,
+        "visitante": 13.4562
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 64.1,
+        "empate": 22.4,
+        "visitante": 13.5
+      },
+      "exibicao": {
+        "mandante": "64,1%",
+        "empate": "22,4%",
+        "visitante": "13,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7767,
+        "visitante": 0.6666
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841168",
+      "rodada": 21,
+      "data_iso": "2026-07-29T15:00",
+      "mandante": "Atlético-MG",
+      "visitante": "Bragantino",
+      "estadio": "Arena MRV",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.2351,
+        "empate": 27.2102,
+        "visitante": 26.5547
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.2,
+        "empate": 27.2,
+        "visitante": 26.6
+      },
+      "exibicao": {
+        "mandante": "46,2%",
+        "empate": "27,2%",
+        "visitante": "26,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3833,
+        "visitante": 0.9774
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841169",
+      "rodada": 21,
+      "data_iso": "2026-07-29T15:00",
+      "mandante": "São Paulo",
+      "visitante": "Santos",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.2188,
+        "empate": 24.8734,
+        "visitante": 22.9078
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.2,
+        "empate": 24.9,
+        "visitante": 22.9
+      },
+      "exibicao": {
+        "mandante": "52,2%",
+        "empate": "24,9%",
+        "visitante": "22,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6139,
+        "visitante": 0.9784
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841175",
+      "rodada": 21,
+      "data_iso": "2026-07-29T15:00",
+      "mandante": "Chapecoense",
+      "visitante": "Vasco da Gama",
+      "estadio": "Arena Condá",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 36.7663,
+        "empate": 25.4206,
+        "visitante": 37.8131
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 36.8,
+        "empate": 25.4,
+        "visitante": 37.8
+      },
+      "exibicao": {
+        "mandante": "36,8%",
+        "empate": "25,4%",
+        "visitante": "37,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.375,
+        "visitante": 1.398
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841176",
+      "rodada": 21,
+      "data_iso": "2026-07-29T15:00",
+      "mandante": "Botafogo",
+      "visitante": "Grêmio",
+      "estadio": "Joao Havelange Stadium",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 60.579,
+        "empate": 21.4645,
+        "visitante": 17.9565
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 60.6,
+        "empate": 21.5,
+        "visitante": 17.9
+      },
+      "exibicao": {
+        "mandante": "60,6%",
+        "empate": "21,5%",
+        "visitante": "17,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9582,
+        "visitante": 0.9625
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841170",
+      "rodada": 21,
+      "data_iso": "2026-07-29T19:30",
+      "mandante": "Mirassol",
+      "visitante": "Remo",
+      "estadio": "Estadio Municipal José Maria de Campos Maia",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 59.1401,
+        "empate": 22.4798,
+        "visitante": 18.3801
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 59.1,
+        "empate": 22.5,
+        "visitante": 18.4
+      },
+      "exibicao": {
+        "mandante": "59,1%",
+        "empate": "22,5%",
+        "visitante": "18,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.8444,
+        "visitante": 0.9192
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841171",
+      "rodada": 21,
+      "data_iso": "2026-07-29T19:30",
+      "mandante": "Internacional",
+      "visitante": "Flamengo",
+      "estadio": "Estadio Beira-Rio",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 28.1492,
+        "empate": 26.1117,
+        "visitante": 45.7391
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 28.2,
+        "empate": 26.1,
+        "visitante": 45.7
+      },
+      "exibicao": {
+        "mandante": "28,2%",
+        "empate": "26,1%",
+        "visitante": "45,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0893,
+        "visitante": 1.464
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841172",
+      "rodada": 21,
+      "data_iso": "2026-07-29T21:30",
+      "mandante": "Vitória",
+      "visitante": "Palmeiras",
+      "estadio": "Estadio Manoel Barradas",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 24.0809,
+        "empate": 27.6465,
+        "visitante": 48.2726
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 24.1,
+        "empate": 27.6,
+        "visitante": 48.3
+      },
+      "exibicao": {
+        "mandante": "24,1%",
+        "empate": "27,6%",
+        "visitante": "48,3%"
+      },
+      "gols_esperados": {
+        "mandante": 0.8786,
+        "visitante": 1.3689
+      },
+      "placar_modal": {
+        "mandante": 0,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841177",
+      "rodada": 21,
+      "data_iso": "2026-07-29T21:30",
+      "mandante": "Fluminense",
+      "visitante": "Bahia",
+      "estadio": "Estadio do Maracana",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 49.9367,
+        "empate": 25.8207,
+        "visitante": 24.2426
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 49.9,
+        "empate": 25.8,
+        "visitante": 24.3
+      },
+      "exibicao": {
+        "mandante": "49,9%",
+        "empate": "25,8%",
+        "visitante": "24,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5204,
+        "visitante": 0.9748
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841174",
+      "rodada": 21,
+      "data_iso": "2026-07-30T19:30",
+      "mandante": "Corinthians",
+      "visitante": "Athletico-PR",
+      "estadio": "Neo Química Arena",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.291,
+        "empate": 29.3808,
+        "visitante": 27.3282
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.3,
+        "empate": 29.4,
+        "visitante": 27.3
+      },
+      "exibicao": {
+        "mandante": "43,3%",
+        "empate": "29,4%",
+        "visitante": "27,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2113,
+        "visitante": 0.8983
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841173",
+      "rodada": 21,
+      "data_iso": "2026-07-30T21:30",
+      "mandante": "Coritiba",
+      "visitante": "Cruzeiro",
+      "estadio": "Couto Pereira",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 39.8337,
+        "empate": 27.1492,
+        "visitante": 33.0171
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 39.8,
+        "empate": 27.2,
+        "visitante": 33.0
+      },
+      "exibicao": {
+        "mandante": "39,8%",
+        "empate": "27,2%",
+        "visitante": "33,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3033,
+        "visitante": 1.161
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841181",
+      "rodada": 22,
+      "data_iso": "2026-08-08T16:00",
+      "mandante": "Grêmio",
+      "visitante": "São Paulo",
+      "estadio": "Arena do Grêmio",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 44.0234,
+        "empate": 27.4005,
+        "visitante": 28.5761
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 44.0,
+        "empate": 27.4,
+        "visitante": 28.6
+      },
+      "exibicao": {
+        "mandante": "44,0%",
+        "empate": "27,4%",
+        "visitante": "28,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3459,
+        "visitante": 1.0276
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841178",
+      "rodada": 22,
+      "data_iso": "2026-08-08T18:30",
+      "mandante": "Remo",
+      "visitante": "Atlético-MG",
+      "estadio": "Mangueirão",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.6673,
+        "empate": 27.1055,
+        "visitante": 32.2272
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.7,
+        "empate": 27.1,
+        "visitante": 32.2
+      },
+      "exibicao": {
+        "mandante": "40,7%",
+        "empate": "27,1%",
+        "visitante": "32,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3201,
+        "visitante": 1.1439
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841184",
+      "rodada": 22,
+      "data_iso": "2026-08-08T20:30",
+      "mandante": "Coritiba",
+      "visitante": "Chapecoense",
+      "estadio": "Couto Pereira",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 65.012,
+        "empate": 19.9045,
+        "visitante": 15.0835
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 65.0,
+        "empate": 19.9,
+        "visitante": 15.1
+      },
+      "exibicao": {
+        "mandante": "65,0%",
+        "empate": "19,9%",
+        "visitante": "15,1%"
+      },
+      "gols_esperados": {
+        "mandante": 2.0974,
+        "visitante": 0.8981
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841185",
+      "rodada": 22,
+      "data_iso": "2026-08-08T21:00",
+      "mandante": "Botafogo",
+      "visitante": "Fluminense",
+      "estadio": "Joao Havelange Stadium",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.8792,
+        "empate": 24.3941,
+        "visitante": 22.7267
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.9,
+        "empate": 24.4,
+        "visitante": 22.7
+      },
+      "exibicao": {
+        "mandante": "52,9%",
+        "empate": "24,4%",
+        "visitante": "22,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6619,
+        "visitante": 0.9997
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841183",
+      "rodada": 22,
+      "data_iso": "2026-08-09T11:00",
+      "mandante": "Cruzeiro",
+      "visitante": "Mirassol",
+      "estadio": "Estadio Mineirão",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.3697,
+        "empate": 27.0703,
+        "visitante": 25.56
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.4,
+        "empate": 27.1,
+        "visitante": 25.5
+      },
+      "exibicao": {
+        "mandante": "47,4%",
+        "empate": "27,1%",
+        "visitante": "25,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4035,
+        "visitante": 0.9533
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841180",
+      "rodada": 22,
+      "data_iso": "2026-08-09T16:00",
+      "mandante": "Palmeiras",
+      "visitante": "Internacional",
+      "estadio": "Allianz Parque",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 66.6924,
+        "empate": 20.833,
+        "visitante": 12.4746
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 66.7,
+        "empate": 20.8,
+        "visitante": 12.5
+      },
+      "exibicao": {
+        "mandante": "66,7%",
+        "empate": "20,8%",
+        "visitante": "12,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9177,
+        "visitante": 0.6836
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841186",
+      "rodada": 22,
+      "data_iso": "2026-08-09T16:00",
+      "mandante": "Bahia",
+      "visitante": "Vasco da Gama",
+      "estadio": "Arena Fonte Nova",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 57.8962,
+        "empate": 22.1746,
+        "visitante": 19.9292
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 57.9,
+        "empate": 22.2,
+        "visitante": 19.9
+      },
+      "exibicao": {
+        "mandante": "57,9%",
+        "empate": "22,2%",
+        "visitante": "19,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.8962,
+        "visitante": 1.0177
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841179",
+      "rodada": 22,
+      "data_iso": "2026-08-09T18:30",
+      "mandante": "Bragantino",
+      "visitante": "Corinthians",
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.6053,
+        "empate": 27.3774,
+        "visitante": 26.0173
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.6,
+        "empate": 27.4,
+        "visitante": 26.0
+      },
+      "exibicao": {
+        "mandante": "46,6%",
+        "empate": "27,4%",
+        "visitante": "26,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3746,
+        "visitante": 0.9524
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841182",
+      "rodada": 22,
+      "data_iso": "2026-08-09T18:30",
+      "mandante": "Santos",
+      "visitante": "Athletico-PR",
+      "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.9026,
+        "empate": 27.4092,
+        "visitante": 31.6882
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.9,
+        "empate": 27.4,
+        "visitante": 31.7
+      },
+      "exibicao": {
+        "mandante": "40,9%",
+        "empate": "27,4%",
+        "visitante": "31,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3025,
+        "visitante": 1.1117
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841187",
+      "rodada": 22,
+      "data_iso": "2026-08-09T19:30",
+      "mandante": "Flamengo",
+      "visitante": "Vitória",
+      "estadio": "Estadio do Maracana",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 71.7765,
+        "empate": 18.0206,
+        "visitante": 10.2029
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 71.8,
+        "empate": 18.0,
+        "visitante": 10.2
+      },
+      "exibicao": {
+        "mandante": "71,8%",
+        "empate": "18,0%",
+        "visitante": "10,2%"
+      },
+      "gols_esperados": {
+        "mandante": 2.1682,
+        "visitante": 0.6747
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841192",
+      "rodada": 23,
+      "data_iso": "2026-08-15T16:30",
+      "mandante": "Fluminense",
+      "visitante": "Palmeiras",
+      "estadio": "Estadio do Maracana",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 31.7395,
+        "empate": 29.2245,
+        "visitante": 39.036
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 31.8,
+        "empate": 29.2,
+        "visitante": 39.0
+      },
+      "exibicao": {
+        "mandante": "31,8%",
+        "empate": "29,2%",
+        "visitante": "39,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0156,
+        "visitante": 1.16
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841195",
+      "rodada": 23,
+      "data_iso": "2026-08-15T16:30",
+      "mandante": "Atlético-MG",
+      "visitante": "Grêmio",
+      "estadio": "Arena MRV",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 49.5724,
+        "empate": 26.3504,
+        "visitante": 24.0772
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 49.6,
+        "empate": 26.3,
+        "visitante": 24.1
+      },
+      "exibicao": {
+        "mandante": "49,6%",
+        "empate": "26,3%",
+        "visitante": "24,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4744,
+        "visitante": 0.9407
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841196",
+      "rodada": 23,
+      "data_iso": "2026-08-15T18:30",
+      "mandante": "Athletico-PR",
+      "visitante": "Bragantino",
+      "estadio": "Arena da Baixada",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 48.0517,
+        "empate": 27.4958,
+        "visitante": 24.4525
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 48.0,
+        "empate": 27.5,
+        "visitante": 24.5
+      },
+      "exibicao": {
+        "mandante": "48,0%",
+        "empate": "27,5%",
+        "visitante": "24,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3779,
+        "visitante": 0.8973
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841189",
+      "rodada": 23,
+      "data_iso": "2026-08-15T21:00",
+      "mandante": "São Paulo",
+      "visitante": "Coritiba",
+      "estadio": "Estádio Cícero Pompeu de Toledo",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 51.8654,
+        "empate": 25.0535,
+        "visitante": 23.0811
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 51.9,
+        "empate": 25.0,
+        "visitante": 23.1
+      },
+      "exibicao": {
+        "mandante": "51,9%",
+        "empate": "25,0%",
+        "visitante": "23,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5962,
+        "visitante": 0.9747
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841194",
+      "rodada": 23,
+      "data_iso": "2026-08-16T11:00",
+      "mandante": "Chapecoense",
+      "visitante": "Bahia",
+      "estadio": "Arena Condá",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 28.9303,
+        "empate": 25.2719,
+        "visitante": 45.7978
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 28.9,
+        "empate": 25.3,
+        "visitante": 45.8
+      },
+      "exibicao": {
+        "mandante": "28,9%",
+        "empate": "25,3%",
+        "visitante": "45,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1695,
+        "visitante": 1.538
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841188",
+      "rodada": 23,
+      "data_iso": "2026-08-16T16:00",
+      "mandante": "Vasco da Gama",
+      "visitante": "Santos",
+      "estadio": "Estádio São Januário",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.4857,
+        "empate": 24.3053,
+        "visitante": 29.209
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.5,
+        "empate": 24.3,
+        "visitante": 29.2
+      },
+      "exibicao": {
+        "mandante": "46,5%",
+        "empate": "24,3%",
+        "visitante": "29,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6397,
+        "visitante": 1.251
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841190",
+      "rodada": 23,
+      "data_iso": "2026-08-16T18:30",
+      "mandante": "Mirassol",
+      "visitante": "Flamengo",
+      "estadio": "Estadio Municipal José Maria de Campos Maia",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 32.6645,
+        "empate": 26.5796,
+        "visitante": 40.7559
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 32.7,
+        "empate": 26.6,
+        "visitante": 40.7
+      },
+      "exibicao": {
+        "mandante": "32,7%",
+        "empate": "26,6%",
+        "visitante": "40,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1889,
+        "visitante": 1.3603
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841197",
+      "rodada": 23,
+      "data_iso": "2026-08-16T18:30",
+      "mandante": "Vitória",
+      "visitante": "Botafogo",
+      "estadio": "Estadio Manoel Barradas",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 34.1438,
+        "empate": 26.2966,
+        "visitante": 39.5596
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 34.1,
+        "empate": 26.3,
+        "visitante": 39.6
+      },
+      "exibicao": {
+        "mandante": "34,1%",
+        "empate": "26,3%",
+        "visitante": "39,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2457,
+        "visitante": 1.3615
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841193",
+      "rodada": 23,
+      "data_iso": "2026-08-16T19:30",
+      "mandante": "Corinthians",
+      "visitante": "Cruzeiro",
+      "estadio": "Neo Química Arena",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 42.2395,
+        "empate": 29.0605,
+        "visitante": 28.7
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 42.2,
+        "empate": 29.1,
+        "visitante": 28.7
+      },
+      "exibicao": {
+        "mandante": "42,2%",
+        "empate": "29,1%",
+        "visitante": "28,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2166,
+        "visitante": 0.9485
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841191",
+      "rodada": 23,
+      "data_iso": "2026-08-17T20:00",
+      "mandante": "Internacional",
+      "visitante": "Remo",
+      "estadio": "Estadio Beira-Rio",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 53.8153,
+        "empate": 24.118,
+        "visitante": 22.0667
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 53.8,
+        "empate": 24.1,
+        "visitante": 22.1
+      },
+      "exibicao": {
+        "mandante": "53,8%",
+        "empate": "24,1%",
+        "visitante": "22,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6899,
+        "visitante": 0.9892
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841205",
+      "rodada": 24,
+      "data_iso": "2026-08-22T16:00",
+      "mandante": "Fluminense",
+      "visitante": "Remo",
+      "estadio": "Estadio do Maracana",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 58.2431,
+        "empate": 23.4305,
+        "visitante": 18.3264
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 58.3,
+        "empate": 23.4,
+        "visitante": 18.3
+      },
+      "exibicao": {
+        "mandante": "58,3%",
+        "empate": "23,4%",
+        "visitante": "18,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.743,
+        "visitante": 0.8619
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841204",
+      "rodada": 24,
+      "data_iso": "2026-08-22T18:30",
+      "mandante": "Internacional",
+      "visitante": "Atlético-MG",
+      "estadio": "Estadio Beira-Rio",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 45.257,
+        "empate": 27.3335,
+        "visitante": 27.4095
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 45.3,
+        "empate": 27.3,
+        "visitante": 27.4
+      },
+      "exibicao": {
+        "mandante": "45,3%",
+        "empate": "27,3%",
+        "visitante": "27,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3646,
+        "visitante": 0.997
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841206",
+      "rodada": 24,
+      "data_iso": "2026-08-22T20:30",
+      "mandante": "Cruzeiro",
+      "visitante": "Flamengo",
+      "estadio": "Estadio Mineirão",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 32.8431,
+        "empate": 27.8065,
+        "visitante": 39.3504
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 32.8,
+        "empate": 27.8,
+        "visitante": 39.4
+      },
+      "exibicao": {
+        "mandante": "32,8%",
+        "empate": "27,8%",
+        "visitante": "39,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1171,
+        "visitante": 1.2506
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841200",
+      "rodada": 24,
+      "data_iso": "2026-08-23T16:00",
+      "mandante": "Vitória",
+      "visitante": "Bahia",
+      "estadio": "Estadio Manoel Barradas",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.3947,
+        "empate": 27.1119,
+        "visitante": 32.4934
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.4,
+        "empate": 27.1,
+        "visitante": 32.5
+      },
+      "exibicao": {
+        "mandante": "40,4%",
+        "empate": "27,1%",
+        "visitante": "32,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3153,
+        "visitante": 1.1503
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841202",
+      "rodada": 24,
+      "data_iso": "2026-08-23T16:00",
+      "mandante": "Bragantino",
+      "visitante": "Grêmio",
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 50.8764,
+        "empate": 25.4143,
+        "visitante": 23.7093
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 50.9,
+        "empate": 25.4,
+        "visitante": 23.7
+      },
+      "exibicao": {
+        "mandante": "50,9%",
+        "empate": "25,4%",
+        "visitante": "23,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5602,
+        "visitante": 0.978
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841203",
+      "rodada": 24,
+      "data_iso": "2026-08-23T16:00",
+      "mandante": "Palmeiras",
+      "visitante": "Vasco da Gama",
+      "estadio": "Allianz Parque",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 73.2068,
+        "empate": 17.1529,
+        "visitante": 9.6403
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 73.2,
+        "empate": 17.2,
+        "visitante": 9.6
+      },
+      "exibicao": {
+        "mandante": "73,2%",
+        "empate": "17,2%",
+        "visitante": "9,6%"
+      },
+      "gols_esperados": {
+        "mandante": 2.2566,
+        "visitante": 0.6798
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841199",
+      "rodada": 24,
+      "data_iso": "2026-08-23T18:30",
+      "mandante": "Chapecoense",
+      "visitante": "São Paulo",
+      "estadio": "Arena Condá",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 29.3332,
+        "empate": 26.9376,
+        "visitante": 43.7292
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 29.3,
+        "empate": 27.0,
+        "visitante": 43.7
+      },
+      "exibicao": {
+        "mandante": "29,3%",
+        "empate": "27,0%",
+        "visitante": "43,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0754,
+        "visitante": 1.376
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841201",
+      "rodada": 24,
+      "data_iso": "2026-08-23T18:30",
+      "mandante": "Santos",
+      "visitante": "Mirassol",
+      "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 41.0835,
+        "empate": 25.8591,
+        "visitante": 33.0574
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 41.1,
+        "empate": 25.9,
+        "visitante": 33.0
+      },
+      "exibicao": {
+        "mandante": "41,1%",
+        "empate": "25,9%",
+        "visitante": "33,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4229,
+        "visitante": 1.2493
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841207",
+      "rodada": 24,
+      "data_iso": "2026-08-23T19:30",
+      "mandante": "Coritiba",
+      "visitante": "Corinthians",
+      "estadio": "Couto Pereira",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.3913,
+        "empate": 26.828,
+        "visitante": 29.7807
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.4,
+        "empate": 26.8,
+        "visitante": 29.8
+      },
+      "exibicao": {
+        "mandante": "43,4%",
+        "empate": "26,8%",
+        "visitante": "29,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.38,
+        "visitante": 1.0946
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841198",
+      "rodada": 24,
+      "data_iso": "2026-08-24T20:00",
+      "mandante": "Botafogo",
+      "visitante": "Athletico-PR",
+      "estadio": "Joao Havelange Stadium",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 53.3362,
+        "empate": 24.7958,
+        "visitante": 21.868
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 53.3,
+        "empate": 24.8,
+        "visitante": 21.9
+      },
+      "exibicao": {
+        "mandante": "53,3%",
+        "empate": "24,8%",
+        "visitante": "21,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6222,
+        "visitante": 0.9414
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841209",
+      "rodada": 25,
+      "data_iso": "2026-08-29T15:00",
+      "mandante": "São Paulo",
+      "visitante": "Bragantino",
+      "estadio": "Estádio Cícero Pompeu de Toledo",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.5406,
+        "empate": 27.1745,
+        "visitante": 26.2849
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.5,
+        "empate": 27.2,
+        "visitante": 26.3
+      },
+      "exibicao": {
+        "mandante": "46,5%",
+        "empate": "27,2%",
+        "visitante": "26,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3887,
+        "visitante": 0.9709
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841211",
+      "rodada": 25,
+      "data_iso": "2026-08-29T15:00",
+      "mandante": "Mirassol",
+      "visitante": "Palmeiras",
+      "estadio": "Estadio Municipal José Maria de Campos Maia",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 31.9225,
+        "empate": 28.1633,
+        "visitante": 39.9142
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 31.9,
+        "empate": 28.2,
+        "visitante": 39.9
+      },
+      "exibicao": {
+        "mandante": "31,9%",
+        "empate": "28,2%",
+        "visitante": "39,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0748,
+        "visitante": 1.2371
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841212",
+      "rodada": 25,
+      "data_iso": "2026-08-29T15:00",
+      "mandante": "Vasco da Gama",
+      "visitante": "Cruzeiro",
+      "estadio": "Estádio São Januário",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 36.8634,
+        "empate": 27.0979,
+        "visitante": 36.0387
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 36.9,
+        "empate": 27.1,
+        "visitante": 36.0
+      },
+      "exibicao": {
+        "mandante": "36,9%",
+        "empate": "27,1%",
+        "visitante": "36,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2512,
+        "visitante": 1.234
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841215",
+      "rodada": 25,
+      "data_iso": "2026-08-29T15:00",
+      "mandante": "Bahia",
+      "visitante": "Internacional",
+      "estadio": "Arena Fonte Nova",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 51.0628,
+        "empate": 24.8717,
+        "visitante": 24.0655
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 51.0,
+        "empate": 24.9,
+        "visitante": 24.1
+      },
+      "exibicao": {
+        "mandante": "51,0%",
+        "empate": "24,9%",
+        "visitante": "24,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6114,
+        "visitante": 1.0234
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841216",
+      "rodada": 25,
+      "data_iso": "2026-08-29T15:00",
+      "mandante": "Atlético-MG",
+      "visitante": "Vitória",
+      "estadio": "Arena MRV",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.0316,
+        "empate": 26.4455,
+        "visitante": 21.5229
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.0,
+        "empate": 26.5,
+        "visitante": 21.5
+      },
+      "exibicao": {
+        "mandante": "52,0%",
+        "empate": "26,5%",
+        "visitante": "21,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4766,
+        "visitante": 0.8452
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841217",
+      "rodada": 25,
+      "data_iso": "2026-08-29T15:00",
+      "mandante": "Grêmio",
+      "visitante": "Chapecoense",
+      "estadio": "Arena do Grêmio",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 64.8484,
+        "empate": 20.4976,
+        "visitante": 14.654
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 64.8,
+        "empate": 20.5,
+        "visitante": 14.7
+      },
+      "exibicao": {
+        "mandante": "64,8%",
+        "empate": "20,5%",
+        "visitante": "14,7%"
+      },
+      "gols_esperados": {
+        "mandante": 2.0107,
+        "visitante": 0.8328
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841219",
+      "rodada": 26,
+      "data_iso": "2026-09-05T15:00",
+      "mandante": "Coritiba",
+      "visitante": "Mirassol",
+      "estadio": "Couto Pereira",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 41.2432,
+        "empate": 25.9548,
+        "visitante": 32.802
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 41.2,
+        "empate": 26.0,
+        "visitante": 32.8
+      },
+      "exibicao": {
+        "mandante": "41,2%",
+        "empate": "26,0%",
+        "visitante": "32,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4176,
+        "visitante": 1.2356
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841220",
+      "rodada": 26,
+      "data_iso": "2026-09-05T15:00",
+      "mandante": "Corinthians",
+      "visitante": "Chapecoense",
+      "estadio": "Neo Química Arena",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 66.2424,
+        "empate": 20.6203,
+        "visitante": 13.1373
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 66.3,
+        "empate": 20.6,
+        "visitante": 13.1
+      },
+      "exibicao": {
+        "mandante": "66,3%",
+        "empate": "20,6%",
+        "visitante": "13,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9579,
+        "visitante": 0.7338
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841221",
+      "rodada": 26,
+      "data_iso": "2026-09-05T15:00",
+      "mandante": "Botafogo",
+      "visitante": "Palmeiras",
+      "estadio": "Joao Havelange Stadium",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 36.9258,
+        "empate": 26.771,
+        "visitante": 36.3032
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 36.9,
+        "empate": 26.8,
+        "visitante": 36.3
+      },
+      "exibicao": {
+        "mandante": "36,9%",
+        "empate": "26,8%",
+        "visitante": "36,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2752,
+        "visitante": 1.262
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841222",
+      "rodada": 26,
+      "data_iso": "2026-09-05T15:00",
+      "mandante": "Vitória",
+      "visitante": "Grêmio",
+      "estadio": "Estadio Manoel Barradas",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.7279,
+        "empate": 27.3051,
+        "visitante": 28.967
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.7,
+        "empate": 27.3,
+        "visitante": 29.0
+      },
+      "exibicao": {
+        "mandante": "43,7%",
+        "empate": "27,3%",
+        "visitante": "29,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3492,
+        "visitante": 1.044
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841223",
+      "rodada": 26,
+      "data_iso": "2026-09-05T15:00",
+      "mandante": "Internacional",
+      "visitante": "Santos",
+      "estadio": "Estadio Beira-Rio",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 51.0339,
+        "empate": 24.493,
+        "visitante": 24.4731
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 51.0,
+        "empate": 24.5,
+        "visitante": 24.5
+      },
+      "exibicao": {
+        "mandante": "51,0%",
+        "empate": "24,5%",
+        "visitante": "24,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6488,
+        "visitante": 1.0631
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841225",
+      "rodada": 26,
+      "data_iso": "2026-09-05T15:00",
+      "mandante": "Remo",
+      "visitante": "Flamengo",
+      "estadio": "Estadio Evandro Almeida (Baenao)",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 23.777,
+        "empate": 24.2139,
+        "visitante": 52.0091
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 23.8,
+        "empate": 24.2,
+        "visitante": 52.0
+      },
+      "exibicao": {
+        "mandante": "23,8%",
+        "empate": "24,2%",
+        "visitante": "52,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0538,
+        "visitante": 1.6797
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841226",
+      "rodada": 26,
+      "data_iso": "2026-09-05T15:00",
+      "mandante": "São Paulo",
+      "visitante": "Atlético-MG",
+      "estadio": "Estádio Cícero Pompeu de Toledo",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.3838,
+        "empate": 27.9066,
+        "visitante": 25.7096
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.4,
+        "empate": 27.9,
+        "visitante": 25.7
+      },
+      "exibicao": {
+        "mandante": "46,4%",
+        "empate": "27,9%",
+        "visitante": "25,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3357,
+        "visitante": 0.9175
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841228",
+      "rodada": 27,
+      "data_iso": "2026-09-12T15:00",
+      "mandante": "Chapecoense",
+      "visitante": "Internacional",
+      "estadio": "Arena Condá",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 31.27,
+        "empate": 26.3215,
+        "visitante": 42.4085
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 31.3,
+        "empate": 26.3,
+        "visitante": 42.4
+      },
+      "exibicao": {
+        "mandante": "31,3%",
+        "empate": "26,3%",
+        "visitante": "42,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1685,
+        "visitante": 1.4058
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841229",
+      "rodada": 27,
+      "data_iso": "2026-09-12T15:00",
+      "mandante": "Botafogo",
+      "visitante": "Bragantino",
+      "estadio": "Joao Havelange Stadium",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 56.997,
+        "empate": 22.7016,
+        "visitante": 20.3014
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 57.0,
+        "empate": 22.7,
+        "visitante": 20.3
+      },
+      "exibicao": {
+        "mandante": "57,0%",
+        "empate": "22,7%",
+        "visitante": "20,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.8372,
+        "visitante": 1.0001
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841230",
+      "rodada": 27,
+      "data_iso": "2026-09-12T15:00",
+      "mandante": "Bahia",
+      "visitante": "Remo",
+      "estadio": "Arena Fonte Nova",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 57.5056,
+        "empate": 22.5734,
+        "visitante": 19.921
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 57.5,
+        "empate": 22.6,
+        "visitante": 19.9
+      },
+      "exibicao": {
+        "mandante": "57,5%",
+        "empate": "22,6%",
+        "visitante": "19,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.8489,
+        "visitante": 0.9901
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841232",
+      "rodada": 27,
+      "data_iso": "2026-09-12T15:00",
+      "mandante": "Coritiba",
+      "visitante": "Athletico-PR",
+      "estadio": "Couto Pereira",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 41.0432,
+        "empate": 27.5114,
+        "visitante": 31.4454
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 41.0,
+        "empate": 27.5,
+        "visitante": 31.5
+      },
+      "exibicao": {
+        "mandante": "41,0%",
+        "empate": "27,5%",
+        "visitante": "31,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2976,
+        "visitante": 1.0995
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841233",
+      "rodada": 27,
+      "data_iso": "2026-09-12T15:00",
+      "mandante": "Santos",
+      "visitante": "Cruzeiro",
+      "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 39.6842,
+        "empate": 27.0442,
+        "visitante": 33.2716
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 39.7,
+        "empate": 27.0,
+        "visitante": 33.3
+      },
+      "exibicao": {
+        "mandante": "39,7%",
+        "empate": "27,0%",
+        "visitante": "33,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3081,
+        "visitante": 1.1739
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "401841234",
+      "rodada": 27,
+      "data_iso": "2026-09-12T15:00",
+      "mandante": "Palmeiras",
+      "visitante": "São Paulo",
+      "estadio": "Allianz Parque",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 63.7526,
+        "empate": 22.6132,
+        "visitante": 13.6342
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 63.8,
+        "empate": 22.6,
+        "visitante": 13.6
+      },
+      "exibicao": {
+        "mandante": "63,8%",
+        "empate": "22,6%",
+        "visitante": "13,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7649,
+        "visitante": 0.6692
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841237",
+      "rodada": 27,
+      "data_iso": "2026-09-12T15:00",
+      "mandante": "Flamengo",
+      "visitante": "Corinthians",
+      "estadio": "Estadio do Maracana",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 65.251,
+        "empate": 21.1764,
+        "visitante": 13.5726
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 65.2,
+        "empate": 21.2,
+        "visitante": 13.6
+      },
+      "exibicao": {
+        "mandante": "65,2%",
+        "empate": "21,2%",
+        "visitante": "13,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9074,
+        "visitante": 0.7312
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "401841006",
+      "rodada": 4,
+      "data_iso": null,
+      "mandante": "Flamengo",
+      "visitante": "Mirassol",
+      "estadio": "Estadio do Maracana",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 63.97,
+        "empate": 21.0006,
+        "visitante": 15.0294
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 64.0,
+        "empate": 21.0,
+        "visitante": 15.0
+      },
+      "exibicao": {
+        "mandante": "64,0%",
+        "empate": "21,0%",
+        "visitante": "15,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9594,
+        "visitante": 0.8254
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-25-Athletico-PR-Fluminense",
+      "rodada": 25,
+      "data_iso": null,
+      "mandante": "Athletico-PR",
+      "visitante": "Fluminense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 44.3473,
+        "empate": 28.9871,
+        "visitante": 26.6656
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 44.3,
+        "empate": 29.0,
+        "visitante": 26.7
+      },
+      "exibicao": {
+        "mandante": "44,3%",
+        "empate": "29,0%",
+        "visitante": "26,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2464,
+        "visitante": 0.897
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-25-Corinthians-Santos",
+      "rodada": 25,
+      "data_iso": null,
+      "mandante": "Corinthians",
+      "visitante": "Santos",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.1396,
+        "empate": 25.0796,
+        "visitante": 22.7808
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.1,
+        "empate": 25.1,
+        "visitante": 22.8
+      },
+      "exibicao": {
+        "mandante": "52,1%",
+        "empate": "25,1%",
+        "visitante": "22,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5943,
+        "visitante": 0.9616
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-25-Flamengo-Botafogo",
+      "rodada": 25,
+      "data_iso": null,
+      "mandante": "Flamengo",
+      "visitante": "Botafogo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 61.0427,
+        "empate": 21.1244,
+        "visitante": 17.8329
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 61.1,
+        "empate": 21.1,
+        "visitante": 17.8
+      },
+      "exibicao": {
+        "mandante": "61,1%",
+        "empate": "21,1%",
+        "visitante": "17,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9989,
+        "visitante": 0.9793
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-25-Remo-Coritiba",
+      "rodada": 25,
+      "data_iso": null,
+      "mandante": "Remo",
+      "visitante": "Coritiba",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 45.7571,
+        "empate": 24.8491,
+        "visitante": 29.3938
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 45.8,
+        "empate": 24.8,
+        "visitante": 29.4
+      },
+      "exibicao": {
+        "mandante": "45,8%",
+        "empate": "24,8%",
+        "visitante": "29,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5776,
+        "visitante": 1.2152
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-26-Bragantino-Bahia",
+      "rodada": 26,
+      "data_iso": null,
+      "mandante": "Bragantino",
+      "visitante": "Bahia",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.4876,
+        "empate": 25.6332,
+        "visitante": 26.8792
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.5,
+        "empate": 25.6,
+        "visitante": 26.9
+      },
+      "exibicao": {
+        "mandante": "47,5%",
+        "empate": "25,6%",
+        "visitante": "26,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.521,
+        "visitante": 1.0776
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-26-Cruzeiro-Athletico-PR",
+      "rodada": 26,
+      "data_iso": null,
+      "mandante": "Cruzeiro",
+      "visitante": "Athletico-PR",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.6603,
+        "empate": 28.7339,
+        "visitante": 24.6058
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.7,
+        "empate": 28.7,
+        "visitante": 24.6
+      },
+      "exibicao": {
+        "mandante": "46,7%",
+        "empate": "28,7%",
+        "visitante": "24,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2847,
+        "visitante": 0.8484
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-26-Fluminense-Vasco da Gama",
+      "rodada": 26,
+      "data_iso": null,
+      "mandante": "Fluminense",
+      "visitante": "Vasco da Gama",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 58.6712,
+        "empate": 22.9988,
+        "visitante": 18.33
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 58.7,
+        "empate": 23.0,
+        "visitante": 18.3
+      },
+      "exibicao": {
+        "mandante": "58,7%",
+        "empate": "23,0%",
+        "visitante": "18,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7876,
+        "visitante": 0.886
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-27-Atlético-MG-Fluminense",
+      "rodada": 27,
+      "data_iso": null,
+      "mandante": "Atlético-MG",
+      "visitante": "Fluminense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 42.5639,
+        "empate": 28.5538,
+        "visitante": 28.8823
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 42.6,
+        "empate": 28.5,
+        "visitante": 28.9
+      },
+      "exibicao": {
+        "mandante": "42,6%",
+        "empate": "28,5%",
+        "visitante": "28,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2513,
+        "visitante": 0.9771
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-27-Grêmio-Vasco da Gama",
+      "rodada": 27,
+      "data_iso": null,
+      "mandante": "Grêmio",
+      "visitante": "Vasco da Gama",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 53.2354,
+        "empate": 23.8326,
+        "visitante": 22.932
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 53.3,
+        "empate": 23.8,
+        "visitante": 22.9
+      },
+      "exibicao": {
+        "mandante": "53,3%",
+        "empate": "23,8%",
+        "visitante": "22,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.721,
+        "visitante": 1.044
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-27-Mirassol-Vitória",
+      "rodada": 27,
+      "data_iso": null,
+      "mandante": "Mirassol",
+      "visitante": "Vitória",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 56.4498,
+        "empate": 24.4097,
+        "visitante": 19.1405
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 56.5,
+        "empate": 24.4,
+        "visitante": 19.1
+      },
+      "exibicao": {
+        "mandante": "56,5%",
+        "empate": "24,4%",
+        "visitante": "19,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6529,
+        "visitante": 0.8477
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-28-Athletico-PR-Bahia",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Athletico-PR",
+      "visitante": "Bahia",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 48.1737,
+        "empate": 26.7788,
+        "visitante": 25.0475
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 48.2,
+        "empate": 26.8,
+        "visitante": 25.0
+      },
+      "exibicao": {
+        "mandante": "48,2%",
+        "empate": "26,8%",
+        "visitante": "25,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4317,
+        "visitante": 0.9515
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-28-Atlético-MG-Chapecoense",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Atlético-MG",
+      "visitante": "Chapecoense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 66.1288,
+        "empate": 20.5239,
+        "visitante": 13.3473
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 66.1,
+        "empate": 20.5,
+        "visitante": 13.4
+      },
+      "exibicao": {
+        "mandante": "66,1%",
+        "empate": "20,5%",
+        "visitante": "13,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9743,
+        "visitante": 0.7516
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-28-Corinthians-Fluminense",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Corinthians",
+      "visitante": "Fluminense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 42.8148,
+        "empate": 28.7763,
+        "visitante": 28.4089
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 42.8,
+        "empate": 28.8,
+        "visitante": 28.4
+      },
+      "exibicao": {
+        "mandante": "42,8%",
+        "empate": "28,8%",
+        "visitante": "28,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2409,
+        "visitante": 0.9539
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-28-Flamengo-Bragantino",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Flamengo",
+      "visitante": "Bragantino",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 66.5653,
+        "empate": 20.0497,
+        "visitante": 13.385
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 66.6,
+        "empate": 20.0,
+        "visitante": 13.4
+      },
+      "exibicao": {
+        "mandante": "66,6%",
+        "empate": "20,0%",
+        "visitante": "13,4%"
+      },
+      "gols_esperados": {
+        "mandante": 2.0312,
+        "visitante": 0.7802
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-28-Grêmio-Palmeiras",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Grêmio",
+      "visitante": "Palmeiras",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 26.8456,
+        "empate": 27.3761,
+        "visitante": 45.7783
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 26.8,
+        "empate": 27.4,
+        "visitante": 45.8
+      },
+      "exibicao": {
+        "mandante": "26,8%",
+        "empate": "27,4%",
+        "visitante": "45,8%"
+      },
+      "gols_esperados": {
+        "mandante": 0.9778,
+        "visitante": 1.3669
+      },
+      "placar_modal": {
+        "mandante": 0,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-28-Mirassol-Botafogo",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Mirassol",
+      "visitante": "Botafogo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 44.0758,
+        "empate": 25.2087,
+        "visitante": 30.7155
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 44.1,
+        "empate": 25.2,
+        "visitante": 30.7
+      },
+      "exibicao": {
+        "mandante": "44,1%",
+        "empate": "25,2%",
+        "visitante": "30,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5238,
+        "visitante": 1.2303
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-28-Remo-Santos",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Remo",
+      "visitante": "Santos",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.0896,
+        "empate": 24.7054,
+        "visitante": 29.205
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.1,
+        "empate": 24.7,
+        "visitante": 29.2
+      },
+      "exibicao": {
+        "mandante": "46,1%",
+        "empate": "24,7%",
+        "visitante": "29,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5951,
+        "visitante": 1.2198
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-28-São Paulo-Internacional",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "São Paulo",
+      "visitante": "Internacional",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 48.6989,
+        "empate": 26.6961,
+        "visitante": 24.605
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 48.7,
+        "empate": 26.7,
+        "visitante": 24.6
+      },
+      "exibicao": {
+        "mandante": "48,7%",
+        "empate": "26,7%",
+        "visitante": "24,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4417,
+        "visitante": 0.941
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-28-Vasco da Gama-Coritiba",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Vasco da Gama",
+      "visitante": "Coritiba",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.1502,
+        "empate": 24.4475,
+        "visitante": 29.4023
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.2,
+        "empate": 24.4,
+        "visitante": 29.4
+      },
+      "exibicao": {
+        "mandante": "46,2%",
+        "empate": "24,4%",
+        "visitante": "29,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6217,
+        "visitante": 1.2463
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-28-Vitória-Cruzeiro",
+      "rodada": 28,
+      "data_iso": null,
+      "mandante": "Vitória",
+      "visitante": "Cruzeiro",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 36.558,
+        "empate": 29.1159,
+        "visitante": 34.3261
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 36.6,
+        "empate": 29.1,
+        "visitante": 34.3
+      },
+      "exibicao": {
+        "mandante": "36,6%",
+        "empate": "29,1%",
+        "visitante": "34,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1226,
+        "visitante": 1.0782
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-29-Athletico-PR-Atlético-MG",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Athletico-PR",
+      "visitante": "Atlético-MG",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.8262,
+        "empate": 28.2446,
+        "visitante": 23.9292
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.8,
+        "empate": 28.3,
+        "visitante": 23.9
+      },
+      "exibicao": {
+        "mandante": "47,8%",
+        "empate": "28,3%",
+        "visitante": "23,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3253,
+        "visitante": 0.848
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-29-Botafogo-Vasco da Gama",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Botafogo",
+      "visitante": "Vasco da Gama",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 66.3048,
+        "empate": 18.8237,
+        "visitante": 14.8715
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 66.3,
+        "empate": 18.8,
+        "visitante": 14.9
+      },
+      "exibicao": {
+        "mandante": "66,3%",
+        "empate": "18,8%",
+        "visitante": "14,9%"
+      },
+      "gols_esperados": {
+        "mandante": 2.2443,
+        "visitante": 0.9639
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-29-Bragantino-Mirassol",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Bragantino",
+      "visitante": "Mirassol",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 44.7028,
+        "empate": 26.6175,
+        "visitante": 28.6797
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 44.7,
+        "empate": 26.6,
+        "visitante": 28.7
+      },
+      "exibicao": {
+        "mandante": "44,7%",
+        "empate": "26,6%",
+        "visitante": "28,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4121,
+        "visitante": 1.075
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-29-Cruzeiro-São Paulo",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Cruzeiro",
+      "visitante": "São Paulo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 49.4514,
+        "empate": 27.4533,
+        "visitante": 23.0953
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 49.4,
+        "empate": 27.5,
+        "visitante": 23.1
+      },
+      "exibicao": {
+        "mandante": "49,4%",
+        "empate": "27,5%",
+        "visitante": "23,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3901,
+        "visitante": 0.855
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-29-Fluminense-Coritiba",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Fluminense",
+      "visitante": "Coritiba",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 55.2572,
+        "empate": 24.1653,
+        "visitante": 20.5775
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 55.2,
+        "empate": 24.2,
+        "visitante": 20.6
+      },
+      "exibicao": {
+        "mandante": "55,2%",
+        "empate": "24,2%",
+        "visitante": "20,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6819,
+        "visitante": 0.9229
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-29-Internacional-Corinthians",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Internacional",
+      "visitante": "Corinthians",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 44.5643,
+        "empate": 27.6863,
+        "visitante": 27.7494
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 44.6,
+        "empate": 27.7,
+        "visitante": 27.7
+      },
+      "exibicao": {
+        "mandante": "44,6%",
+        "empate": "27,7%",
+        "visitante": "27,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3322,
+        "visitante": 0.9887
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-29-Palmeiras-Bahia",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Palmeiras",
+      "visitante": "Bahia",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 65.077,
+        "empate": 21.1149,
+        "visitante": 13.8081
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 65.1,
+        "empate": 21.1,
+        "visitante": 13.8
+      },
+      "exibicao": {
+        "mandante": "65,1%",
+        "empate": "21,1%",
+        "visitante": "13,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9194,
+        "visitante": 0.7479
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-29-Remo-Grêmio",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Remo",
+      "visitante": "Grêmio",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.9783,
+        "empate": 25.8848,
+        "visitante": 30.1369
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 44.0,
+        "empate": 25.9,
+        "visitante": 30.1
+      },
+      "exibicao": {
+        "mandante": "44,0%",
+        "empate": "25,9%",
+        "visitante": "30,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4629,
+        "visitante": 1.165
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-29-Santos-Flamengo",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Santos",
+      "visitante": "Flamengo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 26.3304,
+        "empate": 24.5116,
+        "visitante": 49.158
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 26.3,
+        "empate": 24.5,
+        "visitante": 49.2
+      },
+      "exibicao": {
+        "mandante": "26,3%",
+        "empate": "24,5%",
+        "visitante": "49,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1325,
+        "visitante": 1.6388
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-29-Vitória-Chapecoense",
+      "rodada": 29,
+      "data_iso": null,
+      "mandante": "Vitória",
+      "visitante": "Chapecoense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 60.4157,
+        "empate": 22.6702,
+        "visitante": 16.9141
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 60.4,
+        "empate": 22.7,
+        "visitante": 16.9
+      },
+      "exibicao": {
+        "mandante": "60,4%",
+        "empate": "22,7%",
+        "visitante": "16,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.8067,
+        "visitante": 0.8341
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-30-Atlético-MG-Santos",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Atlético-MG",
+      "visitante": "Santos",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 51.9006,
+        "empate": 24.9336,
+        "visitante": 23.1658
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 51.9,
+        "empate": 24.9,
+        "visitante": 23.2
+      },
+      "exibicao": {
+        "mandante": "51,9%",
+        "empate": "24,9%",
+        "visitante": "23,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6076,
+        "visitante": 0.985
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-30-Bahia-Mirassol",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Bahia",
+      "visitante": "Mirassol",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 45.9623,
+        "empate": 25.7457,
+        "visitante": 28.292
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.0,
+        "empate": 25.7,
+        "visitante": 28.3
+      },
+      "exibicao": {
+        "mandante": "46,0%",
+        "empate": "25,7%",
+        "visitante": "28,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4973,
+        "visitante": 1.117
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-30-Bragantino-Cruzeiro",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Bragantino",
+      "visitante": "Cruzeiro",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.1119,
+        "empate": 27.9327,
+        "visitante": 28.9554
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.1,
+        "empate": 27.9,
+        "visitante": 29.0
+      },
+      "exibicao": {
+        "mandante": "43,1%",
+        "empate": "27,9%",
+        "visitante": "29,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2982,
+        "visitante": 1.0101
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-30-Chapecoense-Athletico-PR",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Chapecoense",
+      "visitante": "Athletico-PR",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 27.3111,
+        "empate": 27.337,
+        "visitante": 45.3519
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 27.3,
+        "empate": 27.3,
+        "visitante": 45.4
+      },
+      "exibicao": {
+        "mandante": "27,3%",
+        "empate": "27,3%",
+        "visitante": "45,4%"
+      },
+      "gols_esperados": {
+        "mandante": 0.9939,
+        "visitante": 1.3653
+      },
+      "placar_modal": {
+        "mandante": 0,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-30-Coritiba-Botafogo",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Coritiba",
+      "visitante": "Botafogo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 37.2011,
+        "empate": 24.7148,
+        "visitante": 38.0841
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 37.2,
+        "empate": 24.7,
+        "visitante": 38.1
+      },
+      "exibicao": {
+        "mandante": "37,2%",
+        "empate": "24,7%",
+        "visitante": "38,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4462,
+        "visitante": 1.466
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-30-Flamengo-Fluminense",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Flamengo",
+      "visitante": "Fluminense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 62.485,
+        "empate": 22.1619,
+        "visitante": 15.3531
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 62.5,
+        "empate": 22.2,
+        "visitante": 15.3
+      },
+      "exibicao": {
+        "mandante": "62,5%",
+        "empate": "22,2%",
+        "visitante": "15,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.8374,
+        "visitante": 0.78
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-30-Grêmio-Internacional",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Grêmio",
+      "visitante": "Internacional",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 46.6268,
+        "empate": 26.2331,
+        "visitante": 27.1401
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 46.6,
+        "empate": 26.2,
+        "visitante": 27.2
+      },
+      "exibicao": {
+        "mandante": "46,6%",
+        "empate": "26,2%",
+        "visitante": "27,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4625,
+        "visitante": 1.0498
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-30-Palmeiras-Corinthians",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Palmeiras",
+      "visitante": "Corinthians",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 63.2808,
+        "empate": 22.9639,
+        "visitante": 13.7553
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 63.3,
+        "empate": 23.0,
+        "visitante": 13.7
+      },
+      "exibicao": {
+        "mandante": "63,3%",
+        "empate": "23,0%",
+        "visitante": "13,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7346,
+        "visitante": 0.661
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-30-São Paulo-Vitória",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "São Paulo",
+      "visitante": "Vitória",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.3298,
+        "empate": 26.3812,
+        "visitante": 21.289
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.3,
+        "empate": 26.4,
+        "visitante": 21.3
+      },
+      "exibicao": {
+        "mandante": "52,3%",
+        "empate": "26,4%",
+        "visitante": "21,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4824,
+        "visitante": 0.8396
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-30-Vasco da Gama-Remo",
+      "rodada": 30,
+      "data_iso": null,
+      "mandante": "Vasco da Gama",
+      "visitante": "Remo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 49.445,
+        "empate": 24.1262,
+        "visitante": 26.4288
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 49.5,
+        "empate": 24.1,
+        "visitante": 26.4
+      },
+      "exibicao": {
+        "mandante": "49,5%",
+        "empate": "24,1%",
+        "visitante": "26,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6806,
+        "visitante": 1.164
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-31-Athletico-PR-Palmeiras",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Athletico-PR",
+      "visitante": "Palmeiras",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 30.5327,
+        "empate": 29.8948,
+        "visitante": 39.5725
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 30.5,
+        "empate": 29.9,
+        "visitante": 39.6
+      },
+      "exibicao": {
+        "mandante": "30,5%",
+        "empate": "29,9%",
+        "visitante": "39,6%"
+      },
+      "gols_esperados": {
+        "mandante": 0.9564,
+        "visitante": 1.1324
+      },
+      "placar_modal": {
+        "mandante": 0,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-31-Atlético-MG-Coritiba",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Atlético-MG",
+      "visitante": "Coritiba",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 51.5482,
+        "empate": 25.1124,
+        "visitante": 23.3394
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 51.6,
+        "empate": 25.1,
+        "visitante": 23.3
+      },
+      "exibicao": {
+        "mandante": "51,6%",
+        "empate": "25,1%",
+        "visitante": "23,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.59,
+        "visitante": 0.9813
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-31-Bahia-Flamengo",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Bahia",
+      "visitante": "Flamengo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 30.786,
+        "empate": 25.7748,
+        "visitante": 43.4392
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 30.8,
+        "empate": 25.8,
+        "visitante": 43.4
+      },
+      "exibicao": {
+        "mandante": "30,8%",
+        "empate": "25,8%",
+        "visitante": "43,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1917,
+        "visitante": 1.4652
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-31-Botafogo-Chapecoense",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Botafogo",
+      "visitante": "Chapecoense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 76.9522,
+        "empate": 14.4517,
+        "visitante": 8.5961
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 77.0,
+        "empate": 14.4,
+        "visitante": 8.6
+      },
+      "exibicao": {
+        "mandante": "77,0%",
+        "empate": "14,4%",
+        "visitante": "8,6%"
+      },
+      "gols_esperados": {
+        "mandante": 2.6221,
+        "visitante": 0.769
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-31-Corinthians-Vitória",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Corinthians",
+      "visitante": "Vitória",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.2217,
+        "empate": 26.608,
+        "visitante": 21.1703
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.2,
+        "empate": 26.6,
+        "visitante": 21.2
+      },
+      "exibicao": {
+        "mandante": "52,2%",
+        "empate": "26,6%",
+        "visitante": "21,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4643,
+        "visitante": 0.8252
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-31-Fluminense-Santos",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Fluminense",
+      "visitante": "Santos",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 55.6209,
+        "empate": 23.9729,
+        "visitante": 20.4062
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 55.6,
+        "empate": 24.0,
+        "visitante": 20.4
+      },
+      "exibicao": {
+        "mandante": "55,6%",
+        "empate": "24,0%",
+        "visitante": "20,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7006,
+        "visitante": 0.9263
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-31-Grêmio-Cruzeiro",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Grêmio",
+      "visitante": "Cruzeiro",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.2177,
+        "empate": 28.0463,
+        "visitante": 31.736
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.2,
+        "empate": 28.1,
+        "visitante": 31.7
+      },
+      "exibicao": {
+        "mandante": "40,2%",
+        "empate": "28,1%",
+        "visitante": "31,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2494,
+        "visitante": 1.0766
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-31-Mirassol-Internacional",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Mirassol",
+      "visitante": "Internacional",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.755,
+        "empate": 24.9471,
+        "visitante": 22.2979
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.8,
+        "empate": 24.9,
+        "visitante": 22.3
+      },
+      "exibicao": {
+        "mandante": "52,8%",
+        "empate": "24,9%",
+        "visitante": "22,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6076,
+        "visitante": 0.9501
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-31-Remo-Bragantino",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "Remo",
+      "visitante": "Bragantino",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.6074,
+        "empate": 26.3888,
+        "visitante": 33.0038
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.6,
+        "empate": 26.4,
+        "visitante": 33.0
+      },
+      "exibicao": {
+        "mandante": "40,6%",
+        "empate": "26,4%",
+        "visitante": "33,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3725,
+        "visitante": 1.2105
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-31-São Paulo-Vasco da Gama",
+      "rodada": 31,
+      "data_iso": null,
+      "mandante": "São Paulo",
+      "visitante": "Vasco da Gama",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 55.2877,
+        "empate": 24.0232,
+        "visitante": 20.6891
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 55.3,
+        "empate": 24.0,
+        "visitante": 20.7
+      },
+      "exibicao": {
+        "mandante": "55,3%",
+        "empate": "24,0%",
+        "visitante": "20,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6965,
+        "visitante": 0.9358
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-32-Chapecoense-Fluminense",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Chapecoense",
+      "visitante": "Fluminense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 26.5201,
+        "empate": 26.4347,
+        "visitante": 47.0452
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 26.5,
+        "empate": 26.4,
+        "visitante": 47.1
+      },
+      "exibicao": {
+        "mandante": "26,5%",
+        "empate": "26,4%",
+        "visitante": "47,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0181,
+        "visitante": 1.4499
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-32-Coritiba-Grêmio",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Coritiba",
+      "visitante": "Grêmio",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.5522,
+        "empate": 25.141,
+        "visitante": 27.3068
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.6,
+        "empate": 25.1,
+        "visitante": 27.3
+      },
+      "exibicao": {
+        "mandante": "47,6%",
+        "empate": "25,1%",
+        "visitante": "27,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5663,
+        "visitante": 1.1241
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-32-Cruzeiro-Remo",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Cruzeiro",
+      "visitante": "Remo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 58.4403,
+        "empate": 23.5069,
+        "visitante": 18.0528
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 58.4,
+        "empate": 23.5,
+        "visitante": 18.1
+      },
+      "exibicao": {
+        "mandante": "58,4%",
+        "empate": "23,5%",
+        "visitante": "18,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7331,
+        "visitante": 0.845
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-32-Flamengo-Atlético-MG",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Flamengo",
+      "visitante": "Atlético-MG",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 66.0641,
+        "empate": 20.6844,
+        "visitante": 13.2515
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 66.1,
+        "empate": 20.7,
+        "visitante": 13.2
+      },
+      "exibicao": {
+        "mandante": "66,1%",
+        "empate": "20,7%",
+        "visitante": "13,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9537,
+        "visitante": 0.7373
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-32-Internacional-Botafogo",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Internacional",
+      "visitante": "Botafogo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 38.8109,
+        "empate": 25.6869,
+        "visitante": 35.5022
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 38.8,
+        "empate": 25.7,
+        "visitante": 35.5
+      },
+      "exibicao": {
+        "mandante": "38,8%",
+        "empate": "25,7%",
+        "visitante": "35,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3962,
+        "visitante": 1.3241
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-32-Mirassol-São Paulo",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Mirassol",
+      "visitante": "São Paulo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 49.9689,
+        "empate": 26.3137,
+        "visitante": 23.7174
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 50.0,
+        "empate": 26.3,
+        "visitante": 23.7
+      },
+      "exibicao": {
+        "mandante": "50,0%",
+        "empate": "26,3%",
+        "visitante": "23,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4794,
+        "visitante": 0.93
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-32-Palmeiras-Bragantino",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Palmeiras",
+      "visitante": "Bragantino",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 64.6271,
+        "empate": 21.7607,
+        "visitante": 13.6122
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 64.6,
+        "empate": 21.8,
+        "visitante": 13.6
+      },
+      "exibicao": {
+        "mandante": "64,6%",
+        "empate": "21,8%",
+        "visitante": "13,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.8472,
+        "visitante": 0.7054
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-32-Santos-Bahia",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Santos",
+      "visitante": "Bahia",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.8132,
+        "empate": 25.0764,
+        "visitante": 31.1104
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.8,
+        "empate": 25.1,
+        "visitante": 31.1
+      },
+      "exibicao": {
+        "mandante": "43,8%",
+        "empate": "25,1%",
+        "visitante": "31,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5327,
+        "visitante": 1.2524
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-32-Vasco da Gama-Corinthians",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Vasco da Gama",
+      "visitante": "Corinthians",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.3648,
+        "empate": 26.9712,
+        "visitante": 32.664
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.4,
+        "empate": 27.0,
+        "visitante": 32.6
+      },
+      "exibicao": {
+        "mandante": "40,4%",
+        "empate": "27,0%",
+        "visitante": "32,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3249,
+        "visitante": 1.1634
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-32-Vitória-Athletico-PR",
+      "rodada": 32,
+      "data_iso": null,
+      "mandante": "Vitória",
+      "visitante": "Athletico-PR",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 37.6682,
+        "empate": 29.5817,
+        "visitante": 32.7501
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 37.7,
+        "empate": 29.6,
+        "visitante": 32.7
+      },
+      "exibicao": {
+        "mandante": "37,7%",
+        "empate": "29,6%",
+        "visitante": "32,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1177,
+        "visitante": 1.0211
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-33-Atlético-MG-Cruzeiro",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Atlético-MG",
+      "visitante": "Cruzeiro",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 41.9902,
+        "empate": 28.8321,
+        "visitante": 29.1777
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 42.0,
+        "empate": 28.8,
+        "visitante": 29.2
+      },
+      "exibicao": {
+        "mandante": "42,0%",
+        "empate": "28,8%",
+        "visitante": "29,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2268,
+        "visitante": 0.9715
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-33-Bahia-São Paulo",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Bahia",
+      "visitante": "São Paulo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 48.3084,
+        "empate": 26.1493,
+        "visitante": 25.5423
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 48.3,
+        "empate": 26.2,
+        "visitante": 25.5
+      },
+      "exibicao": {
+        "mandante": "48,3%",
+        "empate": "26,2%",
+        "visitante": "25,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.483,
+        "visitante": 1.0018
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-33-Bragantino-Chapecoense",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Bragantino",
+      "visitante": "Chapecoense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 67.6836,
+        "empate": 19.4516,
+        "visitante": 12.8648
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 67.7,
+        "empate": 19.4,
+        "visitante": 12.9
+      },
+      "exibicao": {
+        "mandante": "67,7%",
+        "empate": "19,4%",
+        "visitante": "12,9%"
+      },
+      "gols_esperados": {
+        "mandante": 2.0892,
+        "visitante": 0.7814
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-33-Corinthians-Mirassol",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Corinthians",
+      "visitante": "Mirassol",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.8261,
+        "empate": 27.6913,
+        "visitante": 28.4826
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.8,
+        "empate": 27.7,
+        "visitante": 28.5
+      },
+      "exibicao": {
+        "mandante": "43,8%",
+        "empate": "27,7%",
+        "visitante": "28,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3233,
+        "visitante": 1.0095
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-33-Coritiba-Vitória",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Coritiba",
+      "visitante": "Vitória",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 50.312,
+        "empate": 25.2969,
+        "visitante": 24.3911
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 50.3,
+        "empate": 25.3,
+        "visitante": 24.4
+      },
+      "exibicao": {
+        "mandante": "50,3%",
+        "empate": "25,3%",
+        "visitante": "24,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5687,
+        "visitante": 1.0101
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-33-Fluminense-Internacional",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Fluminense",
+      "visitante": "Internacional",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 51.9836,
+        "empate": 25.9228,
+        "visitante": 22.0936
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.0,
+        "empate": 25.9,
+        "visitante": 22.1
+      },
+      "exibicao": {
+        "mandante": "52,0%",
+        "empate": "25,9%",
+        "visitante": "22,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5191,
+        "visitante": 0.891
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-33-Grêmio-Athletico-PR",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Grêmio",
+      "visitante": "Athletico-PR",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 41.3633,
+        "empate": 28.4066,
+        "visitante": 30.2301
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 41.4,
+        "empate": 28.4,
+        "visitante": 30.2
+      },
+      "exibicao": {
+        "mandante": "41,4%",
+        "empate": "28,4%",
+        "visitante": "30,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2439,
+        "visitante": 1.0196
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-33-Remo-Botafogo",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Remo",
+      "visitante": "Botafogo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 33.8101,
+        "empate": 24.8257,
+        "visitante": 41.3642
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 33.8,
+        "empate": 24.8,
+        "visitante": 41.4
+      },
+      "exibicao": {
+        "mandante": "33,8%",
+        "empate": "24,8%",
+        "visitante": "41,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3507,
+        "visitante": 1.5193
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-33-Santos-Palmeiras",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Santos",
+      "visitante": "Palmeiras",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 25.9965,
+        "empate": 26.0315,
+        "visitante": 47.972
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 26.0,
+        "empate": 26.0,
+        "visitante": 48.0
+      },
+      "exibicao": {
+        "mandante": "26,0%",
+        "empate": "26,0%",
+        "visitante": "48,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0238,
+        "visitante": 1.4904
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-33-Vasco da Gama-Flamengo",
+      "rodada": 33,
+      "data_iso": null,
+      "mandante": "Vasco da Gama",
+      "visitante": "Flamengo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 23.8429,
+        "empate": 23.817,
+        "visitante": 52.3401
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 23.9,
+        "empate": 23.8,
+        "visitante": 52.3
+      },
+      "exibicao": {
+        "mandante": "23,9%",
+        "empate": "23,8%",
+        "visitante": "52,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0832,
+        "visitante": 1.7227
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-34-Athletico-PR-Vasco da Gama",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Athletico-PR",
+      "visitante": "Vasco da Gama",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 56.75,
+        "empate": 24.0907,
+        "visitante": 19.1593
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 56.7,
+        "empate": 24.1,
+        "visitante": 19.2
+      },
+      "exibicao": {
+        "mandante": "56,7%",
+        "empate": "24,1%",
+        "visitante": "19,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6833,
+        "visitante": 0.8649
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-34-Botafogo-Atlético-MG",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Botafogo",
+      "visitante": "Atlético-MG",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 56.7284,
+        "empate": 23.3117,
+        "visitante": 19.9599
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 56.7,
+        "empate": 23.3,
+        "visitante": 20.0
+      },
+      "exibicao": {
+        "mandante": "56,7%",
+        "empate": "23,3%",
+        "visitante": "20,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7671,
+        "visitante": 0.9451
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-34-Bragantino-Santos",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Bragantino",
+      "visitante": "Santos",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 53.2418,
+        "empate": 24.0159,
+        "visitante": 22.7423
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 53.2,
+        "empate": 24.0,
+        "visitante": 22.8
+      },
+      "exibicao": {
+        "mandante": "53,2%",
+        "empate": "24,0%",
+        "visitante": "22,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7012,
+        "visitante": 1.024
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-34-Chapecoense-Mirassol",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Chapecoense",
+      "visitante": "Mirassol",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 26.867,
+        "empate": 25.497,
+        "visitante": 47.636
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 26.9,
+        "empate": 25.5,
+        "visitante": 47.6
+      },
+      "exibicao": {
+        "mandante": "26,9%",
+        "empate": "25,5%",
+        "visitante": "47,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0858,
+        "visitante": 1.5343
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-34-Cruzeiro-Bahia",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Cruzeiro",
+      "visitante": "Bahia",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 50.1823,
+        "empate": 25.9352,
+        "visitante": 23.8825
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 50.2,
+        "empate": 25.9,
+        "visitante": 23.9
+      },
+      "exibicao": {
+        "mandante": "50,2%",
+        "empate": "25,9%",
+        "visitante": "23,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5118,
+        "visitante": 0.9557
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-34-Flamengo-Grêmio",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Flamengo",
+      "visitante": "Grêmio",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 69.8637,
+        "empate": 18.515,
+        "visitante": 11.6213
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 69.9,
+        "empate": 18.5,
+        "visitante": 11.6
+      },
+      "exibicao": {
+        "mandante": "69,9%",
+        "empate": "18,5%",
+        "visitante": "11,6%"
+      },
+      "gols_esperados": {
+        "mandante": 2.165,
+        "visitante": 0.7509
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-34-Internacional-Coritiba",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Internacional",
+      "visitante": "Coritiba",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 50.6829,
+        "empate": 24.6622,
+        "visitante": 24.6549
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 50.7,
+        "empate": 24.7,
+        "visitante": 24.6
+      },
+      "exibicao": {
+        "mandante": "50,7%",
+        "empate": "24,7%",
+        "visitante": "24,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6307,
+        "visitante": 1.0592
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-34-Palmeiras-Remo",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Palmeiras",
+      "visitante": "Remo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 72.6735,
+        "empate": 17.6004,
+        "visitante": 9.7261
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 72.7,
+        "empate": 17.6,
+        "visitante": 9.7
+      },
+      "exibicao": {
+        "mandante": "72,7%",
+        "empate": "17,6%",
+        "visitante": "9,7%"
+      },
+      "gols_esperados": {
+        "mandante": 2.2003,
+        "visitante": 0.6614
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-34-São Paulo-Corinthians",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "São Paulo",
+      "visitante": "Corinthians",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 45.6813,
+        "empate": 28.2845,
+        "visitante": 26.0342
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 45.7,
+        "empate": 28.3,
+        "visitante": 26.0
+      },
+      "exibicao": {
+        "mandante": "45,7%",
+        "empate": "28,3%",
+        "visitante": "26,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3041,
+        "visitante": 0.9099
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-34-Vitória-Fluminense",
+      "rodada": 34,
+      "data_iso": null,
+      "mandante": "Vitória",
+      "visitante": "Fluminense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 37.076,
+        "empate": 28.8839,
+        "visitante": 34.0401
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 37.1,
+        "empate": 28.9,
+        "visitante": 34.0
+      },
+      "exibicao": {
+        "mandante": "37,1%",
+        "empate": "28,9%",
+        "visitante": "34,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.145,
+        "visitante": 1.0844
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-35-Corinthians-Botafogo",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Corinthians",
+      "visitante": "Botafogo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.2898,
+        "empate": 26.6135,
+        "visitante": 33.0967
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.3,
+        "empate": 26.6,
+        "visitante": 33.1
+      },
+      "exibicao": {
+        "mandante": "40,3%",
+        "empate": "26,6%",
+        "visitante": "33,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.35,
+        "visitante": 1.1977
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-35-Coritiba-Santos",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Coritiba",
+      "visitante": "Santos",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 49.8015,
+        "empate": 23.8906,
+        "visitante": 26.3079
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 49.8,
+        "empate": 23.9,
+        "visitante": 26.3
+      },
+      "exibicao": {
+        "mandante": "49,8%",
+        "empate": "23,9%",
+        "visitante": "26,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7079,
+        "visitante": 1.177
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-35-Cruzeiro-Palmeiras",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Cruzeiro",
+      "visitante": "Palmeiras",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 32.0232,
+        "empate": 29.4786,
+        "visitante": 38.4982
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 32.0,
+        "empate": 29.5,
+        "visitante": 38.5
+      },
+      "exibicao": {
+        "mandante": "32,0%",
+        "empate": "29,5%",
+        "visitante": "38,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.0099,
+        "visitante": 1.1373
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-35-Flamengo-Athletico-PR",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Flamengo",
+      "visitante": "Athletico-PR",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 62.6814,
+        "empate": 22.5094,
+        "visitante": 14.8092
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 62.7,
+        "empate": 22.5,
+        "visitante": 14.8
+      },
+      "exibicao": {
+        "mandante": "62,7%",
+        "empate": "22,5%",
+        "visitante": "14,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7936,
+        "visitante": 0.7345
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-35-Grêmio-Bahia",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Grêmio",
+      "visitante": "Bahia",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 44.3735,
+        "empate": 25.9317,
+        "visitante": 29.6948
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 44.4,
+        "empate": 25.9,
+        "visitante": 29.7
+      },
+      "exibicao": {
+        "mandante": "44,4%",
+        "empate": "25,9%",
+        "visitante": "29,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4638,
+        "visitante": 1.1485
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-35-Mirassol-Atlético-MG",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Mirassol",
+      "visitante": "Atlético-MG",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 50.3206,
+        "empate": 26.2121,
+        "visitante": 23.4673
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 50.3,
+        "empate": 26.2,
+        "visitante": 23.5
+      },
+      "exibicao": {
+        "mandante": "50,3%",
+        "empate": "26,2%",
+        "visitante": "23,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4893,
+        "visitante": 0.9264
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-35-Remo-Chapecoense",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Remo",
+      "visitante": "Chapecoense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 61.3642,
+        "empate": 21.3672,
+        "visitante": 17.2686
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 61.3,
+        "empate": 21.4,
+        "visitante": 17.3
+      },
+      "exibicao": {
+        "mandante": "61,3%",
+        "empate": "21,4%",
+        "visitante": "17,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9589,
+        "visitante": 0.9308
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-35-São Paulo-Fluminense",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "São Paulo",
+      "visitante": "Fluminense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 42.8586,
+        "empate": 28.5357,
+        "visitante": 28.6057
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 42.9,
+        "empate": 28.5,
+        "visitante": 28.6
+      },
+      "exibicao": {
+        "mandante": "42,9%",
+        "empate": "28,5%",
+        "visitante": "28,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2562,
+        "visitante": 0.9706
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-35-Vasco da Gama-Internacional",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Vasco da Gama",
+      "visitante": "Internacional",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.1714,
+        "empate": 25.738,
+        "visitante": 31.0906
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.2,
+        "empate": 25.7,
+        "visitante": 31.1
+      },
+      "exibicao": {
+        "mandante": "43,2%",
+        "empate": "25,7%",
+        "visitante": "31,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4647,
+        "visitante": 1.2032
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-35-Vitória-Bragantino",
+      "rodada": 35,
+      "data_iso": null,
+      "mandante": "Vitória",
+      "visitante": "Bragantino",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.4939,
+        "empate": 27.8594,
+        "visitante": 31.6467
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.5,
+        "empate": 27.9,
+        "visitante": 31.6
+      },
+      "exibicao": {
+        "mandante": "40,5%",
+        "empate": "27,9%",
+        "visitante": "31,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2658,
+        "visitante": 1.0848
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-36-Athletico-PR-Remo",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Athletico-PR",
+      "visitante": "Remo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 56.3292,
+        "empate": 24.5339,
+        "visitante": 19.1369
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 56.3,
+        "empate": 24.5,
+        "visitante": 19.2
+      },
+      "exibicao": {
+        "mandante": "56,3%",
+        "empate": "24,5%",
+        "visitante": "19,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6413,
+        "visitante": 0.8414
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-36-Atlético-MG-Corinthians",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Atlético-MG",
+      "visitante": "Corinthians",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 45.3868,
+        "empate": 28.3181,
+        "visitante": 26.2951
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 45.4,
+        "empate": 28.3,
+        "visitante": 26.3
+      },
+      "exibicao": {
+        "mandante": "45,4%",
+        "empate": "28,3%",
+        "visitante": "26,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.299,
+        "visitante": 0.916
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-36-Bahia-Coritiba",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Bahia",
+      "visitante": "Coritiba",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 54.3366,
+        "empate": 23.2579,
+        "visitante": 22.4055
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 54.3,
+        "empate": 23.3,
+        "visitante": 22.4
+      },
+      "exibicao": {
+        "mandante": "54,3%",
+        "empate": "23,3%",
+        "visitante": "22,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7841,
+        "visitante": 1.0601
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-36-Botafogo-São Paulo",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Botafogo",
+      "visitante": "São Paulo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 56.3609,
+        "empate": 23.4358,
+        "visitante": 20.2033
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 56.4,
+        "empate": 23.4,
+        "visitante": 20.2
+      },
+      "exibicao": {
+        "mandante": "56,4%",
+        "empate": "23,4%",
+        "visitante": "20,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7553,
+        "visitante": 0.9488
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-36-Bragantino-Vasco da Gama",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Bragantino",
+      "visitante": "Vasco da Gama",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 56.3759,
+        "empate": 23.1459,
+        "visitante": 20.4782
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 56.4,
+        "empate": 23.1,
+        "visitante": 20.5
+      },
+      "exibicao": {
+        "mandante": "56,4%",
+        "empate": "23,1%",
+        "visitante": "20,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.7882,
+        "visitante": 0.9795
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-36-Chapecoense-Cruzeiro",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Chapecoense",
+      "visitante": "Cruzeiro",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 26.1284,
+        "empate": 26.5656,
+        "visitante": 47.306
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 26.1,
+        "empate": 26.6,
+        "visitante": 47.3
+      },
+      "exibicao": {
+        "mandante": "26,1%",
+        "empate": "26,6%",
+        "visitante": "47,3%"
+      },
+      "gols_esperados": {
+        "mandante": 0.9982,
+        "visitante": 1.4417
+      },
+      "placar_modal": {
+        "mandante": 0,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-36-Fluminense-Mirassol",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Fluminense",
+      "visitante": "Mirassol",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.122,
+        "empate": 26.9362,
+        "visitante": 25.9418
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.1,
+        "empate": 26.9,
+        "visitante": 26.0
+      },
+      "exibicao": {
+        "mandante": "47,1%",
+        "empate": "26,9%",
+        "visitante": "26,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4115,
+        "visitante": 0.9724
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-36-Internacional-Vitória",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Internacional",
+      "visitante": "Vitória",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 51.3253,
+        "empate": 25.9568,
+        "visitante": 22.7179
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 51.3,
+        "empate": 26.0,
+        "visitante": 22.7
+      },
+      "exibicao": {
+        "mandante": "51,3%",
+        "empate": "26,0%",
+        "visitante": "22,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5144,
+        "visitante": 0.9123
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-36-Palmeiras-Flamengo",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Palmeiras",
+      "visitante": "Flamengo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.1492,
+        "empate": 26.8506,
+        "visitante": 26.0002
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.1,
+        "empate": 26.9,
+        "visitante": 26.0
+      },
+      "exibicao": {
+        "mandante": "47,1%",
+        "empate": "26,9%",
+        "visitante": "26,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4183,
+        "visitante": 0.9788
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-36-Santos-Grêmio",
+      "rodada": 36,
+      "data_iso": null,
+      "mandante": "Santos",
+      "visitante": "Grêmio",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.4105,
+        "empate": 25.0667,
+        "visitante": 27.5228
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.4,
+        "empate": 25.1,
+        "visitante": 27.5
+      },
+      "exibicao": {
+        "mandante": "47,4%",
+        "empate": "25,1%",
+        "visitante": "27,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5722,
+        "visitante": 1.1366
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-37-Atlético-MG-Vasco da Gama",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Atlético-MG",
+      "visitante": "Vasco da Gama",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 54.9717,
+        "empate": 24.0964,
+        "visitante": 20.9319
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 55.0,
+        "empate": 24.1,
+        "visitante": 20.9
+      },
+      "exibicao": {
+        "mandante": "55,0%",
+        "empate": "24,1%",
+        "visitante": "20,9%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6899,
+        "visitante": 0.9421
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-37-Botafogo-Bahia",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Botafogo",
+      "visitante": "Bahia",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 57.1602,
+        "empate": 22.13,
+        "visitante": 20.7098
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 57.2,
+        "empate": 22.1,
+        "visitante": 20.7
+      },
+      "exibicao": {
+        "mandante": "57,2%",
+        "empate": "22,1%",
+        "visitante": "20,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.9089,
+        "visitante": 1.0605
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-37-Chapecoense-Palmeiras",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Chapecoense",
+      "visitante": "Palmeiras",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 15.4582,
+        "empate": 22.2459,
+        "visitante": 62.2959
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 15.5,
+        "empate": 22.2,
+        "visitante": 62.3
+      },
+      "exibicao": {
+        "mandante": "15,5%",
+        "empate": "22,2%",
+        "visitante": "62,3%"
+      },
+      "gols_esperados": {
+        "mandante": 0.7812,
+        "visitante": 1.8303
+      },
+      "placar_modal": {
+        "mandante": 0,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-37-Corinthians-Grêmio",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Corinthians",
+      "visitante": "Grêmio",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 49.8017,
+        "empate": 26.5186,
+        "visitante": 23.6797
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 49.8,
+        "empate": 26.5,
+        "visitante": 23.7
+      },
+      "exibicao": {
+        "mandante": "49,8%",
+        "empate": "26,5%",
+        "visitante": "23,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4621,
+        "visitante": 0.9184
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-37-Coritiba-Flamengo",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Coritiba",
+      "visitante": "Flamengo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 26.5167,
+        "empate": 24.6702,
+        "visitante": 48.8131
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 26.5,
+        "empate": 24.7,
+        "visitante": 48.8
+      },
+      "exibicao": {
+        "mandante": "26,5%",
+        "empate": "24,7%",
+        "visitante": "48,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.1283,
+        "visitante": 1.6208
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-37-Fluminense-Cruzeiro",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Fluminense",
+      "visitante": "Cruzeiro",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 45.4072,
+        "empate": 28.3409,
+        "visitante": 26.2519
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 45.4,
+        "empate": 28.3,
+        "visitante": 26.3
+      },
+      "exibicao": {
+        "mandante": "45,4%",
+        "empate": "28,3%",
+        "visitante": "26,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2977,
+        "visitante": 0.9137
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-37-Internacional-Bragantino",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Internacional",
+      "visitante": "Bragantino",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 45.3454,
+        "empate": 26.6229,
+        "visitante": 28.0317
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 45.4,
+        "empate": 26.6,
+        "visitante": 28.0
+      },
+      "exibicao": {
+        "mandante": "45,4%",
+        "empate": "26,6%",
+        "visitante": "28,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4187,
+        "visitante": 1.055
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-37-Mirassol-Athletico-PR",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Mirassol",
+      "visitante": "Athletico-PR",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.129,
+        "empate": 27.5437,
+        "visitante": 25.3273
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.1,
+        "empate": 27.6,
+        "visitante": 25.3
+      },
+      "exibicao": {
+        "mandante": "47,1%",
+        "empate": "27,6%",
+        "visitante": "25,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3673,
+        "visitante": 0.9228
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-37-São Paulo-Remo",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "São Paulo",
+      "visitante": "Remo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 54.8968,
+        "empate": 24.4497,
+        "visitante": 20.6535
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 54.9,
+        "empate": 24.4,
+        "visitante": 20.7
+      },
+      "exibicao": {
+        "mandante": "54,9%",
+        "empate": "24,4%",
+        "visitante": "20,7%"
+      },
+      "gols_esperados": {
+        "mandante": 1.6542,
+        "visitante": 0.9104
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-37-Vitória-Santos",
+      "rodada": 37,
+      "data_iso": null,
+      "mandante": "Vitória",
+      "visitante": "Santos",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 45.8359,
+        "empate": 26.0381,
+        "visitante": 28.126
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 45.8,
+        "empate": 26.1,
+        "visitante": 28.1
+      },
+      "exibicao": {
+        "mandante": "45,8%",
+        "empate": "26,1%",
+        "visitante": "28,1%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4711,
+        "visitante": 1.0931
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-38-Athletico-PR-São Paulo",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Athletico-PR",
+      "visitante": "São Paulo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.4914,
+        "empate": 28.3411,
+        "visitante": 24.1675
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.5,
+        "empate": 28.3,
+        "visitante": 24.2
+      },
+      "exibicao": {
+        "mandante": "47,5%",
+        "empate": "28,3%",
+        "visitante": "24,2%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3165,
+        "visitante": 0.8513
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-38-Bahia-Atlético-MG",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Bahia",
+      "visitante": "Atlético-MG",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 48.6634,
+        "empate": 26.0585,
+        "visitante": 25.2781
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 48.7,
+        "empate": 26.0,
+        "visitante": 25.3
+      },
+      "exibicao": {
+        "mandante": "48,7%",
+        "empate": "26,0%",
+        "visitante": "25,3%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4929,
+        "visitante": 0.9978
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-38-Bragantino-Fluminense",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Bragantino",
+      "visitante": "Fluminense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 43.6985,
+        "empate": 27.6567,
+        "visitante": 28.6448
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 43.7,
+        "empate": 27.7,
+        "visitante": 28.6
+      },
+      "exibicao": {
+        "mandante": "43,7%",
+        "empate": "27,7%",
+        "visitante": "28,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.3241,
+        "visitante": 1.0158
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-38-Cruzeiro-Internacional",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Cruzeiro",
+      "visitante": "Internacional",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 52.2018,
+        "empate": 26.0317,
+        "visitante": 21.7665
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 52.2,
+        "empate": 26.0,
+        "visitante": 21.8
+      },
+      "exibicao": {
+        "mandante": "52,2%",
+        "empate": "26,0%",
+        "visitante": "21,8%"
+      },
+      "gols_esperados": {
+        "mandante": 1.5105,
+        "visitante": 0.8735
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-38-Flamengo-Chapecoense",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Flamengo",
+      "visitante": "Chapecoense",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 83.8898,
+        "empate": 11.0617,
+        "visitante": 5.0485
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 83.9,
+        "empate": 11.1,
+        "visitante": 5.0
+      },
+      "exibicao": {
+        "mandante": "83,9%",
+        "empate": "11,1%",
+        "visitante": "5,0%"
+      },
+      "gols_esperados": {
+        "mandante": 2.8991,
+        "visitante": 0.5999
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-38-Grêmio-Mirassol",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Grêmio",
+      "visitante": "Mirassol",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 41.6727,
+        "empate": 26.7877,
+        "visitante": 31.5396
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 41.7,
+        "empate": 26.8,
+        "visitante": 31.5
+      },
+      "exibicao": {
+        "mandante": "41,7%",
+        "empate": "26,8%",
+        "visitante": "31,5%"
+      },
+      "gols_esperados": {
+        "mandante": 1.359,
+        "visitante": 1.1458
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-38-Palmeiras-Coritiba",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Palmeiras",
+      "visitante": "Coritiba",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 70.1313,
+        "empate": 18.6968,
+        "visitante": 11.1719
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 70.1,
+        "empate": 18.7,
+        "visitante": 11.2
+      },
+      "exibicao": {
+        "mandante": "70,1%",
+        "empate": "18,7%",
+        "visitante": "11,2%"
+      },
+      "gols_esperados": {
+        "mandante": 2.1232,
+        "visitante": 0.7081
+      },
+      "placar_modal": {
+        "mandante": 2,
+        "visitante": 0
+      }
+    },
+    {
+      "event_id": "AF-38-Remo-Corinthians",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Remo",
+      "visitante": "Corinthians",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 40.0243,
+        "empate": 27.403,
+        "visitante": 32.5727
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 40.0,
+        "empate": 27.4,
+        "visitante": 32.6
+      },
+      "exibicao": {
+        "mandante": "40,0%",
+        "empate": "27,4%",
+        "visitante": "32,6%"
+      },
+      "gols_esperados": {
+        "mandante": 1.2888,
+        "visitante": 1.1344
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-38-Santos-Botafogo",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Santos",
+      "visitante": "Botafogo",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 37.0143,
+        "empate": 24.6081,
+        "visitante": 38.3776
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 37.0,
+        "empate": 24.6,
+        "visitante": 38.4
+      },
+      "exibicao": {
+        "mandante": "37,0%",
+        "empate": "24,6%",
+        "visitante": "38,4%"
+      },
+      "gols_esperados": {
+        "mandante": 1.4516,
+        "visitante": 1.4823
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    },
+    {
+      "event_id": "AF-38-Vasco da Gama-Vitória",
+      "rodada": 38,
+      "data_iso": null,
+      "mandante": "Vasco da Gama",
+      "visitante": "Vitória",
+      "estadio": "",
+      "status": "pre_jogo",
+      "valido_ate": "inicio_da_partida",
+      "probabilidades_pct": {
+        "mandante": 47.1984,
+        "empate": 25.7768,
+        "visitante": 27.0248
+      },
+      "probabilidades_exibicao_pct": {
+        "mandante": 47.2,
+        "empate": 25.8,
+        "visitante": 27.0
+      },
+      "exibicao": {
+        "mandante": "47,2%",
+        "empate": "25,8%",
+        "visitante": "27,0%"
+      },
+      "gols_esperados": {
+        "mandante": 1.506,
+        "visitante": 1.0735
+      },
+      "placar_modal": {
+        "mandante": 1,
+        "visitante": 1
+      }
+    }
+  ],
+  "avisos": [
+    "Probabilidades pré-jogo: deixam de representar o estado da partida quando a bola começa a rolar.",
+    "Não são cotações de apostas nem garantia de resultado."
+  ]
+}
