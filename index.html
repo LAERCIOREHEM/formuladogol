@@ -3461,6 +3461,15 @@ async function atualizarDadosDoServidor(silencioso = false) {
   tarefas.push(carregarRankingDesempenhoBr({ silencioso: true }));
   tarefas.push(carregarProbabilidadesBolao({ silencioso: true }));
   await Promise.allSettled(tarefas);
+
+  // `refresh()` pode renderizar a classificação antes de o JSON das
+  // probabilidades do bolão terminar de carregar. Quando a página já abre
+  // diretamente no ranking privado, fazemos uma segunda renderização apenas
+  // após todas as fontes estarem resolvidas, evitando exibir "—" por corrida
+  // assíncrona mesmo com a projeção disponível no servidor.
+  if (state.view === 'rank' && state.probabilidadesBolao) {
+    render();
+  }
 }
 
 // ========================================================================
