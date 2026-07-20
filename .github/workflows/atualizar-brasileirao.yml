@@ -32,6 +32,7 @@ on:
       - 'scripts/atualizar_competicoes_af_previsao.py'
       - 'scripts/af_previsao_backtest.py'
       - 'dados-br/config-af-previsao.json'
+      - 'dados-br/participantes-bolao-classificacao.json'
       - 'dados-br/auditoria-modelos-af-previsao.json'
       - 'dados-br/historico-af-previsao/**'
       - 'dados-br/competicoes-af-previsao/**'
@@ -144,7 +145,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -320,6 +321,19 @@ jobs:
           if integrado:
               assert aud_prev.get('schema_version', 0) >= 2, 'auditoria integrada em schema antigo'
               assert isinstance(aud_prev.get('integracao_continental'), dict), 'auditoria sem integração continental'
+          bolao = json.load(open('dados-br/probabilidades-bolao.json', encoding='utf-8'))
+          participantes_bolao = json.load(open('dados-br/participantes-bolao-classificacao.json', encoding='utf-8'))
+          assert bolao.get('status') == 'ok', 'projeção do bolão com status inválido'
+          assert int(bolao.get('simulacoes') or 0) >= 200000, 'projeção do bolão sem amostra probabilística válida'
+          nomes_config = {item.get('nome') for item in (participantes_bolao.get('participantes') or [])}
+          linhas_bolao = bolao.get('participantes') or []
+          assert len(linhas_bolao) == len(nomes_config) >= 2, 'projeção do bolão com participantes incompletos'
+          assert {item.get('nome') for item in linhas_bolao} == nomes_config, 'nomes divergentes na projeção do bolão'
+          soma_titulo_bolao = sum(float(item.get('chance_titulo_pct') or 0) for item in linhas_bolao)
+          assert abs(soma_titulo_bolao - 100.0) <= 0.02, f'chances do bolão não somam 100%: {soma_titulo_bolao}'
+          assert all(0 <= float(item.get('chance_top3_pct') or 0) <= 100 for item in linhas_bolao), 'chance top 3 inválida'
+          assert all(0 <= float(item.get('chance_nao_pagar_pct') or 0) <= 100 for item in linhas_bolao), 'chance de não pagar inválida'
+          print(f'  OK   AF-Previsão do bolão: {len(linhas_bolao)} participantes; título soma {soma_titulo_bolao:.6f}%')
           hist_prev = json.load(open('dados-br/historico-probabilidades.json', encoding='utf-8'))
           assert hist_prev.get('total_snapshots', 0) >= 1, 'histórico do AF-Previsão vazio'
           assert (hist_prev.get('snapshots') or [])[-1].get('hash_entrada') == previsao.get('hash_entrada'), 'histórico não termina no estado publicado'
@@ -370,6 +384,7 @@ jobs:
             "dados-br/competicoes-af-previsao/sul-americana.json"
             "dados-br/auditoria-competicoes-af-previsao.json"
             "dados-br/probabilidades-brasileirao.json"
+            "dados-br/probabilidades-bolao.json"
             "dados-br/auditoria-probabilidades.json"
             "dados-br/historico-probabilidades.json"
             "dados-br/avaliacao-af-previsao.json"
