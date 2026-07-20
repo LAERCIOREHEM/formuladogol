@@ -25,7 +25,7 @@
   <meta name="twitter:image" content="https://brasileirao2026almoco.com.br/og-image-publico-v3.png">
   <meta name="twitter:image:alt" content="Brasileirão 2026 — Almoço de Sexta">
   <link rel="icon" href="favicon.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260720-probability-table-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260720-bolao-probabilidades-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260718-ajustes-mobile-escudos-v3">
 </head>
 <body>
@@ -51,6 +51,7 @@
     </nav>
 
     <main>
+      <a class="probability-back-to-pool" id="voltar-bolao" href="./?brasileirao=1&view=rank" hidden>← Voltar ao bolão</a>
       <section class="stats-summary-grid" id="cards-resumo" aria-label="Destaques do campeonato" aria-live="polite"></section>
 
       <section class="stats-tabs-panel panel" aria-label="Seções de estatísticas">
@@ -133,6 +134,12 @@
               </div>
               <div id="probabilidades-status" aria-live="polite"></div>
               <a class="probability-method-link" href="#metodologia-probabilidades" data-probability-method>Entenda o modelo e consulte a nota técnica ↓</a>
+            </section>
+
+            <section class="probability-pool-method" id="metodologia-bolao" hidden aria-labelledby="titulo-metodologia-bolao">
+              <div><div class="kicker">🏆 Projeção do bolão</div><h3 id="titulo-metodologia-bolao">Como nasce a chance de título de cada participante?</h3></div>
+              <p>Em cada um dos mesmos universos do AF-Previsão, o sistema recalcula a pontuação final do bolão: soma os pontos finais do time do coração e dos outros cinco clubes, aplica <strong>+12</strong> pelo acerto da posição do coração, <strong>+9</strong> por cada posição exata entre os demais e <strong>+6</strong> quando o clube indicado termina rebaixado.</p>
+              <p>Depois, compara todos os participantes dentro daquele mesmo campeonato simulado. A chance de título é a proporção de universos vencidos; quando há empate na liderança, o peso daquele universo é dividido igualmente entre os empatados. Dessa forma, as chances somam exatamente 100%.</p>
             </section>
 
             <section class="probability-details-section" aria-labelledby="titulo-detalhamento-clubes">
@@ -295,7 +302,7 @@
     </footer>
   </div>
 
-  <script src="js/br-estatisticas.js?v=20260720-probability-table-v1"></script>
+  <script src="js/br-estatisticas.js?v=20260720-bolao-probabilidades-v1"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260718-retorno-origem-v3"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>

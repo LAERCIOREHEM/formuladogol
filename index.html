@@ -330,6 +330,12 @@
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
   }
+  .ranking-table thead th.col-chance {
+    min-width: 84px;
+    background: rgba(96,165,250,0.10);
+    color: #bfdbfe;
+    border-right: 1px solid var(--border);
+  }
   .ranking-table thead .group-header {
     background: rgba(255,255,255,0.02);
     color: var(--text-tertiary);
@@ -363,6 +369,21 @@
     border-left: 1px solid var(--border);
     border-right: 1px solid var(--border);
   }
+  .ranking-table tbody td.col-chance { min-width:84px; background:rgba(96,165,250,.055); border-right:1px solid var(--border); }
+  .bolao-chance-btn { width:100%; min-width:62px; padding:7px 6px; border:1px solid rgba(96,165,250,.28); border-radius:10px; background:rgba(96,165,250,.09); color:#dbeafe; font:inherit; font-weight:800; cursor:pointer; }
+  .bolao-chance-btn:hover,.bolao-chance-btn:focus-visible { background:rgba(96,165,250,.17); outline:none; }
+  .bolao-chance-btn small { display:block; margin-top:2px; color:var(--text-tertiary); font-size:8px; font-weight:600; }
+  .bolao-projection-row[hidden] { display:none; }
+  .bolao-projection-row td { padding:0 !important; background:rgba(96,165,250,.035) !important; }
+  .bolao-projection-detail { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; padding:12px; text-align:left; }
+  .bolao-projection-detail article { padding:10px; border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,.025); }
+  .bolao-projection-detail span { display:block; color:var(--text-tertiary); font-size:9px; text-transform:uppercase; letter-spacing:.05em; }
+  .bolao-projection-detail strong { display:block; margin-top:3px; color:var(--text); font-size:15px; }
+  .bolao-af-intro { display:flex; align-items:center; justify-content:space-between; gap:14px; margin:12px 0; padding:14px 16px; border:1px solid rgba(163,230,53,.24); border-radius:14px; background:linear-gradient(135deg,rgba(163,230,53,.08),rgba(96,165,250,.05)); }
+  .bolao-af-intro strong { display:block; color:#efffc3; font-size:14px; }
+  .bolao-af-intro p { margin:4px 0 0; color:var(--text-secondary); font-size:12px; }
+  .bolao-af-intro a { flex:0 0 auto; padding:9px 12px; border-radius:10px; background:var(--accent); color:#081016; text-decoration:none; font-weight:800; font-size:11px; }
+  .bolao-af-meta { margin:8px 2px 0; color:var(--text-tertiary); font-size:10px; text-align:right; }
   .ranking-table tbody td.cell-coracao { background: rgba(244,114,182,0.04); }
   .ranking-table tbody td.cell-cai { background: rgba(251,191,36,0.04); }
   .cell-time {
@@ -465,6 +486,14 @@
     .cell-time { font-size: 10px; }
     .cell-pts { font-size: 12px; }
     .cell-palp { font-size: 8px; }
+    .bolao-projection-detail { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .bolao-af-intro { align-items:flex-start; flex-direction:column; }
+    .bolao-af-intro a { width:100%; text-align:center; }
+    .ranking-table thead th.col-pos,.ranking-table tbody td.col-pos { position:sticky; left:0; z-index:4; min-width:54px; background:var(--card); }
+    .ranking-table thead th.col-nome,.ranking-table tbody td.col-nome { position:sticky; left:54px; z-index:4; min-width:112px; max-width:112px; background:var(--card); }
+    .ranking-table thead th.col-total,.ranking-table tbody td.col-total { position:sticky; left:166px; z-index:4; min-width:58px; background:#10241f; }
+    .ranking-table thead th.col-chance,.ranking-table tbody td.col-chance { position:sticky; left:224px; z-index:4; min-width:74px; background:#112432; box-shadow:6px 0 10px rgba(0,0,0,.18); }
+    .ranking-table thead th.col-pos,.ranking-table thead th.col-nome,.ranking-table thead th.col-total,.ranking-table thead th.col-chance { z-index:7; }
   }
 
   /* PRÓXIMOS JOGOS */
@@ -3164,7 +3193,9 @@ let state = {
   // Transmissões do módulo Ao vivo usadas também na aba Jogos.
   transmissoesTv: {},
   transmissoesAovivo: {},
-  transmissoesAovivoManual: {}
+  transmissoesAovivoManual: {},
+  probabilidadesBolao: null,
+  probabilidadesBolaoErro: null
 };
 
 // ========================================================================
@@ -3301,6 +3332,44 @@ function agendarProximaAtualizacao() {
   }, atraso);
 }
 
+async function carregarProbabilidadesBolao({ silencioso = false } = {}) {
+  try {
+    const resposta = await fetch('dados-br/probabilidades-bolao.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!resposta.ok) throw new Error('HTTP ' + resposta.status);
+    const dados = await resposta.json();
+    if (dados && dados.status === 'ok' && Array.isArray(dados.participantes)) {
+      state.probabilidadesBolao = dados;
+      state.probabilidadesBolaoErro = null;
+    }
+  } catch (erro) {
+    state.probabilidadesBolaoErro = erro;
+    if (!silencioso) console.warn('AF-Previsão do bolão ainda indisponível:', erro);
+  }
+}
+function projecaoBolaoPorNome(nome) {
+  const lista = state.probabilidadesBolao && Array.isArray(state.probabilidadesBolao.participantes) ? state.probabilidadesBolao.participantes : [];
+  return lista.find(item => normalizarNome(item.nome) === normalizarNome(nome)) || null;
+}
+function formatarChanceBolao(item) {
+  if (!item) return '—';
+  const explicita = String(item.chance_titulo_exibicao || '').trim();
+  if (explicita) return explicita;
+  const valor = Number(item.chance_titulo_pct);
+  if (!Number.isFinite(valor)) return '—';
+  if (valor > 0 && valor < .1) return '<0,1%';
+  if (valor > 99.9 && valor < 100) return '>99,9%';
+  return valor.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '%';
+}
+function toggleBolaoProjection(chave) {
+  const seletor = String(chave).replace(/"/g,'\"');
+  const linha = document.querySelector('[data-bolao-detail="' + seletor + '"]');
+  const botao = document.querySelector('[data-bolao-toggle="' + seletor + '"]');
+  if (!linha) return;
+  const abrir = linha.hasAttribute('hidden');
+  if (abrir) linha.removeAttribute('hidden'); else linha.setAttribute('hidden','');
+  if (botao) botao.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+}
+
 async function atualizarDadosDoServidor(silencioso = false) {
   const tarefas = [refresh(silencioso)];
 
@@ -3310,6 +3379,7 @@ async function atualizarDadosDoServidor(silencioso = false) {
   tarefas.push(carregarJogos({ silencioso: true }));
   tarefas.push(carregarResultados({ silencioso: true }));
   tarefas.push(carregarRankingDesempenhoBr({ silencioso: true }));
+  tarefas.push(carregarProbabilidadesBolao({ silencioso: true }));
   await Promise.allSettled(tarefas);
 }
 
@@ -3745,6 +3815,12 @@ function renderRank() {
   html += '<div class="leg-item"><div class="leg-dot" style="background:rgba(74,222,128,0.5);"></div>Acertou posição</div>';
   html += '</div></div>';
 
+  const metaBolao = state.probabilidadesBolao || {};
+  const simulacoesBolao = Number(metaBolao.simulacoes || 0);
+  const atualizadoBolao = metaBolao.gerado_em ? new Date(metaBolao.gerado_em).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'}) : '';
+  html += `<div class="bolao-af-intro"><div><strong>🔮 Chances projetadas pelo AF-Previsão</strong><p>A pontuação de cada participante é recalculada em cada campeonato simulado, incluindo pontos finais dos seis clubes, bônus de posições e o palpite de rebaixamento.</p></div><a href="estatisticas.html?retorno=bolao#probabilidades">Entenda o cálculo</a></div>`;
+  if (simulacoesBolao) html += `<div class="bolao-af-meta">${simulacoesBolao.toLocaleString('pt-BR')} universos simulados${atualizadoBolao ? ' · atualização: ' + atualizadoBolao : ''}</div>`;
+
   // ---- PÓDIO (top 3) — apenas visual; a fonte é o mesmo array `ranking` ----
   if (ranking.length >= 3) {
     const medalhas = ['🥇', '🥈', '🥉'];
@@ -3771,6 +3847,7 @@ function renderRank() {
   html += '<th class="col-pos" rowspan="2">#</th>';
   html += '<th class="col-nome" rowspan="2">Participante</th>';
   html += '<th class="col-total" rowspan="2">Total</th>';
+  html += '<th class="col-chance" rowspan="2">Chance<br>de título</th>';
   html += '<th colspan="1" class="group-header coracao">❤️ Coração</th>';
   html += '<th colspan="5" class="group-header">Times escolhidos (+9 se acertar posição)</th>';
   html += '<th colspan="1" class="group-header cai">⬇️ Cai</th>';
@@ -3793,15 +3870,18 @@ function renderRank() {
 
     // Linha divisora entre não-pagantes e pagantes
     if (i === corteNaoPagantes) {
-      html += `<tr class="divisor-row"><td colspan="9">⚠️ Daqui pra baixo: pagantes do almoço de fim de ano</td></tr>`;
+      html += `<tr class="divisor-row"><td colspan="11">⚠️ Daqui pra baixo: pagantes do almoço de fim de ano</td></tr>`;
     }
 
     const rowClass = isBob ? 'bob-row' : '';
     const setaRank = htmlSetaMovimento(posBaseRank[r.nome], i + 1);
     html += `<tr class="${rowClass}">`;
-    html += `<td><span class="pos-com-seta"><span class="pos-num ${posClass}">${i+1}</span>${setaRank}</span></td>`;
+    html += `<td class="col-pos"><span class="pos-com-seta"><span class="pos-num ${posClass}">${i+1}</span>${setaRank}</span></td>`;
     html += `<td class="col-nome">${r.nome}</td>`;
     html += `<td class="col-total">${r.total}</td>`;
+    const projecao = projecaoBolaoPorNome(r.nome);
+    const chaveProj = normalizarNome(r.nome).replace(/[^a-z0-9]+/g,'-');
+    html += `<td class="col-chance"><button type="button" class="bolao-chance-btn" data-bolao-toggle="${brEscapeAttr(chaveProj)}" aria-expanded="false" onclick="toggleBolaoProjection('${brEscapeAttr(chaveProj)}')">${brEscapeHtml(formatarChanceBolao(projecao))}<small>ver projeção</small></button></td>`;
 
     // Detalhes na ordem: coração, 5 times, cai
     r.detalhes.forEach((d, idxD) => {
@@ -3829,6 +3909,16 @@ function renderRank() {
     });
 
     html += `</tr>`;
+    if (projecao) {
+      const faixa = projecao.faixa_pontuacao_80 || {};
+      html += `<tr class="bolao-projection-row" data-bolao-detail="${brEscapeAttr(chaveProj)}" hidden><td colspan="11"><div class="bolao-projection-detail">
+        <article><span>Chance de título</span><strong>${brEscapeHtml(formatarChanceBolao(projecao))}</strong></article>
+        <article><span>Chance de top 3</span><strong>${Number(projecao.chance_top3_pct||0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}%</strong></article>
+        <article><span>Chance de não pagar</span><strong>${Number(projecao.chance_nao_pagar_pct||0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}%</strong></article>
+        <article><span>Pontuação projetada</span><strong>${Number(projecao.pontuacao_projetada||0)} pts</strong></article>
+        <article><span>Faixa provável de 80%</span><strong>${Number(faixa.minimo||0)}–${Number(faixa.maximo||0)} pts</strong></article>
+      </div></td></tr>`;
+    }
   });
 
   html += '</tbody></table></div>';

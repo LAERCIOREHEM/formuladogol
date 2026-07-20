@@ -1199,6 +1199,12 @@
 
   async function load() {
     bindEvents();
+    const params = new URLSearchParams(location.search || "");
+    const retornoBolao = params.get("retorno") === "bolao";
+    const voltarBolao = $("voltar-bolao");
+    const metodologiaBolao = $("metodologia-bolao");
+    if (voltarBolao) voltarBolao.hidden = !retornoBolao;
+    if (metodologiaBolao) metodologiaBolao.hidden = !retornoBolao;
     const hashTab = location.hash.replace(/^#/, "");
     const openProbabilityMethod = hashTab === "metodologia-probabilidades";
     const abrirMetodologia = hashTab === "metodologia-ranking";

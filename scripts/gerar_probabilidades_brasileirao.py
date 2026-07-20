@@ -77,6 +77,8 @@ AF_SCORE_PATH = ROOT / "dados-br" / "ranking-desempenho.json"
 OUTPUT_PATH = ROOT / "dados-br" / "probabilidades-brasileirao.json"
 AUDIT_PATH = ROOT / "dados-br" / "auditoria-probabilidades.json"
 HISTORY_PATH = ROOT / "dados-br" / "historico-probabilidades.json"
+BOLAO_PARTICIPANTS_PATH = ROOT / "dados-br" / "participantes-bolao-classificacao.json"
+BOLAO_OUTPUT_PATH = ROOT / "dados-br" / "probabilidades-bolao.json"
 BRT = ZoneInfo("America/Sao_Paulo")
 EPS = 1e-12
 MAX_GOALS_OUTPUT = 7
@@ -700,6 +702,137 @@ def sample_scores(
     return (samples // width).astype(np.int16), (samples % width).astype(np.int16)
 
 
+
+def load_bolao_participants(allowed_teams: set[str]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    data = load_json(BOLAO_PARTICIPANTS_PATH)
+    participants = data.get("participantes") or []
+    if not isinstance(participants, list) or not participants:
+        raise ValueError("participantes do bolão ausentes")
+    names: set[str] = set()
+    normalized: list[dict[str, Any]] = []
+    for row in participants:
+        name = str(row.get("nome") or "").strip()
+        heart = row.get("coracao") or {}
+        others = row.get("times") or []
+        relegated = str(row.get("cai") or "").strip()
+        if not name or name in names:
+            raise ValueError(f"participante inválido ou duplicado: {name!r}")
+        names.add(name)
+        if len(others) != 5:
+            raise ValueError(f"{name}: precisa ter exatamente cinco clubes adicionais")
+        choices = [str(heart.get("time") or "").strip(), *(str(item.get("time") or "").strip() for item in others), relegated]
+        missing = [team for team in choices if team not in allowed_teams]
+        if missing:
+            raise ValueError(f"{name}: clubes não reconhecidos: {missing}")
+        normalized.append({
+            "nome": name,
+            "coracao": {"time": choices[0], "palpite": int(heart.get("palpite"))},
+            "times": [{"time": str(item.get("time")), "palpite": int(item.get("palpite"))} for item in others],
+            "cai": relegated,
+        })
+    return normalized, data.get("regra") or {}
+
+
+def calculate_bolao_probabilities(
+    participants: Sequence[dict[str, Any]],
+    rules: dict[str, Any],
+    state: CurrentState,
+    points: np.ndarray,
+    positions: np.ndarray,
+    simulations: int,
+    generated_at: str | None = None,
+    model_version: str | None = None,
+    input_hash: str | None = None,
+) -> dict[str, Any]:
+    team_index = {team: index for index, team in enumerate(state.teams)}
+    participant_count = len(participants)
+    scores = np.zeros((simulations, participant_count), dtype=np.int16)
+    current_scores = np.zeros(participant_count, dtype=np.int16)
+    bonus_heart = int(rules.get("bonus_posicao_coracao") or 12)
+    bonus_other = int(rules.get("bonus_posicao_outros") or 9)
+    bonus_relegated = int(rules.get("bonus_rebaixado") or 6)
+    relegation_range = rules.get("zona_rebaixamento") or [17, 20]
+    relegation_start, relegation_end = int(relegation_range[0]), int(relegation_range[1])
+
+    for participant_index, participant in enumerate(participants):
+        heart = participant["coracao"]
+        heart_index = team_index[heart["time"]]
+        scores[:, participant_index] += points[:, heart_index]
+        scores[:, participant_index] += (positions[:, heart_index] == int(heart["palpite"])).astype(np.int16) * bonus_heart
+        current_scores[participant_index] += int(state.points[heart_index])
+        current_scores[participant_index] += bonus_heart if int(heart["palpite"]) == heart_index + 1 else 0
+        for choice in participant["times"]:
+            choice_index = team_index[choice["time"]]
+            scores[:, participant_index] += points[:, choice_index]
+            scores[:, participant_index] += (positions[:, choice_index] == int(choice["palpite"])).astype(np.int16) * bonus_other
+            current_scores[participant_index] += int(state.points[choice_index])
+            current_scores[participant_index] += bonus_other if int(choice["palpite"]) == choice_index + 1 else 0
+        relegated_index = team_index[participant["cai"]]
+        relegated_mask = (positions[:, relegated_index] >= relegation_start) & (positions[:, relegated_index] <= relegation_end)
+        scores[:, participant_index] += relegated_mask.astype(np.int16) * bonus_relegated
+        if relegation_start <= relegated_index + 1 <= relegation_end:
+            current_scores[participant_index] += bonus_relegated
+
+    maximum = np.max(scores, axis=1)
+    title_divisor = np.sum(scores == maximum[:, None], axis=1, dtype=np.int16)
+    cutoff_non_payers = participant_count // 2
+
+    rows: list[dict[str, Any]] = []
+    for index, participant in enumerate(participants):
+        score_values = scores[:, index]
+        title_share_values = (score_values == maximum) / title_divisor
+        title_probability = float(np.mean(title_share_values))
+        rank_values = 1 + np.sum(scores > score_values[:, None], axis=1, dtype=np.int16)
+        title_pct = float(title_probability * 100.0)
+        top3_pct = float(np.mean(rank_values <= 3) * 100.0)
+        non_payer_pct = float(np.mean(rank_values <= cutoff_non_payers) * 100.0)
+        projected_rank_mean = float(np.mean(rank_values))
+        rows.append({
+            "nome": participant["nome"],
+            "pontos_atuais": int(current_scores[index]),
+            "chance_titulo_pct": round(title_pct, 6),
+            "chance_titulo_exibicao": display_probability(int(round(title_probability * simulations)), simulations, 0.1)["exibicao"],
+            "chance_top3_pct": round(top3_pct, 6),
+            "chance_nao_pagar_pct": round(non_payer_pct, 6),
+            "pontuacao_projetada": _round_half_up(float(np.mean(score_values))),
+            "pontuacao_projetada_media": round(float(np.mean(score_values)), 4),
+            "pontuacao_mediana": int(np.median(score_values)),
+            "faixa_pontuacao_80": {
+                "minimo": int(np.percentile(score_values, 10, method="nearest")),
+                "maximo": int(np.percentile(score_values, 90, method="nearest")),
+            },
+            "posicao_projetada": _round_half_up(projected_rank_mean),
+            "posicao_projetada_media": round(projected_rank_mean, 4),
+            "ocorrencias_titulo_equivalentes": round(float(np.sum(title_share_values)), 6),
+        })
+    rows.sort(key=lambda item: (-float(item["chance_titulo_pct"]), -int(item["pontuacao_projetada"]), item["nome"]))
+    title_total = sum(float(item["chance_titulo_pct"]) for item in rows)
+    if abs(title_total - 100.0) > 0.02:
+        raise ValueError(f"chances do título do bolão não fecham em 100%: {title_total:.6f}")
+    return {
+        "schema_version": 1,
+        "projeto": "AF-Previsão — Bolão dos Clubes",
+        "temporada": 2026,
+        "status": "ok",
+        "gerado_em": generated_at,
+        "versao_modelo": model_version,
+        "hash_entrada": input_hash,
+        "simulacoes": simulations,
+        "participantes": rows,
+        "regra": {
+            **rules,
+            "corte_nao_pagantes": cutoff_non_payers,
+            "titulo": "em empate na maior pontuação, o universo é dividido igualmente entre os líderes",
+            "top3_e_nao_pagar": "posição compartilhada: 1 + quantidade de participantes com pontuação superior",
+        },
+        "auditoria": {
+            "participantes": participant_count,
+            "soma_chances_titulo_pct": round(title_total, 6),
+            "pontuacao_minima_simulada": int(np.min(scores)),
+            "pontuacao_maxima_simulada": int(np.max(scores)),
+        },
+    }
+
 def run_monte_carlo(
     state: CurrentState,
     forecasts: Sequence[MatchForecast],
@@ -707,6 +840,8 @@ def run_monte_carlo(
     seed: int,
     rho: float,
     return_samples: bool = False,
+    bolao_participants: Sequence[dict[str, Any]] | None = None,
+    bolao_rules: dict[str, Any] | None = None,
     display_threshold_pct: float = 0.1,
     position_interval_percentiles: tuple[int, int] = (10, 90),
 ) -> dict[str, Any]:
@@ -838,6 +973,12 @@ def run_monte_carlo(
             }
         )
 
+    bolao = None
+    if bolao_participants:
+        bolao = calculate_bolao_probabilities(
+            bolao_participants, bolao_rules or {}, state, points, positions, simulations
+        )
+
     team_results.sort(key=lambda item: (-item["probabilidades_pct"]["campeao"], item["posicao_projetada_media"]))
     standard_error_max = 100.0 * math.sqrt(0.25 / simulations)
     output: dict[str, Any] = {
@@ -857,6 +998,8 @@ def run_monte_carlo(
             "pares_residuais": total_residual_pairs,
         },
     }
+    if bolao is not None:
+        output["_bolao"] = bolao
     if return_samples:
         output["_league_order"] = order
     return output
@@ -1172,7 +1315,7 @@ def validate_probabilities(teams: Sequence[dict[str, Any]]) -> None:
                 raise ValueError(f"probabilidade fora do intervalo para {item['clube']}")
 
 
-def generate(simulations: int | None = None, seed_override: int | None = None) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
+def generate(simulations: int | None = None, seed_override: int | None = None) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
     config = load_json(CONFIG_PATH)
     audit_models = load_json(AUDIT_MODELS_PATH)
     table = load_json(TABLE_PATH)
@@ -1181,6 +1324,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     calendar = load_json(CALENDAR_PATH)
     state = load_current_state(table)
     allowed_teams = set(state.teams)
+    bolao_participants, bolao_rules = load_bolao_participants(allowed_teams)
     historical = load_historical_matches()
     current = load_current_matches(events, allowed_teams, results)
     integrity = validate_current_results_against_table(current, state)
@@ -1230,10 +1374,13 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         seed,
         rho_production,
         return_samples=True,
+        bolao_participants=bolao_participants,
+        bolao_rules=bolao_rules,
         display_threshold_pct=display_threshold,
         position_interval_percentiles=position_percentiles,
     )
     league_order = simulation.pop("_league_order")
+    bolao = simulation.pop("_bolao")
     try:
         continental_snapshots = load_continental_snapshots()
         continental = integrate_continental_probabilities(
@@ -1289,6 +1436,9 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     input_hash = canonical_hash_payload({"brasileirao": input_hash, "competicoes": continental_hash})
     generated_at = reference.replace(microsecond=0).isoformat()
     model_version = str(config.get("versao_modelo") or "AF-Previsão 1.0")
+    bolao["gerado_em"] = generated_at
+    bolao["versao_modelo"] = model_version
+    bolao["hash_entrada"] = input_hash
     methodology = {
         "arquitetura": "Poisson log-linear ajustado por MAP com priors gaussianos e partial pooling",
         "modelo_de_gols": "Poisson duplo com parâmetros de ataque, defesa e vantagem de mando",
@@ -1475,6 +1625,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "probabilidades": "dados-br/probabilidades-brasileirao.json",
             "historico": "dados-br/historico-probabilidades.json",
             "auditoria": "dados-br/auditoria-probabilidades.json",
+            "probabilidades_bolao": "dados-br/probabilidades-bolao.json",
         },
     }
 
@@ -1485,7 +1636,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         simulations=simulations_final,
         max_snapshots=int(execution.get("historico_max_snapshots") or 300),
     )
-    return probabilities, audit, history
+    return probabilities, audit, history, bolao
 
 
 def self_test() -> None:
@@ -1637,6 +1788,25 @@ def self_test() -> None:
     snapshot_b["copa_do_brasil"]["gerado_em"] = "2026-07-18T01:00:00-03:00"
     if continental_snapshots_state_hash(snapshot_a) != continental_snapshots_state_hash(snapshot_b):
         raise AssertionError("timestamp de coleta não pode criar snapshot histórico artificial")
+    # O bolão precisa repartir empates de título sem perder ou duplicar probabilidade.
+    test_points = np.tile(np.arange(20, 40, dtype=np.int16), (100, 1))
+    test_positions = np.tile(np.arange(1, 21, dtype=np.uint8), (100, 1))
+    test_participants = [
+        {"nome": "A", "coracao": {"time": teams[0], "palpite": 1}, "times": [
+            {"time": teams[1], "palpite": 2}, {"time": teams[2], "palpite": 3},
+            {"time": teams[3], "palpite": 4}, {"time": teams[4], "palpite": 5},
+            {"time": teams[5], "palpite": 6}], "cai": teams[19]},
+        {"nome": "B", "coracao": {"time": teams[0], "palpite": 1}, "times": [
+            {"time": teams[1], "palpite": 2}, {"time": teams[2], "palpite": 3},
+            {"time": teams[3], "palpite": 4}, {"time": teams[4], "palpite": 5},
+            {"time": teams[5], "palpite": 6}], "cai": teams[19]},
+    ]
+    test_bolao = calculate_bolao_probabilities(test_participants, {}, state, test_points, test_positions, 100)
+    if abs(sum(item["chance_titulo_pct"] for item in test_bolao["participantes"]) - 100.0) > 1e-9:
+        raise AssertionError("chances do bolão não somam 100%")
+    if any(abs(item["chance_titulo_pct"] - 50.0) > 1e-9 for item in test_bolao["participantes"]):
+        raise AssertionError("empate do bolão não foi dividido igualmente")
+
     snapshot_b["copa_do_brasil"]["eventos"] = [{"event_id": "novo"}]
     if continental_snapshots_state_hash(snapshot_a) == continental_snapshots_state_hash(snapshot_b):
         raise AssertionError("mudança esportiva precisa alterar o hash continental")
@@ -1653,20 +1823,22 @@ def main() -> int:
         self_test()
         return 0
     try:
-        probabilities, audit, history = generate(args.simulacoes, args.semente)
+        probabilities, audit, history, bolao = generate(args.simulacoes, args.semente)
     except CurrentDataNotSynchronized as exc:
-        previous_files = (OUTPUT_PATH, AUDIT_PATH, HISTORY_PATH)
+        previous_files = (OUTPUT_PATH, AUDIT_PATH, HISTORY_PATH, BOLAO_OUTPUT_PATH)
         previous_valid = all(path.exists() for path in previous_files)
         if previous_valid:
             try:
                 previous_output = load_json(OUTPUT_PATH)
                 previous_audit = load_json(AUDIT_PATH)
                 previous_history = load_json(HISTORY_PATH)
+                previous_bolao = load_json(BOLAO_OUTPUT_PATH)
                 previous_valid = (
                     previous_output.get("status") == "ok"
                     and previous_audit.get("status") == "ok"
                     and bool(previous_history.get("snapshots"))
                     and previous_output.get("hash_entrada") == previous_audit.get("hash_entrada")
+                    and previous_bolao.get("status") == "ok"
                 )
             except (OSError, ValueError, json.JSONDecodeError):
                 previous_valid = False
@@ -1687,6 +1859,7 @@ def main() -> int:
     write_json(OUTPUT_PATH, probabilities)
     write_json(AUDIT_PATH, audit)
     write_json(HISTORY_PATH, history)
+    write_json(BOLAO_OUTPUT_PATH, bolao)
     print(
         "AF-Previsão gerado: "
         f"{probabilities['base_corrente']['partidas_concluidas']} concluídos, "
