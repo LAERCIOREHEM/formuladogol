@@ -249,14 +249,77 @@ def stage_is_final(stage: str, rank: int) -> bool:
     return rank >= 900 or text in explicit or text.startswith("final ")
 
 
+def knockout_stage_from_team_count(team_count: int) -> tuple[int, str] | None:
+    stages = {
+        2: (900, "Final"),
+        4: (800, "Semifinal"),
+        8: (700, "Quartas de final"),
+        16: (600, "Oitavas de final"),
+        32: (500, "Fase de 32"),
+        64: (400, "Fase de 64"),
+    }
+    return stages.get(team_count)
+
+
+def event_pair_key(event: CupEvent) -> tuple[str, str]:
+    return tuple(sorted((normalize_text(event.home.name), normalize_text(event.away.name))))
+
+
+def stage_group_is_consistent(stage_events: Sequence[CupEvent]) -> bool:
+    ties = build_ties(stage_events)
+    participants = {tie.team_a for tie in ties} | {tie.team_b for tie in ties}
+    return bool(ties) and len(participants) == 2 * len(ties) and is_power_of_two(len(participants))
+
+
 def current_stage(events: Sequence[CupEvent]) -> tuple[int, str, list[CupEvent]]:
     pending = [event for event in events if not event.completed]
     if not pending:
         highest = max(event.stage_rank for event in events)
         stage_events = [event for event in events if event.stage_rank == highest]
         return highest, stage_events[0].stage, stage_events
+
     rank = min(event.stage_rank for event in pending)
     stage_events = [event for event in events if event.stage_rank == rank]
+    if stage_group_is_consistent(stage_events):
+        stage = sorted({event.stage for event in stage_events})[0]
+        return rank, stage, stage_events
+
+    # A ESPN às vezes substitui o nome da fase por textos operacionais como
+    # “Ida”, “Volta” ou “avança nos pênaltis”. Nesses casos todos os eventos
+    # podem chegar com fase_ordem=100, misturando o torneio inteiro. Reconstrói
+    # a fase corrente pelos confrontos que ainda possuem partida pendente e
+    # inclui as duas pernas de cada chave.
+    pending_pairs = {event_pair_key(event) for event in pending}
+    paired_events: list[CupEvent] = []
+    for pair in pending_pairs:
+        pair_pending = sorted(
+            (event for event in pending if event_pair_key(event) == pair),
+            key=lambda item: (item.played_at, item.event_id),
+        )
+        paired_events.extend(pair_pending)
+        # Quando só a volta está pendente, inclui a ida concluída mais recente.
+        # Se as duas pernas futuras já vieram da ESPN, não mistura confrontos
+        # antigos entre os mesmos clubes (por exemplo, jogos da fase de grupos).
+        if len(pair_pending) == 1:
+            before = sorted(
+                (
+                    event for event in events
+                    if event.completed
+                    and event_pair_key(event) == pair
+                    and event.played_at < pair_pending[0].played_at
+                    and (pair_pending[0].played_at - event.played_at).days <= 35
+                ),
+                key=lambda item: (item.played_at, item.event_id),
+            )
+            if before:
+                paired_events.append(before[-1])
+    paired_events.sort(key=lambda item: (item.played_at, item.event_id))
+    participants = {event.home.name for event in paired_events} | {event.away.name for event in paired_events}
+    inferred = knockout_stage_from_team_count(len(participants))
+    if inferred and len(participants) == 2 * len(pending_pairs):
+        inferred_rank, inferred_stage = inferred
+        return inferred_rank, inferred_stage, paired_events
+
     stage = sorted({event.stage for event in stage_events})[0]
     return rank, stage, stage_events
 

@@ -1588,7 +1588,7 @@ body > .container > section.hero > img {
 }
 
 /* AF-Previsão: hierarquia principal e tabela comparativa */
-.stats-tab-featured { grid-column: 1 / -1 !important; min-height: 76px; font-size: 18px; }
+.stats-tab-featured { grid-column: 1 / -1 !important; min-height: 76px; padding-inline: 14px; font-size: clamp(15px, 2.2vw, 18px); line-height: 1.15; text-align: center; white-space: normal; overflow-wrap: anywhere; }
 .probability-compact-hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 14px; }
 .probability-compact-hero h2 { margin-top: 3px; color: #fff; }
 .probability-compact-hero p { max-width: 760px; margin: 0; color: #b8c7d4; font-size: 13px; line-height: 1.55; text-align: right; }

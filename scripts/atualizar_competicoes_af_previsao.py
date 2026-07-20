@@ -313,6 +313,72 @@ def extract_event(event: dict[str, Any], spec: CompetitionSpec) -> dict[str, Any
     }
 
 
+
+def knockout_stage_from_team_count(team_count: int) -> tuple[int, str] | None:
+    stages = {
+        2: (900, "Final"),
+        4: (800, "Semifinal"),
+        8: (700, "Quartas de final"),
+        16: (600, "Oitavas de final"),
+        32: (500, "Fase de 32"),
+        64: (400, "Fase de 64"),
+    }
+    return stages.get(team_count)
+
+
+def event_pair_key(event: dict[str, Any]) -> tuple[str, str]:
+    return tuple(sorted((
+        normalize_text((event.get("mandante") or {}).get("nome")),
+        normalize_text((event.get("visitante") or {}).get("nome")),
+    )))
+
+
+def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
+    """Corrige fases que a ESPN devolve apenas como Ida/Volta/status agregado."""
+    pending = [event for event in events if not event.get("concluido")]
+    if not pending:
+        return
+    current_rank = min(int(event.get("fase_ordem") or 0) for event in pending)
+    current_rank_events = [event for event in events if int(event.get("fase_ordem") or 0) == current_rank]
+    current_pairs = {event_pair_key(event) for event in current_rank_events}
+    current_teams = {team for pair in current_pairs for team in pair if team}
+    if current_pairs and len(current_teams) == 2 * len(current_pairs) and len(current_teams) & (len(current_teams) - 1) == 0:
+        return
+
+    pending_pairs = {event_pair_key(event) for event in pending}
+    active_events: list[dict[str, Any]] = []
+    for pair in pending_pairs:
+        pair_pending = sorted(
+            (event for event in pending if event_pair_key(event) == pair),
+            key=lambda item: (item.get("data_iso") or "", item.get("event_id") or ""),
+        )
+        active_events.extend(pair_pending)
+        if len(pair_pending) == 1:
+            pending_date = parse_datetime(pair_pending[0].get("data_iso"))
+            before = []
+            if pending_date:
+                before = sorted(
+                    (
+                        event for event in events
+                        if event.get("concluido")
+                        and event_pair_key(event) == pair
+                        and (event_date := parse_datetime(event.get("data_iso"))) is not None
+                        and event_date < pending_date
+                        and (pending_date - event_date).days <= 35
+                    ),
+                    key=lambda item: (item.get("data_iso") or "", item.get("event_id") or ""),
+                )
+            if before:
+                active_events.append(before[-1])
+    active_teams = {team for pair in pending_pairs for team in pair if team}
+    inferred = knockout_stage_from_team_count(len(active_teams))
+    if not inferred or len(active_teams) != 2 * len(pending_pairs):
+        return
+    inferred_rank, inferred_label = inferred
+    for event in active_events:
+        event["fase_ordem"] = inferred_rank
+        event["fase"] = inferred_label
+
 def detect_current_stage(events: list[dict[str, Any]]) -> dict[str, Any]:
     not_completed = [event for event in events if not event.get("concluido")]
     if not_completed:
@@ -343,6 +409,7 @@ def detect_current_stage(events: list[dict[str, Any]]) -> dict[str, Any]:
 def build_snapshot(spec: CompetitionSpec, raw_events: list[dict[str, Any]]) -> dict[str, Any]:
     events = [parsed for event in raw_events if (parsed := extract_event(event, spec))]
     events.sort(key=lambda item: (item.get("data_iso") or "", item.get("event_id") or ""))
+    normalize_active_knockout_stage(events)
     team_map: dict[str, dict[str, Any]] = {}
     for event in events:
         for side in ("mandante", "visitante"):

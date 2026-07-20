@@ -1527,6 +1527,13 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         )
     except ContinentalDataNotReady as exc:
         raise CurrentDataNotSynchronized(f"AF-Previsão Continental aguardando dados: {exc}") from exc
+
+    input_hash = build_model_state_hash(config, audit_models, state, current, fixtures)
+    continental_hash = continental_snapshots_state_hash(continental_snapshots)
+    input_hash = canonical_hash_payload({"brasileirao": input_hash, "competicoes": continental_hash})
+    generated_at = reference.replace(microsecond=0).isoformat()
+    model_version = str(config.get("versao_modelo") or "AF-Previsão 1.0")
+
     points_thresholds = build_points_thresholds(
         point_objectives,
         continental["pontuacao_objetivos"],
@@ -1573,11 +1580,6 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             if not math.isfinite(value) or not 0.0 <= value <= 100.0:
                 raise ValueError(f"probabilidade integrada inválida para {item['clube']}: {field}")
 
-    input_hash = build_model_state_hash(config, audit_models, state, current, fixtures)
-    continental_hash = continental_snapshots_state_hash(continental_snapshots)
-    input_hash = canonical_hash_payload({"brasileirao": input_hash, "competicoes": continental_hash})
-    generated_at = reference.replace(microsecond=0).isoformat()
-    model_version = str(config.get("versao_modelo") or "AF-Previsão 1.0")
     bolao["gerado_em"] = generated_at
     bolao["versao_modelo"] = model_version
     bolao["hash_entrada"] = input_hash
