@@ -1,8 +1,10 @@
 name: Buscar transmissões ao vivo do Brasileirão
 
 on:
+  # Duas consultas diárias são suficientes para jogos futuros:
+  # 09:15 e 18:15 no horário de Brasília (12:15 e 21:15 UTC).
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '15 12,21 * * *'
   workflow_dispatch:
     inputs:
       event_id:

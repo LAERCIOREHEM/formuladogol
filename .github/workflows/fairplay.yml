@@ -1,11 +1,7 @@
 name: Atualiza fair play (cartões)
 
 on:
-  schedule:
-    # Fallback interno: 1x por hora no minuto :45 durante a Copa.
-    # Minuto :45 escolhido para não bater com atualizar-tudo (:00/:05 via cron externo),
-    # seleções (:20), jogos (:23) e resultados (:33).
-    - cron: "45 * * * *"
+  # Copa encerrada: preservado apenas para eventual execução manual histórica.
   workflow_dispatch: {}
 
 permissions:

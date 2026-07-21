@@ -1,48 +1,16 @@
 name: Atualizar Brasileirao (ESPN)
 
 on:
-  # NOVO workflow do modulo Brasileirao (v2, pos-Copa).
-  # Roda a cada 10 minutos e substitui a antiga cadeia Terra/Globo:
-  #   - tabela.json         -> classificacao via ESPN standings
-  #   - jogos.json          -> proximos jogos via ESPN scoreboard
-  #   - resultados.json     -> resultados via ESPN scoreboard
-  #   - espn_eventos.json   -> indice ESPN para AO VIVO/ONDE ASSISTIR
-  #
-  # OBS 1: o cron do GitHub e "melhor esforco" (pode atrasar alguns minutos
-  #        em horario de pico). O placar EM TEMPO REAL nao depende dele:
-  #        o proprio site consulta a ESPN a cada 30s durante os jogos.
-  # OBS 2: este workflow NAO toca em nada do modulo copa2026/.
-  schedule:
-    - cron: '*/10 * * * *'
+  # Execução operacional exclusiva por workflow_dispatch. O cron-job.org
+  # chama este mesmo gatilho; o botão "Run workflow" continua disponível.
+  # Não há schedule interno nem push automático, evitando execuções duplicadas.
   workflow_dispatch:
-
-  push:
-    paths:
-      - 'atualizar_espn.py'
-      - 'scripts/gerar_estatisticas_brasileirao.py'
-      - 'scripts/buscar_lideres_jogadores_espn.py'
-      - 'scripts/gerar_estatisticas_competicao_brasileirao.py'
-      - 'scripts/gerar_auditoria_estatisticas_brasileirao.py'
-      - 'scripts/buscar_detalhes_jogos_brasileirao.py'
-      - 'scripts/gerar_auditoria_cobertura_resultados.py'
-      - 'scripts/gerar_auditoria_calendario.py'
-      - 'scripts/gerar_probabilidades_brasileirao.py'
-      - 'scripts/gerar_probabilidades_jogos.py'
-      - 'scripts/avaliar_af_previsao.py'
-      - 'scripts/af_previsao_continental.py'
-      - 'scripts/atualizar_competicoes_af_previsao.py'
-      - 'scripts/af_previsao_backtest.py'
-      - 'dados-br/config-af-previsao.json'
-      - 'dados-br/participantes-bolao-classificacao.json'
-      - 'dados-br/auditoria-modelos-af-previsao.json'
-      - 'dados-br/historico-af-previsao/**'
-      - 'dados-br/competicoes-af-previsao/**'
-      - 'dados-br/auditoria-competicoes-af-previsao.json'
-      - 'requirements-af-previsao.txt'
-      - 'dados-br/ajustes-calendario.json'
-      - 'dados-br/resultados-manuais.json'
-      - 'dados-br/publicos-complementares.json'
-      - '.github/workflows/atualizar-brasileirao.yml'
+    inputs:
+      forcar_af:
+        description: 'Forçar o AF-Previsão mesmo sem mudança esportiva relevante'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -107,6 +75,51 @@ jobs:
           python scripts/gerar_probabilidades_jogos.py --self-test
           python scripts/avaliar_af_previsao.py --self-test
 
+      - name: Registrar estado esportivo anterior do AF-Previsão
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          arquivos = {
+              'tabela': 'tabela.json',
+              'resultados': 'resultados.json',
+              'calendario': 'dados-br/calendario-completo.json',
+              'copa_do_brasil': 'dados-br/competicoes-af-previsao/copa-do-brasil.json',
+              'libertadores': 'dados-br/competicoes-af-previsao/libertadores.json',
+              'sul_americana': 'dados-br/competicoes-af-previsao/sul-americana.json',
+              'config': 'dados-br/config-af-previsao.json',
+              'bolao': 'dados-br/participantes-bolao-classificacao.json',
+          }
+
+          def carregar(caminho):
+              path = Path(caminho)
+              if not path.exists():
+                  return None
+              data = json.loads(path.read_text(encoding='utf-8'))
+              if caminho == 'tabela.json':
+                  return data.get('tabela') or []
+              if caminho == 'resultados.json':
+                  return data.get('resultados') or []
+              if caminho.endswith('calendario-completo.json'):
+                  return data.get('partidas') or data.get('jogos') or []
+              if 'competicoes-af-previsao' in caminho:
+                  return {
+                      'status': data.get('status'),
+                      'competicao': data.get('competicao'),
+                      'fase_atual': data.get('fase_atual'),
+                      'eventos': data.get('eventos') or [],
+                  }
+              return data
+
+          estado = {chave: carregar(caminho) for chave, caminho in arquivos.items()}
+          bruto = json.dumps(estado, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
+          digest = hashlib.sha256(bruto).hexdigest()
+          Path('/tmp/af_estado_antes.sha256').write_text(digest, encoding='utf-8')
+          print(f'Estado anterior do AF: {digest}')
+          PY
+
       # --- DADOS DO BRASILEIRAO (100% ESPN) ---
       # O script grava os quatro JSONs de uma vez e falha antes de publicar
       # se a tabela nao preservar exatamente os 20 nomes canonicos do Ranking.
@@ -116,9 +129,6 @@ jobs:
 
       - name: Gerar auditoria estrutural do calendário
         run: python scripts/gerar_auditoria_calendario.py
-
-      - name: Gerar probabilidades pré-jogo de vitória, empate e derrota
-        run: python scripts/gerar_probabilidades_jogos.py
 
       - name: Buscar estatísticas por jogo finalizado
         run: python scripts/buscar_detalhes_jogos_brasileirao.py
@@ -132,11 +142,94 @@ jobs:
       - name: Atualizar competições que alteram as vagas continentais
         run: python scripts/atualizar_competicoes_af_previsao.py --max-age-minutes 45
 
+      - name: Verificar se o estado esportivo exige novo AF-Previsão
+        id: af_gate
+        env:
+          FORCAR_AF: ${{ inputs.forcar_af }}
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          arquivos = {
+              'tabela': 'tabela.json',
+              'resultados': 'resultados.json',
+              'calendario': 'dados-br/calendario-completo.json',
+              'copa_do_brasil': 'dados-br/competicoes-af-previsao/copa-do-brasil.json',
+              'libertadores': 'dados-br/competicoes-af-previsao/libertadores.json',
+              'sul_americana': 'dados-br/competicoes-af-previsao/sul-americana.json',
+              'config': 'dados-br/config-af-previsao.json',
+              'bolao': 'dados-br/participantes-bolao-classificacao.json',
+          }
+
+          def carregar(caminho):
+              path = Path(caminho)
+              if not path.exists():
+                  return None
+              data = json.loads(path.read_text(encoding='utf-8'))
+              if caminho == 'tabela.json':
+                  return data.get('tabela') or []
+              if caminho == 'resultados.json':
+                  return data.get('resultados') or []
+              if caminho.endswith('calendario-completo.json'):
+                  return data.get('partidas') or data.get('jogos') or []
+              if 'competicoes-af-previsao' in caminho:
+                  return {
+                      'status': data.get('status'),
+                      'competicao': data.get('competicao'),
+                      'fase_atual': data.get('fase_atual'),
+                      'eventos': data.get('eventos') or [],
+                  }
+              return data
+
+          estado = {chave: carregar(caminho) for chave, caminho in arquivos.items()}
+          bruto = json.dumps(estado, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
+          depois = hashlib.sha256(bruto).hexdigest()
+          antes_path = Path('/tmp/af_estado_antes.sha256')
+          antes = antes_path.read_text(encoding='utf-8').strip() if antes_path.exists() else ''
+          obrigatorios = [
+              Path('dados-br/probabilidades-brasileirao.json'),
+              Path('dados-br/probabilidades-por-pontuacao.json'),
+              Path('dados-br/probabilidades-bolao.json'),
+              Path('dados-br/probabilidades-jogos.json'),
+          ]
+          faltando = any(not item.exists() for item in obrigatorios)
+          forcar = str(os.environ.get('FORCAR_AF', '')).lower() == 'true'
+          executar = forcar or faltando or antes != depois
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'run_af={str(executar).lower()}\n')
+              output.write(f'estado_antes={antes}\n')
+              output.write(f'estado_depois={depois}\n')
+
+          if forcar:
+              motivo = 'execução manual com forcar_af=true'
+          elif faltando:
+              motivo = 'artefato obrigatório ausente'
+          elif antes != depois:
+              motivo = 'resultado, tabela, calendário, competição continental ou configuração mudou'
+          else:
+              motivo = 'nenhuma mudança esportiva relevante'
+          print(f'Executar AF-Previsão: {executar} — {motivo}')
+          PY
+
+      - name: Gerar probabilidades pré-jogo de vitória, empate e derrota
+        if: steps.af_gate.outputs.run_af == 'true'
+        run: python scripts/gerar_probabilidades_jogos.py
+
       - name: Gerar AF-Previsão integrado e simular o restante do campeonato
+        if: steps.af_gate.outputs.run_af == 'true'
         run: python scripts/gerar_probabilidades_brasileirao.py
 
       - name: Auditar histórico e preparar avaliação final do AF-Previsão
+        if: steps.af_gate.outputs.run_af == 'true'
         run: python scripts/avaliar_af_previsao.py --strict
+
+      - name: Informar preservação do último AF-Previsão
+        if: steps.af_gate.outputs.run_af != 'true'
+        run: echo "Nenhuma mudança esportiva relevante; último AF-Previsão válido preservado sem repetir 2 milhões de simulações."
 
       - name: Gerar estatísticas gerais da competição
         run: python scripts/gerar_estatisticas_competicao_brasileirao.py
