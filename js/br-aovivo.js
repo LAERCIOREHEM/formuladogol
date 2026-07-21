@@ -1341,15 +1341,25 @@
     return out;
   }
 
+  function stripSubstitutionReason(value) {
+    return String(value || "")
+      .replace(/\s+/g, " ")
+      .replace(/\s*\((?:injury|injured|tactical|concussion|illness|medical|les[aã]o|lesionado|contus[aã]o|op[cç][aã]o t[eé]cnica|problema f[ií]sico)\)\s*$/i, "")
+      .replace(/\s+(?:because of|due to)\s+(?:an?\s+)?(?:injury|concussion|illness)\s*$/i, "")
+      .replace(/\s+(?:injury|injured|tactical|concussion|illness|medical|les[aã]o|lesionado|contus[aã]o|op[cç][aã]o t[eé]cnica|problema f[ií]sico)\s*$/i, "")
+      .trim();
+  }
+
   function cleanSubstitutionText(value) {
-    return String(value || "").replace(/\s+/g, " ").replace(/^Substitution[,.:]?\s*/i, "").replace(/^Substitui[cç][aã]o[,.:]?\s*/i, "").trim();
+    const cleaned = String(value || "").replace(/\s+/g, " ").replace(/^Substitution[,.:]?\s*/i, "").replace(/^Substitui[cç][aã]o[,.:]?\s*/i, "").trim();
+    return stripSubstitutionReason(cleaned);
   }
 
   function substitutionNames(item) {
     const raw = String(item && (item.text || item.shortText || item.description) || "").trim();
     let match = raw.match(/(?:Substitution[,.:]?\s*[^.]*\.\s*)?(.+?)\s+replaces\s+(.+?)(?:\.|$)/i);
     if (!match) match = raw.match(/(?:Substitui[cç][aã]o[,.:]?\s*[^.]*\.\s*)?(.+?)\s+entra\s+(?:no\s+lugar\s+de|por)\s+(.+?)(?:\.|$)/i);
-    if (match) return { entered: compactPlayerName(match[1]), left: compactPlayerName(match[2]), raw };
+    if (match) return { entered: compactPlayerName(stripSubstitutionReason(match[1])), left: compactPlayerName(stripSubstitutionReason(match[2])), raw };
     const involved = firstArray(item && item.athletesInvolved, item && item.participants, item && item.athletes);
     const names = involved.map(personName).filter(Boolean).map(compactPlayerName);
     if (names.length >= 2) return { entered: names[0], left: names[1], raw };
