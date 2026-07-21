@@ -260,9 +260,48 @@ jobs:
                   bloco = decomposicao.get(campo) or {}
                   if abs(float(bloco.get('soma_vias_pct', -999.0)) - float(probs[campo])) > 0.002:
                       fail(f'{clube["clube"]}: vias de {campo} não fecham')
-          if abs(total_lib - 600.0) > 0.05:
-              fail(f'Libertadores integrada não soma 600%: {total_lib:.6f}')
+          # A Libertadores integrada não possui soma fixa de 600%: além das vagas-base
+          # do Brasileirão, brasileiros podem entrar por Copa do Brasil, Libertadores e
+          # Sul-Americana. Sobreposições geram repasses. Portanto, a soma representa o
+          # número médio de brasileiros classificados nos universos simulados.
+          alocacao = ((auditoria.get('integracao_continental') or {}).get('alocacao_vagas') or {})
+          esperado_lib = alocacao.get('soma_probabilidades_libertadores_pct')
+          esperado_sula = alocacao.get('soma_probabilidades_sul_americana_pct')
+          if esperado_lib is None or esperado_sula is None:
+              fail('auditoria continental sem somas esperadas de Libertadores/Sul-Americana')
+          esperado_lib = float(esperado_lib)
+          esperado_sula = float(esperado_sula)
+          if not (math.isfinite(esperado_lib) and math.isfinite(esperado_sula)):
+              fail('auditoria continental publicou somas não finitas')
+          if abs(total_lib - esperado_lib) > 0.05:
+              fail(
+                  f'Libertadores integrada diverge da auditoria do motor: '
+                  f'clubes={total_lib:.6f}; auditoria={esperado_lib:.6f}'
+              )
+          if abs(total_sula - esperado_sula) > 0.05:
+              fail(
+                  f'Sul-Americana integrada diverge da auditoria do motor: '
+                  f'clubes={total_sula:.6f}; auditoria={esperado_sula:.6f}'
+              )
+
+          zonas_cfg = ((config.get('execucao_2') or {}).get('zonas_base') or {})
+          faixa_lib = zonas_cfg.get('libertadores_base') or [1, 5]
+          if not isinstance(faixa_lib, list) or len(faixa_lib) != 2:
+              fail(f'config AF inválida em libertadores_base: {faixa_lib}')
+          vagas_base_lib = int(faixa_lib[1]) - int(faixa_lib[0]) + 1
+          minimo_lib = 100.0 * vagas_base_lib
+          # Máximo estrutural atual: vagas-base + campeões da Copa do Brasil,
+          # Libertadores e Sul-Americana (até três vias adicionais).
+          maximo_lib = 100.0 * (vagas_base_lib + 3)
+          if not (minimo_lib - 0.05 <= total_lib <= maximo_lib + 0.05):
+              fail(
+                  f'Libertadores integrada fora dos limites estruturais: {total_lib:.6f}; '
+                  f'esperado entre {minimo_lib:.2f} e {maximo_lib:.2f}'
+              )
           if abs(total_sula - 600.0) > 0.05:
-              fail(f'Sul-Americana integrada não soma 600%: {total_sula:.6f}')
-          print('AF-Previsão Continental: coleta, simulação, decomposição e histórico validados')
+              fail(f'Sul-Americana integrada não soma seis vagas finais (600%): {total_sula:.6f}')
+          print(
+              'AF-Previsão Continental: coleta, simulação, decomposição e histórico validados; '
+              f'Libertadores média={total_lib / 100.0:.4f} clubes; Sul-Americana=6 clubes'
+          )
           PY
