@@ -6,7 +6,7 @@
   "gerado_em": "2026-07-17T22:05:00-03:00",
   "fonte_resultados_calendario": "ESPN",
   "status": "ok",
-  "hash_entrada": "af6ffaf0c555a4e3bdda9282194b5921f9bbacec0af4bdba5c385287c509454b",
+  "hash_entrada": "849b035d521c514f1b087e70dc2973f88d998ae8f5548b0b21d2577777db02dc",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -107,6 +107,9 @@
           "percentual_estimado": 67.136,
           "exibicao": "67,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -115,6 +118,9 @@
           "percentual_estimado": 99.9006,
           "exibicao": "99,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -123,6 +129,9 @@
           "percentual_estimado": 99.98875,
           "exibicao": ">99,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -131,6 +140,9 @@
           "percentual_estimado": 99.96795,
           "exibicao": ">99,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -139,6 +151,9 @@
           "percentual_estimado": 0.03195,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -147,6 +162,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "libertadores": {
@@ -155,6 +173,9 @@
           "percentual_estimado": 99.98485,
           "exibicao": ">99,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -163,6 +184,9 @@
           "percentual_estimado": 0.01515,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -223,6 +247,9 @@
             "percentual_estimado": 99.98485,
             "exibicao": ">99,9%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -232,6 +259,9 @@
               "percentual_estimado": 99.96795,
               "exibicao": ">99,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -240,6 +270,9 @@
               "percentual_estimado": 0.00755,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
@@ -248,15 +281,21 @@
               "percentual_estimado": 0.00235,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 140,
@@ -264,6 +303,9 @@
               "percentual_estimado": 0.007,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -274,6 +316,9 @@
               "percentual_estimado": 0.00505,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -282,6 +327,9 @@
               "percentual_estimado": 0.00225,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -290,6 +338,9 @@
               "percentual_estimado": 0.00025,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -302,6 +353,9 @@
             "percentual_estimado": 0.01515,
             "exibicao": "<0,1%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -311,6 +365,9 @@
               "percentual_estimado": 0.0151,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -319,6 +376,9 @@
               "percentual_estimado": 5e-05,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -348,6 +408,9 @@
           "percentual_estimado": 32.2784,
           "exibicao": "32,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -356,6 +419,9 @@
           "percentual_estimado": 99.27855,
           "exibicao": "99,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -364,6 +430,9 @@
           "percentual_estimado": 99.8689,
           "exibicao": "99,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -372,6 +441,9 @@
           "percentual_estimado": 99.7025,
           "exibicao": "99,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -380,6 +452,9 @@
           "percentual_estimado": 0.2951,
           "exibicao": "0,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -388,6 +463,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "libertadores": {
@@ -396,6 +474,9 @@
           "percentual_estimado": 99.83125,
           "exibicao": "99,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -404,6 +485,9 @@
           "percentual_estimado": 0.1676,
           "exibicao": "0,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -464,6 +548,9 @@
             "percentual_estimado": 99.83125,
             "exibicao": "99,8%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -473,15 +560,21 @@
               "percentual_estimado": 99.7025,
               "exibicao": "99,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 944,
@@ -489,15 +582,21 @@
               "percentual_estimado": 0.0472,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 1631,
@@ -505,6 +604,9 @@
               "percentual_estimado": 0.08155,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -513,25 +615,34 @@
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             }
           },
           "soma_vias_pct": 99.83125
@@ -543,6 +654,9 @@
             "percentual_estimado": 0.1676,
             "exibicao": "0,2%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -552,6 +666,9 @@
               "percentual_estimado": 0.16665,
               "exibicao": "0,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -560,6 +677,9 @@
               "percentual_estimado": 0.00095,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -589,6 +709,9 @@
           "percentual_estimado": 0.19295,
           "exibicao": "0,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -597,6 +720,9 @@
           "percentual_estimado": 42.32565,
           "exibicao": "42,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -605,6 +731,9 @@
           "percentual_estimado": 67.47905,
           "exibicao": "67,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -613,6 +742,9 @@
           "percentual_estimado": 56.36785,
           "exibicao": "56,4%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -621,6 +753,9 @@
           "percentual_estimado": 38.4696,
           "exibicao": "38,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -629,6 +764,9 @@
           "percentual_estimado": 0.18945,
           "exibicao": "0,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -637,6 +775,9 @@
           "percentual_estimado": 67.70955,
           "exibicao": "67,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -645,6 +786,9 @@
           "percentual_estimado": 29.48345,
           "exibicao": "29,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -705,6 +849,9 @@
             "percentual_estimado": 67.70955,
             "exibicao": "67,7%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -714,6 +861,9 @@
               "percentual_estimado": 56.36785,
               "exibicao": "56,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -722,6 +872,9 @@
               "percentual_estimado": 3.55745,
               "exibicao": "3,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
@@ -730,15 +883,21 @@
               "percentual_estimado": 0.94915,
               "exibicao": "0,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 136702,
@@ -746,6 +905,9 @@
               "percentual_estimado": 6.8351,
               "exibicao": "6,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -756,6 +918,9 @@
               "percentual_estimado": 1.27175,
               "exibicao": "1,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -764,6 +929,9 @@
               "percentual_estimado": 1.83445,
               "exibicao": "1,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -772,6 +940,9 @@
               "percentual_estimado": 0.45125,
               "exibicao": "0,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -784,6 +955,9 @@
             "percentual_estimado": 29.48345,
             "exibicao": "29,5%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -793,6 +967,9 @@
               "percentual_estimado": 27.65445,
               "exibicao": "27,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -801,6 +978,9 @@
               "percentual_estimado": 1.829,
               "exibicao": "1,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -830,6 +1010,9 @@
           "percentual_estimado": 0.12575,
           "exibicao": "0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -838,6 +1021,9 @@
           "percentual_estimado": 34.87725,
           "exibicao": "34,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -846,6 +1032,9 @@
           "percentual_estimado": 59.60105,
           "exibicao": "59,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -854,6 +1043,9 @@
           "percentual_estimado": 48.31105,
           "exibicao": "48,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -862,6 +1054,9 @@
           "percentual_estimado": 43.106,
           "exibicao": "43,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -870,6 +1065,9 @@
           "percentual_estimado": 0.54025,
           "exibicao": "0,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -878,6 +1076,9 @@
           "percentual_estimado": 56.6746,
           "exibicao": "56,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -886,6 +1087,9 @@
           "percentual_estimado": 37.921,
           "exibicao": "37,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -946,6 +1150,9 @@
             "percentual_estimado": 56.6746,
             "exibicao": "56,7%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -955,31 +1162,43 @@
               "percentual_estimado": 48.31105,
               "exibicao": "48,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 167271,
@@ -987,6 +1206,9 @@
               "percentual_estimado": 8.36355,
               "exibicao": "8,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -995,25 +1217,34 @@
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             }
           },
           "soma_vias_pct": 56.6746
@@ -1025,6 +1256,9 @@
             "percentual_estimado": 37.921,
             "exibicao": "37,9%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1034,6 +1268,9 @@
               "percentual_estimado": 34.74245,
               "exibicao": "34,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -1042,6 +1279,9 @@
               "percentual_estimado": 3.17855,
               "exibicao": "3,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1071,6 +1311,9 @@
           "percentual_estimado": 0.12055,
           "exibicao": "0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1079,6 +1322,9 @@
           "percentual_estimado": 32.88335,
           "exibicao": "32,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -1087,6 +1333,9 @@
           "percentual_estimado": 57.5375,
           "exibicao": "57,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -1095,6 +1344,9 @@
           "percentual_estimado": 46.128,
           "exibicao": "46,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -1103,6 +1355,9 @@
           "percentual_estimado": 45.0534,
           "exibicao": "45,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -1111,6 +1366,9 @@
           "percentual_estimado": 0.4574,
           "exibicao": "0,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -1119,6 +1377,9 @@
           "percentual_estimado": 58.67775,
           "exibicao": "58,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -1127,6 +1388,9 @@
           "percentual_estimado": 36.26725,
           "exibicao": "36,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -1187,6 +1451,9 @@
             "percentual_estimado": 58.67775,
             "exibicao": "58,7%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1196,6 +1463,9 @@
               "percentual_estimado": 46.128,
               "exibicao": "46,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -1204,23 +1474,32 @@
               "percentual_estimado": 5.265,
               "exibicao": "5,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 145695,
@@ -1228,6 +1507,9 @@
               "percentual_estimado": 7.28475,
               "exibicao": "7,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1238,6 +1520,9 @@
               "percentual_estimado": 1.9335,
               "exibicao": "1,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -1246,6 +1531,9 @@
               "percentual_estimado": 2.6692,
               "exibicao": "2,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -1254,6 +1542,9 @@
               "percentual_estimado": 0.6623,
               "exibicao": "0,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1266,6 +1557,9 @@
             "percentual_estimado": 36.26725,
             "exibicao": "36,3%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1275,6 +1569,9 @@
               "percentual_estimado": 33.3755,
               "exibicao": "33,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -1283,6 +1580,9 @@
               "percentual_estimado": 2.89175,
               "exibicao": "2,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1312,6 +1612,9 @@
           "percentual_estimado": 0.0592,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1320,6 +1623,9 @@
           "percentual_estimado": 22.9136,
           "exibicao": "22,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -1328,6 +1634,9 @@
           "percentual_estimado": 45.6086,
           "exibicao": "45,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -1336,6 +1645,9 @@
           "percentual_estimado": 34.5102,
           "exibicao": "34,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -1344,6 +1656,9 @@
           "percentual_estimado": 50.8716,
           "exibicao": "50,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -1352,6 +1667,9 @@
           "percentual_estimado": 1.08045,
           "exibicao": "1,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -1360,6 +1678,9 @@
           "percentual_estimado": 42.8493,
           "exibicao": "42,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -1368,6 +1689,9 @@
           "percentual_estimado": 47.61195,
           "exibicao": "47,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -1428,6 +1752,9 @@
             "percentual_estimado": 42.8493,
             "exibicao": "42,8%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1437,31 +1764,43 @@
               "percentual_estimado": 34.5102,
               "exibicao": "34,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 166782,
@@ -1469,6 +1808,9 @@
               "percentual_estimado": 8.3391,
               "exibicao": "8,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1477,25 +1819,34 @@
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             }
           },
           "soma_vias_pct": 42.8493
@@ -1507,6 +1858,9 @@
             "percentual_estimado": 47.61195,
             "exibicao": "47,6%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1516,6 +1870,9 @@
               "percentual_estimado": 42.5325,
               "exibicao": "42,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -1524,6 +1881,9 @@
               "percentual_estimado": 5.07945,
               "exibicao": "5,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1553,6 +1913,9 @@
           "percentual_estimado": 0.0563,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1561,6 +1924,9 @@
           "percentual_estimado": 25.37395,
           "exibicao": "25,4%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -1569,6 +1935,9 @@
           "percentual_estimado": 49.71895,
           "exibicao": "49,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -1577,6 +1946,9 @@
           "percentual_estimado": 37.9923,
           "exibicao": "38,0%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -1585,6 +1957,9 @@
           "percentual_estimado": 50.3419,
           "exibicao": "50,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -1593,6 +1968,9 @@
           "percentual_estimado": 0.68105,
           "exibicao": "0,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -1601,6 +1979,9 @@
           "percentual_estimado": 51.96475,
           "exibicao": "52,0%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -1609,6 +1990,9 @@
           "percentual_estimado": 41.2018,
           "exibicao": "41,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -1669,6 +2053,9 @@
             "percentual_estimado": 51.96475,
             "exibicao": "52,0%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1678,23 +2065,32 @@
               "percentual_estimado": 37.9923,
               "exibicao": "38,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 133507,
@@ -1702,6 +2098,9 @@
               "percentual_estimado": 6.67535,
               "exibicao": "6,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -1710,6 +2109,9 @@
               "percentual_estimado": 7.2971,
               "exibicao": "7,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1718,25 +2120,34 @@
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             }
           },
           "soma_vias_pct": 51.96475
@@ -1748,6 +2159,9 @@
             "percentual_estimado": 41.2018,
             "exibicao": "41,2%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1757,6 +2171,9 @@
               "percentual_estimado": 37.61755,
               "exibicao": "37,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -1765,6 +2182,9 @@
               "percentual_estimado": 3.58425,
               "exibicao": "3,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1794,6 +2214,9 @@
           "percentual_estimado": 0.0094,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -1802,6 +2225,9 @@
           "percentual_estimado": 9.89365,
           "exibicao": "9,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -1810,6 +2236,9 @@
           "percentual_estimado": 24.9965,
           "exibicao": "25,0%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -1818,6 +2247,9 @@
           "percentual_estimado": 16.94615,
           "exibicao": "16,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -1826,6 +2258,9 @@
           "percentual_estimado": 52.2255,
           "exibicao": "52,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -1834,6 +2269,9 @@
           "percentual_estimado": 3.91625,
           "exibicao": "3,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -1842,6 +2280,9 @@
           "percentual_estimado": 23.14915,
           "exibicao": "23,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -1850,6 +2291,9 @@
           "percentual_estimado": 54.75735,
           "exibicao": "54,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -1910,6 +2354,9 @@
             "percentual_estimado": 23.14915,
             "exibicao": "23,1%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1919,31 +2366,43 @@
               "percentual_estimado": 16.94615,
               "exibicao": "16,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 124060,
@@ -1951,6 +2410,9 @@
               "percentual_estimado": 6.203,
               "exibicao": "6,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -1959,25 +2421,34 @@
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             }
           },
           "soma_vias_pct": 23.14915
@@ -1989,6 +2460,9 @@
             "percentual_estimado": 54.75735,
             "exibicao": "54,8%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -1998,6 +2472,9 @@
               "percentual_estimado": 46.0225,
               "exibicao": "46,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -2006,6 +2483,9 @@
               "percentual_estimado": 8.73485,
               "exibicao": "8,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2035,6 +2515,9 @@
           "percentual_estimado": 0.00685,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2043,6 +2526,9 @@
           "percentual_estimado": 8.52605,
           "exibicao": "8,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -2051,6 +2537,9 @@
           "percentual_estimado": 22.0477,
           "exibicao": "22,0%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -2059,6 +2548,9 @@
           "percentual_estimado": 14.79415,
           "exibicao": "14,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -2067,6 +2559,9 @@
           "percentual_estimado": 49.7153,
           "exibicao": "49,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -2075,6 +2570,9 @@
           "percentual_estimado": 5.50725,
           "exibicao": "5,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -2083,6 +2581,9 @@
           "percentual_estimado": 34.49645,
           "exibicao": "34,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -2091,6 +2592,9 @@
           "percentual_estimado": 43.44525,
           "exibicao": "43,4%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -2151,6 +2655,9 @@
             "percentual_estimado": 34.49645,
             "exibicao": "34,5%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -2160,6 +2667,9 @@
               "percentual_estimado": 14.79415,
               "exibicao": "14,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -2168,6 +2678,9 @@
               "percentual_estimado": 12.544,
               "exibicao": "12,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
@@ -2176,15 +2689,21 @@
               "percentual_estimado": 2.5509,
               "exibicao": "2,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 92148,
@@ -2192,6 +2711,9 @@
               "percentual_estimado": 4.6074,
               "exibicao": "4,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2202,6 +2724,9 @@
               "percentual_estimado": 5.0344,
               "exibicao": "5,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -2210,6 +2735,9 @@
               "percentual_estimado": 5.9636,
               "exibicao": "6,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -2218,6 +2746,9 @@
               "percentual_estimado": 1.546,
               "exibicao": "1,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2230,6 +2761,9 @@
             "percentual_estimado": 43.44525,
             "exibicao": "43,4%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -2239,6 +2773,9 @@
               "percentual_estimado": 36.30195,
               "exibicao": "36,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -2247,6 +2784,9 @@
               "percentual_estimado": 7.1433,
               "exibicao": "7,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2276,6 +2816,9 @@
           "percentual_estimado": 0.005,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2284,6 +2827,9 @@
           "percentual_estimado": 5.43135,
           "exibicao": "5,4%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -2292,6 +2838,9 @@
           "percentual_estimado": 15.54235,
           "exibicao": "15,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -2300,6 +2849,9 @@
           "percentual_estimado": 9.9142,
           "exibicao": "9,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -2308,6 +2860,9 @@
           "percentual_estimado": 45.64085,
           "exibicao": "45,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -2316,6 +2871,9 @@
           "percentual_estimado": 7.7867,
           "exibicao": "7,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -2324,6 +2882,9 @@
           "percentual_estimado": 14.30175,
           "exibicao": "14,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -2332,6 +2893,9 @@
           "percentual_estimado": 51.8752,
           "exibicao": "51,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -2392,6 +2956,9 @@
             "percentual_estimado": 14.30175,
             "exibicao": "14,3%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -2401,31 +2968,43 @@
               "percentual_estimado": 9.9142,
               "exibicao": "9,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 87751,
@@ -2433,6 +3012,9 @@
               "percentual_estimado": 4.38755,
               "exibicao": "4,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2441,25 +3023,34 @@
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Copa do Brasil",
+              "limite_superior_95_regra_dos_tres_pct": null
             }
           },
           "soma_vias_pct": 14.30175
@@ -2471,6 +3062,9 @@
             "percentual_estimado": 51.8752,
             "exibicao": "51,9%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -2480,6 +3074,9 @@
               "percentual_estimado": 41.2533,
               "exibicao": "41,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -2488,6 +3085,9 @@
               "percentual_estimado": 10.6219,
               "exibicao": "10,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2517,6 +3117,9 @@
           "percentual_estimado": 0.0045,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2525,6 +3128,9 @@
           "percentual_estimado": 7.0874,
           "exibicao": "7,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -2533,6 +3139,9 @@
           "percentual_estimado": 19.4002,
           "exibicao": "19,4%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -2541,6 +3150,9 @@
           "percentual_estimado": 12.6848,
           "exibicao": "12,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -2549,6 +3161,9 @@
           "percentual_estimado": 49.4776,
           "exibicao": "49,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -2557,6 +3172,9 @@
           "percentual_estimado": 5.67735,
           "exibicao": "5,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -2565,6 +3183,9 @@
           "percentual_estimado": 20.2084,
           "exibicao": "20,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -2573,6 +3194,9 @@
           "percentual_estimado": 52.4722,
           "exibicao": "52,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -2633,6 +3257,9 @@
             "percentual_estimado": 20.2084,
             "exibicao": "20,2%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -2642,6 +3269,9 @@
               "percentual_estimado": 12.6848,
               "exibicao": "12,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -2650,23 +3280,32 @@
               "percentual_estimado": 2.44105,
               "exibicao": "2,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 101651,
@@ -2674,6 +3313,9 @@
               "percentual_estimado": 5.08255,
               "exibicao": "5,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2684,6 +3326,9 @@
               "percentual_estimado": 0.96885,
               "exibicao": "1,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -2692,6 +3337,9 @@
               "percentual_estimado": 1.00735,
               "exibicao": "1,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -2700,6 +3348,9 @@
               "percentual_estimado": 0.46485,
               "exibicao": "0,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2712,6 +3363,9 @@
             "percentual_estimado": 52.4722,
             "exibicao": "52,5%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -2721,6 +3375,9 @@
               "percentual_estimado": 43.00805,
               "exibicao": "43,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -2729,6 +3386,9 @@
               "percentual_estimado": 9.46415,
               "exibicao": "9,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2758,6 +3418,9 @@
           "percentual_estimado": 0.0038,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -2766,6 +3429,9 @@
           "percentual_estimado": 5.79235,
           "exibicao": "5,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -2774,6 +3440,9 @@
           "percentual_estimado": 16.56055,
           "exibicao": "16,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -2782,6 +3451,9 @@
           "percentual_estimado": 10.58965,
           "exibicao": "10,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -2790,6 +3462,9 @@
           "percentual_estimado": 46.93735,
           "exibicao": "46,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -2798,6 +3473,9 @@
           "percentual_estimado": 7.3083,
           "exibicao": "7,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -2806,6 +3484,9 @@
           "percentual_estimado": 24.5345,
           "exibicao": "24,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -2814,6 +3495,9 @@
           "percentual_estimado": 46.57475,
           "exibicao": "46,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -2874,6 +3558,9 @@
             "percentual_estimado": 24.5345,
             "exibicao": "24,5%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -2883,6 +3570,9 @@
               "percentual_estimado": 10.58965,
               "exibicao": "10,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -2891,6 +3581,9 @@
               "percentual_estimado": 8.0403,
               "exibicao": "8,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
@@ -2899,15 +3592,21 @@
               "percentual_estimado": 1.7106,
               "exibicao": "1,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 83879,
@@ -2915,6 +3614,9 @@
               "percentual_estimado": 4.19395,
               "exibicao": "4,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2925,6 +3627,9 @@
               "percentual_estimado": 3.04465,
               "exibicao": "3,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -2933,6 +3638,9 @@
               "percentual_estimado": 3.9329,
               "exibicao": "3,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -2941,6 +3649,9 @@
               "percentual_estimado": 1.06275,
               "exibicao": "1,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2953,6 +3664,9 @@
             "percentual_estimado": 46.57475,
             "exibicao": "46,6%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -2962,6 +3676,9 @@
               "percentual_estimado": 37.6177,
               "exibicao": "37,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -2970,6 +3687,9 @@
               "percentual_estimado": 8.95705,
               "exibicao": "9,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -2999,6 +3719,9 @@
           "percentual_estimado": 0.00095,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3007,6 +3730,9 @@
           "percentual_estimado": 2.12605,
           "exibicao": "2,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -3015,6 +3741,9 @@
           "percentual_estimado": 7.2376,
           "exibicao": "7,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -3023,6 +3752,9 @@
           "percentual_estimado": 4.2466,
           "exibicao": "4,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -3031,6 +3763,9 @@
           "percentual_estimado": 32.7045,
           "exibicao": "32,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -3039,6 +3774,9 @@
           "percentual_estimado": 16.4603,
           "exibicao": "16,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -3047,6 +3785,9 @@
           "percentual_estimado": 9.3473,
           "exibicao": "9,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -3055,6 +3796,9 @@
           "percentual_estimado": 40.2757,
           "exibicao": "40,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -3115,6 +3859,9 @@
             "percentual_estimado": 9.3473,
             "exibicao": "9,3%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -3124,6 +3871,9 @@
               "percentual_estimado": 4.2466,
               "exibicao": "4,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -3132,23 +3882,32 @@
               "percentual_estimado": 2.7545,
               "exibicao": "2,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 46924,
@@ -3156,6 +3915,9 @@
               "percentual_estimado": 2.3462,
               "exibicao": "2,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3166,6 +3928,9 @@
               "percentual_estimado": 0.74885,
               "exibicao": "0,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -3174,6 +3939,9 @@
               "percentual_estimado": 1.61545,
               "exibicao": "1,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -3182,6 +3950,9 @@
               "percentual_estimado": 0.3902,
               "exibicao": "0,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3194,6 +3965,9 @@
             "percentual_estimado": 40.2757,
             "exibicao": "40,3%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -3203,6 +3977,9 @@
               "percentual_estimado": 29.4126,
               "exibicao": "29,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -3211,6 +3988,9 @@
               "percentual_estimado": 10.8631,
               "exibicao": "10,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3240,6 +4020,9 @@
           "percentual_estimado": 0.0002,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3248,6 +4031,9 @@
           "percentual_estimado": 1.27125,
           "exibicao": "1,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -3256,6 +4042,9 @@
           "percentual_estimado": 4.77275,
           "exibicao": "4,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -3264,6 +4053,9 @@
           "percentual_estimado": 2.69175,
           "exibicao": "2,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -3272,6 +4064,9 @@
           "percentual_estimado": 26.0157,
           "exibicao": "26,0%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -3280,6 +4075,9 @@
           "percentual_estimado": 23.9492,
           "exibicao": "23,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -3288,6 +4086,9 @@
           "percentual_estimado": 12.96395,
           "exibicao": "13,0%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -3296,6 +4097,9 @@
           "percentual_estimado": 31.34475,
           "exibicao": "31,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -3356,6 +4160,9 @@
             "percentual_estimado": 12.96395,
             "exibicao": "13,0%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -3365,6 +4172,9 @@
               "percentual_estimado": 2.69175,
               "exibicao": "2,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -3373,23 +4183,32 @@
               "percentual_estimado": 8.68175,
               "exibicao": "8,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 31809,
@@ -3397,6 +4216,9 @@
               "percentual_estimado": 1.59045,
               "exibicao": "1,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3407,6 +4229,9 @@
               "percentual_estimado": 3.20555,
               "exibicao": "3,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -3415,6 +4240,9 @@
               "percentual_estimado": 4.3298,
               "exibicao": "4,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -3423,6 +4251,9 @@
               "percentual_estimado": 1.1464,
               "exibicao": "1,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3435,6 +4266,9 @@
             "percentual_estimado": 31.34475,
             "exibicao": "31,3%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -3444,6 +4278,9 @@
               "percentual_estimado": 22.1058,
               "exibicao": "22,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -3452,6 +4289,9 @@
               "percentual_estimado": 9.23895,
               "exibicao": "9,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3481,6 +4321,9 @@
           "percentual_estimado": 0.0001,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3489,6 +4332,9 @@
           "percentual_estimado": 1.30015,
           "exibicao": "1,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -3497,6 +4343,9 @@
           "percentual_estimado": 4.8324,
           "exibicao": "4,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -3505,6 +4354,9 @@
           "percentual_estimado": 2.72945,
           "exibicao": "2,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -3513,6 +4365,9 @@
           "percentual_estimado": 25.9274,
           "exibicao": "25,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -3521,6 +4376,9 @@
           "percentual_estimado": 24.42065,
           "exibicao": "24,4%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -3529,6 +4387,9 @@
           "percentual_estimado": 13.86005,
           "exibicao": "13,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -3537,6 +4398,9 @@
           "percentual_estimado": 30.87575,
           "exibicao": "30,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -3597,6 +4461,9 @@
             "percentual_estimado": 13.86005,
             "exibicao": "13,9%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -3606,6 +4473,9 @@
               "percentual_estimado": 2.72945,
               "exibicao": "2,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -3614,6 +4484,9 @@
               "percentual_estimado": 6.70535,
               "exibicao": "6,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
@@ -3622,15 +4495,21 @@
               "percentual_estimado": 2.8315,
               "exibicao": "2,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 31875,
@@ -3638,6 +4517,9 @@
               "percentual_estimado": 1.59375,
               "exibicao": "1,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3648,6 +4530,9 @@
               "percentual_estimado": 2.4063,
               "exibicao": "2,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -3656,6 +4541,9 @@
               "percentual_estimado": 3.3927,
               "exibicao": "3,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -3664,6 +4552,9 @@
               "percentual_estimado": 0.90635,
               "exibicao": "0,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3676,6 +4567,9 @@
             "percentual_estimado": 30.87575,
             "exibicao": "30,9%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -3685,6 +4579,9 @@
               "percentual_estimado": 21.7896,
               "exibicao": "21,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -3693,6 +4590,9 @@
               "percentual_estimado": 9.08615,
               "exibicao": "9,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3722,6 +4622,9 @@
           "percentual_estimado": 5e-05,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g4": {
@@ -3730,6 +4633,9 @@
           "percentual_estimado": 0.5472,
           "exibicao": "0,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -3738,6 +4644,9 @@
           "percentual_estimado": 2.42825,
           "exibicao": "2,4%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -3746,6 +4655,9 @@
           "percentual_estimado": 1.2606,
           "exibicao": "1,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -3754,6 +4666,9 @@
           "percentual_estimado": 18.3214,
           "exibicao": "18,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -3762,6 +4677,9 @@
           "percentual_estimado": 33.25325,
           "exibicao": "33,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -3770,6 +4688,9 @@
           "percentual_estimado": 24.19485,
           "exibicao": "24,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -3778,6 +4699,9 @@
           "percentual_estimado": 20.23225,
           "exibicao": "20,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -3838,6 +4762,9 @@
             "percentual_estimado": 24.19485,
             "exibicao": "24,2%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -3847,6 +4774,9 @@
               "percentual_estimado": 1.2606,
               "exibicao": "1,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -3855,15 +4785,21 @@
               "percentual_estimado": 11.81935,
               "exibicao": "11,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 206726,
@@ -3871,6 +4807,9 @@
               "percentual_estimado": 10.3363,
               "exibicao": "10,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -3879,6 +4818,9 @@
               "percentual_estimado": 0.7786,
               "exibicao": "0,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3889,6 +4831,9 @@
               "percentual_estimado": 4.86895,
               "exibicao": "4,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -3897,6 +4842,9 @@
               "percentual_estimado": 5.49085,
               "exibicao": "5,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -3905,6 +4853,9 @@
               "percentual_estimado": 1.45955,
               "exibicao": "1,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3917,6 +4868,9 @@
             "percentual_estimado": 20.23225,
             "exibicao": "20,2%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -3926,6 +4880,9 @@
               "percentual_estimado": 13.4442,
               "exibicao": "13,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -3934,6 +4891,9 @@
               "percentual_estimado": 6.78805,
               "exibicao": "6,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -3963,6 +4923,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "g4": {
@@ -3971,6 +4934,9 @@
           "percentual_estimado": 0.3132,
           "exibicao": "0,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -3979,6 +4945,9 @@
           "percentual_estimado": 1.4796,
           "exibicao": "1,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -3987,6 +4956,9 @@
           "percentual_estimado": 0.74945,
           "exibicao": "0,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -3995,6 +4967,9 @@
           "percentual_estimado": 13.06735,
           "exibicao": "13,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -4003,6 +4978,9 @@
           "percentual_estimado": 43.3201,
           "exibicao": "43,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -4011,6 +4989,9 @@
           "percentual_estimado": 13.61875,
           "exibicao": "13,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -4019,6 +5000,9 @@
           "percentual_estimado": 17.23465,
           "exibicao": "17,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -4079,6 +5063,9 @@
             "percentual_estimado": 13.61875,
             "exibicao": "13,6%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -4088,6 +5075,9 @@
               "percentual_estimado": 0.74945,
               "exibicao": "0,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -4096,15 +5086,21 @@
               "percentual_estimado": 7.11505,
               "exibicao": "7,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 103842,
@@ -4112,6 +5108,9 @@
               "percentual_estimado": 5.1921,
               "exibicao": "5,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -4120,6 +5119,9 @@
               "percentual_estimado": 0.56215,
               "exibicao": "0,6%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4130,6 +5132,9 @@
               "percentual_estimado": 2.4453,
               "exibicao": "2,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -4138,6 +5143,9 @@
               "percentual_estimado": 3.69545,
               "exibicao": "3,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -4146,6 +5154,9 @@
               "percentual_estimado": 0.9743,
               "exibicao": "1,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4158,6 +5169,9 @@
             "percentual_estimado": 17.23465,
             "exibicao": "17,2%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -4167,6 +5181,9 @@
               "percentual_estimado": 10.90365,
               "exibicao": "10,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -4175,6 +5192,9 @@
               "percentual_estimado": 6.331,
               "exibicao": "6,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4204,6 +5224,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "g4": {
@@ -4212,6 +5235,9 @@
           "percentual_estimado": 0.08715,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -4220,6 +5246,9 @@
           "percentual_estimado": 0.49535,
           "exibicao": "0,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -4228,6 +5257,9 @@
           "percentual_estimado": 0.2277,
           "exibicao": "0,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -4236,6 +5268,9 @@
           "percentual_estimado": 6.33565,
           "exibicao": "6,3%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -4244,6 +5279,9 @@
           "percentual_estimado": 60.5624,
           "exibicao": "60,6%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -4252,6 +5290,9 @@
           "percentual_estimado": 11.7257,
           "exibicao": "11,7%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -4260,6 +5301,9 @@
           "percentual_estimado": 9.4881,
           "exibicao": "9,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -4320,6 +5364,9 @@
             "percentual_estimado": 11.7257,
             "exibicao": "11,7%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -4329,6 +5376,9 @@
               "percentual_estimado": 0.2277,
               "exibicao": "0,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -4337,15 +5387,21 @@
               "percentual_estimado": 5.81685,
               "exibicao": "5,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 109353,
@@ -4353,6 +5409,9 @@
               "percentual_estimado": 5.46765,
               "exibicao": "5,5%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -4361,6 +5420,9 @@
               "percentual_estimado": 0.2135,
               "exibicao": "0,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4371,6 +5433,9 @@
               "percentual_estimado": 1.90125,
               "exibicao": "1,9%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -4379,6 +5444,9 @@
               "percentual_estimado": 3.1521,
               "exibicao": "3,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -4387,6 +5455,9 @@
               "percentual_estimado": 0.7635,
               "exibicao": "0,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4399,6 +5470,9 @@
             "percentual_estimado": 9.4881,
             "exibicao": "9,5%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -4408,6 +5482,9 @@
               "percentual_estimado": 5.407,
               "exibicao": "5,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -4416,6 +5493,9 @@
               "percentual_estimado": 4.0811,
               "exibicao": "4,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4445,6 +5525,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "g4": {
@@ -4453,6 +5536,9 @@
           "percentual_estimado": 0.07125,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "g6": {
@@ -4461,6 +5547,9 @@
           "percentual_estimado": 0.40395,
           "exibicao": "0,4%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores_base": {
@@ -4469,6 +5558,9 @@
           "percentual_estimado": 0.18565,
           "exibicao": "0,2%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana_base": {
@@ -4477,6 +5569,9 @@
           "percentual_estimado": 5.461,
           "exibicao": "5,5%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -4485,6 +5580,9 @@
           "percentual_estimado": 64.98085,
           "exibicao": "65,0%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -4493,6 +5591,9 @@
           "percentual_estimado": 5.8189,
           "exibicao": "5,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -4501,6 +5602,9 @@
           "percentual_estimado": 8.75225,
           "exibicao": "8,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -4561,6 +5665,9 @@
             "percentual_estimado": 5.8189,
             "exibicao": "5,8%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -4570,6 +5677,9 @@
               "percentual_estimado": 0.18565,
               "exibicao": "0,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
@@ -4578,23 +5688,32 @@
               "percentual_estimado": 5.4472,
               "exibicao": "5,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 3721,
@@ -4602,6 +5721,9 @@
               "percentual_estimado": 0.18605,
               "exibicao": "0,2%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4612,6 +5734,9 @@
               "percentual_estimado": 1.71695,
               "exibicao": "1,7%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -4620,6 +5745,9 @@
               "percentual_estimado": 2.955,
               "exibicao": "3,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -4628,6 +5756,9 @@
               "percentual_estimado": 0.77525,
               "exibicao": "0,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4640,6 +5771,9 @@
             "percentual_estimado": 8.75225,
             "exibicao": "8,8%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -4649,6 +5783,9 @@
               "percentual_estimado": 4.97665,
               "exibicao": "5,0%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -4657,6 +5794,9 @@
               "percentual_estimado": 3.7756,
               "exibicao": "3,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4686,6 +5826,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "g4": {
@@ -4694,6 +5837,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "g6": {
@@ -4702,6 +5848,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "libertadores_base": {
@@ -4710,6 +5859,9 @@
           "percentual_estimado": 0.0,
           "exibicao": "<0,1%",
           "zero_observado": true,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "sul_americana_base": {
@@ -4718,6 +5870,9 @@
           "percentual_estimado": 0.00085,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "rebaixamento": {
@@ -4726,6 +5881,9 @@
           "percentual_estimado": 99.9088,
           "exibicao": "99,9%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
@@ -4734,6 +5892,9 @@
           "percentual_estimado": 1.7613,
           "exibicao": "1,8%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
@@ -4742,6 +5903,9 @@
           "percentual_estimado": 0.0036,
           "exibicao": "<0,1%",
           "zero_observado": false,
+          "possivel_estruturalmente": true,
+          "impossivel_estruturalmente": false,
+          "motivo_impossibilidade": null,
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
@@ -4802,6 +5966,9 @@
             "percentual_estimado": 1.7613,
             "exibicao": "1,8%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -4811,6 +5978,9 @@
               "percentual_estimado": 0.0,
               "exibicao": "<0,1%",
               "zero_observado": true,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             },
             "via_copa_do_brasil": {
@@ -4819,23 +5989,32 @@
               "percentual_estimado": 1.7613,
               "exibicao": "1,8%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_libertadores": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Libertadores",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_titulo_sul_americana": {
               "ocorrencias": 0,
               "simulacoes": 2000000,
               "percentual_estimado": 0.0,
-              "exibicao": "<0,1%",
+              "exibicao": "0%",
               "zero_observado": true,
-              "limite_superior_95_regra_dos_tres_pct": 0.00015
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true,
+              "motivo_impossibilidade": "clube não está mais ativo na Sul-Americana",
+              "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
               "ocorrencias": 0,
@@ -4843,6 +6022,9 @@
               "percentual_estimado": 0.0,
               "exibicao": "<0,1%",
               "zero_observado": true,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
@@ -4853,6 +6035,9 @@
               "percentual_estimado": 0.4365,
               "exibicao": "0,4%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
@@ -4861,6 +6046,9 @@
               "percentual_estimado": 1.0573,
               "exibicao": "1,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
@@ -4869,6 +6057,9 @@
               "percentual_estimado": 0.2675,
               "exibicao": "0,3%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4881,6 +6072,9 @@
             "percentual_estimado": 0.0036,
             "exibicao": "<0,1%",
             "zero_observado": false,
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false,
+            "motivo_impossibilidade": null,
             "limite_superior_95_regra_dos_tres_pct": null
           },
           "vias": {
@@ -4890,6 +6084,9 @@
               "percentual_estimado": 0.00085,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
@@ -4898,6 +6095,9 @@
               "percentual_estimado": 0.00275,
               "exibicao": "<0,1%",
               "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
@@ -4915,7 +6115,7 @@
     ],
     "decomposicao_exclusiva_por_via": true,
     "limiar_exibicao_percentual": 0.1,
-    "hash_snapshots": "8b451f713865f02421b75bf9b23ba7adbbcb31ea3e4057ee42755db0ee02ef25"
+    "hash_snapshots": "2ad1af95e21315ac898b3988f97e415b70c4e18bdc8b6557d9a0583aee64048a"
   },
   "total_previsoes_partidas": 198,
   "partidas_restantes": [
