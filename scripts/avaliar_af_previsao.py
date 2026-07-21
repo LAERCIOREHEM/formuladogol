@@ -44,6 +44,7 @@ from af_previsao_continental import (  # noqa: E402
     allocate_integrated_qualification,
     brazilian_teams_in_events,
     completed_champion,
+    normalize_text,
     parse_snapshot,
 )
 
@@ -253,6 +254,7 @@ def final_cup_simulation(snapshot: Mapping[str, Any]) -> CupSimulation:
         competition=competition,
         team_names=tuple(names),
         brazilian_team_names=brazilian_teams_in_events(competition, events),
+        eligible_team_names=frozenset({normalize_text(champion)}),
         champion_ids=np.asarray([index[champion]], dtype=np.int16),
         runner_up_ids=np.asarray([index[runner]], dtype=np.int16),
         audit={"status": "resultado_final", "campeao": champion, "vice": runner},
