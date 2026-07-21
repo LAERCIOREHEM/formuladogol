@@ -191,12 +191,23 @@ jobs:
               # e migra apenas o histórico, sem criar previsão artificial. Este workflow
               # deve auditar essa preservação segura em vez de falhar com AssertionError
               # genérico antes de a fonte oficial sincronizar.
+              zonas_cfg = ((config.get('execucao_2') or {}).get('zonas_base') or {})
+
+              def tamanho_faixa(chave, legado):
+                  faixa = zonas_cfg.get(chave)
+                  if not isinstance(faixa, list) or len(faixa) != 2:
+                      return legado
+                  inicio, fim = (int(faixa[0]), int(faixa[1]))
+                  if not (1 <= inicio <= fim <= 20):
+                      fail(f'config AF inválida em {chave}: {faixa}')
+                  return fim - inicio + 1
+
               assert_probability_sums({
                   'campeao': 100.0,
                   'g4': 400.0,
                   'g6': 600.0,
-                  'libertadores_base': 600.0,
-                  'sul_americana_base': 600.0,
+                  'libertadores_base': 100.0 * tamanho_faixa('libertadores_base', 6),
+                  'sul_americana_base': 100.0 * tamanho_faixa('sul_americana_base', 6),
                   'rebaixamento': 400.0,
               })
               simulacoes = int((auditoria.get('simulacao') or {}).get('quantidade') or 0)

@@ -280,8 +280,8 @@ jobs:
               'campeao': 100,
               'g4': 400,
               'g6': 600,
-              'libertadores_base': 100 * tamanho_faixa('libertadores', 6),
-              'sul_americana_base': 100 * tamanho_faixa('sul_americana', 6),
+              'libertadores_base': 100 * tamanho_faixa('libertadores_base', 6),
+              'sul_americana_base': 100 * tamanho_faixa('sul_americana_base', 6),
               'rebaixamento': 400,
           }
           for campo, esperado in esperados.items():
