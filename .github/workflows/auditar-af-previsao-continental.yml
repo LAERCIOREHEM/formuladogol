@@ -251,10 +251,18 @@ jobs:
                   if int(detalhe.get('ocorrencias') or 0) < 0:
                       fail(f'{clube["clube"]}: ocorrências negativas em {campo}')
                   if int(detalhe.get('ocorrencias') or 0) == 0:
-                      if not str(detalhe.get('exibicao') or '').startswith('<'):
-                          fail(f'{clube["clube"]}: probabilidade residual sem exibição < em {campo}')
-                      if detalhe.get('limite_superior_95_regra_dos_tres_pct') is None:
-                          fail(f'{clube["clube"]}: residual sem regra dos três em {campo}')
+                      impossivel = detalhe.get('impossivel_estruturalmente') is True or detalhe.get('possivel_estruturalmente') is False
+                      exibicao = str(detalhe.get('exibicao') or '')
+                      if impossivel:
+                          if exibicao not in {'0%', '0,0%'}:
+                              fail(f'{clube["clube"]}: impossibilidade estrutural sem exibição 0% em {campo}')
+                          if detalhe.get('limite_superior_95_regra_dos_tres_pct') is not None:
+                              fail(f'{clube["clube"]}: impossibilidade estrutural não deve usar regra dos três em {campo}')
+                      else:
+                          if not exibicao.startswith('<'):
+                              fail(f'{clube["clube"]}: probabilidade residual sem exibição < em {campo}')
+                          if detalhe.get('limite_superior_95_regra_dos_tres_pct') is None:
+                              fail(f'{clube["clube"]}: residual sem regra dos três em {campo}')
               decomposicao = clube.get('decomposicao_chances') or {}
               for campo in ('libertadores', 'sul_americana'):
                   bloco = decomposicao.get(campo) or {}
