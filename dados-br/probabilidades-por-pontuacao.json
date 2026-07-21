@@ -1,0 +1,1960 @@
+{
+  "schema_version": 1,
+  "projeto": "AF-Previsão — Probabilidades por pontuação final",
+  "temporada": 2026,
+  "status": "ok",
+  "gerado_em": "2026-07-17T22:05:00-03:00",
+  "versao_modelo": "AF-Previsão 1.3",
+  "hash_entrada": "af6ffaf0c555a4e3bdda9282194b5921f9bbacec0af4bdba5c385287c509454b",
+  "simulacoes": 2000000,
+  "metodo": {
+    "definicao": "menor pontuação final cuja probabilidade calibrada é igual ou superior ao nível indicado",
+    "calibracao": "regressão isotônica crescente ponderada pela quantidade de observações em cada pontuação",
+    "sul_americana_ou_melhor": "classificação à Sul-Americana ou à Libertadores; a união evita o paradoxo de uma pontuação maior reduzir a chance de objetivo continental",
+    "percentual_100": "ocorreu em todos os universos simulados disponíveis para aquela faixa; não é prova de impossibilidade matemática do cenário contrário"
+  },
+  "niveis": [
+    {
+      "probabilidade_pct": 50.0,
+      "rotulo": "50%",
+      "titulo": 77,
+      "libertadores": 58,
+      "sul_americana_ou_melhor": 49,
+      "permanencia": 44
+    },
+    {
+      "probabilidade_pct": 60.0,
+      "rotulo": "60%",
+      "titulo": 79,
+      "libertadores": 58,
+      "sul_americana_ou_melhor": 50,
+      "permanencia": 44
+    },
+    {
+      "probabilidade_pct": 70.0,
+      "rotulo": "70%",
+      "titulo": 80,
+      "libertadores": 59,
+      "sul_americana_ou_melhor": 50,
+      "permanencia": 45
+    },
+    {
+      "probabilidade_pct": 80.0,
+      "rotulo": "80%",
+      "titulo": 81,
+      "libertadores": 60,
+      "sul_americana_ou_melhor": 51,
+      "permanencia": 45
+    },
+    {
+      "probabilidade_pct": 90.0,
+      "rotulo": "90%",
+      "titulo": 84,
+      "libertadores": 61,
+      "sul_americana_ou_melhor": 52,
+      "permanencia": 46
+    },
+    {
+      "probabilidade_pct": 95.0,
+      "rotulo": "95%",
+      "titulo": 85,
+      "libertadores": 62,
+      "sul_americana_ou_melhor": 52,
+      "permanencia": 47
+    },
+    {
+      "probabilidade_pct": 97.0,
+      "rotulo": "97%",
+      "titulo": 86,
+      "libertadores": 62,
+      "sul_americana_ou_melhor": 53,
+      "permanencia": 47
+    },
+    {
+      "probabilidade_pct": 99.0,
+      "rotulo": "99%",
+      "titulo": 88,
+      "libertadores": 63,
+      "sul_americana_ou_melhor": 53,
+      "permanencia": 48
+    },
+    {
+      "probabilidade_pct": 99.5,
+      "rotulo": "99,5%",
+      "titulo": 89,
+      "libertadores": 64,
+      "sul_americana_ou_melhor": 54,
+      "permanencia": 48
+    },
+    {
+      "probabilidade_pct": 99.9,
+      "rotulo": "99,9%",
+      "titulo": 91,
+      "libertadores": 65,
+      "sul_americana_ou_melhor": 55,
+      "permanencia": 49
+    },
+    {
+      "probabilidade_pct": 100.0,
+      "rotulo": "100% nos cenários",
+      "titulo": 94,
+      "libertadores": 69,
+      "sul_americana_ou_melhor": 57,
+      "permanencia": 52
+    }
+  ],
+  "curva_por_pontuacao": [
+    {
+      "pontos": 9,
+      "amostras": 25,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 12.0,
+        "calibrada_pct": 1.680672
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 12.0,
+        "calibrada_pct": 1.680672
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 10,
+      "amostras": 213,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 0.469484,
+        "calibrada_pct": 1.680672
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 0.469484,
+        "calibrada_pct": 1.680672
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 11,
+      "amostras": 768,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 2.734375,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 2.734375,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 12,
+      "amostras": 2068,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 2.12766,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 2.12766,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 13,
+      "amostras": 4683,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.55883,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.55883,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 14,
+      "amostras": 9417,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.805246,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.805246,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 15,
+      "amostras": 17009,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.946029,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.946029,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 16,
+      "amostras": 27677,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.680095,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.680095,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 17,
+      "amostras": 42069,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.827949,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.827949,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 18,
+      "amostras": 59598,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.766838,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.766838,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 19,
+      "amostras": 78991,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.834386,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.834386,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 20,
+      "amostras": 99567,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.787741,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.787741,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 21,
+      "amostras": 119608,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.772457,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.772457,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 22,
+      "amostras": 136479,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.761443,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.761443,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 23,
+      "amostras": 149766,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.755405,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.755405,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 24,
+      "amostras": 157011,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.779493,
+        "calibrada_pct": 1.779795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.779493,
+        "calibrada_pct": 1.779795
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 25,
+      "amostras": 158863,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.854428,
+        "calibrada_pct": 1.852234
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.854428,
+        "calibrada_pct": 1.852234
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 26,
+      "amostras": 156270,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 1.850003,
+        "calibrada_pct": 1.852234
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 1.850003,
+        "calibrada_pct": 1.852234
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 27,
+      "amostras": 150079,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 2.022268,
+        "calibrada_pct": 2.022268
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 2.022268,
+        "calibrada_pct": 2.022268
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 28,
+      "amostras": 141140,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 2.334561,
+        "calibrada_pct": 2.334561
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 2.334561,
+        "calibrada_pct": 2.334561
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 29,
+      "amostras": 134097,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 2.841227,
+        "calibrada_pct": 2.841227
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 2.841227,
+        "calibrada_pct": 2.841227
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 30,
+      "amostras": 131208,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 3.712426,
+        "calibrada_pct": 3.712426
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 3.712426,
+        "calibrada_pct": 3.712426
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 31,
+      "amostras": 134165,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 4.940186,
+        "calibrada_pct": 4.940186
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 4.940186,
+        "calibrada_pct": 4.940186
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 32,
+      "amostras": 148728,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 6.226131,
+        "calibrada_pct": 6.226131
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 6.226131,
+        "calibrada_pct": 6.226131
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 33,
+      "amostras": 174749,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 7.434091,
+        "calibrada_pct": 7.434091
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 7.434091,
+        "calibrada_pct": 7.434091
+      },
+      "permanencia": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      }
+    },
+    {
+      "pontos": 34,
+      "amostras": 214126,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 8.631367,
+        "calibrada_pct": 8.631367
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 8.631367,
+        "calibrada_pct": 8.631367
+      },
+      "permanencia": {
+        "bruta_pct": 0.001401,
+        "calibrada_pct": 0.001401
+      }
+    },
+    {
+      "pontos": 35,
+      "amostras": 269351,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 9.30236,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 9.30236,
+        "calibrada_pct": 9.30236
+      },
+      "permanencia": {
+        "bruta_pct": 0.018934,
+        "calibrada_pct": 0.018934
+      }
+    },
+    {
+      "pontos": 36,
+      "amostras": 339677,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 9.689499,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 9.689499,
+        "calibrada_pct": 9.689499
+      },
+      "permanencia": {
+        "bruta_pct": 0.068889,
+        "calibrada_pct": 0.068889
+      }
+    },
+    {
+      "pontos": 37,
+      "amostras": 424671,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 10.088516,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 10.088516,
+        "calibrada_pct": 10.088516
+      },
+      "permanencia": {
+        "bruta_pct": 0.278804,
+        "calibrada_pct": 0.278804
+      }
+    },
+    {
+      "pontos": 38,
+      "amostras": 523069,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 10.165772,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 10.166154,
+        "calibrada_pct": 10.166154
+      },
+      "permanencia": {
+        "bruta_pct": 0.967176,
+        "calibrada_pct": 0.967176
+      }
+    },
+    {
+      "pontos": 39,
+      "amostras": 629778,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 10.273779,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 10.275526,
+        "calibrada_pct": 10.209796
+      },
+      "permanencia": {
+        "bruta_pct": 2.882603,
+        "calibrada_pct": 2.882603
+      }
+    },
+    {
+      "pontos": 40,
+      "amostras": 744140,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 10.185449,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 10.193781,
+        "calibrada_pct": 10.209796
+      },
+      "permanencia": {
+        "bruta_pct": 7.214234,
+        "calibrada_pct": 7.214234
+      }
+    },
+    {
+      "pontos": 41,
+      "amostras": 861295,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 10.156683,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 10.191166,
+        "calibrada_pct": 10.209796
+      },
+      "permanencia": {
+        "bruta_pct": 15.752791,
+        "calibrada_pct": 15.752791
+      }
+    },
+    {
+      "pontos": 42,
+      "amostras": 979621,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 10.069404,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 10.196086,
+        "calibrada_pct": 10.209796
+      },
+      "permanencia": {
+        "bruta_pct": 29.610023,
+        "calibrada_pct": 29.610023
+      }
+    },
+    {
+      "pontos": 43,
+      "amostras": 1094168,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 9.855159,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 10.307741,
+        "calibrada_pct": 10.307741
+      },
+      "permanencia": {
+        "bruta_pct": 48.095722,
+        "calibrada_pct": 48.095722
+      }
+    },
+    {
+      "pontos": 44,
+      "amostras": 1204659,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 9.590349,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 10.967087,
+        "calibrada_pct": 10.967087
+      },
+      "permanencia": {
+        "bruta_pct": 67.663048,
+        "calibrada_pct": 67.663048
+      }
+    },
+    {
+      "pontos": 45,
+      "amostras": 1306673,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 9.341052,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 13.076646,
+        "calibrada_pct": 13.076646
+      },
+      "permanencia": {
+        "bruta_pct": 83.825869,
+        "calibrada_pct": 83.825869
+      }
+    },
+    {
+      "pontos": 46,
+      "amostras": 1394613,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 9.035553,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 17.875138,
+        "calibrada_pct": 17.875138
+      },
+      "permanencia": {
+        "bruta_pct": 93.878445,
+        "calibrada_pct": 93.878445
+      }
+    },
+    {
+      "pontos": 47,
+      "amostras": 1474398,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 8.74289,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 27.136296,
+        "calibrada_pct": 27.136296
+      },
+      "permanencia": {
+        "bruta_pct": 98.32569,
+        "calibrada_pct": 98.32569
+      }
+    },
+    {
+      "pontos": 48,
+      "amostras": 1536711,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 8.39286,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 41.436614,
+        "calibrada_pct": 41.436614
+      },
+      "permanencia": {
+        "bruta_pct": 99.69695,
+        "calibrada_pct": 99.69695
+      }
+    },
+    {
+      "pontos": 49,
+      "amostras": 1581215,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 8.07942,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 59.200994,
+        "calibrada_pct": 59.200994
+      },
+      "permanencia": {
+        "bruta_pct": 99.964394,
+        "calibrada_pct": 99.964394
+      }
+    },
+    {
+      "pontos": 50,
+      "amostras": 1614072,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 7.808264,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 76.400185,
+        "calibrada_pct": 76.400185
+      },
+      "permanencia": {
+        "bruta_pct": 99.997212,
+        "calibrada_pct": 99.997212
+      }
+    },
+    {
+      "pontos": 51,
+      "amostras": 1628444,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 7.624333,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 89.167205,
+        "calibrada_pct": 89.167205
+      },
+      "permanencia": {
+        "bruta_pct": 99.999939,
+        "calibrada_pct": 99.999939
+      }
+    },
+    {
+      "pontos": 52,
+      "amostras": 1623438,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 7.790689,
+        "calibrada_pct": 8.914886
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 96.161603,
+        "calibrada_pct": 96.161603
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 53,
+      "amostras": 1597266,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 9.206795,
+        "calibrada_pct": 9.206795
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 99.014378,
+        "calibrada_pct": 99.014378
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 54,
+      "amostras": 1555288,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 13.105097,
+        "calibrada_pct": 13.105097
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 99.812961,
+        "calibrada_pct": 99.812961
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 55,
+      "amostras": 1486529,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 21.139043,
+        "calibrada_pct": 21.139043
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 99.976321,
+        "calibrada_pct": 99.976321
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 56,
+      "amostras": 1405404,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 33.764668,
+        "calibrada_pct": 33.764668
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 99.998221,
+        "calibrada_pct": 99.998221
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 57,
+      "amostras": 1305430,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 49.657124,
+        "calibrada_pct": 49.657124
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 58,
+      "amostras": 1192773,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 65.677291,
+        "calibrada_pct": 65.677291
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 59,
+      "amostras": 1072495,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 79.193656,
+        "calibrada_pct": 79.193656
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 60,
+      "amostras": 945935,
+      "titulo": {
+        "bruta_pct": 0.0,
+        "calibrada_pct": 0.0
+      },
+      "libertadores": {
+        "bruta_pct": 88.820268,
+        "calibrada_pct": 88.820268
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 61,
+      "amostras": 820980,
+      "titulo": {
+        "bruta_pct": 0.000122,
+        "calibrada_pct": 0.000122
+      },
+      "libertadores": {
+        "bruta_pct": 94.654072,
+        "calibrada_pct": 94.654072
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 62,
+      "amostras": 695186,
+      "titulo": {
+        "bruta_pct": 0.000432,
+        "calibrada_pct": 0.000432
+      },
+      "libertadores": {
+        "bruta_pct": 97.728809,
+        "calibrada_pct": 97.728809
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 63,
+      "amostras": 580925,
+      "titulo": {
+        "bruta_pct": 0.004476,
+        "calibrada_pct": 0.004476
+      },
+      "libertadores": {
+        "bruta_pct": 99.134312,
+        "calibrada_pct": 99.134312
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 64,
+      "amostras": 480851,
+      "titulo": {
+        "bruta_pct": 0.013518,
+        "calibrada_pct": 0.013518
+      },
+      "libertadores": {
+        "bruta_pct": 99.711137,
+        "calibrada_pct": 99.711137
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 65,
+      "amostras": 394576,
+      "titulo": {
+        "bruta_pct": 0.059304,
+        "calibrada_pct": 0.059304
+      },
+      "libertadores": {
+        "bruta_pct": 99.915099,
+        "calibrada_pct": 99.915099
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 66,
+      "amostras": 325037,
+      "titulo": {
+        "bruta_pct": 0.199362,
+        "calibrada_pct": 0.199362
+      },
+      "libertadores": {
+        "bruta_pct": 99.983694,
+        "calibrada_pct": 99.983694
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 67,
+      "amostras": 270809,
+      "titulo": {
+        "bruta_pct": 0.568297,
+        "calibrada_pct": 0.568297
+      },
+      "libertadores": {
+        "bruta_pct": 99.996307,
+        "calibrada_pct": 99.996307
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 68,
+      "amostras": 236474,
+      "titulo": {
+        "bruta_pct": 1.455551,
+        "calibrada_pct": 1.455551
+      },
+      "libertadores": {
+        "bruta_pct": 99.999577,
+        "calibrada_pct": 99.999577
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 69,
+      "amostras": 216014,
+      "titulo": {
+        "bruta_pct": 3.101651,
+        "calibrada_pct": 3.101651
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 70,
+      "amostras": 208154,
+      "titulo": {
+        "bruta_pct": 5.775532,
+        "calibrada_pct": 5.775532
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 71,
+      "amostras": 211474,
+      "titulo": {
+        "bruta_pct": 9.890578,
+        "calibrada_pct": 9.890578
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 72,
+      "amostras": 220921,
+      "titulo": {
+        "bruta_pct": 14.88858,
+        "calibrada_pct": 14.88858
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 73,
+      "amostras": 234780,
+      "titulo": {
+        "bruta_pct": 20.954085,
+        "calibrada_pct": 20.954085
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 74,
+      "amostras": 247712,
+      "titulo": {
+        "bruta_pct": 27.81577,
+        "calibrada_pct": 27.81577
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 75,
+      "amostras": 260851,
+      "titulo": {
+        "bruta_pct": 35.389935,
+        "calibrada_pct": 35.389935
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 76,
+      "amostras": 268746,
+      "titulo": {
+        "bruta_pct": 43.145944,
+        "calibrada_pct": 43.145944
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 77,
+      "amostras": 271069,
+      "titulo": {
+        "bruta_pct": 51.207626,
+        "calibrada_pct": 51.207626
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 78,
+      "amostras": 266605,
+      "titulo": {
+        "bruta_pct": 59.091915,
+        "calibrada_pct": 59.091915
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 79,
+      "amostras": 254382,
+      "titulo": {
+        "bruta_pct": 66.713447,
+        "calibrada_pct": 66.713447
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 80,
+      "amostras": 236959,
+      "titulo": {
+        "bruta_pct": 74.037281,
+        "calibrada_pct": 74.037281
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 81,
+      "amostras": 212630,
+      "titulo": {
+        "bruta_pct": 80.162724,
+        "calibrada_pct": 80.162724
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 82,
+      "amostras": 187659,
+      "titulo": {
+        "bruta_pct": 85.280216,
+        "calibrada_pct": 85.280216
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 83,
+      "amostras": 159168,
+      "titulo": {
+        "bruta_pct": 89.480926,
+        "calibrada_pct": 89.480926
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 84,
+      "amostras": 130806,
+      "titulo": {
+        "bruta_pct": 92.931517,
+        "calibrada_pct": 92.931517
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 85,
+      "amostras": 104997,
+      "titulo": {
+        "bruta_pct": 95.430346,
+        "calibrada_pct": 95.430346
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 86,
+      "amostras": 80699,
+      "titulo": {
+        "bruta_pct": 97.266385,
+        "calibrada_pct": 97.266385
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 87,
+      "amostras": 60107,
+      "titulo": {
+        "bruta_pct": 98.331309,
+        "calibrada_pct": 98.331309
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 88,
+      "amostras": 43340,
+      "titulo": {
+        "bruta_pct": 99.178588,
+        "calibrada_pct": 99.178588
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 89,
+      "amostras": 29669,
+      "titulo": {
+        "bruta_pct": 99.534868,
+        "calibrada_pct": 99.534868
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 90,
+      "amostras": 19702,
+      "titulo": {
+        "bruta_pct": 99.736067,
+        "calibrada_pct": 99.736067
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 91,
+      "amostras": 12586,
+      "titulo": {
+        "bruta_pct": 99.944383,
+        "calibrada_pct": 99.940544
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 92,
+      "amostras": 7597,
+      "titulo": {
+        "bruta_pct": 99.934185,
+        "calibrada_pct": 99.940544
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 93,
+      "amostras": 4324,
+      "titulo": {
+        "bruta_pct": 99.976873,
+        "calibrada_pct": 99.976873
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 94,
+      "amostras": 2471,
+      "titulo": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 95,
+      "amostras": 1261,
+      "titulo": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 96,
+      "amostras": 537,
+      "titulo": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 97,
+      "amostras": 322,
+      "titulo": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 98,
+      "amostras": 55,
+      "titulo": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 99,
+      "amostras": 72,
+      "titulo": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    },
+    {
+      "pontos": 101,
+      "amostras": 6,
+      "titulo": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "libertadores": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "sul_americana_ou_melhor": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      },
+      "permanencia": {
+        "bruta_pct": 100.0,
+        "calibrada_pct": 100.0
+      }
+    }
+  ],
+  "auditoria": {
+    "observacoes_clube_universo": 40000000,
+    "pontos_minimos_observados": 9,
+    "pontos_maximos_observados": 101,
+    "objetivos": [
+      "titulo",
+      "libertadores",
+      "sul_americana_ou_melhor",
+      "permanencia"
+    ],
+    "curvas_monotonicas": true
+  }
+}

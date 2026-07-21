@@ -2,29 +2,32 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-07-20T18:22:46-03:00",
+  "gerado_em": "2026-07-21T00:20:01-03:00",
   "versao_avaliacao": "AF-Avaliação 1.0",
   "integridade_historico": {
     "valido": true,
     "encadeado": true,
     "algoritmo": "SHA-256",
-    "quantidade_snapshots": 1,
+    "quantidade_snapshots": 2,
     "hash_inicial": "102ff233747de8e714b7c37493d033b270209d84a08007ddbf5eef3258e49c9b",
-    "hash_final": "102ff233747de8e714b7c37493d033b270209d84a08007ddbf5eef3258e49c9b",
-    "rodadas_distintas": [],
+    "hash_final": "a99a2d61715bee6887a5df700bf556a68af4179350f928ad1e24bbd436d5e40a",
+    "rodadas_distintas": [
+      19
+    ],
     "modelos_registrados": [
-      "AF-Previsão 1.0"
+      "AF-Previsão 1.0",
+      "AF-Previsão 1.3"
     ],
     "erros": [],
     "avisos": []
   },
   "cobertura": {
-    "snapshots": 1,
-    "rodadas_distintas": 0,
-    "primeira_rodada": null,
-    "ultima_rodada": null,
+    "snapshots": 2,
+    "rodadas_distintas": 1,
+    "primeira_rodada": 19,
+    "ultima_rodada": 19,
     "primeiro_registro": "2026-07-16T21:24:00-03:00",
-    "ultimo_registro": "2026-07-16T21:24:00-03:00",
+    "ultimo_registro": "2026-07-17T22:05:00-03:00",
     "minimo_snapshots_publicacao": 5
   },
   "metricas_planejadas": {
