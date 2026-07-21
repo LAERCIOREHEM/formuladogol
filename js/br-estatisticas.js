@@ -629,10 +629,13 @@
     const raw = Number(value);
     const n = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
     const display = probabilityDisplayText(detail, raw);
-    const residual = detail?.zero_observado || (Number.isFinite(raw) && raw < 0.1);
-    const title = residual
-      ? "Evento não é tratado como impossível: ficou abaixo da resolução visual de 0,1%."
-      : help;
+    const impossible = detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false;
+    const residual = !impossible && (detail?.zero_observado || (Number.isFinite(raw) && raw < 0.1));
+    const title = impossible
+      ? String(detail?.motivo_impossibilidade || "Via estruturalmente indisponível para o clube.")
+      : residual
+        ? "Evento não é tratado como impossível: ficou abaixo da resolução visual de 0,1%."
+        : help;
     return `<div class="probability-metric probability-tone-${escapeAttr(tone)}"${title ? ` title="${escapeAttr(title)}"` : ""}>
       <span>${escapeHtml(label)}${residual ? '<em class="probability-residual-mark" aria-label="Probabilidade residual">ⓘ</em>' : ""}</span>
       <strong>${escapeHtml(display)}</strong>

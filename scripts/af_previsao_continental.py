@@ -86,6 +86,7 @@ class CupSimulation:
     competition: str
     team_names: tuple[str, ...]
     brazilian_team_names: frozenset[str]
+    eligible_team_names: frozenset[str]
     champion_ids: np.ndarray
     runner_up_ids: np.ndarray
     audit: dict[str, Any]
@@ -533,6 +534,7 @@ def simulate_competition(
             competition,
             tuple(all_teams),
             brazilian_team_names,
+            frozenset(normalize_text(name) for name in (champion, runner) if name),
             champion_ids,
             runner_ids,
             {
@@ -608,6 +610,7 @@ def simulate_competition(
             competition=competition,
             team_names=tuple(all_teams),
             brazilian_team_names=brazilian_team_names,
+            eligible_team_names=frozenset(normalize_text(name) for name in participants),
             champion_ids=champion,
             runner_up_ids=runner_up,
             audit={
@@ -662,6 +665,7 @@ def simulate_competition(
         competition=competition,
         team_names=tuple(all_teams),
         brazilian_team_names=brazilian_team_names,
+        eligible_team_names=frozenset(normalize_text(name) for name in participants),
         champion_ids=champion,
         runner_up_ids=runner_up,
         audit={
@@ -689,22 +693,34 @@ def names_to_serie_a_indices(names: np.ndarray, index: Mapping[str, int]) -> np.
     return np.fromiter((index.get(str(name), -1) for name in names), dtype=np.int16, count=len(names))
 
 
-def display_probability(count: int, simulations: int, threshold_pct: float) -> dict[str, Any]:
+def display_probability(
+    count: int,
+    simulations: int,
+    threshold_pct: float,
+    *,
+    structurally_possible: bool = True,
+    impossibility_reason: str | None = None,
+) -> dict[str, Any]:
     pct = 100.0 * count / simulations
     zero_observed = count == 0
-    if pct < threshold_pct:
+    if not structurally_possible:
+        display = "0%"
+    elif pct < threshold_pct:
         display = f"<{str(threshold_pct).replace('.', ',')}%"
     elif pct >= 99.95:
         display = "100,0%" if count == simulations else ">99,9%"
     else:
         display = f"{pct:.1f}%".replace(".", ",")
-    upper_95 = 100.0 * (3.0 / simulations) if zero_observed else None
+    upper_95 = 100.0 * (3.0 / simulations) if zero_observed and structurally_possible else None
     return {
         "ocorrencias": int(count),
         "simulacoes": int(simulations),
         "percentual_estimado": round(pct, 6),
         "exibicao": display,
         "zero_observado": zero_observed,
+        "possivel_estruturalmente": bool(structurally_possible),
+        "impossivel_estruturalmente": not bool(structurally_possible),
+        "motivo_impossibilidade": impossibility_reason if not structurally_possible else None,
         "limite_superior_95_regra_dos_tres_pct": round(upper_95, 8) if upper_95 is not None else None,
     }
 
@@ -906,8 +922,27 @@ def allocate_integrated_qualification(
     results: dict[str, Any] = {}
     threshold = float(config.get("limiar_exibicao_percentual", 0.1))
     for index, team in enumerate(serie_a_names):
+        normalized_team = normalize_text(team)
+        route_possible = {
+            "via_brasileirao": True,
+            "via_copa_do_brasil": normalized_team in copa.eligible_team_names,
+            "via_titulo_libertadores": normalized_team in libertadores.eligible_team_names,
+            "via_titulo_sul_americana": normalized_team in sulamericana.eligible_team_names,
+            "via_repasse": True,
+        }
+        route_reasons = {
+            "via_copa_do_brasil": "clube não está mais ativo na Copa do Brasil",
+            "via_titulo_libertadores": "clube não está mais ativo na Libertadores",
+            "via_titulo_sul_americana": "clube não está mais ativo na Sul-Americana",
+        }
         lib_routes = {
-            route: display_probability(int(values[index]), simulations, threshold)
+            route: display_probability(
+                int(values[index]),
+                simulations,
+                threshold,
+                structurally_possible=route_possible[route],
+                impossibility_reason=route_reasons.get(route),
+            )
             for route, values in route_counts.items()
         }
         lib_total_info = display_probability(int(lib_total[index]), simulations, threshold)
@@ -915,8 +950,15 @@ def allocate_integrated_qualification(
         if abs(route_sum - lib_total_info["percentual_estimado"]) > 0.002:
             raise ValueError(f"decomposição da Libertadores não fecha para {team}")
 
+        copa_possible = normalized_team in copa.eligible_team_names
         copa_subroutes = {
-            route: display_probability(int(values[index]), simulations, threshold)
+            route: display_probability(
+                int(values[index]),
+                simulations,
+                threshold,
+                structurally_possible=copa_possible,
+                impossibility_reason="clube não está mais ativo na Copa do Brasil",
+            )
             for route, values in copa_subroute_counts.items()
         }
         copa_subroute_sum = sum(item["percentual_estimado"] for item in copa_subroutes.values())
@@ -1125,6 +1167,10 @@ def self_test() -> None:
     zero = display_probability(0, 2_000_000, 0.1)
     assert zero["exibicao"] == "<0,1%"
     assert zero["limite_superior_95_regra_dos_tres_pct"] == 0.00015
+    impossible = display_probability(0, 2_000_000, 0.1, structurally_possible=False, impossibility_reason="eliminado")
+    assert impossible["exibicao"] == "0%"
+    assert impossible["impossivel_estruturalmente"] is True
+    assert impossible["limite_superior_95_regra_dos_tres_pct"] is None
 
     # Cenários determinísticos de alocação e repasse. Inclui campeões em G5,
     # finalistas da Copa já classificados e campeões continentais rebaixados.
@@ -1145,6 +1191,7 @@ def self_test() -> None:
             competition=competition,
             team_names=names,
             brazilian_team_names=frozenset(normalize_text(name) for name in brazilian_names),
+            eligible_team_names=frozenset(normalize_text(name) for name in names),
             champion_ids=np.asarray([name_index[name] for name in champions], dtype=np.int16),
             runner_up_ids=np.asarray([name_index[name] for name in runners], dtype=np.int16),
             audit={"status": "fixo_self_test"},
