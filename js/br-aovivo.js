@@ -1030,27 +1030,36 @@
     };
   }
 
+  function percentuaisEmDecimos(values) {
+    const raw = values.map((value) => Math.max(0, Number(value) || 0));
+    const total = raw.reduce((sum, value) => sum + value, 0) || 1;
+    const exact = raw.map((value) => value * 1000 / total);
+    const tenths = exact.map((value) => Math.floor(value));
+    let missing = 1000 - tenths.reduce((sum, value) => sum + value, 0);
+    const order = exact.map((value, index) => ({ index, fraction: value - tenths[index] }))
+      .sort((a, b) => b.fraction - a.fraction || a.index - b.index);
+    for (let i = 0; i < missing; i++) tenths[order[i % order.length].index] += 1;
+    return tenths.map((value) => value / 10);
+  }
+
   function renderProbabilidadeDinamica(g) {
     const pd = probabilidadeDinamica(g);
     if (!pd) return "";
-    const fmt = (v) => {
-      if (v >= 99.5) return ">99%";
-      if (v <= 0.5) return "<1%";
-      return Math.round(v) + "%";
-    };
+    const rounded = percentuaisEmDecimos([pd.home, pd.empate, pd.away]);
+    const fmt = (v) => v.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%";
     const homeNome = esc((g.home && g.home.nome) || "Mandante");
     const awayNome = esc((g.away && g.away.nome) || "Visitante");
-    return '<div class="live-winprob" aria-label="Probabilidade dinâmica ao vivo">' +
-      '<div class="live-winprob-title">Chance de vitória agora</div>' +
+    return '<div class="live-winprob" aria-label="Probabilidade dinâmica do resultado da partida">' +
+      '<div class="live-winprob-title">Chance de resultado</div>' +
       '<div class="live-winprob-bar">' +
-        '<span class="live-winprob-seg home" style="width:' + pd.home.toFixed(1) + '%"></span>' +
-        '<span class="live-winprob-seg draw" style="width:' + pd.empate.toFixed(1) + '%"></span>' +
-        '<span class="live-winprob-seg away" style="width:' + pd.away.toFixed(1) + '%"></span>' +
+        '<span class="live-winprob-seg home" style="width:' + pd.home.toFixed(3) + '%"></span>' +
+        '<span class="live-winprob-seg draw" style="width:' + pd.empate.toFixed(3) + '%"></span>' +
+        '<span class="live-winprob-seg away" style="width:' + pd.away.toFixed(3) + '%"></span>' +
       '</div>' +
       '<div class="live-winprob-legend">' +
-        '<span><strong>' + fmt(pd.home) + '</strong> ' + homeNome + '</span>' +
-        '<span><strong>' + fmt(pd.empate) + '</strong> Empate</span>' +
-        '<span><strong>' + fmt(pd.away) + '</strong> ' + awayNome + '</span>' +
+        '<span><strong>' + fmt(rounded[0]) + '</strong> ' + homeNome + '</span>' +
+        '<span><strong>' + fmt(rounded[1]) + '</strong> Empate</span>' +
+        '<span><strong>' + fmt(rounded[2]) + '</strong> ' + awayNome + '</span>' +
       '</div>' +
       '<div class="live-winprob-note">Estimativa estatística do nosso modelo · não é aposta</div>' +
     '</div>';
@@ -1175,6 +1184,300 @@
     }
     out.sort((a, b) => a.sort - b.sort || a.text.localeCompare(b.text, "pt-BR"));
     return out;
+  }
+
+
+  function firstArray() {
+    let fallback = [];
+    for (const value of arguments) {
+      if (!Array.isArray(value)) continue;
+      if (!fallback.length) fallback = value;
+      if (value.length) return value;
+    }
+    return fallback;
+  }
+
+  function personName(value) {
+    const person = value && (value.athlete || value.player || value.person || value);
+    const ready = person && (person.shortName || person.displayName || person.fullName || person.name);
+    const composed = person && [person.firstName, person.lastName].filter(Boolean).join(" ");
+    return String(ready || composed || "").trim();
+  }
+
+  function teamReference(value) {
+    return value && (value.team || value.competitor || value.club || value.franchise || value) || {};
+  }
+
+  function teamMatches(reference, team) {
+    const ref = teamReference(reference);
+    const refId = String(ref.id || ref.teamId || reference && reference.teamId || "");
+    const teamId = String(team && team.id || "");
+    if (refId && teamId && refId === teamId) return true;
+    const refName = canon(ref.displayName || ref.shortDisplayName || ref.name || ref.location || ref.abbreviation || "");
+    return Boolean(refName && team && norm(refName) === norm(team.nome));
+  }
+
+  function lineupGroupType(group) {
+    const label = norm([group && group.name, group && group.displayName, group && group.label, group && group.type].filter(Boolean).join(" "));
+    if (/starter|starting|titular|lineup/.test(label)) return "starter";
+    if (/substitute|bench|reserve|reserva|suplente/.test(label)) return "reserve";
+    return "";
+  }
+
+  function entryStarter(entry, hint) {
+    for (const value of [entry && entry.starter, entry && entry.isStarter, entry && entry.starting, entry && entry.started]) {
+      if (value === true) return true;
+      if (value === false) return false;
+    }
+    const status = norm([
+      entry && entry.status && (entry.status.name || entry.status.type || entry.status.description),
+      entry && entry.role && (entry.role.name || entry.role.type || entry.role.description),
+      entry && entry.type && (entry.type.name || entry.type.text || entry.type.description)
+    ].filter(Boolean).join(" "));
+    if (/starter|starting|titular/.test(status)) return true;
+    if (/substitute|bench|reserve|reserva|suplente/.test(status)) return false;
+    return hint === "starter" ? true : hint === "reserve" ? false : null;
+  }
+
+  function lineupEntry(entry, hint, index) {
+    const athlete = entry && (entry.athlete || entry.player || entry.person || entry);
+    const name = personName(athlete);
+    if (!name) return null;
+    const id = String(athlete.id || entry && entry.id || "");
+    const jersey = String(entry && (entry.jersey || entry.jerseyNumber || entry.uniformNumber) || athlete.jersey || athlete.jerseyNumber || "").trim();
+    const position = entry && entry.position || athlete.position || {};
+    const positionText = String(position.abbreviation || position.shortName || position.displayName || position.name || entry && entry.positionAbbreviation || "").trim();
+    const starter = entryStarter(entry, hint);
+    const captain = Boolean(entry && (entry.captain === true || entry.isCaptain === true) || athlete.captain === true);
+    const order = Number(entry && (entry.order || entry.sortOrder || entry.lineupOrder || entry.formationPlace));
+    return {
+      id,
+      name,
+      shortName: compactPlayerName(name),
+      jersey,
+      position: positionText,
+      starter,
+      captain,
+      order: Number.isFinite(order) ? order : index + 1000
+    };
+  }
+
+  function dedupePlayers(players) {
+    const byKey = new Map();
+    for (const player of players) {
+      const key = player.id ? "id:" + player.id : "name:" + norm(player.name);
+      const current = byKey.get(key);
+      if (!current || (current.starter !== true && player.starter === true)) byKey.set(key, player);
+    }
+    return Array.from(byKey.values());
+  }
+
+  function sortPlayers(players) {
+    const positionOrder = { G: 0, GK: 0, D: 1, DF: 1, M: 2, MF: 2, F: 3, FW: 3, A: 3 };
+    return players.slice().sort((a, b) => {
+      const poA = positionOrder[String(a.position || "").toUpperCase()] ?? 9;
+      const poB = positionOrder[String(b.position || "").toUpperCase()] ?? 9;
+      return a.order - b.order || poA - poB || (Number(a.jersey) || 999) - (Number(b.jersey) || 999) || a.name.localeCompare(b.name, "pt-BR");
+    });
+  }
+
+  function rosterEntries(container) {
+    const direct = firstArray(container && container.roster, container && container.athletes, container && container.players, container && container.entries);
+    if (direct.length) return direct.map((entry, index) => lineupEntry(entry, "", index)).filter(Boolean);
+    const output = [];
+    for (const group of firstArray(container && container.statistics, container && container.groups, container && container.sections)) {
+      const hint = lineupGroupType(group);
+      const rows = firstArray(group && group.athletes, group && group.players, group && group.roster, group && group.entries);
+      rows.forEach((entry, index) => {
+        const parsed = lineupEntry(entry, hint, output.length + index);
+        if (parsed) output.push(parsed);
+      });
+    }
+    return output;
+  }
+
+  function formationText(container) {
+    const value = container && (container.formation || container.formationName || container.tacticalFormation || container.scheme);
+    if (!value) return "";
+    return String(typeof value === "object" ? value.displayName || value.name || value.text || value.abbreviation || "" : value).trim();
+  }
+
+  function coachNameFrom(value) {
+    const candidates = firstArray(value && value.coaches, value && value.coach ? [value.coach] : [], value && value.headCoach ? [value.headCoach] : []);
+    for (const candidate of candidates) {
+      const name = personName(candidate);
+      if (name) return name;
+    }
+    return "";
+  }
+
+  function coachForTeam(summary, team, roster) {
+    const direct = coachNameFrom(roster);
+    if (direct) return direct;
+    const pools = [
+      summary && summary.coaches,
+      summary && summary.gameInfo && summary.gameInfo.coaches,
+      summary && summary.boxscore && summary.boxscore.teams,
+      summary && summary.header && summary.header.competitions && summary.header.competitions[0] && summary.header.competitions[0].competitors
+    ];
+    for (const pool of pools) {
+      for (const item of (Array.isArray(pool) ? pool : [])) {
+        if (!teamMatches(item, team)) continue;
+        const name = coachNameFrom(item);
+        if (name) return name;
+      }
+    }
+    return "";
+  }
+
+  function lineupContainers(summary) {
+    const out = [];
+    const addAll = (rows, source) => {
+      for (const row of (Array.isArray(rows) ? rows : [])) if (row && typeof row === "object") out.push({ ...row, _lineupSource: source });
+    };
+    addAll(summary && summary.rosters, "rosters");
+    addAll(summary && summary.lineups, "lineups");
+    addAll(summary && summary.boxscore && summary.boxscore.players, "boxscore");
+    return out;
+  }
+
+  function cleanSubstitutionText(value) {
+    return String(value || "").replace(/\s+/g, " ").replace(/^Substitution[,.:]?\s*/i, "").replace(/^Substitui[cç][aã]o[,.:]?\s*/i, "").trim();
+  }
+
+  function substitutionNames(item) {
+    const raw = String(item && (item.text || item.shortText || item.description) || "").trim();
+    let match = raw.match(/(?:Substitution[,.:]?\s*[^.]*\.\s*)?(.+?)\s+replaces\s+(.+?)(?:\.|$)/i);
+    if (!match) match = raw.match(/(?:Substitui[cç][aã]o[,.:]?\s*[^.]*\.\s*)?(.+?)\s+entra\s+(?:no\s+lugar\s+de|por)\s+(.+?)(?:\.|$)/i);
+    if (match) return { entered: compactPlayerName(match[1]), left: compactPlayerName(match[2]), raw };
+    const involved = firstArray(item && item.athletesInvolved, item && item.participants, item && item.athletes);
+    const names = involved.map(personName).filter(Boolean).map(compactPlayerName);
+    if (names.length >= 2) return { entered: names[0], left: names[1], raw };
+    return { entered: names[0] || "", left: "", raw };
+  }
+
+  function substitutionRows(g, summary) {
+    const out = { home: [], away: [] };
+    const seen = new Set();
+    const candidates = [];
+    for (const item of firstArray(summary && summary.plays)) candidates.push(item);
+    for (const item of firstArray(summary && summary.commentary)) candidates.push(item);
+    const homeId = String(g && g.home && g.home.id || "");
+    const awayId = String(g && g.away && g.away.id || "");
+    for (const item of candidates) {
+      const text = String(item && (item.text || item.shortText || item.description) || "");
+      const typeText = norm([item && item.type && (item.type.text || item.type.name || item.type.description), text].filter(Boolean).join(" "));
+      if (!/substitution|substituicao|substituição|replaces|entra no lugar/.test(typeText)) continue;
+      const teamId = String(item && item.team && item.team.id || item && item.teamId || "");
+      let side = teamId && teamId === homeId ? "home" : teamId && teamId === awayId ? "away" : "";
+      if (!side) {
+        const normalizedText = norm(text);
+        if (normalizedText.includes(norm(g.home.nome))) side = "home";
+        else if (normalizedText.includes(norm(g.away.nome))) side = "away";
+      }
+      if (!side) continue;
+      const names = substitutionNames(item);
+      const minute = eventMinute(item);
+      const label = names.entered && names.left
+        ? "Entrou " + names.entered + " · saiu " + names.left
+        : names.entered
+          ? "Entrou " + names.entered
+          : cleanSubstitutionText(text);
+      if (!label) continue;
+      const key = [side, minute, norm(label)].join("|");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out[side].push({ minute, label, sort: Number((minute.match(/\d+/) || [999])[0]) });
+    }
+    out.home.sort((a, b) => a.sort - b.sort || a.label.localeCompare(b.label, "pt-BR"));
+    out.away.sort((a, b) => a.sort - b.sort || a.label.localeCompare(b.label, "pt-BR"));
+    return out;
+  }
+
+  function lineupsForGame(g, summary) {
+    const containers = lineupContainers(summary);
+    const changes = substitutionRows(g, summary || {});
+    const side = (team, key) => {
+      const container = containers.find((item) => teamMatches(item, team)) || null;
+      const parsed = dedupePlayers(rosterEntries(container || {}));
+      const hasStarterMetadata = parsed.some((player) => player.starter !== null);
+      const starters = sortPlayers(parsed.filter((player) => player.starter === true));
+      const reserves = sortPlayers(parsed.filter((player) => player.starter === false));
+      const related = hasStarterMetadata ? [] : sortPlayers(parsed);
+      return {
+        team,
+        formation: formationText(container),
+        coach: coachForTeam(summary || {}, team, container || {}),
+        starters,
+        reserves,
+        related,
+        changes: changes[key]
+      };
+    };
+    const home = side(g.home, "home");
+    const away = side(g.away, "away");
+    const totalPlayers = home.starters.length + home.reserves.length + home.related.length + away.starters.length + away.reserves.length + away.related.length;
+    const startersReady = home.starters.length >= 10 && away.starters.length >= 10;
+    return { home, away, totalPlayers, startersReady, partial: totalPlayers > 0 && !startersReady };
+  }
+
+  function renderLineupPlayer(player) {
+    const meta = [player.position, player.captain ? "capitão" : ""].filter(Boolean).join(" · ");
+    return '<div class="live-lineup-player">' +
+      '<span class="live-lineup-number">' + esc(player.jersey || "—") + '</span>' +
+      '<span class="live-lineup-player-name">' + esc(player.shortName || player.name) + (meta ? '<small>' + esc(meta) + '</small>' : '') + '</span>' +
+    '</div>';
+  }
+
+  function renderLineupChanges(rows) {
+    if (!rows.length) return "";
+    return '<div class="live-lineup-changes"><h4>Substituições</h4>' + rows.map((row) =>
+      '<div class="live-lineup-change"><span>' + esc(row.minute || "—") + '</span><strong>' + esc(row.label) + '</strong></div>'
+    ).join("") + '</div>';
+  }
+
+  function renderLineupTeam(data) {
+    const team = data.team || {};
+    const starters = data.starters.length ? data.starters : data.related;
+    const startersTitle = data.starters.length ? "Titulares" : data.related.length ? "Jogadores relacionados" : "Titulares";
+    const lineupBody = starters.length
+      ? '<div class="live-lineup-list"><h4>' + startersTitle + '<span>' + starters.length + '</span></h4>' + starters.map(renderLineupPlayer).join("") + '</div>'
+      : '<div class="live-lineup-team-empty">Aguardando a ESPN divulgar os titulares.</div>';
+    const reserves = data.reserves.length
+      ? '<details class="live-lineup-reserves"><summary>Reservas <span>' + data.reserves.length + '</span></summary><div class="live-lineup-reserve-list">' + data.reserves.map(renderLineupPlayer).join("") + '</div></details>'
+      : "";
+    return '<article class="live-lineup-team-card">' +
+      '<header class="live-lineup-team-head">' +
+        (team.escudo ? '<img src="' + esc(team.escudo) + '" alt="Escudo do ' + esc(team.nome) + '">' : '') +
+        '<div><h3>' + esc(team.nome) + '</h3>' +
+          (data.formation ? '<span>Formação ' + esc(data.formation) + '</span>' : '<span>Formação não informada</span>') +
+        '</div>' +
+      '</header>' +
+      '<div class="live-lineup-coach"><span>Técnico</span><strong>' + esc(data.coach || "Não informado pela ESPN") + '</strong></div>' +
+      lineupBody + reserves + renderLineupChanges(data.changes) +
+    '</article>';
+  }
+
+  function renderLineups(g, summary) {
+    const data = lineupsForGame(g, summary || {});
+    let note = "Aguardando divulgação pela ESPN.";
+    let stateClass = "waiting";
+    if (data.startersReady) {
+      note = "Escalações confirmadas pela ESPN.";
+      stateClass = "confirmed";
+    } else if (data.partial) {
+      note = "Informações parciais: o card será completado automaticamente.";
+      stateClass = "partial";
+    } else if (data.home.changes.length || data.away.changes.length) {
+      note = "Substituições disponíveis; escalações iniciais ainda não foram informadas.";
+      stateClass = "partial";
+    }
+    return '<section class="panel live-subpanel live-lineups-panel"><div class="panel-inner">' +
+      '<div class="live-section-head"><h2>👥 Escalações</h2><span class="live-section-note">ESPN summary · atualização 30s</span></div>' +
+      '<div class="live-lineups-status ' + stateClass + '"><span aria-hidden="true"></span>' + esc(note) + '</div>' +
+      '<div class="live-lineups-grid">' + renderLineupTeam(data.home) + renderLineupTeam(data.away) + '</div>' +
+      '<p class="live-lineups-footnote">Exibimos apenas informações presentes no resumo da ESPN; dados ausentes não são estimados.</p>' +
+    '</div></section>';
   }
 
   const LIVE_METRIC_RULES = [
@@ -1408,6 +1711,7 @@
       renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +
       '<section class="panel live-subpanel live-stats-panel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">ESPN summary</span></div>' + renderStats(g, summary) + '</div></section>' +
+      renderLineups(g, summary) +
       renderNextList(all, g);
   }
 

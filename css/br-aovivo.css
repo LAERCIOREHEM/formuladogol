@@ -816,3 +816,281 @@
   .live-winprob-legend { font-size: 11px; }
   .live-winprob-legend strong { font-size: 14px; }
 }
+
+/* ======================================================================
+   Escalações ESPN — 21/07/2026
+   Abaixo das estatísticas, atualizadas junto ao ciclo de 30 segundos.
+   ====================================================================== */
+.live-lineups-panel {
+  margin-top: 14px;
+  border-radius: 18px;
+}
+.live-lineups-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 4px 0 14px;
+  border: 1px solid rgba(148, 163, 184, .18);
+  border-radius: 12px;
+  background: rgba(15, 31, 41, .64);
+  color: #b9c7d3;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.4;
+}
+.live-lineups-status > span {
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #94a3b8;
+  box-shadow: 0 0 0 4px rgba(148, 163, 184, .10);
+}
+.live-lineups-status.confirmed {
+  border-color: rgba(74, 222, 128, .23);
+  background: rgba(20, 83, 45, .16);
+  color: #d3f9df;
+}
+.live-lineups-status.confirmed > span {
+  background: #4ade80;
+  box-shadow: 0 0 0 4px rgba(74, 222, 128, .12);
+}
+.live-lineups-status.partial {
+  border-color: rgba(251, 191, 36, .24);
+  background: rgba(120, 53, 15, .14);
+  color: #fde7a4;
+}
+.live-lineups-status.partial > span {
+  background: #fbbf24;
+  box-shadow: 0 0 0 4px rgba(251, 191, 36, .12);
+}
+.live-lineups-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+.live-lineup-team-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, .16);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(15, 31, 41, .92), rgba(10, 22, 30, .90));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+.live-lineup-team-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 72px;
+  border-bottom: 1px solid rgba(148, 163, 184, .12);
+  padding: 12px 14px;
+}
+.live-lineup-team-head img {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+.live-lineup-team-head > div { min-width: 0; }
+.live-lineup-team-head h3 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 17px;
+  font-weight: 950;
+  line-height: 1.1;
+}
+.live-lineup-team-head span {
+  display: block;
+  margin-top: 4px;
+  color: #91a3b4;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.live-lineup-coach {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin: 12px 14px 0;
+  border-radius: 10px;
+  background: rgba(148, 163, 184, .07);
+  padding: 9px 10px;
+}
+.live-lineup-coach span {
+  color: #90a1b1;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.live-lineup-coach strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #f1f5f9;
+  font-size: 12px;
+  font-weight: 900;
+  text-align: right;
+}
+.live-lineup-list,
+.live-lineup-changes {
+  padding: 13px 14px 14px;
+}
+.live-lineup-list h4,
+.live-lineup-changes h4 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 9px;
+  color: #dce7ef;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.live-lineup-list h4 span {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(163, 230, 53, .10);
+  color: #c9f56a;
+  font-size: 10px;
+}
+.live-lineup-player {
+  display: grid;
+  grid-template-columns: 31px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  min-height: 39px;
+  border-top: 1px solid rgba(148, 163, 184, .08);
+  padding: 6px 0;
+}
+.live-lineup-player:first-of-type { border-top: 0; }
+.live-lineup-number {
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  border: 1px solid rgba(163, 230, 53, .20);
+  border-radius: 9px;
+  background: rgba(163, 230, 53, .07);
+  color: #d9ff76;
+  font-size: 11px;
+  font-weight: 950;
+}
+.live-lineup-player-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #eef5fa;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+.live-lineup-player-name small {
+  display: block;
+  margin-top: 2px;
+  color: #718397;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .025em;
+  text-transform: uppercase;
+}
+.live-lineup-team-empty {
+  margin: 13px 14px 14px;
+  border: 1px dashed rgba(148, 163, 184, .20);
+  border-radius: 11px;
+  color: #8496a7;
+  padding: 15px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: center;
+}
+.live-lineup-reserves {
+  border-top: 1px solid rgba(148, 163, 184, .10);
+}
+.live-lineup-reserves summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  min-height: 45px;
+  cursor: pointer;
+  list-style: none;
+  color: #b9c6d1;
+  padding: 10px 14px;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.live-lineup-reserves summary::-webkit-details-marker { display: none; }
+.live-lineup-reserves summary::after {
+  content: "＋";
+  color: #a3e635;
+  font-size: 15px;
+  line-height: 1;
+}
+.live-lineup-reserves[open] summary::after { content: "−"; }
+.live-lineup-reserves summary span {
+  margin-left: auto;
+  color: #8192a2;
+  font-size: 10px;
+}
+.live-lineup-reserve-list {
+  border-top: 1px solid rgba(148, 163, 184, .08);
+  padding: 5px 14px 12px;
+}
+.live-lineup-changes {
+  border-top: 1px solid rgba(148, 163, 184, .10);
+}
+.live-lineup-change {
+  display: grid;
+  grid-template-columns: 47px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  border-top: 1px solid rgba(148, 163, 184, .08);
+  padding: 8px 0;
+}
+.live-lineup-change:first-of-type { border-top: 0; }
+.live-lineup-change > span {
+  color: #fbbf24;
+  font-size: 10px;
+  font-weight: 950;
+}
+.live-lineup-change > strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #dce7ef;
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+.live-lineups-footnote {
+  margin: 12px 2px 0;
+  color: #718397;
+  font-size: 9px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .live-lineups-grid { grid-template-columns: 1fr; }
+  .live-lineup-team-head { min-height: 65px; }
+  .live-lineup-team-head img { width: 42px; height: 42px; flex-basis: 42px; }
+  .live-lineup-team-head h3 { font-size: 16px; }
+}
+
+@media (max-width: 420px) {
+  .live-lineups-status { font-size: 10px; }
+  .live-lineup-coach { grid-template-columns: 1fr; gap: 3px; }
+  .live-lineup-coach strong { text-align: left; }
+  .live-lineup-player { grid-template-columns: 29px minmax(0, 1fr); }
+  .live-lineup-number { width: 29px; height: 29px; }
+}
