@@ -111,6 +111,7 @@ def audit_history(history: Mapping[str, Any], require_chain: bool = False) -> di
     errors: list[str] = []
     warnings: list[str] = []
     seen_inputs: set[str] = set()
+    seen_sports_states: set[str] = set()
     previous_hash: str | None = None
     rounds: list[int] = []
     model_versions: set[str] = set()
@@ -125,6 +126,15 @@ def audit_history(history: Mapping[str, Any], require_chain: bool = False) -> di
             errors.append(f"{prefix}: hash_entrada duplicado")
         else:
             seen_inputs.add(input_hash)
+
+        sports_hash = str(snapshot.get("hash_estado_esportivo") or "")
+        if int(history.get("schema_version") or 0) >= 4:
+            if not sports_hash:
+                errors.append(f"{prefix}: hash_estado_esportivo ausente")
+            elif sports_hash in seen_sports_states:
+                errors.append(f"{prefix}: estado esportivo duplicado")
+            else:
+                seen_sports_states.add(sports_hash)
 
         clubs = list(snapshot.get("clubes") or [])
         names = [str(row.get("clube") or "").strip() for row in clubs]
@@ -189,6 +199,13 @@ def audit_history(history: Mapping[str, Any], require_chain: bool = False) -> di
             errors.append(message)
         else:
             warnings.append(message)
+
+    if int(history.get("schema_version") or 0) >= 4:
+        published = history.get("estado_publicado") or {}
+        if not str(published.get("hash_entrada") or ""):
+            errors.append("estado_publicado sem hash_entrada")
+        if not str(published.get("hash_estado_esportivo") or ""):
+            errors.append("estado_publicado sem hash_estado_esportivo")
 
     declared_integrity = history.get("integridade") or {}
     if chain_present:
@@ -597,6 +614,7 @@ def self_test() -> None:
         "gerado_em": "2026-07-18T08:00:00-03:00",
         "rodada_referencia": 19,
         "hash_entrada": "entrada-1",
+        "hash_estado_esportivo": "estado-1",
         "versao_modelo": "AF-Previsão teste",
         "hash_anterior": None,
         "clubes": [],
@@ -616,7 +634,11 @@ def self_test() -> None:
         })
     snapshot["hash_snapshot"] = snapshot_hash(snapshot)
     history = {
-        "schema_version": 3,
+        "schema_version": 4,
+        "estado_publicado": {
+            "hash_entrada": "entrada-1",
+            "hash_estado_esportivo": "estado-1",
+        },
         "snapshots": [snapshot],
         "integridade": {"hash_final": snapshot["hash_snapshot"], "quantidade_snapshots": 1},
     }

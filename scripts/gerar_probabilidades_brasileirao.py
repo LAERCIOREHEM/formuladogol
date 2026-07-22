@@ -1272,6 +1272,145 @@ def history_snapshot_hash(snapshot: dict[str, Any]) -> str:
     return hashlib.sha256(serialized).hexdigest()
 
 
+def _completed_match_payload(match: Match) -> dict[str, Any]:
+    return {
+        "id": str(match.source_id),
+        "rodada": int(match.round_no),
+        "data": match.played_on.isoformat(),
+        "mandante": match.home,
+        "visitante": match.away,
+        "gols_mandante": int(match.home_goals),
+        "gols_visitante": int(match.away_goals),
+    }
+
+
+def completed_results_state_hash(current_matches: Sequence[Match]) -> str:
+    """Hash exclusivamente dos resultados concluídos do Brasileirão.
+
+    O histórico não pode ganhar nova linha por timestamp, cache continental,
+    mudança de schema ou nova execução Monte Carlo. Só um resultado final novo
+    ou corrigido altera este estado.
+    """
+    rows = [
+        _completed_match_payload(match)
+        for match in sorted(current_matches, key=lambda item: (item.played_on, item.source_id))
+    ]
+    return canonical_hash_payload({"schema": 1, "resultados_concluidos": rows})
+
+
+def build_team_history_states(current_matches: Sequence[Match]) -> dict[str, dict[str, Any]]:
+    """Constrói a referência histórica individual de cada clube.
+
+    A chave do clube muda apenas quando ele próprio conclui uma partida. Isso
+    permite que a interface mostre R18, R19 ou até R4 em caso de jogo atrasado,
+    sem repetir linhas quando apenas outro clube jogou.
+    """
+    by_team: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for match in sorted(current_matches, key=lambda item: (item.played_on, item.source_id)):
+        row = _completed_match_payload(match)
+        by_team[match.home].append(row)
+        by_team[match.away].append(row)
+
+    states: dict[str, dict[str, Any]] = {}
+    for team, rows in by_team.items():
+        last = rows[-1]
+        states[team] = {
+            "hash_estado_clube": canonical_hash_payload(
+                {"schema": 1, "clube": team, "partidas_concluidas": rows}
+            ),
+            "rodada_referencia_clube": int(last["rodada"]),
+            "ultimo_jogo_concluido_id": str(last["id"]),
+            "jogos_concluidos": len(rows),
+        }
+    return states
+
+
+def _legacy_snapshot_state_hash(snapshot: dict[str, Any]) -> str:
+    """Deriva uma chave estável para snapshots anteriores ao schema 4."""
+    clubs = list(snapshot.get("clubes") or [])
+    stable_rows = []
+    meaningful = False
+    for row in sorted(clubs, key=lambda item: str(item.get("clube") or "")):
+        stable = {
+            "clube": row.get("clube"),
+            "posicao_atual": row.get("posicao_atual"),
+            "pontos_atuais": row.get("pontos_atuais"),
+            "jogos_atuais": row.get("jogos_atuais"),
+        }
+        if any(stable[key] is not None for key in ("posicao_atual", "pontos_atuais", "jogos_atuais")):
+            meaningful = True
+        stable_rows.append(stable)
+    if meaningful:
+        return canonical_hash_payload({"schema": "legado-tabela-v1", "clubes": stable_rows})
+    # O primeiro registro legado não tinha estado corrente completo; preserve-o.
+    return canonical_hash_payload(
+        {
+            "schema": "legado-sem-tabela-v1",
+            "gerado_em": snapshot.get("gerado_em"),
+            "hash_entrada": snapshot.get("hash_entrada"),
+        }
+    )
+
+
+def _team_state_from_completed_count(
+    team: str,
+    completed_count: Any,
+    current_matches: Sequence[Match],
+) -> dict[str, Any] | None:
+    try:
+        count = int(completed_count)
+    except (TypeError, ValueError):
+        return None
+    if count <= 0:
+        return None
+    rows = [
+        _completed_match_payload(match)
+        for match in sorted(current_matches, key=lambda item: (item.played_on, item.source_id))
+        if team in {match.home, match.away}
+    ]
+    if count > len(rows):
+        return None
+    subset = rows[:count]
+    last = subset[-1]
+    return {
+        "hash_estado_clube": canonical_hash_payload(
+            {"schema": 1, "clube": team, "partidas_concluidas": subset}
+        ),
+        "rodada_referencia_clube": int(last["rodada"]),
+        "ultimo_jogo_concluido_id": str(last["id"]),
+        "jogos_concluidos": len(subset),
+    }
+
+
+def compact_history_snapshots(
+    snapshots: Sequence[dict[str, Any]],
+    current_matches: Sequence[Match],
+) -> list[dict[str, Any]]:
+    """Remove estados esportivos repetidos e migra referências por clube.
+
+    Em uma sequência duplicada, preserva a versão mais recente do mesmo estado,
+    pois ela contém o schema e a decomposição probabilística mais atuais.
+    """
+    compacted: list[dict[str, Any]] = []
+    for original in snapshots:
+        snapshot = json.loads(json.dumps(original, ensure_ascii=False))
+        snapshot.pop("hash_anterior", None)
+        snapshot.pop("hash_snapshot", None)
+        snapshot.setdefault("hash_estado_esportivo", _legacy_snapshot_state_hash(snapshot))
+        for row in list(snapshot.get("clubes") or []):
+            if row.get("hash_estado_clube") and row.get("rodada_referencia_clube") is not None:
+                continue
+            team = str(row.get("clube") or "").strip()
+            migrated = _team_state_from_completed_count(team, row.get("jogos_atuais"), current_matches)
+            if migrated:
+                row.update(migrated)
+        if compacted and compacted[-1].get("hash_estado_esportivo") == snapshot.get("hash_estado_esportivo"):
+            compacted[-1] = snapshot
+        else:
+            compacted.append(snapshot)
+    return compacted
+
+
 def chain_history_snapshots(snapshots: Sequence[dict[str, Any]]) -> list[dict[str, Any]]:
     """Recalcula uma cadeia SHA-256 determinística sobre os snapshots retidos."""
     chained: list[dict[str, Any]] = []
@@ -1290,11 +1429,19 @@ def validate_history_chain(history: dict[str, Any]) -> None:
     snapshots = list(history.get("snapshots") or [])
     previous_hash: str | None = None
     seen_inputs: set[str] = set()
+    seen_sports_states: set[str] = set()
     for index, snapshot in enumerate(snapshots, start=1):
         input_hash = str(snapshot.get("hash_entrada") or "")
         if not input_hash or input_hash in seen_inputs:
             raise ValueError(f"histórico inválido no snapshot {index}: hash_entrada ausente ou duplicado")
         seen_inputs.add(input_hash)
+        sports_hash = str(snapshot.get("hash_estado_esportivo") or "")
+        if int(history.get("schema_version") or 0) >= 4:
+            if not sports_hash or sports_hash in seen_sports_states:
+                raise ValueError(
+                    f"histórico inválido no snapshot {index}: estado esportivo ausente ou duplicado"
+                )
+            seen_sports_states.add(sports_hash)
         if snapshot.get("hash_anterior") != previous_hash:
             raise ValueError(f"histórico inválido no snapshot {index}: elo anterior divergente")
         computed = history_snapshot_hash(snapshot)
@@ -1309,17 +1456,37 @@ def validate_history_chain(history: dict[str, Any]) -> None:
         raise ValueError("histórico inválido: quantidade declarada diverge da lista")
     if integrity.get("hash_final") != previous_hash:
         raise ValueError("histórico inválido: hash final diverge da cadeia")
+    if int(history.get("schema_version") or 0) >= 4:
+        published = history.get("estado_publicado") or {}
+        if not str(published.get("hash_entrada") or ""):
+            raise ValueError("histórico inválido: hash da publicação corrente ausente")
+        if not str(published.get("hash_estado_esportivo") or ""):
+            raise ValueError("histórico inválido: estado esportivo corrente ausente")
 
 
-def build_history_document(snapshots: Sequence[dict[str, Any]]) -> dict[str, Any]:
+def build_history_document(
+    snapshots: Sequence[dict[str, Any]],
+    published_state: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     chained = chain_history_snapshots(snapshots)
     history = {
-        "schema_version": 3,
+        "schema_version": 4,
         "projeto": "AF-Previsão",
         "descricao": (
-            "Histórico público e encadeado das probabilidades; um snapshot por alteração "
-            "do estado esportivo, identificado por rodada e hash da entrada."
+            "Histórico público e encadeado das probabilidades; um snapshot global por "
+            "novo resultado concluído e uma referência individual por partida concluída de cada clube."
         ),
+        "criterio_snapshot": {
+            "global": "novo resultado final do Brasileirão ou correção de placar final",
+            "por_clube": "a linha do clube muda somente quando o próprio clube conclui uma partida",
+            "nao_gera_snapshot": [
+                "nova execução sem resultado novo",
+                "timestamp ou cache atualizado",
+                "mudança apenas em dados continentais",
+                "oscilação Monte Carlo sem novo resultado",
+            ],
+        },
+        "estado_publicado": dict(published_state or {}),
         "total_snapshots": len(chained),
         "integridade": {
             "algoritmo": "SHA-256",
@@ -1335,6 +1502,61 @@ def build_history_document(snapshots: Sequence[dict[str, Any]]) -> dict[str, Any
     return history
 
 
+def _history_club_rows(
+    teams: Sequence[dict[str, Any]],
+    team_states: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for item in teams:
+        club_state = team_states.get(item["clube"], {})
+        rows.append(
+            {
+                "clube": item["clube"],
+                "posicao_atual": item.get("posicao_atual"),
+                "pontos_atuais": item.get("pontos_atuais"),
+                "jogos_atuais": item.get("jogos_atuais"),
+                "rodada_referencia_clube": club_state.get("rodada_referencia_clube"),
+                "ultimo_jogo_concluido_id": club_state.get("ultimo_jogo_concluido_id"),
+                "hash_estado_clube": club_state.get("hash_estado_clube"),
+                "posicao_projetada": item.get("posicao_projetada"),
+                "posicao_media_estimada": item.get("posicao_projetada_media"),
+                "posicao_mediana": item.get("posicao_projetada_mediana"),
+                "faixa_posicao_80": item.get("faixa_posicao_80"),
+                "distribuicao_posicoes_pct": item.get("distribuicao_posicoes_pct"),
+                "pontos_projetados": item["pontos_projetados"].get("media"),
+                "pontos_media_estimada": item["pontos_projetados"].get(
+                    "media_estimada", item["pontos_projetados"].get("media")
+                ),
+                "pontos_percentis": {
+                    "p10": item["pontos_projetados"].get("percentil_10"),
+                    "p50": item["pontos_projetados"].get("percentil_50"),
+                    "p90": item["pontos_projetados"].get("percentil_90"),
+                },
+                "campeao_pct": item["probabilidades_pct"]["campeao"],
+                "libertadores_pct": item["probabilidades_pct"].get("libertadores"),
+                "sul_americana_pct": item["probabilidades_pct"].get("sul_americana"),
+                "libertadores_base_pct": item["probabilidades_pct"]["libertadores_base"],
+                "sul_americana_base_pct": item["probabilidades_pct"]["sul_americana_base"],
+                "rebaixamento_pct": item["probabilidades_pct"]["rebaixamento"],
+                "exibicao": {
+                    key: detail.get("exibicao")
+                    for key, detail in (item.get("probabilidades_detalhes") or {}).items()
+                },
+                "ocorrencias": {
+                    key: detail.get("ocorrencias")
+                    for key, detail in (item.get("probabilidades_detalhes") or {}).items()
+                },
+                "decomposicao_chances": item.get("decomposicao_chances"),
+                "tendencia_recente": item.get("tendencia_recente"),
+                # Compatibilidade com snapshots das versões anteriores.
+                "pontos_medios": item["pontos_projetados"].get(
+                    "media_estimada", item["pontos_projetados"].get("media")
+                ),
+            }
+        )
+    return rows
+
+
 def update_history(
     existing: dict[str, Any] | None,
     generated_at: str,
@@ -1343,69 +1565,57 @@ def update_history(
     model_version: str,
     round_reference: int,
     simulations: int,
+    current_matches: Sequence[Match] | None = None,
     max_snapshots: int = 300,
 ) -> dict[str, Any]:
     if existing and int(existing.get("schema_version") or 0) >= 3:
         # Não recalcula silenciosamente uma cadeia já publicada: primeiro
         # verifica se o conteúdo ainda corresponde aos hashes registrados.
         validate_history_chain(existing)
-    snapshots = list((existing or {}).get("snapshots") or [])
-    if not snapshots or snapshots[-1].get("hash_entrada") != input_hash:
+
+    current_matches = list(current_matches or [])
+    sports_state_hash = (
+        completed_results_state_hash(current_matches) if current_matches else input_hash
+    )
+    team_states = build_team_history_states(current_matches) if current_matches else {}
+    snapshots = compact_history_snapshots(
+        list((existing or {}).get("snapshots") or []), current_matches
+    )
+    # Ao migrar o último snapshot legado, o próprio hash_entrada confirma que
+    # ele representa exatamente a publicação corrente. Troque apenas a chave
+    # derivada do legado pela chave exata dos resultados, sem criar nova linha.
+    if (
+        snapshots
+        and snapshots[-1].get("hash_entrada") == input_hash
+        and snapshots[-1].get("hash_estado_esportivo") != sports_state_hash
+    ):
+        snapshots[-1]["hash_estado_esportivo"] = sports_state_hash
+
+    if not snapshots or snapshots[-1].get("hash_estado_esportivo") != sports_state_hash:
         snapshots.append(
             {
                 "gerado_em": generated_at,
                 "rodada_referencia": int(round_reference),
                 "hash_entrada": input_hash,
+                "hash_estado_esportivo": sports_state_hash,
+                "motivo_registro": "novo_resultado_concluido",
                 "versao_modelo": model_version,
                 "metodologia": "AF-Previsão Integrada com tendência controlada",
                 "simulacoes": int(simulations),
-                "clubes": [
-                    {
-                        "clube": item["clube"],
-                        "posicao_atual": item.get("posicao_atual"),
-                        "pontos_atuais": item.get("pontos_atuais"),
-                        "jogos_atuais": item.get("jogos_atuais"),
-                        "posicao_projetada": item.get("posicao_projetada"),
-                        "posicao_media_estimada": item.get("posicao_projetada_media"),
-                        "posicao_mediana": item.get("posicao_projetada_mediana"),
-                        "faixa_posicao_80": item.get("faixa_posicao_80"),
-                        "distribuicao_posicoes_pct": item.get("distribuicao_posicoes_pct"),
-                        "pontos_projetados": item["pontos_projetados"].get("media"),
-                        "pontos_media_estimada": item["pontos_projetados"].get(
-                            "media_estimada", item["pontos_projetados"].get("media")
-                        ),
-                        "pontos_percentis": {
-                            "p10": item["pontos_projetados"].get("percentil_10"),
-                            "p50": item["pontos_projetados"].get("percentil_50"),
-                            "p90": item["pontos_projetados"].get("percentil_90"),
-                        },
-                        "campeao_pct": item["probabilidades_pct"]["campeao"],
-                        "libertadores_pct": item["probabilidades_pct"].get("libertadores"),
-                        "sul_americana_pct": item["probabilidades_pct"].get("sul_americana"),
-                        "libertadores_base_pct": item["probabilidades_pct"]["libertadores_base"],
-                        "sul_americana_base_pct": item["probabilidades_pct"]["sul_americana_base"],
-                        "rebaixamento_pct": item["probabilidades_pct"]["rebaixamento"],
-                        "exibicao": {
-                            key: detail.get("exibicao")
-                            for key, detail in (item.get("probabilidades_detalhes") or {}).items()
-                        },
-                        "ocorrencias": {
-                            key: detail.get("ocorrencias")
-                            for key, detail in (item.get("probabilidades_detalhes") or {}).items()
-                        },
-                        "decomposicao_chances": item.get("decomposicao_chances"),
-                        "tendencia_recente": item.get("tendencia_recente"),
-                        # Compatibilidade com snapshots das versões anteriores.
-                        "pontos_medios": item["pontos_projetados"].get(
-                            "media_estimada", item["pontos_projetados"].get("media")
-                        ),
-                    }
-                    for item in teams
-                ],
+                "clubes": _history_club_rows(teams, team_states),
             }
         )
+
     snapshots = snapshots[-max(1, int(max_snapshots)) :]
-    return build_history_document(snapshots)
+    published_state = {
+        "gerado_em": generated_at,
+        "hash_entrada": input_hash,
+        "hash_estado_esportivo": sports_state_hash,
+        "versao_modelo": model_version,
+        "simulacoes": int(simulations),
+    }
+    return build_history_document(snapshots, published_state=published_state)
+
 
 def continental_snapshots_state_hash(snapshots: dict[str, dict[str, Any]]) -> str:
     """Hash apenas do estado esportivo, sem timestamps de coleta/cache."""
@@ -1778,6 +1988,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         existing_history, generated_at, input_hash, teams, model_version,
         round_reference=max((match.round_no for match in current), default=0),
         simulations=simulations_final,
+        current_matches=current,
         max_snapshots=int(execution.get("historico_max_snapshots") or 300),
     )
     return probabilities, audit, history, bolao, points_thresholds
@@ -1908,6 +2119,45 @@ def self_test() -> None:
     )
     if synthetic_history["total_snapshots"] != 1 or repeated_history["total_snapshots"] != 1:
         raise AssertionError("histórico criou snapshot artificial sem mudança esportiva")
+
+    completed_r18 = Match(
+        season=2026, source_id=9001, round_no=18, played_on=date(2026, 7, 17),
+        home=teams[0], away=teams[1], home_goals=1, away_goals=0,
+    )
+    club_history = update_history(
+        None, "2026-07-17T22:00:00-03:00", "entrada-r18", result_a["clubes"],
+        "AF-Previsão teste", round_reference=18, simulations=10_000,
+        current_matches=[completed_r18], max_snapshots=10,
+    )
+    same_results_new_execution = update_history(
+        club_history, "2026-07-17T22:15:00-03:00", "entrada-tecnica-nova", result_a["clubes"],
+        "AF-Previsão teste", round_reference=18, simulations=10_000,
+        current_matches=[completed_r18], max_snapshots=10,
+    )
+    if same_results_new_execution["total_snapshots"] != 1:
+        raise AssertionError("nova execução sem resultado novo criou snapshot")
+    if (same_results_new_execution.get("estado_publicado") or {}).get("hash_entrada") != "entrada-tecnica-nova":
+        raise AssertionError("histórico não registrou a publicação corrente fora da cadeia")
+
+    completed_delayed_r4 = Match(
+        season=2026, source_id=9002, round_no=4, played_on=date(2026, 7, 21),
+        home=teams[0], away=teams[2], home_goals=2, away_goals=2,
+    )
+    delayed_history = update_history(
+        same_results_new_execution, "2026-07-21T23:00:00-03:00", "entrada-r4", result_a["clubes"],
+        "AF-Previsão teste", round_reference=18, simulations=10_000,
+        current_matches=[completed_r18, completed_delayed_r4], max_snapshots=10,
+    )
+    if delayed_history["total_snapshots"] != 2:
+        raise AssertionError("novo resultado concluído não criou snapshot")
+    latest_rows = {row["clube"]: row for row in delayed_history["snapshots"][-1]["clubes"]}
+    if latest_rows[teams[0]].get("rodada_referencia_clube") != 4:
+        raise AssertionError("jogo atrasado não preservou a rodada real do clube")
+    if latest_rows[teams[1]].get("rodada_referencia_clube") != 18:
+        raise AssertionError("clube sem nova partida teve sua rodada individual alterada")
+    if latest_rows[teams[0]].get("hash_estado_clube") == delayed_history["snapshots"][0]["clubes"][0].get("hash_estado_clube"):
+        raise AssertionError("estado individual do clube não mudou após nova partida")
+
     saved = synthetic_history["snapshots"][0]
     if saved.get("rodada_referencia") != 19 or saved["clubes"][0].get("posicao_projetada") is None:
         raise AssertionError("histórico não guardou rodada e projeção final")
@@ -2015,7 +2265,24 @@ def main() -> int:
         # sem criar snapshot novo nem alterar as probabilidades preservadas.
         if int(previous_history.get("schema_version") or 0) >= 3:
             validate_history_chain(previous_history)
-        upgraded_history = build_history_document(list(previous_history.get("snapshots") or []))
+        upgraded_snapshots = compact_history_snapshots(
+            list(previous_history.get("snapshots") or []), []
+        )
+        latest_snapshot = upgraded_snapshots[-1] if upgraded_snapshots else {}
+        published_state = dict(previous_history.get("estado_publicado") or {})
+        published_state.setdefault("gerado_em", previous_output.get("gerado_em"))
+        published_state.setdefault("hash_entrada", previous_output.get("hash_entrada"))
+        published_state.setdefault(
+            "hash_estado_esportivo",
+            latest_snapshot.get("hash_estado_esportivo") or _legacy_snapshot_state_hash(latest_snapshot),
+        )
+        published_state.setdefault("versao_modelo", previous_output.get("versao_modelo"))
+        published_state.setdefault(
+            "simulacoes", (previous_output.get("simulacao") or {}).get("quantidade")
+        )
+        upgraded_history = build_history_document(
+            upgraded_snapshots, published_state=published_state
+        )
         write_json(HISTORY_PATH, upgraded_history)
         print(
             "::warning title=AF-Previsão aguardando sincronização da ESPN::"

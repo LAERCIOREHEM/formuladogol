@@ -720,12 +720,50 @@
     };
   }
 
-  function probabilityClubHistoryDetails(club) {
+  function probabilityHistoryClubStateKey(snapshot, row) {
+    const publishedKey = String(row?.hash_estado_clube || "").trim();
+    if (publishedKey) return publishedKey;
+    const games = Number(row?.jogos_atuais);
+    const points = Number(row?.pontos_atuais);
+    const position = Number(row?.posicao_atual);
+    const clubRound = Number(row?.rodada_referencia_clube);
+    if ([games, points, position].some(Number.isFinite)) {
+      return [
+        Number.isFinite(games) ? games : "—",
+        Number.isFinite(points) ? points : "—",
+        Number.isFinite(position) ? position : "—",
+        Number.isFinite(clubRound) ? clubRound : "—",
+      ].join("|");
+    }
+    return String(snapshot?.hash_estado_esportivo || snapshot?.hash_entrada || snapshot?.hash_snapshot || snapshot?.gerado_em || "");
+  }
+
+  function probabilityClubHistoryRows(clubName, limit = 12) {
     const snapshots = Array.isArray(state.probabilitiesHistory?.snapshots) ? state.probabilitiesHistory.snapshots : [];
-    const historyRows = snapshots.map((snapshot) => probabilityHistoryClubRow(snapshot, club?.clube)).filter(Boolean).slice(-10);
+    const rows = [];
+    snapshots.forEach((snapshot) => {
+      const entry = probabilityHistoryClubRow(snapshot, clubName);
+      if (!entry) return;
+      const key = probabilityHistoryClubStateKey(snapshot, entry.row);
+      if (rows.length && rows[rows.length - 1].stateKey === key) return;
+      rows.push({ ...entry, stateKey: key });
+    });
+    return rows.slice(-Math.max(1, Number(limit) || 12));
+  }
+
+  function probabilityHistoryReference(snapshot, row) {
+    const clubRound = Number(row?.rodada_referencia_clube);
+    if (Number.isFinite(clubRound) && clubRound > 0) return `R${integer(clubRound)}`;
+    const globalRound = Number(snapshot?.rodada_referencia);
+    if (Number.isFinite(globalRound) && globalRound > 0) return `R${integer(globalRound)}`;
+    return dateBR(snapshot?.gerado_em);
+  }
+
+  function probabilityClubHistoryDetails(club) {
+    const historyRows = probabilityClubHistoryRows(club?.clube, 10);
     if (!historyRows.length) return "";
     const body = historyRows.map(({ snapshot, row, position, points }) => {
-      const reference = Number(snapshot?.rodada_referencia) > 0 ? `R${integer(snapshot.rodada_referencia)}` : dateBR(snapshot?.gerado_em);
+      const reference = probabilityHistoryReference(snapshot, row);
       const title = probabilityDisplayText(null, Number(row?.campeao_pct));
       const lib = probabilityDisplayText(null, probabilityHistoryValue(row, "libertadores_pct"));
       const sula = probabilityDisplayText(null, probabilityHistoryValue(row, "sul_americana_pct"));
@@ -735,7 +773,7 @@
     return `<details class="probability-history-details">
       <summary>Evolução da previsão <span>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado salvo" : "estados salvos"}</span></summary>
       <div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${body}</tbody></table></div>
-      <p>O histórico só ganha um registro quando o estado esportivo muda. Ele será usado depois para medir erro de posição, erro de pontos, calibração e Brier Score.</p>
+      <p>A evolução do clube ganha uma nova linha somente quando ele conclui outra partida. Jogos atrasados preservam a rodada real, como R4 após R19. Reexecuções sem jogo novo não criam estados artificiais.</p>
     </details>`;
   }
 
@@ -1033,11 +1071,13 @@
     }
     if (!PROBABILITY_HISTORY_METRICS[state.probabilityHistoryMetric]) state.probabilityHistoryMetric = "campeao_pct";
     const metric = PROBABILITY_HISTORY_METRICS[state.probabilityHistoryMetric];
-    const historyRows = snapshots.map((snapshot) => {
-      const club = (Array.isArray(snapshot?.clubes) ? snapshot.clubes : []).find((row) => normalize(row?.clube) === normalize(state.probabilityHistoryClub));
-      if (!club) return null;
-      return { snapshot, club, value: probabilityHistoryValue(club, state.probabilityHistoryMetric) };
-    }).filter((row) => row && Number.isFinite(row.value)).slice(-12);
+    const historyRows = probabilityClubHistoryRows(state.probabilityHistoryClub, 12)
+      .map(({ snapshot, row }) => ({
+        snapshot,
+        club: row,
+        value: probabilityHistoryValue(row, state.probabilityHistoryMetric),
+      }))
+      .filter((row) => Number.isFinite(row.value));
     const max = Math.max(...historyRows.map((row) => row.value), 0.0001);
     const rowsHtml = historyRows.map(({ snapshot, club, value }) => {
       const detailKey = metric.detail;
@@ -1046,12 +1086,12 @@
       return `<div class="probability-evolution-row"><time>${escapeHtml(dateTimeBR(snapshot?.gerado_em))}</time><div><i style="width:${relative.toFixed(2)}%"></i></div><strong>${escapeHtml(display)}</strong></div>`;
     }).join("");
     target.innerHTML = `<section class="probability-evolution-section">
-      <div class="probability-section-head"><div><div class="kicker">Histórico versionado</div><h3>Evolução das probabilidades</h3></div><span>${integer(snapshots.length)} ${snapshots.length === 1 ? "snapshot" : "snapshots"}</span></div>
+      <div class="probability-section-head"><div><div class="kicker">Histórico versionado</div><h3>Evolução das probabilidades</h3></div><span>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado do clube" : "estados do clube"}</span></div>
       <div class="probability-evolution-controls">
         <label><span>Clube</span><select data-probability-history-club>${clubNames.map((name) => `<option value="${escapeAttr(name)}"${name === state.probabilityHistoryClub ? " selected" : ""}>${escapeHtml(name)}</option>`).join("")}</select></label>
         <label><span>Evento</span><select data-probability-history-metric>${Object.entries(PROBABILITY_HISTORY_METRICS).map(([key, item]) => `<option value="${key}"${key === state.probabilityHistoryMetric ? " selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}</select></label>
       </div>
-      <div class="probability-evolution-caption"><strong>${escapeHtml(state.probabilityHistoryClub)}</strong><span>${escapeHtml(metric.label)} · até 12 estados esportivos mais recentes</span></div>
+      <div class="probability-evolution-caption"><strong>${escapeHtml(state.probabilityHistoryClub)}</strong><span>${escapeHtml(metric.label)} · uma referência por partida concluída do clube</span></div>
       ${historyRows.length ? `<div class="probability-evolution-list">${rowsHtml}</div>` : `<div class="probability-evolution-empty"><strong>Sem série suficiente para esta combinação.</strong></div>`}
     </section>`;
   }
@@ -1082,7 +1122,7 @@
       <article><span>Margem numérica</span><strong>${Number.isFinite(margin) ? `±${number(margin, 3)} p.p.` : "—"}</strong><small>pior caso aproximado, 95%</small></article>
       <article><span>Forma recente</span><strong>${Number.isFinite(trendWindow) ? `${integer(trendWindow)} jogos` : "Aguardando"}</strong><small>${Number.isFinite(trendWeight) ? `${number(trendWeight * 100, 0)}% de peso` : "peso controlado"}${Number.isFinite(trendLimit) ? ` · limite ±${number(trendLimit, 0)}%` : ""}</small></article>
       <article><span>Resolução visual</span><strong>&lt;${number(threshold, 1)}%</strong><small>zero observado não vira impossibilidade</small></article>
-      <article><span>Histórico público</span><strong>${integer(state.probabilityEvaluation?.cobertura?.snapshots ?? state.probabilitiesHistory?.total_snapshots)}</strong><small>${state.probabilityEvaluation?.integridade_historico?.encadeado ? "cadeia SHA-256 íntegra" : "encadeamento após a próxima atualização"}</small></article>`;
+      <article><span>Histórico público</span><strong>${integer(state.probabilitiesHistory?.total_snapshots ?? state.probabilityEvaluation?.cobertura?.snapshots)}</strong><small>${state.probabilityEvaluation?.integridade_historico?.encadeado ? "cadeia SHA-256 íntegra" : "encadeamento após a próxima atualização"}</small></article>`;
   }
 
   function renderProbabilityEvaluation() {
