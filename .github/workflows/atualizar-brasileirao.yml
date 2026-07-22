@@ -247,7 +247,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/historico-ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -273,11 +273,27 @@ jobs:
           print('  OK   JSONs principais: fonte ESPN; tabela com 20 times')
           stats = json.load(open('dados-br/estatisticas.json', encoding='utf-8'))
           rank = json.load(open('dados-br/ranking-desempenho.json', encoding='utf-8'))
+          hist_rank = json.load(open('dados-br/historico-ranking-desempenho.json', encoding='utf-8'))
           assert len(stats.get('clubes') or []) == 20, 'estatisticas.json sem 20 clubes'
           assert len(rank.get('ranking') or []) == 20, 'ranking-desempenho.json sem 20 clubes'
           for item in rank.get('ranking') or []:
               for campo in ['indice_final', 'ataque', 'defesa', 'dominio', 'eficiencia', 'disciplina']:
                   assert campo in item, f'ranking sem campo {campo}'
+          snapshots_rank = hist_rank.get('snapshots') or []
+          assert hist_rank.get('schema_version') == 1, 'histórico do ranking com schema inválido'
+          assert snapshots_rank and snapshots_rank[-1].get('id') == 'atual', 'histórico do ranking sem estado atual'
+          assert len({item.get('id') for item in snapshots_rank}) == len(snapshots_rank), 'snapshots repetidos no histórico do ranking'
+          for snapshot in snapshots_rank:
+              linhas = snapshot.get('ranking') or []
+              assert len(linhas) == 20, f"{snapshot.get('id')}: histórico sem 20 clubes"
+              assert sorted(int(item.get('pos') or 0) for item in linhas) == list(range(1, 21)), f"{snapshot.get('id')}: posições inválidas"
+              jogos_iguais = snapshot.get('jogos_por_clube')
+              if jogos_iguais is not None:
+                  assert all(int(item.get('jogos') or 0) == int(jogos_iguais) for item in linhas), f"{snapshot.get('id')}: amostras desiguais"
+          campos_hist = ['time', 'pos', 'indice_final', 'ataque', 'defesa', 'dominio', 'eficiencia', 'disciplina', 'jogos']
+          atual_hist = [{campo: item.get(campo) for campo in campos_hist} for item in snapshots_rank[-1]['ranking']]
+          atual_rank = [{campo: item.get(campo) for campo in campos_hist} for item in rank['ranking']]
+          assert atual_hist == atual_rank, 'snapshot atual diverge do ranking publicado'
           aud_rank = json.load(open('dados-br/auditoria-ranking-desempenho.json', encoding='utf-8'))
           assert aud_rank.get('clubes_no_ranking') == 20, 'auditoria-ranking sem 20 clubes'
           jogadores = json.load(open('dados-br/jogadores.json', encoding='utf-8'))
@@ -542,6 +558,7 @@ jobs:
             "resultados.json"
             "dados-br/estatisticas.json"
             "dados-br/ranking-desempenho.json"
+            "dados-br/historico-ranking-desempenho.json"
             "dados-br/auditoria-ranking-desempenho.json"
             "dados-br/jogadores.json"
             "dados-br/lideres-jogadores.json"
