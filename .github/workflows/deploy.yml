@@ -26,6 +26,7 @@ on:
       - 'tabela/**'
       - 'resultados/**'
       - 'bolao/**'
+      - 'aniversariantes/**'
       - '.github/workflows/deploy.yml'
 
   # Publica imediatamente após workflows que atualizam dados do site.
@@ -93,10 +94,10 @@ jobs:
             fi
           done
 
-          # Assets, dados e diretorios das rotas limpas do Brasileirão.
-          # GitHub Pages só atende /jogos, /tabela, /resultados e /bolao se os
-          # respectivos <rota>/index.html estiverem dentro do artefato publicado.
-          for dir in img css js dados-br copa2026 docs jogos tabela resultados bolao; do
+          # Assets e dados usados pelas paginas novas do Brasileirão.
+          # Rotas limpas são diretórios estáticos. Sem copiá-las para _site,
+          # o GitHub Pages responde 404 mesmo que existam no repositório.
+          for dir in img css js dados-br copa2026 docs jogos tabela resultados bolao aniversariantes; do
             if [[ -d "$dir" ]]; then
               cp -a "$dir" _site/
             fi
@@ -124,10 +125,6 @@ jobs:
             "_site/clubes.html"
             "_site/museu.html"
             "_site/regras.html"
-            "_site/jogos/index.html"
-            "_site/tabela/index.html"
-            "_site/resultados/index.html"
-            "_site/bolao/index.html"
             "_site/css/br-apostas.css"
             "_site/css/br-estatisticas.css"
             "_site/css/br-aovivo.css"
@@ -143,6 +140,11 @@ jobs:
             "_site/dados-br/auditoria-calendario.json"
             "_site/dados-br/clubes.json"
             "_site/dados-br/museu-brasileirao.json"
+            "_site/jogos/index.html"
+            "_site/tabela/index.html"
+            "_site/resultados/index.html"
+            "_site/bolao/index.html"
+            "_site/aniversariantes/index.html"
           )
           for f in "${REQUIRED_BR[@]}"; do
             if [[ ! -e "$f" ]]; then
@@ -150,23 +152,40 @@ jobs:
               exit 1
             fi
           done
-          echo "OK: paginas, rotas limpas e assets do Brasileirao v2 incluidos no pacote estatico."
+          echo "OK: paginas, assets e rotas limpas do Brasileirao v2 incluidos no pacote estatico."
 
-          # Confere também se cada rota aponta para a view correta da aplicação.
           python - <<'PY'
           from pathlib import Path
 
-          esperadas = {
-              "jogos": "view=jogos",
-              "tabela": "view=tabela",
-              "resultados": "view=resultados",
-              "bolao": "view=rank",
+          rotas = {
+              'jogos': 'jogos',
+              'tabela': 'tabela',
+              'resultados': 'resultados',
+              'bolao': 'rank',
+              'aniversariantes': 'aniversariantes',
           }
-          for rota, marcador in esperadas.items():
-              arquivo = Path("_site") / rota / "index.html"
-              conteudo = arquivo.read_text(encoding="utf-8")
-              assert marcador in conteudo, f"{arquivo}: redirecionamento incorreto; esperado {marcador}"
-          print("OK: rotas limpas mapeadas para as quatro views corretas.")
+          for rota, view in rotas.items():
+              arquivo = Path('_site') / rota / 'index.html'
+              texto = arquivo.read_text(encoding='utf-8')
+              esperado = f'view={view}'
+              assert esperado in texto, f'{arquivo}: redirecionamento divergente; esperado {esperado}'
+
+          index = Path('_site/index.html').read_text(encoding='utf-8')
+          menu = Path('_site/js/br-menu.js').read_text(encoding='utf-8')
+          apostas = Path('_site/js/br-apostas.js').read_text(encoding='utf-8')
+          assert "aniversariantes: '/aniversariantes'" in index, 'index sem rota limpa de aniversariantes'
+          assert '"/aniversariantes": "aniversariantes"' in menu, 'menu sem leitura da rota de aniversariantes'
+          assert 'aniversariantes: "/aniversariantes"' in menu, 'menu sem URL limpa de aniversariantes'
+          assert 'path === "/bolao" || path === "/aniversariantes"' in apostas, 'login sem retorno seguro para as rotas privadas limpas'
+
+          paginas_menu = ['aovivo.html', 'apostas.html', 'clubes.html', 'estatisticas.html', 'museu.html', 'regras.html']
+          legado = '?brasileirao=1&view='
+          for pagina in paginas_menu:
+              texto = (Path('_site') / pagina).read_text(encoding='utf-8')
+              assert legado not in texto, f'{pagina}: menu ainda contém URL legada'
+              for rota in ('/jogos', '/tabela', '/resultados', '/bolao', '/aniversariantes'):
+                  assert f'href="{rota}"' in texto, f'{pagina}: link limpo ausente para {rota}'
+          print('OK: rotas limpas, proteção privada, retorno pós-login e menus conferidos.')
           PY
 
           if find _site -type l | grep -q .; then
