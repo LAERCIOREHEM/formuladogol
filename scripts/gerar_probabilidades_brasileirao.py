@@ -2270,16 +2270,18 @@ def main() -> int:
         )
         latest_snapshot = upgraded_snapshots[-1] if upgraded_snapshots else {}
         published_state = dict(previous_history.get("estado_publicado") or {})
-        published_state.setdefault("gerado_em", previous_output.get("gerado_em"))
-        published_state.setdefault("hash_entrada", previous_output.get("hash_entrada"))
+        # No fallback por dessincronização, a publicação preservada continua
+        # sendo `previous_output`. Portanto, a referência corrente do histórico
+        # precisa ser SOBRESCRITA com os metadados desse arquivo — `setdefault`
+        # manteria um hash antigo e faria a auditoria acusar divergência.
+        published_state["gerado_em"] = previous_output.get("gerado_em")
+        published_state["hash_entrada"] = previous_output.get("hash_entrada")
         published_state.setdefault(
             "hash_estado_esportivo",
             latest_snapshot.get("hash_estado_esportivo") or _legacy_snapshot_state_hash(latest_snapshot),
         )
-        published_state.setdefault("versao_modelo", previous_output.get("versao_modelo"))
-        published_state.setdefault(
-            "simulacoes", (previous_output.get("simulacao") or {}).get("quantidade")
-        )
+        published_state["versao_modelo"] = previous_output.get("versao_modelo")
+        published_state["simulacoes"] = (previous_output.get("simulacao") or {}).get("quantidade")
         upgraded_history = build_history_document(
             upgraded_snapshots, published_state=published_state
         )
