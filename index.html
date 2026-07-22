@@ -2242,6 +2242,9 @@ body > .container > section.hero > img {
     text-decoration: none;
   }
   .mm-modal-footer a:hover { text-decoration: underline; }
+  @media (min-width: 641px) {
+    .mm-modal-card { overflow: hidden; }
+  }
   @media (max-width: 640px) {
     .mm-modal-backdrop { padding: 8px; }
     .mm-modal-card { max-height: calc(100vh - 16px); border-radius: 14px; }
@@ -2860,12 +2863,34 @@ function youtubeVideoIdBr(valor) {
   }
 }
 let mmModalOverflowAnterior = '';
+let mmModalResizeHandler = null;
+function ajustarModalMelhoresMomentosDesktop() {
+  const modal = document.getElementById('mm-modal-player');
+  if (!modal || !window.matchMedia('(min-width: 641px)').matches) return;
+  const card = modal.querySelector('.mm-modal-card');
+  const header = modal.querySelector('.mm-modal-header');
+  const footer = modal.querySelector('.mm-modal-footer');
+  if (!card || !header || !footer) return;
+
+  const margemModal = 36;
+  card.style.width = `${Math.min(960, Math.max(0, window.innerWidth - margemModal))}px`;
+  for (let tentativa = 0; tentativa < 3; tentativa += 1) {
+    const alturaFixa = header.getBoundingClientRect().height
+      + footer.getBoundingClientRect().height
+      + 2; // bordas superior e inferior do card
+    const alturaDisponivelVideo = Math.max(0, window.innerHeight - margemModal - alturaFixa);
+    const larguraPelaAltura = (alturaDisponivelVideo * 16 / 9) + 2;
+    card.style.width = `${Math.floor(Math.min(960, window.innerWidth - margemModal, larguraPelaAltura))}px`;
+  }
+}
 function fecharModalMelhoresMomentos() {
   const modal = document.getElementById('mm-modal-player');
   if (!modal) return;
   const iframe = modal.querySelector('iframe');
   if (iframe) iframe.src = 'about:blank';
   modal.remove();
+  if (mmModalResizeHandler) window.removeEventListener('resize', mmModalResizeHandler);
+  mmModalResizeHandler = null;
   document.body.style.overflow = mmModalOverflowAnterior;
   document.removeEventListener('keydown', teclaModalMelhoresMomentos);
 }
@@ -2908,6 +2933,9 @@ function abrirModalMelhoresMomentos(videoId, titulo, urlOriginal, fonte) {
   mmModalOverflowAnterior = document.body.style.overflow;
   document.body.style.overflow = 'hidden';
   document.body.appendChild(modal);
+  ajustarModalMelhoresMomentosDesktop();
+  mmModalResizeHandler = ajustarModalMelhoresMomentosDesktop;
+  window.addEventListener('resize', mmModalResizeHandler);
   document.addEventListener('keydown', teclaModalMelhoresMomentos);
   modal.querySelector('.mm-modal-close')?.focus();
 }
