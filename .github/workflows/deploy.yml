@@ -22,6 +22,10 @@ on:
       - 'dados-br/**'
       - 'copa2026/**'
       - 'docs/**'
+      - 'jogos/**'
+      - 'tabela/**'
+      - 'resultados/**'
+      - 'bolao/**'
       - '.github/workflows/deploy.yml'
 
   # Publica imediatamente após workflows que atualizam dados do site.
@@ -89,8 +93,10 @@ jobs:
             fi
           done
 
-          # Assets e dados usados pelas paginas novas do Brasileirão.
-          for dir in img css js dados-br copa2026 docs; do
+          # Assets, dados e diretorios das rotas limpas do Brasileirão.
+          # GitHub Pages só atende /jogos, /tabela, /resultados e /bolao se os
+          # respectivos <rota>/index.html estiverem dentro do artefato publicado.
+          for dir in img css js dados-br copa2026 docs jogos tabela resultados bolao; do
             if [[ -d "$dir" ]]; then
               cp -a "$dir" _site/
             fi
@@ -118,6 +124,10 @@ jobs:
             "_site/clubes.html"
             "_site/museu.html"
             "_site/regras.html"
+            "_site/jogos/index.html"
+            "_site/tabela/index.html"
+            "_site/resultados/index.html"
+            "_site/bolao/index.html"
             "_site/css/br-apostas.css"
             "_site/css/br-estatisticas.css"
             "_site/css/br-aovivo.css"
@@ -140,7 +150,24 @@ jobs:
               exit 1
             fi
           done
-          echo "OK: paginas e assets do Brasileirao v2 incluidos no pacote estatico."
+          echo "OK: paginas, rotas limpas e assets do Brasileirao v2 incluidos no pacote estatico."
+
+          # Confere também se cada rota aponta para a view correta da aplicação.
+          python - <<'PY'
+          from pathlib import Path
+
+          esperadas = {
+              "jogos": "view=jogos",
+              "tabela": "view=tabela",
+              "resultados": "view=resultados",
+              "bolao": "view=rank",
+          }
+          for rota, marcador in esperadas.items():
+              arquivo = Path("_site") / rota / "index.html"
+              conteudo = arquivo.read_text(encoding="utf-8")
+              assert marcador in conteudo, f"{arquivo}: redirecionamento incorreto; esperado {marcador}"
+          print("OK: rotas limpas mapeadas para as quatro views corretas.")
+          PY
 
           if find _site -type l | grep -q .; then
             echo "ERRO: existem symlinks dentro de _site."
