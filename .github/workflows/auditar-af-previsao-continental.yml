@@ -146,10 +146,16 @@ jobs:
           snapshots_historicos = historico.get('snapshots') or []
           if not snapshots_historicos:
               fail('histórico do AF-Previsão vazio')
-          if historico.get('schema_version', 0) < 3:
-              fail('histórico ainda não está no schema encadeado da Execução 5')
-          if snapshots_historicos[-1].get('hash_entrada') != previsao.get('hash_entrada'):
-              fail('histórico não termina no mesmo hash_entrada publicado')
+          if historico.get('schema_version', 0) < 4:
+              fail('histórico ainda não usa deduplicação por resultado e referência por clube')
+          estado_publicado = historico.get('estado_publicado') or {}
+          if estado_publicado.get('hash_entrada') != previsao.get('hash_entrada'):
+              fail('histórico não referencia o mesmo hash_entrada publicado')
+          if not estado_publicado.get('hash_estado_esportivo'):
+              fail('histórico sem hash do estado de resultados concluídos')
+          estados_historicos = [item.get('hash_estado_esportivo') for item in snapshots_historicos]
+          if not all(estados_historicos) or len(estados_historicos) != len(set(estados_historicos)):
+              fail('histórico contém estados esportivos repetidos')
           integridade = historico.get('integridade') or {}
           if integridade.get('encadeamento_valido') is not True:
               fail('histórico sem encadeamento SHA-256 válido')

@@ -500,8 +500,12 @@ jobs:
           print(f'  OK   AF-Previsão do bolão: {len(linhas_bolao)} participantes; título soma {soma_titulo_bolao:.6f}%')
           hist_prev = json.load(open('dados-br/historico-probabilidades.json', encoding='utf-8'))
           assert hist_prev.get('total_snapshots', 0) >= 1, 'histórico do AF-Previsão vazio'
-          assert (hist_prev.get('snapshots') or [])[-1].get('hash_entrada') == previsao.get('hash_entrada'), 'histórico não termina no estado publicado'
-          assert hist_prev.get('schema_version', 0) >= 3, 'histórico sem encadeamento da Execução 5'
+          assert hist_prev.get('schema_version', 0) >= 4, 'histórico sem deduplicação por resultado e referência por clube'
+          estado_publicado = hist_prev.get('estado_publicado') or {}
+          assert estado_publicado.get('hash_entrada') == previsao.get('hash_entrada'), 'histórico não referencia a publicação corrente'
+          assert estado_publicado.get('hash_estado_esportivo'), 'histórico sem hash do estado de resultados concluídos'
+          estados_historicos = [item.get('hash_estado_esportivo') for item in (hist_prev.get('snapshots') or [])]
+          assert all(estados_historicos) and len(estados_historicos) == len(set(estados_historicos)), 'histórico contém estados esportivos repetidos'
           integridade_hist = hist_prev.get('integridade') or {}
           assert integridade_hist.get('encadeamento_valido') is True, 'histórico sem integridade declarada'
           assert integridade_hist.get('hash_final') == (hist_prev.get('snapshots') or [])[-1].get('hash_snapshot'), 'hash final do histórico divergente'
