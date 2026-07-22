@@ -74,6 +74,9 @@ jobs:
       - name: Executar integração continental de auditoria
         run: python scripts/gerar_probabilidades_brasileirao.py --simulacoes 2000000 --semente 20260718
 
+      - name: Sincronizar histórico com o AF efetivamente publicado
+        run: python scripts/gerar_probabilidades_brasileirao.py --sincronizar-historico-publicado
+
       - name: Auditar histórico encadeado e avaliação futura
         run: python scripts/avaliar_af_previsao.py --strict
 
@@ -150,7 +153,11 @@ jobs:
               fail('histórico ainda não usa deduplicação por resultado e referência por clube')
           estado_publicado = historico.get('estado_publicado') or {}
           if estado_publicado.get('hash_entrada') != previsao.get('hash_entrada'):
-              fail('histórico não referencia o mesmo hash_entrada publicado')
+              fail(
+                  'histórico não referencia o mesmo hash_entrada publicado: '
+                  f"historico={estado_publicado.get('hash_entrada')} "
+                  f"previsao={previsao.get('hash_entrada')}"
+              )
           if not estado_publicado.get('hash_estado_esportivo'):
               fail('histórico sem hash do estado de resultados concluídos')
           estados_historicos = [item.get('hash_estado_esportivo') for item in snapshots_historicos]

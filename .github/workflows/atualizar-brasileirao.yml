@@ -223,6 +223,9 @@ jobs:
         if: steps.af_gate.outputs.run_af == 'true'
         run: python scripts/gerar_probabilidades_brasileirao.py
 
+      - name: Sincronizar histórico com o AF efetivamente publicado
+        run: python scripts/gerar_probabilidades_brasileirao.py --sincronizar-historico-publicado
+
       - name: Auditar histórico e preparar avaliação final do AF-Previsão
         if: steps.af_gate.outputs.run_af == 'true'
         run: python scripts/avaliar_af_previsao.py --strict
@@ -502,7 +505,10 @@ jobs:
           assert hist_prev.get('total_snapshots', 0) >= 1, 'histórico do AF-Previsão vazio'
           assert hist_prev.get('schema_version', 0) >= 4, 'histórico sem deduplicação por resultado e referência por clube'
           estado_publicado = hist_prev.get('estado_publicado') or {}
-          assert estado_publicado.get('hash_entrada') == previsao.get('hash_entrada'), 'histórico não referencia a publicação corrente'
+          assert estado_publicado.get('hash_entrada') == previsao.get('hash_entrada'), (
+              'histórico não referencia a publicação corrente: '
+              f"historico={estado_publicado.get('hash_entrada')} previsao={previsao.get('hash_entrada')}"
+          )
           assert estado_publicado.get('hash_estado_esportivo'), 'histórico sem hash do estado de resultados concluídos'
           estados_historicos = [item.get('hash_estado_esportivo') for item in (hist_prev.get('snapshots') or [])]
           assert all(estados_historicos) and len(estados_historicos) == len(set(estados_historicos)), 'histórico contém estados esportivos repetidos'
