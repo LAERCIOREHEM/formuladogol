@@ -6,6 +6,7 @@
     competition: "dados-br/estatisticas-competicao.json",
     details: "dados-br/jogos-detalhes.json",
     ranking: "dados-br/ranking-desempenho.json",
+    rankingHistory: "dados-br/historico-ranking-desempenho.json",
     table: "tabela.json",
     results: "resultados.json",
     audit: "dados-br/auditoria-estatisticas.json",
@@ -21,6 +22,7 @@
     competition: null,
     details: null,
     ranking: null,
+    rankingHistory: null,
     table: null,
     results: null,
     audit: null,
@@ -695,10 +697,60 @@
     };
   }
 
+  function performanceHistoryClubRows(clubName) {
+    const snapshots = Array.isArray(state.rankingHistory?.snapshots) ? state.rankingHistory.snapshots : [];
+    return snapshots
+      .filter((snapshot) => snapshot?.destaque_interface || snapshot?.id === "atual")
+      .map((snapshot) => {
+        const item = (Array.isArray(snapshot?.ranking) ? snapshot.ranking : [])
+          .find((row) => normalize(row?.time) === normalize(clubName));
+        return item ? { snapshot, item } : null;
+      })
+      .filter(Boolean);
+  }
+
+  function performanceHistoryMovement(currentPosition, previousPosition) {
+    if (previousPosition === null || previousPosition === undefined) {
+      return '<span class="club-evolution-move is-same">• início</span>';
+    }
+    const current = Number(currentPosition);
+    const previous = Number(previousPosition);
+    if (!Number.isFinite(current) || !Number.isFinite(previous) || current === previous) {
+      return '<span class="club-evolution-move is-same">• manteve</span>';
+    }
+    const delta = Math.abs(previous - current);
+    return current < previous
+      ? `<span class="club-evolution-move is-up">▲ ${integer(delta)}</span>`
+      : `<span class="club-evolution-move is-down">▼ ${integer(delta)}</span>`;
+  }
+
+  function performanceHistoryClubHtml(clubName) {
+    const rows = performanceHistoryClubRows(clubName);
+    if (!rows.length) return "";
+    const cards = rows.map(({ snapshot, item }, index) => {
+      const previous = index > 0 ? rows[index - 1].item : null;
+      const games = Number(item?.jogos);
+      const label = snapshot?.id === "atual"
+        ? `Atual${Number.isFinite(games) ? ` · ${integer(games)} jogos` : ""}`
+        : snapshot?.nome || "Marco";
+      return `<article class="club-evolution-card${snapshot?.id === "atual" ? " is-current" : ""}">
+        <span>${escapeHtml(label)}</span>
+        <strong>${integer(item?.pos)}º <i>·</i> ${number(item?.indice_final, 1)}</strong>
+        <small>posição · AF-Score ${performanceHistoryMovement(item?.pos, previous?.pos)}</small>
+      </article>`;
+    }).join("");
+    return `<section class="club-performance-history" aria-label="Evolução do Ranking de Desempenho de ${escapeAttr(clubName)}">
+      <div class="club-evolution-head"><div><span>AF-Score</span><strong>Evolução do Ranking de Desempenho</strong></div><small>comparação após a mesma quantidade de jogos</small></div>
+      <div class="club-evolution-strip">${cards}</div>
+      <p>Os marcos fechados comparam os 20 clubes após exatamente 5, 10, 15 e, futuramente, mais jogos. Assim, partidas atrasadas não criam vantagem artificial.</p>
+    </section>`;
+  }
+
   function probabilityClubHistoryDetails(club) {
     const snapshots = Array.isArray(state.probabilitiesHistory?.snapshots) ? state.probabilitiesHistory.snapshots : [];
     const historyRows = snapshots.map((snapshot) => probabilityHistoryClubRow(snapshot, club?.clube)).filter(Boolean).slice(-10);
-    if (!historyRows.length) return "";
+    const performanceHistory = performanceHistoryClubHtml(club?.clube);
+    if (!historyRows.length && !performanceHistory) return "";
     const body = historyRows.map(({ snapshot, row, position, points }) => {
       const reference = Number(snapshot?.rodada_referencia) > 0 ? `R${integer(snapshot.rodada_referencia)}` : dateBR(snapshot?.gerado_em);
       const title = probabilityDisplayText(null, Number(row?.campeao_pct));
@@ -707,10 +759,14 @@
       const relegation = probabilityDisplayText(null, Number(row?.rebaixamento_pct));
       return `<tr><th scope="row"><span>${escapeHtml(reference)}</span><small>${escapeHtml(dateBR(snapshot?.gerado_em))}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(title)}</td><td>${escapeHtml(lib)}</td><td>${escapeHtml(sula)}</td><td>${escapeHtml(relegation)}</td></tr>`;
     }).join("");
-    return `<details class="probability-history-details">
-      <summary>Evolução da previsão <span>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado salvo" : "estados salvos"}</span></summary>
+    const forecast = historyRows.length ? `<section class="club-forecast-history">
+      <div class="club-evolution-head"><div><span>AF-Previsão</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado salvo" : "estados salvos"}</small></div>
       <div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${body}</tbody></table></div>
-      <p>O histórico só ganha um registro quando o estado esportivo muda. Ele será usado depois para medir erro de posição, erro de pontos, calibração e Brier Score.</p>
+      <p>Um novo estado é salvo somente quando o clube conclui outra partida. Reexecuções sem jogo novo não criam registros artificiais.</p>
+    </section>` : "";
+    return `<details class="probability-history-details">
+      <summary>Evolução do clube <span>AF-Score + AF-Previsão</span></summary>
+      <div class="club-evolution-content">${performanceHistory}${forecast}</div>
     </details>`;
   }
 
@@ -1136,11 +1192,12 @@
     else if (abrirMetodologia) state.tab = "desempenho";
     else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "probabilidades", "desempenho"].includes(hashTab)) state.tab = hashTab;
 
-    const [leaders, competition, details, ranking, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation] = await Promise.all([
+    const [leaders, competition, details, ranking, rankingHistory, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation] = await Promise.all([
       fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
       fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
       fetchJson(FILES.details, { jogos: {} }),
       fetchJson(FILES.ranking, { ranking: [] }),
+      fetchJson(FILES.rankingHistory, { total_snapshots: 0, snapshots: [] }),
       fetchJson(FILES.table, { tabela: [] }),
       fetchJson(FILES.results, { resultados: [] }),
       fetchJson(FILES.audit, { status: "aguardando_workflow" }),
@@ -1155,6 +1212,7 @@
     state.competition = competition;
     state.details = details;
     state.ranking = ranking;
+    state.rankingHistory = rankingHistory;
     state.table = table;
     state.results = results;
     state.audit = audit;

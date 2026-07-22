@@ -4,7 +4,7 @@
   const $ = (sel) => document.querySelector(sel);
   const fmtData = new Intl.DateTimeFormat("pt-BR", { day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit" });
   const cacheBust = () => "?v=" + Date.now();
-  const state = { clubes: [], tabela: [], ranking: [], probabilidades: {}, resultadosManuais: {}, eventos: [], elencos: {}, mascotes: {}, filtroTexto: "", filtroRegiao: "Todas", selecionado: "" };
+  const state = { clubes: [], tabela: [], ranking: [], rankingHistory: { snapshots: [] }, probabilidades: {}, resultadosManuais: {}, eventos: [], elencos: {}, mascotes: {}, filtroTexto: "", filtroRegiao: "Todas", selecionado: "", jogosExpandidos: false };
 
   function escapeHtml(value){
     return String(value ?? "").replace(/[&<>'"]/g, (ch) => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch]));
@@ -171,6 +171,44 @@
       <a class="club-performance-method" href="estatisticas.html#metodologia-ranking">Entenda como o ranking é calculado →</a>
     </section>`;
   }
+  function historicoRankingDo(nome){
+    const snapshots = Array.isArray(state.rankingHistory?.snapshots) ? state.rankingHistory.snapshots : [];
+    return snapshots
+      .filter(snapshot => snapshot?.destaque_interface || snapshot?.id === "atual")
+      .map(snapshot => {
+        const item = (Array.isArray(snapshot?.ranking) ? snapshot.ranking : []).find(row => slug(row?.time) === slug(nome));
+        return item ? { snapshot, item } : null;
+      })
+      .filter(Boolean);
+  }
+  function movimentoRanking(atual, anterior){
+    if (anterior === null || anterior === undefined) return `<span class="is-same">• início</span>`;
+    const a = Number(atual);
+    const b = Number(anterior);
+    if (!Number.isFinite(a) || !Number.isFinite(b) || a === b) return `<span class="is-same">• manteve</span>`;
+    const delta = Math.abs(b - a);
+    return a < b ? `<span class="is-up">▲ ${delta}</span>` : `<span class="is-down">▼ ${delta}</span>`;
+  }
+  function historicoRankingHtml(nome){
+    const rows = historicoRankingDo(nome);
+    if (!rows.length) return `<div class="empty-state">O histórico do AF-Score será exibido após a atualização do workflow.</div>`;
+    return `<section class="club-ranking-history-card" aria-label="Evolução do Ranking de Desempenho de ${escapeAttr(nome)}">
+      <div class="club-ranking-history-head"><div><span>AF-Score</span><strong>Evolução do desempenho</strong></div><small>marcos com amostras iguais</small></div>
+      <div class="club-ranking-history-strip">${rows.map(({ snapshot, item }, index) => {
+        const anterior = index ? rows[index - 1].item : null;
+        const atual = snapshot.id === "atual";
+        const jogos = Number(item.jogos);
+        const rotulo = atual ? `Atual${Number.isFinite(jogos) ? ` · ${numeroInteiro(jogos)} jogos` : ""}` : snapshot.nome;
+        return `<article class="club-ranking-history-item${atual ? " is-current" : ""}">
+          <span>${escapeHtml(rotulo || "Marco")}</span>
+          <strong>${numeroInteiro(item.pos)}º <i>·</i> ${numeroRanking(item.indice_final)}</strong>
+          <small>posição · AF-Score ${movimentoRanking(item.pos, anterior?.pos)}</small>
+        </article>`;
+      }).join("")}</div>
+      <p>Os marcos de 5 jogos comparam todos os clubes com a mesma quantidade de partidas, sem distorção por jogos atrasados.</p>
+      <a href="estatisticas.html#desempenho">Ver Ranking de Desempenho completo →</a>
+    </section>`;
+  }
   function eventosDo(nome){
     return state.eventos.filter(e => e.mandante === nome || e.visitante === nome)
       .map(aplicarResultadoManualEvento)
@@ -299,6 +337,7 @@
     window.setTimeout(executar, 420);
   }
   function selecionar(nome, { atualizarHash=true, behavior="smooth" } = {}){
+    if (state.selecionado !== nome) state.jogosExpandidos = false;
     state.selecionado = nome;
     const novoHash = `#${slug(nome)}`;
     if (atualizarHash && location.hash !== novoHash) history.pushState(null, "", novoHash);
@@ -339,13 +378,16 @@
     `;
     ativarZoomMascote();
     renderJogos(c.nome);
+    renderHistoricoRanking(c.nome);
     renderElenco(c.nome);
   }
   function renderJogos(nome){
     const eventos = eventosDo(nome);
     const agora = new Date();
-    const ultimos = eventos.filter(isPost).slice(-4).reverse();
-    const proximos = eventos.filter(e => !isPost(e) && new Date(e.data_iso) >= agora).slice(0,4);
+    const ultimosTodos = eventos.filter(isPost).reverse();
+    const proximosTodos = eventos.filter(e => !isPost(e) && new Date(e.data_iso) >= agora);
+    const ultimos = state.jogosExpandidos ? ultimosTodos : ultimosTodos.slice(0,3);
+    const proximos = state.jogosExpandidos ? proximosTodos : proximosTodos.slice(0,3);
     const bloco = [];
     if (proximos.length) {
       bloco.push(`<div class="kicker">Próximos</div>`);
@@ -355,7 +397,19 @@
       bloco.push(`<div class="kicker" style="margin-top:${proximos.length ? 12 : 0}px">Últimos</div>`);
       ultimos.forEach(e => bloco.push(rowJogo(e, true)));
     }
+    const total = ultimosTodos.length + proximosTodos.length;
+    if (total > 6) {
+      bloco.push(`<button type="button" class="club-games-toggle" data-toggle-club-games>${state.jogosExpandidos ? "Mostrar somente 3 próximos e 3 últimos ↑" : `Ver todos os jogos do clube (${total}) ↓`}</button>`);
+    }
     $("#jogos-clube").innerHTML = bloco.join("") || `<div class="empty-state">Ainda não há jogos mapeados para este clube nos snapshots locais.</div>`;
+    $("#jogos-clube").querySelector("[data-toggle-club-games]")?.addEventListener("click", () => {
+      state.jogosExpandidos = !state.jogosExpandidos;
+      renderJogos(nome);
+    });
+  }
+  function renderHistoricoRanking(nome){
+    const target = $("#historico-ranking-clube");
+    if (target) target.innerHTML = historicoRankingHtml(nome);
   }
   function rowJogo(e, finalizado){
     const placar = finalizado ? `${e.placar_mandante ?? "—"} × ${e.placar_visitante ?? "—"}` : "vs";
@@ -394,10 +448,11 @@
     renderChips(); renderGrid(); renderDetalhe();
   }
   async function init(){
-    const [clubesData, tabelaData, rankingData, probabilidadesData, eventosData, elencosData, mascotesData, resultadosManuaisData] = await Promise.all([
+    const [clubesData, tabelaData, rankingData, rankingHistoryData, probabilidadesData, eventosData, elencosData, mascotesData, resultadosManuaisData] = await Promise.all([
       fetchJson("dados-br/clubes.json", { clubes: [] }),
       fetchJson("tabela.json", { tabela: [] }),
       fetchJson("dados-br/ranking-desempenho.json", { ranking: [] }),
+      fetchJson("dados-br/historico-ranking-desempenho.json", { snapshots: [] }),
       fetchJson("dados-br/probabilidades-brasileirao.json", { clubes: [] }),
       fetchJson("espn_eventos.json", { eventos: [] }),
       fetchJson("dados-br/elencos.json", { elencos: {} }),
@@ -407,6 +462,7 @@
     state.clubes = (clubesData.clubes || []).sort((a,b) => a.nome.localeCompare(b.nome, "pt-BR"));
     state.tabela = tabelaData.tabela || [];
     state.ranking = rankingData.ranking || [];
+    state.rankingHistory = rankingHistoryData || { snapshots: [] };
     state.probabilidades = Object.fromEntries((probabilidadesData.clubes || []).map(item => [slug(item.clube), item]));
     state.eventos = eventosData.eventos || [];
     state.elencos = elencosData.elencos || {};

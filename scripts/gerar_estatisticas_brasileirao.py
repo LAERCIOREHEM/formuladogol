@@ -6,6 +6,7 @@ gerar_estatisticas_brasileirao.py — Estatísticas do Brasileirão v2.
 Gera:
   - dados-br/estatisticas.json
   - dados-br/ranking-desempenho.json
+  - dados-br/historico-ranking-desempenho.json
   - dados-br/jogadores.json
 
 Fontes:
@@ -291,6 +292,83 @@ def montar_clubes(tabela: list[dict[str, Any]], resultados: list[dict[str, Any]]
     return clubes
 
 
+def montar_clubes_primeiros_jogos(
+    tabela: list[dict[str, Any]],
+    resultados: list[dict[str, Any]],
+    quantidade: int,
+) -> list[dict[str, Any]]:
+    """Reconstrói a situação de cada clube após exatamente N jogos.
+
+    Comparar por jogos disputados — e não pelo número nominal da rodada — evita
+    distorções causadas por partidas adiadas. Todos os clubes entram em cada
+    fotografia com o mesmo tamanho de amostra.
+    """
+    por_time = resultados_por_time(resultados)
+    clubes: list[dict[str, Any]] = []
+    for linha in tabela:
+        nome = linha["time"]
+        lista = por_time.get(nome, [])[:quantidade]
+        if len(lista) < quantidade:
+            raise RuntimeError(f"{nome} possui apenas {len(lista)} jogos; marco solicitado: {quantidade}")
+
+        vitorias = empates = derrotas = pontos = gp = gc = 0
+        for jogo in lista:
+            if jogo["_mand"] == nome:
+                pro, contra = jogo["_pm"], jogo["_pv"]
+            else:
+                pro, contra = jogo["_pv"], jogo["_pm"]
+            gp += int(pro)
+            gc += int(contra)
+            if pro > contra:
+                vitorias += 1
+                pontos += 3
+            elif pro == contra:
+                empates += 1
+                pontos += 1
+            else:
+                derrotas += 1
+
+        ultimos = lista[-5:]
+        forma = [letra_resultado(jogo, nome) for jogo in ultimos]
+        forma = [item for item in forma if item]
+        pontos_ultimos5 = sum(pontos_do_time(jogo, nome) or 0 for jogo in ultimos)
+        clubes.append({
+            "time": nome,
+            "escudo": linha.get("escudo") or escudo_time(nome),
+            "sigla": linha.get("sigla") or sigla_time(nome),
+            "pos": 0,
+            "pontos": pontos,
+            "jogos": quantidade,
+            "vitorias": vitorias,
+            "empates": empates,
+            "derrotas": derrotas,
+            "gp": gp,
+            "gc": gc,
+            "sg": gp - gc,
+            "aproveitamento": round(100 * pontos / (3 * quantidade)),
+            "forma_ultimos5": forma,
+            "pontos_ultimos5": pontos_ultimos5,
+            "aproveitamento_ultimos5": round(100 * pontos_ultimos5 / (3 * len(ultimos))) if ultimos else 0,
+            "mandante": split_casa_fora(lista, nome, "mandante"),
+            "visitante": split_casa_fora(lista, nome, "visitante"),
+            "sequencia": sequencia_atual(lista, nome),
+        })
+
+    ordem = sorted(
+        clubes,
+        key=lambda item: (
+            -int(item["pontos"]),
+            -int(item["vitorias"]),
+            -int(item["sg"]),
+            -int(item["gp"]),
+            normalizar(item["time"]),
+        ),
+    )
+    for posicao, item in enumerate(ordem, 1):
+        item["pos"] = posicao
+    return clubes
+
+
 
 def carregar_jogos_detalhes() -> dict[str, Any]:
     payload = ler_json("dados-br/jogos-detalhes.json", {"jogos": {}})
@@ -340,13 +418,17 @@ def media_segura(total: float, jogos: int) -> float:
     return round(total / jogos, 3) if jogos else 0.0
 
 
-def agregar_metricas_avancadas(clubes: list[dict[str, Any]]) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
+def agregar_metricas_avancadas(
+    clubes: list[dict[str, Any]],
+    detalhes_payload: dict[str, Any] | None = None,
+    limite_jogos_por_time: int | None = None,
+) -> tuple[dict[str, dict[str, Any]], dict[str, Any]]:
     """Agrega boxscore ESPN por clube para o Ranking Vivo.
 
     Usa dados-br/jogos-detalhes.json quando disponível. Se ainda não houver o
     arquivo, o ranking continua funcionando com os dados de tabela/resultados.
     """
-    detalhes = carregar_jogos_detalhes()
+    detalhes = detalhes_payload if isinstance(detalhes_payload, dict) else carregar_jogos_detalhes()
     jogos = detalhes.get("jogos") if isinstance(detalhes.get("jogos"), dict) else {}
 
     base: dict[str, dict[str, Any]] = {}
@@ -385,7 +467,12 @@ def agregar_metricas_avancadas(clubes: list[dict[str, Any]]) -> tuple[dict[str, 
             "cortes_contra": 0.0,
         }
 
-    for det in (jogos or {}).values():
+    contagem_por_time: dict[str, int] = defaultdict(int)
+    jogos_ordenados = sorted(
+        (item for item in (jogos or {}).values() if isinstance(item, dict)),
+        key=lambda item: (str(item.get("data_iso") or ""), str(item.get("event_id") or "")),
+    )
+    for det in jogos_ordenados:
         if not isinstance(det, dict):
             continue
         mand = para_canonico(det.get("mandante")) or str(det.get("mandante") or "")
@@ -396,6 +483,9 @@ def agregar_metricas_avancadas(clubes: list[dict[str, Any]]) -> tuple[dict[str, 
         for time_nome, lado, lado_adv in ((mand, "home", "away"), (vist, "away", "home")):
             if time_nome not in base:
                 continue
+            if limite_jogos_por_time is not None and contagem_por_time[time_nome] >= limite_jogos_por_time:
+                continue
+            contagem_por_time[time_nome] += 1
             b = base[time_nome]
             b["jogos_com_boxscore"] += 1
             b["posse_total"] += stat_por_nome(stats, "Posse", lado) or 0
@@ -638,8 +728,16 @@ def componentes_desempenho(c: dict[str, Any], avancadas: dict[str, Any]) -> dict
     }
 
 
-def gerar_ranking_desempenho(clubes: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    avancadas_por_time, auditoria = agregar_metricas_avancadas(clubes)
+def gerar_ranking_desempenho(
+    clubes: list[dict[str, Any]],
+    detalhes_payload: dict[str, Any] | None = None,
+    limite_jogos_por_time: int | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    avancadas_por_time, auditoria = agregar_metricas_avancadas(
+        clubes,
+        detalhes_payload=detalhes_payload,
+        limite_jogos_por_time=limite_jogos_por_time,
+    )
     ranking = []
     for c in clubes:
         av = avancadas_por_time.get(c["time"], {})
@@ -681,6 +779,99 @@ def gerar_ranking_desempenho(clubes: list[dict[str, Any]]) -> tuple[list[dict[st
     auditoria["clubes_no_ranking"] = len(ranking)
     auditoria["metodologia"] = "AF-Score 2.0: ataque 28%, defesa 24%, domínio 20%, eficiência 18% e disciplina 10%. Usa boxscore ESPN ampliado por jogo; tabela/resultados ficam como fallback."
     return ranking, auditoria
+
+
+def item_historico_ranking(item: dict[str, Any]) -> dict[str, Any]:
+    campos = (
+        "time", "escudo", "sigla", "pos", "indice_final", "ataque", "defesa",
+        "dominio", "eficiencia", "disciplina", "pos_tabela", "pontos", "jogos", "sg",
+    )
+    return {campo: item.get(campo) for campo in campos}
+
+
+def gerar_historico_ranking_desempenho(
+    tabela: list[dict[str, Any]],
+    resultados: list[dict[str, Any]],
+    ranking_atual: list[dict[str, Any]],
+    detalhes_payload: dict[str, Any],
+    atualizado_em: str,
+) -> dict[str, Any]:
+    por_time = resultados_por_time(resultados)
+    quantidades = [len(por_time.get(linha["time"], [])) for linha in tabela]
+    minimo_jogos = min(quantidades) if quantidades else 0
+    maximo_jogos = max(quantidades) if quantidades else 0
+    snapshots: list[dict[str, Any]] = []
+
+    # Guarda todos os N a partir de cinco para permitir associação precisa com
+    # estados do AF-Previsão. A interface destaca apenas os marcos de cinco jogos.
+    for quantidade in range(5, minimo_jogos + 1):
+        clubes_marco = montar_clubes_primeiros_jogos(tabela, resultados, quantidade)
+        ranking_marco, _ = gerar_ranking_desempenho(
+            clubes_marco,
+            detalhes_payload=detalhes_payload,
+            limite_jogos_por_time=quantidade,
+        )
+        snapshots.append({
+            "id": f"apos-{quantidade}-jogos",
+            "nome": f"Após {quantidade} jogos",
+            "tipo": "amostra_igual",
+            "jogos_por_clube": quantidade,
+            "destaque_interface": quantidade % 5 == 0,
+            "fechado": True,
+            "ranking": [item_historico_ranking(item) for item in ranking_marco],
+        })
+
+    snapshots.append({
+        "id": "atual",
+        "nome": "Atual",
+        "tipo": "estado_atual",
+        "jogos_minimo": minimo_jogos,
+        "jogos_maximo": maximo_jogos,
+        "destaque_interface": True,
+        "fechado": False,
+        "ranking": [item_historico_ranking(item) for item in ranking_atual],
+    })
+
+    return {
+        "schema_version": 1,
+        "atualizado_em": atualizado_em,
+        "temporada": TEMPORADA,
+        "fonte": "resultados.json + dados-br/jogos-detalhes.json",
+        "metodologia": "AF-Score 2.0 recalculado com a mesma fórmula do ranking atual.",
+        "regra_marcos": "Cada marco fechado compara os 20 clubes após exatamente N jogos disputados; partidas adiadas não distorcem a amostra.",
+        "total_snapshots": len(snapshots),
+        "jogos_minimo_atual": minimo_jogos,
+        "jogos_maximo_atual": maximo_jogos,
+        "snapshots": snapshots,
+    }
+
+
+def validar_historico_ranking(payload: dict[str, Any], ranking_atual: list[dict[str, Any]]) -> None:
+    snapshots = payload.get("snapshots") or []
+    if not snapshots or snapshots[-1].get("id") != "atual":
+        raise RuntimeError("histórico do ranking sem snapshot atual")
+    ids = [str(snapshot.get("id") or "") for snapshot in snapshots]
+    if len(ids) != len(set(ids)):
+        raise RuntimeError("histórico do ranking contém snapshots repetidos")
+    for snapshot in snapshots:
+        ranking = snapshot.get("ranking") or []
+        if len(ranking) != 20:
+            raise RuntimeError(f"{snapshot.get('id')}: histórico sem 20 clubes")
+        posicoes = sorted(int(item.get("pos") or 0) for item in ranking)
+        if posicoes != list(range(1, 21)):
+            raise RuntimeError(f"{snapshot.get('id')}: posições inválidas")
+        for item in ranking:
+            for campo in ("indice_final", "ataque", "defesa", "dominio", "eficiencia", "disciplina"):
+                valor = float(item.get(campo))
+                if not 0 <= valor <= 100:
+                    raise RuntimeError(f"{snapshot.get('id')}: {campo} fora da faixa")
+            esperado = snapshot.get("jogos_por_clube")
+            if esperado is not None and int(item.get("jogos") or 0) != int(esperado):
+                raise RuntimeError(f"{snapshot.get('id')}: amostras desiguais")
+
+    atual_compacto = [item_historico_ranking(item) for item in ranking_atual]
+    if snapshots[-1].get("ranking") != atual_compacto:
+        raise RuntimeError("snapshot atual diverge de ranking-desempenho.json")
 
 def fetch_json(url: str, timeout: int = 25, tentativas: int = 2) -> dict[str, Any] | None:
     ultimo: Exception | None = None
@@ -1219,9 +1410,9 @@ def main() -> None:
         raise RuntimeError("tabela.json sem dados; rode atualizar_espn.py antes das estatísticas.")
 
     clubes = montar_clubes(tabela, resultados)
-    ranking, auditoria_ranking = gerar_ranking_desempenho(clubes)
-    artilharia, garcons = carregar_lideres_oficiais(avisos)
     detalhes_data = ler_json("dados-br/jogos-detalhes.json", {})
+    ranking, auditoria_ranking = gerar_ranking_desempenho(clubes, detalhes_payload=detalhes_data)
+    artilharia, garcons = carregar_lideres_oficiais(avisos)
     detalhes_jogos = detalhes_data.get("jogos") or {} if isinstance(detalhes_data, dict) else {}
     eventos_processados = [
         {"event_id": str(r.get("event_id") or ""), "fonte": "dados-br/jogos-detalhes.json"}
@@ -1293,6 +1484,15 @@ def main() -> None:
         "ranking": ranking,
     }
 
+    payload_historico_ranking = gerar_historico_ranking_desempenho(
+        tabela,
+        resultados,
+        ranking,
+        detalhes_data if isinstance(detalhes_data, dict) else {},
+        payload_stats["atualizado_em"],
+    )
+    validar_historico_ranking(payload_historico_ranking, ranking)
+
     payload_jogadores = {
         "atualizado_em": payload_stats["atualizado_em"],
         "temporada": TEMPORADA,
@@ -1313,11 +1513,13 @@ def main() -> None:
 
     gravar_json_atomico("dados-br/estatisticas.json", payload_stats)
     gravar_json_atomico("dados-br/ranking-desempenho.json", payload_ranking)
+    gravar_json_atomico("dados-br/historico-ranking-desempenho.json", payload_historico_ranking)
     gravar_json_atomico("dados-br/auditoria-ranking-desempenho.json", {"gerado_em": payload_stats["atualizado_em"], **auditoria_ranking})
     gravar_json_atomico("dados-br/jogadores.json", payload_jogadores)
 
     print("== ESTATÍSTICAS GERADAS ==")
     print(f"  clubes: {len(clubes)}")
+    print(f"  snapshots do ranking: {payload_historico_ranking['total_snapshots']}")
     print(f"  resultados lidos: {len(resultados)}")
     print(f"  artilharia: {len(artilharia)} jogadores")
     print(f"  garçons: {len(garcons)} jogadores")

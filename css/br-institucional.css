@@ -639,3 +639,85 @@ body.modal-open { overflow: hidden; }
   .club-probability-header small { white-space: normal; }
   .club-probability-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Evolução compacta do AF-Score na ficha de cada clube. */
+.club-games-toggle {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 4px;
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius: 13px;
+  background: rgba(255,255,255,.035);
+  color: #d9ff76;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 900;
+}
+.club-games-toggle:hover,
+.club-games-toggle:focus-visible { border-color: rgba(163,230,53,.45); background: rgba(163,230,53,.08); outline: none; }
+.club-ranking-history-slot { margin-top: 16px; }
+.club-ranking-history-card {
+  padding: 14px;
+  border: 1px solid rgba(163,230,53,.23);
+  border-radius: 18px;
+  background: radial-gradient(circle at 100% 0, rgba(163,230,53,.11), transparent 34%), linear-gradient(145deg, rgba(12,31,32,.92), rgba(5,15,22,.97));
+  box-shadow: 0 14px 34px rgba(0,0,0,.18);
+}
+.club-ranking-history-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+.club-ranking-history-head span,
+.club-ranking-history-head strong { display: block; }
+.club-ranking-history-head span { color: var(--green); font-size: 9px; font-weight: 950; letter-spacing: .12em; text-transform: uppercase; }
+.club-ranking-history-head strong { margin-top: 3px; color: #fff; font-size: 16px; }
+.club-ranking-history-head > small { color: var(--muted); font-size: 10px; text-align: right; }
+.club-ranking-history-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.club-ranking-history-item {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(148,163,184,.13);
+  border-radius: 13px;
+  background: linear-gradient(145deg, rgba(16,34,43,.88), rgba(7,19,27,.95));
+}
+.club-ranking-history-item.is-current {
+  border-color: rgba(163,230,53,.38);
+  background: linear-gradient(145deg, rgba(35,64,39,.72), rgba(8,25,28,.96));
+}
+.club-ranking-history-item > span,
+.club-ranking-history-item > strong,
+.club-ranking-history-item > small { display: block; }
+.club-ranking-history-item > span { color: #93c5fd; font-size: 8px; font-weight: 950; letter-spacing: .06em; text-transform: uppercase; }
+.club-ranking-history-item > strong { margin-top: 6px; color: #d9ff76; font-size: 18px; line-height: 1; }
+.club-ranking-history-item > strong i { color: var(--muted); font-style: normal; font-weight: 500; }
+.club-ranking-history-item > small { margin-top: 6px; color: var(--muted); font-size: 8px; line-height: 1.4; }
+.club-ranking-history-item small span { display: inline-flex; margin-left: 3px; font-weight: 950; white-space: nowrap; }
+.club-ranking-history-item .is-up { color: #86efac; }
+.club-ranking-history-item .is-down { color: #fca5a5; }
+.club-ranking-history-item .is-same { color: #cbd5e1; }
+.club-ranking-history-card > p { margin-top: 10px; font-size: 10px; }
+.club-ranking-history-card > a { display: inline-flex; margin-top: 11px; color: #d9ff76; font-size: 11px; font-weight: 900; text-decoration: none; }
+.club-ranking-history-card > a:hover,
+.club-ranking-history-card > a:focus-visible { text-decoration: underline; outline: none; }
+@media (max-width:640px) {
+  .club-ranking-history-head { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .club-ranking-history-head > small { text-align: left; }
+  .club-ranking-history-strip {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(158px, 78%);
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+  .club-ranking-history-item { scroll-snap-align: start; }
+}
