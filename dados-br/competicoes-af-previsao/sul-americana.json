@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-07-21T23:11:33-03:00",
+  "gerado_em": "2026-07-22T00:11:22-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,12 +17,12 @@
     "ordem": 600,
     "nome": "Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 15
+    "eventos_pendentes": 14
   },
   "resumo": {
     "eventos": 128,
-    "finalizados": 113,
-    "pendentes": 15,
+    "finalizados": 114,
+    "pendentes": 14,
     "equipes": 56,
     "equipes_serie_a_2026": 7
   },
@@ -4604,9 +4604,9 @@
     {
       "event_id": "401874072",
       "data_iso": "2026-07-21T21:30:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "82'",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -4621,7 +4621,7 @@
         "serie_a_2026": false,
         "mandante": true,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "visitante": {
         "espn_id": "2674",
@@ -4631,10 +4631,10 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
-        "placar": 3
+        "vencedor": true,
+        "placar": 4
       },
-      "vencedor": null,
+      "vencedor": "Santos",
       "penaltis": false
     },
     {
