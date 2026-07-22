@@ -904,6 +904,40 @@ body > .container > section.hero > img {
 .stats-performance-metric i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #fbbf24, #a3e635); }
 .stats-performance-metric strong { text-align: right; }
 .stats-performance-card p { font-size: 12px; line-height: 1.45; }
+.ranking-history-details {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148,163,184,.12);
+}
+.ranking-history-details > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 5px 8px;
+  border-radius: 9px;
+  color: #d9ff76;
+  font-size: 11px;
+  font-weight: 950;
+  cursor: pointer;
+  list-style: none;
+  transition: color .18s ease, background .18s ease;
+}
+.ranking-history-details > summary::-webkit-details-marker { display: none; }
+.ranking-history-details > summary:hover { color: #efffc4; background: rgba(163,230,53,.07); }
+.ranking-history-details > summary:focus-visible { outline: 2px solid rgba(163,230,53,.72); outline-offset: 2px; }
+.ranking-history-details > summary i {
+  color: #a3e635;
+  font-style: normal;
+  line-height: 1;
+}
+.ranking-history-details > summary i::before { content: "↓"; }
+.ranking-history-details[open] > summary i::before { content: "↑"; }
+.ranking-history-label.is-open { display: none; }
+.ranking-history-details[open] .ranking-history-label.is-closed { display: none; }
+.ranking-history-details[open] .ranking-history-label.is-open { display: inline; }
+.ranking-history-content { margin-top: 8px; }
+.ranking-history-content .club-performance-history { background: rgba(4,18,25,.52); }
 .methodology-box { margin-top: 13px; border: 1px solid rgba(251,191,36,.25); border-radius: 14px; background: rgba(251,191,36,.04); }
 .methodology-box summary { padding: 12px; color: #ffd452; font-weight: 950; cursor: pointer; }
 .methodology-box p { padding: 0 12px 12px; margin: 0; }
@@ -1544,6 +1578,11 @@ body > .container > section.hero > img {
     scrollbar-width: thin;
   }
   .club-evolution-card { scroll-snap-align: start; }
+  .ranking-history-details > summary {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
 }
 
 /* Execução 5 — avaliação final invisível durante a temporada */
