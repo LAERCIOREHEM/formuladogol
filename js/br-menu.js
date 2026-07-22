@@ -45,14 +45,14 @@
 
   function currentView() {
     var path = String(global.location.pathname || "").replace(/\/+$/, "").toLowerCase();
-    var cleanRoutes = { "/jogos": "jogos", "/tabela": "tabela", "/resultados": "resultados", "/bolao": "rank" };
+    var cleanRoutes = { "/jogos": "jogos", "/tabela": "tabela", "/resultados": "resultados", "/bolao": "rank", "/aniversariantes": "aniversariantes" };
     if (cleanRoutes[path]) return cleanRoutes[path];
     try { return String(new URLSearchParams(global.location.search || "").get("view") || "").toLowerCase(); }
     catch (_) { return ""; }
   }
 
   function cleanUrlForView(view) {
-    var routes = { jogos: "/jogos", tabela: "/tabela", resultados: "/resultados", rank: "/bolao" };
+    var routes = { jogos: "/jogos", tabela: "/tabela", resultados: "/resultados", rank: "/bolao", aniversariantes: "/aniversariantes" };
     return routes[String(view || "").toLowerCase()] || "";
   }
 
@@ -66,10 +66,8 @@
 
   function isPrivateRoute() {
     if (document.body && document.body.getAttribute("data-br-private-page") === "1") return true;
-    var file = basename();
-    if (file === "regras.html") return true;
-    if (file === "" || file === "index.html") return Boolean(PRIVATE_VIEWS[currentView()]);
-    return false;
+    if (basename() === "regras.html") return true;
+    return Boolean(PRIVATE_VIEWS[currentView()]);
   }
 
   function isAdminRoute() {
@@ -82,7 +80,7 @@
 
   function returnTarget() {
     var cleanView = currentView();
-    var cleanTargets = { jogos: "/jogos", tabela: "/tabela", resultados: "/resultados", rank: "/bolao" };
+    var cleanTargets = { jogos: "/jogos", tabela: "/tabela", resultados: "/resultados", rank: "/bolao", aniversariantes: "/aniversariantes" };
     if (cleanTargets[cleanView]) return cleanTargets[cleanView] + (global.location.hash || "");
     var file = basename();
     if (file === "" || file === "index.html") {

@@ -53,6 +53,9 @@
   (function () {
     try {
       var view = String(new URLSearchParams(location.search || '').get('view') || '').toLowerCase();
+      var path = String(location.pathname || '').replace(/\/+$/, '').toLowerCase();
+      if (path === '/bolao') view = 'rank';
+      else if (path === '/aniversariantes') view = 'aniversariantes';
       if (view === 'rank' || view === 'aniversariantes' || view === 'participantes') {
         document.documentElement.classList.add('br-private-pending');
       }
@@ -3767,7 +3770,8 @@ const BR_ROTAS_VIEWS = Object.freeze({
   jogos: '/jogos',
   tabela: '/tabela',
   resultados: '/resultados',
-  rank: '/bolao'
+  rank: '/bolao',
+  aniversariantes: '/aniversariantes'
 });
 
 function brRotaDaView(view) {
@@ -3780,7 +3784,8 @@ function brViewPelaRota(pathname) {
     '/jogos': 'jogos',
     '/tabela': 'tabela',
     '/resultados': 'resultados',
-    '/bolao': 'rank'
+    '/bolao': 'rank',
+    '/aniversariantes': 'aniversariantes'
   };
   return mapa[rota.toLowerCase()] || '';
 }
@@ -3836,7 +3841,7 @@ function setView(v, opcoes = {}) {
 window.addEventListener('popstate', () => {
   const params = new URLSearchParams(location.search || '');
   const view = brViewPelaRota(location.pathname) || params.get('view') || 'jogos';
-  if (['rank', 'tabela', 'jogos', 'resultados'].includes(view)) {
+  if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes'].includes(view)) {
     setView(view, { fromHistory: true });
   }
 });
@@ -6049,7 +6054,7 @@ setTimeout(sincronizarAvisosAniversarioComSessao, 800);
 </script>
 <script src="js/br-clube-retorno.js?v=20260717-retorno-exato-v1"></script>
 <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
-<script src="js/br-menu.js?v=20260718-retorno-origem-v3"></script>
+<script src="js/br-menu.js?v=20260722-rotas-limpas-v2"></script>
 <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

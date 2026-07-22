@@ -336,10 +336,12 @@
       if (!raw) return "";
       const url = new URL(raw, global.location.href);
       if (url.origin !== global.location.origin) return "";
-      const file = url.pathname.split("/").filter(Boolean).pop() || "";
+      const path = String(url.pathname || "/").replace(/\/+$/, "") || "/";
+      const file = path.split("/").filter(Boolean).pop() || "";
       const view = String(url.searchParams.get("view") || "").toLowerCase();
       const adminLegado = view === "participantes" && url.searchParams.get("admin") === "1";
-      const permitido = file === "regras.html" || ((file === "" || file === "index.html") && (["rank", "aniversariantes"].includes(view) || adminLegado));
+      const rotaPrivadaLimpa = path === "/bolao" || path === "/aniversariantes";
+      const permitido = rotaPrivadaLimpa || file === "regras.html" || ((file === "" || file === "index.html") && (["rank", "aniversariantes"].includes(view) || adminLegado));
       if (!permitido) return "";
       sessionStorage.removeItem("brLoginRetorno");
       return url.pathname + url.search + url.hash;
