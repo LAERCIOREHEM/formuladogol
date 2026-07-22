@@ -3466,20 +3466,26 @@ async function inicializar() {
   // Carregamento assíncrono dos JSONs do servidor (atualiza se for mais novo)
   carregarMembrosDoServidor();
 
-  // Permite que páginas separadas voltem para uma aba específica por query string
-  // (?brasileirao=1&view=tabela) ou por sessionStorage (fallback para links antigos).
+  // Rotas limpas. As URLs antigas por query string continuam aceitas e
+  // são normalizadas sem recarregar a página.
   const paramsInit = new URLSearchParams(location.search || '');
   const viewParam = paramsInit.get('view');
+  const viewRota = brViewPelaRota(location.pathname);
   const viewSessao = sessionStorage.getItem('brViewInicial');
-  const viewInicial = viewParam || viewSessao;
+  const viewInicial = viewRota || viewParam || viewSessao;
   if (viewInicial) {
     sessionStorage.removeItem('brViewInicial');
     const privada = viewInicial === 'rank' || viewInicial === 'aniversariantes' || viewInicial === 'participantes';
+    const rotaExplicita = Boolean(viewRota || viewParam);
     // Views privadas só podem ser abertas por URL explícita, que passa pelo
     // guard de sessão. Isso impede que um valor antigo/manipulado no
     // sessionStorage exponha ranking ou aniversariantes no carregamento.
-    if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes', 'participantes'].includes(viewInicial) && (!privada || Boolean(viewParam))) {
+    if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes', 'participantes'].includes(viewInicial) && (!privada || rotaExplicita)) {
       state.view = viewInicial;
+      const rotaLimpa = brRotaDaView(viewInicial);
+      if (rotaLimpa && (viewParam || viewRota)) {
+        history.replaceState({ brView: viewInicial }, '', rotaLimpa + (location.hash || ''));
+      }
     }
   }
 
@@ -3757,10 +3763,41 @@ function render() {
   if (window.BR_CENTER_ACTIVE_NAV) setTimeout(window.BR_CENTER_ACTIVE_NAV, 40);
 }
 
-function setView(v) {
+const BR_ROTAS_VIEWS = Object.freeze({
+  jogos: '/jogos',
+  tabela: '/tabela',
+  resultados: '/resultados',
+  rank: '/bolao'
+});
+
+function brRotaDaView(view) {
+  return BR_ROTAS_VIEWS[String(view || '').toLowerCase()] || '';
+}
+
+function brViewPelaRota(pathname) {
+  const rota = String(pathname || '/').replace(/\/+$/, '') || '/';
+  const mapa = {
+    '/jogos': 'jogos',
+    '/tabela': 'tabela',
+    '/resultados': 'resultados',
+    '/bolao': 'rank'
+  };
+  return mapa[rota.toLowerCase()] || '';
+}
+
+function brAtualizarRota(view, substituir = false) {
+  const rota = brRotaDaView(view);
+  if (!rota || !window.history || typeof window.history.pushState !== 'function') return;
+  const atual = String(location.pathname || '').replace(/\/+$/, '') || '/';
+  if (atual.toLowerCase() === rota.toLowerCase() && !location.search) return;
+  const metodo = substituir ? 'replaceState' : 'pushState';
+  window.history[metodo]({ brView: view }, '', rota + (location.hash || ''));
+}
+
+function setView(v, opcoes = {}) {
   if ((v === 'rank' || v === 'aniversariantes' || v === 'participantes') && !(window.BR_AUTH && window.BR_AUTH.authenticated)) {
     const sufixoAdmin = v === 'participantes' ? '&admin=1' : '';
-    const alvo = `./?brasileirao=1&view=${encodeURIComponent(v)}${sufixoAdmin}`;
+    const alvo = brRotaDaView(v) || `./?brasileirao=1&view=${encodeURIComponent(v)}${sufixoAdmin}`;
     if (window.BR_AUTH && typeof window.BR_AUTH.requireLogin === 'function') {
       window.BR_AUTH.requireLogin(alvo);
     } else {
@@ -3776,6 +3813,7 @@ function setView(v) {
     }
     state.ehAdmin = true;
   }
+  if (!opcoes.fromHistory) brAtualizarRota(v);
   state.view = v;
   if (v !== 'em-breve') state.futuroModulo = null;
   if (v === 'jogos' && !state.jogosCarregados) {
@@ -3794,6 +3832,14 @@ function setView(v) {
   render();
   if (window.BR_CENTER_ACTIVE_NAV) setTimeout(window.BR_CENTER_ACTIVE_NAV, 40);
 }
+
+window.addEventListener('popstate', () => {
+  const params = new URLSearchParams(location.search || '');
+  const view = brViewPelaRota(location.pathname) || params.get('view') || 'jogos';
+  if (['rank', 'tabela', 'jogos', 'resultados'].includes(view)) {
+    setView(view, { fromHistory: true });
+  }
+});
 
 function abrirEmBreve(modulo) {
   state.futuroModulo = modulo;

@@ -44,8 +44,24 @@
   }
 
   function currentView() {
+    var path = String(global.location.pathname || "").replace(/\/+$/, "").toLowerCase();
+    var cleanRoutes = { "/jogos": "jogos", "/tabela": "tabela", "/resultados": "resultados", "/bolao": "rank" };
+    if (cleanRoutes[path]) return cleanRoutes[path];
     try { return String(new URLSearchParams(global.location.search || "").get("view") || "").toLowerCase(); }
     catch (_) { return ""; }
+  }
+
+  function cleanUrlForView(view) {
+    var routes = { jogos: "/jogos", tabela: "/tabela", resultados: "/resultados", rank: "/bolao" };
+    return routes[String(view || "").toLowerCase()] || "";
+  }
+
+  function normalizeMenuLinks(nav) {
+    if (!nav) return;
+    Array.prototype.forEach.call(nav.querySelectorAll("a[data-br-view]"), function (link) {
+      var clean = cleanUrlForView(link.getAttribute("data-br-view"));
+      if (clean) link.setAttribute("href", clean);
+    });
   }
 
   function isPrivateRoute() {
@@ -65,10 +81,12 @@
   }
 
   function returnTarget() {
+    var cleanView = currentView();
+    var cleanTargets = { jogos: "/jogos", tabela: "/tabela", resultados: "/resultados", rank: "/bolao" };
+    if (cleanTargets[cleanView]) return cleanTargets[cleanView] + (global.location.hash || "");
     var file = basename();
     if (file === "" || file === "index.html") {
-      var query = global.location.search || "?brasileirao=1&view=jogos";
-      return "./" + query + (global.location.hash || "");
+      return "/jogos" + (global.location.hash || "");
     }
     return file + (global.location.search || "") + (global.location.hash || "");
   }
@@ -285,6 +303,7 @@
 
   function applyMenu(nav) {
     if (!nav) return;
+    normalizeMenuLinks(nav);
     Array.prototype.forEach.call(nav.querySelectorAll("[data-br-private]"), function (item) {
       item.hidden = !authState.authenticated;
       item.setAttribute("aria-hidden", authState.authenticated ? "false" : "true");
@@ -384,7 +403,7 @@
     try { document.dispatchEvent(new CustomEvent("br:session-changed", { detail: { authenticated: false } })); } catch (_) {}
 
     if (isPrivateRoute()) {
-      global.location.replace("./?brasileirao=1&view=jogos");
+      global.location.replace("/jogos");
       return;
     }
     if (basename() === "apostas.html") {
@@ -417,6 +436,12 @@
       var view = el.getAttribute("data-br-view");
       if (view) {
         try { global.sessionStorage.setItem("brViewInicial", view); } catch (_) {}
+        var clean = cleanUrlForView(view);
+        if (clean && String(el.tagName || "").toLowerCase() === "a") {
+          ev.preventDefault();
+          global.location.href = clean;
+          return;
+        }
       }
       global.setTimeout(function () { centerActive(nav); }, 100);
     });
