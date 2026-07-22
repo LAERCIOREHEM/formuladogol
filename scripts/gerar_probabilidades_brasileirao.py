@@ -1617,6 +1617,86 @@ def update_history(
     return build_history_document(snapshots, published_state=published_state)
 
 
+def reconcile_history_with_published_output(
+    published_output: dict[str, Any],
+    published_audit: dict[str, Any],
+    history: dict[str, Any],
+) -> dict[str, Any]:
+    """Reconcilia metadados do histórico com o AF efetivamente publicado.
+
+    Esta operação é deliberadamente leve: não executa Monte Carlo e não cria
+    snapshot. Ela existe para o caminho em que o workflow preserva o último AF
+    válido (`run_af=false`) ou interrompe uma nova publicação por
+    dessincronização temporária da ESPN. Nesses casos, `estado_publicado` deve
+    apontar para os mesmos metadados de probabilidades-brasileirao.json.
+    """
+    if published_output.get("status") != "ok":
+        raise ValueError("não é possível sincronizar histórico: AF publicado inválido")
+    if published_audit.get("status") != "ok":
+        raise ValueError("não é possível sincronizar histórico: auditoria publicada inválida")
+
+    output_hash = str(published_output.get("hash_entrada") or "").strip()
+    audit_hash = str(published_audit.get("hash_entrada") or "").strip()
+    if not output_hash or output_hash != audit_hash:
+        raise ValueError(
+            "não é possível sincronizar histórico: hash divergente entre AF e auditoria"
+        )
+
+    snapshots_original = list(history.get("snapshots") or [])
+    if not snapshots_original:
+        raise ValueError("não é possível sincronizar histórico vazio")
+    if int(history.get("schema_version") or 0) >= 3:
+        validate_history_chain(history)
+
+    snapshots = compact_history_snapshots(snapshots_original, [])
+    matching_snapshot = next(
+        (item for item in reversed(snapshots) if str(item.get("hash_entrada") or "") == output_hash),
+        None,
+    )
+    latest_snapshot = snapshots[-1] if snapshots else {}
+    previous_published = history.get("estado_publicado") or {}
+    sports_hash = str(
+        (matching_snapshot or {}).get("hash_estado_esportivo")
+        or previous_published.get("hash_estado_esportivo")
+        or latest_snapshot.get("hash_estado_esportivo")
+        or _legacy_snapshot_state_hash(latest_snapshot)
+        or ""
+    ).strip()
+    if not sports_hash:
+        raise ValueError("não é possível sincronizar histórico: estado esportivo ausente")
+
+    published_state = {
+        "gerado_em": published_output.get("gerado_em"),
+        "hash_entrada": output_hash,
+        "hash_estado_esportivo": sports_hash,
+        "versao_modelo": published_output.get("versao_modelo"),
+        "simulacoes": (published_output.get("simulacao") or {}).get("quantidade"),
+    }
+    reconciled = build_history_document(snapshots, published_state=published_state)
+    if (reconciled.get("estado_publicado") or {}).get("hash_entrada") != output_hash:
+        raise AssertionError("reconciliação não atualizou o hash da publicação corrente")
+    return reconciled
+
+
+def synchronize_history_publication_metadata() -> dict[str, Any]:
+    """Sincroniza e grava apenas os metadados da publicação corrente."""
+    published_output = load_json(OUTPUT_PATH)
+    published_audit = load_json(AUDIT_PATH)
+    history = load_json(HISTORY_PATH)
+    reconciled = reconcile_history_with_published_output(
+        published_output, published_audit, history
+    )
+    if reconciled != history:
+        write_json(HISTORY_PATH, reconciled)
+        print(
+            "Histórico sincronizado com o AF publicado: "
+            f"{published_output.get('hash_entrada')}"
+        )
+    else:
+        print("Histórico já estava sincronizado com o AF publicado.")
+    return reconciled
+
+
 def continental_snapshots_state_hash(snapshots: dict[str, dict[str, Any]]) -> str:
     """Hash apenas do estado esportivo, sem timestamps de coleta/cache."""
     stable: dict[str, Any] = {}
@@ -2158,6 +2238,42 @@ def self_test() -> None:
     if latest_rows[teams[0]].get("hash_estado_clube") == delayed_history["snapshots"][0]["clubes"][0].get("hash_estado_clube"):
         raise AssertionError("estado individual do clube não mudou após nova partida")
 
+    stale_publication = json.loads(json.dumps(same_results_new_execution))
+    stale_publication["estado_publicado"]["hash_entrada"] = "hash-publicacao-antigo"
+    snapshot_hashes_before = [
+        item.get("hash_snapshot") for item in stale_publication.get("snapshots") or []
+    ]
+    repaired_publication = reconcile_history_with_published_output(
+        {
+            "status": "ok",
+            "gerado_em": "2026-07-18T09:00:00-03:00",
+            "hash_entrada": "entrada-tecnica-nova",
+            "versao_modelo": "AF-Previsão teste",
+            "simulacao": {"quantidade": 10_000},
+        },
+        {"status": "ok", "hash_entrada": "entrada-tecnica-nova"},
+        stale_publication,
+    )
+    if (repaired_publication.get("estado_publicado") or {}).get("hash_entrada") != "entrada-tecnica-nova":
+        raise AssertionError("reconciliação não corrigiu referência de publicação antiga")
+    if repaired_publication["total_snapshots"] != stale_publication["total_snapshots"]:
+        raise AssertionError("reconciliação criou snapshot sem resultado novo")
+    snapshot_hashes_after = [
+        item.get("hash_snapshot") for item in repaired_publication.get("snapshots") or []
+    ]
+    if snapshot_hashes_after != snapshot_hashes_before:
+        raise AssertionError("reconciliação alterou a cadeia histórica sem necessidade")
+    try:
+        reconcile_history_with_published_output(
+            {"status": "ok", "hash_entrada": "A", "simulacao": {"quantidade": 10_000}},
+            {"status": "ok", "hash_entrada": "B"},
+            stale_publication,
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("reconciliação aceitou AF e auditoria com hashes divergentes")
+
     saved = synthetic_history["snapshots"][0]
     if saved.get("rodada_referencia") != 19 or saved["clubes"][0].get("posicao_projetada") is None:
         raise AssertionError("histórico não guardou rodada e projeção final")
@@ -2233,9 +2349,17 @@ def main() -> int:
     parser.add_argument("--simulacoes", type=int, default=None, help="substitui a quantidade configurada")
     parser.add_argument("--semente", type=int, default=None, help="substitui a semente configurada")
     parser.add_argument("--self-test", action="store_true")
+    parser.add_argument(
+        "--sincronizar-historico-publicado",
+        action="store_true",
+        help="reconcilia o histórico com o AF já publicado, sem executar simulações",
+    )
     args = parser.parse_args()
     if args.self_test:
         self_test()
+        return 0
+    if args.sincronizar_historico_publicado:
+        synchronize_history_publication_metadata()
         return 0
     try:
         probabilities, audit, history, bolao, points_thresholds = generate(args.simulacoes, args.semente)
@@ -2261,31 +2385,9 @@ def main() -> int:
                 previous_valid = False
         if not previous_valid:
             raise
-        # A Execução 5 pode migrar o histórico legado para a cadeia SHA-256
-        # sem criar snapshot novo nem alterar as probabilidades preservadas.
-        if int(previous_history.get("schema_version") or 0) >= 3:
-            validate_history_chain(previous_history)
-        upgraded_snapshots = compact_history_snapshots(
-            list(previous_history.get("snapshots") or []), []
-        )
-        latest_snapshot = upgraded_snapshots[-1] if upgraded_snapshots else {}
-        published_state = dict(previous_history.get("estado_publicado") or {})
-        # No fallback por dessincronização, a publicação preservada continua
-        # sendo `previous_output`. Portanto, a referência corrente do histórico
-        # precisa ser SOBRESCRITA com os metadados desse arquivo — `setdefault`
-        # manteria um hash antigo e faria a auditoria acusar divergência.
-        published_state["gerado_em"] = previous_output.get("gerado_em")
-        published_state["hash_entrada"] = previous_output.get("hash_entrada")
-        published_state.setdefault(
-            "hash_estado_esportivo",
-            latest_snapshot.get("hash_estado_esportivo") or _legacy_snapshot_state_hash(latest_snapshot),
-        )
-        published_state["versao_modelo"] = previous_output.get("versao_modelo")
-        published_state["simulacoes"] = (previous_output.get("simulacao") or {}).get("quantidade")
-        upgraded_history = build_history_document(
-            upgraded_snapshots, published_state=published_state
-        )
-        write_json(HISTORY_PATH, upgraded_history)
+        # Preserva probabilidades e auditoria anteriores e reconcilia, de forma
+        # leve, o ponteiro estado_publicado do histórico com esses arquivos.
+        synchronize_history_publication_metadata()
         print(
             "::warning title=AF-Previsão aguardando sincronização da ESPN::"
             f"{exc}. Probabilidades e auditoria anteriores foram preservadas; "
