@@ -39,6 +39,7 @@ on:
       - 'jogos/**'
       - 'tabela/**'
       - 'resultados/**'
+      - 'copa2026/**'
       - '.github/workflows/deploy.yml'
 
   # Publica imediatamente após workflows que atualizam dados públicos.
@@ -90,7 +91,7 @@ jobs:
         run: |
           set -euo pipefail
           rm -rf _site
-          mkdir -p _site/css _site/js _site/dados-br
+          mkdir -p _site/css _site/js _site/dados-br _site/copa2026/css _site/copa2026/js _site/copa2026/dados _site/copa2026/img
 
           PUBLIC_ROOT=(
             index.html
@@ -162,6 +163,65 @@ jobs:
 
           PUBLIC_ROUTES=(jogos tabela resultados)
 
+          COPA_PUBLIC_FILES=(
+            copa2026/index.html
+            copa2026/aovivo.html
+            copa2026/onde-assistir.html
+            copa2026/estatisticas.html
+            copa2026/selecoes.html
+            copa2026/palcos.html
+            copa2026/museu.html
+            copa2026/favicon-copa.png
+            copa2026/favicon-copa-32.png
+            copa2026/og-copa-publico-v2.png
+            copa2026/robots.txt
+            copa2026/sitemap.xml
+            copa2026/css/copa.css
+            copa2026/js/aovivo.js
+            copa2026/js/config.js
+            copa2026/js/engine.js
+            copa2026/js/estatisticas.js
+            copa2026/js/feedback.js
+            copa2026/js/image-preview.js
+            copa2026/js/jogo-stats.js
+            copa2026/js/museu.js
+            copa2026/js/onde-assistir.js
+            copa2026/js/palcos.js
+            copa2026/js/resultados.js
+            copa2026/js/selecoes.js
+            copa2026/js/times.js
+            copa2026/dados/agenda_mata.json
+            copa2026/dados/agenda_workflow_copa.json
+            copa2026/dados/correcoes-jogadores.json
+            copa2026/dados/elencos.json
+            copa2026/dados/estatisticas.json
+            copa2026/dados/estrutura_mata_mata.json
+            copa2026/dados/fairplay.json
+            copa2026/dados/jogos-completos.json
+            copa2026/dados/jogos-detalhes.json
+            copa2026/dados/lives.json
+            copa2026/dados/melhores-momentos.json
+            copa2026/dados/museu-copa.json
+            copa2026/dados/paises.json
+            copa2026/dados/palcos.json
+            copa2026/dados/palcos_creditos.json
+            copa2026/dados/ranking-desempenho.json
+            copa2026/dados/ranking-selecoes-historico.json
+            copa2026/dados/rostos.json
+            copa2026/dados/rostos_creditos.json
+            copa2026/dados/selecoes.json
+            copa2026/dados/terceiros_map.json
+            copa2026/dados/transmissoes.json
+            copa2026/img/header-copa26-formula-do-gol.png
+          )
+
+          COPA_IMAGE_DIRS=(
+            copa2026/img/bolas
+            copa2026/img/jogadores
+            copa2026/img/mascotes
+            copa2026/img/palcos
+          )
+
           for item in "${PUBLIC_ROOT[@]}" "${PUBLIC_CSS[@]}" "${PUBLIC_JS[@]}" "${PUBLIC_DATA[@]}"; do
             if [[ ! -f "$item" ]]; then
               echo "ERRO: arquivo público obrigatório ausente: $item"
@@ -185,6 +245,23 @@ jobs:
             cp -a "$route/index.html" "_site/$route/index.html"
           done
 
+          for item in "${COPA_PUBLIC_FILES[@]}"; do
+            if [[ ! -f "$item" ]]; then
+              echo "ERRO: arquivo público da Copa ausente: $item"
+              exit 1
+            fi
+            mkdir -p "_site/$(dirname "$item")"
+            cp -a "$item" "_site/$item"
+          done
+
+          for item in "${COPA_IMAGE_DIRS[@]}"; do
+            if [[ ! -d "$item" ]]; then
+              echo "ERRO: diretório público da Copa ausente: $item"
+              exit 1
+            fi
+            cp -a "$item" "_site/$(dirname "$item")/"
+          done
+
           touch _site/.nojekyll
 
       - name: Validar pacote público antes do upload
@@ -198,7 +275,6 @@ jobs:
             _site/membros.json
             _site/bolao
             _site/aniversariantes
-            _site/copa2026
             _site/docs
             _site/css/br-apostas.css
             _site/js/br-apostas.js
@@ -207,6 +283,18 @@ jobs:
             _site/dados-br/participantes-bolao-classificacao.json
             _site/dados-br/probabilidades-bolao.json
             _site/dados-br/ranking-apostas.json
+            _site/copa2026/admin.html
+            _site/copa2026/palpite.html
+            _site/copa2026/palpites.html
+            _site/copa2026/pontos.html
+            _site/copa2026/regras.html
+            _site/copa2026/css/br-apostas.css
+            _site/copa2026/js/admin.js
+            _site/copa2026/js/br-apostas.js
+            _site/copa2026/js/chances-bolao.js
+            _site/copa2026/js/palpites.js
+            _site/copa2026/js/pontos.js
+            _site/copa2026/dados/palpites_mata.json
           )
           for item in "${FORBIDDEN[@]}"; do
             if [[ -e "$item" ]]; then
@@ -223,14 +311,14 @@ jobs:
           import xml.etree.ElementTree as ET
 
           site = Path("_site")
-          pages = [
+          root_pages = [
               "index.html",
               "aovivo.html",
               "estatisticas.html",
               "clubes.html",
               "museu.html",
           ]
-          expected_menu = [
+          root_expected_menu = [
               "Jogos",
               "Ao vivo",
               "Tabela",
@@ -238,13 +326,13 @@ jobs:
               "Estatísticas",
               "Clubes",
               "Museu",
+              "Copa 2026",
           ]
-          forbidden_menu = [
+          root_forbidden_menu = [
               "Apostas",
               "Bolão",
               "Regras",
               "Aniversariantes",
-              "Copa 2026",
               "Login",
           ]
           identity_files = [
@@ -269,7 +357,7 @@ jobs:
                       if attrs.get(key):
                           self.refs.append(attrs[key])
 
-          for page_name in pages:
+          for page_name in root_pages:
               page = site / page_name
               assert page.is_file(), f"página pública ausente: {page_name}"
               text = page.read_text(encoding="utf-8")
@@ -277,14 +365,73 @@ jobs:
               assert nav_match, f"{page_name}: menu principal ausente"
               nav = re.sub(r"<[^>]+>", " ", nav_match.group(1))
               nav = " ".join(nav.split())
-              for label in expected_menu:
+              for label in root_expected_menu:
                   assert label in nav, f"{page_name}: item público ausente no menu: {label}"
-              for label in forbidden_menu:
+              for label in root_forbidden_menu:
                   assert label not in nav, f"{page_name}: item oculto ainda presente no menu: {label}"
               assert '<span class="footer-title">Fórmula do Gol</span>' in text, f"{page_name}: marca nova ausente no disclaimer"
               assert not re.search(r"almo[cç]o de sexta", text, flags=re.I), f"{page_name}: marca antiga ainda presente"
               for identity in identity_files:
                   assert identity in text, f"{page_name}: identidade ausente: {identity}"
+
+              parser = RefParser()
+              parser.feed(text)
+              for raw in parser.refs:
+                  ref = raw.strip()
+                  parsed = urlsplit(ref)
+                  if parsed.scheme or ref.startswith("//") or ref.startswith("#") or ref.startswith("data:"):
+                      continue
+                  path = parsed.path
+                  if not path or path == "/":
+                      continue
+                  target = site / path.lstrip("/") if path.startswith("/") else page.parent / path
+                  if target.is_dir():
+                      target = target / "index.html"
+                  assert target.exists(), f"{page_name}: referência local quebrada: {ref}"
+
+          copa_pages = [
+              "copa2026/index.html",
+              "copa2026/aovivo.html",
+              "copa2026/onde-assistir.html",
+              "copa2026/estatisticas.html",
+              "copa2026/selecoes.html",
+              "copa2026/palcos.html",
+              "copa2026/museu.html",
+          ]
+          copa_expected_menu = [
+              "Jogos",
+              "Ao vivo",
+              "Onde assistir",
+              "Estatísticas",
+              "Seleções",
+              "Sedes",
+              "Museu",
+              "Fórmula do Gol",
+          ]
+          copa_forbidden_menu = [
+              "Bolão",
+              "Palpites",
+              "Meus Palpites",
+              "Regras",
+              "Área do administrador",
+          ]
+
+          for page_name in copa_pages:
+              page = site / page_name
+              assert page.is_file(), f"página pública da Copa ausente: {page_name}"
+              text = page.read_text(encoding="utf-8")
+              nav_match = re.search(r'<nav\b[^>]*class="[^"]*\bmenu\b[^"]*"[^>]*>(.*?)</nav>', text, flags=re.I | re.S)
+              assert nav_match, f"{page_name}: menu principal da Copa ausente"
+              nav = " ".join(re.sub(r"<[^>]+>", " ", nav_match.group(1)).split())
+              for label in copa_expected_menu:
+                  assert label in nav, f"{page_name}: item público ausente no menu: {label}"
+              for label in copa_forbidden_menu:
+                  assert label not in nav, f"{page_name}: item não público presente no menu: {label}"
+              assert "Fórmula do Gol" in text, f"{page_name}: marca Fórmula do Gol ausente"
+              assert "header-copa26-formula-do-gol.png" in text, f"{page_name}: cabeçalho novo ausente"
+              assert "brasileirao2026almoco" not in text.lower(), f"{page_name}: domínio antigo presente"
+              assert not re.search(r"almo[cç]o de sexta", text, flags=re.I), f"{page_name}: marca antiga presente"
+              assert not re.search(r'href=["\'](?:pontos|palpite|palpites|regras|admin)\.html', text, flags=re.I), f"{page_name}: link não público presente"
 
               parser = RefParser()
               parser.feed(text)
@@ -313,7 +460,7 @@ jobs:
           config = (site / "js/br-config.js").read_text(encoding="utf-8")
           assert re.search(r"login\s*:\s*false", config), "login não está desativado"
           assert re.search(r"modulosPrivados\s*:\s*false", config), "módulos privados não estão desativados"
-          assert re.search(r"copa2026\s*:\s*false", config), "Copa 2026 não está desativada"
+          assert re.search(r"copa2026\s*:\s*true", config), "Copa 2026 não está ativada"
 
           menu = (site / "js/br-menu.js").read_text(encoding="utf-8")
           assert "LOGIN_ENABLED && PRIVATE_MODULES_ENABLED" in menu, "menu sem trava de sessão antiga"
@@ -324,7 +471,17 @@ jobs:
 
           robots = (site / "robots.txt").read_text(encoding="utf-8")
           assert "Sitemap: https://formuladogol.com.br/sitemap.xml" in robots
-          for route in ("/apostas.html", "/regras.html", "/bolao/", "/aniversariantes/", "/copa2026/"):
+          for route in (
+              "/apostas.html",
+              "/regras.html",
+              "/bolao/",
+              "/aniversariantes/",
+              "/copa2026/admin.html",
+              "/copa2026/palpite.html",
+              "/copa2026/palpites.html",
+              "/copa2026/pontos.html",
+              "/copa2026/regras.html",
+          ):
               assert f"Disallow: {route}" in robots, f"robots sem bloqueio para {route}"
 
           root = ET.parse(site / "sitemap.xml").getroot()
@@ -336,9 +493,38 @@ jobs:
               "https://formuladogol.com.br/estatisticas.html",
               "https://formuladogol.com.br/clubes.html",
               "https://formuladogol.com.br/museu.html",
+              "https://formuladogol.com.br/copa2026/",
+              "https://formuladogol.com.br/copa2026/aovivo.html",
+              "https://formuladogol.com.br/copa2026/onde-assistir.html",
+              "https://formuladogol.com.br/copa2026/estatisticas.html",
+              "https://formuladogol.com.br/copa2026/selecoes.html",
+              "https://formuladogol.com.br/copa2026/palcos.html",
+              "https://formuladogol.com.br/copa2026/museu.html",
           }
           assert set(urls) == expected_urls, f"sitemap divergente: {urls!r}"
-          assert not any(any(term in url for term in ("apostas", "bolao", "aniversariantes", "copa2026", "regras")) for url in urls)
+          assert not any(any(term in url for term in ("apostas", "bolao", "aniversariantes", "regras", "palpite", "pontos")) for url in urls)
+
+          copa_root = ET.parse(site / "copa2026/sitemap.xml").getroot()
+          copa_urls = [node.text for node in copa_root.findall("sm:url/sm:loc", ns)]
+          expected_copa_urls = {url for url in expected_urls if "/copa2026/" in url}
+          assert set(copa_urls) == expected_copa_urls, f"sitemap da Copa divergente: {copa_urls!r}"
+
+          copa_robots = (site / "copa2026/robots.txt").read_text(encoding="utf-8")
+          assert "Sitemap: https://formuladogol.com.br/copa2026/sitemap.xml" in copa_robots
+          for route in ("admin.html", "palpite.html", "palpites.html", "pontos.html", "regras.html"):
+              assert f"Disallow: /copa2026/{route}" in copa_robots, f"robots da Copa sem bloqueio: {route}"
+
+          resultados_js = (site / "copa2026/js/resultados.js").read_text(encoding="utf-8")
+          aovivo_js = (site / "copa2026/js/aovivo.js").read_text(encoding="utf-8")
+          assert "copa_revelados" not in resultados_js, "Jogos da Copa ainda consulta dados privados"
+          assert "palpites_mata.json" not in resultados_js, "Jogos da Copa ainda carrega dados privados"
+          assert "copa_revelados" not in aovivo_js, "Ao vivo da Copa ainda consulta dados privados"
+          public_copa_code = resultados_js + "\n" + aovivo_js
+          assert not re.search(
+              r"\b(palpit\w*|apost\w*|bol[aã]o|cerveja|vinho|pix)\b",
+              public_copa_code,
+              flags=re.I,
+          ), "JavaScript público da Copa contém recurso não informativo"
 
           redirects = {"jogos": "jogos", "tabela": "tabela", "resultados": "resultados"}
           for route, view in redirects.items():
