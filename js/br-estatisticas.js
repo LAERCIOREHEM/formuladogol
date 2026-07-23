@@ -304,15 +304,17 @@
     const expanded = state.expanded[type];
     const shown = expanded ? list : list.slice(0, 5);
     target.innerHTML = `<div class="stats-player-list">${shown.map((player, index) => {
-      const games = Number(player.jogos);
+      const rawGames = player.jogos;
+      const games = rawGames === null || rawGames === undefined || rawGames === "" ? null : Number(rawGames);
+      const hasGames = Number.isFinite(games) && games > 0;
       const value = Number(player[field] || 0);
-      const average = Number.isFinite(games) && games > 0 ? `${number(value / games, 2)} por jogo` : "Jogos não informados";
+      const average = hasGames ? `${number(value / games, 2)} por jogo` : "Jogos não informados";
       return `<article class="stats-player-row">
         <div class="stats-rank">${integer(player.posicao || index + 1)}</div>
         <div class="stats-player-main">
           <div class="stats-player-name">${escapeHtml(player.nome)}</div>
           <div class="stats-player-club">${shield(player, "stats-mini-shield")}<span>${escapeHtml(player.time)}</span></div>
-          <div class="stats-player-meta">${Number.isFinite(games) ? `${integer(games)} jogos · ` : ""}${escapeHtml(average)}</div>
+          <div class="stats-player-meta">${hasGames ? `${integer(games)} jogos · ` : ""}${escapeHtml(average)}</div>
         </div>
         <div class="stats-player-value"><strong>${integer(value)}</strong><span>${unit}</span></div>
       </article>`;
