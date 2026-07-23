@@ -771,7 +771,7 @@ body > .container > section.hero > img {
 .stats-player-list { display: grid; gap: 10px; }
 .stats-player-row {
   display: grid;
-  grid-template-columns: 46px 56px minmax(0, 1fr) auto;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   padding: 14px;
@@ -780,7 +780,6 @@ body > .container > section.hero > img {
   background: rgba(5,15,22,.68);
 }
 .stats-rank { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; color: #edffc0; border: 1px solid rgba(163,230,53,.28); background: rgba(163,230,53,.10); font-size: 19px; font-weight: 950; }
-.stats-avatar { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 15px; border: 1px solid rgba(163,230,53,.24); color: #dfff8c; background: linear-gradient(145deg, rgba(163,230,53,.15), rgba(255,255,255,.025)); font-weight: 950; letter-spacing: .04em; }
 .stats-player-main { min-width: 0; }
 .stats-player-name { color: #fff; font-size: 20px; font-weight: 950; overflow-wrap: anywhere; }
 .stats-player-club { display: flex; align-items: center; gap: 7px; margin-top: 4px; color: var(--muted); }
@@ -888,8 +887,8 @@ body > .container > section.hero > img {
 .stats-attendance-row small { margin-top: 3px; color: var(--muted); }
 .stats-attendance-row > b { color: var(--green); font-size: 18px; }
 
-.stats-performance-list { display: grid; gap: 11px; }
-.stats-performance-card { padding: 14px; border: 1px solid rgba(148,163,184,.13); border-radius: 17px; background: rgba(5,15,22,.62); }
+.stats-performance-list { display: grid; min-width: 0; gap: 11px; }
+.stats-performance-card { min-width: 0; max-width: 100%; padding: 14px; border: 1px solid rgba(148,163,184,.13); border-radius: 17px; overflow: hidden; background: rgba(5,15,22,.62); }
 .stats-performance-head { display: grid; grid-template-columns: 46px 48px minmax(0,1fr) auto; align-items: center; gap: 10px; }
 .stats-performance-shield { width: 44px; height: 44px; object-fit: contain; }
 .stats-performance-head > div strong, .stats-performance-head > div span { display: block; }
@@ -905,6 +904,8 @@ body > .container > section.hero > img {
 .stats-performance-metric strong { text-align: right; }
 .stats-performance-card p { font-size: 12px; line-height: 1.45; }
 .ranking-history-details {
+  min-width: 0;
+  max-width: 100%;
   margin-top: 12px;
   padding-top: 10px;
   border-top: 1px solid rgba(148,163,184,.12);
@@ -936,8 +937,8 @@ body > .container > section.hero > img {
 .ranking-history-label.is-open { display: none; }
 .ranking-history-details[open] .ranking-history-label.is-closed { display: none; }
 .ranking-history-details[open] .ranking-history-label.is-open { display: inline; }
-.ranking-history-content { margin-top: 8px; }
-.ranking-history-content .club-performance-history { background: rgba(4,18,25,.52); }
+.ranking-history-content { min-width: 0; max-width: 100%; margin-top: 8px; }
+.ranking-history-content .club-performance-history { min-width: 0; max-width: 100%; background: rgba(4,18,25,.52); }
 .methodology-box { margin-top: 13px; border: 1px solid rgba(251,191,36,.25); border-radius: 14px; background: rgba(251,191,36,.04); }
 .methodology-box summary { padding: 12px; color: #ffd452; font-weight: 950; cursor: pointer; }
 .methodology-box p { padding: 0 12px 12px; margin: 0; }
@@ -959,9 +960,8 @@ body > .container > section.hero > img {
   .stats-summary-secondary { font-size: 11px; }
   .stats-tabs { gap: 8px; padding: 10px; }
   .stats-tab { min-height: 84px; padding: 10px 6px; font-size: 15px; }
-  .stats-player-row { grid-template-columns: 42px 48px minmax(0,1fr) 57px; gap: 8px; padding: 11px 9px; }
+  .stats-player-row { grid-template-columns: 42px minmax(0,1fr) 57px; gap: 8px; padding: 11px 9px; }
   .stats-rank { width: 40px; height: 40px; font-size: 16px; }
-  .stats-avatar { width: 46px; height: 46px; font-size: 13px; }
   .stats-player-name { font-size: 17px; }
   .stats-player-meta { font-size: 10px; }
   .stats-player-value { min-width: 52px; }
@@ -1484,9 +1484,13 @@ body > .container > section.hero > img {
 .club-evolution-content { display: grid; gap: 14px; margin-top: 11px; }
 .club-performance-history,
 .club-forecast-history {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding: 12px;
   border: 1px solid rgba(148,163,184,.12);
   border-radius: 15px;
+  overflow: hidden;
   background: rgba(5,15,22,.45);
 }
 .club-evolution-head {
@@ -1508,6 +1512,9 @@ body > .container > section.hero > img {
 .club-evolution-head > small { color: var(--muted); font-size: 9px; text-align: right; }
 .club-evolution-strip {
   display: grid;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
   gap: 8px;
   margin-top: 10px;
@@ -1573,9 +1580,11 @@ body > .container > section.hero > img {
     grid-auto-flow: column;
     grid-auto-columns: minmax(158px, 78%);
     overflow-x: auto;
+    overscroll-behavior-inline: contain;
     padding-bottom: 5px;
     scroll-snap-type: x proximity;
     scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
   }
   .club-evolution-card { scroll-snap-align: start; }
   .ranking-history-details > summary {

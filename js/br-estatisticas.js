@@ -227,16 +227,6 @@
     return String(obj?.time || obj?.nome || obj || "");
   }
 
-  function initials(name) {
-    return String(name || "?")
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase() || "?";
-  }
-
   function shield(obj, cls = "stats-shield") {
     const name = teamName(obj);
     const info = teamInfo(name);
@@ -290,8 +280,8 @@
     const rank = Array.isArray(state.ranking?.ranking) ? state.ranking.ranking[0] : null;
 
     $("cards-resumo").innerHTML = [
-      summaryCard("⚽", "Artilheiro", scorer?.nome, scorer ? `${scorer.time} · ${integer(scorer.gols)} gols` : "Ranking ainda não atualizado", scorer),
-      summaryCard("🎯", "Garçom", assistant?.nome, assistant ? `${assistant.time} · ${integer(assistant.assistencias)} assist.` : "Ranking ainda não atualizado", assistant),
+      summaryCard("⚽", "Artilheiro", scorer?.nome, scorer ? `${scorer.time} · ${integer(scorer.gols)} gols` : "Ranking oficial ainda não atualizado", scorer),
+      summaryCard("🎯", "Garçom", assistant?.nome, assistant ? `${assistant.time} · ${integer(assistant.assistencias)} assist.` : "Ranking oficial ainda não atualizado", assistant),
       summaryCard("🥅", "Melhor ataque", attack?.time, attack ? `${integer(attack.gols_pro ?? attack.gp)} gols` : "Aguardando consolidado", attack),
       summaryCard("⚡", "Ranking", rank?.time, rank ? `Índice ${number(rank.indice_final ?? rank.score, 1)}` : "Aguardando ranking", rank),
     ].join("");
@@ -308,29 +298,21 @@
     const field = type === "artilheiros" ? "gols" : "assistencias";
     const unit = type === "artilheiros" ? "gols" : "assist.";
     if (!list.length) {
-      target.innerHTML = emptyState("Ranking ainda não disponível.", "Execute o workflow Atualizar Brasileirao (ESPN) e aguarde a coleta validada.");
+      target.innerHTML = emptyState("Ranking oficial ainda não disponível.", "Execute o workflow Atualizar Brasileirao (ESPN) e aguarde a coleta validada.");
       return;
     }
     const expanded = state.expanded[type];
     const shown = expanded ? list : list.slice(0, 5);
     target.innerHTML = `<div class="stats-player-list">${shown.map((player, index) => {
-      const gamesRaw = player.jogos;
-      const games = Number(gamesRaw);
+      const games = Number(player.jogos);
       const value = Number(player[field] || 0);
-      const hasGames = gamesRaw !== null && gamesRaw !== "" && Number.isFinite(games) && games > 0;
-      const participationGames = Number(player.jogos_com_participacao);
-      const meta = hasGames
-        ? `${integer(games)} jogos · ${number(value / games, 2)} por jogo`
-        : Number.isFinite(participationGames) && participationGames > 0
-          ? `Participou de gols em ${integer(participationGames)} partida${participationGames === 1 ? "" : "s"}`
-          : "Jogos disputados não informados";
+      const average = Number.isFinite(games) && games > 0 ? `${number(value / games, 2)} por jogo` : "Jogos não informados";
       return `<article class="stats-player-row">
         <div class="stats-rank">${integer(player.posicao || index + 1)}</div>
-        <div class="stats-avatar">${escapeHtml(initials(player.nome))}</div>
         <div class="stats-player-main">
           <div class="stats-player-name">${escapeHtml(player.nome)}</div>
           <div class="stats-player-club">${shield(player, "stats-mini-shield")}<span>${escapeHtml(player.time)}</span></div>
-          <div class="stats-player-meta">${escapeHtml(meta)}</div>
+          <div class="stats-player-meta">${Number.isFinite(games) ? `${integer(games)} jogos · ` : ""}${escapeHtml(average)}</div>
         </div>
         <div class="stats-player-value"><strong>${integer(value)}</strong><span>${unit}</span></div>
       </article>`;
