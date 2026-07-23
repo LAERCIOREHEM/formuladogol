@@ -1,0 +1,41 @@
+name: Notificar sugestões por e-mail
+
+on:
+  # Roda de 2 em 2 horas todos os dias. UTC — não importa a hora, o script
+  # só processa linhas com enviado_email=false.
+  schedule:
+    - cron: '17 */2 * * *'
+  # Permite executar manualmente pela aba Actions (útil para testar).
+  workflow_dispatch:
+
+# Só leitura no repo (checkout). O script fala com Supabase e SMTP por rede.
+permissions:
+  contents: read
+
+concurrency:
+  group: notificar-sugestoes
+  cancel-in-progress: false
+
+jobs:
+  notificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Enviar sugestões pendentes por e-mail
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_DESTINO_SUGESTOES: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
+        run: python scripts/notificar_sugestoes.py
