@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 42,
+    "jogos_na_janela": 38,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 26,
-    "transmissoes_publicadas": 4,
-    "sem_transmissao": 38,
+    "candidatos_oficiais_encontrados": 33,
+    "transmissoes_publicadas": 3,
+    "sem_transmissao": 35,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,44 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841152",
-      "rodada": 19,
-      "jogo": "Coritiba x Palmeiras",
-      "data_iso": "2026-07-22T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401841150",
-      "rodada": 19,
-      "jogo": "Chapecoense x Flamengo",
-      "data_iso": "2026-07-22T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401841154",
-      "rodada": 19,
-      "jogo": "Internacional x Cruzeiro",
-      "data_iso": "2026-07-22T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401841156",
-      "rodada": 19,
-      "jogo": "São Paulo x Athletico-PR",
-      "data_iso": "2026-07-22T21:30:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false
-    },
     {
       "event_id": "401840999",
       "rodada": 4,
@@ -459,25 +421,19 @@
         "identifica transmissão ao vivo",
         "horário compatível (90 min de diferença)"
       ]
-    },
-    {
-      "event_id": "401841156",
-      "jogo": "São Paulo x Athletico-PR",
-      "fonte": "getv",
-      "video_id": "peF4pxnYcec",
-      "url": "https://www.youtube.com/watch?v=peF4pxnYcec",
-      "titulo": "SÃO PAULO X ATHLETICO PR | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
-      "status": "upcoming",
-      "confianca": 0.85,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
     }
   ],
   "rejeitados": [
+    {
+      "video_id": "1WEHcbiWwdw",
+      "url": "https://www.youtube.com/watch?v=1WEHcbiWwdw",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ALPAK X NO RULES | 1ª RODADA | COPA DO MUNDO DE CLUBES KINGS LEAGUE",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-26T13:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
     {
       "video_id": "58K6dkZmL3Q",
       "url": "https://www.youtube.com/watch?v=58K6dkZmL3Q",
@@ -509,6 +465,36 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
+      "video_id": "CU1HQT2bY-s",
+      "url": "https://www.youtube.com/watch?v=CU1HQT2bY-s",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: TIME BRASIL NO MUNDIAL DE CANOAGEM SLALOM | ETAPA OKLAHOMA | FINAIS",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-23T15:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "DfF5xJsk2EE",
+      "url": "https://www.youtube.com/watch?v=DfF5xJsk2EE",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "CAZÉTV LIVE COM CASIMIRO, LUIS E BELTRÃO!",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-27T17:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "FEvVCdXaAgA",
+      "url": "https://www.youtube.com/watch?v=FEvVCdXaAgA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: TIME BRASIL NO MUNDIAL DE CANOAGEM SLALOM | ETAPA OKLAHOMA | FINAIS",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-24T15:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "FYdll9LanTc",
       "url": "https://www.youtube.com/watch?v=FYdll9LanTc",
       "fonte": "cazetv",
@@ -519,23 +505,13 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
-      "video_id": "QSXlXpY8_J4",
-      "url": "https://www.youtube.com/watch?v=QSXlXpY8_J4",
+      "video_id": "M8yN4SFLj_k",
+      "url": "https://www.youtube.com/watch?v=M8yN4SFLj_k",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "TIME BRASIL NO WTT STAR CONTENDER DE SÃO JOSÉ DOS CAMPOS | TÊNIS DE MESA",
+      "titulo": "AO VIVO: LA CAPITAL X UNDERDOGS | 1ª RODADA | COPA DO MUNDO DE CLUBES KINGS LEAGUE",
       "status": "upcoming",
-      "inicio_programado": "2026-07-22T16:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "Rgbm9eMY2J0",
-      "url": "https://www.youtube.com/watch?v=Rgbm9eMY2J0",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): THIAGO WILD X DANIEL RINCON | ATP CHALLENGER DE ZUG",
-      "status": "live",
-      "inicio_programado": "2026-07-22T11:20:00-03:00",
+      "inicio_programado": "2026-07-27T13:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -547,16 +523,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-23T15:50:00-03:00",
       "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
-      "video_id": "TH3IcJnwIpI",
-      "url": "https://www.youtube.com/watch?v=TH3IcJnwIpI",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: FLAMENGO E PALMEIRAS JOGAM HOJE PELO BRASILEIRÃO, VASCO NA SULA E MAIS! | GERAL CAZÉTV",
-      "status": "live",
-      "inicio_programado": "2026-07-22T10:00:00-03:00",
-      "motivo": "conteúdo rejeitado: melhores momentos"
     },
     {
       "video_id": "Ts_Vu4MCwD8",
@@ -579,13 +545,13 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
-      "video_id": "ZoGHLJn_UFo",
-      "url": "https://www.youtube.com/watch?v=ZoGHLJn_UFo",
+      "video_id": "Zifqx-WcwwM",
+      "url": "https://www.youtube.com/watch?v=Zifqx-WcwwM",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "INDEPENDIENTE DE MEDELLÍN X VASCO: SUL-AMERICANA | LANCES EM TEMPO REAL | NOCHE DE COPA",
+      "titulo": "AO VIVO: TIME BRASIL NO MUNDIAL DE CANOAGEM SLALOM | ETAPA OKLAHOMA | FINAIS",
       "status": "upcoming",
-      "inicio_programado": "2026-07-22T18:30:00-03:00",
+      "inicio_programado": "2026-07-25T15:50:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -599,16 +565,6 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
-      "video_id": "nekZF3Th8PI",
-      "url": "https://www.youtube.com/watch?v=nekZF3Th8PI",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "TIME BRASIL NO WTT STAR CONTENDER DE SÃO JOSÉ DOS CAMPOS | TÊNIS DE MESA",
-      "status": "live",
-      "inicio_programado": "2026-07-22T10:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "rlPrTsnFKr4",
       "url": "https://www.youtube.com/watch?v=rlPrTsnFKr4",
       "fonte": "cazetv",
@@ -617,6 +573,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-16T15:05:00-03:00",
       "motivo": "conteúdo rejeitado: pre jogo"
+    },
+    {
+      "video_id": "tOfzcMQyC8I",
+      "url": "https://www.youtube.com/watch?v=tOfzcMQyC8I",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "TIME BRASIL NO WTT STAR CONTENDER DE SÃO JOSÉ DOS CAMPOS | TÊNIS DE MESA",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-23T16:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "z63vnMGM644",
@@ -629,14 +595,54 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
-      "video_id": "3iYss06C2yE",
-      "url": "https://www.youtube.com/watch?v=3iYss06C2yE",
+      "video_id": "z9kKxNhw83A",
+      "url": "https://www.youtube.com/watch?v=z9kKxNhw83A",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: TIME BRASIL NO WTT STAR CONTENDER DE SÃO JOSÉ DOS CAMPOS | TÊNIS DE MESA",
+      "status": "live",
+      "inicio_programado": "2026-07-23T11:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "zM6TZLjQIlw",
+      "url": "https://www.youtube.com/watch?v=zM6TZLjQIlw",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "PALMEIRAS VENCE MAIS UMA! FLA GOLEIA COM SHOW DE PEDRO, FURACÃO VENCE O SP E MAIS! | GERAL CAZÉTV",
+      "status": "live",
+      "inicio_programado": "2026-07-23T10:00:00-03:00",
+      "motivo": "conteúdo rejeitado: melhores momentos"
+    },
+    {
+      "video_id": "8vh4IdQ2ue8",
+      "url": "https://www.youtube.com/watch?v=8vh4IdQ2ue8",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "BOTAFOGO X BRAGANTINO | AQUECIMENTO AO VIVO | COPA DO BRASIL FEMININA | #live | sportv",
+      "titulo": "AO VIVO: CORINTHIANS FECHA A 19ª RODADA DO BRASILEIRÃO | TÁ ON | sportv",
       "status": "upcoming",
-      "inicio_programado": "2026-07-22T18:00:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
+      "inicio_programado": "2026-07-23T12:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "ACeu7VpcBAE",
+      "url": "https://www.youtube.com/watch?v=ACeu7VpcBAE",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE PALMEIRAS ANALISA DUELO CONTRA O CORITIBA PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-23T12:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "G7BpC_UC9Hw",
+      "url": "https://www.youtube.com/watch?v=G7BpC_UC9Hw",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: BRASIL X ALEMANHA | DESAFIO INTERNACIONAL DE JUDÔ | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-30T19:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "HT8QACkIe3I",
@@ -649,24 +655,34 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "PIBjtme4ZjE",
-      "url": "https://www.youtube.com/watch?v=PIBjtme4ZjE",
+      "video_id": "HhjBb3SV0tg",
+      "url": "https://www.youtube.com/watch?v=HhjBb3SV0tg",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO! GE SANTOS ANALISA PARTIDA DA COPA SUL-AMERICANA | #podcast | ge.globo",
+      "titulo": "AO VIVO! GE VASCO ANALISA DUELO COM O INDEPENDIENTE MEDELLÍN NA SUL-AMERICANA | #podcast | ge.globo",
       "status": "upcoming",
-      "inicio_programado": "2026-07-22T16:00:00-03:00",
+      "inicio_programado": "2026-07-23T12:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "SnRsSfnfdw0",
-      "url": "https://www.youtube.com/watch?v=SnRsSfnfdw0",
+      "video_id": "MW4myJLsLaA",
+      "url": "https://www.youtube.com/watch?v=MW4myJLsLaA",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: FLAMENGO VIAJA COM ARRASCAETA E PALMEIRAS ENFRENTA O CORITIBA | TÁ ON | sportv",
+      "titulo": "AO VIVO! GE SÃO PAULO ANALISA DUELO CONTRA O ATHLETICO-PR PELO BRASILEIRÃO | #podcast | ge.globo",
       "status": "upcoming",
-      "inicio_programado": "2026-07-22T12:15:00-03:00",
-      "motivo": "horário incompatível (435 min de diferença)"
+      "inicio_programado": "2026-07-23T15:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "PE6i8ggnw7Y",
+      "url": "https://www.youtube.com/watch?v=PE6i8ggnw7Y",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE FLAMENGO ANALISA DUELO CONTRA A CHAPECOENSE PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "live",
+      "inicio_programado": "2026-07-23T11:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "ZdyEGynme70",
@@ -679,6 +695,16 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
+      "video_id": "cMMMIyVM2fg",
+      "url": "https://www.youtube.com/watch?v=cMMMIyVM2fg",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE CRUZEIRO ANALISA DUELO CONTRA O INTERNACIONAL PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-23T16:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "jpnlIxDADJs",
       "url": "https://www.youtube.com/watch?v=jpnlIxDADJs",
       "fonte": "getv",
@@ -689,48 +715,27 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "kVnvdsolpWQ",
-      "url": "https://www.youtube.com/watch?v=kVnvdsolpWQ",
+      "video_id": "pBVRPAOFd3M",
+      "url": "https://www.youtube.com/watch?v=pBVRPAOFd3M",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "MEU TIME CONTRATOU ALGUÉM? QUEM SE DEU MELHOR NA JANELA DURANTE A COPA? | Panela sportv",
+      "titulo": "FLAMENGO X CORINTHIANS | AO VIVO E COM IMAGENS | BRASILEIRÃO FEMININO 2026 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-07-22T23:30:00-03:00",
+      "inicio_programado": "2026-08-03T17:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "rDMIANYJp3Q",
-      "url": "https://www.youtube.com/watch?v=rDMIANYJp3Q",
+      "video_id": "skX4ZvtH5iM",
+      "url": "https://www.youtube.com/watch?v=skX4ZvtH5iM",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO! GE ATLÉTICO-MG ANALISA DUELO CONTRA BAHIA PELO BRASILEIRÃO | #podcast | ge.globo",
+      "titulo": "AO VIVO: ATHLETICO PR X VITÓRIA | OITAVAS DE FINAL | COPA DO BRASIL 2026 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-07-22T14:30:00-03:00",
+      "inicio_programado": "2026-08-03T19:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401841152",
-      "rodada": 19,
-      "jogo": "Coritiba x Palmeiras",
-      "data_iso": "2026-07-22T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401841150",
-      "rodada": 19,
-      "jogo": "Chapecoense x Flamengo",
-      "data_iso": "2026-07-22T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401841154",
-      "rodada": 19,
-      "jogo": "Internacional x Cruzeiro",
-      "data_iso": "2026-07-22T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401841151",
       "rodada": 19,
@@ -987,5 +992,5 @@
     },
     "observacao": "search.list não é mais usado. Custo: ~2 unidades (channels) + ~20 (playlistItems 500 itens) + ~10 (videos) por execução ≈ 32 unidades. Cabe 300+ execuções/dia dentro das 10.000 gratuitas."
   },
-  "atualizado_em": "2026-07-22T11:22:52-03:00"
+  "atualizado_em": "2026-07-23T11:29:18-03:00"
 }
