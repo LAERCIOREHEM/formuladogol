@@ -569,12 +569,31 @@ def aggregate_from_games(
     counts: dict[tuple[str, str], int] = defaultdict(int)
     display: dict[tuple[str, str], tuple[str, str]] = {}
     match_ids: dict[tuple[str, str], set[str]] = defaultdict(set)
+    appearance_ids: dict[tuple[str, str], set[str]] = defaultdict(set)
+    appearance_display: dict[tuple[str, str], tuple[str, str]] = {}
+    games_with_lineups = 0
     ignored_own_goals = 0
     invalid_games = 0
 
     for event_id, game in games.items():
         if not isinstance(game, dict):
             continue
+        players = game.get("jogadores") or []
+        if isinstance(players, list) and players:
+            games_with_lineups += 1
+            for player in players:
+                if not isinstance(player, dict):
+                    continue
+                player_name = str(player.get("nome") or player.get("name") or "").strip()
+                player_team = para_canonico(player.get("time") or player.get("team")) or str(
+                    player.get("time") or player.get("team") or ""
+                ).strip()
+                if not player_name or not player_team or suspicious_name(player_name):
+                    continue
+                player_key = (norm(player_name), norm(player_team))
+                appearance_ids[player_key].add(str(event_id))
+                appearance_display.setdefault(player_key, (player_name, player_team))
+
         if not (game.get("validacao_eventos") or {}).get("gols_ok", True):
             invalid_games += 1
             continue
@@ -600,22 +619,36 @@ def aggregate_from_games(
                 display.setdefault(key, (name, team))
                 match_ids[key].add(str(event_id))
 
+    def appearance_count(name: str, team: str) -> int | None:
+        exact = appearance_ids.get((norm(name), norm(team)))
+        if exact:
+            return len(exact)
+        compatible = [
+            ids for candidate, ids in appearance_ids.items()
+            if candidate[1] == norm(team)
+            and _name_compatible(appearance_display.get(candidate, (candidate[0], team))[0], name)
+        ]
+        # Só aceita alias quando existe um único candidato no mesmo clube.
+        # Isso evita fundir, por exemplo, "Pedro" com "João Pedro".
+        if len(compatible) != 1:
+            return None
+        return len(compatible[0]) or None
+
     ranking: list[dict[str, Any]] = []
     for key, value in counts.items():
         name, team = display[key]
+        games_played = appearance_count(name, team)
         ranking.append({
             "athlete_id": "",
             "nome": name,
             "time": team,
             "team_id": "",
             "escudo": (ESCUDOS_TIMES.get(team) or {}).get("escudo", ""),
-            # Os summaries confirmam partidas com participação em gol, mas não
-            # todas as aparições do atleta. Não publicamos "0 jogos" nem uma
-            # média inventada.
-            "jogos": None,
+            "jogos": games_played,
             field: int(value),
             "jogos_com_participacao": len(match_ids[key]),
-            "origem_complementar": "eventos validados das partidas (fonte primária)",
+            "origem_complementar": "eventos e escalações validados das partidas (fonte primária)",
+            "origem_jogos": "escalações ESPN summary" if games_played else "",
         })
     ranking.sort(key=lambda x: (-int(x[field]), norm(x["nome"]), norm(x["time"])))
     for pos, item in enumerate(ranking, 1):
@@ -626,6 +659,11 @@ def aggregate_from_games(
         "jogadores": len(ranking),
         "total_eventos_contabilizados": sum(counts.values()),
         "gols_contra_ignorados": ignored_own_goals if stat == "gols" else 0,
+        "jogos_com_escalacoes": games_with_lineups,
+        "aparicoes_confirmadas": sum(len(ids) for ids in appearance_ids.values()),
+        "jogadores_com_jogos": sum(1 for item in ranking if int(item.get("jogos") or 0) > 0),
+        "jogadores_sem_jogos": sum(1 for item in ranking if int(item.get("jogos") or 0) <= 0),
+        "aparicoes_locais_autoritativas": bool(games and games_with_lineups == len(games)),
     }
     return ranking, audit
 
@@ -636,6 +674,7 @@ def merge_reference_and_local(
     stat: str,
     *,
     prefer_local: bool,
+    allow_reference_games: bool = False,
 ) -> list[dict[str, Any]]:
     """Combina a fonte de referência com os eventos locais.
 
@@ -666,14 +705,22 @@ def merge_reference_and_local(
             idx, complementary = candidates[0]
             used_secondary.add(idx)
             if prefer_local:
-                # Nome e identificadores podem ser aproveitados da referência,
-                # mas nunca o total nem os "jogos" potencialmente congelados.
+                # Gols/assistências locais continuam soberanos. A referência
+                # fornece identificação e, apenas quando foi coletada nesta
+                # execução, pode completar aparições ausentes.
                 row["nome"] = str(complementary.get("nome") or row.get("nome") or "")
                 row["athlete_id"] = str(complementary.get("athlete_id") or row.get("athlete_id") or "")
                 row["team_id"] = str(complementary.get("team_id") or row.get("team_id") or "")
-                row["jogos"] = None
-                row.pop("media_por_jogo", None)
-                row["origem_complementar"] = "eventos validados; referência usada apenas para identificação"
+                local_games = int(row.get("jogos") or 0)
+                reference_games = int(complementary.get("jogos") or 0)
+                if local_games <= 0 and allow_reference_games and reference_games > 0:
+                    row["jogos"] = reference_games
+                    row["origem_jogos"] = "ranking ESPN coletado na execução atual"
+                row["origem_complementar"] = (
+                    "eventos e escalações validados; referência usada para identificação"
+                    if int(row.get("jogos") or 0) > 0
+                    else "eventos validados; referência usada apenas para identificação"
+                )
             else:
                 row[field] = max(
                     int(row.get(field) or 0),
@@ -712,7 +759,14 @@ def merge_reference_and_local(
     for pos, item in enumerate(dedup, 1):
         item["posicao"] = pos
         games = int(item.get("jogos") or 0)
-        if games > 0 and not prefer_local:
+        participation_games = int(item.get("jogos_com_participacao") or 0)
+        if games > 0:
+            if games < participation_games:
+                # Dado impossível: não publica uma aparição menor do que os
+                # jogos em que houve gol/assistência confirmada.
+                item["jogos"] = participation_games
+                games = participation_games
+                item["origem_jogos"] = "mínimo validado pelos eventos das partidas"
             item["media_por_jogo"] = round(int(item.get(field) or 0) / games, 3)
         else:
             item.pop("media_por_jogo", None)
@@ -740,6 +794,32 @@ def validate_completeness(ranking: list[dict[str, Any]], stat: str, local_audit:
         elif local_total and merged_total < int(local_total * 0.90):
             errors.append(f"gols: cobertura insuficiente ({merged_total}/{local_total})")
     return errors
+
+
+def validate_games_coverage(
+    ranking: list[dict[str, Any]], stat: str, local_audit: dict[str, Any]
+) -> list[str]:
+    errors: list[str] = []
+    visible_missing = [
+        str(x.get("nome") or "") for x in ranking[:5] if int(x.get("jogos") or 0) <= 0
+    ]
+    if visible_missing:
+        errors.append(
+            f"{stat}: ranking visível tem {len(visible_missing)} jogador(es) sem número de jogos"
+        )
+    if not local_audit.get("aparicoes_locais_autoritativas"):
+        return errors
+    missing = [str(x.get("nome") or "") for x in ranking if int(x.get("jogos") or 0) <= 0]
+    impossible = [
+        str(x.get("nome") or "") for x in ranking
+        if int(x.get("jogos") or 0) < int(x.get("jogos_com_participacao") or 0)
+    ]
+    if missing:
+        errors.append(f"{stat}: {len(missing)} jogador(es) sem número de jogos apesar de escalações completas")
+    if impossible:
+        errors.append(f"{stat}: número de jogos menor que as partidas com participação para {len(impossible)} jogador(es)")
+    return errors
+
 
 def self_test() -> None:
     fixture = {
@@ -784,6 +864,10 @@ def self_test() -> None:
     games_fixture = {
         "j1": {
             "validacao_eventos": {"gols_ok": True},
+            "jogadores": [
+                {"nome": "Pedro", "time": "Flamengo"},
+                {"nome": "Samuel Lino", "time": "Flamengo"},
+            ],
             "gols": [
                 {"jogador": "Pedro", "time": "Flamengo", "assistencias": ["Samuel Lino"], "descricao": "Goal"},
                 {"jogador": "Pedro", "time": "Flamengo", "assistencias": [], "descricao": "Goal"},
@@ -792,6 +876,10 @@ def self_test() -> None:
         },
         "j2": {
             "validacao_eventos": {"gols_ok": True},
+            "jogadores": [
+                {"nome": "Pedro", "time": "Flamengo"},
+                {"nome": "Samuel Lino", "time": "Flamengo"},
+            ],
             "gols": [
                 {"jogador": "Pedro", "time": "Flamengo", "assistencias": ["Samuel Lino"], "descricao": "Goal"},
             ],
@@ -801,19 +889,30 @@ def self_test() -> None:
     local_assists, _ = aggregate_from_games(games_fixture, "assistencias")
     assert local_goals[0]["nome"] == "Pedro" and local_goals[0]["gols"] == 3
     assert local_goals[0]["jogos_com_participacao"] == 2
+    assert local_goals[0]["jogos"] == 2
     assert local_goals_audit["gols_contra_ignorados"] == 1
+    assert local_goals_audit["aparicoes_locais_autoritativas"] is True
     assert local_assists[0]["nome"] == "Samuel Lino" and local_assists[0]["assistencias"] == 2
+    assert not validate_games_coverage(local_goals, "gols", local_goals_audit)
+    assert validate_games_coverage([dict(local_goals[0], jogos=None)], "gols", {})
 
     stale_reference = [
         {"nome": "Pedro", "time": "Flamengo", "athlete_id": "235017", "jogos": 17, "gols": 1}
     ]
-    merged = merge_reference_and_local(stale_reference, local_goals, "gols", prefer_local=True)
+    merged = merge_reference_and_local(
+        stale_reference, local_goals, "gols", prefer_local=True, allow_reference_games=False
+    )
     assert merged[0]["gols"] == 3, "snapshot antigo não pode sobrescrever eventos validados"
     assert merged[0]["athlete_id"] == "235017"
-    assert merged[0]["jogos"] is None, "aparências desatualizadas não podem gerar média falsa"
+    assert merged[0]["jogos"] == 2, "escalações locais devem prevalecer sobre snapshot antigo"
+    missing_local_games = [dict(local_goals[0], jogos=None)]
+    fresh = merge_reference_and_local(
+        stale_reference, missing_local_games, "gols", prefer_local=True, allow_reference_games=True
+    )
+    assert fresh[0]["jogos"] == 17, "coleta ESPN atual pode completar aparições ausentes"
     fallback = merge_reference_and_local(stale_reference, local_goals, "gols", prefer_local=False)
     assert fallback[0]["gols"] == 3, "fallback não pode apagar eventos locais já confirmados"
-    print("SELF-TEST OK: parser, eventos primários, gols contra, assistências, aliases e snapshot obsoleto.")
+    print("SELF-TEST OK: parser, escalações, aparições, eventos primários, gols contra, assistências e aliases.")
 
 
 def main() -> None:
@@ -846,12 +945,16 @@ def main() -> None:
         and not validate_ranking(local_assists, "assistencias")
     )
 
+    local_appearances_complete = bool(
+        local_audit_goals.get("aparicoes_locais_autoritativas")
+        and local_audit_assists.get("aparicoes_locais_autoritativas")
+    )
     fixtures_requested = bool(args.fixture_gols or args.fixture_assistencias)
-    if local_authoritative and not fixtures_requested:
+    if local_authoritative and local_appearances_complete and not fixtures_requested:
         collected_goals, collected_assists = [], []
         log_goals = log_assists = [{
             "status": "nao_consultada",
-            "motivo": "eventos locais completos e validados",
+            "motivo": "eventos e escalações locais completos e validados",
         }]
         source_goals = source_assists = "dados-br/jogos-detalhes.json"
         errors_new_goals = errors_new_assists = []
@@ -874,21 +977,29 @@ def main() -> None:
         "artilharia": reference_goals is prev_goals,
         "assistencias": reference_assists is prev_assists,
     }
+    fresh_reference_games = {
+        "artilharia": bool(reference_goals is collected_goals and collected_goals and not errors_new_goals),
+        "assistencias": bool(reference_assists is collected_assists and collected_assists and not errors_new_assists),
+    }
     used_previous = {
         "artilharia": not local_authoritative and previous_as_reference["artilharia"],
         "assistencias": not local_authoritative and previous_as_reference["assistencias"],
     }
     goals = merge_reference_and_local(
-        reference_goals, local_goals, "gols", prefer_local=local_authoritative
+        reference_goals, local_goals, "gols", prefer_local=local_authoritative,
+        allow_reference_games=fresh_reference_games["artilharia"],
     )
     assists = merge_reference_and_local(
-        reference_assists, local_assists, "assistencias", prefer_local=local_authoritative
+        reference_assists, local_assists, "assistencias", prefer_local=local_authoritative,
+        allow_reference_games=fresh_reference_games["assistencias"],
     )
 
     final_errors = (
         validate_ranking(goals, "gols") + validate_ranking(assists, "assistencias")
         + validate_completeness(goals, "gols", local_audit_goals)
         + validate_completeness(assists, "assistencias", local_audit_assists)
+        + validate_games_coverage(goals, "gols", local_audit_goals)
+        + validate_games_coverage(assists, "assistencias", local_audit_assists)
     )
     status = "valido" if not final_errors else "invalido"
     completeness = {
@@ -903,6 +1014,8 @@ def main() -> None:
             "lider_gols": goals[0] if goals else None,
             "lider_assistencias": assists[0] if assists else None,
             "eventos_locais_autoritativos": local_authoritative,
+            "aparicoes_locais_autoritativas": local_appearances_complete,
+            "referencia_atual_usada_para_jogos": fresh_reference_games,
             "preservado_de_execucao_anterior": used_previous,
             "snapshot_anterior_usado_apenas_para_identificacao": (
                 previous_as_reference if local_authoritative else {"artilharia": False, "assistencias": False}
@@ -932,8 +1045,8 @@ def main() -> None:
 
     payload = {
         "atualizado_em": iso_agora_brt(), "temporada": TEMPORADA,
-        "fonte": "Eventos validados das partidas (ESPN summary); ranking ESPN apenas como fallback",
-        "metodologia": "Reconstrói gols e assistências jogo a jogo. Quando todos os eventos estão completos e validados, seus totais prevalecem; snapshots externos servem somente para identificação e fallback.",
+        "fonte": "Eventos e escalações validados das partidas (ESPN summary); ranking ESPN apenas como fallback",
+        "metodologia": "Reconstrói gols, assistências e jogos disputados partida a partida. Eventos validados definem os totais; escalações confirmam aparições; ranking ESPN atual serve somente para identificação e fallback de aparições quando necessário.",
         "status": "valido", "preservado_de_execucao_anterior": used_previous,
         "fonte_aceita": {"artilharia": source_goals, "assistencias": source_assists},
         "completude": completeness,
