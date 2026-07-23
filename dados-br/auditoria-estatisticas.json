@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-07-23T11:03:43.566095-03:00",
+  "gerado_em": "2026-07-23T13:10:45.628549-03:00",
   "status": "ok",
   "resumo": {
     "clubes": 20,
@@ -7,77 +7,78 @@
     "jogos_com_detalhes": 187,
     "jogos_com_estatisticas": 187,
     "jogos_com_publico": 178,
-    "artilheiros": 219,
+    "artilheiros": 220,
     "assistentes": 199,
     "lider_gols": {
-      "posicao": 1,
       "athlete_id": "",
-      "nome": "Kevin Viveros",
-      "time": "Athletico-PR",
+      "nome": "Pedro",
+      "time": "Flamengo",
       "team_id": "",
-      "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg",
-      "jogos": 17,
-      "gols": 11,
-      "media_por_jogo": 0.647,
-      "jogos_com_participacao": 8,
-      "origem_complementar": "ranking ESPN conferido nos eventos"
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
+      "jogos": null,
+      "gols": 12,
+      "jogos_com_participacao": 9,
+      "origem_complementar": "eventos validados; referência usada apenas para identificação",
+      "posicao": 1
     },
     "lider_assistencias": {
-      "posicao": 1,
       "athlete_id": "",
       "nome": "Andreas Pereira",
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 17,
+      "jogos": null,
       "assistencias": 9,
-      "media_por_jogo": 0.529,
       "jogos_com_participacao": 6,
-      "origem_complementar": "ranking ESPN conferido nos eventos"
+      "origem_complementar": "eventos validados; referência usada apenas para identificação",
+      "posicao": 1
     },
     "erros_criticos": 0,
     "avisos": 0
   },
   "fontes": {
-    "lideres": "ESPN · ranking oficial + eventos validados das partidas",
+    "lideres": "Eventos validados das partidas (ESPN summary); ranking ESPN apenas como fallback",
     "lideres_aceitas": {
-      "artilharia": "",
-      "assistencias": ""
+      "artilharia": "dados-br/jogos-detalhes.json",
+      "assistencias": "dados-br/jogos-detalhes.json"
     },
     "detalhes": "ESPN summary",
-    "competicao": "ESPN · tabela, resultados, summaries e rankings oficiais"
+    "competicao": "ESPN · tabela, resultados e eventos validados dos summaries"
   },
   "auditorias_relacionadas": {
     "lideres": {
-      "artilheiros": 219,
+      "artilheiros": 220,
       "assistentes": 199,
       "lider_gols": {
-        "posicao": 1,
         "athlete_id": "",
-        "nome": "Kevin Viveros",
-        "time": "Athletico-PR",
+        "nome": "Pedro",
+        "time": "Flamengo",
         "team_id": "",
-        "escudo": "https://s.sde.globo.com/media/organizations/2026/01/07/Athletico-PR.svg",
-        "jogos": 17,
-        "gols": 11,
-        "media_por_jogo": 0.647,
-        "jogos_com_participacao": 8,
-        "origem_complementar": "ranking ESPN conferido nos eventos"
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
+        "jogos": null,
+        "gols": 12,
+        "jogos_com_participacao": 9,
+        "origem_complementar": "eventos validados; referência usada apenas para identificação",
+        "posicao": 1
       },
       "lider_assistencias": {
-        "posicao": 1,
         "athlete_id": "",
         "nome": "Andreas Pereira",
         "time": "Palmeiras",
         "team_id": "",
         "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-        "jogos": 17,
+        "jogos": null,
         "assistencias": 9,
-        "media_por_jogo": 0.529,
         "jogos_com_participacao": 6,
-        "origem_complementar": "ranking ESPN conferido nos eventos"
+        "origem_complementar": "eventos validados; referência usada apenas para identificação",
+        "posicao": 1
       },
+      "eventos_locais_autoritativos": true,
       "preservado_de_execucao_anterior": {
+        "artilharia": false,
+        "assistencias": false
+      },
+      "snapshot_anterior_usado_apenas_para_identificacao": {
         "artilharia": true,
         "assistencias": true
       },
@@ -88,7 +89,10 @@
           "jogadores": 220,
           "total_eventos_contabilizados": 483,
           "gols_contra_ignorados": 15,
-          "jogadores_publicados": 219
+          "jogos_pendentes_detalhes": 0,
+          "total_jogos_declarado": 187,
+          "eventos_locais_autoritativos": true,
+          "jogadores_publicados": 220
         },
         "assistencias": {
           "jogos_lidos": 187,
@@ -96,6 +100,9 @@
           "jogadores": 199,
           "total_eventos_contabilizados": 331,
           "gols_contra_ignorados": 0,
+          "jogos_pendentes_detalhes": 0,
+          "total_jogos_declarado": 187,
+          "eventos_locais_autoritativos": true,
           "jogadores_publicados": 199
         }
       }
