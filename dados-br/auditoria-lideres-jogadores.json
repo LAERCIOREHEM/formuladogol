@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-07-23T17:52:45.679758-03:00",
+  "gerado_em": "2026-07-23T19:10:53.635264-03:00",
   "temporada": 2026,
   "status": "valido",
   "resumo": {
@@ -11,11 +11,13 @@
       "time": "Flamengo",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
-      "jogos": null,
+      "jogos": 18,
       "gols": 12,
       "jogos_com_participacao": 9,
-      "origem_complementar": "eventos validados; referência usada apenas para identificação",
-      "posicao": 1
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 1,
+      "media_por_jogo": 0.667
     },
     "lider_assistencias": {
       "athlete_id": "",
@@ -23,13 +25,20 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": null,
+      "jogos": 18,
       "assistencias": 9,
       "jogos_com_participacao": 6,
-      "origem_complementar": "eventos validados; referência usada apenas para identificação",
-      "posicao": 1
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 1,
+      "media_por_jogo": 0.5
     },
     "eventos_locais_autoritativos": true,
+    "aparicoes_locais_autoritativas": true,
+    "referencia_atual_usada_para_jogos": {
+      "artilharia": false,
+      "assistencias": false
+    },
     "preservado_de_execucao_anterior": {
       "artilharia": false,
       "assistencias": false
@@ -45,6 +54,11 @@
         "jogadores": 220,
         "total_eventos_contabilizados": 483,
         "gols_contra_ignorados": 15,
+        "jogos_com_escalacoes": 187,
+        "aparicoes_confirmadas": 5905,
+        "jogadores_com_jogos": 220,
+        "jogadores_sem_jogos": 0,
+        "aparicoes_locais_autoritativas": true,
         "jogos_pendentes_detalhes": 0,
         "total_jogos_declarado": 187,
         "eventos_locais_autoritativos": true,
@@ -56,6 +70,11 @@
         "jogadores": 199,
         "total_eventos_contabilizados": 331,
         "gols_contra_ignorados": 0,
+        "jogos_com_escalacoes": 187,
+        "aparicoes_confirmadas": 5905,
+        "jogadores_com_jogos": 195,
+        "jogadores_sem_jogos": 4,
+        "aparicoes_locais_autoritativas": true,
         "jogos_pendentes_detalhes": 0,
         "total_jogos_declarado": 187,
         "eventos_locais_autoritativos": true,
@@ -71,13 +90,13 @@
     "artilharia": [
       {
         "status": "nao_consultada",
-        "motivo": "eventos locais completos e validados"
+        "motivo": "eventos e escalações locais completos e validados"
       }
     ],
     "assistencias": [
       {
         "status": "nao_consultada",
-        "motivo": "eventos locais completos e validados"
+        "motivo": "eventos e escalações locais completos e validados"
       }
     ]
   },
