@@ -32,7 +32,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="favicon-formula-do-gol-512.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-formula-do-gol.png">
   <link rel="shortcut icon" href="favicon-formula-do-gol.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260723-mobile-ranking-leaders-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260723-player-card-fix-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260718-ajustes-mobile-escudos-v3">
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
@@ -41,6 +41,60 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-3956SD5HFC');
+</script>
+<!-- Schema.org structured data — FAQPage para as perguntas da metodologia -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "@id": "https://formuladogol.com.br/estatisticas.html#webpage",
+      "url": "https://formuladogol.com.br/estatisticas.html",
+      "name": "Probabilidades e estatísticas do Brasileirão 2026 — Fórmula do Gol",
+      "description": "Probabilidades de título, Libertadores e rebaixamento calculadas com 2 milhões de simulações. Artilheiros, assistências, ranking de desempenho AF-Score.",
+      "isPartOf": { "@id": "https://formuladogol.com.br/#website" },
+      "inLanguage": "pt-BR"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Como o Fórmula do Gol calcula as probabilidades do Brasileirão?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Usamos um modelo log-linear de gols com distribuição de Poisson e estimação bayesiana (MAP). Os parâmetros de ataque, defesa e vantagem de mando de cada clube são ajustados sobre mais de 1.100 partidas históricas. O campeonato é então simulado 2 milhões de vezes pelo método Monte Carlo, e a probabilidade publicada é a frequência de cada desfecho nessas simulações."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "O que é o AF-Score e o Ranking de Desempenho?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "O AF-Score é um índice próprio que combina cinco dimensões de desempenho: ataque, defesa, domínio de jogo, eficiência e disciplina. O Ranking de Desempenho ordena os 20 clubes do Brasileirão por esse índice, permitindo comparar desempenho real independentemente da tabela oficial."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "O que significa chance de Libertadores ou rebaixamento?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "É a proporção de simulações em que o clube obteve aquele desfecho ao final de todas as 380 partidas do Brasileirão 2026. Valores abaixo de 0,1% significam que o evento foi raríssimo ou não apareceu nas simulações — mas não é impossível. O modelo é atualizado após cada rodada."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "As probabilidades do Fórmula do Gol são apostas?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Não. As probabilidades exibidas são estimativas estatísticas de um modelo matemático. Não são odds de casas de apostas, não possuem margem de lucro embutida e não constituem incentivo a apostas. São análises quantitativas para informação e entretenimento esportivo."
+          }
+        }
+      ]
+    }
+  ]
+}
 </script>
 </head>
 <body>
@@ -61,6 +115,7 @@
     </nav>
 
     <main>
+      <h1 class="sr-only">Probabilidades e estatísticas do Brasileirão 2026</h1>
       <section class="stats-summary-grid" id="cards-resumo" aria-label="Destaques do campeonato" aria-live="polite"></section>
 
       <section class="stats-tabs-panel panel" aria-label="Seções de estatísticas">
@@ -317,5 +372,15 @@
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260722-rotas-limpas-v2"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
+
+<!-- Conteúdo textual estruturado para indexação -->
+<section class="sr-only" aria-label="Sobre as estatísticas e probabilidades">
+  <h2>Artilheiros e assistências do Brasileirão 2026</h2>
+  <p>O ranking de artilheiros e assistências é reconstruído diretamente dos eventos de cada partida validada, garantindo atualização mais precisa do que fontes agregadas. Gols contra não são contabilizados na artilharia individual.</p>
+  <h2>Probabilidade de título, Libertadores, Sul-Americana e rebaixamento</h2>
+  <p>As probabilidades de cada clube são calculadas simulando o restante do campeonato 2 milhões de vezes. Cada simulação leva em conta o calendário restante, a força estimada de cada time, o mando de campo e o estado atual das copas (Libertadores, Sul-Americana e Copa do Brasil) que influenciam as vagas continentais.</p>
+  <h2>Como interpretar os percentuais de probabilidade</h2>
+  <p>Um clube com 45% de chance de título não vai ganhar com certeza — significa que em 45 de cada 100 simulações ele terminaria campeão dado o estado atual da competição. Os valores são atualizados após cada rodada e podem variar significativamente conforme os resultados reais acontecem.</p>
+</section>
 </body>
 </html>

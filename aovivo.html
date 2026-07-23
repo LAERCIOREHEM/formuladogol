@@ -33,7 +33,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-formula-do-gol.png">
   <link rel="shortcut icon" href="favicon-formula-do-gol.ico">
   <meta name="theme-color" content="#0a161e">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260712-aovivo-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260723-player-card-fix-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260718-ajustes-mobile-escudos-v3">
   <link rel="stylesheet" href="css/br-aovivo.css?v=20260721-escalacoes-resultado-v1">
 <!-- Google Analytics 4 -->
@@ -43,6 +43,24 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-3956SD5HFC');
+</script>
+<!-- Schema.org structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": "https://formuladogol.com.br/aovivo.html#webpage",
+  "url": "https://formuladogol.com.br/aovivo.html",
+  "name": "Chances de vitória ao vivo do Brasileirão — Fórmula do Gol",
+  "description": "Probabilidade dinâmica de vitória, empate e derrota atualizada a cada minuto do jogo. Placar ao vivo, transmissão e chance dinâmica de resultado do Brasileirão 2026.",
+  "isPartOf": { "@id": "https://formuladogol.com.br/#website" },
+  "inLanguage": "pt-BR",
+  "about": {
+    "@type": "SportsEvent",
+    "name": "Campeonato Brasileiro Série A 2026",
+    "sport": "Futebol"
+  }
+}
 </script>
 </head>
 <body>
@@ -63,6 +81,7 @@
     </nav>
 
     <main>
+      <h1 class="sr-only">Chances de vitória ao vivo no Brasileirão 2026</h1>
       <div id="live-alert" class="live-alert" role="status" aria-live="polite"></div>
       <section id="live-switcher" class="live-switcher" aria-label="Escolher partida" hidden></section>
       <section id="live-app" aria-live="polite">
@@ -93,5 +112,14 @@
   <script src="js/br-config.js?v=20260723-copa-publica-v1"></script>
   <script src="js/br-menu.js?v=20260723-copa-publica-v1"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
+
+<!-- Conteúdo textual estruturado para indexação -->
+<section class="sr-only" aria-label="Sobre as probabilidades ao vivo">
+  <h2>Probabilidade dinâmica de resultado ao vivo</h2>
+  <p>Durante cada partida do Brasileirão 2026, o Fórmula do Gol recalcula automaticamente a probabilidade de vitória do mandante, empate e vitória do visitante. O cálculo usa o modelo Poisson condicional: dados o placar atual e o tempo restante, estimamos quantos gols cada time deve marcar e convertemos isso em chance de cada desfecho.</p>
+  <p>Um jogo que está 2 a 0 aos 80 minutos apresentará probabilidade de vitória para o time à frente próxima de 99%, com valores residuais para empate e derrota. Esses valores nunca chegam a 0% enquanto o árbitro não apitar o fim — porque em futebol, nada é impossível até o apito final.</p>
+  <h3>Fatores que influenciam a chance ao vivo</h3>
+  <p>Placar atual, minutos restantes, vantagem de mando de campo e cartões vermelhos são os fatores que o modelo considera em tempo real. As taxas de gol base vêm do modelo pré-jogo, que foi calibrado sobre mais de 1.100 partidas históricas do Brasileirão.</p>
+</section>
 </body>
 </html>

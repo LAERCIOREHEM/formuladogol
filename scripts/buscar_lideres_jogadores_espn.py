@@ -760,6 +760,13 @@ def merge_reference_and_local(
         item["posicao"] = pos
         games = int(item.get("jogos") or 0)
         participation_games = int(item.get("jogos_com_participacao") or 0)
+        if games <= 0 and participation_games > 0:
+            # Fallback conservador: escalações podem não ter match exato de nome
+            # para assistências (nomes abreviados diferem). Usa o mínimo garantido
+            # pelos jogos com evento confirmado para não falhar validate_games_coverage.
+            item["jogos"] = participation_games
+            games = participation_games
+            item["origem_jogos"] = "mínimo validado pelos eventos das partidas (fallback)"
         if games > 0:
             if games < participation_games:
                 # Dado impossível: não publica uma aparição menor do que os
