@@ -50,19 +50,6 @@
 <!-- Descrição geral para SEO -->
 <meta name="description" content="Acompanhe jogos, tabela, resultados, estatísticas, clubes e história do Brasileirão 2026.">
 
-<script>
-  (function () {
-    try {
-      var view = String(new URLSearchParams(location.search || '').get('view') || '').toLowerCase();
-      var path = String(location.pathname || '').replace(/\/+$/, '').toLowerCase();
-      if (path === '/bolao') view = 'rank';
-      else if (path === '/aniversariantes') view = 'aniversariantes';
-      if (view === 'rank' || view === 'aniversariantes' || view === 'participantes') {
-        document.documentElement.classList.add('br-private-pending');
-      }
-    } catch (_) {}
-  })();
-</script>
 <style>
   :root {
     --bg: #0f1419;
@@ -2534,21 +2521,15 @@ body > .container > section.hero > img {
       <img src="img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high">
     </div>
   </header>
-  <nav class="nav" data-br-auth-menu aria-label="Menu principal">
-    <button type="button" onclick="setView('jogos')" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</button>
-    <button type="button" onclick="location.href='aovivo.html'" id="btn-aovivo">🔴 Ao vivo</button>
-    <button type="button" onclick="location.href='apostas.html'" id="btn-apostas" data-br-private hidden>🎯 Apostas</button>
-    <button type="button" onclick="setView('rank')" id="btn-rank" data-br-view="rank" data-br-private hidden>🏆 Bolão</button>
-    <button type="button" onclick="setView('tabela')" id="btn-tabela" data-br-view="tabela">📊 Tabela</button>
-    <button type="button" onclick="setView('resultados')" id="btn-resultados" data-br-view="resultados">✅ Resultados</button>
-    <button type="button" onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
-    <button type="button" onclick="location.href='clubes.html'" id="btn-clubes">🛡️ Clubes</button>
-    <button type="button" onclick="location.href='museu.html'" id="btn-museu">🏛️ Museu</button>
-    <button type="button" onclick="location.href='regras.html'" id="btn-regras" data-br-private hidden>ℹ️ Regras</button>
-    <button type="button" onclick="setView('aniversariantes')" id="btn-aniversariantes" data-br-view="aniversariantes" data-br-private hidden>🎂 Aniversariantes</button>
-    <button type="button" onclick="location.href='copa2026/'" id="btn-copa">🌎 Copa 2026</button>
-    <button type="button" id="btn-login" data-br-auth-link>🔐 Login</button>
-  </nav>
+	  <nav class="nav" data-br-auth-menu aria-label="Menu principal">
+	    <button type="button" onclick="setView('jogos')" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</button>
+	    <button type="button" onclick="location.href='aovivo.html'" id="btn-aovivo">🔴 Ao vivo</button>
+	    <button type="button" onclick="setView('tabela')" id="btn-tabela" data-br-view="tabela">📊 Tabela</button>
+	    <button type="button" onclick="setView('resultados')" id="btn-resultados" data-br-view="resultados">✅ Resultados</button>
+	    <button type="button" onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
+	    <button type="button" onclick="location.href='clubes.html'" id="btn-clubes">🛡️ Clubes</button>
+	    <button type="button" onclick="location.href='museu.html'" id="btn-museu">🏛️ Museu</button>
+	  </nav>
 
   <div class="status-bar" id="status-bar">
     <span id="status-text">Carregando...</span>
@@ -2565,7 +2546,7 @@ body > .container > section.hero > img {
   <section id="br-context-disclaimer" class="br-legal-context" aria-label="Informações legais desta página" hidden></section>
 
   <footer class="site-footer br-disclaimer">
-    <div class="br-footer-copy"><span class="footer-title">Brasileirão 2026 · Almoço de Sexta</span> — Site independente, informativo e sem fins lucrativos, mantido por um grupo de amigos. Não é afiliado, patrocinado ou endossado pela CBF, clubes, ESPN ou qualquer titular de direitos. Dados de jogos e resultados provêm da API pública da ESPN. Escudos, nomes e marcas dos clubes pertencem aos seus respectivos titulares e são exibidos exclusivamente para identificação e contexto esportivo. Os mascotes do site são criações originais inspiradas na identidade visual dos clubes — não reproduzem artes, personagens ou marcas protegidas.</div>
+	    <div class="br-footer-copy"><span class="footer-title">Fórmula do Gol</span> — Site independente, informativo e sem fins lucrativos, mantido por um grupo de amigos. Não é afiliado, patrocinado ou endossado pela CBF, clubes, ESPN ou qualquer titular de direitos. Dados de jogos e resultados provêm da API pública da ESPN. Escudos, nomes e marcas dos clubes pertencem aos seus respectivos titulares e são exibidos exclusivamente para identificação e contexto esportivo. Os mascotes do site são criações originais inspiradas na identidade visual dos clubes — não reproduzem artes, personagens ou marcas protegidas.</div>
     <div class="footer-sugestoes">Solicitações de remoção ou crédito: <button type="button" class="br-feedback-button" data-feedback>💬 Sugestões</button></div>
     <details class="br-source-note">
       <summary>ⓘ De onde vêm os dados?</summary>
@@ -2577,8 +2558,10 @@ body > .container > section.hero > img {
 <div id="modal-container"></div>
 
 <script>
+const BR_PUBLIC_ONLY = true;
+
 // ========================================================================
-// ADMINISTRAÇÃO — acesso centralizado na área autenticada
+// SITE PÚBLICO — módulos privados preservados no repositório e desativados
 // ========================================================================
 
 // O index.html não gera dados; ele apenas lê os JSONs publicados pelo GitHub Actions.
@@ -2591,26 +2574,9 @@ let timerAtualizacao = null;
 let refreshEmAndamento = false;
 
 // ========================================================================
-// PARTICIPANTES INICIAIS — vindos da planilha
+// Dados privados não são incorporados ao site público.
 // ========================================================================
-const PARTICIPANTES_INICIAIS = [
-  {nome:"LAÉRCIO", coracao:{time:"Bahia",palpite:5}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Cruzeiro",palpite:3},{time:"Fluminense",palpite:4},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
-  {nome:"VILELLA", coracao:{time:"Botafogo",palpite:6}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Cruzeiro",palpite:4},{time:"Fluminense",palpite:3},{time:"Athletico-PR",palpite:13}], cai:"Chapecoense"},
-  {nome:"BARRICHELLO (ARMÍNIO)", coracao:{time:"Corinthians",palpite:6}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Cruzeiro",palpite:7},{time:"Bahia",palpite:5},{time:"Athletico-PR",palpite:11}], cai:"Remo"},
-  {nome:"RODRIGO", coracao:{time:"Atlético-MG",palpite:3}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Cruzeiro",palpite:5},{time:"Fluminense",palpite:4},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
-  {nome:"MAX", coracao:{time:"São Paulo",palpite:6}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Atlético-MG",palpite:6},{time:"Internacional",palpite:8},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
-  {nome:"DÁRIO", coracao:{time:"Botafogo",palpite:4}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:2},{time:"Bragantino",palpite:6},{time:"Internacional",palpite:8},{time:"Athletico-PR",palpite:14}], cai:"Chapecoense"},
-  {nome:"MARCOS EDUARDO", coracao:{time:"Fluminense",palpite:4}, times:[{time:"Palmeiras",palpite:1},{time:"Cruzeiro",palpite:2},{time:"Flamengo",palpite:3},{time:"Botafogo",palpite:5},{time:"Athletico-PR",palpite:11}], cai:"Chapecoense"},
-  {nome:"JARDIM", coracao:{time:"Atlético-MG",palpite:1}, times:[{time:"Palmeiras",palpite:4},{time:"Flamengo",palpite:2},{time:"Fluminense",palpite:5},{time:"Cruzeiro",palpite:3},{time:"Athletico-PR",palpite:15}], cai:"Remo"},
-  {nome:"BOB BONECA", coracao:{time:"Cruzeiro",palpite:2}, times:[{time:"Palmeiras",palpite:1},{time:"Flamengo",palpite:3},{time:"Mirassol",palpite:4},{time:"Fluminense",palpite:5},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
-  {nome:"MARCO LOPES", coracao:{time:"Grêmio",palpite:6}, times:[{time:"Flamengo",palpite:1},{time:"Palmeiras",palpite:2},{time:"Cruzeiro",palpite:3},{time:"Fluminense",palpite:4},{time:"Athletico-PR",palpite:12}], cai:"Chapecoense"},
-  {nome:"RUBÃO", coracao:{time:"Coritiba",palpite:10}, times:[{time:"Flamengo",palpite:1},{time:"Palmeiras",palpite:2},{time:"Atlético-MG",palpite:5},{time:"Botafogo",palpite:7},{time:"Athletico-PR",palpite:12}], cai:"Chapecoense"},
-  {nome:"WELLINGTON PAPA", coracao:{time:"Flamengo",palpite:1}, times:[{time:"Cruzeiro",palpite:2},{time:"Palmeiras",palpite:3},{time:"São Paulo",palpite:4},{time:"Botafogo",palpite:5},{time:"Chapecoense",palpite:16}], cai:"Remo"},
-  {nome:"ZAQUEU", coracao:{time:"Flamengo",palpite:1}, times:[{time:"Palmeiras",palpite:2},{time:"Cruzeiro",palpite:3},{time:"Grêmio",palpite:4},{time:"São Paulo",palpite:5},{time:"Athletico-PR",palpite:12}], cai:"Remo"},
-  {nome:"MELILLO", coracao:{time:"Botafogo",palpite:1}, times:[{time:"Palmeiras",palpite:2},{time:"Flamengo",palpite:3},{time:"Corinthians",palpite:4},{time:"Fluminense",palpite:5},{time:"Athletico-PR",palpite:12}], cai:"Cruzeiro"},
-  {nome:"AUGUSTO", coracao:{time:"Botafogo",palpite:1}, times:[{time:"Palmeiras",palpite:2},{time:"Flamengo",palpite:3},{time:"Cruzeiro",palpite:4},{time:"Corinthians",palpite:5},{time:"Coritiba",palpite:13}], cai:"Remo"},
-  {nome:"WELLINGTON B.", coracao:{time:"Vasco da Gama",palpite:14}, times:[{time:"Cruzeiro",palpite:1},{time:"Flamengo",palpite:2},{time:"Palmeiras",palpite:3},{time:"Mirassol",palpite:4},{time:"Remo",palpite:15}], cai:"Vitória"}
-];
+const PARTICIPANTES_INICIAIS = [];
 
 const TIMES_LISTA = ["Athletico-PR","Atlético-MG","Bahia","Botafogo","Bragantino","Chapecoense","Corinthians","Coritiba","Cruzeiro","Flamengo","Fluminense","Grêmio","Internacional","Mirassol","Palmeiras","Remo","Santos","São Paulo","Vasco da Gama","Vitória"];
 
@@ -3196,38 +3162,9 @@ function htmlEstatisticasJogo(j) {
 
 
 // ========================================================================
-// MEMBROS DO GRUPO — 27 pessoas, com data de aniversário (dia/mês)
-// Lista pré-cadastrada. As datas serão preenchidas no Admin pelo usuário.
+// A lista privada de membros permanece fora do artefato público.
 // ========================================================================
-const MEMBROS_INICIAIS = [
-  {nome: "Antônio",                  aniversario: null},
-  {nome: "Alexandre Melillo Lopes",  aniversario: null},
-  {nome: "Jardim",                   aniversario: null},
-  {nome: "Jovail Vilela",            aniversario: null},
-  {nome: "Leonardo Farias",          aniversario: null},
-  {nome: "Luiz Henrique de Barros",  aniversario: null},
-  {nome: "Max",                      aniversario: null},
-  {nome: "Roberto Amorim",           aniversario: null},
-  {nome: "Uélito Borboleta",         aniversario: null},
-  {nome: "Wlamir Silva",             aniversario: null},
-  {nome: "Armínio TUPAL",            aniversario: null},
-  {nome: "Augusto TUPAL",            aniversario: null},
-  {nome: "Dario Araujo",             aniversario: null},
-  {nome: "Érica",                    aniversario: null},
-  {nome: "Marco Lopes",              aniversario: null},
-  {nome: "Marco Torres",             aniversario: null},
-  {nome: "Marcos Eduardo de Carvalho", aniversario: null},
-  {nome: "Roberto Monteiro",         aniversario: null},
-  {nome: "Rodrigo TUPAL",            aniversario: null},
-  {nome: "Rubens Mazer",             aniversario: null},
-  {nome: "Wellington Papa",          aniversario: null},
-  {nome: "Zaqueu SUMPE",             aniversario: null},
-  {nome: "Carlinhos",                aniversario: null},
-  {nome: "José Renato - ZeGrande",   aniversario: null},
-  {nome: "Marcio Vantil",            aniversario: null},
-  {nome: "Marcus Gaze",              aniversario: null},
-  {nome: "Sérgio Nogueira",          aniversario: null}
-];
+const MEMBROS_INICIAIS = [];
 
 // ========================================================================
 
@@ -3237,7 +3174,7 @@ const MEMBROS_INICIAIS = [
 let state = {
   tabela: [],          // [{ pos, time, pontos, jogos, vitorias, empates, derrotas, gp, gc, sg, aproveitamento }]
   participantes: [],
-  membros: [],         // 27 membros do grupo Almoço de Sexta
+  membros: [],         // conteúdo privado desativado no site público
   ultimaAtualizacao: null,
   ehAdmin: false,
   view: 'jogos',
@@ -3421,18 +3358,9 @@ function agendarProximaAtualizacao() {
 }
 
 async function carregarProbabilidadesBolao({ silencioso = false } = {}) {
-  try {
-    const resposta = await fetch('dados-br/probabilidades-bolao.json?t=' + Date.now(), { cache: 'no-store' });
-    if (!resposta.ok) throw new Error('HTTP ' + resposta.status);
-    const dados = await resposta.json();
-    if (dados && dados.status === 'ok' && Array.isArray(dados.participantes)) {
-      state.probabilidadesBolao = dados;
-      state.probabilidadesBolaoErro = null;
-    }
-  } catch (erro) {
-    state.probabilidadesBolaoErro = erro;
-    if (!silencioso) console.warn('AF-Previsão do bolão ainda indisponível:', erro);
-  }
+  state.probabilidadesBolao = null;
+  state.probabilidadesBolaoErro = null;
+  return null;
 }
 function projecaoBolaoPorNome(nome) {
   const lista = state.probabilidadesBolao && Array.isArray(state.probabilidadesBolao.participantes) ? state.probabilidadesBolao.participantes : [];
@@ -3467,36 +3395,16 @@ async function atualizarDadosDoServidor(silencioso = false) {
   tarefas.push(carregarJogos({ silencioso: true }));
   tarefas.push(carregarResultados({ silencioso: true }));
   tarefas.push(carregarRankingDesempenhoBr({ silencioso: true }));
-  tarefas.push(carregarProbabilidadesBolao({ silencioso: true }));
   await Promise.allSettled(tarefas);
-
-  // `refresh()` pode renderizar a classificação antes de o JSON das
-  // probabilidades do bolão terminar de carregar. Quando a página já abre
-  // diretamente no ranking privado, fazemos uma segunda renderização apenas
-  // após todas as fontes estarem resolvidas, evitando exibir "—" por corrida
-  // assíncrona mesmo com a projeção disponível no servidor.
-  if (state.view === 'rank' && state.probabilidadesBolao) {
-    render();
-  }
 }
 
 // ========================================================================
 // CARREGAMENTO PRINCIPAL
 // ========================================================================
 async function inicializar() {
-  // 1. Participantes: do localStorage ou padrão
-  if (!carregarParticipantes()) {
-    state.participantes = JSON.parse(JSON.stringify(PARTICIPANTES_INICIAIS));
-    salvarParticipantes();
-  }
-  // 1b. Membros do grupo: tenta carregar membros.json do servidor primeiro,
-  // depois localStorage, depois lista padrão.
-  if (!carregarMembros()) {
-    state.membros = JSON.parse(JSON.stringify(MEMBROS_INICIAIS));
-    salvarMembros();
-  }
-  // Carregamento assíncrono dos JSONs do servidor (atualiza se for mais novo)
-  carregarMembrosDoServidor();
+  // Dados de participantes e membros não são lidos nem gravados no modo público.
+  state.participantes = [];
+  state.membros = [];
 
   // Rotas limpas. As URLs antigas por query string continuam aceitas e
   // são normalizadas sem recarregar a página.
@@ -3507,17 +3415,15 @@ async function inicializar() {
   const viewInicial = viewRota || viewParam || viewSessao;
   if (viewInicial) {
     sessionStorage.removeItem('brViewInicial');
-    const privada = viewInicial === 'rank' || viewInicial === 'aniversariantes' || viewInicial === 'participantes';
-    const rotaExplicita = Boolean(viewRota || viewParam);
-    // Views privadas só podem ser abertas por URL explícita, que passa pelo
-    // guard de sessão. Isso impede que um valor antigo/manipulado no
-    // sessionStorage exponha ranking ou aniversariantes no carregamento.
-    if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes', 'participantes'].includes(viewInicial) && (!privada || rotaExplicita)) {
+    if (['tabela', 'jogos', 'resultados'].includes(viewInicial)) {
       state.view = viewInicial;
       const rotaLimpa = brRotaDaView(viewInicial);
       if (rotaLimpa && (viewParam || viewRota)) {
         history.replaceState({ brView: viewInicial }, '', rotaLimpa + (location.hash || ''));
       }
+    } else {
+      state.view = 'jogos';
+      history.replaceState({ brView: 'jogos' }, '', '/jogos' + (location.hash || ''));
     }
   }
 
@@ -3798,9 +3704,7 @@ function render() {
 const BR_ROTAS_VIEWS = Object.freeze({
   jogos: '/jogos',
   tabela: '/tabela',
-  resultados: '/resultados',
-  rank: '/bolao',
-  aniversariantes: '/aniversariantes'
+  resultados: '/resultados'
 });
 
 function brRotaDaView(view) {
@@ -3812,9 +3716,7 @@ function brViewPelaRota(pathname) {
   const mapa = {
     '/jogos': 'jogos',
     '/tabela': 'tabela',
-    '/resultados': 'resultados',
-    '/bolao': 'rank',
-    '/aniversariantes': 'aniversariantes'
+    '/resultados': 'resultados'
   };
   return mapa[rota.toLowerCase()] || '';
 }
@@ -3829,6 +3731,14 @@ function brAtualizarRota(view, substituir = false) {
 }
 
 function setView(v, opcoes = {}) {
+  if (BR_PUBLIC_ONLY && (v === 'rank' || v === 'aniversariantes' || v === 'participantes')) {
+    if (!opcoes.fromHistory) {
+      history.replaceState({ brView: 'jogos' }, '', '/jogos' + (location.hash || ''));
+    }
+    state.view = 'jogos';
+    render();
+    return;
+  }
   if ((v === 'rank' || v === 'aniversariantes' || v === 'participantes') && !(window.BR_AUTH && window.BR_AUTH.authenticated)) {
     const sufixoAdmin = v === 'participantes' ? '&admin=1' : '';
     const alvo = brRotaDaView(v) || `./?brasileirao=1&view=${encodeURIComponent(v)}${sufixoAdmin}`;
@@ -3870,8 +3780,10 @@ function setView(v, opcoes = {}) {
 window.addEventListener('popstate', () => {
   const params = new URLSearchParams(location.search || '');
   const view = brViewPelaRota(location.pathname) || params.get('view') || 'jogos';
-  if (['rank', 'tabela', 'jogos', 'resultados', 'aniversariantes'].includes(view)) {
+  if (['tabela', 'jogos', 'resultados'].includes(view)) {
     setView(view, { fromHistory: true });
+  } else {
+    setView('jogos', { fromHistory: true });
   }
 });
 
@@ -5539,7 +5451,7 @@ function mostrarPopupAniversario() {
   let conteudo = '<div style="text-align: center; padding: 8px 4px;">';
   conteudo += '<div style="font-size: 48px; margin-bottom: 8px;">🎂</div>';
   conteudo += '<h2 style="font-size: 22px; font-weight: 700; margin-bottom: 16px;">Hoje é aniversário!</h2>';
-  conteudo += secaoGrupo('🍻 Almoço de Sexta', anivAlmoco, '#f472b6');
+  conteudo += secaoGrupo('Fórmula do Gol', anivAlmoco, '#f472b6');
   conteudo += '<button class="btn" onclick="fecharPopupAniversario()" style="margin-top: 4px; padding: 8px 20px;">Fechar</button>';
   conteudo += '</div>';
 
@@ -5862,7 +5774,7 @@ function fecharEditorMembro() {
 // ========================================================================
 // O token fica salvo SÓ no localStorage do navegador do admin.
 // Nunca vai pro código público. Permissão minima: conteudo, 1 repo.
-const GITHUB_REPO = 'LAERCIOREHEM/BRASILEIRAO2026ALMOCO';
+const GITHUB_REPO = 'LAERCIOREHEM/formuladogol';
 const GITHUB_BRANCH = 'main';
 
 function getGithubToken() {
@@ -5942,7 +5854,7 @@ async function salvarArquivoNoGithub(caminhoArquivo, conteudoTexto, mensagemComm
   }
 }
 
-// Salva o membros.json no GitHub (grupo Almoço de Sexta).
+// Salva o membros.json no repositório do Fórmula do Gol.
 async function sincronizarMembrosGithub() {
   const data = {
     atualizado_em: new Date().toISOString(),
@@ -5951,7 +5863,7 @@ async function sincronizarMembrosGithub() {
   };
   const json = JSON.stringify(data, null, 2);
   return await salvarArquivoNoGithub('membros.json', json,
-    `Atualizar membros.json (Almoço) via Admin do site`);
+    `Atualizar membros.json via administração do Fórmula do Gol`);
 }
 
 
@@ -6082,8 +5994,8 @@ document.addEventListener('br:session-changed', (event) => {
 setTimeout(sincronizarAvisosAniversarioComSessao, 800);
 </script>
 <script src="js/br-clube-retorno.js?v=20260717-retorno-exato-v1"></script>
-<script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
-<script src="js/br-menu.js?v=20260722-rotas-limpas-v2"></script>
+<script src="js/br-config.js?v=20260723-site-publico-v1"></script>
+<script src="js/br-menu.js?v=20260723-site-publico-v1"></script>
 <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>

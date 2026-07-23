@@ -1,11 +1,9 @@
 /* ========================================================================== 
-   br-menu.js — menu público/logado e proteção de rotas do Brasileirão 2026
+   br-menu.js — menu, navegação e proteção de rotas do Fórmula do Gol
    --------------------------------------------------------------------------
-   - Visitante: Jogos, Ao vivo, Tabela, Resultados, Estatísticas, Clubes,
-     Museu, Copa 2026 e Login.
-   - Participante validado: acrescenta Apostas, Bolão, Regras e Aniversariantes;
-     o item Login passa a exibir o nome do participante e permite sair.
-   - A sessão local é sempre validada no Supabase antes de liberar área privada.
+   - O modo público é controlado por BR_CFG.recursos.
+   - Com login/módulos privados desativados, sessões antigas são ignoradas.
+   - A navegação pública e o comportamento responsivo permanecem ativos.
    ========================================================================== */
 (function (global, document) {
   "use strict";
@@ -22,6 +20,16 @@
   var readyResolve;
 
   global.BR_AUTH_READY = new Promise(function (resolve) { readyResolve = resolve; });
+
+  function resourceEnabled(name, fallback) {
+    var resources = global.BR_CFG && global.BR_CFG.recursos ? global.BR_CFG.recursos : {};
+    if (Object.prototype.hasOwnProperty.call(resources, name)) return resources[name] === true;
+    return fallback;
+  }
+
+  var LOGIN_ENABLED = resourceEnabled("login", true);
+  var PRIVATE_MODULES_ENABLED = resourceEnabled("modulosPrivados", true);
+  var COPA_2026_ENABLED = resourceEnabled("copa2026", true);
 
   function safeJson(value) {
     try { return JSON.parse(value || "null"); }
@@ -90,6 +98,7 @@
   }
 
   function loginUrl(target) {
+    if (!LOGIN_ENABLED || !PRIVATE_MODULES_ENABLED) return "/jogos";
     var url = "apostas.html";
     if (target) url += "?retorno=" + encodeURIComponent(target);
     return url;
@@ -274,6 +283,15 @@
 
   function updateAuthItem(item) {
     if (!item) return;
+    if (!LOGIN_ENABLED) {
+      item.hidden = true;
+      item.setAttribute("aria-hidden", "true");
+      item.classList.remove("active");
+      item.removeAttribute("aria-current");
+      return;
+    }
+    item.hidden = false;
+    item.setAttribute("aria-hidden", "false");
     if (authState.authenticated) {
       var nome = displayName(authState.usuario);
       item.textContent = "👤 " + nome;
@@ -303,9 +321,15 @@
     if (!nav) return;
     normalizeMenuLinks(nav);
     Array.prototype.forEach.call(nav.querySelectorAll("[data-br-private]"), function (item) {
-      item.hidden = !authState.authenticated;
-      item.setAttribute("aria-hidden", authState.authenticated ? "false" : "true");
-      if (!authState.authenticated) item.classList.remove("active");
+      var visible = PRIVATE_MODULES_ENABLED && authState.authenticated;
+      item.hidden = !visible;
+      item.setAttribute("aria-hidden", visible ? "false" : "true");
+      if (!visible) item.classList.remove("active");
+    });
+    Array.prototype.forEach.call(nav.querySelectorAll("[data-br-copa], [href^='copa2026'], #btn-copa"), function (item) {
+      item.hidden = !COPA_2026_ENABLED;
+      item.setAttribute("aria-hidden", COPA_2026_ENABLED ? "false" : "true");
+      if (!COPA_2026_ENABLED) item.classList.remove("active");
     });
 
     updateAuthItem(nav.querySelector("[data-br-auth-link]"));
@@ -343,12 +367,16 @@
 
   function finishAuth(next) {
     authState.pending = false;
-    authState.authenticated = Boolean(next && next.authenticated);
+    authState.authenticated = LOGIN_ENABLED && PRIVATE_MODULES_ENABLED && Boolean(next && next.authenticated);
     authState.usuario = authState.authenticated ? next.usuario : null;
     authState.token = authState.authenticated ? next.token : "";
     authState.validationError = String(next && next.validationError || "");
     publishState();
 
+    if (!PRIVATE_MODULES_ENABLED && isPrivateRoute()) {
+      global.location.replace("/jogos");
+      return;
+    }
     if (!authState.authenticated && isPrivateRoute()) {
       redirectToLogin();
       return;
@@ -370,6 +398,10 @@
   async function refreshAuth() {
     authState.pending = true;
     publishState();
+    if (!LOGIN_ENABLED || !PRIVATE_MODULES_ENABLED) {
+      finishAuth({ authenticated: false });
+      return false;
+    }
     var sess = sessionPayload();
     if (!sess || !sess.usuario || !sess.token) {
       finishAuth({ authenticated: false });
@@ -420,6 +452,12 @@
       if (!el) return;
 
       if (el.hasAttribute("data-br-auth-link")) {
+        if (!LOGIN_ENABLED || !PRIVATE_MODULES_ENABLED) {
+          ev.preventDefault();
+          ev.stopPropagation();
+          global.location.href = "/jogos";
+          return;
+        }
         if (authState.authenticated) {
           ev.preventDefault();
           ev.stopPropagation();
@@ -468,8 +506,11 @@
     validationError: "",
     refresh: refreshAuth,
     logout: logout,
-    requireLogin: function (target) { global.location.href = loginUrl(target || returnTarget()); },
-    isPrivateView: function (view) { return Boolean(PRIVATE_VIEWS[String(view || "").toLowerCase()]); }
+    requireLogin: function (target) {
+      global.location.href = LOGIN_ENABLED && PRIVATE_MODULES_ENABLED ? loginUrl(target || returnTarget()) : "/jogos";
+    },
+    isPrivateView: function (view) { return Boolean(PRIVATE_VIEWS[String(view || "").toLowerCase()]); },
+    publicOnly: !LOGIN_ENABLED || !PRIVATE_MODULES_ENABLED
   };
 
   global.BR_CENTER_ACTIVE_NAV = function () {

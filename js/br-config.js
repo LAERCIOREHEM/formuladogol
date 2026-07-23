@@ -1,5 +1,5 @@
 /* ==========================================================================
-   br-config.js — Configuração pública do Bolão Brasileirão 2026
+   br-config.js — Configuração pública do Fórmula do Gol
    --------------------------------------------------------------------------
    A chave abaixo é a ANON/PUBLISHABLE do Supabase. Ela pode ficar no navegador.
    A proteção real deve ficar nas policies/RLS criadas pelo SQL entregue nesta
@@ -10,6 +10,11 @@
 
   global.BR_CFG = {
     temporada: 2026,
+    recursos: {
+      login: false,
+      modulosPrivados: false,
+      copa2026: false
+    },
     rodadaInicialApostas: 20,
     supabase: {
       url: "https://pdetjrsvmnuglskvytro.supabase.co",
