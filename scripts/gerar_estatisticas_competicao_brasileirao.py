@@ -280,7 +280,7 @@ def main() -> None:
     payload = {
         "atualizado_em": now_iso(),
         "temporada": int(leaders.get("temporada") or 2026),
-        "fonte": "ESPN · tabela, resultados, summaries e rankings oficiais",
+        "fonte": "ESPN · tabela, resultados e eventos validados dos summaries",
         "resumo": {
             "jogos_finalizados": len(results),
             "jogos_com_estatisticas": sum(1 for x in games_index if x["tem_estatisticas"]),

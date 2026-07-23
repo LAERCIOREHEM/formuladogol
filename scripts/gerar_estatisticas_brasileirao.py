@@ -1374,11 +1374,7 @@ def coletar_artilharia_assistencias(
 
 
 def carregar_lideres_oficiais(avisos: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Carrega rankings oficiais de temporada produzidos pelo coletor ESPN.
-
-    Esta função substitui a antiga tentativa de reconstruir a classificação
-    geral a partir dos summaries de cada partida.
-    """
+    """Carrega rankings reconstruídos e validados de gols e assistências."""
     data = ler_json("dados-br/lideres-jogadores.json", {})
     if not isinstance(data, dict) or data.get("status") != "valido":
         raise RuntimeError(
@@ -1395,8 +1391,8 @@ def carregar_lideres_oficiais(avisos: list[str]) -> tuple[list[dict[str, Any]], 
             f"{len(assistencias)} assistentes; mínimos esperados {min_gols}/{min_assist}"
         )
     avisos.append(
-        "Artilharia e assistências carregadas do ranking ESPN completado por eventos "
-        "validados de todas as partidas; listas incluem jogadores com um gol/assistência."
+        "Artilharia e assistências reconstruídas a partir dos eventos validados "
+        "de todas as partidas; listas incluem jogadores com um gol/assistência."
     )
     return artilharia, assistencias
 
@@ -1452,7 +1448,7 @@ def main() -> None:
     payload_stats = {
         "atualizado_em": iso_agora_brt(),
         "temporada": TEMPORADA,
-        "fonte": "ESPN · ranking oficial completado + eventos validados das partidas",
+        "fonte": "Eventos validados das partidas (ESPN summary)",
         "total_resultados_lidos": len(resultados),
         "total_eventos_processados": len(eventos_processados),
         "resumo": {
@@ -1496,8 +1492,8 @@ def main() -> None:
     payload_jogadores = {
         "atualizado_em": payload_stats["atualizado_em"],
         "temporada": TEMPORADA,
-        "fonte": "ESPN · ranking oficial + eventos validados das partidas",
-        "metodologia": "Líderes oficiais preservam nomes e totais do topo; eventos validados completam todos os jogadores com gols e assistências.",
+        "fonte": "Eventos validados das partidas (ESPN summary)",
+        "metodologia": "Gols e assistências são reconstruídos jogo a jogo; rankings externos servem somente como referência de identificação e fallback.",
         "total_summaries_processados": 0,
         "total_jogos_finalizados": len(resultados),
         "artilharia": artilharia,
