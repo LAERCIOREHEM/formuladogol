@@ -2,8 +2,8 @@
    resultados.js — Resultados das partidas (Copa 2026), direto da ESPN
    Navegador puxa o feed público da ESPN (sem chave, CORS liberado).
    Navegação por dia + atualização inteligente: 30s só em janela de jogo/ao vivo.
-   NOVO: na FASE DE GRUPOS, cada jogo mostra os palpites de todos (recolhidos,
-   abre no "ver palpites"). Verde = acertou o resultado · 🎯 = cravou o placar.
+   Versão pública informativa: jogos, grupos, mata-mata e resultados, sem
+   carregar ou exibir dados de áreas privadas.
    ========================================================================= */
 (function () {
   "use strict";
@@ -11,7 +11,6 @@
   const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
   const SUMMARY_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary";
   const START = "20260611", END = "20260719";
-  const CFG = window.COPA_CFG || { url: "", key: "" };
 
   // ===== DE-PARA embutido (à prova de timing): sigla/nome EN -> PT + bandeira =====
   var DEPARA = {"MEX": {"n": "México", "i": "mx"}, "RSA": {"n": "África do Sul", "i": "za"}, "KOR": {"n": "Coreia do Sul", "i": "kr"}, "CZE": {"n": "Rep. Tcheca", "i": "cz"}, "CAN": {"n": "Canadá", "i": "ca"}, "BIH": {"n": "Bósnia", "i": "ba"}, "QAT": {"n": "Catar", "i": "qa"}, "SUI": {"n": "Suíça", "i": "ch"}, "BRA": {"n": "Brasil", "i": "br"}, "MAR": {"n": "Marrocos", "i": "ma"}, "HAI": {"n": "Haiti", "i": "ht"}, "SCO": {"n": "Escócia", "i": "gb-sct"}, "USA": {"n": "EUA", "i": "us"}, "PAR": {"n": "Paraguai", "i": "py"}, "AUS": {"n": "Austrália", "i": "au"}, "TUR": {"n": "Turquia", "i": "tr"}, "GER": {"n": "Alemanha", "i": "de"}, "CUW": {"n": "Curaçao", "i": "cw"}, "CIV": {"n": "Costa do Marfim", "i": "ci"}, "ECU": {"n": "Equador", "i": "ec"}, "NED": {"n": "Holanda", "i": "nl"}, "JPN": {"n": "Japão", "i": "jp"}, "SWE": {"n": "Suécia", "i": "se"}, "TUN": {"n": "Tunísia", "i": "tn"}, "BEL": {"n": "Bélgica", "i": "be"}, "EGY": {"n": "Egito", "i": "eg"}, "IRN": {"n": "Irã", "i": "ir"}, "NZL": {"n": "Nova Zelândia", "i": "nz"}, "ESP": {"n": "Espanha", "i": "es"}, "CPV": {"n": "Cabo Verde", "i": "cv"}, "KSA": {"n": "Arábia Saudita", "i": "sa"}, "URU": {"n": "Uruguai", "i": "uy"}, "FRA": {"n": "França", "i": "fr"}, "SEN": {"n": "Senegal", "i": "sn"}, "IRQ": {"n": "Iraque", "i": "iq"}, "NOR": {"n": "Noruega", "i": "no"}, "ARG": {"n": "Argentina", "i": "ar"}, "ALG": {"n": "Argélia", "i": "dz"}, "AUT": {"n": "Áustria", "i": "at"}, "JOR": {"n": "Jordânia", "i": "jo"}, "POR": {"n": "Portugal", "i": "pt"}, "COD": {"n": "RD Congo", "i": "cd"}, "UZB": {"n": "Uzbequistão", "i": "uz"}, "COL": {"n": "Colômbia", "i": "co"}, "ENG": {"n": "Inglaterra", "i": "gb-eng"}, "CRO": {"n": "Croácia", "i": "hr"}, "GHA": {"n": "Gana", "i": "gh"}, "PAN": {"n": "Panamá", "i": "pa"}};
@@ -29,10 +28,10 @@
     return `<a class="team-link${cls}" href="selecoes.html#${encodeURIComponent(sig)}" title="Ver seleção: ${escTxt(nome)}" aria-label="Ver seleção ${escTxt(nome)}">${conteudo}</a>`;
   }
 
-  let JOGOS = [], PALP = [], dia, timer = null, TVS = {};
+  let JOGOS = [], dia, timer = null, TVS = {};
   let MM = {}; // melhores momentos: chave siglas -> {url,titulo}
   let ABA = "jogos", SEL = [], GRP_EVENTS = [], GRP_EVENTS_TS = 0;
-  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0, PALPMATA = {}, AGENDA_MATA = {};
+  let ESTRUT = null, TERMAP = null, MATA_EVENTS = [], MATA_EVENTS_TS = 0, AGENDA_MATA = {};
   let FAIRPLAY = {}, FAIRPLAY_TS = 0; // {sigla: pontos de conduta}, cache 5min
   let FASE_MATA = "16-avos"; // fase selecionada na aba mata-mata
   let MATA_CACHE = null; // guarda o resultado do engine pra trocar de fase sem recalcular
@@ -44,16 +43,6 @@
   let LANCES_CACHE = {}; // eventId -> {ts, dados}; gols/cartões exibidos nos cards
   let JOGOS_DIA_EVENTS = []; // cache dos eventos do dia exibido na aba Jogos
   let REFRESH_MONITOR_EVENTS = [], REFRESH_MONITOR_TS = 0; // monitor leve para ligar/desligar auto-refresh
-
-  async function rpc(fn, body) {
-    const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "apikey": CFG.key, "Authorization": "Bearer " + CFG.key },
-      body: JSON.stringify(body || {})
-    });
-    if (!r.ok) throw new Error("RPC " + fn);
-    return r.json();
-  }
 
   const SEM = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
 
@@ -529,7 +518,7 @@
     });
   }
 
-  // carrega seleções (p/ casar jogo da ESPN -> nosso id) e palpites (Supabase)
+  // Carrega somente dados esportivos públicos.
   const TV_CAT = { // ordem de exibição; cores aproximadas das marcas
     globo:   ["Globo", "#0a7cff", "#fff"],
     sbt:     ["SBT", "#00a651", "#fff"],
@@ -588,25 +577,6 @@
     try {
       AGENDA_MATA = await fetch("dados/agenda_mata.json").then(r => r.json());
     } catch (e) { AGENDA_MATA = {}; }
-    try {
-      const rows = await rpc("copa_revelados", {});
-      PALP = (rows || []).map(r => ({ nome: r.nome, pg: (r.payload || {}).placaresGrupos || {} }));
-    } catch (e) { PALP = []; } // antes da trava vem vazio — normal
-    // Palpites do mata-mata auditados (com hash) — fonte imutável de quem cada um
-    // colocou avançando em cada fase. Usado para corrigir a exibição quando o
-    // desempate FIFA muda quem ocupa cada posição do chaveamento. NÃO altera o banco.
-    try {
-      const pm = await fetch("dados/palpites_mata.json?t=" + Date.now()).then(r => r.json());
-      PALPMATA = (pm && pm.apostadores) || {};
-    } catch (e) { PALPMATA = {}; }
-  }
-  // busca case-insensitive das listas canônicas do mata-mata por nome do apostador
-  function canonicoDe(nome) {
-    if (!nome || !PALPMATA) return null;
-    if (PALPMATA[nome]) return PALPMATA[nome];
-    const alvo = String(nome).trim().toUpperCase();
-    for (const k in PALPMATA) { if (k.toUpperCase() === alvo) return PALPMATA[k]; }
-    return null;
   }
 
   function retornoGrupoHTML() {
@@ -687,11 +657,6 @@
     $("#lista").innerHTML = abasHTML() + avisoStatsPartidas(evs) + evs.map(card).join("");
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     bindRetornoGrupo();
-    document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
-      const d = document.getElementById("sp-" + b.dataset.sp), ab = d.style.display === "none";
-      d.style.display = ab ? "block" : "none";
-      b.innerHTML = ab ? "Ocultar palpites ▴" : "Ver palpites ▾";
-    });
     document.querySelectorAll(".grupo-link[data-grupo]").forEach(b => b.onclick = () => {
       VOLTAR_JOGO = b.dataset.jogo;   // lembra o jogo de origem
       FOCO_GRUPO = b.dataset.grupo;   // grupo a destacar/rolar
@@ -744,11 +709,6 @@
     $("#lista").innerHTML = abasHTML() + avisoStatsPartidas(evs) + html;
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     bindRetornoGrupo();
-    document.querySelectorAll(".vermais[data-sp]").forEach(b => b.onclick = () => {
-      const d = document.getElementById("sp-" + b.dataset.sp), ab = d.style.display === "none";
-      d.style.display = ab ? "block" : "none";
-      b.innerHTML = ab ? "Ocultar palpites ▴" : "Ver palpites ▾";
-    });
     document.querySelectorAll(".grupo-link[data-grupo]").forEach(b => b.onclick = () => {
       VOLTAR_JOGO = b.dataset.jogo; FOCO_GRUPO = b.dataset.grupo; RETORNO_GRUPO = null;
       ABA = "grupos"; const n = $("#prev") && $("#prev").parentElement; if (n) n.style.display = "none";
@@ -1103,80 +1063,6 @@
     };
     travado = travado || {};
     return `<div class="mm-jogo">${time(idA, scoreA, vA, !!travado.a)}${time(idB, scoreB, vB, !!travado.b)}${linhaInfo}</div>`;
-  }
-
-  // ranking "quem acertou as seleções que avançaram" (sem importar posição/cruzamento)
-  function eliminadosMataAtual() {
-    const elim = new Set();
-    (MATA_EVENTS || []).forEach(ev => {
-      try {
-        if (((ev.season && ev.season.slug) || "") === "group-stage") return;
-        const det = resultadoDetalhadoMata(ev);
-        if (det && det.perdedorId) elim.add(det.perdedorId);
-      } catch (e) { /* ignora evento malformado */ }
-    });
-    return elim;
-  }
-  function vivosMataAtual(d) {
-    const base = new Set((d && d.classificados32) || []);
-    const elim = eliminadosMataAtual();
-    elim.forEach(id => base.delete(id));
-    return Array.from(base);
-  }
-  function faseRankingAtual(d) {
-    const vivos = vivosMataAtual(d);
-    const mapa = {
-      "16-avos": { rot:"Classificados (32)", campo:"classificados32", real:(d && d.classificados32) || [], alvo:32 },
-      "Oitavas": { rot:"Avançam às Oitavas (16)", campo:"avancam_oitavas", real:vivos, alvo:16 },
-      "Quartas": { rot:"Avançam às Quartas (8)", campo:"avancam_quartas", real:vivos, alvo:8 },
-      "Semis": { rot:"Semifinalistas (4)", campo:"semifinalistas", real:vivos, alvo:4 },
-      "Final": { rot:"Finalistas (2)", campo:"finalistas", real:vivos, alvo:2 }
-    };
-    return mapa[FASE_MATA] || mapa["16-avos"];
-  }
-  function rankingSelecoesHTML(d) {
-    if (!PALP.length) return "";
-    const fase = faseRankingAtual(d);
-    if (!fase || !fase.real || !fase.real.length) return "";
-
-    // Deriva cada palpite, substitui pelas listas auditadas e conta apenas a fase aberta.
-    // Para Oitavas em diante, "real" = seleções ainda vivas. Assim ninguém cai antes
-    // de ser eliminado efetivamente em campo.
-    const setReal = new Set(fase.real || []);
-    const linhas = PALP.map(p => {
-      let pd;
-      try { pd = COPA_ENGINE.derivar(SEL, pgToArr(p.pg), {}, ESTRUT, TERMAP); }
-      catch (e) { pd = null; }
-      const pmt = pd && canonicoDe(p.nome);
-      if (pmt) {
-        pd.classificados32 = pmt.classificados32 || pd.classificados32;
-        pd.avancam_oitavas = pmt.avancam_oitavas || pd.avancam_oitavas;
-        pd.avancam_quartas = pmt.avancam_quartas || pd.avancam_quartas;
-        pd.semifinalistas = pmt.semifinalistas || pd.semifinalistas;
-        pd.finalistas = pmt.finalistas || pd.finalistas;
-      }
-      const acertos = pd ? (pd[fase.campo] || []).filter(id => setReal.has(id)).length : 0;
-      return { nome:p.nome, acertos };
-    });
-
-    linhas.sort((a, b) => b.acertos - a.acertos || a.nome.localeCompare(b.nome));
-
-    const cabecalho = `<tr><th class="rs-nome">Apostador</th><th>${fase.rot}</th></tr>`;
-    const corpo = linhas.map((l, i) => {
-      return `<tr><td class="rs-nome">${i + 1}. ${l.nome}</td><td><b>${l.acertos}</b><span class="rs-de">/${fase.alvo}</span></td></tr>`;
-    }).join("");
-
-    const legenda = FASE_MATA === "16-avos"
-      ? "Quantas seleções classificadas entre as 32 cada um cravou — <b>não importa a posição nem o cruzamento</b>."
-      : "Quantas seleções cravadas para esta fase ainda permanecem no páreo — <b>só sai quando é eliminada em campo</b>.";
-    return `<div class="rs-box" id="rs-box" style="display:none">
-      <p class="rs-leg">${legenda}</p>
-      <div class="rs-scroll"><table class="rs-tab"><thead>${cabecalho}</thead><tbody>${corpo}</tbody></table></div>
-    </div>`;
-  }
-  // converte o placaresGrupos {jogo_id:{ga,gb}} para o array que o engine espera
-  function pgToArr(pg) {
-    return Object.keys(pg || {}).map(jid => ({ jogo_id: jid, ga: pg[jid].ga, gb: pg[jid].gb }));
   }
 
   // lê o fair play (cartões) do JSON gerado pelo robô (estável, rápido).
@@ -1866,19 +1752,12 @@
 
     $("#lista").innerHTML = abasHTML() + aviso
       + `<div class="mm-pills">${pills}</div>`
-      + corpo
-      + (PALP.length ? `<button class="rs-toggle" id="rs-toggle">🎯 Quem acertou as seleções que avançaram ▾</button>` + rankingSelecoesHTML(d) : "");
+      + corpo;
     document.querySelectorAll(".vbtn").forEach(b => b.onclick = trocarAba);
     document.querySelectorAll(".mm-pill[data-fase]").forEach(b => b.onclick = () => {
       FASE_MATA = b.dataset.fase;
       pintarFaseMata();
     });
-    const rsBtn = document.getElementById("rs-toggle");
-    if (rsBtn) rsBtn.onclick = () => {
-      const box = document.getElementById("rs-box"), ab = box.style.display === "none";
-      box.style.display = ab ? "block" : "none";
-      rsBtn.innerHTML = ab ? "🎯 Quem acertou as seleções que avançaram ▴" : "🎯 Quem acertou as seleções que avançaram ▾";
-    };
   }
 
   function irParaJogoNoDia(idJogo, ymd, origemGrupo) {
@@ -2094,7 +1973,6 @@
     const proj = PARTIDAS_MATA_MAP[String(ev.id)] || null;
     const projHome = (st.state === "pre" && slug !== "group-stage") ? resolveProjetadoCompetidor(home, proj, "a") : null;
     const projAway = (st.state === "pre" && slug !== "group-stage") ? resolveProjetadoCompetidor(away, proj, "b") : null;
-    const palpites = slug === "group-stage" ? palpiteBloco(ev, home, away, st) : "";
     // grupo do jogo (só na fase de grupos): link que leva à Tabela dos Grupos
     let grupoTag = "";
     if (slug === "group-stage") {
@@ -2116,7 +1994,6 @@
         ? blocoMomento((home.team || {}).abbreviation, (away.team || {}).abbreviation)
         : tvChips((home.team || {}).abbreviation, (away.team || {}).abbreviation)}
       ${statsBlocoJogo(ev, home, away)}
-      ${palpites}
     </div>`;
   }
 
@@ -2126,40 +2003,6 @@
     const aAb = dpSigla((away.team || {}).abbreviation) || (away.team || {}).abbreviation;
     const t = SEL.find(x => x.id === hAb) || SEL.find(x => x.id === aAb);
     return t ? t.grupo : null;
-  }
-
-  // palpites de todos para UM jogo de grupo (recolhido)
-  function palpiteBloco(ev, home, away, st) {
-    if (!PALP.length || !JOGOS.length) return "";
-    const hId = home.team && home.team.abbreviation, aId = away.team && away.team.abbreviation;
-    const j = JOGOS.find(x => (x.a === hId && x.b === aId) || (x.a === aId && x.b === hId));
-    if (!j) return "";
-    const inv = (j.a !== hId); // ESPN mostra invertido em relação à engine?
-    const jogado = st.state !== "pre";
-    let ra, rb;
-    if (jogado) {
-      const hs = parseInt(home.score || "0", 10), as = parseInt(away.score || "0", 10);
-      ra = hs; rb = as; // já na ordem da ESPN (mandante x visitante)
-    }
-    let ac = 0;
-    const rows = PALP.map(p => {
-      const graw = p.pg[j.jogo_id];
-      if (!graw) return `<div class="prow"><span>${p.nome}</span><span class="pal">—</span></div>`;
-      // orienta o palpite na MESMA ordem da exibição (ESPN/mandante)
-      const pga = inv ? graw.gb : graw.ga, pgb = inv ? graw.ga : graw.gb;
-      let tag = "";
-      if (jogado) {
-        const exato = pga === ra && pgb === rb;
-        const certo = Math.sign(pga - pgb) === Math.sign(ra - rb);
-        if (certo) ac++;
-        const rotuloEx = st.state === "post" ? "CRAVOU" : "CRAVANDO";
-        tag = exato ? `<span class="cravou">${rotuloEx} 🎯</span>` : `<span class="bola ${certo ? "v" : "x"}"></span>`;
-      } else { tag = '<span class="aguard">aguardando</span>'; }
-      return `<div class="prow"><span>${p.nome}</span><span class="pal">${pga} - ${pgb}${tag}</span></div>`;
-    }).join("");
-    const cnt = jogado ? `${ac} de ${PALP.length} acertaram o resultado` : "Palpites de todos (jogo ainda não começou)";
-    return `<button class="vermais" data-sp="${ev.id}">Ver palpites (${PALP.length}) ▾</button>
-      <div class="subpal" id="sp-${ev.id}" style="display:none"><div class="subcnt">${cnt}</div>${rows}</div>`;
   }
 
   function teamNome(c) { return dpNome((c.team && c.team.abbreviation) || (c.team && c.team.displayName)); }
@@ -2183,7 +2026,7 @@
       const data = await fetch(API + "?dates=20260611-20260719&limit=200").then(r => r.json());
       const pad = n => (n < 10 ? "0" : "") + n;
       const dt = d => d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
-      const linhas = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Bolao Copa 2026//PT-BR", "CALSCALE:GREGORIAN"];
+      const linhas = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Formula do Gol Copa 2026//PT-BR", "CALSCALE:GREGORIAN"];
       (data.events || []).forEach(ev => {
         const c = ev.competitions[0], cs = c.competitors;
         const home = cs.find(x => x.homeAway === "home") || cs[0];
@@ -2192,13 +2035,13 @@
         const an = dpNome((home.team || {}).abbreviation), bn = dpNome((away.team || {}).abbreviation);
         const venue = c.venue ? c.venue.fullName + (c.venue.address && c.venue.address.city ? " · " + c.venue.address.city : "") : "";
         linhas.push("BEGIN:VEVENT");
-        linhas.push("UID:" + ev.id + "@brasileirao2026almoco");
+        linhas.push("UID:" + ev.id + "@formuladogol");
         linhas.push("DTSTAMP:" + dt(new Date()));
         linhas.push("DTSTART:" + dt(ini));
         linhas.push("DTEND:" + dt(fim));
         linhas.push("SUMMARY:" + an + " x " + bn + " — Copa 2026");
         if (venue) linhas.push("LOCATION:" + venue.replace(/,/g, "\\,"));
-        linhas.push("DESCRIPTION:Copa do Mundo 2026. Acompanhe o bolão em brasileirao2026almoco.com.br/copa2026");
+        linhas.push("DESCRIPTION:Copa do Mundo 2026. Acompanhe jogos e resultados em formuladogol.com.br/copa2026/");
         linhas.push("END:VEVENT");
       });
       linhas.push("END:VCALENDAR");

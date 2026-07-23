@@ -13,7 +13,7 @@
     recursos: {
       login: false,
       modulosPrivados: false,
-      copa2026: false
+      copa2026: true
     },
     rodadaInicialApostas: 20,
     supabase: {

@@ -726,17 +726,17 @@
   function baixarICS() {
     var pad = function (n) { return (n < 10 ? "0" : "") + n; };
     function dt(d) { return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z"; }
-    var linhas = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Bolao Copa 2026//PT-BR", "CALSCALE:GREGORIAN"];
+    var linhas = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Formula do Gol Copa 2026//PT-BR", "CALSCALE:GREGORIAN"];
     JOGOS.forEach(function (j) {
       var fim = new Date(j.date.getTime() + 2 * 3600 * 1000);
       linhas.push("BEGIN:VEVENT");
-      linhas.push("UID:" + j.id + "@brasileirao2026almoco");
+      linhas.push("UID:" + j.id + "@formuladogol");
       linhas.push("DTSTAMP:" + dt(new Date()));
       linhas.push("DTSTART:" + dt(j.date));
       linhas.push("DTEND:" + dt(fim));
       linhas.push("SUMMARY:" + (j.an || j.a) + " x " + (j.bn || j.b) + " — Copa 2026");
       if (j.venue) linhas.push("LOCATION:" + j.venue.replace(/,/g, "\\,"));
-      linhas.push("DESCRIPTION:Copa do Mundo 2026. Assista na CazéTV e acompanhe em brasileirao2026almoco.com.br/copa2026");
+      linhas.push("DESCRIPTION:Copa do Mundo 2026. Veja canais e resultados em formuladogol.com.br/copa2026/onde-assistir.html");
       linhas.push("END:VEVENT");
     });
     linhas.push("END:VCALENDAR");
@@ -748,7 +748,7 @@
   }
 
   function compartilhar() {
-    var url = "https://brasileirao2026almoco.com.br/copa2026/onde-assistir.html";
+    var url = "https://formuladogol.com.br/copa2026/onde-assistir.html";
     var texto = "Acompanhe a Copa 2026: jogos, horários, onde assistir, placares, melhores momentos e jogos completos 🏆⚽";
     if (navigator.share) navigator.share({ title: "Copa 2026 — jogos e onde assistir", text: texto, url: url }).catch(function () {});
     else window.open("https://wa.me/?text=" + encodeURIComponent(texto + " " + url), "_blank");

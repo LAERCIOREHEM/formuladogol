@@ -2,9 +2,7 @@
    aovivo.js — Tela "AO VIVO" (Copa 2026)
    Lê o feed da ESPN. Fora da janela de jogo não atualiza; quando há jogo ao vivo (ou nos
    15 min de pré-jogo), mostra a tela cheia; quando acaba (status oficial),
-   sai sozinho. Na FASE DE GRUPOS, cruza com os palpites e mostra as bolinhas
-   (acertando / cravou). No mata-mata, só o placar (palpite por jogo não se
-   aplica — cada um tem chave diferente).
+   sai sozinho. Esta versão pública carrega somente dados esportivos.
    ========================================================================= */
 (function () {
   "use strict";
@@ -24,7 +22,6 @@
     return `<a class="team-link${cls}" href="selecoes.html#${encodeURIComponent(sig)}" title="Ver seleção: ${escTxt(nomeSel)}" aria-label="Ver seleção ${escTxt(nomeSel)}">${conteudo}</a>`;
   }
 
-  const CFG = window.COPA_CFG || { url: "", key: "" };
   const $ = s => document.querySelector(s);
   const API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
   const SUMMARY_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/summary";
@@ -44,15 +41,6 @@
   let LIVES = {};
   let AGENDA_COPA = [];
 
-  async function rpc(fn, body) {
-    const r = await fetch(`${CFG.url}/rest/v1/rpc/${fn}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "apikey": CFG.key, "Authorization": "Bearer " + CFG.key },
-      body: JSON.stringify(body || {})
-    });
-    if (!r.ok) throw new Error("RPC " + fn);
-    return r.json();
-  }
   const nome = id => (DADOS.nomeDe && DADOS.nomeDe[id]) || id || "—";
   const iso = id => (DADOS.isoDe && DADOS.isoDe[id]) || "";
   const flagcdn = id => { const c = iso(id); return c ? `https://flagcdn.com/w80/${c}.png` : ""; };
@@ -170,10 +158,7 @@
       s.selecoes.forEach(x => { DADOS.nomeDe[x.id] = x.nome; DADOS.isoDe[x.id] = x.iso2; });
     } catch (err) { $("#app").innerHTML = '<p class="vazio">Erro ao carregar os dados da Copa.</p>'; return; }
     JOGOS = COPA_ENGINE.gerarJogosGrupos(DADOS.selecoes);
-    try {
-      const rows = await rpc("copa_revelados", {});
-      PART = (rows || []).map(r => ({ nome: r.nome, grupos: (r.payload || {}).placaresGrupos || {} })).sort((a, b) => a.nome.localeCompare(b.nome));
-    } catch (e) { PART = []; }
+    PART = [];
     loop();
   }
 
@@ -330,10 +315,9 @@
       iniciarContadores();
       return;
     }
-    const colapsarPalpites = lives.length > 1;
-    app.innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado com os palpites reais. No dia, é automático (abra sem <b>?demo=1</b>).</div>' : "")
+    app.innerHTML = (demoFlag ? '<div class="demobar">⚙ DEMONSTRAÇÃO — jogo simulado para validar o painel ao vivo.</div>' : "")
       + avisoStatsAoVivo(lives)
-      + lives.map(ev => card(ev, colapsarPalpites)).join("");
+      + lives.map(ev => card(ev)).join("");
     carregarLancesAoVivo(lives);
     if (window.COPA_JOGO_STATS) {
       window.COPA_JOGO_STATS.bind(app);
@@ -672,7 +656,7 @@
     });
   }
 
-  function card(ev, colapsarPalpites) {
+  function card(ev) {
     const comp = ev.competitions[0], st = comp.status.type, cs = comp.competitors;
     const home = cs.find(c => c.homeAway === "home") || cs[0];
     const away = cs.find(c => c.homeAway === "away") || cs[1];
@@ -691,42 +675,7 @@
       return selecaoLinkHTML(id, `${rankBadgeAoVivo(id)}${escudo(c)}<div class="nm">${escTxt(tNome(c))}</div>`, "team-link-live");
     };
 
-    // palpites (só fase de grupos e se já houver palpites revelados)
-    const j = ourGame(ev);
-    let palpHTML = "";
-    if (j && PART.length) {
-      const homeId = norm(home.team.abbreviation);
-      const arr = PART.map(p => {
-        const pr = p.grupos[j.jogo_id];
-        if (!pr || pr.ga == null || pr.gb == null) return { nome: p.nome, s: "vazio", txt: "—" };
-        let ph, pa;
-        if (j.a === homeId) { ph = pr.ga; pa = pr.gb; } else { ph = pr.gb; pa = pr.ga; }
-        const exato = ph === hs && pa === as;
-        const s = exato ? "exato" : (sgn(ph - pa) === sgn(hs - as) ? "acertando" : "errando");
-        return { nome: p.nome, s, txt: ph + "×" + pa };
-      });
-      const ord = { exato: 0, acertando: 1, errando: 2, vazio: 3 };
-      arr.sort((x, y) => ord[x.s] - ord[y.s] || x.nome.localeCompare(y.nome));
-      const n = arr.filter(x => x.s === "acertando" || x.s === "exato").length;
-      const listaHTML = `<div class="lista">${arr.map(x => {
-          const marca = x.s === "exato" ? '<span class="badge-ex">cravando</span>'
-            : x.s === "acertando" ? '<span class="dot v"></span>'
-            : x.s === "vazio" ? '<span class="dot z"></span>' : '<span class="dot x"></span>';
-          return `<div class="pp ${x.s}"><span class="nm">${x.nome}</span><span class="chip">${x.txt}</span>${marca}</div>`;
-        }).join("")}</div>
-        <div class="legenda"><span><span class="dot v"></span> acertando</span><span><span class="badge-ex" style="animation:none">cravando</span> placar exato</span><span><span class="dot x"></span> errando</span></div>`;
-      if (colapsarPalpites) {
-        palpHTML = `<div class="contador compacto"><b>${n}</b> de ${PART.length} acertando o resultado</div>
-          <details class="palp-live-fold">
-            <summary><span class="sum-closed">Ver apostadores (${PART.length}) ▾</span><span class="sum-open">Ocultar apostadores ▲</span></summary>
-            ${listaHTML}
-          </details>`;
-      } else {
-        palpHTML = `<div class="contador"><b>${n}</b> de ${PART.length} acertando o resultado</div>${listaHTML}`;
-      }
-    } else if (!j) {
-      palpHTML = `<div class="obs-fase">Mata-mata: o palpite por placar vale na fase de grupos. Aqui mostramos só o jogo ao vivo.</div>`;
-    }
+    const palpHTML = "";
 
     return `<div class="placar ${pre ? "pre" : ""}">
       <div class="topo"><span class="fase">${faseLabel(ev)}</span>
@@ -785,9 +734,9 @@
   function frasePorHora(h) {
     // h = hora (0-23) do início do jogo, fuso de Brasília
     var manha = ["Começa o dia com Copa!", "Café da manhã com gol?", "Bom dia com futebol!"];
-    var almoco = ["Prepara o almoço que já vem jogo!", "Almoço de sexta com Copa!", "Separa o prato e chama a galera!"];
+    var almoco = ["Prepara o lanche que já vem jogo!", "Hora do jogo da Copa!", "Separa o prato e chama a galera!"];
     var tarde = ["Larga tudo, é dia de Copa!", "A tarde é nossa e da bola!", "Chama a galera pro jogo!"];
-    var noite = ["Esquenta que a noite é de Copa!", "Separa a cerveja, é jogo!", "Fim de dia é com futebol!"];
+    var noite = ["Esquenta que a noite é de Copa!", "Prepara o lanche, é jogo!", "Fim de dia é com futebol!"];
     var arr = h < 11 ? manha : h < 15 ? almoco : h < 18 ? tarde : noite;
     return arr[Math.floor(Math.random() * arr.length)];
   }

@@ -1,5 +1,5 @@
 /* =========================================================================
-   engine.js — Motor de chaveamento do Bolão Copa 2026
+   engine.js — Motor de grupos e chaveamento da Copa 2026
    Responsável por: gerar jogos dos grupos, classificar cada grupo pelos
    critérios FIFA, escolher os 8 melhores terceiros, montar a Round of 32
    (consultando o Anexo C) e propagar os vencedores até a final.

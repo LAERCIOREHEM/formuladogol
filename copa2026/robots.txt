@@ -1,8 +1,12 @@
-# robots.txt — Bolão Copa 2026 (módulo)
+# robots.txt — Copa 2026 · Fórmula do Gol
 User-agent: *
 Allow: /copa2026/
 
-# Não indexar a área do organizador
+# Não indexar áreas que não integram o módulo público informativo
 Disallow: /copa2026/admin.html
+Disallow: /copa2026/palpite.html
+Disallow: /copa2026/palpites.html
+Disallow: /copa2026/pontos.html
+Disallow: /copa2026/regras.html
 
-Sitemap: https://brasileirao2026almoco.com.br/copa2026/sitemap.xml
+Sitemap: https://formuladogol.com.br/copa2026/sitemap.xml
