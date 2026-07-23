@@ -88,7 +88,11 @@ jobs:
             tabela.json resultados.json jogos.json membros.json \
             espn_eventos.json transmissoes.json \
             favicon.ico favicon-16.png favicon-32.png favicon-96.png favicon-192.png favicon-512.png \
-            apple-touch-icon.png og-image.png og-image-publico-v3.png og-image-whatsapp-v2.png og-image-aovivo-v2.jpg; do
+            apple-touch-icon.png og-image.png og-image-publico-v3.png og-image-whatsapp-v2.png og-image-aovivo-v2.jpg \
+            favicon-formula-do-gol.ico \
+            favicon-formula-do-gol-16.png favicon-formula-do-gol-32.png favicon-formula-do-gol-96.png \
+            favicon-formula-do-gol-192.png favicon-formula-do-gol-512.png \
+            apple-touch-icon-formula-do-gol.png og-image-formula-do-gol-v1.png; do
             if [[ -e "$item" ]]; then
               cp -a "$item" _site/
             fi
@@ -145,6 +149,14 @@ jobs:
             "_site/resultados/index.html"
             "_site/bolao/index.html"
             "_site/aniversariantes/index.html"
+            "_site/favicon-formula-do-gol.ico"
+            "_site/favicon-formula-do-gol-16.png"
+            "_site/favicon-formula-do-gol-32.png"
+            "_site/favicon-formula-do-gol-96.png"
+            "_site/favicon-formula-do-gol-192.png"
+            "_site/favicon-formula-do-gol-512.png"
+            "_site/apple-touch-icon-formula-do-gol.png"
+            "_site/og-image-formula-do-gol-v1.png"
           )
           for f in "${REQUIRED_BR[@]}"; do
             if [[ ! -e "$f" ]]; then
@@ -173,19 +185,38 @@ jobs:
           index = Path('_site/index.html').read_text(encoding='utf-8')
           menu = Path('_site/js/br-menu.js').read_text(encoding='utf-8')
           apostas = Path('_site/js/br-apostas.js').read_text(encoding='utf-8')
+          cname = Path('_site/CNAME').read_text(encoding='utf-8').strip()
+          assert cname == 'formuladogol.com.br', f'CNAME divergente: {cname!r}'
           assert "aniversariantes: '/aniversariantes'" in index, 'index sem rota limpa de aniversariantes'
           assert '"/aniversariantes": "aniversariantes"' in menu, 'menu sem leitura da rota de aniversariantes'
           assert 'aniversariantes: "/aniversariantes"' in menu, 'menu sem URL limpa de aniversariantes'
           assert 'path === "/bolao" || path === "/aniversariantes"' in apostas, 'login sem retorno seguro para as rotas privadas limpas'
 
           paginas_menu = ['aovivo.html', 'apostas.html', 'clubes.html', 'estatisticas.html', 'museu.html', 'regras.html']
+          paginas_formula = ['index.html', *paginas_menu]
           legado = '?brasileirao=1&view='
           for pagina in paginas_menu:
               texto = (Path('_site') / pagina).read_text(encoding='utf-8')
               assert legado not in texto, f'{pagina}: menu ainda contém URL legada'
               for rota in ('/jogos', '/tabela', '/resultados', '/bolao', '/aniversariantes'):
                   assert f'href="{rota}"' in texto, f'{pagina}: link limpo ausente para {rota}'
-          print('OK: rotas limpas, proteção privada, retorno pós-login e menus conferidos.')
+
+          referencias_formula = (
+              'favicon-formula-do-gol-16.png',
+              'favicon-formula-do-gol-32.png',
+              'favicon-formula-do-gol-96.png',
+              'favicon-formula-do-gol-192.png',
+              'favicon-formula-do-gol-512.png',
+              'apple-touch-icon-formula-do-gol.png',
+              'favicon-formula-do-gol.ico',
+              'og-image-formula-do-gol-v1.png',
+          )
+          for pagina in paginas_formula:
+              texto = (Path('_site') / pagina).read_text(encoding='utf-8')
+              for referencia in referencias_formula:
+                  assert referencia in texto, f'{pagina}: referência ausente para {referencia}'
+
+          print('OK: domínio, identidade Fórmula do Gol, rotas limpas, proteção privada, retorno pós-login e menus conferidos.')
           PY
 
           if find _site -type l | grep -q .; then
