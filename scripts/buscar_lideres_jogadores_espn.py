@@ -744,8 +744,24 @@ def merge_reference_and_local(
     # aplica comparação aproximada depois dela: dois atletas distintos do
     # mesmo clube podem ter nomes parecidos. O fuzzy matching permanece apenas
     # no modo fallback, para compatibilizar aliases de duas fontes incompletas.
+    # Deduplicação estrita por (nome_norm, time_norm) para ambos os modos.
+    # No modo prefer_local, o enriquecimento pela referência pode produzir
+    # aliases com nome canônico ligeiramente diferente, gerando duplicata.
+    # No modo fallback, combina aliases aproximados entre fontes incompletas.
     if prefer_local:
-        dedup = list(merged)
+        # Deduplicação por chave exata — preserva entrada com maior valor.
+        seen: dict[tuple[str, str], int] = {}
+        dedup_list: list[dict[str, Any]] = []
+        for row in sorted(merged, key=lambda x: (-int(x.get(field) or 0), norm(x.get("nome")), norm(x.get("time")))):
+            key = (norm(str(row.get("nome") or "")), norm(str(row.get("time") or "")))
+            if key in seen:
+                existing = dedup_list[seen[key]]
+                if int(row.get(field) or 0) > int(existing.get(field) or 0):
+                    existing.update(row)
+            else:
+                seen[key] = len(dedup_list)
+                dedup_list.append(row)
+        dedup = dedup_list
     else:
         dedup: list[dict[str, Any]] = []
         for row in sorted(merged, key=lambda x: (-int(x.get(field) or 0), norm(x.get("nome")), norm(x.get("time")))):
