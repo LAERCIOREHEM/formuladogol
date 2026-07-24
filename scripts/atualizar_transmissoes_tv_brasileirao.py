@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Atualiza transmissões de TV/streaming do Brasileirão a partir da ESPN.
+"""Atualiza transmissões oficiais de TV/streaming do Brasileirão.
 
 - Lê a agenda local em jogos.json.
-- Consulta o scoreboard público da ESPN para os próximos jogos.
+- Usa a ESPN como fonte principal e a tabela detalhada da CBF para completar
+  canais que ainda não aparecem no scoreboard.
 - Extrai provedores oficiais conhecidos de TV e streaming (Premiere, SporTV,
   Disney+/ESPN, Prime Video, Globo, Record, GE TV e CazéTV).
 - Preserva os cadastros manuais e mantém GE TV/CazéTV também na grade de
@@ -20,6 +21,7 @@ import datetime as dt
 import json
 import re
 import sys
+import time
 import unicodedata
 import urllib.parse
 import urllib.request
@@ -30,6 +32,16 @@ from zoneinfo import ZoneInfo
 TZ = ZoneInfo("America/Sao_Paulo")
 API = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard"
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from atualizar_espn import para_canonico  # noqa: E402
+from fontes_brasileirao import (  # noqa: E402
+    CBFPartida,
+    buscar_tabela_detalhada_cbf,
+    localizar_partida_cbf,
+)
+
 AGENDA = ROOT / "jogos.json"
 OUTPUT = ROOT / "dados-br" / "transmissoes-tv.json"
 MANUAL = ROOT / "transmissoes.json"
@@ -215,12 +227,24 @@ def broadcasts(event: Mapping[str, Any]) -> List[str]:
     return out
 
 
-def fetch_scoreboard(start: dt.date, end: dt.date) -> Dict[str, Any]:
+def fetch_scoreboard(start: dt.date, end: dt.date, tentativas: int = 3) -> Dict[str, Any]:
     dates = f"{start:%Y%m%d}-{end:%Y%m%d}"
     url = API + "?" + urllib.parse.urlencode({"dates": dates, "limit": 200})
-    req = urllib.request.Request(url, headers={"User-Agent": "brasileirao-tv-discovery/1.0"})
-    with urllib.request.urlopen(req, timeout=30) as response:
-        return json.loads(response.read().decode("utf-8"))
+    ultima: Exception | None = None
+    for tentativa in range(1, max(1, tentativas) + 1):
+        req = urllib.request.Request(url, headers={"User-Agent": "formula-do-gol-tv-discovery/1.0"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+                if not isinstance(payload, dict):
+                    raise RuntimeError("scoreboard ESPN não retornou objeto JSON")
+                return payload
+        except Exception as exc:  # noqa: BLE001
+            ultima = exc
+            print(f"::warning::Scoreboard de transmissões indisponível na tentativa {tentativa}/{tentativas}: {type(exc).__name__}: {exc}")
+            if tentativa < tentativas:
+                time.sleep(2 * tentativa)
+    raise RuntimeError(f"scoreboard de transmissões indisponível após {tentativas} tentativa(s): {ultima}")
 
 
 def auto_entries(agenda: Mapping[str, Any], scoreboard: Mapping[str, Any]) -> Dict[str, Any]:
@@ -252,8 +276,72 @@ def auto_entries(agenda: Mapping[str, Any], scoreboard: Mapping[str, Any]) -> Di
     return out
 
 
-def build(existing: Mapping[str, Any], agenda: Mapping[str, Any], scoreboard: Mapping[str, Any], now: dt.datetime, manual: Optional[Mapping[str, Any]] = None) -> Dict[str, Any]:
+
+def cbf_entries(agenda: Mapping[str, Any], rows: Iterable[CBFPartida]) -> Dict[str, Dict[str, Any]]:
+    """Relaciona a tabela detalhada oficial da CBF à agenda ESPN local."""
+    out: Dict[str, Dict[str, Any]] = {}
+    rows_list = list(rows)
+    for game in agenda.get("jogos") or []:
+        event_id = str(game.get("event_id") or game.get("id") or "").strip()
+        if not event_id:
+            continue
+        home = (game.get("mandante") or {}).get("nome") if isinstance(game.get("mandante"), Mapping) else game.get("mandante")
+        away = (game.get("visitante") or {}).get("nome") if isinstance(game.get("visitante"), Mapping) else game.get("visitante")
+        home = para_canonico(home)
+        away = para_canonico(away)
+        if not home or not away:
+            continue
+        row = localizar_partida_cbf(
+            rows_list,
+            mandante=home,
+            visitante=away,
+            rodada=int(game.get("rodada") or 0),
+            data_iso=str(game.get("data_iso") or ""),
+        )
+        if not row or not row.transmissao:
+            continue
+        channels = sanitize_closed_channels(row.transmissao)
+        if not channels:
+            continue
+        out[event_id] = {
+            "event_id": event_id,
+            "rodada": int(game.get("rodada") or row.rodada or 0),
+            "mandante": home,
+            "visitante": away,
+            "data_iso": game.get("data_iso") or row.data_iso,
+            "tipo": "tv_ou_streaming_oficial",
+            "canais": channels,
+            "origem": "CBF oficial — tabela detalhada",
+            "fonte_editorial": row.origem,
+            "referencia_cbf": row.referencia,
+        }
+    return out
+
+
+def merge_cbf(generated: Dict[str, Dict[str, Any]], official: Mapping[str, Dict[str, Any]]) -> None:
+    """Complementa a ESPN sem removê-la como fonte principal."""
+    for event_id, cbf_item in official.items():
+        existing = generated.get(event_id)
+        if not existing:
+            generated[event_id] = copy.deepcopy(cbf_item)
+            continue
+        merged = sanitize_closed_channels(list(existing.get("canais") or []) + list(cbf_item.get("canais") or []))
+        if merged != list(existing.get("canais") or []):
+            existing["canais"] = merged
+            existing["origem"] = "ESPN automático + CBF oficial"
+            existing["fonte_editorial_cbf"] = cbf_item.get("fonte_editorial")
+            existing["referencia_cbf"] = cbf_item.get("referencia_cbf")
+
+def build(
+    existing: Mapping[str, Any],
+    agenda: Mapping[str, Any],
+    scoreboard: Mapping[str, Any],
+    now: dt.datetime,
+    manual: Optional[Mapping[str, Any]] = None,
+    cbf_rows: Optional[Iterable[CBFPartida]] = None,
+) -> Dict[str, Any]:
     generated = auto_entries(agenda, scoreboard)
+    merge_cbf(generated, cbf_entries(agenda, cbf_rows or []))
     # Preserva cadastros manuais já publicados, inclusive entre execuções em que
     # a ESPN ainda não informou os canais.
     for event_id, item in (existing.get("jogos") or {}).items():
@@ -266,7 +354,7 @@ def build(existing: Mapping[str, Any], agenda: Mapping[str, Any], scoreboard: Ma
     return {
         "descricao": "Transmissões oficiais por TV ou streaming, inclusive GE TV e CazéTV quando publicadas na programação.",
         "politica": {
-            "origem": "ESPN automática com prioridade para transmissoes.json e cadastros manuais; o vídeo exato do YouTube é mantido separadamente",
+            "origem": "ESPN automática; CBF oficial complementa canais ausentes; transmissoes.json é a última correção editorial; o vídeo exato do YouTube é mantido separadamente",
             "limite_links": 3,
             "regra": "Somente páginas oficiais dos serviços; alguns acessos podem exigir assinatura e login.",
         },
@@ -293,7 +381,19 @@ def selftest() -> None:
         }
     }
     manual = {"transmissoes": [{"rodada": 19, "mandante": "Vitória", "visitante": "Vasco da Gama", "transmissao": "Record / Premiere"}]}
-    result = build(existing, agenda, score, dt.datetime(2026, 7, 16, 20, 0, tzinfo=TZ), manual)
+    cbf = [CBFPartida(
+        referencia="001",
+        rodada=19,
+        mandante="Vitória",
+        visitante="Vasco da Gama",
+        data_iso="2026-07-16T19:30:00-03:00",
+        placar_mandante=None,
+        placar_visitante=None,
+        transmissao="Globo / Premiere",
+        origem="CBF teste",
+    )]
+    result = build(existing, agenda, score, dt.datetime(2026, 7, 16, 20, 0, tzinfo=TZ), manual, cbf)
+    # A correção editorial final é intencionalmente soberana sobre ESPN/CBF.
     assert result["jogos"]["1"]["canais"] == ["Record", "Premiere"]
     assert result["jogos"]["1"]["origem"].startswith("manual confirmado")
     assert result["jogos"]["2"]["canais"] == ["GE TV", "Prime Video"]
@@ -302,6 +402,9 @@ def selftest() -> None:
         set(item.get("canais") or []).issubset(ALLOWED_CHANNELS)
         for item in result["jogos"].values()
     )
+    cbf_only = build({"jogos": {}}, agenda, {"events": []}, dt.datetime(2026, 7, 16, 20, 0, tzinfo=TZ), {"transmissoes": []}, cbf)
+    assert cbf_only["jogos"]["1"]["canais"] == ["Globo", "Premiere"]
+    assert cbf_only["jogos"]["1"]["origem"].startswith("CBF oficial")
     print("Selftest OK")
 
 
@@ -317,10 +420,30 @@ def main() -> int:
     agenda = load_json(AGENDA, {"jogos": []})
     existing = load_json(OUTPUT, {"jogos": {}})
     manual = load_json(MANUAL, {"transmissoes": []})
-    score = fetch_scoreboard(now.date() - dt.timedelta(days=1), now.date() + dt.timedelta(days=21))
-    payload = build(existing, agenda, score, now, manual)
+    try:
+        score = fetch_scoreboard(now.date() - dt.timedelta(days=1), now.date() + dt.timedelta(days=21))
+    except Exception as exc:  # noqa: BLE001
+        # Não transforme uma indisponibilidade pontual do endpoint de mídia em
+        # falha de todo o Atualizar Brasileirão, nem apague canais já publicados.
+        print(
+            f"::warning::Transmissões ESPN indisponíveis; último arquivo íntegro preservado: "
+            f"{type(exc).__name__}: {exc}"
+        )
+        return 0
+    try:
+        cbf_rows = buscar_tabela_detalhada_cbf(resolver=para_canonico)
+        print(f"Tabela detalhada da CBF reconhecida: {len(cbf_rows)} partida(s)")
+    except Exception as exc:  # noqa: BLE001
+        cbf_rows = []
+        print(f"::warning::Transmissões CBF indisponíveis; ESPN/manual preservados: {type(exc).__name__}: {exc}")
+    payload = build(existing, agenda, score, now, manual, cbf_rows)
     if args.dry_run:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0
+    comparavel_novo = {k: v for k, v in payload.items() if k != "atualizado_em"}
+    comparavel_antigo = {k: v for k, v in existing.items() if k != "atualizado_em"}
+    if comparavel_novo == comparavel_antigo:
+        print(f"Transmissões sem mudança: {len(payload['jogos'])} jogo(s); arquivo preservado.")
         return 0
     OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Transmissões TV atualizadas: {len(payload['jogos'])} jogo(s)")
