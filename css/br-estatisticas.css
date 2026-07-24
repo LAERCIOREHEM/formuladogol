@@ -771,7 +771,7 @@ body > .container > section.hero > img {
 .stats-player-list { display: grid; gap: 10px; }
 .stats-player-row {
   display: grid;
-  grid-template-columns: 46px minmax(0, 1fr) auto;
+  grid-template-columns: 46px minmax(0, 1fr) 74px;
   align-items: center;
   gap: 12px;
   padding: 14px;
@@ -780,10 +780,11 @@ body > .container > section.hero > img {
   background: rgba(5,15,22,.68);
 }
 .stats-rank { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; color: #edffc0; border: 1px solid rgba(163,230,53,.28); background: rgba(163,230,53,.10); font-size: 19px; font-weight: 950; }
-.stats-player-main { min-width: 0; overflow: hidden; }
-.stats-player-name { color: #fff; font-size: 20px; font-weight: 950; word-break: break-word; overflow-wrap: break-word; white-space: normal; }
-.stats-player-club { display: flex; align-items: center; gap: 7px; margin-top: 4px; color: var(--muted); }
-.stats-player-meta { margin-top: 6px; color: var(--muted-2); font-size: 12px; }
+.stats-player-main { min-width: 0; overflow: visible; }
+.stats-player-name { color: #fff; font-size: 20px; line-height: 1.15; font-weight: 950; word-break: normal; overflow-wrap: anywhere; white-space: normal; }
+.stats-player-club { display: flex; align-items: center; gap: 7px; min-width: 0; margin-top: 4px; color: var(--muted); }
+.stats-player-club span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stats-player-meta { margin-top: 6px; color: var(--muted-2); font-size: 12px; line-height: 1.35; }
 .stats-player-value { min-width: 74px; text-align: right; }
 .stats-player-value strong { display: block; color: var(--green); font-size: 29px; line-height: 1; }
 .stats-player-value span { color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
