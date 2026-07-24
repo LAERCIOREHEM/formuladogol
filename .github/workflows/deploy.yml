@@ -48,6 +48,7 @@ on:
   workflow_run:
     workflows:
       - 'Atualizar Brasileirao (ESPN)'
+      - 'Monitorar Atualizar Brasileirao'
       - 'Buscar transmissões ao vivo do Brasileirão'
       - 'Buscar melhores momentos Brasileirão oficiais'
       - 'Atualizar Elencos Brasileirao (ESPN)'
@@ -158,6 +159,7 @@ jobs:
             dados-br/probabilidades-por-pontuacao.json
             dados-br/ranking-desempenho.json
             dados-br/resultados-manuais.json
+            dados-br/status-atualizacao.json
             dados-br/transmissoes-aovivo-manual.json
             dados-br/transmissoes-aovivo.json
             dados-br/transmissoes-tv.json
@@ -266,6 +268,41 @@ jobs:
 
           touch _site/.nojekyll
 
+          # Estado do próprio deploy, publicado no artefato para o diagnóstico operacional.
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+
+          site = Path('_site')
+          digest = hashlib.sha256()
+          for rel in ('tabela.json', 'resultados.json', 'jogos.json', 'espn_eventos.json'):
+              path = site / rel
+              digest.update(rel.encode('utf-8'))
+              if path.exists():
+                  digest.update(path.read_bytes())
+          run_url = ''
+          if os.environ.get('GITHUB_REPOSITORY') and os.environ.get('GITHUB_RUN_ID'):
+              run_url = f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com').rstrip('/')}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          payload = {
+              'schema_version': 1,
+              'site': 'Fórmula do Gol',
+              'workflow': 'Deploy GitHub Pages',
+              'status': 'ok',
+              'nivel': 'normal',
+              'publicado_em': datetime.now(timezone(timedelta(hours=-3))).replace(microsecond=0).isoformat(),
+              'snapshot_hash_artefato': digest.hexdigest(),
+              'source_commit': os.environ.get('GITHUB_SHA', ''),
+              'run_url': run_url,
+              'run_id': os.environ.get('GITHUB_RUN_ID', ''),
+          }
+          target = site / 'dados-br' / 'status-deploy.json'
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
       - name: Validar pacote público antes do upload
         shell: bash
         run: |
@@ -303,6 +340,19 @@ jobs:
               echo "ERRO: conteúdo privado ou módulo oculto entrou no deploy: $item"
               exit 1
             fi
+          done
+
+          REQUIRED_OPERATIONAL=(
+            _site/dados-br/status-atualizacao.json
+            _site/dados-br/status-deploy.json
+            _site/dados-br/transmissoes-tv.json
+          )
+          for item in "${REQUIRED_OPERATIONAL[@]}"; do
+            if [[ ! -f "$item" ]]; then
+              echo "ERRO: artefato operacional obrigatório ausente: $item"
+              exit 1
+            fi
+            python -m json.tool "$item" >/dev/null
           done
 
           python - <<'PY'
@@ -560,3 +610,15 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         timeout-minutes: 15
+
+      - name: Alertar falha de deploy por e-mail
+        if: failure()
+        continue-on-error: true
+        env:
+          BR_MOTIVO: Falha no deploy do GitHub Pages. O site continua exibindo a última versão publicada com sucesso.
+          BR_WORKFLOW: Deploy GitHub Pages
+          BR_SITE: Fórmula do Gol
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+          EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
+        run: python scripts/gerenciar_status_brasileirao.py --error --notify
