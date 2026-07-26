@@ -1,15 +1,1658 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-07-26T20:26:11.825198-03:00",
+  "gerado_em": "2026-07-26T20:40:41.826823-03:00",
   "fonte": "ESPN summary",
-  "total_jogos": 194,
-  "total_com_estatisticas": 193,
+  "total_jogos": 197,
+  "total_com_estatisticas": 196,
   "total_com_publico": 180,
-  "total_com_eventos": 193,
-  "total_com_jogadores": 193,
-  "total_eventos_validados": 194,
+  "total_com_eventos": 196,
+  "total_com_jogadores": 196,
+  "total_eventos_validados": 197,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841166": {
+      "event_id": "401841166",
+      "event_id_fonte_detalhes": "401841166",
+      "rodada": 20,
+      "data_iso": "2026-07-26T18:30",
+      "mandante": "Flamengo",
+      "visitante": "São Paulo",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "estadio": "Estadio do Maracana",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Daronco, Anderson",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "53.7%",
+          "away": "46.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "18",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "15",
+          "away": "18"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "5"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "427",
+          "away": "354"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "504",
+          "away": "438"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "13",
+          "away": "19"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "12"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "11"
+        },
+        {
+          "nome": "Cortes",
+          "home": "22",
+          "away": "20"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "53.7%",
+          "away": "46.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "18",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "15",
+          "away": "18"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "0",
+          "away": "5"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "427",
+          "away": "354"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "504",
+          "away": "438"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "13",
+          "away": "19"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "12"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "11"
+        },
+        {
+          "nome": "Cortes",
+          "home": "22",
+          "away": "20"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "57'",
+          "jogador": "Léo Pereira",
+          "time": "Flamengo",
+          "assistencias": [
+            "Jorginho"
+          ],
+          "descricao": "Goal 70 Goal! Flamengo 1, São Paulo 0. Léo Pereira (Flamengo) left footed shot from very close range to the centre of the goal. Assisted by Jorginho following a corner. Léo Pereira Goal"
+        },
+        {
+          "minuto": "70'",
+          "jogador": "Jonathan Calleri",
+          "time": "São Paulo",
+          "assistencias": [
+            "Luis Osorio"
+          ],
+          "descricao": "Goal - Header 137 Goal! Flamengo 1, São Paulo 1. Jonathan Calleri (São Paulo) header from the centre of the box to the bottom left corner. Assisted by Luis Osorio with a cross. Jonathan Calleri Goal - Header"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "63'",
+          "jogador": "Alex Sandro",
+          "time": "Flamengo",
+          "descricao": "Yellow Card 94 Alex Sandro (Flamengo) is shown the yellow card for a bad foul. Alex Sandro Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "69'",
+          "jogador": "Wendell",
+          "time": "São Paulo",
+          "descricao": "Yellow Card 94 Wendell (São Paulo) is shown the yellow card for a bad foul. Wendell Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "88'",
+          "jogador": "Jonathan Calleri",
+          "time": "São Paulo",
+          "descricao": "Yellow Card 94 Jonathan Calleri (São Paulo) is shown the yellow card for a bad foul. Jonathan Calleri Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+11'",
+          "jogador": "Marcos Antonio",
+          "time": "São Paulo",
+          "descricao": "Yellow Card 94 Marcos Antônio (São Paulo) is shown the yellow card. Marcos Antonio Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "215388",
+          "nome": "Agustín Rossi",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "125514",
+          "nome": "Alex Sandro",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201683",
+          "nome": "Bruno Henrique",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "246844",
+          "nome": "Emerson Royal",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "202533",
+          "nome": "Erick Pulgar",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "165778",
+          "nome": "Jorginho",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "145405",
+          "nome": "Léo Pereira",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "357117",
+          "nome": "Lorran",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "235017",
+          "nome": "Pedro",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "253937",
+          "nome": "Samuel Lino",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "254145",
+          "nome": "Vitão",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "198940",
+          "nome": "Everton",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "334752",
+          "nome": "Evertton",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "179767",
+          "nome": "Giorgian de Arrascaeta",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "358167",
+          "nome": "Wallace Yan",
+          "time": "Flamengo",
+          "team_id": "819",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "236596",
+          "nome": "Artur",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "196824",
+          "nome": "Danielzinho",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "162558",
+          "nome": "Jonathan Calleri",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "206953",
+          "nome": "Lucas Ramon",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "190483",
+          "nome": "Luciano",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "383055",
+          "nome": "Luis Osorio",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "266282",
+          "nome": "Marcos Antonio",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "319168",
+          "nome": "Pablo Maia",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199013",
+          "nome": "Rafael",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201531",
+          "nome": "Robert Arboleda",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199065",
+          "nome": "Wendell",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270578",
+          "nome": "André Silva",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "296573",
+          "nome": "Ferreira",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "259879",
+          "nome": "Joao Victor",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "285010",
+          "nome": "Sabino",
+          "time": "São Paulo",
+          "team_id": "2026",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Flamengo": 1,
+          "São Paulo": 1
+        },
+        "gols_extraidos": {
+          "Flamengo": 1,
+          "São Paulo": 1
+        },
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Flamengo": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "São Paulo": {
+            "amarelo": 3,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Flamengo": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "São Paulo": {
+            "amarelo": 3,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_ok": true,
+        "ok": true
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-07-26T20:39:21.435120-03:00"
+    },
+    "401841165": {
+      "event_id": "401841165",
+      "event_id_fonte_detalhes": "401841165",
+      "rodada": 20,
+      "data_iso": "2026-07-26T18:30",
+      "mandante": "Grêmio",
+      "visitante": "Fluminense",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "estadio": "Arena do Grêmio",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Edina Alves Batista",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "50.6%",
+          "away": "49.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "12",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "9",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "9"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "403",
+          "away": "415"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        },
+        {
+          "nome": "Passes",
+          "home": "465",
+          "away": "476"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "4",
+          "away": "6"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "14",
+          "away": "8"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "5",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "12",
+          "away": "26"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "50.6%",
+          "away": "49.4%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "12",
+          "away": "7"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "5",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "9",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "9"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "403",
+          "away": "415"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "90%"
+        },
+        {
+          "nome": "Passes",
+          "home": "465",
+          "away": "476"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "4",
+          "away": "6"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "14",
+          "away": "8"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "5",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "12",
+          "away": "26"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "65'",
+          "jogador": "Hulk",
+          "time": "Fluminense",
+          "assistencias": [],
+          "descricao": "Penalty - Scored 98 Goal! Grêmio 0, Fluminense 1. Hulk (Fluminense) converts the penalty with a left footed shot to the bottom right corner. Hulk Penalty - Scored"
+        },
+        {
+          "minuto": "89'",
+          "jogador": "Diego Caito",
+          "time": "Grêmio",
+          "assistencias": [
+            "Jovane Cabral"
+          ],
+          "descricao": "Goal 70 Goal! Grêmio 1, Fluminense 1. Diego Caito (Grêmio) right footed shot from the right side of the box to the bottom left corner. Assisted by Jovane Cabral. Diego Caito Goal"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "12'",
+          "jogador": "Hércules",
+          "time": "Fluminense",
+          "descricao": "Yellow Card 94 Hércules (Fluminense) is shown the yellow card for a bad foul. Hércules Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "13'",
+          "jogador": "Guga",
+          "time": "Fluminense",
+          "descricao": "Yellow Card 94 Guga (Fluminense) is shown the yellow card for a bad foul. Guga Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "69'",
+          "jogador": "Thiago Silva",
+          "time": "Fluminense",
+          "descricao": "Yellow Card 94 Thiago Silva (Fluminense) is shown the yellow card for a bad foul. Thiago Silva Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "77'",
+          "jogador": "Carlos Vinícius",
+          "time": "Grêmio",
+          "descricao": "Yellow Card 94 Carlos Vinícius (Grêmio) is shown the yellow card. Carlos Vinícius Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "79'",
+          "jogador": "Agustín Canobbio",
+          "time": "Fluminense",
+          "descricao": "Yellow Card 94 Agustín Canobbio (Fluminense) is shown the yellow card for a bad foul. Agustín Canobbio Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+2'",
+          "jogador": "Juan Nardoni",
+          "time": "Grêmio",
+          "descricao": "Yellow Card 94 Juan Nardoni (Grêmio) is shown the yellow card for a bad foul. Juan Nardoni Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "241466",
+          "nome": "Agustín Canobbio",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "158382",
+          "nome": "Fábio",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "271557",
+          "nome": "Guga",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "207269",
+          "nome": "Guilherme Arana",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "336622",
+          "nome": "Hércules",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "124068",
+          "nome": "Hulk",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "276023",
+          "nome": "Juan Freytes",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287633",
+          "nome": "Kevin Serna",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199958",
+          "nome": "Luciano Acosta",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "307946",
+          "nome": "Martinelli",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "96254",
+          "nome": "Thiago Silva",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "165749",
+          "nome": "Germán Cano",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "281559",
+          "nome": "Ignácio",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "238342",
+          "nome": "Nonato",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "173588",
+          "nome": "René",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "194039",
+          "nome": "Yeferson Soteldo",
+          "time": "Fluminense",
+          "team_id": "3445",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "252576",
+          "nome": "Carlos Vinícius",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "24388",
+          "nome": "Cristian Pavón",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "303030",
+          "nome": "Erick Noriega",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269079",
+          "nome": "Francis Amuzu",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "317014",
+          "nome": "Gabriel Grando",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "314603",
+          "nome": "Gustavo Martins",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "290594",
+          "nome": "Juan Nardoni",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "229121",
+          "nome": "Marlon",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287664",
+          "nome": "Mateus Tetê",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "238449",
+          "nome": "Mathías Villasanti",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "146109",
+          "nome": "Wálter Kannemann",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "358811",
+          "nome": "Diego Caito",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "286714",
+          "nome": "José Enamorado",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "250059",
+          "nome": "Jovane Cabral",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "187100",
+          "nome": "Martin Braithwaite",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "399092",
+          "nome": "Pedro Gabriel",
+          "time": "Grêmio",
+          "team_id": "6273",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Grêmio": 1,
+          "Fluminense": 1
+        },
+        "gols_extraidos": {
+          "Grêmio": 1,
+          "Fluminense": 1
+        },
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Grêmio": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Fluminense": {
+            "amarelo": 4,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Grêmio": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Fluminense": {
+            "amarelo": 4,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_ok": true,
+        "ok": true
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-07-26T20:39:21.799605-03:00"
+    },
+    "401841163": {
+      "event_id": "401841163",
+      "event_id_fonte_detalhes": "401841163",
+      "rodada": 20,
+      "data_iso": "2026-07-26T18:30",
+      "mandante": "Bragantino",
+      "visitante": "Coritiba",
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Felipe Fernandes De Lima",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "56%",
+          "away": "44%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "20",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "60%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "8",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "17",
+          "away": "3"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "329",
+          "away": "250"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "404",
+          "away": "327"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "11",
+          "away": "8"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "5",
+          "away": "15"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "6",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "20",
+          "away": "28"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "56%",
+          "away": "44%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "20",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "0"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "60%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "8",
+          "away": "1"
+        },
+        {
+          "nome": "Faltas",
+          "home": "17",
+          "away": "3"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "0",
+          "away": "1"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "329",
+          "away": "250"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "404",
+          "away": "327"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "11",
+          "away": "8"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "5",
+          "away": "15"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "6",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "20",
+          "away": "28"
+        }
+      ],
+      "gols": [],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "20'",
+          "jogador": "Lucas Barbosa",
+          "time": "Bragantino",
+          "descricao": "Yellow Card 94 Lucas Barbosa (RB Bragantino) is shown the yellow card for a bad foul. Lucas Barbosa Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "58'",
+          "jogador": "Vini Paulista",
+          "time": "Coritiba",
+          "descricao": "Yellow Card 94 Vini Paulista (Coritiba) is shown the yellow card for a bad foul. Vini Paulista Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "86'",
+          "jogador": "Ignacio Sosa",
+          "time": "Bragantino",
+          "descricao": "Yellow Card 94 Ignacio Sosa (RB Bragantino) is shown the yellow card for a bad foul. Ignacio Sosa Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+1'",
+          "jogador": "Paulo Roberto",
+          "time": "Coritiba",
+          "descricao": "Yellow Card 94 Paulo Roberto (Coritiba) is shown the yellow card for a bad foul. Paulo Roberto Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+6'",
+          "jogador": "Guzmán Rodríguez",
+          "time": "Bragantino",
+          "descricao": "Yellow Card 94 Guzmán Rodríguez (RB Bragantino) is shown the yellow card. Guzmán Rodríguez Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "257335",
+          "nome": "Alix Vinicius",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199680",
+          "nome": "Eduardo Sasha",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "267902",
+          "nome": "Fernando",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "334375",
+          "nome": "Gustavo Marques",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "335360",
+          "nome": "José Herrera",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "311087",
+          "nome": "José Hurtado",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "229555",
+          "nome": "Juninho Capixaba",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "248584",
+          "nome": "Lucas Barbosa",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "279941",
+          "nome": "Ramires",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "339001",
+          "nome": "Rodriguinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "145092",
+          "nome": "Tiago Volpi",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "333314",
+          "nome": "Henry Mosquera",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "317370",
+          "nome": "Ignacio Sosa",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "287035",
+          "nome": "Isidro Pitta",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "202485",
+          "nome": "Pedro Henrique",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "383987",
+          "nome": "Vinicinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "236324",
+          "nome": "Breno",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "243831",
+          "nome": "Bruno Melo",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "256018",
+          "nome": "Jacy Maranhão",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "150215",
+          "nome": "Josué Pesqueira",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "360137",
+          "nome": "Lucas Ronier",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "311037",
+          "nome": "Pedro Rangel",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "216846",
+          "nome": "Pedro Rocha",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "188143",
+          "nome": "Thiago Santos",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "319507",
+          "nome": "Tiago",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "200826",
+          "nome": "Tinga",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "316781",
+          "nome": "Vini Paulista",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "272437",
+          "nome": "Felipe Jonatan",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "333306",
+          "nome": "Joaquín Lavega",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "203693",
+          "nome": "Keno",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "417356",
+          "nome": "Paulo Roberto",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "402818",
+          "nome": "Tissi",
+          "time": "Coritiba",
+          "team_id": "3456",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Bragantino": 0,
+          "Coritiba": 0
+        },
+        "gols_extraidos": {
+          "Bragantino": 0,
+          "Coritiba": 0
+        },
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Bragantino": {
+            "amarelo": 3,
+            "vermelho": 0
+          },
+          "Coritiba": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Bragantino": {
+            "amarelo": 3,
+            "vermelho": 0
+          },
+          "Coritiba": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_ok": true,
+        "ok": true
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-07-26T20:39:22.165661-03:00"
+    },
     "401841159": {
       "event_id": "401841159",
       "event_id_fonte_detalhes": "401841159",
@@ -582,7 +2225,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:55.258158-03:00"
+      "atualizado_em": "2026-07-26T20:39:22.582136-03:00"
     },
     "401841167": {
       "event_id": "401841167",
@@ -1161,7 +2804,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:55.690762-03:00"
+      "atualizado_em": "2026-07-26T20:39:22.963925-03:00"
     },
     "401841160": {
       "event_id": "401841160",
@@ -1698,7 +3341,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:56.052957-03:00"
+      "atualizado_em": "2026-07-26T20:39:23.357604-03:00"
     },
     "401841158": {
       "event_id": "401841158",
@@ -2204,7 +3847,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:56.443752-03:00"
+      "atualizado_em": "2026-07-26T20:39:23.750966-03:00"
     },
     "401841161": {
       "event_id": "401841161",
@@ -2792,7 +4435,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:56.844053-03:00"
+      "atualizado_em": "2026-07-26T20:39:24.171778-03:00"
     },
     "401840999": {
       "event_id": "401840999",
@@ -2856,7 +4499,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:57.026777-03:00"
+      "atualizado_em": "2026-07-26T20:39:24.364674-03:00"
     },
     "401841151": {
       "event_id": "401841151",
@@ -3404,7 +5047,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:57.395077-03:00"
+      "atualizado_em": "2026-07-26T20:39:24.742473-03:00"
     },
     "401841150": {
       "event_id": "401841150",
@@ -3950,7 +5593,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:57.812481-03:00"
+      "atualizado_em": "2026-07-26T20:39:25.095470-03:00"
     },
     "401841154": {
       "event_id": "401841154",
@@ -4540,7 +6183,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:58.190985-03:00"
+      "atualizado_em": "2026-07-26T20:39:25.493241-03:00"
     },
     "401841156": {
       "event_id": "401841156",
@@ -5069,7 +6712,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:58.597790-03:00"
+      "atualizado_em": "2026-07-26T20:39:25.891719-03:00"
     },
     "401841152": {
       "event_id": "401841152",
@@ -5638,7 +7281,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:58.994954-03:00"
+      "atualizado_em": "2026-07-26T20:39:26.291875-03:00"
     },
     "401841148": {
       "event_id": "401841148",
@@ -6161,7 +7804,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:59.420943-03:00"
+      "atualizado_em": "2026-07-26T20:39:26.684626-03:00"
     },
     "401841153": {
       "event_id": "401841153",
@@ -6742,7 +8385,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:24:59.827203-03:00"
+      "atualizado_em": "2026-07-26T20:39:27.052699-03:00"
     },
     "401841155": {
       "event_id": "401841155",
@@ -7312,7 +8955,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:00.208712-03:00"
+      "atualizado_em": "2026-07-26T20:39:27.463758-03:00"
     },
     "401840998": {
       "event_id": "401840998",
@@ -7849,7 +9492,7 @@
       "origem_resultado": "manual confirmado — resultado público e vídeo publicado pelo UOL Esporte",
       "motivo_resultado_manual": "A ESPN manteve o event_id reagendado com placar/status incompatível com o resultado público confirmado.",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:00.596474-03:00"
+      "atualizado_em": "2026-07-26T20:39:27.908054-03:00"
     },
     "401841149": {
       "event_id": "401841149",
@@ -8421,7 +10064,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:00.972542-03:00"
+      "atualizado_em": "2026-07-26T20:39:28.310228-03:00"
     },
     "401841157": {
       "event_id": "401841157",
@@ -8936,7 +10579,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:01.368519-03:00"
+      "atualizado_em": "2026-07-26T20:39:28.697027-03:00"
     },
     "401841145": {
       "event_id": "401841145",
@@ -9485,7 +11128,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:01.918999-03:00"
+      "atualizado_em": "2026-07-26T20:39:29.098724-03:00"
     },
     "401841147": {
       "event_id": "401841147",
@@ -10022,7 +11665,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:02.290356-03:00"
+      "atualizado_em": "2026-07-26T20:39:29.491180-03:00"
     },
     "401841140": {
       "event_id": "401841140",
@@ -10575,7 +12218,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:02.732075-03:00"
+      "atualizado_em": "2026-07-26T20:39:29.889822-03:00"
     },
     "401841142": {
       "event_id": "401841142",
@@ -11089,7 +12732,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:03.101153-03:00"
+      "atualizado_em": "2026-07-26T20:39:30.267414-03:00"
     },
     "401841141": {
       "event_id": "401841141",
@@ -11670,7 +13313,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:03.612491-03:00"
+      "atualizado_em": "2026-07-26T20:39:30.642366-03:00"
     },
     "401841143": {
       "event_id": "401841143",
@@ -12267,7 +13910,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:04.040680-03:00"
+      "atualizado_em": "2026-07-26T20:39:31.023392-03:00"
     },
     "401841146": {
       "event_id": "401841146",
@@ -12867,7 +14510,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:04.432080-03:00"
+      "atualizado_em": "2026-07-26T20:39:31.414568-03:00"
     },
     "401841139": {
       "event_id": "401841139",
@@ -13448,7 +15091,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:04.829009-03:00"
+      "atualizado_em": "2026-07-26T20:39:31.852520-03:00"
     },
     "401841138": {
       "event_id": "401841138",
@@ -13999,7 +15642,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:05.218247-03:00"
+      "atualizado_em": "2026-07-26T20:39:32.219511-03:00"
     },
     "401841144": {
       "event_id": "401841144",
@@ -14561,7 +16204,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:05.643270-03:00"
+      "atualizado_em": "2026-07-26T20:39:32.609146-03:00"
     },
     "401841129": {
       "event_id": "401841129",
@@ -15130,7 +16773,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:06.008483-03:00"
+      "atualizado_em": "2026-07-26T20:39:33.000488-03:00"
     },
     "401841131": {
       "event_id": "401841131",
@@ -15689,7 +17332,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:06.380589-03:00"
+      "atualizado_em": "2026-07-26T20:39:33.395221-03:00"
     },
     "401841128": {
       "event_id": "401841128",
@@ -16210,7 +17853,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:06.761797-03:00"
+      "atualizado_em": "2026-07-26T20:39:33.842834-03:00"
     },
     "401841137": {
       "event_id": "401841137",
@@ -16770,7 +18413,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:07.162165-03:00"
+      "atualizado_em": "2026-07-26T20:39:34.214525-03:00"
     },
     "401841133": {
       "event_id": "401841133",
@@ -17336,7 +18979,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:07.548925-03:00"
+      "atualizado_em": "2026-07-26T20:39:34.609849-03:00"
     },
     "401841136": {
       "event_id": "401841136",
@@ -17945,7 +19588,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:07.942981-03:00"
+      "atualizado_em": "2026-07-26T20:39:35.059135-03:00"
     },
     "401841135": {
       "event_id": "401841135",
@@ -18510,7 +20153,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:08.314672-03:00"
+      "atualizado_em": "2026-07-26T20:39:35.441566-03:00"
     },
     "401841134": {
       "event_id": "401841134",
@@ -19066,7 +20709,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:08.682943-03:00"
+      "atualizado_em": "2026-07-26T20:39:35.814759-03:00"
     },
     "401841132": {
       "event_id": "401841132",
@@ -19635,7 +21278,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:09.114114-03:00"
+      "atualizado_em": "2026-07-26T20:39:36.190361-03:00"
     },
     "401841130": {
       "event_id": "401841130",
@@ -20188,7 +21831,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:09.608033-03:00"
+      "atualizado_em": "2026-07-26T20:39:36.594742-03:00"
     },
     "401841121": {
       "event_id": "401841121",
@@ -20203,7 +21846,7 @@
       "publico": 33549,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Rafael Rodrigo Klein",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -20733,7 +22376,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:10.008453-03:00"
+      "atualizado_em": "2026-07-26T20:39:36.980723-03:00"
     },
     "401841122": {
       "event_id": "401841122",
@@ -20748,7 +22391,7 @@
       "publico": 9202,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Alex Gomes Stefano",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -21302,7 +22945,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:10.376660-03:00"
+      "atualizado_em": "2026-07-26T20:39:37.374332-03:00"
     },
     "401841124": {
       "event_id": "401841124",
@@ -21317,7 +22960,7 @@
       "publico": 1733,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Wagner Do Nascimento Magalhaes",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -21867,7 +23510,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:10.754874-03:00"
+      "atualizado_em": "2026-07-26T20:39:37.768518-03:00"
     },
     "401841119": {
       "event_id": "401841119",
@@ -21882,7 +23525,7 @@
       "publico": 26800,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -22453,7 +24096,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:11.146562-03:00"
+      "atualizado_em": "2026-07-26T20:39:38.171271-03:00"
     },
     "401841118": {
       "event_id": "401841118",
@@ -22468,7 +24111,7 @@
       "publico": 17556,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Felipe Fernandes De Lima",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -23045,7 +24688,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:11.536140-03:00"
+      "atualizado_em": "2026-07-26T20:39:38.723686-03:00"
     },
     "401841123": {
       "event_id": "401841123",
@@ -23060,7 +24703,7 @@
       "publico": 45662,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Paulo Cezar Zanovelli Da Silva",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -23642,7 +25285,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:11.929318-03:00"
+      "atualizado_em": "2026-07-26T20:39:39.124273-03:00"
     },
     "401841125": {
       "event_id": "401841125",
@@ -23657,7 +25300,7 @@
       "publico": 27657,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Savio Pereira Sampaio",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -24191,7 +25834,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:12.319334-03:00"
+      "atualizado_em": "2026-07-26T20:39:39.528219-03:00"
     },
     "401841127": {
       "event_id": "401841127",
@@ -24206,7 +25849,7 @@
       "publico": 28218,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Wilton Pereira Sampaio",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -24758,7 +26401,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:12.722831-03:00"
+      "atualizado_em": "2026-07-26T20:39:39.893729-03:00"
     },
     "401841120": {
       "event_id": "401841120",
@@ -24773,7 +26416,7 @@
       "publico": 20027,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Lucas Casagrande",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -25288,7 +26931,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:13.098942-03:00"
+      "atualizado_em": "2026-07-26T20:39:40.294273-03:00"
     },
     "401841126": {
       "event_id": "401841126",
@@ -25303,7 +26946,7 @@
       "publico": 21688,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Ramon Abatti Abel",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -25859,7 +27502,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:13.552442-03:00"
+      "atualizado_em": "2026-07-26T20:39:40.784686-03:00"
     },
     "401841112": {
       "event_id": "401841112",
@@ -26410,7 +28053,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:13.914134-03:00"
+      "atualizado_em": "2026-07-26T20:39:41.182828-03:00"
     },
     "401841117": {
       "event_id": "401841117",
@@ -26938,7 +28581,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:14.649697-03:00"
+      "atualizado_em": "2026-07-26T20:39:41.708027-03:00"
     },
     "401841115": {
       "event_id": "401841115",
@@ -27506,7 +29149,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:15.033777-03:00"
+      "atualizado_em": "2026-07-26T20:39:42.110746-03:00"
     },
     "401841111": {
       "event_id": "401841111",
@@ -28064,7 +29707,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:15.499321-03:00"
+      "atualizado_em": "2026-07-26T20:39:42.515961-03:00"
     },
     "401841109": {
       "event_id": "401841109",
@@ -28622,7 +30265,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:15.915887-03:00"
+      "atualizado_em": "2026-07-26T20:39:42.912323-03:00"
     },
     "401841108": {
       "event_id": "401841108",
@@ -29141,7 +30784,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:16.281545-03:00"
+      "atualizado_em": "2026-07-26T20:39:43.323552-03:00"
     },
     "401841110": {
       "event_id": "401841110",
@@ -29694,7 +31337,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:16.669530-03:00"
+      "atualizado_em": "2026-07-26T20:39:43.748734-03:00"
     },
     "401841116": {
       "event_id": "401841116",
@@ -30275,7 +31918,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:17.067981-03:00"
+      "atualizado_em": "2026-07-26T20:39:44.135389-03:00"
     },
     "401841113": {
       "event_id": "401841113",
@@ -30856,7 +32499,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:17.604794-03:00"
+      "atualizado_em": "2026-07-26T20:39:44.505088-03:00"
     },
     "401841114": {
       "event_id": "401841114",
@@ -31423,7 +33066,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:17.969163-03:00"
+      "atualizado_em": "2026-07-26T20:39:44.869282-03:00"
     },
     "401841103": {
       "event_id": "401841103",
@@ -31438,7 +33081,7 @@
       "publico": 9943,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Matheus Delgado Candançan",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -32004,7 +33647,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:18.347568-03:00"
+      "atualizado_em": "2026-07-26T20:39:45.237456-03:00"
     },
     "401841099": {
       "event_id": "401841099",
@@ -32019,7 +33662,7 @@
       "publico": 8065,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Paulo Cezar Zanovelli Da Silva",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -32556,7 +34199,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:18.711024-03:00"
+      "atualizado_em": "2026-07-26T20:39:45.634097-03:00"
     },
     "401841104": {
       "event_id": "401841104",
@@ -32571,7 +34214,7 @@
       "publico": 17092,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Felipe Fernandes De Lima",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -33128,7 +34771,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:19.107130-03:00"
+      "atualizado_em": "2026-07-26T20:39:46.023772-03:00"
     },
     "401841105": {
       "event_id": "401841105",
@@ -33143,7 +34786,7 @@
       "publico": 61872,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Wilton Pereira Sampaio",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -33703,7 +35346,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:19.485202-03:00"
+      "atualizado_em": "2026-07-26T20:39:46.682270-03:00"
     },
     "401841101": {
       "event_id": "401841101",
@@ -33718,7 +35361,7 @@
       "publico": 9390,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Davi De Oliveira Lacerda",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -34293,7 +35936,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:19.895110-03:00"
+      "atualizado_em": "2026-07-26T20:39:47.079923-03:00"
     },
     "401841098": {
       "event_id": "401841098",
@@ -34308,7 +35951,7 @@
       "publico": 53921,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Flavio Rodrigues de Souza",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -34894,7 +36537,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:20.273661-03:00"
+      "atualizado_em": "2026-07-26T20:39:47.467347-03:00"
     },
     "401841106": {
       "event_id": "401841106",
@@ -34909,7 +36552,7 @@
       "publico": 25859,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Savio Pereira Sampaio",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -35404,7 +37047,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:20.641072-03:00"
+      "atualizado_em": "2026-07-26T20:39:47.837526-03:00"
     },
     "401841102": {
       "event_id": "401841102",
@@ -35419,7 +37062,7 @@
       "publico": 41282,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Raphael Claus",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -35941,7 +37584,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:21.003761-03:00"
+      "atualizado_em": "2026-07-26T20:39:48.196285-03:00"
     },
     "401841100": {
       "event_id": "401841100",
@@ -35956,7 +37599,7 @@
       "publico": 17848,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Rafael Rodrigo Klein",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -36524,7 +38167,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:21.382484-03:00"
+      "atualizado_em": "2026-07-26T20:39:48.600266-03:00"
     },
     "401841107": {
       "event_id": "401841107",
@@ -36539,7 +38182,7 @@
       "publico": 22116,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Rodrigo Jose Pereira De Lima",
+      "arbitro": "",
       "stats": [
         {
           "nome": "Posse",
@@ -37082,7 +38725,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:21.751333-03:00"
+      "atualizado_em": "2026-07-26T20:39:49.019240-03:00"
     },
     "401841096": {
       "event_id": "401841096",
@@ -37638,7 +39281,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:22.119600-03:00"
+      "atualizado_em": "2026-07-26T20:39:49.410341-03:00"
     },
     "401841090": {
       "event_id": "401841090",
@@ -38212,7 +39855,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:22.501749-03:00"
+      "atualizado_em": "2026-07-26T20:39:49.816837-03:00"
     },
     "401841088": {
       "event_id": "401841088",
@@ -38813,7 +40456,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:22.885429-03:00"
+      "atualizado_em": "2026-07-26T20:39:50.208206-03:00"
     },
     "401841097": {
       "event_id": "401841097",
@@ -39350,7 +40993,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:23.254139-03:00"
+      "atualizado_em": "2026-07-26T20:39:50.611307-03:00"
     },
     "401841089": {
       "event_id": "401841089",
@@ -39907,7 +41550,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:23.705728-03:00"
+      "atualizado_em": "2026-07-26T20:39:51.011718-03:00"
     },
     "401841091": {
       "event_id": "401841091",
@@ -40465,7 +42108,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:24.091407-03:00"
+      "atualizado_em": "2026-07-26T20:39:51.401126-03:00"
     },
     "401841092": {
       "event_id": "401841092",
@@ -40986,7 +42629,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:24.459951-03:00"
+      "atualizado_em": "2026-07-26T20:39:51.781192-03:00"
     },
     "401841095": {
       "event_id": "401841095",
@@ -41572,7 +43215,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:24.864320-03:00"
+      "atualizado_em": "2026-07-26T20:39:52.202280-03:00"
     },
     "401841094": {
       "event_id": "401841094",
@@ -42138,7 +43781,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:25.560121-03:00"
+      "atualizado_em": "2026-07-26T20:39:52.629413-03:00"
     },
     "401841093": {
       "event_id": "401841093",
@@ -42674,7 +44317,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:26.018514-03:00"
+      "atualizado_em": "2026-07-26T20:39:53.078333-03:00"
     },
     "401841086": {
       "event_id": "401841086",
@@ -42689,7 +44332,7 @@
       "publico": 64565,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "",
+      "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
           "nome": "Posse",
@@ -43213,7 +44856,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:26.457750-03:00"
+      "atualizado_em": "2026-07-26T20:39:53.441347-03:00"
     },
     "401841084": {
       "event_id": "401841084",
@@ -43228,7 +44871,7 @@
       "publico": 39714,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "",
+      "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
           "nome": "Posse",
@@ -43769,7 +45412,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:26.865368-03:00"
+      "atualizado_em": "2026-07-26T20:39:53.866645-03:00"
     },
     "401841083": {
       "event_id": "401841083",
@@ -43784,7 +45427,7 @@
       "publico": 4163,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "",
+      "arbitro": "Jonathan Pinheiro",
       "stats": [
         {
           "nome": "Posse",
@@ -44336,7 +45979,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:27.240145-03:00"
+      "atualizado_em": "2026-07-26T20:39:54.312259-03:00"
     },
     "401841079": {
       "event_id": "401841079",
@@ -44892,7 +46535,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:27.616422-03:00"
+      "atualizado_em": "2026-07-26T20:39:54.735809-03:00"
     },
     "401841082": {
       "event_id": "401841082",
@@ -45490,7 +47133,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:27.995096-03:00"
+      "atualizado_em": "2026-07-26T20:39:55.130979-03:00"
     },
     "401841085": {
       "event_id": "401841085",
@@ -46052,7 +47695,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:28.395108-03:00"
+      "atualizado_em": "2026-07-26T20:39:55.516406-03:00"
     },
     "401841087": {
       "event_id": "401841087",
@@ -46619,7 +48262,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:28.774426-03:00"
+      "atualizado_em": "2026-07-26T20:39:55.976394-03:00"
     },
     "401841080": {
       "event_id": "401841080",
@@ -47146,7 +48789,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:29.172295-03:00"
+      "atualizado_em": "2026-07-26T20:39:56.334413-03:00"
     },
     "401841078": {
       "event_id": "401841078",
@@ -47689,7 +49332,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:29.529219-03:00"
+      "atualizado_em": "2026-07-26T20:39:56.722904-03:00"
     },
     "401841081": {
       "event_id": "401841081",
@@ -48240,7 +49883,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:29.921393-03:00"
+      "atualizado_em": "2026-07-26T20:39:57.165615-03:00"
     },
     "401841069": {
       "event_id": "401841069",
@@ -48749,7 +50392,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:30.298829-03:00"
+      "atualizado_em": "2026-07-26T20:39:57.583673-03:00"
     },
     "401841068": {
       "event_id": "401841068",
@@ -49297,7 +50940,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:30.704767-03:00"
+      "atualizado_em": "2026-07-26T20:39:57.967123-03:00"
     },
     "401841072": {
       "event_id": "401841072",
@@ -49871,7 +51514,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:31.076306-03:00"
+      "atualizado_em": "2026-07-26T20:39:58.340223-03:00"
     },
     "401841070": {
       "event_id": "401841070",
@@ -50462,7 +52105,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:31.488012-03:00"
+      "atualizado_em": "2026-07-26T20:39:58.734675-03:00"
     },
     "401841071": {
       "event_id": "401841071",
@@ -51027,7 +52670,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:31.891649-03:00"
+      "atualizado_em": "2026-07-26T20:39:59.185495-03:00"
     },
     "401841077": {
       "event_id": "401841077",
@@ -51581,7 +53224,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:32.279769-03:00"
+      "atualizado_em": "2026-07-26T20:39:59.628600-03:00"
     },
     "401841074": {
       "event_id": "401841074",
@@ -52117,7 +53760,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:32.653444-03:00"
+      "atualizado_em": "2026-07-26T20:39:59.999453-03:00"
     },
     "401841076": {
       "event_id": "401841076",
@@ -52694,7 +54337,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:33.033907-03:00"
+      "atualizado_em": "2026-07-26T20:40:00.406958-03:00"
     },
     "401841075": {
       "event_id": "401841075",
@@ -53217,7 +54860,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:33.399089-03:00"
+      "atualizado_em": "2026-07-26T20:40:00.809952-03:00"
     },
     "401841073": {
       "event_id": "401841073",
@@ -53776,7 +55419,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:33.777297-03:00"
+      "atualizado_em": "2026-07-26T20:40:01.194965-03:00"
     },
     "401841061": {
       "event_id": "401841061",
@@ -54294,7 +55937,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:34.161396-03:00"
+      "atualizado_em": "2026-07-26T20:40:01.593889-03:00"
     },
     "401841060": {
       "event_id": "401841060",
@@ -54845,7 +56488,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:34.562015-03:00"
+      "atualizado_em": "2026-07-26T20:40:02.050554-03:00"
     },
     "401841066": {
       "event_id": "401841066",
@@ -55419,7 +57062,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:34.969730-03:00"
+      "atualizado_em": "2026-07-26T20:40:02.436615-03:00"
     },
     "401841064": {
       "event_id": "401841064",
@@ -55970,7 +57613,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:35.348921-03:00"
+      "atualizado_em": "2026-07-26T20:40:02.850940-03:00"
     },
     "401841058": {
       "event_id": "401841058",
@@ -56509,7 +58152,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:35.724222-03:00"
+      "atualizado_em": "2026-07-26T20:40:03.300503-03:00"
     },
     "401841067": {
       "event_id": "401841067",
@@ -57064,7 +58707,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:36.095168-03:00"
+      "atualizado_em": "2026-07-26T20:40:03.682023-03:00"
     },
     "401841065": {
       "event_id": "401841065",
@@ -57629,7 +59272,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:36.480743-03:00"
+      "atualizado_em": "2026-07-26T20:40:04.075905-03:00"
     },
     "401841062": {
       "event_id": "401841062",
@@ -58187,7 +59830,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:36.915012-03:00"
+      "atualizado_em": "2026-07-26T20:40:04.457349-03:00"
     },
     "401841063": {
       "event_id": "401841063",
@@ -58719,7 +60362,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:37.287648-03:00"
+      "atualizado_em": "2026-07-26T20:40:04.844860-03:00"
     },
     "401841059": {
       "event_id": "401841059",
@@ -59289,7 +60932,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:37.668828-03:00"
+      "atualizado_em": "2026-07-26T20:40:05.252269-03:00"
     },
     "401841052": {
       "event_id": "401841052",
@@ -59842,7 +61485,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:38.037572-03:00"
+      "atualizado_em": "2026-07-26T20:40:05.654384-03:00"
     },
     "401841051": {
       "event_id": "401841051",
@@ -60418,7 +62061,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:38.407313-03:00"
+      "atualizado_em": "2026-07-26T20:40:06.047821-03:00"
     },
     "401841049": {
       "event_id": "401841049",
@@ -60966,7 +62609,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:38.810573-03:00"
+      "atualizado_em": "2026-07-26T20:40:06.445667-03:00"
     },
     "401841050": {
       "event_id": "401841050",
@@ -61533,7 +63176,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:39.188454-03:00"
+      "atualizado_em": "2026-07-26T20:40:06.810984-03:00"
     },
     "401841054": {
       "event_id": "401841054",
@@ -62114,7 +63757,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:39.562549-03:00"
+      "atualizado_em": "2026-07-26T20:40:07.220955-03:00"
     },
     "401841048": {
       "event_id": "401841048",
@@ -62658,7 +64301,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:39.949721-03:00"
+      "atualizado_em": "2026-07-26T20:40:07.598941-03:00"
     },
     "401841056": {
       "event_id": "401841056",
@@ -63218,7 +64861,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:40.327416-03:00"
+      "atualizado_em": "2026-07-26T20:40:08.006803-03:00"
     },
     "401841055": {
       "event_id": "401841055",
@@ -63780,7 +65423,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:40.715318-03:00"
+      "atualizado_em": "2026-07-26T20:40:08.392773-03:00"
     },
     "401841057": {
       "event_id": "401841057",
@@ -64368,7 +66011,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:41.089179-03:00"
+      "atualizado_em": "2026-07-26T20:40:08.853291-03:00"
     },
     "401841053": {
       "event_id": "401841053",
@@ -64923,7 +66566,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:41.475758-03:00"
+      "atualizado_em": "2026-07-26T20:40:09.223032-03:00"
     },
     "401841016": {
       "event_id": "401841016",
@@ -65498,7 +67141,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:41.916417-03:00"
+      "atualizado_em": "2026-07-26T20:40:09.619167-03:00"
     },
     "401841046": {
       "event_id": "401841046",
@@ -66057,7 +67700,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:42.309532-03:00"
+      "atualizado_em": "2026-07-26T20:40:09.993692-03:00"
     },
     "401841043": {
       "event_id": "401841043",
@@ -66608,7 +68251,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:42.668391-03:00"
+      "atualizado_em": "2026-07-26T20:40:10.380482-03:00"
     },
     "401841042": {
       "event_id": "401841042",
@@ -67164,7 +68807,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:43.041105-03:00"
+      "atualizado_em": "2026-07-26T20:40:10.780109-03:00"
     },
     "401841038": {
       "event_id": "401841038",
@@ -67702,7 +69345,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:43.432842-03:00"
+      "atualizado_em": "2026-07-26T20:40:11.194758-03:00"
     },
     "401841045": {
       "event_id": "401841045",
@@ -68234,7 +69877,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:43.820964-03:00"
+      "atualizado_em": "2026-07-26T20:40:11.569907-03:00"
     },
     "401841041": {
       "event_id": "401841041",
@@ -68810,7 +70453,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:44.255916-03:00"
+      "atualizado_em": "2026-07-26T20:40:12.020323-03:00"
     },
     "401841039": {
       "event_id": "401841039",
@@ -69372,7 +71015,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:44.620527-03:00"
+      "atualizado_em": "2026-07-26T20:40:12.406979-03:00"
     },
     "401841040": {
       "event_id": "401841040",
@@ -69944,7 +71587,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:44.991021-03:00"
+      "atualizado_em": "2026-07-26T20:40:12.805605-03:00"
     },
     "401841044": {
       "event_id": "401841044",
@@ -70522,7 +72165,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:45.396033-03:00"
+      "atualizado_em": "2026-07-26T20:40:13.329065-03:00"
     },
     "401841047": {
       "event_id": "401841047",
@@ -71089,7 +72732,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:45.768918-03:00"
+      "atualizado_em": "2026-07-26T20:40:13.748250-03:00"
     },
     "401841036": {
       "event_id": "401841036",
@@ -71636,7 +73279,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:46.146545-03:00"
+      "atualizado_em": "2026-07-26T20:40:14.165092-03:00"
     },
     "401841035": {
       "event_id": "401841035",
@@ -72196,7 +73839,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:46.576860-03:00"
+      "atualizado_em": "2026-07-26T20:40:14.594941-03:00"
     },
     "401841034": {
       "event_id": "401841034",
@@ -72747,7 +74390,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:46.947326-03:00"
+      "atualizado_em": "2026-07-26T20:40:15.057745-03:00"
     },
     "401841031": {
       "event_id": "401841031",
@@ -73316,7 +74959,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:47.345154-03:00"
+      "atualizado_em": "2026-07-26T20:40:15.500151-03:00"
     },
     "401841030": {
       "event_id": "401841030",
@@ -73880,7 +75523,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:47.808793-03:00"
+      "atualizado_em": "2026-07-26T20:40:15.926997-03:00"
     },
     "401841029": {
       "event_id": "401841029",
@@ -74394,7 +76037,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:48.175008-03:00"
+      "atualizado_em": "2026-07-26T20:40:16.308914-03:00"
     },
     "401841033": {
       "event_id": "401841033",
@@ -74936,7 +76579,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:48.537975-03:00"
+      "atualizado_em": "2026-07-26T20:40:16.757127-03:00"
     },
     "401841028": {
       "event_id": "401841028",
@@ -75493,7 +77136,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:48.924953-03:00"
+      "atualizado_em": "2026-07-26T20:40:17.229863-03:00"
     },
     "401841037": {
       "event_id": "401841037",
@@ -76044,7 +77687,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:49.319223-03:00"
+      "atualizado_em": "2026-07-26T20:40:17.695455-03:00"
     },
     "401841032": {
       "event_id": "401841032",
@@ -76611,7 +78254,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:49.715305-03:00"
+      "atualizado_em": "2026-07-26T20:40:18.091318-03:00"
     },
     "401841025": {
       "event_id": "401841025",
@@ -77158,7 +78801,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:50.113711-03:00"
+      "atualizado_em": "2026-07-26T20:40:18.471934-03:00"
     },
     "401841023": {
       "event_id": "401841023",
@@ -77759,7 +79402,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:50.488577-03:00"
+      "atualizado_em": "2026-07-26T20:40:18.847599-03:00"
     },
     "401841019": {
       "event_id": "401841019",
@@ -78347,7 +79990,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:50.857638-03:00"
+      "atualizado_em": "2026-07-26T20:40:19.236923-03:00"
     },
     "401841024": {
       "event_id": "401841024",
@@ -78898,7 +80541,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:51.227876-03:00"
+      "atualizado_em": "2026-07-26T20:40:19.844445-03:00"
     },
     "401841020": {
       "event_id": "401841020",
@@ -79442,7 +81085,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:51.597527-03:00"
+      "atualizado_em": "2026-07-26T20:40:20.230438-03:00"
     },
     "401841022": {
       "event_id": "401841022",
@@ -80034,7 +81677,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:52.032199-03:00"
+      "atualizado_em": "2026-07-26T20:40:20.646471-03:00"
     },
     "401841021": {
       "event_id": "401841021",
@@ -80583,7 +82226,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:52.456825-03:00"
+      "atualizado_em": "2026-07-26T20:40:21.037178-03:00"
     },
     "401841018": {
       "event_id": "401841018",
@@ -81149,7 +82792,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:52.892491-03:00"
+      "atualizado_em": "2026-07-26T20:40:21.443088-03:00"
     },
     "401841026": {
       "event_id": "401841026",
@@ -81723,7 +83366,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:53.332486-03:00"
+      "atualizado_em": "2026-07-26T20:40:21.860772-03:00"
     },
     "401841027": {
       "event_id": "401841027",
@@ -82281,7 +83924,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:53.760715-03:00"
+      "atualizado_em": "2026-07-26T20:40:22.303806-03:00"
     },
     "401841011": {
       "event_id": "401841011",
@@ -82840,7 +84483,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:54.133623-03:00"
+      "atualizado_em": "2026-07-26T20:40:22.835328-03:00"
     },
     "401841008": {
       "event_id": "401841008",
@@ -83372,7 +85015,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:54.496850-03:00"
+      "atualizado_em": "2026-07-26T20:40:23.215809-03:00"
     },
     "401841012": {
       "event_id": "401841012",
@@ -83934,7 +85577,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:54.917645-03:00"
+      "atualizado_em": "2026-07-26T20:40:23.608979-03:00"
     },
     "401841009": {
       "event_id": "401841009",
@@ -84480,7 +86123,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:55.322712-03:00"
+      "atualizado_em": "2026-07-26T20:40:24.010485-03:00"
     },
     "401841013": {
       "event_id": "401841013",
@@ -85041,7 +86684,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:55.720215-03:00"
+      "atualizado_em": "2026-07-26T20:40:24.456773-03:00"
     },
     "401841017": {
       "event_id": "401841017",
@@ -85592,7 +87235,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:56.095679-03:00"
+      "atualizado_em": "2026-07-26T20:40:24.832012-03:00"
     },
     "401841014": {
       "event_id": "401841014",
@@ -86129,7 +87772,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:56.468361-03:00"
+      "atualizado_em": "2026-07-26T20:40:25.224225-03:00"
     },
     "401841015": {
       "event_id": "401841015",
@@ -86673,7 +88316,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:56.868038-03:00"
+      "atualizado_em": "2026-07-26T20:40:25.600282-03:00"
     },
     "401841010": {
       "event_id": "401841010",
@@ -87240,7 +88883,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:57.243790-03:00"
+      "atualizado_em": "2026-07-26T20:40:26.053547-03:00"
     },
     "401841002": {
       "event_id": "401841002",
@@ -87791,7 +89434,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:57.646264-03:00"
+      "atualizado_em": "2026-07-26T20:40:26.440435-03:00"
     },
     "401841005": {
       "event_id": "401841005",
@@ -88352,7 +89995,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:58.004638-03:00"
+      "atualizado_em": "2026-07-26T20:40:26.824405-03:00"
     },
     "401841004": {
       "event_id": "401841004",
@@ -88931,7 +90574,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:58.387724-03:00"
+      "atualizado_em": "2026-07-26T20:40:27.228358-03:00"
     },
     "401841001": {
       "event_id": "401841001",
@@ -89481,7 +91124,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:58.820100-03:00"
+      "atualizado_em": "2026-07-26T20:40:27.656911-03:00"
     },
     "401841000": {
       "event_id": "401841000",
@@ -90044,7 +91687,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:59.217376-03:00"
+      "atualizado_em": "2026-07-26T20:40:28.051295-03:00"
     },
     "401841003": {
       "event_id": "401841003",
@@ -90602,7 +92245,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:59.594196-03:00"
+      "atualizado_em": "2026-07-26T20:40:28.449407-03:00"
     },
     "401841007": {
       "event_id": "401841007",
@@ -91169,7 +92812,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:25:59.972646-03:00"
+      "atualizado_em": "2026-07-26T20:40:28.824539-03:00"
     },
     "401840981": {
       "event_id": "401840981",
@@ -91732,7 +93375,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:00.359126-03:00"
+      "atualizado_em": "2026-07-26T20:40:29.238213-03:00"
     },
     "401840997": {
       "event_id": "401840997",
@@ -92285,7 +93928,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:00.763436-03:00"
+      "atualizado_em": "2026-07-26T20:40:29.674777-03:00"
     },
     "401840988": {
       "event_id": "401840988",
@@ -92857,7 +94500,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:01.170287-03:00"
+      "atualizado_em": "2026-07-26T20:40:30.082832-03:00"
     },
     "401840992": {
       "event_id": "401840992",
@@ -93426,7 +95069,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:01.580748-03:00"
+      "atualizado_em": "2026-07-26T20:40:30.510766-03:00"
     },
     "401840991": {
       "event_id": "401840991",
@@ -93984,7 +95627,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:01.973768-03:00"
+      "atualizado_em": "2026-07-26T20:40:30.940158-03:00"
     },
     "401840995": {
       "event_id": "401840995",
@@ -94549,7 +96192,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:02.348528-03:00"
+      "atualizado_em": "2026-07-26T20:40:31.346446-03:00"
     },
     "401840994": {
       "event_id": "401840994",
@@ -95135,7 +96778,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:02.737854-03:00"
+      "atualizado_em": "2026-07-26T20:40:31.760785-03:00"
     },
     "401840990": {
       "event_id": "401840990",
@@ -95690,7 +97333,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:03.111860-03:00"
+      "atualizado_em": "2026-07-26T20:40:32.132532-03:00"
     },
     "401840989": {
       "event_id": "401840989",
@@ -96270,7 +97913,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:03.490640-03:00"
+      "atualizado_em": "2026-07-26T20:40:32.525749-03:00"
     },
     "401840996": {
       "event_id": "401840996",
@@ -96285,7 +97928,7 @@
       "publico": 5134,
       "publico_tipo": "presente",
       "publico_fonte": "ESPN summary",
-      "arbitro": "Denis Da Silva Ribeiro Serafim",
+      "arbitro": "Braulio Da Silva Machado",
       "stats": [
         {
           "nome": "Posse",
@@ -96849,7 +98492,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:03.879278-03:00"
+      "atualizado_em": "2026-07-26T20:40:32.943307-03:00"
     },
     "401840993": {
       "event_id": "401840993",
@@ -97432,7 +99075,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:04.269610-03:00"
+      "atualizado_em": "2026-07-26T20:40:33.326258-03:00"
     },
     "401840979": {
       "event_id": "401840979",
@@ -97999,7 +99642,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:04.655411-03:00"
+      "atualizado_em": "2026-07-26T20:40:33.713218-03:00"
     },
     "401840982": {
       "event_id": "401840982",
@@ -98521,7 +100164,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:05.025503-03:00"
+      "atualizado_em": "2026-07-26T20:40:34.100085-03:00"
     },
     "401840980": {
       "event_id": "401840980",
@@ -99072,7 +100715,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:05.421086-03:00"
+      "atualizado_em": "2026-07-26T20:40:34.508946-03:00"
     },
     "401840987": {
       "event_id": "401840987",
@@ -99666,7 +101309,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:05.811873-03:00"
+      "atualizado_em": "2026-07-26T20:40:34.958345-03:00"
     },
     "401840983": {
       "event_id": "401840983",
@@ -100262,7 +101905,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:06.237771-03:00"
+      "atualizado_em": "2026-07-26T20:40:35.376967-03:00"
     },
     "401840985": {
       "event_id": "401840985",
@@ -100831,7 +102474,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:06.668810-03:00"
+      "atualizado_em": "2026-07-26T20:40:35.773645-03:00"
     },
     "401840986": {
       "event_id": "401840986",
@@ -101396,7 +103039,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:07.067710-03:00"
+      "atualizado_em": "2026-07-26T20:40:36.217664-03:00"
     },
     "401840978": {
       "event_id": "401840978",
@@ -101968,7 +103611,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:07.466240-03:00"
+      "atualizado_em": "2026-07-26T20:40:37.160010-03:00"
     },
     "401840984": {
       "event_id": "401840984",
@@ -102517,7 +104160,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:07.842557-03:00"
+      "atualizado_em": "2026-07-26T20:40:37.571900-03:00"
     },
     "401840809": {
       "event_id": "401840809",
@@ -103079,7 +104722,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:08.283033-03:00"
+      "atualizado_em": "2026-07-26T20:40:37.970168-03:00"
     },
     "401840975": {
       "event_id": "401840975",
@@ -103624,7 +105267,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:08.675887-03:00"
+      "atualizado_em": "2026-07-26T20:40:38.375857-03:00"
     },
     "401840976": {
       "event_id": "401840976",
@@ -104147,7 +105790,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:09.034674-03:00"
+      "atualizado_em": "2026-07-26T20:40:38.762287-03:00"
     },
     "401840810": {
       "event_id": "401840810",
@@ -104744,7 +106387,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:09.409283-03:00"
+      "atualizado_em": "2026-07-26T20:40:39.146981-03:00"
     },
     "401840811": {
       "event_id": "401840811",
@@ -105325,7 +106968,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:09.822429-03:00"
+      "atualizado_em": "2026-07-26T20:40:39.566503-03:00"
     },
     "401840813": {
       "event_id": "401840813",
@@ -105878,7 +107521,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:10.194423-03:00"
+      "atualizado_em": "2026-07-26T20:40:40.018666-03:00"
     },
     "401840808": {
       "event_id": "401840808",
@@ -106451,7 +108094,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:10.601203-03:00"
+      "atualizado_em": "2026-07-26T20:40:40.420718-03:00"
     },
     "401840977": {
       "event_id": "401840977",
@@ -107023,7 +108666,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:10.983755-03:00"
+      "atualizado_em": "2026-07-26T20:40:40.822903-03:00"
     },
     "401840814": {
       "event_id": "401840814",
@@ -107560,7 +109203,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:11.358371-03:00"
+      "atualizado_em": "2026-07-26T20:40:41.257376-03:00"
     },
     "401840812": {
       "event_id": "401840812",
@@ -108127,7 +109770,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-07-26T20:26:11.745004-03:00"
+      "atualizado_em": "2026-07-26T20:40:41.746580-03:00"
     }
   }
 }
