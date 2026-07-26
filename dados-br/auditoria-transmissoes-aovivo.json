@@ -12,7 +12,7 @@
   "resumo": {
     "jogos_na_janela": 36,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 25,
+    "candidatos_oficiais_encontrados": 26,
     "transmissoes_publicadas": 2,
     "sem_transmissao": 34,
     "erros": 0
@@ -40,15 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841160",
-      "rodada": 20,
-      "jogo": "Vasco da Gama x Mirassol",
-      "data_iso": "2026-07-25T20:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401841159",
       "rodada": 20,
@@ -364,6 +355,15 @@
       "rodada": 24,
       "jogo": "Internacional x Atlético-MG",
       "data_iso": "2026-08-22T18:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false
+    },
+    {
+      "event_id": "401841206",
+      "rodada": 24,
+      "jogo": "Cruzeiro x Flamengo",
+      "data_iso": "2026-08-22T20:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false
@@ -575,6 +575,16 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
+      "video_id": "zhjCj-wyTck",
+      "url": "https://www.youtube.com/watch?v=zhjCj-wyTck",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "GERAL CAZÉTV | 27/07",
+      "status": "upcoming",
+      "inicio_programado": "2026-07-27T10:00:00-03:00",
+      "motivo": "conteúdo rejeitado: melhores momentos"
+    },
+    {
       "video_id": "8CwVyPiBuHQ",
       "url": "https://www.youtube.com/watch?v=8CwVyPiBuHQ",
       "fonte": "getv",
@@ -636,13 +646,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401841160",
-      "rodada": 20,
-      "jogo": "Vasco da Gama x Mirassol",
-      "data_iso": "2026-07-25T20:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401841167",
       "rodada": 20,
@@ -873,6 +876,13 @@
       "jogo": "Internacional x Atlético-MG",
       "data_iso": "2026-08-22T18:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
+    },
+    {
+      "event_id": "401841206",
+      "rodada": 24,
+      "jogo": "Cruzeiro x Flamengo",
+      "data_iso": "2026-08-22T20:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     }
   ],
   "erros": [],
@@ -885,5 +895,5 @@
     },
     "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API."
   },
-  "atualizado_em": "2026-07-25T20:32:34-03:00"
+  "atualizado_em": "2026-07-25T22:08:29-03:00"
 }
