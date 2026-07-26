@@ -2,10 +2,10 @@
   "descricao": "Auditoria da consolidação de transmissões do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 39,
-    "jogos_com_transmissao": 33,
-    "jogos_sem_transmissao_14d": 3,
+    "jogos_com_transmissao": 36,
+    "jogos_sem_transmissao_14d": 2,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 7,
+    "registros_preservados": 10,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -15,38 +15,30 @@
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 19,
-      "duracao_ms": 7382
+      "jogos_com_canal": 21,
+      "duracao_ms": 5602
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 7,
-      "jogos_com_canal": 16,
-      "duracao_ms": 115090
+      "jogos_com_canal": 18,
+      "duracao_ms": 91371
     },
     "espn": {
       "ok": true,
       "eventos_na_janela": 39,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 3615
+      "duracao_ms": 2853
     }
   },
   "sem_transmissao": [
-    {
-      "event_id": "401841177",
-      "rodada": 21,
-      "jogo": "Fluminense x Bahia",
-      "data_iso": "2026-07-29T21:30",
-      "faltam_horas": 76.3,
-      "nivel": "aviso"
-    },
     {
       "event_id": "401841181",
       "rodada": 22,
       "jogo": "Grêmio x São Paulo",
       "data_iso": "2026-08-08T16:00",
-      "faltam_horas": 310.8,
+      "faltam_horas": 310.6,
       "nivel": "aviso"
     },
     {
@@ -54,11 +46,18 @@
       "rodada": 22,
       "jogo": "Remo x Atlético-MG",
       "data_iso": "2026-08-08T18:30",
-      "faltam_horas": 313.3,
+      "faltam_horas": 313.1,
       "nivel": "aviso"
     }
   ],
   "preservados": [
+    {
+      "event_id": "401841173",
+      "jogo": "Coritiba x Cruzeiro",
+      "canais": [
+        "Globo"
+      ]
+    },
     {
       "event_id": "401841183",
       "jogo": "Cruzeiro x Mirassol",
@@ -95,8 +94,22 @@
       ]
     },
     {
+      "event_id": "401841205",
+      "jogo": "Fluminense x Remo",
+      "canais": [
+        "Globo"
+      ]
+    },
+    {
       "event_id": "401841204",
       "jogo": "Internacional x Atlético-MG",
+      "canais": [
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841206",
+      "jogo": "Cruzeiro x Flamengo",
       "canais": [
         "Globo"
       ]
@@ -121,5 +134,5 @@
     "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/07/25/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-20a-rodada.ghtml",
     "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/07/25/athletico-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-07-26T17:09:43-03:00"
+  "atualizado_em": "2026-07-26T17:22:42-03:00"
 }
