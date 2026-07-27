@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 37,
+    "jogos_na_janela": 36,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 27,
     "transmissoes_publicadas": 1,
-    "sem_transmissao": 36,
+    "sem_transmissao": 35,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,24 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841164",
-      "rodada": 20,
-      "jogo": "Palmeiras x Atlético-MG",
-      "data_iso": "2026-07-26T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401841162",
-      "rodada": 20,
-      "jogo": "Remo x Vitória",
-      "data_iso": "2026-07-26T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401841171",
       "rodada": 21,
@@ -374,6 +356,15 @@
       "principal": "",
       "fontes_encontradas": [],
       "manual": false
+    },
+    {
+      "event_id": "401841198",
+      "rodada": 25,
+      "jogo": "Botafogo x Athletico-PR",
+      "data_iso": "2026-08-24T20:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false
     }
   ],
   "aceitos": [
@@ -573,7 +564,7 @@
       "titulo": "AO VIVO! GE ATLÉTICO-MG ANALISA DUELO CONTRA O PALMEIRAS PELO BRASILEIRÃO | #podcast | ge.globo",
       "status": "upcoming",
       "inicio_programado": "2026-07-27T15:30:00-03:00",
-      "motivo": "horário incompatível (1200 min de diferença)"
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "SiYY_wf9ab4",
@@ -623,7 +614,7 @@
       "titulo": "AO VIVO! FLAMENGO X SÃO PAULO, BAHIA X CORINTHIANS, PALMEIRAS X GALO  E MAIS! | Panela SporTV",
       "status": "upcoming",
       "inicio_programado": "2026-07-27T17:00:00-03:00",
-      "motivo": "horário incompatível (1290 min de diferença)"
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "pBVRPAOFd3M",
@@ -657,20 +648,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401841164",
-      "rodada": 20,
-      "jogo": "Palmeiras x Atlético-MG",
-      "data_iso": "2026-07-26T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401841162",
-      "rodada": 20,
-      "jogo": "Remo x Vitória",
-      "data_iso": "2026-07-26T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401841171",
       "rodada": 21,
@@ -908,6 +885,13 @@
       "jogo": "Coritiba x Corinthians",
       "data_iso": "2026-08-23T19:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
+    },
+    {
+      "event_id": "401841198",
+      "rodada": 25,
+      "jogo": "Botafogo x Athletico-PR",
+      "data_iso": "2026-08-24T20:00:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     }
   ],
   "erros": [],
@@ -920,5 +904,5 @@
     },
     "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API."
   },
-  "atualizado_em": "2026-07-26T20:43:35-03:00"
+  "atualizado_em": "2026-07-26T22:20:09-03:00"
 }
