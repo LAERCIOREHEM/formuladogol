@@ -363,6 +363,8 @@ jobs:
           import xml.etree.ElementTree as ET
 
           site = Path("_site")
+          formula_ga_id = "G-3956SD5HFC"
+          old_ga_id = "G-0PPWGP93FD"
           root_pages = [
               "index.html",
               "aovivo.html",
@@ -413,6 +415,14 @@ jobs:
               page = site / page_name
               assert page.is_file(), f"página pública ausente: {page_name}"
               text = page.read_text(encoding="utf-8")
+              title_match = re.search(r"<title>(.*?)</title>", text, flags=re.I | re.S)
+              assert title_match, f"{page_name}: título HTML ausente"
+              title = " ".join(title_match.group(1).split())
+              assert "Fórmula do Gol" in title, f"{page_name}: título sem a marca Fórmula do Gol: {title}"
+              assert not re.search(r"almo[cç]o de sexta|brasileir[aã]o\s+2026\s*[—-]\s*almo", title, flags=re.I), f"{page_name}: título herdado do site anterior: {title}"
+              ga_ids = set(re.findall(r"G-[A-Z0-9]+", text))
+              assert formula_ga_id in ga_ids, f"{page_name}: Analytics do Fórmula do Gol ausente"
+              assert old_ga_id not in ga_ids, f"{page_name}: Analytics do site anterior ainda presente"
               nav_match = re.search(r"<nav\b[^>]*>(.*?)</nav>", text, flags=re.I | re.S)
               assert nav_match, f"{page_name}: menu principal ausente"
               nav = re.sub(r"<[^>]+>", " ", nav_match.group(1))
@@ -440,6 +450,16 @@ jobs:
                   if target.is_dir():
                       target = target / "index.html"
                   assert target.exists(), f"{page_name}: referência local quebrada: {ref}"
+
+          route_titles = {
+              "jogos/index.html": "Jogos do Brasileirão 2026 — Fórmula do Gol",
+              "tabela/index.html": "Tabela do Brasileirão 2026 — Fórmula do Gol",
+              "resultados/index.html": "Resultados do Brasileirão 2026 — Fórmula do Gol",
+          }
+          for page_name, expected_title in route_titles.items():
+              text = (site / page_name).read_text(encoding="utf-8")
+              assert f"<title>{expected_title}</title>" in text, f"{page_name}: título incorreto"
+              assert "brasileirao2026almoco" not in text.lower(), f"{page_name}: domínio antigo presente"
 
           copa_pages = [
               "copa2026/index.html",
@@ -472,6 +492,13 @@ jobs:
               page = site / page_name
               assert page.is_file(), f"página pública da Copa ausente: {page_name}"
               text = page.read_text(encoding="utf-8")
+              title_match = re.search(r"<title>(.*?)</title>", text, flags=re.I | re.S)
+              assert title_match, f"{page_name}: título HTML ausente"
+              title = " ".join(title_match.group(1).split())
+              assert "Fórmula do Gol" in title, f"{page_name}: título público sem a marca Fórmula do Gol: {title}"
+              ga_ids = set(re.findall(r"G-[A-Z0-9]+", text))
+              assert formula_ga_id in ga_ids, f"{page_name}: Analytics do Fórmula do Gol ausente"
+              assert old_ga_id not in ga_ids, f"{page_name}: Analytics do site anterior ainda presente"
               nav_match = re.search(r'<nav\b[^>]*class="[^"]*\bmenu\b[^"]*"[^>]*>(.*?)</nav>', text, flags=re.I | re.S)
               assert nav_match, f"{page_name}: menu principal da Copa ausente"
               nav = " ".join(re.sub(r"<[^>]+>", " ", nav_match.group(1)).split())
@@ -501,6 +528,11 @@ jobs:
                   assert target.exists(), f"{page_name}: referência local quebrada: {ref}"
 
           index = (site / "index.html").read_text(encoding="utf-8")
+          assert "window.FDG_ANALYTICS_PAGE" in index, "index sem título explícito para o Analytics"
+          assert "BR_METADADOS_VIEWS" in index, "index sem títulos por rota pública"
+          assert "Jogos do Brasileirão 2026 — Fórmula do Gol" in index, "título de Jogos ausente"
+          assert "Tabela do Brasileirão 2026 — Fórmula do Gol" in index, "título de Tabela ausente"
+          assert "Resultados do Brasileirão 2026 — Fórmula do Gol" in index, "título de Resultados ausente"
           assert "const BR_PUBLIC_ONLY = true;" in index, "index sem trava pública"
           assert "const PARTICIPANTES_INICIAIS = [];" in index, "participantes incorporados no index público"
           assert "const MEMBROS_INICIAIS = [];" in index, "membros incorporados no index público"
