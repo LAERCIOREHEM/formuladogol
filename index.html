@@ -2816,7 +2816,7 @@ function jogoFinalizadoParaMelhoresMomentos(j) {
   if (manual && manual.ativo !== false && resultadoJaAconteceu(resultadoManualNormalizado(manual))) return true;
   try {
     const live = espnLiveDoJogo(j);
-    if (live && live.estado === 'post') return true;
+    if (espnLiveEhFinalReal(live)) return true;
   } catch (_) {}
   return false;
 }
@@ -4119,7 +4119,8 @@ function jogosLiveAplicaveisNaTabela() {
   const vistos = new Set();
   const saida = [];
   for (const live of Object.values(state.espnLive || {})) {
-    if (!live || !['in','post'].includes(live.estado)) continue;
+    const finalReal = espnLiveEhFinalReal(live);
+    if (!live || !(live.estado === 'in' || finalReal)) continue;
     const m = nomeCanonico(live.mandante), v = nomeCanonico(live.visitante);
     const pm = numeroPlacarLive(live.placarMandante), pv = numeroPlacarLive(live.placarVisitante);
     if (!m || !v || pm === null || pv === null || !oficiais[m] || !oficiais[v]) continue;
@@ -4127,7 +4128,7 @@ function jogosLiveAplicaveisNaTabela() {
     if (vistos.has(chave)) continue;
     vistos.add(chave);
 
-    if (live.estado === 'post') {
+    if (finalReal) {
       const jaNoResultados = resultadoLiveJaEstaNoJson(live);
       const esperadoM = (contagem[m] || 0) + (jaNoResultados ? 0 : 1);
       const esperadoV = (contagem[v] || 0) + (jaNoResultados ? 0 : 1);
@@ -4151,7 +4152,7 @@ function tabelaComJogosAoVivo() {
     for (const t of [m, v]) {
       t.jogos = Number(t.jogos || 0) + 1;
       t._aoVivo = j.estado === 'in';
-      t._provisorioFinal = j.estado === 'post';
+      t._provisorioFinal = j.estado === 'post' && espnLiveEhFinalReal(j);
     }
     m.gp = Number(m.gp || 0) + pm; m.gc = Number(m.gc || 0) + pv;
     v.gp = Number(v.gp || 0) + pv; v.gc = Number(v.gc || 0) + pm;
@@ -4760,7 +4761,7 @@ function renderJogos() {
     const estadoLocal = String(j && j.estado || '').toLowerCase();
     if (estadoLocal === 'post' || j.concluido === true) return false;
     const live = state.espnLive && state.espnLive[espnChaveJogo((j.mandante || {}).nome, (j.visitante || {}).nome)];
-    if (live && live.estado === 'post') return false;
+    if (espnLiveEhFinalReal(live)) return false;
     const manual = resultadoManualDoJogo(j);
     const manualNormalizado = resultadoManualNormalizado(manual);
     if (manualNormalizado && resultadoJaAconteceu(manualNormalizado)) return false;
@@ -4837,11 +4838,12 @@ function renderJogos() {
 
       const horario = formatarHorarioJogo(j.data_iso);
       const live = espnLiveDoJogo(j);
-      const temPlacar = live && (live.estado === 'in' || live.estado === 'post');
-      const clsEstado = live && live.estado === 'in' ? 'live' : (live && live.estado === 'post' ? 'post' : 'pre');
+      const finalReal = espnLiveEhFinalReal(live);
+      const temPlacar = live && (live.estado === 'in' || finalReal);
+      const clsEstado = live && live.estado === 'in' ? 'live' : (finalReal ? 'post' : 'pre');
       const statusHtml = live && live.estado === 'in'
         ? `<span class="badge-aovivo">AO VIVO</span><span class="jogo-status-live">${live.status || ''}</span>`
-        : (live && live.estado === 'post' ? `<span class="jogo-status-fim">Encerrado</span>` : `<span class="jogo-source-pill">pré-jogo</span>`);
+        : (finalReal ? `<span class="jogo-status-fim">Encerrado</span>` : `<span class="jogo-source-pill">pré-jogo</span>`);
       const placarCentro = temPlacar
         ? `<div class="jogo-placar-live">${live.placarMandante} × ${live.placarVisitante}</div>`
         : '<div class="jogo-vs">×</div>';
@@ -4947,6 +4949,38 @@ function espnLiveDoJogo(j) {
   return k ? (state.espnLive || {})[k] : null;
 }
 
+// A ESPN pode devolver state=post com completed=false e placar 0 x 0 para
+// partidas que ainda nem começaram. Centralizamos aqui a validação do sinal
+// de encerramento para que Jogos, Tabela e Resultados usem a mesma regra.
+function espnLiveTextoStatus(live) {
+  return [live && live.status, live && live.statusName, live && live.statusDescription]
+    .filter(Boolean).join(' ').trim().toLowerCase();
+}
+
+function espnLiveEhInterrompido(live) {
+  return /postpon|adiad|suspend|cancel/.test(espnLiveTextoStatus(live));
+}
+
+function espnLiveData(live) {
+  if (!live || !live.dataIso) return null;
+  const d = new Date(live.dataIso);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function espnLiveEhFinalReal(live, referencia = new Date()) {
+  if (!live || espnLiveEhInterrompido(live)) return false;
+  const estado = String(live.estado || '').toLowerCase();
+  const concluido = live.completed === true || live.concluido === true;
+  if (estado !== 'post' && !concluido) return false;
+
+  const data = espnLiveData(live);
+  if (!data || data.getTime() > referencia.getTime() - 90 * 60 * 1000) return false;
+
+  const pm = numeroPlacarLive(live.placarMandante);
+  const pv = numeroPlacarLive(live.placarVisitante);
+  return pm !== null && pv !== null;
+}
+
 async function espnLiveBuscar() {
   // datas em UTC (ontem..amanhã) para cobrir jogos noturnos que viram o dia
   const fmt = d => d.toISOString().slice(0, 10).replace(/-/g, '');
@@ -4986,14 +5020,36 @@ async function espnLiveBuscar() {
         if (quem) gols.push(`${quem}${min ? ' ' + min : ''}${timeGol ? ' (' + timeGol + ')' : ''}`);
       }
 
+      const dataIso = ev.date || comp.date || null;
+      const dataEvento = dataIso ? new Date(dataIso) : null;
+      const completed = tipo.completed === true;
+      const statusName = tipo.name || '';
+      const statusDescription = tipo.description || tipo.detail || tipo.shortDetail || '';
+      const statusTexto = [st.displayClock, tipo.shortDetail, tipo.detail, statusName, statusDescription]
+        .filter(Boolean).join(' ').toLowerCase();
+      let estadoSeguro = String(tipo.state || (completed ? 'post' : 'pre')).toLowerCase();
+
+      // state=post só é confiável se completed=true ou se o horário de início já
+      // tiver passado há pelo menos 90 minutos. Isso preserva empates reais em
+      // 0 x 0 com completed=false, sem transformar partidas futuras em resultado.
+      const dataValida = dataEvento && !Number.isNaN(dataEvento.getTime());
+      const interrompido = /postpon|adiad|suspend|cancel/.test(statusTexto);
+      if (estadoSeguro === 'post' && !completed &&
+          (interrompido || !dataValida || dataEvento.getTime() > Date.now() - 90 * 60 * 1000)) {
+        estadoSeguro = 'pre';
+      }
+
       novo[k] = {
-        estado: tipo.state || 'pre',                       // pre | in | post
+        estado: estadoSeguro,                              // pre | in | post
+        completed: completed,
         status: st.displayClock || tipo.shortDetail || tipo.detail || '',
+        statusName: statusName,
+        statusDescription: statusDescription,
         placarMandante: casa.score != null ? casa.score : '-',
         placarVisitante: fora.score != null ? fora.score : '-',
         mandante: nomeCanonico((casa.team || {}).displayName || (casa.team || {}).name),
         visitante: nomeCanonico((fora.team || {}).displayName || (fora.team || {}).name),
-        dataIso: ev.date || comp.date || null,
+        dataIso: dataIso,
         eventId: ev.id || comp.id || null,
         rodada: Number((((ev.seasonType || {}).name || '').match(/\d+/) || [])[0] || ((comp.notes || []).map(n => n && n.headline).join(' ').match(/\d+/) || [])[0] || 0),
         gols: gols
@@ -5116,7 +5172,7 @@ function resultadosComFinaisRecentesESPN(listaBase) {
   const lista = Array.isArray(listaBase) ? listaBase.slice() : [];
   const chaves = new Set(lista.map(r => espnChaveJogo((r.mandante || {}).nome, (r.visitante || {}).nome)));
   for (const live of Object.values(state.espnLive || {})) {
-    if (!live || live.estado !== 'post') continue;
+    if (!espnLiveEhFinalReal(live)) continue;
     const chave = espnChaveJogo(live.mandante, live.visitante);
     if (!chave || chaves.has(chave)) continue;
     const pm = numeroPlacarLive(live.placarMandante), pv = numeroPlacarLive(live.placarVisitante);
@@ -5242,7 +5298,7 @@ function renderResultados() {
       html += `<div class="resultado-card ${classeJogo}">
         <div class="resultado-meta">
           <span class="resultado-rodada">R${r.rodada}</span>
-          <span class="resultado-data">${dataFmt}${r._provisorioESPN ? ' · <strong style="color:var(--accent)">ESPN ao vivo</strong>' : ''}</span>
+          <span class="resultado-data">${dataFmt}${r._provisorioESPN ? ' · <strong style="color:var(--accent)">ESPN · resultado recém-finalizado</strong>' : ''}</span>
         </div>
         <div class="resultado-jogo">
           ${linkClubeBrasileirao(m.nome, `<span class="resultado-team-text"><span class="resultado-nome">${m.nome || '?'}</span></span><span class="resultado-escudo">${escudoMandante}</span>`, 'resultado-time mandante br-club-link')}

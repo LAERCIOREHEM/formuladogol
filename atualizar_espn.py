@@ -619,10 +619,37 @@ def aplicar_ajustes_calendario(eventos: list[dict[str, Any]]) -> None:
     print(f"Ajustes de calendário aplicados: {aplicados}/{len(ajustes)}")
 
 
+def _status_interrompido(st: dict[str, Any], status_publico: str = "") -> bool:
+    texto = " ".join(str(v or "") for v in (
+        status_publico,
+        st.get("name"), st.get("description"), st.get("detail"), st.get("shortDetail"),
+    )).lower()
+    return bool(re.search(r"postpon|adiad|suspend|cancel", texto))
+
+
+def _estado_scoreboard_seguro(estado_fonte: str, concluido: bool, dt_brt: datetime,
+                              st: dict[str, Any], status_publico: str,
+                              agora: datetime) -> tuple[str, bool]:
+    """Normaliza sinais contraditórios da ESPN sem perder empates 0 x 0 reais.
+
+    O scoreboard ocasionalmente publica state=post, completed=false e relógio 0'
+    para partidas futuras. Um post incompleto só é aceito quando o horário de
+    início já passou há pelo menos 90 minutos e não há sinal de interrupção.
+    """
+    estado = str(estado_fonte or ("post" if concluido else "pre")).lower()
+    interrompido = _status_interrompido(st, status_publico)
+    if concluido:
+        return "post", interrompido
+    if estado == "post" and (interrompido or dt_brt > agora - timedelta(minutes=90)):
+        return "pre", interrompido
+    return estado, interrompido
+
+
 def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[str, Any]]:
     legadas = carregar_rodadas_legadas()
     normalizados: list[dict[str, Any]] = []
     nao_mapeados: list[str] = []
+    agora = agora_brt()
 
     for ev in eventos:
         casa, fora = competidores(ev)
@@ -637,9 +664,11 @@ def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[st
             continue
         comp = primeira_competicao(ev)
         st = tipo_status(ev)
-        estado = str(st.get("state") or "pre").lower()
-        if st.get("completed") is True:
-            estado = "post"
+        concluido = bool(st.get("completed") is True)
+        status_publico = status_evento(ev).get("displayClock") or st.get("shortDetail") or st.get("detail") or ""
+        estado, interrompido = _estado_scoreboard_seguro(
+            str(st.get("state") or "pre"), concluido, dt_brt, st, status_publico, agora
+        )
 
         rodada = extrair_rodada_evento(ev)
         if not rodada:
@@ -656,9 +685,10 @@ def normalizar_eventos_scoreboard(eventos: list[dict[str, Any]]) -> list[dict[st
             "visitante": info_time(vis),
             "estadio": ((comp.get("venue") or {}).get("fullName") or ""),
             "transmissao": transmissao_evento(ev),
-            "status": status_evento(ev).get("displayClock") or st.get("shortDetail") or st.get("detail") or "",
+            "status": status_publico,
             "estado": estado,
-            "concluido": bool(st.get("completed") is True),
+            "concluido": concluido,
+            "adiado": interrompido,
             "placar_mandante": placar_competidor(casa),
             "placar_visitante": placar_competidor(fora),
             "_sort": dt_brt.timestamp(),
@@ -1825,6 +1855,29 @@ def selftest_execucao_6() -> None:
     assert payload_jogo(empate_post)["status"] == "Encerrado"
     empate_pre = dict(empate_post, estado="pre")
     assert not evento_realmente_finalizado(empate_pre, agora_teste)
+
+    # Regressão ESPN: state=post/completed=false em uma partida futura deve
+    # voltar a pre, não receber finalizado_em e continuar elegível à agenda.
+    st_futuro = {"state": "post", "completed": False, "shortDetail": "0'"}
+    dt_futuro = agora_teste + timedelta(days=1)
+    estado_seguro, interrompido = _estado_scoreboard_seguro(
+        "post", False, dt_futuro, st_futuro, "0'", agora_teste
+    )
+    assert estado_seguro == "pre" and not interrompido
+    futuro_inconsistente = dict(
+        empate_post,
+        data_dt=dt_futuro,
+        data_iso=dt_futuro.strftime("%Y-%m-%dT%H:%M"),
+        estado=estado_seguro,
+    )
+    aplicar_finalizados_em(
+        [futuro_inconsistente],
+        {"sync-zero": {"finalizado_em": "2026-07-16T22:37:08-03:00"}},
+        None,
+        agora_teste,
+    )
+    assert "finalizado_em" not in futuro_inconsistente
+    assert not evento_realmente_finalizado(futuro_inconsistente, agora_teste)
 
     tabela_teste = {
         "tabela": [

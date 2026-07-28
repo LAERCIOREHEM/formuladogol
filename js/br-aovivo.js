@@ -182,6 +182,62 @@
     return Number.isNaN(d.getTime()) ? null : d;
   }
 
+  function numericScore(v) {
+    if (v === null || v === undefined || v === "") return null;
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function interruptedStatusText(v) {
+    return /postpon|adiad|suspend|cancel/i.test(String(v || ""));
+  }
+
+  // Validação única para o sinal de encerramento. A ESPN ocasionalmente envia
+  // state=post/completed=false para partidas futuras; só tratamos como final se
+  // a data já passou há pelo menos 90 minutos, houver placar e não houver sinal
+  // de adiamento, suspensão ou cancelamento.
+  function reliableFinalSignal({ state: rawState, completed, date, statusText, homeScore, awayScore }, referenceMs = Date.now()) {
+    const stateValue = String(rawState || "").toLowerCase();
+    if (stateValue !== "post" && completed !== true) return false;
+    if (interruptedStatusText(statusText)) return false;
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return false;
+    if (date.getTime() > referenceMs - 90 * 60000) return false;
+    return numericScore(homeScore) !== null && numericScore(awayScore) !== null;
+  }
+
+  function isReliableFinalGame(game, referenceMs = Date.now()) {
+    if (!game) return false;
+    const rawType = game.raw && game.raw.status && game.raw.status.type;
+    const statusText = [
+      game.detail,
+      game.clock,
+      rawType && rawType.name,
+      rawType && rawType.description,
+      rawType && rawType.detail,
+      rawType && rawType.shortDetail
+    ].filter(Boolean).join(" ");
+    return reliableFinalSignal({
+      state: game.state,
+      completed: game.completed === true || (rawType && rawType.completed === true),
+      date: game.date,
+      statusText,
+      homeScore: game.home && game.home.score,
+      awayScore: game.away && game.away.score
+    }, referenceMs);
+  }
+
+  function isReliableFinalFlatEvent(item, referenceMs = Date.now()) {
+    if (!item) return false;
+    return reliableFinalSignal({
+      state: item.estado,
+      completed: item.concluido === true,
+      date: parseDate(item.data_iso),
+      statusText: String(item.status || ""),
+      homeScore: item.placar_mandante,
+      awayScore: item.placar_visitante
+    }, referenceMs);
+  }
+
   function dateKey(d) {
     const parts = new Intl.DateTimeFormat("en-US", {
       timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit"
@@ -319,19 +375,33 @@
     home.score = h.score == null || h.score === "" ? null : Number(h.score);
     away.score = a.score == null || a.score === "" ? null : Number(a.score);
     const date = parseDate(ev.date || comp.date);
+    const completed = type.completed === true;
+    const statusText = [type.name, type.description, type.detail, type.shortDetail, status.displayClock].filter(Boolean).join(" ");
+    const adiado = interruptedStatusText(statusText);
+    let safeState = String(type.state || (completed ? "post" : "pre")).toLowerCase();
+    if (safeState === "post" && !reliableFinalSignal({
+      state: safeState,
+      completed,
+      date,
+      statusText,
+      homeScore: home.score,
+      awayScore: away.score
+    })) {
+      safeState = "pre";
+    }
     return {
       id: String(ev.id || comp.id || ""),
       rodada: roundFromEvent(ev, comp),
       date,
       dataIso: date ? date.toISOString() : "",
-      state: String(type.state || (type.completed ? "post" : "pre")).toLowerCase(),
-      completed: type.completed === true,
+      state: safeState,
+      completed,
       detail: type.shortDetail || type.detail || status.displayClock || (status.type && status.type.detail) || "",
       clock: status.displayClock || "",
       period: Number(status.period || comp.period || 0),
       venue: venueFromCompetition(comp),
       transmissao: broadcastNames(ev, comp).join(" / "),
-      adiado: /postpon|adiad|suspend|cancel/i.test([type.name, type.description, type.detail, type.shortDetail].join(" ")),
+      adiado,
       dataDefinir: false,
       finalizadoEm: parseDate(ev.finalizado_em || ev.finalizedAt || ev.completedAt),
       home,
@@ -555,7 +625,7 @@
       const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
       const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
       const liveStyle = liveNow || preLive;
-      const finished = game.state === "post";
+      const finished = gameState(game).key === "post";
       const label = finished
         ? "▶ Rever na " + sourceName
         : (liveNow ? "AO VIVO na " + sourceName : (preLive ? "AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName));
@@ -593,7 +663,8 @@
     for (const item of state.eventosLocais) {
       const key = String(item && item.event_id || "");
       const finalizado = parseDate(item && item.finalizado_em);
-      if (key && finalizado) state.finalizadosEm[key] = finalizado.getTime();
+      if (key && finalizado && isReliableFinalFlatEvent(item)) state.finalizadosEm[key] = finalizado.getTime();
+      else if (key) delete state.finalizadosEm[key];
     }
     saveFinalTimes();
   }
@@ -601,7 +672,7 @@
   function finalizadoLocalParaJogo(game) {
     if (!game) return 0;
     const direct = state.eventosLocais.find((item) => String(item && item.event_id || "") === String(game.id || ""));
-    if (direct) {
+    if (direct && isReliableFinalFlatEvent(direct)) {
       const parsed = parseDate(direct.finalizado_em);
       if (parsed) return parsed.getTime();
     }
@@ -633,7 +704,7 @@
       const key = String(game.id || teamKey(game.home && game.home.nome, game.away && game.away.nome));
       if (!key) continue;
       seen.add(key);
-      if (game.state === "post") {
+      if (isReliableFinalGame(game)) {
         const stable = finalizadoLocalParaJogo(game);
         if (stable > 0) state.finalizadosEm[key] = stable;
         else if (!state.finalizadosEm[key]) state.finalizadosEm[key] = estimarFinalizadoEm(game, Date.now());
@@ -707,13 +778,13 @@
 
   function priorityGames(games) {
     const now = Date.now();
-    const live = games.filter((g) => g.state === "in").sort((a, b) => (a.date || 0) - (b.date || 0));
+    const live = games.filter((g) => gameState(g).key === "live").sort((a, b) => (a.date || 0) - (b.date || 0));
     if (live.length) return live;
 
     // Mantém jogos encerrados em destaque por quinze minutos contados da
     // primeira resposta em que a ESPN os marcou como post/finalizados.
     const recent = games.filter((g) => {
-      if (g.state !== "post") return false;
+      if (!isReliableFinalGame(g)) return false;
       const key = String(g.id || teamKey(g.home && g.home.nome, g.away && g.away.nome));
       const endedAt = Number(state.finalizadosEm[key] || 0);
       return endedAt > 0 && now - endedAt <= 15 * 60000;
@@ -722,7 +793,7 @@
       const kb = String(b.id || teamKey(b.home && b.home.nome, b.away && b.away.nome));
       return Number(state.finalizadosEm[kb] || 0) - Number(state.finalizadosEm[ka] || 0);
     });
-    const future = games.filter((g) => g.state !== "post" && !isPostponed(g) && g.date && g.date.getTime() >= now - 30 * 60000)
+    const future = games.filter((g) => gameState(g).key === "pre" && !isPostponed(g) && g.date && g.date.getTime() >= now - 30 * 60000)
       .sort((a, b) => a.date - b.date);
 
     if (recent.length) {
@@ -796,16 +867,23 @@
     return false;
   }
 
-  // Detecta fim de jogo com precisão. type.completed é o sinal canônico da ESPN.
+  // O estado pós-jogo só vale depois da validação temporal e do placar.
   function isFinished(g, statusType, shortDetail) {
-    if (g && (g.state === "post" || g.completed)) return true;
-    if (statusType && statusType.completed === true) return true;
+    if (isReliableFinalGame(g)) return true;
     const name = String((statusType && statusType.name) || "").toUpperCase();
-    if (name === "STATUS_FULL_TIME" || name === "STATUS_FINAL" || name === "STATUS_END_OF_PERIOD" && (g && g.state === "post")) return true;
     const sd = String(shortDetail || "").trim();
-    if (/^FT$/i.test(sd)) return true;
-    if (/^full\s*time$/i.test(sd)) return true;
-    return false;
+    const explicitFinal = statusType && statusType.completed === true ||
+      name === "STATUS_FULL_TIME" || name === "STATUS_FINAL" ||
+      /^FT$/i.test(sd) || /^full\s*time$/i.test(sd);
+    if (!explicitFinal || !g) return false;
+    return reliableFinalSignal({
+      state: "post",
+      completed: statusType && statusType.completed === true,
+      date: g.date,
+      statusText: [name, sd, g.detail, g.clock].filter(Boolean).join(" "),
+      homeScore: g.home && g.home.score,
+      awayScore: g.away && g.away.score
+    });
   }
 
   function gameState(g) {
@@ -1078,7 +1156,7 @@
   }
 
   function countdownText(g) {
-    if (!g || !g.date || g.state === "in" || g.state === "post") return "";
+    if (!g || !g.date || ["live", "post", "postponed"].includes(gameState(g).key)) return "";
     let diff = g.date.getTime() - Date.now();
     if (diff <= 0) return "Aguardando início oficial";
     const days = Math.floor(diff / 86400000); diff %= 86400000;
