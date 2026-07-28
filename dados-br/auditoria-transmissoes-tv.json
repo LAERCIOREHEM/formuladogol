@@ -5,7 +5,7 @@
     "jogos_com_transmissao": 38,
     "jogos_sem_transmissao_14d": 1,
     "jogos_criticos_sem_transmissao_72h": 1,
-    "registros_preservados": 2,
+    "registros_preservados": 3,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -15,21 +15,21 @@
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 36,
-      "duracao_ms": 19972
+      "jogos_com_canal": 34,
+      "duracao_ms": 20329
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 3,
       "jogos_com_canal": 8,
-      "duracao_ms": 65068
+      "duracao_ms": 63915
     },
     "espn": {
       "ok": true,
       "eventos_na_janela": 40,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 1077
+      "duracao_ms": 1289
     }
   },
   "sem_transmissao": [
@@ -38,11 +38,18 @@
       "rodada": 21,
       "jogo": "Chapecoense x Vasco da Gama",
       "data_iso": "2026-07-29T15:00",
-      "faltam_horas": 18.6,
+      "faltam_horas": 18.4,
       "nivel": "critico"
     }
   ],
   "preservados": [
+    {
+      "event_id": "401841169",
+      "jogo": "São Paulo x Santos",
+      "canais": [
+        "Globo"
+      ]
+    },
     {
       "event_id": "401841197",
       "jogo": "Vitória x Botafogo",
@@ -76,5 +83,5 @@
     "https://ge.globo.com/gato-mestre/noticia/2026/07/27/palpite-ge-2026-tropa-do-ge-e-gato-mestre-dividem-a-lideranca-veja-erros-e-acertos-da-20a-rodada-do-brasileiro.ghtml",
     "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/07/27/remo-emplaca-tres-nomes-na-selecao-da-20a-rodada-da-serie-a.ghtml"
   ],
-  "atualizado_em": "2026-07-28T20:22:44-03:00"
+  "atualizado_em": "2026-07-28T20:37:43-03:00"
 }
