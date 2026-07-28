@@ -422,6 +422,27 @@
     return state.agenda.find((x) => teamKey(x.home.nome, x.away.nome) === key) || null;
   }
 
+  // A agenda publicada (jogos.json) é a fonte canônica para partidas futuras.
+  // O scoreboard direto da ESPN é usado para relógio, placar e eventos ao vivo,
+  // mas às vezes devolve partidas-fantasma com horário genérico (por exemplo,
+  // 15:00), state=post e completed=false. Uma partida futura que não exista na
+  // agenda auditada não pode ser criada apenas pela resposta direta do browser.
+  // Exceções: jogo realmente em andamento ou resultado final confiável, para não
+  // ocultar uma atualização legítima durante eventual atraso de publicação.
+  function directGameIsEligible(game, referenceMs = Date.now()) {
+    if (!game || !game.home || !game.away) return false;
+    if (findLocal(game)) return true;
+    if (isReliableFinalGame(game, referenceMs)) return true;
+
+    const statusType = game.raw && game.raw.status && game.raw.status.type;
+    const sourceState = String((statusType && statusType.state) || game.state || '').toLowerCase();
+    const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
+    const nearKickoff = Number.isFinite(kickoff)
+      && kickoff <= referenceMs + 30 * 60000
+      && kickoff >= referenceMs - 4 * 3600000;
+    return sourceState === 'in' && nearKickoff && !game.adiado;
+  }
+
   function mergeLocal(game) {
     const loc = findLocal(game);
     if (!loc) return game;
@@ -698,7 +719,11 @@
     const fim = compactDate(new Date(now.getTime() + 2 * 24 * 3600 * 1000));
     const url = SCOREBOARD_API + "?dates=" + ini + "-" + fim + "&limit=80&_=" + Date.now();
     const data = await fetchJson(url);
-    const normalized = (data.events || []).map(normalizeEvent).filter(Boolean).map(mergeLocal);
+    const normalized = (data.events || [])
+      .map(normalizeEvent)
+      .filter(Boolean)
+      .filter((game) => directGameIsEligible(game))
+      .map(mergeLocal);
     const seen = new Set();
     for (const game of normalized) {
       const key = String(game.id || teamKey(game.home && game.home.nome, game.away && game.away.nome));

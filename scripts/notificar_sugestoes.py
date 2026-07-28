@@ -18,7 +18,7 @@ Variáveis de ambiente esperadas (via secrets do GitHub Actions):
   SMTP_PORT                 — 465
   SMTP_USER                 — laercio.rehem@formuladogol.com.br
   SMTP_PASS                 — App Password gerada no painel do Zoho
-  EMAIL_DESTINO_SUGESTOES   — destino final das notificações
+  O destino é fixo em avisos@formuladogol.com.br (alias do projeto).
 """
 from __future__ import annotations
 
@@ -52,7 +52,11 @@ SMTP_HOST = env_obrigatorio("SMTP_HOST")
 SMTP_PORT = int(env_obrigatorio("SMTP_PORT"))
 SMTP_USER = env_obrigatorio("SMTP_USER")
 SMTP_PASS = env_obrigatorio("SMTP_PASS")
-EMAIL_DESTINO = env_obrigatorio("EMAIL_DESTINO_SUGESTOES")
+
+# Endereço institucional do projeto para receber todas as sugestões. Não é
+# segredo e fica fixado no código para que uma configuração antiga do GitHub
+# não redirecione mensagens para outra caixa por engano.
+EMAIL_DESTINO = "avisos@formuladogol.com.br"
 
 # Nome que aparece como remetente no cliente de e-mail.
 NOME_REMETENTE = "Sugestões · Fórmula do Gol"
