@@ -5,10 +5,10 @@
   "status": "aviso",
   "status_anterior": "aviso",
   "nivel": "aviso",
-  "ultima_tentativa": "2026-07-28T02:13:43-03:00",
-  "ultimo_sucesso": "2026-07-28T02:13:43-03:00",
-  "ultimo_snapshot_valido": "2026-07-28T02:13:43-03:00",
-  "snapshot_hash": "9582ca6d075be5ee22f35723b84e1f7fd31ac19b5dfcb1df9916ec378400adef",
+  "ultima_tentativa": "2026-07-28T13:16:10-03:00",
+  "ultimo_sucesso": "2026-07-28T13:16:10-03:00",
+  "ultimo_snapshot_valido": "2026-07-28T13:16:10-03:00",
+  "snapshot_hash": "fafbbaad9ffc56f43c2cb649ed0ef825c00d8687a599c29e62931183a0c6be10",
   "fonte_principal": "ESPN",
   "fontes_complementares": [
     "override manual"
@@ -22,6 +22,15 @@
       "fonte": "override manual",
       "origem": "manual confirmado — resultado público e vídeo publicado pelo UOL Esporte",
       "motivo": "A ESPN manteve o event_id reagendado com placar/status incompatível com o resultado público confirmado."
+    },
+    {
+      "event_id": "401840999",
+      "rodada": 4,
+      "jogo": "Botafogo x Vitória",
+      "placar": "0 x 0",
+      "fonte": "override manual",
+      "origem": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
+      "motivo": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial."
     }
   ],
   "tentativas": 1,
@@ -29,11 +38,11 @@
   "mensagem_admin": "snapshot auditado e publicado; ESPN permaneceu principal e foram usadas fontes complementares: override manual",
   "mensagem_publica": "Dados atualizados e conferidos com fonte oficial complementar.",
   "mostrar_publico": false,
-  "run_url": "https://github.com/LAERCIOREHEM/formuladogol/actions/runs/30330781709",
-  "run_id": "30330781709",
+  "run_url": "https://github.com/LAERCIOREHEM/formuladogol/actions/runs/30376858601",
+  "run_id": "30376858601",
   "run_attempt": "1",
   "branch": "main",
-  "fingerprint": "f31feb4779f81c33e04c09d35976414ec175204d6f9422e047284c45bdc019ca",
+  "fingerprint": "debd5a4d10b4191f35fa54ed60b8b08f88071be1a9015652d49f9e0c455fa3bb",
   "ultimo_alerta_em": "",
   "ultimo_alerta_fingerprint": "",
   "alerta_email": "não enviado",
