@@ -5,7 +5,7 @@
     "jogos_com_transmissao": 38,
     "jogos_sem_transmissao_14d": 1,
     "jogos_criticos_sem_transmissao_72h": 1,
-    "registros_preservados": 3,
+    "registros_preservados": 5,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -15,21 +15,21 @@
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 35,
-      "duracao_ms": 21087
+      "jogos_com_canal": 32,
+      "duracao_ms": 8277
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 3,
       "jogos_com_canal": 7,
-      "duracao_ms": 64601
+      "duracao_ms": 50363
     },
     "espn": {
       "ok": true,
       "eventos_na_janela": 40,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 1653
+      "duracao_ms": 1756
     }
   },
   "sem_transmissao": [
@@ -38,7 +38,7 @@
       "rodada": 21,
       "jogo": "Chapecoense x Vasco da Gama",
       "data_iso": "2026-07-29T15:00",
-      "faltam_horas": 15.1,
+      "faltam_horas": 14.8,
       "nivel": "critico"
     }
   ],
@@ -56,8 +56,32 @@
       ]
     },
     {
+      "event_id": "401841185",
+      "jogo": "Botafogo x Fluminense",
+      "canais": [
+        "Premiere",
+        "Globo",
+        "GE TV",
+        "SporTV",
+        "Disney+ / ESPN",
+        "Prime Video"
+      ]
+    },
+    {
       "event_id": "401841195",
       "jogo": "Atlético-MG x Grêmio",
+      "canais": [
+        "Premiere",
+        "Globo",
+        "GE TV",
+        "SporTV",
+        "Disney+ / ESPN",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841197",
+      "jogo": "Vitória x Botafogo",
       "canais": [
         "Premiere",
         "Globo",
@@ -88,5 +112,5 @@
     "https://ge.globo.com/gato-mestre/noticia/2026/07/27/palpite-ge-2026-tropa-do-ge-e-gato-mestre-dividem-a-lideranca-veja-erros-e-acertos-da-20a-rodada-do-brasileiro.ghtml",
     "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/07/27/remo-emplaca-tres-nomes-na-selecao-da-20a-rodada-da-serie-a.ghtml"
   ],
-  "atualizado_em": "2026-07-28T23:51:49-03:00"
+  "atualizado_em": "2026-07-29T00:09:47-03:00"
 }
