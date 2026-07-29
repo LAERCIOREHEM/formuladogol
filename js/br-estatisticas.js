@@ -261,32 +261,6 @@
     return `<div class="stats-empty"><strong>${escapeHtml(message)}</strong>${extra ? `<span>${escapeHtml(extra)}</span>` : ""}</div>`;
   }
 
-  function summaryCard(icon, label, primary, secondary, team) {
-    const logo = team ? shield(team, "summary-shield") : `<span class="summary-icon">${icon}</span>`;
-    return `<article class="stats-summary-card">
-      <div class="stats-summary-label">${logo}<span>${escapeHtml(label)}</span></div>
-      <div class="stats-summary-primary">${escapeHtml(primary || "Aguardando dados")}</div>
-      <div class="stats-summary-secondary">${escapeHtml(secondary || "")}</div>
-    </article>`;
-  }
-
-  function renderSummary() {
-    const scorer = leadersValid() ? state.leaders.artilharia[0] : null;
-    const assistant = leadersValid() ? state.leaders.assistencias[0] : null;
-    const attacks = Array.isArray(state.competition?.gols_por_clube) && state.competition.gols_por_clube.length
-      ? state.competition.gols_por_clube
-      : tableRows().slice().sort((a, b) => Number(b.gp || 0) - Number(a.gp || 0));
-    const attack = attacks[0] || null;
-    const rank = Array.isArray(state.ranking?.ranking) ? state.ranking.ranking[0] : null;
-
-    $("cards-resumo").innerHTML = [
-      summaryCard("⚽", "Artilheiro", scorer?.nome, scorer ? `${scorer.time} · ${integer(scorer.gols)} gols` : "Ranking oficial ainda não atualizado", scorer),
-      summaryCard("🎯", "Garçom", assistant?.nome, assistant ? `${assistant.time} · ${integer(assistant.assistencias)} assist.` : "Ranking oficial ainda não atualizado", assistant),
-      summaryCard("🥅", "Melhor ataque", attack?.time, attack ? `${integer(attack.gols_pro ?? attack.gp)} gols` : "Aguardando consolidado", attack),
-      summaryCard("⚡", "Ranking", rank?.time, rank ? `Índice ${number(rank.indice_final ?? rank.score, 1)}` : "Aguardando ranking", rank),
-    ].join("");
-  }
-
   function playerRows(type) {
     if (!leadersValid()) return [];
     return type === "artilheiros" ? state.leaders.artilharia : state.leaders.assistencias;
@@ -1318,7 +1292,6 @@
   }
 
   function renderAll() {
-    renderSummary();
     renderPlayers("artilheiros");
     renderPlayers("assistencias");
     renderClubGoals();

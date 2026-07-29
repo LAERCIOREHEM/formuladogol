@@ -4,6 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fórmula do Gol — A matemática por trás do futebol</title>
+<script>
+  (function redirecionarInicioParaEstatisticas() {
+    const rota = String(window.location.pathname || '/').replace(/\/+$/, '') || '/';
+    if (rota !== '/' && rota !== '/index.html') return;
+
+    const view = String(new URLSearchParams(window.location.search || '').get('view') || '').toLowerCase();
+    if (['jogos', 'tabela', 'resultados'].includes(view)) return;
+
+    window.location.replace('/estatisticas.html' + (window.location.search || '') + (window.location.hash || ''));
+  })();
+</script>
 
 <!-- Google Analytics 4 — propriedade exclusiva do Fórmula do Gol -->
 <script>
@@ -2553,11 +2564,11 @@ body > .container > section.hero > img {
     </div>
   </header>
 	  <nav class="nav" data-br-auth-menu aria-label="Menu principal">
+	    <button type="button" onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
 	    <button type="button" onclick="setView('jogos')" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</button>
 	    <button type="button" onclick="location.href='aovivo.html'" id="btn-aovivo">🔴 Ao vivo</button>
 	    <button type="button" onclick="setView('tabela')" id="btn-tabela" data-br-view="tabela">📊 Tabela</button>
 	    <button type="button" onclick="setView('resultados')" id="btn-resultados" data-br-view="resultados">✅ Resultados</button>
-	    <button type="button" onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
 	    <button type="button" onclick="location.href='clubes.html'" id="btn-clubes">🛡️ Clubes</button>
 	    <button type="button" onclick="location.href='museu.html'" id="btn-museu">🏛️ Museu</button>
 	    <button type="button" onclick="location.href='copa2026/'" id="btn-copa" data-br-copa>🌎 Copa 2026</button>
