@@ -21,7 +21,7 @@ on:
       - 'transmissoes.json'
       - 'favicon-formula-do-gol*'
       - 'apple-touch-icon-formula-do-gol.png'
-      - 'og-image-formula-do-gol-v1.png'
+      - 'og-image-formula-do-gol-v2.jpg'
       - 'img/**'
       - 'css/br-global.css'
       - 'css/br-aovivo.css'
@@ -117,7 +117,7 @@ jobs:
             favicon-formula-do-gol-192.png
             favicon-formula-do-gol-512.png
             apple-touch-icon-formula-do-gol.png
-            og-image-formula-do-gol-v1.png
+            og-image-formula-do-gol-v2.jpg
           )
 
           PUBLIC_CSS=(
@@ -342,6 +342,27 @@ jobs:
             fi
           done
 
+          # Guarda-limite do preview social: o crawler do WhatsApp aborta o download
+          # de og:image acima de ~300 KB e o card fica sem imagem. Falhar aqui é
+          # melhor do que publicar um preview quebrado.
+          OG_IMAGES=(
+            _site/og-image-formula-do-gol-v2.jpg
+            _site/copa2026/og-copa-publico-v2.png
+          )
+          OG_MAX_BYTES=300000
+          for item in "${OG_IMAGES[@]}"; do
+            if [[ ! -f "$item" ]]; then
+              echo "ERRO: og:image ausente no pacote publico: $item"
+              exit 1
+            fi
+            size=$(stat -c%s "$item")
+            if (( size > OG_MAX_BYTES )); then
+              echo "ERRO: og:image acima do limite do WhatsApp: $item ($size bytes > $OG_MAX_BYTES)"
+              exit 1
+            fi
+            echo "OK og:image $item = $size bytes"
+          done
+
           REQUIRED_OPERATIONAL=(
             _site/dados-br/status-atualizacao.json
             _site/dados-br/status-deploy.json
@@ -397,7 +418,7 @@ jobs:
               "favicon-formula-do-gol-512.png",
               "apple-touch-icon-formula-do-gol.png",
               "favicon-formula-do-gol.ico",
-              "og-image-formula-do-gol-v1.png",
+              "og-image-formula-do-gol-v2.jpg",
           ]
 
           class RefParser(HTMLParser):
