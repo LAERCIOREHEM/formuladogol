@@ -571,6 +571,31 @@
     </article>`).join("")}</div>`;
   }
 
+  // Explicação da célula via tooltip nativo do navegador: nenhum pixel a mais
+  // no layout, e a profundidade fica a um gesto de distância para quem quiser
+  // conferir. Prioriza a prova determinística sobre a contagem do Monte Carlo.
+  function probabilityTooltip(detail) {
+    if (!detail || typeof detail !== "object") return "";
+    if (detail.impossivel_estruturalmente && detail.motivo_impossibilidade) {
+      return `Impossível matematicamente — ${detail.motivo_impossibilidade}`;
+    }
+    if (detail.certo_estruturalmente && detail.motivo_certeza) {
+      return `Garantido matematicamente — ${detail.motivo_certeza}`;
+    }
+    const ocorrencias = Number(detail.ocorrencias);
+    const simulacoes = Number(detail.simulacoes);
+    if (!Number.isFinite(ocorrencias) || !Number.isFinite(simulacoes) || simulacoes <= 0) return "";
+    const partes = [`${number(ocorrencias, 0)} ocorrências em ${number(simulacoes, 0)} simulações`];
+    if (detail.zero_observado) {
+      partes.push("não apareceu nas simulações, mas ainda é matematicamente possível");
+      const limite = Number(detail.limite_superior_95_regra_dos_tres_pct);
+      if (Number.isFinite(limite) && limite > 0) {
+        partes.push(`limite superior de 95%: ${String(limite).replace(".", ",")}%`);
+      }
+    }
+    return partes.join(" · ");
+  }
+
   function probabilityDisplayText(detail, value, digits = 1) {
     const explicit = String(detail?.exibicao || "").trim();
     if (explicit) return explicit;
@@ -1089,10 +1114,10 @@
       <th scope="row" class="probability-table-club"><a href="${escapeAttr(clubHref(club?.clube))}">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong></a></th>
       <td class="probability-table-number"><strong>${integer(atual.pontos)}</strong></td>
       <td class="probability-table-number">${integer(atual.jogos)}</td>
-      <td class="probability-table-percent probability-cell-title">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "campeao"), probabilityFieldValue(club, "campeao")))}</td>
-      <td class="probability-table-percent probability-cell-lib">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "libertadores"), probabilityFieldValue(club, "libertadores")))}</td>
-      <td class="probability-table-percent probability-cell-sula">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "sul_americana"), probabilityFieldValue(club, "sul_americana")))}</td>
-      <td class="probability-table-percent probability-cell-drop">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "rebaixamento"), probabilityFieldValue(club, "rebaixamento")))}</td>
+      <td class="probability-table-percent probability-cell-title" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "campeao")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "campeao"), probabilityFieldValue(club, "campeao")))}</td>
+      <td class="probability-table-percent probability-cell-lib" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "libertadores")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "libertadores"), probabilityFieldValue(club, "libertadores")))}</td>
+      <td class="probability-table-percent probability-cell-sula" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "sul_americana")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "sul_americana"), probabilityFieldValue(club, "sul_americana")))}</td>
+      <td class="probability-table-percent probability-cell-drop" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "rebaixamento")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "rebaixamento"), probabilityFieldValue(club, "rebaixamento")))}</td>
       <td class="probability-table-projection"><strong>${position ? `${integer(position)}º` : "—"}</strong></td>
       <td class="probability-table-range">${escapeHtml(rangeText)}</td>
     </tr>`;

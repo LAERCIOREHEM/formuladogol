@@ -834,6 +834,112 @@ def calculate_bolao_probabilities(
         },
     }
 
+
+def analisar_elegibilidade_matematica(
+    state: CurrentState,
+    forecasts: Sequence[MatchForecast],
+) -> dict[str, dict[str, dict[str, Any]]]:
+    """Camada determinística de elegibilidade, independente do Monte Carlo.
+
+    O Monte Carlo mede frequência: "não apareceu em 2 milhões de universos".
+    Isso não é o mesmo que "não pode acontecer". Um cenário de probabilidade
+    10^-190 jamais seria sorteado, por mais simulações que se faça, e ainda
+    assim é aritmeticamente válido. Esta função responde a outra pergunta,
+    por prova e não por amostragem.
+
+    Os testes usados são condições SUFICIENTES, comparando o máximo aritmético
+    de um clube contra pontos JÁ CONQUISTADOS pelos rivais — números que não
+    dependem de nenhuma suposição sobre resultados futuros. Quando nenhum teste
+    conclui, a função se cala e a exibição permanece a do Monte Carlo.
+
+    Deliberadamente NÃO se tenta decidir o caso geral: no sistema de 3 pontos,
+    determinar se um clube ainda pode terminar em certa posição é NP-completo,
+    porque às vezes convém a um concorrente vencer (3 pontos para quem não
+    ameaça) em vez de empatar (1 ponto para quem ameaça). Uma heurística
+    caseira erraria em casos de borda, e errar aqui significa cravar 0% em
+    quem ainda tinha chance — o pior defeito possível neste projeto.
+    """
+    teams = tuple(state.teams)
+    total = len(teams)
+    indice = {team: posicao for posicao, team in enumerate(teams)}
+
+    restantes = [0] * total
+    for previsao in forecasts:
+        restantes[indice[previsao.fixture.home]] += 1
+        restantes[indice[previsao.fixture.away]] += 1
+
+    pontos = [int(valor) for valor in state.points]
+    maximo = [pontos[i] + 3 * restantes[i] for i in range(total)]
+
+    # Faixa de posições que caracteriza cada critério (limites inclusivos).
+    FAIXAS = {
+        "campeao": (1, 1),
+        "g4": (1, 4),
+        "g6": (1, 6),
+        "libertadores_base": (1, 5),
+        "sul_americana_base": (6, 11),
+        "rebaixamento": (17, 20),
+    }
+
+    elegibilidade: dict[str, dict[str, dict[str, Any]]] = {}
+    for i, team in enumerate(teams):
+        # Rivais que JÁ somam mais pontos do que este clube pode alcançar
+        # vencendo tudo: cada um deles termina obrigatoriamente à frente.
+        acima = [j for j in range(total) if j != i and pontos[j] > maximo[i]]
+        # Rivais que NÃO conseguem alcançar os pontos que este clube JÁ tem:
+        # cada um deles termina obrigatoriamente atrás.
+        abaixo = [j for j in range(total) if j != i and maximo[j] < pontos[i]]
+
+        melhor_posicao_possivel = len(acima) + 1        # ninguém abaixo pode subir acima
+        pior_posicao_possivel = total - len(abaixo)     # ninguém acima pode cair abaixo
+
+        criterios: dict[str, dict[str, Any]] = {}
+        for criterio, (limite_alto, limite_baixo) in FAIXAS.items():
+            impossivel = False
+            motivo = None
+            certo = False
+            motivo_certeza = None
+
+            if melhor_posicao_possivel > limite_baixo:
+                impossivel = True
+                lider = max(acima, key=lambda j: pontos[j])
+                motivo = (
+                    f"máximo aritmético de {maximo[i]} pontos ({pontos[i]} + 3x{restantes[i]}); "
+                    f"{len(acima)} clube(s) já somam mais, entre eles {teams[lider]} "
+                    f"com {pontos[lider]}. Melhor posição possível: {melhor_posicao_possivel}º."
+                )
+            elif pior_posicao_possivel < limite_alto:
+                impossivel = True
+                motivo = (
+                    f"{len(abaixo)} clube(s) não alcançam mais os {pontos[i]} pontos já "
+                    f"conquistados. Pior posição possível: {pior_posicao_possivel}º."
+                )
+            elif limite_alto <= melhor_posicao_possivel and pior_posicao_possivel <= limite_baixo:
+                certo = True
+                motivo_certeza = (
+                    f"posição final necessariamente entre {melhor_posicao_possivel}º e "
+                    f"{pior_posicao_possivel}º, dentro da faixa do critério."
+                )
+
+            criterios[criterio] = {
+                "impossivel": impossivel,
+                "motivo_impossibilidade": motivo,
+                "certo": certo,
+                "motivo_certeza": motivo_certeza,
+            }
+
+        criterios["_aritmetica"] = {
+            "pontos_atuais": pontos[i],
+            "jogos_restantes": restantes[i],
+            "pontos_maximos": maximo[i],
+            "melhor_posicao_possivel": melhor_posicao_possivel,
+            "pior_posicao_possivel": pior_posicao_possivel,
+        }
+        elegibilidade[team] = criterios
+
+    return elegibilidade
+
+
 def run_monte_carlo(
     state: CurrentState,
     forecasts: Sequence[MatchForecast],
@@ -905,6 +1011,9 @@ def run_monte_carlo(
     simulations_with_residual_tie = int(np.any(residual_ties, axis=1).sum())
     total_residual_pairs = int(residual_ties.sum())
 
+    # Prova determinística calculada UMA vez, antes do laço por clube.
+    elegibilidade = analisar_elegibilidade_matematica(state, forecasts)
+
     half = simulations // 2
     team_results: list[dict[str, Any]] = []
     position_matrix: dict[str, list[float]] = {}
@@ -949,9 +1058,18 @@ def run_monte_carlo(
                     key: round(value * 100.0, 6) for key, value in probabilities.items()
                 },
                 "probabilidades_detalhes": {
-                    key: display_probability(count, simulations, display_threshold_pct)
+                    key: display_probability(
+                        count,
+                        simulations,
+                        display_threshold_pct,
+                        structurally_possible=not elegibilidade[team][key]["impossivel"],
+                        impossibility_reason=elegibilidade[team][key]["motivo_impossibilidade"],
+                        structurally_certain=elegibilidade[team][key]["certo"],
+                        certainty_reason=elegibilidade[team][key]["motivo_certeza"],
+                    )
                     for key, count in criterion_counts.items()
                 },
+                "elegibilidade_matematica": elegibilidade[team]["_aritmetica"],
                 "posicao_projetada": _round_half_up(position_mean),
                 "posicao_projetada_media": round(position_mean, 4),
                 "posicao_projetada_mediana": int(np.median(team_positions)),
