@@ -303,6 +303,139 @@ jobs:
           target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
 
+      - name: Gerar lastmod dos sitemaps
+        run: |
+          # O lastmod é derivado dos timestamps reais dos arquivos de dados que
+          # cada página consome, e não da data do deploy. Assim o sinal enviado
+          # ao Google é verdadeiro: páginas de dados diários mudam de data todo
+          # dia; páginas históricas (museu) mantêm a data real da última revisão.
+          python - <<'PY'
+          import glob
+          import json
+          import pathlib
+          import xml.etree.ElementTree as ET
+          from datetime import datetime, timedelta, timezone
+
+          NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
+          FUSO_BR = timezone(timedelta(hours=-3))
+          CAMPOS_DATA = ("atualizado_em", "gerado_em")
+          site = pathlib.Path("_site")
+
+          # Dependências reais de dados por página, extraídas dos fetch() de cada
+          # página e dos seus JS. Se um arquivo for renomeado, o deploy falha aqui
+          # em vez de publicar silenciosamente uma data errada.
+          DEPS = {
+              "https://formuladogol.com.br/": [
+                  "tabela.json", "jogos.json", "resultados.json", "espn_eventos.json",
+                  "dados-br/probabilidades-jogos.json", "dados-br/ranking-desempenho.json",
+              ],
+              "https://formuladogol.com.br/aovivo.html": [
+                  "jogos.json", "espn_eventos.json",
+                  "dados-br/probabilidades-jogos.json", "dados-br/probabilidades-brasileirao.json",
+                  "dados-br/transmissoes-aovivo.json", "dados-br/transmissoes-tv.json",
+              ],
+              "https://formuladogol.com.br/estatisticas.html": [
+                  "dados-br/probabilidades-brasileirao.json", "dados-br/ranking-desempenho.json",
+                  "dados-br/lideres-jogadores.json", "dados-br/estatisticas-competicao.json",
+                  "dados-br/probabilidades-por-pontuacao.json", "resultados.json",
+              ],
+              "https://formuladogol.com.br/clubes.html": [
+                  "dados-br/clubes.json", "dados-br/elencos.json",
+                  "dados-br/ranking-desempenho.json", "dados-br/probabilidades-brasileirao.json",
+                  "tabela.json", "espn_eventos.json",
+              ],
+              "https://formuladogol.com.br/museu.html": [
+                  "dados-br/museu-brasileirao.json",
+              ],
+          }
+
+          def data_do_arquivo(rel):
+              caminho = site / rel
+              if not caminho.is_file():
+                  raise SystemExit(f"ERRO lastmod: dependência ausente no pacote público: {rel}")
+              try:
+                  dados = json.loads(caminho.read_text(encoding="utf-8"))
+              except Exception as erro:
+                  raise SystemExit(f"ERRO lastmod: JSON inválido em {rel}: {erro}")
+              if not isinstance(dados, dict):
+                  return None
+              for campo in CAMPOS_DATA:
+                  bruto = str(dados.get(campo) or "").strip()
+                  if not bruto:
+                      continue
+                  try:
+                      momento = datetime.fromisoformat(bruto.replace("Z", "+00:00"))
+                  except ValueError:
+                      continue
+                  if momento.tzinfo is None:
+                      momento = momento.replace(tzinfo=FUSO_BR)
+                  return momento.astimezone(FUSO_BR)
+              return None
+
+          agora = datetime.now(FUSO_BR)
+
+          def data_da_pagina(dependencias, rotulo):
+              datas = [d for d in (data_do_arquivo(rel) for rel in dependencias) if d]
+              if not datas:
+                  raise SystemExit(f"ERRO lastmod: nenhuma data válida para {rotulo}")
+              # Data futura indica relógio ou dado inconsistente: limita a hoje.
+              return min(max(datas), agora).strftime("%Y-%m-%d")
+
+          def aplicar(caminho_sitemap, resolver):
+              ET.register_namespace("", NS)
+              arvore = ET.parse(caminho_sitemap)
+              raiz = arvore.getroot()
+              aplicadas = 0
+              for no in raiz.findall(f"{{{NS}}}url"):
+                  loc = no.find(f"{{{NS}}}loc")
+                  if loc is None or not (loc.text or "").strip():
+                      raise SystemExit(f"ERRO lastmod: <url> sem <loc> em {caminho_sitemap}")
+                  url = loc.text.strip()
+                  valor = resolver(url)
+                  antigo = no.find(f"{{{NS}}}lastmod")
+                  if antigo is not None:
+                      no.remove(antigo)
+                  novo = ET.Element(f"{{{NS}}}lastmod")
+                  novo.text = valor
+                  no.insert(list(no).index(loc) + 1, novo)
+                  aplicadas += 1
+                  print(f"  {url} -> {valor}")
+              ET.indent(raiz, space="  ")
+              arvore.write(caminho_sitemap, encoding="utf-8", xml_declaration=True)
+              return aplicadas
+
+          # O módulo da Copa compartilha os mesmos JS e arquivos de dados entre as
+          # páginas, então não há como diferenciar por página: usa-se a data mais
+          # recente do conjunto de dados do módulo. Calculado primeiro porque as
+          # URLs da Copa também constam do sitemap principal.
+          arquivos_copa = sorted(glob.glob(str(site / "copa2026/dados/*.json")))
+          if not arquivos_copa:
+              raise SystemExit("ERRO lastmod: nenhum arquivo de dados da Copa no pacote público")
+          datas_copa = []
+          for absoluto in arquivos_copa:
+              rel = pathlib.Path(absoluto).relative_to(site).as_posix()
+              data = data_do_arquivo(rel)
+              if data:
+                  datas_copa.append(data)
+          if not datas_copa:
+              raise SystemExit("ERRO lastmod: nenhuma data válida nos dados da Copa")
+          data_copa = min(max(datas_copa), agora).strftime("%Y-%m-%d")
+
+          def resolver(url):
+              if url in DEPS:
+                  return data_da_pagina(DEPS[url], url)
+              if url.startswith("https://formuladogol.com.br/copa2026/"):
+                  return data_copa
+              raise SystemExit(f"ERRO lastmod: URL sem mapeamento de dados: {url}")
+
+          print("sitemap principal:")
+          total_br = aplicar(site / "sitemap.xml", resolver)
+          print("sitemap da Copa:")
+          total_copa = aplicar(site / "copa2026/sitemap.xml", resolver)
+
+          print(f"OK lastmod aplicado: {total_br} URLs no sitemap principal, {total_copa} no da Copa")
+          PY
+
       - name: Validar pacote público antes do upload
         shell: bash
         run: |
@@ -377,6 +510,7 @@ jobs:
           done
 
           python - <<'PY'
+          from datetime import date, datetime, timedelta, timezone
           from html.parser import HTMLParser
           from pathlib import Path
           from urllib.parse import urlsplit
@@ -607,6 +741,27 @@ jobs:
               "https://formuladogol.com.br/copa2026/museu.html",
           }
           assert set(urls) == expected_urls, f"sitemap divergente: {urls!r}"
+
+          # Guarda do lastmod: uma data ausente equivale a não informar frescor;
+          # uma data congelada no passado é pior, porque afirma ao Google que
+          # nada mudou. Uma data futura destrói a confiança no sinal.
+          ns_sm = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          hoje_br = datetime.now(timezone(timedelta(hours=-3))).date()
+          for nome_sitemap in ("sitemap.xml", "copa2026/sitemap.xml"):
+              raiz_sm = ET.parse(site / nome_sitemap).getroot()
+              nos = raiz_sm.findall("sm:url", ns_sm)
+              assert nos, f"{nome_sitemap}: sem URLs"
+              for no_sm in nos:
+                  loc_sm = no_sm.find("sm:loc", ns_sm)
+                  alvo = (loc_sm.text or "").strip() if loc_sm is not None else "?"
+                  lm = no_sm.find("sm:lastmod", ns_sm)
+                  assert lm is not None and (lm.text or "").strip(), f"{nome_sitemap}: {alvo} sem lastmod"
+                  texto_lm = lm.text.strip()
+                  try:
+                      valor_lm = date.fromisoformat(texto_lm)
+                  except ValueError:
+                      raise AssertionError(f"{nome_sitemap}: {alvo} com lastmod inválido: {texto_lm!r}")
+                  assert valor_lm <= hoje_br, f"{nome_sitemap}: {alvo} com lastmod no futuro: {texto_lm}"
           assert not any(any(term in url for term in ("apostas", "bolao", "aniversariantes", "regras", "palpite", "pontos")) for url in urls)
 
           copa_root = ET.parse(site / "copa2026/sitemap.xml").getroot()
