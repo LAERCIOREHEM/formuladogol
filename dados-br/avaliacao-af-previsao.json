@@ -2,18 +2,19 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-07-29T21:16:13-03:00",
+  "gerado_em": "2026-07-29T21:43:12-03:00",
   "versao_avaliacao": "AF-Avaliação 1.0",
   "integridade_historico": {
     "valido": true,
     "encadeado": true,
     "algoritmo": "SHA-256",
-    "quantidade_snapshots": 10,
+    "quantidade_snapshots": 11,
     "hash_inicial": "b37f95c298e78928a7bb1f2c116b48a3935f869b6070f67e4e3c1f0c3cdeaca2",
-    "hash_final": "548f473973b8f40f4b2c0a539f2d9e193b53bc8d6298c4acbe1c0336a9cab272",
+    "hash_final": "e5685d4e415a118e441ac20a6d129abe3fb4de844571e47629ca45e7de6e8162",
     "rodadas_distintas": [
       19,
-      20
+      20,
+      21
     ],
     "modelos_registrados": [
       "AF-Previsão 1.0",
@@ -23,12 +24,12 @@
     "avisos": []
   },
   "cobertura": {
-    "snapshots": 10,
-    "rodadas_distintas": 2,
+    "snapshots": 11,
+    "rodadas_distintas": 3,
     "primeira_rodada": 19,
-    "ultima_rodada": 20,
+    "ultima_rodada": 21,
     "primeiro_registro": "2026-07-16T21:24:00-03:00",
-    "ultimo_registro": "2026-07-26T21:24:00-03:00",
+    "ultimo_registro": "2026-07-29T21:25:00-03:00",
     "minimo_snapshots_publicacao": 5
   },
   "metricas_planejadas": {
@@ -57,10 +58,10 @@
   },
   "publicar_na_interface": false,
   "status": "coletando_historico",
-  "mensagem": "Campeonato em andamento: maior número de jogos por clube é 20/38.",
+  "mensagem": "Campeonato em andamento: maior número de jogos por clube é 21/38.",
   "campeonato": {
     "concluido": false,
-    "detalhe": "Campeonato em andamento: maior número de jogos por clube é 20/38."
+    "detalhe": "Campeonato em andamento: maior número de jogos por clube é 21/38."
   },
   "avaliacao_final": null
 }
