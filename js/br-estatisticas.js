@@ -594,6 +594,50 @@
     return details[field] || (field === "libertadores" ? details.libertadores_base : field === "sul_americana" ? details.sul_americana_base : null);
   }
 
+  // ────────────────────────────────────────────────────────────────────
+  // CLASSIFICAÇÃO CORRENTE NA TABELA DE PROBABILIDADES
+  //
+  // Posição, pontos e jogos são FATO CONSUMADO, não previsão. Ficavam presos
+  // ao instante da simulação (pontos_atuais/jogos_atuais do AF-Previsão), o que
+  // fazia a página exibir 44 pontos enquanto a Tabela já mostrava 47 — janela
+  // que dura de um jogo terminar até o AF recalcular. Passam a vir do
+  // tabela.json, que o auto-refresh mantém atualizado a cada 30 s.
+  //
+  // Percentuais, PROJ. e FAIXA continuam ancorados ao cálculo, porque são
+  // saída da simulação: atualizá-los sem simular seria inventar número. A
+  // frase de "último cálculo" declara essa idade ao leitor.
+  // ────────────────────────────────────────────────────────────────────
+
+  let standingsCache = { fonte: null, mapa: new Map() };
+
+  function standingsIndex() {
+    const linhas = Array.isArray(state.table?.tabela) ? state.table.tabela : [];
+    if (standingsCache.fonte === linhas) return standingsCache.mapa;
+    const mapa = new Map();
+    linhas.forEach((linha) => {
+      const chave = normalize(linha?.time || linha?.clube);
+      if (!chave) return;
+      mapa.set(chave, {
+        posicao: Number(linha?.pos),
+        pontos: Number(linha?.pontos),
+        jogos: Number(linha?.jogos),
+      });
+    });
+    standingsCache = { fonte: linhas, mapa };
+    return mapa;
+  }
+
+  // Devolve o valor oficial quando disponível; senão preserva o do AF-Previsão.
+  function liveStanding(club) {
+    const oficial = standingsIndex().get(normalize(club?.clube));
+    const escolher = (novo, antigo) => (Number.isFinite(novo) ? novo : antigo);
+    return {
+      posicao: escolher(oficial?.posicao, club?.posicao_atual),
+      pontos: escolher(oficial?.pontos, club?.pontos_atuais),
+      jogos: escolher(oficial?.jogos, club?.jogos_atuais),
+    };
+  }
+
   function probabilityClubRows() {
     return Array.isArray(state.probabilities?.clubes) ? state.probabilities.clubes : [];
   }
@@ -846,7 +890,7 @@
       rebaixamento: "rebaixamento",
     }[sort];
     sorted.sort((a, b) => {
-      if (sort === "classificacao") return (Number(a?.posicao_atual) || 99) - (Number(b?.posicao_atual) || 99);
+      if (sort === "classificacao") return (Number(liveStanding(a).posicao) || 99) - (Number(liveStanding(b).posicao) || 99);
       if (sort === "posicao") return (projectedPosition(a) || 99) - (projectedPosition(b) || 99);
       if (sort === "pontos") return (projectedPoints(b) || 0) - (projectedPoints(a) || 0);
       return probabilityFieldValue(b, probabilityKey) - probabilityFieldValue(a, probabilityKey);
@@ -918,7 +962,7 @@
         <a class="probability-club-link" href="${escapeAttr(clubHref(club?.clube))}" aria-label="Abrir página de ${escapeAttr(club?.clube)}">${shield(info, "probability-club-shield")}</a>
         <div class="probability-club-title">
           <a href="${escapeAttr(clubHref(club?.clube))}"><strong>${escapeHtml(club?.clube)}</strong></a>
-          <span>${integer(club?.posicao_atual)}º na tabela · ${integer(club?.pontos_atuais)} pts · ${integer(club?.jogos_atuais)} jogos</span>
+          <span>${integer(liveStanding(club).posicao)}º na tabela · ${integer(liveStanding(club).pontos)} pts · ${integer(liveStanding(club).jogos)} jogos</span>
         </div>
         <div class="probability-points">
           <strong>${projected ?? "—"}</strong><span>pontos projetados</span>
@@ -1039,11 +1083,12 @@
     const position = projectedPosition(club);
     const range = probabilityPositionRange(club);
     const rangeText = range ? `${integer(range.best)}º–${integer(range.worst)}º` : "—";
+    const atual = liveStanding(club);
     return `<tr>
-      <td class="probability-table-position"><span>${integer(club?.posicao_atual)}</span></td>
+      <td class="probability-table-position"><span>${integer(atual.posicao)}</span></td>
       <th scope="row" class="probability-table-club"><a href="${escapeAttr(clubHref(club?.clube))}">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong></a></th>
-      <td class="probability-table-number"><strong>${integer(club?.pontos_atuais)}</strong></td>
-      <td class="probability-table-number">${integer(club?.jogos_atuais)}</td>
+      <td class="probability-table-number"><strong>${integer(atual.pontos)}</strong></td>
+      <td class="probability-table-number">${integer(atual.jogos)}</td>
       <td class="probability-table-percent probability-cell-title">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "campeao"), probabilityFieldValue(club, "campeao")))}</td>
       <td class="probability-table-percent probability-cell-lib">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "libertadores"), probabilityFieldValue(club, "libertadores")))}</td>
       <td class="probability-table-percent probability-cell-sula">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "sul_americana"), probabilityFieldValue(club, "sul_americana")))}</td>
@@ -1051,6 +1096,16 @@
       <td class="probability-table-projection"><strong>${position ? `${integer(position)}º` : "—"}</strong></td>
       <td class="probability-table-range">${escapeHtml(rangeText)}</td>
     </tr>`;
+  }
+
+  // Declara ao leitor a idade dos percentuais. Reutiliza probability-table-hint,
+  // classe já estilizada e responsiva, para não introduzir CSS novo.
+  function probabilityCalcNote() {
+    const gerado = state.probabilities?.gerado_em;
+    if (!gerado) return "";
+    const quando = dateTimeBR(gerado);
+    if (!quando || quando === "—") return "";
+    return `<p class="probability-table-hint">Último cálculo das probabilidades: ${escapeHtml(quando)}.</p>`;
   }
 
   function renderProbabilityRanking() {
@@ -1063,6 +1118,7 @@
     }
     target.innerHTML = `<section class="probability-ranking-section probability-comparison-section">
       <div class="probability-section-head"><div><div class="kicker">20 clubes</div><h3>Tabela geral de probabilidades</h3></div><span>compare chances e projeções em uma única leitura</span></div>
+      ${probabilityCalcNote()}
       <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
       <div class="probability-table-shell">
         <table class="probability-comparison-table">
