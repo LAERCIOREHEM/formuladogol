@@ -1098,14 +1098,14 @@
     </tr>`;
   }
 
-  // Declara ao leitor a idade dos percentuais. Reutiliza probability-table-hint,
-  // classe já estilizada e responsiva, para não introduzir CSS novo.
+  // Declara ao leitor a idade dos percentuais, logo abaixo da chamada da seção,
+  // dentro da coluna direita do cabeçalho (.probability-head-aside).
   function probabilityCalcNote() {
     const gerado = state.probabilities?.gerado_em;
     if (!gerado) return "";
     const quando = dateTimeBR(gerado);
     if (!quando || quando === "—") return "";
-    return `<p class="probability-table-hint">Último cálculo das probabilidades: ${escapeHtml(quando)}.</p>`;
+    return `<small>Último cálculo das probabilidades: ${escapeHtml(quando)}</small>`;
   }
 
   function renderProbabilityRanking() {
@@ -1117,8 +1117,7 @@
       return;
     }
     target.innerHTML = `<section class="probability-ranking-section probability-comparison-section">
-      <div class="probability-section-head"><div><div class="kicker">20 clubes</div><h3>Tabela geral de probabilidades</h3></div><span>compare chances e projeções em uma única leitura</span></div>
-      ${probabilityCalcNote()}
+      <div class="probability-section-head"><div><div class="kicker">20 clubes</div><h3>Tabela geral de probabilidades</h3></div><div class="probability-head-aside"><span>compare chances e projeções em uma única leitura</span>${probabilityCalcNote()}</div></div>
       <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
       <div class="probability-table-shell">
         <table class="probability-comparison-table">

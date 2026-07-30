@@ -1198,7 +1198,12 @@ body > .container > section.hero > img {
 .probability-evolution-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(148,163,184,.13); }
 .probability-section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 11px; }
 .probability-section-head h3 { margin-top: 3px; color: #fff; font-size: 20px; }
-.probability-section-head > span { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; text-align: right; }
+.probability-section-head > span,
+.probability-section-head > .probability-head-aside > span { color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; text-align: right; }
+/* Coluna à direita do cabeçalho: a chamada da seção e, abaixo dela, a data
+   do último cálculo. O span continua recebendo o mesmo estilo de antes. */
+.probability-head-aside { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; min-width: 0; }
+.probability-head-aside > small { color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; text-transform: none; text-align: right; opacity: .85; }
 .probability-club-list { display: grid; gap: 10px; }
 .probability-club-card { padding: 13px; border: 1px solid rgba(148,163,184,.14); border-radius: 18px; background: linear-gradient(145deg, rgba(6,17,25,.78), rgba(9,24,31,.74)); }
 .probability-club-head { display: grid; grid-template-columns: 42px 48px minmax(0,1fr) minmax(140px,auto); align-items: center; gap: 10px; }
@@ -1411,7 +1416,9 @@ body > .container > section.hero > img {
   .probability-highlight > b { font-size: 25px; }
   .probability-section-head { align-items: flex-start; }
   .probability-section-head h3 { font-size: 17px; }
-  .probability-section-head > span { max-width: 120px; font-size: 8px; }
+  .probability-section-head > span,
+  .probability-section-head > .probability-head-aside > span { max-width: 120px; font-size: 8px; }
+  .probability-head-aside > small { max-width: 160px; font-size: 9px; }
   .probability-club-card { padding: 10px; }
   .probability-club-title strong { font-size: 15px; }
   .probability-club-title span { font-size: 9px; }
