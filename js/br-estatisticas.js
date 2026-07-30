@@ -16,7 +16,15 @@
     probabilityModelsAudit: "dados-br/auditoria-modelos-af-previsao.json",
     probabilityEvaluation: "dados-br/avaliacao-af-previsao.json",
     pointsThresholds: "dados-br/probabilidades-por-pontuacao.json",
+    // Sentinela leve (2 KB) usada só para detectar mudança de dados sem
+    // rebaixar os 5,8 MB do conjunto completo a cada verificação.
+    updateStatus: "dados-br/status-atualizacao.json",
   };
+
+  // Intervalo igual ao do AO VIVO da home e do br-aovivo.js (ESPN_LIVE_MS).
+  const REFRESH_MS = 30000;
+
+  const refreshState = { timer: null, ocupado: false, assinatura: null };
 
   const state = {
     leaders: null,
@@ -1303,16 +1311,33 @@
     activateTab(state.tab, false);
   }
 
-  async function load() {
-    bindEvents();
-    const hashTab = location.hash.replace(/^#/, "");
-    const openProbabilityMethod = hashTab === "metodologia-probabilidades";
-    const abrirMetodologia = hashTab === "metodologia-ranking";
-    if (openProbabilityMethod) state.tab = "probabilidades";
-    else if (abrirMetodologia) state.tab = "desempenho";
-    else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "probabilidades", "desempenho"].includes(hashTab)) state.tab = hashTab;
+  // ────────────────────────────────────────────────────────────────────
+  // CARGA DE DADOS E ATUALIZAÇÃO AUTOMÁTICA
+  //
+  // O conjunto completo pesa ~5,8 MB (jogos-detalhes.json sozinho tem 2,8 MB).
+  // Rebaixar tudo a cada 30 s consumiria ~700 MB/hora por aba aberta, então a
+  // verificação periódica lê apenas duas sentinelas leves e só recarrega o
+  // conjunto quando elas indicam que os dados realmente mudaram:
+  //   • status-atualizacao.json  → snapshot_hash cobre tabela, resultados,
+  //     jogos e espn_eventos (o estado esportivo);
+  //   • auditoria-probabilidades.json → gerado_em e hash_entrada cobrem o
+  //     modelo AF-Previsão, que o snapshot_hash não alcança.
+  // ────────────────────────────────────────────────────────────────────
 
-    const [leaders, competition, details, ranking, rankingHistory, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation, pointsThresholds] = await Promise.all([
+  function assinaturaDados(statusPartidas, auditoriaProbabilidades) {
+    const s = statusPartidas || {};
+    const a = auditoriaProbabilidades || {};
+    return [
+      s.snapshot_hash || "",
+      s.ultimo_snapshot_valido || "",
+      s.ultimo_sucesso || "",
+      a.hash_entrada || "",
+      a.gerado_em || "",
+    ].join("|");
+  }
+
+  async function carregarDados() {
+    const [leaders, competition, details, ranking, rankingHistory, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation, pointsThresholds, updateStatus] = await Promise.all([
       fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
       fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
       fetchJson(FILES.details, { jogos: {} }),
@@ -1327,6 +1352,7 @@
       fetchJson(FILES.probabilityModelsAudit, { status: "aguardando_workflow" }),
       fetchJson(FILES.probabilityEvaluation, { status: "aguardando_primeira_execucao", publicar_na_interface: false }),
       fetchJson(FILES.pointsThresholds, { status: "aguardando_workflow", niveis: [] }),
+      fetchJson(FILES.updateStatus, {}),
     ]);
 
     state.leaders = leaders;
@@ -1343,11 +1369,68 @@
     state.probabilityModelsAudit = probabilityModelsAudit;
     state.probabilityEvaluation = probabilityEvaluation;
     state.pointsThresholds = pointsThresholds;
+
+    // A assinatura é semeada com os mesmos bytes que acabaram de ser aplicados
+    // na tela, e não numa leitura posterior. Sem isso, uma publicação ocorrida
+    // entre a carga e a primeira verificação passaria despercebida.
+    refreshState.assinatura = assinaturaDados(updateStatus, probabilitiesAudit);
+  }
+
+  async function verificarAtualizacao() {
+    if (refreshState.ocupado || document.hidden) return;
+    refreshState.ocupado = true;
+    try {
+      const [statusPartidas, auditoriaProbabilidades] = await Promise.all([
+        fetchJson(FILES.updateStatus, null),
+        fetchJson(FILES.probabilitiesAudit, null),
+      ]);
+      // Falha de rede devolve null nas duas: nada a comparar, tenta de novo depois.
+      if (!statusPartidas && !auditoriaProbabilidades) return;
+
+      const nova = assinaturaDados(statusPartidas, auditoriaProbabilidades);
+      if (!refreshState.assinatura || nova === refreshState.assinatura) return;
+
+      // Dados mudaram de fato. Preserva a rolagem porque renderAll() reescreve
+      // o conteúdo dos painéis e a altura da página pode variar.
+      const rolagem = window.scrollY;
+      await carregarDados();
+      renderAll();
+      window.scrollTo(0, rolagem);
+    } catch (error) {
+      console.warn("Estatísticas: atualização automática indisponível agora:", error);
+    } finally {
+      refreshState.ocupado = false;
+      clearTimeout(refreshState.timer);
+      refreshState.timer = setTimeout(verificarAtualizacao, REFRESH_MS);
+    }
+  }
+
+  function armarAtualizacaoAutomatica() {
+    clearTimeout(refreshState.timer);
+    refreshState.timer = setTimeout(verificarAtualizacao, REFRESH_MS);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) return;
+      clearTimeout(refreshState.timer);
+      verificarAtualizacao();
+    });
+  }
+
+  async function load() {
+    bindEvents();
+    const hashTab = location.hash.replace(/^#/, "");
+    const openProbabilityMethod = hashTab === "metodologia-probabilidades";
+    const abrirMetodologia = hashTab === "metodologia-ranking";
+    if (openProbabilityMethod) state.tab = "probabilidades";
+    else if (abrirMetodologia) state.tab = "desempenho";
+    else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "probabilidades", "desempenho"].includes(hashTab)) state.tab = hashTab;
+
+    await carregarDados();
     renderAll();
     if (openProbabilityMethod) {
       requestAnimationFrame(() => $("metodologia-probabilidades")?.scrollIntoView({ behavior: "auto", block: "start" }));
     }
     if (abrirMetodologia) requestAnimationFrame(() => document.getElementById("metodologia-ranking")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    armarAtualizacaoAutomatica();
   }
 
   document.addEventListener("DOMContentLoaded", load);
