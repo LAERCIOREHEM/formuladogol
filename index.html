@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fórmula do Gol — A matemática por trás do futebol</title>
+<title>Brasileirão 2026: jogos, tabela e probabilidades — Fórmula do Gol</title>
 <script>
   (function redirecionarInicioParaEstatisticas() {
     const rota = String(window.location.pathname || '/').replace(/\/+$/, '') || '/';
@@ -33,7 +33,7 @@
       resultados: porRota['/resultados']
     };
     const pagina = porRota[rota.toLowerCase()] || porView[view] || [
-      'Fórmula do Gol — A matemática por trás do futebol',
+      'Brasileirão 2026: jogos, tabela e probabilidades — Fórmula do Gol',
       '/'
     ];
     document.title = pagina[0];
@@ -67,7 +67,7 @@
 <meta name="theme-color" content="#10b981">
 
 <!-- Open Graph (preview no WhatsApp, Facebook, LinkedIn, Telegram) -->
-<meta property="og:title" content="Fórmula do Gol — A matemática por trás do futebol">
+<meta property="og:title" content="Brasileirão 2026: jogos, tabela e probabilidades — Fórmula do Gol">
 <meta property="og:description" content="Probabilidades de vitória, título, Libertadores e rebaixamento no Brasileirão 2026. Chances calculadas com 2 milhões de simulações por rodada usando modelo Poisson-bayesiano. Estatísticas, jogos e resultados atualizados em tempo real.">
 <meta property="og:image" content="https://formuladogol.com.br/og-image-formula-do-gol-v2.jpg">
 <meta property="og:image:secure_url" content="https://formuladogol.com.br/og-image-formula-do-gol-v2.jpg">
@@ -84,7 +84,7 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Fórmula do Gol — A matemática por trás do futebol">
+<meta name="twitter:title" content="Brasileirão 2026: jogos, tabela e probabilidades — Fórmula do Gol">
 <meta name="twitter:description" content="Probabilidades de vitória, título, Libertadores e rebaixamento no Brasileirão 2026. Chances calculadas com 2 milhões de simulações por rodada usando modelo Poisson-bayesiano. Estatísticas, jogos e resultados atualizados em tempo real.">
 <meta name="twitter:image" content="https://formuladogol.com.br/og-image-formula-do-gol-v2.jpg">
 <meta name="twitter:image:alt" content="Fórmula do Gol — A matemática por trás do futebol">
@@ -2553,25 +2553,25 @@ body > .container > section.hero > img {
     .jogo-time.br-club-link, .resultado-time.br-club-link { padding: 4px 2px; }
   }
 </style>
-<link rel="stylesheet" href="css/br-global.css?v=20260724-status-dot-v2">
+<link rel="stylesheet" href="css/br-global.css?v=20260729-sronly-v1">
 </head>
 <body>
 <div class="container">
   <header>
-    <h1 class="sr-only">Fórmula do Gol — A matemática por trás do futebol</h1>
+    <h1 class="sr-only">Brasileirão 2026: jogos, tabela e probabilidades — Fórmula do Gol</h1>
     <div class="hero-header">
       <img src="img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high">
     </div>
   </header>
 	  <nav class="nav" data-br-auth-menu aria-label="Menu principal">
-	    <button type="button" onclick="location.href='estatisticas.html'" id="btn-estatisticas">📈 Estatísticas</button>
-	    <button type="button" onclick="setView('jogos')" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</button>
-	    <button type="button" onclick="location.href='aovivo.html'" id="btn-aovivo">🔴 Ao vivo</button>
-	    <button type="button" onclick="setView('tabela')" id="btn-tabela" data-br-view="tabela">📊 Tabela</button>
-	    <button type="button" onclick="setView('resultados')" id="btn-resultados" data-br-view="resultados">✅ Resultados</button>
-	    <button type="button" onclick="location.href='clubes.html'" id="btn-clubes">🛡️ Clubes</button>
-	    <button type="button" onclick="location.href='museu.html'" id="btn-museu">🏛️ Museu</button>
-	    <button type="button" onclick="location.href='copa2026/'" id="btn-copa" data-br-copa>🌎 Copa 2026</button>
+	    <a href="estatisticas.html" id="btn-estatisticas">📈 Estatísticas</a>
+	    <a href="/jogos" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('jogos');}" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</a>
+	    <a href="aovivo.html" id="btn-aovivo">🔴 Ao vivo</a>
+	    <a href="/tabela" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('tabela');}" id="btn-tabela" data-br-view="tabela">📊 Tabela</a>
+	    <a href="/resultados" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('resultados');}" id="btn-resultados" data-br-view="resultados">✅ Resultados</a>
+	    <a href="clubes.html" id="btn-clubes">🛡️ Clubes</a>
+	    <a href="museu.html" id="btn-museu">🏛️ Museu</a>
+	    <a href="copa2026/" id="btn-copa" data-br-copa>🌎 Copa 2026</a>
 	  </nav>
 
   <div class="status-bar" id="status-bar">
@@ -3778,7 +3778,7 @@ function brAplicarMetadadosDaView(view, usarInicio = false) {
   const meta = BR_METADADOS_VIEWS[String(view || '').toLowerCase()];
   const naRaiz = usarInicio && (String(location.pathname || '/').replace(/\/+$/, '') || '/') === '/';
   const titulo = naRaiz || !meta
-    ? 'Fórmula do Gol — A matemática por trás do futebol'
+    ? 'Brasileirão 2026: jogos, tabela e probabilidades — Fórmula do Gol'
     : meta.titulo;
   const rota = naRaiz || !meta ? '/' : meta.rota;
   const descricao = naRaiz || !meta

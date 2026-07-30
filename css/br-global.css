@@ -912,3 +912,17 @@ html[data-br-update-status="error"] .br-update-status-dot {
   background: #f87171;
   box-shadow: 0 0 0 2px rgba(248, 113, 113, .17);
 }
+
+/* Título semântico acessível: lido por leitores de tela e por buscadores,
+   sem alterar o layout visual das páginas. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
