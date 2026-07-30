@@ -102,6 +102,7 @@ jobs:
             estatisticas.html
             clubes.html
             museu.html
+            78f8b10d32edcce04827b713eae52df5.txt
             CNAME
             robots.txt
             sitemap.xml
@@ -894,6 +895,66 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         timeout-minutes: 15
+
+
+
+      - name: Notificar buscadores via IndexNow
+        if: success()
+        run: |
+          # IndexNow avisa Bing, Yandex, Naver e DuckDuckGo em uma única chamada.
+          # O Google NÃO suporta o protocolo — o sitemap com lastmod real já
+          # cobre o Google. A chave está em 78f8b10d32edcce04827b713eae52df5.txt na raiz do site.
+          python - <<'INNER'
+          import json, urllib.request, urllib.error
+
+          CHAVE = "78f8b10d32edcce04827b713eae52df5"
+          HOST  = "formuladogol.com.br"
+          URLS  = [
+              "https://formuladogol.com.br/",
+              "https://formuladogol.com.br/estatisticas.html",
+              "https://formuladogol.com.br/aovivo.html",
+              "https://formuladogol.com.br/clubes.html",
+              "https://formuladogol.com.br/museu.html",
+              "https://formuladogol.com.br/copa2026/",
+          ]
+
+          payload = json.dumps({
+              "host": HOST,
+              "key": CHAVE,
+              "keyLocation": "https://" + HOST + "/" + CHAVE + ".txt",
+              "urlList": URLS,
+          }).encode("utf-8")
+
+          req = urllib.request.Request(
+              "https://api.indexnow.org/indexnow",
+              data=payload,
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=15) as resp:
+                  status = resp.status
+          except urllib.error.HTTPError as e:
+              status = e.code
+          except urllib.error.URLError as e:
+              print("IndexNow: erro de rede: " + str(e.reason))
+              raise SystemExit(0)
+
+          CODIGOS = {
+              200: "OK - URLs aceitas",
+              202: "OK - URLs recebidas e serao processadas",
+              400: "AVISO - request mal formado",
+              403: "AVISO - chave nao corresponde ao arquivo de verificacao",
+              422: "AVISO - URLs nao pertencem ao host declarado",
+              429: "AVISO - rate limit",
+          }
+          print("IndexNow: HTTP " + str(status) + " - " + CODIGOS.get(status, "codigo desconhecido"))
+          print("URLs submetidas: " + str(len(URLS)))
+          for u in URLS:
+              print("  " + u)
+          if status not in (200, 202):
+              print("IndexNow: deploy continua mesmo com este aviso")
+          INNER
 
       - name: Alertar falha de deploy por e-mail
         if: failure()
