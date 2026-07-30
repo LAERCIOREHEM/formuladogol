@@ -313,6 +313,7 @@ jobs:
           import glob
           import json
           import pathlib
+          import re
           import xml.etree.ElementTree as ET
           from datetime import datetime, timedelta, timezone
 
@@ -434,6 +435,26 @@ jobs:
           total_copa = aplicar(site / "copa2026/sitemap.xml", resolver)
 
           print(f"OK lastmod aplicado: {total_br} URLs no sitemap principal, {total_copa} no da Copa")
+
+          # O dateModified do Dataset (JSON-LD) usa a mesma data honesta do lastmod
+          # da página. Uma data estática viraria mentira no dia seguinte, e o
+          # frescor é justamente o diferencial declarado do projeto.
+          URL_STATS = "https://formuladogol.com.br/estatisticas.html"
+          data_stats = data_da_pagina(DEPS[URL_STATS], URL_STATS)
+          pagina_stats = site / "estatisticas.html"
+          html_stats = pagina_stats.read_text(encoding="utf-8")
+          # Substituição por padrão (e não pela sentinela literal) para o passo ser
+          # idempotente: reexecutar apenas reescreve o mesmo valor, em vez de falhar.
+          PADRAO_DATA = r'"dateModified": "\d{4}-\d{2}-\d{2}"'
+          ocorrencias = len(re.findall(PADRAO_DATA, html_stats))
+          if ocorrencias != 1:
+              raise SystemExit(
+                  "ERRO dateModified: esperado exatamente 1 campo dateModified em "
+                  f"estatisticas.html, encontrados {ocorrencias}"
+              )
+          html_stats = re.sub(PADRAO_DATA, f'"dateModified": "{data_stats}"', html_stats)
+          pagina_stats.write_text(html_stats, encoding="utf-8")
+          print(f"OK dateModified do Dataset: {data_stats}")
           PY
 
       - name: Validar pacote público antes do upload
@@ -514,6 +535,7 @@ jobs:
           from html.parser import HTMLParser
           from pathlib import Path
           from urllib.parse import urlsplit
+          import json
           import re
           import xml.etree.ElementTree as ET
 
@@ -762,6 +784,60 @@ jobs:
                   except ValueError:
                       raise AssertionError(f"{nome_sitemap}: {alvo} com lastmod inválido: {texto_lm!r}")
                   assert valor_lm <= hoje_br, f"{nome_sitemap}: {alvo} com lastmod no futuro: {texto_lm}"
+
+          # Guarda dos dados estruturados. Motivo concreto: as páginas internas
+          # referenciavam "#website" e "#organization" que não estavam definidos
+          # em lugar nenhum, porque o index.html não tinha JSON-LD. Referência
+          # pendurada não gera erro visível — só silenciosamente não funciona.
+          paginas_ld = ("index.html", "estatisticas.html", "aovivo.html")
+          definidos = set()
+          referencias = []
+          blocos = 0
+          for nome_ld in paginas_ld:
+              conteudo_ld = (site / nome_ld).read_text(encoding="utf-8")
+              achados = re.findall(
+                  r'<script type="application/ld\+json">(.*?)</script>', conteudo_ld, re.S
+              )
+              assert achados, f"{nome_ld}: sem bloco JSON-LD"
+              assert "0000-00-00" not in conteudo_ld, f"{nome_ld}: sentinela de data não substituída"
+              for bruto_ld in achados:
+                  blocos += 1
+                  try:
+                      dados_ld = json.loads(bruto_ld)
+                  except json.JSONDecodeError as erro:
+                      raise AssertionError(f"{nome_ld}: JSON-LD inválido: {erro}")
+                  nos = dados_ld.get("@graph") if isinstance(dados_ld, dict) else None
+                  if nos is None:
+                      nos = [dados_ld] if isinstance(dados_ld, dict) else list(dados_ld)
+
+                  def varrer(valor, dentro_de_no):
+                      if isinstance(valor, dict):
+                          identificador = valor.get("@id")
+                          if identificador and valor.get("@type"):
+                              definidos.add(identificador)
+                          elif identificador and set(valor.keys()) == {"@id"}:
+                              referencias.append((nome_ld, identificador))
+                          for chave, item in valor.items():
+                              if chave != "@id":
+                                  varrer(item, True)
+                      elif isinstance(valor, list):
+                          for item in valor:
+                              varrer(item, dentro_de_no)
+
+                  for no_ld in nos:
+                      varrer(no_ld, False)
+
+          for origem_ld, referencia in referencias:
+              assert referencia in definidos, (
+                  f"{origem_ld}: JSON-LD referencia @id inexistente: {referencia}"
+              )
+
+          tipos_index = re.findall(r'"@type": "([A-Za-z]+)"', (site / "index.html").read_text(encoding="utf-8"))
+          for obrigatorio in ("Organization", "WebSite", "WebPage", "Person"):
+              assert obrigatorio in tipos_index, f"index.html: JSON-LD sem {obrigatorio}"
+          conteudo_stats = (site / "estatisticas.html").read_text(encoding="utf-8")
+          assert '"@type": "Dataset"' in conteudo_stats, "estatisticas.html: JSON-LD sem Dataset"
+          print(f"OK JSON-LD: {blocos} blocos, {len(definidos)} entidades, {len(referencias)} referências resolvidas")
           assert not any(any(term in url for term in ("apostas", "bolao", "aniversariantes", "regras", "palpite", "pontos")) for url in urls)
 
           copa_root = ET.parse(site / "copa2026/sitemap.xml").getroot()
