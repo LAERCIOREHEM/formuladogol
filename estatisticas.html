@@ -57,8 +57,76 @@
       "url": "https://formuladogol.com.br/estatisticas.html",
       "name": "Probabilidades e estatísticas do Brasileirão 2026 — Fórmula do Gol",
       "description": "Probabilidades de título, Libertadores e rebaixamento calculadas com 2 milhões de simulações. Artilheiros, assistências, ranking de desempenho AF-Score.",
-      "isPartOf": { "@id": "https://formuladogol.com.br/#website" },
+      "isPartOf": {
+        "@id": "https://formuladogol.com.br/#website"
+      },
       "inLanguage": "pt-BR"
+    },
+    {
+      "@type": "Dataset",
+      "@id": "https://formuladogol.com.br/estatisticas.html#dataset",
+      "name": "Probabilidades do Campeonato Brasileiro Série A 2026 — Fórmula do Gol",
+      "description": "Conjunto de dados com as probabilidades de título, classificação para a Libertadores, classificação para a Sul-Americana e rebaixamento de cada um dos 20 clubes do Campeonato Brasileiro Série A 2026, acompanhado da projeção de pontos ao final das 380 partidas e do índice de desempenho AF-Score. As estimativas são recalculadas a cada rodada por modelo log-linear de gols com distribuição de Poisson, estimação bayesiana e 2 milhões de simulações Monte Carlo do campeonato completo.",
+      "url": "https://formuladogol.com.br/estatisticas.html",
+      "sameAs": "https://formuladogol.com.br/estatisticas.html",
+      "creator": {
+        "@id": "https://formuladogol.com.br/#organization"
+      },
+      "publisher": {
+        "@id": "https://formuladogol.com.br/#organization"
+      },
+      "isAccessibleForFree": true,
+      "inLanguage": "pt-BR",
+      "temporalCoverage": "2026",
+      "spatialCoverage": {
+        "@type": "Place",
+        "name": "Brasil"
+      },
+      "measurementTechnique": "Modelo log-linear de gols com distribuição de Poisson, estimação bayesiana (MAP) e simulação Monte Carlo com 2 milhões de repetições do campeonato",
+      "variableMeasured": [
+        {
+          "@type": "PropertyValue",
+          "name": "Probabilidade de título",
+          "unitText": "%"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "Probabilidade de classificação para a Libertadores",
+          "unitText": "%"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "Probabilidade de classificação para a Sul-Americana",
+          "unitText": "%"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "Probabilidade de rebaixamento",
+          "unitText": "%"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "Projeção de pontos ao final do campeonato",
+          "unitText": "pontos"
+        },
+        {
+          "@type": "PropertyValue",
+          "name": "AF-Score (índice de desempenho)"
+        }
+      ],
+      "keywords": [
+        "probabilidades Brasileirão 2026",
+        "chances de título Brasileirão",
+        "chances de rebaixamento",
+        "chances de Libertadores",
+        "projeção de pontos Brasileirão",
+        "simulação Monte Carlo futebol",
+        "estatística do futebol brasileiro"
+      ],
+      "dateModified": "0000-00-00",
+      "mainEntityOfPage": {
+        "@id": "https://formuladogol.com.br/estatisticas.html#webpage"
+      }
     },
     {
       "@type": "FAQPage",

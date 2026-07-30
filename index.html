@@ -2554,6 +2554,86 @@ body > .container > section.hero > img {
   }
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260729-sronly-v1">
+<!-- Dados estruturados: raiz do grafo (Organization, Person, WebSite, WebPage).
+     As demais páginas referenciam #website e #organization definidos aqui. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://formuladogol.com.br/#organization",
+      "name": "Fórmula do Gol",
+      "alternateName": "Fórmula do Gol — probabilidades do futebol brasileiro",
+      "url": "https://formuladogol.com.br/",
+      "description": "Observatório independente de probabilidades e estatísticas do futebol brasileiro. Calcula diariamente as chances de título, Libertadores, Sul-Americana e rebaixamento do Campeonato Brasileiro por meio de modelo estatístico e simulação Monte Carlo.",
+      "logo": {
+        "@type": "ImageObject",
+        "@id": "https://formuladogol.com.br/#logo",
+        "url": "https://formuladogol.com.br/favicon-formula-do-gol-512.png",
+        "width": 512,
+        "height": 512,
+        "caption": "Fórmula do Gol"
+      },
+      "image": {
+        "@id": "https://formuladogol.com.br/#logo"
+      },
+      "founder": {
+        "@id": "https://formuladogol.com.br/#autor"
+      },
+      "knowsAbout": [
+        "Probabilidades do Campeonato Brasileiro",
+        "Estatística aplicada ao futebol",
+        "Simulação Monte Carlo",
+        "Modelos de Poisson para previsão de gols"
+      ]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://formuladogol.com.br/#autor",
+      "name": "Laércio Rehem",
+      "jobTitle": "Matemático e Analista de Sistemas",
+      "description": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas e responsável pelo projeto Fórmula do Gol.",
+      "alumniOf": {
+        "@type": "CollegeOrUniversity",
+        "name": "Universidade Federal da Bahia"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://formuladogol.com.br/#website",
+      "url": "https://formuladogol.com.br/",
+      "name": "Fórmula do Gol",
+      "description": "Probabilidades, projeções e estatísticas do Campeonato Brasileiro Série A, atualizadas diariamente.",
+      "publisher": {
+        "@id": "https://formuladogol.com.br/#organization"
+      },
+      "inLanguage": "pt-BR"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://formuladogol.com.br/#webpage",
+      "url": "https://formuladogol.com.br/",
+      "name": "Brasileirão 2026: jogos, tabela e probabilidades — Fórmula do Gol",
+      "description": "Probabilidades de vitória, título, Libertadores e rebaixamento no Brasileirão 2026. Chances calculadas com 2 milhões de simulações por rodada usando modelo Poisson-bayesiano. Estatísticas, jogos e resultados atualizados em tempo real.",
+      "isPartOf": {
+        "@id": "https://formuladogol.com.br/#website"
+      },
+      "about": {
+        "@type": "SportsOrganization",
+        "name": "Campeonato Brasileiro de Futebol Série A 2026"
+      },
+      "primaryImageOfPage": {
+        "@type": "ImageObject",
+        "url": "https://formuladogol.com.br/og-image-formula-do-gol-v2.jpg",
+        "width": 1200,
+        "height": 630
+      },
+      "inLanguage": "pt-BR"
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <div class="container">
