@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-07-30T23:44:51.240973-03:00",
+  "gerado_em": "2026-07-30T23:48:56.215653-03:00",
   "temporada": 2026,
   "status": "valido",
   "resumo": {
@@ -49,34 +49,34 @@
     },
     "completude": {
       "artilharia": {
-        "jogos_lidos": 204,
+        "jogos_lidos": 205,
         "jogos_invalidos_ignorados": 0,
         "jogadores": 227,
-        "total_eventos_contabilizados": 512,
+        "total_eventos_contabilizados": 513,
         "gols_contra_ignorados": 18,
-        "jogos_com_escalacoes": 203,
-        "aparicoes_confirmadas": 6411,
+        "jogos_com_escalacoes": 204,
+        "aparicoes_confirmadas": 6443,
         "jogadores_com_jogos": 227,
         "jogadores_sem_jogos": 0,
         "aparicoes_locais_autoritativas": false,
         "jogos_pendentes_detalhes": 0,
-        "total_jogos_declarado": 204,
+        "total_jogos_declarado": 205,
         "eventos_locais_autoritativos": true,
         "jogadores_publicados": 227
       },
       "assistencias": {
-        "jogos_lidos": 204,
+        "jogos_lidos": 205,
         "jogos_invalidos_ignorados": 0,
         "jogadores": 211,
-        "total_eventos_contabilizados": 352,
+        "total_eventos_contabilizados": 353,
         "gols_contra_ignorados": 0,
-        "jogos_com_escalacoes": 203,
-        "aparicoes_confirmadas": 6411,
+        "jogos_com_escalacoes": 204,
+        "aparicoes_confirmadas": 6443,
         "jogadores_com_jogos": 207,
         "jogadores_sem_jogos": 4,
         "aparicoes_locais_autoritativas": false,
         "jogos_pendentes_detalhes": 0,
-        "total_jogos_declarado": 204,
+        "total_jogos_declarado": 205,
         "eventos_locais_autoritativos": true,
         "jogadores_publicados": 210
       }
@@ -91,32 +91,34 @@
       {
         "url": "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/leaders?limit=200",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/leaders?limit=200",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 400: Bad Request"
       },
       {
         "url": "https://sports.core.api.espn.com/v3/sports/soccer/bra.1/leaders?season=2026&limit=200",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://site.web.api.espn.com/apis/common/v3/sports/soccer/bra.1/statistics/byathlete?region=br&lang=pt&contentorigin=espn&isqualified=true&season=2026&limit=200&category=goals&sort=goals%3Adesc",
-        "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "status": "ok",
+        "content_type": "application/json;charset=utf-8",
+        "itens_extraidos": 0,
+        "refs_espn_resolvidas": 0
       },
       {
         "url": "https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?region=br&lang=pt&contentorigin=espn&isqualified=true&limit=200&sort=goals%3Adesc&season=2026",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?region=us&lang=en&contentorigin=espn&isqualified=true&limit=200&sort=goals%3Adesc&season=2026",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/athletes?season=2026&limit=200&sort=goals%3Adesc",
@@ -131,7 +133,7 @@
       {
         "url": "https://site.web.api.espn.com/apis/v2/sports/soccer/bra.1/leaders?region=br&lang=pt&season=2026&limit=200",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://www.espn.com.br/futebol/estatisticas/_/liga/bra.1/temporada/2026?xhr=1",
@@ -148,32 +150,34 @@
       {
         "url": "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/seasons/2026/leaders?limit=200",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://sports.core.api.espn.com/v2/sports/soccer/leagues/bra.1/leaders?limit=200",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 400: Bad Request"
       },
       {
         "url": "https://sports.core.api.espn.com/v3/sports/soccer/bra.1/leaders?season=2026&limit=200",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://site.web.api.espn.com/apis/common/v3/sports/soccer/bra.1/statistics/byathlete?region=br&lang=pt&contentorigin=espn&isqualified=true&season=2026&limit=200&category=assists&sort=assists%3Adesc",
-        "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "status": "ok",
+        "content_type": "application/json;charset=utf-8",
+        "itens_extraidos": 0,
+        "refs_espn_resolvidas": 0
       },
       {
         "url": "https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?region=br&lang=pt&contentorigin=espn&isqualified=true&limit=200&sort=assists%3Adesc&season=2026",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://site.web.api.espn.com/apis/fittwo/v3/sports/soccer/bra.1/athletes?region=us&lang=en&contentorigin=espn&isqualified=true&limit=200&sort=assists%3Adesc&season=2026",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/athletes?season=2026&limit=200&sort=assists%3Adesc",
@@ -188,7 +192,7 @@
       {
         "url": "https://site.web.api.espn.com/apis/v2/sports/soccer/bra.1/leaders?region=br&lang=pt&season=2026&limit=200",
         "status": "erro",
-        "erro": "URLError: <urlopen error timed out>"
+        "erro": "HTTPError: HTTP Error 404: Not Found"
       },
       {
         "url": "https://www.espn.com.br/futebol/estatisticas/_/liga/bra.1/temporada/2026?xhr=1",
