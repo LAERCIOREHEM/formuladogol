@@ -1130,7 +1130,27 @@
     if (!gerado) return "";
     const quando = dateTimeBR(gerado);
     if (!quando || quando === "—") return "";
-    return `<small>Último cálculo das probabilidades: ${escapeHtml(quando)}</small>`;
+
+    // A data sozinha é ambígua: um cálculo de ontem pode estar perfeitamente
+    // em dia (nenhum jogo terminou desde então) ou atrasado. Quem lê não tem
+    // como saber. A comparação abaixo responde isso: quantos jogos já foram
+    // disputados contra quantos o último cálculo levou em conta.
+    const disputados = Array.isArray(state.results?.resultados)
+      ? state.results.resultados.length
+      : null;
+    const considerados = Number(state.probabilities?.base_corrente?.partidas_concluidas);
+
+    let situacao = "";
+    if (disputados !== null && Number.isFinite(considerados)) {
+      const pendentes = disputados - considerados;
+      if (pendentes <= 0) {
+        situacao = ` · em dia com os ${integer(disputados)} jogos disputados`;
+      } else {
+        situacao = ` · ${integer(pendentes)} ${pendentes === 1 ? "jogo aguarda" : "jogos aguardam"} recálculo`;
+      }
+    }
+
+    return `<small>Último cálculo das probabilidades: ${escapeHtml(quando + situacao)}</small>`;
   }
 
   function renderProbabilityRanking() {
