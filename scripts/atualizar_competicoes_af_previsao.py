@@ -346,15 +346,50 @@ def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
         return
 
     pending_pairs = {event_pair_key(event) for event in pending}
+
+    # Uma fase não deixa de ser a fase atual quando algumas chaves terminam
+    # antes das demais. Se a ESPN chamou as partidas apenas de "Ida/Volta",
+    # incorpora também as chaves concluídas na mesma janela de jogos. Sem isso,
+    # 6 voltas pendentes de uma fase com 8 chaves parecem formar 12 equipes e a
+    # reconstrução é rejeitada como não sendo potência de dois.
+    pending_dates = [
+        parsed for event in pending
+        if (parsed := parse_datetime(event.get("data_iso"))) is not None
+    ]
+    if pending_dates:
+        lower = min(pending_dates) - timedelta(days=3)
+        upper = max(pending_dates) + timedelta(days=3)
+        cohort_pairs = {
+            event_pair_key(event)
+            for event in events
+            if int(event.get("fase_ordem") or 0) == current_rank
+            and (parsed := parse_datetime(event.get("data_iso"))) is not None
+            and lower <= parsed <= upper
+        }
+        cohort_teams = {team for pair in cohort_pairs for team in pair if team}
+        if (
+            len(cohort_pairs) >= len(pending_pairs)
+            and len(cohort_teams) == 2 * len(cohort_pairs)
+            and len(cohort_teams) & (len(cohort_teams) - 1) == 0
+        ):
+            pending_pairs = cohort_pairs
+
     active_events: list[dict[str, Any]] = []
     for pair in pending_pairs:
-        pair_pending = sorted(
-            (event for event in pending if event_pair_key(event) == pair),
+        pair_current = sorted(
+            (
+                event for event in events
+                if event_pair_key(event) == pair
+                and int(event.get("fase_ordem") or 0) == current_rank
+            ),
             key=lambda item: (item.get("data_iso") or "", item.get("event_id") or ""),
         )
-        active_events.extend(pair_pending)
-        if len(pair_pending) == 1:
-            pending_date = parse_datetime(pair_pending[0].get("data_iso"))
+        if not pair_current:
+            continue
+        latest_event = pair_current[-1]
+        active_events.append(latest_event)
+        if len(pair_current) == 1 or event_pair_key(pair_current[-2]) != pair:
+            pending_date = parse_datetime(latest_event.get("data_iso"))
             before = []
             if pending_date:
                 before = sorted(
@@ -362,6 +397,7 @@ def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
                         event for event in events
                         if event.get("concluido")
                         and event_pair_key(event) == pair
+                        and event is not latest_event
                         and (event_date := parse_datetime(event.get("data_iso"))) is not None
                         and event_date < pending_date
                         and (pending_date - event_date).days <= 35
@@ -370,6 +406,8 @@ def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
                 )
             if before:
                 active_events.append(before[-1])
+        else:
+            active_events.append(pair_current[-2])
     active_teams = {team for pair in pending_pairs for team in pair if team}
     inferred = knockout_stage_from_team_count(len(active_teams))
     if not inferred or len(active_teams) != 2 * len(pending_pairs):
@@ -615,6 +653,41 @@ def self_test() -> None:
     current = build_snapshot(spec, [synthetic, pending])
     assert current["fase_atual"]["ordem"] == 800
     assert current["fase_atual"]["eventos_pendentes"] == 1
+
+    # Regressão: duas das oito voltas terminaram antes das outras seis. A fase
+    # completa continua tendo 16 equipes e não pode ser reduzida às pendentes.
+    mixed_stage: list[dict[str, Any]] = []
+    for tie in range(8):
+        first = f"Equipe {2 * tie:02d}"
+        second = f"Equipe {2 * tie + 1:02d}"
+        for leg, (home, away, when) in enumerate((
+            (first, second, "2026-07-21T20:00:00-03:00"),
+            (second, first, "2026-07-28T20:00:00-03:00"),
+        ), start=1):
+            completed = leg == 1 or tie < 2
+            mixed_stage.append({
+                "event_id": f"mixed-{tie}-{leg}",
+                "data_iso": when,
+                "concluido": completed,
+                "fase": "Ida" if leg == 1 else "Volta",
+                "fase_ordem": 100,
+                "mandante": {"nome": home},
+                "visitante": {"nome": away},
+            })
+    mixed_stage.append({
+        "event_id": "mixed-fase-antiga",
+        "data_iso": "2026-04-02T20:00:00-03:00",
+        "concluido": True,
+        "fase": "Fase não identificada",
+        "fase_ordem": 100,
+        "mandante": {"nome": "Equipe antiga A"},
+        "visitante": {"nome": "Equipe antiga B"},
+    })
+    normalize_active_knockout_stage(mixed_stage)
+    rebuilt = detect_current_stage(mixed_stage)
+    assert rebuilt["ordem"] == 600
+    assert rebuilt["eventos"] == 16
+    assert rebuilt["eventos_pendentes"] == 6
     print("Self-test coleta AF-Previsão Continental: OK")
 
 

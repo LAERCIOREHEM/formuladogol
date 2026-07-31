@@ -257,18 +257,33 @@ def build_model_state_hash(
         for match in current
     ]
     fixture_structure = [
-        {"rodada": fixture.round_no, "mandante": fixture.home, "visitante": fixture.away}
-        for fixture in sorted(fixtures, key=lambda item: (item.round_no, item.home, item.away))
+        {
+            "event_id": fixture.event_id,
+            "rodada": fixture.round_no,
+            "data_iso": fixture.kickoff,
+            "mandante": fixture.home,
+            "visitante": fixture.away,
+            "estadio": fixture.stadium,
+        }
+        for fixture in sorted(
+            fixtures,
+            key=lambda item: (item.round_no, item.home, item.away, item.event_id),
+        )
     ]
     winner = (audit_models.get("selecao_modelo") or {}).get("vencedor") or {}
     payload = {
-        "schema": 1,
+        "schema": 2,
         "versao_modelo": config.get("versao_modelo"),
         "execucao_2": config.get("execucao_2"),
         "execucao_2_5": config.get("execucao_2_5"),
         "execucao_4": config.get("execucao_4"),
         "historico": historical_hashes,
         "modelo_vencedor": winner,
+        "participantes_bolao_sha256": (
+            file_sha256(BOLAO_PARTICIPANTS_PATH)
+            if BOLAO_PARTICIPANTS_PATH.exists()
+            else None
+        ),
         "tabela": table_rows,
         "resultados_2026": current_rows,
         "estrutura_restante": fixture_structure,
@@ -834,112 +849,6 @@ def calculate_bolao_probabilities(
         },
     }
 
-
-def analisar_elegibilidade_matematica(
-    state: CurrentState,
-    forecasts: Sequence[MatchForecast],
-) -> dict[str, dict[str, dict[str, Any]]]:
-    """Camada determinística de elegibilidade, independente do Monte Carlo.
-
-    O Monte Carlo mede frequência: "não apareceu em 2 milhões de universos".
-    Isso não é o mesmo que "não pode acontecer". Um cenário de probabilidade
-    10^-190 jamais seria sorteado, por mais simulações que se faça, e ainda
-    assim é aritmeticamente válido. Esta função responde a outra pergunta,
-    por prova e não por amostragem.
-
-    Os testes usados são condições SUFICIENTES, comparando o máximo aritmético
-    de um clube contra pontos JÁ CONQUISTADOS pelos rivais — números que não
-    dependem de nenhuma suposição sobre resultados futuros. Quando nenhum teste
-    conclui, a função se cala e a exibição permanece a do Monte Carlo.
-
-    Deliberadamente NÃO se tenta decidir o caso geral: no sistema de 3 pontos,
-    determinar se um clube ainda pode terminar em certa posição é NP-completo,
-    porque às vezes convém a um concorrente vencer (3 pontos para quem não
-    ameaça) em vez de empatar (1 ponto para quem ameaça). Uma heurística
-    caseira erraria em casos de borda, e errar aqui significa cravar 0% em
-    quem ainda tinha chance — o pior defeito possível neste projeto.
-    """
-    teams = tuple(state.teams)
-    total = len(teams)
-    indice = {team: posicao for posicao, team in enumerate(teams)}
-
-    restantes = [0] * total
-    for previsao in forecasts:
-        restantes[indice[previsao.fixture.home]] += 1
-        restantes[indice[previsao.fixture.away]] += 1
-
-    pontos = [int(valor) for valor in state.points]
-    maximo = [pontos[i] + 3 * restantes[i] for i in range(total)]
-
-    # Faixa de posições que caracteriza cada critério (limites inclusivos).
-    FAIXAS = {
-        "campeao": (1, 1),
-        "g4": (1, 4),
-        "g6": (1, 6),
-        "libertadores_base": (1, 5),
-        "sul_americana_base": (6, 11),
-        "rebaixamento": (17, 20),
-    }
-
-    elegibilidade: dict[str, dict[str, dict[str, Any]]] = {}
-    for i, team in enumerate(teams):
-        # Rivais que JÁ somam mais pontos do que este clube pode alcançar
-        # vencendo tudo: cada um deles termina obrigatoriamente à frente.
-        acima = [j for j in range(total) if j != i and pontos[j] > maximo[i]]
-        # Rivais que NÃO conseguem alcançar os pontos que este clube JÁ tem:
-        # cada um deles termina obrigatoriamente atrás.
-        abaixo = [j for j in range(total) if j != i and maximo[j] < pontos[i]]
-
-        melhor_posicao_possivel = len(acima) + 1        # ninguém abaixo pode subir acima
-        pior_posicao_possivel = total - len(abaixo)     # ninguém acima pode cair abaixo
-
-        criterios: dict[str, dict[str, Any]] = {}
-        for criterio, (limite_alto, limite_baixo) in FAIXAS.items():
-            impossivel = False
-            motivo = None
-            certo = False
-            motivo_certeza = None
-
-            if melhor_posicao_possivel > limite_baixo:
-                impossivel = True
-                lider = max(acima, key=lambda j: pontos[j])
-                motivo = (
-                    f"máximo aritmético de {maximo[i]} pontos ({pontos[i]} + 3x{restantes[i]}); "
-                    f"{len(acima)} clube(s) já somam mais, entre eles {teams[lider]} "
-                    f"com {pontos[lider]}. Melhor posição possível: {melhor_posicao_possivel}º."
-                )
-            elif pior_posicao_possivel < limite_alto:
-                impossivel = True
-                motivo = (
-                    f"{len(abaixo)} clube(s) não alcançam mais os {pontos[i]} pontos já "
-                    f"conquistados. Pior posição possível: {pior_posicao_possivel}º."
-                )
-            elif limite_alto <= melhor_posicao_possivel and pior_posicao_possivel <= limite_baixo:
-                certo = True
-                motivo_certeza = (
-                    f"posição final necessariamente entre {melhor_posicao_possivel}º e "
-                    f"{pior_posicao_possivel}º, dentro da faixa do critério."
-                )
-
-            criterios[criterio] = {
-                "impossivel": impossivel,
-                "motivo_impossibilidade": motivo,
-                "certo": certo,
-                "motivo_certeza": motivo_certeza,
-            }
-
-        criterios["_aritmetica"] = {
-            "pontos_atuais": pontos[i],
-            "jogos_restantes": restantes[i],
-            "pontos_maximos": maximo[i],
-            "melhor_posicao_possivel": melhor_posicao_possivel,
-            "pior_posicao_possivel": pior_posicao_possivel,
-        }
-        elegibilidade[team] = criterios
-
-    return elegibilidade
-
-
 def run_monte_carlo(
     state: CurrentState,
     forecasts: Sequence[MatchForecast],
@@ -1011,9 +920,6 @@ def run_monte_carlo(
     simulations_with_residual_tie = int(np.any(residual_ties, axis=1).sum())
     total_residual_pairs = int(residual_ties.sum())
 
-    # Prova determinística calculada UMA vez, antes do laço por clube.
-    elegibilidade = analisar_elegibilidade_matematica(state, forecasts)
-
     half = simulations // 2
     team_results: list[dict[str, Any]] = []
     position_matrix: dict[str, list[float]] = {}
@@ -1058,18 +964,9 @@ def run_monte_carlo(
                     key: round(value * 100.0, 6) for key, value in probabilities.items()
                 },
                 "probabilidades_detalhes": {
-                    key: display_probability(
-                        count,
-                        simulations,
-                        display_threshold_pct,
-                        structurally_possible=not elegibilidade[team][key]["impossivel"],
-                        impossibility_reason=elegibilidade[team][key]["motivo_impossibilidade"],
-                        structurally_certain=elegibilidade[team][key]["certo"],
-                        certainty_reason=elegibilidade[team][key]["motivo_certeza"],
-                    )
+                    key: display_probability(count, simulations, display_threshold_pct)
                     for key, count in criterion_counts.items()
                 },
-                "elegibilidade_matematica": elegibilidade[team]["_aritmetica"],
                 "posicao_projetada": _round_half_up(position_mean),
                 "posicao_projetada_media": round(position_mean, 4),
                 "posicao_projetada_mediana": int(np.median(team_positions)),
@@ -1829,6 +1726,154 @@ def continental_snapshots_state_hash(snapshots: dict[str, dict[str, Any]]) -> st
     return canonical_hash_payload(stable)
 
 
+def assess_publication_freshness(
+    published: dict[str, Any],
+    expected_hash: str,
+    state: CurrentState,
+    current: Sequence[Match],
+    fixtures: Sequence[Fixture],
+) -> dict[str, Any]:
+    """Compara o AF publicado com o estado esportivo que deveria alimentá-lo.
+
+    O hash é a verificação principal; as verificações redundantes produzem um
+    diagnóstico legível e impedem que um arquivo antigo pareça atual apenas por
+    conter uma estrutura JSON válida.
+    """
+    reasons: list[str] = []
+    published_hash = str(published.get("hash_entrada") or "")
+    base = published.get("base_corrente") or {}
+    current_count = len(current)
+    remaining_count = len(fixtures)
+
+    if published.get("status") != "ok":
+        reasons.append("status publicado diferente de ok")
+    if not published_hash:
+        reasons.append("AF publicado sem hash_entrada")
+    elif published_hash != expected_hash:
+        reasons.append("hash_entrada publicado não corresponde ao estado esportivo atual")
+    if int(base.get("partidas_concluidas") or -1) != current_count:
+        reasons.append(
+            "quantidade de partidas concluídas publicada diverge da fonte atual "
+            f"({base.get('partidas_concluidas')}/{current_count})"
+        )
+    if int(base.get("partidas_restantes") or -1) != remaining_count:
+        reasons.append(
+            "quantidade de partidas restantes publicada diverge do calendário atual "
+            f"({base.get('partidas_restantes')}/{remaining_count})"
+        )
+    if int(base.get("partidas_totais") or -1) != 380:
+        reasons.append("base publicada não totaliza 380 partidas")
+    if int(published.get("total_previsoes_partidas") or -1) != remaining_count:
+        reasons.append("lista publicada de previsões não cobre os jogos restantes atuais")
+
+    concluded_ids = {str(match.source_id) for match in current}
+    published_remaining_ids = {
+        str(item.get("event_id") or "")
+        for item in (published.get("partidas_restantes") or [])
+        if str(item.get("event_id") or "")
+    }
+    overlap = sorted(concluded_ids & published_remaining_ids)
+    if overlap:
+        reasons.append(
+            "partida já concluída ainda consta nas previsões: " + ", ".join(overlap[:5])
+        )
+
+    published_clubs = {
+        str(item.get("clube") or ""): item for item in (published.get("clubes") or [])
+    }
+    if len(published_clubs) != 20:
+        reasons.append("AF publicado não contém 20 clubes únicos")
+    for index, team in enumerate(state.teams):
+        row = published_clubs.get(team)
+        if row is None:
+            reasons.append(f"clube ausente no AF publicado: {team}")
+            continue
+        if int(row.get("pontos_atuais") or 0) != int(state.points[index]):
+            reasons.append(f"pontuação atual publicada diverge para {team}")
+        if int(row.get("jogos_atuais") or 0) != int(state.played[index]):
+            reasons.append(f"quantidade de jogos publicada diverge para {team}")
+
+    return {
+        "atualizado": not reasons,
+        "estado_pronto": True,
+        "hash_esperado": expected_hash,
+        "hash_publicado": published_hash,
+        "partidas_concluidas_atuais": current_count,
+        "partidas_concluidas_publicadas": base.get("partidas_concluidas"),
+        "partidas_restantes_atuais": remaining_count,
+        "partidas_restantes_publicadas": base.get("partidas_restantes"),
+        "motivos": reasons,
+    }
+
+
+def current_publication_freshness() -> dict[str, Any]:
+    """Determina se o AF publicado representa exatamente os dados correntes."""
+    try:
+        config = load_json(CONFIG_PATH)
+        audit_models = load_json(AUDIT_MODELS_PATH)
+        table = load_json(TABLE_PATH)
+        events = load_json(EVENTS_PATH)
+        results = load_json(RESULTS_PATH) if RESULTS_PATH.exists() else {"resultados": []}
+        calendar = load_json(CALENDAR_PATH)
+        state = load_current_state(table)
+        allowed_teams = set(state.teams)
+        current = load_current_matches(events, allowed_teams, results)
+        validate_current_results_against_table(current, state)
+        concluded_ids = {str(match.source_id) for match in current}
+        fixtures, _ = load_fixtures(calendar, concluded_ids, allowed_teams)
+        if len(current) + len(fixtures) != 380:
+            raise CurrentDataNotSynchronized(
+                "resultados e calendário atuais não totalizam 380 partidas"
+            )
+        snapshots = load_continental_snapshots()
+        brasileirao_hash = build_model_state_hash(
+            config, audit_models, state, current, fixtures
+        )
+        expected_hash = canonical_hash_payload({
+            "brasileirao": brasileirao_hash,
+            "competicoes": continental_snapshots_state_hash(snapshots),
+        })
+        if not OUTPUT_PATH.exists():
+            return {
+                "atualizado": False,
+                "estado_pronto": True,
+                "hash_esperado": expected_hash,
+                "hash_publicado": "",
+                "partidas_concluidas_atuais": len(current),
+                "partidas_concluidas_publicadas": None,
+                "partidas_restantes_atuais": len(fixtures),
+                "partidas_restantes_publicadas": None,
+                "motivos": ["arquivo de probabilidades ainda não existe"],
+            }
+        published = load_json(OUTPUT_PATH)
+        return assess_publication_freshness(
+            published, expected_hash, state, current, fixtures
+        )
+    except (OSError, ValueError, json.JSONDecodeError, ContinentalDataNotReady) as exc:
+        return {
+            "atualizado": False,
+            "estado_pronto": False,
+            "hash_esperado": "",
+            "hash_publicado": "",
+            "partidas_concluidas_atuais": None,
+            "partidas_concluidas_publicadas": None,
+            "partidas_restantes_atuais": None,
+            "partidas_restantes_publicadas": None,
+            "motivos": [str(exc)],
+        }
+
+
+def write_github_outputs(values: dict[str, Any]) -> None:
+    """Expõe ao workflow se houve publicação nova ou preservação temporária."""
+    output_path = str(os.environ.get("GITHUB_OUTPUT") or "").strip()
+    if not output_path:
+        return
+    with Path(output_path).open("a", encoding="utf-8", newline="\n") as handle:
+        for key, value in values.items():
+            safe_value = str(value).replace("\r", " ").replace("\n", " ")
+            handle.write(f"{key}={safe_value}\n")
+
+
 def validate_probabilities(teams: Sequence[dict[str, Any]]) -> None:
     if len(teams) != 20 or len({item["clube"] for item in teams}) != 20:
         raise ValueError("resultado probabilístico precisa conter 20 clubes únicos")
@@ -2511,12 +2556,29 @@ def main() -> int:
             f"{exc}. Probabilidades e auditoria anteriores foram preservadas; "
             "o histórico foi apenas encadeado, sem criar novo estado esportivo."
         )
+        write_github_outputs({
+            "af_updated": "false",
+            "af_pending": "true",
+            "af_reason": str(exc),
+        })
         return 0
     write_json(OUTPUT_PATH, probabilities)
     write_json(AUDIT_PATH, audit)
     write_json(HISTORY_PATH, history)
     write_json(BOLAO_OUTPUT_PATH, bolao)
     write_json(POINT_THRESHOLDS_OUTPUT_PATH, points_thresholds)
+    freshness = current_publication_freshness()
+    if not freshness.get("atualizado"):
+        reasons = "; ".join(freshness.get("motivos") or ["motivo não informado"])
+        raise RuntimeError(
+            "a nova publicação do AF não representa integralmente o estado atual: " + reasons
+        )
+    write_github_outputs({
+        "af_updated": "true",
+        "af_pending": "false",
+        "af_reason": "ok",
+        "af_hash": probabilities.get("hash_entrada") or "",
+    })
     print(
         "AF-Previsão gerado: "
         f"{probabilities['base_corrente']['partidas_concluidas']} concluídos, "

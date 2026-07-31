@@ -1048,8 +1048,12 @@
       if (g.period === 1) return 25;
       return 0;
     }
-    // No intervalo a ESPN pode mandar 45; trata como 45 cheio.
-    return Math.min(base + acr, 95);
+    // Enquanto a partida estiver em curso, o relógio nunca pode transformar
+    // o placar atual em resultado definitivo. A ESPN informa 90+N como tempo
+    // decorrido, mas não publica de forma confiável quanto o árbitro ainda
+    // deixará jogar. Preservamos uma janela mínima de 30 segundos; somente o
+    // estado oficial de pós-jogo encerra as possibilidades estatísticas.
+    return Math.min(base + acr, 89.5);
   }
 
   function taxasAoVivo(g) {
@@ -1076,7 +1080,8 @@
 
   function probabilidadeDinamica(g) {
     const s = gameState(g);
-    if (s.key !== "live") return null;
+    const emJogo = s.key === "live";
+    if (!emJogo && s.key !== "post") return null;
     const taxas = taxasAoVivo(g);
     if (!taxas) return null;
 
@@ -1084,9 +1089,16 @@
     const golsAway = Number(g.away && g.away.score);
     if (!isFinite(golsHome) || !isFinite(golsAway)) return null;
 
+    // 100% só existe depois que a fonte oficial confirma o encerramento.
+    if (!emJogo) {
+      if (golsHome > golsAway) return { home: 100, empate: 0, away: 0, minuto: 90, restanteMin: 0 };
+      if (golsHome < golsAway) return { home: 0, empate: 0, away: 100, minuto: 90, restanteMin: 0 };
+      return { home: 0, empate: 100, away: 0, minuto: 90, restanteMin: 0 };
+    }
+
     const DURACAO = 90;
     const minuto = minutoAtual(g);
-    const restanteMin = Math.max(0, DURACAO - minuto);
+    const restanteMin = Math.max(0.5, DURACAO - minuto);
     const fracao = restanteMin / DURACAO;
 
     // Ajuste por expulsão: um time com um jogador a menos perde força
@@ -1100,13 +1112,6 @@
     // Taxa esperada de gols no tempo restante.
     const lambdaHome = taxas.home * fracao * fatorHome;
     const lambdaAway = taxas.away * fracao * fatorAway;
-
-    // Se o jogo essencialmente acabou (restante ~0), o placar atual decide.
-    if (restanteMin <= 0 || (lambdaHome < 1e-4 && lambdaAway < 1e-4)) {
-      if (golsHome > golsAway) return { home: 100, empate: 0, away: 0, minuto, restanteMin };
-      if (golsHome < golsAway) return { home: 0, empate: 0, away: 100, minuto, restanteMin };
-      return { home: 0, empate: 100, away: 0, minuto, restanteMin };
-    }
 
     const MAXG = 8;
     const distH = distribuicaoGolsRestantes(lambdaHome, MAXG);
@@ -1124,32 +1129,32 @@
       }
     }
     const total = pHome + pEmpate + pAway || 1;
-    return {
-      home: (pHome / total) * 100,
-      empate: (pEmpate / total) * 100,
-      away: (pAway / total) * 100,
-      minuto,
-      restanteMin
-    };
-  }
+    let home = (pHome / total) * 100;
+    let empate = (pEmpate / total) * 100;
+    let away = (pAway / total) * 100;
 
-  function percentuaisEmDecimos(values) {
-    const raw = values.map((value) => Math.max(0, Number(value) || 0));
-    const total = raw.reduce((sum, value) => sum + value, 0) || 1;
-    const exact = raw.map((value) => value * 1000 / total);
-    const tenths = exact.map((value) => Math.floor(value));
-    let missing = 1000 - tenths.reduce((sum, value) => sum + value, 0);
-    const order = exact.map((value, index) => ({ index, fraction: value - tenths[index] }))
-      .sort((a, b) => b.fraction - a.fraction || a.index - b.index);
-    for (let i = 0; i < missing; i++) tenths[order[i % order.length].index] += 1;
-    return tenths.map((value) => value / 10);
+    // Enquanto a partida estiver ao vivo, nenhum dos três desfechos é
+    // impossível. O piso evita que o arredondamento visual publique 0%/100%
+    // antes do apito, mantendo a soma exatamente normalizada em 100%.
+    const PISO_AO_VIVO = 0.01;
+    const comPiso = [home, empate, away].map((valor) => Math.max(valor, PISO_AO_VIVO));
+    const somaComPiso = comPiso.reduce((soma, valor) => soma + valor, 0) || 1;
+    home = comPiso[0] * 100 / somaComPiso;
+    empate = comPiso[1] * 100 / somaComPiso;
+    away = comPiso[2] * 100 / somaComPiso;
+
+    return { home, empate, away, minuto, restanteMin };
   }
 
   function renderProbabilidadeDinamica(g) {
     const pd = probabilidadeDinamica(g);
     if (!pd) return "";
-    const rounded = percentuaisEmDecimos([pd.home, pd.empate, pd.away]);
-    const fmt = (v) => v.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + "%";
+    // Duas casas nas caudas impedem que 99,99% apareça como 100,0% e que
+    // 0,01% apareça como 0,0% durante a partida.
+    const fmt = (v) => {
+      const casas = (v >= 99 || v <= 1) ? 2 : 1;
+      return v.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas }) + "%";
+    };
     const homeNome = esc((g.home && g.home.nome) || "Mandante");
     const awayNome = esc((g.away && g.away.nome) || "Visitante");
     return '<div class="live-winprob" aria-label="Probabilidade dinâmica do resultado da partida">' +
@@ -1160,9 +1165,9 @@
         '<span class="live-winprob-seg away" style="width:' + pd.away.toFixed(3) + '%"></span>' +
       '</div>' +
       '<div class="live-winprob-legend">' +
-        '<span><strong>' + fmt(rounded[0]) + '</strong> ' + homeNome + '</span>' +
-        '<span><strong>' + fmt(rounded[1]) + '</strong> Empate</span>' +
-        '<span><strong>' + fmt(rounded[2]) + '</strong> ' + awayNome + '</span>' +
+        '<span><strong>' + fmt(pd.home) + '</strong> ' + homeNome + '</span>' +
+        '<span><strong>' + fmt(pd.empate) + '</strong> Empate</span>' +
+        '<span><strong>' + fmt(pd.away) + '</strong> ' + awayNome + '</span>' +
       '</div>' +
       '<div class="live-winprob-note">Estimativa estatística do nosso modelo · não é aposta</div>' +
     '</div>';

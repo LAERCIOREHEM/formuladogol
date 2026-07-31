@@ -285,6 +285,53 @@ def current_stage(events: Sequence[CupEvent]) -> tuple[int, str, list[CupEvent]]
         stage = sorted({event.stage for event in stage_events})[0]
         return rank, stage, stage_events
 
+    # Quando parte das chaves da mesma fase já acabou, olhar somente as
+    # partidas pendentes produz contagens como 12 equipes em uma fase real de
+    # 16. Reconstrói primeiro a rodada pela janela comum das partidas de volta,
+    # incluindo as chaves que terminaram alguns dias antes.
+    pending_dates = [event.played_at for event in pending]
+    lower = min(pending_dates) - timedelta(days=3)
+    upper = max(pending_dates) + timedelta(days=3)
+    cohort_events = [
+        event for event in events
+        if event.stage_rank == rank and lower <= event.played_at <= upper
+    ]
+    cohort_pairs = {event_pair_key(event) for event in cohort_events}
+    cohort_participants = {team for pair in cohort_pairs for team in pair}
+    if (
+        cohort_pairs
+        and len(cohort_participants) == 2 * len(cohort_pairs)
+        and is_power_of_two(len(cohort_participants))
+    ):
+        reconstructed: list[CupEvent] = []
+        for pair in cohort_pairs:
+            pair_events = sorted(
+                (event for event in events if event_pair_key(event) == pair),
+                key=lambda item: (item.played_at, item.event_id),
+            )
+            latest = next(
+                (
+                    event for event in reversed(pair_events)
+                    if lower <= event.played_at <= upper and event.stage_rank == rank
+                ),
+                None,
+            )
+            if latest is None:
+                continue
+            previous = [
+                event for event in pair_events
+                if event.played_at < latest.played_at
+                and (latest.played_at - event.played_at).days <= 35
+            ]
+            if previous:
+                reconstructed.append(previous[-1])
+            reconstructed.append(latest)
+        reconstructed.sort(key=lambda item: (item.played_at, item.event_id))
+        inferred = knockout_stage_from_team_count(len(cohort_participants))
+        if inferred and len(reconstructed) >= len(cohort_pairs):
+            inferred_rank, inferred_stage = inferred
+            return inferred_rank, inferred_stage, reconstructed
+
     # A ESPN às vezes substitui o nome da fase por textos operacionais como
     # “Ida”, “Volta” ou “avança nos pênaltis”. Nesses casos todos os eventos
     # podem chegar com fase_ordem=100, misturando o torneio inteiro. Reconstrói
@@ -700,15 +747,11 @@ def display_probability(
     *,
     structurally_possible: bool = True,
     impossibility_reason: str | None = None,
-    structurally_certain: bool = False,
-    certainty_reason: str | None = None,
 ) -> dict[str, Any]:
     pct = 100.0 * count / simulations
     zero_observed = count == 0
     if not structurally_possible:
         display = "0%"
-    elif structurally_certain:
-        display = "100,0%"
     elif pct < threshold_pct:
         display = f"<{str(threshold_pct).replace('.', ',')}%"
     elif pct >= 99.95:
@@ -725,8 +768,6 @@ def display_probability(
         "possivel_estruturalmente": bool(structurally_possible),
         "impossivel_estruturalmente": not bool(structurally_possible),
         "motivo_impossibilidade": impossibility_reason if not structurally_possible else None,
-        "certo_estruturalmente": bool(structurally_certain and structurally_possible),
-        "motivo_certeza": certainty_reason if (structurally_certain and structurally_possible) else None,
         "limite_superior_95_regra_dos_tres_pct": round(upper_95, 8) if upper_95 is not None else None,
     }
 
@@ -1143,6 +1184,34 @@ def self_test() -> None:
         "libertadores": snapshot("libertadores", [*teams[:4], "River", "Boca", "LDU", "Nacional"]),
         "sul_americana": snapshot("sul_americana", [*teams[4:8], "Lanús", "Colo-Colo", "Emelec", "Cerro"]),
     }
+
+    # Regressão: em uma fase de oito chaves, duas voltas já terminaram e seis
+    # ainda estão pendentes; a reconstrução deve manter as 16 equipes.
+    mixed = snapshot("sul_americana", [*teams[:16]], stage="Volta")
+    for event in mixed["eventos"]:
+        event["fase_ordem"] = 100
+        event["fase"] = "Ida" if event["event_id"].endswith("-1") else "Volta"
+        tie_index = int(event["event_id"].split("-")[-2])
+        first_leg = event["event_id"].endswith("-1")
+        completed = first_leg or tie_index in {0, 2}
+        event["concluido"] = completed
+        event["estado"] = "post" if completed else "pre"
+    old_event = json.loads(json.dumps(mixed["eventos"][0]))
+    old_event["event_id"] = "sul_americana-fase-antiga"
+    old_event["data_iso"] = "2026-04-02T20:00:00-03:00"
+    old_event["mandante"]["nome"] = "Equipe antiga A"
+    old_event["visitante"]["nome"] = "Equipe antiga B"
+    old_event["concluido"] = True
+    old_event["estado"] = "post"
+    mixed["eventos"].append(old_event)
+    _, mixed_events, _ = parse_snapshot(mixed)
+    mixed_rank, _, mixed_current = current_stage(mixed_events)
+    mixed_ties = build_ties(mixed_current)
+    mixed_participants = {tie.team_a for tie in mixed_ties} | {tie.team_b for tie in mixed_ties}
+    assert mixed_rank == 600
+    assert len(mixed_ties) == 8
+    assert len(mixed_participants) == 16
+
     simulations = 10_000
     # Ordem fixa: Clube 00 em primeiro, Clube 19 em último.
     order = np.broadcast_to(np.arange(20, dtype=np.int16), (simulations, 20)).copy()
