@@ -596,7 +596,16 @@ def metrics(predictions: Sequence[Prediction]) -> dict[str, Any]:
     for lower_index in range(10):
         lower = lower_index / 10.0
         upper = (lower_index + 1) / 10.0
-        bucket = [item for item in flat if lower <= item[0] < upper or (upper == 1.0 and item[0] <= 1.0)]
+        # A última faixa é fechada à direita para não perder a probabilidade
+        # exata 1,0; as demais são semiabertas. A condição anterior era
+        # "item[0] <= 1.0", sempre verdadeira quando upper == 1.0, o que fazia
+        # a faixa 0,9–1,0 capturar TODOS os registros em vez de apenas os dela.
+        no_topo = upper == 1.0
+        bucket = [
+            item
+            for item in flat
+            if lower <= item[0] and (item[0] <= upper if no_topo else item[0] < upper)
+        ]
         if not bucket:
             bins.append(
                 {
