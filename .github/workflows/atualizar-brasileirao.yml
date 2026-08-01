@@ -511,6 +511,7 @@ jobs:
               'sul_americana': 'dados-br/competicoes-af-previsao/sul-americana.json',
           }.items():
               snapshot = json.load(open(arquivo, encoding='utf-8'))
+              assert int(snapshot.get('schema_version') or 0) >= 2, f'{arquivo}: normalização continental antiga'
               assert (snapshot.get('competicao') or {}).get('chave') == chave, f'{arquivo}: competição divergente'
               competicoes[chave] = snapshot
           aud_copas = json.load(open('dados-br/auditoria-competicoes-af-previsao.json', encoding='utf-8'))
@@ -534,9 +535,9 @@ jobs:
           assert len(clubes_prev) == 20, 'AF-Previsão sem 20 clubes'
           assert previsao.get('total_previsoes_partidas') == previsao.get('base_corrente', {}).get('partidas_restantes'), 'AF-Previsão sem previsão para todos os jogos restantes'
           assert len(previsao.get('partidas_restantes') or []) == previsao.get('base_corrente', {}).get('partidas_restantes'), 'lista de partidas previstas incompleta'
-          # Validação compatível com o schema publicado. O schema legado usa
-          # Libertadores-base G6 (600%); o modelo continental usa a faixa definida
-          # no config (atualmente G5 = 500%). Em caso de coleta inconsistente, o
+          # Validação compatível com o schema publicado. O schema legado mantinha
+          # uma métrica G6 separada (600%); o modelo continental usa as cinco
+          # vagas-base reais definidas no config (G5 = 500%). Em caso de coleta inconsistente, o
           # gerador preserva o snapshot anterior e a trava deve validar a versão
           # preservada — não aplicar a regra de outro schema.
           schema_prev = int(previsao.get('schema_version') or 1)
