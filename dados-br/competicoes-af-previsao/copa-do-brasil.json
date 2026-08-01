@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "temporada": 2026,
   "competicao": {
@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-01T19:13:59-03:00",
+  "gerado_em": "2026-08-01T20:26:21-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,14 +17,14 @@
     "ordem": 600,
     "nome": "Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 16
+    "eventos_pendentes": 15
   },
   "resumo": {
     "eventos": 142,
-    "finalizados": 126,
-    "pendentes": 16,
+    "finalizados": 127,
+    "pendentes": 15,
     "equipes": 126,
-    "equipes_serie_a_2026": 26
+    "equipes_serie_a_2026": 21
   },
   "equipes": [
     {
@@ -68,6 +68,15 @@
       "nome": "Amazonas",
       "nome_espn": "Amazonas",
       "sigla": "AMA",
+      "pais": "BRA",
+      "serie_a_2026": false,
+      "jogos": 2
+    },
+    {
+      "espn_id": "6154",
+      "nome": "América Mineiro",
+      "nome_espn": "América Mineiro",
+      "sigla": "AMG",
       "pais": "BRA",
       "serie_a_2026": false,
       "jogos": 2
@@ -154,15 +163,6 @@
       "jogos": 5
     },
     {
-      "espn_id": "6154",
-      "nome": "Atlético-MG",
-      "nome_espn": "América Mineiro",
-      "sigla": "AMG",
-      "pais": "BRA",
-      "serie_a_2026": true,
-      "jogos": 2
-    },
-    {
       "espn_id": "7632",
       "nome": "Atlético-MG",
       "nome_espn": "Atlético-MG",
@@ -235,15 +235,6 @@
       "jogos": 1
     },
     {
-      "espn_id": "17317",
-      "nome": "Botafogo",
-      "nome_espn": "Botafogo-PB",
-      "sigla": "BPB",
-      "pais": "BRA",
-      "serie_a_2026": true,
-      "jogos": 1
-    },
-    {
       "espn_id": "6086",
       "nome": "Botafogo",
       "nome_espn": "Botafogo",
@@ -251,6 +242,15 @@
       "pais": "BRA",
       "serie_a_2026": true,
       "jogos": 2
+    },
+    {
+      "espn_id": "17317",
+      "nome": "Botafogo-PB",
+      "nome_espn": "Botafogo-PB",
+      "sigla": "BPB",
+      "pais": "BRA",
+      "serie_a_2026": false,
+      "jogos": 1
     },
     {
       "espn_id": "19398",
@@ -451,15 +451,6 @@
       "jogos": 2
     },
     {
-      "espn_id": "21401",
-      "nome": "Fluminense",
-      "nome_espn": "Fluminense PI",
-      "sigla": "FEC",
-      "pais": "BRA",
-      "serie_a_2026": true,
-      "jogos": 2
-    },
-    {
       "espn_id": "3445",
       "nome": "Fluminense",
       "nome_espn": "Fluminense",
@@ -467,6 +458,15 @@
       "pais": "BRA",
       "serie_a_2026": true,
       "jogos": 4
+    },
+    {
+      "espn_id": "21401",
+      "nome": "Fluminense PI",
+      "nome_espn": "Fluminense PI",
+      "sigla": "FEC",
+      "pais": "BRA",
+      "serie_a_2026": false,
+      "jogos": 2
     },
     {
       "espn_id": "6272",
@@ -865,6 +865,15 @@
       "jogos": 2
     },
     {
+      "espn_id": "131687",
+      "nome": "Porto Vitória FC",
+      "nome_espn": "Porto Vitória FC",
+      "sigla": "PORV",
+      "pais": "BRA",
+      "serie_a_2026": false,
+      "jogos": 1
+    },
+    {
       "espn_id": "4773",
       "nome": "Portuguesa",
       "nome_espn": "Portuguesa",
@@ -1099,15 +1108,6 @@
       "jogos": 2
     },
     {
-      "espn_id": "131683",
-      "nome": "Vasco da Gama",
-      "nome_espn": "Vasco da Gama AC",
-      "sigla": "VAC",
-      "pais": "BRA",
-      "serie_a_2026": true,
-      "jogos": 1
-    },
-    {
       "espn_id": "3454",
       "nome": "Vasco da Gama",
       "nome_espn": "Vasco da Gama",
@@ -1117,6 +1117,15 @@
       "jogos": 4
     },
     {
+      "espn_id": "131683",
+      "nome": "Vasco da Gama AC",
+      "nome_espn": "Vasco da Gama AC",
+      "sigla": "VAC",
+      "pais": "BRA",
+      "serie_a_2026": false,
+      "jogos": 1
+    },
+    {
       "espn_id": "9973",
       "nome": "Vila Nova",
       "nome_espn": "Vila Nova",
@@ -1124,15 +1133,6 @@
       "pais": "BRA",
       "serie_a_2026": false,
       "jogos": 3
-    },
-    {
-      "espn_id": "131687",
-      "nome": "Vitória",
-      "nome_espn": "Porto Vitória FC",
-      "sigla": "PORV",
-      "pais": "BRA",
-      "serie_a_2026": true,
-      "jogos": 1
     },
     {
       "espn_id": "3457",
@@ -1644,11 +1644,11 @@
       "estadio": "Arena da Floresta",
       "mandante": {
         "espn_id": "131683",
-        "nome": "Vasco da Gama",
+        "nome": "Vasco da Gama AC",
         "nome_espn": "Vasco da Gama AC",
         "sigla": "VAC",
         "pais": "BRA",
-        "serie_a_2026": true,
+        "serie_a_2026": false,
         "mandante": true,
         "vencedor": false,
         "placar": 1
@@ -2483,11 +2483,11 @@
       },
       "visitante": {
         "espn_id": "17317",
-        "nome": "Botafogo",
+        "nome": "Botafogo-PB",
         "nome_espn": "Botafogo-PB",
         "sigla": "BPB",
         "pais": "BRA",
-        "serie_a_2026": true,
+        "serie_a_2026": false,
         "mandante": false,
         "vencedor": false,
         "placar": 1
@@ -2879,11 +2879,11 @@
       },
       "visitante": {
         "espn_id": "131687",
-        "nome": "Vitória",
+        "nome": "Porto Vitória FC",
         "nome_espn": "Porto Vitória FC",
         "sigla": "PORV",
         "pais": "BRA",
-        "serie_a_2026": true,
+        "serie_a_2026": false,
         "mandante": false,
         "vencedor": false,
         "placar": 0
@@ -3048,11 +3048,11 @@
       "estadio": "Estádio Raimundo Sampaio (Independência)",
       "mandante": {
         "espn_id": "6154",
-        "nome": "Atlético-MG",
+        "nome": "América Mineiro",
         "nome_espn": "América Mineiro",
         "sigla": "AMG",
         "pais": "BRA",
-        "serie_a_2026": true,
+        "serie_a_2026": false,
         "mandante": true,
         "vencedor": true,
         "placar": 1
@@ -3068,7 +3068,7 @@
         "vencedor": false,
         "placar": 1
       },
-      "vencedor": "Atlético-MG",
+      "vencedor": "América Mineiro",
       "penaltis": true
     },
     {
@@ -3095,16 +3095,16 @@
       },
       "visitante": {
         "espn_id": "21401",
-        "nome": "Fluminense",
+        "nome": "Fluminense PI",
         "nome_espn": "Fluminense PI",
         "sigla": "FEC",
         "pais": "BRA",
-        "serie_a_2026": true,
+        "serie_a_2026": false,
         "mandante": false,
         "vencedor": true,
         "placar": 0
       },
-      "vencedor": "Fluminense",
+      "vencedor": "Fluminense PI",
       "penaltis": true
     },
     {
@@ -3527,11 +3527,11 @@
       },
       "visitante": {
         "espn_id": "21401",
-        "nome": "Fluminense",
+        "nome": "Fluminense PI",
         "nome_espn": "Fluminense PI",
         "sigla": "FEC",
         "pais": "BRA",
-        "serie_a_2026": true,
+        "serie_a_2026": false,
         "mandante": false,
         "vencedor": false,
         "placar": 0
@@ -4031,11 +4031,11 @@
       },
       "visitante": {
         "espn_id": "6154",
-        "nome": "Atlético-MG",
+        "nome": "América Mineiro",
         "nome_espn": "América Mineiro",
         "sigla": "AMG",
         "pais": "BRA",
-        "serie_a_2026": true,
+        "serie_a_2026": false,
         "mandante": false,
         "vencedor": false,
         "placar": 0
@@ -5702,9 +5702,9 @@
     {
       "event_id": "401873956",
       "data_iso": "2026-08-01T17:30:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "85'",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5738,9 +5738,9 @@
     {
       "event_id": "401873958",
       "data_iso": "2026-08-01T19:30:00-03:00",
-      "estado": "pre",
+      "estado": "in",
       "concluido": false,
-      "status": "Sáb., Agosto 1º at 6:30 PM EDT",
+      "status": "17'",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
