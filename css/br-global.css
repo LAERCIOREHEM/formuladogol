@@ -677,6 +677,36 @@ html.br-private-pending body {
 .br-footer-copy {
   color: rgba(226, 232, 240, .82);
 }
+.br-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 0 0 10px;
+  padding: 0 0 10px;
+  border-bottom: 1px solid rgba(148, 163, 184, .14);
+}
+.br-footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: #d9ff76 !important;
+  text-decoration: none;
+  font-weight: 950 !important;
+}
+.br-footer-links a:hover {
+  color: #f4ffce !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.br-footer-links a:focus-visible {
+  outline: 3px solid rgba(96, 165, 250, .34);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+.br-footer-links a[aria-current="page"] {
+  color: #fde68a !important;
+}
 .br-feedback-button {
   display: inline-flex;
   align-items: center;

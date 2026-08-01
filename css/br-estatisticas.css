@@ -354,6 +354,26 @@ body > .container > header.hero img {
   }
 }
 
+/* Resumo editorial visível e indexável, sem interferir na subaba principal. */
+.probability-index-summary {
+  margin-top: 16px;
+  border-color: rgba(163,230,53,.20);
+  background: linear-gradient(135deg, rgba(7,24,29,.92), rgba(9,22,18,.84));
+}
+.probability-index-summary .panel-inner { padding: clamp(17px, 3vw, 25px); }
+.probability-index-summary h2 { margin: 5px 0 9px; color: #f4f8fb; font-size: clamp(21px, 3vw, 29px); }
+.probability-index-summary p { max-width: 980px; margin: 0; color: #b8c8d5; line-height: 1.65; }
+.probability-index-summary p strong { color: #efffc3; }
+.probability-index-facts { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; margin: 16px 0; }
+.probability-index-facts span { min-width: 0; padding: 11px 12px; border: 1px solid rgba(148,163,184,.14); border-radius: 13px; background: rgba(2,10,15,.36); color: #9fb1bf; font-size: 12px; line-height: 1.45; }
+.probability-index-facts b { display: block; color: #eaffad; font-size: 13px; }
+.probability-index-summary a { display: inline-flex; min-height: 34px; align-items: center; color: #d9ff76; font-weight: 900; text-decoration: none; }
+.probability-index-summary a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.probability-index-summary a:focus-visible { outline: 3px solid rgba(96,165,250,.34); outline-offset: 3px; border-radius: 5px; }
+@media (max-width: 700px) {
+  .probability-index-facts { grid-template-columns: 1fr; }
+}
+
 
 /* HOTFIX 20260707 — cabeçalho ultra compacto.
    Deve ficar no fim do CSS: vale para header.hero, section.hero e div.hero-header. */

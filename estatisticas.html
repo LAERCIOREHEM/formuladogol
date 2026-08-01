@@ -32,8 +32,8 @@
   <link rel="icon" type="image/png" sizes="512x512" href="favicon-formula-do-gol-512.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-formula-do-gol.png">
   <link rel="shortcut icon" href="favicon-formula-do-gol.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260730-nota-cabecalho-v1">
-  <link rel="stylesheet" href="css/br-global.css?v=20260729-sronly-v1">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260801-seo-visivel-v1">
+  <link rel="stylesheet" href="css/br-global.css?v=20260801-footer-institucional-v1">
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
 <script>
@@ -152,7 +152,7 @@
           "name": "O que significa chance de Libertadores ou rebaixamento?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "É a proporção de simulações em que o clube obteve aquele desfecho ao final de todas as 380 partidas do Brasileirão 2026. Valores abaixo de 0,1% significam que o evento foi raríssimo ou não apareceu nas simulações — mas não é impossível. O modelo é atualizado após cada rodada."
+            "text": "É a proporção de simulações em que o clube obteve aquele desfecho ao final de todas as 380 partidas do Brasileirão 2026. Valores abaixo de 0,001% significam que o evento ficou abaixo da resolução visual publicada — mas não é tratado como impossível apenas por isso. O modelo é atualizado após cada rodada."
           }
         },
         {
@@ -272,7 +272,7 @@
               <p class="probability-intro">O AF-Previsão combina o Brasileirão com os possíveis desfechos da Copa do Brasil, da CONMEBOL Libertadores e da CONMEBOL Sudamericana, incluindo sobreposições e repasses de vagas. Probabilidade não é certeza nem cotação de aposta.</p>
               <div class="probability-notice" role="note">
                 <span aria-hidden="true">ⓘ</span>
-                <p><strong>Leitura importante:</strong> valores como <b>&lt;0,1%</b> indicam um cenário residual, não impossibilidade matemática. As chances de Libertadores e Sul-Americana são <strong>consolidadas</strong> pelas diferentes vias de classificação.</p>
+                <p><strong>Leitura importante:</strong> valores como <b>&lt;0,001%</b> indicam um cenário residual, não impossibilidade matemática. As chances de Libertadores e Sul-Americana são <strong>consolidadas</strong> pelas diferentes vias de classificação.</p>
               </div>
               <div id="probabilidades-status" aria-live="polite"></div>
               <a class="probability-method-link" href="#metodologia-probabilidades" data-probability-method>Entenda o modelo e consulte a nota técnica ↓</a>
@@ -292,7 +292,7 @@
                 <article><span>1</span><h4>O que o modelo observa?</h4><p>Resultados, mandos, placares e calendário do Brasileirão, além do estado factual das três copas que podem alterar as vagas continentais.</p></article>
                 <article><span>2</span><h4>O que ele projeta?</h4><p>A força ofensiva e defensiva transforma cada jogo restante em probabilidades. A forma dos últimos 12 jogos entra apenas como ajuste leve e limitado.</p></article>
                 <article><span>3</span><h4>Como nasce o percentual?</h4><p>O campeonato e os mata-matas são simulados 2 milhões de vezes. A chance publicada é a frequência do desfecho nesses universos.</p></article>
-                <article><span>4</span><h4>Como interpretar?</h4><p>Um número alto não é garantia. Um valor abaixo de 0,1% não é zero absoluto. Cada novo resultado pode alterar toda a projeção.</p></article>
+                <article><span>4</span><h4>Como interpretar?</h4><p>Um número alto não é garantia. Um valor abaixo de 0,001% não é zero absoluto. Cada novo resultado pode alterar toda a projeção.</p></article>
               </div>
 
               <div class="probability-audit-grid" id="probabilidades-auditoria-metodo" aria-live="polite"></div>
@@ -302,7 +302,7 @@
                 <div>
                   <p><strong>Chance consolidada:</strong> Libertadores e Sul-Americana consideram Brasileirão, títulos, Copa do Brasil e repasses aplicáveis.</p>
                   <p><strong>Vias exclusivas:</strong> o detalhamento não conta o mesmo universo duas vezes; a soma dos caminhos fecha com a chance total.</p>
-                  <p><strong>&lt;0,1% não é impossível:</strong> significa que o evento foi raríssimo ou não apareceu nas simulações realizadas.</p>
+                  <p><strong>&lt;0,001% não é impossível:</strong> significa que o evento ficou abaixo da resolução visual publicada; o diagnóstico matemático de impossibilidade é tratado separadamente.</p>
                   <p><strong>Posição e pontos:</strong> aparecem como inteiros para facilitar a leitura; as médias decimais permanecem guardadas no JSON para auditoria.</p>
                   <p><strong>Tendência recente:</strong> o modelo incorpora uma camada de suavização exponencial inspirada na lógica de Holt-Winters para captar evolução ou queda recente. Ela usa os últimos 12 jogos de forma parcimoniosa, pesa 8% e não pode alterar em mais de 10% a taxa de gols prevista para uma partida.</p>
                   <p><strong>Histórico auditável:</strong> cada clube guarda, no próprio card, a evolução de posição, pontos e probabilidades. Os snapshots só são criados quando o estado esportivo muda e ficam encadeados por SHA-256 para permitir a avaliação posterior do modelo.</p>
@@ -350,7 +350,7 @@
                     </article>
                     <article id="metodo-residuais">
                       <span class="probability-method-step">07</span>
-                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,1%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico cria um novo snapshot apenas quando o estado esportivo muda e registra rodada, projeções, distribuição completa das posições e probabilidades. Os registros são encadeados por SHA-256, permitindo detectar alterações retroativas, e aparecem de forma compacta dentro do card de cada clube. A avaliação final só será exibida nesta própria aba depois da conclusão do Brasileirão e das competições que alteram as vagas continentais; até lá, nenhum bloco vazio ocupa a página.</p></div>
+                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,001%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico cria um novo snapshot apenas quando o estado esportivo muda e registra rodada, projeções, distribuição completa das posições e probabilidades. Os registros são encadeados por SHA-256, permitindo detectar alterações retroativas, e aparecem de forma compacta dentro do card de cada clube. A avaliação final só será exibida nesta própria aba depois da conclusão do Brasileirão e das competições que alteram as vagas continentais; até lá, nenhum bloco vazio ocupa a página.</p></div>
                     </article>
                     <article id="metodo-validacao">
                       <span class="probability-method-step">08</span>
@@ -417,6 +417,20 @@
       </section>
 
       <p class="stats-note"><b>Nota:</b> dados de jogadores, partidas e público aparecem conforme disponibilidade nas fontes ESPN. Rankings oficiais de gols e assistências ficam separados dos eventos extraídos jogo a jogo para evitar contagens incompletas.</p>
+
+      <section class="probability-index-summary panel" aria-labelledby="titulo-resumo-probabilidades">
+        <div class="panel-inner">
+          <div class="kicker">PROBABILIDADES DO BRASILEIRÃO 2026</div>
+          <h2 id="titulo-resumo-probabilidades">Uma leitura estatística do campeonato inteiro</h2>
+          <p>O Fórmula do Gol calcula as chances de título, Libertadores, Sul-Americana e rebaixamento dos 20 clubes e projeta a pontuação e a posição final. A cada atualização íntegra, o calendário restante é processado em <strong>2 milhões de simulações</strong>, considerando força estimada, mando de campo e os caminhos de classificação abertos pelas competições continentais e pela Copa do Brasil.</p>
+          <div class="probability-index-facts">
+            <span><b>20 clubes</b> comparados na mesma tabela</span>
+            <span><b>2 milhões</b> de simulações por atualização</span>
+            <span><b>Metodologia pública</b> e limites de leitura documentados</span>
+          </div>
+          <a href="/sobre.html">Conheça o projeto Fórmula do Gol →</a>
+        </div>
+      </section>
     </main>
 
     <section class="br-legal-context" aria-label="Informações sobre as estatísticas">
@@ -428,6 +442,7 @@
     </section>
 
     <footer class="site-footer br-disclaimer">
+      <nav class="br-footer-links" aria-label="Links institucionais"><a href="/sobre.html">ⓘ Sobre o Fórmula do Gol</a></nav>
       <div class="br-footer-copy"><span class="footer-title">Fórmula do Gol</span> — Site independente, informativo e sem fins lucrativos, mantido por um grupo de amigos. Não é afiliado, patrocinado ou endossado pela CBF, clubes, ESPN ou qualquer titular de direitos. Dados de jogos e resultados provêm da API pública da ESPN. Escudos, nomes e marcas dos clubes pertencem aos seus respectivos titulares e são exibidos exclusivamente para identificação e contexto esportivo. Os mascotes do site são criações originais inspiradas na identidade visual dos clubes — não reproduzem artes, personagens ou marcas protegidas.</div>
       <div class="footer-sugestoes">Solicitações de remoção ou crédito: <button type="button" class="br-feedback-button" data-feedback>💬 Sugestões</button></div>
       <details class="br-source-note">
@@ -442,14 +457,5 @@
   <script src="js/br-menu.js?v=20260724-status-dot-v2"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 
-<!-- Conteúdo textual estruturado para indexação -->
-<section class="sr-only" aria-label="Sobre as estatísticas e probabilidades">
-  <h2>Artilheiros e assistências do Brasileirão 2026</h2>
-  <p>O ranking de artilheiros e assistências é reconstruído diretamente dos eventos de cada partida validada, garantindo atualização mais precisa do que fontes agregadas. Gols contra não são contabilizados na artilharia individual.</p>
-  <h2>Probabilidade de título, Libertadores, Sul-Americana e rebaixamento</h2>
-  <p>As probabilidades de cada clube são calculadas simulando o restante do campeonato 2 milhões de vezes. Cada simulação leva em conta o calendário restante, a força estimada de cada time, o mando de campo e o estado atual das copas (Libertadores, Sul-Americana e Copa do Brasil) que influenciam as vagas continentais.</p>
-  <h2>Como interpretar os percentuais de probabilidade</h2>
-  <p>Um clube com 45% de chance de título não vai ganhar com certeza — significa que em 45 de cada 100 simulações ele terminaria campeão dado o estado atual da competição. Os valores são atualizados após cada rodada e podem variar significativamente conforme os resultados reais acontecem.</p>
-</section>
 </body>
 </html>
