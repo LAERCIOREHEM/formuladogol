@@ -93,6 +93,7 @@
     if (n >= 0 && n < 0.001) return "<0,001%";
     if (n >= 100) return "100,000%";
     if (n > 99.999) return ">99,999%";
+    if (n >= 99.9) return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}%`;
     if (n < 0.1) return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}%`;
     if (n < 1) return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
     return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;

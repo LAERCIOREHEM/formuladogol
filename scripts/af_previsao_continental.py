@@ -760,6 +760,10 @@ def display_probability(
         display = "100,000%"
     elif pct > 100.0 - threshold_pct:
         display = f">{100.0 - threshold_pct:.3f}%".replace(".", ",")
+    elif pct >= 99.9:
+        # Não arredondar uma probabilidade residual real para 100,0%.
+        # Ex.: 1.999.949/2.000.000 = 99,99745%, exibido como 99,997%.
+        display = f"{pct:.3f}%".replace(".", ",")
     elif pct < 0.1:
         display = f"{pct:.3f}%".replace(".", ",")
     elif pct < 1.0:
@@ -1254,6 +1258,8 @@ def self_test() -> None:
     assert display_probability(128, 2_000_000, 0.001)["exibicao"] == "0,006%"
     assert display_probability(9_720, 2_000_000, 0.001)["exibicao"] == "0,49%"
     assert display_probability(149_200, 2_000_000, 0.001)["exibicao"] == "7,5%"
+    assert display_probability(1_999_949, 2_000_000, 0.001)["exibicao"] == "99,997%"
+    assert display_probability(1_999_999, 2_000_000, 0.001)["exibicao"] == ">99,999%"
     assert display_probability(2_000_000, 2_000_000, 0.001)["exibicao"] == "100,000%"
     impossible = display_probability(0, 2_000_000, 0.001, structurally_possible=False, impossibility_reason="eliminado")
     assert impossible["exibicao"] == "0,000%"

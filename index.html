@@ -3614,6 +3614,7 @@ function formatarPercentualPreciso(valorBruto, exibicaoExplicita = '') {
   if (valor >= 0 && valor < .001) return '<0,001%';
   if (valor >= 100) return '100,000%';
   if (valor > 99.999) return '>99,999%';
+  if (valor >= 99.9) return valor.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3}) + '%';
   if (valor < .1) return valor.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3}) + '%';
   if (valor < 1) return valor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '%';
   return valor.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '%';

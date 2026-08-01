@@ -19,6 +19,7 @@ Uso:
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import re
@@ -561,12 +562,93 @@ def validate_snapshot(snapshot: dict[str, Any], spec: CompetitionSpec) -> None:
                     raise ValueError(f"{spec.key}: finalizado sem placar")
 
 
+def migrate_legacy_snapshot(snapshot: dict[str, Any], spec: CompetitionSpec) -> dict[str, Any] | None:
+    """Migra com segurança um snapshot v1 para a normalização exata da v2.
+
+    A primeira execução após a troca de schema não pode depender de a ESPN
+    responder naquele instante. Todos os clubes são reclassificados a partir
+    dos nomes já preservados no JSON usando somente aliases exatos; em seguida,
+    equipes e contagens são reconstruídas dos eventos. Schemas desconhecidos
+    continuam sendo rejeitados, sem receber apenas uma troca cosmética de número.
+    """
+    version = int(snapshot.get("schema_version") or 0)
+    if version == SNAPSHOT_SCHEMA_VERSION:
+        return None
+    if version != 1 or (snapshot.get("competicao") or {}).get("chave") != spec.key:
+        raise ValueError(f"{spec.key}: snapshot legado incompatível com migração segura")
+
+    migrated = copy.deepcopy(snapshot)
+    events = migrated.get("eventos") or []
+    if not isinstance(events, list) or not events:
+        raise ValueError(f"{spec.key}: snapshot legado sem eventos para migrar")
+
+    team_map: dict[str, dict[str, Any]] = {}
+    for event in events:
+        for side in ("mandante", "visitante"):
+            team = event.get(side) or {}
+            # nome_espn é a evidência bruta preservada. O campo nome do schema
+            # antigo pode já ter sido canonizado por aproximação; só o usamos
+            # quando o nome original realmente não existe.
+            source_name = team.get("nome_espn") or team.get("nome")
+            canonical = serie_a_canonical_exact(source_name)
+            if canonical:
+                team["nome"] = canonical
+            elif team.get("nome_espn"):
+                team["nome"] = str(team["nome_espn"]).strip()
+            team["serie_a_2026"] = bool(canonical)
+            key = str(team.get("espn_id") or normalize_text(team.get("nome")))
+            current = team_map.setdefault(
+                key,
+                {
+                    "espn_id": team.get("espn_id"),
+                    "nome": team.get("nome"),
+                    "nome_espn": team.get("nome_espn"),
+                    "sigla": team.get("sigla"),
+                    "pais": team.get("pais"),
+                    "serie_a_2026": bool(canonical),
+                    "jogos": 0,
+                },
+            )
+            current["jogos"] += 1
+            current["serie_a_2026"] = bool(current["serie_a_2026"] or canonical)
+
+    migrated["schema_version"] = SNAPSHOT_SCHEMA_VERSION
+    migrated["equipes"] = sorted(
+        team_map.values(), key=lambda item: normalize_text(item.get("nome"))
+    )
+    summary = dict(migrated.get("resumo") or {})
+    summary.update(
+        {
+            "eventos": len(events),
+            "finalizados": sum(bool(event.get("concluido")) for event in events),
+            "pendentes": sum(not bool(event.get("concluido")) for event in events),
+            "equipes": len(team_map),
+            "equipes_serie_a_2026": sum(
+                bool(team.get("serie_a_2026")) for team in team_map.values()
+            ),
+        }
+    )
+    migrated["resumo"] = summary
+    migrated["migracao_schema"] = {
+        "origem": 1,
+        "destino": SNAPSHOT_SCHEMA_VERSION,
+        "regra": "reclassificação por aliases exatos preservando eventos ESPN",
+    }
+    validate_snapshot(migrated, spec)
+    return migrated
+
+
 def run_update(force: bool, strict: bool, max_age_minutes: int) -> dict[str, Any]:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     audit_rows: list[dict[str, Any]] = []
     failures: list[str] = []
     for spec in COMPETITIONS:
         path = DATA_DIR / spec.filename
+        if path.exists():
+            previous = load_json(path)
+            migrated = migrate_legacy_snapshot(previous, spec)
+            if migrated is not None:
+                write_json_atomic(path, migrated)
         if not force and snapshot_is_fresh(path, max_age_minutes):
             previous = load_json(path)
             audit_rows.append(
@@ -681,6 +763,17 @@ def self_test() -> None:
     validate_snapshot(snapshot, spec)
     assert snapshot["resumo"]["eventos"] == 1
     assert snapshot["fase_atual"]["status"] == "encerrada"
+
+    legacy = json.loads(json.dumps(snapshot))
+    legacy["schema_version"] = 1
+    legacy["eventos"][0]["visitante"].update(
+        {"nome": "Botafogo", "nome_espn": "Botafogo-PB", "sigla": "BOT", "serie_a_2026": True}
+    )
+    migrated = migrate_legacy_snapshot(legacy, spec)
+    assert migrated is not None and migrated["schema_version"] == SNAPSHOT_SCHEMA_VERSION
+    assert migrated["eventos"][0]["mandante"]["serie_a_2026"] is True
+    assert migrated["eventos"][0]["visitante"]["nome"] == "Botafogo-PB"
+    assert migrated["eventos"][0]["visitante"]["serie_a_2026"] is False
 
     pending = json.loads(json.dumps(synthetic))
     pending["id"] = "124"

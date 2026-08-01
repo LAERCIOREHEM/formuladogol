@@ -606,6 +606,11 @@
     if (n >= 0 && n < 0.001) return "<0,001%";
     if (n >= 100) return "100,000%";
     if (n > 99.999) return ">99,999%";
+    // Uma casa decimal transformava 99,99745% em 100,0%, embora ainda
+    // existissem simulações no resultado complementar. Perto de 100%, a
+    // mesma resolução de três casas usada nas probabilidades residuais evita
+    // comunicar certeza inexistente.
+    if (n >= 99.9) return `${number(n, 3)}%`;
     if (n < 0.1) return `${number(n, 3)}%`;
     if (n < 1) return `${number(n, 2)}%`;
     return `${number(n, digits)}%`;
@@ -1227,7 +1232,8 @@
     const max = Math.max(...historyRows.map((row) => row.value), 0.0001);
     const rowsHtml = historyRows.map(({ snapshot, club, value }) => {
       const detailKey = metric.detail;
-      const display = String(club?.exibicao?.[detailKey] || "").trim() || probabilityDisplayText(null, value);
+      const explicit = String(club?.exibicao?.[detailKey] || "").trim();
+      const display = probabilityDisplayText(explicit ? { exibicao: explicit } : null, value);
       const relative = value <= 0 ? 0 : Math.max(2, (value / max) * 100);
       return `<div class="probability-evolution-row"><time>${escapeHtml(dateTimeBR(snapshot?.gerado_em))}</time><div><i style="width:${relative.toFixed(2)}%"></i></div><strong>${escapeHtml(display)}</strong></div>`;
     }).join("");
