@@ -2,7 +2,7 @@
   "schema_version": 1,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta das competições que alteram vagas",
-  "gerado_em": "2026-08-01T20:52:17-03:00",
+  "gerado_em": "2026-08-01T20:59:47-03:00",
   "status": "ok",
   "fonte": "ESPN",
   "temporada": 2026,
@@ -11,27 +11,27 @@
       "competicao": "copa_do_brasil",
       "status": "cache_valido",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-08-01T19:13:59-03:00",
+      "gerado_em": "2026-08-01T20:26:21-03:00",
       "eventos": 142
     },
     {
       "competicao": "libertadores",
       "status": "cache_valido",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-08-01T19:14:00-03:00",
+      "gerado_em": "2026-08-01T20:26:22-03:00",
       "eventos": 142
     },
     {
       "competicao": "sul_americana",
       "status": "cache_valido",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-08-01T19:14:01-03:00",
+      "gerado_em": "2026-08-01T20:26:24-03:00",
       "eventos": 144
     }
   ],
   "falhas": [],
   "regras_operacionais": {
-    "cache_minutos": 999999,
+    "cache_minutos": 45,
     "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
     "nenhum_json_vazio": true
   }
