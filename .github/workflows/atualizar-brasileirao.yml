@@ -578,14 +578,24 @@ jobs:
               total_sula = sum(float(item['probabilidades_pct']['sul_americana']) for item in clubes_prev)
               assert abs(total_sula - 600) <= 0.02, f'Sul-Americana integrada não soma 600%: {total_sula}'
               for item in clubes_prev:
-                  for campo in ('libertadores', 'sul_americana'):
-                      detalhe = (item.get('probabilidades_detalhes') or {}).get(campo) or {}
-                      simulacoes_detalhe = int(detalhe.get('simulacoes') or 0)
+              for campo in ('libertadores', 'sul_americana'):
+                  detalhe = (item.get('probabilidades_detalhes') or {}).get(campo) or {}
+                  simulacoes_detalhe = int(detalhe.get('simulacoes') or 0)
                       assert simulacoes_detalhe >= 200000, f'{item["clube"]}: detalhe sem amostra probabilística válida em {campo}'
-                      if simulacoes_detalhe < simulacoes_configuradas:
-                          print(f'::warning::{item["clube"]}: previsão preservada com {simulacoes_detalhe} simulações; a próxima publicação íntegra usará {simulacoes_configuradas}.')
-                      assert isinstance(detalhe.get('exibicao'), str), f'{item["clube"]}: exibição ausente em {campo}'
-                  decomposicao = item.get('decomposicao_chances') or {}
+                  if simulacoes_detalhe < simulacoes_configuradas:
+                      print(f'::warning::{item["clube"]}: previsão preservada com {simulacoes_detalhe} simulações; a próxima publicação íntegra usará {simulacoes_configuradas}.')
+                  assert isinstance(detalhe.get('exibicao'), str), f'{item["clube"]}: exibição ausente em {campo}'
+                  ocorrencias = int(detalhe.get('ocorrencias') or 0)
+                  percentual = float(item['probabilidades_pct'][campo])
+                  assert abs(percentual - 100.0 * ocorrencias / simulacoes_detalhe) <= 0.000001, f'{item["clube"]}: percentual diverge das ocorrências em {campo}'
+                  if 0.0 < percentual < 100.0:
+                      assert not detalhe['exibicao'].startswith('100'), f'{item["clube"]}: arredondamento criou certeza falsa em {campo}'
+              lib_pct = float(item['probabilidades_pct']['libertadores'])
+              sula_pct = float(item['probabilidades_pct']['sul_americana'])
+              assert lib_pct + sula_pct <= 100.000001, f'{item["clube"]}: destinos continentais se sobrepõem'
+              if sula_pct > 0.0:
+                  assert lib_pct < 100.0, f'{item["clube"]}: Libertadores em 100% com Sul-Americana positiva'
+              decomposicao = item.get('decomposicao_chances') or {}
                   lib = decomposicao.get('libertadores') or {}
                   sula = decomposicao.get('sul_americana') or {}
                   assert abs(float(lib.get('soma_vias_pct', -1)) - float(item['probabilidades_pct']['libertadores'])) <= 0.002, f'{item["clube"]}: vias da Libertadores não fecham'
