@@ -598,11 +598,16 @@
 
   function probabilityDisplayText(detail, value, digits = 1) {
     const explicit = String(detail?.exibicao || "").trim();
-    if (explicit) return explicit;
+    const legacyExplicit = /^(?:<0,1|>99,9|0|100,0)%$/.test(explicit);
+    if (explicit && !legacyExplicit) return explicit;
     const n = Number(value);
     if (!Number.isFinite(n)) return "—";
-    if (n >= 0 && n < 0.1) return "<0,1%";
-    if (n > 99.9 && n < 100) return ">99,9%";
+    if (detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false) return "0,000%";
+    if (n >= 0 && n < 0.001) return "<0,001%";
+    if (n >= 100) return "100,000%";
+    if (n > 99.999) return ">99,999%";
+    if (n < 0.1) return `${number(n, 3)}%`;
+    if (n < 1) return `${number(n, 2)}%`;
     return `${number(n, digits)}%`;
   }
 
@@ -677,11 +682,11 @@
     const n = Number.isFinite(raw) ? Math.max(0, Math.min(100, raw)) : 0;
     const display = probabilityDisplayText(detail, raw);
     const impossible = detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false;
-    const residual = !impossible && (detail?.zero_observado || (Number.isFinite(raw) && raw < 0.1));
+    const residual = !impossible && (detail?.zero_observado || (Number.isFinite(raw) && raw < 0.001));
     const title = impossible
       ? String(detail?.motivo_impossibilidade || "Via estruturalmente indisponível para o clube.")
       : residual
-        ? "Evento não é tratado como impossível: ficou abaixo da resolução visual de 0,1%."
+        ? "Evento não é tratado como impossível: ficou abaixo da resolução visual de 0,001%."
         : help;
     return `<div class="probability-metric probability-tone-${escapeAttr(tone)}"${title ? ` title="${escapeAttr(title)}"` : ""}>
       <span>${escapeHtml(label)}${residual ? '<em class="probability-residual-mark" aria-label="Probabilidade residual">ⓘ</em>' : ""}</span>
@@ -1249,7 +1254,7 @@
     const base = models?.base || {};
     const integrated = data?.integracao_continental || {};
     const margin = Number(sim?.convergencia?.margem_95_maxima_pontos_percentuais ?? sim?.margem_95_maxima_pontos_percentuais ?? data?.simulacao?.margem_95_maxima_pontos_percentuais);
-    const threshold = Number(integrated?.limiar_exibicao_percentual ?? 0.1);
+    const threshold = Number(integrated?.limiar_exibicao_percentual ?? 0.001);
     const competitions = Array.isArray(integrated?.competicoes) ? integrated.competicoes.length : 0;
     const trend = data?.metodologia_resumida?.tendencia_recente || audit?.tendencia_recente?.configuracao || {};
     const trendWindow = Number(trend?.janela_jogos);
@@ -1262,7 +1267,7 @@
       <article><span>Monte Carlo</span><strong>${integer(sim.quantidade || data?.simulacao?.quantidade)}</strong><small>semente ${integer(sim.semente || data?.simulacao?.semente)}</small></article>
       <article><span>Margem numérica</span><strong>${Number.isFinite(margin) ? `±${number(margin, 3)} p.p.` : "—"}</strong><small>pior caso aproximado, 95%</small></article>
       <article><span>Forma recente</span><strong>${Number.isFinite(trendWindow) ? `${integer(trendWindow)} jogos` : "Aguardando"}</strong><small>${Number.isFinite(trendWeight) ? `${number(trendWeight * 100, 0)}% de peso` : "peso controlado"}${Number.isFinite(trendLimit) ? ` · limite ±${number(trendLimit, 0)}%` : ""}</small></article>
-      <article><span>Resolução visual</span><strong>&lt;${number(threshold, 1)}%</strong><small>zero observado não vira impossibilidade</small></article>
+      <article><span>Resolução visual</span><strong>&lt;${number(threshold, 3)}%</strong><small>zero observado não vira impossibilidade</small></article>
       <article><span>Histórico público</span><strong>${integer(state.probabilitiesHistory?.total_snapshots ?? state.probabilityEvaluation?.cobertura?.snapshots)}</strong><small>${state.probabilityEvaluation?.integridade_historico?.encadeado ? "cadeia SHA-256 íntegra" : "encadeamento após a próxima atualização"}</small></article>`;
   }
 

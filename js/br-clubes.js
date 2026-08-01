@@ -85,11 +85,16 @@
   }
   function pctCompacto(valor, detalhe=null){
     const explicito = String(detalhe && detalhe.exibicao || "").trim();
-    if (explicito) return explicito;
+    const explicitoLegado = /^(?:<0,1|>99,9|0|100,0)%$/.test(explicito);
+    if (explicito && !explicitoLegado) return explicito;
     const n = Number(valor);
     if (!Number.isFinite(n)) return "—";
-    if (n >= 0 && n < 0.1) return "<0,1%";
-    if (n > 99.9 && n < 100) return ">99,9%";
+    if (detalhe && (detalhe.impossivel_estruturalmente === true || detalhe.possivel_estruturalmente === false)) return "0,000%";
+    if (n >= 0 && n < 0.001) return "<0,001%";
+    if (n >= 100) return "100,000%";
+    if (n > 99.999) return ">99,999%";
+    if (n < 0.1) return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}%`;
+    if (n < 1) return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
     return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
   }
   function posicaoProjetada(p){

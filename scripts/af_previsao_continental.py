@@ -135,6 +135,8 @@ def parse_team(payload: Mapping[str, Any]) -> CupTeam:
 
 
 def parse_snapshot(snapshot: Mapping[str, Any]) -> tuple[str, list[CupEvent], dict[str, Any]]:
+    if int(snapshot.get("schema_version") or 0) < 2:
+        raise ContinentalDataNotReady("snapshot continental anterior à normalização exata de clubes")
     competition = str((snapshot.get("competicao") or {}).get("chave") or "")
     if competition not in SNAPSHOT_FILES:
         raise ContinentalDataNotReady("snapshot sem chave de competição válida")
@@ -751,11 +753,17 @@ def display_probability(
     pct = 100.0 * count / simulations
     zero_observed = count == 0
     if not structurally_possible:
-        display = "0%"
+        display = "0,000%"
     elif pct < threshold_pct:
-        display = f"<{str(threshold_pct).replace('.', ',')}%"
-    elif pct >= 99.95:
-        display = "100,0%" if count == simulations else ">99,9%"
+        display = f"<{threshold_pct:.3f}%".replace(".", ",")
+    elif count == simulations:
+        display = "100,000%"
+    elif pct > 100.0 - threshold_pct:
+        display = f">{100.0 - threshold_pct:.3f}%".replace(".", ",")
+    elif pct < 0.1:
+        display = f"{pct:.3f}%".replace(".", ",")
+    elif pct < 1.0:
+        display = f"{pct:.2f}%".replace(".", ",")
     else:
         display = f"{pct:.1f}%".replace(".", ",")
     upper_95 = 100.0 * (3.0 / simulations) if zero_observed and structurally_possible else None
@@ -967,7 +975,7 @@ def allocate_integrated_qualification(
                 sula_repasse[team] += 1
 
     results: dict[str, Any] = {}
-    threshold = float(config.get("limiar_exibicao_percentual", 0.1))
+    threshold = float(config.get("limiar_exibicao_percentual", 0.001))
     for index, team in enumerate(serie_a_names):
         normalized_team = normalize_text(team)
         route_possible = {
@@ -1169,7 +1177,7 @@ def self_test() -> None:
                     }
                 )
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "status": "ok",
             "competicao": {
                 "chave": key,
@@ -1223,7 +1231,7 @@ def self_test() -> None:
         "brasileirao_vagas_preliminares": 1,
         "sul_americana_vagas": 6,
         "rebaixamento_a_partir_da_posicao": 17,
-        "limiar_exibicao_percentual": 0.1,
+        "limiar_exibicao_percentual": 0.001,
     }
     result_a = integrate_continental_probabilities(
         snapshots, league_model, order, teams, simulations, 1234, config
@@ -1239,11 +1247,16 @@ def self_test() -> None:
         assert abs(lib["total"]["percentual_estimado"] - lib["soma_vias_pct"]) < 0.002, team
         sula = item["sul_americana"]
         assert abs(sula["total"]["percentual_estimado"] - sula["soma_vias_pct"]) < 0.002, team
-    zero = display_probability(0, 2_000_000, 0.1)
-    assert zero["exibicao"] == "<0,1%"
+    zero = display_probability(0, 2_000_000, 0.001)
+    assert zero["exibicao"] == "<0,001%"
     assert zero["limite_superior_95_regra_dos_tres_pct"] == 0.00015
-    impossible = display_probability(0, 2_000_000, 0.1, structurally_possible=False, impossibility_reason="eliminado")
-    assert impossible["exibicao"] == "0%"
+    assert display_probability(20, 2_000_000, 0.001)["exibicao"] == "0,001%"
+    assert display_probability(128, 2_000_000, 0.001)["exibicao"] == "0,006%"
+    assert display_probability(9_720, 2_000_000, 0.001)["exibicao"] == "0,49%"
+    assert display_probability(149_200, 2_000_000, 0.001)["exibicao"] == "7,5%"
+    assert display_probability(2_000_000, 2_000_000, 0.001)["exibicao"] == "100,000%"
+    impossible = display_probability(0, 2_000_000, 0.001, structurally_possible=False, impossibility_reason="eliminado")
+    assert impossible["exibicao"] == "0,000%"
     assert impossible["impossivel_estruturalmente"] is True
     assert impossible["limite_superior_95_regra_dos_tres_pct"] is None
 
@@ -1291,7 +1304,7 @@ def self_test() -> None:
         teams,
     )
     final_snapshot = {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": "ok",
         "competicao": {
             "chave": "copa_do_brasil",

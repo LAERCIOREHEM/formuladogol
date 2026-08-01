@@ -37,14 +37,17 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 try:
-    from atualizar_espn import para_canonico  # type: ignore
+    from atualizar_espn import ALIASES, CANONICOS, normalizar  # type: ignore
 except Exception:  # pragma: no cover - fallback isolado
-    para_canonico = None
+    ALIASES = {}
+    CANONICOS = []
+    normalizar = None
 
 BRT = ZoneInfo("America/Sao_Paulo")
 SEASON = int(os.environ.get("AF_PREVISAO_TEMPORADA", "2026"))
 DATA_DIR = ROOT / "dados-br" / "competicoes-af-previsao"
 AUDIT_PATH = ROOT / "dados-br" / "auditoria-competicoes-af-previsao.json"
+SNAPSHOT_SCHEMA_VERSION = 2
 BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard"
 HEADERS = {
     "User-Agent": (
@@ -242,6 +245,29 @@ def country_code(team: dict[str, Any], spec: CompetitionSpec) -> str | None:
     return None
 
 
+def serie_a_canonical_exact(*candidates: Any) -> str | None:
+    """Reconhece somente os 20 clubes por nomes/aliases exatos.
+
+    O normalizador geral do Brasileirão também possui uma busca aproximada por
+    palavras. Ela é útil dentro da competição, mas não é segura no universo de
+    copas: "América Mineiro", "Botafogo-PB" e "Vitória-ES", por exemplo, não
+    podem herdar a identidade de clubes da Série A apenas por compartilharem
+    uma palavra. O coletor continental, portanto, usa somente aliases exatos.
+    """
+    if not callable(normalizar):
+        return None
+    canonical_by_normalized = {normalizar(name): name for name in CANONICOS}
+    for candidate in candidates:
+        key = normalizar(candidate)
+        if not key:
+            continue
+        if key in ALIASES:
+            return str(ALIASES[key])
+        if key in canonical_by_normalized:
+            return canonical_by_normalized[key]
+    return None
+
+
 def team_payload(competitor: dict[str, Any], spec: CompetitionSpec) -> dict[str, Any]:
     team = competitor.get("team") or {}
     names = [
@@ -251,7 +277,7 @@ def team_payload(competitor: dict[str, Any], spec: CompetitionSpec) -> dict[str,
         team.get("location"),
         competitor.get("displayName"),
     ]
-    canonical = para_canonico(*names) if callable(para_canonico) else None
+    canonical = serie_a_canonical_exact(*names)
     display = canonical or next((str(value).strip() for value in names if value), "Equipe não identificada")
     return {
         "espn_id": str(team.get("id") or competitor.get("id") or ""),
@@ -470,7 +496,7 @@ def build_snapshot(spec: CompetitionSpec, raw_events: list[dict[str, Any]]) -> d
     generated = now_brt().isoformat()
     current_stage = detect_current_stage(events)
     return {
-        "schema_version": 1,
+        "schema_version": SNAPSHOT_SCHEMA_VERSION,
         "projeto": "AF-Previsão Continental",
         "temporada": SEASON,
         "competicao": {
@@ -503,6 +529,8 @@ def snapshot_is_fresh(path: Path, max_age_minutes: int) -> bool:
         data = load_json(path)
         if data.get("status") != "ok":
             return False
+        if int(data.get("schema_version") or 0) != SNAPSHOT_SCHEMA_VERSION:
+            return False
         generated = parse_datetime(data.get("gerado_em"))
         return bool(generated and now_brt() - generated <= timedelta(minutes=max_age_minutes))
     except Exception:  # noqa: BLE001
@@ -510,6 +538,8 @@ def snapshot_is_fresh(path: Path, max_age_minutes: int) -> bool:
 
 
 def validate_snapshot(snapshot: dict[str, Any], spec: CompetitionSpec) -> None:
+    if int(snapshot.get("schema_version") or 0) != SNAPSHOT_SCHEMA_VERSION:
+        raise ValueError(f"{spec.key}: schema de snapshot desatualizado")
     if snapshot.get("status") not in {"ok", "sem_eventos"}:
         raise ValueError(f"{spec.key}: status inválido")
     if (snapshot.get("competicao") or {}).get("espn_league") != spec.league:
@@ -571,9 +601,13 @@ def run_update(force: bool, strict: bool, max_age_minutes: int) -> dict[str, Any
         except Exception as exc:  # noqa: BLE001
             message = f"{spec.key}: {type(exc).__name__}: {exc}"
             failures.append(message)
-            if strict or not path.exists():
+            previous = load_json(path) if path.exists() else None
+            previous_compatible = bool(
+                previous
+                and int(previous.get("schema_version") or 0) == SNAPSHOT_SCHEMA_VERSION
+            )
+            if strict or not previous_compatible:
                 raise RuntimeError(message) from exc
-            previous = load_json(path)
             audit_rows.append(
                 {
                     "competicao": spec.key,
@@ -639,6 +673,10 @@ def self_test() -> None:
     assert parsed["mandante"]["serie_a_2026"] is True
     assert parsed["visitante"]["pais"] == "ARG"
     assert parsed["vencedor"] == "Palmeiras"
+    assert serie_a_canonical_exact("América Mineiro", "América-MG", "AMG") is None
+    assert serie_a_canonical_exact("Botafogo-PB") is None
+    assert serie_a_canonical_exact("Vitória-ES") is None
+    assert serie_a_canonical_exact("Atlético-MG", "Atlético Mineiro") == "Atlético-MG"
     snapshot = build_snapshot(spec, [synthetic])
     validate_snapshot(snapshot, spec)
     assert snapshot["resumo"]["eventos"] == 1

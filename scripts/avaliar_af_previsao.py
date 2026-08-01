@@ -674,6 +674,7 @@ def self_test() -> None:
 
     def final_snapshot(key: str, champion: str, runner: str) -> dict[str, Any]:
         return {
+            "schema_version": 2,
             "status": "ok",
             "competicao": {"chave": key},
             "eventos": [{
@@ -703,7 +704,7 @@ def self_test() -> None:
             "brasileirao_vagas_diretas": 4,
             "brasileirao_vagas_preliminares": 1,
             "sul_americana_vagas": 6,
-            "limiar_exibicao_percentual": 0.1,
+            "limiar_exibicao_percentual": 0.001,
         }
     }
     resolved = resolve_final_outcomes(final_rows, competition_snapshots, rules)

@@ -759,6 +759,7 @@ def calculate_bolao_probabilities(
     generated_at: str | None = None,
     model_version: str | None = None,
     input_hash: str | None = None,
+    display_threshold_pct: float = 0.001,
 ) -> dict[str, Any]:
     team_index = {team: index for index, team in enumerate(state.teams)}
     participant_count = len(participants)
@@ -802,14 +803,18 @@ def calculate_bolao_probabilities(
         title_pct = float(title_probability * 100.0)
         top3_pct = float(np.mean(rank_values <= 3) * 100.0)
         non_payer_pct = float(np.mean(rank_values <= cutoff_non_payers) * 100.0)
+        top3_count = int(np.sum(rank_values <= 3))
+        non_payer_count = int(np.sum(rank_values <= cutoff_non_payers))
         projected_rank_mean = float(np.mean(rank_values))
         rows.append({
             "nome": participant["nome"],
             "pontos_atuais": int(current_scores[index]),
             "chance_titulo_pct": round(title_pct, 6),
-            "chance_titulo_exibicao": display_probability(int(round(title_probability * simulations)), simulations, 0.1)["exibicao"],
+            "chance_titulo_exibicao": display_probability(int(round(title_probability * simulations)), simulations, display_threshold_pct)["exibicao"],
             "chance_top3_pct": round(top3_pct, 6),
+            "chance_top3_exibicao": display_probability(top3_count, simulations, display_threshold_pct)["exibicao"],
             "chance_nao_pagar_pct": round(non_payer_pct, 6),
+            "chance_nao_pagar_exibicao": display_probability(non_payer_count, simulations, display_threshold_pct)["exibicao"],
             "pontuacao_projetada": _round_half_up(float(np.mean(score_values))),
             "pontuacao_projetada_media": round(float(np.mean(score_values)), 4),
             "pontuacao_mediana": int(np.median(score_values)),
@@ -858,7 +863,7 @@ def run_monte_carlo(
     return_samples: bool = False,
     bolao_participants: Sequence[dict[str, Any]] | None = None,
     bolao_rules: dict[str, Any] | None = None,
-    display_threshold_pct: float = 0.1,
+    display_threshold_pct: float = 0.001,
     position_interval_percentiles: tuple[int, int] = (10, 90),
 ) -> dict[str, Any]:
     if simulations < 10_000:
@@ -992,7 +997,8 @@ def run_monte_carlo(
     bolao = None
     if bolao_participants:
         bolao = calculate_bolao_probabilities(
-            bolao_participants, bolao_rules or {}, state, points, positions, simulations
+            bolao_participants, bolao_rules or {}, state, points, positions, simulations,
+            display_threshold_pct=display_threshold_pct,
         )
 
     team_results.sort(key=lambda item: (-item["probabilidades_pct"]["campeao"], item["posicao_projetada_media"]))
@@ -1946,7 +1952,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         max_fixture_adjustment_pct=float(trend_settings.get("limite_ajuste_taxa_partida_pct") or 10.0),
     )
     execution_25 = config.get("execucao_2_5") or {}
-    display_threshold = float(execution_25.get("limiar_exibicao_percentual", 0.1))
+    display_threshold = float(execution_25.get("limiar_exibicao_percentual", 0.001))
     projection_settings = execution_4.get("projecoes_exibicao") or {}
     raw_position_percentiles = projection_settings.get("faixa_posicao_percentis") or [10, 90]
     position_percentiles = (int(raw_position_percentiles[0]), int(raw_position_percentiles[1]))
@@ -2110,7 +2116,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "status": "ok",
             "competicoes": ["Copa do Brasil", "CONMEBOL Libertadores", "CONMEBOL Sudamericana"],
             "decomposicao_exclusiva_por_via": True,
-            "limiar_exibicao_percentual": float(execution_25.get("limiar_exibicao_percentual", 0.1)),
+            "limiar_exibicao_percentual": float(execution_25.get("limiar_exibicao_percentual", 0.001)),
             "hash_snapshots": continental_hash,
         },
         "total_previsoes_partidas": len(forecasts),
@@ -2118,7 +2124,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         "avisos": [
             "Probabilidades não são certezas e mudam quando novos jogos são concluídos.",
             "Libertadores e Sul-Americana são probabilidades consolidadas e incluem os caminhos por copas e repasses regulamentares.",
-            "Valores exibidos como <0,1% não significam impossibilidade matemática; indicam evento abaixo da resolução visual escolhida.",
+            "Valores exibidos como <0,001% não significam impossibilidade matemática; indicam evento abaixo da resolução visual escolhida.",
             "O modelo não utiliza cotações de apostas.",
         ],
     }
