@@ -11,6 +11,7 @@ on:
       - 'estatisticas.html'
       - 'clubes.html'
       - 'museu.html'
+      - 'sobre.html'
       - 'CNAME'
       - 'robots.txt'
       - 'sitemap.xml'
@@ -27,6 +28,7 @@ on:
       - 'css/br-aovivo.css'
       - 'css/br-estatisticas.css'
       - 'css/br-institucional.css'
+      - 'css/br-sobre.css'
       - 'js/br-aovivo.js'
       - 'js/br-clube-retorno.js'
       - 'js/br-clubes.js'
@@ -102,6 +104,7 @@ jobs:
             estatisticas.html
             clubes.html
             museu.html
+            sobre.html
             78f8b10d32edcce04827b713eae52df5.txt
             CNAME
             robots.txt
@@ -126,6 +129,7 @@ jobs:
             css/br-aovivo.css
             css/br-estatisticas.css
             css/br-institucional.css
+            css/br-sobre.css
           )
 
           PUBLIC_JS=(
@@ -351,6 +355,12 @@ jobs:
               ],
           }
 
+          # Página institucional estática: a data é a revisão real deste conteúdo,
+          # não a data de cada deploy automático dos dados esportivos.
+          STATIC_LASTMOD = {
+              "https://formuladogol.com.br/sobre.html": "2026-08-01",
+          }
+
           def data_do_arquivo(rel):
               caminho = site / rel
               if not caminho.is_file():
@@ -426,6 +436,8 @@ jobs:
           def resolver(url):
               if url in DEPS:
                   return data_da_pagina(DEPS[url], url)
+              if url in STATIC_LASTMOD:
+                  return STATIC_LASTMOD[url]
               if url.startswith("https://formuladogol.com.br/copa2026/"):
                   return data_copa
               raise SystemExit(f"ERRO lastmod: URL sem mapeamento de dados: {url}")
@@ -755,6 +767,7 @@ jobs:
               "https://formuladogol.com.br/estatisticas.html",
               "https://formuladogol.com.br/clubes.html",
               "https://formuladogol.com.br/museu.html",
+              "https://formuladogol.com.br/sobre.html",
               "https://formuladogol.com.br/copa2026/",
               "https://formuladogol.com.br/copa2026/aovivo.html",
               "https://formuladogol.com.br/copa2026/onde-assistir.html",
@@ -790,7 +803,10 @@ jobs:
           # referenciavam "#website" e "#organization" que não estavam definidos
           # em lugar nenhum, porque o index.html não tinha JSON-LD. Referência
           # pendurada não gera erro visível — só silenciosamente não funciona.
-          paginas_ld = ("index.html", "estatisticas.html", "aovivo.html")
+          paginas_ld = (
+              "index.html", "estatisticas.html", "aovivo.html",
+              "clubes.html", "museu.html", "sobre.html",
+          )
           definidos = set()
           referencias = []
           blocos = 0
@@ -838,6 +854,9 @@ jobs:
               assert obrigatorio in tipos_index, f"index.html: JSON-LD sem {obrigatorio}"
           conteudo_stats = (site / "estatisticas.html").read_text(encoding="utf-8")
           assert '"@type": "Dataset"' in conteudo_stats, "estatisticas.html: JSON-LD sem Dataset"
+          conteudo_sobre = (site / "sobre.html").read_text(encoding="utf-8")
+          assert '"@type": "AboutPage"' in conteudo_sobre, "sobre.html: JSON-LD sem AboutPage"
+          assert "espaços de lazer" in conteudo_sobre, "sobre.html: identidade sem desambiguação explícita"
           print(f"OK JSON-LD: {blocos} blocos, {len(definidos)} entidades, {len(referencias)} referências resolvidas")
           assert not any(any(term in url for term in ("apostas", "bolao", "aniversariantes", "regras", "palpite", "pontos")) for url in urls)
 
