@@ -990,6 +990,10 @@ jobs:
 
       - name: Confirmar e avisar publicação editorial
         if: success()
+        # A publicação já foi concluída pelo passo anterior. Confirmação pública
+        # e e-mail são pós-deploy e jamais devem transformar uma publicação
+        # válida em falha por ausência de secrets ou indisponibilidade externa.
+        continue-on-error: true
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
@@ -1009,6 +1013,12 @@ jobs:
           import urllib.request
           from pathlib import Path
 
+          obrigatorios = ('RESEND_API_KEY', 'EMAIL_DESTINO', 'EMAIL_REMETENTE')
+          ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
+          if ausentes:
+              print('::warning title=E-mail editorial não enviado::Configure os secrets ' + ', '.join(ausentes) + '. A página foi publicada normalmente.')
+              raise SystemExit(0)
+
           dados = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
           artigo = max(dados['artigos'], key=lambda item: (item['rodada'], item['modificado_em']))
           url, rodada, titulo = artigo['url'], artigo['rodada'], artigo['titulo']
@@ -1025,12 +1035,8 @@ jobs:
                   break
               time.sleep(15)
           if not confirmado:
-              raise SystemExit(f'Deploy concluído, mas o marcador da rodada {rodada} não apareceu em {url}')
-
-          obrigatorios = ('RESEND_API_KEY', 'EMAIL_DESTINO', 'EMAIL_REMETENTE')
-          ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
-          if ausentes:
-              raise SystemExit('Secrets de e-mail ausentes: ' + ', '.join(ausentes))
+              print(f'::warning title=Página ainda não confirmada::O deploy terminou, mas o marcador da rodada {rodada} ainda não apareceu em {url}. O e-mail não foi enviado.')
+              raise SystemExit(0)
           corpo = {
               'from': os.environ['EMAIL_REMETENTE'],
               'to': [os.environ['EMAIL_DESTINO']],
@@ -1038,9 +1044,14 @@ jobs:
               'html': f'<p>Coloquei a nova página no ar.</p><p><strong>{titulo}</strong></p><p><a href="{url}">Abrir página publicada</a></p>',
           }
           req = urllib.request.Request('https://api.resend.com/emails', data=json.dumps(corpo).encode(), headers={'Authorization': 'Bearer ' + os.environ['RESEND_API_KEY'], 'Content-Type': 'application/json'}, method='POST')
-          with urllib.request.urlopen(req, timeout=30) as resposta:
-              if resposta.status not in (200, 201):
-                  raise SystemExit(f'Resend respondeu HTTP {resposta.status}')
+          try:
+              with urllib.request.urlopen(req, timeout=30) as resposta:
+                  if resposta.status not in (200, 201):
+                      print(f'::warning title=E-mail editorial não enviado::Resend respondeu HTTP {resposta.status}. A página foi publicada normalmente.')
+                      raise SystemExit(0)
+          except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as erro:
+              print(f'::warning title=E-mail editorial não enviado::{erro}. A página foi publicada normalmente.')
+              raise SystemExit(0)
           print(f'Página confirmada e e-mail enviado: {url}')
           PY
 
