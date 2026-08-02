@@ -18,7 +18,9 @@ on:
         default: false
         type: boolean
   workflow_run:
-    workflows: ['Atualizar Brasileirao (ESPN)']
+    workflows:
+      - 'Atualizar Brasileirao (ESPN)'
+      - 'Buscar melhores momentos Brasileirão oficiais'
     types: [completed]
   schedule:
     # Retentativas independentes do workflow pesado: 03:18 e 07:18 em Brasília.
@@ -94,6 +96,10 @@ jobs:
               assert 'NewsArticle' in texto
               assert f'data-fdg-analise-rodada="{artigo["rodada"]}"' in texto
               assert artigo['titulo'] in texto
+              assert 'analysis-round-nav' in texto
+              assert texto.count('analysis-game-card') == artigo['jogos_concluidos']
+              assert '0,000%' not in texto
+              assert 'Padrão dos percentuais' in texto
           Parser().feed(Path('analises/index.html').read_text(encoding='utf-8'))
           for xml in ('sitemap.xml', 'news-sitemap.xml', 'feed.xml'):
               ET.parse(xml)

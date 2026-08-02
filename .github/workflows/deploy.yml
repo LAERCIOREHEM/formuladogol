@@ -995,9 +995,11 @@ jobs:
         # válida em falha por ausência de secrets ou indisponibilidade externa.
         continue-on-error: true
         env:
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
-          EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1008,12 +1010,16 @@ jobs:
           python - <<'PY'
           import json
           import os
+          import smtplib
+          import ssl
           import time
           import urllib.error
           import urllib.request
+          from email.message import EmailMessage
+          from email.utils import formataddr
           from pathlib import Path
 
-          obrigatorios = ('RESEND_API_KEY', 'EMAIL_DESTINO', 'EMAIL_REMETENTE')
+          obrigatorios = ('SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_DESTINO')
           ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
           if ausentes:
               print('::warning title=E-mail editorial não enviado::Configure os secrets ' + ', '.join(ausentes) + '. A página foi publicada normalmente.')
@@ -1037,19 +1043,30 @@ jobs:
           if not confirmado:
               print(f'::warning title=Página ainda não confirmada::O deploy terminou, mas o marcador da rodada {rodada} ainda não apareceu em {url}. O e-mail não foi enviado.')
               raise SystemExit(0)
-          corpo = {
-              'from': os.environ['EMAIL_REMETENTE'],
-              'to': [os.environ['EMAIL_DESTINO']],
-              'subject': f'Fórmula do Gol: análise da rodada {rodada} publicada',
-              'html': f'<p>Coloquei a nova página no ar.</p><p><strong>{titulo}</strong></p><p><a href="{url}">Abrir página publicada</a></p>',
-          }
-          req = urllib.request.Request('https://api.resend.com/emails', data=json.dumps(corpo).encode(), headers={'Authorization': 'Bearer ' + os.environ['RESEND_API_KEY'], 'Content-Type': 'application/json'}, method='POST')
+          mensagem = EmailMessage()
+          mensagem['From'] = formataddr(('Fórmula do Gol', os.environ['SMTP_USER']))
+          mensagem['To'] = os.environ['EMAIL_DESTINO']
+          mensagem['Subject'] = f'Fórmula do Gol: análise da rodada {rodada} publicada'
+          mensagem.set_content(f'Coloquei a nova página no ar.\n\n{titulo}\n\n{url}')
+          mensagem.add_alternative(
+              f'<p>Coloquei a nova página no ar.</p><p><strong>{titulo}</strong></p><p><a href="{url}">Abrir página publicada</a></p>',
+              subtype='html',
+          )
           try:
-              with urllib.request.urlopen(req, timeout=30) as resposta:
-                  if resposta.status not in (200, 201):
-                      print(f'::warning title=E-mail editorial não enviado::Resend respondeu HTTP {resposta.status}. A página foi publicada normalmente.')
-                      raise SystemExit(0)
-          except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError) as erro:
+              porta = int(os.environ['SMTP_PORT'])
+              contexto = ssl.create_default_context()
+              if porta == 465:
+                  with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], porta, context=contexto, timeout=30) as servidor:
+                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                      servidor.send_message(mensagem)
+              else:
+                  with smtplib.SMTP(os.environ['SMTP_HOST'], porta, timeout=30) as servidor:
+                      servidor.ehlo()
+                      servidor.starttls(context=contexto)
+                      servidor.ehlo()
+                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                      servidor.send_message(mensagem)
+          except (OSError, ValueError, smtplib.SMTPException) as erro:
               print(f'::warning title=E-mail editorial não enviado::{erro}. A página foi publicada normalmente.')
               raise SystemExit(0)
           print(f'Página confirmada e e-mail enviado: {url}')
@@ -1120,10 +1137,44 @@ jobs:
         if: failure()
         continue-on-error: true
         env:
-          BR_MOTIVO: Falha no deploy do GitHub Pages. O site continua exibindo a última versão publicada com sucesso.
-          BR_WORKFLOW: Deploy GitHub Pages
-          BR_SITE: Fórmula do Gol
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
-          EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
-        run: python scripts/gerenciar_status_brasileirao.py --error --notify
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
+        run: |
+          python - <<'PY'
+          import os
+          import smtplib
+          import ssl
+          from email.message import EmailMessage
+          from email.utils import formataddr
+
+          obrigatorios = ('SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_DESTINO')
+          ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
+          if ausentes:
+              print('::warning title=Alerta de deploy não enviado::Secrets SMTP ausentes: ' + ', '.join(ausentes))
+              raise SystemExit(0)
+          url_execucao = f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/{os.environ.get('GITHUB_REPOSITORY', '')}/actions/runs/{os.environ.get('GITHUB_RUN_ID', '')}"
+          mensagem = EmailMessage()
+          mensagem['From'] = formataddr(('Fórmula do Gol', os.environ['SMTP_USER']))
+          mensagem['To'] = os.environ['EMAIL_DESTINO']
+          mensagem['Subject'] = 'Fórmula do Gol: falha no deploy do site'
+          mensagem.set_content('O deploy do GitHub Pages falhou. A última versão publicada continua no ar.\n\n' + url_execucao)
+          try:
+              porta = int(os.environ['SMTP_PORT'])
+              contexto = ssl.create_default_context()
+              if porta == 465:
+                  with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], porta, context=contexto, timeout=30) as servidor:
+                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                      servidor.send_message(mensagem)
+              else:
+                  with smtplib.SMTP(os.environ['SMTP_HOST'], porta, timeout=30) as servidor:
+                      servidor.ehlo()
+                      servidor.starttls(context=contexto)
+                      servidor.ehlo()
+                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                      servidor.send_message(mensagem)
+          except (OSError, ValueError, smtplib.SMTPException) as erro:
+              print(f'::warning title=Alerta de deploy não enviado::{erro}')
+          PY
