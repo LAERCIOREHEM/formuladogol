@@ -19,6 +19,7 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
+from decimal import Decimal, ROUND_HALF_UP
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -74,25 +75,44 @@ def nome_time(objeto: Any) -> str:
     return normalizar_nome(objeto)
 
 
+def _decimal(valor: float) -> Decimal:
+    return Decimal(str(float(valor)))
+
+
+def _arredondar(valor: float, casas: int) -> Decimal:
+    passo = Decimal("1").scaleb(-casas)
+    return _decimal(valor).quantize(passo, rounding=ROUND_HALF_UP)
+
+
+def _numero_pt_br(valor: Decimal, casas: int) -> str:
+    return f"{valor:.{casas}f}".replace(".", ",")
+
+
+def casas_percentual(valor: float) -> int | None:
+    """Define a precisão visual sem atribuir casas artificiais aos limites."""
+    valor = float(valor)
+    if valor == 0 or valor == 100 or 0 < valor < 0.001 or 99.9 < valor < 100:
+        return None
+    if valor < 0.1:
+        return 3
+    if valor < 1:
+        return 2
+    return 1
+
+
 def percentual(valor: float) -> str:
     valor = float(valor)
     if valor == 0:
         return "0%"
-    if valor < 0.001:
+    if 0 < valor < 0.001:
         return "<0,001%"
-    if valor < 0.1:
-        casas = 3
-    elif valor < 1:
-        casas = 2
-    elif valor < 99.9:
-        casas = 1
-    elif valor < 99.99:
-        casas = 2
-    elif valor < 99.999:
-        casas = 3
-    else:
-        casas = 4
-    return f"{valor:.{casas}f}%".replace(".", ",")
+    if valor == 100:
+        return "100%"
+    if 99.9 < valor < 100:
+        return ">99,9%"
+    casas = casas_percentual(valor)
+    assert casas is not None
+    return _numero_pt_br(_arredondar(valor, casas), casas) + "%"
 
 
 def variacao(valor: float) -> str:
@@ -102,6 +122,45 @@ def variacao(valor: float) -> str:
         return ("↑" if valor > 0 else "↓") + " <0,001 p.p."
     sinal = "+" if valor > 0 else ""
     return (f"{sinal}{valor:.3f}" if abs(valor) < 0.1 else f"{sinal}{valor:.1f}").replace(".", ",") + " p.p."
+
+
+def comparacao_percentual(antes: float, depois: float) -> tuple[str, str, str]:
+    """Formata o trio de modo que a variação feche com os valores visíveis.
+
+    Quando ambos os percentuais são numéricos, eles usam a mesma precisão e
+    a variação é calculada depois do arredondamento. Limites como ``<0,001%``
+    continuam censurados, porque revelar casas adicionais sugeriria uma precisão
+    que a interface deliberadamente não oferece.
+    """
+    antes, depois = float(antes), float(depois)
+    bruto = depois - antes
+    casas_antes, casas_depois = casas_percentual(antes), casas_percentual(depois)
+
+    if casas_antes is not None and casas_depois is not None:
+        casas = max(casas_antes, casas_depois)
+        antes_exibido = _arredondar(antes, casas)
+        depois_exibido = _arredondar(depois, casas)
+        delta_exibido = depois_exibido - antes_exibido
+        texto_antes = _numero_pt_br(antes_exibido, casas) + "%"
+        texto_depois = _numero_pt_br(depois_exibido, casas) + "%"
+        if delta_exibido == 0:
+            if bruto == 0:
+                texto_delta = "0 p.p."
+            else:
+                limite = _numero_pt_br(Decimal("1").scaleb(-casas), casas)
+                texto_delta = ("↑" if bruto > 0 else "↓") + f" <{limite} p.p."
+        else:
+            sinal = "+" if delta_exibido > 0 else ""
+            texto_delta = f"{sinal}{_numero_pt_br(delta_exibido, casas)} p.p."
+        return texto_antes, texto_depois, texto_delta
+
+    texto_antes, texto_depois = percentual(antes), percentual(depois)
+    if bruto and texto_antes == texto_depois:
+        limite = "0,001" if texto_antes == "<0,001%" else "0,1"
+        texto_delta = ("↑" if bruto > 0 else "↓") + f" <{limite} p.p."
+    else:
+        texto_delta = variacao(bruto)
+    return texto_antes, texto_depois, texto_delta
 
 
 def data_humana(iso: str) -> str:
@@ -554,10 +613,11 @@ def tabela_comparativa(dossie: dict[str, Any]) -> str:
     corpo = []
     for c in linhas:
         classe_delta = "delta-up" if c["titulo_delta"] > 0 else "delta-down" if c["titulo_delta"] < 0 else "delta-flat"
+        titulo_antes, titulo_depois, titulo_delta = comparacao_percentual(c["titulo_antes"], c["titulo_depois"])
         corpo.append(f'''<tr>
           <th scope="row"><a href="../clubes.html#{esc(c['clube'].lower().replace(' ', '-'))}">{esc(c['clube'])}</a></th>
           <td>{c['pontos_depois']}</td>
-          <td>{esc(percentual(c['titulo_antes']))}</td><td>{esc(percentual(c['titulo_depois']))}</td><td class="delta {classe_delta}">{esc(variacao(c['titulo_delta']))}</td>
+          <td>{esc(titulo_antes)}</td><td>{esc(titulo_depois)}</td><td class="delta {classe_delta}">{esc(titulo_delta)}</td>
           <td>{esc(percentual(c['libertadores_depois']))}</td><td>{esc(percentual(c['rebaixamento_depois']))}</td>
         </tr>''')
     return '''<div class="analysis-table-wrap" tabindex="0" aria-label="Tabela comparativa com rolagem horizontal">
@@ -751,10 +811,14 @@ def self_test() -> int:
     assert percentual(0.0005) == "<0,001%"
     assert percentual(0.0022) == "0,002%"
     assert percentual(77.5218) == "77,5%"
-    assert percentual(99.9806) == "99,98%"
+    assert percentual(99.9806) == ">99,9%"
+    assert percentual(100) == "100%"
     assert variacao(0) == "0 p.p."
     assert variacao(0.00045) == "↑ <0,001 p.p."
     assert variacao(-0.00005) == "↓ <0,001 p.p."
+    assert comparacao_percentual(0.00745, 0.00555) == ("0,007%", "0,006%", "-0,001 p.p.")
+    assert comparacao_percentual(0, 0.00005) == ("0%", "<0,001%", "↑ <0,001 p.p.")
+    assert comparacao_percentual(99.96, 99.97) == (">99,9%", ">99,9%", "↑ <0,1 p.p.")
     config = carregar_json(ARQUIVO_CONFIG)
     estado = estado_rodada(20, datetime(2026, 8, 2, 12, tzinfo=FUSO_BR), config)
     assert estado["elegivel"] and estado["jogos_concluidos"] == 10
@@ -770,6 +834,8 @@ def self_test() -> int:
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
     assert "br-analises.css?v=20260802-titulos-editoriais-v4" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
+    assert "0,007%</td><td>0,006%</td><td class=\"delta delta-down\">-0,001 p.p.</td>" in pagina
+    assert "99,96%" not in pagina and "&gt;99,9%" in pagina
     assert "Padrão dos percentuais" in pagina and "analysis-round-nav" in pagina
     assert pagina.count("▶ Melhores momentos") == 10
     assert pagina.count("Estatísticas do jogo") == 10
