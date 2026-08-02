@@ -15,6 +15,8 @@ on:
       - 'CNAME'
       - 'robots.txt'
       - 'sitemap.xml'
+      - 'news-sitemap.xml'
+      - 'feed.xml'
       - 'tabela.json'
       - 'resultados.json'
       - 'jogos.json'
@@ -29,6 +31,7 @@ on:
       - 'css/br-estatisticas.css'
       - 'css/br-institucional.css'
       - 'css/br-sobre.css'
+      - 'css/br-analises.css'
       - 'js/br-aovivo.js'
       - 'js/br-clube-retorno.js'
       - 'js/br-clubes.js'
@@ -38,6 +41,7 @@ on:
       - 'js/br-menu.js'
       - 'js/br-museu.js'
       - 'dados-br/**'
+      - 'analises/**'
       - 'jogos/**'
       - 'tabela/**'
       - 'resultados/**'
@@ -55,6 +59,7 @@ on:
       - 'Buscar melhores momentos Brasileirão oficiais'
       - 'Atualizar Elencos Brasileirao (ESPN)'
       - 'Revisar melhores momentos Brasileirão oficiais'
+      - 'Publicar análise editorial da rodada'
     types: [completed]
 
 permissions:
@@ -90,6 +95,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 2
 
       - name: Montar site público
         shell: bash
@@ -109,6 +115,8 @@ jobs:
             CNAME
             robots.txt
             sitemap.xml
+            news-sitemap.xml
+            feed.xml
             tabela.json
             resultados.json
             jogos.json
@@ -130,6 +138,7 @@ jobs:
             css/br-estatisticas.css
             css/br-institucional.css
             css/br-sobre.css
+            css/br-analises.css
           )
 
           PUBLIC_JS=(
@@ -168,6 +177,7 @@ jobs:
             dados-br/transmissoes-aovivo-manual.json
             dados-br/transmissoes-aovivo.json
             dados-br/transmissoes-tv.json
+            dados-br/analises.json
           )
 
           PUBLIC_ROUTES=(jogos tabela resultados)
@@ -244,6 +254,12 @@ jobs:
             exit 1
           fi
           cp -a img _site/
+
+          if [[ ! -d analises ]] || [[ ! -f analises/index.html ]]; then
+            echo "ERRO: seção pública de análises ausente."
+            exit 1
+          fi
+          cp -a analises _site/
 
           for route in "${PUBLIC_ROUTES[@]}"; do
             if [[ ! -f "$route/index.html" ]]; then
@@ -361,6 +377,15 @@ jobs:
               "https://formuladogol.com.br/sobre.html": "2026-08-01",
           }
 
+          analises_manifesto = json.loads((site / "dados-br/analises.json").read_text(encoding="utf-8"))
+          artigos_analise = {
+              item["url"]: str(item["modificado_em"])[:10]
+              for item in (analises_manifesto.get("artigos") or [])
+          }
+          if not artigos_analise:
+              raise SystemExit("ERRO lastmod: manifesto editorial vazio")
+          data_hub_analises = max(artigos_analise.values())
+
           def data_do_arquivo(rel):
               caminho = site / rel
               if not caminho.is_file():
@@ -438,6 +463,10 @@ jobs:
                   return data_da_pagina(DEPS[url], url)
               if url in STATIC_LASTMOD:
                   return STATIC_LASTMOD[url]
+              if url == "https://formuladogol.com.br/analises/":
+                  return data_hub_analises
+              if url in artigos_analise:
+                  return artigos_analise[url]
               if url.startswith("https://formuladogol.com.br/copa2026/"):
                   return data_copa
               raise SystemExit(f"ERRO lastmod: URL sem mapeamento de dados: {url}")
@@ -567,6 +596,7 @@ jobs:
               "Ao vivo",
               "Tabela",
               "Resultados",
+              "Análises",
               "Estatísticas",
               "Clubes",
               "Museu",
@@ -650,6 +680,46 @@ jobs:
               text = (site / page_name).read_text(encoding="utf-8")
               assert f"<title>{expected_title}</title>" in text, f"{page_name}: título incorreto"
               assert "brasileirao2026almoco" not in text.lower(), f"{page_name}: domínio antigo presente"
+
+          manifest_analises = json.loads((site / "dados-br/analises.json").read_text(encoding="utf-8"))
+          artigos_analises = manifest_analises.get("artigos") or []
+          assert manifest_analises.get("total_artigos") == len(artigos_analises) >= 1, "manifesto editorial vazio ou divergente"
+          paginas_analise = ["analises/index.html"] + [f"analises/{item['slug']}" for item in artigos_analises]
+          for page_name in paginas_analise:
+              page = site / page_name
+              assert page.is_file(), f"página editorial ausente: {page_name}"
+              text = page.read_text(encoding="utf-8")
+              parser = RefParser()
+              parser.feed(text)
+              assert formula_ga_id in text, f"{page_name}: Analytics ausente"
+              assert old_ga_id not in text, f"{page_name}: Analytics antigo presente"
+              nav_match = re.search(r'<nav\b[^>]*class="[^"]*\bnav\b[^"]*"[^>]*>(.*?)</nav>', text, flags=re.I | re.S)
+              assert nav_match, f"{page_name}: menu editorial ausente"
+              nav = " ".join(re.sub(r"<[^>]+>", " ", nav_match.group(1)).split())
+              for label in root_expected_menu:
+                  assert label in nav, f"{page_name}: item de menu ausente: {label}"
+              for raw in parser.refs:
+                  parsed = urlsplit(raw.strip())
+                  if parsed.scheme or raw.startswith("//") or raw.startswith("#") or raw.startswith("data:"):
+                      continue
+                  path = parsed.path
+                  if not path or path == "/":
+                      continue
+                  target = site / path.lstrip("/") if path.startswith("/") else page.parent / path
+                  if target.is_dir():
+                      target = target / "index.html"
+                  assert target.exists(), f"{page_name}: referência local quebrada: {raw}"
+          for artigo in artigos_analises:
+              text = (site / "analises" / artigo["slug"]).read_text(encoding="utf-8")
+              assert '"@type":"NewsArticle"' in text, f"{artigo['slug']}: NewsArticle ausente"
+              assert f'data-fdg-analise-rodada="{artigo["rodada"]}"' in text, f"{artigo['slug']}: marcador editorial ausente"
+          ET.parse(site / "news-sitemap.xml")
+          ET.parse(site / "feed.xml")
+          sitemap_text = (site / "sitemap.xml").read_text(encoding="utf-8")
+          assert "https://formuladogol.com.br/analises/" in sitemap_text, "hub editorial ausente do sitemap"
+          for artigo in artigos_analises:
+              assert artigo["url"] in sitemap_text, f"URL editorial ausente do sitemap: {artigo['url']}"
+          print(f"OK seção editorial: {len(artigos_analises)} artigo(s), links, Schema e XMLs")
 
           copa_pages = [
               "copa2026/index.html",
@@ -776,6 +846,8 @@ jobs:
               "https://formuladogol.com.br/copa2026/palcos.html",
               "https://formuladogol.com.br/copa2026/museu.html",
           }
+          expected_urls.add("https://formuladogol.com.br/analises/")
+          expected_urls.update(artigo["url"] for artigo in artigos_analises)
           assert set(urls) == expected_urls, f"sitemap divergente: {urls!r}"
 
           # Guarda do lastmod: uma data ausente equivale a não informar frescor;
@@ -916,6 +988,61 @@ jobs:
         timeout-minutes: 15
 
 
+      - name: Confirmar e avisar publicação editorial
+        if: success()
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
+          EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! git diff-tree --no-commit-id --name-only -r HEAD | grep -Eq '^(analises/|dados-br/analises\.json$)'; then
+            echo "Deploy sem alteração editorial; e-mail dispensado."
+            exit 0
+          fi
+          python - <<'PY'
+          import json
+          import os
+          import time
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          dados = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
+          artigo = max(dados['artigos'], key=lambda item: (item['rodada'], item['modificado_em']))
+          url, rodada, titulo = artigo['url'], artigo['rodada'], artigo['titulo']
+          marcador = f'data-fdg-analise-rodada="{rodada}"'
+          confirmado = False
+          for tentativa in range(1, 31):
+              try:
+                  req = urllib.request.Request(f'{url}?deploy={os.environ.get("GITHUB_RUN_ID", "")}', headers={'Cache-Control': 'no-cache'})
+                  with urllib.request.urlopen(req, timeout=15) as resposta:
+                      confirmado = marcador in resposta.read().decode('utf-8', errors='replace')
+              except urllib.error.URLError as erro:
+                  print(f'Verificação pública {tentativa}/30: {erro}')
+              if confirmado:
+                  break
+              time.sleep(15)
+          if not confirmado:
+              raise SystemExit(f'Deploy concluído, mas o marcador da rodada {rodada} não apareceu em {url}')
+
+          obrigatorios = ('RESEND_API_KEY', 'EMAIL_DESTINO', 'EMAIL_REMETENTE')
+          ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
+          if ausentes:
+              raise SystemExit('Secrets de e-mail ausentes: ' + ', '.join(ausentes))
+          corpo = {
+              'from': os.environ['EMAIL_REMETENTE'],
+              'to': [os.environ['EMAIL_DESTINO']],
+              'subject': f'Fórmula do Gol: análise da rodada {rodada} publicada',
+              'html': f'<p>Coloquei a nova página no ar.</p><p><strong>{titulo}</strong></p><p><a href="{url}">Abrir página publicada</a></p>',
+          }
+          req = urllib.request.Request('https://api.resend.com/emails', data=json.dumps(corpo).encode(), headers={'Authorization': 'Bearer ' + os.environ['RESEND_API_KEY'], 'Content-Type': 'application/json'}, method='POST')
+          with urllib.request.urlopen(req, timeout=30) as resposta:
+              if resposta.status not in (200, 201):
+                  raise SystemExit(f'Resend respondeu HTTP {resposta.status}')
+          print(f'Página confirmada e e-mail enviado: {url}')
+          PY
 
       - name: Notificar buscadores via IndexNow
         if: success()
@@ -924,7 +1051,7 @@ jobs:
           # O Google NÃO suporta o protocolo — o sitemap com lastmod real já
           # cobre o Google. A chave está em 78f8b10d32edcce04827b713eae52df5.txt na raiz do site.
           python - <<'INNER'
-          import json, urllib.request, urllib.error
+          import json, pathlib, urllib.request, urllib.error
 
           CHAVE = "78f8b10d32edcce04827b713eae52df5"
           HOST  = "formuladogol.com.br"
@@ -936,6 +1063,9 @@ jobs:
               "https://formuladogol.com.br/museu.html",
               "https://formuladogol.com.br/copa2026/",
           ]
+          manifesto = json.loads(pathlib.Path("dados-br/analises.json").read_text(encoding="utf-8"))
+          URLS.append("https://formuladogol.com.br/analises/")
+          URLS.extend(item["url"] for item in (manifesto.get("artigos") or [])[-5:])
 
           payload = json.dumps({
               "host": HOST,
