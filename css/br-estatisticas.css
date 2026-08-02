@@ -1226,7 +1226,7 @@ body > .container > section.hero > img {
 .probability-head-aside > small { color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; text-transform: none; text-align: right; opacity: .85; }
 .probability-club-list { display: grid; gap: 10px; }
 .probability-club-card { padding: 13px; border: 1px solid rgba(148,163,184,.14); border-radius: 18px; background: linear-gradient(145deg, rgba(6,17,25,.78), rgba(9,24,31,.74)); }
-.probability-club-head { display: grid; grid-template-columns: 42px 48px minmax(0,1fr) minmax(140px,auto); align-items: center; gap: 10px; }
+.probability-club-head { display: grid; grid-template-columns: 42px 48px minmax(0,1fr) minmax(180px,auto); align-items: center; gap: 10px; }
 .probability-order { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid rgba(163,230,53,.27); border-radius: 12px; color: #efffc3; background: rgba(163,230,53,.09); font-size: 16px; font-weight: 950; }
 .probability-club-link { display: grid; place-items: center; border-radius: 12px; text-decoration: none; }
 .probability-club-link:focus-visible,
@@ -1239,12 +1239,18 @@ body > .container > section.hero > img {
 .probability-club-title span { display: block; }
 .probability-club-title strong { font-size: 18px; overflow-wrap: anywhere; }
 .probability-club-title span { margin-top: 4px; color: var(--muted); font-size: 11px; }
-.probability-points { min-width: 140px; text-align: right; }
+.probability-current-standing { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 7px; }
+.probability-current-standing .probability-current-label { display: inline-flex; align-items: center; min-height: 20px; margin: 0; padding: 3px 7px; border: 1px solid rgba(163,230,53,.28); border-radius: 999px; color: #d9ff76; background: rgba(163,230,53,.09); font-size: 8px; font-weight: 950; letter-spacing: .08em; line-height: 1; text-transform: uppercase; }
+.probability-current-standing strong { display: inline-flex; align-items: baseline; gap: 3px; color: #fff; font-size: 17px; line-height: 1; white-space: nowrap; }
+.probability-current-standing strong em { color: #aebdca; font-size: 9px; font-style: normal; font-weight: 900; text-transform: uppercase; }
+.probability-current-standing b { color: #dbe7ef; font-size: 11px; font-weight: 850; white-space: nowrap; }
+.probability-points { min-width: 180px; padding: 9px 11px; border: 1px solid rgba(163,230,53,.18); border-radius: 12px; background: linear-gradient(145deg,rgba(163,230,53,.065),rgba(255,255,255,.018)); text-align: right; }
 .probability-points strong,
 .probability-points span,
 .probability-points small { display: block; }
-.probability-points strong { color: #d9ff76; font-size: 25px; line-height: 1; }
-.probability-points span { margin-top: 3px; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.probability-points strong { margin-top: 5px; color: #d9ff76; font-size: 25px; line-height: 1; }
+.probability-points strong em { color: #b9ca9a; font-size: 9px; font-style: normal; font-weight: 900; text-transform: uppercase; }
+.probability-points span { margin: 0; color: #c7d59e; font-size: 9px; font-weight: 950; letter-spacing: .08em; text-transform: uppercase; }
 .probability-points small { margin-top: 4px; color: #aebdca; font-size: 10px; }
 .probability-metric-grid { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 7px; margin-top: 11px; }
 .probability-metric { min-width: 0; padding: 9px; border: 1px solid rgba(148,163,184,.10); border-radius: 12px; background: rgba(255,255,255,.022); }
@@ -1442,6 +1448,12 @@ body > .container > section.hero > img {
   .probability-club-card { padding: 10px; }
   .probability-club-title strong { font-size: 15px; }
   .probability-club-title span { font-size: 9px; }
+  .probability-current-standing { gap: 5px 8px; margin-top: 6px; }
+  .probability-current-standing strong { font-size: 15px; }
+  .probability-current-standing b { font-size: 9px; }
+  .probability-points { grid-template-columns: auto minmax(0,1fr); }
+  .probability-points strong { justify-self: end; }
+  .probability-points small { grid-column: 1 / -1; text-align: left; }
   .probability-metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; }
   .probability-metric { padding: 8px; }
   .probability-metric strong { font-size: 15px; }

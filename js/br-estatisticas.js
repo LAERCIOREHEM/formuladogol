@@ -1093,17 +1093,27 @@
     const range = probabilityPositionRange(club);
     const rangeText = range ? `${integer(range.best)}º–${integer(range.worst)}º` : "—";
     const continental = continentalDisplayTriplet(club);
+    const current = liveStanding(club);
+    const currentPosition = integer(current.posicao);
+    const currentPoints = integer(current.pontos);
+    const currentGames = integer(current.jogos);
     return `<article class="probability-club-card">
       <div class="probability-club-head">
         <span class="probability-order">${integer(order)}</span>
         <a class="probability-club-link" href="${escapeAttr(clubHref(club?.clube))}" aria-label="Abrir página de ${escapeAttr(club?.clube)}">${shield(info, "probability-club-shield")}</a>
         <div class="probability-club-title">
           <a href="${escapeAttr(clubHref(club?.clube))}"><strong>${escapeHtml(club?.clube)}</strong></a>
-          <span>${integer(liveStanding(club).posicao)}º na tabela · ${integer(liveStanding(club).pontos)} pts · ${integer(liveStanding(club).jogos)} jogos</span>
+          <div class="probability-current-standing" aria-label="Situação atual: ${escapeAttr(currentPoints)} pontos, ${escapeAttr(currentPosition)}º lugar, ${escapeAttr(currentGames)} jogos">
+            <span class="probability-current-label">Agora</span>
+            <strong>${currentPoints} <em>pts</em></strong>
+            <b>${currentPosition}º lugar</b>
+            <b>${currentGames} jogos</b>
+          </div>
         </div>
         <div class="probability-points">
-          <strong>${projected ?? "—"}</strong><span>pontos projetados</span>
-          <small>faixa central de 80%: ${integer(points.percentil_10)}–${integer(points.percentil_90)}</small>
+          <span>Projeção final</span>
+          <strong>${projected ?? "—"} <em>pts</em></strong>
+          <small>após 38 jogos · faixa de 80%: ${integer(points.percentil_10)}–${integer(points.percentil_90)}</small>
         </div>
       </div>
       <div class="probability-metric-grid">

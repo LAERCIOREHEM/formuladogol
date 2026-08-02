@@ -48,7 +48,7 @@
       label: "Premiere",
       aliases: ["premiere"],
       links: [
-        { label: "Globoplay", url: "https://globoplay.globo.com/categorias/premiere/" },
+        { label: "Premiere", url: "https://globoplay.globo.com/categorias/premiere/" },
         { label: "Claro tv+", url: "https://www.clarotvmais.com.br/ao-vivo" },
         { label: "Prime Video", url: "https://www.primevideo.com/-/pt/channel/65837b7c-1c81-4f8a-80f5-d1bba5cde8f1" }
       ]
