@@ -5,10 +5,10 @@
   "temporada": 2026,
   "gerado_em": "2026-07-30T23:27:00-03:00",
   "referencia_esportiva_em": "2026-07-30T23:27:00-03:00",
-  "calculado_em": "2026-08-02T01:46:43-03:00",
+  "calculado_em": "2026-08-02T17:14:20-03:00",
   "fonte_resultados_calendario": "ESPN",
   "status": "ok",
-  "hash_entrada": "ffd0b9340694574c2d01a0421eb71f145b090a7c57d7abcd3e258b97fcd879a9",
+  "hash_entrada": "0ed3c72aeb194b27699969681ea93c786c5cd4a534f97e37b1a429b8ba4c2405",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -49,10 +49,11 @@
       "libertadores": "chance consolidada por Brasileirão, Copa do Brasil, Libertadores, Sul-Americana e repasses",
       "sul_americana": "seis vagas alocadas após a definição de todos os classificados à Libertadores",
       "rebaixamento": "17º ao 20º",
-      "posicao_projetada": "média das posições simuladas arredondada para o inteiro mais próximo",
+      "posicao_projetada": "posição única na classificação projetada, ordenada pela pontuação final média sem arredondamento; empates seguem vitórias, saldo, gols pró, posição média simulada e nome do clube",
+      "posicao_projetada_media": "média marginal das posições simuladas, preservada separadamente para auditoria e leitura da incerteza",
       "faixa_posicao_80": "intervalo entre os percentis 10 e 90 das posições simuladas"
     },
-    "projecoes_exibicao": "pontos e posição aparecem como inteiros; médias sem arredondamento permanecem no JSON para auditoria",
+    "projecoes_exibicao": "pontos aparecem como inteiros e cada clube recebe uma posição exclusiva de 1º a 20º na classificação projetada; médias sem arredondamento permanecem no JSON para auditoria",
     "af_score": "auditado como diagnóstico, não aplicado sem backtesting histórico homogêneo"
   },
   "base_corrente": {
@@ -67,6 +68,199 @@
     "erro_padrao_maximo_pontos_percentuais": 0.035355,
     "margem_95_maxima_pontos_percentuais": 0.069296,
     "maior_diferenca_entre_metades_pontos_percentuais": 0.1533
+  },
+  "classificacao_projetada": {
+    "posicoes_unicas": true,
+    "criterios": [
+      "pontos finais médios",
+      "vitórias médias",
+      "saldo de gols médio",
+      "gols pró médios",
+      "posição média simulada",
+      "nome do clube como chave estável residual"
+    ],
+    "ordem": [
+      {
+        "posicao": 1,
+        "clube": "Palmeiras",
+        "pontos_medios": 79.7873155,
+        "vitorias_medias": 23.6106385,
+        "saldo_medio": 36.3356705,
+        "gols_pro_medios": 67.1198865,
+        "posicao_media_simulada": 1.2374715
+      },
+      {
+        "posicao": 2,
+        "clube": "Flamengo",
+        "pontos_medios": 73.960549,
+        "vitorias_medias": 21.3132775,
+        "saldo_medio": 34.826263,
+        "gols_pro_medios": 69.4032795,
+        "posicao_media_simulada": 1.914556
+      },
+      {
+        "posicao": 3,
+        "clube": "Athletico-PR",
+        "pontos_medios": 61.95208,
+        "vitorias_medias": 17.7500075,
+        "saldo_medio": 11.484386,
+        "gols_pro_medios": 48.3529805,
+        "posicao_media_simulada": 4.573554
+      },
+      {
+        "posicao": 4,
+        "clube": "Botafogo",
+        "pontos_medios": 58.9350225,
+        "vitorias_medias": 16.5261505,
+        "saldo_medio": 9.9353235,
+        "gols_pro_medios": 62.1750565,
+        "posicao_media_simulada": 5.9111935
+      },
+      {
+        "posicao": 5,
+        "clube": "Fluminense",
+        "pontos_medios": 58.4815525,
+        "vitorias_medias": 15.6308735,
+        "saldo_medio": 6.904905,
+        "gols_pro_medios": 50.6718585,
+        "posicao_media_simulada": 6.2874745
+      },
+      {
+        "posicao": 6,
+        "clube": "Bahia",
+        "pontos_medios": 55.6637395,
+        "vitorias_medias": 14.4465295,
+        "saldo_medio": 4.503108,
+        "gols_pro_medios": 50.9618865,
+        "posicao_media_simulada": 7.891285
+      },
+      {
+        "posicao": 7,
+        "clube": "Bragantino",
+        "pontos_medios": 55.3822405,
+        "vitorias_medias": 15.5772485,
+        "saldo_medio": 5.5865625,
+        "gols_pro_medios": 47.87001,
+        "posicao_media_simulada": 7.760394
+      },
+      {
+        "posicao": 8,
+        "clube": "Cruzeiro",
+        "pontos_medios": 54.8907065,
+        "vitorias_medias": 14.711476,
+        "saldo_medio": -0.475674,
+        "gols_pro_medios": 47.535236,
+        "posicao_media_simulada": 8.3067015
+      },
+      {
+        "posicao": 9,
+        "clube": "Atlético-MG",
+        "pontos_medios": 54.1020455,
+        "vitorias_medias": 15.1454265,
+        "saldo_medio": 2.128739,
+        "gols_pro_medios": 47.979687,
+        "posicao_media_simulada": 8.5587055
+      },
+      {
+        "posicao": 10,
+        "clube": "Corinthians",
+        "pontos_medios": 52.7346835,
+        "vitorias_medias": 13.3889215,
+        "saldo_medio": 2.778443,
+        "gols_pro_medios": 42.147442,
+        "posicao_media_simulada": 9.7014405
+      },
+      {
+        "posicao": 11,
+        "clube": "São Paulo",
+        "pontos_medios": 51.8433525,
+        "vitorias_medias": 14.043879,
+        "saldo_medio": 3.682117,
+        "gols_pro_medios": 47.550828,
+        "posicao_media_simulada": 9.9864375
+      },
+      {
+        "posicao": 12,
+        "clube": "Mirassol",
+        "pontos_medios": 47.7228585,
+        "vitorias_medias": 12.669138,
+        "saldo_medio": -3.8919165,
+        "gols_pro_medios": 45.445778,
+        "posicao_media_simulada": 12.6484405
+      },
+      {
+        "posicao": 13,
+        "clube": "Coritiba",
+        "pontos_medios": 47.5674205,
+        "vitorias_medias": 12.4349795,
+        "saldo_medio": -7.1419505,
+        "gols_pro_medios": 44.860626,
+        "posicao_media_simulada": 12.9043135
+      },
+      {
+        "posicao": 14,
+        "clube": "Vitória",
+        "pontos_medios": 45.301077,
+        "vitorias_medias": 11.9386885,
+        "saldo_medio": -14.7159365,
+        "gols_pro_medios": 39.344984,
+        "posicao_media_simulada": 14.279959
+      },
+      {
+        "posicao": 15,
+        "clube": "Grêmio",
+        "pontos_medios": 45.1900325,
+        "vitorias_medias": 11.1988735,
+        "saldo_medio": -6.218793,
+        "gols_pro_medios": 43.8096045,
+        "posicao_media_simulada": 14.3641255
+      },
+      {
+        "posicao": 16,
+        "clube": "Internacional",
+        "pontos_medios": 44.0625975,
+        "vitorias_medias": 10.901432,
+        "saldo_medio": -5.886133,
+        "gols_pro_medios": 43.443083,
+        "posicao_media_simulada": 14.9727035
+      },
+      {
+        "posicao": 17,
+        "clube": "Santos",
+        "pontos_medios": 42.6420845,
+        "vitorias_medias": 10.376971,
+        "saldo_medio": -10.0332505,
+        "gols_pro_medios": 50.1708735,
+        "posicao_media_simulada": 15.7435215
+      },
+      {
+        "posicao": 18,
+        "clube": "Vasco da Gama",
+        "pontos_medios": 41.602795,
+        "vitorias_medias": 10.435166,
+        "saldo_medio": -14.6110315,
+        "gols_pro_medios": 44.2394765,
+        "posicao_media_simulada": 16.2399085
+      },
+      {
+        "posicao": 19,
+        "clube": "Remo",
+        "pontos_medios": 40.5328685,
+        "vitorias_medias": 10.1420005,
+        "saldo_medio": -15.9136215,
+        "gols_pro_medios": 43.784334,
+        "posicao_media_simulada": 16.750794
+      },
+      {
+        "posicao": 20,
+        "clube": "Chapecoense",
+        "pontos_medios": 24.3785945,
+        "vitorias_medias": 4.4919385,
+        "saldo_medio": -39.2772105,
+        "gols_pro_medios": 35.883417,
+        "posicao_media_simulada": 19.9670205
+      }
+    ]
   },
   "destaques": {
     "maior_chance_titulo": {
@@ -214,8 +408,16 @@
         }
       },
       "posicao_projetada": 1,
+      "posicao_classificacao_projetada": 1,
       "posicao_projetada_media": 1.2375,
       "posicao_projetada_mediana": 1,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 79.7873155,
+        "vitorias_medias": 23.6106385,
+        "saldo_medio": 36.3356705,
+        "gols_pro_medios": 67.1198865,
+        "posicao_media_simulada": 1.2374715
+      },
       "faixa_posicao_80": {
         "melhor": 1,
         "pior": 2,
@@ -563,8 +765,16 @@
         }
       },
       "posicao_projetada": 2,
+      "posicao_classificacao_projetada": 2,
       "posicao_projetada_media": 1.9146,
       "posicao_projetada_mediana": 2,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 73.960549,
+        "vitorias_medias": 21.3132775,
+        "saldo_medio": 34.826263,
+        "gols_pro_medios": 69.4032795,
+        "posicao_media_simulada": 1.914556
+      },
       "faixa_posicao_80": {
         "melhor": 1,
         "pior": 2,
@@ -911,9 +1121,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 5,
+      "posicao_projetada": 3,
+      "posicao_classificacao_projetada": 3,
       "posicao_projetada_media": 4.5736,
       "posicao_projetada_mediana": 4,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 61.95208,
+        "vitorias_medias": 17.7500075,
+        "saldo_medio": 11.484386,
+        "gols_pro_medios": 48.3529805,
+        "posicao_media_simulada": 4.573554
+      },
       "faixa_posicao_80": {
         "melhor": 3,
         "pior": 8,
@@ -1260,9 +1478,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 6,
+      "posicao_projetada": 4,
+      "posicao_classificacao_projetada": 4,
       "posicao_projetada_media": 5.9112,
       "posicao_projetada_mediana": 5,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 58.9350225,
+        "vitorias_medias": 16.5261505,
+        "saldo_medio": 9.9353235,
+        "gols_pro_medios": 62.1750565,
+        "posicao_media_simulada": 5.9111935
+      },
       "faixa_posicao_80": {
         "melhor": 3,
         "pior": 10,
@@ -1609,9 +1835,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 6,
+      "posicao_projetada": 5,
+      "posicao_classificacao_projetada": 5,
       "posicao_projetada_media": 6.2875,
       "posicao_projetada_mediana": 6,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 58.4815525,
+        "vitorias_medias": 15.6308735,
+        "saldo_medio": 6.904905,
+        "gols_pro_medios": 50.6718585,
+        "posicao_media_simulada": 6.2874745
+      },
       "faixa_posicao_80": {
         "melhor": 3,
         "pior": 10,
@@ -1958,9 +2192,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 8,
+      "posicao_projetada": 7,
+      "posicao_classificacao_projetada": 7,
       "posicao_projetada_media": 7.7604,
       "posicao_projetada_mediana": 7,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 55.3822405,
+        "vitorias_medias": 15.5772485,
+        "saldo_medio": 5.5865625,
+        "gols_pro_medios": 47.87001,
+        "posicao_media_simulada": 7.760394
+      },
       "faixa_posicao_80": {
         "melhor": 4,
         "pior": 12,
@@ -2307,9 +2549,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 8,
+      "posicao_projetada": 6,
+      "posicao_classificacao_projetada": 6,
       "posicao_projetada_media": 7.8913,
       "posicao_projetada_mediana": 8,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 55.6637395,
+        "vitorias_medias": 14.4465295,
+        "saldo_medio": 4.503108,
+        "gols_pro_medios": 50.9618865,
+        "posicao_media_simulada": 7.891285
+      },
       "faixa_posicao_80": {
         "melhor": 4,
         "pior": 12,
@@ -2657,8 +2907,16 @@
         }
       },
       "posicao_projetada": 8,
+      "posicao_classificacao_projetada": 8,
       "posicao_projetada_media": 8.3067,
       "posicao_projetada_mediana": 8,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 54.8907065,
+        "vitorias_medias": 14.711476,
+        "saldo_medio": -0.475674,
+        "gols_pro_medios": 47.535236,
+        "posicao_media_simulada": 8.3067015
+      },
       "faixa_posicao_80": {
         "melhor": 4,
         "pior": 13,
@@ -3006,8 +3264,16 @@
         }
       },
       "posicao_projetada": 9,
+      "posicao_classificacao_projetada": 9,
       "posicao_projetada_media": 8.5587,
       "posicao_projetada_mediana": 8,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 54.1020455,
+        "vitorias_medias": 15.1454265,
+        "saldo_medio": 2.128739,
+        "gols_pro_medios": 47.979687,
+        "posicao_media_simulada": 8.5587055
+      },
       "faixa_posicao_80": {
         "melhor": 4,
         "pior": 13,
@@ -3354,9 +3620,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 10,
+      "posicao_projetada": 11,
+      "posicao_classificacao_projetada": 11,
       "posicao_projetada_media": 9.9864,
       "posicao_projetada_mediana": 10,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 51.8433525,
+        "vitorias_medias": 14.043879,
+        "saldo_medio": 3.682117,
+        "gols_pro_medios": 47.550828,
+        "posicao_media_simulada": 9.9864375
+      },
       "faixa_posicao_80": {
         "melhor": 5,
         "pior": 15,
@@ -3704,8 +3978,16 @@
         }
       },
       "posicao_projetada": 10,
+      "posicao_classificacao_projetada": 10,
       "posicao_projetada_media": 9.7014,
       "posicao_projetada_mediana": 10,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 52.7346835,
+        "vitorias_medias": 13.3889215,
+        "saldo_medio": 2.778443,
+        "gols_pro_medios": 42.147442,
+        "posicao_media_simulada": 9.7014405
+      },
       "faixa_posicao_80": {
         "melhor": 5,
         "pior": 14,
@@ -4052,9 +4334,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 13,
+      "posicao_projetada": 12,
+      "posicao_classificacao_projetada": 12,
       "posicao_projetada_media": 12.6484,
       "posicao_projetada_mediana": 13,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 47.7228585,
+        "vitorias_medias": 12.669138,
+        "saldo_medio": -3.8919165,
+        "gols_pro_medios": 45.445778,
+        "posicao_media_simulada": 12.6484405
+      },
       "faixa_posicao_80": {
         "melhor": 8,
         "pior": 17,
@@ -4402,8 +4692,16 @@
         }
       },
       "posicao_projetada": 13,
+      "posicao_classificacao_projetada": 13,
       "posicao_projetada_media": 12.9043,
       "posicao_projetada_mediana": 13,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 47.5674205,
+        "vitorias_medias": 12.4349795,
+        "saldo_medio": -7.1419505,
+        "gols_pro_medios": 44.860626,
+        "posicao_media_simulada": 12.9043135
+      },
       "faixa_posicao_80": {
         "melhor": 8,
         "pior": 17,
@@ -4750,9 +5048,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 14,
+      "posicao_projetada": 15,
+      "posicao_classificacao_projetada": 15,
       "posicao_projetada_media": 14.3641,
       "posicao_projetada_mediana": 15,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 45.1900325,
+        "vitorias_medias": 11.1988735,
+        "saldo_medio": -6.218793,
+        "gols_pro_medios": 43.8096045,
+        "posicao_media_simulada": 14.3641255
+      },
       "faixa_posicao_80": {
         "melhor": 10,
         "pior": 18,
@@ -5100,8 +5406,16 @@
         }
       },
       "posicao_projetada": 14,
+      "posicao_classificacao_projetada": 14,
       "posicao_projetada_media": 14.28,
       "posicao_projetada_mediana": 15,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 45.301077,
+        "vitorias_medias": 11.9386885,
+        "saldo_medio": -14.7159365,
+        "gols_pro_medios": 39.344984,
+        "posicao_media_simulada": 14.279959
+      },
       "faixa_posicao_80": {
         "melhor": 10,
         "pior": 18,
@@ -5448,9 +5762,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 15,
+      "posicao_projetada": 16,
+      "posicao_classificacao_projetada": 16,
       "posicao_projetada_media": 14.9727,
       "posicao_projetada_mediana": 15,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 44.0625975,
+        "vitorias_medias": 10.901432,
+        "saldo_medio": -5.886133,
+        "gols_pro_medios": 43.443083,
+        "posicao_media_simulada": 14.9727035
+      },
       "faixa_posicao_80": {
         "melhor": 11,
         "pior": 19,
@@ -5797,9 +6119,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 16,
+      "posicao_projetada": 17,
+      "posicao_classificacao_projetada": 17,
       "posicao_projetada_media": 15.7435,
       "posicao_projetada_mediana": 16,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 42.6420845,
+        "vitorias_medias": 10.376971,
+        "saldo_medio": -10.0332505,
+        "gols_pro_medios": 50.1708735,
+        "posicao_media_simulada": 15.7435215
+      },
       "faixa_posicao_80": {
         "melhor": 12,
         "pior": 19,
@@ -6146,9 +6476,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 16,
+      "posicao_projetada": 18,
+      "posicao_classificacao_projetada": 18,
       "posicao_projetada_media": 16.2399,
       "posicao_projetada_mediana": 17,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 41.602795,
+        "vitorias_medias": 10.435166,
+        "saldo_medio": -14.6110315,
+        "gols_pro_medios": 44.2394765,
+        "posicao_media_simulada": 16.2399085
+      },
       "faixa_posicao_80": {
         "melhor": 12,
         "pior": 19,
@@ -6495,9 +6833,17 @@
           "limite_superior_95_regra_dos_tres_pct": null
         }
       },
-      "posicao_projetada": 17,
+      "posicao_projetada": 19,
+      "posicao_classificacao_projetada": 19,
       "posicao_projetada_media": 16.7508,
       "posicao_projetada_mediana": 17,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 40.5328685,
+        "vitorias_medias": 10.1420005,
+        "saldo_medio": -15.9136215,
+        "gols_pro_medios": 43.784334,
+        "posicao_media_simulada": 16.750794
+      },
       "faixa_posicao_80": {
         "melhor": 13,
         "pior": 19,
@@ -6845,8 +7191,16 @@
         }
       },
       "posicao_projetada": 20,
+      "posicao_classificacao_projetada": 20,
       "posicao_projetada_media": 19.967,
       "posicao_projetada_mediana": 20,
+      "classificacao_projetada_criterios": {
+        "pontos_medios": 24.3785945,
+        "vitorias_medias": 4.4919385,
+        "saldo_medio": -39.2772105,
+        "gols_pro_medios": 35.883417,
+        "posicao_media_simulada": 19.9670205
+      },
       "faixa_posicao_80": {
         "melhor": 20,
         "pior": 20,
@@ -7077,7 +7431,7 @@
     ],
     "decomposicao_exclusiva_por_via": true,
     "limiar_exibicao_percentual": 0.001,
-    "hash_snapshots": "6a37fa05aaa79bc66b7676cf937a89f03d970c65fd4ea7f28fc20867807cf317"
+    "hash_snapshots": "f95806c25b8e3102ea3fa08eba2b7be87ff714443731f03f8972f9b63697923f"
   },
   "total_previsoes_partidas": 175,
   "partidas_restantes": [
