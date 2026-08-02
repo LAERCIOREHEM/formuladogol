@@ -23,6 +23,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 
 FUSO_BR = timezone(timedelta(hours=-3))
@@ -519,14 +520,29 @@ def valor_estatistica(valor: Any) -> str:
     return texto
 
 
+def youtube_video_id(valor: str) -> str:
+    bruto = str(valor or "").strip()
+    if re.fullmatch(r"[A-Za-z0-9_-]{6,20}", bruto):
+        return bruto
+    try:
+        url = urlparse(bruto)
+    except ValueError:
+        return ""
+    host = (url.hostname or "").lower().removeprefix("www.")
+    video_id = ""
+    if host == "youtu.be":
+        video_id = next(iter(filter(None, url.path.split("/"))), "")
+    elif host == "youtube.com" or host.endswith(".youtube.com"):
+        video_id = (parse_qs(url.query).get("v") or [""])[0]
+        partes = [parte for parte in url.path.split("/") if parte]
+        if not video_id and len(partes) >= 2 and partes[0] in {"embed", "shorts", "live"}:
+            video_id = partes[1]
+    return video_id if re.fullmatch(r"[A-Za-z0-9_-]{6,20}", video_id) else ""
+
+
 def renderizar_jogo(jogo: dict[str, Any]) -> str:
     video = jogo.get("melhores_momentos") or {}
     detalhes = jogo.get("detalhes") or {}
-    acoes = [f'<a href="../resultados">Placar e resumo</a>']
-    if video.get("url"):
-        acoes.append(
-            f'<a class="analysis-video" href="{esc(video["url"])}" target="_blank" rel="noopener noreferrer">▶ Melhores momentos</a>'
-        )
     meta = []
     if detalhes.get("estadio"):
         meta.append(f'<span>📍 {esc(detalhes["estadio"])}</span>')
@@ -536,8 +552,10 @@ def renderizar_jogo(jogo: dict[str, Any]) -> str:
     if isinstance(publico, (int, float)) and publico > 0:
         meta.append(f'<span>Público: {int(publico):,}</span>'.replace(",", "."))
     estatisticas = detalhes.get("estatisticas") or []
-    expansivel = ""
+    painel_estatisticas = ""
+    botao_estatisticas = ""
     if estatisticas or meta:
+        identificador = "stats-" + re.sub(r"[^A-Za-z0-9_-]", "-", str(jogo.get("event_id") or "jogo"))
         linhas = "".join(
             f'<tr><td>{esc(valor_estatistica(item.get("mandante")))}</td><th scope="row">{esc(item.get("nome"))}</th><td>{esc(valor_estatistica(item.get("visitante")))}</td></tr>'
             for item in estatisticas
@@ -547,12 +565,21 @@ def renderizar_jogo(jogo: dict[str, Any]) -> str:
             tabela = f'''<div class="analysis-game-stats-wrap"><table class="analysis-game-stats">
               <thead><tr><th>{esc(jogo['mandante'])}</th><th>Estatística</th><th>{esc(jogo['visitante'])}</th></tr></thead>
               <tbody>{linhas}</tbody></table></div>'''
-        expansivel = f'''<details class="analysis-game-details"><summary>Estatísticas do jogo</summary>
-          <div class="analysis-game-meta">{''.join(meta)}</div>{tabela}</details>'''
+        botao_estatisticas = f'<button type="button" class="analysis-stats-toggle" aria-expanded="false" aria-controls="{esc(identificador)}">▸ Estatísticas do jogo</button>'
+        painel_estatisticas = f'''<div class="analysis-game-details" id="{esc(identificador)}" hidden>
+          <div class="analysis-game-meta">{''.join(meta)}</div>{tabela}</div>'''
+    botao_video = ""
+    video_id = youtube_video_id(video.get("url") or "")
+    if video_id:
+        botao_video = (
+            f'<button type="button" class="analysis-video" data-video-id="{esc(video_id)}" '
+            f'data-video-title="{esc(video.get("titulo") or jogo["linha"])}" '
+            f'data-video-source="{esc(video.get("fonte") or "YouTube")}">▶ Melhores momentos</button>'
+        )
     return f'''<article class="analysis-game-card">
-      <h3><a href="../resultados">{esc(jogo['linha'])}</a></h3>
-      <div class="analysis-game-actions">{''.join(acoes)}</div>
-      {expansivel}
+      <h3>{esc(jogo['linha'])}</h3>
+      <div class="analysis-game-actions">{botao_estatisticas}{botao_video}</div>
+      {painel_estatisticas}
     </article>'''
 
 
@@ -601,7 +628,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-titulos-editoriais-v4">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-video-incorporado-v5">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');</script>
   <script type="application/ld+json">{json_ld}</script>
@@ -678,6 +705,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
     {rodape('../')}
   </div>
   <script src="../js/br-menu.js?v=20260724-status-dot-v2"></script>
+  <script src="../js/br-analises.js?v=20260802-video-incorporado-v1"></script>
 </body>
 </html>'''.replace(f"{dossie['simulacoes']:,}", f"{dossie['simulacoes']:,}".replace(",", "."))
     metadados = {"rodada": rodada, "slug": slug_rodada(rodada), "url": url, "titulo": titulo, "linha_fina": linha_fina, "publicado_em": publicado, "modificado_em": modificado, "jogos_concluidos": dossie["estado"]["jogos_concluidos"], "jogos_pendentes": dossie["estado"]["jogos_pendentes"], "hash_dossie": hashlib.sha256(json.dumps(dossie, ensure_ascii=False, sort_keys=True).encode()).hexdigest()}
@@ -813,6 +841,9 @@ def self_test() -> int:
     assert percentual(77.5218) == "77,5%"
     assert percentual(99.9806) == ">99,9%"
     assert percentual(100) == "100%"
+    assert youtube_video_id("https://www.youtube.com/watch?v=JDF3vatmswE") == "JDF3vatmswE"
+    assert youtube_video_id("https://youtu.be/JDF3vatmswE") == "JDF3vatmswE"
+    assert youtube_video_id("https://example.com/watch?v=JDF3vatmswE") == ""
     assert variacao(0) == "0 p.p."
     assert variacao(0.00045) == "↑ <0,001 p.p."
     assert variacao(-0.00005) == "↓ <0,001 p.p."
@@ -832,13 +863,17 @@ def self_test() -> int:
     validar_editorial(editorial, dossie)
     pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00", carregar_manifesto().get("artigos") or [])
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
-    assert "br-analises.css?v=20260802-titulos-editoriais-v4" in pagina
+    assert "br-analises.css?v=20260802-video-incorporado-v5" in pagina
+    assert "br-analises.js?v=20260802-video-incorporado-v1" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
     assert "0,007%</td><td>0,006%</td><td class=\"delta delta-down\">-0,001 p.p.</td>" in pagina
     assert "99,96%" not in pagina and "&gt;99,9%" in pagina
     assert "Padrão dos percentuais" in pagina and "analysis-round-nav" in pagina
-    assert pagina.count("▶ Melhores momentos") == 10
-    assert pagina.count("Estatísticas do jogo") == 10
+    assert pagina.count('class="analysis-video"') == 10
+    assert pagina.count('class="analysis-stats-toggle"') == 10
+    assert pagina.count('class="analysis-game-details"') == 10
+    assert "Placar e resumo" not in pagina and 'target="_blank"' not in pagina
+    assert '<h3><a href="../resultados">' not in pagina
     assert meta["jogos_concluidos"] == 10
     hub = gerar_hub(carregar_manifesto().get("artigos") or [])
     assert '<h1 class="analysis-page-title">Análises do Brasileirão 2026</h1>' in hub
