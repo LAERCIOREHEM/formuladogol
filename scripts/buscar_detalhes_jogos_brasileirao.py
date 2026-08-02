@@ -3,7 +3,7 @@
 """
 buscar_detalhes_jogos_brasileirao.py
 
-Busca o summary da ESPN para cada jogo finalizado do Brasileirão e gera:
+Busca incrementalmente o summary da ESPN para jogos finalizados do Brasileirão e gera:
   - dados-br/jogos-detalhes.json
   - dados-br/auditoria-jogos-detalhes.json
 
@@ -1267,6 +1267,54 @@ def jogo_finalizado(jogo: dict[str, Any]) -> bool:
     return True
 
 
+def _data_jogo(jogo: dict[str, Any]) -> datetime | None:
+    raw = str(jogo.get("data_iso") or "").strip()
+    if not raw:
+        return None
+    try:
+        value = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return value.replace(tzinfo=FUSO_BRASILIA) if value.tzinfo is None else value.astimezone(FUSO_BRASILIA)
+
+
+def registro_pode_usar_cache(
+    jogo: dict[str, Any],
+    antigo: dict[str, Any] | None,
+    event_id_fonte: str,
+    refresh_hours: float,
+    *,
+    agora: datetime | None = None,
+) -> bool:
+    """Evita baixar novamente summaries finais já íntegros e estabilizados.
+
+    Jogos recentes continuam sendo consultados por uma janela curta porque a
+    ESPN pode completar público, cartões e escalações depois do apito final.
+    Correção de placar, troca do ID-fonte, falta de estatísticas ou auditoria
+    incompleta invalidam o cache imediatamente.
+    """
+    if not isinstance(antigo, dict):
+        return False
+    if str(antigo.get("event_id_fonte_detalhes") or antigo.get("event_id") or "") != str(event_id_fonte):
+        return False
+    if antigo.get("placar_mandante") != jogo.get("placar_mandante") or antigo.get("placar_visitante") != jogo.get("placar_visitante"):
+        return False
+    if str(antigo.get("mandante") or "") != str((jogo.get("mandante") or {}).get("nome") or ""):
+        return False
+    if str(antigo.get("visitante") or "") != str((jogo.get("visitante") or {}).get("nome") or ""):
+        return False
+    if not list(antigo.get("stats") or antigo.get("estatisticas") or []):
+        return False
+    validation = antigo.get("validacao_eventos") or {}
+    if validation.get("ok") is not True or validation.get("pendente_detalhes") is True:
+        return False
+    played_at = _data_jogo(jogo)
+    now = agora or datetime.now(FUSO_BRASILIA)
+    if refresh_hours > 0 and played_at is not None and now - played_at < timedelta(hours=refresh_hours):
+        return False
+    return True
+
+
 def montar_registro(
     event_id: str,
     jogo: dict[str, Any],
@@ -1428,6 +1476,23 @@ def self_test() -> None:
     assert _ajustar_validacao_manual_sem_eventos(
         manual, validar_eventos(manual, [], gols, []), gols, [], "não deve mascarar evento parcial"
     ).get("pendente_detalhes") is not True
+    cache_game = {
+        "data_iso": "2026-07-01T20:00:00-03:00",
+        "mandante": {"nome": "Flamengo"}, "visitante": {"nome": "Palmeiras"},
+        "placar_mandante": 1, "placar_visitante": 0,
+    }
+    cache_record = {
+        "event_id": "123", "event_id_fonte_detalhes": "123",
+        "mandante": "Flamengo", "visitante": "Palmeiras",
+        "placar_mandante": 1, "placar_visitante": 0,
+        "stats": [{"nome": "Posse", "home": "60%", "away": "40%"}],
+        "validacao_eventos": {"ok": True},
+    }
+    test_now = datetime(2026, 7, 4, 20, 0, tzinfo=FUSO_BRASILIA)
+    assert registro_pode_usar_cache(cache_game, cache_record, "123", 48, agora=test_now)
+    assert not registro_pode_usar_cache({**cache_game, "placar_mandante": 2}, cache_record, "123", 48, agora=test_now)
+    assert not registro_pode_usar_cache(cache_game, cache_record, "999", 48, agora=test_now)
+    assert not registro_pode_usar_cache(cache_game, {**cache_record, "stats": []}, "123", 48, agora=test_now)
     mapa_ids = carregar_event_ids_detalhes()
     if RESULTADOS_MANUAIS.exists():
         assert mapa_ids.get("401840998") == "401879459", mapa_ids
@@ -1499,6 +1564,11 @@ def main() -> None:
     parser.add_argument("--reparar-local", action="store_true", help="Sanitiza o JSON atual sem acessar a rede.")
     parser.add_argument("--max-jogos", type=int, default=0, help="Limite opcional de jogos processados nesta execução.")
     parser.add_argument("--sleep", type=float, default=0.08, help="Pausa entre chamadas ESPN.")
+    parser.add_argument(
+        "--refresh-hours", type=float, default=48.0,
+        help="Reconsulta jogos íntegros somente durante esta janela após o início; use 0 para cache imediato.",
+    )
+    parser.add_argument("--force-refresh", action="store_true", help="Ignora o cache incremental e reconsulta todos os jogos.")
     args = parser.parse_args()
 
     if args.self_test:
@@ -1535,6 +1605,16 @@ def main() -> None:
         sufixo_fonte = f" · detalhes ESPN {event_id_fonte}" if event_id_fonte != event_id else ""
         label = f"R{jogo.get('rodada')} · {(jogo.get('mandante') or {}).get('nome')} x {(jogo.get('visitante') or {}).get('nome')} · {event_id}{sufixo_fonte}"
         antigo = jogos_anteriores.get(event_id) if isinstance(jogos_anteriores, dict) else None
+
+        if not args.force_refresh and registro_pode_usar_cache(jogo, antigo, event_id_fonte, args.refresh_hours):
+            cached = dict(antigo)
+            manual_publico, manual_fonte, manual_tipo = publico_complementar(event_id, publicos_complementares)
+            if cached.get("publico") in (None, "", 0, "0") and manual_publico is not None:
+                cached.update(publico=manual_publico, publico_fonte=manual_fonte, publico_tipo=manual_tipo)
+            jogos_saida[event_id] = cached
+            preservados += 1
+            print(f"[{i:03d}/{len(resultados):03d}] CACHE {label}: summary final íntegro preservado")
+            continue
 
         if args.reparar_local:
             stats = list((antigo or {}).get("stats") or (antigo or {}).get("estatisticas") or [])

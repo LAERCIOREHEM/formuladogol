@@ -748,22 +748,29 @@ def display_probability(
     threshold_pct: float,
     *,
     structurally_possible: bool = True,
+    structurally_certain: bool = False,
     impossibility_reason: str | None = None,
 ) -> dict[str, Any]:
     pct = 100.0 * count / simulations
     zero_observed = count == 0
     if not structurally_possible:
-        display = "0,000%"
+        display = "0%"
     elif pct < threshold_pct:
         display = f"<{threshold_pct:.3f}%".replace(".", ",")
+    elif count == simulations and structurally_certain:
+        display = "100%"
     elif count == simulations:
-        display = "100,000%"
+        display = f">{100.0 - threshold_pct:.3f}%".replace(".", ",")
     elif pct > 100.0 - threshold_pct:
         display = f">{100.0 - threshold_pct:.3f}%".replace(".", ",")
     else:
-        # Uma única escala visual em toda a aplicação. Três casas preservam
-        # eventos raros sem transformar 99,95% ou 99,997% em falsa certeza.
-        display = f"{pct:.3f}%".replace(".", ",")
+        # Precisão adaptativa: leitura limpa nas chances comuns e casas extras
+        # apenas quando elas carregam informação. Perto de 100%, aumenta a
+        # precisão até impedir que o arredondamento comunique certeza falsa.
+        digits = 3 if pct < 0.1 else 2 if pct < 1.0 else 1
+        while digits < 3 and round(pct, digits) >= 100.0:
+            digits += 1
+        display = f"{pct:.{digits}f}%".replace(".", ",")
     upper_95 = 100.0 * (3.0 / simulations) if zero_observed and structurally_possible else None
     return {
         "ocorrencias": int(count),
@@ -773,6 +780,7 @@ def display_probability(
         "zero_observado": zero_observed,
         "possivel_estruturalmente": bool(structurally_possible),
         "impossivel_estruturalmente": not bool(structurally_possible),
+        "certeza_estrutural": bool(structurally_certain),
         "motivo_impossibilidade": impossibility_reason if not structurally_possible else None,
         "limite_superior_95_regra_dos_tres_pct": round(upper_95, 8) if upper_95 is not None else None,
     }
@@ -1270,13 +1278,14 @@ def self_test() -> None:
     assert zero["limite_superior_95_regra_dos_tres_pct"] == 0.00015
     assert display_probability(20, 2_000_000, 0.001)["exibicao"] == "0,001%"
     assert display_probability(128, 2_000_000, 0.001)["exibicao"] == "0,006%"
-    assert display_probability(9_720, 2_000_000, 0.001)["exibicao"] == "0,486%"
-    assert display_probability(149_200, 2_000_000, 0.001)["exibicao"] == "7,460%"
+    assert display_probability(9_720, 2_000_000, 0.001)["exibicao"] == "0,49%"
+    assert display_probability(149_200, 2_000_000, 0.001)["exibicao"] == "7,5%"
     assert display_probability(1_999_949, 2_000_000, 0.001)["exibicao"] == "99,997%"
     assert display_probability(1_999_999, 2_000_000, 0.001)["exibicao"] == ">99,999%"
-    assert display_probability(2_000_000, 2_000_000, 0.001)["exibicao"] == "100,000%"
+    assert display_probability(2_000_000, 2_000_000, 0.001)["exibicao"] == ">99,999%"
+    assert display_probability(2_000_000, 2_000_000, 0.001, structurally_certain=True)["exibicao"] == "100%"
     impossible = display_probability(0, 2_000_000, 0.001, structurally_possible=False, impossibility_reason="eliminado")
-    assert impossible["exibicao"] == "0,000%"
+    assert impossible["exibicao"] == "0%"
     assert impossible["impossivel_estruturalmente"] is True
     assert impossible["limite_superior_95_regra_dos_tres_pct"] is None
 

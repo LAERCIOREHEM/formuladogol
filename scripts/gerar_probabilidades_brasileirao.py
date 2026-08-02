@@ -1798,6 +1798,23 @@ def assess_publication_freshness(
             reasons.append(f"pontuação atual publicada diverge para {team}")
         if int(row.get("jogos_atuais") or 0) != int(state.played[index]):
             reasons.append(f"quantidade de jogos publicada diverge para {team}")
+        probabilities = row.get("probabilidades_pct") or {}
+        details = row.get("probabilidades_detalhes") or {}
+        decomposition = row.get("decomposicao_chances") or {}
+        required_destinations = ("libertadores", "sul_americana", "sem_competicao_continental")
+        missing = [field for field in required_destinations if field not in probabilities]
+        if missing:
+            reasons.append(
+                f"publicação continental incompleta para {team}: " + ", ".join(missing)
+            )
+            continue
+        if any(field not in details for field in required_destinations):
+            reasons.append(f"detalhamento continental incompleto para {team}")
+        if any(field not in decomposition for field in required_destinations):
+            reasons.append(f"decomposição continental incompleta para {team}")
+        destination_total = sum(float(probabilities[field]) for field in required_destinations)
+        if abs(destination_total - 100.0) > 0.000001:
+            reasons.append(f"destinos continentais publicados não fecham 100% para {team}")
 
     return {
         "atualizado": not reasons,
@@ -1991,6 +2008,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     continental_hash = continental_snapshots_state_hash(continental_snapshots)
     input_hash = canonical_hash_payload({"brasileirao": input_hash, "competicoes": continental_hash})
     generated_at = reference.replace(microsecond=0).isoformat()
+    calculated_at = datetime.now(BRT).replace(microsecond=0).isoformat()
     model_version = str(config.get("versao_modelo") or "AF-Previsão 1.0")
 
     points_thresholds = build_points_thresholds(
@@ -2098,6 +2116,8 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         "versao_modelo": model_version,
         "temporada": 2026,
         "gerado_em": generated_at,
+        "referencia_esportiva_em": generated_at,
+        "calculado_em": calculated_at,
         "fonte_resultados_calendario": "ESPN",
         "status": "ok",
         "hash_entrada": input_hash,
@@ -2166,6 +2186,8 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         "versao_modelo": model_version,
         "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
         "gerado_em": generated_at,
+        "referencia_esportiva_em": generated_at,
+        "calculado_em": calculated_at,
         "status": "ok",
         "hash_entrada": input_hash,
         "responsavel": config.get("responsavel"),

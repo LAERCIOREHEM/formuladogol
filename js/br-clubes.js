@@ -86,11 +86,13 @@
   function pctCompacto(valor, detalhe=null){
     const n = Number(valor);
     if (!Number.isFinite(n)) return "—";
-    if (detalhe && (detalhe.impossivel_estruturalmente === true || detalhe.possivel_estruturalmente === false)) return "0,000%";
+    if (detalhe && (detalhe.impossivel_estruturalmente === true || detalhe.possivel_estruturalmente === false)) return "0%";
     if (n >= 0 && n < 0.001) return "<0,001%";
-    if (n >= 100) return "100,000%";
+    if (n >= 100) return detalhe && detalhe.certeza_estrutural === true ? "100%" : ">99,999%";
     if (n > 99.999) return ">99,999%";
-    return `${n.toLocaleString("pt-BR", { minimumFractionDigits: 3, maximumFractionDigits: 3 })}%`;
+    let casas = n < 0.1 ? 3 : n < 1 ? 2 : 1;
+    while (casas < 3 && Number(n.toFixed(casas)) >= 100) casas += 1;
+    return `${n.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas })}%`;
   }
   function posicaoProjetada(p){
     const n = Number(p && (p.posicao_projetada ?? p.posicao_projetada_mediana ?? p.posicao_projetada_media));
