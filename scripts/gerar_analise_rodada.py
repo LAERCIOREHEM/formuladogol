@@ -542,7 +542,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-analises-v3">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-titulos-editoriais-v4">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');</script>
   <script type="application/ld+json">{json_ld}</script>
@@ -768,6 +768,7 @@ def self_test() -> int:
     validar_editorial(editorial, dossie)
     pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00", carregar_manifesto().get("artigos") or [])
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
+    assert "br-analises.css?v=20260802-titulos-editoriais-v4" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
     assert "Padrão dos percentuais" in pagina and "analysis-round-nav" in pagina
     assert pagina.count("▶ Melhores momentos") == 10
