@@ -5,10 +5,10 @@
   "temporada": 2026,
   "gerado_em": "2026-07-30T23:27:00-03:00",
   "referencia_esportiva_em": "2026-07-30T23:27:00-03:00",
-  "calculado_em": "2026-08-02T17:14:20-03:00",
+  "calculado_em": "2026-08-02T18:14:12-03:00",
   "fonte_resultados_calendario": "ESPN",
   "status": "ok",
-  "hash_entrada": "0ed3c72aeb194b27699969681ea93c786c5cd4a534f97e37b1a429b8ba4c2405",
+  "hash_entrada": "207ca57d409e54fc7a8c1d224d85219df72660d3944697f7bd2e750e7a72aba2",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -269,11 +269,11 @@
     },
     "maior_chance_libertadores": {
       "clube": "Palmeiras",
-      "probabilidade_pct": 99.9978
+      "probabilidade_pct": 99.99865
     },
     "maior_chance_sul_americana": {
       "clube": "São Paulo",
-      "probabilidade_pct": 58.3918
+      "probabilidade_pct": 58.26845
     },
     "maior_risco_rebaixamento": {
       "clube": "Chapecoense",
@@ -293,8 +293,8 @@
         "libertadores_base": 99.99375,
         "sul_americana_base": 0.00625,
         "rebaixamento": 0.0,
-        "libertadores": 99.9978,
-        "sul_americana": 0.0022,
+        "libertadores": 99.99865,
+        "sul_americana": 0.00135,
         "sem_competicao_continental": 0.0
       },
       "probabilidades_detalhes": {
@@ -371,10 +371,10 @@
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "libertadores": {
-          "ocorrencias": 1999956,
+          "ocorrencias": 1999973,
           "simulacoes": 2000000,
-          "percentual_estimado": 99.9978,
-          "exibicao": "99,998%",
+          "percentual_estimado": 99.99865,
+          "exibicao": "99,999%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -383,10 +383,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 44,
+          "ocorrencias": 27,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.0022,
-          "exibicao": "0,002%",
+          "percentual_estimado": 0.00135,
+          "exibicao": "0,001%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -467,10 +467,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1999956,
+            "ocorrencias": 1999973,
             "simulacoes": 2000000,
-            "percentual_estimado": 99.9978,
-            "exibicao": "99,998%",
+            "percentual_estimado": 99.99865,
+            "exibicao": "99,999%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -492,10 +492,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 27,
+              "ocorrencias": 63,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.00135,
-              "exibicao": "0,001%",
+              "percentual_estimado": 0.00315,
+              "exibicao": "0,003%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -528,10 +528,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 40,
+              "ocorrencias": 21,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.002,
-              "exibicao": "0,002%",
+              "percentual_estimado": 0.00105,
+              "exibicao": "0,001%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -542,10 +542,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 17,
+              "ocorrencias": 38,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.00085,
-              "exibicao": "<0,001%",
+              "percentual_estimado": 0.0019,
+              "exibicao": "0,002%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -554,10 +554,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 7,
+              "ocorrencias": 24,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.00035,
-              "exibicao": "<0,001%",
+              "percentual_estimado": 0.0012,
+              "exibicao": "0,001%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -566,9 +566,9 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 3,
+              "ocorrencias": 1,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.00015,
+              "percentual_estimado": 5e-05,
               "exibicao": "<0,001%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -578,14 +578,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 99.9978
+          "soma_vias_pct": 99.99865
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 44,
+            "ocorrencias": 27,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.0022,
-            "exibicao": "0,002%",
+            "percentual_estimado": 0.00135,
+            "exibicao": "0,001%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -595,10 +595,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 44,
+              "ocorrencias": 27,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.0022,
-              "exibicao": "0,002%",
+              "percentual_estimado": 0.00135,
+              "exibicao": "0,001%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -619,7 +619,7 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             }
           },
-          "soma_vias_pct": 0.0022
+          "soma_vias_pct": 0.00135
         },
         "sem_competicao_continental": {
           "total": {
@@ -650,9 +650,9 @@
         "libertadores_base": 99.6982,
         "sul_americana_base": 0.3013,
         "rebaixamento": 0.0,
-        "libertadores": 99.85105,
-        "sul_americana": 0.1489,
-        "sem_competicao_continental": 5e-05
+        "libertadores": 99.88845,
+        "sul_americana": 0.11145,
+        "sem_competicao_continental": 0.0001
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -728,9 +728,9 @@
           "limite_superior_95_regra_dos_tres_pct": 0.00015
         },
         "libertadores": {
-          "ocorrencias": 1997021,
+          "ocorrencias": 1997769,
           "simulacoes": 2000000,
-          "percentual_estimado": 99.85105,
+          "percentual_estimado": 99.88845,
           "exibicao": "99,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -740,10 +740,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 2978,
+          "ocorrencias": 2229,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.1489,
-          "exibicao": "0,15%",
+          "percentual_estimado": 0.11145,
+          "exibicao": "0,11%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -752,9 +752,9 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1,
+          "ocorrencias": 2,
           "simulacoes": 2000000,
-          "percentual_estimado": 5e-05,
+          "percentual_estimado": 0.0001,
           "exibicao": "<0,001%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -824,9 +824,9 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1997021,
+            "ocorrencias": 1997769,
             "simulacoes": 2000000,
-            "percentual_estimado": 99.85105,
+            "percentual_estimado": 99.88845,
             "exibicao": "99,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -885,10 +885,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 2071,
+              "ocorrencias": 2819,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.10355,
-              "exibicao": "0,10%",
+              "percentual_estimado": 0.14095,
+              "exibicao": "0,14%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -935,14 +935,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 99.85105
+          "soma_vias_pct": 99.88845
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 2978,
+            "ocorrencias": 2229,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.1489,
-            "exibicao": "0,15%",
+            "percentual_estimado": 0.11145,
+            "exibicao": "0,11%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -952,10 +952,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 2971,
+              "ocorrencias": 2223,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.14855,
-              "exibicao": "0,15%",
+              "percentual_estimado": 0.11115,
+              "exibicao": "0,11%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -964,9 +964,9 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 7,
+              "ocorrencias": 6,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.00035,
+              "percentual_estimado": 0.0003,
               "exibicao": "<0,001%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -976,13 +976,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.1489
+          "soma_vias_pct": 0.11145
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1,
+            "ocorrencias": 2,
             "simulacoes": 2000000,
-            "percentual_estimado": 5e-05,
+            "percentual_estimado": 0.0001,
             "exibicao": "<0,001%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -1007,9 +1007,9 @@
         "libertadores_base": 74.68145,
         "sul_americana_base": 24.3887,
         "rebaixamento": 0.0066,
-        "libertadores": 83.6025,
-        "sul_americana": 16.041,
-        "sem_competicao_continental": 0.3565
+        "libertadores": 85.6355,
+        "sul_americana": 14.07875,
+        "sem_competicao_continental": 0.28575
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -1085,10 +1085,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 1672050,
+          "ocorrencias": 1712710,
           "simulacoes": 2000000,
-          "percentual_estimado": 83.6025,
-          "exibicao": "83,6%",
+          "percentual_estimado": 85.6355,
+          "exibicao": "85,6%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1097,10 +1097,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 320820,
+          "ocorrencias": 281575,
           "simulacoes": 2000000,
-          "percentual_estimado": 16.041,
-          "exibicao": "16,0%",
+          "percentual_estimado": 14.07875,
+          "exibicao": "14,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1109,10 +1109,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 7130,
+          "ocorrencias": 5715,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.3565,
-          "exibicao": "0,36%",
+          "percentual_estimado": 0.28575,
+          "exibicao": "0,29%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1181,10 +1181,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1672050,
+            "ocorrencias": 1712710,
             "simulacoes": 2000000,
-            "percentual_estimado": 83.6025,
-            "exibicao": "83,6%",
+            "percentual_estimado": 85.6355,
+            "exibicao": "85,6%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -1206,10 +1206,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 54461,
+              "ocorrencias": 52112,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.72305,
-              "exibicao": "2,7%",
+              "percentual_estimado": 2.6056,
+              "exibicao": "2,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1242,10 +1242,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 123960,
+              "ocorrencias": 166969,
               "simulacoes": 2000000,
-              "percentual_estimado": 6.198,
-              "exibicao": "6,2%",
+              "percentual_estimado": 8.34845,
+              "exibicao": "8,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1256,10 +1256,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 22028,
+              "ocorrencias": 19900,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.1014,
-              "exibicao": "1,1%",
+              "percentual_estimado": 0.995,
+              "exibicao": "0,99%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1268,10 +1268,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 24344,
+              "ocorrencias": 17021,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.2172,
-              "exibicao": "1,2%",
+              "percentual_estimado": 0.85105,
+              "exibicao": "0,85%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1280,10 +1280,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 8089,
+              "ocorrencias": 15191,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.40445,
-              "exibicao": "0,40%",
+              "percentual_estimado": 0.75955,
+              "exibicao": "0,76%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1292,14 +1292,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 83.6025
+          "soma_vias_pct": 85.6355
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 320820,
+            "ocorrencias": 281575,
             "simulacoes": 2000000,
-            "percentual_estimado": 16.041,
-            "exibicao": "16,0%",
+            "percentual_estimado": 14.07875,
+            "exibicao": "14,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -1309,10 +1309,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 311415,
+              "ocorrencias": 270594,
               "simulacoes": 2000000,
-              "percentual_estimado": 15.57075,
-              "exibicao": "15,6%",
+              "percentual_estimado": 13.5297,
+              "exibicao": "13,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1321,10 +1321,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 9405,
+              "ocorrencias": 10981,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.47025,
-              "exibicao": "0,47%",
+              "percentual_estimado": 0.54905,
+              "exibicao": "0,55%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1333,14 +1333,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 16.041
+          "soma_vias_pct": 14.07875
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 7130,
+            "ocorrencias": 5715,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.3565,
-            "exibicao": "0,36%",
+            "percentual_estimado": 0.28575,
+            "exibicao": "0,29%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -1364,9 +1364,9 @@
         "libertadores_base": 53.48945,
         "sul_americana_base": 41.9953,
         "rebaixamento": 0.1303,
-        "libertadores": 66.19785,
-        "sul_americana": 31.61605,
-        "sem_competicao_continental": 2.1861
+        "libertadores": 69.16485,
+        "sul_americana": 28.99985,
+        "sem_competicao_continental": 1.8353
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -1442,10 +1442,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 1323957,
+          "ocorrencias": 1383297,
           "simulacoes": 2000000,
-          "percentual_estimado": 66.19785,
-          "exibicao": "66,2%",
+          "percentual_estimado": 69.16485,
+          "exibicao": "69,2%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1454,10 +1454,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 632321,
+          "ocorrencias": 579997,
           "simulacoes": 2000000,
-          "percentual_estimado": 31.61605,
-          "exibicao": "31,6%",
+          "percentual_estimado": 28.99985,
+          "exibicao": "29,0%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1466,10 +1466,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 43722,
+          "ocorrencias": 36706,
           "simulacoes": 2000000,
-          "percentual_estimado": 2.1861,
-          "exibicao": "2,2%",
+          "percentual_estimado": 1.8353,
+          "exibicao": "1,8%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1538,10 +1538,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1323957,
+            "ocorrencias": 1383297,
             "simulacoes": 2000000,
-            "percentual_estimado": 66.19785,
-            "exibicao": "66,2%",
+            "percentual_estimado": 69.16485,
+            "exibicao": "69,2%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -1599,10 +1599,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 180982,
+              "ocorrencias": 240322,
               "simulacoes": 2000000,
-              "percentual_estimado": 9.0491,
-              "exibicao": "9,0%",
+              "percentual_estimado": 12.0161,
+              "exibicao": "12,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1649,14 +1649,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 66.19785
+          "soma_vias_pct": 69.16485
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 632321,
+            "ocorrencias": 579997,
             "simulacoes": 2000000,
-            "percentual_estimado": 31.61605,
-            "exibicao": "31,6%",
+            "percentual_estimado": 28.99985,
+            "exibicao": "29,0%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -1666,10 +1666,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 592877,
+              "ocorrencias": 533537,
               "simulacoes": 2000000,
-              "percentual_estimado": 29.64385,
-              "exibicao": "29,6%",
+              "percentual_estimado": 26.67685,
+              "exibicao": "26,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1678,10 +1678,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 39444,
+              "ocorrencias": 46460,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.9722,
-              "exibicao": "2,0%",
+              "percentual_estimado": 2.323,
+              "exibicao": "2,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1690,14 +1690,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 31.61605
+          "soma_vias_pct": 28.99985
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 43722,
+            "ocorrencias": 36706,
             "simulacoes": 2000000,
-            "percentual_estimado": 2.1861,
-            "exibicao": "2,2%",
+            "percentual_estimado": 1.8353,
+            "exibicao": "1,8%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -1721,9 +1721,9 @@
         "libertadores_base": 46.6236,
         "sul_americana_base": 48.2219,
         "rebaixamento": 0.11045,
-        "libertadores": 64.0665,
-        "sul_americana": 33.69545,
-        "sem_competicao_continental": 2.23805
+        "libertadores": 67.0262,
+        "sul_americana": 31.1116,
+        "sem_competicao_continental": 1.8622
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -1799,10 +1799,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 1281330,
+          "ocorrencias": 1340524,
           "simulacoes": 2000000,
-          "percentual_estimado": 64.0665,
-          "exibicao": "64,1%",
+          "percentual_estimado": 67.0262,
+          "exibicao": "67,0%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1811,10 +1811,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 673909,
+          "ocorrencias": 622232,
           "simulacoes": 2000000,
-          "percentual_estimado": 33.69545,
-          "exibicao": "33,7%",
+          "percentual_estimado": 31.1116,
+          "exibicao": "31,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1823,10 +1823,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 44761,
+          "ocorrencias": 37244,
           "simulacoes": 2000000,
-          "percentual_estimado": 2.23805,
-          "exibicao": "2,2%",
+          "percentual_estimado": 1.8622,
+          "exibicao": "1,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -1895,10 +1895,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 1281330,
+            "ocorrencias": 1340524,
             "simulacoes": 2000000,
-            "percentual_estimado": 64.0665,
-            "exibicao": "64,1%",
+            "percentual_estimado": 67.0262,
+            "exibicao": "67,0%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -1920,10 +1920,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 150075,
+              "ocorrencias": 143205,
               "simulacoes": 2000000,
-              "percentual_estimado": 7.50375,
-              "exibicao": "7,5%",
+              "percentual_estimado": 7.16025,
+              "exibicao": "7,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1956,10 +1956,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 175467,
+              "ocorrencias": 241531,
               "simulacoes": 2000000,
-              "percentual_estimado": 8.77335,
-              "exibicao": "8,8%",
+              "percentual_estimado": 12.07655,
+              "exibicao": "12,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1970,10 +1970,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 65158,
+              "ocorrencias": 59117,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.2579,
-              "exibicao": "3,3%",
+              "percentual_estimado": 2.95585,
+              "exibicao": "3,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1982,10 +1982,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 64010,
+              "ocorrencias": 44106,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.2005,
-              "exibicao": "3,2%",
+              "percentual_estimado": 2.2053,
+              "exibicao": "2,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -1994,10 +1994,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 20907,
+              "ocorrencias": 39982,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.04535,
-              "exibicao": "1,0%",
+              "percentual_estimado": 1.9991,
+              "exibicao": "2,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2006,14 +2006,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 64.0665
+          "soma_vias_pct": 67.0262
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 673909,
+            "ocorrencias": 622232,
             "simulacoes": 2000000,
-            "percentual_estimado": 33.69545,
-            "exibicao": "33,7%",
+            "percentual_estimado": 31.1116,
+            "exibicao": "31,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2023,10 +2023,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 632167,
+              "ocorrencias": 572475,
               "simulacoes": 2000000,
-              "percentual_estimado": 31.60835,
-              "exibicao": "31,6%",
+              "percentual_estimado": 28.62375,
+              "exibicao": "28,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2035,10 +2035,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 41742,
+              "ocorrencias": 49757,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.0871,
-              "exibicao": "2,1%",
+              "percentual_estimado": 2.48785,
+              "exibicao": "2,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2047,14 +2047,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 33.69545
+          "soma_vias_pct": 31.1116
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 44761,
+            "ocorrencias": 37244,
             "simulacoes": 2000000,
-            "percentual_estimado": 2.23805,
-            "exibicao": "2,2%",
+            "percentual_estimado": 1.8622,
+            "exibicao": "1,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2078,9 +2078,9 @@
         "libertadores_base": 27.7232,
         "sul_americana_base": 58.9259,
         "rebaixamento": 0.58455,
-        "libertadores": 40.59715,
-        "sul_americana": 52.2904,
-        "sem_competicao_continental": 7.11245
+        "libertadores": 43.96695,
+        "sul_americana": 49.8803,
+        "sem_competicao_continental": 6.15275
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -2156,10 +2156,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 811943,
+          "ocorrencias": 879339,
           "simulacoes": 2000000,
-          "percentual_estimado": 40.59715,
-          "exibicao": "40,6%",
+          "percentual_estimado": 43.96695,
+          "exibicao": "44,0%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2168,10 +2168,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1045808,
+          "ocorrencias": 997606,
           "simulacoes": 2000000,
-          "percentual_estimado": 52.2904,
-          "exibicao": "52,3%",
+          "percentual_estimado": 49.8803,
+          "exibicao": "49,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2180,10 +2180,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 142249,
+          "ocorrencias": 123055,
           "simulacoes": 2000000,
-          "percentual_estimado": 7.11245,
-          "exibicao": "7,1%",
+          "percentual_estimado": 6.15275,
+          "exibicao": "6,2%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2252,10 +2252,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 811943,
+            "ocorrencias": 879339,
             "simulacoes": 2000000,
-            "percentual_estimado": 40.59715,
-            "exibicao": "40,6%",
+            "percentual_estimado": 43.96695,
+            "exibicao": "44,0%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2313,10 +2313,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 194684,
+              "ocorrencias": 262080,
               "simulacoes": 2000000,
-              "percentual_estimado": 9.7342,
-              "exibicao": "9,7%",
+              "percentual_estimado": 13.104,
+              "exibicao": "13,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2363,14 +2363,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 40.59715
+          "soma_vias_pct": 43.96695
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1045808,
+            "ocorrencias": 997606,
             "simulacoes": 2000000,
-            "percentual_estimado": 52.2904,
-            "exibicao": "52,3%",
+            "percentual_estimado": 49.8803,
+            "exibicao": "49,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2380,10 +2380,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 932564,
+              "ocorrencias": 865168,
               "simulacoes": 2000000,
-              "percentual_estimado": 46.6282,
-              "exibicao": "46,6%",
+              "percentual_estimado": 43.2584,
+              "exibicao": "43,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2392,10 +2392,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 113244,
+              "ocorrencias": 132438,
               "simulacoes": 2000000,
-              "percentual_estimado": 5.6622,
-              "exibicao": "5,7%",
+              "percentual_estimado": 6.6219,
+              "exibicao": "6,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2404,14 +2404,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 52.2904
+          "soma_vias_pct": 49.8803
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 142249,
+            "ocorrencias": 123055,
             "simulacoes": 2000000,
-            "percentual_estimado": 7.11245,
-            "exibicao": "7,1%",
+            "percentual_estimado": 6.15275,
+            "exibicao": "6,2%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2435,9 +2435,9 @@
         "libertadores_base": 25.88505,
         "sul_americana_base": 60.07885,
         "rebaixamento": 0.6576,
-        "libertadores": 36.36815,
-        "sul_americana": 55.8267,
-        "sem_competicao_continental": 7.80515
+        "libertadores": 39.9257,
+        "sul_americana": 53.29895,
+        "sem_competicao_continental": 6.77535
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -2513,10 +2513,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 727363,
+          "ocorrencias": 798514,
           "simulacoes": 2000000,
-          "percentual_estimado": 36.36815,
-          "exibicao": "36,4%",
+          "percentual_estimado": 39.9257,
+          "exibicao": "39,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2525,10 +2525,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1116534,
+          "ocorrencias": 1065979,
           "simulacoes": 2000000,
-          "percentual_estimado": 55.8267,
-          "exibicao": "55,8%",
+          "percentual_estimado": 53.29895,
+          "exibicao": "53,3%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2537,10 +2537,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 156103,
+          "ocorrencias": 135507,
           "simulacoes": 2000000,
-          "percentual_estimado": 7.80515,
-          "exibicao": "7,8%",
+          "percentual_estimado": 6.77535,
+          "exibicao": "6,8%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2609,10 +2609,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 727363,
+            "ocorrencias": 798514,
             "simulacoes": 2000000,
-            "percentual_estimado": 36.36815,
-            "exibicao": "36,4%",
+            "percentual_estimado": 39.9257,
+            "exibicao": "39,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2670,10 +2670,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 209662,
+              "ocorrencias": 280813,
               "simulacoes": 2000000,
-              "percentual_estimado": 10.4831,
-              "exibicao": "10,5%",
+              "percentual_estimado": 14.04065,
+              "exibicao": "14,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2720,14 +2720,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 36.36815
+          "soma_vias_pct": 39.9257
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1116534,
+            "ocorrencias": 1065979,
             "simulacoes": 2000000,
-            "percentual_estimado": 55.8267,
-            "exibicao": "55,8%",
+            "percentual_estimado": 53.29895,
+            "exibicao": "53,3%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2737,10 +2737,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 991915,
+              "ocorrencias": 920764,
               "simulacoes": 2000000,
-              "percentual_estimado": 49.59575,
-              "exibicao": "49,6%",
+              "percentual_estimado": 46.0382,
+              "exibicao": "46,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2749,10 +2749,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 124619,
+              "ocorrencias": 145215,
               "simulacoes": 2000000,
-              "percentual_estimado": 6.23095,
-              "exibicao": "6,2%",
+              "percentual_estimado": 7.26075,
+              "exibicao": "7,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -2761,14 +2761,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 55.8267
+          "soma_vias_pct": 53.29895
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 156103,
+            "ocorrencias": 135507,
             "simulacoes": 2000000,
-            "percentual_estimado": 7.80515,
-            "exibicao": "7,8%",
+            "percentual_estimado": 6.77535,
+            "exibicao": "6,8%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2792,9 +2792,9 @@
         "libertadores_base": 22.1861,
         "sul_americana_base": 60.4336,
         "rebaixamento": 0.98075,
-        "libertadores": 44.0175,
-        "sul_americana": 47.45245,
-        "sem_competicao_continental": 8.53005
+        "libertadores": 46.42455,
+        "sul_americana": 46.10585,
+        "sem_competicao_continental": 7.4696
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -2870,10 +2870,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 880350,
+          "ocorrencias": 928491,
           "simulacoes": 2000000,
-          "percentual_estimado": 44.0175,
-          "exibicao": "44,0%",
+          "percentual_estimado": 46.42455,
+          "exibicao": "46,4%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2882,10 +2882,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 949049,
+          "ocorrencias": 922117,
           "simulacoes": 2000000,
-          "percentual_estimado": 47.45245,
-          "exibicao": "47,5%",
+          "percentual_estimado": 46.10585,
+          "exibicao": "46,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2894,10 +2894,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 170601,
+          "ocorrencias": 149392,
           "simulacoes": 2000000,
-          "percentual_estimado": 8.53005,
-          "exibicao": "8,5%",
+          "percentual_estimado": 7.4696,
+          "exibicao": "7,5%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -2966,10 +2966,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 880350,
+            "ocorrencias": 928491,
             "simulacoes": 2000000,
-            "percentual_estimado": 44.0175,
-            "exibicao": "44,0%",
+            "percentual_estimado": 46.42455,
+            "exibicao": "46,4%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -2991,10 +2991,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 233663,
+              "ocorrencias": 222483,
               "simulacoes": 2000000,
-              "percentual_estimado": 11.68315,
-              "exibicao": "11,7%",
+              "percentual_estimado": 11.12415,
+              "exibicao": "11,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3027,10 +3027,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 155173,
+              "ocorrencias": 214494,
               "simulacoes": 2000000,
-              "percentual_estimado": 7.75865,
-              "exibicao": "7,8%",
+              "percentual_estimado": 10.7247,
+              "exibicao": "10,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3041,10 +3041,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 99810,
+              "ocorrencias": 90303,
               "simulacoes": 2000000,
-              "percentual_estimado": 4.9905,
-              "exibicao": "5,0%",
+              "percentual_estimado": 4.51515,
+              "exibicao": "4,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3053,10 +3053,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 99652,
+              "ocorrencias": 68431,
               "simulacoes": 2000000,
-              "percentual_estimado": 4.9826,
-              "exibicao": "5,0%",
+              "percentual_estimado": 3.42155,
+              "exibicao": "3,4%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3065,10 +3065,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 34201,
+              "ocorrencias": 63749,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.71005,
-              "exibicao": "1,7%",
+              "percentual_estimado": 3.18745,
+              "exibicao": "3,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3077,14 +3077,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 44.0175
+          "soma_vias_pct": 46.42455
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 949049,
+            "ocorrencias": 922117,
             "simulacoes": 2000000,
-            "percentual_estimado": 47.45245,
-            "exibicao": "47,5%",
+            "percentual_estimado": 46.10585,
+            "exibicao": "46,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3094,10 +3094,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 834751,
+              "ocorrencias": 784791,
               "simulacoes": 2000000,
-              "percentual_estimado": 41.73755,
-              "exibicao": "41,7%",
+              "percentual_estimado": 39.23955,
+              "exibicao": "39,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3106,10 +3106,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 114298,
+              "ocorrencias": 137326,
               "simulacoes": 2000000,
-              "percentual_estimado": 5.7149,
-              "exibicao": "5,7%",
+              "percentual_estimado": 6.8663,
+              "exibicao": "6,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3118,14 +3118,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 47.45245
+          "soma_vias_pct": 46.10585
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 170601,
+            "ocorrencias": 149392,
             "simulacoes": 2000000,
-            "percentual_estimado": 8.53005,
-            "exibicao": "8,5%",
+            "percentual_estimado": 7.4696,
+            "exibicao": "7,5%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3149,9 +3149,9 @@
         "libertadores_base": 20.30635,
         "sul_americana_base": 60.03915,
         "rebaixamento": 1.2588,
-        "libertadores": 34.195,
-        "sul_americana": 54.869,
-        "sem_competicao_continental": 10.936
+        "libertadores": 36.93985,
+        "sul_americana": 53.3998,
+        "sem_competicao_continental": 9.66035
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -3227,10 +3227,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 683900,
+          "ocorrencias": 738797,
           "simulacoes": 2000000,
-          "percentual_estimado": 34.195,
-          "exibicao": "34,2%",
+          "percentual_estimado": 36.93985,
+          "exibicao": "36,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3239,10 +3239,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1097380,
+          "ocorrencias": 1067996,
           "simulacoes": 2000000,
-          "percentual_estimado": 54.869,
-          "exibicao": "54,9%",
+          "percentual_estimado": 53.3998,
+          "exibicao": "53,4%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3251,10 +3251,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 218720,
+          "ocorrencias": 193207,
           "simulacoes": 2000000,
-          "percentual_estimado": 10.936,
-          "exibicao": "10,9%",
+          "percentual_estimado": 9.66035,
+          "exibicao": "9,7%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3323,10 +3323,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 683900,
+            "ocorrencias": 738797,
             "simulacoes": 2000000,
-            "percentual_estimado": 34.195,
-            "exibicao": "34,2%",
+            "percentual_estimado": 36.93985,
+            "exibicao": "36,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3348,10 +3348,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 70515,
+              "ocorrencias": 65614,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.52575,
-              "exibicao": "3,5%",
+              "percentual_estimado": 3.2807,
+              "exibicao": "3,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3384,10 +3384,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 166354,
+              "ocorrencias": 226152,
               "simulacoes": 2000000,
-              "percentual_estimado": 8.3177,
-              "exibicao": "8,3%",
+              "percentual_estimado": 11.3076,
+              "exibicao": "11,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3398,21 +3398,9 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 30252,
+              "ocorrencias": 26167,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.5126,
-              "exibicao": "1,5%",
-              "zero_observado": false,
-              "possivel_estruturalmente": true,
-              "impossivel_estruturalmente": false,
-              "certeza_estrutural": false,
-              "motivo_impossibilidade": null,
-              "limite_superior_95_regra_dos_tres_pct": null
-            },
-            "vice": {
-              "ocorrencias": 26189,
-              "simulacoes": 2000000,
-              "percentual_estimado": 1.30945,
+              "percentual_estimado": 1.30835,
               "exibicao": "1,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -3421,11 +3409,23 @@
               "motivo_impossibilidade": null,
               "limite_superior_95_regra_dos_tres_pct": null
             },
-            "vice_herda_vaga_direta": {
-              "ocorrencias": 14074,
+            "vice": {
+              "ocorrencias": 14693,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.7037,
-              "exibicao": "0,70%",
+              "percentual_estimado": 0.73465,
+              "exibicao": "0,73%",
+              "zero_observado": false,
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false,
+              "certeza_estrutural": false,
+              "motivo_impossibilidade": null,
+              "limite_superior_95_regra_dos_tres_pct": null
+            },
+            "vice_herda_vaga_direta": {
+              "ocorrencias": 24754,
+              "simulacoes": 2000000,
+              "percentual_estimado": 1.2377,
+              "exibicao": "1,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3434,14 +3434,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 34.195
+          "soma_vias_pct": 36.93985
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1097380,
+            "ocorrencias": 1067996,
             "simulacoes": 2000000,
-            "percentual_estimado": 54.869,
-            "exibicao": "54,9%",
+            "percentual_estimado": 53.3998,
+            "exibicao": "53,4%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3451,10 +3451,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 950690,
+              "ocorrencias": 894387,
               "simulacoes": 2000000,
-              "percentual_estimado": 47.5345,
-              "exibicao": "47,5%",
+              "percentual_estimado": 44.71935,
+              "exibicao": "44,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3463,10 +3463,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 146690,
+              "ocorrencias": 173609,
               "simulacoes": 2000000,
-              "percentual_estimado": 7.3345,
-              "exibicao": "7,3%",
+              "percentual_estimado": 8.68045,
+              "exibicao": "8,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3475,14 +3475,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 54.869
+          "soma_vias_pct": 53.3998
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 218720,
+            "ocorrencias": 193207,
             "simulacoes": 2000000,
-            "percentual_estimado": 10.936,
-            "exibicao": "10,9%",
+            "percentual_estimado": 9.66035,
+            "exibicao": "9,7%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3506,9 +3506,9 @@
         "libertadores_base": 10.8931,
         "sul_americana_base": 55.52105,
         "rebaixamento": 3.48465,
-        "libertadores": 20.6036,
-        "sul_americana": 58.3918,
-        "sem_competicao_continental": 21.0046
+        "libertadores": 22.77195,
+        "sul_americana": 58.26845,
+        "sem_competicao_continental": 18.9596
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -3584,10 +3584,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 412072,
+          "ocorrencias": 455439,
           "simulacoes": 2000000,
-          "percentual_estimado": 20.6036,
-          "exibicao": "20,6%",
+          "percentual_estimado": 22.77195,
+          "exibicao": "22,8%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3596,10 +3596,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1167836,
+          "ocorrencias": 1165369,
           "simulacoes": 2000000,
-          "percentual_estimado": 58.3918,
-          "exibicao": "58,4%",
+          "percentual_estimado": 58.26845,
+          "exibicao": "58,3%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3608,10 +3608,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 420092,
+          "ocorrencias": 379192,
           "simulacoes": 2000000,
-          "percentual_estimado": 21.0046,
-          "exibicao": "21,0%",
+          "percentual_estimado": 18.9596,
+          "exibicao": "19,0%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3680,10 +3680,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 412072,
+            "ocorrencias": 455439,
             "simulacoes": 2000000,
-            "percentual_estimado": 20.6036,
-            "exibicao": "20,6%",
+            "percentual_estimado": 22.77195,
+            "exibicao": "22,8%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3741,10 +3741,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 121758,
+              "ocorrencias": 165125,
               "simulacoes": 2000000,
-              "percentual_estimado": 6.0879,
-              "exibicao": "6,1%",
+              "percentual_estimado": 8.25625,
+              "exibicao": "8,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3791,14 +3791,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 20.6036
+          "soma_vias_pct": 22.77195
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1167836,
+            "ocorrencias": 1165369,
             "simulacoes": 2000000,
-            "percentual_estimado": 58.3918,
-            "exibicao": "58,4%",
+            "percentual_estimado": 58.26845,
+            "exibicao": "58,3%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3808,10 +3808,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 943214,
+              "ocorrencias": 899847,
               "simulacoes": 2000000,
-              "percentual_estimado": 47.1607,
-              "exibicao": "47,2%",
+              "percentual_estimado": 44.99235,
+              "exibicao": "45,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3820,10 +3820,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 224622,
+              "ocorrencias": 265522,
               "simulacoes": 2000000,
-              "percentual_estimado": 11.2311,
-              "exibicao": "11,2%",
+              "percentual_estimado": 13.2761,
+              "exibicao": "13,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -3832,14 +3832,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 58.3918
+          "soma_vias_pct": 58.26845
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 420092,
+            "ocorrencias": 379192,
             "simulacoes": 2000000,
-            "percentual_estimado": 21.0046,
-            "exibicao": "21,0%",
+            "percentual_estimado": 18.9596,
+            "exibicao": "19,0%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -3863,9 +3863,9 @@
         "libertadores_base": 11.5344,
         "sul_americana_base": 58.42185,
         "rebaixamento": 2.52155,
-        "libertadores": 28.26185,
-        "sul_americana": 54.91325,
-        "sem_competicao_continental": 16.8249
+        "libertadores": 30.0994,
+        "sul_americana": 54.82865,
+        "sem_competicao_continental": 15.07195
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -3941,10 +3941,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 565237,
+          "ocorrencias": 601988,
           "simulacoes": 2000000,
-          "percentual_estimado": 28.26185,
-          "exibicao": "28,3%",
+          "percentual_estimado": 30.0994,
+          "exibicao": "30,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3953,10 +3953,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 1098265,
+          "ocorrencias": 1096573,
           "simulacoes": 2000000,
-          "percentual_estimado": 54.91325,
-          "exibicao": "54,9%",
+          "percentual_estimado": 54.82865,
+          "exibicao": "54,8%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -3965,10 +3965,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 336498,
+          "ocorrencias": 301439,
           "simulacoes": 2000000,
-          "percentual_estimado": 16.8249,
-          "exibicao": "16,8%",
+          "percentual_estimado": 15.07195,
+          "exibicao": "15,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4037,10 +4037,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 565237,
+            "ocorrencias": 601988,
             "simulacoes": 2000000,
-            "percentual_estimado": 28.26185,
-            "exibicao": "28,3%",
+            "percentual_estimado": 30.0994,
+            "exibicao": "30,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4062,10 +4062,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 174542,
+              "ocorrencias": 165201,
               "simulacoes": 2000000,
-              "percentual_estimado": 8.7271,
-              "exibicao": "8,7%",
+              "percentual_estimado": 8.26005,
+              "exibicao": "8,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4098,10 +4098,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 123710,
+              "ocorrencias": 169802,
               "simulacoes": 2000000,
-              "percentual_estimado": 6.1855,
-              "exibicao": "6,2%",
+              "percentual_estimado": 8.4901,
+              "exibicao": "8,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4112,10 +4112,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 71409,
+              "ocorrencias": 63975,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.57045,
-              "exibicao": "3,6%",
+              "percentual_estimado": 3.19875,
+              "exibicao": "3,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4124,10 +4124,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 75809,
+              "ocorrencias": 51407,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.79045,
-              "exibicao": "3,8%",
+              "percentual_estimado": 2.57035,
+              "exibicao": "2,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4136,10 +4136,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 27324,
+              "ocorrencias": 49819,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.3662,
-              "exibicao": "1,4%",
+              "percentual_estimado": 2.49095,
+              "exibicao": "2,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4148,14 +4148,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 28.26185
+          "soma_vias_pct": 30.0994
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 1098265,
+            "ocorrencias": 1096573,
             "simulacoes": 2000000,
-            "percentual_estimado": 54.91325,
-            "exibicao": "54,9%",
+            "percentual_estimado": 54.82865,
+            "exibicao": "54,8%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4165,10 +4165,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 905817,
+              "ocorrencias": 865619,
               "simulacoes": 2000000,
-              "percentual_estimado": 45.29085,
-              "exibicao": "45,3%",
+              "percentual_estimado": 43.28095,
+              "exibicao": "43,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4177,10 +4177,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 192448,
+              "ocorrencias": 230954,
               "simulacoes": 2000000,
-              "percentual_estimado": 9.6224,
-              "exibicao": "9,6%",
+              "percentual_estimado": 11.5477,
+              "exibicao": "11,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4189,14 +4189,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 54.91325
+          "soma_vias_pct": 54.82865
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 336498,
+            "ocorrencias": 301439,
             "simulacoes": 2000000,
-            "percentual_estimado": 16.8249,
-            "exibicao": "16,8%",
+            "percentual_estimado": 15.07195,
+            "exibicao": "15,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4220,9 +4220,9 @@
         "libertadores_base": 2.72445,
         "sul_americana_base": 32.9207,
         "rebaixamento": 14.3427,
-        "libertadores": 15.20645,
-        "sul_americana": 40.44635,
-        "sem_competicao_continental": 44.3472
+        "libertadores": 15.6167,
+        "sul_americana": 42.5295,
+        "sem_competicao_continental": 41.8538
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -4298,10 +4298,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 304129,
+          "ocorrencias": 312334,
           "simulacoes": 2000000,
-          "percentual_estimado": 15.20645,
-          "exibicao": "15,2%",
+          "percentual_estimado": 15.6167,
+          "exibicao": "15,6%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4310,10 +4310,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 808927,
+          "ocorrencias": 850590,
           "simulacoes": 2000000,
-          "percentual_estimado": 40.44635,
-          "exibicao": "40,4%",
+          "percentual_estimado": 42.5295,
+          "exibicao": "42,5%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4322,10 +4322,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 886944,
+          "ocorrencias": 837076,
           "simulacoes": 2000000,
-          "percentual_estimado": 44.3472,
-          "exibicao": "44,3%",
+          "percentual_estimado": 41.8538,
+          "exibicao": "41,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4394,10 +4394,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 304129,
+            "ocorrencias": 312334,
             "simulacoes": 2000000,
-            "percentual_estimado": 15.20645,
-            "exibicao": "15,2%",
+            "percentual_estimado": 15.6167,
+            "exibicao": "15,6%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4419,10 +4419,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 150460,
+              "ocorrencias": 142107,
               "simulacoes": 2000000,
-              "percentual_estimado": 7.523,
-              "exibicao": "7,5%",
+              "percentual_estimado": 7.10535,
+              "exibicao": "7,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4455,10 +4455,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 43296,
+              "ocorrencias": 59854,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.1648,
-              "exibicao": "2,2%",
+              "percentual_estimado": 2.9927,
+              "exibicao": "3,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4469,10 +4469,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 59144,
+              "ocorrencias": 53026,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.9572,
-              "exibicao": "3,0%",
+              "percentual_estimado": 2.6513,
+              "exibicao": "2,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4481,10 +4481,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 66907,
+              "ocorrencias": 44559,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.34535,
-              "exibicao": "3,3%",
+              "percentual_estimado": 2.22795,
+              "exibicao": "2,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4493,10 +4493,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 24409,
+              "ocorrencias": 44522,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.22045,
-              "exibicao": "1,2%",
+              "percentual_estimado": 2.2261,
+              "exibicao": "2,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4505,14 +4505,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 15.20645
+          "soma_vias_pct": 15.6167
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 808927,
+            "ocorrencias": 850590,
             "simulacoes": 2000000,
-            "percentual_estimado": 40.44635,
-            "exibicao": "40,4%",
+            "percentual_estimado": 42.5295,
+            "exibicao": "42,5%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4522,10 +4522,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 545443,
+              "ocorrencias": 531830,
               "simulacoes": 2000000,
-              "percentual_estimado": 27.27215,
-              "exibicao": "27,3%",
+              "percentual_estimado": 26.5915,
+              "exibicao": "26,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4534,10 +4534,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 263484,
+              "ocorrencias": 318760,
               "simulacoes": 2000000,
-              "percentual_estimado": 13.1742,
-              "exibicao": "13,2%",
+              "percentual_estimado": 15.938,
+              "exibicao": "15,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4546,14 +4546,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 40.44635
+          "soma_vias_pct": 42.5295
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 886944,
+            "ocorrencias": 837076,
             "simulacoes": 2000000,
-            "percentual_estimado": 44.3472,
-            "exibicao": "44,3%",
+            "percentual_estimado": 41.8538,
+            "exibicao": "41,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4577,9 +4577,9 @@
         "libertadores_base": 1.9104,
         "sul_americana_base": 30.44485,
         "rebaixamento": 14.90225,
-        "libertadores": 3.7965,
-        "sul_americana": 43.935,
-        "sem_competicao_continental": 52.2685
+        "libertadores": 4.5343,
+        "sul_americana": 46.32195,
+        "sem_competicao_continental": 49.14375
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -4655,10 +4655,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 75930,
+          "ocorrencias": 90686,
           "simulacoes": 2000000,
-          "percentual_estimado": 3.7965,
-          "exibicao": "3,8%",
+          "percentual_estimado": 4.5343,
+          "exibicao": "4,5%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4667,10 +4667,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 878700,
+          "ocorrencias": 926439,
           "simulacoes": 2000000,
-          "percentual_estimado": 43.935,
-          "exibicao": "43,9%",
+          "percentual_estimado": 46.32195,
+          "exibicao": "46,3%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4679,10 +4679,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1045370,
+          "ocorrencias": 982875,
           "simulacoes": 2000000,
-          "percentual_estimado": 52.2685,
-          "exibicao": "52,3%",
+          "percentual_estimado": 49.14375,
+          "exibicao": "49,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -4751,10 +4751,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 75930,
+            "ocorrencias": 90686,
             "simulacoes": 2000000,
-            "percentual_estimado": 3.7965,
-            "exibicao": "3,8%",
+            "percentual_estimado": 4.5343,
+            "exibicao": "4,5%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4812,10 +4812,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 37722,
+              "ocorrencias": 52478,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.8861,
-              "exibicao": "1,9%",
+              "percentual_estimado": 2.6239,
+              "exibicao": "2,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4862,14 +4862,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 3.7965
+          "soma_vias_pct": 4.5343
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 878700,
+            "ocorrencias": 926439,
             "simulacoes": 2000000,
-            "percentual_estimado": 43.935,
-            "exibicao": "43,9%",
+            "percentual_estimado": 46.32195,
+            "exibicao": "46,3%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4879,10 +4879,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 571175,
+              "ocorrencias": 556419,
               "simulacoes": 2000000,
-              "percentual_estimado": 28.55875,
-              "exibicao": "28,6%",
+              "percentual_estimado": 27.82095,
+              "exibicao": "27,8%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4891,10 +4891,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 307525,
+              "ocorrencias": 370020,
               "simulacoes": 2000000,
-              "percentual_estimado": 15.37625,
-              "exibicao": "15,4%",
+              "percentual_estimado": 18.501,
+              "exibicao": "18,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -4903,14 +4903,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 43.935
+          "soma_vias_pct": 46.32195
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1045370,
+            "ocorrencias": 982875,
             "simulacoes": 2000000,
-            "percentual_estimado": 52.2685,
-            "exibicao": "52,3%",
+            "percentual_estimado": 49.14375,
+            "exibicao": "49,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -4934,9 +4934,9 @@
         "libertadores_base": 0.78815,
         "sul_americana_base": 18.0483,
         "rebaixamento": 29.55415,
-        "libertadores": 14.35455,
-        "sul_americana": 25.5712,
-        "sem_competicao_continental": 60.07425
+        "libertadores": 14.06925,
+        "sul_americana": 27.73985,
+        "sem_competicao_continental": 58.1909
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -5012,10 +5012,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 287091,
+          "ocorrencias": 281385,
           "simulacoes": 2000000,
-          "percentual_estimado": 14.35455,
-          "exibicao": "14,4%",
+          "percentual_estimado": 14.06925,
+          "exibicao": "14,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5024,10 +5024,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 511424,
+          "ocorrencias": 554797,
           "simulacoes": 2000000,
-          "percentual_estimado": 25.5712,
-          "exibicao": "25,6%",
+          "percentual_estimado": 27.73985,
+          "exibicao": "27,7%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5036,10 +5036,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1201485,
+          "ocorrencias": 1163818,
           "simulacoes": 2000000,
-          "percentual_estimado": 60.07425,
-          "exibicao": "60,1%",
+          "percentual_estimado": 58.1909,
+          "exibicao": "58,2%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5108,10 +5108,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 287091,
+            "ocorrencias": 281385,
             "simulacoes": 2000000,
-            "percentual_estimado": 14.35455,
-            "exibicao": "14,4%",
+            "percentual_estimado": 14.06925,
+            "exibicao": "14,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5133,10 +5133,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 254631,
+              "ocorrencias": 241898,
               "simulacoes": 2000000,
-              "percentual_estimado": 12.73155,
-              "exibicao": "12,7%",
+              "percentual_estimado": 12.0949,
+              "exibicao": "12,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5169,10 +5169,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 16697,
+              "ocorrencias": 23724,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.83485,
-              "exibicao": "0,83%",
+              "percentual_estimado": 1.1862,
+              "exibicao": "1,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5183,10 +5183,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 109891,
+              "ocorrencias": 99003,
               "simulacoes": 2000000,
-              "percentual_estimado": 5.49455,
-              "exibicao": "5,5%",
+              "percentual_estimado": 4.95015,
+              "exibicao": "5,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5195,10 +5195,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 105606,
+              "ocorrencias": 71804,
               "simulacoes": 2000000,
-              "percentual_estimado": 5.2803,
-              "exibicao": "5,3%",
+              "percentual_estimado": 3.5902,
+              "exibicao": "3,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5207,10 +5207,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 39134,
+              "ocorrencias": 71091,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.9567,
-              "exibicao": "2,0%",
+              "percentual_estimado": 3.55455,
+              "exibicao": "3,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5219,14 +5219,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 14.35455
+          "soma_vias_pct": 14.06925
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 511424,
+            "ocorrencias": 554797,
             "simulacoes": 2000000,
-            "percentual_estimado": 25.5712,
-            "exibicao": "25,6%",
+            "percentual_estimado": 27.73985,
+            "exibicao": "27,7%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5236,10 +5236,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 297847,
+              "ocorrencias": 293472,
               "simulacoes": 2000000,
-              "percentual_estimado": 14.89235,
-              "exibicao": "14,9%",
+              "percentual_estimado": 14.6736,
+              "exibicao": "14,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5248,10 +5248,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 213577,
+              "ocorrencias": 261325,
               "simulacoes": 2000000,
-              "percentual_estimado": 10.67885,
-              "exibicao": "10,7%",
+              "percentual_estimado": 13.06625,
+              "exibicao": "13,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5260,14 +5260,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 25.5712
+          "soma_vias_pct": 27.73985
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1201485,
+            "ocorrencias": 1163818,
             "simulacoes": 2000000,
-            "percentual_estimado": 60.07425,
-            "exibicao": "60,1%",
+            "percentual_estimado": 58.1909,
+            "exibicao": "58,2%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5291,9 +5291,9 @@
         "libertadores_base": 0.7033,
         "sul_americana_base": 17.81155,
         "rebaixamento": 27.1354,
-        "libertadores": 5.8698,
-        "sul_americana": 28.30695,
-        "sem_competicao_continental": 65.82325
+        "libertadores": 5.93775,
+        "sul_americana": 30.66745,
+        "sem_competicao_continental": 63.3948
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -5369,9 +5369,9 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 117396,
+          "ocorrencias": 118755,
           "simulacoes": 2000000,
-          "percentual_estimado": 5.8698,
+          "percentual_estimado": 5.93775,
           "exibicao": "5,9%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -5381,10 +5381,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 566139,
+          "ocorrencias": 613349,
           "simulacoes": 2000000,
-          "percentual_estimado": 28.30695,
-          "exibicao": "28,3%",
+          "percentual_estimado": 30.66745,
+          "exibicao": "30,7%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5393,10 +5393,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1316465,
+          "ocorrencias": 1267896,
           "simulacoes": 2000000,
-          "percentual_estimado": 65.82325,
-          "exibicao": "65,8%",
+          "percentual_estimado": 63.3948,
+          "exibicao": "63,4%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5465,9 +5465,9 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 117396,
+            "ocorrencias": 118755,
             "simulacoes": 2000000,
-            "percentual_estimado": 5.8698,
+            "percentual_estimado": 5.93775,
             "exibicao": "5,9%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -5490,10 +5490,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 86583,
+              "ocorrencias": 81338,
               "simulacoes": 2000000,
-              "percentual_estimado": 4.32915,
-              "exibicao": "4,3%",
+              "percentual_estimado": 4.0669,
+              "exibicao": "4,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5526,10 +5526,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 16747,
+              "ocorrencias": 23351,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.83735,
-              "exibicao": "0,84%",
+              "percentual_estimado": 1.16755,
+              "exibicao": "1,2%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5540,10 +5540,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 28487,
+              "ocorrencias": 25355,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.42435,
-              "exibicao": "1,4%",
+              "percentual_estimado": 1.26775,
+              "exibicao": "1,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5552,10 +5552,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 44550,
+              "ocorrencias": 29803,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.2275,
-              "exibicao": "2,2%",
+              "percentual_estimado": 1.49015,
+              "exibicao": "1,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5564,10 +5564,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 13546,
+              "ocorrencias": 26180,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.6773,
-              "exibicao": "0,68%",
+              "percentual_estimado": 1.309,
+              "exibicao": "1,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5576,14 +5576,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 5.8698
+          "soma_vias_pct": 5.93775
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 566139,
+            "ocorrencias": 613349,
             "simulacoes": 2000000,
-            "percentual_estimado": 28.30695,
-            "exibicao": "28,3%",
+            "percentual_estimado": 30.66745,
+            "exibicao": "30,7%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5593,10 +5593,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 324016,
+              "ocorrencias": 318534,
               "simulacoes": 2000000,
-              "percentual_estimado": 16.2008,
-              "exibicao": "16,2%",
+              "percentual_estimado": 15.9267,
+              "exibicao": "15,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5605,10 +5605,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 242123,
+              "ocorrencias": 294815,
               "simulacoes": 2000000,
-              "percentual_estimado": 12.10615,
-              "exibicao": "12,1%",
+              "percentual_estimado": 14.74075,
+              "exibicao": "14,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5617,14 +5617,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 28.30695
+          "soma_vias_pct": 30.66745
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1316465,
+            "ocorrencias": 1267896,
             "simulacoes": 2000000,
-            "percentual_estimado": 65.82325,
-            "exibicao": "65,8%",
+            "percentual_estimado": 63.3948,
+            "exibicao": "63,4%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5648,9 +5648,9 @@
         "libertadores_base": 0.3943,
         "sul_americana_base": 13.256,
         "rebaixamento": 36.3854,
-        "libertadores": 9.37545,
-        "sul_americana": 21.344,
-        "sem_competicao_continental": 69.28055
+        "libertadores": 9.12475,
+        "sul_americana": 23.43245,
+        "sem_competicao_continental": 67.4428
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -5726,10 +5726,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 187509,
+          "ocorrencias": 182495,
           "simulacoes": 2000000,
-          "percentual_estimado": 9.37545,
-          "exibicao": "9,4%",
+          "percentual_estimado": 9.12475,
+          "exibicao": "9,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5738,10 +5738,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 426880,
+          "ocorrencias": 468649,
           "simulacoes": 2000000,
-          "percentual_estimado": 21.344,
-          "exibicao": "21,3%",
+          "percentual_estimado": 23.43245,
+          "exibicao": "23,4%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5750,10 +5750,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1385611,
+          "ocorrencias": 1348856,
           "simulacoes": 2000000,
-          "percentual_estimado": 69.28055,
-          "exibicao": "69,3%",
+          "percentual_estimado": 67.4428,
+          "exibicao": "67,4%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -5822,10 +5822,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 187509,
+            "ocorrencias": 182495,
             "simulacoes": 2000000,
-            "percentual_estimado": 9.37545,
-            "exibicao": "9,4%",
+            "percentual_estimado": 9.12475,
+            "exibicao": "9,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5847,10 +5847,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 168882,
+              "ocorrencias": 159423,
               "simulacoes": 2000000,
-              "percentual_estimado": 8.4441,
-              "exibicao": "8,4%",
+              "percentual_estimado": 7.97115,
+              "exibicao": "8,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5883,10 +5883,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 10741,
+              "ocorrencias": 15186,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.53705,
-              "exibicao": "0,54%",
+              "percentual_estimado": 0.7593,
+              "exibicao": "0,76%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5897,10 +5897,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 66025,
+              "ocorrencias": 58699,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.30125,
-              "exibicao": "3,3%",
+              "percentual_estimado": 2.93495,
+              "exibicao": "2,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5909,10 +5909,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 75545,
+              "ocorrencias": 50917,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.77725,
-              "exibicao": "3,8%",
+              "percentual_estimado": 2.54585,
+              "exibicao": "2,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5921,10 +5921,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 27312,
+              "ocorrencias": 49807,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.3656,
-              "exibicao": "1,4%",
+              "percentual_estimado": 2.49035,
+              "exibicao": "2,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5933,14 +5933,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 9.37545
+          "soma_vias_pct": 9.12475
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 426880,
+            "ocorrencias": 468649,
             "simulacoes": 2000000,
-            "percentual_estimado": 21.344,
-            "exibicao": "21,3%",
+            "percentual_estimado": 23.43245,
+            "exibicao": "23,4%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -5950,10 +5950,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 231622,
+              "ocorrencias": 228803,
               "simulacoes": 2000000,
-              "percentual_estimado": 11.5811,
-              "exibicao": "11,6%",
+              "percentual_estimado": 11.44015,
+              "exibicao": "11,4%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5962,10 +5962,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 195258,
+              "ocorrencias": 239846,
               "simulacoes": 2000000,
-              "percentual_estimado": 9.7629,
-              "exibicao": "9,8%",
+              "percentual_estimado": 11.9923,
+              "exibicao": "12,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -5974,14 +5974,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 21.344
+          "soma_vias_pct": 23.43245
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1385611,
+            "ocorrencias": 1348856,
             "simulacoes": 2000000,
-            "percentual_estimado": 69.28055,
-            "exibicao": "69,3%",
+            "percentual_estimado": 67.4428,
+            "exibicao": "67,4%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6005,9 +6005,9 @@
         "libertadores_base": 0.2787,
         "sul_americana_base": 9.0646,
         "rebaixamento": 48.4441,
-        "libertadores": 8.10105,
-        "sul_americana": 15.4214,
-        "sem_competicao_continental": 76.47755
+        "libertadores": 7.838,
+        "sul_americana": 17.05015,
+        "sem_competicao_continental": 75.11185
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -6083,10 +6083,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 162021,
+          "ocorrencias": 156760,
           "simulacoes": 2000000,
-          "percentual_estimado": 8.10105,
-          "exibicao": "8,1%",
+          "percentual_estimado": 7.838,
+          "exibicao": "7,8%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6095,10 +6095,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 308428,
+          "ocorrencias": 341003,
           "simulacoes": 2000000,
-          "percentual_estimado": 15.4214,
-          "exibicao": "15,4%",
+          "percentual_estimado": 17.05015,
+          "exibicao": "17,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6107,10 +6107,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1529551,
+          "ocorrencias": 1502237,
           "simulacoes": 2000000,
-          "percentual_estimado": 76.47755,
-          "exibicao": "76,5%",
+          "percentual_estimado": 75.11185,
+          "exibicao": "75,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6179,10 +6179,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 162021,
+            "ocorrencias": 156760,
             "simulacoes": 2000000,
-            "percentual_estimado": 8.10105,
-            "exibicao": "8,1%",
+            "percentual_estimado": 7.838,
+            "exibicao": "7,8%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6204,10 +6204,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 122863,
+              "ocorrencias": 114715,
               "simulacoes": 2000000,
-              "percentual_estimado": 6.14315,
-              "exibicao": "6,1%",
+              "percentual_estimado": 5.73575,
+              "exibicao": "5,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6240,10 +6240,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 6934,
+              "ocorrencias": 9821,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.3467,
-              "exibicao": "0,35%",
+              "percentual_estimado": 0.49105,
+              "exibicao": "0,49%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6254,10 +6254,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 45555,
+              "ocorrencias": 40061,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.27775,
-              "exibicao": "2,3%",
+              "percentual_estimado": 2.00305,
+              "exibicao": "2,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6266,10 +6266,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 57073,
+              "ocorrencias": 38622,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.85365,
-              "exibicao": "2,9%",
+              "percentual_estimado": 1.9311,
+              "exibicao": "1,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6278,10 +6278,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 20235,
+              "ocorrencias": 36032,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.01175,
-              "exibicao": "1,0%",
+              "percentual_estimado": 1.8016,
+              "exibicao": "1,8%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6290,14 +6290,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 8.10105
+          "soma_vias_pct": 7.838
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 308428,
+            "ocorrencias": 341003,
             "simulacoes": 2000000,
-            "percentual_estimado": 15.4214,
-            "exibicao": "15,4%",
+            "percentual_estimado": 17.05015,
+            "exibicao": "17,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6307,10 +6307,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 160591,
+              "ocorrencias": 158478,
               "simulacoes": 2000000,
-              "percentual_estimado": 8.02955,
-              "exibicao": "8,0%",
+              "percentual_estimado": 7.9239,
+              "exibicao": "7,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6319,10 +6319,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 147837,
+              "ocorrencias": 182525,
               "simulacoes": 2000000,
-              "percentual_estimado": 7.39185,
-              "exibicao": "7,4%",
+              "percentual_estimado": 9.12625,
+              "exibicao": "9,1%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6331,14 +6331,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 15.4214
+          "soma_vias_pct": 17.05015
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1529551,
+            "ocorrencias": 1502237,
             "simulacoes": 2000000,
-            "percentual_estimado": 76.47755,
-            "exibicao": "76,5%",
+            "percentual_estimado": 75.11185,
+            "exibicao": "75,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6362,9 +6362,9 @@
         "libertadores_base": 0.1295,
         "sul_americana_base": 6.2077,
         "rebaixamento": 55.62725,
-        "libertadores": 6.97925,
-        "sul_americana": 11.64325,
-        "sem_competicao_continental": 81.3775
+        "libertadores": 6.73075,
+        "sul_americana": 13.02945,
+        "sem_competicao_continental": 80.2398
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -6440,10 +6440,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 139585,
+          "ocorrencias": 134615,
           "simulacoes": 2000000,
-          "percentual_estimado": 6.97925,
-          "exibicao": "7,0%",
+          "percentual_estimado": 6.73075,
+          "exibicao": "6,7%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6452,10 +6452,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 232865,
+          "ocorrencias": 260589,
           "simulacoes": 2000000,
-          "percentual_estimado": 11.64325,
-          "exibicao": "11,6%",
+          "percentual_estimado": 13.02945,
+          "exibicao": "13,0%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6464,10 +6464,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1627550,
+          "ocorrencias": 1604796,
           "simulacoes": 2000000,
-          "percentual_estimado": 81.3775,
-          "exibicao": "81,4%",
+          "percentual_estimado": 80.2398,
+          "exibicao": "80,2%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6536,10 +6536,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 139585,
+            "ocorrencias": 134615,
             "simulacoes": 2000000,
-            "percentual_estimado": 6.97925,
-            "exibicao": "7,0%",
+            "percentual_estimado": 6.73075,
+            "exibicao": "6,7%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6561,10 +6561,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 104727,
+              "ocorrencias": 98196,
               "simulacoes": 2000000,
-              "percentual_estimado": 5.23635,
-              "exibicao": "5,2%",
+              "percentual_estimado": 4.9098,
+              "exibicao": "4,9%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6597,10 +6597,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 3977,
+              "ocorrencias": 5538,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.19885,
-              "exibicao": "0,20%",
+              "percentual_estimado": 0.2769,
+              "exibicao": "0,28%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6611,10 +6611,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 38097,
+              "ocorrencias": 33940,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.90485,
-              "exibicao": "1,9%",
+              "percentual_estimado": 1.697,
+              "exibicao": "1,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6623,10 +6623,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 50543,
+              "ocorrencias": 33551,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.52715,
-              "exibicao": "2,5%",
+              "percentual_estimado": 1.67755,
+              "exibicao": "1,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6635,10 +6635,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 16087,
+              "ocorrencias": 30705,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.80435,
-              "exibicao": "0,80%",
+              "percentual_estimado": 1.53525,
+              "exibicao": "1,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6647,14 +6647,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 6.97925
+          "soma_vias_pct": 6.73075
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 232865,
+            "ocorrencias": 260589,
             "simulacoes": 2000000,
-            "percentual_estimado": 11.64325,
-            "exibicao": "11,6%",
+            "percentual_estimado": 13.02945,
+            "exibicao": "13,0%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6664,10 +6664,10 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 111807,
+              "ocorrencias": 110825,
               "simulacoes": 2000000,
-              "percentual_estimado": 5.59035,
-              "exibicao": "5,6%",
+              "percentual_estimado": 5.54125,
+              "exibicao": "5,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6676,10 +6676,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 121058,
+              "ocorrencias": 149764,
               "simulacoes": 2000000,
-              "percentual_estimado": 6.0529,
-              "exibicao": "6,1%",
+              "percentual_estimado": 7.4882,
+              "exibicao": "7,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6688,14 +6688,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 11.64325
+          "soma_vias_pct": 13.02945
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1627550,
+            "ocorrencias": 1604796,
             "simulacoes": 2000000,
-            "percentual_estimado": 81.3775,
-            "exibicao": "81,4%",
+            "percentual_estimado": 80.2398,
+            "exibicao": "80,2%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6719,9 +6719,9 @@
         "libertadores_base": 0.05655,
         "sul_americana_base": 3.91235,
         "rebaixamento": 63.9259,
-        "libertadores": 7.4961,
-        "sul_americana": 8.0826,
-        "sem_competicao_continental": 84.4213
+        "libertadores": 7.21405,
+        "sul_americana": 9.1418,
+        "sem_competicao_continental": 83.64415
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -6797,10 +6797,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 149922,
+          "ocorrencias": 144281,
           "simulacoes": 2000000,
-          "percentual_estimado": 7.4961,
-          "exibicao": "7,5%",
+          "percentual_estimado": 7.21405,
+          "exibicao": "7,2%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6809,10 +6809,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 161652,
+          "ocorrencias": 182836,
           "simulacoes": 2000000,
-          "percentual_estimado": 8.0826,
-          "exibicao": "8,1%",
+          "percentual_estimado": 9.1418,
+          "exibicao": "9,1%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6821,10 +6821,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1688426,
+          "ocorrencias": 1672883,
           "simulacoes": 2000000,
-          "percentual_estimado": 84.4213,
-          "exibicao": "84,4%",
+          "percentual_estimado": 83.64415,
+          "exibicao": "83,6%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -6893,10 +6893,10 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 149922,
+            "ocorrencias": 144281,
             "simulacoes": 2000000,
-            "percentual_estimado": 7.4961,
-            "exibicao": "7,5%",
+            "percentual_estimado": 7.21405,
+            "exibicao": "7,2%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -6918,10 +6918,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 146768,
+              "ocorrencias": 140293,
               "simulacoes": 2000000,
-              "percentual_estimado": 7.3384,
-              "exibicao": "7,3%",
+              "percentual_estimado": 7.01465,
+              "exibicao": "7,0%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6954,10 +6954,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 2023,
+              "ocorrencias": 2857,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.10115,
-              "exibicao": "0,10%",
+              "percentual_estimado": 0.14285,
+              "exibicao": "0,14%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6968,10 +6968,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 51793,
+              "ocorrencias": 46398,
               "simulacoes": 2000000,
-              "percentual_estimado": 2.58965,
-              "exibicao": "2,6%",
+              "percentual_estimado": 2.3199,
+              "exibicao": "2,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6980,10 +6980,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 70321,
+              "ocorrencias": 48359,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.51605,
-              "exibicao": "3,5%",
+              "percentual_estimado": 2.41795,
+              "exibicao": "2,4%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -6992,10 +6992,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 24654,
+              "ocorrencias": 45536,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.2327,
-              "exibicao": "1,2%",
+              "percentual_estimado": 2.2768,
+              "exibicao": "2,3%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -7004,14 +7004,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 7.4961
+          "soma_vias_pct": 7.21405
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 161652,
+            "ocorrencias": 182836,
             "simulacoes": 2000000,
-            "percentual_estimado": 8.0826,
-            "exibicao": "8,1%",
+            "percentual_estimado": 9.1418,
+            "exibicao": "9,1%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -7021,9 +7021,9 @@
           },
           "vias": {
             "via_brasileirao": {
-              "ocorrencias": 70482,
+              "ocorrencias": 70017,
               "simulacoes": 2000000,
-              "percentual_estimado": 3.5241,
+              "percentual_estimado": 3.50085,
               "exibicao": "3,5%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -7033,10 +7033,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 91170,
+              "ocorrencias": 112819,
               "simulacoes": 2000000,
-              "percentual_estimado": 4.5585,
-              "exibicao": "4,6%",
+              "percentual_estimado": 5.64095,
+              "exibicao": "5,6%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -7045,14 +7045,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 8.0826
+          "soma_vias_pct": 9.1418
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1688426,
+            "ocorrencias": 1672883,
             "simulacoes": 2000000,
-            "percentual_estimado": 84.4213,
-            "exibicao": "84,4%",
+            "percentual_estimado": 83.64415,
+            "exibicao": "83,6%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -7076,9 +7076,9 @@
         "libertadores_base": 0.0,
         "sul_americana_base": 0.0001,
         "rebaixamento": 99.9476,
-        "libertadores": 1.7497,
-        "sul_americana": 0.00205,
-        "sem_competicao_continental": 98.24825
+        "libertadores": 1.65565,
+        "sul_americana": 0.0024,
+        "sem_competicao_continental": 98.34195
       },
       "probabilidades_detalhes": {
         "campeao": {
@@ -7154,9 +7154,9 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "libertadores": {
-          "ocorrencias": 34994,
+          "ocorrencias": 33113,
           "simulacoes": 2000000,
-          "percentual_estimado": 1.7497,
+          "percentual_estimado": 1.65565,
           "exibicao": "1,7%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -7166,9 +7166,9 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sul_americana": {
-          "ocorrencias": 41,
+          "ocorrencias": 48,
           "simulacoes": 2000000,
-          "percentual_estimado": 0.00205,
+          "percentual_estimado": 0.0024,
           "exibicao": "0,002%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
@@ -7178,10 +7178,10 @@
           "limite_superior_95_regra_dos_tres_pct": null
         },
         "sem_competicao_continental": {
-          "ocorrencias": 1964965,
+          "ocorrencias": 1966839,
           "simulacoes": 2000000,
-          "percentual_estimado": 98.24825,
-          "exibicao": "98,2%",
+          "percentual_estimado": 98.34195,
+          "exibicao": "98,3%",
           "zero_observado": false,
           "possivel_estruturalmente": true,
           "impossivel_estruturalmente": false,
@@ -7250,9 +7250,9 @@
       "decomposicao_chances": {
         "libertadores": {
           "total": {
-            "ocorrencias": 34994,
+            "ocorrencias": 33113,
             "simulacoes": 2000000,
-            "percentual_estimado": 1.7497,
+            "percentual_estimado": 1.65565,
             "exibicao": "1,7%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -7275,9 +7275,9 @@
               "limite_superior_95_regra_dos_tres_pct": 0.00015
             },
             "via_copa_do_brasil": {
-              "ocorrencias": 34994,
+              "ocorrencias": 33113,
               "simulacoes": 2000000,
-              "percentual_estimado": 1.7497,
+              "percentual_estimado": 1.65565,
               "exibicao": "1,7%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -7325,10 +7325,10 @@
           },
           "subvias_copa_do_brasil": {
             "campeao": {
-              "ocorrencias": 9464,
+              "ocorrencias": 8304,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.4732,
-              "exibicao": "0,47%",
+              "percentual_estimado": 0.4152,
+              "exibicao": "0,42%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -7337,10 +7337,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice": {
-              "ocorrencias": 19093,
+              "ocorrencias": 12659,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.95465,
-              "exibicao": "0,95%",
+              "percentual_estimado": 0.63295,
+              "exibicao": "0,63%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -7349,10 +7349,10 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "vice_herda_vaga_direta": {
-              "ocorrencias": 6437,
+              "ocorrencias": 12150,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.32185,
-              "exibicao": "0,32%",
+              "percentual_estimado": 0.6075,
+              "exibicao": "0,61%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
               "impossivel_estruturalmente": false,
@@ -7361,13 +7361,13 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 1.7497
+          "soma_vias_pct": 1.65565
         },
         "sul_americana": {
           "total": {
-            "ocorrencias": 41,
+            "ocorrencias": 48,
             "simulacoes": 2000000,
-            "percentual_estimado": 0.00205,
+            "percentual_estimado": 0.0024,
             "exibicao": "0,002%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
@@ -7390,9 +7390,9 @@
               "limite_superior_95_regra_dos_tres_pct": null
             },
             "via_repasse": {
-              "ocorrencias": 39,
+              "ocorrencias": 46,
               "simulacoes": 2000000,
-              "percentual_estimado": 0.00195,
+              "percentual_estimado": 0.0023,
               "exibicao": "0,002%",
               "zero_observado": false,
               "possivel_estruturalmente": true,
@@ -7402,14 +7402,14 @@
               "limite_superior_95_regra_dos_tres_pct": null
             }
           },
-          "soma_vias_pct": 0.00205
+          "soma_vias_pct": 0.0024
         },
         "sem_competicao_continental": {
           "total": {
-            "ocorrencias": 1964965,
+            "ocorrencias": 1966839,
             "simulacoes": 2000000,
-            "percentual_estimado": 98.24825,
-            "exibicao": "98,2%",
+            "percentual_estimado": 98.34195,
+            "exibicao": "98,3%",
             "zero_observado": false,
             "possivel_estruturalmente": true,
             "impossivel_estruturalmente": false,
@@ -7431,7 +7431,7 @@
     ],
     "decomposicao_exclusiva_por_via": true,
     "limiar_exibicao_percentual": 0.001,
-    "hash_snapshots": "f95806c25b8e3102ea3fa08eba2b7be87ff714443731f03f8972f9b63697923f"
+    "hash_snapshots": "27328101d1fbef9f2b80a992aabe0c7ce282c29d38421b8cf3ed2205b4d4ddad"
   },
   "total_previsoes_partidas": 175,
   "partidas_restantes": [
