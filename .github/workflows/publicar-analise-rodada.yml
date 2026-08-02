@@ -62,7 +62,7 @@ jobs:
       - name: Detectar e gerar análise
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.6' }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.6-terra' }}
           RODADA: ${{ inputs.rodada }}
           FORCAR: ${{ inputs.forcar }}
           SEM_IA: ${{ inputs.sem_ia }}
@@ -90,6 +90,8 @@ jobs:
           manifest = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
           assert manifest['total_artigos'] == len(manifest['artigos']) >= 1
           for artigo in manifest['artigos']:
+              assert artigo.get('hash_editorial')
+              assert isinstance(artigo.get('editorial'), dict)
               pagina = Path('analises') / artigo['slug']
               texto = pagina.read_text(encoding='utf-8')
               Parser().feed(texto)
@@ -97,6 +99,7 @@ jobs:
               assert f'data-fdg-analise-rodada="{artigo["rodada"]}"' in texto
               assert artigo['titulo'] in texto
               assert 'analysis-round-nav' in texto
+              assert 'analysis-copy-section' in texto
               assert texto.count('analysis-game-card') == artigo['jogos_concluidos']
               assert '0,000%' not in texto
               assert 'Padrão dos percentuais' in texto
