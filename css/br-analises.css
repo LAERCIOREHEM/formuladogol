@@ -15,4 +15,8 @@ body{margin:0;padding:16px;background:radial-gradient(circle at 8% 4%,rgba(119,1
 
 /* Texto editorial: colunas visualmente completas em desktop e leitura
    regular no celular, sem justificar títulos, tabelas ou ações. */
-:is(.analysis-card p,.analysis-deck,.analysis-note,.analysis-method,.analysis-copy p,.analysis-help,.analysis-percent-legend){text-align:justify;text-align-last:left;text-justify:inter-word;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:break-word}
+:is(.analysis-card p,.analysis-deck,.analysis-note,.analysis-method,.analysis-copy p,.analysis-help,.analysis-percent-legend){text-align:justify;text-align-last:left;text-justify:inter-word;-webkit-hyphens:none;hyphens:none;overflow-wrap:break-word}
+
+/* O editorial deve usar a largura real do card. Os max-width históricos
+   deixavam metade da página vazia em monitores largos. */
+:is(.analysis-head,.analysis-deck,.analysis-copy,.analysis-copy-sections){width:100%;max-width:none}

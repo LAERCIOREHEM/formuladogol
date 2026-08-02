@@ -1936,7 +1936,21 @@ body > .container > section.hero > img {
   text-align: justify;
   text-align-last: left;
   text-justify: inter-word;
-  -webkit-hyphens: auto;
-  hyphens: auto;
+  -webkit-hyphens: none;
+  hyphens: none;
   overflow-wrap: break-word;
+}
+
+/* Os limites anteriores criavam uma coluna estreita dentro de cards largos.
+   Estes textos agora ocupam toda a largura útil do próprio componente. */
+:is(
+  .probability-index-summary p,
+  .ranking-method-intro,
+  .probability-intro,
+  .probability-notice,
+  .probability-method-lead,
+  .stats-intro p
+) {
+  width: 100%;
+  max-width: none;
 }
