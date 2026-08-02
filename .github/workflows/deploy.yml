@@ -64,7 +64,7 @@ on:
     types: [completed]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -1002,13 +1002,10 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
+          NOTIFICACOES_ANALISE: dados-br/analises-notificacoes.json
         shell: bash
         run: |
           set -euo pipefail
-          if ! git diff-tree --no-commit-id --name-only -r HEAD | grep -Eq '^(analises/|dados-br/analises\.json$)'; then
-            echo "Deploy sem alteração editorial; e-mail dispensado."
-            exit 0
-          fi
           python - <<'PY'
           import json
           import os
@@ -1017,6 +1014,7 @@ jobs:
           import time
           import urllib.error
           import urllib.request
+          from datetime import datetime, timedelta, timezone
           from email.message import EmailMessage
           from email.utils import formataddr
           from pathlib import Path
@@ -1030,6 +1028,16 @@ jobs:
           dados = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
           artigo = max(dados['artigos'], key=lambda item: (item['rodada'], item['modificado_em']))
           url, rodada, titulo = artigo['url'], artigo['rodada'], artigo['titulo']
+          caminho_notificacoes = Path(os.environ['NOTIFICACOES_ANALISE'])
+          notificacoes = json.loads(caminho_notificacoes.read_text(encoding='utf-8'))
+          rodadas_notificadas = {
+              int(item['rodada'])
+              for item in notificacoes.get('notificacoes') or []
+          }
+          if int(rodada) in rodadas_notificadas:
+              print(f'Rodada {rodada} já notificada; e-mail dispensado.')
+              raise SystemExit(0)
+
           marcador = f'data-fdg-analise-rodada="{rodada}"'
           confirmado = False
           for tentativa in range(1, 31):
@@ -1071,8 +1079,47 @@ jobs:
           except (OSError, ValueError, smtplib.SMTPException) as erro:
               print(f'::warning title=E-mail editorial não enviado::{erro}. A página foi publicada normalmente.')
               raise SystemExit(0)
+
+          notificacoes.setdefault('notificacoes', []).append({
+              'rodada': int(rodada),
+              'slug': artigo['slug'],
+              'url': url,
+              'notificado_em': datetime.now(
+                  timezone(timedelta(hours=-3))
+              ).replace(microsecond=0).isoformat(),
+          })
+          notificacoes['notificacoes'].sort(key=lambda item: int(item['rodada']))
+          notificacoes['total_notificacoes'] = len(notificacoes['notificacoes'])
+          caminho_temporario = caminho_notificacoes.with_suffix('.tmp')
+          caminho_temporario.write_text(
+              json.dumps(notificacoes, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8',
+          )
+          caminho_temporario.replace(caminho_notificacoes)
           print(f'Página confirmada e e-mail enviado: {url}')
           PY
+
+          if git diff --quiet -- "$NOTIFICACOES_ANALISE"; then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$NOTIFICACOES_ANALISE"
+          git commit -m "Registrar notificação editorial por e-mail [skip ci]"
+
+          publicado=false
+          for tentativa in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              publicado=true
+              break
+            fi
+            echo "Tentativa $tentativa/3 de registrar a notificação não concluiu; tentando novamente."
+          done
+          if [[ "$publicado" != "true" ]]; then
+            echo "::warning title=Registro da notificação pendente::O e-mail foi enviado, mas o registro de deduplicação não pôde ser publicado."
+          fi
 
       - name: Notificar buscadores via IndexNow
         if: success()
