@@ -42,9 +42,7 @@ jobs:
           cache-dependency-path: requirements-af-previsao.txt
 
       - name: Instalar dependências do AF-Previsão e coleta web
-        run: |
-          python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
-          python -m pip install --disable-pip-version-check --no-cache-dir curl-cffi==0.15.0
+        run: python -m pip install --disable-pip-version-check -r requirements-af-previsao.txt
 
       - name: Mostrar horario da execucao
         run: |
@@ -211,9 +209,9 @@ jobs:
         if: steps.espn.outputs.sincronizado == 'true'
         run: python scripts/gerar_auditoria_calendario.py
 
-      - name: Buscar estatísticas por jogo finalizado
+      - name: Buscar incrementalmente estatísticas dos jogos finalizados
         if: steps.espn.outputs.sincronizado == 'true'
-        run: python scripts/buscar_detalhes_jogos_brasileirao.py
+        run: python scripts/buscar_detalhes_jogos_brasileirao.py --refresh-hours 48
 
       - name: Buscar líderes oficiais de gols e assistências
         if: steps.espn.outputs.sincronizado == 'true'
