@@ -167,3 +167,18 @@
     transition: none;
   }
 }
+
+/* Leitura institucional consistente em qualquer largura de tela. */
+:is(
+  .about-lead,
+  .about-card p,
+  .about-identity p,
+  .about-responsibility p
+) {
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}

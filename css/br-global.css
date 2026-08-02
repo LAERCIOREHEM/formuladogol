@@ -956,3 +956,25 @@ html[data-br-update-status="error"] .br-update-status-dot {
   white-space: nowrap;
   border: 0;
 }
+
+/* ======================================================================
+   TIPOGRAFIA EDITORIAL — leitura uniforme em desktop e celular
+   ----------------------------------------------------------------------
+   Somente textos explicativos entram nesta regra. Títulos, menus, botões,
+   tabelas e valores numéricos mantêm o alinhamento próprio de cada bloco.
+   ====================================================================== */
+:is(
+  .br-legal-context > :not(.br-legal-context-icon):not(.br-legal-context-divider),
+  .br-footer-copy,
+  .br-source-note p,
+  .returno-note,
+  .bolao-af-intro p,
+  .site-footer.br-disclaimer
+) {
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}

@@ -1899,3 +1899,44 @@ body > .container > section.hero > img {
   .probability-points-more > summary { display:block; }
   .probability-points-more > summary span { display:block; margin-top:3px; }
 }
+
+/* Textos de leitura e metodologia: ocupação equilibrada dos cards sem
+   interferir em métricas, tabelas, títulos, rótulos ou controles. */
+:is(
+  .probability-index-summary p,
+  .ranking-method-intro,
+  .ranking-method-grid p,
+  .ranking-method-notes p,
+  .ranking-method-disclaimer,
+  .probability-intro,
+  .probability-notice p,
+  .probability-route-columns section > p,
+  .probability-route-note,
+  .probability-evolution-empty p,
+  .probability-method-lead,
+  .probability-plain-grid p,
+  .probability-reading-guide p,
+  .probability-method-sections p,
+  .probability-authorship p,
+  .probability-references li,
+  .probability-method-disclaimer,
+  .probability-continental-note,
+  .probability-final-evaluation > p,
+  .probability-final-evaluation-details > p,
+  .probability-pool-method p,
+  .probability-points-card > p,
+  .probability-points-notes p,
+  .stats-intro p,
+  .stats-summary-secondary,
+  .stats-empty span,
+  .stats-source-note,
+  .stats-performance-card p,
+  .stats-note
+) {
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}

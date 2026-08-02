@@ -724,3 +724,25 @@ body.modal-open { overflow: hidden; }
   }
   .club-ranking-history-item { scroll-snap-align: start; }
 }
+
+/* Descrições institucionais dos clubes e do museu. Os dados compactos e
+   os títulos permanecem com o alinhamento original. */
+:is(
+  .club-card > p,
+  .detail-hero p,
+  .detail-grid .panel-inner > p,
+  .club-probability-card p,
+  .club-performance-card p,
+  .club-ranking-history-card > p,
+  .timeline-card p,
+  .record-card p,
+  .empty-state,
+  .site-footer
+) {
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}

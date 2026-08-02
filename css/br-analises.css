@@ -12,3 +12,7 @@ body{margin:0;padding:16px;background:radial-gradient(circle at 8% 4%,rgba(119,1
 @media(max-width:620px){body{padding:8px}}
 @media(max-width:390px){.analysis-kpis{grid-template-columns:1fr}.analysis-card{padding:18px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* Texto editorial: colunas visualmente completas em desktop e leitura
+   regular no celular, sem justificar títulos, tabelas ou ações. */
+:is(.analysis-card p,.analysis-deck,.analysis-note,.analysis-method,.analysis-copy p,.analysis-help,.analysis-percent-legend){text-align:justify;text-align-last:left;text-justify:inter-word;-webkit-hyphens:auto;hyphens:auto;overflow-wrap:break-word}

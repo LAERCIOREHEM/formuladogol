@@ -687,3 +687,18 @@ body > .container > section.hero > img {
     overflow-x: auto;
   }
 }
+
+/* Regras, orientações e estados vazios; formulários e placares ficam fora. */
+:is(
+  .rule-card span,
+  .panel-inner > .muted-note,
+  .panel-inner.empty p,
+  .panel-inner > p:not(.badge):not(.status-message)
+) {
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}

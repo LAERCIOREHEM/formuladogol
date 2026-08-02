@@ -1103,3 +1103,18 @@
   .live-lineup-player { grid-template-columns: 29px minmax(0, 1fr); }
   .live-lineup-number { width: 29px; height: 29px; }
 }
+
+/* Notas explicativas do acompanhamento ao vivo. */
+:is(
+  .live-provider-card p,
+  .live-stats-note,
+  .live-lineups-footnote,
+  .live-empty
+) {
+  text-align: justify;
+  text-align-last: left;
+  text-justify: inter-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
