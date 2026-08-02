@@ -2024,20 +2024,29 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         integrated = continental_by_team[item["clube"]]
         item["probabilidades_pct"]["libertadores"] = integrated["libertadores"]["total"]["percentual_estimado"]
         item["probabilidades_pct"]["sul_americana"] = integrated["sul_americana"]["total"]["percentual_estimado"]
+        item["probabilidades_pct"]["sem_competicao_continental"] = integrated["sem_competicao_continental"]["total"]["percentual_estimado"]
         item["probabilidades_detalhes"]["libertadores"] = integrated["libertadores"]["total"]
         item["probabilidades_detalhes"]["sul_americana"] = integrated["sul_americana"]["total"]
+        item["probabilidades_detalhes"]["sem_competicao_continental"] = integrated["sem_competicao_continental"]["total"]
         item["decomposicao_chances"] = {
             "libertadores": integrated["libertadores"],
             "sul_americana": integrated["sul_americana"],
+            "sem_competicao_continental": integrated["sem_competicao_continental"],
         }
     total_sul_integrada = sum(item["probabilidades_pct"]["sul_americana"] for item in teams)
     if abs(total_sul_integrada - 600.0) > 0.02:
         raise ValueError(f"soma integrada da Sul-Americana inválida: {total_sul_integrada:.6f}")
     for item in teams:
-        for field in ("libertadores", "sul_americana"):
+        for field in ("libertadores", "sul_americana", "sem_competicao_continental"):
             value = float(item["probabilidades_pct"][field])
             if not math.isfinite(value) or not 0.0 <= value <= 100.0:
                 raise ValueError(f"probabilidade integrada inválida para {item['clube']}: {field}")
+        destinos = sum(
+            float(item["probabilidades_pct"][field])
+            for field in ("libertadores", "sul_americana", "sem_competicao_continental")
+        )
+        if abs(destinos - 100.0) > 0.000001:
+            raise ValueError(f"destinos continentais não fecham 100% para {item['clube']}: {destinos:.6f}")
 
     bolao["gerado_em"] = generated_at
     bolao["versao_modelo"] = model_version

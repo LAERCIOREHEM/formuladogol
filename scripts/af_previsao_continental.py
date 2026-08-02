@@ -760,16 +760,10 @@ def display_probability(
         display = "100,000%"
     elif pct > 100.0 - threshold_pct:
         display = f">{100.0 - threshold_pct:.3f}%".replace(".", ",")
-    elif pct >= 99.9:
-        # Não arredondar uma probabilidade residual real para 100,0%.
-        # Ex.: 1.999.949/2.000.000 = 99,99745%, exibido como 99,997%.
-        display = f"{pct:.3f}%".replace(".", ",")
-    elif pct < 0.1:
-        display = f"{pct:.3f}%".replace(".", ",")
-    elif pct < 1.0:
-        display = f"{pct:.2f}%".replace(".", ",")
     else:
-        display = f"{pct:.1f}%".replace(".", ",")
+        # Uma única escala visual em toda a aplicação. Três casas preservam
+        # eventos raros sem transformar 99,95% ou 99,997% em falsa certeza.
+        display = f"{pct:.3f}%".replace(".", ",")
     upper_95 = 100.0 * (3.0 / simulations) if zero_observed and structurally_possible else None
     return {
         "ocorrencias": int(count),
@@ -1033,6 +1027,15 @@ def allocate_integrated_qualification(
         if abs(sula_route_sum - sula_total_info["percentual_estimado"]) > 0.002:
             raise ValueError(f"decomposição da Sul-Americana não fecha para {team}")
 
+        sem_continental_count = simulations - int(lib_total[index]) - int(sula_total[index])
+        if sem_continental_count < 0:
+            raise ValueError(f"destinos continentais se sobrepõem para {team}")
+        sem_continental_info = display_probability(
+            sem_continental_count,
+            simulations,
+            threshold,
+        )
+
         results[team] = {
             "libertadores": {
                 "total": lib_total_info,
@@ -1044,6 +1047,10 @@ def allocate_integrated_qualification(
                 "total": sula_total_info,
                 "vias": sula_routes,
                 "soma_vias_pct": round(sula_route_sum, 6),
+            },
+            "sem_competicao_continental": {
+                "total": sem_continental_info,
+                "regra": "complemento exclusivo após Libertadores e Sul-Americana",
             },
         }
 
@@ -1251,13 +1258,20 @@ def self_test() -> None:
         assert abs(lib["total"]["percentual_estimado"] - lib["soma_vias_pct"]) < 0.002, team
         sula = item["sul_americana"]
         assert abs(sula["total"]["percentual_estimado"] - sula["soma_vias_pct"]) < 0.002, team
+        sem_continental = item["sem_competicao_continental"]["total"]
+        total_destinos = (
+            int(lib["total"]["ocorrencias"])
+            + int(sula["total"]["ocorrencias"])
+            + int(sem_continental["ocorrencias"])
+        )
+        assert total_destinos == simulations, team
     zero = display_probability(0, 2_000_000, 0.001)
     assert zero["exibicao"] == "<0,001%"
     assert zero["limite_superior_95_regra_dos_tres_pct"] == 0.00015
     assert display_probability(20, 2_000_000, 0.001)["exibicao"] == "0,001%"
     assert display_probability(128, 2_000_000, 0.001)["exibicao"] == "0,006%"
-    assert display_probability(9_720, 2_000_000, 0.001)["exibicao"] == "0,49%"
-    assert display_probability(149_200, 2_000_000, 0.001)["exibicao"] == "7,5%"
+    assert display_probability(9_720, 2_000_000, 0.001)["exibicao"] == "0,486%"
+    assert display_probability(149_200, 2_000_000, 0.001)["exibicao"] == "7,460%"
     assert display_probability(1_999_949, 2_000_000, 0.001)["exibicao"] == "99,997%"
     assert display_probability(1_999_999, 2_000_000, 0.001)["exibicao"] == ">99,999%"
     assert display_probability(2_000_000, 2_000_000, 0.001)["exibicao"] == "100,000%"

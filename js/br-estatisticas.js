@@ -597,23 +597,13 @@
   }
 
   function probabilityDisplayText(detail, value, digits = 1) {
-    const explicit = String(detail?.exibicao || "").trim();
-    const legacyExplicit = /^(?:<0,1|>99,9|0|100,0)%$/.test(explicit);
-    if (explicit && !legacyExplicit) return explicit;
     const n = Number(value);
     if (!Number.isFinite(n)) return "—";
     if (detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false) return "0,000%";
     if (n >= 0 && n < 0.001) return "<0,001%";
     if (n >= 100) return "100,000%";
     if (n > 99.999) return ">99,999%";
-    // Uma casa decimal transformava 99,99745% em 100,0%, embora ainda
-    // existissem simulações no resultado complementar. Perto de 100%, a
-    // mesma resolução de três casas usada nas probabilidades residuais evita
-    // comunicar certeza inexistente.
-    if (n >= 99.9) return `${number(n, 3)}%`;
-    if (n < 0.1) return `${number(n, 3)}%`;
-    if (n < 1) return `${number(n, 2)}%`;
-    return `${number(n, digits)}%`;
+    return `${number(n, 3)}%`;
   }
 
   function probabilityFieldValue(club, field) {
@@ -621,12 +611,51 @@
     if (Number.isFinite(Number(p[field]))) return Number(p[field]);
     if (field === "libertadores") return Number(p.libertadores_base);
     if (field === "sul_americana") return Number(p.sul_americana_base);
+    if (field === "sem_competicao_continental") {
+      const lib = Number(p.libertadores ?? p.libertadores_base);
+      const sula = Number(p.sul_americana ?? p.sul_americana_base);
+      return Number.isFinite(lib) && Number.isFinite(sula) ? Math.max(0, 100 - lib - sula) : NaN;
+    }
     return Number(p[field]);
   }
 
   function probabilityFieldDetail(club, field) {
     const details = club?.probabilidades_detalhes || {};
     return details[field] || (field === "libertadores" ? details.libertadores_base : field === "sul_americana" ? details.sul_americana_base : null);
+  }
+
+  // Converte a tríade exclusiva em milésimos percentuais usando o método
+  // dos maiores restos. Toda possibilidade matemática recebe ao menos uma
+  // unidade visual (0,001%) e a compensação sai do maior destino. Assim, as
+  // três células exibidas somam exatamente 100,000% em cada linha.
+  function continentalDisplayTriplet(club) {
+    const fields = ["libertadores", "sul_americana", "sem_competicao_continental"];
+    const raw = fields.map((field) => Math.max(0, Number(probabilityFieldValue(club, field)) || 0));
+    const rawTotal = raw.reduce((sum, value) => sum + value, 0);
+    const normalized = rawTotal > 0 ? raw.map((value) => 100 * value / rawTotal) : [0, 0, 100];
+    const scaled = normalized.map((value) => value * 1000);
+    const units = scaled.map((value, index) => {
+      const detail = probabilityFieldDetail(club, fields[index]);
+      const possible = detail?.impossivel_estruturalmente !== true && detail?.possivel_estruturalmente !== false;
+      const observedOrPossible = normalized[index] > 0 || possible;
+      return observedOrPossible ? Math.max(1, Math.floor(value + 1e-9)) : 0;
+    });
+    let difference = 100000 - units.reduce((sum, value) => sum + value, 0);
+    const order = scaled.map((value, index) => ({ index, remainder: value - Math.floor(value) }))
+      .sort((a, b) => difference >= 0 ? b.remainder - a.remainder : units[b.index] - units[a.index]);
+    let cursor = 0;
+    while (difference !== 0) {
+      const index = order[cursor % order.length].index;
+      if (difference > 0) {
+        units[index] += 1;
+        difference -= 1;
+      } else if (units[index] > 1) {
+        units[index] -= 1;
+        difference += 1;
+      }
+      cursor += 1;
+    }
+    return Object.fromEntries(fields.map((field, index) => [field, `${number(units[index] / 1000, 3)}%`]));
   }
 
   // ────────────────────────────────────────────────────────────────────
@@ -986,6 +1015,7 @@
     const titleValue = probabilityFieldValue(club, "campeao");
     const libValue = probabilityFieldValue(club, "libertadores");
     const sulaValue = probabilityFieldValue(club, "sul_americana");
+    const noContinentalValue = probabilityFieldValue(club, "sem_competicao_continental");
     const relegationValue = probabilityFieldValue(club, "rebaixamento");
     const position = projectedPosition(club);
     const projected = projectedPoints(club);
@@ -1010,6 +1040,7 @@
         ${probabilityProjectionMetric("Faixa provável", rangeText, "range", "Faixa central de 80% das posições simuladas.")}
         ${probabilityMetric("Libertadores", libValue, "libertadores", probabilityFieldDetail(club, "libertadores"), "Chance consolidada por Brasileirão, copas, títulos continentais e repasses.")}
         ${probabilityMetric("Sul-Americana", sulaValue, "sulamericana", probabilityFieldDetail(club, "sul_americana"), "Chance consolidada após a alocação de todas as vagas de Libertadores.")}
+        ${probabilityMetric("Sem competição continental", noContinentalValue, "neutral", probabilityFieldDetail(club, "sem_competicao_continental"), "Complemento exclusivo: não alcançar Libertadores nem Sul-Americana.")}
         ${probabilityMetric("Rebaixamento", relegationValue, "relegation", probabilityFieldDetail(club, "rebaixamento"))}
       </div>
       ${probabilityTrendNote(club)}
@@ -1119,14 +1150,20 @@
     const range = probabilityPositionRange(club);
     const rangeText = range ? `${integer(range.best)}º–${integer(range.worst)}º` : "—";
     const atual = liveStanding(club);
+    const continental = continentalDisplayTriplet(club);
+    const noContinentalDetail = probabilityFieldDetail(club, "sem_competicao_continental");
+    const noContinentalRaw = probabilityFieldValue(club, "sem_competicao_continental");
+    const noContinentalTooltip = probabilityTooltip(noContinentalDetail)
+      || `Complemento calculado antes do arredondamento conjunto: ${number(noContinentalRaw, 5)}%`;
     return `<tr>
       <td class="probability-table-position"><span>${integer(atual.posicao)}</span></td>
       <th scope="row" class="probability-table-club"><a href="${escapeAttr(clubHref(club?.clube))}">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong></a></th>
       <td class="probability-table-number"><strong>${integer(atual.pontos)}</strong></td>
       <td class="probability-table-number">${integer(atual.jogos)}</td>
       <td class="probability-table-percent probability-cell-title" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "campeao")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "campeao"), probabilityFieldValue(club, "campeao")))}</td>
-      <td class="probability-table-percent probability-cell-lib" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "libertadores")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "libertadores"), probabilityFieldValue(club, "libertadores")))}</td>
-      <td class="probability-table-percent probability-cell-sula" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "sul_americana")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "sul_americana"), probabilityFieldValue(club, "sul_americana")))}</td>
+      <td class="probability-table-percent probability-cell-lib" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "libertadores")))}">${escapeHtml(continental.libertadores)}</td>
+      <td class="probability-table-percent probability-cell-sula" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "sul_americana")))}">${escapeHtml(continental.sul_americana)}</td>
+      <td class="probability-table-percent probability-cell-none" title="${escapeAttr(noContinentalTooltip)}">${escapeHtml(continental.sem_competicao_continental)}</td>
       <td class="probability-table-percent probability-cell-drop" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "rebaixamento")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "rebaixamento"), probabilityFieldValue(club, "rebaixamento")))}</td>
       <td class="probability-table-projection"><strong>${position ? `${integer(position)}º` : "—"}</strong></td>
       <td class="probability-table-range">${escapeHtml(rangeText)}</td>
@@ -1176,10 +1213,11 @@
       <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
       <div class="probability-table-shell">
         <table class="probability-comparison-table">
-          <thead><tr><th>Pos.</th><th>Time</th><th>Pts</th><th>J</th><th>Campeão</th><th>Libertadores</th><th>Sul-Americana</th><th>Rebaixamento</th><th>Proj.</th><th>Faixa</th></tr></thead>
+          <thead><tr><th>Pos.</th><th>Time</th><th>Pts</th><th>J</th><th>Campeão</th><th>Libertadores</th><th>Sul-Americana</th><th>Sem continental</th><th>Rebaixamento</th><th>Proj.</th><th>Faixa</th></tr></thead>
           <tbody>${rows.map(probabilityComparisonRow).join("")}</tbody>
         </table>
       </div>
+      <p class="probability-continental-note"><strong>Destino continental:</strong> Libertadores + Sul-Americana + sem competição continental = <strong>100,000%</strong> em cada clube. Os três valores são arredondados em conjunto; uma possibilidade ainda válida abaixo da resolução recebe o piso visual de 0,001%, compensado no maior destino. Rebaixamento é um risco independente, pois uma vaga conquistada por copa pode coexistir com queda.</p>
     </section>`;
   }
 

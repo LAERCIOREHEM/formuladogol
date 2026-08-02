@@ -3606,18 +3606,12 @@ function formatarChanceBolao(item) {
   return formatarPercentualPreciso(item.chance_titulo_pct, explicita);
 }
 function formatarPercentualPreciso(valorBruto, exibicaoExplicita = '') {
-  const explicita = String(exibicaoExplicita || '').trim();
-  const explicitaLegada = /^(?:<0,1|>99,9|0|100,0)%$/.test(explicita);
-  if (explicita && !explicitaLegada) return explicita;
   const valor = Number(valorBruto);
   if (!Number.isFinite(valor)) return '—';
   if (valor >= 0 && valor < .001) return '<0,001%';
   if (valor >= 100) return '100,000%';
   if (valor > 99.999) return '>99,999%';
-  if (valor >= 99.9) return valor.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3}) + '%';
-  if (valor < .1) return valor.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3}) + '%';
-  if (valor < 1) return valor.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}) + '%';
-  return valor.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1}) + '%';
+  return valor.toLocaleString('pt-BR',{minimumFractionDigits:3,maximumFractionDigits:3}) + '%';
 }
 function toggleBolaoProjection(chave) {
   const seletor = String(chave).replace(/"/g,'\"');

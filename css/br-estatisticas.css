@@ -1742,7 +1742,7 @@ body > .container > section.hero > img {
 .probability-comparison-section { margin-top: 18px; }
 .probability-table-hint { margin: -2px 0 10px; color: var(--muted); font-size: 11px; }
 .probability-table-shell { position: relative; width: 100%; overflow-x: auto; border: 1px solid rgba(148,163,184,.18); border-radius: 17px; background: rgba(4,16,23,.72); scrollbar-width: thin; }
-.probability-comparison-table { width: 100%; min-width: 1040px; border-collapse: separate; border-spacing: 0; color: #e8f1f7; font-size: 12px; }
+.probability-comparison-table { width: 100%; min-width: 1160px; border-collapse: separate; border-spacing: 0; color: #e8f1f7; font-size: 12px; }
 .probability-comparison-table th,
 .probability-comparison-table td { height: 54px; padding: 9px 11px; border-bottom: 1px solid rgba(148,163,184,.10); white-space: nowrap; text-align: center; }
 .probability-comparison-table thead th { position: sticky; top: 0; z-index: 5; height: 46px; color: #aebdca; background: #12212b; font-size: 10px; font-weight: 950; letter-spacing: .06em; text-transform: uppercase; }
@@ -1764,6 +1764,9 @@ body > .container > section.hero > img {
 .probability-cell-title { color: #ffe47a; }
 .probability-cell-lib { color: #cfff86; }
 .probability-cell-sula { color: #7dd3fc; }
+.probability-cell-none { color: #c4b5fd; }
+.probability-continental-note { margin: 10px 2px 0; color: #8fa1b1; font-size: 11px; line-height: 1.55; }
+.probability-continental-note strong { color: #dce7ef; }
 .probability-cell-drop { color: #fda4af; }
 .probability-table-projection strong { color: #ddd6fe; font-size: 15px; }
 .probability-table-range { color: #fde68a; font-weight: 900; }
@@ -1777,7 +1780,7 @@ body > .container > section.hero > img {
   .probability-compact-hero { display: block; }
   .probability-compact-hero p { margin-top: 8px; font-size: 12px; text-align: left; }
   .probability-overview-card { padding: 13px; }
-  .probability-comparison-table { min-width: 930px; font-size: 11px; }
+  .probability-comparison-table { min-width: 1050px; font-size: 11px; }
   .probability-comparison-table th,
   .probability-comparison-table td { height: 50px; padding: 8px 9px; }
   .probability-comparison-table thead th:first-child,
