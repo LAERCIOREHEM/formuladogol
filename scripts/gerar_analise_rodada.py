@@ -431,7 +431,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-analises-v1">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-analises-v2">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');</script>
   <script type="application/ld+json">{json_ld}</script>
@@ -525,7 +525,7 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
     <header class="hero"><a href="../estatisticas.html"><img src="../img/header-formula-do-gol.png" alt="Fórmula do Gol — A matemática por trás do futebol"></a></header>
     {menu('../', True)}
     <main>
-      <section class="analysis-hub-head"><span>BRASILEIRÃO 2026</span><h1>{titulo}</h1><p>{descricao}</p></section>
+      <h1 class="analysis-page-title">{titulo}</h1>
       <section class="analysis-grid" aria-label="Arquivo de análises">{''.join(cards) if cards else '<p>Nenhuma análise publicada.</p>'}</section>
     </main>
     {rodape('../')}
@@ -651,6 +651,9 @@ def self_test() -> int:
     pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00")
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
     assert meta["jogos_concluidos"] == 10
+    hub = gerar_hub(carregar_manifesto().get("artigos") or [])
+    assert '<h1 class="analysis-page-title">Análises do Brasileirão 2026</h1>' in hub
+    assert "analysis-hub-head" not in hub
     print("OK self-test: detector, fatos, percentuais, editorial e HTML.")
     return 0
 
