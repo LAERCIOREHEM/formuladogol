@@ -101,9 +101,11 @@ def casas_percentual(valor: float) -> int | None:
     return 1
 
 
-def percentual(valor: float) -> str:
+def percentual(valor: float, possivel_matematicamente: bool | None = None) -> str:
     valor = float(valor)
     if valor == 0:
+        if possivel_matematicamente is True:
+            return "<0,001%"
         return "0%"
     if 0 < valor < 0.001:
         return "<0,001%"
@@ -125,7 +127,12 @@ def variacao(valor: float) -> str:
     return (f"{sinal}{valor:.3f}" if abs(valor) < 0.1 else f"{sinal}{valor:.1f}").replace(".", ",") + " p.p."
 
 
-def comparacao_percentual(antes: float, depois: float) -> tuple[str, str, str]:
+def comparacao_percentual(
+    antes: float,
+    depois: float,
+    possivel_antes: bool | None = None,
+    possivel_depois: bool | None = None,
+) -> tuple[str, str, str]:
     """Formata o trio de modo que a variação feche com os valores visíveis.
 
     Quando ambos os percentuais são numéricos, eles usam a mesma precisão e
@@ -155,7 +162,8 @@ def comparacao_percentual(antes: float, depois: float) -> tuple[str, str, str]:
             texto_delta = f"{sinal}{_numero_pt_br(delta_exibido, casas)} p.p."
         return texto_antes, texto_depois, texto_delta
 
-    texto_antes, texto_depois = percentual(antes), percentual(depois)
+    texto_antes = percentual(antes, possivel_antes)
+    texto_depois = percentual(depois, possivel_depois)
     if bruto and texto_antes == texto_depois:
         limite = "0,001" if texto_antes == "<0,001%" else "0,1"
         texto_delta = ("↑" if bruto > 0 else "↓") + f" <{limite} p.p."
@@ -321,11 +329,34 @@ def clube_por_nome(snapshot: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {normalizar_nome(c.get("clube")): c for c in snapshot.get("clubes") or []}
 
 
+def titulo_matematicamente_possivel(clube: dict[str, Any], lider_pontos: int) -> bool:
+    """Distingue zero observado no Monte Carlo de impossibilidade matemática.
+
+    Só crava impossibilidade quando nem vencendo todas as partidas restantes o
+    clube alcançaria a pontuação atual do líder. Empates em pontos permanecem
+    possíveis porque os critérios de desempate ainda podem decidir o campeonato.
+    """
+    if float(clube.get("campeao_pct") or 0) > 0:
+        return True
+    try:
+        pontos = int(clube["pontos_atuais"])
+        jogos = int(clube["jogos_atuais"])
+    except (KeyError, TypeError, ValueError):
+        return True
+    if not 0 <= jogos <= 38:
+        return True
+    if jogos == 38:
+        return int(clube.get("posicao_atual") or 0) == 1
+    return pontos + 3 * (38 - jogos) >= lider_pontos
+
+
 def montar_dossie(rodada: int, estado: dict[str, Any]) -> dict[str, Any]:
     inicio, fim = snapshots_da_rodada(rodada)
     antes, depois = clube_por_nome(inicio), clube_por_nome(fim)
     if set(antes) != set(depois) or len(depois) != 20:
         raise ErroAnalise("Snapshots não contêm os mesmos vinte clubes")
+    lider_antes = max(int(c.get("pontos_atuais") or 0) for c in antes.values())
+    lider_depois = max(int(c.get("pontos_atuais") or 0) for c in depois.values())
     linhas = []
     for nome in depois:
         a, d = antes[nome], depois[nome]
@@ -335,6 +366,8 @@ def montar_dossie(rodada: int, estado: dict[str, Any]) -> dict[str, Any]:
             "pontos_depois": int(d.get("pontos_atuais") or 0),
             "titulo_antes": float(a.get("campeao_pct") or 0),
             "titulo_depois": float(d.get("campeao_pct") or 0),
+            "titulo_possivel_antes": titulo_matematicamente_possivel(a, lider_antes),
+            "titulo_possivel_depois": titulo_matematicamente_possivel(d, lider_depois),
             "titulo_delta": float(d.get("campeao_pct") or 0) - float(a.get("campeao_pct") or 0),
             "libertadores_antes": float(a.get("libertadores_pct") or 0),
             "libertadores_depois": float(d.get("libertadores_pct") or 0),
@@ -628,7 +661,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-video-incorporado-v5">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-probabilidade-sticky-v6">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');</script>
   <script type="application/ld+json">{json_ld}</script>
@@ -640,7 +673,12 @@ def tabela_comparativa(dossie: dict[str, Any]) -> str:
     corpo = []
     for c in linhas:
         classe_delta = "delta-up" if c["titulo_delta"] > 0 else "delta-down" if c["titulo_delta"] < 0 else "delta-flat"
-        titulo_antes, titulo_depois, titulo_delta = comparacao_percentual(c["titulo_antes"], c["titulo_depois"])
+        titulo_antes, titulo_depois, titulo_delta = comparacao_percentual(
+            c["titulo_antes"],
+            c["titulo_depois"],
+            c["titulo_possivel_antes"],
+            c["titulo_possivel_depois"],
+        )
         corpo.append(f'''<tr>
           <th scope="row"><a href="../clubes.html#{esc(c['clube'].lower().replace(' ', '-'))}">{esc(c['clube'])}</a></th>
           <td>{c['pontos_depois']}</td>
@@ -697,7 +735,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
         {cards_variacoes(dossie)}
         <section class="analysis-copy"><h2>O retrato da rodada</h2>{paragrafos}</section>
         <section><h2>Resultados considerados</h2><div class="analysis-results">{resultados}</div></section>
-        <section><h2>Como as probabilidades mudaram</h2><p class="analysis-help">Comparação entre o último snapshot anterior e o fechamento editorial da rodada. No celular, arraste a tabela para o lado.</p><p class="analysis-percent-legend"><strong>Padrão dos percentuais:</strong> <b>0%</b> significa nenhum cenário nas simulações; <b>&lt;0,001%</b> significa que houve cenários, mas abaixo do menor valor exibido. Nas variações, <b>↑/↓ &lt;0,001 p.p.</b> preserva movimentos residuais sem exibir zeros falsos.</p>{tabela_comparativa(dossie)}</section>
+        <section><h2>Como as probabilidades mudaram</h2><p class="analysis-help">Comparação entre o último snapshot anterior e o fechamento editorial da rodada. No celular, arraste a tabela para o lado.</p><p class="analysis-percent-legend"><strong>Padrão dos percentuais:</strong> <b>0%</b> aparece somente quando o título já é matematicamente impossível; <b>&lt;0,001%</b> preserva uma possibilidade ainda existente, mas abaixo da resolução exibida — inclusive quando ela não ocorreu nas 2 milhões de simulações. Nas variações, <b>↑/↓ &lt;0,001 p.p.</b> identifica movimentos residuais sem criar zeros falsos.</p>{tabela_comparativa(dossie)}</section>
         <aside class="analysis-method"><strong>Leitura dos dados:</strong> as probabilidades são estimativas do AF-Previsão, calculadas em {dossie['simulacoes']:,} simulações e não representam certezas. O texto automático utiliza somente um dossiê factual auditado; resultados e percentuais são inseridos diretamente dos JSONs do Fórmula do Gol.</aside>
         <nav class="analysis-next" aria-label="Mais conteúdo"><a href="./">← Todas as análises</a><a href="../estatisticas.html#probabilidades">Probabilidades atuais →</a></nav>
       </article>
@@ -836,6 +874,13 @@ def executar(args: argparse.Namespace) -> int:
 
 def self_test() -> int:
     assert percentual(0) == "0%"
+    assert percentual(0, True) == "<0,001%"
+    assert percentual(0, False) == "0%"
+    assert titulo_matematicamente_possivel({"campeao_pct": 0, "pontos_atuais": 22, "jogos_atuais": 20}, 47)
+    assert not titulo_matematicamente_possivel(
+        {"campeao_pct": 0, "pontos_atuais": 60, "jogos_atuais": 38, "posicao_atual": 2},
+        60,
+    )
     assert percentual(0.0005) == "<0,001%"
     assert percentual(0.0022) == "0,002%"
     assert percentual(77.5218) == "77,5%"
@@ -849,12 +894,16 @@ def self_test() -> int:
     assert variacao(-0.00005) == "↓ <0,001 p.p."
     assert comparacao_percentual(0.00745, 0.00555) == ("0,007%", "0,006%", "-0,001 p.p.")
     assert comparacao_percentual(0, 0.00005) == ("0%", "<0,001%", "↑ <0,001 p.p.")
+    assert comparacao_percentual(0, 0.00005, True, True) == ("<0,001%", "<0,001%", "↑ <0,001 p.p.")
+    assert comparacao_percentual(0, 0, False, False) == ("0%", "0%", "0 p.p.")
     assert comparacao_percentual(99.96, 99.97) == (">99,9%", ">99,9%", "↑ <0,1 p.p.")
     config = carregar_json(ARQUIVO_CONFIG)
     estado = estado_rodada(20, datetime(2026, 8, 2, 12, tzinfo=FUSO_BR), config)
     assert estado["elegivel"] and estado["jogos_concluidos"] == 10
     dossie = montar_dossie(20, estado)
     assert len(dossie["jogos"]) == 10 and len(dossie["clubes"]) == 20
+    gremio = next(c for c in dossie["clubes"] if c["clube"] == "Grêmio")
+    assert gremio["titulo_possivel_antes"] and gremio["titulo_possivel_depois"]
     resultados = {j["linha"] for j in dossie["jogos"]}
     assert "Flamengo 1 × 1 São Paulo" in resultados
     assert "Palmeiras 1 × 2 Atlético-MG" in resultados
@@ -863,10 +912,14 @@ def self_test() -> int:
     validar_editorial(editorial, dossie)
     pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00", carregar_manifesto().get("artigos") or [])
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
-    assert "br-analises.css?v=20260802-video-incorporado-v5" in pagina
+    assert "br-analises.css?v=20260802-probabilidade-sticky-v6" in pagina
     assert "br-analises.js?v=20260802-video-incorporado-v1" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
     assert "0,007%</td><td>0,006%</td><td class=\"delta delta-down\">-0,001 p.p.</td>" in pagina
+    assert re.search(
+        r">Grêmio</a>\s*</th>\s*<td>22</td>\s*<td>&lt;0,001%</td><td>&lt;0,001%</td>",
+        pagina,
+    )
     assert "99,96%" not in pagina and "&gt;99,9%" in pagina
     assert "Padrão dos percentuais" in pagina and "analysis-round-nav" in pagina
     assert pagina.count('class="analysis-video"') == 10
