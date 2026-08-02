@@ -15,6 +15,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -33,7 +34,7 @@ TOTAL_JOGOS_RODADA = 10
 ARQUIVO_MANIFESTO = Path("dados-br/analises.json")
 ARQUIVO_CONFIG = Path("dados-br/config-analises.json")
 CAMINHO_ANALISES = Path("analises")
-MODELO_PADRAO = "gpt-5.6"
+MODELO_PADRAO = "gpt-5.6-terra"
 MARCADOR = "fdg-analise-rodada"
 
 
@@ -68,6 +69,14 @@ def agora_br() -> datetime:
 
 def normalizar_nome(valor: str) -> str:
     return re.sub(r"\s+", " ", str(valor or "").strip())
+
+
+def normalizar_modelo_openai(valor: str | None) -> str:
+    bruto = normalizar_nome(valor or MODELO_PADRAO)
+    alias = re.sub(r"[\s_]+", "-", bruto.casefold())
+    if alias in {"5.6-terra", "gpt-5.6-terra"}:
+        return "gpt-5.6-terra"
+    return bruto or MODELO_PADRAO
 
 
 def nome_time(objeto: Any) -> str:
@@ -350,6 +359,26 @@ def titulo_matematicamente_possivel(clube: dict[str, Any], lider_pontos: int) ->
     return pontos + 3 * (38 - jogos) >= lider_pontos
 
 
+def libertadores_matematicamente_possivel(clube: dict[str, Any]) -> bool:
+    if float(clube.get("libertadores_pct") or 0) > 0:
+        return True
+    total = (((clube.get("decomposicao_chances") or {}).get("libertadores") or {}).get("total") or {})
+    if total.get("impossivel_estruturalmente") is True:
+        return False
+    if total.get("possivel_estruturalmente") is not None:
+        return bool(total.get("possivel_estruturalmente"))
+    return int(clube.get("jogos_atuais") or 0) < 38
+
+
+def rebaixamento_matematicamente_possivel(clube: dict[str, Any]) -> bool:
+    if float(clube.get("rebaixamento_pct") or 0) > 0:
+        return True
+    jogos = int(clube.get("jogos_atuais") or 0)
+    if jogos < 38:
+        return True
+    return int(clube.get("posicao_atual") or 0) >= 17
+
+
 def montar_dossie(rodada: int, estado: dict[str, Any]) -> dict[str, Any]:
     inicio, fim = snapshots_da_rodada(rodada)
     antes, depois = clube_por_nome(inicio), clube_por_nome(fim)
@@ -362,8 +391,14 @@ def montar_dossie(rodada: int, estado: dict[str, Any]) -> dict[str, Any]:
         a, d = antes[nome], depois[nome]
         linhas.append({
             "clube": nome,
+            "posicao_antes": int(a.get("posicao_atual") or 0),
+            "posicao_depois": int(d.get("posicao_atual") or 0),
             "pontos_antes": int(a.get("pontos_atuais") or 0),
             "pontos_depois": int(d.get("pontos_atuais") or 0),
+            "jogos_antes": int(a.get("jogos_atuais") or 0),
+            "jogos_depois": int(d.get("jogos_atuais") or 0),
+            "posicao_projetada_depois": int(d.get("posicao_projetada") or 0),
+            "pontos_projetados_depois": int(d.get("pontos_projetados") or 0),
             "titulo_antes": float(a.get("campeao_pct") or 0),
             "titulo_depois": float(d.get("campeao_pct") or 0),
             "titulo_possivel_antes": titulo_matematicamente_possivel(a, lider_antes),
@@ -371,9 +406,16 @@ def montar_dossie(rodada: int, estado: dict[str, Any]) -> dict[str, Any]:
             "titulo_delta": float(d.get("campeao_pct") or 0) - float(a.get("campeao_pct") or 0),
             "libertadores_antes": float(a.get("libertadores_pct") or 0),
             "libertadores_depois": float(d.get("libertadores_pct") or 0),
+            "libertadores_possivel_depois": libertadores_matematicamente_possivel(d),
             "libertadores_delta": float(d.get("libertadores_pct") or 0) - float(a.get("libertadores_pct") or 0),
+            "sul_americana_antes": float(a.get("sul_americana_pct") or 0),
+            "sul_americana_depois": float(d.get("sul_americana_pct") or 0),
+            "sul_americana_delta": float(d.get("sul_americana_pct") or 0) - float(a.get("sul_americana_pct") or 0),
+            "sem_continental_antes": max(0.0, 100.0 - float(a.get("libertadores_pct") or 0) - float(a.get("sul_americana_pct") or 0)),
+            "sem_continental_depois": max(0.0, 100.0 - float(d.get("libertadores_pct") or 0) - float(d.get("sul_americana_pct") or 0)),
             "rebaixamento_antes": float(a.get("rebaixamento_pct") or 0),
             "rebaixamento_depois": float(d.get("rebaixamento_pct") or 0),
+            "rebaixamento_possivel_depois": rebaixamento_matematicamente_possivel(d),
             "rebaixamento_delta": float(d.get("rebaixamento_pct") or 0) - float(a.get("rebaixamento_pct") or 0),
         })
     jogos = jogos_concluidos(rodada)
@@ -397,24 +439,73 @@ def narrativa_segura(dossie: dict[str, Any]) -> dict[str, Any]:
     rodada = dossie["rodada"]
     alta = maiores(dossie, "titulo_delta", 1)[0]
     baixa = maiores(dossie, "titulo_delta", 1, False)[0]
+    alta_lib = maiores(dossie, "libertadores_delta", 1)[0]
+    baixa_lib = maiores(dossie, "libertadores_delta", 1, False)[0]
+    alerta_queda = maiores(dossie, "rebaixamento_delta", 1)[0]
+    alivio_queda = maiores(dossie, "rebaixamento_delta", 1, False)[0]
     jogos = {j["mandante"]: j for j in dossie["jogos"]}
     if rodada == 20 and "Palmeiras" in jogos and "Flamengo" in jogos:
         return {
-            "titulo": "Rodada 20 reabre a disputa: Flamengo avança nas projeções após tropeço do Palmeiras",
-            "linha_fina": "O líder perdeu em casa, o vice empatou, e o modelo registrou uma aproximação relevante nas chances de título.",
-            "paragrafos": [
-                "A rodada mudou o tom da corrida pelo título. O Palmeiras saiu derrotado diante do Atlético-MG, enquanto o Flamengo somou um ponto contra o São Paulo. O resultado combinado reduziu a vantagem estatística do líder e manteve a disputa mais aberta.",
-                "O Botafogo também aproveitou a rodada ao vencer o Cruzeiro fora de casa. O resultado fortaleceu sua posição na briga continental e aumentou a pressão sobre o bloco imediatamente à frente.",
-                "Na parte inferior da tabela, a Chapecoense buscou um empate com o Santos, mas permaneceu em situação delicada. Vitória e Internacional terminaram a rodada sem pontuar, ampliando a importância dos confrontos seguintes.",
+            "titulo": "Rodada 20 abre a porta, mas Flamengo aproveita só parte do tropeço do Palmeiras",
+            "linha_fina": "O Atlético-MG derrubou o líder, o Flamengo parou no São Paulo e a rodada premiou Athletico-PR, Botafogo e Remo com avanços importantes nas projeções.",
+            "secoes": [
+                {
+                    "titulo": "O líder caiu; o perseguidor hesitou",
+                    "paragrafos": [
+                        "A rodada ofereceu ao Flamengo a oportunidade mais clara de apertar a liderança, mas terminou com gosto ambíguo para os dois primeiros. O Palmeiras perdeu em casa para o Atlético-MG e abriu uma fresta no topo; o time rubro-negro, porém, ficou no empate com o São Paulo e aproveitou apenas parte do espaço deixado pelo rival.",
+                        "A fotografia estatística mudou sem inverter a hierarquia. O Palmeiras segue como favorito porque a vantagem construída até aqui ainda pesa em grande parte das simulações. O Flamengo avançou, mas sua aproximação nasceu da combinação entre o revés do líder e o ponto que somou, não de uma virada completa na corrida pelo título. A disputa ficou mais viva; ainda não ficou equilibrada.",
+                    ],
+                },
+                {
+                    "titulo": "Três vitórias que mexeram no bloco continental",
+                    "paragrafos": [
+                        "Athletico-PR e Botafogo foram os vencedores com efeito mais nítido na corrida continental. O time paranaense venceu o Internacional e consolidou sua presença no grupo da frente. O Botafogo, por sua vez, venceu o Cruzeiro fora de casa e deu um salto relevante: somou pontos, ultrapassou concorrentes e transformou um confronto direto em ganho duplo na projeção de Libertadores.",
+                        "O Atlético-MG produziu o resultado de maior repercussão ao derrubar o líder em seu estádio. Além do peso simbólico, a vitória melhorou simultaneamente seus caminhos: aproximou o clube da faixa continental e reduziu com força o risco de queda. São Paulo e Fluminense pontuaram fora de casa, mas os empates tiveram alcance mais limitado diante das vitórias de concorrentes diretos.",
+                    ],
+                },
+                {
+                    "titulo": "Na parte de baixo, vencer valeu muito mais do que resistir",
+                    "paragrafos": [
+                        "O Remo conseguiu a resposta mais valiosa entre os ameaçados. A vitória sobre o Vitória não resolveu sua temporada, mas retirou pressão imediata e reduziu sensivelmente o risco projetado de rebaixamento. O efeito inverso atingiu o adversário: sem pontuar, o Vitória perdeu margem para os times que vinham logo atrás e terminou a rodada mais exposto.",
+                        "Santos e Chapecoense fizeram um empate que serviu pouco aos dois. A Chapecoense acrescentou um ponto, mas continua isolada na situação mais grave do campeonato. Para o Santos, ficar apenas no empate em casa teve custo maior, porque o risco de queda cresceu enquanto Remo e Atlético-MG venceram. O Internacional também saiu prejudicado: a derrota para o Athletico-PR aumentou a distância para a zona de alívio.",
+                    ],
+                },
+                {
+                    "titulo": "O que a rodada deixa para a sequência",
+                    "paragrafos": [
+                        "O principal recado está no contraste entre tabela e probabilidade. Um único fim de semana não apaga a vantagem acumulada pelo Palmeiras, mas mostrou que o líder ainda pode ceder terreno. Ao Flamengo cabe transformar a pressão estatística em vitórias; aos perseguidores do bloco continental, a rodada confirmou que confrontos diretos produzem movimentos maiores do que a simples soma de pontos.",
+                        "Na metade inferior, a margem para tropeços diminuiu. O Remo provou como uma vitória altera rapidamente a leitura do risco, enquanto Santos, Vitória e Internacional sentiram o efeito contrário. As projeções não encerram nenhuma disputa: elas registram, com base no que já aconteceu e no calendário restante, quem saiu desta rodada com caminhos mais largos e quem passou a depender de uma reação mais urgente.",
+                    ],
+                },
             ],
         }
     return {
         "titulo": f"Rodada {rodada}: {alta['clube']} ganha espaço e {baixa['clube']} recua nas projeções",
         "linha_fina": "Os resultados alteraram as probabilidades de título, classificação continental e permanência no Brasileirão.",
-        "paragrafos": [
-            f"A rodada teve impacto direto nas projeções. {alta['clube']} registrou o avanço mais relevante na disputa pelo título, enquanto {baixa['clube']} perdeu terreno.",
-            "As mudanças não dependem de um resultado isolado. O modelo recalcula todos os jogos restantes e considera a combinação entre pontuação, força recente e caminhos continentais.",
-            "O quadro ainda está aberto. As próximas partidas podem deslocar novamente as probabilidades, sobretudo entre clubes próximos na classificação.",
+        "secoes": [
+            {
+                "titulo": "A mudança central da rodada",
+                "paragrafos": [
+                    f"A rodada alterou o equilíbrio da disputa principal. {alta['clube']} registrou o avanço mais relevante na probabilidade de título, enquanto {baixa['clube']} perdeu terreno. O movimento não transforma automaticamente quem subiu em favorito nem elimina quem recuou; ele mostra como os resultados modificaram o conjunto de caminhos disponíveis até o fim do campeonato.",
+                    "A leitura também não depende de uma partida isolada. O modelo recalcula todo o calendário restante e combina pontuação acumulada, quantidade de jogos disputados, mando de campo, força estimada e as vagas continentais ainda abertas. Por isso, dois clubes que somam o mesmo número de pontos podem terminar a rodada com mudanças diferentes nas projeções.",
+                    "O dado mais importante é a direção do movimento, e não uma interpretação apressada de certeza. Ganhar probabilidade significa que o clube terminou a rodada com uma parcela maior dos desfechos simulados a seu favor; perder probabilidade indica que outros caminhos passaram a exigir uma combinação mais difícil de resultados.",
+                ],
+            },
+            {
+                "titulo": "A corrida continental ficou mais seletiva",
+                "paragrafos": [
+                    f"Na disputa por Libertadores, {alta_lib['clube']} foi o clube que mais ampliou sua presença nos cenários classificados. No sentido contrário, {baixa_lib['clube']} terminou a rodada com a perda mais acentuada. Essa faixa costuma reagir com força porque reúne times próximos, calendários diferentes e vias adicionais abertas pelas copas, o que torna cada ponto especialmente relevante.",
+                    "Vitórias em confrontos diretos tendem a produzir movimentos maiores porque um clube avança ao mesmo tempo que impede o concorrente de pontuar. Empates podem preservar posição na tabela, mas nem sempre mantêm a mesma probabilidade quando adversários próximos vencem. A projeção continental, portanto, deve ser lida como uma corrida conjunta e não como uma sequência de avaliações isoladas.",
+                    "A classificação atual continua sendo o registro oficial do campeonato, enquanto a probabilidade olha adiante. Essa diferença explica por que um time pode aparecer momentaneamente atrás na tabela e ainda conservar uma projeção melhor: jogos a cumprir, força estimada e confrontos restantes também influenciam a distribuição final.",
+                ],
+            },
+            {
+                "titulo": "A pressão mudou de endereço na parte de baixo",
+                "paragrafos": [
+                    f"Na luta contra o rebaixamento, {alerta_queda['clube']} recebeu o maior aumento de risco, enquanto {alivio_queda['clube']} conseguiu o alívio mais expressivo. A diferença resume a lógica da parte inferior: uma vitória pode devolver margem e confiança estatística, enquanto um tropeço ganha peso adicional quando concorrentes diretos aproveitam a mesma rodada.",
+                    "As probabilidades não funcionam como sentença. Elas organizam os caminhos disponíveis depois de cada rodada e serão recalculadas sempre que um novo resultado alterar a base esportiva. O quadro permanece aberto, mas a comparação permite identificar quem ganhou alternativas para a sequência e quem passou a depender de uma reação mais rápida para reduzir a pressão.",
+                ],
+            },
         ],
     }
 
@@ -426,52 +517,133 @@ def schema_editorial() -> dict[str, Any]:
         "properties": {
             "titulo": {"type": "string", "minLength": 35, "maxLength": 130},
             "linha_fina": {"type": "string", "minLength": 60, "maxLength": 220},
-            "paragrafos": {"type": "array", "minItems": 3, "maxItems": 4, "items": {"type": "string", "minLength": 90, "maxLength": 520}},
+            "secoes": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 4,
+                "items": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {
+                        "titulo": {"type": "string", "minLength": 18, "maxLength": 85},
+                        "paragrafos": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 3,
+                            "items": {"type": "string", "minLength": 150, "maxLength": 760},
+                        },
+                    },
+                    "required": ["titulo", "paragrafos"],
+                },
+            },
         },
-        "required": ["titulo", "linha_fina", "paragrafos"],
+        "required": ["titulo", "linha_fina", "secoes"],
     }
+
+
+def resumo_editorial(dossie: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "rodada": dossie["rodada"],
+        "simulacoes": dossie["simulacoes"],
+        "resultados": [
+            {
+                "partida": j["linha"],
+                "mandante": j["mandante"],
+                "visitante": j["visitante"],
+            }
+            for j in dossie["jogos"]
+        ],
+        "classificacao_e_probabilidades": sorted(
+            [
+                {
+                    chave: c[chave]
+                    for chave in (
+                        "clube", "posicao_antes", "posicao_depois", "pontos_antes", "pontos_depois",
+                        "jogos_antes", "jogos_depois", "posicao_projetada_depois", "pontos_projetados_depois",
+                        "titulo_antes", "titulo_depois", "titulo_delta", "libertadores_antes",
+                        "libertadores_depois", "libertadores_delta", "sul_americana_antes",
+                        "sul_americana_depois", "sul_americana_delta", "sem_continental_antes",
+                        "sem_continental_depois", "rebaixamento_antes",
+                        "rebaixamento_depois", "rebaixamento_delta",
+                    )
+                }
+                for c in dossie["clubes"]
+            ],
+            key=lambda c: (c["posicao_depois"], c["clube"]),
+        ),
+        "destaques_calculados": {
+            "altas_titulo": [c["clube"] for c in maiores(dossie, "titulo_delta", 5)],
+            "baixas_titulo": [c["clube"] for c in maiores(dossie, "titulo_delta", 5, reverso=False)],
+            "altas_libertadores": [c["clube"] for c in maiores(dossie, "libertadores_delta", 5)],
+            "baixas_libertadores": [c["clube"] for c in maiores(dossie, "libertadores_delta", 5, reverso=False)],
+            "altas_risco_rebaixamento": [c["clube"] for c in maiores(dossie, "rebaixamento_delta", 5)],
+            "quedas_risco_rebaixamento": [c["clube"] for c in maiores(dossie, "rebaixamento_delta", 5, reverso=False)],
+        },
+        "partidas_pendentes": dossie["estado"]["pendentes"],
+    }
+
+
+def hash_editorial(dossie: dict[str, Any]) -> str:
+    return hashlib.sha256(
+        json.dumps(resumo_editorial(dossie), ensure_ascii=False, sort_keys=True).encode()
+    ).hexdigest()
+
+
+def editorial_gerado_pela_openai(origem: Any) -> bool:
+    return str(origem or "").startswith("openai:")
 
 
 def chamar_openai(dossie: dict[str, Any], modelo: str) -> dict[str, Any]:
     chave = os.environ.get("OPENAI_API_KEY", "").strip()
     if not chave:
         raise ErroAnalise("OPENAI_API_KEY não configurada")
-    resumo = {
-        "rodada": dossie["rodada"],
-        "resultados": [j["linha"] for j in dossie["jogos"]],
-        "maiores_altas_titulo": [{"clube": c["clube"], "delta_pp": round(c["titulo_delta"], 4)} for c in maiores(dossie, "titulo_delta")],
-        "maiores_baixas_titulo": [{"clube": c["clube"], "delta_pp": round(c["titulo_delta"], 4)} for c in maiores(dossie, "titulo_delta", reverso=False)],
-        "maiores_altas_libertadores": [{"clube": c["clube"], "delta_pp": round(c["libertadores_delta"], 4)} for c in maiores(dossie, "libertadores_delta")],
-        "maiores_altas_rebaixamento": [{"clube": c["clube"], "delta_pp": round(c["rebaixamento_delta"], 4)} for c in maiores(dossie, "rebaixamento_delta")],
-        "partidas_pendentes": dossie["estado"]["pendentes"],
-    }
+    resumo = resumo_editorial(dossie)
     instrucao = (
-        "Você é o editor esportivo do Fórmula do Gol. Escreva em português brasileiro, com voz humana, precisa e sóbria. "
-        "Use exclusivamente o dossiê fornecido. Não invente causa tática, lesão, jogador, declaração, local, rodada ou resultado. "
-        "Não use algarismos em nenhum campo: os números auditados serão inseridos pelo template. Não use clichês como 'vale destacar', "
-        "'em um cenário', 'a narrativa', 'mergulhar', 'jornada' ou 'não apenas'. Explique o que mudou e por que isso importa, sem prometer certezas."
+        "Você é o editor esportivo do Fórmula do Gol, projeto independente de Laércio Rehem. Produza uma análise autoral "
+        "em português brasileiro, com voz de colunista experiente: humana, direta, sóbria e interpretativa. Use exclusivamente "
+        "o dossiê factual fornecido. Não invente desempenho tático, domínio, chances criadas, lesão, jogador, declaração, torcida, "
+        "local ou qualquer causa que não esteja no dossiê. Diferencie resultado, classificação atual e projeção estatística. "
+        "O texto deve explicar por que a combinação dos resultados mudou as corridas por título, vagas continentais e permanência. "
+        "Não repita mecanicamente todos os placares, pois eles aparecerão em cards logo abaixo. Não escreva algarismos: números "
+        "auditados serão exibidos pelo template e pela tabela. Não trate probabilidade como certeza. Evite clichês e linguagem de IA, "
+        "incluindo 'vale destacar', 'em um cenário', 'a narrativa', 'mergulhar', 'jornada', 'não apenas', 'o futebol nos ensina' e "
+        "'mais do que nunca'. Crie seções com ângulos distintos, transições naturais e informação concreta; não encerre com frase motivacional."
     )
     payload = {
         "model": modelo,
         "store": False,
+        "reasoning": {"effort": "medium"},
         "input": [
-            {"role": "system", "content": instrucao},
+            {"role": "developer", "content": instrucao},
             {"role": "user", "content": "Dossiê factual auditado:\n" + json.dumps(resumo, ensure_ascii=False, separators=(",", ":"))},
         ],
-        "max_output_tokens": 1600,
+        "max_output_tokens": 4200,
         "text": {"format": {"type": "json_schema", "name": "analise_rodada", "strict": True, "schema": schema_editorial()}},
     }
-    requisicao = urllib.request.Request(
-        "https://api.openai.com/v1/responses",
-        data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Authorization": f"Bearer {chave}", "Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(requisicao, timeout=90) as resposta:
-            retorno = json.loads(resposta.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as erro:
-        raise ErroAnalise(f"Falha na API da OpenAI: {erro}") from erro
+    retorno = None
+    for tentativa in range(1, 4):
+        requisicao = urllib.request.Request(
+            "https://api.openai.com/v1/responses",
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={"Authorization": f"Bearer {chave}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(requisicao, timeout=150) as resposta:
+                retorno = json.loads(resposta.read().decode("utf-8"))
+            break
+        except urllib.error.HTTPError as erro:
+            detalhe = erro.read().decode("utf-8", errors="replace")[:600]
+            if erro.code not in {408, 409, 429, 500, 502, 503, 504} or tentativa == 3:
+                raise ErroAnalise(f"OpenAI respondeu HTTP {erro.code}: {detalhe}") from erro
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as erro:
+            if tentativa == 3:
+                raise ErroAnalise(f"Falha na API da OpenAI após três tentativas: {erro}") from erro
+        time.sleep(2 ** (tentativa - 1))
+    if not isinstance(retorno, dict):
+        raise ErroAnalise("A API da OpenAI não devolveu uma resposta utilizável")
+    if retorno.get("status") == "incomplete":
+        raise ErroAnalise(f"Resposta incompleta da OpenAI: {retorno.get('incomplete_details') or 'sem detalhe'}")
     textos = []
     for saida in retorno.get("output") or []:
         for parte in saida.get("content") or []:
@@ -486,22 +658,35 @@ def chamar_openai(dossie: dict[str, Any], modelo: str) -> dict[str, Any]:
 
 
 def validar_editorial(editorial: dict[str, Any], dossie: dict[str, Any]) -> None:
-    if set(editorial) != {"titulo", "linha_fina", "paragrafos"}:
+    if set(editorial) != {"titulo", "linha_fina", "secoes"}:
         raise ErroAnalise("Editorial fora do schema esperado")
-    campos = [editorial["titulo"], editorial["linha_fina"], *(editorial["paragrafos"] or [])]
-    if len(editorial["paragrafos"]) not in {3, 4} or not all(isinstance(x, str) for x in campos):
+    secoes = editorial.get("secoes") or []
+    if len(secoes) not in {3, 4} or any(set(secao) != {"titulo", "paragrafos"} for secao in secoes):
+        raise ErroAnalise("Editorial incompleto")
+    if any(len(secao.get("paragrafos") or []) not in {2, 3} for secao in secoes):
+        raise ErroAnalise("Quantidade de parágrafos fora do padrão editorial")
+    campos = [editorial["titulo"], editorial["linha_fina"]]
+    for secao in secoes:
+        campos.append(secao["titulo"])
+        campos.extend(secao["paragrafos"])
+    if not all(isinstance(x, str) and x.strip() for x in campos):
         raise ErroAnalise("Editorial incompleto")
     texto = " ".join(campos)
     texto_sem_rodada = texto.replace(str(dossie["rodada"]), "")
     if re.search(r"\d", texto_sem_rodada):
         raise ErroAnalise("A IA incluiu algarismos; conteúdo rejeitado para impedir dado não auditado")
-    proibidos = ["vale destacar", "em um cenário", "a narrativa", "mergulhar", "jornada", "não apenas"]
+    proibidos = ["vale destacar", "em um cenário", "a narrativa", "mergulhar", "jornada", "não apenas", "o futebol nos ensina", "mais do que nunca"]
     if any(frase in texto.casefold() for frase in proibidos):
         raise ErroAnalise("Editorial contém linguagem artificial proibida")
     clubes = {c["clube"] for c in dossie["clubes"]}
     conhecidos = [c for c in clubes if c.casefold() in texto.casefold()]
     if not conhecidos:
         raise ErroAnalise("Editorial não menciona nenhum clube do dossiê")
+    total_palavras = len(re.findall(r"\b[\wÀ-ÿ-]+\b", " ".join(
+        paragrafo for secao in secoes for paragrafo in secao["paragrafos"]
+    )))
+    if not 380 <= total_palavras <= 950:
+        raise ErroAnalise(f"Editorial deve ter entre 380 e 950 palavras; recebeu {total_palavras}")
 
 
 def esc(valor: Any) -> str:
@@ -661,7 +846,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-menu-box-v7">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-openai-editorial-v1">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');</script>
   <script type="application/ld+json">{json_ld}</script>
@@ -683,7 +868,7 @@ def tabela_comparativa(dossie: dict[str, Any]) -> str:
           <th scope="row"><a href="../clubes.html#{esc(c['clube'].lower().replace(' ', '-'))}">{esc(c['clube'])}</a></th>
           <td>{c['pontos_depois']}</td>
           <td>{esc(titulo_antes)}</td><td>{esc(titulo_depois)}</td><td class="delta {classe_delta}">{esc(titulo_delta)}</td>
-          <td>{esc(percentual(c['libertadores_depois']))}</td><td>{esc(percentual(c['rebaixamento_depois']))}</td>
+          <td>{esc(percentual(c['libertadores_depois'], c['libertadores_possivel_depois']))}</td><td>{esc(percentual(c['rebaixamento_depois'], c['rebaixamento_possivel_depois']))}</td>
         </tr>''')
     return '''<div class="analysis-table-wrap" tabindex="0" aria-label="Tabela comparativa com rolagem horizontal">
       <table class="analysis-table">
@@ -714,7 +899,13 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
         jogos = ", ".join(f"{p['mandante']} × {p['visitante']}" for p in dossie["estado"]["pendentes"])
         nota_pendente = f'<aside class="analysis-note"><strong>Rodada com pendência:</strong> {esc(jogos)}. Esta página será atualizada na mesma URL após a realização da partida.</aside>'
     resultados = "".join(renderizar_jogo(jogo) for jogo in dossie["jogos"])
-    paragrafos = "\n".join(f"<p>{esc(p)}</p>" for p in editorial["paragrafos"])
+    secoes_editoriais = "\n".join(
+        '<section class="analysis-copy-section">'
+        f'<h3>{esc(secao["titulo"])}</h3>'
+        + "".join(f"<p>{esc(paragrafo)}</p>" for paragrafo in secao["paragrafos"])
+        + "</section>"
+        for secao in editorial["secoes"]
+    )
     html_final = cabecalho_html(titulo, linha_fina, url, "NewsArticle", publicado, modificado) + f'''
 <body data-{MARCADOR}="{rodada}">
   <div class="container analysis-shell">
@@ -733,10 +924,10 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
         </header>
         {nota_pendente}
         {cards_variacoes(dossie)}
-        <section class="analysis-copy"><h2>O retrato da rodada</h2>{paragrafos}</section>
+        <section class="analysis-copy"><h2>O retrato da rodada</h2><div class="analysis-copy-sections">{secoes_editoriais}</div></section>
         <section><h2>Resultados considerados</h2><div class="analysis-results">{resultados}</div></section>
         <section><h2>Como as probabilidades mudaram</h2><p class="analysis-help">Comparação entre o último snapshot anterior e o fechamento editorial da rodada. No celular, arraste a tabela para o lado.</p><p class="analysis-percent-legend"><strong>Padrão dos percentuais:</strong> <b>0%</b> aparece somente quando o título já é matematicamente impossível; <b>&lt;0,001%</b> preserva uma possibilidade ainda existente, mas abaixo da resolução exibida — inclusive quando ela não ocorreu nas 2 milhões de simulações. Nas variações, <b>↑/↓ &lt;0,001 p.p.</b> identifica movimentos residuais sem criar zeros falsos.</p>{tabela_comparativa(dossie)}</section>
-        <aside class="analysis-method"><strong>Leitura dos dados:</strong> as probabilidades são estimativas do AF-Previsão, calculadas em {dossie['simulacoes']:,} simulações e não representam certezas. O texto automático utiliza somente um dossiê factual auditado; resultados e percentuais são inseridos diretamente dos JSONs do Fórmula do Gol.</aside>
+        <aside class="analysis-method"><strong>Leitura dos dados:</strong> as probabilidades são estimativas do AF-Previsão, calculadas em {dossie['simulacoes']:,} simulações e não representam certezas. A análise editorial utiliza somente um dossiê factual auditado; resultados e percentuais são inseridos diretamente dos JSONs do Fórmula do Gol.</aside>
         <nav class="analysis-next" aria-label="Mais conteúdo"><a href="./">← Todas as análises</a><a href="../estatisticas.html#probabilidades">Probabilidades atuais →</a></nav>
       </article>
     </main>
@@ -834,28 +1025,54 @@ def executar(args: argparse.Namespace) -> int:
         print(f"Rodada {rodada} não elegível: {estado['motivo']} ({estado['jogos_concluidos']}/{TOTAL_JOGOS_RODADA}).")
         return 0
     dossie = montar_dossie(rodada, estado)
-    fallback = narrativa_segura(dossie)
-    editorial, origem = fallback, "deterministico"
-    if not args.sem_ia:
-        try:
-            candidato = chamar_openai(dossie, args.modelo)
-            validar_editorial(candidato, dossie)
-            if not re.search(rf"\b{rodada}\b", candidato["titulo"]):
-                candidato["titulo"] = f"Rodada {rodada}: {candidato['titulo']}"
-            editorial, origem = candidato, "openai"
-        except ErroAnalise as erro:
-            print(f"::warning::Editorial da OpenAI rejeitado; usando versão segura: {erro}", file=sys.stderr)
-    validar_editorial(editorial, dossie)
+    hash_dossie = hashlib.sha256(
+        json.dumps(dossie, ensure_ascii=False, sort_keys=True).encode()
+    ).hexdigest()
+    hash_fatos_editoriais = hash_editorial(dossie)
     manifesto = carregar_manifesto()
     artigos = manifesto.get("artigos") or []
     anterior = next((a for a in artigos if int(a.get("rodada") or 0) == rodada), None)
+    anterior_com_ia = bool(anterior and editorial_gerado_pela_openai(anterior.get("origem_editorial")))
+    if (
+        anterior
+        and anterior.get("hash_dossie") == hash_dossie
+        and not args.forcar
+        and (anterior_com_ia or args.sem_ia)
+    ):
+        print(f"Rodada {rodada} já publicada com o mesmo dossiê; API e arquivos não foram acionados.")
+        return 0
+
+    editorial_anterior = anterior.get("editorial") if anterior else None
+    reutilizar_editorial = bool(
+        anterior
+        and not args.forcar
+        and (anterior_com_ia or args.sem_ia)
+        and anterior.get("hash_editorial") == hash_fatos_editoriais
+        and isinstance(editorial_anterior, dict)
+    )
+    if reutilizar_editorial:
+        validar_editorial(editorial_anterior, dossie)
+        editorial = editorial_anterior
+        origem = str(anterior.get("origem_editorial") or "editorial_reutilizado")
+        print(f"Fatos editoriais da rodada {rodada} inalterados; texto existente reutilizado sem chamar a API.")
+    else:
+        fallback = narrativa_segura(dossie)
+        if args.sem_ia:
+            editorial, origem = fallback, "editorial_curado" if rodada == 20 else "deterministico"
+        else:
+            modelo = normalizar_modelo_openai(args.modelo)
+            candidato = chamar_openai(dossie, modelo)
+            validar_editorial(candidato, dossie)
+            if not re.search(rf"\b{rodada}\b", candidato["titulo"]):
+                candidato["titulo"] = f"Rodada {rodada}: {candidato['titulo']}"
+            editorial, origem = candidato, f"openai:{modelo}"
+    validar_editorial(editorial, dossie)
     publicado = anterior.get("publicado_em") if anterior else momento.replace(microsecond=0).isoformat()
     modificado = momento.replace(microsecond=0).isoformat()
     pagina, metadados = gerar_artigo(dossie, editorial, publicado, modificado, artigos)
+    metadados["hash_editorial"] = hash_fatos_editoriais
+    metadados["editorial"] = editorial
     metadados["origem_editorial"] = origem
-    if anterior and anterior.get("hash_dossie") == metadados["hash_dossie"] and not args.forcar:
-        print(f"Rodada {rodada} já publicada com o mesmo dossiê; nenhuma alteração.")
-        return 0
     artigos = [a for a in artigos if int(a.get("rodada") or 0) != rodada] + [metadados]
     artigos.sort(key=lambda a: int(a["rodada"]))
     manifesto.update({"schema_version": 1, "site": "Fórmula do Gol", "temporada": TEMPORADA, "atualizado_em": modificado, "total_artigos": len(artigos), "artigos": artigos})
@@ -873,10 +1090,16 @@ def executar(args: argparse.Namespace) -> int:
 
 
 def self_test() -> int:
+    assert normalizar_modelo_openai("5.6 TERRA") == "gpt-5.6-terra"
+    assert normalizar_modelo_openai("gpt-5.6-terra") == "gpt-5.6-terra"
+    assert editorial_gerado_pela_openai("openai:gpt-5.6-terra")
+    assert not editorial_gerado_pela_openai("editorial_curado")
     assert percentual(0) == "0%"
     assert percentual(0, True) == "<0,001%"
     assert percentual(0, False) == "0%"
     assert titulo_matematicamente_possivel({"campeao_pct": 0, "pontos_atuais": 22, "jogos_atuais": 20}, 47)
+    assert rebaixamento_matematicamente_possivel({"rebaixamento_pct": 0, "jogos_atuais": 20, "posicao_atual": 1})
+    assert not rebaixamento_matematicamente_possivel({"rebaixamento_pct": 0, "jogos_atuais": 38, "posicao_atual": 1})
     assert not titulo_matematicamente_possivel(
         {"campeao_pct": 0, "pontos_atuais": 60, "jogos_atuais": 38, "posicao_atual": 2},
         60,
@@ -902,6 +1125,10 @@ def self_test() -> int:
     assert estado["elegivel"] and estado["jogos_concluidos"] == 10
     dossie = montar_dossie(20, estado)
     assert len(dossie["jogos"]) == 10 and len(dossie["clubes"]) == 20
+    dossie_midias = json.loads(json.dumps(dossie, ensure_ascii=False))
+    dossie_midias["jogos"][0]["melhores_momentos"]["titulo"] = "Título atualizado depois"
+    assert hash_editorial(dossie_midias) == hash_editorial(dossie)
+    assert hashlib.sha256(json.dumps(dossie_midias, ensure_ascii=False, sort_keys=True).encode()).hexdigest() != hashlib.sha256(json.dumps(dossie, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
     gremio = next(c for c in dossie["clubes"] if c["clube"] == "Grêmio")
     assert gremio["titulo_possivel_antes"] and gremio["titulo_possivel_depois"]
     resultados = {j["linha"] for j in dossie["jogos"]}
@@ -910,11 +1137,13 @@ def self_test() -> int:
     assert "Vitória 0 × 4 Palmeiras" not in resultados
     editorial = narrativa_segura(dossie)
     validar_editorial(editorial, dossie)
+    dossie_contingencia = dict(dossie, rodada=21)
+    validar_editorial(narrativa_segura(dossie_contingencia), dossie_contingencia)
     pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00", carregar_manifesto().get("artigos") or [])
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
     assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in pagina
     assert "header-formula-do-gol.png" not in pagina
-    assert "br-analises.css?v=20260802-menu-box-v7" in pagina
+    assert "br-analises.css?v=20260802-openai-editorial-v1" in pagina
     assert "br-analises.js?v=20260802-video-incorporado-v1" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
     assert "0,007%</td><td>0,006%</td><td class=\"delta delta-down\">-0,001 p.p.</td>" in pagina
@@ -924,6 +1153,9 @@ def self_test() -> int:
     )
     assert "99,96%" not in pagina and "&gt;99,9%" in pagina
     assert "Padrão dos percentuais" in pagina and "analysis-round-nav" in pagina
+    assert pagina.count('class="analysis-copy-section"') == 4
+    assert "O líder caiu; o perseguidor hesitou" in pagina
+    assert "A análise editorial utiliza somente um dossiê factual auditado" in pagina
     assert pagina.count('class="analysis-video"') == 10
     assert pagina.count('class="analysis-stats-toggle"') == 10
     assert pagina.count('class="analysis-game-details"') == 10
