@@ -8,7 +8,8 @@ Execução 5 do projeto:
   * simula Copa do Brasil, Libertadores e Sul-Americana;
   * aloca, em cada universo Monte Carlo, vagas e repasses regulamentares;
   * publica chances continentais consolidadas e decompostas por via exclusiva;
-  * publica posição e pontos projetados em inteiros, preservando as médias brutas para auditoria;
+  * publica uma classificação projetada única de 1º a 20º e pontos em inteiros,
+    preservando as médias brutas e a distribuição marginal para auditoria;
   * registra ocorrências brutas, limites de resolução e histórico encadeado por rodada;
   * preserva a distribuição completa necessária à avaliação científica pós-campeonato.
 
@@ -927,6 +928,7 @@ def run_monte_carlo(
 
     half = simulations // 2
     team_results: list[dict[str, Any]] = []
+    projection_sort_keys: dict[str, tuple[float, float, float, float, float]] = {}
     position_matrix: dict[str, list[float]] = {}
     convergence_deltas: list[float] = []
     for index, team in enumerate(state.teams):
@@ -957,6 +959,16 @@ def run_monte_carlo(
         points_team = points[:, index]
         position_mean = float(np.mean(team_positions))
         points_mean = float(np.mean(points_team))
+        wins_mean = float(np.mean(wins[:, index]))
+        goal_difference_mean = float(np.mean(goal_difference[:, index]))
+        goals_for_mean = float(np.mean(goals_for[:, index]))
+        projection_sort_keys[team] = (
+            points_mean,
+            wins_mean,
+            goal_difference_mean,
+            goals_for_mean,
+            position_mean,
+        )
         position_lower = int(np.percentile(team_positions, lower_position_pct, method="nearest"))
         position_upper = int(np.percentile(team_positions, upper_position_pct, method="nearest"))
         team_results.append(
@@ -972,9 +984,20 @@ def run_monte_carlo(
                     key: display_probability(count, simulations, display_threshold_pct)
                     for key, count in criterion_counts.items()
                 },
-                "posicao_projetada": _round_half_up(position_mean),
+                # A média marginal continua publicada para auditoria. A posição
+                # única da classificação projetada é atribuída após processar
+                # os 20 clubes, usando a pontuação média sem arredondamento.
+                "posicao_projetada": None,
+                "posicao_classificacao_projetada": None,
                 "posicao_projetada_media": round(position_mean, 4),
                 "posicao_projetada_mediana": int(np.median(team_positions)),
+                "classificacao_projetada_criterios": {
+                    "pontos_medios": round(points_mean, 8),
+                    "vitorias_medias": round(wins_mean, 8),
+                    "saldo_medio": round(goal_difference_mean, 8),
+                    "gols_pro_medios": round(goals_for_mean, 8),
+                    "posicao_media_simulada": round(position_mean, 8),
+                },
                 "faixa_posicao_80": {
                     "melhor": min(position_lower, position_upper),
                     "pior": max(position_lower, position_upper),
@@ -994,6 +1017,23 @@ def run_monte_carlo(
             }
         )
 
+    projected_table = sorted(
+        team_results,
+        key=lambda item: (
+            -projection_sort_keys[item["clube"]][0],
+            -projection_sort_keys[item["clube"]][1],
+            -projection_sort_keys[item["clube"]][2],
+            -projection_sort_keys[item["clube"]][3],
+            projection_sort_keys[item["clube"]][4],
+            item["clube"],
+        ),
+    )
+    for projected_position, item in enumerate(projected_table, start=1):
+        item["posicao_classificacao_projetada"] = projected_position
+        # Mantém compatibilidade com consumidores anteriores, agora com a
+        # semântica correta: uma posição exclusiva na tabela projetada.
+        item["posicao_projetada"] = projected_position
+
     bolao = None
     if bolao_participants:
         bolao = calculate_bolao_probabilities(
@@ -1005,6 +1045,25 @@ def run_monte_carlo(
     standard_error_max = 100.0 * math.sqrt(0.25 / simulations)
     output: dict[str, Any] = {
         "clubes": team_results,
+        "classificacao_projetada": {
+            "posicoes_unicas": True,
+            "criterios": [
+                "pontos finais médios",
+                "vitórias médias",
+                "saldo de gols médio",
+                "gols pró médios",
+                "posição média simulada",
+                "nome do clube como chave estável residual",
+            ],
+            "ordem": [
+                {
+                    "posicao": item["posicao_classificacao_projetada"],
+                    "clube": item["clube"],
+                    **item["classificacao_projetada_criterios"],
+                }
+                for item in projected_table
+            ],
+        },
         "simulacoes": simulations,
         "semente": seed,
         "convergencia": {
@@ -1540,8 +1599,12 @@ def _history_club_rows(
                 "ultimo_jogo_concluido_id": club_state.get("ultimo_jogo_concluido_id"),
                 "hash_estado_clube": club_state.get("hash_estado_clube"),
                 "posicao_projetada": item.get("posicao_projetada"),
+                "posicao_classificacao_projetada": item.get(
+                    "posicao_classificacao_projetada", item.get("posicao_projetada")
+                ),
                 "posicao_media_estimada": item.get("posicao_projetada_media"),
                 "posicao_mediana": item.get("posicao_projetada_mediana"),
+                "classificacao_projetada_criterios": item.get("classificacao_projetada_criterios"),
                 "faixa_posicao_80": item.get("faixa_posicao_80"),
                 "distribuicao_posicoes_pct": item.get("distribuicao_posicoes_pct"),
                 "pontos_projetados": item["pontos_projetados"].get("media"),
@@ -1900,6 +1963,19 @@ def write_github_outputs(values: dict[str, Any]) -> None:
 def validate_probabilities(teams: Sequence[dict[str, Any]]) -> None:
     if len(teams) != 20 or len({item["clube"] for item in teams}) != 20:
         raise ValueError("resultado probabilístico precisa conter 20 clubes únicos")
+    projected_positions = sorted(
+        int(item.get("posicao_classificacao_projetada") or 0) for item in teams
+    )
+    if projected_positions != list(range(1, 21)):
+        raise ValueError(
+            "classificação projetada precisa conter exatamente uma posição de 1º a 20º"
+        )
+    if any(
+        int(item.get("posicao_projetada") or 0)
+        != int(item.get("posicao_classificacao_projetada") or 0)
+        for item in teams
+    ):
+        raise ValueError("campo de compatibilidade da posição projetada está divergente")
     expected_sums = {
         "campeao": 100.0,
         "g4": 400.0,
@@ -2104,10 +2180,11 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "libertadores": "chance consolidada por Brasileirão, Copa do Brasil, Libertadores, Sul-Americana e repasses",
             "sul_americana": "seis vagas alocadas após a definição de todos os classificados à Libertadores",
             "rebaixamento": "17º ao 20º",
-            "posicao_projetada": "média das posições simuladas arredondada para o inteiro mais próximo",
+            "posicao_projetada": "posição única na classificação projetada, ordenada pela pontuação final média sem arredondamento; empates seguem vitórias, saldo, gols pró, posição média simulada e nome do clube",
+            "posicao_projetada_media": "média marginal das posições simuladas, preservada separadamente para auditoria e leitura da incerteza",
             "faixa_posicao_80": "intervalo entre os percentis 10 e 90 das posições simuladas",
         },
-        "projecoes_exibicao": "pontos e posição aparecem como inteiros; médias sem arredondamento permanecem no JSON para auditoria",
+        "projecoes_exibicao": "pontos aparecem como inteiros e cada clube recebe uma posição exclusiva de 1º a 20º na classificação projetada; médias sem arredondamento permanecem no JSON para auditoria",
         "af_score": "auditado como diagnóstico, não aplicado sem backtesting histórico homogêneo",
     }
     probabilities = {
@@ -2134,6 +2211,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "semente": seed,
             **simulation["convergencia"],
         },
+        "classificacao_projetada": simulation["classificacao_projetada"],
         "destaques": {
             "maior_chance_titulo": highlight(teams, "campeao"),
             "maior_chance_libertadores": highlight(teams, "libertadores"),

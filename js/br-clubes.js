@@ -94,8 +94,42 @@
     while (casas < 3 && Number(n.toFixed(casas)) >= 100) casas += 1;
     return `${n.toLocaleString("pt-BR", { minimumFractionDigits: casas, maximumFractionDigits: casas })}%`;
   }
+  function mediaProjetada(p){
+    const pontos = p && p.pontos_projetados;
+    const raw = pontos && typeof pontos === "object" ? (pontos.media_estimada ?? pontos.media) : (p?.pontos_media_estimada ?? p?.pontos_medios ?? pontos);
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : Number.NEGATIVE_INFINITY;
+  }
+  function criterioProjetado(p, campo){
+    const n = Number(p?.classificacao_projetada_criterios?.[campo]);
+    return Number.isFinite(n) ? n : Number.NEGATIVE_INFINITY;
+  }
+  function mediaPosicaoProjetada(p){
+    const n = Number(p?.classificacao_projetada_criterios?.posicao_media_simulada ?? p?.posicao_projetada_media ?? p?.posicao_media_estimada ?? p?.posicao_projetada);
+    return Number.isFinite(n) ? n : Number.POSITIVE_INFINITY;
+  }
+  function garantirClassificacaoProjetadaUnica(rows){
+    if (!Array.isArray(rows) || !rows.length) return rows || [];
+    const publicadas = rows.map(item => Number(item?.posicao_classificacao_projetada));
+    const validas = publicadas.every(pos => Number.isInteger(pos) && pos >= 1 && pos <= 20) && new Set(publicadas).size === rows.length;
+    if (validas) return rows;
+    rows.slice().sort((a,b) => {
+      for (const [av,bv] of [
+        [mediaProjetada(a), mediaProjetada(b)],
+        [criterioProjetado(a,"vitorias_medias"), criterioProjetado(b,"vitorias_medias")],
+        [criterioProjetado(a,"saldo_medio"), criterioProjetado(b,"saldo_medio")],
+        [criterioProjetado(a,"gols_pro_medios"), criterioProjetado(b,"gols_pro_medios")],
+      ]) {
+        if (av !== bv) return bv - av;
+      }
+      const mediaDelta = mediaPosicaoProjetada(a) - mediaPosicaoProjetada(b);
+      if (mediaDelta) return mediaDelta;
+      return String(a?.clube || "").localeCompare(String(b?.clube || ""), "pt-BR", { sensitivity:"base" });
+    }).forEach((item,index) => { item.posicao_classificacao_projetada = index + 1; });
+    return rows;
+  }
   function posicaoProjetada(p){
-    const n = Number(p && (p.posicao_projetada ?? p.posicao_projetada_mediana ?? p.posicao_projetada_media));
+    const n = Number(p && (p.posicao_classificacao_projetada ?? p.posicao_projetada ?? p.posicao_projetada_mediana ?? p.posicao_projetada_media));
     return Number.isFinite(n) ? Math.max(1, Math.min(20, Math.round(n))) : null;
   }
   function pontosProjetados(p){
@@ -465,7 +499,8 @@
     state.tabela = tabelaData.tabela || [];
     state.ranking = rankingData.ranking || [];
     state.rankingHistory = rankingHistoryData || { snapshots: [] };
-    state.probabilidades = Object.fromEntries((probabilidadesData.clubes || []).map(item => [slug(item.clube), item]));
+    const probabilidadesClubes = garantirClassificacaoProjetadaUnica(probabilidadesData.clubes || []);
+    state.probabilidades = Object.fromEntries(probabilidadesClubes.map(item => [slug(item.clube), item]));
     state.eventos = eventosData.eventos || [];
     state.elencos = elencosData.elencos || {};
     state.mascotes = mascotesData.mascotes || {};

@@ -757,11 +757,73 @@
     </a>`;
   }
 
-  function projectedPosition(club) {
-    const explicit = Number(club?.posicao_projetada);
+  const projectedPositionsCache = new WeakMap();
+
+  function projectedPointsMean(club) {
+    const points = club?.pontos_projetados;
+    const raw = points && typeof points === "object"
+      ? points.media_estimada ?? points.media
+      : club?.pontos_media_estimada ?? club?.pontos_medios ?? points;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : Number.NEGATIVE_INFINITY;
+  }
+
+  function projectedCriterion(club, field) {
+    const value = Number(club?.classificacao_projetada_criterios?.[field]);
+    return Number.isFinite(value) ? value : Number.NEGATIVE_INFINITY;
+  }
+
+  function projectedMeanPosition(club) {
+    const value = Number(
+      club?.classificacao_projetada_criterios?.posicao_media_simulada
+      ?? club?.posicao_projetada_media
+      ?? club?.posicao_media_estimada
+      ?? club?.posicao_projetada
+    );
+    return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+  }
+
+  function projectedPositionsForRows(rows) {
+    if (!Array.isArray(rows) || !rows.length) return new Map();
+    const cached = projectedPositionsCache.get(rows);
+    if (cached) return cached;
+
+    const published = rows.map((club) => Number(club?.posicao_classificacao_projetada));
+    const publishedIsUnique = published.every((position) => Number.isInteger(position) && position >= 1 && position <= 20)
+      && new Set(published).size === rows.length;
+    const map = new Map();
+    if (publishedIsUnique) {
+      rows.forEach((club, index) => map.set(normalize(club?.clube), published[index]));
+    } else {
+      rows.slice().sort((a, b) => {
+        for (const [aValue, bValue] of [
+          [projectedPointsMean(a), projectedPointsMean(b)],
+          [projectedCriterion(a, "vitorias_medias"), projectedCriterion(b, "vitorias_medias")],
+          [projectedCriterion(a, "saldo_medio"), projectedCriterion(b, "saldo_medio")],
+          [projectedCriterion(a, "gols_pro_medios"), projectedCriterion(b, "gols_pro_medios")],
+        ]) {
+          if (aValue !== bValue) return bValue - aValue;
+        }
+        const meanDelta = projectedMeanPosition(a) - projectedMeanPosition(b);
+        if (meanDelta) return meanDelta;
+        return String(a?.clube || "").localeCompare(String(b?.clube || ""), "pt-BR", { sensitivity: "base" });
+      }).forEach((club, index) => map.set(normalize(club?.clube), index + 1));
+    }
+    projectedPositionsCache.set(rows, map);
+    return map;
+  }
+
+  function projectedPositionAmong(club, rows) {
+    const derived = projectedPositionsForRows(rows).get(normalize(club?.clube));
+    if (Number.isFinite(derived)) return derived;
+    const explicit = Number(club?.posicao_classificacao_projetada ?? club?.posicao_projetada);
     if (Number.isFinite(explicit)) return Math.max(1, Math.min(20, Math.round(explicit)));
-    const mean = Number(club?.posicao_projetada_media);
+    const mean = projectedMeanPosition(club);
     return Number.isFinite(mean) ? Math.max(1, Math.min(20, Math.round(mean))) : null;
+  }
+
+  function projectedPosition(club) {
+    return projectedPositionAmong(club, probabilityClubRows());
   }
 
   function projectedPoints(club) {
@@ -809,16 +871,21 @@
   }
 
   function probabilityHistoryClubRow(snapshot, clubName) {
-    const row = (Array.isArray(snapshot?.clubes) ? snapshot.clubes : []).find((item) => normalize(item?.clube) === normalize(clubName));
+    const rows = Array.isArray(snapshot?.clubes) ? snapshot.clubes : [];
+    const row = rows.find((item) => normalize(item?.clube) === normalize(clubName));
     if (!row) return null;
-    const positionRaw = Number(row.posicao_projetada ?? row.posicao_media_estimada);
     const pointsRaw = Number(row.pontos_projetados ?? row.pontos_media_estimada ?? row.pontos_medios);
     return {
       snapshot,
       row,
-      position: Number.isFinite(positionRaw) ? Math.round(positionRaw) : null,
+      position: projectedPositionAmong(row, rows),
       points: Number.isFinite(pointsRaw) ? Math.round(pointsRaw) : null,
     };
+  }
+
+  function probabilityClubContext(clubName) {
+    const name = String(clubName || "").trim();
+    return name ? `<b class="probability-club-context">${escapeHtml(name)}</b>` : "";
   }
 
   function performanceHistoryClubRows(clubName) {
@@ -864,7 +931,7 @@
       </article>`;
     }).join("");
     return `<section class="club-performance-history" aria-label="Evolução do Ranking de Desempenho de ${escapeAttr(clubName)}">
-      <div class="club-evolution-head"><div><span>AF-Score</span><strong>Evolução do Ranking de Desempenho</strong></div><small>comparação após a mesma quantidade de jogos</small></div>
+      <div class="club-evolution-head"><div><span>AF-Score ${probabilityClubContext(clubName)}</span><strong>Evolução do Ranking de Desempenho</strong></div><small>comparação após a mesma quantidade de jogos</small></div>
       <div class="club-evolution-strip">${cards}</div>
       <p>Os marcos fechados comparam os 20 clubes após exatamente 5, 10, 15 e, futuramente, mais jogos. Assim, partidas atrasadas não criam vantagem artificial.</p>
     </section>`;
@@ -931,12 +998,12 @@
       return `<tr><th scope="row"><span>${escapeHtml(reference)}</span><small>${escapeHtml(dateBR(snapshot?.gerado_em))}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(title)}</td><td>${escapeHtml(lib)}</td><td>${escapeHtml(sula)}</td><td>${escapeHtml(relegation)}</td></tr>`;
     }).join("");
     const forecastHistory = historyRows.length ? `<section class="club-forecast-history">
-      <div class="club-evolution-head"><div><span>AF-Previsão</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado salvo" : "estados salvos"}</small></div>
+      <div class="club-evolution-head"><div><span>AF-Previsão ${probabilityClubContext(club?.clube)}</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado salvo" : "estados salvos"}</small></div>
       <div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${body}</tbody></table></div>
       <p>A evolução do clube ganha uma nova linha somente quando ele conclui outra partida. Jogos atrasados preservam a rodada real, como R4 após R19. Reexecuções sem jogo novo não criam estados artificiais.</p>
     </section>` : "";
     return `<details class="probability-history-details">
-      <summary>Evolução do clube <span>AF-Score + AF-Previsão</span></summary>
+      <summary>Evolução do clube <span>AF-Score + AF-Previsão ${probabilityClubContext(club?.clube)}</span></summary>
       <div class="club-evolution-content">${performanceHistory}${forecastHistory}</div>
     </details>`;
   }
@@ -1064,7 +1131,7 @@
     const cupDisplays = probabilityBreakdownDisplays(cupSubroutes, cupTarget);
     const cupRows = Object.entries(cupSubroutes).map(([key, detail]) => probabilityRouteRow(key, detail, "cup", cupDisplays[key])).join("");
     return `<details class="probability-route-details">
-      <summary>Como se formam as chances continentais? <span>vias exclusivas e auditáveis</span></summary>
+      <summary>Como se formam as chances continentais? <span>vias exclusivas e auditáveis ${probabilityClubContext(club?.clube)}</span></summary>
       <div class="probability-route-columns">
         <section>
           <div class="probability-route-head"><span>Libertadores consolidada</span><strong>${escapeHtml(continental.libertadores)}</strong></div>
@@ -1118,7 +1185,7 @@
       </div>
       <div class="probability-metric-grid">
         ${probabilityMetric("Campeão", titleValue, "title", probabilityFieldDetail(club, "campeao"))}
-        ${probabilityProjectionMetric("Posição projetada", position ? `${integer(position)}º` : "—", "position", "Média das posições simuladas, exibida como inteiro.")}
+        ${probabilityProjectionMetric("Posição projetada", position ? `${integer(position)}º` : "—", "position", "Posição única na classificação projetada, ordenada pela pontuação final média das simulações.")}
         ${probabilityProjectionMetric("Faixa provável", rangeText, "range", "Faixa central de 80% das posições simuladas.")}
         ${probabilityMetric("Libertadores", libValue, "libertadores", probabilityFieldDetail(club, "libertadores"), "Chance consolidada por Brasileirão, copas, títulos continentais e repasses.", continental.libertadores)}
         ${probabilityMetric("Sul-Americana", sulaValue, "sulamericana", probabilityFieldDetail(club, "sul_americana"), "Chance consolidada após a alocação de todas as vagas de Libertadores.", continental.sul_americana)}
@@ -1127,7 +1194,7 @@
       ${probabilityTrendNote(club)}
       ${probabilityQualificationRoutes(club)}
       <details class="probability-position-details">
-        <summary>Distribuição das 20 posições <span>projeção: ${position ? `${integer(position)}º` : "—"} · mediana: ${integer(club?.posicao_projetada_mediana)}º</span></summary>
+        <summary>Distribuição das 20 posições <span>projeção: ${position ? `${integer(position)}º` : "—"} · mediana: ${integer(club?.posicao_projetada_mediana)}º ${probabilityClubContext(club?.clube)}</span></summary>
         ${probabilityPositionDistribution(club)}
       </details>
       ${probabilityClubHistoryDetails(club)}
@@ -1299,7 +1366,7 @@
       <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
       <div class="probability-table-shell">
         <table class="probability-comparison-table">
-          <thead><tr><th>Pos.</th><th>Time</th><th>Pts</th><th>J</th><th>Campeão</th><th>Libertadores</th><th>Sul-Americana</th><th>Sem continental</th><th>Rebaixamento</th><th>Proj.</th><th>Faixa</th></tr></thead>
+          <thead><tr><th>Pos.</th><th>Time</th><th>Pts</th><th>J</th><th>Campeão</th><th>Libertadores</th><th>Sul-Americana</th><th>Sem continental</th><th>Rebaixamento</th><th title="Posição única na classificação projetada por pontos finais médios">Proj.</th><th>Faixa</th></tr></thead>
           <tbody>${rows.map(probabilityComparisonRow).join("")}</tbody>
         </table>
       </div>

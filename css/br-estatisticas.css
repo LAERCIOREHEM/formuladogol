@@ -1280,6 +1280,17 @@ body > .container > section.hero > img {
 }
 .probability-route-details > summary span,
 .probability-position-details > summary span { color: var(--muted); font-weight: 700; }
+.probability-club-context {
+  display: inline-block;
+  margin-left: 5px;
+  color: #d9ff76;
+  font-size: .92em;
+  font-weight: 950;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.probability-club-context::before { content: "·"; margin-right: 5px; color: #738599; }
 .probability-route-columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin-top: 10px; }
 .probability-route-columns > section { min-width: 0; padding: 11px; border: 1px solid rgba(148,163,184,.12); border-radius: 13px; background: rgba(255,255,255,.022); }
 .probability-route-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 8px; }
@@ -1521,6 +1532,10 @@ body > .container > section.hero > img {
   cursor: pointer;
 }
 .probability-history-details > summary span { color: var(--muted); font-weight: 700; }
+.probability-route-details > summary .probability-club-context,
+.probability-position-details > summary .probability-club-context,
+.probability-history-details > summary .probability-club-context,
+.club-evolution-head .probability-club-context { color: #d9ff76; font-weight: 950; }
 .club-evolution-content { display: grid; gap: 14px; margin-top: 11px; }
 .club-performance-history,
 .club-forecast-history {
@@ -1612,6 +1627,7 @@ body > .container > section.hero > img {
 }
 @media (max-width: 560px) {
   .probability-history-details > summary { align-items: flex-start; flex-direction: column; gap: 3px; }
+  .probability-club-context { margin-left: 3px; white-space: normal; overflow-wrap: anywhere; }
   .probability-projection-metric small { min-height: 0; }
   .club-evolution-head { align-items: flex-start; flex-direction: column; gap: 4px; }
   .club-evolution-head > small { text-align: left; }
