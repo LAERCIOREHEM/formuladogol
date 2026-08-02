@@ -661,7 +661,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-probabilidade-sticky-v6">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-menu-box-v7">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');</script>
   <script type="application/ld+json">{json_ld}</script>
@@ -914,7 +914,7 @@ def self_test() -> int:
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
     assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in pagina
     assert "header-formula-do-gol.png" not in pagina
-    assert "br-analises.css?v=20260802-probabilidade-sticky-v6" in pagina
+    assert "br-analises.css?v=20260802-menu-box-v7" in pagina
     assert "br-analises.js?v=20260802-video-incorporado-v1" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
     assert "0,007%</td><td>0,006%</td><td class=\"delta delta-down\">-0,001 p.p.</td>" in pagina
