@@ -880,20 +880,29 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
 }
 .live-lineup-team-head {
-  display: flex;
-  align-items: center;
-  gap: 11px;
   min-height: 72px;
   border-bottom: 1px solid rgba(148, 163, 184, .12);
   padding: 12px 14px;
 }
+.live-lineup-team-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+.live-lineup-team-link:hover h3,
+.live-lineup-team-link:focus-visible h3 { color: var(--green); }
+.live-lineup-team-link:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
 .live-lineup-team-head img {
   flex: 0 0 46px;
   width: 46px;
   height: 46px;
   object-fit: contain;
 }
-.live-lineup-team-head > div { min-width: 0; }
+.live-lineup-team-link > div { min-width: 0; }
 .live-lineup-team-head h3 {
   margin: 0;
   color: #f8fafc;

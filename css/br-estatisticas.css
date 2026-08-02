@@ -802,8 +802,11 @@ body > .container > section.hero > img {
 .stats-rank { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; color: #edffc0; border: 1px solid rgba(163,230,53,.28); background: rgba(163,230,53,.10); font-size: 19px; font-weight: 950; }
 .stats-player-main { min-width: 0; overflow: visible; }
 .stats-player-name { color: #fff; font-size: 20px; line-height: 1.15; font-weight: 950; word-break: normal; overflow-wrap: anywhere; white-space: normal; }
-.stats-player-club { display: flex; align-items: center; gap: 7px; min-width: 0; margin-top: 4px; color: var(--muted); }
+.stats-player-club { display: flex; align-items: center; gap: 7px; width: fit-content; max-width: 100%; min-width: 0; margin-top: 4px; border-radius: 8px; color: var(--muted); text-decoration: none; }
 .stats-player-club span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stats-player-club:hover span,
+.stats-player-club:focus-visible span { color: var(--green); }
+.stats-player-club:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .stats-player-meta { margin-top: 6px; color: var(--muted-2); font-size: 12px; line-height: 1.35; }
 .stats-player-value { min-width: 74px; text-align: right; }
 .stats-player-value strong { display: block; color: var(--green); font-size: 29px; line-height: 1; }
@@ -820,6 +823,10 @@ body > .container > section.hero > img {
 .stats-filter-control select { width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid rgba(148,163,184,.18); border-radius: 12px; background: #102238; color: #fff; font: inherit; font-weight: 800; }
 .stats-filter-current { display: flex; align-items: center; gap: 11px; }
 .stats-filter-current > div { min-width: 0; flex: 1; }
+.stats-filter-club-link { display: flex; align-items: center; gap: 11px; min-width: 0; flex: 1; border-radius: 11px; color: inherit; text-decoration: none; }
+.stats-filter-club-link > div { min-width: 0; flex: 1; }
+.stats-filter-club-link:hover strong { color: var(--green); }
+.stats-filter-club-link:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .stats-filter-current strong, .stats-filter-current span { display: block; }
 .stats-filter-current strong { color: #fff; }
 .stats-filter-current span { margin-top: 3px; color: var(--muted); font-size: 12px; }
@@ -835,8 +842,12 @@ body > .container > section.hero > img {
 .stats-game-summary-main { min-width: 0; }
 .stats-game-date { margin-bottom: 7px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
 .stats-game-teams { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 8px; }
-.stats-game-teams > span { display: flex; align-items: center; gap: 6px; min-width: 0; font-weight: 900; }
-.stats-game-teams > span:last-of-type { justify-content: flex-end; text-align: right; }
+.stats-game-team-link { display: flex; align-items: center; gap: 6px; min-width: 0; border-radius: 9px; color: inherit; font-weight: 900; text-decoration: none; }
+.stats-game-team-link > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stats-game-team-link:last-of-type { justify-content: flex-end; text-align: right; }
+.stats-game-team-link:hover,
+.stats-game-team-link:focus-visible { color: var(--green); }
+.stats-game-team-link:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 .stats-game-teams b { color: #fff; font-size: 18px; white-space: nowrap; }
 .stats-game-shield { width: 24px; height: 24px; object-fit: contain; }
 .stats-game-quick { margin-top: 7px; color: var(--muted-2); font-size: 11px; }
@@ -991,7 +1002,7 @@ body > .container > section.hero > img {
   .stats-game-card > summary { grid-template-columns: 39px minmax(0,1fr) 20px; padding: 10px 8px; }
   .stats-game-round { width: 37px; height: 37px; font-size: 12px; }
   .stats-game-teams { gap: 4px; }
-  .stats-game-teams > span { font-size: 12px; }
+  .stats-game-team-link { font-size: 12px; }
   .stats-game-teams b { font-size: 15px; }
   .stats-game-shield { width: 20px; height: 20px; }
   .stats-game-info-grid { grid-template-columns: 1fr; }
@@ -1225,7 +1236,8 @@ body > .container > section.hero > img {
 .probability-head-aside { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; min-width: 0; }
 .probability-head-aside > small { color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; text-transform: none; text-align: right; opacity: .85; }
 .probability-club-list { display: grid; gap: 10px; }
-.probability-club-card { padding: 13px; border: 1px solid rgba(148,163,184,.14); border-radius: 18px; background: linear-gradient(145deg, rgba(6,17,25,.78), rgba(9,24,31,.74)); }
+.probability-club-card { scroll-margin-top: 112px; padding: 13px; border: 1px solid rgba(148,163,184,.14); border-radius: 18px; background: linear-gradient(145deg, rgba(6,17,25,.78), rgba(9,24,31,.74)); }
+.probability-club-card:target { border-color: rgba(163,230,53,.48); box-shadow: 0 0 0 2px rgba(163,230,53,.10), 0 14px 34px rgba(0,0,0,.22); }
 .probability-club-head { display: grid; grid-template-columns: 42px 48px minmax(0,1fr) minmax(180px,auto); align-items: center; gap: 10px; }
 .probability-order { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid rgba(163,230,53,.27); border-radius: 12px; color: #efffc3; background: rgba(163,230,53,.09); font-size: 16px; font-weight: 950; }
 .probability-club-link { display: grid; place-items: center; border-radius: 12px; text-decoration: none; }
@@ -1616,6 +1628,11 @@ body > .container > section.hero > img {
 .probability-history-scroll thead th:first-child { z-index: 2; background: #0d2029; }
 .probability-history-scroll tbody tr:last-child th,
 .probability-history-scroll tbody tr:last-child td { border-bottom: 0; }
+.probability-history-scroll tbody tr.is-current th,
+.probability-history-scroll tbody tr.is-current td { color: #efffc3; background: rgba(163,230,53,.075); font-weight: 900; }
+.probability-history-scroll tbody tr.is-current th:first-child { background: #143027; }
+.probability-history-scroll tbody tr.is-current th span { color: #d9ff76; }
+.probability-history-scroll tbody tr.is-current th small { color: #b8ca9c; }
 .probability-history-scroll th span,
 .probability-history-scroll th small { display: block; }
 .probability-history-scroll th span { color: #fff; font-size: 10px; }

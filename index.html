@@ -2656,6 +2656,8 @@ body > .container > section.hero > img {
   /* Clubes clicáveis em Jogos e Resultados */
   .br-club-link { color: inherit; text-decoration: none; border-radius: 14px; transition: background .16s ease, transform .16s ease, box-shadow .16s ease; }
   .br-club-link:hover, .br-club-link:focus-visible { background: rgba(163,230,53,.07); box-shadow: 0 0 0 1px rgba(163,230,53,.22); outline: none; transform: translateY(-1px); }
+  .tabela-time-link, .returno-team-link { display: block; }
+  .tabela-time-link .tabela-time-cel, .returno-team-link .returno-team { padding: 5px; }
   .jogo-time.br-club-link { padding: 7px 5px; }
   .resultado-time.br-club-link { padding: 6px; }
   @media (max-width: 640px) {
@@ -4467,8 +4469,9 @@ function htmlTabelaReturno() {
       '</tr></thead><tbody>';
     for (const clube of calculo.tabela) {
       const escudo = escudoDe(clube.time);
+      const identidade = `<span class="returno-team">${brEscudoImg(escudo?.escudo || '', clube.time, 'tabela-escudo')}<span>${brEscapeHtml(clube.time)}</span></span>`;
       html += `<tr><td><span class="returno-position">${clube.pos}</span></td>` +
-        `<td><span class="returno-team">${brEscudoImg(escudo?.escudo || '', clube.time, 'tabela-escudo')}<span>${brEscapeHtml(clube.time)}</span></span></td>` +
+        `<td>${linkClubeBrasileirao(clube.time, identidade, 'returno-team-link br-club-link')}</td>` +
         `<td><span class="returno-points">${clube.pontos}</span></td><td>${clube.jogos}</td>` +
         `<td>${clube.vitorias}</td><td>${clube.empates}</td><td>${clube.derrotas}</td>` +
         `<td>${clube.gp}</td><td>${clube.gc}</td><td>${clube.sg > 0 ? '+' : ''}${clube.sg}</td>` +
@@ -4523,7 +4526,8 @@ function renderTabela() {
     else if (t.pos === 5) cls = 'zona-prelibertadores';
     const seta = htmlSetaMovimento(posBase[t.time], t.pos);
     const esc = escudoDe(t.time);
-    const celTime = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${t.time}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
+    const identidade = `<div class="tabela-time-cel">${brEscudoImg(esc?.escudo || '', t.time, 'tabela-escudo')}<span>${brEscapeHtml(t.time)}</span>${t._aoVivo ? '<small style="color:#fb7185;font-size:8px;font-weight:900;letter-spacing:.08em;">AO VIVO</small>' : (t._provisorioFinal ? '<small style="color:var(--accent);font-size:8px;font-weight:900;letter-spacing:.08em;">FINAL</small>' : '')}</div>`;
+    const celTime = linkClubeBrasileirao(t.time, identidade, 'tabela-time-link br-club-link');
     let celForma = '';
     if (forma) {
       const f5 = forma[t.time] || [];
@@ -5114,7 +5118,11 @@ function renderJogos() {
     html += `<option value="${c}" ${selected}>${c}</option>`;
   }
   html += '</select></div>';
-  html += `<div class="br-filter-current-card"><div class="br-filter-team">${filtroShield}<div><div class="br-filter-team-title">${filtro || 'Todos os clubes'}</div><div class="br-filter-team-note">${filtroDescricao}</div></div></div>${filtro ? '<button type="button" class="br-filter-clear" onclick="setFiltroJogos(\'\')">Limpar</button>' : ''}</div>`;
+  const filtroIdentidade = `${filtroShield}<div><div class="br-filter-team-title">${brEscapeHtml(filtro || 'Todos os clubes')}</div><div class="br-filter-team-note">${brEscapeHtml(filtroDescricao)}</div></div>`;
+  const filtroTime = filtro
+    ? linkClubeBrasileirao(filtro, filtroIdentidade, 'br-filter-team br-club-link')
+    : `<div class="br-filter-team">${filtroIdentidade}</div>`;
+  html += `<div class="br-filter-current-card">${filtroTime}${filtro ? '<button type="button" class="br-filter-clear" onclick="setFiltroJogos(\'\')">Limpar</button>' : ''}</div>`;
   html += '</div>';
   html += '<div class="br-filter-mini-strip" aria-label="Atalhos rápidos de clubes">';
   html += `<button class="br-mini-club ${!filtro ? 'ativo' : ''}" type="button" title="Todos" onclick="setFiltroJogos('')">BR</button>`;

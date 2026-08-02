@@ -5,6 +5,8 @@
   function escapeHtml(value){ return String(value ?? "").replace(/[&<>'"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[ch])); }
   function escapeAttr(value){ return escapeHtml(value); }
   function slug(value){ return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
+  function clubSlug(value){ return slug(value).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, ""); }
+  function clubHref(value){ return "clubes.html#" + encodeURIComponent(clubSlug(value)); }
   function cacheBust(){ return "?v=" + Date.now(); }
   async function fetchJson(path){
     const res = await fetch(path + cacheBust(), { cache: "no-store" });
@@ -50,7 +52,7 @@
     $("#timeline").innerHTML = lista.slice().reverse().map(c => `<article class="timeline-item">
       <div class="year-pill">${escapeHtml(c.ano)}</div>
       <div class="timeline-card">
-        <h3>${escudo(c)}<span>${escapeHtml(c.campeao)}</span></h3>
+        <h3><a class="timeline-club-link" href="${clubHref(c.campeao)}" aria-label="Abrir página do ${escapeAttr(c.campeao)}">${escudo(c)}<span>${escapeHtml(c.campeao)}</span></a></h3>
         <p>${escapeHtml(c.formato)}${c.nota ? " · " + escapeHtml(c.nota) : ""}</p>
       </div>
     </article>`).join("");

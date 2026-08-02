@@ -136,6 +136,22 @@
     return `clubes.html#${encodeURIComponent(clubSlug(name))}`;
   }
 
+  function probabilityCardId(name) {
+    return `probabilidade-${clubSlug(name) || "clube"}`;
+  }
+
+  function probabilityCardHref(name) {
+    return `#${probabilityCardId(name)}`;
+  }
+
+  function clubIdentityLink(name, inner, className = "", stopPropagation = false) {
+    const club = String(name || "").trim();
+    if (!club) return inner;
+    const cls = className ? ` class="${escapeAttr(className)}"` : "";
+    const stop = stopPropagation ? ' onclick="event.stopPropagation()"' : "";
+    return `<a${cls} href="${escapeAttr(clubHref(club))}" aria-label="Abrir página de ${escapeAttr(club)}"${stop}>${inner}</a>`;
+  }
+
   function number(value, digits = 0) {
     const n = Number(value);
     if (!Number.isFinite(n)) return "—";
@@ -297,7 +313,7 @@
         <div class="stats-rank">${integer(player.posicao || index + 1)}</div>
         <div class="stats-player-main">
           <div class="stats-player-name">${escapeHtml(player.nome)}</div>
-          <div class="stats-player-club">${shield(player, "stats-mini-shield")}<span>${escapeHtml(player.time)}</span></div>
+          ${clubIdentityLink(player.time, `${shield(player, "stats-mini-shield")}<span>${escapeHtml(player.time)}</span>`, "stats-player-club")}
           ${meta ? `<div class="stats-player-meta">${escapeHtml(meta)}</div>` : ""}
         </div>
         <div class="stats-player-value"><strong>${integer(value)}</strong><span>${unit}</span></div>
@@ -331,8 +347,9 @@
         </select>
       </div>
       <div class="stats-filter-current">
-        ${selected ? shield(info, "stats-filter-shield") : `<span class="stats-filter-all">BR</span>`}
-        <div><strong>${escapeHtml(selected || "Todos os clubes")}</strong><span>${integer(games.length)} partida(s) encontrada(s)</span></div>
+        ${selected
+          ? clubIdentityLink(selected, `${shield(info, "stats-filter-shield")}<div><strong>${escapeHtml(selected)}</strong><span>${integer(games.length)} partida(s) encontrada(s)</span></div>`, "stats-filter-club-link")
+          : `<span class="stats-filter-all">BR</span><div><strong>Todos os clubes</strong><span>${integer(games.length)} partida(s) encontrada(s)</span></div>`}
         ${selected ? `<button type="button" data-clear-game-filter>Limpar</button>` : ""}
       </div>
     </div>`;
@@ -390,9 +407,9 @@
         <div class="stats-game-summary-main">
           <div class="stats-game-date">${escapeHtml(dateBR(game.data_iso || detail.data_iso))}</div>
           <div class="stats-game-teams">
-            <span>${shield(home, "stats-game-shield")} ${escapeHtml(teamName(home))}</span>
+            ${clubIdentityLink(teamName(home), `${shield(home, "stats-game-shield")}<span>${escapeHtml(teamName(home))}</span>`, "stats-game-team-link", true)}
             <b>${escapeHtml(matchScore(game))}</b>
-            <span>${escapeHtml(teamName(away))} ${shield(away, "stats-game-shield")}</span>
+            ${clubIdentityLink(teamName(away), `<span>${escapeHtml(teamName(away))}</span>${shield(away, "stats-game-shield")}`, "stats-game-team-link", true)}
           </div>
           <div class="stats-game-quick">${detail.estadio ? `📍 ${escapeHtml(detail.estadio)}` : ""}${Number.isFinite(crowd) && crowd > 0 ? ` · 👥 ${integer(crowd)}` : ""}</div>
         </div>
@@ -987,20 +1004,35 @@
 
   function probabilityClubHistoryDetails(club) {
     const historyRows = probabilityClubHistoryRows(club?.clube, 10);
+    const currentCalculatedAt = state.probabilities?.calculado_em || state.probabilities?.gerado_em || "";
+    const currentEntry = club ? {
+      snapshot: { gerado_em: currentCalculatedAt },
+      row: {
+        campeao_pct: probabilityFieldValue(club, "campeao"),
+        libertadores_pct: probabilityFieldValue(club, "libertadores"),
+        sul_americana_pct: probabilityFieldValue(club, "sul_americana"),
+        rebaixamento_pct: probabilityFieldValue(club, "rebaixamento"),
+      },
+      position: projectedPosition(club),
+      points: projectedPoints(club),
+      isCurrent: true,
+    } : null;
+    const displayRows = currentEntry ? [...historyRows, currentEntry] : historyRows;
     const performanceHistory = performanceHistoryClubHtml(club?.clube);
-    if (!historyRows.length && !performanceHistory) return "";
-    const body = historyRows.map(({ snapshot, row, position, points }) => {
-      const reference = probabilityHistoryReference(snapshot, row);
-      const title = probabilityDisplayText(null, Number(row?.campeao_pct));
-      const lib = probabilityDisplayText(null, probabilityHistoryValue(row, "libertadores_pct"));
-      const sula = probabilityDisplayText(null, probabilityHistoryValue(row, "sul_americana_pct"));
-      const relegation = probabilityDisplayText(null, Number(row?.rebaixamento_pct));
-      return `<tr><th scope="row"><span>${escapeHtml(reference)}</span><small>${escapeHtml(dateBR(snapshot?.gerado_em))}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(title)}</td><td>${escapeHtml(lib)}</td><td>${escapeHtml(sula)}</td><td>${escapeHtml(relegation)}</td></tr>`;
+    if (!displayRows.length && !performanceHistory) return "";
+    const body = displayRows.map(({ snapshot, row, position, points, isCurrent }) => {
+      const reference = isCurrent ? "ATUAL" : probabilityHistoryReference(snapshot, row);
+      const title = probabilityDisplayText(isCurrent ? probabilityFieldDetail(club, "campeao") : null, Number(row?.campeao_pct));
+      const lib = probabilityDisplayText(isCurrent ? probabilityFieldDetail(club, "libertadores") : null, probabilityHistoryValue(row, "libertadores_pct"));
+      const sula = probabilityDisplayText(isCurrent ? probabilityFieldDetail(club, "sul_americana") : null, probabilityHistoryValue(row, "sul_americana_pct"));
+      const relegation = probabilityDisplayText(isCurrent ? probabilityFieldDetail(club, "rebaixamento") : null, Number(row?.rebaixamento_pct));
+      const referenceDetail = isCurrent ? "cálculo vigente" : dateBR(snapshot?.gerado_em);
+      return `<tr${isCurrent ? ' class="is-current"' : ""}><th scope="row"${isCurrent && snapshot?.gerado_em ? ` title="Calculado em ${escapeAttr(dateTimeBR(snapshot.gerado_em))}"` : ""}><span>${escapeHtml(reference)}</span><small>${escapeHtml(referenceDetail)}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(title)}</td><td>${escapeHtml(lib)}</td><td>${escapeHtml(sula)}</td><td>${escapeHtml(relegation)}</td></tr>`;
     }).join("");
-    const forecastHistory = historyRows.length ? `<section class="club-forecast-history">
-      <div class="club-evolution-head"><div><span>AF-Previsão ${probabilityClubContext(club?.clube)}</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado salvo" : "estados salvos"}</small></div>
+    const forecastHistory = displayRows.length ? `<section class="club-forecast-history">
+      <div class="club-evolution-head"><div><span>AF-Previsão ${probabilityClubContext(club?.clube)}</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado histórico" : "estados históricos"} + cálculo atual</small></div>
       <div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${body}</tbody></table></div>
-      <p>A evolução do clube ganha uma nova linha somente quando ele conclui outra partida. Jogos atrasados preservam a rodada real, como R4 após R19. Reexecuções sem jogo novo não criam estados artificiais.</p>
+      <p>As linhas históricas avançam quando o clube conclui outra partida. A linha ATUAL acompanha o cálculo vigente e pode mudar quando jogos de outros clubes alteram a classificação projetada, sem criar um snapshot histórico artificial.</p>
     </section>` : "";
     return `<details class="probability-history-details">
       <summary>Evolução do clube <span>AF-Score + AF-Previsão ${probabilityClubContext(club?.clube)}</span></summary>
@@ -1164,7 +1196,7 @@
     const currentPosition = integer(current.posicao);
     const currentPoints = integer(current.pontos);
     const currentGames = integer(current.jogos);
-    return `<article class="probability-club-card">
+    return `<article class="probability-club-card" id="${escapeAttr(probabilityCardId(club?.clube))}" data-probability-club="${escapeAttr(clubSlug(club?.clube))}">
       <div class="probability-club-head">
         <span class="probability-order">${integer(order)}</span>
         <a class="probability-club-link" href="${escapeAttr(clubHref(club?.clube))}" aria-label="Abrir página de ${escapeAttr(club?.clube)}">${shield(info, "probability-club-shield")}</a>
@@ -1305,7 +1337,7 @@
       || `Complemento calculado antes do arredondamento conjunto: ${number(noContinentalRaw, 5)}%`;
     return `<tr>
       <td class="probability-table-position"><span>${integer(atual.posicao)}</span></td>
-      <th scope="row" class="probability-table-club"><a href="${escapeAttr(clubHref(club?.clube))}">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong></a></th>
+      <th scope="row" class="probability-table-club"><a href="${escapeAttr(probabilityCardHref(club?.clube))}" aria-label="Ver projeção detalhada de ${escapeAttr(club?.clube)} nesta página">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong></a></th>
       <td class="probability-table-number"><strong>${integer(atual.pontos)}</strong></td>
       <td class="probability-table-number">${integer(atual.jogos)}</td>
       <td class="probability-table-percent probability-cell-title" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "campeao")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "campeao"), probabilityFieldValue(club, "campeao")))}</td>
@@ -1732,6 +1764,9 @@
       requestAnimationFrame(() => $("metodologia-probabilidades")?.scrollIntoView({ behavior: "auto", block: "start" }));
     }
     if (abrirMetodologia) requestAnimationFrame(() => document.getElementById("metodologia-ranking")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    if (hashTab.startsWith("probabilidade-")) {
+      requestAnimationFrame(() => document.getElementById(hashTab)?.scrollIntoView({ behavior: "auto", block: "start" }));
+    }
     armarAtualizacaoAutomatica();
   }
 

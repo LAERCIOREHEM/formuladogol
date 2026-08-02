@@ -1566,10 +1566,12 @@
       : "";
     return '<article class="live-lineup-team-card">' +
       '<header class="live-lineup-team-head">' +
-        (team.escudo ? '<img src="' + esc(team.escudo) + '" alt="Escudo do ' + esc(team.nome) + '">' : '') +
-        '<div><h3>' + esc(team.nome) + '</h3>' +
-          (data.formation ? '<span>Formação ' + esc(data.formation) + '</span>' : '<span>Formação não informada</span>') +
-        '</div>' +
+        '<a class="live-lineup-team-link" href="' + clubHref(team.nome) + '" aria-label="Abrir página do ' + esc(team.nome) + '">' +
+          (team.escudo ? '<img src="' + esc(team.escudo) + '" alt="Escudo do ' + esc(team.nome) + '">' : '') +
+          '<div><h3>' + esc(team.nome) + '</h3>' +
+            (data.formation ? '<span>Formação ' + esc(data.formation) + '</span>' : '<span>Formação não informada</span>') +
+          '</div>' +
+        '</a>' +
       '</header>' +
       '<div class="live-lineup-coach"><span>Técnico</span><strong>' + esc(data.coach || "Não informado pela ESPN") + '</strong></div>' +
       lineupBody + reserves + renderLineupChanges(data.changes) +
