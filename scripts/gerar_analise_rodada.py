@@ -96,8 +96,10 @@ def percentual(valor: float) -> str:
 
 
 def variacao(valor: float) -> str:
-    if abs(valor) < 0.0005:
+    if valor == 0:
         return "0 p.p."
+    if abs(valor) < 0.001:
+        return ("↑" if valor > 0 else "↓") + " <0,001 p.p."
     sinal = "+" if valor > 0 else ""
     return (f"{sinal}{valor:.3f}" if abs(valor) < 0.1 else f"{sinal}{valor:.1f}").replace(".", ",") + " p.p."
 
@@ -109,8 +111,53 @@ def data_humana(iso: str) -> str:
     return data.astimezone(FUSO_BR).strftime("%d/%m/%Y às %H:%M")
 
 
+def data_curta(iso: str) -> str:
+    data = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+    if data.tzinfo is None:
+        data = data.replace(tzinfo=FUSO_BR)
+    return data.astimezone(FUSO_BR).strftime("%d/%m/%Y")
+
+
 def slug_rodada(rodada: int) -> str:
     return f"brasileirao-{TEMPORADA}-rodada-{rodada}.html"
+
+
+def indice_complementos_jogos() -> tuple[dict[str, Any], dict[str, Any]]:
+    automaticos = carregar_json(Path("dados-br/melhores-momentos.json")).get("jogos") or {}
+    manuais = carregar_json(Path("dados-br/melhores-momentos-manual.json")).get("jogos") or {}
+    detalhes = carregar_json(Path("dados-br/jogos-detalhes.json")).get("jogos") or {}
+    videos = {str(chave): valor for chave, valor in automaticos.items() if isinstance(valor, dict)}
+    videos.update({str(chave): valor for chave, valor in manuais.items() if isinstance(valor, dict)})
+    detalhes = {str(chave): valor for chave, valor in detalhes.items() if isinstance(valor, dict)}
+    return videos, detalhes
+
+
+def complemento_jogo(jogo: "Jogo", videos: dict[str, Any], detalhes: dict[str, Any]) -> dict[str, Any]:
+    video_bruto = videos.get(jogo.event_id) or {}
+    detalhe_bruto = detalhes.get(jogo.event_id) or {}
+    video = None
+    if str(video_bruto.get("url") or "").startswith(("https://", "http://")):
+        video = {
+            "url": str(video_bruto.get("url")),
+            "titulo": normalizar_nome(video_bruto.get("titulo") or "Melhores momentos"),
+            "fonte": normalizar_nome(video_bruto.get("fonte") or "YouTube"),
+        }
+    estatisticas = []
+    for item in detalhe_bruto.get("stats") or detalhe_bruto.get("estatisticas") or []:
+        if not isinstance(item, dict) or not normalizar_nome(item.get("nome")):
+            continue
+        estatisticas.append({
+            "nome": normalizar_nome(item.get("nome")),
+            "mandante": str(item.get("home") if item.get("home") is not None else "—"),
+            "visitante": str(item.get("away") if item.get("away") is not None else "—"),
+        })
+    detalhe = {
+        "estadio": normalizar_nome(detalhe_bruto.get("estadio")),
+        "arbitro": normalizar_nome(detalhe_bruto.get("arbitro")),
+        "publico": detalhe_bruto.get("publico"),
+        "estatisticas": estatisticas,
+    }
+    return jogo.__dict__ | {"linha": jogo.linha, "melhores_momentos": video, "detalhes": detalhe}
 
 
 @dataclass(frozen=True)
@@ -237,13 +284,14 @@ def montar_dossie(rodada: int, estado: dict[str, Any]) -> dict[str, Any]:
             "rebaixamento_delta": float(d.get("rebaixamento_pct") or 0) - float(a.get("rebaixamento_pct") or 0),
         })
     jogos = jogos_concluidos(rodada)
+    videos, detalhes = indice_complementos_jogos()
     return {
         "rodada": rodada,
         "snapshot_antes": inicio.get("gerado_em"),
         "snapshot_depois": fim.get("gerado_em"),
         "simulacoes": int(fim.get("simulacoes") or 0),
         "estado": estado,
-        "jogos": [j.__dict__ | {"linha": j.linha} for j in jogos],
+        "jogos": [complemento_jogo(j, videos, detalhes) for j in jogos],
         "clubes": linhas,
     }
 
@@ -386,6 +434,69 @@ def menu(prefixo: str, ativo: bool = False) -> str:
     return '<nav class="nav" data-br-auth-menu aria-label="Menu principal">\n' + "\n".join(links) + "\n    </nav>"
 
 
+def submenu_rodadas(artigos: list[dict[str, Any]], rodada_ativa: int | None = None) -> str:
+    disponiveis = {
+        int(item.get("rodada") or 0): str(item.get("slug") or slug_rodada(int(item.get("rodada") or 0)))
+        for item in artigos
+        if int(item.get("rodada") or 0) > 0
+    }
+    if rodada_ativa:
+        disponiveis.setdefault(rodada_ativa, slug_rodada(rodada_ativa))
+    links = []
+    for rodada in sorted(disponiveis, reverse=True):
+        if rodada_ativa and rodada > rodada_ativa:
+            continue
+        atual = ' class="active" aria-current="page"' if rodada == rodada_ativa else ""
+        links.append(f'<a href="{esc(disponiveis[rodada])}"{atual}>R{rodada}</a>')
+    if not links:
+        return ""
+    return '<nav class="analysis-round-nav" aria-label="Histórico por rodada"><strong>RODADAS</strong><div>' + "".join(links) + "</div></nav>"
+
+
+def valor_estatistica(valor: Any) -> str:
+    texto = str(valor if valor is not None else "—")
+    if re.fullmatch(r"-?\d+\.\d+%", texto):
+        texto = texto.replace(".", ",")
+    return texto
+
+
+def renderizar_jogo(jogo: dict[str, Any]) -> str:
+    video = jogo.get("melhores_momentos") or {}
+    detalhes = jogo.get("detalhes") or {}
+    acoes = [f'<a href="../resultados">Placar e resumo</a>']
+    if video.get("url"):
+        acoes.append(
+            f'<a class="analysis-video" href="{esc(video["url"])}" target="_blank" rel="noopener noreferrer">▶ Melhores momentos</a>'
+        )
+    meta = []
+    if detalhes.get("estadio"):
+        meta.append(f'<span>📍 {esc(detalhes["estadio"])}</span>')
+    if detalhes.get("arbitro"):
+        meta.append(f'<span>Árbitro: {esc(detalhes["arbitro"])}</span>')
+    publico = detalhes.get("publico")
+    if isinstance(publico, (int, float)) and publico > 0:
+        meta.append(f'<span>Público: {int(publico):,}</span>'.replace(",", "."))
+    estatisticas = detalhes.get("estatisticas") or []
+    expansivel = ""
+    if estatisticas or meta:
+        linhas = "".join(
+            f'<tr><td>{esc(valor_estatistica(item.get("mandante")))}</td><th scope="row">{esc(item.get("nome"))}</th><td>{esc(valor_estatistica(item.get("visitante")))}</td></tr>'
+            for item in estatisticas
+        )
+        tabela = ""
+        if linhas:
+            tabela = f'''<div class="analysis-game-stats-wrap"><table class="analysis-game-stats">
+              <thead><tr><th>{esc(jogo['mandante'])}</th><th>Estatística</th><th>{esc(jogo['visitante'])}</th></tr></thead>
+              <tbody>{linhas}</tbody></table></div>'''
+        expansivel = f'''<details class="analysis-game-details"><summary>Estatísticas do jogo</summary>
+          <div class="analysis-game-meta">{''.join(meta)}</div>{tabela}</details>'''
+    return f'''<article class="analysis-game-card">
+      <h3><a href="../resultados">{esc(jogo['linha'])}</a></h3>
+      <div class="analysis-game-actions">{''.join(acoes)}</div>
+      {expansivel}
+    </article>'''
+
+
 def rodape(prefixo: str) -> str:
     return f'''<footer class="site-footer">
       <nav class="br-footer-links" aria-label="Links institucionais"><a href="{prefixo}sobre.html">ⓘ Sobre o Fórmula do Gol</a></nav>
@@ -431,7 +542,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-analises-v2">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260802-analises-v3">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');</script>
   <script type="application/ld+json">{json_ld}</script>
@@ -442,10 +553,11 @@ def tabela_comparativa(dossie: dict[str, Any]) -> str:
     linhas = sorted(dossie["clubes"], key=lambda c: (-c["pontos_depois"], -c["titulo_depois"], c["clube"]))
     corpo = []
     for c in linhas:
+        classe_delta = "delta-up" if c["titulo_delta"] > 0 else "delta-down" if c["titulo_delta"] < 0 else "delta-flat"
         corpo.append(f'''<tr>
           <th scope="row"><a href="../clubes.html#{esc(c['clube'].lower().replace(' ', '-'))}">{esc(c['clube'])}</a></th>
           <td>{c['pontos_depois']}</td>
-          <td>{esc(percentual(c['titulo_antes']))}</td><td>{esc(percentual(c['titulo_depois']))}</td><td class="delta">{esc(variacao(c['titulo_delta']))}</td>
+          <td>{esc(percentual(c['titulo_antes']))}</td><td>{esc(percentual(c['titulo_depois']))}</td><td class="delta {classe_delta}">{esc(variacao(c['titulo_delta']))}</td>
           <td>{esc(percentual(c['libertadores_depois']))}</td><td>{esc(percentual(c['rebaixamento_depois']))}</td>
         </tr>''')
     return '''<div class="analysis-table-wrap" tabindex="0" aria-label="Tabela comparativa com rolagem horizontal">
@@ -468,7 +580,7 @@ def cards_variacoes(dossie: dict[str, Any]) -> str:
     return '<div class="analysis-kpis">' + "".join(f'<article><span>{esc(rotulo)}</span><strong>{esc(clube)}</strong><b>{esc(valor)}</b></article>' for rotulo, clube, valor in itens) + "</div>"
 
 
-def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: str, modificado: str) -> tuple[str, dict[str, Any]]:
+def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: str, modificado: str, historico: list[dict[str, Any]]) -> tuple[str, dict[str, Any]]:
     rodada = dossie["rodada"]
     url = f"{SITE}/analises/{slug_rodada(rodada)}"
     titulo, linha_fina = editorial["titulo"], editorial["linha_fina"]
@@ -476,27 +588,29 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
     if dossie["estado"]["jogos_pendentes"]:
         jogos = ", ".join(f"{p['mandante']} × {p['visitante']}" for p in dossie["estado"]["pendentes"])
         nota_pendente = f'<aside class="analysis-note"><strong>Rodada com pendência:</strong> {esc(jogos)}. Esta página será atualizada na mesma URL após a realização da partida.</aside>'
-    resultados = "".join(f'<li><a href="../resultados">{esc(j["linha"])}</a></li>' for j in dossie["jogos"])
+    resultados = "".join(renderizar_jogo(jogo) for jogo in dossie["jogos"])
     paragrafos = "\n".join(f"<p>{esc(p)}</p>" for p in editorial["paragrafos"])
     html_final = cabecalho_html(titulo, linha_fina, url, "NewsArticle", publicado, modificado) + f'''
 <body data-{MARCADOR}="{rodada}">
   <div class="container analysis-shell">
     <header class="hero"><a href="../estatisticas.html"><img src="../img/header-formula-do-gol.png" alt="Fórmula do Gol — A matemática por trás do futebol"></a></header>
     {menu('../', True)}
+    {submenu_rodadas(historico, rodada)}
     <main>
       <article class="analysis-article">
         <nav class="analysis-breadcrumb" aria-label="Navegação estrutural"><a href="./">Análises</a><span>›</span><span>Rodada {rodada}</span></nav>
         <header class="analysis-head">
+          <div class="analysis-published"><time datetime="{esc(publicado)}">Publicado em {data_curta(publicado)}</time></div>
           <span class="analysis-tag">ANÁLISE DA RODADA {rodada}</span>
           <h1>{esc(titulo)}</h1>
           <p class="analysis-deck">{esc(linha_fina)}</p>
-          <div class="analysis-byline">Por <a href="../sobre.html">Laércio Rehem</a> · Publicado em {data_humana(publicado)} · Atualizado em {data_humana(modificado)}</div>
+          <div class="analysis-byline">Por <a href="../sobre.html">Laércio Rehem</a></div>
         </header>
         {nota_pendente}
         {cards_variacoes(dossie)}
         <section class="analysis-copy"><h2>O retrato da rodada</h2>{paragrafos}</section>
-        <section><h2>Resultados considerados</h2><ul class="analysis-results">{resultados}</ul></section>
-        <section><h2>Como as probabilidades mudaram</h2><p class="analysis-help">Comparação entre o último snapshot anterior e o fechamento editorial da rodada. No celular, arraste a tabela para o lado.</p>{tabela_comparativa(dossie)}</section>
+        <section><h2>Resultados considerados</h2><div class="analysis-results">{resultados}</div></section>
+        <section><h2>Como as probabilidades mudaram</h2><p class="analysis-help">Comparação entre o último snapshot anterior e o fechamento editorial da rodada. No celular, arraste a tabela para o lado.</p><p class="analysis-percent-legend"><strong>Padrão dos percentuais:</strong> <b>0%</b> significa nenhum cenário nas simulações; <b>&lt;0,001%</b> significa que houve cenários, mas abaixo do menor valor exibido. Nas variações, <b>↑/↓ &lt;0,001 p.p.</b> preserva movimentos residuais sem exibir zeros falsos.</p>{tabela_comparativa(dossie)}</section>
         <aside class="analysis-method"><strong>Leitura dos dados:</strong> as probabilidades são estimativas do AF-Previsão, calculadas em {dossie['simulacoes']:,} simulações e não representam certezas. O texto automático utiliza somente um dossiê factual auditado; resultados e percentuais são inseridos diretamente dos JSONs do Fórmula do Gol.</aside>
         <nav class="analysis-next" aria-label="Mais conteúdo"><a href="./">← Todas as análises</a><a href="../estatisticas.html#probabilidades">Probabilidades atuais →</a></nav>
       </article>
@@ -516,7 +630,7 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
     for i, artigo in enumerate(ordenados):
         classe = " analysis-card-featured" if i == 0 else ""
         pendencia = " · edição parcial" if artigo.get("jogos_pendentes") else ""
-        cards.append(f'''<article class="analysis-card{classe}"><span>RODADA {artigo['rodada']}{pendencia}</span><h2><a href="{esc(artigo['slug'])}">{esc(artigo['titulo'])}</a></h2><p>{esc(artigo['linha_fina'])}</p><time datetime="{esc(artigo['modificado_em'])}">{data_humana(artigo['modificado_em'])}</time><a class="analysis-read" href="{esc(artigo['slug'])}">Ler análise →</a></article>''')
+        cards.append(f'''<article class="analysis-card{classe}"><time datetime="{esc(artigo['publicado_em'])}">Publicado em {data_curta(artigo['publicado_em'])}</time><span>RODADA {artigo['rodada']}{pendencia}</span><h2><a href="{esc(artigo['slug'])}">{esc(artigo['titulo'])}</a></h2><p>{esc(artigo['linha_fina'])}</p><a class="analysis-read" href="{esc(artigo['slug'])}">Ler análise →</a></article>''')
     titulo = "Análises do Brasileirão 2026"
     descricao = "Leitura rodada a rodada dos resultados e das mudanças nas probabilidades de título, Libertadores e rebaixamento."
     return cabecalho_html(titulo, descricao, f"{SITE}/analises/", "CollectionPage") + f'''
@@ -524,6 +638,7 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
   <div class="container analysis-shell">
     <header class="hero"><a href="../estatisticas.html"><img src="../img/header-formula-do-gol.png" alt="Fórmula do Gol — A matemática por trás do futebol"></a></header>
     {menu('../', True)}
+    {submenu_rodadas(artigos)}
     <main>
       <h1 class="analysis-page-title">{titulo}</h1>
       <section class="analysis-grid" aria-label="Arquivo de análises">{''.join(cards) if cards else '<p>Nenhuma análise publicada.</p>'}</section>
@@ -610,7 +725,7 @@ def executar(args: argparse.Namespace) -> int:
     anterior = next((a for a in artigos if int(a.get("rodada") or 0) == rodada), None)
     publicado = anterior.get("publicado_em") if anterior else momento.replace(microsecond=0).isoformat()
     modificado = momento.replace(microsecond=0).isoformat()
-    pagina, metadados = gerar_artigo(dossie, editorial, publicado, modificado)
+    pagina, metadados = gerar_artigo(dossie, editorial, publicado, modificado, artigos)
     metadados["origem_editorial"] = origem
     if anterior and anterior.get("hash_dossie") == metadados["hash_dossie"] and not args.forcar:
         print(f"Rodada {rodada} já publicada com o mesmo dossiê; nenhuma alteração.")
@@ -637,6 +752,9 @@ def self_test() -> int:
     assert percentual(0.0022) == "0,002%"
     assert percentual(77.5218) == "77,5%"
     assert percentual(99.9806) == "99,98%"
+    assert variacao(0) == "0 p.p."
+    assert variacao(0.00045) == "↑ <0,001 p.p."
+    assert variacao(-0.00005) == "↓ <0,001 p.p."
     config = carregar_json(ARQUIVO_CONFIG)
     estado = estado_rodada(20, datetime(2026, 8, 2, 12, tzinfo=FUSO_BR), config)
     assert estado["elegivel"] and estado["jogos_concluidos"] == 10
@@ -648,12 +766,17 @@ def self_test() -> int:
     assert "Vitória 0 × 4 Palmeiras" not in resultados
     editorial = narrativa_segura(dossie)
     validar_editorial(editorial, dossie)
-    pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00")
+    pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00", carregar_manifesto().get("artigos") or [])
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
+    assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
+    assert "Padrão dos percentuais" in pagina and "analysis-round-nav" in pagina
+    assert pagina.count("▶ Melhores momentos") == 10
+    assert pagina.count("Estatísticas do jogo") == 10
     assert meta["jogos_concluidos"] == 10
     hub = gerar_hub(carregar_manifesto().get("artigos") or [])
     assert '<h1 class="analysis-page-title">Análises do Brasileirão 2026</h1>' in hub
     assert "analysis-hub-head" not in hub
+    assert "Publicado em 02/08/2026" in hub and "analysis-round-nav" in hub
     print("OK self-test: detector, fatos, percentuais, editorial e HTML.")
     return 0
 
