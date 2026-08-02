@@ -718,7 +718,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
     html_final = cabecalho_html(titulo, linha_fina, url, "NewsArticle", publicado, modificado) + f'''
 <body data-{MARCADOR}="{rodada}">
   <div class="container analysis-shell">
-    <header class="hero"><a href="../estatisticas.html"><img src="../img/header-formula-do-gol.png" alt="Fórmula do Gol — A matemática por trás do futebol"></a></header>
+    <header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high"></header>
     {menu('../', True)}
     {submenu_rodadas(historico, rodada)}
     <main>
@@ -762,7 +762,7 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
     return cabecalho_html(titulo, descricao, f"{SITE}/analises/", "CollectionPage") + f'''
 <body>
   <div class="container analysis-shell">
-    <header class="hero"><a href="../estatisticas.html"><img src="../img/header-formula-do-gol.png" alt="Fórmula do Gol — A matemática por trás do futebol"></a></header>
+    <header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high"></header>
     {menu('../', True)}
     {submenu_rodadas(artigos)}
     <main>
@@ -912,6 +912,8 @@ def self_test() -> int:
     validar_editorial(editorial, dossie)
     pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00", carregar_manifesto().get("artigos") or [])
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
+    assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in pagina
+    assert "header-formula-do-gol.png" not in pagina
     assert "br-analises.css?v=20260802-probabilidade-sticky-v6" in pagina
     assert "br-analises.js?v=20260802-video-incorporado-v1" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
@@ -929,6 +931,8 @@ def self_test() -> int:
     assert '<h3><a href="../resultados">' not in pagina
     assert meta["jogos_concluidos"] == 10
     hub = gerar_hub(carregar_manifesto().get("artigos") or [])
+    assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in hub
+    assert "header-formula-do-gol.png" not in hub
     assert '<h1 class="analysis-page-title">Análises do Brasileirão 2026</h1>' in hub
     assert "analysis-hub-head" not in hub
     assert "Publicado em 02/08/2026" in hub and "analysis-round-nav" in hub
