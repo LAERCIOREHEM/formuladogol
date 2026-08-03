@@ -848,7 +848,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
   <link rel="stylesheet" href="../css/br-analises.css?v=20260802-openai-editorial-v1">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');</script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');gtag('config','AW-18273186827');gtag('event','ads_conversion_PAGE_VIEW_1',{{}});</script>
   <script type="application/ld+json">{json_ld}</script>
 </head>'''
 
