@@ -121,32 +121,60 @@
     return '<img src="' + esc(src) + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + FALLBACK_SHIELD + '\';this.classList.add(\'is-neutral-shield\')">';
   }
 
+  function gameState(game) {
+    const stateName = String(game.estado || game.status_estado || "").toLowerCase();
+    const detail = String(game.status_detalhe || "").trim();
+    if (["in", "live", "em_andamento"].includes(stateName)) {
+      return { label: detail || "Ao vivo", css: "live", cardCss: "is-live" };
+    }
+    if (["post", "final", "encerrado"].includes(stateName) || game.concluido === true) {
+      return { label: detail || "Encerrado", css: "", cardCss: "" };
+    }
+    if (game.adiado === true) return { label: "Adiado", css: "", cardCss: "" };
+    return { label: "pré-jogo", css: "", cardCss: "" };
+  }
+
   function renderGame(game) {
     const date = parseDate(game.data_iso);
     const home = game.mandante || {};
     const away = game.visitante || {};
     const transmission = transmissionFor(game);
     const competition = String(game.competicao_chave || "");
+    const currentState = gameState(game);
     const liveLink = "aovivo.html?event=" + encodeURIComponent(String(game.event_id || ""));
     const probability = game.probabilidades_disponiveis === true
-      ? '<a class="agenda-action probability" href="/jogos">📊 Ver probabilidades</a>'
+      ? '<a class="agenda-action probability" href="/jogos">📊 Probabilidades</a>'
       : "";
     const youtube = transmission.youtubeUrl
-      ? '<a class="agenda-action live" href="' + esc(transmission.youtubeUrl) + '" target="_blank" rel="noopener noreferrer">▶ Transmissão oficial</a>'
+      ? '<a class="agenda-action live" href="' + esc(transmission.youtubeUrl) + '" target="_blank" rel="noopener noreferrer">▶ Assistir</a>'
       : "";
-    return '<article class="agenda-game" data-event-id="' + esc(game.event_id) + '">' +
-      '<div class="agenda-time">' + esc(formatTime(date)) + '<small>Brasília</small></div>' +
+    const venue = game.estadio ? '<span>📍 ' + esc(game.estadio) + '</span>' : '<span>📍 Local a confirmar</span>';
+
+    return '<article class="agenda-game ' + currentState.cardCss + '" data-event-id="' + esc(game.event_id) + '">' +
+      '<div class="agenda-card-top">' +
+        '<div class="agenda-card-heading">' +
+          '<span class="agenda-competition ' + esc(competition) + '">' + esc(game.competicao_nome_curto || competitionLabels[competition] || game.competicao_nome) + '</span>' +
+          '<span class="agenda-phase">' + esc(phaseText(game)) + '</span>' +
+        '</div>' +
+        '<span class="agenda-time">' + esc(formatTime(date)) + '<small>Brasília</small></span>' +
+      '</div>' +
       '<div class="agenda-fixture">' +
-        '<div class="agenda-competition-line"><span class="agenda-competition ' + esc(competition) + '">' + esc(game.competicao_nome_curto || competitionLabels[competition] || game.competicao_nome) + '</span><span class="agenda-phase">' + esc(phaseText(game)) + '</span></div>' +
         '<div class="agenda-teams">' +
-          '<div class="agenda-team home"><span class="agenda-team-name">' + esc(home.nome) + '</span>' + logo(home) + '</div>' +
+          '<div class="agenda-team home">' + logo(home) + '<span class="agenda-team-name">' + esc(home.nome) + '</span></div>' +
           '<div class="agenda-versus">×</div>' +
           '<div class="agenda-team away">' + logo(away) + '<span class="agenda-team-name">' + esc(away.nome) + '</span></div>' +
         '</div>' +
+        '<div class="agenda-extra">' +
+          '<div class="agenda-meta">' +
+            '<span class="agenda-state-pill ' + currentState.css + '">' + esc(currentState.label) + '</span>' +
+            venue +
+            '<span class="agenda-watch">📺 ' + esc(transmission.label) + '</span>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
-      '<div class="agenda-extra">' +
-        '<div class="agenda-meta">' + (game.estadio ? '🏟️ ' + esc(game.estadio) + '<br>' : '') + '<span class="agenda-watch">📺 ' + esc(transmission.label) + '</span></div>' +
-        '<div class="agenda-actions"><a class="agenda-action live" href="' + esc(liveLink) + '">🔴 Abrir ao vivo</a>' + probability + youtube + '</div>' +
+      '<div class="agenda-actions">' +
+        '<span class="agenda-source-pill">Dados: ESPN</span>' +
+        '<div class="agenda-actions-links"><a class="agenda-action live" href="' + esc(liveLink) + '">🔴 Abrir ao vivo</a>' + probability + youtube + '</div>' +
       '</div>' +
     '</article>';
   }

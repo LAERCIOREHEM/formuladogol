@@ -1,41 +1,58 @@
-.agenda-intro { margin-bottom: 14px; }
-.agenda-intro p { max-width: 920px; }
+/* Agenda dos clubes do Brasileirão
+   Mantém o mesmo padrão visual dos cards da aba Jogos. */
 
-.agenda-controls { margin-bottom: 14px; }
+.agenda-controls {
+  margin-bottom: 14px;
+  border-color: rgba(148,163,184,.17);
+  background: rgba(14,24,31,.84);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+}
 .agenda-controls .panel-inner {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(240px, .65fr);
+  grid-template-columns: minmax(0,1.35fr) minmax(250px,.65fr);
   gap: 16px;
+  padding: 14px 16px;
 }
 .agenda-filter-block { min-width: 0; }
 .agenda-filter-label {
   display: block;
   margin-bottom: 8px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
-  letter-spacing: .08em;
+  letter-spacing: .09em;
   text-transform: uppercase;
 }
-.agenda-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.agenda-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
 .agenda-chip {
   appearance: none;
+  min-height: 34px;
+  padding: 7px 12px;
   border: 1px solid rgba(148,163,184,.18);
   border-radius: 999px;
   background: rgba(255,255,255,.035);
   color: #d9e6f2;
-  min-height: 34px;
-  padding: 7px 11px;
   font: inherit;
   font-size: 11px;
   font-weight: 900;
+  white-space: nowrap;
   cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, transform .16s ease;
 }
-.agenda-chip:hover { border-color: rgba(163,230,53,.36); background: rgba(163,230,53,.08); }
+.agenda-chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(163,230,53,.36);
+  background: rgba(163,230,53,.08);
+}
 .agenda-chip.active {
-  border-color: rgba(255,231,129,.9);
-  background: linear-gradient(135deg, #facc15, #fbbf24);
+  border-color: rgba(255,231,129,.92);
+  background: linear-gradient(135deg,#facc15,#fbbf24);
   color: #142009;
+  box-shadow: 0 8px 20px rgba(250,204,21,.13);
 }
 
 .agenda-status {
@@ -45,139 +62,288 @@
   font-size: 12px;
   font-weight: 750;
 }
-.agenda-days { display: grid; gap: 14px; }
-.agenda-day {
-  border: 1px solid rgba(148,163,184,.17);
-  border-radius: 18px;
-  background: rgba(10,22,30,.78);
-  overflow: hidden;
-  box-shadow: 0 16px 42px rgba(0,0,0,.18);
+
+.agenda-days {
+  display: grid;
+  gap: 22px;
 }
-.agenda-day.is-today { border-color: rgba(163,230,53,.38); }
+.agenda-day {
+  min-width: 0;
+}
 .agenda-day-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 11px 14px;
-  border-bottom: 1px solid rgba(148,163,184,.13);
-  background: linear-gradient(90deg, rgba(163,230,53,.08), rgba(255,255,255,.015));
+  gap: 9px;
+  margin: 0 0 10px;
+  padding: 0 2px;
 }
 .agenda-day-title {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+  display: inline-flex;
+  align-items: center;
   min-width: 0;
+  padding: 9px 14px;
+  border: 1px solid rgba(163,230,53,.20);
+  border-radius: 999px;
+  background: linear-gradient(90deg,rgba(163,230,53,.16),rgba(163,230,53,.03));
+  color: #d9ff76;
 }
-.agenda-day-title strong { color: #efffc3; font-size: 14px; }
-.agenda-day-title span { color: var(--muted); font-size: 11px; font-weight: 800; }
+.agenda-day-title::before {
+  content: "📅";
+  flex: 0 0 auto;
+  margin-right: 8px;
+}
+.agenda-day-title strong {
+  overflow: hidden;
+  color: #efffc3;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .10em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.agenda-day-title span {
+  flex: 0 0 auto;
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
 .agenda-today-badge {
   flex: 0 0 auto;
+  padding: 5px 9px;
   border: 1px solid rgba(163,230,53,.35);
   border-radius: 999px;
   background: rgba(163,230,53,.12);
   color: #eaffb2;
-  padding: 4px 8px;
   font-size: 9px;
   font-weight: 950;
   letter-spacing: .08em;
   text-transform: uppercase;
 }
-.agenda-game-list { display: grid; }
-.agenda-game {
+
+.agenda-game-list {
   display: grid;
-  grid-template-columns: 68px minmax(0, 1fr) minmax(190px, .46fr);
-  gap: 12px;
-  align-items: center;
+  grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+  gap: 14px;
+}
+.agenda-game {
+  position: relative;
+  display: flex;
   min-width: 0;
-  padding: 13px 14px;
-  border-top: 1px solid rgba(148,163,184,.10);
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(148,163,184,.17);
+  border-radius: 18px;
+  background: rgba(14,24,31,.84);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
 }
-.agenda-game:first-child { border-top: 0; }
-.agenda-game:hover { background: rgba(255,255,255,.018); }
-.agenda-time {
-  color: #fff5bf;
-  font-size: 17px;
-  font-weight: 950;
-  font-variant-numeric: tabular-nums;
-  text-align: center;
+.agenda-game:hover {
+  transform: translateY(-2px);
+  border-color: rgba(163,230,53,.34);
+  box-shadow: 0 18px 44px rgba(0,0,0,.22), 0 0 0 1px rgba(163,230,53,.04);
 }
-.agenda-time small {
-  display: block;
-  margin-top: 2px;
-  color: var(--muted-2);
-  font-size: 8px;
-  font-weight: 900;
-  letter-spacing: .06em;
-  text-transform: uppercase;
+.agenda-game.is-live {
+  border-color: rgba(251,113,133,.44);
+  box-shadow: 0 0 0 1px rgba(251,113,133,.08), 0 16px 40px rgba(251,113,133,.08);
 }
-.agenda-fixture { min-width: 0; }
-.agenda-competition-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+
+.agenda-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 52px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(148,163,184,.12);
+  background: linear-gradient(90deg,rgba(255,255,255,.045),transparent);
+}
+.agenda-card-heading {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
 .agenda-competition {
   display: inline-flex;
   align-items: center;
+  width: fit-content;
+  max-width: 100%;
   min-height: 22px;
+  padding: 4px 8px;
+  overflow: hidden;
   border: 1px solid rgba(148,163,184,.20);
   border-radius: 999px;
-  padding: 4px 8px;
   font-size: 9px;
   font-weight: 950;
   letter-spacing: .05em;
+  text-overflow: ellipsis;
   text-transform: uppercase;
+  white-space: nowrap;
 }
-.agenda-competition.brasileirao { color: #eaffb2; background: rgba(163,230,53,.10); border-color: rgba(163,230,53,.25); }
-.agenda-competition.copa_do_brasil { color: #ffe69a; background: rgba(251,191,36,.10); border-color: rgba(251,191,36,.25); }
-.agenda-competition.libertadores { color: #dbeafe; background: rgba(96,165,250,.10); border-color: rgba(96,165,250,.25); }
-.agenda-competition.sul_americana { color: #f3e8ff; background: rgba(192,132,252,.10); border-color: rgba(192,132,252,.25); }
-.agenda-phase { color: var(--muted); font-size: 10px; font-weight: 800; }
-.agenda-teams {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr);
-  align-items: center;
-  gap: 8px;
-}
-.agenda-team { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.agenda-team.home { justify-content: flex-end; text-align: right; }
-.agenda-team.away { justify-content: flex-start; text-align: left; }
-.agenda-team img {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  flex: 0 0 auto;
-  filter: drop-shadow(0 5px 8px rgba(0,0,0,.30));
-}
-.agenda-team.home img { order: 2; }
-.agenda-team-name {
-  min-width: 0;
+.agenda-competition.brasileirao { color:#eaffb2; background:rgba(163,230,53,.10); border-color:rgba(163,230,53,.25); }
+.agenda-competition.copa_do_brasil { color:#ffe69a; background:rgba(251,191,36,.10); border-color:rgba(251,191,36,.25); }
+.agenda-competition.libertadores { color:#dbeafe; background:rgba(96,165,250,.10); border-color:rgba(96,165,250,.25); }
+.agenda-competition.sul_americana { color:#f3e8ff; background:rgba(192,132,252,.10); border-color:rgba(192,132,252,.25); }
+.agenda-phase {
   overflow: hidden;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 800;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: var(--text);
+}
+.agenda-time {
+  flex: 0 0 auto;
+  padding: 5px 10px;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 999px;
+  background: linear-gradient(135deg,#d9ff76,#7de24e);
+  color: #06120d;
+  font-size: 13px;
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 8px 20px rgba(163,230,53,.12);
+}
+.agenda-time small { display: none; }
+
+.agenda-fixture {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: column;
+  padding: 16px 14px 12px;
+}
+.agenda-teams {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(44px,auto) minmax(0,1fr);
+  align-items: center;
+  gap: 12px;
+  min-height: 112px;
+}
+.agenda-team {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+.agenda-team.home,
+.agenda-team.away { justify-content: center; text-align: center; }
+.agenda-team img {
+  width: 58px;
+  height: 58px;
+  padding: 6px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  border: 1px solid rgba(148,163,184,.15);
+  border-radius: 18px;
+  background: radial-gradient(circle at 50% 35%,rgba(255,255,255,.10),rgba(255,255,255,.02));
+  filter: drop-shadow(0 5px 8px rgba(0,0,0,.30));
+}
+.agenda-team.home img { order: 0; }
+.agenda-team-name {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  color: #f7fbff;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agenda-versus {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  justify-self: center;
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 50%;
+  background: rgba(255,255,255,.03);
+  color: var(--muted);
   font-size: 14px;
   font-weight: 900;
 }
-.agenda-versus { color: var(--muted-2); font-size: 12px; font-weight: 900; text-align: center; }
-.agenda-extra { min-width: 0; display: grid; gap: 6px; justify-items: end; }
-.agenda-meta { color: var(--muted); font-size: 10px; text-align: right; line-height: 1.35; }
+
+.agenda-extra {
+  display: block;
+  min-width: 0;
+  margin-top: 12px;
+}
+.agenda-meta {
+  display: grid;
+  gap: 4px;
+  min-height: 78px;
+  padding: 10px 12px;
+  border: 1px solid rgba(148,163,184,.12);
+  border-radius: 14px;
+  background: rgba(2,6,12,.25);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: left;
+}
+.agenda-state-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-bottom: 2px;
+  padding: 3px 8px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.035);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+}
+.agenda-state-pill.live {
+  border-color: rgba(251,113,133,.28);
+  background: rgba(251,113,133,.08);
+  color: #fecaca;
+}
 .agenda-watch { color: #d9ff76; font-weight: 900; }
-.agenda-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+
+.agenda-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px 12px;
+}
+.agenda-source-pill,
 .agenda-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 29px;
-  border: 1px solid rgba(148,163,184,.20);
-  border-radius: 9px;
-  background: rgba(255,255,255,.04);
-  color: #dce9f5;
-  padding: 6px 8px;
+  min-height: 30px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.035);
+  color: var(--muted);
+  padding: 5px 10px;
+  font-size: 10px;
+  font-weight: 850;
   text-decoration: none;
-  font-size: 9px;
-  font-weight: 900;
+  white-space: nowrap;
 }
-.agenda-action:hover { border-color: rgba(163,230,53,.35); background: rgba(163,230,53,.08); }
-.agenda-action.live { color: #fecaca; border-color: rgba(248,113,113,.30); background: rgba(248,113,113,.08); }
-.agenda-action.probability { color: #eaffb2; border-color: rgba(163,230,53,.28); }
+.agenda-action { border-radius: 10px; color: #dce9f5; }
+.agenda-action:hover { border-color:rgba(163,230,53,.35); background:rgba(163,230,53,.08); }
+.agenda-action.live { color:#fecaca; border-color:rgba(248,113,113,.30); background:rgba(248,113,113,.08); }
+.agenda-action.probability { color:#eaffb2; border-color:rgba(163,230,53,.28); }
+.agenda-actions-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
 .agenda-empty {
   border: 1px dashed rgba(148,163,184,.22);
   border-radius: 18px;
@@ -188,21 +354,49 @@
 
 @media (max-width: 820px) {
   .agenda-controls .panel-inner { grid-template-columns: 1fr; gap: 13px; }
-  .agenda-game { grid-template-columns: 58px minmax(0,1fr); gap: 10px; }
-  .agenda-extra { grid-column: 1 / -1; grid-template-columns: minmax(0,1fr) auto; align-items: center; justify-items: stretch; padding-left: 68px; }
-  .agenda-meta { text-align: left; }
+  .agenda-game-list { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 560px) {
-  .agenda-game { grid-template-columns: 48px minmax(0,1fr); padding: 12px 10px; gap: 7px; }
-  .agenda-time { font-size: 15px; }
-  .agenda-teams { grid-template-columns: minmax(0,1fr) 16px minmax(0,1fr); gap: 4px; }
-  .agenda-team { gap: 5px; }
-  .agenda-team img { width: 30px; height: 30px; }
-  .agenda-team-name { font-size: 12px; }
-  .agenda-extra { display: block; padding-left: 55px; }
-  .agenda-meta { margin-bottom: 7px; }
-  .agenda-actions { justify-content: flex-start; }
-  .agenda-day-head { padding: 10px; }
-  .agenda-day-title { display: grid; gap: 1px; }
+  .agenda-controls { border-radius: 16px; }
+  .agenda-controls .panel-inner { padding: 12px; }
+  .agenda-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 3px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .agenda-chip { flex: 0 0 auto; min-height: 32px; padding: 6px 10px; font-size: 10px; }
+  .agenda-status { margin-top: 2px; font-size: 11px; }
+  .agenda-days { gap: 20px; }
+  .agenda-day-head { gap: 6px; }
+  .agenda-day-title { min-width: 0; padding: 8px 11px; }
+  .agenda-day-title strong { font-size: 10px; letter-spacing: .08em; }
+  .agenda-day-title span { display: none; }
+  .agenda-today-badge { padding: 4px 7px; font-size: 8px; }
+  .agenda-game { border-radius: 16px; }
+  .agenda-card-top { min-height: 50px; padding: 9px 10px; }
+  .agenda-competition { max-width: 190px; font-size: 8px; }
+  .agenda-phase { max-width: 205px; font-size: 8px; }
+  .agenda-time { padding: 5px 9px; font-size: 12px; }
+  .agenda-fixture { padding: 14px 10px 10px; }
+  .agenda-teams { grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); gap:8px; min-height:102px; }
+  .agenda-team img { width:48px; height:48px; border-radius:15px; }
+  .agenda-team-name { font-size:12px; }
+  .agenda-versus { width:38px; height:38px; font-size:13px; }
+  .agenda-extra { margin-top:10px; }
+  .agenda-meta { min-height:72px; padding:10px 11px; font-size:12px; }
+  .agenda-actions { flex-direction:column; align-items:stretch; padding:10px; }
+  .agenda-source-pill { justify-content:center; }
+  .agenda-actions-links { width:100%; justify-content:stretch; }
+  .agenda-action { flex:1 1 auto; min-width:0; padding:6px 8px; font-size:9px; }
+}
+
+@media (max-width: 390px) {
+  .agenda-competition { max-width: 150px; }
+  .agenda-phase { max-width: 165px; }
+  .agenda-team-name { font-size: 11px; }
+  .agenda-team img { width: 44px; height: 44px; }
+  .agenda-versus { width: 34px; height: 34px; }
 }
