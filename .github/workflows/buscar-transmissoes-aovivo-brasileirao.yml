@@ -1,4 +1,4 @@
-name: Buscar transmissões ao vivo do Brasileirão
+name: Buscar transmissões dos clubes do Brasileirão
 
 on:
   # Busca ativa a cada 15 minutos entre 06:07 e 23:52 BRT.
@@ -23,11 +23,17 @@ on:
   push:
     paths:
       - 'scripts/buscar_transmissoes_aovivo_brasileirao.py'
+      - 'scripts/gerar_agenda_clubes_brasileirao.py'
+      - 'jogos.json'
+      - 'dados-br/competicoes-af-previsao/copa-do-brasil.json'
+      - 'dados-br/competicoes-af-previsao/libertadores.json'
+      - 'dados-br/competicoes-af-previsao/sul-americana.json'
       - 'dados-br/config-transmissoes-aovivo.json'
       - 'dados-br/transmissoes-aovivo-manual.json'
       - 'dados-br/config-transmissoes-tv.json'
       - 'transmissoes.json'
       - 'scripts/atualizar_transmissoes_tv_brasileirao.py'
+      - 'fontes_brasileirao.py'
       - '.github/workflows/buscar-transmissoes-aovivo-brasileirao.yml'
 
 permissions:
@@ -61,10 +67,14 @@ jobs:
       - name: Validar script e configuração
         run: |
           set -euo pipefail
+          python -m py_compile scripts/gerar_agenda_clubes_brasileirao.py
+          python scripts/gerar_agenda_clubes_brasileirao.py --self-test
+          python scripts/gerar_agenda_clubes_brasileirao.py
           python -m py_compile scripts/buscar_transmissoes_aovivo_brasileirao.py
           python scripts/buscar_transmissoes_aovivo_brasileirao.py --selftest
           python -m py_compile scripts/atualizar_transmissoes_tv_brasileirao.py
           python scripts/atualizar_transmissoes_tv_brasileirao.py --selftest
+          python -m json.tool dados-br/agenda-clubes-br.json > /dev/null
           python -m json.tool dados-br/config-transmissoes-aovivo.json > /dev/null
           python -m json.tool dados-br/config-transmissoes-tv.json > /dev/null
           python -m json.tool dados-br/transmissoes-aovivo.json > /dev/null
@@ -165,6 +175,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           FILES=(
+            "dados-br/agenda-clubes-br.json"
             "dados-br/transmissoes-aovivo.json"
             "dados-br/auditoria-transmissoes-aovivo.json"
             "dados-br/transmissoes-tv.json"
@@ -199,7 +210,7 @@ jobs:
             fi
 
             git add -- "${FILES[@]}"
-            git commit -m "Atualizar transmissões ao vivo Brasileirão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            git commit -m "Atualizar agenda e transmissões dos clubes do Brasileirão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
 
             if git push origin HEAD:main; then
               echo "Push concluído na tentativa $i."

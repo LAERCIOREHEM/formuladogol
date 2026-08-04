@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'scripts/atualizar_competicoes_af_previsao.py'
+      - 'scripts/gerar_agenda_clubes_brasileirao.py'
       - 'scripts/af_previsao_continental.py'
       - 'scripts/gerar_probabilidades_brasileirao.py'
       - 'scripts/avaliar_af_previsao.py'
@@ -54,10 +55,12 @@ jobs:
             atualizar_espn.py \
             scripts/af_previsao_backtest.py \
             scripts/atualizar_competicoes_af_previsao.py \
+            scripts/gerar_agenda_clubes_brasileirao.py \
             scripts/af_previsao_continental.py \
             scripts/gerar_probabilidades_brasileirao.py \
             scripts/avaliar_af_previsao.py
           python scripts/atualizar_competicoes_af_previsao.py --self-test
+          python scripts/gerar_agenda_clubes_brasileirao.py --self-test
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
           python scripts/avaliar_af_previsao.py --self-test
@@ -70,6 +73,9 @@ jobs:
 
       - name: Buscar ao vivo as três competições relacionadas às vagas
         run: python scripts/atualizar_competicoes_af_previsao.py --strict --force --max-age-minutes 0
+
+      - name: Gerar agenda consolidada para auditoria
+        run: python scripts/gerar_agenda_clubes_brasileirao.py
 
       - name: Executar integração continental de auditoria
         run: python scripts/gerar_probabilidades_brasileirao.py --simulacoes 2000000 --semente 20260718
@@ -88,6 +94,7 @@ jobs:
             dados-br/competicoes-af-previsao/libertadores.json \
             dados-br/competicoes-af-previsao/sul-americana.json \
             dados-br/auditoria-competicoes-af-previsao.json \
+            dados-br/agenda-clubes-br.json \
             dados-br/probabilidades-brasileirao.json \
             dados-br/auditoria-probabilidades.json \
             dados-br/historico-probabilidades.json \
