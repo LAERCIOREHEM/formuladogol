@@ -2,98 +2,51 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 71,
-    "jogos_com_transmissao": 42,
-    "jogos_sem_transmissao_14d": 16,
-    "jogos_criticos_sem_transmissao_72h": 6,
-    "registros_preservados": 40,
-    "fontes_com_falha": 0
+    "jogos_com_transmissao": 52,
+    "jogos_sem_transmissao_14d": 8,
+    "jogos_criticos_sem_transmissao_72h": 0,
+    "registros_preservados": 3,
+    "fontes_com_falha": 1
   },
   "fontes": {
     "cbf": {
-      "ok": true,
-      "competicoes_ok": [
-        "brasileirao",
-        "copa_do_brasil"
-      ],
+      "ok": false,
+      "competicoes_ok": [],
       "registros": 0,
-      "erros": [],
-      "duracao_ms": 9
+      "erros": [
+        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)> | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+        "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+        "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
+      ],
+      "duracao_ms": 14492
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 0,
-      "duracao_ms": 1
+      "jogos_com_canal": 49,
+      "duracao_ms": 22682
     },
     "ge_artigos": {
       "ok": true,
-      "artigos_consultados": 0,
-      "jogos_com_canal": 0,
-      "duracao_ms": 0
+      "artigos_consultados": 3,
+      "jogos_com_canal": 18,
+      "duracao_ms": 102008
     },
     "espn": {
       "ok": true,
       "competicoes_consultadas": 4,
-      "eventos_na_janela": 0,
+      "eventos_na_janela": 71,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 0
+      "duracao_ms": 4386
     }
   },
   "sem_transmissao": [
-    {
-      "event_id": "401874039",
-      "rodada": 0,
-      "jogo": "Cruzeiro x Chapecoense",
-      "data_iso": "2026-08-05T19:00:00-03:00",
-      "faltam_horas": 25.3,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "401874038",
-      "rodada": 0,
-      "jogo": "Grêmio x Mirassol",
-      "data_iso": "2026-08-05T19:30:00-03:00",
-      "faltam_horas": 25.8,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "401874095",
-      "rodada": 0,
-      "jogo": "Fluminense x Vasco da Gama",
-      "data_iso": "2026-08-05T21:30:00-03:00",
-      "faltam_horas": 27.8,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "401874099",
-      "rodada": 0,
-      "jogo": "Fortaleza x Palmeiras",
-      "data_iso": "2026-08-05T21:30:00-03:00",
-      "faltam_horas": 27.8,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "401874094",
-      "rodada": 0,
-      "jogo": "Corinthians x Internacional",
-      "data_iso": "2026-08-06T20:00:00-03:00",
-      "faltam_horas": 50.3,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "401874096",
-      "rodada": 0,
-      "jogo": "Vitória x Athletico-PR",
-      "data_iso": "2026-08-06T20:00:00-03:00",
-      "faltam_horas": 50.3,
-      "nivel": "critico"
-    },
     {
       "event_id": "401874070",
       "rodada": 0,
       "jogo": "Fluminense x Independiente Rivadavia",
       "data_iso": "2026-08-11T19:00:00-03:00",
-      "faltam_horas": 169.3,
+      "faltam_horas": 168.7,
       "nivel": "aviso"
     },
     {
@@ -101,7 +54,7 @@
       "rodada": 0,
       "jogo": "Bolívar x São Paulo",
       "data_iso": "2026-08-11T21:30:00-03:00",
-      "faltam_horas": 171.8,
+      "faltam_horas": 171.2,
       "nivel": "aviso"
     },
     {
@@ -109,23 +62,7 @@
       "rodada": 0,
       "jogo": "Palmeiras x Cerro Porteño",
       "data_iso": "2026-08-12T19:00:00-03:00",
-      "faltam_horas": 193.3,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401902743",
-      "rodada": 0,
-      "jogo": "Bragantino x Atlético-MG",
-      "data_iso": "2026-08-12T19:00:00-03:00",
-      "faltam_horas": 193.3,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401874153",
-      "rodada": 0,
-      "jogo": "Cruzeiro x Flamengo",
-      "data_iso": "2026-08-12T21:30:00-03:00",
-      "faltam_horas": 195.8,
+      "faltam_horas": 192.7,
       "nivel": "aviso"
     },
     {
@@ -133,7 +70,7 @@
       "rodada": 0,
       "jogo": "Mirassol x Liga de Quito",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 217.3,
+      "faltam_horas": 216.7,
       "nivel": "aviso"
     },
     {
@@ -141,7 +78,7 @@
       "rodada": 0,
       "jogo": "Santos x Macará",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 217.3,
+      "faltam_horas": 216.7,
       "nivel": "aviso"
     },
     {
@@ -149,7 +86,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Club Olimpia",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 217.3,
+      "faltam_horas": 216.7,
       "nivel": "aviso"
     },
     {
@@ -157,7 +94,7 @@
       "rodada": 0,
       "jogo": "Rosário Central x Corinthians",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "faltam_horas": 219.8,
+      "faltam_horas": 219.2,
       "nivel": "aviso"
     },
     {
@@ -165,34 +102,11 @@
       "rodada": 0,
       "jogo": "Cienciano del Cusco x Botafogo",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "faltam_horas": 219.8,
+      "faltam_horas": 219.2,
       "nivel": "aviso"
     }
   ],
   "preservados": [
-    {
-      "event_id": "401841181",
-      "jogo": "Grêmio x São Paulo",
-      "canais": [
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841178",
-      "jogo": "Remo x Atlético-MG",
-      "canais": [
-        "Prime Video",
-        "SporTV",
-        "Premiere"
-      ]
-    },
-    {
-      "event_id": "401841184",
-      "jogo": "Coritiba x Chapecoense",
-      "canais": [
-        "Globo"
-      ]
-    },
     {
       "event_id": "401841185",
       "jogo": "Botafogo x Fluminense",
@@ -205,192 +119,10 @@
       ]
     },
     {
-      "event_id": "401841183",
-      "jogo": "Cruzeiro x Mirassol",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Globo",
-        "Prime Video"
-      ]
-    },
-    {
-      "event_id": "401841186",
-      "jogo": "Bahia x Vasco da Gama",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Prime Video",
-        "Globo",
-        "GE TV"
-      ]
-    },
-    {
-      "event_id": "401841180",
-      "jogo": "Palmeiras x Internacional",
-      "canais": [
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841179",
-      "jogo": "Bragantino x Corinthians",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841182",
-      "jogo": "Santos x Athletico-PR",
-      "canais": [
-        "Globo",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841187",
-      "jogo": "Flamengo x Vitória",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "GE TV"
-      ]
-    },
-    {
-      "event_id": "401841195",
-      "jogo": "Atlético-MG x Grêmio",
-      "canais": [
-        "Prime Video",
-        "SporTV",
-        "Premiere"
-      ]
-    },
-    {
-      "event_id": "401841192",
-      "jogo": "Fluminense x Palmeiras",
-      "canais": [
-        "Globo",
-        "SporTV",
-        "Premiere",
-        "Prime Video",
-        "GE TV"
-      ]
-    },
-    {
-      "event_id": "401841196",
-      "jogo": "Athletico-PR x Bragantino",
-      "canais": [
-        "Globo",
-        "SporTV"
-      ]
-    },
-    {
       "event_id": "401841189",
       "jogo": "São Paulo x Coritiba",
       "canais": [
         "Globo"
-      ]
-    },
-    {
-      "event_id": "401841194",
-      "jogo": "Chapecoense x Bahia",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Prime Video",
-        "Globo",
-        "GE TV"
-      ]
-    },
-    {
-      "event_id": "401841188",
-      "jogo": "Vasco da Gama x Santos",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841190",
-      "jogo": "Mirassol x Flamengo",
-      "canais": [
-        "Globo",
-        "SporTV",
-        "Premiere",
-        "Prime Video",
-        "GE TV"
-      ]
-    },
-    {
-      "event_id": "401841197",
-      "jogo": "Vitória x Botafogo",
-      "canais": [
-        "Globo",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841193",
-      "jogo": "Corinthians x Cruzeiro",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Globo",
-        "Prime Video"
-      ]
-    },
-    {
-      "event_id": "401841191",
-      "jogo": "Internacional x Remo",
-      "canais": [
-        "Prime Video",
-        "SporTV",
-        "Premiere"
-      ]
-    },
-    {
-      "event_id": "401841205",
-      "jogo": "Fluminense x Remo",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841204",
-      "jogo": "Internacional x Atlético-MG",
-      "canais": [
-        "Globo",
-        "Prime Video",
-        "SporTV",
-        "Premiere"
-      ]
-    },
-    {
-      "event_id": "401841206",
-      "jogo": "Cruzeiro x Flamengo",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Prime Video",
-        "Globo",
-        "GE TV"
-      ]
-    },
-    {
-      "event_id": "401841202",
-      "jogo": "Bragantino x Grêmio",
-      "canais": [
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841203",
-      "jogo": "Palmeiras x Vasco da Gama",
-      "canais": [
-        "Globo",
-        "SporTV",
-        "Premiere",
-        "Prime Video",
-        "GE TV"
       ]
     },
     {
@@ -399,131 +131,17 @@
       "canais": [
         "Globo"
       ]
-    },
-    {
-      "event_id": "401841201",
-      "jogo": "Santos x Mirassol",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Globo",
-        "Prime Video",
-        "GE TV"
-      ]
-    },
-    {
-      "event_id": "401841207",
-      "jogo": "Coritiba x Corinthians",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841198",
-      "jogo": "Botafogo x Athletico-PR",
-      "canais": [
-        "Globo",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841216",
-      "jogo": "Atlético-MG x Vitória",
-      "canais": [
-        "Prime Video",
-        "SporTV",
-        "Premiere"
-      ]
-    },
-    {
-      "event_id": "401841215",
-      "jogo": "Bahia x Internacional",
-      "canais": [
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841217",
-      "jogo": "Grêmio x Chapecoense",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Globo",
-        "Prime Video"
-      ]
-    },
-    {
-      "event_id": "401841211",
-      "jogo": "Mirassol x Palmeiras",
-      "canais": [
-        "Globo",
-        "SporTV",
-        "Premiere",
-        "Prime Video"
-      ]
-    },
-    {
-      "event_id": "401841209",
-      "jogo": "São Paulo x Bragantino",
-      "canais": [
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841212",
-      "jogo": "Vasco da Gama x Cruzeiro",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Prime Video",
-        "Globo",
-        "GE TV"
-      ]
-    },
-    {
-      "event_id": "401841221",
-      "jogo": "Botafogo x Palmeiras",
-      "canais": [
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841220",
-      "jogo": "Corinthians x Chapecoense",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "Globo",
-        "Prime Video"
-      ]
-    },
-    {
-      "event_id": "401841223",
-      "jogo": "Internacional x Santos",
-      "canais": [
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841226",
-      "jogo": "São Paulo x Atlético-MG",
-      "canais": [
-        "Prime Video",
-        "SporTV",
-        "Premiere"
-      ]
-    },
-    {
-      "event_id": "401841222",
-      "jogo": "Vitória x Grêmio",
-      "canais": [
-        "SporTV",
-        "Premiere",
-        "GE TV"
-      ]
     }
   ],
-  "erros": [],
-  "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-08-04T17:43:00-03:00"
+  "erros": [
+    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)> | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+    "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
+  ],
+  "artigos_ge_descobertos": [
+    "https://ge.globo.com/sp/futebol/copa-do-brasil/noticia/2026/08/02/palmeiras-x-fortaleza-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/gato-mestre/noticia/2026/08/01/palpite-ge-2026-empate-do-flamengo-derruba-bancada-veja-erros-e-acertos-da-21a-rodada-do-brasileiro.ghtml",
+    "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/08/01/atletico-mg-x-juventude-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+  ],
+  "atualizado_em": "2026-08-04T18:20:43-03:00"
 }
