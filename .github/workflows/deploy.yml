@@ -8,6 +8,7 @@ on:
     paths:
       - 'index.html'
       - 'aovivo.html'
+      - 'agenda.html'
       - 'estatisticas.html'
       - 'clubes.html'
       - 'museu.html'
@@ -28,11 +29,13 @@ on:
       - 'img/**'
       - 'css/br-global.css'
       - 'css/br-aovivo.css'
+      - 'css/br-agenda.css'
       - 'css/br-estatisticas.css'
       - 'css/br-institucional.css'
       - 'css/br-sobre.css'
       - 'css/br-analises.css'
       - 'js/br-aovivo.js'
+      - 'js/br-agenda.js'
       - 'js/br-analises.js'
       - 'js/br-clube-retorno.js'
       - 'js/br-clubes.js'
@@ -108,6 +111,7 @@ jobs:
           PUBLIC_ROOT=(
             index.html
             aovivo.html
+            agenda.html
             estatisticas.html
             clubes.html
             museu.html
@@ -136,6 +140,7 @@ jobs:
           PUBLIC_CSS=(
             css/br-global.css
             css/br-aovivo.css
+            css/br-agenda.css
             css/br-estatisticas.css
             css/br-institucional.css
             css/br-sobre.css
@@ -144,6 +149,7 @@ jobs:
 
           PUBLIC_JS=(
             js/br-aovivo.js
+            js/br-agenda.js
             js/br-analises.js
             js/br-clube-retorno.js
             js/br-clubes.js
@@ -155,6 +161,7 @@ jobs:
           )
 
           PUBLIC_DATA=(
+            dados-br/agenda-clubes-br.json
             dados-br/auditoria-estatisticas.json
             dados-br/auditoria-modelos-af-previsao.json
             dados-br/auditoria-probabilidades.json
@@ -353,8 +360,12 @@ jobs:
                   "tabela.json", "jogos.json", "resultados.json", "espn_eventos.json",
                   "dados-br/probabilidades-jogos.json", "dados-br/ranking-desempenho.json",
               ],
+              "https://formuladogol.com.br/agenda.html": [
+                  "dados-br/agenda-clubes-br.json", "dados-br/transmissoes-tv.json",
+                  "dados-br/transmissoes-aovivo.json",
+              ],
               "https://formuladogol.com.br/aovivo.html": [
-                  "jogos.json", "espn_eventos.json",
+                  "jogos.json", "espn_eventos.json", "dados-br/agenda-clubes-br.json",
                   "dados-br/probabilidades-jogos.json", "dados-br/probabilidades-brasileirao.json",
                   "dados-br/transmissoes-aovivo.json", "dados-br/transmissoes-tv.json",
               ],
@@ -589,17 +600,19 @@ jobs:
           root_pages = [
               "index.html",
               "aovivo.html",
+              "agenda.html",
               "estatisticas.html",
               "clubes.html",
               "museu.html",
           ]
           root_expected_menu = [
+              "Estatísticas",
               "Jogos",
+              "Agenda",
               "Ao vivo",
               "Tabela",
               "Resultados",
               "Análises",
-              "Estatísticas",
               "Clubes",
               "Museu",
               "Copa 2026",
@@ -835,6 +848,7 @@ jobs:
           urls = [node.text for node in root.findall("sm:url/sm:loc", ns)]
           expected_urls = {
               "https://formuladogol.com.br/",
+              "https://formuladogol.com.br/agenda.html",
               "https://formuladogol.com.br/aovivo.html",
               "https://formuladogol.com.br/estatisticas.html",
               "https://formuladogol.com.br/clubes.html",
