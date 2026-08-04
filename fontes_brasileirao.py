@@ -278,10 +278,13 @@ def parse_cbf_tabela_detalhada(
         if "rodada" not in normalizar_texto(row_text) or "ref" not in normalizar_texto(row_text):
             continue
         round_match = re.search(r"Rodada\s*:\s*(\d+)", row_text, flags=re.IGNORECASE)
+        round_label_match = re.search(r"Rodada\s*:\s*([^|]+)", row_text, flags=re.IGNORECASE)
+        round_label = normalizar_texto(round_label_match.group(1) if round_label_match else "")
+        round_number = int(round_match.group(1)) if round_match else (1 if "ida" in round_label else (2 if "volta" in round_label else 0))
         ref_match = re.search(r"Ref\s*:\s*(\d+)", row_text, flags=re.IGNORECASE)
         kickoff = _parse_datetime_brt(row_text)
         teams = _find_teams(row_text, resolver)
-        if not round_match or not kickoff or len(teams) < 2:
+        if not kickoff or len(teams) < 2:
             continue
         # Escolhe os dois primeiros clubes distintos. Títulos/cabeçalhos não têm
         # data e rodada juntos, então não entram aqui.
@@ -291,7 +294,7 @@ def parse_cbf_tabela_detalhada(
         home_score, away_score = _parse_score(row_text)
         item = CBFPartida(
             referencia=ref_match.group(1) if ref_match else "",
-            rodada=int(round_match.group(1)),
+            rodada=round_number,
             mandante=home,
             visitante=away,
             data_iso=kickoff.strftime("%Y-%m-%dT%H:%M"),
@@ -479,6 +482,17 @@ def _selftest() -> None:
     )
     assert second and second.transmissao == "Premiere, Record, YouTube / Cazé TV"
     assert second.placar_mandante is None and second.placar_visitante is None
+
+    copa_sample = """
+    <div>Ref: 139 Rodada: Volta | Juventude Atlético Mineiro |
+      Data: 04/08/2026 - terça-feira às 19h30 |
+      Transmissão: Amazon Prime
+    </div>
+    """
+    aliases.update({"juventude": "Juventude", "atletico mineiro": "Atlético-MG"})
+    copa_rows = parse_cbf_tabela_detalhada(copa_sample, resolver=resolver, origem="teste-copa")
+    assert len(copa_rows) == 1, copa_rows
+    assert copa_rows[0].rodada == 2 and copa_rows[0].transmissao == "Amazon Prime"
     print("Selftest fontes complementares do Brasileirão OK")
 
 

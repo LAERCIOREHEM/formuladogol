@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Consolida transmissões oficiais do Brasileirão Série A.
+"""Consolida transmissões oficiais dos clubes do Brasileirão.
 
 Fontes automáticas, independentes e auditáveis:
 1. CBF — tabela detalhada oficial (autoridade para grade de transmissão);
@@ -44,14 +44,23 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from atualizar_espn import para_canonico  # noqa: E402
-from fontes_brasileirao import CBFPartida, buscar_tabela_detalhada_cbf, localizar_partida_cbf  # noqa: E402
+from fontes_brasileirao import (  # noqa: E402
+    CBFPartida,
+    buscar_tabela_detalhada_cbf,
+    localizar_partida_cbf,
+)
 
-ESPN_SCOREBOARD = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard"
-ESPN_SUMMARY = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary"
+ESPN_API_ROOT = "https://site.api.espn.com/apis/site/v2/sports/soccer"
+ESPN_SCOREBOARD = ESPN_API_ROOT + "/bra.1/scoreboard"
+ESPN_SUMMARY = ESPN_API_ROOT + "/bra.1/summary"
 GE_AGENDA = "https://ge.globo.com/agenda/"
 GE_BRASILEIRAO = "https://ge.globo.com/futebol/brasileirao-serie-a/"
+CBF_COPA_DO_BRASIL_URLS = (
+    "https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada",
+    "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada",
+)
 
-AGENDA = ROOT / "jogos.json"
+AGENDA = ROOT / "dados-br" / "agenda-clubes-br.json"
 OUTPUT = ROOT / "dados-br" / "transmissoes-tv.json"
 AUDIT_OUTPUT = ROOT / "dados-br" / "auditoria-transmissoes-tv.json"
 CONFIG_PATH = ROOT / "dados-br" / "config-transmissoes-tv.json"
@@ -75,6 +84,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "janela_critica_horas": 72,
     "janela_aviso_dias": 14,
     "preservar_apos_jogo_horas": 6,
+    "cbf_copa_do_brasil_urls": list(CBF_COPA_DO_BRASIL_URLS),
     "ge_agenda_url": GE_AGENDA,
     "ge_brasileirao_url": GE_BRASILEIRAO,
     "ge_max_artigos": 12,
@@ -228,6 +238,14 @@ def game_team_name(game: Mapping[str, Any], side: str) -> str:
     if isinstance(value, Mapping):
         return str(value.get("nome") or value.get("displayName") or value.get("name") or "")
     return str(value or "")
+
+
+def game_competition_key(game: Mapping[str, Any]) -> str:
+    return str(game.get("competicao_chave") or "brasileirao")
+
+
+def game_league(game: Mapping[str, Any]) -> str:
+    return str(game.get("espn_league") or "bra.1")
 
 
 def agenda_games(agenda: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -664,6 +682,7 @@ def espn_scoreboard_entries(
     scoreboard: Mapping[str, Any],
     games: Sequence[Mapping[str, Any]],
     captured_at: str,
+    reference: str = ESPN_SCOREBOARD,
 ) -> tuple[dict[str, list[Evidence]], set[str]]:
     out: dict[str, list[Evidence]] = {}
     present: set[str] = set()
@@ -672,18 +691,18 @@ def espn_scoreboard_entries(
         game = match_game(games, event_id=event_id)
         if not game:
             continue
-        present.add(str(game.get("event_id") or game.get("id") or event_id))
+        canonical_id = str(game.get("event_id") or game.get("id") or event_id)
+        present.add(canonical_id)
         channels = espn_broadcasts(event)
         if channels:
-            out.setdefault(event_id, []).append(Evidence(
+            out.setdefault(canonical_id, []).append(Evidence(
                 source="ESPN scoreboard",
                 channels=channels,
-                reference=ESPN_SCOREBOARD,
+                reference=reference,
                 captured_at=captured_at,
                 authority=50,
             ))
     return out, present
-
 
 def espn_summary_entries(
     games: Sequence[Mapping[str, Any]],
@@ -695,10 +714,13 @@ def espn_summary_entries(
     errors: list[str],
 ) -> dict[str, list[Evidence]]:
     out: dict[str, list[Evidence]] = {}
+    game_by_id = {str(game.get("event_id") or game.get("id") or ""): game for game in games}
     ids = sorted(set(str(x) for x in event_ids if x))
 
     def fetch_one(event_id: str) -> tuple[str, str, list[str], str]:
-        url = ESPN_SUMMARY + "?" + urllib.parse.urlencode({"event": event_id})
+        game = game_by_id.get(event_id) or {}
+        league = game_league(game)
+        url = ESPN_API_ROOT + "/" + league + "/summary?" + urllib.parse.urlencode({"event": event_id})
         try:
             summary = fetch_json(url, timeout=timeout, attempts=attempts)
             return event_id, url, extract_channels(summary), ""
@@ -719,6 +741,40 @@ def espn_summary_entries(
                 ))
     return out
 
+def agenda_team_resolver(games: Sequence[Mapping[str, Any]]):
+    """Resolve nomes da CBF usando os clubes presentes na agenda consolidada."""
+    aliases: dict[str, str] = {}
+    for game in games:
+        for side in ("mandante", "visitante"):
+            name = game_team_name(game, side)
+            if not name:
+                continue
+            aliases[norm(name)] = name
+            aliases[team_key(name)] = name
+
+    def resolve(value: Any) -> Optional[str]:
+        key = norm(value)
+        return aliases.get(key) or aliases.get(team_key(value)) or para_canonico(value)
+
+    return resolve
+
+
+def buscar_copa_do_brasil_cbf(
+    games: Sequence[Mapping[str, Any]], cfg: Mapping[str, Any]
+) -> tuple[list[CBFPartida], list[str]]:
+    resolver = agenda_team_resolver(games)
+    urls = cfg.get("cbf_copa_do_brasil_urls") or CBF_COPA_DO_BRASIL_URLS
+    errors: list[str] = []
+    for url in urls:
+        try:
+            rows = buscar_tabela_detalhada_cbf(resolver=resolver, url=str(url))
+            if rows:
+                return rows, errors
+            errors.append(f"{url}: tabela sem partidas reconhecíveis")
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{url}: {type(exc).__name__}: {exc}")
+    return [], errors
+
 
 def cbf_evidence(
     games: Sequence[Mapping[str, Any]], rows: Iterable[CBFPartida], captured_at: str
@@ -729,8 +785,10 @@ def cbf_evidence(
         event_id = str(game.get("event_id") or game.get("id") or "")
         if not event_id:
             continue
-        home = para_canonico(game_team_name(game, "mandante"))
-        away = para_canonico(game_team_name(game, "visitante"))
+        home_raw = game_team_name(game, "mandante")
+        away_raw = game_team_name(game, "visitante")
+        home = para_canonico(home_raw) or home_raw
+        away = para_canonico(away_raw) or away_raw
         if not home or not away:
             continue
         row = localizar_partida_cbf(
@@ -877,20 +935,45 @@ def collect(
     errors: list[str] = []
     payloads = dict(source_payloads or {})
 
-    # CBF
+    # CBF: Série A e Copa do Brasil são consultadas separadamente para que
+    # uma indisponibilidade não derrube a outra fonte oficial.
+    started = time.monotonic()
+    cbf_rows: list[CBFPartida] = []
+    cbf_errors: list[str] = []
+    cbf_ok: list[str] = []
+
     try:
-        started = time.monotonic()
-        rows = payloads.get("cbf_rows")
-        if rows is None:
-            rows = buscar_tabela_detalhada_cbf(resolver=para_canonico)
-        rows = list(rows)
-        merge_evidence(evidence_by_game, cbf_evidence(games, rows, captured_at))
-        source_status["cbf"] = {
-            "ok": True, "registros": len(rows), "duracao_ms": round((time.monotonic() - started) * 1000),
-        }
+        rows_series = payloads.get("cbf_rows")
+        if rows_series is None:
+            rows_series = buscar_tabela_detalhada_cbf(resolver=para_canonico)
+        rows_series = list(rows_series)
+        cbf_rows.extend(rows_series)
+        cbf_ok.append("brasileirao")
     except Exception as exc:  # noqa: BLE001
-        source_status["cbf"] = {"ok": False, "erro": f"{type(exc).__name__}: {exc}"}
-        errors.append("CBF: " + source_status["cbf"]["erro"])
+        cbf_errors.append("Brasileirão: " + f"{type(exc).__name__}: {exc}")
+
+    try:
+        if source_payloads is not None:
+            rows_copa = list(payloads.get("cbf_copa_rows") or [])
+            copa_errors: list[str] = []
+        else:
+            rows_copa, copa_errors = buscar_copa_do_brasil_cbf(games, cfg)
+        cbf_rows.extend(rows_copa)
+        cbf_errors.extend("Copa do Brasil: " + item for item in copa_errors)
+        if rows_copa or source_payloads is not None:
+            cbf_ok.append("copa_do_brasil")
+    except Exception as exc:  # noqa: BLE001
+        cbf_errors.append("Copa do Brasil: " + f"{type(exc).__name__}: {exc}")
+
+    merge_evidence(evidence_by_game, cbf_evidence(games, cbf_rows, captured_at))
+    source_status["cbf"] = {
+        "ok": bool(cbf_ok),
+        "competicoes_ok": cbf_ok,
+        "registros": len(cbf_rows),
+        "erros": cbf_errors,
+        "duracao_ms": round((time.monotonic() - started) * 1000),
+    }
+    errors.extend("CBF: " + item for item in cbf_errors)
 
     # GE Agenda
     if cfg.get("habilitar_ge_agenda", True):
@@ -963,18 +1046,33 @@ def collect(
             source_status["ge_artigos"] = {"ok": False, "erro": f"{type(exc).__name__}: {exc}"}
             errors.append("GE artigos: " + source_status["ge_artigos"]["erro"])
 
-    # ESPN scoreboard e summaries dos jogos ainda sem informação.
+    # ESPN scoreboard e summaries, consultados separadamente por competição.
     try:
         started = time.monotonic()
-        scoreboard = payloads.get("espn_scoreboard")
-        if scoreboard is None:
-            dates = f"{(now.date() - dt.timedelta(days=2)):%Y%m%d}-{(now.date() + dt.timedelta(days=int(cfg.get('janela_futuro_dias') or 35))):%Y%m%d}"
-            scoreboard = fetch_json(
-                ESPN_SCOREBOARD + "?" + urllib.parse.urlencode({"dates": dates, "limit": 300}),
-                timeout=timeout, attempts=attempts,
-            )
-        espn_found, present_ids = espn_scoreboard_entries(scoreboard, games, captured_at)
-        merge_evidence(evidence_by_game, espn_found)
+        start_date = now.date() - dt.timedelta(days=2)
+        end_date = now.date() + dt.timedelta(days=int(cfg.get("janela_futuro_dias") or 35))
+        dates = f"{start_date:%Y%m%d}-{end_date:%Y%m%d}"
+        leagues = sorted({game_league(game) for game in games})
+        espn_found_all: dict[str, list[Evidence]] = {}
+        present_ids: set[str] = set()
+        scoreboards_payload = payloads.get("espn_scoreboards") if isinstance(payloads.get("espn_scoreboards"), Mapping) else {}
+
+        for league in leagues:
+            league_games = [game for game in games if game_league(game) == league]
+            reference = ESPN_API_ROOT + "/" + league + "/scoreboard"
+            scoreboard = scoreboards_payload.get(league) if isinstance(scoreboards_payload, Mapping) else None
+            if scoreboard is None and league == "bra.1" and payloads.get("espn_scoreboard") is not None:
+                scoreboard = payloads.get("espn_scoreboard")
+            if scoreboard is None:
+                scoreboard = fetch_json(
+                    reference + "?" + urllib.parse.urlencode({"dates": dates, "limit": 300}),
+                    timeout=timeout, attempts=attempts,
+                )
+            found, present = espn_scoreboard_entries(scoreboard, league_games, captured_at, reference)
+            merge_evidence(espn_found_all, found)
+            present_ids.update(present)
+
+        merge_evidence(evidence_by_game, espn_found_all)
         missing_ids = [
             str(g.get("event_id") or g.get("id") or "") for g in games
             if str(g.get("event_id") or g.get("id") or "") and not evidence_by_game.get(str(g.get("event_id") or g.get("id") or ""))
@@ -982,12 +1080,15 @@ def collect(
         summary_found: dict[str, list[Evidence]] = {}
         if cfg.get("habilitar_espn_summary", True):
             if "espn_summaries" in payloads:
+                game_by_id = {str(g.get("event_id") or g.get("id") or ""): g for g in games}
                 for event_id, summary in (payloads.get("espn_summaries") or {}).items():
                     channels = extract_channels(summary)
                     if channels:
+                        game = game_by_id.get(str(event_id)) or {}
+                        url = ESPN_API_ROOT + "/" + game_league(game) + "/summary?event=" + str(event_id)
                         summary_found.setdefault(str(event_id), []).append(Evidence(
                             source="ESPN summary", channels=channels,
-                            reference=ESPN_SUMMARY + "?event=" + str(event_id), captured_at=captured_at, authority=55,
+                            reference=url, captured_at=captured_at, authority=55,
                         ))
             else:
                 summary_found = espn_summary_entries(
@@ -995,8 +1096,9 @@ def collect(
                 )
             merge_evidence(evidence_by_game, summary_found)
         source_status["espn"] = {
-            "ok": True, "eventos_na_janela": len(present_ids), "scoreboard_com_canal": len(espn_found),
-            "summary_com_canal": len(summary_found), "duracao_ms": round((time.monotonic() - started) * 1000),
+            "ok": True, "competicoes_consultadas": len(leagues), "eventos_na_janela": len(present_ids),
+            "scoreboard_com_canal": len(espn_found_all), "summary_com_canal": len(summary_found),
+            "duracao_ms": round((time.monotonic() - started) * 1000),
         }
     except Exception as exc:  # noqa: BLE001
         source_status["espn"] = {"ok": False, "erro": f"{type(exc).__name__}: {exc}"}
@@ -1016,7 +1118,7 @@ def collect(
 
     generated = dict(sorted(generated.items(), key=lambda kv: str(kv[1].get("data_iso") or "")))
     payload = {
-        "descricao": "Transmissões oficiais por TV ou streaming do Brasileirão Série A.",
+        "descricao": "Transmissões oficiais por TV ou streaming dos clubes do Brasileirão.",
         "politica": {
             "fontes": ["CBF oficial", "GE Agenda", "GE guias editoriais", "ESPN", "override manual"],
             "regra_preservacao": "resposta vazia ou falha de uma fonte nunca apaga transmissão válida já publicada",
@@ -1051,7 +1153,7 @@ def collect(
         for event_id, item in generated.items() if item.get("confianca") == "preservado"
     ]
     audit = {
-        "descricao": "Auditoria da consolidação de transmissões do Brasileirão.",
+        "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
         "resumo": {
             "jogos_na_janela": len(games),
             "jogos_com_transmissao": len(generated),

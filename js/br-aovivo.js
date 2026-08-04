@@ -1,8 +1,8 @@
 (function () {
   "use strict";
 
-  const SCOREBOARD_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard";
-  const SUMMARY_API = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary";
+  const ESPN_API_ROOT = "https://site.api.espn.com/apis/site/v2/sports/soccer";
+  const DEFAULT_LEAGUE = "bra.1";
   const REFRESH_MS = 30000;
   const TZ = "America/Sao_Paulo";
 
@@ -142,7 +142,7 @@
     diretos: [],
     transmissoes: {},
     transmissoesTv: {},
-    selecionado: "",
+    selecionado: new URLSearchParams(window.location.search || "").get("event") || "",
     resumoPorId: {},
     ultimaAtualizacao: null,
     ultimaFalha: "",
@@ -277,10 +277,12 @@
     const t = raw || {};
     const nome = canon(t.nome || t.displayName || t.name || t.shortDisplayName || t.abbreviation);
     return {
-      id: String(t.id || ""),
+      id: String(t.espn_id || t.id || ""),
       nome: nome || String(t.displayName || t.name || "Time"),
       sigla: t.sigla || t.abbreviation || SIGLAS[nome] || "",
-      escudo: t.escudo || (Array.isArray(t.logos) && t.logos[0] && t.logos[0].href) || t.logo || ""
+      escudo: t.escudo || (Array.isArray(t.logos) && t.logos[0] && t.logos[0].href) || t.logo || "",
+      serieA: t.serie_a_2026 === true || t.serieA === true,
+      pais: String(t.pais || t.countryCode || "")
     };
   }
 
@@ -291,7 +293,7 @@
       date: parseDate(j.data_iso),
       dataIso: j.data_iso || "",
       state: String(j.estado || "pre"),
-      completed: String(j.estado || "") === "post",
+      completed: j.concluido === true || String(j.estado || "") === "post",
       detail: j.status || "",
       clock: "",
       venue: j.estadio || "",
@@ -302,7 +304,14 @@
       home: { ...localTeam(j.mandante), score: j.placar_mandante },
       away: { ...localTeam(j.visitante), score: j.placar_visitante },
       raw: null,
-      source: "local"
+      source: "local",
+      competitionKey: String(j.competicao_chave || "brasileirao"),
+      competitionName: String(j.competicao_nome || "Campeonato Brasileiro Série A"),
+      competitionShort: String(j.competicao_nome_curto || "Brasileirão"),
+      espnLeague: String(j.espn_league || DEFAULT_LEAGUE),
+      fase: String(j.fase || ""),
+      perna: Number(j.perna || 0),
+      probabilitiesAvailable: j.probabilidades_disponiveis === true
     }));
   }
 
@@ -362,7 +371,7 @@
     return out;
   }
 
-  function normalizeEvent(ev) {
+  function normalizeEvent(ev, meta) {
     const comp = getCompetition(ev);
     const competitors = comp.competitors || [];
     const h = competitors.find((c) => c.homeAway === "home") || competitors[0];
@@ -389,6 +398,7 @@
     })) {
       safeState = "pre";
     }
+    const info = meta || {};
     return {
       id: String(ev.id || comp.id || ""),
       rodada: roundFromEvent(ev, comp),
@@ -408,7 +418,14 @@
       away,
       raw: ev,
       competition: comp,
-      source: "espn"
+      source: "espn",
+      competitionKey: String(info.competitionKey || "brasileirao"),
+      competitionName: String(info.competitionName || "Campeonato Brasileiro Série A"),
+      competitionShort: String(info.competitionShort || "Brasileirão"),
+      espnLeague: String(info.espnLeague || DEFAULT_LEAGUE),
+      fase: String(info.fase || ""),
+      perna: Number(info.perna || 0),
+      probabilitiesAvailable: info.probabilitiesAvailable === true
     };
   }
 
@@ -457,7 +474,14 @@
       adiado: loc.adiado || game.adiado,
       finalizadoEm: game.finalizadoEm || loc.finalizadoEm || null,
       home: { ...loc.home, ...game.home, nome: loc.home.nome || game.home.nome, escudo: loc.home.escudo || game.home.escudo },
-      away: { ...loc.away, ...game.away, nome: loc.away.nome || game.away.nome, escudo: loc.away.escudo || game.away.escudo }
+      away: { ...loc.away, ...game.away, nome: loc.away.nome || game.away.nome, escudo: loc.away.escudo || game.away.escudo },
+      competitionKey: loc.competitionKey || game.competitionKey || "brasileirao",
+      competitionName: loc.competitionName || game.competitionName || "Campeonato Brasileiro Série A",
+      competitionShort: loc.competitionShort || game.competitionShort || "Brasileirão",
+      espnLeague: loc.espnLeague || game.espnLeague || DEFAULT_LEAGUE,
+      fase: loc.fase || game.fase || "",
+      perna: loc.perna || game.perna || 0,
+      probabilitiesAvailable: loc.probabilitiesAvailable === true
     };
   }
 
@@ -673,12 +697,12 @@
   }
 
   async function loadLocal() {
-    const [jogos, eventos, probabilidades] = await Promise.all([
-      fetchJson("jogos.json?t=" + Date.now()),
+    const [agenda, eventos, probabilidades] = await Promise.all([
+      fetchJson("dados-br/agenda-clubes-br.json?t=" + Date.now()),
       fetchJson("espn_eventos.json?t=" + Date.now()).catch(() => ({ eventos: [] })),
       loadProbabilityDataset()
     ]);
-    state.agenda = localGamesFromJson(jogos).filter((g) => !g.dataDefinir && g.date);
+    state.agenda = localGamesFromJson(agenda).filter((g) => !g.dataDefinir && g.date);
     state.eventosLocais = (eventos.eventos || []).slice();
     state.probabilidadesJogos = probabilidades;
     for (const item of state.eventosLocais) {
@@ -717,18 +741,46 @@
     const now = new Date();
     const ini = compactDate(new Date(now.getTime() - 24 * 3600 * 1000));
     const fim = compactDate(new Date(now.getTime() + 2 * 24 * 3600 * 1000));
-    const url = SCOREBOARD_API + "?dates=" + ini + "-" + fim + "&limit=80&_=" + Date.now();
-    const data = await fetchJson(url);
-    const normalized = (data.events || [])
-      .map(normalizeEvent)
-      .filter(Boolean)
+    const leagues = new Map();
+    const windowStart = now.getTime() - 24 * 3600 * 1000;
+    const windowEnd = now.getTime() + 2 * 24 * 3600 * 1000;
+    state.agenda.forEach((game) => {
+      const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
+      const isRequested = Boolean(state.selecionado && String(game.id || "") === String(state.selecionado));
+      if (!isRequested && (!Number.isFinite(kickoff) || kickoff < windowStart || kickoff > windowEnd)) return;
+      const league = game.espnLeague || DEFAULT_LEAGUE;
+      if (!leagues.has(league)) leagues.set(league, []);
+      leagues.get(league).push(game);
+    });
+
+    const requests = Array.from(leagues.entries()).map(async ([league, localGames]) => {
+      const url = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/scoreboard?dates=" + ini + "-" + fim + "&limit=100&_=" + Date.now();
+      const data = await fetchJson(url);
+      return (data.events || []).map((event) => {
+        const eventId = String(event && event.id || "");
+        const local = localGames.find((game) => String(game.id || "") === eventId) || null;
+        const meta = local || {
+          espnLeague: league,
+          competitionKey: league === DEFAULT_LEAGUE ? "brasileirao" : "",
+          competitionName: league === DEFAULT_LEAGUE ? "Campeonato Brasileiro Série A" : "",
+          competitionShort: league === DEFAULT_LEAGUE ? "Brasileirão" : "",
+          probabilitiesAvailable: league === DEFAULT_LEAGUE
+        };
+        return normalizeEvent(event, meta);
+      }).filter(Boolean);
+    });
+
+    const settled = await Promise.allSettled(requests);
+    const normalized = settled.flatMap((result) => result.status === "fulfilled" ? result.value : [])
       .filter((game) => directGameIsEligible(game))
       .map(mergeLocal);
-    const seen = new Set();
+    if (!normalized.length && settled.some((result) => result.status === "rejected")) {
+      throw new Error("ESPN indisponível para as competições consultadas");
+    }
+
     for (const game of normalized) {
       const key = String(game.id || teamKey(game.home && game.home.nome, game.away && game.away.nome));
       if (!key) continue;
-      seen.add(key);
       if (isReliableFinalGame(game)) {
         const stable = finalizadoLocalParaJogo(game);
         if (stable > 0) state.finalizadosEm[key] = stable;
@@ -779,7 +831,14 @@
       transmissao: primary.transmissao || secondary.transmissao,
       finalizadoEm: primary.finalizadoEm || secondary.finalizadoEm || null,
       home: { ...secondary.home, ...primary.home, escudo: primary.home.escudo || secondary.home.escudo },
-      away: { ...secondary.away, ...primary.away, escudo: primary.away.escudo || secondary.away.escudo }
+      away: { ...secondary.away, ...primary.away, escudo: primary.away.escudo || secondary.away.escudo },
+      competitionKey: primary.competitionKey || secondary.competitionKey || "brasileirao",
+      competitionName: primary.competitionName || secondary.competitionName || "Campeonato Brasileiro Série A",
+      competitionShort: primary.competitionShort || secondary.competitionShort || "Brasileirão",
+      espnLeague: primary.espnLeague || secondary.espnLeague || DEFAULT_LEAGUE,
+      fase: primary.fase || secondary.fase || "",
+      perna: primary.perna || secondary.perna || 0,
+      probabilitiesAvailable: primary.probabilitiesAvailable === true || secondary.probabilitiesAvailable === true
     };
   }
 
@@ -837,14 +896,19 @@
   }
 
   function chooseGame(games) {
-    const priorities = priorityGames(games);
-    // A seleção principal deve vir SOMENTE dos jogos prioritários: ao vivo,
-    // encerrados há no máximo 15 minutos ou próximos jogos. O fallback antigo
-    // usava todos os jogos — inclusive encerrados — e fazia uma partida finalizada
-    // reaparecer indefinidamente depois que a janela pós-jogo expirava.
-    const eligible = priorities;
-    let selected = eligible.find((g) => g.id && g.id === state.selecionado);
-    if (!selected) selected = eligible[0] || null;
+    let priorities = priorityGames(games);
+    const requested = state.selecionado
+      ? games.find((g) => g.id && g.id === state.selecionado)
+      : null;
+    const requestedEligible = requested && !isPostponed(requested) && (
+      gameState(requested).key === "live" ||
+      gameState(requested).key === "pre" ||
+      (requested.date && requested.date.getTime() >= Date.now() - 6 * 3600000)
+    );
+    let selected = requestedEligible ? requested : priorities[0] || null;
+    if (selected && !priorities.some((g) => sameFixture(g, selected))) {
+      priorities = [selected].concat(priorities).slice(0, 8);
+    }
     if (selected && selected.id) state.selecionado = selected.id;
     else state.selecionado = null;
     return { selected, priorities };
@@ -857,6 +921,7 @@
   }
 
   function teamLink(team, inner) {
+    if (!team || team.serieA !== true) return '<div class="live-team-link is-static">' + inner + '</div>';
     return '<a class="live-team-link" href="' + esc(clubHref(team.nome)) + '" aria-label="Abrir página de ' + esc(team.nome) + '">' + inner + '</a>';
   }
 
@@ -942,6 +1007,7 @@
   }
 
   function probabilityRowForGame(game) {
+    if (!game || game.competitionKey !== "brasileirao" || game.probabilitiesAvailable !== true) return null;
     const data = state.probabilidadesJogos;
     const rows = data && Array.isArray(data.jogos) ? data.jogos : [];
     if (!game || !rows.length) return null;
@@ -1175,14 +1241,15 @@
 
   function simpleMessage(g) {
     const s = gameState(g);
-    if (s.key === "live") return "Bola rolando pelo Brasileirão!";
-    if (s.key === "post") return "Fim de jogo no Brasileirão.";
+    const competition = g.competitionShort || "competição";
+    if (s.key === "live") return "Bola rolando pela " + competition + "!";
+    if (s.key === "post") return "Fim de jogo pela " + competition + ".";
     if (s.key === "postponed") return "A partida aguarda nova definição oficial.";
     if (!g.date) return "Data e horário ainda serão confirmados.";
     const diff = g.date.getTime() - Date.now();
     if (diff <= 20 * 60000 && diff > 0) return "Tá quase na hora. Prepare a torcida!";
     const today = dateKey(g.date) === dateKey(new Date());
-    return today ? "Hoje tem Brasileirão!" : "Próximo compromisso do Brasileirão.";
+    return today ? "Hoje tem " + competition + "!" : "Próximo compromisso pela " + competition + ".";
   }
 
   function countdownText(g) {
@@ -1732,7 +1799,9 @@
   async function loadSummary(g) {
     if (!g || !g.id || g.source !== "espn") return null;
     try {
-      const data = await fetchJson(SUMMARY_API + "?event=" + encodeURIComponent(g.id) + "&_=" + Date.now());
+      const league = g.espnLeague || DEFAULT_LEAGUE;
+      const url = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(g.id) + "&_=" + Date.now();
+      const data = await fetchJson(url);
       state.resumoPorId[g.id] = data;
       return data;
     } catch (e) {
@@ -1787,8 +1856,18 @@
       '<div class="live-next-list">' + next.map((g) => {
         const canal = transmissionLabel(g);
         return '<div class="live-next-item"><div><div class="live-next-teams">' + esc(g.home.nome) + ' × ' + esc(g.away.nome) + '</div>' +
-          (canal ? '<span class="live-next-channel">📺 ' + esc(canal) + '</span>' : '') + '</div><div class="live-next-meta">Rodada ' + esc(g.rodada || "—") + '<br>' + esc(formatShort(g.date)) + '</div></div>';
+          (canal ? '<span class="live-next-channel">📺 ' + esc(canal) + '</span>' : '') + '</div><div class="live-next-meta">' + esc(competitionRoundText(g)) + '<br>' + esc(formatShort(g.date)) + '</div></div>';
       }).join("") + '</div></div></section>';
+  }
+
+  function competitionRoundText(g) {
+    if (!g) return "";
+    if (g.competitionKey === "brasileirao") return g.rodada ? "Rodada " + g.rodada : "Brasileirão";
+    const parts = [g.competitionShort || g.competitionName || "Competição"];
+    if (g.fase) parts.push(g.fase);
+    if (Number(g.perna) === 1) parts.push("Ida");
+    if (Number(g.perna) === 2) parts.push("Volta");
+    return parts.join(" · ");
   }
 
   function renderMain(g, summary, all) {
@@ -1801,7 +1880,7 @@
     const score = scoreVisible
       ? '<div class="live-score">' + esc(g.home.score == null ? 0 : g.home.score) + ' × ' + esc(g.away.score == null ? 0 : g.away.score) + '</div>'
       : '<div class="live-vs">×</div>';
-    const roundText = g.rodada ? "Rodada " + g.rodada : "Brasileirão";
+    const roundText = competitionRoundText(g);
     const delayed = g.adiado ? " · jogo adiado" : "";
     const countdown = countdownText(g);
     const venue = g.venue ? '<span>🏟️ <strong>' + esc(g.venue) + '</strong></span>' : "";
@@ -1809,8 +1888,9 @@
     const goalLines = renderGoalsUnderTeams(g, summary);
     // A previsão pré-jogo permanece visível até a bola rolar. Durante a partida,
     // o mesmo conjunto de taxas alimenta a atualização Poisson condicional.
-    const probabilityDesktop = s.key === "pre" ? renderPregameProbability(g, "desktop") : "";
-    const probabilityMobile = s.key === "pre" ? renderPregameProbability(g, "mobile") : "";
+    const hasProbabilities = g.competitionKey === "brasileirao" && g.probabilitiesAvailable === true;
+    const probabilityDesktop = s.key === "pre" && hasProbabilities ? renderPregameProbability(g, "desktop") : "";
+    const probabilityMobile = s.key === "pre" && hasProbabilities ? renderPregameProbability(g, "mobile") : "";
     const probabilityHome = probabilityDesktop && probabilityDesktop.home ? probabilityDesktop.home : "";
     const probabilityDraw = probabilityDesktop && probabilityDesktop.draw ? probabilityDesktop.draw : "";
     const probabilityAway = probabilityDesktop && probabilityDesktop.away ? probabilityDesktop.away : "";
@@ -1826,7 +1906,7 @@
       (countdown ? '<div class="live-countdown" data-countdown-game="' + esc(g.id) + '">' + esc(countdown) + '</div>' : "") + '</div>' +
       teamLink(g.away, '<div class="live-team">' + probabilityAway + teamLogo(g.away) + '<div class="live-team-name">' + esc(g.away.nome) + '</div>' + goalLines.away + '<div class="live-team-abbr">' + esc(g.away.sigla || SIGLAS[g.away.nome] || "") + '</div></div>') + '</div>' +
       probabilityMobile +
-      renderProbabilidadeDinamica(g) +
+      (hasProbabilities ? renderProbabilidadeDinamica(g) : "") +
       '<div class="live-meta">' + venue + transmission + '</div>' +
       renderTransmission(g) +
       '<div class="live-message">' + esc(simpleMessage(g)) + '</div></div></section>' +

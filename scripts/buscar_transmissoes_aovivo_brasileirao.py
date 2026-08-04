@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Localiza transmissões oficiais do Brasileirão nos canais GE TV e CazéTV.
+"""Localiza transmissões oficiais dos clubes do Brasileirão nos canais GE TV e CazéTV.
 
 Regras principais:
-- Escopo exclusivo do módulo Brasileirão.
+- Escopo: Brasileirão e jogos dos clubes da Série A na Copa do Brasil, Libertadores e Sul-Americana.
 - Só aceita vídeos pertencentes aos channelIds oficiais configurados.
 - Só considera transmissões `upcoming` ou `live`.
 - Faz varredura barata da playlist de uploads em toda execução útil.
@@ -162,6 +162,9 @@ class Game:
     visitante: str
     estado: str
     estadio: str = ""
+    competicao_chave: str = "brasileirao"
+    competicao_nome: str = "Brasileirão"
+    espn_league: str = "bra.1"
 
     @property
     def key(self) -> str:
@@ -259,6 +262,9 @@ def load_games(path: Path) -> List[Game]:
             visitante=away,
             estado=str(item.get("estado") or "pre").lower(),
             estadio=str(item.get("estadio") or ""),
+            competicao_chave=str(item.get("competicao_chave") or "brasileirao"),
+            competicao_nome=str(item.get("competicao_nome_curto") or item.get("competicao_nome") or "Brasileirão"),
+            espn_league=str(item.get("espn_league") or "bra.1"),
         ))
     return sorted(games, key=lambda g: (g.kickoff, g.rodada, g.mandante, g.visitante))
 
@@ -770,7 +776,7 @@ def build_outputs(
     aliases = getv_config.get("aliases_clubes") or {}
     existing = load_json(root / "dados-br/transmissoes-aovivo.json", {"jogos": {}})
     manual = load_json(root / "dados-br/transmissoes-aovivo-manual.json", {"jogos": {}})
-    games = load_games(root / "jogos.json")
+    games = load_games(root / "dados-br/agenda-clubes-br.json")
 
     before_minutes = int(config.get("janela_antes_horas", 24) * 60)
     after_minutes = int(config.get("janela_depois_inicio_minutos", 90))
@@ -783,7 +789,7 @@ def build_outputs(
         targets = [game for game in games if game.event_id == args.event_id]
 
     output_base = {
-        "fonte": "YouTube oficial — CazéTV e GE TV",
+        "fonte": "YouTube oficial — CazéTV e GE TV | clubes do Brasileirão",
         "politica": {
             "prioridade": ["cazetv", "getv"],
             "regra": "Somente canais oficiais configurados; CazéTV tem prioridade sobre GE TV; link único.",
@@ -893,6 +899,9 @@ def build_outputs(
         entry = {
             "event_id": game.event_id,
             "rodada": game.rodada,
+            "competicao_chave": game.competicao_chave,
+            "competicao_nome": game.competicao_nome,
+            "espn_league": game.espn_league,
             "mandante": game.mandante,
             "visitante": game.visitante,
             "data_iso": iso_brt(game.kickoff),
@@ -907,6 +916,8 @@ def build_outputs(
             no_stream.append({
                 "event_id": game.event_id,
                 "rodada": game.rodada,
+                "competicao_chave": game.competicao_chave,
+                "competicao_nome": game.competicao_nome,
                 "jogo": f"{game.mandante} x {game.visitante}",
                 "data_iso": iso_brt(game.kickoff),
                 "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV",
@@ -914,6 +925,8 @@ def build_outputs(
         game_reports.append({
             "event_id": game.event_id,
             "rodada": game.rodada,
+            "competicao_chave": game.competicao_chave,
+            "competicao_nome": game.competicao_nome,
             "jogo": f"{game.mandante} x {game.visitante}",
             "data_iso": iso_brt(game.kickoff),
             "principal": principal.get("nome") if principal else "",
@@ -1021,7 +1034,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if current_time is None:
         raise RuntimeError("--now inválido")
 
-    for rel in ("jogos.json", "dados-br/config-transmissoes-aovivo.json", "dados-br/transmissoes-aovivo-manual.json"):
+    for rel in ("dados-br/agenda-clubes-br.json", "dados-br/config-transmissoes-aovivo.json", "dados-br/transmissoes-aovivo-manual.json"):
         if not (root / rel).exists():
             raise RuntimeError(f"Arquivo obrigatório ausente: {rel}")
         load_json(root / rel, {})

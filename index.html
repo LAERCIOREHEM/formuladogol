@@ -2760,9 +2760,10 @@ body > .container > section.hero > img {
       <img src="img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high">
     </div>
   </header>
-	  <nav class="nav" data-br-auth-menu aria-label="Menu principal">
+	  	  <nav class="nav" data-br-auth-menu aria-label="Menu principal">
 	    <a href="estatisticas.html" id="btn-estatisticas">📈 Estatísticas</a>
 	    <a href="/jogos" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('jogos');}" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</a>
+	    <a href="agenda.html" id="btn-agenda">🗓️ Agenda</a>
 	    <a href="aovivo.html" id="btn-aovivo">🔴 Ao vivo</a>
 	    <a href="/tabela" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('tabela');}" id="btn-tabela" data-br-view="tabela">📊 Tabela</a>
 	    <a href="/resultados" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('resultados');}" id="btn-resultados" data-br-view="resultados">✅ Resultados</a>
@@ -5099,7 +5100,7 @@ function renderJogos() {
   const meta = state.jogosMeta || {};
   const temLive = espnLiveTemJogoRolando();
   let html = '<div class="section-title-row">';
-  html += `<div><div class="br-kicker">Agenda e transmissão</div><h2>Próximos jogos</h2></div>`;
+  html += `<div><div class="br-kicker">Agenda e transmissão</div><h2>Jogos do Brasileirão</h2></div>`;
   if (temLive) {
     html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> ESPN a cada 30s${state._espnLiveUltima ? ' · ' + formatarSomenteHora(state._espnLiveUltima) : ''}</span>`;
   } else if (meta.atualizado_em_br) {
