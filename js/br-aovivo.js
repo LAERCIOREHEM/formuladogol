@@ -5,6 +5,10 @@
   const DEFAULT_LEAGUE = "bra.1";
   const REFRESH_MS = 30000;
   const TZ = "America/Sao_Paulo";
+  const FINAL_RETENTION_BR_MS = 5 * 60000;
+  const FINAL_RETENTION_OTHER_MS = 60 * 60000;
+  const PRE_GAME_WINDOW_BEFORE_MS = 30 * 60000;
+  const PRE_GAME_WINDOW_AFTER_MS = 90 * 60000;
 
   const $ = (sel) => document.querySelector(sel);
   const app = $("#live-app");
@@ -860,39 +864,69 @@
     return g.adiado && (!g.date || /adiad|postpon|data a definir/i.test(g.detail || ""));
   }
 
+  function finalRetentionMs(game) {
+    return game && game.competitionKey === "brasileirao"
+      ? FINAL_RETENTION_BR_MS
+      : FINAL_RETENTION_OTHER_MS;
+  }
+
+  function finalTimestamp(game) {
+    if (!game) return 0;
+    const key = String(game.id || teamKey(game.home && game.home.nome, game.away && game.away.nome));
+    return Number(state.finalizadosEm[key] || 0);
+  }
+
+  function isRecentlyFinished(game, now = Date.now()) {
+    if (!isReliableFinalGame(game, now)) return false;
+    const endedAt = finalTimestamp(game);
+    if (!(endedAt > 0)) return false;
+    const age = now - endedAt;
+    return age >= 0 && age <= finalRetentionMs(game);
+  }
+
+  function isStartingWindow(game, now = Date.now()) {
+    if (!game || gameState(game).key !== "pre" || isPostponed(game) || !(game.date instanceof Date)) return false;
+    const kickoff = game.date.getTime();
+    return kickoff >= now - PRE_GAME_WINDOW_BEFORE_MS && kickoff <= now + PRE_GAME_WINDOW_AFTER_MS;
+  }
+
   function priorityGames(games) {
     const now = Date.now();
-    const live = games.filter((g) => gameState(g).key === "live").sort((a, b) => (a.date || 0) - (b.date || 0));
-    if (live.length) return live;
+    const live = games
+      .filter((g) => gameState(g).key === "live")
+      .sort((a, b) => (a.date || 0) - (b.date || 0));
 
-    // Mantém jogos encerrados em destaque por quinze minutos contados da
-    // primeira resposta em que a ESPN os marcou como post/finalizados.
-    const recent = games.filter((g) => {
-      if (!isReliableFinalGame(g)) return false;
-      const key = String(g.id || teamKey(g.home && g.home.nome, g.away && g.away.nome));
-      const endedAt = Number(state.finalizadosEm[key] || 0);
-      return endedAt > 0 && now - endedAt <= 15 * 60000;
-    }).sort((a, b) => {
-      const ka = String(a.id || teamKey(a.home && a.home.nome, a.away && a.away.nome));
-      const kb = String(b.id || teamKey(b.home && b.home.nome, b.away && b.away.nome));
-      return Number(state.finalizadosEm[kb] || 0) - Number(state.finalizadosEm[ka] || 0);
-    });
-    const future = games.filter((g) => gameState(g).key === "pre" && !isPostponed(g) && g.date && g.date.getTime() >= now - 30 * 60000)
+    const starting = games
+      .filter((g) => isStartingWindow(g, now))
       .sort((a, b) => a.date - b.date);
 
-    if (recent.length) {
-      const latestKey = String(recent[0].id || teamKey(recent[0].home.nome, recent[0].away.nome));
-      const latest = Number(state.finalizadosEm[latestKey] || 0);
-      return recent.filter((g) => {
-        const key = String(g.id || teamKey(g.home.nome, g.away.nome));
-        return Math.abs(Number(state.finalizadosEm[key] || 0) - latest) <= 2 * 60000;
-      }).slice(0, 8);
-    }
-    if (future.length) {
-      const first = future[0].date.getTime();
-      return future.filter((g) => Math.abs(g.date.getTime() - first) <= 2 * 60000).slice(0, 8);
-    }
-    return [];
+    const recent = games
+      .filter((g) => isRecentlyFinished(g, now))
+      .sort((a, b) => finalTimestamp(b) - finalTimestamp(a));
+
+    // A faixa superior representa uma janela única de acompanhamento: jogos
+    // em andamento, partidas prestes a começar (inclusive pequenos atrasos da
+    // ESPN) e jogos recém-encerrados. No Brasileirão, o pós-jogo permanece por
+    // 5 minutos; Copa do Brasil, Libertadores e Sul-Americana ficam por 1 hora,
+    // pois esses resultados não possuem uma página própria no site.
+    const activeWindow = [];
+    const addUnique = (game) => {
+      if (!game || activeWindow.some((item) => sameFixture(item, game))) return;
+      activeWindow.push(game);
+    };
+    live.forEach(addUnique);
+    starting.forEach(addUnique);
+    recent.forEach(addUnique);
+    if (activeWindow.length) return activeWindow.slice(0, 8);
+
+    // Fora da janela ativa, mantém o comportamento anterior: apresenta apenas
+    // o próximo horário disponível, sem poluir o seletor com toda a agenda.
+    const future = games
+      .filter((g) => gameState(g).key === "pre" && !isPostponed(g) && g.date && g.date.getTime() >= now - PRE_GAME_WINDOW_BEFORE_MS)
+      .sort((a, b) => a.date - b.date);
+    if (!future.length) return [];
+    const first = future[0].date.getTime();
+    return future.filter((g) => Math.abs(g.date.getTime() - first) <= 2 * 60000).slice(0, 8);
   }
 
   function chooseGame(games) {
@@ -900,10 +934,11 @@
     const requested = state.selecionado
       ? games.find((g) => g.id && g.id === state.selecionado)
       : null;
+    const requestedState = requested ? gameState(requested).key : "";
     const requestedEligible = requested && !isPostponed(requested) && (
-      gameState(requested).key === "live" ||
-      gameState(requested).key === "pre" ||
-      (requested.date && requested.date.getTime() >= Date.now() - 6 * 3600000)
+      requestedState === "live" ||
+      requestedState === "pre" ||
+      (requestedState === "post" && isRecentlyFinished(requested))
     );
     let selected = requestedEligible ? requested : priorities[0] || null;
     if (selected && !priorities.some((g) => sameFixture(g, selected))) {
