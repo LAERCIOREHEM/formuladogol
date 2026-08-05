@@ -11,6 +11,11 @@ on:
         required: false
         default: false
         type: boolean
+      reconstruir_fontes:
+        description: 'Reconstruir a temporada completa das três copas (uso excepcional)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -25,7 +30,7 @@ jobs:
   atualizar:
     name: Buscar dados ESPN e publicar JSONs
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - name: Baixar repositorio
@@ -152,7 +157,7 @@ jobs:
         run: |
           printf '::warning::A ESPN não sincronizou standings e scoreboard após %s tentativa(s).\n' "${ESPN_TENTATIVAS:-0}"
           printf '::warning::%s\n' "${ESPN_MOTIVO:-Motivo não informado pelo coletor.}"
-          echo "O workflow termina com sucesso sem publicar arquivos parciais ou contraditórios."
+          echo "A base do Brasileirão será preservada; as copas e o AF-Previsão continuarão pela rota independente."
 
       - name: Registrar alerta de snapshot preservado
         if: steps.espn.outputs.sincronizado != 'true'
@@ -168,40 +173,6 @@ jobs:
           EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
           EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
         run: python scripts/gerenciar_status_brasileirao.py --from-env --notify
-
-      - name: Publicar somente o status preservado
-        if: steps.espn.outputs.sincronizado != 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          cd "$GITHUB_WORKSPACE"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          STATUS_FILE="dados-br/status-atualizacao.json"
-          if [[ -z "$(git status --porcelain -- "$STATUS_FILE")" ]]; then
-            echo "Status operacional sem alteração."
-            exit 0
-          fi
-          TMP_DIR="$(mktemp -d)"
-          mkdir -p "$TMP_DIR/dados-br"
-          cp -a "$STATUS_FILE" "$TMP_DIR/$STATUS_FILE"
-          for i in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --hard origin/main
-            git clean -fd
-            mkdir -p dados-br
-            cp -a "$TMP_DIR/$STATUS_FILE" "$STATUS_FILE"
-            if [[ -z "$(git status --porcelain -- "$STATUS_FILE")" ]]; then
-              echo "Outro run já publicou o mesmo status."
-              exit 0
-            fi
-            git add -- "$STATUS_FILE"
-            git commit -m "Registrar aviso operacional do Brasileirao - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
-            if git push origin HEAD:main; then exit 0; fi
-            sleep 3
-          done
-          echo "ERRO: não foi possível publicar o status preservado."
-          exit 1
 
       - name: Gerar auditoria estrutural do calendário
         if: steps.espn.outputs.sincronizado == 'true'
@@ -220,24 +191,47 @@ jobs:
         run: python scripts/gerar_estatisticas_brasileirao.py
 
       - name: Atualizar competições que alteram as vagas continentais
-        if: steps.espn.outputs.sincronizado == 'true'
-        run: python scripts/atualizar_competicoes_af_previsao.py --max-age-minutes 45
+        id: continental
+        env:
+          FORCAR_AF: ${{ inputs.forcar_af }}
+          RECONSTRUIR_FONTES: ${{ inputs.reconstruir_fontes }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARGS=(
+            --max-age-minutes 45
+            --live-cache-minutes 5
+            --live-window-hours 4
+            --full-refresh-hours 168
+            --past-days 21
+            --future-days 120
+          )
+          if [[ "${FORCAR_AF:-false}" == "true" ]]; then
+            ARGS+=(--force --max-age-minutes 0)
+          fi
+          if [[ "${RECONSTRUIR_FONTES:-false}" == "true" ]]; then
+            ARGS+=(--full --force --max-age-minutes 0)
+          fi
+          python scripts/atualizar_competicoes_af_previsao.py "${ARGS[@]}"
 
       - name: Gerar agenda dos clubes do Brasileirão
-        if: steps.espn.outputs.sincronizado == 'true'
+        if: ${{ always() && steps.continental.outcome == 'success' }}
         run: |
           python scripts/gerar_agenda_clubes_brasileirao.py
           python -m json.tool dados-br/agenda-clubes-br.json > /dev/null
 
       - name: Atualizar transmissões oficiais da agenda
-        if: steps.espn.outputs.sincronizado == 'true'
+        if: ${{ always() && steps.continental.outcome == 'success' }}
         run: python scripts/atualizar_transmissoes_tv_brasileirao.py
 
       - name: Verificar se o estado esportivo exige novo AF-Previsão
-        if: steps.espn.outputs.sincronizado == 'true'
+        if: ${{ always() && steps.continental.outcome == 'success' }}
         id: af_gate
         env:
           FORCAR_AF: ${{ inputs.forcar_af }}
+          BR_SINCRONIZADO: ${{ steps.espn.outputs.sincronizado }}
+          CONTINENTAL_READY: ${{ steps.continental.outputs.continental_ready }}
+          CONTINENTAL_CHANGED: ${{ steps.continental.outputs.continental_changed }}
         run: |
           python - <<'PY'
           import hashlib
@@ -245,7 +239,10 @@ jobs:
           import os
           from pathlib import Path
 
-          from scripts.gerar_probabilidades_brasileirao import current_publication_freshness
+          from scripts.gerar_probabilidades_brasileirao import (
+              continental_collection_readiness,
+              current_publication_freshness,
+          )
 
           arquivos = {
               'tabela': 'tabela.json',
@@ -292,20 +289,36 @@ jobs:
           faltando = any(not item.exists() for item in obrigatorios)
           forcar = str(os.environ.get('FORCAR_AF', '')).lower() == 'true'
           vigencia = current_publication_freshness()
+          coleta = continental_collection_readiness(30)
+          base_valida = bool(vigencia.get('estado_pronto'))
+          continental_pronto = (
+              str(os.environ.get('CONTINENTAL_READY', '')).lower() == 'true'
+              and bool(coleta.get('pronto'))
+          )
           desatualizado = not bool(vigencia.get('atualizado'))
-          executar = forcar or faltando or antes != depois or desatualizado
+          solicitado = forcar or faltando or antes != depois or desatualizado
+          executar = solicitado and base_valida and continental_pronto
           motivos_vigencia = '; '.join(vigencia.get('motivos') or [])
+          motivos_coleta = '; '.join(coleta.get('motivos') or [])
 
           with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
               output.write(f'run_af={str(executar).lower()}\n')
+              output.write(f'run_requested={str(solicitado).lower()}\n')
+              output.write(f'base_valida={str(base_valida).lower()}\n')
+              output.write(f'continental_pronto={str(continental_pronto).lower()}\n')
+              output.write(f'continental_changed={str(os.environ.get("CONTINENTAL_CHANGED", "false")).lower()}\n')
               output.write(f'estado_antes={antes}\n')
               output.write(f'estado_depois={depois}\n')
               output.write(f'af_desatualizado={str(desatualizado).lower()}\n')
               output.write(f'hash_af_esperado={vigencia.get("hash_esperado") or ""}\n')
               output.write(f'hash_af_publicado={vigencia.get("hash_publicado") or ""}\n')
 
-          if forcar:
-              motivo = 'execução manual com forcar_af=true'
+          if not base_valida:
+              motivo = 'base local preservada do Brasileirão não passou na auditoria: ' + (motivos_vigencia or 'motivo não informado')
+          elif not continental_pronto:
+              motivo = 'coleta das copas não foi confirmada: ' + (motivos_coleta or 'motivo não informado')
+          elif forcar:
+              motivo = 'execução manual com forcar_af=true e coleta continental forçada'
           elif faltando:
               motivo = 'artefato obrigatório ausente'
           elif antes != depois:
@@ -315,19 +328,22 @@ jobs:
           else:
               motivo = 'nenhuma mudança esportiva relevante e AF publicado vigente'
           print(f'Executar AF-Previsão: {executar} — {motivo}')
+          print(f'Base do Brasileirão sincronizada nesta execução: {os.environ.get("BR_SINCRONIZADO") == "true"}')
           PY
 
       - name: Gerar probabilidades pré-jogo de vitória, empate e derrota
-        if: steps.espn.outputs.sincronizado == 'true' && steps.af_gate.outputs.run_af == 'true'
+        if: steps.af_gate.outputs.run_af == 'true'
         run: python scripts/gerar_probabilidades_jogos.py
 
       - name: Gerar AF-Previsão integrado e simular o restante do campeonato
-        if: steps.espn.outputs.sincronizado == 'true' && steps.af_gate.outputs.run_af == 'true'
+        if: steps.af_gate.outputs.run_af == 'true'
         id: af_generate
+        env:
+          AF_EXIGIR_COLETA_CONTINENTAL_ATUAL: 'true'
         run: python scripts/gerar_probabilidades_brasileirao.py
 
       - name: Confirmar vigência do AF após a tentativa de geração
-        if: steps.espn.outputs.sincronizado == 'true' && steps.af_gate.outputs.run_af == 'true'
+        if: steps.af_gate.outputs.run_af == 'true'
         env:
           AF_UPDATED: ${{ steps.af_generate.outputs.af_updated }}
         run: |
@@ -354,31 +370,34 @@ jobs:
                   '::warning title=AF-Previsão pendente de nova tentativa::'
                   + (reasons or 'as fontes auxiliares ainda não estão sincronizadas')
               )
-              print(
-                  'Os resultados correntes podem ser publicados, e o próximo agendamento '
-                  'tentará novamente mesmo sem outra partida encerrada.'
-              )
+              print('A publicação anterior será preservada e a mudança continental não será commitada isoladamente.')
           PY
 
       - name: Sincronizar histórico com o AF efetivamente publicado
-        if: steps.espn.outputs.sincronizado == 'true'
+        if: steps.af_gate.outputs.base_valida == 'true'
         run: python scripts/gerar_probabilidades_brasileirao.py --sincronizar-historico-publicado
 
       - name: Auditar histórico e preparar avaliação final do AF-Previsão
-        if: steps.espn.outputs.sincronizado == 'true' && steps.af_generate.outputs.af_updated == 'true'
+        if: steps.af_generate.outputs.af_updated == 'true'
         run: python scripts/avaliar_af_previsao.py --strict
 
       - name: Informar preservação temporária do AF e retentativa automática
-        if: steps.espn.outputs.sincronizado == 'true' && steps.af_gate.outputs.run_af == 'true' && steps.af_generate.outputs.af_updated != 'true'
+        if: steps.af_gate.outputs.run_af == 'true' && steps.af_generate.outputs.af_updated != 'true'
         env:
           AF_REASON: ${{ steps.af_generate.outputs.af_reason }}
         run: |
           printf '::warning::Último AF válido preservado nesta execução: %s\n' "${AF_REASON:-fonte auxiliar temporariamente indisponível}"
-          echo "A vigência continuará falsa; o próximo workflow repetirá a geração automaticamente."
+          echo "A mudança continental não será publicada sem o AF correspondente."
 
       - name: Informar preservação do último AF-Previsão
-        if: steps.espn.outputs.sincronizado == 'true' && steps.af_gate.outputs.run_af != 'true'
+        if: steps.af_gate.outputs.run_af != 'true' && steps.af_gate.outputs.run_requested != 'true'
         run: echo "Nenhuma mudança esportiva relevante; último AF-Previsão válido preservado sem repetir 2 milhões de simulações."
+
+      - name: Informar bloqueio seguro do recálculo
+        if: steps.af_gate.outputs.run_requested == 'true' && steps.af_gate.outputs.run_af != 'true'
+        run: |
+          echo "::warning::O AF precisava de recálculo, mas a base local ou a coleta continental não passou nas travas de segurança."
+          echo "Nenhum cenário novo será publicado até todas as fontes necessárias estarem íntegras."
 
       - name: Gerar estatísticas gerais da competição
         if: steps.espn.outputs.sincronizado == 'true'
@@ -726,12 +745,153 @@ jobs:
           print('  OK   Estatísticas, calendário e AF-Previsão gerados')
           PY
 
+      - name: Validar atualização independente das copas e do AF
+        if: steps.espn.outputs.sincronizado != 'true'
+        env:
+          CONTINENTAL_READY: ${{ steps.continental.outputs.continental_ready }}
+          CONTINENTAL_CHANGED: ${{ steps.continental.outputs.continental_changed }}
+          AF_UPDATED: ${{ steps.af_generate.outputs.af_updated }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          from scripts.gerar_probabilidades_brasileirao import current_publication_freshness
+
+          def load(path):
+              with open(path, encoding='utf-8') as handle:
+                  return json.load(handle)
+
+          status = load('dados-br/status-atualizacao.json')
+          assert status.get('sincronizado') is False, 'status preservado deveria registrar sincronizado=false'
+
+          ready = os.environ.get('CONTINENTAL_READY') == 'true'
+          changed = os.environ.get('CONTINENTAL_CHANGED') == 'true'
+          af_updated = os.environ.get('AF_UPDATED') == 'true'
+          if not ready:
+              print('Coleta continental não confirmada: somente o status operacional poderá ser publicado.')
+              raise SystemExit(0)
+
+          files = [
+              'dados-br/competicoes-af-previsao/copa-do-brasil.json',
+              'dados-br/competicoes-af-previsao/libertadores.json',
+              'dados-br/competicoes-af-previsao/sul-americana.json',
+              'dados-br/auditoria-competicoes-af-previsao.json',
+              'dados-br/agenda-clubes-br.json',
+          ]
+          for path in files:
+              assert Path(path).exists(), f'arquivo obrigatório ausente: {path}'
+              load(path)
+          audit = load('dados-br/auditoria-competicoes-af-previsao.json')
+          assert audit.get('status') == 'ok' and audit.get('coleta_confiavel') is True, 'auditoria continental não está confiável'
+          assert len(audit.get('competicoes') or []) == 3, 'auditoria continental incompleta'
+
+          if changed and not af_updated:
+              raise SystemExit(
+                  'ERRO: a situação esportiva das copas mudou, mas o AF correspondente não foi gerado. '
+                  'Os novos snapshots não podem ser publicados isoladamente.'
+              )
+          if af_updated:
+              freshness = current_publication_freshness()
+              assert freshness.get('atualizado') is True, '; '.join(freshness.get('motivos') or [])
+              probabilities = load('dados-br/probabilidades-brasileirao.json')
+              coverage = (probabilities.get('integracao_continental') or {}).get('cobertura') or {}
+              assert coverage.get('todas_consideradas') is True, 'AF novo sem cobertura declarada das três copas'
+              assert len(coverage.get('competicoes') or []) == 3, 'cobertura continental incompleta no AF novo'
+          print(f'Atualização independente validada: changed={changed}, af_updated={af_updated}.')
+          PY
+
+      - name: Commitar copas e AF mesmo com Brasileirão preservado
+        if: steps.espn.outputs.sincronizado != 'true'
+        env:
+          CONTINENTAL_READY: ${{ steps.continental.outputs.continental_ready }}
+          CONTINENTAL_CHANGED: ${{ steps.continental.outputs.continental_changed }}
+          AF_UPDATED: ${{ steps.af_generate.outputs.af_updated }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$GITHUB_WORKSPACE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=("dados-br/status-atualizacao.json")
+          if [[ "${CONTINENTAL_READY:-false}" == "true" ]]; then
+            if [[ "${CONTINENTAL_CHANGED:-false}" != "true" || "${AF_UPDATED:-false}" == "true" ]]; then
+              FILES+=(
+                "dados-br/competicoes-af-previsao/copa-do-brasil.json"
+                "dados-br/competicoes-af-previsao/libertadores.json"
+                "dados-br/competicoes-af-previsao/sul-americana.json"
+                "dados-br/auditoria-competicoes-af-previsao.json"
+                "dados-br/agenda-clubes-br.json"
+                "dados-br/transmissoes-tv.json"
+                "dados-br/auditoria-transmissoes-tv.json"
+              )
+            fi
+          fi
+          if [[ "${AF_UPDATED:-false}" == "true" ]]; then
+            FILES+=(
+              "dados-br/probabilidades-brasileirao.json"
+              "dados-br/probabilidades-por-pontuacao.json"
+              "dados-br/probabilidades-jogos.json"
+              "dados-br/auditoria-probabilidades-jogos.json"
+              "dados-br/probabilidades-bolao.json"
+              "dados-br/auditoria-probabilidades.json"
+              "dados-br/historico-probabilidades.json"
+              "dados-br/avaliacao-af-previsao.json"
+            )
+          fi
+
+          EXISTING=()
+          for f in "${FILES[@]}"; do
+            [[ -e "$f" ]] && EXISTING+=("$f")
+          done
+          FILES=("${EXISTING[@]}")
+          if [[ ${#FILES[@]} -eq 0 ]] || [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+            echo "Sem mudanças independentes para publicar."
+            exit 0
+          fi
+
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            mkdir -p "$TMP_DIR/$(dirname "$f")"
+            cp -a "$f" "$TMP_DIR/$f"
+          done
+
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+            for f in "${FILES[@]}"; do
+              rm -rf "$f"
+              mkdir -p "$(dirname "$f")"
+              cp -a "$TMP_DIR/$f" "$f"
+            done
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Outro run já publicou os mesmos artefatos."
+              exit 0
+            fi
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar copas e AF-Previsão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            if git push origin HEAD:main; then
+              echo "Push independente concluído na tentativa $i."
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "ERRO: push independente falhou após 5 tentativas."
+          exit 1
+
       # Estrategia de push ROBUSTA E PADRONIZADA (modelo melhores-momentos):
       # guarda os artefatos gerados -> fetch + reset --hard origin/main ->
       # reaplica os arquivos -> commit -> push. Nunca gera conflito artificial
       # de rebase em arquivos-artefato, mesmo sob concorrencia real.
       - name: Commitar JSONs juntos com push robusto
         if: steps.espn.outputs.sincronizado == 'true'
+        env:
+          CONTINENTAL_READY: ${{ steps.continental.outputs.continental_ready }}
+          CONTINENTAL_CHANGED: ${{ steps.continental.outputs.continental_changed }}
+          AF_UPDATED: ${{ steps.af_generate.outputs.af_updated }}
         shell: bash
         run: |
           set -euo pipefail
@@ -740,6 +900,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # O bloco do Brasileirão pode ser publicado mesmo se uma fonte auxiliar
+          # falhar. Já snapshots continentais esportivamente novos só seguem junto
+          # do AF que os incorporou; isso impede JSONs matematicamente contraditórios.
           FILES=(
             "tabela.json"
             "espn_eventos.json"
@@ -762,20 +925,40 @@ jobs:
             "dados-br/auditoria-cobertura-resultados.json"
             "dados-br/calendario-completo.json"
             "dados-br/auditoria-calendario.json"
-            "dados-br/competicoes-af-previsao/copa-do-brasil.json"
-            "dados-br/competicoes-af-previsao/libertadores.json"
-            "dados-br/competicoes-af-previsao/sul-americana.json"
-            "dados-br/auditoria-competicoes-af-previsao.json"
-            "dados-br/agenda-clubes-br.json"
-            "dados-br/probabilidades-brasileirao.json"
-            "dados-br/probabilidades-por-pontuacao.json"
-            "dados-br/probabilidades-jogos.json"
-            "dados-br/auditoria-probabilidades-jogos.json"
-            "dados-br/probabilidades-bolao.json"
-            "dados-br/auditoria-probabilidades.json"
-            "dados-br/historico-probabilidades.json"
-            "dados-br/avaliacao-af-previsao.json"
           )
+
+          if [[ "${CONTINENTAL_READY:-false}" == "true" ]]; then
+            if [[ "${CONTINENTAL_CHANGED:-false}" != "true" || "${AF_UPDATED:-false}" == "true" ]]; then
+              FILES+=(
+                "dados-br/competicoes-af-previsao/copa-do-brasil.json"
+                "dados-br/competicoes-af-previsao/libertadores.json"
+                "dados-br/competicoes-af-previsao/sul-americana.json"
+                "dados-br/auditoria-competicoes-af-previsao.json"
+                "dados-br/agenda-clubes-br.json"
+              )
+            else
+              echo "::warning::Mudança nas copas não será publicada sem o AF correspondente."
+            fi
+          fi
+
+          if [[ "${AF_UPDATED:-false}" == "true" ]]; then
+            FILES+=(
+              "dados-br/probabilidades-brasileirao.json"
+              "dados-br/probabilidades-por-pontuacao.json"
+              "dados-br/probabilidades-jogos.json"
+              "dados-br/auditoria-probabilidades-jogos.json"
+              "dados-br/probabilidades-bolao.json"
+              "dados-br/auditoria-probabilidades.json"
+              "dados-br/historico-probabilidades.json"
+              "dados-br/avaliacao-af-previsao.json"
+            )
+          fi
+
+          EXISTING=()
+          for f in "${FILES[@]}"; do
+            [[ -e "$f" ]] && EXISTING+=("$f")
+          done
+          FILES=("${EXISTING[@]}")
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Sem mudancas nos JSONs - nada a commitar."
