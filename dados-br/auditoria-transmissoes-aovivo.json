@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 71,
+    "jogos_na_janela": 70,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 23,
+    "candidatos_oficiais_encontrados": 24,
     "transmissoes_publicadas": 5,
-    "sem_transmissao": 66,
+    "sem_transmissao": 65,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,17 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401874097",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Juventude x Atlético-MG",
-      "data_iso": "2026-08-04T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401874098",
       "rodada": 0,
@@ -916,16 +905,6 @@
   ],
   "rejeitados": [
     {
-      "video_id": "BlcPk6Vzdtg",
-      "url": "https://www.youtube.com/watch?v=BlcPk6Vzdtg",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "REMO X SANTOS | AQUECIMENTO AO VIVO | COPA DO BRASIL 2026 | #live | sportv",
-      "status": "live",
-      "inicio_programado": "2026-08-04T20:30:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
       "video_id": "j2l4rPTBrK8",
       "url": "https://www.youtube.com/watch?v=j2l4rPTBrK8",
       "fonte": "getv",
@@ -1056,6 +1035,26 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "NN33sADnRUo",
+      "url": "https://www.youtube.com/watch?v=NN33sADnRUo",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE ATLÉTICO-MG ANALISA DUELO PELA COPA DO BRASIL | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-05T15:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "cBcsPXmV9NE",
+      "url": "https://www.youtube.com/watch?v=cBcsPXmV9NE",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE SANTOS ANALISA DUELO CONTRA O REMO PELA COPA DO BRASIL | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-05T14:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "eFxY6C6kgjw",
       "url": "https://www.youtube.com/watch?v=eFxY6C6kgjw",
       "fonte": "getv",
@@ -1097,15 +1096,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401874097",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Juventude x Atlético-MG",
-      "data_iso": "2026-08-04T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401874098",
       "rodada": 0,
@@ -1702,5 +1692,5 @@
     },
     "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API."
   },
-  "atualizado_em": "2026-08-04T20:45:12-03:00"
+  "atualizado_em": "2026-08-04T22:07:35-03:00"
 }
