@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-04T02:11:22-03:00",
+  "gerado_em": "2026-08-05T00:34:57-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,14 +17,21 @@
     "ordem": 600,
     "nome": "Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 9
+    "eventos_pendentes": 6
   },
   "resumo": {
     "eventos": 142,
-    "finalizados": 133,
-    "pendentes": 9,
+    "finalizados": 136,
+    "pendentes": 6,
     "equipes": 126,
     "equipes_serie_a_2026": 21
+  },
+  "coleta": {
+    "modo": "incremental",
+    "janela_inicio": "2026-07-15T00:00:00-03:00",
+    "janela_fim": "2026-12-03T23:59:59-03:00",
+    "requisicoes": 4,
+    "ultima_completa_em": "2026-08-04T02:11:22-03:00"
   },
   "equipes": [
     {
@@ -5954,9 +5961,9 @@
     {
       "event_id": "401873938",
       "data_iso": "2026-08-03T21:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Seg., Agosto 3º at 8:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5970,8 +5977,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 2
       },
       "visitante": {
         "espn_id": "3457",
@@ -5984,15 +5991,15 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Athletico-PR",
       "penaltis": false
     },
     {
       "event_id": "401874097",
       "data_iso": "2026-08-04T19:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Ter., Agosto 4º at 6:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -6017,18 +6024,18 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Atlético-MG",
       "penaltis": false
     },
     {
       "event_id": "401874098",
       "data_iso": "2026-08-04T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Ter., Agosto 4º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -6053,10 +6060,10 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Santos",
       "penaltis": false
     },
     {

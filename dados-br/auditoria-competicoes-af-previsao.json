@@ -1,37 +1,97 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "projeto": "AF-Previsão Continental",
-  "etapa": "Execução 2.5 — coleta das competições que alteram vagas",
-  "gerado_em": "2026-08-04T02:43:00-03:00",
+  "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
+  "gerado_em": "2026-08-05T00:34:58-03:00",
   "status": "ok",
+  "coleta_confiavel": true,
+  "mudanca_esportiva": true,
+  "hash_estado_antes": "28d70ffbd67d5665f53de88db628c60b3f51ef47684b552beb12da6baa749aac",
+  "hash_estado_depois": "1b4fd39cc9b877ed456ccd612d393cc072bde258415d3dc7469fa95bf1578d49",
   "fonte": "ESPN",
   "temporada": 2026,
   "competicoes": [
     {
       "competicao": "copa_do_brasil",
-      "status": "cache_valido",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-08-04T02:11:22-03:00",
-      "eventos": 142
+      "gerado_em": "2026-08-05T00:34:57-03:00",
+      "cache_efetivo_minutos": 0,
+      "eventos": 142,
+      "finalizados": 136,
+      "pendentes": 6,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 600,
+        "nome": "Oitavas de final",
+        "eventos": 16,
+        "eventos_pendentes": 6
+      },
+      "coleta": {
+        "modo": "incremental",
+        "janela_inicio": "2026-07-15T00:00:00-03:00",
+        "janela_fim": "2026-12-03T23:59:59-03:00",
+        "requisicoes": 4,
+        "ultima_completa_em": "2026-08-04T02:11:22-03:00"
+      }
     },
     {
       "competicao": "libertadores",
-      "status": "cache_valido",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-08-04T02:11:23-03:00",
-      "eventos": 142
+      "gerado_em": "2026-08-05T00:34:57-03:00",
+      "cache_efetivo_minutos": 0,
+      "eventos": 142,
+      "finalizados": 126,
+      "pendentes": 16,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 600,
+        "nome": "Oitavas de final",
+        "eventos": 16,
+        "eventos_pendentes": 16
+      },
+      "coleta": {
+        "modo": "incremental",
+        "janela_inicio": "2026-07-15T00:00:00-03:00",
+        "janela_fim": "2026-12-03T23:59:59-03:00",
+        "requisicoes": 4,
+        "ultima_completa_em": "2026-08-04T02:11:23-03:00"
+      }
     },
     {
       "competicao": "sul_americana",
-      "status": "cache_valido",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-08-04T02:11:25-03:00",
-      "eventos": 144
+      "gerado_em": "2026-08-05T00:34:58-03:00",
+      "cache_efetivo_minutos": 0,
+      "eventos": 144,
+      "finalizados": 128,
+      "pendentes": 16,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 600,
+        "nome": "Oitavas de final",
+        "eventos": 16,
+        "eventos_pendentes": 16
+      },
+      "coleta": {
+        "modo": "incremental",
+        "janela_inicio": "2026-07-15T00:00:00-03:00",
+        "janela_fim": "2026-12-03T23:59:59-03:00",
+        "requisicoes": 4,
+        "ultima_completa_em": "2026-08-04T02:11:25-03:00"
+      }
     }
   ],
   "falhas": [],
   "regras_operacionais": {
-    "cache_minutos": 45,
+    "cache_padrao_minutos": 0,
+    "cache_janela_de_jogo_minutos": 5,
+    "janela_de_jogo_horas_apos_inicio": 4,
+    "janela_incremental_dias_passado": 21,
+    "janela_incremental_dias_futuro": 120,
+    "reconstrucao_completa_horas": 168,
     "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
     "nenhum_json_vazio": true
   }
