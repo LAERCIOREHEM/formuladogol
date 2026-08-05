@@ -81,6 +81,7 @@ HISTORY_PATH = ROOT / "dados-br" / "historico-probabilidades.json"
 BOLAO_PARTICIPANTS_PATH = ROOT / "dados-br" / "participantes-bolao-classificacao.json"
 BOLAO_OUTPUT_PATH = ROOT / "dados-br" / "probabilidades-bolao.json"
 POINT_THRESHOLDS_OUTPUT_PATH = ROOT / "dados-br" / "probabilidades-por-pontuacao.json"
+CONTINENTAL_AUDIT_PATH = ROOT / "dados-br" / "auditoria-competicoes-af-previsao.json"
 BRT = ZoneInfo("America/Sao_Paulo")
 EPS = 1e-12
 MAX_GOALS_OUTPUT = 7
@@ -1781,6 +1782,110 @@ def synchronize_history_publication_metadata() -> dict[str, Any]:
     return reconciled
 
 
+def parse_optional_datetime(value: Any) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=BRT)
+        return parsed.astimezone(BRT)
+    except ValueError:
+        return None
+
+
+def continental_collection_readiness(max_age_minutes: int = 30) -> dict[str, Any]:
+    """Confirma que as três copas foram verificadas nesta execução recente.
+
+    A consistência do hash esportivo continua sendo a prova da publicação. Esta
+    checagem adicional impede que snapshots antigos, embora internamente válidos,
+    sejam confundidos com uma coleta externa recém-realizada.
+    """
+    reasons: list[str] = []
+    try:
+        audit = load_json(CONTINENTAL_AUDIT_PATH)
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        return {"pronto": False, "motivos": [f"auditoria continental indisponível: {exc}"]}
+    generated = parse_optional_datetime(audit.get("gerado_em"))
+    if not generated:
+        reasons.append("auditoria continental sem horário válido")
+    else:
+        age = datetime.now(BRT) - generated
+        if age > timedelta(minutes=max_age_minutes):
+            reasons.append(
+                "auditoria continental não pertence à execução corrente "
+                f"({int(age.total_seconds() // 60)} min)"
+            )
+    if int(audit.get("schema_version") or 0) < 2:
+        reasons.append("auditoria continental em schema anterior à coleta independente")
+    if audit.get("status") != "ok" or audit.get("coleta_confiavel") is not True:
+        reasons.append("uma ou mais competições continentais não foram confirmadas")
+    rows = {str(row.get("competicao") or ""): row for row in (audit.get("competicoes") or [])}
+    expected = {"copa_do_brasil", "libertadores", "sul_americana"}
+    if set(rows) != expected:
+        reasons.append("auditoria continental não cobre exatamente as três competições")
+    accepted = {"atualizado", "cache_valido"}
+    for key in sorted(expected):
+        if key in rows and rows[key].get("status") not in accepted:
+            reasons.append(f"{key}: coleta não confirmada ({rows[key].get('status')})")
+
+    current_hash = ""
+    try:
+        snapshots = load_continental_snapshots()
+        current_hash = continental_snapshots_state_hash(snapshots)
+        audit_hash = str(audit.get("hash_estado_depois") or "")
+        if not audit_hash:
+            reasons.append("auditoria continental sem hash do estado coletado")
+        elif audit_hash != current_hash:
+            reasons.append("snapshots continentais divergem da auditoria da coleta corrente")
+    except (OSError, ValueError, json.JSONDecodeError, ContinentalDataNotReady) as exc:
+        reasons.append(f"snapshots continentais indisponíveis: {exc}")
+
+    return {
+        "pronto": not reasons,
+        "gerado_em": audit.get("gerado_em"),
+        "hash_estado": current_hash or audit.get("hash_estado_depois"),
+        "mudanca_esportiva": bool(audit.get("mudanca_esportiva")),
+        "motivos": reasons,
+    }
+
+
+def continental_snapshots_coverage(snapshots: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    timestamps: list[datetime] = []
+    for key, snapshot in sorted(snapshots.items()):
+        meta = snapshot.get("competicao") or {}
+        generated = parse_optional_datetime(snapshot.get("gerado_em"))
+        if generated:
+            timestamps.append(generated)
+        summary = snapshot.get("resumo") or {}
+        rows.append(
+            {
+                "chave": key,
+                "nome": meta.get("nome"),
+                "gerado_em": snapshot.get("gerado_em"),
+                "fase_atual": snapshot.get("fase_atual") or {},
+                "eventos_finalizados": int(summary.get("finalizados") or 0),
+                "eventos_pendentes": int(summary.get("pendentes") or 0),
+                "modo_coleta": (snapshot.get("coleta") or {}).get("modo"),
+            }
+        )
+    expected = {"copa_do_brasil", "libertadores", "sul_americana"}
+    covered = {str(row.get("chave") or "") for row in rows}
+    all_valid = covered == expected and all(
+        (snapshots.get(key) or {}).get("status") == "ok" for key in expected
+    )
+    return {
+        "todas_consideradas": all_valid,
+        "competicoes": rows,
+        "referencia_mais_antiga_em": min(timestamps).isoformat() if timestamps else None,
+        "referencia_mais_recente_em": max(timestamps).isoformat() if timestamps else None,
+        # Campo de compatibilidade mantido para consumidores já publicados.
+        "snapshots_atualizados_em": max(timestamps).isoformat() if timestamps else None,
+    }
+
+
 def continental_snapshots_state_hash(snapshots: dict[str, dict[str, Any]]) -> str:
     """Hash apenas do estado esportivo, sem timestamps de coleta/cache."""
     stable: dict[str, Any] = {}
@@ -2004,6 +2109,13 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     events = load_json(EVENTS_PATH)
     results = load_json(RESULTS_PATH) if RESULTS_PATH.exists() else {"resultados": []}
     calendar = load_json(CALENDAR_PATH)
+    if str(os.environ.get("AF_EXIGIR_COLETA_CONTINENTAL_ATUAL", "")).lower() == "true":
+        readiness = continental_collection_readiness(30)
+        if not readiness.get("pronto"):
+            raise CurrentDataNotSynchronized(
+                "coleta continental ainda não foi confirmada nesta execução: "
+                + "; ".join(readiness.get("motivos") or ["motivo não informado"])
+            )
     state = load_current_state(table)
     allowed_teams = set(state.teams)
     bolao_participants, bolao_rules = load_bolao_participants(allowed_teams)
@@ -2082,6 +2194,7 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
 
     input_hash = build_model_state_hash(config, audit_models, state, current, fixtures)
     continental_hash = continental_snapshots_state_hash(continental_snapshots)
+    continental_coverage = continental_snapshots_coverage(continental_snapshots)
     input_hash = canonical_hash_payload({"brasileirao": input_hash, "competicoes": continental_hash})
     generated_at = reference.replace(microsecond=0).isoformat()
     calculated_at = datetime.now(BRT).replace(microsecond=0).isoformat()
@@ -2225,6 +2338,17 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
             "decomposicao_exclusiva_por_via": True,
             "limiar_exibicao_percentual": float(execution_25.get("limiar_exibicao_percentual", 0.001)),
             "hash_snapshots": continental_hash,
+            "cobertura": continental_coverage,
+        },
+        "cobertura_dados": {
+            "atualizado_em": calculated_at,
+            "brasileirao": {
+                "fonte": "ESPN",
+                "referencia_esportiva_em": generated_at,
+                "partidas_concluidas": len(current),
+                "partidas_restantes": len(fixtures),
+            },
+            "copas": continental_coverage,
         },
         "total_previsoes_partidas": len(forecasts),
         "partidas_restantes": serialize_match_forecasts(forecasts),
@@ -2304,6 +2428,14 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
         "sensibilidade_dixon_coles": dc_audit,
         "diagnostico_af_score": af_audit,
         "integracao_continental": continental["auditoria"],
+        "cobertura_dados": {
+            "brasileirao": {
+                "referencia_esportiva_em": generated_at,
+                "partidas_concluidas": len(current),
+                "partidas_restantes": len(fixtures),
+            },
+            "copas": continental_coverage,
+        },
         "validacoes": {
             "clubes": len(teams),
             "soma_campeao_pct": round(sum(item["probabilidades_pct"]["campeao"] for item in teams), 6),
@@ -2619,6 +2751,32 @@ def self_test() -> None:
         cuts = [row[key] for row in threshold_test["niveis"] if row[key] is not None]
         assert cuts == sorted(cuts), (key, cuts)
 
+    coverage_test = continental_snapshots_coverage({
+        "copa_do_brasil": {
+            "status": "ok",
+            "gerado_em": "2026-08-05T00:10:00-03:00",
+            "competicao": {"nome": "Copa do Brasil"},
+            "fase_atual": {"nome": "Quartas de final"},
+            "resumo": {"finalizados": 10, "pendentes": 6},
+            "coleta": {"modo": "incremental"},
+        },
+        "libertadores": {
+            "status": "ok",
+            "gerado_em": "2026-08-05T00:11:00-03:00",
+            "competicao": {"nome": "CONMEBOL Libertadores"},
+            "fase_atual": {}, "resumo": {}, "coleta": {"modo": "incremental"},
+        },
+        "sul_americana": {
+            "status": "ok",
+            "gerado_em": "2026-08-05T00:12:00-03:00",
+            "competicao": {"nome": "CONMEBOL Sudamericana"},
+            "fase_atual": {}, "resumo": {}, "coleta": {"modo": "incremental"},
+        },
+    })
+    assert coverage_test["todas_consideradas"] is True
+    assert coverage_test["referencia_mais_antiga_em"] == "2026-08-05T00:10:00-03:00"
+    assert coverage_test["referencia_mais_recente_em"] == "2026-08-05T00:12:00-03:00"
+    assert coverage_test["snapshots_atualizados_em"] == "2026-08-05T00:12:00-03:00"
     print("Self-test AF-Previsão Execução 5: OK")
 
 

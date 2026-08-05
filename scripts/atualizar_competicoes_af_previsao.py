@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import os
 import re
@@ -141,14 +142,38 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def fetch_json(url: str, timeout: int = 30, attempts: int = 3) -> dict[str, Any]:
+    """Busca JSON via curl-cffi/Chrome e urllib, preservando fallback duplo."""
     last_error: Exception | None = None
     for attempt in range(1, attempts + 1):
+        separator = "&" if "?" in url else "?"
+        cache_url = f"{url}{separator}_={int(time.time())}"
+        errors: list[str] = []
         try:
-            separator = "&" if "?" in url else "?"
-            request = urllib.request.Request(
-                f"{url}{separator}_={int(time.time())}",
-                headers=HEADERS,
+            from curl_cffi import requests as curl_requests  # type: ignore
+
+            response = curl_requests.get(
+                cache_url,
+                impersonate="chrome",
+                timeout=timeout + 5 * (attempt - 1),
+                headers={
+                    "Accept": HEADERS["Accept"],
+                    "Accept-Language": HEADERS["Accept-Language"],
+                    "Cache-Control": HEADERS["Cache-Control"],
+                },
             )
+            response.raise_for_status()
+            data = response.json()
+            if not isinstance(data, dict):
+                raise ValueError("resposta ESPN sem objeto JSON na raiz")
+            return data
+        except ImportError:
+            pass
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"curl_cffi={type(exc).__name__}: {exc}")
+            last_error = exc
+
+        try:
+            request = urllib.request.Request(cache_url, headers=HEADERS)
             with urllib.request.urlopen(request, timeout=timeout + 5 * (attempt - 1)) as response:
                 charset = response.headers.get_content_charset() or "utf-8"
                 data = json.loads(response.read().decode(charset, errors="replace"))
@@ -156,31 +181,59 @@ def fetch_json(url: str, timeout: int = 30, attempts: int = 3) -> dict[str, Any]
                 raise ValueError("resposta ESPN sem objeto JSON na raiz")
             return data
         except Exception as exc:  # noqa: BLE001
-            last_error = exc
+            errors.append(f"urllib={type(exc).__name__}: {exc}")
+            last_error = RuntimeError(" | ".join(errors))
             if attempt < attempts:
                 time.sleep(2 * attempt)
     raise RuntimeError(f"falha ao buscar {url}: {last_error}")
 
 
-def date_windows(year: int, days: int = 42) -> Iterable[tuple[datetime, datetime]]:
-    cursor = datetime(year, 1, 1, tzinfo=BRT)
-    end = datetime(year, 12, 31, 23, 59, tzinfo=BRT)
+def date_windows_between(
+    start: datetime, end: datetime, days: int = 42
+) -> Iterable[tuple[datetime, datetime]]:
+    cursor = start
     while cursor <= end:
         upper = min(end, cursor + timedelta(days=days - 1))
         yield cursor, upper
         cursor = upper + timedelta(days=1)
 
 
-def fetch_season_events(spec: CompetitionSpec) -> list[dict[str, Any]]:
+def date_windows(year: int, days: int = 42) -> Iterable[tuple[datetime, datetime]]:
+    start = datetime(year, 1, 1, tzinfo=BRT)
+    end = datetime(year, 12, 31, 23, 59, tzinfo=BRT)
+    yield from date_windows_between(start, end, days)
+
+
+def fetch_events_between(
+    spec: CompetitionSpec, start: datetime, end: datetime
+) -> tuple[list[dict[str, Any]], int]:
     events: dict[str, dict[str, Any]] = {}
-    for start, end in date_windows(SEASON):
-        date_range = f"{start:%Y%m%d}-{end:%Y%m%d}"
+    requests = 0
+    season_start = datetime(SEASON, 1, 1, tzinfo=BRT)
+    season_end = datetime(SEASON, 12, 31, 23, 59, tzinfo=BRT)
+    start = max(start, season_start)
+    end = min(end, season_end)
+    if start > end:
+        return [], 0
+    for lower, upper in date_windows_between(start, end):
+        date_range = f"{lower:%Y%m%d}-{upper:%Y%m%d}"
         url = BASE_URL.format(league=spec.league)
         payload = fetch_json(f"{url}?dates={date_range}&limit=250&lang=pt&region=br")
+        requests += 1
         for event in payload.get("events") or []:
             if isinstance(event, dict) and event.get("id"):
                 events[str(event["id"])] = event
-    return sorted(events.values(), key=lambda item: (str(item.get("date") or ""), str(item.get("id") or "")))
+    return sorted(
+        events.values(), key=lambda item: (str(item.get("date") or ""), str(item.get("id") or ""))
+    ), requests
+
+
+def fetch_season_events(spec: CompetitionSpec) -> tuple[list[dict[str, Any]], int]:
+    return fetch_events_between(
+        spec,
+        datetime(SEASON, 1, 1, tzinfo=BRT),
+        datetime(SEASON, 12, 31, 23, 59, tzinfo=BRT),
+    )
 
 
 def score_value(value: Any) -> int | None:
@@ -471,8 +524,13 @@ def detect_current_stage(events: list[dict[str, Any]]) -> dict[str, Any]:
     return {"status": "sem_eventos", "ordem": 0, "nome": None, "eventos": 0, "eventos_pendentes": 0}
 
 
-def build_snapshot(spec: CompetitionSpec, raw_events: list[dict[str, Any]]) -> dict[str, Any]:
-    events = [parsed for event in raw_events if (parsed := extract_event(event, spec))]
+def build_snapshot_from_normalized(
+    spec: CompetitionSpec,
+    normalized_events: list[dict[str, Any]],
+    *,
+    collection: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    events = copy.deepcopy(normalized_events)
     events.sort(key=lambda item: (item.get("data_iso") or "", item.get("event_id") or ""))
     normalize_active_knockout_stage(events)
     team_map: dict[str, dict[str, Any]] = {}
@@ -518,9 +576,204 @@ def build_snapshot(spec: CompetitionSpec, raw_events: list[dict[str, Any]]) -> d
             "equipes": len(team_map),
             "equipes_serie_a_2026": sum(bool(team.get("serie_a_2026")) for team in team_map.values()),
         },
+        "coleta": collection or {"modo": "completa", "requisicoes": None, "ultima_completa_em": generated},
         "equipes": sorted(team_map.values(), key=lambda item: normalize_text(item.get("nome"))),
         "eventos": events,
     }
+
+
+def build_snapshot(
+    spec: CompetitionSpec,
+    raw_events: list[dict[str, Any]],
+    *,
+    collection: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    events = [parsed for event in raw_events if (parsed := extract_event(event, spec))]
+    return build_snapshot_from_normalized(spec, events, collection=collection)
+
+
+def snapshot_state_payload(snapshot: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "status": snapshot.get("status"),
+        "temporada": snapshot.get("temporada"),
+        "competicao": snapshot.get("competicao"),
+        "fase_atual": snapshot.get("fase_atual"),
+        "eventos": snapshot.get("eventos") or [],
+    }
+
+
+def snapshots_state_hash(snapshots: dict[str, dict[str, Any]]) -> str:
+    stable = {
+        key: snapshot_state_payload(snapshot)
+        for key, snapshot in sorted(snapshots.items())
+    }
+    raw = json.dumps(stable, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
+
+
+def load_existing_snapshots() -> dict[str, dict[str, Any]]:
+    result: dict[str, dict[str, Any]] = {}
+    for spec in COMPETITIONS:
+        path = DATA_DIR / spec.filename
+        if path.exists():
+            try:
+                result[spec.key] = load_json(path)
+            except Exception:  # noqa: BLE001
+                pass
+    return result
+
+
+def write_github_outputs(values: dict[str, Any]) -> None:
+    output_path = os.environ.get("GITHUB_OUTPUT")
+    if not output_path:
+        return
+    with open(output_path, "a", encoding="utf-8") as handle:
+        for key, value in values.items():
+            safe = str(value).replace("\n", " ").replace("\r", " ")
+            handle.write(f"{key}={safe}\n")
+
+
+def effective_cache_minutes(
+    snapshot: dict[str, Any] | None,
+    default_minutes: int,
+    live_minutes: int,
+    live_window_hours: int,
+) -> int:
+    if not snapshot or live_minutes >= default_minutes:
+        return default_minutes
+    now = now_brt()
+    before = timedelta(hours=2)
+    after = timedelta(hours=max(3, live_window_hours))
+    for event in snapshot.get("eventos") or []:
+        event_time = parse_datetime(event.get("data_iso"))
+        if event_time and event_time - before <= now <= event_time + after:
+            return live_minutes
+    return default_minutes
+
+
+def full_refresh_due(snapshot: dict[str, Any] | None, hours: int) -> bool:
+    if not snapshot or hours <= 0:
+        return not snapshot
+    collection = snapshot.get("coleta") or {}
+    last_full = parse_datetime(collection.get("ultima_completa_em") or snapshot.get("gerado_em"))
+    return not last_full or now_brt() - last_full >= timedelta(hours=hours)
+
+
+def incremental_snapshot(
+    spec: CompetitionSpec,
+    previous: dict[str, Any],
+    past_days: int,
+    future_days: int,
+) -> dict[str, Any]:
+    now = now_brt()
+    start = (now - timedelta(days=past_days)).replace(hour=0, minute=0, second=0, microsecond=0)
+    end = (now + timedelta(days=future_days)).replace(hour=23, minute=59, second=59, microsecond=0)
+    raw, requests = fetch_events_between(spec, start, end)
+    parsed = [item for event in raw if (item := extract_event(event, spec))]
+    if not parsed:
+        previous_in_window = [
+            item for item in (previous.get("eventos") or [])
+            if (event_time := parse_datetime(item.get("data_iso"))) is not None
+            and start <= event_time <= end
+        ]
+        if previous_in_window:
+            raise RuntimeError(
+                "janela incremental ESPN voltou vazia apesar de conter "
+                f"{len(previous_in_window)} evento(s) no snapshot anterior"
+            )
+        previous_collection = previous.get("coleta") or {}
+        return build_snapshot_from_normalized(
+            spec,
+            previous.get("eventos") or [],
+            collection={
+                "modo": "incremental_sem_eventos_na_janela",
+                "janela_inicio": start.isoformat(),
+                "janela_fim": end.isoformat(),
+                "requisicoes": requests,
+                "ultima_completa_em": previous_collection.get("ultima_completa_em") or previous.get("gerado_em"),
+            },
+        )
+    merged = {
+        str(item.get("event_id")): copy.deepcopy(item)
+        for item in (previous.get("eventos") or [])
+        if item.get("event_id")
+    }
+    for item in parsed:
+        merged[str(item["event_id"])] = item
+    previous_collection = previous.get("coleta") or {}
+    collection = {
+        "modo": "incremental",
+        "janela_inicio": start.isoformat(),
+        "janela_fim": end.isoformat(),
+        "requisicoes": requests,
+        "ultima_completa_em": previous_collection.get("ultima_completa_em") or previous.get("gerado_em"),
+    }
+    return build_snapshot_from_normalized(spec, list(merged.values()), collection=collection)
+
+
+def refreshed_snapshot(
+    spec: CompetitionSpec,
+    previous: dict[str, Any] | None,
+    *,
+    force_full: bool,
+    full_refresh_hours: int,
+    past_days: int,
+    future_days: int,
+) -> dict[str, Any]:
+    def complete_snapshot() -> dict[str, Any]:
+        raw, requests = fetch_season_events(spec)
+        candidate = build_snapshot(
+            spec,
+            raw,
+            collection={
+                "modo": "completa",
+                "requisicoes": requests,
+                "ultima_completa_em": now_brt().isoformat(),
+            },
+        )
+        if previous:
+            previous_completed = {
+                str(item.get("event_id")) for item in (previous.get("eventos") or [])
+                if item.get("concluido") and item.get("event_id")
+            }
+            candidate_completed = {
+                str(item.get("event_id")) for item in (candidate.get("eventos") or [])
+                if item.get("concluido") and item.get("event_id")
+            }
+            missing = sorted(previous_completed - candidate_completed)
+            if missing:
+                raise RuntimeError(
+                    "reconstrução completa omitiu resultados históricos já confirmados: "
+                    + ", ".join(missing[:5])
+                )
+        return candidate
+
+    if not previous:
+        return complete_snapshot()
+
+    # Uma reconstrução manual não deve depender primeiro da janela incremental:
+    # tenta a temporada completa; se a ESPN bloquear essa consulta, ainda salva
+    # a execução usando a janela recente mesclada ao último snapshot íntegro.
+    if force_full:
+        try:
+            return complete_snapshot()
+        except Exception as full_error:  # noqa: BLE001
+            incremental = incremental_snapshot(spec, previous, past_days, future_days)
+            collection = dict(incremental.get("coleta") or {})
+            collection["reconstrucao_completa_preservada_apos_falha"] = str(full_error)
+            incremental["coleta"] = collection
+            return incremental
+
+    incremental = incremental_snapshot(spec, previous, past_days, future_days)
+    if not full_refresh_due(previous, full_refresh_hours):
+        return incremental
+    try:
+        return complete_snapshot()
+    except Exception as exc:  # noqa: BLE001
+        collection = dict(incremental.get("coleta") or {})
+        collection["reconstrucao_completa_preservada_apos_falha"] = str(exc)
+        incremental["coleta"] = collection
+        return incremental
 
 
 def snapshot_is_fresh(path: Path, max_age_minutes: int) -> bool:
@@ -638,18 +891,36 @@ def migrate_legacy_snapshot(snapshot: dict[str, Any], spec: CompetitionSpec) -> 
     return migrated
 
 
-def run_update(force: bool, strict: bool, max_age_minutes: int) -> dict[str, Any]:
+def run_update(
+    force: bool,
+    strict: bool,
+    max_age_minutes: int,
+    *,
+    live_cache_minutes: int = 5,
+    live_window_hours: int = 4,
+    full_refresh_hours: int = 168,
+    force_full: bool = False,
+    past_days: int = 21,
+    future_days: int = 120,
+) -> dict[str, Any]:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
+    before_snapshots = load_existing_snapshots()
+    before_hash = snapshots_state_hash(before_snapshots)
     audit_rows: list[dict[str, Any]] = []
     failures: list[str] = []
     for spec in COMPETITIONS:
         path = DATA_DIR / spec.filename
+        previous: dict[str, Any] | None = None
         if path.exists():
             previous = load_json(path)
             migrated = migrate_legacy_snapshot(previous, spec)
             if migrated is not None:
                 write_json_atomic(path, migrated)
-        if not force and snapshot_is_fresh(path, max_age_minutes):
+                previous = migrated
+        cache_minutes = effective_cache_minutes(
+            previous, max_age_minutes, live_cache_minutes, live_window_hours
+        )
+        if not force and snapshot_is_fresh(path, cache_minutes):
             previous = load_json(path)
             audit_rows.append(
                 {
@@ -657,13 +928,21 @@ def run_update(force: bool, strict: bool, max_age_minutes: int) -> dict[str, Any
                     "status": "cache_valido",
                     "arquivo": str(path.relative_to(ROOT)),
                     "gerado_em": previous.get("gerado_em"),
+                    "cache_efetivo_minutos": cache_minutes,
                     "eventos": (previous.get("resumo") or {}).get("eventos", 0),
+                    "coleta": previous.get("coleta") or {},
                 }
             )
             continue
         try:
-            raw_events = fetch_season_events(spec)
-            snapshot = build_snapshot(spec, raw_events)
+            snapshot = refreshed_snapshot(
+                spec,
+                previous,
+                force_full=force_full,
+                full_refresh_hours=full_refresh_hours,
+                past_days=past_days,
+                future_days=future_days,
+            )
             validate_snapshot(snapshot, spec)
             if snapshot.get("status") != "ok":
                 raise ValueError("ESPN não retornou eventos normalizáveis")
@@ -674,10 +953,12 @@ def run_update(force: bool, strict: bool, max_age_minutes: int) -> dict[str, Any
                     "status": "atualizado",
                     "arquivo": str(path.relative_to(ROOT)),
                     "gerado_em": snapshot.get("gerado_em"),
+                    "cache_efetivo_minutos": cache_minutes,
                     "eventos": snapshot["resumo"]["eventos"],
                     "finalizados": snapshot["resumo"]["finalizados"],
                     "pendentes": snapshot["resumo"]["pendentes"],
                     "fase_atual": snapshot.get("fase_atual"),
+                    "coleta": snapshot.get("coleta") or {},
                 }
             )
         except Exception as exc:  # noqa: BLE001
@@ -685,8 +966,7 @@ def run_update(force: bool, strict: bool, max_age_minutes: int) -> dict[str, Any
             failures.append(message)
             previous = load_json(path) if path.exists() else None
             previous_compatible = bool(
-                previous
-                and int(previous.get("schema_version") or 0) == SNAPSHOT_SCHEMA_VERSION
+                previous and int(previous.get("schema_version") or 0) == SNAPSHOT_SCHEMA_VERSION
             )
             if strict or not previous_compatible:
                 raise RuntimeError(message) from exc
@@ -696,26 +976,51 @@ def run_update(force: bool, strict: bool, max_age_minutes: int) -> dict[str, Any
                     "status": "preservado_apos_falha",
                     "arquivo": str(path.relative_to(ROOT)),
                     "gerado_em": previous.get("gerado_em"),
+                    "cache_efetivo_minutos": cache_minutes,
                     "erro": message,
                 }
             )
+    after_snapshots = load_existing_snapshots()
+    after_hash = snapshots_state_hash(after_snapshots)
+    ready = not failures and len(after_snapshots) == len(COMPETITIONS) and all(
+        snapshot.get("status") == "ok" for snapshot in after_snapshots.values()
+    )
     audit = {
-        "schema_version": 1,
+        "schema_version": 2,
         "projeto": "AF-Previsão Continental",
-        "etapa": "Execução 2.5 — coleta das competições que alteram vagas",
+        "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
         "gerado_em": now_brt().isoformat(),
-        "status": "ok" if not failures else "parcial_com_snapshot_preservado",
+        "status": "ok" if ready else "parcial_com_snapshot_preservado",
+        "coleta_confiavel": ready,
+        "mudanca_esportiva": before_hash != after_hash,
+        "hash_estado_antes": before_hash,
+        "hash_estado_depois": after_hash,
         "fonte": "ESPN",
         "temporada": SEASON,
         "competicoes": audit_rows,
         "falhas": failures,
         "regras_operacionais": {
-            "cache_minutos": max_age_minutes,
+            "cache_padrao_minutos": max_age_minutes,
+            "cache_janela_de_jogo_minutos": live_cache_minutes,
+            "janela_de_jogo_horas_apos_inicio": live_window_hours,
+            "janela_incremental_dias_passado": past_days,
+            "janela_incremental_dias_futuro": future_days,
+            "reconstrucao_completa_horas": full_refresh_hours,
             "falha_de_rede": "preserva o último snapshot íntegro; --strict transforma a falha em erro",
             "nenhum_json_vazio": True,
         },
     }
     write_json_atomic(AUDIT_PATH, audit)
+    write_github_outputs(
+        {
+            "continental_ready": str(ready).lower(),
+            "continental_changed": str(before_hash != after_hash).lower(),
+            "continental_status": audit["status"],
+            "continental_hash_before": before_hash,
+            "continental_hash_after": after_hash,
+            "continental_failures": " | ".join(failures),
+        }
+    )
     return audit
 
 
@@ -819,20 +1124,61 @@ def self_test() -> None:
     assert rebuilt["ordem"] == 600
     assert rebuilt["eventos"] == 16
     assert rebuilt["eventos_pendentes"] == 6
-    print("Self-test coleta AF-Previsão Continental: OK")
+
+    now = now_brt()
+    live_snapshot = build_snapshot_from_normalized(
+        spec,
+        [{
+            **parsed,
+            "event_id": "live-cache",
+            "data_iso": (now - timedelta(hours=1)).isoformat(),
+            "concluido": False,
+            "estado": "in",
+        }],
+    )
+    assert effective_cache_minutes(live_snapshot, 45, 5, 4) == 5
+    old_snapshot = copy.deepcopy(live_snapshot)
+    old_snapshot["eventos"][0]["data_iso"] = (now - timedelta(days=2)).isoformat()
+    assert effective_cache_minutes(old_snapshot, 45, 5, 4) == 45
+    merged_snapshot = build_snapshot_from_normalized(
+        spec, [parsed], collection={"modo": "incremental", "ultima_completa_em": now.isoformat()}
+    )
+    assert merged_snapshot["coleta"]["modo"] == "incremental"
+    stable_a = snapshots_state_hash({spec.key: merged_snapshot})
+    changed_timestamp = copy.deepcopy(merged_snapshot)
+    changed_timestamp["gerado_em"] = (now + timedelta(minutes=1)).isoformat()
+    stable_b = snapshots_state_hash({spec.key: changed_timestamp})
+    assert stable_a == stable_b
+    print("Self-test coleta AF-Previsão Continental incremental: OK")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--force", action="store_true", help="ignora cache e consulta a ESPN")
+    parser.add_argument("--full", action="store_true", help="força reconstrução completa da temporada após a janela incremental")
     parser.add_argument("--strict", action="store_true", help="falha se qualquer competição não atualizar")
     parser.add_argument("--max-age-minutes", type=int, default=45)
+    parser.add_argument("--live-cache-minutes", type=int, default=5)
+    parser.add_argument("--live-window-hours", type=int, default=4)
+    parser.add_argument("--full-refresh-hours", type=int, default=168)
+    parser.add_argument("--past-days", type=int, default=21)
+    parser.add_argument("--future-days", type=int, default=120)
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     if args.self_test:
         self_test()
         return 0
-    audit = run_update(args.force, args.strict, args.max_age_minutes)
+    audit = run_update(
+        args.force,
+        args.strict,
+        args.max_age_minutes,
+        live_cache_minutes=args.live_cache_minutes,
+        live_window_hours=args.live_window_hours,
+        full_refresh_hours=args.full_refresh_hours,
+        force_full=args.full,
+        past_days=args.past_days,
+        future_days=args.future_days,
+    )
     print(
         "Competições AF-Previsão atualizadas: "
         + ", ".join(f"{row['competicao']}={row['status']}" for row in audit["competicoes"])

@@ -1353,37 +1353,39 @@
   // Declara ao leitor a idade dos percentuais, logo abaixo da chamada da seção,
   // dentro da coluna direita do cabeçalho (.probability-head-aside).
   function probabilityCalcNote() {
-    const gerado = state.probabilities?.gerado_em;
-    if (!gerado) return "";
-    const quando = dateTimeBR(gerado);
-    if (!quando || quando === "—") return "";
+    const calculado = state.probabilities?.calculado_em;
+    const referencia = state.probabilities?.gerado_em;
+    const horario = dateTimeBR(calculado || referencia);
+    if (!horario || horario === "—") return "";
 
-    // A data sozinha é ambígua: um cálculo de ontem pode estar perfeitamente
-    // em dia (nenhum jogo terminou desde então) ou atrasado. Quem lê não tem
-    // como saber. A comparação abaixo responde isso: quantos jogos já foram
-    // disputados contra quantos o último cálculo levou em conta.
     const disputados = Array.isArray(state.results?.resultados)
       ? state.results.resultados.length
       : null;
     const considerados = Number(state.probabilities?.base_corrente?.partidas_concluidas);
+    const possuiContagem = disputados !== null && Number.isFinite(considerados);
+    const pendentes = possuiContagem ? Math.max(0, disputados - considerados) : 0;
 
-    let situacao = "";
-    if (disputados !== null && Number.isFinite(considerados)) {
-      const pendentes = disputados - considerados;
-      if (pendentes <= 0) {
-        situacao = ` · em dia com os ${integer(disputados)} jogos disputados`;
-      } else {
-        situacao = ` · ${integer(pendentes)} ${pendentes === 1 ? "jogo aguarda" : "jogos aguardam"} recálculo`;
-      }
+    const coverageRows = state.probabilities?.integracao_continental?.cobertura?.competicoes;
+    const chavesCobertas = new Set(
+      Array.isArray(coverageRows) ? coverageRows.map((item) => String(item?.chave || "")) : []
+    );
+    const copasConfirmadas = ["copa_do_brasil", "libertadores", "sul_americana"]
+      .every((chave) => chavesCobertas.has(chave));
+    const baseCopas = copasConfirmadas
+      ? "o estado mais recente da Copa do Brasil, da Libertadores e da Sul-Americana"
+      : "as bases continentais disponíveis no último cálculo";
+
+    if (possuiContagem && pendentes > 0) {
+      const palavra = pendentes === 1 ? "jogo aguarda" : "jogos aguardam";
+      return `<small>Último cálculo em ${escapeHtml(horario)} · considera ${integer(considerados)} de ${integer(disputados)} resultados do Brasileirão e ${escapeHtml(baseCopas)}; ${integer(pendentes)} ${palavra} recálculo.</small>`;
     }
 
-    const calculado = state.probabilities?.calculado_em;
-    if (calculado) {
-      const execucao = dateTimeBR(calculado);
-      return `<small>Calculado em ${escapeHtml(execucao)} · base esportiva até ${escapeHtml(quando + situacao)}</small>`;
-    }
-    return `<small>Base esportiva das probabilidades: ${escapeHtml(quando + situacao)}</small>`;
+    const baseBrasileirao = Number.isFinite(considerados)
+      ? `todos os ${integer(considerados)} resultados do Brasileirão`
+      : "todos os resultados disponíveis do Brasileirão";
+    return `<small>Atualizado em ${escapeHtml(horario)}, considerando ${escapeHtml(baseBrasileirao)} e ${escapeHtml(baseCopas)}.</small>`;
   }
+
 
   function renderProbabilityRanking() {
     const target = $("probabilidades-ranking");

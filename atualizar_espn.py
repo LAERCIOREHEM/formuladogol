@@ -21,7 +21,8 @@ Regras de segurança:
      íntegro sem publicar arquivos parciais.
   4. Nenhum arquivo de copa2026/ é lido ou alterado.
 
-Só usa biblioteca padrão, para rodar direto no GitHub Actions.
+Usa a biblioteca padrão e, quando disponível, curl-cffi com fingerprint de
+navegador para reduzir bloqueios HTTP em runners compartilhados do GitHub Actions.
 """
 
 from __future__ import annotations
@@ -185,23 +186,59 @@ def info_time(nome: str) -> dict[str, str]:
 
 
 def fetch_json(url: str, timeout: int = 25, tentativas: int = 3) -> dict[str, Any]:
+    """Busca JSON com dois clientes HTTP e fingerprint real de navegador.
+
+    A ESPN ocasionalmente responde 403 ao ``urllib`` em runners compartilhados do
+    GitHub Actions. O projeto já instala ``curl-cffi`` para outras coletas; ele é
+    tentado primeiro com impersonação de Chrome e o ``urllib`` permanece como
+    fallback independente. Uma resposta só é aceita quando a raiz é um objeto.
+    """
     ultimo: Exception | None = None
     for i in range(1, tentativas + 1):
+        sep = "&" if "?" in url else "?"
+        cache_url = f"{url}{sep}_={int(time.time())}"
+        erros: list[str] = []
+
         try:
-            sep = "&" if "?" in url else "?"
-            req = urllib.request.Request(
-                f"{url}{sep}_={int(time.time())}",
-                headers=HEADERS,
+            from curl_cffi import requests as curl_requests  # type: ignore
+
+            response = curl_requests.get(
+                cache_url,
+                impersonate="chrome",
+                timeout=timeout + 8 * (i - 1),
+                headers={
+                    "Accept": HEADERS["Accept"],
+                    "Accept-Language": HEADERS["Accept-Language"],
+                    "Cache-Control": HEADERS["Cache-Control"],
+                },
             )
+            response.raise_for_status()
+            data = response.json()
+            if not isinstance(data, dict):
+                raise ValueError("resposta ESPN sem objeto JSON na raiz")
+            return data
+        except ImportError:
+            pass
+        except Exception as exc:  # noqa: BLE001
+            erros.append(f"curl_cffi={type(exc).__name__}: {exc}")
+            ultimo = exc
+
+        try:
+            req = urllib.request.Request(cache_url, headers=HEADERS)
             with urllib.request.urlopen(req, timeout=timeout + 10 * (i - 1)) as r:
                 charset = r.headers.get_content_charset() or "utf-8"
                 bruto = r.read().decode(charset, errors="replace")
-                return json.loads(bruto)
-        except Exception as e:  # noqa: BLE001
-            ultimo = e
-            print(f"  tentativa {i}/{tentativas} falhou: {type(e).__name__}: {e}")
+            data = json.loads(bruto)
+            if not isinstance(data, dict):
+                raise ValueError("resposta ESPN sem objeto JSON na raiz")
+            return data
+        except Exception as exc:  # noqa: BLE001
+            erros.append(f"urllib={type(exc).__name__}: {exc}")
+            ultimo = RuntimeError(" | ".join(erros))
+            print(f"  tentativa {i}/{tentativas} falhou: {ultimo}")
             if i < tentativas:
                 time.sleep(2 * i)
+
     raise RuntimeError(f"falha ao buscar JSON: {url} :: {ultimo}")
 
 
@@ -373,26 +410,192 @@ def datas_url(inicio: datetime, fim: datetime) -> str:
     return f"{inicio.strftime('%Y%m%d')}-{fim.strftime('%Y%m%d')}"
 
 
+def _scoreboard_range(inicio: datetime, fim: datetime, *, tentativas: int = 2) -> list[dict[str, Any]]:
+    url = (
+        f"{URL_SCOREBOARD}?dates={datas_url(inicio, fim)}&limit=250"
+        "&lang=pt&region=br"
+    )
+    print(f"Fonte: {url}")
+    payload = fetch_json(url, timeout=25, tentativas=tentativas)
+    return [item for item in (payload.get("events") or []) if isinstance(item, dict)]
+
+
+def _restaurar_evento_normalizado(item: dict[str, Any]) -> dict[str, Any] | None:
+    data_dt = parse_iso_brt(item.get("data_iso"))
+    mandante = para_canonico(item.get("mandante"))
+    visitante = para_canonico(item.get("visitante"))
+    if not data_dt or not mandante or not visitante or not item.get("event_id"):
+        return None
+    restored = {
+        "event_id": str(item.get("event_id")),
+        "rodada": int(item.get("rodada") or 0),
+        "data_dt": data_dt,
+        "data_iso": data_dt.strftime("%Y-%m-%dT%H:%M"),
+        "mandante_nome": mandante,
+        "visitante_nome": visitante,
+        "mandante": info_time(mandante),
+        "visitante": info_time(visitante),
+        "estadio": str(item.get("estadio") or ""),
+        "transmissao": str(item.get("transmissao") or ""),
+        "status": str(item.get("status") or ""),
+        "estado": str(item.get("estado") or "pre"),
+        "concluido": bool(item.get("concluido") is True),
+        "adiado": bool(item.get("adiado") is True),
+        "data_definir": bool(item.get("data_definir") is True),
+        "placar_mandante": item.get("placar_mandante"),
+        "placar_visitante": item.get("placar_visitante"),
+        "finalizado_em": str(item.get("finalizado_em") or ""),
+        "rodada_corrigida_de": item.get("rodada_corrigida_de"),
+        "motivo_ajuste": str(item.get("motivo_ajuste") or ""),
+        "resultado_manual": bool(item.get("resultado_manual") is True),
+        "resultado_fallback": bool(item.get("resultado_fallback") is True),
+        "fonte_resultado": str(item.get("fonte_resultado") or "ESPN"),
+        "origem_resultado": str(item.get("origem_resultado") or ""),
+        "motivo_fallback": str(item.get("motivo_fallback") or ""),
+        "motivo_resultado_manual": str(item.get("motivo_resultado_manual") or ""),
+        "_sort": data_dt.timestamp(),
+    }
+    return restored
+
+
+def carregar_eventos_normalizados_anteriores() -> list[dict[str, Any]]:
+    path = Path("espn_eventos.json")
+    if not path.exists():
+        return []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return []
+    restored = [
+        event for item in (payload.get("eventos") or [])
+        if isinstance(item, dict) and (event := _restaurar_evento_normalizado(item))
+    ]
+    restored.sort(key=lambda item: item["_sort"])
+    return restored
+
+
+def _scoreboard_anual_util(
+    eventos: list[dict[str, Any]], anteriores: list[dict[str, Any]]
+) -> tuple[bool, str]:
+    if len(eventos) < 20:
+        return False, f"consulta anual retornou somente {len(eventos)} eventos"
+    ids_finalizados_anteriores = {
+        str(item.get("event_id")) for item in anteriores
+        if item.get("concluido") and item.get("event_id")
+    }
+    ids_finalizados_novos = {
+        str(item.get("event_id")) for item in eventos
+        if item.get("concluido") and item.get("event_id")
+    }
+    missing = sorted(ids_finalizados_anteriores - ids_finalizados_novos)
+    if missing:
+        return False, (
+            "consulta anual omitiu resultados históricos já confirmados: "
+            + ", ".join(missing[:5])
+        )
+    if len(ids_finalizados_novos) < len(ids_finalizados_anteriores):
+        return False, (
+            "consulta anual regrediu a quantidade de resultados "
+            f"({len(ids_finalizados_novos)}/{len(ids_finalizados_anteriores)})"
+        )
+    return True, "consulta anual íntegra"
+
+
+def _mesclar_eventos_normalizados(
+    anteriores: list[dict[str, Any]], novos: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    merged = {str(item.get("event_id")): copy.deepcopy(item) for item in anteriores if item.get("event_id")}
+    for item in novos:
+        event_id = str(item.get("event_id") or "")
+        if event_id:
+            merged[event_id] = item
+    events = sorted(merged.values(), key=lambda item: item.get("_sort") or 0)
+    inferir_rodadas_faltantes(events)
+    aplicar_ajustes_calendario(events)
+    return sanear_eventos_por_rodada(events)
+
+
 def buscar_eventos_scoreboard() -> list[dict[str, Any]]:
-    print("== EVENTOS/JOGOS/RESULTADOS (ESPN scoreboard) ==")
-    inicio, fim = periodo_temporada()
-    eventos_por_id: dict[str, dict[str, Any]] = {}
-    cursor = inicio
-    while cursor <= fim:
-        proximo = min(cursor + timedelta(days=27), fim)
-        url = f"{URL_SCOREBOARD}?dates={datas_url(cursor, proximo)}&limit=200"
-        print(f"Fonte: {url}")
-        data = fetch_json(url, timeout=25, tentativas=2)
-        for ev in data.get("events") or []:
-            eid = str(ev.get("id") or "")
-            if eid:
-                eventos_por_id[eid] = ev
-        cursor = proximo + timedelta(days=1)
-    eventos = list(eventos_por_id.values())
-    print(f"Eventos brutos encontrados na temporada: {len(eventos)}")
-    if not eventos:
-        raise RuntimeError("A ESPN não retornou eventos para a temporada; mantendo JSONs anteriores.")
-    return eventos
+    """Obtém o scoreboard com uma consulta anual e fallback incremental.
+
+    A consulta anual reduz a carga normal de cerca de dez requisições para uma.
+    Se ela estiver bloqueada ou incompleta, a janela crítica (resultados recentes
+    e próximos jogos) é consultada primeiro e mesclada ao último snapshot íntegro.
+    Assim uma falha em janeiro nunca impede a captura de um resultado de agosto.
+    """
+    print("== EVENTOS/JOGOS/RESULTADOS (ESPN scoreboard otimizado) ==")
+    anteriores = carregar_eventos_normalizados_anteriores()
+
+    season_start = datetime(TEMPORADA, 1, 1, tzinfo=timezone.utc)
+    season_end = datetime(TEMPORADA, 12, 31, 23, 59, tzinfo=timezone.utc)
+    annual_url = (
+        f"{URL_SCOREBOARD}?dates={datas_url(season_start, season_end)}"
+        "&limit=500&lang=pt&region=br"
+    )
+    try:
+        print(f"Fonte anual prioritária: {annual_url}")
+        annual_payload = fetch_json(annual_url, timeout=30, tentativas=2)
+        annual_raw = [item for item in (annual_payload.get("events") or []) if isinstance(item, dict)]
+        annual = normalizar_eventos_scoreboard(annual_raw)
+        usable, reason = _scoreboard_anual_util(annual, anteriores)
+        if usable:
+            print(f"Scoreboard anual aceito: {len(annual)} eventos — {reason}.")
+            return annual
+        print(f"::warning::Scoreboard anual rejeitado: {reason}. Usando coleta incremental.")
+    except Exception as exc:  # noqa: BLE001
+        print(f"::warning::Scoreboard anual indisponível: {type(exc).__name__}: {exc}")
+
+    if not anteriores:
+        # Primeira implantação: sem base local não existe mesclagem segura.
+        inicio, fim = periodo_temporada()
+        raw: list[dict[str, Any]] = []
+        cursor = inicio
+        while cursor <= fim:
+            upper = min(cursor + timedelta(days=27), fim)
+            raw.extend(_scoreboard_range(cursor, upper, tentativas=2))
+            cursor = upper + timedelta(days=1)
+        normalized = normalizar_eventos_scoreboard(raw)
+        if not normalized:
+            raise RuntimeError("A ESPN não retornou eventos e não existe snapshot anterior.")
+        return normalized
+
+    agora = agora_brt()
+    critical_start = (agora - timedelta(days=10)).replace(hour=0, minute=0, second=0, microsecond=0)
+    critical_end = (agora + timedelta(days=21)).replace(hour=23, minute=59, second=59, microsecond=0)
+    raw_by_id: dict[str, dict[str, Any]] = {}
+
+    # A janela crítica é obrigatória: contém jogos recém-encerrados e os próximos.
+    for item in _scoreboard_range(critical_start, critical_end, tentativas=3):
+        event_id = str(item.get("id") or "")
+        if event_id:
+            raw_by_id[event_id] = item
+
+    # Janelas auxiliares ampliam a agenda. Falha nelas não invalida os resultados
+    # recentes porque o histórico íntegro já está preservado localmente.
+    optional_ranges = [
+        (agora - timedelta(days=45), critical_start - timedelta(seconds=1), "passado complementar"),
+        (critical_end + timedelta(seconds=1), agora + timedelta(days=75), "futuro complementar"),
+    ]
+    for start, end, label in optional_ranges:
+        if start > end:
+            continue
+        try:
+            for item in _scoreboard_range(start, end, tentativas=1):
+                event_id = str(item.get("id") or "")
+                if event_id:
+                    raw_by_id[event_id] = item
+        except Exception as exc:  # noqa: BLE001
+            print(f"::warning::Janela {label} preservada do snapshot anterior: {exc}")
+
+    novos = normalizar_eventos_scoreboard(list(raw_by_id.values()))
+    if not novos:
+        raise RuntimeError("A janela crítica da ESPN não retornou eventos normalizáveis.")
+    merged = _mesclar_eventos_normalizados(anteriores, novos)
+    print(
+        "Scoreboard incremental mesclado: "
+        f"{len(novos)} eventos renovados, {len(merged)} eventos totais preservados."
+    )
+    return merged
 
 
 def primeira_competicao(ev: dict[str, Any]) -> dict[str, Any]:
@@ -1923,7 +2126,35 @@ def selftest_execucao_6() -> None:
     assert _eventos_candidatos_fallback(
         [final_espn], divergencias_times, permitir_finalizados_espn=True
     ) == [final_espn]
-    print("Selftest Execução 6 e sincronização cruzada OK")
+
+    # Regressão do coletor incremental: o evento renovado substitui o anterior,
+    # enquanto resultados históricos fora da janela continuam presentes.
+    antigo = {
+        "event_id": "A", "rodada": 1, "data_dt": agora_teste - timedelta(days=30),
+        "data_iso": (agora_teste - timedelta(days=30)).strftime("%Y-%m-%dT%H:%M"),
+        "mandante_nome": "Bahia", "visitante_nome": "Vitória",
+        "mandante": info_time("Bahia"), "visitante": info_time("Vitória"),
+        "estadio": "", "transmissao": "", "status": "Final",
+        "estado": "post", "concluido": True, "adiado": False,
+        "placar_mandante": 1, "placar_visitante": 0, "_sort": (agora_teste - timedelta(days=30)).timestamp(),
+    }
+    pendente = {
+        "event_id": "B", "rodada": 2, "data_dt": agora_teste,
+        "data_iso": agora_teste.strftime("%Y-%m-%dT%H:%M"),
+        "mandante_nome": "Santos", "visitante_nome": "Remo",
+        "mandante": info_time("Santos"), "visitante": info_time("Remo"),
+        "estadio": "", "transmissao": "", "status": "Agendado",
+        "estado": "pre", "concluido": False, "adiado": False,
+        "placar_mandante": None, "placar_visitante": None, "_sort": agora_teste.timestamp(),
+    }
+    encerrado = dict(pendente, status="Final", estado="post", concluido=True, placar_mandante=2, placar_visitante=0)
+    merged_test = _mesclar_eventos_normalizados([antigo, pendente], [encerrado])
+    merged_map = {item["event_id"]: item for item in merged_test}
+    assert merged_map["A"]["placar_mandante"] == 1
+    assert merged_map["B"]["concluido"] is True and merged_map["B"]["placar_mandante"] == 2
+    usable, _ = _scoreboard_anual_util([antigo, encerrado] * 10, [antigo])
+    assert usable is True
+    print("Selftest Execução 6, HTTP resiliente e coleta incremental OK")
 
 
 def main() -> None:
@@ -1935,8 +2166,7 @@ def main() -> None:
         try:
             tabela = gerar_tabela()
             validar_contra_ranking(tabela)
-            eventos_brutos = buscar_eventos_scoreboard()
-            eventos_normalizados = normalizar_eventos_scoreboard(eventos_brutos)
+            eventos_normalizados = buscar_eventos_scoreboard()
             aplicar_transmissoes_manuais(eventos_normalizados)
             if not eventos_normalizados:
                 raise RuntimeError("Nenhum evento ESPN foi normalizado; mantendo snapshot anterior.")
