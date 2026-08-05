@@ -414,6 +414,62 @@ def penalties_winner(
     return np.where(rng.random(team_a_ids.shape) < probability_a, team_a_ids, team_b_ids)
 
 
+def completed_tie_winner(tie: Tie) -> str | None:
+    """Retorna o vencedor factual de uma chave já encerrada.
+
+    A função é deliberadamente determinística: ela não usa a amostra Monte
+    Carlo para decidir se um clube ainda está vivo. Isso evita comunicar uma
+    chance residual para equipes já eliminadas quando a ESPN ainda não publicou
+    os confrontos da fase seguinte.
+    """
+    if not tie.events or not all(event.completed for event in tie.events):
+        return None
+
+    aggregate_a = 0
+    aggregate_b = 0
+    fixed_winner: str | None = None
+    for event in tie.events:
+        if event.home_goals is None or event.away_goals is None:
+            raise ContinentalDataNotReady(f"{tie.key}: partida concluída sem placar")
+        home_is_a = event.home.name == tie.team_a
+        if home_is_a:
+            aggregate_a += event.home_goals
+            aggregate_b += event.away_goals
+        else:
+            aggregate_a += event.away_goals
+            aggregate_b += event.home_goals
+        if event.penalties and event.winner:
+            fixed_winner = event.winner
+
+    if aggregate_a > aggregate_b:
+        return tie.team_a
+    if aggregate_b > aggregate_a:
+        return tie.team_b
+    if fixed_winner in {tie.team_a, tie.team_b}:
+        return fixed_winner
+    raise ContinentalDataNotReady(
+        f"{tie.key}: confronto concluído e empatado no agregado sem vencedor dos pênaltis"
+    )
+
+
+def structurally_active_teams(ties: Sequence[Tie]) -> tuple[str, ...]:
+    """Lista clubes que ainda podem conquistar o torneio.
+
+    Em chaves encerradas, somente o vencedor permanece elegível. Em chaves com
+    ao menos uma partida pendente, ambos continuam estruturalmente possíveis.
+    O resultado independe de o sorteio da fase seguinte já ter sido publicado.
+    """
+    active: set[str] = set()
+    for tie in ties:
+        winner = completed_tie_winner(tie)
+        if winner is not None:
+            active.add(winner)
+        else:
+            active.add(tie.team_a)
+            active.add(tie.team_b)
+    return tuple(sorted(active, key=normalize_text))
+
+
 def simulate_current_tie(
     tie: Tie,
     team_index: Mapping[str, int],
@@ -617,6 +673,13 @@ def simulate_competition(
             f"{competition}: fase atual inconsistente ({len(participants)} equipes, {len(ties)} chaves)"
         )
 
+    # A fase seguinte pode ainda não existir no feed da ESPN. Nesse intervalo,
+    # `participants` contém também os derrotados das chaves já encerradas. A
+    # elegibilidade estrutural precisa refletir os vencedores confirmados, não
+    # todos os nomes que participaram da fase corrente.
+    active_teams = structurally_active_teams(ties)
+    active_team_names = frozenset(normalize_text(name) for name in active_teams)
+
     model = fit_cup_model(
         events,
         league_model,
@@ -659,7 +722,7 @@ def simulate_competition(
             competition=competition,
             team_names=tuple(all_teams),
             brazilian_team_names=brazilian_team_names,
-            eligible_team_names=frozenset(normalize_text(name) for name in participants),
+            eligible_team_names=active_team_names,
             champion_ids=champion,
             runner_up_ids=runner_up,
             audit={
@@ -667,7 +730,8 @@ def simulate_competition(
                 "fase_atual": stage,
                 "fase_ordem": rank,
                 "chaves_atuais": 1,
-                "equipes_ativas": 2,
+                "equipes_ativas": len(active_teams),
+                "clubes_ativos": list(active_teams),
                 "rodadas_simuladas_tamanhos": [1],
                 "pareamento_futuro": "não aplicável",
                 "partidas_concluidas_no_ajuste": model["matches"],
@@ -714,7 +778,7 @@ def simulate_competition(
         competition=competition,
         team_names=tuple(all_teams),
         brazilian_team_names=brazilian_team_names,
-        eligible_team_names=frozenset(normalize_text(name) for name in participants),
+        eligible_team_names=active_team_names,
         champion_ids=champion,
         runner_up_ids=runner_up,
         audit={
@@ -722,7 +786,8 @@ def simulate_competition(
             "fase_atual": stage,
             "fase_ordem": rank,
             "chaves_atuais": len(ties),
-            "equipes_ativas": len(participants),
+            "equipes_ativas": len(active_teams),
+            "clubes_ativos": list(active_teams),
             "rodadas_simuladas_tamanhos": round_sizes,
             "pareamento_futuro": str(meta.get("pareamento_apos_fase_atual") or "chave"),
             "partidas_concluidas_no_ajuste": model["matches"],
@@ -1239,6 +1304,38 @@ def self_test() -> None:
     assert len(mixed_ties) == 8
     assert len(mixed_participants) == 16
 
+    # Regressão: enquanto a ESPN ainda não publicou as quartas, uma equipe já
+    # eliminada nas oitavas não pode permanecer estruturalmente elegível. O
+    # vencedor confirmado segue vivo; os dois clubes das demais chaves ainda
+    # pendentes continuam possíveis.
+    partial_copa = snapshot("copa_do_brasil", [*teams[:8]], stage="Oitavas de final")
+    first_tie = [
+        event for event in partial_copa["eventos"]
+        if event["event_id"].startswith("copa_do_brasil-0-")
+    ]
+    first_tie.sort(key=lambda event: event["event_id"])
+    first_tie[0]["concluido"] = True
+    first_tie[0]["estado"] = "post"
+    first_tie[0]["mandante"]["placar"] = 0
+    first_tie[0]["visitante"]["placar"] = 0
+    first_tie[1]["concluido"] = True
+    first_tie[1]["estado"] = "post"
+    first_tie[1]["mandante"]["placar"] = 0
+    first_tie[1]["visitante"]["placar"] = 1
+    first_tie[1]["vencedor"] = teams[0]
+
+    partial_simulations = 2_000
+    partial_cup = simulate_competition(
+        partial_copa, league_model, teams, partial_simulations, 991, {
+            "desvio_prior_copas": 0.65,
+            "meia_vida_copas_dias": 240,
+            "peso_modelo_brasileirao_para_serie_a": 0.65,
+        }
+    )
+    assert normalize_text(teams[0]) in partial_cup.eligible_team_names
+    assert normalize_text(teams[1]) not in partial_cup.eligible_team_names
+    assert int(partial_cup.audit["equipes_ativas"]) == 7
+
     simulations = 10_000
     # Ordem fixa: Clube 00 em primeiro, Clube 19 em último.
     order = np.broadcast_to(np.arange(20, dtype=np.int16), (simulations, 20)).copy()
@@ -1252,6 +1349,27 @@ def self_test() -> None:
         "rebaixamento_a_partir_da_posicao": 17,
         "limiar_exibicao_percentual": 0.001,
     }
+    partial_order = np.broadcast_to(
+        np.arange(20, dtype=np.int16), (partial_simulations, 20)
+    ).copy()
+    partial_lib = simulate_competition(
+        snapshots["libertadores"], league_model, teams, partial_simulations, 992, config
+    )
+    partial_sula = simulate_competition(
+        snapshots["sul_americana"], league_model, teams, partial_simulations, 993, config
+    )
+    partial_allocated = allocate_integrated_qualification(
+        partial_order, teams, partial_cup, partial_lib, partial_sula,
+        partial_simulations, config,
+    )
+    eliminated_cup = partial_allocated["clubes"][teams[1]]["libertadores"]
+    assert eliminated_cup["vias"]["via_copa_do_brasil"]["exibicao"] == "0%"
+    assert eliminated_cup["vias"]["via_copa_do_brasil"]["impossivel_estruturalmente"] is True
+    assert all(
+        detail["exibicao"] == "0%" and detail["impossivel_estruturalmente"] is True
+        for detail in eliminated_cup["subvias_copa_do_brasil"].values()
+    )
+
     result_a = integrate_continental_probabilities(
         snapshots, league_model, order, teams, simulations, 1234, config
     )
