@@ -64,6 +64,7 @@ on:
       - 'Atualizar Elencos Brasileirao (ESPN)'
       - 'Revisar melhores momentos Brasileirão oficiais'
       - 'Publicar análise editorial da rodada'
+      - 'Publicar análise editorial da Copa do Brasil'
     types: [completed]
 
 permissions:
@@ -170,6 +171,7 @@ jobs:
             dados-br/elencos.json
             dados-br/estatisticas-competicao.json
             dados-br/historico-probabilidades.json
+            dados-br/historico-probabilidades-continentais.json
             dados-br/historico-ranking-desempenho.json
             dados-br/jogos-detalhes.json
             dados-br/lideres-jogadores.json
@@ -726,8 +728,29 @@ jobs:
                   assert target.exists(), f"{page_name}: referência local quebrada: {raw}"
           for artigo in artigos_analises:
               text = (site / "analises" / artigo["slug"]).read_text(encoding="utf-8")
+              identificador = str(artigo.get("id_editorial") or "")
+              if not identificador and artigo.get("rodada"):
+                  identificador = f'brasileirao-2026-rodada-{int(artigo["rodada"])}'
+              assert identificador, f"{artigo['slug']}: id editorial ausente"
               assert '"@type":"NewsArticle"' in text, f"{artigo['slug']}: NewsArticle ausente"
-              assert f'data-fdg-analise-rodada="{artigo["rodada"]}"' in text, f"{artigo['slug']}: marcador editorial ausente"
+              assert f'data-fdg-editorial-id="{identificador}"' in text, f"{artigo['slug']}: marcador editorial genérico ausente"
+              tipo = str(artigo.get("tipo") or "")
+              if tipo == "brasileirao_rodada":
+                  rodada = int(artigo.get("rodada") or 0)
+                  assert rodada and f'data-fdg-analise-rodada="{rodada}"' in text, f"{artigo['slug']}: marcador de rodada ausente"
+                  assert text.count('class="analysis-game-card"') == int(artigo.get("jogos_concluidos") or 0), f"{artigo['slug']}: jogos divergentes"
+              elif tipo == "copa_do_brasil_fase":
+                  assert int(artigo.get("confrontos") or 0) == 8, f"{artigo['slug']}: confrontos divergentes"
+                  assert len(artigo.get("classificados") or []) == 8, f"{artigo['slug']}: classificados incompletos"
+                  assert text.count('class="analysis-cup-tie"') == 8, f"{artigo['slug']}: cards de confronto divergentes"
+                  assert text.count('class="analysis-status ') == 14, f"{artigo['slug']}: comparativo da Série A divergente"
+                  assert "Os confrontos das quartas dependerão do sorteio" in text, f"{artigo['slug']}: ressalva do sorteio ausente"
+                  assert "Tabela do Brasileirão" not in text and "analysis-kpis" not in text, f"{artigo['slug']}: layout incorreto"
+              else:
+                  raise AssertionError(f"{artigo['slug']}: tipo editorial desconhecido: {tipo}")
+          historico_continental = json.loads((site / "dados-br/historico-probabilidades-continentais.json").read_text(encoding="utf-8"))
+          assert historico_continental.get("total_marcos") == len(historico_continental.get("marcos") or []), "histórico continental divergente"
+          assert any(item.get("id") == "copa-do-brasil-2026-oitavas-antes-jogos-de-volta" for item in historico_continental.get("marcos") or []), "fotografia anterior da Copa do Brasil ausente"
           ET.parse(site / "news-sitemap.xml")
           ET.parse(site / "feed.xml")
           sitemap_text = (site / "sitemap.xml").read_text(encoding="utf-8")
@@ -1021,6 +1044,7 @@ jobs:
         run: |
           set -euo pipefail
           python - <<'PY'
+          import html
           import json
           import os
           import smtplib
@@ -1040,77 +1064,96 @@ jobs:
               raise SystemExit(0)
 
           dados = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
-          artigo = max(dados['artigos'], key=lambda item: (item['rodada'], item['modificado_em']))
-          url, rodada, titulo = artigo['url'], artigo['rodada'], artigo['titulo']
+          artigos = dados.get('artigos') or []
           caminho_notificacoes = Path(os.environ['NOTIFICACOES_ANALISE'])
           notificacoes = json.loads(caminho_notificacoes.read_text(encoding='utf-8'))
-          rodadas_notificadas = {
-              int(item['rodada'])
-              for item in notificacoes.get('notificacoes') or []
-          }
-          if int(rodada) in rodadas_notificadas:
-              print(f'Rodada {rodada} já notificada; e-mail dispensado.')
+
+          def id_editorial(item):
+              valor = str(item.get('id_editorial') or '').strip()
+              if valor:
+                  return valor
+              numero = int(item.get('rodada') or 0)
+              return f'brasileirao-2026-rodada-{numero}' if numero else ''
+
+          ids_notificados = {id_editorial(item) for item in notificacoes.get('notificacoes') or []}
+          pendentes = [item for item in artigos if id_editorial(item) and id_editorial(item) not in ids_notificados]
+          pendentes.sort(key=lambda item: (str(item.get('publicado_em') or ''), str(item.get('modificado_em') or '')))
+          if not pendentes:
+              print('Nenhum editorial novo aguardando e-mail.')
               raise SystemExit(0)
 
-          marcador = f'data-fdg-analise-rodada="{rodada}"'
-          confirmado = False
-          for tentativa in range(1, 31):
+          porta = int(os.environ['SMTP_PORT'])
+          contexto = ssl.create_default_context()
+          enviados = 0
+          for artigo in pendentes:
+              editorial_id = id_editorial(artigo)
+              rodada = int(artigo.get('rodada') or 0)
+              url, titulo = artigo['url'], artigo['titulo']
+              assunto = str(artigo.get('email_assunto') or (f'Fórmula do Gol: análise da rodada {rodada} publicada' if rodada else 'Fórmula do Gol: nova análise publicada'))
+              chamada = str(artigo.get('email_chamada') or 'Uma nova análise do Fórmula do Gol está no ar.')
+              marcador = f'data-fdg-editorial-id="{editorial_id}"'
+              confirmado = False
+              for tentativa in range(1, 31):
+                  try:
+                      req = urllib.request.Request(f'{url}?deploy={os.environ.get("GITHUB_RUN_ID", "")}', headers={'Cache-Control': 'no-cache'})
+                      with urllib.request.urlopen(req, timeout=15) as resposta:
+                          confirmado = marcador in resposta.read().decode('utf-8', errors='replace')
+                  except urllib.error.URLError as erro:
+                      print(f'Verificação pública de {editorial_id} {tentativa}/30: {erro}')
+                  if confirmado:
+                      break
+                  time.sleep(15)
+              if not confirmado:
+                  print(f'::warning title=Página ainda não confirmada::O marcador {editorial_id} ainda não apareceu em {url}; este e-mail ficou pendente.')
+                  continue
+
+              mensagem = EmailMessage()
+              mensagem['From'] = formataddr(('Fórmula do Gol', os.environ['SMTP_USER']))
+              mensagem['To'] = os.environ['EMAIL_DESTINO']
+              mensagem['Subject'] = assunto
+              mensagem.set_content(f'{chamada}\n\n{titulo}\n\n{url}')
+              mensagem.add_alternative(
+                  f'<p>{html.escape(chamada)}</p><p><strong>{html.escape(titulo)}</strong></p><p><a href="{html.escape(url, quote=True)}">Abrir página publicada</a></p>',
+                  subtype='html',
+              )
               try:
-                  req = urllib.request.Request(f'{url}?deploy={os.environ.get("GITHUB_RUN_ID", "")}', headers={'Cache-Control': 'no-cache'})
-                  with urllib.request.urlopen(req, timeout=15) as resposta:
-                      confirmado = marcador in resposta.read().decode('utf-8', errors='replace')
-              except urllib.error.URLError as erro:
-                  print(f'Verificação pública {tentativa}/30: {erro}')
-              if confirmado:
-                  break
-              time.sleep(15)
-          if not confirmado:
-              print(f'::warning title=Página ainda não confirmada::O deploy terminou, mas o marcador da rodada {rodada} ainda não apareceu em {url}. O e-mail não foi enviado.')
-              raise SystemExit(0)
-          mensagem = EmailMessage()
-          mensagem['From'] = formataddr(('Fórmula do Gol', os.environ['SMTP_USER']))
-          mensagem['To'] = os.environ['EMAIL_DESTINO']
-          mensagem['Subject'] = f'Fórmula do Gol: análise da rodada {rodada} publicada'
-          mensagem.set_content(f'Coloquei a nova página no ar.\n\n{titulo}\n\n{url}')
-          mensagem.add_alternative(
-              f'<p>Coloquei a nova página no ar.</p><p><strong>{titulo}</strong></p><p><a href="{url}">Abrir página publicada</a></p>',
-              subtype='html',
-          )
-          try:
-              porta = int(os.environ['SMTP_PORT'])
-              contexto = ssl.create_default_context()
-              if porta == 465:
-                  with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], porta, context=contexto, timeout=30) as servidor:
-                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
-                      servidor.send_message(mensagem)
-              else:
-                  with smtplib.SMTP(os.environ['SMTP_HOST'], porta, timeout=30) as servidor:
-                      servidor.ehlo()
-                      servidor.starttls(context=contexto)
-                      servidor.ehlo()
-                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
-                      servidor.send_message(mensagem)
-          except (OSError, ValueError, smtplib.SMTPException) as erro:
-              print(f'::warning title=E-mail editorial não enviado::{erro}. A página foi publicada normalmente.')
-              raise SystemExit(0)
+                  if porta == 465:
+                      with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], porta, context=contexto, timeout=30) as servidor:
+                          servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                          servidor.send_message(mensagem)
+                  else:
+                      with smtplib.SMTP(os.environ['SMTP_HOST'], porta, timeout=30) as servidor:
+                          servidor.ehlo()
+                          servidor.starttls(context=contexto)
+                          servidor.ehlo()
+                          servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                          servidor.send_message(mensagem)
+              except (OSError, ValueError, smtplib.SMTPException) as erro:
+                  print(f'::warning title=E-mail editorial não enviado::{editorial_id}: {erro}. A página foi publicada normalmente.')
+                  continue
 
-          notificacoes.setdefault('notificacoes', []).append({
-              'rodada': int(rodada),
-              'slug': artigo['slug'],
-              'url': url,
-              'notificado_em': datetime.now(
-                  timezone(timedelta(hours=-3))
-              ).replace(microsecond=0).isoformat(),
-          })
-          notificacoes['notificacoes'].sort(key=lambda item: int(item['rodada']))
+              registro = {
+                  'id_editorial': editorial_id,
+                  'tipo': str(artigo.get('tipo') or 'editorial'),
+                  'slug': artigo['slug'],
+                  'url': url,
+                  'notificado_em': datetime.now(timezone(timedelta(hours=-3))).replace(microsecond=0).isoformat(),
+              }
+              if rodada:
+                  registro['rodada'] = rodada
+              notificacoes.setdefault('notificacoes', []).append(registro)
+              ids_notificados.add(editorial_id)
+              enviados += 1
+              print(f'Página confirmada e e-mail enviado: {url}')
+
+          if not enviados:
+              raise SystemExit(0)
+          notificacoes['notificacoes'].sort(key=lambda item: str(item.get('notificado_em') or ''))
+          notificacoes['schema_version'] = 2
           notificacoes['total_notificacoes'] = len(notificacoes['notificacoes'])
           caminho_temporario = caminho_notificacoes.with_suffix('.tmp')
-          caminho_temporario.write_text(
-              json.dumps(notificacoes, ensure_ascii=False, indent=2) + '\n',
-              encoding='utf-8',
-          )
+          caminho_temporario.write_text(json.dumps(notificacoes, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           caminho_temporario.replace(caminho_notificacoes)
-          print(f'Página confirmada e e-mail enviado: {url}')
           PY
 
           if git diff --quiet -- "$NOTIFICACOES_ANALISE"; then
