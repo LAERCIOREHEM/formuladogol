@@ -693,10 +693,39 @@ def esc(valor: Any) -> str:
     return html.escape(str(valor), quote=True)
 
 
+def id_editorial_artigo(artigo: dict[str, Any]) -> str:
+    identificador = normalizar_nome(artigo.get("id_editorial") or "")
+    if identificador:
+        return identificador
+    rodada = int(artigo.get("rodada") or 0)
+    return f"brasileirao-{TEMPORADA}-rodada-{rodada}" if rodada else normalizar_nome(artigo.get("slug") or "editorial")
+
+
+def rotulo_menu_artigo(artigo: dict[str, Any]) -> str:
+    rotulo = normalizar_nome(artigo.get("rotulo_menu") or "")
+    if rotulo:
+        return rotulo
+    rodada = int(artigo.get("rodada") or 0)
+    return f"R{rodada}" if rodada else "Análise"
+
+
+def categoria_artigo(artigo: dict[str, Any]) -> str:
+    categoria = normalizar_nome(artigo.get("categoria") or "")
+    if categoria:
+        return categoria
+    rodada = int(artigo.get("rodada") or 0)
+    return f"RODADA {rodada}" if rodada else "ANÁLISE"
+
+
+def chave_ordenacao_artigo(artigo: dict[str, Any]) -> tuple[str, str]:
+    return (str(artigo.get("publicado_em") or artigo.get("modificado_em") or ""), id_editorial_artigo(artigo))
+
+
 def menu(prefixo: str, ativo: bool = False) -> str:
     itens = [
         ("📈", "Estatísticas", f"{prefixo}estatisticas.html"),
         ("⚽", "Jogos", f"{prefixo}jogos"),
+        ("🗓️", "Agenda", f"{prefixo}agenda.html"),
         ("🔴", "Ao vivo", f"{prefixo}aovivo.html"),
         ("📊", "Tabela", f"{prefixo}tabela"),
         ("✅", "Resultados", f"{prefixo}resultados"),
@@ -711,25 +740,32 @@ def menu(prefixo: str, ativo: bool = False) -> str:
         links.append(f'      <a href="{href}"{classe}>{icone} {rotulo}</a>')
     return '<nav class="nav" data-br-auth-menu aria-label="Menu principal">\n' + "\n".join(links) + "\n    </nav>"
 
-
-def submenu_rodadas(artigos: list[dict[str, Any]], rodada_ativa: int | None = None) -> str:
-    disponiveis = {
-        int(item.get("rodada") or 0): str(item.get("slug") or slug_rodada(int(item.get("rodada") or 0)))
-        for item in artigos
-        if int(item.get("rodada") or 0) > 0
-    }
-    if rodada_ativa:
-        disponiveis.setdefault(rodada_ativa, slug_rodada(rodada_ativa))
+def submenu_rodadas(
+    artigos: list[dict[str, Any]],
+    rodada_ativa: int | None = None,
+    id_ativo: str | None = None,
+) -> str:
+    ativo = id_ativo or (f"brasileirao-{TEMPORADA}-rodada-{rodada_ativa}" if rodada_ativa else None)
+    disponiveis: dict[str, dict[str, Any]] = {}
+    for item in artigos:
+        identificador = id_editorial_artigo(item)
+        if identificador:
+            disponiveis[identificador] = item
+    if rodada_ativa and ativo not in disponiveis:
+        disponiveis[ativo] = {
+            "id_editorial": ativo,
+            "rodada": rodada_ativa,
+            "rotulo_menu": f"R{rodada_ativa}",
+            "slug": slug_rodada(rodada_ativa),
+            "publicado_em": "",
+        }
     links = []
-    for rodada in sorted(disponiveis, reverse=True):
-        if rodada_ativa and rodada > rodada_ativa:
-            continue
-        atual = ' class="active" aria-current="page"' if rodada == rodada_ativa else ""
-        links.append(f'<a href="{esc(disponiveis[rodada])}"{atual}>R{rodada}</a>')
+    for identificador, item in sorted(disponiveis.items(), key=lambda par: chave_ordenacao_artigo(par[1]), reverse=True):
+        atual = ' class="active" aria-current="page"' if identificador == ativo else ""
+        links.append(f'<a href="{esc(item.get("slug") or "")}"{atual}>{esc(rotulo_menu_artigo(item))}</a>')
     if not links:
         return ""
-    return '<nav class="analysis-round-nav" aria-label="Histórico por rodada"><strong>RODADAS</strong><div>' + "".join(links) + "</div></nav>"
-
+    return '<nav class="analysis-round-nav" aria-label="Arquivo de análises"><strong>ANÁLISES</strong><div>' + "".join(links) + "</div></nav>"
 
 def valor_estatistica(valor: Any) -> str:
     texto = str(valor if valor is not None else "—")
@@ -892,6 +928,7 @@ def cards_variacoes(dossie: dict[str, Any]) -> str:
 
 def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: str, modificado: str, historico: list[dict[str, Any]]) -> tuple[str, dict[str, Any]]:
     rodada = dossie["rodada"]
+    identificador = f"brasileirao-{TEMPORADA}-rodada-{rodada}"
     url = f"{SITE}/analises/{slug_rodada(rodada)}"
     titulo, linha_fina = editorial["titulo"], editorial["linha_fina"]
     nota_pendente = ""
@@ -907,11 +944,11 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
         for secao in editorial["secoes"]
     )
     html_final = cabecalho_html(titulo, linha_fina, url, "NewsArticle", publicado, modificado) + f'''
-<body data-{MARCADOR}="{rodada}">
+<body data-{MARCADOR}="{rodada}" data-fdg-editorial-id="{identificador}">
   <div class="container analysis-shell">
     <header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high"></header>
     {menu('../', True)}
-    {submenu_rodadas(historico, rodada)}
+    {submenu_rodadas(historico, rodada, identificador)}
     <main>
       <article class="analysis-article">
         <nav class="analysis-breadcrumb" aria-label="Navegação estrutural"><a href="./">Análises</a><span>›</span><span>Rodada {rodada}</span></nav>
@@ -934,23 +971,43 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
     {rodape('../')}
   </div>
   <script src="../js/br-menu.js?v=20260724-status-dot-v2"></script>
-  <script src="../js/br-analises.js?v=20260802-video-incorporado-v1"></script>
+  <script src="../js/br-analises.js?v=20260805-editorial-continental-v1"></script>
 </body>
 </html>'''.replace(f"{dossie['simulacoes']:,}", f"{dossie['simulacoes']:,}".replace(",", "."))
-    metadados = {"rodada": rodada, "slug": slug_rodada(rodada), "url": url, "titulo": titulo, "linha_fina": linha_fina, "publicado_em": publicado, "modificado_em": modificado, "jogos_concluidos": dossie["estado"]["jogos_concluidos"], "jogos_pendentes": dossie["estado"]["jogos_pendentes"], "hash_dossie": hashlib.sha256(json.dumps(dossie, ensure_ascii=False, sort_keys=True).encode()).hexdigest()}
+    metadados = {
+        "tipo": "brasileirao_rodada",
+        "id_editorial": identificador,
+        "rotulo_menu": f"R{rodada}",
+        "categoria": f"RODADA {rodada}",
+        "rodada": rodada,
+        "slug": slug_rodada(rodada),
+        "url": url,
+        "titulo": titulo,
+        "linha_fina": linha_fina,
+        "publicado_em": publicado,
+        "modificado_em": modificado,
+        "jogos_concluidos": dossie["estado"]["jogos_concluidos"],
+        "jogos_pendentes": dossie["estado"]["jogos_pendentes"],
+        "hash_dossie": hashlib.sha256(json.dumps(dossie, ensure_ascii=False, sort_keys=True).encode()).hexdigest(),
+        "email_assunto": f"Fórmula do Gol: análise da rodada {rodada} publicada",
+        "email_chamada": f"A análise da rodada {rodada} do Brasileirão já está no ar.",
+    }
     return html_final, metadados
 
-
 def gerar_hub(artigos: list[dict[str, Any]]) -> str:
-    ordenados = sorted(artigos, key=lambda a: (a["rodada"], a["modificado_em"]), reverse=True)
+    ordenados = sorted(artigos, key=chave_ordenacao_artigo, reverse=True)
     cards = []
     for i, artigo in enumerate(ordenados):
         classe = " analysis-card-featured" if i == 0 else ""
         pendencia = " · edição parcial" if artigo.get("jogos_pendentes") else ""
-        cards.append(f'''<article class="analysis-card{classe}"><time datetime="{esc(artigo['publicado_em'])}">Publicado em {data_curta(artigo['publicado_em'])}</time><span>RODADA {artigo['rodada']}{pendencia}</span><h2><a href="{esc(artigo['slug'])}">{esc(artigo['titulo'])}</a></h2><p>{esc(artigo['linha_fina'])}</p><a class="analysis-read" href="{esc(artigo['slug'])}">Ler análise →</a></article>''')
-    titulo = "Análises do Brasileirão 2026"
-    descricao = "Leitura rodada a rodada dos resultados e das mudanças nas probabilidades de título, Libertadores e rebaixamento."
-    return cabecalho_html(titulo, descricao, f"{SITE}/analises/", "CollectionPage") + f'''
+        cards.append(
+            f'<article class="analysis-card{classe}"><time datetime="{esc(artigo["publicado_em"])}">Publicado em {data_curta(artigo["publicado_em"])}</time>'
+            f'<span>{esc(categoria_artigo(artigo))}{pendencia}</span><h2><a href="{esc(artigo["slug"])}">{esc(artigo["titulo"])}</a></h2>'
+            f'<p>{esc(artigo["linha_fina"])}</p><a class="analysis-read" href="{esc(artigo["slug"])}">Ler análise →</a></article>'
+        )
+    titulo = "Análises do Fórmula do Gol"
+    descricao = "Análises dos resultados do Brasileirão e dos torneios que alteram as chances continentais dos clubes da Série A."
+    return cabecalho_html("Análises", descricao, f"{SITE}/analises/", "CollectionPage") + f'''
 <body>
   <div class="container analysis-shell">
     <header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high"></header>
@@ -966,21 +1023,19 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
 </body>
 </html>'''
 
-
 def atualizar_sitemap(artigos: list[dict[str, Any]]) -> None:
     ns = "http://www.sitemaps.org/schemas/sitemap/0.9"
     ET.register_namespace("", ns)
     caminho = Path("sitemap.xml")
     raiz = ET.parse(caminho).getroot()
     urls = {((no.find(f"{{{ns}}}loc").text or "").strip()): no for no in raiz.findall(f"{{{ns}}}url")}
-    desejadas = [f"{SITE}/analises/"] + [a["url"] for a in sorted(artigos, key=lambda a: a["rodada"])]
+    desejadas = [f"{SITE}/analises/"] + [a["url"] for a in sorted(artigos, key=chave_ordenacao_artigo)]
     for url in desejadas:
         if url not in urls:
             no = ET.SubElement(raiz, f"{{{ns}}}url")
             ET.SubElement(no, f"{{{ns}}}loc").text = url
     ET.indent(raiz, space="  ")
     ET.ElementTree(raiz).write(caminho, encoding="utf-8", xml_declaration=True)
-
 
 def gerar_news_sitemap(artigos: list[dict[str, Any]], momento: datetime) -> str:
     recentes = [a for a in artigos if momento - datetime.fromisoformat(a["publicado_em"]).astimezone(FUSO_BR) <= timedelta(days=2)]
@@ -997,14 +1052,21 @@ def gerar_feed(artigos: list[dict[str, Any]], momento: datetime) -> str:
         itens.append(f'''<item><title>{esc(a['titulo'])}</title><link>{esc(a['url'])}</link><guid isPermaLink="true">{esc(a['url'])}</guid><pubDate>{data}</pubDate><description>{esc(a['linha_fina'])}</description></item>''')
     agora_rfc = momento.astimezone(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")
     return f'''<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"><channel><title>Análises — Fórmula do Gol</title><link>{SITE}/analises/</link><description>Análises rodada a rodada do Brasileirão 2026.</description><language>pt-BR</language><lastBuildDate>{agora_rfc}</lastBuildDate>{''.join(itens)}</channel></rss>'''
+<rss version="2.0"><channel><title>Análises — Fórmula do Gol</title><link>{SITE}/analises/</link><description>Análises do Brasileirão e dos torneios que alteram as chances continentais dos clubes da Série A.</description><language>pt-BR</language><lastBuildDate>{agora_rfc}</lastBuildDate>{''.join(itens)}</channel></rss>'''
 
 
 def carregar_manifesto() -> dict[str, Any]:
     if not ARQUIVO_MANIFESTO.exists():
-        return {"schema_version": 1, "site": "Fórmula do Gol", "artigos": []}
-    return carregar_json(ARQUIVO_MANIFESTO)
-
+        return {"schema_version": 2, "site": "Fórmula do Gol", "artigos": []}
+    manifesto = carregar_json(ARQUIVO_MANIFESTO)
+    artigos = manifesto.get("artigos") or []
+    for artigo in artigos:
+        artigo.setdefault("id_editorial", id_editorial_artigo(artigo))
+        artigo.setdefault("rotulo_menu", rotulo_menu_artigo(artigo))
+        artigo.setdefault("categoria", categoria_artigo(artigo))
+        artigo.setdefault("tipo", "brasileirao_rodada" if int(artigo.get("rodada") or 0) else "editorial")
+    manifesto["artigos"] = artigos
+    return manifesto
 
 def executar(args: argparse.Namespace) -> int:
     config = carregar_json(ARQUIVO_CONFIG)
@@ -1073,9 +1135,9 @@ def executar(args: argparse.Namespace) -> int:
     metadados["hash_editorial"] = hash_fatos_editoriais
     metadados["editorial"] = editorial
     metadados["origem_editorial"] = origem
-    artigos = [a for a in artigos if int(a.get("rodada") or 0) != rodada] + [metadados]
-    artigos.sort(key=lambda a: int(a["rodada"]))
-    manifesto.update({"schema_version": 1, "site": "Fórmula do Gol", "temporada": TEMPORADA, "atualizado_em": modificado, "total_artigos": len(artigos), "artigos": artigos})
+    artigos = [a for a in artigos if not (a.get("tipo") == "brasileirao_rodada" and int(a.get("rodada") or 0) == rodada)] + [metadados]
+    artigos.sort(key=chave_ordenacao_artigo)
+    manifesto.update({"schema_version": 2, "site": "Fórmula do Gol", "temporada": TEMPORADA, "atualizado_em": modificado, "total_artigos": len(artigos), "artigos": artigos})
     if args.dry_run:
         print(json.dumps({"metadados": metadados, "editorial": editorial, "estado": estado}, ensure_ascii=False, indent=2))
         return 0
@@ -1140,11 +1202,11 @@ def self_test() -> int:
     dossie_contingencia = dict(dossie, rodada=21)
     validar_editorial(narrativa_segura(dossie_contingencia), dossie_contingencia)
     pagina, meta = gerar_artigo(dossie, editorial, "2026-08-02T12:00:00-03:00", "2026-08-02T12:00:00-03:00", carregar_manifesto().get("artigos") or [])
-    assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina
+    assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina and 'data-fdg-editorial-id="brasileirao-2026-rodada-20"' in pagina
     assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in pagina
     assert "header-formula-do-gol.png" not in pagina
     assert "br-analises.css?v=20260802-openai-editorial-v1" in pagina
-    assert "br-analises.js?v=20260802-video-incorporado-v1" in pagina
+    assert "br-analises.js?v=20260805-editorial-continental-v1" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
     assert "0,007%</td><td>0,006%</td><td class=\"delta delta-down\">-0,001 p.p.</td>" in pagina
     assert re.search(
@@ -1165,9 +1227,9 @@ def self_test() -> int:
     hub = gerar_hub(carregar_manifesto().get("artigos") or [])
     assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in hub
     assert "header-formula-do-gol.png" not in hub
-    assert '<h1 class="analysis-page-title">Análises do Brasileirão 2026</h1>' in hub
+    assert '<h1 class="analysis-page-title">Análises do Fórmula do Gol</h1>' in hub
     assert "analysis-hub-head" not in hub
-    assert "Publicado em 02/08/2026" in hub and "analysis-round-nav" in hub
+    assert "Publicado em 02/08/2026" in hub and "analysis-round-nav" in hub and ">ANÁLISES</strong>" in hub
     print("OK self-test: detector, fatos, percentuais, editorial e HTML.")
     return 0
 
