@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 69,
+    "jogos_na_janela": 68,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 24,
     "transmissoes_publicadas": 5,
-    "sem_transmissao": 64,
+    "sem_transmissao": 63,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,17 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401874039",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Cruzeiro x Chapecoense",
-      "data_iso": "2026-08-05T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401874038",
       "rodada": 0,
@@ -818,12 +807,13 @@
       "video_id": "4okxkJUPlys",
       "url": "https://www.youtube.com/watch?v=4okxkJUPlys",
       "titulo": "AO VIVO: FLUMINENSE X VASCO | OITAVAS DE FINAL | COPA DO BRASIL 2026 | ge tv",
-      "status": "upcoming",
-      "confianca": 0.85,
+      "status": "live",
+      "confianca": 0.9,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
         "horário compatível (90 min de diferença)"
       ]
     },
@@ -984,6 +974,16 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
+      "video_id": "-ceckOJaNv8",
+      "url": "https://www.youtube.com/watch?v=-ceckOJaNv8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "VÁGNER MANCINI MOSTRA A INCRÍVEL ESTRUTURA DO RED BULL BRAGANTINO | Tropa ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-07T22:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "00BoR6Wax0M",
       "url": "https://www.youtube.com/watch?v=00BoR6Wax0M",
       "fonte": "getv",
@@ -1064,16 +1064,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "vLDXP3WDlN0",
-      "url": "https://www.youtube.com/watch?v=vLDXP3WDlN0",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "FLUMINENSE 2 X 2 VASCO | COPA DO BRASIL 2000 | MELHORES MOMENTOS | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-08-05T19:00:00-03:00",
-      "motivo": "conteúdo rejeitado: melhores momentos"
-    },
-    {
       "video_id": "z0RicLTMVmE",
       "url": "https://www.youtube.com/watch?v=z0RicLTMVmE",
       "fonte": "getv",
@@ -1085,15 +1075,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401874039",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Cruzeiro x Chapecoense",
-      "data_iso": "2026-08-05T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401874038",
       "rodada": 0,
@@ -1672,5 +1653,5 @@
     },
     "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API."
   },
-  "atualizado_em": "2026-08-05T19:37:09-03:00"
+  "atualizado_em": "2026-08-05T20:32:47-03:00"
 }
