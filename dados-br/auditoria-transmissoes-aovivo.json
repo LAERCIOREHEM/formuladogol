@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 70,
+    "jogos_na_janela": 69,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 24,
     "transmissoes_publicadas": 5,
-    "sem_transmissao": 65,
+    "sem_transmissao": 64,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,17 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401874098",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Remo x Santos",
-      "data_iso": "2026-08-04T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401874039",
       "rodada": 0,
@@ -1097,15 +1086,6 @@
   ],
   "sem_transmissao": [
     {
-      "event_id": "401874098",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Remo x Santos",
-      "data_iso": "2026-08-04T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
       "event_id": "401874039",
       "rodada": 0,
       "competicao_chave": "copa_do_brasil",
@@ -1692,5 +1672,5 @@
     },
     "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API."
   },
-  "atualizado_em": "2026-08-04T22:07:35-03:00"
+  "atualizado_em": "2026-08-05T00:27:05-03:00"
 }
