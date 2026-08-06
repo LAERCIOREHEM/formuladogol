@@ -1,11 +1,11 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 69,
-    "jogos_com_transmissao": 51,
+    "jogos_na_janela": 65,
+    "jogos_com_transmissao": 48,
     "jogos_sem_transmissao_14d": 11,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 3,
+    "registros_preservados": 4,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -18,26 +18,26 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
       ],
-      "duracao_ms": 13758
+      "duracao_ms": 13997
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 48,
-      "duracao_ms": 13198
+      "jogos_com_canal": 44,
+      "duracao_ms": 19413
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 2,
-      "jogos_com_canal": 4,
-      "duracao_ms": 50239
+      "jogos_com_canal": 2,
+      "duracao_ms": 45935
     },
     "espn": {
       "ok": true,
       "competicoes_consultadas": 4,
-      "eventos_na_janela": 69,
+      "eventos_na_janela": 65,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 4366
+      "duracao_ms": 4645
     }
   },
   "sem_transmissao": [
@@ -46,7 +46,7 @@
       "rodada": 0,
       "jogo": "Fluminense x Independiente Rivadavia",
       "data_iso": "2026-08-11T19:00:00-03:00",
-      "faltam_horas": 139.1,
+      "faltam_horas": 138.8,
       "nivel": "aviso"
     },
     {
@@ -54,7 +54,7 @@
       "rodada": 0,
       "jogo": "Bolívar x São Paulo",
       "data_iso": "2026-08-11T21:30:00-03:00",
-      "faltam_horas": 141.6,
+      "faltam_horas": 141.3,
       "nivel": "aviso"
     },
     {
@@ -62,7 +62,7 @@
       "rodada": 0,
       "jogo": "Palmeiras x Cerro Porteño",
       "data_iso": "2026-08-12T19:00:00-03:00",
-      "faltam_horas": 163.1,
+      "faltam_horas": 162.8,
       "nivel": "aviso"
     },
     {
@@ -70,7 +70,7 @@
       "rodada": 0,
       "jogo": "Mirassol x Liga de Quito",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 187.1,
+      "faltam_horas": 186.8,
       "nivel": "aviso"
     },
     {
@@ -78,7 +78,7 @@
       "rodada": 0,
       "jogo": "Santos x Macará",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 187.1,
+      "faltam_horas": 186.8,
       "nivel": "aviso"
     },
     {
@@ -86,7 +86,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Club Olimpia",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 187.1,
+      "faltam_horas": 186.8,
       "nivel": "aviso"
     },
     {
@@ -94,7 +94,7 @@
       "rodada": 0,
       "jogo": "Rosário Central x Corinthians",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "faltam_horas": 189.6,
+      "faltam_horas": 189.3,
       "nivel": "aviso"
     },
     {
@@ -102,7 +102,7 @@
       "rodada": 0,
       "jogo": "Cienciano del Cusco x Botafogo",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "faltam_horas": 189.6,
+      "faltam_horas": 189.3,
       "nivel": "aviso"
     },
     {
@@ -110,7 +110,7 @@
       "rodada": 0,
       "jogo": "Independiente Rivadavia x Fluminense",
       "data_iso": "2026-08-18T19:00:00-03:00",
-      "faltam_horas": 307.1,
+      "faltam_horas": 306.8,
       "nivel": "aviso"
     },
     {
@@ -118,7 +118,7 @@
       "rodada": 0,
       "jogo": "São Paulo x Bolívar",
       "data_iso": "2026-08-18T21:30:00-03:00",
-      "faltam_horas": 309.6,
+      "faltam_horas": 309.3,
       "nivel": "aviso"
     },
     {
@@ -126,16 +126,18 @@
       "rodada": 0,
       "jogo": "Cerro Porteño x Palmeiras",
       "data_iso": "2026-08-19T19:00:00-03:00",
-      "faltam_horas": 331.1,
+      "faltam_horas": 330.8,
       "nivel": "aviso"
     }
   ],
   "preservados": [
     {
-      "event_id": "401841189",
-      "jogo": "São Paulo x Coritiba",
+      "event_id": "401841187",
+      "jogo": "Flamengo x Vitória",
       "canais": [
-        "Globo"
+        "SporTV",
+        "Premiere",
+        "GE TV"
       ]
     },
     {
@@ -151,6 +153,18 @@
       "canais": [
         "SporTV"
       ]
+    },
+    {
+      "event_id": "401841225",
+      "jogo": "Remo x Flamengo",
+      "canais": [
+        "SporTV",
+        "Premiere",
+        "GE TV",
+        "Prime Video",
+        "Globo",
+        "Disney+ / ESPN"
+      ]
     }
   ],
   "erros": [
@@ -162,5 +176,5 @@
     "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/08/05/cruzeiro-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/sp/futebol/copa-do-brasil/noticia/2026/08/02/palmeiras-x-fortaleza-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-08-05T23:56:44-03:00"
+  "atualizado_em": "2026-08-06T00:12:19-03:00"
 }
