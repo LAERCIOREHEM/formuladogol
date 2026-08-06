@@ -1,0 +1,1523 @@
+name: Deploy site (GitHub Pages)
+
+on:
+  workflow_dispatch:
+    inputs:
+      forcar:
+        description: 'Publicar mesmo que o site esteja identico ao ja publicado'
+        type: boolean
+        default: false
+
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'aovivo.html'
+      - 'agenda.html'
+      - 'estatisticas.html'
+      - 'clubes.html'
+      - 'museu.html'
+      - 'sobre.html'
+      - 'CNAME'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'news-sitemap.xml'
+      - 'feed.xml'
+      - 'tabela.json'
+      - 'resultados.json'
+      - 'jogos.json'
+      - 'espn_eventos.json'
+      - 'transmissoes.json'
+      - 'favicon-formula-do-gol*'
+      - 'apple-touch-icon-formula-do-gol.png'
+      - 'og-image-formula-do-gol-v2.jpg'
+      - 'img/**'
+      - 'css/br-global.css'
+      - 'css/br-aovivo.css'
+      - 'css/br-agenda.css'
+      - 'css/br-estatisticas.css'
+      - 'css/br-institucional.css'
+      - 'css/br-sobre.css'
+      - 'css/br-analises.css'
+      - 'js/br-aovivo.js'
+      - 'js/br-agenda.js'
+      - 'js/br-analises.js'
+      - 'js/br-clube-retorno.js'
+      - 'js/br-clubes.js'
+      - 'js/br-config.js'
+      - 'js/br-estatisticas.js'
+      - 'js/br-feedback.js'
+      - 'js/br-menu.js'
+      - 'js/br-museu.js'
+      - 'dados-br/**'
+      - 'analises/**'
+      - 'jogos/**'
+      - 'tabela/**'
+      - 'resultados/**'
+      - 'copa2026/**'
+      - '.github/workflows/deploy.yml'
+
+  # PUBLICACAO COALESCIDA (substitui o antigo gatilho workflow_run)
+  #
+  # Antes, oito workflows disparavam um deploy cada vez que terminavam. Como o
+  # robo de transmissoes roda de 15 em 15 minutos, isso gerava ~78 deploys/dia
+  # numa fila que e SERIAL. A fila nunca drenava, e um push seu ficava esperando
+  # atras dela — quando nao era descartado por um deploy de robo mais novo.
+  #
+  # Agora o deploy roda sozinho, em cadencia fixa, apenas nas janelas ativas, e
+  # publica tudo o que os robos acumularam desde a ultima vez. Se nada mudou, o
+  # passo de guarda encerra em ~1 min sem tocar no Pages.
+  #
+  # Janelas (horario de Brasilia, UTC-3):
+  #   Seg-Sex: 19h -> 02h      Sab-Dom: 13h -> 02h
+  schedule:
+    # 19h00-23h59 BRT de segunda a sexta  =  22-23 UTC seg-sex
+    - cron: '10,25,40,55 22,23 * * 1-5'
+    # 13h00-23h59 BRT sabado e domingo    =  16-23 UTC sab/dom
+    - cron: '10,25,40,55 16-23 * * 6,0'
+    # 00h00-02h59 BRT todos os dias       =  03-05 UTC (e 00-02 UTC = 21-23h BRT
+    # da vespera, ja coberto acima) -> aqui fica a madrugada BRT
+    - cron: '10,25,40,55 0-5 * * *'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  deployments: read
+
+# Não cancelar um deploy que já chegou à publicação do Pages. Novas execuções
+# aguardam na fila e, ao iniciar, sempre fazem checkout do main mais recente.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Publicar GitHub Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url || steps.deployment_retry2.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 2
+
+      - name: Montar site público
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site/css _site/js _site/dados-br _site/copa2026/css _site/copa2026/js _site/copa2026/dados _site/copa2026/img
+
+          PUBLIC_ROOT=(
+            index.html
+            aovivo.html
+            agenda.html
+            estatisticas.html
+            clubes.html
+            museu.html
+            sobre.html
+            78f8b10d32edcce04827b713eae52df5.txt
+            CNAME
+            robots.txt
+            sitemap.xml
+            news-sitemap.xml
+            feed.xml
+            tabela.json
+            resultados.json
+            jogos.json
+            espn_eventos.json
+            transmissoes.json
+            favicon-formula-do-gol.ico
+            favicon-formula-do-gol-16.png
+            favicon-formula-do-gol-32.png
+            favicon-formula-do-gol-96.png
+            favicon-formula-do-gol-192.png
+            favicon-formula-do-gol-512.png
+            apple-touch-icon-formula-do-gol.png
+            og-image-formula-do-gol-v2.jpg
+          )
+
+          PUBLIC_CSS=(
+            css/br-global.css
+            css/br-aovivo.css
+            css/br-agenda.css
+            css/br-estatisticas.css
+            css/br-institucional.css
+            css/br-sobre.css
+            css/br-analises.css
+          )
+
+          PUBLIC_JS=(
+            js/br-aovivo.js
+            js/br-agenda.js
+            js/br-analises.js
+            js/br-clube-retorno.js
+            js/br-clubes.js
+            js/br-config.js
+            js/br-estatisticas.js
+            js/br-feedback.js
+            js/br-menu.js
+            js/br-museu.js
+          )
+
+          PUBLIC_DATA=(
+            dados-br/agenda-clubes-br.json
+            dados-br/auditoria-estatisticas.json
+            dados-br/auditoria-modelos-af-previsao.json
+            dados-br/auditoria-probabilidades.json
+            dados-br/avaliacao-af-previsao.json
+            dados-br/clubes.json
+            dados-br/elencos.json
+            dados-br/estatisticas-competicao.json
+            dados-br/historico-probabilidades.json
+            dados-br/historico-probabilidades-continentais.json
+            dados-br/historico-ranking-desempenho.json
+            dados-br/jogos-detalhes.json
+            dados-br/lideres-jogadores.json
+            dados-br/mascotes.json
+            dados-br/melhores-momentos-manual.json
+            dados-br/melhores-momentos.json
+            dados-br/museu-brasileirao.json
+            dados-br/probabilidades-brasileirao.json
+            dados-br/probabilidades-jogos.json
+            dados-br/probabilidades-por-pontuacao.json
+            dados-br/ranking-desempenho.json
+            dados-br/resultados-manuais.json
+            dados-br/status-atualizacao.json
+            dados-br/transmissoes-aovivo-manual.json
+            dados-br/transmissoes-aovivo.json
+            dados-br/transmissoes-tv.json
+            dados-br/analises.json
+          )
+
+          PUBLIC_ROUTES=(jogos tabela resultados)
+
+          COPA_PUBLIC_FILES=(
+            copa2026/index.html
+            copa2026/aovivo.html
+            copa2026/onde-assistir.html
+            copa2026/estatisticas.html
+            copa2026/selecoes.html
+            copa2026/palcos.html
+            copa2026/museu.html
+            copa2026/favicon-copa.png
+            copa2026/favicon-copa-32.png
+            copa2026/og-copa-publico-v2.png
+            copa2026/robots.txt
+            copa2026/sitemap.xml
+            copa2026/css/copa.css
+            copa2026/js/aovivo.js
+            copa2026/js/config.js
+            copa2026/js/engine.js
+            copa2026/js/estatisticas.js
+            copa2026/js/feedback.js
+            copa2026/js/image-preview.js
+            copa2026/js/jogo-stats.js
+            copa2026/js/museu.js
+            copa2026/js/onde-assistir.js
+            copa2026/js/palcos.js
+            copa2026/js/resultados.js
+            copa2026/js/selecoes.js
+            copa2026/js/times.js
+            copa2026/dados/agenda_mata.json
+            copa2026/dados/agenda_workflow_copa.json
+            copa2026/dados/correcoes-jogadores.json
+            copa2026/dados/elencos.json
+            copa2026/dados/estatisticas.json
+            copa2026/dados/estrutura_mata_mata.json
+            copa2026/dados/fairplay.json
+            copa2026/dados/jogos-completos.json
+            copa2026/dados/jogos-detalhes.json
+            copa2026/dados/lives.json
+            copa2026/dados/melhores-momentos.json
+            copa2026/dados/museu-copa.json
+            copa2026/dados/paises.json
+            copa2026/dados/palcos.json
+            copa2026/dados/palcos_creditos.json
+            copa2026/dados/ranking-desempenho.json
+            copa2026/dados/ranking-selecoes-historico.json
+            copa2026/dados/rostos.json
+            copa2026/dados/rostos_creditos.json
+            copa2026/dados/selecoes.json
+            copa2026/dados/terceiros_map.json
+            copa2026/dados/transmissoes.json
+            copa2026/img/header-copa26-formula-do-gol.png
+          )
+
+          COPA_IMAGE_DIRS=(
+            copa2026/img/bolas
+            copa2026/img/jogadores
+            copa2026/img/mascotes
+            copa2026/img/palcos
+          )
+
+          for item in "${PUBLIC_ROOT[@]}" "${PUBLIC_CSS[@]}" "${PUBLIC_JS[@]}" "${PUBLIC_DATA[@]}"; do
+            if [[ ! -f "$item" ]]; then
+              echo "ERRO: arquivo público obrigatório ausente: $item"
+              exit 1
+            fi
+            cp -a "$item" "_site/$item"
+          done
+
+          if [[ ! -d img ]]; then
+            echo "ERRO: diretório público img ausente."
+            exit 1
+          fi
+          cp -a img _site/
+
+          if [[ ! -d analises ]] || [[ ! -f analises/index.html ]]; then
+            echo "ERRO: seção pública de análises ausente."
+            exit 1
+          fi
+          cp -a analises _site/
+
+          for route in "${PUBLIC_ROUTES[@]}"; do
+            if [[ ! -f "$route/index.html" ]]; then
+              echo "ERRO: rota pública obrigatória ausente: $route/index.html"
+              exit 1
+            fi
+            mkdir -p "_site/$route"
+            cp -a "$route/index.html" "_site/$route/index.html"
+          done
+
+          for item in "${COPA_PUBLIC_FILES[@]}"; do
+            if [[ ! -f "$item" ]]; then
+              echo "ERRO: arquivo público da Copa ausente: $item"
+              exit 1
+            fi
+            mkdir -p "_site/$(dirname "$item")"
+            cp -a "$item" "_site/$item"
+          done
+
+          for item in "${COPA_IMAGE_DIRS[@]}"; do
+            if [[ ! -d "$item" ]]; then
+              echo "ERRO: diretório público da Copa ausente: $item"
+              exit 1
+            fi
+            cp -a "$item" "_site/$(dirname "$item")/"
+          done
+
+          touch _site/.nojekyll
+
+          # Estado do próprio deploy, publicado no artefato para o diagnóstico operacional.
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+
+          site = Path('_site')
+          digest = hashlib.sha256()
+          for rel in ('tabela.json', 'resultados.json', 'jogos.json', 'espn_eventos.json'):
+              path = site / rel
+              digest.update(rel.encode('utf-8'))
+              if path.exists():
+                  digest.update(path.read_bytes())
+          run_url = ''
+          if os.environ.get('GITHUB_REPOSITORY') and os.environ.get('GITHUB_RUN_ID'):
+              run_url = f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com').rstrip('/')}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+          payload = {
+              'schema_version': 1,
+              'site': 'Fórmula do Gol',
+              'workflow': 'Deploy GitHub Pages',
+              'status': 'ok',
+              'nivel': 'normal',
+              'publicado_em': datetime.now(timezone(timedelta(hours=-3))).replace(microsecond=0).isoformat(),
+              'snapshot_hash_artefato': digest.hexdigest(),
+              'source_commit': os.environ.get('GITHUB_SHA', ''),
+              'run_url': run_url,
+              'run_id': os.environ.get('GITHUB_RUN_ID', ''),
+          }
+          target = site / 'dados-br' / 'status-deploy.json'
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          PY
+
+      - name: Gerar lastmod dos sitemaps
+        run: |
+          # O lastmod é derivado dos timestamps reais dos arquivos de dados que
+          # cada página consome, e não da data do deploy. Assim o sinal enviado
+          # ao Google é verdadeiro: páginas de dados diários mudam de data todo
+          # dia; páginas históricas (museu) mantêm a data real da última revisão.
+          python - <<'PY'
+          import glob
+          import json
+          import pathlib
+          import re
+          import xml.etree.ElementTree as ET
+          from datetime import datetime, timedelta, timezone
+
+          NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
+          FUSO_BR = timezone(timedelta(hours=-3))
+          CAMPOS_DATA = ("atualizado_em", "gerado_em")
+          site = pathlib.Path("_site")
+
+          # Dependências reais de dados por página, extraídas dos fetch() de cada
+          # página e dos seus JS. Se um arquivo for renomeado, o deploy falha aqui
+          # em vez de publicar silenciosamente uma data errada.
+          DEPS = {
+              "https://formuladogol.com.br/": [
+                  "tabela.json", "jogos.json", "resultados.json", "espn_eventos.json",
+                  "dados-br/probabilidades-jogos.json", "dados-br/ranking-desempenho.json",
+              ],
+              "https://formuladogol.com.br/agenda.html": [
+                  "dados-br/agenda-clubes-br.json", "dados-br/transmissoes-tv.json",
+                  "dados-br/transmissoes-aovivo.json",
+              ],
+              "https://formuladogol.com.br/aovivo.html": [
+                  "jogos.json", "espn_eventos.json", "dados-br/agenda-clubes-br.json",
+                  "dados-br/probabilidades-jogos.json", "dados-br/probabilidades-brasileirao.json",
+                  "dados-br/transmissoes-aovivo.json", "dados-br/transmissoes-tv.json",
+              ],
+              "https://formuladogol.com.br/estatisticas.html": [
+                  "dados-br/probabilidades-brasileirao.json", "dados-br/ranking-desempenho.json",
+                  "dados-br/lideres-jogadores.json", "dados-br/estatisticas-competicao.json",
+                  "dados-br/probabilidades-por-pontuacao.json", "resultados.json",
+              ],
+              "https://formuladogol.com.br/clubes.html": [
+                  "dados-br/clubes.json", "dados-br/elencos.json",
+                  "dados-br/ranking-desempenho.json", "dados-br/probabilidades-brasileirao.json",
+                  "tabela.json", "espn_eventos.json",
+              ],
+              "https://formuladogol.com.br/museu.html": [
+                  "dados-br/museu-brasileirao.json",
+              ],
+          }
+
+          # Página institucional estática: a data é a revisão real deste conteúdo,
+          # não a data de cada deploy automático dos dados esportivos.
+          STATIC_LASTMOD = {
+              "https://formuladogol.com.br/sobre.html": "2026-08-01",
+          }
+
+          analises_manifesto = json.loads((site / "dados-br/analises.json").read_text(encoding="utf-8"))
+          artigos_analise = {
+              item["url"]: str(item["modificado_em"])[:10]
+              for item in (analises_manifesto.get("artigos") or [])
+          }
+          if not artigos_analise:
+              raise SystemExit("ERRO lastmod: manifesto editorial vazio")
+          data_hub_analises = max(artigos_analise.values())
+
+          def data_do_arquivo(rel):
+              caminho = site / rel
+              if not caminho.is_file():
+                  raise SystemExit(f"ERRO lastmod: dependência ausente no pacote público: {rel}")
+              try:
+                  dados = json.loads(caminho.read_text(encoding="utf-8"))
+              except Exception as erro:
+                  raise SystemExit(f"ERRO lastmod: JSON inválido em {rel}: {erro}")
+              if not isinstance(dados, dict):
+                  return None
+              for campo in CAMPOS_DATA:
+                  bruto = str(dados.get(campo) or "").strip()
+                  if not bruto:
+                      continue
+                  try:
+                      momento = datetime.fromisoformat(bruto.replace("Z", "+00:00"))
+                  except ValueError:
+                      continue
+                  if momento.tzinfo is None:
+                      momento = momento.replace(tzinfo=FUSO_BR)
+                  return momento.astimezone(FUSO_BR)
+              return None
+
+          agora = datetime.now(FUSO_BR)
+
+          def data_da_pagina(dependencias, rotulo):
+              datas = [d for d in (data_do_arquivo(rel) for rel in dependencias) if d]
+              if not datas:
+                  raise SystemExit(f"ERRO lastmod: nenhuma data válida para {rotulo}")
+              # Data futura indica relógio ou dado inconsistente: limita a hoje.
+              return min(max(datas), agora).strftime("%Y-%m-%d")
+
+          def aplicar(caminho_sitemap, resolver):
+              ET.register_namespace("", NS)
+              arvore = ET.parse(caminho_sitemap)
+              raiz = arvore.getroot()
+              aplicadas = 0
+              for no in raiz.findall(f"{{{NS}}}url"):
+                  loc = no.find(f"{{{NS}}}loc")
+                  if loc is None or not (loc.text or "").strip():
+                      raise SystemExit(f"ERRO lastmod: <url> sem <loc> em {caminho_sitemap}")
+                  url = loc.text.strip()
+                  valor = resolver(url)
+                  antigo = no.find(f"{{{NS}}}lastmod")
+                  if antigo is not None:
+                      no.remove(antigo)
+                  novo = ET.Element(f"{{{NS}}}lastmod")
+                  novo.text = valor
+                  no.insert(list(no).index(loc) + 1, novo)
+                  aplicadas += 1
+                  print(f"  {url} -> {valor}")
+              ET.indent(raiz, space="  ")
+              arvore.write(caminho_sitemap, encoding="utf-8", xml_declaration=True)
+              return aplicadas
+
+          # O módulo da Copa compartilha os mesmos JS e arquivos de dados entre as
+          # páginas, então não há como diferenciar por página: usa-se a data mais
+          # recente do conjunto de dados do módulo. Calculado primeiro porque as
+          # URLs da Copa também constam do sitemap principal.
+          arquivos_copa = sorted(glob.glob(str(site / "copa2026/dados/*.json")))
+          if not arquivos_copa:
+              raise SystemExit("ERRO lastmod: nenhum arquivo de dados da Copa no pacote público")
+          datas_copa = []
+          for absoluto in arquivos_copa:
+              rel = pathlib.Path(absoluto).relative_to(site).as_posix()
+              data = data_do_arquivo(rel)
+              if data:
+                  datas_copa.append(data)
+          if not datas_copa:
+              raise SystemExit("ERRO lastmod: nenhuma data válida nos dados da Copa")
+          data_copa = min(max(datas_copa), agora).strftime("%Y-%m-%d")
+
+          def resolver(url):
+              if url in DEPS:
+                  return data_da_pagina(DEPS[url], url)
+              if url in STATIC_LASTMOD:
+                  return STATIC_LASTMOD[url]
+              if url == "https://formuladogol.com.br/analises/":
+                  return data_hub_analises
+              if url in artigos_analise:
+                  return artigos_analise[url]
+              if url.startswith("https://formuladogol.com.br/copa2026/"):
+                  return data_copa
+              raise SystemExit(f"ERRO lastmod: URL sem mapeamento de dados: {url}")
+
+          print("sitemap principal:")
+          total_br = aplicar(site / "sitemap.xml", resolver)
+          print("sitemap da Copa:")
+          total_copa = aplicar(site / "copa2026/sitemap.xml", resolver)
+
+          print(f"OK lastmod aplicado: {total_br} URLs no sitemap principal, {total_copa} no da Copa")
+
+          # O dateModified do Dataset (JSON-LD) usa a mesma data honesta do lastmod
+          # da página. Uma data estática viraria mentira no dia seguinte, e o
+          # frescor é justamente o diferencial declarado do projeto.
+          URL_STATS = "https://formuladogol.com.br/estatisticas.html"
+          data_stats = data_da_pagina(DEPS[URL_STATS], URL_STATS)
+          pagina_stats = site / "estatisticas.html"
+          html_stats = pagina_stats.read_text(encoding="utf-8")
+          # Substituição por padrão (e não pela sentinela literal) para o passo ser
+          # idempotente: reexecutar apenas reescreve o mesmo valor, em vez de falhar.
+          PADRAO_DATA = r'"dateModified": "\d{4}-\d{2}-\d{2}"'
+          ocorrencias = len(re.findall(PADRAO_DATA, html_stats))
+          if ocorrencias != 1:
+              raise SystemExit(
+                  "ERRO dateModified: esperado exatamente 1 campo dateModified em "
+                  f"estatisticas.html, encontrados {ocorrencias}"
+              )
+          html_stats = re.sub(PADRAO_DATA, f'"dateModified": "{data_stats}"', html_stats)
+          pagina_stats.write_text(html_stats, encoding="utf-8")
+          print(f"OK dateModified do Dataset: {data_stats}")
+          PY
+
+      # CAUSA RAIZ do "Timeout reached" com status deployment_in_progress:
+      # o pacote publicado tem ~181 MB em 1.270 arquivos, e o actions/deploy-pages
+      # tem teto RIGIDO de 600000 ms (10 min) para o sincronismo — valores maiores
+      # sao reduzidos silenciosamente. Nao ha como esperar mais; a unica saida e
+      # entregar menos bytes.
+      #
+      # A otimizacao roda AQUI, sobre _site, e nao sobre o repositorio: o acervo
+      # original em alta resolucao continua versionado e intacto, e o artefato
+      # sai leve em toda publicacao, sem depender de ninguem lembrar de rodar o
+      # script antes do commit. Custo medido: ~26 s para 1.140 imagens.
+      - name: Otimizar imagens do pacote publico
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Alguns ambientes marcam o Python do sistema como "externally managed"
+          # (PEP 668) e recusam o pip direto. A segunda forma cobre esse caso.
+          python3 -m pip install --quiet --disable-pip-version-check pillow \
+            || python3 -m pip install --quiet --disable-pip-version-check --break-system-packages pillow
+          python3 scripts/otimizar_imagens.py --raiz _site --pastas img copa2026/img
+
+      - name: Validar pacote público antes do upload
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          FORBIDDEN=(
+            _site/apostas.html
+            _site/regras.html
+            _site/membros.json
+            _site/bolao
+            _site/aniversariantes
+            _site/docs
+            _site/css/br-apostas.css
+            _site/js/br-apostas.js
+            _site/dados-br/apostas-config.json
+            _site/dados-br/apuracao.json
+            _site/dados-br/participantes-bolao-classificacao.json
+            _site/dados-br/probabilidades-bolao.json
+            _site/dados-br/ranking-apostas.json
+            _site/copa2026/admin.html
+            _site/copa2026/palpite.html
+            _site/copa2026/palpites.html
+            _site/copa2026/pontos.html
+            _site/copa2026/regras.html
+            _site/copa2026/css/br-apostas.css
+            _site/copa2026/js/admin.js
+            _site/copa2026/js/br-apostas.js
+            _site/copa2026/js/chances-bolao.js
+            _site/copa2026/js/palpites.js
+            _site/copa2026/js/pontos.js
+            _site/copa2026/dados/palpites_mata.json
+          )
+          for item in "${FORBIDDEN[@]}"; do
+            if [[ -e "$item" ]]; then
+              echo "ERRO: conteúdo privado ou módulo oculto entrou no deploy: $item"
+              exit 1
+            fi
+          done
+
+          # Guarda-limite do preview social: o crawler do WhatsApp aborta o download
+          # de og:image acima de ~300 KB e o card fica sem imagem. Falhar aqui é
+          # melhor do que publicar um preview quebrado.
+          OG_IMAGES=(
+            _site/og-image-formula-do-gol-v2.jpg
+            _site/copa2026/og-copa-publico-v2.png
+          )
+          OG_MAX_BYTES=300000
+          for item in "${OG_IMAGES[@]}"; do
+            if [[ ! -f "$item" ]]; then
+              echo "ERRO: og:image ausente no pacote publico: $item"
+              exit 1
+            fi
+            size=$(stat -c%s "$item")
+            if (( size > OG_MAX_BYTES )); then
+              echo "ERRO: og:image acima do limite do WhatsApp: $item ($size bytes > $OG_MAX_BYTES)"
+              exit 1
+            fi
+            echo "OK og:image $item = $size bytes"
+          done
+
+          REQUIRED_OPERATIONAL=(
+            _site/dados-br/status-atualizacao.json
+            _site/dados-br/status-deploy.json
+            _site/dados-br/transmissoes-tv.json
+          )
+          for item in "${REQUIRED_OPERATIONAL[@]}"; do
+            if [[ ! -f "$item" ]]; then
+              echo "ERRO: artefato operacional obrigatório ausente: $item"
+              exit 1
+            fi
+            python -m json.tool "$item" >/dev/null
+          done
+
+          python - <<'PY'
+          from datetime import date, datetime, timedelta, timezone
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlsplit
+          import json
+          import re
+          import xml.etree.ElementTree as ET
+
+          site = Path("_site")
+          formula_ga_id = "G-3956SD5HFC"
+          old_ga_id = "G-0PPWGP93FD"
+          root_pages = [
+              "index.html",
+              "aovivo.html",
+              "agenda.html",
+              "estatisticas.html",
+              "clubes.html",
+              "museu.html",
+          ]
+          root_expected_menu = [
+              "Estatísticas",
+              "Jogos",
+              "Agenda",
+              "Ao vivo",
+              "Tabela",
+              "Resultados",
+              "Análises",
+              "Clubes",
+              "Museu",
+              "Copa 2026",
+          ]
+          root_forbidden_menu = [
+              "Apostas",
+              "Bolão",
+              "Regras",
+              "Aniversariantes",
+              "Login",
+          ]
+          identity_files = [
+              "favicon-formula-do-gol-16.png",
+              "favicon-formula-do-gol-32.png",
+              "favicon-formula-do-gol-96.png",
+              "favicon-formula-do-gol-192.png",
+              "favicon-formula-do-gol-512.png",
+              "apple-touch-icon-formula-do-gol.png",
+              "favicon-formula-do-gol.ico",
+              "og-image-formula-do-gol-v2.jpg",
+          ]
+
+          class RefParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.refs = []
+
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  for key in ("src", "href"):
+                      if attrs.get(key):
+                          self.refs.append(attrs[key])
+
+          for page_name in root_pages:
+              page = site / page_name
+              assert page.is_file(), f"página pública ausente: {page_name}"
+              text = page.read_text(encoding="utf-8")
+              title_match = re.search(r"<title>(.*?)</title>", text, flags=re.I | re.S)
+              assert title_match, f"{page_name}: título HTML ausente"
+              title = " ".join(title_match.group(1).split())
+              assert "Fórmula do Gol" in title, f"{page_name}: título sem a marca Fórmula do Gol: {title}"
+              assert not re.search(r"almo[cç]o de sexta|brasileir[aã]o\s+2026\s*[—-]\s*almo", title, flags=re.I), f"{page_name}: título herdado do site anterior: {title}"
+              ga_ids = set(re.findall(r"G-[A-Z0-9]+", text))
+              assert formula_ga_id in ga_ids, f"{page_name}: Analytics do Fórmula do Gol ausente"
+              assert old_ga_id not in ga_ids, f"{page_name}: Analytics do site anterior ainda presente"
+              nav_match = re.search(r"<nav\b[^>]*>(.*?)</nav>", text, flags=re.I | re.S)
+              assert nav_match, f"{page_name}: menu principal ausente"
+              nav = re.sub(r"<[^>]+>", " ", nav_match.group(1))
+              nav = " ".join(nav.split())
+              for label in root_expected_menu:
+                  assert label in nav, f"{page_name}: item público ausente no menu: {label}"
+              for label in root_forbidden_menu:
+                  assert label not in nav, f"{page_name}: item oculto ainda presente no menu: {label}"
+              assert '<span class="footer-title">Fórmula do Gol</span>' in text, f"{page_name}: marca nova ausente no disclaimer"
+              assert not re.search(r"almo[cç]o de sexta", text, flags=re.I), f"{page_name}: marca antiga ainda presente"
+              for identity in identity_files:
+                  assert identity in text, f"{page_name}: identidade ausente: {identity}"
+
+              parser = RefParser()
+              parser.feed(text)
+              for raw in parser.refs:
+                  ref = raw.strip()
+                  parsed = urlsplit(ref)
+                  if parsed.scheme or ref.startswith("//") or ref.startswith("#") or ref.startswith("data:"):
+                      continue
+                  path = parsed.path
+                  if not path or path == "/":
+                      continue
+                  target = site / path.lstrip("/") if path.startswith("/") else page.parent / path
+                  if target.is_dir():
+                      target = target / "index.html"
+                  assert target.exists(), f"{page_name}: referência local quebrada: {ref}"
+
+          route_titles = {
+              "jogos/index.html": "Jogos do Brasileirão 2026 — Fórmula do Gol",
+              "tabela/index.html": "Tabela do Brasileirão 2026 — Fórmula do Gol",
+              "resultados/index.html": "Resultados do Brasileirão 2026 — Fórmula do Gol",
+          }
+          for page_name, expected_title in route_titles.items():
+              text = (site / page_name).read_text(encoding="utf-8")
+              assert f"<title>{expected_title}</title>" in text, f"{page_name}: título incorreto"
+              assert "brasileirao2026almoco" not in text.lower(), f"{page_name}: domínio antigo presente"
+
+          manifest_analises = json.loads((site / "dados-br/analises.json").read_text(encoding="utf-8"))
+          artigos_analises = manifest_analises.get("artigos") or []
+          assert manifest_analises.get("total_artigos") == len(artigos_analises) >= 1, "manifesto editorial vazio ou divergente"
+          paginas_analise = ["analises/index.html"] + [f"analises/{item['slug']}" for item in artigos_analises]
+          for page_name in paginas_analise:
+              page = site / page_name
+              assert page.is_file(), f"página editorial ausente: {page_name}"
+              text = page.read_text(encoding="utf-8")
+              parser = RefParser()
+              parser.feed(text)
+              assert formula_ga_id in text, f"{page_name}: Analytics ausente"
+              assert old_ga_id not in text, f"{page_name}: Analytics antigo presente"
+              nav_match = re.search(r'<nav\b[^>]*class="[^"]*\bnav\b[^"]*"[^>]*>(.*?)</nav>', text, flags=re.I | re.S)
+              assert nav_match, f"{page_name}: menu editorial ausente"
+              nav = " ".join(re.sub(r"<[^>]+>", " ", nav_match.group(1)).split())
+              for label in root_expected_menu:
+                  assert label in nav, f"{page_name}: item de menu ausente: {label}"
+              for raw in parser.refs:
+                  parsed = urlsplit(raw.strip())
+                  if parsed.scheme or raw.startswith("//") or raw.startswith("#") or raw.startswith("data:"):
+                      continue
+                  path = parsed.path
+                  if not path or path == "/":
+                      continue
+                  target = site / path.lstrip("/") if path.startswith("/") else page.parent / path
+                  if target.is_dir():
+                      target = target / "index.html"
+                  assert target.exists(), f"{page_name}: referência local quebrada: {raw}"
+          for artigo in artigos_analises:
+              text = (site / "analises" / artigo["slug"]).read_text(encoding="utf-8")
+              identificador = str(artigo.get("id_editorial") or "")
+              if not identificador and artigo.get("rodada"):
+                  identificador = f'brasileirao-2026-rodada-{int(artigo["rodada"])}'
+              assert identificador, f"{artigo['slug']}: id editorial ausente"
+              assert '"@type":"NewsArticle"' in text, f"{artigo['slug']}: NewsArticle ausente"
+              assert f'data-fdg-editorial-id="{identificador}"' in text, f"{artigo['slug']}: marcador editorial genérico ausente"
+              tipo = str(artigo.get("tipo") or "")
+              if tipo == "brasileirao_rodada":
+                  rodada = int(artigo.get("rodada") or 0)
+                  assert rodada and f'data-fdg-analise-rodada="{rodada}"' in text, f"{artigo['slug']}: marcador de rodada ausente"
+                  assert text.count('class="analysis-game-card"') == int(artigo.get("jogos_concluidos") or 0), f"{artigo['slug']}: jogos divergentes"
+              elif tipo == "copa_do_brasil_fase":
+                  assert int(artigo.get("confrontos") or 0) == 8, f"{artigo['slug']}: confrontos divergentes"
+                  assert len(artigo.get("classificados") or []) == 8, f"{artigo['slug']}: classificados incompletos"
+                  assert text.count('class="analysis-cup-tie"') == 8, f"{artigo['slug']}: cards de confronto divergentes"
+                  assert text.count('class="analysis-status ') == 14, f"{artigo['slug']}: comparativo da Série A divergente"
+                  assert "Os confrontos das quartas dependerão do sorteio" in text, f"{artigo['slug']}: ressalva do sorteio ausente"
+                  assert "Tabela do Brasileirão" not in text and "analysis-kpis" not in text, f"{artigo['slug']}: layout incorreto"
+              else:
+                  raise AssertionError(f"{artigo['slug']}: tipo editorial desconhecido: {tipo}")
+          historico_continental = json.loads((site / "dados-br/historico-probabilidades-continentais.json").read_text(encoding="utf-8"))
+          assert historico_continental.get("total_marcos") == len(historico_continental.get("marcos") or []), "histórico continental divergente"
+          assert any(item.get("id") == "copa-do-brasil-2026-oitavas-antes-jogos-de-volta" for item in historico_continental.get("marcos") or []), "fotografia anterior da Copa do Brasil ausente"
+          ET.parse(site / "news-sitemap.xml")
+          ET.parse(site / "feed.xml")
+          sitemap_text = (site / "sitemap.xml").read_text(encoding="utf-8")
+          assert "https://formuladogol.com.br/analises/" in sitemap_text, "hub editorial ausente do sitemap"
+          for artigo in artigos_analises:
+              assert artigo["url"] in sitemap_text, f"URL editorial ausente do sitemap: {artigo['url']}"
+          print(f"OK seção editorial: {len(artigos_analises)} artigo(s), links, Schema e XMLs")
+
+          copa_pages = [
+              "copa2026/index.html",
+              "copa2026/aovivo.html",
+              "copa2026/onde-assistir.html",
+              "copa2026/estatisticas.html",
+              "copa2026/selecoes.html",
+              "copa2026/palcos.html",
+              "copa2026/museu.html",
+          ]
+          copa_expected_menu = [
+              "Jogos",
+              "Ao vivo",
+              "Onde assistir",
+              "Estatísticas",
+              "Seleções",
+              "Sedes",
+              "Museu",
+              "Fórmula do Gol",
+          ]
+          copa_forbidden_menu = [
+              "Bolão",
+              "Palpites",
+              "Meus Palpites",
+              "Regras",
+              "Área do administrador",
+          ]
+
+          for page_name in copa_pages:
+              page = site / page_name
+              assert page.is_file(), f"página pública da Copa ausente: {page_name}"
+              text = page.read_text(encoding="utf-8")
+              title_match = re.search(r"<title>(.*?)</title>", text, flags=re.I | re.S)
+              assert title_match, f"{page_name}: título HTML ausente"
+              title = " ".join(title_match.group(1).split())
+              assert "Fórmula do Gol" in title, f"{page_name}: título público sem a marca Fórmula do Gol: {title}"
+              ga_ids = set(re.findall(r"G-[A-Z0-9]+", text))
+              assert formula_ga_id in ga_ids, f"{page_name}: Analytics do Fórmula do Gol ausente"
+              assert old_ga_id not in ga_ids, f"{page_name}: Analytics do site anterior ainda presente"
+              nav_match = re.search(r'<nav\b[^>]*class="[^"]*\bmenu\b[^"]*"[^>]*>(.*?)</nav>', text, flags=re.I | re.S)
+              assert nav_match, f"{page_name}: menu principal da Copa ausente"
+              nav = " ".join(re.sub(r"<[^>]+>", " ", nav_match.group(1)).split())
+              for label in copa_expected_menu:
+                  assert label in nav, f"{page_name}: item público ausente no menu: {label}"
+              for label in copa_forbidden_menu:
+                  assert label not in nav, f"{page_name}: item não público presente no menu: {label}"
+              assert "Fórmula do Gol" in text, f"{page_name}: marca Fórmula do Gol ausente"
+              assert "header-copa26-formula-do-gol.png" in text, f"{page_name}: cabeçalho novo ausente"
+              assert "brasileirao2026almoco" not in text.lower(), f"{page_name}: domínio antigo presente"
+              assert not re.search(r"almo[cç]o de sexta", text, flags=re.I), f"{page_name}: marca antiga presente"
+              assert not re.search(r'href=["\'](?:pontos|palpite|palpites|regras|admin)\.html', text, flags=re.I), f"{page_name}: link não público presente"
+
+              parser = RefParser()
+              parser.feed(text)
+              for raw in parser.refs:
+                  ref = raw.strip()
+                  parsed = urlsplit(ref)
+                  if parsed.scheme or ref.startswith("//") or ref.startswith("#") or ref.startswith("data:"):
+                      continue
+                  path = parsed.path
+                  if not path or path == "/":
+                      continue
+                  target = site / path.lstrip("/") if path.startswith("/") else page.parent / path
+                  if target.is_dir():
+                      target = target / "index.html"
+                  assert target.exists(), f"{page_name}: referência local quebrada: {ref}"
+
+          index = (site / "index.html").read_text(encoding="utf-8")
+          assert "window.FDG_ANALYTICS_PAGE" in index, "index sem título explícito para o Analytics"
+          assert "BR_METADADOS_VIEWS" in index, "index sem títulos por rota pública"
+          assert "Jogos do Brasileirão 2026 — Fórmula do Gol" in index, "título de Jogos ausente"
+          assert "Tabela do Brasileirão 2026 — Fórmula do Gol" in index, "título de Tabela ausente"
+          assert "Resultados do Brasileirão 2026 — Fórmula do Gol" in index, "título de Resultados ausente"
+          assert "const BR_PUBLIC_ONLY = true;" in index, "index sem trava pública"
+          assert "const PARTICIPANTES_INICIAIS = [];" in index, "participantes incorporados no index público"
+          assert "const MEMBROS_INICIAIS = [];" in index, "membros incorporados no index público"
+          assert "BRASILEIRAO2026ALMOCO" not in index, "referência ao repositório antigo no index"
+
+          stats = (site / "estatisticas.html").read_text(encoding="utf-8")
+          assert "responsável pelo projeto Fórmula do Gol." in stats, "crédito metodológico sem a nova marca"
+
+          config = (site / "js/br-config.js").read_text(encoding="utf-8")
+          assert re.search(r"login\s*:\s*false", config), "login não está desativado"
+          assert re.search(r"modulosPrivados\s*:\s*false", config), "módulos privados não estão desativados"
+          assert re.search(r"copa2026\s*:\s*true", config), "Copa 2026 não está ativada"
+
+          menu = (site / "js/br-menu.js").read_text(encoding="utf-8")
+          assert "LOGIN_ENABLED && PRIVATE_MODULES_ENABLED" in menu, "menu sem trava de sessão antiga"
+          assert 'global.location.replace("/jogos")' in menu, "rota privada sem retorno público"
+
+          cname = (site / "CNAME").read_text(encoding="utf-8").strip()
+          assert cname == "formuladogol.com.br", f"CNAME divergente: {cname!r}"
+
+          robots = (site / "robots.txt").read_text(encoding="utf-8")
+          assert "Sitemap: https://formuladogol.com.br/sitemap.xml" in robots
+          for route in (
+              "/apostas.html",
+              "/regras.html",
+              "/bolao/",
+              "/aniversariantes/",
+              "/copa2026/admin.html",
+              "/copa2026/palpite.html",
+              "/copa2026/palpites.html",
+              "/copa2026/pontos.html",
+              "/copa2026/regras.html",
+          ):
+              assert f"Disallow: {route}" in robots, f"robots sem bloqueio para {route}"
+
+          root = ET.parse(site / "sitemap.xml").getroot()
+          ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          urls = [node.text for node in root.findall("sm:url/sm:loc", ns)]
+          expected_urls = {
+              "https://formuladogol.com.br/",
+              "https://formuladogol.com.br/agenda.html",
+              "https://formuladogol.com.br/aovivo.html",
+              "https://formuladogol.com.br/estatisticas.html",
+              "https://formuladogol.com.br/clubes.html",
+              "https://formuladogol.com.br/museu.html",
+              "https://formuladogol.com.br/sobre.html",
+              "https://formuladogol.com.br/copa2026/",
+              "https://formuladogol.com.br/copa2026/aovivo.html",
+              "https://formuladogol.com.br/copa2026/onde-assistir.html",
+              "https://formuladogol.com.br/copa2026/estatisticas.html",
+              "https://formuladogol.com.br/copa2026/selecoes.html",
+              "https://formuladogol.com.br/copa2026/palcos.html",
+              "https://formuladogol.com.br/copa2026/museu.html",
+          }
+          expected_urls.add("https://formuladogol.com.br/analises/")
+          expected_urls.update(artigo["url"] for artigo in artigos_analises)
+          assert set(urls) == expected_urls, f"sitemap divergente: {urls!r}"
+
+          # Guarda do lastmod: uma data ausente equivale a não informar frescor;
+          # uma data congelada no passado é pior, porque afirma ao Google que
+          # nada mudou. Uma data futura destrói a confiança no sinal.
+          ns_sm = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+          hoje_br = datetime.now(timezone(timedelta(hours=-3))).date()
+          for nome_sitemap in ("sitemap.xml", "copa2026/sitemap.xml"):
+              raiz_sm = ET.parse(site / nome_sitemap).getroot()
+              nos = raiz_sm.findall("sm:url", ns_sm)
+              assert nos, f"{nome_sitemap}: sem URLs"
+              for no_sm in nos:
+                  loc_sm = no_sm.find("sm:loc", ns_sm)
+                  alvo = (loc_sm.text or "").strip() if loc_sm is not None else "?"
+                  lm = no_sm.find("sm:lastmod", ns_sm)
+                  assert lm is not None and (lm.text or "").strip(), f"{nome_sitemap}: {alvo} sem lastmod"
+                  texto_lm = lm.text.strip()
+                  try:
+                      valor_lm = date.fromisoformat(texto_lm)
+                  except ValueError:
+                      raise AssertionError(f"{nome_sitemap}: {alvo} com lastmod inválido: {texto_lm!r}")
+                  assert valor_lm <= hoje_br, f"{nome_sitemap}: {alvo} com lastmod no futuro: {texto_lm}"
+
+          # Guarda dos dados estruturados. Motivo concreto: as páginas internas
+          # referenciavam "#website" e "#organization" que não estavam definidos
+          # em lugar nenhum, porque o index.html não tinha JSON-LD. Referência
+          # pendurada não gera erro visível — só silenciosamente não funciona.
+          paginas_ld = (
+              "index.html", "estatisticas.html", "aovivo.html",
+              "clubes.html", "museu.html", "sobre.html",
+          )
+          definidos = set()
+          referencias = []
+          blocos = 0
+          for nome_ld in paginas_ld:
+              conteudo_ld = (site / nome_ld).read_text(encoding="utf-8")
+              achados = re.findall(
+                  r'<script type="application/ld\+json">(.*?)</script>', conteudo_ld, re.S
+              )
+              assert achados, f"{nome_ld}: sem bloco JSON-LD"
+              assert "0000-00-00" not in conteudo_ld, f"{nome_ld}: sentinela de data não substituída"
+              for bruto_ld in achados:
+                  blocos += 1
+                  try:
+                      dados_ld = json.loads(bruto_ld)
+                  except json.JSONDecodeError as erro:
+                      raise AssertionError(f"{nome_ld}: JSON-LD inválido: {erro}")
+                  nos = dados_ld.get("@graph") if isinstance(dados_ld, dict) else None
+                  if nos is None:
+                      nos = [dados_ld] if isinstance(dados_ld, dict) else list(dados_ld)
+
+                  def varrer(valor, dentro_de_no):
+                      if isinstance(valor, dict):
+                          identificador = valor.get("@id")
+                          if identificador and valor.get("@type"):
+                              definidos.add(identificador)
+                          elif identificador and set(valor.keys()) == {"@id"}:
+                              referencias.append((nome_ld, identificador))
+                          for chave, item in valor.items():
+                              if chave != "@id":
+                                  varrer(item, True)
+                      elif isinstance(valor, list):
+                          for item in valor:
+                              varrer(item, dentro_de_no)
+
+                  for no_ld in nos:
+                      varrer(no_ld, False)
+
+          for origem_ld, referencia in referencias:
+              assert referencia in definidos, (
+                  f"{origem_ld}: JSON-LD referencia @id inexistente: {referencia}"
+              )
+
+          tipos_index = re.findall(r'"@type": "([A-Za-z]+)"', (site / "index.html").read_text(encoding="utf-8"))
+          for obrigatorio in ("Organization", "WebSite", "WebPage", "Person"):
+              assert obrigatorio in tipos_index, f"index.html: JSON-LD sem {obrigatorio}"
+          conteudo_stats = (site / "estatisticas.html").read_text(encoding="utf-8")
+          assert '"@type": "Dataset"' in conteudo_stats, "estatisticas.html: JSON-LD sem Dataset"
+          conteudo_sobre = (site / "sobre.html").read_text(encoding="utf-8")
+          assert '"@type": "AboutPage"' in conteudo_sobre, "sobre.html: JSON-LD sem AboutPage"
+          assert "espaços de lazer" in conteudo_sobre, "sobre.html: identidade sem desambiguação explícita"
+          print(f"OK JSON-LD: {blocos} blocos, {len(definidos)} entidades, {len(referencias)} referências resolvidas")
+          assert not any(any(term in url for term in ("apostas", "bolao", "aniversariantes", "regras", "palpite", "pontos")) for url in urls)
+
+          copa_root = ET.parse(site / "copa2026/sitemap.xml").getroot()
+          copa_urls = [node.text for node in copa_root.findall("sm:url/sm:loc", ns)]
+          expected_copa_urls = {url for url in expected_urls if "/copa2026/" in url}
+          assert set(copa_urls) == expected_copa_urls, f"sitemap da Copa divergente: {copa_urls!r}"
+
+          copa_robots = (site / "copa2026/robots.txt").read_text(encoding="utf-8")
+          assert "Sitemap: https://formuladogol.com.br/copa2026/sitemap.xml" in copa_robots
+          for route in ("admin.html", "palpite.html", "palpites.html", "pontos.html", "regras.html"):
+              assert f"Disallow: /copa2026/{route}" in copa_robots, f"robots da Copa sem bloqueio: {route}"
+
+          resultados_js = (site / "copa2026/js/resultados.js").read_text(encoding="utf-8")
+          aovivo_js = (site / "copa2026/js/aovivo.js").read_text(encoding="utf-8")
+          assert "copa_revelados" not in resultados_js, "Jogos da Copa ainda consulta dados privados"
+          assert "palpites_mata.json" not in resultados_js, "Jogos da Copa ainda carrega dados privados"
+          assert "copa_revelados" not in aovivo_js, "Ao vivo da Copa ainda consulta dados privados"
+          public_copa_code = resultados_js + "\n" + aovivo_js
+          assert not re.search(
+              r"\b(palpit\w*|apost\w*|bol[aã]o|cerveja|vinho|pix)\b",
+              public_copa_code,
+              flags=re.I,
+          ), "JavaScript público da Copa contém recurso não informativo"
+
+          redirects = {"jogos": "jogos", "tabela": "tabela", "resultados": "resultados"}
+          for route, view in redirects.items():
+              text = (site / route / "index.html").read_text(encoding="utf-8")
+              assert f"view={view}" in text, f"{route}: redirecionamento divergente"
+
+          print("OK: pacote público, menus, identidade, privacidade, SEO e referências locais conferidos.")
+          PY
+
+          if find _site -type l | grep -q .; then
+            echo "ERRO: existem symlinks dentro de _site."
+            find _site -type l
+            exit 1
+          fi
+
+          echo "Total de arquivos públicos:"
+          find _site -type f | wc -l
+
+          echo "Tamanho total do pacote público:"
+          du -sh _site
+
+          # Guarda de peso. Pacote grande alonga a fase de sincronismo do Pages
+          # e aumenta a janela em que outra implantação pode cancelar esta.
+          BYTES=$(du -sb _site | cut -f1)
+          MB=$((BYTES / 1024 / 1024))
+          echo "Peso do artefato: ${MB} MB"
+          if (( MB > 400 )); then
+            echo "ERRO: artefato com ${MB} MB (limite operacional 400 MB)."
+            echo "Rode 'python scripts/otimizar_imagens.py' e comite as imagens otimizadas."
+            exit 1
+          fi
+          if (( MB > 120 )); then
+            echo "::warning::Artefato com ${MB} MB. Acima de 120 MB o deploy do Pages fica lento; considere rodar scripts/otimizar_imagens.py."
+          fi
+
+      # CAUSA RAIZ do erro "Deployment cancelled." logo na primeira consulta de
+      # status: existe uma SEGUNDA fonte criando implantações do Pages neste
+      # repositório. Quando a origem do Pages está em "Deploy from a branch", o
+      # GitHub mantém ativo o workflow embutido "pages build and deployment",
+      # que dispara a cada push em main (e os robôs deste repositório commitam
+      # em main o tempo todo). As duas implantações disputam a mesma fila serial
+      # e o serviço cancela a mais antiga — que é justamente a criada aqui.
+      #
+      # actions/configure-pages NÃO corrige isso: com enablement padrão ele
+      # apenas lê as configurações. Aqui a origem é fixada explicitamente em
+      # build_type=workflow, o que desativa o workflow embutido de vez.
+      # ---------------------------------------------------------------------
+      # GUARDA DE CONTEUDO — a resposta possivel para "deploy incremental".
+      #
+      # O GitHub Pages NAO tem publicacao incremental: toda implantacao envia o
+      # artefato inteiro e sincroniza tudo. Nao existe API de delta. O que da
+      # para fazer e nao publicar quando nao ha o que publicar.
+      #
+      # A maior parte das execucoes dos robos nao muda nada (o robo de
+      # transmissoes checa de 15 em 15 min e quase sempre encontra o mesmo
+      # conteudo). Aqui o pacote e reduzido a um unico hash; se ele bater com o
+      # da ultima publicacao, o job encerra em ~1 min sem tocar no Pages.
+      #
+      # status-deploy.json fica de fora do hash porque carrega timestamp e SHA
+      # do commit — muda em toda execucao por construcao. Verificado: e o UNICO
+      # arquivo nao deterministico do pacote.
+      - name: Calcular hash do pacote
+        id: guarda
+        shell: bash
+        run: |
+          set -euo pipefail
+          HASH=$(find _site -type f ! -path '_site/dados-br/status-deploy.json' -print0 \
+            | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
+          echo "hash=${HASH}" >> "$GITHUB_OUTPUT"
+          echo "Hash do pacote: ${HASH}"
+          mkdir -p .hash-publicado
+          echo "${HASH}" > .hash-publicado/hash.txt
+
+      - name: Consultar hash da ultima publicacao
+        id: cache_hash
+        uses: actions/cache/restore@v4
+        with:
+          path: .hash-publicado
+          key: pages-publicado-${{ steps.guarda.outputs.hash }}
+
+      - name: Decidir se publica
+        id: decisao
+        shell: bash
+        env:
+          FORCAR: ${{ github.event.inputs.forcar }}
+          CACHE_HIT: ${{ steps.cache_hash.outputs.cache-hit }}
+          EVENTO: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          if [[ "${FORCAR:-false}" == "true" ]]; then
+            echo "publicar=true" >> "$GITHUB_OUTPUT"
+            echo "Publicando: forcado pelo operador."
+          elif [[ "${CACHE_HIT:-}" == "true" ]]; then
+            echo "publicar=false" >> "$GITHUB_OUTPUT"
+            echo "PULANDO: o pacote e byte a byte identico ao ja publicado."
+            echo "Nada mudou desde a ultima implantacao — nao ha o que enviar ao Pages."
+            echo "::notice::Deploy dispensado (site inalterado). Evento: ${EVENTO}."
+          else
+            echo "publicar=true" >> "$GITHUB_OUTPUT"
+            echo "Publicando: o pacote mudou desde a ultima implantacao."
+          fi
+
+      - name: Fixar origem do Pages em GitHub Actions
+        if: steps.decisao.outputs.publicar == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          atual=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type // "desconhecido"' 2>/dev/null || echo "sem_pages")
+          echo "build_type atual: ${atual}"
+
+          if [[ "$atual" == "workflow" ]]; then
+            echo "OK: origem já é GitHub Actions. Nenhum workflow embutido concorrendo."
+            exit 0
+          fi
+
+          echo "::warning::Origem do Pages estava em '${atual}'. Corrigindo para 'workflow'."
+          if gh api --method PUT "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow >/dev/null 2>&1; then
+            echo "Origem corrigida para GitHub Actions."
+          else
+            echo "::warning::Não foi possível alterar automaticamente (o GITHUB_TOKEN pode não ter permissão de administração)."
+            echo "::warning::Ajuste manualmente em Settings > Pages > Build and deployment > Source = GitHub Actions."
+          fi
+
+      - name: Destravar fila do Pages (cancelar implantações concorrentes)
+        if: steps.decisao.outputs.publicar == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          # Implantações presas em queued/in_progress bloqueiam a fila serial do
+          # Pages e cancelam ou atrasam esta publicação. São canceladas aqui,
+          # antes de criarmos a nossa, para que a nossa seja a única na fila.
+          LIMITE=$(date -u -d '5 minutes ago' +%s)
+          PRESOS=0
+
+          gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=github-pages&per_page=30" \
+            --jq '.[] | [.id, .sha, .created_at] | @tsv' > /tmp/deployments.tsv || exit 0
+
+          while IFS=$'\t' read -r id sha criado; do
+            [[ -z "${id:-}" ]] && continue
+            [[ "$sha" == "$GITHUB_SHA" ]] && continue
+
+            estado=$(gh api "repos/${GITHUB_REPOSITORY}/deployments/${id}/statuses?per_page=1" \
+              --jq '.[0].state // "sem_status"' 2>/dev/null || echo "sem_status")
+
+            case "$estado" in
+              queued|in_progress|pending|waiting) ;;
+              *) continue ;;
+            esac
+
+            nascido=$(date -u -d "$criado" +%s 2>/dev/null || echo 0)
+            if (( nascido == 0 || nascido > LIMITE )); then
+              continue
+            fi
+
+            echo "Cancelando implantacao concorrente: id=${id} sha=${sha} estado=${estado} criada_em=${criado}"
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/deployments/${sha}/cancel" >/dev/null 2>&1 \
+              || echo "  (nao foi possivel cancelar ${sha}; seguindo assim mesmo)"
+            PRESOS=$((PRESOS + 1))
+          done < /tmp/deployments.tsv
+
+          if (( PRESOS == 0 )); then
+            echo "Fila do Pages limpa: nenhuma implantacao concorrente encontrada."
+          else
+            echo "Implantacoes concorrentes canceladas: ${PRESOS}."
+            sleep 20
+          fi
+
+      - name: Configure Pages
+        if: steps.decisao.outputs.publicar == 'true'
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        if: steps.decisao.outputs.publicar == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+          retention-days: 1
+
+      # O aviso de Node 20 emitido por actions/deploy-pages@v4 é apenas de
+      # compatibilidade: o runner do GitHub já executa a action em Node 24.
+      # Uma implantação do Pages pode, excepcionalmente, ser cancelada pelo
+      # serviço depois de o artefato ser aceito. As duas primeiras tentativas não
+      # encerram o job; se isso ocorrer, aguardamos e criamos uma nova
+      # implantação usando exatamente o mesmo artefato validado.
+      - name: Deploy to GitHub Pages
+        if: steps.decisao.outputs.publicar == 'true'
+        id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 600000
+          error_count: 20
+          reporting_interval: 5000
+        timeout-minutes: 12
+
+      - name: Aguardar antes de repetir deploy cancelado
+        if: steps.decisao.outputs.publicar == 'true' && steps.deployment.outcome == 'failure'
+        shell: bash
+        run: sleep 60
+
+      - name: Repetir deploy no GitHub Pages
+        id: deployment_retry
+        continue-on-error: true
+        if: steps.decisao.outputs.publicar == 'true' && steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 600000
+          error_count: 20
+          reporting_interval: 5000
+        timeout-minutes: 12
+
+      - name: Aguardar antes da última tentativa de deploy
+        if: steps.decisao.outputs.publicar == 'true' && steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
+        shell: bash
+        run: sleep 120
+
+      # Terceira e última tentativa: esta NÃO tem continue-on-error, portanto
+      # falha aqui reprova o job e dispara o alerta.
+      - name: Última tentativa de deploy no GitHub Pages
+        id: deployment_retry2
+        if: steps.decisao.outputs.publicar == 'true' && steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 600000
+          error_count: 20
+          reporting_interval: 5000
+        timeout-minutes: 12
+
+      # Registra o hash recem-publicado. Na proxima execucao, se o pacote for
+      # identico, o cache dara hit e o deploy sera dispensado.
+      - name: Registrar hash publicado
+        if: steps.decisao.outputs.publicar == 'true' && success()
+        continue-on-error: true
+        uses: actions/cache/save@v4
+        with:
+          path: .hash-publicado
+          key: pages-publicado-${{ steps.guarda.outputs.hash }}
+
+      - name: Confirmar e avisar publicação editorial
+        if: steps.decisao.outputs.publicar == 'true' && success()
+        # A publicação já foi concluída pelo passo anterior. Confirmação pública
+        # e e-mail são pós-deploy e jamais devem transformar uma publicação
+        # válida em falha por ausência de secrets ou indisponibilidade externa.
+        continue-on-error: true
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
+          NOTIFICACOES_ANALISE: dados-br/analises-notificacoes.json
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import html
+          import json
+          import os
+          import smtplib
+          import ssl
+          import time
+          import urllib.error
+          import urllib.request
+          from datetime import datetime, timedelta, timezone
+          from email.message import EmailMessage
+          from email.utils import formataddr
+          from pathlib import Path
+
+          obrigatorios = ('SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_DESTINO')
+          ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
+          if ausentes:
+              print('::warning title=E-mail editorial não enviado::Configure os secrets ' + ', '.join(ausentes) + '. A página foi publicada normalmente.')
+              raise SystemExit(0)
+
+          dados = json.loads(Path('dados-br/analises.json').read_text(encoding='utf-8'))
+          artigos = dados.get('artigos') or []
+          caminho_notificacoes = Path(os.environ['NOTIFICACOES_ANALISE'])
+          notificacoes = json.loads(caminho_notificacoes.read_text(encoding='utf-8'))
+
+          def id_editorial(item):
+              valor = str(item.get('id_editorial') or '').strip()
+              if valor:
+                  return valor
+              numero = int(item.get('rodada') or 0)
+              return f'brasileirao-2026-rodada-{numero}' if numero else ''
+
+          ids_notificados = {id_editorial(item) for item in notificacoes.get('notificacoes') or []}
+          pendentes = [item for item in artigos if id_editorial(item) and id_editorial(item) not in ids_notificados]
+          pendentes.sort(key=lambda item: (str(item.get('publicado_em') or ''), str(item.get('modificado_em') or '')))
+          if not pendentes:
+              print('Nenhum editorial novo aguardando e-mail.')
+              raise SystemExit(0)
+
+          porta = int(os.environ['SMTP_PORT'])
+          contexto = ssl.create_default_context()
+          enviados = 0
+          for artigo in pendentes:
+              editorial_id = id_editorial(artigo)
+              rodada = int(artigo.get('rodada') or 0)
+              url, titulo = artigo['url'], artigo['titulo']
+              assunto = str(artigo.get('email_assunto') or (f'Fórmula do Gol: análise da rodada {rodada} publicada' if rodada else 'Fórmula do Gol: nova análise publicada'))
+              chamada = str(artigo.get('email_chamada') or 'Uma nova análise do Fórmula do Gol está no ar.')
+              marcador = f'data-fdg-editorial-id="{editorial_id}"'
+              confirmado = False
+              for tentativa in range(1, 31):
+                  try:
+                      req = urllib.request.Request(f'{url}?deploy={os.environ.get("GITHUB_RUN_ID", "")}', headers={'Cache-Control': 'no-cache'})
+                      with urllib.request.urlopen(req, timeout=15) as resposta:
+                          confirmado = marcador in resposta.read().decode('utf-8', errors='replace')
+                  except urllib.error.URLError as erro:
+                      print(f'Verificação pública de {editorial_id} {tentativa}/30: {erro}')
+                  if confirmado:
+                      break
+                  time.sleep(15)
+              if not confirmado:
+                  print(f'::warning title=Página ainda não confirmada::O marcador {editorial_id} ainda não apareceu em {url}; este e-mail ficou pendente.')
+                  continue
+
+              mensagem = EmailMessage()
+              mensagem['From'] = formataddr(('Fórmula do Gol', os.environ['SMTP_USER']))
+              mensagem['To'] = os.environ['EMAIL_DESTINO']
+              mensagem['Subject'] = assunto
+              mensagem.set_content(f'{chamada}\n\n{titulo}\n\n{url}')
+              mensagem.add_alternative(
+                  f'<p>{html.escape(chamada)}</p><p><strong>{html.escape(titulo)}</strong></p><p><a href="{html.escape(url, quote=True)}">Abrir página publicada</a></p>',
+                  subtype='html',
+              )
+              try:
+                  if porta == 465:
+                      with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], porta, context=contexto, timeout=30) as servidor:
+                          servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                          servidor.send_message(mensagem)
+                  else:
+                      with smtplib.SMTP(os.environ['SMTP_HOST'], porta, timeout=30) as servidor:
+                          servidor.ehlo()
+                          servidor.starttls(context=contexto)
+                          servidor.ehlo()
+                          servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                          servidor.send_message(mensagem)
+              except (OSError, ValueError, smtplib.SMTPException) as erro:
+                  print(f'::warning title=E-mail editorial não enviado::{editorial_id}: {erro}. A página foi publicada normalmente.')
+                  continue
+
+              registro = {
+                  'id_editorial': editorial_id,
+                  'tipo': str(artigo.get('tipo') or 'editorial'),
+                  'slug': artigo['slug'],
+                  'url': url,
+                  'notificado_em': datetime.now(timezone(timedelta(hours=-3))).replace(microsecond=0).isoformat(),
+              }
+              if rodada:
+                  registro['rodada'] = rodada
+              notificacoes.setdefault('notificacoes', []).append(registro)
+              ids_notificados.add(editorial_id)
+              enviados += 1
+              print(f'Página confirmada e e-mail enviado: {url}')
+
+          if not enviados:
+              raise SystemExit(0)
+          notificacoes['notificacoes'].sort(key=lambda item: str(item.get('notificado_em') or ''))
+          notificacoes['schema_version'] = 2
+          notificacoes['total_notificacoes'] = len(notificacoes['notificacoes'])
+          caminho_temporario = caminho_notificacoes.with_suffix('.tmp')
+          caminho_temporario.write_text(json.dumps(notificacoes, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+          caminho_temporario.replace(caminho_notificacoes)
+          PY
+
+          if git diff --quiet -- "$NOTIFICACOES_ANALISE"; then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "$NOTIFICACOES_ANALISE"
+          git commit -m "Registrar notificação editorial por e-mail [skip ci]"
+
+          publicado=false
+          for tentativa in 1 2 3; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              publicado=true
+              break
+            fi
+            echo "Tentativa $tentativa/3 de registrar a notificação não concluiu; tentando novamente."
+          done
+          if [[ "$publicado" != "true" ]]; then
+            echo "::warning title=Registro da notificação pendente::O e-mail foi enviado, mas o registro de deduplicação não pôde ser publicado."
+          fi
+
+      - name: Notificar buscadores via IndexNow
+        if: steps.decisao.outputs.publicar == 'true' && success()
+        run: |
+          # IndexNow avisa Bing, Yandex, Naver e DuckDuckGo em uma única chamada.
+          # O Google NÃO suporta o protocolo — o sitemap com lastmod real já
+          # cobre o Google. A chave está em 78f8b10d32edcce04827b713eae52df5.txt na raiz do site.
+          python - <<'INNER'
+          import json, pathlib, urllib.request, urllib.error
+
+          CHAVE = "78f8b10d32edcce04827b713eae52df5"
+          HOST  = "formuladogol.com.br"
+          URLS  = [
+              "https://formuladogol.com.br/",
+              "https://formuladogol.com.br/estatisticas.html",
+              "https://formuladogol.com.br/aovivo.html",
+              "https://formuladogol.com.br/clubes.html",
+              "https://formuladogol.com.br/museu.html",
+              "https://formuladogol.com.br/copa2026/",
+          ]
+          manifesto = json.loads(pathlib.Path("dados-br/analises.json").read_text(encoding="utf-8"))
+          URLS.append("https://formuladogol.com.br/analises/")
+          URLS.extend(item["url"] for item in (manifesto.get("artigos") or [])[-5:])
+
+          payload = json.dumps({
+              "host": HOST,
+              "key": CHAVE,
+              "keyLocation": "https://" + HOST + "/" + CHAVE + ".txt",
+              "urlList": URLS,
+          }).encode("utf-8")
+
+          req = urllib.request.Request(
+              "https://api.indexnow.org/indexnow",
+              data=payload,
+              headers={"Content-Type": "application/json; charset=utf-8"},
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=15) as resp:
+                  status = resp.status
+          except urllib.error.HTTPError as e:
+              status = e.code
+          except urllib.error.URLError as e:
+              print("IndexNow: erro de rede: " + str(e.reason))
+              raise SystemExit(0)
+
+          CODIGOS = {
+              200: "OK - URLs aceitas",
+              202: "OK - URLs recebidas e serao processadas",
+              400: "AVISO - request mal formado",
+              403: "AVISO - chave nao corresponde ao arquivo de verificacao",
+              422: "AVISO - URLs nao pertencem ao host declarado",
+              429: "AVISO - rate limit",
+          }
+          print("IndexNow: HTTP " + str(status) + " - " + CODIGOS.get(status, "codigo desconhecido"))
+          print("URLs submetidas: " + str(len(URLS)))
+          for u in URLS:
+              print("  " + u)
+          if status not in (200, 202):
+              print("IndexNow: deploy continua mesmo com este aviso")
+          INNER
+
+      - name: Alertar falha de deploy por e-mail
+        if: failure()
+        continue-on-error: true
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO_SUGESTOES }}
+        run: |
+          python - <<'PY'
+          import os
+          import smtplib
+          import ssl
+          from email.message import EmailMessage
+          from email.utils import formataddr
+
+          obrigatorios = ('SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'EMAIL_DESTINO')
+          ausentes = [nome for nome in obrigatorios if not os.environ.get(nome, '').strip()]
+          if ausentes:
+              print('::warning title=Alerta de deploy não enviado::Secrets SMTP ausentes: ' + ', '.join(ausentes))
+              raise SystemExit(0)
+          url_execucao = f"{os.environ.get('GITHUB_SERVER_URL', 'https://github.com')}/{os.environ.get('GITHUB_REPOSITORY', '')}/actions/runs/{os.environ.get('GITHUB_RUN_ID', '')}"
+          mensagem = EmailMessage()
+          mensagem['From'] = formataddr(('Fórmula do Gol', os.environ['SMTP_USER']))
+          mensagem['To'] = os.environ['EMAIL_DESTINO']
+          mensagem['Subject'] = 'Fórmula do Gol: falha no deploy do site'
+          mensagem.set_content('O deploy do GitHub Pages falhou. A última versão publicada continua no ar.\n\n' + url_execucao)
+          try:
+              porta = int(os.environ['SMTP_PORT'])
+              contexto = ssl.create_default_context()
+              if porta == 465:
+                  with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], porta, context=contexto, timeout=30) as servidor:
+                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                      servidor.send_message(mensagem)
+              else:
+                  with smtplib.SMTP(os.environ['SMTP_HOST'], porta, timeout=30) as servidor:
+                      servidor.ehlo()
+                      servidor.starttls(context=contexto)
+                      servidor.ehlo()
+                      servidor.login(os.environ['SMTP_USER'], os.environ['SMTP_PASS'])
+                      servidor.send_message(mensagem)
+          except (OSError, ValueError, smtplib.SMTPException) as erro:
+              print(f'::warning title=Alerta de deploy não enviado::{erro}')
+          PY

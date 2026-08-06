@@ -1,0 +1,99 @@
+name: Publicar análise editorial da rodada
+
+on:
+  workflow_dispatch:
+    inputs:
+      rodada:
+        description: 'Rodada específica (vazio = detectar automaticamente)'
+        required: false
+        type: string
+      forcar:
+        description: 'Publicar mesmo fora da janela editorial'
+        required: false
+        default: false
+        type: boolean
+      sem_ia:
+        description: 'Usar somente o texto determinístico de contingência'
+        required: false
+        default: false
+        type: boolean
+  # REMOVIDO: gatilho workflow_run em 'Atualizar Brasileirao (ESPN)' e
+  # 'Buscar melhores momentos'. O Atualizar roda de hora em hora o dia inteiro
+  # (cron externo), entao esse gatilho fazia a analise editorial publicar em
+  # qualquer horario — inclusive no meio da tarde, concorrendo com os robos do
+  # dia. A publicacao editorial agora acontece SOMENTE na janela noturna.
+  schedule:
+    # 23h18 e 01h18 em Brasilia (02:18 e 04:18 UTC).
+    - cron: '18 2,4 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Baixar o main mais recente
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validar gerador e dados editoriais
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/gerar_analise_rodada.py scripts/validar_artefatos_analises.py
+          python scripts/gerar_analise_rodada.py --self-test
+          python -m json.tool dados-br/config-analises.json >/dev/null
+          python scripts/validar_artefatos_analises.py
+
+      - name: Detectar e gerar análise
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.6-terra' }}
+          RODADA: ${{ inputs.rodada }}
+          FORCAR: ${{ inputs.forcar }}
+          SEM_IA: ${{ inputs.sem_ia }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=()
+          if [[ -n "${RODADA:-}" ]]; then args+=(--rodada "$RODADA"); fi
+          if [[ "${FORCAR:-false}" == "true" ]]; then args+=(--forcar); fi
+          if [[ "${SEM_IA:-false}" == "true" ]]; then args+=(--sem-ia); fi
+          python scripts/gerar_analise_rodada.py "${args[@]}"
+
+      - name: Validar artefatos gerados
+        run: |
+          set -euo pipefail
+          python -m json.tool dados-br/analises.json >/dev/null
+          python scripts/validar_artefatos_analises.py
+
+      - name: Publicar no repositório
+        shell: bash
+        run: |
+          set -euo pipefail
+          arquivos=(analises css/br-analises.css dados-br/analises.json sitemap.xml news-sitemap.xml feed.xml)
+          if [[ -z "$(git status --porcelain -- "${arquivos[@]}")" ]]; then
+            echo "Nenhuma análise nova ou atualização editorial."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "${arquivos[@]}"
+          git commit -m "Publicar análise editorial do Brasileirão"
+          git push origin HEAD:main
