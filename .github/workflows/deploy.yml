@@ -71,6 +71,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  deployments: read
 
 # Não cancelar um deploy que já chegou à publicação do Pages. Novas execuções
 # aguardam na fila e, ao iniciar, sempre fazem checkout do main mais recente.
@@ -82,7 +83,7 @@ jobs:
   deploy:
     name: Publicar GitHub Pages
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     if: >-
       github.event_name == 'workflow_dispatch' ||
@@ -93,7 +94,7 @@ jobs:
 
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url || steps.deployment_retry2.outputs.page_url }}
 
     steps:
       - name: Checkout
@@ -1013,6 +1014,102 @@ jobs:
           echo "Tamanho total do pacote público:"
           du -sh _site
 
+          # Guarda de peso. Pacote grande alonga a fase de sincronismo do Pages
+          # e aumenta a janela em que outra implantação pode cancelar esta.
+          BYTES=$(du -sb _site | cut -f1)
+          MB=$((BYTES / 1024 / 1024))
+          echo "Peso do artefato: ${MB} MB"
+          if (( MB > 400 )); then
+            echo "ERRO: artefato com ${MB} MB (limite operacional 400 MB)."
+            echo "Rode 'python scripts/otimizar_imagens.py' e comite as imagens otimizadas."
+            exit 1
+          fi
+          if (( MB > 120 )); then
+            echo "::warning::Artefato com ${MB} MB. Acima de 120 MB o deploy do Pages fica lento; considere rodar scripts/otimizar_imagens.py."
+          fi
+
+      # CAUSA RAIZ do erro "Deployment cancelled." logo na primeira consulta de
+      # status: existe uma SEGUNDA fonte criando implantações do Pages neste
+      # repositório. Quando a origem do Pages está em "Deploy from a branch", o
+      # GitHub mantém ativo o workflow embutido "pages build and deployment",
+      # que dispara a cada push em main (e os robôs deste repositório commitam
+      # em main o tempo todo). As duas implantações disputam a mesma fila serial
+      # e o serviço cancela a mais antiga — que é justamente a criada aqui.
+      #
+      # actions/configure-pages NÃO corrige isso: com enablement padrão ele
+      # apenas lê as configurações. Aqui a origem é fixada explicitamente em
+      # build_type=workflow, o que desativa o workflow embutido de vez.
+      - name: Fixar origem do Pages em GitHub Actions
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          atual=$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.build_type // "desconhecido"' 2>/dev/null || echo "sem_pages")
+          echo "build_type atual: ${atual}"
+
+          if [[ "$atual" == "workflow" ]]; then
+            echo "OK: origem já é GitHub Actions. Nenhum workflow embutido concorrendo."
+            exit 0
+          fi
+
+          echo "::warning::Origem do Pages estava em '${atual}'. Corrigindo para 'workflow'."
+          if gh api --method PUT "repos/${GITHUB_REPOSITORY}/pages" -f build_type=workflow >/dev/null 2>&1; then
+            echo "Origem corrigida para GitHub Actions."
+          else
+            echo "::warning::Não foi possível alterar automaticamente (o GITHUB_TOKEN pode não ter permissão de administração)."
+            echo "::warning::Ajuste manualmente em Settings > Pages > Build and deployment > Source = GitHub Actions."
+          fi
+
+      - name: Destravar fila do Pages (cancelar implantações concorrentes)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          # Implantações presas em queued/in_progress bloqueiam a fila serial do
+          # Pages e cancelam ou atrasam esta publicação. São canceladas aqui,
+          # antes de criarmos a nossa, para que a nossa seja a única na fila.
+          LIMITE=$(date -u -d '5 minutes ago' +%s)
+          PRESOS=0
+
+          gh api "repos/${GITHUB_REPOSITORY}/deployments?environment=github-pages&per_page=30" \
+            --jq '.[] | [.id, .sha, .created_at] | @tsv' > /tmp/deployments.tsv || exit 0
+
+          while IFS=$'\t' read -r id sha criado; do
+            [[ -z "${id:-}" ]] && continue
+            [[ "$sha" == "$GITHUB_SHA" ]] && continue
+
+            estado=$(gh api "repos/${GITHUB_REPOSITORY}/deployments/${id}/statuses?per_page=1" \
+              --jq '.[0].state // "sem_status"' 2>/dev/null || echo "sem_status")
+
+            case "$estado" in
+              queued|in_progress|pending|waiting) ;;
+              *) continue ;;
+            esac
+
+            nascido=$(date -u -d "$criado" +%s 2>/dev/null || echo 0)
+            if (( nascido == 0 || nascido > LIMITE )); then
+              continue
+            fi
+
+            echo "Cancelando implantacao concorrente: id=${id} sha=${sha} estado=${estado} criada_em=${criado}"
+            gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/deployments/${sha}/cancel" >/dev/null 2>&1 \
+              || echo "  (nao foi possivel cancelar ${sha}; seguindo assim mesmo)"
+            PRESOS=$((PRESOS + 1))
+          done < /tmp/deployments.tsv
+
+          if (( PRESOS == 0 )); then
+            echo "Fila do Pages limpa: nenhuma implantacao concorrente encontrada."
+          else
+            echo "Implantacoes concorrentes canceladas: ${PRESOS}."
+            sleep 20
+          fi
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
@@ -1020,13 +1117,14 @@ jobs:
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
+          retention-days: 1
 
       # O aviso de Node 20 emitido por actions/deploy-pages@v4 é apenas de
       # compatibilidade: o runner do GitHub já executa a action em Node 24.
       # Uma implantação do Pages pode, excepcionalmente, ser cancelada pelo
-      # serviço depois de o artefato ser aceito. A primeira tentativa não
-      # encerra o job; se isso ocorrer, aguardamos e criamos uma nova implantação
-      # usando exatamente o mesmo artefato validado.
+      # serviço depois de o artefato ser aceito. As duas primeiras tentativas não
+      # encerram o job; se isso ocorrer, aguardamos e criamos uma nova
+      # implantação usando exatamente o mesmo artefato validado.
       - name: Deploy to GitHub Pages
         id: deployment
         continue-on-error: true
@@ -1040,11 +1138,29 @@ jobs:
       - name: Aguardar antes de repetir deploy cancelado
         if: steps.deployment.outcome == 'failure'
         shell: bash
-        run: sleep 30
+        run: sleep 60
 
       - name: Repetir deploy no GitHub Pages
         id: deployment_retry
+        continue-on-error: true
         if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 900000
+          error_count: 20
+          reporting_interval: 5000
+        timeout-minutes: 17
+
+      - name: Aguardar antes da última tentativa de deploy
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
+        shell: bash
+        run: sleep 120
+
+      # Terceira e última tentativa: esta NÃO tem continue-on-error, portanto
+      # falha aqui reprova o job e dispara o alerta.
+      - name: Última tentativa de deploy no GitHub Pages
+        id: deployment_retry2
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
         uses: actions/deploy-pages@v4
         with:
           timeout: 900000
