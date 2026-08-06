@@ -120,6 +120,11 @@
   ]);
 
   const FINAL_CACHE_KEY = "br2026_finais_reais_v2";
+  const LIVE_STATS_CACHE_KEY = "br2026_estatisticas_ao_vivo_v1";
+  const LIVE_STATS_CACHE_MAX_AGE_MS = 6 * 3600000;
+  const PARTIAL_STATS_THRESHOLD = 6;
+  const PARTIAL_STATS_RETRY_DELAY_MS = 1200;
+  const PARTIAL_STATS_RETRY_COOLDOWN_MS = 60000;
 
   function cachedFinalTimes() {
     try {
@@ -140,6 +145,27 @@
     try { localStorage.setItem(FINAL_CACHE_KEY, JSON.stringify(state.finalizadosEm || {})); } catch (_) {}
   }
 
+  function cachedLiveStats() {
+    try {
+      const parsed = JSON.parse(sessionStorage.getItem(LIVE_STATS_CACHE_KEY) || "{}");
+      const now = Date.now();
+      const out = {};
+      for (const [eventId, entry] of Object.entries(parsed || {})) {
+        const updatedAt = Number(entry && entry.updatedAt || 0);
+        if (!updatedAt || now - updatedAt > LIVE_STATS_CACHE_MAX_AGE_MS) continue;
+        if (!entry.metrics || typeof entry.metrics !== "object") continue;
+        out[eventId] = entry;
+      }
+      return out;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function saveLiveStats() {
+    try { sessionStorage.setItem(LIVE_STATS_CACHE_KEY, JSON.stringify(state.statsPorId || {})); } catch (_) {}
+  }
+
   const state = {
     agenda: [],
     eventosLocais: [],
@@ -148,6 +174,11 @@
     transmissoesTv: {},
     selecionado: new URLSearchParams(window.location.search || "").get("event") || "",
     resumoPorId: {},
+    statsPorId: cachedLiveStats(),
+    statsRetryAt: {},
+    summaryRequestSerial: 0,
+    renderSerial: 0,
+    summaryAbortController: null,
     ultimaAtualizacao: null,
     ultimaFalha: "",
     timer: null,
@@ -489,8 +520,8 @@
     };
   }
 
-  async function fetchJson(url) {
-    const r = await fetch(url, { cache: "no-store" });
+  async function fetchJson(url, options = {}) {
+    const r = await fetch(url, Object.assign({ cache: "no-store" }, options));
     if (!r.ok) throw new Error("HTTP " + r.status);
     return r.json();
   }
@@ -1761,7 +1792,7 @@
     return s;
   }
 
-  function collectStats(g, summary) {
+  function extractStatsRows(g, summary) {
     const byTeam = {};
     const add = (team, stats) => {
       if (!team) return;
@@ -1811,6 +1842,60 @@
     return rows.sort((a,b) => a.order - b.order);
   }
 
+  function statsEventKey(g) {
+    return String(g && g.id || teamKey(g && g.home && g.home.nome, g && g.away && g.away.nome) || "");
+  }
+
+  function statsFixtureKey(g) {
+    return [statsEventKey(g), teamKey(g && g.home && g.home.nome, g && g.away && g.away.nome)].join("|");
+  }
+
+  function cachedStatsCount(g) {
+    const key = statsEventKey(g);
+    const entry = key && state.statsPorId[key];
+    if (!entry || entry.fixtureKey !== statsFixtureKey(g) || !entry.metrics) return 0;
+    return Object.keys(entry.metrics).length;
+  }
+
+  function mergeStatsRows(g, currentRows) {
+    const key = statsEventKey(g);
+    if (!key) return currentRows;
+    const fixtureKey = statsFixtureKey(g);
+    let entry = state.statsPorId[key];
+    if (!entry || entry.fixtureKey !== fixtureKey || !entry.metrics || typeof entry.metrics !== "object") {
+      entry = { fixtureKey, updatedAt: 0, metrics: {} };
+    }
+
+    // A ESPN pode entregar primeiro um conjunto resumido e, segundos depois,
+    // o boxscore completo. Atualizamos toda métrica presente, mas preservamos
+    // temporariamente as ausentes para que uma resposta parcial não faça linhas
+    // já válidas desaparecerem da tela.
+    for (const row of (currentRows || [])) {
+      entry.metrics[row.label] = {
+        label: row.label, home: row.home, away: row.away, order: row.order
+      };
+    }
+    if ((currentRows || []).length) entry.updatedAt = Date.now();
+    state.statsPorId[key] = entry;
+
+    const now = Date.now();
+    for (const [eventId, cached] of Object.entries(state.statsPorId)) {
+      if (!cached || now - Number(cached.updatedAt || 0) > LIVE_STATS_CACHE_MAX_AGE_MS) delete state.statsPorId[eventId];
+    }
+    saveLiveStats();
+
+    return Object.values(entry.metrics).map((row) => {
+      const hn = numericStat(row.home), an = numericStat(row.away);
+      let pct = 50;
+      if (Number.isFinite(hn) && Number.isFinite(an) && hn + an > 0) pct = Math.max(4, Math.min(96, hn / (hn + an) * 100));
+      return Object.assign({}, row, { pct });
+    }).sort((a, b) => a.order - b.order);
+  }
+
+  function collectStats(g, summary) {
+    return mergeStatsRows(g, extractStatsRows(g, summary));
+  }
+
   function goalsBySide(g, summary) {
     const rows = eventRows(g, summary).filter(r => r.type.key === "goal");
     const home = [], away = [];
@@ -1831,16 +1916,76 @@
     return { home: side(goals.home), away: side(goals.away) };
   }
 
+  function waitWithSignal(ms, signal) {
+    return new Promise((resolve, reject) => {
+      let settled = false;
+      const finish = (callback, value) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (signal) signal.removeEventListener("abort", onAbort);
+        callback(value);
+      };
+      const onAbort = () => {
+        const error = new Error("AbortError");
+        error.name = "AbortError";
+        finish(reject, error);
+      };
+      const timer = setTimeout(() => finish(resolve), ms);
+      if (!signal) return;
+      if (signal.aborted) { onAbort(); return; }
+      signal.addEventListener("abort", onAbort, { once: true });
+    });
+  }
+
   async function loadSummary(g) {
     if (!g || !g.id || g.source !== "espn") return null;
+    const eventId = String(g.id);
+    const requestSerial = ++state.summaryRequestSerial;
+    if (state.summaryAbortController) state.summaryAbortController.abort();
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    state.summaryAbortController = controller;
+    const signal = controller && controller.signal;
+
     try {
       const league = g.espnLeague || DEFAULT_LEAGUE;
-      const url = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(g.id) + "&_=" + Date.now();
-      const data = await fetchJson(url);
-      state.resumoPorId[g.id] = data;
+      const makeUrl = (suffix) => ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/summary?event=" + encodeURIComponent(eventId) + "&_=" + Date.now() + (suffix || "");
+      let data = await fetchJson(makeUrl(""), signal ? { signal } : {});
+      let rows = extractStatsRows(g, data);
+      const previousCount = cachedStatsCount(g);
+      const now = Date.now();
+      const lastRetry = Number(state.statsRetryAt[eventId] || 0);
+      const looksPartial = rows.length < previousCount || (rows.length > 0 && rows.length <= PARTIAL_STATS_THRESHOLD);
+
+      // Uma segunda leitura curta resolve a janela em que o scoreboard já está
+      // atualizado, mas o summary da ESPN ainda chegou apenas com as métricas
+      // básicas. O cooldown impede excesso de chamadas em competições cuja fonte
+      // realmente ofereça somente um conjunto reduzido.
+      if (looksPartial && now - lastRetry >= PARTIAL_STATS_RETRY_COOLDOWN_MS) {
+        state.statsRetryAt[eventId] = now;
+        try {
+          await waitWithSignal(PARTIAL_STATS_RETRY_DELAY_MS, signal);
+          const retryData = await fetchJson(makeUrl("&retry=1"), signal ? { signal } : {});
+          const retryRows = extractStatsRows(g, retryData);
+          if (retryRows.length >= rows.length) {
+            data = retryData;
+            rows = retryRows;
+          }
+        } catch (retryError) {
+          if (retryError && retryError.name === "AbortError") throw retryError;
+          // A primeira resposta continua válida; falhar apenas a leitura extra
+          // não deve apagar nem interromper o conteúdo já recebido.
+        }
+      }
+
+      if (requestSerial !== state.summaryRequestSerial) return state.resumoPorId[eventId] || null;
+      state.resumoPorId[eventId] = data;
       return data;
     } catch (e) {
-      return state.resumoPorId[g.id] || null;
+      if (e && e.name !== "AbortError") console.warn("Summary ESPN indisponível para " + eventId + ":", e);
+      return state.resumoPorId[eventId] || null;
+    } finally {
+      if (requestSerial === state.summaryRequestSerial) state.summaryAbortController = null;
     }
   }
 
@@ -1951,11 +2096,15 @@
   }
 
   async function renderPage() {
+    const renderSerial = ++state.renderSerial;
     const all = allGames();
     const { selected, priorities } = chooseGame(all);
     const switchGames = priorities.length ? priorities : (selected ? [selected] : []);
     renderSwitcher(switchGames, selected);
     const summary = await loadSummary(selected);
+    // Ao trocar rapidamente de partida, uma resposta anterior pode chegar depois.
+    // Nunca permitimos que ela redesenhe o jogo atualmente selecionado.
+    if (renderSerial !== state.renderSerial) return;
     renderMain(selected, summary, all);
     updateCountdowns();
     if (badge) {
