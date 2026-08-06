@@ -2,12 +2,12 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-08-05T22:44:22-03:00",
+  "gerado_em": "2026-08-05T23:12:25-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "mudanca_esportiva": true,
-  "hash_estado_antes": "61ddd32ebe7877bbfed5562f7340c0b3278bd4e729d531d4c7e5b452695ad634",
-  "hash_estado_depois": "1c022b7cc838f3ce9747d5d82d8954f73a5c696b26be3d1b8d1ec24fd8119419",
+  "hash_estado_antes": "1c022b7cc838f3ce9747d5d82d8954f73a5c696b26be3d1b8d1ec24fd8119419",
+  "hash_estado_depois": "b1edd5ce0a21f93ae89bc0659badbb9f42d884b71bf7f463b32d8111c1ec4fcf",
   "fonte": "ESPN",
   "temporada": 2026,
   "competicoes": [
@@ -15,7 +15,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-08-05T22:44:20-03:00",
+      "gerado_em": "2026-08-05T23:12:25-03:00",
       "cache_efetivo_minutos": 5,
       "eventos": 142,
       "finalizados": 138,
@@ -37,20 +37,11 @@
     },
     {
       "competicao": "libertadores",
-      "status": "atualizado",
+      "status": "cache_valido",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
       "gerado_em": "2026-08-05T22:44:21-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 142,
-      "finalizados": 126,
-      "pendentes": 16,
-      "fase_atual": {
-        "status": "em_andamento",
-        "ordem": 600,
-        "nome": "Oitavas de final",
-        "eventos": 16,
-        "eventos_pendentes": 16
-      },
       "coleta": {
         "modo": "incremental",
         "janela_inicio": "2026-07-15T00:00:00-03:00",
@@ -61,20 +52,11 @@
     },
     {
       "competicao": "sul_americana",
-      "status": "atualizado",
+      "status": "cache_valido",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
       "gerado_em": "2026-08-05T22:44:22-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 144,
-      "finalizados": 128,
-      "pendentes": 16,
-      "fase_atual": {
-        "status": "em_andamento",
-        "ordem": 600,
-        "nome": "Oitavas de final",
-        "eventos": 16,
-        "eventos_pendentes": 16
-      },
       "coleta": {
         "modo": "incremental",
         "janela_inicio": "2026-07-15T00:00:00-03:00",
