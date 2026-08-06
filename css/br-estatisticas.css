@@ -1954,3 +1954,238 @@ body > .container > section.hero > img {
   width: 100%;
   max-width: none;
 }
+
+/* CONTROLES ANALÍTICOS 20260806 — filtros do AF-Score, comparação de clubes e público por clube. */
+.stats-performance-tools {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 13px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 17px;
+  background: linear-gradient(135deg, rgba(17,35,42,.78), rgba(5,15,22,.82));
+}
+.stats-performance-filter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.stats-performance-filter-head > div span,
+.stats-performance-filter-head > div strong { display: block; }
+.stats-performance-filter-head > div span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.stats-performance-filter-head > div strong { margin-top: 3px; color: #eaffb5; font-size: 15px; }
+.stats-performance-filter {
+  display: flex;
+  gap: 7px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(163,230,53,.42) transparent;
+}
+.stats-performance-filter-btn,
+.stats-compare-toggle {
+  min-height: 38px;
+  padding: 8px 13px;
+  border: 1px solid rgba(148,163,184,.18);
+  border-radius: 999px;
+  background: rgba(255,255,255,.025);
+  color: #dbe7f2;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 950;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+.stats-performance-filter-btn:hover,
+.stats-performance-filter-btn:focus-visible,
+.stats-compare-toggle:hover,
+.stats-compare-toggle:focus-visible { border-color: rgba(163,230,53,.52); color: #efffc4; outline: none; }
+.stats-performance-filter-btn.is-active,
+.stats-compare-toggle.is-active {
+  border-color: rgba(251,191,36,.72);
+  background: linear-gradient(135deg, rgba(251,191,36,.95), rgba(255,212,82,.95));
+  color: #17200a;
+  box-shadow: 0 8px 20px rgba(251,191,36,.12);
+}
+.stats-compare-toggle:active,
+.stats-performance-filter-btn:active { transform: translateY(1px); }
+.stats-performance-metric.is-selected {
+  margin-inline: -5px;
+  padding: 5px;
+  border: 1px solid rgba(251,191,36,.30);
+  border-radius: 10px;
+  background: rgba(251,191,36,.055);
+}
+.stats-performance-metric.is-selected span,
+.stats-performance-metric.is-selected strong { color: #ffe17a; font-weight: 950; }
+.stats-performance-metric.is-selected > div { background: rgba(251,191,36,.16); }
+
+.stats-compare-panel {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 13px;
+  border: 1px solid rgba(163,230,53,.24);
+  border-radius: 17px;
+  background: radial-gradient(circle at 100% 0, rgba(163,230,53,.09), transparent 36%), rgba(5,15,22,.72);
+}
+.stats-compare-selectors {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 9px;
+}
+.stats-compare-selectors label,
+.stats-attendance-controls label { display: grid; gap: 5px; min-width: 0; }
+.stats-compare-selectors label > span,
+.stats-attendance-controls label > span {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+}
+.stats-compare-selectors select,
+.stats-attendance-controls select {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 8px 34px 8px 11px;
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 12px;
+  background-color: #0b1a22;
+  color: #eef6fd;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+}
+.stats-compare-selectors select:focus,
+.stats-attendance-controls select:focus { border-color: rgba(163,230,53,.65); outline: 2px solid rgba(163,230,53,.16); }
+.stats-attendance-controls select:disabled { opacity: .48; cursor: not-allowed; }
+.stats-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--compare-count, 2), minmax(0,1fr));
+  gap: 9px;
+}
+.stats-compare-card {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 15px;
+  background: rgba(255,255,255,.025);
+}
+.stats-compare-club {
+  display: grid;
+  grid-template-columns: 42px minmax(0,1fr);
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(148,163,184,.12);
+}
+.stats-compare-shield { width: 40px; height: 40px; object-fit: contain; }
+.stats-compare-club strong,
+.stats-compare-club span { display: block; }
+.stats-compare-club strong { color: #fff; font-size: 15px; }
+.stats-compare-club span { margin-top: 3px; color: var(--muted); font-size: 10px; }
+.stats-compare-metrics { display: grid; gap: 7px; margin-top: 10px; }
+.stats-compare-metric {
+  display: grid;
+  grid-template-columns: 72px minmax(0,1fr) 38px;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 5px;
+  border-radius: 9px;
+}
+.stats-compare-metric > span { color: var(--muted); font-size: 10px; }
+.stats-compare-metric > div { height: 7px; overflow: hidden; border-radius: 999px; background: rgba(96,165,250,.13); }
+.stats-compare-metric i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #fbbf24, #a3e635); }
+.stats-compare-metric > strong { color: #e7eef5; font-size: 11px; text-align: right; }
+.stats-compare-metric.is-best { background: rgba(163,230,53,.07); }
+.stats-compare-metric.is-best > span,
+.stats-compare-metric.is-best > strong { color: #d9ff76; font-weight: 950; }
+.stats-compare-empty {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px dashed rgba(148,163,184,.24);
+  border-radius: 13px;
+  color: var(--muted);
+  text-align: center;
+}
+.stats-compare-empty strong { color: #e7eef5; }
+.stats-compare-empty span { font-size: 11px; }
+
+.stats-attendance-controls {
+  display: grid;
+  grid-template-columns: minmax(180px,.8fr) minmax(170px,.65fr) minmax(240px,1.25fr);
+  align-items: end;
+  gap: 9px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 15px;
+  background: rgba(5,15,22,.48);
+}
+.stats-attendance-context {
+  min-width: 0;
+  min-height: 42px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 7px 11px;
+  border-left: 3px solid rgba(163,230,53,.58);
+  border-radius: 0 10px 10px 0;
+  background: rgba(163,230,53,.045);
+}
+.stats-attendance-context strong,
+.stats-attendance-context span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stats-attendance-context strong { color: #eaffb5; font-size: 13px; }
+.stats-attendance-context span { margin-top: 3px; color: var(--muted); font-size: 10px; }
+.stats-attendance-row:hover,
+.stats-attendance-row:focus-visible { background: rgba(163,230,53,.06); outline: 1px solid rgba(163,230,53,.25); }
+
+@media (max-width: 920px) {
+  .stats-compare-selectors { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .stats-compare-selectors label:last-child { grid-column: 1 / -1; }
+  .stats-compare-grid { grid-template-columns: 1fr; }
+  .stats-attendance-controls { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .stats-attendance-context { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+  .stats-performance-tools,
+  .stats-compare-panel { padding: 10px; border-radius: 14px; }
+  .stats-performance-filter-head { align-items: flex-start; }
+  .stats-performance-filter-head > div strong { font-size: 13px; }
+  .stats-compare-toggle { min-height: 36px; padding-inline: 10px; font-size: 10px; }
+  .stats-performance-filter { margin-inline: -2px; }
+  .stats-performance-filter-btn { min-height: 36px; padding: 7px 11px; font-size: 10px; }
+  .stats-compare-selectors,
+  .stats-attendance-controls { grid-template-columns: 1fr; }
+  .stats-compare-selectors label:last-child,
+  .stats-attendance-context { grid-column: auto; }
+  .stats-compare-club { grid-template-columns: 38px minmax(0,1fr); }
+  .stats-compare-shield { width: 36px; height: 36px; }
+  .stats-compare-metric { grid-template-columns: 68px minmax(0,1fr) 34px; gap: 5px; }
+  .stats-attendance-context { min-height: 0; }
+  .stats-attendance-summary > div { padding: 10px; }
+  .stats-attendance-summary strong { font-size: 17px; }
+  .stats-attendance-row { grid-template-columns: 28px minmax(0,1fr) auto; gap: 7px; padding: 9px 7px; }
+  .stats-attendance-row strong { font-size: 12px; }
+  .stats-attendance-row small { font-size: 9px; }
+  .stats-attendance-row > b { font-size: 15px; }
+}
+@media (max-width: 420px) {
+  .stats-performance-filter-head { display: grid; }
+  .stats-compare-toggle { width: 100%; }
+  .stats-attendance-summary { gap: 6px; }
+  .stats-attendance-summary > div:last-child { grid-column: 1 / -1; }
+}

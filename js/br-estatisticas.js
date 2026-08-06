@@ -49,6 +49,11 @@
     expandedClubGoals: {},
     clubFilter: "",
     gamesLimit: 10,
+    rankingMetric: "indice_final",
+    rankingCompareOpen: false,
+    rankingCompare: ["", "", ""],
+    attendanceClub: "",
+    attendanceScope: "todos",
   };
 
   const $ = (id) => document.getElementById(id);
@@ -518,6 +523,151 @@
     return `<div class="stats-sequence-list">${rows.map((row) => `<div class="stats-sequence-row"><span>${escapeHtml(row.label)}</span><strong>${escapeHtml(row.data?.time || "—")}</strong><b>${integer(row.data?.quantidade)}</b></div>`).join("")}</div>`;
   }
 
+  const PERFORMANCE_METRICS = [
+    { key: "indice_final", label: "Índice geral", short: "Índice" },
+    { key: "ataque", label: "Ataque", short: "Ataque" },
+    { key: "defesa", label: "Defesa", short: "Defesa" },
+    { key: "dominio", label: "Domínio", short: "Domínio" },
+    { key: "eficiencia", label: "Eficiência", short: "Eficiência" },
+    { key: "disciplina", label: "Disciplina", short: "Disciplina" },
+  ];
+
+  const ATTENDANCE_SCOPES = [
+    { key: "todos", label: "Todos os jogos" },
+    { key: "mandante", label: "Como mandante" },
+    { key: "visitante", label: "Como visitante" },
+  ];
+
+  function performanceMetricConfig(key) {
+    return PERFORMANCE_METRICS.find((item) => item.key === key) || PERFORMANCE_METRICS[0];
+  }
+
+  function performanceValue(club, key) {
+    const raw = key === "indice_final" ? (club?.indice_final ?? club?.score) : club?.[key];
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function sortedPerformanceRanking() {
+    const source = Array.isArray(state.ranking?.ranking) ? state.ranking.ranking : [];
+    const key = performanceMetricConfig(state.rankingMetric).key;
+    return source.slice().sort((a, b) => {
+      const metricDiff = performanceValue(b, key) - performanceValue(a, key);
+      if (Math.abs(metricDiff) > 1e-9) return metricDiff;
+      const indexDiff = performanceValue(b, "indice_final") - performanceValue(a, "indice_final");
+      if (Math.abs(indexDiff) > 1e-9) return indexDiff;
+      const originalA = Number(a?.pos ?? a?.pos_ranking) || 999;
+      const originalB = Number(b?.pos ?? b?.pos_ranking) || 999;
+      if (originalA !== originalB) return originalA - originalB;
+      return String(a?.time || "").localeCompare(String(b?.time || ""), "pt-BR");
+    });
+  }
+
+  function allClubNames() {
+    const names = new Map();
+    const add = (value) => {
+      const name = String(value || "").trim();
+      if (!name) return;
+      const key = normalize(name);
+      if (!names.has(key)) names.set(key, name);
+    };
+    (Array.isArray(state.ranking?.ranking) ? state.ranking.ranking : []).forEach((club) => add(club?.time));
+    (Array.isArray(state.competition?.jogos) ? state.competition.jogos : []).forEach((game) => {
+      add(game?.mandante);
+      add(game?.visitante);
+    });
+    return Array.from(names.values()).sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }
+
+  function performanceFilterControls() {
+    const metric = performanceMetricConfig(state.rankingMetric);
+    return `<section class="stats-performance-tools" aria-label="Controles do Ranking de Desempenho">
+      <div class="stats-performance-filter-head">
+        <div><span>Ordenar o ranking por</span><strong>${escapeHtml(metric.label)}</strong></div>
+        <button class="stats-compare-toggle${state.rankingCompareOpen ? " is-active" : ""}" type="button" data-ranking-compare-toggle aria-expanded="${state.rankingCompareOpen ? "true" : "false"}">⚖️ ${state.rankingCompareOpen ? "Fechar comparação" : "Comparar clubes"}</button>
+      </div>
+      <div class="stats-performance-filter" role="group" aria-label="Métrica usada para ordenar o ranking">
+        ${PERFORMANCE_METRICS.map((item) => `<button type="button" class="stats-performance-filter-btn${item.key === metric.key ? " is-active" : ""}" data-ranking-metric="${escapeAttr(item.key)}" aria-pressed="${item.key === metric.key ? "true" : "false"}">${escapeHtml(item.label)}</button>`).join("")}
+      </div>
+    </section>`;
+  }
+
+  function rankingComparePanel(ranking) {
+    if (!state.rankingCompareOpen) return "";
+    const byName = new Map(ranking.map((club) => [normalize(club.time), club]));
+    const selectedClubs = state.rankingCompare.map((name) => byName.get(normalize(name))).filter(Boolean);
+    const selectedNames = new Set(state.rankingCompare.filter(Boolean));
+    const selects = state.rankingCompare.map((selected, index) => {
+      const placeholder = index === 2 ? "Terceiro clube (opcional)" : `Clube ${index + 1}`;
+      const options = allClubNames().map((club) => {
+        const disabled = club !== selected && selectedNames.has(club);
+        return `<option value="${escapeAttr(club)}"${club === selected ? " selected" : ""}${disabled ? " disabled" : ""}>${escapeHtml(club)}</option>`;
+      }).join("");
+      return `<label><span>${escapeHtml(placeholder)}</span><select data-ranking-compare-slot="${index}"><option value="">${escapeHtml(placeholder)}</option>${options}</select></label>`;
+    }).join("");
+
+    let comparison = `<div class="stats-compare-empty"><strong>Selecione pelo menos dois clubes.</strong><span>O comparativo usa exatamente as notas publicadas no AF-Score.</span></div>`;
+    if (selectedClubs.length >= 2) {
+      const bestByMetric = Object.fromEntries(PERFORMANCE_METRICS.map((item) => [item.key, Math.max(...selectedClubs.map((club) => performanceValue(club, item.key)))]));
+      comparison = `<div class="stats-compare-grid" style="--compare-count:${selectedClubs.length}">${selectedClubs.map((club) => `<article class="stats-compare-card">
+        <div class="stats-compare-club">${shield(club, "stats-compare-shield")}<div><strong>${escapeHtml(club.time)}</strong><span>${integer(club.pontos)} pts · ${integer(club.pos_tabela)}º na tabela</span></div></div>
+        <div class="stats-compare-metrics">${PERFORMANCE_METRICS.map((item) => {
+          const value = performanceValue(club, item.key);
+          const isBest = Math.abs(value - bestByMetric[item.key]) < 1e-9;
+          return `<div class="stats-compare-metric${isBest ? " is-best" : ""}"><span>${escapeHtml(item.label)}</span><div><i style="width:${Math.max(0, Math.min(100, value)).toFixed(1)}%"></i></div><strong>${number(value, 1)}</strong></div>`;
+        }).join("")}</div>
+      </article>`).join("")}</div>`;
+    }
+
+    return `<section class="stats-compare-panel" aria-label="Comparação de clubes">
+      <div class="stats-compare-selectors">${selects}</div>
+      ${comparison}
+      <p class="stats-source-note">Notas de 0 a 100. O destaque identifica o maior valor entre os clubes selecionados em cada dimensão.</p>
+    </section>`;
+  }
+
+  function attendanceMatchesScope(game, club, scope) {
+    if (!club) return true;
+    const clubKey = normalize(club);
+    const home = normalize(game?.mandante) === clubKey;
+    const away = normalize(game?.visitante) === clubKey;
+    if (scope === "mandante") return home;
+    if (scope === "visitante") return away;
+    return home || away;
+  }
+
+  function attendanceFilteredData() {
+    const club = state.attendanceClub;
+    const scope = club ? state.attendanceScope : "todos";
+    const allGames = Array.isArray(state.competition?.jogos) ? state.competition.jogos : [];
+    const eligible = allGames.filter((game) => attendanceMatchesScope(game, club, scope));
+    const informed = eligible
+      .filter((game) => Number.isFinite(Number(game?.publico)) && Number(game.publico) > 0)
+      .slice()
+      .sort((a, b) => Number(b.publico) - Number(a.publico) || String(b.data_iso || "").localeCompare(String(a.data_iso || "")));
+    const total = informed.reduce((sum, game) => sum + Number(game.publico), 0);
+    return {
+      club,
+      scope,
+      games: informed,
+      total,
+      average: informed.length ? Math.round(total / informed.length) : 0,
+      max: informed[0] || null,
+      min: informed.length ? informed[informed.length - 1] : null,
+      informedCount: informed.length,
+      missingCount: Math.max(0, eligible.length - informed.length),
+    };
+  }
+
+  function attendanceControls(data) {
+    const selectedScope = ATTENDANCE_SCOPES.some((item) => item.key === data.scope) ? data.scope : "todos";
+    return `<div class="stats-attendance-controls">
+      <label><span>Clube</span><select data-attendance-club><option value="">Todos os clubes</option>${allClubNames().map((club) => `<option value="${escapeAttr(club)}"${club === data.club ? " selected" : ""}>${escapeHtml(club)}</option>`).join("")}</select></label>
+      <label><span>Recorte</span><select data-attendance-scope${data.club ? "" : " disabled"}>${ATTENDANCE_SCOPES.map((item) => `<option value="${escapeAttr(item.key)}"${item.key === selectedScope ? " selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}</select></label>
+      <div class="stats-attendance-context"><strong>${escapeHtml(data.club || "Campeonato inteiro")}</strong><span>${escapeHtml(ATTENDANCE_SCOPES.find((item) => item.key === selectedScope)?.label || "Todos os jogos")} · ${integer(data.informedCount)} com público${data.missingCount ? ` · ${integer(data.missingCount)} sem dado` : ""}</span></div>
+    </div>`;
+  }
+
   function attendanceGameRow(game, index) {
     return `<button type="button" class="stats-attendance-row" data-open-game="${escapeAttr(game.event_id || "")}">
       <span>${integer(index + 1)}</span>
@@ -530,7 +680,8 @@
     const target = $("campeonato-conteudo");
     const performance = state.competition?.performance_por_partida || {};
     const attendance = state.competition?.publico || {};
-    const ranking = Array.isArray(attendance.ranking) ? attendance.ranking : [];
+    const filteredAttendance = attendanceFilteredData();
+    const ranking = filteredAttendance.games;
     const attendanceShown = state.expanded.publico ? ranking : ranking.slice(0, 5);
     const performanceHtml = [
       performance.mais_gols_mandante,
@@ -545,43 +696,45 @@
     </div>
     <section class="panel stats-attendance-panel"><div class="panel-inner">
       <div class="section-head"><div><div class="kicker">👥 Torcida</div><h2>Público</h2></div><span class="badge">Jogos com dado oficial</span></div>
+      ${attendanceControls(filteredAttendance)}
       <div class="stats-attendance-summary">
-        <div><span>Maior público</span><strong>${integer(attendance.maior_publico?.publico)}</strong></div>
-        <div><span>Menor público</span><strong>${integer(attendance.menor_publico?.publico)}</strong></div>
-        <div><span>Média</span><strong>${integer(attendance.media_publico)}</strong></div>
-        <div><span>Total</span><strong>${integer(attendance.total_publico)}</strong></div>
-        <div><span>Jogos informados</span><strong>${integer(attendance.jogos_com_publico)}</strong></div>
+        <div><span>Maior público</span><strong>${filteredAttendance.max ? integer(filteredAttendance.max.publico) : "—"}</strong></div>
+        <div><span>Menor público</span><strong>${filteredAttendance.min ? integer(filteredAttendance.min.publico) : "—"}</strong></div>
+        <div><span>Média</span><strong>${filteredAttendance.informedCount ? integer(filteredAttendance.average) : "—"}</strong></div>
+        <div><span>Total</span><strong>${filteredAttendance.informedCount ? integer(filteredAttendance.total) : "—"}</strong></div>
+        <div><span>Jogos informados</span><strong>${integer(filteredAttendance.informedCount)}</strong></div>
       </div>
-      ${attendanceShown.length ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 maiores ↑" : `Ver todos os públicos (${ranking.length}) ↓`}</button>` : ""}` : emptyState("As fontes consultadas ainda não disponibilizaram público para os jogos processados.")}
-      <p class="stats-source-note">${escapeHtml(attendance.observacao || "Média calculada somente sobre partidas com público informado.")}</p>
+      ${attendanceShown.length ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 maiores ↑" : `Ver todos os públicos (${ranking.length}) ↓`}</button>` : ""}` : emptyState("Nenhum jogo deste recorte possui público oficial informado.")}
+      <p class="stats-source-note">${escapeHtml(attendance.observacao || "Média calculada somente sobre partidas com público informado.")}${filteredAttendance.missingCount ? ` Neste recorte, ${integer(filteredAttendance.missingCount)} ${filteredAttendance.missingCount === 1 ? "partida ainda não possui" : "partidas ainda não possuem"} público oficial e não ${filteredAttendance.missingCount === 1 ? "entra" : "entram"} nos cálculos.` : ""}</p>
     </div></section>`;
   }
 
-  function metricBar(label, value) {
+  function metricBar(label, value, selected = false) {
     const n = Math.max(0, Math.min(100, Number(value) || 0));
-    return `<div class="stats-performance-metric"><span>${escapeHtml(label)}</span><div><i style="width:${n.toFixed(1)}%"></i></div><strong>${number(n, 1)}</strong></div>`;
+    return `<div class="stats-performance-metric${selected ? " is-selected" : ""}"><span>${escapeHtml(label)}</span><div><i style="width:${n.toFixed(1)}%"></i></div><strong>${number(n, 1)}</strong></div>`;
   }
 
   function renderRanking() {
     const target = $("ranking-desempenho");
-    const ranking = Array.isArray(state.ranking?.ranking) ? state.ranking.ranking : [];
+    const ranking = sortedPerformanceRanking();
     if (!ranking.length) {
       target.innerHTML = emptyState("Ranking de desempenho ainda não disponível.");
       return;
     }
-    target.innerHTML = `<div class="stats-performance-list">${ranking.map((club, index) => `<article class="stats-performance-card">
+    const metric = performanceMetricConfig(state.rankingMetric);
+    target.innerHTML = `${performanceFilterControls()}${rankingComparePanel(ranking)}<div class="stats-performance-list">${ranking.map((club, index) => `<article class="stats-performance-card">
       <div class="stats-performance-head">
-        <span class="stats-rank">${integer(club.pos || club.pos_ranking || index + 1)}</span>
+        <span class="stats-rank">${integer(index + 1)}</span>
         <a class="stats-performance-club-link" href="${escapeAttr(clubHref(club.time))}" title="Abrir página de ${escapeAttr(club.time)}" aria-label="Abrir página de ${escapeAttr(club.time)}">${shield(club, "stats-performance-shield")}</a>
-        <div><a class="stats-performance-name-link" href="${escapeAttr(clubHref(club.time))}"><strong>${escapeHtml(club.time)}</strong></a><span>${integer(club.pontos)} pts · ${integer(club.pos_tabela)}º na tabela · SG ${integer(club.sg)}</span></div>
-        <b>${number(club.indice_final ?? club.score, 1)}<small>índice</small></b>
+        <div><a class="stats-performance-name-link" href="${escapeAttr(clubHref(club.time))}"><strong>${escapeHtml(club.time)}</strong></a><span>${integer(club.pontos)} pts · ${integer(club.pos_tabela)}º na tabela · SG ${integer(club.sg)}${metric.key !== "indice_final" ? ` · Índice ${number(performanceValue(club, "indice_final"), 1)}` : ""}</span></div>
+        <b>${number(performanceValue(club, metric.key), 1)}<small>${escapeHtml(metric.short)}</small></b>
       </div>
       <div class="stats-performance-bars">
-        ${metricBar("Ataque", club.ataque)}
-        ${metricBar("Defesa", club.defesa)}
-        ${metricBar("Domínio", club.dominio)}
-        ${metricBar("Eficiência", club.eficiencia)}
-        ${metricBar("Disciplina", club.disciplina)}
+        ${metricBar("Ataque", club.ataque, metric.key === "ataque")}
+        ${metricBar("Defesa", club.defesa, metric.key === "defesa")}
+        ${metricBar("Domínio", club.dominio, metric.key === "dominio")}
+        ${metricBar("Eficiência", club.eficiencia, metric.key === "eficiencia")}
+        ${metricBar("Disciplina", club.disciplina, metric.key === "disciplina")}
       </div>
       <p>${escapeHtml(club.justificativa || "Índice calculado pelo site.")}</p>
       ${rankingPerformanceHistoryDetails(club.time)}
@@ -1600,6 +1753,30 @@
       if (metricSelect) {
         state.probabilityHistoryMetric = metricSelect.value;
         renderProbabilityEvolution();
+        return;
+      }
+      const rankingCompare = event.target.closest("[data-ranking-compare-slot]");
+      if (rankingCompare) {
+        const slot = Number(rankingCompare.dataset.rankingCompareSlot);
+        if (Number.isInteger(slot) && slot >= 0 && slot < state.rankingCompare.length) {
+          state.rankingCompare[slot] = rankingCompare.value;
+          renderRanking();
+        }
+        return;
+      }
+      const attendanceClub = event.target.closest("[data-attendance-club]");
+      if (attendanceClub) {
+        state.attendanceClub = attendanceClub.value;
+        if (!state.attendanceClub) state.attendanceScope = "todos";
+        state.expanded.publico = false;
+        renderChampionship();
+        return;
+      }
+      const attendanceScope = event.target.closest("[data-attendance-scope]");
+      if (attendanceScope) {
+        state.attendanceScope = ATTENDANCE_SCOPES.some((item) => item.key === attendanceScope.value) ? attendanceScope.value : "todos";
+        state.expanded.publico = false;
+        renderChampionship();
       }
     });
     document.addEventListener("click", (event) => {
@@ -1614,6 +1791,22 @@
       if (attendance) {
         state.expanded.publico = !state.expanded.publico;
         renderChampionship();
+        return;
+      }
+      const rankingMetric = event.target.closest("[data-ranking-metric]");
+      if (rankingMetric) {
+        state.rankingMetric = performanceMetricConfig(rankingMetric.dataset.rankingMetric).key;
+        renderRanking();
+        return;
+      }
+      const compareToggle = event.target.closest("[data-ranking-compare-toggle]");
+      if (compareToggle) {
+        state.rankingCompareOpen = !state.rankingCompareOpen;
+        if (state.rankingCompareOpen && state.rankingCompare.filter(Boolean).length < 2) {
+          const first = sortedPerformanceRanking().slice(0, 2).map((club) => club.time);
+          state.rankingCompare = [first[0] || "", first[1] || "", ""];
+        }
+        renderRanking();
         return;
       }
       const probabilityMethod = event.target.closest("[data-probability-method]");
