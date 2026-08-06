@@ -515,6 +515,26 @@ jobs:
           print(f"OK dateModified do Dataset: {data_stats}")
           PY
 
+      # CAUSA RAIZ do "Timeout reached" com status deployment_in_progress:
+      # o pacote publicado tem ~181 MB em 1.270 arquivos, e o actions/deploy-pages
+      # tem teto RIGIDO de 600000 ms (10 min) para o sincronismo — valores maiores
+      # sao reduzidos silenciosamente. Nao ha como esperar mais; a unica saida e
+      # entregar menos bytes.
+      #
+      # A otimizacao roda AQUI, sobre _site, e nao sobre o repositorio: o acervo
+      # original em alta resolucao continua versionado e intacto, e o artefato
+      # sai leve em toda publicacao, sem depender de ninguem lembrar de rodar o
+      # script antes do commit. Custo medido: ~26 s para 1.140 imagens.
+      - name: Otimizar imagens do pacote publico
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Alguns ambientes marcam o Python do sistema como "externally managed"
+          # (PEP 668) e recusam o pip direto. A segunda forma cobre esse caso.
+          python3 -m pip install --quiet --disable-pip-version-check pillow \
+            || python3 -m pip install --quiet --disable-pip-version-check --break-system-packages pillow
+          python3 scripts/otimizar_imagens.py --raiz _site --pastas img copa2026/img
+
       - name: Validar pacote público antes do upload
         shell: bash
         run: |
@@ -1130,10 +1150,10 @@ jobs:
         continue-on-error: true
         uses: actions/deploy-pages@v4
         with:
-          timeout: 900000
+          timeout: 600000
           error_count: 20
           reporting_interval: 5000
-        timeout-minutes: 17
+        timeout-minutes: 12
 
       - name: Aguardar antes de repetir deploy cancelado
         if: steps.deployment.outcome == 'failure'
@@ -1146,10 +1166,10 @@ jobs:
         if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
         with:
-          timeout: 900000
+          timeout: 600000
           error_count: 20
           reporting_interval: 5000
-        timeout-minutes: 17
+        timeout-minutes: 12
 
       - name: Aguardar antes da última tentativa de deploy
         if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
@@ -1163,10 +1183,10 @@ jobs:
         if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
         uses: actions/deploy-pages@v4
         with:
-          timeout: 900000
+          timeout: 600000
           error_count: 20
           reporting_interval: 5000
-        timeout-minutes: 17
+        timeout-minutes: 12
 
       - name: Confirmar e avisar publicação editorial
         if: success()
