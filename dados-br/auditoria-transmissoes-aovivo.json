@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 67,
+    "jogos_na_janela": 65,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 24,
-    "transmissoes_publicadas": 5,
-    "sem_transmissao": 62,
+    "candidatos_oficiais_encontrados": 26,
+    "transmissoes_publicadas": 4,
+    "sem_transmissao": 61,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,30 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401874095",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Fluminense x Vasco da Gama",
-      "data_iso": "2026-08-05T21:30:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false
-    },
-    {
-      "event_id": "401874099",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Fortaleza x Palmeiras",
-      "data_iso": "2026-08-05T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401874094",
       "rodada": 0,
@@ -790,39 +766,6 @@
   ],
   "aceitos": [
     {
-      "event_id": "401874095",
-      "jogo": "Fluminense x Vasco da Gama",
-      "fonte": "getv",
-      "video_id": "4okxkJUPlys",
-      "url": "https://www.youtube.com/watch?v=4okxkJUPlys",
-      "titulo": "AO VIVO: FLUMINENSE X VASCO | OITAVAS DE FINAL | COPA DO BRASIL 2026 | ge tv",
-      "status": "live",
-      "confianca": 0.9,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
-    },
-    {
-      "event_id": "401874153",
-      "jogo": "Cruzeiro x Flamengo",
-      "fonte": "getv",
-      "video_id": "HT8QACkIe3I",
-      "url": "https://www.youtube.com/watch?v=HT8QACkIe3I",
-      "titulo": "AO VIVO: CRUZEIRO X FLAMENGO | OITAVAS DE FINAL | LIBERTADORES 2026 | ge tv",
-      "status": "upcoming",
-      "confianca": 0.85,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401874096",
       "jogo": "Vitória x Athletico-PR",
       "fonte": "getv",
@@ -869,9 +812,35 @@
         "identifica transmissão ao vivo",
         "horário compatível (90 min de diferença)"
       ]
+    },
+    {
+      "event_id": "401874153",
+      "jogo": "Cruzeiro x Flamengo",
+      "fonte": "getv",
+      "video_id": "HT8QACkIe3I",
+      "url": "https://www.youtube.com/watch?v=HT8QACkIe3I",
+      "titulo": "AO VIVO: CRUZEIRO X FLAMENGO | OITAVAS DE FINAL | LIBERTADORES 2026 | ge tv",
+      "status": "upcoming",
+      "confianca": 0.85,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (90 min de diferença)"
+      ]
     }
   ],
   "rejeitados": [
+    {
+      "video_id": "4okxkJUPlys",
+      "url": "https://www.youtube.com/watch?v=4okxkJUPlys",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: VASCO ELIMINA O FLUMINENSE DA COPA DO BRASIL MAIS UMA VEZ! | Tropa ge tv",
+      "status": "live",
+      "inicio_programado": "2026-08-05T20:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
     {
       "video_id": "6aH_p7C1D8w",
       "url": "https://www.youtube.com/watch?v=6aH_p7C1D8w",
@@ -1019,7 +988,17 @@
       "canal": "ge tv",
       "titulo": "KAIO JORGE, ATACANTE DO CRUZEIRO, ABRE A CASA PARA A GE TV! | Tropa ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-08-06T00:30:00-03:00",
+      "inicio_programado": "2026-08-06T00:35:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "lUNGBRhKoRY",
+      "url": "https://www.youtube.com/watch?v=lUNGBRhKoRY",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "VASCO VOLTA A ELIMINAR O FLUMINENSE E VAI ÀS QUARTAS NA COPA DO BRASIL | TA ON | sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-06T12:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1053,6 +1032,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "yDDNae_yk1w",
+      "url": "https://www.youtube.com/watch?v=yDDNae_yk1w",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: WSL TAHITI PRO 2026 | ETAPA DE TEAHUPO'O - DIA 1 | SURFE | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-08T14:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "z0RicLTMVmE",
       "url": "https://www.youtube.com/watch?v=z0RicLTMVmE",
       "fonte": "getv",
@@ -1064,15 +1053,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401874099",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Fortaleza x Palmeiras",
-      "data_iso": "2026-08-05T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401874094",
       "rodada": 0,
@@ -1633,5 +1613,5 @@
     },
     "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API."
   },
-  "atualizado_em": "2026-08-05T21:53:53-03:00"
+  "atualizado_em": "2026-08-06T00:30:26-03:00"
 }
