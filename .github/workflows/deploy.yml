@@ -93,11 +93,11 @@ jobs:
 
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main
           fetch-depth: 2
@@ -1017,15 +1017,40 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: _site
 
+      # O aviso de Node 20 emitido por actions/deploy-pages@v4 é apenas de
+      # compatibilidade: o runner do GitHub já executa a action em Node 24.
+      # Uma implantação do Pages pode, excepcionalmente, ser cancelada pelo
+      # serviço depois de o artefato ser aceito. A primeira tentativa não
+      # encerra o job; se isso ocorrer, aguardamos e criamos uma nova implantação
+      # usando exatamente o mesmo artefato validado.
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
         uses: actions/deploy-pages@v4
-        timeout-minutes: 15
+        with:
+          timeout: 900000
+          error_count: 20
+          reporting_interval: 5000
+        timeout-minutes: 17
 
+      - name: Aguardar antes de repetir deploy cancelado
+        if: steps.deployment.outcome == 'failure'
+        shell: bash
+        run: sleep 30
+
+      - name: Repetir deploy no GitHub Pages
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        with:
+          timeout: 900000
+          error_count: 20
+          reporting_interval: 5000
+        timeout-minutes: 17
 
       - name: Confirmar e avisar publicação editorial
         if: success()
