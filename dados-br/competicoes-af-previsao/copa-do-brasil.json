@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-05T21:44:30-03:00",
+  "gerado_em": "2026-08-05T21:59:04-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,12 +17,12 @@
     "ordem": 600,
     "nome": "Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 6
+    "eventos_pendentes": 4
   },
   "resumo": {
     "eventos": 142,
-    "finalizados": 136,
-    "pendentes": 6,
+    "finalizados": 138,
+    "pendentes": 4,
     "equipes": 126,
     "equipes_serie_a_2026": 21
   },
@@ -6069,9 +6069,9 @@
     {
       "event_id": "401874039",
       "data_iso": "2026-08-05T19:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Agosto 5º at 6:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -6085,8 +6085,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 2
       },
       "visitante": {
         "espn_id": "9318",
@@ -6099,15 +6099,15 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Cruzeiro",
       "penaltis": false
     },
     {
       "event_id": "401874038",
       "data_iso": "2026-08-05T19:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Agosto 5º at 6:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -6121,8 +6121,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
       "visitante": {
         "espn_id": "9169",
@@ -6135,15 +6135,15 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Grêmio",
       "penaltis": false
     },
     {
       "event_id": "401874095",
       "data_iso": "2026-08-05T21:30:00-03:00",
-      "estado": "pre",
+      "estado": "in",
       "concluido": false,
-      "status": "Qua., Agosto 5º at 8:30 PM EDT",
+      "status": "29'",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -6177,9 +6177,9 @@
     {
       "event_id": "401874099",
       "data_iso": "2026-08-05T21:30:00-03:00",
-      "estado": "pre",
+      "estado": "in",
       "concluido": false,
-      "status": "Qua., Agosto 5º at 8:30 PM EDT",
+      "status": "29'",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
