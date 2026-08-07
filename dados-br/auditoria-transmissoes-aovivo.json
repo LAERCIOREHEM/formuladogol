@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 65,
+    "jogos_na_janela": 63,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 24,
-    "transmissoes_publicadas": 4,
-    "sem_transmissao": 61,
+    "candidatos_oficiais_encontrados": 27,
+    "transmissoes_publicadas": 8,
+    "sem_transmissao": 55,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -40,30 +40,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401874094",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Corinthians x Internacional",
-      "data_iso": "2026-08-06T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401874096",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Vitória x Athletico-PR",
-      "data_iso": "2026-08-06T20:00:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false
-    },
     {
       "event_id": "401841181",
       "rodada": 22,
@@ -183,8 +159,10 @@
       "competicao_nome": "Libertadores",
       "jogo": "Fluminense x Independiente Rivadavia",
       "data_iso": "2026-08-11T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
       "manual": false
     },
     {
@@ -194,8 +172,10 @@
       "competicao_nome": "Sul-Americana",
       "jogo": "Bolívar x São Paulo",
       "data_iso": "2026-08-11T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
       "manual": false
     },
     {
@@ -205,8 +185,10 @@
       "competicao_nome": "Sul-Americana",
       "jogo": "Bragantino x Atlético-MG",
       "data_iso": "2026-08-12T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
       "manual": false
     },
     {
@@ -227,9 +209,9 @@
       "competicao_nome": "Libertadores",
       "jogo": "Cruzeiro x Flamengo",
       "data_iso": "2026-08-12T21:30:00-03:00",
-      "principal": "GE TV",
+      "principal": "CazéTV",
       "fontes_encontradas": [
-        "GE TV"
+        "CazéTV"
       ],
       "manual": false
     },
@@ -251,8 +233,10 @@
       "competicao_nome": "Sul-Americana",
       "jogo": "Santos x Macará",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
       "manual": false
     },
     {
@@ -284,8 +268,10 @@
       "competicao_nome": "Libertadores",
       "jogo": "Rosário Central x Corinthians",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
       "manual": false
     },
     {
@@ -766,19 +752,93 @@
   ],
   "aceitos": [
     {
-      "event_id": "401874096",
-      "jogo": "Vitória x Athletico-PR",
-      "fonte": "getv",
-      "video_id": "nGTETXSq94E",
-      "url": "https://www.youtube.com/watch?v=nGTETXSq94E",
-      "titulo": "AO VIVO: VITÓRIA X ATHLETICO PARANENSE | OITAVAS DE FINAL | COPA DO BRASIL 2026 | ge tv",
+      "event_id": "401874153",
+      "jogo": "Cruzeiro x Flamengo",
+      "fonte": "cazetv",
+      "video_id": "AlE9jCqkbA8",
+      "url": "https://www.youtube.com/watch?v=AlE9jCqkbA8",
+      "titulo": "CRUZEIRO X FLAMENGO: LIBERTADORES | LANCES EM TEMPO REAL | NOCHE DE COPA",
       "status": "upcoming",
-      "confianca": 0.85,
+      "confianca": 0.8467,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (90 min de diferença)"
+        "horário compatível (30 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401874070",
+      "jogo": "Fluminense x Independiente Rivadavia",
+      "fonte": "cazetv",
+      "video_id": "Co2aqgVd5qk",
+      "url": "https://www.youtube.com/watch?v=Co2aqgVd5qk",
+      "titulo": "FLUMINENSE X INDEPENDIENTE RIVADAVIA: LIBERTADORES | LANCES EM TEMPO REAL | NOCHE DE COPA",
+      "status": "upcoming",
+      "confianca": 0.8467,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "horário compatível (30 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401902572",
+      "jogo": "Santos x Macará",
+      "fonte": "cazetv",
+      "video_id": "MZ26CcHMBlk",
+      "url": "https://www.youtube.com/watch?v=MZ26CcHMBlk",
+      "titulo": "VASCO X OLÍMPIA E SANTOS X MACARÁ: SUL-AMERICANA | LANCES EM TEMPO REAL | NOCHE DE COPA",
+      "status": "upcoming",
+      "confianca": 0.8467,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "horário compatível (30 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401902743",
+      "jogo": "Bragantino x Atlético-MG",
+      "fonte": "cazetv",
+      "video_id": "TsOOA1q0EbQ",
+      "url": "https://www.youtube.com/watch?v=TsOOA1q0EbQ",
+      "titulo": "PALMEIRAS X CERRO PORTEÑO E RB BRAGANTINO X ATLÉTICO MINEIRO | LIBERTADORES E COPA SUL-AMERICANA",
+      "status": "upcoming",
+      "confianca": 0.8467,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "horário compatível (30 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401874075",
+      "jogo": "Rosário Central x Corinthians",
+      "fonte": "cazetv",
+      "video_id": "bb70Ip_26VM",
+      "url": "https://www.youtube.com/watch?v=bb70Ip_26VM",
+      "titulo": "ROSARIO CENTRAL X CORINTHIANS E CIENCIANO X BOTAFOGO | LIBERTADORES E COPA SUL-AMERICANA",
+      "status": "upcoming",
+      "confianca": 0.8467,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "horário compatível (30 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401903296",
+      "jogo": "Bolívar x São Paulo",
+      "fonte": "cazetv",
+      "video_id": "pYy2BKTHxnI",
+      "url": "https://www.youtube.com/watch?v=pYy2BKTHxnI",
+      "titulo": "BOLÍVAR X SÃO PAULO: SUL-AMERICANA | LANCES EM TEMPO REAL | NOCHE DE COPA",
+      "status": "upcoming",
+      "confianca": 0.8467,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "horário compatível (30 min de diferença)"
       ]
     },
     {
@@ -832,13 +892,23 @@
   ],
   "rejeitados": [
     {
-      "video_id": "lUNGBRhKoRY",
-      "url": "https://www.youtube.com/watch?v=lUNGBRhKoRY",
+      "video_id": "USzPEfeS1VE",
+      "url": "https://www.youtube.com/watch?v=USzPEfeS1VE",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "VASCO VOLTA A ELIMINAR O FLUMINENSE E VAI ÀS QUARTAS NA COPA DO BRASIL | TA ON | sportv",
-      "status": "live",
-      "inicio_programado": "2026-08-06T12:15:00-03:00",
+      "titulo": "AO VIVO! GE FLAMENGO ANALISA NEGOCIAÇÃO COM LUIZ HENRIQUE | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-07T15:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "Xa4YI5FNU0Y",
+      "url": "https://www.youtube.com/watch?v=Xa4YI5FNU0Y",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "NÁUTICO X CEARÁ | AO VIVO E COM IMAGENS | BRASILEIRÃO SÉRIE B 2026 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-18T21:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -938,18 +1008,8 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: CORITIBA X CHAPECOENSE | BRASILEIRÃO 2026 | 22ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-08-08T19:15:00-03:00",
+      "inicio_programado": "2026-08-08T19:00:00-03:00",
       "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
-      "video_id": "-ceckOJaNv8",
-      "url": "https://www.youtube.com/watch?v=-ceckOJaNv8",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "VÁGNER MANCINI MOSTRA A INCRÍVEL ESTRUTURA DO RED BULL BRAGANTINO | Tropa ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-07T22:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "00BoR6Wax0M",
@@ -959,16 +1019,6 @@
       "titulo": "AO VIVO: NEW ENGLAND PATRIOTS X CLEVELAND BROWNS | PRÉ-TEMPORADA 2026/27 | NFL | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-08-27T21:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "08VpweBE1Y8",
-      "url": "https://www.youtube.com/watch?v=08VpweBE1Y8",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! GE VASCO ANALISA SEGUNDO JOGO DAS OITAVAS DA COPA DO BRASIL| #podcast | ge.globo",
-      "status": "live",
-      "inicio_programado": "2026-08-06T11:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -992,26 +1042,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "qFljDzMNfMw",
-      "url": "https://www.youtube.com/watch?v=qFljDzMNfMw",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! GE PALMEIRAS ANALISA SEGUNDO JOGO DAS OITAVAS DA COPA DO BRSIL | #podcast | ge.globo",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-06T16:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "tUS82zE1LLQ",
-      "url": "https://www.youtube.com/watch?v=tUS82zE1LLQ",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! GE CRUZEIRO ANALISA SEGUNDO JOGO DAS OITAVAS DA COPA DO BRASIL | #podcast | ge.globo",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-06T16:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "udtKEbbFCFc",
       "url": "https://www.youtube.com/watch?v=udtKEbbFCFc",
       "fonte": "getv",
@@ -1030,18 +1060,19 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-08T14:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "ztJu1EeouT8",
+      "url": "https://www.youtube.com/watch?v=ztJu1EeouT8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: DEFINIDOS OS ÚLTIMOS CLASSIFICADOS PARA AS QUARTAS DA COPA DO BRASIL | TA ON | sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-07T12:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401874094",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Corinthians x Internacional",
-      "data_iso": "2026-08-06T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401841181",
       "rodada": 22,
@@ -1124,33 +1155,6 @@
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     },
     {
-      "event_id": "401874070",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Fluminense x Independiente Rivadavia",
-      "data_iso": "2026-08-11T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401903296",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Bolívar x São Paulo",
-      "data_iso": "2026-08-11T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401902743",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Bragantino x Atlético-MG",
-      "data_iso": "2026-08-12T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
       "event_id": "401874076",
       "rodada": 0,
       "competicao_chave": "libertadores",
@@ -1169,15 +1173,6 @@
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     },
     {
-      "event_id": "401902572",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Santos x Macará",
-      "data_iso": "2026-08-13T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
       "event_id": "401902742",
       "rodada": 0,
       "competicao_chave": "sul_americana",
@@ -1192,15 +1187,6 @@
       "competicao_chave": "sul_americana",
       "competicao_nome": "Sul-Americana",
       "jogo": "Cienciano del Cusco x Botafogo",
-      "data_iso": "2026-08-13T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401874075",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Rosário Central x Corinthians",
       "data_iso": "2026-08-13T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     },
@@ -1593,5 +1579,5 @@
     },
     "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API."
   },
-  "atualizado_em": "2026-08-06T12:29:45-03:00"
+  "atualizado_em": "2026-08-07T01:45:45-03:00"
 }
