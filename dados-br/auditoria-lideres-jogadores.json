@@ -1,9 +1,9 @@
 {
-  "gerado_em": "2026-08-04T02:42:57.373002-03:00",
+  "gerado_em": "2026-08-07T09:09:52.183207-03:00",
   "temporada": 2026,
   "status": "valido",
   "resumo": {
-    "artilheiros": 227,
+    "artilheiros": 226,
     "assistentes": 210,
     "lider_gols": {
       "athlete_id": "",
@@ -14,7 +14,7 @@
       "jogos": 20,
       "gols": 12,
       "jogos_com_participacao": 9,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_complementar": "referência preservada; eventos locais ainda incompletos",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 1,
       "media_por_jogo": 0.6
@@ -28,29 +28,29 @@
       "jogos": 20,
       "assistencias": 9,
       "jogos_com_participacao": 6,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_complementar": "referência preservada; eventos locais ainda incompletos",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 1,
       "media_por_jogo": 0.45
     },
-    "eventos_locais_autoritativos": true,
+    "eventos_locais_autoritativos": false,
     "aparicoes_locais_autoritativas": false,
     "referencia_atual_usada_para_jogos": {
       "artilharia": false,
       "assistencias": false
     },
     "preservado_de_execucao_anterior": {
-      "artilharia": false,
-      "assistencias": false
-    },
-    "snapshot_anterior_usado_apenas_para_identificacao": {
       "artilharia": true,
       "assistencias": true
     },
+    "snapshot_anterior_usado_apenas_para_identificacao": {
+      "artilharia": false,
+      "assistencias": false
+    },
     "completude": {
       "artilharia": {
-        "jogos_lidos": 205,
-        "jogos_invalidos_ignorados": 0,
+        "jogos_lidos": 207,
+        "jogos_invalidos_ignorados": 1,
         "jogadores": 227,
         "total_eventos_contabilizados": 513,
         "gols_contra_ignorados": 18,
@@ -59,14 +59,14 @@
         "jogadores_com_jogos": 227,
         "jogadores_sem_jogos": 0,
         "aparicoes_locais_autoritativas": false,
-        "jogos_pendentes_detalhes": 0,
-        "total_jogos_declarado": 205,
-        "eventos_locais_autoritativos": true,
-        "jogadores_publicados": 227
+        "jogos_pendentes_detalhes": 1,
+        "total_jogos_declarado": 207,
+        "eventos_locais_autoritativos": false,
+        "jogadores_publicados": 226
       },
       "assistencias": {
-        "jogos_lidos": 205,
-        "jogos_invalidos_ignorados": 0,
+        "jogos_lidos": 207,
+        "jogos_invalidos_ignorados": 1,
         "jogadores": 211,
         "total_eventos_contabilizados": 353,
         "gols_contra_ignorados": 0,
@@ -75,9 +75,9 @@
         "jogadores_com_jogos": 207,
         "jogadores_sem_jogos": 4,
         "aparicoes_locais_autoritativas": false,
-        "jogos_pendentes_detalhes": 0,
-        "total_jogos_declarado": 205,
-        "eventos_locais_autoritativos": true,
+        "jogos_pendentes_detalhes": 1,
+        "total_jogos_declarado": 207,
+        "eventos_locais_autoritativos": false,
         "jogadores_publicados": 210
       }
     }
@@ -123,12 +123,12 @@
       {
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/athletes?season=2026&limit=200&sort=goals%3Adesc",
         "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
+        "erro": "HTTPError: HTTP Error 403: Forbidden"
       },
       {
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/leaders?season=2026&limit=200",
         "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
+        "erro": "HTTPError: HTTP Error 403: Forbidden"
       },
       {
         "url": "https://site.web.api.espn.com/apis/v2/sports/soccer/bra.1/leaders?region=br&lang=pt&season=2026&limit=200",
@@ -182,12 +182,12 @@
       {
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/athletes?season=2026&limit=200&sort=assists%3Adesc",
         "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
+        "erro": "HTTPError: HTTP Error 403: Forbidden"
       },
       {
         "url": "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/leaders?season=2026&limit=200",
         "status": "erro",
-        "erro": "HTTPError: HTTP Error 404: Not Found"
+        "erro": "HTTPError: HTTP Error 403: Forbidden"
       },
       {
         "url": "https://site.web.api.espn.com/apis/v2/sports/soccer/bra.1/leaders?region=br&lang=pt&season=2026&limit=200",

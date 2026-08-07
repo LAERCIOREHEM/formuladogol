@@ -1,34 +1,99 @@
 {
-  "gerado_em": "2026-08-04T02:42:52.368545-03:00",
+  "gerado_em": "2026-08-07T09:09:47.170851-03:00",
   "fonte": "ESPN summary",
   "modo": "rede",
-  "total_resultados_lidos": 205,
-  "total_processados": 205,
-  "total_buscados_na_espn": 1,
+  "total_resultados_lidos": 207,
+  "total_processados": 207,
+  "total_buscados_na_espn": 0,
   "total_com_estatisticas": 204,
   "total_com_publico": 182,
-  "total_sem_publico": 23,
+  "total_sem_publico": 25,
   "total_com_eventos": 204,
-  "total_eventos_validados": 205,
-  "total_eventos_pendentes_detalhes": 0,
-  "eventos_pendentes_detalhes": [],
-  "total_inconsistencias_eventos": 0,
-  "inconsistencias_eventos": [],
-  "total_sem_estatisticas": 1,
-  "total_preservados_de_execucao_anterior": 204,
-  "total_falhas": 0,
-  "sem_estatisticas": [
+  "total_eventos_validados": 206,
+  "total_eventos_pendentes_detalhes": 1,
+  "eventos_pendentes_detalhes": [
     {
-      "event_id": "401840999",
-      "jogo": "R4 · Botafogo x Vitória · 401840999"
+      "event_id": "401879459",
+      "jogo": "Bahia x Chapecoense",
+      "validacao": {
+        "gols_esperados": {
+          "Bahia": 2,
+          "Chapecoense": 0
+        },
+        "gols_extraidos": {
+          "Bahia": 0,
+          "Chapecoense": 0
+        },
+        "gols_completos": false,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": false,
+        "cartoes_esperados": {
+          "Bahia": {
+            "amarelo": null,
+            "vermelho": null
+          },
+          "Chapecoense": {
+            "amarelo": null,
+            "vermelho": null
+          }
+        },
+        "cartoes_extraidos": {
+          "Bahia": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Chapecoense": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": false,
+        "pendente_detalhes": true,
+        "tipo_pendencia": "ficha_espn_incompleta",
+        "motivo": "ficha de gols incompleta: 0/2 atribuídos"
+      }
     }
   ],
-  "falhas": [],
+  "total_inconsistencias_eventos": 0,
+  "inconsistencias_eventos": [],
+  "total_sem_estatisticas": 0,
+  "total_preservados_de_execucao_anterior": 205,
+  "total_falhas": 2,
+  "sem_estatisticas": [],
+  "falhas": [
+    {
+      "event_id": "401879458",
+      "jogo": "R0 · Botafogo x Vitória · 401879458",
+      "erro": "falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401879458: HTTPError: HTTP Error 403: Forbidden"
+    },
+    {
+      "event_id": "401879459",
+      "jogo": "R0 · Bahia x Chapecoense · 401879459",
+      "erro": "falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401879459: HTTPError: HTTP Error 403: Forbidden"
+    }
+  ],
   "total_com_jogadores": 204,
   "jogos_sem_escalacoes": [
     {
       "event_id": "401840999",
       "jogo": "Botafogo x Vitória"
+    },
+    {
+      "event_id": "401879458",
+      "jogo": "Botafogo x Vitória"
+    },
+    {
+      "event_id": "401879459",
+      "jogo": "Bahia x Chapecoense"
     }
   ]
 }

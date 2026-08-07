@@ -1,14 +1,14 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-04T02:42:52.368437-03:00",
+  "gerado_em": "2026-08-07T09:09:47.170686-03:00",
   "fonte": "ESPN summary",
-  "total_jogos": 205,
+  "total_jogos": 207,
   "total_com_estatisticas": 204,
   "total_com_publico": 182,
   "total_com_eventos": 204,
   "total_com_jogadores": 204,
-  "total_eventos_validados": 205,
-  "total_eventos_pendentes_detalhes": 0,
+  "total_eventos_validados": 206,
+  "total_eventos_pendentes_detalhes": 1,
   "jogos": {
     "401841173": {
       "event_id": "401841173",
@@ -8867,6 +8867,11 @@
           "Botafogo": 0,
           "Vitória": 0
         },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
         "gols_ok": true,
         "cartoes_esperados": {
           "Botafogo": {
@@ -8892,15 +8897,19 @@
         "cartoes_sem_excesso": true,
         "cartoes_time_desconhecido": 0,
         "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
         "cartoes_ok": true,
-        "ok": true
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
       },
       "fonte": "Resultado confirmado; detalhes ESPN",
       "resultado_manual": true,
       "origem_resultado": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo_resultado_manual": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial.",
-      "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-04T02:42:52.287010-03:00"
+      "preservado_de_execucao_anterior": true,
+      "atualizado_em": "2026-08-07T09:09:43.777375-03:00"
     },
     "401841151": {
       "event_id": "401841151",
@@ -9449,6 +9458,79 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-01T22:44:23.902358-03:00"
+    },
+    "401879458": {
+      "event_id": "401879458",
+      "event_id_fonte_detalhes": "401879458",
+      "rodada": 0,
+      "data_iso": "2026-07-23T19:30",
+      "mandante": "Botafogo",
+      "visitante": "Vitória",
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "estadio": "Joao Havelange Stadium",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [],
+      "estatisticas": [],
+      "gols": [],
+      "cartoes": [],
+      "jogadores": [],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Botafogo": 0,
+          "Vitória": 0
+        },
+        "gols_extraidos": {
+          "Botafogo": 0,
+          "Vitória": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Botafogo": {
+            "amarelo": null,
+            "vermelho": null
+          },
+          "Vitória": {
+            "amarelo": null,
+            "vermelho": null
+          }
+        },
+        "cartoes_extraidos": {
+          "Botafogo": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Vitória": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-07T09:09:45.429027-03:00"
     },
     "401841150": {
       "event_id": "401841150",
@@ -13894,6 +13976,79 @@
       "motivo_resultado_manual": "A ESPN manteve o event_id reagendado com placar/status incompatível com o resultado público confirmado.",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-01T22:44:27.498569-03:00"
+    },
+    "401879459": {
+      "event_id": "401879459",
+      "event_id_fonte_detalhes": "401879459",
+      "rodada": 0,
+      "data_iso": "2026-07-17T19:30",
+      "mandante": "Bahia",
+      "visitante": "Chapecoense",
+      "placar_mandante": 2,
+      "placar_visitante": 0,
+      "estadio": "Arena Fonte Nova",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [],
+      "estatisticas": [],
+      "gols": [],
+      "cartoes": [],
+      "jogadores": [],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Bahia": 2,
+          "Chapecoense": 0
+        },
+        "gols_extraidos": {
+          "Bahia": 0,
+          "Chapecoense": 0
+        },
+        "gols_completos": false,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": false,
+        "cartoes_esperados": {
+          "Bahia": {
+            "amarelo": null,
+            "vermelho": null
+          },
+          "Chapecoense": {
+            "amarelo": null,
+            "vermelho": null
+          }
+        },
+        "cartoes_extraidos": {
+          "Bahia": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Chapecoense": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": false,
+        "pendente_detalhes": true,
+        "tipo_pendencia": "ficha_espn_incompleta",
+        "motivo": "ficha de gols incompleta: 0/2 atribuídos"
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-07T09:09:47.089200-03:00"
     },
     "401841149": {
       "event_id": "401841149",

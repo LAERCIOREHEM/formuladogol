@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-08-04T02:42:52.056992-03:00",
+  "gerado_em": "2026-08-07T09:09:42.056113-03:00",
   "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
@@ -9,16 +9,25 @@
     "rodadas_com_10_jogos": 38,
     "clubes_com_38_jogos": 20,
     "confrontos_com_ida_e_volta": 190,
-    "partidas_com_data_confirmada": 255,
-    "partidas_com_data_a_definir": 125,
-    "resultados_publicados": 205,
-    "proximos_publicados": 43,
-    "eventos_espn_na_janela": 267,
+    "partidas_com_data_confirmada": 262,
+    "partidas_com_data_a_definir": 118,
+    "resultados_publicados": 207,
+    "proximos_publicados": 42,
+    "eventos_espn_na_janela": 249,
     "ajustes_calendario_configurados": 3,
-    "jogos_adiados_sem_data": 1,
+    "jogos_adiados_sem_data": 0,
     "rodadas_espn_com_clube_repetido": 0,
+    "rodadas_preservadas_do_calendario_anterior": 1,
     "falhas_graves": 0
   },
+  "avisos": [
+    {
+      "tipo": "rodada_preservada_do_calendario_anterior",
+      "rodada": 4,
+      "jogos_espn_recebidos": 9,
+      "jogos_preservados": 10
+    }
+  ],
   "distribuicao_jogos_disputados": {
     "21": 10,
     "20": 10
@@ -105,15 +114,7 @@
       "jogos_disputados": 20
     }
   ],
-  "jogos_adiados_sem_data": [
-    {
-      "event_id": "401841006",
-      "rodada": 4,
-      "mandante": "Flamengo",
-      "visitante": "Mirassol",
-      "status": "Data a definir"
-    }
-  ],
+  "jogos_adiados_sem_data": [],
   "rodadas_calendario_completo": [
     {
       "rodada": 1,
@@ -406,10 +407,13 @@
     },
     {
       "rodada": 4,
-      "jogos_mapeados": 10,
+      "jogos_mapeados": 9,
       "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": true
+      "clubes_ausentes": [
+        "Flamengo",
+        "Mirassol"
+      ],
+      "integra": false
     },
     {
       "rodada": 5,
@@ -525,10 +529,10 @@
     },
     {
       "rodada": 21,
-      "jogos_mapeados": 10,
+      "jogos_mapeados": 6,
       "clubes_repetidos": [],
       "clubes_ausentes": [],
-      "integra": true
+      "integra": false
     },
     {
       "rodada": 22,
@@ -539,11 +543,13 @@
     },
     {
       "rodada": 23,
-      "jogos_mapeados": 9,
+      "jogos_mapeados": 8,
       "clubes_repetidos": [],
       "clubes_ausentes": [
+        "Atlético-MG",
         "Bahia",
-        "Chapecoense"
+        "Chapecoense",
+        "Grêmio"
       ],
       "integra": false
     },
@@ -575,20 +581,6 @@
     },
     {
       "rodada": 27,
-      "jogos_mapeados": 7,
-      "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": false
-    },
-    {
-      "rodada": 28,
-      "jogos_mapeados": 7,
-      "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": false
-    },
-    {
-      "rodada": 29,
       "jogos_mapeados": 2,
       "clubes_repetidos": [],
       "clubes_ausentes": [],
@@ -604,5 +596,5 @@
   ],
   "duplicados_entre_resultados_e_proximos": [],
   "falhas": [],
-  "observacao": "A ESPN é consultada de 1º de janeiro até 60 dias à frente. O calendario-completo.json preserva datas conhecidas e completa os 380 confrontos pela inversão obrigatória dos mandos do primeiro turno."
+  "observacao": "O calendário só é substituído depois de validar 380 partidas, 38 rodadas íntegras, 20 clubes com 38 jogos e 190 confrontos de ida e volta."
 }
