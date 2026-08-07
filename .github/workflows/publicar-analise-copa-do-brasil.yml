@@ -52,11 +52,18 @@ jobs:
           python -m py_compile \
             scripts/gerar_analise_rodada.py \
             scripts/gerar_analise_copa_do_brasil.py \
+            scripts/buscar_melhores_momentos_copa_do_brasil.py \
             scripts/validar_artefatos_analises.py
           python scripts/gerar_analise_rodada.py --self-test
           python scripts/gerar_analise_copa_do_brasil.py --self-test
+          python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
           python -m json.tool dados-br/historico-probabilidades-continentais.json >/dev/null
           python scripts/validar_artefatos_analises.py
+
+      - name: Atualizar melhores momentos oficiais das oitavas
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
 
       - name: Detectar fechamento e gerar editorial
         env:
@@ -89,6 +96,7 @@ jobs:
             analises
             dados-br/analises.json
             dados-br/historico-probabilidades-continentais.json
+            dados-br/melhores-momentos-copa-do-brasil.json
             sitemap.xml
             news-sitemap.xml
             feed.xml

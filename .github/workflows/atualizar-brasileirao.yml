@@ -80,6 +80,7 @@ jobs:
             scripts/gerar_probabilidades_jogos.py \
             scripts/avaliar_af_previsao.py \
             scripts/gerar_analise_copa_do_brasil.py \
+            scripts/buscar_melhores_momentos_copa_do_brasil.py \
             scripts/validar_artefatos_analises.py
           python scripts/validar_python_embutido_workflow.py --self-test
           python scripts/validar_python_embutido_workflow.py .github/workflows/atualizar-brasileirao.yml
@@ -98,6 +99,7 @@ jobs:
           python scripts/gerar_probabilidades_jogos.py --self-test
           python scripts/avaliar_af_previsao.py --self-test
           python scripts/gerar_analise_copa_do_brasil.py --self-test
+          python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
           python scripts/validar_artefatos_analises.py
           python -m json.tool dados-br/config-transmissoes-tv.json > /dev/null
           python -m json.tool dados-br/auditoria-transmissoes-tv.json > /dev/null
@@ -412,6 +414,12 @@ jobs:
       - name: Auditar histórico e preparar avaliação final do AF-Previsão
         if: steps.af_generate.outputs.af_updated == 'true'
         run: python scripts/avaliar_af_previsao.py --strict
+
+      - name: Atualizar melhores momentos oficiais da Copa do Brasil
+        if: ${{ steps.continental.outcome == 'success' }}
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
 
       - name: Gerar editorial pós-oitavas da Copa do Brasil no mesmo ciclo
         if: ${{ steps.continental.outcome == 'success' && (steps.af_gate.outputs.run_af != 'true' || steps.af_generate.outcome == 'success') }}
@@ -1078,6 +1086,7 @@ jobs:
             "analises"
             "dados-br/analises.json"
             "dados-br/historico-probabilidades-continentais.json"
+            "dados-br/melhores-momentos-copa-do-brasil.json"
             "sitemap.xml"
             "news-sitemap.xml"
             "feed.xml"

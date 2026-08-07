@@ -1,4 +1,4 @@
-name: Buscar melhores momentos Brasileirão oficiais
+name: Buscar melhores momentos oficiais
 
 on:
   workflow_dispatch:
@@ -60,10 +60,12 @@ jobs:
       - name: Validar scripts offline
         run: |
           python -m py_compile scripts/buscar_melhores_momentos_getv.py
+          python -m py_compile scripts/buscar_melhores_momentos_copa_do_brasil.py
           python -m py_compile scripts/substituir_fontes_preferidas_mm.py
           python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
           python -m py_compile scripts/gerar_relatorio_fontes_melhores_momentos.py
           python scripts/buscar_melhores_momentos_getv.py --dry-run --modo incremental
+          python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
           python scripts/substituir_fontes_preferidas_mm.py --selftest
           python scripts/gerar_relatorio_fontes_melhores_momentos.py --dry-run
 
@@ -126,6 +128,11 @@ jobs:
           echo "Executando: ${CMD[*]}"
           "${CMD[@]}"
 
+      - name: Buscar melhores momentos oficiais das oitavas da Copa do Brasil
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
+
       - name: Bloquear vídeos de jogos não encerrados ou fontes não autorizadas
         run: |
           python - <<'PY'
@@ -178,6 +185,7 @@ jobs:
           FILES=(
             "dados-br/melhores-momentos.json"
             "dados-br/melhores-momentos-manual.json"
+            "dados-br/melhores-momentos-copa-do-brasil.json"
             "dados-br/getv-playlists.json"
             "dados-br/auditoria-melhores-momentos.json"
             "dados-br/auditoria-cobertura-resultados.json"
@@ -218,7 +226,7 @@ jobs:
             fi
 
             git add -- "${FILES[@]}"
-            git commit -m "Atualizar melhores momentos Brasileirão oficiais - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            git commit -m "Atualizar melhores momentos oficiais - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
 
             if git push origin HEAD:main; then
               echo "Push OK na tentativa $i."
@@ -238,4 +246,6 @@ jobs:
         if: steps.publish.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run publicar-analise-rodada.yml --ref main
+        run: |
+          gh workflow run publicar-analise-rodada.yml --ref main
+          gh workflow run publicar-analise-copa-do-brasil.yml --ref main
