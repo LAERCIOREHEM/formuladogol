@@ -1,26 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Gera auditoria e mapa completo do calendário do Brasileirão 2026.
+"""Gera e audita o calendário completo do Brasileirão 2026.
 
-Entradas normalizadas pelo atualizar_espn.py:
-  - espn_eventos.json
-  - jogos.json
-  - resultados.json
-  - tabela.json
-  - dados-br/ajustes-calendario.json
+A matriz estrutural tem 380 partidas. A ESPN é a fonte preferencial para
+rodadas, datas e IDs, mas o feed pode omitir temporariamente jogos já
+conhecidos. Nessas situações, o último calendário estruturalmente íntegro é
+usado como base e apenas os campos oficiais disponíveis são atualizados.
 
-Saídas:
-  - dados-br/calendario-completo.json: os 380 confrontos (38 rodadas), usando
-    as 19 rodadas do primeiro turno como matriz e invertendo os mandos no
-    segundo turno; datas/event_id da ESPN são preservados quando disponíveis.
-  - dados-br/auditoria-calendario.json: invariantes, jogos disputados por clube,
-    adiados sem data e eventuais falhas estruturais.
-
-Nenhum arquivo de copa2026/ é lido ou alterado.
+O arquivo válido anterior nunca é substituído por um calendário incompleto.
 """
 from __future__ import annotations
 
+import argparse
 import json
+import tempfile
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -55,6 +48,18 @@ def chave_evento(e: dict[str, Any]) -> tuple[int, str, str]:
     )
 
 
+def gravar_json_atomico(path: Path, payload: dict[str, Any]) -> None:
+    """Grava sem deixar arquivo parcial em caso de interrupção."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", dir=path.parent, delete=False, suffix=".tmp"
+    ) as tmp:
+        json.dump(payload, tmp, ensure_ascii=False, indent=2)
+        tmp.write("\n")
+        temporario = Path(tmp.name)
+    temporario.replace(path)
+
+
 def item_calendario(
     rodada: int,
     mandante: str,
@@ -79,46 +84,138 @@ def item_calendario(
     }
 
 
-def montar_calendario_completo(eventos: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Monta as 38 rodadas a partir da matriz íntegra do primeiro turno."""
+def rodada_estruturalmente_integra(
+    itens: list[dict[str, Any]], clubes_esperados: set[str]
+) -> bool:
+    if len(itens) != 10:
+        return False
+    clubes: list[str] = []
+    chaves: set[tuple[int, str, str]] = set()
+    for item in itens:
+        mandante = nome_time(item.get("mandante"))
+        visitante = nome_time(item.get("visitante"))
+        if not mandante or not visitante or mandante == visitante:
+            return False
+        chave = chave_evento(item)
+        if chave in chaves:
+            return False
+        chaves.add(chave)
+        clubes.extend((mandante, visitante))
+    return (
+        len(clubes) == 20
+        and len(set(clubes)) == 20
+        and (not clubes_esperados or set(clubes) == clubes_esperados)
+    )
+
+
+def calendario_anterior_valido(
+    payload: dict[str, Any] | None, clubes_esperados: set[str]
+) -> list[dict[str, Any]]:
+    if not isinstance(payload, dict):
+        return []
+    jogos = list(payload.get("jogos") or payload.get("partidas") or [])
+    if len(jogos) != 380:
+        return []
+    por_rodada: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for jogo in jogos:
+        por_rodada[int(jogo.get("rodada") or 0)].append(jogo)
+    if any(
+        not rodada_estruturalmente_integra(por_rodada.get(rodada, []), clubes_esperados)
+        for rodada in range(1, 39)
+    ):
+        return []
+    return jogos
+
+
+def montar_calendario_completo(
+    eventos: list[dict[str, Any]],
+    clubes_esperados: set[str],
+    calendario_anterior: list[dict[str, Any]] | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Monta 38 rodadas sem degradar um calendário válido por falha transitória."""
     falhas: list[dict[str, Any]] = []
-    por_chave = {chave_evento(e): e for e in eventos}
-    ida_por_rodada: dict[int, list[dict[str, Any]]] = defaultdict(list)
-    for e in eventos:
-        r = int(e.get("rodada") or 0)
-        if 1 <= r <= 19:
-            ida_por_rodada[r].append(e)
+    avisos: list[dict[str, Any]] = []
+    anterior = list(calendario_anterior or [])
+
+    atual_por_chave = {chave_evento(e): e for e in eventos if chave_evento(e)[0]}
+    anterior_por_chave = {chave_evento(e): e for e in anterior if chave_evento(e)[0]}
+
+    atual_por_rodada: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    anterior_por_rodada: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for evento in eventos:
+        rodada = int(evento.get("rodada") or 0)
+        if 1 <= rodada <= 19:
+            atual_por_rodada[rodada].append(evento)
+    for evento in anterior:
+        rodada = int(evento.get("rodada") or 0)
+        if 1 <= rodada <= 19:
+            anterior_por_rodada[rodada].append(evento)
+
+    matriz_ida: dict[int, list[dict[str, Any]]] = {}
+    for rodada in range(1, 20):
+        atuais = atual_por_rodada.get(rodada, [])
+        anteriores = anterior_por_rodada.get(rodada, [])
+        if rodada_estruturalmente_integra(atuais, clubes_esperados):
+            matriz_ida[rodada] = atuais
+            continue
+        if rodada_estruturalmente_integra(anteriores, clubes_esperados):
+            matriz_ida[rodada] = anteriores
+            avisos.append({
+                "tipo": "rodada_preservada_do_calendario_anterior",
+                "rodada": rodada,
+                "jogos_espn_recebidos": len(atuais),
+                "jogos_preservados": 10,
+            })
+            continue
+        falhas.append({
+            "tipo": "primeiro_turno_sem_base_integra",
+            "rodada": rodada,
+            "jogos_espn_recebidos": len(atuais),
+            "jogos_calendario_anterior": len(anteriores),
+            "esperado": 10,
+        })
+
+    if falhas:
+        return [], falhas, avisos
 
     calendario: list[dict[str, Any]] = []
     for rodada in range(1, 20):
         ida = sorted(
-            ida_por_rodada.get(rodada, []),
+            matriz_ida[rodada],
             key=lambda x: (nome_time(x.get("mandante")), nome_time(x.get("visitante"))),
         )
-        if len(ida) != 10:
-            falhas.append({
-                "tipo": "primeiro_turno_incompleto",
-                "rodada": rodada,
-                "jogos_mapeados": len(ida),
-                "esperado": 10,
-            })
-        for e in ida:
-            mandante = nome_time(e.get("mandante"))
-            visitante = nome_time(e.get("visitante"))
-            calendario.append(item_calendario(rodada, mandante, visitante, e, "ESPN/primeiro turno"))
+        for estrutura in ida:
+            mandante = nome_time(estrutura.get("mandante"))
+            visitante = nome_time(estrutura.get("visitante"))
+            chave_ida = (rodada, mandante, visitante)
+            fonte_ida = atual_por_chave.get(chave_ida) or anterior_por_chave.get(chave_ida) or estrutura
+            origem_ida = (
+                "ESPN/primeiro turno"
+                if chave_ida in atual_por_chave
+                else "calendário anterior íntegro/primeiro turno"
+            )
+            calendario.append(item_calendario(
+                rodada, mandante, visitante, fonte_ida, origem_ida
+            ))
 
             rodada_volta = rodada + 19
-            retorno = por_chave.get((rodada_volta, visitante, mandante))
+            chave_volta = (rodada_volta, visitante, mandante)
+            fonte_volta = atual_por_chave.get(chave_volta) or anterior_por_chave.get(chave_volta)
+            origem_volta = (
+                "ESPN/segundo turno"
+                if chave_volta in atual_por_chave
+                else (
+                    "calendário anterior íntegro/segundo turno"
+                    if chave_volta in anterior_por_chave
+                    else "mando invertido do primeiro turno"
+                )
+            )
             calendario.append(item_calendario(
-                rodada_volta,
-                visitante,
-                mandante,
-                retorno,
-                "ESPN/segundo turno" if retorno else "mando invertido do primeiro turno",
+                rodada_volta, visitante, mandante, fonte_volta, origem_volta
             ))
 
     calendario.sort(key=lambda x: (int(x["rodada"]), x["mandante"], x["visitante"]))
-    return calendario, falhas
+    return calendario, falhas, avisos
 
 
 def auditar_calendario_completo(
@@ -130,6 +227,7 @@ def auditar_calendario_completo(
     por_clube: Counter[str] = Counter()
     mandos: Counter[tuple[str, str]] = Counter()
     pares: Counter[frozenset[str]] = Counter()
+    ids: Counter[str] = Counter()
 
     for jogo in calendario:
         r = int(jogo.get("rodada") or 0)
@@ -139,6 +237,9 @@ def auditar_calendario_completo(
         por_clube.update([mandante, visitante])
         mandos[(mandante, visitante)] += 1
         pares[frozenset((mandante, visitante))] += 1
+        event_id = str(jogo.get("event_id") or "").strip()
+        if event_id:
+            ids[event_id] += 1
 
     for rodada in range(1, 39):
         arr = por_rodada.get(rodada, [])
@@ -185,6 +286,10 @@ def auditar_calendario_completo(
     if pares_incorretos:
         falhas.append({"tipo": "confronto_sem_ida_e_volta", "itens": pares_incorretos})
 
+    ids_duplicados = sorted(event_id for event_id, qtd in ids.items() if qtd > 1)
+    if ids_duplicados:
+        falhas.append({"tipo": "event_id_duplicado", "event_ids": ids_duplicados})
+
     resumo = {
         "partidas_mapeadas": len(calendario),
         "rodadas_com_10_jogos": sum(1 for r in rodadas if r["integra"]),
@@ -202,40 +307,88 @@ def auditar_calendario_completo(
     return resumo, rodadas, falhas
 
 
+def executar_self_test() -> None:
+    clubes = {f"Time {i:02d}" for i in range(1, 21)}
+    times = sorted(clubes)
+    rotacao = times[:]
+    ida: list[dict[str, Any]] = []
+    for rodada in range(1, 20):
+        for i in range(10):
+            a = rotacao[i]
+            b = rotacao[-(i + 1)]
+            mandante, visitante = (a, b) if (rodada + i) % 2 else (b, a)
+            ida.append({
+                "rodada": rodada,
+                "mandante": mandante,
+                "visitante": visitante,
+                "event_id": f"IDA-{rodada:02d}-{i:02d}",
+                "data_iso": "2026-01-01T16:00",
+            })
+        rotacao = [rotacao[0], rotacao[-1], *rotacao[1:-1]]
+
+    completo, falhas, _ = montar_calendario_completo(ida, clubes, [])
+    assert not falhas and len(completo) == 380
+    resumo, _, falhas_auditoria = auditar_calendario_completo(completo, clubes)
+    assert not falhas_auditoria
+    assert resumo["partidas_mapeadas"] == 380
+    assert resumo["rodadas_com_10_jogos"] == 38
+
+    incompleto = [x for x in ida if not (x["rodada"] == 7 and x["event_id"].endswith("-03"))]
+    preservado, falhas, avisos = montar_calendario_completo(incompleto, clubes, completo)
+    assert not falhas and len(preservado) == 380
+    assert any(x["rodada"] == 7 for x in avisos)
+    resumo, _, falhas_auditoria = auditar_calendario_completo(preservado, clubes)
+    assert not falhas_auditoria and resumo["partidas_mapeadas"] == 380
+
+    sem_base, falhas, _ = montar_calendario_completo(incompleto, clubes, [])
+    assert not sem_base and falhas
+    print("Self-test do calendário: OK")
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--self-test", action="store_true")
+    args = parser.parse_args()
+    if args.self_test:
+        executar_self_test()
+        return
+
     eventos = list(ler(ARQ_EVENTOS).get("eventos") or [])
     jogos = list(ler(ARQ_JOGOS).get("jogos") or [])
     resultados = list(ler(ARQ_RESULTADOS).get("resultados") or [])
     tabela = list(ler(ARQ_TABELA).get("tabela") or [])
     ajustes = list(ler(ARQ_AJUSTES).get("ajustes") or []) if ARQ_AJUSTES.exists() else []
     clubes_esperados = {str(x.get("time") or "").strip() for x in tabela if x.get("time")}
+    if len(clubes_esperados) != 20:
+        raise RuntimeError(f"Tabela inválida para gerar calendário: {len(clubes_esperados)} clubes")
 
-    calendario, falhas_calendario = montar_calendario_completo(eventos)
+    anterior_payload = ler(ARQ_CALENDARIO) if ARQ_CALENDARIO.exists() else None
+    anterior = calendario_anterior_valido(anterior_payload, clubes_esperados)
+
+    calendario, falhas_montagem, avisos = montar_calendario_completo(
+        eventos, clubes_esperados, anterior
+    )
+    if falhas_montagem:
+        raise RuntimeError(
+            "Calendário não foi alterado: feed atual incompleto e não existe base anterior íntegra. "
+            + json.dumps(falhas_montagem, ensure_ascii=False)
+        )
+
     resumo_completo, rodadas_completas, falhas_invariantes = auditar_calendario_completo(
         calendario, clubes_esperados
     )
-
-    calendario_payload = {
-        "gerado_em": datetime.now(FUSO_BRASILIA).isoformat(),
-        "fonte": "ESPN + matriz de mandos do primeiro turno",
-        "regra": "Rodadas 20 a 38 são o espelho obrigatório das rodadas 1 a 19, com mandos invertidos.",
-        "total_partidas": len(calendario),
-        "partidas_com_data_confirmada": resumo_completo["partidas_com_data_confirmada"],
-        "partidas_com_data_a_definir": resumo_completo["partidas_com_data_a_definir"],
-        "jogos": calendario,
-    }
-    ARQ_CALENDARIO.parent.mkdir(parents=True, exist_ok=True)
-    ARQ_CALENDARIO.write_text(
-        json.dumps(calendario_payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    if falhas_invariantes or resumo_completo["partidas_mapeadas"] != 380:
+        raise RuntimeError(
+            "Calendário candidato rejeitado antes da gravação: "
+            + json.dumps(falhas_invariantes, ensure_ascii=False)
+        )
 
     por_rodada_espn: dict[int, list[dict[str, Any]]] = defaultdict(list)
     for e in eventos:
         por_rodada_espn[int(e.get("rodada") or 0)].append(e)
 
     rodadas_espn = []
-    falhas: list[dict[str, Any]] = [*falhas_calendario, *falhas_invariantes]
+    falhas: list[dict[str, Any]] = []
     for r in sorted(k for k in por_rodada_espn if k):
         arr = por_rodada_espn[r]
         clubes: list[str] = []
@@ -290,7 +443,21 @@ def main() -> None:
         "ajustes_calendario_configurados": len(ajustes),
         "jogos_adiados_sem_data": len(jogos_sem_data),
         "rodadas_espn_com_clube_repetido": sum(1 for r in rodadas_espn if r["clubes_repetidos"]),
+        "rodadas_preservadas_do_calendario_anterior": len(avisos),
         "falhas_graves": len(falhas),
+    }
+
+    calendario_payload = {
+        "gerado_em": datetime.now(FUSO_BRASILIA).isoformat(),
+        "fonte": "ESPN + último calendário íntegro + matriz de mandos do primeiro turno",
+        "regra": (
+            "O feed ESPN atualiza dados oficiais. Se uma rodada do primeiro turno vier incompleta, "
+            "a estrutura válida anterior é preservada. Rodadas 20 a 38 espelham as rodadas 1 a 19."
+        ),
+        "total_partidas": 380,
+        "partidas_com_data_confirmada": resumo_completo["partidas_com_data_confirmada"],
+        "partidas_com_data_a_definir": resumo_completo["partidas_com_data_a_definir"],
+        "jogos": calendario,
     }
 
     saida = {
@@ -298,6 +465,7 @@ def main() -> None:
         "fonte": "auditoria local sobre JSONs normalizados da ESPN",
         "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
         "resumo": resumo,
+        "avisos": avisos,
         "distribuicao_jogos_disputados": {
             str(k): v for k, v in sorted(distribuicao_jogos.items(), reverse=True)
         },
@@ -311,14 +479,22 @@ def main() -> None:
         ],
         "falhas": falhas,
         "observacao": (
-            "A ESPN é consultada de 1º de janeiro até 60 dias à frente. "
-            "O calendario-completo.json preserva datas conhecidas e completa os 380 confrontos "
-            "pela inversão obrigatória dos mandos do primeiro turno."
+            "O calendário só é substituído depois de validar 380 partidas, 38 rodadas íntegras, "
+            "20 clubes com 38 jogos e 190 confrontos de ida e volta."
         ),
     }
-    ARQ_SAIDA.write_text(json.dumps(saida, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    # A gravação ocorre somente depois de todas as invariantes estruturais passarem.
+    gravar_json_atomico(ARQ_CALENDARIO, calendario_payload)
+    gravar_json_atomico(ARQ_SAIDA, saida)
     print(f"Calendário completo gerado: {ARQ_CALENDARIO.relative_to(ROOT)}")
     print(f"Auditoria gerada: {ARQ_SAIDA.relative_to(ROOT)}")
+    if avisos:
+        for aviso in avisos:
+            print(
+                "::warning::Calendário preservou a rodada "
+                f"{aviso['rodada']} porque a ESPN retornou {aviso['jogos_espn_recebidos']}/10 jogos."
+            )
     print(json.dumps(saida["resumo"], ensure_ascii=False, indent=2))
 
 
