@@ -788,10 +788,38 @@ jobs:
           assert len(audit.get('competicoes') or []) == 3, 'auditoria continental incompleta'
 
           if changed and not af_updated:
-              raise SystemExit(
-                  'ERRO: a situação esportiva das copas mudou, mas o AF correspondente não foi gerado. '
-                  'Os novos snapshots não podem ser publicados isoladamente.'
+              # NAO e erro. E o estado de preservacao previsto pelo proprio
+              # workflow, e ele ja esta tratado corretamente logo adiante:
+              #
+              #  - o passo "Commitar copas e AF mesmo com Brasileirao preservado"
+              #    tem a condicao
+              #        CONTINENTAL_CHANGED != true || AF_UPDATED == true
+              #    ou seja, neste exato cenario ele JA exclui os snapshots das
+              #    copas da lista de arquivos e publica somente o
+              #    status-atualizacao.json;
+              #  - o passo "Informar preservacao temporaria do AF e retentativa
+              #    automatica" ja emite ::warning:: dizendo que a mudanca
+              #    continental nao sera publicada sem o AF correspondente.
+              #
+              # Antes, este SystemExit derrubava o job ANTES desses passos
+              # rodarem. Resultado: a protecao nunca era exercida, o
+              # status-atualizacao.json tambem deixava de ser commitado e a
+              # execucao inteira aparecia como falha vermelha — mesmo com o
+              # sistema tendo se comportado exatamente como projetado.
+              #
+              # A causa de fundo aqui e o ESPN nao ter sincronizado nesta
+              # execucao (este bloco so roda quando sincronizado != true). Sem
+              # base do Brasileirao atualizada, o gerador se recusa — com razao —
+              # a publicar um AF novo. A proxima execucao resolve sozinha.
+              print(
+                  '::warning title=Copas mudaram sem AF correspondente::'
+                  'A situacao esportiva das copas mudou, mas o AF nao pode ser gerado '
+                  'nesta execucao (base do Brasileirao nao sincronizada). Os novos '
+                  'snapshots NAO serao publicados isoladamente; a publicacao anterior '
+                  'e preservada e a proxima execucao refaz a tentativa.'
               )
+              print('Atualizacao independente validada: changed=True, af_updated=False (preservacao).')
+              raise SystemExit(0)
           if af_updated:
               freshness = current_publication_freshness()
               assert freshness.get('atualizado') is True, '; '.join(freshness.get('motivos') or [])
