@@ -22,7 +22,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -760,6 +760,38 @@ def update_history(history: dict[str, Any], mark: dict[str, Any]) -> None:
     validate_history(history)
 
 
+def overdue_pending_games(
+    phase: Mapping[str, Any], *, grace_hours: float = 4.0, now: datetime | None = None
+) -> list[dict[str, Any]]:
+    """Retorna jogos ainda pendentes cujo início já passou além da tolerância.
+
+    Isso não tenta adivinhar resultado. Serve apenas para impedir que um snapshot
+    continental evidentemente congelado seja tratado como "fase em andamento" e
+    faça o workflow terminar verde sem publicar nem explicar o bloqueio real.
+    """
+    current = now or agora_br()
+    if current.tzinfo is None:
+        current = current.replace(tzinfo=FUSO_BR)
+    limit = current - timedelta(hours=max(0.0, grace_hours))
+    overdue: list[dict[str, Any]] = []
+    for tie in phase.get("confrontos") or []:
+        for game in tie.get("jogos") or []:
+            if game.get("concluido"):
+                continue
+            raw_date = str(game.get("data_iso") or "").strip()
+            if not raw_date:
+                continue
+            try:
+                kickoff = datetime.fromisoformat(raw_date.replace("Z", "+00:00"))
+            except ValueError:
+                continue
+            if kickoff.tzinfo is None:
+                kickoff = kickoff.replace(tzinfo=FUSO_BR)
+            if kickoff <= limit:
+                overdue.append(dict(game))
+    return overdue
+
+
 def execute(args: argparse.Namespace) -> int:
     history = load_json(HISTORY_PATH)
     validate_history(history)
@@ -767,6 +799,20 @@ def execute(args: argparse.Namespace) -> int:
     phase = phase_summary(cup_snapshot)
     if not phase["todos_concluidos"]:
         completed = sum(1 for tie in phase["confrontos"] if tie["concluido"])
+        overdue = overdue_pending_games(
+            phase,
+            grace_hours=args.tolerancia_snapshot_horas,
+        )
+        if args.falhar_se_snapshot_atrasado and overdue:
+            labels = [
+                f"{game.get('mandante')} x {game.get('visitante')} "
+                f"({game.get('event_id')}, {game.get('data_iso')})"
+                for game in overdue
+            ]
+            raise EditorialCopaError(
+                "snapshot da Copa do Brasil está atrasado: jogos ainda marcados como pendentes "
+                "após a tolerância operacional — " + "; ".join(labels)
+            )
         print(f"Oitavas ainda em andamento: {completed}/{EXPECTED_TIES} confrontos encerrados.")
         return 0
     if len(phase["classificados"]) != EXPECTED_TIES or len(set(phase["classificados"])) != EXPECTED_TIES:
@@ -928,6 +974,26 @@ def self_test() -> int:
         [{"id_editorial": ARTICLE_ID, "rotulo_menu": "CB · QF", "slug": ARTICLE_SLUG, "publicado_em": "2026-08-07T00:10:00-03:00"}],
         id_ativo=ARTICLE_ID,
     )
+    overdue = overdue_pending_games(
+        {
+            "confrontos": [
+                {
+                    "jogos": [
+                        {
+                            "event_id": "atrasado",
+                            "data_iso": "2026-08-06T20:00:00-03:00",
+                            "mandante": "Time A",
+                            "visitante": "Time B",
+                            "concluido": False,
+                        }
+                    ]
+                }
+            ]
+        },
+        grace_hours=6,
+        now=datetime.fromisoformat("2026-08-07T03:00:00-03:00"),
+    )
+    assert len(overdue) == 1
     print("OK self-test: histórico, fase, comparativo, HTML e navegação continental.")
     return 0
 
@@ -937,6 +1003,17 @@ def main() -> int:
     parser.add_argument("--forcar", action="store_true", help="Regenera o texto depois que a fase estiver elegível")
     parser.add_argument("--sem-ia", action="store_true", help="Usa o editorial determinístico")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--falhar-se-snapshot-atrasado",
+        action="store_true",
+        help="Falha se houver jogo pendente muito depois do horário previsto",
+    )
+    parser.add_argument(
+        "--tolerancia-snapshot-horas",
+        type=float,
+        default=4.0,
+        help="Tolerância após o início do jogo antes de considerar o snapshot congelado",
+    )
     parser.add_argument("--modelo", default=os.environ.get("OPENAI_MODEL", MODELO_PADRAO))
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
