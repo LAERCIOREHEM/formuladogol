@@ -327,7 +327,7 @@ def enrich_fixture_event_ids(
     atribuir data/ID definitivo. Assim que o scoreboard passa a oferecer o ID,
     a previsão precisa usar esse identificador para ser encontrada em Jogos.
     """
-    event_map: dict[tuple[str, str], dict[str, Any]] = {}
+    event_map: dict[tuple[int, str, str], list[dict[str, Any]]] = {}
     for item in events.get("eventos") or []:
         event_id = str(item.get("event_id") or "").strip()
         home = str(item.get("mandante") or "").strip()
@@ -335,16 +335,30 @@ def enrich_fixture_event_ids(
         round_no = int(item.get("rodada") or 0)
         if not event_id or not home or not away or round_no <= 0:
             continue
-        key = (home, away)
-        current = event_map.get(key)
-        if current and str(current.get("event_id")) != event_id:
-            raise ValueError(f"mais de um event_id ESPN para {key}: {current.get('event_id')} e {event_id}")
-        event_map[key] = item
+        event_map.setdefault((round_no, home, away), []).append(item)
+
+    def escolher_evento(candidatos: Sequence[dict[str, Any]], fixture: Fixture) -> dict[str, Any] | None:
+        if not candidatos:
+            return None
+        # Reagendamentos podem aparecer duas vezes no feed ESPN com IDs diferentes.
+        # O ID já gravado no calendário é a referência canônica sempre que existir.
+        for item in candidatos:
+            if str(item.get("event_id") or "").strip() == fixture.event_id:
+                return item
+        def prioridade(item: dict[str, Any]) -> tuple[int, int, int, str, str]:
+            return (
+                1 if item.get("resultado_manual") is True else 0,
+                1 if item.get("concluido") is True or str(item.get("estado") or "").lower() == "post" else 0,
+                0 if item.get("adiado") is True and not item.get("concluido") else 1,
+                str(item.get("data_iso") or ""),
+                str(item.get("event_id") or ""),
+            )
+        return max(candidatos, key=prioridade)
 
     enriched: list[Fixture] = []
     seen_ids: set[str] = set()
     for fixture in fixtures:
-        item = event_map.get((fixture.home, fixture.away))
+        item = escolher_evento(event_map.get((fixture.round_no, fixture.home, fixture.away), []), fixture)
         event_id = fixture.event_id
         kickoff = fixture.kickoff
         stadium = fixture.stadium
