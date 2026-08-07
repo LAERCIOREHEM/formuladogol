@@ -74,7 +74,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          args=()
+          args=(--falhar-se-snapshot-atrasado --tolerancia-snapshot-horas 4)
           if [[ "${FORCAR:-false}" == "true" ]]; then args+=(--forcar); fi
           if [[ "${SEM_IA:-false}" == "true" ]]; then args+=(--sem-ia); fi
           python scripts/gerar_analise_copa_do_brasil.py "${args[@]}"
