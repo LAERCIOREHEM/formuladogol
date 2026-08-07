@@ -680,20 +680,15 @@ jobs:
           assert int(base_jogos.get('partidas_concluidas') or -1) + len(jogos_previstos) == 380, 'partição inválida nas probabilidades por jogo'
           assert int(base_jogos.get('partidas_restantes') or -1) == len(jogos_previstos), 'base corrente divergente nas probabilidades por jogo'
           ids_concluidos = {str(item.get('event_id') or item.get('id') or '') for item in (r.get('resultados') or [])}
-          ids_espn_por_confronto = {}
-          for item in (e.get('eventos') or []):
-              event_id_espn = str(item.get('event_id') or '').strip()
-              chave = (str(item.get('mandante') or ''), str(item.get('visitante') or ''))
-              if event_id_espn and chave[0] and chave[1]:
-                  assert chave not in ids_espn_por_confronto or ids_espn_por_confronto[chave] == event_id_espn, f'mais de um event_id ESPN para {chave}'
-                  ids_espn_por_confronto[chave] = event_id_espn
+          # O calendário completo é a fonte canônica dos 380 IDs. O feed ESPN
+          # pode conter simultaneamente o evento original e o reagendado, com
+          # IDs diferentes para o mesmo confronto; isso não é corrupção.
           mapa_calendario = {}
           for item in (completo.get('jogos') or []):
               mandante = str(item.get('mandante') or '')
               visitante = str(item.get('visitante') or '')
               rodada = int(item.get('rodada') or 0)
-              chave = (mandante, visitante)
-              event_id = str(item.get('event_id') or '').strip() or ids_espn_por_confronto.get(chave) or f'AF-{rodada:02d}-{mandante}-{visitante}'
+              event_id = str(item.get('event_id') or '').strip() or f'AF-{rodada:02d}-{mandante}-{visitante}'
               assert event_id not in mapa_calendario, f'event_id duplicado no calendário: {event_id}'
               mapa_calendario[event_id] = (mandante, visitante)
           assert len(mapa_calendario) == 380, 'calendário sem 380 event_ids únicos/canônicos'
