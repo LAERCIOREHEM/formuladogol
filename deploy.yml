@@ -2,11 +2,6 @@ name: Deploy site (GitHub Pages)
 
 on:
   workflow_dispatch:
-    inputs:
-      forcar:
-        description: 'Publicar mesmo que o site esteja identico ao ja publicado'
-        type: boolean
-        default: false
 
   push:
     branches: [main]
@@ -15,6 +10,7 @@ on:
       - 'aovivo.html'
       - 'agenda.html'
       - 'estatisticas.html'
+      - 'acuracia.html'
       - 'clubes.html'
       - 'museu.html'
       - 'sobre.html'
@@ -36,6 +32,7 @@ on:
       - 'css/br-aovivo.css'
       - 'css/br-agenda.css'
       - 'css/br-estatisticas.css'
+      - 'css/br-acuracia.css'
       - 'css/br-institucional.css'
       - 'css/br-sobre.css'
       - 'css/br-analises.css'
@@ -46,6 +43,7 @@ on:
       - 'js/br-clubes.js'
       - 'js/br-config.js'
       - 'js/br-estatisticas.js'
+      - 'js/br-acuracia.js'
       - 'js/br-feedback.js'
       - 'js/br-menu.js'
       - 'js/br-museu.js'
@@ -55,29 +53,6 @@ on:
       - 'tabela/**'
       - 'resultados/**'
       - 'copa2026/**'
-      - '.github/workflows/deploy.yml'
-
-  # PUBLICACAO COALESCIDA (substitui o antigo gatilho workflow_run)
-  #
-  # Antes, oito workflows disparavam um deploy cada vez que terminavam. Como o
-  # robo de transmissoes roda de 15 em 15 minutos, isso gerava ~78 deploys/dia
-  # numa fila que e SERIAL. A fila nunca drenava, e um push seu ficava esperando
-  # atras dela — quando nao era descartado por um deploy de robo mais novo.
-  #
-  # Agora o deploy roda sozinho, em cadencia fixa, apenas nas janelas ativas, e
-  # publica tudo o que os robos acumularam desde a ultima vez. Se nada mudou, o
-  # passo de guarda encerra em ~1 min sem tocar no Pages.
-  #
-  # Janelas (horario de Brasilia, UTC-3):
-  #   Seg-Sex: 19h -> 02h      Sab-Dom: 13h -> 02h
-  schedule:
-    # 19h00-23h59 BRT de segunda a sexta  =  22-23 UTC seg-sex
-    - cron: '10,25,40,55 22,23 * * 1-5'
-    # 13h00-23h59 BRT sabado e domingo    =  16-23 UTC sab/dom
-    - cron: '10,25,40,55 16-23 * * 6,0'
-    # 00h00-02h59 BRT todos os dias       =  03-05 UTC (e 00-02 UTC = 21-23h BRT
-    # da vespera, ja coberto acima) -> aqui fica a madrugada BRT
-    - cron: '10,25,40,55 0-5 * * *'
 
 permissions:
   contents: write
@@ -85,11 +60,12 @@ permissions:
   id-token: write
   deployments: read
 
-# Não cancelar um deploy que já chegou à publicação do Pages. Novas execuções
-# aguardam na fila e, ao iniciar, sempre fazem checkout do main mais recente.
+# Uma publicação nova substitui uma anterior ainda em andamento. O deploy nasce
+# somente de push com arquivo público alterado (ou chamada manual), evitando fila
+# de versões obsoletas e execuções cinzas criadas por workflow_run.
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -120,6 +96,7 @@ jobs:
             aovivo.html
             agenda.html
             estatisticas.html
+            acuracia.html
             clubes.html
             museu.html
             sobre.html
@@ -149,6 +126,7 @@ jobs:
             css/br-aovivo.css
             css/br-agenda.css
             css/br-estatisticas.css
+            css/br-acuracia.css
             css/br-institucional.css
             css/br-sobre.css
             css/br-analises.css
@@ -162,6 +140,7 @@ jobs:
             js/br-clubes.js
             js/br-config.js
             js/br-estatisticas.js
+            js/br-acuracia.js
             js/br-feedback.js
             js/br-menu.js
             js/br-museu.js
@@ -173,10 +152,12 @@ jobs:
             dados-br/auditoria-modelos-af-previsao.json
             dados-br/auditoria-probabilidades.json
             dados-br/avaliacao-af-previsao.json
+            dados-br/acuracia-af-previsao.json
             dados-br/clubes.json
             dados-br/elencos.json
             dados-br/estatisticas-competicao.json
             dados-br/historico-probabilidades.json
+            dados-br/historico-probabilidades-jogos.json
             dados-br/historico-probabilidades-continentais.json
             dados-br/historico-ranking-desempenho.json
             dados-br/jogos-detalhes.json
@@ -381,6 +362,9 @@ jobs:
                   "dados-br/probabilidades-brasileirao.json", "dados-br/ranking-desempenho.json",
                   "dados-br/lideres-jogadores.json", "dados-br/estatisticas-competicao.json",
                   "dados-br/probabilidades-por-pontuacao.json", "resultados.json",
+              ],
+              "https://formuladogol.com.br/acuracia.html": [
+                  "dados-br/acuracia-af-previsao.json",
               ],
               "https://formuladogol.com.br/clubes.html": [
                   "dados-br/clubes.json", "dados-br/elencos.json",
@@ -630,6 +614,7 @@ jobs:
               "aovivo.html",
               "agenda.html",
               "estatisticas.html",
+              "acuracia.html",
               "clubes.html",
               "museu.html",
           ]
@@ -713,6 +698,19 @@ jobs:
                   if target.is_dir():
                       target = target / "index.html"
                   assert target.exists(), f"{page_name}: referência local quebrada: {ref}"
+
+          # A nova área de Acurácia é inserida dinamicamente nas páginas antigas
+          # por br-menu.js, mas sua própria página já deve nascer com a ordem
+          # editorial definitiva: Análises -> Acurácia -> Clubes.
+          acuracia_text = (site / "acuracia.html").read_text(encoding="utf-8")
+          acuracia_nav_match = re.search(r"<nav\b[^>]*>(.*?)</nav>", acuracia_text, flags=re.I | re.S)
+          assert acuracia_nav_match, "acuracia.html: menu principal ausente"
+          acuracia_nav = " ".join(re.sub(r"<[^>]+>", " ", acuracia_nav_match.group(1)).split())
+          for label in ("Análises", "Acurácia", "Clubes"):
+              assert label in acuracia_nav, f"acuracia.html: item de menu ausente: {label}"
+          assert acuracia_nav.index("Análises") < acuracia_nav.index("Acurácia") < acuracia_nav.index("Clubes"), (
+              "acuracia.html: ordem do menu deve ser Análises -> Acurácia -> Clubes"
+          )
 
           route_titles = {
               "jogos/index.html": "Jogos do Brasileirão 2026 — Fórmula do Gol",
@@ -900,6 +898,7 @@ jobs:
               "https://formuladogol.com.br/agenda.html",
               "https://formuladogol.com.br/aovivo.html",
               "https://formuladogol.com.br/estatisticas.html",
+              "https://formuladogol.com.br/acuracia.html",
               "https://formuladogol.com.br/clubes.html",
               "https://formuladogol.com.br/museu.html",
               "https://formuladogol.com.br/sobre.html",
@@ -941,7 +940,7 @@ jobs:
           # em lugar nenhum, porque o index.html não tinha JSON-LD. Referência
           # pendurada não gera erro visível — só silenciosamente não funciona.
           paginas_ld = (
-              "index.html", "estatisticas.html", "aovivo.html",
+              "index.html", "estatisticas.html", "acuracia.html", "aovivo.html",
               "clubes.html", "museu.html", "sobre.html",
           )
           definidos = set()
@@ -1064,64 +1063,7 @@ jobs:
       # actions/configure-pages NÃO corrige isso: com enablement padrão ele
       # apenas lê as configurações. Aqui a origem é fixada explicitamente em
       # build_type=workflow, o que desativa o workflow embutido de vez.
-      # ---------------------------------------------------------------------
-      # GUARDA DE CONTEUDO — a resposta possivel para "deploy incremental".
-      #
-      # O GitHub Pages NAO tem publicacao incremental: toda implantacao envia o
-      # artefato inteiro e sincroniza tudo. Nao existe API de delta. O que da
-      # para fazer e nao publicar quando nao ha o que publicar.
-      #
-      # A maior parte das execucoes dos robos nao muda nada (o robo de
-      # transmissoes checa de 15 em 15 min e quase sempre encontra o mesmo
-      # conteudo). Aqui o pacote e reduzido a um unico hash; se ele bater com o
-      # da ultima publicacao, o job encerra em ~1 min sem tocar no Pages.
-      #
-      # status-deploy.json fica de fora do hash porque carrega timestamp e SHA
-      # do commit — muda em toda execucao por construcao. Verificado: e o UNICO
-      # arquivo nao deterministico do pacote.
-      - name: Calcular hash do pacote
-        id: guarda
-        shell: bash
-        run: |
-          set -euo pipefail
-          HASH=$(find _site -type f ! -path '_site/dados-br/status-deploy.json' -print0 \
-            | sort -z | xargs -0 sha256sum | sha256sum | cut -d' ' -f1)
-          echo "hash=${HASH}" >> "$GITHUB_OUTPUT"
-          echo "Hash do pacote: ${HASH}"
-          mkdir -p .hash-publicado
-          echo "${HASH}" > .hash-publicado/hash.txt
-
-      - name: Consultar hash da ultima publicacao
-        id: cache_hash
-        uses: actions/cache/restore@v4
-        with:
-          path: .hash-publicado
-          key: pages-publicado-${{ steps.guarda.outputs.hash }}
-
-      - name: Decidir se publica
-        id: decisao
-        shell: bash
-        env:
-          FORCAR: ${{ github.event.inputs.forcar }}
-          CACHE_HIT: ${{ steps.cache_hash.outputs.cache-hit }}
-          EVENTO: ${{ github.event_name }}
-        run: |
-          set -euo pipefail
-          if [[ "${FORCAR:-false}" == "true" ]]; then
-            echo "publicar=true" >> "$GITHUB_OUTPUT"
-            echo "Publicando: forcado pelo operador."
-          elif [[ "${CACHE_HIT:-}" == "true" ]]; then
-            echo "publicar=false" >> "$GITHUB_OUTPUT"
-            echo "PULANDO: o pacote e byte a byte identico ao ja publicado."
-            echo "Nada mudou desde a ultima implantacao — nao ha o que enviar ao Pages."
-            echo "::notice::Deploy dispensado (site inalterado). Evento: ${EVENTO}."
-          else
-            echo "publicar=true" >> "$GITHUB_OUTPUT"
-            echo "Publicando: o pacote mudou desde a ultima implantacao."
-          fi
-
       - name: Fixar origem do Pages em GitHub Actions
-        if: steps.decisao.outputs.publicar == 'true'
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
@@ -1146,7 +1088,6 @@ jobs:
           fi
 
       - name: Destravar fila do Pages (cancelar implantações concorrentes)
-        if: steps.decisao.outputs.publicar == 'true'
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
@@ -1194,11 +1135,9 @@ jobs:
           fi
 
       - name: Configure Pages
-        if: steps.decisao.outputs.publicar == 'true'
         uses: actions/configure-pages@v5
 
       - name: Upload artifact
-        if: steps.decisao.outputs.publicar == 'true'
         uses: actions/upload-pages-artifact@v4
         with:
           path: _site
@@ -1211,7 +1150,6 @@ jobs:
       # encerram o job; se isso ocorrer, aguardamos e criamos uma nova
       # implantação usando exatamente o mesmo artefato validado.
       - name: Deploy to GitHub Pages
-        if: steps.decisao.outputs.publicar == 'true'
         id: deployment
         continue-on-error: true
         uses: actions/deploy-pages@v4
@@ -1222,14 +1160,14 @@ jobs:
         timeout-minutes: 12
 
       - name: Aguardar antes de repetir deploy cancelado
-        if: steps.decisao.outputs.publicar == 'true' && steps.deployment.outcome == 'failure'
+        if: steps.deployment.outcome == 'failure'
         shell: bash
         run: sleep 60
 
       - name: Repetir deploy no GitHub Pages
         id: deployment_retry
         continue-on-error: true
-        if: steps.decisao.outputs.publicar == 'true' && steps.deployment.outcome == 'failure'
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4
         with:
           timeout: 600000
@@ -1238,7 +1176,7 @@ jobs:
         timeout-minutes: 12
 
       - name: Aguardar antes da última tentativa de deploy
-        if: steps.decisao.outputs.publicar == 'true' && steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
         shell: bash
         run: sleep 120
 
@@ -1246,7 +1184,7 @@ jobs:
       # falha aqui reprova o job e dispara o alerta.
       - name: Última tentativa de deploy no GitHub Pages
         id: deployment_retry2
-        if: steps.decisao.outputs.publicar == 'true' && steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
         uses: actions/deploy-pages@v4
         with:
           timeout: 600000
@@ -1254,18 +1192,8 @@ jobs:
           reporting_interval: 5000
         timeout-minutes: 12
 
-      # Registra o hash recem-publicado. Na proxima execucao, se o pacote for
-      # identico, o cache dara hit e o deploy sera dispensado.
-      - name: Registrar hash publicado
-        if: steps.decisao.outputs.publicar == 'true' && success()
-        continue-on-error: true
-        uses: actions/cache/save@v4
-        with:
-          path: .hash-publicado
-          key: pages-publicado-${{ steps.guarda.outputs.hash }}
-
       - name: Confirmar e avisar publicação editorial
-        if: steps.decisao.outputs.publicar == 'true' && success()
+        if: success()
         # A publicação já foi concluída pelo passo anterior. Confirmação pública
         # e e-mail são pós-deploy e jamais devem transformar uma publicação
         # válida em falha por ausência de secrets ou indisponibilidade externa.
@@ -1416,7 +1344,7 @@ jobs:
           fi
 
       - name: Notificar buscadores via IndexNow
-        if: steps.decisao.outputs.publicar == 'true' && success()
+        if: success()
         run: |
           # IndexNow avisa Bing, Yandex, Naver e DuckDuckGo em uma única chamada.
           # O Google NÃO suporta o protocolo — o sitemap com lastmod real já
