@@ -10,11 +10,11 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 63,
+    "jogos_na_janela": 62,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 26,
+    "candidatos_oficiais_encontrados": 27,
     "transmissoes_publicadas": 8,
-    "sem_transmissao": 55,
+    "sem_transmissao": 54,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -272,17 +272,6 @@
       "fontes_encontradas": [
         "CazéTV"
       ],
-      "manual": false
-    },
-    {
-      "event_id": "401841195",
-      "rodada": 23,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Grêmio",
-      "data_iso": "2026-08-15T16:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
       "manual": false
     },
     {
@@ -876,6 +865,16 @@
   ],
   "rejeitados": [
     {
+      "video_id": "AJOz0Qbpay0",
+      "url": "https://www.youtube.com/watch?v=AJOz0Qbpay0",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "CORINTHIANS ELIMINADO PELO INTER; VITÓRIA CONSEGUE VIRADA HISTÓRICA CONTRA O FURACÃO | GERAL CAZÉTV",
+      "status": "live",
+      "inicio_programado": "2026-08-07T10:00:00-03:00",
+      "motivo": "conteúdo rejeitado: melhores momentos"
+    },
+    {
       "video_id": "USzPEfeS1VE",
       "url": "https://www.youtube.com/watch?v=USzPEfeS1VE",
       "fonte": "getv",
@@ -1172,15 +1171,6 @@
       "competicao_nome": "Sul-Americana",
       "jogo": "Cienciano del Cusco x Botafogo",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401841195",
-      "rodada": 23,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Grêmio",
-      "data_iso": "2026-08-15T16:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
     },
     {
@@ -1563,5 +1553,5 @@
     },
     "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API."
   },
-  "atualizado_em": "2026-08-07T09:04:46-03:00"
+  "atualizado_em": "2026-08-07T10:23:23-03:00"
 }
