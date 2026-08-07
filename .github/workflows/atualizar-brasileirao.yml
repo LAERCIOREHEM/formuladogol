@@ -78,7 +78,9 @@ jobs:
             scripts/gerar_probabilidades_brasileirao.py \
             scripts/reconciliar_af_continental.py \
             scripts/gerar_probabilidades_jogos.py \
-            scripts/avaliar_af_previsao.py
+            scripts/avaliar_af_previsao.py \
+            scripts/gerar_analise_copa_do_brasil.py \
+            scripts/validar_artefatos_analises.py
           python scripts/validar_python_embutido_workflow.py --self-test
           python scripts/validar_python_embutido_workflow.py .github/workflows/atualizar-brasileirao.yml
           python atualizar_espn.py --selftest
@@ -95,6 +97,8 @@ jobs:
           python scripts/gerar_probabilidades_brasileirao.py --self-test
           python scripts/gerar_probabilidades_jogos.py --self-test
           python scripts/avaliar_af_previsao.py --self-test
+          python scripts/gerar_analise_copa_do_brasil.py --self-test
+          python scripts/validar_artefatos_analises.py
           python -m json.tool dados-br/config-transmissoes-tv.json > /dev/null
           python -m json.tool dados-br/auditoria-transmissoes-tv.json > /dev/null
 
@@ -218,6 +222,23 @@ jobs:
             ARGS+=(--full --force --max-age-minutes 0)
           fi
           python scripts/atualizar_competicoes_af_previsao.py "${ARGS[@]}"
+
+      - name: Impedir publicação com resultado continental vencido e não incorporado
+        if: ${{ always() && steps.continental.outcome == 'success' }}
+        run: |
+          python - <<'PY'
+          import json
+
+          with open('dados-br/auditoria-competicoes-af-previsao.json', encoding='utf-8') as handle:
+              audit = json.load(handle)
+          blocking = list(audit.get('falhas_bloqueantes') or [])
+          if blocking:
+              raise SystemExit(
+                  'ERRO: atualização continental possui pendência factual bloqueante; '
+                  'o site não será publicado com probabilidades antigas. ' + ' | '.join(blocking)
+              )
+          print('Coleta continental sem pendência factual bloqueante.')
+          PY
 
       - name: Gerar agenda dos clubes do Brasileirão
         if: ${{ always() && steps.continental.outcome == 'success' }}
@@ -391,6 +412,21 @@ jobs:
       - name: Auditar histórico e preparar avaliação final do AF-Previsão
         if: steps.af_generate.outputs.af_updated == 'true'
         run: python scripts/avaliar_af_previsao.py --strict
+
+      - name: Gerar editorial pós-oitavas da Copa do Brasil no mesmo ciclo
+        if: ${{ steps.continental.outcome == 'success' && (steps.af_gate.outputs.run_af != 'true' || steps.af_generate.outcome == 'success') }}
+        env:
+          OPENAI_API_KEY: ''
+        run: |
+          set -euo pipefail
+          # Determinístico por desenho: publicação do dado esportivo não pode
+          # depender de disponibilidade de LLM. Se as oitavas ainda não tiverem
+          # terminado, o gerador apenas informa que a fase não está elegível.
+          python scripts/gerar_analise_copa_do_brasil.py \
+            --sem-ia \
+            --falhar-se-snapshot-atrasado \
+            --tolerancia-snapshot-horas 4
+          python scripts/validar_artefatos_analises.py
 
       - name: Informar preservação temporária do AF e retentativa automática
         if: steps.af_gate.outputs.run_af == 'true' && steps.af_generate.outputs.af_updated != 'true'
@@ -1039,6 +1075,12 @@ jobs:
             "dados-br/auditoria-cobertura-resultados.json"
             "dados-br/calendario-completo.json"
             "dados-br/auditoria-calendario.json"
+            "analises"
+            "dados-br/analises.json"
+            "dados-br/historico-probabilidades-continentais.json"
+            "sitemap.xml"
+            "news-sitemap.xml"
+            "feed.xml"
           )
 
           if [[ "${CONTINENTAL_READY:-false}" == "true" ]]; then
