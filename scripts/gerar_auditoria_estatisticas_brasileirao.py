@@ -120,6 +120,7 @@ def main() -> None:
     event_errors: list[str] = []
     pending_manual_details: list[str] = []
     duplicate_events: list[str] = []
+    incomplete_events: list[str] = []
     narrative_false_positives: list[str] = []
     for event_id, game in detail_games.items():
         if not isinstance(game, dict):
@@ -159,7 +160,28 @@ def main() -> None:
             if "attempt saved" in desc or "shot is saved" in desc:
                 narrative_false_positives.append(f"{event_id}: {goal.get('jogador')}")
         if extracted != expected:
-            event_errors.append(f"{event_id}: gols extraídos {extracted} != placar {expected}")
+            # DISTINÇÃO ESSENCIAL: atraso de publicação != corrupção de dado.
+            #
+            # A ESPN publica o placar final assim que o jogo acaba, mas os
+            # eventos nominais (autor do gol, minuto) chegam depois — às vezes
+            # horas depois. Antes, qualquer diferença era tratada como corrupção
+            # e derrubava a auditoria inteira, congelando o site por causa de
+            # jogos que simplesmente ainda não tinham ficha completa.
+            #
+            #   ATRASO      -> nenhum time tem MAIS gols nominais do que marcou.
+            #                  A ficha está incompleta, nunca contraditória.
+            #                  Vira aviso; a próxima execução completa.
+            #   CORRUPÇÃO   -> algum time tem MAIS gols nominais do que o placar.
+            #                  Gol fantasma, duplicado ou atribuído ao time
+            #                  errado. Continua crítico e continua bloqueando.
+            excedente = any(extracted[t] > expected[t] for t in expected)
+            if excedente:
+                event_errors.append(f"{event_id}: gols extraídos {extracted} != placar {expected}")
+            else:
+                incomplete_events.append(
+                    f"{event_id}: ficha nominal incompleta ({sum(extracted.values())}"
+                    f"/{sum(expected.values())} gols publicados pela ESPN)"
+                )
         seen_cards: set[tuple[str, str, str, str]] = set()
         for card in game.get("cartoes") or []:
             if not isinstance(card, dict):
@@ -172,6 +194,20 @@ def main() -> None:
         warnings.append(
             f"{len(pending_manual_details)} resultado(s) manual(is) confirmado(s) aguardando detalhes nominais da ESPN"
         )
+    if incomplete_events:
+        # Trava de segurança: atraso pontual da ESPN é normal; atraso generalizado
+        # indica coleta quebrada e volta a ser crítico.
+        limite = max(4, int(len(detail_games) * 0.05))
+        if len(incomplete_events) > limite:
+            critical.append(
+                f"{len(incomplete_events)} jogo(s) com ficha nominal incompleta "
+                f"(limite tolerado: {limite}) — coleta de eventos provavelmente quebrada"
+            )
+        else:
+            warnings.append(
+                f"{len(incomplete_events)} jogo(s) aguardando eventos nominais da ESPN: "
+                + "; ".join(incomplete_events[:4])
+            )
     if event_errors:
         critical.append(f"{len(event_errors)} jogo(s) com gols/cartões incompatíveis")
     if duplicate_events:
