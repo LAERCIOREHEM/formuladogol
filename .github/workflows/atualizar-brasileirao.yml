@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       forcar_af:
-        description: 'Forçar o AF-Previsão mesmo sem mudança esportiva relevante'
+        description: 'Uso excepcional: refazer o AF mesmo sem mudança; normalmente deixe desmarcado'
         required: false
         default: false
         type: boolean
@@ -299,7 +299,8 @@ jobs:
               and bool(coleta.get('pronto'))
           )
           desatualizado = not bool(vigencia.get('atualizado'))
-          solicitado = forcar or faltando or antes != depois or desatualizado
+          continental_changed = str(os.environ.get('CONTINENTAL_CHANGED', '')).lower() == 'true'
+          solicitado = forcar or faltando or continental_changed or antes != depois or desatualizado
           executar = solicitado and base_valida and continental_pronto
           motivos_vigencia = '; '.join(vigencia.get('motivos') or [])
           motivos_coleta = '; '.join(coleta.get('motivos') or [])
@@ -324,6 +325,8 @@ jobs:
               motivo = 'execução manual com forcar_af=true e coleta continental forçada'
           elif faltando:
               motivo = 'artefato obrigatório ausente'
+          elif continental_changed:
+              motivo = 'a situação esportiva das competições continentais mudou'
           elif antes != depois:
               motivo = 'resultado, tabela, calendário, competição continental ou configuração mudou'
           elif desatualizado:
@@ -447,6 +450,13 @@ jobs:
           python - <<'PY'
           import json
           import math
+          from scripts.gerar_probabilidades_brasileirao import (
+              continental_snapshots_state_hash,
+              load_current_matches,
+              load_current_state,
+              load_fixtures,
+              sporting_fixture_key,
+          )
           for arq in ['tabela.json', 'jogos.json', 'resultados.json']:
               d = json.load(open(arq, encoding='utf-8'))
               assert d.get('fonte') == 'ESPN', f'{arq}: fonte nao e ESPN'
@@ -668,6 +678,28 @@ jobs:
           if integrado:
               assert aud_prev.get('schema_version', 0) >= 2, 'auditoria integrada em schema antigo'
               assert isinstance(aud_prev.get('integracao_continental'), dict), 'auditoria sem integração continental'
+              hash_continental_atual = continental_snapshots_state_hash(competicoes)
+              hash_continental_af = str((previsao.get('integracao_continental') or {}).get('hash_snapshots') or '')
+              assert hash_continental_af == hash_continental_atual, (
+                  'AF não foi recalculado com o snapshot continental atual: '
+                  f'af={hash_continental_af} atual={hash_continental_atual}'
+              )
+              copa_snapshot = competicoes['copa_do_brasil']
+              copa_resumo = copa_snapshot.get('resumo') or {}
+              copa_fase = copa_snapshot.get('fase_atual') or {}
+              auditoria_integracao = (aud_prev.get('integracao_continental') or {}).get('competicoes') or {}
+              copa_af = auditoria_integracao.get('copa_do_brasil') or {}
+              assert int(copa_af.get('partidas_concluidas_no_ajuste') or -1) == int(copa_resumo.get('finalizados') or 0), (
+                  'AF não incorporou todas as partidas concluídas da Copa do Brasil'
+              )
+              # Ao terminar as oitavas, o modelo deve partir dos oito classificados
+              # factuais e recalcular as probabilidades consolidadas dos 20 clubes.
+              if int(copa_fase.get('ordem') or 0) == 600 and int(copa_fase.get('eventos_pendentes') or 0) == 0:
+                  ativos = list(copa_af.get('clubes_ativos') or [])
+                  assert int(copa_af.get('equipes_ativas') or 0) == 8, 'Copa finalizada nas oitavas sem exatamente 8 classificados no AF'
+                  assert len(ativos) == len(set(ativos)) == 8, 'lista de classificados da Copa inválida no AF'
+                  assert list(copa_af.get('rodadas_simuladas_tamanhos') or []) == [8, 4, 2, 1], 'estrutura simulada da Copa não parte das oitavas concluídas'
+                  print('  OK   Copa do Brasil: 8 classificados factuais incorporados e probabilidades recalculadas')
           probabilidades_jogos = json.load(open('dados-br/probabilidades-jogos.json', encoding='utf-8'))
           auditoria_jogos = json.load(open('dados-br/auditoria-probabilidades-jogos.json', encoding='utf-8'))
           assert probabilidades_jogos.get('schema_version') == 1, 'probabilidades por jogo em schema inesperado'
@@ -679,26 +711,45 @@ jobs:
           assert int(probabilidades_jogos.get('total_jogos') or -1) == len(jogos_previstos), 'total divergente nas probabilidades por jogo'
           assert int(base_jogos.get('partidas_concluidas') or -1) + len(jogos_previstos) == 380, 'partição inválida nas probabilidades por jogo'
           assert int(base_jogos.get('partidas_restantes') or -1) == len(jogos_previstos), 'base corrente divergente nas probabilidades por jogo'
-          ids_concluidos = {str(item.get('event_id') or item.get('id') or '') for item in (r.get('resultados') or [])}
-          # O calendário completo é a fonte canônica dos 380 IDs. O feed ESPN
-          # pode conter simultaneamente o evento original e o reagendado, com
-          # IDs diferentes para o mesmo confronto; isso não é corrupção.
-          mapa_calendario = {}
-          for item in (completo.get('jogos') or []):
-              mandante = str(item.get('mandante') or '')
-              visitante = str(item.get('visitante') or '')
-              rodada = int(item.get('rodada') or 0)
-              event_id = str(item.get('event_id') or '').strip() or f'AF-{rodada:02d}-{mandante}-{visitante}'
-              assert event_id not in mapa_calendario, f'event_id duplicado no calendário: {event_id}'
-              mapa_calendario[event_id] = (mandante, visitante)
-          assert len(mapa_calendario) == 380, 'calendário sem 380 event_ids únicos/canônicos'
-          ids_esperados = set(mapa_calendario) - ids_concluidos
-          ids_jogos = [str(item.get('event_id') or '') for item in jogos_previstos]
-          assert len(ids_jogos) == len(set(ids_jogos)), 'event_id duplicado nas probabilidades por jogo'
-          assert set(ids_jogos) == ids_esperados, 'cobertura das probabilidades por jogo diverge do calendário restante'
+          # Valida a cobertura pela identidade esportiva estável, não pelo ID
+          # transitório da ESPN. O calendário continua sendo a fonte canônica.
+          estado_atual = load_current_state(t)
+          clubes_permitidos = set(estado_atual.teams)
+          concluidos = load_current_matches(e, clubes_permitidos, r)
+          ids_concluidos = {str(item.source_id) for item in concluidos}
+          chaves_concluidas = {
+              sporting_fixture_key(item.round_no, item.home, item.away) for item in concluidos
+          }
+          restantes, _ = load_fixtures(
+              completo, ids_concluidos, clubes_permitidos, concluded_keys=chaves_concluidas
+          )
+          mapa_restantes = {
+              sporting_fixture_key(item.round_no, item.home, item.away): item
+              for item in restantes
+          }
+          assert len(mapa_restantes) == len(restantes), 'calendário restante contém confronto duplicado'
+
+          mapa_jogos = {}
+          ids_jogos = []
           for item in jogos_previstos:
+              event_id = str(item.get('event_id') or '').strip()
+              assert event_id, 'probabilidade pré-jogo sem event_id canônico'
+              ids_jogos.append(event_id)
+              chave = sporting_fixture_key(
+                  int(item.get('rodada') or 0),
+                  str(item.get('mandante') or ''),
+                  str(item.get('visitante') or ''),
+              )
+              assert chave not in mapa_jogos, f'confronto duplicado nas probabilidades por jogo: {chave}'
+              mapa_jogos[chave] = item
+          assert len(ids_jogos) == len(set(ids_jogos)), 'event_id duplicado nas probabilidades por jogo'
+          assert set(mapa_jogos) == set(mapa_restantes), (
+              'cobertura das probabilidades por jogo diverge do calendário restante; '
+              f'faltam={sorted(set(mapa_restantes) - set(mapa_jogos))[:3]} '
+              f'sobram={sorted(set(mapa_jogos) - set(mapa_restantes))[:3]}'
+          )
+          for chave, item in mapa_jogos.items():
               event_id = str(item.get('event_id') or '')
-              assert (str(item.get('mandante') or ''), str(item.get('visitante') or '')) == mapa_calendario[event_id], f'{event_id}: clubes divergentes do calendário'
               assert item.get('status') == 'pre_jogo', f'{event_id}: status não é pré-jogo'
               assert item.get('valido_ate') == 'inicio_da_partida', f'{event_id}: validade ausente'
               for bloco_nome in ('probabilidades_pct', 'probabilidades_exibicao_pct'):
