@@ -72,6 +72,12 @@ def validate(root: Path) -> None:
             assert "Os confrontos das quartas dependerão do sorteio" in text, f"{slug}: ressalva do sorteio ausente"
             assert "Tabela do Brasileirão" not in text and "analysis-kpis" not in text, f"{slug}: layout indevidamente herdado da rodada"
             assert re.search(r"Via Copa.*0%", text, flags=re.I | re.S), f"{slug}: eliminação sem zero explícito"
+            expected_videos = int(article.get("melhores_momentos_vinculados") or 0)
+            video_ids = re.findall(r'data-video-id="([A-Za-z0-9_-]{11})"', text)
+            assert len(video_ids) == expected_videos, f"{slug}: quantidade de embeds diverge do manifesto ({len(video_ids)}/{expected_videos})"
+            assert len(video_ids) == len(set(video_ids)), f"{slug}: vídeo de melhores momentos duplicado"
+            assert text.count('class="analysis-cup-video-card analysis-inline-video"') == expected_videos, f"{slug}: cards de vídeo divergentes"
+            assert '<iframe' not in ''.join(re.findall(r'<div class="analysis-cup-legs">.*?</div>\s*</article>', text, flags=re.S)), f"{slug}: iframe carregado antes do clique; lazy-load quebrado"
         else:
             raise AssertionError(f"{slug}: tipo editorial desconhecido: {article_type}")
 

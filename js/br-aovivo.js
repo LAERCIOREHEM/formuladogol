@@ -526,17 +526,72 @@
     return r.json();
   }
 
-  function safeYouTubeUrl(value) {
+  function youtubeVideoId(value) {
     try {
-      const url = new URL(String(value || ""), window.location.href);
+      const raw = String(value || "").trim();
+      if (/^[A-Za-z0-9_-]{11}$/.test(raw)) return raw;
+      const url = new URL(raw, window.location.href);
       const host = url.hostname.toLowerCase();
-      if (host !== "youtube.com" && host !== "www.youtube.com" && host !== "youtu.be") return "";
-      if (host === "youtu.be") return /^[A-Za-z0-9_-]{11}$/.test(url.pathname.replace(/^\//, "")) ? url.href : "";
-      const id = url.searchParams.get("v");
-      return /^[A-Za-z0-9_-]{11}$/.test(id || "") ? url.href : "";
+      if (host === "youtu.be" || host === "www.youtu.be") {
+        const id = url.pathname.replace(/^\//, "").split("/")[0];
+        return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
+      }
+      if (host !== "youtube.com" && host !== "www.youtube.com" && !host.endsWith(".youtube.com")) return "";
+      const parts = url.pathname.replace(/^\//, "").split("/").filter(Boolean);
+      let id = url.searchParams.get("v") || "";
+      if (!id && parts.length >= 2 && ["live", "embed", "shorts"].includes(parts[0])) id = parts[1];
+      return /^[A-Za-z0-9_-]{11}$/.test(id) ? id : "";
     } catch (_) {
       return "";
     }
+  }
+
+  function safeYouTubeUrl(value) {
+    const id = youtubeVideoId(value);
+    return id ? "https://www.youtube.com/watch?v=" + id : "";
+  }
+
+  let liveMediaModal = null;
+  let liveMediaFocus = null;
+  let liveMediaOverflow = "";
+
+  function closeLiveMedia() {
+    if (!liveMediaModal) return;
+    const iframe = liveMediaModal.querySelector("iframe");
+    if (iframe) iframe.src = "about:blank";
+    liveMediaModal.remove();
+    liveMediaModal = null;
+    document.body.style.overflow = liveMediaOverflow;
+    if (liveMediaFocus && document.body.contains(liveMediaFocus)) liveMediaFocus.focus();
+    liveMediaFocus = null;
+  }
+
+  function openLiveMedia(button) {
+    const videoId = youtubeVideoId(button && button.dataset ? button.dataset.videoId : "");
+    if (!videoId) return;
+    closeLiveMedia();
+    liveMediaFocus = button;
+    liveMediaOverflow = document.body.style.overflow;
+    const title = String(button.dataset.videoTitle || "Transmissão oficial").trim();
+    const source = String(button.dataset.videoSource || "YouTube").trim();
+    const modal = document.createElement("div");
+    modal.className = "live-media-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-labelledby", "live-media-title");
+    modal.innerHTML = '<section class="live-media-card"><header class="live-media-header"><strong id="live-media-title"></strong><button type="button" class="live-media-close" aria-label="Fechar transmissão">×</button></header><div class="live-media-frame"><iframe loading="eager" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><footer class="live-media-footer"></footer></section>';
+    modal.querySelector("#live-media-title").textContent = title;
+    modal.querySelector(".live-media-footer").textContent = "Transmissão oficial: " + source + " · reproduzida dentro do Fórmula do Gol.";
+    const iframe = modal.querySelector("iframe");
+    iframe.title = title;
+    iframe.src = "https://www.youtube-nocookie.com/embed/" + encodeURIComponent(videoId) + "?autoplay=1&rel=0&playsinline=1";
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal || event.target.closest(".live-media-close")) closeLiveMedia();
+    });
+    liveMediaModal = modal;
+    document.body.style.overflow = "hidden";
+    document.body.appendChild(modal);
+    modal.querySelector(".live-media-close").focus();
   }
 
   function safeOfficialUrl(value) {
@@ -697,9 +752,10 @@
   function renderTransmission(game) {
     const entry = transmissionForGame(game);
     const principal = entry && entry.principal;
-    const url = principal && safeYouTubeUrl(principal.url);
+    const videoId = principal && principal.embeddable !== false ? youtubeVideoId(principal.video_id || principal.url) : "";
+    const url = videoId ? "https://www.youtube.com/watch?v=" + videoId : "";
     let youtube = "";
-    if (url) {
+    if (videoId) {
       const sourceName = principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
       const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
       const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
@@ -712,7 +768,7 @@
       const note = finished
         ? "Transmissão oficial encerrada no YouTube"
         : (liveNow ? "Transmissão oficial ao vivo no YouTube" : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube"));
-      youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + '</div></div>';
+      youtube = '<div class="live-stream-area"><button type="button" class="live-stream-button live-embed-open ' + (liveStyle ? "is-live" : "") + '" data-video-id="' + esc(videoId) + '" data-video-title="' + esc((game.home && game.home.nome || "") + " x " + (game.away && game.away.nome || "")) + '" data-video-source="' + esc(sourceName) + '">' + esc(label) + '</button><div class="live-stream-note">' + esc(note) + ' · abre aqui no site</div></div>';
     }
     return youtube + renderClosedTransmission(game);
   }
@@ -2168,6 +2224,18 @@
       state.timer = setTimeout(refresh, REFRESH_MS);
     }
   }
+
+  document.addEventListener("click", (event) => {
+    const button = event.target.closest(".live-embed-open");
+    if (button) {
+      event.preventDefault();
+      openLiveMedia(button);
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && liveMediaModal) closeLiveMedia();
+  });
 
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) {

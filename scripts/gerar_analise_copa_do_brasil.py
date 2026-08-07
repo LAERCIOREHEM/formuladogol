@@ -66,6 +66,7 @@ HISTORY_PATH = ROOT / "dados-br" / "historico-probabilidades-continentais.json"
 PROBABILITIES_PATH = ROOT / "dados-br" / "probabilidades-brasileirao.json"
 COPA_PATH = ROOT / "dados-br" / "competicoes-af-previsao" / "copa-do-brasil.json"
 MANIFEST_PATH = ROOT / "dados-br" / "analises.json"
+HIGHLIGHTS_PATH = ROOT / "dados-br" / "melhores-momentos-copa-do-brasil.json"
 ARTICLE_ID = "copa-do-brasil-2026-classificados-quartas"
 ARTICLE_SLUG = "copa-do-brasil-2026-classificados-quartas.html"
 ARTICLE_URL = f"{SITE}/analises/{ARTICLE_SLUG}"
@@ -608,7 +609,32 @@ def render_team(team: Mapping[str, Any], classified: str | None) -> str:
     return f'<div class="analysis-cup-team"><div class="analysis-cup-crest">{image}</div><strong>{esc(name)}</strong>{status}</div>'
 
 
-def render_tie(tie: Mapping[str, Any]) -> str:
+def load_highlights() -> dict[str, Any]:
+    data = load_json(HIGHLIGHTS_PATH) if HIGHLIGHTS_PATH.exists() else {}
+    games = data.get("jogos") if isinstance(data, dict) else {}
+    return games if isinstance(games, dict) else {}
+
+
+def render_highlight(game: Mapping[str, Any], highlights: Mapping[str, Any]) -> str:
+    event_id = str(game.get("event_id") or "")
+    video = highlights.get(event_id) if event_id else None
+    if not isinstance(video, Mapping):
+        return ""
+    video_id = str(video.get("video_id") or "").strip()
+    if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id) or video.get("embeddable") is False:
+        return ""
+    title = str(video.get("titulo") or f"{game.get('mandante')} x {game.get('visitante')} — melhores momentos")
+    source = str(video.get("fonte") or "YouTube oficial")
+    thumb = str(video.get("thumbnail") or f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg")
+    return f'''<button type="button" class="analysis-cup-video-card analysis-inline-video"
+      data-video-id="{esc(video_id)}" data-video-title="{esc(title)}" data-video-source="{esc(source)}"
+      aria-label="Assistir melhores momentos de {esc(game.get('mandante'))} x {esc(game.get('visitante'))}">
+      <span class="analysis-cup-video-thumb"><img src="{esc(thumb)}" alt="" loading="lazy"><i aria-hidden="true">▶</i></span>
+      <span class="analysis-cup-video-copy"><b>Melhores momentos</b><small>{esc(source)}</small></span>
+    </button>'''
+
+
+def render_tie(tie: Mapping[str, Any], highlights: Mapping[str, Any]) -> str:
     classified = str(tie.get("classificado") or "")
     eliminated = str(tie.get("eliminado") or "")
     team_a = tie["equipe_a"]
@@ -622,8 +648,9 @@ def render_tie(tie: Mapping[str, Any]) -> str:
             f'{int(game["placar_visitante"]) if game.get("placar_visitante") is not None else "—"}</b> {esc(game["visitante"])}'
         )
         stadium = f'<small>📍 {esc(game.get("estadio"))}</small>' if game.get("estadio") else ""
+        video = render_highlight(game, highlights)
         games_html.append(
-            f'<div class="analysis-cup-leg"><span>{leg}</span><time datetime="{esc(game.get("data_iso") or "")}">{esc(date_game(game.get("data_iso")))}</time><p>{score}</p>{stadium}</div>'
+            f'<div class="analysis-cup-leg"><span>{leg}</span><time datetime="{esc(game.get("data_iso") or "")}">{esc(date_game(game.get("data_iso")))}</time><p>{score}</p>{stadium}{video}</div>'
         )
     penalty = " · decisão nos pênaltis" if tie.get("decidido_nos_penaltis") else ""
     return f'''<article class="analysis-cup-tie">
@@ -678,7 +705,13 @@ def render_article(data: dict[str, Any], editorial: dict[str, Any], published: s
         + "</section>"
         for section in editorial["secoes"]
     )
-    ties = "".join(render_tie(tie) for tie in data["confrontos"])
+    highlights = load_highlights()
+    ties = "".join(render_tie(tie, highlights) for tie in data["confrontos"])
+    highlight_hash = canonical_hash(highlights)
+    highlight_count = sum(
+        1 for tie in data["confrontos"] for game in tie.get("jogos") or []
+        if str(game.get("event_id") or "") in highlights
+    )
     before_date = data["antes"].get("probabilidades_calculadas_em") or ""
     after_date = data["depois"].get("probabilidades_calculadas_em") or ""
     navigation_history = [article for article in articles if article.get("id_editorial") != ARTICLE_ID]
@@ -722,7 +755,7 @@ def render_article(data: dict[str, Any], editorial: dict[str, Any], published: s
     {rodape('../')}
   </div>
   <script src="../js/br-menu.js?v=20260724-status-dot-v2"></script>
-  <script src="../js/br-analises.js?v=20260805-editorial-continental-v1"></script>
+  <script src="../js/br-analises.js?v=20260807-copa-highlights-inline-v1"></script>
 </body>
 </html>'''
     metadata = {
@@ -745,6 +778,8 @@ def render_article(data: dict[str, Any], editorial: dict[str, Any], published: s
         "classificados": data["classificados"],
         "hash_dossie": canonical_hash(data),
         "hash_editorial": canonical_hash(editorial_summary(data)),
+        "hash_melhores_momentos": highlight_hash,
+        "melhores_momentos_vinculados": highlight_count,
         "editorial": editorial,
         "email_assunto": "Fórmula do Gol: definidos os classificados às quartas da Copa do Brasil",
         "email_chamada": "As oitavas terminaram. Veja os oito classificados e como os resultados alteraram as chances de Libertadores dos clubes da Série A.",
@@ -836,10 +871,16 @@ def execute(args: argparse.Namespace) -> int:
     articles = manifest.get("artigos") or []
     existing = next((article for article in articles if article.get("id_editorial") == ARTICLE_ID), None)
     dossier_hash = canonical_hash(data)
-    if existing and existing.get("hash_dossie") == dossier_hash and not args.forcar:
+    current_highlight_hash = canonical_hash(load_highlights())
+    if (
+        existing
+        and existing.get("hash_dossie") == dossier_hash
+        and str(existing.get("hash_melhores_momentos") or "") == current_highlight_hash
+        and not args.forcar
+    ):
         if history_changed and not args.dry_run:
             gravar_texto(HISTORY_PATH, json.dumps(history, ensure_ascii=False, indent=2))
-        print("Editorial da Copa do Brasil já publicado com o mesmo fechamento.")
+        print("Editorial da Copa do Brasil já publicado com o mesmo fechamento e os mesmos vídeos.")
         return 0
     fallback = narrative_fallback(data)
     if args.sem_ia:
@@ -970,6 +1011,20 @@ def self_test() -> int:
     assert "Tabela do Brasileirão" not in page
     assert "analysis-kpis" not in page
     assert metadata["confrontos"] == 8 and len(metadata["classificados"]) == 8
+    video_sample = render_highlight(
+        {"event_id": "401874096", "mandante": "Vitória", "visitante": "Athletico-PR"},
+        {
+            "401874096": {
+                "video_id": "AbCdEfGhI_1",
+                "titulo": "Vitória 4 x 0 Athletico-PR | Melhores momentos | Copa do Brasil 2026",
+                "fonte": "GE TV",
+                "thumbnail": "https://i.ytimg.com/vi/AbCdEfGhI_1/hqdefault.jpg",
+                "embeddable": True,
+            }
+        },
+    )
+    assert 'analysis-inline-video' in video_sample and 'data-video-id="AbCdEfGhI_1"' in video_sample
+    assert render_highlight({"event_id": "x"}, {"x": {"video_id": "invalido"}}) == ""
     assert "CB · QF" in submenu_rodadas(
         [{"id_editorial": ARTICLE_ID, "rotulo_menu": "CB · QF", "slug": ARTICLE_SLUG, "publicado_em": "2026-08-07T00:10:00-03:00"}],
         id_ativo=ARTICLE_ID,

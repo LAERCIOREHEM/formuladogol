@@ -76,6 +76,42 @@
     modal.querySelector(".analysis-media-close").focus();
   }
 
+
+  function abrirVideoInline(botao) {
+    const videoId = String(botao.dataset.videoId || "").trim();
+    if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) return;
+    const titulo = String(botao.dataset.videoTitle || "Melhores momentos").trim();
+    const fonte = String(botao.dataset.videoSource || "YouTube oficial").trim();
+    const container = botao.closest(".analysis-cup-leg");
+    if (!container) return;
+    const previous = container.querySelector(".analysis-cup-video-inline");
+    if (previous) previous.remove();
+    botao.hidden = true;
+
+    const frame = document.createElement("div");
+    frame.className = "analysis-cup-video-inline";
+    frame.innerHTML = `<div class="analysis-cup-video-inline-head">
+      <span>▶ Melhores momentos</span>
+      <button type="button" class="analysis-cup-video-inline-close" aria-label="Fechar melhores momentos">×</button>
+    </div>
+    <div class="analysis-cup-video-inline-frame"><iframe loading="eager"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>
+    <small class="analysis-cup-video-inline-source"></small>`;
+    const iframe = frame.querySelector("iframe");
+    iframe.title = titulo;
+    iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0&playsinline=1`;
+    frame.querySelector(".analysis-cup-video-inline-source").textContent = `Vídeo oficial: ${fonte}`;
+    frame.querySelector(".analysis-cup-video-inline-close").addEventListener("click", () => {
+      iframe.src = "about:blank";
+      frame.remove();
+      botao.hidden = false;
+      botao.focus();
+    });
+    container.appendChild(frame);
+    frame.querySelector(".analysis-cup-video-inline-close").focus();
+  }
+
   function alternarEstatisticas(botao) {
     const id = botao.getAttribute("aria-controls");
     const painel = id ? document.getElementById(id) : null;
@@ -87,6 +123,11 @@
   }
 
   document.addEventListener("click", (evento) => {
+    const botaoInline = evento.target.closest(".analysis-inline-video");
+    if (botaoInline) {
+      abrirVideoInline(botaoInline);
+      return;
+    }
     const botaoVideo = evento.target.closest(".analysis-video");
     if (botaoVideo) {
       abrirVideo(botaoVideo);

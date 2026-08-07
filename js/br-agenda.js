@@ -93,7 +93,7 @@
     const principal = yt && yt.principal;
     return {
       label: channels.join(" / ") || (principal && (principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV"))) || "Transmissão a confirmar",
-      youtubeUrl: principal && safeYoutube(principal.url)
+      youtubeUrl: principal && principal.embeddable !== false ? safeYoutube(principal.url) : ""
     };
   }
 
@@ -146,7 +146,7 @@
       ? '<a class="agenda-action probability" href="/jogos">📊 Probabilidades</a>'
       : "";
     const youtube = transmission.youtubeUrl
-      ? '<a class="agenda-action live" href="' + esc(transmission.youtubeUrl) + '" target="_blank" rel="noopener noreferrer">▶ Assistir</a>'
+      ? '<a class="agenda-action live" href="' + esc(liveLink) + '">▶ Assistir aqui</a>'
       : "";
     const venue = game.estadio ? '<span>📍 ' + esc(game.estadio) + '</span>' : '<span>📍 Local a confirmar</span>';
 

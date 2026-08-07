@@ -185,6 +185,8 @@ class Candidate:
     actual_end: Optional[dt.datetime]
     thumbnail: str = ""
     source: str = ""
+    embeddable: bool = True
+    privacy_status: str = "public"
     score: float = 0.0
     confidence: float = 0.0
     reasons: List[str] = field(default_factory=list)
@@ -206,6 +208,7 @@ class Candidate:
             "confianca": round(self.confidence, 4),
             "motivos": self.reasons,
             "origem_busca": self.source,
+            "embeddable": self.embeddable,
         }
 
 
@@ -303,6 +306,12 @@ def candidate_from_video(item: Mapping[str, Any], channel_key: str, source: str)
     if not re.fullmatch(r"[A-Za-z0-9_-]{11}", vid):
         return None
     snippet = item.get("snippet") or {}
+    status_obj = item.get("status") or {}
+    # O Fórmula do Gol só publica botão YouTube quando o titular permite
+    # incorporação. Assim, clicar em AO VIVO nunca depende de redirecionar o
+    # visitante para fora do site por causa de um vídeo não embeddable.
+    if str(status_obj.get("privacyStatus") or "public") != "public" or status_obj.get("embeddable") is not True:
+        return None
     live = item.get("liveStreamingDetails") or {}
     thumbs = snippet.get("thumbnails") or {}
     thumb = ""
@@ -323,6 +332,8 @@ def candidate_from_video(item: Mapping[str, Any], channel_key: str, source: str)
         actual_end=parse_datetime(live.get("actualEndTime"), UTC),
         thumbnail=thumb,
         source=source,
+        embeddable=True,
+        privacy_status="public",
     )
 
 
@@ -988,6 +999,22 @@ def selftest() -> None:
     alias_game = Game("2", 20, game.kickoff, "Bragantino", "Athletico-PR", "pre")
     alias_cand = Candidate("DDDDDDDDDDD", "getv", "UC2", "ge tv", "RB BRAGANTINO X ATHLETICO PARANAENSE AO VIVO", "Brasileirão", "live", None, game.kickoff, None)
     assert not evaluate_candidate(alias_cand, alias_game, config, aliases).rejected_reason
+
+    # Só uma live pública e explicitamente embeddable pode virar player interno.
+    emb_ok = candidate_from_video({
+        "id": "EEEEEEEEEEE",
+        "snippet": {"channelId": "UC2", "channelTitle": "ge tv", "title": "A X B AO VIVO", "liveBroadcastContent": "upcoming"},
+        "status": {"privacyStatus": "public", "embeddable": True},
+        "liveStreamingDetails": {"scheduledStartTime": "2026-07-16T21:30:00Z"},
+    }, "getv", "test")
+    assert emb_ok is not None and emb_ok.embeddable is True
+    emb_blocked = candidate_from_video({
+        "id": "FFFFFFFFFFF",
+        "snippet": {"channelId": "UC2", "channelTitle": "ge tv", "title": "A X B AO VIVO", "liveBroadcastContent": "upcoming"},
+        "status": {"privacyStatus": "public", "embeddable": False},
+        "liveStreamingDetails": {"scheduledStartTime": "2026-07-16T21:30:00Z"},
+    }, "getv", "test")
+    assert emb_blocked is None
 
     # Prioridade: CazéTV vence GE TV; link único (alternativas vazio)
     principal, alternatives = choose_links({"getv": {"fonte": "getv"}, "cazetv": {"fonte": "cazetv"}}, ["cazetv", "getv"])
