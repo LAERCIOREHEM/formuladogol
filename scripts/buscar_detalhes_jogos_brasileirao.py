@@ -1008,10 +1008,50 @@ def _limit_cards(cartoes: list[dict[str, Any]], jogo: dict[str, Any] | None, sta
 
 
 def validar_eventos(jogo: dict[str, Any], stats: list[dict[str, Any]], gols: list[dict[str, Any]], cartoes: list[dict[str, Any]]) -> dict[str, Any]:
+    """Valida incompatibilidades sem confundir ficha incompleta com dado corrompido.
+
+    A ESPN pode publicar o placar final antes de completar a equipe/autoria dos
+    gols e cartões. Nessa janela, o registro fica ``pendente_detalhes`` e será
+    reconsultado na próxima execução. Só excesso, duplicidade ou impossibilidade
+    de conciliar os eventos com placar/boxscore é inconsistente e bloqueante.
+    """
     home = str((jogo.get("mandante") or {}).get("nome") or jogo.get("mandante") or "")
     away = str((jogo.get("visitante") or {}).get("nome") or jogo.get("visitante") or "")
-    expected_goals = {home: int(jogo.get("placar_mandante") or 0), away: int(jogo.get("placar_visitante") or 0)}
-    found_goals = {team: sum(1 for g in gols if _canonical_team(g.get("time"), jogo) == team) for team in (home, away)}
+    valid_teams = {home, away}
+
+    expected_goals = {
+        home: int(jogo.get("placar_mandante") or 0),
+        away: int(jogo.get("placar_visitante") or 0),
+    }
+    found_goals = {
+        team: sum(1 for g in gols if _canonical_team(g.get("time"), jogo) == team)
+        for team in (home, away)
+    }
+    unknown_goals = [g for g in gols if _canonical_team(g.get("time"), jogo) not in valid_teams]
+    seen_goals: set[tuple[str, str, str]] = set()
+    duplicate_goals = 0
+    for goal in gols:
+        signature = (
+            _minute_key(goal.get("minuto")),
+            normalizar(goal.get("jogador")) or _event_narrative_signature(goal, "gol"),
+            normalizar(_canonical_team(goal.get("time"), jogo)),
+        )
+        if signature in seen_goals:
+            duplicate_goals += 1
+        seen_goals.add(signature)
+
+    goals_no_excess = all(found_goals[team] <= expected_goals[team] for team in (home, away))
+    goals_deficit = sum(max(0, expected_goals[team] - found_goals[team]) for team in (home, away))
+    unknown_goals_fit_deficit = len(unknown_goals) <= goals_deficit
+    goals_within_total = len(gols) <= sum(expected_goals.values())
+    goals_compatible = (
+        goals_no_excess
+        and unknown_goals_fit_deficit
+        and goals_within_total
+        and duplicate_goals == 0
+    )
+    goals_complete = found_goals == expected_goals and not unknown_goals
+
     expected_cards: dict[str, dict[str, int | None]] = {}
     found_cards: dict[str, dict[str, int]] = {}
     for team, side in ((home, "home"), (away, "away")):
@@ -1020,9 +1060,14 @@ def validar_eventos(jogo: dict[str, Any], stats: list[dict[str, Any]], gols: lis
             "vermelho": _metric_int(stats, "Vermelhos", side),
         }
         found_cards[team] = {
-            tipo: sum(1 for c in cartoes if c.get("tipo") == tipo and _canonical_team(c.get("time"), jogo) == team)
+            tipo: sum(
+                1
+                for c in cartoes
+                if c.get("tipo") == tipo and _canonical_team(c.get("time"), jogo) == team
+            )
             for tipo in ("amarelo", "vermelho")
         }
+
     cards_complete = all(
         exp is None or found_cards[team][tipo] == exp
         for team in (home, away)
@@ -1033,7 +1078,6 @@ def validar_eventos(jogo: dict[str, Any], stats: list[dict[str, Any]], gols: lis
         for team in (home, away)
         for tipo, exp in expected_cards[team].items()
     )
-    valid_teams = {home, away}
     unknown_cards = [c for c in cartoes if _canonical_team(c.get("time"), jogo) not in valid_teams]
     seen_cards: set[tuple[str, str, str]] = set()
     duplicate_cards = 0
@@ -1046,23 +1090,67 @@ def validar_eventos(jogo: dict[str, Any], stats: list[dict[str, Any]], gols: lis
         if signature in seen_cards:
             duplicate_cards += 1
         seen_cards.add(signature)
-    goals_ok = found_goals == expected_goals
-    # A ESPN pode informar no boxscore mais cartões do que os eventos nominais
-    # disponibilizados no feed. Não inventamos atletas para completar a lista;
-    # a trava crítica é impedir excesso, duplicidade e equipe inválida.
-    cards_ok = cards_no_excess and not unknown_cards and duplicate_cards == 0
+
+    unknown_cards_by_type = {
+        tipo: sum(1 for c in unknown_cards if c.get("tipo") == tipo)
+        for tipo in ("amarelo", "vermelho")
+    }
+    cards_assignment_possible = True
+    for tipo in ("amarelo", "vermelho"):
+        expected_values = [expected_cards[team][tipo] for team in (home, away)]
+        if all(value is not None for value in expected_values):
+            deficit = sum(
+                max(0, int(expected_cards[team][tipo] or 0) - found_cards[team][tipo])
+                for team in (home, away)
+            )
+            if unknown_cards_by_type[tipo] > deficit:
+                cards_assignment_possible = False
+                break
+
+    cards_compatible = cards_no_excess and cards_assignment_possible and duplicate_cards == 0
+    # Ausência de cartões nominais é tolerada; evento existente sem equipe fica
+    # pendente até a ESPN completar a atribuição.
+    cards_pending_attribution = bool(unknown_cards) and cards_compatible
+    cards_ok = cards_compatible
+
+    pending_details = (
+        goals_compatible
+        and cards_compatible
+        and (not goals_complete or cards_pending_attribution)
+    )
+    validation_ok = goals_complete and cards_ok and not cards_pending_attribution
+
+    pending_reasons: list[str] = []
+    if not goals_complete and goals_compatible:
+        pending_reasons.append(
+            f"ficha de gols incompleta: {sum(found_goals.values())}/{sum(expected_goals.values())} atribuídos"
+        )
+        if unknown_goals:
+            pending_reasons.append(f"{len(unknown_goals)} gol(s) ainda sem equipe")
+    if cards_pending_attribution:
+        pending_reasons.append(f"{len(unknown_cards)} cartão(ões) ainda sem equipe")
+
     return {
         "gols_esperados": expected_goals,
         "gols_extraidos": found_goals,
-        "gols_ok": goals_ok,
+        "gols_completos": goals_complete,
+        "gols_sem_excesso": goals_no_excess,
+        "gols_time_desconhecido": len(unknown_goals),
+        "gols_duplicados": duplicate_goals,
+        "gols_compativeis": goals_compatible,
+        "gols_ok": goals_complete,
         "cartoes_esperados": expected_cards,
         "cartoes_extraidos": found_cards,
         "cartoes_completos": cards_complete,
         "cartoes_sem_excesso": cards_no_excess,
         "cartoes_time_desconhecido": len(unknown_cards),
         "cartoes_duplicados": duplicate_cards,
+        "cartoes_compativeis": cards_compatible,
         "cartoes_ok": cards_ok,
-        "ok": goals_ok and cards_ok,
+        "ok": validation_ok,
+        "pendente_detalhes": pending_details,
+        "tipo_pendencia": "ficha_espn_incompleta" if pending_details else "",
+        "motivo": "; ".join(pending_reasons),
     }
 
 
@@ -1082,6 +1170,11 @@ def validacao_resultado_manual_pendente(jogo: dict[str, Any], motivo: str) -> di
             away: int(jogo.get("placar_visitante") or 0),
         },
         "gols_extraidos": {home: 0, away: 0},
+        "gols_completos": False,
+        "gols_sem_excesso": True,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": True,
         "gols_ok": False,
         "cartoes_esperados": {},
         "cartoes_extraidos": {},
@@ -1089,10 +1182,12 @@ def validacao_resultado_manual_pendente(jogo: dict[str, Any], motivo: str) -> di
         "cartoes_sem_excesso": True,
         "cartoes_time_desconhecido": 0,
         "cartoes_duplicados": 0,
+        "cartoes_compativeis": True,
         "cartoes_ok": True,
         "ok": False,
         "resultado_confirmado": True,
         "pendente_detalhes": True,
+        "tipo_pendencia": "resultado_manual_sem_ficha",
         "motivo": motivo[:300],
     }
 

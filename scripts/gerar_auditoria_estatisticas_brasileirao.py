@@ -94,6 +94,24 @@ def classify_game_events(event_id: str, game: dict[str, Any]) -> dict[str, Any]:
             "narrative_false_positives": [],
         }
 
+    is_safe_espn_pending = (
+        validation.get("pendente_detalhes") is True
+        and validation.get("tipo_pendencia") == "ficha_espn_incompleta"
+        and validation.get("gols_compativeis") is True
+        and validation.get("cartoes_compativeis") is True
+    )
+    if is_safe_espn_pending:
+        return {
+            "pending_manual": None,
+            "errors": [],
+            "incomplete": (
+                f"{event_id}: ficha ESPN incompleta sem contradição"
+                + (f" ({validation.get('motivo')})" if validation.get("motivo") else "")
+            ),
+            "duplicates": [],
+            "narrative_false_positives": [],
+        }
+
     home = str(game.get("mandante") or "")
     away = str(game.get("visitante") or "")
     errors: list[str] = []

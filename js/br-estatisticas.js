@@ -53,7 +53,9 @@
     rankingCompareOpen: false,
     rankingCompare: ["", "", ""],
     attendanceClub: "",
-    attendanceScope: "todos",
+    attendanceScope: "mandante",
+    attendanceClubSort: "average_desc",
+    attendanceGameSort: "publico_desc",
   };
 
   const $ = (id) => document.getElementById(id);
@@ -538,6 +540,22 @@
     { key: "visitante", label: "Como visitante" },
   ];
 
+  const ATTENDANCE_CLUB_SORTS = [
+    { key: "average_desc", label: "Média — maior primeiro", short: "Média" },
+    { key: "average_asc", label: "Média — menor primeiro", short: "Média" },
+    { key: "total_desc", label: "Total de público", short: "Total" },
+    { key: "max_desc", label: "Maior público", short: "Maior público" },
+    { key: "informed_desc", label: "Jogos informados", short: "Jogos" },
+    { key: "name_asc", label: "Clube — A a Z", short: "Média" },
+  ];
+
+  const ATTENDANCE_GAME_SORTS = [
+    { key: "publico_desc", label: "Público — maior primeiro" },
+    { key: "publico_asc", label: "Público — menor primeiro" },
+    { key: "date_desc", label: "Mais recentes primeiro" },
+    { key: "date_asc", label: "Mais antigos primeiro" },
+  ];
+
   function performanceMetricConfig(key) {
     return PERFORMANCE_METRICS.find((item) => item.key === key) || PERFORMANCE_METRICS[0];
   }
@@ -636,35 +654,92 @@
     return home || away;
   }
 
+  function attendanceScopeKey() {
+    return ATTENDANCE_SCOPES.some((item) => item.key === state.attendanceScope) ? state.attendanceScope : "todos";
+  }
+
+  function sortAttendanceGames(games) {
+    const key = ATTENDANCE_GAME_SORTS.some((item) => item.key === state.attendanceGameSort) ? state.attendanceGameSort : "publico_desc";
+    return games.slice().sort((a, b) => {
+      if (key === "publico_asc") return Number(a.publico) - Number(b.publico) || String(a.data_iso || "").localeCompare(String(b.data_iso || ""));
+      if (key === "date_desc") return String(b.data_iso || "").localeCompare(String(a.data_iso || "")) || Number(b.publico) - Number(a.publico);
+      if (key === "date_asc") return String(a.data_iso || "").localeCompare(String(b.data_iso || "")) || Number(b.publico) - Number(a.publico);
+      return Number(b.publico) - Number(a.publico) || String(b.data_iso || "").localeCompare(String(a.data_iso || ""));
+    });
+  }
+
   function attendanceFilteredData() {
     const club = state.attendanceClub;
-    const scope = club ? state.attendanceScope : "todos";
+    const scope = attendanceScopeKey();
     const allGames = Array.isArray(state.competition?.jogos) ? state.competition.jogos : [];
     const eligible = allGames.filter((game) => attendanceMatchesScope(game, club, scope));
-    const informed = eligible
-      .filter((game) => Number.isFinite(Number(game?.publico)) && Number(game.publico) > 0)
-      .slice()
-      .sort((a, b) => Number(b.publico) - Number(a.publico) || String(b.data_iso || "").localeCompare(String(a.data_iso || "")));
-    const total = informed.reduce((sum, game) => sum + Number(game.publico), 0);
+    const informedRaw = eligible.filter((game) => Number.isFinite(Number(game?.publico)) && Number(game.publico) > 0);
+    const games = sortAttendanceGames(informedRaw);
+    const byPublic = informedRaw.slice().sort((a, b) => Number(b.publico) - Number(a.publico) || String(b.data_iso || "").localeCompare(String(a.data_iso || "")));
+    const total = informedRaw.reduce((sum, game) => sum + Number(game.publico), 0);
     return {
       club,
       scope,
-      games: informed,
+      games,
       total,
-      average: informed.length ? Math.round(total / informed.length) : 0,
-      max: informed[0] || null,
-      min: informed.length ? informed[informed.length - 1] : null,
-      informedCount: informed.length,
-      missingCount: Math.max(0, eligible.length - informed.length),
+      average: informedRaw.length ? total / informedRaw.length : 0,
+      max: byPublic[0] || null,
+      min: byPublic.length ? byPublic[byPublic.length - 1] : null,
+      informedCount: informedRaw.length,
+      missingCount: Math.max(0, eligible.length - informedRaw.length),
     };
   }
 
-  function attendanceControls(data) {
+  function attendanceClubRanking(scope) {
+    const allGames = Array.isArray(state.competition?.jogos) ? state.competition.jogos : [];
+    const rows = allClubNames().map((club) => {
+      const eligible = allGames.filter((game) => attendanceMatchesScope(game, club, scope));
+      const informed = eligible.filter((game) => Number.isFinite(Number(game?.publico)) && Number(game.publico) > 0);
+      const total = informed.reduce((sum, game) => sum + Number(game.publico), 0);
+      const max = informed.reduce((best, game) => !best || Number(game.publico) > Number(best.publico) ? game : best, null);
+      return {
+        club,
+        total,
+        average: informed.length ? total / informed.length : 0,
+        max,
+        informedCount: informed.length,
+        missingCount: Math.max(0, eligible.length - informed.length),
+      };
+    }).filter((item) => item.informedCount > 0);
+
+    const sortKey = ATTENDANCE_CLUB_SORTS.some((item) => item.key === state.attendanceClubSort) ? state.attendanceClubSort : "average_desc";
+    return rows.sort((a, b) => {
+      let diff = 0;
+      if (sortKey === "average_asc") diff = a.average - b.average;
+      else if (sortKey === "total_desc") diff = b.total - a.total;
+      else if (sortKey === "max_desc") diff = Number(b.max?.publico || 0) - Number(a.max?.publico || 0);
+      else if (sortKey === "informed_desc") diff = b.informedCount - a.informedCount;
+      else if (sortKey === "name_asc") return a.club.localeCompare(b.club, "pt-BR");
+      else diff = b.average - a.average;
+      if (Math.abs(diff) > 1e-9) return diff;
+      const averageDiff = b.average - a.average;
+      if (Math.abs(averageDiff) > 1e-9) return averageDiff;
+      if (b.total !== a.total) return b.total - a.total;
+      return a.club.localeCompare(b.club, "pt-BR");
+    });
+  }
+
+  function attendanceControls(data, clubRanking) {
     const selectedScope = ATTENDANCE_SCOPES.some((item) => item.key === data.scope) ? data.scope : "todos";
+    const sorts = data.club ? ATTENDANCE_GAME_SORTS : ATTENDANCE_CLUB_SORTS;
+    const selectedSort = data.club
+      ? (ATTENDANCE_GAME_SORTS.some((item) => item.key === state.attendanceGameSort) ? state.attendanceGameSort : "publico_desc")
+      : (ATTENDANCE_CLUB_SORTS.some((item) => item.key === state.attendanceClubSort) ? state.attendanceClubSort : "average_desc");
+    const scopeLabel = ATTENDANCE_SCOPES.find((item) => item.key === selectedScope)?.label || "Todos os jogos";
+    const contextTitle = data.club || "Ranking de clubes";
+    const contextText = data.club
+      ? `${scopeLabel} · ${integer(data.informedCount)} com público${data.missingCount ? ` · ${integer(data.missingCount)} sem dado` : ""}`
+      : `${scopeLabel} · ${integer(clubRanking.length)} clubes com dados oficiais`;
     return `<div class="stats-attendance-controls">
       <label><span>Clube</span><select data-attendance-club><option value="">Todos os clubes</option>${allClubNames().map((club) => `<option value="${escapeAttr(club)}"${club === data.club ? " selected" : ""}>${escapeHtml(club)}</option>`).join("")}</select></label>
-      <label><span>Recorte</span><select data-attendance-scope${data.club ? "" : " disabled"}>${ATTENDANCE_SCOPES.map((item) => `<option value="${escapeAttr(item.key)}"${item.key === selectedScope ? " selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}</select></label>
-      <div class="stats-attendance-context"><strong>${escapeHtml(data.club || "Campeonato inteiro")}</strong><span>${escapeHtml(ATTENDANCE_SCOPES.find((item) => item.key === selectedScope)?.label || "Todos os jogos")} · ${integer(data.informedCount)} com público${data.missingCount ? ` · ${integer(data.missingCount)} sem dado` : ""}</span></div>
+      <label><span>Recorte</span><select data-attendance-scope>${ATTENDANCE_SCOPES.map((item) => `<option value="${escapeAttr(item.key)}"${item.key === selectedScope ? " selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}</select></label>
+      <label><span>Ordenar por</span><select data-attendance-sort>${sorts.map((item) => `<option value="${escapeAttr(item.key)}"${item.key === selectedSort ? " selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}</select></label>
+      <div class="stats-attendance-context"><strong>${escapeHtml(contextTitle)}</strong><span>${escapeHtml(contextText)}</span></div>
     </div>`;
   }
 
@@ -676,12 +751,31 @@
     </button>`;
   }
 
+  function attendanceClubPrimary(item) {
+    const key = state.attendanceClubSort;
+    if (key === "total_desc") return { value: integer(item.total), label: "total" };
+    if (key === "max_desc") return { value: integer(item.max?.publico), label: "maior público" };
+    if (key === "informed_desc") return { value: integer(item.informedCount), label: item.informedCount === 1 ? "jogo" : "jogos" };
+    return { value: integer(Math.round(item.average)), label: "média" };
+  }
+
+  function attendanceClubRow(item, index) {
+    const primary = attendanceClubPrimary(item);
+    return `<button type="button" class="stats-attendance-club-row" data-attendance-select-club="${escapeAttr(item.club)}" aria-label="Ver jogos e público de ${escapeAttr(item.club)}">
+      <span class="stats-attendance-club-rank">${integer(index + 1)}</span>
+      <div class="stats-attendance-club-main">${shield(item.club, "stats-attendance-shield")}<div><strong>${escapeHtml(item.club)}</strong><small>${integer(item.informedCount)} ${item.informedCount === 1 ? "jogo informado" : "jogos informados"}${item.missingCount ? ` · ${integer(item.missingCount)} sem dado` : ""}</small></div></div>
+      <div class="stats-attendance-club-secondary"><span>Total ${integer(item.total)}</span><span>Máx. ${integer(item.max?.publico)}</span></div>
+      <div class="stats-attendance-club-primary"><strong>${primary.value}</strong><span>${escapeHtml(primary.label)}</span></div>
+    </button>`;
+  }
+
   function renderChampionship() {
     const target = $("campeonato-conteudo");
     const performance = state.competition?.performance_por_partida || {};
     const attendance = state.competition?.publico || {};
     const filteredAttendance = attendanceFilteredData();
-    const ranking = filteredAttendance.games;
+    const clubRanking = filteredAttendance.club ? [] : attendanceClubRanking(filteredAttendance.scope);
+    const ranking = filteredAttendance.club ? filteredAttendance.games : clubRanking;
     const attendanceShown = state.expanded.publico ? ranking : ranking.slice(0, 5);
     const performanceHtml = [
       performance.mais_gols_mandante,
@@ -696,15 +790,18 @@
     </div>
     <section class="panel stats-attendance-panel"><div class="panel-inner">
       <div class="section-head"><div><div class="kicker">👥 Torcida</div><h2>Público</h2></div><span class="badge">Jogos com dado oficial</span></div>
-      ${attendanceControls(filteredAttendance)}
+      ${attendanceControls(filteredAttendance, clubRanking)}
       <div class="stats-attendance-summary">
         <div><span>Maior público</span><strong>${filteredAttendance.max ? integer(filteredAttendance.max.publico) : "—"}</strong></div>
         <div><span>Menor público</span><strong>${filteredAttendance.min ? integer(filteredAttendance.min.publico) : "—"}</strong></div>
-        <div><span>Média</span><strong>${filteredAttendance.informedCount ? integer(filteredAttendance.average) : "—"}</strong></div>
+        <div><span>Média</span><strong>${filteredAttendance.informedCount ? integer(Math.round(filteredAttendance.average)) : "—"}</strong></div>
         <div><span>Total</span><strong>${filteredAttendance.informedCount ? integer(filteredAttendance.total) : "—"}</strong></div>
         <div><span>Jogos informados</span><strong>${integer(filteredAttendance.informedCount)}</strong></div>
       </div>
-      ${attendanceShown.length ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 maiores ↑" : `Ver todos os públicos (${ranking.length}) ↓`}</button>` : ""}` : emptyState("Nenhum jogo deste recorte possui público oficial informado.")}
+      ${attendanceShown.length ? `${filteredAttendance.club
+        ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>`
+        : `<div class="stats-attendance-ranking-head"><div><strong>Ranking de clubes</strong><span>${escapeHtml(ATTENDANCE_SCOPES.find((item) => item.key === filteredAttendance.scope)?.label || "Todos os jogos")}</span></div><small>Selecione um clube para abrir os jogos</small></div><div class="stats-attendance-club-list">${attendanceShown.map(attendanceClubRow).join("")}</div>`}
+        ${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 primeiros ↑" : `Ver ranking completo (${ranking.length}) ↓`}</button>` : ""}` : emptyState(filteredAttendance.club ? "Nenhum jogo deste recorte possui público oficial informado." : "Nenhum clube deste recorte possui público oficial informado.")}
       <p class="stats-source-note">${escapeHtml(attendance.observacao || "Média calculada somente sobre partidas com público informado.")}${filteredAttendance.missingCount ? ` Neste recorte, ${integer(filteredAttendance.missingCount)} ${filteredAttendance.missingCount === 1 ? "partida ainda não possui" : "partidas ainda não possuem"} público oficial e não ${filteredAttendance.missingCount === 1 ? "entra" : "entram"} nos cálculos.` : ""}</p>
     </div></section>`;
   }
@@ -1767,7 +1864,6 @@
       const attendanceClub = event.target.closest("[data-attendance-club]");
       if (attendanceClub) {
         state.attendanceClub = attendanceClub.value;
-        if (!state.attendanceClub) state.attendanceScope = "todos";
         state.expanded.publico = false;
         renderChampionship();
         return;
@@ -1775,6 +1871,17 @@
       const attendanceScope = event.target.closest("[data-attendance-scope]");
       if (attendanceScope) {
         state.attendanceScope = ATTENDANCE_SCOPES.some((item) => item.key === attendanceScope.value) ? attendanceScope.value : "todos";
+        state.expanded.publico = false;
+        renderChampionship();
+        return;
+      }
+      const attendanceSort = event.target.closest("[data-attendance-sort]");
+      if (attendanceSort) {
+        if (state.attendanceClub) {
+          state.attendanceGameSort = ATTENDANCE_GAME_SORTS.some((item) => item.key === attendanceSort.value) ? attendanceSort.value : "publico_desc";
+        } else {
+          state.attendanceClubSort = ATTENDANCE_CLUB_SORTS.some((item) => item.key === attendanceSort.value) ? attendanceSort.value : "average_desc";
+        }
         state.expanded.publico = false;
         renderChampionship();
       }
@@ -1785,6 +1892,13 @@
         const type = expand.dataset.expandList;
         state.expanded[type] = !state.expanded[type];
         renderPlayers(type);
+        return;
+      }
+      const attendanceClubRow = event.target.closest("[data-attendance-select-club]");
+      if (attendanceClubRow) {
+        state.attendanceClub = attendanceClubRow.dataset.attendanceSelectClub || "";
+        state.expanded.publico = false;
+        renderChampionship();
         return;
       }
       const attendance = event.target.closest("[data-expand-attendance]");
