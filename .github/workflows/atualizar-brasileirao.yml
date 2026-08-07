@@ -78,6 +78,8 @@ jobs:
             scripts/gerar_probabilidades_brasileirao.py \
             scripts/reconciliar_af_continental.py \
             scripts/gerar_probabilidades_jogos.py \
+            scripts/gerar_acuracia_af_previsao.py \
+            scripts/gerar_balanco_acuracia_temporada.py \
             scripts/avaliar_af_previsao.py \
             scripts/gerar_analise_copa_do_brasil.py \
             scripts/buscar_melhores_momentos_copa_do_brasil.py \
@@ -97,6 +99,8 @@ jobs:
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
           python scripts/gerar_probabilidades_jogos.py --self-test
+          python scripts/gerar_acuracia_af_previsao.py --self-test
+          python scripts/gerar_balanco_acuracia_temporada.py --self-test
           python scripts/avaliar_af_previsao.py --self-test
           python scripts/gerar_analise_copa_do_brasil.py --self-test
           python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
@@ -148,6 +152,15 @@ jobs:
           Path('/tmp/af_estado_antes.sha256').write_text(digest, encoding='utf-8')
           print(f'Estado anterior do AF: {digest}')
           PY
+
+      - name: Congelar probabilidades pré-jogo para auditoria
+        shell: bash
+        run: |
+          # Não bloqueia a atualização esportiva: em caso de problema, o último
+          # histórico válido permanece intacto e o workflow segue normalmente.
+          if ! python scripts/gerar_acuracia_af_previsao.py --capturar-pre-jogo; then
+            echo "::warning title=Acurácia preservada::Falha ao congelar probabilidades pré-jogo; o último histórico válido será mantido."
+          fi
 
       # --- DADOS DO BRASILEIRAO ---
       # A ESPN permanece como fonte principal. Somente quando a auditoria não
@@ -481,6 +494,42 @@ jobs:
           EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
         run: python scripts/gerenciar_status_brasileirao.py --from-env --notify
 
+      - name: Atualizar painel de acurácia do AF-Previsão
+        if: steps.espn.outputs.sincronizado == 'true'
+        shell: bash
+        run: |
+          if ! python scripts/gerar_acuracia_af_previsao.py --capturar-pre-jogo --atualizar; then
+            echo "::warning title=Acurácia preservada::O módulo de acurácia não atualizou; o último estado válido será publicado sem bloquear o Brasileirão."
+          fi
+
+      - name: Gerar balanço final da acurácia quando elegível
+        if: steps.espn.outputs.sincronizado == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          backup="$(mktemp -d)"
+          cp -a analises "$backup/analises"
+          cp -a dados-br/analises.json "$backup/analises.json"
+          cp -a sitemap.xml "$backup/sitemap.xml"
+          cp -a news-sitemap.xml "$backup/news-sitemap.xml"
+          cp -a feed.xml "$backup/feed.xml"
+          restore_editorial() {
+            rm -rf analises
+            cp -a "$backup/analises" analises
+            cp -a "$backup/analises.json" dados-br/analises.json
+            cp -a "$backup/sitemap.xml" sitemap.xml
+            cp -a "$backup/news-sitemap.xml" news-sitemap.xml
+            cp -a "$backup/feed.xml" feed.xml
+          }
+          if ! python scripts/gerar_balanco_acuracia_temporada.py; then
+            restore_editorial
+            echo "::warning title=Balanço de acurácia preservado::O editorial final de acurácia não foi atualizado; a publicação esportiva seguirá com o último estado válido."
+          elif ! python scripts/validar_artefatos_analises.py; then
+            restore_editorial
+            echo "::warning title=Editorial de acurácia preservado::A validação editorial falhou; os artefatos anteriores foram restaurados e o Brasileirão seguirá normalmente."
+          fi
+          rm -rf "$backup"
+
       - name: Conferir e validar JSONs gerados
         if: steps.espn.outputs.sincronizado == 'true'
         env:
@@ -489,7 +538,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/transmissoes-tv.json dados-br/auditoria-transmissoes-tv.json dados-br/status-atualizacao.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/historico-ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/agenda-clubes-br.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/transmissoes-tv.json dados-br/auditoria-transmissoes-tv.json dados-br/status-atualizacao.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/historico-ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/agenda-clubes-br.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json dados-br/historico-probabilidades-jogos.json dados-br/acuracia-af-previsao.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -867,6 +916,16 @@ jobs:
           assert avaliacao.get('status') in {'coletando_historico', 'aguardando_resultados_continentais', 'avaliacao_concluida', 'avaliacao_concluida_amostra_reduzida'}, 'status inválido da avaliação AF'
           assert (avaliacao.get('integridade_historico') or {}).get('valido') is True, 'avaliação detectou histórico inválido'
           assert (avaliacao.get('integridade_historico') or {}).get('encadeado') is True, 'avaliação não reconheceu a cadeia do histórico'
+          historico_jogos = json.load(open('dados-br/historico-probabilidades-jogos.json', encoding='utf-8'))
+          acuracia = json.load(open('dados-br/acuracia-af-previsao.json', encoding='utf-8'))
+          assert historico_jogos.get('schema_version') == 1, 'histórico pré-jogo em schema inválido'
+          assert isinstance(historico_jogos.get('previsoes'), list), 'histórico pré-jogo sem previsões'
+          assert (historico_jogos.get('criterio') or {}).get('nao_reconstroi_passado') is True, 'histórico pré-jogo sem trava retrospectiva'
+          assert acuracia.get('status') == 'ok', 'painel de acurácia inválido'
+          assert (acuracia.get('escopo_publico') or {}).get('avaliacao_alvo') == 'resultado_v_e_d', 'painel de acurácia fora do alvo V/E/D'
+          assert (acuracia.get('escopo_publico') or {}).get('avaliacao_jogo_individual_publica') is False, 'painel não deve expor acurácia jogo a jogo'
+          assert isinstance(acuracia.get('timeline_clubes'), dict) and len(acuracia.get('timeline_clubes') or {}) == 20, 'timeline de acurácia sem 20 clubes'
+          print('  OK   Acurácia AF-Previsão: histórico pré-jogo, calibração agregada e timeline por clube')
           print('  OK   Estatísticas, calendário e AF-Previsão gerados')
           PY
 
@@ -970,7 +1029,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          FILES=("dados-br/status-atualizacao.json")
+          FILES=(
+            "dados-br/status-atualizacao.json"
+            "dados-br/historico-probabilidades-jogos.json"
+            "dados-br/acuracia-af-previsao.json"
+          )
           if [[ "${CONTINENTAL_READY:-false}" == "true" ]]; then
             if [[ "${CONTINENTAL_CHANGED:-false}" != "true" || "${AF_UPDATED:-false}" == "true" ]]; then
               FILES+=(
@@ -1069,6 +1132,8 @@ jobs:
             "dados-br/transmissoes-tv.json"
             "dados-br/auditoria-transmissoes-tv.json"
             "dados-br/status-atualizacao.json"
+            "dados-br/historico-probabilidades-jogos.json"
+            "dados-br/acuracia-af-previsao.json"
             "dados-br/estatisticas.json"
             "dados-br/ranking-desempenho.json"
             "dados-br/historico-ranking-desempenho.json"

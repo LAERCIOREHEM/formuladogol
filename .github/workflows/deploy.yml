@@ -10,6 +10,7 @@ on:
       - 'aovivo.html'
       - 'agenda.html'
       - 'estatisticas.html'
+      - 'acuracia.html'
       - 'clubes.html'
       - 'museu.html'
       - 'sobre.html'
@@ -31,6 +32,7 @@ on:
       - 'css/br-aovivo.css'
       - 'css/br-agenda.css'
       - 'css/br-estatisticas.css'
+      - 'css/br-acuracia.css'
       - 'css/br-institucional.css'
       - 'css/br-sobre.css'
       - 'css/br-analises.css'
@@ -41,6 +43,7 @@ on:
       - 'js/br-clubes.js'
       - 'js/br-config.js'
       - 'js/br-estatisticas.js'
+      - 'js/br-acuracia.js'
       - 'js/br-feedback.js'
       - 'js/br-menu.js'
       - 'js/br-museu.js'
@@ -93,6 +96,7 @@ jobs:
             aovivo.html
             agenda.html
             estatisticas.html
+            acuracia.html
             clubes.html
             museu.html
             sobre.html
@@ -122,6 +126,7 @@ jobs:
             css/br-aovivo.css
             css/br-agenda.css
             css/br-estatisticas.css
+            css/br-acuracia.css
             css/br-institucional.css
             css/br-sobre.css
             css/br-analises.css
@@ -135,6 +140,7 @@ jobs:
             js/br-clubes.js
             js/br-config.js
             js/br-estatisticas.js
+            js/br-acuracia.js
             js/br-feedback.js
             js/br-menu.js
             js/br-museu.js
@@ -146,10 +152,12 @@ jobs:
             dados-br/auditoria-modelos-af-previsao.json
             dados-br/auditoria-probabilidades.json
             dados-br/avaliacao-af-previsao.json
+            dados-br/acuracia-af-previsao.json
             dados-br/clubes.json
             dados-br/elencos.json
             dados-br/estatisticas-competicao.json
             dados-br/historico-probabilidades.json
+            dados-br/historico-probabilidades-jogos.json
             dados-br/historico-probabilidades-continentais.json
             dados-br/historico-ranking-desempenho.json
             dados-br/jogos-detalhes.json
@@ -873,6 +881,7 @@ jobs:
               "https://formuladogol.com.br/agenda.html",
               "https://formuladogol.com.br/aovivo.html",
               "https://formuladogol.com.br/estatisticas.html",
+              "https://formuladogol.com.br/acuracia.html",
               "https://formuladogol.com.br/clubes.html",
               "https://formuladogol.com.br/museu.html",
               "https://formuladogol.com.br/sobre.html",

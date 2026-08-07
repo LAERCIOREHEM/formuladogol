@@ -12,6 +12,8 @@ on:
       - 'scripts/af_previsao_continental.py'
       - 'scripts/gerar_probabilidades_brasileirao.py'
       - 'scripts/gerar_probabilidades_jogos.py'
+      - 'scripts/gerar_acuracia_af_previsao.py'
+      - 'scripts/gerar_balanco_acuracia_temporada.py'
       - 'scripts/reconciliar_af_continental.py'
       - 'scripts/avaliar_af_previsao.py'
       - 'scripts/af_previsao_backtest.py'
@@ -68,6 +70,8 @@ jobs:
             scripts/af_previsao_continental.py \
             scripts/gerar_probabilidades_brasileirao.py \
             scripts/gerar_probabilidades_jogos.py \
+            scripts/gerar_acuracia_af_previsao.py \
+            scripts/gerar_balanco_acuracia_temporada.py \
             scripts/reconciliar_af_continental.py \
             scripts/avaliar_af_previsao.py
           python fontes_brasileirao.py --selftest
@@ -79,6 +83,8 @@ jobs:
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
           python scripts/gerar_probabilidades_jogos.py --self-test
+          python scripts/gerar_acuracia_af_previsao.py --self-test
+          python scripts/gerar_balanco_acuracia_temporada.py --self-test
           python scripts/avaliar_af_previsao.py --self-test
 
       - name: Confirmar CI determinístico no push
