@@ -498,7 +498,9 @@ def call_openai(data: dict[str, Any], model: str) -> dict[str, Any]:
         "da Copa do Brasil, usando exclusivamente o dossiê fornecido. Deixe explícito que foram definidos os classificados, "
         "não os confrontos das quartas, pois haverá sorteio. Não invente fatos táticos, jogadores, declarações ou causas. "
         "Não escreva algarismos nem percentuais: os dados auditados serão inseridos pelo template. Diferencie chance total de "
-        "Libertadores e via específica da Copa do Brasil. Evite clichês, frases motivacionais e linguagem publicitária."
+        "Libertadores e via específica da Copa do Brasil. Evite clichês, frases motivacionais e linguagem publicitária. "
+        "As três seções devem somar entre duzentas e quarenta e quatrocentas e vinte palavras nos seis parágrafos; "
+        "não entregue um texto abaixo desse intervalo."
     )
     payload = {
         "model": model,
@@ -883,17 +885,41 @@ def execute(args: argparse.Namespace) -> int:
         print("Editorial da Copa do Brasil já publicado com o mesmo fechamento e os mesmos vídeos.")
         return 0
     fallback = narrative_fallback(data)
-    if args.sem_ia:
+    same_dossier = bool(existing and existing.get("hash_dossie") == dossier_hash)
+    stored_editorial = existing.get("editorial") if same_dossier and existing else None
+
+    # Alteração apenas de mídia não deve reescrever um editorial já publicado.
+    # Isso preserva o texto aprovado e evita chamar a IA novamente só porque
+    # melhores momentos foram encontrados depois da publicação esportiva.
+    if same_dossier and not args.forcar and isinstance(stored_editorial, dict):
+        try:
+            validate_editorial(stored_editorial, data)
+        except EditorialCopaError as exc:
+            print(
+                "::warning::Editorial armazenado não passou na validação atual "
+                f"({exc}); será regenerado com contingência segura se necessário."
+            )
+        else:
+            editorial = stored_editorial
+            origin = str(existing.get("origem_editorial") or "editorial-preservado")
+            print("Texto editorial já publicado preservado; atualizando somente melhores momentos/metadados.")
+    elif args.sem_ia:
         editorial, origin = fallback, "deterministico"
+        validate_editorial(editorial, data)
     else:
         model = normalizar_modelo_openai(args.modelo)
         try:
             editorial = call_openai(data, model)
+            # Uma resposta JSON pode estar formalmente correta e ainda violar
+            # as regras editoriais (como ocorreu com 190 palavras). Valide aqui
+            # para que qualquer saída inadequada caia no fallback em vez de
+            # derrubar o workflow.
+            validate_editorial(editorial, data)
             origin = f"openai:{model}"
         except EditorialCopaError as exc:
-            print(f"Aviso: redação por IA indisponível ({exc}); usando contingência determinística.")
+            print(f"Aviso: redação por IA inválida/indisponível ({exc}); usando contingência determinística.")
             editorial, origin = fallback, "deterministico-contingencia"
-    validate_editorial(editorial, data)
+            validate_editorial(editorial, data)
     published = existing.get("publicado_em") if existing else agora_br().replace(microsecond=0).isoformat()
     modified = agora_br().replace(microsecond=0).isoformat()
     page, metadata = render_article(data, editorial, published, modified, articles)
