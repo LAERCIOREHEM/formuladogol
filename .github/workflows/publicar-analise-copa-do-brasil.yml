@@ -13,10 +13,6 @@ on:
         required: false
         default: false
         type: boolean
-  workflow_run:
-    workflows:
-      - 'Atualizar Brasileirao (ESPN)'
-    types: [completed]
   schedule:
     # Retentativas curtas e independentes durante a semana de fechamento da fase.
     - cron: '28 6,10 * * *'
@@ -30,9 +26,6 @@ concurrency:
 
 jobs:
   publicar:
-    if: >-
-      github.event_name != 'workflow_run' ||
-      (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -87,9 +80,11 @@ jobs:
           python scripts/validar_artefatos_analises.py
 
       - name: Publicar no repositório
+        id: publish
         shell: bash
         run: |
           set -euo pipefail
+          echo "published=false" >> "$GITHUB_OUTPUT"
           arquivos=(
             analises
             dados-br/analises.json
@@ -112,6 +107,7 @@ jobs:
             git pull --rebase origin main
             if git push origin HEAD:main; then
               publicado=true
+              echo "published=true" >> "$GITHUB_OUTPUT"
               break
             fi
             echo "Tentativa ${tentativa}/3 não concluiu; tentando novamente."
@@ -120,3 +116,4 @@ jobs:
             echo "::error title=Falha ao publicar editorial::Não foi possível enviar o commit ao main."
             exit 1
           fi
+
