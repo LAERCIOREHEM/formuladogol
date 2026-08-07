@@ -277,6 +277,40 @@ def stage_group_is_consistent(stage_events: Sequence[CupEvent]) -> bool:
 def current_stage(events: Sequence[CupEvent]) -> tuple[int, str, list[CupEvent]]:
     pending = [event for event in events if not event.completed]
     if not pending:
+        latest = max(event.played_at for event in events)
+        lower = latest - timedelta(days=12)
+        recent = [event for event in events if lower <= event.played_at <= latest]
+
+        # Primeiro procura uma fase explícita na coorte MAIS RECENTE. Não usa o
+        # maior rank do torneio inteiro, pois isso faria uma fase antiga bem
+        # rotulada vencer uma fase nova que a ESPN passou a chamar apenas de
+        # "Volta - X avança..." depois do apito final.
+        recent_specific_ranks = sorted(
+            {event.stage_rank for event in recent if event.stage_rank >= 200},
+            reverse=True,
+        )
+        for rank_candidate in recent_specific_ranks:
+            candidate_events = [event for event in recent if event.stage_rank == rank_candidate]
+            if candidate_events and stage_group_is_consistent(candidate_events):
+                return rank_candidate, candidate_events[0].stage, candidate_events
+
+        # Fallback pós-apito: reconstrói a última eliminatória pela coorte
+        # cronológica e pelos confrontos de ida/volta, sem misturar o torneio
+        # inteiro.
+        grouped: dict[tuple[str, str], list[CupEvent]] = {}
+        for event in recent:
+            grouped.setdefault(event_pair_key(event), []).append(event)
+        two_leg_pairs = {pair: items for pair, items in grouped.items() if len(items) >= 2}
+        participants = {team for pair in two_leg_pairs for team in pair}
+        inferred = knockout_stage_from_team_count(len(participants))
+        if inferred and len(participants) == 2 * len(two_leg_pairs):
+            inferred_rank, inferred_stage = inferred
+            reconstructed = sorted(
+                [event for items in two_leg_pairs.values() for event in items],
+                key=lambda item: (item.played_at, item.event_id),
+            )
+            return inferred_rank, inferred_stage, reconstructed
+
         highest = max(event.stage_rank for event in events)
         stage_events = [event for event in events if event.stage_rank == highest]
         return highest, stage_events[0].stage, stage_events
@@ -1416,6 +1450,19 @@ def self_test() -> None:
             event["vencedor"] = None
     closed_structure = validate_competition_snapshot_structure(closed_round_of_16)
     assert int(closed_structure["equipes_ativas"]) == 8
+
+    # Regressão: depois do último apito a ESPN pode degradar todos os nomes da
+    # fase para textos de agregado. Mesmo com fase_ordem=100, a coorte recente
+    # de oito chaves ida/volta deve ser reconhecida como oitavas encerradas.
+    generic_closed_round = json.loads(json.dumps(closed_round_of_16))
+    for event in generic_closed_round["eventos"]:
+        event["fase"] = "Volta - classificado no agregado"
+        event["fase_ordem"] = 100
+    generic_structure = validate_competition_snapshot_structure(generic_closed_round)
+    assert generic_structure["fase_ordem"] == 600
+    assert generic_structure["chaves"] == 8
+    assert generic_structure["equipes_ativas"] == 8
+
     closed_cup = simulate_competition(
         closed_round_of_16, league_model, teams, 2_000, 994, {
             "desvio_prior_copas": 0.65,

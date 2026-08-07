@@ -481,6 +481,10 @@ def refresh_overdue_pending_with_summaries(
             if not parsed:
                 errors.append(f"{event_id}: summary sem evento normalizável")
                 continue
+            # O summary pós-jogo frequentemente troca "Oitavas de final" por
+            # "Volta - X avança...". Preserva a fase conhecida do próprio
+            # evento antes de substituir placar/estado/vencedor.
+            preserve_known_phase_metadata([parsed], [original])
             # Não aceitar resposta de outro confronto em caso de ID ESPN reciclado.
             if event_pair_key(parsed) != event_pair_key(original):
                 errors.append(f"{event_id}: summary retornou confronto divergente")
@@ -539,6 +543,102 @@ def event_pair_key(event: dict[str, Any]) -> tuple[str, str]:
         normalize_text((event.get("mandante") or {}).get("nome")),
         normalize_text((event.get("visitante") or {}).get("nome")),
     )))
+
+
+def phase_metadata_is_specific(event: dict[str, Any]) -> bool:
+    """Indica se a fase veio com informação eliminatória útil.
+
+    A ESPN frequentemente substitui ``Oitavas de final`` por textos de status
+    como ``Volta - X avança ...`` depois do apito final. Nesses casos
+    ``round_rank`` cai para a faixa 100 e perderíamos a identidade da fase.
+    """
+    return int(event.get("fase_ordem") or 0) >= 200
+
+
+def preserve_known_phase_metadata(
+    fresh_events: list[dict[str, Any]],
+    previous_events: list[dict[str, Any]],
+) -> int:
+    """Preserva a fase já conhecida quando a ESPN degrada o rótulo do evento.
+
+    A identidade do evento é o ``event_id`` ESPN. Só copiamos fase/ordem do
+    snapshot anterior quando o dado novo é genérico e o anterior é específico;
+    placar, vencedor, estado e data continuam sempre vindo da coleta nova.
+    """
+    previous_by_id = {
+        str(item.get("event_id")): item
+        for item in previous_events
+        if item.get("event_id")
+    }
+    preserved = 0
+    for event in fresh_events:
+        old = previous_by_id.get(str(event.get("event_id") or ""))
+        if not old or phase_metadata_is_specific(event) or not phase_metadata_is_specific(old):
+            continue
+        event["fase"] = old.get("fase") or event.get("fase")
+        event["fase_ordem"] = int(old.get("fase_ordem") or event.get("fase_ordem") or 0)
+        if not event.get("semana") and old.get("semana") is not None:
+            event["semana"] = old.get("semana")
+        if not event.get("perna") and old.get("perna") is not None:
+            event["perna"] = old.get("perna")
+        preserved += 1
+    return preserved
+
+
+def infer_latest_completed_knockout_stage(events: list[dict[str, Any]]) -> tuple[int, str, set[str]] | None:
+    """Infere a última fase encerrada quando todos os rótulos ESPN viram genéricos.
+
+    Usa exclusivamente a coorte cronológica mais recente e confrontos repetidos
+    (ida/volta). É um fallback para primeira coleta sem snapshot anterior; a via
+    principal é preservar a fase pelo ``event_id``.
+    """
+    completed = [
+        event for event in events
+        if event.get("concluido") and parse_datetime(event.get("data_iso")) is not None
+    ]
+    if not completed:
+        return None
+    latest = max(parse_datetime(event.get("data_iso")) for event in completed)
+    # Uma eliminatória de ida/volta da Copa normalmente se conclui numa janela
+    # curta. 12 dias cobrem ida + volta sem misturar a fase anterior.
+    lower = latest - timedelta(days=12)
+    recent = [
+        event for event in completed
+        if (dt := parse_datetime(event.get("data_iso"))) is not None and lower <= dt <= latest
+    ]
+    pair_events: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for event in recent:
+        pair_events.setdefault(event_pair_key(event), []).append(event)
+    # Mantém apenas confrontos com duas partidas recentes; isso elimina jogos
+    # isolados de fases anteriores que por acaso caiam na mesma janela.
+    two_leg_pairs = {pair: items for pair, items in pair_events.items() if len(items) >= 2}
+    participants = {team for pair in two_leg_pairs for team in pair if team}
+    inferred = knockout_stage_from_team_count(len(participants))
+    if not inferred or len(participants) != 2 * len(two_leg_pairs):
+        return None
+    rank, label = inferred
+    ids = {str(item.get("event_id")) for items in two_leg_pairs.values() for item in items if item.get("event_id")}
+    return rank, label, ids
+
+
+def normalize_completed_knockout_stage(events: list[dict[str, Any]]) -> None:
+    """Garante fase eliminatória explícita depois que não restam pendências.
+
+    Não usa o maior ``fase_ordem`` do torneio inteiro: uma fase anterior pode
+    continuar rotulada corretamente enquanto a fase recém-encerrada chega da
+    ESPN apenas como "Volta - X avança". A inferência cronológica é, portanto,
+    aplicada mesmo quando há metadados específicos em partidas antigas.
+    """
+    if any(not event.get("concluido") for event in events):
+        return
+    inferred = infer_latest_completed_knockout_stage(events)
+    if not inferred:
+        return
+    rank, label, ids = inferred
+    for event in events:
+        if str(event.get("event_id") or "") in ids and not phase_metadata_is_specific(event):
+            event["fase_ordem"] = rank
+            event["fase"] = label
 
 
 def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
@@ -661,6 +761,7 @@ def build_snapshot_from_normalized(
     events = copy.deepcopy(normalized_events)
     events.sort(key=lambda item: (item.get("data_iso") or "", item.get("event_id") or ""))
     normalize_active_knockout_stage(events)
+    normalize_completed_knockout_stage(events)
     team_map: dict[str, dict[str, Any]] = {}
     for event in events:
         for side in ("mandante", "visitante"):
@@ -831,6 +932,7 @@ def incremental_snapshot(
         for item in (previous.get("eventos") or [])
         if item.get("event_id")
     }
+    preserve_known_phase_metadata(parsed, previous.get("eventos") or [])
     for item in parsed:
         merged[str(item["event_id"])] = item
     previous_collection = previous.get("coleta") or {}
@@ -855,13 +957,20 @@ def refreshed_snapshot(
 ) -> dict[str, Any]:
     def complete_snapshot() -> dict[str, Any]:
         raw, requests = fetch_season_events(spec)
-        candidate = build_snapshot(
+        parsed = [item for event in raw if (item := extract_event(event, spec))]
+        phase_metadata_preserved = 0
+        if previous:
+            phase_metadata_preserved = preserve_known_phase_metadata(
+                parsed, previous.get("eventos") or []
+            )
+        candidate = build_snapshot_from_normalized(
             spec,
-            raw,
+            parsed,
             collection={
                 "modo": "completa",
                 "requisicoes": requests,
                 "ultima_completa_em": now_brt().isoformat(),
+                "fases_preservadas_por_event_id": phase_metadata_preserved,
             },
         )
         if previous:
@@ -1345,6 +1454,58 @@ def self_test() -> None:
     assert rebuilt["eventos"] == 16
     assert rebuilt["eventos_pendentes"] == 6
 
+    # Regressão pós-apito da Copa do Brasil: quando a última pendência vira
+    # finalizada, a ESPN pode substituir TODOS os rótulos da fase por textos
+    # operacionais. O snapshot anterior é a fonte autoritativa da fase pelo
+    # mesmo event_id; placares e vencedores continuam vindo da coleta fresca.
+    previous_round: list[dict[str, Any]] = []
+    fresh_round: list[dict[str, Any]] = []
+    for tie in range(8):
+        first = f"Oitavas {2 * tie:02d}"
+        second = f"Oitavas {2 * tie + 1:02d}"
+        for leg, (home, away, when) in enumerate((
+            (first, second, "2026-07-30T20:00:00-03:00"),
+            (second, first, "2026-08-06T20:00:00-03:00"),
+        ), start=1):
+            event_id = f"closed-{tie}-{leg}"
+            base = {
+                "event_id": event_id,
+                "data_iso": when,
+                "estado": "post",
+                "concluido": True,
+                "status": "Finalizado",
+                "fase": "Oitavas de final",
+                "fase_ordem": 600,
+                "semana": None,
+                "perna": leg,
+                "estadio": "Arena",
+                "mandante": {"espn_id": f"h-{tie}-{leg}", "nome": home, "nome_espn": home, "sigla": "H", "pais": "BRA", "serie_a_2026": False, "mandante": True, "vencedor": leg == 1, "placar": 1 if leg == 1 else 0},
+                "visitante": {"espn_id": f"a-{tie}-{leg}", "nome": away, "nome_espn": away, "sigla": "A", "pais": "BRA", "serie_a_2026": False, "mandante": False, "vencedor": False, "placar": 0},
+                "vencedor": home if leg == 1 else None,
+                "penaltis": False,
+            }
+            previous_round.append(copy.deepcopy(base))
+            degraded = copy.deepcopy(base)
+            degraded["fase"] = f"Volta - {first} avança no agregado" if leg == 2 else "Ida"
+            degraded["fase_ordem"] = 100
+            fresh_round.append(degraded)
+    assert preserve_known_phase_metadata(fresh_round, previous_round) == 16
+    rebuilt_closed = build_snapshot_from_normalized(spec, fresh_round)
+    assert rebuilt_closed["fase_atual"]["ordem"] == 600
+    assert rebuilt_closed["fase_atual"]["eventos"] == 16
+    assert rebuilt_closed["fase_atual"]["eventos_pendentes"] == 0
+
+    # E sem snapshot anterior o fallback cronológico ainda precisa reconstruir
+    # a última eliminatória, evitando 125 equipes / 118 chaves.
+    generic_closed = copy.deepcopy(fresh_round)
+    for event in generic_closed:
+        event["fase"] = "Fase não identificada"
+        event["fase_ordem"] = 100
+    normalize_completed_knockout_stage(generic_closed)
+    inferred_closed = detect_current_stage(generic_closed)
+    assert inferred_closed["ordem"] == 600
+    assert inferred_closed["eventos"] == 16
+
     now = now_brt()
     live_snapshot = build_snapshot_from_normalized(
         spec,
@@ -1393,7 +1554,7 @@ def self_test() -> None:
                     "competitions": [{
                         "date": (now - timedelta(hours=8)).isoformat(),
                         "status": {"type": {"state": "post", "completed": True, "detail": "Finalizado"}},
-                        "type": {"text": "Oitavas de final"},
+                        "type": {"text": "Volta - Flamengo avança no agregado"},
                         "leg": {"value": 2},
                         "venue": {"fullName": "Arena"},
                         "competitors": [
@@ -1411,6 +1572,8 @@ def self_test() -> None:
         globals()["fetch_json"] = original_fetch
     assert diag["consultados"] == 1 and diag["atualizados"] == 1 and not diag["pendentes"]
     assert refreshed["resumo"]["finalizados"] == 1 and refreshed["resumo"]["pendentes"] == 0
+    assert refreshed["eventos"][0]["fase_ordem"] == 600
+    assert refreshed["eventos"][0]["fase"] == "Oitavas de final"
     assert_no_overdue_pending(refreshed, spec, grace_hours=4)
     merged_snapshot = build_snapshot_from_normalized(
         spec, [parsed], collection={"modo": "incremental", "ultima_completa_em": now.isoformat()}
