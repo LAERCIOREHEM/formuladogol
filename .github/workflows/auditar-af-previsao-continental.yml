@@ -8,6 +8,8 @@ on:
       - 'scripts/gerar_agenda_clubes_brasileirao.py'
       - 'scripts/af_previsao_continental.py'
       - 'scripts/gerar_probabilidades_brasileirao.py'
+      - 'scripts/gerar_probabilidades_jogos.py'
+      - 'scripts/reconciliar_af_continental.py'
       - 'scripts/avaliar_af_previsao.py'
       - 'scripts/af_previsao_backtest.py'
       - 'dados-br/config-af-previsao.json'
@@ -58,35 +60,52 @@ jobs:
             scripts/gerar_agenda_clubes_brasileirao.py \
             scripts/af_previsao_continental.py \
             scripts/gerar_probabilidades_brasileirao.py \
+            scripts/gerar_probabilidades_jogos.py \
+            scripts/reconciliar_af_continental.py \
             scripts/avaliar_af_previsao.py
           python scripts/atualizar_competicoes_af_previsao.py --self-test
           python scripts/gerar_agenda_clubes_brasileirao.py --self-test
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
+          python scripts/gerar_probabilidades_jogos.py --self-test
           python scripts/avaliar_af_previsao.py --self-test
 
+      - name: Confirmar CI determinístico no push
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          echo "CI determinístico concluído: sintaxe e self-tests do AF-Previsão Continental passaram."
+          echo "A coleta ESPN ao vivo e o Monte Carlo de produção não rodam em commits de código."
+          echo "A auditoria integrada completa continua disponível por workflow_dispatch."
+
       - name: Sincronizar o estado corrente do Brasileirão
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           set -euo pipefail
           python atualizar_espn.py
           python scripts/gerar_auditoria_calendario.py
 
       - name: Buscar ao vivo as três competições relacionadas às vagas
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: python scripts/atualizar_competicoes_af_previsao.py --strict --force --max-age-minutes 0
 
       - name: Gerar agenda consolidada para auditoria
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: python scripts/gerar_agenda_clubes_brasileirao.py
 
       - name: Executar integração continental de auditoria
-        run: python scripts/gerar_probabilidades_brasileirao.py --simulacoes 2000000 --semente 20260718
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: python scripts/reconciliar_af_continental.py --force --simulacoes 2000000 --max-attempts 3
 
       - name: Sincronizar histórico com o AF efetivamente publicado
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: python scripts/gerar_probabilidades_brasileirao.py --sincronizar-historico-publicado
 
       - name: Auditar histórico encadeado e avaliação futura
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: python scripts/avaliar_af_previsao.py --strict
 
       - name: Validar artefatos integrados
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           set -euo pipefail
           for arquivo in \
