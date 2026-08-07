@@ -337,16 +337,19 @@ jobs:
           print(f'Base do Brasileirão sincronizada nesta execução: {os.environ.get("BR_SINCRONIZADO") == "true"}')
           PY
 
-      - name: Gerar probabilidades pré-jogo de vitória, empate e derrota
-        if: steps.af_gate.outputs.run_af == 'true'
-        run: python scripts/gerar_probabilidades_jogos.py
-
-      - name: Gerar AF-Previsão integrado e simular o restante do campeonato
+      - name: Reconciliar AF-Previsão com o estado esportivo atual
         if: steps.af_gate.outputs.run_af == 'true'
         id: af_generate
         env:
-          AF_EXIGIR_COLETA_CONTINENTAL_ATUAL: 'true'
-        run: python scripts/gerar_probabilidades_brasileirao.py
+          FORCAR_AF: ${{ inputs.forcar_af }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ARGS=(--max-attempts 2)
+          if [[ "${FORCAR_AF:-false}" == "true" ]]; then
+            ARGS+=(--force)
+          fi
+          python scripts/reconciliar_af_continental.py "${ARGS[@]}"
 
       - name: Confirmar vigência do AF após a tentativa de geração
         if: steps.af_gate.outputs.run_af == 'true'
@@ -434,6 +437,9 @@ jobs:
 
       - name: Conferir e validar JSONs gerados
         if: steps.espn.outputs.sincronizado == 'true'
+        env:
+          CONTINENTAL_CHANGED: ${{ steps.continental.outputs.continental_changed }}
+          AF_UPDATED: ${{ steps.af_generate.outputs.af_updated }}
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
@@ -450,6 +456,7 @@ jobs:
           python - <<'PY'
           import json
           import math
+          import os
           from scripts.gerar_probabilidades_brasileirao import (
               continental_snapshots_state_hash,
               load_current_matches,
@@ -680,26 +687,42 @@ jobs:
               assert isinstance(aud_prev.get('integracao_continental'), dict), 'auditoria sem integração continental'
               hash_continental_atual = continental_snapshots_state_hash(competicoes)
               hash_continental_af = str((previsao.get('integracao_continental') or {}).get('hash_snapshots') or '')
-              assert hash_continental_af == hash_continental_atual, (
-                  'AF não foi recalculado com o snapshot continental atual: '
-                  f'af={hash_continental_af} atual={hash_continental_atual}'
-              )
-              copa_snapshot = competicoes['copa_do_brasil']
-              copa_resumo = copa_snapshot.get('resumo') or {}
-              copa_fase = copa_snapshot.get('fase_atual') or {}
-              auditoria_integracao = (aud_prev.get('integracao_continental') or {}).get('competicoes') or {}
-              copa_af = auditoria_integracao.get('copa_do_brasil') or {}
-              assert int(copa_af.get('partidas_concluidas_no_ajuste') or -1) == int(copa_resumo.get('finalizados') or 0), (
-                  'AF não incorporou todas as partidas concluídas da Copa do Brasil'
-              )
-              # Ao terminar as oitavas, o modelo deve partir dos oito classificados
-              # factuais e recalcular as probabilidades consolidadas dos 20 clubes.
-              if int(copa_fase.get('ordem') or 0) == 600 and int(copa_fase.get('eventos_pendentes') or 0) == 0:
-                  ativos = list(copa_af.get('clubes_ativos') or [])
-                  assert int(copa_af.get('equipes_ativas') or 0) == 8, 'Copa finalizada nas oitavas sem exatamente 8 classificados no AF'
-                  assert len(ativos) == len(set(ativos)) == 8, 'lista de classificados da Copa inválida no AF'
-                  assert list(copa_af.get('rodadas_simuladas_tamanhos') or []) == [8, 4, 2, 1], 'estrutura simulada da Copa não parte das oitavas concluídas'
-                  print('  OK   Copa do Brasil: 8 classificados factuais incorporados e probabilidades recalculadas')
+              continental_changed = os.environ.get('CONTINENTAL_CHANGED') == 'true'
+              af_updated = os.environ.get('AF_UPDATED') == 'true'
+              af_cobre_snapshots_atuais = hash_continental_af == hash_continental_atual
+              if not af_cobre_snapshots_atuais:
+                  if continental_changed and not af_updated:
+                      # Estado transacional deliberado: o working tree contém a coleta
+                      # nova, porém o bloco de commit exclui esses snapshots enquanto
+                      # não existir AF correspondente. Validar o AF antigo contra a
+                      # coleta ainda não publicável criava uma falha artificial.
+                      print(
+                          '::warning::Snapshots continentais novos ainda não serão publicados: '
+                          f'AF preservado={hash_continental_af} coleta atual={hash_continental_atual}. '
+                          'O commit manterá o último conjunto AF+copas consistente.'
+                      )
+                  else:
+                      raise AssertionError(
+                          'AF não foi recalculado com o snapshot continental atual: '
+                          f'af={hash_continental_af} atual={hash_continental_atual}'
+                      )
+              if af_cobre_snapshots_atuais:
+                  copa_snapshot = competicoes['copa_do_brasil']
+                  copa_resumo = copa_snapshot.get('resumo') or {}
+                  copa_fase = copa_snapshot.get('fase_atual') or {}
+                  auditoria_integracao = (aud_prev.get('integracao_continental') or {}).get('competicoes') or {}
+                  copa_af = auditoria_integracao.get('copa_do_brasil') or {}
+                  assert int(copa_af.get('partidas_concluidas_no_ajuste') or -1) == int(copa_resumo.get('finalizados') or 0), (
+                      'AF não incorporou todas as partidas concluídas da Copa do Brasil'
+                  )
+                  # Ao terminar as oitavas, o modelo deve partir dos oito classificados
+                  # factuais e recalcular as probabilidades consolidadas dos 20 clubes.
+                  if int(copa_fase.get('ordem') or 0) == 600 and int(copa_fase.get('eventos_pendentes') or 0) == 0:
+                      ativos = list(copa_af.get('clubes_ativos') or [])
+                      assert int(copa_af.get('equipes_ativas') or 0) == 8, 'Copa finalizada nas oitavas sem exatamente 8 classificados no AF'
+                      assert len(ativos) == len(set(ativos)) == 8, 'lista de classificados da Copa inválida no AF'
+                      assert list(copa_af.get('rodadas_simuladas_tamanhos') or []) == [8, 4, 2, 1], 'estrutura simulada da Copa não parte das oitavas concluídas'
+                      print('  OK   Copa do Brasil: 8 classificados factuais incorporados e probabilidades recalculadas')
           probabilidades_jogos = json.load(open('dados-br/probabilidades-jogos.json', encoding='utf-8'))
           auditoria_jogos = json.load(open('dados-br/auditoria-probabilidades-jogos.json', encoding='utf-8'))
           assert probabilidades_jogos.get('schema_version') == 1, 'probabilidades por jogo em schema inesperado'
