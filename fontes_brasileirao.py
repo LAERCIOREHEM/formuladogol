@@ -357,23 +357,25 @@ def localizar_partida_cbf(
     tolerancia_horas: int = 36,
 ) -> Optional[CBFPartida]:
     target_dt = _parse_iso_brt(data_iso)
-    candidates: list[tuple[float, CBFPartida]] = []
+    candidates: list[tuple[float, int, CBFPartida]] = []
     for row in rows:
         if row.mandante != mandante or row.visitante != visitante:
             continue
-        if rodada and row.rodada != rodada:
-            continue
+        # No Brasileirão o par ordenado mandante/visitante é único. A rodada
+        # pode divergir entre ESPN e CBF após adiamento/reagendamento, portanto
+        # ela é critério de desempate e nunca filtro eliminatório.
+        round_penalty = 0 if not rodada or row.rodada == rodada else 1
         row_dt = _parse_iso_brt(row.data_iso)
         distance = 0.0
         if target_dt and row_dt:
             distance = abs((row_dt - target_dt).total_seconds())
             if distance > tolerancia_horas * 3600:
                 continue
-        candidates.append((distance, row))
+        candidates.append((distance, round_penalty, row))
     if not candidates:
         return None
-    candidates.sort(key=lambda item: item[0])
-    return candidates[0][1]
+    candidates.sort(key=lambda item: (item[0], item[1]))
+    return candidates[0][2]
 
 
 def fetch_api_football_fixtures(
@@ -477,6 +479,12 @@ def _selftest() -> None:
         rows, mandante="Botafogo", visitante="Vitória", rodada=4, data_iso="2026-07-23T19:30"
     )
     assert first and (first.placar_mandante, first.placar_visitante) == (0, 0)
+    # A ESPN pode mover a rodada editorial de um jogo reagendado. O fallback
+    # oficial da CBF deve reconhecer o mesmo mando pela dupla de clubes/data.
+    first_round_changed = localizar_partida_cbf(
+        rows, mandante="Botafogo", visitante="Vitória", rodada=99, data_iso="2026-07-23T19:30"
+    )
+    assert first_round_changed is first
     second = localizar_partida_cbf(
         rows, mandante="Vasco da Gama", visitante="Mirassol", rodada=20, data_iso="2026-07-25T20:30"
     )

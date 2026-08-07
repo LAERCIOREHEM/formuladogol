@@ -62,6 +62,7 @@ DATA_DIR = ROOT / "dados-br" / "competicoes-af-previsao"
 AUDIT_PATH = ROOT / "dados-br" / "auditoria-competicoes-af-previsao.json"
 SNAPSHOT_SCHEMA_VERSION = 2
 BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard"
+SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/summary"
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -405,6 +406,122 @@ def extract_event(event: dict[str, Any], spec: CompetitionSpec) -> dict[str, Any
 
 
 
+def _raw_event_from_summary(payload: dict[str, Any], event_id: str) -> dict[str, Any] | None:
+    """Converte o header do summary ESPN no formato bruto aceito por extract_event."""
+    header = payload.get("header") or {}
+    competitions = header.get("competitions") or []
+    competition = competitions[0] if competitions else None
+    if not isinstance(competition, dict):
+        return None
+    return {
+        "id": str(header.get("id") or event_id),
+        "date": competition.get("date") or header.get("date"),
+        "status": competition.get("status") or header.get("status"),
+        "season": header.get("season"),
+        "seasonType": header.get("seasonType"),
+        "week": header.get("week"),
+        "competitions": [competition],
+    }
+
+
+def _evento_adiado_ou_cancelado(event: dict[str, Any]) -> bool:
+    texto = normalize_text(event.get("status"))
+    return any(termo in texto for termo in ("adiado", "postponed", "cancelado", "canceled", "cancelled"))
+
+
+def overdue_pending_events(
+    snapshot: dict[str, Any], *, grace_hours: int
+) -> list[dict[str, Any]]:
+    """Pendências cujo horário já passou além da janela normal de duração do jogo."""
+    limite = now_brt() - timedelta(hours=max(3, int(grace_hours)))
+    vencidos: list[dict[str, Any]] = []
+    for event in snapshot.get("eventos") or []:
+        if event.get("concluido") or _evento_adiado_ou_cancelado(event):
+            continue
+        data = parse_datetime(event.get("data_iso"))
+        if data and data < limite:
+            vencidos.append(event)
+    return vencidos
+
+
+def refresh_overdue_pending_with_summaries(
+    spec: CompetitionSpec,
+    snapshot: dict[str, Any],
+    *,
+    grace_hours: int,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Reconsulta individualmente jogos vencidos no endpoint summary da ESPN.
+
+    O scoreboard em janelas longas pode permanecer em cache após o apito final.
+    O summary individual é a segunda rota oficial já usada pelo projeto para o
+    Brasileirão e evita que uma fase encerrada permaneça artificialmente aberta.
+    """
+    overdue = overdue_pending_events(snapshot, grace_hours=grace_hours)
+    if not overdue:
+        return snapshot, {"consultados": 0, "atualizados": 0, "pendentes": []}
+
+    normalized_by_id = {
+        str(item.get("event_id")): copy.deepcopy(item)
+        for item in (snapshot.get("eventos") or [])
+        if item.get("event_id")
+    }
+    consulted = 0
+    updated = 0
+    errors: list[str] = []
+    for original in overdue:
+        event_id = str(original.get("event_id") or "").strip()
+        if not event_id:
+            continue
+        consulted += 1
+        try:
+            url = SUMMARY_URL.format(league=spec.league) + f"?event={event_id}"
+            payload = fetch_json(url, timeout=25, attempts=2)
+            raw = _raw_event_from_summary(payload, event_id)
+            parsed = extract_event(raw, spec) if raw else None
+            if not parsed:
+                errors.append(f"{event_id}: summary sem evento normalizável")
+                continue
+            # Não aceitar resposta de outro confronto em caso de ID ESPN reciclado.
+            if event_pair_key(parsed) != event_pair_key(original):
+                errors.append(f"{event_id}: summary retornou confronto divergente")
+                continue
+            before = normalized_by_id.get(event_id)
+            normalized_by_id[event_id] = parsed
+            if before != parsed:
+                updated += 1
+        except Exception as exc:  # noqa: BLE001
+            errors.append(f"{event_id}: {type(exc).__name__}: {exc}")
+
+    collection = dict(snapshot.get("coleta") or {})
+    collection["summary_pendentes_vencidos"] = {
+        "consultados": consulted,
+        "atualizados": updated,
+        "erros": errors,
+    }
+    refreshed = build_snapshot_from_normalized(
+        spec, list(normalized_by_id.values()), collection=collection
+    )
+    still_overdue = [
+        str(item.get("event_id"))
+        for item in overdue_pending_events(refreshed, grace_hours=grace_hours)
+    ]
+    return refreshed, {
+        "consultados": consulted,
+        "atualizados": updated,
+        "pendentes": still_overdue,
+        "erros": errors,
+    }
+
+
+def assert_no_overdue_pending(snapshot: dict[str, Any], spec: CompetitionSpec, *, grace_hours: int) -> None:
+    overdue = overdue_pending_events(snapshot, grace_hours=grace_hours)
+    if overdue:
+        ids = ", ".join(str(item.get("event_id") or "?") for item in overdue[:6])
+        raise ValueError(
+            f"{spec.key}: há jogo(s) com horário vencido sem resultado confirmado pela ESPN: {ids}"
+        )
+
+
 def knockout_stage_from_team_count(team_count: int) -> tuple[int, str] | None:
     stages = {
         2: (900, "Final"),
@@ -652,6 +769,11 @@ def effective_cache_minutes(
 ) -> int:
     if not snapshot or live_minutes >= default_minutes:
         return default_minutes
+    # Resultado vencido nunca pode ser considerado cache válido. Isso cobre o
+    # intervalo após o fim da janela "ao vivo", quando um scoreboard stale em
+    # ``pre`` antes voltava ao cache padrão de 45 minutos.
+    if overdue_pending_events(snapshot, grace_hours=max(4, live_window_hours)):
+        return 0
     now = now_brt()
     before = timedelta(hours=2)
     after = timedelta(hours=max(3, live_window_hours))
@@ -1002,6 +1124,12 @@ def run_update(
                 past_days=past_days,
                 future_days=future_days,
             )
+            snapshot, summary_refresh = refresh_overdue_pending_with_summaries(
+                spec, snapshot, grace_hours=max(4, live_window_hours)
+            )
+            assert_no_overdue_pending(
+                snapshot, spec, grace_hours=max(4, live_window_hours)
+            )
             validate_snapshot(snapshot, spec)
             if snapshot.get("status") == "ok":
                 try:
@@ -1029,6 +1157,7 @@ def run_update(
                     "finalizados": snapshot["resumo"]["finalizados"],
                     "pendentes": snapshot["resumo"]["pendentes"],
                     "fase_atual": snapshot.get("fase_atual"),
+                    "summary_pendentes_vencidos": summary_refresh,
                     "coleta": snapshot.get("coleta") or {},
                 }
             )
@@ -1230,7 +1359,59 @@ def self_test() -> None:
     assert effective_cache_minutes(live_snapshot, 45, 5, 4) == 5
     old_snapshot = copy.deepcopy(live_snapshot)
     old_snapshot["eventos"][0]["data_iso"] = (now - timedelta(days=2)).isoformat()
-    assert effective_cache_minutes(old_snapshot, 45, 5, 4) == 45
+    assert effective_cache_minutes(old_snapshot, 45, 5, 4) == 0
+
+    # Regressão: scoreboard amplo pode ficar em ``pre`` após o término. O
+    # summary individual deve fechar a partida antes de o snapshot ser aceito.
+    pending_overdue = build_snapshot_from_normalized(
+        spec,
+        [{
+            "event_id": "summary-overdue",
+            "data_iso": (now - timedelta(hours=8)).isoformat(),
+            "estado": "pre",
+            "concluido": False,
+            "status": "Agendado",
+            "fase": "Oitavas de final",
+            "fase_ordem": 600,
+            "semana": None,
+            "perna": 2,
+            "estadio": "Arena",
+            "mandante": {"espn_id": "1", "nome": "Flamengo", "nome_espn": "Flamengo", "sigla": "FLA", "pais": "BRA", "serie_a_2026": True, "mandante": True, "vencedor": False, "placar": 0},
+            "visitante": {"espn_id": "2", "nome": "Palmeiras", "nome_espn": "Palmeiras", "sigla": "PAL", "pais": "BRA", "serie_a_2026": True, "mandante": False, "vencedor": False, "placar": 0},
+            "vencedor": None,
+            "penaltis": False,
+        }],
+    )
+    original_fetch = globals()["fetch_json"]
+    try:
+        def fake_summary(url: str, timeout: int = 30, attempts: int = 3) -> dict[str, Any]:
+            del url, timeout, attempts
+            return {
+                "header": {
+                    "id": "summary-overdue",
+                    "status": {"type": {"state": "post", "completed": True, "detail": "Finalizado"}},
+                    "competitions": [{
+                        "date": (now - timedelta(hours=8)).isoformat(),
+                        "status": {"type": {"state": "post", "completed": True, "detail": "Finalizado"}},
+                        "type": {"text": "Oitavas de final"},
+                        "leg": {"value": 2},
+                        "venue": {"fullName": "Arena"},
+                        "competitors": [
+                            {"homeAway": "home", "winner": True, "score": 2, "team": {"id": "1", "displayName": "Flamengo", "abbreviation": "FLA"}},
+                            {"homeAway": "away", "winner": False, "score": 1, "team": {"id": "2", "displayName": "Palmeiras", "abbreviation": "PAL"}},
+                        ],
+                    }],
+                }
+            }
+        globals()["fetch_json"] = fake_summary
+        refreshed, diag = refresh_overdue_pending_with_summaries(
+            spec, pending_overdue, grace_hours=4
+        )
+    finally:
+        globals()["fetch_json"] = original_fetch
+    assert diag["consultados"] == 1 and diag["atualizados"] == 1 and not diag["pendentes"]
+    assert refreshed["resumo"]["finalizados"] == 1 and refreshed["resumo"]["pendentes"] == 0
+    assert_no_overdue_pending(refreshed, spec, grace_hours=4)
     merged_snapshot = build_snapshot_from_normalized(
         spec, [parsed], collection={"modo": "incremental", "ultima_completa_em": now.isoformat()}
     )

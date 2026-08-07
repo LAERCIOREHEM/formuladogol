@@ -324,20 +324,21 @@ def enrich_fixture_event_ids(
 ) -> list[Fixture]:
     """Enriquece o confronto com o ID operacional, data e estádio da ESPN.
 
-    A identidade esportiva usada nas auditorias é rodada + mandante + visitante.
-    O ``event_id`` ESPN continua no arquivo pré-jogo para integração com os cards
-    e com a agenda; em reagendamentos, o candidato válido é escolhido de modo
+    A identidade esportiva usada nas auditorias é mandante + visitante. A rodada
+    permanece como metadado do calendário porque a ESPN pode reatribuí-la em
+    adiamentos/reagendamentos. O ``event_id`` ESPN continua no arquivo pré-jogo
+    para integração com cards e agenda; o candidato válido é escolhido de modo
     determinístico e o ID já persistido no calendário tem prioridade.
     """
-    event_map: dict[tuple[int, str, str], list[dict[str, Any]]] = {}
+    event_map: dict[tuple[str, str], list[dict[str, Any]]] = {}
     for item in events.get("eventos") or []:
         event_id = str(item.get("event_id") or "").strip()
         home = str(item.get("mandante") or "").strip()
         away = str(item.get("visitante") or "").strip()
         round_no = int(item.get("rodada") or 0)
-        if not event_id or not home or not away or round_no <= 0:
+        if not event_id or not home or not away:
             continue
-        event_map.setdefault((round_no, home, away), []).append(item)
+        event_map.setdefault(sporting_fixture_key(round_no, home, away), []).append(item)
 
     def escolher_evento(candidatos: Sequence[dict[str, Any]], fixture: Fixture) -> dict[str, Any] | None:
         if not candidatos:
@@ -360,7 +361,10 @@ def enrich_fixture_event_ids(
     enriched: list[Fixture] = []
     seen_ids: set[str] = set()
     for fixture in fixtures:
-        item = escolher_evento(event_map.get((fixture.round_no, fixture.home, fixture.away), []), fixture)
+        item = escolher_evento(
+            event_map.get(sporting_fixture_key(fixture.round_no, fixture.home, fixture.away), []),
+            fixture,
+        )
         event_id = fixture.event_id
         kickoff = fixture.kickoff
         stadium = fixture.stadium
@@ -534,7 +538,8 @@ def self_test() -> None:
                 "estadio": "Arena Antiga", "adiado": True,
             },
             {
-                "event_id": "espn-novo", "rodada": 38, "mandante": "Clube A",
+                # Reagendamento com rodada editorial alterada pela fonte.
+                "event_id": "espn-novo", "rodada": 99, "mandante": "Clube A",
                 "visitante": "Clube B", "data_iso": "2026-12-03T20:30",
                 "estadio": "Arena Nova",
             },

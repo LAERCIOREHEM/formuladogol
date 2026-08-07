@@ -186,9 +186,16 @@ def parse_date(value: str | None) -> date | None:
             return None
 
 
-def sporting_fixture_key(round_no: int, home: str, away: str) -> tuple[int, str, str]:
-    """Identidade esportiva estável de uma partida do Brasileirão."""
-    return (int(round_no), str(home).strip(), str(away).strip())
+def sporting_fixture_key(round_no: int, home: str, away: str) -> tuple[str, str]:
+    """Identidade esportiva estável de uma partida do Brasileirão.
+
+    O Brasileirão tem exatamente um confronto por mando para cada par de
+    clubes. A rodada é metadado editorial e pode ser alterada pela ESPN em
+    adiamentos/reagendamentos; por isso ela não participa da identidade.
+    ``round_no`` é mantido no contrato da função para não duplicar chamadas.
+    """
+    del round_no
+    return (str(home).strip(), str(away).strip())
 
 
 def canonical_fixture_event_id(
@@ -420,8 +427,8 @@ def load_current_matches(
         )
 
     # A ESPN pode manter o evento original e o reagendado com IDs distintos.
-    # A identidade da partida no campeonato é rodada + mandante + visitante.
-    by_sporting_key: dict[tuple[int, str, str], Match] = {}
+    # A identidade da partida no campeonato é mandante + visitante; a rodada é metadado mutável.
+    by_sporting_key: dict[tuple[str, str], Match] = {}
     for match in sorted(merged.values(), key=lambda item: (item.played_on, item.source_id)):
         key = sporting_fixture_key(match.round_no, match.home, match.away)
         previous = by_sporting_key.get(key)
@@ -543,7 +550,7 @@ def load_fixtures(
     calendar: dict[str, Any],
     concluded_ids: set[str],
     allowed_teams: set[str],
-    concluded_keys: set[tuple[int, str, str]] | None = None,
+    concluded_keys: set[tuple[str, str]] | None = None,
 ) -> tuple[list[Fixture], int]:
     items = calendar.get("jogos") or []
     if int(calendar.get("total_partidas") or len(items)) != 380 or len(items) != 380:
@@ -551,7 +558,8 @@ def load_fixtures(
     seen_ids: set[str] = set()
     fixtures: list[Fixture] = []
     concluded_in_calendar = 0
-    pair_rounds: set[tuple[int, str, str]] = set()
+    recognized_concluded_keys: set[tuple[str, str]] = set()
+    sporting_keys: set[tuple[str, str]] = set()
     for item in items:
         home = str(item.get("mandante") or "").strip()
         away = str(item.get("visitante") or "").strip()
@@ -565,11 +573,12 @@ def load_fixtures(
         if home not in allowed_teams or away not in allowed_teams or home == away:
             raise ValueError(f"calendário inválido no evento {event_id}: {home} x {away}")
         key = sporting_fixture_key(round_no, home, away)
-        if key in pair_rounds:
-            raise ValueError(f"partida duplicada na rodada {round_no}: {home} x {away}")
-        pair_rounds.add(key)
+        if key in sporting_keys:
+            raise ValueError(f"calendário contém mais de uma partida com o mesmo mando: {home} x {away}")
+        sporting_keys.add(key)
         if event_id in concluded_ids or (concluded_keys is not None and key in concluded_keys):
             concluded_in_calendar += 1
+            recognized_concluded_keys.add(key)
             continue
         fixtures.append(
             Fixture(
@@ -583,9 +592,12 @@ def load_fixtures(
         )
     expected_concluded = len(concluded_keys) if concluded_keys is not None else len(concluded_ids)
     if concluded_in_calendar != expected_concluded:
+        missing = []
+        if concluded_keys is not None:
+            missing = sorted(concluded_keys - recognized_concluded_keys)[:6]
         raise ValueError(
             "calendário não reconheceu todos os concluídos: "
-            f"{concluded_in_calendar}/{expected_concluded}"
+            f"{concluded_in_calendar}/{expected_concluded}; faltam={missing}"
         )
     if len(fixtures) + concluded_in_calendar != 380:
         raise ValueError("partição entre jogos concluídos e restantes não totaliza 380")
@@ -2005,7 +2017,7 @@ def assess_publication_freshness(
     }
     overlap = sorted(concluded_keys & published_remaining_keys)
     if overlap:
-        readable = [f"R{round_no} {home} x {away}" for round_no, home, away in overlap[:5]]
+        readable = [f"{home} x {away}" for home, away in overlap[:5]]
         reasons.append(
             "partida já concluída ainda consta nas previsões: " + ", ".join(readable)
         )
@@ -2809,7 +2821,9 @@ def self_test() -> None:
             "placar_mandante": 1, "placar_visitante": 0,
         },
         {
-            "event_id": "90002", "concluido": True, "rodada": 7,
+            # A rodada mudou no feed após o reagendamento. O mando continua
+            # sendo a identidade esportiva da mesma partida.
+            "event_id": "90002", "concluido": True, "rodada": 99,
             "data_iso": "2026-03-08T16:00:00-03:00",
             "mandante": "Clube A", "visitante": "Clube B",
             "placar_mandante": 1, "placar_visitante": 0,

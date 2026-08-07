@@ -48,6 +48,30 @@ def chave_evento(e: dict[str, Any]) -> tuple[int, str, str]:
     )
 
 
+def chave_mando(e: dict[str, Any]) -> tuple[str, str]:
+    """Identidade estrutural: cada mando ocorre exatamente uma vez no campeonato."""
+    return (nome_time(e.get("mandante")), nome_time(e.get("visitante")))
+
+
+def escolher_fonte_evento(candidatos: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Escolhe deterministicamente o evento útil entre IDs antigos/reagendados."""
+    if not candidatos:
+        return None
+
+    def prioridade(item: dict[str, Any]) -> tuple[int, int, int, str, str]:
+        estado = str(item.get("estado") or "").lower()
+        concluido = item.get("concluido") is True or estado == "post"
+        return (
+            1 if item.get("resultado_manual") is True else 0,
+            1 if concluido else 0,
+            0 if item.get("adiado") is True and not concluido else 1,
+            str(item.get("data_iso") or ""),
+            str(item.get("event_id") or ""),
+        )
+
+    return max(candidatos, key=prioridade)
+
+
 def gravar_json_atomico(path: Path, payload: dict[str, Any]) -> None:
     """Grava sem deixar arquivo parcial em caso de interrupção."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -140,6 +164,20 @@ def montar_calendario_completo(
     atual_por_chave = {chave_evento(e): e for e in eventos if chave_evento(e)[0]}
     anterior_por_chave = {chave_evento(e): e for e in anterior if chave_evento(e)[0]}
 
+    # A ESPN pode mudar a rodada editorial de um jogo adiado/reagendado. Como
+    # cada combinação mandante->visitante ocorre uma única vez no Brasileirão,
+    # o mando é a identidade estrutural mais estável para reaproveitar metadados.
+    atuais_por_mando: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    anteriores_por_mando: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    for evento in eventos:
+        if all(chave_mando(evento)):
+            atuais_por_mando[chave_mando(evento)].append(evento)
+    for evento in anterior:
+        if all(chave_mando(evento)):
+            anteriores_por_mando[chave_mando(evento)].append(evento)
+    atual_por_mando = {chave: escolher_fonte_evento(itens) for chave, itens in atuais_por_mando.items()}
+    anterior_por_mando = {chave: escolher_fonte_evento(itens) for chave, itens in anteriores_por_mando.items()}
+
     atual_por_rodada: dict[int, list[dict[str, Any]]] = defaultdict(list)
     anterior_por_rodada: dict[int, list[dict[str, Any]]] = defaultdict(list)
     for evento in eventos:
@@ -188,10 +226,17 @@ def montar_calendario_completo(
             mandante = nome_time(estrutura.get("mandante"))
             visitante = nome_time(estrutura.get("visitante"))
             chave_ida = (rodada, mandante, visitante)
-            fonte_ida = atual_por_chave.get(chave_ida) or anterior_por_chave.get(chave_ida) or estrutura
+            mando_ida = (mandante, visitante)
+            fonte_ida = (
+                atual_por_mando.get(mando_ida)
+                or atual_por_chave.get(chave_ida)
+                or anterior_por_mando.get(mando_ida)
+                or anterior_por_chave.get(chave_ida)
+                or estrutura
+            )
             origem_ida = (
                 "ESPN/primeiro turno"
-                if chave_ida in atual_por_chave
+                if fonte_ida is not None and atual_por_mando.get(mando_ida) is fonte_ida
                 else "calendário anterior íntegro/primeiro turno"
             )
             calendario.append(item_calendario(
@@ -200,13 +245,19 @@ def montar_calendario_completo(
 
             rodada_volta = rodada + 19
             chave_volta = (rodada_volta, visitante, mandante)
-            fonte_volta = atual_por_chave.get(chave_volta) or anterior_por_chave.get(chave_volta)
+            mando_volta = (visitante, mandante)
+            fonte_volta = (
+                atual_por_mando.get(mando_volta)
+                or atual_por_chave.get(chave_volta)
+                or anterior_por_mando.get(mando_volta)
+                or anterior_por_chave.get(chave_volta)
+            )
             origem_volta = (
                 "ESPN/segundo turno"
-                if chave_volta in atual_por_chave
+                if fonte_volta is not None and atual_por_mando.get(mando_volta) is fonte_volta
                 else (
                     "calendário anterior íntegro/segundo turno"
-                    if chave_volta in anterior_por_chave
+                    if fonte_volta is not None
                     else "mando invertido do primeiro turno"
                 )
             )
@@ -339,6 +390,28 @@ def executar_self_test() -> None:
     assert any(x["rodada"] == 7 for x in avisos)
     resumo, _, falhas_auditoria = auditar_calendario_completo(preservado, clubes)
     assert not falhas_auditoria and resumo["partidas_mapeadas"] == 380
+
+    # Regressão: a ESPN pode devolver uma partida com outra rodada após
+    # reagendamento. O calendário mantém a rodada estrutural, mas incorpora o
+    # novo event_id/data pelo mando, sem criar a 381ª partida.
+    alvo = completo[0]
+    reagendado = {
+        "rodada": 99,
+        "mandante": alvo["mandante"],
+        "visitante": alvo["visitante"],
+        "event_id": "ESPN-REAGENDADO",
+        "data_iso": "2026-12-31T20:30",
+        "estado": "pre",
+    }
+    com_reagendamento = [*ida, reagendado]
+    recalc, falhas, _ = montar_calendario_completo(com_reagendamento, clubes, completo)
+    assert not falhas and len(recalc) == 380
+    recalc_alvo = next(
+        x for x in recalc
+        if x["mandante"] == alvo["mandante"] and x["visitante"] == alvo["visitante"]
+    )
+    assert recalc_alvo["rodada"] == alvo["rodada"]
+    assert recalc_alvo["event_id"] == "ESPN-REAGENDADO"
 
     sem_base, falhas, _ = montar_calendario_completo(incompleto, clubes, [])
     assert not sem_base and falhas

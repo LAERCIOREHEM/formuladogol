@@ -1396,6 +1396,40 @@ def self_test() -> None:
     assert normalize_text(teams[1]) not in partial_cup.eligible_team_names
     assert int(partial_cup.audit["equipes_ativas"]) == 7
 
+    # Regressão central da Copa do Brasil: oitavas totalmente encerradas e
+    # quartas ainda sem sorteio publicado. Devem restar exatamente 8 vencedores
+    # factuais e o motor simula quartas -> semifinal -> final por sorteio.
+    closed_round_of_16 = snapshot(
+        "copa_do_brasil", [*teams[:16]], stage="Oitavas de final"
+    )
+    for event in closed_round_of_16["eventos"]:
+        event["concluido"] = True
+        event["estado"] = "post"
+        first_leg = event["event_id"].endswith("-1")
+        if first_leg:
+            event["mandante"]["placar"] = 1
+            event["visitante"]["placar"] = 0
+            event["vencedor"] = event["mandante"]["nome"]
+        else:
+            event["mandante"]["placar"] = 0
+            event["visitante"]["placar"] = 0
+            event["vencedor"] = None
+    closed_structure = validate_competition_snapshot_structure(closed_round_of_16)
+    assert int(closed_structure["equipes_ativas"]) == 8
+    closed_cup = simulate_competition(
+        closed_round_of_16, league_model, teams, 2_000, 994, {
+            "desvio_prior_copas": 0.65,
+            "meia_vida_copas_dias": 240,
+            "peso_modelo_brasileirao_para_serie_a": 0.65,
+        }
+    )
+    assert int(closed_cup.audit["equipes_ativas"]) == 8
+    assert list(closed_cup.audit["rodadas_simuladas_tamanhos"]) == [8, 4, 2, 1]
+    expected_winners = {normalize_text(teams[i]) for i in range(0, 16, 2)}
+    expected_losers = {normalize_text(teams[i]) for i in range(1, 16, 2)}
+    assert expected_winners == set(closed_cup.eligible_team_names)
+    assert not (expected_losers & set(closed_cup.eligible_team_names))
+
     simulations = 10_000
     # Ordem fixa: Clube 00 em primeiro, Clube 19 em último.
     order = np.broadcast_to(np.arange(20, dtype=np.int16), (simulations, 20)).copy()
