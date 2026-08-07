@@ -43,6 +43,7 @@ from gerar_probabilidades_brasileirao import (
     load_historical_matches,
     load_json,
     serialize_match_forecasts,
+    sporting_fixture_key,
     validate_current_results_against_table,
     write_json,
 )
@@ -321,11 +322,12 @@ def validate_previous_publication() -> tuple[bool, str]:
 def enrich_fixture_event_ids(
     fixtures: Sequence[Fixture], events: dict[str, Any]
 ) -> list[Fixture]:
-    """Troca IDs sintéticos pelo ID ESPN quando o calendário ainda não o gravou.
+    """Enriquece o confronto com o ID operacional, data e estádio da ESPN.
 
-    O calendário completo preserva os 380 confrontos mesmo antes de a ESPN
-    atribuir data/ID definitivo. Assim que o scoreboard passa a oferecer o ID,
-    a previsão precisa usar esse identificador para ser encontrada em Jogos.
+    A identidade esportiva usada nas auditorias é rodada + mandante + visitante.
+    O ``event_id`` ESPN continua no arquivo pré-jogo para integração com os cards
+    e com a agenda; em reagendamentos, o candidato válido é escolhido de modo
+    determinístico e o ID já persistido no calendário tem prioridade.
     """
     event_map: dict[tuple[int, str, str], list[dict[str, Any]]] = {}
     for item in events.get("eventos") or []:
@@ -397,7 +399,12 @@ def generate() -> tuple[dict[str, Any], dict[str, Any]]:
     current = load_current_matches(events, allowed_teams, results)
     validate_current_results_against_table(current, state)
     concluded_ids = {str(match.source_id) for match in current}
-    fixtures, _ = load_fixtures(calendar, concluded_ids, allowed_teams)
+    concluded_keys = {
+        sporting_fixture_key(match.round_no, match.home, match.away) for match in current
+    }
+    fixtures, _ = load_fixtures(
+        calendar, concluded_ids, allowed_teams, concluded_keys=concluded_keys
+    )
     fixtures = enrich_fixture_event_ids(fixtures, events)
     if len(current) + len(fixtures) != 380:
         raise ValueError("quantidade de partidas correntes não totaliza 380")
@@ -511,8 +518,34 @@ def self_test() -> None:
             "visitante": "Clube B", "data_iso": "2026-12-01T16:00", "estadio": "Arena",
         }]},
     )
-    if enriched[0].event_id != "espn-123" or enriched[0].kickoff != "2026-12-01T16:00":
-        raise AssertionError("ID ESPN não substituiu o identificador sintético")
+    if (
+        enriched[0].event_id != "espn-123"
+        or enriched[0].kickoff != "2026-12-01T16:00"
+        or enriched[0].stadium != "Arena"
+    ):
+        raise AssertionError("enriquecimento não aplicou o ID e os metadados ESPN")
+
+    rescheduled = enrich_fixture_event_ids(
+        [Fixture("AF-38-Clube A-Clube B", 38, "Clube A", "Clube B", None, "")],
+        {"eventos": [
+            {
+                "event_id": "espn-antigo", "rodada": 38, "mandante": "Clube A",
+                "visitante": "Clube B", "data_iso": "2026-11-20T16:00",
+                "estadio": "Arena Antiga", "adiado": True,
+            },
+            {
+                "event_id": "espn-novo", "rodada": 38, "mandante": "Clube A",
+                "visitante": "Clube B", "data_iso": "2026-12-03T20:30",
+                "estadio": "Arena Nova",
+            },
+        ]},
+    )
+    if (
+        rescheduled[0].event_id != "espn-novo"
+        or rescheduled[0].kickoff != "2026-12-03T20:30"
+        or rescheduled[0].stadium != "Arena Nova"
+    ):
+        raise AssertionError("reagendamento ESPN não selecionou o ID e os metadados atuais")
     print("Self-test probabilidades pré-jogo: OK")
 
 

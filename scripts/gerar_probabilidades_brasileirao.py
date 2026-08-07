@@ -186,6 +186,24 @@ def parse_date(value: str | None) -> date | None:
             return None
 
 
+def sporting_fixture_key(round_no: int, home: str, away: str) -> tuple[int, str, str]:
+    """Identidade esportiva estável de uma partida do Brasileirão."""
+    return (int(round_no), str(home).strip(), str(away).strip())
+
+
+def canonical_fixture_event_id(
+    round_no: int,
+    home: str,
+    away: str,
+    raw_event_id: Any = None,
+) -> str:
+    """ID persistido no calendário ou fallback sintético determinístico."""
+    event_id = str(raw_event_id or "").strip()
+    if event_id:
+        return event_id
+    return f"AF-{int(round_no):02d}-{str(home).strip()}-{str(away).strip()}"
+
+
 def parse_reference_datetime(table: dict[str, Any], events: dict[str, Any]) -> datetime:
     candidates = [table.get("atualizado_em"), table.get("atualizado_em_br"), events.get("atualizado_em")]
     for value in candidates:
@@ -248,7 +266,9 @@ def build_model_state_hash(
         })
     current_rows = [
         {
-            "id": match.source_id,
+            "chave_esportiva": sporting_fixture_key(
+                match.round_no, match.home, match.away
+            ),
             "rodada": match.round_no,
             "data": match.played_on.isoformat(),
             "mandante": match.home,
@@ -274,7 +294,7 @@ def build_model_state_hash(
     ]
     winner = (audit_models.get("selecao_modelo") or {}).get("vencedor") or {}
     payload = {
-        "schema": 2,
+        "schema": 3,
         "versao_modelo": config.get("versao_modelo"),
         "execucao_2": config.get("execucao_2"),
         "execucao_2_5": config.get("execucao_2_5"),
@@ -399,8 +419,30 @@ def load_current_matches(
             "resultados.json",
         )
 
-    matches = sorted(merged.values(), key=lambda match: (match.played_on, match.source_id))
-    return matches
+    # A ESPN pode manter o evento original e o reagendado com IDs distintos.
+    # A identidade da partida no campeonato é rodada + mandante + visitante.
+    by_sporting_key: dict[tuple[int, str, str], Match] = {}
+    for match in sorted(merged.values(), key=lambda item: (item.played_on, item.source_id)):
+        key = sporting_fixture_key(match.round_no, match.home, match.away)
+        previous = by_sporting_key.get(key)
+        if previous is None:
+            by_sporting_key[key] = match
+            continue
+        if (previous.home_goals, previous.away_goals) != (
+            match.home_goals, match.away_goals
+        ):
+            raise ValueError(
+                "partida duplicada com placares conflitantes: "
+                f"R{match.round_no} {match.home} x {match.away}; "
+                f"IDs {previous.source_id}/{match.source_id}"
+            )
+        # Para duplicatas equivalentes, mantém o evento efetivamente disputado.
+        if (match.played_on, match.source_id) > (previous.played_on, previous.source_id):
+            by_sporting_key[key] = match
+
+    return sorted(
+        by_sporting_key.values(), key=lambda match: (match.played_on, match.source_id)
+    )
 
 
 def load_current_state(table: dict[str, Any]) -> CurrentState:
@@ -497,7 +539,12 @@ def validate_current_results_against_table(matches: Sequence[Match], state: Curr
     }
 
 
-def load_fixtures(calendar: dict[str, Any], concluded_ids: set[str], allowed_teams: set[str]) -> tuple[list[Fixture], int]:
+def load_fixtures(
+    calendar: dict[str, Any],
+    concluded_ids: set[str],
+    allowed_teams: set[str],
+    concluded_keys: set[tuple[int, str, str]] | None = None,
+) -> tuple[list[Fixture], int]:
     items = calendar.get("jogos") or []
     if int(calendar.get("total_partidas") or len(items)) != 380 or len(items) != 380:
         raise ValueError("calendário completo precisa conter exatamente 380 partidas")
@@ -509,18 +556,19 @@ def load_fixtures(calendar: dict[str, Any], concluded_ids: set[str], allowed_tea
         home = str(item.get("mandante") or "").strip()
         away = str(item.get("visitante") or "").strip()
         round_no = int(item.get("rodada") or 0)
-        raw_event_id = str(item.get("event_id") or "").strip()
-        event_id = raw_event_id or f"AF-{round_no:02d}-{home}-{away}"
+        event_id = canonical_fixture_event_id(
+            round_no, home, away, item.get("event_id")
+        )
         if event_id in seen_ids:
             raise ValueError(f"calendário com event_id duplicado: {event_id!r}")
         seen_ids.add(event_id)
         if home not in allowed_teams or away not in allowed_teams or home == away:
             raise ValueError(f"calendário inválido no evento {event_id}: {home} x {away}")
-        key = (round_no, home, away)
+        key = sporting_fixture_key(round_no, home, away)
         if key in pair_rounds:
             raise ValueError(f"partida duplicada na rodada {round_no}: {home} x {away}")
         pair_rounds.add(key)
-        if event_id in concluded_ids:
+        if event_id in concluded_ids or (concluded_keys is not None and key in concluded_keys):
             concluded_in_calendar += 1
             continue
         fixtures.append(
@@ -533,9 +581,11 @@ def load_fixtures(calendar: dict[str, Any], concluded_ids: set[str], allowed_tea
                 stadium=str(item.get("estadio") or "").strip(),
             )
         )
-    if concluded_in_calendar != len(concluded_ids):
+    expected_concluded = len(concluded_keys) if concluded_keys is not None else len(concluded_ids)
+    if concluded_in_calendar != expected_concluded:
         raise ValueError(
-            f"calendário não reconheceu todos os concluídos: {concluded_in_calendar}/{len(concluded_ids)}"
+            "calendário não reconheceu todos os concluídos: "
+            f"{concluded_in_calendar}/{expected_concluded}"
         )
     if len(fixtures) + concluded_in_calendar != 380:
         raise ValueError("partição entre jogos concluídos e restantes não totaliza 380")
@@ -1940,16 +1990,22 @@ def assess_publication_freshness(
     if int(published.get("total_previsoes_partidas") or -1) != remaining_count:
         reasons.append("lista publicada de previsões não cobre os jogos restantes atuais")
 
-    concluded_ids = {str(match.source_id) for match in current}
-    published_remaining_ids = {
-        str(item.get("event_id") or "")
-        for item in (published.get("partidas_restantes") or [])
-        if str(item.get("event_id") or "")
+    concluded_keys = {
+        sporting_fixture_key(match.round_no, match.home, match.away) for match in current
     }
-    overlap = sorted(concluded_ids & published_remaining_ids)
+    published_remaining_keys = {
+        sporting_fixture_key(
+            int(item.get("rodada") or 0),
+            str(item.get("mandante") or ""),
+            str(item.get("visitante") or ""),
+        )
+        for item in (published.get("partidas_restantes") or [])
+    }
+    overlap = sorted(concluded_keys & published_remaining_keys)
     if overlap:
+        readable = [f"R{round_no} {home} x {away}" for round_no, home, away in overlap[:5]]
         reasons.append(
-            "partida já concluída ainda consta nas previsões: " + ", ".join(overlap[:5])
+            "partida já concluída ainda consta nas previsões: " + ", ".join(readable)
         )
 
     published_clubs = {
@@ -2011,7 +2067,12 @@ def current_publication_freshness() -> dict[str, Any]:
         current = load_current_matches(events, allowed_teams, results)
         validate_current_results_against_table(current, state)
         concluded_ids = {str(match.source_id) for match in current}
-        fixtures, _ = load_fixtures(calendar, concluded_ids, allowed_teams)
+        concluded_keys = {
+            sporting_fixture_key(match.round_no, match.home, match.away) for match in current
+        }
+        fixtures, _ = load_fixtures(
+            calendar, concluded_ids, allowed_teams, concluded_keys=concluded_keys
+        )
         if len(current) + len(fixtures) != 380:
             raise CurrentDataNotSynchronized(
                 "resultados e calendário atuais não totalizam 380 partidas"
@@ -2123,7 +2184,12 @@ def generate(simulations: int | None = None, seed_override: int | None = None) -
     current = load_current_matches(events, allowed_teams, results)
     integrity = validate_current_results_against_table(current, state)
     concluded_ids = {str(match.source_id) for match in current}
-    fixtures, concluded_in_calendar = load_fixtures(calendar, concluded_ids, allowed_teams)
+    concluded_keys = {
+        sporting_fixture_key(match.round_no, match.home, match.away) for match in current
+    }
+    fixtures, concluded_in_calendar = load_fixtures(
+        calendar, concluded_ids, allowed_teams, concluded_keys=concluded_keys
+    )
     if len(current) + len(fixtures) != 380:
         raise ValueError("quantidade de partidas correntes não totaliza 380")
 
@@ -2730,6 +2796,38 @@ def self_test() -> None:
     snapshot_b["copa_do_brasil"]["eventos"] = [{"event_id": "novo"}]
     if continental_snapshots_state_hash(snapshot_a) == continental_snapshots_state_hash(snapshot_b):
         raise AssertionError("mudança esportiva precisa alterar o hash continental")
+
+    # IDs distintos da ESPN para o mesmo jogo reagendado não podem criar duas
+    # partidas concluídas nem remover um confronto adicional do calendário.
+    duplicate_events = {"eventos": [
+        {
+            "event_id": "90001", "concluido": True, "rodada": 7,
+            "data_iso": "2026-03-01T16:00:00-03:00",
+            "mandante": "Clube A", "visitante": "Clube B",
+            "placar_mandante": 1, "placar_visitante": 0,
+        },
+        {
+            "event_id": "90002", "concluido": True, "rodada": 7,
+            "data_iso": "2026-03-08T16:00:00-03:00",
+            "mandante": "Clube A", "visitante": "Clube B",
+            "placar_mandante": 1, "placar_visitante": 0,
+        },
+    ]}
+    deduplicated = load_current_matches(
+        duplicate_events, {"Clube A", "Clube B"}, {"resultados": []}
+    )
+    if len(deduplicated) != 1 or deduplicated[0].source_id != 90002:
+        raise AssertionError("reagendamento ESPN não foi deduplicado pela identidade esportiva")
+    conflicting_events = json.loads(json.dumps(duplicate_events))
+    conflicting_events["eventos"][1]["placar_mandante"] = 2
+    try:
+        load_current_matches(
+            conflicting_events, {"Clube A", "Clube B"}, {"resultados": []}
+        )
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("duplicata ESPN com placares conflitantes não foi bloqueada")
     total_counts = [0] * 115
     title_counts = [0] * 115
     permanence_counts = [0] * 115
