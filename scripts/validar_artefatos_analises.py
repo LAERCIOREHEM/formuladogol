@@ -78,6 +78,14 @@ def validate(root: Path) -> None:
             assert len(video_ids) == len(set(video_ids)), f"{slug}: vídeo de melhores momentos duplicado"
             assert text.count('class="analysis-cup-video-card analysis-inline-video"') == expected_videos, f"{slug}: cards de vídeo divergentes"
             assert '<iframe' not in ''.join(re.findall(r'<div class="analysis-cup-legs">.*?</div>\s*</article>', text, flags=re.S)), f"{slug}: iframe carregado antes do clique; lazy-load quebrado"
+        elif article_type == "acuracia_temporada":
+            temporada = int(article.get("temporada") or 2026)
+            assert f'data-fdg-acuracia-temporada="{temporada}"' in text, f"{slug}: marcador do balanço de acurácia ausente"
+            assert "AF-Previsão" in text, f"{slug}: balanço sem referência ao AF-Previsão"
+            assert "faixa" in text.lower() and "80%" in text, f"{slug}: balanço sem destaque para a faixa central de 80%"
+            assert "segunda metade" in text.lower(), f"{slug}: escopo histórico de 2026 não declarado"
+            proibidos = ("maiores erros", "piores previsões", "placar exato")
+            assert not any(item in text.lower() for item in proibidos), f"{slug}: conteúdo negativo/fora do escopo no balanço público"
         else:
             raise AssertionError(f"{slug}: tipo editorial desconhecido: {article_type}")
 

@@ -377,8 +377,44 @@
     }
   }
 
+  function ensureAccuracyLink(nav) {
+    if (!nav) return;
+    var tagged = nav.querySelector('[data-br-acuracia]');
+    if (tagged) return;
+    var analyses = null;
+    var links = nav.querySelectorAll('a');
+    for (var i = 0; i < links.length; i += 1) {
+      var href = String(links[i].getAttribute('href') || '').toLowerCase();
+      var text = String(links[i].textContent || '').toLowerCase();
+      if (href.indexOf('acuracia') >= 0 || text.indexOf('acurácia') >= 0 || text.indexOf('acuracia') >= 0) {
+        links[i].setAttribute('data-br-acuracia', '1');
+        if (basename() === 'acuracia.html') {
+          links[i].classList.add('active');
+          links[i].setAttribute('aria-current', 'page');
+        }
+        return;
+      }
+      if (!analyses && (href.indexOf('analises') >= 0 || text.indexOf('análises') >= 0 || text.indexOf('analises') >= 0)) {
+        analyses = links[i];
+      }
+    }
+    if (!analyses) return;
+    var accuracy = document.createElement('a');
+    var path = String(global.location.pathname || '');
+    var inSubdir = /\/(analises|jogos|tabela|resultados)\//.test(path) || /\/analises\/?$/.test(path);
+    accuracy.href = inSubdir ? '../acuracia.html' : 'acuracia.html';
+    accuracy.textContent = '🎯 Acurácia';
+    accuracy.setAttribute('data-br-acuracia', '1');
+    if (basename() === 'acuracia.html') {
+      accuracy.classList.add('active');
+      accuracy.setAttribute('aria-current', 'page');
+    }
+    analyses.insertAdjacentElement('afterend', accuracy);
+  }
+
   function applyMenu(nav) {
     if (!nav) return;
+    ensureAccuracyLink(nav);
     normalizeMenuLinks(nav);
     Array.prototype.forEach.call(nav.querySelectorAll("[data-br-private]"), function (item) {
       var visible = PRIVATE_MODULES_ENABLED && authState.authenticated;
@@ -558,7 +594,10 @@
   }
 
   function wireAllMenus() {
-    Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), wireNav);
+    Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), function (nav) {
+      ensureAccuracyLink(nav);
+      wireNav(nav);
+    });
   }
 
   global.BR_AUTH = {

@@ -1,15 +1,16 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "projeto": "AF-Previsão",
-  "descricao": "Histórico público e encadeado das probabilidades; um snapshot global por novo resultado concluído e uma referência individual por partida concluída de cada clube.",
+  "descricao": "Histórico público e encadeado das probabilidades; um snapshot global por mudança esportiva que altere a previsão publicada, incluindo Brasileirão e competições continentais.",
   "criterio_snapshot": {
-    "global": "novo resultado final do Brasileirão ou correção de placar final",
-    "por_clube": "a linha do clube muda somente quando o próprio clube conclui uma partida",
+    "global": "novo estado esportivo publicado: Brasileirão, Copa do Brasil, Libertadores ou Sul-Americana",
+    "por_clube": "hash_previsao_clube identifica cada estado público materialmente distinto do clube",
+    "identidade_global": "hash_estado_esportivo combina Brasileirão, competições continentais e versão do modelo",
+    "hash_entrada": "pode repetir quando somente o estado continental muda; não é mais a chave de deduplicação global",
     "nao_gera_snapshot": [
-      "nova execução sem resultado novo",
+      "nova execução sem mudança esportiva",
       "timestamp ou cache atualizado",
-      "mudança apenas em dados continentais",
-      "oscilação Monte Carlo sem novo resultado"
+      "oscilação Monte Carlo sem mudança de entrada esportiva"
     ]
   },
   "estado_publicado": {

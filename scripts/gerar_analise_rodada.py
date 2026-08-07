@@ -33,6 +33,7 @@ TEMPORADA = 2026
 TOTAL_JOGOS_RODADA = 10
 ARQUIVO_MANIFESTO = Path("dados-br/analises.json")
 ARQUIVO_CONFIG = Path("dados-br/config-analises.json")
+ARQUIVO_ACURACIA = Path("dados-br/acuracia-af-previsao.json")
 CAMINHO_ANALISES = Path("analises")
 MODELO_PADRAO = "gpt-5.6-terra"
 MARCADOR = "fdg-analise-rodada"
@@ -730,6 +731,7 @@ def menu(prefixo: str, ativo: bool = False) -> str:
         ("📊", "Tabela", f"{prefixo}tabela"),
         ("✅", "Resultados", f"{prefixo}resultados"),
         ("📰", "Análises", f"{prefixo}analises/"),
+        ("🎯", "Acurácia", f"{prefixo}acuracia.html"),
         ("🛡️", "Clubes", f"{prefixo}clubes.html"),
         ("🏛️", "Museu", f"{prefixo}museu.html"),
         ("🌎", "Copa 2026", f"{prefixo}copa2026/"),
@@ -737,7 +739,8 @@ def menu(prefixo: str, ativo: bool = False) -> str:
     links = []
     for icone, rotulo, href in itens:
         classe = ' class="active" aria-current="page"' if ativo and rotulo == "Análises" else ""
-        links.append(f'      <a href="{href}"{classe}>{icone} {rotulo}</a>')
+        marcador = ' data-br-acuracia="1"' if rotulo == "Acurácia" else ""
+        links.append(f'      <a href="{href}"{classe}{marcador}>{icone} {rotulo}</a>')
     return '<nav class="nav" data-br-auth-menu aria-label="Menu principal">\n' + "\n".join(links) + "\n    </nav>"
 
 def submenu_rodadas(
@@ -882,7 +885,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260807-copa-highlights-inline-v1">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260807-acuracia-box-v1">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');gtag('config','AW-18273186827');gtag('event','ads_conversion_PAGE_VIEW_1',{{}});</script>
   <script type="application/ld+json">{json_ld}</script>
@@ -926,6 +929,58 @@ def cards_variacoes(dossie: dict[str, Any]) -> str:
     return '<div class="analysis-kpis">' + "".join(f'<article><span>{esc(rotulo)}</span><strong>{esc(clube)}</strong><b>{esc(valor)}</b></article>' for rotulo, clube, valor in itens) + "</div>"
 
 
+def box_acuracia_rodada(rodada: int, dados: dict[str, Any] | None = None) -> str:
+    """Retorna um box editorial apenas quando há um destaque agregado positivo.
+
+    A página pública de Acurácia continua com a avaliação matemática completa;
+    o editorial da rodada usa apenas sinais positivos suficientemente robustos,
+    sem listar partidas individuais nem criar uma seção de erros.
+    """
+    if dados is None:
+        try:
+            dados = carregar_json(ARQUIVO_ACURACIA)
+        except ErroAnalise:
+            return ""
+    jogos = dados.get("jogos") or {}
+    alvo = next(
+        (item for item in (jogos.get("por_rodada") or []) if int(item.get("rodada") or 0) == int(rodada)),
+        None,
+    )
+    if not alvo:
+        return ""
+
+    destaques: list[str] = []
+    amostra = int(alvo.get("maior_probabilidade_avaliada") or 0)
+    taxa = alvo.get("taxa_confirmacao_pct")
+    if amostra >= 5 and taxa is not None and float(taxa) >= 60.0:
+        destaques.append(
+            f'<strong>{esc(_numero_pt_br(_arredondar(float(taxa), 1), 1))}%</strong> '
+            'das tendências de maior probabilidade da rodada se confirmaram.'
+        )
+
+    fortes = int(alvo.get("previsoes_fortes_60_total") or 0)
+    taxa_fortes = alvo.get("taxa_fortes_60_pct")
+    if fortes >= 2 and taxa_fortes is not None and float(taxa_fortes) >= 80.0:
+        if abs(float(taxa_fortes) - 100.0) <= 1e-9:
+            destaques.append(
+                f'Todas as <strong>{fortes}</strong> previsões com confiança de 60% ou mais foram confirmadas.'
+            )
+        else:
+            destaques.append(
+                f'<strong>{esc(_numero_pt_br(_arredondar(float(taxa_fortes), 1), 1))}%</strong> '
+                'das previsões com confiança de 60% ou mais foram confirmadas.'
+            )
+
+    if not destaques:
+        return ""
+    return (
+        '<aside class="analysis-accuracy-box" aria-label="AF em prova">'
+        '<div><span>🎯 AF EM PROVA</span><p>' + ' '.join(destaques) + '</p></div>'
+        '<a href="../acuracia.html">Ver acurácia do AF-Previsão →</a>'
+        '</aside>'
+    )
+
+
 def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: str, modificado: str, historico: list[dict[str, Any]]) -> tuple[str, dict[str, Any]]:
     rodada = dossie["rodada"]
     identificador = f"brasileirao-{TEMPORADA}-rodada-{rodada}"
@@ -961,6 +1016,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
         </header>
         {nota_pendente}
         {cards_variacoes(dossie)}
+        {box_acuracia_rodada(rodada)}
         <section class="analysis-copy"><h2>O retrato da rodada</h2><div class="analysis-copy-sections">{secoes_editoriais}</div></section>
         <section><h2>Resultados considerados</h2><div class="analysis-results">{resultados}</div></section>
         <section><h2>Como as probabilidades mudaram</h2><p class="analysis-help">Comparação entre o último snapshot anterior e o fechamento editorial da rodada. No celular, arraste a tabela para o lado.</p><p class="analysis-percent-legend"><strong>Padrão dos percentuais:</strong> <b>0%</b> aparece somente quando o título já é matematicamente impossível; <b>&lt;0,001%</b> preserva uma possibilidade ainda existente, mas abaixo da resolução exibida — inclusive quando ela não ocorreu nas 2 milhões de simulações. Nas variações, <b>↑/↓ &lt;0,001 p.p.</b> identifica movimentos residuais sem criar zeros falsos.</p>{tabela_comparativa(dossie)}</section>
@@ -1205,7 +1261,7 @@ def self_test() -> int:
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina and 'data-fdg-editorial-id="brasileirao-2026-rodada-20"' in pagina
     assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in pagina
     assert "header-formula-do-gol.png" not in pagina
-    assert "br-analises.css?v=20260807-copa-highlights-inline-v1" in pagina
+    assert "br-analises.css?v=20260807-acuracia-box-v1" in pagina
     assert "br-analises.js?v=20260805-editorial-continental-v1" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
     assert "0,007%</td><td>0,006%</td><td class=\"delta delta-down\">-0,001 p.p.</td>" in pagina
@@ -1215,6 +1271,18 @@ def self_test() -> int:
     )
     assert "99,96%" not in pagina and "&gt;99,9%" in pagina
     assert "Padrão dos percentuais" in pagina and "analysis-round-nav" in pagina
+    assert '<a href="../analises/" class="active" aria-current="page">📰 Análises</a>' in pagina
+    assert pagina.index('📰 Análises') < pagina.index('🎯 Acurácia') < pagina.index('🛡️ Clubes')
+    positivo = box_acuracia_rodada(20, {"jogos": {"por_rodada": [{
+        "rodada": 20, "maior_probabilidade_avaliada": 10, "taxa_confirmacao_pct": 70.0,
+        "previsoes_fortes_60_total": 3, "taxa_fortes_60_pct": 100.0,
+    }]}})
+    assert '70,0%' in positivo and 'Todas as <strong>3</strong>' in positivo and 'maiores erros' not in positivo.casefold()
+    neutro = box_acuracia_rodada(20, {"jogos": {"por_rodada": [{
+        "rodada": 20, "maior_probabilidade_avaliada": 10, "taxa_confirmacao_pct": 40.0,
+        "previsoes_fortes_60_total": 2, "taxa_fortes_60_pct": 50.0,
+    }]}})
+    assert neutro == ""
     assert pagina.count('class="analysis-copy-section"') == 4
     assert "O líder caiu; o perseguidor hesitou" in pagina
     assert "A análise editorial utiliza somente um dossiê factual auditado" in pagina

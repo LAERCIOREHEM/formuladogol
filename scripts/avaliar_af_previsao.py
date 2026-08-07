@@ -122,7 +122,7 @@ def audit_history(history: Mapping[str, Any], require_chain: bool = False) -> di
         input_hash = str(snapshot.get("hash_entrada") or "")
         if not input_hash:
             errors.append(f"{prefix}: hash_entrada ausente")
-        elif input_hash in seen_inputs:
+        elif int(history.get("schema_version") or 0) < 5 and input_hash in seen_inputs:
             errors.append(f"{prefix}: hash_entrada duplicado")
         else:
             seen_inputs.add(input_hash)

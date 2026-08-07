@@ -33,6 +33,7 @@ import math
 import os
 import sys
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -1428,17 +1429,42 @@ def _completed_match_payload(match: Match) -> dict[str, Any]:
 
 
 def completed_results_state_hash(current_matches: Sequence[Match]) -> str:
-    """Hash exclusivamente dos resultados concluídos do Brasileirão.
-
-    O histórico não pode ganhar nova linha por timestamp, cache continental,
-    mudança de schema ou nova execução Monte Carlo. Só um resultado final novo
-    ou corrigido altera este estado.
-    """
+    """Hash estável dos resultados concluídos do Brasileirão."""
     rows = [
         _completed_match_payload(match)
         for match in sorted(current_matches, key=lambda item: (item.played_on, item.source_id))
     ]
     return canonical_hash_payload({"schema": 1, "resultados_concluidos": rows})
+
+
+def history_prediction_state_hash(
+    current_matches: Sequence[Match],
+    model_version: str,
+) -> tuple[str, dict[str, Any]]:
+    """Identidade esportiva da previsão pública usada pelo histórico.
+
+    Desde agosto/2026 o histórico precisa registrar também mudanças factuais das
+    três copas que alteram as vagas continentais. O estado combina apenas entradas
+    esportivas estáveis: resultados concluídos do Brasileirão, snapshots das copas
+    e versão declarada do modelo. Timestamp, cache e nova amostragem Monte Carlo
+    não criam um novo estado por si só.
+    """
+    br_hash = completed_results_state_hash(current_matches)
+    continental_hash = ""
+    try:
+        snapshots = load_continental_snapshots()
+        if snapshots:
+            continental_hash = continental_snapshots_state_hash(snapshots)
+    except (OSError, ValueError, KeyError, TypeError):
+        # Compatibilidade com self-tests e migração local sem snapshots completos.
+        continental_hash = "indisponivel"
+    components = {
+        "schema": 2,
+        "brasileirao_resultados": br_hash,
+        "continental": continental_hash,
+        "versao_modelo": str(model_version or ""),
+    }
+    return canonical_hash_payload(components), components
 
 
 def build_team_history_states(current_matches: Sequence[Match]) -> dict[str, dict[str, Any]]:
@@ -1575,8 +1601,13 @@ def validate_history_chain(history: dict[str, Any]) -> None:
     seen_sports_states: set[str] = set()
     for index, snapshot in enumerate(snapshots, start=1):
         input_hash = str(snapshot.get("hash_entrada") or "")
-        if not input_hash or input_hash in seen_inputs:
-            raise ValueError(f"histórico inválido no snapshot {index}: hash_entrada ausente ou duplicado")
+        if not input_hash:
+            raise ValueError(f"histórico inválido no snapshot {index}: hash_entrada ausente")
+        # No schema 5, o mesmo hash de entrada do Brasileirão pode coexistir em
+        # estados continentais diferentes. A deduplicação canônica passa a ser
+        # hash_estado_esportivo; schemas anteriores preservam a regra histórica.
+        if int(history.get("schema_version") or 0) < 5 and input_hash in seen_inputs:
+            raise ValueError(f"histórico inválido no snapshot {index}: hash_entrada duplicado")
         seen_inputs.add(input_hash)
         sports_hash = str(snapshot.get("hash_estado_esportivo") or "")
         if int(history.get("schema_version") or 0) >= 4:
@@ -1613,20 +1644,21 @@ def build_history_document(
 ) -> dict[str, Any]:
     chained = chain_history_snapshots(snapshots)
     history = {
-        "schema_version": 4,
+        "schema_version": 5,
         "projeto": "AF-Previsão",
         "descricao": (
-            "Histórico público e encadeado das probabilidades; um snapshot global por "
-            "novo resultado concluído e uma referência individual por partida concluída de cada clube."
+            "Histórico público e encadeado das probabilidades; um snapshot global por mudança "
+            "esportiva que altere a previsão publicada, incluindo Brasileirão e competições continentais."
         ),
         "criterio_snapshot": {
-            "global": "novo resultado final do Brasileirão ou correção de placar final",
-            "por_clube": "a linha do clube muda somente quando o próprio clube conclui uma partida",
+            "global": "novo estado esportivo publicado: Brasileirão, Copa do Brasil, Libertadores ou Sul-Americana",
+            "por_clube": "hash_previsao_clube identifica cada estado público materialmente distinto do clube",
+            "identidade_global": "hash_estado_esportivo combina Brasileirão, competições continentais e versão do modelo",
+            "hash_entrada": "pode repetir quando somente o estado continental muda; não é mais a chave de deduplicação global",
             "nao_gera_snapshot": [
-                "nova execução sem resultado novo",
+                "nova execução sem mudança esportiva",
                 "timestamp ou cache atualizado",
-                "mudança apenas em dados continentais",
-                "oscilação Monte Carlo sem novo resultado",
+                "oscilação Monte Carlo sem mudança de entrada esportiva",
             ],
         },
         "estado_publicado": dict(published_state or {}),
@@ -1652,8 +1684,7 @@ def _history_club_rows(
     rows: list[dict[str, Any]] = []
     for item in teams:
         club_state = team_states.get(item["clube"], {})
-        rows.append(
-            {
+        row = {
                 "clube": item["clube"],
                 "posicao_atual": item.get("posicao_atual"),
                 "pontos_atuais": item.get("pontos_atuais"),
@@ -1700,8 +1731,45 @@ def _history_club_rows(
                     "media_estimada", item["pontos_projetados"].get("media")
                 ),
             }
-        )
+        # Identidade da previsão individual: muda quando qualquer valor público
+        # relevante do clube muda, inclusive por uma classificação continental.
+        row["hash_previsao_clube"] = canonical_hash_payload({
+            "schema": 1,
+            "clube": row.get("clube"),
+            "jogos_atuais": row.get("jogos_atuais"),
+            "posicao_atual": row.get("posicao_atual"),
+            "pontos_atuais": row.get("pontos_atuais"),
+            "posicao_projetada": row.get("posicao_projetada"),
+            "faixa_posicao_80": row.get("faixa_posicao_80"),
+            "pontos_projetados": row.get("pontos_projetados"),
+            "pontos_percentis": row.get("pontos_percentis"),
+            "campeao_pct": row.get("campeao_pct"),
+            "libertadores_pct": row.get("libertadores_pct"),
+            "sul_americana_pct": row.get("sul_americana_pct"),
+        })
+        rows.append(row)
     return rows
+
+
+def _history_public_rows_signature(rows: Sequence[Mapping[str, Any]]) -> str:
+    """Assinatura apenas do que é material para a timeline pública do clube."""
+    normalized = []
+    for row in rows:
+        normalized.append({
+            "clube": row.get("clube"),
+            "jogos_atuais": row.get("jogos_atuais"),
+            "posicao_atual": row.get("posicao_atual"),
+            "pontos_atuais": row.get("pontos_atuais"),
+            "posicao_projetada": row.get("posicao_classificacao_projetada", row.get("posicao_projetada")),
+            "faixa_posicao_80": row.get("faixa_posicao_80"),
+            "pontos_projetados": row.get("pontos_projetados", row.get("pontos_medios")),
+            "pontos_percentis": row.get("pontos_percentis"),
+            "campeao_pct": row.get("campeao_pct"),
+            "libertadores_pct": row.get("libertadores_pct", row.get("libertadores_base_pct")),
+            "sul_americana_pct": row.get("sul_americana_pct", row.get("sul_americana_base_pct")),
+        })
+    normalized.sort(key=lambda item: str(item.get("clube") or ""))
+    return canonical_hash_payload({"schema": 1, "clubes": normalized})
 
 
 def update_history(
@@ -1721,22 +1789,34 @@ def update_history(
         validate_history_chain(existing)
 
     current_matches = list(current_matches or [])
-    sports_state_hash = (
-        completed_results_state_hash(current_matches) if current_matches else input_hash
-    )
+    if current_matches:
+        sports_state_hash, state_components = history_prediction_state_hash(current_matches, model_version)
+    else:
+        sports_state_hash = input_hash
+        state_components = {"schema": "self-test", "hash_entrada": input_hash, "versao_modelo": model_version}
     team_states = build_team_history_states(current_matches) if current_matches else {}
     snapshots = compact_history_snapshots(
         list((existing or {}).get("snapshots") or []), current_matches
     )
-    # Ao migrar o último snapshot legado, o próprio hash_entrada confirma que
-    # ele representa exatamente a publicação corrente. Troque apenas a chave
-    # derivada do legado pela chave exata dos resultados, sem criar nova linha.
+    current_rows = _history_club_rows(teams, team_states)
+    current_public_signature = _history_public_rows_signature(current_rows)
+    previous_public_signature = (
+        _history_public_rows_signature(list(snapshots[-1].get("clubes") or []))
+        if snapshots else None
+    )
+
+    # Migração sem linha artificial: se apenas a definição da chave global mudou
+    # e a previsão pública é materialmente idêntica, atualiza a identidade do
+    # último snapshot e reencadeia os hashes. Se os percentuais/faixas mudaram
+    # (ex.: classificação na Copa do Brasil), preserva ambos os estados.
     if (
         snapshots
-        and snapshots[-1].get("hash_entrada") == input_hash
         and snapshots[-1].get("hash_estado_esportivo") != sports_state_hash
+        and previous_public_signature == current_public_signature
     ):
         snapshots[-1]["hash_estado_esportivo"] = sports_state_hash
+        snapshots[-1]["estado_componentes"] = state_components
+        snapshots[-1]["motivo_registro"] = snapshots[-1].get("motivo_registro") or "migracao_identidade_esportiva_sem_mudanca_publica"
 
     if not snapshots or snapshots[-1].get("hash_estado_esportivo") != sports_state_hash:
         snapshots.append(
@@ -1745,11 +1825,12 @@ def update_history(
                 "rodada_referencia": int(round_reference),
                 "hash_entrada": input_hash,
                 "hash_estado_esportivo": sports_state_hash,
-                "motivo_registro": "novo_resultado_concluido",
+                "estado_componentes": state_components,
+                "motivo_registro": "mudanca_estado_esportivo_publicavel",
                 "versao_modelo": model_version,
                 "metodologia": "AF-Previsão Integrada com tendência controlada",
                 "simulacoes": int(simulations),
-                "clubes": _history_club_rows(teams, team_states),
+                "clubes": current_rows,
             }
         )
 
@@ -1758,6 +1839,7 @@ def update_history(
         "gerado_em": generated_at,
         "hash_entrada": input_hash,
         "hash_estado_esportivo": sports_state_hash,
+        "estado_componentes": state_components,
         "versao_modelo": model_version,
         "simulacoes": int(simulations),
     }
@@ -2713,8 +2795,11 @@ def self_test() -> None:
         season=2026, source_id=9002, round_no=4, played_on=date(2026, 7, 21),
         home=teams[0], away=teams[2], home_goals=2, away_goals=2,
     )
+    result_after_delayed = deepcopy(result_a["clubes"])
+    result_after_delayed[0]["jogos_atuais"] = int(result_after_delayed[0].get("jogos_atuais") or 0) + 1
+    result_after_delayed[0]["pontos_atuais"] = int(result_after_delayed[0].get("pontos_atuais") or 0) + 1
     delayed_history = update_history(
-        same_results_new_execution, "2026-07-21T23:00:00-03:00", "entrada-r4", result_a["clubes"],
+        same_results_new_execution, "2026-07-21T23:00:00-03:00", "entrada-r4", result_after_delayed,
         "AF-Previsão teste", round_reference=18, simulations=10_000,
         current_matches=[completed_r18, completed_delayed_r4], max_snapshots=10,
     )

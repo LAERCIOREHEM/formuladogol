@@ -29,3 +29,42 @@ body{margin:0;padding:16px;background:radial-gradient(circle at 8% 4%,rgba(119,1
 /* Copa do Brasil — melhores momentos sob cada jogo (lazy-load, 07/08/2026). */
 .analysis-cup-video-card{display:grid;grid-template-columns:112px minmax(0,1fr);align-items:center;gap:10px;width:100%;margin-top:10px;padding:0;border:1px solid rgba(246,201,72,.28);border-radius:10px;overflow:hidden;background:rgba(246,201,72,.055);color:var(--an-text);font:inherit;text-align:left;cursor:pointer;transition:border-color .16s ease,transform .16s ease,background .16s ease}.analysis-cup-video-card:hover,.analysis-cup-video-card:focus-visible{border-color:rgba(246,201,72,.72);background:rgba(246,201,72,.09);transform:translateY(-1px);outline:none}.analysis-cup-video-thumb{position:relative;display:block;aspect-ratio:16/9;background:#02080c;overflow:hidden}.analysis-cup-video-thumb img{display:block;width:100%;height:100%;object-fit:cover}.analysis-cup-video-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.08),rgba(0,0,0,.32))}.analysis-cup-video-thumb i{position:absolute;z-index:1;left:50%;top:50%;display:grid;place-items:center;width:34px;height:34px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(200,255,83,.94);box-shadow:0 8px 22px rgba(0,0,0,.4);color:#112000;font-size:14px;font-style:normal}.analysis-cup-video-copy{display:grid;gap:2px;min-width:0;padding:7px 9px 7px 0}.analysis-cup-video-copy b{color:#ffe785;font-size:11px;line-height:1.25}.analysis-cup-video-copy small{overflow:hidden;color:var(--an-muted);font-size:9px;line-height:1.25;text-overflow:ellipsis;white-space:nowrap}.analysis-cup-video-inline{margin-top:10px;overflow:hidden;border:1px solid rgba(246,201,72,.28);border-radius:10px;background:#030b10}.analysis-cup-video-inline-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 8px 7px 10px;color:#ffe785;font-size:10px;font-weight:900}.analysis-cup-video-inline-close{display:grid;place-items:center;width:27px;height:27px;border:1px solid rgba(255,255,255,.15);border-radius:50%;background:rgba(255,255,255,.06);color:#fff;font:900 17px/1 system-ui,sans-serif;cursor:pointer}.analysis-cup-video-inline-close:hover,.analysis-cup-video-inline-close:focus-visible{border-color:rgba(248,113,113,.55);background:rgba(248,113,113,.16);outline:none}.analysis-cup-video-inline-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000}.analysis-cup-video-inline-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.analysis-cup-video-inline-source{display:block;padding:7px 9px;color:var(--an-muted);font-size:8px}
 @media(max-width:620px){.analysis-cup-video-card{grid-template-columns:104px minmax(0,1fr)}.analysis-cup-video-copy b{font-size:10px}.analysis-cup-video-thumb i{width:32px;height:32px}.analysis-cup-video-inline-head{font-size:9px}}
+
+/* AF em prova — box editorial compacto. Só é renderizado quando há destaque
+   agregado positivo suficiente na rodada; não lista jogos nem erros. */
+.analysis-accuracy-box{
+  margin:16px 0 22px;
+  padding:14px 16px;
+  border:1px solid rgba(16,185,129,.24);
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(15,23,42,.22));
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.analysis-accuracy-box div>span{
+  display:block;
+  margin-bottom:5px;
+  color:#34d399;
+  font-size:.74rem;
+  font-weight:900;
+  letter-spacing:.09em;
+}
+.analysis-accuracy-box p{
+  margin:0;
+  color:var(--text,#e5e7eb);
+  line-height:1.45;
+}
+.analysis-accuracy-box a{
+  flex:0 0 auto;
+  color:#34d399;
+  font-weight:800;
+  text-decoration:none;
+  white-space:nowrap;
+}
+.analysis-accuracy-box a:hover{text-decoration:underline}
+@media(max-width:720px){
+  .analysis-accuracy-box{align-items:flex-start;flex-direction:column;gap:9px;padding:13px 14px}
+  .analysis-accuracy-box a{white-space:normal}
+}
