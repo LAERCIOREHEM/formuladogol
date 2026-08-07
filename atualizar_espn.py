@@ -1702,6 +1702,64 @@ def gerar_jogos_resultados_eventos(eventos_brutos: list[dict[str, Any]],
     return jogos_json, resultados_json, eventos_json
 
 
+def _delta_resultados_manuais() -> dict[str, dict[str, int]]:
+    """Efeito, na classificação, dos resultados manuais ativos.
+
+    PROBLEMA QUE ISTO RESOLVE
+    ------------------------
+    `aplicar_resultados_manuais` injeta partidas no lado dos RESULTADOS, mas
+    nada equivalente acontecia no lado do STANDINGS. Quando a ESPN não conta
+    essas partidas na classificação — exatamente o motivo pelo qual o override
+    existe —, a reconstrução passa a ter mais jogos que o standings e a
+    auditoria NUNCA fecha. Não é uma dessincronia temporária de minutos: é um
+    impasse permanente, que congela o site até alguém editar o override na mão.
+
+    Este delta permite comparar as duas leituras possíveis do mesmo estado.
+    """
+    delta: dict[str, dict[str, int]] = {}
+
+    def acumular(clube: str, campo: str, valor: int) -> None:
+        if not clube:
+            return
+        delta.setdefault(clube, {}).setdefault(campo, 0)
+        delta[clube][campo] += valor
+
+    for ajuste in carregar_resultados_manuais():
+        if ajuste.get("ativo") is False:
+            continue
+        mandante = para_canonico(ajuste.get("mandante"))
+        visitante = para_canonico(ajuste.get("visitante"))
+        if not mandante or not visitante or mandante == visitante:
+            continue
+        try:
+            gols_mandante = int(ajuste.get("placar_mandante"))
+            gols_visitante = int(ajuste.get("placar_visitante"))
+        except (TypeError, ValueError):
+            continue
+
+        acumular(mandante, "jogos", 1)
+        acumular(visitante, "jogos", 1)
+        acumular(mandante, "gp", gols_mandante)
+        acumular(mandante, "gc", gols_visitante)
+        acumular(visitante, "gp", gols_visitante)
+        acumular(visitante, "gc", gols_mandante)
+        if gols_mandante > gols_visitante:
+            acumular(mandante, "pontos", 3)
+            acumular(mandante, "vitorias", 1)
+            acumular(visitante, "derrotas", 1)
+        elif gols_mandante < gols_visitante:
+            acumular(visitante, "pontos", 3)
+            acumular(visitante, "vitorias", 1)
+            acumular(mandante, "derrotas", 1)
+        else:
+            acumular(mandante, "pontos", 1)
+            acumular(visitante, "pontos", 1)
+            acumular(mandante, "empates", 1)
+            acumular(visitante, "empates", 1)
+
+    return delta
+
+
 def diagnosticar_sincronia_tabela_resultados(
     tabela_payload: dict[str, Any], resultados_payload: dict[str, Any]
 ) -> list[dict[str, Any]]:
@@ -1785,20 +1843,57 @@ def diagnosticar_sincronia_tabela_resultados(
             casa["empates"] += 1
             fora["empates"] += 1
 
-    discrepancias = list(anomalias)
-    for clube in CANONICOS:
-        oficial = oficiais[clube]
-        for campo in ("jogos", "pontos", "vitorias", "empates", "derrotas", "gp", "gc"):
-            reconstruido = int(acumulado[clube][campo])
-            valor_oficial = int(oficial.get(campo) or 0)
-            if reconstruido != valor_oficial:
-                discrepancias.append({
-                    "clube": clube,
-                    "campo": campo,
-                    "reconstruido": reconstruido,
-                    "oficial": valor_oficial,
-                })
-    return discrepancias
+    # Duas leituras legítimas do MESMO estado esportivo:
+    #
+    #   sem_delta  -> a ESPN já contabiliza no standings as partidas cobertas por
+    #                 resultado manual (caso normal, depois que ela regulariza);
+    #   com_delta  -> a ESPN ainda NÃO as contabiliza, e o override existe
+    #                 justamente por isso.
+    #
+    # O snapshot é aceito quando QUALQUER uma das duas fecha integralmente. Isso
+    # não afrouxa a trava: continua sendo exigida consistência total: nenhuma
+    # divergência parcial é tolerada em nenhuma das leituras. O que deixa de
+    # existir é o impasse permanente em que o override tornava a auditoria
+    # matematicamente impossível de fechar.
+    #
+    # Também é auto-corretivo: no dia em que a ESPN regularizar a classificação,
+    # a leitura sem_delta passa a fechar sozinha, sem nenhuma edição manual.
+    delta = _delta_resultados_manuais()
+
+    def comparar(usar_delta: bool) -> list[dict[str, Any]]:
+        achados: list[dict[str, Any]] = []
+        for clube in CANONICOS:
+            oficial = oficiais[clube]
+            ajuste = delta.get(clube, {}) if usar_delta else {}
+            for campo in ("jogos", "pontos", "vitorias", "empates", "derrotas", "gp", "gc"):
+                reconstruido = int(acumulado[clube][campo])
+                valor_oficial = int(oficial.get(campo) or 0) + int(ajuste.get(campo, 0))
+                if reconstruido != valor_oficial:
+                    achados.append({
+                        "clube": clube,
+                        "campo": campo,
+                        "reconstruido": reconstruido,
+                        "oficial": valor_oficial,
+                    })
+        return achados
+
+    sem_delta = comparar(usar_delta=False)
+    if not sem_delta:
+        return list(anomalias)
+
+    if delta:
+        com_delta = comparar(usar_delta=True)
+        if not com_delta:
+            print(
+                "::notice::Classificação fechou considerando os resultados manuais ativos "
+                "ainda não contabilizados no standings da ESPN."
+            )
+            return list(anomalias)
+        # Reporta a leitura mais próxima de fechar, para o diagnóstico ser útil.
+        if len(com_delta) < len(sem_delta):
+            return list(anomalias) + com_delta
+
+    return list(anomalias) + sem_delta
 
 
 def resumir_discrepancias(discrepancias: list[dict[str, Any]], limite: int = 8) -> str:
