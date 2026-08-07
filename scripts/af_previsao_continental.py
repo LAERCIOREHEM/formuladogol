@@ -618,6 +618,66 @@ def brazilian_teams_in_events(competition: str, events: Sequence[CupEvent]) -> f
     return frozenset(names)
 
 
+def validate_competition_snapshot_structure(snapshot: Mapping[str, Any]) -> dict[str, Any]:
+    """Valida se o snapshot atual pode alimentar a simulação sem usar o modelo.
+
+    A coleta ESPN pode estar sintaticamente válida e ainda representar uma fase
+    eliminatória incompleta (por exemplo, somente parte dos confrontos futuros).
+    Essa validação é deliberadamente a mesma estrutura exigida pelo simulador,
+    mas ocorre antes do ajuste estatístico e do Monte Carlo.
+    """
+    competition, events, _meta = parse_snapshot(snapshot)
+    if not events:
+        raise ContinentalDataNotReady(f"{competition}: snapshot sem eventos")
+
+    completed = completed_champion(events)
+    if completed:
+        champion, runner = completed
+        return {
+            "status": "encerrada",
+            "fase": "Final",
+            "fase_ordem": max((event.stage_rank for event in events), default=0),
+            "chaves": 1,
+            "equipes_ativas": 1,
+            "clubes_ativos": [champion],
+            "campeao": champion,
+            "vice": runner,
+        }
+
+    rank, stage, stage_events = current_stage(events)
+    if stage_is_group(stage):
+        raise ContinentalDataNotReady(
+            f"{competition}: fase de grupos ativa; a Execução 2.5 exige mata-mata definido"
+        )
+    ties = build_ties(stage_events)
+    if not ties:
+        raise ContinentalDataNotReady(f"{competition}: nenhuma chave da fase atual foi identificada")
+    final_stage = stage_is_final(stage, rank)
+    if final_stage and len(ties) != 1:
+        raise ContinentalDataNotReady(f"{competition}: final precisa conter exatamente um confronto")
+    if not final_stage and rank >= 600:
+        incomplete_ties = [tie.key for tie in ties if len(tie.events) != 2]
+        if incomplete_ties:
+            raise ContinentalDataNotReady(
+                f"{competition}: fase eliminatória com confrontos sem ida e volta: {incomplete_ties[:3]}"
+            )
+    participants = sorted({tie.team_a for tie in ties} | {tie.team_b for tie in ties}, key=normalize_text)
+    if len(participants) != 2 * len(ties) or not is_power_of_two(len(participants)):
+        raise ContinentalDataNotReady(
+            f"{competition}: fase atual inconsistente ({len(participants)} equipes, {len(ties)} chaves)"
+        )
+    active_teams = structurally_active_teams(ties)
+    return {
+        "status": "pronto",
+        "fase": stage,
+        "fase_ordem": rank,
+        "chaves": len(ties),
+        "equipes_ativas": len(active_teams),
+        "clubes_ativos": list(active_teams),
+        "eventos_fase": len(stage_events),
+    }
+
+
 def simulate_competition(
     snapshot: Mapping[str, Any],
     league_model: Mapping[str, Any],

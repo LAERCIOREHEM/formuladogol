@@ -45,6 +45,17 @@ except Exception:  # pragma: no cover - fallback isolado
     CANONICOS = []
     normalizar = None
 
+try:
+    from scripts.af_previsao_continental import (
+        ContinentalDataNotReady,
+        validate_competition_snapshot_structure,
+    )
+except ModuleNotFoundError:  # execução direta: python scripts/arquivo.py
+    from af_previsao_continental import (
+        ContinentalDataNotReady,
+        validate_competition_snapshot_structure,
+    )
+
 BRT = ZoneInfo("America/Sao_Paulo")
 SEASON = int(os.environ.get("AF_PREVISAO_TEMPORADA", "2026"))
 DATA_DIR = ROOT / "dados-br" / "competicoes-af-previsao"
@@ -891,6 +902,53 @@ def migrate_legacy_snapshot(snapshot: dict[str, Any], spec: CompetitionSpec) -> 
     return migrated
 
 
+def preserved_snapshot_safe_for_af(
+    snapshot: dict[str, Any] | None,
+    *,
+    live_window_hours: int,
+    max_snapshot_age_hours: int = 24,
+) -> tuple[bool, list[str]]:
+    """Aceita fallback factual somente fora de janela de jogo e por tempo limitado."""
+    reasons: list[str] = []
+    if not snapshot or snapshot.get("status") != "ok":
+        return False, ["snapshot anterior ausente ou inválido"]
+    try:
+        validate_competition_snapshot_structure(snapshot)
+    except ContinentalDataNotReady as exc:
+        return False, [f"snapshot anterior não simulável: {exc}"]
+
+    generated = parse_datetime(snapshot.get("gerado_em"))
+    now = now_brt()
+    if not generated:
+        reasons.append("snapshot anterior sem horário válido")
+    else:
+        age = now - generated
+        if age > timedelta(hours=max_snapshot_age_hours):
+            reasons.append(
+                f"snapshot anterior tem {age.total_seconds() / 3600:.1f}h; limite={max_snapshot_age_hours}h"
+            )
+
+    before = timedelta(hours=2)
+    after = timedelta(hours=max(4, live_window_hours))
+    for event in snapshot.get("eventos") or []:
+        if event.get("concluido"):
+            continue
+        event_time = parse_datetime(event.get("data_iso"))
+        if not event_time:
+            continue
+        if event_time - before <= now <= event_time + after:
+            reasons.append(
+                f"há jogo em janela crítica sem confirmação: {event.get('event_id')}"
+            )
+            break
+        if event_time < now - after:
+            reasons.append(
+                f"há jogo vencido sem resultado confirmado: {event.get('event_id')}"
+            )
+            break
+    return not reasons, reasons
+
+
 def run_update(
     force: bool,
     strict: bool,
@@ -908,6 +966,7 @@ def run_update(
     before_hash = snapshots_state_hash(before_snapshots)
     audit_rows: list[dict[str, Any]] = []
     failures: list[str] = []
+    blocking_failures: list[str] = []
     for spec in COMPETITIONS:
         path = DATA_DIR / spec.filename
         previous: dict[str, Any] | None = None
@@ -944,6 +1003,18 @@ def run_update(
                 future_days=future_days,
             )
             validate_snapshot(snapshot, spec)
+            if snapshot.get("status") == "ok":
+                try:
+                    structural = validate_competition_snapshot_structure(snapshot)
+                except ContinentalDataNotReady as exc:
+                    raise ValueError(f"snapshot não está pronto para o AF: {exc}") from exc
+                snapshot["validacao_af"] = {
+                    "status": "pronto",
+                    "fase": structural.get("fase"),
+                    "fase_ordem": structural.get("fase_ordem"),
+                    "chaves": structural.get("chaves"),
+                    "equipes_ativas": structural.get("equipes_ativas"),
+                }
             if snapshot.get("status") != "ok":
                 raise ValueError("ESPN não retornou eventos normalizáveis")
             write_json_atomic(path, snapshot)
@@ -970,20 +1041,37 @@ def run_update(
             )
             if strict or not previous_compatible:
                 raise RuntimeError(message) from exc
+            safe_preserved, safe_reasons = preserved_snapshot_safe_for_af(
+                previous, live_window_hours=live_window_hours
+            )
+            if not safe_preserved:
+                blocking_failures.append(
+                    f"{spec.key}: snapshot preservado não é seguro para o AF: "
+                    + "; ".join(safe_reasons)
+                )
             audit_rows.append(
                 {
                     "competicao": spec.key,
-                    "status": "preservado_apos_falha",
+                    "status": (
+                        "preservado_apos_falha_seguro" if safe_preserved
+                        else "preservado_apos_falha"
+                    ),
                     "arquivo": str(path.relative_to(ROOT)),
                     "gerado_em": previous.get("gerado_em"),
                     "cache_efetivo_minutos": cache_minutes,
                     "erro": message,
+                    "fallback_seguro_para_af": safe_preserved,
+                    "motivos_fallback": safe_reasons,
                 }
             )
     after_snapshots = load_existing_snapshots()
     after_hash = snapshots_state_hash(after_snapshots)
-    ready = not failures and len(after_snapshots) == len(COMPETITIONS) and all(
-        snapshot.get("status") == "ok" for snapshot in after_snapshots.values()
+    accepted_rows = {"atualizado", "cache_valido", "preservado_apos_falha_seguro"}
+    ready = (
+        not blocking_failures
+        and len(after_snapshots) == len(COMPETITIONS)
+        and all(snapshot.get("status") == "ok" for snapshot in after_snapshots.values())
+        and all(row.get("status") in accepted_rows for row in audit_rows)
     )
     audit = {
         "schema_version": 2,
@@ -999,6 +1087,9 @@ def run_update(
         "temporada": SEASON,
         "competicoes": audit_rows,
         "falhas": failures,
+        "falhas_bloqueantes": blocking_failures,
+        "fontes_totalmente_atualizadas": not failures,
+        "snapshots_prontos_para_af": ready,
         "regras_operacionais": {
             "cache_padrao_minutos": max_age_minutes,
             "cache_janela_de_jogo_minutos": live_cache_minutes,

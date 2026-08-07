@@ -1871,11 +1871,13 @@ def continental_collection_readiness(max_age_minutes: int = 30) -> dict[str, Any
         reasons.append("auditoria continental em schema anterior à coleta independente")
     if audit.get("status") != "ok" or audit.get("coleta_confiavel") is not True:
         reasons.append("uma ou mais competições continentais não foram confirmadas")
+    if audit.get("snapshots_prontos_para_af") is False:
+        reasons.append("auditoria continental marcou snapshots como impróprios para o AF")
     rows = {str(row.get("competicao") or ""): row for row in (audit.get("competicoes") or [])}
     expected = {"copa_do_brasil", "libertadores", "sul_americana"}
     if set(rows) != expected:
         reasons.append("auditoria continental não cobre exatamente as três competições")
-    accepted = {"atualizado", "cache_valido"}
+    accepted = {"atualizado", "cache_valido", "preservado_apos_falha_seguro"}
     for key in sorted(expected):
         if key in rows and rows[key].get("status") not in accepted:
             reasons.append(f"{key}: coleta não confirmada ({rows[key].get('status')})")
