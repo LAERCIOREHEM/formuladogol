@@ -9,27 +9,27 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-06T14:44:59-03:00",
+  "gerado_em": "2026-08-07T09:44:02-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "em_andamento",
+    "status": "encerrada",
     "ordem": 600,
     "nome": "Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 2
+    "eventos_pendentes": 0
   },
   "resumo": {
     "eventos": 142,
-    "finalizados": 140,
-    "pendentes": 2,
+    "finalizados": 142,
+    "pendentes": 0,
     "equipes": 126,
     "equipes_serie_a_2026": 21
   },
   "coleta": {
     "modo": "incremental",
-    "janela_inicio": "2026-07-16T00:00:00-03:00",
-    "janela_fim": "2026-12-04T23:59:59-03:00",
+    "janela_inicio": "2026-07-17T00:00:00-03:00",
+    "janela_fim": "2026-12-05T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-08-04T02:11:22-03:00"
   },
@@ -6213,9 +6213,9 @@
     {
       "event_id": "401874094",
       "data_iso": "2026-08-06T20:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qui., Agosto 6º at 7:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -6230,7 +6230,7 @@
         "serie_a_2026": true,
         "mandante": true,
         "vencedor": false,
-        "placar": 0
+        "placar": 2
       },
       "visitante": {
         "espn_id": "1936",
@@ -6240,18 +6240,18 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Internacional",
       "penaltis": false
     },
     {
       "event_id": "401874096",
       "data_iso": "2026-08-06T20:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qui., Agosto 6º at 7:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -6265,8 +6265,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 4
       },
       "visitante": {
         "espn_id": "3458",
@@ -6279,8 +6279,15 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Vitória",
       "penaltis": false
     }
-  ]
+  ],
+  "validacao_af": {
+    "status": "pronto",
+    "fase": "Oitavas de final",
+    "fase_ordem": 600,
+    "chaves": 8,
+    "equipes_ativas": 8
+  }
 }
