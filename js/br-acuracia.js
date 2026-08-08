@@ -47,10 +47,7 @@
   }
 
   function renderSummary() {
-    var data = state.data;
-    var games = data.jogos || {};
-    var scope = data.escopo_publico || {};
-    el("accuracy-scope").textContent = scope.observacao || "Histórico auditável da segunda metade do Brasileirão 2026.";
+    var games = (state.data || {}).jogos || {};
     el("accuracy-games-badge").textContent = games.jogos_avaliados ? number(games.jogos_avaliados,0) + " jogos avaliados" : "Coleta iniciada";
   }
 
