@@ -5,7 +5,7 @@
     "jogos_com_transmissao": 45,
     "jogos_sem_transmissao_14d": 16,
     "jogos_criticos_sem_transmissao_72h": 1,
-    "registros_preservados": 18,
+    "registros_preservados": 20,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -18,18 +18,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
       ],
-      "duracao_ms": 16611
+      "duracao_ms": 16566
     },
     "ge_agenda": {
       "ok": true,
       "jogos_com_canal": 22,
-      "duracao_ms": 10173
+      "duracao_ms": 7053
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 6,
-      "jogos_com_canal": 18,
-      "duracao_ms": 152628
+      "jogos_com_canal": 16,
+      "duracao_ms": 99312
     },
     "espn": {
       "ok": true,
@@ -37,7 +37,7 @@
       "eventos_na_janela": 61,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 7848
+      "duracao_ms": 5679
     }
   },
   "sem_transmissao": [
@@ -46,7 +46,7 @@
       "rodada": 0,
       "jogo": "Fluminense x Independiente Rivadavia",
       "data_iso": "2026-08-11T19:00:00-03:00",
-      "faltam_horas": 70.3,
+      "faltam_horas": 70.2,
       "nivel": "critico"
     },
     {
@@ -54,7 +54,7 @@
       "rodada": 0,
       "jogo": "Bolívar x São Paulo",
       "data_iso": "2026-08-11T21:30:00-03:00",
-      "faltam_horas": 72.8,
+      "faltam_horas": 72.7,
       "nivel": "aviso"
     },
     {
@@ -62,7 +62,7 @@
       "rodada": 0,
       "jogo": "Palmeiras x Cerro Porteño",
       "data_iso": "2026-08-12T19:00:00-03:00",
-      "faltam_horas": 94.3,
+      "faltam_horas": 94.2,
       "nivel": "aviso"
     },
     {
@@ -70,7 +70,7 @@
       "rodada": 0,
       "jogo": "Mirassol x Liga de Quito",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 118.3,
+      "faltam_horas": 118.2,
       "nivel": "aviso"
     },
     {
@@ -78,7 +78,7 @@
       "rodada": 0,
       "jogo": "Santos x Macará",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 118.3,
+      "faltam_horas": 118.2,
       "nivel": "aviso"
     },
     {
@@ -86,7 +86,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Club Olimpia",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 118.3,
+      "faltam_horas": 118.2,
       "nivel": "aviso"
     },
     {
@@ -94,7 +94,7 @@
       "rodada": 0,
       "jogo": "Rosário Central x Corinthians",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "faltam_horas": 120.8,
+      "faltam_horas": 120.7,
       "nivel": "aviso"
     },
     {
@@ -102,7 +102,7 @@
       "rodada": 0,
       "jogo": "Cienciano del Cusco x Botafogo",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "faltam_horas": 120.8,
+      "faltam_horas": 120.7,
       "nivel": "aviso"
     },
     {
@@ -110,7 +110,7 @@
       "rodada": 0,
       "jogo": "Independiente Rivadavia x Fluminense",
       "data_iso": "2026-08-18T19:00:00-03:00",
-      "faltam_horas": 238.3,
+      "faltam_horas": 238.2,
       "nivel": "aviso"
     },
     {
@@ -118,7 +118,7 @@
       "rodada": 0,
       "jogo": "São Paulo x Bolívar",
       "data_iso": "2026-08-18T21:30:00-03:00",
-      "faltam_horas": 240.8,
+      "faltam_horas": 240.7,
       "nivel": "aviso"
     },
     {
@@ -126,7 +126,7 @@
       "rodada": 0,
       "jogo": "Cerro Porteño x Palmeiras",
       "data_iso": "2026-08-19T19:00:00-03:00",
-      "faltam_horas": 262.3,
+      "faltam_horas": 262.2,
       "nivel": "aviso"
     },
     {
@@ -134,7 +134,7 @@
       "rodada": 0,
       "jogo": "Liga de Quito x Mirassol",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "faltam_horas": 286.3,
+      "faltam_horas": 286.2,
       "nivel": "aviso"
     },
     {
@@ -142,7 +142,7 @@
       "rodada": 0,
       "jogo": "Club Olimpia x Vasco da Gama",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "faltam_horas": 286.3,
+      "faltam_horas": 286.2,
       "nivel": "aviso"
     },
     {
@@ -150,7 +150,7 @@
       "rodada": 0,
       "jogo": "Macará x Santos",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "faltam_horas": 286.3,
+      "faltam_horas": 286.2,
       "nivel": "aviso"
     },
     {
@@ -158,7 +158,7 @@
       "rodada": 0,
       "jogo": "Corinthians x Rosário Central",
       "data_iso": "2026-08-20T21:30:00-03:00",
-      "faltam_horas": 288.8,
+      "faltam_horas": 288.7,
       "nivel": "aviso"
     },
     {
@@ -166,7 +166,7 @@
       "rodada": 0,
       "jogo": "Botafogo x Cienciano del Cusco",
       "data_iso": "2026-08-20T21:30:00-03:00",
-      "faltam_horas": 288.8,
+      "faltam_horas": 288.7,
       "nivel": "aviso"
     }
   ],
@@ -185,6 +185,13 @@
         "Globo",
         "SporTV",
         "Premiere"
+      ]
+    },
+    {
+      "event_id": "401841192",
+      "jogo": "Fluminense x Palmeiras",
+      "canais": [
+        "Globo"
       ]
     },
     {
@@ -242,6 +249,13 @@
     {
       "event_id": "401841207",
       "jogo": "Coritiba x Corinthians",
+      "canais": [
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841216",
+      "jogo": "Atlético-MG x Vitória",
       "canais": [
         "Globo"
       ]
@@ -321,5 +335,5 @@
     "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/08/08/botafogo-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/pa/futebol/brasileirao-serie-a/noticia/2026/08/07/remo-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-08-08T20:42:04-03:00"
+  "atualizado_em": "2026-08-08T20:48:49-03:00"
 }
