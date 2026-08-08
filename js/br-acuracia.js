@@ -62,29 +62,13 @@
     var bottom = smoothLinePath(lowerReversed).replace(/^M[^QTLCSAZ]*\s?/, 'L');
     return top + " " + bottom + " Z";
   }
-  function addChartDefs(svg, suffix) {
+  function addChartDefs(svg) {
     var defs = svgNode("defs");
     var areaGradient = svgNode("linearGradient", { id: "accuracyAreaGradient", x1: "0", y1: "0", x2: "0", y2: "1" });
-    areaGradient.appendChild(svgNode("stop", { offset: "0%", "stop-color": "rgba(163,230,53,.28)" }));
-    areaGradient.appendChild(svgNode("stop", { offset: "100%", "stop-color": "rgba(163,230,53,.05)" }));
+    areaGradient.appendChild(svgNode("stop", { offset: "0%", "stop-color": "#a3e635", "stop-opacity": ".24" }));
+    areaGradient.appendChild(svgNode("stop", { offset: "100%", "stop-color": "#a3e635", "stop-opacity": ".045" }));
     defs.appendChild(areaGradient);
-    var glow = svgNode("filter", { id: "accuracyGlow-" + suffix, x: "-30%", y: "-30%", width: "160%", height: "160%" });
-    glow.appendChild(svgNode("feGaussianBlur", { stdDeviation: "3", result: "blur" }));
-    glow.appendChild(svgNode("feMerge", {}));
-    var merge = glow.lastChild;
-    merge.appendChild(svgNode("feMergeNode", { in: "blur" }));
-    merge.appendChild(svgNode("feMergeNode", { in: "SourceGraphic" }));
-    defs.appendChild(glow);
     svg.appendChild(defs);
-    return "url(#accuracyGlow-" + suffix + ")";
-  }
-  function addSeriesTag(svg, x, y, textValue) {
-    var paddingX = 8;
-    var width = Math.max(54, textValue.length * 6.2 + paddingX * 2);
-    var group = svgNode("g", { transform: "translate(" + (x - width / 2) + " " + y + ")" });
-    group.appendChild(svgNode("rect", { width: width, height: 22, rx: 11, class: "label-chip" }));
-    group.appendChild(svgNode("text", { x: width / 2, y: 14, "text-anchor": "middle", class: "series-tag" }, textValue));
-    svg.appendChild(group);
   }
   function linePath(points) {
     return points.map(function (point, index) { return (index ? "L" : "M") + point[0].toFixed(2) + " " + point[1].toFixed(2); }).join(" ");
@@ -111,6 +95,7 @@
     var width = 780, height = 330, left = 52, right = 24, top = 22, bottom = 50;
     var w = width - left - right, h = height - top - bottom;
     var svg = createSvg(width, height);
+    addChartDefs(svg);
     [0,20,40,60,80,100].forEach(function (tick) {
       var x = left + w * tick / 100;
       var y = top + h - h * tick / 100;
@@ -125,7 +110,7 @@
     var points = bins.map(function (row) {
       return [left + w * Number(row.probabilidade_media_pct) / 100, top + h - h * Number(row.frequencia_observada_pct) / 100, row];
     });
-    svg.appendChild(svgNode("path", { d:smoothLinePath(points.map(function(p){return [p[0],p[1]];})), class:"line-main", filter:addChartDefs(svg, "calibration") }));
+    svg.appendChild(svgNode("path", { d:smoothLinePath(points.map(function(p){return [p[0],p[1]];})), class:"line-main" }));
     points.forEach(function (point) {
       var circle = svgNode("circle", { cx:point[0], cy:point[1], r:5, class:"dot-main" });
       circle.appendChild(svgNode("title", {}, "Probabilidade média " + pct(point[2].probabilidade_media_pct,1) + " · ocorreu " + pct(point[2].frequencia_observada_pct,1) + " · amostra " + number(point[2].amostra,0)));
@@ -194,7 +179,7 @@
       return top+h-h*ratio;
     }
     var svg=createSvg(width,height);
-    var glowFilter = addChartDefs(svg, "timeline-" + state.metric);
+    addChartDefs(svg);
     for(var i=0;i<=4;i+=1){
       var value=yMin+(yMax-yMin)*i/4;
       var yy=y(value);
@@ -207,14 +192,30 @@
     if(rows.length<=6){for(var j=0;j<rows.length;j+=1)labelIndexes.push(j);} else {labelIndexes=[0,Math.round((rows.length-1)/3),Math.round(2*(rows.length-1)/3),rows.length-1];}
     var used={};
     labelIndexes.forEach(function(index){if(used[index])return;used[index]=1;var row=rows[index];svg.appendChild(svgNode("text",{x:x(index),y:height-bottom+20,"text-anchor":"middle"},Number(row.jogos_atuais||0)+"J"));});
-    return {svg:svg,width:width,height:height,left:left,right:right,top:top,bottom:bottom,w:w,h:h,x:x,y:y,glowFilter:glowFilter};
+    return {svg:svg,width:width,height:height,left:left,right:right,top:top,bottom:bottom,w:w,h:h,x:x,y:y};
   }
 
-  function addSeries(svg, base, rows, accessor, className, dotClass, label) {
+  function addSeries(svg, base, rows, accessor, className, dotClass, label, valueDigits, valueSuffix) {
     var points=[];
-    rows.forEach(function(row,index){var raw=accessor(row);if(raw==null||raw==="")return;var value=Number(raw);if(Number.isFinite(value))points.push([base.x(index),base.y(value),row,value]);});
-    if(points.length>1) svg.appendChild(svgNode("path",{d:smoothLinePath(points.map(function(p){return[p[0],p[1]];})),class:className,filter:base.glowFilter}));
-    points.forEach(function(p,index){svg.appendChild(svgNode("circle",{cx:p[0],cy:p[1],r:8.5,class:"point-halo"}));var c=svgNode("circle",{cx:p[0],cy:p[1],r:4.2,class:dotClass});c.appendChild(svgNode("title",{},label+": "+number(p[3],1)+" · após "+number(p[2].jogos_atuais,0)+" jogos · "+dateLabel(p[2].gerado_em)));svg.appendChild(c);if(index===points.length-1){addSeriesTag(svg,p[0],Math.max(8,p[1]-30),label);}});
+    rows.forEach(function(row,index){
+      var raw=accessor(row);
+      if(raw==null||raw==="")return;
+      var value=Number(raw);
+      if(Number.isFinite(value))points.push([base.x(index),base.y(value),row,value]);
+    });
+    if(points.length>1){
+      svg.appendChild(svgNode("path",{
+        d:smoothLinePath(points.map(function(p){return[p[0],p[1]];})),
+        class:className
+      }));
+    }
+    points.forEach(function(p){
+      svg.appendChild(svgNode("circle",{cx:p[0],cy:p[1],r:7,class:"point-halo"}));
+      var c=svgNode("circle",{cx:p[0],cy:p[1],r:3.9,class:dotClass});
+      var displayed=number(p[3], valueDigits == null ? 1 : valueDigits) + (valueSuffix || "");
+      c.appendChild(svgNode("title",{},label+": "+displayed+" · após "+number(p[2].jogos_atuais,0)+" jogos · "+dateLabel(p[2].gerado_em)));
+      svg.appendChild(c);
+    });
   }
 
   function renderPosition(rows, target) {
@@ -222,8 +223,8 @@
     var upper=[], lower=[];
     rows.forEach(function(row,index){var range=row.faixa_posicao_80||{};if(range.melhor==null||range.pior==null)return;var best=Number(range.melhor),worst=Number(range.pior);if(Number.isFinite(best)&&Number.isFinite(worst)){upper.push([base.x(index),base.y(best)]);lower.push([base.x(index),base.y(worst)]);}});
     if(upper.length>1&&lower.length===upper.length){svg.appendChild(svgNode("path",{d:areaSmoothPath(upper,lower),class:"area-80"}));}
-    addSeries(svg,base,rows,function(r){return r.posicao_projetada;},"line-main","dot-main","Posição projetada");
-    addSeries(svg,base,rows,function(r){return r.posicao_atual;},"line-secondary","dot-secondary","Posição real naquele momento");
+    addSeries(svg,base,rows,function(r){return r.posicao_projetada;},"line-main","dot-main","Posição projetada",0,"º");
+    addSeries(svg,base,rows,function(r){return r.posicao_atual;},"line-secondary","dot-secondary","Posição real naquele momento",0,"º");
     target.appendChild(svg);
     el("accuracy-timeline-legend").innerHTML='<span><i class="area"></i>faixa central de 80%</span><span><i></i>posição projetada</span><span><i class="secondary"></i>posição real no momento</span>';
   }
