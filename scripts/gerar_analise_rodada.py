@@ -726,7 +726,6 @@ def menu(prefixo: str, ativo: bool = False) -> str:
     itens = [
         ("📈", "Estatísticas", f"{prefixo}estatisticas.html"),
         ("⚽", "Jogos", f"{prefixo}jogos"),
-        ("🗓️", "Agenda", f"{prefixo}agenda.html"),
         ("🔴", "Ao vivo", f"{prefixo}aovivo.html"),
         ("📊", "Tabela", f"{prefixo}tabela"),
         ("✅", "Resultados", f"{prefixo}resultados"),
@@ -1026,7 +1025,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
     </main>
     {rodape('../')}
   </div>
-  <script src="../js/br-menu.js?v=20260724-status-dot-v2"></script>
+  <script src="../js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
   <script src="../js/br-analises.js?v=20260805-editorial-continental-v1"></script>
 </body>
 </html>'''.replace(f"{dossie['simulacoes']:,}", f"{dossie['simulacoes']:,}".replace(",", "."))
@@ -1075,7 +1074,7 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
     </main>
     {rodape('../')}
   </div>
-  <script src="../js/br-menu.js?v=20260724-status-dot-v2"></script>
+  <script src="../js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
 </body>
 </html>'''
 

@@ -756,7 +756,7 @@ def render_article(data: dict[str, Any], editorial: dict[str, Any], published: s
     </main>
     {rodape('../')}
   </div>
-  <script src="../js/br-menu.js?v=20260724-status-dot-v2"></script>
+  <script src="../js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
   <script src="../js/br-analises.js?v=20260807-copa-highlights-inline-v1"></script>
 </body>
 </html>'''

@@ -1,3 +1,4 @@
+# DEPLOY_SCHEMA: acuracia-v3-2026-08-08
 name: Deploy site (GitHub Pages)
 
 on:
@@ -29,6 +30,7 @@ on:
       - 'og-image-formula-do-gol-v2.jpg'
       - 'img/**'
       - 'css/br-global.css'
+      - 'css/br-jogos.css'
       - 'css/br-aovivo.css'
       - 'css/br-agenda.css'
       - 'css/br-estatisticas.css'
@@ -123,6 +125,7 @@ jobs:
 
           PUBLIC_CSS=(
             css/br-global.css
+            css/br-jogos.css
             css/br-aovivo.css
             css/br-agenda.css
             css/br-estatisticas.css
@@ -322,8 +325,9 @@ jobs:
           target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
 
-      - name: Gerar lastmod dos sitemaps
+      - name: Gerar lastmod dos sitemaps (Acurácia v3)
         run: |
+          echo "DEPLOY_SCHEMA=acuracia-v3-2026-08-08"
           # O lastmod é derivado dos timestamps reais dos arquivos de dados que
           # cada página consome, e não da data do deploy. Assim o sinal enviado
           # ao Google é verdadeiro: páginas de dados diários mudam de data todo
@@ -433,8 +437,9 @@ jobs:
                   if loc is None or not (loc.text or "").strip():
                       raise SystemExit(f"ERRO lastmod: <url> sem <loc> em {caminho_sitemap}")
                   url = loc.text.strip()
-                  valor = resolver(url)
                   antigo = no.find(f"{{{NS}}}lastmod")
+                  lastmod_existente = (antigo.text or "").strip() if antigo is not None else ""
+                  valor = resolver(url, lastmod_existente)
                   if antigo is not None:
                       no.remove(antigo)
                   novo = ET.Element(f"{{{NS}}}lastmod")
@@ -463,7 +468,18 @@ jobs:
               raise SystemExit("ERRO lastmod: nenhuma data válida nos dados da Copa")
           data_copa = min(max(datas_copa), agora).strftime("%Y-%m-%d")
 
-          def resolver(url):
+          # Fallback de segurança: uma página nova no sitemap nunca deve derrubar
+          # todo o Pages só porque seu mapeamento de lastmod ainda não foi cadastrado.
+          # Páginas conhecidas continuam usando suas dependências reais; para uma URL
+          # raiz .html desconhecida preservamos um lastmod válido já existente e, se
+          # ele não existir, usamos o status operacional do site como referência
+          # conservadora e emitimos warning visível no log.
+          try:
+              data_status_global = data_da_pagina(["dados-br/status-atualizacao.json"], "status global")
+          except SystemExit:
+              data_status_global = agora.strftime("%Y-%m-%d")
+
+          def resolver(url, lastmod_existente=""):
               if url in DEPS:
                   return data_da_pagina(DEPS[url], url)
               if url in STATIC_LASTMOD:
@@ -474,7 +490,21 @@ jobs:
                   return artigos_analise[url]
               if url.startswith("https://formuladogol.com.br/copa2026/"):
                   return data_copa
-              raise SystemExit(f"ERRO lastmod: URL sem mapeamento de dados: {url}")
+
+              if re.fullmatch(r"\d{4}-\d{2}-\d{2}", lastmod_existente or ""):
+                  print(f"::warning::lastmod sem mapeamento explícito para {url}; preservando {lastmod_existente}.")
+                  return lastmod_existente
+
+              if url.startswith("https://formuladogol.com.br/"):
+                  rel = url.removeprefix("https://formuladogol.com.br/").split("?", 1)[0].split("#", 1)[0]
+                  if rel and (site / rel).is_file():
+                      print(
+                          f"::warning::lastmod sem mapeamento explícito para {url}; "
+                          f"usando status global {data_status_global}."
+                      )
+                      return data_status_global
+
+              raise SystemExit(f"ERRO lastmod: URL externa ou inválida sem mapeamento: {url}")
 
           print("sitemap principal:")
           total_br = aplicar(site / "sitemap.xml", resolver)
@@ -621,7 +651,6 @@ jobs:
           root_expected_menu = [
               "Estatísticas",
               "Jogos",
-              "Agenda",
               "Ao vivo",
               "Tabela",
               "Resultados",
@@ -713,7 +742,7 @@ jobs:
           )
 
           route_titles = {
-              "jogos/index.html": "Jogos do Brasileirão 2026 — Fórmula do Gol",
+              "jogos/index.html": "Jogos dos clubes do Brasileirão 2026 — Fórmula do Gol",
               "tabela/index.html": "Tabela do Brasileirão 2026 — Fórmula do Gol",
               "resultados/index.html": "Resultados do Brasileirão 2026 — Fórmula do Gol",
           }
@@ -852,7 +881,7 @@ jobs:
           index = (site / "index.html").read_text(encoding="utf-8")
           assert "window.FDG_ANALYTICS_PAGE" in index, "index sem título explícito para o Analytics"
           assert "BR_METADADOS_VIEWS" in index, "index sem títulos por rota pública"
-          assert "Jogos do Brasileirão 2026 — Fórmula do Gol" in index, "título de Jogos ausente"
+          assert "Jogos dos clubes do Brasileirão 2026 — Fórmula do Gol" in index, "título de Jogos unificados ausente"
           assert "Tabela do Brasileirão 2026 — Fórmula do Gol" in index, "título de Tabela ausente"
           assert "Resultados do Brasileirão 2026 — Fórmula do Gol" in index, "título de Resultados ausente"
           assert "const BR_PUBLIC_ONLY = true;" in index, "index sem trava pública"

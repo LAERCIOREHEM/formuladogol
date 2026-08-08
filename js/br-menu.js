@@ -77,6 +77,17 @@
     });
   }
 
+  function removeLegacyAgendaLink(nav) {
+    if (!nav) return;
+    Array.prototype.forEach.call(nav.querySelectorAll("a"), function (link) {
+      var href = String(link.getAttribute("href") || "").toLowerCase();
+      var text = String(link.textContent || "").toLowerCase();
+      if (href.indexOf("agenda.html") >= 0 || /^\s*🗓️?\s*agenda\s*$/.test(text) || text.trim() === "agenda") {
+        link.remove();
+      }
+    });
+  }
+
   function isPrivateRoute() {
     if (document.body && document.body.getAttribute("data-br-private-page") === "1") return true;
     if (basename() === "regras.html") return true;
@@ -414,6 +425,7 @@
 
   function applyMenu(nav) {
     if (!nav) return;
+    removeLegacyAgendaLink(nav);
     ensureAccuracyLink(nav);
     normalizeMenuLinks(nav);
     Array.prototype.forEach.call(nav.querySelectorAll("[data-br-private]"), function (item) {
@@ -595,6 +607,7 @@
 
   function wireAllMenus() {
     Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), function (nav) {
+      removeLegacyAgendaLink(nav);
       ensureAccuracyLink(nav);
       wireNav(nav);
     });

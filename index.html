@@ -23,7 +23,7 @@
     const rota = String(window.location.pathname || '/').replace(/\/+$/, '') || '/';
     const view = String(params.get('view') || '').toLowerCase();
     const porRota = {
-      '/jogos': ['Jogos do Brasileirão 2026 — Fórmula do Gol', '/jogos'],
+      '/jogos': ['Jogos dos clubes do Brasileirão 2026 — Fórmula do Gol', '/jogos'],
       '/tabela': ['Tabela do Brasileirão 2026 — Fórmula do Gol', '/tabela'],
       '/resultados': ['Resultados do Brasileirão 2026 — Fórmula do Gol', '/resultados']
     };
@@ -2665,6 +2665,7 @@ body > .container > section.hero > img {
   }
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260801-footer-institucional-v1">
+<link rel="stylesheet" href="css/br-jogos.css?v=20260808-jogos-unificados-v1">
 <!-- Dados estruturados: raiz do grafo (Organization, Person, WebSite, WebPage).
      As demais páginas referenciam #website e #organization definidos aqui. -->
 <script type="application/ld+json">
@@ -2763,7 +2764,6 @@ body > .container > section.hero > img {
 	  	  <nav class="nav" data-br-auth-menu aria-label="Menu principal">
 	    <a href="estatisticas.html" id="btn-estatisticas">📈 Estatísticas</a>
 	    <a href="/jogos" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('jogos');}" id="btn-jogos" class="active" data-br-view="jogos">⚽ Jogos</a>
-	    <a href="agenda.html" id="btn-agenda">🗓️ Agenda</a>
 	    <a href="aovivo.html" id="btn-aovivo">🔴 Ao vivo</a>
 	    <a href="/tabela" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('tabela');}" id="btn-tabela" data-br-view="tabela">📊 Tabela</a>
 	    <a href="/resultados" onclick="if(event.button===0&&!event.ctrlKey&&!event.metaKey&&!event.shiftKey&&!event.altKey){event.preventDefault();event.stopPropagation();setView('resultados');}" id="btn-resultados" data-br-view="resultados">✅ Resultados</a>
@@ -3463,7 +3463,16 @@ let state = {
   probabilidadesBolaoErro: null,
   // AF-Previsão — chances pré-jogo de vitória, empate e derrota.
   probabilidadesJogos: null,
-  probabilidadesJogosErro: null
+  probabilidadesJogosErro: null,
+  // Agenda unificada: Brasileirão + competições continentais/nacionais dos 20 clubes.
+  agendaJogos: [],
+  agendaMeta: null,
+  agendaErro: null,
+  jogosFiltroTime: '',
+  jogosFiltroCompeticao: 'todos',
+  jogosFiltroPeriodo: 'hoje',
+  jogosFiltroData: '',
+  jogosFiltrosInicializados: false
 };
 
 // ========================================================================
@@ -3960,9 +3969,9 @@ const BR_ROTAS_VIEWS = Object.freeze({
 
 const BR_METADADOS_VIEWS = Object.freeze({
   jogos: Object.freeze({
-    titulo: 'Jogos do Brasileirão 2026 — Fórmula do Gol',
+    titulo: 'Jogos dos clubes do Brasileirão 2026 — Fórmula do Gol',
     rota: '/jogos',
-    descricao: 'Próximos jogos do Brasileirão 2026, horários, transmissões e probabilidades no Fórmula do Gol.'
+    descricao: 'Agenda dos clubes da Série A no Brasileirão, Copa do Brasil, Libertadores e Sul-Americana, com transmissões e AF-Previsão no Brasileirão.'
   }),
   tabela: Object.freeze({
     titulo: 'Tabela do Brasileirão 2026 — Fórmula do Gol',
@@ -4734,6 +4743,43 @@ async function carregarJogos(opcoes = {}) {
     state.jogosCarregados = true;
   }
 
+  // A agenda unificada é a fonte de apresentação da aba Jogos. Ela reúne
+  // Brasileirão, Copa do Brasil, Libertadores e Sul-Americana para os clubes
+  // da Série A. Mantemos jogos.json em state.jogos porque ele continua sendo
+  // a fonte canônica do live browser-side do Brasileirão.
+  try {
+    const r = await fetch('dados-br/agenda-clubes-br.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    if (!d || !Array.isArray(d.jogos)) throw new Error('agenda-clubes-br.json inválido');
+    state.agendaJogos = d.jogos.slice().sort((a, b) => String(a.data_iso || '').localeCompare(String(b.data_iso || '')));
+    state.agendaMeta = {
+      gerado_em: d.gerado_em || '',
+      periodo: d.periodo || {},
+      resumo: d.resumo || {}
+    };
+    state.agendaErro = null;
+  } catch (e) {
+    if (!opcoes.silencioso) console.error('Erro ao carregar agenda unificada:', e);
+    if (!(opcoes.silencioso && Array.isArray(state.agendaJogos) && state.agendaJogos.length)) {
+      state.agendaErro = e && e.message ? e.message : String(e || 'indisponível');
+      // Fallback conservador: a página continua com o Brasileirão se a agenda
+      // complementar estiver temporariamente indisponível.
+      state.agendaJogos = (state.jogos || []).map(j => ({
+        ...j,
+        event_id: String(j.event_id || j.id || ''),
+        competicao_chave: 'brasileirao',
+        competicao_nome: 'Campeonato Brasileiro Série A',
+        competicao_nome_curto: 'Brasileirão',
+        fase: '',
+        perna: null,
+        concluido: String(j.estado || '').toLowerCase() === 'post',
+        probabilidades_disponiveis: true,
+        possui_clube_serie_a_2026: true
+      }));
+    }
+  }
+
   // Acessórios (tolerantes a 404 — se não existirem, o site segue normal):
   // espn_eventos.json                    -> transmissão/ONDE ASSISTIR vinda da ESPN (robô)
   // transmissoes.json                    -> ajuste manual legado de "onde assistir"
@@ -5043,52 +5089,193 @@ function htmlProbabilidadesPreJogo(j, modo = 'desktop') {
   };
 }
 
-function renderJogos() {
-  const container = document.getElementById('view-jogos');
+const BR_JOGOS_COMPETICOES = Object.freeze({
+  todos: { label: 'Todos', curto: 'Todos' },
+  brasileirao: { label: 'Brasileirão', curto: 'Brasileirão' },
+  copa_do_brasil: { label: 'Copa do Brasil', curto: 'Copa do Brasil' },
+  libertadores: { label: 'Libertadores', curto: 'Libertadores' },
+  sul_americana: { label: 'Sul-Americana', curto: 'Sul-Americana' }
+});
+const BR_JOGOS_ORDEM_COMPETICOES = ['todos','brasileirao','copa_do_brasil','libertadores','sul_americana'];
 
-  if (!state.jogosCarregados) {
-    container.innerHTML = '<div class="card empty">Carregando próximos jogos...</div>';
-    return;
+function jogoUnificadoEhBrasileirao(j) {
+  return String(j && j.competicao_chave || 'brasileirao') === 'brasileirao';
+}
+function chaveHojeBR(offsetDias = 0) {
+  const agora = new Date(Date.now() + Number(offsetDias || 0) * 86400000);
+  return chaveDataAgrupada(agora.toISOString());
+}
+function dataChaveNoIntervalo(chave, inicio, fim) {
+  return Boolean(chave && inicio && fim && chave >= inicio && chave <= fim);
+}
+function jogoPassaPeriodo(j) {
+  const chave = chaveDataAgrupada(j.data_iso);
+  const dataExata = String(state.jogosFiltroData || '').trim();
+  if (dataExata) return chave === dataExata;
+  const periodo = state.jogosFiltroPeriodo || 'hoje';
+  const hoje = chaveHojeBR(0);
+  if (periodo === 'todos') return true;
+  if (periodo === 'amanha') return chave === chaveHojeBR(1);
+  if (periodo === '7dias') return dataChaveNoIntervalo(chave, hoje, chaveHojeBR(6));
+  return chave === hoje;
+}
+function competicaoDoJogo(j) {
+  const chave = String(j && j.competicao_chave || 'brasileirao');
+  return BR_JOGOS_COMPETICOES[chave] || { label: String(j && (j.competicao_nome_curto || j.competicao_nome) || 'Competição'), curto: String(j && (j.competicao_nome_curto || j.competicao_nome) || 'Competição') };
+}
+function faseDoJogo(j) {
+  if (jogoUnificadoEhBrasileirao(j)) {
+    return j.rodada ? 'Rodada ' + Number(j.rodada) + (j.adiado ? ' · adiado' : '') : 'Série A 2026';
   }
-
-  if (state.jogosErro) {
-    container.innerHTML = `<div class="card empty"><div style="color: var(--danger); margin-bottom: 6px;">⚠ Não foi possível carregar os próximos jogos</div><div style="font-size: 12px; color: var(--text-tertiary);">${state.jogosErro}</div></div>`;
-    return;
+  const partes = [];
+  if (j.fase) partes.push(String(j.fase));
+  if (Number(j.perna) === 1) partes.push('Ida');
+  if (Number(j.perna) === 2) partes.push('Volta');
+  return partes.join(' · ') || 'Fase em andamento';
+}
+function timeSerieA2026(time, nome) {
+  if (time && time.serie_a_2026 === true) return true;
+  const canonico = nomeCanonico(nome || (time && time.nome));
+  return Boolean(canonico && TIMES_LISTA.includes(canonico));
+}
+function htmlTimeJogoUnificado(time, conteudo, classe) {
+  const nome = String(time && time.nome || '');
+  return timeSerieA2026(time, nome)
+    ? linkClubeBrasileirao(nome, conteudo, classe)
+    : `<div class="${classe || ''}">${conteudo}</div>`;
+}
+function entradaAoVivoJogo(j) {
+  const manual = entradaTransmissaoPorJogo(j, state.transmissoesAovivoManual);
+  const auto = entradaTransmissaoPorJogo(j, state.transmissoesAovivo);
+  const entrada = manual || auto;
+  const principal = entrada && entrada.principal && typeof entrada.principal === 'object' ? entrada.principal : null;
+  if (!principal || principal.embeddable === false || !String(principal.url || principal.video_id || '').trim()) return null;
+  return { entrada, principal };
+}
+function estadoVisualJogo(j) {
+  const liveBR = jogoUnificadoEhBrasileirao(j) ? espnLiveDoJogo(j) : null;
+  if (liveBR && liveBR.estado === 'in') {
+    return { estado: 'live', label: liveBR.status || 'Ao vivo', placarM: liveBR.placarMandante, placarV: liveBR.placarVisitante, gols: liveBR.gols || [] };
   }
-
-  if (!state.jogos || state.jogos.length === 0) {
-    container.innerHTML = '<div class="card empty">Nenhum jogo futuro encontrado para a rodada atual.</div>';
-    return;
+  if (liveBR && espnLiveEhFinalReal(liveBR)) {
+    return { estado: 'post', label: 'Encerrado', placarM: liveBR.placarMandante, placarV: liveBR.placarVisitante, gols: liveBR.gols || [] };
   }
-
-  const clubesPresentes = [];
-  for (const j of state.jogos) {
-    for (const lado of ['mandante', 'visitante']) {
-      const c = nomeCanonico((j[lado] || {}).nome);
-      if (c && !clubesPresentes.includes(c)) clubesPresentes.push(c);
+  const bruto = String(j && (j.estado || j.status_estado) || '').toLowerCase();
+  if (['in','live','em_andamento'].includes(bruto)) {
+    return { estado: 'live', label: String(j.status_detalhe || j.status || 'Ao vivo'), placarM: j.placar_mandante, placarV: j.placar_visitante, gols: [] };
+  }
+  if (['post','final','encerrado'].includes(bruto) || j.concluido === true) {
+    return { estado: 'post', label: String(j.status_detalhe || 'Encerrado'), placarM: j.placar_mandante, placarV: j.placar_visitante, gols: [] };
+  }
+  if (j.adiado === true) return { estado: 'pre', label: 'Adiado', placarM: null, placarV: null, gols: [] };
+  return { estado: 'pre', label: 'pré-jogo', placarM: null, placarV: null, gols: [] };
+}
+function inicializarFiltrosJogosSeNecessario(lista) {
+  if (state.jogosFiltrosInicializados) return;
+  const hoje = chaveHojeBR(0);
+  const temHoje = (lista || []).some(j => chaveDataAgrupada(j.data_iso) === hoje);
+  state.jogosFiltroPeriodo = temHoje ? 'hoje' : '7dias';
+  state.jogosFiltroCompeticao = 'todos';
+  state.jogosFiltroData = '';
+  state.jogosFiltrosInicializados = true;
+}
+function jogosUnificadosBase() {
+  const lista = Array.isArray(state.agendaJogos) && state.agendaJogos.length
+    ? state.agendaJogos
+    : (state.jogos || []).map(j => ({ ...j, competicao_chave: 'brasileirao', competicao_nome_curto: 'Brasileirão', probabilidades_disponiveis: true }));
+  return lista.slice().sort((a,b) => String(a.data_iso || '').localeCompare(String(b.data_iso || '')));
+}
+function jogosUnificadosFiltrados(lista) {
+  const competencia = state.jogosFiltroCompeticao || 'todos';
+  const clube = state.jogosFiltroTime || '';
+  return (lista || []).filter(j => {
+    if (competencia !== 'todos' && String(j.competicao_chave || 'brasileirao') !== competencia) return false;
+    if (!jogoPassaPeriodo(j)) return false;
+    if (clube) {
+      const m = nomeCanonico((j.mandante || {}).nome);
+      const v = nomeCanonico((j.visitante || {}).nome);
+      if (m !== clube && v !== clube) return false;
     }
-  }
-  clubesPresentes.sort((a, b) => a.localeCompare(b, 'pt-BR'));
-
-  // Defesa em profundidade: mesmo se o backend estiver atrasado e um jogo
-  // encerrado ainda aparecer aqui, a aba Jogos NUNCA renderiza estado 'post'.
-  // Também respeita o sinal live da ESPN — se o navegador já detectou fim
-  // de partida, o jogo some daqui imediatamente e reaparece em Resultados.
-  const jogosBase = (state.jogos || []).filter(j => {
-    const estadoLocal = String(j && j.estado || '').toLowerCase();
-    if (estadoLocal === 'post' || j.concluido === true) return false;
-    const live = state.espnLive && state.espnLive[espnChaveJogo((j.mandante || {}).nome, (j.visitante || {}).nome)];
-    if (espnLiveEhFinalReal(live)) return false;
-    const manual = resultadoManualDoJogo(j);
-    const manualNormalizado = resultadoManualNormalizado(manual);
-    if (manualNormalizado && resultadoJaAconteceu(manualNormalizado)) return false;
     return true;
   });
+}
+function htmlChipCompeticao(key, disponiveis) {
+  // Mantemos as quatro competições sempre visíveis. Se uma fase ainda não
+  // tiver confrontos publicados (ex.: Copa aguardando sorteio), o filtro
+  // continua acessível e retorna a mensagem de agenda vazia em vez de sumir.
+  void disponiveis;
+  const info = BR_JOGOS_COMPETICOES[key] || { label: key };
+  const ativo = (state.jogosFiltroCompeticao || 'todos') === key;
+  return `<button type="button" class="br-games-chip br-comp-chip ${ativo ? 'ativo' : ''}" data-comp="${brEscapeAttr(key)}" onclick="setFiltroCompeticaoJogos('${brEscapeAttr(key)}')" aria-pressed="${ativo ? 'true' : 'false'}">${brEscapeHtml(info.label)}</button>`;
+}
+function htmlChipPeriodo(key, label) {
+  const ativo = !state.jogosFiltroData && (state.jogosFiltroPeriodo || 'hoje') === key;
+  return `<button type="button" class="br-games-chip ${ativo ? 'ativo' : ''}" onclick="setFiltroPeriodoJogos('${key}')" aria-pressed="${ativo ? 'true' : 'false'}">${label}</button>`;
+}
+
+function renderJogos() {
+  const container = document.getElementById('view-jogos');
+  if (!state.jogosCarregados) {
+    container.innerHTML = '<div class="card empty">Carregando jogos...</div>';
+    return;
+  }
+  if (state.jogosErro && !(state.agendaJogos || []).length) {
+    container.innerHTML = `<div class="card empty"><div style="color: var(--danger); margin-bottom: 6px;">⚠ Não foi possível carregar os jogos</div><div style="font-size: 12px; color: var(--text-tertiary);">${brEscapeHtml(state.jogosErro)}</div></div>`;
+    return;
+  }
+
+  const lista = jogosUnificadosBase();
+  inicializarFiltrosJogosSeNecessario(lista);
+  const jogosVisiveis = jogosUnificadosFiltrados(lista);
+  const competicoesDisponiveis = new Set(lista.map(j => String(j.competicao_chave || 'brasileirao')));
+  const clubesPresentes = TIMES_LISTA.filter(clube => lista.some(j => nomeCanonico((j.mandante || {}).nome) === clube || nomeCanonico((j.visitante || {}).nome) === clube));
   const filtro = state.jogosFiltroTime || '';
-  const jogosVisiveis = !filtro ? jogosBase : jogosBase.filter(j =>
-    nomeCanonico((j.mandante || {}).nome) === filtro ||
-    nomeCanonico((j.visitante || {}).nome) === filtro
-  );
+  const meta = state.agendaMeta || state.jogosMeta || {};
+  const temLive = jogosVisiveis.some(j => estadoVisualJogo(j).estado === 'live');
+
+  let html = '<div class="section-title-row br-games-heading">';
+  html += '<div><div class="br-kicker">Agenda, probabilidades e transmissão</div><h2>Jogos</h2></div>';
+  if (temLive) {
+    html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> acompanhamento em tempo real</span>`;
+  } else {
+    const atualizado = (state.jogosMeta || {}).atualizado_em_br || (meta.gerado_em ? new Date(meta.gerado_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '');
+    html += `<span class="br-games-heading-note">Brasileirão · Copa do Brasil · Libertadores · Sul-Americana${atualizado ? ' · atualizado ' + brEscapeHtml(atualizado) : ''}<span class="br-update-status-dot" role="img" aria-label="Status da atualização" title="Status da atualização"></span></span>`;
+  }
+  html += '</div>';
+
+  html += '<section class="br-games-filters" aria-label="Filtros dos jogos">';
+  html += '<div class="br-games-filter-block"><span class="br-games-filter-title">Competição</span><div class="br-games-chips">';
+  html += BR_JOGOS_ORDEM_COMPETICOES.map(key => htmlChipCompeticao(key, competicoesDisponiveis)).join('');
+  html += '</div></div>';
+  html += '<div class="br-games-filter-block"><span class="br-games-filter-title">Período</span><div class="br-games-period-row"><div class="br-games-chips">';
+  html += htmlChipPeriodo('hoje','Hoje') + htmlChipPeriodo('amanha','Amanhã') + htmlChipPeriodo('7dias','Próximos 7 dias') + htmlChipPeriodo('todos','Todos');
+  html += '</div><label class="br-games-date-label"><span>Data</span><input id="br-games-date" type="date" value="' + brEscapeAttr(state.jogosFiltroData || '') + '" onchange="setFiltroDataJogos(this.value)" aria-label="Filtrar por data"></label></div></div>';
+  html += '<div class="br-games-filter-block br-games-club-filter"><label class="br-games-filter-title" for="select-filtro-jogos">Clube</label>';
+  html += `<select id="select-filtro-jogos" class="br-select-clube br-games-select" onchange="setFiltroJogos(this.value)"><option value="" ${!filtro ? 'selected' : ''}>Todos os clubes</option>`;
+  for (const c of clubesPresentes) html += `<option value="${brEscapeAttr(c)}" ${filtro === c ? 'selected' : ''}>${brEscapeHtml(c)}</option>`;
+  html += '</select></div>';
+  html += '</section>';
+
+  html += '<div class="br-filter-mini-strip br-games-club-strip" aria-label="Atalhos rápidos de clubes">';
+  html += `<button class="br-mini-club ${!filtro ? 'ativo' : ''}" type="button" title="Todos os clubes" onclick="setFiltroJogos('')">BR</button>`;
+  for (const c of clubesPresentes) {
+    const esc = ESCUDOS_TIMES[c];
+    const cSafe = c.replace(/'/g, "\\'");
+    html += `<button class="br-mini-club ${filtro === c ? 'ativo' : ''}" type="button" title="${brEscapeAttr(c)}" onclick="setFiltroJogos('${cSafe}')">${brEscudoImg(esc?.escudo || '', c, 'br-mini-club-shield')}</button>`;
+  }
+  html += '</div>';
+
+  const resumoPartes = [];
+  if (state.jogosFiltroCompeticao !== 'todos') resumoPartes.push((BR_JOGOS_COMPETICOES[state.jogosFiltroCompeticao] || {}).label || state.jogosFiltroCompeticao);
+  if (filtro) resumoPartes.push(filtro);
+  if (state.jogosFiltroData) resumoPartes.push(new Date(state.jogosFiltroData + 'T12:00:00-03:00').toLocaleDateString('pt-BR'));
+  html += `<div class="br-games-result-count"><strong>${jogosVisiveis.length}</strong> ${jogosVisiveis.length === 1 ? 'jogo' : 'jogos'}${resumoPartes.length ? ' · ' + brEscapeHtml(resumoPartes.join(' · ')) : ''}</div>`;
+
+  if (!jogosVisiveis.length) {
+    html += '<div class="card empty br-games-empty">Nenhum jogo encontrado com estes filtros. Tente outro período, competição ou clube.</div>';
+    container.innerHTML = html;
+    return;
+  }
 
   const grupos = {};
   for (const j of jogosVisiveis) {
@@ -5096,121 +5283,77 @@ function renderJogos() {
     if (!grupos[chave]) grupos[chave] = [];
     grupos[chave].push(j);
   }
-  const chavesOrdenadas = Object.keys(grupos).sort();
-  const meta = state.jogosMeta || {};
-  const temLive = espnLiveTemJogoRolando();
-  let html = '<div class="section-title-row">';
-  html += `<div><div class="br-kicker">Agenda e transmissão</div><h2>Jogos do Brasileirão</h2></div>`;
-  if (temLive) {
-    html += `<span class="live-info-bar"><span class="badge-aovivo">AO VIVO</span> ESPN a cada 30s${state._espnLiveUltima ? ' · ' + formatarSomenteHora(state._espnLiveUltima) : ''}</span>`;
-  } else if (meta.atualizado_em_br) {
-    html += `<span style="font-size:11px;color:var(--accent);font-weight:700;">Atualizado em ${meta.atualizado_em_br} · Fonte ESPN<span class="br-update-status-dot" role="img" aria-label="Status da atualização do Brasileirão" title="Status da atualização do Brasileirão"></span></span>`;
-  }
-  html += '</div>';
-
-  const filtroEsc = filtro ? ESCUDOS_TIMES[filtro] : null;
-  const proximoDoFiltro = jogosVisiveis[0] || null;
-  const filtroDescricao = filtro
-    ? `${jogosVisiveis.length} jogo(s) encontrado(s)${proximoDoFiltro ? ' · próximo: ' + formatarDataAgrupada(proximoDoFiltro.data_iso) + ' às ' + formatarHorarioJogo(proximoDoFiltro.data_iso) : ''}`
-    : 'Mostrando todos os clubes e jogos disponíveis no snapshot ESPN.';
-  const filtroShield = filtro
-    ? brEscudoImg(filtroEsc?.escudo || '', filtro, 'br-filter-shield-img')
-    : `<span class="br-filter-shield-fallback">BR</span>`;
-  html += '<div class="br-filter-panel" aria-label="Filtro de jogos por clube">';
-  html += '<div class="br-filter-select-card">';
-  html += '<label class="br-filter-label" for="select-filtro-jogos">Filtrar jogos por clube</label>';
-  html += `<select id="select-filtro-jogos" class="br-select-clube" onchange="setFiltroJogos(this.value)"><option value="" ${!filtro ? 'selected' : ''}>Todos os clubes</option>`;
-  for (const c of clubesPresentes) {
-    const selected = filtro === c ? 'selected' : '';
-    html += `<option value="${c}" ${selected}>${c}</option>`;
-  }
-  html += '</select></div>';
-  const filtroIdentidade = `${filtroShield}<div><div class="br-filter-team-title">${brEscapeHtml(filtro || 'Todos os clubes')}</div><div class="br-filter-team-note">${brEscapeHtml(filtroDescricao)}</div></div>`;
-  const filtroTime = filtro
-    ? linkClubeBrasileirao(filtro, filtroIdentidade, 'br-filter-team br-club-link')
-    : `<div class="br-filter-team">${filtroIdentidade}</div>`;
-  html += `<div class="br-filter-current-card">${filtroTime}${filtro ? '<button type="button" class="br-filter-clear" onclick="setFiltroJogos(\'\')">Limpar</button>' : ''}</div>`;
-  html += '</div>';
-  html += '<div class="br-filter-mini-strip" aria-label="Atalhos rápidos de clubes">';
-  html += `<button class="br-mini-club ${!filtro ? 'ativo' : ''}" type="button" title="Todos" onclick="setFiltroJogos('')">BR</button>`;
-  for (const c of clubesPresentes) {
-    const esc = ESCUDOS_TIMES[c];
-    const cSafe = c.replace(/'/g, "\\'");
-    html += `<button class="br-mini-club ${filtro === c ? 'ativo' : ''}" type="button" title="${c}" onclick="setFiltroJogos('${cSafe}')">` +
-      brEscudoImg(esc?.escudo || '', c, 'br-mini-club-shield') + `</button>`;
-  }
-  html += '</div>';
-
-  if (jogosVisiveis.length === 0) {
-    html += '<div class="card empty">Nenhum jogo encontrado para este filtro.</div>';
-  }
-
-  for (const chave of chavesOrdenadas) {
-    const jogos = grupos[chave];
-    const labelData = formatarDataAgrupada(jogos[0].data_iso);
-    html += `<div class="dia-header">${labelData}</div>`;
+  for (const chave of Object.keys(grupos).sort()) {
+    const jogos = grupos[chave].slice().sort((a,b) => String(a.data_iso || '').localeCompare(String(b.data_iso || '')));
+    html += `<div class="dia-header">${brEscapeHtml(formatarDataAgrupada(jogos[0].data_iso))}</div>`;
     html += '<div class="jogos-grid">';
-
     for (const j of jogos) {
       const m = j.mandante || {};
       const v = j.visitante || {};
       const escudoMandante = brEscudoImg(m.escudo || '', m.nome || '', 'jogo-escudo-img');
       const escudoVisitante = brEscudoImg(v.escudo || '', v.nome || '', 'jogo-escudo-img');
-
       const horario = formatarHorarioJogo(j.data_iso);
-      const live = espnLiveDoJogo(j);
-      const finalReal = espnLiveEhFinalReal(live);
-      const temPlacar = live && (live.estado === 'in' || finalReal);
-      const clsEstado = live && live.estado === 'in' ? 'live' : (finalReal ? 'post' : 'pre');
-      const statusHtml = live && live.estado === 'in'
-        ? `<span class="badge-aovivo">AO VIVO</span><span class="jogo-status-live">${live.status || ''}</span>`
-        : (finalReal ? `<span class="jogo-status-fim">Encerrado</span>` : `<span class="jogo-source-pill">pré-jogo</span>`);
-      const placarCentro = temPlacar
-        ? `<div class="jogo-placar-live">${live.placarMandante} × ${live.placarVisitante}</div>`
-        : '<div class="jogo-vs">×</div>';
+      const estado = estadoVisualJogo(j);
+      const temPlacar = estado.estado !== 'pre' && Number.isFinite(Number(estado.placarM)) && Number.isFinite(Number(estado.placarV));
+      const placarCentro = temPlacar ? `<div class="jogo-placar-live">${Number(estado.placarM)} × ${Number(estado.placarV)}</div>` : '<div class="jogo-vs">×</div>';
+      const statusHtml = estado.estado === 'live' ? `<span class="badge-aovivo">AO VIVO</span><span class="jogo-status-live">${brEscapeHtml(estado.label)}</span>` : (estado.estado === 'post' ? '<span class="jogo-status-fim">Encerrado</span>' : `<span class="jogo-source-pill">${brEscapeHtml(estado.label)}</span>`);
       const tx = ondeAssistir(j);
-      const probabilidadesDesktop = htmlProbabilidadesPreJogo(j, 'desktop');
-      const probabilidadesMobile = htmlProbabilidadesPreJogo(j, 'mobile');
+      const compKey = String(j.competicao_chave || 'brasileirao');
+      const comp = competicaoDoJogo(j);
+      const probabilidadesDesktop = jogoUnificadoEhBrasileirao(j) ? htmlProbabilidadesPreJogo(j, 'desktop') : '';
+      const probabilidadesMobile = jogoUnificadoEhBrasileirao(j) ? htmlProbabilidadesPreJogo(j, 'mobile') : '';
       const probMandante = probabilidadesDesktop && probabilidadesDesktop.mandante ? probabilidadesDesktop.mandante : '';
       const probEmpate = probabilidadesDesktop && probabilidadesDesktop.empate ? probabilidadesDesktop.empate : '';
       const probVisitante = probabilidadesDesktop && probabilidadesDesktop.visitante ? probabilidadesDesktop.visitante : '';
+      const conteudoM = `${probMandante}<span class="jogo-escudo">${escudoMandante}</span><span class="jogo-nome">${brEscapeHtml(m.nome || '?')}</span>`;
+      const conteudoV = `${probVisitante}<span class="jogo-escudo">${escudoVisitante}</span><span class="jogo-nome">${brEscapeHtml(v.nome || '?')}</span>`;
+      const liveEmbed = entradaAoVivoJogo(j);
+      const eventId = String(j.event_id || j.id || '');
+      const assistir = liveEmbed && eventId ? `<a class="br-game-action br-game-action-live" href="aovivo.html?event=${encodeURIComponent(eventId)}">▶ Assistir aqui</a>` : '';
 
-      html += `<div class="jogo-card ${clsEstado}">
-        <div class="jogo-card-top">
-          <span class="jogo-round-badge">${j.rodada ? 'Rodada ' + j.rodada + (j.adiado ? ' · adiado' : '') : 'Brasileirão'}</span>
-          <span class="jogo-hora-pill">${horario}</span>
+      html += `<article class="jogo-card ${estado.estado} br-game-unified" data-competition="${brEscapeAttr(compKey)}" data-event-id="${brEscapeAttr(eventId)}">
+        <div class="jogo-card-top br-game-card-top">
+          <div class="br-game-card-labels"><span class="br-competition-badge ${brEscapeAttr(compKey)}">${brEscapeHtml(comp.curto)}</span><span class="jogo-round-badge">${brEscapeHtml(faseDoJogo(j))}</span></div>
+          <span class="jogo-hora-pill">${brEscapeHtml(horario)}</span>
         </div>
         <div class="jogo-main">
           ${probabilidadesDesktop ? '<div class="jogo-prob-kicker">Probabilidades pré-jogo · AF-Previsão</div>' : ''}
           <div class="jogo-times jogo-times-v2">
-            ${linkClubeBrasileirao(m.nome, `${probMandante}<span class="jogo-escudo">${escudoMandante}</span><span class="jogo-nome">${m.nome || '?'}</span>`, 'jogo-time jogo-team-side br-club-link')}
+            ${htmlTimeJogoUnificado(m, conteudoM, 'jogo-time jogo-team-side br-club-link')}
             <div class="jogo-center-stack">${probEmpate}${placarCentro}</div>
-            ${linkClubeBrasileirao(v.nome, `${probVisitante}<span class="jogo-escudo">${escudoVisitante}</span><span class="jogo-nome">${v.nome || '?'}</span>`, 'jogo-time jogo-team-side br-club-link')}
+            ${htmlTimeJogoUnificado(v, conteudoV, 'jogo-time jogo-team-side br-club-link')}
           </div>
-          ${probabilidadesMobile}`;
-
-      const detalhes = [];
-      detalhes.push(`<span class="jogo-detalhe">${statusHtml}</span>`);
-      if (j.estadio) detalhes.push(`<span class="jogo-detalhe">📍 ${j.estadio}</span>`);
-      if (tx) detalhes.push(`<span class="jogo-detalhe">📺 ${tx}</span>`);
+          ${probabilidadesMobile || ''}`;
+      const detalhes = [`<span class="jogo-detalhe">${statusHtml}</span>`];
+      detalhes.push(j.estadio ? `<span class="jogo-detalhe">📍 ${brEscapeHtml(j.estadio)}</span>` : '<span class="jogo-detalhe">📍 Local a confirmar</span>');
+      detalhes.push(`<span class="jogo-detalhe">📺 ${brEscapeHtml(tx || 'Transmissão a confirmar')}</span>`);
       html += `<div class="jogo-detalhes">${detalhes.join('')}</div>`;
-
-      if (live && live.gols && live.gols.length > 0) {
-        html += `<div class="jogo-gols">⚽ ${live.gols.join(' · ')}</div>`;
-      }
+      if (estado.gols && estado.gols.length) html += `<div class="jogo-gols">⚽ ${estado.gols.map(brEscapeHtml).join(' · ')}</div>`;
       html += '</div>';
-      const mmJogo = htmlMelhoresMomentos(j, 'jogo');
-      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span>${mmJogo}</div>`;
-      html += '</div>';
+      const mmJogo = jogoUnificadoEhBrasileirao(j) ? htmlMelhoresMomentos(j, 'jogo') : '';
+      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span><div class="br-game-actions-right">${assistir}${mmJogo}</div></div>`;
+      html += '</article>';
     }
     html += '</div>';
   }
-
   container.innerHTML = html;
 }
 
 function setFiltroJogos(time) {
   state.jogosFiltroTime = time || '';
+  renderJogos();
+}
+function setFiltroCompeticaoJogos(chave) {
+  state.jogosFiltroCompeticao = BR_JOGOS_COMPETICOES[chave] ? chave : 'todos';
+  renderJogos();
+}
+function setFiltroPeriodoJogos(periodo) {
+  state.jogosFiltroPeriodo = ['hoje','amanha','7dias','todos'].includes(periodo) ? periodo : 'hoje';
+  state.jogosFiltroData = '';
+  renderJogos();
+}
+function setFiltroDataJogos(data) {
+  state.jogosFiltroData = /^\d{4}-\d{2}-\d{2}$/.test(String(data || '')) ? String(data) : '';
   renderJogos();
 }
 
@@ -6454,7 +6597,7 @@ setTimeout(sincronizarAvisosAniversarioComSessao, 800);
 </script>
 <script src="js/br-clube-retorno.js?v=20260717-retorno-exato-v1"></script>
 <script src="js/br-config.js?v=20260723-copa-publica-v1"></script>
-<script src="js/br-menu.js?v=20260724-status-dot-v2"></script>
+<script src="js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
 <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
 </body>
 </html>
