@@ -49,18 +49,7 @@
   function renderSummary() {
     var data = state.data;
     var games = data.jogos || {};
-    var top = games.maior_probabilidade || {};
-    var strong = games.alta_confianca_80 || {};
     var scope = data.escopo_publico || {};
-    var cards = [
-      ["Jogos avaliados", number(games.jogos_avaliados, 0), "Probabilidades congeladas antes do kickoff"],
-      ["Maior probabilidade confirmada", pct(top.taxa_confirmacao_pct, 1), top.amostra ? number(top.confirmadas,0) + " confirmações em " + number(top.amostra,0) + " jogos avaliáveis" : "A amostra começa com a nova coleta"],
-      ["Previsões ≥80% confirmadas", pct(strong.taxa_confirmacao_pct, 1), strong.amostra ? number(strong.confirmadas,0) + " de " + number(strong.amostra,0) + " previsões de alta confiança" : "Aguardando amostra ≥80%"],
-      ["Histórico auditável", scope.inicio_historico_classificacao ? "Desde jul/2026" : "Em coleta", scope.inicio_historico_classificacao ? "Projeções registradas desde " + dateLabel(scope.inicio_historico_classificacao) : "Segunda metade do Brasileirão 2026"]
-    ];
-    el("accuracy-summary").innerHTML = cards.map(function (card) {
-      return '<article class="accuracy-summary-card"><span>' + esc(card[0]) + '</span><strong>' + esc(card[1]) + '</strong><small>' + esc(card[2]) + '</small></article>';
-    }).join("");
     el("accuracy-scope").textContent = scope.observacao || "Histórico auditável da segunda metade do Brasileirão 2026.";
     el("accuracy-games-badge").textContent = games.jogos_avaliados ? number(games.jogos_avaliados,0) + " jogos avaliados" : "Coleta iniciada";
   }
@@ -121,7 +110,7 @@
     var clubs = Object.keys((state.data || {}).timeline_clubes || {}).sort(function (a,b) { return a.localeCompare(b,"pt-BR"); });
     var select = el("accuracy-club-select");
     select.innerHTML = clubs.map(function (club) { return '<option value="' + esc(club) + '">' + esc(club) + '</option>'; }).join("");
-    var preferred = clubs.indexOf("Vitória") >= 0 ? "Vitória" : clubs[0] || "";
+    var preferred = clubs[0] || "";
     state.club = preferred;
     select.value = preferred;
     select.addEventListener("change", function () { state.club = select.value; renderTimeline(); });
