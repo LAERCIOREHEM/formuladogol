@@ -13,12 +13,18 @@ on:
         required: false
         default: false
         type: boolean
+      encadear_rodada:
+        description: 'Ao concluir, disparar o editorial da rodada (uso interno do Atualizar Brasileirao)'
+        required: false
+        default: false
+        type: boolean
   schedule:
     # Retentativas curtas e independentes durante a semana de fechamento da fase.
     - cron: '28 6,10 * * *'
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: repo-write-main
@@ -124,4 +130,14 @@ jobs:
             echo "::error title=Falha ao publicar editorial::Não foi possível enviar o commit ao main."
             exit 1
           fi
+
+      - name: Encadear editorial da rodada
+        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.encadear_rodada == true }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run publicar-analise-rodada.yml --ref main
+          echo "Editorial da rodada despachado após a Copa; a fila global repo-write-main permanece serial."
 
