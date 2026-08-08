@@ -39,6 +39,53 @@
     if (text != null) node.textContent = text;
     return node;
   }
+
+  function smoothLinePath(points) {
+    if (!points.length) return "";
+    if (points.length === 1) return "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
+    var d = "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
+    for (var i = 0; i < points.length - 1; i += 1) {
+      var p0 = points[i];
+      var p1 = points[i + 1];
+      var mx = (p0[0] + p1[0]) / 2;
+      var my = (p0[1] + p1[1]) / 2;
+      d += " Q" + p0[0].toFixed(2) + " " + p0[1].toFixed(2) + " " + mx.toFixed(2) + " " + my.toFixed(2);
+    }
+    var last = points[points.length - 1];
+    d += " T" + last[0].toFixed(2) + " " + last[1].toFixed(2);
+    return d;
+  }
+  function areaSmoothPath(upper, lower) {
+    if (!upper.length || !lower.length || upper.length !== lower.length) return "";
+    var lowerReversed = lower.slice().reverse();
+    var top = smoothLinePath(upper);
+    var bottom = smoothLinePath(lowerReversed).replace(/^M[^QTLCSAZ]*\s?/, 'L');
+    return top + " " + bottom + " Z";
+  }
+  function addChartDefs(svg, suffix) {
+    var defs = svgNode("defs");
+    var areaGradient = svgNode("linearGradient", { id: "accuracyAreaGradient", x1: "0", y1: "0", x2: "0", y2: "1" });
+    areaGradient.appendChild(svgNode("stop", { offset: "0%", "stop-color": "rgba(163,230,53,.28)" }));
+    areaGradient.appendChild(svgNode("stop", { offset: "100%", "stop-color": "rgba(163,230,53,.05)" }));
+    defs.appendChild(areaGradient);
+    var glow = svgNode("filter", { id: "accuracyGlow-" + suffix, x: "-30%", y: "-30%", width: "160%", height: "160%" });
+    glow.appendChild(svgNode("feGaussianBlur", { stdDeviation: "3", result: "blur" }));
+    glow.appendChild(svgNode("feMerge", {}));
+    var merge = glow.lastChild;
+    merge.appendChild(svgNode("feMergeNode", { in: "blur" }));
+    merge.appendChild(svgNode("feMergeNode", { in: "SourceGraphic" }));
+    defs.appendChild(glow);
+    svg.appendChild(defs);
+    return "url(#accuracyGlow-" + suffix + ")";
+  }
+  function addSeriesTag(svg, x, y, textValue) {
+    var paddingX = 8;
+    var width = Math.max(54, textValue.length * 6.2 + paddingX * 2);
+    var group = svgNode("g", { transform: "translate(" + (x - width / 2) + " " + y + ")" });
+    group.appendChild(svgNode("rect", { width: width, height: 22, rx: 11, class: "label-chip" }));
+    group.appendChild(svgNode("text", { x: width / 2, y: 14, "text-anchor": "middle", class: "series-tag" }, textValue));
+    svg.appendChild(group);
+  }
   function linePath(points) {
     return points.map(function (point, index) { return (index ? "L" : "M") + point[0].toFixed(2) + " " + point[1].toFixed(2); }).join(" ");
   }
@@ -61,7 +108,7 @@
       return;
     }
     target.innerHTML = "";
-    var width = 760, height = 300, left = 48, right = 18, top = 20, bottom = 42;
+    var width = 780, height = 330, left = 52, right = 24, top = 22, bottom = 50;
     var w = width - left - right, h = height - top - bottom;
     var svg = createSvg(width, height);
     [0,20,40,60,80,100].forEach(function (tick) {
@@ -74,11 +121,11 @@
     });
     svg.appendChild(svgNode("line", { x1:left, y1:height-bottom, x2:width-right, y2:height-bottom, class:"axis" }));
     svg.appendChild(svgNode("line", { x1:left, y1:top, x2:left, y2:height-bottom, class:"axis" }));
-    svg.appendChild(svgNode("path", { d:linePath([[left,height-bottom],[width-right,top]]), class:"ideal" }));
+    svg.appendChild(svgNode("path", { d:smoothLinePath([[left,height-bottom],[width-right,top]]), class:"ideal" }));
     var points = bins.map(function (row) {
       return [left + w * Number(row.probabilidade_media_pct) / 100, top + h - h * Number(row.frequencia_observada_pct) / 100, row];
     });
-    svg.appendChild(svgNode("path", { d:linePath(points.map(function(p){return [p[0],p[1]];})), class:"line-main" }));
+    svg.appendChild(svgNode("path", { d:smoothLinePath(points.map(function(p){return [p[0],p[1]];})), class:"line-main", filter:addChartDefs(svg, "calibration") }));
     points.forEach(function (point) {
       var circle = svgNode("circle", { cx:point[0], cy:point[1], r:5, class:"dot-main" });
       circle.appendChild(svgNode("title", {}, "Probabilidade média " + pct(point[2].probabilidade_media_pct,1) + " · ocorreu " + pct(point[2].frequencia_observada_pct,1) + " · amostra " + number(point[2].amostra,0)));
@@ -138,7 +185,7 @@
   }
 
   function timelineBase(rows, yMin, yMax, invertY) {
-    var width = 780, height = 320, left = 48, right = 18, top = 20, bottom = 48;
+    var width = 800, height = 350, left = 54, right = 22, top = 24, bottom = 54;
     var w = width-left-right, h=height-top-bottom;
     function x(index) { return rows.length <= 1 ? left+w/2 : left + w * index/(rows.length-1); }
     function y(value) {
@@ -147,6 +194,7 @@
       return top+h-h*ratio;
     }
     var svg=createSvg(width,height);
+    var glowFilter = addChartDefs(svg, "timeline-" + state.metric);
     for(var i=0;i<=4;i+=1){
       var value=yMin+(yMax-yMin)*i/4;
       var yy=y(value);
@@ -159,21 +207,21 @@
     if(rows.length<=6){for(var j=0;j<rows.length;j+=1)labelIndexes.push(j);} else {labelIndexes=[0,Math.round((rows.length-1)/3),Math.round(2*(rows.length-1)/3),rows.length-1];}
     var used={};
     labelIndexes.forEach(function(index){if(used[index])return;used[index]=1;var row=rows[index];svg.appendChild(svgNode("text",{x:x(index),y:height-bottom+20,"text-anchor":"middle"},Number(row.jogos_atuais||0)+"J"));});
-    return {svg:svg,width:width,height:height,left:left,right:right,top:top,bottom:bottom,w:w,h:h,x:x,y:y};
+    return {svg:svg,width:width,height:height,left:left,right:right,top:top,bottom:bottom,w:w,h:h,x:x,y:y,glowFilter:glowFilter};
   }
 
   function addSeries(svg, base, rows, accessor, className, dotClass, label) {
     var points=[];
     rows.forEach(function(row,index){var raw=accessor(row);if(raw==null||raw==="")return;var value=Number(raw);if(Number.isFinite(value))points.push([base.x(index),base.y(value),row,value]);});
-    if(points.length>1) svg.appendChild(svgNode("path",{d:linePath(points.map(function(p){return[p[0],p[1]];})),class:className}));
-    points.forEach(function(p){var c=svgNode("circle",{cx:p[0],cy:p[1],r:3.8,class:dotClass});c.appendChild(svgNode("title",{},label+": "+number(p[3],1)+" · após "+number(p[2].jogos_atuais,0)+" jogos · "+dateLabel(p[2].gerado_em)));svg.appendChild(c);});
+    if(points.length>1) svg.appendChild(svgNode("path",{d:smoothLinePath(points.map(function(p){return[p[0],p[1]];})),class:className,filter:base.glowFilter}));
+    points.forEach(function(p,index){svg.appendChild(svgNode("circle",{cx:p[0],cy:p[1],r:8.5,class:"point-halo"}));var c=svgNode("circle",{cx:p[0],cy:p[1],r:4.2,class:dotClass});c.appendChild(svgNode("title",{},label+": "+number(p[3],1)+" · após "+number(p[2].jogos_atuais,0)+" jogos · "+dateLabel(p[2].gerado_em)));svg.appendChild(c);if(index===points.length-1){addSeriesTag(svg,p[0],Math.max(8,p[1]-30),label);}});
   }
 
   function renderPosition(rows, target) {
     var base=timelineBase(rows,1,20,true), svg=base.svg;
     var upper=[], lower=[];
     rows.forEach(function(row,index){var range=row.faixa_posicao_80||{};if(range.melhor==null||range.pior==null)return;var best=Number(range.melhor),worst=Number(range.pior);if(Number.isFinite(best)&&Number.isFinite(worst)){upper.push([base.x(index),base.y(best)]);lower.push([base.x(index),base.y(worst)]);}});
-    if(upper.length>1&&lower.length===upper.length){var polygon=upper.concat(lower.slice().reverse()).map(function(p){return p[0].toFixed(2)+","+p[1].toFixed(2);}).join(" ");svg.appendChild(svgNode("polygon",{points:polygon,class:"area-80"}));}
+    if(upper.length>1&&lower.length===upper.length){svg.appendChild(svgNode("path",{d:areaSmoothPath(upper,lower),class:"area-80"}));}
     addSeries(svg,base,rows,function(r){return r.posicao_projetada;},"line-main","dot-main","Posição projetada");
     addSeries(svg,base,rows,function(r){return r.posicao_atual;},"line-secondary","dot-secondary","Posição real naquele momento");
     target.appendChild(svg);
@@ -182,7 +230,7 @@
 
   function renderPoints(rows,target){
     var values=[];rows.forEach(function(r){var range=r.faixa_pontos_80||{};values.push(r.pontos_atuais,r.pontos_projetados,range.min,range.max);});var b=bounds(values,0,114),base=timelineBase(rows,Math.max(0,b[0]),Math.min(114,b[1]),false),svg=base.svg;
-    var upper=[],lower=[];rows.forEach(function(row,index){var range=row.faixa_pontos_80||{};if(range.min==null||range.max==null)return;var low=Number(range.min),high=Number(range.max);if(Number.isFinite(low)&&Number.isFinite(high)){upper.push([base.x(index),base.y(high)]);lower.push([base.x(index),base.y(low)]);}});if(upper.length>1&&lower.length===upper.length){svg.appendChild(svgNode("polygon",{points:upper.concat(lower.slice().reverse()).map(function(p){return p[0].toFixed(2)+","+p[1].toFixed(2);}).join(" "),class:"area-80"}));}
+    var upper=[],lower=[];rows.forEach(function(row,index){var range=row.faixa_pontos_80||{};if(range.min==null||range.max==null)return;var low=Number(range.min),high=Number(range.max);if(Number.isFinite(low)&&Number.isFinite(high)){upper.push([base.x(index),base.y(high)]);lower.push([base.x(index),base.y(low)]);}});if(upper.length>1&&lower.length===upper.length){svg.appendChild(svgNode("path",{d:areaSmoothPath(upper,lower),class:"area-80"}));}
     addSeries(svg,base,rows,function(r){return r.pontos_projetados;},"line-main","dot-main","Pontos finais projetados");
     addSeries(svg,base,rows,function(r){return r.pontos_atuais;},"line-secondary","dot-secondary","Pontos acumulados no momento");
     target.appendChild(svg);el("accuracy-timeline-legend").innerHTML='<span><i class="area"></i>faixa central de 80%</span><span><i></i>pontos finais projetados</span><span><i class="secondary"></i>pontos acumulados</span>';
