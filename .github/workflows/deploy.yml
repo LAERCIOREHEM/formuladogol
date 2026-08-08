@@ -1,3 +1,4 @@
+# DEPLOY_SCHEMA: acuracia-v3-2026-08-08
 name: Deploy site (GitHub Pages)
 
 on:
@@ -322,8 +323,9 @@ jobs:
           target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
 
-      - name: Gerar lastmod dos sitemaps
+      - name: Gerar lastmod dos sitemaps (Acurácia v3)
         run: |
+          echo "DEPLOY_SCHEMA=acuracia-v3-2026-08-08"
           # O lastmod é derivado dos timestamps reais dos arquivos de dados que
           # cada página consome, e não da data do deploy. Assim o sinal enviado
           # ao Google é verdadeiro: páginas de dados diários mudam de data todo
@@ -362,6 +364,9 @@ jobs:
                   "dados-br/probabilidades-brasileirao.json", "dados-br/ranking-desempenho.json",
                   "dados-br/lideres-jogadores.json", "dados-br/estatisticas-competicao.json",
                   "dados-br/probabilidades-por-pontuacao.json", "resultados.json",
+              ],
+              "https://formuladogol.com.br/acuracia.html": [
+                  "dados-br/acuracia-af-previsao.json",
               ],
               "https://formuladogol.com.br/clubes.html": [
                   "dados-br/clubes.json", "dados-br/elencos.json",
@@ -430,8 +435,9 @@ jobs:
                   if loc is None or not (loc.text or "").strip():
                       raise SystemExit(f"ERRO lastmod: <url> sem <loc> em {caminho_sitemap}")
                   url = loc.text.strip()
-                  valor = resolver(url)
                   antigo = no.find(f"{{{NS}}}lastmod")
+                  lastmod_existente = (antigo.text or "").strip() if antigo is not None else ""
+                  valor = resolver(url, lastmod_existente)
                   if antigo is not None:
                       no.remove(antigo)
                   novo = ET.Element(f"{{{NS}}}lastmod")
@@ -460,7 +466,18 @@ jobs:
               raise SystemExit("ERRO lastmod: nenhuma data válida nos dados da Copa")
           data_copa = min(max(datas_copa), agora).strftime("%Y-%m-%d")
 
-          def resolver(url):
+          # Fallback de segurança: uma página nova no sitemap nunca deve derrubar
+          # todo o Pages só porque seu mapeamento de lastmod ainda não foi cadastrado.
+          # Páginas conhecidas continuam usando suas dependências reais; para uma URL
+          # raiz .html desconhecida preservamos um lastmod válido já existente e, se
+          # ele não existir, usamos o status operacional do site como referência
+          # conservadora e emitimos warning visível no log.
+          try:
+              data_status_global = data_da_pagina(["dados-br/status-atualizacao.json"], "status global")
+          except SystemExit:
+              data_status_global = agora.strftime("%Y-%m-%d")
+
+          def resolver(url, lastmod_existente=""):
               if url in DEPS:
                   return data_da_pagina(DEPS[url], url)
               if url in STATIC_LASTMOD:
@@ -471,7 +488,21 @@ jobs:
                   return artigos_analise[url]
               if url.startswith("https://formuladogol.com.br/copa2026/"):
                   return data_copa
-              raise SystemExit(f"ERRO lastmod: URL sem mapeamento de dados: {url}")
+
+              if re.fullmatch(r"\d{4}-\d{2}-\d{2}", lastmod_existente or ""):
+                  print(f"::warning::lastmod sem mapeamento explícito para {url}; preservando {lastmod_existente}.")
+                  return lastmod_existente
+
+              if url.startswith("https://formuladogol.com.br/"):
+                  rel = url.removeprefix("https://formuladogol.com.br/").split("?", 1)[0].split("#", 1)[0]
+                  if rel and (site / rel).is_file():
+                      print(
+                          f"::warning::lastmod sem mapeamento explícito para {url}; "
+                          f"usando status global {data_status_global}."
+                      )
+                      return data_status_global
+
+              raise SystemExit(f"ERRO lastmod: URL externa ou inválida sem mapeamento: {url}")
 
           print("sitemap principal:")
           total_br = aplicar(site / "sitemap.xml", resolver)
@@ -611,6 +642,7 @@ jobs:
               "aovivo.html",
               "agenda.html",
               "estatisticas.html",
+              "acuracia.html",
               "clubes.html",
               "museu.html",
           ]
@@ -694,6 +726,19 @@ jobs:
                   if target.is_dir():
                       target = target / "index.html"
                   assert target.exists(), f"{page_name}: referência local quebrada: {ref}"
+
+          # A nova área de Acurácia é inserida dinamicamente nas páginas antigas
+          # por br-menu.js, mas sua própria página já deve nascer com a ordem
+          # editorial definitiva: Análises -> Acurácia -> Clubes.
+          acuracia_text = (site / "acuracia.html").read_text(encoding="utf-8")
+          acuracia_nav_match = re.search(r"<nav\b[^>]*>(.*?)</nav>", acuracia_text, flags=re.I | re.S)
+          assert acuracia_nav_match, "acuracia.html: menu principal ausente"
+          acuracia_nav = " ".join(re.sub(r"<[^>]+>", " ", acuracia_nav_match.group(1)).split())
+          for label in ("Análises", "Acurácia", "Clubes"):
+              assert label in acuracia_nav, f"acuracia.html: item de menu ausente: {label}"
+          assert acuracia_nav.index("Análises") < acuracia_nav.index("Acurácia") < acuracia_nav.index("Clubes"), (
+              "acuracia.html: ordem do menu deve ser Análises -> Acurácia -> Clubes"
+          )
 
           route_titles = {
               "jogos/index.html": "Jogos do Brasileirão 2026 — Fórmula do Gol",
@@ -923,7 +968,7 @@ jobs:
           # em lugar nenhum, porque o index.html não tinha JSON-LD. Referência
           # pendurada não gera erro visível — só silenciosamente não funciona.
           paginas_ld = (
-              "index.html", "estatisticas.html", "aovivo.html",
+              "index.html", "estatisticas.html", "acuracia.html", "aovivo.html",
               "clubes.html", "museu.html", "sobre.html",
           )
           definidos = set()
