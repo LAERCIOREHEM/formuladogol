@@ -16,7 +16,8 @@
     probabilityModelsAudit: "dados-br/auditoria-modelos-af-previsao.json",
     probabilityEvaluation: "dados-br/avaliacao-af-previsao.json",
     pointsThresholds: "dados-br/probabilidades-por-pontuacao.json",
-    // Sentinela leve (2 KB) usada só para detectar mudança de dados sem
+    continentalAudit: "dados-br/auditoria-competicoes-af-previsao.json",
+    // Sentinelas leves usadas para detectar mudança de dados sem
     // rebaixar os 5,8 MB do conjunto completo a cada verificação.
     updateStatus: "dados-br/status-atualizacao.json",
   };
@@ -41,6 +42,8 @@
     probabilityModelsAudit: null,
     probabilityEvaluation: null,
     pointsThresholds: null,
+    updateStatus: null,
+    continentalAudit: null,
     probabilitySort: "classificacao",
     probabilityHistoryClub: "",
     probabilityHistoryMetric: "campeao_pct",
@@ -1600,40 +1603,45 @@
     </tr>`;
   }
 
-  // Declara ao leitor a idade dos percentuais, logo abaixo da chamada da seção,
-  // dentro da coluna direita do cabeçalho (.probability-head-aside).
-  function probabilityCalcNote() {
-    const calculado = state.probabilities?.calculado_em;
-    const referencia = state.probabilities?.gerado_em;
-    const horario = dateTimeBR(calculado || referencia);
-    if (!horario || horario === "—") return "";
-
-    const disputados = Array.isArray(state.results?.resultados)
-      ? state.results.resultados.length
-      : null;
-    const considerados = Number(state.probabilities?.base_corrente?.partidas_concluidas);
-    const possuiContagem = disputados !== null && Number.isFinite(considerados);
-    const pendentes = possuiContagem ? Math.max(0, disputados - considerados) : 0;
-
-    const coverageRows = state.probabilities?.integracao_continental?.cobertura?.competicoes;
-    const chavesCobertas = new Set(
-      Array.isArray(coverageRows) ? coverageRows.map((item) => String(item?.chave || "")) : []
-    );
-    const copasConfirmadas = ["copa_do_brasil", "libertadores", "sul_americana"]
-      .every((chave) => chavesCobertas.has(chave));
-    const baseCopas = copasConfirmadas
-      ? "o estado mais recente da Copa do Brasil, da Libertadores e da Sul-Americana"
-      : "as bases continentais disponíveis no último cálculo";
-
-    if (possuiContagem && pendentes > 0) {
-      const palavra = pendentes === 1 ? "jogo aguarda" : "jogos aguardam";
-      return `<small>Último cálculo em ${escapeHtml(horario)} · considera ${integer(considerados)} de ${integer(disputados)} resultados do Brasileirão e ${escapeHtml(baseCopas)}; ${integer(pendentes)} ${palavra} recálculo.</small>`;
+  // Data pública compacta da seção. Usa o evento de atualização mais recente
+  // entre Brasileirão, AF-Previsão e as três competições que alteram vagas.
+  function probabilityDataUpdatedAt() {
+    const candidates = [
+      state.updateStatus?.ultimo_sucesso,
+      state.updateStatus?.ultimo_snapshot_valido,
+      state.probabilities?.calculado_em,
+      state.probabilities?.gerado_em,
+      state.probabilitiesAudit?.gerado_em,
+      state.continentalAudit?.gerado_em,
+      state.leaders?.gerado_em,
+      state.competition?.gerado_em,
+      state.details?.gerado_em,
+      state.ranking?.gerado_em,
+    ];
+    const continentalRows = state.continentalAudit?.competicoes;
+    if (Array.isArray(continentalRows)) {
+      continentalRows.forEach((item) => candidates.push(item?.gerado_em));
     }
+    let latest = null;
+    candidates.forEach((value) => {
+      if (!value) return;
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return;
+      if (!latest || parsed > latest) latest = parsed;
+    });
+    return latest;
+  }
 
-    const baseBrasileirao = Number.isFinite(considerados)
-      ? `todos os ${integer(considerados)} resultados do Brasileirão`
-      : "todos os resultados disponíveis do Brasileirão";
-    return `<small>Atualizado em ${escapeHtml(horario)}, considerando ${escapeHtml(baseBrasileirao)} e ${escapeHtml(baseCopas)}.</small>`;
+  function probabilityDataUpdatedLabel() {
+    const latest = probabilityDataUpdatedAt();
+    if (!latest) return "Dados atualizados recentemente";
+    const date = latest.toLocaleDateString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+    return `Dados atualizados em ${date}`;
   }
 
 
@@ -1646,7 +1654,10 @@
       return;
     }
     target.innerHTML = `<section class="probability-ranking-section probability-comparison-section" aria-label="Probabilidades">
-      <div class="probability-section-head"><div class="kicker">Probabilidades</div></div>
+      <div class="probability-section-head">
+        <div><div class="kicker">Probabilidades</div></div>
+        <div class="probability-head-aside"><small>${escapeHtml(probabilityDataUpdatedLabel())}</small></div>
+      </div>
       <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
       <div class="probability-table-shell">
         <table class="probability-comparison-table">
@@ -1967,20 +1978,23 @@
   //     modelo AF-Previsão, que o snapshot_hash não alcança.
   // ────────────────────────────────────────────────────────────────────
 
-  function assinaturaDados(statusPartidas, auditoriaProbabilidades) {
+  function assinaturaDados(statusPartidas, auditoriaProbabilidades, auditoriaContinental) {
     const s = statusPartidas || {};
     const a = auditoriaProbabilidades || {};
+    const c = auditoriaContinental || {};
     return [
       s.snapshot_hash || "",
       s.ultimo_snapshot_valido || "",
       s.ultimo_sucesso || "",
       a.hash_entrada || "",
       a.gerado_em || "",
+      c.hash_estado_depois || "",
+      c.gerado_em || "",
     ].join("|");
   }
 
   async function carregarDados() {
-    const [leaders, competition, details, ranking, rankingHistory, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation, pointsThresholds, updateStatus] = await Promise.all([
+    const [leaders, competition, details, ranking, rankingHistory, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation, pointsThresholds, updateStatus, continentalAudit] = await Promise.all([
       fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
       fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
       fetchJson(FILES.details, { jogos: {} }),
@@ -1996,6 +2010,7 @@
       fetchJson(FILES.probabilityEvaluation, { status: "aguardando_primeira_execucao", publicar_na_interface: false }),
       fetchJson(FILES.pointsThresholds, { status: "aguardando_workflow", niveis: [] }),
       fetchJson(FILES.updateStatus, {}),
+      fetchJson(FILES.continentalAudit, { status: "aguardando_workflow", competicoes: [] }),
     ]);
 
     state.leaders = leaders;
@@ -2012,25 +2027,28 @@
     state.probabilityModelsAudit = probabilityModelsAudit;
     state.probabilityEvaluation = probabilityEvaluation;
     state.pointsThresholds = pointsThresholds;
+    state.updateStatus = updateStatus;
+    state.continentalAudit = continentalAudit;
 
     // A assinatura é semeada com os mesmos bytes que acabaram de ser aplicados
     // na tela, e não numa leitura posterior. Sem isso, uma publicação ocorrida
     // entre a carga e a primeira verificação passaria despercebida.
-    refreshState.assinatura = assinaturaDados(updateStatus, probabilitiesAudit);
+    refreshState.assinatura = assinaturaDados(updateStatus, probabilitiesAudit, continentalAudit);
   }
 
   async function verificarAtualizacao() {
     if (refreshState.ocupado || document.hidden) return;
     refreshState.ocupado = true;
     try {
-      const [statusPartidas, auditoriaProbabilidades] = await Promise.all([
+      const [statusPartidas, auditoriaProbabilidades, auditoriaContinental] = await Promise.all([
         fetchJson(FILES.updateStatus, null),
         fetchJson(FILES.probabilitiesAudit, null),
+        fetchJson(FILES.continentalAudit, null),
       ]);
-      // Falha de rede devolve null nas duas: nada a comparar, tenta de novo depois.
-      if (!statusPartidas && !auditoriaProbabilidades) return;
+      // Falha de rede devolve null nas sentinelas: nada a comparar, tenta de novo depois.
+      if (!statusPartidas && !auditoriaProbabilidades && !auditoriaContinental) return;
 
-      const nova = assinaturaDados(statusPartidas, auditoriaProbabilidades);
+      const nova = assinaturaDados(statusPartidas, auditoriaProbabilidades, auditoriaContinental);
       if (!refreshState.assinatura || nova === refreshState.assinatura) return;
 
       // Dados mudaram de fato. Preserva a rolagem porque renderAll() reescreve
