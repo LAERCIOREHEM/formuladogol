@@ -2,19 +2,20 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-08-07T09:49:04-03:00",
+  "gerado_em": "2026-08-08T18:17:36-03:00",
   "versao_avaliacao": "AF-Avaliação 1.0",
   "integridade_historico": {
     "valido": true,
     "encadeado": true,
     "algoritmo": "SHA-256",
-    "quantidade_snapshots": 15,
+    "quantidade_snapshots": 16,
     "hash_inicial": "b37f95c298e78928a7bb1f2c116b48a3935f869b6070f67e4e3c1f0c3cdeaca2",
-    "hash_final": "efc4c8fb8e58af8b369e18437ed1e7823033faca692639aa5d7442fe17306330",
+    "hash_final": "bfc591c83b20e08097477fe307a1a391a4e1091d482b74bf3597788fecddad99",
     "rodadas_distintas": [
       19,
       20,
-      21
+      21,
+      22
     ],
     "modelos_registrados": [
       "AF-Previsão 1.0",
@@ -24,12 +25,12 @@
     "avisos": []
   },
   "cobertura": {
-    "snapshots": 15,
-    "rodadas_distintas": 3,
+    "snapshots": 16,
+    "rodadas_distintas": 4,
     "primeira_rodada": 19,
-    "ultima_rodada": 21,
+    "ultima_rodada": 22,
     "primeiro_registro": "2026-07-16T21:24:00-03:00",
-    "ultimo_registro": "2026-08-04T02:41:46-03:00",
+    "ultimo_registro": "2026-08-08T17:55:00-03:00",
     "minimo_snapshots_publicacao": 5
   },
   "metricas_planejadas": {

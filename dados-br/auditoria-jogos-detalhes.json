@@ -1,17 +1,67 @@
 {
-  "gerado_em": "2026-08-08T17:41:46.393966-03:00",
+  "gerado_em": "2026-08-08T18:12:23.633287-03:00",
   "fonte": "ESPN summary",
   "modo": "rede",
-  "total_resultados_lidos": 207,
-  "total_processados": 207,
+  "total_resultados_lidos": 208,
+  "total_processados": 208,
   "total_buscados_na_espn": 0,
   "total_com_estatisticas": 204,
   "total_com_publico": 182,
-  "total_sem_publico": 25,
+  "total_sem_publico": 26,
   "total_com_eventos": 204,
   "total_eventos_validados": 206,
-  "total_eventos_pendentes_detalhes": 1,
+  "total_eventos_pendentes_detalhes": 2,
   "eventos_pendentes_detalhes": [
+    {
+      "event_id": "401841181",
+      "jogo": "Grêmio x São Paulo",
+      "validacao": {
+        "gols_esperados": {
+          "Grêmio": 2,
+          "São Paulo": 1
+        },
+        "gols_extraidos": {
+          "Grêmio": 0,
+          "São Paulo": 0
+        },
+        "gols_completos": false,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": false,
+        "cartoes_esperados": {
+          "Grêmio": {
+            "amarelo": null,
+            "vermelho": null
+          },
+          "São Paulo": {
+            "amarelo": null,
+            "vermelho": null
+          }
+        },
+        "cartoes_extraidos": {
+          "Grêmio": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "São Paulo": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": false,
+        "pendente_detalhes": true,
+        "tipo_pendencia": "ficha_espn_incompleta",
+        "motivo": "ficha de gols incompleta: 0/3 atribuídos"
+      }
+    },
     {
       "event_id": "401879459",
       "jogo": "Bahia x Chapecoense",
@@ -67,11 +117,21 @@
   "inconsistencias_eventos": [],
   "total_sem_estatisticas": 0,
   "total_preservados_de_execucao_anterior": 207,
-  "total_falhas": 0,
+  "total_falhas": 1,
   "sem_estatisticas": [],
-  "falhas": [],
+  "falhas": [
+    {
+      "event_id": "401841181",
+      "jogo": "R22 · Grêmio x São Paulo · 401841181",
+      "erro": "falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841181: HTTPError: HTTP Error 403: Forbidden"
+    }
+  ],
   "total_com_jogadores": 204,
   "jogos_sem_escalacoes": [
+    {
+      "event_id": "401841181",
+      "jogo": "Grêmio x São Paulo"
+    },
     {
       "event_id": "401840999",
       "jogo": "Botafogo x Vitória"
