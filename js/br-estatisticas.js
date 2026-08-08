@@ -1641,7 +1641,13 @@
       month: "2-digit",
       year: "numeric",
     });
-    return `Dados atualizados em ${date}`;
+    const time = latest.toLocaleTimeString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    return `Dados atualizados em ${date} às ${time} BRT`;
   }
 
 
