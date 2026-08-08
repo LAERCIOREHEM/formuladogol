@@ -1,15 +1,88 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-08T20:09:49.075998-03:00",
+  "gerado_em": "2026-08-08T20:41:53.789140-03:00",
   "fonte": "ESPN summary",
-  "total_jogos": 208,
+  "total_jogos": 209,
   "total_com_estatisticas": 204,
   "total_com_publico": 182,
   "total_com_eventos": 204,
   "total_com_jogadores": 204,
   "total_eventos_validados": 206,
-  "total_eventos_pendentes_detalhes": 2,
+  "total_eventos_pendentes_detalhes": 3,
   "jogos": {
+    "401841178": {
+      "event_id": "401841178",
+      "event_id_fonte_detalhes": "401841178",
+      "rodada": 22,
+      "data_iso": "2026-08-08T18:30",
+      "mandante": "Remo",
+      "visitante": "Atlético-MG",
+      "placar_mandante": 2,
+      "placar_visitante": 2,
+      "estadio": "Mangueirão",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [],
+      "estatisticas": [],
+      "gols": [],
+      "cartoes": [],
+      "jogadores": [],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Remo": 2,
+          "Atlético-MG": 2
+        },
+        "gols_extraidos": {
+          "Remo": 0,
+          "Atlético-MG": 0
+        },
+        "gols_completos": false,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": false,
+        "cartoes_esperados": {
+          "Remo": {
+            "amarelo": null,
+            "vermelho": null
+          },
+          "Atlético-MG": {
+            "amarelo": null,
+            "vermelho": null
+          }
+        },
+        "cartoes_extraidos": {
+          "Remo": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Atlético-MG": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": false,
+        "pendente_detalhes": true,
+        "tipo_pendencia": "ficha_espn_incompleta",
+        "motivo": "ficha de gols incompleta: 0/4 atribuídos"
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-08T20:41:46.726734-03:00"
+    },
     "401841181": {
       "event_id": "401841181",
       "event_id_fonte_detalhes": "401841181",
@@ -81,7 +154,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T20:09:44.035310-03:00"
+      "atualizado_em": "2026-08-08T20:41:48.402326-03:00"
     },
     "401841173": {
       "event_id": "401841173",
@@ -8982,7 +9055,7 @@
       "origem_resultado": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo_resultado_manual": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial.",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T20:09:45.676797-03:00"
+      "atualizado_em": "2026-08-08T20:41:50.315335-03:00"
     },
     "401841151": {
       "event_id": "401841151",
@@ -9603,7 +9676,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T20:09:47.336223-03:00"
+      "atualizado_em": "2026-08-08T20:41:51.984198-03:00"
     },
     "401841150": {
       "event_id": "401841150",
@@ -14121,7 +14194,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T20:09:48.992966-03:00"
+      "atualizado_em": "2026-08-08T20:41:53.705764-03:00"
     },
     "401841149": {
       "event_id": "401841149",
