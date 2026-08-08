@@ -1645,8 +1645,8 @@
       target.innerHTML = "";
       return;
     }
-    target.innerHTML = `<section class="probability-ranking-section probability-comparison-section">
-      <div class="probability-section-head"><div><div class="kicker">20 clubes</div><h3>Tabela geral de probabilidades</h3></div><div class="probability-head-aside"><span>compare chances e projeções em uma única leitura</span>${probabilityCalcNote()}</div></div>
+    target.innerHTML = `<section class="probability-ranking-section probability-comparison-section" aria-label="Probabilidades">
+      <div class="probability-section-head"><div class="kicker">Probabilidades</div></div>
       <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
       <div class="probability-table-shell">
         <table class="probability-comparison-table">
