@@ -80,6 +80,36 @@ def team_name(obj: Any) -> str:
     return para_canonico(obj) or str(obj or "")
 
 
+def deduplicar_resultados(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Remove IDs alternativos que representam a mesma partida física.
+
+    Em reagendamentos a ESPN pode publicar um novo event_id enquanto o projeto
+    preserva o ID original/confirmado. Para estatísticas agregadas isso não pode
+    contar como dois jogos. Preferimos a entrada com rodada oficial (> 0) e, em
+    seguida, o resultado manual confirmado quando houver.
+    """
+    escolhidos: dict[tuple[str, str, str, Any, Any], dict[str, Any]] = {}
+    ordem: list[tuple[str, str, str, Any, Any]] = []
+    for game in results:
+        sig = (
+            str(game.get("data_iso") or "")[:10],
+            team_name(game.get("mandante")),
+            team_name(game.get("visitante")),
+            game.get("placar_mandante"),
+            game.get("placar_visitante"),
+        )
+        if sig not in escolhidos:
+            escolhidos[sig] = game
+            ordem.append(sig)
+            continue
+        atual = escolhidos[sig]
+        prioridade_novo = (int(game.get("rodada") or 0) > 0, game.get("resultado_manual") is True)
+        prioridade_atual = (int(atual.get("rodada") or 0) > 0, atual.get("resultado_manual") is True)
+        if prioridade_novo > prioridade_atual:
+            escolhidos[sig] = game
+    return [escolhidos[sig] for sig in ordem]
+
+
 def result_code(game: dict[str, Any], team: str) -> str | None:
     home = team_name(game.get("mandante"))
     away = team_name(game.get("visitante"))
@@ -219,7 +249,7 @@ def attendance_stats(results: list[dict[str, Any]], details: dict[str, Any]) -> 
         "maior_publico": rows[0] if rows else None,
         "menor_publico": rows[-1] if rows else None,
         "ranking": rows,
-        "observacao": "Média calculada apenas sobre jogos com público informado pela ESPN.",
+        "observacao": "Média calculada apenas sobre jogos com público informado pela ESPN ou por complemento documental validado.",
     }
 
 
@@ -263,7 +293,8 @@ def main() -> None:
     leaders = read_json(ROOT / "dados-br" / "lideres-jogadores.json", {})
 
     table = [x for x in table_data.get("tabela") or [] if isinstance(x, dict)]
-    results = [x for x in results_data.get("resultados") or [] if isinstance(x, dict)]
+    results_raw = [x for x in results_data.get("resultados") or [] if isinstance(x, dict)]
+    results = deduplicar_resultados(results_raw)
     details = details_data.get("jogos") or {}
     if not isinstance(details, dict):
         details = {}
@@ -280,7 +311,7 @@ def main() -> None:
     payload = {
         "atualizado_em": now_iso(),
         "temporada": int(leaders.get("temporada") or 2026),
-        "fonte": "ESPN · tabela, resultados e eventos validados dos summaries",
+        "fonte": "ESPN · tabela, resultados e eventos; público complementado por fonte documental quando ausente",
         "resumo": {
             "jogos_finalizados": len(results),
             "jogos_com_estatisticas": sum(1 for x in games_index if x["tem_estatisticas"]),

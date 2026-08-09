@@ -52,6 +52,28 @@ def read(path: Path, default: Any) -> Any:
         return default
 
 
+def event_ids_partidas_unicas(result_rows: list[dict[str, Any]]) -> set[str]:
+    """Seleciona um event_id por partida física para agregações de campeonato."""
+    escolhidos: dict[tuple[str, str, str, Any, Any], dict[str, Any]] = {}
+    for game in result_rows:
+        sig = (
+            str(game.get("data_iso") or "")[:10],
+            norm((game.get("mandante") or {}).get("nome") if isinstance(game.get("mandante"), dict) else game.get("mandante")),
+            norm((game.get("visitante") or {}).get("nome") if isinstance(game.get("visitante"), dict) else game.get("visitante")),
+            game.get("placar_mandante"),
+            game.get("placar_visitante"),
+        )
+        atual = escolhidos.get(sig)
+        if atual is None:
+            escolhidos[sig] = game
+            continue
+        prioridade_novo = (int(game.get("rodada") or 0) > 0, game.get("resultado_manual") is True)
+        prioridade_atual = (int(atual.get("rodada") or 0) > 0, atual.get("resultado_manual") is True)
+        if prioridade_novo > prioridade_atual:
+            escolhidos[sig] = game
+    return {str(x.get("event_id") or "") for x in escolhidos.values() if x.get("event_id")}
+
+
 def write(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
@@ -380,11 +402,16 @@ def main() -> None:
         critical.append(f"{len(narrative_false_positives)} falso(s) gol(s) originado(s) de finalização/defesa")
 
     with_public = sum(1 for g in detail_games.values() if (g or {}).get("publico") not in (None, "", 0, "0"))
+    ids_unicos = event_ids_partidas_unicas(result_rows)
+    with_public_unique = sum(
+        1 for eid in ids_unicos
+        if (detail_games.get(eid) or {}).get("publico") not in (None, "", 0, "0")
+    )
     with_stats = sum(1 for g in detail_games.values() if (g or {}).get("stats") or (g or {}).get("estatisticas"))
     if with_stats == 0:
         critical.append("nenhum jogo com estatísticas detalhadas")
     if with_public == 0:
-        warnings.append("nenhum público coletado ainda; conferir retorno da ESPN summary")
+        warnings.append("nenhum público coletado ainda; conferir ESPN e complemento documental")
     elif detail_games and with_public < int(len(detail_games) * 0.80):
         warnings.append(f"público disponível em somente {with_public}/{len(detail_games)} jogos")
 
@@ -401,8 +428,8 @@ def main() -> None:
     if short_club_scorers:
         critical.append("clubes com menos de cinco marcadores individualizados: " + ", ".join(short_club_scorers))
     attendance = competition.get("publico") or {}
-    if int(attendance.get("jogos_com_publico") or 0) != with_public:
-        critical.append("contagem de jogos com público diverge entre detalhes e competição")
+    if int(attendance.get("jogos_com_publico") or 0) != with_public_unique:
+        critical.append("contagem de jogos únicos com público diverge entre detalhes e competição")
 
     if len(players.get("artilharia") or []) < 5 or len(players.get("assistencias") or []) < 5:
         critical.append("dados-br/jogadores.json não recebeu os rankings oficiais")
@@ -431,6 +458,7 @@ def main() -> None:
             "jogos_com_detalhes": len(detail_games),
             "jogos_com_estatisticas": with_stats,
             "jogos_com_publico": with_public,
+            "jogos_unicos_com_publico": with_public_unique,
             "artilheiros": len(goals),
             "assistentes": len(assists),
             "lider_gols": goals[0] if goals else None,

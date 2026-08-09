@@ -1657,10 +1657,11 @@ def self_test() -> None:
     assert any(x["nome"] == "Interceptações" and x["home"] == "11" and x["away"] == "9" for x in stats)
     assert any(x["nome"] == "Cruzamentos" and x["home"] == "22" and x["away"] == "15" for x in stats)
     scoreboard = {
-        "competitions": [{"competitors": summary["boxscore"]["teams"]}],
+        "competitions": [{"attendance": 43210, "competitors": summary["boxscore"]["teams"]}],
     }
     stats_scoreboard = parse_scoreboard_stats(scoreboard, jogo)
     assert any(x["nome"] == "Posse" and x["home"] == "60%" and x["away"] == "40%" for x in stats_scoreboard)
+    assert parse_publico(scoreboard) == 43210, "scoreboard também deve fornecer público quando a ESPN o expõe"
     merged = mesclar_estatisticas(
         [{"nome": "Posse", "home": "60%", "away": "40%"}],
         stats_scoreboard,
@@ -1755,6 +1756,16 @@ def _build_audit(
         if not (j.get("validacao_eventos") or {}).get("ok")
         and not (j.get("validacao_eventos") or {}).get("pendente_detalhes")
     ]
+    sem_publico = [
+        {
+            "event_id": eid,
+            "rodada": j.get("rodada"),
+            "jogo": f"{j.get('mandante')} x {j.get('visitante')}",
+            "data_iso": j.get("data_iso"),
+        }
+        for eid, j in jogos_saida.items()
+        if j.get("publico") in (None, "")
+    ]
     return {
         "gerado_em": iso_agora_brt(), "fonte": "ESPN summary + scoreboard", "modo": modo,
         "total_resultados_lidos": len(base_resultados.get("resultados") or []),
@@ -1765,7 +1776,8 @@ def _build_audit(
         "falhas_refresh_preservadas": falhas_refresh_preservadas or [],
         "total_com_estatisticas": sum(1 for j in jogos_saida.values() if j.get("stats")),
         "total_com_publico": sum(1 for j in jogos_saida.values() if j.get("publico") not in (None, "")),
-        "total_sem_publico": sum(1 for j in jogos_saida.values() if j.get("publico") in (None, "")),
+        "total_sem_publico": len(sem_publico),
+        "sem_publico": sem_publico,
         "total_com_eventos": sum(1 for j in jogos_saida.values() if j.get("gols") or j.get("cartoes")),
         "total_eventos_validados": sum(1 for j in jogos_saida.values() if (j.get("validacao_eventos") or {}).get("ok")),
         "total_eventos_pendentes_detalhes": len(pendentes_detalhes),
@@ -1948,6 +1960,10 @@ def main() -> None:
             publico_fonte = "ESPN summary" if publico is not None else ""
             publico_tipo = "presente" if publico is not None else ""
             if publico is None:
+                publico_scoreboard = parse_publico(scoreboard_event or {})
+                if publico_scoreboard is not None:
+                    publico, publico_fonte, publico_tipo = publico_scoreboard, "ESPN scoreboard", "presente"
+            if publico is None:
                 publico, publico_fonte, publico_tipo = publico_complementar(event_id, publicos_complementares)
             estadio = parse_estadio(summary, jogo)
             arbitro = parse_arbitro(summary)
@@ -1995,6 +2011,10 @@ def main() -> None:
             publico = (antigo or {}).get("publico")
             publico_fonte = str((antigo or {}).get("publico_fonte") or "")
             publico_tipo = str((antigo or {}).get("publico_tipo") or "")
+            if publico in (None, "", 0, "0"):
+                publico_scoreboard = parse_publico(scoreboard_event or {})
+                if publico_scoreboard is not None:
+                    publico, publico_fonte, publico_tipo = publico_scoreboard, "ESPN scoreboard", "presente"
             if publico in (None, "", 0, "0") and manual_publico is not None:
                 publico, publico_fonte, publico_tipo = manual_publico, manual_fonte, manual_tipo
             comp = ((scoreboard_event or {}).get("competitions") or [{}])[0]
