@@ -1,15 +1,1078 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-09T17:42:00.788003-03:00",
+  "gerado_em": "2026-08-09T18:09:52.616629-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 212,
-  "total_com_estatisticas": 211,
+  "total_jogos": 214,
+  "total_com_estatisticas": 213,
   "total_com_publico": 211,
-  "total_com_eventos": 211,
-  "total_com_jogadores": 211,
-  "total_eventos_validados": 212,
+  "total_com_eventos": 213,
+  "total_com_jogadores": 213,
+  "total_eventos_validados": 214,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841186": {
+      "event_id": "401841186",
+      "event_id_fonte_detalhes": "401841186",
+      "rodada": 22,
+      "data_iso": "2026-08-09T16:00",
+      "mandante": "Bahia",
+      "visitante": "Vasco da Gama",
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "estadio": "Arena Fonte Nova",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Rodrigo Jose Pereira De Lima",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "51.1%",
+          "away": "48.9%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "14"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "7"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "10"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "320",
+          "away": "299"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "383",
+          "away": "363"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "8",
+          "away": "27"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "18",
+          "away": "10"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "4",
+          "away": "24"
+        },
+        {
+          "nome": "Cortes",
+          "home": "24",
+          "away": "20"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "51.1%",
+          "away": "48.9%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "14"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "7"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "6"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "10"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "320",
+          "away": "299"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "383",
+          "away": "363"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "8",
+          "away": "27"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "18",
+          "away": "10"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "4",
+          "away": "24"
+        },
+        {
+          "nome": "Cortes",
+          "home": "24",
+          "away": "20"
+        }
+      ],
+      "gols": [],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "31'",
+          "jogador": "Cuiabano",
+          "time": "Vasco da Gama",
+          "descricao": "Yellow Card 94 Cuiabano (Vasco da Gama) is shown the yellow card for a bad foul. Cuiabano Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "37'",
+          "jogador": "Thiago Mendes",
+          "time": "Vasco da Gama",
+          "descricao": "Yellow Card 94 Thiago Mendes (Vasco da Gama) is shown the yellow card. Thiago Mendes Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "76'",
+          "jogador": "Ademir",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Ademir (Bahia) is shown the yellow card. Ademir Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "269675",
+          "nome": "Ademir",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "318291",
+          "nome": "Alejo Veliz",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "219090",
+          "nome": "David Duarte",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269910",
+          "nome": "Jean Lucas",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304757",
+          "nome": "Luciano Juba",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285757",
+          "nome": "Nicolás Acevedo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "266664",
+          "nome": "Rodrigo Nestor",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "381149",
+          "nome": "Román Gómez",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "224106",
+          "nome": "Ronaldo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "82782",
+          "nome": "Santiago Ramos",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "198360",
+          "nome": "Willian José",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "299932",
+          "nome": "Caio Alexandre",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "407479",
+          "nome": "Kaue Furquim",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "335673",
+          "nome": "Mateo Sanabria",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "227241",
+          "nome": "Michel Araújo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "360186",
+          "nome": "Zé Guilherme",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "315293",
+          "nome": "Adson",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "257744",
+          "nome": "Brenner",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "235940",
+          "nome": "Carlos Cuesta",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "334756",
+          "nome": "Cuiabano",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "219005",
+          "nome": "David",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "196873",
+          "nome": "Jair",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "205464",
+          "nome": "Léo Jardim",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "234842",
+          "nome": "Paulo Henrique",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "337099",
+          "nome": "Robert",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "198302",
+          "nome": "Tchê Tchê",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201717",
+          "nome": "Thiago Mendes",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "317383",
+          "nome": "Alan Saldivia",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "357720",
+          "nome": "Cauan Barros",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "250733",
+          "nome": "Claudio Spinelli",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "285203",
+          "nome": "Marino Hinestroza",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "402641",
+          "nome": "Ramon Rique",
+          "time": "Vasco da Gama",
+          "team_id": "3454",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Bahia": 0,
+          "Vasco da Gama": 0
+        },
+        "gols_extraidos": {
+          "Bahia": 0,
+          "Vasco da Gama": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Bahia": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Vasco da Gama": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Bahia": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Vasco da Gama": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary + scoreboard",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-09T18:09:49.584119-03:00"
+    },
+    "401841180": {
+      "event_id": "401841180",
+      "event_id_fonte_detalhes": "401841180",
+      "rodada": 22,
+      "data_iso": "2026-08-09T16:00",
+      "mandante": "Palmeiras",
+      "visitante": "Internacional",
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "estadio": "Allianz Parque",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Davi De Oliveira Lacerda",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "62.4%",
+          "away": "37.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "9",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "461",
+          "away": "258"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "545",
+          "away": "343"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "8",
+          "away": "9"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "15",
+          "away": "14"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "11",
+          "away": "7"
+        },
+        {
+          "nome": "Cortes",
+          "home": "13",
+          "away": "34"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "62.4%",
+          "away": "37.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "9",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "5",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "16"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "461",
+          "away": "258"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "545",
+          "away": "343"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "8",
+          "away": "9"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "15",
+          "away": "14"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "11",
+          "away": "7"
+        },
+        {
+          "nome": "Cortes",
+          "home": "13",
+          "away": "34"
+        }
+      ],
+      "gols": [],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "39'",
+          "jogador": "Murilo",
+          "time": "Palmeiras",
+          "descricao": "Yellow Card 94 Murilo (Palmeiras) is shown the yellow card for a bad foul. Murilo Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "52'",
+          "jogador": "Paulinho",
+          "time": "Internacional",
+          "descricao": "Yellow Card 94 Paulinho Paula (Internacional) is shown the yellow card for a bad foul. Paulinho Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "70'",
+          "jogador": "Brian Aguirre",
+          "time": "Internacional",
+          "descricao": "Yellow Card 94 Braian Aguirre (Internacional) is shown the yellow card for a bad foul. Brian Aguirre Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "72'",
+          "jogador": "Matheus Cunha Queiroz",
+          "time": "Internacional",
+          "descricao": "Yellow Card 94 Matheus Cunha (Internacional) is shown the yellow card. Matheus Cunha Queiroz Yellow Car"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "165232",
+          "nome": "Alan Patrick",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285029",
+          "nome": "Alexander Bernabei",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "295006",
+          "nome": "Bruno Gomes",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "188485",
+          "nome": "Bruno Henrique",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "251963",
+          "nome": "Félix Torres",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "200562",
+          "nome": "Guillermo Maripán",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270246",
+          "nome": "Johan Carbonero",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304656",
+          "nome": "Matheus Bahia",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "315201",
+          "nome": "Matheus Cunha Queiroz",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "289499",
+          "nome": "Paulinho",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287903",
+          "nome": "Vitinho",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "309131",
+          "nome": "Brian Aguirre",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "417352",
+          "nome": "João Bezerra",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "222664",
+          "nome": "Juninho",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "229574",
+          "nome": "Ronaldo",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "222631",
+          "nome": "Alexander Barboza",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "382966",
+          "nome": "Allan Andrade",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "210143",
+          "nome": "Andreas Pereira",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "276741",
+          "nome": "Carlos Miguel",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "109962",
+          "nome": "Emiliano Martínez",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "239566",
+          "nome": "Jhon Arias",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "254007",
+          "nome": "Joaquín Piquerez",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "234016",
+          "nome": "Marlon Freitas",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "289046",
+          "nome": "Maurício",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "252609",
+          "nome": "Murilo",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "301653",
+          "nome": "Ramón Sosa",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "315619",
+          "nome": "Agustín Giay",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "152812",
+          "nome": "Felipe Anderson",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "311743",
+          "nome": "José Manuel López",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "329383",
+          "nome": "Vitor Roque",
+          "time": "Palmeiras",
+          "team_id": "2029",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Palmeiras": 0,
+          "Internacional": 0
+        },
+        "gols_extraidos": {
+          "Palmeiras": 0,
+          "Internacional": 0
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Palmeiras": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Internacional": {
+            "amarelo": 3,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Palmeiras": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Internacional": {
+            "amarelo": 3,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary + scoreboard",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-09T18:09:50.020839-03:00"
+    },
     "401841183": {
       "event_id": "401841183",
       "event_id_fonte_detalhes": "401841183",
@@ -593,7 +1656,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T17:41:58.292062-03:00"
+      "atualizado_em": "2026-08-09T18:09:50.449657-03:00"
     },
     "401841185": {
       "event_id": "401841185",
@@ -1167,7 +2230,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T17:41:58.769335-03:00"
+      "atualizado_em": "2026-08-09T18:09:50.925787-03:00"
     },
     "401841184": {
       "event_id": "401841184",
@@ -1722,7 +2785,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T17:41:59.180212-03:00"
+      "atualizado_em": "2026-08-09T18:09:51.369328-03:00"
     },
     "401841178": {
       "event_id": "401841178",
@@ -2302,7 +3365,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T17:41:59.824417-03:00"
+      "atualizado_em": "2026-08-09T18:09:51.752303-03:00"
     },
     "401841181": {
       "event_id": "401841181",
@@ -2892,7 +3955,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T17:42:00.248509-03:00"
+      "atualizado_em": "2026-08-09T18:09:52.166983-03:00"
     },
     "401841173": {
       "event_id": "401841173",
@@ -11793,7 +12856,7 @@
       "origem_resultado": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo_resultado_manual": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial.",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T17:42:00.705514-03:00"
+      "atualizado_em": "2026-08-09T18:09:52.534189-03:00"
     },
     "401841151": {
       "event_id": "401841151",
