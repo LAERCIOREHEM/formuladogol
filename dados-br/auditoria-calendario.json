@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-08-08T20:41:44.974163-03:00",
+  "gerado_em": "2026-08-08T21:09:40.558481-03:00",
   "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
@@ -12,13 +12,13 @@
     "partidas_com_data_confirmada": 262,
     "partidas_com_data_a_definir": 118,
     "resultados_publicados": 209,
-    "proximos_publicados": 41,
+    "proximos_publicados": 40,
     "eventos_espn_na_janela": 249,
     "ajustes_calendario_configurados": 3,
     "jogos_adiados_sem_data": 0,
     "rodadas_espn_com_clube_repetido": 0,
     "rodadas_preservadas_do_calendario_anterior": 1,
-    "falhas_graves": 1
+    "falhas_graves": 0
   },
   "avisos": [
     {
@@ -595,18 +595,7 @@
       "integra": false
     }
   ],
-  "duplicados_entre_resultados_e_proximos": [
-    {
-      "rodada": 22,
-      "mandante": "Remo",
-      "visitante": "Atlético-MG"
-    }
-  ],
-  "falhas": [
-    {
-      "tipo": "jogo_em_resultados_e_proximos",
-      "total": 1
-    }
-  ],
+  "duplicados_entre_resultados_e_proximos": [],
+  "falhas": [],
   "observacao": "O calendário só é substituído depois de validar 380 partidas, 38 rodadas íntegras, 20 clubes com 38 jogos e 190 confrontos de ida e volta."
 }
