@@ -12,7 +12,7 @@
   "resumo": {
     "jogos_na_janela": 58,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 32,
+    "candidatos_oficiais_encontrados": 33,
     "search_api_fallback_chamadas": 2,
     "search_api_jogos_elegiveis": 22,
     "search_api_jogos_pulados_grade_estavel": 36,
@@ -722,6 +722,16 @@
     }
   ],
   "rejeitados": [
+    {
+      "video_id": "qxt8hkI930o",
+      "url": "https://www.youtube.com/watch?v=qxt8hkI930o",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "FLAMENGO X VITÓRIA | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-09T18:00:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
+    },
     {
       "video_id": "6aH_p7C1D8w",
       "url": "https://www.youtube.com/watch?v=6aH_p7C1D8w",
@@ -1722,5 +1732,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos channelIds oficiais de GE TV/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-09T16:40:12-03:00"
+  "atualizado_em": "2026-08-09T17:04:11-03:00"
 }
