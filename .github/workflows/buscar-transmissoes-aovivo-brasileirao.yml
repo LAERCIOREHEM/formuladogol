@@ -1,12 +1,12 @@
 name: Buscar transmissões dos clubes do Brasileirão
 
 on:
-  # Busca ativa a cada 15 minutos entre 06:07 e 23:52 BRT.
-  # Na madrugada, uma verificação por hora preserva atualidade sem desperdício.
-  # Minutos deslocados evitam o pico de carga do GitHub no início da hora.
+  # Busca ativa a cada 10 minutos nas faixas de jogos.
+  # Na madrugada, uma verificação por hora preserva atualidade sem consumir quota.
+  # O search.list caro só é acionado pelo script na janela crítica e quando necessário.
   schedule:
-    - cron: '7,22,37,52 9-23 * * *'
-    - cron: '7,22,37,52 0-2 * * *'
+    - cron: '3,13,23,33,43,53 9-23 * * *'
+    - cron: '3,13,23,33,43,53 0-2 * * *'
     - cron: '17 3-8 * * *'
   workflow_dispatch:
     inputs:
@@ -25,6 +25,7 @@ on:
       - 'scripts/buscar_transmissoes_aovivo_brasileirao.py'
       - 'scripts/gerar_agenda_clubes_brasileirao.py'
       - 'jogos.json'
+      - 'dados-br/calendario-completo.json'
       - 'dados-br/competicoes-af-previsao/copa-do-brasil.json'
       - 'dados-br/competicoes-af-previsao/libertadores.json'
       - 'dados-br/competicoes-af-previsao/sul-americana.json'
@@ -138,7 +139,7 @@ jobs:
               assert parsed.netloc.lower() in {'www.youtube.com', 'youtube.com'}, f'{event_id}: URL fora do YouTube'
               assert parse_qs(parsed.query).get('v'), f'{event_id}: URL sem video_id'
               if jogo.get('alternativas'):
-                  assert principal.get('fonte') == 'cazetv', f'{event_id}: com duas fontes, CazéTV deve ser principal'
+                  assert principal.get('fonte') == 'getv', f'{event_id}: com duas fontes, GE TV deve ser principal'
           aud = json.load(open('dados-br/auditoria-transmissoes-aovivo.json', encoding='utf-8'))
           assert isinstance(aud.get('resumo'), dict), 'auditoria sem resumo'
           assert isinstance(aud.get('rejeitados'), list), 'auditoria sem rejeitados'
@@ -151,8 +152,32 @@ jobs:
               assert jogo.get('canais'), f'TV: {event_id} sem canais'
               assert jogo.get('confianca') in {'confirmado', 'manual', 'preservado'}, f'TV: confiança inválida em {event_id}'
               assert isinstance(jogo.get('fontes'), list) and jogo['fontes'], f'TV: {event_id} sem evidências'
+              assert isinstance(jogo.get('acessos'), list), f'TV: {event_id} sem lista de acessos'
               invalidos = set(jogo['canais']) - permitidos
               assert not invalidos, f'TV: canal não permitido em {event_id}: {sorted(invalidos)}'
+              if jogo.get('estavel') is True and jogo.get('canais') == ['Globo']:
+                  raise AssertionError(f'TV: {event_id} não pode considerar Globo isolada como grade estável')
+              for acesso in jogo.get('acessos') or []:
+                  assert str(acesso.get('url') or '').startswith('https://'), f'TV: acesso inválido em {event_id}'
+
+          # Grade editorial fixa é um contrato incremental: depois de verificada,
+          # não pode desaparecer numa execução futura. Player integral GE/Cazé
+          # pode SOMAR, mas nunca substituir os canais já confirmados.
+          manual = json.load(open('transmissoes.json', encoding='utf-8'))
+          from scripts.atualizar_transmissoes_tv_brasileirao import extract_channels
+          for regra in manual.get('transmissoes') or []:
+              if str(regra.get('modo') or '').lower() != 'fixo' or not regra.get('event_id'):
+                  continue
+              event_id = str(regra['event_id'])
+              saida = tv['jogos'].get(event_id)
+              if not saida:
+                  continue  # fora da janela corrente do coletor
+              esperados = set(extract_channels(regra.get('transmissao') or regra.get('canais')))
+              atuais = set(saida.get('canais') or [])
+              assert esperados <= atuais, f'TV: {event_id} perdeu canal fixo: {sorted(esperados - atuais)}'
+              if regra.get('exclusivo') is True:
+                  assert atuais == esperados, f'TV: {event_id} exclusivo recebeu canal indevido: {sorted(atuais - esperados)}'
+
           aud_tv = json.load(open('dados-br/auditoria-transmissoes-tv.json', encoding='utf-8'))
           resumo_tv = aud_tv.get('resumo') or {}
           assert isinstance(aud_tv.get('fontes'), dict), 'auditoria TV sem fontes'
@@ -161,7 +186,7 @@ jobs:
           criticos = int(resumo_tv.get('jogos_criticos_sem_transmissao_72h') or 0)
           if criticos:
               print(f'::warning title=Transmissões pendentes::{criticos} jogo(s) nas próximas 72h ainda sem canal confirmado')
-          print(f'YouTube e transmissões TV validados; críticos sem canal: {criticos}')
+          print(f'YouTube e transmissões TV validados; prioridade GE TV/CazéTV; críticos sem canal: {criticos}')
           PY
 
       - name: Commitar somente quando houver mudança real
