@@ -10,7 +10,7 @@ Regras principais:
 - Faz scraping da página /@canal/streams (custo zero de quota) em toda
   execução para capturar lives agendadas não presentes nos uploads recentes.
 - Liga o vídeo ao jogo somente quando clubes + horário dão confiança alta.
-- CazéTV tem prioridade sobre GE TV; exibe sempre um único link.
+- GE TV tem prioridade sobre CazéTV; exibe sempre um único link.
 - Links manuais têm prioridade absoluta e nunca são sobrescritos.
 
 Usa apenas biblioteca padrão do Python. Requer YOUTUBE_API_KEY para
@@ -580,6 +580,86 @@ def scan_uploads(client: YouTubeClient, channel: Mapping[str, str], max_items: i
 
 
 
+def scan_search_api(
+    client: YouTubeClient,
+    channel: Mapping[str, str],
+    event_type: str,
+    max_results: int,
+    errors: List[str],
+) -> List[Candidate]:
+    """Fallback agressivo e controlado via search.list no canal oficial.
+
+    search.list custa 100 unidades, por isso só é acionado na janela crítica e
+    apenas quando /streams + uploads não localizaram a transmissão. A busca é
+    restrita pelo ``channelId`` oficial e por ``eventType`` (live/upcoming).
+    """
+    if event_type not in {"live", "upcoming"}:
+        return []
+    channel_id = str(channel.get("channel_id") or "")
+    if not channel_id:
+        return []
+    try:
+        data = client.get(
+            "search",
+            part="snippet",
+            channelId=channel_id,
+            type="video",
+            eventType=event_type,
+            order="date",
+            maxResults=max(1, min(50, int(max_results or 25))),
+        )
+        ids: List[str] = []
+        for item in data.get("items") or []:
+            raw_id = item.get("id") or {}
+            vid = str(raw_id.get("videoId") if isinstance(raw_id, Mapping) else raw_id or "")
+            if re.fullmatch(r"[A-Za-z0-9_-]{11}", vid):
+                ids.append(vid)
+        if not ids:
+            return []
+        details = fetch_video_details(client, ids)
+    except Exception as exc:  # noqa: BLE001
+        errors.append(f"Falha no search.list {event_type} de {channel.get('nome')}: {exc}")
+        return []
+
+    out: List[Candidate] = []
+    for item in details:
+        cand = candidate_from_video(item, str(channel.get("chave")), f"search-{event_type}")
+        if cand and cand.channel_id == channel_id and cand.status in {"upcoming", "live"}:
+            out.append(cand)
+    return out
+
+
+def game_minutes_to_kickoff(game: Game, current_time: dt.datetime) -> float:
+    return (game.kickoff - current_time).total_seconds() / 60.0
+
+
+def needs_live_search(
+    games: Sequence[Game],
+    matched: Mapping[str, Mapping[str, Candidate]],
+    current_time: dt.datetime,
+    config: Mapping[str, Any],
+) -> bool:
+    before = float(config.get("search_live_antes_minutos") or 30)
+    after = float(config.get("search_live_depois_minutos") or 180)
+    return any(
+        not matched.get(game.event_id) and -after <= game_minutes_to_kickoff(game, current_time) <= before
+        for game in games
+    )
+
+
+def needs_upcoming_search(
+    games: Sequence[Game],
+    matched: Mapping[str, Mapping[str, Candidate]],
+    current_time: dt.datetime,
+    config: Mapping[str, Any],
+) -> bool:
+    before = float(config.get("search_upcoming_antes_minutos") or 90)
+    return any(
+        not matched.get(game.event_id) and 0 < game_minutes_to_kickoff(game, current_time) <= before
+        for game in games
+    )
+
+
 def load_existing_video_ids(output: Mapping[str, Any], manual: Mapping[str, Any]) -> List[str]:
     ids: List[str] = []
     for container in (output, manual):
@@ -802,8 +882,8 @@ def build_outputs(
     output_base = {
         "fonte": "YouTube oficial — CazéTV e GE TV | clubes do Brasileirão",
         "politica": {
-            "prioridade": ["cazetv", "getv"],
-            "regra": "Somente canais oficiais configurados; CazéTV tem prioridade sobre GE TV; link único.",
+            "prioridade": list(config.get("prioridade") or ["getv", "cazetv"]),
+            "regra": "Somente canais oficiais configurados; GE TV tem prioridade sobre CazéTV; link único.",
             "janela": f"de {config.get('janela_antes_horas', 24)}h antes até {after_minutes} min após o início",
             "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta",
         },
@@ -875,7 +955,7 @@ def build_outputs(
             errors.append(f"Falha ao revalidar links existentes: {exc}")
 
     # Deduplica: /streams > uploads > validação-direta.
-    source_rank = {"streams-page": 3, "uploads": 2, "validação-direta": 1}
+    source_rank = {"search-live": 5, "search-upcoming": 4, "streams-page": 3, "uploads": 2, "validação-direta": 1}
     unique: Dict[str, Candidate] = {}
     for cand in candidates:
         old = unique.get(cand.video_id)
@@ -884,7 +964,52 @@ def build_outputs(
     candidates = list(unique.values())
 
     matched, accepted, rejected = match_candidates_to_games(targets, candidates, channels, config, aliases)
-    priority = list(config.get("prioridade") or ["cazetv", "getv"])
+    manual_target_ids = {
+        game.event_id for game in targets if manual_links_for_game(manual, game, channels)
+    }
+    matched_for_search: Dict[str, Dict[str, Candidate]] = {
+        game.event_id: dict(matched.get(game.event_id, {})) for game in targets
+    }
+    for event_id in manual_target_ids:
+        matched_for_search.setdefault(event_id, {})["manual"] = Candidate(
+            video_id="MANUAL00000", channel_key="manual", channel_id="", channel_title="",
+            title="", description="", status="live", scheduled_start=None, actual_start=None, actual_end=None,
+        )
+
+    # 4) Fallback agressivo na janela crítica. /streams e uploads às vezes
+    # atrasam a exposição de uma live recém-iniciada; search.list enxerga o
+    # estado ao vivo diretamente no canal oficial. O custo é controlado e a
+    # busca só roda quando ainda existe jogo sem vínculo seguro.
+    search_calls = 0
+    max_search_calls = int(config.get("search_limite_chamadas_por_execucao") or 4)
+    if config.get("search_api_fallback", True):
+        aggressive: List[Candidate] = []
+        if needs_live_search(targets, matched_for_search, current_time, config):
+            for channel in channels.values():
+                if search_calls >= max_search_calls:
+                    break
+                aggressive.extend(scan_search_api(
+                    client, channel, "live", int(config.get("search_max_resultados") or 25), errors
+                ))
+                search_calls += 1
+        if needs_upcoming_search(targets, matched_for_search, current_time, config):
+            for channel in channels.values():
+                if search_calls >= max_search_calls:
+                    break
+                aggressive.extend(scan_search_api(
+                    client, channel, "upcoming", int(config.get("search_max_resultados") or 25), errors
+                ))
+                search_calls += 1
+
+        if aggressive:
+            for cand in aggressive:
+                old_cand = unique.get(cand.video_id)
+                if old_cand is None or cand.source.startswith("search-"):
+                    unique[cand.video_id] = cand
+            candidates = list(unique.values())
+            matched, accepted, rejected = match_candidates_to_games(targets, candidates, channels, config, aliases)
+
+    priority = list(config.get("prioridade") or ["getv", "cazetv"])
 
     published: Dict[str, Any] = {}
     no_stream: List[Dict[str, Any]] = []
@@ -953,6 +1078,7 @@ def build_outputs(
             "jogos_na_janela": len(targets),
             "busca_streams_executada": True,
             "candidatos_oficiais_encontrados": len(candidates),
+            "search_api_fallback_chamadas": search_calls,
             "transmissoes_publicadas": len(published),
             "sem_transmissao": len(no_stream),
             "erros": len(errors),
@@ -966,7 +1092,7 @@ def build_outputs(
         "quota_estimada_youtube": {
             "unidades": client.quota_estimated,
             "requisicoes": client.requests,
-            "observacao": "search.list não é usado. A aba /streams custa apenas videos.list; a playlist de uploads mantém redundância. A execução típica permanece muito abaixo da cota diária gratuita do YouTube Data API.",
+            "observacao": "A descoberta usa /streams + uploads e aciona search.list apenas como fallback na janela crítica. search.list é restrito aos channelIds oficiais de GE TV/CazéTV e limitado por execução.",
         },
     }
     return output_base, audit, True
@@ -1016,13 +1142,43 @@ def selftest() -> None:
     }, "getv", "test")
     assert emb_blocked is None
 
-    # Prioridade: CazéTV vence GE TV; link único (alternativas vazio)
-    principal, alternatives = choose_links({"getv": {"fonte": "getv"}, "cazetv": {"fonte": "cazetv"}}, ["cazetv", "getv"])
-    assert principal and principal["fonte"] == "cazetv"
+    # Prioridade: GE TV vence CazéTV; link único (alternativas vazio)
+    principal, alternatives = choose_links({"getv": {"fonte": "getv"}, "cazetv": {"fonte": "cazetv"}}, ["getv", "cazetv"])
+    assert principal and principal["fonte"] == "getv"
     assert alternatives == [], f"alternativas devem ser vazias, got {alternatives}"
 
     assert video_id_from_url("https://www.youtube.com/watch?v=54apQSJpf0A") == "54apQSJpf0A"
     assert video_id_from_url("https://youtu.be/54apQSJpf0A?t=2") == "54apQSJpf0A"
+
+    # Fallback search.list: restrito ao channelId oficial e validado por videos.list.
+    class FakeClient:
+        def __init__(self):
+            self.requests = {}
+            self.quota_estimated = 0
+        def get(self, resource, **params):
+            self.requests[resource] = self.requests.get(resource, 0) + 1
+            self.quota_estimated += ENDPOINT_COST.get(resource, 1)
+            if resource == "search":
+                assert params.get("channelId") == "UC1"
+                assert params.get("eventType") == "live"
+                return {"items": [{"id": {"videoId": "GGGGGGGGGGG"}}]}
+            if resource == "videos":
+                return {"items": [{
+                    "id": "GGGGGGGGGGG",
+                    "snippet": {
+                        "channelId": "UC1", "channelTitle": "CazéTV",
+                        "title": "BOTAFOGO X SANTOS | BRASILEIRÃO 2026 | AO VIVO",
+                        "description": "", "liveBroadcastContent": "live",
+                    },
+                    "status": {"privacyStatus": "public", "embeddable": True},
+                    "liveStreamingDetails": {"actualStartTime": "2026-07-16T22:30:00Z"},
+                }]}
+            raise AssertionError(resource)
+    fake = FakeClient()
+    search_candidates = scan_search_api(fake, {"chave":"cazetv","nome":"CazéTV","channel_id":"UC1"}, "live", 25, [])
+    assert len(search_candidates) == 1 and search_candidates[0].video_id == "GGGGGGGGGGG"
+    assert fake.quota_estimated == 101
+    assert needs_live_search([game], {game.event_id:{}}, game.kickoff, {"search_live_antes_minutos":30,"search_live_depois_minutos":180})
 
     # Teste scraping: extrai IDs de HTML simulado
     html_fake = '''
@@ -1034,7 +1190,7 @@ def selftest() -> None:
     assert "Cih-UxYNCSs" in ids_found, f"ID da live Cazé não encontrado: {ids_found}"
     assert len(ids_found) == 3
 
-    print("SELFTEST OK: vínculo, rejeições, aliases, prioridade CazéTV, link único, /streams e uploads")
+    print("SELFTEST OK: vínculo, rejeições, aliases, prioridade GE TV, link único, /streams, uploads e fallback search")
 
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:

@@ -65,6 +65,7 @@ OUTPUT = ROOT / "dados-br" / "transmissoes-tv.json"
 AUDIT_OUTPUT = ROOT / "dados-br" / "auditoria-transmissoes-tv.json"
 CONFIG_PATH = ROOT / "dados-br" / "config-transmissoes-tv.json"
 MANUAL = ROOT / "transmissoes.json"
+LIVE_YOUTUBE = ROOT / "dados-br" / "transmissoes-aovivo.json"
 
 PROVIDERS: list[tuple[str, tuple[str, ...]]] = [
     ("Premiere", ("premiere", "premiere clubes")),
@@ -77,6 +78,10 @@ PROVIDERS: list[tuple[str, tuple[str, ...]]] = [
     ("CazéTV", ("cazetv", "caze tv", "cazé tv", "youtube cazetv", "youtube / caze tv")),
 ]
 ALLOWED_CHANNELS = {label for label, _ in PROVIDERS}
+PREFERRED_CHANNEL_ORDER = {
+    "GE TV": 0, "CazéTV": 1, "Premiere": 2, "SporTV": 3,
+    "Globo": 4, "Record": 5, "Prime Video": 6, "Disney+ / ESPN": 7,
+}
 
 DEFAULT_CONFIG: dict[str, Any] = {
     "janela_passado_dias": 2,
@@ -553,8 +558,24 @@ def channels_near_game(raw_text: str, home: str, away: str, *, radius: int = 140
         return []
     _, hp, ap = best
     start = max(0, min(hp, ap) - 300)
-    end = min(len(ntext), max(hp, ap) + 850)
-    return extract_channels(ntext[start:end])
+    end = min(len(ntext), max(hp, ap) + 1000)
+    window = ntext[start:end]
+
+    # Primeiro tenta frases explicitamente ligadas a transmissão. Isso evita
+    # que a marca/publisher "Globo" presente em metadados da página vença um
+    # texto editorial claro como "O Premiere transmite o duelo ao vivo".
+    explicit_segments = re.findall(
+        r".{0,140}(?:transmiss(?:ao|oes)|transmite|onde assistir|ao vivo).{0,220}",
+        window,
+    )
+    explicit: list[str] = []
+    for segment in explicit_segments:
+        for channel in extract_channels(segment):
+            if channel not in explicit:
+                explicit.append(channel)
+    if explicit:
+        return explicit
+    return extract_channels(window)
 
 
 def iter_json_nodes(node: Any) -> Iterator[Any]:
@@ -571,6 +592,26 @@ def iter_json_nodes(node: Any) -> Iterator[Any]:
         yield node
 
 
+BROADCAST_CONTEXT_KEYS = {
+    "broadcast", "broadcasts", "geobroadcasts", "media", "channel", "channels",
+    "transmissao", "transmission", "where to watch", "wheretowatch",
+    "onde assistir", "ondeassistir", "streaming", "watch", "watchproviders",
+}
+
+
+def node_has_broadcast_context(node: Any) -> bool:
+    """Evita confundir metadados editoriais (ex.: publisher=Globo) com transmissão."""
+    if isinstance(node, Mapping):
+        for key, value in node.items():
+            if norm(key) in BROADCAST_CONTEXT_KEYS:
+                return True
+            if isinstance(value, (Mapping, list, tuple)) and node_has_broadcast_context(value):
+                return True
+    elif isinstance(node, (list, tuple)):
+        return any(node_has_broadcast_context(value) for value in node)
+    return False
+
+
 def structured_channels_for_game(json_blobs: Sequence[Any], home: str, away: str) -> list[str]:
     """Seleciona o menor objeto JSON que contém os dois clubes e um provedor."""
     matches: list[tuple[int, list[str]]] = []
@@ -578,6 +619,8 @@ def structured_channels_for_game(json_blobs: Sequence[Any], home: str, away: str
         for node in iter_json_nodes(blob):
             text = flatten_text(node, max_chars=8000)
             if not text_contains_game(text, home, away):
+                continue
+            if not node_has_broadcast_context(node):
                 continue
             channels = extract_channels(node)
             if channels:
@@ -840,6 +883,39 @@ def manual_evidence(manual: Mapping[str, Any], games: Sequence[Mapping[str, Any]
     return out
 
 
+def live_youtube_evidence(
+    live_output: Mapping[str, Any], games: Sequence[Mapping[str, Any]], captured_at: str
+) -> dict[str, list[Evidence]]:
+    """Transforma player oficial validado em evidência forte de onde assistir."""
+    out: dict[str, list[Evidence]] = {}
+    game_ids = {str(g.get("event_id") or g.get("id") or "") for g in games}
+    for event_id, item in (live_output.get("jogos") or {}).items():
+        if str(event_id) not in game_ids or not isinstance(item, Mapping):
+            continue
+        links = [item.get("principal")] + list(item.get("alternativas") or [])
+        channels: list[str] = []
+        refs: list[str] = []
+        for link in links:
+            if not isinstance(link, Mapping):
+                continue
+            source = norm(link.get("fonte"))
+            label = "GE TV" if source == "getv" else ("CazéTV" if source == "cazetv" else "")
+            if label and label not in channels:
+                channels.append(label)
+            if link.get("url"):
+                refs.append(str(link.get("url")))
+        if channels:
+            out.setdefault(str(event_id), []).append(Evidence(
+                source="YouTube oficial validado",
+                channels=channels,
+                reference=" | ".join(refs) or "dados-br/transmissoes-aovivo.json",
+                captured_at=captured_at,
+                authority=120,
+                detail="player oficial público e embeddable validado por channelId",
+            ))
+    return out
+
+
 def existing_evidence(existing: Mapping[str, Any], games: Sequence[Mapping[str, Any]], captured_at: str) -> dict[str, list[Evidence]]:
     out: dict[str, list[Evidence]] = {}
     for event_id, item in (existing.get("jogos") or {}).items():
@@ -899,6 +975,7 @@ def consolidate_game(
                 channels.append(channel)
     if not channels:
         return None
+    channels.sort(key=lambda channel: (PREFERRED_CHANNEL_ORDER.get(channel, 99), channel))
 
     source_names = [e.source for e in selected]
     return {
@@ -1104,11 +1181,21 @@ def collect(
         source_status["espn"] = {"ok": False, "erro": f"{type(exc).__name__}: {exc}"}
         errors.append("ESPN: " + source_status["espn"]["erro"])
 
+    # O player oficial validado pelo workflow de YouTube também é evidência de
+    # transmissão. Como esse workflow roda antes deste script, uma CazéTV/GE TV
+    # encontrada ao vivo passa a aparecer imediatamente em "Onde assistir".
+    live_output = payloads.get("aovivo_output") if isinstance(payloads.get("aovivo_output"), Mapping) else None
+    if live_output is None:
+        live_output = load_json(LIVE_YOUTUBE, {"jogos": {}})
+    live_found = live_youtube_evidence(live_output, games, captured_at)
+    merge_evidence(evidence_by_game, live_found)
+    source_status["youtube_oficial"] = {"ok": True, "jogos_com_canal": len(live_found)}
+
     # Override manual e snapshot anterior entram por último, com políticas próprias.
     merge_evidence(evidence_by_game, manual_evidence(manual, games, captured_at))
     merge_evidence(evidence_by_game, existing_evidence(existing, games, captured_at))
 
-    any_automatic_ok = any(source_status.get(name, {}).get("ok") for name in ("cbf", "ge_agenda", "ge_artigos", "espn"))
+    any_automatic_ok = any(source_status.get(name, {}).get("ok") for name in ("cbf", "ge_agenda", "ge_artigos", "espn", "youtube_oficial"))
     generated: dict[str, Any] = {}
     for game in games:
         event_id = str(game.get("event_id") or game.get("id") or "")
@@ -1120,7 +1207,7 @@ def collect(
     payload = {
         "descricao": "Transmissões oficiais por TV ou streaming dos clubes do Brasileirão.",
         "politica": {
-            "fontes": ["CBF oficial", "GE Agenda", "GE guias editoriais", "ESPN", "override manual"],
+            "fontes": ["CBF oficial", "GE Agenda", "GE guias editoriais", "ESPN", "YouTube oficial validado", "override manual"],
             "regra_preservacao": "resposta vazia ou falha de uma fonte nunca apaga transmissão válida já publicada",
             "regra_publicacao": "somente canais oficiais da lista permitida; evidências ficam registradas por jogo",
             "youtube_exato": "links exatos de GE TV/CazéTV permanecem em dados-br/transmissoes-aovivo.json",
@@ -1202,8 +1289,8 @@ def selftest() -> None:
         source_payloads={"cbf_rows": cbf, "ge_agenda_html": ge_html, "espn_scoreboard": espn, "espn_summaries": {}},
     )
     assert payload["jogos"]["1"]["canais"] == ["Premiere", "SporTV"]
-    assert payload["jogos"]["2"]["canais"] == ["Premiere", "Record", "CazéTV"]
-    assert payload["jogos"]["3"]["canais"] == ["Globo", "Premiere"]
+    assert payload["jogos"]["2"]["canais"] == ["CazéTV", "Premiere", "Record"]
+    assert payload["jogos"]["3"]["canais"] == ["Premiere", "Globo"]
     assert payload["jogos"]["3"]["confianca"] == "manual"
     assert audit["resumo"]["jogos_criticos_sem_transmissao_72h"] == 0
 
@@ -1231,6 +1318,13 @@ def selftest() -> None:
     parsed_blobs = json_candidates_from_html(ge_html)
     assert structured_channels_for_game(parsed_blobs, "Santos", "Chapecoense") == ["Premiere", "SporTV"]
     assert structured_channels_for_game(parsed_blobs, "Vasco da Gama", "Mirassol") == ["Record", "CazéTV"]
+    publisher_noise = [{"name":"Globo", "headline":"Coritiba x Chapecoense", "description":"notícia do jogo"}]
+    assert structured_channels_for_game(publisher_noise, "Coritiba", "Chapecoense") == []
+    explicit_page = "Coritiba e Chapecoense se enfrentam hoje. O Premiere transmite o duelo ao vivo."
+    assert channels_near_game(explicit_page, "Coritiba", "Chapecoense") == ["Premiere"]
+    live_test = {"jogos":{"1":{"principal":{"fonte":"cazetv","url":"https://www.youtube.com/watch?v=AAAAAAAAAAA"},"alternativas":[]}}}
+    live_games = [{"event_id":"1","mandante":{"nome":"Coritiba"},"visitante":{"nome":"Chapecoense"}}]
+    assert live_youtube_evidence(live_test, live_games, "2026-08-08T22:00:00-03:00")["1"][0].channels == ["CazéTV"]
     print("SELFTEST OK: CBF, GE, ESPN, manual, preservação, auditoria e links editoriais")
 
 

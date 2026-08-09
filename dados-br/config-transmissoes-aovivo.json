@@ -2,8 +2,8 @@
   "fonte": "YouTube oficial",
   "competicao": "Clubes da Série A 2026 — Brasileirão, Copa do Brasil, Libertadores e Sul-Americana",
   "prioridade": [
-    "cazetv",
-    "getv"
+    "getv",
+    "cazetv"
   ],
   "canais": [
     {
@@ -24,10 +24,10 @@
     }
   ],
   "janela_antes_horas": 1008,
-  "janela_depois_inicio_minutos": 90,
-  "manter_apos_inicio_horas": 3,
+  "janela_depois_inicio_minutos": 180,
+  "manter_apos_inicio_horas": 4,
   "uploads_max_itens": 500,
-  "tolerancia_horario_minutos": 180,
+  "tolerancia_horario_minutos": 240,
   "confianca_minima": 0.72,
   "termos_competicao": [
     "brasileirão",
@@ -58,6 +58,12 @@
     "compacto"
   ],
   "agenda_ge_referencia": "https://ge.globo.com/agenda/#/futebol",
-  "observacao": "A agenda consolidada dos clubes do Brasileirão orienta a grade; o botão de vídeo só é publicado quando existe live oficial validada pelo channelId do YouTube. A aba /streams e a playlist de uploads são consultadas de forma redundante.",
-  "streams_max_itens": 120
+  "observacao": "A agenda consolidada orienta a grade. Descoberta redundante: /streams + uploads + search.list oficial de baixo volume na janela crítica. GE TV tem prioridade sobre CazéTV; somente vídeo público, oficial e embeddable vira player interno.",
+  "streams_max_itens": 120,
+  "search_api_fallback": true,
+  "search_live_antes_minutos": 30,
+  "search_live_depois_minutos": 180,
+  "search_upcoming_antes_minutos": 90,
+  "search_max_resultados": 25,
+  "search_limite_chamadas_por_execucao": 4
 }

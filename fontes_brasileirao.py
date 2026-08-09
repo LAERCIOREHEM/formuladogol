@@ -20,6 +20,7 @@ import html
 import json
 import os
 import re
+import ssl
 import time
 import unicodedata
 import urllib.error
@@ -76,6 +77,14 @@ def normalizar_texto(valor: Any) -> str:
     return re.sub(r"\s+", " ", texto).strip()
 
 
+def _cbf_official_host(url: str) -> bool:
+    try:
+        host = (urllib.parse.urlparse(url).hostname or "").lower()
+    except Exception:
+        return False
+    return host == "cbf.com.br" or host.endswith(".cbf.com.br")
+
+
 def fetch_text(url: str, *, timeout: int = 30, tentativas: int = 2) -> str:
     """Busca HTML oficial com fingerprint de navegador e fallback padrão.
 
@@ -91,14 +100,30 @@ def fetch_text(url: str, *, timeout: int = 30, tentativas: int = 2) -> str:
         try:
             from curl_cffi import requests as curl_requests  # type: ignore
 
-            response = curl_requests.get(
-                cache_url,
-                impersonate="chrome",
-                timeout=timeout + (tentativa - 1) * 8,
-                headers={"Accept-Language": HEADERS_HTML["Accept-Language"]},
-            )
-            response.raise_for_status()
-            return response.text
+            try:
+                response = curl_requests.get(
+                    cache_url,
+                    impersonate="chrome",
+                    timeout=timeout + (tentativa - 1) * 8,
+                    headers={"Accept-Language": HEADERS_HTML["Accept-Language"]},
+                )
+                response.raise_for_status()
+                return response.text
+            except Exception as first_exc:
+                # A cadeia TLS pública da CBF já falhou em runners GitHub por
+                # problema de certificado intermediário. O fallback sem
+                # verificação fica estritamente limitado a hosts oficiais CBF.
+                if not _cbf_official_host(cache_url):
+                    raise
+                response = curl_requests.get(
+                    cache_url,
+                    impersonate="chrome",
+                    timeout=timeout + (tentativa - 1) * 8,
+                    headers={"Accept-Language": HEADERS_HTML["Accept-Language"]},
+                    verify=False,
+                )
+                response.raise_for_status()
+                return response.text
         except ImportError:
             pass
         except Exception as exc:  # noqa: BLE001
@@ -112,6 +137,15 @@ def fetch_text(url: str, *, timeout: int = 30, tentativas: int = 2) -> str:
                 return response.read().decode(charset, errors="replace")
         except Exception as exc:  # noqa: BLE001
             erros_tentativa.append(f"urllib={type(exc).__name__}: {exc}")
+            if _cbf_official_host(cache_url):
+                try:
+                    context = ssl._create_unverified_context()
+                    req = urllib.request.Request(cache_url, headers=HEADERS_HTML)
+                    with urllib.request.urlopen(req, timeout=timeout + (tentativa - 1) * 8, context=context) as response:
+                        charset = response.headers.get_content_charset() or "utf-8"
+                        return response.read().decode(charset, errors="replace")
+                except Exception as insecure_exc:  # noqa: BLE001
+                    erros_tentativa.append(f"urllib-cbf-fallback={type(insecure_exc).__name__}: {insecure_exc}")
             ultimo = RuntimeError(" | ".join(erros_tentativa))
             if tentativa < tentativas:
                 time.sleep(2 * tentativa)
@@ -446,6 +480,9 @@ def localizar_fixture_api_football(
 
 
 def _selftest() -> None:
+    assert _cbf_official_host("https://www.cbf.com.br/x")
+    assert _cbf_official_host("https://cbf-hml.cbf.com.br/x")
+    assert not _cbf_official_host("https://example.com/x")
     aliases = {
         "botafogo": "Botafogo",
         "vitoria": "Vitória",
