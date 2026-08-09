@@ -1239,6 +1239,22 @@ jobs:
           echo "ERRO: Push falhou apos 5 tentativas."
           exit 1
 
+      - name: Disparar deploy após publicação válida
+        if: >-
+          steps.publish_main.outputs.published == 'true' ||
+          steps.publish_independent.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          # O push acima é autenticado com GITHUB_TOKEN e, por proteção contra
+          # recursão do GitHub Actions, não cria outro workflow por evento push.
+          # deploy.yml aceita workflow_dispatch, portanto o acionamos
+          # explicitamente após o commit ter sido publicado no main.
+          gh workflow run deploy.yml --ref main
+          echo "Deploy do site disparado para o main recém-publicado."
+
       - name: Disparar editoriais somente após publicação válida
         if: >-
           steps.publish_main.outputs.published == 'true' ||
@@ -1248,21 +1264,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # O deploy NÃO é despachado aqui. O próprio push dos dados públicos
-          # aciona deploy.yml exatamente uma vez. Despachar também por API criava
-          # dois Deploy site para o mesmo commit.
-          # IMPORTANTE: não dispare os dois workflows ao mesmo tempo.
+          # IMPORTANTE: não dispare os dois workflows editoriais ao mesmo tempo.
           # Todos os workflows que escrevem no main usam repo-write-main.
-          # O GitHub mantém no máximo 1 execução running + 1 pending por grupo;
-          # dois dispatches enquanto este workflow ainda ocupa o grupo faziam
-          # uma execução pendente substituir/cancelar a outra.
-          #
-          # A Copa é o primeiro elo. Ao terminar (mesmo sem artigo novo, ou
-          # mesmo se algum passo editorial falhar), ela despacha a análise da
-          # rodada. Assim existe no máximo UMA execução editorial pendente.
-          gh workflow run publicar-analise-copa-do-brasil.yml             --ref main             -f encadear_rodada=true
+          # A Copa é o primeiro elo e encadeia a análise da rodada ao concluir.
+          gh workflow run publicar-analise-copa-do-brasil.yml --ref main -f encadear_rodada=true
           echo "Editorial da Copa disparado; ele encadeará o editorial da rodada ao concluir."
-          echo "O deploy continua sendo acionado apenas por push público real."
 
   # Alerta integrado ao próprio workflow. Substitui o antigo workflow
   # "Monitorar Atualizar Brasileirao" e evita uma execução cinza a cada hora.
