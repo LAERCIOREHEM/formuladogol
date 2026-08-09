@@ -1,15 +1,1089 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-09T20:09:52.221260-03:00",
+  "gerado_em": "2026-08-09T20:44:25.411321-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 214,
-  "total_com_estatisticas": 213,
+  "total_jogos": 216,
+  "total_com_estatisticas": 215,
   "total_com_publico": 211,
-  "total_com_eventos": 213,
-  "total_com_jogadores": 213,
-  "total_eventos_validados": 214,
+  "total_com_eventos": 215,
+  "total_com_jogadores": 215,
+  "total_eventos_validados": 216,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841179": {
+      "event_id": "401841179",
+      "event_id_fonte_detalhes": "401841179",
+      "rodada": 22,
+      "data_iso": "2026-08-09T18:30",
+      "mandante": "Bragantino",
+      "visitante": "Corinthians",
+      "placar_mandante": 0,
+      "placar_visitante": 2,
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Raphael Claus",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "48%",
+          "away": "52%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "10",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "14"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "286",
+          "away": "307"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "353",
+          "away": "389"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "12",
+          "away": "15"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "5",
+          "away": "10"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "3",
+          "away": "17"
+        },
+        {
+          "nome": "Cortes",
+          "home": "21",
+          "away": "26"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "48%",
+          "away": "52%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "10",
+          "away": "9"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "20%",
+          "away": "40%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "14"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "3"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "4",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "286",
+          "away": "307"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "353",
+          "away": "389"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "12",
+          "away": "15"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "5",
+          "away": "10"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "3",
+          "away": "17"
+        },
+        {
+          "nome": "Cortes",
+          "home": "21",
+          "away": "26"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "59'",
+          "jogador": "Rodrigo Garro",
+          "time": "Corinthians",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! RB Bragantino 0, Corinthians 1. Rodrigo Garro (Corinthians) left footed shot from the centre of the box to the bottom left corner. Rodrigo Garro Goal"
+        },
+        {
+          "minuto": "87'",
+          "jogador": "Pedro Raúl",
+          "time": "Corinthians",
+          "assistencias": [
+            "Matheuzinho"
+          ],
+          "descricao": "Goal - Header 137 Goal! RB Bragantino 0, Corinthians 2. Pedro Raul (Corinthians) header from the centre of the box to the bottom left corner. Assisted by Matheuzinho with a cross. Pedro Raúl Goal - Header"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "10'",
+          "jogador": "Rodrigo Garro",
+          "time": "Corinthians",
+          "descricao": "Yellow Card 94 Rodrigo Garro (Corinthians) is shown the yellow card for a bad foul. Rodrigo Garro Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "17'",
+          "jogador": "Ramires",
+          "time": "Bragantino",
+          "descricao": "Yellow Card 94 Eric Ramires (RB Bragantino) is shown the yellow card. Ramires Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "74'",
+          "jogador": "André Carrillo",
+          "time": "Corinthians",
+          "descricao": "Yellow Card 94 André Carrillo (Corinthians) is shown the yellow card for a bad foul. André Carrillo Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "80'",
+          "jogador": "Gabriel Paulista",
+          "time": "Corinthians",
+          "descricao": "Yellow Card 94 Gabriel Paulista (Corinthians) is shown the yellow card. Gabriel Paulista Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "257335",
+          "nome": "Alix Vinicius",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199680",
+          "nome": "Eduardo Sasha",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "333314",
+          "nome": "Henry Mosquera",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287035",
+          "nome": "Isidro Pitta",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "311087",
+          "nome": "José Hurtado",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "229555",
+          "nome": "Juninho Capixaba",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "248584",
+          "nome": "Lucas Barbosa",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "202485",
+          "nome": "Pedro Henrique",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "279941",
+          "nome": "Ramires",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "339001",
+          "nome": "Rodriguinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "145092",
+          "nome": "Tiago Volpi",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "357358",
+          "nome": "Gustavinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "361621",
+          "nome": "Marcelinho Braz",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "225538",
+          "nome": "Matheus Fernandes",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "383987",
+          "nome": "Vinicinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "400891",
+          "nome": "Yuri",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "223437",
+          "nome": "Allan",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "338898",
+          "nome": "Breno Bidon",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "192226",
+          "nome": "Gabriel Paulista",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "168981",
+          "nome": "Gustavo Henrique",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "257051",
+          "nome": "Hugo Souza",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "347456",
+          "nome": "Kaio",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "272533",
+          "nome": "Mateuzinho",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287774",
+          "nome": "Matheus Bidu",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "234070",
+          "nome": "Pedro Raúl",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "236099",
+          "nome": "Raniele",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270562",
+          "nome": "Rodrigo Garro",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "148189",
+          "nome": "André Carrillo",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "169136",
+          "nome": "Jesse Lingard",
+          "time": "Corinthians",
+          "team_id": "874",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Bragantino": 0,
+          "Corinthians": 2
+        },
+        "gols_extraidos": {
+          "Bragantino": 0,
+          "Corinthians": 2
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Bragantino": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Corinthians": {
+            "amarelo": 3,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Bragantino": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Corinthians": {
+            "amarelo": 3,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary + scoreboard",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-09T20:44:21.168852-03:00"
+    },
+    "401841182": {
+      "event_id": "401841182",
+      "event_id_fonte_detalhes": "401841182",
+      "rodada": 22,
+      "data_iso": "2026-08-09T18:30",
+      "mandante": "Santos",
+      "visitante": "Athletico-PR",
+      "placar_mandante": 0,
+      "placar_visitante": 2,
+      "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Rafael Rodrigo Klein",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "62.4%",
+          "away": "37.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "10",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "10",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "494",
+          "away": "280"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "568",
+          "away": "351"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "10",
+          "away": "12"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "12",
+          "away": "18"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "15",
+          "away": "38"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "62.4%",
+          "away": "37.6%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "22",
+          "away": "8"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "2",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "10",
+          "away": "3"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "10%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "10",
+          "away": "2"
+        },
+        {
+          "nome": "Faltas",
+          "home": "12",
+          "away": "11"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "1"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "494",
+          "away": "280"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "90%",
+          "away": "80%"
+        },
+        {
+          "nome": "Passes",
+          "home": "568",
+          "away": "351"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "10",
+          "away": "12"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "12",
+          "away": "18"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "9",
+          "away": "9"
+        },
+        {
+          "nome": "Cortes",
+          "home": "15",
+          "away": "38"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "14'",
+          "jogador": "Kevin Viveros",
+          "time": "Athletico-PR",
+          "assistencias": [],
+          "descricao": "Goal 70 Goal! Santos 0, Athletico Paranaense 1. Kevin Viveros (Athletico Paranaense) left footed shot from the centre of the box to the bottom left corner. Kevin Viveros Goal"
+        },
+        {
+          "minuto": "26'",
+          "jogador": "Kevin Viveros",
+          "time": "Athletico-PR",
+          "assistencias": [
+            "João Cruz"
+          ],
+          "descricao": "Goal 70 Goal! Santos 0, Athletico Paranaense 2. Kevin Viveros (Athletico Paranaense) left footed shot from the centre of the box to the bottom right corner. Assisted by João Cruz following a fast break. Kevin Viveros Goal"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "20'",
+          "jogador": "Adonis Frias",
+          "time": "Santos",
+          "descricao": "Yellow Card 94 Adonis Frías (Santos) is shown the yellow card for a bad foul. Adonis Frias Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "34'",
+          "jogador": "Kevin Viveros",
+          "time": "Athletico-PR",
+          "descricao": "Yellow Card 94 Kevin Viveros (Athletico Paranaense) is shown the yellow card for a bad foul. Kevin Viveros Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "381170",
+          "nome": "Arthur Dias",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287688",
+          "nome": "Gastón Benavídez",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "198761",
+          "nome": "Gilberto",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "173351",
+          "nome": "Jádson",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "361359",
+          "nome": "João Cruz",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270242",
+          "nome": "Juan Felipe Aguirre",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "268476",
+          "nome": "Kevin Viveros",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "380327",
+          "nome": "Leozinho",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "113352",
+          "nome": "Luiz Gustavo",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "322655",
+          "nome": "Mycael",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "197049",
+          "nome": "Stiven Mendoza",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "360826",
+          "nome": "Dantas",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "382858",
+          "nome": "Diogo Riquelme",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "361357",
+          "nome": "Eduardo",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "315789",
+          "nome": "Filipinho",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "340596",
+          "nome": "Kerwin Vargas",
+          "time": "Athletico-PR",
+          "team_id": "3458",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "234447",
+          "nome": "Adonis Frias",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "279454",
+          "nome": "Álvaro Barreal",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270486",
+          "nome": "Christian Oliva",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "182522",
+          "nome": "Gabriel Barbosa",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "399179",
+          "nome": "Gabriel Bontempo",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "266665",
+          "nome": "Gabriel Brazão",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "301544",
+          "nome": "Gabriel Menino",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "236353",
+          "nome": "Gonzalo Escobar",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "154853",
+          "nome": "Gustavo Caballero",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "408862",
+          "nome": "João Ananias",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "196856",
+          "nome": "João Schmidt",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269813",
+          "nome": "Benjamín Rollheiser",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "236314",
+          "nome": "Rony",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "218938",
+          "nome": "Thaciano",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "173621",
+          "nome": "Willian Arão",
+          "time": "Santos",
+          "team_id": "2674",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Santos": 0,
+          "Athletico-PR": 2
+        },
+        "gols_extraidos": {
+          "Santos": 0,
+          "Athletico-PR": 2
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Santos": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Athletico-PR": {
+            "amarelo": 1,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Santos": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Athletico-PR": {
+            "amarelo": 1,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary + scoreboard",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-09T20:44:21.703129-03:00"
+    },
     "401841186": {
       "event_id": "401841186",
       "event_id_fonte_detalhes": "401841186",
@@ -544,7 +1618,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T20:09:49.104306-03:00"
+      "atualizado_em": "2026-08-09T20:44:22.193449-03:00"
     },
     "401841180": {
       "event_id": "401841180",
@@ -1071,7 +2145,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T20:09:49.518059-03:00"
+      "atualizado_em": "2026-08-09T20:44:22.606234-03:00"
     },
     "401841183": {
       "event_id": "401841183",
@@ -1656,7 +2730,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T20:09:49.918086-03:00"
+      "atualizado_em": "2026-08-09T20:44:23.002325-03:00"
     },
     "401841185": {
       "event_id": "401841185",
@@ -2230,7 +3304,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T20:09:50.523394-03:00"
+      "atualizado_em": "2026-08-09T20:44:23.532878-03:00"
     },
     "401841184": {
       "event_id": "401841184",
@@ -2785,7 +3859,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T20:09:50.917593-03:00"
+      "atualizado_em": "2026-08-09T20:44:23.960931-03:00"
     },
     "401841178": {
       "event_id": "401841178",
@@ -3365,7 +4439,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T20:09:51.307488-03:00"
+      "atualizado_em": "2026-08-09T20:44:24.366188-03:00"
     },
     "401841181": {
       "event_id": "401841181",
@@ -3955,7 +5029,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T20:09:51.755005-03:00"
+      "atualizado_em": "2026-08-09T20:44:24.816785-03:00"
     },
     "401841173": {
       "event_id": "401841173",
@@ -12856,7 +13930,7 @@
       "origem_resultado": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo_resultado_manual": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial.",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-09T20:09:52.138777-03:00"
+      "atualizado_em": "2026-08-09T20:44:25.328834-03:00"
     },
     "401841151": {
       "event_id": "401841151",
