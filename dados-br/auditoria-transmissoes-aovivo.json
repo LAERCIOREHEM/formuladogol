@@ -12,8 +12,8 @@
   "resumo": {
     "jogos_na_janela": 58,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 27,
-    "search_api_fallback_chamadas": 0,
+    "candidatos_oficiais_encontrados": 32,
+    "search_api_fallback_chamadas": 2,
     "search_api_jogos_elegiveis": 22,
     "search_api_jogos_pulados_grade_estavel": 36,
     "transmissoes_publicadas": 2,
@@ -694,12 +694,13 @@
       "video_id": "uVdrqw8H1u8",
       "url": "https://www.youtube.com/watch?v=uVdrqw8H1u8",
       "titulo": "PALMEIRAS X INTERNACIONAL | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
-      "status": "upcoming",
-      "confianca": 0.875,
+      "status": "live",
+      "confianca": 0.925,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
         "horário compatível (90 min de diferença)"
       ]
     },
@@ -721,16 +722,6 @@
     }
   ],
   "rejeitados": [
-    {
-      "video_id": "JnIm9FoIc0E",
-      "url": "https://www.youtube.com/watch?v=JnIm9FoIc0E",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: TIME BRASIL NO SLS RIO TAKEOVER 2026 | SKATE | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-08-09T11:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
     {
       "video_id": "6aH_p7C1D8w",
       "url": "https://www.youtube.com/watch?v=6aH_p7C1D8w",
@@ -892,6 +883,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "5brLBN2ER4Q",
+      "url": "https://www.youtube.com/watch?v=5brLBN2ER4Q",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE FLAMENGO ANALISA DUELO CONTRA O VITÓRIA PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-10T15:00:00-03:00",
+      "motivo": "horário incompatível (1170 min de diferença)"
+    },
+    {
       "video_id": "89tPGaf7W4s",
       "url": "https://www.youtube.com/watch?v=89tPGaf7W4s",
       "fonte": "getv",
@@ -899,6 +900,46 @@
       "titulo": "ATLÉTICO-MG X GRÊMIO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-08-16T14:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "8gJi9hnnmIg",
+      "url": "https://www.youtube.com/watch?v=8gJi9hnnmIg",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE FLUMINENSE ANALISA EMPATE CONTRA O BOTAFOGO PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-10T10:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "B1O3WjJORhY",
+      "url": "https://www.youtube.com/watch?v=B1O3WjJORhY",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE BOTAFOGO ANALISA EMPATE CONTRA O FLUMINENSE PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-10T12:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "DehtZcYif0Q",
+      "url": "https://www.youtube.com/watch?v=DehtZcYif0Q",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE CRUZEIRO ANALISA VITÓRIA CONTRA O MIRASSOL PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-10T14:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "FiJYoVlWn6o",
+      "url": "https://www.youtube.com/watch?v=FiJYoVlWn6o",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE VASCO ANALISA DUELO CONTRA O BAHIA PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-10T14:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -947,8 +988,18 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "SURFE AO VIVO: WSL TAHITI PRO 2026 | ETAPA DE TEAHUPO'O | DIA 2 | ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-08-09T14:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "tJBjYhNHtiE",
+      "url": "https://www.youtube.com/watch?v=tJBjYhNHtiE",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! GE ATLÉTICO-MG ANALISA EMPATE CONTRA O REMO PELO BRASILEIRÃO | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-10T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1662,13 +1713,14 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 45,
+    "unidades": 245,
     "requisicoes": {
       "channels": 2,
       "videos": 23,
-      "playlistItems": 20
+      "playlistItems": 20,
+      "search": 2
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos channelIds oficiais de GE TV/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-09T13:16:05-03:00"
+  "atualizado_em": "2026-08-09T14:39:12-03:00"
 }
