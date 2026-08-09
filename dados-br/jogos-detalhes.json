@@ -1,15 +1,88 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-08T22:09:49.185819-03:00",
+  "gerado_em": "2026-08-08T22:41:49.393770-03:00",
   "fonte": "ESPN summary",
-  "total_jogos": 209,
+  "total_jogos": 210,
   "total_com_estatisticas": 204,
   "total_com_publico": 182,
   "total_com_eventos": 204,
   "total_com_jogadores": 204,
   "total_eventos_validados": 206,
-  "total_eventos_pendentes_detalhes": 3,
+  "total_eventos_pendentes_detalhes": 4,
   "jogos": {
+    "401841184": {
+      "event_id": "401841184",
+      "event_id_fonte_detalhes": "401841184",
+      "rodada": 22,
+      "data_iso": "2026-08-08T20:30",
+      "mandante": "Coritiba",
+      "visitante": "Chapecoense",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "estadio": "Couto Pereira",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [],
+      "estatisticas": [],
+      "gols": [],
+      "cartoes": [],
+      "jogadores": [],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Coritiba": 2,
+          "Chapecoense": 1
+        },
+        "gols_extraidos": {
+          "Coritiba": 0,
+          "Chapecoense": 0
+        },
+        "gols_completos": false,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": false,
+        "cartoes_esperados": {
+          "Coritiba": {
+            "amarelo": null,
+            "vermelho": null
+          },
+          "Chapecoense": {
+            "amarelo": null,
+            "vermelho": null
+          }
+        },
+        "cartoes_extraidos": {
+          "Coritiba": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Chapecoense": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": false,
+        "pendente_detalhes": true,
+        "tipo_pendencia": "ficha_espn_incompleta",
+        "motivo": "ficha de gols incompleta: 0/3 atribuídos"
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-08T22:41:40.479469-03:00"
+    },
     "401841178": {
       "event_id": "401841178",
       "event_id_fonte_detalhes": "401841178",
@@ -81,7 +154,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:09:42.430614-03:00"
+      "atualizado_em": "2026-08-08T22:41:42.242395-03:00"
     },
     "401841181": {
       "event_id": "401841181",
@@ -154,7 +227,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:09:44.087850-03:00"
+      "atualizado_em": "2026-08-08T22:41:44.012445-03:00"
     },
     "401841173": {
       "event_id": "401841173",
@@ -9055,7 +9128,7 @@
       "origem_resultado": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo_resultado_manual": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial.",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:09:45.731938-03:00"
+      "atualizado_em": "2026-08-08T22:41:45.776970-03:00"
     },
     "401841151": {
       "event_id": "401841151",
@@ -9676,7 +9749,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:09:47.374265-03:00"
+      "atualizado_em": "2026-08-08T22:41:47.538151-03:00"
     },
     "401841150": {
       "event_id": "401841150",
@@ -14194,7 +14267,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:09:49.102597-03:00"
+      "atualizado_em": "2026-08-08T22:41:49.310779-03:00"
     },
     "401841149": {
       "event_id": "401841149",

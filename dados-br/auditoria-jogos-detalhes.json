@@ -1,17 +1,67 @@
 {
-  "gerado_em": "2026-08-08T22:09:49.186063-03:00",
+  "gerado_em": "2026-08-08T22:41:49.393927-03:00",
   "fonte": "ESPN summary",
   "modo": "rede",
-  "total_resultados_lidos": 209,
-  "total_processados": 209,
+  "total_resultados_lidos": 210,
+  "total_processados": 210,
   "total_buscados_na_espn": 0,
   "total_com_estatisticas": 204,
   "total_com_publico": 182,
-  "total_sem_publico": 27,
+  "total_sem_publico": 28,
   "total_com_eventos": 204,
   "total_eventos_validados": 206,
-  "total_eventos_pendentes_detalhes": 3,
+  "total_eventos_pendentes_detalhes": 4,
   "eventos_pendentes_detalhes": [
+    {
+      "event_id": "401841184",
+      "jogo": "Coritiba x Chapecoense",
+      "validacao": {
+        "gols_esperados": {
+          "Coritiba": 2,
+          "Chapecoense": 1
+        },
+        "gols_extraidos": {
+          "Coritiba": 0,
+          "Chapecoense": 0
+        },
+        "gols_completos": false,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": false,
+        "cartoes_esperados": {
+          "Coritiba": {
+            "amarelo": null,
+            "vermelho": null
+          },
+          "Chapecoense": {
+            "amarelo": null,
+            "vermelho": null
+          }
+        },
+        "cartoes_extraidos": {
+          "Coritiba": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Chapecoense": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": false,
+        "pendente_detalhes": true,
+        "tipo_pendencia": "ficha_espn_incompleta",
+        "motivo": "ficha de gols incompleta: 0/3 atribuídos"
+      }
+    },
     {
       "event_id": "401841178",
       "jogo": "Remo x Atlético-MG",
@@ -167,11 +217,21 @@
   "inconsistencias_eventos": [],
   "total_sem_estatisticas": 0,
   "total_preservados_de_execucao_anterior": 209,
-  "total_falhas": 0,
+  "total_falhas": 1,
   "sem_estatisticas": [],
-  "falhas": [],
+  "falhas": [
+    {
+      "event_id": "401841184",
+      "jogo": "R22 · Coritiba x Chapecoense · 401841184",
+      "erro": "falha ao buscar https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary?event=401841184: HTTPError: HTTP Error 403: Forbidden"
+    }
+  ],
   "total_com_jogadores": 204,
   "jogos_sem_escalacoes": [
+    {
+      "event_id": "401841184",
+      "jogo": "Coritiba x Chapecoense"
+    },
     {
       "event_id": "401841178",
       "jogo": "Remo x Atlético-MG"
