@@ -65,13 +65,17 @@ def validate(root: Path) -> None:
             assert text.count('class="analysis-game-card"') == int(article.get("jogos_concluidos") or 0), f"{slug}: jogos divergentes"
             assert "Padrão dos percentuais" in text, f"{slug}: explicação de percentuais ausente"
         elif article_type == "copa_do_brasil_fase":
-            assert int(article.get("confrontos") or 0) == 8, f"{slug}: quantidade de confrontos inválida"
-            assert len(article.get("classificados") or []) == 8, f"{slug}: classificados incompletos"
-            assert text.count('class="analysis-cup-tie"') == 8, f"{slug}: cards de confronto divergentes"
-            assert text.count('class="analysis-status ') == 14, f"{slug}: comparação da Série A divergente"
-            assert "Os confrontos das quartas dependerão do sorteio" in text, f"{slug}: ressalva do sorteio ausente"
+            confrontos = int(article.get("confrontos") or 0)
+            classificados = article.get("classificados") or []
+            assert confrontos in {1, 2, 4, 8}, f"{slug}: quantidade de confrontos inválida: {confrontos}"
+            assert len(classificados) == confrontos, f"{slug}: classificados/vencedor incompatíveis com a fase"
+            assert len(set(classificados)) == len(classificados), f"{slug}: classificados duplicados"
+            assert text.count('class="analysis-cup-tie"') == confrontos, f"{slug}: cards de confronto divergentes"
+            assert article.get("fase_encerrada") and article.get("fase_seguinte"), f"{slug}: metadados da fase ausentes"
+            assert 'data-fdg-analise-competicao="copa-do-brasil"' in text, f"{slug}: marcador da competição ausente"
             assert "Tabela do Brasileirão" not in text and "analysis-kpis" not in text, f"{slug}: layout indevidamente herdado da rodada"
-            assert re.search(r"Via Copa.*0%", text, flags=re.I | re.S), f"{slug}: eliminação sem zero explícito"
+            if 'class="analysis-status status-eliminated"' in text:
+                assert re.search(r"Via Copa.*0%", text, flags=re.I | re.S), f"{slug}: eliminação sem zero explícito"
             expected_videos = int(article.get("melhores_momentos_vinculados") or 0)
             video_ids = re.findall(r'data-video-id="([A-Za-z0-9_-]{11})"', text)
             assert len(video_ids) == expected_videos, f"{slug}: quantidade de embeds diverge do manifesto ({len(video_ids)}/{expected_videos})"

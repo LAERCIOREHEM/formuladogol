@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Localiza melhores momentos oficiais das oitavas da Copa do Brasil 2026 no YouTube.
+"""Localiza melhores momentos oficiais das fases eliminatórias da Copa do Brasil 2026 no YouTube.
 
 Objetivos:
 - vincular vídeo por event_id ESPN, nunca apenas pelo nome do confronto;
@@ -31,8 +31,7 @@ COPA_PATH = ROOT / "dados-br" / "competicoes-af-previsao" / "copa-do-brasil.json
 CONFIG_PATH = ROOT / "dados-br" / "config-transmissoes-aovivo.json"
 OUTPUT_PATH = ROOT / "dados-br" / "melhores-momentos-copa-do-brasil.json"
 YT_API = "https://www.googleapis.com/youtube/v3"
-PHASE_RANK = 600
-EXPECTED_GAMES = 16
+PHASES = {600: "Oitavas de final", 700: "Quartas de final", 800: "Semifinal", 900: "Final"}
 TZ = dt.timezone(dt.timedelta(hours=-3))
 
 
@@ -108,10 +107,26 @@ def side_name(side: Any) -> str:
     return str((side or {}).get("nome") or (side or {}).get("nome_espn") or "").strip()
 
 
-def game_rows(snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
+def current_phase_rank(snapshot: Mapping[str, Any]) -> int:
+    try:
+        rank = int((snapshot.get("fase_atual") or {}).get("ordem") or 0)
+    except (TypeError, ValueError):
+        rank = 0
+    if rank in PHASES:
+        return rank
+    available = sorted({
+        int(event.get("fase_ordem") or 0)
+        for event in (snapshot.get("eventos") or [])
+        if int(event.get("fase_ordem") or 0) in PHASES
+    })
+    return available[-1] if available else 0
+
+
+def game_rows(snapshot: Mapping[str, Any], phase_rank: int | None = None) -> list[dict[str, Any]]:
+    rank = phase_rank or current_phase_rank(snapshot)
     rows: list[dict[str, Any]] = []
     for event in snapshot.get("eventos") or []:
-        if int(event.get("fase_ordem") or 0) != PHASE_RANK:
+        if int(event.get("fase_ordem") or 0) != rank:
             continue
         if not event.get("concluido"):
             continue
@@ -121,6 +136,7 @@ def game_rows(snapshot: Mapping[str, Any]) -> list[dict[str, Any]]:
             continue
         rows.append({
             "event_id": str(event.get("event_id") or ""),
+            "fase_ordem": rank,
             "data_iso": str(event.get("data_iso") or ""),
             "mandante": home,
             "visitante": away,
@@ -305,7 +321,11 @@ def best_for_game(game: Mapping[str, Any], candidates: Sequence[Candidate], chan
 def build_payload(games: Sequence[Mapping[str, Any]], found: Mapping[str, Candidate], client: YouTube | None, previous: Mapping[str, Any] | None = None) -> dict[str, Any]:
     previous = previous or {}
     previous_games = previous.get("jogos") if isinstance(previous, Mapping) else {}
-    rows: dict[str, Any] = {}
+    rows: dict[str, Any] = {
+        str(key): dict(value)
+        for key, value in (previous_games or {}).items()
+        if isinstance(value, Mapping)
+    }
     missing: list[str] = []
     for game in games:
         event_id = str(game["event_id"])
@@ -339,8 +359,8 @@ def build_payload(games: Sequence[Mapping[str, Any]], found: Mapping[str, Candid
     return {
         "schema_version": 1,
         "competicao": "Copa do Brasil 2026",
-        "fase": "Oitavas de final",
-        "fase_ordem": PHASE_RANK,
+        "fase": PHASES.get(int(games[0].get("fase_ordem") or 0), "Fase eliminatória") if games else str((previous or {}).get("fase") or "Fase eliminatória"),
+        "fase_ordem": int(games[0].get("fase_ordem") or 0) if games else int((previous or {}).get("fase_ordem") or 0),
         "atualizado_em": iso(now_brt()),
         "fonte": "YouTube oficial — vídeos públicos com incorporação permitida",
         "politica": "Vínculo por event_id ESPN; canais oficiais; ambos os clubes e a competição precisam ser reconhecidos; embed deve estar permitido pelo YouTube.",
@@ -358,9 +378,13 @@ def build_payload(games: Sequence[Mapping[str, Any]], found: Mapping[str, Candid
 
 def run(api_key: str, dry_run: bool = False) -> dict[str, Any]:
     snapshot = load_json(COPA_PATH, {}) or {}
-    games = game_rows(snapshot)
-    if len(games) != EXPECTED_GAMES:
-        raise RuntimeError(f"Copa do Brasil: esperado {EXPECTED_GAMES} jogos concluídos das oitavas; encontrados {len(games)}")
+    rank = current_phase_rank(snapshot)
+    if rank not in PHASES:
+        raise RuntimeError("Copa do Brasil: fase eliminatória atual não identificada")
+    games = game_rows(snapshot, rank)
+    if not games:
+        print(f"Copa do Brasil: nenhum jogo concluído em {PHASES[rank]}; mapa anterior preservado.")
+        return load_json(OUTPUT_PATH, {}) or build_payload([], {}, None, {})
     config = load_json(CONFIG_PATH, {}) or {}
     channels = [item for item in (config.get("canais") or []) if item.get("channel_id")]
     channel_ids = {str(item["channel_id"]) for item in channels}
@@ -407,8 +431,13 @@ def self_test() -> None:
     assert scored.score >= 120 and "placar confere" in scored.reasons
     bad = Candidate("AbCdEfGhI_2","official","GE TV","VITÓRIA 4 X 0 BAHIA | MELHORES MOMENTOS | COPA DO BRASIL 2026","","",True,True,"test")
     assert evaluate(bad, game).score == 0
-    payload = build_payload([{"event_id":"1", **game}], {"1": scored}, None, {})
+    payload = build_payload([{"event_id":"1", "fase_ordem":700, **game}], {"1": scored}, None, {})
     assert payload["total_vinculados"] == 1 and payload["jogos"]["1"]["embeddable"] is True
+    assert payload["fase"] == "Quartas de final" and payload["fase_ordem"] == 700
+    previous = {"jogos": {"old": {"event_id": "old", "video_id": "AbCdEfGhI_9", "embeddable": True}}, "fase": "Oitavas de final", "fase_ordem": 600}
+    preserved = build_payload([{"event_id":"1", "fase_ordem":700, **game}], {}, None, previous)
+    assert "old" in preserved["jogos"] and "1" not in preserved["jogos"]
+    assert current_phase_rank({"fase_atual": {"ordem": 800}, "eventos": []}) == 800
     changed_time = copy.deepcopy(payload)
     changed_time["atualizado_em"] = "2099-01-01T00:00:00-03:00"
     changed_time["auditoria_api"] = {"quota_estimada": 999, "requisicoes": {"search": 9}}

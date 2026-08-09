@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Gera e valida as análises editoriais estáticas do Brasileirão.
 
-O modelo de linguagem nunca recebe liberdade para inventar dados: resultados,
-variações e tabelas são produzidos deterministicamente a partir dos JSONs do
-site. A IA, quando configurada, redige somente trechos narrativos sem algarismos.
+Resultados, variações e tabelas são produzidos deterministicamente a partir dos
+JSONs do site. Quando existe editorial da camada diária de IA, este script apenas
+valida e publica o JSON já produzido; nunca chama a OpenAI diretamente.
 """
 
 from __future__ import annotations
@@ -15,9 +15,6 @@ import json
 import os
 import re
 import sys
-import time
-import urllib.error
-import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from decimal import Decimal, ROUND_HALF_UP
@@ -35,7 +32,6 @@ ARQUIVO_MANIFESTO = Path("dados-br/analises.json")
 ARQUIVO_CONFIG = Path("dados-br/config-analises.json")
 ARQUIVO_ACURACIA = Path("dados-br/acuracia-af-previsao.json")
 CAMINHO_ANALISES = Path("analises")
-MODELO_PADRAO = "gpt-5.6-terra"
 MARCADOR = "fdg-analise-rodada"
 
 
@@ -70,14 +66,6 @@ def agora_br() -> datetime:
 
 def normalizar_nome(valor: str) -> str:
     return re.sub(r"\s+", " ", str(valor or "").strip())
-
-
-def normalizar_modelo_openai(valor: str | None) -> str:
-    bruto = normalizar_nome(valor or MODELO_PADRAO)
-    alias = re.sub(r"[\s_]+", "-", bruto.casefold())
-    if alias in {"5.6-terra", "gpt-5.6-terra"}:
-        return "gpt-5.6-terra"
-    return bruto or MODELO_PADRAO
 
 
 def nome_time(objeto: Any) -> str:
@@ -592,70 +580,6 @@ def hash_editorial(dossie: dict[str, Any]) -> str:
 
 def editorial_gerado_pela_openai(origem: Any) -> bool:
     return str(origem or "").startswith("openai:")
-
-
-def chamar_openai(dossie: dict[str, Any], modelo: str) -> dict[str, Any]:
-    chave = os.environ.get("OPENAI_API_KEY", "").strip()
-    if not chave:
-        raise ErroAnalise("OPENAI_API_KEY não configurada")
-    resumo = resumo_editorial(dossie)
-    instrucao = (
-        "Você é o editor esportivo do Fórmula do Gol, projeto independente de Laércio Rehem. Produza uma análise autoral "
-        "em português brasileiro, com voz de colunista experiente: humana, direta, sóbria e interpretativa. Use exclusivamente "
-        "o dossiê factual fornecido. Não invente desempenho tático, domínio, chances criadas, lesão, jogador, declaração, torcida, "
-        "local ou qualquer causa que não esteja no dossiê. Diferencie resultado, classificação atual e projeção estatística. "
-        "O texto deve explicar por que a combinação dos resultados mudou as corridas por título, vagas continentais e permanência. "
-        "Não repita mecanicamente todos os placares, pois eles aparecerão em cards logo abaixo. Não escreva algarismos: números "
-        "auditados serão exibidos pelo template e pela tabela. Não trate probabilidade como certeza. Evite clichês e linguagem de IA, "
-        "incluindo 'vale destacar', 'em um cenário', 'a narrativa', 'mergulhar', 'jornada', 'não apenas', 'o futebol nos ensina' e "
-        "'mais do que nunca'. Crie seções com ângulos distintos, transições naturais e informação concreta; não encerre com frase motivacional."
-    )
-    payload = {
-        "model": modelo,
-        "store": False,
-        "reasoning": {"effort": "medium"},
-        "input": [
-            {"role": "developer", "content": instrucao},
-            {"role": "user", "content": "Dossiê factual auditado:\n" + json.dumps(resumo, ensure_ascii=False, separators=(",", ":"))},
-        ],
-        "max_output_tokens": 4200,
-        "text": {"format": {"type": "json_schema", "name": "analise_rodada", "strict": True, "schema": schema_editorial()}},
-    }
-    retorno = None
-    for tentativa in range(1, 4):
-        requisicao = urllib.request.Request(
-            "https://api.openai.com/v1/responses",
-            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-            headers={"Authorization": f"Bearer {chave}", "Content-Type": "application/json"},
-            method="POST",
-        )
-        try:
-            with urllib.request.urlopen(requisicao, timeout=150) as resposta:
-                retorno = json.loads(resposta.read().decode("utf-8"))
-            break
-        except urllib.error.HTTPError as erro:
-            detalhe = erro.read().decode("utf-8", errors="replace")[:600]
-            if erro.code not in {408, 409, 429, 500, 502, 503, 504} or tentativa == 3:
-                raise ErroAnalise(f"OpenAI respondeu HTTP {erro.code}: {detalhe}") from erro
-        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as erro:
-            if tentativa == 3:
-                raise ErroAnalise(f"Falha na API da OpenAI após três tentativas: {erro}") from erro
-        time.sleep(2 ** (tentativa - 1))
-    if not isinstance(retorno, dict):
-        raise ErroAnalise("A API da OpenAI não devolveu uma resposta utilizável")
-    if retorno.get("status") == "incomplete":
-        raise ErroAnalise(f"Resposta incompleta da OpenAI: {retorno.get('incomplete_details') or 'sem detalhe'}")
-    textos = []
-    for saida in retorno.get("output") or []:
-        for parte in saida.get("content") or []:
-            if parte.get("type") == "output_text" and parte.get("text"):
-                textos.append(parte["text"])
-    if not textos:
-        raise ErroAnalise("Resposta da OpenAI sem output_text")
-    try:
-        return json.loads("".join(textos))
-    except json.JSONDecodeError as erro:
-        raise ErroAnalise("Resposta editorial não é JSON válido") from erro
 
 
 def validar_editorial(editorial: dict[str, Any], dossie: dict[str, Any]) -> None:
@@ -1174,15 +1098,19 @@ def executar(args: argparse.Namespace) -> int:
         print(f"Fatos editoriais da rodada {rodada} inalterados; texto existente reutilizado sem chamar a API.")
     else:
         fallback = narrativa_segura(dossie)
-        if args.sem_ia:
-            editorial, origem = fallback, "editorial_curado" if rodada == 20 else "deterministico"
-        else:
-            modelo = normalizar_modelo_openai(args.modelo)
-            candidato = chamar_openai(dossie, modelo)
+        if args.editorial_json:
+            try:
+                candidato = json.loads(Path(args.editorial_json).read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise ErroAnalise(f"Editorial externo inválido: {exc}") from exc
             validar_editorial(candidato, dossie)
             if not re.search(rf"\b{rodada}\b", candidato["titulo"]):
                 candidato["titulo"] = f"Rodada {rodada}: {candidato['titulo']}"
-            editorial, origem = candidato, f"openai:{modelo}"
+            editorial, origem = candidato, args.origem_editorial or "openai:auditoria-diaria"
+        else:
+            # A única chamada diária à OpenAI pertence a auditoria_ia_diaria.py.
+            # Sem --editorial-json, este gerador sempre usa a contingência determinística.
+            editorial, origem = fallback, "editorial_curado" if rodada == 20 else "deterministico"
     validar_editorial(editorial, dossie)
     publicado = anterior.get("publicado_em") if anterior else momento.replace(microsecond=0).isoformat()
     modificado = momento.replace(microsecond=0).isoformat()
@@ -1207,8 +1135,6 @@ def executar(args: argparse.Namespace) -> int:
 
 
 def self_test() -> int:
-    assert normalizar_modelo_openai("5.6 TERRA") == "gpt-5.6-terra"
-    assert normalizar_modelo_openai("gpt-5.6-terra") == "gpt-5.6-terra"
     assert editorial_gerado_pela_openai("openai:gpt-5.6-terra")
     assert not editorial_gerado_pela_openai("editorial_curado")
     assert percentual(0) == "0%"
@@ -1305,9 +1231,10 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--rodada", type=int, choices=range(1, 39))
     parser.add_argument("--forcar", action="store_true", help="Gera mesmo fora da janela ou substitui conteúdo idêntico")
-    parser.add_argument("--sem-ia", action="store_true", help="Usa editorial determinístico e não chama API")
+    parser.add_argument("--sem-ia", action="store_true", help="Compatibilidade: sem --editorial-json o editorial é sempre determinístico")
     parser.add_argument("--dry-run", action="store_true", help="Valida e mostra o resultado sem gravar arquivos")
-    parser.add_argument("--modelo", default=os.environ.get("OPENAI_MODEL", MODELO_PADRAO))
+    parser.add_argument("--editorial-json", help="Editorial já produzido por uma camada externa; não chama a OpenAI")
+    parser.add_argument("--origem-editorial", default="", help="Rótulo de origem usado com --editorial-json")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
     try:
