@@ -1,14 +1,14 @@
 {
-  "gerado_em": "2026-08-09T15:11:15.849768-03:00",
+  "gerado_em": "2026-08-09T15:14:04.913021-03:00",
   "status": "ok",
   "resumo": {
     "clubes": 20,
     "jogos_finalizados": 212,
     "jogos_com_detalhes": 212,
-    "jogos_com_estatisticas": 204,
-    "jogos_com_publico": 182,
-    "artilheiros": 226,
-    "assistentes": 210,
+    "jogos_com_estatisticas": 211,
+    "jogos_com_publico": 183,
+    "artilheiros": 234,
+    "assistentes": 216,
     "lider_gols": {
       "athlete_id": "",
       "nome": "Kevin Viveros",
@@ -18,7 +18,7 @@
       "jogos": 20,
       "gols": 12,
       "jogos_com_participacao": 9,
-      "origem_complementar": "referência preservada; eventos locais ainda incompletos",
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 1,
       "media_por_jogo": 0.6
@@ -32,13 +32,13 @@
       "jogos": 20,
       "assistencias": 9,
       "jogos_com_participacao": 6,
-      "origem_complementar": "referência preservada; eventos locais ainda incompletos",
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 1,
       "media_por_jogo": 0.45
     },
     "erros_criticos": 0,
-    "avisos": 1
+    "avisos": 0
   },
   "fontes": {
     "lideres": "Eventos e escalações validados das partidas (ESPN summary); ranking ESPN apenas como fallback",
@@ -46,13 +46,13 @@
       "artilharia": "",
       "assistencias": ""
     },
-    "detalhes": "ESPN summary",
+    "detalhes": "ESPN summary + scoreboard",
     "competicao": "ESPN · tabela, resultados e eventos validados dos summaries"
   },
   "auditorias_relacionadas": {
     "lideres": {
-      "artilheiros": 226,
-      "assistentes": 210,
+      "artilheiros": 234,
+      "assistentes": 216,
       "lider_gols": {
         "athlete_id": "",
         "nome": "Kevin Viveros",
@@ -62,7 +62,7 @@
         "jogos": 20,
         "gols": 12,
         "jogos_com_participacao": 9,
-        "origem_complementar": "referência preservada; eventos locais ainda incompletos",
+        "origem_complementar": "eventos e escalações validados; referência usada para identificação",
         "origem_jogos": "escalações ESPN summary",
         "posicao": 1,
         "media_por_jogo": 0.6
@@ -76,64 +76,64 @@
         "jogos": 20,
         "assistencias": 9,
         "jogos_com_participacao": 6,
-        "origem_complementar": "referência preservada; eventos locais ainda incompletos",
+        "origem_complementar": "eventos e escalações validados; referência usada para identificação",
         "origem_jogos": "escalações ESPN summary",
         "posicao": 1,
         "media_por_jogo": 0.45
       },
-      "eventos_locais_autoritativos": false,
+      "eventos_locais_autoritativos": true,
       "aparicoes_locais_autoritativas": false,
       "referencia_atual_usada_para_jogos": {
         "artilharia": false,
         "assistencias": false
       },
       "preservado_de_execucao_anterior": {
-        "artilharia": true,
-        "assistencias": true
-      },
-      "snapshot_anterior_usado_apenas_para_identificacao": {
         "artilharia": false,
         "assistencias": false
+      },
+      "snapshot_anterior_usado_apenas_para_identificacao": {
+        "artilharia": true,
+        "assistencias": true
       },
       "completude": {
         "artilharia": {
           "jogos_lidos": 212,
-          "jogos_invalidos_ignorados": 6,
-          "jogadores": 227,
-          "total_eventos_contabilizados": 513,
+          "jogos_invalidos_ignorados": 0,
+          "jogadores": 234,
+          "total_eventos_contabilizados": 531,
           "gols_contra_ignorados": 18,
-          "jogos_com_escalacoes": 204,
-          "aparicoes_confirmadas": 6443,
-          "jogadores_com_jogos": 227,
+          "jogos_com_escalacoes": 211,
+          "aparicoes_confirmadas": 6667,
+          "jogadores_com_jogos": 234,
           "jogadores_sem_jogos": 0,
           "aparicoes_locais_autoritativas": false,
-          "jogos_pendentes_detalhes": 6,
+          "jogos_pendentes_detalhes": 0,
           "total_jogos_declarado": 212,
-          "eventos_locais_autoritativos": false,
-          "jogadores_publicados": 226
+          "eventos_locais_autoritativos": true,
+          "jogadores_publicados": 234
         },
         "assistencias": {
           "jogos_lidos": 212,
-          "jogos_invalidos_ignorados": 6,
-          "jogadores": 211,
-          "total_eventos_contabilizados": 353,
+          "jogos_invalidos_ignorados": 0,
+          "jogadores": 216,
+          "total_eventos_contabilizados": 366,
           "gols_contra_ignorados": 0,
-          "jogos_com_escalacoes": 204,
-          "aparicoes_confirmadas": 6443,
-          "jogadores_com_jogos": 207,
+          "jogos_com_escalacoes": 211,
+          "aparicoes_confirmadas": 6667,
+          "jogadores_com_jogos": 212,
           "jogadores_sem_jogos": 4,
           "aparicoes_locais_autoritativas": false,
-          "jogos_pendentes_detalhes": 6,
+          "jogos_pendentes_detalhes": 0,
           "total_jogos_declarado": 212,
-          "eventos_locais_autoritativos": false,
-          "jogadores_publicados": 210
+          "eventos_locais_autoritativos": true,
+          "jogadores_publicados": 216
         }
       }
     },
     "detalhes": {
       "total_processados": 212,
-      "total_com_estatisticas": 204,
-      "total_com_publico": 182,
+      "total_com_estatisticas": 211,
+      "total_com_publico": 183,
       "total_falhas": 0
     }
   },
@@ -145,7 +145,5 @@
   "elencos_incompletos": [],
   "nomes_suspeitos": [],
   "erros_criticos": [],
-  "avisos": [
-    "6 jogo(s) aguardando eventos nominais da ESPN: 401841183: ficha ESPN incompleta sem contradição (ficha de gols incompleta: 0/4 atribuídos); 401841185: ficha ESPN incompleta sem contradição (ficha de gols incompleta: 0/2 atribuídos); 401841184: ficha ESPN incompleta sem contradição (ficha de gols incompleta: 0/3 atribuídos); 401841178: ficha ESPN incompleta sem contradição (ficha de gols incompleta: 0/4 atribuídos)"
-  ]
+  "avisos": []
 }

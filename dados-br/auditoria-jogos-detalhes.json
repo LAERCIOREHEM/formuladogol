@@ -1,358 +1,38 @@
 {
-  "gerado_em": "2026-08-09T15:09:57.886333-03:00",
-  "fonte": "ESPN summary",
+  "gerado_em": "2026-08-09T15:13:05.423892-03:00",
+  "fonte": "ESPN summary + scoreboard",
   "modo": "rede",
   "total_resultados_lidos": 212,
   "total_processados": 212,
-  "total_buscados_na_espn": 0,
-  "total_com_estatisticas": 204,
-  "total_com_publico": 182,
-  "total_sem_publico": 30,
-  "total_com_eventos": 204,
-  "total_eventos_validados": 206,
-  "total_eventos_pendentes_detalhes": 6,
-  "eventos_pendentes_detalhes": [
-    {
-      "event_id": "401841183",
-      "jogo": "Cruzeiro x Mirassol",
-      "validacao": {
-        "gols_esperados": {
-          "Cruzeiro": 3,
-          "Mirassol": 1
-        },
-        "gols_extraidos": {
-          "Cruzeiro": 0,
-          "Mirassol": 0
-        },
-        "gols_completos": false,
-        "gols_sem_excesso": true,
-        "gols_time_desconhecido": 0,
-        "gols_duplicados": 0,
-        "gols_compativeis": true,
-        "gols_ok": false,
-        "cartoes_esperados": {
-          "Cruzeiro": {
-            "amarelo": null,
-            "vermelho": null
-          },
-          "Mirassol": {
-            "amarelo": null,
-            "vermelho": null
-          }
-        },
-        "cartoes_extraidos": {
-          "Cruzeiro": {
-            "amarelo": 0,
-            "vermelho": 0
-          },
-          "Mirassol": {
-            "amarelo": 0,
-            "vermelho": 0
-          }
-        },
-        "cartoes_completos": true,
-        "cartoes_sem_excesso": true,
-        "cartoes_time_desconhecido": 0,
-        "cartoes_duplicados": 0,
-        "cartoes_compativeis": true,
-        "cartoes_ok": true,
-        "ok": false,
-        "pendente_detalhes": true,
-        "tipo_pendencia": "ficha_espn_incompleta",
-        "motivo": "ficha de gols incompleta: 0/4 atribuídos"
-      }
-    },
-    {
-      "event_id": "401841185",
-      "jogo": "Botafogo x Fluminense",
-      "validacao": {
-        "gols_esperados": {
-          "Botafogo": 1,
-          "Fluminense": 1
-        },
-        "gols_extraidos": {
-          "Botafogo": 0,
-          "Fluminense": 0
-        },
-        "gols_completos": false,
-        "gols_sem_excesso": true,
-        "gols_time_desconhecido": 0,
-        "gols_duplicados": 0,
-        "gols_compativeis": true,
-        "gols_ok": false,
-        "cartoes_esperados": {
-          "Botafogo": {
-            "amarelo": null,
-            "vermelho": null
-          },
-          "Fluminense": {
-            "amarelo": null,
-            "vermelho": null
-          }
-        },
-        "cartoes_extraidos": {
-          "Botafogo": {
-            "amarelo": 0,
-            "vermelho": 0
-          },
-          "Fluminense": {
-            "amarelo": 0,
-            "vermelho": 0
-          }
-        },
-        "cartoes_completos": true,
-        "cartoes_sem_excesso": true,
-        "cartoes_time_desconhecido": 0,
-        "cartoes_duplicados": 0,
-        "cartoes_compativeis": true,
-        "cartoes_ok": true,
-        "ok": false,
-        "pendente_detalhes": true,
-        "tipo_pendencia": "ficha_espn_incompleta",
-        "motivo": "ficha de gols incompleta: 0/2 atribuídos"
-      }
-    },
-    {
-      "event_id": "401841184",
-      "jogo": "Coritiba x Chapecoense",
-      "validacao": {
-        "gols_esperados": {
-          "Coritiba": 2,
-          "Chapecoense": 1
-        },
-        "gols_extraidos": {
-          "Coritiba": 0,
-          "Chapecoense": 0
-        },
-        "gols_completos": false,
-        "gols_sem_excesso": true,
-        "gols_time_desconhecido": 0,
-        "gols_duplicados": 0,
-        "gols_compativeis": true,
-        "gols_ok": false,
-        "cartoes_esperados": {
-          "Coritiba": {
-            "amarelo": null,
-            "vermelho": null
-          },
-          "Chapecoense": {
-            "amarelo": null,
-            "vermelho": null
-          }
-        },
-        "cartoes_extraidos": {
-          "Coritiba": {
-            "amarelo": 0,
-            "vermelho": 0
-          },
-          "Chapecoense": {
-            "amarelo": 0,
-            "vermelho": 0
-          }
-        },
-        "cartoes_completos": true,
-        "cartoes_sem_excesso": true,
-        "cartoes_time_desconhecido": 0,
-        "cartoes_duplicados": 0,
-        "cartoes_compativeis": true,
-        "cartoes_ok": true,
-        "ok": false,
-        "pendente_detalhes": true,
-        "tipo_pendencia": "ficha_espn_incompleta",
-        "motivo": "ficha de gols incompleta: 0/3 atribuídos"
-      }
-    },
-    {
-      "event_id": "401841178",
-      "jogo": "Remo x Atlético-MG",
-      "validacao": {
-        "gols_esperados": {
-          "Remo": 2,
-          "Atlético-MG": 2
-        },
-        "gols_extraidos": {
-          "Remo": 0,
-          "Atlético-MG": 0
-        },
-        "gols_completos": false,
-        "gols_sem_excesso": true,
-        "gols_time_desconhecido": 0,
-        "gols_duplicados": 0,
-        "gols_compativeis": true,
-        "gols_ok": false,
-        "cartoes_esperados": {
-          "Remo": {
-            "amarelo": null,
-            "vermelho": null
-          },
-          "Atlético-MG": {
-            "amarelo": null,
-            "vermelho": null
-          }
-        },
-        "cartoes_extraidos": {
-          "Remo": {
-            "amarelo": 0,
-            "vermelho": 0
-          },
-          "Atlético-MG": {
-            "amarelo": 0,
-            "vermelho": 0
-          }
-        },
-        "cartoes_completos": true,
-        "cartoes_sem_excesso": true,
-        "cartoes_time_desconhecido": 0,
-        "cartoes_duplicados": 0,
-        "cartoes_compativeis": true,
-        "cartoes_ok": true,
-        "ok": false,
-        "pendente_detalhes": true,
-        "tipo_pendencia": "ficha_espn_incompleta",
-        "motivo": "ficha de gols incompleta: 0/4 atribuídos"
-      }
-    },
-    {
-      "event_id": "401841181",
-      "jogo": "Grêmio x São Paulo",
-      "validacao": {
-        "gols_esperados": {
-          "Grêmio": 2,
-          "São Paulo": 1
-        },
-        "gols_extraidos": {
-          "Grêmio": 0,
-          "São Paulo": 0
-        },
-        "gols_completos": false,
-        "gols_sem_excesso": true,
-        "gols_time_desconhecido": 0,
-        "gols_duplicados": 0,
-        "gols_compativeis": true,
-        "gols_ok": false,
-        "cartoes_esperados": {
-          "Grêmio": {
-            "amarelo": null,
-            "vermelho": null
-          },
-          "São Paulo": {
-            "amarelo": null,
-            "vermelho": null
-          }
-        },
-        "cartoes_extraidos": {
-          "Grêmio": {
-            "amarelo": 0,
-            "vermelho": 0
-          },
-          "São Paulo": {
-            "amarelo": 0,
-            "vermelho": 0
-          }
-        },
-        "cartoes_completos": true,
-        "cartoes_sem_excesso": true,
-        "cartoes_time_desconhecido": 0,
-        "cartoes_duplicados": 0,
-        "cartoes_compativeis": true,
-        "cartoes_ok": true,
-        "ok": false,
-        "pendente_detalhes": true,
-        "tipo_pendencia": "ficha_espn_incompleta",
-        "motivo": "ficha de gols incompleta: 0/3 atribuídos"
-      }
-    },
-    {
-      "event_id": "401879459",
-      "jogo": "Bahia x Chapecoense",
-      "validacao": {
-        "gols_esperados": {
-          "Bahia": 2,
-          "Chapecoense": 0
-        },
-        "gols_extraidos": {
-          "Bahia": 0,
-          "Chapecoense": 0
-        },
-        "gols_completos": false,
-        "gols_sem_excesso": true,
-        "gols_time_desconhecido": 0,
-        "gols_duplicados": 0,
-        "gols_compativeis": true,
-        "gols_ok": false,
-        "cartoes_esperados": {
-          "Bahia": {
-            "amarelo": null,
-            "vermelho": null
-          },
-          "Chapecoense": {
-            "amarelo": null,
-            "vermelho": null
-          }
-        },
-        "cartoes_extraidos": {
-          "Bahia": {
-            "amarelo": 0,
-            "vermelho": 0
-          },
-          "Chapecoense": {
-            "amarelo": 0,
-            "vermelho": 0
-          }
-        },
-        "cartoes_completos": true,
-        "cartoes_sem_excesso": true,
-        "cartoes_time_desconhecido": 0,
-        "cartoes_duplicados": 0,
-        "cartoes_compativeis": true,
-        "cartoes_ok": true,
-        "ok": false,
-        "pendente_detalhes": true,
-        "tipo_pendencia": "ficha_espn_incompleta",
-        "motivo": "ficha de gols incompleta: 0/2 atribuídos"
-      }
-    }
-  ],
+  "total_buscados_na_espn": 8,
+  "total_cache_incremental": 204,
+  "total_complementados_scoreboard": 0,
+  "total_falhas_refresh_preservadas": 0,
+  "falhas_refresh_preservadas": [],
+  "total_com_estatisticas": 211,
+  "total_com_publico": 183,
+  "total_sem_publico": 29,
+  "total_com_eventos": 211,
+  "total_eventos_validados": 212,
+  "total_eventos_pendentes_detalhes": 0,
+  "eventos_pendentes_detalhes": [],
   "total_inconsistencias_eventos": 0,
   "inconsistencias_eventos": [],
-  "total_sem_estatisticas": 0,
-  "total_preservados_de_execucao_anterior": 212,
+  "total_sem_estatisticas": 1,
+  "total_preservados_de_execucao_anterior": 204,
   "total_falhas": 0,
-  "sem_estatisticas": [],
+  "sem_estatisticas": [
+    {
+      "event_id": "401840999",
+      "jogo": "R4 · Botafogo x Vitória · 401840999"
+    }
+  ],
   "falhas": [],
-  "total_com_jogadores": 204,
+  "total_com_jogadores": 211,
   "jogos_sem_escalacoes": [
-    {
-      "event_id": "401841183",
-      "jogo": "Cruzeiro x Mirassol"
-    },
-    {
-      "event_id": "401841185",
-      "jogo": "Botafogo x Fluminense"
-    },
-    {
-      "event_id": "401841184",
-      "jogo": "Coritiba x Chapecoense"
-    },
-    {
-      "event_id": "401841178",
-      "jogo": "Remo x Atlético-MG"
-    },
-    {
-      "event_id": "401841181",
-      "jogo": "Grêmio x São Paulo"
-    },
     {
       "event_id": "401840999",
       "jogo": "Botafogo x Vitória"
-    },
-    {
-      "event_id": "401879458",
-      "jogo": "Botafogo x Vitória"
-    },
-    {
-      "event_id": "401879459",
-      "jogo": "Bahia x Chapecoense"
     }
   ]
 }
