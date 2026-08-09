@@ -12,7 +12,7 @@
   "resumo": {
     "jogos_na_janela": 58,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 33,
+    "candidatos_oficiais_encontrados": 34,
     "search_api_fallback_chamadas": 2,
     "search_api_jogos_elegiveis": 22,
     "search_api_jogos_pulados_grade_estavel": 36,
@@ -723,6 +723,16 @@
   ],
   "rejeitados": [
     {
+      "video_id": "Y4x_-sCdNgo",
+      "url": "https://www.youtube.com/watch?v=Y4x_-sCdNgo",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "RED BULL BRAGANTINO X CORINTHIANS | BRASILEIRÃO 2026 | AQUECIMENTO AO VIVO | Premiere",
+      "status": "live",
+      "inicio_programado": "2026-08-09T17:30:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
+    },
+    {
       "video_id": "qxt8hkI930o",
       "url": "https://www.youtube.com/watch?v=qxt8hkI930o",
       "fonte": "getv",
@@ -853,6 +863,16 @@
       "motivo": "conteúdo rejeitado: noche de copa"
     },
     {
+      "video_id": "jRI0eKG2ro8",
+      "url": "https://www.youtube.com/watch?v=jRI0eKG2ro8",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: BRUNA TAKAHASHI NO EUROPA SMASH | TÊNIS DE MESA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-10T14:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "pYy2BKTHxnI",
       "url": "https://www.youtube.com/watch?v=pYy2BKTHxnI",
       "fonte": "cazetv",
@@ -963,6 +983,16 @@
       "motivo": "conteúdo rejeitado: melhores momentos"
     },
     {
+      "video_id": "LY6U7W24ZqU",
+      "url": "https://www.youtube.com/watch?v=LY6U7W24ZqU",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "CRUZEIRO ELIMINA O FLAMENGO NAS OITAVAS DE FINAL DA LIBERTADORES 2018 | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-09T19:19:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "Xa4YI5FNU0Y",
       "url": "https://www.youtube.com/watch?v=Xa4YI5FNU0Y",
       "fonte": "getv",
@@ -973,16 +1003,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "Y4x_-sCdNgo",
-      "url": "https://www.youtube.com/watch?v=Y4x_-sCdNgo",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: RED BULL BRAGANTINO X CORINTHIANS | BRASILEIRÃO 2026 | PRÉ-JOGO | Premiere",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-09T17:30:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
       "video_id": "eFxY6C6kgjw",
       "url": "https://www.youtube.com/watch?v=eFxY6C6kgjw",
       "fonte": "getv",
@@ -990,16 +1010,6 @@
       "titulo": "AO VIVO: LAS VEGAS RAIDERS X HOUSTON TEXANS | PRÉ-TEMPORADA 2026/27 | NFL | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-08-20T21:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "nZy3ySQmLxM",
-      "url": "https://www.youtube.com/watch?v=nZy3ySQmLxM",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "SURFE AO VIVO: WSL TAHITI PRO 2026 | ETAPA DE TEAHUPO'O | DIA 2 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-08-09T14:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1723,14 +1733,14 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 245,
+    "unidades": 244,
     "requisicoes": {
       "channels": 2,
-      "videos": 23,
+      "videos": 22,
       "playlistItems": 20,
       "search": 2
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos channelIds oficiais de GE TV/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-09T17:04:11-03:00"
+  "atualizado_em": "2026-08-09T17:50:41-03:00"
 }
