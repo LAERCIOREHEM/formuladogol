@@ -11,7 +11,9 @@
     ],
     "regra_preservacao": "resposta vazia ou falha de uma fonte nunca apaga transmissão válida já publicada",
     "regra_publicacao": "somente canais oficiais da lista permitida; evidências ficam registradas por jogo",
-    "youtube_exato": "links exatos de GE TV/CazéTV permanecem em dados-br/transmissoes-aovivo.json"
+    "youtube_exato": "links exatos de GE TV/CazéTV permanecem em dados-br/transmissoes-aovivo.json",
+    "incremental": "grades fixas/confirmadas não repetem GE/ESPN; CBF global e busca oficial de YouTube continuam detectando mudanças relevantes",
+    "acessos": "canais de direitos e plataformas de acesso são campos distintos; Claro tv+/Globoplay são opções para canais contratados, não novos detentores de direitos"
   },
   "jogos": {
     "401841183": {
@@ -22,50 +24,29 @@
       "data_iso": "2026-08-09T11:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Prime Video"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Prime Video"
           ],
-          "referencia": "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/08/cruzeiro-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 22",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/08/coritiba-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Prime Video",
+          "url": "https://www.primevideo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -77,20 +58,41 @@
       "data_iso": "2026-08-09T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "Premiere",
         "Globo"
       ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Globo",
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/09/bahia-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 22",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -103,60 +105,56 @@
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "GE TV",
+        "Premiere",
         "Globo"
       ],
-      "origem": "GE Agenda + GE guia editorial + YouTube oficial validado",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json + YouTube oficial validado",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Globo",
+            "Premiere"
+          ],
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 22",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        },
         {
           "fonte": "YouTube oficial validado",
           "canais": [
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=uVdrqw8H1u8",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
           "autoridade": 120,
           "detalhe": "player oficial público e embeddable validado por channelId"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir na GE TV",
+          "url": "https://www.youtube.com/watch?v=uVdrqw8H1u8",
+          "tipo": "player_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/09/palmeiras-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/09/bahia-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -168,30 +166,34 @@
       "data_iso": "2026-08-09T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 22",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -203,30 +205,34 @@
       "data_iso": "2026-08-09T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/09/palmeiras-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 22",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/08/coritiba-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -239,23 +245,45 @@
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Premiere",
-        "SporTV",
-        "Globo"
+        "SporTV"
       ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "SporTV",
             "Premiere",
-            "Globo"
+            "SporTV"
           ],
-          "referencia": "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/08/08/botafogo-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 22",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV no Globoplay",
+          "url": "https://globoplay.globo.com/canais/sportv-us/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -267,20 +295,29 @@
       "data_iso": "2026-08-11T19:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV"
+        "Disney+ / ESPN"
       ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "YouTube oficial validado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "CazéTV"
+            "Disney+ / ESPN"
           ],
-          "referencia": "https://www.youtube.com/watch?v=Co2aqgVd5qk",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -292,20 +329,70 @@
       "data_iso": "2026-08-11T21:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV"
+        "SBT",
+        "Disney+ / ESPN"
       ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "YouTube oficial validado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "CazéTV"
+            "SBT",
+            "Disney+ / ESPN"
           ],
-          "referencia": "https://www.youtube.com/watch?v=pYy2BKTHxnI",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
+          "referencia": "SBT Sports + ESPN/Disney+ — grade das oitavas da Sul-Americana 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "SBT ao vivo",
+          "url": "https://www.sbt.com.br/ao-vivo",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401874076": {
+      "event_id": "401874076",
+      "rodada": 0,
+      "mandante": "Palmeiras",
+      "visitante": "Cerro Porteño",
+      "data_iso": "2026-08-12T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Paramount+"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Paramount+"
+          ],
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -317,41 +404,29 @@
       "data_iso": "2026-08-12T19:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV",
-        "Globo"
+        "Disney+ / ESPN"
       ],
-      "origem": "GE Agenda + GE guia editorial + YouTube oficial validado",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "YouTube oficial validado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "CazéTV"
+            "Disney+ / ESPN"
           ],
-          "referencia": "https://www.youtube.com/watch?v=TsOOA1q0EbQ",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
-        },
+          "referencia": "ESPN/Disney+ — grade das oitavas da Sul-Americana 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -363,51 +438,77 @@
       "data_iso": "2026-08-12T21:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV",
-        "Globo"
+        "GE TV",
+        "Globo",
+        "Paramount+"
       ],
-      "origem": "GE Agenda + GE guia editorial + YouTube oficial validado",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "YouTube oficial validado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "CazéTV"
+            "GE TV",
+            "Globo",
+            "Paramount+"
           ],
-          "referencia": "https://www.youtube.com/watch?v=AlE9jCqkbA8",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "GE TV no YouTube",
+          "url": "https://www.youtube.com/@getv/streams",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401874073": {
+      "event_id": "401874073",
+      "rodada": 0,
+      "mandante": "Mirassol",
+      "visitante": "Liga de Quito",
+      "data_iso": "2026-08-13T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
         {
-          "fonte": "GE Agenda",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Disney+ / ESPN"
           ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -419,20 +520,63 @@
       "data_iso": "2026-08-13T19:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV"
+        "Disney+ / ESPN"
       ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "YouTube oficial validado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "CazéTV"
+            "Disney+ / ESPN"
           ],
-          "referencia": "https://www.youtube.com/watch?v=MZ26CcHMBlk",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
+          "referencia": "ESPN Brasil — tabela das oitavas da Sul-Americana 2026, transmissão ESPN no Disney+",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401902742": {
+      "event_id": "401902742",
+      "rodada": 0,
+      "mandante": "Vasco da Gama",
+      "visitante": "Club Olimpia",
+      "data_iso": "2026-08-13T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Paramount+"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Paramount+"
+          ],
+          "referencia": "Paramount+ — confrontos Vasco x Olimpia pelas oitavas da Sul-Americana 2026, transmissão exclusiva",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -444,20 +588,102 @@
       "data_iso": "2026-08-13T21:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "CazéTV"
+        "Disney+ / ESPN"
       ],
-      "origem": "YouTube oficial validado",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "YouTube oficial validado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "CazéTV"
+            "Disney+ / ESPN"
           ],
-          "referencia": "https://www.youtube.com/watch?v=bb70Ip_26VM",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401902715": {
+      "event_id": "401902715",
+      "rodada": 0,
+      "mandante": "Cienciano del Cusco",
+      "visitante": "Botafogo",
+      "data_iso": "2026-08-13T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Paramount+"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Paramount+"
+          ],
+          "referencia": "Paramount+ — grade das oitavas da Sul-Americana 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401841195": {
+      "event_id": "401841195",
+      "rodada": 23,
+      "mandante": "Atlético-MG",
+      "visitante": "Grêmio",
+      "data_iso": "2026-08-15T16:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Premiere"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Premiere"
+          ],
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -469,20 +695,34 @@
       "data_iso": "2026-08-15T16:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE Agenda",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE Agenda",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -494,30 +734,34 @@
       "data_iso": "2026-08-15T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -529,55 +773,85 @@
       "data_iso": "2026-08-15T21:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere",
+        "SporTV"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere",
+            "SporTV"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV no Globoplay",
+          "url": "https://globoplay.globo.com/canais/sportv-us/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
     "401841194": {
       "event_id": "401841194",
-      "rodada": 38,
+      "rodada": 23,
       "mandante": "Chapecoense",
       "visitante": "Bahia",
       "data_iso": "2026-08-16T11:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -589,20 +863,34 @@
       "data_iso": "2026-08-16T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE Agenda",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE Agenda",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -614,40 +902,48 @@
       "data_iso": "2026-08-16T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "CazéTV",
+        "Premiere",
+        "Record"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere",
+            "Record",
+            "CazéTV"
           ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "CazéTV no YouTube",
+          "url": "https://www.youtube.com/@CazeTV/streams",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Record ao vivo",
+          "url": "https://record.r7.com/ao-vivo/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -659,20 +955,34 @@
       "data_iso": "2026-08-16T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/08/cruzeiro-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -684,30 +994,29 @@
       "data_iso": "2026-08-16T19:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Prime Video"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Prime Video"
           ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Prime Video",
+          "url": "https://www.primevideo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -719,20 +1028,155 @@
       "data_iso": "2026-08-17T20:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere",
+        "SporTV"
       ],
-      "origem": "GE Agenda",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE Agenda",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere",
+            "SporTV"
           ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV no Globoplay",
+          "url": "https://globoplay.globo.com/canais/sportv-us/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401874156": {
+      "event_id": "401874156",
+      "rodada": 0,
+      "mandante": "Independiente Rivadavia",
+      "visitante": "Fluminense",
+      "data_iso": "2026-08-18T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Disney+ / ESPN"
+          ],
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401903294": {
+      "event_id": "401903294",
+      "rodada": 0,
+      "mandante": "São Paulo",
+      "visitante": "Bolívar",
+      "data_iso": "2026-08-18T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "SBT",
+        "Disney+ / ESPN"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "SBT",
+            "Disney+ / ESPN"
+          ],
+          "referencia": "SBT Sports + ESPN/Disney+ — grade das oitavas da Sul-Americana 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "SBT ao vivo",
+          "url": "https://www.sbt.com.br/ao-vivo",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401874155": {
+      "event_id": "401874155",
+      "rodada": 0,
+      "mandante": "Cerro Porteño",
+      "visitante": "Palmeiras",
+      "data_iso": "2026-08-19T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Paramount+"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Paramount+"
+          ],
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -744,30 +1188,29 @@
       "data_iso": "2026-08-19T19:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Disney+ / ESPN"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Disney+ / ESPN"
           ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
+          "referencia": "ESPN/Disney+ — grade das oitavas da Sul-Americana 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -780,50 +1223,222 @@
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "GE TV",
-        "Globo"
+        "Globo",
+        "Paramount+"
       ],
-      "origem": "GE Agenda + GE guia editorial + YouTube oficial validado",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json + YouTube oficial validado",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "GE TV",
+            "Globo",
+            "Paramount+"
+          ],
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        },
         {
           "fonte": "YouTube oficial validado",
           "canais": [
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=yM9qJJG6gIQ",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
           "autoridade": 120,
           "detalhe": "player oficial público e embeddable validado por channelId"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Assistir na GE TV",
+          "url": "https://www.youtube.com/watch?v=yM9qJJG6gIQ",
+          "tipo": "player_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401874142": {
+      "event_id": "401874142",
+      "rodada": 0,
+      "mandante": "Liga de Quito",
+      "visitante": "Mirassol",
+      "data_iso": "2026-08-20T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
         {
-          "fonte": "GE Agenda",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Disney+ / ESPN"
           ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401902740": {
+      "event_id": "401902740",
+      "rodada": 0,
+      "mandante": "Club Olimpia",
+      "visitante": "Vasco da Gama",
+      "data_iso": "2026-08-20T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Paramount+"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Paramount+"
+          ],
+          "referencia": "Paramount+ — confrontos Vasco x Olimpia pelas oitavas da Sul-Americana 2026, transmissão exclusiva",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401902449": {
+      "event_id": "401902449",
+      "rodada": 0,
+      "mandante": "Macará",
+      "visitante": "Santos",
+      "data_iso": "2026-08-20T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Disney+ / ESPN"
+          ],
+          "referencia": "ESPN Brasil — tabela das oitavas da Sul-Americana 2026, transmissão ESPN no Disney+",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401874149": {
+      "event_id": "401874149",
+      "rodada": 0,
+      "mandante": "Corinthians",
+      "visitante": "Rosário Central",
+      "data_iso": "2026-08-20T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Disney+ / ESPN"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Disney+ / ESPN"
+          ],
+          "referencia": "ge — grade das oitavas da Libertadores 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Disney+ (ESPN)",
+          "url": "https://www.disneyplus.com/pt-br/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401902741": {
+      "event_id": "401902741",
+      "rodada": 0,
+      "mandante": "Botafogo",
+      "visitante": "Cienciano del Cusco",
+      "data_iso": "2026-08-20T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Paramount+"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Paramount+"
+          ],
+          "referencia": "Paramount+ — grade das oitavas da Sul-Americana 2026",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Paramount+",
+          "url": "https://www.paramountplus.com/br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -835,20 +1450,34 @@
       "data_iso": "2026-08-22T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE Agenda",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE Agenda",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -861,23 +1490,45 @@
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Premiere",
-        "SporTV",
-        "Prime Video"
+        "SporTV"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
             "Premiere",
-            "SporTV",
-            "Prime Video"
+            "SporTV"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV no Globoplay",
+          "url": "https://globoplay.globo.com/canais/sportv-us/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "SporTV na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -889,40 +1540,29 @@
       "data_iso": "2026-08-22T20:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Prime Video"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": true,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Prime Video"
           ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada; exclusiva"
+        }
+      ],
+      "acessos": [
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Prime Video",
+          "url": "https://www.primevideo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -934,20 +1574,41 @@
       "data_iso": "2026-08-23T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "Premiere",
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Globo",
+            "Premiere"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -959,40 +1620,41 @@
       "data_iso": "2026-08-23T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "Premiere",
         "Globo"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Globo",
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/08/cruzeiro-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -1004,20 +1666,41 @@
       "data_iso": "2026-08-23T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "Premiere",
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Globo",
+            "Premiere"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -1029,22 +1712,48 @@
       "data_iso": "2026-08-23T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "CazéTV",
         "Premiere",
-        "SporTV"
+        "Record"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
             "Premiere",
-            "SporTV"
+            "Record",
+            "CazéTV"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "CazéTV no YouTube",
+          "url": "https://www.youtube.com/@CazeTV/streams",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Record ao vivo",
+          "url": "https://record.r7.com/ao-vivo/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
@@ -1056,458 +1765,127 @@
       "data_iso": "2026-08-23T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
     "401841207": {
       "event_id": "401841207",
-      "rodada": 25,
+      "rodada": 24,
       "mandante": "Coritiba",
       "visitante": "Corinthians",
       "data_iso": "2026-08-23T19:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "Premiere"
       ],
-      "origem": "GE Agenda",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "GE Agenda",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     },
     "401841198": {
       "event_id": "401841198",
-      "rodada": 25,
+      "rodada": 24,
       "mandante": "Botafogo",
       "visitante": "Athletico-PR",
       "data_iso": "2026-08-24T20:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
-      ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
-      "fontes": [
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ]
-    },
-    "401841216": {
-      "event_id": "401841216",
-      "rodada": 25,
-      "mandante": "Atlético-MG",
-      "visitante": "Vitória",
-      "data_iso": "2026-08-29T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ]
-    },
-    "401841215": {
-      "event_id": "401841215",
-      "rodada": 25,
-      "mandante": "Bahia",
-      "visitante": "Internacional",
-      "data_iso": "2026-08-29T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "GE TV",
-        "Premiere",
-        "SporTV",
-        "Globo",
-        "Prime Video"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "GE TV",
-            "Premiere",
-            "SporTV",
-            "Globo",
-            "Prime Video"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ]
-    },
-    "401841217": {
-      "event_id": "401841217",
-      "rodada": 25,
-      "mandante": "Grêmio",
-      "visitante": "Chapecoense",
-      "data_iso": "2026-08-29T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
         "Premiere",
         "SporTV"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
             "Premiere",
             "SporTV"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
+          "capturado_em": "2026-08-09T00:20:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
         }
-      ]
-    },
-    "401841211": {
-      "event_id": "401841211",
-      "rodada": 25,
-      "mandante": "Mirassol",
-      "visitante": "Palmeiras",
-      "data_iso": "2026-08-29T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
-      "fontes": [
+      "acessos": [
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ]
-    },
-    "401841209": {
-      "event_id": "401841209",
-      "rodada": 26,
-      "mandante": "São Paulo",
-      "visitante": "Bragantino",
-      "data_iso": "2026-08-29T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
-      "fontes": [
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/09/palmeiras-x-internacional-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ]
-    },
-    "401841212": {
-      "event_id": "401841212",
-      "rodada": 26,
-      "mandante": "Vasco da Gama",
-      "visitante": "Cruzeiro",
-      "data_iso": "2026-08-29T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ]
-    },
-    "401841221": {
-      "event_id": "401841221",
-      "rodada": 26,
-      "mandante": "Botafogo",
-      "visitante": "Palmeiras",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
-      "fontes": [
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ]
-    },
-    "401841220": {
-      "event_id": "401841220",
-      "rodada": 26,
-      "mandante": "Corinthians",
-      "visitante": "Chapecoense",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
-      "fontes": [
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "nome": "SporTV no Globoplay",
+          "url": "https://globoplay.globo.com/canais/sportv-us/",
+          "tipo": "acesso_oficial"
         },
         {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ]
-    },
-    "401841219": {
-      "event_id": "401841219",
-      "rodada": 26,
-      "mandante": "Coritiba",
-      "visitante": "Mirassol",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
-      "fontes": [
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ]
-    },
-    "401841223": {
-      "event_id": "401841223",
-      "rodada": 26,
-      "mandante": "Internacional",
-      "visitante": "Santos",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "GE Agenda",
-      "confianca": "confirmado",
-      "fontes": [
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ]
-    },
-    "401841225": {
-      "event_id": "401841225",
-      "rodada": 26,
-      "mandante": "Remo",
-      "visitante": "Flamengo",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "GE guia editorial",
-      "confianca": "confirmado",
-      "fontes": [
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        }
-      ]
-    },
-    "401841226": {
-      "event_id": "401841226",
-      "rodada": 27,
-      "mandante": "São Paulo",
-      "visitante": "Atlético-MG",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ]
-    },
-    "401841222": {
-      "event_id": "401841222",
-      "rodada": 27,
-      "mandante": "Vitória",
-      "visitante": "Grêmio",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Globo"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-09T07:56:44-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "nome": "SporTV na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
         }
       ]
     }
   },
-  "atualizado_em": "2026-08-09T07:56:44-03:00"
+  "atualizado_em": "2026-08-09T00:20:00-03:00"
 }

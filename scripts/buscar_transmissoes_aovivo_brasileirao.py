@@ -44,7 +44,7 @@ ENDPOINT_COST = {
     "channels": 1,
     "playlistItems": 1,
     "videos": 1,
-    "search": 100,  # nunca usado — mantido apenas para documentação
+    "search": 100,  # fallback caro, usado só quando a grade torna GE TV/CazéTV plausível
 }
 
 
@@ -347,6 +347,12 @@ def evaluate_candidate(candidate: Candidate, game: Game, config: Mapping[str, An
         if term and whole_term(combined_n, term):
             evaluated.rejected_reason = f"conteúdo rejeitado: {term}"
             return evaluated
+    # Um player integral deve corresponder a uma única partida. Títulos que
+    # agregam dois ou mais jogos ("A x B e C x D") são programas multiplex,
+    # narração ou acompanhamento e não devem virar embed do confronto.
+    if len(re.findall(r"(?:^|\s)x(?:\s|$)", title_n)) > 1:
+        evaluated.rejected_reason = "conteúdo reúne mais de uma partida"
+        return evaluated
     if candidate.status not in {"upcoming", "live"}:
         evaluated.rejected_reason = "vídeo não está como transmissão futura ou ao vivo"
         return evaluated
@@ -660,6 +666,32 @@ def needs_upcoming_search(
     )
 
 
+def aggressive_search_policy(game: Game, tv_snapshot: Mapping[str, Any]) -> tuple[bool, str]:
+    """Decide se vale gastar quota de ``search.list`` neste jogo.
+
+    /streams e uploads continuam sendo varridos para todos os jogos da janela.
+    O search.list (100 unidades) fica reservado a casos em que GE TV/CazéTV
+    continuam plausíveis: grade ainda desconhecida, menção explícita a esses
+    canais, ou grade aberta com Globo/Record. Grade exclusiva Prime/Paramount+
+    e grades estáveis somente em Premiere/SporTV/ESPN/SBT não repetem a busca
+    cara a cada dez minutos.
+    """
+    games = tv_snapshot.get("jogos") if isinstance(tv_snapshot, Mapping) else None
+    item = games.get(game.event_id) if isinstance(games, Mapping) else None
+    if not isinstance(item, Mapping):
+        return True, "grade ainda não consolidada"
+    channels = {str(value) for value in (item.get("canais") or []) if value}
+    if channels & {"GE TV", "CazéTV"}:
+        return True, "grade já indica GE TV/CazéTV; buscar player exato"
+    if item.get("exclusivo") is True:
+        return False, "grade exclusiva confirmada sem GE TV/CazéTV"
+    if channels & {"Globo", "Record"}:
+        return True, "grade aberta pode ter direito digital GE TV/CazéTV"
+    if item.get("estavel") is True:
+        return False, "grade estável confirmada sem indício de GE TV/CazéTV"
+    return True, "grade ainda não estável"
+
+
 def load_existing_video_ids(output: Mapping[str, Any], manual: Mapping[str, Any]) -> List[str]:
     ids: List[str] = []
     for container in (output, manual):
@@ -775,7 +807,7 @@ def choose_links(links: Mapping[str, Dict[str, Any]], priority: Sequence[str]) -
     for key, value in links.items():
         if key not in priority:
             ordered.append(value)
-    # Retorna APENAS o principal (link único — CazéTV tem prioridade sobre GE TV)
+    # Retorna APENAS o principal; a ordem vem da configuração (GE TV antes da CazéTV).
     return (ordered[0] if ordered else None, [])
 
 
@@ -867,6 +899,7 @@ def build_outputs(
     aliases = getv_config.get("aliases_clubes") or {}
     existing = load_json(root / "dados-br/transmissoes-aovivo.json", {"jogos": {}})
     manual = load_json(root / "dados-br/transmissoes-aovivo-manual.json", {"jogos": {}})
+    tv_snapshot = load_json(root / "dados-br/transmissoes-tv.json", {"jogos": {}})
     games = load_games(root / "dados-br/agenda-clubes-br.json")
 
     before_minutes = int(config.get("janela_antes_horas", 24) * 60)
@@ -976,15 +1009,21 @@ def build_outputs(
             title="", description="", status="live", scheduled_start=None, actual_start=None, actual_end=None,
         )
 
-    # 4) Fallback agressivo na janela crítica. /streams e uploads às vezes
-    # atrasam a exposição de uma live recém-iniciada; search.list enxerga o
-    # estado ao vivo diretamente no canal oficial. O custo é controlado e a
-    # busca só roda quando ainda existe jogo sem vínculo seguro.
+    # 4) Fallback agressivo na janela crítica. /streams e uploads continuam
+    # em TODOS os jogos; search.list, que custa 100 unidades, só é usado onde
+    # a grade ainda torna GE TV/CazéTV plausíveis. Isso evita desperdiçar quota
+    # em Prime/Paramount+ exclusivos ou grades estáveis sem direito digital.
+    search_policy = {game.event_id: aggressive_search_policy(game, tv_snapshot) for game in targets}
+    search_targets = [game for game in targets if search_policy[game.event_id][0]]
+    search_skipped = [
+        {"event_id": game.event_id, "jogo": f"{game.mandante} x {game.visitante}", "motivo": search_policy[game.event_id][1]}
+        for game in targets if not search_policy[game.event_id][0]
+    ]
     search_calls = 0
     max_search_calls = int(config.get("search_limite_chamadas_por_execucao") or 4)
-    if config.get("search_api_fallback", True):
+    if config.get("search_api_fallback", True) and not args.no_search:
         aggressive: List[Candidate] = []
-        if needs_live_search(targets, matched_for_search, current_time, config):
+        if args.force_search or needs_live_search(search_targets, matched_for_search, current_time, config):
             for channel in channels.values():
                 if search_calls >= max_search_calls:
                     break
@@ -992,7 +1031,7 @@ def build_outputs(
                     client, channel, "live", int(config.get("search_max_resultados") or 25), errors
                 ))
                 search_calls += 1
-        if needs_upcoming_search(targets, matched_for_search, current_time, config):
+        if args.force_search or needs_upcoming_search(search_targets, matched_for_search, current_time, config):
             for channel in channels.values():
                 if search_calls >= max_search_calls:
                     break
@@ -1079,6 +1118,8 @@ def build_outputs(
             "busca_streams_executada": True,
             "candidatos_oficiais_encontrados": len(candidates),
             "search_api_fallback_chamadas": search_calls,
+            "search_api_jogos_elegiveis": len(search_targets),
+            "search_api_jogos_pulados_grade_estavel": len(search_skipped),
             "transmissoes_publicadas": len(published),
             "sem_transmissao": len(no_stream),
             "erros": len(errors),
@@ -1087,12 +1128,13 @@ def build_outputs(
         "jogos_analisados": game_reports,
         "aceitos": accepted,
         "rejeitados": rejected,
+        "search_api_pulados": search_skipped,
         "sem_transmissao": no_stream,
         "erros": errors,
         "quota_estimada_youtube": {
             "unidades": client.quota_estimated,
             "requisicoes": client.requests,
-            "observacao": "A descoberta usa /streams + uploads e aciona search.list apenas como fallback na janela crítica. search.list é restrito aos channelIds oficiais de GE TV/CazéTV e limitado por execução.",
+            "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos channelIds oficiais de GE TV/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis.",
         },
     }
     return output_base, audit, True
@@ -1106,7 +1148,7 @@ def selftest() -> None:
         "Athletico-PR": ["athletico paranaense"],
     }
     config = {
-        "palavras_rejeitadas": ["melhores momentos", "pre jogo", "pós jogo", "react", "radio"],
+        "palavras_rejeitadas": ["melhores momentos", "pre jogo", "pós jogo", "react", "radio", "lances em tempo real", "noche de copa"],
         "termos_competicao": ["brasileirao", "brasileirão"],
         "tolerancia_horario_minutos": 180,
         "confianca_minima": 0.72,
@@ -1118,6 +1160,14 @@ def selftest() -> None:
 
     wrong = Candidate("BBBBBBBBBBB", "getv", "UC2", "ge tv", "BOTAFOGO X SANTOS | MELHORES MOMENTOS", "", "upcoming", game.kickoff, None, None)
     assert evaluate_candidate(wrong, game, config, aliases).rejected_reason
+
+    commentary = Candidate("HHHHHHHHHHH", "cazetv", "UC1", "CazéTV", "BOTAFOGO X SANTOS | LANCES EM TEMPO REAL | NOCHE DE COPA", "", "upcoming", game.kickoff, None, None)
+    rejected = evaluate_candidate(commentary, game, config, aliases).rejected_reason
+    assert rejected and "conteúdo rejeitado" in rejected
+
+    multiplex = Candidate("IIIIIIIIIII", "cazetv", "UC1", "CazéTV", "BOTAFOGO X SANTOS E PALMEIRAS X INTERNACIONAL | AO VIVO", "", "upcoming", game.kickoff, None, None)
+    rejected_multi = evaluate_candidate(multiplex, game, config, aliases).rejected_reason
+    assert rejected_multi == "conteúdo reúne mais de uma partida"
 
     far = Candidate("CCCCCCCCCCC", "getv", "UC2", "ge tv", "BOTAFOGO X SANTOS | AO VIVO", "", "upcoming", game.kickoff + dt.timedelta(hours=6), None, None)
     assert "horário incompatível" in evaluate_candidate(far, game, config, aliases).rejected_reason
@@ -1179,6 +1229,16 @@ def selftest() -> None:
     assert len(search_candidates) == 1 and search_candidates[0].video_id == "GGGGGGGGGGG"
     assert fake.quota_estimated == 101
     assert needs_live_search([game], {game.event_id:{}}, game.kickoff, {"search_live_antes_minutos":30,"search_live_depois_minutos":180})
+    ok, _ = aggressive_search_policy(game, {"jogos": {}})
+    assert ok
+    ok, _ = aggressive_search_policy(game, {"jogos":{"1":{"canais":["Prime Video"],"estavel":True,"exclusivo":True}}})
+    assert not ok
+    ok, _ = aggressive_search_policy(game, {"jogos":{"1":{"canais":["Premiere"],"estavel":True,"exclusivo":False}}})
+    assert not ok
+    ok, _ = aggressive_search_policy(game, {"jogos":{"1":{"canais":["Premiere","Globo"],"estavel":True,"exclusivo":False}}})
+    assert ok
+    ok, _ = aggressive_search_policy(game, {"jogos":{"1":{"canais":["CazéTV","Premiere","Record"],"estavel":True,"exclusivo":False}}})
+    assert ok
 
     # Teste scraping: extrai IDs de HTML simulado
     html_fake = '''
@@ -1198,8 +1258,8 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument("--root", default=".", help="Raiz do repositório")
     parser.add_argument("--dry-run", action="store_true", help="Analisa sem gravar arquivos")
     parser.add_argument("--offline", action="store_true", help="Não acessa YouTube; útil apenas para validar janela/JSONs")
-    parser.add_argument("--no-search", action="store_true", help="Legado: sem efeito (search.list não é mais usado)")
-    parser.add_argument("--force-search", action="store_true", help="Legado: sem efeito (search.list não é mais usado)")
+    parser.add_argument("--no-search", action="store_true", help="Desativa apenas o fallback caro search.list; /streams e uploads continuam ativos")
+    parser.add_argument("--force-search", action="store_true", help="Força search.list nos jogos elegíveis pela grade, respeitando o limite por execução")
     parser.add_argument("--event-id", default="", help="Limita a um event_id")
     parser.add_argument("--now", default="", help="Horário ISO para testes")
     parser.add_argument("--selftest", action="store_true")
@@ -1217,7 +1277,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if current_time is None:
         raise RuntimeError("--now inválido")
 
-    for rel in ("dados-br/agenda-clubes-br.json", "dados-br/config-transmissoes-aovivo.json", "dados-br/transmissoes-aovivo-manual.json"):
+    for rel in ("dados-br/agenda-clubes-br.json", "dados-br/config-transmissoes-aovivo.json", "dados-br/transmissoes-aovivo-manual.json", "dados-br/transmissoes-tv.json"):
         if not (root / rel).exists():
             raise RuntimeError(f"Arquivo obrigatório ausente: {rel}")
         load_json(root / rel, {})

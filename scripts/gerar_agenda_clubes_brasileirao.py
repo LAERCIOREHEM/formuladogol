@@ -2,7 +2,8 @@
 """Gera a agenda complementar dos clubes do Brasileirão.
 
 A saída reúne:
-- todos os jogos do Brasileirão publicados em ``jogos.json``;
+- todos os jogos do Brasileirão publicados em ``jogos.json`` e, quando o feed
+  corrente estiver incompleto, complementados pelo calendário canônico de 380 jogos;
 - Copa do Brasil, Libertadores e Sul-Americana somente quando ao menos um
   participante pertence à Série A 2026;
 - apenas partidas de hoje até o fim do mês seguinte.
@@ -128,12 +129,65 @@ def probabilities_ids(root: Path) -> set[str]:
     }
 
 
+def club_metadata(root: Path) -> dict[str, dict[str, Any]]:
+    data = load_json(root / "dados-br" / "clubes.json", {"clubes": []})
+    out: dict[str, dict[str, Any]] = {}
+    for raw in data.get("clubes") or []:
+        if not isinstance(raw, Mapping):
+            continue
+        name = str(raw.get("nome") or "").strip()
+        if not name:
+            continue
+        out[norm(name)] = {
+            "nome": name,
+            "sigla": str(raw.get("sigla") or ""),
+            "escudo": str(raw.get("escudo") or ""),
+        }
+    return out
+
+
+def brasileirao_team_from_name(name: Any, metadata: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
+    raw_name = str(name or "Time").strip() or "Time"
+    meta = metadata.get(norm(raw_name), {})
+    return team_from_brasileirao({
+        "nome": str(meta.get("nome") or raw_name),
+        "sigla": str(meta.get("sigla") or ""),
+        "escudo": str(meta.get("escudo") or ""),
+    })
+
+
 def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[str, Any]]:
     data = load_json(root / "jogos.json", {"jogos": []})
+    calendar_data = load_json(root / "dados-br" / "calendario-completo.json", {"jogos": []})
+    metadata = club_metadata(root)
+    canonical_round_by_matchup: dict[tuple[str, str], int] = {}
+    for item in calendar_data.get("jogos") or []:
+        if not isinstance(item, Mapping):
+            continue
+        home_name = str(item.get("mandante") or "").strip()
+        away_name = str(item.get("visitante") or "").strip()
+        round_no = int(item.get("rodada") or 0)
+        if home_name and away_name and round_no:
+            canonical_round_by_matchup[(norm(home_name), norm(away_name))] = round_no
+    seen_ids: set[str] = set()
+    seen_matchups: set[tuple[str, str]] = set()
+    round_counts: dict[int, int] = {}
+    for raw in data.get("jogos") or []:
+        if isinstance(raw, Mapping):
+            round_no = int(raw.get("rodada") or 0)
+            if round_no:
+                round_counts[round_no] = round_counts.get(round_no, 0) + 1
+
     for raw in data.get("jogos") or []:
         if not isinstance(raw, Mapping):
             continue
-        event_id = str(raw.get("event_id") or "")
+        event_id = str(raw.get("event_id") or "").strip()
+        home = team_from_brasileirao(raw.get("mandante"))
+        away = team_from_brasileirao(raw.get("visitante"))
+        if event_id:
+            seen_ids.add(event_id)
+        seen_matchups.add((norm(home.get("nome")), norm(away.get("nome"))))
+        canonical_round = canonical_round_by_matchup.get((norm(home.get("nome")), norm(away.get("nome"))), int(raw.get("rodada") or 0))
         yield {
             "event_id": event_id,
             "competicao_chave": "brasileirao",
@@ -144,12 +198,12 @@ def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[st
             "estado": str(raw.get("estado") or "pre").lower(),
             "concluido": str(raw.get("estado") or "").lower() == "post",
             "status": str(raw.get("status") or ""),
-            "rodada": int(raw.get("rodada") or 0),
+            "rodada": canonical_round,
             "fase": "",
             "perna": None,
             "estadio": str(raw.get("estadio") or ""),
-            "mandante": team_from_brasileirao(raw.get("mandante")),
-            "visitante": team_from_brasileirao(raw.get("visitante")),
+            "mandante": home,
+            "visitante": away,
             "placar_mandante": raw.get("placar_mandante"),
             "placar_visitante": raw.get("placar_visitante"),
             "adiado": raw.get("adiado") is True,
@@ -157,6 +211,54 @@ def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[st
             "possui_clube_serie_a_2026": True,
             "probabilidades_disponiveis": bool(event_id and event_id in probability_ids),
             "fonte": "jogos.json",
+        }
+
+    # O feed operacional pode omitir temporariamente uma partida futura mesmo
+    # quando o calendário canônico de 380 jogos já possui event_id/data válidos.
+    # A agenda não pode herdar esse buraco: complementa apenas jogos ausentes,
+    # sem sobrescrever estado/placar de jogos.json.
+    for raw in calendar_data.get("jogos") or []:
+        if not isinstance(raw, Mapping):
+            continue
+        event_id = str(raw.get("event_id") or "").strip()
+        home_name = str(raw.get("mandante") or "").strip()
+        away_name = str(raw.get("visitante") or "").strip()
+        if not home_name or not away_name:
+            continue
+        matchup = (norm(home_name), norm(away_name))
+        if (event_id and event_id in seen_ids) or matchup in seen_matchups:
+            continue
+        round_no = int(raw.get("rodada") or 0)
+        # Fallback só atua como reparo de buraco em rodada já detalhada pelo feed
+        # corrente. Não transforma datas básicas/placeholder de rodadas futuras em
+        # agenda oficial antes da hora.
+        if round_counts.get(round_no, 0) < 8:
+            continue
+        if raw.get("data_definir") is True or not str(raw.get("data_iso") or "").strip():
+            continue
+        yield {
+            "event_id": event_id,
+            "competicao_chave": "brasileirao",
+            "competicao_nome": "Campeonato Brasileiro Série A",
+            "competicao_nome_curto": "Brasileirão",
+            "espn_league": "bra.1",
+            "data_iso": str(raw.get("data_iso") or ""),
+            "estado": str(raw.get("estado") or "pre").lower(),
+            "concluido": raw.get("concluido") is True,
+            "status": "pré-jogo",
+            "rodada": int(raw.get("rodada") or 0),
+            "fase": "",
+            "perna": None,
+            "estadio": str(raw.get("estadio") or ""),
+            "mandante": brasileirao_team_from_name(home_name, metadata),
+            "visitante": brasileirao_team_from_name(away_name, metadata),
+            "placar_mandante": None,
+            "placar_visitante": None,
+            "adiado": raw.get("adiado") is True,
+            "data_definir": False,
+            "possui_clube_serie_a_2026": True,
+            "probabilidades_disponiveis": bool(event_id and event_id in probability_ids),
+            "fonte": "dados-br/calendario-completo.json (fallback canônico)",
         }
 
 
@@ -244,7 +346,7 @@ def build(root: Path, now: datetime) -> dict[str, Any]:
             "regra": "de hoje até o último dia do mês seguinte",
         },
         "filtros": {
-            "brasileirao": "todos os jogos publicados",
+            "brasileirao": "jogos publicados + fallback canônico para partidas futuras ausentes do feed corrente",
             "copas": "somente partidas com ao menos um clube da Série A 2026",
             "probabilidades": "disponíveis apenas para partidas do Brasileirão com saída AF-Previsão publicada",
         },
@@ -287,6 +389,8 @@ def selftest() -> None:
     assert norm("Sul-Americana") == "sul americana"
     sample = team_from_cup({"espn_id": "123", "nome": "Exemplo", "serie_a_2026": False})
     assert sample["escudo"].endswith("/123.png")
+    fallback_team = brasileirao_team_from_name("Palmeiras", {"palmeiras": {"nome": "Palmeiras", "sigla": "PAL", "escudo": "x.svg"}})
+    assert fallback_team["sigla"] == "PAL" and fallback_team["escudo"] == "x.svg"
     print("self-test OK")
 
 

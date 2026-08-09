@@ -1358,6 +1358,40 @@
   }
   .jogo-status-live { font-size: 11px; color: #f87171; font-weight: 600; }
   .jogo-status-fim { font-size: 11px; color: var(--text-secondary); font-weight: 600; }
+
+  .br-watch-access {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    margin: -1px 16px 14px;
+    padding: 0 2px;
+  }
+  .br-watch-access-label {
+    color: #8193a5;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .055em;
+  }
+  .br-watch-access a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 5px 9px;
+    border: 1px solid rgba(148,163,184,.16);
+    border-radius: 999px;
+    background: rgba(255,255,255,.035);
+    color: #cfe0ec;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+  .br-watch-access a:hover, .br-watch-access a:focus-visible {
+    border-color: rgba(163,230,53,.45);
+    color: #efffc3;
+    background: rgba(163,230,53,.08);
+  }
   .jogo-gols {
     margin-top: 6px;
     font-size: 11px;
@@ -2663,6 +2697,12 @@ body > .container > section.hero > img {
   @media (max-width: 640px) {
     .jogo-time.br-club-link, .resultado-time.br-club-link { padding: 4px 2px; }
   }
+
+  @media (max-width: 620px) {
+    .br-watch-access { margin: -1px 12px 12px; gap: 6px; }
+    .br-watch-access a { font-size: 10px; min-height: 29px; padding: 5px 8px; }
+  }
+
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260801-footer-institucional-v1">
 <link rel="stylesheet" href="css/br-jogos.css?v=20260808-jogos-unificados-v1">
@@ -4888,10 +4928,23 @@ function juntarCanais(canais) {
   return out.join(' / ');
 }
 
-// "Onde assistir" de um jogo: YouTube oficial prevalece, depois TV/streaming fechado e fontes legadas.
+// "Onde assistir" usa primeiro o consolidado auditado. Esse arquivo já reúne
+// grade oficial + eventual player integral GE TV/CazéTV, evitando que um link
+// de YouTube apague Premiere/Globo/SporTV ou que um override antigo esconda
+// uma opção mais recente. Fontes legadas ficam somente como fallback.
 function ondeAssistir(j) {
   const m = nomeCanonico((j.mandante || {}).nome);
   const v = nomeCanonico((j.visitante || {}).nome);
+
+  const tv = entradaTransmissaoPorJogo(j, state.transmissoesTv);
+  const tvNomes = nomesCanaisEntrada(tv);
+  if (tvNomes.length) return juntarCanais(tvNomes);
+
+  const ytManual = entradaTransmissaoPorJogo(j, state.transmissoesAovivoManual);
+  const ytAuto = entradaTransmissaoPorJogo(j, state.transmissoesAovivo);
+  const yt = ytManual || ytAuto;
+  const ytNomes = nomesCanaisEntrada(yt);
+  if (ytNomes.length) return juntarCanais(ytNomes);
 
   for (const t of (state.transmissoesManuais || [])) {
     if (nomeCanonico(t.mandante) === m && nomeCanonico(t.visitante) === v &&
@@ -4899,24 +4952,26 @@ function ondeAssistir(j) {
       return t.transmissao || '';
     }
   }
-
-  // Manual de YouTube primeiro, depois robô: se houver GE TV/CazéTV, mostra isso
-  // no card da aba Jogos em vez de manter uma transmissão fechada redundante.
-  const ytManual = entradaTransmissaoPorJogo(j, state.transmissoesAovivoManual);
-  const ytAuto = entradaTransmissaoPorJogo(j, state.transmissoesAovivo);
-  const yt = ytManual || ytAuto;
-  const ytNomes = nomesCanaisEntrada(yt);
-  if (ytNomes.length) return juntarCanais(ytNomes);
-
-  const tv = entradaTransmissaoPorJogo(j, state.transmissoesTv);
-  const tvNomes = nomesCanaisEntrada(tv);
-  if (tvNomes.length) return juntarCanais(tvNomes);
-
   if (j.transmissao) return j.transmissao;
   for (const e of (state.espnEventos || [])) {
     if (e.mandante === m && e.visitante === v && e.transmissao) return e.transmissao;
   }
   return '';
+}
+
+function acessosOndeAssistir(j) {
+  const tv = entradaTransmissaoPorJogo(j, state.transmissoesTv);
+  const acessos = Array.isArray(tv?.acessos) ? tv.acessos : [];
+  const vistos = new Set();
+  return acessos.filter(item => {
+    // O player GE TV/CazéTV usa o botão interno "Assistir aqui"; aqui ficam
+    // apenas acessos oficiais aos demais canais/plataformas.
+    if (!item || item.tipo === 'player_oficial' || !item.url || !item.nome) return false;
+    const key = String(item.nome) + '|' + String(item.url);
+    if (vistos.has(key)) return false;
+    vistos.add(key);
+    return true;
+  });
 }
 
 // Helper: extrai a data calendário no fuso de Brasília a partir de um ISO.
@@ -5298,6 +5353,7 @@ function renderJogos() {
       const placarCentro = temPlacar ? `<div class="jogo-placar-live">${Number(estado.placarM)} × ${Number(estado.placarV)}</div>` : '<div class="jogo-vs">×</div>';
       const statusHtml = estado.estado === 'live' ? `<span class="badge-aovivo">AO VIVO</span><span class="jogo-status-live">${brEscapeHtml(estado.label)}</span>` : (estado.estado === 'post' ? '<span class="jogo-status-fim">Encerrado</span>' : `<span class="jogo-source-pill">${brEscapeHtml(estado.label)}</span>`);
       const tx = ondeAssistir(j);
+      const acessosTx = acessosOndeAssistir(j);
       const compKey = String(j.competicao_chave || 'brasileirao');
       const comp = competicaoDoJogo(j);
       const probabilidadesDesktop = jogoUnificadoEhBrasileirao(j) ? htmlProbabilidadesPreJogo(j, 'desktop') : '';
@@ -5328,6 +5384,9 @@ function renderJogos() {
       detalhes.push(j.estadio ? `<span class="jogo-detalhe">📍 ${brEscapeHtml(j.estadio)}</span>` : '<span class="jogo-detalhe">📍 Local a confirmar</span>');
       detalhes.push(`<span class="jogo-detalhe">📺 ${brEscapeHtml(tx || 'Transmissão a confirmar')}</span>`);
       html += `<div class="jogo-detalhes">${detalhes.join('')}</div>`;
+      if (acessosTx.length) {
+        html += `<div class="br-watch-access"><span class="br-watch-access-label">Acessar</span>${acessosTx.map(item => `<a href="${brEscapeAttr(item.url)}" target="_blank" rel="noopener noreferrer">${brEscapeHtml(item.nome)}</a>`).join('')}</div>`;
+      }
       if (estado.gols && estado.gols.length) html += `<div class="jogo-gols">⚽ ${estado.gols.map(brEscapeHtml).join(' · ')}</div>`;
       html += '</div>';
       const mmJogo = jogoUnificadoEhBrasileirao(j) ? htmlMelhoresMomentos(j, 'jogo') : '';

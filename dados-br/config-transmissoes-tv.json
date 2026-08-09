@@ -20,9 +20,11 @@
   "ge_paginas_feed": 2,
   "politica": [
     "CBF oficial é a autoridade da grade do Brasileirão e da Copa do Brasil quando a informação estiver disponível.",
-    "GE Agenda e guias editoriais complementam anúncios recentes das quatro competições.",
-    "ESPN scoreboard e summary são fontes auxiliares por competição.",
-    "Uma resposta vazia nunca apaga informação válida já publicada.",
-    "transmissoes.json é o override editorial de última instância."
+    "Grades verificadas em transmissoes.json com modo=fixo são incrementais: GE/ESPN não são reconsultados a cada ciclo.",
+    "Prime Video ou Paramount+ confirmados como únicos provedores podem ser marcados exclusivo=true e não recebem canais adicionais.",
+    "Globo isolada nunca é tratada como grade estável; o coletor continua enriquecendo para encontrar Premiere/SporTV/GE TV quando houver.",
+    "GE TV e CazéTV só entram como player quando o vídeo oficial é de uma única partida, integral, público e embeddable.",
+    "Opções de acesso (Globoplay, Claro tv+ etc.) são exibidas separadamente dos detentores de direitos e não criam canais fictícios.",
+    "Uma resposta vazia nunca apaga informação válida já publicada."
   ]
 }

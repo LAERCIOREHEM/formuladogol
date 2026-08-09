@@ -11,7 +11,7 @@
       "nome": "CazéTV",
       "handle": "@CazeTV",
       "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
-      "prioridade": 1,
+      "prioridade": 2,
       "streams_url": "https://www.youtube.com/@CazeTV/streams"
     },
     {
@@ -19,7 +19,7 @@
       "nome": "GE TV",
       "handle": "@getv",
       "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
-      "prioridade": 2,
+      "prioridade": 1,
       "streams_url": "https://www.youtube.com/@getv/streams"
     }
   ],
@@ -55,10 +55,15 @@
     "narracao",
     "coletiva",
     "programa esportivo",
-    "compacto"
+    "compacto",
+    "lances em tempo real",
+    "noche de copa",
+    "tempo real sem imagens",
+    "watchalong",
+    "watch party"
   ],
   "agenda_ge_referencia": "https://ge.globo.com/agenda/#/futebol",
-  "observacao": "A agenda consolidada orienta a grade. Descoberta redundante: /streams + uploads + search.list oficial de baixo volume na janela crítica. GE TV tem prioridade sobre CazéTV; somente vídeo público, oficial e embeddable vira player interno.",
+  "observacao": "A agenda consolidada orienta a grade. Descoberta redundante: /streams + uploads em todos os jogos; search.list oficial só na janela crítica e quando a grade ainda torna GE TV/CazéTV plausíveis. GE TV tem prioridade sobre CazéTV. Lives de narração, watchalong, multiplex ou lances em tempo real são rejeitadas; somente jogo integral público, oficial e embeddable vira player interno.",
   "streams_max_itens": 120,
   "search_api_fallback": true,
   "search_live_antes_minutos": 30,

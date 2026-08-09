@@ -1,6 +1,12 @@
 {
-  "_como_usar": "Ajuste editorial de última instância para 'onde assistir'. As fontes automáticas oficiais e editoriais são prioritárias; use esta lista apenas para confirmar ou corrigir publicação oficial. Informe event_id, competição, data, mandante, visitante, transmissão e fonte.",
+  "_como_usar": "Ajuste editorial auditável para 'onde assistir'. Entradas com modo=fixo foram conferidas em grade oficial/editorial e deixam de ser reconsultadas nas fontes editoriais a cada ciclo. exclusivo=true impede acrescentar outro direito de TV/streaming; GE TV/CazéTV só podem ser acrescentados quando existir player integral oficial validado. event_id é a chave preferencial.",
   "transmissoes": [
+    {
+      "rodada": 4,
+      "mandante": "Bahia",
+      "visitante": "Chapecoense",
+      "transmissao": "Premiere"
+    },
     {
       "event_id": "401840999",
       "rodada": 4,
@@ -10,29 +16,10 @@
       "fonte": "CazéTV — link informado/manual confirmado em 18/07/2026"
     },
     {
-      "rodada": 4,
-      "mandante": "Bahia",
-      "visitante": "Chapecoense",
-      "transmissao": "Premiere"
-    },
-    {
-      "rodada": 21,
-      "mandante": "Vitória",
-      "visitante": "Palmeiras",
-      "transmissao": "GE TV"
-    },
-    {
       "rodada": 19,
       "mandante": "Botafogo",
       "visitante": "Santos",
       "transmissao": "Premiere / Record / CazéTV",
-      "fonte": "ge — guia da 19ª rodada, 16/07/2026"
-    },
-    {
-      "rodada": 19,
-      "mandante": "Vitória",
-      "visitante": "Vasco da Gama",
-      "transmissao": "Premiere",
       "fonte": "ge — guia da 19ª rodada, 16/07/2026"
     },
     {
@@ -50,6 +37,13 @@
       "fonte": "ge — guia da 19ª rodada, 16/07/2026"
     },
     {
+      "rodada": 19,
+      "mandante": "Vitória",
+      "visitante": "Vasco da Gama",
+      "transmissao": "Premiere",
+      "fonte": "ge — guia da 19ª rodada, 16/07/2026"
+    },
+    {
       "event_id": "401841148",
       "rodada": 19,
       "mandante": "Atlético-MG",
@@ -58,34 +52,10 @@
       "fonte": "ge — guia da 19ª rodada, 16/07/2026"
     },
     {
-      "event_id": "401841152",
-      "rodada": 19,
-      "mandante": "Coritiba",
-      "visitante": "Palmeiras",
-      "transmissao": "Prime Video",
-      "fonte": "ge — guia da 19ª rodada, 16/07/2026"
-    },
-    {
       "event_id": "401841150",
       "rodada": 19,
       "mandante": "Chapecoense",
       "visitante": "Flamengo",
-      "transmissao": "Globo / Premiere",
-      "fonte": "ge — guia da 19ª rodada, 16/07/2026"
-    },
-    {
-      "event_id": "401841156",
-      "rodada": 19,
-      "mandante": "São Paulo",
-      "visitante": "Athletico-PR",
-      "transmissao": "GE TV / Globo / Premiere",
-      "fonte": "ge — guia da 19ª rodada, 16/07/2026"
-    },
-    {
-      "event_id": "401841154",
-      "rodada": 19,
-      "mandante": "Internacional",
-      "visitante": "Cruzeiro",
       "transmissao": "Globo / Premiere",
       "fonte": "ge — guia da 19ª rodada, 16/07/2026"
     },
@@ -98,27 +68,35 @@
       "fonte": "ge — guia da 19ª rodada, 16/07/2026"
     },
     {
+      "event_id": "401841152",
+      "rodada": 19,
+      "mandante": "Coritiba",
+      "visitante": "Palmeiras",
+      "transmissao": "Prime Video",
+      "fonte": "ge — guia da 19ª rodada, 16/07/2026"
+    },
+    {
+      "event_id": "401841154",
+      "rodada": 19,
+      "mandante": "Internacional",
+      "visitante": "Cruzeiro",
+      "transmissao": "Globo / Premiere",
+      "fonte": "ge — guia da 19ª rodada, 16/07/2026"
+    },
+    {
+      "event_id": "401841156",
+      "rodada": 19,
+      "mandante": "São Paulo",
+      "visitante": "Athletico-PR",
+      "transmissao": "GE TV / Globo / Premiere",
+      "fonte": "ge — guia da 19ª rodada, 16/07/2026"
+    },
+    {
       "event_id": "401841158",
       "rodada": 20,
       "mandante": "Athletico-PR",
       "visitante": "Internacional",
       "transmissao": "Prime Video",
-      "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
-    },
-    {
-      "event_id": "401841161",
-      "rodada": 20,
-      "mandante": "Santos",
-      "visitante": "Chapecoense",
-      "transmissao": "Premiere / SporTV",
-      "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
-    },
-    {
-      "event_id": "401841160",
-      "rodada": 20,
-      "mandante": "Vasco da Gama",
-      "visitante": "Mirassol",
-      "transmissao": "Premiere / Record / CazéTV",
       "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
     },
     {
@@ -130,18 +108,26 @@
       "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
     },
     {
-      "event_id": "401841167",
+      "event_id": "401841160",
       "rodada": 20,
-      "mandante": "Cruzeiro",
-      "visitante": "Botafogo",
-      "transmissao": "Globo / Premiere",
+      "mandante": "Vasco da Gama",
+      "visitante": "Mirassol",
+      "transmissao": "Premiere / Record / CazéTV",
       "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
     },
     {
-      "event_id": "401841165",
+      "event_id": "401841161",
       "rodada": 20,
-      "mandante": "Grêmio",
-      "visitante": "Fluminense",
+      "mandante": "Santos",
+      "visitante": "Chapecoense",
+      "transmissao": "Premiere / SporTV",
+      "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
+    },
+    {
+      "event_id": "401841162",
+      "rodada": 20,
+      "mandante": "Remo",
+      "visitante": "Vitória",
       "transmissao": "Premiere",
       "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
     },
@@ -154,14 +140,6 @@
       "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
     },
     {
-      "event_id": "401841166",
-      "rodada": 20,
-      "mandante": "Flamengo",
-      "visitante": "São Paulo",
-      "transmissao": "Premiere",
-      "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
-    },
-    {
       "event_id": "401841164",
       "rodada": 20,
       "mandante": "Palmeiras",
@@ -170,12 +148,42 @@
       "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
     },
     {
-      "event_id": "401841162",
+      "event_id": "401841165",
       "rodada": 20,
-      "mandante": "Remo",
-      "visitante": "Vitória",
+      "mandante": "Grêmio",
+      "visitante": "Fluminense",
       "transmissao": "Premiere",
       "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
+    },
+    {
+      "event_id": "401841166",
+      "rodada": 20,
+      "mandante": "Flamengo",
+      "visitante": "São Paulo",
+      "transmissao": "Premiere",
+      "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
+    },
+    {
+      "event_id": "401841167",
+      "rodada": 20,
+      "mandante": "Cruzeiro",
+      "visitante": "Botafogo",
+      "transmissao": "Globo / Premiere",
+      "fonte": "CBF — Tabela Detalhada do Brasileirão Série A 2026, rodadas 19 a 24"
+    },
+    {
+      "rodada": 21,
+      "mandante": "Vitória",
+      "visitante": "Palmeiras",
+      "transmissao": "GE TV"
+    },
+    {
+      "event_id": "401841184",
+      "rodada": 22,
+      "mandante": "Coritiba",
+      "visitante": "Chapecoense",
+      "transmissao": "CazéTV / Premiere",
+      "fonte": "CazéTV — live oficial confirmada (z63vnMGM644) + ge — Premiere, verificados em 08/08/2026"
     },
     {
       "event_id": "401874097",
@@ -196,12 +204,557 @@
       "fonte": "CBF oficial — Copa do Brasil, jogo 140, verificado em 04/08/2026"
     },
     {
-      "event_id": "401841184",
+      "event_id": "401841183",
       "rodada": 22,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-09T11:00:00-03:00",
+      "mandante": "Cruzeiro",
+      "visitante": "Mirassol",
+      "transmissao": "Prime Video",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 22"
+    },
+    {
+      "event_id": "401841180",
+      "rodada": 22,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-09T16:00:00-03:00",
+      "mandante": "Palmeiras",
+      "visitante": "Internacional",
+      "transmissao": "Globo / Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 22"
+    },
+    {
+      "event_id": "401841186",
+      "rodada": 22,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-09T16:00:00-03:00",
+      "mandante": "Bahia",
+      "visitante": "Vasco da Gama",
+      "transmissao": "Globo / Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 22"
+    },
+    {
+      "event_id": "401841179",
+      "rodada": 22,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-09T18:30:00-03:00",
+      "mandante": "Bragantino",
+      "visitante": "Corinthians",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 22"
+    },
+    {
+      "event_id": "401841182",
+      "rodada": 22,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-09T18:30:00-03:00",
+      "mandante": "Santos",
+      "visitante": "Athletico-PR",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 22"
+    },
+    {
+      "event_id": "401841187",
+      "rodada": 22,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-09T19:30:00-03:00",
+      "mandante": "Flamengo",
+      "visitante": "Vitória",
+      "transmissao": "Premiere / SporTV",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 22"
+    },
+    {
+      "event_id": "401874070",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-11T19:00:00-03:00",
+      "mandante": "Fluminense",
+      "visitante": "Independiente Rivadavia",
+      "transmissao": "Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401903296",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-11T21:30:00-03:00",
+      "mandante": "Bolívar",
+      "visitante": "São Paulo",
+      "transmissao": "SBT / Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "SBT Sports + ESPN/Disney+ — grade das oitavas da Sul-Americana 2026"
+    },
+    {
+      "event_id": "401874076",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-12T19:00:00-03:00",
+      "mandante": "Palmeiras",
+      "visitante": "Cerro Porteño",
+      "transmissao": "Paramount+",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401902743",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-12T19:00:00-03:00",
+      "mandante": "Bragantino",
+      "visitante": "Atlético-MG",
+      "transmissao": "Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ESPN/Disney+ — grade das oitavas da Sul-Americana 2026"
+    },
+    {
+      "event_id": "401874153",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-12T21:30:00-03:00",
+      "mandante": "Cruzeiro",
+      "visitante": "Flamengo",
+      "transmissao": "GE TV / Globo / Paramount+",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401874073",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-13T19:00:00-03:00",
+      "mandante": "Mirassol",
+      "visitante": "Liga de Quito",
+      "transmissao": "Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401874075",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-13T21:30:00-03:00",
+      "mandante": "Rosário Central",
+      "visitante": "Corinthians",
+      "transmissao": "Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401902715",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-13T21:30:00-03:00",
+      "mandante": "Cienciano del Cusco",
+      "visitante": "Botafogo",
+      "transmissao": "Paramount+",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "Paramount+ — grade das oitavas da Sul-Americana 2026"
+    },
+    {
+      "event_id": "401841192",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-15T16:30:00-03:00",
+      "mandante": "Fluminense",
+      "visitante": "Palmeiras",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841195",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-15T16:30:00-03:00",
+      "mandante": "Atlético-MG",
+      "visitante": "Grêmio",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841196",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-15T18:30:00-03:00",
+      "mandante": "Athletico-PR",
+      "visitante": "Bragantino",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841189",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-15T21:00:00-03:00",
+      "mandante": "São Paulo",
+      "visitante": "Coritiba",
+      "transmissao": "Premiere / SporTV",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841194",
+      "rodada": 38,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-16T11:00:00-03:00",
+      "mandante": "Chapecoense",
+      "visitante": "Bahia",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841188",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-16T16:00:00-03:00",
+      "mandante": "Vasco da Gama",
+      "visitante": "Santos",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841190",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-16T18:30:00-03:00",
+      "mandante": "Mirassol",
+      "visitante": "Flamengo",
+      "transmissao": "Premiere / Record / CazéTV",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841197",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-16T18:30:00-03:00",
+      "mandante": "Vitória",
+      "visitante": "Botafogo",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841193",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-16T19:30:00-03:00",
+      "mandante": "Corinthians",
+      "visitante": "Cruzeiro",
+      "transmissao": "Prime Video",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401841191",
+      "rodada": 23,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-17T20:00:00-03:00",
+      "mandante": "Internacional",
+      "visitante": "Remo",
+      "transmissao": "Premiere / SporTV",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 23"
+    },
+    {
+      "event_id": "401874156",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-18T19:00:00-03:00",
+      "mandante": "Independiente Rivadavia",
+      "visitante": "Fluminense",
+      "transmissao": "Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401903294",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-18T21:30:00-03:00",
+      "mandante": "São Paulo",
+      "visitante": "Bolívar",
+      "transmissao": "SBT / Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "SBT Sports + ESPN/Disney+ — grade das oitavas da Sul-Americana 2026"
+    },
+    {
+      "event_id": "401874155",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-19T19:00:00-03:00",
+      "mandante": "Cerro Porteño",
+      "visitante": "Palmeiras",
+      "transmissao": "Paramount+",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401902714",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-19T19:00:00-03:00",
+      "mandante": "Atlético-MG",
+      "visitante": "Bragantino",
+      "transmissao": "Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ESPN/Disney+ — grade das oitavas da Sul-Americana 2026"
+    },
+    {
+      "event_id": "401874141",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-19T21:30:00-03:00",
+      "mandante": "Flamengo",
+      "visitante": "Cruzeiro",
+      "transmissao": "GE TV / Globo / Paramount+",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401874142",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-20T19:00:00-03:00",
+      "mandante": "Liga de Quito",
+      "visitante": "Mirassol",
+      "transmissao": "Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401874149",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "data_iso": "2026-08-20T21:30:00-03:00",
+      "mandante": "Corinthians",
+      "visitante": "Rosário Central",
+      "transmissao": "Disney+ / ESPN",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ge — grade das oitavas da Libertadores 2026"
+    },
+    {
+      "event_id": "401902741",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-20T21:30:00-03:00",
+      "mandante": "Botafogo",
+      "visitante": "Cienciano del Cusco",
+      "transmissao": "Paramount+",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "Paramount+ — grade das oitavas da Sul-Americana 2026"
+    },
+    {
+      "event_id": "401841205",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-22T16:00:00-03:00",
+      "mandante": "Fluminense",
+      "visitante": "Remo",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841204",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-22T18:30:00-03:00",
+      "mandante": "Internacional",
+      "visitante": "Atlético-MG",
+      "transmissao": "Premiere / SporTV",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841206",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-22T20:30:00-03:00",
+      "mandante": "Cruzeiro",
+      "visitante": "Flamengo",
+      "transmissao": "Prime Video",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841200",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-23T16:00:00-03:00",
+      "mandante": "Vitória",
+      "visitante": "Bahia",
+      "transmissao": "Globo / Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841202",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-23T16:00:00-03:00",
+      "mandante": "Bragantino",
+      "visitante": "Grêmio",
+      "transmissao": "Globo / Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841203",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-23T16:00:00-03:00",
+      "mandante": "Palmeiras",
+      "visitante": "Vasco da Gama",
+      "transmissao": "Globo / Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841199",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-23T18:30:00-03:00",
+      "mandante": "Chapecoense",
+      "visitante": "São Paulo",
+      "transmissao": "Premiere / Record / CazéTV",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841201",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-23T18:30:00-03:00",
+      "mandante": "Santos",
+      "visitante": "Mirassol",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841207",
+      "rodada": 25,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-23T19:30:00-03:00",
       "mandante": "Coritiba",
-      "visitante": "Chapecoense",
-      "transmissao": "CazéTV / Premiere",
-      "fonte": "CazéTV — live oficial confirmada (z63vnMGM644) + ge — Premiere, verificados em 08/08/2026"
+      "visitante": "Corinthians",
+      "transmissao": "Premiere",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401841198",
+      "rodada": 25,
+      "competicao_chave": "brasileirao",
+      "data_iso": "2026-08-24T20:00:00-03:00",
+      "mandante": "Botafogo",
+      "visitante": "Athletico-PR",
+      "transmissao": "Premiere / SporTV",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "CBF oficial — tabela detalhada Série A 2026, rodada 24"
+    },
+    {
+      "event_id": "401902572",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-13T19:00:00-03:00",
+      "mandante": "Santos",
+      "visitante": "Macará",
+      "transmissao": "ESPN / Disney+",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ESPN Brasil — tabela das oitavas da Sul-Americana 2026, transmissão ESPN no Disney+"
+    },
+    {
+      "event_id": "401902449",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-20T19:00:00-03:00",
+      "mandante": "Macará",
+      "visitante": "Santos",
+      "transmissao": "ESPN / Disney+",
+      "modo": "fixo",
+      "exclusivo": false,
+      "fonte": "ESPN Brasil — tabela das oitavas da Sul-Americana 2026, transmissão ESPN no Disney+"
+    },
+    {
+      "event_id": "401902742",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-13T19:00:00-03:00",
+      "mandante": "Vasco da Gama",
+      "visitante": "Club Olimpia",
+      "transmissao": "Paramount+",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "Paramount+ — confrontos Vasco x Olimpia pelas oitavas da Sul-Americana 2026, transmissão exclusiva"
+    },
+    {
+      "event_id": "401902740",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "data_iso": "2026-08-20T19:00:00-03:00",
+      "mandante": "Club Olimpia",
+      "visitante": "Vasco da Gama",
+      "transmissao": "Paramount+",
+      "modo": "fixo",
+      "exclusivo": true,
+      "fonte": "Paramount+ — confrontos Vasco x Olimpia pelas oitavas da Sul-Americana 2026, transmissão exclusiva"
     }
-  ]
+  ],
+  "atualizado_em": "2026-08-09T00:20:00-03:00"
 }
