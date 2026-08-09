@@ -1,15 +1,88 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-08T22:41:49.393770-03:00",
+  "gerado_em": "2026-08-08T23:12:20.774999-03:00",
   "fonte": "ESPN summary",
-  "total_jogos": 210,
+  "total_jogos": 211,
   "total_com_estatisticas": 204,
   "total_com_publico": 182,
   "total_com_eventos": 204,
   "total_com_jogadores": 204,
   "total_eventos_validados": 206,
-  "total_eventos_pendentes_detalhes": 4,
+  "total_eventos_pendentes_detalhes": 5,
   "jogos": {
+    "401841185": {
+      "event_id": "401841185",
+      "event_id_fonte_detalhes": "401841185",
+      "rodada": 22,
+      "data_iso": "2026-08-08T21:00",
+      "mandante": "Botafogo",
+      "visitante": "Fluminense",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "estadio": "Joao Havelange Stadium",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "",
+      "stats": [],
+      "estatisticas": [],
+      "gols": [],
+      "cartoes": [],
+      "jogadores": [],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Botafogo": 1,
+          "Fluminense": 1
+        },
+        "gols_extraidos": {
+          "Botafogo": 0,
+          "Fluminense": 0
+        },
+        "gols_completos": false,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": false,
+        "cartoes_esperados": {
+          "Botafogo": {
+            "amarelo": null,
+            "vermelho": null
+          },
+          "Fluminense": {
+            "amarelo": null,
+            "vermelho": null
+          }
+        },
+        "cartoes_extraidos": {
+          "Botafogo": {
+            "amarelo": 0,
+            "vermelho": 0
+          },
+          "Fluminense": {
+            "amarelo": 0,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": false,
+        "pendente_detalhes": true,
+        "tipo_pendencia": "ficha_espn_incompleta",
+        "motivo": "ficha de gols incompleta: 0/2 atribuídos"
+      },
+      "fonte": "ESPN summary",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-08T23:12:10.886218-03:00"
+    },
     "401841184": {
       "event_id": "401841184",
       "event_id_fonte_detalhes": "401841184",
@@ -80,8 +153,8 @@
       "resultado_manual": false,
       "origem_resultado": "",
       "motivo_resultado_manual": "",
-      "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-08T22:41:40.479469-03:00"
+      "preservado_de_execucao_anterior": true,
+      "atualizado_em": "2026-08-08T23:12:12.519584-03:00"
     },
     "401841178": {
       "event_id": "401841178",
@@ -154,7 +227,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:41:42.242395-03:00"
+      "atualizado_em": "2026-08-08T23:12:14.151180-03:00"
     },
     "401841181": {
       "event_id": "401841181",
@@ -227,7 +300,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:41:44.012445-03:00"
+      "atualizado_em": "2026-08-08T23:12:15.775993-03:00"
     },
     "401841173": {
       "event_id": "401841173",
@@ -9128,7 +9201,7 @@
       "origem_resultado": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo_resultado_manual": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial.",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:41:45.776970-03:00"
+      "atualizado_em": "2026-08-08T23:12:17.399825-03:00"
     },
     "401841151": {
       "event_id": "401841151",
@@ -9749,7 +9822,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:41:47.538151-03:00"
+      "atualizado_em": "2026-08-08T23:12:19.026881-03:00"
     },
     "401841150": {
       "event_id": "401841150",
@@ -14267,7 +14340,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": true,
-      "atualizado_em": "2026-08-08T22:41:49.310779-03:00"
+      "atualizado_em": "2026-08-08T23:12:20.692514-03:00"
     },
     "401841149": {
       "event_id": "401841149",
