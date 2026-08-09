@@ -2,10 +2,10 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 60,
-    "jogos_com_transmissao": 44,
-    "jogos_sem_transmissao_14d": 16,
-    "jogos_criticos_sem_transmissao_72h": 2,
-    "registros_preservados": 17,
+    "jogos_com_transmissao": 48,
+    "jogos_sem_transmissao_14d": 12,
+    "jogos_criticos_sem_transmissao_72h": 0,
+    "registros_preservados": 15,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -14,22 +14,22 @@
       "competicoes_ok": [],
       "registros": 0,
       "erros": [
-        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)> | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
-        "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
-        "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
+        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
+        "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
+        "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 15011
+      "duracao_ms": 22532
     },
     "ge_agenda": {
       "ok": true,
       "jogos_com_canal": 24,
-      "duracao_ms": 8144
+      "duracao_ms": 8796
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 5,
-      "jogos_com_canal": 16,
-      "duracao_ms": 122396
+      "jogos_com_canal": 18,
+      "duracao_ms": 119495
     },
     "espn": {
       "ok": true,
@@ -37,32 +37,20 @@
       "eventos_na_janela": 60,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 7580
+      "duracao_ms": 9026
+    },
+    "youtube_oficial": {
+      "ok": true,
+      "jogos_com_canal": 9
     }
   },
   "sem_transmissao": [
-    {
-      "event_id": "401874070",
-      "rodada": 0,
-      "jogo": "Fluminense x Independiente Rivadavia",
-      "data_iso": "2026-08-11T19:00:00-03:00",
-      "faltam_horas": 68.8,
-      "nivel": "critico"
-    },
-    {
-      "event_id": "401903296",
-      "rodada": 0,
-      "jogo": "Bolívar x São Paulo",
-      "data_iso": "2026-08-11T21:30:00-03:00",
-      "faltam_horas": 71.3,
-      "nivel": "critico"
-    },
     {
       "event_id": "401874076",
       "rodada": 0,
       "jogo": "Palmeiras x Cerro Porteño",
       "data_iso": "2026-08-12T19:00:00-03:00",
-      "faltam_horas": 92.8,
+      "faltam_horas": 92.4,
       "nivel": "aviso"
     },
     {
@@ -70,15 +58,7 @@
       "rodada": 0,
       "jogo": "Mirassol x Liga de Quito",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 116.8,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401902572",
-      "rodada": 0,
-      "jogo": "Santos x Macará",
-      "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 116.8,
+      "faltam_horas": 116.4,
       "nivel": "aviso"
     },
     {
@@ -86,15 +66,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Club Olimpia",
       "data_iso": "2026-08-13T19:00:00-03:00",
-      "faltam_horas": 116.8,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401874075",
-      "rodada": 0,
-      "jogo": "Rosário Central x Corinthians",
-      "data_iso": "2026-08-13T21:30:00-03:00",
-      "faltam_horas": 119.3,
+      "faltam_horas": 116.4,
       "nivel": "aviso"
     },
     {
@@ -102,7 +74,7 @@
       "rodada": 0,
       "jogo": "Cienciano del Cusco x Botafogo",
       "data_iso": "2026-08-13T21:30:00-03:00",
-      "faltam_horas": 119.3,
+      "faltam_horas": 118.9,
       "nivel": "aviso"
     },
     {
@@ -110,7 +82,7 @@
       "rodada": 0,
       "jogo": "Independiente Rivadavia x Fluminense",
       "data_iso": "2026-08-18T19:00:00-03:00",
-      "faltam_horas": 236.8,
+      "faltam_horas": 236.4,
       "nivel": "aviso"
     },
     {
@@ -118,7 +90,7 @@
       "rodada": 0,
       "jogo": "São Paulo x Bolívar",
       "data_iso": "2026-08-18T21:30:00-03:00",
-      "faltam_horas": 239.3,
+      "faltam_horas": 238.9,
       "nivel": "aviso"
     },
     {
@@ -126,7 +98,7 @@
       "rodada": 0,
       "jogo": "Cerro Porteño x Palmeiras",
       "data_iso": "2026-08-19T19:00:00-03:00",
-      "faltam_horas": 260.8,
+      "faltam_horas": 260.4,
       "nivel": "aviso"
     },
     {
@@ -134,7 +106,7 @@
       "rodada": 0,
       "jogo": "Liga de Quito x Mirassol",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "faltam_horas": 284.8,
+      "faltam_horas": 284.4,
       "nivel": "aviso"
     },
     {
@@ -142,7 +114,7 @@
       "rodada": 0,
       "jogo": "Club Olimpia x Vasco da Gama",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "faltam_horas": 284.8,
+      "faltam_horas": 284.4,
       "nivel": "aviso"
     },
     {
@@ -150,7 +122,7 @@
       "rodada": 0,
       "jogo": "Macará x Santos",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "faltam_horas": 284.8,
+      "faltam_horas": 284.4,
       "nivel": "aviso"
     },
     {
@@ -158,7 +130,7 @@
       "rodada": 0,
       "jogo": "Corinthians x Rosário Central",
       "data_iso": "2026-08-20T21:30:00-03:00",
-      "faltam_horas": 287.3,
+      "faltam_horas": 286.9,
       "nivel": "aviso"
     },
     {
@@ -166,7 +138,7 @@
       "rodada": 0,
       "jogo": "Botafogo x Cienciano del Cusco",
       "data_iso": "2026-08-20T21:30:00-03:00",
-      "faltam_horas": 287.3,
+      "faltam_horas": 286.9,
       "nivel": "aviso"
     }
   ],
@@ -182,9 +154,9 @@
       "event_id": "401841187",
       "jogo": "Flamengo x Vitória",
       "canais": [
-        "Globo",
+        "Premiere",
         "SporTV",
-        "Premiere"
+        "Globo"
       ]
     },
     {
@@ -205,9 +177,9 @@
       "event_id": "401841204",
       "jogo": "Internacional x Atlético-MG",
       "canais": [
-        "Prime Video",
+        "Premiere",
         "SporTV",
-        "Premiere"
+        "Prime Video"
       ]
     },
     {
@@ -243,11 +215,11 @@
       "event_id": "401841215",
       "jogo": "Bahia x Internacional",
       "canais": [
-        "Prime Video",
-        "Premiere",
-        "Globo",
         "GE TV",
-        "SporTV"
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video"
       ]
     },
     {
@@ -273,20 +245,6 @@
       ]
     },
     {
-      "event_id": "401841219",
-      "jogo": "Coritiba x Mirassol",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841225",
-      "jogo": "Remo x Flamengo",
-      "canais": [
-        "Globo"
-      ]
-    },
-    {
       "event_id": "401841226",
       "jogo": "São Paulo x Atlético-MG",
       "canais": [
@@ -302,9 +260,9 @@
     }
   ],
   "erros": [
-    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)> | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
-    "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>",
-    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: falha ao buscar página oficial: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada :: curl_cffi=CertificateVerifyError: Failed to perform, curl: (60) SSL certificate problem: unable to get local issuer certificate. See https://curl.se/libcurl/c/libcurl-errors.html first for more details. | urllib=URLError: <urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1010)>"
+    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
+    "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
+    "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [
     "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/08/cruzeiro-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
@@ -313,5 +271,5 @@
     "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/08/coritiba-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/08/08/botafogo-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-08-08T22:10:00-03:00"
+  "atualizado_em": "2026-08-08T22:35:23-03:00"
 }

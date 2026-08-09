@@ -2,14 +2,45 @@
   "fonte": "YouTube oficial — CazéTV e GE TV | clubes do Brasileirão",
   "politica": {
     "prioridade": [
-      "cazetv",
-      "getv"
+      "getv",
+      "cazetv"
     ],
-    "regra": "Somente canais oficiais configurados; CazéTV tem prioridade sobre GE TV; link único.",
-    "janela": "de 1008h antes até 90 min após o início",
+    "regra": "Somente canais oficiais configurados; GE TV tem prioridade sobre CazéTV; link único.",
+    "janela": "de 1008h antes até 180 min após o início",
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "jogos": {
+    "401841184": {
+      "event_id": "401841184",
+      "rodada": 22,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Coritiba",
+      "visitante": "Chapecoense",
+      "data_iso": "2026-08-08T20:30:00-03:00",
+      "estadio": "Couto Pereira",
+      "origem": "manual",
+      "principal": {
+        "fonte": "cazetv",
+        "nome": "CazéTV",
+        "video_id": "z63vnMGM644",
+        "url": "https://www.youtube.com/watch?v=z63vnMGM644",
+        "status": "live",
+        "inicio_programado": "2026-08-08T20:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "Coritiba x Chapecoense — AO VIVO na CazéTV",
+        "canal": "CazéTV",
+        "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
+        "thumbnail": "",
+        "confianca": 1.0,
+        "motivos": [
+          "link manual com prioridade absoluta"
+        ],
+        "origem_busca": "manual"
+      },
+      "alternativas": []
+    },
     "401841180": {
       "event_id": "401841180",
       "rodada": 22,
@@ -33,7 +64,7 @@
         "canal": "ge tv",
         "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
         "thumbnail": "https://i.ytimg.com/vi/uVdrqw8H1u8/maxresdefault_live.jpg",
-        "confianca": 0.85,
+        "confianca": 0.875,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
@@ -68,7 +99,7 @@
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/Co2aqgVd5qk/maxresdefault_live.jpg",
-        "confianca": 0.8467,
+        "confianca": 0.855,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
@@ -102,7 +133,7 @@
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/pYy2BKTHxnI/maxresdefault_live.jpg",
-        "confianca": 0.8467,
+        "confianca": 0.855,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
@@ -136,7 +167,7 @@
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/TsOOA1q0EbQ/maxresdefault_live.jpg",
-        "confianca": 0.8467,
+        "confianca": 0.855,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
@@ -170,7 +201,7 @@
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/AlE9jCqkbA8/maxresdefault_live.jpg",
-        "confianca": 0.8467,
+        "confianca": 0.855,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
@@ -204,7 +235,7 @@
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/MZ26CcHMBlk/maxresdefault_live.jpg",
-        "confianca": 0.8467,
+        "confianca": 0.855,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
@@ -238,7 +269,7 @@
         "canal": "CazéTV",
         "channel_id": "UCZiYbVptd3PVPf4f6eR6UaQ",
         "thumbnail": "https://i.ytimg.com/vi/bb70Ip_26VM/maxresdefault_live.jpg",
-        "confianca": 0.8467,
+        "confianca": 0.855,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
@@ -272,7 +303,7 @@
         "canal": "ge tv",
         "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
         "thumbnail": "https://i.ytimg.com/vi/yM9qJJG6gIQ/maxresdefault_live.jpg",
-        "confianca": 0.85,
+        "confianca": 0.875,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
@@ -285,5 +316,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-08-07T12:20:33-03:00"
+  "atualizado_em": "2026-08-08T22:35:05-03:00"
 }

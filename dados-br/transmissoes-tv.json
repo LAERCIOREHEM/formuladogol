@@ -6,6 +6,7 @@
       "GE Agenda",
       "GE guias editoriais",
       "ESPN",
+      "YouTube oficial validado",
       "override manual"
     ],
     "regra_preservacao": "resposta vazia ou falha de uma fonte nunca apaga transmissão válida já publicada",
@@ -21,50 +22,22 @@
       "data_iso": "2026-08-08T20:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo"
+        "CazéTV",
+        "Premiere"
       ],
-      "origem": "GE Agenda + GE guia editorial",
-      "confianca": "confirmado",
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
       "fontes": [
         {
-          "fonte": "GE guia editorial",
+          "fonte": "override editorial — transmissoes.json",
           "canais": [
-            "Globo"
+            "CazéTV",
+            "Premiere"
           ],
-          "referencia": "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/08/cruzeiro-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE guia editorial",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
-          "autoridade": 85,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
-        },
-        {
-          "fonte": "GE Agenda",
-          "canais": [
-            "Globo"
-          ],
-          "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
-          "autoridade": 80,
-          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+          "referencia": "CazéTV — live oficial confirmada (z63vnMGM644) + ge — Premiere, verificados em 08/08/2026",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 1000,
+          "detalhe": ""
         }
       ]
     },
@@ -87,7 +60,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -97,7 +70,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -107,7 +80,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/08/08/botafogo-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -132,7 +105,17 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/08/cruzeiro-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -142,7 +125,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/08/coritiba-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -152,7 +135,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -177,7 +160,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -191,18 +174,29 @@
       "data_iso": "2026-08-09T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "GE TV",
         "Globo"
       ],
-      "origem": "GE Agenda",
+      "origem": "GE Agenda + YouTube oficial validado",
       "confianca": "confirmado",
       "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "GE TV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=uVdrqw8H1u8",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 120,
+          "detalhe": "player oficial público e embeddable validado por channelId"
+        },
         {
           "fonte": "GE Agenda",
           "canais": [
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -227,7 +221,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -252,7 +246,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/08/coritiba-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -266,9 +260,9 @@
       "data_iso": "2026-08-09T19:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Globo",
+        "Premiere",
         "SporTV",
-        "Premiere"
+        "Globo"
       ],
       "origem": "snapshot anterior preservado",
       "confianca": "preservado",
@@ -281,9 +275,59 @@
             "Premiere"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+        }
+      ]
+    },
+    "401874070": {
+      "event_id": "401874070",
+      "rodada": 0,
+      "mandante": "Fluminense",
+      "visitante": "Independiente Rivadavia",
+      "data_iso": "2026-08-11T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "CazéTV"
+      ],
+      "origem": "YouTube oficial validado",
+      "confianca": "confirmado",
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=Co2aqgVd5qk",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 120,
+          "detalhe": "player oficial público e embeddable validado por channelId"
+        }
+      ]
+    },
+    "401903296": {
+      "event_id": "401903296",
+      "rodada": 0,
+      "mandante": "Bolívar",
+      "visitante": "São Paulo",
+      "data_iso": "2026-08-11T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "CazéTV"
+      ],
+      "origem": "YouTube oficial validado",
+      "confianca": "confirmado",
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=pYy2BKTHxnI",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 120,
+          "detalhe": "player oficial público e embeddable validado por channelId"
         }
       ]
     },
@@ -295,18 +339,29 @@
       "data_iso": "2026-08-12T19:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "CazéTV",
         "Globo"
       ],
-      "origem": "GE Agenda",
+      "origem": "GE Agenda + YouTube oficial validado",
       "confianca": "confirmado",
       "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=TsOOA1q0EbQ",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 120,
+          "detalhe": "player oficial público e embeddable validado por channelId"
+        },
         {
           "fonte": "GE Agenda",
           "canais": [
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -320,18 +375,39 @@
       "data_iso": "2026-08-12T21:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "CazéTV",
         "Globo"
       ],
-      "origem": "GE Agenda + GE guia editorial",
+      "origem": "GE Agenda + GE guia editorial + YouTube oficial validado",
       "confianca": "confirmado",
       "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=AlE9jCqkbA8",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 120,
+          "detalhe": "player oficial público e embeddable validado por channelId"
+        },
         {
           "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -341,9 +417,59 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        }
+      ]
+    },
+    "401902572": {
+      "event_id": "401902572",
+      "rodada": 0,
+      "mandante": "Santos",
+      "visitante": "Macará",
+      "data_iso": "2026-08-13T19:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "CazéTV"
+      ],
+      "origem": "YouTube oficial validado",
+      "confianca": "confirmado",
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=MZ26CcHMBlk",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 120,
+          "detalhe": "player oficial público e embeddable validado por channelId"
+        }
+      ]
+    },
+    "401874075": {
+      "event_id": "401874075",
+      "rodada": 0,
+      "mandante": "Rosário Central",
+      "visitante": "Corinthians",
+      "data_iso": "2026-08-13T21:30:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "CazéTV"
+      ],
+      "origem": "YouTube oficial validado",
+      "confianca": "confirmado",
+      "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "CazéTV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=bb70Ip_26VM",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 120,
+          "detalhe": "player oficial público e embeddable validado por channelId"
         }
       ]
     },
@@ -366,7 +492,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -391,7 +517,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -416,7 +542,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -441,7 +567,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -451,7 +577,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -476,7 +602,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -486,7 +612,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -511,7 +637,17 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -521,7 +657,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -546,7 +682,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -571,7 +707,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -596,7 +732,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -621,7 +757,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -635,18 +771,39 @@
       "data_iso": "2026-08-19T21:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
+        "GE TV",
         "Globo"
       ],
-      "origem": "GE Agenda + GE guia editorial",
+      "origem": "GE Agenda + GE guia editorial + YouTube oficial validado",
       "confianca": "confirmado",
       "fontes": [
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "GE TV"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=yM9qJJG6gIQ",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 120,
+          "detalhe": "player oficial público e embeddable validado por channelId"
+        },
         {
           "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -656,7 +813,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -681,7 +838,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -695,9 +852,9 @@
       "data_iso": "2026-08-22T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Prime Video",
+        "Premiere",
         "SporTV",
-        "Premiere"
+        "Prime Video"
       ],
       "origem": "snapshot anterior preservado",
       "confianca": "preservado",
@@ -710,7 +867,7 @@
             "Premiere"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -735,7 +892,17 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -745,7 +912,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -770,7 +937,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -795,7 +962,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/08/cruzeiro-x-mirassol-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -805,7 +972,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -815,7 +982,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -840,7 +1007,7 @@
             "GE TV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -867,7 +1034,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -892,7 +1059,17 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -902,7 +1079,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -927,7 +1104,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -952,7 +1129,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -962,7 +1139,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -987,7 +1164,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1001,11 +1178,11 @@
       "data_iso": "2026-08-29T15:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Prime Video",
-        "Premiere",
-        "Globo",
         "GE TV",
-        "SporTV"
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video"
       ],
       "origem": "snapshot anterior preservado",
       "confianca": "preservado",
@@ -1020,7 +1197,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1047,7 +1224,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1072,7 +1249,17 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/gato-mestre/noticia/2026/08/08/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-22a-rodada-do-brasileirao.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
+        },
+        {
+          "fonte": "GE guia editorial",
+          "canais": [
+            "Globo"
+          ],
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -1082,7 +1269,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1107,7 +1294,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1132,7 +1319,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1157,7 +1344,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1182,7 +1369,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 85,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         },
@@ -1192,7 +1379,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1208,18 +1395,18 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ]
     },
@@ -1242,7 +1429,7 @@
             "Globo"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -1258,18 +1445,18 @@
       "canais": [
         "Globo"
       ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
+      "origem": "GE guia editorial",
+      "confianca": "confirmado",
       "fontes": [
         {
-          "fonte": "snapshot anterior preservado",
+          "fonte": "GE guia editorial",
           "canais": [
             "Globo"
           ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
+          "referencia": "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
+          "autoridade": 85,
+          "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
       ]
     },
@@ -1292,7 +1479,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1317,12 +1504,12 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-08T22:10:00-03:00",
+          "capturado_em": "2026-08-08T22:35:23-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
       ]
     }
   },
-  "atualizado_em": "2026-08-08T22:10:00-03:00"
+  "atualizado_em": "2026-08-08T22:35:23-03:00"
 }
