@@ -12,17 +12,14 @@ on:
         required: false
         default: false
         type: boolean
-      sem_ia:
-        description: 'Usar somente o texto determinístico de contingência'
-        required: false
-        default: false
-        type: boolean
   schedule:
-    # Retentativas independentes do workflow pesado: 03:18 e 07:18 em Brasília.
+    # Retentativas determinísticas independentes do workflow pesado:
+    # 03:18 e 07:18 em Brasília. A IA fica centralizada na auditoria diária.
     - cron: '18 6,10 * * *'
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: repo-write-main
@@ -54,20 +51,16 @@ jobs:
           python -m json.tool dados-br/config-analises.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
-      - name: Detectar e gerar análise
+      - name: Detectar e gerar análise determinística
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.6-terra' }}
           RODADA: ${{ inputs.rodada }}
           FORCAR: ${{ inputs.forcar }}
-          SEM_IA: ${{ inputs.sem_ia }}
         shell: bash
         run: |
           set -euo pipefail
-          args=()
+          args=(--sem-ia)
           if [[ -n "${RODADA:-}" ]]; then args+=(--rodada "$RODADA"); fi
           if [[ "${FORCAR:-false}" == "true" ]]; then args+=(--forcar); fi
-          if [[ "${SEM_IA:-false}" == "true" ]]; then args+=(--sem-ia); fi
           python scripts/gerar_analise_rodada.py "${args[@]}"
 
       - name: Validar artefatos gerados
@@ -76,21 +69,70 @@ jobs:
           python -m json.tool dados-br/analises.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
-      - name: Publicar no repositório
+      - name: Publicar no repositório com push robusto
         id: publish
         shell: bash
         run: |
           set -euo pipefail
           echo "published=false" >> "$GITHUB_OUTPUT"
-          arquivos=(analises css/br-analises.css dados-br/analises.json sitemap.xml news-sitemap.xml feed.xml)
-          if [[ -z "$(git status --porcelain -- "${arquivos[@]}")" ]]; then
+          cd "$GITHUB_WORKSPACE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=(analises css/br-analises.css dados-br/analises.json sitemap.xml news-sitemap.xml feed.xml)
+          EXISTING=()
+          for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
+          FILES=("${EXISTING[@]}")
+
+          if [[ ${#FILES[@]} -eq 0 ]] || [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Nenhuma análise nova ou atualização editorial."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "${arquivos[@]}"
-          git commit -m "Publicar análise editorial do Brasileirão"
-          git push origin HEAD:main
-          echo "published=true" >> "$GITHUB_OUTPUT"
 
+          TMP_DIR="$(mktemp -d)"
+          trap 'rm -rf "$TMP_DIR"' EXIT
+          for f in "${FILES[@]}"; do
+            mkdir -p "$TMP_DIR/$(dirname "$f")"
+            cp -a "$f" "$TMP_DIR/$f"
+          done
+
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              rm -rf "$f"
+              mkdir -p "$(dirname "$f")"
+              cp -a "$TMP_DIR/$f" "$f"
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Outro run já publicou os mesmos artefatos."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Publicar análise editorial do Brasileirão"
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Push rejeitado; nova tentativa sobre origin/main atualizado."
+            sleep 3
+          done
+
+          echo "::error title=Falha ao publicar editorial::Não foi possível enviar o commit ao main após 5 tentativas."
+          exit 1
+
+      - name: Disparar deploy após publicação
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run deploy.yml --ref main
+          echo "Deploy disparado para o editorial recém-publicado."

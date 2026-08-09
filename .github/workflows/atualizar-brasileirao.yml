@@ -85,6 +85,7 @@ jobs:
             scripts/avaliar_af_previsao.py \
             scripts/gerar_analise_copa_do_brasil.py \
             scripts/buscar_melhores_momentos_copa_do_brasil.py \
+            scripts/auditoria_ia_diaria.py \
             scripts/validar_artefatos_analises.py
           python scripts/validar_python_embutido_workflow.py --self-test
           python scripts/validar_python_embutido_workflow.py .github/workflows/atualizar-brasileirao.yml
@@ -107,6 +108,7 @@ jobs:
           python scripts/avaliar_af_previsao.py --self-test
           python scripts/gerar_analise_copa_do_brasil.py --self-test
           python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
+          python scripts/auditoria_ia_diaria.py --self-test
           python scripts/validar_artefatos_analises.py
           python -m json.tool dados-br/config-transmissoes-tv.json > /dev/null
           python -m json.tool dados-br/auditoria-transmissoes-tv.json > /dev/null
@@ -442,15 +444,16 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
 
-      - name: Gerar editorial pós-oitavas da Copa do Brasil no mesmo ciclo
+      - name: Gerar editorial determinístico da fase atual da Copa do Brasil
         if: ${{ steps.continental.outcome == 'success' && (steps.af_gate.outputs.run_af != 'true' || steps.af_generate.outcome == 'success') }}
         env:
           OPENAI_API_KEY: ''
         run: |
           set -euo pipefail
           # Determinístico por desenho: publicação do dado esportivo não pode
-          # depender de disponibilidade de LLM. Se as oitavas ainda não tiverem
-          # terminado, o gerador apenas informa que a fase não está elegível.
+          # depender de disponibilidade de LLM. A IA editorial roda somente na
+          # auditoria diária centralizada. Se a fase atual ainda não tiver
+          # terminado, o gerador apenas informa que ela não está elegível.
           python scripts/gerar_analise_copa_do_brasil.py \
             --sem-ia \
             --falhar-se-snapshot-atrasado \
@@ -822,14 +825,24 @@ jobs:
                   assert int(copa_af.get('partidas_concluidas_no_ajuste') or -1) == int(copa_resumo.get('finalizados') or 0), (
                       'AF não incorporou todas as partidas concluídas da Copa do Brasil'
                   )
-                  # Ao terminar as oitavas, o modelo deve partir dos oito classificados
-                  # factuais e recalcular as probabilidades consolidadas dos 20 clubes.
-                  if int(copa_fase.get('ordem') or 0) == 600 and int(copa_fase.get('eventos_pendentes') or 0) == 0:
+                  # Em qualquer fase eliminatória encerrada, o AF deve partir dos
+                  # vencedores factuais e simular somente o caminho ainda restante.
+                  fase_ordem = int(copa_fase.get('ordem') or 0)
+                  esperados_por_fase = {600: 8, 700: 4, 800: 2, 900: 1}
+                  if fase_ordem in esperados_por_fase and int(copa_fase.get('eventos_pendentes') or 0) == 0:
+                      esperados = esperados_por_fase[fase_ordem]
                       ativos = list(copa_af.get('clubes_ativos') or [])
-                      assert int(copa_af.get('equipes_ativas') or 0) == 8, 'Copa finalizada nas oitavas sem exatamente 8 classificados no AF'
-                      assert len(ativos) == len(set(ativos)) == 8, 'lista de classificados da Copa inválida no AF'
-                      assert list(copa_af.get('rodadas_simuladas_tamanhos') or []) == [8, 4, 2, 1], 'estrutura simulada da Copa não parte das oitavas concluídas'
-                      print('  OK   Copa do Brasil: 8 classificados factuais incorporados e probabilidades recalculadas')
+                      assert int(copa_af.get('equipes_ativas') or 0) == esperados, f'Copa encerrada na fase {fase_ordem} sem {esperados} vencedor(es) ativo(s) no AF'
+                      assert len(ativos) == len(set(ativos)) == esperados, 'lista de vencedores da Copa inválida no AF'
+                      tamanhos_esperados = []
+                      tamanho = esperados
+                      while tamanho >= 1:
+                          tamanhos_esperados.append(tamanho)
+                          if tamanho == 1:
+                              break
+                          tamanho //= 2
+                      assert list(copa_af.get('rodadas_simuladas_tamanhos') or []) == tamanhos_esperados, f'estrutura simulada da Copa incompatível com a fase {fase_ordem}'
+                      print(f'  OK   Copa do Brasil: {esperados} vencedor(es) factual(is) incorporado(s) e probabilidades recalculadas')
           probabilidades_jogos = json.load(open('dados-br/probabilidades-jogos.json', encoding='utf-8'))
           auditoria_jogos = json.load(open('dados-br/auditoria-probabilidades-jogos.json', encoding='utf-8'))
           assert probabilidades_jogos.get('schema_version') == 1, 'probabilidades por jogo em schema inesperado'
@@ -1279,9 +1292,10 @@ jobs:
           set -euo pipefail
           # IMPORTANTE: não dispare os dois workflows editoriais ao mesmo tempo.
           # Todos os workflows que escrevem no main usam repo-write-main.
-          # A Copa é o primeiro elo e encadeia a análise da rodada ao concluir.
+          # A Copa é o primeiro elo e encadeia a análise determinística da rodada.
+          # Nenhum destes workflows chama OpenAI; a IA roda uma única vez ao dia.
           gh workflow run publicar-analise-copa-do-brasil.yml --ref main -f encadear_rodada=true
-          echo "Editorial da Copa disparado; ele encadeará o editorial da rodada ao concluir."
+          echo "Editorial determinístico da Copa disparado; ele encadeará o editorial determinístico da rodada."
 
   # Alerta integrado ao próprio workflow. Substitui o antigo workflow
   # "Monitorar Atualizar Brasileirao" e evita uma execução cinza a cada hora.

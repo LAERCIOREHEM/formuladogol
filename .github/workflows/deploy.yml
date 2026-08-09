@@ -793,11 +793,15 @@ jobs:
                   assert rodada and f'data-fdg-analise-rodada="{rodada}"' in text, f"{artigo['slug']}: marcador de rodada ausente"
                   assert text.count('class="analysis-game-card"') == int(artigo.get("jogos_concluidos") or 0), f"{artigo['slug']}: jogos divergentes"
               elif tipo == "copa_do_brasil_fase":
-                  assert int(artigo.get("confrontos") or 0) == 8, f"{artigo['slug']}: confrontos divergentes"
-                  assert len(artigo.get("classificados") or []) == 8, f"{artigo['slug']}: classificados incompletos"
-                  assert text.count('class="analysis-cup-tie"') == 8, f"{artigo['slug']}: cards de confronto divergentes"
-                  assert text.count('class="analysis-status ') == 14, f"{artigo['slug']}: comparativo da Série A divergente"
-                  assert "Os confrontos das quartas dependerão do sorteio" in text, f"{artigo['slug']}: ressalva do sorteio ausente"
+                  confrontos = int(artigo.get("confrontos") or 0)
+                  classificados = artigo.get("classificados") or []
+                  assert confrontos in {1, 2, 4, 8}, f"{artigo['slug']}: quantidade de confrontos inválida: {confrontos}"
+                  assert len(classificados) == confrontos, f"{artigo['slug']}: classificados/vencedor incompatíveis com a fase"
+                  assert len(set(classificados)) == len(classificados), f"{artigo['slug']}: classificados duplicados"
+                  assert text.count('class="analysis-cup-tie"') == confrontos, f"{artigo['slug']}: cards de confronto divergentes"
+                  assert artigo.get("fase_encerrada"), f"{artigo['slug']}: fase encerrada ausente"
+                  assert artigo.get("fase_seguinte"), f"{artigo['slug']}: fase seguinte/desfecho ausente"
+                  assert 'data-fdg-analise-competicao="copa-do-brasil"' in text, f"{artigo['slug']}: marcador da competição ausente"
                   assert "Tabela do Brasileirão" not in text and "analysis-kpis" not in text, f"{artigo['slug']}: layout incorreto"
               else:
                   raise AssertionError(f"{artigo['slug']}: tipo editorial desconhecido: {tipo}")

@@ -8,18 +8,14 @@ on:
         required: false
         default: false
         type: boolean
-      sem_ia:
-        description: 'Usar somente o texto determinístico de contingência'
-        required: false
-        default: false
-        type: boolean
       encadear_rodada:
         description: 'Ao concluir, disparar o editorial da rodada (uso interno do Atualizar Brasileirao)'
         required: false
         default: false
         type: boolean
   schedule:
-    # Retentativas curtas e independentes durante a semana de fechamento da fase.
+    # Retentativas determinísticas curtas e independentes durante fechamentos.
+    # A redação por IA fica centralizada na auditoria diária, uma vez por dia.
     - cron: '28 6,10 * * *'
 
 permissions:
@@ -67,23 +63,19 @@ jobs:
           python -m json.tool dados-br/historico-probabilidades-continentais.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
-      - name: Atualizar melhores momentos oficiais das oitavas
+      - name: Atualizar melhores momentos oficiais da fase atual
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
 
-      - name: Detectar fechamento e gerar editorial
+      - name: Detectar fechamento e gerar editorial determinístico
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.6-terra' }}
           FORCAR: ${{ inputs.forcar }}
-          SEM_IA: ${{ inputs.sem_ia }}
         shell: bash
         run: |
           set -euo pipefail
-          args=(--falhar-se-snapshot-atrasado --tolerancia-snapshot-horas 4)
+          args=(--sem-ia --falhar-se-snapshot-atrasado --tolerancia-snapshot-horas 4)
           if [[ "${FORCAR:-false}" == "true" ]]; then args+=(--forcar); fi
-          if [[ "${SEM_IA:-false}" == "true" ]]; then args+=(--sem-ia); fi
           python scripts/gerar_analise_copa_do_brasil.py "${args[@]}"
 
       - name: Validar artefatos depois da geração
@@ -91,15 +83,21 @@ jobs:
           set -euo pipefail
           python -m json.tool dados-br/analises.json >/dev/null
           python -m json.tool dados-br/historico-probabilidades-continentais.json >/dev/null
+          python -m json.tool dados-br/melhores-momentos-copa-do-brasil.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
-      - name: Publicar no repositório
+      - name: Publicar no repositório com push robusto
         id: publish
         shell: bash
         run: |
           set -euo pipefail
           echo "published=false" >> "$GITHUB_OUTPUT"
-          arquivos=(
+          cd "$GITHUB_WORKSPACE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=(
             analises
             dados-br/analises.json
             dados-br/historico-probabilidades-continentais.json
@@ -108,31 +106,63 @@ jobs:
             news-sitemap.xml
             feed.xml
           )
-          if [[ -z "$(git status --porcelain -- "${arquivos[@]}")" ]]; then
-            echo "O fechamento das oitavas ainda não está elegível ou já foi publicado."
+          EXISTING=()
+          for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
+          FILES=("${EXISTING[@]}")
+
+          if [[ ${#FILES[@]} -eq 0 ]] || [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+            echo "A fase atual ainda não está elegível ou seus artefatos já estão publicados."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- "${arquivos[@]}"
-          git commit -m "Publicar análise da Copa do Brasil: classificados às quartas"
 
-          publicado=false
-          for tentativa in 1 2 3; do
-            git pull --rebase origin main
-            if git push origin HEAD:main; then
-              publicado=true
-              echo "published=true" >> "$GITHUB_OUTPUT"
-              break
-            fi
-            echo "Tentativa ${tentativa}/3 não concluiu; tentando novamente."
+          TMP_DIR="$(mktemp -d)"
+          trap 'rm -rf "$TMP_DIR"' EXIT
+          for f in "${FILES[@]}"; do
+            mkdir -p "$TMP_DIR/$(dirname "$f")"
+            cp -a "$f" "$TMP_DIR/$f"
           done
-          if [[ "$publicado" != "true" ]]; then
-            echo "::error title=Falha ao publicar editorial::Não foi possível enviar o commit ao main."
-            exit 1
-          fi
 
-      - name: Encadear editorial da rodada
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              rm -rf "$f"
+              mkdir -p "$(dirname "$f")"
+              cp -a "$TMP_DIR/$f" "$f"
+            done
+
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "Outro run já publicou os mesmos artefatos."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Publicar análise da fase atual da Copa do Brasil"
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Push rejeitado; nova tentativa sobre origin/main atualizado."
+            sleep 3
+          done
+
+          echo "::error title=Falha ao publicar editorial::Não foi possível enviar o commit ao main após 5 tentativas."
+          exit 1
+
+      - name: Disparar deploy após publicação
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run deploy.yml --ref main
+          echo "Deploy disparado para a Copa do Brasil recém-publicada."
+
+      - name: Encadear editorial determinístico da rodada
         if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.encadear_rodada == true }}
         env:
           GH_TOKEN: ${{ github.token }}
@@ -140,5 +170,4 @@ jobs:
         run: |
           set -euo pipefail
           gh workflow run publicar-analise-rodada.yml --ref main
-          echo "Editorial da rodada despachado após a Copa; a fila global repo-write-main permanece serial."
-
+          echo "Editorial determinístico da rodada despachado; a IA diária permanece centralizada."

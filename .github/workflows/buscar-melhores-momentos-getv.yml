@@ -129,7 +129,7 @@ jobs:
           echo "Executando: ${CMD[*]}"
           "${CMD[@]}"
 
-      - name: Buscar melhores momentos oficiais das oitavas da Copa do Brasil
+      - name: Buscar melhores momentos oficiais da fase atual da Copa do Brasil
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
@@ -243,7 +243,7 @@ jobs:
           exit 1
 
 
-      - name: Reavaliar editorial da rodada após novos melhores momentos
+      - name: Reavaliar editoriais determinísticos após novos melhores momentos
         if: steps.publish.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
