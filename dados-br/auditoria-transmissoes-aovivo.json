@@ -10,14 +10,14 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 58,
+    "jogos_na_janela": 56,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 34,
-    "search_api_fallback_chamadas": 2,
-    "search_api_jogos_elegiveis": 22,
+    "search_api_fallback_chamadas": 0,
+    "search_api_jogos_elegiveis": 20,
     "search_api_jogos_pulados_grade_estavel": 36,
-    "transmissoes_publicadas": 2,
-    "sem_transmissao": 56,
+    "transmissoes_publicadas": 1,
+    "sem_transmissao": 55,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -43,30 +43,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841186",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Vasco da Gama",
-      "data_iso": "2026-08-09T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401841180",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x Internacional",
-      "data_iso": "2026-08-09T16:00:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false
-    },
     {
       "event_id": "401841179",
       "rodada": 22,
@@ -688,23 +664,6 @@
   ],
   "aceitos": [
     {
-      "event_id": "401841180",
-      "jogo": "Palmeiras x Internacional",
-      "fonte": "getv",
-      "video_id": "uVdrqw8H1u8",
-      "url": "https://www.youtube.com/watch?v=uVdrqw8H1u8",
-      "titulo": "PALMEIRAS X INTERNACIONAL | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
-      "status": "live",
-      "confianca": 0.925,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401874141",
       "jogo": "Flamengo x Cruzeiro",
       "fonte": "getv",
@@ -723,22 +682,12 @@
   ],
   "rejeitados": [
     {
-      "video_id": "Y4x_-sCdNgo",
-      "url": "https://www.youtube.com/watch?v=Y4x_-sCdNgo",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "RED BULL BRAGANTINO X CORINTHIANS | BRASILEIRÃO 2026 | AQUECIMENTO AO VIVO | Premiere",
-      "status": "live",
-      "inicio_programado": "2026-08-09T17:30:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
       "video_id": "qxt8hkI930o",
       "url": "https://www.youtube.com/watch?v=qxt8hkI930o",
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "FLAMENGO X VITÓRIA | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-08-09T18:00:00-03:00",
       "motivo": "conteúdo rejeitado: pre jogo"
     },
@@ -979,7 +928,7 @@
       "canal": "ge tv",
       "titulo": "PALMEIRAS 1 X 4 INTERNACIONAL | BRASILEIRÃO 2006 | MELHORES MOMENTOS | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-08-09T19:00:00-03:00",
+      "inicio_programado": "2026-08-09T19:30:00-03:00",
       "motivo": "conteúdo rejeitado: melhores momentos"
     },
     {
@@ -989,7 +938,7 @@
       "canal": "ge tv",
       "titulo": "CRUZEIRO ELIMINA O FLAMENGO NAS OITAVAS DE FINAL DA LIBERTADORES 2018 | ge.globo",
       "status": "upcoming",
-      "inicio_programado": "2026-08-09T19:19:00-03:00",
+      "inicio_programado": "2026-08-09T19:50:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1001,6 +950,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-18T21:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "Y4x_-sCdNgo",
+      "url": "https://www.youtube.com/watch?v=Y4x_-sCdNgo",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "RED BULL BRAGANTINO X CORINTHIANS | BRASILEIRÃO 2026 | AQUECIMENTO AO VIVO | Premiere",
+      "status": "live",
+      "inicio_programado": "2026-08-09T17:30:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
       "video_id": "eFxY6C6kgjw",
@@ -1021,6 +980,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-10T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "uVdrqw8H1u8",
+      "url": "https://www.youtube.com/watch?v=uVdrqw8H1u8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "PALMEIRAS 0 X 0 INTERNACIONAL: JOGO TRUNCADO E EMPATE SEM GOLS! | PÓS-JOGO AO VIVO | TROPA GE TV",
+      "status": "live",
+      "inicio_programado": "2026-08-09T14:30:00-03:00",
+      "motivo": "conteúdo rejeitado: pos jogo"
     },
     {
       "video_id": "udtKEbbFCFc",
@@ -1226,15 +1195,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401841186",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Vasco da Gama",
-      "data_iso": "2026-08-09T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401841179",
       "rodada": 22,
@@ -1733,14 +1693,13 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 244,
+    "unidades": 44,
     "requisicoes": {
       "channels": 2,
       "videos": 22,
-      "playlistItems": 20,
-      "search": 2
+      "playlistItems": 20
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos channelIds oficiais de GE TV/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-09T17:50:41-03:00"
+  "atualizado_em": "2026-08-09T18:18:32-03:00"
 }
