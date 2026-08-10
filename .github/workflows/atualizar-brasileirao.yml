@@ -208,10 +208,6 @@ jobs:
         if: steps.espn.outputs.sincronizado == 'true'
         run: python scripts/gerar_auditoria_calendario.py
 
-      - name: Complementar públicos ausentes por fonte documental
-        if: steps.espn.outputs.sincronizado == 'true'
-        run: python scripts/atualizar_publicos_brasileirao.py
-
       - name: Buscar incrementalmente estatísticas dos jogos finalizados
         if: steps.espn.outputs.sincronizado == 'true'
         run: python scripts/buscar_detalhes_jogos_brasileirao.py --refresh-hours 48
@@ -1156,8 +1152,6 @@ jobs:
             "dados-br/jogadores.json"
             "dados-br/lideres-jogadores.json"
             "dados-br/auditoria-lideres-jogadores.json"
-            "dados-br/publicos-complementares.json"
-            "dados-br/auditoria-publicos.json"
             "dados-br/jogos-detalhes.json"
             "dados-br/auditoria-jogos-detalhes.json"
             "dados-br/estatisticas-competicao.json"

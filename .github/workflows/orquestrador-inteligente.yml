@@ -80,16 +80,21 @@ jobs:
           EVENT_ID: ${{ steps.plano.outputs.event_id }}
           RODADA: ${{ steps.plano.outputs.rodada }}
           MODO: ${{ steps.plano.outputs.modo }}
+        shell: bash
         run: |
+          # IMPORTANTE: não usar `[[ cond ]] && echo` como último comando do
+          # bloco. Quando o campo está vazio, `[[ ... ]]` retorna 1 e o step
+          # inteiro termina falsamente como falha, embora ACAO=none seja sucesso.
           {
             echo "## Orquestrador Fórmula do Gol"
             echo ""
             echo "- **Ação:** \`${ACAO:-none}\`"
             echo "- **Motivo:** ${MOTIVO:-sem motivo}"
-            [[ -n "${EVENT_ID:-}" ]] && echo "- **event_id:** \`${EVENT_ID}\`"
-            [[ -n "${RODADA:-}" ]] && echo "- **rodada:** \`${RODADA}\`"
-            [[ -n "${MODO:-}" ]] && echo "- **modo:** \`${MODO}\`"
+            if [[ -n "${EVENT_ID:-}" ]]; then echo "- **event_id:** \`${EVENT_ID}\`"; fi
+            if [[ -n "${RODADA:-}" ]]; then echo "- **rodada:** \`${RODADA}\`"; fi
+            if [[ -n "${MODO:-}" ]]; then echo "- **modo:** \`${MODO}\`"; fi
           } >> "$GITHUB_STEP_SUMMARY"
+          exit 0
 
       - name: Disparar somente o workflow necessário
         if: ${{ inputs.dry_run != true && steps.plano.outputs.acao != 'none' }}
@@ -104,6 +109,9 @@ jobs:
           case "$ACAO" in
             atualizar_brasileirao)
               gh workflow run atualizar-brasileirao.yml --ref main
+              ;;
+            publicos)
+              gh workflow run atualizar-publicos-brasileirao.yml --ref main
               ;;
             melhores_momentos)
               gh workflow run buscar-melhores-momentos-getv.yml --ref main -f modo=incremental
