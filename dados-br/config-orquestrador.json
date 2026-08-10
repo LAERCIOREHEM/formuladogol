@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "descricao": "Política determinística do orquestrador de workflows do Fórmula do Gol. A IA não decide gatilhos operacionais.",
+  "timezone": "America/Sao_Paulo",
+  "cron_recomendado": "*/10 * * * *",
+  "prioridade": [
+    "atualizar_brasileirao",
+    "melhores_momentos_primeira_tentativa",
+    "transmissao_aovivo",
+    "editorial_copa_do_brasil",
+    "editorial_rodada",
+    "melhores_momentos_retentativa",
+    "transmissoes_tv"
+  ],
+  "atualizar_brasileirao": {
+    "sondagem_antes_minutos": 45,
+    "sondagem_depois_minutos": 240,
+    "intervalo_pre_jogo_minutos": 60,
+    "intervalo_durante_jogo_minutos": 30,
+    "retentativa_final_pendente_minutos": 10,
+    "fallback_final_estimado_minutos": 105,
+    "manutencao_diaria_apos": "05:10"
+  },
+  "melhores_momentos": {
+    "primeira_tentativa_apos_final_minutos": 10,
+    "intervalos_retentativa": [
+      {"ate_horas": 2, "minutos": 10},
+      {"ate_horas": 6, "minutos": 30},
+      {"ate_horas": 24, "minutos": 120},
+      {"ate_horas": 72, "minutos": 360},
+      {"ate_horas": 99999, "minutos": 720}
+    ],
+    "ignorar_rodada_zero": true
+  },
+  "transmissoes": {
+    "tv_diaria_apos": "06:30",
+    "tv_retentativa_critica_horas": 6,
+    "aovivo_antes_minutos": 90,
+    "aovivo_depois_minutos": 180,
+    "aovivo_intervalo_minutos": 10
+  },
+  "github": {
+    "branch": "main",
+    "historico_runs": 300,
+    "bloquear_se_writer_ativo": true
+  }
+}
