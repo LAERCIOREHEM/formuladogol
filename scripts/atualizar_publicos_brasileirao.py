@@ -7,6 +7,8 @@ Complementa automaticamente o público presente dos jogos finalizados do
 Brasileirão quando a ESPN não informa o campo.
 
 Fonte documental automática principal: artigos por rodada do ge/Gato Mestre.
+A descoberta usa primeiro o sitemap diário do ge, portanto NÃO depende de adivinhar
+o slug/título da matéria; a URL histórica previsível fica apenas como fallback.
 A rotina é conservadora:
   * usa somente "Público presente"/"Público total"; nunca transforma pagantes
     em público presente;
@@ -18,6 +20,7 @@ A rotina é conservadora:
 Saídas:
   - dados-br/publicos-complementares.json
   - dados-br/auditoria-publicos.json
+  - dados-br/jogos-detalhes.json (somente campos de público já existentes no índice)
 """
 from __future__ import annotations
 
@@ -29,7 +32,9 @@ import sys
 import time
 import unicodedata
 import urllib.error
+import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -41,6 +46,7 @@ DETALHES = ROOT / "dados-br" / "jogos-detalhes.json"
 SAIDA = ROOT / "dados-br" / "publicos-complementares.json"
 AUDITORIA = ROOT / "dados-br" / "auditoria-publicos.json"
 FUSO_BRASILIA = timezone(timedelta(hours=-3))
+GE_SITEMAP_TEMPLATE = "https://ge.globo.com/sitemap/ge/{ano:04d}/{mes:02d}/{dia:02d}_{parte}.xml"
 GE_TEMPLATE = (
     "https://ge.globo.com/gato-mestre/noticia/{ano:04d}/{mes:02d}/{dia:02d}/"
     "veja-os-publicos-da-{rodada}a-rodada-do-campeonato-brasileiro.ghtml"
@@ -330,6 +336,81 @@ def variantes_url_ge(url: str) -> list[str]:
     return list(dict.fromkeys([raw, amp]))
 
 
+
+def extrair_urls_sitemap(conteudo: str) -> list[str]:
+    """Extrai <loc> de sitemap XML tolerando namespace e XML parcialmente escapado."""
+    raw = str(conteudo or "").strip()
+    if not raw:
+        return []
+    urls: list[str] = []
+    try:
+        root = ET.fromstring(raw)
+        for node in root.iter():
+            if str(node.tag).split("}")[-1].lower() != "loc":
+                continue
+            url = html_lib.unescape(str(node.text or "").strip())
+            if url.startswith("https://"):
+                urls.append(url)
+    except ET.ParseError:
+        for match in re.finditer(r"(?is)<loc>\s*(.*?)\s*</loc>", raw):
+            url = html_lib.unescape(re.sub(r"\s+", "", match.group(1)))
+            if url.startswith("https://"):
+                urls.append(url)
+    return list(dict.fromkeys(urls))
+
+
+def pontuar_url_publico_ge(url: str, rodada: int) -> int:
+    texto = normalizar(urllib.parse.unquote(str(url or "")))
+    score = 0
+    if "ge globo com gato mestre noticia" in texto:
+        score += 8
+    if "publico" in texto or "publicos" in texto:
+        score += 10
+    if "brasileirao" in texto or "campeonato brasileiro" in texto:
+        score += 5
+    if f"{int(rodada)}a rodada" in texto or f"{int(rodada)} rodada" in texto:
+        score += 12
+    if "veja a lista" in texto or "veja os publicos" in texto:
+        score += 3
+    return score
+
+
+def descobrir_urls_ge_por_sitemap(
+    rodada: int,
+    datas: list[date],
+    *,
+    max_datas: int = 8,
+    max_partes: int = 2,
+) -> tuple[list[str], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Descobre matérias candidatas sem depender do slug editorial do ge."""
+    candidatos: dict[str, int] = {}
+    auditoria: list[dict[str, Any]] = []
+    erros: list[dict[str, Any]] = []
+    datas_unicas = list(dict.fromkeys(datas))[: max(1, int(max_datas))]
+    for d in datas_unicas:
+        for parte in range(1, max(1, int(max_partes)) + 1):
+            sitemap = GE_SITEMAP_TEMPLATE.format(ano=d.year, mes=d.month, dia=d.day, parte=parte)
+            try:
+                conteudo = buscar_html(sitemap, timeout=18, tentativas=1)
+            except FileNotFoundError:
+                # _2.xml, por exemplo, normalmente nem existe; isso não é erro operacional.
+                continue
+            except Exception as exc:
+                erros.append({"rodada": rodada, "url": sitemap, "erro": str(exc)[:500], "tipo": "sitemap"})
+                continue
+            urls = extrair_urls_sitemap(conteudo)
+            aceitas = 0
+            for url in urls:
+                score = pontuar_url_publico_ge(url, rodada)
+                if score < 18:
+                    continue
+                candidatos[url] = max(candidatos.get(url, 0), score)
+                aceitas += 1
+            auditoria.append({"rodada": rodada, "url": sitemap, "urls": len(urls), "candidatas": aceitas, "tipo": "sitemap"})
+    ordenadas = [url for url, _ in sorted(candidatos.items(), key=lambda item: (-item[1], item[0]))]
+    return ordenadas[:20], auditoria, erros
+
+
 def _chave_item_artigo(item: dict[str, Any]) -> tuple[str, str, int, int] | None:
     try:
         gc = int(item.get("placar_mandante"))
@@ -545,13 +626,20 @@ def executar_coleta(
         for rodada in rodadas_pendentes:
             jogos_rodada = por_rodada.get(rodada, [])
             fonte_existente = _fonte_rodada_existente(payload, rodada)
+            datas = datas_candidatas(jogos_rodada)
+            descobertas, audit_sitemap, erros_sitemap = descobrir_urls_ge_por_sitemap(rodada, datas)
+            fontes_consultadas.extend(audit_sitemap)
+            erros_fontes.extend(erros_sitemap)
+
             urls_base: list[str] = []
             if fonte_existente:
                 urls_base.append(fonte_existente)
-            urls_base.extend(url_ge(rodada, d) for d in datas_candidatas(jogos_rodada))
-            # Dedup preservando ordem. Cada URL do ge é consultada também em AMP:
-            # em atualizações recentes houve casos em que uma versão já continha o
-            # público e a outra ainda servia conteúdo em cache sem esse número.
+            # Primeiro URLs realmente publicadas no sitemap; só depois mantemos o
+            # padrão histórico como fallback. Assim títulos novos não quebram a coleta.
+            urls_base.extend(descobertas)
+            urls_base.extend(url_ge(rodada, d) for d in datas)
+            # Dedup preservando ordem. Cada URL de artigo do ge é consultada também
+            # em AMP para contornar defasagem de cache entre representações.
             urls_base = list(dict.fromkeys(urls_base))
             artigo_itens: list[dict[str, Any]] = []
             url_encontrada = ""
@@ -696,6 +784,56 @@ def executar_coleta(
     return saida, audit
 
 
+
+def propagar_publicos_para_detalhes(
+    detalhes: dict[str, Any],
+    complementos: dict[str, Any],
+) -> tuple[dict[str, Any], int, list[dict[str, Any]]]:
+    """Atualiza somente público/fonte/tipo em jogos-detalhes, sem reconsultar ESPN.
+
+    Regra conservadora: nunca substitui um público já informado por número
+    diferente. Divergências são auditadas para revisão manual.
+    """
+    saida = dict(detalhes) if isinstance(detalhes, dict) else {}
+    jogos_antigos = saida.get("jogos") if isinstance(saida.get("jogos"), dict) else {}
+    jogos = {str(k): dict(v) for k, v in jogos_antigos.items() if isinstance(v, dict)}
+    mapa = complementos.get("jogos") if isinstance(complementos, dict) else {}
+    if not isinstance(mapa, dict):
+        mapa = {}
+    alteracoes = 0
+    conflitos: list[dict[str, Any]] = []
+    for event_id, comp in mapa.items():
+        if not isinstance(comp, dict) or str(event_id) not in jogos:
+            continue
+        publico = numero_publico(comp.get("publico"))
+        if publico is None:
+            continue
+        row = jogos[str(event_id)]
+        atual = numero_publico(row.get("publico"))
+        if atual is not None:
+            if atual != publico:
+                conflitos.append({
+                    "event_id": str(event_id),
+                    "publico_detalhes": atual,
+                    "publico_complementar": publico,
+                    "fonte_detalhes": str(row.get("publico_fonte") or ""),
+                    "fonte_complementar": str(comp.get("fonte") or ""),
+                })
+            continue
+        row["publico"] = publico
+        row["publico_fonte"] = str(comp.get("fonte") or comp.get("origem") or "complemento documental")
+        row["publico_tipo"] = str(comp.get("tipo") or "presente")
+        alteracoes += 1
+
+    if alteracoes:
+        saida["jogos"] = jogos
+        saida["total_com_publico"] = sum(1 for row in jogos.values() if numero_publico(row.get("publico")) is not None)
+        # Não reescrevemos contadores de estatísticas/eventos: esta operação só
+        # propaga público. O timestamp sinaliza ao front que o JSON mudou.
+        saida["gerado_em"] = iso_agora_brt()
+    return saida, alteracoes, conflitos
+
+
 def self_test() -> None:
     fixture = r'''<!doctype html><html><body>
       <h2>Botafogo 2 x 1 Santos (Nilton Santos)</h2>
@@ -755,7 +893,33 @@ def self_test() -> None:
     ])
     assert not itens_conf and len(conflitos_merge) == 1
 
-    print("SELF-TEST OK: parser GE, normal+AMP, público presente/total, bloqueio de pagantes, aliases, duplicados e conflitos.")
+    detalhes_fixture = {
+        "gerado_em": "antes",
+        "total_com_publico": 0,
+        "jogos": {
+            "x": {"event_id": "x", "publico": None},
+            "y": {"event_id": "y", "publico": 12000, "publico_fonte": "ESPN"},
+        },
+    }
+    comp_fixture = {"jogos": {
+        "x": {"publico": 15000, "tipo": "presente", "fonte": "ge"},
+        "y": {"publico": 13000, "tipo": "presente", "fonte": "ge"},
+    }}
+    detalhes_novos, n_prop, conf_prop = propagar_publicos_para_detalhes(detalhes_fixture, comp_fixture)
+    assert n_prop == 1 and detalhes_novos["jogos"]["x"]["publico"] == 15000
+    assert detalhes_novos["jogos"]["y"]["publico"] == 12000 and len(conf_prop) == 1
+
+    sitemap_fixture = """<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      <url><loc>https://ge.globo.com/gato-mestre/noticia/2026/08/09/flamengo-x-vitoria-tem-o-maior-publico-da-22a-rodada-do-brasileirao-veja-a-lista.ghtml</loc></url>
+      <url><loc>https://ge.globo.com/futebol/noticia/2026/08/09/outra-materia.ghtml</loc></url>
+    </urlset>"""
+    sm = extrair_urls_sitemap(sitemap_fixture)
+    assert len(sm) == 2
+    assert pontuar_url_publico_ge(sm[0], 22) >= 30
+    assert pontuar_url_publico_ge(sm[1], 22) < 18
+
+    print("SELF-TEST OK: parser GE, sitemap dinâmico, normal+AMP, público presente/total, bloqueio de pagantes, aliases, duplicados e conflitos.")
 
 
 def main() -> None:
@@ -798,6 +962,15 @@ def main() -> None:
         return
 
     salvar_json_atomico(SAIDA, saida)
+
+    detalhes_atualizados, propagados_detalhes, conflitos_detalhes = propagar_publicos_para_detalhes(
+        detalhes if isinstance(detalhes, dict) else {}, saida
+    )
+    if propagados_detalhes:
+        salvar_json_atomico(DETALHES, detalhes_atualizados)
+    audit["propagados_para_jogos_detalhes"] = propagados_detalhes
+    audit["conflitos_jogos_detalhes"] = conflitos_detalhes
+
     audit_anterior = carregar_json(AUDITORIA, {})
     if isinstance(audit_anterior, dict):
         atual_cmp = {k: v for k, v in audit.items() if k != "gerado_em"}
@@ -807,9 +980,9 @@ def main() -> None:
     salvar_json_atomico(AUDITORIA, audit)
     print(
         "OK: públicos complementares atualizados · "
-        f"novos={audit['novos_complementos']} · "
+        f"novos={audit['novos_complementos']} · propagados_detalhes={propagados_detalhes} · "
         f"cobertura={audit['total_com_publico_ou_complemento']}/{audit['total_jogos_finalizados']} · "
-        f"sem público={audit['total_sem_publico']} · conflitos={len(audit['conflitos'])}"
+        f"sem público={audit['total_sem_publico']} · conflitos={len(audit['conflitos']) + len(conflitos_detalhes)}"
     )
     if audit["erros_fontes"]:
         print(f"AVISO: {len(audit['erros_fontes'])} falha(s) de fonte externa; snapshot anterior preservado.", file=sys.stderr)

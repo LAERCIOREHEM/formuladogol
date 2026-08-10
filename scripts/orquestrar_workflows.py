@@ -12,18 +12,22 @@ Política resumida
 -----------------
 1. Atualizar Brasileirão tem prioridade máxima:
    - pré-jogo, se a base estiver antiga;
-   - durante jogo, no intervalo configurado;
    - imediatamente quando a ESPN detectar FINAL ainda não incorporado;
    - uma manutenção de segurança por dia.
-2. Melhores momentos:
+   Placar/gol AO VIVO NÃO dispara pipeline pesado: a classificação live é
+   calculada no navegador a partir do scoreboard ESPN.
+2. Públicos pendentes:
+   - primeira tentativa 15 min após o FINAL;
+   - retentativas com backoff, sem reprocessar o Brasileirão inteiro.
+3. Melhores momentos:
    - primeira busca 10 min após o FINAL;
    - retentativas com backoff, sem rodar eternamente a cada 10 min.
-3. Transmissão ao vivo:
+4. Transmissão ao vivo:
    - apenas perto de jogo elegível, enquanto faltar player GE TV/CazéTV;
    - respeita grade exclusiva/estável já conhecida.
-4. Editorial:
+5. Editorial:
    - somente quando o fechamento está realmente elegível e o dossiê mudou.
-5. TV futura:
+6. TV futura:
    - uma vez por dia; retentativa extra apenas se houver pendência crítica <72h.
 
 O workflow GitHub correspondente usa a decisão para disparar no máximo UM
@@ -55,6 +59,9 @@ AGENDA_PATH = ROOT / "dados-br" / "agenda-clubes-br.json"
 RESULTS_PATH = ROOT / "resultados.json"
 ESPN_EVENTS_PATH = ROOT / "espn_eventos.json"
 STATUS_UPDATE_PATH = ROOT / "dados-br" / "status-atualizacao.json"
+PUBLIC_COMPLEMENTS_PATH = ROOT / "dados-br" / "publicos-complementares.json"
+PUBLIC_AUDIT_PATH = ROOT / "dados-br" / "auditoria-publicos.json"
+DETAILS_PATH = ROOT / "dados-br" / "jogos-detalhes.json"
 MM_PATH = ROOT / "dados-br" / "melhores-momentos.json"
 MM_MANUAL_PATH = ROOT / "dados-br" / "melhores-momentos-manual.json"
 MM_COPA_PATH = ROOT / "dados-br" / "melhores-momentos-copa-do-brasil.json"
@@ -75,6 +82,7 @@ CONTINENTAL_PATHS = {
 
 WORKFLOW_MAIN = "Atualizar Brasileirao (ESPN)"
 WORKFLOW_MM = "Buscar melhores momentos oficiais"
+WORKFLOW_PUBLICOS = "Atualizar públicos do Brasileirão"
 WORKFLOW_TRANSMISSOES = "Buscar transmissões dos clubes do Brasileirão"
 WORKFLOW_EDITORIAL_RODADA = "Publicar análise editorial da rodada"
 WORKFLOW_EDITORIAL_COPA = "Publicar análise editorial da Copa do Brasil"
@@ -85,6 +93,7 @@ REPO_WRITERS = {
     "Auditar modelos AF-Previsão",
     "Auditoria IA diária",
     "Buscar melhores momentos oficiais",
+    "Atualizar públicos do Brasileirão",
     "Buscar transmissões dos clubes do Brasileirão",
     "Publicar análise editorial da Copa do Brasil",
     "Publicar análise editorial da rodada",
@@ -104,10 +113,20 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "sondagem_antes_minutos": 45,
         "sondagem_depois_minutos": 240,
         "intervalo_pre_jogo_minutos": 60,
-        "intervalo_durante_jogo_minutos": 30,
         "retentativa_final_pendente_minutos": 10,
         "fallback_final_estimado_minutos": 105,
         "manutencao_diaria_apos": "05:10",
+    },
+    "publicos": {
+        "primeira_tentativa_apos_final_minutos": 15,
+        "intervalos_retentativa": [
+            {"ate_horas": 2, "minutos": 30},
+            {"ate_horas": 6, "minutos": 60},
+            {"ate_horas": 24, "minutos": 120},
+            {"ate_horas": 72, "minutos": 360},
+            {"ate_horas": 168, "minutos": 720},
+            {"ate_horas": 99999, "minutos": 1440},
+        ],
     },
     "melhores_momentos": {
         "primeira_tentativa_apos_final_minutos": 10,
@@ -443,6 +462,9 @@ def synthetic_runs_from_artifacts(tz: ZoneInfo) -> list[dict[str, Any]]:
     mm = load_json(MM_PATH, {})
     add(WORKFLOW_MM, mm.get("atualizado_em") if isinstance(mm, Mapping) else None, "Melhores momentos · artefato local")
 
+    publicos = load_json(PUBLIC_AUDIT_PATH, {})
+    add(WORKFLOW_PUBLICOS, publicos.get("gerado_em") if isinstance(publicos, Mapping) else None, "Públicos · artefato local")
+
     tv = load_json(TV_AUDIT_PATH, {})
     add(
         WORKFLOW_TRANSMISSOES,
@@ -505,11 +527,8 @@ def main_update_decision(
     retry_final = int(cfg.get("retentativa_final_pendente_minutos") or 10)
 
     final_pending: list[Game] = []
-    changed_live: list[Game] = []
-    live: list[Game] = []
     pre: list[Game] = []
     fallback_final: list[Game] = []
-    published = local_event_states()
     before = int(cfg.get("sondagem_antes_minutos") or 45)
     after = int(cfg.get("sondagem_depois_minutos") or 240)
     estimated_final = int(cfg.get("fallback_final_estimado_minutos") or 105)
@@ -520,24 +539,8 @@ def main_update_decision(
         known = game.event_id in final_ids
         probe = states.get(game.event_id) or {}
         state = str(probe.get("state") or "")
-        local = published.get(game.event_id) or {}
-        local_state = str(local.get("state") or "")
-        score_changed = (
-            state == "in"
-            and probe.get("home_score") is not None
-            and probe.get("away_score") is not None
-            and (
-                score_value(local.get("home_score")) != score_value(probe.get("home_score"))
-                or score_value(local.get("away_score")) != score_value(probe.get("away_score"))
-            )
-        )
-        state_changed = state in {"in", "post"} and state != local_state
-        if state == "post" and (not known or state_changed):
+        if state == "post" and not known:
             final_pending.append(game)
-        elif state == "in":
-            live.append(game)
-            if score_changed or state_changed:
-                changed_live.append(game)
         elif state == "pre" and game.kickoff >= now:
             pre.append(game)
         elif not state and not known and now >= game.kickoff + timedelta(minutes=estimated_final):
@@ -560,20 +563,8 @@ def main_update_decision(
             details=tuple(probe_errors[:3]),
         )
 
-    if changed_live:
-        labels = ", ".join(game.label for game in changed_live[:4])
-        return Decision(
-            "atualizar_brasileirao",
-            f"Mudança factual AO VIVO detectada na ESPN (início/placar): {labels}.",
-        )
-
-    live_interval = int(cfg.get("intervalo_durante_jogo_minutos") or 30)
-    if live and since_success >= live_interval:
-        labels = ", ".join(game.label for game in live[:4])
-        return Decision(
-            "atualizar_brasileirao",
-            f"Há jogo(s) realmente AO VIVO e a última atualização completa tem {int(since_success)} min: {labels}.",
-        )
+    # Gol, empate, virada e início AO VIVO não justificam o pipeline pesado.
+    # Tabela e Estatísticas consultam o scoreboard ESPN no navegador a cada 30 s.
 
     pre_interval = int(cfg.get("intervalo_pre_jogo_minutos") or 60)
     imminent = [game for game in pre if game.kickoff <= now + timedelta(minutes=before)]
@@ -589,6 +580,97 @@ def main_update_decision(
         return Decision(
             "atualizar_brasileirao",
             "Manutenção diária de segurança: ainda não houve atualização completa bem-sucedida hoje.",
+        )
+    return None
+
+
+
+def public_retry_interval(age_hours: float, config: Mapping[str, Any]) -> int:
+    rows = config.get("publicos", {}).get("intervalos_retentativa") or []
+    for row in rows:
+        try:
+            if age_hours <= float(row.get("ate_horas")):
+                return int(row.get("minutos"))
+        except (TypeError, ValueError):
+            continue
+    return 1440
+
+
+def _attendance_number(value: Any) -> int | None:
+    try:
+        if value is None or isinstance(value, bool):
+            return None
+        if isinstance(value, (int, float)):
+            n = int(round(float(value)))
+        else:
+            digits = "".join(ch for ch in str(value) if ch.isdigit())
+            if not digits:
+                return None
+            n = int(digits)
+        return n if 100 <= n <= 250000 else None
+    except (TypeError, ValueError):
+        return None
+
+
+def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> list[tuple[dict[str, Any], datetime]]:
+    results = load_json(RESULTS_PATH, {})
+    rows = results.get("resultados") if isinstance(results, Mapping) else []
+    details_payload = load_json(DETAILS_PATH, {})
+    details = details_payload.get("jogos") if isinstance(details_payload, Mapping) else {}
+    if not isinstance(details, Mapping):
+        details = {}
+    comp_payload = load_json(PUBLIC_COMPLEMENTS_PATH, {})
+    complements = comp_payload.get("jogos") if isinstance(comp_payload, Mapping) else {}
+    if not isinstance(complements, Mapping):
+        complements = {}
+    min_age = int(config.get("publicos", {}).get("primeira_tentativa_apos_final_minutos") or 15)
+    pending: list[tuple[dict[str, Any], datetime]] = []
+    for raw in rows or []:
+        if not isinstance(raw, Mapping):
+            continue
+        row = dict(raw)
+        event_id = str(row.get("event_id") or row.get("id") or "").strip()
+        if not event_id:
+            continue
+        detail = details.get(event_id) if isinstance(details, Mapping) else None
+        complement = complements.get(event_id) if isinstance(complements, Mapping) else None
+        detail_public = _attendance_number((detail or {}).get("publico")) if isinstance(detail, Mapping) else None
+        comp_public = _attendance_number((complement or {}).get("publico")) if isinstance(complement, Mapping) else None
+        if detail_public is not None or comp_public is not None:
+            continue
+        ended = result_final_time(row, tz)
+        if ended is None or now < ended + timedelta(minutes=min_age):
+            continue
+        pending.append((row, ended))
+    pending.sort(key=lambda item: item[1], reverse=True)
+    return pending
+
+
+def public_decision(config: Mapping[str, Any], now: datetime, tz: ZoneInfo, runs: Sequence[Mapping[str, Any]]) -> Decision | None:
+    pending = pending_publics(config, now, tz)
+    if not pending:
+        return None
+    last, _ = last_run(runs, WORKFLOW_PUBLICOS, tz)
+    first_due = list(pending) if last is None else [(row, ended) for row, ended in pending if ended > last]
+    if first_due:
+        row, ended = min(first_due, key=lambda item: item[1])
+        event_id = str(row.get("event_id") or "")
+        label = f"{team_name(row.get('mandante'))} x {team_name(row.get('visitante'))}".strip(" x")
+        return Decision(
+            "publicos",
+            f"Primeira busca de público: {label or event_id} terminou há {int(minutes_since(ended, now))} min e segue sem público presente.",
+            event_id=event_id,
+            mode="incremental",
+        )
+    min_interval = min(public_retry_interval(minutes_since(ended, now) / 60.0, config) for _, ended in pending)
+    if minutes_since(last, now) >= min_interval:
+        oldest_row, oldest_end = min(pending, key=lambda item: item[1])
+        event_id = str(oldest_row.get("event_id") or "")
+        return Decision(
+            "publicos",
+            f"Retentativa de público: ainda há {len(pending)} jogo(s) finalizado(s) sem público; backoff atual {min_interval} min.",
+            event_id=event_id,
+            mode="incremental",
         )
     return None
 
@@ -912,17 +994,22 @@ def decide(
     if main:
         return main
 
-    # 2. Primeira busca de vídeo deve acontecer logo após o primeiro snapshot FINAL.
+    # 2. Público pendente é uma tarefa leve e independente do pipeline completo.
+    publico = public_decision(config, now, tz, runs)
+    if publico:
+        return publico
+
+    # 3. Primeira busca de vídeo deve acontecer logo após o primeiro snapshot FINAL.
     mm_first, mm_retry = mm_decisions(config, now, tz, runs)
     if mm_first:
         return mm_first
 
-    # 3. Link ao vivo é janela perecível; não deve esperar editorial.
+    # 4. Link ao vivo é janela perecível; não deve esperar editorial.
     live = transmission_live_decision(config, now, games, final_ids, tz, runs)
     if live:
         return live
 
-    # 4/5. Editoriais só acordam quando existe algo publicável ou desatualizado.
+    # 5/6. Editoriais só acordam quando existe algo publicável ou desatualizado.
     cup = cup_editorial_decision()
     if cup:
         return cup
@@ -930,11 +1017,11 @@ def decide(
     if rodada:
         return rodada
 
-    # 6. Depois da primeira busca, vídeos ausentes entram em backoff.
+    # 7. Depois da primeira busca, vídeos ausentes entram em backoff.
     if mm_retry:
         return mm_retry
 
-    # 7. Grade futura: diária, com exceção de pendência crítica.
+    # 8. Grade futura: diária, com exceção de pendência crítica.
     tv = tv_decision(config, now, tz, runs)
     if tv:
         return tv
@@ -987,10 +1074,8 @@ def self_test() -> int:
 
     # FINAL desconhecido deve vencer qualquer manutenção.
     original_known = globals()["known_final_ids"]
-    original_local = globals()["local_event_states"]
     try:
         globals()["known_final_ids"] = lambda: set()
-        globals()["local_event_states"] = lambda: {}
         decision = main_update_decision(
             config=config,
             now=now,
@@ -1003,8 +1088,8 @@ def self_test() -> int:
         )
         assert decision and decision.action == "atualizar_brasileirao"
 
-        # Gol novo durante a partida deve disparar sem esperar o heartbeat de 30 min.
-        globals()["local_event_states"] = lambda: {"1": {"state": "in", "home_score": 0, "away_score": 0}}
+        # Gol novo durante a partida NÃO deve disparar workflow pesado; o browser
+        # já atualiza classificação/estatísticas pelo scoreboard ESPN a cada 30 s.
         recent = [{"name": WORKFLOW_MAIN, "status": "completed", "conclusion": "success", "created_at": "2026-08-10T00:25:00Z"}]
         goal = main_update_decision(
             config=config,
@@ -1016,18 +1101,22 @@ def self_test() -> int:
             runs=recent,
             tz=tz,
         )
-        assert goal and goal.action == "atualizar_brasileirao"
-        assert "Mudança factual" in goal.reason
+        assert goal is None
     finally:
         globals()["known_final_ids"] = original_known
-        globals()["local_event_states"] = original_local
 
     # Política de transmissão: exclusiva bloqueia, Globo mantém elegibilidade.
     # Teste puro via snapshots artificiais seria excessivo aqui; a função real
     # é exercida pelo --dry-run sobre o repositório no pacote de validação.
     assert canonical_hash({"b": 2, "a": 1}) == canonical_hash({"a": 1, "b": 2})
 
-    print("OK self-test: prioridade, tempo, backoff, histórico, gol ao vivo e decisão pós-FINAL.")
+    assert public_retry_interval(1.0, config) == 30
+    assert public_retry_interval(5.0, config) == 60
+    assert public_retry_interval(20.0, config) == 120
+    assert public_retry_interval(100.0, config) == 720
+    assert public_retry_interval(500.0, config) == 1440
+
+    print("OK self-test: prioridade, tempo, backoff, gol ao vivo sem pipeline pesado e decisão pós-FINAL.")
     return 0
 
 
