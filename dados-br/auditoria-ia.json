@@ -1,0 +1,935 @@
+{
+  "schema_version": 1,
+  "data_brt": "2026-08-10",
+  "executado_em": "2026-08-10T09:30:14-03:00",
+  "status": "atencao",
+  "resumo": "A auditoria não identificou falhas críticas nos dados finais. Permanecem avisos de cobertura de transmissão sem impacto crítico, uma lacuna de estatísticas e dois jogos sem melhores momentos após o prazo de carência.",
+  "triagem": {
+    "data_hora_brt": "2026-08-10T09:30:14-03:00",
+    "saude": {
+      "status_deterministico": "atencao",
+      "criticos": [],
+      "avisos": [
+        "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
+        "2 jogo(s) sem melhores momentos após 24 h"
+      ],
+      "indicadores": {
+        "estatisticas_erros_criticos": 0,
+        "calendario_falhas_graves": 0,
+        "detalhes_inconsistencias": 0,
+        "detalhes_falhas": 0,
+        "jogos_sem_estatisticas": 1,
+        "transmissoes_criticas": 0,
+        "publicos_antigos_sem_dado": 0,
+        "melhores_momentos_mais_48h": 2,
+        "ultimo_sucesso_horas": 4.3
+      }
+    },
+    "pendencias": {
+      "publicos": [],
+      "transmissoes": [],
+      "melhores_momentos_apos_24h": [
+        {
+          "event_id": "401879458",
+          "rodada": 0,
+          "mandante": "Botafogo",
+          "visitante": "Vitória",
+          "horas_desde_fim": 150.8
+        },
+        {
+          "event_id": "401879459",
+          "rodada": 0,
+          "mandante": "Bahia",
+          "visitante": "Chapecoense",
+          "horas_desde_fim": 150.8
+        }
+      ]
+    },
+    "editoriais": {
+      "rodada": {
+        "rodada": 22,
+        "resumo": {
+          "rodada": 22,
+          "simulacoes": 2000000,
+          "resultados": [
+            {
+              "partida": "Grêmio 2 × 1 São Paulo",
+              "mandante": "Grêmio",
+              "visitante": "São Paulo"
+            },
+            {
+              "partida": "Remo 2 × 2 Atlético-MG",
+              "mandante": "Remo",
+              "visitante": "Atlético-MG"
+            },
+            {
+              "partida": "Coritiba 2 × 1 Chapecoense",
+              "mandante": "Coritiba",
+              "visitante": "Chapecoense"
+            },
+            {
+              "partida": "Botafogo 1 × 1 Fluminense",
+              "mandante": "Botafogo",
+              "visitante": "Fluminense"
+            },
+            {
+              "partida": "Cruzeiro 3 × 1 Mirassol",
+              "mandante": "Cruzeiro",
+              "visitante": "Mirassol"
+            },
+            {
+              "partida": "Palmeiras 0 × 0 Internacional",
+              "mandante": "Palmeiras",
+              "visitante": "Internacional"
+            },
+            {
+              "partida": "Bahia 0 × 0 Vasco da Gama",
+              "mandante": "Bahia",
+              "visitante": "Vasco da Gama"
+            },
+            {
+              "partida": "Bragantino 0 × 2 Corinthians",
+              "mandante": "Bragantino",
+              "visitante": "Corinthians"
+            },
+            {
+              "partida": "Santos 0 × 2 Athletico-PR",
+              "mandante": "Santos",
+              "visitante": "Athletico-PR"
+            },
+            {
+              "partida": "Flamengo 2 × 0 Vitória",
+              "mandante": "Flamengo",
+              "visitante": "Vitória"
+            }
+          ],
+          "classificacao_e_probabilidades": [
+            {
+              "clube": "Palmeiras",
+              "posicao_antes": 1,
+              "posicao_depois": 1,
+              "pontos_antes": 47,
+              "pontos_depois": 48,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 1,
+              "pontos_projetados_depois": 78,
+              "titulo_antes": 77.53985,
+              "titulo_depois": 65.9154,
+              "titulo_delta": -11.624449999999996,
+              "libertadores_antes": 99.99845,
+              "libertadores_depois": 99.99705,
+              "libertadores_delta": -0.0014000000000038426,
+              "sul_americana_antes": 0.00155,
+              "sul_americana_depois": 0.00295,
+              "sul_americana_delta": 0.0014,
+              "sem_continental_antes": 0.0,
+              "sem_continental_depois": 0.0,
+              "rebaixamento_antes": 0.0,
+              "rebaixamento_depois": 0.0,
+              "rebaixamento_delta": 0.0
+            },
+            {
+              "clube": "Flamengo",
+              "posicao_antes": 2,
+              "posicao_depois": 2,
+              "pontos_antes": 39,
+              "pontos_depois": 42,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 2,
+              "pontos_projetados_depois": 75,
+              "titulo_antes": 21.92,
+              "titulo_depois": 32.74765,
+              "titulo_delta": 10.827649999999998,
+              "libertadores_antes": 99.88,
+              "libertadores_depois": 99.94165,
+              "libertadores_delta": 0.061650000000000205,
+              "sul_americana_antes": 0.1198,
+              "sul_americana_depois": 0.05835,
+              "sul_americana_delta": -0.061450000000000005,
+              "sem_continental_antes": 0.00020000000000454377,
+              "sem_continental_depois": 4.343747583845925e-15,
+              "rebaixamento_antes": 0.0,
+              "rebaixamento_depois": 0.0,
+              "rebaixamento_delta": 0.0
+            },
+            {
+              "clube": "Athletico-PR",
+              "posicao_antes": 3,
+              "posicao_depois": 3,
+              "pontos_antes": 37,
+              "pontos_depois": 40,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 3,
+              "pontos_projetados_depois": 64,
+              "titulo_antes": 0.3566,
+              "titulo_depois": 1.1849,
+              "titulo_delta": 0.8283,
+              "libertadores_antes": 83.8798,
+              "libertadores_depois": 93.30535,
+              "libertadores_delta": 9.425550000000001,
+              "sul_americana_antes": 15.8371,
+              "sul_americana_depois": 6.65275,
+              "sul_americana_delta": -9.184349999999998,
+              "sem_continental_antes": 0.28309999999999746,
+              "sem_continental_depois": 0.04189999999999561,
+              "rebaixamento_antes": 0.0066,
+              "rebaixamento_depois": 0.00035,
+              "rebaixamento_delta": -0.00625
+            },
+            {
+              "clube": "Fluminense",
+              "posicao_antes": 4,
+              "posicao_depois": 4,
+              "pontos_antes": 34,
+              "pontos_depois": 35,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 4,
+              "pontos_projetados_depois": 59,
+              "titulo_antes": 0.0508,
+              "titulo_depois": 0.0564,
+              "titulo_delta": 0.005600000000000001,
+              "libertadores_antes": 61.47185,
+              "libertadores_depois": 63.85,
+              "libertadores_delta": 2.378149999999998,
+              "sul_americana_antes": 36.55435,
+              "sul_americana_depois": 34.6556,
+              "sul_americana_delta": -1.8987499999999997,
+              "sem_continental_antes": 1.9737999999999971,
+              "sem_continental_depois": 1.4943999999999988,
+              "rebaixamento_antes": 0.11315,
+              "rebaixamento_depois": 0.06775,
+              "rebaixamento_delta": -0.045399999999999996
+            },
+            {
+              "clube": "Cruzeiro",
+              "posicao_antes": 7,
+              "posicao_depois": 5,
+              "pontos_antes": 30,
+              "pontos_depois": 33,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 6,
+              "pontos_projetados_depois": 57,
+              "titulo_antes": 0.0085,
+              "titulo_depois": 0.02145,
+              "titulo_delta": 0.01295,
+              "libertadores_antes": 53.6286,
+              "libertadores_depois": 62.8618,
+              "libertadores_delta": 9.233200000000004,
+              "sul_americana_antes": 40.0404,
+              "sul_americana_depois": 34.26705,
+              "sul_americana_delta": -5.773350000000001,
+              "sem_continental_antes": 6.331000000000003,
+              "sem_continental_depois": 2.87115,
+              "rebaixamento_antes": 0.98195,
+              "rebaixamento_depois": 0.2658,
+              "rebaixamento_delta": -0.7161500000000001
+            },
+            {
+              "clube": "Bahia",
+              "posicao_antes": 5,
+              "posicao_depois": 6,
+              "pontos_antes": 32,
+              "pontos_depois": 33,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 8,
+              "pontos_projetados_depois": 55,
+              "titulo_antes": 0.0113,
+              "titulo_depois": 0.00475,
+              "titulo_delta": -0.006549999999999999,
+              "libertadores_antes": 39.00235,
+              "libertadores_depois": 31.34115,
+              "libertadores_delta": -7.661200000000001,
+              "sul_americana_antes": 54.51395,
+              "sul_americana_depois": 60.3042,
+              "sul_americana_delta": 5.79025,
+              "sem_continental_antes": 6.483699999999999,
+              "sem_continental_depois": 8.35465,
+              "rebaixamento_antes": 0.6489,
+              "rebaixamento_depois": 0.81215,
+              "rebaixamento_delta": 0.16325
+            },
+            {
+              "clube": "Corinthians",
+              "posicao_antes": 9,
+              "posicao_depois": 7,
+              "pontos_antes": 29,
+              "pontos_depois": 32,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 7,
+              "pontos_projetados_depois": 55,
+              "titulo_antes": 0.0014,
+              "titulo_depois": 0.0062,
+              "titulo_delta": 0.0048,
+              "libertadores_antes": 21.9793,
+              "libertadores_depois": 38.1695,
+              "libertadores_delta": 16.1902,
+              "sul_americana_antes": 62.0827,
+              "sul_americana_depois": 55.60715,
+              "sul_americana_delta": -6.4755500000000055,
+              "sem_continental_antes": 15.938000000000002,
+              "sem_continental_depois": 6.2233500000000035,
+              "rebaixamento_antes": 2.51305,
+              "rebaixamento_depois": 0.56085,
+              "rebaixamento_delta": -1.9522
+            },
+            {
+              "clube": "Bragantino",
+              "posicao_antes": 6,
+              "posicao_depois": 8,
+              "pontos_antes": 31,
+              "pontos_depois": 31,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 10,
+              "pontos_projetados_depois": 53,
+              "titulo_antes": 0.016,
+              "titulo_depois": 0.00325,
+              "titulo_delta": -0.012750000000000001,
+              "libertadores_antes": 43.1087,
+              "libertadores_depois": 27.7273,
+              "libertadores_delta": -15.3814,
+              "sul_americana_antes": 51.0221,
+              "sul_americana_depois": 60.7332,
+              "sul_americana_delta": 9.711099999999995,
+              "sem_continental_antes": 5.869199999999999,
+              "sem_continental_depois": 11.539500000000004,
+              "rebaixamento_antes": 0.59205,
+              "rebaixamento_depois": 1.42105,
+              "rebaixamento_delta": 0.829
+            },
+            {
+              "clube": "Botafogo",
+              "posicao_antes": 8,
+              "posicao_depois": 9,
+              "pontos_antes": 29,
+              "pontos_depois": 30,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 5,
+              "pontos_projetados_depois": 58,
+              "titulo_antes": 0.09045,
+              "titulo_depois": 0.0557,
+              "titulo_delta": -0.03475,
+              "libertadores_antes": 68.41655,
+              "libertadores_depois": 62.2341,
+              "libertadores_delta": -6.182450000000003,
+              "sul_americana_antes": 29.83055,
+              "sul_americana_depois": 35.47335,
+              "sul_americana_delta": 5.642800000000005,
+              "sem_continental_antes": 1.7529000000000003,
+              "sem_continental_depois": 2.2925499999999985,
+              "rebaixamento_antes": 0.12915,
+              "rebaixamento_depois": 0.16895,
+              "rebaixamento_delta": 0.0398
+            },
+            {
+              "clube": "Coritiba",
+              "posicao_antes": 11,
+              "posicao_depois": 10,
+              "pontos_antes": 27,
+              "pontos_depois": 30,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 12,
+              "pontos_projetados_depois": 48,
+              "titulo_antes": 0.0001,
+              "titulo_depois": 5e-05,
+              "titulo_delta": -5e-05,
+              "libertadores_antes": 4.36095,
+              "libertadores_depois": 5.67665,
+              "libertadores_delta": 1.3157000000000005,
+              "sul_americana_antes": 47.3772,
+              "sul_americana_depois": 53.90465,
+              "sul_americana_delta": 6.527449999999995,
+              "sem_continental_antes": 48.261849999999995,
+              "sem_continental_depois": 40.41870000000001,
+              "rebaixamento_antes": 14.8987,
+              "rebaixamento_depois": 9.91615,
+              "rebaixamento_delta": -4.98255
+            },
+            {
+              "clube": "Atlético-MG",
+              "posicao_antes": 10,
+              "posicao_depois": 11,
+              "pontos_antes": 28,
+              "pontos_depois": 29,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 9,
+              "pontos_projetados_depois": 54,
+              "titulo_antes": 0.00365,
+              "titulo_depois": 0.0035,
+              "titulo_delta": -0.00014999999999999996,
+              "libertadores_antes": 48.16935,
+              "libertadores_depois": 46.23415,
+              "libertadores_delta": -1.9352000000000018,
+              "sul_americana_antes": 44.05855,
+              "sul_americana_depois": 45.66755,
+              "sul_americana_delta": 1.6090000000000018,
+              "sem_continental_antes": 7.772100000000002,
+              "sem_continental_depois": 8.098300000000002,
+              "rebaixamento_antes": 1.25975,
+              "rebaixamento_depois": 1.1983,
+              "rebaixamento_delta": -0.061450000000000005
+            },
+            {
+              "clube": "São Paulo",
+              "posicao_antes": 12,
+              "posicao_depois": 12,
+              "pontos_antes": 26,
+              "pontos_depois": 26,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 11,
+              "pontos_projetados_depois": 51,
+              "titulo_antes": 0.0011,
+              "titulo_depois": 0.00065,
+              "titulo_delta": -0.0004500000000000001,
+              "libertadores_antes": 22.2176,
+              "libertadores_depois": 16.68335,
+              "libertadores_delta": -5.53425,
+              "sul_americana_antes": 59.4077,
+              "sul_americana_depois": 59.6988,
+              "sul_americana_delta": 0.29110000000000014,
+              "sem_continental_antes": 18.374699999999997,
+              "sem_continental_depois": 23.617849999999997,
+              "rebaixamento_antes": 3.4817,
+              "rebaixamento_depois": 4.71905,
+              "rebaixamento_delta": 1.2373500000000002
+            },
+            {
+              "clube": "Vitória",
+              "posicao_antes": 13,
+              "posicao_depois": 13,
+              "pontos_antes": 26,
+              "pontos_depois": 26,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 16,
+              "pontos_projetados_depois": 45,
+              "titulo_antes": 0.0,
+              "titulo_depois": 0.0,
+              "titulo_delta": 0.0,
+              "libertadores_antes": 14.56575,
+              "libertadores_depois": 13.9905,
+              "libertadores_delta": -0.5752499999999987,
+              "sul_americana_antes": 28.7706,
+              "sul_americana_depois": 26.09605,
+              "sul_americana_delta": -2.67455,
+              "sem_continental_antes": 56.663650000000004,
+              "sem_continental_depois": 59.91345,
+              "rebaixamento_antes": 27.1709,
+              "rebaixamento_depois": 29.6853,
+              "rebaixamento_delta": 2.514400000000002
+            },
+            {
+              "clube": "Grêmio",
+              "posicao_antes": 17,
+              "posicao_depois": 14,
+              "pontos_antes": 22,
+              "pontos_depois": 25,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 13,
+              "pontos_projetados_depois": 47,
+              "titulo_antes": 0.0,
+              "titulo_depois": 5e-05,
+              "titulo_delta": 5e-05,
+              "libertadores_antes": 25.79265,
+              "libertadores_depois": 27.24545,
+              "libertadores_delta": 1.4528000000000034,
+              "sul_americana_antes": 24.82355,
+              "sul_americana_depois": 32.88175,
+              "sul_americana_delta": 8.058199999999996,
+              "sem_continental_antes": 49.38380000000001,
+              "sem_continental_depois": 39.8728,
+              "rebaixamento_antes": 29.616,
+              "rebaixamento_depois": 18.0427,
+              "rebaixamento_delta": -11.5733
+            },
+            {
+              "clube": "Mirassol",
+              "posicao_antes": 14,
+              "posicao_depois": 15,
+              "pontos_antes": 23,
+              "pontos_depois": 23,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 14,
+              "pontos_projetados_depois": 46,
+              "titulo_antes": 0.00025,
+              "titulo_depois": 5e-05,
+              "titulo_delta": -0.0002,
+              "libertadores_antes": 8.4392,
+              "libertadores_depois": 5.7182,
+              "libertadores_delta": -2.720999999999999,
+              "sul_americana_antes": 47.01715,
+              "sul_americana_depois": 39.7397,
+              "sul_americana_delta": -7.277450000000002,
+              "sem_continental_antes": 44.54365,
+              "sem_continental_depois": 54.542100000000005,
+              "rebaixamento_antes": 14.34015,
+              "rebaixamento_depois": 19.92525,
+              "rebaixamento_delta": 5.585099999999999
+            },
+            {
+              "clube": "Internacional",
+              "posicao_antes": 16,
+              "posicao_depois": 16,
+              "pontos_antes": 22,
+              "pontos_depois": 23,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 15,
+              "pontos_projetados_depois": 45,
+              "titulo_antes": 0.0,
+              "titulo_depois": 0.0,
+              "titulo_delta": 0.0,
+              "libertadores_antes": 20.71385,
+              "libertadores_depois": 21.42385,
+              "libertadores_delta": 0.7100000000000009,
+              "sul_americana_antes": 21.29995,
+              "sul_americana_depois": 24.7187,
+              "sul_americana_delta": 3.4187499999999993,
+              "sem_continental_antes": 57.9862,
+              "sem_continental_depois": 53.85745,
+              "rebaixamento_antes": 36.37495,
+              "rebaixamento_depois": 30.1191,
+              "rebaixamento_delta": -6.255849999999999
+            },
+            {
+              "clube": "Santos",
+              "posicao_antes": 15,
+              "posicao_depois": 17,
+              "pontos_antes": 22,
+              "pontos_depois": 22,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 18,
+              "pontos_projetados_depois": 41,
+              "titulo_antes": 0.0,
+              "titulo_depois": 0.0,
+              "titulo_delta": 0.0,
+              "libertadores_antes": 19.93045,
+              "libertadores_depois": 18.7026,
+              "libertadores_delta": -1.22785,
+              "sul_americana_antes": 15.5419,
+              "sul_americana_depois": 9.1039,
+              "sul_americana_delta": -6.438000000000001,
+              "sem_continental_antes": 64.52765,
+              "sem_continental_depois": 72.1935,
+              "rebaixamento_antes": 48.3897,
+              "rebaixamento_depois": 62.85045,
+              "rebaixamento_delta": 14.460750000000004
+            },
+            {
+              "clube": "Vasco da Gama",
+              "posicao_antes": 18,
+              "posicao_depois": 18,
+              "pontos_antes": 21,
+              "pontos_depois": 22,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 17,
+              "pontos_projetados_depois": 42,
+              "titulo_antes": 0.0,
+              "titulo_depois": 0.0,
+              "titulo_delta": 0.0,
+              "libertadores_antes": 20.0902,
+              "libertadores_depois": 20.2171,
+              "libertadores_delta": 0.12689999999999912,
+              "sul_americana_antes": 11.77405,
+              "sul_americana_depois": 12.28265,
+              "sul_americana_delta": 0.5085999999999995,
+              "sem_continental_antes": 68.13575,
+              "sem_continental_depois": 67.50025,
+              "rebaixamento_antes": 55.63025,
+              "rebaixamento_depois": 53.09475,
+              "rebaixamento_delta": -2.535499999999999
+            },
+            {
+              "clube": "Remo",
+              "posicao_antes": 19,
+              "posicao_depois": 19,
+              "pontos_antes": 21,
+              "pontos_depois": 22,
+              "jogos_antes": 21,
+              "jogos_depois": 22,
+              "posicao_projetada_depois": 19,
+              "pontos_projetados_depois": 40,
+              "titulo_antes": 0.0,
+              "titulo_depois": 0.0,
+              "titulo_delta": 0.0,
+              "libertadores_antes": 0.1947,
+              "libertadores_depois": 0.1192,
+              "libertadores_delta": -0.07550000000000001,
+              "sul_americana_antes": 9.9239,
+              "sul_americana_depois": 8.15015,
+              "sul_americana_delta": -1.7737499999999997,
+              "sem_continental_antes": 89.8814,
+              "sem_continental_depois": 91.73065,
+              "rebaixamento_antes": 63.9095,
+              "rebaixamento_depois": 67.1831,
+              "rebaixamento_delta": 3.2735999999999947
+            },
+            {
+              "clube": "Chapecoense",
+              "posicao_antes": 20,
+              "posicao_depois": 20,
+              "pontos_antes": 10,
+              "pontos_depois": 10,
+              "jogos_antes": 20,
+              "jogos_depois": 21,
+              "posicao_projetada_depois": 20,
+              "pontos_projetados_depois": 24,
+              "titulo_antes": 0.0,
+              "titulo_depois": 0.0,
+              "titulo_delta": 0.0,
+              "libertadores_antes": 0.0,
+              "libertadores_depois": 0.0,
+              "libertadores_delta": 0.0,
+              "sul_americana_antes": 0.00295,
+              "sul_americana_depois": 0.0015,
+              "sul_americana_delta": -0.00145,
+              "sem_continental_antes": 99.99705,
+              "sem_continental_depois": 99.9985,
+              "rebaixamento_antes": 99.94355,
+              "rebaixamento_depois": 99.96895,
+              "rebaixamento_delta": 0.025400000000004752
+            }
+          ],
+          "destaques_calculados": {
+            "altas_titulo": [
+              "Flamengo",
+              "Athletico-PR",
+              "Cruzeiro",
+              "Fluminense",
+              "Corinthians"
+            ],
+            "baixas_titulo": [
+              "Palmeiras",
+              "Botafogo",
+              "Bragantino",
+              "Bahia",
+              "São Paulo"
+            ],
+            "altas_libertadores": [
+              "Corinthians",
+              "Athletico-PR",
+              "Cruzeiro",
+              "Fluminense",
+              "Grêmio"
+            ],
+            "baixas_libertadores": [
+              "Bragantino",
+              "Bahia",
+              "Botafogo",
+              "São Paulo",
+              "Mirassol"
+            ],
+            "altas_risco_rebaixamento": [
+              "Santos",
+              "Mirassol",
+              "Remo",
+              "Vitória",
+              "São Paulo"
+            ],
+            "quedas_risco_rebaixamento": [
+              "Grêmio",
+              "Internacional",
+              "Coritiba",
+              "Vasco da Gama",
+              "Corinthians"
+            ]
+          },
+          "partidas_pendentes": []
+        },
+        "origem_atual": "deterministico"
+      },
+      "copa_do_brasil": {
+        "fase_ordem": 600,
+        "fase": "Oitavas de final",
+        "resumo": {
+          "competicao": "Copa do Brasil",
+          "fase_encerrada": "Oitavas de final",
+          "fase_seguinte": "Quartas de final",
+          "classificados": [
+            "Atlético-MG",
+            "Cruzeiro",
+            "Grêmio",
+            "Internacional",
+            "Palmeiras",
+            "Santos",
+            "Vasco da Gama",
+            "Vitória"
+          ],
+          "eliminados": [
+            "Athletico-PR",
+            "Chapecoense",
+            "Corinthians",
+            "Fluminense",
+            "Fortaleza",
+            "Juventude",
+            "Mirassol",
+            "Remo"
+          ],
+          "clubes_serie_a": [
+            {
+              "clube": "Atlético-MG",
+              "situacao": "classificado",
+              "movimento_via_copa": "alta",
+              "movimento_libertadores_total": "alta"
+            },
+            {
+              "clube": "Vasco da Gama",
+              "situacao": "classificado",
+              "movimento_via_copa": "alta",
+              "movimento_libertadores_total": "alta"
+            },
+            {
+              "clube": "Santos",
+              "situacao": "classificado",
+              "movimento_via_copa": "alta",
+              "movimento_libertadores_total": "alta"
+            },
+            {
+              "clube": "Grêmio",
+              "situacao": "classificado",
+              "movimento_via_copa": "alta",
+              "movimento_libertadores_total": "alta"
+            },
+            {
+              "clube": "Cruzeiro",
+              "situacao": "classificado",
+              "movimento_via_copa": "alta",
+              "movimento_libertadores_total": "alta"
+            },
+            {
+              "clube": "Vitória",
+              "situacao": "classificado",
+              "movimento_via_copa": "alta",
+              "movimento_libertadores_total": "alta"
+            },
+            {
+              "clube": "Internacional",
+              "situacao": "classificado",
+              "movimento_via_copa": "alta",
+              "movimento_libertadores_total": "alta"
+            },
+            {
+              "clube": "Palmeiras",
+              "situacao": "classificado",
+              "movimento_via_copa": "queda",
+              "movimento_libertadores_total": "queda"
+            },
+            {
+              "clube": "Fluminense",
+              "situacao": "eliminado",
+              "movimento_via_copa": "queda",
+              "movimento_libertadores_total": "queda"
+            },
+            {
+              "clube": "Remo",
+              "situacao": "eliminado",
+              "movimento_via_copa": "queda",
+              "movimento_libertadores_total": "queda"
+            },
+            {
+              "clube": "Mirassol",
+              "situacao": "eliminado",
+              "movimento_via_copa": "queda",
+              "movimento_libertadores_total": "queda"
+            },
+            {
+              "clube": "Athletico-PR",
+              "situacao": "eliminado",
+              "movimento_via_copa": "queda",
+              "movimento_libertadores_total": "queda"
+            },
+            {
+              "clube": "Chapecoense",
+              "situacao": "eliminado",
+              "movimento_via_copa": "queda",
+              "movimento_libertadores_total": "queda"
+            },
+            {
+              "clube": "Corinthians",
+              "situacao": "eliminado",
+              "movimento_via_copa": "queda",
+              "movimento_libertadores_total": "queda"
+            }
+          ]
+        },
+        "origem_atual": "deterministico"
+      }
+    },
+    "politica": {
+      "ia_maximo_chamadas_dia": 1,
+      "melhores_momentos_carencia_horas": 24.0,
+      "auto_correcao": [
+        "publico_presente_ou_total",
+        "transmissao_faltante_com_fonte"
+      ],
+      "nunca_alterar_por_ia": [
+        "placar",
+        "classificacao",
+        "estatisticas",
+        "calculos"
+      ]
+    }
+  },
+  "openai": {
+    "modelo": "gpt-5.6-terra",
+    "tentativa_efetuada": true,
+    "chamadas_nesta_execucao": 1,
+    "limite_chamadas_dia": 1,
+    "falhas_consecutivas": 1,
+    "erro": "falha ao aplicar saída validada: Command '['/opt/hostedtoolcache/Python/3.12.13/x64/bin/python', 'scripts/gerar_analise_rodada.py', '--rodada', '22', '--editorial-json', '/tmp/tmp5qnke66b.json', '--origem-editorial', 'openai:gpt-5.6-terra:auditoria-diaria']' returned non-zero exit status 1.",
+    "web_habilitada": true,
+    "web_searches": 0,
+    "web_tool_calls": 0,
+    "web_acoes": [],
+    "fontes_web": []
+  },
+  "resultado_ia": {
+    "status_geral": "atencao",
+    "resumo": "A auditoria não identificou falhas críticas nos dados finais. Permanecem avisos de cobertura de transmissão sem impacto crítico, uma lacuna de estatísticas e dois jogos sem melhores momentos após o prazo de carência.",
+    "problemas": [
+      {
+        "categoria": "transmissao",
+        "severidade": "atencao",
+        "mensagem": "Há falhas em fontes de transmissão, mas a cobertura final não apresenta perda crítica.",
+        "event_id": "",
+        "requer_intervencao": false
+      },
+      {
+        "categoria": "estatisticas",
+        "severidade": "info",
+        "mensagem": "Há um jogo sem estatísticas, sem inconsistências ou falhas críticas nos detalhes finais.",
+        "event_id": "",
+        "requer_intervencao": false
+      },
+      {
+        "categoria": "melhores_momentos",
+        "severidade": "atencao",
+        "mensagem": "Botafogo x Vitória permanece sem melhores momentos após o prazo de carência.",
+        "event_id": "401879458",
+        "requer_intervencao": true
+      },
+      {
+        "categoria": "melhores_momentos",
+        "severidade": "atencao",
+        "mensagem": "Bahia x Chapecoense permanece sem melhores momentos após o prazo de carência.",
+        "event_id": "401879459",
+        "requer_intervencao": true
+      }
+    ],
+    "correcoes_publico": [],
+    "correcoes_transmissao": [],
+    "melhores_momentos_pendentes": [
+      {
+        "event_id": "401879458",
+        "status": "investigar",
+        "fonte_url": "",
+        "justificativa": "A partida está sem melhores momentos há mais de vinte e quatro horas. Não há fonte inequívoca no dossiê para vinculação automática."
+      },
+      {
+        "event_id": "401879459",
+        "status": "investigar",
+        "fonte_url": "",
+        "justificativa": "A partida está sem melhores momentos há mais de vinte e quatro horas. Não há fonte inequívoca no dossiê para vinculação automática."
+      }
+    ],
+    "editorial_rodada": {
+      "titulo": "Rodada reposiciona a disputa no Brasileiro",
+      "linha_fina": "A jornada trouxe avanços importantes na corrida continental e aumentou a pressão na parte inferior da tabela.",
+      "secoes": [
+        {
+          "titulo": "Disputa na frente ganha novos contornos",
+          "paragrafos": [
+            "O Flamengo foi um dos principais beneficiados da rodada e reduziu a distância projetada na corrida pelo título. O Athletico Paranaense também avançou, enquanto o Palmeiras seguiu na liderança, mas viu sua projeção de conquista recuar após o empate.",
+            "Cruzeiro e Corinthians aproveitaram seus resultados para melhorar a perspectiva de classificação à Libertadores. O Fluminense sustentou posição relevante, enquanto Bahia, Botafogo e Bragantino perderam terreno na disputa pelas vagas mais altas."
+          ]
+        },
+        {
+          "titulo": "Tabela inferior fica mais pressionada",
+          "paragrafos": [
+            "O Grêmio conseguiu um resultado que diminuiu de forma expressiva seu risco de rebaixamento e ainda melhorou sua projeção continental. Internacional, Coritiba, Vasco da Gama e Corinthians também reduziram a ameaça na parte de baixo.",
+            "Santos teve o maior agravamento de risco da rodada. Mirassol, Remo, Vitória e São Paulo também passaram a conviver com cenário mais delicado, enquanto a Chapecoense permaneceu na última posição projetada."
+          ]
+        },
+        {
+          "titulo": "Empates e vitórias mexem com a zona intermediária",
+          "paragrafos": [
+            "Os empates de Palmeiras, Internacional, Bahia, Vasco da Gama, Botafogo, Fluminense, Remo e Atlético Mineiro ajudaram a preservar posições, mas produziram efeitos distintos nas projeções de cada clube.",
+            "As vitórias de Flamengo, Athletico Paranaense, Corinthians, Cruzeiro, Grêmio e Coritiba foram determinantes para as mudanças mais visíveis na classificação e nas probabilidades da rodada."
+          ]
+        }
+      ]
+    },
+    "editorial_copa": {
+      "titulo": "Copa do Brasil abre caminho para as quartas de final",
+      "linha_fina": "A definição das oitavas separou os classificados que seguem na competição dos clubes que deixam a disputa.",
+      "secoes": [
+        {
+          "titulo": "Classificados seguem vivos",
+          "paragrafos": [
+            "Atlético Mineiro, Cruzeiro, Grêmio, Internacional, Palmeiras, Santos, Vasco da Gama e Vitória avançaram para as quartas de final.",
+            "Para esses clubes da Série A, a classificação pela Copa representou melhora na projeção continental por essa rota, ainda que o movimento total possa variar conforme o cenário do campeonato."
+          ]
+        },
+        {
+          "titulo": "Eliminados encerram a campanha",
+          "paragrafos": [
+            "Athletico Paranaense, Chapecoense, Corinthians, Fluminense, Mirassol e Remo ficaram pelo caminho entre os clubes da Série A presentes no recorte.",
+            "A eliminação retirou essa possibilidade de avanço pela Copa e foi acompanhada de queda na projeção continental total indicada pelo dossiê."
+          ]
+        },
+        {
+          "titulo": "Próxima fase concentra a disputa",
+          "paragrafos": [
+            "As quartas de final reunirão oito classificados, com a competição passando a ter peso ainda maior como rota para a classificação continental. A continuidade do torneio será acompanhada sem interferir nos dados determinísticos do campeonato. ",
+            "A presença de clubes em diferentes faixas da tabela nacional reforça que a Copa permanece como frente decisiva para quem busca ampliar suas alternativas na temporada."
+          ]
+        }
+      ]
+    }
+  },
+  "correcoes": {
+    "publicos_aceitos": [],
+    "transmissoes_aceitas": [],
+    "rejeitadas": [],
+    "publicos_aplicados": [],
+    "transmissoes_aplicadas": [],
+    "editoriais_aplicados": []
+  },
+  "criticos_nao_resolvidos": [],
+  "alerta": {
+    "ultimo_fingerprint": "",
+    "ultimo_enviado_em": "",
+    "envio_nesta_execucao": false,
+    "detalhe": "não necessário"
+  },
+  "historico": [
+    {
+      "data_brt": "2026-08-10",
+      "executado_em": "2026-08-10T09:30:14-03:00",
+      "status": "atencao",
+      "resumo": "A auditoria não identificou falhas críticas nos dados finais. Permanecem avisos de cobertura de transmissão sem impacto crítico, uma lacuna de estatísticas e dois jogos sem melhores momentos após o prazo de carência.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    }
+  ]
+}
