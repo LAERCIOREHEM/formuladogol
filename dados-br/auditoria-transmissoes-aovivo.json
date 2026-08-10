@@ -10,14 +10,14 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 54,
+    "jogos_na_janela": 53,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 29,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 20,
-    "search_api_jogos_pulados_grade_estavel": 34,
+    "search_api_jogos_pulados_grade_estavel": 33,
     "transmissoes_publicadas": 1,
-    "sem_transmissao": 53,
+    "sem_transmissao": 52,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -43,17 +43,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841187",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Vitória",
-      "data_iso": "2026-08-09T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401874070",
       "rodada": 0,
@@ -827,7 +816,7 @@
       "titulo": "AO VIVO! GE FLAMENGO ANALISA DUELO CONTRA O VITÓRIA PELO BRASILEIRÃO | #podcast | ge.globo",
       "status": "upcoming",
       "inicio_programado": "2026-08-10T15:00:00-03:00",
-      "motivo": "horário incompatível (1170 min de diferença)"
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "89tPGaf7W4s",
@@ -937,15 +926,10 @@
       "titulo": "AO VIVO! RODADA DO BRASILEIRÃO, SORTEIO DA COPA DO BRASIL E LIBERTADORES! | Panela Sportv",
       "status": "upcoming",
       "inicio_programado": "2026-08-10T17:00:00-03:00",
-      "motivo": "horário incompatível (1290 min de diferença)"
+      "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "search_api_pulados": [
-    {
-      "event_id": "401841187",
-      "jogo": "Flamengo x Vitória",
-      "motivo": "grade estável confirmada sem indício de GE TV/CazéTV"
-    },
     {
       "event_id": "401874070",
       "jogo": "Fluminense x Independiente Rivadavia",
@@ -1113,15 +1097,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401841187",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Vitória",
-      "data_iso": "2026-08-09T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401874070",
       "rodada": 0,
@@ -1601,5 +1576,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos channelIds oficiais de GE TV/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-09T21:39:13-03:00"
+  "atualizado_em": "2026-08-09T23:27:58-03:00"
 }
