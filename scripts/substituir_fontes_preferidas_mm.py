@@ -495,6 +495,7 @@ def montar_entrada(jogo: Dict[str, Any], cand: Dict[str, Any]) -> Dict[str, Any]
         "channel_id": cand.get("channel_id"),
         "channel_title": cand.get("channel_title") or ROTULOS.get(canal, canal),
         "fonte": ROTULOS.get(canal, canal),
+        "embeddable": canal != "caze",
         "fonte_busca": cand.get("metodo") or "fonte preferida",
         "confianca": 1.0,
         "motivos": [
@@ -889,6 +890,8 @@ def selftest() -> int:
     cand_caze = {"video_id": "b", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "caze", "metodo": "search.list"}
     esc = escolher_candidato(jogo, [cand_caze, cand_ge])
     c(esc and esc["video_id"] == "a", "prioridade GE > Cazé")
+    entrada_caze = montar_entrada(jogo, {"video_id": "b", "titulo": "REMO X SÃO PAULO | MELHORES MOMENTOS", "canal": "caze"})
+    c(entrada_caze.get("embeddable") is False, "CazéTV deve ser link externo, nunca embed")
     entrada = montar_entrada(jogo, cand_ge)
     c(entrada["fonte"] == "GE TV / YouTube" and entrada["url"].endswith("v=a"), "monta entrada no formato do site")
     print("\nSELFTEST:", "PASSOU ✅" if ok else "FALHOU ❌")

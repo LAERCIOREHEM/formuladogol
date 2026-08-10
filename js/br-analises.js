@@ -37,9 +37,18 @@
     }
   }
 
+  function fonteEhCaze(value) {
+    const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return raw.includes("cazetv") || raw.includes("caze tv");
+  }
+
   function abrirVideo(botao) {
     const videoId = String(botao.dataset.videoId || "").trim();
     if (!/^[A-Za-z0-9_-]{6,20}$/.test(videoId)) return;
+    if (fonteEhCaze(botao.dataset.videoSource)) {
+      window.open(`https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
     fecharVideo();
 
     focoAnterior = botao;
@@ -80,6 +89,10 @@
   function abrirVideoInline(botao) {
     const videoId = String(botao.dataset.videoId || "").trim();
     if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) return;
+    if (fonteEhCaze(botao.dataset.videoSource)) {
+      window.open(`https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}`, "_blank", "noopener,noreferrer");
+      return;
+    }
     const titulo = String(botao.dataset.videoTitle || "Melhores momentos").trim();
     const fonte = String(botao.dataset.videoSource || "YouTube oficial").trim();
     const container = botao.closest(".analysis-cup-leg");

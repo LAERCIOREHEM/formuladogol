@@ -14,6 +14,7 @@ import html
 import json
 import os
 import re
+import unicodedata
 import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -751,11 +752,20 @@ def renderizar_jogo(jogo: dict[str, Any]) -> str:
     botao_video = ""
     video_id = youtube_video_id(video.get("url") or "")
     if video_id:
-        botao_video = (
-            f'<button type="button" class="analysis-video" data-video-id="{esc(video_id)}" '
-            f'data-video-title="{esc(video.get("titulo") or jogo["linha"])}" '
-            f'data-video-source="{esc(video.get("fonte") or "YouTube")}">▶ Melhores momentos</button>'
-        )
+        fonte_video = str(video.get("fonte") or video.get("channel_title") or "YouTube")
+        fonte_norm = unicodedata.normalize("NFD", fonte_video.lower()); fonte_norm = "".join(ch for ch in fonte_norm if unicodedata.category(ch) != "Mn")
+        caze = "cazetv" in fonte_norm or "caze tv" in fonte_norm or str(video.get("channel_id") or "") == "UCZiYbVptd3PVPf4f6eR6UaQ"
+        if video.get("embeddable") is False or caze:
+            botao_video = (
+                f'<a class="analysis-video analysis-video-external" href="https://www.youtube.com/watch?v={esc(video_id)}" '
+                f'target="_blank" rel="noopener noreferrer" title="Abrir melhores momentos no canal oficial">▶ Melhores momentos ↗</a>'
+            )
+        else:
+            botao_video = (
+                f'<button type="button" class="analysis-video" data-video-id="{esc(video_id)}" '
+                f'data-video-title="{esc(video.get("titulo") or jogo["linha"])}" '
+                f'data-video-source="{esc(fonte_video)}">▶ Melhores momentos</button>'
+            )
     return f'''<article class="analysis-game-card">
       <h3>{esc(jogo['linha'])}</h3>
       <div class="analysis-game-actions">{botao_estatisticas}{botao_video}</div>
@@ -1211,10 +1221,12 @@ def self_test() -> int:
     assert pagina.count('class="analysis-copy-section"') == 4
     assert "O líder caiu; o perseguidor hesitou" in pagina
     assert "A análise editorial utiliza somente um dossiê factual auditado" in pagina
-    assert pagina.count('class="analysis-video"') == 10
+    assert len(re.findall(r'class="analysis-video(?:\s|\")', pagina)) == 10
+    assert pagina.count('analysis-video-external') == 1
+    assert 'https://www.youtube.com/watch?v=JDF3vatmswE' in pagina
     assert pagina.count('class="analysis-stats-toggle"') == 10
     assert pagina.count('class="analysis-game-details"') == 10
-    assert "Placar e resumo" not in pagina and 'target="_blank"' not in pagina
+    assert "Placar e resumo" not in pagina
     assert '<h3><a href="../resultados">' not in pagina
     assert meta["jogos_concluidos"] == 10
     hub = gerar_hub(carregar_manifesto().get("artigos") or [])

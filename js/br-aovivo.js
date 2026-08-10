@@ -551,6 +551,40 @@
     return id ? "https://www.youtube.com/watch?v=" + id : "";
   }
 
+  function sourceIsCaze(value) {
+    const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return raw.includes("cazetv") || raw.includes("caze tv") || raw === "caze" || raw === "cazetv";
+  }
+
+  function isCommentaryOnlyTitle(value) {
+    const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return /\blances?\s+(?:em\s+tempo\s+real|ao\s+vivo)\b/.test(raw)
+      || /\blance\s+a\s+lance\b/.test(raw)
+      || raw.includes("noche de copa")
+      || raw.includes("watchalong")
+      || raw.includes("watch party")
+      || (raw.includes("sem imagens") && (raw.includes("ao vivo") || raw.includes("tempo real")));
+  }
+
+  function sanitizeLivePrincipal(principal) {
+    if (!principal || typeof principal !== "object") return null;
+    if (String(principal.video_id || "") === "Co2aqgVd5qk" || isCommentaryOnlyTitle(principal.titulo || principal.title)) return null;
+    const clean = Object.assign({}, principal);
+    if (sourceIsCaze(clean.fonte) || sourceIsCaze(clean.nome) || sourceIsCaze(clean.canal)) clean.embeddable = false;
+    return clean;
+  }
+
+  function sanitizeTransmissionMap(source) {
+    const out = {};
+    for (const [key, entry] of Object.entries(source && typeof source === "object" ? source : {})) {
+      if (!entry || typeof entry !== "object") continue;
+      const principal = sanitizeLivePrincipal(entry.principal);
+      if (!principal) continue;
+      out[key] = Object.assign({}, entry, { principal });
+    }
+    return out;
+  }
+
   let liveMediaModal = null;
   let liveMediaFocus = null;
   let liveMediaOverflow = "";
@@ -574,6 +608,10 @@
     liveMediaOverflow = document.body.style.overflow;
     const title = String(button.dataset.videoTitle || "Transmissão oficial").trim();
     const source = String(button.dataset.videoSource || "YouTube").trim();
+    if (sourceIsCaze(source)) {
+      window.open("https://www.youtube.com/watch?v=" + encodeURIComponent(videoId), "_blank", "noopener,noreferrer");
+      return;
+    }
     const modal = document.createElement("div");
     modal.className = "live-media-modal";
     modal.setAttribute("role", "dialog");
@@ -604,7 +642,7 @@
     }
   }
 
-  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v1";
+  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v2";
   const TRANSMISSION_CACHE_TV = "br2026_transmissoes_tv_v1";
 
   function cachedTransmissionMap(key) {
@@ -651,8 +689,8 @@
 
     // Nunca apaga um link válido por causa de uma falha transitória, 404 durante
     // deploy ou resposta vazia em um único ciclo. O manual prevalece sobre o robô.
-    const mergedYoutube = Object.assign({}, previousYoutube, automatic, manual);
-    state.transmissoes = Object.keys(mergedYoutube).length ? mergedYoutube : previousYoutube;
+    const mergedYoutube = sanitizeTransmissionMap(Object.assign({}, previousYoutube, automatic, manual));
+    state.transmissoes = Object.keys(mergedYoutube).length ? mergedYoutube : sanitizeTransmissionMap(previousYoutube);
     state.transmissoesTv = Object.keys(tv).length ? Object.assign({}, previousTv, tv) : previousTv;
     saveTransmissionMap(TRANSMISSION_CACHE_YT, state.transmissoes);
     saveTransmissionMap(TRANSMISSION_CACHE_TV, state.transmissoesTv);
@@ -678,7 +716,9 @@
   }
 
   function transmissionForGame(game) {
-    return transmissionEntryForGame(game, state.transmissoes);
+    const entry = transmissionEntryForGame(game, state.transmissoes);
+    if (!entry || !sanitizeLivePrincipal(entry.principal)) return null;
+    return Object.assign({}, entry, { principal: sanitizeLivePrincipal(entry.principal) });
   }
 
   function providerForChannel(channel) {
@@ -752,10 +792,10 @@
   function renderTransmission(game) {
     const entry = transmissionForGame(game);
     const principal = entry && entry.principal;
-    const videoId = principal && principal.embeddable !== false ? youtubeVideoId(principal.video_id || principal.url) : "";
-    const url = videoId ? "https://www.youtube.com/watch?v=" + videoId : "";
+    const rawVideoId = principal ? youtubeVideoId(principal.video_id || principal.url) : "";
+    const url = rawVideoId ? "https://www.youtube.com/watch?v=" + rawVideoId : "";
     let youtube = "";
-    if (videoId) {
+    if (rawVideoId && principal) {
       const sourceName = principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
       const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
       const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
@@ -768,7 +808,12 @@
       const note = finished
         ? "Transmissão oficial encerrada no YouTube"
         : (liveNow ? "Transmissão oficial ao vivo no YouTube" : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube"));
-      youtube = '<div class="live-stream-area"><button type="button" class="live-stream-button live-embed-open ' + (liveStyle ? "is-live" : "") + '" data-video-id="' + esc(videoId) + '" data-video-title="' + esc((game.home && game.home.nome || "") + " x " + (game.away && game.away.nome || "")) + '" data-video-source="' + esc(sourceName) + '">' + esc(label) + '</button><div class="live-stream-note">' + esc(note) + ' · abre aqui no site</div></div>';
+      const externalOnly = principal.embeddable === false || sourceIsCaze(principal.fonte) || sourceIsCaze(sourceName);
+      if (externalOnly) {
+        youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + ' · abre no canal oficial</div></div>';
+      } else {
+        youtube = '<div class="live-stream-area"><button type="button" class="live-stream-button live-embed-open ' + (liveStyle ? "is-live" : "") + '" data-video-id="' + esc(rawVideoId) + '" data-video-title="' + esc((game.home && game.home.nome || "") + " x " + (game.away && game.away.nome || "")) + '" data-video-source="' + esc(sourceName) + '">' + esc(label) + '</button><div class="live-stream-note">' + esc(note) + ' · abre aqui no site</div></div>';
+      }
     }
     return youtube + renderClosedTransmission(game);
   }

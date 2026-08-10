@@ -307,10 +307,11 @@ def candidate_from_video(item: Mapping[str, Any], channel_key: str, source: str)
         return None
     snippet = item.get("snippet") or {}
     status_obj = item.get("status") or {}
-    # O Fórmula do Gol só publica botão YouTube quando o titular permite
-    # incorporação. Assim, clicar em AO VIVO nunca depende de redirecionar o
-    # visitante para fora do site por causa de um vídeo não embeddable.
-    if str(status_obj.get("privacyStatus") or "public") != "public" or status_obj.get("embeddable") is not True:
+    # Vídeo precisa ser público. A incorporação, porém, é uma decisão de UI:
+    # CazéTV é sempre publicada como LINK EXTERNO (nunca iframe), e qualquer
+    # outro vídeo oficial marcado pelo YouTube como não-embeddable também pode
+    # permanecer como link externo em vez de ser descartado.
+    if str(status_obj.get("privacyStatus") or "public") != "public":
         return None
     live = item.get("liveStreamingDetails") or {}
     thumbs = snippet.get("thumbnails") or {}
@@ -332,7 +333,7 @@ def candidate_from_video(item: Mapping[str, Any], channel_key: str, source: str)
         actual_end=parse_datetime(live.get("actualEndTime"), UTC),
         thumbnail=thumb,
         source=source,
-        embeddable=True,
+        embeddable=(status_obj.get("embeddable") is True and channel_key != "cazetv"),
         privacy_status="public",
     )
 
@@ -342,6 +343,22 @@ def evaluate_candidate(candidate: Candidate, game: Game, config: Mapping[str, An
     title_n = norm(candidate.title)
     desc_n = norm(candidate.description)
     combined_n = (title_n + " " + desc_n).strip()
+    blocked_ids = {str(x or "").strip() for x in (config.get("video_ids_rejeitados") or [])}
+    if candidate.video_id in blocked_ids:
+        evaluated.rejected_reason = "vídeo bloqueado editorialmente"
+        return evaluated
+    # Acompanhamento lance a lance / narração sem imagens NÃO é transmissão do jogo.
+    # Mantemos esta trava além da lista configurável para cobrir variações de título.
+    commentary_patterns = (
+        "lances em tempo real", "lances ao vivo", "lance a lance",
+        "noche de copa", "watchalong", "watch party",
+    )
+    if any(whole_term(combined_n, term) for term in commentary_patterns):
+        evaluated.rejected_reason = "conteúdo rejeitado: acompanhamento sem imagens do jogo"
+        return evaluated
+    if whole_term(combined_n, "sem imagens") and (whole_term(combined_n, "ao vivo") or whole_term(combined_n, "tempo real")):
+        evaluated.rejected_reason = "conteúdo rejeitado: acompanhamento sem imagens do jogo"
+        return evaluated
     banned = [norm(x) for x in config.get("palavras_rejeitadas") or []]
     for term in banned:
         if term and whole_term(combined_n, term):
@@ -795,6 +812,7 @@ def manual_links_for_game(manual: Mapping[str, Any], game: Game, channels: Mappi
             "confianca": 1.0,
             "motivos": ["link manual com prioridade absoluta"],
             "origem_busca": "manual",
+            "embeddable": source_key != "cazetv",
         }
     return result
 
@@ -1148,7 +1166,8 @@ def selftest() -> None:
         "Athletico-PR": ["athletico paranaense"],
     }
     config = {
-        "palavras_rejeitadas": ["melhores momentos", "pre jogo", "pós jogo", "react", "radio", "lances em tempo real", "noche de copa"],
+        "palavras_rejeitadas": ["melhores momentos", "pre jogo", "pós jogo", "react", "radio", "lances em tempo real", "lances ao vivo", "noche de copa"],
+        "video_ids_rejeitados": ["Co2aqgVd5qk"],
         "termos_competicao": ["brasileirao", "brasileirão"],
         "tolerancia_horario_minutos": 180,
         "confianca_minima": 0.72,
@@ -1165,6 +1184,20 @@ def selftest() -> None:
     rejected = evaluate_candidate(commentary, game, config, aliases).rejected_reason
     assert rejected and "conteúdo rejeitado" in rejected
 
+    # Regressão do falso positivo real: acompanhamento "lances" nunca pode virar transmissão.
+    false_live = Candidate("Co2aqgVd5qk", "cazetv", "UC1", "CazéTV", "FLUMINENSE X INDEPENDIENTE RIVADAVIA: LIBERTADORES | LANCES EM TEMPO REAL | NOCHE DE COPA", "", "upcoming", game.kickoff, None, None)
+    assert evaluate_candidate(false_live, game, config, aliases).rejected_reason
+
+    # Política de exibição: CazéTV pode ser aceita como link, mas nunca como embed.
+    fake_item = {
+        "id": "ZZZZZZZZZZZ",
+        "snippet": {"channelId": "UC1", "channelTitle": "CazéTV", "title": "BOTAFOGO X SANTOS | AO VIVO", "liveBroadcastContent": "upcoming"},
+        "status": {"privacyStatus": "public", "embeddable": True},
+        "liveStreamingDetails": {"scheduledStartTime": "2026-07-16T22:30:00Z"},
+    }
+    caze_link = candidate_from_video(fake_item, "cazetv", "test")
+    assert caze_link is not None and caze_link.embeddable is False
+
     multiplex = Candidate("IIIIIIIIIII", "cazetv", "UC1", "CazéTV", "BOTAFOGO X SANTOS E PALMEIRAS X INTERNACIONAL | AO VIVO", "", "upcoming", game.kickoff, None, None)
     rejected_multi = evaluate_candidate(multiplex, game, config, aliases).rejected_reason
     assert rejected_multi == "conteúdo reúne mais de uma partida"
@@ -1176,7 +1209,7 @@ def selftest() -> None:
     alias_cand = Candidate("DDDDDDDDDDD", "getv", "UC2", "ge tv", "RB BRAGANTINO X ATHLETICO PARANAENSE AO VIVO", "Brasileirão", "live", None, game.kickoff, None)
     assert not evaluate_candidate(alias_cand, alias_game, config, aliases).rejected_reason
 
-    # Só uma live pública e explicitamente embeddable pode virar player interno.
+    # Vídeos públicos podem permanecer como link; embed interno respeita a flag do titular.
     emb_ok = candidate_from_video({
         "id": "EEEEEEEEEEE",
         "snippet": {"channelId": "UC2", "channelTitle": "ge tv", "title": "A X B AO VIVO", "liveBroadcastContent": "upcoming"},
@@ -1190,7 +1223,7 @@ def selftest() -> None:
         "status": {"privacyStatus": "public", "embeddable": False},
         "liveStreamingDetails": {"scheduledStartTime": "2026-07-16T21:30:00Z"},
     }, "getv", "test")
-    assert emb_blocked is None
+    assert emb_blocked is not None and emb_blocked.embeddable is False
 
     # Prioridade: GE TV vence CazéTV; link único (alternativas vazio)
     principal, alternatives = choose_links({"getv": {"fonte": "getv"}, "cazetv": {"fonte": "cazetv"}}, ["getv", "cazetv"])

@@ -3096,6 +3096,11 @@ function melhoresMomentosDoJogo(j) {
   }
   return null;
 }
+function melhoresMomentosEhCaze(mm) {
+  const texto = [mm && mm.fonte, mm && mm.channel_title, mm && mm.canal].filter(Boolean).join(' ')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  return texto.includes('cazetv') || texto.includes('caze tv') || String(mm && mm.channel_id || '') === 'UCZiYbVptd3PVPf4f6eR6UaQ';
+}
 function youtubeVideoIdBr(valor) {
   const direto = String(valor || '').trim();
   if (/^[A-Za-z0-9_-]{6,20}$/.test(direto)) return direto;
@@ -3150,6 +3155,12 @@ function teclaModalMelhoresMomentos(evento) {
 }
 function abrirModalMelhoresMomentos(videoId, titulo, urlOriginal, fonte) {
   const id = youtubeVideoIdBr(videoId || urlOriginal);
+  const fonteNorm = String(fonte || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  if (fonteNorm.includes('cazetv') || fonteNorm.includes('caze tv')) {
+    const destino = urlOriginal || (id ? `https://www.youtube.com/watch?v=${encodeURIComponent(id)}` : '');
+    if (destino) window.open(destino, '_blank', 'noopener,noreferrer');
+    return;
+  }
   if (!id) {
     if (urlOriginal) window.open(urlOriginal, '_blank', 'noopener,noreferrer');
     return;
@@ -3210,7 +3221,8 @@ function htmlMelhoresMomentos(j, contexto = 'jogo') {
   const thumb = mm.thumbnail ? `<img src="${brEscapeAttr(mm.thumbnail)}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<span class=&quot;mm-play&quot;>▶</span>'">` : '<span class="mm-play">▶</span>';
   const conf = Number(mm.confianca || 0);
   const titleAttr = conf ? `${titulo} · confiança ${(conf * 100).toFixed(0)}%` : titulo;
-  if (!videoId) {
+  const embedBloqueado = mm.embeddable === false || melhoresMomentosEhCaze(mm);
+  if (!videoId || embedBloqueado) {
     return `<a class="mm-link mm-${contexto}" href="${brEscapeAttr(url)}" target="_blank" rel="noopener noreferrer" title="${brEscapeAttr(titleAttr)}">
       <span class="mm-thumb">${thumb}</span>
       <span class="mm-text"><strong>▶️ Melhores momentos</strong><span>${brEscapeHtml(titulo)}</span></span>

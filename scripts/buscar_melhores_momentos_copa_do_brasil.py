@@ -311,7 +311,7 @@ def search_game(client: YouTube, channel_id: str, game: Mapping[str, Any]) -> li
 
 def best_for_game(game: Mapping[str, Any], candidates: Sequence[Candidate], channel_ids: set[str]) -> Candidate | None:
     scored = [evaluate(candidate, game) for candidate in candidates if candidate.channel_id in channel_ids]
-    scored = [candidate for candidate in scored if candidate.score >= 92 and candidate.embeddable and candidate.public]
+    scored = [candidate for candidate in scored if candidate.score >= 92 and candidate.public]
     if not scored:
         return None
     scored.sort(key=lambda item: (item.score, item.published_at, item.video_id), reverse=True)
@@ -344,7 +344,7 @@ def build_payload(games: Sequence[Mapping[str, Any]], found: Mapping[str, Candid
                 "titulo": candidate.title,
                 "fonte": candidate.channel_title or "YouTube oficial",
                 "channel_id": candidate.channel_id,
-                "embeddable": True,
+                "embeddable": bool(candidate.embeddable and candidate.channel_id != "UCZiYbVptd3PVPf4f6eR6UaQ" and "caze" not in norm(candidate.channel_title)),
                 "confianca": round(min(1.0, candidate.score / 126.0), 4),
                 "motivos": list(candidate.reasons),
                 "origem_busca": candidate.source,

@@ -77,10 +77,13 @@ def validate(root: Path) -> None:
             if 'class="analysis-status status-eliminated"' in text:
                 assert re.search(r"Via Copa.*0%", text, flags=re.I | re.S), f"{slug}: eliminação sem zero explícito"
             expected_videos = int(article.get("melhores_momentos_vinculados") or 0)
-            video_ids = re.findall(r'data-video-id="([A-Za-z0-9_-]{11})"', text)
-            assert len(video_ids) == expected_videos, f"{slug}: quantidade de embeds diverge do manifesto ({len(video_ids)}/{expected_videos})"
+            inline_ids = re.findall(r'data-video-id="([A-Za-z0-9_-]{11})"', text)
+            external_ids = re.findall(r'class="analysis-cup-video-card analysis-cup-video-external"[^>]+href="https://www\.youtube\.com/watch\?v=([A-Za-z0-9_-]{11})"', text)
+            video_ids = inline_ids + external_ids
+            assert len(video_ids) == expected_videos, f"{slug}: quantidade de vídeos diverge do manifesto ({len(video_ids)}/{expected_videos})"
             assert len(video_ids) == len(set(video_ids)), f"{slug}: vídeo de melhores momentos duplicado"
-            assert text.count('class="analysis-cup-video-card analysis-inline-video"') == expected_videos, f"{slug}: cards de vídeo divergentes"
+            total_cards = text.count('class="analysis-cup-video-card analysis-inline-video"') + text.count('class="analysis-cup-video-card analysis-cup-video-external"')
+            assert total_cards == expected_videos, f"{slug}: cards de vídeo divergentes"
             assert '<iframe' not in ''.join(re.findall(r'<div class="analysis-cup-legs">.*?</div>\s*</article>', text, flags=re.S)), f"{slug}: iframe carregado antes do clique; lazy-load quebrado"
         elif article_type == "acuracia_temporada":
             temporada = int(article.get("temporada") or 2026)

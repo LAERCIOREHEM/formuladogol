@@ -693,11 +693,20 @@ def render_highlight(game: Mapping[str, Any], highlights: Mapping[str, Any]) -> 
     if not isinstance(video, Mapping):
         return ""
     video_id = str(video.get("video_id") or "").strip()
-    if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id) or video.get("embeddable") is False:
+    if not re.fullmatch(r"[A-Za-z0-9_-]{11}", video_id):
         return ""
     title = str(video.get("titulo") or f"{game.get('mandante')} x {game.get('visitante')} — melhores momentos")
     source = str(video.get("fonte") or "YouTube oficial")
     thumb = str(video.get("thumbnail") or f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg")
+    source_norm = source.casefold()
+    external_only = video.get("embeddable") is False or "caz" in source_norm or str(video.get("channel_id") or "") == "UCZiYbVptd3PVPf4f6eR6UaQ"
+    if external_only:
+        return f'''<a class="analysis-cup-video-card analysis-cup-video-external"
+          href="https://www.youtube.com/watch?v={esc(video_id)}" target="_blank" rel="noopener noreferrer"
+          aria-label="Abrir melhores momentos de {esc(game.get('mandante'))} x {esc(game.get('visitante'))} no canal oficial">
+          <span class="analysis-cup-video-thumb"><img src="{esc(thumb)}" alt="" loading="lazy"><i aria-hidden="true">↗</i></span>
+          <span class="analysis-cup-video-copy"><b>Melhores momentos</b><small>{esc(source)} · abrir no YouTube</small></span>
+        </a>'''
     return f'''<button type="button" class="analysis-cup-video-card analysis-inline-video"
       data-video-id="{esc(video_id)}" data-video-title="{esc(title)}" data-video-source="{esc(source)}"
       aria-label="Assistir melhores momentos de {esc(game.get('mandante'))} x {esc(game.get('visitante'))}">
