@@ -10,14 +10,14 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "resumo": {
-    "jogos_na_janela": 56,
+    "jogos_na_janela": 54,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 30,
+    "candidatos_oficiais_encontrados": 29,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 20,
-    "search_api_jogos_pulados_grade_estavel": 36,
+    "search_api_jogos_pulados_grade_estavel": 34,
     "transmissoes_publicadas": 1,
-    "sem_transmissao": 55,
+    "sem_transmissao": 53,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -43,28 +43,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841179",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bragantino x Corinthians",
-      "data_iso": "2026-08-09T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
-    {
-      "event_id": "401841182",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Santos x Athletico-PR",
-      "data_iso": "2026-08-09T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false
-    },
     {
       "event_id": "401841187",
       "rodada": 22,
@@ -682,16 +660,6 @@
   ],
   "rejeitados": [
     {
-      "video_id": "VxnLAx2ma0w",
-      "url": "https://www.youtube.com/watch?v=VxnLAx2ma0w",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "REACT DE JOÃO FONSECA X BEN SHELTON | OITAVAS DE FINAL | ESPECIAL MASTERS 1000 DE MONTREAL",
-      "status": "live",
-      "inicio_programado": "2026-08-09T18:45:00-03:00",
-      "motivo": "conteúdo rejeitado: react"
-    },
-    {
       "video_id": "6aH_p7C1D8w",
       "url": "https://www.youtube.com/watch?v=6aH_p7C1D8w",
       "fonte": "cazetv",
@@ -974,16 +942,6 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401841179",
-      "jogo": "Bragantino x Corinthians",
-      "motivo": "grade estável confirmada sem indício de GE TV/CazéTV"
-    },
-    {
-      "event_id": "401841182",
-      "jogo": "Santos x Athletico-PR",
-      "motivo": "grade estável confirmada sem indício de GE TV/CazéTV"
-    },
-    {
       "event_id": "401841187",
       "jogo": "Flamengo x Vitória",
       "motivo": "grade estável confirmada sem indício de GE TV/CazéTV"
@@ -1155,24 +1113,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401841179",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bragantino x Corinthians",
-      "data_iso": "2026-08-09T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
-    {
-      "event_id": "401841182",
-      "rodada": 22,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Santos x Athletico-PR",
-      "data_iso": "2026-08-09T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV"
-    },
     {
       "event_id": "401841187",
       "rodada": 22,
@@ -1653,13 +1593,13 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 45,
+    "unidades": 44,
     "requisicoes": {
       "channels": 2,
-      "videos": 23,
+      "videos": 22,
       "playlistItems": 20
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos channelIds oficiais de GE TV/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-09T20:04:30-03:00"
+  "atualizado_em": "2026-08-09T21:39:13-03:00"
 }
