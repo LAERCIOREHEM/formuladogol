@@ -2840,6 +2840,7 @@ body > .container > section.hero > img {
 
 <div id="modal-container"></div>
 
+<script src="js/br-classificacao-live.js?v=20260809-sync-live-v1"></script>
 <script>
 const BR_PUBLIC_ONLY = true;
 
@@ -4381,65 +4382,25 @@ function resultadoLiveJaEstaNoJson(live) {
 }
 
 function jogosLiveAplicaveisNaTabela() {
-  const oficiais = Object.fromEntries((state.tabela || []).map(t => [t.time, t]));
-  const contagem = contagemResultadosPorTime();
-  const vistos = new Set();
-  const saida = [];
-  for (const live of Object.values(state.espnLive || {})) {
-    const finalReal = espnLiveEhFinalReal(live);
-    if (!live || !(live.estado === 'in' || finalReal)) continue;
-    const m = nomeCanonico(live.mandante), v = nomeCanonico(live.visitante);
-    const pm = numeroPlacarLive(live.placarMandante), pv = numeroPlacarLive(live.placarVisitante);
-    if (!m || !v || pm === null || pv === null || !oficiais[m] || !oficiais[v]) continue;
-    const chave = `${m}|${v}`;
-    if (vistos.has(chave)) continue;
-    vistos.add(chave);
-
-    if (finalReal) {
-      const jaNoResultados = resultadoLiveJaEstaNoJson(live);
-      const esperadoM = (contagem[m] || 0) + (jaNoResultados ? 0 : 1);
-      const esperadoV = (contagem[v] || 0) + (jaNoResultados ? 0 : 1);
-      // Assim que a tabela oficial alcançar a quantidade de partidas concluídas,
-      // a projeção é retirada e a ESPN volta a ser a única fonte da classificação.
-      if (Number(oficiais[m].jogos) >= esperadoM && Number(oficiais[v].jogos) >= esperadoV) continue;
-    }
-    saida.push({ ...live, mandante: m, visitante: v, placarMandante: pm, placarVisitante: pv });
-  }
-  return saida;
+  if (!window.BRClassificacaoLive) return [];
+  return window.BRClassificacaoLive.applicableGames({
+    table: state.tabela || [],
+    results: state.resultados || [],
+    liveMap: state.espnLive || {},
+    canonicalize: nomeCanonico,
+  });
 }
 
 function tabelaComJogosAoVivo() {
-  const base = (state.tabela || []).map(t => ({ ...t, _aoVivo: false, _provisorioFinal: false }));
-  const porTime = Object.fromEntries(base.map(t => [t.time, t]));
-  const jogos = jogosLiveAplicaveisNaTabela();
-  for (const j of jogos) {
-    const m = porTime[j.mandante], v = porTime[j.visitante];
-    if (!m || !v) continue;
-    const pm = j.placarMandante, pv = j.placarVisitante;
-    for (const t of [m, v]) {
-      t.jogos = Number(t.jogos || 0) + 1;
-      t._aoVivo = j.estado === 'in';
-      t._provisorioFinal = j.estado === 'post' && espnLiveEhFinalReal(j);
-    }
-    m.gp = Number(m.gp || 0) + pm; m.gc = Number(m.gc || 0) + pv;
-    v.gp = Number(v.gp || 0) + pv; v.gc = Number(v.gc || 0) + pm;
-    if (pm > pv) { m.vitorias++; v.derrotas++; m.pontos += 3; }
-    else if (pm < pv) { v.vitorias++; m.derrotas++; v.pontos += 3; }
-    else { m.empates++; v.empates++; m.pontos++; v.pontos++; }
+  if (!window.BRClassificacaoLive) {
+    return { tabela: (state.tabela || []).map(t => ({ ...t })), jogos: [] };
   }
-  for (const t of base) {
-    t.sg = Number(t.gp || 0) - Number(t.gc || 0);
-    t.aproveitamento = t.jogos ? Math.round((Number(t.pontos || 0) / (Number(t.jogos) * 3)) * 100) : 0;
-  }
-  base.sort((a,b) =>
-    Number(b.pontos)-Number(a.pontos) ||
-    Number(b.vitorias)-Number(a.vitorias) ||
-    Number(b.sg)-Number(a.sg) ||
-    Number(b.gp)-Number(a.gp) ||
-    String(a.time).localeCompare(String(b.time), 'pt-BR')
-  );
-  base.forEach((t,i) => { t.pos = i + 1; });
-  return { tabela: base, jogos };
+  return window.BRClassificacaoLive.projectStandings({
+    table: state.tabela || [],
+    results: state.resultados || [],
+    liveMap: state.espnLive || {},
+    canonicalize: nomeCanonico,
+  });
 }
 
 function calcularTabelaReturno() {
@@ -5491,95 +5452,14 @@ function espnLiveData(live) {
 }
 
 function espnLiveEhFinalReal(live, referencia = new Date()) {
-  if (!live || espnLiveEhInterrompido(live)) return false;
-  const estado = String(live.estado || '').toLowerCase();
-  const concluido = live.completed === true || live.concluido === true;
-  if (estado !== 'post' && !concluido) return false;
-
-  const data = espnLiveData(live);
-  if (!data || data.getTime() > referencia.getTime() - 90 * 60 * 1000) return false;
-
-  const pm = numeroPlacarLive(live.placarMandante);
-  const pv = numeroPlacarLive(live.placarVisitante);
-  return pm !== null && pv !== null;
+  return window.BRClassificacaoLive
+    ? window.BRClassificacaoLive.isRealFinal(live, referencia)
+    : false;
 }
 
 async function espnLiveBuscar() {
-  // datas em UTC (ontem..amanhã) para cobrir jogos noturnos que viram o dia
-  const fmt = d => d.toISOString().slice(0, 10).replace(/-/g, '');
-  const hoje = new Date();
-  const ini = fmt(new Date(hoje.getTime() - 86400000));
-  const fim = fmt(new Date(hoje.getTime() + 86400000));
-  const url = `${ESPN_SCOREBOARD_BR}?dates=${ini}-${fim}&limit=60&_=${Date.now()}`;
-  const resp = await fetch(url, { cache: 'no-store' });
-  if (!resp.ok) throw new Error('ESPN HTTP ' + resp.status);
-  const data = await resp.json();
-
-  const novo = {};
-  for (const ev of (data.events || [])) {
-    try {
-      const comp = (ev.competitions || [])[0] || {};
-      const cs = comp.competitors || [];
-      const casa = cs.find(c => c.homeAway === 'home');
-      const fora = cs.find(c => c.homeAway === 'away');
-      if (!casa || !fora) continue;
-      const k = espnChaveJogo(
-        (casa.team || {}).displayName || (casa.team || {}).name,
-        (fora.team || {}).displayName || (fora.team || {}).name
-      );
-      if (!k) continue;
-
-      const st = (comp.status || {}) || {};
-      const tipo = st.type || {};
-      // gols: a ESPN traz em competitions[0].details (scoringPlay = true)
-      const gols = [];
-      for (const d of (comp.details || [])) {
-        if (!d || d.scoringPlay !== true) continue;
-        const atletaGol = ((d.athletesInvolved || [])[0] || {});
-        const quem = nomeJogadorCurtoESPN(atletaGol);
-        const min = ((d.clock || {}).displayValue || '').trim();
-        const timeGol = String((d.team || {}).id || '') === String((casa.team || {}).id || '')
-          ? (casa.team || {}).abbreviation : (fora.team || {}).abbreviation;
-        if (quem) gols.push(`${quem}${min ? ' ' + min : ''}${timeGol ? ' (' + timeGol + ')' : ''}`);
-      }
-
-      const dataIso = ev.date || comp.date || null;
-      const dataEvento = dataIso ? new Date(dataIso) : null;
-      const completed = tipo.completed === true;
-      const statusName = tipo.name || '';
-      const statusDescription = tipo.description || tipo.detail || tipo.shortDetail || '';
-      const statusTexto = [st.displayClock, tipo.shortDetail, tipo.detail, statusName, statusDescription]
-        .filter(Boolean).join(' ').toLowerCase();
-      let estadoSeguro = String(tipo.state || (completed ? 'post' : 'pre')).toLowerCase();
-
-      // state=post só é confiável se completed=true ou se o horário de início já
-      // tiver passado há pelo menos 90 minutos. Isso preserva empates reais em
-      // 0 x 0 com completed=false, sem transformar partidas futuras em resultado.
-      const dataValida = dataEvento && !Number.isNaN(dataEvento.getTime());
-      const interrompido = /postpon|adiad|suspend|cancel/.test(statusTexto);
-      if (estadoSeguro === 'post' && !completed &&
-          (interrompido || !dataValida || dataEvento.getTime() > Date.now() - 90 * 60 * 1000)) {
-        estadoSeguro = 'pre';
-      }
-
-      novo[k] = {
-        estado: estadoSeguro,                              // pre | in | post
-        completed: completed,
-        status: st.displayClock || tipo.shortDetail || tipo.detail || '',
-        statusName: statusName,
-        statusDescription: statusDescription,
-        placarMandante: casa.score != null ? casa.score : '-',
-        placarVisitante: fora.score != null ? fora.score : '-',
-        mandante: nomeCanonico((casa.team || {}).displayName || (casa.team || {}).name),
-        visitante: nomeCanonico((fora.team || {}).displayName || (fora.team || {}).name),
-        dataIso: dataIso,
-        eventId: ev.id || comp.id || null,
-        rodada: Number((((ev.seasonType || {}).name || '').match(/\d+/) || [])[0] || ((comp.notes || []).map(n => n && n.headline).join(' ').match(/\d+/) || [])[0] || 0),
-        gols: gols
-      };
-    } catch (e) { /* evento malformado: ignora */ }
-  }
-  state.espnLive = novo;
+  if (!window.BRClassificacaoLive) throw new Error('Motor de classificação ao vivo indisponível');
+  state.espnLive = await window.BRClassificacaoLive.fetchScoreboard({ canonicalize: nomeCanonico });
   state._espnLiveUltima = new Date();
 }
 

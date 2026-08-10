@@ -9,6 +9,7 @@
     rankingHistory: "dados-br/historico-ranking-desempenho.json",
     table: "tabela.json",
     results: "resultados.json",
+    schedule: "jogos.json",
     audit: "dados-br/auditoria-estatisticas.json",
     probabilities: "dados-br/probabilidades-brasileirao.json",
     probabilitiesAudit: "dados-br/auditoria-probabilidades.json",
@@ -26,6 +27,7 @@
   const REFRESH_MS = 30000;
 
   const refreshState = { timer: null, ocupado: false, assinatura: null };
+  const liveRefreshState = { timer: null, ocupado: false, assinatura: null };
 
   const state = {
     leaders: null,
@@ -35,6 +37,10 @@
     rankingHistory: null,
     table: null,
     results: null,
+    schedule: null,
+    espnLive: {},
+    espnLiveFetchedAt: null,
+    espnLiveError: null,
     audit: null,
     probabilities: null,
     probabilitiesAudit: null,
@@ -957,34 +963,147 @@
   // frase de "último cálculo" declara essa idade ao leitor.
   // ────────────────────────────────────────────────────────────────────
 
-  let standingsCache = { fonte: null, mapa: new Map() };
+  let standingsCache = { table: null, results: null, live: null, projection: null, mapa: new Map() };
 
-  function standingsIndex() {
-    const linhas = Array.isArray(state.table?.tabela) ? state.table.tabela : [];
-    if (standingsCache.fonte === linhas) return standingsCache.mapa;
-    const mapa = new Map();
-    linhas.forEach((linha) => {
-      const chave = normalize(linha?.time || linha?.clube);
-      if (!chave) return;
-      mapa.set(chave, {
-        posicao: Number(linha?.pos),
-        pontos: Number(linha?.pontos),
-        jogos: Number(linha?.jogos),
-      });
-    });
-    standingsCache = { fonte: linhas, mapa };
-    return mapa;
+  function canonicalLiveTeam(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return null;
+    const rows = Array.isArray(state.table?.tabela) ? state.table.tabela : [];
+    const exact = rows.find((row) => normalize(row?.time || row?.clube) === normalize(raw));
+    if (exact) return exact.time || exact.clube;
+
+    const aliases = {
+      "athletico paranaense": "Athletico-PR",
+      "athletico": "Athletico-PR",
+      "atletico paranaense": "Athletico-PR",
+      "atletico mineiro": "Atlético-MG",
+      "atletico mg": "Atlético-MG",
+      "red bull bragantino": "Bragantino",
+      "rb bragantino": "Bragantino",
+      "vasco": "Vasco da Gama",
+      "cr vasco da gama": "Vasco da Gama",
+      "ec bahia": "Bahia",
+      "ec vitoria": "Vitória",
+      "sc internacional": "Internacional",
+      "se palmeiras": "Palmeiras",
+      "cr flamengo": "Flamengo",
+      "clube do remo": "Remo",
+      "sao paulo fc": "São Paulo",
+      "santos fc": "Santos",
+      "mirassol fc": "Mirassol",
+      "coritiba fc": "Coritiba",
+      "chapecoense sc": "Chapecoense",
+      "sc corinthians paulista": "Corinthians",
+      "gremio fbpa": "Grêmio",
+      "botafogo rj": "Botafogo",
+      "fluminense fc": "Fluminense",
+      "cruzeiro ec": "Cruzeiro",
+    };
+    const key = normalize(raw);
+    if (aliases[key]) return aliases[key];
+
+    const tokens = [
+      ["paranaense", "Athletico-PR"], ["athletico", "Athletico-PR"], ["mineiro", "Atlético-MG"],
+      ["bragantino", "Bragantino"], ["chapecoense", "Chapecoense"], ["corinthians", "Corinthians"],
+      ["coritiba", "Coritiba"], ["cruzeiro", "Cruzeiro"], ["flamengo", "Flamengo"],
+      ["fluminense", "Fluminense"], ["gremio", "Grêmio"], ["internacional", "Internacional"],
+      ["mirassol", "Mirassol"], ["palmeiras", "Palmeiras"], ["remo", "Remo"], ["santos", "Santos"],
+      ["sao paulo", "São Paulo"], ["vasco", "Vasco da Gama"], ["botafogo", "Botafogo"],
+      ["bahia", "Bahia"], ["vitoria", "Vitória"],
+    ];
+    for (const [token, canonical] of tokens) {
+      if (` ${key} `.includes(` ${token} `) || key === token) return canonical;
+    }
+    return null;
   }
 
-  // Devolve o valor oficial quando disponível; senão preserva o do AF-Previsão.
+  function currentStandingsProjection() {
+    const table = Array.isArray(state.table?.tabela) ? state.table.tabela : [];
+    const results = Array.isArray(state.results?.resultados) ? state.results.resultados : [];
+    const live = state.espnLive || {};
+    if (
+      standingsCache.table === table &&
+      standingsCache.results === results &&
+      standingsCache.live === live &&
+      standingsCache.projection
+    ) return standingsCache.projection;
+
+    const engine = window.BRClassificacaoLive;
+    const projection = engine
+      ? engine.projectStandings({ table, results, liveMap: live, canonicalize: canonicalLiveTeam })
+      : { tabela: table.map((row) => ({ ...row })), jogos: [] };
+    const mapa = new Map();
+    projection.tabela.forEach((row) => {
+      const key = normalize(row?.time || row?.clube);
+      if (key) mapa.set(key, row);
+    });
+    standingsCache = { table, results, live, projection, mapa };
+    return projection;
+  }
+
+  function standingsIndex() {
+    currentStandingsProjection();
+    return standingsCache.mapa;
+  }
+
+  // Posição/pontos/jogos vêm da classificação factual (incluindo placar ao vivo).
+  // Percentuais e projeções permanecem presos ao snapshot do AF-Previsão.
   function liveStanding(club) {
-    const oficial = standingsIndex().get(normalize(club?.clube));
-    const escolher = (novo, antigo) => (Number.isFinite(novo) ? novo : antigo);
+    const official = standingsIndex().get(normalize(club?.clube));
+    const choose = (current, snapshot) => (Number.isFinite(Number(current)) ? Number(current) : snapshot);
     return {
-      posicao: escolher(oficial?.posicao, club?.posicao_atual),
-      pontos: escolher(oficial?.pontos, club?.pontos_atuais),
-      jogos: escolher(oficial?.jogos, club?.jogos_atuais),
+      posicao: choose(official?.pos, club?.posicao_atual),
+      pontos: choose(official?.pontos, club?.pontos_atuais),
+      jogos: choose(official?.jogos, club?.jogos_atuais),
+      aoVivo: official?._aoVivo === true,
+      provisorioFinal: official?._provisorioFinal === true,
     };
+  }
+
+  function dataHojeBR() {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(new Date());
+  }
+
+  function hojeEhTercaBR() {
+    const day = new Intl.DateTimeFormat("en-US", { timeZone: "America/Sao_Paulo", weekday: "short" }).format(new Date());
+    return day === "Tue";
+  }
+
+  function probabilityMovementSnapshot() {
+    const table = Array.isArray(state.table?.tabela) ? state.table.tabela : [];
+    if (!table.length) return null;
+    const current = Object.fromEntries(table.map((row) => [row.time || row.clube, Number(row.pos)]));
+    const today = dataHojeBR();
+    let snapshot = null;
+    try { snapshot = JSON.parse(localStorage.getItem("snapshot_tabela_v2") || "null"); } catch (_) {}
+    if (!snapshot) {
+      snapshot = { dataBase: today, posicoesBase: current };
+      try { localStorage.setItem("snapshot_tabela_v2", JSON.stringify(snapshot)); } catch (_) {}
+    } else if (hojeEhTercaBR() && snapshot.dataBase !== today) {
+      snapshot = { dataBase: today, posicoesBase: current };
+      try { localStorage.setItem("snapshot_tabela_v2", JSON.stringify(snapshot)); } catch (_) {}
+    }
+    return snapshot;
+  }
+
+  function probabilityMovementHtml(team, currentPosition) {
+    if (hojeEhTercaBR()) return "";
+    const snapshot = probabilityMovementSnapshot();
+    const base = Number(snapshot?.posicoesBase?.[team]);
+    const current = Number(currentPosition);
+    if (!base || !current || base === current) return "";
+    const diff = base - current;
+    return diff > 0
+      ? `<span class="probability-position-move is-up" title="Subiu ${diff} ${diff === 1 ? "posição" : "posições"}">▲${diff}</span>`
+      : `<span class="probability-position-move is-down" title="Caiu ${-diff} ${-diff === 1 ? "posição" : "posições"}">▼${-diff}</span>`;
+  }
+
+  function probabilityStandingBadge(standing) {
+    if (standing?.aoVivo) return '<span class="probability-standing-badge is-live">AO VIVO</span>';
+    if (standing?.provisorioFinal) return '<span class="probability-standing-badge is-final">FINAL</span>';
+    return "";
   }
 
   function probabilityClubRows() {
@@ -1501,7 +1620,7 @@
     const competitions = Array.isArray(integrated.competicoes) ? integrated.competicoes.length : 0;
     target.innerHTML = `<div class="probability-status-grid">
       <div><span>Modelo</span><strong>${escapeHtml(data.versao_modelo || "AF-Previsão")}</strong></div>
-      <div><span>Atualização</span><strong>${escapeHtml(dateTimeBR(data.gerado_em))}</strong></div>
+      <div><span>Último cálculo</span><strong>${escapeHtml(dateTimeBR(data.calculado_em || data.gerado_em))}</strong></div>
       <div><span>Campeonato</span><strong>${integer(base.partidas_concluidas)} concluídas · ${integer(base.partidas_restantes)} restantes</strong></div>
       <div><span>Universos integrados</span><strong>2.000.000 simulações${competitions ? ` · ${integer(competitions)} copas` : ""}</strong></div>
     </div>`;
@@ -1588,9 +1707,12 @@
     const noContinentalRaw = probabilityFieldValue(club, "sem_competicao_continental");
     const noContinentalTooltip = probabilityTooltip(noContinentalDetail)
       || `Complemento calculado antes do arredondamento conjunto: ${number(noContinentalRaw, 5)}%`;
-    return `<tr>
-      <td class="probability-table-position"><span>${integer(atual.posicao)}</span></td>
-      <th scope="row" class="probability-table-club"><a href="${escapeAttr(probabilityCardHref(club?.clube))}" aria-label="Ver projeção detalhada de ${escapeAttr(club?.clube)} nesta página">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong></a></th>
+    const movement = probabilityMovementHtml(club?.clube, atual.posicao);
+    const badge = probabilityStandingBadge(atual);
+    const rowClass = atual.aoVivo ? " is-live-standing" : (atual.provisorioFinal ? " is-final-standing" : "");
+    return `<tr class="${rowClass.trim()}">
+      <td class="probability-table-position"><span>${integer(atual.posicao)}</span>${movement}</td>
+      <th scope="row" class="probability-table-club"><a href="${escapeAttr(probabilityCardHref(club?.clube))}" aria-label="Ver projeção detalhada de ${escapeAttr(club?.clube)} nesta página">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong>${badge}</a></th>
       <td class="probability-table-number"><strong>${integer(atual.pontos)}</strong></td>
       <td class="probability-table-number">${integer(atual.jogos)}</td>
       <td class="probability-table-percent probability-cell-title" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "campeao")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "campeao"), probabilityFieldValue(club, "campeao")))}</td>
@@ -1603,51 +1725,64 @@
     </tr>`;
   }
 
-  // Data pública compacta da seção. Usa o evento de atualização mais recente
-  // entre Brasileirão, AF-Previsão e as três competições que alteram vagas.
-  function probabilityDataUpdatedAt() {
-    const candidates = [
-      state.updateStatus?.ultimo_sucesso,
-      state.updateStatus?.ultimo_snapshot_valido,
+  // Horário do snapshot probabilístico. Não mistura atualização esportiva factual
+  // com o momento em que o Monte Carlo realmente foi recalculado.
+  function probabilityCalculationAt() {
+    for (const value of [
       state.probabilities?.calculado_em,
       state.probabilities?.gerado_em,
       state.probabilitiesAudit?.gerado_em,
-      state.continentalAudit?.gerado_em,
-      state.leaders?.gerado_em,
-      state.competition?.gerado_em,
-      state.details?.gerado_em,
-      state.ranking?.gerado_em,
-    ];
-    const continentalRows = state.continentalAudit?.competicoes;
-    if (Array.isArray(continentalRows)) {
-      continentalRows.forEach((item) => candidates.push(item?.gerado_em));
-    }
-    let latest = null;
-    candidates.forEach((value) => {
-      if (!value) return;
+    ]) {
+      if (!value) continue;
       const parsed = new Date(value);
-      if (Number.isNaN(parsed.getTime())) return;
-      if (!latest || parsed > latest) latest = parsed;
-    });
-    return latest;
+      if (!Number.isNaN(parsed.getTime())) return parsed;
+    }
+    return null;
   }
 
-  function probabilityDataUpdatedLabel() {
-    const latest = probabilityDataUpdatedAt();
-    if (!latest) return "Dados atualizados recentemente";
+  function probabilityCalculationLabel() {
+    const latest = probabilityCalculationAt();
+    if (!latest) return "Último cálculo de probabilidades indisponível";
     const date = latest.toLocaleDateString("pt-BR", {
-      timeZone: "America/Sao_Paulo",
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
+      timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric",
     });
     const time = latest.toLocaleTimeString("pt-BR", {
-      timeZone: "America/Sao_Paulo",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
+      timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", hour12: false,
     });
-    return `Dados atualizados em ${date} às ${time} BRT`;
+    return `Probabilidades calculadas em ${date} às ${time} BRT`;
+  }
+
+  function probabilitySportsState() {
+    const projection = currentStandingsProjection();
+    const live = projection.jogos.some((game) => String(game?.estado || "").toLowerCase() === "in");
+    if (live) return "live";
+    const finalPending = projection.jogos.some((game) => String(game?.estado || "").toLowerCase() === "post");
+    if (finalPending) return "pending";
+
+    // Também detecta a janela em que tabela/resultados já foram publicados,
+    // mas o AF-Previsão ainda carrega pontos/jogos do snapshot anterior.
+    const behind = probabilityClubRows().some((club) => {
+      const current = liveStanding(club);
+      return Number(current.pontos) !== Number(club?.pontos_atuais) || Number(current.jogos) !== Number(club?.jogos_atuais);
+    });
+    return behind ? "pending" : "synced";
+  }
+
+  function probabilitySyncNotice() {
+    const status = probabilitySportsState();
+    if (status === "live") {
+      return `<div class="probability-sync-notice is-live" role="status">
+        <span class="probability-sync-dot" aria-hidden="true"></span>
+        <div><strong>CLASSIFICAÇÃO AO VIVO</strong><p>Pontos, jogos e posições consideram os placares em andamento. Os percentuais, a projeção final e a faixa permanecem no último cálculo do AF-Previsão.</p></div>
+      </div>`;
+    }
+    if (status === "pending") {
+      return `<div class="probability-sync-notice is-pending" role="status">
+        <span class="probability-sync-dot" aria-hidden="true"></span>
+        <div><strong>RESULTADOS ATUALIZADOS · PROBABILIDADES EM ATUALIZAÇÃO</strong><p>A classificação já reflete os resultados disponíveis; os percentuais serão substituídos somente quando a nova simulação íntegra for publicada.</p></div>
+      </div>`;
+    }
+    return "";
   }
 
 
@@ -1662,8 +1797,9 @@
     target.innerHTML = `<section class="probability-ranking-section probability-comparison-section" aria-label="Probabilidades">
       <div class="probability-section-head">
         <div><div class="kicker">Probabilidades</div></div>
-        <div class="probability-head-aside"><small>${escapeHtml(probabilityDataUpdatedLabel())}</small></div>
+        <div class="probability-head-aside"><small>${escapeHtml(probabilityCalculationLabel())}</small></div>
       </div>
+      ${probabilitySyncNotice()}
       <p class="probability-table-hint">↔ No celular, arraste a tabela para ver todas as probabilidades e projeções.</p>
       <div class="probability-table-shell">
         <table class="probability-comparison-table">
@@ -2000,7 +2136,7 @@
   }
 
   async function carregarDados() {
-    const [leaders, competition, details, ranking, rankingHistory, table, results, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation, pointsThresholds, updateStatus, continentalAudit] = await Promise.all([
+    const [leaders, competition, details, ranking, rankingHistory, table, results, schedule, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation, pointsThresholds, updateStatus, continentalAudit] = await Promise.all([
       fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
       fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
       fetchJson(FILES.details, { jogos: {} }),
@@ -2008,6 +2144,7 @@
       fetchJson(FILES.rankingHistory, { total_snapshots: 0, snapshots: [] }),
       fetchJson(FILES.table, { tabela: [] }),
       fetchJson(FILES.results, { resultados: [] }),
+      fetchJson(FILES.schedule, { jogos: [] }),
       fetchJson(FILES.audit, { status: "aguardando_workflow" }),
       fetchJson(FILES.probabilities, { status: "aguardando_workflow", clubes: [], partidas_restantes: [] }),
       fetchJson(FILES.probabilitiesAudit, { status: "aguardando_workflow" }),
@@ -2026,6 +2163,7 @@
     state.rankingHistory = rankingHistory;
     state.table = table;
     state.results = results;
+    state.schedule = schedule;
     state.audit = audit;
     state.probabilities = probabilities;
     state.probabilitiesAudit = probabilitiesAudit;
@@ -2082,6 +2220,71 @@
     });
   }
 
+  function liveSignature(liveMap) {
+    return Object.values(liveMap || {})
+      .map((game) => [game.eventId || "", game.estado || "", game.placarMandante ?? "", game.placarVisitante ?? "", game.status || ""].join(":"))
+      .sort()
+      .join("|");
+  }
+
+  function liveWindowActive() {
+    const engine = window.BRClassificacaoLive;
+    if (!engine) return false;
+    return engine.isWindowActive(
+      Array.isArray(state.schedule?.jogos) ? state.schedule.jogos : [],
+      state.espnLive || {},
+      new Date(),
+      20,
+      150,
+    );
+  }
+
+  async function refreshLiveStandings(options = {}) {
+    const engine = window.BRClassificacaoLive;
+    if (!engine || liveRefreshState.ocupado || document.hidden) return false;
+    if (!options.force && !liveWindowActive()) return false;
+    liveRefreshState.ocupado = true;
+    try {
+      const live = await engine.fetchScoreboard({ canonicalize: canonicalLiveTeam });
+      const signature = liveSignature(live);
+      const changed = signature !== liveRefreshState.assinatura;
+      state.espnLive = live;
+      state.espnLiveFetchedAt = new Date();
+      state.espnLiveError = null;
+      liveRefreshState.assinatura = signature;
+      standingsCache.live = null;
+      if (changed && options.render !== false) {
+        renderProbabilityRanking();
+        renderProbabilityDetails();
+      }
+      return changed;
+    } catch (error) {
+      // Falha momentânea da ESPN não apaga o último estado ao vivo válido.
+      state.espnLiveError = String(error?.message || error || "falha ao consultar ESPN");
+      console.warn("Estatísticas: classificação ao vivo temporariamente indisponível:", error);
+      return false;
+    } finally {
+      liveRefreshState.ocupado = false;
+    }
+  }
+
+  function armLiveRefresh() {
+    clearTimeout(liveRefreshState.timer);
+    const tick = async () => {
+      if (!document.hidden && liveWindowActive()) await refreshLiveStandings();
+      clearTimeout(liveRefreshState.timer);
+      liveRefreshState.timer = setTimeout(tick, REFRESH_MS);
+    };
+    liveRefreshState.timer = setTimeout(tick, REFRESH_MS);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) return;
+      clearTimeout(liveRefreshState.timer);
+      refreshLiveStandings({ force: liveWindowActive() }).finally(() => {
+        liveRefreshState.timer = setTimeout(tick, REFRESH_MS);
+      });
+    });
+  }
+
   async function load() {
     bindEvents();
     const hashTab = location.hash.replace(/^#/, "");
@@ -2092,6 +2295,7 @@
     else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "probabilidades", "desempenho"].includes(hashTab)) state.tab = hashTab;
 
     await carregarDados();
+    if (liveWindowActive()) await refreshLiveStandings({ force: true, render: false });
     renderAll();
     if (openProbabilityMethod) {
       requestAnimationFrame(() => $("metodologia-probabilidades")?.scrollIntoView({ behavior: "auto", block: "start" }));
@@ -2101,6 +2305,7 @@
       requestAnimationFrame(() => document.getElementById(hashTab)?.scrollIntoView({ behavior: "auto", block: "start" }));
     }
     armarAtualizacaoAutomatica();
+    armLiveRefresh();
   }
 
   document.addEventListener("DOMContentLoaded", load);
