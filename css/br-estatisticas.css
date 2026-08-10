@@ -2294,13 +2294,17 @@ body > .container > section.hero > img {
 .probability-comparison-table tr.is-final-standing > th,
 .probability-comparison-table tr.is-final-standing > td { background-image: linear-gradient(rgba(163, 230, 53, .018), rgba(163, 230, 53, .018)); }
 
-.probability-table-position { white-space: nowrap; }
+.probability-table-position {
+  white-space: nowrap;
+  text-align: center;
+}
 .probability-table-position > span:first-child {
-  display: grid;
+  display: inline-grid;
   place-items: center;
   width: 34px;
   height: 34px;
-  margin: auto;
+  margin: 0;
+  vertical-align: middle;
   border: 1px solid rgba(163,230,53,.27);
   border-radius: 11px;
   color: #efffc3;
@@ -2309,20 +2313,21 @@ body > .container > section.hero > img {
 }
 .probability-table-position .probability-position-move {
   display: inline-flex;
+  align-items: center;
   width: auto;
   height: auto;
   min-width: 0;
-  margin: 4px auto 0;
+  margin: 0 0 0 5px;
   padding: 1px 4px;
   border: 0;
-  border-radius: 6px;
-  background: transparent;
-  font-size: 9px;
-  font-weight: 950;
-  line-height: 1.25;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
 }
-.probability-position-move.is-up { color: #a3e635; }
-.probability-position-move.is-down { color: #fb7185; }
+.probability-position-move.is-up { color: var(--green-2); background: rgba(74,222,128,.10); }
+.probability-position-move.is-down { color: var(--danger); background: rgba(248,113,113,.10); }
 
 .probability-standing-badge {
   flex: 0 0 auto;
@@ -2340,7 +2345,7 @@ body > .container > section.hero > img {
   .probability-sync-notice strong { font-size: 10px; }
   .probability-sync-notice p { font-size: 10px; }
   .probability-table-position > span:first-child { width: 31px; height: 31px; }
-  .probability-table-position .probability-position-move { font-size: 8px; }
+  .probability-table-position .probability-position-move { margin-left: 3px; padding: 1px 3px; font-size: 9px; }
   .probability-standing-badge { font-size: 7px; }
 }
 
