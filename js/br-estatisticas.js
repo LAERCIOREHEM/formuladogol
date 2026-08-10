@@ -51,6 +51,7 @@
     updateStatus: null,
     continentalAudit: null,
     probabilitySort: "classificacao",
+    probabilityInlineClub: "",
     probabilityHistoryClub: "",
     probabilityHistoryMetric: "campeao_pct",
     tab: "probabilidades",
@@ -158,6 +159,10 @@
 
   function probabilityCardHref(name) {
     return `#${probabilityCardId(name)}`;
+  }
+
+  function probabilityInlinePanelId(name) {
+    return `probabilidade-resumo-${clubSlug(name) || "clube"}`;
   }
 
   function clubIdentityLink(name, inner, className = "", stopPropagation = false) {
@@ -1430,6 +1435,36 @@
     }).join("")}</div>`;
   }
 
+  function probabilityInlineDetailsRow(club) {
+    const clubName = String(club?.clube || "").trim();
+    if (!clubName) return "";
+    const position = projectedPosition(club);
+    const median = Number(club?.posicao_projetada_mediana);
+    const medianText = Number.isFinite(median) && median > 0 ? `${integer(median)}º` : "—";
+    const performanceHistory = performanceHistoryClubHtml(clubName);
+    return `<tr class="probability-inline-row" data-probability-inline-row="${escapeAttr(clubSlug(clubName))}">
+      <td colspan="11">
+        <div class="probability-inline-viewport">
+          <section class="probability-inline-panel" id="${escapeAttr(probabilityInlinePanelId(clubName))}" aria-label="Resumo estatístico de ${escapeAttr(clubName)}">
+            <header class="probability-inline-head">
+              <div><span>Resumo rápido</span><strong>${escapeHtml(clubName)}</strong></div>
+              <div class="probability-inline-head-meta"><span>projeção: <b>${position ? `${integer(position)}º` : "—"}</b></span><i>•</i><span>mediana: <b>${escapeHtml(medianText)}</b></span></div>
+            </header>
+            <section class="probability-inline-distribution" aria-label="Distribuição das 20 posições de ${escapeAttr(clubName)}">
+              <div class="probability-inline-section-title"><strong>Distribuição das 20 posições</strong><small>20 cenários de classificação</small></div>
+              ${probabilityPositionDistribution(club)}
+            </section>
+            ${performanceHistory ? `<div class="probability-inline-evolution">${performanceHistory}</div>` : ""}
+            <div class="probability-inline-actions">
+              <a href="${escapeAttr(probabilityCardHref(clubName))}" data-probability-inline-more="${escapeAttr(clubName)}">Mais detalhes de ${escapeHtml(clubName)} ↓</a>
+              <button type="button" data-probability-inline-close="${escapeAttr(clubName)}">Recolher ▲</button>
+            </div>
+          </section>
+        </div>
+      </td>
+    </tr>`;
+  }
+
   function probabilitySortRows(rows) {
     const sort = state.probabilitySort;
     const sorted = rows.slice();
@@ -1709,10 +1744,11 @@
       || `Complemento calculado antes do arredondamento conjunto: ${number(noContinentalRaw, 5)}%`;
     const movement = probabilityMovementHtml(club?.clube, atual.posicao);
     const badge = probabilityStandingBadge(atual);
-    const rowClass = atual.aoVivo ? " is-live-standing" : (atual.provisorioFinal ? " is-final-standing" : "");
-    return `<tr class="${rowClass.trim()}">
+    const inlineOpen = normalize(state.probabilityInlineClub) === normalize(club?.clube);
+    const rowClass = `${atual.aoVivo ? " is-live-standing" : (atual.provisorioFinal ? " is-final-standing" : "")}${inlineOpen ? " is-inline-open" : ""}`;
+    return `<tr class="${rowClass.trim()}" data-probability-table-club="${escapeAttr(clubSlug(club?.clube))}">
       <td class="probability-table-position"><span>${integer(atual.posicao)}</span>${movement}</td>
-      <th scope="row" class="probability-table-club"><a href="${escapeAttr(probabilityCardHref(club?.clube))}" aria-label="Ver projeção detalhada de ${escapeAttr(club?.clube)} nesta página">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong>${badge}</a></th>
+      <th scope="row" class="probability-table-club"><button type="button" class="probability-table-club-toggle" data-probability-inline-toggle="${escapeAttr(club?.clube)}" aria-expanded="${inlineOpen ? "true" : "false"}" aria-controls="${escapeAttr(probabilityInlinePanelId(club?.clube))}" aria-label="${inlineOpen ? "Recolher" : "Abrir"} resumo de ${escapeAttr(club?.clube)}">${shield(info, "probability-table-shield")}<strong>${escapeHtml(club?.clube)}</strong>${badge}<span class="probability-table-toggle-caret" aria-hidden="true">${inlineOpen ? "▴" : "▾"}</span></button></th>
       <td class="probability-table-number"><strong>${integer(atual.pontos)}</strong></td>
       <td class="probability-table-number">${integer(atual.jogos)}</td>
       <td class="probability-table-percent probability-cell-title" title="${escapeAttr(probabilityTooltip(probabilityFieldDetail(club, "campeao")))}">${escapeHtml(probabilityDisplayText(probabilityFieldDetail(club, "campeao"), probabilityFieldValue(club, "campeao")))}</td>
@@ -1789,6 +1825,8 @@
   function renderProbabilityRanking() {
     const target = $("probabilidades-ranking");
     if (!target) return;
+    const previousShell = target.querySelector(".probability-table-shell");
+    const previousScrollLeft = previousShell ? previousShell.scrollLeft : 0;
     const rows = probabilitySortRows(probabilityClubRows());
     if (!rows.length) {
       target.innerHTML = "";
@@ -1804,11 +1842,17 @@
       <div class="probability-table-shell">
         <table class="probability-comparison-table">
           <thead><tr><th>Pos.</th><th>Time</th><th>Pts</th><th>J</th><th>Campeão</th><th>Libertadores</th><th>Sul-Americana</th><th>Sem continental</th><th>Rebaixamento</th><th title="Posição única na classificação projetada por pontos finais médios">Proj.</th><th>Faixa</th></tr></thead>
-          <tbody>${rows.map(probabilityComparisonRow).join("")}</tbody>
+          <tbody>${rows.map((club) => {
+            const row = probabilityComparisonRow(club);
+            const inline = normalize(state.probabilityInlineClub) === normalize(club?.clube) ? probabilityInlineDetailsRow(club) : "";
+            return row + inline;
+          }).join("")}</tbody>
         </table>
       </div>
       <p class="probability-continental-note"><strong>Destino continental:</strong> Libertadores + Sul-Americana + sem competição continental = <strong>100%</strong> em cada clube. Os três valores são arredondados em conjunto e usam de uma a três casas conforme a precisão necessária; uma possibilidade válida abaixo da resolução recebe o piso visual de 0,001%, compensado no maior destino. Rebaixamento é um risco independente, pois uma vaga conquistada por copa pode coexistir com queda.</p>
     </section>`;
+    const shell = target.querySelector(".probability-table-shell");
+    if (shell && previousScrollLeft) shell.scrollLeft = previousScrollLeft;
   }
 
   function renderProbabilityDetails() {
@@ -2074,6 +2118,36 @@
           state.rankingCompare = [first[0] || "", first[1] || "", ""];
         }
         renderRanking();
+        return;
+      }
+      const probabilityInlineToggle = event.target.closest("[data-probability-inline-toggle]");
+      if (probabilityInlineToggle) {
+        event.preventDefault();
+        const club = probabilityInlineToggle.dataset.probabilityInlineToggle || "";
+        state.probabilityInlineClub = normalize(state.probabilityInlineClub) === normalize(club) ? "" : club;
+        renderProbabilityRanking();
+        return;
+      }
+      const probabilityInlineClose = event.target.closest("[data-probability-inline-close]");
+      if (probabilityInlineClose) {
+        event.preventDefault();
+        const club = probabilityInlineClose.dataset.probabilityInlineClose || state.probabilityInlineClub || "";
+        state.probabilityInlineClub = "";
+        renderProbabilityRanking();
+        requestAnimationFrame(() => {
+          const toggle = qsa("[data-probability-inline-toggle]").find((item) => normalize(item.dataset.probabilityInlineToggle) === normalize(club));
+          toggle?.focus({ preventScroll: true });
+          toggle?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+        });
+        return;
+      }
+      const probabilityInlineMore = event.target.closest("[data-probability-inline-more]");
+      if (probabilityInlineMore) {
+        event.preventDefault();
+        const club = probabilityInlineMore.dataset.probabilityInlineMore || "";
+        const cardId = probabilityCardId(club);
+        history.replaceState(null, "", `#${cardId}`);
+        document.getElementById(cardId)?.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
       const probabilityMethod = event.target.closest("[data-probability-method]");

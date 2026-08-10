@@ -1804,8 +1804,16 @@ body > .container > section.hero > img {
 .probability-comparison-table thead th:nth-child(2) { z-index: 7; background: #12212b; }
 .probability-table-position span { display: grid; place-items: center; width: 34px; height: 34px; margin: auto; border: 1px solid rgba(163,230,53,.27); border-radius: 11px; color: #efffc3; background: rgba(163,230,53,.09); font-weight: 950; }
 .probability-table-club { text-align: left !important; }
-.probability-table-club a { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
-.probability-table-club a:hover strong { color: var(--green); }
+.probability-table-club a,
+.probability-table-club-toggle { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
+.probability-table-club-toggle { width: 100%; margin: 0; padding: 0; border: 0; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.probability-table-club a:hover strong,
+.probability-table-club-toggle:hover strong,
+.probability-table-club-toggle:focus-visible strong { color: var(--green); }
+.probability-table-club-toggle:focus-visible { outline: 2px solid rgba(163,230,53,.52); outline-offset: 4px; border-radius: 7px; }
+.probability-table-toggle-caret { flex: 0 0 auto; margin-left: auto; color: #8fa1b1; font-size: 12px; line-height: 1; transition: color .16s ease, transform .16s ease; }
+.probability-table-club-toggle:hover .probability-table-toggle-caret,
+.probability-table-club-toggle[aria-expanded="true"] .probability-table-toggle-caret { color: #d9ff76; }
 .probability-table-shield { flex: 0 0 auto; width: 32px; height: 32px; object-fit: contain; }
 .probability-table-number strong { color: #dfff8c; font-size: 15px; }
 .probability-table-percent { font-weight: 950; font-variant-numeric: tabular-nums; }
@@ -1837,7 +1845,8 @@ body > .container > section.hero > img {
   .probability-comparison-table tbody th:nth-child(2) { left: 48px; width: 158px; min-width: 158px; }
   .probability-table-position span { width: 31px; height: 31px; }
   .probability-table-shield { width: 28px; height: 28px; }
-  .probability-table-club a { gap: 7px; }
+  .probability-table-club a,
+  .probability-table-club-toggle { gap: 7px; }
   .probability-table-club strong { max-width: 112px; overflow: hidden; text-overflow: ellipsis; }
 }
 
@@ -2355,4 +2364,169 @@ body > .container > section.hero > img {
 
 @media (prefers-reduced-motion: reduce) {
   .probability-sync-notice.is-live .probability-sync-dot { animation: none; }
+}
+
+
+/* ======================================================================
+   AF-Previsão — resumo inline por clube na tabela comparativa
+   Clique no time abre apenas distribuição das posições + evolução AF-Score.
+   O detalhamento completo continua na seção "Análise por time".
+   ====================================================================== */
+.probability-comparison-table tr.is-inline-open > th,
+.probability-comparison-table tr.is-inline-open > td {
+  background-image: linear-gradient(rgba(163,230,53,.045), rgba(163,230,53,.045));
+}
+.probability-inline-row:hover > * { background-color: transparent !important; }
+.probability-comparison-table tbody tr.probability-inline-row > td {
+  position: static !important;
+  left: auto !important;
+  z-index: 1 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto;
+  padding: 0;
+  border-bottom: 1px solid rgba(163,230,53,.18);
+  background: #071820;
+  white-space: normal;
+  text-align: left;
+}
+.probability-inline-viewport {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px 12px;
+}
+.probability-inline-panel {
+  width: 100%;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid rgba(163,230,53,.26);
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgba(9,27,34,.96), rgba(5,18,25,.98));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 10px 24px rgba(0,0,0,.15);
+}
+.probability-inline-head,
+.probability-inline-section-title,
+.probability-inline-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.probability-inline-head { margin-bottom: 10px; }
+.probability-inline-head > div:first-child > span,
+.probability-inline-head > div:first-child > strong { display: block; }
+.probability-inline-head > div:first-child > span {
+  color: var(--green);
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+}
+.probability-inline-head > div:first-child > strong { margin-top: 2px; color: #fff; font-size: 14px; }
+.probability-inline-head-meta { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 9px; }
+.probability-inline-head-meta b { color: #d9ff76; font-size: 10px; }
+.probability-inline-head-meta i { color: #526575; font-style: normal; }
+.probability-inline-distribution {
+  padding: 11px;
+  border: 1px solid rgba(148,163,184,.12);
+  border-radius: 13px;
+  background: rgba(5,15,22,.45);
+}
+.probability-inline-section-title strong,
+.probability-inline-section-title small { display: block; }
+.probability-inline-section-title strong { color: #fff; font-size: 11px; }
+.probability-inline-section-title small { color: var(--muted); font-size: 8px; }
+.probability-inline-panel .probability-position-grid { margin-top: 8px; }
+.probability-inline-evolution { margin-top: 9px; }
+.probability-inline-evolution .club-performance-history { padding: 11px; }
+.probability-inline-evolution .club-performance-history > p { display: none; }
+.probability-inline-evolution .club-evolution-strip { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.probability-inline-actions { justify-content: flex-end; margin-top: 10px; }
+.probability-inline-actions a,
+.probability-inline-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 9px;
+  font-weight: 950;
+  text-decoration: none;
+  cursor: pointer;
+}
+.probability-inline-actions a {
+  border: 1px solid rgba(163,230,53,.30);
+  color: #eaffb5;
+  background: rgba(163,230,53,.08);
+}
+.probability-inline-actions button {
+  border: 1px solid rgba(148,163,184,.18);
+  color: #c7d3de;
+  background: rgba(255,255,255,.035);
+}
+.probability-inline-actions a:hover,
+.probability-inline-actions a:focus-visible { background: rgba(163,230,53,.14); outline: none; }
+.probability-inline-actions button:hover,
+.probability-inline-actions button:focus-visible { color: #fff; background: rgba(255,255,255,.075); outline: none; }
+
+@media (max-width: 700px) {
+  .probability-inline-viewport {
+    position: sticky;
+    left: 0;
+    width: calc(100vw - 46px);
+    max-width: calc(100vw - 46px);
+    padding: 8px;
+  }
+  .probability-inline-panel { padding: 9px; border-radius: 13px; }
+  .probability-inline-head { align-items: flex-start; margin-bottom: 8px; }
+  .probability-inline-head > div:first-child > strong { font-size: 12px; }
+  .probability-inline-head-meta { gap: 4px; font-size: 8px; }
+  .probability-inline-distribution { padding: 8px; }
+  .probability-inline-section-title small { display: none; }
+  .probability-inline-panel .probability-position-grid {
+    grid-template-columns: repeat(4,minmax(0,1fr));
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .probability-inline-panel .probability-position-cell {
+    grid-template-columns: auto minmax(0,1fr);
+    gap: 3px 4px;
+    padding: 5px;
+    border-radius: 7px;
+  }
+  .probability-inline-panel .probability-position-cell span { font-size: 8px; }
+  .probability-inline-panel .probability-position-cell strong { font-size: 8px; }
+  .probability-inline-panel .probability-position-cell > div { grid-column: 1 / -1; height: 3px; }
+  .probability-inline-evolution { margin-top: 7px; }
+  .probability-inline-evolution .club-performance-history { padding: 8px; }
+  .probability-inline-evolution .club-evolution-head { display: flex; flex-direction: row; align-items: flex-end; gap: 7px; }
+  .probability-inline-evolution .club-evolution-head > small { max-width: 120px; text-align: right; font-size: 7px; }
+  .probability-inline-evolution .club-evolution-strip {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(118px, 42%);
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .probability-inline-evolution .club-evolution-card { padding: 8px; scroll-snap-align: start; }
+  .probability-inline-evolution .club-evolution-card > strong { font-size: 15px; }
+  .probability-inline-actions { gap: 6px; margin-top: 8px; }
+  .probability-inline-actions a,
+  .probability-inline-actions button { min-height: 32px; padding: 6px 9px; font-size: 8px; }
+}
+
+@media (max-width: 390px) {
+  .probability-inline-viewport { width: calc(100vw - 38px); max-width: calc(100vw - 38px); padding-inline: 6px; }
+  .probability-inline-head-meta i { display: none; }
+  .probability-inline-head-meta { display: grid; gap: 1px; text-align: right; }
+  .probability-inline-panel .probability-position-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+  .probability-inline-panel .probability-position-cell { padding: 4px; }
+  .probability-inline-evolution .club-evolution-strip { grid-auto-columns: minmax(112px, 46%); }
+  .probability-inline-actions { justify-content: space-between; }
 }
