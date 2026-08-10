@@ -8,15 +8,6 @@ on:
         required: false
         default: false
         type: boolean
-      encadear_rodada:
-        description: 'Ao concluir, disparar o editorial da rodada (uso interno do Atualizar Brasileirao)'
-        required: false
-        default: false
-        type: boolean
-  schedule:
-    # Retentativas determinísticas curtas e independentes durante fechamentos.
-    # A redação por IA fica centralizada na auditoria diária, uma vez por dia.
-    - cron: '28 6,10 * * *'
 
 permissions:
   contents: write
@@ -161,13 +152,3 @@ jobs:
           set -euo pipefail
           gh workflow run deploy.yml --ref main
           echo "Deploy disparado para a Copa do Brasil recém-publicada."
-
-      - name: Encadear editorial determinístico da rodada
-        if: ${{ always() && github.event_name == 'workflow_dispatch' && inputs.encadear_rodada == true }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh workflow run publicar-analise-rodada.yml --ref main
-          echo "Editorial determinístico da rodada despachado; a IA diária permanece centralizada."

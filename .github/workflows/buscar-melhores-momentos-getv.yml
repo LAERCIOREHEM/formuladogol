@@ -1,4 +1,5 @@
 name: Buscar melhores momentos oficiais
+run-name: Melhores momentos · ${{ inputs.modo || 'incremental' }}
 
 on:
   workflow_dispatch:
@@ -27,10 +28,6 @@ on:
         description: "Consultas por jogo em cada canal oficial"
         required: true
         default: "2"
-  # 3 vezes ao dia. 04:30, 11:30 e 17:30 UTC equivalem a
-  # 01:30, 08:30 e 14:30 no horário de Brasília.
-  schedule:
-    - cron: '30 4,11,17 * * *'
 
 permissions:
   contents: write
@@ -242,11 +239,12 @@ jobs:
           echo "ERRO: Push falhou após 5 tentativas."
           exit 1
 
-
-      - name: Reavaliar editoriais determinísticos após novos melhores momentos
+      - name: Disparar deploy após melhores momentos publicados
         if: steps.publish.outputs.published == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+        shell: bash
         run: |
-          gh workflow run publicar-analise-rodada.yml --ref main
-          gh workflow run publicar-analise-copa-do-brasil.yml --ref main
+          set -euo pipefail
+          gh workflow run deploy.yml --ref main
+          echo "Deploy disparado para os melhores momentos recém-publicados."

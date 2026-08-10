@@ -1,17 +1,21 @@
 name: Buscar transmissões dos clubes do Brasileirão
+run-name: Transmissões · ${{ inputs.modo || 'completo' }} · ${{ inputs.event_id || 'todos' }}
 
 on:
-  # Busca ativa a cada 10 minutos nas faixas de jogos.
-  # Na madrugada, uma verificação por hora preserva atualidade sem consumir quota.
-  # O search.list caro só é acionado pelo script na janela crítica e quando necessário.
-  schedule:
-    - cron: '3,13,23,33,43,53 9-23 * * *'
-    - cron: '3,13,23,33,43,53 0-2 * * *'
-    - cron: '17 3-8 * * *'
+  # Sem schedule e sem push automático. O orquestrador decide quando há trabalho.
   workflow_dispatch:
     inputs:
+      modo:
+        description: 'aovivo = player GE TV/CazéTV; tv = grade futura; completo = ambos'
+        required: true
+        default: 'completo'
+        type: choice
+        options:
+          - aovivo
+          - tv
+          - completo
       event_id:
-        description: 'Opcional: pesquisar apenas um event_id da ESPN'
+        description: 'Opcional: pesquisar apenas um event_id da ESPN no modo aovivo'
         required: false
         default: ''
         type: string
@@ -20,25 +24,10 @@ on:
         required: false
         default: false
         type: boolean
-  push:
-    paths:
-      - 'scripts/buscar_transmissoes_aovivo_brasileirao.py'
-      - 'scripts/gerar_agenda_clubes_brasileirao.py'
-      - 'jogos.json'
-      - 'dados-br/calendario-completo.json'
-      - 'dados-br/competicoes-af-previsao/copa-do-brasil.json'
-      - 'dados-br/competicoes-af-previsao/libertadores.json'
-      - 'dados-br/competicoes-af-previsao/sul-americana.json'
-      - 'dados-br/config-transmissoes-aovivo.json'
-      - 'dados-br/transmissoes-aovivo-manual.json'
-      - 'dados-br/config-transmissoes-tv.json'
-      - 'transmissoes.json'
-      - 'scripts/atualizar_transmissoes_tv_brasileirao.py'
-      - 'fontes_brasileirao.py'
-      - '.github/workflows/buscar-transmissoes-aovivo-brasileirao.yml'
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: repo-write-main
@@ -89,31 +78,38 @@ jobs:
       - name: Buscar transmissões oficiais
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-          EVENT_NAME: ${{ github.event_name }}
+          INPUT_MODO: ${{ inputs.modo }}
           INPUT_EVENT_ID: ${{ inputs.event_id }}
           INPUT_DRY_RUN: ${{ inputs.dry_run }}
         shell: bash
         run: |
           set -euo pipefail
 
-          CMD=(python scripts/buscar_transmissoes_aovivo_brasileirao.py)
-
-          if [[ -n "${INPUT_EVENT_ID:-}" ]]; then
-            CMD+=(--event-id "${INPUT_EVENT_ID}")
+          MODO="${INPUT_MODO:-completo}"
+          if [[ "$MODO" != "tv" ]]; then
+            CMD=(python scripts/buscar_transmissoes_aovivo_brasileirao.py)
+            if [[ -n "${INPUT_EVENT_ID:-}" ]]; then
+              CMD+=(--event-id "${INPUT_EVENT_ID}")
+            fi
+            if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+              CMD+=(--dry-run)
+            fi
+            echo "Executando player ao vivo: ${CMD[*]}"
+            "${CMD[@]}"
+          else
+            echo "Modo tv: busca de player ao vivo não será executada."
           fi
-          if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
-            CMD+=(--dry-run)
-          fi
 
-          echo "Executando: ${CMD[*]}"
-          "${CMD[@]}"
-
-          TV_CMD=(python scripts/atualizar_transmissoes_tv_brasileirao.py)
-          if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
-            TV_CMD+=(--dry-run)
+          if [[ "$MODO" != "aovivo" ]]; then
+            TV_CMD=(python scripts/atualizar_transmissoes_tv_brasileirao.py)
+            if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+              TV_CMD+=(--dry-run)
+            fi
+            echo "Executando grade de TV: ${TV_CMD[*]}"
+            "${TV_CMD[@]}"
+          else
+            echo "Modo aovivo: atualização da grade de TV não será executada."
           fi
-          echo "Executando: ${TV_CMD[*]}"
-          "${TV_CMD[@]}"
 
       - name: Validar relatórios gerados
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != true }}
@@ -191,22 +187,33 @@ jobs:
           PY
 
       - name: Commitar somente quando houver mudança real
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != true }}
+        id: publish
+        if: ${{ inputs.dry_run != true }}
+        env:
+          INPUT_MODO: ${{ inputs.modo }}
         shell: bash
         run: |
           set -euo pipefail
+          echo "published=false" >> "$GITHUB_OUTPUT"
           cd "$GITHUB_WORKSPACE"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          FILES=(
-            "dados-br/agenda-clubes-br.json"
-            "dados-br/transmissoes-aovivo.json"
-            "dados-br/auditoria-transmissoes-aovivo.json"
-            "dados-br/transmissoes-tv.json"
-            "dados-br/auditoria-transmissoes-tv.json"
-          )
+          MODO="${INPUT_MODO:-completo}"
+          FILES=("dados-br/agenda-clubes-br.json")
+          if [[ "$MODO" != "tv" ]]; then
+            FILES+=(
+              "dados-br/transmissoes-aovivo.json"
+              "dados-br/auditoria-transmissoes-aovivo.json"
+            )
+          fi
+          if [[ "$MODO" != "aovivo" ]]; then
+            FILES+=(
+              "dados-br/transmissoes-tv.json"
+              "dados-br/auditoria-transmissoes-tv.json"
+            )
+          fi
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Nenhuma transmissão nova ou mudança de auditoria. Nada para commitar."
@@ -240,6 +247,7 @@ jobs:
 
             if git push origin HEAD:main; then
               echo "Push concluído na tentativa $i."
+              echo "published=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
 
@@ -249,3 +257,13 @@ jobs:
 
           echo "ERRO: push falhou após 5 tentativas."
           exit 1
+
+      - name: Disparar deploy após transmissão publicada
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run deploy.yml --ref main
+          echo "Deploy disparado para a atualização de transmissões."

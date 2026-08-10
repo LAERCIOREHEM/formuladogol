@@ -1,9 +1,9 @@
 name: Atualizar Brasileirao (ESPN)
 
 on:
-  # Execução operacional exclusiva por workflow_dispatch. O cron-job.org
-  # chama este mesmo gatilho; o botão "Run workflow" continua disponível.
-  # Não há schedule interno nem push automático, evitando execuções duplicadas.
+  # Execução operacional exclusiva por workflow_dispatch. O orquestrador
+  # inteligente chama este gatilho quando existe trabalho esportivo real;
+  # o botão "Run workflow" continua disponível para uso excepcional.
   workflow_dispatch:
     inputs:
       forcar_af:
@@ -271,10 +271,6 @@ jobs:
           python scripts/gerar_agenda_clubes_brasileirao.py
           python -m json.tool dados-br/agenda-clubes-br.json > /dev/null
 
-      - name: Atualizar transmissões oficiais da agenda
-        if: ${{ always() && steps.continental.outcome == 'success' }}
-        run: python scripts/atualizar_transmissoes_tv_brasileirao.py
-
       - name: Verificar se o estado esportivo exige novo AF-Previsão
         if: ${{ always() && steps.continental.outcome == 'success' }}
         id: af_gate
@@ -437,12 +433,6 @@ jobs:
       - name: Auditar histórico e preparar avaliação final do AF-Previsão
         if: steps.af_generate.outputs.af_updated == 'true'
         run: python scripts/avaliar_af_previsao.py --strict
-
-      - name: Atualizar melhores momentos oficiais da Copa do Brasil
-        if: ${{ steps.continental.outcome == 'success' }}
-        env:
-          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
-        run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
 
       - name: Gerar editorial determinístico da fase atual da Copa do Brasil
         if: ${{ steps.continental.outcome == 'success' && (steps.af_gate.outputs.run_af != 'true' || steps.af_generate.outcome == 'success') }}
@@ -1280,22 +1270,6 @@ jobs:
           # explicitamente após o commit ter sido publicado no main.
           gh workflow run deploy.yml --ref main
           echo "Deploy do site disparado para o main recém-publicado."
-
-      - name: Disparar editoriais somente após publicação válida
-        if: >-
-          steps.publish_main.outputs.published == 'true' ||
-          steps.publish_independent.outputs.published == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          # IMPORTANTE: não dispare os dois workflows editoriais ao mesmo tempo.
-          # Todos os workflows que escrevem no main usam repo-write-main.
-          # A Copa é o primeiro elo e encadeia a análise determinística da rodada.
-          # Nenhum destes workflows chama OpenAI; a IA roda uma única vez ao dia.
-          gh workflow run publicar-analise-copa-do-brasil.yml --ref main -f encadear_rodada=true
-          echo "Editorial determinístico da Copa disparado; ele encadeará o editorial determinístico da rodada."
 
   # Alerta integrado ao próprio workflow. Substitui o antigo workflow
   # "Monitorar Atualizar Brasileirao" e evita uma execução cinza a cada hora.
