@@ -34,6 +34,25 @@ ARQUIVO_CONFIG = Path("dados-br/config-analises.json")
 ARQUIVO_ACURACIA = Path("dados-br/acuracia-af-previsao.json")
 CAMINHO_ANALISES = Path("analises")
 MARCADOR = "fdg-analise-rodada"
+LIMITE_CLUBES_MOVIMENTOS = 8
+MOVIMENTOS_EDITORIAIS = {
+    "titulo": {
+        "rotulo": "Título", "icone": "🏆", "valor": "titulo_depois", "delta": "titulo_delta",
+        "possivel": "titulo_possivel_depois", "limiar_pp": 0.1,
+    },
+    "libertadores": {
+        "rotulo": "Libertadores", "icone": "🟢", "valor": "libertadores_depois", "delta": "libertadores_delta",
+        "possivel": "libertadores_possivel_depois", "limiar_pp": 1.0,
+    },
+    "sul_americana": {
+        "rotulo": "Sul-Americana", "icone": "🔵", "valor": "sul_americana_depois", "delta": "sul_americana_delta",
+        "possivel": "sul_americana_possivel_depois", "limiar_pp": 1.0,
+    },
+    "rebaixamento": {
+        "rotulo": "Rebaixamento", "icone": "🔻", "valor": "rebaixamento_depois", "delta": "rebaixamento_delta",
+        "possivel": "rebaixamento_possivel_depois", "limiar_pp": 1.0,
+    },
+}
 
 
 class ErroAnalise(RuntimeError):
@@ -360,6 +379,17 @@ def libertadores_matematicamente_possivel(clube: dict[str, Any]) -> bool:
     return int(clube.get("jogos_atuais") or 0) < 38
 
 
+def sul_americana_matematicamente_possivel(clube: dict[str, Any]) -> bool:
+    if float(clube.get("sul_americana_pct") or 0) > 0:
+        return True
+    total = (((clube.get("decomposicao_chances") or {}).get("sul_americana") or {}).get("total") or {})
+    if total.get("impossivel_estruturalmente") is True:
+        return False
+    if total.get("possivel_estruturalmente") is not None:
+        return bool(total.get("possivel_estruturalmente"))
+    return int(clube.get("jogos_atuais") or 0) < 38
+
+
 def rebaixamento_matematicamente_possivel(clube: dict[str, Any]) -> bool:
     if float(clube.get("rebaixamento_pct") or 0) > 0:
         return True
@@ -400,6 +430,7 @@ def montar_dossie(rodada: int, estado: dict[str, Any]) -> dict[str, Any]:
             "libertadores_delta": float(d.get("libertadores_pct") or 0) - float(a.get("libertadores_pct") or 0),
             "sul_americana_antes": float(a.get("sul_americana_pct") or 0),
             "sul_americana_depois": float(d.get("sul_americana_pct") or 0),
+            "sul_americana_possivel_depois": sul_americana_matematicamente_possivel(d),
             "sul_americana_delta": float(d.get("sul_americana_pct") or 0) - float(a.get("sul_americana_pct") or 0),
             "sem_continental_antes": max(0.0, 100.0 - float(a.get("libertadores_pct") or 0) - float(a.get("sul_americana_pct") or 0)),
             "sem_continental_depois": max(0.0, 100.0 - float(d.get("libertadores_pct") or 0) - float(d.get("sul_americana_pct") or 0)),
@@ -819,34 +850,201 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
   <link rel="stylesheet" href="/css/br-social-footer.css?v=20260811-social-v1">
-  <link rel="stylesheet" href="../css/br-analises.css?v=20260807-acuracia-box-v1">
+  <link rel="stylesheet" href="../css/br-analises.css?v=20260811-movimentos-v1">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');gtag('config','AW-18273186827');gtag('event','ads_conversion_PAGE_VIEW_1',{{}});</script>
   <script type="application/ld+json">{json_ld}</script>
 </head>'''
 
 
-def tabela_comparativa(dossie: dict[str, Any]) -> str:
-    linhas = sorted(dossie["clubes"], key=lambda c: (-c["pontos_depois"], -c["titulo_depois"], c["clube"]))
-    corpo = []
-    for c in linhas:
-        classe_delta = "delta-up" if c["titulo_delta"] > 0 else "delta-down" if c["titulo_delta"] < 0 else "delta-flat"
-        titulo_antes, titulo_depois, titulo_delta = comparacao_percentual(
-            c["titulo_antes"],
-            c["titulo_depois"],
-            c["titulo_possivel_antes"],
-            c["titulo_possivel_depois"],
+def movimento_significativo(clube: dict[str, Any], chave: str) -> bool:
+    cfg = MOVIMENTOS_EDITORIAIS[chave]
+    return abs(float(clube[cfg["delta"]])) + 1e-12 >= float(cfg["limiar_pp"])
+
+
+def pontuacao_movimento(clube: dict[str, Any]) -> float:
+    return max(
+        abs(float(clube[cfg["delta"]])) / float(cfg["limiar_pp"])
+        for cfg in MOVIMENTOS_EDITORIAIS.values()
+    )
+
+
+def selecionar_clubes_movimentos(dossie: dict[str, Any], limite: int = LIMITE_CLUBES_MOVIMENTOS) -> list[dict[str, Any]]:
+    """Seleciona apenas clubes com deslocamentos editoriais relevantes.
+
+    Cada frente preserva, quando existente, a maior alta e a maior queda acima
+    do limiar. As vagas restantes são preenchidas pelos maiores movimentos
+    normalizados. O limite de oito mantém o bloco legível no celular sem deixar
+    de representar título, Libertadores, Sul-Americana e rebaixamento.
+    """
+    clubes = list(dossie["clubes"])
+    obrigatorios: set[str] = set()
+    candidatos = [
+        clube for clube in clubes
+        if any(movimento_significativo(clube, chave) for chave in MOVIMENTOS_EDITORIAIS)
+    ]
+    for cfg in MOVIMENTOS_EDITORIAIS.values():
+        campo = cfg["delta"]
+        limiar = float(cfg["limiar_pp"])
+        altas = [c for c in clubes if float(c[campo]) >= limiar]
+        baixas = [c for c in clubes if float(c[campo]) <= -limiar]
+        if altas:
+            obrigatorios.add(max(altas, key=lambda c: (float(c[campo]), -int(c["posicao_depois"])))["clube"])
+        if baixas:
+            obrigatorios.add(min(baixas, key=lambda c: (float(c[campo]), int(c["posicao_depois"])))["clube"])
+
+    ranking = sorted(
+        candidatos,
+        key=lambda c: (-pontuacao_movimento(c), int(c["posicao_depois"]), c["clube"]),
+    )
+    selecionados = [c for c in ranking if c["clube"] in obrigatorios]
+    if len(selecionados) > limite:
+        selecionados = selecionados[:limite]
+    nomes = {c["clube"] for c in selecionados}
+    for clube in ranking:
+        if len(selecionados) >= limite:
+            break
+        if clube["clube"] not in nomes:
+            selecionados.append(clube)
+            nomes.add(clube["clube"])
+    return sorted(selecionados, key=lambda c: (int(c["posicao_depois"]), c["clube"]))
+
+
+def variacao_editorial(valor: float) -> str:
+    valor = float(valor)
+    if valor == 0:
+        return "—"
+    seta = "↑" if valor > 0 else "↓"
+    absoluto = abs(valor)
+    if absoluto < 0.001:
+        return f"{seta} <0,001 p.p."
+    texto = (f"{absoluto:.3f}" if absoluto < 0.1 else f"{absoluto:.1f}").replace(".", ",")
+    return f"{seta} {texto} p.p."
+
+
+def celula_movimento(clube: dict[str, Any], chave: str, mobile: bool = False) -> str:
+    cfg = MOVIMENTOS_EDITORIAIS[chave]
+    delta = float(clube[cfg["delta"]])
+    significativo = movimento_significativo(clube, chave)
+    possivel = clube.get(cfg["possivel"]) if cfg.get("possivel") else None
+    atual = percentual(float(clube[cfg["valor"]]), possivel)
+    classe_delta = "delta-up" if delta > 0 else "delta-down" if delta < 0 else "delta-flat"
+    classe = "is-significant" if significativo else "is-muted"
+    delta_texto = variacao_editorial(delta) if significativo else "—"
+    conteudo = (
+        f'<span class="analysis-move-current">{esc(atual)}</span>'
+        f'<span class="analysis-move-delta {classe_delta}">{esc(delta_texto)}</span>'
+    )
+    if mobile:
+        return (
+            f'<div class="analysis-move-metric {classe}" data-metric="{esc(chave)}">'
+            f'<span class="analysis-move-label"><span aria-hidden="true">{cfg["icone"]}</span> {esc(cfg["rotulo"])}</span>'
+            f'{conteudo}</div>'
         )
-        corpo.append(f'''<tr>
-          <th scope="row"><a href="../clubes.html#{esc(c['clube'].lower().replace(' ', '-'))}">{esc(c['clube'])}</a></th>
-          <td>{c['pontos_depois']}</td>
-          <td>{esc(titulo_antes)}</td><td>{esc(titulo_depois)}</td><td class="delta {classe_delta}">{esc(titulo_delta)}</td>
-          <td>{esc(percentual(c['libertadores_depois'], c['libertadores_possivel_depois']))}</td><td>{esc(percentual(c['rebaixamento_depois'], c['rebaixamento_possivel_depois']))}</td>
-        </tr>''')
-    return '''<div class="analysis-table-wrap" tabindex="0" aria-label="Tabela comparativa com rolagem horizontal">
-      <table class="analysis-table">
-        <thead><tr><th>Clube</th><th>Pts</th><th>Título antes</th><th>Título depois</th><th>Variação</th><th>Libertadores</th><th>Rebaixamento</th></tr></thead>
-        <tbody>''' + "".join(corpo) + "</tbody></table></div>"
+    return f'<td class="analysis-move-cell {classe}">{conteudo}</td>'
+
+
+def destaques_movimentos(dossie: dict[str, Any]) -> str:
+    clubes = dossie["clubes"]
+    frases: list[str] = []
+
+    def extremos(chave: str) -> tuple[dict[str, Any] | None, dict[str, Any] | None]:
+        cfg = MOVIMENTOS_EDITORIAIS[chave]
+        campo = cfg["delta"]
+        limiar = float(cfg["limiar_pp"])
+        altas = [c for c in clubes if float(c[campo]) >= limiar]
+        baixas = [c for c in clubes if float(c[campo]) <= -limiar]
+        alta = max(altas, key=lambda c: float(c[campo])) if altas else None
+        baixa = min(baixas, key=lambda c: float(c[campo])) if baixas else None
+        return alta, baixa
+
+    alta_t, baixa_t = extremos("titulo")
+    if alta_t or baixa_t:
+        partes = []
+        if alta_t:
+            partes.append(
+                f'<strong>{esc(alta_t["clube"])}</strong> subiu para '
+                f'{esc(percentual(alta_t["titulo_depois"], alta_t["titulo_possivel_depois"]))} '
+                f'({esc(variacao_editorial(alta_t["titulo_delta"]))})'
+            )
+        if baixa_t:
+            partes.append(
+                f'<strong>{esc(baixa_t["clube"])}</strong> caiu para '
+                f'{esc(percentual(baixa_t["titulo_depois"], baixa_t["titulo_possivel_depois"]))} '
+                f'({esc(variacao_editorial(baixa_t["titulo_delta"]))})'
+            )
+        frases.append("No título, " + "; ".join(partes) + ".")
+
+    alta_l, baixa_l = extremos("libertadores")
+    alta_s, baixa_s = extremos("sul_americana")
+    blocos_cont = []
+    if alta_l or baixa_l:
+        partes = []
+        if alta_l:
+            partes.append(f'<strong>{esc(alta_l["clube"])}</strong> teve a maior alta ({esc(variacao_editorial(alta_l["libertadores_delta"]))})')
+        if baixa_l:
+            partes.append(f'<strong>{esc(baixa_l["clube"])}</strong> a maior queda ({esc(variacao_editorial(baixa_l["libertadores_delta"]))})')
+        blocos_cont.append("Na Libertadores, " + " e ".join(partes))
+    if alta_s or baixa_s:
+        partes = []
+        if alta_s:
+            partes.append(f'<strong>{esc(alta_s["clube"])}</strong> liderou o avanço ({esc(variacao_editorial(alta_s["sul_americana_delta"]))})')
+        if baixa_s:
+            partes.append(f'<strong>{esc(baixa_s["clube"])}</strong> teve o maior recuo ({esc(variacao_editorial(baixa_s["sul_americana_delta"]))})')
+        blocos_cont.append("na Sul-Americana, " + " e ".join(partes))
+    if blocos_cont:
+        frases.append("; ".join(blocos_cont) + ".")
+
+    alta_r, baixa_r = extremos("rebaixamento")
+    if alta_r or baixa_r:
+        partes = []
+        if alta_r:
+            partes.append(f'<strong>{esc(alta_r["clube"])}</strong> teve o maior aumento de risco ({esc(variacao_editorial(alta_r["rebaixamento_delta"]))})')
+        if baixa_r:
+            partes.append(f'<strong>{esc(baixa_r["clube"])}</strong> teve o maior alívio ({esc(variacao_editorial(baixa_r["rebaixamento_delta"]))})')
+        frases.append("No rebaixamento, " + "; ".join(partes) + ".")
+
+    if not frases:
+        return ""
+    return '<ul class="analysis-movement-highlights">' + "".join(f"<li>{frase}</li>" for frase in frases[:3]) + "</ul>"
+
+
+def tabela_comparativa(dossie: dict[str, Any]) -> str:
+    linhas = selecionar_clubes_movimentos(dossie)
+    if not linhas:
+        return '<p class="analysis-no-movements">A rodada não produziu variações acima dos limiares editoriais definidos.</p>'
+
+    corpo = []
+    cards = []
+    for c in linhas:
+        corpo.append(
+            '<tr>'
+            f'<th scope="row"><a href="../clubes.html#{esc(c["clube"].lower().replace(" ", "-"))}">{esc(c["clube"])}</a></th>'
+            + "".join(celula_movimento(c, chave) for chave in MOVIMENTOS_EDITORIAIS)
+            + '</tr>'
+        )
+        metricas_mobile = "".join(
+            celula_movimento(c, chave, mobile=True)
+            for chave in MOVIMENTOS_EDITORIAIS
+            if movimento_significativo(c, chave)
+        )
+        cards.append(
+            f'<article class="analysis-movement-card"><header><a href="../clubes.html#{esc(c["clube"].lower().replace(" ", "-"))}">{esc(c["clube"])}</a>'
+            f'<span>{int(c["posicao_depois"])}º</span></header><div class="analysis-movement-card-grid">{metricas_mobile}</div></article>'
+        )
+
+    cabecalhos = "".join(
+        f'<th><span aria-hidden="true">{cfg["icone"]}</span> {esc(cfg["rotulo"])}</th>'
+        for cfg in MOVIMENTOS_EDITORIAIS.values()
+    )
+    return (
+        f'<div class="analysis-movement-count">{len(linhas)} clubes com os movimentos mais relevantes da rodada</div>'
+        '<div class="analysis-movement-desktop">'
+        '<div class="analysis-table-wrap" tabindex="0" aria-label="Principais mudanças de probabilidades da rodada">'
+        '<table class="analysis-table analysis-movement-table"><thead><tr><th>Clube</th>'
+        + cabecalhos + '</tr></thead><tbody>' + "".join(corpo) + '</tbody></table></div></div>'
+        '<div class="analysis-movement-mobile">' + "".join(cards) + '</div>'
+    )
 
 
 def cards_variacoes(dossie: dict[str, Any]) -> str:
@@ -953,7 +1151,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
         {box_acuracia_rodada(rodada)}
         <section class="analysis-copy"><h2>O retrato da rodada</h2><div class="analysis-copy-sections">{secoes_editoriais}</div></section>
         <section><h2>Resultados considerados</h2><div class="analysis-results">{resultados}</div></section>
-        <section><h2>Como as probabilidades mudaram</h2><p class="analysis-help">Comparação entre o último snapshot anterior e o fechamento editorial da rodada. No celular, arraste a tabela para o lado.</p><p class="analysis-percent-legend"><strong>Padrão dos percentuais:</strong> <b>0%</b> aparece somente quando o título já é matematicamente impossível; <b>&lt;0,001%</b> preserva uma possibilidade ainda existente, mas abaixo da resolução exibida — inclusive quando ela não ocorreu nas 2 milhões de simulações. Nas variações, <b>↑/↓ &lt;0,001 p.p.</b> identifica movimentos residuais sem criar zeros falsos.</p>{tabela_comparativa(dossie)}</section>
+        <section class="analysis-movements"><h2>Como a rodada mexeu com as chances</h2><p class="analysis-help">O quadro destaca somente movimentos com relevância editorial: pelo menos 0,1 p.p. no título e 1,0 p.p. em Libertadores, Sul-Americana ou rebaixamento. A chance atual aparece junto da variação para preservar o contexto.</p><p class="analysis-percent-legend"><strong>Padrão dos percentuais:</strong> <b>0%</b> aparece somente quando o desfecho é estruturalmente impossível; <b>&lt;0,001%</b> preserva uma possibilidade ainda existente, mas abaixo da resolução exibida. Movimentos menores que os limiares acima não entram no destaque.</p>{destaques_movimentos(dossie)}{tabela_comparativa(dossie)}</section>
         <aside class="analysis-method"><strong>Leitura dos dados:</strong> as probabilidades são estimativas do AF-Previsão, calculadas em {dossie['simulacoes']:,} simulações e não representam certezas. A análise editorial utiliza somente um dossiê factual auditado; resultados e percentuais são inseridos diretamente dos JSONs do Fórmula do Gol.</aside>
         <nav class="analysis-next" aria-label="Mais conteúdo"><a href="./">← Todas as análises</a><a href="../estatisticas.html#probabilidades">Probabilidades atuais →</a></nav>
       </article>
@@ -1199,15 +1397,16 @@ def self_test() -> int:
     assert '"@type":"NewsArticle"' in pagina and f'data-{MARCADOR}="20"' in pagina and 'data-fdg-editorial-id="brasileirao-2026-rodada-20"' in pagina
     assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in pagina
     assert "header-formula-do-gol.png" not in pagina
-    assert "br-analises.css?v=20260807-acuracia-box-v1" in pagina
+    assert "br-analises.css?v=20260811-movimentos-v1" in pagina
     assert "br-analises.js?v=20260805-editorial-continental-v1" in pagina
     assert "Publicado em 02/08/2026" in pagina and "0,000%" not in pagina
-    assert "0,007%</td><td>0,006%</td><td class=\"delta delta-down\">-0,001 p.p.</td>" in pagina
-    assert re.search(
-        r">Grêmio</a>\s*</th>\s*<td>22</td>\s*<td>&lt;0,001%</td><td>&lt;0,001%</td>",
-        pagina,
-    )
-    assert "99,96%" not in pagina and "&gt;99,9%" in pagina
+    selecionados = selecionar_clubes_movimentos(dossie)
+    assert 1 <= len(selecionados) <= LIMITE_CLUBES_MOVIMENTOS
+    assert len({c["clube"] for c in selecionados}) == len(selecionados)
+    assert all(any(movimento_significativo(c, chave) for chave in MOVIMENTOS_EDITORIAIS) for c in selecionados)
+    assert "Como a rodada mexeu com as chances" in pagina
+    assert "analysis-movement-table" in pagina and "analysis-movement-mobile" in pagina
+    assert "Sul-Americana" in pagina and "0,1 p.p." in pagina and "1,0 p.p." in pagina
     assert "Padrão dos percentuais" in pagina and "analysis-round-nav" in pagina
     assert '<a href="../analises/" class="active" aria-current="page">📰 Análises</a>' in pagina
     assert pagina.index('📰 Análises') < pagina.index('🎯 Acurácia') < pagina.index('🛡️ Clubes')
