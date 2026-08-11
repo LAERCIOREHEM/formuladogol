@@ -1,4 +1,4 @@
-# DEPLOY_SCHEMA: acuracia-v3-2026-08-08
+# DEPLOY_SCHEMA: social-footer-v1-2026-08-11
 name: Deploy site (GitHub Pages)
 
 on:
@@ -38,6 +38,7 @@ on:
       - 'css/br-institucional.css'
       - 'css/br-sobre.css'
       - 'css/br-analises.css'
+      - 'css/br-social-footer.css'
       - 'js/br-aovivo.js'
       - 'js/br-agenda.js'
       - 'js/br-analises.js'
@@ -50,6 +51,7 @@ on:
       - 'js/br-feedback.js'
       - 'js/br-menu.js'
       - 'js/br-museu.js'
+      - 'js/br-social-footer.js'
       - 'dados-br/**'
       - 'analises/**'
       - 'jogos/**'
@@ -134,6 +136,7 @@ jobs:
             css/br-institucional.css
             css/br-sobre.css
             css/br-analises.css
+            css/br-social-footer.css
           )
 
           PUBLIC_JS=(
@@ -149,6 +152,7 @@ jobs:
             js/br-feedback.js
             js/br-menu.js
             js/br-museu.js
+            js/br-social-footer.js
           )
 
           PUBLIC_DATA=(
@@ -329,7 +333,7 @@ jobs:
 
       - name: Gerar lastmod dos sitemaps (Acurácia v3)
         run: |
-          echo "DEPLOY_SCHEMA=acuracia-v3-2026-08-08"
+          echo "DEPLOY_SCHEMA=social-footer-v1-2026-08-11"
           # O lastmod é derivado dos timestamps reais dos arquivos de dados que
           # cada página consome, e não da data do deploy. Assim o sinal enviado
           # ao Google é verdadeiro: páginas de dados diários mudam de data todo
@@ -649,6 +653,7 @@ jobs:
               "acuracia.html",
               "clubes.html",
               "museu.html",
+              "sobre.html",
           ]
           root_expected_menu = [
               "Estatísticas",
