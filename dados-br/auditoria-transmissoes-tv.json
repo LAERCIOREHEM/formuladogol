@@ -5,8 +5,8 @@
     "jogos_com_transmissao": 50,
     "jogos_sem_transmissao_14d": 0,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 3,
-    "jogos_estaveis_sem_reconsulta_editorial": 41,
+    "registros_preservados": 6,
+    "jogos_estaveis_sem_reconsulta_editorial": 44,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -19,26 +19,26 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 7667
+      "duracao_ms": 6773
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 7,
-      "duracao_ms": 6315
+      "jogos_com_canal": 4,
+      "duracao_ms": 4279
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 4,
-      "jogos_com_canal": 4,
-      "duracao_ms": 25664
+      "jogos_com_canal": 1,
+      "duracao_ms": 14929
     },
     "espn": {
       "ok": true,
       "competicoes_consultadas": 1,
-      "eventos_na_janela": 12,
+      "eventos_na_janela": 9,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 1714
+      "duracao_ms": 1499
     },
     "youtube_oficial": {
       "ok": true,
@@ -48,6 +48,14 @@
   "sem_transmissao": [],
   "preservados": [
     {
+      "event_id": "401841216",
+      "jogo": "Atlético-MG x Vitória",
+      "canais": [
+        "SporTV",
+        "Globo"
+      ]
+    },
+    {
       "event_id": "401841217",
       "jogo": "Grêmio x Chapecoense",
       "canais": [
@@ -56,8 +64,8 @@
       ]
     },
     {
-      "event_id": "401841211",
-      "jogo": "Mirassol x Palmeiras",
+      "event_id": "401841212",
+      "jogo": "Vasco da Gama x Cruzeiro",
       "canais": [
         "GE TV",
         "Premiere",
@@ -78,6 +86,22 @@
         "Paramount+",
         "Disney+ / ESPN"
       ]
+    },
+    {
+      "event_id": "401841223",
+      "jogo": "Internacional x Santos",
+      "canais": [
+        "SporTV",
+        "Globo"
+      ]
+    },
+    {
+      "event_id": "401841222",
+      "jogo": "Vitória x Grêmio",
+      "canais": [
+        "SporTV",
+        "Globo"
+      ]
     }
   ],
   "erros": [
@@ -91,5 +115,5 @@
     "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/08/10/pela-primeira-vez-rodada-da-serie-a-tera-tres-arbitras-mulheres.ghtml",
     "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/08/10/cartola-2026-assistencia-sg-e-desarmes-fazem-matheuzinho-do-corinthians-craque-da-rodada-22.ghtml"
   ],
-  "atualizado_em": "2026-08-11T11:01:28-03:00"
+  "atualizado_em": "2026-08-11T11:11:30-03:00"
 }
