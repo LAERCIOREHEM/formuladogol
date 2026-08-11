@@ -3,7 +3,7 @@
 
   var STYLE_ID = "fdg-social-footer-css";
   var BLOCK_CLASS = "fdg-social-footer";
-  var STYLE_URL = "/css/br-social-footer.css?v=20260811-social-v1";
+  var STYLE_URL = "/css/br-social-footer.css?v=20260811-social-v2-tiktok";
 
   var NETWORKS = [
     {
@@ -33,6 +33,13 @@
       title: "Fórmula do Gol no Facebook",
       href: "https://www.facebook.com/profile.php?id=61593205074956",
       icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.2 21v-8h2.8l.5-3h-3.3V8.1c0-.9.3-1.6 1.7-1.6H18V3.8c-.7-.1-1.6-.2-2.6-.2-2.6 0-4.4 1.6-4.4 4.5V10H8v3h3v8z" fill="currentColor"/></svg>'
+    },
+    {
+      id: "tiktok",
+      label: "TikTok",
+      title: "Fórmula do Gol no TikTok — @formuladogol",
+      href: "https://www.tiktok.com/@formuladogol",
+      icon: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.1 3.5v9.15a4.35 4.35 0 1 1-3.25-4.21v2.45a1.95 1.95 0 1 0 .85 1.61v-9h2.4c.33 2.28 1.7 3.66 4.4 4.09v2.35c-1.75-.18-3.2-.83-4.4-1.91V3.5z" fill="currentColor"/></svg>'
     }
   ];
 

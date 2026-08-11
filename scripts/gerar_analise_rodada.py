@@ -849,7 +849,7 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
-  <link rel="stylesheet" href="/css/br-social-footer.css?v=20260811-social-v1">
+  <link rel="stylesheet" href="/css/br-social-footer.css?v=20260811-social-v2-tiktok">
   <link rel="stylesheet" href="../css/br-analises.css?v=20260811-movimentos-v1">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');gtag('config','AW-18273186827');gtag('event','ads_conversion_PAGE_VIEW_1',{{}});</script>
@@ -1159,7 +1159,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
     {rodape('../')}
   </div>
   <script src="../js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
-  <script src="/js/br-social-footer.js?v=20260811-social-v1" defer></script>
+  <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>
   <script src="../js/br-analises.js?v=20260805-editorial-continental-v1"></script>
 </body>
 </html>'''.replace(f"{dossie['simulacoes']:,}", f"{dossie['simulacoes']:,}".replace(",", "."))
@@ -1209,7 +1209,7 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
     {rodape('../')}
   </div>
   <script src="../js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
-  <script src="/js/br-social-footer.js?v=20260811-social-v1" defer></script>
+  <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>
 </body>
 </html>'''
 
