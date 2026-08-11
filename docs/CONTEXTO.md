@@ -30,7 +30,7 @@ A página principal acompanha o Brasileirão 2026 e oferece, entre outros recurs
 - módulo `copa2026/`, preservado como área própria da Copa do Mundo 2026;
 - feedback/sugestões via Supabase e notificação por e-mail.
 
-O site é independente, informativo e sem fins lucrativos. O rodapé público identifica Laércio Rehem como criador/desenvolvedor/mantenedor e explicita a ausência de afiliação com CBF, clubes, ESPN ou titulares de direitos.
+O site é independente, informativo e sem fins lucrativos. O rodapé público identifica Laércio Rehem como criador/desenvolvedor/mantenedor e explicita a ausência de afiliação com CBF, clubes, ESPN ou titulares de direitos. O mesmo rodapé possui um componente global de redes sociais, exibido em todas as páginas públicas do Fórmula do Gol e da Copa 2026 (exceto a área administrativa), com links oficiais para Instagram `@siteformuladogol`, X `@siteformulagol`, YouTube e Facebook.
 
 ---
 

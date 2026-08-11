@@ -1,0 +1,130 @@
+/* Fórmula do Gol — bloco global de redes sociais do rodapé.
+   Mantém as marcas em uma linguagem visual única do site; as cores oficiais
+   das plataformas não são usadas para evitar ruído no rodapé. */
+.fdg-social-footer{
+  --fdg-social-accent:#ffd23f;
+  --fdg-social-text:#dbe5ee;
+  --fdg-social-muted:#9fb0bf;
+  --fdg-social-border:rgba(148,163,184,.18);
+  --fdg-social-bg:rgba(6,18,27,.46);
+  margin:14px 0 12px;
+  padding:14px 0;
+  border-top:1px solid var(--fdg-social-border);
+  border-bottom:1px solid var(--fdg-social-border);
+  text-align:center;
+}
+.fdg-social-title{
+  margin:0 0 10px;
+  color:var(--fdg-social-accent);
+  font-size:11px;
+  font-weight:950;
+  line-height:1.2;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+}
+.fdg-social-nav{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:stretch;
+  gap:8px 10px;
+  width:100%;
+  max-width:660px;
+  margin:0 auto;
+}
+.site-footer .fdg-social-link,
+.footer .fdg-social-link,
+.copa-footer .fdg-social-link,
+.fdg-social-link{
+  box-sizing:border-box;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex:0 0 145px;
+  width:145px;
+  min-width:0;
+  min-height:40px;
+  padding:8px 12px;
+  border:1px solid var(--fdg-social-border);
+  border-radius:999px;
+  background:var(--fdg-social-bg);
+  color:var(--fdg-social-text) !important;
+  text-decoration:none !important;
+  font-size:12px;
+  font-weight:850 !important;
+  line-height:1;
+  white-space:nowrap;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+  transition:border-color .18s ease,color .18s ease,background .18s ease,transform .18s ease;
+}
+.site-footer .fdg-social-link:hover,
+.footer .fdg-social-link:hover,
+.copa-footer .fdg-social-link:hover,
+.fdg-social-link:hover,
+.site-footer .fdg-social-link:focus-visible,
+.footer .fdg-social-link:focus-visible,
+.copa-footer .fdg-social-link:focus-visible,
+.fdg-social-link:focus-visible{
+  border-color:rgba(255,210,63,.72);
+  background:rgba(255,210,63,.09);
+  color:var(--fdg-social-accent) !important;
+  outline:none;
+  transform:translateY(-1px);
+}
+.fdg-social-icon{
+  display:inline-grid;
+  place-items:center;
+  width:20px;
+  height:20px;
+  flex:0 0 20px;
+  color:currentColor;
+}
+.fdg-social-icon svg{
+  display:block;
+  width:20px;
+  height:20px;
+  overflow:visible;
+}
+.fdg-social-label{display:inline-block}
+@media(max-width:680px){
+  .fdg-social-footer{
+    margin:12px 0 10px;
+    padding:12px 0;
+  }
+  .fdg-social-title{
+    margin-bottom:9px;
+    font-size:10px;
+    letter-spacing:.11em;
+  }
+  .fdg-social-nav{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    width:100%;
+    max-width:360px;
+  }
+  .site-footer .fdg-social-link,
+  .footer .fdg-social-link,
+  .copa-footer .fdg-social-link,
+  .fdg-social-link{
+    flex:1 1 calc(50% - 4px);
+    min-width:0;
+    width:auto;
+    min-height:39px;
+    padding:8px 9px;
+    font-size:11.5px;
+  }
+}
+@media(max-width:340px){
+  .fdg-social-nav{gap:6px}
+  .site-footer .fdg-social-link,
+  .footer .fdg-social-link,
+  .copa-footer .fdg-social-link,
+  .fdg-social-link{padding-inline:7px;font-size:11px}
+  .fdg-social-icon,.fdg-social-icon svg{width:18px;height:18px}
+}
+@media(prefers-reduced-motion:reduce){
+  .fdg-social-link{transition:none !important}
+  .fdg-social-link:hover,.fdg-social-link:focus-visible{transform:none !important}
+}

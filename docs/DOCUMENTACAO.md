@@ -57,7 +57,7 @@ Os diretórios `jogos/`, `tabela/`, `resultados/`, `bolao/` e `aniversariantes/`
 
 ### Menu atual
 
-O menu principal do `index.html` expõe: **Estatísticas, Jogos, Ao vivo, Tabela, Resultados, Análises, Clubes, Museu e Copa 2026**. O rodapé aponta para **Sobre o Fórmula do Gol**. `br-menu.js` remove o link legado “Agenda” quando aparece em menus antigos.
+O menu principal do `index.html` expõe: **Estatísticas, Jogos, Ao vivo, Tabela, Resultados, Análises, Clubes, Museu e Copa 2026**. O rodapé aponta para **Sobre o Fórmula do Gol** e inclui o componente global **Siga a Fórmula do Gol**, com Instagram, X, YouTube e Facebook. O bloco é inserido por `br-social-footer.js` em todas as páginas públicas com rodapé (inclusive o módulo Copa 2026), exceto `copa2026/admin.html`; os links abrem em nova aba com `noopener noreferrer`. `br-menu.js` remove o link legado “Agenda” quando aparece em menus antigos.
 
 ---
 
@@ -81,6 +81,7 @@ O menu principal do `index.html` expõe: **Estatísticas, Jogos, Ao vivo, Tabela
 | `br-menu.js` | Menu responsivo/flutuante, rotas, flags de autenticação e indicador de saúde. |
 | `br-museu.js` | Museu do Brasileirão: campeões, títulos, recordes, filtros e links para clubes. |
 | `br-pontuacao.js` | Motor de pontuação do bolão privado preservado. |
+| `br-social-footer.js` | Componente global do rodapé social; centraliza URLs, SVGs acessíveis e montagem do bloco nas páginas públicas. |
 
 ### CSS (`css/`)
 
@@ -96,6 +97,7 @@ O menu principal do `index.html` expõe: **Estatísticas, Jogos, Ao vivo, Tabela
 | `br-institucional.css` | Clubes, Museu e páginas institucionais. |
 | `br-jogos.css` | Home/Jogos/Tabela/Resultados. |
 | `br-sobre.css` | Página Sobre. |
+| `br-social-footer.css` | Aparência do bloco social global; quatro redes lado a lado no desktop e grade 2×2 compacta no celular, com foco/hover no amarelo do site. |
 
 ### Assets
 
