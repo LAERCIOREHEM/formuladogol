@@ -3,6 +3,12 @@
 
   const ESPN_API_ROOT = "https://site.api.espn.com/apis/site/v2/sports/soccer";
   const DEFAULT_LEAGUE = "bra.1";
+  const LEAGUE_META = {
+    "bra.1": { competitionKey: "brasileirao", competitionName: "Campeonato Brasileiro Série A", competitionShort: "Brasileirão" },
+    "bra.copa_do_brazil": { competitionKey: "copa_do_brasil", competitionName: "Copa do Brasil", competitionShort: "Copa do Brasil" },
+    "conmebol.libertadores": { competitionKey: "libertadores", competitionName: "CONMEBOL Libertadores", competitionShort: "Libertadores" },
+    "conmebol.sudamericana": { competitionKey: "sul_americana", competitionName: "CONMEBOL Sudamericana", competitionShort: "Sul-Americana" }
+  };
   const REFRESH_MS = 30000;
   const TZ = "America/Sao_Paulo";
   const FINAL_RETENTION_BR_MS = 5 * 60000;
@@ -79,6 +85,13 @@
         { label: "Prime Video", url: "https://www.primevideo.com/-/pt/store" }
       ]
     },
+    paramount: {
+      label: "Paramount+",
+      aliases: ["paramount+", "paramount plus", "paramount"],
+      links: [
+        { label: "Paramount+", url: "https://www.paramountplus.com/br/" }
+      ]
+    },
     globo: {
       label: "Globo",
       aliases: ["globo", "tv globo"],
@@ -115,6 +128,8 @@
     "claro.com.br", "www.claro.com.br",
     "primevideo.com", "www.primevideo.com",
     "disneyplus.com", "www.disneyplus.com",
+    "paramountplus.com", "www.paramountplus.com",
+    "sbt.com.br", "www.sbt.com.br",
     "record.r7.com", "www.record.r7.com", "r7.com", "www.r7.com",
     "youtube.com", "www.youtube.com"
   ]);
@@ -483,7 +498,18 @@
   // ocultar uma atualização legítima durante eventual atraso de publicação.
   function directGameIsEligible(game, referenceMs = Date.now()) {
     if (!game || !game.home || !game.away) return false;
-    if (findLocal(game)) return true;
+    const local = findLocal(game);
+    if (local) return true;
+
+    // COMPETIÇÕES COMPLEMENTARES: o scoreboard da ESPN devolve TODOS os jogos
+    // da Libertadores/Sul-Americana/Copa do Brasil. A página Ao Vivo acompanha
+    // somente as partidas já aprovadas pela agenda local (clubes do Brasileirão).
+    // Portanto, um evento continental/copa sem correspondência na agenda nunca
+    // pode entrar apenas porque está ao vivo ou acabou de terminar.
+    if (String(game.espnLeague || DEFAULT_LEAGUE) !== DEFAULT_LEAGUE) return false;
+
+    // No Brasileirão, a resposta direta continua autorizada como contingência
+    // para um atraso pontual da agenda publicada.
     if (isReliableFinalGame(game, referenceMs)) return true;
 
     const statusType = game.raw && game.raw.status && game.raw.status.type;
@@ -776,6 +802,12 @@
     };
 
     for (const item of (Array.isArray(entry.links) ? entry.links : [])) addLink(item.label, item.url);
+    // O backend publica acessos oficiais em `acessos` (ex.: Paramount+).
+    // Esse campo é distinto de `canais`: direitos de transmissão e plataforma
+    // de acesso não devem ser confundidos, mas ambos precisam ser clicáveis.
+    for (const item of (Array.isArray(entry.acessos) ? entry.acessos : [])) {
+      addLink(item.nome || item.label || "Acessar", item.url);
+    }
     for (const canal of canais) {
       const provider = providerForChannel(canal);
       for (const item of ((provider && provider.links) || [])) addLink(item.label, item.url);
@@ -895,11 +927,12 @@
       return (data.events || []).map((event) => {
         const eventId = String(event && event.id || "");
         const local = localGames.find((game) => String(game.id || "") === eventId) || null;
+        const leagueMeta = LEAGUE_META[league] || {};
         const meta = local || {
           espnLeague: league,
-          competitionKey: league === DEFAULT_LEAGUE ? "brasileirao" : "",
-          competitionName: league === DEFAULT_LEAGUE ? "Campeonato Brasileiro Série A" : "",
-          competitionShort: league === DEFAULT_LEAGUE ? "Brasileirão" : "",
+          competitionKey: leagueMeta.competitionKey || "",
+          competitionName: leagueMeta.competitionName || "",
+          competitionShort: leagueMeta.competitionShort || "",
           probabilitiesAvailable: league === DEFAULT_LEAGUE
         };
         return normalizeEvent(event, meta);
