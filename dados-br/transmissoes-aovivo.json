@@ -10,41 +10,42 @@
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta"
   },
   "jogos": {
-    "401874141": {
-      "event_id": "401874141",
+    "401874153": {
+      "event_id": "401874153",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
       "espn_league": "conmebol.libertadores",
-      "mandante": "Flamengo",
-      "visitante": "Cruzeiro",
-      "data_iso": "2026-08-19T21:30:00-03:00",
-      "estadio": "Estadio do Maracana",
+      "mandante": "Cruzeiro",
+      "visitante": "Flamengo",
+      "data_iso": "2026-08-12T21:30:00-03:00",
+      "estadio": "Estadio Mineirão",
       "origem": "automático",
       "principal": {
         "fonte": "getv",
         "nome": "GE TV",
-        "video_id": "yM9qJJG6gIQ",
-        "url": "https://www.youtube.com/watch?v=yM9qJJG6gIQ",
-        "status": "upcoming",
-        "inicio_programado": "2026-08-19T20:00:00-03:00",
-        "inicio_real": "",
-        "titulo": "AO VIVO: FLAMENGO X CRUZEIRO | OITAVAS DE FINAL | LIBERTADORES 2026 | ge tv",
+        "video_id": "HT8QACkIe3I",
+        "url": "https://www.youtube.com/watch?v=HT8QACkIe3I",
+        "status": "live",
+        "inicio_programado": "2026-08-12T19:30:00-03:00",
+        "inicio_real": "2026-08-12T19:28:07-03:00",
+        "titulo": "AO VIVO: CRUZEIRO X FLAMENGO | OITAVAS DE FINAL | LIBERTADORES 2026 | ge tv",
         "canal": "ge tv",
         "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
-        "thumbnail": "https://i.ytimg.com/vi/yM9qJJG6gIQ/maxresdefault_live.jpg",
-        "confianca": 0.875,
+        "thumbnail": "https://i.ytimg.com/vi/HT8QACkIe3I/maxresdefault_live.jpg",
+        "confianca": 0.9,
         "motivos": [
           "os dois clubes aparecem no título",
           "identifica Brasileirão/competição",
           "identifica transmissão ao vivo",
-          "horário compatível (90 min de diferença)"
+          "transmissão já está ao vivo",
+          "horário compatível (120 min de diferença)"
         ],
-        "origem_busca": "uploads",
+        "origem_busca": "streams-page",
         "embeddable": true
       },
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-08-09T18:18:32-03:00"
+  "atualizado_em": "2026-08-12T20:01:18-03:00"
 }
