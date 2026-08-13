@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-12T20:51:29-03:00",
+  "gerado_em": "2026-08-12T21:01:43-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,12 +17,12 @@
     "ordem": 600,
     "nome": "Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 14
+    "eventos_pendentes": 12
   },
   "resumo": {
     "eventos": 144,
-    "finalizados": 130,
-    "pendentes": 14,
+    "finalizados": 132,
+    "pendentes": 12,
     "equipes": 56,
     "equipes_serie_a_2026": 7
   },
@@ -5223,9 +5223,9 @@
     {
       "event_id": "401902573",
       "data_iso": "2026-08-12T19:00:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "22'",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5250,18 +5250,18 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Montevideo City Torque",
       "penaltis": false
     },
     {
       "event_id": "401902743",
       "data_iso": "2026-08-12T19:00:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "22'",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5286,10 +5286,10 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Atlético-MG",
       "penaltis": false
     },
     {
