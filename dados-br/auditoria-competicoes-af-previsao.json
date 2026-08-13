@@ -2,36 +2,22 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-08-13T05:11:35-03:00",
+  "gerado_em": "2026-08-13T05:31:33-03:00",
   "status": "ok",
   "coleta_confiavel": true,
-  "mudanca_esportiva": true,
-  "hash_estado_antes": "d91fe82ae28ffb6b1f047055bd22b26d6ee9480896ddf2083db5ec7d2088efa7",
+  "mudanca_esportiva": false,
+  "hash_estado_antes": "1ce7702129303146b8d45f5df7280ded3335e03a07cf11cceb1cef761a39fd76",
   "hash_estado_depois": "1ce7702129303146b8d45f5df7280ded3335e03a07cf11cceb1cef761a39fd76",
   "fonte": "ESPN",
   "temporada": 2026,
   "competicoes": [
     {
       "competicao": "copa_do_brasil",
-      "status": "atualizado",
+      "status": "cache_valido",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
       "gerado_em": "2026-08-13T05:11:31-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 150,
-      "finalizados": 142,
-      "pendentes": 8,
-      "fase_atual": {
-        "status": "em_andamento",
-        "ordem": 700,
-        "nome": "Quartas de final",
-        "eventos": 8,
-        "eventos_pendentes": 8
-      },
-      "summary_pendentes_vencidos": {
-        "consultados": 0,
-        "atualizados": 0,
-        "pendentes": []
-      },
       "coleta": {
         "modo": "incremental",
         "janela_inicio": "2026-07-23T00:00:00-03:00",
@@ -42,25 +28,11 @@
     },
     {
       "competicao": "libertadores",
-      "status": "atualizado",
+      "status": "cache_valido",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
       "gerado_em": "2026-08-13T05:11:32-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 142,
-      "finalizados": 131,
-      "pendentes": 11,
-      "fase_atual": {
-        "status": "em_andamento",
-        "ordem": 600,
-        "nome": "Oitavas de final",
-        "eventos": 16,
-        "eventos_pendentes": 11
-      },
-      "summary_pendentes_vencidos": {
-        "consultados": 0,
-        "atualizados": 0,
-        "pendentes": []
-      },
       "coleta": {
         "modo": "incremental",
         "janela_inicio": "2026-07-23T00:00:00-03:00",
@@ -72,25 +44,11 @@
     },
     {
       "competicao": "sul_americana",
-      "status": "atualizado",
+      "status": "cache_valido",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
       "gerado_em": "2026-08-13T05:11:35-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 144,
-      "finalizados": 132,
-      "pendentes": 12,
-      "fase_atual": {
-        "status": "em_andamento",
-        "ordem": 600,
-        "nome": "2026 CONMEBOL Sudamericana, Round of 16 / Oitavas de final",
-        "eventos": 16,
-        "eventos_pendentes": 12
-      },
-      "summary_pendentes_vencidos": {
-        "consultados": 0,
-        "atualizados": 0,
-        "pendentes": []
-      },
       "coleta": {
         "modo": "incremental",
         "janela_inicio": "2026-07-23T00:00:00-03:00",
