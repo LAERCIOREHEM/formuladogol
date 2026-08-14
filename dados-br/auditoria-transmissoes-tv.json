@@ -5,8 +5,8 @@
     "jogos_com_transmissao": 49,
     "jogos_sem_transmissao_14d": 0,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 2,
-    "jogos_estaveis_sem_reconsulta_editorial": 30,
+    "registros_preservados": 4,
+    "jogos_estaveis_sem_reconsulta_editorial": 32,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -19,26 +19,26 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 7332
+      "duracao_ms": 5635
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 17,
-      "duracao_ms": 9848
+      "jogos_com_canal": 15,
+      "duracao_ms": 8029
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 7,
-      "jogos_com_canal": 2,
-      "duracao_ms": 64297
+      "jogos_com_canal": 0,
+      "duracao_ms": 56058
     },
     "espn": {
       "ok": true,
       "competicoes_consultadas": 2,
-      "eventos_na_janela": 21,
+      "eventos_na_janela": 19,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 1465
+      "duracao_ms": 1478
     },
     "youtube_oficial": {
       "ok": true,
@@ -48,10 +48,30 @@
   "sem_transmissao": [],
   "preservados": [
     {
+      "event_id": "401909064",
+      "jogo": "Internacional x Grêmio",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
       "event_id": "401841211",
       "jogo": "Mirassol x Palmeiras",
       "canais": [
         "Globo"
+      ]
+    },
+    {
+      "event_id": "401909114",
+      "jogo": "Grêmio x Internacional",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Disney+ / ESPN"
       ]
     },
     {
@@ -76,5 +96,5 @@
     "https://ge.globo.com/cartola/dicas/noticia/2026/08/13/cartola-2026-veja-seis-dicas-pouco-visadas-para-a-defesa-na-rodada-23-do-brasileirao.ghtml",
     "https://ge.globo.com/gato-mestre/noticia/2026/08/13/zubeldia-e-o-14o-tecnico-demitido-no-brasileirao-2026-veja-a-lista.ghtml"
   ],
-  "atualizado_em": "2026-08-14T19:01:14-03:00"
+  "atualizado_em": "2026-08-14T19:10:56-03:00"
 }
