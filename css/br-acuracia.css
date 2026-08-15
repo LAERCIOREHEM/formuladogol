@@ -72,15 +72,38 @@
 .accuracy-chart .line-gold { stroke: #fbbf24; stroke-width: 2.5; }
 .accuracy-chart .line-muted { stroke: rgba(226,232,240,.66); stroke-width: 1.7; }
 .accuracy-chart .area-80 {
-  fill: url(#accuracyAreaGradient);
-  stroke: rgba(163,230,53,.25);
-  stroke-width: 1;
+  fill: url(#afBandGradient);
+  stroke: none;
+}
+/* Bordas explícitas da faixa: sem elas a área lia como mancha, não como intervalo. */
+.accuracy-chart .area-edge {
+  fill: none;
+  stroke: rgba(163,230,53,.42);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 4;
   vector-effect: non-scaling-stroke;
 }
+/* Calibração */
+.accuracy-chart .dot-weak {
+  fill: rgba(148,163,184,.42);
+  stroke: #07131a;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+}
+.accuracy-chart .dot-main, .accuracy-chart .dot-secondary, .accuracy-chart .dot-gold { cursor: pointer; }
+.accuracy-chart .err {
+  stroke: rgba(163,230,53,.45);
+  stroke-width: 2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.accuracy-chart .err-weak { stroke: rgba(148,163,184,.32); stroke-dasharray: 3 4; }
+.accuracy-chart .axis-label { fill: #7d8fa3; font-size: 12px; font-weight: 800; }
 /* O halo precisa ser explicitamente transparente. Sem esta regra o SVG usa preto
    como fill padrão, produzindo os círculos pretos grandes vistos na página. */
 .accuracy-chart .point-halo {
-  fill: rgba(255,255,255,.012);
+  fill: none;
   stroke: rgba(226,232,240,.13);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
@@ -214,7 +237,9 @@
 .accuracy-legend i.secondary { background: #60a5fa; }
 .accuracy-legend i.gold { background: #fbbf24; }
 .accuracy-legend i.muted { background: rgba(226,232,240,.62); }
-.accuracy-legend i.area { height: 9px; background: rgba(163,230,53,.18); border: 1px solid rgba(163,230,53,.28); }
+.accuracy-legend i.area { height: 9px; background: rgba(163,230,53,.18); border: 1px solid rgba(163,230,53,.42); }
+.accuracy-legend i.weak { width: 10px; height: 10px; border-radius: 50%; background: rgba(148,163,184,.42); }
+.accuracy-legend i.bar { width: 3px; height: 14px; border-radius: 999px; background: rgba(163,230,53,.55); }
 .accuracy-grid-two {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -314,4 +339,96 @@
   .accuracy-technical-grid { grid-template-columns: 1fr; }
   .accuracy-chart, .accuracy-chart svg { min-height: 230px; }
   .accuracy-milestone { grid-template-columns: 68px 1fr auto; }
+}
+
+
+/* ======================================================================
+   Cartões de resumo, selo de integridade e tooltip tátil
+   ====================================================================== */
+.af-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 10px 0 14px;
+}
+.af-card {
+  border: 1px solid rgba(148,163,184,.14);
+  border-radius: 16px;
+  padding: 14px 15px;
+  background: linear-gradient(180deg, rgba(9,22,30,.92), rgba(4,12,18,.86));
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.af-card span {
+  color: #8fa2b6;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.af-card strong {
+  color: #d9ff76;
+  font-size: 34px;
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: -.02em;
+}
+.af-card small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+.af-card-thin strong { color: #ffd54a; }
+
+.af-seal {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  border: 1px solid rgba(163,230,53,.20);
+  border-radius: 16px;
+  padding: 13px 16px;
+  margin: 0 0 14px;
+  background: linear-gradient(180deg, rgba(105,199,0,.07), rgba(4,12,18,.5));
+}
+.af-seal-icon { font-size: 21px; line-height: 1; }
+.af-seal strong { color: #eef7ff; font-size: 13.5px; font-weight: 900; display: block; }
+.af-seal p { margin: 4px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+.af-seal code {
+  color: #a3e635;
+  background: rgba(163,230,53,.08);
+  border-radius: 6px;
+  padding: 1px 5px;
+  font-size: 11px;
+}
+.af-read { margin: 8px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.5; }
+
+.af-tip {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .12s ease;
+  background: rgba(3,10,16,.97);
+  border: 1px solid rgba(163,230,53,.28);
+  border-radius: 11px;
+  padding: 9px 11px;
+  color: #eef7ff;
+  font-size: 11.5px;
+  line-height: 1.5;
+  max-width: 210px;
+  z-index: 6;
+  box-shadow: 0 10px 26px rgba(0,0,0,.55);
+}
+.af-tip.is-on { opacity: 1; }
+.af-tip b { color: #d9ff76; }
+.af-tip i { color: #8fa2b6; font-style: italic; }
+.af-tip-hash { color: #8fa2b6; font-size: 10.5px; }
+
+@media (max-width: 900px) {
+  .af-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .af-card strong { font-size: 28px; }
+}
+@media (max-width: 520px) {
+  .af-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .af-card { padding: 11px 12px; }
+  .af-card strong { font-size: 24px; }
+  .af-seal { flex-direction: column; gap: 8px; }
+  .af-tip { max-width: 180px; }
 }
