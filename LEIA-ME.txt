@@ -1,33 +1,47 @@
-FORMULA DO GOL - Pagina Acuracia (UX)
-=====================================
+FORMULA DO GOL - Pagina Acuracia (UX) - v2
+==========================================
 
-ONDE COLOCAR CADA ARQUIVO (mesma estrutura do repositorio):
+ONDE COLOCAR CADA ARQUIVO:
 
   acuracia.html          ->  acuracia.html          (raiz)
   css/br-acuracia.css    ->  css/br-acuracia.css
   js/br-acuracia.js      ->  js/br-acuracia.js
 
-Os tres caminhos ja estao na lista de "paths" do deploy.yml,
-entao o Deploy site (GitHub Pages) dispara sozinho apos o push.
-Nao e preciso rodar nada manualmente.
+Os tres caminhos ja estao no "paths" do deploy.yml: o Deploy site
+(GitHub Pages) dispara sozinho apos o push. Use Ctrl+F5 ao conferir.
 
-Ao conferir no navegador, use Ctrl+F5 (CSS e JS ficam em cache).
+CORRECAO IMPORTANTE NESTA VERSAO
+--------------------------------
+A versao anterior rotulava a amostra dos bins como "jogos". Estava
+ERRADO. Cada jogo gera 3 previsoes (vitoria, empate e derrota), e a
+soma dos bins e 30 para 10 jogos apurados. O rotulo agora diz
+"previsoes".
 
-O QUE MUDOU
------------
-1. Os 4 cards do topo foram removidos. Os numeros passaram para a
-   linha de chips do painel de calibracao, no mesmo componente que a
-   aba ja usava ("Jogos: 22 - Posicao atual: 3o").
-2. O grafico de dispersao da calibracao virou barras comparadas por
-   faixa: "modelo disse" x "aconteceu". E HTML, nao SVG, entao
-   funciona igual no celular.
-3. Faixas com menos de 5 jogos aparecem esmaecidas e marcadas como
-   "poucos jogos ainda". O limiar e a constante MIN_BIN no topo do JS.
-4. Grafico do clube: escala dinamica, rotulo escrito na ponta de cada
-   linha (sem legenda embaixo), faixa de 80% discreta ao fundo.
-5. Tooltip corrigido: nao sai mais do quadro e vira para baixo quando
-   o ponto esta no topo. Funciona por toque no celular.
-6. Abaixo de 560px de largura os graficos viram tabela.
-7. Painel novo de integridade SHA-256 no fim da pagina.
+O selo tambem foi corrigido: os 1.699 nao sao partidas, sao registros
+de previsao pre-jogo (a mesma partida e registrada de novo a cada
+atualizacao ate ser disputada).
+
+NOVO PAINEL DE ESCOPO
+---------------------
+Comunica inicio, progresso e fim da apuracao:
+  Inicio  : rodada 22 (04/08)
+  Agora   : 10 jogos / 30 previsoes
+  Fim     : rodada 38, encerramento do Brasileirao
+  Barra   : 10 de 170 jogos previstos (5,9%)
+
+Os totais sao calculados no JS a partir das constantes RODADAS_TOTAL
+(38) e JOGOS_POR_RODADA (10), e da primeira rodada presente em
+jogos.por_rodada. Se o formato do campeonato mudar, ajuste as duas
+constantes no topo do arquivo.
+
+DEMAIS MUDANCAS
+---------------
+1. Os 4 cards do topo sairam; os numeros foram para a linha de chips.
+2. Calibracao em barras comparadas "modelo disse" x "aconteceu".
+3. Faixas com menos de 5 previsoes ficam esmaecidas (constante MIN_BIN).
+4. Grafico do clube com escala dinamica e rotulo na ponta da linha.
+5. Tooltip nao sai mais do quadro e funciona por toque.
+6. Abaixo de 560px os graficos viram tabela.
+7. Painel de integridade SHA-256 no fim da pagina.
 
 NAO HOUVE MUDANCA METODOLOGICA. Apenas apresentacao.

@@ -124,13 +124,47 @@
     ].map(function (i) { return "<span>" + esc(i[0]) + ": <b>" + esc(i[1]) + "</b></span>"; }).join("");
   }
 
+  /* Escopo da apuração: quando começou, quanto já foi apurado e até quando vai.
+     Sem isso o leitor não sabe se 10 jogos é o total ou o começo. */
+  var RODADAS_TOTAL = 38;
+  var JOGOS_POR_RODADA = 10;
+
+  function renderScope() {
+    var target = el("accuracy-scope");
+    if (!target) return;
+    var games = (state.data || {}).jogos || {};
+    var scope = (state.data || {}).escopo_publico || {};
+    var rounds = games.por_rodada || [];
+    var firstRound = rounds.length ? Number(rounds[0].rodada) : null;
+    var avaliados = Number(games.jogos_avaliados) || 0;
+    var previsoes = (games.calibracao || []).reduce(function (acc, b) { return acc + (Number(b.amostra) || 0); }, 0);
+    var previstos = firstRound ? (RODADAS_TOTAL - firstRound + 1) * JOGOS_POR_RODADA : null;
+    var progresso = previstos ? Math.min(100, avaliados / previstos * 100) : 0;
+
+    target.innerHTML =
+      '<div class="af-scope">' +
+        '<div class="af-scope-line">' +
+          '<div><span>Início da apuração</span><b>' +
+            (firstRound ? "Rodada " + firstRound : "—") + "</b><small>" +
+            (dateLabel(scope.inicio_historico_jogos) || "—") + "</small></div>" +
+          '<div><span>Apurado até agora</span><b>' + number(avaliados, 0) + " jogos</b><small>" +
+            number(previsoes, 0) + " previsões (3 por jogo)</small></div>" +
+          '<div><span>Fim da apuração</span><b>Rodada ' + RODADAS_TOTAL + "</b><small>encerramento do Brasileirão</small></div>" +
+        "</div>" +
+        '<div class="af-scope-bar"><i style="width:' + progresso.toFixed(1) + '%"></i></div>' +
+        '<div class="af-scope-foot"><span>' + number(avaliados, 0) + " de " +
+          (previstos ? number(previstos, 0) : "—") + " jogos previstos para esta apuração</span><b>" +
+          number(progresso, 1) + "%</b></div>" +
+      "</div>";
+  }
+
   function renderSeal() {
     var integ = (state.data || {}).integridade || {};
     var seal = el("accuracy-seal-body");
     if (!seal) return;
     seal.innerHTML =
       '<div class="af-seal-grid">' +
-        '<div><span>Previsões travadas</span><b>' + number(integ.historico_pre_jogo_total, 0) + "</b></div>" +
+        '<div><span>Registros de previsão pré-jogo</span><b>' + number(integ.historico_pre_jogo_total, 0) + "</b><em>cada partida é registrada novamente a cada atualização até ser disputada</em></div>" +
         '<div><span>Snapshots da temporada</span><b>' + number(integ.snapshots_temporada, 0) + "</b></div>" +
         '<div><span>Último elo da cadeia</span><b><code>' + esc(shortHash(integ.hash_pre_jogo)) + "…</code></b></div>" +
       "</div>";
@@ -159,8 +193,8 @@
       var gap = Math.abs(said - happened);
       return '<article class="af-bin' + (weak ? " af-bin-weak" : "") + '">' +
         '<header><b>' + row.faixa_pct[0] + "–" + row.faixa_pct[1] + "%</b>" +
-          '<span class="af-bin-n">' + number(n, 0) + (n === 1 ? " jogo" : " jogos") +
-          (weak ? ' · <i>poucos jogos ainda</i>' : "") + "</span></header>" +
+          '<span class="af-bin-n">' + number(n, 0) + (n === 1 ? " previsão" : " previsões") +
+          (weak ? ' · <i>amostra pequena</i>' : "") + "</span></header>" +
         '<div class="af-bin-bars">' +
           '<div class="af-bin-row"><span>modelo disse</span>' +
             '<div class="af-track"><i class="af-said" style="width:' + said.toFixed(1) + '%"></i></div>' +
@@ -181,7 +215,7 @@
       '<span class="accuracy-legend">' +
         '<span><i class="said"></i>probabilidade que o modelo indicou</span>' +
         '<span><i></i>frequência com que aconteceu</span>' +
-        (weakCount ? '<span><i class="weak"></i>faixa com menos de ' + MIN_BIN + " jogos</span>" : "") +
+        (weakCount ? '<span><i class="weak"></i>faixa com menos de ' + MIN_BIN + " previsões</span>" : "") +
       "</span>";
     renderTechnical();
   }
@@ -464,7 +498,7 @@
   }
 
   function renderAll() {
-    renderGameChips(); renderSeal(); renderCalibration();
+    renderGameChips(); renderScope(); renderSeal(); renderCalibration();
     setClubOptions(); wireTabs(); renderTimeline(); renderRange(); renderSeasonEvents();
   }
 
