@@ -80,10 +80,6 @@
         <p>O histórico auditável das projeções do modelo e sua evolução ao longo do Brasileirão 2026.</p>
       </header>
 
-      <!-- Resposta antes da ferramenta: os números que o visitante veio conferir. -->
-      <section id="accuracy-summary" class="af-summary" aria-label="Resumo da acurácia"></section>
-      <section id="accuracy-seal" aria-label="Integridade do histórico"></section>
-
       <section class="panel accuracy-section" aria-labelledby="accuracy-timeline-title">
         <div class="panel-inner">
           <div class="section-head accuracy-section-head">
@@ -114,14 +110,14 @@
         <div class="panel-inner">
           <div class="section-head accuracy-section-head">
             <div>
-              <div class="kicker">Diagnóstico · probabilidades dos jogos</div>
+              <div class="kicker">Probabilidades dos jogos</div>
               <h2 id="accuracy-games-title">Calibração do AF-Previsão</h2>
-              <p>Quando o modelo diz 30%, aquilo acontece perto de 30% das vezes? Quanto mais perto da diagonal, melhor calibrado.
-                 Este painel é diagnóstico: com poucas partidas avaliadas, cada ponto ainda carrega muita incerteza — por isso o tamanho do ponto e a barra vertical importam mais que a posição dele.</p>
+              <p>Cada faixa compara a probabilidade que o modelo indicou com a frequência em que o resultado realmente aconteceu. Quanto mais parecidas as duas barras, melhor calibrado o modelo.</p>
             </div>
             <span id="accuracy-games-badge" class="badge live-soft">Coleta em andamento</span>
           </div>
-          <div id="accuracy-calibration" class="accuracy-chart" role="img" aria-label="Gráfico de calibração das probabilidades dos jogos"></div>
+          <div id="accuracy-games-chips" class="accuracy-current"></div>
+          <div id="accuracy-calibration" class="accuracy-chart" aria-label="Comparação entre probabilidade indicada e frequência observada"></div>
           <div id="accuracy-calibration-note" class="accuracy-note"></div>
           <details class="accuracy-details">
             <summary>Detalhes técnicos</summary>
@@ -154,6 +150,19 @@
             <div id="accuracy-season-events" class="accuracy-season-events"></div>
           </div>
         </article>
+      </section>
+
+      <section class="panel accuracy-section" aria-labelledby="accuracy-seal-title">
+        <div class="panel-inner">
+          <div class="section-head accuracy-section-head">
+            <div>
+              <div class="kicker">Integridade do histórico</div>
+              <h2 id="accuracy-seal-title">Previsões travadas por SHA-256</h2>
+              <p>Cada previsão é registrada antes da partida e encadeada ao hash anterior. Alterar uma previsão passada quebraria toda a cadeia, e isso é verificável.</p>
+            </div>
+          </div>
+          <div id="accuracy-seal-body"></div>
+        </div>
       </section>
 
       <section class="panel accuracy-section accuracy-method" aria-labelledby="accuracy-method-title">

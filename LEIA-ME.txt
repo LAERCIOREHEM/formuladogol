@@ -1,0 +1,33 @@
+FORMULA DO GOL - Pagina Acuracia (UX)
+=====================================
+
+ONDE COLOCAR CADA ARQUIVO (mesma estrutura do repositorio):
+
+  acuracia.html          ->  acuracia.html          (raiz)
+  css/br-acuracia.css    ->  css/br-acuracia.css
+  js/br-acuracia.js      ->  js/br-acuracia.js
+
+Os tres caminhos ja estao na lista de "paths" do deploy.yml,
+entao o Deploy site (GitHub Pages) dispara sozinho apos o push.
+Nao e preciso rodar nada manualmente.
+
+Ao conferir no navegador, use Ctrl+F5 (CSS e JS ficam em cache).
+
+O QUE MUDOU
+-----------
+1. Os 4 cards do topo foram removidos. Os numeros passaram para a
+   linha de chips do painel de calibracao, no mesmo componente que a
+   aba ja usava ("Jogos: 22 - Posicao atual: 3o").
+2. O grafico de dispersao da calibracao virou barras comparadas por
+   faixa: "modelo disse" x "aconteceu". E HTML, nao SVG, entao
+   funciona igual no celular.
+3. Faixas com menos de 5 jogos aparecem esmaecidas e marcadas como
+   "poucos jogos ainda". O limiar e a constante MIN_BIN no topo do JS.
+4. Grafico do clube: escala dinamica, rotulo escrito na ponta de cada
+   linha (sem legenda embaixo), faixa de 80% discreta ao fundo.
+5. Tooltip corrigido: nao sai mais do quadro e vira para baixo quando
+   o ponto esta no topo. Funciona por toque no celular.
+6. Abaixo de 560px de largura os graficos viram tabela.
+7. Painel novo de integridade SHA-256 no fim da pagina.
+
+NAO HOUVE MUDANCA METODOLOGICA. Apenas apresentacao.

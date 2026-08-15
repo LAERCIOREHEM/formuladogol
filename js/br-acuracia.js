@@ -2,46 +2,46 @@
   "use strict";
 
   var DATA_URL = "dados-br/acuracia-af-previsao.json";
-  var MIN_BIN = 5; // amostra mínima para um bin entrar na curva principal
+  var MIN_BIN = 5;        // amostra mínima para o bin valer leitura
+  var MOBILE_MAX = 560;   // abaixo disso, SVG vira lista
   var state = { data: null, club: "", metric: "posicao" };
 
   function el(id) { return document.getElementById(id); }
-  function esc(value) {
-    return String(value == null ? "" : value).replace(/[&<>'"]/g, function (char) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char];
+  function esc(v) {
+    return String(v == null ? "" : v).replace(/[&<>'"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[c];
     });
   }
-  function number(value, digits) {
-    var n = Number(value);
+  function number(v, d) {
+    var n = Number(v);
     if (!Number.isFinite(n)) return "—";
-    return n.toLocaleString("pt-BR", { minimumFractionDigits: digits || 0, maximumFractionDigits: digits == null ? 1 : digits });
+    return n.toLocaleString("pt-BR", { minimumFractionDigits: d || 0, maximumFractionDigits: d == null ? 1 : d });
   }
-  function pct(value, digits) {
-    var n = Number(value);
-    if (!Number.isFinite(n)) return "Em acompanhamento";
-    return number(n, digits == null ? 1 : digits) + "%";
+  function pct(v, d) {
+    var n = Number(v);
+    if (!Number.isFinite(n)) return "—";
+    return number(n, d == null ? 1 : d) + "%";
   }
-  function dateLabel(value) {
-    if (!value) return "";
-    var d = new Date(value);
+  function dateLabel(v) {
+    if (!v) return "";
+    var d = new Date(v);
     if (Number.isNaN(d.getTime())) return "";
     return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   }
-  function shortHash(value) {
-    if (!value) return "";
-    return String(value).slice(0, 10);
-  }
-  function createSvg(width, height) {
-    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 " + width + " " + height);
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-    return svg;
+  function shortHash(v) { return v ? String(v).slice(0, 10) : ""; }
+  function isMobile() { return window.innerWidth <= MOBILE_MAX; }
+
+  function createSvg(w, h) {
+    var s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    s.setAttribute("viewBox", "0 0 " + w + " " + h);
+    s.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    return s;
   }
   function svgNode(name, attrs, text) {
-    var node = document.createElementNS("http://www.w3.org/2000/svg", name);
-    Object.keys(attrs || {}).forEach(function (key) { node.setAttribute(key, attrs[key]); });
-    if (text != null) node.textContent = text;
-    return node;
+    var n = document.createElementNS("http://www.w3.org/2000/svg", name);
+    Object.keys(attrs || {}).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    if (text != null) n.textContent = text;
+    return n;
   }
   function straightPath(points) {
     return points.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(2) + " " + p[1].toFixed(2); }).join(" ");
@@ -51,63 +51,53 @@
     if (points.length === 1) return "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
     var d = "M" + points[0][0].toFixed(2) + " " + points[0][1].toFixed(2);
     for (var i = 0; i < points.length - 1; i += 1) {
-      var p0 = points[i], p1 = points[i + 1];
-      d += " Q" + p0[0].toFixed(2) + " " + p0[1].toFixed(2) + " " + ((p0[0] + p1[0]) / 2).toFixed(2) + " " + ((p0[1] + p1[1]) / 2).toFixed(2);
+      var a = points[i], b = points[i + 1];
+      d += " Q" + a[0].toFixed(2) + " " + a[1].toFixed(2) + " " + ((a[0] + b[0]) / 2).toFixed(2) + " " + ((a[1] + b[1]) / 2).toFixed(2);
     }
     var last = points[points.length - 1];
     return d + " T" + last[0].toFixed(2) + " " + last[1].toFixed(2);
   }
-
-  /* Área da faixa de 80% montada diretamente a partir dos dois contornos.
-     A versão anterior remontava o path com regex, o que produzia
-     preenchimentos torcidos quando o primeiro comando mudava de forma. */
   function bandPath(upper, lower) {
     if (!upper.length || upper.length !== lower.length) return "";
     var top = upper.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(2) + " " + p[1].toFixed(2); }).join(" ");
     var bottom = lower.slice().reverse().map(function (p) { return "L" + p[0].toFixed(2) + " " + p[1].toFixed(2); }).join(" ");
     return top + " " + bottom + " Z";
   }
-
-  /* Gradiente ancorado no topo e na base REAIS da faixa (userSpaceOnUse).
-     Antes o gradiente ia de 0 a 1 do objeto e desbotava para fora da faixa,
-     produzindo a mancha sem borda definida. */
-  function addBandGradient(svg, yTop, yBottom) {
-    var defs = svgNode("defs");
-    var grad = svgNode("linearGradient", {
-      id: "afBandGradient", gradientUnits: "userSpaceOnUse",
-      x1: "0", y1: String(yTop), x2: "0", y2: String(yBottom)
-    });
-    grad.appendChild(svgNode("stop", { offset: "0%", "stop-color": "#a3e635", "stop-opacity": ".16" }));
-    grad.appendChild(svgNode("stop", { offset: "50%", "stop-color": "#a3e635", "stop-opacity": ".10" }));
-    grad.appendChild(svgNode("stop", { offset: "100%", "stop-color": "#a3e635", "stop-opacity": ".16" }));
-    defs.appendChild(grad);
-    svg.appendChild(defs);
-  }
   function chartEmpty(target, message) {
-    target.innerHTML = '<div class="empty-state" style="margin:12px">' + esc(message) + '</div>';
+    target.innerHTML = '<div class="empty-state" style="margin:12px">' + esc(message) + "</div>";
   }
 
-  /* ---------- tooltip tátil (funciona em celular, ao contrário de <title>) ---------- */
-  function tip(target) {
-    var node = target.querySelector(".af-tip");
-    if (!node) { node = document.createElement("div"); node.className = "af-tip"; target.appendChild(node); }
-    return node;
+  /* ------------------------------------------------------------------ */
+  /* Tooltip: fica dentro do quadro nos dois eixos e vira para baixo     */
+  /* quando o ponto está no topo. O container não pode ter overflow      */
+  /* hidden — é o que cortava a caixa antes.                             */
+  /* ------------------------------------------------------------------ */
+  function tipNode(target) {
+    var n = target.querySelector(".af-tip");
+    if (!n) { n = document.createElement("div"); n.className = "af-tip"; target.appendChild(n); }
+    return n;
   }
   function bindTip(target, node, html) {
     function show(event) {
       event.stopPropagation();
-      var box = tip(target), rect = target.getBoundingClientRect();
-      var point = event.touches && event.touches[0] ? event.touches[0] : event;
+      var box = tipNode(target), rect = target.getBoundingClientRect();
+      var pt = event.touches && event.touches[0] ? event.touches[0] : event;
       box.innerHTML = html;
       box.classList.add("is-on");
-      var x = point.clientX - rect.left, y = point.clientY - rect.top;
-      box.style.left = Math.min(Math.max(x, 96), rect.width - 96) + "px";
-      box.style.top = Math.max(y - 16, 12) + "px";
+      var bw = box.offsetWidth, bh = box.offsetHeight;
+      var x = pt.clientX - rect.left, y = pt.clientY - rect.top;
+      var below = y - bh - 14 < 0;
+      box.classList.toggle("is-below", below);
+      var left = Math.min(Math.max(x, bw / 2 + 6), rect.width - bw / 2 - 6);
+      var topPos = below ? y + 16 : y - 14;
+      topPos = Math.min(topPos, rect.height - (below ? bh + 6 : 6));
+      box.style.left = left + "px";
+      box.style.top = Math.max(topPos, below ? 6 : bh + 6) + "px";
     }
     node.addEventListener("mouseenter", show);
     node.addEventListener("mousemove", show);
     node.addEventListener("touchstart", show, { passive: true });
-    node.addEventListener("mouseleave", function () { tip(target).classList.remove("is-on"); });
+    node.addEventListener("mouseleave", function () { tipNode(target).classList.remove("is-on"); });
   }
   function closeTips() {
     Array.prototype.forEach.call(document.querySelectorAll(".af-tip"), function (n) { n.classList.remove("is-on"); });
@@ -115,147 +105,84 @@
   document.addEventListener("click", closeTips);
   document.addEventListener("touchstart", closeTips, { passive: true });
 
-  /* ---------- cartões de resumo: a resposta antes da ferramenta ---------- */
-  function renderSummary() {
+  /* ------------------------------------------------------------------ */
+  /* Chips: mesmo componente já usado na linha "Jogos: 22 · Posição..."  */
+  /* ------------------------------------------------------------------ */
+  function renderGameChips() {
     var games = (state.data || {}).jogos || {};
-    var integrity = (state.data || {}).integridade || {};
-    var technical = games.metricas_tecnicas || {};
-    var favourite = games.maior_probabilidade || {};
-
+    var fav = games.maior_probabilidade || {};
+    var tech = games.metricas_tecnicas || {};
     var badge = el("accuracy-games-badge");
     if (badge) badge.textContent = games.jogos_avaliados ? number(games.jogos_avaliados, 0) + " jogos avaliados" : "Coleta iniciada";
-
-    var cards = el("accuracy-summary");
-    if (!cards) return;
-    var sample = Number(favourite.amostra) || 0;
-    var thin = sample < 30;
-
-    cards.innerHTML = [
-      '<article class="af-card">' +
-        '<span>Jogos avaliados</span>' +
-        '<strong>' + number(games.jogos_avaliados, 0) + '</strong>' +
-        '<small>Previsões registradas antes da bola rolar. Nenhuma é reconstruída depois.</small>' +
-      '</article>',
-      '<article class="af-card' + (thin ? " af-card-thin" : "") + '">' +
-        '<span>Favorito confirmado</span>' +
-        '<strong>' + pct(favourite.taxa_confirmacao_pct, 0) + '</strong>' +
-        '<small>' + number(favourite.confirmadas, 0) + ' de ' + number(favourite.amostra, 0) + ' jogos.' +
-        (thin ? ' Amostra ainda pequena para conclusão.' : '') + '</small>' +
-      '</article>',
-      '<article class="af-card">' +
-        '<span>Brier multiclasse</span>' +
-        '<strong>' + number(technical.brier_multiclasse_medio, 3) + '</strong>' +
-        '<small>Quanto menor, melhor. Mede acerto e honestidade da probabilidade juntos.</small>' +
-      '</article>',
-      '<article class="af-card">' +
-        '<span>Log Loss</span>' +
-        '<strong>' + number(technical.log_loss_medio, 3) + '</strong>' +
-        '<small>Penaliza previsão confiante que não se confirma.</small>' +
-      '</article>'
-    ].join("");
-
-    var seal = el("accuracy-seal");
-    if (seal) {
-      seal.innerHTML = '<div class="af-seal">' +
-        '<div class="af-seal-icon" aria-hidden="true">🔒</div>' +
-        '<div><strong>' + number(integrity.historico_pre_jogo_total, 0) + ' previsões travadas por SHA-256</strong>' +
-        '<p>Cada previsão é registrada antes do jogo e encadeada ao hash anterior. Alterar uma previsão passada quebraria toda a cadeia — e isso é verificável. ' +
-        'Último elo: <code>' + esc(shortHash(integrity.hash_pre_jogo)) + '…</code> · ' +
-        number(integrity.snapshots_temporada, 0) + ' snapshots de temporada.</p></div></div>';
-    }
+    var chips = el("accuracy-games-chips");
+    if (!chips) return;
+    chips.innerHTML = [
+      ["Jogos avaliados", number(games.jogos_avaliados, 0)],
+      ["Favorito venceu", number(fav.confirmadas, 0) + " de " + number(fav.amostra, 0)],
+      ["Brier", number(tech.brier_multiclasse_medio, 3)],
+      ["Log Loss", number(tech.log_loss_medio, 3)]
+    ].map(function (i) { return "<span>" + esc(i[0]) + ": <b>" + esc(i[1]) + "</b></span>"; }).join("");
   }
 
-  /* ---------- calibração ---------- */
-  /* Intervalo de Wilson: com n=2 a barra atravessa o gráfico, e isso é a mensagem. */
-  function wilson(successes, n) {
-    if (!n) return [0, 100];
-    var z = 1.96, p = successes / n;
-    var denom = 1 + z * z / n;
-    var centre = (p + z * z / (2 * n)) / denom;
-    var margin = (z / denom) * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n));
-    return [Math.max(0, (centre - margin) * 100), Math.min(1, centre + margin) * 100];
+  function renderSeal() {
+    var integ = (state.data || {}).integridade || {};
+    var seal = el("accuracy-seal-body");
+    if (!seal) return;
+    seal.innerHTML =
+      '<div class="af-seal-grid">' +
+        '<div><span>Previsões travadas</span><b>' + number(integ.historico_pre_jogo_total, 0) + "</b></div>" +
+        '<div><span>Snapshots da temporada</span><b>' + number(integ.snapshots_temporada, 0) + "</b></div>" +
+        '<div><span>Último elo da cadeia</span><b><code>' + esc(shortHash(integ.hash_pre_jogo)) + "…</code></b></div>" +
+      "</div>";
   }
 
+  /* ------------------------------------------------------------------ */
+  /* Calibração em barras comparadas — HTML, não SVG.                   */
+  /* Duas barras lado a lado é a comparação mais fácil de ler que        */
+  /* existe, e resolve o mobile por construção.                          */
+  /* ------------------------------------------------------------------ */
   function renderCalibration() {
     var target = el("accuracy-calibration");
-    var all = ((state.data.jogos || {}).calibracao || []).filter(function (r) { return Number(r.amostra) > 0; });
-    if (!all.length) {
+    var bins = ((state.data.jogos || {}).calibracao || []).filter(function (r) { return Number(r.amostra) > 0; });
+    if (!bins.length) {
       chartEmpty(target, "A calibração aparecerá automaticamente assim que houver partidas com previsão pré-jogo registrada e resultado final.");
       el("accuracy-calibration-note").textContent = "Nenhuma previsão passada é reconstruída: a série começa apenas com probabilidades realmente registradas antes do jogo.";
       renderTechnical();
       return;
     }
 
-    target.innerHTML = "";
-    var width = 780, height = 360, left = 58, right = 26, top = 26, bottom = 56;
-    var w = width - left - right, h = height - top - bottom;
-    var svg = createSvg(width, height);
-    function X(v) { return left + w * v / 100; }
-    function Y(v) { return top + h - h * v / 100; }
-
-    [0, 20, 40, 60, 80, 100].forEach(function (t) {
-      svg.appendChild(svgNode("line", { x1: left, y1: Y(t), x2: width - right, y2: Y(t), class: "grid" }));
-      svg.appendChild(svgNode("line", { x1: X(t), y1: top, x2: X(t), y2: height - bottom, class: "grid" }));
-      svg.appendChild(svgNode("text", { x: left - 10, y: Y(t) + 4, "text-anchor": "end" }, t + "%"));
-      svg.appendChild(svgNode("text", { x: X(t), y: height - bottom + 22, "text-anchor": "middle" }, t + "%"));
-    });
-    svg.appendChild(svgNode("line", { x1: left, y1: height - bottom, x2: width - right, y2: height - bottom, class: "axis" }));
-    svg.appendChild(svgNode("line", { x1: left, y1: top, x2: left, y2: height - bottom, class: "axis" }));
-    // diagonal de calibração perfeita: reta, e reta de verdade
-    svg.appendChild(svgNode("line", { x1: X(0), y1: Y(0), x2: X(100), y2: Y(100), class: "ideal" }));
-
-    var strong = all.filter(function (r) { return Number(r.amostra) >= MIN_BIN; });
-    var weak = all.filter(function (r) { return Number(r.amostra) < MIN_BIN; });
-
-    // barras de erro primeiro, para ficarem atrás dos pontos
-    all.forEach(function (row) {
+    var rows = bins.map(function (row) {
       var n = Number(row.amostra);
-      var obs = Number(row.frequencia_observada_pct);
-      var ci = wilson(Math.round(obs / 100 * n), n);
-      var x = X(Number(row.probabilidade_media_pct));
-      svg.appendChild(svgNode("line", {
-        x1: x, y1: Y(ci[0]), x2: x, y2: Y(ci[1]),
-        class: n >= MIN_BIN ? "err" : "err err-weak"
-      }));
-    });
+      var said = Number(row.probabilidade_media_pct);
+      var happened = Number(row.frequencia_observada_pct);
+      var weak = n < MIN_BIN;
+      var gap = Math.abs(said - happened);
+      return '<article class="af-bin' + (weak ? " af-bin-weak" : "") + '">' +
+        '<header><b>' + row.faixa_pct[0] + "–" + row.faixa_pct[1] + "%</b>" +
+          '<span class="af-bin-n">' + number(n, 0) + (n === 1 ? " jogo" : " jogos") +
+          (weak ? ' · <i>poucos jogos ainda</i>' : "") + "</span></header>" +
+        '<div class="af-bin-bars">' +
+          '<div class="af-bin-row"><span>modelo disse</span>' +
+            '<div class="af-track"><i class="af-said" style="width:' + said.toFixed(1) + '%"></i></div>' +
+            "<b>" + pct(said, 1) + "</b></div>" +
+          '<div class="af-bin-row"><span>aconteceu</span>' +
+            '<div class="af-track"><i class="af-happened" style="width:' + happened.toFixed(1) + '%"></i></div>' +
+            "<b>" + pct(happened, 1) + "</b></div>" +
+        "</div>" +
+        (weak ? "" : '<footer class="af-bin-gap">diferença de ' + number(gap, 1) + " pontos percentuais</footer>") +
+        "</article>";
+    }).join("");
 
-    // curva apenas entre bins com amostra suficiente, e com segmentos RETOS.
-    // Calibração é um conjunto de bins discretos: não existe valor entre dois bins.
-    if (strong.length > 1) {
-      svg.appendChild(svgNode("path", {
-        d: straightPath(strong.map(function (r) { return [X(Number(r.probabilidade_media_pct)), Y(Number(r.frequencia_observada_pct))]; })),
-        class: "line-main"
-      }));
-    }
+    target.innerHTML = '<div class="af-bins">' + rows + "</div>";
 
-    all.forEach(function (row) {
-      var n = Number(row.amostra);
-      var x = X(Number(row.probabilidade_media_pct));
-      var y = Y(Number(row.frequencia_observada_pct));
-      var r = 4 + Math.sqrt(n) * 1.7; // raio proporcional à amostra
-      var dot = svgNode("circle", { cx: x, cy: y, r: r.toFixed(1), class: n >= MIN_BIN ? "dot-main" : "dot-weak" });
-      bindTip(target, dot,
-        "<b>Faixa " + row.faixa_pct[0] + "–" + row.faixa_pct[1] + "%</b><br>" +
-        "Modelo indicou: " + pct(row.probabilidade_media_pct, 1) + "<br>" +
-        "Aconteceu em: " + pct(row.frequencia_observada_pct, 1) + "<br>" +
-        "Amostra: <b>" + number(n, 0) + (n === 1 ? " jogo" : " jogos") + "</b>" +
-        (n < MIN_BIN ? "<br><i>Amostra insuficiente — não entra na curva.</i>" : ""));
-      svg.appendChild(dot);
-    });
-
-    svg.appendChild(svgNode("text", { x: left + w / 2, y: height - 8, "text-anchor": "middle", class: "axis-label" }, "Probabilidade indicada pelo modelo"));
-    svg.appendChild(svgNode("text", { x: 16, y: top + h / 2, transform: "rotate(-90 16 " + (top + h / 2) + ")", "text-anchor": "middle", class: "axis-label" }, "Frequência observada"));
-    target.appendChild(svg);
-
+    var strong = bins.filter(function (r) { return Number(r.amostra) >= MIN_BIN; });
+    var weakCount = bins.length - strong.length;
     el("accuracy-calibration-note").innerHTML =
       '<span class="accuracy-legend">' +
-        '<span><i></i>bin com amostra ≥ ' + MIN_BIN + '</span>' +
-        '<span><i class="weak"></i>amostra menor que ' + MIN_BIN + '</span>' +
-        '<span><i class="bar"></i>intervalo de 95%</span>' +
-        '<span><i class="muted"></i>calibração perfeita</span>' +
-      '</span>' +
-      '<p class="af-read">O tamanho do ponto é a quantidade de jogos naquele bin. A barra vertical é a incerteza: ' +
-      'quanto menor a amostra, mais alta a barra. ' + (weak.length ? 'Há ' + weak.length + ' bins com pouquíssimos jogos — eles aparecem apagados justamente porque ainda não dizem nada.' : '') + '</p>';
+        '<span><i class="said"></i>probabilidade que o modelo indicou</span>' +
+        '<span><i></i>frequência com que aconteceu</span>' +
+        (weakCount ? '<span><i class="weak"></i>faixa com menos de ' + MIN_BIN + " jogos</span>" : "") +
+      "</span>";
     renderTechnical();
   }
 
@@ -263,160 +190,216 @@
     var t = ((state.data.jogos || {}).metricas_tecnicas || {});
     var scope = (state.data || {}).escopo_publico || {};
     el("accuracy-technical").innerHTML = '<div class="accuracy-technical-grid">' +
-      '<div><strong>Brier multiclasse médio</strong><br>' + esc(number(t.brier_multiclasse_medio, 4)) + '<br><small>Quanto menor, melhor. Métrica técnica, não manchete.</small></div>' +
-      '<div><strong>Log Loss médio</strong><br>' + esc(number(t.log_loss_medio, 4)) + '<br><small>Penaliza previsões excessivamente confiantes quando o evento não ocorre.</small></div>' +
-      '<div><strong>Início do histórico de jogos</strong><br>' + esc(dateLabel(scope.inicio_historico_jogos) || "—") + '<br><small>' + esc(scope.observacao || "") + '</small></div>' +
-      '</div>';
+      "<div><strong>Brier multiclasse médio</strong><br>" + esc(number(t.brier_multiclasse_medio, 4)) + "<br><small>Mede acerto e honestidade da probabilidade ao mesmo tempo. Quanto menor, melhor.</small></div>" +
+      "<div><strong>Log Loss médio</strong><br>" + esc(number(t.log_loss_medio, 4)) + "<br><small>Penaliza previsão confiante que não se confirma.</small></div>" +
+      "<div><strong>Início do histórico de jogos</strong><br>" + esc(dateLabel(scope.inicio_historico_jogos) || "—") + "<br><small>" + esc(scope.observacao || "") + "</small></div>" +
+      "</div>";
   }
 
-  /* ---------- timeline por clube ---------- */
+  /* ------------------------------------------------------------------ */
+  /* Evolução por clube                                                  */
+  /* ------------------------------------------------------------------ */
   function clubRows() { return (((state.data || {}).timeline_clubes || {})[state.club] || []); }
 
   function setClubOptions() {
     var clubs = Object.keys((state.data || {}).timeline_clubes || {}).sort(function (a, b) { return a.localeCompare(b, "pt-BR"); });
     var select = el("accuracy-club-select");
-    select.innerHTML = clubs.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join("");
+    select.innerHTML = clubs.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("");
     state.club = clubs[0] || "";
     select.value = state.club;
     select.addEventListener("change", function () { state.club = select.value; renderTimeline(); });
   }
 
   function renderCurrent(rows) {
-    var current = rows[rows.length - 1];
-    if (!current) { el("accuracy-timeline-current").innerHTML = ""; return; }
-    var interval = current.faixa_posicao_80 || {}, pointRange = current.faixa_pontos_80 || {};
+    var cur = rows[rows.length - 1];
+    if (!cur) { el("accuracy-timeline-current").innerHTML = ""; return; }
+    var p = cur.faixa_posicao_80 || {}, pt = cur.faixa_pontos_80 || {};
     el("accuracy-timeline-current").innerHTML = [
-      ["Jogos", current.jogos_atuais],
-      ["Posição atual", current.posicao_atual ? current.posicao_atual + "º" : "—"],
-      ["Projetada", current.posicao_projetada ? current.posicao_projetada + "º" : "—"],
-      ["Faixa 80%", interval.melhor && interval.pior ? interval.melhor + "º–" + interval.pior + "º" : "—"],
-      ["Pontos projetados", current.pontos_projetados == null ? "—" : current.pontos_projetados],
-      ["Faixa pontos 80%", pointRange.min != null && pointRange.max != null ? pointRange.min + "–" + pointRange.max : "—"]
-    ].map(function (i) { return '<span>' + esc(i[0]) + ': <b>' + esc(i[1]) + '</b></span>'; }).join("");
+      ["Jogos", cur.jogos_atuais],
+      ["Posição atual", cur.posicao_atual ? cur.posicao_atual + "º" : "—"],
+      ["Projetada", cur.posicao_projetada ? cur.posicao_projetada + "º" : "—"],
+      ["Faixa 80%", p.melhor && p.pior ? p.melhor + "º–" + p.pior + "º" : "—"],
+      ["Pontos projetados", cur.pontos_projetados == null ? "—" : cur.pontos_projetados],
+      ["Faixa pontos 80%", pt.min != null && pt.max != null ? pt.min + "–" + pt.max : "—"]
+    ].map(function (i) { return "<span>" + esc(i[0]) + ": <b>" + esc(i[1]) + "</b></span>"; }).join("");
   }
 
-  function bounds(values, fallbackMin, fallbackMax, minSpan) {
+  function bounds(values, fbMin, fbMax, minSpan) {
     var f = values.map(Number).filter(Number.isFinite);
-    if (!f.length) return [fallbackMin, fallbackMax];
-    var min = Math.min.apply(null, f), max = Math.max.apply(null, f);
-    var span = max - min;
-    if (minSpan && span < minSpan) { var grow = (minSpan - span) / 2; min -= grow; max += grow; }
-    var pad = Math.max(0.6, (max - min) * 0.10);
+    if (!f.length) return [fbMin, fbMax];
+    var min = Math.min.apply(null, f), max = Math.max.apply(null, f), span = max - min;
+    if (minSpan && span < minSpan) { var g = (minSpan - span) / 2; min -= g; max += g; }
+    var pad = Math.max(0.6, (max - min) * 0.12);
     return [min - pad, max + pad];
   }
 
-  function timelineBase(rows, yMin, yMax, invertY, yFormatter) {
-    var width = 820, height = 360, left = 60, right = 24, top = 26, bottom = 58;
+  function timelineBase(rows, yMin, yMax, invertY, yFmt) {
+    // margem direita maior: os rótulos das séries ficam na ponta da linha,
+    // o que dispensa legenda embaixo do gráfico.
+    var width = 880, height = 350, left = 58, right = 128, top = 26, bottom = 52;
     var w = width - left - right, h = height - top - bottom;
     function x(i) { return rows.length <= 1 ? left + w / 2 : left + w * i / (rows.length - 1); }
     function y(v) {
-      var ratio = (Number(v) - yMin) / (yMax - yMin || 1);
-      if (invertY) ratio = 1 - ratio;
-      return top + h - h * ratio;
+      var r = (Number(v) - yMin) / (yMax - yMin || 1);
+      if (invertY) r = 1 - r;
+      return top + h - h * r;
     }
     var svg = createSvg(width, height);
     for (var i = 0; i <= 4; i += 1) {
       var value = yMin + (yMax - yMin) * i / 4, yy = y(value);
-      svg.appendChild(svgNode("line", { x1: left, y1: yy, x2: width - right, y2: yy, class: "grid" }));
-      svg.appendChild(svgNode("text", { x: left - 10, y: yy + 4, "text-anchor": "end" }, yFormatter(value)));
+      svg.appendChild(svgNode("line", { x1: left, y1: yy, x2: left + w, y2: yy, class: "grid" }));
+      svg.appendChild(svgNode("text", { x: left - 10, y: yy + 4, "text-anchor": "end" }, yFmt(value)));
     }
-    svg.appendChild(svgNode("line", { x1: left, y1: height - bottom, x2: width - right, y2: height - bottom, class: "axis" }));
+    svg.appendChild(svgNode("line", { x1: left, y1: height - bottom, x2: left + w, y2: height - bottom, class: "axis" }));
     svg.appendChild(svgNode("line", { x1: left, y1: top, x2: left, y2: height - bottom, class: "axis" }));
 
-    // rótulos de rodada, não "22J"
     var idx = [];
     if (rows.length <= 6) { for (var j = 0; j < rows.length; j += 1) idx.push(j); }
     else { idx = [0, Math.round((rows.length - 1) / 3), Math.round(2 * (rows.length - 1) / 3), rows.length - 1]; }
-    var used = {}, seenLabel = {};
+    var used = {}, seen = {};
     idx.forEach(function (i2) {
       if (used[i2]) return; used[i2] = 1;
       var row = rows[i2];
-      var label = row.rodada_referencia != null ? "R" + row.rodada_referencia : Number(row.jogos_atuais || 0) + " jogos";
-      // Vários snapshots podem pertencer à mesma rodada; repetir "R22" duas vezes
-      // no eixo confunde. Na repetição, mostra a data do snapshot.
-      if (seenLabel[label]) { label = dateLabel(row.gerado_em) || label; }
-      seenLabel[label] = 1;
-      svg.appendChild(svgNode("text", { x: x(i2), y: height - bottom + 22, "text-anchor": "middle" }, label));
+      var label = row.rodada_referencia != null ? "R" + row.rodada_referencia : number(row.jogos_atuais, 0) + " jogos";
+      if (seen[label]) label = dateLabel(row.gerado_em) || label;
+      seen[label] = 1;
+      svg.appendChild(svgNode("text", { x: x(i2), y: height - bottom + 21, "text-anchor": "middle" }, label));
     });
     return { svg: svg, width: width, height: height, left: left, right: right, top: top, bottom: bottom, w: w, h: h, x: x, y: y };
   }
 
-  function addBand(svg, base, rows, lowAccessor, highAccessor) {
+  function addBand(svg, base, rows, lowAcc, highAcc) {
     var upper = [], lower = [];
     rows.forEach(function (row, i) {
-      var low = lowAccessor(row), high = highAccessor(row);
-      if (low == null || high == null) return;
-      var a = Number(low), b = Number(high);
+      var lo = lowAcc(row), hi = highAcc(row);
+      if (lo == null || hi == null) return;
+      var a = Number(lo), b = Number(hi);
       if (!Number.isFinite(a) || !Number.isFinite(b)) return;
       upper.push([base.x(i), base.y(b)]);
       lower.push([base.x(i), base.y(a)]);
     });
     if (upper.length < 2) return;
-    var ys = upper.concat(lower).map(function (p) { return p[1]; });
-    addBandGradient(svg, Math.min.apply(null, ys), Math.max.apply(null, ys));
+    // Preenchimento chapado e discreto. O gradiente e as bordas tracejadas
+    // roubavam a atenção das linhas, que são a informação principal.
     svg.appendChild(svgNode("path", { d: bandPath(upper, lower), class: "area-80" }));
-    svg.appendChild(svgNode("path", { d: straightPath(upper), class: "area-edge" }));
-    svg.appendChild(svgNode("path", { d: straightPath(lower), class: "area-edge" }));
   }
 
-  function addSeries(target, svg, base, rows, accessor, className, dotClass, label, digits, suffix) {
+  function addSeries(target, svg, base, rows, acc, lineClass, dotClass, label, digits, suffix, endLabel, labelClass) {
+    // base.height / base.bottom usados no posicionamento do rótulo
     var points = [];
     rows.forEach(function (row, i) {
-      var raw = accessor(row);
+      var raw = acc(row);
       if (raw == null || raw === "") return;
       var v = Number(raw);
       if (Number.isFinite(v)) points.push([base.x(i), base.y(v), row, v]);
     });
-    if (points.length > 1) svg.appendChild(svgNode("path", { d: smoothLinePath(points.map(function (p) { return [p[0], p[1]]; })), class: className }));
+    if (!points.length) return;
+    if (points.length > 1) {
+      svg.appendChild(svgNode("path", { d: smoothLinePath(points.map(function (p) { return [p[0], p[1]]; })), class: lineClass }));
+    }
     points.forEach(function (p) {
       var c = svgNode("circle", { cx: p[0], cy: p[1], r: 4.2, class: dotClass });
       bindTip(target, c,
         "<b>" + esc(label) + ": " + number(p[3], digits == null ? 1 : digits) + (suffix || "") + "</b><br>" +
-        "Após " + number(p[2].jogos_atuais, 0) + " jogos · " + dateLabel(p[2].gerado_em) + "<br>" +
-        (p[2].hash_previsao_clube ? '<span class="af-tip-hash">🔒 ' + esc(shortHash(p[2].hash_previsao_clube)) + "…</span>" : ""));
+        "Após " + number(p[2].jogos_atuais, 0) + " jogos · " + dateLabel(p[2].gerado_em) +
+        (p[2].hash_previsao_clube ? '<br><span class="af-tip-hash">🔒 ' + esc(shortHash(p[2].hash_previsao_clube)) + "…</span>" : ""));
       svg.appendChild(c);
     });
+    // Rótulo na ponta da linha, no lugar da legenda. Quando duas séries
+    // terminam no mesmo valor os rótulos se sobrepõem, então empilha.
+    var last = points[points.length - 1];
+    var used = svg.__labelYs || (svg.__labelYs = []);
+    var ly = last[1] + 4;
+    for (var guard = 0; guard < 12; guard += 1) {
+      var clash = used.some(function (v) { return Math.abs(v - ly) < 15; });
+      if (!clash) break;
+      ly += 15;
+    }
+    if (ly > base.height - base.bottom) ly = last[1] + 4 - 15 * used.length;
+    used.push(ly);
+    svg.appendChild(svgNode("text", { x: last[0] + 12, y: ly, class: "series-label " + labelClass }, endLabel));
+    if (Math.abs(ly - (last[1] + 4)) > 1) {
+      svg.appendChild(svgNode("line", {
+        x1: last[0] + 5, y1: last[1], x2: last[0] + 9, y2: ly - 4, class: "label-leader " + labelClass
+      }));
+    }
+  }
+
+  function mobileTable(rows, columns) {
+    var slice = rows.slice(-8);
+    return '<div class="af-mtable"><table><thead><tr><th>Rodada</th>' +
+      columns.map(function (c) { return "<th>" + esc(c[0]) + "</th>"; }).join("") +
+      "</tr></thead><tbody>" +
+      slice.map(function (row) {
+        return "<tr><td>" + (row.rodada_referencia != null ? "R" + row.rodada_referencia : number(row.jogos_atuais, 0) + "J") + "</td>" +
+          columns.map(function (c) { return "<td>" + esc(c[1](row)) + "</td>"; }).join("") + "</tr>";
+      }).join("") +
+      "</tbody></table></div>";
   }
 
   function renderPosition(rows, target) {
-    // domínio dinâmico: a escala fixa 1..20 espremia toda a série num canto
+    if (isMobile()) {
+      target.innerHTML = mobileTable(rows, [
+        ["Projetada", function (r) { return r.posicao_projetada != null ? r.posicao_projetada + "º" : "—"; }],
+        ["Real", function (r) { return r.posicao_atual != null ? r.posicao_atual + "º" : "—"; }]
+      ]);
+      el("accuracy-timeline-legend").innerHTML = "";
+      return;
+    }
     var values = [];
     rows.forEach(function (r) {
-      var range = r.faixa_posicao_80 || {};
-      values.push(r.posicao_atual, r.posicao_projetada, range.melhor, range.pior);
+      var f = r.faixa_posicao_80 || {};
+      values.push(r.posicao_atual, r.posicao_projetada, f.melhor, f.pior);
     });
     var b = bounds(values, 1, 20, 6);
     var yMin = Math.max(1, Math.floor(b[0])), yMax = Math.min(20, Math.ceil(b[1]));
     var base = timelineBase(rows, yMin, yMax, true, function (v) { return Math.round(v) + "º"; }), svg = base.svg;
     addBand(svg, base, rows, function (r) { return (r.faixa_posicao_80 || {}).pior; }, function (r) { return (r.faixa_posicao_80 || {}).melhor; });
-    addSeries(target, svg, base, rows, function (r) { return r.posicao_projetada; }, "line-main", "dot-main", "Posição projetada", 0, "º");
-    addSeries(target, svg, base, rows, function (r) { return r.posicao_atual; }, "line-secondary", "dot-secondary", "Posição real no momento", 0, "º");
+    addSeries(target, svg, base, rows, function (r) { return r.posicao_atual; }, "line-secondary", "dot-secondary", "Posição real", 0, "º", "posição real", "lbl-secondary");
+    addSeries(target, svg, base, rows, function (r) { return r.posicao_projetada; }, "line-main", "dot-main", "Posição projetada", 0, "º", "nossa projeção", "lbl-main");
     target.appendChild(svg);
-    el("accuracy-timeline-legend").innerHTML = '<span><i class="area"></i>faixa central de 80%</span><span><i></i>posição projetada</span><span><i class="secondary"></i>posição real no momento</span>';
+    el("accuracy-timeline-legend").innerHTML = '<span><i class="area"></i>faixa central de 80% da projeção</span>';
   }
 
   function renderPoints(rows, target) {
+    if (isMobile()) {
+      target.innerHTML = mobileTable(rows, [
+        ["Projetados", function (r) { return r.pontos_projetados != null ? number(r.pontos_projetados, 0) : "—"; }],
+        ["Atuais", function (r) { return r.pontos_atuais != null ? number(r.pontos_atuais, 0) : "—"; }]
+      ]);
+      el("accuracy-timeline-legend").innerHTML = "";
+      return;
+    }
     var values = [];
-    rows.forEach(function (r) { var range = r.faixa_pontos_80 || {}; values.push(r.pontos_atuais, r.pontos_projetados, range.min, range.max); });
+    rows.forEach(function (r) { var f = r.faixa_pontos_80 || {}; values.push(r.pontos_atuais, r.pontos_projetados, f.min, f.max); });
     var b = bounds(values, 0, 114, 12);
     var base = timelineBase(rows, Math.max(0, b[0]), Math.min(114, b[1]), false, function (v) { return String(Math.round(v)); }), svg = base.svg;
     addBand(svg, base, rows, function (r) { return (r.faixa_pontos_80 || {}).min; }, function (r) { return (r.faixa_pontos_80 || {}).max; });
-    addSeries(target, svg, base, rows, function (r) { return r.pontos_projetados; }, "line-main", "dot-main", "Pontos finais projetados", 0, "");
-    addSeries(target, svg, base, rows, function (r) { return r.pontos_atuais; }, "line-secondary", "dot-secondary", "Pontos acumulados", 0, "");
+    addSeries(target, svg, base, rows, function (r) { return r.pontos_atuais; }, "line-secondary", "dot-secondary", "Pontos acumulados", 0, "", "pontos hoje", "lbl-secondary");
+    addSeries(target, svg, base, rows, function (r) { return r.pontos_projetados; }, "line-main", "dot-main", "Pontos finais projetados", 0, "", "nossa projeção", "lbl-main");
     target.appendChild(svg);
-    el("accuracy-timeline-legend").innerHTML = '<span><i class="area"></i>faixa central de 80%</span><span><i></i>pontos finais projetados</span><span><i class="secondary"></i>pontos acumulados</span>';
+    el("accuracy-timeline-legend").innerHTML = '<span><i class="area"></i>faixa central de 80% da projeção</span>';
   }
 
   function renderProbabilities(rows, target) {
+    if (isMobile()) {
+      target.innerHTML = mobileTable(rows, [
+        ["Título", function (r) { return pct((r.probabilidades_pct || {}).campeao, 1); }],
+        ["Liberta", function (r) { return pct((r.probabilidades_pct || {}).libertadores, 1); }],
+        ["Sula", function (r) { return pct((r.probabilidades_pct || {}).sul_americana, 1); }]
+      ]);
+      el("accuracy-timeline-legend").innerHTML = "";
+      return;
+    }
     var values = [];
     rows.forEach(function (r) { var p = r.probabilidades_pct || {}; values.push(p.campeao, p.libertadores, p.sul_americana); });
     var b = bounds(values, 0, 100, 25);
     var base = timelineBase(rows, Math.max(0, b[0]), Math.min(100, b[1]), false, function (v) { return Math.round(v) + "%"; }), svg = base.svg;
-    addSeries(target, svg, base, rows, function (r) { return (r.probabilidades_pct || {}).campeao; }, "line-gold", "dot-gold", "Campeão", 1, "%");
-    addSeries(target, svg, base, rows, function (r) { return (r.probabilidades_pct || {}).libertadores; }, "line-main", "dot-main", "Libertadores", 1, "%");
-    addSeries(target, svg, base, rows, function (r) { return (r.probabilidades_pct || {}).sul_americana; }, "line-secondary", "dot-secondary", "Sul-Americana", 1, "%");
+    addSeries(target, svg, base, rows, function (r) { return (r.probabilidades_pct || {}).sul_americana; }, "line-secondary", "dot-secondary", "Sul-Americana", 1, "%", "Sul-Americana", "lbl-secondary");
+    addSeries(target, svg, base, rows, function (r) { return (r.probabilidades_pct || {}).campeao; }, "line-gold", "dot-gold", "Campeão", 1, "%", "título", "lbl-gold");
+    addSeries(target, svg, base, rows, function (r) { return (r.probabilidades_pct || {}).libertadores; }, "line-main", "dot-main", "Libertadores", 1, "%", "Libertadores", "lbl-main");
     target.appendChild(svg);
-    el("accuracy-timeline-legend").innerHTML = '<span><i class="gold"></i>campeão</span><span><i></i>Libertadores</span><span><i class="secondary"></i>Sul-Americana</span>';
+    el("accuracy-timeline-legend").innerHTML = "";
   }
 
   function renderTimeline() {
@@ -446,10 +429,10 @@
   function milestoneHtml(rows) {
     if (!rows || !rows.length) return "";
     return '<div class="accuracy-milestones">' + rows.slice(-6).map(function (row) {
-      return '<div class="accuracy-milestone"><span>Após ' + number(row.apos_jogos, 0) + ' jogos</span>' +
+      return '<div class="accuracy-milestone"><span>Após ' + number(row.apos_jogos, 0) + " jogos</span>" +
         '<div class="accuracy-milestone-track"><i style="width:' + Math.max(0, Math.min(100, Number(row.cobertura_pct) || 0)) + '%"></i></div>' +
-        '<b>' + pct(row.cobertura_pct, 1) + '</b></div>';
-    }).join("") + '</div>';
+        "<b>" + pct(row.cobertura_pct, 1) + "</b></div>";
+    }).join("") + "</div>";
   }
 
   function renderRange() {
@@ -459,31 +442,41 @@
       history.innerHTML = ""; return;
     }
     var position = (range.posicao || {}).destaque || {}, points = (range.pontos || {}).destaque || {};
-    target.innerHTML = '<article class="accuracy-range-card"><span>Posição final dentro da faixa</span><strong>' + pct(position.cobertura_pct, 1) + '</strong><small>Referência: após ' + number(position.apos_jogos, 0) + ' jogos · amostra ' + number(position.amostra, 0) + ' clubes</small></article>' +
-      '<article class="accuracy-range-card"><span>Pontuação final dentro da faixa</span><strong>' + pct(points.cobertura_pct, 1) + '</strong><small>Referência: após ' + number(points.apos_jogos, 0) + ' jogos · amostra ' + number(points.amostra, 0) + ' clubes</small></article>';
+    target.innerHTML = '<article class="accuracy-range-card"><span>Posição final dentro da faixa</span><strong>' + pct(position.cobertura_pct, 1) + "</strong><small>Referência: após " + number(position.apos_jogos, 0) + " jogos · amostra " + number(position.amostra, 0) + " clubes</small></article>" +
+      '<article class="accuracy-range-card"><span>Pontuação final dentro da faixa</span><strong>' + pct(points.cobertura_pct, 1) + "</strong><small>Referência: após " + number(points.apos_jogos, 0) + " jogos · amostra " + number(points.amostra, 0) + " clubes</small></article>";
     history.innerHTML = '<div class="accuracy-note"><strong>Evolução da cobertura por estágio</strong></div>' + milestoneHtml((range.posicao || {}).marcos || []);
   }
 
-  function eventLabel(key) { return { campeao: "Campeão", libertadores: "Libertadores", sul_americana: "Sul-Americana" }[key] || key; }
+  function eventLabel(k) { return { campeao: "Campeão", libertadores: "Libertadores", sul_americana: "Sul-Americana" }[k] || k; }
 
   function renderSeasonEvents() {
     var section = state.data.eventos_temporada || {}, target = el("accuracy-season-events");
     if (section.status !== "concluido") {
-      target.innerHTML = '<div class="accuracy-waiting" style="grid-column:1/-1"><strong>Em acompanhamento.</strong><br>' + esc(section.mensagem || "Os desfechos ainda não estão definidos.") + '</div>';
+      target.innerHTML = '<div class="accuracy-waiting" style="grid-column:1/-1"><strong>Em acompanhamento.</strong><br>' + esc(section.mensagem || "Os desfechos ainda não estão definidos.") + "</div>";
       return;
     }
     var events = section.eventos || {};
     target.innerHTML = ["campeao", "libertadores", "sul_americana"].map(function (key) {
       var high = (events[key] || {}).alta_confianca_80 || {};
-      return '<article class="accuracy-event-card"><span>' + esc(eventLabel(key)) + ' · confiança ≥80%</span><strong>' + pct(high.taxa_confirmacao_pct, 1) + '</strong><small>' +
-        (high.amostra ? number(high.confirmadas, 0) + ' confirmações em ' + number(high.amostra, 0) + ' previsões de alta confiança' : 'Sem amostra ≥80%') + '</small></article>';
+      return '<article class="accuracy-event-card"><span>' + esc(eventLabel(key)) + " · confiança ≥80%</span><strong>" + pct(high.taxa_confirmacao_pct, 1) + "</strong><small>" +
+        (high.amostra ? number(high.confirmadas, 0) + " confirmações em " + number(high.amostra, 0) + " previsões de alta confiança" : "Sem amostra ≥80%") + "</small></article>";
     }).join("");
   }
 
   function renderAll() {
-    renderSummary(); renderCalibration(); setClubOptions(); wireTabs();
-    renderTimeline(); renderRange(); renderSeasonEvents();
+    renderGameChips(); renderSeal(); renderCalibration();
+    setClubOptions(); wireTabs(); renderTimeline(); renderRange(); renderSeasonEvents();
   }
+
+  var resizeTimer = null, lastMobile = null;
+  window.addEventListener("resize", function () {
+    if (!state.data) return;
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(function () {
+      var m = isMobile();
+      if (m !== lastMobile) { lastMobile = m; renderTimeline(); }
+    }, 180);
+  });
 
   async function init() {
     try {
@@ -492,9 +485,10 @@
       var data = await response.json();
       if (!data || data.status !== "ok") throw new Error("JSON de acurácia inválido");
       state.data = data;
+      lastMobile = isMobile();
       renderAll();
     } catch (error) {
-      el("accuracy-app").insertAdjacentHTML("afterbegin", '<div class="accuracy-error"><strong>Não foi possível carregar a acurácia agora.</strong><br>' + esc(error && error.message ? error.message : "Falha desconhecida") + '</div>');
+      el("accuracy-app").insertAdjacentHTML("afterbegin", '<div class="accuracy-error"><strong>Não foi possível carregar a acurácia agora.</strong><br>' + esc(error && error.message ? error.message : "Falha desconhecida") + "</div>");
     }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
