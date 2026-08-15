@@ -5,7 +5,7 @@
     "jogos_com_transmissao": 49,
     "jogos_sem_transmissao_14d": 0,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 2,
+    "registros_preservados": 19,
     "jogos_estaveis_sem_reconsulta_editorial": 30,
     "fontes_com_falha": 1
   },
@@ -19,18 +19,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 5647
+      "duracao_ms": 8532
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 17,
-      "duracao_ms": 9552
+      "jogos_com_canal": 0,
+      "duracao_ms": 3725
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 6,
       "jogos_com_canal": 0,
-      "duracao_ms": 49973
+      "duracao_ms": 48075
     },
     "espn": {
       "ok": true,
@@ -38,7 +38,7 @@
       "eventos_na_janela": 21,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 1411
+      "duracao_ms": 5829
     },
     "youtube_oficial": {
       "ok": true,
@@ -48,6 +48,69 @@
   "sem_transmissao": [],
   "preservados": [
     {
+      "event_id": "401909066",
+      "jogo": "Cruzeiro x Atlético-MG",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401909065",
+      "jogo": "Palmeiras x Santos",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401909113",
+      "jogo": "Vasco da Gama x Vitória",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401909064",
+      "jogo": "Internacional x Grêmio",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841216",
+      "jogo": "Atlético-MG x Vitória",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841215",
+      "jogo": "Bahia x Internacional",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841217",
+      "jogo": "Grêmio x Chapecoense",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
       "event_id": "401841211",
       "jogo": "Mirassol x Palmeiras",
       "canais": [
@@ -55,10 +118,99 @@
       ]
     },
     {
+      "event_id": "401841209",
+      "jogo": "São Paulo x Bragantino",
+      "canais": [
+        "Premiere",
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841212",
+      "jogo": "Vasco da Gama x Cruzeiro",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401909112",
+      "jogo": "Atlético-MG x Cruzeiro",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401909110",
+      "jogo": "Santos x Palmeiras",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401909111",
+      "jogo": "Vitória x Vasco da Gama",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401909114",
+      "jogo": "Grêmio x Internacional",
+      "canais": [
+        "Premiere",
+        "SporTV",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841221",
+      "jogo": "Botafogo x Palmeiras",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841220",
+      "jogo": "Corinthians x Chapecoense",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841223",
+      "jogo": "Internacional x Santos",
+      "canais": [
+        "Paramount+",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
       "event_id": "401841226",
       "jogo": "São Paulo x Atlético-MG",
       "canais": [
         "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841222",
+      "jogo": "Vitória x Grêmio",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
       ]
     }
   ],
@@ -68,12 +220,12 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [
+    "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/15/athletico-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/15/sao-paulo-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/08/15/fluminense-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/15/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-23a-rodada.ghtml",
     "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/14/cbf-divulga-tabela-detalhada-das-rodadas-25-e-26-da-serie-a-do-brasileirao.ghtml",
-    "https://ge.globo.com/cartola/dicas/noticia/2026/08/14/cartola-com-destaque-para-o-palmeiras-mapa-da-mitada-revela-fartura-de-meias-para-rodada-23.ghtml",
-    "https://ge.globo.com/cartola/dicas/noticia/2026/08/14/cartola-2026-veja-seis-dicas-pouco-visadas-para-meio-e-ataque-na-rodada-23-do-brasileirao.ghtml",
-    "https://ge.globo.com/sp/campinas-e-regiao/futebol/brasileirao-serie-b/noticia/2026/08/14/ponte-preta-x-nautico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/gato-mestre/dicas/noticia/2026/08/13/veja-a-expectativa-de-gols-xg-e-as-dicas-de-sg-para-a-rodada-23-do-cartola-2026.ghtml",
-    "https://ge.globo.com/cartola/dicas/noticia/2026/08/13/cartola-2026-veja-seis-dicas-pouco-visadas-para-a-defesa-na-rodada-23-do-brasileirao.ghtml"
+    "https://ge.globo.com/cartola/dicas/noticia/2026/08/14/cartola-com-destaque-para-o-palmeiras-mapa-da-mitada-revela-fartura-de-meias-para-rodada-23.ghtml"
   ],
-  "atualizado_em": "2026-08-14T21:41:03-03:00"
+  "atualizado_em": "2026-08-15T06:31:04-03:00"
 }
