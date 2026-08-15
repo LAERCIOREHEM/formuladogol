@@ -80,6 +80,10 @@
         <p>O histórico auditável das projeções do modelo e sua evolução ao longo do Brasileirão 2026.</p>
       </header>
 
+      <!-- Resposta antes da ferramenta: os números que o visitante veio conferir. -->
+      <section id="accuracy-summary" class="af-summary" aria-label="Resumo da acurácia"></section>
+      <section id="accuracy-seal" aria-label="Integridade do histórico"></section>
+
       <section class="panel accuracy-section" aria-labelledby="accuracy-timeline-title">
         <div class="panel-inner">
           <div class="section-head accuracy-section-head">
@@ -110,9 +114,10 @@
         <div class="panel-inner">
           <div class="section-head accuracy-section-head">
             <div>
-              <div class="kicker">Probabilidades dos jogos</div>
+              <div class="kicker">Diagnóstico · probabilidades dos jogos</div>
               <h2 id="accuracy-games-title">Calibração do AF-Previsão</h2>
-              <p>Quando o modelo atribui uma probabilidade, com que frequência aquele resultado realmente acontece?</p>
+              <p>Quando o modelo diz 30%, aquilo acontece perto de 30% das vezes? Quanto mais perto da diagonal, melhor calibrado.
+                 Este painel é diagnóstico: com poucas partidas avaliadas, cada ponto ainda carrega muita incerteza — por isso o tamanho do ponto e a barra vertical importam mais que a posição dele.</p>
             </div>
             <span id="accuracy-games-badge" class="badge live-soft">Coleta em andamento</span>
           </div>
