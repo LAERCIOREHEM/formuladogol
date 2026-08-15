@@ -26,6 +26,12 @@ from typing import Any, Iterable, Mapping
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from atualizar_espn import para_canonico  # noqa: E402
+from fontes_brasileirao import CBFAgendaPartida, buscar_agenda_cbf  # noqa: E402
+
 TZ = ZoneInfo("America/Sao_Paulo")
 OUTPUT = ROOT / "dados-br" / "agenda-clubes-br.json"
 
@@ -156,10 +162,44 @@ def brasileirao_team_from_name(name: Any, metadata: Mapping[str, Mapping[str, An
     })
 
 
-def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[str, Any]]:
+def _rodadas_com_kickoff_provisorio(rows: Iterable[Mapping[str, Any]]) -> set[int]:
+    """Detecta lote ESPN claramente provisório sem inventar horário.
+
+    Quando o feed corrente conhece menos de 10 jogos de uma rodada e publica
+    pelo menos quatro deles no EXATO mesmo instante, tratamos esse timestamp
+    como placeholder até a grade se detalhar ou a CBF confirmar o confronto.
+    A regra não atinge uma rodada completa (inclusive a R38, que pode ser
+    legitimamente simultânea) e confirmação CBF sempre prevalece depois.
+    """
+    por_rodada: dict[int, list[str]] = {}
+    for raw in rows:
+        if not isinstance(raw, Mapping):
+            continue
+        rodada = int(raw.get("rodada") or 0)
+        data_iso = str(raw.get("data_iso") or "").strip()
+        estado = str(raw.get("estado") or "pre").lower()
+        if not (1 <= rodada <= 38) or not data_iso or estado == "post" or raw.get("data_definir") is True:
+            continue
+        por_rodada.setdefault(rodada, []).append(data_iso)
+    return {
+        rodada
+        for rodada, datas in por_rodada.items()
+        if 4 <= len(datas) < 10 and len(set(datas)) == 1
+    }
+
+
+def brasileirao_games(
+    root: Path,
+    probability_ids: set[str],
+    official_schedule: Iterable[CBFAgendaPartida] = (),
+) -> Iterable[dict[str, Any]]:
     data = load_json(root / "jogos.json", {"jogos": []})
     calendar_data = load_json(root / "dados-br" / "calendario-completo.json", {"jogos": []})
     metadata = club_metadata(root)
+    official_by_matchup = {
+        (norm(row.mandante), norm(row.visitante)): row
+        for row in official_schedule
+    }
     canonical_round_by_matchup: dict[tuple[str, str], int] = {}
     for item in calendar_data.get("jogos") or []:
         if not isinstance(item, Mapping):
@@ -172,13 +212,15 @@ def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[st
     seen_ids: set[str] = set()
     seen_matchups: set[tuple[str, str]] = set()
     round_counts: dict[int, int] = {}
-    for raw in data.get("jogos") or []:
+    raw_rows = list(data.get("jogos") or [])
+    for raw in raw_rows:
         if isinstance(raw, Mapping):
             round_no = int(raw.get("rodada") or 0)
             if round_no:
                 round_counts[round_no] = round_counts.get(round_no, 0) + 1
+    provisional_rounds = _rodadas_com_kickoff_provisorio(raw_rows)
 
-    for raw in data.get("jogos") or []:
+    for raw in raw_rows:
         if not isinstance(raw, Mapping):
             continue
         event_id = str(raw.get("event_id") or "").strip()
@@ -187,14 +229,20 @@ def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[st
         if event_id:
             seen_ids.add(event_id)
         seen_matchups.add((norm(home.get("nome")), norm(away.get("nome"))))
-        canonical_round = canonical_round_by_matchup.get((norm(home.get("nome")), norm(away.get("nome"))), int(raw.get("rodada") or 0))
+        matchup = (norm(home.get("nome")), norm(away.get("nome")))
+        canonical_round = canonical_round_by_matchup.get(matchup, int(raw.get("rodada") or 0))
+        official = official_by_matchup.get(matchup)
+        raw_date = str(raw.get("data_iso") or "")
+        official_date = str(official.data_iso if official else "")
+        chosen_date = official_date or raw_date
+        provisional = canonical_round in provisional_rounds and not official_date
         yield {
             "event_id": event_id,
             "competicao_chave": "brasileirao",
             "competicao_nome": "Campeonato Brasileiro Série A",
             "competicao_nome_curto": "Brasileirão",
             "espn_league": "bra.1",
-            "data_iso": str(raw.get("data_iso") or ""),
+            "data_iso": chosen_date,
             "estado": str(raw.get("estado") or "pre").lower(),
             "concluido": str(raw.get("estado") or "").lower() == "post",
             "status": str(raw.get("status") or ""),
@@ -207,10 +255,13 @@ def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[st
             "placar_mandante": raw.get("placar_mandante"),
             "placar_visitante": raw.get("placar_visitante"),
             "adiado": raw.get("adiado") is True,
-            "data_definir": raw.get("data_definir") is True,
+            "data_definir": bool((raw.get("data_definir") is True or provisional) and not official_date),
             "possui_clube_serie_a_2026": True,
             "probabilidades_disponiveis": bool(event_id and event_id in probability_ids),
             "fonte": "jogos.json",
+            "fonte_calendario": "CBF oficial — agenda de credenciamento" if official else str(raw.get("fonte_calendario") or "ESPN"),
+            "origem_calendario": official.origem if official else str(raw.get("origem_calendario") or ""),
+            "data_fonte_anterior": raw_date if official_date and raw_date and raw_date != official_date else "",
         }
 
     # O feed operacional pode omitir temporariamente uma partida futura mesmo
@@ -229,12 +280,17 @@ def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[st
         if (event_id and event_id in seen_ids) or matchup in seen_matchups:
             continue
         round_no = int(raw.get("rodada") or 0)
-        # Fallback só atua como reparo de buraco em rodada já detalhada pelo feed
-        # corrente. Não transforma datas básicas/placeholder de rodadas futuras em
-        # agenda oficial antes da hora.
-        if round_counts.get(round_no, 0) < 8:
+        official = official_by_matchup.get(matchup)
+        official_date = str(official.data_iso if official else "")
+        raw_date = str(raw.get("data_iso") or "").strip()
+        # Sem confirmação oficial, o fallback continua conservador e só repara
+        # buraco em rodada já amplamente detalhada pelo feed. Quando a própria
+        # CBF publicou o kickoff, ela autoriza a entrada mesmo que a ESPN ainda
+        # tenha menos de oito jogos ou data placeholder/a definir.
+        if round_counts.get(round_no, 0) < 8 and not official:
             continue
-        if raw.get("data_definir") is True or not str(raw.get("data_iso") or "").strip():
+        chosen_date = official_date or raw_date
+        if (raw.get("data_definir") is True and not official) or not chosen_date:
             continue
         yield {
             "event_id": event_id,
@@ -242,7 +298,7 @@ def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[st
             "competicao_nome": "Campeonato Brasileiro Série A",
             "competicao_nome_curto": "Brasileirão",
             "espn_league": "bra.1",
-            "data_iso": str(raw.get("data_iso") or ""),
+            "data_iso": chosen_date,
             "estado": str(raw.get("estado") or "pre").lower(),
             "concluido": raw.get("concluido") is True,
             "status": "pré-jogo",
@@ -259,6 +315,9 @@ def brasileirao_games(root: Path, probability_ids: set[str]) -> Iterable[dict[st
             "possui_clube_serie_a_2026": True,
             "probabilidades_disponiveis": bool(event_id and event_id in probability_ids),
             "fonte": "dados-br/calendario-completo.json (fallback canônico)",
+            "fonte_calendario": "CBF oficial — agenda de credenciamento" if official else str(raw.get("fonte_calendario") or "calendário canônico"),
+            "origem_calendario": official.origem if official else str(raw.get("origem_calendario") or ""),
+            "data_fonte_anterior": raw_date if official_date and raw_date and raw_date != official_date else "",
         }
 
 
@@ -299,13 +358,15 @@ def cup_games(spec: Mapping[str, Any]) -> Iterable[dict[str, Any]]:
         }
 
 
-def build(root: Path, now: datetime) -> dict[str, Any]:
+def build(
+    root: Path, now: datetime, official_schedule: Iterable[CBFAgendaPartida] = ()
+) -> dict[str, Any]:
     now = now.astimezone(TZ).replace(microsecond=0)
     start = datetime.combine(now.date(), time.min, tzinfo=TZ)
     end = end_of_next_month(now)
     probs = probabilities_ids(root)
 
-    candidates = list(brasileirao_games(root, probs))
+    candidates = list(brasileirao_games(root, probs, official_schedule))
     for spec in COMPETICOES:
         candidates.extend(cup_games(spec))
 
@@ -315,7 +376,16 @@ def build(root: Path, now: datetime) -> dict[str, Any]:
         date = parse_dt(item.get("data_iso"))
         if item.get("data_definir") is True or date is None or not (start <= date <= end):
             continue
-        key = (str(item.get("competicao_chave") or ""), str(item.get("event_id") or ""))
+        event_id = str(item.get("event_id") or "").strip()
+        if event_id:
+            identity = f"id:{event_id}"
+        else:
+            identity = "match:" + "|".join((
+                norm((item.get("mandante") or {}).get("nome") if isinstance(item.get("mandante"), Mapping) else item.get("mandante")),
+                norm((item.get("visitante") or {}).get("nome") if isinstance(item.get("visitante"), Mapping) else item.get("visitante")),
+                date.strftime("%Y-%m-%dT%H:%M"),
+            ))
+        key = (str(item.get("competicao_chave") or ""), identity)
         if key in seen:
             continue
         seen.add(key)
@@ -391,6 +461,21 @@ def selftest() -> None:
     assert sample["escudo"].endswith("/123.png")
     fallback_team = brasileirao_team_from_name("Palmeiras", {"palmeiras": {"nome": "Palmeiras", "sigla": "PAL", "escudo": "x.svg"}})
     assert fallback_team["sigla"] == "PAL" and fallback_team["escudo"] == "x.svg"
+    official = CBFAgendaPartida(
+        mandante="Atlético-MG", visitante="Grêmio", data_iso="2026-08-16T16:00", origem="teste"
+    )
+    assert official.data_iso == "2026-08-16T16:00"
+    provisional = [
+        {"rodada": 26, "data_iso": "2026-09-05T15:00", "estado": "pre"}
+        for _ in range(7)
+    ]
+    assert _rodadas_com_kickoff_provisorio(provisional) == {26}
+    # Rodada completa simultânea não é tratada como placeholder: a R38 pode
+    # legitimamente ter todos os jogos no mesmo horário.
+    assert _rodadas_com_kickoff_provisorio(provisional + [
+        {"rodada": 26, "data_iso": "2026-09-05T15:00", "estado": "pre"}
+        for _ in range(3)
+    ]) == set()
     print("self-test OK")
 
 
@@ -410,7 +495,15 @@ def main(argv: list[str] | None = None) -> int:
     now = parse_dt(args.now) if args.now else datetime.now(TZ)
     if now is None:
         raise SystemExit("--now inválido")
-    payload = build(ROOT, now)
+    official_schedule: list[CBFAgendaPartida] = []
+    try:
+        official_schedule = buscar_agenda_cbf(resolver=para_canonico)
+        print(f"Agenda oficial CBF: {len(official_schedule)} kickoffs disponíveis para reconciliação.")
+    except Exception as exc:  # noqa: BLE001
+        # A agenda pública nunca deixa de ser gerada por indisponibilidade da
+        # fonte complementar. Nesse cenário, conserva o fluxo ESPN/canônico.
+        print(f"::warning::Agenda CBF indisponível; mantendo fontes locais: {type(exc).__name__}: {exc}")
+    payload = build(ROOT, now, official_schedule)
     changed = atomic_write(Path(args.output), payload)
     verb = "atualizada" if changed else "já estava atualizada"
     print(

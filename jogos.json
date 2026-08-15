@@ -1,9 +1,10 @@
 {
-  "atualizado_em": "2026-08-15T05:11:14.416330-03:00",
-  "atualizado_em_br": "15/08/2026 05:11 BRT",
+  "atualizado_em": "2026-08-15T08:06:00-03:00",
+  "atualizado_em_br": "15/08/2026 08:06 BRT",
   "fonte": "ESPN",
   "fontes_complementares": [
-    "override manual"
+    "override manual",
+    "CBF agenda oficial"
   ],
   "fallbacks_resultado": [
     {
@@ -29,12 +30,9 @@
   "rodadas_consultadas": [
     23,
     24,
-    25,
-    26,
-    27,
-    38
+    25
   ],
-  "total_jogos": 32,
+  "total_jogos": 26,
   "jogos": [
     {
       "event_id": "401841192",
@@ -107,7 +105,7 @@
     },
     {
       "event_id": "401841194",
-      "rodada": 38,
+      "rodada": 23,
       "data_iso": "2026-08-16T11:00",
       "mandante": {
         "nome": "Chapecoense",
@@ -126,7 +124,10 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "rodada_corrigida_de": 38,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841188",
@@ -149,7 +150,36 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
+    },
+    {
+      "event_id": "401841195",
+      "rodada": 23,
+      "data_iso": "2026-08-16T16:00",
+      "mandante": {
+        "nome": "Atlético-MG",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg",
+        "sigla": "CAM"
+      },
+      "visitante": {
+        "nome": "Grêmio",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg",
+        "sigla": "GRE"
+      },
+      "estadio": "Arena MRV",
+      "transmissao": "GE TV / Globo / Premiere",
+      "status": "Pré-jogo",
+      "estado": "pre",
+      "adiado": false,
+      "data_definir": false,
+      "placar_mandante": null,
+      "placar_visitante": null,
+      "fonte_evento": "CBF oficial + calendário canônico",
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_espn_original": "2026-08-15T16:30"
     },
     {
       "event_id": "401841190",
@@ -172,7 +202,9 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841197",
@@ -195,7 +227,9 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841193",
@@ -218,7 +252,9 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841191",
@@ -241,7 +277,9 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841205",
@@ -264,7 +302,9 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841204",
@@ -287,7 +327,9 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841206",
@@ -310,53 +352,9 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841203",
-      "rodada": 24,
-      "data_iso": "2026-08-23T16:00",
-      "mandante": {
-        "nome": "Palmeiras",
-        "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-        "sigla": "PAL"
-      },
-      "visitante": {
-        "nome": "Vasco da Gama",
-        "escudo": "https://s.sde.globo.com/media/organizations/2021/09/04/vasco_SVG.svg",
-        "sigla": "VAS"
-      },
-      "estadio": "Allianz Parque",
-      "transmissao": "Globo / Premiere",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841202",
-      "rodada": 24,
-      "data_iso": "2026-08-23T16:00",
-      "mandante": {
-        "nome": "Bragantino",
-        "escudo": "https://s.sde.globo.com/media/organizations/2021/06/28/bragantino.svg",
-        "sigla": "RBB"
-      },
-      "visitante": {
-        "nome": "Grêmio",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg",
-        "sigla": "GRE"
-      },
-      "estadio": "Estádio Municipal Cicero de Souza Marques",
-      "transmissao": "Globo / Premiere",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841200",
@@ -379,7 +377,59 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
+    },
+    {
+      "event_id": "401841202",
+      "rodada": 24,
+      "data_iso": "2026-08-23T16:00",
+      "mandante": {
+        "nome": "Bragantino",
+        "escudo": "https://s.sde.globo.com/media/organizations/2021/06/28/bragantino.svg",
+        "sigla": "RBB"
+      },
+      "visitante": {
+        "nome": "Grêmio",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg",
+        "sigla": "GRE"
+      },
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "transmissao": "Globo / Premiere",
+      "status": "0'",
+      "estado": "pre",
+      "adiado": false,
+      "data_definir": false,
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
+    },
+    {
+      "event_id": "401841203",
+      "rodada": 24,
+      "data_iso": "2026-08-23T16:00",
+      "mandante": {
+        "nome": "Palmeiras",
+        "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+        "sigla": "PAL"
+      },
+      "visitante": {
+        "nome": "Vasco da Gama",
+        "escudo": "https://s.sde.globo.com/media/organizations/2021/09/04/vasco_SVG.svg",
+        "sigla": "VAS"
+      },
+      "estadio": "Allianz Parque",
+      "transmissao": "Globo / Premiere",
+      "status": "0'",
+      "estado": "pre",
+      "adiado": false,
+      "data_definir": false,
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841199",
@@ -402,7 +452,9 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841201",
@@ -425,11 +477,13 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841207",
-      "rodada": 25,
+      "rodada": 24,
       "data_iso": "2026-08-23T19:30",
       "mandante": {
         "nome": "Coritiba",
@@ -448,11 +502,14 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "rodada_corrigida_de": 25,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841198",
-      "rodada": 25,
+      "rodada": 24,
       "data_iso": "2026-08-24T20:00",
       "mandante": {
         "nome": "Botafogo",
@@ -471,12 +528,15 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "rodada_corrigida_de": 25,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/"
     },
     {
       "event_id": "401841216",
       "rodada": 25,
-      "data_iso": "2026-08-29T15:00",
+      "data_iso": "2026-08-29T18:30",
       "mandante": {
         "nome": "Atlético-MG",
         "escudo": "https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg",
@@ -494,81 +554,15 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841215",
-      "rodada": 25,
-      "data_iso": "2026-08-29T15:00",
-      "mandante": {
-        "nome": "Bahia",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/bahia.svg",
-        "sigla": "BAH"
-      },
-      "visitante": {
-        "nome": "Internacional",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/internacional.svg",
-        "sigla": "INT"
-      },
-      "estadio": "Arena Fonte Nova",
-      "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841217",
-      "rodada": 25,
-      "data_iso": "2026-08-29T15:00",
-      "mandante": {
-        "nome": "Grêmio",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg",
-        "sigla": "GRE"
-      },
-      "visitante": {
-        "nome": "Chapecoense",
-        "escudo": "https://s.sde.globo.com/media/organizations/2021/06/21/CHAPECOENSE-2018.svg",
-        "sigla": "CHA"
-      },
-      "estadio": "Arena do Grêmio",
-      "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841211",
-      "rodada": 25,
-      "data_iso": "2026-08-29T15:00",
-      "mandante": {
-        "nome": "Mirassol",
-        "escudo": "https://s.sde.globo.com/media/organizations/2024/08/20/mirassol-novo-svg-71690.svg",
-        "sigla": "MIR"
-      },
-      "visitante": {
-        "nome": "Palmeiras",
-        "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-        "sigla": "PAL"
-      },
-      "estadio": "Estadio Municipal José Maria de Campos Maia",
-      "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_espn_original": "2026-08-29T15:00"
     },
     {
       "event_id": "401841209",
-      "rodada": 26,
-      "data_iso": "2026-08-29T15:00",
+      "rodada": 25,
+      "data_iso": "2026-08-29T20:00",
       "mandante": {
         "nome": "São Paulo",
         "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/sao-paulo.svg",
@@ -586,12 +580,16 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "rodada_corrigida_de": 26,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_espn_original": "2026-08-29T15:00"
     },
     {
       "event_id": "401841212",
-      "rodada": 26,
-      "data_iso": "2026-08-29T15:00",
+      "rodada": 25,
+      "data_iso": "2026-08-29T21:20",
       "mandante": {
         "nome": "Vasco da Gama",
         "escudo": "https://s.sde.globo.com/media/organizations/2021/09/04/vasco_SVG.svg",
@@ -609,168 +607,89 @@
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "rodada_corrigida_de": 26,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_espn_original": "2026-08-29T15:00"
     },
     {
-      "event_id": "401841221",
-      "rodada": 26,
-      "data_iso": "2026-09-05T15:00",
+      "event_id": "401841215",
+      "rodada": 25,
+      "data_iso": "2026-08-30T16:00",
       "mandante": {
-        "nome": "Botafogo",
-        "escudo": "https://s.sde.globo.com/media/organizations/2019/02/04/botafogo-svg.svg",
-        "sigla": "BOT"
+        "nome": "Bahia",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/bahia.svg",
+        "sigla": "BAH"
       },
       "visitante": {
-        "nome": "Palmeiras",
-        "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-        "sigla": "PAL"
+        "nome": "Internacional",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/internacional.svg",
+        "sigla": "INT"
       },
-      "estadio": "Joao Havelange Stadium",
+      "estadio": "Arena Fonte Nova",
       "transmissao": "",
       "status": "0'",
       "estado": "pre",
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_espn_original": "2026-08-29T15:00"
     },
     {
-      "event_id": "401841220",
-      "rodada": 26,
-      "data_iso": "2026-09-05T15:00",
+      "event_id": "401841217",
+      "rodada": 25,
+      "data_iso": "2026-08-30T18:30",
       "mandante": {
-        "nome": "Corinthians",
-        "escudo": "https://s.sde.globo.com/media/organizations/2024/10/09/Corinthians_2024_Q4ahot4.svg",
-        "sigla": "COR"
+        "nome": "Grêmio",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg",
+        "sigla": "GRE"
       },
       "visitante": {
         "nome": "Chapecoense",
         "escudo": "https://s.sde.globo.com/media/organizations/2021/06/21/CHAPECOENSE-2018.svg",
         "sigla": "CHA"
       },
-      "estadio": "Neo Química Arena",
+      "estadio": "Arena do Grêmio",
       "transmissao": "",
       "status": "0'",
       "estado": "pre",
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_espn_original": "2026-08-29T15:00"
     },
     {
-      "event_id": "401841219",
-      "rodada": 26,
-      "data_iso": "2026-09-05T15:00",
+      "event_id": "401841211",
+      "rodada": 25,
+      "data_iso": "2026-08-30T19:30",
       "mandante": {
-        "nome": "Coritiba",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/coritiba.svg",
-        "sigla": "CFC"
-      },
-      "visitante": {
         "nome": "Mirassol",
         "escudo": "https://s.sde.globo.com/media/organizations/2024/08/20/mirassol-novo-svg-71690.svg",
         "sigla": "MIR"
       },
-      "estadio": "Couto Pereira",
-      "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841223",
-      "rodada": 26,
-      "data_iso": "2026-09-05T15:00",
-      "mandante": {
-        "nome": "Internacional",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/internacional.svg",
-        "sigla": "INT"
-      },
       "visitante": {
-        "nome": "Santos",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/santos.svg",
-        "sigla": "SAN"
+        "nome": "Palmeiras",
+        "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+        "sigla": "PAL"
       },
-      "estadio": "Estadio Beira-Rio",
+      "estadio": "Estadio Municipal José Maria de Campos Maia",
       "transmissao": "",
       "status": "0'",
       "estado": "pre",
       "adiado": false,
       "data_definir": false,
       "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841225",
-      "rodada": 26,
-      "data_iso": "2026-09-05T15:00",
-      "mandante": {
-        "nome": "Remo",
-        "escudo": "https://s.sde.globo.com/media/organizations/2021/02/25/Remo-PA.svg",
-        "sigla": "REM"
-      },
-      "visitante": {
-        "nome": "Flamengo",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
-        "sigla": "FLA"
-      },
-      "estadio": "Estadio Evandro Almeida (Baenao)",
-      "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841226",
-      "rodada": 27,
-      "data_iso": "2026-09-05T15:00",
-      "mandante": {
-        "nome": "São Paulo",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/sao-paulo.svg",
-        "sigla": "SAO"
-      },
-      "visitante": {
-        "nome": "Atlético-MG",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg",
-        "sigla": "CAM"
-      },
-      "estadio": "Estádio Cícero Pompeu de Toledo",
-      "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
-    },
-    {
-      "event_id": "401841222",
-      "rodada": 27,
-      "data_iso": "2026-09-05T15:00",
-      "mandante": {
-        "nome": "Vitória",
-        "escudo": "https://s.sde.globo.com/media/organizations/2025/12/18/Vitoria_2025.svg",
-        "sigla": "VIT"
-      },
-      "visitante": {
-        "nome": "Grêmio",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/03/12/gremio.svg",
-        "sigla": "GRE"
-      },
-      "estadio": "Estadio Manoel Barradas",
-      "transmissao": "",
-      "status": "0'",
-      "estado": "pre",
-      "adiado": false,
-      "data_definir": false,
-      "placar_mandante": 0,
-      "placar_visitante": 0
+      "placar_visitante": 0,
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_espn_original": "2026-08-29T15:00"
     }
   ]
 }

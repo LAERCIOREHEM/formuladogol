@@ -92,7 +92,15 @@ def item_calendario(
     origem: str,
 ) -> dict[str, Any]:
     fonte = fonte or {}
-    data_iso = fonte.get("data_iso")
+    data_bruta = fonte.get("data_iso")
+    data_definir = bool(fonte.get("data_definir") is True or not data_bruta)
+    # Se a própria origem marcou o kickoff como provisório/data a definir, o
+    # calendário canônico não mantém esse timestamp no campo operacional. O
+    # valor bruto continua disponível apenas para auditoria/proveniência.
+    data_iso = None if data_definir else data_bruta
+    data_anterior = str(fonte.get("data_espn_original") or fonte.get("data_fonte_anterior") or "")
+    if data_definir and data_bruta and not data_anterior:
+        data_anterior = str(data_bruta)
     return {
         "rodada": rodada,
         "mandante": mandante,
@@ -102,9 +110,13 @@ def item_calendario(
         "estado": str(fonte.get("estado") or ""),
         "concluido": bool(fonte.get("concluido") is True),
         "adiado": bool(fonte.get("adiado") is True),
-        "data_definir": bool(fonte.get("data_definir") is True or not data_iso),
+        "data_definir": data_definir,
         "estadio": str(fonte.get("estadio") or ""),
         "origem": origem,
+        "fonte_calendario": str(fonte.get("fonte_calendario") or ""),
+        "origem_calendario": str(fonte.get("origem_calendario") or ""),
+        "data_fonte_anterior": data_anterior,
+        "motivo_calendario": str(fonte.get("motivo_calendario") or ""),
     }
 
 
@@ -269,6 +281,74 @@ def montar_calendario_completo(
     return calendario, falhas, avisos
 
 
+def marcar_kickoffs_herdados_provisorios(
+    calendario: list[dict[str, Any]], agora: datetime
+) -> list[dict[str, Any]]:
+    """Remove horários-placeholder herdados que não têm confirmação corrente.
+
+    Critério deliberadamente conservador: em uma rodada futura, se 4 a 9
+    partidas herdadas do calendário anterior têm exatamente o mesmo kickoff,
+    não possuem confirmação CBF e coexistem com partidas ainda sem data, o
+    timestamp é preservado apenas em ``data_fonte_anterior`` e deixa de ser
+    publicado como horário confirmado.
+    """
+    por_rodada: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for item in calendario:
+        rodada = int(item.get("rodada") or 0)
+        if 1 <= rodada <= 38:
+            por_rodada[rodada].append(item)
+
+    avisos: list[dict[str, Any]] = []
+    for rodada, itens in sorted(por_rodada.items()):
+        herdados: list[tuple[dict[str, Any], datetime]] = []
+        for item in itens:
+            if "calendário anterior íntegro" not in str(item.get("origem") or ""):
+                continue
+            if "CBF oficial" in str(item.get("fonte_calendario") or ""):
+                continue
+            # Aceita tanto o horário ainda ativo quanto o valor já suprimido
+            # em execução anterior. Isso torna a auditoria idempotente e mantém
+            # a razão da supressão visível em todas as execuções futuras.
+            bruto = str(item.get("data_iso") or item.get("data_fonte_anterior") or "").strip()
+            if not bruto:
+                continue
+            try:
+                kickoff = datetime.fromisoformat(bruto.replace("Z", "+00:00"))
+                if kickoff.tzinfo is None:
+                    kickoff = kickoff.replace(tzinfo=FUSO_BRASILIA)
+                kickoff = kickoff.astimezone(FUSO_BRASILIA)
+            except ValueError:
+                continue
+            if kickoff < agora - timedelta(hours=6):
+                continue
+            herdados.append((item, kickoff))
+
+        # O padrão só é suspeito quando a rodada não tem dez kickoffs distintos
+        # e 4 a 9 jogos herdados compartilham exatamente o mesmo timestamp. Uma
+        # rodada completa simultânea (caso clássico da R38) permanece.
+        sem_data = sum(1 for item in itens if item.get("data_definir") is True or not item.get("data_iso"))
+        timestamps = {kickoff.strftime("%Y-%m-%dT%H:%M") for _, kickoff in herdados}
+        if not (4 <= len(herdados) < 10 and sem_data > 0 and len(timestamps) == 1):
+            continue
+        timestamp = next(iter(timestamps))
+        for item, _ in herdados:
+            anterior = str(item.get("data_iso") or "").strip()
+            if anterior and not str(item.get("data_fonte_anterior") or "").strip():
+                item["data_fonte_anterior"] = anterior
+            item["data_iso"] = None
+            item["data_definir"] = True
+            item["motivo_calendario"] = (
+                f"kickoff herdado provisório ({len(herdados)} jogos da R{rodada} em {timestamp})"
+            )
+        avisos.append({
+            "tipo": "kickoff_herdado_provisorio",
+            "rodada": rodada,
+            "data_iso_anterior": timestamp,
+            "jogos": len(herdados),
+        })
+    return avisos
+
+
 def auditar_calendario_completo(
     calendario: list[dict[str, Any]], clubes_esperados: set[str]
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
@@ -352,8 +432,12 @@ def auditar_calendario_completo(
             and mandos.get(tuple(sorted(par)), 0) == 1
             and mandos.get(tuple(reversed(sorted(par))), 0) == 1
         ),
-        "partidas_com_data_confirmada": sum(1 for j in calendario if j.get("data_iso")),
-        "partidas_com_data_a_definir": sum(1 for j in calendario if not j.get("data_iso")),
+        "partidas_com_data_confirmada": sum(
+            1 for j in calendario if j.get("data_iso") and j.get("data_definir") is not True
+        ),
+        "partidas_com_data_a_definir": sum(
+            1 for j in calendario if j.get("data_definir") is True or not j.get("data_iso")
+        ),
     }
     return resumo, rodadas, falhas
 
@@ -413,6 +497,30 @@ def executar_self_test() -> None:
     assert recalc_alvo["rodada"] == alvo["rodada"]
     assert recalc_alvo["event_id"] == "ESPN-REAGENDADO"
 
+    # Regressão: lote parcial herdado com horário idêntico não pode virar
+    # kickoff público só porque existia no snapshot anterior.
+    lote = []
+    for i in range(5):
+        lote.append({
+            "rodada": 27, "mandante": f"A{i}", "visitante": f"B{i}",
+            "data_iso": "2026-09-12T15:00", "data_definir": False,
+            "origem": "calendário anterior íntegro/segundo turno",
+            "fonte_calendario": "",
+        })
+    for i in range(5, 10):
+        lote.append({
+            "rodada": 27, "mandante": f"A{i}", "visitante": f"B{i}",
+            "data_iso": None, "data_definir": True,
+            "origem": "calendário anterior íntegro/segundo turno",
+            "fonte_calendario": "",
+        })
+    avisos_lote = marcar_kickoffs_herdados_provisorios(
+        lote, datetime(2026, 8, 15, 8, 0, tzinfo=FUSO_BRASILIA)
+    )
+    assert len(avisos_lote) == 1 and avisos_lote[0]["jogos"] == 5
+    assert all(x.get("data_definir") is True for x in lote)
+    assert all(x.get("data_iso") is None for x in lote)
+
     sem_base, falhas, _ = montar_calendario_completo(incompleto, clubes, [])
     assert not sem_base and falhas
     print("Self-test do calendário: OK")
@@ -441,6 +549,8 @@ def main() -> None:
     calendario, falhas_montagem, avisos = montar_calendario_completo(
         eventos, clubes_esperados, anterior
     )
+    agora = datetime.now(FUSO_BRASILIA)
+    avisos.extend(marcar_kickoffs_herdados_provisorios(calendario, agora))
     if falhas_montagem:
         raise RuntimeError(
             "Calendário não foi alterado: feed atual incompleto e não existe base anterior íntegra. "
@@ -456,9 +566,76 @@ def main() -> None:
             + json.dumps(falhas_invariantes, ensure_ascii=False)
         )
 
+    preservados_sem_confirmacao: list[dict[str, Any]] = []
+    for item in calendario:
+        data_iso = str(item.get("data_iso") or "").strip()
+        if not data_iso or "calendário anterior íntegro" not in str(item.get("origem") or ""):
+            continue
+        try:
+            kickoff = datetime.fromisoformat(data_iso.replace("Z", "+00:00"))
+            if kickoff.tzinfo is None:
+                kickoff = kickoff.replace(tzinfo=FUSO_BRASILIA)
+            kickoff = kickoff.astimezone(FUSO_BRASILIA)
+        except ValueError:
+            continue
+        if kickoff < agora - timedelta(hours=6):
+            continue
+        if "CBF oficial" in str(item.get("fonte_calendario") or ""):
+            continue
+        aviso = {
+            "tipo": "kickoff_futuro_preservado_sem_confirmacao_atual",
+            "rodada": int(item.get("rodada") or 0),
+            "mandante": item.get("mandante"),
+            "visitante": item.get("visitante"),
+            "data_iso": data_iso,
+        }
+        preservados_sem_confirmacao.append(aviso)
+    avisos.extend(preservados_sem_confirmacao)
+
     por_rodada_espn: dict[int, list[dict[str, Any]]] = defaultdict(list)
     for e in eventos:
         por_rodada_espn[int(e.get("rodada") or 0)].append(e)
+
+    provisorios_espn: list[dict[str, Any]] = []
+    for r, arr in sorted(por_rodada_espn.items()):
+        if not (1 <= r <= 38):
+            continue
+
+        # Quando o normalizador já identificou o lote como placeholder, mantém
+        # essa informação visível na auditoria mesmo com data_definir=true.
+        marcados = [
+            e for e in arr
+            if "kickoff ESPN provisório" in str(e.get("motivo_ajuste") or "")
+        ]
+        if marcados:
+            datas_marcadas = {str(e.get("data_iso") or "").strip() for e in marcados if e.get("data_iso")}
+            provisorios_espn.append({
+                "tipo": "kickoff_espn_provisorio",
+                "rodada": r,
+                "data_iso": next(iter(datas_marcadas)) if len(datas_marcadas) == 1 else None,
+                "jogos": len(marcados),
+            })
+            continue
+
+        futuros_datados = [
+            e for e in arr
+            if str(e.get("estado") or "pre").lower() != "post"
+            and e.get("data_definir") is not True
+            and str(e.get("data_iso") or "").strip()
+        ]
+        datas = [str(e.get("data_iso") or "").strip() for e in futuros_datados]
+        # Mesmo critério conservador usado pela agenda pública: feed incompleto
+        # com >=4 jogos no exato mesmo timestamp é tratado como lote provisório
+        # até detalhamento da ESPN ou confirmação da CBF. Uma rodada completa
+        # simultânea (ex.: R38) não entra nesta regra.
+        if 4 <= len(datas) < 10 and len(set(datas)) == 1:
+            provisorios_espn.append({
+                "tipo": "kickoff_espn_provisorio",
+                "rodada": r,
+                "data_iso": datas[0],
+                "jogos": len(datas),
+            })
+    avisos.extend(provisorios_espn)
 
     rodadas_espn = []
     falhas: list[dict[str, Any]] = []
@@ -514,9 +691,22 @@ def main() -> None:
         "proximos_publicados": len(jogos),
         "eventos_espn_na_janela": len(eventos),
         "ajustes_calendario_configurados": len(ajustes),
-        "jogos_adiados_sem_data": len(jogos_sem_data),
+        "jogos_adiados_sem_data": sum(
+            1 for e in eventos if e.get("data_definir") is True and e.get("adiado") is True
+        ),
+        "jogos_com_data_a_definir": len(jogos_sem_data),
         "rodadas_espn_com_clube_repetido": sum(1 for r in rodadas_espn if r["clubes_repetidos"]),
-        "rodadas_preservadas_do_calendario_anterior": len(avisos),
+        "rodadas_preservadas_do_calendario_anterior": sum(
+            1 for aviso in avisos if aviso.get("tipo") == "rodada_preservada_do_calendario_anterior"
+        ),
+        "kickoffs_confirmados_cbf": sum(
+            1 for item in calendario if "CBF oficial" in str(item.get("fonte_calendario") or "")
+        ),
+        "kickoffs_preservados_sem_confirmacao_atual": len(preservados_sem_confirmacao),
+        "kickoffs_espn_provisorios_suprimidos_da_agenda": sum(int(x.get("jogos") or 0) for x in provisorios_espn),
+        "kickoffs_herdados_provisorios_suprimidos": sum(
+            int(x.get("jogos") or 0) for x in avisos if x.get("tipo") == "kickoff_herdado_provisorio"
+        ),
         "falhas_graves": len(falhas),
     }
 
@@ -564,10 +754,26 @@ def main() -> None:
     print(f"Auditoria gerada: {ARQ_SAIDA.relative_to(ROOT)}")
     if avisos:
         for aviso in avisos:
-            print(
-                "::warning::Calendário preservou a rodada "
-                f"{aviso['rodada']} porque a ESPN retornou {aviso['jogos_espn_recebidos']}/10 jogos."
-            )
+            if aviso.get("tipo") == "rodada_preservada_do_calendario_anterior":
+                print(
+                    "::warning::Calendário preservou a rodada "
+                    f"{aviso['rodada']} porque a ESPN retornou {aviso['jogos_espn_recebidos']}/10 jogos."
+                )
+            elif aviso.get("tipo") == "kickoff_futuro_preservado_sem_confirmacao_atual":
+                print(
+                    "::warning::Kickoff futuro preservado sem confirmação CBF nesta execução: "
+                    f"R{aviso['rodada']} {aviso['mandante']} x {aviso['visitante']} — {aviso['data_iso']}"
+                )
+            elif aviso.get("tipo") == "kickoff_espn_provisorio":
+                print(
+                    "::warning::Lote de kickoff ESPN tratado como provisório e suprimido da agenda pública: "
+                    f"R{aviso['rodada']} — {aviso['jogos']} jogos em {aviso['data_iso']}"
+                )
+            elif aviso.get("tipo") == "kickoff_herdado_provisorio":
+                print(
+                    "::warning::Kickoff herdado tratado como provisório e removido do calendário confirmado: "
+                    f"R{aviso['rodada']} — {aviso['jogos']} jogos em {aviso['data_iso_anterior']}"
+                )
     print(json.dumps(saida["resumo"], ensure_ascii=False, indent=2))
 
 

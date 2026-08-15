@@ -16,45 +16,6 @@
     "acessos": "canais de direitos e plataformas de acesso são campos distintos; Claro tv+/Globoplay são opções para canais contratados, não novos detentores de direitos"
   },
   "jogos": {
-    "401841195": {
-      "event_id": "401841195",
-      "rodada": 23,
-      "mandante": "Atlético-MG",
-      "visitante": "Grêmio",
-      "data_iso": "2026-08-15T16:30:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Premiere"
-      ],
-      "origem": "override editorial — transmissoes.json",
-      "confianca": "manual",
-      "estavel": true,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "override editorial — transmissoes.json",
-          "canais": [
-            "Premiere"
-          ],
-          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
-          "autoridade": 1000,
-          "detalhe": "grade editorial verificada"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
     "401841192": {
       "event_id": "401841192",
       "rodada": 23,
@@ -76,7 +37,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -115,7 +76,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -156,7 +117,7 @@
             "SporTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -205,7 +166,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -223,15 +184,17 @@
         }
       ]
     },
-    "401841188": {
-      "event_id": "401841188",
+    "401841195": {
+      "event_id": "401841195",
       "rodada": 23,
-      "mandante": "Vasco da Gama",
-      "visitante": "Santos",
+      "mandante": "Atlético-MG",
+      "visitante": "Grêmio",
       "data_iso": "2026-08-16T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
-        "Premiere"
+        "GE TV",
+        "Premiere",
+        "Globo"
       ],
       "origem": "override editorial — transmissoes.json",
       "confianca": "manual",
@@ -241,10 +204,63 @@
         {
           "fonte": "override editorial — transmissoes.json",
           "canais": [
+            "GE TV",
+            "Globo",
             "Premiere"
           ],
-          "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "referencia": "CBF oficial — jogo 226, rodada 23",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
+          "autoridade": 1000,
+          "detalhe": "grade editorial verificada"
+        }
+      ],
+      "acessos": [
+        {
+          "nome": "GE TV no YouTube",
+          "url": "https://www.youtube.com/@getv/streams",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere no Globoplay",
+          "url": "https://globoplay.globo.com/canais/premiere/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "Premiere na Claro tv+",
+          "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
+          "tipo": "acesso_oficial"
+        }
+      ]
+    },
+    "401841188": {
+      "event_id": "401841188",
+      "rodada": 23,
+      "mandante": "Vasco da Gama",
+      "visitante": "Santos",
+      "data_iso": "2026-08-16T16:00:00-03:00",
+      "tipo": "tv_ou_streaming_oficial",
+      "canais": [
+        "Premiere",
+        "Globo"
+      ],
+      "origem": "override editorial — transmissoes.json",
+      "confianca": "manual",
+      "estavel": true,
+      "exclusivo": false,
+      "fontes": [
+        {
+          "fonte": "override editorial — transmissoes.json",
+          "canais": [
+            "Globo",
+            "Premiere"
+          ],
+          "referencia": "CBF oficial — jogo 222, rodada 23",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -258,6 +274,11 @@
         {
           "nome": "Premiere na Claro tv+",
           "url": "https://www.clarotvmais.com.br/",
+          "tipo": "acesso_oficial"
+        },
+        {
+          "nome": "TV Globo no Globoplay",
+          "url": "https://globoplay.globo.com/",
           "tipo": "acesso_oficial"
         }
       ]
@@ -287,7 +308,7 @@
             "CazéTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -336,7 +357,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -375,7 +396,7 @@
             "Prime Video"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -411,7 +432,7 @@
             "SporTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 23",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -460,7 +481,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -496,7 +517,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "SBT Sports + ESPN/Disney+ — grade das oitavas da Sul-Americana 2026",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -535,7 +556,7 @@
             "Paramount+"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -569,7 +590,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ESPN/Disney+ — grade das oitavas da Sul-Americana 2026",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -607,7 +628,7 @@
             "Paramount+"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -651,7 +672,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -685,7 +706,7 @@
             "Paramount+"
           ],
           "referencia": "Paramount+ — confrontos Vasco x Olimpia pelas oitavas da Sul-Americana 2026, transmissão exclusiva",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -719,7 +740,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ESPN Brasil — tabela das oitavas da Sul-Americana 2026, transmissão ESPN no Disney+",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -753,7 +774,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -787,7 +808,7 @@
             "Paramount+"
           ],
           "referencia": "Paramount+ — grade das oitavas da Sul-Americana 2026",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -821,7 +842,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -862,7 +883,7 @@
             "SporTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -911,7 +932,7 @@
             "Prime Video"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -947,7 +968,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -993,7 +1014,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1039,7 +1060,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1087,7 +1108,7 @@
             "CazéTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1136,7 +1157,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1175,7 +1196,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1216,7 +1237,7 @@
             "SporTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:06:00-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1271,7 +1292,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1325,7 +1346,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1370,7 +1391,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1428,7 +1449,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1466,7 +1487,7 @@
       "rodada": 25,
       "mandante": "Atlético-MG",
       "visitante": "Vitória",
-      "data_iso": "2026-08-29T15:00:00-03:00",
+      "data_iso": "2026-08-29T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "GE TV",
@@ -1488,7 +1509,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1526,7 +1547,7 @@
       "rodada": 25,
       "mandante": "Bahia",
       "visitante": "Internacional",
-      "data_iso": "2026-08-29T15:00:00-03:00",
+      "data_iso": "2026-08-30T16:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "SporTV"
@@ -1542,7 +1563,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1565,7 +1586,7 @@
       "rodada": 25,
       "mandante": "Grêmio",
       "visitante": "Chapecoense",
-      "data_iso": "2026-08-29T15:00:00-03:00",
+      "data_iso": "2026-08-30T18:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "GE TV",
@@ -1587,7 +1608,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1625,7 +1646,7 @@
       "rodada": 25,
       "mandante": "Mirassol",
       "visitante": "Palmeiras",
-      "data_iso": "2026-08-29T15:00:00-03:00",
+      "data_iso": "2026-08-30T19:30:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Globo"
@@ -1641,7 +1662,7 @@
             "Globo"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1659,7 +1680,7 @@
       "rodada": 25,
       "mandante": "São Paulo",
       "visitante": "Bragantino",
-      "data_iso": "2026-08-29T15:00:00-03:00",
+      "data_iso": "2026-08-29T20:00:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "Premiere",
@@ -1677,7 +1698,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1710,7 +1731,7 @@
       "rodada": 25,
       "mandante": "Vasco da Gama",
       "visitante": "Cruzeiro",
-      "data_iso": "2026-08-29T15:00:00-03:00",
+      "data_iso": "2026-08-29T21:20:00-03:00",
       "tipo": "tv_ou_streaming_oficial",
       "canais": [
         "GE TV",
@@ -1732,7 +1753,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1792,7 +1813,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1846,7 +1867,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1891,7 +1912,7 @@
             "Prime Video"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1949,7 +1970,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
+          "capturado_em": "2026-08-15T08:01:05-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -1978,249 +1999,10 @@
         {
           "nome": "Disney+ (ESPN)",
           "url": "https://www.disneyplus.com/pt-br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841221": {
-      "event_id": "401841221",
-      "rodada": 26,
-      "mandante": "Botafogo",
-      "visitante": "Palmeiras",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "SporTV"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "SporTV"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "SporTV no Globoplay",
-          "url": "https://globoplay.globo.com/canais/sportv-us/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841220": {
-      "event_id": "401841220",
-      "rodada": 26,
-      "mandante": "Corinthians",
-      "visitante": "Chapecoense",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "GE TV",
-        "Premiere",
-        "Globo",
-        "Prime Video"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "GE TV",
-            "Premiere",
-            "Globo",
-            "Prime Video"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "GE TV no YouTube",
-          "url": "https://www.youtube.com/@getv/streams",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "TV Globo no Globoplay",
-          "url": "https://globoplay.globo.com/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Prime Video",
-          "url": "https://www.primevideo.com/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841223": {
-      "event_id": "401841223",
-      "rodada": 26,
-      "mandante": "Internacional",
-      "visitante": "Santos",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "Paramount+",
-        "Disney+ / ESPN"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "Paramount+",
-            "Disney+ / ESPN"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "Paramount+",
-          "url": "https://www.paramountplus.com/br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Disney+ (ESPN)",
-          "url": "https://www.disneyplus.com/pt-br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841226": {
-      "event_id": "401841226",
-      "rodada": 26,
-      "mandante": "São Paulo",
-      "visitante": "Atlético-MG",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "SporTV"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "SporTV"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "SporTV no Globoplay",
-          "url": "https://globoplay.globo.com/canais/sportv-us/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "SporTV na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        }
-      ]
-    },
-    "401841222": {
-      "event_id": "401841222",
-      "rodada": 26,
-      "mandante": "Vitória",
-      "visitante": "Grêmio",
-      "data_iso": "2026-09-05T15:00:00-03:00",
-      "tipo": "tv_ou_streaming_oficial",
-      "canais": [
-        "GE TV",
-        "Premiere",
-        "Globo",
-        "Prime Video"
-      ],
-      "origem": "snapshot anterior preservado",
-      "confianca": "preservado",
-      "estavel": false,
-      "exclusivo": false,
-      "fontes": [
-        {
-          "fonte": "snapshot anterior preservado",
-          "canais": [
-            "GE TV",
-            "Premiere",
-            "Globo",
-            "Prime Video"
-          ],
-          "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-15T10:41:05-03:00",
-          "autoridade": 10,
-          "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
-        }
-      ],
-      "acessos": [
-        {
-          "nome": "GE TV no YouTube",
-          "url": "https://www.youtube.com/@getv/streams",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere no Globoplay",
-          "url": "https://globoplay.globo.com/canais/premiere/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Premiere na Claro tv+",
-          "url": "https://www.clarotvmais.com.br/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "TV Globo no Globoplay",
-          "url": "https://globoplay.globo.com/",
-          "tipo": "acesso_oficial"
-        },
-        {
-          "nome": "Prime Video",
-          "url": "https://www.primevideo.com/",
           "tipo": "acesso_oficial"
         }
       ]
     }
   },
-  "atualizado_em": "2026-08-15T10:41:05-03:00"
+  "atualizado_em": "2026-08-15T08:06:00-03:00"
 }

@@ -40,6 +40,13 @@ CBF_TABELA_DETALHADA_URLS = tuple(dict.fromkeys(filter(None, (
     CBF_TABELA_DETALHADA_URL,
     "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada",
 ))))
+# A página de credenciamento da própria CBF expõe a agenda operacional já
+# desdobrada por data/hora. Ela é usada exclusivamente para confirmar/reconciliar
+# kickoffs futuros quando o scoreboard da ESPN omite ou mantém um horário antigo.
+CBF_CREDENCIAMENTO_SERIE_A_URL = os.environ.get(
+    "CBF_CREDENCIAMENTO_SERIE_A_URL",
+    "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+)
 API_FOOTBALL_BASE = "https://v3.football.api-sports.io"
 
 HEADERS_HTML = {
@@ -64,6 +71,19 @@ class CBFPartida:
     placar_visitante: Optional[int]
     transmissao: str
     origem: str = CBF_TABELA_DETALHADA_URL
+
+    def public(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class CBFAgendaPartida:
+    """Kickoff oficial publicado na agenda operacional da CBF."""
+
+    mandante: str
+    visitante: str
+    data_iso: str
+    origem: str = CBF_CREDENCIAMENTO_SERIE_A_URL
 
     def public(self) -> dict[str, Any]:
         return asdict(self)
@@ -288,6 +308,137 @@ def _parse_transmission(cells: list[str], row_text: str) -> str:
     return value
 
 
+class _VisibleTextParser(HTMLParser):
+    """Extrai todo o texto visível sem depender do markup da página."""
+
+    BREAK_TAGS = {"br", "p", "div", "li", "tr", "td", "th", "article", "section", "a"}
+    SKIP_TAGS = {"script", "style", "noscript"}
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+        self._skip_depth = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, Optional[str]]]) -> None:
+        tag = tag.lower()
+        if tag in self.SKIP_TAGS:
+            self._skip_depth += 1
+            return
+        if self._skip_depth:
+            return
+        if tag == "img":
+            alt = dict(attrs).get("alt") or ""
+            if alt:
+                self.parts.append(alt)
+        if tag in self.BREAK_TAGS:
+            self.parts.append(" \n ")
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        if tag in self.SKIP_TAGS:
+            if self._skip_depth:
+                self._skip_depth -= 1
+            return
+        if self._skip_depth:
+            return
+        if tag in self.BREAK_TAGS:
+            self.parts.append(" \n ")
+
+    def handle_data(self, data: str) -> None:
+        if not self._skip_depth:
+            self.parts.append(data)
+
+    def text(self) -> str:
+        value = html.unescape(" ".join(self.parts)).replace("\xa0", " ")
+        value = re.sub(r"[ \t\r\f\v]+", " ", value)
+        value = re.sub(r" *\n+ *", " \n ", value)
+        return value.strip()
+
+
+def parse_cbf_agenda_credencial(
+    html_text: str,
+    *,
+    resolver: Callable[[Any], Optional[str]],
+    origem: str = CBF_CREDENCIAMENTO_SERIE_A_URL,
+) -> list[CBFAgendaPartida]:
+    """Lê a agenda de credenciamento da CBF para confirmar datas/horários.
+
+    O parser não depende de classes CSS. Cada kickoff ``dd/mm/aaaa às hh:mm``
+    é associado ao par de clubes ao redor do separador ``x``. O mandante é o
+    último clube reconhecido antes do separador e o visitante é o primeiro
+    depois dele; assim nomes de estádio como ``São Januário`` não podem virar
+    falsamente ``São Paulo``.
+    """
+    parser = _VisibleTextParser()
+    parser.feed(html_text)
+    parser.close()
+    text = parser.text()
+    out: list[CBFAgendaPartida] = []
+    seen: set[tuple[str, str, str]] = set()
+
+    kickoff_re = re.compile(
+        r"\b(\d{2}/\d{2}/\d{4})\b\s*(?:às|as)\s*(\d{1,2})[:h](\d{2})\s*(?:hs?|horas?)?",
+        flags=re.IGNORECASE,
+    )
+    for match in kickoff_re.finditer(text):
+        line_start = text.rfind("\n", 0, match.start()) + 1
+        line_end = text.find("\n", match.end())
+        if line_end < 0:
+            line_end = len(text)
+        line = text[line_start:line_end].strip()
+        prefix = line[: max(0, match.start() - line_start)]
+        separators = list(re.finditer(r"\s+[xX×]\s+", prefix))
+        if not separators:
+            # Fallback para markup que colapse blocos: limita a janela e usa o
+            # último separador antes do kickoff.
+            window_start = max(0, match.start() - 320)
+            prefix = text[window_start:match.start()]
+            separators = list(re.finditer(r"\s+[xX×]\s+", prefix))
+        if not separators:
+            continue
+        sep = separators[-1]
+        home_candidates = _find_teams(prefix[:sep.start()], resolver)
+        away_candidates = _find_teams(prefix[sep.end():], resolver)
+        if not home_candidates or not away_candidates:
+            continue
+        home = home_candidates[-1][1]
+        away = away_candidates[0][1]
+        if not home or not away or home == away:
+            continue
+        kickoff = _parse_datetime_brt(line) or _parse_datetime_brt(text[max(0, match.start()-100):match.end()])
+        if not kickoff:
+            continue
+        item = CBFAgendaPartida(
+            mandante=home,
+            visitante=away,
+            data_iso=kickoff.strftime("%Y-%m-%dT%H:%M"),
+            origem=origem,
+        )
+        key = (item.mandante, item.visitante, item.data_iso)
+        if key not in seen:
+            out.append(item)
+            seen.add(key)
+    out.sort(key=lambda x: (x.data_iso, x.mandante, x.visitante))
+    return out
+
+
+def buscar_agenda_cbf(
+    *, resolver: Callable[[Any], Optional[str]], url: str = CBF_CREDENCIAMENTO_SERIE_A_URL
+) -> list[CBFAgendaPartida]:
+    page = fetch_text(url)
+    rows = parse_cbf_agenda_credencial(page, resolver=resolver, origem=url)
+    if not rows:
+        raise RuntimeError(f"agenda oficial da CBF carregada sem partidas reconhecíveis: {url}")
+    return rows
+
+
+def localizar_agenda_cbf(
+    rows: Iterable[CBFAgendaPartida], *, mandante: str, visitante: str
+) -> Optional[CBFAgendaPartida]:
+    matches = [row for row in rows if row.mandante == mandante and row.visitante == visitante]
+    return matches[0] if len(matches) == 1 else None
+
+
 def parse_cbf_tabela_detalhada(
     html_text: str,
     *,
@@ -300,22 +451,28 @@ def parse_cbf_tabela_detalhada(
 
     rows = parser.rows
     # Proteção para mudanças de markup: o buscador da CBF também pode devolver
-    # os registros sem <tr>. Neste caso, separa pelo marcador "Ref:".
+    # os registros sem <tr>. Aceita tanto o marcador histórico "Ref:" quanto
+    # o atual "Jogo:" e "Rodada" com ou sem dois-pontos.
     if not rows:
         raw = parser.fallback_text()
-        rows = [[chunk] for chunk in re.split(r"(?=\bRef:\s*\d+)", raw) if "Rodada:" in chunk]
+        rows = [
+            [chunk]
+            for chunk in re.split(r"(?=\b(?:Ref|Jogo)\s*:?\s*\d+)", raw, flags=re.IGNORECASE)
+            if re.search(r"\bRodada\b", chunk, flags=re.IGNORECASE)
+        ]
 
     out: list[CBFPartida] = []
     seen: set[tuple[int, str, str, str]] = set()
     for cells in rows:
         row_text = " | ".join(cells)
-        if "rodada" not in normalizar_texto(row_text) or "ref" not in normalizar_texto(row_text):
+        normalized_row = normalizar_texto(row_text)
+        if "rodada" not in normalized_row or not ("ref" in normalized_row or "jogo" in normalized_row):
             continue
-        round_match = re.search(r"Rodada\s*:\s*(\d+)", row_text, flags=re.IGNORECASE)
-        round_label_match = re.search(r"Rodada\s*:\s*([^|]+)", row_text, flags=re.IGNORECASE)
+        round_match = re.search(r"Rodada\s*:?\s*(\d+)", row_text, flags=re.IGNORECASE)
+        round_label_match = re.search(r"Rodada\s*:?\s*([^|]+)", row_text, flags=re.IGNORECASE)
         round_label = normalizar_texto(round_label_match.group(1) if round_label_match else "")
         round_number = int(round_match.group(1)) if round_match else (1 if "ida" in round_label else (2 if "volta" in round_label else 0))
-        ref_match = re.search(r"Ref\s*:\s*(\d+)", row_text, flags=re.IGNORECASE)
+        ref_match = re.search(r"(?:Ref|Jogo)\s*:?\s*(\d+)", row_text, flags=re.IGNORECASE)
         kickoff = _parse_datetime_brt(row_text)
         teams = _find_teams(row_text, resolver)
         if not kickoff or len(teams) < 2:
@@ -492,6 +649,10 @@ def _selftest() -> None:
         "mirassol": "Mirassol",
         "bahia": "Bahia",
         "corinthians": "Corinthians",
+        "atletico mineiro": "Atlético-MG",
+        "gremio": "Grêmio",
+        "santos": "Santos",
+        "santos fc": "Santos",
     }
 
     def resolver(value: Any) -> Optional[str]:
@@ -538,6 +699,31 @@ def _selftest() -> None:
     copa_rows = parse_cbf_tabela_detalhada(copa_sample, resolver=resolver, origem="teste-copa")
     assert len(copa_rows) == 1, copa_rows
     assert copa_rows[0].rodada == 2 and copa_rows[0].transmissao == "Amazon Prime"
+
+    current_markup_sample = """
+    <div>Jogo: 226 Rodada 23 Atlético Mineiro Grêmio
+      Data: 16/08/2026 - domingo às 16:00 | Transmissão: GE TV, Globo, Premiere
+    </div>
+    """
+    current_rows = parse_cbf_tabela_detalhada(current_markup_sample, resolver=resolver, origem="teste-atual")
+    assert len(current_rows) == 1, current_rows
+    assert current_rows[0].rodada == 23 and current_rows[0].referencia == "226"
+
+    agenda_sample = """
+    <section>
+      <div>X Vasco da Gama Saf / RJ x Santos FC / SP São Januário - , RJ 16/08/2026 às 16:00 hs</div>
+      <div>Encerrado 13/08/2026 18:00h</div>
+      <div>X Atlético Mineiro / MG x Grêmio / RS ARENA MRV - , MG 16/08/2026 às 16:00 hs</div>
+      <div>Encerrado 13/08/2026 18:00h</div>
+    </section>
+    """
+    aliases.update({"santos fc": "Santos", "santos": "Santos", "gremio": "Grêmio"})
+    agenda_rows = parse_cbf_agenda_credencial(agenda_sample, resolver=resolver, origem="teste-agenda")
+    assert len(agenda_rows) == 2, agenda_rows
+    vasco_santos = localizar_agenda_cbf(agenda_rows, mandante="Vasco da Gama", visitante="Santos")
+    assert vasco_santos and vasco_santos.data_iso == "2026-08-16T16:00", agenda_rows
+    atletico_gremio = localizar_agenda_cbf(agenda_rows, mandante="Atlético-MG", visitante="Grêmio")
+    assert atletico_gremio and atletico_gremio.data_iso == "2026-08-16T16:00"
     print("Selftest fontes complementares do Brasileirão OK")
 
 

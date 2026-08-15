@@ -1,5 +1,5 @@
 {
-  "gerado_em": "2026-08-15T05:11:14.520481-03:00",
+  "gerado_em": "2026-08-15T08:46:16.581116-03:00",
   "fonte": "auditoria local sobre JSONs normalizados da ESPN",
   "escopo": "módulo Brasileirão; nenhum arquivo da Copa",
   "resumo": {
@@ -9,15 +9,20 @@
     "rodadas_com_10_jogos": 38,
     "clubes_com_38_jogos": 20,
     "confrontos_com_ida_e_volta": 190,
-    "partidas_com_data_confirmada": 262,
-    "partidas_com_data_a_definir": 118,
-    "resultados_publicados": 217,
-    "proximos_publicados": 32,
-    "eventos_espn_na_janela": 249,
+    "partidas_com_data_confirmada": 249,
+    "partidas_com_data_a_definir": 131,
+    "resultados_publicados": 215,
+    "proximos_publicados": 26,
+    "eventos_espn_na_janela": 248,
     "ajustes_calendario_configurados": 3,
     "jogos_adiados_sem_data": 0,
+    "jogos_com_data_a_definir": 7,
     "rodadas_espn_com_clube_repetido": 0,
     "rodadas_preservadas_do_calendario_anterior": 1,
+    "kickoffs_confirmados_cbf": 27,
+    "kickoffs_preservados_sem_confirmacao_atual": 0,
+    "kickoffs_espn_provisorios_suprimidos_da_agenda": 7,
+    "kickoffs_herdados_provisorios_suprimidos": 10,
     "falhas_graves": 0
   },
   "avisos": [
@@ -26,6 +31,24 @@
       "rodada": 4,
       "jogos_espn_recebidos": 9,
       "jogos_preservados": 10
+    },
+    {
+      "tipo": "kickoff_herdado_provisorio",
+      "rodada": 27,
+      "data_iso_anterior": "2026-09-12T15:00",
+      "jogos": 5
+    },
+    {
+      "tipo": "kickoff_herdado_provisorio",
+      "rodada": 28,
+      "data_iso_anterior": "2026-09-19T15:00",
+      "jogos": 5
+    },
+    {
+      "tipo": "kickoff_espn_provisorio",
+      "rodada": 26,
+      "data_iso": "2026-09-05T15:00",
+      "jogos": 7
     }
   ],
   "distribuicao_jogos_disputados": {
@@ -114,7 +137,57 @@
       "jogos_disputados": 21
     }
   ],
-  "jogos_adiados_sem_data": [],
+  "jogos_adiados_sem_data": [
+    {
+      "event_id": "401841219",
+      "rodada": 26,
+      "mandante": "Coritiba",
+      "visitante": "Mirassol",
+      "status": "0'"
+    },
+    {
+      "event_id": "401841220",
+      "rodada": 26,
+      "mandante": "Corinthians",
+      "visitante": "Chapecoense",
+      "status": "0'"
+    },
+    {
+      "event_id": "401841221",
+      "rodada": 26,
+      "mandante": "Botafogo",
+      "visitante": "Palmeiras",
+      "status": "0'"
+    },
+    {
+      "event_id": "401841222",
+      "rodada": 26,
+      "mandante": "Vitória",
+      "visitante": "Grêmio",
+      "status": "0'"
+    },
+    {
+      "event_id": "401841223",
+      "rodada": 26,
+      "mandante": "Internacional",
+      "visitante": "Santos",
+      "status": "0'"
+    },
+    {
+      "event_id": "401841225",
+      "rodada": 26,
+      "mandante": "Remo",
+      "visitante": "Flamengo",
+      "status": "0'"
+    },
+    {
+      "event_id": "401841226",
+      "rodada": 26,
+      "mandante": "São Paulo",
+      "visitante": "Atlético-MG",
+      "status": "0'"
+    }
+  ],
   "rodadas_calendario_completo": [
     {
       "rodada": 1,
@@ -543,27 +616,17 @@
     },
     {
       "rodada": 23,
-      "jogos_mapeados": 8,
+      "jogos_mapeados": 10,
       "clubes_repetidos": [],
-      "clubes_ausentes": [
-        "Atlético-MG",
-        "Bahia",
-        "Chapecoense",
-        "Grêmio"
-      ],
-      "integra": false
+      "clubes_ausentes": [],
+      "integra": true
     },
     {
       "rodada": 24,
-      "jogos_mapeados": 8,
+      "jogos_mapeados": 10,
       "clubes_repetidos": [],
-      "clubes_ausentes": [
-        "Athletico-PR",
-        "Botafogo",
-        "Corinthians",
-        "Coritiba"
-      ],
-      "integra": false
+      "clubes_ausentes": [],
+      "integra": true
     },
     {
       "rodada": 25,
@@ -575,20 +638,6 @@
     {
       "rodada": 26,
       "jogos_mapeados": 7,
-      "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": false
-    },
-    {
-      "rodada": 27,
-      "jogos_mapeados": 2,
-      "clubes_repetidos": [],
-      "clubes_ausentes": [],
-      "integra": false
-    },
-    {
-      "rodada": 38,
-      "jogos_mapeados": 1,
       "clubes_repetidos": [],
       "clubes_ausentes": [],
       "integra": false
