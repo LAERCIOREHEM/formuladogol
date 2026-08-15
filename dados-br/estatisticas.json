@@ -1,9 +1,9 @@
 {
-  "atualizado_em": "2026-08-15T17:51:19.864837-03:00",
+  "atualizado_em": "2026-08-15T18:31:20.072550-03:00",
   "temporada": 2026,
   "fonte": "Eventos validados das partidas (ESPN summary)",
-  "total_resultados_lidos": 215,
-  "total_eventos_processados": 215,
+  "total_resultados_lidos": 216,
+  "total_eventos_processados": 216,
   "resumo": {
     "lider_geral": {
       "time": "Palmeiras",
@@ -11,23 +11,23 @@
       "sigla": "PAL",
       "pos": 1,
       "pontos": 48,
-      "jogos": 22,
+      "jogos": 23,
       "vitorias": 14,
       "empates": 6,
-      "derrotas": 2,
-      "gp": 38,
-      "gc": 16,
-      "sg": 22,
-      "aproveitamento": 73,
+      "derrotas": 3,
+      "gp": 40,
+      "gc": 19,
+      "sg": 21,
+      "aproveitamento": 70,
       "forma_ultimos5": [
-        "V",
         "V",
         "D",
         "V",
-        "E"
+        "E",
+        "D"
       ],
-      "pontos_ultimos5": 10,
-      "aproveitamento_ultimos5": 67,
+      "pontos_ultimos5": 7,
+      "aproveitamento_ultimos5": 47,
       "mandante": {
         "jogos": 11,
         "pontos": 24,
@@ -40,23 +40,74 @@
         "aproveitamento": 73
       },
       "visitante": {
+        "jogos": 12,
+        "pontos": 24,
+        "vitorias": 7,
+        "empates": 3,
+        "derrotas": 2,
+        "gp": 23,
+        "gc": 11,
+        "sg": 12,
+        "aproveitamento": 67
+      },
+      "sequencia": {
+        "tipo": "D",
+        "quantidade": 1,
+        "texto": "1 derrota(s) seguida(s)"
+      }
+    },
+    "melhor_ataque": {
+      "time": "Palmeiras",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "sigla": "PAL",
+      "pos": 1,
+      "pontos": 48,
+      "jogos": 23,
+      "vitorias": 14,
+      "empates": 6,
+      "derrotas": 3,
+      "gp": 40,
+      "gc": 19,
+      "sg": 21,
+      "aproveitamento": 70,
+      "forma_ultimos5": [
+        "V",
+        "D",
+        "V",
+        "E",
+        "D"
+      ],
+      "pontos_ultimos5": 7,
+      "aproveitamento_ultimos5": 47,
+      "mandante": {
         "jogos": 11,
         "pontos": 24,
         "vitorias": 7,
         "empates": 3,
         "derrotas": 1,
-        "gp": 21,
+        "gp": 17,
         "gc": 8,
-        "sg": 13,
+        "sg": 9,
         "aproveitamento": 73
       },
+      "visitante": {
+        "jogos": 12,
+        "pontos": 24,
+        "vitorias": 7,
+        "empates": 3,
+        "derrotas": 2,
+        "gp": 23,
+        "gc": 11,
+        "sg": 12,
+        "aproveitamento": 67
+      },
       "sequencia": {
-        "tipo": "E",
+        "tipo": "D",
         "quantidade": 1,
-        "texto": "1 empate(s) seguida(s)"
+        "texto": "1 derrota(s) seguida(s)"
       }
     },
-    "melhor_ataque": {
+    "melhor_defesa": {
       "time": "Flamengo",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
       "sigla": "FLA",
@@ -105,57 +156,6 @@
         "tipo": "V",
         "quantidade": 1,
         "texto": "1 vitória(s) seguida(s)"
-      }
-    },
-    "melhor_defesa": {
-      "time": "Palmeiras",
-      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "sigla": "PAL",
-      "pos": 1,
-      "pontos": 48,
-      "jogos": 22,
-      "vitorias": 14,
-      "empates": 6,
-      "derrotas": 2,
-      "gp": 38,
-      "gc": 16,
-      "sg": 22,
-      "aproveitamento": 73,
-      "forma_ultimos5": [
-        "V",
-        "V",
-        "D",
-        "V",
-        "E"
-      ],
-      "pontos_ultimos5": 10,
-      "aproveitamento_ultimos5": 67,
-      "mandante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
-        "empates": 3,
-        "derrotas": 1,
-        "gp": 17,
-        "gc": 8,
-        "sg": 9,
-        "aproveitamento": 73
-      },
-      "visitante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
-        "empates": 3,
-        "derrotas": 1,
-        "gp": 21,
-        "gc": 8,
-        "sg": 13,
-        "aproveitamento": 73
-      },
-      "sequencia": {
-        "tipo": "E",
-        "quantidade": 1,
-        "texto": "1 empate(s) seguida(s)"
       }
     },
     "time_em_alta": {
@@ -375,13 +375,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
+      "jogos": 20,
       "gols": 6,
       "jogos_com_participacao": 6,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 12,
-      "media_por_jogo": 0.316
+      "media_por_jogo": 0.3
     },
     {
       "athlete_id": "",
@@ -511,6 +511,20 @@
     },
     {
       "athlete_id": "",
+      "nome": "Maurício",
+      "time": "Palmeiras",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "jogos": 20,
+      "gols": 5,
+      "jogos_com_participacao": 4,
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 22,
+      "media_por_jogo": 0.25
+    },
+    {
+      "athlete_id": "",
       "nome": "Pedro Rocha",
       "time": "Coritiba",
       "team_id": "",
@@ -520,7 +534,7 @@
       "jogos_com_participacao": 5,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 22,
+      "posicao": 23,
       "media_por_jogo": 0.238
     },
     {
@@ -534,7 +548,7 @@
       "jogos_com_participacao": 5,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 23,
+      "posicao": 24,
       "media_por_jogo": 0.357
     },
     {
@@ -548,7 +562,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 24,
+      "posicao": 25,
       "media_por_jogo": 0.238
     },
     {
@@ -562,7 +576,7 @@
       "jogos_com_participacao": 5,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 25,
+      "posicao": 26,
       "media_por_jogo": 0.227
     },
     {
@@ -571,13 +585,13 @@
       "time": "Fluminense",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 15,
+      "jogos": 16,
       "gols": 4,
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 26,
-      "media_por_jogo": 0.267
+      "posicao": 27,
+      "media_por_jogo": 0.25
     },
     {
       "athlete_id": "",
@@ -590,7 +604,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 27,
+      "posicao": 28,
       "media_por_jogo": 0.211
     },
     {
@@ -599,13 +613,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
+      "jogos": 20,
       "gols": 4,
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 28,
-      "media_por_jogo": 0.211
+      "posicao": 29,
+      "media_por_jogo": 0.2
     },
     {
       "athlete_id": "",
@@ -618,7 +632,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 29,
+      "posicao": 30,
       "media_por_jogo": 0.222
     },
     {
@@ -632,7 +646,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 30,
+      "posicao": 31,
       "media_por_jogo": 0.222
     },
     {
@@ -646,7 +660,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 31,
+      "posicao": 32,
       "media_por_jogo": 0.267
     },
     {
@@ -660,7 +674,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 32,
+      "posicao": 33,
       "media_por_jogo": 0.25
     },
     {
@@ -674,8 +688,22 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 33,
+      "posicao": 34,
       "media_por_jogo": 0.4
+    },
+    {
+      "athlete_id": "",
+      "nome": "Gustavo Gómez",
+      "time": "Palmeiras",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "jogos": 20,
+      "gols": 4,
+      "jogos_com_participacao": 4,
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 35,
+      "media_por_jogo": 0.2
     },
     {
       "athlete_id": "",
@@ -688,7 +716,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 34,
+      "posicao": 36,
       "media_por_jogo": 0.222
     },
     {
@@ -697,13 +725,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 17,
+      "jogos": 18,
       "gols": 4,
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 35,
-      "media_por_jogo": 0.235
+      "posicao": 37,
+      "media_por_jogo": 0.222
     },
     {
       "athlete_id": "",
@@ -716,7 +744,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 36,
+      "posicao": 38,
       "media_por_jogo": 0.211
     },
     {
@@ -730,22 +758,8 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 37,
+      "posicao": 39,
       "media_por_jogo": 0.222
-    },
-    {
-      "athlete_id": "",
-      "nome": "Maurício",
-      "time": "Palmeiras",
-      "team_id": "",
-      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
-      "gols": 4,
-      "jogos_com_participacao": 3,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
-      "origem_jogos": "escalações ESPN summary",
-      "posicao": 38,
-      "media_por_jogo": 0.211
     },
     {
       "athlete_id": "",
@@ -753,13 +767,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 18,
+      "jogos": 19,
       "gols": 4,
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 39,
-      "media_por_jogo": 0.222
+      "posicao": 40,
+      "media_por_jogo": 0.211
     },
     {
       "athlete_id": "",
@@ -772,7 +786,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 40,
+      "posicao": 41,
       "media_por_jogo": 0.286
     },
     {
@@ -786,7 +800,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 41,
+      "posicao": 42,
       "media_por_jogo": 0.222
     },
     {
@@ -800,7 +814,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 42,
+      "posicao": 43,
       "media_por_jogo": 0.222
     },
     {
@@ -814,7 +828,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 43,
+      "posicao": 44,
       "media_por_jogo": 0.176
     },
     {
@@ -828,7 +842,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 44,
+      "posicao": 45,
       "media_por_jogo": 0.15
     },
     {
@@ -842,7 +856,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 45,
+      "posicao": 46,
       "media_por_jogo": 0.167
     },
     {
@@ -856,7 +870,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 46,
+      "posicao": 47,
       "media_por_jogo": 0.176
     },
     {
@@ -870,7 +884,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 47,
+      "posicao": 48,
       "media_por_jogo": 0.176
     },
     {
@@ -884,7 +898,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 48,
+      "posicao": 49,
       "media_por_jogo": 0.176
     },
     {
@@ -898,7 +912,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 49,
+      "posicao": 50,
       "media_por_jogo": 0.167
     },
     {
@@ -912,7 +926,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 50,
+      "posicao": 51,
       "media_por_jogo": 0.2
     },
     {
@@ -926,7 +940,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 51,
+      "posicao": 52,
       "media_por_jogo": 0.231
     },
     {
@@ -940,22 +954,8 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 52,
-      "media_por_jogo": 0.214
-    },
-    {
-      "athlete_id": "",
-      "nome": "Gustavo Gómez",
-      "time": "Palmeiras",
-      "team_id": "",
-      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
-      "gols": 3,
-      "jogos_com_participacao": 3,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
-      "origem_jogos": "escalações ESPN summary",
       "posicao": 53,
-      "media_por_jogo": 0.158
+      "media_por_jogo": 0.214
     },
     {
       "athlete_id": "",
@@ -963,13 +963,13 @@
       "time": "Fluminense",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 20,
+      "jogos": 21,
       "gols": 3,
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 54,
-      "media_por_jogo": 0.15
+      "media_por_jogo": 0.143
     },
     {
       "athlete_id": "",
@@ -1047,13 +1047,13 @@
       "time": "Fluminense",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 18,
+      "jogos": 19,
       "gols": 3,
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 60,
-      "media_por_jogo": 0.167
+      "media_por_jogo": 0.158
     },
     {
       "athlete_id": "",
@@ -1103,13 +1103,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 10,
+      "jogos": 11,
       "gols": 3,
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 64,
-      "media_por_jogo": 0.3
+      "media_por_jogo": 0.273
     },
     {
       "athlete_id": "",
@@ -1313,13 +1313,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 15,
+      "jogos": 16,
       "gols": 2,
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 79,
-      "media_por_jogo": 0.133
+      "media_por_jogo": 0.125
     },
     {
       "athlete_id": "",
@@ -1393,6 +1393,20 @@
     },
     {
       "athlete_id": "",
+      "nome": "Hulk",
+      "time": "Fluminense",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
+      "jogos": 5,
+      "gols": 2,
+      "jogos_com_participacao": 2,
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 85,
+      "media_por_jogo": 0.4
+    },
+    {
+      "athlete_id": "",
       "nome": "Ignácio",
       "time": "Fluminense",
       "team_id": "",
@@ -1402,7 +1416,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 85,
+      "posicao": 86,
       "media_por_jogo": 0.182
     },
     {
@@ -1416,7 +1430,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 86,
+      "posicao": 87,
       "media_por_jogo": 0.118
     },
     {
@@ -1430,7 +1444,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 87,
+      "posicao": 88,
       "media_por_jogo": 0.105
     },
     {
@@ -1444,7 +1458,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 88,
+      "posicao": 89,
       "media_por_jogo": 0.133
     },
     {
@@ -1458,7 +1472,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 89,
+      "posicao": 90,
       "media_por_jogo": 0.133
     },
     {
@@ -1472,7 +1486,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 90,
+      "posicao": 91,
       "media_por_jogo": 0.143
     },
     {
@@ -1486,7 +1500,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 91,
+      "posicao": 92,
       "media_por_jogo": 0.2
     },
     {
@@ -1500,7 +1514,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 92,
+      "posicao": 93,
       "media_por_jogo": 0.2
     },
     {
@@ -1514,8 +1528,22 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 93,
+      "posicao": 94,
       "media_por_jogo": 0.111
+    },
+    {
+      "athlete_id": "",
+      "nome": "Kevin Serna",
+      "time": "Fluminense",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
+      "jogos": 22,
+      "gols": 2,
+      "jogos_com_participacao": 2,
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 95,
+      "media_por_jogo": 0.091
     },
     {
       "athlete_id": "",
@@ -1528,7 +1556,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 94,
+      "posicao": 96,
       "media_por_jogo": 0.111
     },
     {
@@ -1542,7 +1570,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 95,
+      "posicao": 97,
       "media_por_jogo": 0.105
     },
     {
@@ -1556,7 +1584,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 96,
+      "posicao": 98,
       "media_por_jogo": 0.125
     },
     {
@@ -1570,7 +1598,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 97,
+      "posicao": 99,
       "media_por_jogo": 0.111
     },
     {
@@ -1584,7 +1612,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 98,
+      "posicao": 100,
       "media_por_jogo": 0.1
     },
     {
@@ -1593,13 +1621,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 21,
+      "jogos": 22,
       "gols": 2,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 99,
-      "media_por_jogo": 0.095
+      "posicao": 101,
+      "media_por_jogo": 0.091
     },
     {
       "athlete_id": "",
@@ -1612,7 +1640,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 100,
+      "posicao": 102,
       "media_por_jogo": 0.118
     },
     {
@@ -1626,7 +1654,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 101,
+      "posicao": 103,
       "media_por_jogo": 0.154
     },
     {
@@ -1640,7 +1668,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 102,
+      "posicao": 104,
       "media_por_jogo": 0.125
     },
     {
@@ -1654,7 +1682,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 103,
+      "posicao": 105,
       "media_por_jogo": 0.105
     },
     {
@@ -1668,7 +1696,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 104,
+      "posicao": 106,
       "media_por_jogo": 0.118
     },
     {
@@ -1682,7 +1710,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 105,
+      "posicao": 107,
       "media_por_jogo": 0.154
     },
     {
@@ -1696,7 +1724,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 106,
+      "posicao": 108,
       "media_por_jogo": 0.154
     },
     {
@@ -1710,7 +1738,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 107,
+      "posicao": 109,
       "media_por_jogo": 0.2
     },
     {
@@ -1724,7 +1752,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 108,
+      "posicao": 110,
       "media_por_jogo": 0.222
     },
     {
@@ -1738,7 +1766,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 109,
+      "posicao": 111,
       "media_por_jogo": 0.2
     },
     {
@@ -1752,7 +1780,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 110,
+      "posicao": 112,
       "media_por_jogo": 0.333
     },
     {
@@ -1766,7 +1794,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 111,
+      "posicao": 113,
       "media_por_jogo": 0.111
     },
     {
@@ -1780,7 +1808,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 112,
+      "posicao": 114,
       "media_por_jogo": 0.143
     },
     {
@@ -1794,7 +1822,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 113,
+      "posicao": 115,
       "media_por_jogo": 0.118
     },
     {
@@ -1808,7 +1836,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 114,
+      "posicao": 116,
       "media_por_jogo": 0.125
     },
     {
@@ -1822,7 +1850,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 115,
+      "posicao": 117,
       "media_por_jogo": 0.167
     },
     {
@@ -1836,7 +1864,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 116,
+      "posicao": 118,
       "media_por_jogo": 0.111
     },
     {
@@ -1850,7 +1878,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 117,
+      "posicao": 119,
       "media_por_jogo": 0.143
     },
     {
@@ -1864,7 +1892,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 118,
+      "posicao": 120,
       "media_por_jogo": 0.105
     },
     {
@@ -1878,7 +1906,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 119,
+      "posicao": 121,
       "media_por_jogo": 0.143
     },
     {
@@ -1892,7 +1920,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 120,
+      "posicao": 122,
       "media_por_jogo": 0.105
     },
     {
@@ -1906,7 +1934,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 121,
+      "posicao": 123,
       "media_por_jogo": 0.133
     },
     {
@@ -1920,7 +1948,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 122,
+      "posicao": 124,
       "media_por_jogo": 0.095
     },
     {
@@ -1934,7 +1962,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 123,
+      "posicao": 125,
       "media_por_jogo": 0.045
     },
     {
@@ -1948,7 +1976,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 124,
+      "posicao": 126,
       "media_por_jogo": 0.111
     },
     {
@@ -1962,7 +1990,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 125,
+      "posicao": 127,
       "media_por_jogo": 0.083
     },
     {
@@ -1976,7 +2004,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 126,
+      "posicao": 128,
       "media_por_jogo": 0.077
     },
     {
@@ -1985,13 +2013,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 21,
+      "jogos": 22,
       "gols": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 127,
-      "media_por_jogo": 0.048
+      "posicao": 129,
+      "media_por_jogo": 0.045
     },
     {
       "athlete_id": "",
@@ -2004,7 +2032,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 128,
+      "posicao": 130,
       "media_por_jogo": 0.25
     },
     {
@@ -2018,7 +2046,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 129,
+      "posicao": 131,
       "media_por_jogo": 0.067
     },
     {
@@ -2032,7 +2060,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 130,
+      "posicao": 132,
       "media_por_jogo": 0.067
     },
     {
@@ -2046,7 +2074,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 131,
+      "posicao": 133,
       "media_por_jogo": 0.062
     },
     {
@@ -2060,7 +2088,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 132,
+      "posicao": 134,
       "media_por_jogo": 0.05
     },
     {
@@ -2074,7 +2102,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 133,
+      "posicao": 135,
       "media_por_jogo": 0.25
     },
     {
@@ -2088,7 +2116,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 134,
+      "posicao": 136,
       "media_por_jogo": 0.067
     },
     {
@@ -2102,7 +2130,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 135,
+      "posicao": 137,
       "media_por_jogo": 0.077
     },
     {
@@ -2116,7 +2144,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 136,
+      "posicao": 138,
       "media_por_jogo": 0.067
     },
     {
@@ -2130,7 +2158,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 137,
+      "posicao": 139,
       "media_por_jogo": 0.071
     },
     {
@@ -2144,7 +2172,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 138,
+      "posicao": 140,
       "media_por_jogo": 0.062
     },
     {
@@ -2158,7 +2186,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 139,
+      "posicao": 141,
       "media_por_jogo": 0.053
     },
     {
@@ -2172,7 +2200,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 140,
+      "posicao": 142,
       "media_por_jogo": 0.071
     },
     {
@@ -2186,7 +2214,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 141,
+      "posicao": 143,
       "media_por_jogo": 0.053
     },
     {
@@ -2200,7 +2228,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 142,
+      "posicao": 144,
       "media_por_jogo": 0.071
     },
     {
@@ -2214,7 +2242,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 143,
+      "posicao": 145,
       "media_por_jogo": 0.5
     },
     {
@@ -2228,7 +2256,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 144,
+      "posicao": 146,
       "media_por_jogo": 0.1
     },
     {
@@ -2242,7 +2270,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 145,
+      "posicao": 147,
       "media_por_jogo": 0.25
     },
     {
@@ -2256,7 +2284,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 146,
+      "posicao": 148,
       "media_por_jogo": 0.333
     },
     {
@@ -2270,7 +2298,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 147,
+      "posicao": 149,
       "media_por_jogo": 0.333
     },
     {
@@ -2284,7 +2312,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 148,
+      "posicao": 150,
       "media_por_jogo": 0.067
     },
     {
@@ -2298,7 +2326,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 149,
+      "posicao": 151,
       "media_por_jogo": 0.053
     },
     {
@@ -2312,7 +2340,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 150,
+      "posicao": 152,
       "media_por_jogo": 0.059
     },
     {
@@ -2326,7 +2354,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 151,
+      "posicao": 153,
       "media_por_jogo": 0.077
     },
     {
@@ -2340,7 +2368,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 152,
+      "posicao": 154,
       "media_por_jogo": 0.067
     },
     {
@@ -2354,7 +2382,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 153,
+      "posicao": 155,
       "media_por_jogo": 0.1
     },
     {
@@ -2368,7 +2396,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 154,
+      "posicao": 156,
       "media_por_jogo": 0.125
     },
     {
@@ -2382,7 +2410,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 155,
+      "posicao": 157,
       "media_por_jogo": 0.062
     },
     {
@@ -2396,7 +2424,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 156,
+      "posicao": 158,
       "media_por_jogo": 0.053
     },
     {
@@ -2410,7 +2438,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 157,
+      "posicao": 159,
       "media_por_jogo": 0.091
     },
     {
@@ -2424,7 +2452,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 158,
+      "posicao": 160,
       "media_por_jogo": 0.077
     },
     {
@@ -2438,7 +2466,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 159,
+      "posicao": 161,
       "media_por_jogo": 0.059
     },
     {
@@ -2452,8 +2480,22 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 160,
+      "posicao": 162,
       "media_por_jogo": 0.111
+    },
+    {
+      "athlete_id": "",
+      "nome": "Germán Cano",
+      "time": "Fluminense",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
+      "jogos": 8,
+      "gols": 1,
+      "jogos_com_participacao": 1,
+      "origem_complementar": "eventos e escalações validados das partidas (fonte primária)",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 163,
+      "media_por_jogo": 0.125
     },
     {
       "athlete_id": "",
@@ -2466,7 +2508,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 161,
+      "posicao": 164,
       "media_por_jogo": 0.071
     },
     {
@@ -2480,7 +2522,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 162,
+      "posicao": 165,
       "media_por_jogo": 0.067
     },
     {
@@ -2494,7 +2536,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 163,
+      "posicao": 166,
       "media_por_jogo": 0.1
     },
     {
@@ -2508,7 +2550,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 164,
+      "posicao": 167,
       "media_por_jogo": 0.091
     },
     {
@@ -2522,7 +2564,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 165,
+      "posicao": 168,
       "media_por_jogo": 0.091
     },
     {
@@ -2536,22 +2578,8 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 166,
+      "posicao": 169,
       "media_por_jogo": 0.083
-    },
-    {
-      "athlete_id": "",
-      "nome": "Hulk",
-      "time": "Fluminense",
-      "team_id": "",
-      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 4,
-      "gols": 1,
-      "jogos_com_participacao": 1,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
-      "origem_jogos": "escalações ESPN summary",
-      "posicao": 167,
-      "media_por_jogo": 0.25
     },
     {
       "athlete_id": "",
@@ -2564,7 +2592,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 168,
+      "posicao": 170,
       "media_por_jogo": 0.143
     },
     {
@@ -2578,7 +2606,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 169,
+      "posicao": 171,
       "media_por_jogo": 0.167
     },
     {
@@ -2592,7 +2620,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 170,
+      "posicao": 172,
       "media_por_jogo": 0.053
     },
     {
@@ -2606,7 +2634,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 171,
+      "posicao": 173,
       "media_por_jogo": 0.143
     },
     {
@@ -2620,7 +2648,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 172,
+      "posicao": 174,
       "media_por_jogo": 0.167
     },
     {
@@ -2634,7 +2662,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 173,
+      "posicao": 175,
       "media_por_jogo": 0.5
     },
     {
@@ -2648,7 +2676,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 174,
+      "posicao": 176,
       "media_por_jogo": 0.167
     },
     {
@@ -2662,7 +2690,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 175,
+      "posicao": 177,
       "media_por_jogo": 0.048
     },
     {
@@ -2676,7 +2704,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 176,
+      "posicao": 178,
       "media_por_jogo": 0.333
     },
     {
@@ -2690,7 +2718,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 177,
+      "posicao": 179,
       "media_por_jogo": 0.083
     },
     {
@@ -2704,7 +2732,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 178,
+      "posicao": 180,
       "media_por_jogo": 0.062
     },
     {
@@ -2718,7 +2746,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 179,
+      "posicao": 181,
       "media_por_jogo": 0.067
     },
     {
@@ -2732,7 +2760,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 180,
+      "posicao": 182,
       "media_por_jogo": 0.1
     },
     {
@@ -2746,7 +2774,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 181,
+      "posicao": 183,
       "media_por_jogo": 0.048
     },
     {
@@ -2760,7 +2788,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 182,
+      "posicao": 184,
       "media_por_jogo": 0.056
     },
     {
@@ -2774,7 +2802,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 183,
+      "posicao": 185,
       "media_por_jogo": 0.071
     },
     {
@@ -2788,7 +2816,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 184,
+      "posicao": 186,
       "media_por_jogo": 0.111
     },
     {
@@ -2802,22 +2830,8 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 185,
+      "posicao": 187,
       "media_por_jogo": 0.111
-    },
-    {
-      "athlete_id": "",
-      "nome": "Kevin Serna",
-      "time": "Fluminense",
-      "team_id": "",
-      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 21,
-      "gols": 1,
-      "jogos_com_participacao": 1,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
-      "origem_jogos": "escalações ESPN summary",
-      "posicao": 186,
-      "media_por_jogo": 0.048
     },
     {
       "athlete_id": "",
@@ -2830,7 +2844,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 187,
+      "posicao": 188,
       "media_por_jogo": 0.125
     },
     {
@@ -2844,7 +2858,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 188,
+      "posicao": 189,
       "media_por_jogo": 0.056
     },
     {
@@ -2858,7 +2872,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 189,
+      "posicao": 190,
       "media_por_jogo": 0.333
     },
     {
@@ -2872,7 +2886,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 190,
+      "posicao": 191,
       "media_por_jogo": 0.5
     },
     {
@@ -2886,7 +2900,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 191,
+      "posicao": 192,
       "media_por_jogo": 0.062
     },
     {
@@ -2900,7 +2914,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 192,
+      "posicao": 193,
       "media_por_jogo": 0.125
     },
     {
@@ -2914,7 +2928,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 193,
+      "posicao": 194,
       "media_por_jogo": 0.125
     },
     {
@@ -2928,7 +2942,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 194,
+      "posicao": 195,
       "media_por_jogo": 0.067
     },
     {
@@ -2942,7 +2956,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 195,
+      "posicao": 196,
       "media_por_jogo": 0.056
     },
     {
@@ -2956,7 +2970,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 196,
+      "posicao": 197,
       "media_por_jogo": 0.083
     },
     {
@@ -2970,7 +2984,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 197,
+      "posicao": 198,
       "media_por_jogo": 0.125
     },
     {
@@ -2984,7 +2998,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 198,
+      "posicao": 199,
       "media_por_jogo": 0.091
     },
     {
@@ -2998,7 +3012,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 199,
+      "posicao": 200,
       "media_por_jogo": 0.091
     },
     {
@@ -3012,7 +3026,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 200,
+      "posicao": 201,
       "media_por_jogo": 0.067
     },
     {
@@ -3026,7 +3040,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 201,
+      "posicao": 202,
       "media_por_jogo": 0.048
     },
     {
@@ -3040,7 +3054,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 202,
+      "posicao": 203,
       "media_por_jogo": 0.125
     },
     {
@@ -3054,7 +3068,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 203,
+      "posicao": 204,
       "media_por_jogo": 0.056
     },
     {
@@ -3068,7 +3082,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 204,
+      "posicao": 205,
       "media_por_jogo": 0.125
     },
     {
@@ -3082,7 +3096,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 205,
+      "posicao": 206,
       "media_por_jogo": 0.111
     },
     {
@@ -3091,13 +3105,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
+      "jogos": 20,
       "gols": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 206,
-      "media_por_jogo": 0.053
+      "posicao": 207,
+      "media_por_jogo": 0.05
     },
     {
       "athlete_id": "",
@@ -3110,7 +3124,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 207,
+      "posicao": 208,
       "media_por_jogo": 0.067
     },
     {
@@ -3119,13 +3133,13 @@
       "time": "Fluminense",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 9,
+      "jogos": 10,
       "gols": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 208,
-      "media_por_jogo": 0.111
+      "posicao": 209,
+      "media_por_jogo": 0.1
     },
     {
       "athlete_id": "",
@@ -3138,7 +3152,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 209,
+      "posicao": 210,
       "media_por_jogo": 0.059
     },
     {
@@ -3152,7 +3166,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 210,
+      "posicao": 211,
       "media_por_jogo": 0.5
     },
     {
@@ -3166,7 +3180,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 211,
+      "posicao": 212,
       "media_por_jogo": 0.111
     },
     {
@@ -3180,7 +3194,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 212,
+      "posicao": 213,
       "media_por_jogo": 0.333
     },
     {
@@ -3194,7 +3208,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 213,
+      "posicao": 214,
       "media_por_jogo": 0.053
     },
     {
@@ -3208,7 +3222,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 214,
+      "posicao": 215,
       "media_por_jogo": 0.056
     },
     {
@@ -3222,7 +3236,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 215,
+      "posicao": 216,
       "media_por_jogo": 0.048
     },
     {
@@ -3236,7 +3250,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 216,
+      "posicao": 217,
       "media_por_jogo": 0.333
     },
     {
@@ -3250,7 +3264,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 217,
+      "posicao": 218,
       "media_por_jogo": 0.067
     },
     {
@@ -3264,7 +3278,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 218,
+      "posicao": 219,
       "media_por_jogo": 0.125
     },
     {
@@ -3278,7 +3292,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 219,
+      "posicao": 220,
       "media_por_jogo": 0.111
     },
     {
@@ -3292,7 +3306,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 220,
+      "posicao": 221,
       "media_por_jogo": 0.1
     },
     {
@@ -3306,7 +3320,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 221,
+      "posicao": 222,
       "media_por_jogo": 0.062
     },
     {
@@ -3320,7 +3334,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 222,
+      "posicao": 223,
       "media_por_jogo": 0.059
     },
     {
@@ -3334,7 +3348,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 223,
+      "posicao": 224,
       "media_por_jogo": 0.067
     },
     {
@@ -3348,7 +3362,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 224,
+      "posicao": 225,
       "media_por_jogo": 1.0
     },
     {
@@ -3362,7 +3376,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 225,
+      "posicao": 226,
       "media_por_jogo": 0.2
     },
     {
@@ -3376,7 +3390,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 226,
+      "posicao": 227,
       "media_por_jogo": 0.077
     },
     {
@@ -3390,7 +3404,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 227,
+      "posicao": 228,
       "media_por_jogo": 0.048
     },
     {
@@ -3404,7 +3418,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 228,
+      "posicao": 229,
       "media_por_jogo": 0.125
     },
     {
@@ -3418,7 +3432,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 229,
+      "posicao": 230,
       "media_por_jogo": 1.0
     },
     {
@@ -3432,7 +3446,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 230,
+      "posicao": 231,
       "media_por_jogo": 0.062
     },
     {
@@ -3446,7 +3460,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 231,
+      "posicao": 232,
       "media_por_jogo": 1.0
     },
     {
@@ -3460,7 +3474,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 232,
+      "posicao": 233,
       "media_por_jogo": 0.062
     },
     {
@@ -3474,7 +3488,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 233,
+      "posicao": 234,
       "media_por_jogo": 0.059
     },
     {
@@ -3488,7 +3502,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 234,
+      "posicao": 235,
       "media_por_jogo": 0.091
     },
     {
@@ -3502,7 +3516,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 235,
+      "posicao": 236,
       "media_por_jogo": 0.2
     },
     {
@@ -3516,7 +3530,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 236,
+      "posicao": 237,
       "media_por_jogo": 0.077
     }
   ],
@@ -3527,13 +3541,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 21,
+      "jogos": 22,
       "assistencias": 9,
       "jogos_com_participacao": 6,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 1,
-      "media_por_jogo": 0.429
+      "media_por_jogo": 0.409
     },
     {
       "athlete_id": "",
@@ -3663,6 +3677,20 @@
     },
     {
       "athlete_id": "",
+      "nome": "Joaquín Piquerez",
+      "time": "Palmeiras",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "jogos": 11,
+      "assistencias": 4,
+      "jogos_com_participacao": 4,
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 11,
+      "media_por_jogo": 0.364
+    },
+    {
+      "athlete_id": "",
       "nome": "José Rodríguez",
       "time": "Vasco da Gama",
       "team_id": "",
@@ -3672,7 +3700,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 11,
+      "posicao": 12,
       "media_por_jogo": 0.286
     },
     {
@@ -3686,7 +3714,7 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 12,
+      "posicao": 13,
       "media_por_jogo": 0.25
     },
     {
@@ -3700,7 +3728,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos validados; referência usada apenas para identificação",
       "origem_jogos": "mínimo validado pelos eventos das partidas (fallback)",
-      "posicao": 13,
+      "posicao": 14,
       "media_por_jogo": 1.333
     },
     {
@@ -3714,8 +3742,22 @@
       "jogos_com_participacao": 4,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 14,
+      "posicao": 15,
       "media_por_jogo": 0.19
+    },
+    {
+      "athlete_id": "",
+      "nome": "Agustín Canobbio",
+      "time": "Fluminense",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
+      "jogos": 16,
+      "assistencias": 3,
+      "jogos_com_participacao": 3,
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 16,
+      "media_por_jogo": 0.188
     },
     {
       "athlete_id": "",
@@ -3728,7 +3770,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 15,
+      "posicao": 17,
       "media_por_jogo": 0.136
     },
     {
@@ -3742,7 +3784,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 16,
+      "posicao": 18,
       "media_por_jogo": 0.15
     },
     {
@@ -3756,7 +3798,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 17,
+      "posicao": 19,
       "media_por_jogo": 0.167
     },
     {
@@ -3770,7 +3812,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 18,
+      "posicao": 20,
       "media_por_jogo": 0.176
     },
     {
@@ -3784,7 +3826,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 19,
+      "posicao": 21,
       "media_por_jogo": 0.167
     },
     {
@@ -3798,7 +3840,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 20,
+      "posicao": 22,
       "media_por_jogo": 0.188
     },
     {
@@ -3812,7 +3854,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 21,
+      "posicao": 23,
       "media_por_jogo": 0.231
     },
     {
@@ -3826,7 +3868,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 22,
+      "posicao": 24,
       "media_por_jogo": 0.176
     },
     {
@@ -3840,7 +3882,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 23,
+      "posicao": 25,
       "media_por_jogo": 0.158
     },
     {
@@ -3854,7 +3896,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 24,
+      "posicao": 26,
       "media_por_jogo": 0.158
     },
     {
@@ -3868,7 +3910,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 25,
+      "posicao": 27,
       "media_por_jogo": 0.158
     },
     {
@@ -3882,7 +3924,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 26,
+      "posicao": 28,
       "media_por_jogo": 0.176
     },
     {
@@ -3896,7 +3938,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 27,
+      "posicao": 29,
       "media_por_jogo": 0.188
     },
     {
@@ -3910,7 +3952,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 28,
+      "posicao": 30,
       "media_por_jogo": 0.176
     },
     {
@@ -3924,22 +3966,8 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 29,
+      "posicao": 31,
       "media_por_jogo": 0.25
-    },
-    {
-      "athlete_id": "",
-      "nome": "Joaquín Piquerez",
-      "time": "Palmeiras",
-      "team_id": "",
-      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 10,
-      "assistencias": 3,
-      "jogos_com_participacao": 3,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
-      "origem_jogos": "escalações ESPN summary",
-      "posicao": 30,
-      "media_por_jogo": 0.3
     },
     {
       "athlete_id": "",
@@ -3952,7 +3980,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 31,
+      "posicao": 32,
       "media_por_jogo": 0.143
     },
     {
@@ -3961,13 +3989,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
+      "jogos": 20,
       "assistencias": 3,
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 32,
-      "media_por_jogo": 0.158
+      "posicao": 33,
+      "media_por_jogo": 0.15
     },
     {
       "athlete_id": "",
@@ -3980,7 +4008,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 33,
+      "posicao": 34,
       "media_por_jogo": 0.2
     },
     {
@@ -3994,7 +4022,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 34,
+      "posicao": 35,
       "media_por_jogo": 0.167
     },
     {
@@ -4008,7 +4036,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 35,
+      "posicao": 36,
       "media_por_jogo": 0.143
     },
     {
@@ -4022,7 +4050,7 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 36,
+      "posicao": 37,
       "media_por_jogo": 0.2
     },
     {
@@ -4036,22 +4064,8 @@
       "jogos_com_participacao": 3,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 37,
-      "media_por_jogo": 0.2
-    },
-    {
-      "athlete_id": "",
-      "nome": "Agustín Canobbio",
-      "time": "Fluminense",
-      "team_id": "",
-      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 15,
-      "assistencias": 2,
-      "jogos_com_participacao": 2,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
-      "origem_jogos": "escalações ESPN summary",
       "posicao": 38,
-      "media_por_jogo": 0.133
+      "media_por_jogo": 0.2
     },
     {
       "athlete_id": "",
@@ -4087,13 +4101,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
+      "jogos": 20,
       "assistencias": 2,
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 41,
-      "media_por_jogo": 0.105
+      "media_por_jogo": 0.1
     },
     {
       "athlete_id": "",
@@ -4255,13 +4269,13 @@
       "time": "Fluminense",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 13,
+      "jogos": 14,
       "assistencias": 2,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 53,
-      "media_por_jogo": 0.154
+      "media_por_jogo": 0.143
     },
     {
       "athlete_id": "",
@@ -4437,13 +4451,13 @@
       "time": "Fluminense",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 21,
+      "jogos": 22,
       "assistencias": 2,
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
       "posicao": 66,
-      "media_por_jogo": 0.095
+      "media_por_jogo": 0.091
     },
     {
       "athlete_id": "",
@@ -4531,6 +4545,20 @@
     },
     {
       "athlete_id": "",
+      "nome": "Martinelli",
+      "time": "Fluminense",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
+      "jogos": 16,
+      "assistencias": 2,
+      "jogos_com_participacao": 2,
+      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 73,
+      "media_por_jogo": 0.125
+    },
+    {
+      "athlete_id": "",
       "nome": "Matheus Pereira",
       "time": "Cruzeiro",
       "team_id": "",
@@ -4540,7 +4568,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 73,
+      "posicao": 74,
       "media_por_jogo": 0.105
     },
     {
@@ -4554,7 +4582,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 74,
+      "posicao": 75,
       "media_por_jogo": 0.111
     },
     {
@@ -4568,7 +4596,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 75,
+      "posicao": 76,
       "media_por_jogo": 0.222
     },
     {
@@ -4582,7 +4610,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 76,
+      "posicao": 77,
       "media_por_jogo": 0.222
     },
     {
@@ -4596,7 +4624,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 77,
+      "posicao": 78,
       "media_por_jogo": 0.333
     },
     {
@@ -4610,7 +4638,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 78,
+      "posicao": 79,
       "media_por_jogo": 0.154
     },
     {
@@ -4619,13 +4647,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 18,
+      "jogos": 19,
       "assistencias": 2,
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 79,
-      "media_por_jogo": 0.111
+      "posicao": 80,
+      "media_por_jogo": 0.105
     },
     {
       "athlete_id": "",
@@ -4638,7 +4666,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 80,
+      "posicao": 81,
       "media_por_jogo": 0.105
     },
     {
@@ -4647,13 +4675,13 @@
       "time": "Fluminense",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 15,
+      "jogos": 16,
       "assistencias": 2,
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 81,
-      "media_por_jogo": 0.133
+      "posicao": 82,
+      "media_por_jogo": 0.125
     },
     {
       "athlete_id": "",
@@ -4666,7 +4694,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 82,
+      "posicao": 83,
       "media_por_jogo": 0.133
     },
     {
@@ -4680,7 +4708,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 83,
+      "posicao": 84,
       "media_por_jogo": 0.133
     },
     {
@@ -4694,7 +4722,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 84,
+      "posicao": 85,
       "media_por_jogo": 0.111
     },
     {
@@ -4708,7 +4736,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 85,
+      "posicao": 86,
       "media_por_jogo": 0.118
     },
     {
@@ -4722,7 +4750,7 @@
       "jogos_com_participacao": 2,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 86,
+      "posicao": 87,
       "media_por_jogo": 0.182
     },
     {
@@ -4736,7 +4764,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 87,
+      "posicao": 88,
       "media_por_jogo": 0.045
     },
     {
@@ -4750,7 +4778,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 88,
+      "posicao": 89,
       "media_por_jogo": 0.125
     },
     {
@@ -4764,7 +4792,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 89,
+      "posicao": 90,
       "media_por_jogo": 0.062
     },
     {
@@ -4778,7 +4806,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 90,
+      "posicao": 91,
       "media_por_jogo": 0.053
     },
     {
@@ -4792,7 +4820,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 91,
+      "posicao": 92,
       "media_por_jogo": 0.125
     },
     {
@@ -4806,7 +4834,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 92,
+      "posicao": 93,
       "media_por_jogo": 0.056
     },
     {
@@ -4820,7 +4848,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 93,
+      "posicao": 94,
       "media_por_jogo": 0.056
     },
     {
@@ -4834,7 +4862,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 94,
+      "posicao": 95,
       "media_por_jogo": 0.056
     },
     {
@@ -4848,7 +4876,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 95,
+      "posicao": 96,
       "media_por_jogo": 0.111
     },
     {
@@ -4862,7 +4890,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 96,
+      "posicao": 97,
       "media_por_jogo": 0.059
     },
     {
@@ -4876,7 +4904,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 97,
+      "posicao": 98,
       "media_por_jogo": 0.083
     },
     {
@@ -4890,7 +4918,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 98,
+      "posicao": 99,
       "media_por_jogo": 0.091
     },
     {
@@ -4904,7 +4932,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 99,
+      "posicao": 100,
       "media_por_jogo": 0.067
     },
     {
@@ -4918,7 +4946,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 100,
+      "posicao": 101,
       "media_por_jogo": 0.067
     },
     {
@@ -4932,7 +4960,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 101,
+      "posicao": 102,
       "media_por_jogo": 0.05
     },
     {
@@ -4946,7 +4974,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 102,
+      "posicao": 103,
       "media_por_jogo": 0.053
     },
     {
@@ -4960,7 +4988,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 103,
+      "posicao": 104,
       "media_por_jogo": 0.053
     },
     {
@@ -4974,7 +5002,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 104,
+      "posicao": 105,
       "media_por_jogo": 0.05
     },
     {
@@ -4988,7 +5016,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 105,
+      "posicao": 106,
       "media_por_jogo": 0.067
     },
     {
@@ -5002,7 +5030,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 106,
+      "posicao": 107,
       "media_por_jogo": 0.091
     },
     {
@@ -5016,7 +5044,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 107,
+      "posicao": 108,
       "media_por_jogo": 0.059
     },
     {
@@ -5030,7 +5058,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 108,
+      "posicao": 109,
       "media_por_jogo": 0.05
     },
     {
@@ -5044,7 +5072,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 109,
+      "posicao": 110,
       "media_por_jogo": 0.143
     },
     {
@@ -5058,7 +5086,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 110,
+      "posicao": 111,
       "media_por_jogo": 0.167
     },
     {
@@ -5072,7 +5100,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 111,
+      "posicao": 112,
       "media_por_jogo": 0.062
     },
     {
@@ -5086,7 +5114,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 112,
+      "posicao": 113,
       "media_por_jogo": 0.053
     },
     {
@@ -5100,7 +5128,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 113,
+      "posicao": 114,
       "media_por_jogo": 0.056
     },
     {
@@ -5114,7 +5142,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 114,
+      "posicao": 115,
       "media_por_jogo": 0.067
     },
     {
@@ -5128,7 +5156,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 115,
+      "posicao": 116,
       "media_por_jogo": 0.071
     },
     {
@@ -5142,7 +5170,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 116,
+      "posicao": 117,
       "media_por_jogo": 0.111
     },
     {
@@ -5156,7 +5184,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos validados; referência usada apenas para identificação",
       "origem_jogos": "mínimo validado pelos eventos das partidas (fallback)",
-      "posicao": 117,
+      "posicao": 118,
       "media_por_jogo": 1.0
     },
     {
@@ -5170,7 +5198,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 118,
+      "posicao": 119,
       "media_por_jogo": 0.091
     },
     {
@@ -5184,7 +5212,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 119,
+      "posicao": 120,
       "media_por_jogo": 0.077
     },
     {
@@ -5198,7 +5226,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 120,
+      "posicao": 121,
       "media_por_jogo": 0.067
     },
     {
@@ -5212,7 +5240,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 121,
+      "posicao": 122,
       "media_por_jogo": 0.048
     },
     {
@@ -5226,7 +5254,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 122,
+      "posicao": 123,
       "media_por_jogo": 0.048
     },
     {
@@ -5240,7 +5268,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 123,
+      "posicao": 124,
       "media_por_jogo": 0.059
     },
     {
@@ -5254,7 +5282,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 124,
+      "posicao": 125,
       "media_por_jogo": 0.1
     },
     {
@@ -5268,7 +5296,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 125,
+      "posicao": 126,
       "media_por_jogo": 0.059
     },
     {
@@ -5282,7 +5310,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 126,
+      "posicao": 127,
       "media_por_jogo": 0.1
     },
     {
@@ -5291,13 +5319,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 15,
+      "jogos": 16,
       "assistencias": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 127,
-      "media_por_jogo": 0.067
+      "posicao": 128,
+      "media_por_jogo": 0.062
     },
     {
       "athlete_id": "",
@@ -5310,7 +5338,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 128,
+      "posicao": 129,
       "media_por_jogo": 0.1
     },
     {
@@ -5324,7 +5352,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 129,
+      "posicao": 130,
       "media_por_jogo": 0.143
     },
     {
@@ -5338,7 +5366,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 130,
+      "posicao": 131,
       "media_por_jogo": 0.143
     },
     {
@@ -5352,7 +5380,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 131,
+      "posicao": 132,
       "media_por_jogo": 0.071
     },
     {
@@ -5366,7 +5394,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 132,
+      "posicao": 133,
       "media_por_jogo": 0.071
     },
     {
@@ -5380,7 +5408,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 133,
+      "posicao": 134,
       "media_por_jogo": 0.067
     },
     {
@@ -5394,7 +5422,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 134,
+      "posicao": 135,
       "media_por_jogo": 0.071
     },
     {
@@ -5408,7 +5436,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 135,
+      "posicao": 136,
       "media_por_jogo": 0.067
     },
     {
@@ -5422,7 +5450,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 136,
+      "posicao": 137,
       "media_por_jogo": 0.091
     },
     {
@@ -5436,7 +5464,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos validados; referência usada apenas para identificação",
       "origem_jogos": "mínimo validado pelos eventos das partidas (fallback)",
-      "posicao": 137,
+      "posicao": 138,
       "media_por_jogo": 1.0
     },
     {
@@ -5450,7 +5478,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 138,
+      "posicao": 139,
       "media_por_jogo": 0.067
     },
     {
@@ -5464,7 +5492,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 139,
+      "posicao": 140,
       "media_por_jogo": 0.062
     },
     {
@@ -5478,7 +5506,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 140,
+      "posicao": 141,
       "media_por_jogo": 0.056
     },
     {
@@ -5492,7 +5520,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 141,
+      "posicao": 142,
       "media_por_jogo": 0.143
     },
     {
@@ -5506,7 +5534,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 142,
+      "posicao": 143,
       "media_por_jogo": 0.083
     },
     {
@@ -5515,13 +5543,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 17,
+      "jogos": 18,
       "assistencias": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 143,
-      "media_por_jogo": 0.059
+      "posicao": 144,
+      "media_por_jogo": 0.056
     },
     {
       "athlete_id": "",
@@ -5534,7 +5562,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 144,
+      "posicao": 145,
       "media_por_jogo": 0.048
     },
     {
@@ -5548,7 +5576,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 145,
+      "posicao": 146,
       "media_por_jogo": 0.167
     },
     {
@@ -5562,7 +5590,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 146,
+      "posicao": 147,
       "media_por_jogo": 0.059
     },
     {
@@ -5576,7 +5604,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 147,
+      "posicao": 148,
       "media_por_jogo": 0.056
     },
     {
@@ -5590,7 +5618,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 148,
+      "posicao": 149,
       "media_por_jogo": 0.053
     },
     {
@@ -5604,7 +5632,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 149,
+      "posicao": 150,
       "media_por_jogo": 0.067
     },
     {
@@ -5618,7 +5646,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 150,
+      "posicao": 151,
       "media_por_jogo": 0.059
     },
     {
@@ -5632,8 +5660,22 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 151,
+      "posicao": 152,
       "media_por_jogo": 0.062
+    },
+    {
+      "athlete_id": "",
+      "nome": "José Manuel López",
+      "time": "Palmeiras",
+      "team_id": "",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "jogos": 20,
+      "assistencias": 1,
+      "jogos_com_participacao": 1,
+      "origem_complementar": "eventos e escalações validados das partidas (fonte primária)",
+      "origem_jogos": "escalações ESPN summary",
+      "posicao": 153,
+      "media_por_jogo": 0.05
     },
     {
       "athlete_id": "",
@@ -5646,7 +5688,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 152,
+      "posicao": 154,
       "media_por_jogo": 0.5
     },
     {
@@ -5660,7 +5702,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 153,
+      "posicao": 155,
       "media_por_jogo": 0.071
     },
     {
@@ -5674,7 +5716,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 154,
+      "posicao": 156,
       "media_por_jogo": 0.077
     },
     {
@@ -5688,7 +5730,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos validados; referência usada apenas para identificação",
       "origem_jogos": "mínimo validado pelos eventos das partidas (fallback)",
-      "posicao": 155,
+      "posicao": 157,
       "media_por_jogo": 1.0
     },
     {
@@ -5702,7 +5744,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 156,
+      "posicao": 158,
       "media_por_jogo": 0.1
     },
     {
@@ -5716,7 +5758,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 157,
+      "posicao": 159,
       "media_por_jogo": 0.1
     },
     {
@@ -5730,7 +5772,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 158,
+      "posicao": 160,
       "media_por_jogo": 0.25
     },
     {
@@ -5744,7 +5786,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 159,
+      "posicao": 161,
       "media_por_jogo": 0.056
     },
     {
@@ -5758,7 +5800,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 160,
+      "posicao": 162,
       "media_por_jogo": 0.056
     },
     {
@@ -5772,7 +5814,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 161,
+      "posicao": 163,
       "media_por_jogo": 0.053
     },
     {
@@ -5786,7 +5828,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 162,
+      "posicao": 164,
       "media_por_jogo": 0.053
     },
     {
@@ -5800,7 +5842,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 163,
+      "posicao": 165,
       "media_por_jogo": 0.125
     },
     {
@@ -5814,7 +5856,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 164,
+      "posicao": 166,
       "media_por_jogo": 0.067
     },
     {
@@ -5828,7 +5870,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 165,
+      "posicao": 167,
       "media_por_jogo": 0.083
     },
     {
@@ -5842,7 +5884,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 166,
+      "posicao": 168,
       "media_por_jogo": 0.091
     },
     {
@@ -5856,7 +5898,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 167,
+      "posicao": 169,
       "media_por_jogo": 0.056
     },
     {
@@ -5870,7 +5912,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 168,
+      "posicao": 170,
       "media_por_jogo": 0.2
     },
     {
@@ -5884,7 +5926,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 169,
+      "posicao": 171,
       "media_por_jogo": 0.091
     },
     {
@@ -5898,7 +5940,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 170,
+      "posicao": 172,
       "media_por_jogo": 0.2
     },
     {
@@ -5912,7 +5954,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 171,
+      "posicao": 173,
       "media_por_jogo": 0.05
     },
     {
@@ -5926,7 +5968,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 172,
+      "posicao": 174,
       "media_por_jogo": 0.1
     },
     {
@@ -5940,7 +5982,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 173,
+      "posicao": 175,
       "media_por_jogo": 0.048
     },
     {
@@ -5954,7 +5996,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 174,
+      "posicao": 176,
       "media_por_jogo": 0.125
     },
     {
@@ -5963,27 +6005,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 21,
+      "jogos": 22,
       "assistencias": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 175,
-      "media_por_jogo": 0.048
-    },
-    {
-      "athlete_id": "",
-      "nome": "Martinelli",
-      "time": "Fluminense",
-      "team_id": "",
-      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 15,
-      "assistencias": 1,
-      "jogos_com_participacao": 1,
-      "origem_complementar": "eventos e escalações validados; referência usada para identificação",
-      "origem_jogos": "escalações ESPN summary",
-      "posicao": 176,
-      "media_por_jogo": 0.067
+      "posicao": 177,
+      "media_por_jogo": 0.045
     },
     {
       "athlete_id": "",
@@ -5996,7 +6024,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 177,
+      "posicao": 178,
       "media_por_jogo": 0.059
     },
     {
@@ -6010,7 +6038,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 178,
+      "posicao": 179,
       "media_por_jogo": 0.111
     },
     {
@@ -6024,7 +6052,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 179,
+      "posicao": 180,
       "media_por_jogo": 0.071
     },
     {
@@ -6038,7 +6066,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 180,
+      "posicao": 181,
       "media_por_jogo": 0.059
     },
     {
@@ -6052,7 +6080,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 181,
+      "posicao": 182,
       "media_por_jogo": 0.111
     },
     {
@@ -6066,7 +6094,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 182,
+      "posicao": 183,
       "media_por_jogo": 0.077
     },
     {
@@ -6080,7 +6108,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 183,
+      "posicao": 184,
       "media_por_jogo": 0.5
     },
     {
@@ -6089,13 +6117,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
+      "jogos": 20,
       "assistencias": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 184,
-      "media_por_jogo": 0.053
+      "posicao": 185,
+      "media_por_jogo": 0.05
     },
     {
       "athlete_id": "",
@@ -6108,7 +6136,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 185,
+      "posicao": 186,
       "media_por_jogo": 0.071
     },
     {
@@ -6122,7 +6150,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 186,
+      "posicao": 187,
       "media_por_jogo": 0.077
     },
     {
@@ -6131,13 +6159,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 19,
+      "jogos": 20,
       "assistencias": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 187,
-      "media_por_jogo": 0.053
+      "posicao": 188,
+      "media_por_jogo": 0.05
     },
     {
       "athlete_id": "",
@@ -6150,7 +6178,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 188,
+      "posicao": 189,
       "media_por_jogo": 0.077
     },
     {
@@ -6164,7 +6192,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 189,
+      "posicao": 190,
       "media_por_jogo": 0.25
     },
     {
@@ -6178,7 +6206,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 190,
+      "posicao": 191,
       "media_por_jogo": 0.077
     },
     {
@@ -6192,7 +6220,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 191,
+      "posicao": 192,
       "media_por_jogo": 0.083
     },
     {
@@ -6206,7 +6234,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 192,
+      "posicao": 193,
       "media_por_jogo": 0.1
     },
     {
@@ -6215,13 +6243,13 @@
       "time": "Fluminense",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "jogos": 9,
+      "jogos": 10,
       "assistencias": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 193,
-      "media_por_jogo": 0.111
+      "posicao": 194,
+      "media_por_jogo": 0.1
     },
     {
       "athlete_id": "",
@@ -6234,7 +6262,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 194,
+      "posicao": 195,
       "media_por_jogo": 0.059
     },
     {
@@ -6248,7 +6276,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 195,
+      "posicao": 196,
       "media_por_jogo": 0.091
     },
     {
@@ -6262,7 +6290,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 196,
+      "posicao": 197,
       "media_por_jogo": 0.048
     },
     {
@@ -6276,7 +6304,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 197,
+      "posicao": 198,
       "media_por_jogo": 0.056
     },
     {
@@ -6290,7 +6318,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 198,
+      "posicao": 199,
       "media_por_jogo": 0.25
     },
     {
@@ -6304,7 +6332,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 199,
+      "posicao": 200,
       "media_por_jogo": 0.062
     },
     {
@@ -6318,7 +6346,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 200,
+      "posicao": 201,
       "media_por_jogo": 0.071
     },
     {
@@ -6332,7 +6360,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 201,
+      "posicao": 202,
       "media_por_jogo": 0.071
     },
     {
@@ -6346,7 +6374,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 202,
+      "posicao": 203,
       "media_por_jogo": 0.077
     },
     {
@@ -6360,7 +6388,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 203,
+      "posicao": 204,
       "media_por_jogo": 0.062
     },
     {
@@ -6374,7 +6402,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 204,
+      "posicao": 205,
       "media_por_jogo": 0.167
     },
     {
@@ -6388,7 +6416,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 205,
+      "posicao": 206,
       "media_por_jogo": 0.059
     },
     {
@@ -6402,7 +6430,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 206,
+      "posicao": 207,
       "media_por_jogo": 0.056
     },
     {
@@ -6416,7 +6444,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 207,
+      "posicao": 208,
       "media_por_jogo": 0.053
     },
     {
@@ -6430,7 +6458,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 208,
+      "posicao": 209,
       "media_por_jogo": 0.056
     },
     {
@@ -6439,13 +6467,13 @@
       "time": "Palmeiras",
       "team_id": "",
       "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "jogos": 10,
+      "jogos": 11,
       "assistencias": 1,
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 209,
-      "media_por_jogo": 0.1
+      "posicao": 210,
+      "media_por_jogo": 0.091
     },
     {
       "athlete_id": "",
@@ -6458,7 +6486,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 210,
+      "posicao": 211,
       "media_por_jogo": 0.1
     },
     {
@@ -6472,7 +6500,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 211,
+      "posicao": 212,
       "media_por_jogo": 0.053
     },
     {
@@ -6486,7 +6514,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 212,
+      "posicao": 213,
       "media_por_jogo": 0.048
     },
     {
@@ -6500,7 +6528,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 213,
+      "posicao": 214,
       "media_por_jogo": 0.062
     },
     {
@@ -6514,7 +6542,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 214,
+      "posicao": 215,
       "media_por_jogo": 0.048
     },
     {
@@ -6528,7 +6556,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 215,
+      "posicao": 216,
       "media_por_jogo": 0.059
     },
     {
@@ -6542,7 +6570,7 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 216,
+      "posicao": 217,
       "media_por_jogo": 0.2
     },
     {
@@ -6556,11 +6584,62 @@
       "jogos_com_participacao": 1,
       "origem_complementar": "eventos e escalações validados; referência usada para identificação",
       "origem_jogos": "escalações ESPN summary",
-      "posicao": 217,
+      "posicao": 218,
       "media_por_jogo": 0.05
     }
   ],
   "melhor_ataque": [
+    {
+      "time": "Palmeiras",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "sigla": "PAL",
+      "pos": 1,
+      "pontos": 48,
+      "jogos": 23,
+      "vitorias": 14,
+      "empates": 6,
+      "derrotas": 3,
+      "gp": 40,
+      "gc": 19,
+      "sg": 21,
+      "aproveitamento": 70,
+      "forma_ultimos5": [
+        "V",
+        "D",
+        "V",
+        "E",
+        "D"
+      ],
+      "pontos_ultimos5": 7,
+      "aproveitamento_ultimos5": 47,
+      "mandante": {
+        "jogos": 11,
+        "pontos": 24,
+        "vitorias": 7,
+        "empates": 3,
+        "derrotas": 1,
+        "gp": 17,
+        "gc": 8,
+        "sg": 9,
+        "aproveitamento": 73
+      },
+      "visitante": {
+        "jogos": 12,
+        "pontos": 24,
+        "vitorias": 7,
+        "empates": 3,
+        "derrotas": 2,
+        "gp": 23,
+        "gc": 11,
+        "sg": 12,
+        "aproveitamento": 67
+      },
+      "sequencia": {
+        "tipo": "D",
+        "quantidade": 1,
+        "texto": "1 derrota(s) seguida(s)"
+      }
+    },
     {
       "time": "Flamengo",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
@@ -6610,57 +6689,6 @@
         "tipo": "V",
         "quantidade": 1,
         "texto": "1 vitória(s) seguida(s)"
-      }
-    },
-    {
-      "time": "Palmeiras",
-      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "sigla": "PAL",
-      "pos": 1,
-      "pontos": 48,
-      "jogos": 22,
-      "vitorias": 14,
-      "empates": 6,
-      "derrotas": 2,
-      "gp": 38,
-      "gc": 16,
-      "sg": 22,
-      "aproveitamento": 73,
-      "forma_ultimos5": [
-        "V",
-        "V",
-        "D",
-        "V",
-        "E"
-      ],
-      "pontos_ultimos5": 10,
-      "aproveitamento_ultimos5": 67,
-      "mandante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
-        "empates": 3,
-        "derrotas": 1,
-        "gp": 17,
-        "gc": 8,
-        "sg": 9,
-        "aproveitamento": 73
-      },
-      "visitante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
-        "empates": 3,
-        "derrotas": 1,
-        "gp": 21,
-        "gc": 8,
-        "sg": 13,
-        "aproveitamento": 73
-      },
-      "sequencia": {
-        "tipo": "E",
-        "quantidade": 1,
-        "texto": "1 empate(s) seguida(s)"
       }
     },
     {
@@ -6719,34 +6747,34 @@
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
       "sigla": "FLU",
       "pos": 4,
-      "pontos": 35,
-      "jogos": 22,
-      "vitorias": 9,
+      "pontos": 38,
+      "jogos": 23,
+      "vitorias": 10,
       "empates": 8,
       "derrotas": 5,
-      "gp": 31,
-      "gc": 26,
-      "sg": 5,
-      "aproveitamento": 53,
+      "gp": 34,
+      "gc": 28,
+      "sg": 6,
+      "aproveitamento": 55,
       "forma_ultimos5": [
         "E",
         "E",
         "E",
         "E",
-        "E"
+        "V"
       ],
-      "pontos_ultimos5": 5,
-      "aproveitamento_ultimos5": 33,
+      "pontos_ultimos5": 7,
+      "aproveitamento_ultimos5": 47,
       "mandante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
+        "jogos": 12,
+        "pontos": 27,
+        "vitorias": 8,
         "empates": 3,
         "derrotas": 1,
-        "gp": 18,
-        "gc": 11,
-        "sg": 7,
-        "aproveitamento": 73
+        "gp": 21,
+        "gc": 13,
+        "sg": 8,
+        "aproveitamento": 75
       },
       "visitante": {
         "jogos": 11,
@@ -6760,9 +6788,9 @@
         "aproveitamento": 33
       },
       "sequencia": {
-        "tipo": "E",
-        "quantidade": 5,
-        "texto": "5 empate(s) seguida(s)"
+        "tipo": "V",
+        "quantidade": 1,
+        "texto": "1 vitória(s) seguida(s)"
       }
     },
     {
@@ -7584,57 +7612,6 @@
   ],
   "melhor_defesa": [
     {
-      "time": "Palmeiras",
-      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "sigla": "PAL",
-      "pos": 1,
-      "pontos": 48,
-      "jogos": 22,
-      "vitorias": 14,
-      "empates": 6,
-      "derrotas": 2,
-      "gp": 38,
-      "gc": 16,
-      "sg": 22,
-      "aproveitamento": 73,
-      "forma_ultimos5": [
-        "V",
-        "V",
-        "D",
-        "V",
-        "E"
-      ],
-      "pontos_ultimos5": 10,
-      "aproveitamento_ultimos5": 67,
-      "mandante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
-        "empates": 3,
-        "derrotas": 1,
-        "gp": 17,
-        "gc": 8,
-        "sg": 9,
-        "aproveitamento": 73
-      },
-      "visitante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
-        "empates": 3,
-        "derrotas": 1,
-        "gp": 21,
-        "gc": 8,
-        "sg": 13,
-        "aproveitamento": 73
-      },
-      "sequencia": {
-        "tipo": "E",
-        "quantidade": 1,
-        "texto": "1 empate(s) seguida(s)"
-      }
-    },
-    {
       "time": "Flamengo",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
       "sigla": "FLA",
@@ -7683,6 +7660,57 @@
         "tipo": "V",
         "quantidade": 1,
         "texto": "1 vitória(s) seguida(s)"
+      }
+    },
+    {
+      "time": "Palmeiras",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "sigla": "PAL",
+      "pos": 1,
+      "pontos": 48,
+      "jogos": 23,
+      "vitorias": 14,
+      "empates": 6,
+      "derrotas": 3,
+      "gp": 40,
+      "gc": 19,
+      "sg": 21,
+      "aproveitamento": 70,
+      "forma_ultimos5": [
+        "V",
+        "D",
+        "V",
+        "E",
+        "D"
+      ],
+      "pontos_ultimos5": 7,
+      "aproveitamento_ultimos5": 47,
+      "mandante": {
+        "jogos": 11,
+        "pontos": 24,
+        "vitorias": 7,
+        "empates": 3,
+        "derrotas": 1,
+        "gp": 17,
+        "gc": 8,
+        "sg": 9,
+        "aproveitamento": 73
+      },
+      "visitante": {
+        "jogos": 12,
+        "pontos": 24,
+        "vitorias": 7,
+        "empates": 3,
+        "derrotas": 2,
+        "gp": 23,
+        "gc": 11,
+        "sg": 12,
+        "aproveitamento": 67
+      },
+      "sequencia": {
+        "tipo": "D",
+        "quantidade": 1,
+        "texto": "1 derrota(s) seguida(s)"
       }
     },
     {
@@ -7941,57 +7969,6 @@
       }
     },
     {
-      "time": "Fluminense",
-      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
-      "sigla": "FLU",
-      "pos": 4,
-      "pontos": 35,
-      "jogos": 22,
-      "vitorias": 9,
-      "empates": 8,
-      "derrotas": 5,
-      "gp": 31,
-      "gc": 26,
-      "sg": 5,
-      "aproveitamento": 53,
-      "forma_ultimos5": [
-        "E",
-        "E",
-        "E",
-        "E",
-        "E"
-      ],
-      "pontos_ultimos5": 5,
-      "aproveitamento_ultimos5": 33,
-      "mandante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
-        "empates": 3,
-        "derrotas": 1,
-        "gp": 18,
-        "gc": 11,
-        "sg": 7,
-        "aproveitamento": 73
-      },
-      "visitante": {
-        "jogos": 11,
-        "pontos": 11,
-        "vitorias": 2,
-        "empates": 5,
-        "derrotas": 4,
-        "gp": 13,
-        "gc": 15,
-        "sg": -2,
-        "aproveitamento": 33
-      },
-      "sequencia": {
-        "tipo": "E",
-        "quantidade": 5,
-        "texto": "5 empate(s) seguida(s)"
-      }
-    },
-    {
       "time": "Atlético-MG",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/10/atletico-mg.svg",
       "sigla": "CAM",
@@ -8142,6 +8119,57 @@
         "tipo": "E",
         "quantidade": 2,
         "texto": "2 empate(s) seguida(s)"
+      }
+    },
+    {
+      "time": "Fluminense",
+      "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
+      "sigla": "FLU",
+      "pos": 4,
+      "pontos": 38,
+      "jogos": 23,
+      "vitorias": 10,
+      "empates": 8,
+      "derrotas": 5,
+      "gp": 34,
+      "gc": 28,
+      "sg": 6,
+      "aproveitamento": 55,
+      "forma_ultimos5": [
+        "E",
+        "E",
+        "E",
+        "E",
+        "V"
+      ],
+      "pontos_ultimos5": 7,
+      "aproveitamento_ultimos5": 47,
+      "mandante": {
+        "jogos": 12,
+        "pontos": 27,
+        "vitorias": 8,
+        "empates": 3,
+        "derrotas": 1,
+        "gp": 21,
+        "gc": 13,
+        "sg": 8,
+        "aproveitamento": 75
+      },
+      "visitante": {
+        "jogos": 11,
+        "pontos": 11,
+        "vitorias": 2,
+        "empates": 5,
+        "derrotas": 4,
+        "gp": 13,
+        "gc": 15,
+        "sg": -2,
+        "aproveitamento": 33
+      },
+      "sequencia": {
+        "tipo": "V",
+        "quantidade": 1,
+        "texto": "1 vitória(s) seguida(s)"
       }
     },
     {
@@ -8611,23 +8639,23 @@
       "sigla": "PAL",
       "pos": 1,
       "pontos": 48,
-      "jogos": 22,
+      "jogos": 23,
       "vitorias": 14,
       "empates": 6,
-      "derrotas": 2,
-      "gp": 38,
-      "gc": 16,
-      "sg": 22,
-      "aproveitamento": 73,
+      "derrotas": 3,
+      "gp": 40,
+      "gc": 19,
+      "sg": 21,
+      "aproveitamento": 70,
       "forma_ultimos5": [
-        "V",
         "V",
         "D",
         "V",
-        "E"
+        "E",
+        "D"
       ],
-      "pontos_ultimos5": 10,
-      "aproveitamento_ultimos5": 67,
+      "pontos_ultimos5": 7,
+      "aproveitamento_ultimos5": 47,
       "mandante": {
         "jogos": 11,
         "pontos": 24,
@@ -8640,20 +8668,20 @@
         "aproveitamento": 73
       },
       "visitante": {
-        "jogos": 11,
+        "jogos": 12,
         "pontos": 24,
         "vitorias": 7,
         "empates": 3,
-        "derrotas": 1,
-        "gp": 21,
-        "gc": 8,
-        "sg": 13,
-        "aproveitamento": 73
+        "derrotas": 2,
+        "gp": 23,
+        "gc": 11,
+        "sg": 12,
+        "aproveitamento": 67
       },
       "sequencia": {
-        "tipo": "E",
+        "tipo": "D",
         "quantidade": 1,
-        "texto": "1 empate(s) seguida(s)"
+        "texto": "1 derrota(s) seguida(s)"
       }
     },
     {
@@ -8763,34 +8791,34 @@
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
       "sigla": "FLU",
       "pos": 4,
-      "pontos": 35,
-      "jogos": 22,
-      "vitorias": 9,
+      "pontos": 38,
+      "jogos": 23,
+      "vitorias": 10,
       "empates": 8,
       "derrotas": 5,
-      "gp": 31,
-      "gc": 26,
-      "sg": 5,
-      "aproveitamento": 53,
+      "gp": 34,
+      "gc": 28,
+      "sg": 6,
+      "aproveitamento": 55,
       "forma_ultimos5": [
         "E",
         "E",
         "E",
         "E",
-        "E"
+        "V"
       ],
-      "pontos_ultimos5": 5,
-      "aproveitamento_ultimos5": 33,
+      "pontos_ultimos5": 7,
+      "aproveitamento_ultimos5": 47,
       "mandante": {
-        "jogos": 11,
-        "pontos": 24,
-        "vitorias": 7,
+        "jogos": 12,
+        "pontos": 27,
+        "vitorias": 8,
         "empates": 3,
         "derrotas": 1,
-        "gp": 18,
-        "gc": 11,
-        "sg": 7,
-        "aproveitamento": 73
+        "gp": 21,
+        "gc": 13,
+        "sg": 8,
+        "aproveitamento": 75
       },
       "visitante": {
         "jogos": 11,
@@ -8804,9 +8832,9 @@
         "aproveitamento": 33
       },
       "sequencia": {
-        "tipo": "E",
-        "quantidade": 5,
-        "texto": "5 empate(s) seguida(s)"
+        "tipo": "V",
+        "quantidade": 1,
+        "texto": "1 vitória(s) seguida(s)"
       }
     },
     {
@@ -9683,113 +9711,113 @@
       "pos": 1
     },
     {
-      "time": "Palmeiras",
-      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
-      "sigla": "PAL",
-      "score": 61.6,
-      "indice_final": 61.6,
-      "ataque": 61.8,
-      "defesa": 64.9,
-      "dominio": 50.7,
-      "eficiencia": 71.5,
-      "disciplina": 56.8,
-      "metricas": {
-        "gols_pro_jogo": 1.73,
-        "gols_contra_jogo": 0.73,
-        "saldo_por_jogo": 1.0,
-        "posse_media": 51.7,
-        "finalizacoes_media": 14.1,
-        "finalizacoes_contra_media": 13.2,
-        "chutes_gol_media": 4.5,
-        "chutes_gol_contra_media": 3.8,
-        "passes_certos_media": 361.9,
-        "passes_media": 425.3,
-        "passes_saldo_media": 28.0,
-        "precisao_passe_media": 84.5,
-        "escanteios_media": 5.8,
-        "escanteios_saldo_media": -0.0,
-        "aproveitamento_chutes_media": 35.0,
-        "bloqueados_media": 3.9,
-        "defesas_media": 3.0,
-        "desarmes_media": 12.0,
-        "interceptacoes_media": 7.3,
-        "interceptacoes_saldo_media": -1.1,
-        "cruzamentos_media": 9.8,
-        "cortes_media": 24.3,
-        "faltas_media": 13.9,
-        "cartoes_media": 2.18,
-        "jogos_com_boxscore": 22
-      },
-      "pos_tabela": 1,
-      "pontos": 48,
-      "jogos": 22,
-      "sg": 22,
-      "gp": 38,
-      "gc": 16,
-      "aproveitamento": 73,
-      "forma_ultimos5": [
-        "V",
-        "V",
-        "D",
-        "V",
-        "E"
-      ],
-      "justificativa": "Índice 61.6: ataque 61.8, defesa 64.9, domínio 50.7, eficiência 71.5 e disciplina 56.8. Modelo AF-Score usa finalizações, chutes no gol, passes, desarmes, interceptações, cruzamentos, cortes e disciplina quando disponíveis. Tabela: 73% de aproveitamento, SG 22 e forma VVDVE.",
-      "pos": 2
-    },
-    {
       "time": "Fluminense",
       "escudo": "https://s.sde.globo.com/media/organizations/2018/03/11/fluminense.svg",
       "sigla": "FLU",
-      "score": 60.1,
-      "indice_final": 60.1,
-      "ataque": 65.0,
-      "defesa": 49.2,
-      "dominio": 82.7,
-      "eficiencia": 46.3,
-      "disciplina": 52.4,
+      "score": 61.1,
+      "indice_final": 61.1,
+      "ataque": 66.4,
+      "defesa": 47.8,
+      "dominio": 82.6,
+      "eficiencia": 52.2,
+      "disciplina": 51.4,
       "metricas": {
-        "gols_pro_jogo": 1.41,
-        "gols_contra_jogo": 1.18,
-        "saldo_por_jogo": 0.23,
+        "gols_pro_jogo": 1.48,
+        "gols_contra_jogo": 1.22,
+        "saldo_por_jogo": 0.26,
         "posse_media": 59.0,
         "finalizacoes_media": 15.3,
-        "finalizacoes_contra_media": 12.3,
+        "finalizacoes_contra_media": 12.4,
         "chutes_gol_media": 5.7,
-        "chutes_gol_contra_media": 4.6,
-        "passes_certos_media": 465.6,
-        "passes_media": 529.2,
-        "passes_saldo_media": 166.6,
-        "precisao_passe_media": 87.3,
-        "escanteios_media": 5.8,
-        "escanteios_saldo_media": 1.5,
-        "aproveitamento_chutes_media": 37.7,
-        "bloqueados_media": 3.5,
+        "chutes_gol_contra_media": 4.7,
+        "passes_certos_media": 464.1,
+        "passes_media": 527.3,
+        "passes_saldo_media": 166.7,
+        "precisao_passe_media": 87.4,
+        "escanteios_media": 5.7,
+        "escanteios_saldo_media": 1.4,
+        "aproveitamento_chutes_media": 37.8,
+        "bloqueados_media": 3.4,
         "defesas_media": 3.4,
-        "desarmes_media": 11.7,
+        "desarmes_media": 11.9,
         "interceptacoes_media": 7.0,
-        "interceptacoes_saldo_media": -2.0,
-        "cruzamentos_media": 10.4,
-        "cortes_media": 21.7,
-        "faltas_media": 13.2,
-        "cartoes_media": 2.64,
-        "jogos_com_boxscore": 22
+        "interceptacoes_saldo_media": -2.3,
+        "cruzamentos_media": 10.1,
+        "cortes_media": 21.9,
+        "faltas_media": 13.3,
+        "cartoes_media": 2.7,
+        "jogos_com_boxscore": 23
       },
       "pos_tabela": 4,
-      "pontos": 35,
-      "jogos": 22,
-      "sg": 5,
-      "gp": 31,
-      "gc": 26,
-      "aproveitamento": 53,
+      "pontos": 38,
+      "jogos": 23,
+      "sg": 6,
+      "gp": 34,
+      "gc": 28,
+      "aproveitamento": 55,
       "forma_ultimos5": [
         "E",
         "E",
         "E",
         "E",
-        "E"
+        "V"
       ],
-      "justificativa": "Índice 60.1: ataque 65.0, defesa 49.2, domínio 82.7, eficiência 46.3 e disciplina 52.4. Modelo AF-Score usa finalizações, chutes no gol, passes, desarmes, interceptações, cruzamentos, cortes e disciplina quando disponíveis. Tabela: 53% de aproveitamento, SG 5 e forma EEEEE.",
+      "justificativa": "Índice 61.1: ataque 66.4, defesa 47.8, domínio 82.6, eficiência 52.2 e disciplina 51.4. Modelo AF-Score usa finalizações, chutes no gol, passes, desarmes, interceptações, cruzamentos, cortes e disciplina quando disponíveis. Tabela: 55% de aproveitamento, SG 6 e forma EEEEV.",
+      "pos": 2
+    },
+    {
+      "time": "Palmeiras",
+      "escudo": "https://s.sde.globo.com/media/organizations/2019/07/06/Palmeiras.svg",
+      "sigla": "PAL",
+      "score": 59.6,
+      "indice_final": 59.6,
+      "ataque": 63.0,
+      "defesa": 62.1,
+      "dominio": 49.0,
+      "eficiencia": 64.4,
+      "disciplina": 56.2,
+      "metricas": {
+        "gols_pro_jogo": 1.74,
+        "gols_contra_jogo": 0.83,
+        "saldo_por_jogo": 0.91,
+        "posse_media": 51.2,
+        "finalizacoes_media": 14.1,
+        "finalizacoes_contra_media": 13.3,
+        "chutes_gol_media": 4.7,
+        "chutes_gol_contra_media": 3.9,
+        "passes_certos_media": 357.4,
+        "passes_media": 420.7,
+        "passes_saldo_media": 19.5,
+        "precisao_passe_media": 84.3,
+        "escanteios_media": 5.8,
+        "escanteios_saldo_media": -0.0,
+        "aproveitamento_chutes_media": 35.7,
+        "bloqueados_media": 3.8,
+        "defesas_media": 3.0,
+        "desarmes_media": 12.3,
+        "interceptacoes_media": 7.6,
+        "interceptacoes_saldo_media": -0.7,
+        "cruzamentos_media": 10.1,
+        "cortes_media": 24.4,
+        "faltas_media": 14.0,
+        "cartoes_media": 2.22,
+        "jogos_com_boxscore": 23
+      },
+      "pos_tabela": 1,
+      "pontos": 48,
+      "jogos": 23,
+      "sg": 21,
+      "gp": 40,
+      "gc": 19,
+      "aproveitamento": 70,
+      "forma_ultimos5": [
+        "V",
+        "D",
+        "V",
+        "E",
+        "D"
+      ],
+      "justificativa": "Índice 59.6: ataque 63.0, defesa 62.1, domínio 49.0, eficiência 64.4 e disciplina 56.2. Modelo AF-Score usa finalizações, chutes no gol, passes, desarmes, interceptações, cruzamentos, cortes e disciplina quando disponíveis. Tabela: 70% de aproveitamento, SG 21 e forma VDVED.",
       "pos": 3
     },
     {
@@ -11587,6 +11615,10 @@
     },
     {
       "event_id": "401841187",
+      "fonte": "dados-br/jogos-detalhes.json"
+    },
+    {
+      "event_id": "401841192",
       "fonte": "dados-br/jogos-detalhes.json"
     }
   ],
