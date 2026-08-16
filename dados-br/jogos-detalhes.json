@@ -1,15 +1,602 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-16T11:22:39.766407-03:00",
+  "gerado_em": "2026-08-16T13:02:08.619395-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 218,
-  "total_com_estatisticas": 218,
+  "total_jogos": 219,
+  "total_com_estatisticas": 219,
   "total_com_publico": 218,
-  "total_com_eventos": 218,
-  "total_com_jogadores": 218,
-  "total_eventos_validados": 218,
+  "total_com_eventos": 219,
+  "total_com_jogadores": 219,
+  "total_eventos_validados": 219,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841194": {
+      "event_id": "401841194",
+      "event_id_fonte_detalhes": "401841194",
+      "rodada": 23,
+      "data_iso": "2026-08-16T11:00",
+      "mandante": "Chapecoense",
+      "visitante": "Bahia",
+      "placar_mandante": 3,
+      "placar_visitante": 3,
+      "estadio": "Arena Condá",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Daiane Caroline Muniz Dos Santos",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "34.5%",
+          "away": "65.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "12",
+          "away": "19"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "16",
+          "away": "9"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "0"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "228",
+          "away": "506"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        },
+        {
+          "nome": "Passes",
+          "home": "283",
+          "away": "555"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "9",
+          "away": "10"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "8"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "6",
+          "away": "25"
+        },
+        {
+          "nome": "Cortes",
+          "home": "20",
+          "away": "17"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "34.5%",
+          "away": "65.5%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "12",
+          "away": "19"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "4"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "5",
+          "away": "4"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "20%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "3",
+          "away": "5"
+        },
+        {
+          "nome": "Faltas",
+          "home": "16",
+          "away": "9"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "0"
+        },
+        {
+          "nome": "Defesas",
+          "home": "3",
+          "away": "0"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "228",
+          "away": "506"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "90%"
+        },
+        {
+          "nome": "Passes",
+          "home": "283",
+          "away": "555"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "9",
+          "away": "10"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "7",
+          "away": "8"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "6",
+          "away": "25"
+        },
+        {
+          "nome": "Cortes",
+          "home": "20",
+          "away": "17"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "13'",
+          "jogador": "Alejo Veliz",
+          "time": "Bahia",
+          "assistencias": [],
+          "descricao": "Penalty - Scored 98 Goal! Chapecoense 0, Bahia 1. Alejo Veliz (Bahia) converts the penalty with a right footed shot to the centre of the goal. Alejo Veliz Penalty - Scored"
+        },
+        {
+          "minuto": "19'",
+          "jogador": "Giovanni Augusto",
+          "time": "Chapecoense",
+          "assistencias": [
+            "Yago Felipe"
+          ],
+          "descricao": "Goal 70 Goal! Chapecoense 1, Bahia 1. Giovanni Augusto (Chapecoense) right footed shot from the left side of the box to the bottom right corner. Assisted by Yago Felipe with a cross. Giovanni Augusto Goal"
+        },
+        {
+          "minuto": "42'",
+          "jogador": "Kauan",
+          "time": "Bahia",
+          "assistencias": [],
+          "descricao": "Own Goal 97 Own Goal by Kauan Faria, Chapecoense. Chapecoense 1, Bahia 2. Kauan Own Goal"
+        },
+        {
+          "minuto": "48'",
+          "jogador": "Marcinho",
+          "time": "Chapecoense",
+          "assistencias": [
+            "Giovanni Augusto"
+          ],
+          "descricao": "Goal 70 Goal! Chapecoense 2, Bahia 2. Marcinho (Chapecoense) right footed shot from the centre of the box to the centre of the goal. Assisted by Giovanni Augusto with a cross. Marcinho Goal"
+        },
+        {
+          "minuto": "65'",
+          "jogador": "Nicolás Acevedo",
+          "time": "Bahia",
+          "assistencias": [
+            "Jean Lucas"
+          ],
+          "descricao": "Goal 70 Goal! Chapecoense 2, Bahia 3. Nicolás Acevedo (Bahia) right footed shot from outside the box to the top right corner. Assisted by Jean Lucas. Nicolás Acevedo Goal"
+        },
+        {
+          "minuto": "71'",
+          "jogador": "Túlio Eduardo Silva De Oliveira",
+          "time": "Chapecoense",
+          "assistencias": [
+            "Giovanni Augusto"
+          ],
+          "descricao": "Goal - Header 137 Goal! Chapecoense 3, Bahia 3. Túlio (Chapecoense) header from very close range to the high centre of the goal. Assisted by Giovanni Augusto with a cross. Túlio Eduardo Silva De Oliveira"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "84'",
+          "jogador": "Mateo Sanabria",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Mateo Sanabria (Bahia) is shown the yellow card for a bad foul. Mateo Sanabria Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "89'",
+          "jogador": "Camilo",
+          "time": "Chapecoense",
+          "descricao": "Yellow Card 94 Camilo (Chapecoense) is shown the yellow card for a bad foul. Camilo Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+2'",
+          "jogador": "Erick Pulga",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Erick Pulga (Bahia) is shown the yellow card for a bad foul. Erick Pulga Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "318291",
+          "nome": "Alejo Veliz",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "219090",
+          "nome": "David Duarte",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "333907",
+          "nome": "Erick Pulga",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269910",
+          "nome": "Jean Lucas",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "407479",
+          "nome": "Kaue Furquim",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304757",
+          "nome": "Luciano Juba",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285757",
+          "nome": "Nicolás Acevedo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "266664",
+          "nome": "Rodrigo Nestor",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "381149",
+          "nome": "Román Gómez",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "224106",
+          "nome": "Ronaldo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "82782",
+          "nome": "Santiago Ramos",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "299932",
+          "nome": "Caio Alexandre",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "253796",
+          "nome": "Erick",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "335673",
+          "nome": "Mateo Sanabria",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "227241",
+          "nome": "Michel Araújo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "360186",
+          "nome": "Zé Guilherme",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "276217",
+          "nome": "Anderson Paixão",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "157066",
+          "nome": "Bruno Matias",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285089",
+          "nome": "Camilo",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "319649",
+          "nome": "Eduardo Doma",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "301225",
+          "nome": "Fernando",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "140012",
+          "nome": "Giovanni Augusto",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285446",
+          "nome": "Heitor",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "338663",
+          "nome": "Kauan",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "199933",
+          "nome": "Kevin Ramírez",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "64671",
+          "nome": "Marcinho",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "202554",
+          "nome": "Yago Felipe",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "236283",
+          "nome": "Bruno Pacheco",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "396967",
+          "nome": "David",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "314590",
+          "nome": "Everton",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "317377",
+          "nome": "Franco Rossi",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "3108270",
+          "nome": "Túlio Eduardo Silva De Oliveira",
+          "time": "Chapecoense",
+          "team_id": "9318",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Chapecoense": 3,
+          "Bahia": 3
+        },
+        "gols_extraidos": {
+          "Chapecoense": 3,
+          "Bahia": 3
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Chapecoense": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Bahia": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Chapecoense": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Bahia": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary + scoreboard",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-16T13:02:05.778674-03:00"
+    },
     "401841189": {
       "event_id": "401841189",
       "event_id_fonte_detalhes": "401841189",
@@ -555,10 +1142,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-16T05:11:14.006259-03:00",
+      "atualizado_em": "2026-08-16T13:02:06.668444-03:00",
+      "publico_pagante": 44443,
       "renda": 2097395,
-      "dados_publico_fonte_adicional": "São Paulo FC: público presente e renda; ge: público pagante",
-      "publico_pagante": 44443
+      "dados_publico_fonte_adicional": "São Paulo FC: público presente e renda; ge: público pagante"
     },
     "401841196": {
       "event_id": "401841196",
@@ -1083,7 +1670,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-16T05:11:14.402956-03:00",
+      "atualizado_em": "2026-08-16T13:02:07.101479-03:00",
       "publico_pagante": 30473,
       "renda": 1242250,
       "dados_publico_fonte_adicional": "Athletico: público total, pagantes e renda"
@@ -1694,7 +2281,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-16T05:11:14.789437-03:00",
+      "atualizado_em": "2026-08-16T13:02:07.578998-03:00",
       "publico_pagante": 18152,
       "renda": 1021559.5,
       "dados_publico_fonte_adicional": "público total, pagantes e renda"
@@ -16187,7 +16774,7 @@
       "publico": 16772,
       "publico_tipo": "presente",
       "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/07/23/botafogo-esbarra-no-goleiro-e-fica-no-0-a-0-contra-o-vitoria-em-jogo-atrasado-do-brasileirao.htm",
-      "arbitro": "",
+      "arbitro": "Jonathan Pinheiro",
       "stats": [
         {
           "nome": "Posse",
@@ -16211,7 +16798,7 @@
         },
         {
           "nome": "Aproveitamento dos chutes",
-          "home": "32%",
+          "home": "30%",
           "away": "20%",
           "note": "chutes no gol ÷ finalizações"
         },
@@ -16252,8 +16839,8 @@
         },
         {
           "nome": "Precisão de passe",
-          "home": "82%",
-          "away": "76%"
+          "home": "80%",
+          "away": "80%"
         },
         {
           "nome": "Passes",
@@ -16263,7 +16850,7 @@
         {
           "nome": "Desarmes",
           "home": "12",
-          "away": "14"
+          "away": "20"
         },
         {
           "nome": "Interceptações",
@@ -16273,7 +16860,7 @@
         {
           "nome": "Cruzamentos",
           "home": "7",
-          "away": "5"
+          "away": "8"
         },
         {
           "nome": "Cortes",
@@ -16304,7 +16891,7 @@
         },
         {
           "nome": "Aproveitamento dos chutes",
-          "home": "32%",
+          "home": "30%",
           "away": "20%",
           "note": "chutes no gol ÷ finalizações"
         },
@@ -16345,8 +16932,8 @@
         },
         {
           "nome": "Precisão de passe",
-          "home": "82%",
-          "away": "76%"
+          "home": "80%",
+          "away": "80%"
         },
         {
           "nome": "Passes",
@@ -16356,7 +16943,7 @@
         {
           "nome": "Desarmes",
           "home": "12",
-          "away": "14"
+          "away": "20"
         },
         {
           "nome": "Interceptações",
@@ -16366,7 +16953,7 @@
         {
           "nome": "Cruzamentos",
           "home": "7",
-          "away": "5"
+          "away": "8"
         },
         {
           "nome": "Cortes",
@@ -16381,28 +16968,44 @@
           "minuto": "34'",
           "jogador": "Emmanuel Martínez",
           "time": "Vitória",
-          "descricao": "34' · cartão amarelo · Emmanuel Martínez (Vitória)"
+          "descricao": "Yellow Card 94 Emmanuel Martínez (Vitória) is shown the yellow card for a bad foul. Emmanuel Martínez Yellow Card"
         },
         {
           "tipo": "amarelo",
-          "minuto": "90+1'",
+          "minuto": "90'+1'",
           "jogador": "Mateo Ponte",
           "time": "Botafogo",
-          "descricao": "90+1' · cartão amarelo · Mateo Ponte (Botafogo)"
+          "descricao": "Yellow Card 94 Mateo Ponte (Botafogo) is shown the yellow card for a bad foul. Mateo Ponte Yellow Card"
         }
       ],
       "jogadores": [
         {
-          "athlete_id": "250143",
-          "nome": "Warleson",
+          "athlete_id": "199734",
+          "nome": "Alex Telles",
           "time": "Botafogo",
           "team_id": "6086",
           "titular": true,
           "entrou": false
         },
         {
-          "athlete_id": "268700",
-          "nome": "Vitinho",
+          "athlete_id": "379785",
+          "nome": "Álvaro Montoro",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "224103",
+          "nome": "Arthur Cabral",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "297056",
+          "nome": "Cristian Medina",
           "time": "Botafogo",
           "team_id": "6086",
           "titular": true,
@@ -16425,40 +17028,8 @@
           "entrou": false
         },
         {
-          "athlete_id": "199734",
-          "nome": "Alex Telles",
-          "time": "Botafogo",
-          "team_id": "6086",
-          "titular": true,
-          "entrou": false
-        },
-        {
-          "athlete_id": "297056",
-          "nome": "Cristian Medina",
-          "time": "Botafogo",
-          "team_id": "6086",
-          "titular": true,
-          "entrou": false
-        },
-        {
-          "athlete_id": "398719",
-          "nome": "Victor Hugo",
-          "time": "Botafogo",
-          "team_id": "6086",
-          "titular": true,
-          "entrou": false
-        },
-        {
           "athlete_id": "176810",
           "nome": "Lucas Villalba",
-          "time": "Botafogo",
-          "team_id": "6086",
-          "titular": true,
-          "entrou": false
-        },
-        {
-          "athlete_id": "379785",
-          "nome": "Álvaro Montoro",
           "time": "Botafogo",
           "team_id": "6086",
           "titular": true,
@@ -16473,32 +17044,32 @@
           "entrou": false
         },
         {
-          "athlete_id": "224103",
-          "nome": "Arthur Cabral",
+          "athlete_id": "398719",
+          "nome": "Victor Hugo",
           "time": "Botafogo",
           "team_id": "6086",
           "titular": true,
           "entrou": false
         },
         {
-          "athlete_id": "359977",
-          "nome": "Mateo Ponte",
+          "athlete_id": "268700",
+          "nome": "Vitinho",
           "time": "Botafogo",
           "team_id": "6086",
-          "titular": false,
-          "entrou": true
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "250143",
+          "nome": "Warleson",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": true,
+          "entrou": false
         },
         {
           "athlete_id": "306764",
           "nome": "Danilo Santos",
-          "time": "Botafogo",
-          "team_id": "6086",
-          "titular": false,
-          "entrou": true
-        },
-        {
-          "athlete_id": "83178",
-          "nome": "Santiago Rodríguez",
           "time": "Botafogo",
           "team_id": "6086",
           "titular": false,
@@ -16521,20 +17092,20 @@
           "entrou": true
         },
         {
-          "athlete_id": "287941",
-          "nome": "Lucas Arcanjo",
-          "time": "Vitória",
-          "team_id": "3457",
-          "titular": true,
-          "entrou": false
+          "athlete_id": "359977",
+          "nome": "Mateo Ponte",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
         },
         {
-          "athlete_id": "284450",
-          "nome": "Jamerson",
-          "time": "Vitória",
-          "team_id": "3457",
-          "titular": true,
-          "entrou": false
+          "athlete_id": "83178",
+          "nome": "Santiago Rodríguez",
+          "time": "Botafogo",
+          "team_id": "6086",
+          "titular": false,
+          "entrou": true
         },
         {
           "athlete_id": "271773",
@@ -16545,32 +17116,8 @@
           "entrou": false
         },
         {
-          "athlete_id": "266676",
-          "nome": "Luan Cândido",
-          "time": "Vitória",
-          "team_id": "3457",
-          "titular": true,
-          "entrou": false
-        },
-        {
-          "athlete_id": "269915",
-          "nome": "Ramon",
-          "time": "Vitória",
-          "team_id": "3457",
-          "titular": true,
-          "entrou": false
-        },
-        {
           "athlete_id": "218649",
           "nome": "Emmanuel Martínez",
-          "time": "Vitória",
-          "team_id": "3457",
-          "titular": true,
-          "entrou": false
-        },
-        {
-          "athlete_id": "383950",
-          "nome": "Zé Vitor",
           "time": "Vitória",
           "team_id": "3457",
           "titular": true,
@@ -16593,8 +17140,40 @@
           "entrou": false
         },
         {
+          "athlete_id": "284450",
+          "nome": "Jamerson",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "266676",
+          "nome": "Luan Cândido",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287941",
+          "nome": "Lucas Arcanjo",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
           "athlete_id": "218972",
           "nome": "Matheus",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269915",
+          "nome": "Ramon",
           "time": "Vitória",
           "team_id": "3457",
           "titular": true,
@@ -16609,12 +17188,12 @@
           "entrou": false
         },
         {
-          "athlete_id": "315766",
-          "nome": "Matheusinho",
+          "athlete_id": "383950",
+          "nome": "Zé Vitor",
           "time": "Vitória",
           "team_id": "3457",
-          "titular": false,
-          "entrou": true
+          "titular": true,
+          "entrou": false
         },
         {
           "athlete_id": "252315",
@@ -16625,8 +17204,16 @@
           "entrou": true
         },
         {
-          "athlete_id": "215771",
-          "nome": "Tomás Pochettino",
+          "athlete_id": "379661",
+          "nome": "Diego Tarzia",
+          "time": "Vitória",
+          "team_id": "3457",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "315766",
+          "nome": "Matheusinho",
           "time": "Vitória",
           "team_id": "3457",
           "titular": false,
@@ -16641,8 +17228,8 @@
           "entrou": true
         },
         {
-          "athlete_id": "379661",
-          "nome": "Diego Tarzia",
+          "athlete_id": "215771",
+          "nome": "Tomás Pochettino",
           "time": "Vitória",
           "team_id": "3457",
           "titular": false,
@@ -16696,17 +17283,15 @@
         "tipo_pendencia": "",
         "motivo": ""
       },
-      "fonte": "Resultado confirmado; detalhes ESPN 401879458",
+      "fonte": "Resultado confirmado; detalhes ESPN",
       "resultado_manual": true,
       "origem_resultado": "CBF — tabela/jogo oficial do Campeonato Brasileiro Série A 2026",
       "motivo_resultado_manual": "Última trava para o caso em que a ESPN mantenha o jogo encerrado em estado incompatível com a classificação oficial.",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-16T10:31:05.298166-03:00",
+      "atualizado_em": "2026-08-16T13:02:08.536955-03:00",
       "publico_pagante": 14439,
       "renda": 473220,
-      "dados_publico_fonte_adicional": "foto do placar do estádio fornecida pelo mantenedor confirma 16.772 presentes; pagantes/renda fornecidos pelo mantenedor",
-      "fonte_detalhes": "ESPN Team Stats 401879458; seed local verificado, refresh do summary/API obrigatório na próxima execução",
-      "forcar_refresh_detalhes": true
+      "dados_publico_fonte_adicional": "foto do placar do estádio fornecida pelo mantenedor confirma 16.772 presentes; pagantes/renda fornecidos pelo mantenedor"
     },
     "401841151": {
       "event_id": "401841151",
@@ -122553,7 +123138,5 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  },
-  "total_com_publico_pagante": 216,
-  "total_com_renda": 218
+  }
 }
