@@ -412,6 +412,38 @@ def publico_complementar(event_id: str, mapa: dict[str, dict[str, Any]]) -> tupl
     return valor, str(item.get("fonte") or ""), str(item.get("tipo") or "presente")
 
 
+def aplicar_dados_adicionais_publico(
+    jogos_saida: dict[str, dict[str, Any]], mapa: dict[str, dict[str, Any]]
+) -> int:
+    """Propaga pagantes/renda documentados sem confundi-los com público presente."""
+    alterados = 0
+    for event_id, item in (mapa or {}).items():
+        if not isinstance(item, dict) or str(event_id) not in jogos_saida:
+            continue
+        row = jogos_saida[str(event_id)]
+        publico_comp = _attendance_number(item.get("publico"))
+        publico_row = _attendance_number(row.get("publico"))
+        if publico_comp is None or (publico_row is not None and publico_row != publico_comp):
+            continue
+        antes = (row.get("publico_pagante"), row.get("renda"), row.get("dados_publico_fonte_adicional"))
+        pagantes = _attendance_number(item.get("pagantes"))
+        if pagantes is not None and pagantes <= publico_comp:
+            row["publico_pagante"] = pagantes
+        renda = item.get("renda")
+        try:
+            renda_num = float(renda)
+        except (TypeError, ValueError):
+            renda_num = 0.0
+        if renda_num > 0:
+            row["renda"] = int(renda_num) if renda_num.is_integer() else round(renda_num, 2)
+        fonte_extra = str(item.get("fonte_adicional") or "").strip()
+        if fonte_extra:
+            row["dados_publico_fonte_adicional"] = fonte_extra
+        depois = (row.get("publico_pagante"), row.get("renda"), row.get("dados_publico_fonte_adicional"))
+        alterados += int(depois != antes)
+    return alterados
+
+
 def parse_estadio(summary: dict[str, Any], jogo: dict[str, Any]) -> str:
     paths = [
         ((summary.get("gameInfo") or {}).get("venue") or {}),
@@ -1717,7 +1749,13 @@ def self_test() -> None:
     mapa_ids = carregar_event_ids_detalhes()
     if RESULTADOS_MANUAIS.exists():
         assert mapa_ids.get("401840998") == "401879459", mapa_ids
-    print("SELF-TEST OK: público, scoreboard, merge de estatísticas, escalações, eventos, deduplicação, ID alternativo e fallback manual.")
+    extra_rows = {"x": {"publico": 16772}}
+    assert aplicar_dados_adicionais_publico(extra_rows, {"x": {"publico": 16772, "pagantes": 14439, "renda": 473220, "fonte_adicional": "documento"}}) == 1
+    assert extra_rows["x"]["publico_pagante"] == 14439 and extra_rows["x"]["renda"] == 473220
+    bloqueado = {"x": {"publico": 16772}}
+    aplicar_dados_adicionais_publico(bloqueado, {"x": {"publico": 16772, "pagantes": 18000}})
+    assert "publico_pagante" not in bloqueado["x"]
+    print("SELF-TEST OK: público, renda/pagantes documentados, scoreboard, merge de estatísticas, escalações, eventos, deduplicação, ID alternativo e fallback manual.")
 
 
 def _build_payload(jogos_saida: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -2051,6 +2089,7 @@ def main() -> None:
         )
         time.sleep(max(0.0, args.sleep))
 
+    aplicar_dados_adicionais_publico(jogos_saida, publicos_complementares)
     payload = _build_payload(jogos_saida)
     auditoria = _build_audit(
         base_resultados, resultados, jogos_saida, buscados=buscados, preservados=preservados,

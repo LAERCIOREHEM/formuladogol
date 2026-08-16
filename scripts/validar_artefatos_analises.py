@@ -33,6 +33,8 @@ def validate(root: Path) -> None:
     hub = (root / "analises" / "index.html").read_text(encoding="utf-8")
     Parser().feed(hub)
     assert "analysis-round-nav" in hub, "hub sem arquivo interno de análises"
+    menu_slugs = [str(article.get("slug") or "") for article in articles]
+    menu_labels = [str(article.get("rotulo_menu") or "") for article in articles]
 
     for article in articles:
         identifier = editorial_id(article)
@@ -52,6 +54,14 @@ def validate(root: Path) -> None:
         assert f'data-fdg-editorial-id="{identifier}"' in text, f"{slug}: marcador editorial genérico ausente"
         assert article["titulo"] in text, f"{slug}: título divergente"
         assert "analysis-round-nav" in text, f"{slug}: navegação interna ausente"
+        nav_match = re.search(r'<nav class="analysis-round-nav" aria-label="Arquivo de análises">(.*?)</nav>', text, flags=re.S)
+        assert nav_match, f"{slug}: bloco de navegação interna inválido"
+        nav_html = nav_match.group(1)
+        for menu_slug, menu_label in zip(menu_slugs, menu_labels):
+            assert nav_html.count(f'href="{menu_slug}"') == 1, f"{slug}: subaba {menu_slug} ausente ou duplicada"
+            assert menu_label in nav_html, f"{slug}: rótulo {menu_label!r} ausente da navegação"
+        assert nav_html.count('aria-current="page"') == 1, f"{slug}: página ativa precisa ser única"
+        assert re.search(rf'href="{re.escape(slug)}" class="active" aria-current="page"', nav_html), f"{slug}: artigo atual não está marcado como ativo"
         assert "analysis-copy-section" in text, f"{slug}: corpo editorial ausente"
         assert slug in hub, f"{slug}: card ausente do hub"
         assert str(article["rotulo_menu"]) in hub, f"{slug}: subaba ausente do hub"

@@ -28,6 +28,20 @@
     if (Number.isNaN(d.getTime())) return "";
     return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
   }
+  function dateTimeLabel(v) {
+    if (!v) return "—";
+    var d = new Date(v);
+    if (Number.isNaN(d.getTime())) return "—";
+    var parts = new Intl.DateTimeFormat("pt-BR", {
+      timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", hour12: false
+    }).formatToParts(d);
+    function part(type) {
+      var found = parts.find(function (item) { return item.type === type; });
+      return found ? found.value : "";
+    }
+    return part("day") + "/" + part("month") + "/" + part("year") + " " + part("hour") + ":" + part("minute") + " BRT";
+  }
   function shortHash(v) { return v ? String(v).slice(0, 10) : ""; }
   function isMobile() { return window.innerWidth <= MOBILE_MAX; }
 
@@ -108,6 +122,19 @@
   /* ------------------------------------------------------------------ */
   /* Chips: mesmo componente já usado na linha "Jogos: 22 · Posição..."  */
   /* ------------------------------------------------------------------ */
+  function renderUpdateStatus() {
+    var target = el("accuracy-update-status");
+    if (!target) return;
+    var data = state.data || {};
+    var games = data.jogos || {};
+    var rounds = Array.isArray(games.por_rodada) ? games.por_rodada : [];
+    var firstRound = rounds.length ? Number(rounds[0].rodada) : null;
+    var evaluated = Number(games.jogos_avaliados) || 0;
+    target.textContent = "Última aferição: " + dateTimeLabel(data.gerado_em) +
+      " · " + evaluated.toLocaleString("pt-BR") + " jogos avaliados" +
+      (firstRound ? " · histórico pré-jogo desde a R" + firstRound : "");
+  }
+
   function renderGameChips() {
     var games = (state.data || {}).jogos || {};
     var fav = games.maior_probabilidade || {};
@@ -516,7 +543,7 @@
   }
 
   function renderAll() {
-    renderGameChips(); renderScope(); renderSeal(); renderCalibration();
+    renderUpdateStatus(); renderGameChips(); renderScope(); renderSeal(); renderCalibration();
     setClubOptions(); wireTabs(); renderTimeline(); renderRange(); renderSeasonEvents();
   }
 

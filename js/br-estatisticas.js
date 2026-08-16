@@ -212,6 +212,54 @@
     });
   }
 
+  function dateTimeCompactBR(value) {
+    if (!value) return "—";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      day: "2-digit", month: "2-digit", year: "numeric",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+    }).replace(",", "") + " BRT";
+  }
+
+  function coverageLabel(done, total) {
+    const n = Number(done);
+    const d = Number(total);
+    if (!Number.isFinite(n) || !Number.isFinite(d) || d <= 0) return "—";
+    const pct = Math.max(0, Math.min(100, n / d * 100));
+    return `${integer(n)}/${integer(d)} (${number(pct, Math.abs(pct - 100) < 1e-9 ? 0 : 1)}%)`;
+  }
+
+  function totalFinishedGames() {
+    const results = resultsRows().length;
+    if (results) return results;
+    const competitionTotal = Number(state.competition?.resumo?.jogos_finalizados);
+    if (Number.isFinite(competitionTotal) && competitionTotal > 0) return competitionTotal;
+    const tableTotal = tableRows().reduce((sum, row) => sum + (Number(row?.jogos) || 0), 0) / 2;
+    return Number.isFinite(tableTotal) ? Math.round(tableTotal) : 0;
+  }
+
+  function statsCountForGames(games) {
+    return games.reduce((count, game) => {
+      const detail = gameDetail(game) || {};
+      const stats = Array.isArray(detail.stats) ? detail.stats : (Array.isArray(detail.estatisticas) ? detail.estatisticas : []);
+      return count + (stats.length ? 1 : 0);
+    }, 0);
+  }
+
+  function expectedClubGames(name) {
+    const row = tableRows().find((item) => normalize(item?.time) === normalize(name));
+    const value = Number(row?.jogos);
+    return Number.isFinite(value) && value >= 0 ? value : null;
+  }
+
+  function moneyBR(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n) || n <= 0) return "—";
+    return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
   async function fetchJson(path, fallback) {
     try {
       const response = await fetch(`${path}${path.includes("?") ? "&" : "?"}t=${Date.now()}`, { cache: "no-store" });
@@ -322,7 +370,14 @@
     }
     const expanded = state.expanded[type];
     const shown = expanded ? list : list.slice(0, 5);
-    target.innerHTML = `<div class="stats-player-list">${shown.map((player, index) => {
+    const completenessKey = type === "artilheiros" ? "artilharia" : "assistencias";
+    const completeness = state.leaders?.completude?.[completenessKey] || {};
+    const totalGames = Number(completeness.total_jogos_declarado) || totalFinishedGames();
+    const gamesRead = Number(completeness.jogos_lidos) || 0;
+    const lineupGames = Number(completeness.jogos_com_escalacoes) || 0;
+    const statusTone = gamesRead === totalGames && lineupGames === totalGames ? "" : " is-warning";
+    const status = `Base de eventos: ${coverageLabel(gamesRead, totalGames)} · escalações: ${coverageLabel(lineupGames, totalGames)} · atualizado ${dateTimeCompactBR(state.leaders?.atualizado_em)}`;
+    target.innerHTML = `<div class="stats-data-status${statusTone}">${escapeHtml(status)}</div><div class="stats-player-list">${shown.map((player, index) => {
       const rawGames = player.jogos;
       const games = rawGames === null || rawGames === undefined || rawGames === "" ? null : Number(rawGames);
       const hasGames = Number.isFinite(games) && games > 0;
@@ -359,7 +414,11 @@
     const selected = state.clubFilter;
     const info = selected ? teamInfo(selected) : null;
     const games = filteredGames();
-    $("filtro-jogos").innerHTML = `<div class="stats-game-filter">
+    const detailed = statsCountForGames(games);
+    const expectedGames = selected ? expectedClubGames(selected) : totalFinishedGames();
+    const denominator = expectedGames || games.length;
+    const gamesStatus = `${coverageLabel(games.length, denominator)} jogos listados · estatísticas: ${coverageLabel(detailed, denominator)} · atualizado ${dateTimeCompactBR(state.details?.gerado_em)}`;
+    $("filtro-jogos").innerHTML = `<div class="stats-data-status${games.length === denominator && detailed === denominator ? "" : " is-warning"}">${escapeHtml(gamesStatus)}</div><div class="stats-game-filter">
       <div class="stats-filter-control">
         <label for="stats-club-filter">Clube</label>
         <select id="stats-club-filter">
@@ -369,8 +428,8 @@
       </div>
       <div class="stats-filter-current">
         ${selected
-          ? clubIdentityLink(selected, `${shield(info, "stats-filter-shield")}<div><strong>${escapeHtml(selected)}</strong><span>${integer(games.length)} partida(s) encontrada(s)</span></div>`, "stats-filter-club-link")
-          : `<span class="stats-filter-all">BR</span><div><strong>Todos os clubes</strong><span>${integer(games.length)} partida(s) encontrada(s)</span></div>`}
+          ? clubIdentityLink(selected, `${shield(info, "stats-filter-shield")}<div><strong>${escapeHtml(selected)}</strong><span>${coverageLabel(games.length, denominator)} jogos listados</span></div>`, "stats-filter-club-link")
+          : `<span class="stats-filter-all">BR</span><div><strong>Todos os clubes</strong><span>${coverageLabel(games.length, denominator)} jogos listados</span></div>`}
         ${selected ? `<button type="button" data-clear-game-filter>Limpar</button>` : ""}
       </div>
     </div>`;
@@ -420,6 +479,8 @@
     const home = game.mandante || teamInfo(detail.mandante);
     const away = game.visitante || teamInfo(detail.visitante);
     const crowd = Number(detail.publico);
+    const paidCrowd = Number(detail.publico_pagante);
+    const revenue = Number(detail.renda);
     const goals = uniqueEvents(detail.gols, "goal");
     const cards = uniqueEvents(detail.cartoes, "card");
     return `<details class="stats-game-card" data-game-id="${escapeAttr(game.event_id || game.id || "")}">
@@ -439,7 +500,9 @@
       <div class="stats-game-body">
         <div class="stats-game-info-grid">
           <div><span>Estádio</span><strong>${escapeHtml(detail.estadio || game.estadio || "Não informado")}</strong></div>
-          <div><span>Público</span><strong>${Number.isFinite(crowd) && crowd > 0 ? integer(crowd) : "Não informado"}</strong></div>
+          <div><span>Público presente</span><strong>${Number.isFinite(crowd) && crowd > 0 ? integer(crowd) : "Não informado"}</strong></div>
+          ${Number.isFinite(paidCrowd) && paidCrowd > 0 ? `<div><span>Público pagante</span><strong>${integer(paidCrowd)}</strong></div>` : ""}
+          ${Number.isFinite(revenue) && revenue > 0 ? `<div><span>Renda</span><strong>${escapeHtml(moneyBR(revenue))}</strong></div>` : ""}
           <div><span>Árbitro</span><strong>${escapeHtml(detail.arbitro || "Não informado")}</strong></div>
         </div>
         ${(goals.length || cards.length) ? `<div class="stats-match-events">
@@ -447,7 +510,7 @@
           ${cards.length ? `<section><h4>Cartões</h4><ul>${cards.map(cardLine).join("")}</ul></section>` : ""}
         </div>` : ""}
         ${statisticRows(detail)}
-        <div class="stats-source-note">Fonte: ESPN; público complementado por fonte documental quando ausente. Nenhum campo é estimado.</div>
+        <div class="stats-source-note">Fonte: ESPN; público e dados adicionais podem ser complementados por fonte documental identificada quando ausentes. Nenhum campo é estimado.</div>
       </div>
     </details>`;
   }
@@ -480,11 +543,13 @@
       const expanded = Boolean(state.expandedClubGoals[key]);
       const shown = expanded ? markers : markers.slice(0, 5);
       const unknown = Number(club.gols_nao_individualizados || 0);
+      const expectedGames = expectedClubGames(club.time);
+      const gamesDenominator = expectedGames === null ? Number(club.jogos) : expectedGames;
       return `<details class="stats-club-goals-card">
         <summary>
           <span class="stats-rank">${integer(club.posicao || index + 1)}</span>
           <a class="stats-club-shield-link" href="${escapeAttr(clubHref(club.time))}" title="Abrir página de ${escapeAttr(club.time)}" aria-label="Abrir página de ${escapeAttr(club.time)}" onclick="event.stopPropagation()">${shield(club, "stats-club-shield")}</a>
-          <div class="stats-club-goals-main"><a href="${escapeAttr(clubHref(club.time))}" onclick="event.stopPropagation()"><strong>${escapeHtml(club.time)}</strong></a><span>${integer(club.jogos)} jogos · média ${number(club.media_gols, 2)}</span></div>
+          <div class="stats-club-goals-main"><a href="${escapeAttr(clubHref(club.time))}" onclick="event.stopPropagation()"><strong>${escapeHtml(club.time)}</strong></a><span>${coverageLabel(club.jogos, gamesDenominator)} jogos computados · média ${number(club.media_gols, 2)}</span></div>
           <div class="stats-club-goals-value"><strong>${integer(club.gols_pro)}</strong><span>gols</span></div>
           <span class="stats-game-chevron">⌄</span>
         </summary>
@@ -748,7 +813,7 @@
     const contextTitle = data.club || "Ranking de clubes";
     const contextText = data.club
       ? `${scopeLabel} · ${integer(data.informedCount)} com público${data.missingCount ? ` · ${integer(data.missingCount)} sem dado` : ""}`
-      : `${scopeLabel} · ${integer(clubRanking.length)} clubes com dados oficiais`;
+      : `${scopeLabel} · ${integer(clubRanking.length)} clubes com público`;
     return `<div class="stats-attendance-controls">
       <label><span>Clube</span><select data-attendance-club><option value="">Todos os clubes</option>${allClubNames().map((club) => `<option value="${escapeAttr(club)}"${club === data.club ? " selected" : ""}>${escapeHtml(club)}</option>`).join("")}</select></label>
       <label><span>Recorte</span><select data-attendance-scope>${ATTENDANCE_SCOPES.map((item) => `<option value="${escapeAttr(item.key)}"${item.key === selectedScope ? " selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}</select></label>
@@ -777,7 +842,7 @@
     const primary = attendanceClubPrimary(item);
     return `<button type="button" class="stats-attendance-club-row" data-attendance-select-club="${escapeAttr(item.club)}" aria-label="Ver jogos e público de ${escapeAttr(item.club)}">
       <span class="stats-attendance-club-rank">${integer(index + 1)}</span>
-      <div class="stats-attendance-club-main">${shield(item.club, "stats-attendance-shield")}<div><strong>${escapeHtml(item.club)}</strong><small>${integer(item.informedCount)} ${item.informedCount === 1 ? "jogo informado" : "jogos informados"}${item.missingCount ? ` · ${integer(item.missingCount)} sem dado` : ""}</small></div></div>
+      <div class="stats-attendance-club-main">${shield(item.club, "stats-attendance-shield")}<div><strong>${escapeHtml(item.club)}</strong><small>${integer(item.informedCount)} ${item.informedCount === 1 ? "jogo com público" : "jogos com público"}${item.missingCount ? ` · ${integer(item.missingCount)} sem dado` : ""}</small></div></div>
       <div class="stats-attendance-club-secondary"><span>Total ${integer(item.total)}</span><span>Máx. ${integer(item.max?.publico)}</span></div>
       <div class="stats-attendance-club-primary"><strong>${primary.value}</strong><span>${escapeHtml(primary.label)}</span></div>
     </button>`;
@@ -803,20 +868,26 @@
       <section class="panel"><div class="panel-inner"><div class="section-head"><div><div class="kicker">🔁 Momento</div><h2>Sequências</h2></div></div>${sequenceRows()}</div></section>
     </div>
     <section class="panel stats-attendance-panel"><div class="panel-inner">
-      <div class="section-head"><div><div class="kicker">👥 Torcida</div><h2>Público</h2></div><span class="badge">Jogos com dado oficial</span></div>
+      <div class="section-head"><div><div class="kicker">👥 Torcida</div><h2>Público</h2></div><span class="badge">Cobertura de público</span></div>
+      ${(() => {
+        const total = Number(state.competition?.resumo?.jogos_finalizados) || totalFinishedGames();
+        const informed = Number(attendance.jogos_com_publico) || 0;
+        const pending = Math.max(0, total - informed);
+        return `<div class="stats-data-status${pending ? " is-warning" : ""}">Cobertura: ${coverageLabel(informed, total)} jogos · ${integer(pending)} ${pending === 1 ? "pendente" : "pendentes"} · atualizado ${escapeHtml(dateTimeCompactBR(state.competition?.atualizado_em))}</div>`;
+      })()}
       ${attendanceControls(filteredAttendance, clubRanking)}
       <div class="stats-attendance-summary">
         <div><span>Maior público</span><strong>${filteredAttendance.max ? integer(filteredAttendance.max.publico) : "—"}</strong></div>
         <div><span>Menor público</span><strong>${filteredAttendance.min ? integer(filteredAttendance.min.publico) : "—"}</strong></div>
         <div><span>Média</span><strong>${filteredAttendance.informedCount ? integer(Math.round(filteredAttendance.average)) : "—"}</strong></div>
         <div><span>Total</span><strong>${filteredAttendance.informedCount ? integer(filteredAttendance.total) : "—"}</strong></div>
-        <div><span>Jogos informados</span><strong>${integer(filteredAttendance.informedCount)}</strong></div>
+        <div><span>Jogos com público</span><strong>${integer(filteredAttendance.informedCount)}</strong></div>
       </div>
       ${attendanceShown.length ? `${filteredAttendance.club
         ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>`
         : `<div class="stats-attendance-ranking-head"><div><strong>Ranking de clubes</strong><span>${escapeHtml(ATTENDANCE_SCOPES.find((item) => item.key === filteredAttendance.scope)?.label || "Todos os jogos")}</span></div><small>Selecione um clube para abrir os jogos</small></div><div class="stats-attendance-club-list">${attendanceShown.map(attendanceClubRow).join("")}</div>`}
-        ${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 primeiros ↑" : `Ver ranking completo (${ranking.length}) ↓`}</button>` : ""}` : emptyState(filteredAttendance.club ? "Nenhum jogo deste recorte possui público oficial informado." : "Nenhum clube deste recorte possui público oficial informado.")}
-      <p class="stats-source-note">${escapeHtml(attendance.observacao || "Média calculada somente sobre partidas com público informado.")}${filteredAttendance.missingCount ? ` Neste recorte, ${integer(filteredAttendance.missingCount)} ${filteredAttendance.missingCount === 1 ? "partida ainda não possui" : "partidas ainda não possuem"} público oficial e não ${filteredAttendance.missingCount === 1 ? "entra" : "entram"} nos cálculos.` : ""}</p>
+        ${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 primeiros ↑" : `Ver ranking completo (${ranking.length}) ↓`}</button>` : ""}` : emptyState(filteredAttendance.club ? "Nenhum jogo deste recorte possui público informado." : "Nenhum clube deste recorte possui público informado.")}
+      <p class="stats-source-note">${escapeHtml(attendance.observacao || "Média calculada somente sobre partidas com público informado.")}${filteredAttendance.missingCount ? ` Neste recorte, ${integer(filteredAttendance.missingCount)} ${filteredAttendance.missingCount === 1 ? "partida ainda não possui" : "partidas ainda não possuem"} público informado e não ${filteredAttendance.missingCount === 1 ? "entra" : "entram"} nos cálculos.` : ""}</p>
     </div></section>`;
   }
 
@@ -1785,7 +1856,10 @@
     const time = latest.toLocaleTimeString("pt-BR", {
       timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", hour12: false,
     });
-    return `Probabilidades calculadas em ${date} às ${time} BRT`;
+    const base = Number(state.probabilities?.base_corrente?.partidas_concluidas) || 0;
+    const current = totalFinishedGames() || base;
+    const coverage = base && current ? ` · base: ${coverageLabel(base, current)} jogos concluídos` : "";
+    return `Calculadas em ${date} ${time} BRT${coverage}`;
   }
 
   function probabilitySportsState() {

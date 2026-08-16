@@ -725,6 +725,37 @@ def submenu_rodadas(
         return ""
     return '<nav class="analysis-round-nav" aria-label="Arquivo de análises"><strong>ANÁLISES</strong><div>' + "".join(links) + "</div></nav>"
 
+def sincronizar_submenus_artigos(artigos: list[dict[str, Any]]) -> int:
+    """Mantém o arquivo interno de análises idêntico em todos os artigos publicados.
+
+    Artigos antigos não podem ficar congelados com a lista disponível na data em
+    que foram gerados. A cada nova publicação, somente o bloco de navegação é
+    reconstruído; corpo, datas, hashes editoriais e metadados do artigo permanecem
+    intactos.
+    """
+    alterados = 0
+    padrao = re.compile(r'<nav class="analysis-round-nav" aria-label="Arquivo de análises">.*?</nav>', re.S)
+    for artigo in artigos:
+        slug = str(artigo.get("slug") or "").strip()
+        identificador = id_editorial_artigo(artigo)
+        if not slug or not identificador:
+            continue
+        caminho = CAMINHO_ANALISES / slug
+        if not caminho.exists():
+            continue
+        texto = caminho.read_text(encoding="utf-8")
+        novo_menu = submenu_rodadas(artigos, id_ativo=identificador)
+        if not novo_menu:
+            continue
+        novo_texto, substituicoes = padrao.subn(novo_menu, texto, count=1)
+        if substituicoes != 1:
+            raise RuntimeError(f"{slug}: bloco analysis-round-nav ausente ou inválido")
+        if novo_texto != texto:
+            gravar_texto(caminho, novo_texto)
+            alterados += 1
+    return alterados
+
+
 def valor_estatistica(valor: Any) -> str:
     texto = str(valor if valor is not None else "—")
     if re.fullmatch(r"-?\d+\.\d+%", texto):
@@ -1337,6 +1368,7 @@ def executar(args: argparse.Namespace) -> int:
         return 0
     gravar_texto(CAMINHO_ANALISES / slug_rodada(rodada), pagina)
     gravar_texto(CAMINHO_ANALISES / "index.html", gerar_hub(artigos))
+    sincronizar_submenus_artigos(artigos)
     gravar_texto(ARQUIVO_MANIFESTO, json.dumps(manifesto, ensure_ascii=False, indent=2))
     atualizar_sitemap(artigos)
     gravar_texto(Path("news-sitemap.xml"), gerar_news_sitemap(artigos, momento))

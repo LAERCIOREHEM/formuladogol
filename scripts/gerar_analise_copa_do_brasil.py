@@ -47,6 +47,7 @@ from gerar_analise_rodada import (  # noqa: E402
     menu,
     rodape,
     submenu_rodadas,
+    sincronizar_submenus_artigos,
     atualizar_sitemap,
 )
 from gerar_probabilidades_brasileirao import current_publication_freshness  # noqa: E402
@@ -970,6 +971,7 @@ def execute(args: argparse.Namespace) -> int:
     gravar_texto(HISTORY_PATH, json.dumps(history, ensure_ascii=False, indent=2))
     gravar_texto(CAMINHO_ANALISES / ARTICLE_SLUG, page)
     gravar_texto(CAMINHO_ANALISES / "index.html", gerar_hub(articles))
+    sincronizar_submenus_artigos(articles)
     gravar_texto(MANIFEST_PATH, json.dumps(manifest, ensure_ascii=False, indent=2))
     atualizar_sitemap(articles)
     moment = agora_br()

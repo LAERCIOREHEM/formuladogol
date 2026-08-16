@@ -789,10 +789,11 @@ def propagar_publicos_para_detalhes(
     detalhes: dict[str, Any],
     complementos: dict[str, Any],
 ) -> tuple[dict[str, Any], int, list[dict[str, Any]]]:
-    """Atualiza somente público/fonte/tipo em jogos-detalhes, sem reconsultar ESPN.
+    """Propaga público e metadados documentais em jogos-detalhes, sem rede.
 
     Regra conservadora: nunca substitui um público já informado por número
-    diferente. Divergências são auditadas para revisão manual.
+    diferente; pagantes/renda só acompanham um complemento cujo público
+    presente seja compatível. Divergências são auditadas para revisão manual.
     """
     saida = dict(detalhes) if isinstance(detalhes, dict) else {}
     jogos_antigos = saida.get("jogos") if isinstance(saida.get("jogos"), dict) else {}
@@ -810,15 +811,33 @@ def propagar_publicos_para_detalhes(
             continue
         row = jogos[str(event_id)]
         atual = numero_publico(row.get("publico"))
+        if atual is not None and atual != publico:
+            conflitos.append({
+                "event_id": str(event_id),
+                "publico_detalhes": atual,
+                "publico_complementar": publico,
+                "fonte_detalhes": str(row.get("publico_fonte") or ""),
+                "fonte_complementar": str(comp.get("fonte") or ""),
+            })
+            continue
+        pagantes = numero_publico(comp.get("pagantes"))
+        if pagantes is not None and pagantes <= publico and row.get("publico_pagante") != pagantes:
+            row["publico_pagante"] = pagantes
+            alteracoes += 1
+        renda = comp.get("renda")
+        try:
+            renda_num = float(renda)
+        except (TypeError, ValueError):
+            renda_num = 0.0
+        renda_normalizada = int(renda_num) if renda_num > 0 and renda_num.is_integer() else round(renda_num, 2) if renda_num > 0 else None
+        if renda_normalizada is not None and row.get("renda") != renda_normalizada:
+            row["renda"] = renda_normalizada
+            alteracoes += 1
+        fonte_extra = str(comp.get("fonte_adicional") or "").strip()
+        if fonte_extra and row.get("dados_publico_fonte_adicional") != fonte_extra:
+            row["dados_publico_fonte_adicional"] = fonte_extra
+            alteracoes += 1
         if atual is not None:
-            if atual != publico:
-                conflitos.append({
-                    "event_id": str(event_id),
-                    "publico_detalhes": atual,
-                    "publico_complementar": publico,
-                    "fonte_detalhes": str(row.get("publico_fonte") or ""),
-                    "fonte_complementar": str(comp.get("fonte") or ""),
-                })
             continue
         row["publico"] = publico
         row["publico_fonte"] = str(comp.get("fonte") or comp.get("origem") or "complemento documental")
@@ -919,7 +938,16 @@ def self_test() -> None:
     assert pontuar_url_publico_ge(sm[0], 22) >= 30
     assert pontuar_url_publico_ge(sm[1], 22) < 18
 
-    print("SELF-TEST OK: parser GE, sitemap dinâmico, normal+AMP, público presente/total, bloqueio de pagantes, aliases, duplicados e conflitos.")
+    detalhes_extra = {"jogos": {"x": {"publico": 16772}}}
+    complementos_extra = {"jogos": {"x": {"publico": 16772, "tipo": "presente", "fonte": "fonte", "pagantes": 14439, "renda": 473220, "fonte_adicional": "documento"}}}
+    propagado_extra, alteracoes_extra, conflitos_extra = propagar_publicos_para_detalhes(detalhes_extra, complementos_extra)
+    assert not conflitos_extra and alteracoes_extra >= 2
+    assert propagado_extra["jogos"]["x"]["publico_pagante"] == 14439 and propagado_extra["jogos"]["x"]["renda"] == 473220
+    detalhes_invalido = {"jogos": {"x": {"publico": 16772}}}
+    complemento_invalido = {"jogos": {"x": {"publico": 16772, "pagantes": 18000}}}
+    propagado_invalido, _, conflitos_invalido = propagar_publicos_para_detalhes(detalhes_invalido, complemento_invalido)
+    assert not conflitos_invalido and "publico_pagante" not in propagado_invalido["jogos"]["x"]
+    print("SELF-TEST OK: parser GE, sitemap dinâmico, normal+AMP, público presente/total, renda/pagantes documentados, bloqueio de pagantes, aliases, duplicados e conflitos.")
 
 
 def main() -> None:

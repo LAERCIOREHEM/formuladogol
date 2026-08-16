@@ -61,7 +61,6 @@ DETAILS_PATH = ROOT / "dados-br" / "jogos-detalhes.json"
 STATS_COMP_PATH = ROOT / "dados-br" / "estatisticas-competicao.json"
 TRANSMISSIONS_PATH = ROOT / "dados-br" / "transmissoes-tv.json"
 RESULTS_PATH = ROOT / "resultados.json"
-PUBLIC_AUDIT_PATH = ROOT / "dados-br" / "auditoria-publicos.json"
 TRANSMISSIONS_AUDIT_PATH = ROOT / "dados-br" / "auditoria-transmissoes-tv.json"
 HIGHLIGHTS_PATH = ROOT / "dados-br" / "melhores-momentos.json"
 HIGHLIGHTS_MANUAL_PATH = ROOT / "dados-br" / "melhores-momentos-manual.json"
@@ -183,29 +182,67 @@ def hours_since_game(row: Mapping[str, Any], moment: datetime) -> float | None:
     return (moment - finished).total_seconds() / 3600.0
 
 
-def public_gaps(moment: datetime, details: Mapping[str, Any]) -> list[dict[str, Any]]:
-    public_audit = load_json(PUBLIC_AUDIT_PATH, {}) or {}
-    results = result_by_id()
-    detail_games = details.get("jogos") or {}
+def _public_value(value: Any) -> int | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        number = int(value)
+    else:
+        text = str(value or "").strip().replace(" ", "")
+        if not text:
+            return None
+        # Público é inteiro; pontos e vírgulas em fontes documentais são
+        # separadores de milhar, não casas decimais.
+        text = text.replace(".", "").replace(",", "")
+        try:
+            number = int(text)
+        except ValueError:
+            return None
+    return number if 0 < number <= MAX_PUBLIC else None
+
+
+def public_gaps_from_sources(
+    moment: datetime,
+    results: Mapping[str, Mapping[str, Any]],
+    detail_games: Mapping[str, Any],
+    complements: Mapping[str, Any],
+) -> list[dict[str, Any]]:
+    """Calcula as lacunas a partir das bases correntes, sem depender de auditoria antiga.
+
+    O arquivo auditoria-publicos.json é um artefato de diagnóstico e pode não ser
+    regravado quando uma tentativa automática não encontra nenhum novo público.
+    Usá-lo como fila fazia a IA ignorar partidas recentes. A fonte de verdade para
+    a triagem passa a ser: resultados finalizados + detalhes + complementos.
+    """
     rows: list[dict[str, Any]] = []
-    for item in public_audit.get("sem_publico") or []:
-        event_id = str(item.get("event_id") or "")
-        if not event_id or event_id not in results:
+    for event_id, result in results.items():
+        detail = detail_games.get(event_id) if isinstance(detail_games, Mapping) else None
+        complement = complements.get(event_id) if isinstance(complements, Mapping) else None
+        if _public_value((detail or {}).get("publico")) is not None:
             continue
-        if (detail_games.get(event_id) or {}).get("publico"):
+        if _public_value((complement or {}).get("publico")) is not None:
             continue
-        age = hours_since_game(results[event_id], moment)
+        age = hours_since_game(result, moment)
         if age is None or age < PUBLIC_RESEARCH_GRACE_HOURS:
             continue
         rows.append({
             "event_id": event_id,
-            "rodada": int(item.get("rodada") or results[event_id].get("rodada") or 0),
-            "data_iso": results[event_id].get("data_iso"),
-            "mandante": (results[event_id].get("mandante") or {}).get("nome") or item.get("mandante") or "",
-            "visitante": (results[event_id].get("visitante") or {}).get("nome") or item.get("visitante") or "",
+            "rodada": int(result.get("rodada") or 0),
+            "data_iso": result.get("data_iso"),
+            "mandante": (result.get("mandante") or {}).get("nome") or "",
+            "visitante": (result.get("visitante") or {}).get("nome") or "",
             "horas_desde_fim": round(age, 1),
         })
+    rows.sort(key=lambda item: (int(item.get("rodada") or 0), str(item.get("data_iso") or ""), str(item.get("event_id") or "")))
     return rows
+
+
+def public_gaps(moment: datetime, details: Mapping[str, Any]) -> list[dict[str, Any]]:
+    results = result_by_id()
+    detail_games = details.get("jogos") or {}
+    public_payload = load_json(PUBLIC_PATH, {}) or {}
+    complements = public_payload.get("jogos") if isinstance(public_payload, Mapping) else {}
+    return public_gaps_from_sources(moment, results, detail_games, complements or {})
 
 
 def transmission_gaps(moment: datetime, transmissions: Mapping[str, Any]) -> list[dict[str, Any]]:
@@ -1086,6 +1123,22 @@ def self_test() -> int:
         "finalizado_em": "2026-08-01T20:00:00-03:00",
     }
     assert hours_since_game(sample_result, datetime.fromisoformat("2026-08-02T20:00:00-03:00")) == 24
+    # Regressão: a triagem deve encontrar a lacuna pelas bases atuais mesmo que
+    # auditoria-publicos.json esteja antiga ou diga zero pendências.
+    gap_result = {
+        "1": {
+            "event_id": "1", "rodada": 23, "data_iso": "2026-08-01T18:00:00-03:00",
+            "mandante": {"nome": "Time A"}, "visitante": {"nome": "Time B"},
+            "finalizado_em": "2026-08-01T20:00:00-03:00",
+        }
+    }
+    gaps = public_gaps_from_sources(
+        datetime.fromisoformat("2026-08-02T05:30:00-03:00"), gap_result, {"1": {"publico": None}}, {}
+    )
+    assert [item["event_id"] for item in gaps] == ["1"]
+    assert public_gaps_from_sources(
+        datetime.fromisoformat("2026-08-02T05:30:00-03:00"), gap_result, {"1": {"publico": None}}, {"1": {"publico": 12345}}
+    ) == []
     assert allowed_source_url("https://ge.globo.com/futebol/noticia/teste.ghtml")
     assert not allowed_source_url("https://example.com/noticia")
     assert normalize_url("https://GE.GLOBO.COM/a/?utm=x#z") == "https://ge.globo.com/a"
