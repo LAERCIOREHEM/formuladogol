@@ -624,6 +624,7 @@
     { key: "average_asc", label: "Média — menor primeiro", short: "Média" },
     { key: "total_desc", label: "Total de público", short: "Total" },
     { key: "max_desc", label: "Maior público", short: "Maior público" },
+    { key: "revenue_desc", label: "Renda — maior primeiro", short: "Renda" },
     { key: "informed_desc", label: "Jogos informados", short: "Jogos" },
     { key: "name_asc", label: "Clube — A a Z", short: "Média" },
   ];
@@ -631,6 +632,8 @@
   const ATTENDANCE_GAME_SORTS = [
     { key: "publico_desc", label: "Público — maior primeiro" },
     { key: "publico_asc", label: "Público — menor primeiro" },
+    { key: "revenue_desc", label: "Renda — maior primeiro" },
+    { key: "revenue_asc", label: "Renda — menor primeiro" },
     { key: "date_desc", label: "Mais recentes primeiro" },
     { key: "date_asc", label: "Mais antigos primeiro" },
   ];
@@ -740,6 +743,18 @@
   function sortAttendanceGames(games) {
     const key = ATTENDANCE_GAME_SORTS.some((item) => item.key === state.attendanceGameSort) ? state.attendanceGameSort : "publico_desc";
     return games.slice().sort((a, b) => {
+      const revenueA = Number(a?.renda);
+      const revenueB = Number(b?.renda);
+      const validRevenueA = Number.isFinite(revenueA) && revenueA > 0;
+      const validRevenueB = Number.isFinite(revenueB) && revenueB > 0;
+      if (key === "revenue_desc" || key === "revenue_asc") {
+        if (validRevenueA !== validRevenueB) return validRevenueA ? -1 : 1;
+        if (validRevenueA && validRevenueB) {
+          const diff = key === "revenue_asc" ? revenueA - revenueB : revenueB - revenueA;
+          if (Math.abs(diff) > 0.005) return diff;
+        }
+        return String(b.data_iso || "").localeCompare(String(a.data_iso || ""));
+      }
       if (key === "publico_asc") return Number(a.publico) - Number(b.publico) || String(a.data_iso || "").localeCompare(String(b.data_iso || ""));
       if (key === "date_desc") return String(b.data_iso || "").localeCompare(String(a.data_iso || "")) || Number(b.publico) - Number(a.publico);
       if (key === "date_asc") return String(a.data_iso || "").localeCompare(String(b.data_iso || "")) || Number(b.publico) - Number(a.publico);
@@ -756,6 +771,8 @@
     const games = sortAttendanceGames(informedRaw);
     const byPublic = informedRaw.slice().sort((a, b) => Number(b.publico) - Number(a.publico) || String(b.data_iso || "").localeCompare(String(a.data_iso || "")));
     const total = informedRaw.reduce((sum, game) => sum + Number(game.publico), 0);
+    const revenueRows = eligible.filter((game) => Number.isFinite(Number(game?.renda)) && Number(game.renda) > 0);
+    const revenueTotal = revenueRows.reduce((sum, game) => sum + Number(game.renda), 0);
     return {
       club,
       scope,
@@ -766,6 +783,9 @@
       min: byPublic.length ? byPublic[byPublic.length - 1] : null,
       informedCount: informedRaw.length,
       missingCount: Math.max(0, eligible.length - informedRaw.length),
+      revenueTotal,
+      revenueInformedCount: revenueRows.length,
+      revenueMissingCount: Math.max(0, eligible.length - revenueRows.length),
     };
   }
 
@@ -776,6 +796,8 @@
       const informed = eligible.filter((game) => Number.isFinite(Number(game?.publico)) && Number(game.publico) > 0);
       const total = informed.reduce((sum, game) => sum + Number(game.publico), 0);
       const max = informed.reduce((best, game) => !best || Number(game.publico) > Number(best.publico) ? game : best, null);
+      const revenueRows = eligible.filter((game) => Number.isFinite(Number(game?.renda)) && Number(game.renda) > 0);
+      const revenueTotal = revenueRows.reduce((sum, game) => sum + Number(game.renda), 0);
       return {
         club,
         total,
@@ -783,6 +805,9 @@
         max,
         informedCount: informed.length,
         missingCount: Math.max(0, eligible.length - informed.length),
+        revenueTotal,
+        revenueInformedCount: revenueRows.length,
+        revenueMissingCount: Math.max(0, eligible.length - revenueRows.length),
       };
     }).filter((item) => item.informedCount > 0);
 
@@ -792,6 +817,7 @@
       if (sortKey === "average_asc") diff = a.average - b.average;
       else if (sortKey === "total_desc") diff = b.total - a.total;
       else if (sortKey === "max_desc") diff = Number(b.max?.publico || 0) - Number(a.max?.publico || 0);
+      else if (sortKey === "revenue_desc") diff = Number(b.revenueTotal || 0) - Number(a.revenueTotal || 0);
       else if (sortKey === "informed_desc") diff = b.informedCount - a.informedCount;
       else if (sortKey === "name_asc") return a.club.localeCompare(b.club, "pt-BR");
       else diff = b.average - a.average;
@@ -823,19 +849,24 @@
   }
 
   function attendanceGameRow(game, index) {
+    const revenueSort = state.attendanceGameSort === "revenue_desc" || state.attendanceGameSort === "revenue_asc";
+    const primary = revenueSort ? moneyBR(game.renda) : integer(game.publico);
+    const primaryClass = revenueSort ? " is-money" : "";
+    const primaryTitle = revenueSort ? ` title="${escapeAttr(moneyBR(game.renda))}"` : "";
     return `<button type="button" class="stats-attendance-row" data-open-game="${escapeAttr(game.event_id || "")}">
       <span>${integer(index + 1)}</span>
       <div><strong>${escapeHtml(game.mandante)} × ${escapeHtml(game.visitante)}</strong><small>R${escapeHtml(game.rodada || "—")} · ${escapeHtml(dateBR(game.data_iso))}</small></div>
-      <b>${integer(game.publico)}</b>
+      <b class="${primaryClass.trim()}"${primaryTitle}>${escapeHtml(primary)}</b>
     </button>`;
   }
 
   function attendanceClubPrimary(item) {
     const key = state.attendanceClubSort;
-    if (key === "total_desc") return { value: integer(item.total), label: "total" };
-    if (key === "max_desc") return { value: integer(item.max?.publico), label: "maior público" };
-    if (key === "informed_desc") return { value: integer(item.informedCount), label: item.informedCount === 1 ? "jogo" : "jogos" };
-    return { value: integer(Math.round(item.average)), label: "média" };
+    if (key === "total_desc") return { value: integer(item.total), label: "total", money: false };
+    if (key === "max_desc") return { value: integer(item.max?.publico), label: "maior público", money: false };
+    if (key === "revenue_desc") return { value: moneyBR(item.revenueTotal), label: "renda", money: true };
+    if (key === "informed_desc") return { value: integer(item.informedCount), label: item.informedCount === 1 ? "jogo" : "jogos", money: false };
+    return { value: integer(Math.round(item.average)), label: "média", money: false };
   }
 
   function attendanceClubRow(item, index) {
@@ -844,7 +875,7 @@
       <span class="stats-attendance-club-rank">${integer(index + 1)}</span>
       <div class="stats-attendance-club-main">${shield(item.club, "stats-attendance-shield")}<div><strong>${escapeHtml(item.club)}</strong><small>${integer(item.informedCount)} ${item.informedCount === 1 ? "jogo com público" : "jogos com público"}${item.missingCount ? ` · ${integer(item.missingCount)} sem dado` : ""}</small></div></div>
       <div class="stats-attendance-club-secondary"><span>Total ${integer(item.total)}</span><span>Máx. ${integer(item.max?.publico)}</span></div>
-      <div class="stats-attendance-club-primary"><strong>${primary.value}</strong><span>${escapeHtml(primary.label)}</span></div>
+      <div class="stats-attendance-club-primary${primary.money ? " is-money" : ""}"${primary.money ? ` title="${escapeAttr(primary.value)}"` : ""}><strong>${escapeHtml(primary.value)}</strong><span>${escapeHtml(primary.label)}</span></div>
     </button>`;
   }
 
@@ -881,7 +912,7 @@
         <div><span>Menor público</span><strong>${filteredAttendance.min ? integer(filteredAttendance.min.publico) : "—"}</strong></div>
         <div><span>Média</span><strong>${filteredAttendance.informedCount ? integer(Math.round(filteredAttendance.average)) : "—"}</strong></div>
         <div><span>Total</span><strong>${filteredAttendance.informedCount ? integer(filteredAttendance.total) : "—"}</strong></div>
-        <div><span>Jogos com público</span><strong>${integer(filteredAttendance.informedCount)}</strong></div>
+        <div class="is-revenue"><span>Renda</span><strong>${filteredAttendance.revenueInformedCount ? escapeHtml(moneyBR(filteredAttendance.revenueTotal)) : "—"}</strong></div>
       </div>
       ${attendanceShown.length ? `${filteredAttendance.club
         ? `<div class="stats-attendance-list">${attendanceShown.map(attendanceGameRow).join("")}</div>`
@@ -905,11 +936,14 @@
     }
     const metric = performanceMetricConfig(state.rankingMetric);
     const rankingUpdated = dateTimeCompactBR(state.ranking?.atualizado_em);
-    target.innerHTML = `<div class="stats-data-status">Atualizado ${escapeHtml(rankingUpdated)}</div>${performanceFilterControls()}${rankingComparePanel(ranking)}<div class="stats-performance-list">${ranking.map((club, index) => `<article class="stats-performance-card">
+    const finishedGames = totalFinishedGames();
+    const statsGames = Number(state.competition?.resumo?.jogos_com_estatisticas) || 0;
+    const rankingCoverage = finishedGames > 0 ? ` · base estatística: ${coverageLabel(statsGames, finishedGames)} jogos` : "";
+    target.innerHTML = `<div class="stats-data-status">Atualizado ${escapeHtml(rankingUpdated)}${escapeHtml(rankingCoverage)}</div>${performanceFilterControls()}${rankingComparePanel(ranking)}<div class="stats-performance-list">${ranking.map((club, index) => `<article class="stats-performance-card">
       <div class="stats-performance-head">
         <span class="stats-rank">${integer(index + 1)}</span>
         <a class="stats-performance-club-link" href="${escapeAttr(clubHref(club.time))}" title="Abrir página de ${escapeAttr(club.time)}" aria-label="Abrir página de ${escapeAttr(club.time)}">${shield(club, "stats-performance-shield")}</a>
-        <div><a class="stats-performance-name-link" href="${escapeAttr(clubHref(club.time))}"><strong>${escapeHtml(club.time)}</strong></a><span>${integer(club.pontos)} pts · ${integer(club.pos_tabela)}º na tabela · SG ${integer(club.sg)}${metric.key !== "indice_final" ? ` · Índice ${number(performanceValue(club, "indice_final"), 1)}` : ""}</span></div>
+        <div><a class="stats-performance-name-link" href="${escapeAttr(clubHref(club.time))}"><strong>${escapeHtml(club.time)}</strong></a><span>${integer(club.pontos)} pts · ${integer(club.pos_tabela)}º na tabela · ${integer(club.jogos)} jogos · ${integer(club.aproveitamento)}% aproveitamento${metric.key !== "indice_final" ? ` · Índice ${number(performanceValue(club, "indice_final"), 1)}` : ""}</span></div>
         <b>${number(performanceValue(club, metric.key), 1)}<small>${escapeHtml(metric.short)}</small></b>
       </div>
       <div class="stats-performance-bars">

@@ -748,8 +748,8 @@ def gerar_ranking_desempenho(
             f"Índice {comp['indice_final']}: ataque {comp['ataque']}, defesa {comp['defesa']}, "
             f"domínio {comp['dominio']}, eficiência {comp['eficiencia']} e disciplina {comp['disciplina']}. "
             f"Modelo AF-Score usa finalizações, chutes no gol, passes, desarmes, interceptações, "
-            f"cruzamentos, cortes e disciplina quando disponíveis. Tabela: {c.get('aproveitamento', 0)}% de aproveitamento, "
-            f"SG {c.get('sg', 0)} e forma {forma_txt}."
+            f"cruzamentos, cortes e disciplina quando disponíveis. Tabela: {c.get('jogos', 0)} jogos, "
+            f"{c.get('aproveitamento', 0)}% de aproveitamento e forma {forma_txt}."
         )
         ranking.append({
             "time": c["time"],

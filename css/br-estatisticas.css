@@ -922,6 +922,7 @@ body > .container > section.hero > img {
 .stats-attendance-summary span, .stats-attendance-summary strong { display: block; }
 .stats-attendance-summary span { color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; }
 .stats-attendance-summary strong { margin-top: 5px; color: #fff; font-size: 20px; }
+.stats-attendance-summary > div.is-revenue strong { font-size: 17px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .stats-attendance-list { display: grid; gap: 6px; }
 .stats-attendance-row { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 10px; border: 0; border-radius: 11px; background: rgba(5,15,22,.58); color: var(--text); text-align: left; font: inherit; cursor: pointer; }
 .stats-attendance-row > span { color: var(--muted); text-align: center; }
@@ -2213,6 +2214,9 @@ body > .container > section.hero > img {
 .stats-attendance-club-primary span { display: block; }
 .stats-attendance-club-primary strong { color: var(--green); font-size: 18px; line-height: 1; }
 .stats-attendance-club-primary span { margin-top: 4px; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.stats-attendance-club-primary.is-money { min-width: 138px; }
+.stats-attendance-club-primary.is-money strong { font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.stats-attendance-row > b.is-money { font-size: 14px; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .stats-attendance-row:hover,
 .stats-attendance-row:focus-visible,
 .stats-attendance-club-row:hover,
@@ -2244,6 +2248,7 @@ body > .container > section.hero > img {
   .stats-attendance-context { min-height: 0; }
   .stats-attendance-summary > div { padding: 10px; }
   .stats-attendance-summary strong { font-size: 17px; }
+  .stats-attendance-summary > div.is-revenue strong { font-size: 14px; }
   .stats-attendance-ranking-head { align-items: flex-start; }
   .stats-attendance-ranking-head > small { display: none; }
   .stats-attendance-club-row { grid-template-columns: 28px minmax(0,1fr) auto; gap: 7px; padding: 9px 7px; }
@@ -2254,6 +2259,9 @@ body > .container > section.hero > img {
   .stats-attendance-club-main small { font-size: 9px; }
   .stats-attendance-club-primary { min-width: 72px; }
   .stats-attendance-club-primary strong { font-size: 15px; }
+  .stats-attendance-club-primary.is-money { min-width: 118px; }
+  .stats-attendance-club-primary.is-money strong,
+  .stats-attendance-row > b.is-money { font-size: 12px; }
   .stats-attendance-row { grid-template-columns: 28px minmax(0,1fr) auto; gap: 7px; padding: 9px 7px; }
   .stats-attendance-row strong { font-size: 12px; }
   .stats-attendance-row small { font-size: 9px; }

@@ -137,6 +137,8 @@ def game_brief(game: dict[str, Any], details: dict[str, Any] | None = None) -> d
         "placar_visitante": game.get("placar_visitante"),
         "estadio": str(details.get("estadio") or game.get("estadio") or ""),
         "publico": details.get("publico"),
+        "publico_pagante": details.get("publico_pagante"),
+        "renda": details.get("renda"),
         "arbitro": str(details.get("arbitro") or ""),
         "tem_estatisticas": bool(details.get("stats") or details.get("estatisticas")),
         "tem_eventos": bool(details.get("gols") or details.get("cartoes")),
@@ -241,6 +243,8 @@ def attendance_stats(results: list[dict[str, Any]], details: dict[str, Any]) -> 
         rows.append(row)
     rows.sort(key=lambda x: int(x["publico"]), reverse=True)
     total = sum(int(x["publico"]) for x in rows)
+    revenue_rows = [x for x in rows if isinstance(x.get("renda"), (int, float)) and float(x.get("renda") or 0) > 0]
+    total_revenue = round(sum(float(x.get("renda") or 0) for x in revenue_rows), 2)
     return {
         "jogos_com_publico": len(rows),
         "jogos_sem_publico": max(0, len(results) - len(rows)),
@@ -248,8 +252,11 @@ def attendance_stats(results: list[dict[str, Any]], details: dict[str, Any]) -> 
         "media_publico": round(total / len(rows)) if rows else None,
         "maior_publico": rows[0] if rows else None,
         "menor_publico": rows[-1] if rows else None,
+        "jogos_com_renda": len(revenue_rows),
+        "jogos_sem_renda": max(0, len(results) - len(revenue_rows)),
+        "renda_total": total_revenue,
         "ranking": rows,
-        "observacao": "Média calculada apenas sobre jogos com público informado pela ESPN ou por complemento documental validado.",
+        "observacao": "Média calculada apenas sobre jogos com público informado pela ESPN ou por complemento documental validado. Renda somada somente quando o valor foi documentado.",
     }
 
 
@@ -316,6 +323,7 @@ def main() -> None:
             "jogos_finalizados": len(results),
             "jogos_com_estatisticas": sum(1 for x in games_index if x["tem_estatisticas"]),
             "jogos_com_publico": sum(1 for x in games_index if x.get("publico") not in (None, "")),
+            "jogos_com_renda": sum(1 for x in games_index if isinstance(x.get("renda"), (int, float)) and float(x.get("renda") or 0) > 0),
             "clubes": len(table),
         },
         "performance_por_partida": performance_records(results, details),
