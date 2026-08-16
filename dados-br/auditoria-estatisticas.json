@@ -1,11 +1,11 @@
 {
-  "gerado_em": "2026-08-16T10:21:30.999711-03:00",
+  "gerado_em": "2026-08-16T10:31:24.626392-03:00",
   "status": "ok",
   "resumo": {
     "clubes": 20,
     "jogos_finalizados": 218,
     "jogos_com_detalhes": 218,
-    "jogos_com_estatisticas": 217,
+    "jogos_com_estatisticas": 218,
     "jogos_com_publico": 218,
     "jogos_unicos_com_publico": 218,
     "artilheiros": 240,
@@ -44,8 +44,8 @@
   "fontes": {
     "lideres": "Eventos e escalações validados das partidas (ESPN summary); ranking ESPN apenas como fallback",
     "lideres_aceitas": {
-      "artilharia": "",
-      "assistencias": ""
+      "artilharia": "dados-br/jogos-detalhes.json",
+      "assistencias": "dados-br/jogos-detalhes.json"
     },
     "detalhes": "ESPN summary + scoreboard",
     "competicao": "ESPN · tabela, resultados e eventos; público complementado por fonte documental quando ausente"
@@ -83,7 +83,7 @@
         "media_por_jogo": 0.409
       },
       "eventos_locais_autoritativos": true,
-      "aparicoes_locais_autoritativas": false,
+      "aparicoes_locais_autoritativas": true,
       "referencia_atual_usada_para_jogos": {
         "artilharia": false,
         "assistencias": false
@@ -103,11 +103,11 @@
           "jogadores": 240,
           "total_eventos_contabilizados": 544,
           "gols_contra_ignorados": 18,
-          "jogos_com_escalacoes": 217,
-          "aparicoes_confirmadas": 6850,
+          "jogos_com_escalacoes": 218,
+          "aparicoes_confirmadas": 6882,
           "jogadores_com_jogos": 240,
           "jogadores_sem_jogos": 0,
-          "aparicoes_locais_autoritativas": false,
+          "aparicoes_locais_autoritativas": true,
           "jogos_pendentes_detalhes": 0,
           "total_jogos_declarado": 218,
           "eventos_locais_autoritativos": true,
@@ -119,11 +119,11 @@
           "jogadores": 219,
           "total_eventos_contabilizados": 377,
           "gols_contra_ignorados": 0,
-          "jogos_com_escalacoes": 217,
-          "aparicoes_confirmadas": 6850,
+          "jogos_com_escalacoes": 218,
+          "aparicoes_confirmadas": 6882,
           "jogadores_com_jogos": 214,
           "jogadores_sem_jogos": 5,
-          "aparicoes_locais_autoritativas": false,
+          "aparicoes_locais_autoritativas": true,
           "jogos_pendentes_detalhes": 0,
           "total_jogos_declarado": 218,
           "eventos_locais_autoritativos": true,
@@ -133,7 +133,7 @@
     },
     "detalhes": {
       "total_processados": 218,
-      "total_com_estatisticas": 217,
+      "total_com_estatisticas": 218,
       "total_com_publico": 218,
       "total_falhas": 0
     }

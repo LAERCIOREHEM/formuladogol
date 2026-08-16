@@ -1483,7 +1483,7 @@ def carregar_event_ids_detalhes() -> dict[str, str]:
         if not isinstance(item, dict) or item.get("ativo") is False:
             continue
         canonico = str(item.get("event_id") or chave or "").strip()
-        detalhes = str(item.get("event_id_detalhes") or "").strip()
+        detalhes = str(item.get("event_id_detalhes") or item.get("event_id_espn_pagina") or "").strip()
         if canonico.isdigit() and detalhes.isdigit() and canonico != detalhes:
             mapa[canonico] = detalhes
     return mapa
@@ -1534,6 +1534,8 @@ def registro_pode_usar_cache(
     incompleta invalidam o cache imediatamente.
     """
     if not isinstance(antigo, dict):
+        return False
+    if antigo.get("forcar_refresh_detalhes") is True:
         return False
     if str(antigo.get("event_id_fonte_detalhes") or antigo.get("event_id") or "") != str(event_id_fonte):
         return False
@@ -1746,9 +1748,11 @@ def self_test() -> None:
     assert not registro_pode_usar_cache({**cache_game, "placar_mandante": 2}, cache_record, "123", 48, agora=test_now)
     assert not registro_pode_usar_cache(cache_game, cache_record, "999", 48, agora=test_now)
     assert not registro_pode_usar_cache(cache_game, {**cache_record, "stats": []}, "123", 48, agora=test_now)
+    assert not registro_pode_usar_cache(cache_game, {**cache_record, "forcar_refresh_detalhes": True}, "123", 48, agora=test_now)
     mapa_ids = carregar_event_ids_detalhes()
     if RESULTADOS_MANUAIS.exists():
         assert mapa_ids.get("401840998") == "401879459", mapa_ids
+        assert mapa_ids.get("401840999") == "401879458", mapa_ids
     extra_rows = {"x": {"publico": 16772}}
     assert aplicar_dados_adicionais_publico(extra_rows, {"x": {"publico": 16772, "pagantes": 14439, "renda": 473220, "fonte_adicional": "documento"}}) == 1
     assert extra_rows["x"]["publico_pagante"] == 14439 and extra_rows["x"]["renda"] == 473220
