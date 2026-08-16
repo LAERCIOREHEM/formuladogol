@@ -916,6 +916,8 @@ def manual_policy_for_game(manual: Mapping[str, Any], game: Mapping[str, Any]) -
                 "modo": str(raw.get("modo") or "").strip().lower(),
                 "exclusivo": raw.get("exclusivo") is True,
                 "fonte": str(raw.get("fonte") or "transmissoes.json"),
+                "fonte_url": str(raw.get("fonte_url") or "").strip(),
+                "data_iso": str(raw.get("data_iso") or "").strip(),
             }
     return {}
 
@@ -989,7 +991,7 @@ def manual_evidence(manual: Mapping[str, Any], games: Sequence[Mapping[str, Any]
         out.setdefault(event_id, []).append(Evidence(
             source="override editorial — transmissoes.json",
             channels=channels,
-            reference=str(raw.get("fonte") or "transmissoes.json"),
+            reference=str(raw.get("fonte_url") or raw.get("fonte") or "transmissoes.json"),
             captured_at=captured_at,
             authority=1000,
             detail=("grade editorial verificada" + ("; exclusiva" if raw.get("exclusivo") is True else "")),
@@ -1127,7 +1129,7 @@ def consolidate_game(
         "rodada": int(game.get("rodada") or 0),
         "mandante": game_team_name(game, "mandante"),
         "visitante": game_team_name(game, "visitante"),
-        "data_iso": game.get("data_iso") or "",
+        "data_iso": (policy.get("data_iso") if policy.get("modo") == "fixo" else "") or game.get("data_iso") or "",
         "tipo": "tv_ou_streaming_oficial",
         "canais": channels,
         "origem": " + ".join(dict.fromkeys(source_names)),
@@ -1386,22 +1388,23 @@ def collect(
 
     critical_hours = int(cfg.get("janela_critica_horas") or 72)
     warning_days = int(cfg.get("janela_aviso_dias") or 14)
-    missing: list[dict[str, Any]] = []
+    missing_all: list[dict[str, Any]] = []
     for game in games:
         event_id = str(game.get("event_id") or game.get("id") or "")
         kickoff = parse_dt(game.get("data_iso"))
         if event_id in generated or not kickoff or kickoff < now - dt.timedelta(hours=6):
             continue
         hours = (kickoff - now).total_seconds() / 3600
-        if hours <= warning_days * 24:
-            missing.append({
-                "event_id": event_id,
-                "rodada": int(game.get("rodada") or 0),
-                "jogo": f"{game_team_name(game, 'mandante')} x {game_team_name(game, 'visitante')}",
-                "data_iso": game.get("data_iso") or "",
-                "faltam_horas": round(hours, 1),
-                "nivel": "critico" if hours <= critical_hours else "aviso",
-            })
+        missing_all.append({
+            "event_id": event_id,
+            "rodada": int(game.get("rodada") or 0),
+            "jogo": f"{game_team_name(game, 'mandante')} x {game_team_name(game, 'visitante')}",
+            "data_iso": game.get("data_iso") or "",
+            "faltam_horas": round(hours, 1),
+            "nivel": "critico" if hours <= critical_hours else ("aviso" if hours <= warning_days * 24 else "futuro"),
+        })
+    missing_all.sort(key=lambda item: (float(item.get("faltam_horas") or 0), str(item.get("event_id") or "")))
+    missing = [item for item in missing_all if float(item.get("faltam_horas") or 0) <= warning_days * 24]
 
     preserved = [
         {"event_id": event_id, "jogo": f"{item.get('mandante')} x {item.get('visitante')}", "canais": item.get("canais")}
@@ -1412,7 +1415,9 @@ def collect(
         "resumo": {
             "jogos_na_janela": len(games),
             "jogos_com_transmissao": len(generated),
+            "jogos_sem_transmissao_na_janela": len(missing_all),
             "jogos_sem_transmissao_14d": len(missing),
+            "jogos_sem_transmissao_fora_14d": len(missing_all) - len(missing),
             "jogos_criticos_sem_transmissao_72h": sum(1 for item in missing if item["nivel"] == "critico"),
             "registros_preservados": len(preserved),
             "jogos_estaveis_sem_reconsulta_editorial": len(stable_ids),
@@ -1420,6 +1425,7 @@ def collect(
         },
         "fontes": source_status,
         "sem_transmissao": missing,
+        "sem_transmissao_futura": missing_all,
         "preservados": preserved,
         "erros": errors,
         "artigos_ge_descobertos": article_urls,
@@ -1478,6 +1484,20 @@ def selftest() -> None:
     assert preserved_payload["jogos"]["1"]["canais"] == ["Premiere"]
     assert preserved_payload["jogos"]["1"]["confianca"] == "preservado"
     assert preserved_audit["resumo"]["registros_preservados"] == 1
+
+    # Lacuna distante continua auditável, mas não vira alerta/retentativa de 14 dias.
+    future_agenda = {"jogos": [{
+        "event_id": "99", "rodada": 27, "mandante": "Santos", "visitante": "Cruzeiro",
+        "data_iso": "2026-09-20T16:00:00-03:00",
+    }]}
+    _, future_audit = collect(
+        agenda=future_agenda, existing={"jogos": {}}, manual={"transmissoes": []},
+        cfg={**DEFAULT_CONFIG, "janela_futuro_dias": 62, "habilitar_ge_agenda": False, "habilitar_ge_artigos": False, "habilitar_espn_summary": False},
+        now=now, source_payloads={"cbf_rows": [], "cbf_copa_rows": [], "espn_scoreboard": {"events": []}},
+    )
+    assert future_audit["resumo"]["jogos_sem_transmissao_na_janela"] == 1
+    assert future_audit["resumo"]["jogos_sem_transmissao_14d"] == 0
+    assert future_audit["sem_transmissao_futura"][0]["nivel"] == "futuro"
 
     # Parser de links editoriais.
     article_index = '<a href="/futebol/brasileirao-serie-a/noticia/2026/07/24/brasileirao-veja-onde-assistir-aos-jogos-da-20a-rodada.ghtml">Onde assistir aos jogos da rodada</a>'

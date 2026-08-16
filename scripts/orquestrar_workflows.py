@@ -28,7 +28,9 @@ Política resumida
 5. Editorial:
    - somente quando o fechamento está realmente elegível e o dossiê mudou.
 6. TV futura:
-   - uma vez por dia; retentativa extra apenas se houver pendência crítica <72h.
+   - cobertura completa nos próximos 14 dias: manutenção a cada 72h;
+   - havendo jogo sem grade nos próximos 14 dias: no máximo uma vez a cada 24h;
+   - pendência crítica <72h: retentativa extraordinária a cada 6h.
 
 O workflow GitHub correspondente usa a decisão para disparar no máximo UM
 workflow escritor por ciclo, evitando filas inúteis no grupo repo-write-main.
@@ -141,6 +143,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
     },
     "transmissoes": {
         "tv_diaria_apos": "06:30",
+        "tv_intervalo_saudavel_horas": 72,
+        "tv_intervalo_pendencia_horas": 24,
         "tv_retentativa_critica_horas": 6,
         "aovivo_antes_minutos": 90,
         "aovivo_depois_minutos": 180,
@@ -859,23 +863,74 @@ def transmission_live_decision(config: Mapping[str, Any], now: datetime, games: 
     )
 
 
-def tv_decision(config: Mapping[str, Any], now: datetime, tz: ZoneInfo, runs: Sequence[Mapping[str, Any]]) -> Decision | None:
+def tv_decision(
+    config: Mapping[str, Any],
+    now: datetime,
+    tz: ZoneInfo,
+    runs: Sequence[Mapping[str, Any]],
+    audit_summary: Mapping[str, Any] | None = None,
+) -> Decision | None:
+    """Agenda a varredura completa de TV com cadência proporcional à pendência.
+
+    O orquestrador pode continuar sendo chamado a cada 10 minutos, mas o modo
+    ``tv`` não acompanha essa cadência: cobertura saudável usa 72h; pendências
+    em até 14 dias usam 24h; somente lacunas a menos de 72h autorizam retry de
+    6h. Assim ``Transmissões · tv · todos`` deixa de gerar varredura diária
+    quando a grade relevante já está completa.
+    """
     cfg = config["transmissoes"]
     last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains="· tv")
-    daily_after = str(cfg.get("tv_diaria_apos") or "06:30")
-    if time_reached(now, daily_after) and (last is None or last.date() < now.date()):
-        return Decision("transmissoes_tv", "Atualização diária da grade de TV ainda não executada hoje.", mode="tv")
-    audit = load_json(TV_AUDIT_PATH, {})
-    summary = audit.get("resumo") if isinstance(audit, Mapping) else {}
-    try:
-        critical = int((summary or {}).get("jogos_criticos_sem_transmissao_72h") or 0)
-    except (TypeError, ValueError):
-        critical = 0
+    first_after = str(cfg.get("tv_diaria_apos") or "06:30")
+
+    if audit_summary is None:
+        audit = load_json(TV_AUDIT_PATH, {})
+        summary_raw = audit.get("resumo") if isinstance(audit, Mapping) else {}
+        summary = summary_raw if isinstance(summary_raw, Mapping) else {}
+    else:
+        summary = audit_summary
+
+    def _count(key: str) -> int:
+        try:
+            return max(0, int(summary.get(key) or 0))
+        except (TypeError, ValueError):
+            return 0
+
+    critical = _count("jogos_criticos_sem_transmissao_72h")
+    missing_14d = _count("jogos_sem_transmissao_14d")
+    age_minutes = minutes_since(last, now)
     critical_hours = float(cfg.get("tv_retentativa_critica_horas") or 6)
-    if critical > 0 and minutes_since(last, now) >= critical_hours * 60:
+    pending_hours = float(cfg.get("tv_intervalo_pendencia_horas") or 24)
+    healthy_hours = float(cfg.get("tv_intervalo_saudavel_horas") or 72)
+
+    # Primeira execução: conserva a janela matinal para evitar varredura
+    # desnecessária à meia-noite após um deploy/recriação de histórico.
+    if last is None:
+        if time_reached(now, first_after):
+            return Decision("transmissoes_tv", "Primeira atualização da grade de TV ainda não executada.", mode="tv")
+        return None
+
+    # Lacuna realmente próxima merece prioridade e independe do horário-base.
+    if critical > 0 and age_minutes >= critical_hours * 60:
         return Decision(
             "transmissoes_tv",
             f"Há {critical} jogo(s) nas próximas 72h sem grade confirmada; retentativa crítica após {critical_hours:g}h.",
+            mode="tv",
+        )
+
+    if not time_reached(now, first_after):
+        return None
+
+    if missing_14d > 0 and age_minutes >= pending_hours * 60:
+        return Decision(
+            "transmissoes_tv",
+            f"Há {missing_14d} jogo(s) nos próximos 14 dias sem grade; nova pesquisa após {pending_hours:g}h.",
+            mode="tv",
+        )
+
+    if missing_14d == 0 and age_minutes >= healthy_hours * 60:
+        return Decision(
+            "transmissoes_tv",
+            f"Cobertura dos próximos 14 dias completa; manutenção preventiva após {healthy_hours:g}h.",
             mode="tv",
         )
     return None
@@ -1108,6 +1163,39 @@ def self_test() -> int:
     # Política de transmissão: exclusiva bloqueia, Globo mantém elegibilidade.
     # Teste puro via snapshots artificiais seria excessivo aqui; a função real
     # é exercida pelo --dry-run sobre o repositório no pacote de validação.
+    # TV futura: o cron pode consultar a cada 10 min, mas a varredura completa
+    # deve respeitar 72h quando saudável, 24h com pendência e 6h se crítica.
+    tx_cfg = deep_merge(DEFAULT_CONFIG, {"transmissoes": {
+        "tv_diaria_apos": "06:30",
+        "tv_intervalo_saudavel_horas": 72,
+        "tv_intervalo_pendencia_horas": 24,
+        "tv_retentativa_critica_horas": 6,
+    }})
+    tx_now = datetime(2026, 8, 16, 12, 0, tzinfo=tz)
+    healthy_summary = {"jogos_sem_transmissao_14d": 0, "jogos_criticos_sem_transmissao_72h": 0}
+    recent_tv = [{
+        "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
+        "created_at": "2026-08-15T15:00:00Z", "display_title": "Transmissões · tv · todos",
+    }]
+    assert tv_decision(tx_cfg, tx_now, tz, recent_tv, healthy_summary) is None
+    old_tv = [{
+        "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
+        "created_at": "2026-08-13T15:00:00Z", "display_title": "Transmissões · tv · todos",
+    }]
+    assert tv_decision(tx_cfg, tx_now, tz, old_tv, healthy_summary).action == "transmissoes_tv"
+    pending_summary = {"jogos_sem_transmissao_14d": 2, "jogos_criticos_sem_transmissao_72h": 0}
+    day_old_tv = [{
+        "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
+        "created_at": "2026-08-15T14:00:00Z", "display_title": "Transmissões · tv · todos",
+    }]
+    assert tv_decision(tx_cfg, tx_now, tz, day_old_tv, pending_summary).action == "transmissoes_tv"
+    critical_summary = {"jogos_sem_transmissao_14d": 1, "jogos_criticos_sem_transmissao_72h": 1}
+    six_hours_tv = [{
+        "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
+        "created_at": "2026-08-16T08:00:00Z", "display_title": "Transmissões · tv · todos",
+    }]
+    assert tv_decision(tx_cfg, tx_now, tz, six_hours_tv, critical_summary).action == "transmissoes_tv"
+
     assert canonical_hash({"b": 2, "a": 1}) == canonical_hash({"a": 1, "b": 2})
 
     assert public_retry_interval(1.0, config) == 30
