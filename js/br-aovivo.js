@@ -849,20 +849,27 @@
       const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
       const liveStyle = liveNow || preLive;
       const finished = gameState(game).key === "post";
+      const isCaze = sourceIsCaze(principal.fonte) || sourceIsCaze(sourceName);
       const label = finished
         ? "▶ Rever na " + sourceName
-        : (liveNow ? "AO VIVO na " + sourceName : (preLive ? "AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName));
+        : (isCaze
+            ? (liveNow ? "▶ Assistir ao vivo na CazéTV" : (preLive ? "▶ Assistir em breve na CazéTV" : "▶ Assistir na CazéTV"))
+            : (liveNow ? "AO VIVO na " + sourceName : (preLive ? "AO VIVO em breve na " + sourceName : "▶ Assistir na " + sourceName)));
       const note = finished
         ? "Transmissão oficial encerrada no YouTube"
         : (liveNow ? "Transmissão oficial ao vivo no YouTube" : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube"));
-      const externalOnly = principal.embeddable === false || sourceIsCaze(principal.fonte) || sourceIsCaze(sourceName);
+      const externalOnly = principal.embeddable === false || isCaze;
       if (externalOnly) {
-        youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + ' · abre no canal oficial</div></div>';
+        youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + ' · link oficial exato</div></div>';
       } else {
         youtube = '<div class="live-stream-area"><button type="button" class="live-stream-button live-embed-open ' + (liveStyle ? "is-live" : "") + '" data-video-id="' + esc(rawVideoId) + '" data-video-title="' + esc((game.home && game.home.nome || "") + " x " + (game.away && game.away.nome || "")) + '" data-video-source="' + esc(sourceName) + '">' + esc(label) + '</button><div class="live-stream-note">' + esc(note) + ' · abre aqui no site</div></div>';
       }
     }
-    return youtube + renderClosedTransmission(game);
+    const closed = renderClosedTransmission(game);
+    // Copa 2026 UX: CazéTV nunca é embed e o CTA exato aparece logo DEPOIS
+    // do card "Onde assistir". GE TV mantém o player interno antes do card.
+    if (principal && (sourceIsCaze(principal.fonte) || sourceIsCaze(principal.nome))) return closed + youtube;
+    return youtube + closed;
   }
 
   async function loadProbabilityDataset() {

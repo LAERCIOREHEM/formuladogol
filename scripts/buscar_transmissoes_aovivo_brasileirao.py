@@ -1211,6 +1211,20 @@ def selftest() -> None:
         "upcoming", game.kickoff - dt.timedelta(minutes=60), None, None,
     )
     assert not evaluate_candidate(full_game_with_prepost_desc, game, config, aliases).rejected_reason
+
+    # Regressão real de 16/08/2026: a live integral Mirassol x Flamengo da
+    # CazéTV foi encontrada em /streams, mas uma execução antiga a descartou
+    # por a descrição mencionar o pré-jogo. O título abaixo deve SEMPRE vencer.
+    mirassol_game = Game("401841190", 23, dt.datetime(2026, 8, 16, 18, 30, tzinfo=TZ), "Mirassol", "Flamengo", "pre")
+    mirassol_caze = Candidate(
+        "XAzonbmE2aw", "cazetv", "UC1", "CazéTV",
+        "AO VIVO: MIRASSOL X FLAMENGO | BRASILEIRÃO 2026 | 23ª RODADA",
+        "A partir das 17h tem pré-jogo e depois transmissão completa com imagens.",
+        "upcoming", dt.datetime(2026, 8, 16, 16, 30, tzinfo=TZ), None, None,
+    )
+    mirassol_eval = evaluate_candidate(mirassol_caze, mirassol_game, config, aliases)
+    assert not mirassol_eval.rejected_reason and mirassol_eval.confidence >= 0.72, mirassol_eval
+
     pre_only = Candidate(
         "KKKKKKKKKKK", "getv", "UC2", "ge tv",
         "PRÉ-JOGO: BOTAFOGO X SANTOS | AO VIVO", "",

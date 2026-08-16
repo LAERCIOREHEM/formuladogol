@@ -10,7 +10,7 @@ apenas decide, em cada ciclo, qual é a única próxima ação útil.
 
 Política resumida
 -----------------
-1. Atualizar Brasileirão tem prioridade máxima:
+1. Primeira busca do player oficial tem prioridade perecível única; depois, Atualizar Brasileirão volta a ter prioridade máxima:
    - pré-jogo, se a base estiver antiga;
    - imediatamente quando a ESPN detectar FINAL ainda não incorporado;
    - uma manutenção de segurança por dia.
@@ -46,7 +46,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 from zoneinfo import ZoneInfo
@@ -833,7 +833,16 @@ def live_search_allowed(event_id: str) -> tuple[bool, str]:
     return True, "grade ainda não estável"
 
 
-def transmission_live_decision(config: Mapping[str, Any], now: datetime, games: Sequence[Game], final_ids: set[str], tz: ZoneInfo, runs: Sequence[Mapping[str, Any]]) -> Decision | None:
+def transmission_live_decision(
+    config: Mapping[str, Any],
+    now: datetime,
+    games: Sequence[Game],
+    final_ids: set[str],
+    tz: ZoneInfo,
+    runs: Sequence[Mapping[str, Any]],
+    *,
+    only_never_checked: bool = False,
+) -> Decision | None:
     cfg = config["transmissoes"]
     before = int(cfg.get("aovivo_antes_minutos") or 90)
     after = int(cfg.get("aovivo_depois_minutos") or 180)
@@ -851,10 +860,18 @@ def transmission_live_decision(config: Mapping[str, Any], now: datetime, games: 
     if not candidates:
         return None
     candidates.sort(key=lambda item: abs((item[0].kickoff - now).total_seconds()))
-    game, policy = candidates[0]
-    last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains=f"aovivo · {game.event_id}")
-    if minutes_since(last, now) < interval:
+    selected: tuple[Game, str] | None = None
+    for candidate_game, candidate_policy in candidates:
+        last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains=f"aovivo · {candidate_game.event_id}")
+        if only_never_checked and last is not None:
+            continue
+        if not only_never_checked and minutes_since(last, now) < interval:
+            continue
+        selected = (candidate_game, candidate_policy)
+        break
+    if selected is None:
         return None
+    game, policy = selected
     return Decision(
         "transmissao_aovivo",
         f"Player oficial ainda não localizado para {game.label}; {policy}.",
@@ -1035,7 +1052,16 @@ def decide(
 
     final_ids = known_final_ids()
 
-    # 1. Dado esportivo sempre vence.
+    # 0. Primeira tentativa do player é perecível e precisa de UMA chance
+    # garantida. Depois dessa primeira busca, retentativas voltam para a
+    # prioridade normal abaixo do pipeline esportivo, evitando starvation.
+    live_first = transmission_live_decision(
+        config, now, games, final_ids, tz, runs, only_never_checked=True
+    )
+    if live_first:
+        return live_first
+
+    # 1. Dado esportivo sempre vence nas retentativas subsequentes.
     main = main_update_decision(
         config=config,
         now=now,
@@ -1142,6 +1168,27 @@ def self_test() -> int:
             tz=tz,
         )
         assert decision and decision.action == "atualizar_brasileirao"
+
+        # A primeira busca de player exato não pode ser sufocada pelo pipeline
+        # principal. Depois de um run aovivo para o evento, a prioridade volta
+        # ao dado esportivo até vencer o backoff normal de transmissão.
+        live_game = Game("live-1", "brasileirao", "bra.1", now + timedelta(minutes=20), "Mirassol", "Flamengo")
+        original_live_allowed = globals()["live_search_allowed"]
+        original_live_entries = globals()["live_entries"]
+        try:
+            globals()["live_search_allowed"] = lambda event_id: (True, "grade indica CazéTV")
+            globals()["live_entries"] = lambda path: set()
+            first = transmission_live_decision(config, now, [live_game], set(), tz, [], only_never_checked=True)
+            assert first and first.action == "transmissao_aovivo" and first.event_id == "live-1"
+            prior_live_run = [{
+                "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
+                "created_at": now.astimezone(timezone.utc).isoformat(),
+                "display_title": "Transmissões · aovivo · live-1",
+            }]
+            assert transmission_live_decision(config, now, [live_game], set(), tz, prior_live_run, only_never_checked=True) is None
+        finally:
+            globals()["live_search_allowed"] = original_live_allowed
+            globals()["live_entries"] = original_live_entries
 
         # Gol novo durante a partida NÃO deve disparar workflow pesado; o browser
         # já atualiza classificação/estatísticas pelo scoreboard ESPN a cada 30 s.
