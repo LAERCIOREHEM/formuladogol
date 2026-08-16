@@ -1118,6 +1118,15 @@ def self_test() -> None:
     fixture_nao_divulgado = """<h2>Time A 0 x 0 Time B</h2><p>Público pagante: não divulgado</p><p>Público presente: 10.000</p><p>Renda líquida: R$ 500.000</p>"""
     parsed_nd = parse_artigo_ge(fixture_nao_divulgado)[0]
     assert parsed_nd["pagantes"] is None and parsed_nd["renda"] == 500000
+    # Regressão: público presente/total não pode ser promovido a pagante quando a fonte diz
+    # explicitamente que o número de pagantes não foi divulgado.
+    detalhes_nd = {"jogos": {"x": {"publico": 4129}}}
+    complemento_nd = {"jogos": {"x": {"publico": 4129, "tipo": "presente", "pagantes_status": "nao_divulgado", "renda": 103620}}}
+    propagado_nd, _, conflitos_nd = propagar_publicos_para_detalhes(detalhes_nd, complemento_nd)
+    assert not conflitos_nd
+    assert propagado_nd["jogos"]["x"]["publico"] == 4129
+    assert propagado_nd["jogos"]["x"]["renda"] == 103620
+    assert "publico_pagante" not in propagado_nd["jogos"]["x"]
     assert numero_renda("R$ 473.220,00") == 473220 and numero_renda("R$ 785.419,30") == 785419.30
     print("SELF-TEST OK: parser GE, sitemap dinâmico, normal+AMP, público presente/total, renda/pagantes documentados, bloqueio de pagantes, aliases, duplicados e conflitos.")
 
