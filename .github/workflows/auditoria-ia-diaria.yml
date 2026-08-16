@@ -1,9 +1,10 @@
 name: Auditoria IA diária
 
 on:
-  # Única janela programada da camada de IA: 08:45 em Brasília.
+  # Única janela programada da camada de IA: 05:30 em Brasília.
+  # A janela ocorre após a carência mínima de 6 h mesmo para jogos que terminem perto de 23 h.
   schedule:
-    - cron: '45 11 * * *'
+    - cron: '30 8 * * *'
   workflow_dispatch:
 
 permissions:
