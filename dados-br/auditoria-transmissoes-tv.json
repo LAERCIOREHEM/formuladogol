@@ -1,12 +1,12 @@
 {
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
-    "jogos_na_janela": 68,
-    "jogos_com_transmissao": 44,
+    "jogos_na_janela": 65,
+    "jogos_com_transmissao": 41,
     "jogos_sem_transmissao_14d": 0,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 14,
-    "jogos_estaveis_sem_reconsulta_editorial": 30,
+    "registros_preservados": 12,
+    "jogos_estaveis_sem_reconsulta_editorial": 27,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -19,18 +19,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 7857
+      "duracao_ms": 8636
     },
     "ge_agenda": {
       "ok": true,
       "jogos_com_canal": 0,
-      "duracao_ms": 8086
+      "duracao_ms": 6018
     },
     "ge_artigos": {
       "ok": true,
-      "artigos_consultados": 5,
-      "jogos_com_canal": 0,
-      "duracao_ms": 79399
+      "artigos_consultados": 9,
+      "jogos_com_canal": 2,
+      "duracao_ms": 125617
     },
     "espn": {
       "ok": true,
@@ -38,7 +38,7 @@
       "eventos_na_janela": 38,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 10763
+      "duracao_ms": 10887
     },
     "youtube_oficial": {
       "ok": true,
@@ -62,16 +62,6 @@
       "jogo": "Palmeiras x Santos",
       "canais": [
         "SporTV"
-      ]
-    },
-    {
-      "event_id": "401909113",
-      "jogo": "Vasco da Gama x Vitória",
-      "canais": [
-        "GE TV",
-        "Premiere",
-        "Globo",
-        "Prime Video"
       ]
     },
     {
@@ -155,16 +145,6 @@
       ]
     },
     {
-      "event_id": "401909111",
-      "jogo": "Vitória x Vasco da Gama",
-      "canais": [
-        "GE TV",
-        "Premiere",
-        "Globo",
-        "Prime Video"
-      ]
-    },
-    {
       "event_id": "401909114",
       "jogo": "Grêmio x Internacional",
       "canais": [
@@ -180,11 +160,15 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [
+    "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/16/corinthians-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/16/vitoria-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/16/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/sp/tem-esporte/futebol/brasileirao-serie-a/noticia/2026/08/16/mirassol-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/gato-mestre/noticia/2026/08/15/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-23a-rodada-do-brasileirao.ghtml",
     "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/15/athletico-x-bragantino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/08/15/sao-paulo-x-coritiba-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/08/15/fluminense-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/15/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-23a-rodada.ghtml"
   ],
-  "atualizado_em": "2026-08-15T17:21:03-03:00"
+  "atualizado_em": "2026-08-16T10:11:09-03:00"
 }
