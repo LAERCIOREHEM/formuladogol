@@ -3273,6 +3273,13 @@ function detalhesDoJogo(j) {
   return null;
 }
 
+const BR_ESTATISTICAS_PASSES = new Map([
+  ['passes', 0],
+  ['passes certos', 1],
+  ['precisao de passe', 2],
+  ['precisao de passes', 2],
+]);
+
 const BR_ESTATISTICAS_RODAPE = new Map([
   ['escanteios', 0],
   ['amarelos', 1],
@@ -3281,18 +3288,40 @@ const BR_ESTATISTICAS_RODAPE = new Map([
 ]);
 
 function ordenarEstatisticasParaExibicao(stats) {
-  return (Array.isArray(stats) ? stats : [])
-    .map((stat, indice) => ({ stat, indice }))
-    .sort((a, b) => {
-      const nomeA = normalizarNome(a.stat && (a.stat.nome || a.stat.label || ''));
-      const nomeB = normalizarNome(b.stat && (b.stat.nome || b.stat.label || ''));
-      const fimA = BR_ESTATISTICAS_RODAPE.has(nomeA);
-      const fimB = BR_ESTATISTICAS_RODAPE.has(nomeB);
-      if (fimA !== fimB) return fimA ? 1 : -1;
-      if (fimA && fimB) return BR_ESTATISTICAS_RODAPE.get(nomeA) - BR_ESTATISTICAS_RODAPE.get(nomeB);
-      return a.indice - b.indice;
-    })
-    .map(item => item.stat);
+  const itens = (Array.isArray(stats) ? stats : []).map((stat, indice) => ({
+    stat,
+    indice,
+    nome: normalizarNome(stat && (stat.nome || stat.label || ''))
+  }));
+
+  // Escanteios/cartões/impedimentos permanecem no rodapé, na ordem fixa já adotada.
+  const corpo = itens.filter(item => !BR_ESTATISTICAS_RODAPE.has(item.nome));
+  const rodape = itens
+    .filter(item => BR_ESTATISTICAS_RODAPE.has(item.nome))
+    .sort((a, b) => BR_ESTATISTICAS_RODAPE.get(a.nome) - BR_ESTATISTICAS_RODAPE.get(b.nome));
+
+  // O bloco de passes deve ser sempre contíguo e nesta ordem:
+  // Passes → Passes certos → Precisão de passe(s).
+  const primeiraMetricaDePasse = corpo.findIndex(item => BR_ESTATISTICAS_PASSES.has(item.nome));
+  let corpoOrdenado = corpo;
+  if (primeiraMetricaDePasse >= 0) {
+    const antesDoBloco = corpo.slice(0, primeiraMetricaDePasse)
+      .filter(item => !BR_ESTATISTICAS_PASSES.has(item.nome)).length;
+    const passes = corpo
+      .filter(item => BR_ESTATISTICAS_PASSES.has(item.nome))
+      .sort((a, b) => {
+        const prioridade = BR_ESTATISTICAS_PASSES.get(a.nome) - BR_ESTATISTICAS_PASSES.get(b.nome);
+        return prioridade || (a.indice - b.indice);
+      });
+    const demais = corpo.filter(item => !BR_ESTATISTICAS_PASSES.has(item.nome));
+    corpoOrdenado = [
+      ...demais.slice(0, antesDoBloco),
+      ...passes,
+      ...demais.slice(antesDoBloco),
+    ];
+  }
+
+  return [...corpoOrdenado, ...rodape].map(item => item.stat);
 }
 
 function estatisticasDoJogo(j) {
@@ -3425,12 +3454,9 @@ function htmlResumoResultadoDetalhes(j) {
   const renda = Number(det.renda);
   const partes = [];
   if (estadio) partes.push(`<span>📍 ${brEscapeHtml(estadio)}</span>`);
-  const temDadosPublico = [publico, pagantes, renda].some((v) => Number.isFinite(v) && v > 0);
-  if (temDadosPublico) {
-    partes.push(`<span>👥 ${Number.isFinite(publico) && publico > 0 ? `${publico.toLocaleString('pt-BR')} presentes` : 'público presente não divulgado'}</span>`);
-    partes.push(`<span>🎟️ ${Number.isFinite(pagantes) && pagantes > 0 ? `${pagantes.toLocaleString('pt-BR')} pagantes` : 'pagantes não divulgados'}</span>`);
-    partes.push(`<span>💰 ${Number.isFinite(renda) && renda > 0 ? brEscapeHtml(formatarDinheiroBR(renda)) : 'renda não divulgada'}</span>`);
-  }
+  if (Number.isFinite(publico) && publico > 0) partes.push(`<span>👥 ${publico.toLocaleString('pt-BR')} presentes</span>`);
+  if (Number.isFinite(pagantes) && pagantes > 0) partes.push(`<span>🎟️ ${pagantes.toLocaleString('pt-BR')} pagantes</span>`);
+  if (Number.isFinite(renda) && renda > 0) partes.push(`<span>💰 ${brEscapeHtml(formatarDinheiroBR(renda))}</span>`);
   if (!partes.length) return '';
   return `<div class="resultado-info-compacta">${partes.join('')}</div>`;
 }
@@ -3472,9 +3498,9 @@ function htmlEstatisticasJogo(j) {
   }).join('');
   const info = `<div class="match-info-grid">
     <div><span>Estádio</span><strong>${brEscapeHtml(det.estadio || j.estadio || 'Não informado')}</strong></div>
-    <div><span>Público presente</span><strong>${Number.isFinite(publico) && publico > 0 ? publico.toLocaleString('pt-BR') : 'Não divulgado'}</strong></div>
-    <div><span>Público pagante</span><strong>${Number.isFinite(pagantes) && pagantes > 0 ? pagantes.toLocaleString('pt-BR') : 'Não divulgado'}</strong></div>
-    <div><span>Renda</span><strong>${Number.isFinite(renda) && renda > 0 ? brEscapeHtml(formatarDinheiroBR(renda)) : 'Não divulgada'}</strong></div>
+    <div><span>Público presente</span><strong>${Number.isFinite(publico) && publico > 0 ? publico.toLocaleString('pt-BR') : 'Não informado'}</strong></div>
+    ${Number.isFinite(pagantes) && pagantes > 0 ? `<div><span>Público pagante</span><strong>${pagantes.toLocaleString('pt-BR')}</strong></div>` : ''}
+    ${Number.isFinite(renda) && renda > 0 ? `<div><span>Renda</span><strong>${brEscapeHtml(formatarDinheiroBR(renda))}</strong></div>` : ''}
     <div><span>Árbitro</span><strong>${brEscapeHtml(det.arbitro || 'Não informado')}</strong></div>
   </div>`;
   const events = (gols.length || cartoes.length) ? `<div class="match-event-grid">
