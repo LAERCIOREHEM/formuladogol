@@ -464,10 +464,59 @@
     return `<li><span>${icon} ${escapeHtml(card?.minuto || "")}</span><strong>${escapeHtml(card?.jogador || "Cartão")}</strong><small>${escapeHtml(card?.time || "")}</small></li>`;
   }
 
+  const GAME_STATS_PASS_ORDER = new Map([
+    ["passes", 0],
+    ["passes certos", 1],
+    ["precisao de passe", 2],
+    ["precisao de passes", 2],
+  ]);
+
+  const GAME_STATS_FOOTER_ORDER = new Map([
+    ["escanteios", 0],
+    ["amarelos", 1],
+    ["vermelhos", 2],
+    ["impedimentos", 3],
+  ]);
+
+  function orderedGameStats(rawStats) {
+    const items = (Array.isArray(rawStats) ? rawStats : []).map((stat, index) => ({
+      stat,
+      index,
+      name: normalize(stat?.nome || stat?.label || ""),
+    }));
+
+    const body = items.filter((item) => !GAME_STATS_FOOTER_ORDER.has(item.name));
+    const footer = items
+      .filter((item) => GAME_STATS_FOOTER_ORDER.has(item.name))
+      .sort((a, b) => GAME_STATS_FOOTER_ORDER.get(a.name) - GAME_STATS_FOOTER_ORDER.get(b.name));
+
+    const firstPassIndex = body.findIndex((item) => GAME_STATS_PASS_ORDER.has(item.name));
+    let orderedBody = body;
+    if (firstPassIndex >= 0) {
+      const insertionIndex = body.slice(0, firstPassIndex)
+        .filter((item) => !GAME_STATS_PASS_ORDER.has(item.name)).length;
+      const passStats = body
+        .filter((item) => GAME_STATS_PASS_ORDER.has(item.name))
+        .sort((a, b) => {
+          const priority = GAME_STATS_PASS_ORDER.get(a.name) - GAME_STATS_PASS_ORDER.get(b.name);
+          return priority || (a.index - b.index);
+        });
+      const otherStats = body.filter((item) => !GAME_STATS_PASS_ORDER.has(item.name));
+      orderedBody = [
+        ...otherStats.slice(0, insertionIndex),
+        ...passStats,
+        ...otherStats.slice(insertionIndex),
+      ];
+    }
+
+    return [...orderedBody, ...footer].map((item) => item.stat);
+  }
+
   function statisticRows(detail) {
     const stats = Array.isArray(detail?.stats) ? detail.stats : (Array.isArray(detail?.estatisticas) ? detail.estatisticas : []);
     if (!stats.length) return emptyState("Estatísticas avançadas não disponibilizadas para esta partida.");
-    return `<div class="stats-match-stat-list">${stats.map((stat) => `<div class="stats-match-stat-row">
+    const orderedStats = orderedGameStats(stats);
+    return `<div class="stats-match-stat-list">${orderedStats.map((stat) => `<div class="stats-match-stat-row">
       <strong>${escapeHtml(stat.home ?? stat.mandante ?? "—")}</strong>
       <span>${escapeHtml(stat.nome || stat.label || "Estatística")}</span>
       <strong>${escapeHtml(stat.away ?? stat.visitante ?? "—")}</strong>
