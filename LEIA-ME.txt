@@ -1,4 +1,4 @@
-FORMULA DO GOL - Pagina Acuracia (UX) - v2
+FORMULA DO GOL - Pagina Acuracia (UX) - v3
 ==========================================
 
 ONDE COLOCAR CADA ARQUIVO:
@@ -10,37 +10,30 @@ ONDE COLOCAR CADA ARQUIVO:
 Os tres caminhos ja estao no "paths" do deploy.yml: o Deploy site
 (GitHub Pages) dispara sozinho apos o push. Use Ctrl+F5 ao conferir.
 
-CORRECAO IMPORTANTE NESTA VERSAO
---------------------------------
-A versao anterior rotulava a amostra dos bins como "jogos". Estava
-ERRADO. Cada jogo gera 3 previsoes (vitoria, empate e derrota), e a
-soma dos bins e 30 para 10 jogos apurados. O rotulo agora diz
-"previsoes".
+CORRECAO DESTA VERSAO (v3)
+--------------------------
+A tabela do celular repetia "R22" varias vezes com o mesmo valor.
+Causa: o historico grava varios snapshots dentro da mesma rodada, e a
+tabela listava os ultimos 8 REGISTROS, nao as ultimas 8 RODADAS.
+Agora agrupa por rodada e mostra o ultimo snapshot de cada uma
+(funcao byRound no JS). O grafico do desktop nao era afetado.
 
-O selo tambem foi corrigido: os 1.699 nao sao partidas, sao registros
-de previsao pre-jogo (a mesma partida e registrada de novo a cada
-atualizacao ate ser disputada).
-
-NOVO PAINEL DE ESCOPO
----------------------
-Comunica inicio, progresso e fim da apuracao:
-  Inicio  : rodada 22 (04/08)
-  Agora   : 10 jogos / 30 previsoes
-  Fim     : rodada 38, encerramento do Brasileirao
-  Barra   : 10 de 170 jogos previstos (5,9%)
-
-Os totais sao calculados no JS a partir das constantes RODADAS_TOTAL
-(38) e JOGOS_POR_RODADA (10), e da primeira rodada presente em
-jogos.por_rodada. Se o formato do campeonato mudar, ajuste as duas
-constantes no topo do arquivo.
+CORRECOES DA v2 (mantidas)
+--------------------------
+- Amostra dos bins e "previsoes", nao "jogos": cada partida gera 3
+  previsoes (vitoria, empate, derrota). 10 jogos = 30 previsoes.
+- Os 1.699 sao registros de previsao pre-jogo, nao partidas.
+- Painel de escopo com inicio (rodada 22), progresso e fim (rodada 38),
+  com barra: 10 de 170 jogos previstos.
+  Constantes RODADAS_TOTAL (38) e JOGOS_POR_RODADA (10) no topo do JS.
 
 DEMAIS MUDANCAS
 ---------------
 1. Os 4 cards do topo sairam; os numeros foram para a linha de chips.
 2. Calibracao em barras comparadas "modelo disse" x "aconteceu".
-3. Faixas com menos de 5 previsoes ficam esmaecidas (constante MIN_BIN).
+3. Faixas com menos de 5 previsoes esmaecidas (constante MIN_BIN).
 4. Grafico do clube com escala dinamica e rotulo na ponta da linha.
-5. Tooltip nao sai mais do quadro e funciona por toque.
+5. Tooltip nao sai do quadro e funciona por toque.
 6. Abaixo de 560px os graficos viram tabela.
 7. Painel de integridade SHA-256 no fim da pagina.
 

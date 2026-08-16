@@ -359,16 +359,34 @@
     }
   }
 
+  /* O histórico grava vários snapshots dentro da mesma rodada. Listar os
+     últimos registros crus repetia "R22" oito vezes com o mesmo valor.
+     Aqui fica um registro por rodada: o último snapshot de cada uma. */
+  function byRound(rows) {
+    var order = [], map = {};
+    rows.forEach(function (row) {
+      var key = row.rodada_referencia != null
+        ? "R" + row.rodada_referencia
+        : "J" + (row.jogos_atuais == null ? "?" : row.jogos_atuais);
+      if (!map[key]) order.push(key);
+      map[key] = row; // sobrescreve: fica o mais recente da rodada
+    });
+    return order.map(function (key) { return { key: key, row: map[key] }; });
+  }
+
   function mobileTable(rows, columns) {
-    var slice = rows.slice(-8);
+    var grouped = byRound(rows);
+    var slice = grouped.slice(-8);
+    var body = slice.map(function (item) {
+      return "<tr><td>" + esc(item.key) + "</td>" +
+        columns.map(function (c) { return "<td>" + esc(c[1](item.row)) + "</td>"; }).join("") + "</tr>";
+    }).join("");
+    var note = grouped.length > slice.length
+      ? '<p class="af-mnote">Últimas ' + slice.length + " rodadas de " + grouped.length + " registradas. Um registro por rodada.</p>"
+      : '<p class="af-mnote">Um registro por rodada.</p>';
     return '<div class="af-mtable"><table><thead><tr><th>Rodada</th>' +
       columns.map(function (c) { return "<th>" + esc(c[0]) + "</th>"; }).join("") +
-      "</tr></thead><tbody>" +
-      slice.map(function (row) {
-        return "<tr><td>" + (row.rodada_referencia != null ? "R" + row.rodada_referencia : number(row.jogos_atuais, 0) + "J") + "</td>" +
-          columns.map(function (c) { return "<td>" + esc(c[1](row)) + "</td>"; }).join("") + "</tr>";
-      }).join("") +
-      "</tbody></table></div>";
+      "</tr></thead><tbody>" + body + "</tbody></table>" + note + "</div>";
   }
 
   function renderPosition(rows, target) {
