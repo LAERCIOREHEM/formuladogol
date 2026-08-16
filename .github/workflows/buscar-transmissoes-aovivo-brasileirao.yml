@@ -97,7 +97,16 @@ jobs:
             echo "Executando player ao vivo: ${CMD[*]}"
             "${CMD[@]}"
           else
-            echo "Modo tv: busca de player ao vivo não será executada."
+            # A varredura de grade já é pouco frequente (72h quando saudável).
+            # Aproveitamos essa execução para colher, SEM search.list caro,
+            # players GE TV/CazéTV que já estejam agendados em /streams/uploads.
+            # Isso evita depender dos últimos 90 minutos antes do jogo.
+            CMD=(python scripts/buscar_transmissoes_aovivo_brasileirao.py --no-search)
+            if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+              CMD+=(--dry-run)
+            fi
+            echo "Modo tv: colheita barata de players futuros: ${CMD[*]}"
+            "${CMD[@]}"
           fi
 
           if [[ "$MODO" != "aovivo" ]]; then
