@@ -791,6 +791,12 @@
     const canais = Array.isArray(entry.canais) ? entry.canais.filter(Boolean) : [];
     if (!canais.length) return "";
 
+    const exact = transmissionForGame(game);
+    const exactPrincipal = exact && exact.principal;
+    const exactProvider = exactPrincipal
+      ? (sourceIsCaze(exactPrincipal.fonte) || sourceIsCaze(exactPrincipal.nome) ? "cazetv" : (String(exactPrincipal.fonte || "").toLowerCase() === "getv" ? "getv" : ""))
+      : "";
+
     const links = [];
     const seen = new Set();
     const addLink = (label, value) => {
@@ -800,16 +806,25 @@
       seen.add(key);
       links.push({ label: String(label || "Acessar"), url });
     };
+    const isGenericDuplicateOfExact = (label) => {
+      if (!exactProvider) return false;
+      const provider = providerForChannel(label);
+      return !!(provider && provider.key === exactProvider);
+    };
 
-    for (const item of (Array.isArray(entry.links) ? entry.links : [])) addLink(item.label, item.url);
+    for (const item of (Array.isArray(entry.links) ? entry.links : [])) {
+      if (!isGenericDuplicateOfExact(item.label || item.nome)) addLink(item.label, item.url);
+    }
     // O backend publica acessos oficiais em `acessos` (ex.: Paramount+).
-    // Esse campo é distinto de `canais`: direitos de transmissão e plataforma
-    // de acesso não devem ser confundidos, mas ambos precisam ser clicáveis.
+    // Quando já existe o vídeo EXATO da GE TV/CazéTV, omitimos o link genérico
+    // do canal para não competir com o player/link específico mostrado acima.
     for (const item of (Array.isArray(entry.acessos) ? entry.acessos : [])) {
-      addLink(item.nome || item.label || "Acessar", item.url);
+      const label = item.nome || item.label || "Acessar";
+      if (!isGenericDuplicateOfExact(label)) addLink(label, item.url);
     }
     for (const canal of canais) {
       const provider = providerForChannel(canal);
+      if (provider && provider.key === exactProvider) continue;
       for (const item of ((provider && provider.links) || [])) addLink(item.label, item.url);
     }
 

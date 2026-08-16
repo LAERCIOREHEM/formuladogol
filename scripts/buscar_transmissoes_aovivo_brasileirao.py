@@ -359,9 +359,13 @@ def evaluate_candidate(candidate: Candidate, game: Game, config: Mapping[str, An
     if whole_term(combined_n, "sem imagens") and (whole_term(combined_n, "ao vivo") or whole_term(combined_n, "tempo real")):
         evaluated.rejected_reason = "conteúdo rejeitado: acompanhamento sem imagens do jogo"
         return evaluated
+    # Termos editoriais amplos (pré-jogo, pós-jogo, melhores momentos etc.)
+    # só desqualificam quando aparecem no TÍTULO. Descrições de transmissões
+    # integrais frequentemente anunciam o pré/pós-jogo do próprio canal e não
+    # podem derrubar um vídeo cujo título identifica claramente a partida.
     banned = [norm(x) for x in config.get("palavras_rejeitadas") or []]
     for term in banned:
-        if term and whole_term(combined_n, term):
+        if term and whole_term(title_n, term):
             evaluated.rejected_reason = f"conteúdo rejeitado: {term}"
             return evaluated
     # Um player integral deve corresponder a uma única partida. Títulos que
@@ -922,13 +926,25 @@ def build_outputs(
 
     before_minutes = int(config.get("janela_antes_horas", 24) * 60)
     after_minutes = int(config.get("janela_depois_inicio_minutos", 90))
-    targets = [
+    window_targets = [
         game for game in games
         if game.estado != "post"
         and -after_minutes <= (game.kickoff - current_time).total_seconds() / 60 <= before_minutes
     ]
+    # O event_id limita apenas o FALLBACK caro (search.list). A varredura barata
+    # de /streams + uploads já enxerga várias lives futuras na mesma execução;
+    # por isso aproveitamos essas descobertas e as vinculamos a TODOS os jogos
+    # elegíveis da janela. Assim um player agendado dias antes não é descartado
+    # só porque o orquestrador foi chamado para outra partida.
     if args.event_id:
-        targets = [game for game in games if game.event_id == args.event_id]
+        focus_targets = [game for game in games if game.event_id == args.event_id]
+    else:
+        focus_targets = list(window_targets)
+
+    by_id = {game.event_id: game for game in window_targets}
+    for game in focus_targets:
+        by_id[game.event_id] = game
+    publish_targets = list(by_id.values())
 
     output_base = {
         "fonte": "YouTube oficial — CazéTV e GE TV | clubes do Brasileirão",
@@ -937,11 +953,12 @@ def build_outputs(
             "regra": "Somente canais oficiais configurados; GE TV tem prioridade sobre CazéTV; link único.",
             "janela": f"de {config.get('janela_antes_horas', 24)}h antes até {after_minutes} min após o início",
             "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta",
+            "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco.",
         },
         "jogos": {},
     }
 
-    if not targets:
+    if not publish_targets:
         keep_past = int(config.get("manter_apos_inicio_horas", 3) * 60)
         game_by_id = {g.event_id: g for g in games}
         for event_id, entry in (existing.get("jogos") or {}).items():
@@ -1014,12 +1031,12 @@ def build_outputs(
             unique[cand.video_id] = cand
     candidates = list(unique.values())
 
-    matched, accepted, rejected = match_candidates_to_games(targets, candidates, channels, config, aliases)
+    matched, accepted, rejected = match_candidates_to_games(publish_targets, candidates, channels, config, aliases)
     manual_target_ids = {
-        game.event_id for game in targets if manual_links_for_game(manual, game, channels)
+        game.event_id for game in focus_targets if manual_links_for_game(manual, game, channels)
     }
     matched_for_search: Dict[str, Dict[str, Candidate]] = {
-        game.event_id: dict(matched.get(game.event_id, {})) for game in targets
+        game.event_id: dict(matched.get(game.event_id, {})) for game in focus_targets
     }
     for event_id in manual_target_ids:
         matched_for_search.setdefault(event_id, {})["manual"] = Candidate(
@@ -1031,11 +1048,11 @@ def build_outputs(
     # em TODOS os jogos; search.list, que custa 100 unidades, só é usado onde
     # a grade ainda torna GE TV/CazéTV plausíveis. Isso evita desperdiçar quota
     # em Prime/Paramount+ exclusivos ou grades estáveis sem direito digital.
-    search_policy = {game.event_id: aggressive_search_policy(game, tv_snapshot) for game in targets}
-    search_targets = [game for game in targets if search_policy[game.event_id][0]]
+    search_policy = {game.event_id: aggressive_search_policy(game, tv_snapshot) for game in focus_targets}
+    search_targets = [game for game in focus_targets if search_policy[game.event_id][0]]
     search_skipped = [
         {"event_id": game.event_id, "jogo": f"{game.mandante} x {game.visitante}", "motivo": search_policy[game.event_id][1]}
-        for game in targets if not search_policy[game.event_id][0]
+        for game in focus_targets if not search_policy[game.event_id][0]
     ]
     search_calls = 0
     max_search_calls = int(config.get("search_limite_chamadas_por_execucao") or 4)
@@ -1064,14 +1081,15 @@ def build_outputs(
                 if old_cand is None or cand.source.startswith("search-"):
                     unique[cand.video_id] = cand
             candidates = list(unique.values())
-            matched, accepted, rejected = match_candidates_to_games(targets, candidates, channels, config, aliases)
+            matched, accepted, rejected = match_candidates_to_games(publish_targets, candidates, channels, config, aliases)
 
     priority = list(config.get("prioridade") or ["getv", "cazetv"])
 
     published: Dict[str, Any] = {}
     no_stream: List[Dict[str, Any]] = []
     game_reports: List[Dict[str, Any]] = []
-    for game in targets:
+    focus_ids = {game.event_id for game in focus_targets}
+    for game in publish_targets:
         manual_links = manual_links_for_game(manual, game, channels)
         automatic_links: Dict[str, Dict[str, Any]] = {}
         for source_key, cand in matched.get(game.event_id, {}).items():
@@ -1105,7 +1123,7 @@ def build_outputs(
         }
         if principal:
             published[game.event_id] = entry
-        else:
+        elif game.event_id in focus_ids:
             no_stream.append({
                 "event_id": game.event_id,
                 "rodada": game.rodada,
@@ -1115,24 +1133,28 @@ def build_outputs(
                 "data_iso": iso_brt(game.kickoff),
                 "motivo": "nenhuma transmissão oficial validada em CazéTV ou GE TV",
             })
-        game_reports.append({
-            "event_id": game.event_id,
-            "rodada": game.rodada,
-            "competicao_chave": game.competicao_chave,
-            "competicao_nome": game.competicao_nome,
-            "jogo": f"{game.mandante} x {game.visitante}",
-            "data_iso": iso_brt(game.kickoff),
-            "principal": principal.get("nome") if principal else "",
-            "fontes_encontradas": [principal.get("nome")] if principal else [],
-            "manual": bool(manual_links),
-        })
+        if principal or game.event_id in focus_ids:
+            game_reports.append({
+                "event_id": game.event_id,
+                "rodada": game.rodada,
+                "competicao_chave": game.competicao_chave,
+                "competicao_nome": game.competicao_nome,
+                "jogo": f"{game.mandante} x {game.visitante}",
+                "data_iso": iso_brt(game.kickoff),
+                "principal": principal.get("nome") if principal else "",
+                "fontes_encontradas": [principal.get("nome")] if principal else [],
+                "manual": bool(manual_links),
+                "descoberta_antecipada": bool(principal and game.event_id not in focus_ids),
+            })
 
     output_base["jogos"] = dict(sorted(published.items(), key=lambda kv: kv[1].get("data_iso", "")))
     audit = {
         "fonte": output_base["fonte"],
         "politica": output_base["politica"],
         "resumo": {
-            "jogos_na_janela": len(targets),
+            "jogos_na_janela": len(publish_targets),
+            "jogos_foco": len(focus_targets),
+            "descobertas_antecipadas": sum(1 for game in publish_targets if game.event_id not in focus_ids and game.event_id in published),
             "busca_streams_executada": True,
             "candidatos_oficiais_encontrados": len(candidates),
             "search_api_fallback_chamadas": search_calls,
@@ -1179,6 +1201,22 @@ def selftest() -> None:
 
     wrong = Candidate("BBBBBBBBBBB", "getv", "UC2", "ge tv", "BOTAFOGO X SANTOS | MELHORES MOMENTOS", "", "upcoming", game.kickoff, None, None)
     assert evaluate_candidate(wrong, game, config, aliases).rejected_reason
+
+    # Regressão: transmissão integral não pode ser descartada porque a descrição
+    # menciona o pré/pós-jogo do próprio canal. O título é a evidência editorial.
+    full_game_with_prepost_desc = Candidate(
+        "JJJJJJJJJJJ", "getv", "UC2", "ge tv",
+        "BOTAFOGO X SANTOS | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
+        "Começamos com o pré-jogo e seguimos com o pós-jogo depois do apito final.",
+        "upcoming", game.kickoff - dt.timedelta(minutes=60), None, None,
+    )
+    assert not evaluate_candidate(full_game_with_prepost_desc, game, config, aliases).rejected_reason
+    pre_only = Candidate(
+        "KKKKKKKKKKK", "getv", "UC2", "ge tv",
+        "PRÉ-JOGO: BOTAFOGO X SANTOS | AO VIVO", "",
+        "upcoming", game.kickoff, None, None,
+    )
+    assert evaluate_candidate(pre_only, game, config, aliases).rejected_reason
 
     commentary = Candidate("HHHHHHHHHHH", "cazetv", "UC1", "CazéTV", "BOTAFOGO X SANTOS | LANCES EM TEMPO REAL | NOCHE DE COPA", "", "upcoming", game.kickoff, None, None)
     rejected = evaluate_candidate(commentary, game, config, aliases).rejected_reason
@@ -1283,7 +1321,7 @@ def selftest() -> None:
     assert "Cih-UxYNCSs" in ids_found, f"ID da live Cazé não encontrado: {ids_found}"
     assert len(ids_found) == 3
 
-    print("SELFTEST OK: vínculo, rejeições, aliases, prioridade GE TV, link único, /streams, uploads e fallback search")
+    print("SELFTEST OK: vínculo, rejeições, descrição pré/pós segura, aliases, prioridade GE TV, link único, /streams, uploads e fallback search")
 
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
