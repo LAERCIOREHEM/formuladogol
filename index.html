@@ -3273,10 +3273,33 @@ function detalhesDoJogo(j) {
   return null;
 }
 
+const BR_ESTATISTICAS_RODAPE = new Map([
+  ['escanteios', 0],
+  ['amarelos', 1],
+  ['vermelhos', 2],
+  ['impedimentos', 3],
+]);
+
+function ordenarEstatisticasParaExibicao(stats) {
+  return (Array.isArray(stats) ? stats : [])
+    .map((stat, indice) => ({ stat, indice }))
+    .sort((a, b) => {
+      const nomeA = normalizarNome(a.stat && (a.stat.nome || a.stat.label || ''));
+      const nomeB = normalizarNome(b.stat && (b.stat.nome || b.stat.label || ''));
+      const fimA = BR_ESTATISTICAS_RODAPE.has(nomeA);
+      const fimB = BR_ESTATISTICAS_RODAPE.has(nomeB);
+      if (fimA !== fimB) return fimA ? 1 : -1;
+      if (fimA && fimB) return BR_ESTATISTICAS_RODAPE.get(nomeA) - BR_ESTATISTICAS_RODAPE.get(nomeB);
+      return a.indice - b.indice;
+    })
+    .map(item => item.stat);
+}
+
 function estatisticasDoJogo(j) {
   const det = detalhesDoJogo(j);
   const stats = det ? (det.stats || det.estatisticas || []) : [];
-  return Array.isArray(stats) ? stats.filter(s => s && (s.home !== '' || s.away !== '')) : [];
+  const validas = Array.isArray(stats) ? stats.filter(s => s && (s.home !== '' || s.away !== '')) : [];
+  return ordenarEstatisticasParaExibicao(validas);
 }
 
 

@@ -135,7 +135,7 @@
   ]);
 
   const FINAL_CACHE_KEY = "br2026_finais_reais_v2";
-  const LIVE_STATS_CACHE_KEY = "br2026_estatisticas_ao_vivo_v1";
+  const LIVE_STATS_CACHE_KEY = "br2026_estatisticas_ao_vivo_v2";
   const LIVE_STATS_CACHE_MAX_AGE_MS = 6 * 3600000;
   const PARTIAL_STATS_THRESHOLD = 6;
   const PARTIAL_STATS_RETRY_DELAY_MS = 1200;
@@ -1877,19 +1877,19 @@
     { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage","aproveitamento dos chutes"], label:"Aproveitamento dos chutes", order:7, percent01:true, derived:"shotPct" },
     { keys:["big chances created","bigchancescreated"], label:"Grandes chances", order:8 },
     { keys:["big chances missed","bigchancesmissed"], label:"Chances perdidas", order:9 },
-    { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:10 },
-    { keys:["fouls committed","foulscommitted","fouls"], label:"Faltas", order:11 },
-    { keys:["yellow cards","yellowcards"], label:"Amarelos", order:12 },
-    { keys:["red cards","redcards"], label:"Vermelhos", order:13 },
-    { keys:["offsides","offside"], label:"Impedimentos", order:14 },
-    { keys:["saves","goalkeeper saves"], label:"Defesas", order:15 },
-    { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:16 },
-    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:17, percent01:true },
-    { keys:["total passes","totalpasses","passes"], label:"Passes", order:18 },
-    { keys:["duels won","duelswon"], label:"Duelos vencidos", order:19 },
-    { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:20 },
-    { keys:["interceptions"], label:"Interceptações", order:21 },
-    { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:22 }
+    { keys:["fouls committed","foulscommitted","fouls"], label:"Faltas", order:10 },
+    { keys:["saves","goalkeeper saves"], label:"Defesas", order:11 },
+    { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:12 },
+    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:13, percent01:true },
+    { keys:["total passes","totalpasses","passes"], label:"Passes", order:14 },
+    { keys:["duels won","duelswon"], label:"Duelos vencidos", order:15 },
+    { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:16 },
+    { keys:["interceptions"], label:"Interceptações", order:17 },
+    { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:18 },
+    { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:19 },
+    { keys:["yellow cards","yellowcards"], label:"Amarelos", order:20 },
+    { keys:["red cards","redcards"], label:"Vermelhos", order:21 },
+    { keys:["offsides","offside"], label:"Impedimentos", order:22 }
   ];
 
   function metricKey(s) {
