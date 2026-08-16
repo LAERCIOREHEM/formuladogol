@@ -1,6 +1,6 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-16T10:31:05.298184-03:00",
+  "gerado_em": "2026-08-16T11:22:39.766407-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 218,
   "total_com_estatisticas": 218,
@@ -557,7 +557,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-16T05:11:14.006259-03:00",
       "renda": 2097395,
-      "dados_publico_fonte_adicional": "São Paulo FC informa 44.491 presentes e renda de R$ 2.097.395,00."
+      "dados_publico_fonte_adicional": "São Paulo FC: público presente e renda; ge: público pagante",
+      "publico_pagante": 44443
     },
     "401841196": {
       "event_id": "401841196",
@@ -1085,7 +1086,7 @@
       "atualizado_em": "2026-08-16T05:11:14.402956-03:00",
       "publico_pagante": 30473,
       "renda": 1242250,
-      "dados_publico_fonte_adicional": "Athletico informa 31.089 presentes, 30.473 pagantes e renda grafada como R$ 1.242,250; valor normalizado numericamente para R$ 1.242.250,00."
+      "dados_publico_fonte_adicional": "Athletico: público total, pagantes e renda"
     },
     "401841192": {
       "event_id": "401841192",
@@ -1696,7 +1697,7 @@
       "atualizado_em": "2026-08-16T05:11:14.789437-03:00",
       "publico_pagante": 18152,
       "renda": 1021559.5,
-      "dados_publico_fonte_adicional": "Público presente, pagantes e renda publicados após Fluminense 3 x 2 Palmeiras em 15/08/2026."
+      "dados_publico_fonte_adicional": "público total, pagantes e renda"
     },
     "401841187": {
       "event_id": "401841187",
@@ -2244,7 +2245,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-11T18:21:12.221902-03:00"
+      "atualizado_em": "2026-08-11T18:21:12.221902-03:00",
+      "publico_pagante": 55270,
+      "renda": 4684900,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841179": {
       "event_id": "401841179",
@@ -2258,7 +2262,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 6912,
       "publico_tipo": "presente",
-      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/09/flamengo-x-vitoria-tem-o-maior-publico-da-22a-rodada-do-brasileirao-veja-a-lista.ghtml",
+      "publico_fonte": "https://www.redbullbragantino.com.br/",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -2780,7 +2784,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-11T18:21:12.684408-03:00"
+      "atualizado_em": "2026-08-11T18:21:12.684408-03:00",
+      "publico_pagante": 6808,
+      "renda": 326885,
+      "dados_publico_fonte_adicional": "dados oficiais/complementares do mandante"
     },
     "401841182": {
       "event_id": "401841182",
@@ -3318,7 +3325,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-11T18:21:13.163494-03:00"
+      "atualizado_em": "2026-08-11T18:21:13.163494-03:00",
+      "publico_pagante": 7007,
+      "renda": 357469,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841180": {
       "event_id": "401841180",
@@ -3845,7 +3855,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-11T05:11:18.200878-03:00"
+      "atualizado_em": "2026-08-11T05:11:18.200878-03:00",
+      "publico_pagante": 38725,
+      "renda": 3224431,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841186": {
       "event_id": "401841186",
@@ -4381,7 +4394,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-11T05:11:17.820619-03:00"
+      "atualizado_em": "2026-08-11T05:11:17.820619-03:00",
+      "publico_pagante": 39834,
+      "renda": 1875017,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841183": {
       "event_id": "401841183",
@@ -4393,9 +4409,9 @@
       "placar_mandante": 3,
       "placar_visitante": 1,
       "estadio": "Estadio Mineirão",
-      "publico": 57850,
+      "publico": 57851,
       "publico_tipo": "presente",
-      "publico_fonte": "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/futebol-mineiro/cruzeiro/cruzeiro-registra-segundo-maior-publico-de-2026-contra-mirassol-veja-numeros/",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/09/flamengo-x-vitoria-tem-o-maior-publico-da-22a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -4966,7 +4982,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-11T05:11:18.561178-03:00"
+      "atualizado_em": "2026-08-11T05:11:18.561178-03:00",
+      "publico_pagante": 54593,
+      "renda": 2321090,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841185": {
       "event_id": "401841185",
@@ -4980,7 +4999,7 @@
       "estadio": "Joao Havelange Stadium",
       "publico": 23994,
       "publico_tipo": "presente",
-      "publico_fonte": "https://www.fogaonet.com/noticias-do-botafogo/botafogo-fluminense-campeonato-brasileiro-2026/",
+      "publico_fonte": "https://www.fogaonet.com/noticias-do-botafogo/publico-renda-botafogo-fluminense-brasileirao-2026/",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -5540,7 +5559,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-10T05:11:36.266542-03:00"
+      "atualizado_em": "2026-08-10T05:11:36.266542-03:00",
+      "publico_pagante": 21744,
+      "renda": 840195,
+      "dados_publico_fonte_adicional": "público total, pagantes e renda"
     },
     "401841184": {
       "event_id": "401841184",
@@ -5554,7 +5576,7 @@
       "estadio": "Couto Pereira",
       "publico": 17239,
       "publico_tipo": "presente",
-      "publico_fonte": "https://radioplugaraucaria.com/coritiba-supera-desfalques-e-vence-a-chapecoense-no-couto-pereira-pelo-brasileirao/",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/09/flamengo-x-vitoria-tem-o-maior-publico-da-22a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "João Vitor Gobi",
       "stats": [
         {
@@ -6095,7 +6117,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-10T05:11:36.633425-03:00"
+      "atualizado_em": "2026-08-10T05:11:36.633425-03:00",
+      "publico_pagante": 17092,
+      "renda": 538802,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841178": {
       "event_id": "401841178",
@@ -6675,7 +6700,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-10T05:11:36.978360-03:00"
+      "atualizado_em": "2026-08-10T05:11:36.978360-03:00",
+      "publico_pagante": 11963,
+      "renda": 658920,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841181": {
       "event_id": "401841181",
@@ -6689,7 +6717,7 @@
       "estadio": "Arena do Grêmio",
       "publico": 34783,
       "publico_tipo": "presente",
-      "publico_fonte": "https://www.gazetaesportiva.com/campeonatos/brasileiro-serie-a/sao-paulo-toma-virada-do-gremio-e-amarga-oitavo-jogo-de-jejum-no-brasileiro/",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/09/flamengo-x-vitoria-tem-o-maior-publico-da-22a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "André Luis Skettino Policarpo Bento",
       "stats": [
         {
@@ -7265,7 +7293,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-10T05:11:37.518853-03:00"
+      "atualizado_em": "2026-08-10T05:11:37.518853-03:00",
+      "publico_pagante": 34525,
+      "renda": 1871546,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841173": {
       "event_id": "401841173",
@@ -7795,7 +7826,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:14.261330-03:00"
+      "atualizado_em": "2026-08-01T22:44:14.261330-03:00",
+      "publico_pagante": 18014,
+      "renda": 597142,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841174": {
       "event_id": "401841174",
@@ -8350,7 +8384,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:15.269666-03:00"
+      "atualizado_em": "2026-08-01T22:44:15.269666-03:00",
+      "publico_pagante": 38828,
+      "renda": 2606640,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841172": {
       "event_id": "401841172",
@@ -8938,7 +8975,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:16.284275-03:00"
+      "atualizado_em": "2026-08-01T22:44:16.284275-03:00",
+      "publico_pagante": 14660,
+      "renda": 416546,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841177": {
       "event_id": "401841177",
@@ -9458,7 +9498,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:15.887980-03:00"
+      "atualizado_em": "2026-08-01T22:44:15.887980-03:00",
+      "publico_pagante": 11095,
+      "renda": 523539,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841170": {
       "event_id": "401841170",
@@ -9472,7 +9515,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 4519,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/07/30/veja-os-publicos-da-21a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Paulo Torezin",
       "stats": [
         {
@@ -10009,7 +10052,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:17.289696-03:00"
+      "atualizado_em": "2026-08-01T22:44:17.289696-03:00",
+      "publico_pagante": 4499,
+      "renda": 120900,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841171": {
       "event_id": "401841171",
@@ -10023,7 +10069,7 @@
       "estadio": "Estadio Beira-Rio",
       "publico": 18359,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/inter-empata-com-o-flamengo-por-1-a-1",
       "arbitro": "Matheus Delgado Candançan",
       "stats": [
         {
@@ -10560,7 +10606,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:16.909119-03:00"
+      "atualizado_em": "2026-08-01T22:44:16.909119-03:00",
+      "publico_pagante": 15904,
+      "renda": 477627,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841162": {
       "event_id": "401841162",
@@ -11113,7 +11162,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:18.916174-03:00"
+      "atualizado_em": "2026-08-01T22:44:18.916174-03:00",
+      "publico_pagante": 10344,
+      "renda": 514230,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841164": {
       "event_id": "401841164",
@@ -11666,7 +11718,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:18.199642-03:00"
+      "atualizado_em": "2026-08-01T22:44:18.199642-03:00",
+      "publico_pagante": 30284,
+      "renda": 2685569,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841163": {
       "event_id": "401841163",
@@ -12207,7 +12262,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:20.452108-03:00"
+      "atualizado_em": "2026-08-01T22:44:20.452108-03:00",
+      "publico_pagante": 2796,
+      "renda": 68850,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841165": {
       "event_id": "401841165",
@@ -12772,7 +12830,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:19.908607-03:00"
+      "atualizado_em": "2026-08-01T22:44:19.908607-03:00",
+      "publico_pagante": 23728,
+      "renda": 1312277,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841166": {
       "event_id": "401841166",
@@ -13309,7 +13370,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:19.473275-03:00"
+      "atualizado_em": "2026-08-01T22:44:19.473275-03:00",
+      "publico_pagante": 66689,
+      "renda": 6007010,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841159": {
       "event_id": "401841159",
@@ -13883,7 +13947,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:20.967642-03:00"
+      "atualizado_em": "2026-08-01T22:44:20.967642-03:00",
+      "publico_pagante": 44255,
+      "renda": 2005328,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841167": {
       "event_id": "401841167",
@@ -14462,7 +14529,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:21.721062-03:00"
+      "atualizado_em": "2026-08-01T22:44:21.721062-03:00",
+      "publico_pagante": 35865,
+      "renda": 2140431,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841160": {
       "event_id": "401841160",
@@ -14999,7 +15069,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:22.302762-03:00"
+      "atualizado_em": "2026-08-01T22:44:22.302762-03:00",
+      "publico_pagante": 9983,
+      "renda": 683218,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841158": {
       "event_id": "401841158",
@@ -15505,7 +15578,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:22.728865-03:00"
+      "atualizado_em": "2026-08-01T22:44:22.728865-03:00",
+      "publico_pagante": 27034,
+      "renda": 1324695,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841161": {
       "event_id": "401841161",
@@ -15519,7 +15595,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 12121,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/07/26/veja-os-publicos-da-20a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
       "stats": [
         {
@@ -16093,7 +16169,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:23.141513-03:00"
+      "atualizado_em": "2026-08-01T22:44:23.141513-03:00",
+      "publico_pagante": 12101,
+      "renda": 791945,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840999": {
       "event_id": "401840999",
@@ -16625,7 +16704,7 @@
       "atualizado_em": "2026-08-16T10:31:05.298166-03:00",
       "publico_pagante": 14439,
       "renda": 473220,
-      "dados_publico_fonte_adicional": "Informação fornecida pelo mantenedor em 16/08/2026; foto do placar do estádio confirma 16.772 presentes.",
+      "dados_publico_fonte_adicional": "foto do placar do estádio fornecida pelo mantenedor confirma 16.772 presentes; pagantes/renda fornecidos pelo mantenedor",
       "fonte_detalhes": "ESPN Team Stats 401879458; seed local verificado, refresh do summary/API obrigatório na próxima execução",
       "forcar_refresh_detalhes": true
     },
@@ -16641,7 +16720,7 @@
       "estadio": "Neo Química Arena",
       "publico": 43623,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/07/23/veja-os-publicos-da-19a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -17175,7 +17254,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:23.902358-03:00"
+      "atualizado_em": "2026-08-01T22:44:23.902358-03:00",
+      "publico_pagante": 43473,
+      "renda": 3104834,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841150": {
       "event_id": "401841150",
@@ -17721,7 +17803,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:24.293748-03:00"
+      "atualizado_em": "2026-08-01T22:44:24.293748-03:00",
+      "renda": 1605755,
+      "dados_publico_fonte_adicional": "ge/Gato Mestre: 13.769 presentes, 13.201 pagantes e renda de R$ 1.605.755",
+      "publico_pagante": 13201
     },
     "401841154": {
       "event_id": "401841154",
@@ -17735,7 +17820,7 @@
       "estadio": "Estadio Beira-Rio",
       "publico": 12266,
       "publico_tipo": "presente",
-      "publico_fonte": "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/07/23/veja-os-publicos-da-19a-rodada-do-campeonato-brasileiro.ghtml",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/cronica-internacional-x-cruzeiro-19-rodada-brasileirao-2026",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -18311,7 +18396,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:24.756497-03:00"
+      "atualizado_em": "2026-08-01T22:44:24.756497-03:00",
+      "publico_pagante": 10685,
+      "renda": 238117,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841156": {
       "event_id": "401841156",
@@ -18840,7 +18928,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:25.149626-03:00"
+      "atualizado_em": "2026-08-01T22:44:25.149626-03:00",
+      "publico_pagante": 6473,
+      "renda": 344992,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841152": {
       "event_id": "401841152",
@@ -18854,7 +18945,7 @@
       "estadio": "Couto Pereira",
       "publico": 27273,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/07/23/veja-os-publicos-da-19a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -19409,7 +19500,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:25.543272-03:00"
+      "atualizado_em": "2026-08-01T22:44:25.543272-03:00",
+      "publico_pagante": 27130,
+      "renda": 1734045,
+      "dados_publico_fonte_adicional": "corrigida inversão editorial: total deve ser >= pagantes"
     },
     "401841148": {
       "event_id": "401841148",
@@ -19932,7 +20026,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:26.005323-03:00"
+      "atualizado_em": "2026-08-01T22:44:26.005323-03:00",
+      "publico_pagante": 27208,
+      "renda": 1579191,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841153": {
       "event_id": "401841153",
@@ -20513,7 +20610,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:26.504505-03:00"
+      "atualizado_em": "2026-08-01T22:44:26.504505-03:00",
+      "publico_pagante": 20126,
+      "renda": 954808,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841155": {
       "event_id": "401841155",
@@ -21083,7 +21183,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:26.910577-03:00"
+      "atualizado_em": "2026-08-01T22:44:26.910577-03:00",
+      "publico_pagante": 4577,
+      "renda": 128000,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840998": {
       "event_id": "401840998",
@@ -21097,7 +21200,7 @@
       "estadio": "Arena Fonte Nova",
       "publico": 29421,
       "publico_tipo": "presente",
-      "publico_fonte": "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/07/17/bahia-decide-no-1-tempo-e-bate-a-lanterna-chapecoense-em-duelo-atrasado-pelo-brasileiro.htm",
+      "publico_fonte": "https://www.bahianoticias.com.br/esportes/bahia/33848-confira-publico-e-renda-de-bahia-x-chapecoense-pelo-brasileirao",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -21620,7 +21723,10 @@
       "origem_resultado": "manual confirmado — resultado público e vídeo publicado pelo UOL Esporte",
       "motivo_resultado_manual": "A ESPN manteve o event_id reagendado com placar/status incompatível com o resultado público confirmado.",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:27.498569-03:00"
+      "atualizado_em": "2026-08-01T22:44:27.498569-03:00",
+      "publico_pagante": 29242,
+      "renda": 785419.3,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841149": {
       "event_id": "401841149",
@@ -22192,7 +22298,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:28.106741-03:00"
+      "atualizado_em": "2026-08-01T22:44:28.106741-03:00",
+      "publico_pagante": 13632,
+      "renda": 457870,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841157": {
       "event_id": "401841157",
@@ -22707,7 +22816,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:28.527069-03:00"
+      "atualizado_em": "2026-08-01T22:44:28.527069-03:00",
+      "publico_pagante": 19963,
+      "renda": 517486,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841145": {
       "event_id": "401841145",
@@ -23256,7 +23368,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:29.019475-03:00"
+      "atualizado_em": "2026-08-01T22:44:29.019475-03:00",
+      "publico_pagante": 23346,
+      "renda": 1302508,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841147": {
       "event_id": "401841147",
@@ -23270,7 +23385,7 @@
       "estadio": "Mangueirão",
       "publico": 25649,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/31/veja-os-publicos-da-18a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Jonathan Pinheiro",
       "stats": [
         {
@@ -23793,7 +23908,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:29.415754-03:00"
+      "atualizado_em": "2026-08-01T22:44:29.415754-03:00",
+      "publico_pagante": 21627,
+      "renda": 1939000,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841140": {
       "event_id": "401841140",
@@ -24346,7 +24464,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:29.830015-03:00"
+      "atualizado_em": "2026-08-01T22:44:29.830015-03:00",
+      "publico_pagante": 36475,
+      "renda": 2981297,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841142": {
       "event_id": "401841142",
@@ -24860,7 +24981,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:30.275822-03:00"
+      "atualizado_em": "2026-08-01T22:44:30.275822-03:00",
+      "publico_pagante": 19231,
+      "renda": 782797,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841141": {
       "event_id": "401841141",
@@ -25441,7 +25565,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:30.723248-03:00"
+      "atualizado_em": "2026-08-01T22:44:30.723248-03:00",
+      "publico_pagante": 5462,
+      "renda": 179195,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841143": {
       "event_id": "401841143",
@@ -26038,7 +26165,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:31.487644-03:00"
+      "atualizado_em": "2026-08-01T22:44:31.487644-03:00",
+      "publico_pagante": 11153,
+      "renda": 483218,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841139": {
       "event_id": "401841139",
@@ -26619,7 +26749,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:32.726528-03:00"
+      "atualizado_em": "2026-08-01T22:44:32.726528-03:00",
+      "publico_pagante": 42089,
+      "renda": 2611781,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841146": {
       "event_id": "401841146",
@@ -27219,7 +27352,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:32.312025-03:00"
+      "atualizado_em": "2026-08-01T22:44:32.312025-03:00",
+      "publico_pagante": 25140,
+      "renda": 698096,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841138": {
       "event_id": "401841138",
@@ -27770,7 +27906,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:33.308506-03:00"
+      "atualizado_em": "2026-08-01T22:44:33.308506-03:00",
+      "publico_pagante": 27523,
+      "renda": 1067260,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841144": {
       "event_id": "401841144",
@@ -28332,7 +28471,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:33.756528-03:00"
+      "atualizado_em": "2026-08-01T22:44:33.756528-03:00",
+      "publico_pagante": 48644,
+      "renda": 3457350,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841129": {
       "event_id": "401841129",
@@ -28344,9 +28486,9 @@
       "placar_mandante": 3,
       "placar_visitante": 2,
       "estadio": "Couto Pereira",
-      "publico": 20588,
+      "publico": 20680,
       "publico_tipo": "presente",
-      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
+      "publico_fonte": "https://www.esporteclubebahia.com.br/fichas-tecnicas/",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -28901,7 +29043,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:34.327804-03:00"
+      "atualizado_em": "2026-08-01T22:44:34.327804-03:00",
+      "publico_pagante": 20588,
+      "renda": 647328,
+      "dados_publico_fonte_adicional": "ficha técnica Bahia + imagem do estádio: 20.680 total / 20.588 pagantes"
     },
     "401841131": {
       "event_id": "401841131",
@@ -28915,7 +29060,7 @@
       "estadio": "Estádio São Januário",
       "publico": 13805,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
       "stats": [
         {
@@ -29460,7 +29605,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:34.786140-03:00"
+      "atualizado_em": "2026-08-01T22:44:34.786140-03:00",
+      "publico_pagante": 13072,
+      "renda": 883812,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841128": {
       "event_id": "401841128",
@@ -29474,7 +29622,7 @@
       "estadio": "Neo Química Arena",
       "publico": 42508,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -29981,7 +30129,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:35.243742-03:00"
+      "atualizado_em": "2026-08-01T22:44:35.243742-03:00",
+      "publico_pagante": 42358,
+      "renda": 3117460,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841133": {
       "event_id": "401841133",
@@ -30547,7 +30698,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:36.315589-03:00"
+      "atualizado_em": "2026-08-01T22:44:36.315589-03:00",
+      "publico_pagante": 21578,
+      "renda": 1287520,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841137": {
       "event_id": "401841137",
@@ -30561,7 +30715,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 44625,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -31107,7 +31261,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:35.880580-03:00"
+      "atualizado_em": "2026-08-01T22:44:35.880580-03:00",
+      "publico_pagante": 41245,
+      "renda": 2301247,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841136": {
       "event_id": "401841136",
@@ -31121,7 +31278,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 71205,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -31716,7 +31873,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:36.927635-03:00"
+      "atualizado_em": "2026-08-01T22:44:36.927635-03:00",
+      "publico_pagante": 67251,
+      "renda": 7748220,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841134": {
       "event_id": "401841134",
@@ -31730,7 +31890,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 7085,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -32272,7 +32432,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:38.107518-03:00"
+      "atualizado_em": "2026-08-01T22:44:38.107518-03:00",
+      "publico_pagante": 7065,
+      "renda": 180760,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841135": {
       "event_id": "401841135",
@@ -32284,9 +32447,9 @@
       "placar_mandante": 3,
       "placar_visitante": 2,
       "estadio": "Arena do Grêmio",
-      "publico": 37113,
+      "publico": 37385,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -32837,7 +33000,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:37.322393-03:00"
+      "atualizado_em": "2026-08-01T22:44:37.322393-03:00",
+      "publico_pagante": 37113,
+      "renda": 2437715,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841130": {
       "event_id": "401841130",
@@ -32849,9 +33015,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 24802,
+      "publico": 25114,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -33390,7 +33556,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:39.020695-03:00"
+      "atualizado_em": "2026-08-01T22:44:39.020695-03:00",
+      "publico_pagante": 24802,
+      "renda": 585241,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841132": {
       "event_id": "401841132",
@@ -33404,7 +33573,7 @@
       "estadio": "Estádio Cícero Pompeu de Toledo",
       "publico": 25338,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -33959,7 +34128,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:38.548309-03:00"
+      "atualizado_em": "2026-08-01T22:44:38.548309-03:00",
+      "publico_pagante": 25317,
+      "renda": 1411442,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841121": {
       "event_id": "401841121",
@@ -33971,9 +34143,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Arena da Baixada",
-      "publico": 33549,
+      "publico": 34197,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -34504,7 +34676,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:39.402581-03:00"
+      "atualizado_em": "2026-08-01T22:44:39.402581-03:00",
+      "publico_pagante": 33549,
+      "renda": 2625020,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841122": {
       "event_id": "401841122",
@@ -34518,7 +34693,7 @@
       "estadio": "Arena Condá",
       "publico": 9202,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Alex Gomes Stefano",
       "stats": [
         {
@@ -35073,7 +35248,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:39.842016-03:00"
+      "atualizado_em": "2026-08-01T22:44:39.842016-03:00",
+      "publico_pagante": 8710,
+      "renda": 373580,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841124": {
       "event_id": "401841124",
@@ -35087,7 +35265,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 1733,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wagner Do Nascimento Magalhaes",
       "stats": [
         {
@@ -35638,7 +35816,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:40.276215-03:00"
+      "atualizado_em": "2026-08-01T22:44:40.276215-03:00",
+      "publico_pagante": 1731,
+      "renda": 47280,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841118": {
       "event_id": "401841118",
@@ -35652,7 +35833,7 @@
       "estadio": "Joao Havelange Stadium",
       "publico": 17556,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -36230,7 +36411,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:41.084870-03:00"
+      "atualizado_em": "2026-08-01T22:44:41.084870-03:00",
+      "publico_pagante": 15841,
+      "renda": 656210,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841119": {
       "event_id": "401841119",
@@ -36242,9 +36426,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Arena Fonte Nova",
-      "publico": 26800,
+      "publico": 26927,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
       "stats": [
         {
@@ -36816,7 +37000,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:40.684039-03:00"
+      "atualizado_em": "2026-08-01T22:44:40.684039-03:00",
+      "publico_pagante": 26800,
+      "renda": 771759,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841123": {
       "event_id": "401841123",
@@ -36830,7 +37017,7 @@
       "estadio": "Neo Química Arena",
       "publico": 45662,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -37413,7 +37600,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:41.626667-03:00"
+      "atualizado_em": "2026-08-01T22:44:41.626667-03:00",
+      "publico_pagante": 45631,
+      "renda": 3022470,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841125": {
       "event_id": "401841125",
@@ -37427,7 +37617,7 @@
       "estadio": "Arena Barueri",
       "publico": 27657,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -37962,7 +38152,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:42.071987-03:00"
+      "atualizado_em": "2026-08-01T22:44:42.071987-03:00",
+      "publico_pagante": 27642,
+      "renda": 903506,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841127": {
       "event_id": "401841127",
@@ -37976,7 +38169,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 28218,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -38529,7 +38722,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:42.458340-03:00"
+      "atualizado_em": "2026-08-01T22:44:42.458340-03:00",
+      "publico_pagante": 26918,
+      "renda": 1233169,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841120": {
       "event_id": "401841120",
@@ -38543,7 +38739,7 @@
       "estadio": "Arena MRV",
       "publico": 20027,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/17/veja-os-publicos-da-16a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -39059,7 +39255,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:43.150551-03:00"
+      "atualizado_em": "2026-08-01T22:44:43.150551-03:00",
+      "publico_pagante": 18201,
+      "renda": 894904,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841126": {
       "event_id": "401841126",
@@ -39071,9 +39270,9 @@
       "placar_mandante": 4,
       "placar_visitante": 1,
       "estadio": "Estadio Beira-Rio",
-      "publico": 21688,
+      "publico": 21411,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/inter-goleia-o-vasco-no-beira-rio",
       "arbitro": "Ramon Abatti Abel",
       "stats": [
         {
@@ -39630,7 +39829,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:44.181042-03:00"
+      "atualizado_em": "2026-08-01T22:44:44.181042-03:00",
+      "publico_pagante": 18705,
+      "renda": 720927.5,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841112": {
       "event_id": "401841112",
@@ -39644,7 +39846,7 @@
       "estadio": "Estádio São Januário",
       "publico": 13917,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -40181,7 +40383,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:44.565832-03:00"
+      "atualizado_em": "2026-08-01T22:44:44.565832-03:00",
+      "publico_pagante": 13315,
+      "renda": 898312,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841117": {
       "event_id": "401841117",
@@ -40193,9 +40398,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Arena do Grêmio",
-      "publico": 30617,
+      "publico": 30891,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -40709,7 +40914,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:45.003712-03:00"
+      "atualizado_em": "2026-08-01T22:44:45.003712-03:00",
+      "publico_pagante": 30617,
+      "renda": 2169784,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841109": {
       "event_id": "401841109",
@@ -40723,7 +40931,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 6291,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -41267,7 +41475,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:46.237302-03:00"
+      "atualizado_em": "2026-08-01T22:44:46.237302-03:00",
+      "renda": 375855.4,
+      "dados_publico_fonte_adicional": "ge/Gato Mestre: 6.291 presentes; Santos FC: 6.291 pagantes e renda de R$ 375.855,40",
+      "publico_pagante": 6291
     },
     "401841111": {
       "event_id": "401841111",
@@ -41281,7 +41492,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 2343,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -41825,7 +42036,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:45.837340-03:00"
+      "atualizado_em": "2026-08-01T22:44:45.837340-03:00",
+      "publico_pagante": 2329,
+      "renda": 65040,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841115": {
       "event_id": "401841115",
@@ -41839,7 +42053,7 @@
       "estadio": "Neo Química Arena",
       "publico": 37366,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -42393,7 +42607,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:45.434542-03:00"
+      "atualizado_em": "2026-08-01T22:44:45.434542-03:00",
+      "publico_pagante": 37246,
+      "renda": 2790051,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841108": {
       "event_id": "401841108",
@@ -42407,7 +42624,7 @@
       "estadio": "Arena MRV",
       "publico": 33043,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -42912,7 +43129,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:46.633829-03:00"
+      "atualizado_em": "2026-08-01T22:44:46.633829-03:00",
+      "publico_pagante": 29710,
+      "renda": 1731167,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841110": {
       "event_id": "401841110",
@@ -42926,7 +43146,7 @@
       "estadio": "Mangueirão",
       "publico": 40629,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -43465,7 +43685,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:47.015530-03:00"
+      "atualizado_em": "2026-08-01T22:44:47.015530-03:00",
+      "publico_pagante": 36649,
+      "renda": 3814360,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841116": {
       "event_id": "401841116",
@@ -43477,9 +43700,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Arena Fonte Nova",
-      "publico": 30309,
+      "publico": 30423,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -44046,7 +44269,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:47.701007-03:00"
+      "atualizado_em": "2026-08-01T22:44:47.701007-03:00",
+      "publico_pagante": 30309,
+      "renda": 898702,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841113": {
       "event_id": "401841113",
@@ -44060,7 +44286,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 17670,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -44627,7 +44853,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:48.094354-03:00"
+      "atualizado_em": "2026-08-01T22:44:48.094354-03:00",
+      "publico_pagante": 15774,
+      "renda": 724548,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841114": {
       "event_id": "401841114",
@@ -44639,9 +44868,9 @@
       "placar_mandante": 2,
       "placar_visitante": 2,
       "estadio": "Couto Pereira",
-      "publico": 15878,
+      "publico": 15972,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/10/veja-os-publicos-da-15a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -45194,7 +45423,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:48.498631-03:00"
+      "atualizado_em": "2026-08-01T22:44:48.498631-03:00",
+      "publico_pagante": 15878,
+      "renda": 704275,
+      "dados_publico_fonte_adicional": "público total/pagantes consolidados"
     },
     "401841103": {
       "event_id": "401841103",
@@ -45208,7 +45440,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 9943,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Matheus Delgado Candançan",
       "stats": [
         {
@@ -45775,7 +46007,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:48.983687-03:00"
+      "atualizado_em": "2026-08-01T22:44:48.983687-03:00",
+      "publico_pagante": 9910,
+      "renda": 842360,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841099": {
       "event_id": "401841099",
@@ -45789,7 +46024,7 @@
       "estadio": "Arena Condá",
       "publico": 8065,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -46327,7 +46562,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:49.383113-03:00"
+      "atualizado_em": "2026-08-01T22:44:49.383113-03:00",
+      "publico_pagante": 7689,
+      "renda": 322070,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841104": {
       "event_id": "401841104",
@@ -46339,9 +46577,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio Beira-Rio",
-      "publico": 17092,
+      "publico": 16173,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/inter-vence-o-fluminense-e-sobe-na-tabela-do-brasileirao",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -46899,7 +47137,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:49.889817-03:00"
+      "atualizado_em": "2026-08-01T22:44:49.889817-03:00",
+      "publico_pagante": 14349,
+      "renda": 325596,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841101": {
       "event_id": "401841101",
@@ -46913,7 +47154,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 9390,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -47489,7 +47730,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:50.772600-03:00"
+      "atualizado_em": "2026-08-01T22:44:50.772600-03:00",
+      "publico_pagante": 9369,
+      "renda": 569128,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841105": {
       "event_id": "401841105",
@@ -47503,7 +47747,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 61872,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -48064,7 +48308,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:50.313178-03:00"
+      "atualizado_em": "2026-08-01T22:44:50.313178-03:00",
+      "publico_pagante": 57516,
+      "renda": 5261145,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841098": {
       "event_id": "401841098",
@@ -48078,7 +48325,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 53921,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -48665,7 +48912,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:51.188691-03:00"
+      "atualizado_em": "2026-08-01T22:44:51.188691-03:00",
+      "publico_pagante": 50399,
+      "renda": 4014835,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841106": {
       "event_id": "401841106",
@@ -48677,9 +48927,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Arena da Baixada",
-      "publico": 25859,
+      "publico": 26753,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.athletico.com.br/",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -49175,7 +49425,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:51.651394-03:00"
+      "atualizado_em": "2026-08-01T22:44:51.651394-03:00",
+      "publico_pagante": 25859,
+      "renda": 1540205,
+      "dados_publico_fonte_adicional": "dados oficiais do mandante consolidados"
     },
     "401841100": {
       "event_id": "401841100",
@@ -49187,9 +49440,9 @@
       "placar_mandante": 4,
       "placar_visitante": 1,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 17848,
+      "publico": 18012,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -49758,7 +50011,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:52.559214-03:00"
+      "atualizado_em": "2026-08-01T22:44:52.559214-03:00",
+      "publico_pagante": 17848,
+      "renda": 435475,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841102": {
       "event_id": "401841102",
@@ -49772,7 +50028,7 @@
       "estadio": "Allianz Parque",
       "publico": 41282,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -50295,7 +50551,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:52.098937-03:00"
+      "atualizado_em": "2026-08-01T22:44:52.098937-03:00",
+      "publico_pagante": 41212,
+      "renda": 3997353,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841107": {
       "event_id": "401841107",
@@ -50309,7 +50568,7 @@
       "estadio": "Joao Havelange Stadium",
       "publico": 22116,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/05/03/veja-os-publicos-da-14a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -50853,7 +51112,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:53.121555-03:00"
+      "atualizado_em": "2026-08-01T22:44:53.121555-03:00",
+      "publico_pagante": 18780,
+      "renda": 696020,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841090": {
       "event_id": "401841090",
@@ -50867,7 +51129,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 13885,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -51427,7 +51689,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:54.064037-03:00"
+      "atualizado_em": "2026-08-01T22:44:54.064037-03:00",
+      "publico_pagante": 12457,
+      "renda": 578481,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841096": {
       "event_id": "401841096",
@@ -51441,7 +51706,7 @@
       "estadio": "Arena MRV",
       "publico": 28148,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -51983,7 +52248,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:53.622862-03:00"
+      "atualizado_em": "2026-08-01T22:44:53.622862-03:00",
+      "publico_pagante": 25560,
+      "renda": 1555303,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841088": {
       "event_id": "401841088",
@@ -51995,9 +52263,9 @@
       "placar_mandante": 3,
       "placar_visitante": 1,
       "estadio": "Arena da Baixada",
-      "publico": 17428,
+      "publico": 18021,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -52584,7 +52852,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:54.697004-03:00"
+      "atualizado_em": "2026-08-01T22:44:54.697004-03:00",
+      "publico_pagante": 17428,
+      "renda": 545030,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841097": {
       "event_id": "401841097",
@@ -52598,7 +52869,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 6166,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -53121,7 +53392,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:55.244655-03:00"
+      "atualizado_em": "2026-08-01T22:44:55.244655-03:00",
+      "publico_pagante": 6154,
+      "renda": 323555,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841089": {
       "event_id": "401841089",
@@ -53135,7 +53409,7 @@
       "estadio": "Neo Química Arena",
       "publico": 41977,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -53678,7 +53952,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:55.997781-03:00"
+      "atualizado_em": "2026-08-01T22:44:55.997781-03:00",
+      "publico_pagante": 41822,
+      "renda": 3245975,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841091": {
       "event_id": "401841091",
@@ -53690,9 +53967,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Arena do Grêmio",
-      "publico": 35164,
+      "publico": 35443,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -54236,7 +54513,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:56.632758-03:00"
+      "atualizado_em": "2026-08-01T22:44:56.632758-03:00",
+      "publico_pagante": 35164,
+      "renda": 2013591,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841092": {
       "event_id": "401841092",
@@ -54250,7 +54530,7 @@
       "estadio": "Estádio Brinco de Ouro da Princesa",
       "publico": 15706,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -54757,7 +55037,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:57.045636-03:00"
+      "atualizado_em": "2026-08-01T22:44:57.045636-03:00",
+      "publico_pagante": 15454,
+      "renda": 1087398,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841093": {
       "event_id": "401841093",
@@ -54771,7 +55054,7 @@
       "estadio": "Estadio Evandro Almeida (Baenao)",
       "publico": 12993,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -55293,7 +55576,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:58.710761-03:00"
+      "atualizado_em": "2026-08-01T22:44:58.710761-03:00",
+      "publico_pagante": 11019,
+      "renda": 708575,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841094": {
       "event_id": "401841094",
@@ -55307,7 +55593,7 @@
       "estadio": "Arena BRB Mané Garrincha",
       "publico": 16332,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.terra.com.br/esportes/botafogo/com-tempos-distintos-botafogo-e-internacional-empatam-no-mane-garrincha%2Cb3f76c9a57bdd93f0b3cbb129c120906z22ly4u2.html",
       "arbitro": "",
       "stats": [
         {
@@ -55859,7 +56145,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:58.199149-03:00"
+      "atualizado_em": "2026-08-01T22:44:58.199149-03:00",
+      "publico_pagante": 16332,
+      "renda": 1936951,
+      "dados_publico_fonte_adicional": "público presente/renda; pagantes também reportados em fonte complementar"
     },
     "401841095": {
       "event_id": "401841095",
@@ -55871,9 +56160,9 @@
       "placar_mandante": 2,
       "placar_visitante": 2,
       "estadio": "Arena Fonte Nova",
-      "publico": 33894,
+      "publico": 34009,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/26/veja-os-publicos-da-13a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -56445,7 +56734,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:57.692660-03:00"
+      "atualizado_em": "2026-08-01T22:44:57.692660-03:00",
+      "publico_pagante": 33894,
+      "renda": 1167095,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841086": {
       "event_id": "401841086",
@@ -56459,7 +56751,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 64565,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -56984,7 +57276,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:59.096824-03:00"
+      "atualizado_em": "2026-08-01T22:44:59.096824-03:00",
+      "publico_pagante": 60955,
+      "renda": 4816853,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841083": {
       "event_id": "401841083",
@@ -56998,7 +57293,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 4163,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -57551,7 +57846,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:00.566060-03:00"
+      "atualizado_em": "2026-08-01T22:45:00.566060-03:00",
+      "publico_pagante": 4156,
+      "renda": 120655,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841084": {
       "event_id": "401841084",
@@ -57565,7 +57863,7 @@
       "estadio": "Allianz Parque",
       "publico": 39714,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "",
       "stats": [
         {
@@ -58107,7 +58405,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:44:59.521150-03:00"
+      "atualizado_em": "2026-08-01T22:44:59.521150-03:00",
+      "publico_pagante": 39668,
+      "renda": 3489280,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841079": {
       "event_id": "401841079",
@@ -58119,9 +58420,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Couto Pereira",
-      "publico": 28305,
+      "publico": 28426,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
       "stats": [
         {
@@ -58663,7 +58964,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:00.962228-03:00"
+      "atualizado_em": "2026-08-01T22:45:00.962228-03:00",
+      "publico_pagante": 28305,
+      "renda": 1102670,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841082": {
       "event_id": "401841082",
@@ -58677,7 +58981,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 14179,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://jornalheiros.blogspot.com/2026/04/ficha-tecnica-santos-2-x-3-fluminense.html",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -59261,7 +59565,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:01.438935-03:00"
+      "atualizado_em": "2026-08-01T22:45:01.438935-03:00",
+      "publico_pagante": 14150,
+      "renda": 1192798.58,
+      "dados_publico_fonte_adicional": "ficha técnica: público presente, pagantes e renda"
     },
     "401841085": {
       "event_id": "401841085",
@@ -59273,9 +59580,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Estadio Beira-Rio",
-      "publico": 30601,
+      "publico": 30052,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/inter-e-derrotado-no-beira-rio",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -59823,7 +60130,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:01.996295-03:00"
+      "atualizado_em": "2026-08-01T22:45:01.996295-03:00",
+      "publico_pagante": 26079,
+      "renda": 1062074,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841087": {
       "event_id": "401841087",
@@ -59837,7 +60147,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 28279,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -60390,7 +60700,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:02.422630-03:00"
+      "atualizado_em": "2026-08-01T22:45:02.422630-03:00",
+      "publico_pagante": 25238,
+      "renda": 1093900,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841080": {
       "event_id": "401841080",
@@ -60402,9 +60715,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 21709,
+      "publico": 21991,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Alex Gomes Stefano",
       "stats": [
         {
@@ -60917,7 +61230,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:03.045795-03:00"
+      "atualizado_em": "2026-08-01T22:45:03.045795-03:00",
+      "publico_pagante": 21709,
+      "renda": 728219,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841078": {
       "event_id": "401841078",
@@ -60931,7 +61247,7 @@
       "estadio": "Arena Condá",
       "publico": 10184,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Matheus Delgado Candançan",
       "stats": [
         {
@@ -61460,7 +61776,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:03.474466-03:00"
+      "atualizado_em": "2026-08-01T22:45:03.474466-03:00",
+      "publico_pagante": 9571,
+      "renda": 447500,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841081": {
       "event_id": "401841081",
@@ -61474,7 +61793,7 @@
       "estadio": "Estádio São Januário",
       "publico": 20067,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/19/veja-os-publicos-da-12a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -62011,7 +62330,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:03.944852-03:00"
+      "atualizado_em": "2026-08-01T22:45:03.944852-03:00",
+      "publico_pagante": 19370,
+      "renda": 1468814,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841068": {
       "event_id": "401841068",
@@ -62025,7 +62347,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 38674,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Ramon Abatti Abel",
       "stats": [
         {
@@ -62559,7 +62881,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:04.758246-03:00"
+      "atualizado_em": "2026-08-01T22:45:04.758246-03:00",
+      "publico_pagante": 34437,
+      "renda": 1452216,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841069": {
       "event_id": "401841069",
@@ -62571,9 +62896,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Neo Química Arena",
-      "publico": 46263,
+      "publico": 46466,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.neoquimicaarena.com.br/noticias/timao-segura-empate-com-dois-a-menos-em-derby-pela-11-rodada-do-brasileirao-2026-arena",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -63068,7 +63393,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:04.344035-03:00"
+      "atualizado_em": "2026-08-01T22:45:04.344035-03:00",
+      "publico_pagante": 46263,
+      "renda": 3569127.5,
+      "dados_publico_fonte_adicional": "Neo Química Arena: público total, pagantes e renda"
     },
     "401841072": {
       "event_id": "401841072",
@@ -63082,7 +63410,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 44833,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -63642,7 +63970,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:05.177996-03:00"
+      "atualizado_em": "2026-08-01T22:45:05.177996-03:00",
+      "publico_pagante": 40788,
+      "renda": 3554438,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841070": {
       "event_id": "401841070",
@@ -63656,7 +63987,7 @@
       "estadio": "Joao Havelange Stadium",
       "publico": 14695,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -64233,7 +64564,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:05.720849-03:00"
+      "atualizado_em": "2026-08-01T22:45:05.720849-03:00",
+      "publico_pagante": 12149,
+      "renda": 389600,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841071": {
       "event_id": "401841071",
@@ -64245,9 +64579,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Arena da Baixada",
-      "publico": 24146,
+      "publico": 24630,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "André Luis Skettino Policarpo Bento",
       "stats": [
         {
@@ -64798,7 +65132,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:06.152750-03:00"
+      "atualizado_em": "2026-08-01T22:45:06.152750-03:00",
+      "publico_pagante": 24146,
+      "renda": 906480,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841077": {
       "event_id": "401841077",
@@ -64810,9 +65147,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Estadio Beira-Rio",
-      "publico": 40562,
+      "publico": 39135,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/empate-sem-gols-no-gre-nal-452",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -65352,7 +65689,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:06.930296-03:00"
+      "atualizado_em": "2026-08-01T22:45:06.930296-03:00",
+      "publico_pagante": 35361,
+      "renda": 1480051.5,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841074": {
       "event_id": "401841074",
@@ -65366,7 +65706,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 12175,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -65888,7 +66228,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:07.404785-03:00"
+      "atualizado_em": "2026-08-01T22:45:07.404785-03:00",
+      "publico_pagante": 12157,
+      "renda": 938763,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841076": {
       "event_id": "401841076",
@@ -65902,7 +66245,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 4276,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -66465,7 +66808,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:07.858155-03:00"
+      "atualizado_em": "2026-08-01T22:45:07.858155-03:00",
+      "publico_pagante": 4261,
+      "renda": 113080,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841073": {
       "event_id": "401841073",
@@ -66477,9 +66823,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 17891,
+      "publico": 18102,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -67024,7 +67370,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:08.642850-03:00"
+      "atualizado_em": "2026-08-01T22:45:08.642850-03:00",
+      "publico_pagante": 17891,
+      "renda": 539406,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841075": {
       "event_id": "401841075",
@@ -67038,7 +67387,7 @@
       "estadio": "Mangueirão",
       "publico": 35305,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/12/veja-os-publicos-da-11a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -67547,7 +67896,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:08.247566-03:00"
+      "atualizado_em": "2026-08-01T22:45:08.247566-03:00",
+      "publico_pagante": 31263,
+      "renda": 2635940,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841061": {
       "event_id": "401841061",
@@ -67559,9 +67911,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Arena do Grêmio",
-      "publico": 23251,
+      "publico": 23543,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Edina Alves Batista",
       "stats": [
         {
@@ -68065,7 +68417,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:09.102753-03:00"
+      "atualizado_em": "2026-08-01T22:45:09.102753-03:00",
+      "publico_pagante": 23251,
+      "renda": 1291056,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841060": {
       "event_id": "401841060",
@@ -68079,7 +68434,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 3597,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -68616,7 +68971,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:09.665177-03:00"
+      "atualizado_em": "2026-08-01T22:45:09.665177-03:00",
+      "publico_pagante": 3585,
+      "renda": 83980,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841064": {
       "event_id": "401841064",
@@ -68630,7 +68988,7 @@
       "estadio": "Neo Química Arena",
       "publico": 32213,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -69167,7 +69525,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:10.678986-03:00"
+      "atualizado_em": "2026-08-01T22:45:10.678986-03:00",
+      "publico_pagante": 32093,
+      "renda": 2171746,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841066": {
       "event_id": "401841066",
@@ -69179,9 +69540,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Arena Fonte Nova",
-      "publico": 41387,
+      "publico": 41645,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -69741,7 +70102,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:10.247151-03:00"
+      "atualizado_em": "2026-08-01T22:45:10.247151-03:00",
+      "publico_pagante": 41387,
+      "renda": 1794355,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841058": {
       "event_id": "401841058",
@@ -69755,7 +70119,7 @@
       "estadio": "Arena MRV",
       "publico": 29356,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Matheus Delgado Candançan",
       "stats": [
         {
@@ -70280,7 +70644,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:11.116712-03:00"
+      "atualizado_em": "2026-08-01T22:45:11.116712-03:00",
+      "publico_pagante": 27490,
+      "renda": 1337800,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841067": {
       "event_id": "401841067",
@@ -70294,7 +70661,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 68615,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -70835,7 +71202,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:11.605485-03:00"
+      "atualizado_em": "2026-08-01T22:45:11.605485-03:00",
+      "publico_pagante": 65123,
+      "renda": 5896368,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841065": {
       "event_id": "401841065",
@@ -70849,7 +71219,7 @@
       "estadio": "Arena Condá",
       "publico": 9484,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Jonathan Pinheiro",
       "stats": [
         {
@@ -71400,7 +71770,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:12.502206-03:00"
+      "atualizado_em": "2026-08-01T22:45:12.502206-03:00",
+      "publico_pagante": 9044,
+      "renda": 383020,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841062": {
       "event_id": "401841062",
@@ -71414,7 +71787,7 @@
       "estadio": "Estádio São Januário",
       "publico": 20072,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wagner Do Nascimento Magalhaes",
       "stats": [
         {
@@ -71958,7 +72331,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:13.037725-03:00"
+      "atualizado_em": "2026-08-01T22:45:13.037725-03:00",
+      "publico_pagante": 19369,
+      "renda": 1385294,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841063": {
       "event_id": "401841063",
@@ -71970,9 +72346,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Couto Pereira",
-      "publico": 24565,
+      "publico": 24693,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -72490,7 +72866,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:13.555354-03:00"
+      "atualizado_em": "2026-08-01T22:45:13.555354-03:00",
+      "publico_pagante": 24565,
+      "renda": 1037726,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841059": {
       "event_id": "401841059",
@@ -72504,7 +72883,7 @@
       "estadio": "Estádio Cícero Pompeu de Toledo",
       "publico": 36650,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/05/veja-os-publicos-da-10a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -73060,7 +73439,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:14.251166-03:00"
+      "atualizado_em": "2026-08-01T22:45:14.251166-03:00",
+      "publico_pagante": 36553,
+      "renda": 2022929,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841051": {
       "event_id": "401841051",
@@ -73074,7 +73456,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 5854,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
       "stats": [
         {
@@ -73636,7 +74018,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:15.163484-03:00"
+      "atualizado_em": "2026-08-01T22:45:15.163484-03:00",
+      "publico_pagante": 5851,
+      "renda": 379005,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841052": {
       "event_id": "401841052",
@@ -73650,7 +74035,7 @@
       "estadio": "Arena Barueri",
       "publico": 13572,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -74189,7 +74574,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:14.739276-03:00"
+      "atualizado_em": "2026-08-01T22:45:14.739276-03:00",
+      "publico_pagante": 13556,
+      "renda": 475973,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841049": {
       "event_id": "401841049",
@@ -74203,7 +74591,7 @@
       "estadio": "Arena Condá",
       "publico": 10614,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "João Vitor Gobi",
       "stats": [
         {
@@ -74737,7 +75125,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:16.072267-03:00"
+      "atualizado_em": "2026-08-01T22:45:16.072267-03:00",
+      "publico_pagante": 9940,
+      "renda": 446920,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841050": {
       "event_id": "401841050",
@@ -74751,7 +75142,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 12242,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -75304,7 +75695,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:17.236710-03:00"
+      "atualizado_em": "2026-08-01T22:45:17.236710-03:00",
+      "publico_pagante": 12219,
+      "renda": 850095,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841054": {
       "event_id": "401841054",
@@ -75318,7 +75712,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 24701,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -75885,7 +76279,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:17.670281-03:00"
+      "atualizado_em": "2026-08-01T22:45:17.670281-03:00",
+      "publico_pagante": 22283,
+      "renda": 1202607,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841048": {
       "event_id": "401841048",
@@ -75899,7 +76296,7 @@
       "estadio": "Couto Pereira",
       "publico": 27224,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Ramon Abatti Abel",
       "stats": [
         {
@@ -76429,7 +76826,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:18.174295-03:00"
+      "atualizado_em": "2026-08-01T22:45:18.174295-03:00",
+      "publico_pagante": 27113,
+      "renda": 1484749,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841055": {
       "event_id": "401841055",
@@ -76443,7 +76843,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 23907,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Yuri Elino Ferreira Da Cruz",
       "stats": [
         {
@@ -76991,7 +77391,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:19.122072-03:00"
+      "atualizado_em": "2026-08-01T22:45:19.122072-03:00",
+      "publico_pagante": 20685,
+      "renda": 1261519,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841056": {
       "event_id": "401841056",
@@ -77003,9 +77406,9 @@
       "placar_mandante": 3,
       "placar_visitante": 0,
       "estadio": "Arena Fonte Nova",
-      "publico": 29213,
+      "publico": 29316,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Jonathan Pinheiro",
       "stats": [
         {
@@ -77551,7 +77954,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:18.645045-03:00"
+      "atualizado_em": "2026-08-01T22:45:18.645045-03:00",
+      "publico_pagante": 29213,
+      "renda": 733554,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841053": {
       "event_id": "401841053",
@@ -77565,7 +77971,7 @@
       "estadio": "Estadio Beira-Rio",
       "publico": 14780,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/inter-empata-por-1-a-1-com-o-sao-paulo",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -78106,7 +78512,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:20.045940-03:00"
+      "atualizado_em": "2026-08-01T22:45:20.045940-03:00",
+      "publico_pagante": 12713,
+      "renda": 317307,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841057": {
       "event_id": "401841057",
@@ -78120,7 +78529,7 @@
       "estadio": "Joao Havelange Stadium",
       "publico": 6781,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/04/01/veja-os-publicos-da-9a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -78694,7 +79103,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:19.637943-03:00"
+      "atualizado_em": "2026-08-01T22:45:19.637943-03:00",
+      "publico_pagante": 5472,
+      "renda": 178360,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841016": {
       "event_id": "401841016",
@@ -78706,9 +79118,9 @@
       "placar_mandante": 4,
       "placar_visitante": 1,
       "estadio": "Arena da Baixada",
-      "publico": 21967,
+      "publico": 22625,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.terra.com.br/esportes/botafogo/athletico-goleia-o-botafogo-e-assume-vice-lideranca-do-brasileirao,1d2b910b869313b749df6ba13d3a2edcbal3kf7i.html",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -79269,7 +79681,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:20.544826-03:00"
+      "atualizado_em": "2026-08-01T22:45:20.544826-03:00",
+      "publico_pagante": 21967,
+      "renda": 864995,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841046": {
       "event_id": "401841046",
@@ -79283,7 +79698,7 @@
       "estadio": "Neo Química Arena",
       "publico": 41896,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -79828,7 +80243,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:20.969219-03:00"
+      "atualizado_em": "2026-08-01T22:45:20.969219-03:00",
+      "publico_pagante": 41428,
+      "renda": 3260285,
+      "dados_publico_fonte_adicional": "Gato Mestre: público presente, pagantes e renda"
     },
     "401841042": {
       "event_id": "401841042",
@@ -79840,9 +80258,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 17837,
+      "publico": 17995,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wagner Do Nascimento Magalhaes",
       "stats": [
         {
@@ -80384,7 +80802,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:22.213805-03:00"
+      "atualizado_em": "2026-08-01T22:45:22.213805-03:00",
+      "publico_pagante": 17837,
+      "renda": 402733,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841043": {
       "event_id": "401841043",
@@ -80396,9 +80817,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio Beira-Rio",
-      "publico": 17428,
+      "publico": 16736,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/inter-bate-a-chapecoense-por-2-a-0",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -80935,7 +81356,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:21.511771-03:00"
+      "atualizado_em": "2026-08-01T22:45:21.511771-03:00",
+      "publico_pagante": 14650,
+      "renda": 340092.5,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841038": {
       "event_id": "401841038",
@@ -80947,9 +81371,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Arena da Baixada",
-      "publico": 31376,
+      "publico": 31885,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -81473,7 +81897,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:22.731577-03:00"
+      "atualizado_em": "2026-08-01T22:45:22.731577-03:00",
+      "publico_pagante": 31376,
+      "renda": 1927660,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841039": {
       "event_id": "401841039",
@@ -81487,7 +81914,7 @@
       "estadio": "Estádio São Januário",
       "publico": 20650,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -82035,7 +82462,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:24.136385-03:00"
+      "atualizado_em": "2026-08-01T22:45:24.136385-03:00",
+      "publico_pagante": 19874,
+      "renda": 1436156,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841041": {
       "event_id": "401841041",
@@ -82049,7 +82479,7 @@
       "estadio": "Mangueirão",
       "publico": 22447,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "João Vitor Gobi",
       "stats": [
         {
@@ -82611,7 +83041,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:23.742263-03:00"
+      "atualizado_em": "2026-08-01T22:45:23.742263-03:00",
+      "publico_pagante": 18224,
+      "renda": 758510,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841045": {
       "event_id": "401841045",
@@ -82625,7 +83058,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 43252,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Ramon Abatti Abel",
       "stats": [
         {
@@ -83143,7 +83576,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:23.192265-03:00"
+      "atualizado_em": "2026-08-01T22:45:23.192265-03:00",
+      "publico_pagante": 39872,
+      "renda": 2747016,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841040": {
       "event_id": "401841040",
@@ -83157,7 +83593,7 @@
       "estadio": "Estádio Cícero Pompeu de Toledo",
       "publico": 54210,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -83715,7 +84151,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:24.604060-03:00"
+      "atualizado_em": "2026-08-01T22:45:24.604060-03:00",
+      "publico_pagante": 54058,
+      "renda": 3254805,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841044": {
       "event_id": "401841044",
@@ -83729,7 +84168,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 22025,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -84293,7 +84732,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:25.071721-03:00"
+      "atualizado_em": "2026-08-01T22:45:25.071721-03:00",
+      "publico_pagante": 19871,
+      "renda": 1047495,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841047": {
       "event_id": "401841047",
@@ -84307,7 +84749,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 4089,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/22/veja-os-publicos-da-8a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -84860,7 +85302,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:25.511708-03:00"
+      "atualizado_em": "2026-08-01T22:45:25.511708-03:00",
+      "renda": 178250,
+      "dados_publico_fonte_adicional": "ge/Gato Mestre: 4.089 presentes, 4.076 pagantes e renda de R$ 178.250",
+      "publico_pagante": 4076
     },
     "401841036": {
       "event_id": "401841036",
@@ -84874,7 +85319,7 @@
       "estadio": "Arena Condá",
       "publico": 18031,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -85407,7 +85852,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:25.970797-03:00"
+      "atualizado_em": "2026-08-01T22:45:25.970797-03:00",
+      "renda": 1394980,
+      "dados_publico_fonte_adicional": "ge/Gato Mestre: 18.031 presentes e renda; Meu Timão: 18.031 pagantes",
+      "publico_pagante": 18031
     },
     "401841035": {
       "event_id": "401841035",
@@ -85421,7 +85869,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 62075,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -85967,7 +86415,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:26.768902-03:00"
+      "atualizado_em": "2026-08-01T22:45:26.768902-03:00",
+      "publico_pagante": 59250,
+      "renda": 3649640,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841034": {
       "event_id": "401841034",
@@ -85979,9 +86430,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Arena do Grêmio",
-      "publico": 19963,
+      "publico": 20206,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Alex Gomes Stefano",
       "stats": [
         {
@@ -86518,7 +86969,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:27.350170-03:00"
+      "atualizado_em": "2026-08-01T22:45:27.350170-03:00",
+      "publico_pagante": 19963,
+      "renda": 1143108,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841030": {
       "event_id": "401841030",
@@ -86532,7 +86986,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 28940,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -87082,7 +87536,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:28.324610-03:00"
+      "atualizado_em": "2026-08-01T22:45:28.324610-03:00",
+      "publico_pagante": 26607,
+      "renda": 1743201,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841031": {
       "event_id": "401841031",
@@ -87096,7 +87553,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 10031,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.santosfc.com.br/santos-fc-perde-para-o-internacional-na-vila-belmiro/",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -87651,7 +88108,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:27.907268-03:00"
+      "atualizado_em": "2026-08-01T22:45:27.907268-03:00",
+      "renda": 631264.73,
+      "dados_publico_fonte_adicional": "Santos FC: público e renda; Itatiaia: público pagante",
+      "publico_pagante": 10031
     },
     "401841029": {
       "event_id": "401841029",
@@ -87665,7 +88125,7 @@
       "estadio": "Arena MRV",
       "publico": 36830,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
       "stats": [
         {
@@ -88165,7 +88625,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:28.818607-03:00"
+      "atualizado_em": "2026-08-01T22:45:28.818607-03:00",
+      "publico_pagante": 34860,
+      "renda": 1158909,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841033": {
       "event_id": "401841033",
@@ -88179,7 +88642,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 4129,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -88707,7 +89170,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:29.447031-03:00"
+      "atualizado_em": "2026-08-01T22:45:29.447031-03:00",
+      "renda": 103620,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841028": {
       "event_id": "401841028",
@@ -88719,9 +89184,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Arena da Baixada",
-      "publico": 20084,
+      "publico": 20733,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -89264,7 +89729,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:29.859114-03:00"
+      "atualizado_em": "2026-08-01T22:45:29.859114-03:00",
+      "publico_pagante": 20084,
+      "renda": 706895,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841032": {
       "event_id": "401841032",
@@ -89278,7 +89746,7 @@
       "estadio": "Allianz Parque",
       "publico": 29450,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -89831,7 +90299,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:31.080943-03:00"
+      "atualizado_em": "2026-08-01T22:45:31.080943-03:00",
+      "renda": 2143279,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841037": {
       "event_id": "401841037",
@@ -89843,9 +90313,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Arena Fonte Nova",
-      "publico": 29732,
+      "publico": 29857,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/19/com-recorde-no-maracana-veja-os-publicos-da-7a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Ramon Abatti Abel",
       "stats": [
         {
@@ -90382,7 +90852,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:30.544929-03:00"
+      "atualizado_em": "2026-08-01T22:45:30.544929-03:00",
+      "publico_pagante": 29732,
+      "renda": 761775,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841025": {
       "event_id": "401841025",
@@ -90396,7 +90869,7 @@
       "estadio": "Arena Condá",
       "publico": 19307,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Bruno Pereira Vasconcelos",
       "stats": [
         {
@@ -90929,7 +91402,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:31.492384-03:00"
+      "atualizado_em": "2026-08-01T22:45:31.492384-03:00",
+      "publico_pagante": 18029,
+      "renda": 1261120,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841019": {
       "event_id": "401841019",
@@ -90943,7 +91419,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 5400,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -91517,7 +91993,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:32.342652-03:00"
+      "atualizado_em": "2026-08-01T22:45:32.342652-03:00",
+      "publico_pagante": 5396,
+      "renda": 234525,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841023": {
       "event_id": "401841023",
@@ -91531,7 +92010,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 22352,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Paulo Torezin",
       "stats": [
         {
@@ -92118,7 +92597,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:31.932625-03:00"
+      "atualizado_em": "2026-08-01T22:45:31.932625-03:00",
+      "publico_pagante": 14581,
+      "renda": 855327,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841020": {
       "event_id": "401841020",
@@ -92132,7 +92614,7 @@
       "estadio": "Allianz Parque",
       "publico": 35360,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -92662,7 +93144,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:33.605528-03:00"
+      "atualizado_em": "2026-08-01T22:45:33.605528-03:00",
+      "publico_pagante": 35325,
+      "renda": 2704568,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841024": {
       "event_id": "401841024",
@@ -92674,9 +93159,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Couto Pereira",
-      "publico": 28300,
+      "publico": 28404,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -93213,7 +93698,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:33.076577-03:00"
+      "atualizado_em": "2026-08-01T22:45:33.076577-03:00",
+      "publico_pagante": 28300,
+      "renda": 917730,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841018": {
       "event_id": "401841018",
@@ -93227,7 +93715,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 15008,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -93779,7 +94267,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:35.137049-03:00"
+      "atualizado_em": "2026-08-01T22:45:35.137049-03:00",
+      "publico_pagante": 14987,
+      "renda": 1006279,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841021": {
       "event_id": "401841021",
@@ -93791,9 +94282,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Estadio Beira-Rio",
-      "publico": 17230,
+      "publico": 16574,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://internacional.com.br/noticias/masculino/colorado-e-superado-no-beira-rio",
       "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
       "stats": [
         {
@@ -94328,7 +94819,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:34.688557-03:00"
+      "atualizado_em": "2026-08-01T22:45:34.688557-03:00",
+      "publico_pagante": 15087,
+      "renda": 369461,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401841022": {
       "event_id": "401841022",
@@ -94342,7 +94836,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 24675,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Matheus Delgado Candançan",
       "stats": [
         {
@@ -94920,7 +95414,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:34.280259-03:00"
+      "atualizado_em": "2026-08-01T22:45:34.280259-03:00",
+      "publico_pagante": 22747,
+      "renda": 1153025,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841026": {
       "event_id": "401841026",
@@ -94934,7 +95431,7 @@
       "estadio": "Joao Havelange Stadium",
       "publico": 16176,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -95494,7 +95991,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:35.888455-03:00"
+      "atualizado_em": "2026-08-01T22:45:35.888455-03:00",
+      "publico_pagante": 14789,
+      "renda": 628290,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841027": {
       "event_id": "401841027",
@@ -95506,9 +96006,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 16421,
+      "publico": 16533,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/15/veja-os-publicos-da-6a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "João Vitor Gobi",
       "stats": [
         {
@@ -96052,7 +96552,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:36.348439-03:00"
+      "atualizado_em": "2026-08-01T22:45:36.348439-03:00",
+      "publico_pagante": 16421,
+      "renda": 398823,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841011": {
       "event_id": "401841011",
@@ -96064,9 +96567,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Arena do Grêmio",
-      "publico": 19236,
+      "publico": 19472,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -96611,7 +97114,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:36.782780-03:00"
+      "atualizado_em": "2026-08-01T22:45:36.782780-03:00",
+      "publico_pagante": 19236,
+      "renda": 1058814,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841008": {
       "event_id": "401841008",
@@ -96625,7 +97131,7 @@
       "estadio": "Estádio do Canindé",
       "publico": 13493,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -97143,7 +97649,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:37.303107-03:00"
+      "atualizado_em": "2026-08-01T22:45:37.303107-03:00",
+      "publico_pagante": 13490,
+      "renda": 542204,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841012": {
       "event_id": "401841012",
@@ -97157,7 +97666,7 @@
       "estadio": "Estádio São Januário",
       "publico": 17291,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -97705,7 +98214,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:37.717141-03:00"
+      "atualizado_em": "2026-08-01T22:45:37.717141-03:00",
+      "publico_pagante": 16647,
+      "renda": 1187396,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841009": {
       "event_id": "401841009",
@@ -97719,7 +98231,7 @@
       "estadio": "Mangueirão",
       "publico": 26528,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -98251,7 +98763,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:38.342324-03:00"
+      "atualizado_em": "2026-08-01T22:45:38.342324-03:00",
+      "publico_pagante": 22995,
+      "renda": 1292410,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841013": {
       "event_id": "401841013",
@@ -98265,7 +98780,7 @@
       "estadio": "Neo Química Arena",
       "publico": 34759,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -98812,7 +99327,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:38.790105-03:00"
+      "atualizado_em": "2026-08-01T22:45:38.790105-03:00",
+      "publico_pagante": 34639,
+      "renda": 2455230,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841017": {
       "event_id": "401841017",
@@ -98826,7 +99344,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 47214,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -99363,7 +99881,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:39.252243-03:00"
+      "atualizado_em": "2026-08-01T22:45:39.252243-03:00",
+      "publico_pagante": 44804,
+      "renda": 3107105,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841014": {
       "event_id": "401841014",
@@ -99375,9 +99896,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Arena Fonte Nova",
-      "publico": 43421,
+      "publico": 43632,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -99900,7 +100421,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:39.669187-03:00"
+      "atualizado_em": "2026-08-01T22:45:39.669187-03:00",
+      "publico_pagante": 43421,
+      "renda": 1517916,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841015": {
       "event_id": "401841015",
@@ -99914,7 +100438,7 @@
       "estadio": "Arena MRV",
       "publico": 10132,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Ramon Abatti Abel",
       "stats": [
         {
@@ -100444,7 +100968,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:40.079935-03:00"
+      "atualizado_em": "2026-08-01T22:45:40.079935-03:00",
+      "publico_pagante": 8179,
+      "renda": 454203,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841010": {
       "event_id": "401841010",
@@ -100458,7 +100985,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 8152,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/03/12/veja-os-publicos-da-5a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -101011,7 +101538,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:40.683006-03:00"
+      "atualizado_em": "2026-08-01T22:45:40.683006-03:00",
+      "publico_pagante": 8134,
+      "renda": 506220,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841002": {
       "event_id": "401841002",
@@ -101025,7 +101555,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 8808,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/25/veja-os-publicos-da-4a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -101562,7 +102092,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:41.266264-03:00"
+      "atualizado_em": "2026-08-01T22:45:41.266264-03:00",
+      "publico_pagante": 8802,
+      "renda": 539319,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841004": {
       "event_id": "401841004",
@@ -101576,7 +102109,7 @@
       "estadio": "Arena Barueri",
       "publico": 10329,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/25/veja-os-publicos-da-4a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -102141,7 +102674,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:42.202641-03:00"
+      "atualizado_em": "2026-08-01T22:45:42.202641-03:00",
+      "publico_pagante": 10327,
+      "renda": 353329,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841005": {
       "event_id": "401841005",
@@ -102153,9 +102689,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Arena do Grêmio",
-      "publico": 15437,
+      "publico": 15714,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/25/veja-os-publicos-da-4a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -102702,7 +103238,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:41.680363-03:00"
+      "atualizado_em": "2026-08-01T22:45:41.680363-03:00",
+      "publico_pagante": 15437,
+      "renda": 1056911,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841001": {
       "event_id": "401841001",
@@ -102716,7 +103255,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 20267,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/25/veja-os-publicos-da-4a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -103252,7 +103791,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:42.837060-03:00"
+      "atualizado_em": "2026-08-01T22:45:42.837060-03:00",
+      "renda": 1155377.5,
+      "dados_publico_fonte_adicional": "ge/Gato Mestre: 20.267 presentes; Meu Timão: 20.267 pagantes e renda de R$ 1.155.377,50",
+      "publico_pagante": 20267
     },
     "401841000": {
       "event_id": "401841000",
@@ -103264,9 +103806,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Couto Pereira",
-      "publico": 27515,
+      "publico": 27675,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/25/veja-os-publicos-da-4a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -103815,7 +104357,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:43.303584-03:00"
+      "atualizado_em": "2026-08-01T22:45:43.303584-03:00",
+      "publico_pagante": 27515,
+      "renda": 1377610,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401841003": {
       "event_id": "401841003",
@@ -103829,7 +104374,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 2378,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/25/veja-os-publicos-da-4a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wagner Do Nascimento Magalhaes",
       "stats": [
         {
@@ -104373,7 +104918,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:43.722984-03:00"
+      "atualizado_em": "2026-08-01T22:45:43.722984-03:00",
+      "renda": 67430,
+      "dados_publico_fonte_adicional": "ge/Gato Mestre: 2.378 pagantes e renda; ge (ranking da rodada): 2.378 presentes",
+      "publico_pagante": 2378
     },
     "401841007": {
       "event_id": "401841007",
@@ -104387,7 +104935,7 @@
       "estadio": "Mangueirão",
       "publico": 21687,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/25/veja-os-publicos-da-4a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -104940,7 +105488,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:44.209096-03:00"
+      "atualizado_em": "2026-08-01T22:45:44.209096-03:00",
+      "publico_pagante": 17450,
+      "renda": 1156800,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840981": {
       "event_id": "401840981",
@@ -104954,7 +105505,7 @@
       "estadio": "Arena da Baixada",
       "publico": 16804,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.athletico.com.br/resumo_do_jogo/athletico-desperdica-chances-e-e-superado-pelo-corinthians/",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -105503,7 +106054,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:44.881763-03:00"
+      "atualizado_em": "2026-08-01T22:45:44.881763-03:00",
+      "publico_pagante": 16496,
+      "renda": 1137055,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840997": {
       "event_id": "401840997",
@@ -105515,9 +106069,9 @@
       "placar_mandante": 1,
       "placar_visitante": 3,
       "estadio": "Estadio Beira-Rio",
-      "publico": 20486,
+      "publico": 20082,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.internacional.com.br/noticias/masculino/inter-e-superado-no-beira-rio",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -106056,7 +106610,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:45.388749-03:00"
+      "atualizado_em": "2026-08-01T22:45:45.388749-03:00",
+      "publico_pagante": 17693,
+      "renda": 532841.5,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401840988": {
       "event_id": "401840988",
@@ -106070,7 +106627,7 @@
       "estadio": "Neo Química Arena",
       "publico": 26985,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.corinthians.com.br/noticias/corinthians-vence-red-bull-bragantino-por-2-a-0-na-neo-quimica-arena",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -106628,7 +107185,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:45.979291-03:00"
+      "atualizado_em": "2026-08-01T22:45:45.979291-03:00",
+      "publico_pagante": 26700,
+      "renda": 1571151,
+      "dados_publico_fonte_adicional": "fonte oficial/complementar do mandante"
     },
     "401840992": {
       "event_id": "401840992",
@@ -106642,7 +107202,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 30397,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -107197,7 +107757,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:46.778578-03:00"
+      "atualizado_em": "2026-08-01T22:45:46.778578-03:00",
+      "publico_pagante": 27748,
+      "renda": 1396716,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840991": {
       "event_id": "401840991",
@@ -107209,9 +107772,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Arena da Baixada",
-      "publico": 26387,
+      "publico": 27083,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Ramon Abatti Abel",
       "stats": [
         {
@@ -107755,7 +108318,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:47.214560-03:00"
+      "atualizado_em": "2026-08-01T22:45:47.214560-03:00",
+      "publico_pagante": 26387,
+      "renda": 1388300,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840994": {
       "event_id": "401840994",
@@ -107769,7 +108335,7 @@
       "estadio": "Estádio São Januário",
       "publico": 11477,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -108341,7 +108907,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:48.715217-03:00"
+      "atualizado_em": "2026-08-01T22:45:48.715217-03:00",
+      "publico_pagante": 10925,
+      "renda": 727772,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840995": {
       "event_id": "401840995",
@@ -108355,7 +108924,7 @@
       "estadio": "Estádio Cícero Pompeu de Toledo",
       "publico": 18491,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -108906,7 +109475,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:48.228334-03:00"
+      "atualizado_em": "2026-08-01T22:45:48.228334-03:00",
+      "publico_pagante": 18406,
+      "renda": 863361,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840990": {
       "event_id": "401840990",
@@ -108920,7 +109492,7 @@
       "estadio": "Arena MRV",
       "publico": 16056,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Matheus Delgado Candançan",
       "stats": [
         {
@@ -109461,7 +110033,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:49.340580-03:00"
+      "atualizado_em": "2026-08-01T22:45:49.340580-03:00",
+      "publico_pagante": 14525,
+      "renda": 727332,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840989": {
       "event_id": "401840989",
@@ -109475,7 +110050,7 @@
       "estadio": "Arena Condá",
       "publico": 10578,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wagner Do Nascimento Magalhaes",
       "stats": [
         {
@@ -110041,7 +110616,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:49.857001-03:00"
+      "atualizado_em": "2026-08-01T22:45:49.857001-03:00",
+      "publico_pagante": 9909,
+      "renda": 438790,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840996": {
       "event_id": "401840996",
@@ -110055,7 +110633,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 5134,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Denis Da Silva Ribeiro Serafim",
       "stats": [
         {
@@ -110620,7 +111198,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:50.332417-03:00"
+      "atualizado_em": "2026-08-01T22:45:50.332417-03:00",
+      "publico_pagante": 5119,
+      "renda": 145500,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840993": {
       "event_id": "401840993",
@@ -110632,9 +111213,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 26983,
+      "publico": 27080,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/12/veja-os-publicos-da-terceira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -111203,7 +111784,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:50.754612-03:00"
+      "atualizado_em": "2026-08-01T22:45:50.754612-03:00",
+      "publico_pagante": 26983,
+      "renda": 843664,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840979": {
       "event_id": "401840979",
@@ -111217,7 +111801,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 15270,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -111770,7 +112354,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:51.182346-03:00"
+      "atualizado_em": "2026-08-01T22:45:51.182346-03:00",
+      "publico_pagante": 12544,
+      "renda": 745534,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840982": {
       "event_id": "401840982",
@@ -111784,7 +112371,7 @@
       "estadio": "Estádio São Januário",
       "publico": 15702,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -112292,7 +112879,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:51.752789-03:00"
+      "atualizado_em": "2026-08-01T22:45:51.752789-03:00",
+      "publico_pagante": 15191,
+      "renda": 1046218,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840980": {
       "event_id": "401840980",
@@ -112304,9 +112894,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Arena Fonte Nova",
-      "publico": 40310,
+      "publico": 40424,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Matheus Delgado Candançan",
       "stats": [
         {
@@ -112843,7 +113433,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:52.186546-03:00"
+      "atualizado_em": "2026-08-01T22:45:52.186546-03:00",
+      "publico_pagante": 40310,
+      "renda": 1288776,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840983": {
       "event_id": "401840983",
@@ -112857,7 +113450,7 @@
       "estadio": "Arena Barueri",
       "publico": 8953,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -113439,7 +114032,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:53.769903-03:00"
+      "atualizado_em": "2026-08-01T22:45:53.769903-03:00",
+      "publico_pagante": 8950,
+      "renda": 263547,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840987": {
       "event_id": "401840987",
@@ -113451,9 +114047,9 @@
       "placar_mandante": 5,
       "placar_visitante": 3,
       "estadio": "Arena do Grêmio",
-      "publico": 18340,
+      "publico": 18573,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -114033,7 +114629,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:52.736018-03:00"
+      "atualizado_em": "2026-08-01T22:45:52.736018-03:00",
+      "publico_pagante": 18340,
+      "renda": 1384153,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840985": {
       "event_id": "401840985",
@@ -114047,7 +114646,7 @@
       "estadio": "Mangueirão",
       "publico": 21118,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Alex Gomes Stefano",
       "stats": [
         {
@@ -114602,7 +115201,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:54.231390-03:00"
+      "atualizado_em": "2026-08-01T22:45:54.231390-03:00",
+      "publico_pagante": 16733,
+      "renda": 1393400,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840986": {
       "event_id": "401840986",
@@ -114616,7 +115218,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 10280,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -115167,7 +115769,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:54.663593-03:00"
+      "atualizado_em": "2026-08-01T22:45:54.663593-03:00",
+      "publico_pagante": 10270,
+      "renda": 602736,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840978": {
       "event_id": "401840978",
@@ -115181,7 +115786,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 56421,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -115739,7 +116344,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:55.315054-03:00"
+      "atualizado_em": "2026-08-01T22:45:55.315054-03:00",
+      "publico_pagante": 52792,
+      "renda": 3857425,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840984": {
       "event_id": "401840984",
@@ -115753,7 +116361,7 @@
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 3459,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/02/05/veja-os-publicos-da-segunda-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Lucas Paulo Torezin",
       "stats": [
         {
@@ -116288,7 +116896,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:55.799627-03:00"
+      "atualizado_em": "2026-08-01T22:45:55.799627-03:00",
+      "publico_pagante": 3456,
+      "renda": 129670,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840809": {
       "event_id": "401840809",
@@ -116302,7 +116913,7 @@
       "estadio": "Joao Havelange Stadium",
       "publico": 16901,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Matheus Delgado Candançan",
       "stats": [
         {
@@ -116850,7 +117461,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:56.234060-03:00"
+      "atualizado_em": "2026-08-01T22:45:56.234060-03:00",
+      "publico_pagante": 15307,
+      "renda": 538780,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840975": {
       "event_id": "401840975",
@@ -116864,7 +117478,7 @@
       "estadio": "Estadio Municipal José Maria de Campos Maia",
       "publico": 5883,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -117395,7 +118009,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:56.744770-03:00"
+      "atualizado_em": "2026-08-01T22:45:56.744770-03:00",
+      "publico_pagante": 5869,
+      "renda": 180000,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840976": {
       "event_id": "401840976",
@@ -117409,7 +118026,7 @@
       "estadio": "Estádio Cícero Pompeu de Toledo",
       "publico": 27203,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Wilton Pereira Sampaio",
       "stats": [
         {
@@ -117918,7 +118535,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:57.201361-03:00"
+      "atualizado_em": "2026-08-01T22:45:57.201361-03:00",
+      "publico_pagante": 27168,
+      "renda": 1543721,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840810": {
       "event_id": "401840810",
@@ -117932,7 +118552,7 @@
       "estadio": "Arena Condá",
       "publico": 17551,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -118515,7 +119135,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:57.637096-03:00"
+      "atualizado_em": "2026-08-01T22:45:57.637096-03:00",
+      "publico_pagante": 17077,
+      "renda": 1007940,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840811": {
       "event_id": "401840811",
@@ -118529,7 +119152,7 @@
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
       "publico": 13577,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -119096,7 +119719,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:58.272130-03:00"
+      "atualizado_em": "2026-08-01T22:45:58.272130-03:00",
+      "publico_pagante": 13479,
+      "renda": 1162555,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840813": {
       "event_id": "401840813",
@@ -119110,7 +119736,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 22986,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -119649,7 +120275,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:58.758183-03:00"
+      "atualizado_em": "2026-08-01T22:45:58.758183-03:00",
+      "publico_pagante": 20928,
+      "renda": 972325,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840808": {
       "event_id": "401840808",
@@ -119663,7 +120292,7 @@
       "estadio": "Arena MRV",
       "publico": 25770,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Bruno Arleu de Araujo",
       "stats": [
         {
@@ -120222,7 +120851,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:45:59.230277-03:00"
+      "atualizado_em": "2026-08-01T22:45:59.230277-03:00",
+      "publico_pagante": 23812,
+      "renda": 1331908,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840812": {
       "event_id": "401840812",
@@ -120234,9 +120866,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": 16511,
+      "publico": 16603,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Ramon Abatti Abel",
       "stats": [
         {
@@ -120789,7 +121421,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:46:01.405815-03:00"
+      "atualizado_em": "2026-08-01T22:46:01.405815-03:00",
+      "publico_pagante": 16511,
+      "renda": 387892,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     },
     "401840814": {
       "event_id": "401840814",
@@ -120801,9 +121436,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Estadio Beira-Rio",
-      "publico": 17264,
+      "publico": 17059,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://www.internacional.com.br/noticias/masculino/reves-na-estreia-do-brasileirao",
       "arbitro": "Flavio Rodrigues de Souza",
       "stats": [
         {
@@ -121326,7 +121961,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:46:00.615120-03:00"
+      "atualizado_em": "2026-08-01T22:46:00.615120-03:00",
+      "publico_pagante": 14904,
+      "renda": 357073,
+      "dados_publico_fonte_adicional": "Internacional: público total, pagantes e renda"
     },
     "401840977": {
       "event_id": "401840977",
@@ -121338,9 +121976,9 @@
       "placar_mandante": 0,
       "placar_visitante": 1,
       "estadio": "Couto Pereira",
-      "publico": 19535,
+      "publico": 19637,
       "publico_tipo": "presente",
-      "publico_fonte": "ESPN summary",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -121898,7 +122536,12 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-01T22:46:00.191992-03:00"
+      "atualizado_em": "2026-08-01T22:46:00.191992-03:00",
+      "publico_pagante": 19535,
+      "renda": 588128,
+      "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 216,
+  "total_com_renda": 218
 }

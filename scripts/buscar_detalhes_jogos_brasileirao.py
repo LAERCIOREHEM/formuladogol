@@ -415,20 +415,36 @@ def publico_complementar(event_id: str, mapa: dict[str, dict[str, Any]]) -> tupl
 def aplicar_dados_adicionais_publico(
     jogos_saida: dict[str, dict[str, Any]], mapa: dict[str, dict[str, Any]]
 ) -> int:
-    """Propaga pagantes/renda documentados sem confundi-los com público presente."""
+    """Aplica público presente/total, pagantes e renda documentados.
+
+    Um complemento explicitamente marcado como público presente/total corrige
+    a semântica do valor da ESPN quando necessário. Pagantes e renda são
+    tratados como campos independentes e nunca promovidos a público presente.
+    """
     alterados = 0
     for event_id, item in (mapa or {}).items():
         if not isinstance(item, dict) or str(event_id) not in jogos_saida:
             continue
         row = jogos_saida[str(event_id)]
+        antes = (
+            row.get("publico"), row.get("publico_fonte"), row.get("publico_tipo"),
+            row.get("publico_pagante"), row.get("renda"), row.get("dados_publico_fonte_adicional"),
+        )
         publico_comp = _attendance_number(item.get("publico"))
-        publico_row = _attendance_number(row.get("publico"))
-        if publico_comp is None or (publico_row is not None and publico_row != publico_comp):
-            continue
-        antes = (row.get("publico_pagante"), row.get("renda"), row.get("dados_publico_fonte_adicional"))
+        fonte = str(item.get("fonte") or item.get("origem") or "complemento documental")
+        tipo = str(item.get("tipo") or "presente")
+        if publico_comp is not None:
+            row["publico"] = publico_comp
+            row["publico_fonte"] = fonte
+            row["publico_tipo"] = tipo
+
+        publico_base = _attendance_number(row.get("publico"))
         pagantes = _attendance_number(item.get("pagantes"))
-        if pagantes is not None and pagantes <= publico_comp:
+        if pagantes is not None and (publico_base is None or pagantes <= publico_base):
             row["publico_pagante"] = pagantes
+        elif str(item.get("pagantes_status") or "") == "nao_divulgado":
+            row.pop("publico_pagante", None)
+
         renda = item.get("renda")
         try:
             renda_num = float(renda)
@@ -436,13 +452,18 @@ def aplicar_dados_adicionais_publico(
             renda_num = 0.0
         if renda_num > 0:
             row["renda"] = int(renda_num) if renda_num.is_integer() else round(renda_num, 2)
+        elif str(item.get("renda_status") or "") == "nao_divulgado":
+            row.pop("renda", None)
+
         fonte_extra = str(item.get("fonte_adicional") or "").strip()
         if fonte_extra:
             row["dados_publico_fonte_adicional"] = fonte_extra
-        depois = (row.get("publico_pagante"), row.get("renda"), row.get("dados_publico_fonte_adicional"))
+        depois = (
+            row.get("publico"), row.get("publico_fonte"), row.get("publico_tipo"),
+            row.get("publico_pagante"), row.get("renda"), row.get("dados_publico_fonte_adicional"),
+        )
         alterados += int(depois != antes)
     return alterados
-
 
 def parse_estadio(summary: dict[str, Any], jogo: dict[str, Any]) -> str:
     paths = [

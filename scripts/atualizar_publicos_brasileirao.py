@@ -135,6 +135,35 @@ def numero_publico(valor: Any) -> int | None:
     return n if 100 <= n <= 250000 else None
 
 
+def numero_renda(valor: Any) -> int | float | None:
+    """Normaliza valores monetários brasileiros sem inventar centavos."""
+    if isinstance(valor, bool):
+        return None
+    if isinstance(valor, (int, float)):
+        n = float(valor)
+    else:
+        raw = str(valor or "").strip()
+        if not raw or "nao divulg" in normalizar(raw):
+            return None
+        raw = re.sub(r"(?i)r\$", "", raw).strip().replace(" ", "")
+        if not raw:
+            return None
+        if "," in raw:
+            raw = raw.replace(".", "").replace(",", ".")
+        elif raw.count(".") >= 1:
+            partes = raw.split(".")
+            if all(part.isdigit() for part in partes) and all(len(part) == 3 for part in partes[1:]):
+                raw = "".join(partes)
+        raw = re.sub(r"[^0-9.]", "", raw)
+        try:
+            n = float(raw)
+        except (TypeError, ValueError):
+            return None
+    if not (0 < n < 100_000_000):
+        return None
+    return int(n) if n.is_integer() else round(n, 2)
+
+
 def jogo_finalizado(jogo: dict[str, Any]) -> bool:
     return str(jogo.get("estado") or "").lower() == "post" and jogo.get("placar_mandante") is not None and jogo.get("placar_visitante") is not None
 
@@ -225,53 +254,79 @@ RE_JOGO = re.compile(
     flags=re.IGNORECASE,
 )
 RE_PUBLICO_PRESENTE = re.compile(r"^P[uú]blico\s+(?:presente|total)\s*:\s*(.+)$", flags=re.IGNORECASE)
+RE_PUBLICO_PAGANTE = re.compile(r"^P[uú]blico\s+pagante\s*:\s*(.+)$", flags=re.IGNORECASE)
+RE_RENDA = re.compile(r"^Renda(?:\s+(?:bruta|l[ií]quida))?\s*:\s*(.+)$", flags=re.IGNORECASE)
 
 
 def parse_artigo_ge(conteudo: str) -> list[dict[str, Any]]:
+    """Extrai público presente/total, pagantes e renda por partida da matéria do ge."""
     linhas = html_para_linhas(conteudo)
     jogos: list[dict[str, Any]] = []
     for i, linha in enumerate(linhas):
         m = RE_JOGO.match(linha)
         if not m:
             continue
-        # Evita confundir títulos/frases longas com uma ficha de jogo.
         casa = re.sub(r"\s+", " ", m.group("casa")).strip()
         fora = re.sub(r"\s+", " ", m.group("fora")).strip()
         if len(casa) > 45 or len(fora) > 45:
             continue
         publico: int | None = None
+        pagantes: int | None = None
+        renda: int | float | None = None
         tipo = ""
-        for prox in linhas[i + 1 : i + 12]:
-            # Ao encontrar outra partida, encerra o bloco atual.
+        publico_status = ""
+        pagantes_status = ""
+        renda_status = ""
+        for prox in linhas[i + 1 : i + 16]:
             if RE_JOGO.match(prox):
                 break
             pm = RE_PUBLICO_PRESENTE.match(prox)
             if pm:
                 publico = numero_publico(pm.group(1))
+                publico_status = "divulgado" if publico is not None else "nao_divulgado"
                 tipo = "presente" if publico is not None else "nao_divulgado"
-                break
+                continue
+            pg = RE_PUBLICO_PAGANTE.match(prox)
+            if pg:
+                pagantes = numero_publico(pg.group(1))
+                pagantes_status = "divulgado" if pagantes is not None else "nao_divulgado"
+                continue
+            rm = RE_RENDA.match(prox)
+            if rm:
+                renda = numero_renda(rm.group(1))
+                renda_status = "divulgado" if renda is not None else "nao_divulgado"
+                continue
         jogos.append({
             "mandante": casa,
             "visitante": fora,
             "placar_mandante": int(m.group("gc")),
             "placar_visitante": int(m.group("gf")),
             "publico": publico,
+            "pagantes": pagantes,
+            "renda": renda,
             "tipo": tipo,
+            "publico_status": publico_status,
+            "pagantes_status": pagantes_status,
+            "renda_status": renda_status,
         })
-    # Remove repetições causadas por conteúdo duplicado no HTML/JSON.
     unicos: dict[tuple[str, str, int, int], dict[str, Any]] = {}
     for item in jogos:
-        chave = (
-            time_canonico(item["mandante"]),
-            time_canonico(item["visitante"]),
-            int(item["placar_mandante"]),
-            int(item["placar_visitante"]),
-        )
+        chave = (time_canonico(item["mandante"]), time_canonico(item["visitante"]), int(item["placar_mandante"]), int(item["placar_visitante"]))
         anterior = unicos.get(chave)
-        if anterior is None or (anterior.get("publico") is None and item.get("publico") is not None):
+        if anterior is None:
             unicos[chave] = item
+            continue
+        combinado = dict(anterior)
+        for campo in ("publico", "pagantes", "renda"):
+            if combinado.get(campo) is None and item.get(campo) is not None:
+                combinado[campo] = item.get(campo)
+        for campo in ("publico_status", "pagantes_status", "renda_status"):
+            if not combinado.get(campo) and item.get(campo):
+                combinado[campo] = item.get(campo)
+        if not combinado.get("tipo") and item.get("tipo"):
+            combinado["tipo"] = item.get("tipo")
+        unicos[chave] = combinado
     return list(unicos.values())
-
 
 def buscar_html(url: str, timeout: int = 22, tentativas: int = 2) -> str:
     erros: list[str] = []
@@ -425,18 +480,14 @@ def _chave_item_artigo(item: dict[str, Any]) -> tuple[str, str, int, int] | None
 
 
 def mesclar_itens_artigos(fontes_parseadas: list[tuple[str, list[dict[str, Any]]]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """Mescla HTML normal/AMP, preferindo versão que efetivamente publicou o público.
-
-    Se duas variantes trouxerem números diferentes para a mesma partida, o valor é
-    bloqueado e o conflito vai para a auditoria; não escolhemos um número no escuro.
-    """
+    """Mescla normal/AMP campo a campo e bloqueia somente divergências reais."""
     merged: dict[tuple[str, str, int, int], dict[str, Any]] = {}
     conflitos: list[dict[str, Any]] = []
-    bloqueadas: set[tuple[str, str, int, int]] = set()
+    campos_bloqueados: dict[tuple[str, str, int, int], set[str]] = defaultdict(set)
     for fonte_url, itens in fontes_parseadas:
         for bruto in itens:
             chave = _chave_item_artigo(bruto)
-            if chave is None or chave in bloqueadas:
+            if chave is None:
                 continue
             item = dict(bruto)
             item["_fonte_url"] = fonte_url
@@ -444,21 +495,28 @@ def mesclar_itens_artigos(fontes_parseadas: list[tuple[str, list[dict[str, Any]]
             if anterior is None:
                 merged[chave] = item
                 continue
-            velho = numero_publico(anterior.get("publico"))
-            novo = numero_publico(item.get("publico"))
-            if velho is None and novo is not None:
-                merged[chave] = item
-            elif velho is not None and novo is not None and velho != novo:
-                conflitos.append({
-                    "tipo": "divergencia_variantes_ge",
-                    "partida": list(chave),
-                    "valor_1": velho,
-                    "fonte_1": anterior.get("_fonte_url"),
-                    "valor_2": novo,
-                    "fonte_2": fonte_url,
-                })
-                merged.pop(chave, None)
-                bloqueadas.add(chave)
+            combinado = dict(anterior)
+            for campo, normalizador in (("publico", numero_publico), ("pagantes", numero_publico), ("renda", numero_renda)):
+                if campo in campos_bloqueados[chave]:
+                    continue
+                velho = normalizador(anterior.get(campo))
+                novo = normalizador(item.get(campo))
+                if velho is None and novo is not None:
+                    combinado[campo] = item.get(campo)
+                    combinado["_fonte_url"] = fonte_url
+                elif velho is not None and novo is not None and velho != novo:
+                    conflitos.append({
+                        "tipo": "divergencia_variantes_ge",
+                        "campo": campo,
+                        "partida": list(chave),
+                        "valor_1": velho,
+                        "fonte_1": anterior.get("_fonte_url"),
+                        "valor_2": novo,
+                        "fonte_2": fonte_url,
+                    })
+                    combinado[campo] = None
+                    campos_bloqueados[chave].add(campo)
+            merged[chave] = combinado
     return list(merged.values()), conflitos
 
 
@@ -517,32 +575,92 @@ def _fonte_rodada_existente(payload: dict[str, Any], rodada: int) -> str:
 def _registrar_complemento(
     mapa: dict[str, dict[str, Any]],
     event_id: str,
-    publico: int,
+    publico: int | None,
     fonte: str,
     *,
     tipo: str = "presente",
     origem: str = "ge/Gato Mestre",
+    pagantes: int | None = None,
+    renda: int | float | None = None,
+    publico_status: str = "",
+    pagantes_status: str = "",
+    renda_status: str = "",
+    fonte_adicional: str = "",
 ) -> tuple[bool, dict[str, Any] | None]:
-    atual = mapa.get(event_id)
-    valor_atual = complemento_valido(atual)
-    if valor_atual is not None:
-        if valor_atual == publico:
-            return False, None
-        return False, {
-            "event_id": event_id,
-            "existente": valor_atual,
-            "novo": publico,
-            "fonte_existente": str((atual or {}).get("fonte") or ""),
-            "fonte_nova": fonte,
-        }
-    mapa[event_id] = {
-        "publico": int(publico),
-        "tipo": tipo,
-        "fonte": fonte,
-        "origem": origem,
-    }
-    return True, None
+    """Registra campos documentais de forma independente.
 
+    O público presente/total só é gravado quando a fonte o fornece como tal;
+    pagantes e renda podem ser preservados mesmo quando o total não foi divulgado.
+    """
+    atual = dict(mapa.get(event_id) or {})
+    novo = dict(atual)
+    mudou = False
+    conflito: dict[str, Any] | None = None
+
+    publico_ok = numero_publico(publico)
+    valor_atual = complemento_valido(atual)
+    if publico_ok is not None:
+        if valor_atual is not None and valor_atual != publico_ok:
+            conflito = {
+                "event_id": event_id,
+                "existente": valor_atual,
+                "novo": publico_ok,
+                "fonte_existente": str(atual.get("fonte") or ""),
+                "fonte_nova": fonte,
+            }
+        else:
+            campos = {"publico": int(publico_ok), "tipo": tipo or "presente", "fonte": fonte, "origem": origem}
+            for chave, valor in campos.items():
+                if novo.get(chave) != valor:
+                    novo[chave] = valor
+                    mudou = True
+    elif publico_status == "nao_divulgado" and novo.get("publico_status") != "nao_divulgado":
+        novo["publico_status"] = "nao_divulgado"
+        mudou = True
+
+    pag = numero_publico(pagantes)
+    base = publico_ok or complemento_valido(novo)
+    if pag is not None and (base is None or pag <= base):
+        if novo.get("pagantes") != pag:
+            novo["pagantes"] = pag
+            mudou = True
+        if novo.get("pagantes_status") != "divulgado":
+            novo["pagantes_status"] = "divulgado"
+            mudou = True
+    elif pagantes_status == "nao_divulgado" and pag is None and novo.get("pagantes") is None:
+        if novo.get("pagantes_status") != "nao_divulgado":
+            novo["pagantes_status"] = "nao_divulgado"
+            mudou = True
+
+    renda_ok = numero_renda(renda)
+    if renda_ok is not None:
+        if novo.get("renda") != renda_ok:
+            novo["renda"] = renda_ok
+            mudou = True
+        if novo.get("renda_status") != "divulgado":
+            novo["renda_status"] = "divulgado"
+            mudou = True
+    elif renda_status == "nao_divulgado" and novo.get("renda") is None:
+        if novo.get("renda_status") != "nao_divulgado":
+            novo["renda_status"] = "nao_divulgado"
+            mudou = True
+
+    if publico_status == "divulgado" and publico_ok is not None and novo.get("publico_status") != "divulgado":
+        novo["publico_status"] = "divulgado"
+        mudou = True
+    if fonte_adicional and novo.get("fonte_adicional") != fonte_adicional:
+        novo["fonte_adicional"] = fonte_adicional
+        mudou = True
+    if mudou:
+        if fonte and not novo.get("fonte"):
+            novo["fonte"] = fonte
+        if origem and not novo.get("origem"):
+            novo["origem"] = origem
+
+    # Não cria entradas vazias só para marcar uma tentativa sem dados.
+    if mudou and any(novo.get(k) not in (None, "") for k in ("publico", "pagantes", "renda", "publico_status", "pagantes_status", "renda_status")):
+        mapa[event_id] = novo
+    return mudou, conflito
 
 def propagar_duplicados(
     resultados: list[dict[str, Any]],
@@ -576,6 +694,8 @@ def propagar_duplicados(
         publico, fonte, tipo, origem = conhecidos[0]
         for jogo in jogos:
             eid = str(jogo.get("event_id") or "")
+            if complemento_valido(mapa.get(eid)) is not None:
+                continue
             mudou, conflito = _registrar_complemento(mapa, eid, publico, fonte, tipo=tipo, origem=origem)
             alteracoes += int(mudou)
             if conflito:
@@ -606,7 +726,16 @@ def executar_coleta(
         eid = str(jogo.get("event_id") or "")
         return numero_publico((detalhes_jogos.get(eid) or {}).get("publico")) is not None or complemento_valido(mapa.get(eid)) is not None
 
-    pendentes = [j for j in finalizados if not tem_publico(j)]
+    def precisa_enriquecimento(jogo: dict[str, Any]) -> bool:
+        eid = str(jogo.get("event_id") or "")
+        d = detalhes_jogos.get(eid) or {}
+        comp = mapa.get(eid) or {}
+        tem_presente = tem_publico(jogo) or str(comp.get("publico_status") or "") == "nao_divulgado"
+        tem_pagantes = numero_publico(d.get("publico_pagante")) is not None or numero_publico(comp.get("pagantes")) is not None or str(comp.get("pagantes_status") or "") == "nao_divulgado"
+        tem_renda = numero_renda(d.get("renda")) is not None or numero_renda(comp.get("renda")) is not None or str(comp.get("renda_status") or "") == "nao_divulgado"
+        return not (tem_presente and tem_pagantes and tem_renda)
+
+    pendentes = [j for j in finalizados if precisa_enriquecimento(j)]
     rodadas_pendentes = sorted({int(j.get("rodada") or 0) for j in pendentes if int(j.get("rodada") or 0) > 0}, reverse=True)
     if max_rodadas > 0:
         rodadas_pendentes = rodadas_pendentes[:max_rodadas]
@@ -674,16 +803,25 @@ def executar_coleta(
                 }
             for jogo in jogos_rodada:
                 eid = str(jogo.get("event_id") or "")
-                if complemento_valido(mapa.get(eid)) is not None:
-                    continue
                 item = next((x for x in artigo_itens if _match_artigo_resultado(x, jogo)), None)
                 if not item:
                     continue
-                publico = numero_publico(item.get("publico"))
-                if publico is None:
+                publico_artigo = numero_publico(item.get("publico"))
+                pagantes_artigo = numero_publico(item.get("pagantes"))
+                renda_artigo = numero_renda(item.get("renda"))
+                statuses = (str(item.get("publico_status") or ""), str(item.get("pagantes_status") or ""), str(item.get("renda_status") or ""))
+                if publico_artigo is None and pagantes_artigo is None and renda_artigo is None and not any(statuses):
                     continue
                 fonte_item = str(item.get("_fonte_url") or url_encontrada)
-                mudou, conflito = _registrar_complemento(mapa, eid, publico, fonte_item)
+                mudou, conflito = _registrar_complemento(
+                    mapa, eid, publico_artigo, fonte_item,
+                    pagantes=pagantes_artigo,
+                    renda=renda_artigo,
+                    publico_status=statuses[0],
+                    pagantes_status=statuses[1],
+                    renda_status=statuses[2],
+                    fonte_adicional="Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+                )
                 inseridos += int(mudou)
                 if conflito:
                     conflitos.append(conflito)
@@ -693,9 +831,9 @@ def executar_coleta(
     conflitos.extend(conflitos_dup)
 
     comentario = (
-        "Complemento de público presente para jogos em que a ESPN não trouxe o campo. "
-        "Coleta automática prioritária no ge/Gato Mestre; fontes documentais avulsas "
-        "podem ser mantidas para jogos remarcados ou ainda ausentes na matéria da rodada."
+        "Complemento documental de público presente, pagantes e renda. "
+        "Coleta automática prioritária no ge/Gato Mestre; público pagante nunca substitui "
+        "público presente e fontes avulsas podem cobrir jogos remarcados."
     )
     houve_mudanca_payload = (
         payload.get("_comentario") != comentario
@@ -763,13 +901,30 @@ def executar_coleta(
                 "placar": f"{jogo.get('placar_mandante')} x {jogo.get('placar_visitante')}",
             })
 
+    jogos_com_pagantes = 0
+    jogos_com_renda = 0
+    for jogo in finalizados:
+        eid = str(jogo.get("event_id") or "")
+        d = detalhes_jogos.get(eid) or {}
+        comp = mapa.get(eid) or {}
+        publico_base = numero_publico(d.get("publico")) or complemento_valido(comp)
+        pag = numero_publico(d.get("publico_pagante")) or numero_publico(comp.get("pagantes"))
+        if pag is not None and publico_base is not None and pag <= publico_base:
+            jogos_com_pagantes += 1
+        if numero_renda(d.get("renda")) is not None or numero_renda(comp.get("renda")) is not None:
+            jogos_com_renda += 1
+
     audit = {
         "gerado_em": iso_agora_brt(),
-        "fonte_automatica": "ge/Gato Mestre (público presente/total; nunca pagantes como substituto)",
+        "fonte_automatica": "ge/Gato Mestre (presente/total, pagantes e renda; pagantes nunca substituem público presente)",
         "total_jogos_finalizados": len(finalizados),
         "total_com_publico_ou_complemento": len(finalizados) - len(sem_publico),
         "total_sem_publico": len(sem_publico),
         "sem_publico": sem_publico,
+        "total_com_publico_pagante": jogos_com_pagantes,
+        "total_sem_publico_pagante": len(finalizados) - jogos_com_pagantes,
+        "total_com_renda": jogos_com_renda,
+        "total_sem_renda": len(finalizados) - jogos_com_renda,
         "total_partidas_fisicas": len(grupos_fisicos),
         "total_partidas_fisicas_com_publico": len(grupos_fisicos) - len(partidas_fisicas_sem_publico),
         "total_partidas_fisicas_sem_publico": len(partidas_fisicas_sem_publico),
@@ -789,11 +944,13 @@ def propagar_publicos_para_detalhes(
     detalhes: dict[str, Any],
     complementos: dict[str, Any],
 ) -> tuple[dict[str, Any], int, list[dict[str, Any]]]:
-    """Propaga público e metadados documentais em jogos-detalhes, sem rede.
+    """Propaga dados documentais de público para jogos-detalhes, sem rede.
 
-    Regra conservadora: nunca substitui um público já informado por número
-    diferente; pagantes/renda só acompanham um complemento cujo público
-    presente seja compatível. Divergências são auditadas para revisão manual.
+    Quando o complemento identifica explicitamente público presente/total, ele é
+    autoritativo para a semântica desse campo e pode corrigir um número da ESPN
+    que, em alguns jogos, corresponde na prática apenas aos pagantes. Pagantes e
+    renda são independentes; ausências explicitamente documentadas removem
+    valores antigos que não tenham a mesma garantia semântica.
     """
     saida = dict(detalhes) if isinstance(detalhes, dict) else {}
     jogos_antigos = saida.get("jogos") if isinstance(saida.get("jogos"), dict) else {}
@@ -806,52 +963,58 @@ def propagar_publicos_para_detalhes(
     for event_id, comp in mapa.items():
         if not isinstance(comp, dict) or str(event_id) not in jogos:
             continue
-        publico = numero_publico(comp.get("publico"))
-        if publico is None:
-            continue
         row = jogos[str(event_id)]
-        atual = numero_publico(row.get("publico"))
-        if atual is not None and atual != publico:
-            conflitos.append({
-                "event_id": str(event_id),
-                "publico_detalhes": atual,
-                "publico_complementar": publico,
-                "fonte_detalhes": str(row.get("publico_fonte") or ""),
-                "fonte_complementar": str(comp.get("fonte") or ""),
-            })
-            continue
+        publico = numero_publico(comp.get("publico"))
+        fonte = str(comp.get("fonte") or comp.get("origem") or "complemento documental")
+        tipo = str(comp.get("tipo") or "presente")
+
+        if publico is not None:
+            atual = numero_publico(row.get("publico"))
+            if atual is not None and atual != publico:
+                conflitos.append({
+                    "event_id": str(event_id),
+                    "publico_detalhes_anterior": atual,
+                    "publico_documental": publico,
+                    "fonte_detalhes_anterior": str(row.get("publico_fonte") or ""),
+                    "fonte_documental": fonte,
+                    "acao": "corrigido_para_publico_presente_documentado",
+                })
+            for chave, valor in (("publico", publico), ("publico_fonte", fonte), ("publico_tipo", tipo)):
+                if row.get(chave) != valor:
+                    row[chave] = valor
+                    alteracoes += 1
+
+        base_publico = numero_publico(row.get("publico"))
         pagantes = numero_publico(comp.get("pagantes"))
-        if pagantes is not None and pagantes <= publico and row.get("publico_pagante") != pagantes:
-            row["publico_pagante"] = pagantes
+        if pagantes is not None and (base_publico is None or pagantes <= base_publico):
+            if row.get("publico_pagante") != pagantes:
+                row["publico_pagante"] = pagantes
+                alteracoes += 1
+        elif str(comp.get("pagantes_status") or "") == "nao_divulgado" and "publico_pagante" in row:
+            row.pop("publico_pagante", None)
             alteracoes += 1
-        renda = comp.get("renda")
-        try:
-            renda_num = float(renda)
-        except (TypeError, ValueError):
-            renda_num = 0.0
-        renda_normalizada = int(renda_num) if renda_num > 0 and renda_num.is_integer() else round(renda_num, 2) if renda_num > 0 else None
-        if renda_normalizada is not None and row.get("renda") != renda_normalizada:
-            row["renda"] = renda_normalizada
+
+        renda_normalizada = numero_renda(comp.get("renda"))
+        if renda_normalizada is not None:
+            if row.get("renda") != renda_normalizada:
+                row["renda"] = renda_normalizada
+                alteracoes += 1
+        elif str(comp.get("renda_status") or "") == "nao_divulgado" and "renda" in row:
+            row.pop("renda", None)
             alteracoes += 1
+
         fonte_extra = str(comp.get("fonte_adicional") or "").strip()
         if fonte_extra and row.get("dados_publico_fonte_adicional") != fonte_extra:
             row["dados_publico_fonte_adicional"] = fonte_extra
             alteracoes += 1
-        if atual is not None:
-            continue
-        row["publico"] = publico
-        row["publico_fonte"] = str(comp.get("fonte") or comp.get("origem") or "complemento documental")
-        row["publico_tipo"] = str(comp.get("tipo") or "presente")
-        alteracoes += 1
 
     if alteracoes:
         saida["jogos"] = jogos
         saida["total_com_publico"] = sum(1 for row in jogos.values() if numero_publico(row.get("publico")) is not None)
-        # Não reescrevemos contadores de estatísticas/eventos: esta operação só
-        # propaga público. O timestamp sinaliza ao front que o JSON mudou.
+        saida["total_com_publico_pagante"] = sum(1 for row in jogos.values() if numero_publico(row.get("publico_pagante")) is not None)
+        saida["total_com_renda"] = sum(1 for row in jogos.values() if numero_renda(row.get("renda")) is not None)
         saida["gerado_em"] = iso_agora_brt()
     return saida, alteracoes, conflitos
-
 
 def self_test() -> None:
     fixture = r'''<!doctype html><html><body>
@@ -910,7 +1073,7 @@ def self_test() -> None:
         (normal, [{**base, "publico": 12000}]),
         (amp, [{**base, "publico": 12266}]),
     ])
-    assert not itens_conf and len(conflitos_merge) == 1
+    assert len(itens_conf) == 1 and itens_conf[0]["publico"] is None and len(conflitos_merge) == 1
 
     detalhes_fixture = {
         "gerado_em": "antes",
@@ -925,8 +1088,8 @@ def self_test() -> None:
         "y": {"publico": 13000, "tipo": "presente", "fonte": "ge"},
     }}
     detalhes_novos, n_prop, conf_prop = propagar_publicos_para_detalhes(detalhes_fixture, comp_fixture)
-    assert n_prop == 1 and detalhes_novos["jogos"]["x"]["publico"] == 15000
-    assert detalhes_novos["jogos"]["y"]["publico"] == 12000 and len(conf_prop) == 1
+    assert n_prop >= 2 and detalhes_novos["jogos"]["x"]["publico"] == 15000
+    assert detalhes_novos["jogos"]["y"]["publico"] == 13000 and len(conf_prop) == 1
 
     sitemap_fixture = """<?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -947,11 +1110,20 @@ def self_test() -> None:
     complemento_invalido = {"jogos": {"x": {"publico": 16772, "pagantes": 18000}}}
     propagado_invalido, _, conflitos_invalido = propagar_publicos_para_detalhes(detalhes_invalido, complemento_invalido)
     assert not conflitos_invalido and "publico_pagante" not in propagado_invalido["jogos"]["x"]
+    fixture_financeiro = """<h2>Time A 2 x 1 Time B (Estádio)</h2><p>Público pagante: 12.345</p><p>Público presente: 13.000</p><p>Renda: R$ 1.234.567,89</p>"""
+    parsed_financeiro = parse_artigo_ge(fixture_financeiro)
+    assert len(parsed_financeiro) == 1
+    assert parsed_financeiro[0]["publico"] == 13000 and parsed_financeiro[0]["pagantes"] == 12345
+    assert parsed_financeiro[0]["renda"] == 1234567.89
+    fixture_nao_divulgado = """<h2>Time A 0 x 0 Time B</h2><p>Público pagante: não divulgado</p><p>Público presente: 10.000</p><p>Renda líquida: R$ 500.000</p>"""
+    parsed_nd = parse_artigo_ge(fixture_nao_divulgado)[0]
+    assert parsed_nd["pagantes"] is None and parsed_nd["renda"] == 500000
+    assert numero_renda("R$ 473.220,00") == 473220 and numero_renda("R$ 785.419,30") == 785419.30
     print("SELF-TEST OK: parser GE, sitemap dinâmico, normal+AMP, público presente/total, renda/pagantes documentados, bloqueio de pagantes, aliases, duplicados e conflitos.")
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Atualiza público presente complementar do Brasileirão.")
+    parser = argparse.ArgumentParser(description="Atualiza público presente, pagantes e renda do Brasileirão.")
     parser.add_argument("--self-test", action="store_true", help="Executa testes internos sem rede.")
     parser.add_argument("--dry-run", action="store_true", help="Executa coleta/auditoria sem gravar arquivos.")
     parser.add_argument("--sem-rede", action="store_true", help="Somente consolida/propaga os complementos já gravados.")

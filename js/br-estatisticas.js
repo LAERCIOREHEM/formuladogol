@@ -500,9 +500,9 @@
       <div class="stats-game-body">
         <div class="stats-game-info-grid">
           <div><span>Estádio</span><strong>${escapeHtml(detail.estadio || game.estadio || "Não informado")}</strong></div>
-          <div><span>Público presente</span><strong>${Number.isFinite(crowd) && crowd > 0 ? integer(crowd) : "Não informado"}</strong></div>
-          ${Number.isFinite(paidCrowd) && paidCrowd > 0 ? `<div><span>Público pagante</span><strong>${integer(paidCrowd)}</strong></div>` : ""}
-          ${Number.isFinite(revenue) && revenue > 0 ? `<div><span>Renda</span><strong>${escapeHtml(moneyBR(revenue))}</strong></div>` : ""}
+          <div><span>Público presente</span><strong>${Number.isFinite(crowd) && crowd > 0 ? integer(crowd) : "Não divulgado"}</strong></div>
+          <div><span>Público pagante</span><strong>${Number.isFinite(paidCrowd) && paidCrowd > 0 ? integer(paidCrowd) : "Não divulgado"}</strong></div>
+          <div><span>Renda</span><strong>${Number.isFinite(revenue) && revenue > 0 ? escapeHtml(moneyBR(revenue)) : "Não divulgada"}</strong></div>
           <div><span>Árbitro</span><strong>${escapeHtml(detail.arbitro || "Não informado")}</strong></div>
         </div>
         ${(goals.length || cards.length) ? `<div class="stats-match-events">
@@ -904,7 +904,8 @@
       return;
     }
     const metric = performanceMetricConfig(state.rankingMetric);
-    target.innerHTML = `${performanceFilterControls()}${rankingComparePanel(ranking)}<div class="stats-performance-list">${ranking.map((club, index) => `<article class="stats-performance-card">
+    const rankingUpdated = dateTimeCompactBR(state.ranking?.atualizado_em);
+    target.innerHTML = `<div class="stats-data-status">Atualizado ${escapeHtml(rankingUpdated)}</div>${performanceFilterControls()}${rankingComparePanel(ranking)}<div class="stats-performance-list">${ranking.map((club, index) => `<article class="stats-performance-card">
       <div class="stats-performance-head">
         <span class="stats-rank">${integer(index + 1)}</span>
         <a class="stats-performance-club-link" href="${escapeAttr(clubHref(club.time))}" title="Abrir página de ${escapeAttr(club.time)}" aria-label="Abrir página de ${escapeAttr(club.time)}">${shield(club, "stats-performance-shield")}</a>

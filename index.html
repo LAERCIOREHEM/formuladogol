@@ -3425,9 +3425,12 @@ function htmlResumoResultadoDetalhes(j) {
   const renda = Number(det.renda);
   const partes = [];
   if (estadio) partes.push(`<span>📍 ${brEscapeHtml(estadio)}</span>`);
-  if (Number.isFinite(publico) && publico > 0) partes.push(`<span>👥 ${publico.toLocaleString('pt-BR')} presentes</span>`);
-  if (Number.isFinite(pagantes) && pagantes > 0) partes.push(`<span>🎟️ ${pagantes.toLocaleString('pt-BR')} pagantes</span>`);
-  if (Number.isFinite(renda) && renda > 0) partes.push(`<span>💰 ${brEscapeHtml(formatarDinheiroBR(renda))}</span>`);
+  const temDadosPublico = [publico, pagantes, renda].some((v) => Number.isFinite(v) && v > 0);
+  if (temDadosPublico) {
+    partes.push(`<span>👥 ${Number.isFinite(publico) && publico > 0 ? `${publico.toLocaleString('pt-BR')} presentes` : 'público presente não divulgado'}</span>`);
+    partes.push(`<span>🎟️ ${Number.isFinite(pagantes) && pagantes > 0 ? `${pagantes.toLocaleString('pt-BR')} pagantes` : 'pagantes não divulgados'}</span>`);
+    partes.push(`<span>💰 ${Number.isFinite(renda) && renda > 0 ? brEscapeHtml(formatarDinheiroBR(renda)) : 'renda não divulgada'}</span>`);
+  }
   if (!partes.length) return '';
   return `<div class="resultado-info-compacta">${partes.join('')}</div>`;
 }
@@ -3469,9 +3472,9 @@ function htmlEstatisticasJogo(j) {
   }).join('');
   const info = `<div class="match-info-grid">
     <div><span>Estádio</span><strong>${brEscapeHtml(det.estadio || j.estadio || 'Não informado')}</strong></div>
-    <div><span>Público presente</span><strong>${Number.isFinite(publico) && publico > 0 ? publico.toLocaleString('pt-BR') : 'Não informado'}</strong></div>
-    ${Number.isFinite(pagantes) && pagantes > 0 ? `<div><span>Público pagante</span><strong>${pagantes.toLocaleString('pt-BR')}</strong></div>` : ''}
-    ${Number.isFinite(renda) && renda > 0 ? `<div><span>Renda</span><strong>${brEscapeHtml(formatarDinheiroBR(renda))}</strong></div>` : ''}
+    <div><span>Público presente</span><strong>${Number.isFinite(publico) && publico > 0 ? publico.toLocaleString('pt-BR') : 'Não divulgado'}</strong></div>
+    <div><span>Público pagante</span><strong>${Number.isFinite(pagantes) && pagantes > 0 ? pagantes.toLocaleString('pt-BR') : 'Não divulgado'}</strong></div>
+    <div><span>Renda</span><strong>${Number.isFinite(renda) && renda > 0 ? brEscapeHtml(formatarDinheiroBR(renda)) : 'Não divulgada'}</strong></div>
     <div><span>Árbitro</span><strong>${brEscapeHtml(det.arbitro || 'Não informado')}</strong></div>
   </div>`;
   const events = (gols.length || cartoes.length) ? `<div class="match-event-grid">

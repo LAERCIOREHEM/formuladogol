@@ -1439,17 +1439,27 @@
     '</div>';
   }
 
+  function competitionPhrase(g) {
+    const competition = String(g.competitionShort || "competição").trim();
+    const key = String(g.competitionKey || "").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+    if (key === "brasileirao" || /brasileir[aã]o/i.test(competition)) return { label: competition, inCompetition: `pelo ${competition}` };
+    if (["copa_brasil", "copa_do_brasil"].includes(key) || /copa do brasil/i.test(competition)) return { label: competition, inCompetition: `pela ${competition}` };
+    if (key === "libertadores" || /libertadores/i.test(competition)) return { label: competition, inCompetition: `pela ${competition}` };
+    if (["sul_americana", "sulamericana"].includes(key) || /sul[- ]?americana/i.test(competition)) return { label: competition, inCompetition: `pela ${competition}` };
+    return { label: competition, inCompetition: competition === "competição" ? "na competição" : `em ${competition}` };
+  }
+
   function simpleMessage(g) {
     const s = gameState(g);
-    const competition = g.competitionShort || "competição";
-    if (s.key === "live") return "Bola rolando pela " + competition + "!";
-    if (s.key === "post") return "Fim de jogo pela " + competition + ".";
+    const competition = competitionPhrase(g);
+    if (s.key === "live") return `Bola rolando ${competition.inCompetition}!`;
+    if (s.key === "post") return `Fim de jogo ${competition.inCompetition}.`;
     if (s.key === "postponed") return "A partida aguarda nova definição oficial.";
     if (!g.date) return "Data e horário ainda serão confirmados.";
     const diff = g.date.getTime() - Date.now();
-    if (diff <= 20 * 60000 && diff > 0) return "Tá quase na hora. Prepare a torcida!";
+    if (diff <= 20 * 60000 && diff > 0) return "Contagem regressiva: falta pouco para a bola rolar!";
     const today = dateKey(g.date) === dateKey(new Date());
-    return today ? "Hoje tem " + competition + "!" : "Próximo compromisso pela " + competition + ".";
+    return today ? `Hoje tem ${competition.label}!` : `Próximo compromisso ${competition.inCompetition}.`;
   }
 
   function countdownText(g) {
