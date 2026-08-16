@@ -1,17 +1,16 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-08-15",
-  "executado_em": "2026-08-15T08:54:58-03:00",
+  "data_brt": "2026-08-16",
+  "executado_em": "2026-08-16T08:55:32-03:00",
   "status": "critico",
-  "resumo": "Os dados finais de resultados, classificação e cálculos estão íntegros. Permanecem avisos não críticos sobre fontes de transmissão, uma ausência de estatísticas e dois jogos sem melhores momentos após o prazo de carência.",
+  "resumo": "A base determinística está íntegra nos itens críticos, mas há avisos de fontes de transmissão e um jogo sem estatísticas disponíveis.",
   "triagem": {
-    "data_hora_brt": "2026-08-15T08:54:58-03:00",
+    "data_hora_brt": "2026-08-16T08:55:32-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
       "avisos": [
-        "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
-        "2 jogo(s) sem melhores momentos após 24 h"
+        "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
       ],
       "indicadores": {
         "estatisticas_erros_criticos": 0,
@@ -21,29 +20,14 @@
         "jogos_sem_estatisticas": 1,
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
-        "melhores_momentos_mais_48h": 2,
+        "melhores_momentos_mais_48h": 0,
         "ultimo_sucesso_horas": 3.7
       }
     },
     "pendencias": {
       "publicos": [],
       "transmissoes": [],
-      "melhores_momentos_apos_24h": [
-        {
-          "event_id": "401879458",
-          "rodada": 0,
-          "mandante": "Botafogo",
-          "visitante": "Vitória",
-          "horas_desde_fim": 270.2
-        },
-        {
-          "event_id": "401879459",
-          "rodada": 0,
-          "mandante": "Bahia",
-          "visitante": "Chapecoense",
-          "horas_desde_fim": 270.2
-        }
-      ]
+      "melhores_momentos_apos_24h": []
     },
     "editoriais": {
       "rodada": {
@@ -115,16 +99,16 @@
               "posicao_projetada_depois": 1,
               "pontos_projetados_depois": 78,
               "titulo_antes": 77.53985,
-              "titulo_depois": 65.9154,
-              "titulo_delta": -11.624449999999996,
+              "titulo_depois": 65.8786,
+              "titulo_delta": -11.661249999999995,
               "libertadores_antes": 99.99845,
-              "libertadores_depois": 99.99675,
-              "libertadores_delta": -0.0016999999999995907,
+              "libertadores_depois": 99.997,
+              "libertadores_delta": -0.0014500000000055024,
               "sul_americana_antes": 0.00155,
-              "sul_americana_depois": 0.00325,
-              "sul_americana_delta": 0.0017,
+              "sul_americana_depois": 0.003,
+              "sul_americana_delta": 0.0014500000000000001,
               "sem_continental_antes": 0.0,
-              "sem_continental_depois": 0.0,
+              "sem_continental_depois": 1.1362438767648086e-16,
               "rebaixamento_antes": 0.0,
               "rebaixamento_depois": 0.0,
               "rebaixamento_delta": 0.0
@@ -140,16 +124,16 @@
               "posicao_projetada_depois": 2,
               "pontos_projetados_depois": 75,
               "titulo_antes": 21.92,
-              "titulo_depois": 32.74765,
-              "titulo_delta": 10.827649999999998,
+              "titulo_depois": 32.7765,
+              "titulo_delta": 10.856499999999997,
               "libertadores_antes": 99.88,
               "libertadores_depois": 99.945,
               "libertadores_delta": 0.06499999999999773,
               "sul_americana_antes": 0.1198,
-              "sul_americana_depois": 0.055,
-              "sul_americana_delta": -0.0648,
+              "sul_americana_depois": 0.05495,
+              "sul_americana_delta": -0.06485,
               "sem_continental_antes": 0.00020000000000454377,
-              "sem_continental_depois": 6.8209327075408055e-15,
+              "sem_continental_depois": 5.0000000006822365e-05,
               "rebaixamento_antes": 0.0,
               "rebaixamento_depois": 0.0,
               "rebaixamento_delta": 0.0
@@ -165,19 +149,19 @@
               "posicao_projetada_depois": 3,
               "pontos_projetados_depois": 64,
               "titulo_antes": 0.3566,
-              "titulo_depois": 1.1849,
-              "titulo_delta": 0.8283,
+              "titulo_depois": 1.19705,
+              "titulo_delta": 0.8404499999999999,
               "libertadores_antes": 83.8798,
-              "libertadores_depois": 93.3932,
-              "libertadores_delta": 9.51339999999999,
+              "libertadores_depois": 93.41735,
+              "libertadores_delta": 9.537549999999996,
               "sul_americana_antes": 15.8371,
-              "sul_americana_depois": 6.56695,
-              "sul_americana_delta": -9.27015,
+              "sul_americana_depois": 6.54385,
+              "sul_americana_delta": -9.29325,
               "sem_continental_antes": 0.28309999999999746,
-              "sem_continental_depois": 0.0398500000000066,
+              "sem_continental_depois": 0.038800000000001056,
               "rebaixamento_antes": 0.0066,
-              "rebaixamento_depois": 0.00035,
-              "rebaixamento_delta": -0.00625
+              "rebaixamento_depois": 0.00025,
+              "rebaixamento_delta": -0.00635
             },
             {
               "clube": "Fluminense",
@@ -190,19 +174,19 @@
               "posicao_projetada_depois": 4,
               "pontos_projetados_depois": 59,
               "titulo_antes": 0.0508,
-              "titulo_depois": 0.0564,
-              "titulo_delta": 0.005600000000000001,
+              "titulo_depois": 0.0552,
+              "titulo_delta": 0.004400000000000001,
               "libertadores_antes": 61.47185,
-              "libertadores_depois": 64.1002,
-              "libertadores_delta": 2.6283499999999975,
+              "libertadores_depois": 64.0662,
+              "libertadores_delta": 2.5943499999999915,
               "sul_americana_antes": 36.55435,
-              "sul_americana_depois": 34.41515,
-              "sul_americana_delta": -2.1392000000000024,
+              "sul_americana_depois": 34.4307,
+              "sul_americana_delta": -2.123649999999998,
               "sem_continental_antes": 1.9737999999999971,
-              "sem_continental_depois": 1.484650000000002,
+              "sem_continental_depois": 1.5031000000000034,
               "rebaixamento_antes": 0.11315,
-              "rebaixamento_depois": 0.06775,
-              "rebaixamento_delta": -0.045399999999999996
+              "rebaixamento_depois": 0.0746,
+              "rebaixamento_delta": -0.03855
             },
             {
               "clube": "Cruzeiro",
@@ -215,19 +199,19 @@
               "posicao_projetada_depois": 6,
               "pontos_projetados_depois": 57,
               "titulo_antes": 0.0085,
-              "titulo_depois": 0.02145,
-              "titulo_delta": 0.01295,
+              "titulo_depois": 0.0195,
+              "titulo_delta": 0.011,
               "libertadores_antes": 53.6286,
-              "libertadores_depois": 63.3924,
-              "libertadores_delta": 9.763800000000003,
+              "libertadores_depois": 63.3599,
+              "libertadores_delta": 9.731300000000005,
               "sul_americana_antes": 40.0404,
-              "sul_americana_depois": 33.81055,
-              "sul_americana_delta": -6.229849999999999,
+              "sul_americana_depois": 33.83535,
+              "sul_americana_delta": -6.20505,
               "sem_continental_antes": 6.331000000000003,
-              "sem_continental_depois": 2.7970499999999987,
+              "sem_continental_depois": 2.8047499999999985,
               "rebaixamento_antes": 0.98195,
-              "rebaixamento_depois": 0.2658,
-              "rebaixamento_delta": -0.7161500000000001
+              "rebaixamento_depois": 0.26805,
+              "rebaixamento_delta": -0.7139
             },
             {
               "clube": "Bahia",
@@ -240,19 +224,19 @@
               "posicao_projetada_depois": 8,
               "pontos_projetados_depois": 55,
               "titulo_antes": 0.0113,
-              "titulo_depois": 0.00475,
-              "titulo_delta": -0.006549999999999999,
+              "titulo_depois": 0.00515,
+              "titulo_delta": -0.006149999999999999,
               "libertadores_antes": 39.00235,
-              "libertadores_depois": 31.6685,
-              "libertadores_delta": -7.333849999999998,
+              "libertadores_depois": 31.69985,
+              "libertadores_delta": -7.302499999999998,
               "sul_americana_antes": 54.51395,
-              "sul_americana_depois": 60.07335,
-              "sul_americana_delta": 5.559399999999997,
+              "sul_americana_depois": 60.0825,
+              "sul_americana_delta": 5.568550000000002,
               "sem_continental_antes": 6.483699999999999,
-              "sem_continental_depois": 8.258150000000008,
+              "sem_continental_depois": 8.217649999999999,
               "rebaixamento_antes": 0.6489,
-              "rebaixamento_depois": 0.81215,
-              "rebaixamento_delta": 0.16325
+              "rebaixamento_depois": 0.8116,
+              "rebaixamento_delta": 0.16269999999999996
             },
             {
               "clube": "Corinthians",
@@ -265,19 +249,19 @@
               "posicao_projetada_depois": 7,
               "pontos_projetados_depois": 55,
               "titulo_antes": 0.0014,
-              "titulo_depois": 0.0062,
-              "titulo_delta": 0.0048,
+              "titulo_depois": 0.00785,
+              "titulo_delta": 0.006449999999999999,
               "libertadores_antes": 21.9793,
-              "libertadores_depois": 39.59105,
-              "libertadores_delta": 17.611750000000004,
+              "libertadores_depois": 39.60275,
+              "libertadores_delta": 17.623450000000002,
               "sul_americana_antes": 62.0827,
-              "sul_americana_depois": 54.32945,
-              "sul_americana_delta": -7.753250000000001,
+              "sul_americana_depois": 54.31285,
+              "sul_americana_delta": -7.769850000000005,
               "sem_continental_antes": 15.938000000000002,
-              "sem_continental_depois": 6.079499999999996,
+              "sem_continental_depois": 6.084400000000002,
               "rebaixamento_antes": 2.51305,
-              "rebaixamento_depois": 0.56085,
-              "rebaixamento_delta": -1.9522
+              "rebaixamento_depois": 0.57025,
+              "rebaixamento_delta": -1.9427999999999996
             },
             {
               "clube": "Bragantino",
@@ -290,19 +274,19 @@
               "posicao_projetada_depois": 10,
               "pontos_projetados_depois": 53,
               "titulo_antes": 0.016,
-              "titulo_depois": 0.00325,
-              "titulo_delta": -0.012750000000000001,
+              "titulo_depois": 0.0029,
+              "titulo_delta": -0.0131,
               "libertadores_antes": 43.1087,
-              "libertadores_depois": 25.6479,
-              "libertadores_delta": -17.4608,
+              "libertadores_depois": 25.5956,
+              "libertadores_delta": -17.513099999999998,
               "sul_americana_antes": 51.0221,
-              "sul_americana_depois": 62.68645,
-              "sul_americana_delta": 11.664349999999999,
+              "sul_americana_depois": 62.7458,
+              "sul_americana_delta": 11.723700000000001,
               "sem_continental_antes": 5.869199999999999,
-              "sem_continental_depois": 11.665650000000007,
+              "sem_continental_depois": 11.658599999999993,
               "rebaixamento_antes": 0.59205,
-              "rebaixamento_depois": 1.42105,
-              "rebaixamento_delta": 0.829
+              "rebaixamento_depois": 1.44015,
+              "rebaixamento_delta": 0.8481000000000001
             },
             {
               "clube": "Botafogo",
@@ -315,19 +299,19 @@
               "posicao_projetada_depois": 5,
               "pontos_projetados_depois": 58,
               "titulo_antes": 0.09045,
-              "titulo_depois": 0.0557,
-              "titulo_delta": -0.03475,
+              "titulo_depois": 0.05315,
+              "titulo_delta": -0.0373,
               "libertadores_antes": 68.41655,
-              "libertadores_depois": 60.0451,
-              "libertadores_delta": -8.371450000000003,
+              "libertadores_depois": 60.02055,
+              "libertadores_delta": -8.396,
               "sul_americana_antes": 29.83055,
-              "sul_americana_depois": 37.57625,
-              "sul_americana_delta": 7.745700000000003,
+              "sul_americana_depois": 37.61995,
+              "sul_americana_delta": 7.789400000000004,
               "sem_continental_antes": 1.7529000000000003,
-              "sem_continental_depois": 2.3786500000000004,
+              "sem_continental_depois": 2.359499999999997,
               "rebaixamento_antes": 0.12915,
-              "rebaixamento_depois": 0.16895,
-              "rebaixamento_delta": 0.0398
+              "rebaixamento_depois": 0.1673,
+              "rebaixamento_delta": 0.03815000000000002
             },
             {
               "clube": "Coritiba",
@@ -343,16 +327,16 @@
               "titulo_depois": 5e-05,
               "titulo_delta": -5e-05,
               "libertadores_antes": 4.36095,
-              "libertadores_depois": 5.7864,
-              "libertadores_delta": 1.4254500000000005,
+              "libertadores_depois": 5.82825,
+              "libertadores_delta": 1.4672999999999998,
               "sul_americana_antes": 47.3772,
-              "sul_americana_depois": 53.94475,
-              "sul_americana_delta": 6.567549999999997,
+              "sul_americana_depois": 53.8322,
+              "sul_americana_delta": 6.454999999999998,
               "sem_continental_antes": 48.261849999999995,
-              "sem_continental_depois": 40.26885,
+              "sem_continental_depois": 40.33955,
               "rebaixamento_antes": 14.8987,
-              "rebaixamento_depois": 9.91615,
-              "rebaixamento_delta": -4.98255
+              "rebaixamento_depois": 9.92655,
+              "rebaixamento_delta": -4.972149999999999
             },
             {
               "clube": "Atlético-MG",
@@ -365,19 +349,19 @@
               "posicao_projetada_depois": 9,
               "pontos_projetados_depois": 54,
               "titulo_antes": 0.00365,
-              "titulo_depois": 0.0035,
-              "titulo_delta": -0.00014999999999999996,
+              "titulo_depois": 0.0037,
+              "titulo_delta": 5.000000000000013e-05,
               "libertadores_antes": 48.16935,
-              "libertadores_depois": 47.34335,
-              "libertadores_delta": -0.8260000000000005,
+              "libertadores_depois": 47.3919,
+              "libertadores_delta": -0.7774500000000018,
               "sul_americana_antes": 44.05855,
-              "sul_americana_depois": 44.7666,
-              "sul_americana_delta": 0.7080500000000001,
+              "sul_americana_depois": 44.71215,
+              "sul_americana_delta": 0.6536000000000044,
               "sem_continental_antes": 7.772100000000002,
-              "sem_continental_depois": 7.890050000000002,
+              "sem_continental_depois": 7.895949999999999,
               "rebaixamento_antes": 1.25975,
-              "rebaixamento_depois": 1.1983,
-              "rebaixamento_delta": -0.061450000000000005
+              "rebaixamento_depois": 1.18365,
+              "rebaixamento_delta": -0.07609999999999983
             },
             {
               "clube": "São Paulo",
@@ -390,19 +374,19 @@
               "posicao_projetada_depois": 11,
               "pontos_projetados_depois": 51,
               "titulo_antes": 0.0011,
-              "titulo_depois": 0.00065,
-              "titulo_delta": -0.0004500000000000001,
+              "titulo_depois": 0.00025,
+              "titulo_delta": -0.0008500000000000001,
               "libertadores_antes": 22.2176,
-              "libertadores_depois": 17.26155,
-              "libertadores_delta": -4.956050000000001,
+              "libertadores_depois": 17.2213,
+              "libertadores_delta": -4.9963000000000015,
               "sul_americana_antes": 59.4077,
-              "sul_americana_depois": 59.28325,
-              "sul_americana_delta": -0.12444999999999595,
+              "sul_americana_depois": 59.32935,
+              "sul_americana_delta": -0.07835000000000036,
               "sem_continental_antes": 18.374699999999997,
-              "sem_continental_depois": 23.455199999999998,
+              "sem_continental_depois": 23.449350000000003,
               "rebaixamento_antes": 3.4817,
-              "rebaixamento_depois": 4.71905,
-              "rebaixamento_delta": 1.2373500000000002
+              "rebaixamento_depois": 4.75185,
+              "rebaixamento_delta": 1.2701500000000001
             },
             {
               "clube": "Vitória",
@@ -418,16 +402,16 @@
               "titulo_depois": 0.0,
               "titulo_delta": 0.0,
               "libertadores_antes": 14.56575,
-              "libertadores_depois": 15.41785,
-              "libertadores_delta": 0.8521000000000001,
+              "libertadores_depois": 15.41865,
+              "libertadores_delta": 0.8529,
               "sul_americana_antes": 28.7706,
-              "sul_americana_depois": 25.7123,
-              "sul_americana_delta": -3.0583000000000027,
+              "sul_americana_depois": 25.70265,
+              "sul_americana_delta": -3.0679500000000033,
               "sem_continental_antes": 56.663650000000004,
-              "sem_continental_depois": 58.86985,
+              "sem_continental_depois": 58.8787,
               "rebaixamento_antes": 27.1709,
-              "rebaixamento_depois": 29.6853,
-              "rebaixamento_delta": 2.514400000000002
+              "rebaixamento_depois": 29.75585,
+              "rebaixamento_delta": 2.584949999999999
             },
             {
               "clube": "Grêmio",
@@ -443,16 +427,16 @@
               "titulo_depois": 5e-05,
               "titulo_delta": 5e-05,
               "libertadores_antes": 25.79265,
-              "libertadores_depois": 28.4187,
-              "libertadores_delta": 2.626050000000003,
+              "libertadores_depois": 28.41655,
+              "libertadores_delta": 2.6239000000000026,
               "sul_americana_antes": 24.82355,
-              "sul_americana_depois": 32.3194,
-              "sul_americana_delta": 7.495850000000001,
+              "sul_americana_depois": 32.3347,
+              "sul_americana_delta": 7.511149999999997,
               "sem_continental_antes": 49.38380000000001,
-              "sem_continental_depois": 39.2619,
+              "sem_continental_depois": 39.24875,
               "rebaixamento_antes": 29.616,
-              "rebaixamento_depois": 18.0427,
-              "rebaixamento_delta": -11.5733
+              "rebaixamento_depois": 17.97485,
+              "rebaixamento_delta": -11.64115
             },
             {
               "clube": "Mirassol",
@@ -468,16 +452,16 @@
               "titulo_depois": 5e-05,
               "titulo_delta": -0.0002,
               "libertadores_antes": 8.4392,
-              "libertadores_depois": 5.17655,
-              "libertadores_delta": -3.26265,
+              "libertadores_depois": 5.1948,
+              "libertadores_delta": -3.2443999999999997,
               "sul_americana_antes": 47.01715,
-              "sul_americana_depois": 40.09005,
-              "sul_americana_delta": -6.927100000000003,
+              "sul_americana_depois": 40.076,
+              "sul_americana_delta": -6.94115,
               "sem_continental_antes": 44.54365,
-              "sem_continental_depois": 54.733399999999996,
+              "sem_continental_depois": 54.7292,
               "rebaixamento_antes": 14.34015,
-              "rebaixamento_depois": 19.92525,
-              "rebaixamento_delta": 5.585099999999999
+              "rebaixamento_depois": 19.8957,
+              "rebaixamento_delta": 5.555550000000002
             },
             {
               "clube": "Internacional",
@@ -493,16 +477,16 @@
               "titulo_depois": 0.0,
               "titulo_delta": 0.0,
               "libertadores_antes": 20.71385,
-              "libertadores_depois": 21.281,
-              "libertadores_delta": 0.567149999999998,
+              "libertadores_depois": 21.28895,
+              "libertadores_delta": 0.5750999999999991,
               "sul_americana_antes": 21.29995,
-              "sul_americana_depois": 24.78185,
-              "sul_americana_delta": 3.4818999999999996,
+              "sul_americana_depois": 24.6942,
+              "sul_americana_delta": 3.3942499999999995,
               "sem_continental_antes": 57.9862,
-              "sem_continental_depois": 53.937149999999995,
+              "sem_continental_depois": 54.016850000000005,
               "rebaixamento_antes": 36.37495,
-              "rebaixamento_depois": 30.1191,
-              "rebaixamento_delta": -6.255849999999999
+              "rebaixamento_depois": 30.15025,
+              "rebaixamento_delta": -6.224699999999999
             },
             {
               "clube": "Santos",
@@ -518,16 +502,16 @@
               "titulo_depois": 0.0,
               "titulo_delta": 0.0,
               "libertadores_antes": 19.93045,
-              "libertadores_depois": 13.01315,
-              "libertadores_delta": -6.917300000000001,
+              "libertadores_depois": 13.01685,
+              "libertadores_delta": -6.913600000000001,
               "sul_americana_antes": 15.5419,
-              "sul_americana_depois": 9.6507,
-              "sul_americana_delta": -5.8911999999999995,
+              "sul_americana_depois": 9.67915,
+              "sul_americana_delta": -5.86275,
               "sem_continental_antes": 64.52765,
-              "sem_continental_depois": 77.33615,
+              "sem_continental_depois": 77.304,
               "rebaixamento_antes": 48.3897,
-              "rebaixamento_depois": 62.85045,
-              "rebaixamento_delta": 14.460750000000004
+              "rebaixamento_depois": 62.88125,
+              "rebaixamento_delta": 14.491550000000004
             },
             {
               "clube": "Vasco da Gama",
@@ -543,16 +527,16 @@
               "titulo_depois": 0.0,
               "titulo_delta": 0.0,
               "libertadores_antes": 20.0902,
-              "libertadores_depois": 24.2142,
-              "libertadores_delta": 4.124000000000002,
+              "libertadores_depois": 24.21445,
+              "libertadores_delta": 4.12425,
               "sul_americana_antes": 11.77405,
-              "sul_americana_depois": 11.7884,
-              "sul_americana_delta": 0.01434999999999853,
+              "sul_americana_depois": 11.83375,
+              "sul_americana_delta": 0.05969999999999942,
               "sem_continental_antes": 68.13575,
-              "sem_continental_depois": 63.9974,
+              "sem_continental_depois": 63.9518,
               "rebaixamento_antes": 55.63025,
-              "rebaixamento_depois": 53.09475,
-              "rebaixamento_delta": -2.535499999999999
+              "rebaixamento_depois": 53.0241,
+              "rebaixamento_delta": -2.6061499999999995
             },
             {
               "clube": "Remo",
@@ -568,16 +552,16 @@
               "titulo_depois": 0.0,
               "titulo_delta": 0.0,
               "libertadores_antes": 0.1947,
-              "libertadores_depois": 0.1216,
-              "libertadores_delta": -0.07310000000000001,
+              "libertadores_depois": 0.11855,
+              "libertadores_delta": -0.07615000000000001,
               "sul_americana_antes": 9.9239,
-              "sul_americana_depois": 8.145,
-              "sul_americana_delta": -1.7789000000000001,
+              "sul_americana_depois": 8.17565,
+              "sul_americana_delta": -1.7482500000000005,
               "sem_continental_antes": 89.8814,
-              "sem_continental_depois": 91.7334,
+              "sem_continental_depois": 91.7058,
               "rebaixamento_antes": 63.9095,
-              "rebaixamento_depois": 67.1831,
-              "rebaixamento_delta": 3.2735999999999947
+              "rebaixamento_depois": 67.153,
+              "rebaixamento_delta": 3.2435000000000045
             },
             {
               "clube": "Chapecoense",
@@ -596,13 +580,13 @@
               "libertadores_depois": 0.0,
               "libertadores_delta": 0.0,
               "sul_americana_antes": 0.00295,
-              "sul_americana_depois": 0.0013,
-              "sul_americana_delta": -0.00165,
+              "sul_americana_depois": 0.00125,
+              "sul_americana_delta": -0.0017,
               "sem_continental_antes": 99.99705,
-              "sem_continental_depois": 99.9987,
+              "sem_continental_depois": 99.99875,
               "rebaixamento_antes": 99.94355,
-              "rebaixamento_depois": 99.96895,
-              "rebaixamento_delta": 0.025400000000004752
+              "rebaixamento_depois": 99.97075,
+              "rebaixamento_delta": 0.02719999999999345
             }
           ],
           "destaques_calculados": {
@@ -610,8 +594,8 @@
               "Flamengo",
               "Athletico-PR",
               "Cruzeiro",
-              "Fluminense",
-              "Corinthians"
+              "Corinthians",
+              "Fluminense"
             ],
             "baixas_titulo": [
               "Palmeiras",
@@ -625,7 +609,7 @@
               "Cruzeiro",
               "Athletico-PR",
               "Vasco da Gama",
-              "Fluminense"
+              "Grêmio"
             ],
             "baixas_libertadores": [
               "Bragantino",
@@ -675,9 +659,9 @@
     "tentativa_efetuada": true,
     "chamadas_nesta_execucao": 1,
     "limite_chamadas_dia": 1,
-    "falhas_consecutivas": 6,
-    "erro": "falha ao aplicar saída validada: Command '['/opt/hostedtoolcache/Python/3.12.13/x64/bin/python', 'scripts/gerar_analise_rodada.py', '--rodada', '22', '--editorial-json', '/tmp/tmpurm7s0qq.json', '--origem-editorial', 'openai:gpt-5.6-terra:auditoria-diaria']' returned non-zero exit status 1.",
-    "web_habilitada": true,
+    "falhas_consecutivas": 7,
+    "erro": "falha ao aplicar saída validada: Command '['/opt/hostedtoolcache/Python/3.12.13/x64/bin/python', 'scripts/gerar_analise_rodada.py', '--rodada', '22', '--editorial-json', '/tmp/tmp32m8iail.json', '--origem-editorial', 'openai:gpt-5.6-terra:auditoria-diaria']' returned non-zero exit status 1.",
+    "web_habilitada": false,
     "web_searches": 0,
     "web_tool_calls": 0,
     "web_acoes": [],
@@ -685,76 +669,49 @@
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Os dados finais de resultados, classificação e cálculos estão íntegros. Permanecem avisos não críticos sobre fontes de transmissão, uma ausência de estatísticas e dois jogos sem melhores momentos após o prazo de carência.",
+    "resumo": "A base determinística está íntegra nos itens críticos, mas há avisos de fontes de transmissão e um jogo sem estatísticas disponíveis.",
     "problemas": [
       {
-        "categoria": "transmissao",
+        "categoria": "fonte",
         "severidade": "atencao",
-        "mensagem": "Há falhas em fontes de transmissão, mas sem perda crítica de cobertura ou pendências de eventos elegíveis para correção.",
+        "mensagem": "Fontes de transmissão falharam, sem perda crítica de cobertura.",
         "event_id": "",
         "requer_intervencao": false
       },
       {
         "categoria": "estatisticas",
         "severidade": "atencao",
-        "mensagem": "Há um jogo sem estatísticas, sem inconsistências ou falhas críticas registradas nos detalhes.",
+        "mensagem": "Há um jogo sem estatísticas no monitoramento determinístico; não há inconsistência quantitativa nem ação de correção por esta camada.",
         "event_id": "",
         "requer_intervencao": false
-      },
-      {
-        "categoria": "melhores_momentos",
-        "severidade": "atencao",
-        "mensagem": "Jogo sem melhores momentos após o prazo de carência; requer investigação editorial, sem vínculo automático.",
-        "event_id": "401879458",
-        "requer_intervencao": true
-      },
-      {
-        "categoria": "melhores_momentos",
-        "severidade": "atencao",
-        "mensagem": "Jogo sem melhores momentos após o prazo de carência; requer investigação editorial, sem vínculo automático.",
-        "event_id": "401879459",
-        "requer_intervencao": true
       }
     ],
     "correcoes_publico": [],
     "correcoes_transmissao": [],
-    "melhores_momentos_pendentes": [
-      {
-        "event_id": "401879458",
-        "status": "investigar",
-        "fonte_url": "",
-        "justificativa": "A partida entre Botafogo e Vitória permanece sem melhores momentos muito além da carência. Não foi encontrada, neste dossiê, fonte direta que permita qualquer vínculo automático."
-      },
-      {
-        "event_id": "401879459",
-        "status": "investigar",
-        "fonte_url": "",
-        "justificativa": "A partida entre Bahia e Chapecoense permanece sem melhores momentos muito além da carência. Não foi encontrada, neste dossiê, fonte direta que permita qualquer vínculo automático."
-      }
-    ],
+    "melhores_momentos_pendentes": [],
     "editorial_rodada": {
-      "titulo": "Rodada vinte e dois redesenha a disputa em todas as faixas",
-      "linha_fina": "A rodada trouxe mudanças importantes nas projeções, com aproximação na corrida pelo título, avanços na zona continental e maior pressão na parte de baixo.",
+      "titulo": "Rodada movimenta a disputa em todas as faixas",
+      "linha_fina": "Vitórias de Flamengo, Athletico-PR, Cruzeiro, Corinthians e Grêmio redesenharam projeções, enquanto Palmeiras preservou a ponta após empate.",
       "secoes": [
         {
-          "titulo": "A ponta segue aberta",
+          "titulo": "Liderança sob pressão",
           "paragrafos": [
-            "O Palmeiras manteve a liderança após o empate, mas viu sua projeção de título recuar. O Flamengo venceu e foi o principal beneficiado na disputa pelo topo, enquanto o Athletico Paranaense também ampliou sua perspectiva.",
-            "Cruzeiro e Corinthians saíram fortalecidos por vitórias que melhoraram suas projeções continentais. O Fluminense pontuou fora de casa e preservou posição relevante entre os primeiros colocados."
+            "O Palmeiras empatou com o Internacional e permaneceu na liderança, mas viu o Flamengo reduzir terreno com a vitória sobre o Vitória. O resultado rubro-negro foi o principal avanço na disputa pelo título entre os clubes do topo.",
+            "O Athletico-PR também venceu, diante do Santos, e reforçou sua posição entre os primeiros colocados. Cruzeiro e Corinthians foram outros vencedores que ganharam espaço nas projeções continentais."
           ]
         },
         {
-          "titulo": "Movimentação no bloco intermediário",
+          "titulo": "Meio da tabela em transformação",
           "paragrafos": [
-            "O triunfo do Grêmio teve impacto expressivo: o clube ganhou posições e reduziu seu risco de rebaixamento. Coritiba também avançou com a vitória, enquanto o Internacional diminuiu a pressão depois do empate.",
-            "Na direção oposta, Bragantino, Botafogo e Bahia perderam terreno nas projeções de vaga na Libertadores. O São Paulo foi derrotado e passou a carregar cenário menos favorável na tabela projetada."
+            "O Cruzeiro superou o Mirassol e avançou na classificação. O Corinthians venceu o Bragantino fora de casa, enquanto o Coritiba bateu a Chapecoense e também subiu posições.",
+            "Botafogo e Fluminense dividiram pontos, assim como Bahia e Vasco da Gama. Os empates tiveram efeitos distintos: o Fluminense sustentou lugar de destaque, e o Bahia perdeu espaço nas projeções para a Libertadores."
           ]
         },
         {
-          "titulo": "Alerta na luta contra a queda",
+          "titulo": "Parte de baixo ganha novos contornos",
           "paragrafos": [
-            "O Santos perdeu e entrou na zona de rebaixamento projetada, com crescimento marcante do risco. Mirassol, Remo e Vitória também terminaram a rodada com aumento da ameaça.",
-            "Vasco da Gama e Internacional somaram pontos e tiveram alívio nas projeções, mas a disputa na parte inferior continua concentrada e sem margem confortável."
+            "O Grêmio venceu o São Paulo e deu passo importante para se afastar da zona de rebaixamento. O Internacional também somou ponto fora de casa e melhorou sua perspectiva.",
+            "Na direção oposta, o Santos perdeu para o Athletico-PR e passou a ocupar a zona de rebaixamento. Remo e Chapecoense seguem nas últimas posições após empate e derrota, respectivamente."
           ]
         }
       ]
@@ -857,6 +814,21 @@
       "executado_em": "2026-08-15T08:54:58-03:00",
       "status": "critico",
       "resumo": "Os dados finais de resultados, classificação e cálculos estão íntegros. Permanecem avisos não críticos sobre fontes de transmissão, uma ausência de estatísticas e dois jogos sem melhores momentos após o prazo de carência.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "camada diária de IA falhou por dois dias/executações consecutivos"
+      ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-08-16",
+      "executado_em": "2026-08-16T08:55:32-03:00",
+      "status": "critico",
+      "resumo": "A base determinística está íntegra nos itens críticos, mas há avisos de fontes de transmissão e um jogo sem estatísticas disponíveis.",
       "chamadas_openai": 1,
       "web_searches": 0,
       "publicos_aplicados": 0,
