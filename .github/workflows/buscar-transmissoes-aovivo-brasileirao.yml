@@ -210,13 +210,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           MODO="${INPUT_MODO:-completo}"
-          FILES=("dados-br/agenda-clubes-br.json")
-          if [[ "$MODO" != "tv" ]]; then
-            FILES+=(
-              "dados-br/transmissoes-aovivo.json"
-              "dados-br/auditoria-transmissoes-aovivo.json"
-            )
-          fi
+          # O modo TV também executa a colheita barata de players futuros.
+          # Portanto, transmissoes-aovivo*.json SEMPRE entram no commit; caso
+          # contrário a live exata pode ser encontrada e descartada no fim do run.
+          FILES=(
+            "dados-br/agenda-clubes-br.json"
+            "dados-br/transmissoes-aovivo.json"
+            "dados-br/auditoria-transmissoes-aovivo.json"
+          )
           if [[ "$MODO" != "aovivo" ]]; then
             FILES+=(
               "dados-br/transmissoes-tv.json"
