@@ -59,6 +59,7 @@
     probabilityHistoryMetric: "campeao_pct",
     tab: "probabilidades",
     expanded: { artilheiros: false, assistencias: false, publico: false },
+    playerClubFilters: { artilheiros: "", assistencias: "" },
     expandedClubGoals: {},
     clubFilter: "",
     gamesLimit: 10,
@@ -472,15 +473,28 @@
     return base;
   }
 
+  function playerClubFilterOptions(selected) {
+    const clubs = clubOptions();
+    return `<option value="">Todos os clubes</option>${clubs.map((club) => {
+      const name = String(club?.time || "").trim();
+      return name ? `<option value="${escapeAttr(name)}"${normalize(name) === normalize(selected) ? " selected" : ""}>${escapeHtml(name)}</option>` : "";
+    }).join("")}`;
+  }
+
   function renderPlayers(type) {
     const target = type === "artilheiros" ? $("lista-artilharia") : $("lista-assistencias");
-    const list = playerRows(type);
+    const allPlayers = playerRows(type);
     const field = type === "artilheiros" ? "gols" : "assistencias";
     const unit = type === "artilheiros" ? "gols" : "assist.";
-    if (!list.length) {
+    if (!allPlayers.length) {
       target.innerHTML = emptyState("Ranking oficial ainda não disponível.", "Execute o workflow Atualizar Brasileirao (ESPN) e aguarde a coleta validada.");
       return;
     }
+
+    const selectedClub = state.playerClubFilters?.[type] || "";
+    const list = allPlayers
+      .filter((player) => !selectedClub || normalize(player.time) === normalize(selectedClub))
+      .map((player, index) => ({ ...player, _filteredPosition: index + 1 }));
     const expanded = state.expanded[type];
     const shown = expanded ? list : list.slice(0, 5);
     const completenessKey = type === "artilheiros" ? "artilharia" : "assistencias";
@@ -493,7 +507,16 @@
     const liveSuffix = liveGames.length ? ` · 🔴 eventos ao vivo: ${liveFactsOk}/${liveGames.length} jogos provisórios` : "";
     const statusTone = gamesRead === totalGames && lineupGames === totalGames && (!liveGames.length || liveFactsOk === liveGames.length) ? "" : " is-warning";
     const status = `Base consolidada: ${coverageLabel(gamesRead, totalGames)} jogos encerrados · escalações: ${coverageLabel(lineupGames, totalGames)} · atualizado ${dateTimeCompactBR(state.leaders?.atualizado_em)}${liveSuffix}`;
-    target.innerHTML = `<div class="stats-data-status${statusTone}">${escapeHtml(status)}</div><div class="stats-player-list">${shown.map((player, index) => {
+    const filterLabel = selectedClub ? `${selectedClub} · ${list.length} ${list.length === 1 ? "jogador" : "jogadores"} no ranking` : `${allPlayers.length} jogadores no ranking geral`;
+    const filter = `<div class="stats-player-filter">
+      <div class="stats-filter-control">
+        <label for="stats-player-club-${type}">Clube</label>
+        <select id="stats-player-club-${type}" data-player-club-filter="${type}" aria-label="Filtrar ${type === "artilheiros" ? "artilheiros" : "assistências"} por clube">${playerClubFilterOptions(selectedClub)}</select>
+        <div class="stats-player-filter-note">${escapeHtml(filterLabel)}</div>
+      </div>
+    </div>`;
+
+    const ranking = list.length ? `<div class="stats-player-list">${shown.map((player, index) => {
       const rawGames = player.jogos;
       const games = rawGames === null || rawGames === undefined || rawGames === "" ? null : Number(rawGames);
       const hasGames = Number.isFinite(games) && games > 0;
@@ -502,7 +525,7 @@
       const average = hasGames ? `${number(value / games, 2)} por jogo` : "";
       const meta = hasGames ? `${gamesLabel} · ${average}` : "";
       return `<article class="stats-player-row">
-        <div class="stats-rank">${integer(player.posicao || index + 1)}</div>
+        <div class="stats-rank">${integer(player._filteredPosition || index + 1)}</div>
         <div class="stats-player-main">
           <div class="stats-player-name">${escapeHtml(player.nome)}</div>
           ${clubIdentityLink(player.time, `${shield(player, "stats-mini-shield")}<span>${escapeHtml(player.time)}</span>`, "stats-player-club")}
@@ -510,7 +533,9 @@
         </div>
         <div class="stats-player-value"><strong>${integer(value)}</strong><span>${unit}</span>${player._liveDelta ? `<em class="stats-live-delta">+${integer(player._liveDelta)} AO VIVO</em>` : ""}</div>
       </article>`;
-    }).join("")}</div>${list.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-list="${type}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${list.length}) ↓`}</button>` : ""}`;
+    }).join("")}</div>${list.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-list="${type}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${list.length}) ↓`}</button>` : ""}` : emptyState(`Nenhum ${type === "artilheiros" ? "artilheiro" : "jogador com assistência"} encontrado para ${selectedClub}.`, "O filtro considera a base consolidada e os eventos provisórios AO VIVO já validados pela ESPN.");
+
+    target.innerHTML = `<div class="stats-data-status${statusTone}">${escapeHtml(status)}</div>${filter}${ranking}`;
   }
 
   function clubOptions() {
@@ -2310,6 +2335,16 @@
   function bindEvents() {
     qsa("[data-tab]").forEach((button) => button.addEventListener("click", () => activateTab(button.dataset.tab)));
     document.addEventListener("change", (event) => {
+      const playerClubFilter = event.target.closest("[data-player-club-filter]");
+      if (playerClubFilter) {
+        const type = playerClubFilter.dataset.playerClubFilter;
+        if (type === "artilheiros" || type === "assistencias") {
+          state.playerClubFilters[type] = playerClubFilter.value || "";
+          state.expanded[type] = false;
+          renderPlayers(type);
+        }
+        return;
+      }
       const clubSelect = event.target.closest("[data-probability-history-club]");
       if (clubSelect) {
         state.probabilityHistoryClub = clubSelect.value;

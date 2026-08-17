@@ -799,6 +799,9 @@ body > .container > section.hero > img {
 
 .stats-empty { display: grid; gap: 5px; padding: 18px; border: 1px dashed rgba(148,163,184,.24); border-radius: 15px; color: var(--text); background: rgba(255,255,255,.025); }
 .stats-empty span { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.stats-player-filter { width: min(100%, 430px); margin: 0 0 14px; }
+.stats-player-filter .stats-filter-control { padding: 10px 12px; }
+.stats-player-filter-note { margin-top: 7px; color: var(--muted-2); font-size: 11px; line-height: 1.35; }
 .stats-player-list { display: grid; gap: 10px; }
 .stats-player-row {
   display: grid;
@@ -1007,6 +1010,10 @@ body > .container > section.hero > img {
   .stats-player-row { grid-template-columns: 36px minmax(0,1fr) 52px; gap: 8px; padding: 11px 9px; }
   .stats-rank { width: 34px; height: 34px; font-size: 14px; border-radius: 10px; }
   .stats-player-name { font-size: 15px; }
+  .stats-player-filter { width: 100%; margin-bottom: 10px; }
+  .stats-player-filter .stats-filter-control { padding: 9px; border-radius: 13px; }
+  .stats-player-filter .stats-filter-control select { min-height: 42px; }
+  .stats-player-filter-note { font-size: 9px; }
   .stats-player-meta { font-size: 10px; }
   .stats-data-status { font-size: 9px; line-height: 1.3; margin-bottom: 9px; }
   .stats-player-value { min-width: 52px; }
