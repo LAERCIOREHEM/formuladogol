@@ -7,7 +7,7 @@
     "jogos_sem_transmissao_14d": 0,
     "jogos_sem_transmissao_fora_14d": 2,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 0,
+    "registros_preservados": 8,
     "jogos_estaveis_sem_reconsulta_editorial": 49,
     "fontes_com_falha": 1
   },
@@ -21,18 +21,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 6061
+      "duracao_ms": 6816
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 8,
-      "duracao_ms": 5730
+      "jogos_com_canal": 0,
+      "duracao_ms": 2856
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 7,
       "jogos_com_canal": 0,
-      "duracao_ms": 29275
+      "duracao_ms": 25181
     },
     "espn": {
       "ok": true,
@@ -40,7 +40,7 @@
       "eventos_na_janela": 10,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 860
+      "duracao_ms": 2724
     },
     "youtube_oficial": {
       "ok": true,
@@ -54,7 +54,7 @@
       "rodada": 27,
       "jogo": "Chapecoense x Internacional",
       "data_iso": "2026-09-12T15:00:00-03:00",
-      "faltam_horas": 628.6,
+      "faltam_horas": 628.3,
       "nivel": "futuro"
     },
     {
@@ -62,11 +62,90 @@
       "rodada": 27,
       "jogo": "Bahia x Remo",
       "data_iso": "2026-09-12T15:00:00-03:00",
-      "faltam_horas": 628.6,
+      "faltam_horas": 628.3,
       "nivel": "futuro"
     }
   ],
-  "preservados": [],
+  "preservados": [
+    {
+      "event_id": "401841231",
+      "jogo": "Atlético-MG x Fluminense",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Paramount+",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841229",
+      "jogo": "Botafogo x Bragantino",
+      "canais": [
+        "GE TV",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Paramount+",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841232",
+      "jogo": "Coritiba x Athletico-PR",
+      "canais": [
+        "Premiere",
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841237",
+      "jogo": "Flamengo x Corinthians",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841236",
+      "jogo": "Grêmio x Vasco da Gama",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841235",
+      "jogo": "Mirassol x Vitória",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841234",
+      "jogo": "Palmeiras x São Paulo",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841233",
+      "jogo": "Santos x Cruzeiro",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    }
+  ],
   "erros": [
     "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
@@ -81,5 +160,5 @@
     "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/08/16/atletico-mg-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
     "https://ge.globo.com/sp/tem-esporte/futebol/brasileirao-serie-a/noticia/2026/08/16/mirassol-x-flamengo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-08-17T10:21:11-03:00"
+  "atualizado_em": "2026-08-17T10:41:26-03:00"
 }
