@@ -2550,3 +2550,8 @@ body > .container > section.hero > img {
   .probability-inline-evolution .club-evolution-strip { grid-auto-columns: minmax(112px, 46%); }
   .probability-inline-actions { justify-content: space-between; }
 }
+
+/* Overlay factual AO VIVO: nunca substitui a base consolidada; desaparece após a consolidação. */
+.stats-live-delta { display:block; margin-top:4px; color:#ff748e; font-size:9px; line-height:1.15; font-style:normal; font-weight:950; letter-spacing:.04em; white-space:nowrap; }
+.stats-live-inline { color:#ff748e; font-size:9px; font-style:normal; font-weight:950; white-space:nowrap; }
+@media (max-width: 700px) { .stats-live-delta { font-size:8px; letter-spacing:0; } .stats-live-inline { font-size:8px; } }

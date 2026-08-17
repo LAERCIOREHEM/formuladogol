@@ -41,6 +41,9 @@
     espnLive: {},
     espnLiveFetchedAt: null,
     espnLiveError: null,
+    liveFacts: {},
+    liveFactsFetchedAt: null,
+    liveFactsError: null,
     audit: null,
     probabilities: null,
     probabilitiesAudit: null,
@@ -354,9 +357,119 @@
     return `<div class="stats-empty"><strong>${escapeHtml(message)}</strong>${extra ? `<span>${escapeHtml(extra)}</span>` : ""}</div>`;
   }
 
+  function liveApplicableGames() {
+    const engine = window.BRClassificacaoLive;
+    if (!engine) return [];
+    return engine.applicableGames({
+      table: Array.isArray(state.table?.tabela) ? state.table.tabela : [],
+      results: Array.isArray(state.results?.resultados) ? state.results.resultados : [],
+      liveMap: state.espnLive || {},
+      canonicalize: canonicalLiveTeam,
+      referenceDate: new Date(),
+    });
+  }
+
+  function expectedClubGamesWithLive(name) {
+    const base = expectedClubGames(name);
+    if (base === null) return null;
+    const extra = liveApplicableGames().filter((game) => normalize(game.mandante) === normalize(name) || normalize(game.visitante) === normalize(name)).length;
+    return base + extra;
+  }
+
+  function playerKey(name, team) {
+    return `${normalize(team)}|${normalize(name)}`;
+  }
+
+  function playerNamesCompatible(a, b) {
+    const na = normalize(a), nb = normalize(b);
+    if (!na || !nb) return false;
+    if (na === nb) return true;
+    const ta = na.split(" ").filter(Boolean), tb = nb.split(" ").filter(Boolean);
+    if (!ta.length || !tb.length) return false;
+    const lastA = ta[ta.length - 1], lastB = tb[tb.length - 1];
+    const firstA = ta[0], firstB = tb[0];
+    const shared = ta.filter((token) => tb.includes(token));
+    if (firstA === firstB && shared.length >= 2) return true;
+    if (lastA === lastB && firstA === firstB) return true;
+    if (lastA === lastB && firstA.length === 1 && firstB.startsWith(firstA)) return true;
+    if (lastA === lastB && firstB.length === 1 && firstA.startsWith(firstB)) return true;
+    return shared.length >= 2 && (firstA === firstB || lastA === lastB);
+  }
+
+  function findPlayerRow(rows, name, team) {
+    const teamNorm = normalize(team);
+    const exact = rows.find((row) => normalize(row.time) === teamNorm && normalize(row.nome) === normalize(name));
+    if (exact) return exact;
+    const candidates = rows.filter((row) => normalize(row.time) === teamNorm && playerNamesCompatible(row.nome, name));
+    return candidates.length === 1 ? candidates[0] : null;
+  }
+
+  function liveDeltas() {
+    const goals = new Map(), assists = new Map(), appearances = new Map();
+    const activeEventIds = new Set(liveApplicableGames().map((game) => String(game.eventId || "")).filter(Boolean));
+    for (const [eventId, facts] of Object.entries(state.liveFacts || {})) {
+      if (!activeEventIds.has(String(eventId)) || !facts || facts.ok !== true) continue;
+      for (const appearance of facts.appearances || []) {
+        const key = playerKey(appearance.name, appearance.team);
+        if (!key || key === "|") continue;
+        if (!appearances.has(key)) appearances.set(key, new Set());
+        appearances.get(key).add(eventId);
+      }
+      for (const goal of facts.goals || []) {
+        if (!goal.ownGoal && goal.scorer && goal.team) {
+          const key = playerKey(goal.scorer, goal.team);
+          goals.set(key, (goals.get(key) || 0) + 1);
+        }
+        for (const assistant of goal.assists || []) {
+          if (!assistant || !goal.team) continue;
+          const key = playerKey(assistant, goal.team);
+          assists.set(key, (assists.get(key) || 0) + 1);
+        }
+      }
+    }
+    return { goals, assists, appearances };
+  }
+
   function playerRows(type) {
     if (!leadersValid()) return [];
-    return type === "artilheiros" ? state.leaders.artilharia : state.leaders.assistencias;
+    const base = (type === "artilheiros" ? state.leaders.artilharia : state.leaders.assistencias).map((row) => ({ ...row }));
+    const field = type === "artilheiros" ? "gols" : "assistencias";
+    const deltas = liveDeltas();
+    const statMap = type === "artilheiros" ? deltas.goals : deltas.assists;
+    const byKey = new Map(base.map((row) => [playerKey(row.nome, row.time), row]));
+    for (const [key, delta] of statMap) {
+      const [teamNorm, nameNorm] = key.split("|");
+      const fact = Object.values(state.liveFacts || {}).flatMap((item) => item?.goals || []).flatMap((goal) => {
+        const values = type === "artilheiros" ? [{ name: goal.scorer, team: goal.team }] : (goal.assists || []).map((name) => ({ name, team: goal.team }));
+        return values;
+      }).find((item) => normalize(item.team) === teamNorm && normalize(item.name) === nameNorm);
+      let row = byKey.get(key) || (fact ? findPlayerRow(base, fact.name, fact.team) : null);
+      if (!row) {
+        if (!fact) continue;
+        const info = teamInfo(fact.team) || {};
+        row = { nome: fact.name, time: fact.team, escudo: info.escudo || "", jogos: 0, [field]: 0 };
+        base.push(row);
+      }
+      byKey.set(key, row);
+      row[field] = Number(row[field] || 0) + delta;
+      row._liveDelta = delta;
+    }
+    for (const row of base) {
+      let appearances = deltas.appearances.get(playerKey(row.nome, row.time));
+      if (!appearances) {
+        for (const [key, events] of deltas.appearances) {
+          const [teamNorm, nameNorm] = key.split("|");
+          if (normalize(row.time) === teamNorm && playerNamesCompatible(row.nome, nameNorm)) { appearances = events; break; }
+        }
+      }
+      if (appearances && appearances.size) {
+        row.jogos = Number(row.jogos || 0) + appearances.size;
+        row._liveGames = appearances.size;
+      }
+    }
+    base.sort((a,b) => Number(b[field]||0)-Number(a[field]||0) || Number(a.posicao||9999)-Number(b.posicao||9999) || String(a.nome||"").localeCompare(String(b.nome||""), "pt-BR"));
+    base.forEach((row,index) => { row.posicao = index + 1; });
+    return base;
   }
 
   function renderPlayers(type) {
@@ -375,8 +488,11 @@
     const totalGames = Number(completeness.total_jogos_declarado) || totalFinishedGames();
     const gamesRead = Number(completeness.jogos_lidos) || 0;
     const lineupGames = Number(completeness.jogos_com_escalacoes) || 0;
-    const statusTone = gamesRead === totalGames && lineupGames === totalGames ? "" : " is-warning";
-    const status = `Base de eventos: ${coverageLabel(gamesRead, totalGames)} · escalações: ${coverageLabel(lineupGames, totalGames)} · atualizado ${dateTimeCompactBR(state.leaders?.atualizado_em)}`;
+    const liveGames = liveApplicableGames();
+    const liveFactsOk = liveGames.filter((game) => state.liveFacts?.[String(game.eventId)]?.ok === true).length;
+    const liveSuffix = liveGames.length ? ` · 🔴 eventos ao vivo: ${liveFactsOk}/${liveGames.length} jogos provisórios` : "";
+    const statusTone = gamesRead === totalGames && lineupGames === totalGames && (!liveGames.length || liveFactsOk === liveGames.length) ? "" : " is-warning";
+    const status = `Base consolidada: ${coverageLabel(gamesRead, totalGames)} jogos encerrados · escalações: ${coverageLabel(lineupGames, totalGames)} · atualizado ${dateTimeCompactBR(state.leaders?.atualizado_em)}${liveSuffix}`;
     target.innerHTML = `<div class="stats-data-status${statusTone}">${escapeHtml(status)}</div><div class="stats-player-list">${shown.map((player, index) => {
       const rawGames = player.jogos;
       const games = rawGames === null || rawGames === undefined || rawGames === "" ? null : Number(rawGames);
@@ -392,7 +508,7 @@
           ${clubIdentityLink(player.time, `${shield(player, "stats-mini-shield")}<span>${escapeHtml(player.time)}</span>`, "stats-player-club")}
           ${meta ? `<div class="stats-player-meta">${escapeHtml(meta)}</div>` : ""}
         </div>
-        <div class="stats-player-value"><strong>${integer(value)}</strong><span>${unit}</span></div>
+        <div class="stats-player-value"><strong>${integer(value)}</strong><span>${unit}</span>${player._liveDelta ? `<em class="stats-live-delta">+${integer(player._liveDelta)} AO VIVO</em>` : ""}</div>
       </article>`;
     }).join("")}</div>${list.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-list="${type}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${list.length}) ↓`}</button>` : ""}`;
   }
@@ -464,52 +580,9 @@
     return `<li><span>${icon} ${escapeHtml(card?.minuto || "")}</span><strong>${escapeHtml(card?.jogador || "Cartão")}</strong><small>${escapeHtml(card?.time || "")}</small></li>`;
   }
 
-  const GAME_STATS_PASS_ORDER = new Map([
-    ["passes", 0],
-    ["passes certos", 1],
-    ["precisao de passe", 2],
-    ["precisao de passes", 2],
-  ]);
-
-  const GAME_STATS_FOOTER_ORDER = new Map([
-    ["escanteios", 0],
-    ["amarelos", 1],
-    ["vermelhos", 2],
-    ["impedimentos", 3],
-  ]);
-
   function orderedGameStats(rawStats) {
-    const items = (Array.isArray(rawStats) ? rawStats : []).map((stat, index) => ({
-      stat,
-      index,
-      name: normalize(stat?.nome || stat?.label || ""),
-    }));
-
-    const body = items.filter((item) => !GAME_STATS_FOOTER_ORDER.has(item.name));
-    const footer = items
-      .filter((item) => GAME_STATS_FOOTER_ORDER.has(item.name))
-      .sort((a, b) => GAME_STATS_FOOTER_ORDER.get(a.name) - GAME_STATS_FOOTER_ORDER.get(b.name));
-
-    const firstPassIndex = body.findIndex((item) => GAME_STATS_PASS_ORDER.has(item.name));
-    let orderedBody = body;
-    if (firstPassIndex >= 0) {
-      const insertionIndex = body.slice(0, firstPassIndex)
-        .filter((item) => !GAME_STATS_PASS_ORDER.has(item.name)).length;
-      const passStats = body
-        .filter((item) => GAME_STATS_PASS_ORDER.has(item.name))
-        .sort((a, b) => {
-          const priority = GAME_STATS_PASS_ORDER.get(a.name) - GAME_STATS_PASS_ORDER.get(b.name);
-          return priority || (a.index - b.index);
-        });
-      const otherStats = body.filter((item) => !GAME_STATS_PASS_ORDER.has(item.name));
-      orderedBody = [
-        ...otherStats.slice(0, insertionIndex),
-        ...passStats,
-        ...otherStats.slice(insertionIndex),
-      ];
-    }
-
-    return [...orderedBody, ...footer].map((item) => item.stat);
+    const sorter = window.BREstatisticasOrdem;
+    return sorter ? sorter.sortStats(rawStats) : (Array.isArray(rawStats) ? rawStats : []);
   }
 
   function statisticRows(detail) {
@@ -579,32 +652,74 @@
     });
   }
 
+  function liveClubGoalsRows() {
+    const base = (Array.isArray(state.competition?.gols_por_clube) ? state.competition.gols_por_clube : []).map((club) => ({
+      ...club,
+      marcadores: (Array.isArray(club.marcadores) ? club.marcadores : []).map((player) => ({ ...player })),
+    }));
+    const byClub = new Map(base.map((club) => [normalize(club.time), club]));
+    const parsedScorers = new Map();
+    for (const game of liveApplicableGames()) {
+      const home = byClub.get(normalize(game.mandante));
+      const away = byClub.get(normalize(game.visitante));
+      const hs = Number(game.placarMandante || 0), as = Number(game.placarVisitante || 0);
+      if (home) { home.jogos = Number(home.jogos||0)+1; home.gols_pro=Number(home.gols_pro||0)+hs; home.gols_contra=Number(home.gols_contra||0)+as; home._liveGoals=(home._liveGoals||0)+hs; }
+      if (away) { away.jogos = Number(away.jogos||0)+1; away.gols_pro=Number(away.gols_pro||0)+as; away.gols_contra=Number(away.gols_contra||0)+hs; away._liveGoals=(away._liveGoals||0)+as; }
+      const facts = state.liveFacts?.[String(game.eventId)];
+      if (!facts?.ok) continue;
+      for (const goal of facts.goals || []) {
+        if (goal.ownGoal || !goal.scorer || !goal.team) continue;
+        const club = byClub.get(normalize(goal.team)); if (!club) continue;
+        const key = playerKey(goal.scorer, club.time);
+        parsedScorers.set(normalize(club.time), (parsedScorers.get(normalize(club.time))||0)+1);
+        let marker = club.marcadores.find((row) => playerKey(row.nome, club.time) === key) || findPlayerRow(club.marcadores, goal.scorer, club.time);
+        if (!marker) { marker={ nome:goal.scorer, time:club.time, escudo:club.escudo, gols:0, jogos:0 }; club.marcadores.push(marker); }
+        marker.gols=Number(marker.gols||0)+1; marker._liveDelta=Number(marker._liveDelta||0)+1;
+      }
+    }
+    for (const club of base) {
+      club.saldo=Number(club.gols_pro||0)-Number(club.gols_contra||0);
+      club.media_gols=Number(club.jogos)>0 ? Number(club.gols_pro||0)/Number(club.jogos) : 0;
+      const parsed=parsedScorers.get(normalize(club.time))||0;
+      const unknownLive=Math.max(0,Number(club._liveGoals||0)-parsed);
+      club.gols_nao_individualizados=Number(club.gols_nao_individualizados||0)+unknownLive;
+      club.marcadores.sort((a,b)=>Number(b.gols||0)-Number(a.gols||0)||String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR"));
+    }
+    base.sort((a,b)=>Number(b.gols_pro||0)-Number(a.gols_pro||0)||String(a.time||"").localeCompare(String(b.time||""),"pt-BR"));
+    base.forEach((club,index)=>{club.posicao=index+1;});
+    return base;
+  }
+
   function renderClubGoals() {
     const target = $("lista-gols-clube");
-    const list = Array.isArray(state.competition?.gols_por_clube) ? state.competition.gols_por_clube : [];
+    const list = liveClubGoalsRows();
     if (!list.length) {
       target.innerHTML = emptyState("Consolidado de gols por clube ainda não disponível.", "Aguarde a atualização automática dos dados.");
       return;
     }
-    target.innerHTML = `<div class="stats-club-goals-list">${list.map((club, index) => {
+    const liveGames = liveApplicableGames();
+    const baseGames = Number(state.competition?.resumo?.jogos_finalizados) || totalFinishedGames();
+    const liveSuffix = liveGames.length ? ` · 🔴 ${liveGames.length} ${liveGames.length === 1 ? "jogo ao vivo incorporado provisoriamente" : "jogos ao vivo incorporados provisoriamente"}` : "";
+    const goalsStatus = `Base consolidada: ${integer(baseGames)} jogos encerrados · atualizado ${dateTimeCompactBR(state.competition?.atualizado_em)}${liveSuffix}`;
+    target.innerHTML = `<div class="stats-data-status">${escapeHtml(goalsStatus)}</div><div class="stats-club-goals-list">${list.map((club, index) => {
       const markers = Array.isArray(club.marcadores) ? club.marcadores : [];
       const key = clubSlug(club.time);
       const expanded = Boolean(state.expandedClubGoals[key]);
       const shown = expanded ? markers : markers.slice(0, 5);
       const unknown = Number(club.gols_nao_individualizados || 0);
-      const expectedGames = expectedClubGames(club.time);
+      const expectedGames = expectedClubGamesWithLive(club.time);
       const gamesDenominator = expectedGames === null ? Number(club.jogos) : expectedGames;
       return `<details class="stats-club-goals-card">
         <summary>
           <span class="stats-rank">${integer(club.posicao || index + 1)}</span>
           <a class="stats-club-shield-link" href="${escapeAttr(clubHref(club.time))}" title="Abrir página de ${escapeAttr(club.time)}" aria-label="Abrir página de ${escapeAttr(club.time)}" onclick="event.stopPropagation()">${shield(club, "stats-club-shield")}</a>
           <div class="stats-club-goals-main"><a href="${escapeAttr(clubHref(club.time))}" onclick="event.stopPropagation()"><strong>${escapeHtml(club.time)}</strong></a><span>${coverageLabel(club.jogos, gamesDenominator)} jogos computados · média ${number(club.media_gols, 2)}</span></div>
-          <div class="stats-club-goals-value"><strong>${integer(club.gols_pro)}</strong><span>gols</span></div>
+          <div class="stats-club-goals-value"><strong>${integer(club.gols_pro)}</strong><span>gols</span>${club._liveGoals ? `<em class="stats-live-delta">+${integer(club._liveGoals)} AO VIVO</em>` : ""}</div>
           <span class="stats-game-chevron">⌄</span>
         </summary>
         <div class="stats-club-markers">
           <h4>Marcadores do clube</h4>
-          ${markers.length ? `<div class="stats-marker-list">${shown.map((player) => `<div><span>${escapeHtml(player.nome)}</span><strong>${integer(player.gols)}</strong></div>`).join("")}${unknown > 0 ? `<div class="stats-marker-other"><span>Gols contra ou ainda sem autoria individualizada</span><strong>${integer(unknown)}</strong></div>` : ""}</div>${markers.length > 5 ? `<button class="stats-expand-btn stats-marker-expand" type="button" data-expand-club-goals="${escapeAttr(key)}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${markers.length}) ↓`}</button>` : ""}` : emptyState("Nenhum marcador individualizado na base consolidada.")}
+          ${markers.length ? `<div class="stats-marker-list">${shown.map((player) => `<div><span>${escapeHtml(player.nome)}${player._liveDelta ? ` <em class="stats-live-inline">+${integer(player._liveDelta)} AO VIVO</em>` : ""}</span><strong>${integer(player.gols)}</strong></div>`).join("")}${unknown > 0 ? `<div class="stats-marker-other"><span>Gols contra ou ainda sem autoria individualizada</span><strong>${integer(unknown)}</strong></div>` : ""}</div>${markers.length > 5 ? `<button class="stats-expand-btn stats-marker-expand" type="button" data-expand-club-goals="${escapeAttr(key)}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${markers.length}) ↓`}</button>` : ""}` : emptyState("Nenhum marcador individualizado na base consolidada.")}
           <div class="stats-club-balance"><span>Gols sofridos: <b>${integer(club.gols_contra)}</b></span><span>Saldo: <b>${integer(club.saldo)}</b></span></div>
         </div>
       </details>`;
@@ -2452,6 +2567,44 @@
     });
   }
 
+  function liveFactsSignature(factsMap) {
+    return Object.entries(factsMap || {}).map(([eventId, facts]) => {
+      const goals=(facts?.goals||[]).map((g)=>[g.minute,g.scorer,g.team,(g.assists||[]).join("+"),g.ownGoal?1:0].join("~")).join(";");
+      const apps=(facts?.appearances||[]).map((a)=>playerKey(a.name,a.team)).sort().join(";");
+      return `${eventId}:${facts?.ok?1:0}:${goals}:${apps}`;
+    }).sort().join("|");
+  }
+
+  async function refreshLiveFacts(options = {}) {
+    const engine = window.BRClassificacaoLive;
+    if (!engine) return false;
+    const games = liveApplicableGames();
+    if (!games.length) {
+      const had = Object.keys(state.liveFacts || {}).length > 0;
+      state.liveFacts = {}; state.liveFactsError = null;
+      if (had && options.render !== false) { renderPlayers("artilheiros"); renderPlayers("assistencias"); renderClubGoals(); }
+      return had;
+    }
+    const previous = state.liveFacts || {};
+    const next = {};
+    let failures = 0;
+    await Promise.all(games.map(async (game) => {
+      const eventId=String(game.eventId||""); if(!eventId) return;
+      try {
+        const summary=await engine.fetchSummary(eventId);
+        const facts=engine.normalizeSummaryFacts(summary, game, canonicalLiveTeam);
+        next[eventId]={ ok:true, ...facts };
+      } catch (error) {
+        failures += 1;
+        next[eventId]=previous[eventId] || { ok:false, goals:[], appearances:[] };
+      }
+    }));
+    const changed=liveFactsSignature(next)!==liveFactsSignature(previous);
+    state.liveFacts=next; state.liveFactsFetchedAt=new Date(); state.liveFactsError=failures ? `${failures} summary(s) indisponível(is)` : null;
+    if ((changed || options.forceRender) && options.render !== false) { renderPlayers("artilheiros"); renderPlayers("assistencias"); renderClubGoals(); }
+    return changed;
+  }
+
   function liveSignature(liveMap) {
     return Object.values(liveMap || {})
       .map((game) => [game.eventId || "", game.estado || "", game.placarMandante ?? "", game.placarVisitante ?? "", game.status || ""].join(":"))
@@ -2488,6 +2641,7 @@
       if (changed && options.render !== false) {
         renderProbabilityRanking();
         renderProbabilityDetails();
+        renderClubGoals();
       }
       return changed;
     } catch (error) {
@@ -2503,7 +2657,10 @@
   function armLiveRefresh() {
     clearTimeout(liveRefreshState.timer);
     const tick = async () => {
-      if (!document.hidden && liveWindowActive()) await refreshLiveStandings();
+      if (!document.hidden && liveWindowActive()) {
+        await refreshLiveStandings();
+        await refreshLiveFacts();
+      }
       clearTimeout(liveRefreshState.timer);
       liveRefreshState.timer = setTimeout(tick, REFRESH_MS);
     };
@@ -2511,7 +2668,7 @@
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) return;
       clearTimeout(liveRefreshState.timer);
-      refreshLiveStandings({ force: liveWindowActive() }).finally(() => {
+      refreshLiveStandings({ force: liveWindowActive() }).then(() => refreshLiveFacts()).finally(() => {
         liveRefreshState.timer = setTimeout(tick, REFRESH_MS);
       });
     });
@@ -2527,7 +2684,10 @@
     else if (["artilheiros", "jogos", "assistencias", "gols-clube", "campeonato", "probabilidades", "desempenho"].includes(hashTab)) state.tab = hashTab;
 
     await carregarDados();
-    if (liveWindowActive()) await refreshLiveStandings({ force: true, render: false });
+    if (liveWindowActive()) {
+      await refreshLiveStandings({ force: true, render: false });
+      await refreshLiveFacts({ render: false });
+    }
     renderAll();
     if (openProbabilityMethod) {
       requestAnimationFrame(() => $("metodologia-probabilidades")?.scrollIntoView({ behavior: "auto", block: "start" }));

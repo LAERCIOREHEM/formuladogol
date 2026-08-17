@@ -7,6 +7,7 @@
   "use strict";
 
   const SCOREBOARD_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/scoreboard";
+  const SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/bra.1/summary";
   const FINAL_MINUTES_AFTER_START = 90;
 
   function numberScore(value) {
@@ -151,6 +152,208 @@
       }
     }
     return map;
+  }
+
+
+  function personName(value) {
+    const person = value && (value.athlete || value.player || value.person || value) || {};
+    return String(person.displayName || person.fullName || person.name || person.shortName || "").trim();
+  }
+
+  function cleanPlayerName(value) {
+    return personName({ name: value })
+      .replace(/\s+(?:assisted by|following|after)\s+.*$/i, "")
+      .replace(/\s*\([^)]*\)\s*$/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function eventText(item) {
+    const type = item && item.type;
+    const parts = [];
+    if (type && typeof type === "object") parts.push(type.text, type.name, type.displayName, type.description);
+    else if (type) parts.push(type);
+    parts.push(item && item.text, item && item.description, item && item.shortText, item && item.headline);
+    return parts.filter(Boolean).map(String).filter((value, index, all) => all.indexOf(value) === index).join(" ").replace(/\s+/g, " ").trim();
+  }
+
+  function eventMinute(item) {
+    for (const key of ["clock", "time", "displayClock", "timeDisplayValue", "minute", "minuto"]) {
+      const value = item && item[key];
+      if (value && typeof value === "object") {
+        const text = value.displayValue || value.displayClock || value.text || value.value;
+        if (text != null && text !== "") return String(text);
+      } else if (value != null && value !== "") return String(value);
+    }
+    return "";
+  }
+
+  function summaryEventNodes(summary) {
+    const priorities = { scoringplays:100, keyevents:90, incidents:80, matchevents:75, plays:50, commentary:40, details:30 };
+    const out = [], seenLists = new Set();
+    const walk = (node) => {
+      if (!node) return;
+      if (Array.isArray(node)) { node.forEach(walk); return; }
+      if (typeof node !== "object") return;
+      for (const [key, value] of Object.entries(node)) {
+        const nk = normalizeText(key).replace(/\s+/g, "");
+        if (Array.isArray(value) && priorities[nk] && !seenLists.has(value)) {
+          seenLists.add(value);
+          value.forEach((item) => { if (item && typeof item === "object") out.push({ item, priority: priorities[nk] }); });
+        }
+        if (value && typeof value === "object") walk(value);
+      }
+    };
+    walk(summary || {});
+    return out.sort((a,b) => b.priority - a.priority);
+  }
+
+  function summaryTeamMap(summary, live, canonicalize) {
+    const canon = typeof canonicalize === "function" ? canonicalize : (value) => value;
+    const out = {};
+    const add = (team, fallback) => {
+      if (!team || typeof team !== "object") return;
+      const name = canon(team.displayName || team.shortDisplayName || team.name || team.location || fallback || "");
+      const id = String(team.id || team.uid || "");
+      if (id && name) out[id] = name;
+    };
+    const competitors = (((summary || {}).header || {}).competitions || [])[0]?.competitors || [];
+    competitors.forEach((row) => add(row.team || row, row.homeAway === "home" ? live?.mandante : live?.visitante));
+    (((summary || {}).boxscore || {}).teams || []).forEach((row) => add(row.team || row));
+    return out;
+  }
+
+  function eventAthletes(item) {
+    const out = [];
+    for (const key of ["athletes", "athletesInvolved", "participants", "players"]) {
+      for (const entry of (item && item[key]) || []) {
+        if (!entry || typeof entry !== "object") continue;
+        const name = personName(entry);
+        const role = normalizeText([entry.type, entry.role, entry.position].map((x) => x && typeof x === "object" ? (x.text || x.name || x.description || "") : (x || "")).join(" "));
+        if (name) out.push({ name: cleanPlayerName(name), role });
+      }
+    }
+    for (const key of ["athlete", "player", "scorer"]) {
+      if (item && item[key] && typeof item[key] === "object") {
+        const name = cleanPlayerName(personName(item[key]));
+        if (name && !out.some((row) => normalizeText(row.name) === normalizeText(name))) out.push({ name, role: key === "scorer" ? "scorer" : "" });
+      }
+    }
+    return out;
+  }
+
+  function isGoalEvent(item, text) {
+    const type = normalizeText(item && item.type && typeof item.type === "object" ? [item.type.text,item.type.name,item.type.description].filter(Boolean).join(" ") : item && item.type);
+    const normalized = normalizeText(text);
+    if (/attempt saved|shot saved|save made|shots on goal|shots on target|expected goals|goalkeeper|missed|blocked/.test(normalized) && !/\b(goal|gol)!/i.test(text)) return false;
+    return /\bown goal\b|\bgoal\b|\bgol\b/.test(type) || /\b(?:goal|gol)!/i.test(text) || /\bown goal by\b/i.test(text);
+  }
+
+  function teamFromEvent(item, teamMap, live, canonicalize) {
+    const canon = typeof canonicalize === "function" ? canonicalize : (value) => value;
+    const raw = item && (item.team || item.competitor || item.club);
+    if (raw && typeof raw === "object") {
+      const id = String(raw.id || raw.uid || "");
+      if (id && teamMap[id]) return teamMap[id];
+      const name = canon(raw.displayName || raw.shortDisplayName || raw.name || raw.location || raw.abbreviation || "");
+      if (name) return name;
+    }
+    return "";
+  }
+
+  function extractAssists(text) {
+    const out = [];
+    const regex = /assist(?:ed|ência|encia)?\s+(?:by|de|por)\s+([^.;()]+)/gi;
+    let match;
+    while ((match = regex.exec(String(text || "")))) {
+      const name = cleanPlayerName(match[1]);
+      if (name && !out.some((row) => normalizeText(row) === normalizeText(name))) out.push(name);
+    }
+    return out;
+  }
+
+  function summaryAppearances(summary, live, canonicalize, teamMap) {
+    const canon = typeof canonicalize === "function" ? canonicalize : (value) => value;
+    const out = [];
+    const blocks = [];
+    if (Array.isArray(summary && summary.rosters)) blocks.push(...summary.rosters);
+    if (Array.isArray(summary && summary.lineups)) blocks.push(...summary.lineups);
+    for (const [index, block] of blocks.entries()) {
+      if (!block || typeof block !== "object") continue;
+      const rawTeam = block.team || block.club || block.competitor || {};
+      let team = teamFromEvent({ team: rawTeam }, teamMap, live, canon);
+      if (!team) team = index === 0 ? live?.mandante : index === 1 ? live?.visitante : "";
+      const entries = [];
+      for (const key of ["roster", "athletes", "players", "lineup"]) if (Array.isArray(block[key])) entries.push(...block[key]);
+      for (const entry of entries) {
+        if (!entry || typeof entry !== "object") continue;
+        const dnp = entry.didNotPlay === true || entry.did_not_play === true || entry.dnp === true;
+        if (dnp) continue;
+        const rawMinutes = entry.minutes ?? entry.minutesPlayed ?? (entry.stats && entry.stats.minutes);
+        const minutes = Number(String(rawMinutes ?? "").replace(/[^0-9.]/g, ""));
+        const played = entry.starter === true || entry.starting === true || entry.isStarter === true || entry.subbedIn === true || entry.subbed_in === true || entry.entered === true || entry.played === true || entry.appeared === true || entry.participated === true || (Number.isFinite(minutes) && minutes > 0);
+        if (!played) continue;
+        const name = cleanPlayerName(personName(entry));
+        if (name && team) out.push({ name, team });
+      }
+    }
+    const seen = new Set();
+    return out.filter((row) => { const key = normalizeText(row.team)+"|"+normalizeText(row.name); if (seen.has(key)) return false; seen.add(key); return true; });
+  }
+
+  function normalizeSummaryFacts(summary, live, canonicalize) {
+    const canon = typeof canonicalize === "function" ? canonicalize : (value) => value;
+    const teamMap = summaryTeamMap(summary, live || {}, canon);
+    const best = new Map();
+    for (const node of summaryEventNodes(summary || {})) {
+      const item = node.item, text = eventText(item);
+      if (!text || !isGoalEvent(item, text)) continue;
+      const athletes = eventAthletes(item);
+      let scorer = (athletes.find((row) => !/assist/.test(row.role)) || {}).name || "";
+      if (!scorer) {
+        const m = text.match(/(?:goal|gol)!.*?\.\s*([^().]+?)\s*\(([^)]+)\)/i) || text.match(/own goal by\s+([^,.;]+)/i);
+        if (m) scorer = cleanPlayerName(m[1]);
+      }
+      let assists = athletes.filter((row) => /assist/.test(row.role)).map((row) => row.name);
+      if (!assists.length) assists = extractAssists(text);
+      const team = teamFromEvent(item, teamMap, live || {}, canon);
+      const minute = eventMinute(item);
+      const ownGoal = /own goal|gol contra/i.test(text);
+      const key = [minute.replace(/\s+/g,""), normalizeText(scorer) || normalizeText(text), normalizeText(team)].join("|");
+      const quality = node.priority + (scorer ? 20 : 0) + (team ? 10 : 0) + (assists.length ? 3 : 0);
+      const previous = best.get(key);
+      if (!previous || quality > previous.quality) best.set(key, { quality, goal:{ minute, scorer, team, assists, ownGoal, text } });
+    }
+    let goals = Array.from(best.values(), (entry) => entry.goal).sort((a,b) => (parseInt(a.minute)||999)-(parseInt(b.minute)||999));
+    const limits = new Map([[canon(live?.mandante), numberScore(live?.placarMandante) || 0], [canon(live?.visitante), numberScore(live?.placarVisitante) || 0]]);
+    const used = new Map();
+    goals = goals.filter((goal) => {
+      const team = canon(goal.team);
+      if (!team || !limits.has(team)) return true;
+      const count = used.get(team) || 0;
+      if (count >= limits.get(team)) return false;
+      used.set(team, count + 1);
+      goal.team = team;
+      return true;
+    });
+    const appearances = summaryAppearances(summary || {}, live || {}, canon, teamMap);
+    for (const goal of goals) {
+      if (goal.scorer && goal.team) appearances.push({ name: goal.scorer, team: goal.team });
+      goal.assists.forEach((name) => { if (name && goal.team) appearances.push({ name, team: goal.team }); });
+    }
+    const seen = new Set();
+    const uniqueAppearances = appearances.filter((row) => { const key=normalizeText(row.team)+"|"+normalizeText(row.name); if(seen.has(key)) return false; seen.add(key); return true; });
+    return { goals, appearances: uniqueAppearances };
+  }
+
+  async function fetchSummary(eventId, options) {
+    const opts = options || {};
+    const fetcher = opts.fetcher || (typeof fetch === "function" ? fetch.bind(globalThis) : null);
+    if (!fetcher) throw new Error("fetch indisponível");
+    const url = `${opts.url || SUMMARY_URL}?event=${encodeURIComponent(String(eventId || ""))}&_=${Date.now()}`;
+    const response = await fetcher(url, { cache:"no-store", signal: opts.signal });
+    if (!response || !response.ok) throw new Error(`ESPN summary HTTP ${response ? response.status : "sem resposta"}`);
+    return response.json();
   }
 
   function dateToken(date) {
@@ -350,6 +553,7 @@
 
   return {
     SCOREBOARD_URL,
+    SUMMARY_URL,
     numberScore,
     normalizeText,
     liveStatusText,
@@ -358,6 +562,8 @@
     gameKey,
     normalizeScoreboard,
     fetchScoreboard,
+    fetchSummary,
+    normalizeSummaryFacts,
     resultCounts,
     liveResultAlreadyStored,
     applicableGames,

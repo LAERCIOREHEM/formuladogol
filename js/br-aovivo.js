@@ -135,7 +135,7 @@
   ]);
 
   const FINAL_CACHE_KEY = "br2026_finais_reais_v2";
-  const LIVE_STATS_CACHE_KEY = "br2026_estatisticas_ao_vivo_v2";
+  const LIVE_STATS_CACHE_KEY = "br2026_estatisticas_ao_vivo_v3";
   const LIVE_STATS_CACHE_MAX_AGE_MS = 6 * 3600000;
   const PARTIAL_STATS_THRESHOLD = 6;
   const PARTIAL_STATS_RETRY_DELAY_MS = 1200;
@@ -1900,28 +1900,24 @@
   }
 
   const LIVE_METRIC_RULES = [
-    { keys:["expected goals","expectedgoals","xg"], label:"xG", order:1 },
-    { keys:["possession pct","possession percent","possession percentage","possessionpct","possession","posse"], label:"Posse", order:2, percent:true },
-    { keys:["total shots","totalshots","shots total","shots","shot attempts","finalizacoes","finalizações"], label:"Finalizações", order:3 },
-    { keys:["shots on goal","shots on target","shotsongoal","shotsontarget","chutes no gol"], label:"Chutes no gol", order:4 },
-    { keys:["shots off target","shotsofftarget"], label:"Chutes para fora", order:5 },
-    { keys:["blocked shots","blockedshots"], label:"Chutes bloqueados", order:6 },
-    { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage","aproveitamento dos chutes"], label:"Aproveitamento dos chutes", order:7, percent01:true, derived:"shotPct" },
-    { keys:["big chances created","bigchancescreated"], label:"Grandes chances", order:8 },
-    { keys:["big chances missed","bigchancesmissed"], label:"Chances perdidas", order:9 },
-    { keys:["fouls committed","foulscommitted","fouls"], label:"Faltas", order:10 },
-    { keys:["saves","goalkeeper saves"], label:"Defesas", order:11 },
-    { keys:["total passes","totalpasses","passes"], label:"Passes", order:12 },
-    { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:13 },
-    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:14, percent01:true },
-    { keys:["duels won","duelswon"], label:"Duelos vencidos", order:15 },
-    { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:16 },
-    { keys:["interceptions"], label:"Interceptações", order:17 },
-    { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:18 },
-    { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:19 },
-    { keys:["yellow cards","yellowcards"], label:"Amarelos", order:20 },
-    { keys:["red cards","redcards"], label:"Vermelhos", order:21 },
-    { keys:["offsides","offside"], label:"Impedimentos", order:22 }
+    { keys:["possession pct","possession percent","possession percentage","possessionpct","possession","posse"], label:"Posse", order:1, percent:true },
+    { keys:["total shots","totalshots","shots total","shots","shot attempts","finalizacoes","finalizações"], label:"Finalizações", order:2 },
+    { keys:["shots on goal","shots on target","shotsongoal","shotsontarget","chutes no gol"], label:"Chutes no gol", order:3 },
+    { keys:["blocked shots","blockedshots"], label:"Chutes bloqueados", order:4 },
+    { keys:["shot pct","shot percent","shot percentage","shotpct","shooting percentage","aproveitamento dos chutes"], label:"Aproveitamento dos chutes", order:5, percent01:true, derived:"shotPct" },
+    { keys:["fouls committed","foulscommitted","fouls"], label:"Faltas", order:6 },
+    { keys:["saves","goalkeeper saves"], label:"Defesas", order:7 },
+    { keys:["total passes","totalpasses","passes"], label:"Passes", order:8 },
+    { keys:["accurate passes","accuratepasses","completed passes","passes completed"], label:"Passes certos", order:9 },
+    { keys:["pass pct","pass percent","pass percentage","pass accuracy","passpct","passaccuracy"], label:"Precisão de passe", order:10, percent01:true },
+    { keys:["tackles won","tackleswon","tackles"], label:"Desarmes", order:11 },
+    { keys:["interceptions"], label:"Interceptações", order:12 },
+    { keys:["crosses","total crosses","totalcrosses"], label:"Cruzamentos", order:13 },
+    { keys:["clearances","clearance"], label:"Cortes", order:14 },
+    { keys:["corner kicks","cornerkicks","won corners","woncorners","corners"], label:"Escanteios", order:15 },
+    { keys:["yellow cards","yellowcards"], label:"Amarelos", order:16 },
+    { keys:["red cards","redcards"], label:"Vermelhos", order:17 },
+    { keys:["offsides","offside"], label:"Impedimentos", order:18 }
   ];
 
   function metricKey(s) {
@@ -2059,7 +2055,9 @@
   }
 
   function collectStats(g, summary) {
-    return mergeStatsRows(g, extractStatsRows(g, summary));
+    const rows = mergeStatsRows(g, extractStatsRows(g, summary));
+    const sorter = window.BREstatisticasOrdem;
+    return sorter ? sorter.sortStats(rows.map((row) => ({ ...row, nome: row.label }))).map(({ nome, ...row }) => row) : rows;
   }
 
   function goalsBySide(g, summary) {
