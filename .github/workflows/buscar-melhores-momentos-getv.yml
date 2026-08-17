@@ -136,8 +136,28 @@ jobs:
         run: |
           python - <<'PY'
           import json
+          import re
           from pathlib import Path
-          from scripts.substituir_fontes_preferidas_mm import chave_jogo_dict, preferido
+          from urllib.parse import parse_qs, urlparse
+          from scripts.substituir_fontes_preferidas_mm import chave_jogo_dict, classificar_video, preferido
+
+          def youtube_video_id_da_url(raw):
+              raw = str(raw or '').strip()
+              if not raw:
+                  return ''
+              parsed = urlparse(raw)
+              host = parsed.netloc.lower().split(':', 1)[0]
+              video_id = ''
+              if host in {'youtu.be', 'www.youtu.be'}:
+                  video_id = parsed.path.strip('/').split('/', 1)[0]
+              elif host == 'youtube.com' or host.endswith('.youtube.com'):
+                  if parsed.path.rstrip('/') == '/watch':
+                      video_id = (parse_qs(parsed.query).get('v') or [''])[0]
+                  else:
+                      partes = [x for x in parsed.path.split('/') if x]
+                      if len(partes) >= 2 and partes[0] in {'embed', 'shorts', 'live'}:
+                          video_id = partes[1]
+              return video_id if re.fullmatch(r'[A-Za-z0-9_-]{6,20}', video_id or '') else ''
 
           resultados = json.loads(Path('resultados.json').read_text(encoding='utf-8')).get('resultados') or []
           ids = {str(j.get('event_id') or j.get('id') or '') for j in resultados if str(j.get('event_id') or j.get('id') or '')}
@@ -159,10 +179,18 @@ jobs:
                       erros.append(f'{arquivo}:{key}: jogo ainda não está em resultados.json')
                   if not preferido(item):
                       erros.append(f'{arquivo}:{key}: fonte não autorizada ({item.get("fonte") or item.get("channel_title") or "sem fonte"})')
+                  video_id_url = youtube_video_id_da_url(item.get('url'))
+                  if not video_id_url:
+                      erros.append(f'{arquivo}:{key}: Melhores Momentos deve apontar para vídeo exato do YouTube; URL inválida: {item.get("url") or "sem URL"}')
+                  video_id_declarado = str(item.get('video_id') or '').strip()
+                  if video_id_declarado and video_id_url and video_id_declarado != video_id_url:
+                      erros.append(f'{arquivo}:{key}: video_id {video_id_declarado} diverge do vídeo da URL {video_id_url}')
+                  if classificar_video(item) == 'caze' and item.get('embeddable') is not False:
+                      erros.append(f'{arquivo}:{key}: CazéTV nunca pode ser embeddable em Melhores Momentos')
 
           if erros:
               raise SystemExit('Validação de melhores momentos falhou:\n- ' + '\n- '.join(erros[:30]))
-          print(f'OK: {len(ids)} resultados; todos os vínculos pertencem a jogos encerrados e fontes autorizadas.')
+          print(f'OK: {len(ids)} resultados; todos os vínculos são vídeos exatos do YouTube em fontes autorizadas; CazéTV sem embed.')
           PY
 
       - name: Gerar auditorias da aba Resultados e das fontes
