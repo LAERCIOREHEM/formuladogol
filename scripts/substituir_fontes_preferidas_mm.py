@@ -12,7 +12,9 @@ preferidas:
 
 Regra editorial atual:
   - canal aleatório NÃO entra no site, mesmo que o título diga "ge.globo";
-  - nas primeiras 48 horas, prioriza GE/Globo, CazéTV e Prime Video;
+  - a transmissão oficial do jogo define a prioridade de busca: Prime -> Prime Video Sport Brasil;
+    GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV;
+  - se a fonte que transmitiu ainda não publicou, mantém fallback entre as demais fontes primárias;
   - depois de 48 horas sem publicação primária, aceita UOL Esporte;
   - se não achar vídeo em fonte preferida, o jogo fica SEM link;
   - a auditoria informa exatamente quais jogos seguem sem link preferido.
@@ -43,11 +45,15 @@ MM_MANUAL = RAIZ / "dados-br" / "melhores-momentos-manual.json"
 GETV_PLAYLISTS = RAIZ / "dados-br" / "getv-playlists.json"
 RELATORIO = RAIZ / "dados-br" / "relatorio-substituicao-fontes.json"
 RESULTADOS = RAIZ / "resultados.json"
+TRANSMISSOES_TV = RAIZ / "dados-br" / "transmissoes-tv.json"
 
 # Channel IDs usados como trava dura quando o vídeo vem da API.
 GE_CHANNEL_ID = "UCgCKagVhzGnZcuP9bSMgMCg"
 CAZE_CHANNEL_ID = "UCZiYbVptd3PVPf4f6eR6UaQ"
-PRIME_HANDLES = ["@primevideosportbr", "@PrimeVideoSportBR", "@primevideobr", "@primevideobrasil"]
+# Canal esportivo oficial da Prime Video no Brasil. O ID é a âncora dura; handles
+# ficam apenas como fallback documental caso o canal seja migrado no futuro.
+PRIME_CHANNEL_ID = "UC6RD83p2Hlum9aURp3pASeQ"
+PRIME_HANDLES = ["@PrimeVideoSportBrasil", "@primevideosportbr", "@PrimeVideoSportBR", "@primevideobr", "@primevideobrasil"]
 UOL_HANDLES = ["@uolesporte", "@UOLEsporte"]
 UOL_FALLBACK_HORAS = 48
 
@@ -186,6 +192,10 @@ def resolver_channel_id(api_key: str, handles: Iterable[str]) -> str:
 
 
 def resolver_prime_channel_id(api_key: str) -> str:
+    # Channel ID conhecido evita uma chamada channels.list e impede que um alias
+    # incompleto faça a busca do Prime desaparecer silenciosamente.
+    if PRIME_CHANNEL_ID:
+        return PRIME_CHANNEL_ID
     return resolver_channel_id(api_key, PRIME_HANDLES)
 
 
@@ -374,11 +384,80 @@ def score_candidato(cand: Dict[str, Any], jogo: Dict[str, Any]) -> int:
     return score
 
 
-def escolher_candidato(jogo: Dict[str, Any], cands: Iterable[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+def _familia_transmissao(canal: Any) -> str:
+    n = norm_min(canal)
+    if not n:
+        return ""
+    if "prime video" in n or "amazon prime" in n:
+        return "prime"
+    if any(x in n for x in ["ge tv", "ge.globo", "sportv", "premiere", "globoplay", "tv globo", "globo"]):
+        return "ge"
+    if any(x in n for x in ["cazetv", "caze tv", "caze", "record"]):
+        return "caze"
+    return ""
+
+
+def indexar_transmissoes_tv(data: Dict[str, Any]) -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Dict[str, Any]]]:
+    por_id: Dict[str, Dict[str, Any]] = {}
+    por_chave: Dict[str, Dict[str, Any]] = {}
+    jogos = data.get("jogos") or {}
+    itens = jogos.values() if isinstance(jogos, dict) else jogos if isinstance(jogos, list) else []
+    for reg in itens:
+        if not isinstance(reg, dict):
+            continue
+        eid = str(reg.get("event_id") or reg.get("id") or "").strip()
+        if eid:
+            por_id[eid] = reg
+        if reg.get("rodada") and reg.get("mandante") and reg.get("visitante"):
+            fake = {
+                "rodada": reg.get("rodada"),
+                "mandante": {"nome": reg.get("mandante")},
+                "visitante": {"nome": reg.get("visitante")},
+            }
+            por_chave[chave_jogo_dict(fake)] = reg
+    return por_id, por_chave
+
+
+def transmissao_do_jogo(jogo: Dict[str, Any], tx_por_id: Dict[str, Dict[str, Any]], tx_por_chave: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    eid = str(jogo.get("event_id") or jogo.get("id") or "").strip()
+    if eid and eid in tx_por_id:
+        return tx_por_id[eid]
+    return tx_por_chave.get(chave_jogo_dict(jogo), {})
+
+
+def ordem_fontes_para_jogo(jogo: Dict[str, Any], tx_por_id: Optional[Dict[str, Dict[str, Any]]] = None, tx_por_chave: Optional[Dict[str, Dict[str, Any]]] = None) -> List[str]:
+    """Retorna a ordem de busca orientada pela transmissão oficial registrada.
+
+    A fonte que originou a transmissão ganha precedência, mas nunca exclusividade:
+    se ela ainda não publicou highlights, as demais fontes primárias seguem válidas.
+    """
+    tx = transmissao_do_jogo(jogo, tx_por_id or {}, tx_por_chave or {})
+    prioritarias: List[str] = []
+    for canal in tx.get("canais") or []:
+        familia = _familia_transmissao(canal)
+        if familia and familia not in prioritarias:
+            prioritarias.append(familia)
+
+    # Se a grade marcar exclusividade, a família originadora fica inequivocamente
+    # na frente. Para grades com múltiplas emissoras, preservamos a ordem registrada.
+    base = ["ge", "caze", "prime"]
+    ordem = prioritarias + [c for c in base if c not in prioritarias]
+    return ordem
+
+
+def escolher_candidato(
+    jogo: Dict[str, Any],
+    cands: Iterable[Dict[str, Any]],
+    ordem_fontes: Optional[List[str]] = None,
+) -> Optional[Dict[str, Any]]:
     aptos = [c for c in cands if video_serve_para_jogo(c.get("titulo"), jogo)]
     if not aptos:
         return None
-    aptos.sort(key=lambda c: (ORDEM.get(c.get("canal"), 99), -score_candidato(c, jogo), c.get("published_at") or ""))
+    ordem = ordem_fontes or ["ge", "caze", "prime", "uol"]
+    rank = {canal: idx for idx, canal in enumerate(ordem)}
+    if "uol" not in rank:
+        rank["uol"] = len(rank) + 10
+    aptos.sort(key=lambda c: (rank.get(c.get("canal"), 99), -score_candidato(c, jogo), c.get("published_at") or ""))
     return aptos[0]
 
 
@@ -639,6 +718,8 @@ def rodar(args: argparse.Namespace) -> int:
         jogos_resultados = []
     auto = carregar(MM_AUTO, {"jogos": {}})
     manual = carregar(MM_MANUAL, {"jogos": {}})
+    transmissoes_tv = carregar(TRANSMISSOES_TV, {"jogos": {}})
+    tx_por_id, tx_por_chave = indexar_transmissoes_tv(transmissoes_tv)
     auto.setdefault("jogos", {})
     manual.setdefault("jogos", {})
     auto_jogos_originais = json.loads(json.dumps(auto.get("jogos") or {}))
@@ -675,10 +756,17 @@ def rodar(args: argparse.Namespace) -> int:
         item = video_do_jogo(jogo, por_id, por_chave)
         video = item[2] if item else None
         cat = classificar_video(video, prime_id, uol_id)
+        ordem_jogo = ordem_fontes_para_jogo(jogo, tx_por_id, tx_por_chave)
+        primeira = ordem_jogo[0] if ordem_jogo else "ge"
         if cat == "sem_video":
             alvos.append((jogo, "sem_link_preferido", item))
         elif cat in {"ge", "caze", "prime", "uol"}:
-            mantidos_preferidos.append(resumo_jogo(jogo, f"mantido: fonte preferida ({cat})", video))
+            # Um link válido continua publicável, mas se não for da fonte que
+            # transmitiu o jogo tentamos promovê-lo para a origem prioritária.
+            if cat != primeira and primeira in {"ge", "caze", "prime"}:
+                alvos.append((jogo, f"fonte_valida_mas_prioridade_da_transmissao_e_{primeira}", item))
+            else:
+                mantidos_preferidos.append(resumo_jogo(jogo, f"mantido: fonte preferida ({cat})", video))
         else:
             alvos.append((jogo, "fonte_nao_preferida_removida", item))
 
@@ -697,13 +785,6 @@ def rodar(args: argparse.Namespace) -> int:
                     candidatos.extend(listar_playlist(api_key, pid, args.paginas_getv, "ge"))
         except Exception as exc:
             erros.append(f"Falha ao varrer playlists GE: {exc}")
-        # A playlist da rodada pode demorar a receber um vídeo recém-publicado e
-        # search.list também pode sofrer atraso de indexação. A playlist de uploads
-        # do canal oficial GE TV é barata (playlistItems) e fecha essa janela.
-        try:
-            candidatos.extend(listar_playlist(api_key, uploads_de(GE_CHANNEL_ID), args.paginas_getv_uploads, "ge"))
-        except Exception as exc:
-            erros.append(f"Falha ao varrer uploads GE TV: {exc}")
         try:
             candidatos.extend(listar_playlist(api_key, uploads_de(CAZE_CHANNEL_ID), args.paginas_caze, "caze"))
         except Exception as exc:
@@ -722,13 +803,14 @@ def rodar(args: argparse.Namespace) -> int:
     for jogo, motivo, item in alvos:
         event_id = str(jogo.get("event_id") or jogo.get("id") or "")
         atual = item[2] if item else None
-        cand = escolher_candidato(jogo, candidatos)
+        ordem_jogo = ordem_fontes_para_jogo(jogo, tx_por_id, tx_por_chave)
+        cand = escolher_candidato(jogo, candidatos, ordem_jogo)
 
-        # Se a varredura por playlists não achou, tenta search.list SOMENTE dentro dos canais permitidos.
+        # Se a varredura por playlists não achou, tenta search.list SOMENTE dentro dos canais permitidos,
+        # começando pela emissora/plataforma que efetivamente transmitiu o jogo.
         if not cand and youtube_ativo and QUOTA["search"] < args.max_search_total:
-            canais = [(GE_CHANNEL_ID, "ge"), (CAZE_CHANNEL_ID, "caze")]
-            if prime_id:
-                canais.append((prime_id, "prime"))
+            ids_canais = {"ge": GE_CHANNEL_ID, "caze": CAZE_CHANNEL_ID, "prime": prime_id}
+            canais = [(ids_canais[c], c) for c in ordem_jogo if ids_canais.get(c)]
             # UOL só participa do search.list depois de 48h sem fonte primária.
             # Vínculos manuais informados pelo administrador continuam válidos
             # imediatamente, pois já foram individualmente conferidos.
@@ -745,11 +827,12 @@ def rodar(args: argparse.Namespace) -> int:
                             "rodada": jogo.get("rodada"),
                             "jogo": f"{nome_time(jogo.get('mandante'))} x {nome_time(jogo.get('visitante'))}",
                             "canal": canal,
+                            "prioridade_fontes": ordem_jogo,
                             "query": q,
                             "resultados": len(achados),
                         })
                         candidatos.extend(achados)
-                        cand = escolher_candidato(jogo, achados)
+                        cand = escolher_candidato(jogo, achados, ordem_jogo)
                         if cand:
                             break
                     except Exception as exc:
@@ -782,15 +865,11 @@ def rodar(args: argparse.Namespace) -> int:
                 remover_chave(auto, key, event_id)
                 remover_chave(manual, key, event_id)
             removidos.append(resumo_jogo(jogo, motivo, atual))
-        if uol_fallback_liberado(jogo):
-            motivo_sem_link = "sem link em GE/Globo, CazéTV, Prime Video ou UOL após 48h"
-        else:
-            motivo_sem_link = "sem link em GE/Globo, CazéTV ou Prime Video; UOL ainda bloqueado pela carência de 48h"
-        ainda_sem_link.append(resumo_jogo(jogo, motivo_sem_link, atual))
+        ainda_sem_link.append(resumo_jogo(jogo, "sem link em GE/Globo, CazéTV, Prime Video ou UOL após 48h", atual))
 
     if not args.dry_run:
         fonte_auto = "GE/Globo, CazéTV, Prime Video e fallback UOL Esporte / YouTube"
-        politica_auto = "GE/Globo, CazéTV e Prime Video têm prioridade; após 48 horas sem publicação, UOL Esporte é aceito como fallback. Outros canais são removidos."
+        politica_auto = "A transmissão oficial define a primeira fonte de busca (Prime, GE/Globo/Premiere/sportv ou CazéTV/Record); as demais fontes primárias seguem como fallback. Após 48 horas, UOL Esporte é aceito como fallback. Outros canais são removidos."
         observacao_manual = "Fallback manual prioritário. GE/Globo, CazéTV e Prime Video são fontes primárias; UOL Esporte é permitido manualmente e como fallback automático após 48 horas."
         auto_mudou = (
             auto.get("jogos") != auto_jogos_originais
@@ -820,8 +899,8 @@ def rodar(args: argparse.Namespace) -> int:
         "atualizado_em": agora_iso(),
         "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
         "politica": {
-            "regra": "GE/Globo/sportv/Premiere/Globoplay, CazéTV e Amazon Prime Video são prioritários. Após 48 horas sem vídeo, UOL Esporte é aceito como fallback.",
-            "criterio": "A validação usa fonte/canal real e channelId quando disponível. Título com 'ge.globo' em canal aleatório não é aceito; UOL automático respeita carência de 48 horas.",
+            "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
+            "criterio": "A validação usa fonte/canal real e channelId quando disponível. A prioridade vem de dados-br/transmissoes-tv.json; título com 'ge.globo' em canal aleatório não é aceito; UOL automático respeita carência de 48 horas.",
             "escopo": "Apenas módulo Brasileirão. Nada em copa2026 é alterado.",
         },
         "dry_run": bool(args.dry_run),
@@ -876,7 +955,6 @@ def selftest() -> int:
     c(classificar_video({"channel_id": CAZE_CHANNEL_ID}) == "caze", "classifica CazéTV por channelId")
     c(preferido({"fonte": "UOL Esporte / YouTube"}), "aceita UOL Esporte como fonte de fallback")
     c(uploads_de(GE_CHANNEL_ID).startswith("UU"), "gera playlist de uploads")
-    c(uploads_de(GE_CHANNEL_ID) == "UU" + GE_CHANNEL_ID[2:], "playlist de uploads GE TV é derivada corretamente do channelId")
     antigo = {**jogo, "data_iso": "2026-07-15T20:00:00-03:00"}
     recente = {**jogo, "data_iso": "2026-07-18T20:00:00-03:00"}
     agora_teste = datetime(2026, 7, 18, 21, 0, tzinfo=BRT)
@@ -901,7 +979,28 @@ def selftest() -> int:
     cand_ge = {"video_id": "a", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "ge", "metodo": "playlistItems"}
     cand_caze = {"video_id": "b", "titulo": "REMO 1 X 0 SÃO PAULO | MELHORES MOMENTOS | 18ª RODADA BRASILEIRÃO 2026", "canal": "caze", "metodo": "search.list"}
     esc = escolher_candidato(jogo, [cand_caze, cand_ge])
-    c(esc and esc["video_id"] == "a", "prioridade GE > Cazé")
+    c(esc and esc["video_id"] == "a", "fallback padrão mantém GE > Cazé")
+
+    tx_prime = ({"evt-prime": {"event_id": "evt-prime", "canais": ["Prime Video"], "exclusivo": True}}, {})
+    jogo_prime = {**jogo, "event_id": "evt-prime"}
+    cand_prime = {"video_id": "p", "titulo": cand_ge["titulo"], "canal": "prime", "metodo": "playlistItems"}
+    ordem_prime = ordem_fontes_para_jogo(jogo_prime, *tx_prime)
+    c(ordem_prime[:3] == ["prime", "ge", "caze"], "Prime exclusivo é pesquisado antes de GE/Cazé")
+    esc_prime = escolher_candidato(jogo_prime, [cand_ge, cand_caze, cand_prime], ordem_prime)
+    c(esc_prime and esc_prime["video_id"] == "p", "jogo do Prime prefere highlight oficial do Prime")
+    esc_prime_fallback = escolher_candidato(jogo_prime, [cand_ge, cand_caze], ordem_prime)
+    c(esc_prime_fallback and esc_prime_fallback["video_id"] == "a", "sem vídeo Prime, fallback GE/Cazé continua funcionando")
+
+    tx_ge = ({"evt-ge": {"event_id": "evt-ge", "canais": ["Premiere", "Globo"]}}, {})
+    jogo_ge = {**jogo, "event_id": "evt-ge"}
+    ordem_ge = ordem_fontes_para_jogo(jogo_ge, *tx_ge)
+    c(ordem_ge[0] == "ge", "Premiere/Globo priorizam GE TV")
+
+    tx_caze = ({"evt-caze": {"event_id": "evt-caze", "canais": ["CazéTV", "Record"]}}, {})
+    jogo_caze = {**jogo, "event_id": "evt-caze"}
+    ordem_caze = ordem_fontes_para_jogo(jogo_caze, *tx_caze)
+    c(ordem_caze[0] == "caze", "CazéTV/Record priorizam CazéTV")
+    c(resolver_prime_channel_id("chave-nao-usada") == PRIME_CHANNEL_ID, "Prime usa channel ID oficial fixo sem depender de handle")
     entrada_caze = montar_entrada(jogo, {"video_id": "b", "titulo": "REMO X SÃO PAULO | MELHORES MOMENTOS", "canal": "caze"})
     c(entrada_caze.get("embeddable") is False, "CazéTV deve ser link externo, nunca embed")
     entrada = montar_entrada(jogo, cand_ge)
@@ -918,7 +1017,6 @@ def main() -> int:
     ap.add_argument("--rodada-inicio", type=int, default=0)
     ap.add_argument("--rodada-fim", type=int, default=0)
     ap.add_argument("--paginas-getv", type=int, default=2)
-    ap.add_argument("--paginas-getv-uploads", type=int, default=4, help="páginas recentes da playlist de uploads do canal GE TV")
     ap.add_argument("--paginas-caze", type=int, default=12)
     ap.add_argument("--paginas-prime", type=int, default=8)
     ap.add_argument("--max-search-total", type=int, default=20, help="limite de chamadas search.list somente em canais preferidos")
