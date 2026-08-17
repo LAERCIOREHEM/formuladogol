@@ -697,6 +697,13 @@ def rodar(args: argparse.Namespace) -> int:
                     candidatos.extend(listar_playlist(api_key, pid, args.paginas_getv, "ge"))
         except Exception as exc:
             erros.append(f"Falha ao varrer playlists GE: {exc}")
+        # A playlist da rodada pode demorar a receber um vídeo recém-publicado e
+        # search.list também pode sofrer atraso de indexação. A playlist de uploads
+        # do canal oficial GE TV é barata (playlistItems) e fecha essa janela.
+        try:
+            candidatos.extend(listar_playlist(api_key, uploads_de(GE_CHANNEL_ID), args.paginas_getv_uploads, "ge"))
+        except Exception as exc:
+            erros.append(f"Falha ao varrer uploads GE TV: {exc}")
         try:
             candidatos.extend(listar_playlist(api_key, uploads_de(CAZE_CHANNEL_ID), args.paginas_caze, "caze"))
         except Exception as exc:
@@ -775,7 +782,11 @@ def rodar(args: argparse.Namespace) -> int:
                 remover_chave(auto, key, event_id)
                 remover_chave(manual, key, event_id)
             removidos.append(resumo_jogo(jogo, motivo, atual))
-        ainda_sem_link.append(resumo_jogo(jogo, "sem link em GE/Globo, CazéTV, Prime Video ou UOL após 48h", atual))
+        if uol_fallback_liberado(jogo):
+            motivo_sem_link = "sem link em GE/Globo, CazéTV, Prime Video ou UOL após 48h"
+        else:
+            motivo_sem_link = "sem link em GE/Globo, CazéTV ou Prime Video; UOL ainda bloqueado pela carência de 48h"
+        ainda_sem_link.append(resumo_jogo(jogo, motivo_sem_link, atual))
 
     if not args.dry_run:
         fonte_auto = "GE/Globo, CazéTV, Prime Video e fallback UOL Esporte / YouTube"
@@ -865,6 +876,7 @@ def selftest() -> int:
     c(classificar_video({"channel_id": CAZE_CHANNEL_ID}) == "caze", "classifica CazéTV por channelId")
     c(preferido({"fonte": "UOL Esporte / YouTube"}), "aceita UOL Esporte como fonte de fallback")
     c(uploads_de(GE_CHANNEL_ID).startswith("UU"), "gera playlist de uploads")
+    c(uploads_de(GE_CHANNEL_ID) == "UU" + GE_CHANNEL_ID[2:], "playlist de uploads GE TV é derivada corretamente do channelId")
     antigo = {**jogo, "data_iso": "2026-07-15T20:00:00-03:00"}
     recente = {**jogo, "data_iso": "2026-07-18T20:00:00-03:00"}
     agora_teste = datetime(2026, 7, 18, 21, 0, tzinfo=BRT)
@@ -906,6 +918,7 @@ def main() -> int:
     ap.add_argument("--rodada-inicio", type=int, default=0)
     ap.add_argument("--rodada-fim", type=int, default=0)
     ap.add_argument("--paginas-getv", type=int, default=2)
+    ap.add_argument("--paginas-getv-uploads", type=int, default=4, help="páginas recentes da playlist de uploads do canal GE TV")
     ap.add_argument("--paginas-caze", type=int, default=12)
     ap.add_argument("--paginas-prime", type=int, default=8)
     ap.add_argument("--max-search-total", type=int, default=20, help="limite de chamadas search.list somente em canais preferidos")
