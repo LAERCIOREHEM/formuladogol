@@ -1,7 +1,7 @@
 {
-  "atualizado_em": "2026-08-16T22:42:35-03:00",
+  "atualizado_em": "2026-08-16T23:05:00-03:00",
   "fonte": "manual",
-  "observacao": "Fallback manual prioritário. GE/Globo, CazéTV e Prime Video são fontes primárias; UOL Esporte é permitido manualmente e como fallback automático após 48 horas.",
+  "observacao": "Fallback manual prioritário. Todo vínculo de Melhores Momentos deve apontar para um vídeo exato do YouTube em fonte autorizada; páginas ge.globo/Globoplay não são destinos válidos. GE TV pode usar embed; CazéTV permanece sempre sem embed.",
   "exemplo_comentado": {
     "401841145": {
       "event_id": "401841145",
@@ -1133,21 +1133,22 @@
       "visitante": "Grêmio",
       "placar_mandante": 3,
       "placar_visitante": 0,
-      "video_id": "",
-      "titulo": "Atlético-MG 3 x 0 Grêmio | Melhores momentos | 23ª rodada | Brasileirão 2026",
-      "url": "https://ge.globo.com/video/atletico-mg-3-x-0-gremio-melhores-momentos-23a-rodada-brasileirao-2026-14873766.ghtml",
-      "thumbnail": null,
+      "video_id": "84Yo81jENDk",
+      "titulo": "ATLÉTICO-MG 3 X 0 GRÊMIO | MELHORES MOMENTOS | 23ª RODADA CAMPEONATO BRASILEIRO 2026 | ge tv",
+      "url": "https://www.youtube.com/watch?v=84Yo81jENDk",
+      "thumbnail": "https://i.ytimg.com/vi/84Yo81jENDk/hqdefault.jpg",
       "playlist_id": null,
       "published_at": "2026-08-16",
-      "fonte": "ge.globo",
-      "fonte_busca": "Pesquisa documental verificada no ge",
-      "channel_title": "ge",
+      "fonte": "GE TV / YouTube",
+      "fonte_busca": "Correção manual verificada no canal oficial GE TV / YouTube",
+      "channel_title": "ge tv",
       "confianca": 1.0,
       "motivos": [
-        "página oficial de melhores momentos do ge",
+        "vídeo oficial de melhores momentos no canal GE TV / YouTube",
         "event_id, placar e rodada conferidos em resultados.json",
-        "fonte primária autorizada"
-      ]
+        "URL de vídeo exata; página ge.globo não é aceita como destino de Melhores Momentos"
+      ],
+      "embeddable": true
     },
     "401841197": {
       "event_id": "401841197",
@@ -1157,21 +1158,22 @@
       "visitante": "Botafogo",
       "placar_mandante": 1,
       "placar_visitante": 0,
-      "video_id": "",
-      "titulo": "Vitória 1 x 0 Botafogo | Melhores Momentos | 23ª rodada | Campeonato Brasileiro 2026",
-      "url": "https://ge.globo.com/video/vitoria-1-x-0-botafogo-melhores-momentos-23a-rodada-campeonato-brasileiro-2026-14873994.ghtml",
-      "thumbnail": null,
+      "video_id": "eeF8CdvLfPo",
+      "titulo": "VITÓRIA 1 X 0 BOTAFOGO | MELHORES MOMENTOS | 23ª RODADA CAMPEONATO BRASILEIRO 2026 | ge.globo",
+      "url": "https://www.youtube.com/watch?v=eeF8CdvLfPo",
+      "thumbnail": "https://i.ytimg.com/vi/eeF8CdvLfPo/hqdefault.jpg",
       "playlist_id": null,
       "published_at": "2026-08-16",
-      "fonte": "ge.globo",
-      "fonte_busca": "Pesquisa documental verificada no ge",
-      "channel_title": "ge",
+      "fonte": "GE TV / YouTube",
+      "fonte_busca": "Correção manual verificada no canal oficial GE TV / YouTube",
+      "channel_title": "ge tv",
       "confianca": 1.0,
       "motivos": [
-        "página oficial de melhores momentos do ge",
+        "vídeo oficial de melhores momentos no canal GE TV / YouTube",
         "event_id, placar e rodada conferidos em resultados.json",
-        "fonte primária autorizada"
-      ]
+        "URL de vídeo exata; página ge.globo não é aceita como destino de Melhores Momentos"
+      ],
+      "embeddable": true
     }
   }
 }
