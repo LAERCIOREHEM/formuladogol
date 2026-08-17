@@ -89,11 +89,17 @@ jobs:
           est = json.loads(Path('dados-br/estatisticas-competicao.json').read_text(encoding='utf-8'))
           assert isinstance(aud.get('partidas_fisicas_sem_publico'), list)
           assert isinstance(det.get('jogos'), dict)
-          assert isinstance((est.get('publico') or {}).get('jogos'), list)
-          assert int((est.get('resumo') or {}).get('jogos_com_publico') or 0) > 0
+          publico = est.get('publico') or {}
+          resumo = est.get('resumo') or {}
+          assert isinstance(publico.get('ranking'), list), 'estatisticas-competicao.publico.ranking ausente/inválido'
+          assert int(resumo.get('jogos_finalizados') or 0) == int(aud.get('total_jogos_finalizados') or 0), 'finalizados divergentes entre estatísticas e auditoria de público'
+          assert int(resumo.get('jogos_com_publico') or 0) == int(aud.get('total_com_publico_ou_complemento') or 0), 'cobertura de público divergente'
+          assert int(resumo.get('jogos_com_renda') or 0) == int(aud.get('total_com_renda') or 0), 'cobertura de renda divergente'
+          assert int(resumo.get('jogos_com_publico') or 0) > 0
           print(
               'Cobertura após coleta: '
-              f"{aud.get('total_partidas_fisicas_com_publico')}/{aud.get('total_partidas_fisicas')} partidas físicas"
+              f"{aud.get('total_partidas_fisicas_com_publico')}/{aud.get('total_partidas_fisicas')} partidas físicas; "
+              f"renda {resumo.get('jogos_com_renda')}/{resumo.get('jogos_finalizados')}"
           )
           PY
 
