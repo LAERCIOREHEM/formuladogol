@@ -7,6 +7,7 @@ on:
   push:
     branches: [main]
     paths:
+      - '.github/workflows/deploy.yml'
       - 'index.html'
       - 'aovivo.html'
       - 'agenda.html'
@@ -46,6 +47,7 @@ on:
       - 'js/br-clubes.js'
       - 'js/br-config.js'
       - 'js/br-estatisticas.js'
+      - 'js/br-estatisticas-ordem.js'
       - 'js/br-classificacao-live.js'
       - 'js/br-acuracia.js'
       - 'js/br-feedback.js'
@@ -147,6 +149,7 @@ jobs:
             js/br-clubes.js
             js/br-config.js
             js/br-estatisticas.js
+            js/br-estatisticas-ordem.js
             js/br-classificacao-live.js
             js/br-acuracia.js
             js/br-feedback.js
