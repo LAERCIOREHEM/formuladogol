@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-08-16",
-  "executado_em": "2026-08-16T08:55:32-03:00",
+  "data_brt": "2026-08-17",
+  "executado_em": "2026-08-17T06:07:25-03:00",
   "status": "critico",
-  "resumo": "A base determinística está íntegra nos itens críticos, mas há avisos de fontes de transmissão e um jogo sem estatísticas disponíveis.",
+  "resumo": "A coleta determinística está íntegra nos indicadores críticos. Há avisos de falha em fontes de transmissão, mas sem perda crítica de cobertura e sem pendências que permitam correção.",
   "triagem": {
-    "data_hora_brt": "2026-08-16T08:55:32-03:00",
+    "data_hora_brt": "2026-08-17T06:07:25-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
@@ -17,11 +17,11 @@
         "calendario_falhas_graves": 0,
         "detalhes_inconsistencias": 0,
         "detalhes_falhas": 0,
-        "jogos_sem_estatisticas": 1,
+        "jogos_sem_estatisticas": 0,
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 3.7
+        "ultimo_sucesso_horas": 0.9
       }
     },
     "pendencias": {
@@ -659,8 +659,8 @@
     "tentativa_efetuada": true,
     "chamadas_nesta_execucao": 1,
     "limite_chamadas_dia": 1,
-    "falhas_consecutivas": 7,
-    "erro": "falha ao aplicar saída validada: Command '['/opt/hostedtoolcache/Python/3.12.13/x64/bin/python', 'scripts/gerar_analise_rodada.py', '--rodada', '22', '--editorial-json', '/tmp/tmp32m8iail.json', '--origem-editorial', 'openai:gpt-5.6-terra:auditoria-diaria']' returned non-zero exit status 1.",
+    "falhas_consecutivas": 8,
+    "erro": "falha ao aplicar saída validada: Command '['/opt/hostedtoolcache/Python/3.12.13/x64/bin/python', 'scripts/gerar_analise_rodada.py', '--rodada', '22', '--editorial-json', '/tmp/tmpxl0wuadb.json', '--origem-editorial', 'openai:gpt-5.6-terra:auditoria-diaria']' returned non-zero exit status 1.",
     "web_habilitada": false,
     "web_searches": 0,
     "web_tool_calls": 0,
@@ -669,19 +669,12 @@
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "A base determinística está íntegra nos itens críticos, mas há avisos de fontes de transmissão e um jogo sem estatísticas disponíveis.",
+    "resumo": "A coleta determinística está íntegra nos indicadores críticos. Há avisos de falha em fontes de transmissão, mas sem perda crítica de cobertura e sem pendências que permitam correção.",
     "problemas": [
       {
         "categoria": "fonte",
         "severidade": "atencao",
-        "mensagem": "Fontes de transmissão falharam, sem perda crítica de cobertura.",
-        "event_id": "",
-        "requer_intervencao": false
-      },
-      {
-        "categoria": "estatisticas",
-        "severidade": "atencao",
-        "mensagem": "Há um jogo sem estatísticas no monitoramento determinístico; não há inconsistência quantitativa nem ação de correção por esta camada.",
+        "mensagem": "Fontes de transmissão apresentaram falhas isoladas, sem perda crítica de cobertura nos dados finais.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -690,28 +683,28 @@
     "correcoes_transmissao": [],
     "melhores_momentos_pendentes": [],
     "editorial_rodada": {
-      "titulo": "Rodada movimenta a disputa em todas as faixas",
-      "linha_fina": "Vitórias de Flamengo, Athletico-PR, Cruzeiro, Corinthians e Grêmio redesenharam projeções, enquanto Palmeiras preservou a ponta após empate.",
+      "titulo": "Rodada movimenta a disputa em todas as faixas da tabela",
+      "linha_fina": "Vitórias de Flamengo, Athletico-PR, Corinthians, Cruzeiro e Grêmio alteraram projeções, enquanto o Santos viu crescer o risco na parte de baixo.",
       "secoes": [
         {
-          "titulo": "Liderança sob pressão",
+          "titulo": "Pressão no alto da tabela",
           "paragrafos": [
-            "O Palmeiras empatou com o Internacional e permaneceu na liderança, mas viu o Flamengo reduzir terreno com a vitória sobre o Vitória. O resultado rubro-negro foi o principal avanço na disputa pelo título entre os clubes do topo.",
-            "O Athletico-PR também venceu, diante do Santos, e reforçou sua posição entre os primeiros colocados. Cruzeiro e Corinthians foram outros vencedores que ganharam espaço nas projeções continentais."
+            "O Flamengo venceu o Vitória e reduziu a distância em relação ao Palmeiras, que empatou com o Internacional. O resultado rubro-negro elevou sua projeção de título, enquanto a do líder recuou após a igualdade.",
+            "O Athletico-PR também avançou com a vitória sobre o Santos. O clube ampliou sua projeção de classificação para a Libertadores e se manteve entre os primeiros colocados."
           ]
         },
         {
-          "titulo": "Meio da tabela em transformação",
+          "titulo": "Corrida continental ganha novos movimentos",
           "paragrafos": [
-            "O Cruzeiro superou o Mirassol e avançou na classificação. O Corinthians venceu o Bragantino fora de casa, enquanto o Coritiba bateu a Chapecoense e também subiu posições.",
-            "Botafogo e Fluminense dividiram pontos, assim como Bahia e Vasco da Gama. Os empates tiveram efeitos distintos: o Fluminense sustentou lugar de destaque, e o Bahia perdeu espaço nas projeções para a Libertadores."
+            "Corinthians e Cruzeiro venceram fora e dentro de casa, respectivamente, e deram saltos importantes nas projeções de Libertadores. O Coritiba também somou pontos ao superar a Chapecoense.",
+            "Bahia e Botafogo empataram em seus compromissos, enquanto o Bragantino foi derrotado pelo Corinthians. Os resultados mexeram nas projeções dos clubes na disputa por vagas continentais."
           ]
         },
         {
-          "titulo": "Parte de baixo ganha novos contornos",
+          "titulo": "Parte de baixo segue aberta",
           "paragrafos": [
-            "O Grêmio venceu o São Paulo e deu passo importante para se afastar da zona de rebaixamento. O Internacional também somou ponto fora de casa e melhorou sua perspectiva.",
-            "Na direção oposta, o Santos perdeu para o Athletico-PR e passou a ocupar a zona de rebaixamento. Remo e Chapecoense seguem nas últimas posições após empate e derrota, respectivamente."
+            "O Grêmio venceu o São Paulo e deixou a zona de rebaixamento, com queda relevante em seu risco projetado. O Internacional também reduziu sua projeção de queda após empatar com o Palmeiras.",
+            "O Santos perdeu para o Athletico-PR e passou a ocupar a zona de rebaixamento, com aumento expressivo no risco projetado. Remo, Vitória e Mirassol também tiveram piora nesse indicador após a rodada."
           ]
         }
       ]
@@ -829,6 +822,21 @@
       "executado_em": "2026-08-16T08:55:32-03:00",
       "status": "critico",
       "resumo": "A base determinística está íntegra nos itens críticos, mas há avisos de fontes de transmissão e um jogo sem estatísticas disponíveis.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "camada diária de IA falhou por dois dias/executações consecutivos"
+      ],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-08-17",
+      "executado_em": "2026-08-17T06:07:25-03:00",
+      "status": "critico",
+      "resumo": "A coleta determinística está íntegra nos indicadores críticos. Há avisos de falha em fontes de transmissão, mas sem perda crítica de cobertura e sem pendências que permitam correção.",
       "chamadas_openai": 1,
       "web_searches": 0,
       "publicos_aplicados": 0,
