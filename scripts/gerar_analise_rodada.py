@@ -467,8 +467,8 @@ def narrativa_segura(dossie: dict[str, Any]) -> dict[str, Any]:
     jogos = {j["mandante"]: j for j in dossie["jogos"]}
     if rodada == 20 and "Palmeiras" in jogos and "Flamengo" in jogos:
         return {
-            "titulo": "Rodada 20 abre a porta, mas Flamengo aproveita só parte do tropeço do Palmeiras",
-            "linha_fina": "O Atlético-MG derrubou o líder, o Flamengo parou no São Paulo e a rodada premiou Athletico-PR, Botafogo e Remo com avanços importantes nas projeções.",
+            "titulo": "Rodada 20: Palmeiras perde força e Botafogo avança na Libertadores",
+            "linha_fina": "A derrota do líder reabriu espaço no topo, enquanto Botafogo, Athletico-PR e Atlético-MG ganharam força nas projeções continentais do Brasileirão.",
             "secoes": [
                 {
                     "titulo": "O líder caiu; o perseguidor hesitou",
@@ -500,9 +500,26 @@ def narrativa_segura(dossie: dict[str, Any]) -> dict[str, Any]:
                 },
             ],
         }
+    favorito_antes = max(dossie["clubes"], key=lambda c: (c["titulo_antes"], c["clube"]))
+    favorito_depois = max(dossie["clubes"], key=lambda c: (c["titulo_depois"], c["clube"]))
+    if favorito_antes["clube"] != favorito_depois["clube"]:
+        titulo_forte = (
+            f"Rodada {rodada}: {favorito_depois['clube']} vira favorito ao título e supera "
+            f"{favorito_antes['clube']}"
+        )
+        linha_forte = (
+            f"A rodada mudou o favorito ao título do Brasileirão e também mexeu nas corridas por "
+            f"Libertadores, Sul-Americana e permanência."
+        )
+    else:
+        titulo_forte = f"Rodada {rodada}: {alta['clube']} avança nas chances de título e {baixa['clube']} perde força"
+        linha_forte = (
+            f"A rodada alterou a disputa pelo título e também redesenhou as projeções de Libertadores, "
+            f"Sul-Americana e rebaixamento."
+        )
     return {
-        "titulo": f"Rodada {rodada}: {alta['clube']} ganha espaço e {baixa['clube']} recua nas projeções",
-        "linha_fina": "Os resultados alteraram as probabilidades de título, classificação continental e permanência no Brasileirão.",
+        "titulo": titulo_forte,
+        "linha_fina": linha_forte,
         "secoes": [
             {
                 "titulo": "A mudança central da rodada",
@@ -1184,7 +1201,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
         <section><h2>Resultados considerados</h2><div class="analysis-results">{resultados}</div></section>
         <section class="analysis-movements"><h2>Como a rodada mexeu com as chances</h2><p class="analysis-help">O quadro destaca somente movimentos com relevância editorial: pelo menos 0,1 p.p. no título e 1,0 p.p. em Libertadores, Sul-Americana ou rebaixamento. A chance atual aparece junto da variação para preservar o contexto.</p><p class="analysis-percent-legend"><strong>Padrão dos percentuais:</strong> <b>0%</b> aparece somente quando o desfecho é estruturalmente impossível; <b>&lt;0,001%</b> preserva uma possibilidade ainda existente, mas abaixo da resolução exibida. Movimentos menores que os limiares acima não entram no destaque.</p>{destaques_movimentos(dossie)}{tabela_comparativa(dossie)}</section>
         <aside class="analysis-method"><strong>Leitura dos dados:</strong> as probabilidades são estimativas do AF-Previsão, calculadas em {dossie['simulacoes']:,} simulações e não representam certezas. A análise editorial utiliza somente um dossiê factual auditado; resultados e percentuais são inseridos diretamente dos JSONs do Fórmula do Gol.</aside>
-        <nav class="analysis-next" aria-label="Mais conteúdo"><a href="./">← Todas as análises</a><a href="../estatisticas.html#probabilidades">Probabilidades atuais →</a></nav>
+        <nav class="analysis-next" aria-label="Mais conteúdo"><a href="./">← Todas as análises</a><a href="../estatisticas.html#probabilidades">Probabilidades do Brasileirão 2026 →</a></nav>
       </article>
     </main>
     {rodape('../')}
@@ -1225,9 +1242,9 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
             f'<span>{esc(categoria_artigo(artigo))}{pendencia}</span><h2><a href="{esc(artigo["slug"])}">{esc(artigo["titulo"])}</a></h2>'
             f'<p>{esc(artigo["linha_fina"])}</p><a class="analysis-read" href="{esc(artigo["slug"])}">Ler análise →</a></article>'
         )
-    titulo = "Análises do Fórmula do Gol"
-    descricao = "Análises dos resultados do Brasileirão e dos torneios que alteram as chances continentais dos clubes da Série A."
-    return cabecalho_html("Análises", descricao, f"{SITE}/analises/", "CollectionPage") + f'''
+    titulo = "Análises do Brasileirão 2026"
+    descricao = "Análises do Brasileirão 2026 com mudanças nas chances de título, Libertadores, Sul-Americana e rebaixamento após cada rodada."
+    return cabecalho_html("Análises do Brasileirão 2026: título, Libertadores e rebaixamento", descricao, f"{SITE}/analises/", "CollectionPage") + f'''
 <body>
   <div class="container analysis-shell">
     <header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high"></header>
@@ -1273,7 +1290,7 @@ def gerar_feed(artigos: list[dict[str, Any]], momento: datetime) -> str:
         itens.append(f'''<item><title>{esc(a['titulo'])}</title><link>{esc(a['url'])}</link><guid isPermaLink="true">{esc(a['url'])}</guid><pubDate>{data}</pubDate><description>{esc(a['linha_fina'])}</description></item>''')
     agora_rfc = momento.astimezone(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")
     return f'''<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"><channel><title>Análises — Fórmula do Gol</title><link>{SITE}/analises/</link><description>Análises do Brasileirão e dos torneios que alteram as chances continentais dos clubes da Série A.</description><language>pt-BR</language><lastBuildDate>{agora_rfc}</lastBuildDate>{''.join(itens)}</channel></rss>'''
+<rss version="2.0"><channel><title>Análises do Brasileirão 2026 — Fórmula do Gol</title><link>{SITE}/analises/</link><description>Análises do Brasileirão 2026 com chances de título, Libertadores, Sul-Americana e rebaixamento após cada rodada.</description><language>pt-BR</language><lastBuildDate>{agora_rfc}</lastBuildDate>{''.join(itens)}</channel></rss>'''
 
 
 def carregar_manifesto() -> dict[str, Any]:
@@ -1466,7 +1483,7 @@ def self_test() -> int:
     hub = gerar_hub(carregar_manifesto().get("artigos") or [])
     assert '<header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png"' in hub
     assert "header-formula-do-gol.png" not in hub
-    assert '<h1 class="analysis-page-title">Análises do Fórmula do Gol</h1>' in hub
+    assert '<h1 class="analysis-page-title">Análises do Brasileirão 2026</h1>' in hub
     assert "analysis-hub-head" not in hub
     assert "Publicado em 02/08/2026" in hub and "analysis-round-nav" in hub and ">ANÁLISES</strong>" in hub
     print("OK self-test: detector, fatos, percentuais, editorial e HTML.")

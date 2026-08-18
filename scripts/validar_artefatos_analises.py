@@ -29,7 +29,7 @@ def validate(root: Path) -> None:
     articles = manifest.get("artigos") or []
     assert int(manifest.get("schema_version") or 0) >= 2, "manifesto editorial precisa usar schema 2"
     assert manifest.get("total_artigos") == len(articles) >= 1, "manifesto editorial vazio ou divergente"
-    ids, slugs, urls = set(), set(), set()
+    ids, slugs, urls, title_keys = set(), set(), set(), set()
     hub = (root / "analises" / "index.html").read_text(encoding="utf-8")
     Parser().feed(hub)
     assert "analysis-round-nav" in hub, "hub sem arquivo interno de análises"
@@ -52,7 +52,17 @@ def validate(root: Path) -> None:
         Parser().feed(text)
         assert '"@type":"NewsArticle"' in text, f"{slug}: NewsArticle ausente"
         assert f'data-fdg-editorial-id="{identifier}"' in text, f"{slug}: marcador editorial genérico ausente"
-        assert article["titulo"] in text, f"{slug}: título divergente"
+        title = str(article["titulo"])
+        description = str(article.get("linha_fina") or "")
+        title_key = re.sub(r"^rodada\s+\d+\s*:\s*", "", title.casefold()).strip()
+        assert title_key not in title_keys, f"{slug}: manchete editorial repetida: {title!r}"
+        title_keys.add(title_key)
+        assert f"<title>{title} — Fórmula do Gol</title>" in text, f"{slug}: <title> divergente do manifesto"
+        assert f"<h1>{title}</h1>" in text, f"{slug}: H1 divergente do manifesto"
+        assert f'meta name="description" content="{description}"' in text, f"{slug}: meta description divergente"
+        assert f'meta property="og:title" content="{title} — Fórmula do Gol"' in text, f"{slug}: og:title divergente"
+        assert f'meta name="twitter:title" content="{title} — Fórmula do Gol"' in text, f"{slug}: twitter:title divergente"
+        assert 'Probabilidades do Brasileirão 2026 →' in text, f"{slug}: âncora SEO para probabilidades ausente"
         assert "analysis-round-nav" in text, f"{slug}: navegação interna ausente"
         nav_match = re.search(r'<nav class="analysis-round-nav" aria-label="Arquivo de análises">(.*?)</nav>', text, flags=re.S)
         assert nav_match, f"{slug}: bloco de navegação interna inválido"

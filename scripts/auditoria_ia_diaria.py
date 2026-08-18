@@ -541,7 +541,11 @@ def build_openai_payload(triage: Mapping[str, Any], model: str) -> dict[str, Any
         "vínculo automático: apenas classifique a pendência; jogos com menos de vinte e quatro horas nem aparecem no dossiê. "
         "Se web_search estiver disponível, use-o apenas para lacunas factuais; prefira UMA única busca que cubra as pendências e não "
         "pesquise apenas para enriquecer prosa editorial. Os editoriais devem usar SOMENTE o dossiê fornecido, sem fatos externos, sem "
-        "algarismos na redação e sem inventar desempenho tático, jogadores, declarações ou causas. Se não houver editorial elegível, "
+        "algarismos na redação e sem inventar desempenho tático, jogadores, declarações ou causas. O título deve funcionar como uma manchete "
+        "jornalística específica: destacar o maior fato comprovado da rodada, priorizar uma mudança de favorito ao título quando ela ocorrer e, "
+        "na ausência disso, a oscilação esportivamente mais relevante em título, Libertadores ou rebaixamento. Evite fórmulas genéricas repetidas "
+        "como 'ganha espaço e recua nas projeções'. Use termos que descrevam a intenção real da página, como Brasileirão, título, Libertadores ou "
+        "rebaixamento quando forem o assunto central. Se não houver editorial elegível, "
         "retorne null no campo correspondente. Não transforme avisos isolados de fonte em incidente crítico quando os dados finais estão íntegros."
     )
     payload: dict[str, Any] = {
