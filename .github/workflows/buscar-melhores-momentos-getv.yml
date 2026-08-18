@@ -62,9 +62,11 @@ jobs:
           python -m py_compile scripts/substituir_fontes_preferidas_mm.py
           python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
           python -m py_compile scripts/gerar_relatorio_fontes_melhores_momentos.py
+          python -m py_compile scripts/sincronizar_midias_editoriais.py
           python scripts/buscar_melhores_momentos_getv.py --dry-run --modo incremental
           python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
           python scripts/substituir_fontes_preferidas_mm.py --selftest
+          python scripts/sincronizar_midias_editoriais.py --self-test
           python scripts/gerar_relatorio_fontes_melhores_momentos.py --dry-run
 
       - name: Buscar vídeos prioritários na GE TV por playlists
@@ -193,6 +195,12 @@ jobs:
           print(f'OK: {len(ids)} resultados; todos os vínculos são vídeos exatos do YouTube em fontes autorizadas; CazéTV sem embed.')
           PY
 
+      - name: Sincronizar melhores momentos nos editoriais já publicados
+        run: |
+          set -euo pipefail
+          python scripts/sincronizar_midias_editoriais.py
+          python scripts/validar_artefatos_analises.py
+
       - name: Gerar auditorias da aba Resultados e das fontes
         run: |
           python scripts/gerar_auditoria_cobertura_resultados.py
@@ -219,6 +227,14 @@ jobs:
             "dados-br/auditoria-fontes-melhores-momentos.json"
             "dados-br/relatorio-substituicao-fontes.json"
           )
+
+          # O sincronizador altera somente HTMLs editoriais que realmente ficaram
+          # defasados em relação aos JSONs de Melhores Momentos. Incluí-los
+          # dinamicamente permite corrigir um editorial mesmo quando o vídeo já
+          # estava no JSON antes desta execução.
+          while IFS= read -r arquivo; do
+            [[ -n "$arquivo" ]] && FILES+=("$arquivo")
+          done < <(git diff --name-only -- 'analises/*.html')
 
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "Nenhuma mudança nos JSONs de melhores momentos. Nada para commitar."
