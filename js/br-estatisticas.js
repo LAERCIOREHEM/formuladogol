@@ -489,18 +489,62 @@
     return rows.reduce((sum, club) => sum + Number(club?.gols_pro || 0), 0);
   }
 
-  function updateChampionshipGoalsBadges(rows = championshipGoalsRows()) {
+  function ownGoalBreakdown() {
+    const byClub = new Map();
+    const liveByClub = new Map();
+    const add = (map, team, amount = 1) => {
+      const key = normalize(team);
+      if (!key) return;
+      map.set(key, (map.get(key) || 0) + amount);
+    };
+
+    for (const game of Object.values(state.details?.jogos || {})) {
+      if (!game || typeof game !== "object") continue;
+      for (const goal of game.gols || []) {
+        const description = String(goal?.descricao || "");
+        if (!/own goal|gol contra/i.test(description) || !goal?.time) continue;
+        add(byClub, goal.time);
+      }
+    }
+
+    const activeEventIds = new Set(liveApplicableGames().map((game) => String(game.eventId || "")).filter(Boolean));
+    for (const [eventId, facts] of Object.entries(state.liveFacts || {})) {
+      if (!activeEventIds.has(String(eventId)) || !facts || facts.ok !== true) continue;
+      for (const goal of facts.goals || []) {
+        if (!goal?.ownGoal || !goal?.team) continue;
+        add(byClub, goal.team);
+        add(liveByClub, goal.team);
+      }
+    }
+
+    const total = Array.from(byClub.values()).reduce((sum, value) => sum + Number(value || 0), 0);
+    const liveTotal = Array.from(liveByClub.values()).reduce((sum, value) => sum + Number(value || 0), 0);
+    return { byClub, liveByClub, total, liveTotal };
+  }
+
+  function goalBreakdown(rows = championshipGoalsRows(), players = null) {
+    const playerList = Array.isArray(players) ? players : playerRows("artilheiros");
     const total = championshipGoalsTotal(rows);
+    const playerGoals = playerList.reduce((sum, player) => sum + Number(player?.gols || 0), 0);
+    const ownGoals = ownGoalBreakdown();
+    const unattributed = Math.max(0, total - playerGoals - ownGoals.total);
+    return { total, playerGoals, ownGoals: ownGoals.total, unattributed, ownGoalsByClub: ownGoals.byClub, liveOwnGoalsByClub: ownGoals.liveByClub, liveOwnGoals: ownGoals.liveTotal };
+  }
+
+  function updateChampionshipGoalsBadges(rows = championshipGoalsRows(), players = null) {
+    const breakdown = goalBreakdown(rows, players);
     const liveGames = liveApplicableGames();
-    const suffix = liveGames.length ? " · AO VIVO" : "";
+    const parts = [`${integer(breakdown.total)} gols no campeonato`, `${integer(breakdown.playerGoals)} de jogadores`, `${integer(breakdown.ownGoals)} gols contra`];
+    if (breakdown.unattributed > 0) parts.push(`${integer(breakdown.unattributed)} sem autoria`);
+    if (liveGames.length) parts.push("AO VIVO");
     ["total-gols-campeonato-artilheiros", "total-gols-campeonato-clubes"].forEach((id) => {
       const node = $(id);
       if (node) {
-        node.textContent = `${integer(total)} gols no campeonato${suffix}`;
+        node.textContent = parts.join(" · ");
         node.classList.toggle("is-live", liveGames.length > 0);
       }
     });
-    return total;
+    return breakdown;
   }
 
   function renderPlayers(type) {
@@ -531,30 +575,43 @@
     const status = `Base consolidada: ${coverageLabel(gamesRead, totalGames)} jogos encerrados · escalações: ${coverageLabel(lineupGames, totalGames)} · atualizado ${dateTimeCompactBR(state.leaders?.atualizado_em)}${liveSuffix}`;
     const filterLabel = selectedClub ? `${selectedClub} · ${list.length} ${list.length === 1 ? "jogador" : "jogadores"} no ranking` : `${allPlayers.length} jogadores no ranking geral`;
     const goalRows = type === "artilheiros" ? championshipGoalsRows() : [];
-    const championshipGoals = type === "artilheiros" ? updateChampionshipGoalsBadges(goalRows) : 0;
+    const goalTotals = type === "artilheiros" ? updateChampionshipGoalsBadges(goalRows, allPlayers) : null;
     const selectedGoalClub = type === "artilheiros" && selectedClub
       ? goalRows.find((club) => normalize(club?.time) === normalize(selectedClub))
       : null;
+    const selectedOwnGoals = type === "artilheiros" && selectedClub ? Number(goalTotals?.ownGoalsByClub?.get(normalize(selectedClub)) || 0) : 0;
+    const selectedLiveOwnGoals = type === "artilheiros" && selectedClub ? Number(goalTotals?.liveOwnGoalsByClub?.get(normalize(selectedClub)) || 0) : 0;
+    const playerGoalsInScope = type === "artilheiros" ? list.reduce((sum, player) => sum + Number(player?.gols || 0), 0) : 0;
+    const scopeGoalTotal = type === "artilheiros" ? (selectedClub ? Number(selectedGoalClub?.gols_pro || 0) : Number(goalTotals?.total || 0)) : 0;
+    const scopeUnattributedGoals = type === "artilheiros" ? Math.max(0, scopeGoalTotal - playerGoalsInScope - (selectedClub ? selectedOwnGoals : Number(goalTotals?.ownGoals || 0))) : 0;
     const filteredTotal = type === "artilheiros"
-      ? (selectedClub ? Number(selectedGoalClub?.gols_pro || 0) : championshipGoals)
+      ? scopeGoalTotal
       : list.reduce((sum, player) => sum + Number(player?.[field] || 0), 0);
     const filteredTotalLabel = selectedClub ? "Total do clube" : "Total do campeonato";
     const filteredTotalUnit = type === "artilheiros" ? "gols" : "assistências";
     const totalTitle = type === "artilheiros"
-      ? "Inclui todos os gols creditados ao clube, inclusive gols contra ou ainda sem autoria individualizada."
+      ? "O total do clube fecha com os gols dos jogadores mais os gols contra a favor; qualquer evento sem autoria explícita é informado separadamente."
       : "Soma das assistências individualizadas e validadas na base atual.";
+    const totalBreakdown = type === "artilheiros"
+      ? `${integer(playerGoalsInScope)} de jogadores · ${integer(selectedClub ? selectedOwnGoals : Number(goalTotals?.ownGoals || 0))} ${selectedClub && selectedOwnGoals === 1 ? "gol contra" : "gols contra"}${scopeUnattributedGoals ? ` · ${integer(scopeUnattributedGoals)} sem autoria` : ""}`
+      : "";
     const filter = `<div class="stats-player-filter">
       <div class="stats-filter-control">
         <label for="stats-player-club-${type}">Clube</label>
         <select id="stats-player-club-${type}" data-player-club-filter="${type}" aria-label="Filtrar ${type === "artilheiros" ? "artilheiros" : "assistências"} por clube">${playerClubFilterOptions(selectedClub)}</select>
         <div class="stats-player-filter-footer">
           <div class="stats-player-filter-note">${escapeHtml(filterLabel)}</div>
-          <div class="stats-player-filter-total" title="${escapeAttr(totalTitle)}"><span>${escapeHtml(filteredTotalLabel)}</span><strong>${integer(filteredTotal)} ${escapeHtml(filteredTotalUnit)}</strong></div>
+          <div class="stats-player-filter-total" title="${escapeAttr(totalTitle)}"><span>${escapeHtml(filteredTotalLabel)}</span><strong>${integer(filteredTotal)} ${escapeHtml(filteredTotalUnit)}</strong>${totalBreakdown ? `<small>${escapeHtml(totalBreakdown)}</small>` : ""}</div>
         </div>
       </div>
     </div>`;
 
-    const ranking = list.length ? `<div class="stats-player-list">${shown.map((player, index) => {
+    const ownGoalRows = type === "artilheiros" && selectedClub ? [
+      selectedOwnGoals > 0 ? `<div class="stats-own-goal-row"><div class="stats-own-goal-icon">↩</div><div><strong>${selectedOwnGoals === 1 ? "Gol contra a favor" : "Gols contra a favor"}</strong><span>Conta para o placar e para Gols/clube, mas não pertence ao ranking individual.</span></div><div class="stats-own-goal-value"><strong>${integer(selectedOwnGoals)}</strong>${selectedLiveOwnGoals ? `<em class="stats-live-delta">+${integer(selectedLiveOwnGoals)} AO VIVO</em>` : ""}</div></div>` : "",
+      scopeUnattributedGoals > 0 ? `<div class="stats-own-goal-row is-unattributed"><div class="stats-own-goal-icon">?</div><div><strong>${scopeUnattributedGoals === 1 ? "Gol sem autoria individualizada" : "Gols sem autoria individualizada"}</strong><span>Evento contabilizado no placar, ainda sem jogador identificado na base.</span></div><div class="stats-own-goal-value"><strong>${integer(scopeUnattributedGoals)}</strong></div></div>` : ""
+    ].filter(Boolean).join("") : "";
+
+    const rankingList = list.length ? `<div class="stats-player-list">${shown.map((player, index) => {
       const rawGames = player.jogos;
       const games = rawGames === null || rawGames === undefined || rawGames === "" ? null : Number(rawGames);
       const hasGames = Number.isFinite(games) && games > 0;
@@ -571,7 +628,8 @@
         </div>
         <div class="stats-player-value"><strong>${integer(value)}</strong><span>${unit}</span>${player._liveDelta ? `<em class="stats-live-delta">+${integer(player._liveDelta)} AO VIVO</em>` : ""}</div>
       </article>`;
-    }).join("")}</div>${list.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-list="${type}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${list.length}) ↓`}</button>` : ""}` : emptyState(`Nenhum ${type === "artilheiros" ? "artilheiro" : "jogador com assistência"} encontrado para ${selectedClub}.`, "O filtro considera a base consolidada e os eventos provisórios AO VIVO já validados pela ESPN.");
+    }).join("")}</div>${list.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-list="${type}">${expanded ? "Mostrar somente os 5 primeiros ↑" : `Ver todos (${list.length}) ↓`}</button>` : ""}` : "";
+    const ranking = (rankingList || ownGoalRows) ? `${rankingList}${ownGoalRows ? `<div class="stats-own-goal-list">${ownGoalRows}</div>` : ""}` : emptyState(`Nenhum ${type === "artilheiros" ? "artilheiro" : "jogador com assistência"} encontrado para ${selectedClub}.`, "O filtro considera a base consolidada e os eventos provisórios AO VIVO já validados pela ESPN.");
 
     target.innerHTML = `<div class="stats-data-status${statusTone}">${escapeHtml(status)}</div>${filter}${ranking}`;
   }
@@ -765,7 +823,7 @@
     const liveSuffix = liveGames.length ? ` · 🔴 ${liveGames.length} ${liveGames.length === 1 ? "jogo ao vivo incorporado provisoriamente" : "jogos ao vivo incorporados provisoriamente"}` : "";
     const goalsStatus = `Base consolidada: ${integer(baseGames)} jogos encerrados · atualizado ${dateTimeCompactBR(state.competition?.atualizado_em)}${liveSuffix}`;
     const championshipGoals = updateChampionshipGoalsBadges(list);
-    target.innerHTML = `<div class="stats-data-status">${escapeHtml(goalsStatus)} · total: ${integer(championshipGoals)} gols</div><div class="stats-club-goals-list">${list.map((club, index) => {
+    target.innerHTML = `<div class="stats-data-status">${escapeHtml(goalsStatus)} · total: ${integer(championshipGoals.total)} gols</div><div class="stats-club-goals-list">${list.map((club, index) => {
       const markers = Array.isArray(club.marcadores) ? club.marcadores : [];
       const key = clubSlug(club.time);
       const expanded = Boolean(state.expandedClubGoals[key]);

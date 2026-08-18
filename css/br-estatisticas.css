@@ -2585,3 +2585,24 @@ body > .container > section.hero > img {
   .stats-section-head-meta { max-width: 58%; }
   .stats-player-filter-footer { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; }
 }
+
+
+/* GOLS CONTRA 20260817 — fecha o total do clube sem transformar gol contra em artilheiro. */
+.stats-player-filter-total small { display:block; margin-top:3px; color:var(--muted); font-size:9px; line-height:1.2; font-weight:800; white-space:normal; }
+.stats-own-goal-list { display:grid; gap:8px; margin-top:10px; }
+.stats-own-goal-row { display:grid; grid-template-columns:46px minmax(0,1fr) 74px; align-items:center; gap:12px; padding:12px 14px; border:1px dashed rgba(251,191,36,.28); border-radius:16px; background:rgba(251,191,36,.045); }
+.stats-own-goal-row.is-unattributed { border-color:rgba(148,163,184,.24); background:rgba(148,163,184,.035); }
+.stats-own-goal-icon { display:grid; place-items:center; width:38px; height:38px; border-radius:12px; color:#ffd452; background:rgba(251,191,36,.10); font-size:18px; font-weight:950; }
+.stats-own-goal-row > div:nth-child(2) { min-width:0; }
+.stats-own-goal-row > div:nth-child(2) strong { display:block; color:#fff3bf; font-size:14px; line-height:1.2; }
+.stats-own-goal-row > div:nth-child(2) span { display:block; margin-top:3px; color:var(--muted-2); font-size:10px; line-height:1.3; }
+.stats-own-goal-value { text-align:right; }
+.stats-own-goal-value > strong { display:block; color:#ffd452; font-size:24px; line-height:1; }
+@media (max-width:700px) {
+  .stats-player-filter-total small { font-size:8px; }
+  .stats-own-goal-row { grid-template-columns:36px minmax(0,1fr) 52px; gap:8px; padding:10px 9px; border-radius:13px; }
+  .stats-own-goal-icon { width:32px; height:32px; border-radius:10px; font-size:15px; }
+  .stats-own-goal-row > div:nth-child(2) strong { font-size:12px; }
+  .stats-own-goal-row > div:nth-child(2) span { font-size:9px; }
+  .stats-own-goal-value > strong { font-size:21px; }
+}
