@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-17T22:21:15.119692-03:00",
+  "gerado_em": "2026-08-18T01:31:14.382367-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 225,
   "total_com_estatisticas": 225,
-  "total_com_publico": 224,
+  "total_com_publico": 225,
   "total_com_eventos": 225,
   "total_com_jogadores": 225,
   "total_eventos_validados": 225,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Estadio Beira-Rio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 29614,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/16/sao-paulo-x-coritiba-tem-o-maior-publico-da-23a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Edina Alves Batista",
       "stats": [
         {
@@ -575,7 +575,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-17T22:01:18.228845-03:00"
+      "atualizado_em": "2026-08-17T22:01:18.228845-03:00",
+      "publico_pagante": 26443,
+      "renda": 890190,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841193": {
       "event_id": "401841193",
@@ -126564,6 +126567,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 219,
-  "total_com_renda": 224
+  "total_com_publico_pagante": 220,
+  "total_com_renda": 225
 }
