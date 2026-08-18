@@ -785,6 +785,18 @@ def rodar(args: argparse.Namespace) -> int:
                     candidatos.extend(listar_playlist(api_key, pid, args.paginas_getv, "ge"))
         except Exception as exc:
             erros.append(f"Falha ao varrer playlists GE: {exc}")
+        # Além das playlists por rodada, varre os uploads recentes da GE TV.
+        # Vídeos recém-publicados podem aparecer no canal antes de serem
+        # adicionados à playlist específica da rodada. O workflow já passa
+        # --paginas-getv-uploads; manter a opção aqui evita divergência entre
+        # a CLI e o workflow e melhora a descoberta incremental.
+        if args.paginas_getv_uploads > 0:
+            try:
+                candidatos.extend(
+                    listar_playlist(api_key, uploads_de(GE_CHANNEL_ID), args.paginas_getv_uploads, "ge")
+                )
+            except Exception as exc:
+                erros.append(f"Falha ao varrer uploads GE TV: {exc}")
         try:
             candidatos.extend(listar_playlist(api_key, uploads_de(CAZE_CHANNEL_ID), args.paginas_caze, "caze"))
         except Exception as exc:
@@ -1009,20 +1021,31 @@ def selftest() -> int:
     return 0 if ok else 1
 
 
-def main() -> int:
+def criar_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(description="Sanitiza e busca melhores momentos em fontes primárias e UOL após 48 horas.")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--sem-youtube", action="store_true", help="não consulta YouTube; apenas remove fontes não preferidas e gera relatório")
     ap.add_argument("--rodada-inicio", type=int, default=0)
     ap.add_argument("--rodada-fim", type=int, default=0)
-    ap.add_argument("--paginas-getv", type=int, default=2)
+    ap.add_argument("--paginas-getv", type=int, default=2, help="páginas de playlists GE por rodada")
+    ap.add_argument(
+        "--paginas-getv-uploads",
+        dest="paginas_getv_uploads",
+        type=int,
+        default=4,
+        help="páginas dos uploads recentes da GE TV; complementa as playlists por rodada",
+    )
     ap.add_argument("--paginas-caze", type=int, default=12)
     ap.add_argument("--paginas-prime", type=int, default=8)
     ap.add_argument("--max-search-total", type=int, default=20, help="limite de chamadas search.list somente em canais preferidos")
     ap.add_argument("--max-consultas-por-jogo", type=int, default=2)
     ap.add_argument("--max-results-search", type=int, default=6)
-    args = ap.parse_args()
+    return ap
+
+
+def main() -> int:
+    args = criar_parser().parse_args()
     if args.selftest:
         return selftest()
     return rodar(args)
