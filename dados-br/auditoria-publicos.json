@@ -1,22 +1,120 @@
 {
-  "gerado_em": "2026-08-16T22:44:42.661556-03:00",
+  "gerado_em": "2026-08-17T22:21:15.116390-03:00",
   "fonte_automatica": "ge/Gato Mestre (presente/total, pagantes e renda; pagantes nunca substituem público presente)",
-  "total_jogos_finalizados": 224,
+  "total_jogos_finalizados": 225,
   "total_com_publico_ou_complemento": 224,
-  "total_sem_publico": 0,
-  "sem_publico": [],
+  "total_sem_publico": 1,
+  "sem_publico": [
+    {
+      "event_id": "401841191",
+      "rodada": 23,
+      "data_iso": "2026-08-17T20:00",
+      "mandante": "Internacional",
+      "visitante": "Remo",
+      "placar": "1 x 1"
+    }
+  ],
   "total_com_publico_pagante": 219,
-  "total_sem_publico_pagante": 5,
+  "total_sem_publico_pagante": 6,
   "total_com_renda": 224,
-  "total_sem_renda": 0,
-  "total_partidas_fisicas": 224,
+  "total_sem_renda": 1,
+  "total_partidas_fisicas": 225,
   "total_partidas_fisicas_com_publico": 224,
-  "total_partidas_fisicas_sem_publico": 0,
-  "partidas_fisicas_sem_publico": [],
-  "rodadas_pendentes_no_inicio": [],
-  "novos_complementos": 0,
-  "fontes_consultadas": [],
-  "erros_fontes": [],
+  "total_partidas_fisicas_sem_publico": 1,
+  "partidas_fisicas_sem_publico": [
+    {
+      "event_ids": [
+        "401841191"
+      ],
+      "rodada": 23,
+      "data_iso": "2026-08-17T20:00",
+      "mandante": "Internacional",
+      "visitante": "Remo",
+      "placar": "1 x 1"
+    }
+  ],
+  "rodadas_pendentes_no_inicio": [
+    23
+  ],
+  "novos_complementos": 9,
+  "fontes_consultadas": [
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/17_1.xml",
+      "urls": 569,
+      "candidatas": 1,
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/18_1.xml",
+      "urls": 19,
+      "candidatas": 0,
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/16_1.xml",
+      "urls": 391,
+      "candidatas": 0,
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/15_1.xml",
+      "urls": 459,
+      "candidatas": 1,
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/gato-mestre/noticia/2026/08/16/sao-paulo-x-coritiba-tem-o-maior-publico-da-23a-rodada-do-brasileirao-veja-a-lista.ghtml",
+      "itens": 9
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/08/16/sao-paulo-x-coritiba-tem-o-maior-publico-da-23a-rodada-do-brasileirao-veja-a-lista.ghtml",
+      "itens": 9
+    }
+  ],
+  "erros_fontes": [
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/17_2.xml",
+      "erro": "urllib tentativa 1: HTML muito curto (215 bytes)",
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/18_2.xml",
+      "erro": "urllib tentativa 1: HTML muito curto (215 bytes)",
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/19_1.xml",
+      "erro": "urllib tentativa 1: HTML muito curto (215 bytes)",
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/19_2.xml",
+      "erro": "urllib tentativa 1: HTML muito curto (215 bytes)",
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/16_2.xml",
+      "erro": "urllib tentativa 1: HTML muito curto (215 bytes)",
+      "tipo": "sitemap"
+    },
+    {
+      "rodada": 23,
+      "url": "https://ge.globo.com/sitemap/ge/2026/08/15_2.xml",
+      "erro": "urllib tentativa 1: HTML muito curto (215 bytes)",
+      "tipo": "sitemap"
+    }
+  ],
   "conflitos": [],
   "fontes_em_uso": {
     "https://ge.globo.com/gato-mestre/noticia/2026/01/29/veja-os-publicos-da-primeira-rodada-do-campeonato-brasileiro.ghtml": 9,
@@ -70,6 +168,6 @@
     "https://www.terra.com.br/esportes/botafogo/com-tempos-distintos-botafogo-e-internacional-empatam-no-mane-garrincha%2Cb3f76c9a57bdd93f0b3cbb129c120906z22ly4u2.html": 1,
     "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/07/23/botafogo-esbarra-no-goleiro-e-fica-no-0-a-0-contra-o-vitoria-em-jogo-atrasado-do-brasileirao.htm": 1
   },
-  "propagados_para_jogos_detalhes": 0,
+  "propagados_para_jogos_detalhes": 13,
   "conflitos_jogos_detalhes": []
 }
