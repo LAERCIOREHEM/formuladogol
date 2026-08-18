@@ -1,15 +1,582 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-17T19:21:24.675108-03:00",
+  "gerado_em": "2026-08-17T22:01:21.214307-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 224,
-  "total_com_estatisticas": 224,
+  "total_jogos": 225,
+  "total_com_estatisticas": 225,
   "total_com_publico": 224,
-  "total_com_eventos": 224,
-  "total_com_jogadores": 224,
-  "total_eventos_validados": 224,
+  "total_com_eventos": 225,
+  "total_com_jogadores": 225,
+  "total_eventos_validados": 225,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841191": {
+      "event_id": "401841191",
+      "event_id_fonte_detalhes": "401841191",
+      "rodada": 23,
+      "data_iso": "2026-08-17T20:00",
+      "mandante": "Internacional",
+      "visitante": "Remo",
+      "placar_mandante": 1,
+      "placar_visitante": 1,
+      "estadio": "Estadio Beira-Rio",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Edina Alves Batista",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "39.7%",
+          "away": "60.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "12"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes",
+          "home": "339",
+          "away": "522"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "242",
+          "away": "451"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "16",
+          "away": "14"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "8",
+          "away": "19"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "2",
+          "away": "17"
+        },
+        {
+          "nome": "Cortes",
+          "home": "26",
+          "away": "24"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "5"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "4"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "39.7%",
+          "away": "60.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "11",
+          "away": "12"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "3",
+          "away": "3"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "30%",
+          "away": "30%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "13",
+          "away": "12"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Passes",
+          "home": "339",
+          "away": "522"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "242",
+          "away": "451"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "70%",
+          "away": "90%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "16",
+          "away": "14"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "8",
+          "away": "19"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "2",
+          "away": "17"
+        },
+        {
+          "nome": "Cortes",
+          "home": "26",
+          "away": "24"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "4",
+          "away": "5"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "1",
+          "away": "4"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "2",
+          "away": "2"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "3'",
+          "jogador": "Johan Carbonero",
+          "time": "Internacional",
+          "assistencias": [
+            "Matheus Bahia"
+          ],
+          "descricao": "Goal 70 Goal! Internacional 1, Remo 0. Johan Carbonero (Internacional) left footed shot from the centre of the box to the bottom right corner. Assisted by Matheus Bahia with a cross. Johan Carbonero Goal"
+        },
+        {
+          "minuto": "90'+5'",
+          "jogador": "Vitor Bueno",
+          "time": "Remo",
+          "assistencias": [],
+          "descricao": "Goal - Free-kick 138 Goal! Internacional 1, Remo 1. Vitor Bueno (Remo) from a free kick with a right footed shot to the bottom left corner. Vitor Bueno Goal - Free-kick"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "49'",
+          "jogador": "Marllon",
+          "time": "Remo",
+          "descricao": "Yellow Card 94 Marllon (Remo) is shown the yellow card for a bad foul. Marllon Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "58'",
+          "jogador": "Jajá",
+          "time": "Remo",
+          "descricao": "Yellow Card 94 Jája Silva (Remo) is shown the yellow card for a bad foul. Jajá Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "66'",
+          "jogador": "Zé Ricardo",
+          "time": "Remo",
+          "descricao": "Yellow Card 94 Zé Ricardo (Remo) is shown the yellow card for a bad foul. Zé Ricardo Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "82'",
+          "jogador": "Matheus Bahia",
+          "time": "Internacional",
+          "descricao": "Yellow Card 94 Matheus Bahia (Internacional) is shown the yellow card for a bad foul. Matheus Bahia Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+5'",
+          "jogador": "Vitor Bueno",
+          "time": "Remo",
+          "descricao": "Yellow Card 94 Vitor Bueno (Remo) is shown the yellow card for excessive celebration. Vitor Bueno Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "165232",
+          "nome": "Alan Patrick",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285029",
+          "nome": "Alexander Bernabei",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "295006",
+          "nome": "Bruno Gomes",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "188485",
+          "nome": "Bruno Henrique",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "76818",
+          "nome": "Gabriel Mercado",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "200562",
+          "nome": "Guillermo Maripán",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270246",
+          "nome": "Johan Carbonero",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304656",
+          "nome": "Matheus Bahia",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "315201",
+          "nome": "Matheus Cunha Queiroz",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "286704",
+          "nome": "Rodrigo Villagra",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "287903",
+          "nome": "Vitinho",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "270260",
+          "nome": "Alerrando",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "361374",
+          "nome": "Allex",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "304469",
+          "nome": "Calebe",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "251963",
+          "nome": "Félix Torres",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "289499",
+          "nome": "Paulinho",
+          "time": "Internacional",
+          "team_id": "1936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "254447",
+          "nome": "Duplexe Tchamba",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "235385",
+          "nome": "Gabriel Taliari",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "301185",
+          "nome": "Jajá",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "201793",
+          "nome": "José Welison",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "286532",
+          "nome": "Leonel Picco",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304826",
+          "nome": "Marcelinho",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "206952",
+          "nome": "Marcelo Rangel",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "157743",
+          "nome": "Marllon",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "186832",
+          "nome": "Yago Pikachu",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "319270",
+          "nome": "Zé Ivaldo",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "276661",
+          "nome": "Zé Ricardo",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "301188",
+          "nome": "Alef Manga",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "254464",
+          "nome": "Antonio Galeano",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "359364",
+          "nome": "David Francisco",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "198362",
+          "nome": "Patrick",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "200775",
+          "nome": "Vitor Bueno",
+          "time": "Remo",
+          "team_id": "4936",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Internacional": 1,
+          "Remo": 1
+        },
+        "gols_extraidos": {
+          "Internacional": 1,
+          "Remo": 1
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Internacional": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Remo": {
+            "amarelo": 4,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Internacional": {
+            "amarelo": 1,
+            "vermelho": 0
+          },
+          "Remo": {
+            "amarelo": 4,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary + scoreboard",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-08-17T22:01:18.228845-03:00"
+    },
     "401841193": {
       "event_id": "401841193",
       "event_id_fonte_detalhes": "401841193",
@@ -567,7 +1134,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-17T19:21:22.142672-03:00",
+      "atualizado_em": "2026-08-17T22:01:18.880860-03:00",
       "publico_pagante": 37894,
       "renda": 2554979,
       "dados_publico_fonte_adicional": "público presente, público pagante quando divulgado e renda"
@@ -1161,7 +1728,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-17T19:21:22.520593-03:00",
+      "atualizado_em": "2026-08-17T22:01:19.297846-03:00",
       "renda": 729300,
       "dados_publico_fonte_adicional": "público presente, público pagante quando divulgado e renda"
     },
@@ -1720,7 +2287,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-17T19:21:22.901422-03:00",
+      "atualizado_em": "2026-08-17T22:01:19.705864-03:00",
       "publico_pagante": 19917,
       "renda": 525232,
       "dados_publico_fonte_adicional": "público presente, público pagante quando divulgado e renda"
@@ -2276,7 +2843,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-17T19:21:23.326626-03:00",
+      "atualizado_em": "2026-08-17T22:01:20.114303-03:00",
       "publico_pagante": 19548,
       "renda": 771718,
       "dados_publico_fonte_adicional": "público presente, público pagante quando divulgado e renda"
@@ -2862,7 +3429,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-17T19:21:23.749006-03:00",
+      "atualizado_em": "2026-08-17T22:01:20.708831-03:00",
       "renda": 1630895,
       "dados_publico_fonte_adicional": "público presente, público pagante quando divulgado e renda"
     },
@@ -3451,7 +4018,7 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-17T19:21:24.123546-03:00",
+      "atualizado_em": "2026-08-17T22:01:21.130162-03:00",
       "renda": 248670,
       "dados_publico_fonte_adicional": "público presente, público pagante quando divulgado e renda"
     },
