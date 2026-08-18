@@ -1937,6 +1937,72 @@
   .zona-rebaixamento td:first-child { box-shadow: inset 4px 0 0 #e11d48; }
   .forma-dot { box-shadow: 0 0 0 1px rgba(0,0,0,.15); }
 
+
+  /* Tabela: leitura personalizada dos patamares do AF-Previsão */
+  .team-needs-card {
+    margin: 18px 0;
+    padding: clamp(14px, 2vw, 20px);
+    border: 1px solid rgba(163,230,53,.20);
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(8,24,29,.96), rgba(7,18,27,.92));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+  }
+  .team-needs-head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  .team-needs-kicker { color:var(--accent); font-size:10px; font-weight:950; letter-spacing:.08em; text-transform:uppercase; }
+  .team-needs-title { margin:3px 0 0; color:#fff; font-size:clamp(17px,2vw,22px); line-height:1.15; }
+  .team-needs-copy { margin:7px 0 0; max-width:760px; color:#9fb0bd; font-size:11px; line-height:1.5; }
+  .team-needs-controls { display:flex; align-items:flex-end; justify-content:flex-start; gap:10px; margin-top:13px; flex-wrap:wrap; }
+  .team-needs-field { display:grid; gap:5px; min-width:210px; }
+  .team-needs-field.is-level { min-width:150px; }
+  .team-needs-field label { color:#8fa2b2; font-size:9px; font-weight:950; letter-spacing:.07em; text-transform:uppercase; }
+  .team-needs-field select {
+    width:100%; min-height:38px; padding:8px 34px 8px 11px;
+    border:1px solid rgba(148,163,184,.26); border-radius:10px;
+    background:#0b1b23; color:#eef6fb; font:inherit; font-size:12px; font-weight:850;
+  }
+  .team-needs-field select:focus { outline:2px solid rgba(163,230,53,.45); outline-offset:2px; }
+  .team-needs-prompt { margin-top:12px; padding:11px 12px; border:1px dashed rgba(148,163,184,.20); border-radius:11px; color:#8fa2b2; font-size:11px; }
+  .team-needs-summary { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-top:14px; padding-top:13px; border-top:1px solid rgba(148,163,184,.13); }
+  .team-needs-team { display:flex; align-items:center; gap:10px; min-width:0; }
+  .team-needs-team img { width:34px; height:34px; object-fit:contain; flex:0 0 auto; }
+  .team-needs-team strong { display:block; color:#fff; font-size:15px; line-height:1.2; }
+  .team-needs-team small { display:block; margin-top:3px; color:#91a5b5; font-size:10px; }
+  .team-needs-live { flex:0 0 auto; padding:5px 8px; border-radius:999px; background:rgba(251,113,133,.10); color:#fb8da1; font-size:8px; font-weight:950; letter-spacing:.06em; text-transform:uppercase; }
+  .team-needs-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; margin-top:11px; }
+  .team-needs-objective { min-width:0; padding:12px; border:1px solid rgba(148,163,184,.15); border-radius:13px; background:rgba(3,14,21,.52); }
+  .team-needs-objective-head { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+  .team-needs-objective-title { color:#e9f2f8; font-size:11px; font-weight:950; }
+  .team-needs-current { color:#96a9b8; font-size:8px; font-weight:850; text-align:right; white-space:nowrap; }
+  .team-needs-current strong { color:#d9ff76; font-size:11px; }
+  .team-needs-target { margin-top:10px; }
+  .team-needs-target strong { color:#fff; font-size:24px; line-height:1; letter-spacing:-.03em; }
+  .team-needs-target span { margin-left:4px; color:#8fa2b2; font-size:9px; font-weight:900; text-transform:uppercase; }
+  .team-needs-gap { margin-top:7px; color:#c9d6df; font-size:10px; line-height:1.45; }
+  .team-needs-gap b { color:#efffc3; }
+  .team-needs-detail { margin-top:5px; color:#8497a6; font-size:9px; line-height:1.4; }
+  .team-needs-objective.is-reached { border-color:rgba(163,230,53,.24); background:rgba(163,230,53,.045); }
+  .team-needs-objective.is-impossible { border-color:rgba(251,113,133,.20); background:rgba(251,113,133,.035); }
+  .team-needs-objective.is-impossible .team-needs-target strong { color:#f4a2b0; }
+  .team-needs-note { margin:10px 0 0; color:#7f93a2; font-size:9px; line-height:1.5; }
+  .team-needs-note strong { color:#aebfca; }
+  @media (max-width: 980px) { .team-needs-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+  @media (max-width: 640px) {
+    .team-needs-card { margin:14px 0; padding:13px 11px; border-radius:15px; }
+    .team-needs-head { display:block; }
+    .team-needs-copy { font-size:10px; }
+    .team-needs-controls { display:grid; grid-template-columns:1fr; gap:8px; }
+    .team-needs-field, .team-needs-field.is-level { min-width:0; width:100%; }
+    .team-needs-field select { min-height:42px; font-size:12px; }
+    .team-needs-summary { align-items:flex-start; }
+    .team-needs-team img { width:30px; height:30px; }
+    .team-needs-team strong { font-size:13px; }
+    .team-needs-live { margin-top:2px; }
+    .team-needs-grid { grid-template-columns:1fr; gap:7px; }
+    .team-needs-objective { padding:11px; }
+    .team-needs-objective-head { align-items:center; }
+    .team-needs-target strong { font-size:21px; }
+  }
+
   .returno-details {
     margin-top: 16px;
     overflow: hidden;
@@ -3534,6 +3600,12 @@ let state = {
   // AF-Previsão — chances pré-jogo de vitória, empate e derrota.
   probabilidadesJogos: null,
   probabilidadesJogosErro: null,
+  // Tabela — painel "O que seu time precisa?" alimentado pelo mesmo AF-Previsão.
+  probabilidadesBrasileirao: null,
+  probabilidadesPorPontuacao: null,
+  metasObjetivosErro: null,
+  metasObjetivoClube: '',
+  metasObjetivoNivel: 80,
   // Agenda unificada: Brasileirão + competições continentais/nacionais dos 20 clubes.
   agendaJogos: [],
   agendaMeta: null,
@@ -3753,6 +3825,29 @@ function toggleBolaoProjection(chave) {
   if (botao) botao.setAttribute('aria-expanded', abrir ? 'true' : 'false');
 }
 
+
+async function carregarMetasObjetivosTabela({ silencioso = false } = {}) {
+  try {
+    const stamp = Date.now();
+    const [rProb, rPts] = await Promise.all([
+      fetch('dados-br/probabilidades-brasileirao.json?t=' + stamp, { cache: 'no-store' }),
+      fetch('dados-br/probabilidades-por-pontuacao.json?t=' + stamp, { cache: 'no-store' })
+    ]);
+    if (!rProb.ok) throw new Error('probabilidades-brasileirao HTTP ' + rProb.status);
+    if (!rPts.ok) throw new Error('probabilidades-por-pontuacao HTTP ' + rPts.status);
+    const [prob, pts] = await Promise.all([rProb.json(), rPts.json()]);
+    if (!prob || prob.status !== 'ok' || !Array.isArray(prob.clubes)) throw new Error('probabilidades-brasileirao inválido');
+    if (!pts || pts.status !== 'ok' || !Array.isArray(pts.niveis)) throw new Error('probabilidades-por-pontuacao inválido');
+    state.probabilidadesBrasileirao = prob;
+    state.probabilidadesPorPontuacao = pts;
+    state.metasObjetivosErro = null;
+  } catch (e) {
+    state.metasObjetivosErro = e && e.message ? e.message : String(e || 'indisponível');
+    if (!silencioso) console.warn('Painel de metas por clube indisponível:', e);
+  }
+  if (state.view === 'tabela') renderObjetivosTime();
+}
+
 async function atualizarDadosDoServidor(silencioso = false) {
   const tarefas = [refresh(silencioso)];
 
@@ -3762,6 +3857,7 @@ async function atualizarDadosDoServidor(silencioso = false) {
   tarefas.push(carregarJogos({ silencioso: true }));
   tarefas.push(carregarResultados({ silencioso: true }));
   tarefas.push(carregarRankingDesempenhoBr({ silencioso: true }));
+  tarefas.push(carregarMetasObjetivosTabela({ silencioso: true }));
   await Promise.allSettled(tarefas);
 }
 
@@ -4529,6 +4625,196 @@ function calcularTabelaReturno() {
   return { tabela, jogosComputados, rodadaMaisRecente };
 }
 
+
+function metasObjetivosClubesOrdenados() {
+  return (Array.isArray(state.tabela) ? state.tabela : [])
+    .map(item => nomeCanonico(item && item.time))
+    .filter(Boolean)
+    .filter((nome, indice, lista) => lista.indexOf(nome) === indice)
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+}
+
+function metasObjetivosNivelAtual() {
+  const niveis = Array.isArray(state.probabilidadesPorPontuacao && state.probabilidadesPorPontuacao.niveis)
+    ? state.probabilidadesPorPontuacao.niveis : [];
+  const desejado = Number(state.metasObjetivoNivel || 80);
+  return niveis.find(item => Number(item && item.probabilidade_pct) === desejado)
+    || niveis.find(item => Number(item && item.probabilidade_pct) === 80)
+    || niveis[0] || null;
+}
+
+function metasObjetivosProbClube(nome) {
+  const clubes = Array.isArray(state.probabilidadesBrasileirao && state.probabilidadesBrasileirao.clubes)
+    ? state.probabilidadesBrasileirao.clubes : [];
+  const chave = nomeCanonico(nome);
+  return clubes.find(item => nomeCanonico(item && item.clube) === chave) || null;
+}
+
+function metasObjetivosTabelaClube(nome) {
+  const proj = tabelaComJogosAoVivo();
+  const chave = nomeCanonico(nome);
+  return (proj.tabela || []).find(item => nomeCanonico(item && item.time) === chave) || null;
+}
+
+function metasObjetivosChance(prob, tipo) {
+  const p = prob && prob.probabilidades_pct ? prob.probabilidades_pct : {};
+  if (tipo === 'titulo') return Number(p.campeao);
+  if (tipo === 'libertadores') return Number(p.libertadores);
+  if (tipo === 'sul_americana_ou_melhor') {
+    const lib = Number(p.libertadores);
+    const sula = Number(p.sul_americana);
+    return Number.isFinite(lib) && Number.isFinite(sula) ? Math.min(100, Math.max(0, lib + sula)) : NaN;
+  }
+  if (tipo === 'permanencia') {
+    const queda = Number(p.rebaixamento);
+    return Number.isFinite(queda) ? Math.min(100, Math.max(0, 100 - queda)) : NaN;
+  }
+  return NaN;
+}
+
+function metasObjetivosFormatarChance(valor) {
+  const n = Number(valor);
+  if (!Number.isFinite(n)) return '—';
+  if (n <= 0) return '0%';
+  if (n < .001) return '<0,001%';
+  if (n > 99.999) return '>99,999%';
+  const casas = n < .1 ? 3 : n < 1 ? 2 : 1;
+  return n.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas }) + '%';
+}
+
+function metasObjetivosCombinacao(pontos, jogosRestantes) {
+  const alvo = Math.max(0, Math.ceil(Number(pontos) || 0));
+  const jogos = Math.max(0, Math.floor(Number(jogosRestantes) || 0));
+  if (!alvo || !jogos) return null;
+  let melhor = null;
+  for (let v = 0; v <= jogos; v += 1) {
+    for (let e = 0; e <= jogos - v; e += 1) {
+      const obtidos = 3 * v + e;
+      if (obtidos < alvo) continue;
+      const candidato = { v, e, obtidos, excedente: obtidos - alvo, usados: v + e };
+      if (!melhor || candidato.excedente < melhor.excedente ||
+          (candidato.excedente === melhor.excedente && candidato.usados < melhor.usados) ||
+          (candidato.excedente === melhor.excedente && candidato.usados === melhor.usados && candidato.v > melhor.v)) {
+        melhor = candidato;
+      }
+    }
+  }
+  if (!melhor) return null;
+  const partes = [];
+  if (melhor.v) partes.push(`${melhor.v}V`);
+  if (melhor.e) partes.push(`${melhor.e}E`);
+  return { ...melhor, texto: partes.join(' + ') || '—' };
+}
+
+function metasObjetivosCard(def, nivel, clubeTabela, clubeProb) {
+  const meta = Number(nivel && nivel[def.key]);
+  const pontos = Number(clubeTabela && clubeTabela.pontos) || 0;
+  const jogos = Number(clubeTabela && clubeTabela.jogos) || 0;
+  const restantes = Math.max(0, 38 - jogos);
+  const maximo = pontos + restantes * 3;
+  const falta = Number.isFinite(meta) ? Math.max(0, meta - pontos) : NaN;
+  const chance = metasObjetivosChance(clubeProb, def.key);
+  const nivelRotulo = String((nivel && nivel.rotulo) || `${Number(nivel && nivel.probabilidade_pct) || 80}%`);
+  let classe = '';
+  let gap = '';
+  let detalhe = '';
+  if (!Number.isFinite(meta)) {
+    gap = 'Patamar indisponível nesta atualização.';
+  } else if (pontos >= meta) {
+    classe = ' is-reached';
+    gap = `<b>Patamar já atingido.</b> O clube já possui pelo menos ${meta} pontos.`;
+    detalhe = 'A pontuação não diminui; o patamar final continuará alcançado.';
+  } else if (maximo < meta) {
+    classe = ' is-impossible';
+    gap = `<b>Patamar de ${brEscapeHtml(nivelRotulo)} não alcançável.</b>`;
+    detalhe = `Teto possível hoje: ${maximo} pts (${restantes} jogos restantes).`;
+  } else {
+    const ritmo = restantes ? falta / restantes : 0;
+    const aproveitamento = restantes ? (falta / (restantes * 3)) * 100 : 0;
+    const combo = metasObjetivosCombinacao(falta, restantes);
+    gap = `Faltam <b>${falta} pts</b> em ${restantes} jogos.`;
+    detalhe = `${ritmo.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})} pt/jogo · ${aproveitamento.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})}% dos pontos disponíveis`;
+    if (combo) detalhe += ` · uma combinação possível: ${combo.texto}${combo.obtidos > falta ? ` (${combo.obtidos} pts)` : ''}`;
+  }
+  return `<article class="team-needs-objective${classe}">
+    <div class="team-needs-objective-head"><span class="team-needs-objective-title">${def.icon} ${brEscapeHtml(def.label)}</span><span class="team-needs-current">AF atual<br><strong>${brEscapeHtml(metasObjetivosFormatarChance(chance))}</strong></span></div>
+    <div class="team-needs-target"><strong>${Number.isFinite(meta) ? meta : '—'}</strong><span>pts para ${brEscapeHtml(nivelRotulo)}</span></div>
+    <div class="team-needs-gap">${gap}</div>
+    ${detalhe ? `<div class="team-needs-detail">${brEscapeHtml(detalhe)}</div>` : ''}
+  </article>`;
+}
+
+function htmlObjetivosTimeBase() {
+  return `<section class="team-needs-card" id="objetivos-time-card" aria-labelledby="objetivos-time-titulo">
+    <div class="team-needs-head"><div><div class="team-needs-kicker">AF-Previsão · leitura personalizada</div><h3 class="team-needs-title" id="objetivos-time-titulo">O que seu time precisa?</h3><p class="team-needs-copy">Escolha um clube e veja, sem fazer contas, quantos pontos faltam para atingir os patamares de título, Libertadores, competição continental e permanência calculados pelo modelo.</p></div></div>
+    <div id="objetivos-time-conteudo"><div class="team-needs-prompt">Carregando patamares do AF-Previsão…</div></div>
+  </section>`;
+}
+
+function renderObjetivosTime() {
+  const target = document.getElementById('objetivos-time-conteudo');
+  if (!target) return;
+  const dataProb = state.probabilidadesBrasileirao;
+  const dataPts = state.probabilidadesPorPontuacao;
+  if (!dataProb || !dataPts) {
+    target.innerHTML = `<div class="team-needs-prompt">${state.metasObjetivosErro ? 'Patamares temporariamente indisponíveis. A tabela principal continua atualizada normalmente.' : 'Carregando patamares do AF-Previsão…'}</div>`;
+    return;
+  }
+  const clubes = metasObjetivosClubesOrdenados();
+  const niveis = Array.isArray(dataPts.niveis) ? dataPts.niveis : [];
+  const selecionado = clubes.includes(state.metasObjetivoClube) ? state.metasObjetivoClube : '';
+  const nivel = metasObjetivosNivelAtual();
+  const nivelAtual = Number(nivel && nivel.probabilidade_pct) || 80;
+  const opClubes = ['<option value="">Selecione o clube</option>'].concat(clubes.map(nome => `<option value="${brEscapeAttr(nome)}"${nome === selecionado ? ' selected' : ''}>${brEscapeHtml(nome)}</option>`)).join('');
+  const opNiveis = niveis.map(item => {
+    const valor = Number(item && item.probabilidade_pct);
+    return `<option value="${valor}"${valor === nivelAtual ? ' selected' : ''}>${brEscapeHtml(String(item.rotulo || valor + '%'))}</option>`;
+  }).join('');
+  let html = `<div class="team-needs-controls">
+    <div class="team-needs-field"><label for="objetivos-time-select">Time</label><select id="objetivos-time-select" onchange="selecionarMetasObjetivoClube(this.value)">${opClubes}</select></div>
+    <div class="team-needs-field is-level"><label for="objetivos-nivel-select">Nível de segurança</label><select id="objetivos-nivel-select" onchange="selecionarMetasObjetivoNivel(this.value)">${opNiveis}</select></div>
+  </div>`;
+  if (!selecionado) {
+    html += '<div class="team-needs-prompt">Selecione um clube para transformar os patamares gerais do campeonato em uma leitura direta da situação daquele time.</div>';
+    target.innerHTML = html;
+    return;
+  }
+  const clubeTabela = metasObjetivosTabelaClube(selecionado);
+  const clubeProb = metasObjetivosProbClube(selecionado);
+  if (!clubeTabela || !clubeProb || !nivel) {
+    html += '<div class="team-needs-prompt">Não foi possível cruzar este clube com o snapshot atual do AF-Previsão.</div>';
+    target.innerHTML = html;
+    return;
+  }
+  const pontos = Number(clubeTabela.pontos) || 0;
+  const jogos = Number(clubeTabela.jogos) || 0;
+  const restantes = Math.max(0, 38 - jogos);
+  const esc = escudoDe(selecionado);
+  const live = Boolean(clubeTabela._aoVivo || clubeTabela._provisorioFinal || pontos !== Number(clubeProb.pontos_atuais) || jogos !== Number(clubeProb.jogos_atuais));
+  html += `<div class="team-needs-summary"><div class="team-needs-team">${brEscudoImg(esc?.escudo || '', selecionado, 'tabela-escudo')}<div><strong>${brEscapeHtml(selecionado)}</strong><small>${pontos} pts · ${jogos} jogos · ${restantes} restantes</small></div></div>${live ? '<span class="team-needs-live">Tabela ao vivo</span>' : ''}</div>`;
+  const defs = [
+    { key:'permanencia', label:'Permanência', icon:'🛡️' },
+    { key:'sul_americana_ou_melhor', label:'Sul-Americana+', icon:'🟦' },
+    { key:'libertadores', label:'Libertadores', icon:'🌎' },
+    { key:'titulo', label:'Título', icon:'🏆' }
+  ];
+  html += `<div class="team-needs-grid">${defs.map(def => metasObjetivosCard(def, nivel, clubeTabela, clubeProb)).join('')}</div>`;
+  const gerado = state.probabilidadesBrasileirao && state.probabilidadesBrasileirao.gerado_em ? formatarDataHoraBrCompleta(state.probabilidadesBrasileirao.gerado_em) : '—';
+  html += `<p class="team-needs-note"><strong>Como ler:</strong> os pontos são patamares gerais observados nos 2 milhões de universos do AF-Previsão; não são garantia matemática. “Sul-Americana+” significa terminar com pelo menos uma vaga continental (Sul-Americana ou Libertadores). ${live ? 'A pontuação acima acompanha a classificação ao vivo; as probabilidades “AF atual” permanecem as da última simulação concluída. ' : ''}Última simulação: ${brEscapeHtml(gerado)}.</p>`;
+  target.innerHTML = html;
+}
+
+function selecionarMetasObjetivoClube(valor) {
+  state.metasObjetivoClube = nomeCanonico(valor || '');
+  renderObjetivosTime();
+}
+
+function selecionarMetasObjetivoNivel(valor) {
+  const numero = Number(valor);
+  if (Number.isFinite(numero)) state.metasObjetivoNivel = numero;
+  renderObjetivosTime();
+}
+
 function htmlTabelaReturno() {
   const calculo = calcularTabelaReturno();
   const carregando = !calculo;
@@ -4643,9 +4929,10 @@ function renderTabela() {
   });
   html += '</tbody></table></div></div>';
   html += '<div class="legenda"><div class="legenda-item"><div class="legenda-dot" style="background:#22c55e;"></div>Libertadores (G4)</div><div class="legenda-item"><div class="legenda-dot" style="background:#a3e635;"></div>Pré-Libertadores (5º)</div><div class="legenda-item"><div class="legenda-dot" style="background:#e11d48;"></div>Rebaixamento (Z4)</div><div class="legenda-item"><span class="seta-mov seta-up">▲</span>Subiu</div><div class="legenda-item"><span class="seta-mov seta-down">▼</span>Caiu</div></div>';
+  html += htmlObjetivosTimeBase();
   html += htmlTabelaReturno();
   document.getElementById('view-tabela').innerHTML = html;
-  requestAnimationFrame(ativarTabelaCongeladaMobile);
+  requestAnimationFrame(() => { ativarTabelaCongeladaMobile(); renderObjetivosTime(); });
 }
 
 /* Congelar painéis da classificação no celular.
