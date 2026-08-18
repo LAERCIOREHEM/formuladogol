@@ -2562,3 +2562,26 @@ body > .container > section.hero > img {
 .stats-live-delta { display:block; margin-top:4px; color:#ff748e; font-size:9px; line-height:1.15; font-style:normal; font-weight:950; letter-spacing:.04em; white-space:nowrap; }
 .stats-live-inline { color:#ff748e; font-size:9px; font-style:normal; font-weight:950; white-space:nowrap; }
 @media (max-width: 700px) { .stats-live-delta { font-size:8px; letter-spacing:0; } .stats-live-inline { font-size:8px; } }
+
+/* TOTAIS 20260817 — gols do campeonato e totais por clube nos filtros de líderes. */
+.stats-section-head-meta { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.stats-total-chip { display: inline-flex; align-items: center; min-height: 34px; padding: 7px 11px; border: 1px solid rgba(163,230,53,.22); border-radius: 999px; background: rgba(163,230,53,.08); color: #dfff8c; font-size: 11px; line-height: 1.1; font-weight: 950; white-space: nowrap; }
+.stats-total-chip.is-live::before { content: ""; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: #fb7185; box-shadow: 0 0 0 3px rgba(251,113,133,.12); }
+.stats-player-filter-footer { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 8px; }
+.stats-player-filter-footer .stats-player-filter-note { flex: 1 1 auto; min-width: 0; margin-top: 0; }
+.stats-player-filter-total { flex: 0 0 auto; min-width: 126px; padding: 7px 10px; border: 1px solid rgba(163,230,53,.18); border-radius: 11px; background: rgba(163,230,53,.07); text-align: right; }
+.stats-player-filter-total span, .stats-player-filter-total strong { display: block; }
+.stats-player-filter-total span { color: var(--muted-2); font-size: 9px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.stats-player-filter-total strong { margin-top: 2px; color: #dfff8c; font-size: 14px; line-height: 1.15; }
+@media (max-width: 700px) {
+  .stats-section-head-meta { max-width: 52%; gap: 5px; }
+  .stats-total-chip { min-height: 29px; padding: 6px 8px; font-size: 9px; white-space: normal; text-align: center; }
+  .stats-player-filter-footer { align-items: stretch; gap: 7px; }
+  .stats-player-filter-total { min-width: 108px; padding: 6px 8px; }
+  .stats-player-filter-total span { font-size: 8px; }
+  .stats-player-filter-total strong { font-size: 12px; }
+}
+@media (max-width: 430px) {
+  .stats-section-head-meta { max-width: 58%; }
+  .stats-player-filter-footer { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; }
+}

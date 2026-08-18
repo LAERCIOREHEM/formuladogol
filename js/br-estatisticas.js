@@ -481,6 +481,28 @@
     }).join("")}`;
   }
 
+  function championshipGoalsRows() {
+    return liveClubGoalsRows();
+  }
+
+  function championshipGoalsTotal(rows = championshipGoalsRows()) {
+    return rows.reduce((sum, club) => sum + Number(club?.gols_pro || 0), 0);
+  }
+
+  function updateChampionshipGoalsBadges(rows = championshipGoalsRows()) {
+    const total = championshipGoalsTotal(rows);
+    const liveGames = liveApplicableGames();
+    const suffix = liveGames.length ? " · AO VIVO" : "";
+    ["total-gols-campeonato-artilheiros", "total-gols-campeonato-clubes"].forEach((id) => {
+      const node = $(id);
+      if (node) {
+        node.textContent = `${integer(total)} gols no campeonato${suffix}`;
+        node.classList.toggle("is-live", liveGames.length > 0);
+      }
+    });
+    return total;
+  }
+
   function renderPlayers(type) {
     const target = type === "artilheiros" ? $("lista-artilharia") : $("lista-assistencias");
     const allPlayers = playerRows(type);
@@ -508,11 +530,27 @@
     const statusTone = gamesRead === totalGames && lineupGames === totalGames && (!liveGames.length || liveFactsOk === liveGames.length) ? "" : " is-warning";
     const status = `Base consolidada: ${coverageLabel(gamesRead, totalGames)} jogos encerrados · escalações: ${coverageLabel(lineupGames, totalGames)} · atualizado ${dateTimeCompactBR(state.leaders?.atualizado_em)}${liveSuffix}`;
     const filterLabel = selectedClub ? `${selectedClub} · ${list.length} ${list.length === 1 ? "jogador" : "jogadores"} no ranking` : `${allPlayers.length} jogadores no ranking geral`;
+    const goalRows = type === "artilheiros" ? championshipGoalsRows() : [];
+    const championshipGoals = type === "artilheiros" ? updateChampionshipGoalsBadges(goalRows) : 0;
+    const selectedGoalClub = type === "artilheiros" && selectedClub
+      ? goalRows.find((club) => normalize(club?.time) === normalize(selectedClub))
+      : null;
+    const filteredTotal = type === "artilheiros"
+      ? (selectedClub ? Number(selectedGoalClub?.gols_pro || 0) : championshipGoals)
+      : list.reduce((sum, player) => sum + Number(player?.[field] || 0), 0);
+    const filteredTotalLabel = selectedClub ? "Total do clube" : "Total do campeonato";
+    const filteredTotalUnit = type === "artilheiros" ? "gols" : "assistências";
+    const totalTitle = type === "artilheiros"
+      ? "Inclui todos os gols creditados ao clube, inclusive gols contra ou ainda sem autoria individualizada."
+      : "Soma das assistências individualizadas e validadas na base atual.";
     const filter = `<div class="stats-player-filter">
       <div class="stats-filter-control">
         <label for="stats-player-club-${type}">Clube</label>
         <select id="stats-player-club-${type}" data-player-club-filter="${type}" aria-label="Filtrar ${type === "artilheiros" ? "artilheiros" : "assistências"} por clube">${playerClubFilterOptions(selectedClub)}</select>
-        <div class="stats-player-filter-note">${escapeHtml(filterLabel)}</div>
+        <div class="stats-player-filter-footer">
+          <div class="stats-player-filter-note">${escapeHtml(filterLabel)}</div>
+          <div class="stats-player-filter-total" title="${escapeAttr(totalTitle)}"><span>${escapeHtml(filteredTotalLabel)}</span><strong>${integer(filteredTotal)} ${escapeHtml(filteredTotalUnit)}</strong></div>
+        </div>
       </div>
     </div>`;
 
@@ -726,7 +764,8 @@
     const baseGames = Number(state.competition?.resumo?.jogos_finalizados) || totalFinishedGames();
     const liveSuffix = liveGames.length ? ` · 🔴 ${liveGames.length} ${liveGames.length === 1 ? "jogo ao vivo incorporado provisoriamente" : "jogos ao vivo incorporados provisoriamente"}` : "";
     const goalsStatus = `Base consolidada: ${integer(baseGames)} jogos encerrados · atualizado ${dateTimeCompactBR(state.competition?.atualizado_em)}${liveSuffix}`;
-    target.innerHTML = `<div class="stats-data-status">${escapeHtml(goalsStatus)}</div><div class="stats-club-goals-list">${list.map((club, index) => {
+    const championshipGoals = updateChampionshipGoalsBadges(list);
+    target.innerHTML = `<div class="stats-data-status">${escapeHtml(goalsStatus)} · total: ${integer(championshipGoals)} gols</div><div class="stats-club-goals-list">${list.map((club, index) => {
       const markers = Array.isArray(club.marcadores) ? club.marcadores : [];
       const key = clubSlug(club.time);
       const expanded = Boolean(state.expandedClubGoals[key]);
