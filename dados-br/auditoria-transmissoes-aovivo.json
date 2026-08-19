@@ -13,15 +13,15 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 67,
-    "jogos_foco": 67,
+    "jogos_na_janela": 66,
+    "jogos_foco": 66,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 33,
+    "candidatos_oficiais_encontrados": 35,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 37,
+    "search_api_jogos_elegiveis": 36,
     "search_api_jogos_pulados_grade_estavel": 30,
-    "transmissoes_publicadas": 4,
+    "transmissoes_publicadas": 3,
     "sem_transmissao": 63,
     "erros": 0
   },
@@ -68,20 +68,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401903294",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "São Paulo x Bolívar",
-      "data_iso": "2026-08-18T21:30:00-03:00",
-      "principal": "SBT",
-      "fontes_encontradas": [
-        "SBT"
-      ],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
     {
       "event_id": "401902714",
       "rodada": 0,
@@ -883,40 +869,6 @@
   ],
   "aceitos": [
     {
-      "event_id": "401903294",
-      "jogo": "São Paulo x Bolívar",
-      "fonte": "sbt_sports",
-      "video_id": "woTeBjjKUL0",
-      "url": "https://www.youtube.com/watch?v=woTeBjjKUL0",
-      "titulo": "AO VIVO São Paulo x Bolívar | Sul-Americana 2026",
-      "status": "live",
-      "confianca": 0.975,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (30 min de diferença)"
-      ]
-    },
-    {
-      "event_id": "401903294",
-      "jogo": "São Paulo x Bolívar",
-      "fonte": "sbt",
-      "video_id": "NVeJlvmOVdQ",
-      "url": "https://www.youtube.com/watch?v=NVeJlvmOVdQ",
-      "titulo": "AO VIVO São Paulo x Bolívar | Sul-Americana 2026",
-      "status": "live",
-      "confianca": 0.975,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (30 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841203",
       "jogo": "Palmeiras x Vasco da Gama",
       "fonte": "getv",
@@ -972,6 +924,26 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "NÁUTICO X CEARÁ | AO VIVO E COM IMAGENS | BRASILEIRÃO SÉRIE B 2026 | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-08-18T21:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "woTeBjjKUL0",
+      "url": "https://www.youtube.com/watch?v=woTeBjjKUL0",
+      "fonte": "sbt_sports",
+      "canal": "SBT Sports",
+      "titulo": "AO VIVO São Paulo x Bolívar | Sul-Americana 2026",
+      "status": "live",
+      "inicio_programado": "2026-08-18T21:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "NVeJlvmOVdQ",
+      "url": "https://www.youtube.com/watch?v=NVeJlvmOVdQ",
+      "fonte": "sbt",
+      "canal": "SBT",
+      "titulo": "AO VIVO São Paulo x Bolívar | Sul-Americana 2026",
       "status": "live",
       "inicio_programado": "2026-08-18T21:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -1077,6 +1049,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "AdoArP0xJqE",
+      "url": "https://www.youtube.com/watch?v=AdoArP0xJqE",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: TÊNIS | IGOR MARCONDES X LAUTARO MIDON | CHALLENGER DE KINGSTON | OITAVAS DE FINAL",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-19T13:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "BtxN65z-K3Y",
       "url": "https://www.youtube.com/watch?v=BtxN65z-K3Y",
       "fonte": "cazetv",
@@ -1105,6 +1087,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-20T21:00:00-03:00",
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
+    },
+    {
+      "video_id": "P2zX1MvKxpY",
+      "url": "https://www.youtube.com/watch?v=P2zX1MvKxpY",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ROMA X FIORENTINA | SÉRIE A 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-24T14:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "SexZS1j7teY",
@@ -1171,7 +1163,7 @@
       "url": "https://www.youtube.com/watch?v=dXkUK8aJgIQ",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "PALMEIRAS X CERRO PORTEÑO E ATLÉTICO MINEIRO X RB BRAGANTINO | LIBERTADORES E COPA SUL-AMERICANA",
+      "titulo": "PALMEIRAS X CERRO PORTEÑO: COPA LIBERTADORES | LANCES EM TEMPO REAL | NOCHE DE COPA",
       "status": "upcoming",
       "inicio_programado": "2026-08-19T18:30:00-03:00",
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
@@ -1978,5 +1970,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-18T23:01:05-03:00"
+  "atualizado_em": "2026-08-18T23:51:06-03:00"
 }
