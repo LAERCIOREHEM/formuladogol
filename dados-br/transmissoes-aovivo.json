@@ -1,16 +1,53 @@
 {
-  "fonte": "YouTube oficial — CazéTV e GE TV | clubes do Brasileirão",
+  "fonte": "YouTube oficial — GE TV, SBT e CazéTV | clubes do Brasileirão",
   "politica": {
     "prioridade": [
       "getv",
+      "sbt",
       "cazetv"
     ],
-    "regra": "Somente canais oficiais configurados; GE TV tem prioridade sobre CazéTV; link único.",
+    "regra": "Somente canais oficiais configurados; GE TV tem prioridade sobre SBT e CazéTV; link único; embed respeita status.embeddable do YouTube (CazéTV sempre externa).",
     "janela": "de 1008h antes até 180 min após o início",
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta",
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
+    "401903294": {
+      "event_id": "401903294",
+      "rodada": 0,
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "espn_league": "conmebol.sudamericana",
+      "mandante": "São Paulo",
+      "visitante": "Bolívar",
+      "data_iso": "2026-08-18T21:30:00-03:00",
+      "estadio": "Estádio Cícero Pompeu de Toledo",
+      "origem": "automático",
+      "principal": {
+        "fonte": "sbt",
+        "nome": "SBT",
+        "video_id": "NVeJlvmOVdQ",
+        "url": "https://www.youtube.com/watch?v=NVeJlvmOVdQ",
+        "status": "live",
+        "inicio_programado": "2026-08-18T21:00:00-03:00",
+        "inicio_real": "2026-08-18T21:09:41-03:00",
+        "titulo": "AO VIVO São Paulo x Bolívar | Sul-Americana 2026",
+        "canal": "SBT",
+        "channel_id": "UCR3TOnFWDeAlT-Ho6LueDmg",
+        "thumbnail": "https://i.ytimg.com/vi/NVeJlvmOVdQ/maxresdefault_live.jpg",
+        "confianca": 0.975,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "transmissão já está ao vivo",
+          "horário compatível (30 min de diferença)"
+        ],
+        "origem_busca": "streams-page",
+        "embeddable": true
+      },
+      "alternativas": []
+    },
     "401874141": {
       "event_id": "401874141",
       "rodada": 0,
@@ -117,5 +154,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-08-18T11:31:14-03:00"
+  "atualizado_em": "2026-08-18T22:41:00-03:00"
 }
