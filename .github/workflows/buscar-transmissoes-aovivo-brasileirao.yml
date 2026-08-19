@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       modo:
-        description: 'aovivo = player/link GE TV/SBT/CazéTV; tv = grade futura; completo = ambos'
+        description: 'aovivo = player GE TV/SBT/CazéTV; tv = grade futura; completo = ambos'
         required: true
         default: 'completo'
         type: choice
@@ -99,7 +99,7 @@ jobs:
           else
             # A varredura de grade já é pouco frequente (72h quando saudável).
             # Aproveitamos essa execução para colher, SEM search.list caro,
-            # players/links GE TV/SBT/CazéTV que já estejam agendados em /streams/uploads.
+            # players GE TV/SBT/CazéTV que já estejam agendados em /streams/uploads.
             # Isso evita depender dos últimos 90 minutos antes do jogo.
             CMD=(python scripts/buscar_transmissoes_aovivo_brasileirao.py --no-search)
             if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
@@ -139,15 +139,18 @@ jobs:
               assert str(jogo.get('event_id')) == str(event_id), f'event_id divergente em {event_id}'
               principal = jogo.get('principal')
               assert isinstance(principal, dict), f'{event_id}: sem principal válido'
-              assert principal.get('fonte') in {'cazetv', 'getv', 'sbt'}, f'{event_id}: fonte não permitida'
+              assert principal.get('fonte') in {'cazetv', 'getv', 'sbt', 'sbt_sports'}, f'{event_id}: fonte não permitida'
               url = principal.get('url', '')
               parsed = urlparse(url)
-              assert parsed.netloc.lower() in {'www.youtube.com', 'youtube.com'}, f'{event_id}: URL fora do YouTube'
-              assert parse_qs(parsed.query).get('v'), f'{event_id}: URL sem video_id'
+              host = parsed.netloc.lower()
+              assert host in {'www.youtube.com', 'youtube.com', 'youtu.be', 'www.youtu.be'}, f'{event_id}: URL fora do YouTube'
+              if host in {'youtu.be', 'www.youtu.be'}:
+                  video_id = parsed.path.strip('/').split('/')[0]
+              else:
+                  video_id = (parse_qs(parsed.query).get('v') or [''])[0]
+              assert len(video_id) == 11, f'{event_id}: URL sem video_id válido'
               if jogo.get('alternativas'):
-                  fontes = [principal.get('fonte')] + [alt.get('fonte') for alt in jogo.get('alternativas') or [] if isinstance(alt, dict)]
-                  ordem = {'getv': 0, 'sbt': 1, 'cazetv': 2}
-                  assert principal.get('fonte') == min(fontes, key=lambda fonte: ordem.get(fonte, 99)), f'{event_id}: prioridade de fontes inválida'
+                  assert principal.get('fonte') == 'getv', f'{event_id}: com duas fontes, GE TV deve ser principal'
           aud = json.load(open('dados-br/auditoria-transmissoes-aovivo.json', encoding='utf-8'))
           assert isinstance(aud.get('resumo'), dict), 'auditoria sem resumo'
           assert isinstance(aud.get('rejeitados'), list), 'auditoria sem rejeitados'
