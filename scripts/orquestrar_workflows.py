@@ -23,7 +23,7 @@ Política resumida
    - primeira busca 10 min após o FINAL;
    - retentativas com backoff, sem rodar eternamente a cada 10 min.
 4. Transmissão ao vivo:
-   - apenas perto de jogo elegível, enquanto faltar player GE TV/CazéTV;
+   - apenas perto de jogo elegível, enquanto faltar player GE TV/SBT/CazéTV;
    - respeita grade exclusiva/estável já conhecida.
 5. Editorial:
    - somente quando o fechamento está realmente elegível e o dossiê mudou.
@@ -822,14 +822,14 @@ def live_search_allowed(event_id: str) -> tuple[bool, str]:
     if not isinstance(item, Mapping):
         return True, "grade ainda não consolidada"
     channels = {str(value) for value in (item.get("canais") or []) if value}
-    if channels & {"GE TV", "CazéTV"}:
-        return True, "grade já indica GE TV/CazéTV"
+    if channels & {"GE TV", "SBT", "CazéTV"}:
+        return True, "grade já indica GE TV/SBT/CazéTV"
     if item.get("exclusivo") is True:
-        return False, "grade exclusiva confirmada sem GE TV/CazéTV"
+        return False, "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
     if channels & {"Globo", "Record"}:
         return True, "grade aberta pode ter direito digital"
     if item.get("estavel") is True:
-        return False, "grade estável confirmada sem indício de GE TV/CazéTV"
+        return False, "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
     return True, "grade ainda não estável"
 
 
@@ -1207,9 +1207,22 @@ def self_test() -> int:
     finally:
         globals()["known_final_ids"] = original_known
 
-    # Política de transmissão: exclusiva bloqueia, Globo mantém elegibilidade.
-    # Teste puro via snapshots artificiais seria excessivo aqui; a função real
-    # é exercida pelo --dry-run sobre o repositório no pacote de validação.
+    # Política de transmissão: SBT precisa disparar a busca do player exato,
+    # assim como GE TV/CazéTV; uma grade estável exclusiva sem esses alvos bloqueia.
+    original_tv_path = globals()["TV_PATH"]
+    import tempfile
+    try:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            fake_tv = Path(tmpdir) / "transmissoes-tv.json"
+            globals()["TV_PATH"] = fake_tv
+            fake_tv.write_text(json.dumps({"jogos": {"sbt-1": {"canais": ["SBT", "Disney+ / ESPN"], "estavel": True}}}), encoding="utf-8")
+            allowed, reason = live_search_allowed("sbt-1")
+            assert allowed and "SBT" in reason
+            fake_tv.write_text(json.dumps({"jogos": {"pay-1": {"canais": ["Disney+ / ESPN"], "estavel": True, "exclusivo": True}}}), encoding="utf-8")
+            allowed, _ = live_search_allowed("pay-1")
+            assert not allowed
+    finally:
+        globals()["TV_PATH"] = original_tv_path
     # TV futura: o cron pode consultar a cada 10 min, mas a varredura completa
     # deve respeitar 72h quando saudável, 24h com pendência e 6h se crítica.
     tx_cfg = deep_merge(DEFAULT_CONFIG, {"transmissoes": {

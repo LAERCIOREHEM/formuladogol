@@ -92,7 +92,7 @@
     const channels = tv && Array.isArray(tv.canais) ? tv.canais.filter(Boolean) : [];
     const principal = yt && yt.principal;
     return {
-      label: channels.join(" / ") || (principal && (principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV"))) || "Transmissão a confirmar",
+      label: channels.join(" / ") || (principal && (principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : (principal.fonte === "sbt" ? "SBT" : "GE TV")))) || "Transmissão a confirmar",
       youtubeUrl: principal && principal.embeddable !== false ? safeYoutube(principal.url) : ""
     };
   }

@@ -101,7 +101,10 @@ ACCESS_OPTIONS: dict[str, list[tuple[str, str]]] = {
     "Prime Video": [("Prime Video", "https://www.primevideo.com/")],
     "Disney+ / ESPN": [("Disney+ (ESPN)", "https://www.disneyplus.com/pt-br/")],
     "Paramount+": [("Paramount+", "https://www.paramountplus.com/br/")],
-    "SBT": [("SBT ao vivo", "https://www.sbt.com.br/ao-vivo")],
+    "SBT": [
+        ("SBT no YouTube", "https://www.youtube.com/@sbt/streams"),
+        ("SBT ao vivo", "https://www.sbt.com.br/ao-vivo"),
+    ],
     "Record": [("Record ao vivo", "https://record.r7.com/ao-vivo/")],
 }
 
@@ -897,7 +900,7 @@ def manual_policy_for_game(manual: Mapping[str, Any], game: Mapping[str, Any]) -
 
     ``modo=fixo`` significa que a grade de TV/streaming foi conferida em fonte
     oficial e não precisa de GE/ESPN a cada ciclo. O workflow de YouTube segue
-    independente e pode acrescentar GE TV/CazéTV quando a entrada não for
+    independente e pode acrescentar GE TV/SBT/CazéTV quando a entrada não for
     explicitamente exclusiva.
     """
     for raw in manual.get("transmissoes") or []:
@@ -937,7 +940,11 @@ def exact_live_access(live_output: Mapping[str, Any], event_id: str) -> list[dic
         if not isinstance(link, Mapping) or not link.get("url"):
             continue
         source = norm(link.get("fonte"))
-        label = "Assistir na GE TV" if source == "getv" else ("Assistir na CazéTV" if source == "cazetv" else "")
+        label = {
+            "getv": "Assistir na GE TV",
+            "sbt": "Assistir no SBT",
+            "cazetv": "Assistir na CazéTV",
+        }.get(source, "")
         if label:
             out.append({"nome": label, "url": str(link.get("url")), "tipo": "player_oficial"})
     return out
@@ -951,6 +958,8 @@ def access_options_for_game(entry: Mapping[str, Any], live_output: Mapping[str, 
     for item in exact:
         if "GE TV" in item["nome"]:
             exact_channels.add("GE TV")
+        if "SBT" in item["nome"]:
+            exact_channels.add("SBT")
         if "CazéTV" in item["nome"]:
             exact_channels.add("CazéTV")
         key = (item["nome"], item["url"])
@@ -1015,7 +1024,7 @@ def live_youtube_evidence(
             if not isinstance(link, Mapping):
                 continue
             source = norm(link.get("fonte"))
-            label = "GE TV" if source == "getv" else ("CazéTV" if source == "cazetv" else "")
+            label = {"getv": "GE TV", "sbt": "SBT", "cazetv": "CazéTV"}.get(source, "")
             if label and label not in channels:
                 channels.append(label)
             if link.get("url"):
@@ -1027,7 +1036,7 @@ def live_youtube_evidence(
                 reference=" | ".join(refs) or "dados-br/transmissoes-aovivo.json",
                 captured_at=captured_at,
                 authority=120,
-                detail="player oficial público e embeddable validado por channelId",
+                detail="vídeo oficial público validado por channelId; embed conforme status.embeddable",
             ))
     return out
 
@@ -1097,7 +1106,7 @@ def consolidate_game(
             selected = manual
         elif policy.get("modo") == "fixo":
             # Grade fixa evita refazer pesquisa editorial; um player integral
-            # GE TV/CazéTV validado pode ser acrescentado sem substituir direitos.
+            # GE TV/SBT/CazéTV validado pode ser acrescentado sem substituir direitos.
             selected = manual + youtube
         else:
             selected = manual
@@ -1378,7 +1387,7 @@ def collect(
             "fontes": ["CBF oficial", "GE Agenda", "GE guias editoriais", "ESPN", "YouTube oficial validado", "override manual"],
             "regra_preservacao": "resposta vazia ou falha de uma fonte nunca apaga transmissão válida já publicada",
             "regra_publicacao": "somente canais oficiais da lista permitida; evidências ficam registradas por jogo",
-            "youtube_exato": "links exatos de GE TV/CazéTV permanecem em dados-br/transmissoes-aovivo.json",
+            "youtube_exato": "links exatos de GE TV/SBT/CazéTV permanecem em dados-br/transmissoes-aovivo.json",
             "incremental": "grades fixas/confirmadas não repetem GE/ESPN; CBF global e busca oficial de YouTube continuam detectando mudanças relevantes",
             "acessos": "canais de direitos e plataformas de acesso são campos distintos; Claro tv+/Globoplay são opções para canais contratados, não novos detentores de direitos",
         },
@@ -1527,6 +1536,12 @@ def selftest() -> None:
     exact_access = access_options_for_game({"event_id":"1","canais":["CazéTV","Premiere"]}, live_test)
     assert exact_access[0]["tipo"] == "player_oficial" and "watch?v=AAAAAAAAAAA" in exact_access[0]["url"]
     assert not any(item["nome"] == "CazéTV no YouTube" for item in exact_access), "link genérico não deve duplicar player exato"
+    sbt_live = {"jogos":{"3":{"principal":{"fonte":"sbt","url":"https://www.youtube.com/watch?v=BBBBBBBBBBB"},"alternativas":[]}}}
+    sbt_games = [{"event_id":"3","mandante":{"nome":"São Paulo"},"visitante":{"nome":"Bolívar"}}]
+    assert live_youtube_evidence(sbt_live, sbt_games, "2026-08-18T22:00:00-03:00")["3"][0].channels == ["SBT"]
+    sbt_access = access_options_for_game({"event_id":"3","canais":["SBT","Disney+ / ESPN"]}, sbt_live)
+    assert sbt_access[0] == {"nome":"Assistir no SBT","url":"https://www.youtube.com/watch?v=BBBBBBBBBBB","tipo":"player_oficial"}
+    assert not any(item["nome"] == "SBT no YouTube" for item in sbt_access), "link genérico SBT não deve duplicar vídeo exato"
     generic_access = access_options_for_game({"event_id":"2","canais":["CazéTV"]}, {"jogos":{}})
     assert generic_access == [{"nome":"CazéTV no YouTube","url":"https://www.youtube.com/@CazeTV/streams","tipo":"acesso_oficial"}]
     print("SELFTEST OK: CBF, GE, ESPN, manual, preservação, auditoria e links editoriais")

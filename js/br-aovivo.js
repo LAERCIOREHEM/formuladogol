@@ -113,6 +113,13 @@
         { label: "Canal GE TV", url: "https://www.youtube.com/@getv" }
       ]
     },
+    sbt: {
+      label: "SBT",
+      aliases: ["sbt", "sbt sports", "+sbt"],
+      links: [
+        { label: "SBT no YouTube", url: "https://www.youtube.com/@sbt/streams" }
+      ]
+    },
     cazetv: {
       label: "CazéTV",
       aliases: ["cazetv", "caze tv"],
@@ -582,6 +589,20 @@
     return raw.includes("cazetv") || raw.includes("caze tv") || raw === "caze" || raw === "cazetv";
   }
 
+  function sourceIsSbt(value) {
+    const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    return raw === "sbt" || raw.includes("sbt sports") || raw === "+sbt";
+  }
+
+  function sourceDisplayName(principal) {
+    if (!principal) return "YouTube";
+    if (principal.nome) return String(principal.nome);
+    if (sourceIsCaze(principal.fonte) || sourceIsCaze(principal.canal)) return "CazéTV";
+    if (sourceIsSbt(principal.fonte) || sourceIsSbt(principal.canal)) return "SBT";
+    if (String(principal.fonte || "").toLowerCase() === "getv") return "GE TV";
+    return String(principal.canal || principal.fonte || "YouTube");
+  }
+
   function isCommentaryOnlyTitle(value) {
     const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     return /\blances?\s+(?:em\s+tempo\s+real|ao\s+vivo)\b/.test(raw)
@@ -779,7 +800,7 @@
   function transmissionLabel(game) {
     const yt = transmissionForGame(game);
     const principal = yt && yt.principal;
-    if (principal && safeYouTubeUrl(principal.url)) return principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
+    if (principal && safeYouTubeUrl(principal.url)) return sourceDisplayName(principal);
     const closed = closedTransmissionForGame(game);
     const canais = closed && Array.isArray(closed.canais) ? closed.canais.filter(Boolean) : [];
     return canais.join(" / ");
@@ -794,7 +815,11 @@
     const exact = transmissionForGame(game);
     const exactPrincipal = exact && exact.principal;
     const exactProvider = exactPrincipal
-      ? (sourceIsCaze(exactPrincipal.fonte) || sourceIsCaze(exactPrincipal.nome) ? "cazetv" : (String(exactPrincipal.fonte || "").toLowerCase() === "getv" ? "getv" : ""))
+      ? (sourceIsCaze(exactPrincipal.fonte) || sourceIsCaze(exactPrincipal.nome)
+          ? "cazetv"
+          : (sourceIsSbt(exactPrincipal.fonte) || sourceIsSbt(exactPrincipal.nome)
+              ? "sbt"
+              : (String(exactPrincipal.fonte || "").toLowerCase() === "getv" ? "getv" : "")))
       : "";
 
     const links = [];
@@ -816,7 +841,7 @@
       if (!isGenericDuplicateOfExact(item.label || item.nome)) addLink(item.label, item.url);
     }
     // O backend publica acessos oficiais em `acessos` (ex.: Paramount+).
-    // Quando já existe o vídeo EXATO da GE TV/CazéTV, omitimos o link genérico
+    // Quando já existe o vídeo EXATO da GE TV/SBT/CazéTV, omitimos o link genérico
     // do canal para não competir com o player/link específico mostrado acima.
     for (const item of (Array.isArray(entry.acessos) ? entry.acessos : [])) {
       const label = item.nome || item.label || "Acessar";
@@ -843,7 +868,7 @@
     const url = rawVideoId ? "https://www.youtube.com/watch?v=" + rawVideoId : "";
     let youtube = "";
     if (rawVideoId && principal) {
-      const sourceName = principal.nome || (principal.fonte === "cazetv" ? "CazéTV" : "GE TV");
+      const sourceName = sourceDisplayName(principal);
       const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
       const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
       const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
@@ -866,8 +891,8 @@
       }
     }
     const closed = renderClosedTransmission(game);
-    // Copa 2026 UX: CazéTV nunca é embed e o CTA exato aparece logo DEPOIS
-    // do card "Onde assistir". GE TV mantém o player interno antes do card.
+    // CazéTV nunca é embed e o CTA exato aparece logo DEPOIS do card
+    // "Onde assistir". GE TV e SBT seguem status.embeddable do YouTube.
     if (principal && (sourceIsCaze(principal.fonte) || sourceIsCaze(principal.nome))) return closed + youtube;
     return youtube + closed;
   }
