@@ -11,7 +11,7 @@
     ],
     "regra_preservacao": "resposta vazia ou falha de uma fonte nunca apaga transmissão válida já publicada",
     "regra_publicacao": "somente canais oficiais da lista permitida; evidências ficam registradas por jogo",
-    "youtube_exato": "links exatos de GE TV/CazéTV permanecem em dados-br/transmissoes-aovivo.json",
+    "youtube_exato": "links exatos de GE TV/SBT/CazéTV permanecem em dados-br/transmissoes-aovivo.json",
     "incremental": "grades fixas/confirmadas não repetem GE/ESPN; CBF global e busca oficial de YouTube continuam detectando mudanças relevantes",
     "acessos": "canais de direitos e plataformas de acesso são campos distintos; Claro tv+/Globoplay são opções para canais contratados, não novos detentores de direitos"
   },
@@ -37,7 +37,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -61,7 +61,7 @@
         "SBT",
         "Disney+ / ESPN"
       ],
-      "origem": "override editorial — transmissoes.json",
+      "origem": "override editorial — transmissoes.json + YouTube oficial validado",
       "confianca": "manual",
       "estavel": true,
       "exclusivo": false,
@@ -73,16 +73,26 @@
             "Disney+ / ESPN"
           ],
           "referencia": "SBT Sports + ESPN/Disney+ — grade das oitavas da Sul-Americana 2026",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
+        },
+        {
+          "fonte": "YouTube oficial validado",
+          "canais": [
+            "SBT"
+          ],
+          "referencia": "https://www.youtube.com/watch?v=woTeBjjKUL0",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
+          "autoridade": 120,
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
       ],
       "acessos": [
         {
-          "nome": "SBT ao vivo",
-          "url": "https://www.sbt.com.br/ao-vivo",
-          "tipo": "acesso_oficial"
+          "nome": "Assistir no SBT",
+          "url": "https://www.youtube.com/watch?v=woTeBjjKUL0",
+          "tipo": "player_oficial"
         },
         {
           "nome": "Disney+ (ESPN)",
@@ -112,7 +122,7 @@
             "Paramount+"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -146,7 +156,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ESPN/Disney+ — grade das oitavas da Sul-Americana 2026",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -184,7 +194,7 @@
             "Paramount+"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         },
@@ -194,9 +204,9 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=yM9qJJG6gIQ",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
       ],
       "acessos": [
@@ -238,7 +248,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -272,7 +282,7 @@
             "Paramount+"
           ],
           "referencia": "Paramount+ — confrontos Vasco x Olimpia pelas oitavas da Sul-Americana 2026, transmissão exclusiva",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -306,7 +316,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ESPN Brasil — tabela das oitavas da Sul-Americana 2026, transmissão ESPN no Disney+",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -340,7 +350,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "ge — grade das oitavas da Libertadores 2026",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -374,7 +384,7 @@
             "Paramount+"
           ],
           "referencia": "Paramount+ — grade das oitavas da Sul-Americana 2026",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -408,7 +418,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -449,7 +459,7 @@
             "SporTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -498,7 +508,7 @@
             "Prime Video"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -534,7 +544,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -581,7 +591,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         },
@@ -591,9 +601,9 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=YXH_s6XP0R0",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
       ],
       "acessos": [
@@ -642,7 +652,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -690,7 +700,7 @@
             "CazéTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -739,7 +749,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -778,7 +788,7 @@
             "Premiere"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -819,7 +829,7 @@
             "SporTV"
           ],
           "referencia": "CBF oficial — tabela detalhada Série A 2026, rodada 24",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -870,7 +880,7 @@
             "Premiere"
           ],
           "referencia": "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -926,7 +936,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         },
@@ -936,9 +946,9 @@
             "GE TV"
           ],
           "referencia": "https://www.youtube.com/watch?v=ljy_FTVY5Bo",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 120,
-          "detalhe": "player oficial público e embeddable validado por channelId"
+          "detalhe": "vídeo oficial público validado por channelId; embed conforme status.embeddable"
         }
       ],
       "acessos": [
@@ -1006,7 +1016,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1065,7 +1075,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -1099,7 +1109,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1140,7 +1150,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1193,7 +1203,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1242,7 +1252,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1283,7 +1293,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1331,7 +1341,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1380,7 +1390,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1419,7 +1429,7 @@
             "Prime Video"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -1455,7 +1465,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1504,7 +1514,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1545,7 +1555,7 @@
             "Premiere"
           ],
           "referencia": "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1600,7 +1610,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1665,7 +1675,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1724,7 +1734,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -1758,7 +1768,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1797,7 +1807,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1836,7 +1846,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1877,7 +1887,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1928,7 +1938,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -1974,7 +1984,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -2022,7 +2032,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -2075,7 +2085,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -2124,7 +2134,7 @@
             "Prime Video"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada; exclusiva"
         }
@@ -2160,7 +2170,7 @@
             "Premiere"
           ],
           "referencia": "https://www.flashscore.com.br/noticias/cbf-detalha-tabela-das-rodadas-25-e-26-do-brasileirao-veja-jogos-datas-e-horarios/OWfA7SIl/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 1000,
           "detalhe": "grade editorial verificada"
         }
@@ -2217,7 +2227,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2291,7 +2301,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2357,7 +2367,7 @@
             "SporTV"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -2412,7 +2422,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2472,7 +2482,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2532,7 +2542,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2586,7 +2596,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2631,7 +2641,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2691,7 +2701,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2745,7 +2755,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2794,7 +2804,7 @@
             "SporTV"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2860,7 +2870,7 @@
             "Paramount+"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2905,7 +2915,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -2963,7 +2973,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -3025,7 +3035,7 @@
             "Disney+ / ESPN"
           ],
           "referencia": "dados-br/transmissoes-tv.json",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 10,
           "detalhe": "usado somente quando nenhuma fonte automática respondeu com dado válido"
         }
@@ -3095,7 +3105,7 @@
             "Prime Video"
           ],
           "referencia": "https://ge.globo.com/agenda/",
-          "capturado_em": "2026-08-18T22:31:17-03:00",
+          "capturado_em": "2026-08-18T22:51:29-03:00",
           "autoridade": 80,
           "detalhe": "clubes e provedores identificados no mesmo bloco de conteúdo"
         }
@@ -3129,5 +3139,5 @@
       ]
     }
   },
-  "atualizado_em": "2026-08-18T22:31:17-03:00"
+  "atualizado_em": "2026-08-18T22:51:29-03:00"
 }
