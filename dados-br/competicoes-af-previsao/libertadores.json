@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-18T21:20:58-03:00",
+  "gerado_em": "2026-08-18T23:31:31-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,12 +17,12 @@
     "ordem": 600,
     "nome": "Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 8
+    "eventos_pendentes": 6
   },
   "resumo": {
     "eventos": 142,
-    "finalizados": 134,
-    "pendentes": 8,
+    "finalizados": 136,
+    "pendentes": 6,
     "equipes": 47,
     "equipes_serie_a_2026": 8
   },
@@ -5287,9 +5287,9 @@
     {
       "event_id": "401874152",
       "data_iso": "2026-08-18T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Ter., Agosto 18º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5314,18 +5314,18 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Independiente del Valle",
       "penaltis": false
     },
     {
       "event_id": "401874163",
       "data_iso": "2026-08-18T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Ter., Agosto 18º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5350,10 +5350,10 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 3
       },
-      "vencedor": null,
+      "vencedor": "Estudiantes de La Plata",
       "penaltis": false
     },
     {
@@ -5578,6 +5578,6 @@
     "fase": "Oitavas de final",
     "fase_ordem": 600,
     "chaves": 8,
-    "equipes_ativas": 15
+    "equipes_ativas": 14
   }
 }
