@@ -3,8 +3,8 @@
   "competicao": "Clubes da Série A 2026 — Brasileirão, Copa do Brasil, Libertadores e Sul-Americana",
   "prioridade": [
     "getv",
+    "sbt_sports",
     "sbt",
-    "sbt_main",
     "cazetv"
   ],
   "canais": [
@@ -17,15 +17,15 @@
       "streams_url": "https://www.youtube.com/@getv/streams"
     },
     {
-      "chave": "sbt",
-      "nome": "SBT Sports",
+      "chave": "sbt_sports",
+      "nome": "SBT",
       "handle": "@SBTSports",
       "channel_id": "",
       "prioridade": 2,
       "streams_url": "https://www.youtube.com/@SBTSports/streams"
     },
     {
-      "chave": "sbt_main",
+      "chave": "sbt",
       "nome": "SBT",
       "handle": "@sbt",
       "channel_id": "",
@@ -86,7 +86,7 @@
     "sem imagens do jogo"
   ],
   "agenda_ge_referencia": "https://ge.globo.com/agenda/#/futebol",
-  "observacao": "A agenda consolidada orienta a grade. Descoberta redundante: /streams + uploads em todos os jogos; search.list oficial só na janela crítica e quando a grade ainda torna GE TV/SBT/CazéTV plausíveis. Para SBT, o canal esportivo oficial @SBTSports é a fonte primária dos jogos (Sul-Americana/Champions), com @sbt mantido como redundância. GE TV tem prioridade sobre SBT e CazéTV. Lives de narração, watchalong, multiplex ou lances em tempo real são rejeitadas; somente jogo integral público e oficial é aceito. O campo status.embeddable da API do YouTube decide o player interno para GE TV/SBT; CazéTV permanece sempre como link externo.",
+  "observacao": "A agenda consolidada orienta a grade. Descoberta redundante: /streams + uploads em todos os jogos; search.list oficial só na janela crítica e quando a grade ainda torna GE TV/SBT/CazéTV plausíveis. O SBT é monitorado no canal principal @sbt e, para jogos esportivos, também no canal oficial @SBTSports; o usuário sempre recebe o vídeo exato quando ele é identificado, nunca um link genérico no lugar do vídeo. GE TV tem prioridade sobre SBT e CazéTV. Lives de narração, watchalong, multiplex ou lances em tempo real são rejeitadas; somente jogo integral público e oficial é aceito. O campo status.embeddable da API do YouTube decide o player interno para GE TV/SBT; CazéTV permanece sempre como link externo.",
   "streams_max_itens": 120,
   "search_api_fallback": true,
   "search_live_antes_minutos": 30,

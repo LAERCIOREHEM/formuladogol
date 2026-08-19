@@ -102,7 +102,6 @@ ACCESS_OPTIONS: dict[str, list[tuple[str, str]]] = {
     "Disney+ / ESPN": [("Disney+ (ESPN)", "https://www.disneyplus.com/pt-br/")],
     "Paramount+": [("Paramount+", "https://www.paramountplus.com/br/")],
     "SBT": [
-        ("SBT Sports no YouTube", "https://www.youtube.com/@SBTSports/streams"),
         ("SBT no YouTube", "https://www.youtube.com/@sbt/streams"),
         ("SBT ao vivo", "https://www.sbt.com.br/ao-vivo"),
     ],
@@ -944,8 +943,7 @@ def exact_live_access(live_output: Mapping[str, Any], event_id: str) -> list[dic
         label = {
             "getv": "Assistir na GE TV",
             "sbt": "Assistir no SBT",
-            "sbt_main": "Assistir no SBT",
-            "sbt_sports": "Assistir no SBT",
+            "sbt sports": "Assistir no SBT",
             "cazetv": "Assistir na CazéTV",
         }.get(source, "")
         if label:
@@ -1027,7 +1025,7 @@ def live_youtube_evidence(
             if not isinstance(link, Mapping):
                 continue
             source = norm(link.get("fonte"))
-            label = {"getv": "GE TV", "sbt": "SBT", "sbt_main": "SBT", "sbt_sports": "SBT", "cazetv": "CazéTV"}.get(source, "")
+            label = {"getv": "GE TV", "sbt": "SBT", "sbt sports": "SBT", "cazetv": "CazéTV"}.get(source, "")
             if label and label not in channels:
                 channels.append(label)
             if link.get("url"):
@@ -1539,11 +1537,11 @@ def selftest() -> None:
     exact_access = access_options_for_game({"event_id":"1","canais":["CazéTV","Premiere"]}, live_test)
     assert exact_access[0]["tipo"] == "player_oficial" and "watch?v=AAAAAAAAAAA" in exact_access[0]["url"]
     assert not any(item["nome"] == "CazéTV no YouTube" for item in exact_access), "link genérico não deve duplicar player exato"
-    sbt_live = {"jogos":{"3":{"principal":{"fonte":"sbt","url":"https://www.youtube.com/watch?v=BBBBBBBBBBB"},"alternativas":[]}}}
+    sbt_live = {"jogos":{"3":{"principal":{"fonte":"sbt_sports","url":"https://youtu.be/BBBBBBBBBBB"},"alternativas":[]}}}
     sbt_games = [{"event_id":"3","mandante":{"nome":"São Paulo"},"visitante":{"nome":"Bolívar"}}]
     assert live_youtube_evidence(sbt_live, sbt_games, "2026-08-18T22:00:00-03:00")["3"][0].channels == ["SBT"]
     sbt_access = access_options_for_game({"event_id":"3","canais":["SBT","Disney+ / ESPN"]}, sbt_live)
-    assert sbt_access[0] == {"nome":"Assistir no SBT","url":"https://www.youtube.com/watch?v=BBBBBBBBBBB","tipo":"player_oficial"}
+    assert sbt_access[0] == {"nome":"Assistir no SBT","url":"https://youtu.be/BBBBBBBBBBB","tipo":"player_oficial"}
     assert not any(item["nome"] == "SBT no YouTube" for item in sbt_access), "link genérico SBT não deve duplicar vídeo exato"
     generic_access = access_options_for_game({"event_id":"2","canais":["CazéTV"]}, {"jogos":{}})
     assert generic_access == [{"nome":"CazéTV no YouTube","url":"https://www.youtube.com/@CazeTV/streams","tipo":"acesso_oficial"}]

@@ -10,7 +10,7 @@ Regras principais:
 - Faz scraping da página /@canal/streams (custo zero de quota) em toda
   execução para capturar lives agendadas não presentes nos uploads recentes.
 - Liga o vídeo ao jogo somente quando clubes + horário dão confiança alta.
-- GE TV tem prioridade sobre SBT e CazéTV; SBT Sports é a fonte esportiva primária, com SBT principal redundante; exibe sempre um único link.
+- GE TV tem prioridade sobre SBT e CazéTV; o SBT é monitorado em @sbt e @SBTSports; exibe sempre um único link exato.
 - Links manuais têm prioridade absoluta e nunca são sobrescritos.
 
 Usa apenas biblioteca padrão do Python. Requer YOUTUBE_API_KEY para
@@ -155,7 +155,7 @@ def youtube_url(video_id: str) -> str:
 
 def is_sbt_source(value: Any) -> bool:
     key = norm(value).replace(" ", "_")
-    return key in {"sbt", "sbt_main", "sbt_sports"} or key.startswith("sbt_")
+    return key in {"sbt", "sbt_sports"} or key.startswith("sbt_")
 
 
 @dataclass
@@ -202,7 +202,7 @@ class Candidate:
             "fonte": self.channel_key,
             "nome": channel_name,
             "video_id": self.video_id,
-            "url": youtube_url(self.video_id),
+            "url": (f"https://youtu.be/{self.video_id}" if is_sbt_source(self.channel_key) else youtube_url(self.video_id)),
             "status": self.status,
             "inicio_programado": iso_brt(self.scheduled_start) if self.scheduled_start else "",
             "inicio_real": iso_brt(self.actual_start) if self.actual_start else "",
@@ -744,7 +744,7 @@ def load_existing_video_ids(output: Mapping[str, Any], manual: Mapping[str, Any]
                         vid = str(link.get("video_id") or video_id_from_url(link.get("url")))
                         if vid:
                             ids.append(vid)
-            for key in ("cazetv", "getv", "sbt", "sbt_main", "url"):
+            for key in ("cazetv", "getv", "sbt", "sbt_sports", "url"):
                 vid = video_id_from_url(entry.get(key))
                 if vid:
                     ids.append(vid)
@@ -777,7 +777,7 @@ def manual_links_for_game(manual: Mapping[str, Any], game: Game, channels: Mappi
 
     result: Dict[str, Dict[str, Any]] = {}
     candidates: List[Tuple[str, Any]] = []
-    for key in ("cazetv", "getv", "sbt", "sbt_main"):
+    for key in ("cazetv", "getv", "sbt", "sbt_sports"):
         if entry.get(key):
             candidates.append((key, entry.get(key)))
     principal = entry.get("principal")
@@ -810,7 +810,7 @@ def manual_links_for_game(manual: Mapping[str, Any], game: Game, channels: Mappi
             "fonte": source_key,
             "nome": channel.get("nome") or source_key,
             "video_id": vid,
-            "url": youtube_url(vid),
+            "url": (f"https://youtu.be/{vid}" if is_sbt_source(source_key) else youtube_url(vid)),
             "status": str(entry.get("status") or "upcoming"),
             "inicio_programado": iso_brt(game.kickoff),
             "inicio_real": "",
@@ -823,7 +823,7 @@ def manual_links_for_game(manual: Mapping[str, Any], game: Game, channels: Mappi
             "origem_busca": "manual",
             "embeddable": (
                 bool(raw.get("embeddable")) if isinstance(raw, dict) and "embeddable" in raw
-                else source_key != "cazetv"
+                else (source_key == "getv")
             ),
         }
     return result
@@ -955,10 +955,10 @@ def build_outputs(
     publish_targets = list(by_id.values())
 
     output_base = {
-        "fonte": "YouTube oficial — GE TV, SBT Sports/SBT e CazéTV | clubes do Brasileirão",
+        "fonte": "YouTube oficial — GE TV, SBT e CazéTV | clubes do Brasileirão",
         "politica": {
-            "prioridade": list(config.get("prioridade") or ["getv", "sbt", "sbt_main", "cazetv"]),
-            "regra": "Somente canais oficiais configurados; SBT Sports é o canal esportivo primário do SBT e @sbt é redundante; GE TV tem prioridade sobre SBT e CazéTV; link único; embed respeita status.embeddable do YouTube (CazéTV sempre externa).",
+            "prioridade": list(config.get("prioridade") or ["getv", "sbt_sports", "sbt", "cazetv"]),
+            "regra": "Somente canais oficiais configurados; SBT é monitorado em @sbt e @SBTSports; GE TV tem prioridade sobre SBT e CazéTV; sempre usa o vídeo exato identificado; embed somente quando status.embeddable=true (CazéTV sempre externa).",
             "janela": f"de {config.get('janela_antes_horas', 24)}h antes até {after_minutes} min após o início",
             "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta",
             "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco.",
@@ -1091,7 +1091,7 @@ def build_outputs(
             candidates = list(unique.values())
             matched, accepted, rejected = match_candidates_to_games(publish_targets, candidates, channels, config, aliases)
 
-    priority = list(config.get("prioridade") or ["getv", "sbt", "sbt_main", "cazetv"])
+    priority = list(config.get("prioridade") or ["getv", "sbt_sports", "sbt", "cazetv"])
 
     published: Dict[str, Any] = {}
     no_stream: List[Dict[str, Any]] = []
@@ -1203,8 +1203,8 @@ def selftest() -> None:
         "confianca_minima": 0.72,
     }
 
-    # O canal SBT é resolvido pelo handle oficial, sem depender de channel_id
-    # hardcoded no repositório. forHandle aceita valores com @.
+    # Canais do SBT são resolvidos por handle oficial, sem depender de channel_id
+    # hardcoded no repositório. O canal esportivo é redundância de descoberta.
     class FakeChannelClient:
         def get(self, resource, **params):
             assert resource == "channels"
@@ -1216,10 +1216,11 @@ def selftest() -> None:
             }]}
     resolved = resolve_channels(FakeChannelClient(), {"canais": [{
         "chave": "sbt", "nome": "SBT", "handle": "@sbt", "channel_id": "",
-        "prioridade": 2, "streams_url": "https://www.youtube.com/@sbt/streams",
+        "prioridade": 3, "streams_url": "https://www.youtube.com/@sbt/streams",
     }]}, [])
     assert resolved["sbt"]["channel_id"] == "UCSBT123"
     assert resolved["sbt"]["uploads_playlist"] == "UUSBT123"
+    assert is_sbt_source("sbt_sports") and is_sbt_source("SBT Sports")
     game = Game("1", 19, dt.datetime(2026, 7, 16, 19, 30, tzinfo=TZ), "Botafogo", "Santos", "pre")
     caze = Candidate("AAAAAAAAAAA", "cazetv", "UC1", "CazéTV", "BOTAFOGO X SANTOS | BRASILEIRÃO 2026 | AO VIVO", "", "upcoming", dt.datetime(2026, 7, 16, 18, 30, tzinfo=TZ), None, None)
     ev = evaluate_candidate(caze, game, config, aliases)
@@ -1383,7 +1384,7 @@ def selftest() -> None:
     assert "Cih-UxYNCSs" in ids_found, f"ID da live Cazé não encontrado: {ids_found}"
     assert len(ids_found) == 3
 
-    print("SELFTEST OK: vínculo, rejeições, aliases, prioridade GE TV>SBT>CazéTV, embed dinâmico SBT, link único, /streams, uploads e fallback search")
+    print("SELFTEST OK: vínculo, rejeições, aliases, prioridade GE TV>SBT>CazéTV, SBT em @sbt/@SBTSports, embed só quando validado, link único, /streams, uploads e fallback search")
 
 
 def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:

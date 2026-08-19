@@ -1,13 +1,13 @@
 {
-  "fonte": "YouTube oficial — GE TV, SBT Sports/SBT e CazéTV | clubes do Brasileirão",
+  "fonte": "YouTube oficial — GE TV, SBT e CazéTV | clubes do Brasileirão",
   "politica": {
     "prioridade": [
       "getv",
+      "sbt_sports",
       "sbt",
-      "sbt_main",
       "cazetv"
     ],
-    "regra": "Somente canais oficiais configurados; SBT Sports é o canal esportivo primário do SBT e @sbt é redundante; GE TV tem prioridade sobre SBT e CazéTV; link único; embed respeita status.embeddable do YouTube (CazéTV sempre externa).",
+    "regra": "Somente canais oficiais configurados; SBT é monitorado em @sbt e @SBTSports; GE TV tem prioridade sobre SBT e CazéTV; sempre usa o vídeo exato identificado; embed somente quando status.embeddable=true (CazéTV sempre externa).",
     "janela": "de 1008h antes até 180 min após o início",
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta",
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
@@ -23,29 +23,25 @@
       "visitante": "Bolívar",
       "data_iso": "2026-08-18T21:30:00-03:00",
       "estadio": "Estádio Cícero Pompeu de Toledo",
-      "origem": "automático",
+      "origem": "link-oficial-exato",
       "principal": {
-        "fonte": "sbt",
-        "nome": "SBT Sports",
-        "video_id": "woTeBjjKUL0",
-        "url": "https://www.youtube.com/watch?v=woTeBjjKUL0",
+        "fonte": "sbt_sports",
+        "nome": "SBT",
+        "video_id": "tkrtg0md5lc",
+        "url": "https://youtu.be/tkrtg0md5lc",
         "status": "live",
-        "inicio_programado": "2026-08-18T21:00:00-03:00",
-        "inicio_real": "2026-08-18T21:04:06-03:00",
-        "titulo": "AO VIVO São Paulo x Bolívar | Sul-Americana 2026",
+        "inicio_programado": "2026-08-18T21:15:00-03:00",
+        "inicio_real": "",
+        "titulo": "São Paulo x Bolívar AO VIVO | Copa Sul-Americana | 18/08/2026 | Oitavas de Final – Jogo de Volta",
         "canal": "SBT Sports",
-        "channel_id": "UCxc3marqP9BJSkQ0_K4mqDg",
-        "thumbnail": "https://i.ytimg.com/vi/woTeBjjKUL0/maxresdefault_live.jpg",
-        "confianca": 0.975,
+        "channel_id": "",
+        "thumbnail": "",
+        "confianca": 1.0,
         "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "transmissão já está ao vivo",
-          "horário compatível (30 min de diferença)"
+          "vídeo exato oficial do SBT identificado para São Paulo x Bolívar"
         ],
-        "origem_busca": "streams-page",
-        "embeddable": true
+        "origem_busca": "link exato verificado em 18/08/2026",
+        "embeddable": false
       },
       "alternativas": []
     },
@@ -155,5 +151,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-08-18T22:51:08-03:00"
+  "atualizado_em": "2026-08-18T22:47:00-03:00"
 }

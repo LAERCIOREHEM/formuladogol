@@ -115,9 +115,8 @@
     },
     sbt: {
       label: "SBT",
-      aliases: ["sbt", "sbt sports", "sbt_sports", "sbt main", "sbt_main", "+sbt"],
+      aliases: ["sbt", "sbt sports", "sbt_sports", "+sbt"],
       links: [
-        { label: "SBT Sports no YouTube", url: "https://www.youtube.com/@SBTSports/streams" },
         { label: "SBT no YouTube", url: "https://www.youtube.com/@sbt/streams" },
         { label: "SBT ao vivo", url: "https://www.sbt.com.br/ao-vivo" }
       ]
@@ -140,7 +139,7 @@
     "paramountplus.com", "www.paramountplus.com",
     "sbt.com.br", "www.sbt.com.br",
     "record.r7.com", "www.record.r7.com", "r7.com", "www.r7.com",
-    "youtube.com", "www.youtube.com"
+    "youtube.com", "www.youtube.com", "youtu.be", "www.youtu.be"
   ]);
 
   const FINAL_CACHE_KEY = "br2026_finais_reais_v2";
@@ -593,7 +592,7 @@
 
   function sourceIsSbt(value) {
     const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    return raw === "sbt" || raw === "sbt_main" || raw === "sbt_sports" || raw.includes("sbt sports") || raw.includes("sbt main") || raw === "+sbt";
+    return raw === "sbt" || raw === "sbt_sports" || raw.includes("sbt sports") || raw === "+sbt";
   }
 
   function sourceDisplayName(principal) {
@@ -691,7 +690,7 @@
     }
   }
 
-  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v2";
+  const TRANSMISSION_CACHE_YT = "br2026_transmissoes_youtube_v3";
   const TRANSMISSION_CACHE_TV = "br2026_transmissoes_tv_v1";
 
   function cachedTransmissionMap(key) {
@@ -867,7 +866,10 @@
     const entry = transmissionForGame(game);
     const principal = entry && entry.principal;
     const rawVideoId = principal ? youtubeVideoId(principal.video_id || principal.url) : "";
-    const url = rawVideoId ? "https://www.youtube.com/watch?v=" + rawVideoId : "";
+    const principalUrl = principal && principal.url ? safeOfficialUrl(principal.url) : "";
+    const url = rawVideoId
+      ? (principalUrl && youtubeVideoId(principalUrl) === rawVideoId ? principalUrl : "https://www.youtube.com/watch?v=" + rawVideoId)
+      : "";
     let youtube = "";
     if (rawVideoId && principal) {
       const sourceName = sourceDisplayName(principal);
@@ -885,7 +887,9 @@
       const note = finished
         ? "Transmissão oficial encerrada no YouTube"
         : (liveNow ? "Transmissão oficial ao vivo no YouTube" : (preLive ? "A bola rola em breve — transmissão oficial no YouTube" : "Transmissão oficial programada no YouTube"));
-      const externalOnly = principal.embeddable === false || isCaze;
+      // Só abre iframe quando o backend confirmou explicitamente status.embeddable=true.
+      // Isso evita inventar suporte a embed para SBT (ou qualquer outro canal).
+      const externalOnly = isCaze || principal.embeddable !== true;
       if (externalOnly) {
         youtube = '<div class="live-stream-area"><a class="live-stream-button ' + (liveStyle ? "is-live" : "") + '" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a><div class="live-stream-note">' + esc(note) + ' · link oficial exato</div></div>';
       } else {
@@ -893,8 +897,8 @@
       }
     }
     const closed = renderClosedTransmission(game);
-    // CazéTV nunca é embed e o CTA exato aparece logo DEPOIS do card
-    // "Onde assistir". GE TV e SBT seguem status.embeddable do YouTube.
+    // CazéTV nunca é embed. GE TV e SBT só abrem player interno quando
+    // status.embeddable=true foi confirmado pelo YouTube; caso contrário usam o link exato externo.
     if (principal && (sourceIsCaze(principal.fonte) || sourceIsCaze(principal.nome))) return closed + youtube;
     return youtube + closed;
   }
