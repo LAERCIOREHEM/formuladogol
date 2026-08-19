@@ -10,7 +10,7 @@ Regras principais:
 - Faz scraping da página /@canal/streams (custo zero de quota) em toda
   execução para capturar lives agendadas não presentes nos uploads recentes.
 - Liga o vídeo ao jogo somente quando clubes + horário dão confiança alta.
-- GE TV tem prioridade sobre SBT e CazéTV; exibe sempre um único link.
+- GE TV tem prioridade sobre SBT e CazéTV; SBT Sports é a fonte esportiva primária, com SBT principal redundante; exibe sempre um único link.
 - Links manuais têm prioridade absoluta e nunca são sobrescritos.
 
 Usa apenas biblioteca padrão do Python. Requer YOUTUBE_API_KEY para
@@ -151,6 +151,11 @@ def video_id_from_url(value: Any) -> str:
 
 def youtube_url(video_id: str) -> str:
     return f"https://www.youtube.com/watch?v={video_id}"
+
+
+def is_sbt_source(value: Any) -> bool:
+    key = norm(value).replace(" ", "_")
+    return key in {"sbt", "sbt_main", "sbt_sports"} or key.startswith("sbt_")
 
 
 @dataclass
@@ -739,7 +744,7 @@ def load_existing_video_ids(output: Mapping[str, Any], manual: Mapping[str, Any]
                         vid = str(link.get("video_id") or video_id_from_url(link.get("url")))
                         if vid:
                             ids.append(vid)
-            for key in ("cazetv", "getv", "sbt", "url"):
+            for key in ("cazetv", "getv", "sbt", "sbt_main", "url"):
                 vid = video_id_from_url(entry.get(key))
                 if vid:
                     ids.append(vid)
@@ -772,7 +777,7 @@ def manual_links_for_game(manual: Mapping[str, Any], game: Game, channels: Mappi
 
     result: Dict[str, Dict[str, Any]] = {}
     candidates: List[Tuple[str, Any]] = []
-    for key in ("cazetv", "getv", "sbt"):
+    for key in ("cazetv", "getv", "sbt", "sbt_main"):
         if entry.get(key):
             candidates.append((key, entry.get(key)))
     principal = entry.get("principal")
@@ -818,7 +823,7 @@ def manual_links_for_game(manual: Mapping[str, Any], game: Game, channels: Mappi
             "origem_busca": "manual",
             "embeddable": (
                 bool(raw.get("embeddable")) if isinstance(raw, dict) and "embeddable" in raw
-                else source_key not in {"cazetv", "sbt"}
+                else source_key != "cazetv"
             ),
         }
     return result
@@ -950,10 +955,10 @@ def build_outputs(
     publish_targets = list(by_id.values())
 
     output_base = {
-        "fonte": "YouTube oficial — GE TV, SBT e CazéTV | clubes do Brasileirão",
+        "fonte": "YouTube oficial — GE TV, SBT Sports/SBT e CazéTV | clubes do Brasileirão",
         "politica": {
-            "prioridade": list(config.get("prioridade") or ["getv", "sbt", "cazetv"]),
-            "regra": "Somente canais oficiais configurados; GE TV tem prioridade sobre SBT e CazéTV; link único; embed respeita status.embeddable do YouTube (CazéTV sempre externa).",
+            "prioridade": list(config.get("prioridade") or ["getv", "sbt", "sbt_main", "cazetv"]),
+            "regra": "Somente canais oficiais configurados; SBT Sports é o canal esportivo primário do SBT e @sbt é redundante; GE TV tem prioridade sobre SBT e CazéTV; link único; embed respeita status.embeddable do YouTube (CazéTV sempre externa).",
             "janela": f"de {config.get('janela_antes_horas', 24)}h antes até {after_minutes} min após o início",
             "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta",
             "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco.",
@@ -1086,7 +1091,7 @@ def build_outputs(
             candidates = list(unique.values())
             matched, accepted, rejected = match_candidates_to_games(publish_targets, candidates, channels, config, aliases)
 
-    priority = list(config.get("prioridade") or ["getv", "sbt", "cazetv"])
+    priority = list(config.get("prioridade") or ["getv", "sbt", "sbt_main", "cazetv"])
 
     published: Dict[str, Any] = {}
     no_stream: List[Dict[str, Any]] = []

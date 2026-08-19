@@ -115,9 +115,11 @@
     },
     sbt: {
       label: "SBT",
-      aliases: ["sbt", "sbt sports", "+sbt"],
+      aliases: ["sbt", "sbt sports", "sbt_sports", "sbt main", "sbt_main", "+sbt"],
       links: [
-        { label: "SBT no YouTube", url: "https://www.youtube.com/@sbt/streams" }
+        { label: "SBT Sports no YouTube", url: "https://www.youtube.com/@SBTSports/streams" },
+        { label: "SBT no YouTube", url: "https://www.youtube.com/@sbt/streams" },
+        { label: "SBT ao vivo", url: "https://www.sbt.com.br/ao-vivo" }
       ]
     },
     cazetv: {
@@ -591,7 +593,7 @@
 
   function sourceIsSbt(value) {
     const raw = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    return raw === "sbt" || raw.includes("sbt sports") || raw === "+sbt";
+    return raw === "sbt" || raw === "sbt_main" || raw === "sbt_sports" || raw.includes("sbt sports") || raw.includes("sbt main") || raw === "+sbt";
   }
 
   function sourceDisplayName(principal) {

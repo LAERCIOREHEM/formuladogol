@@ -102,6 +102,7 @@ ACCESS_OPTIONS: dict[str, list[tuple[str, str]]] = {
     "Disney+ / ESPN": [("Disney+ (ESPN)", "https://www.disneyplus.com/pt-br/")],
     "Paramount+": [("Paramount+", "https://www.paramountplus.com/br/")],
     "SBT": [
+        ("SBT Sports no YouTube", "https://www.youtube.com/@SBTSports/streams"),
         ("SBT no YouTube", "https://www.youtube.com/@sbt/streams"),
         ("SBT ao vivo", "https://www.sbt.com.br/ao-vivo"),
     ],
@@ -943,6 +944,8 @@ def exact_live_access(live_output: Mapping[str, Any], event_id: str) -> list[dic
         label = {
             "getv": "Assistir na GE TV",
             "sbt": "Assistir no SBT",
+            "sbt_main": "Assistir no SBT",
+            "sbt_sports": "Assistir no SBT",
             "cazetv": "Assistir na CazéTV",
         }.get(source, "")
         if label:
@@ -1024,7 +1027,7 @@ def live_youtube_evidence(
             if not isinstance(link, Mapping):
                 continue
             source = norm(link.get("fonte"))
-            label = {"getv": "GE TV", "sbt": "SBT", "cazetv": "CazéTV"}.get(source, "")
+            label = {"getv": "GE TV", "sbt": "SBT", "sbt_main": "SBT", "sbt_sports": "SBT", "cazetv": "CazéTV"}.get(source, "")
             if label and label not in channels:
                 channels.append(label)
             if link.get("url"):
