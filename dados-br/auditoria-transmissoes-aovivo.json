@@ -1,13 +1,13 @@
 {
-  "fonte": "YouTube oficial — GE TV, SBT Sports/SBT e CazéTV | clubes do Brasileirão",
+  "fonte": "YouTube oficial — GE TV, SBT e CazéTV | clubes do Brasileirão",
   "politica": {
     "prioridade": [
       "getv",
+      "sbt_sports",
       "sbt",
-      "sbt_main",
       "cazetv"
     ],
-    "regra": "Somente canais oficiais configurados; SBT Sports é o canal esportivo primário do SBT e @sbt é redundante; GE TV tem prioridade sobre SBT e CazéTV; link único; embed respeita status.embeddable do YouTube (CazéTV sempre externa).",
+    "regra": "Somente canais oficiais configurados; SBT é monitorado em @sbt e @SBTSports; GE TV tem prioridade sobre SBT e CazéTV; sempre usa o vídeo exato identificado; embed somente quando status.embeddable=true (CazéTV sempre externa).",
     "janela": "de 1008h antes até 180 min após o início",
     "manual": "dados-br/transmissoes-aovivo-manual.json tem prioridade absoluta",
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
@@ -36,9 +36,9 @@
       "prioridade": "1",
       "streams_url": "https://www.youtube.com/@getv/streams"
     },
-    "sbt": {
-      "chave": "sbt",
-      "nome": "SBT Sports",
+    "sbt_sports": {
+      "chave": "sbt_sports",
+      "nome": "SBT",
       "channel_id": "UCxc3marqP9BJSkQ0_K4mqDg",
       "channel_title": "SBT Sports",
       "uploads_playlist": "UUxc3marqP9BJSkQ0_K4mqDg",
@@ -46,8 +46,8 @@
       "prioridade": "2",
       "streams_url": "https://www.youtube.com/@SBTSports/streams"
     },
-    "sbt_main": {
-      "chave": "sbt_main",
+    "sbt": {
+      "chave": "sbt",
       "nome": "SBT",
       "channel_id": "UCR3TOnFWDeAlT-Ho6LueDmg",
       "channel_title": "SBT",
@@ -75,9 +75,9 @@
       "competicao_nome": "Sul-Americana",
       "jogo": "São Paulo x Bolívar",
       "data_iso": "2026-08-18T21:30:00-03:00",
-      "principal": "SBT Sports",
+      "principal": "SBT",
       "fontes_encontradas": [
-        "SBT Sports"
+        "SBT"
       ],
       "manual": false,
       "descoberta_antecipada": false
@@ -885,7 +885,7 @@
     {
       "event_id": "401903294",
       "jogo": "São Paulo x Bolívar",
-      "fonte": "sbt",
+      "fonte": "sbt_sports",
       "video_id": "woTeBjjKUL0",
       "url": "https://www.youtube.com/watch?v=woTeBjjKUL0",
       "titulo": "AO VIVO São Paulo x Bolívar | Sul-Americana 2026",
@@ -902,7 +902,7 @@
     {
       "event_id": "401903294",
       "jogo": "São Paulo x Bolívar",
-      "fonte": "sbt_main",
+      "fonte": "sbt",
       "video_id": "NVeJlvmOVdQ",
       "url": "https://www.youtube.com/watch?v=NVeJlvmOVdQ",
       "titulo": "AO VIVO São Paulo x Bolívar | Sul-Americana 2026",
@@ -1059,7 +1059,7 @@
     {
       "video_id": "nf-GkBcgFyU",
       "url": "https://www.youtube.com/watch?v=nf-GkBcgFyU",
-      "fonte": "sbt_main",
+      "fonte": "sbt",
       "canal": "SBT",
       "titulo": "SBT 45 anos: depoimentos emocionantes de quem faz essa história acontecer | GIRO SBT",
       "status": "upcoming",
@@ -1978,5 +1978,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-18T22:51:08-03:00"
+  "atualizado_em": "2026-08-18T23:01:05-03:00"
 }
