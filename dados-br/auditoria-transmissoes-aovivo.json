@@ -17,13 +17,13 @@
     "jogos_foco": 63,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 6,
+    "candidatos_oficiais_encontrados": 33,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 35,
     "search_api_jogos_pulados_grade_estavel": 28,
     "transmissoes_publicadas": 5,
     "sem_transmissao": 58,
-    "erros": 6
+    "erros": 0
   },
   "canais_resolvidos": {
     "getv": {
@@ -853,38 +853,6 @@
       ]
     },
     {
-      "event_id": "401841212",
-      "jogo": "Vasco da Gama x Cruzeiro",
-      "fonte": "cazetv",
-      "video_id": "3nJN6ljCXHQ",
-      "url": "https://www.youtube.com/watch?v=3nJN6ljCXHQ",
-      "titulo": "AO VIVO: VASCO X CRUZEIRO | BRASILEIRÃO 2026 | 25ª RODADA",
-      "status": "upcoming",
-      "confianca": 0.9,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (60 min de diferença)"
-      ]
-    },
-    {
-      "event_id": "401841221",
-      "jogo": "Botafogo x Palmeiras",
-      "fonte": "cazetv",
-      "video_id": "Er4OSInPkl4",
-      "url": "https://www.youtube.com/watch?v=Er4OSInPkl4",
-      "titulo": "AO VIVO: BOTAFOGO X PALMEIRAS | BRASILEIRÃO 2026 | 26ª RODADA",
-      "status": "upcoming",
-      "confianca": 0.9,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (60 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841203",
       "jogo": "Palmeiras x Vasco da Gama",
       "fonte": "getv",
@@ -915,6 +883,38 @@
         "identifica transmissão ao vivo",
         "horário compatível (90 min de diferença)"
       ]
+    },
+    {
+      "event_id": "401841212",
+      "jogo": "Vasco da Gama x Cruzeiro",
+      "fonte": "cazetv",
+      "video_id": "3nJN6ljCXHQ",
+      "url": "https://www.youtube.com/watch?v=3nJN6ljCXHQ",
+      "titulo": "AO VIVO: VASCO X CRUZEIRO | BRASILEIRÃO 2026 | 25ª RODADA",
+      "status": "upcoming",
+      "confianca": 0.9,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (60 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401841221",
+      "jogo": "Botafogo x Palmeiras",
+      "fonte": "cazetv",
+      "video_id": "Er4OSInPkl4",
+      "url": "https://www.youtube.com/watch?v=Er4OSInPkl4",
+      "titulo": "AO VIVO: BOTAFOGO X PALMEIRAS | BRASILEIRÃO 2026 | 26ª RODADA",
+      "status": "upcoming",
+      "confianca": 0.9,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (60 min de diferença)"
+      ]
     }
   ],
   "rejeitados": [
@@ -926,6 +926,276 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2025-02-24T18:51:26-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "3YfWrTW-Aoc",
+      "url": "https://www.youtube.com/watch?v=3YfWrTW-Aoc",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "CORINTHIANS x ROSARIO CENTRAL | NARRAÇÃO AO VIVO | OITAVAS DE FINAL | LIBERTADORES 2026 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-20T20:30:00-03:00",
+      "motivo": "conteúdo rejeitado: narracao"
+    },
+    {
+      "video_id": "9nw-Ty53em8",
+      "url": "https://www.youtube.com/watch?v=9nw-Ty53em8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "BATALHA DURA ENTRE JAGUARS E TEXANS: O GUIA DA AFC SUL PARA 2026 | Primeira Descida | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-20T20:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "LDLC6MWP6Fc",
+      "url": "https://www.youtube.com/watch?v=LDLC6MWP6Fc",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "MELHOR DIVISÃO DA NFL? O GUIA DA AFC OESTE PARA 2026 | Primeira Descida | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-21T00:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "gGbqdZTDqhU",
+      "url": "https://www.youtube.com/watch?v=gGbqdZTDqhU",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: SPATEN FIGHT NIGHT 3 | LUTA | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-29T21:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "nPpLjkNSfis",
+      "url": "https://www.youtube.com/watch?v=nPpLjkNSfis",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: BIG 3 | FINAL + ALL STAR GAME | BASQUETE 3X3 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-22T13:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "2XfDrmDWSiQ",
+      "url": "https://www.youtube.com/watch?v=2XfDrmDWSiQ",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: MANCHESTER CITY X BOURNEMOUTH | PREMIER LEAGUE 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T09:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "7OtXcAh6CB0",
+      "url": "https://www.youtube.com/watch?v=7OtXcAh6CB0",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: PALMEIRAS X RB BRAGANTINO | PAULISTÃO F 2026 | 7ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-26T17:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "BtxN65z-K3Y",
+      "url": "https://www.youtube.com/watch?v=BtxN65z-K3Y",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: BORUSSIA DORTMUND X BAYERN DE MUNIQUE | FINAL DA SUPERCOPA DA ALEMANHA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-22T14:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "L2yxDn8LXU4",
+      "url": "https://www.youtube.com/watch?v=L2yxDn8LXU4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: VALENCIA X CELTA DE VIGO | LA LIGA 26/27 | 2ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-22T13:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "N8XnijsbLhc",
+      "url": "https://www.youtube.com/watch?v=N8XnijsbLhc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "CORINTHIANS X ROSARIO CENTRAL: NARRAÇÃO AO VIVO | LIBERTADORES DA AMÉRICA | NOCHE DE COPA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-20T21:00:00-03:00",
+      "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
+    },
+    {
+      "video_id": "P2zX1MvKxpY",
+      "url": "https://www.youtube.com/watch?v=P2zX1MvKxpY",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ROMA X FIORENTINA | SÉRIE A 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-24T14:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "PvW8j8Ag81I",
+      "url": "https://www.youtube.com/watch?v=PvW8j8Ag81I",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "GERAL CAZÉTV | 21/08",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-21T10:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "SexZS1j7teY",
+      "url": "https://www.youtube.com/watch?v=SexZS1j7teY",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ELCHE X BARCELONA | LALIGA 26/27 | 2ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T15:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "U1ar65xJMd0",
+      "url": "https://www.youtube.com/watch?v=U1ar65xJMd0",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ATLÉTICO DE MADRID X VILLARREAL | LA LIGA 26/27 | 2ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T11:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "VR2qJrtUD_k",
+      "url": "https://www.youtube.com/watch?v=VR2qJrtUD_k",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: LENS X AUXERRE | LIGUE 1 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-22T11:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "b5mq3heqxd4",
+      "url": "https://www.youtube.com/watch?v=b5mq3heqxd4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "VASCO X OLÍMPIA E SANTOS X MACARÁ: NARRAÇÃO AO VIVO | SUL-AMERICANA | NOCHE DE COPA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-20T18:00:00-03:00",
+      "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
+    },
+    {
+      "video_id": "bF5BaemOCzQ",
+      "url": "https://www.youtube.com/watch?v=bF5BaemOCzQ",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: RAYO VALLECANO X ALAVÉS | LA LIGA 26/27 | 2ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-20T15:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "dViWumhVwUs",
+      "url": "https://www.youtube.com/watch?v=dViWumhVwUs",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): TOULOUSE X LYON | LIGUE 1 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-22T15:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "dVpdjMuKAtc",
+      "url": "https://www.youtube.com/watch?v=dVpdjMuKAtc",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ATHLETIC BILBAO X SEVILLA | LA LIGA 26/27 | 2ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-22T11:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "dgqUKFUS1NE",
+      "url": "https://www.youtube.com/watch?v=dgqUKFUS1NE",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ESPANYOL X REAL MADRID | LALIGA 26/27 | 2ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-22T16:20:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "eYgY4y7lx70",
+      "url": "https://www.youtube.com/watch?v=eYgY4y7lx70",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: GETAFE X RACING CLUB | LA LIGA 26/27 | 2ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T13:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "gcW4KK1W4rw",
+      "url": "https://www.youtube.com/watch?v=gcW4KK1W4rw",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): ANGERS X LILLE | LIGUE 1 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T09:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "jmNzFYNKE1c",
+      "url": "https://www.youtube.com/watch?v=jmNzFYNKE1c",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: LE HAVRE X MÔNACO | LIGUE 1 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T11:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "nri8Dl2c3aE",
+      "url": "https://www.youtube.com/watch?v=nri8Dl2c3aE",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): NICE X FC LORIENT | LIGUE 1 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-22T15:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "nyXX7v1q-xY",
+      "url": "https://www.youtube.com/watch?v=nyXX7v1q-xY",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: PARIS SAINT-GERMAIN X RENNES | LIGUE 1 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T14:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "pUt5kbM8Qdg",
+      "url": "https://www.youtube.com/watch?v=pUt5kbM8Qdg",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: OSASUNA X LEVANTE | LA LIGA 26/27 | 2ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-24T14:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "z9tBGyFpiCY",
+      "url": "https://www.youtube.com/watch?v=z9tBGyFpiCY",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: MARSEILLE X STRASBOURG | LIGUE 1 26/27 | 1ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-21T15:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
@@ -1595,22 +1865,15 @@
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
-  "erros": [
-    "Falha ao detalhar uploads de GE TV: Falha de rede na YouTube API em videos: <urlopen error [Errno 104] Connection reset by peer>",
-    "Falha ao varrer uploads de SBT: Falha de rede na YouTube API em playlistItems: <urlopen error [Errno 104] Connection reset by peer>",
-    "Falha ao detalhar uploads de SBT: Falha de rede na YouTube API em videos: <urlopen error [Errno 104] Connection reset by peer>",
-    "Falha ao varrer uploads de SBT: Falha de rede na YouTube API em playlistItems: <urlopen error [Errno 104] Connection reset by peer>",
-    "Falha ao detalhar uploads de SBT: Falha de rede na YouTube API em videos: <urlopen error [Errno 104] Connection reset by peer>",
-    "Falha ao varrer uploads de CazéTV: Falha de rede na YouTube API em playlistItems: <urlopen error [Errno 104] Connection reset by peer>"
-  ],
+  "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 38,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 11,
-      "playlistItems": 23
+      "videos": 43,
+      "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-20T13:21:06-03:00"
+  "atualizado_em": "2026-08-20T13:31:58-03:00"
 }
