@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 66,
-    "jogos_foco": 66,
+    "jogos_na_janela": 64,
+    "jogos_foco": 64,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 33,
+    "candidatos_oficiais_encontrados": 32,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 36,
-    "search_api_jogos_pulados_grade_estavel": 30,
+    "search_api_jogos_pulados_grade_estavel": 28,
     "transmissoes_publicadas": 5,
-    "sem_transmissao": 61,
+    "sem_transmissao": 59,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -68,30 +68,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401902714",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Bragantino",
-      "data_iso": "2026-08-19T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401874155",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Cerro Porteño x Palmeiras",
-      "data_iso": "2026-08-19T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
     {
       "event_id": "401874141",
       "rodada": 0,
@@ -966,16 +942,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "6aH_p7C1D8w",
-      "url": "https://www.youtube.com/watch?v=6aH_p7C1D8w",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "PALMEIRAS X CERRO PORTEÑO: COPA LIBERTADORES | LANCES EM TEMPO REAL | NOCHE DE COPA",
-      "status": "live",
-      "inicio_programado": "2026-08-19T14:30:00-03:00",
-      "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
-    },
-    {
       "video_id": "3YfWrTW-Aoc",
       "url": "https://www.youtube.com/watch?v=3YfWrTW-Aoc",
       "fonte": "getv",
@@ -1238,16 +1204,6 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401902714",
-      "jogo": "Atlético-MG x Bragantino",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401874155",
-      "jogo": "Cerro Porteño x Palmeiras",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
-    {
       "event_id": "401902740",
       "jogo": "Club Olimpia x Vasco da Gama",
       "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
@@ -1389,24 +1345,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401902714",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Bragantino",
-      "data_iso": "2026-08-19T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401874155",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Cerro Porteño x Palmeiras",
-      "data_iso": "2026-08-19T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
     {
       "event_id": "401902740",
       "rodada": 0,
@@ -1941,13 +1879,13 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-19T19:31:35-03:00"
+  "atualizado_em": "2026-08-19T21:31:06-03:00"
 }
