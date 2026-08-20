@@ -17,7 +17,7 @@
     "jogos_foco": 63,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 42,
+    "candidatos_oficiais_encontrados": 43,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 35,
     "search_api_jogos_pulados_grade_estavel": 28,
@@ -919,6 +919,16 @@
   ],
   "rejeitados": [
     {
+      "video_id": "3YfWrTW-Aoc",
+      "url": "https://www.youtube.com/watch?v=3YfWrTW-Aoc",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "CORINTHIANS x ROSARIO CENTRAL | NARRAÇÃO AO VIVO | OITAVAS DE FINAL | LIBERTADORES 2026 | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-08-20T20:30:00-03:00",
+      "motivo": "conteúdo rejeitado: narracao"
+    },
+    {
       "video_id": "LLpNUqHVam8",
       "url": "https://www.youtube.com/watch?v=LLpNUqHVam8",
       "fonte": "sbt",
@@ -937,16 +947,6 @@
       "status": "live",
       "inicio_programado": "2026-08-20T18:00:00-03:00",
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
-    },
-    {
-      "video_id": "3YfWrTW-Aoc",
-      "url": "https://www.youtube.com/watch?v=3YfWrTW-Aoc",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "CORINTHIANS x ROSARIO CENTRAL | NARRAÇÃO AO VIVO | OITAVAS DE FINAL | LIBERTADORES 2026 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-20T20:30:00-03:00",
-      "motivo": "conteúdo rejeitado: narracao"
     },
     {
       "video_id": "9nw-Ty53em8",
@@ -986,6 +986,16 @@
       "titulo": "TENNESSEE TITANS X SEATTLE SEAHAWKS | AQUECIMENTO AO VIVO | NFL | #live | sportv",
       "status": "upcoming",
       "inicio_programado": "2026-08-23T20:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "eFxY6C6kgjw",
+      "url": "https://www.youtube.com/watch?v=eFxY6C6kgjw",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: LAS VEGAS RAIDERS X HOUSTON TEXANS | PRÉ-TEMPORADA 2026/27 | NFL | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-08-20T20:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1965,5 +1975,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-20T20:20:58-03:00"
+  "atualizado_em": "2026-08-20T20:30:59-03:00"
 }
