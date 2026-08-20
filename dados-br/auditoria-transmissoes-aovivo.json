@@ -17,12 +17,12 @@
     "jogos_foco": 64,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 32,
+    "candidatos_oficiais_encontrados": 33,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 36,
     "search_api_jogos_pulados_grade_estavel": 28,
-    "transmissoes_publicadas": 5,
-    "sem_transmissao": 59,
+    "transmissoes_publicadas": 6,
+    "sem_transmissao": 58,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -297,8 +297,10 @@
       "competicao_nome": "Copa do Brasil",
       "jogo": "Vasco da Gama x Vitória",
       "data_iso": "2026-08-26T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
+      "principal": "GE TV",
+      "fontes_encontradas": [
+        "GE TV"
+      ],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -863,6 +865,22 @@
         "identifica transmissão ao vivo",
         "transmissão já está ao vivo",
         "horário compatível (120 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401909113",
+      "jogo": "Vasco da Gama x Vitória",
+      "fonte": "getv",
+      "video_id": "2ocY9xQVQiE",
+      "url": "https://www.youtube.com/watch?v=2ocY9xQVQiE",
+      "titulo": "AO VIVO: VASCO X VITÓRIA | QUARTAS DE FINAL | COPA DO BRASIL 2026 | ge tv",
+      "status": "upcoming",
+      "confianca": 0.875,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (90 min de diferença)"
       ]
     },
     {
@@ -1481,15 +1499,6 @@
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     },
     {
-      "event_id": "401909113",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Vasco da Gama x Vitória",
-      "data_iso": "2026-08-26T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
       "event_id": "401909064",
       "rodada": 0,
       "competicao_chave": "copa_do_brasil",
@@ -1887,5 +1896,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-19T21:31:06-03:00"
+  "atualizado_em": "2026-08-19T21:40:58-03:00"
 }
