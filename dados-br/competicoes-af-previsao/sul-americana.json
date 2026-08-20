@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-19T21:11:30-03:00",
+  "gerado_em": "2026-08-19T23:31:21-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,12 +17,12 @@
     "ordem": 600,
     "nome": "2026 CONMEBOL Sudamericana, Round of 16 / Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 6
+    "eventos_pendentes": 4
   },
   "resumo": {
     "eventos": 144,
-    "finalizados": 138,
-    "pendentes": 6,
+    "finalizados": 140,
+    "pendentes": 4,
     "equipes": 56,
     "equipes_serie_a_2026": 7
   },
@@ -5491,7 +5491,7 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 2
       },
       "visitante": {
@@ -5505,15 +5505,15 @@
         "vencedor": false,
         "placar": 2
       },
-      "vencedor": null,
+      "vencedor": "Atlético-MG",
       "penaltis": false
     },
     {
       "event_id": "401902571",
       "data_iso": "2026-08-19T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Agosto 19º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5527,8 +5527,8 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 2
       },
       "visitante": {
         "espn_id": "7767",
@@ -5539,17 +5539,17 @@
         "serie_a_2026": false,
         "mandante": false,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Montevideo City Torque",
       "penaltis": false
     },
     {
       "event_id": "401903232",
       "data_iso": "2026-08-19T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Agosto 19º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5730,6 +5730,6 @@
     "fase": "2026 CONMEBOL Sudamericana, Round of 16",
     "fase_ordem": 600,
     "chaves": 8,
-    "equipes_ativas": 13
+    "equipes_ativas": 12
   }
 }
