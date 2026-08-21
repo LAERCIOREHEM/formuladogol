@@ -296,3 +296,16 @@ jobs:
             echo "::warning title=Falha ao enviar alerta Resend::HTTP ${HTTP_CODE}; $(head -c 500 /tmp/resend-failure.json 2>/dev/null)"
           fi
 
+
+      - name: Sinalizar falha persistente da camada de IA
+        if: always() && steps.ai_gate.outputs.run_daily == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ -f dados-br/auditoria-ia.json ]] || exit 0
+          FALHAS="$(jq -r '.openai.falhas_consecutivas // 0' dados-br/auditoria-ia.json)"
+          ERRO="$(jq -r '.openai.erro // ""' dados-br/auditoria-ia.json)"
+          if [[ "$FALHAS" =~ ^[0-9]+$ ]] && (( FALHAS > 0 )); then
+            echo "::error title=Auditoria IA degradada::${FALHAS} falha(s) consecutiva(s) na camada OpenAI. ${ERRO}"
+            exit 1
+          fi

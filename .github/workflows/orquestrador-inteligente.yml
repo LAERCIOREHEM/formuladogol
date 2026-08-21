@@ -126,6 +126,9 @@ jobs:
             editorial_copa_do_brasil)
               gh workflow run publicar-analise-copa-do-brasil.yml --ref main
               ;;
+            editorial_continentais)
+              gh workflow run publicar-analise-continentais.yml --ref main
+              ;;
             editorial_rodada)
               test -n "$RODADA"
               gh workflow run publicar-analise-rodada.yml --ref main -f rodada="$RODADA"

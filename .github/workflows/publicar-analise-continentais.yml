@@ -1,0 +1,83 @@
+name: Publicar análise editorial continental
+run-name: Editorial continental · brasileiros
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: fdg-editorial-continentais
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Baixar main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validar geradores offline
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/gerar_analise_continental.py scripts/buscar_melhores_momentos_continentais.py
+          python scripts/gerar_analise_continental.py --self-test
+          python scripts/buscar_melhores_momentos_continentais.py --self-test
+
+      - name: Buscar melhores momentos oficiais da CONMEBOL
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${YOUTUBE_API_KEY:-}" ]]; then
+            python scripts/buscar_melhores_momentos_continentais.py
+          else
+            echo "::warning title=YouTube API ausente::Preservando vínculos já publicados; o editorial não será bloqueado."
+          fi
+
+      - name: Gerar editorial continental quando elegível
+        run: python scripts/gerar_analise_continental.py
+
+      - name: Validar artefatos editoriais
+        run: |
+          set -euo pipefail
+          python -m json.tool dados-br/analises.json >/dev/null
+          python -m json.tool dados-br/melhores-momentos-continentais.json >/dev/null
+          python scripts/validar_artefatos_analises.py
+
+      - name: Publicar alterações
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILES=(analises dados-br/analises.json dados-br/melhores-momentos-continentais.json sitemap.xml news-sitemap.xml feed.xml)
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Nenhuma alteração editorial necessária."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "${FILES[@]}"
+          git commit -m "Publicar editorial continental dos brasileiros"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Disparar deploy
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
