@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 63,
-    "jogos_foco": 63,
+    "jogos_na_janela": 60,
+    "jogos_foco": 60,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 42,
+    "candidatos_oficiais_encontrados": 44,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 35,
-    "search_api_jogos_pulados_grade_estavel": 28,
+    "search_api_jogos_pulados_grade_estavel": 25,
     "transmissoes_publicadas": 5,
-    "sem_transmissao": 58,
+    "sem_transmissao": 55,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -68,42 +68,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401902740",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Club Olimpia x Vasco da Gama",
-      "data_iso": "2026-08-20T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401874142",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Liga de Quito x Mirassol",
-      "data_iso": "2026-08-20T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401902449",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Macará x Santos",
-      "data_iso": "2026-08-20T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
     {
       "event_id": "401902741",
       "rodada": 0,
@@ -939,14 +903,24 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "b5mq3heqxd4",
-      "url": "https://www.youtube.com/watch?v=b5mq3heqxd4",
+      "video_id": "N8XnijsbLhc",
+      "url": "https://www.youtube.com/watch?v=N8XnijsbLhc",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "VASCO X OLÍMPIA E SANTOS X MACARÁ: NARRAÇÃO AO VIVO | SUL-AMERICANA | NOCHE DE COPA",
+      "titulo": "CORINTHIANS X ROSARIO CENTRAL: NARRAÇÃO AO VIVO | LIBERTADORES DA AMÉRICA | NOCHE DE COPA",
       "status": "live",
-      "inicio_programado": "2026-08-20T18:00:00-03:00",
+      "inicio_programado": "2026-08-20T21:00:00-03:00",
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
+    },
+    {
+      "video_id": "3zFZiMlEFGE",
+      "url": "https://www.youtube.com/watch?v=3zFZiMlEFGE",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "A DIVISÃO MAIS ACIRRADA DA NFL: O GUIA DA AFC NORTE PARA 2026 | Primeira Descida | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T19:25:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "LDLC6MWP6Fc",
@@ -955,7 +929,7 @@
       "canal": "ge tv",
       "titulo": "MELHOR DIVISÃO DA NFL? O GUIA DA AFC OESTE PARA 2026 | Primeira Descida | ge.globo",
       "status": "upcoming",
-      "inicio_programado": "2026-08-21T00:00:00-03:00",
+      "inicio_programado": "2026-08-20T23:59:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -966,6 +940,16 @@
       "titulo": "JÚLIO BAPTISTA DIZ QUE BRASIL PRECISA SE ADAPTAR E APONTA ERRO DE NEYMAR | ABRE ASPAS | ge.globo",
       "status": "upcoming",
       "inicio_programado": "2026-08-21T19:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "TrMxMlzBfaY",
+      "url": "https://www.youtube.com/watch?v=TrMxMlzBfaY",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "BATALHAS PELO TOPO E PELA ESCOLHA #1: O GUIA DA AFC LESTE PARA 2026 | Primeira Descida | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T21:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -983,7 +967,7 @@
       "url": "https://www.youtube.com/watch?v=eFxY6C6kgjw",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: LAS VEGAS RAIDERS X HOUSTON TEXANS | PRÉ-TEMPORADA 2026/27 | NFL | ge tv",
+      "titulo": "AO VIVO E COM IMAGENS: LAS VEGAS RAIDERS X HOUSTON TEXANS | PRÉ-TEMPORADA 2026/27 | NFL | ge tv",
       "status": "live",
       "inicio_programado": "2026-08-20T20:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -1007,6 +991,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-22T13:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "zlinlSwQ3t0",
+      "url": "https://www.youtube.com/watch?v=zlinlSwQ3t0",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: CORITIBA X CORINTHIANS | BRASILERÃO 2026 | PRÉ-JOGO | Premiere",
+      "status": "upcoming",
+      "inicio_programado": "2026-08-23T18:30:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
       "video_id": "2XfDrmDWSiQ",
@@ -1077,16 +1071,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-22T13:50:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "N8XnijsbLhc",
-      "url": "https://www.youtube.com/watch?v=N8XnijsbLhc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "CORINTHIANS X ROSARIO CENTRAL: NARRAÇÃO AO VIVO | LIBERTADORES DA AMÉRICA | NOCHE DE COPA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-20T21:00:00-03:00",
-      "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
     },
     {
       "video_id": "P2zX1MvKxpY",
@@ -1291,21 +1275,6 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401902740",
-      "jogo": "Club Olimpia x Vasco da Gama",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401874142",
-      "jogo": "Liga de Quito x Mirassol",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401902449",
-      "jogo": "Macará x Santos",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
       "event_id": "401902741",
       "jogo": "Botafogo x Cienciano del Cusco",
       "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
@@ -1432,33 +1401,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401902740",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Club Olimpia x Vasco da Gama",
-      "data_iso": "2026-08-20T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401874142",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Liga de Quito x Mirassol",
-      "data_iso": "2026-08-20T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401902449",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Macará x Santos",
-      "data_iso": "2026-08-20T19:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
     {
       "event_id": "401902741",
       "rodada": 0,
@@ -1965,5 +1907,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-20T20:41:10-03:00"
+  "atualizado_em": "2026-08-20T21:41:02-03:00"
 }
