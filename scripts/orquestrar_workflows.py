@@ -88,6 +88,7 @@ WORKFLOW_PUBLICOS = "Atualizar públicos do Brasileirão"
 WORKFLOW_TRANSMISSOES = "Buscar transmissões dos clubes do Brasileirão"
 WORKFLOW_EDITORIAL_RODADA = "Publicar análise editorial da rodada"
 WORKFLOW_EDITORIAL_COPA = "Publicar análise editorial da Copa do Brasil"
+WORKFLOW_EDITORIAL_CONTINENTAIS = "Publicar análise editorial continental"
 
 REPO_WRITERS = {
     "Atualizar Brasileirao (ESPN)",
@@ -98,6 +99,7 @@ REPO_WRITERS = {
     "Atualizar públicos do Brasileirão",
     "Buscar transmissões dos clubes do Brasileirão",
     "Publicar análise editorial da Copa do Brasil",
+    "Publicar análise editorial continental",
     "Publicar análise editorial da rodada",
     "Revisar melhores momentos Brasileirão oficiais",
 }
@@ -1031,6 +1033,29 @@ def cup_editorial_decision() -> Decision | None:
     return None
 
 
+
+def continental_editorial_decision() -> Decision | None:
+    try:
+        from gerar_analise_continental import SNAPS, MM_PATH, latest_publishable, build_ties, build_article, load as continental_load
+        snapshots = {key: continental_load(path, {}) for key, path in SNAPS.items()}
+        rank = latest_publishable(snapshots)
+        if not rank:
+            return None
+        ties = [tie for comp, snap in snapshots.items() for tie in build_ties(comp, snap, rank)]
+        if not ties:
+            return None
+        highlights = continental_load(MM_PATH, {"jogos": {}}) or {"jogos": {}}
+        expected = build_article(rank, ties, highlights, datetime.now(ZoneInfo("America/Sao_Paulo")).replace(microsecond=0))
+    except Exception:
+        return None
+    manifest = load_json(ANALYSES_PATH, {})
+    article = next((item for item in (manifest.get("artigos") or []) if isinstance(item, Mapping) and item.get("id_editorial") == expected.get("id_editorial")), None)
+    if article is None:
+        return Decision("editorial_continentais", f"Fase continental {expected.get('fase_encerrada')} encerrada no recorte brasileiro e editorial ainda não existe.")
+    if str(article.get("hash_dossie") or "") != str(expected.get("hash_dossie") or "") or str(article.get("hash_melhores_momentos") or "") != str(expected.get("hash_melhores_momentos") or ""):
+        return Decision("editorial_continentais", "Editorial continental publicado está desatualizado em relação aos confrontos ou melhores momentos.")
+    return None
+
 def decide(
     *,
     config: Mapping[str, Any],
@@ -1094,6 +1119,9 @@ def decide(
     cup = cup_editorial_decision()
     if cup:
         return cup
+    continental = continental_editorial_decision()
+    if continental:
+        return continental
     rodada = round_editorial_decision(now)
     if rodada:
         return rodada

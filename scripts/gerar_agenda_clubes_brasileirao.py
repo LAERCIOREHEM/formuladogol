@@ -321,6 +321,55 @@ def brasileirao_games(
         }
 
 
+def _continental_tie_key(raw: Mapping[str, Any]) -> tuple[str, str]:
+    home = raw.get("mandante") if isinstance(raw.get("mandante"), Mapping) else {}
+    away = raw.get("visitante") if isinstance(raw.get("visitante"), Mapping) else {}
+    ids = [str(home.get("espn_id") or home.get("nome") or ""), str(away.get("espn_id") or away.get("nome") or "")]
+    return tuple(sorted(ids))
+
+
+def _continental_aggregate(data: Mapping[str, Any], raw: Mapping[str, Any]) -> dict[str, Any]:
+    """Agregado orientado pelo mandante/visitante do jogo exibido.
+
+    Na ida mostra o placar acumulado da própria ida. Antes da volta, considera
+    somente a ida concluída; durante/depois da volta soma também o placar atual.
+    """
+    try:
+        leg = int(raw.get("perna") or 0)
+        rank = int(raw.get("fase_ordem") or 0)
+    except (TypeError, ValueError):
+        return {}
+    if leg not in {1, 2} or rank < 600:
+        return {}
+    key = _continental_tie_key(raw)
+    home = raw.get("mandante") if isinstance(raw.get("mandante"), Mapping) else {}
+    away = raw.get("visitante") if isinstance(raw.get("visitante"), Mapping) else {}
+    hid, aid = str(home.get("espn_id") or home.get("nome") or ""), str(away.get("espn_id") or away.get("nome") or "")
+    totals = {hid: 0, aid: 0}
+    used = 0
+    current_id = str(raw.get("event_id") or "")
+    for event in data.get("eventos") or []:
+        if not isinstance(event, Mapping) or int(event.get("fase_ordem") or 0) != rank or _continental_tie_key(event) != key:
+            continue
+        event_leg = int(event.get("perna") or 0)
+        include = bool(event.get("concluido")) or str(event.get("event_id") or "") == current_id
+        if event_leg > leg or not include:
+            continue
+        eh = event.get("mandante") if isinstance(event.get("mandante"), Mapping) else {}
+        ea = event.get("visitante") if isinstance(event.get("visitante"), Mapping) else {}
+        ehid, eaid = str(eh.get("espn_id") or eh.get("nome") or ""), str(ea.get("espn_id") or ea.get("nome") or "")
+        if ehid in totals and eaid in totals:
+            totals[ehid] += int(eh.get("placar") or 0); totals[eaid] += int(ea.get("placar") or 0); used += 1
+    return {
+        "confronto_id": "-".join(key),
+        "partida_numero": leg,
+        "partidas_total": 2,
+        "agregado_mandante": totals.get(hid, 0),
+        "agregado_visitante": totals.get(aid, 0),
+        "agregado_disponivel": used > 0,
+    }
+
+
 def cup_games(spec: Mapping[str, Any]) -> Iterable[dict[str, Any]]:
     data = load_json(Path(spec["arquivo"]), {"eventos": []})
     competition = data.get("competicao") if isinstance(data.get("competicao"), Mapping) else {}
@@ -332,6 +381,7 @@ def cup_games(spec: Mapping[str, Any]) -> Iterable[dict[str, Any]]:
         away = team_from_cup(raw.get("visitante"))
         if not (home["serie_a_2026"] or away["serie_a_2026"]):
             continue
+        knockout = _continental_aggregate(data, raw) if str(spec["chave"]) in {"libertadores", "sul_americana"} else {}
         yield {
             "event_id": str(raw.get("event_id") or ""),
             "competicao_chave": str(spec["chave"]),
@@ -345,6 +395,7 @@ def cup_games(spec: Mapping[str, Any]) -> Iterable[dict[str, Any]]:
             "rodada": 0,
             "fase": str(raw.get("fase") or ""),
             "perna": raw.get("perna"),
+            **knockout,
             "estadio": str(raw.get("estadio") or ""),
             "mandante": home,
             "visitante": away,

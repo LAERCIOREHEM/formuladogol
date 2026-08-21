@@ -568,7 +568,7 @@ def schema_editorial() -> dict[str, Any]:
                             "type": "array",
                             "minItems": 2,
                             "maxItems": 3,
-                            "items": {"type": "string", "minLength": 150, "maxLength": 760},
+                            "items": {"type": "string", "minLength": 420, "maxLength": 900},
                         },
                     },
                     "required": ["titulo", "paragrafos"],

@@ -369,6 +369,12 @@
       espnLeague: String(j.espn_league || DEFAULT_LEAGUE),
       fase: String(j.fase || ""),
       perna: Number(j.perna || 0),
+      confronto_id: String(j.confronto_id || ""),
+      partida_numero: Number(j.partida_numero || j.perna || 0),
+      partidas_total: Number(j.partidas_total || 0),
+      agregado_disponivel: j.agregado_disponivel === true,
+      agregado_mandante: Number(j.agregado_mandante || 0),
+      agregado_visitante: Number(j.agregado_visitante || 0),
       probabilitiesAvailable: j.probabilidades_disponiveis === true
     }));
   }
@@ -550,6 +556,12 @@
       espnLeague: loc.espnLeague || game.espnLeague || DEFAULT_LEAGUE,
       fase: loc.fase || game.fase || "",
       perna: loc.perna || game.perna || 0,
+      confronto_id: loc.confronto_id || game.confronto_id || "",
+      partida_numero: loc.partida_numero || game.partida_numero || loc.perna || game.perna || 0,
+      partidas_total: loc.partidas_total || game.partidas_total || 0,
+      agregado_disponivel: loc.agregado_disponivel === true || game.agregado_disponivel === true,
+      agregado_mandante: loc.agregado_disponivel === true ? Number(loc.agregado_mandante || 0) : Number(game.agregado_mandante || 0),
+      agregado_visitante: loc.agregado_disponivel === true ? Number(loc.agregado_visitante || 0) : Number(game.agregado_visitante || 0),
       probabilitiesAvailable: loc.probabilitiesAvailable === true
     };
   }
@@ -1060,6 +1072,12 @@
       espnLeague: primary.espnLeague || secondary.espnLeague || DEFAULT_LEAGUE,
       fase: primary.fase || secondary.fase || "",
       perna: primary.perna || secondary.perna || 0,
+      confronto_id: primary.confronto_id || secondary.confronto_id || "",
+      partida_numero: primary.partida_numero || secondary.partida_numero || primary.perna || secondary.perna || 0,
+      partidas_total: primary.partidas_total || secondary.partidas_total || 0,
+      agregado_disponivel: primary.agregado_disponivel === true || secondary.agregado_disponivel === true,
+      agregado_mandante: primary.agregado_disponivel === true ? Number(primary.agregado_mandante || 0) : Number(secondary.agregado_mandante || 0),
+      agregado_visitante: primary.agregado_disponivel === true ? Number(primary.agregado_visitante || 0) : Number(secondary.agregado_visitante || 0),
       probabilitiesAvailable: primary.probabilitiesAvailable === true || secondary.probabilitiesAvailable === true
     };
   }
@@ -2240,8 +2258,9 @@
     if (g.competitionKey === "brasileirao") return g.rodada ? "Rodada " + g.rodada : "Brasileirão";
     const parts = [g.competitionShort || g.competitionName || "Competição"];
     if (g.fase) parts.push(g.fase);
-    if (Number(g.perna) === 1) parts.push("Ida");
-    if (Number(g.perna) === 2) parts.push("Volta");
+    if (Number(g.perna) === 1) parts.push("Partida 1 de 2");
+    if (Number(g.perna) === 2) parts.push("Partida 2 de 2");
+    if (Number(g.perna) === 2 && g.agregado_disponivel) parts.push("Agregado " + Number(g.agregado_mandante || 0) + "–" + Number(g.agregado_visitante || 0));
     return parts.join(" · ");
   }
 

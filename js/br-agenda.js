@@ -111,8 +111,9 @@
     if (game.competicao_chave === "brasileirao") return game.rodada ? "Rodada " + game.rodada : "Série A 2026";
     const parts = [];
     if (game.fase) parts.push(game.fase);
-    if (Number(game.perna) === 1) parts.push("Ida");
-    if (Number(game.perna) === 2) parts.push("Volta");
+    if (Number(game.perna) === 1) parts.push("Partida 1 de 2");
+    if (Number(game.perna) === 2) parts.push("Partida 2 de 2");
+    if (Number(game.perna) === 2 && game.agregado_disponivel) parts.push("Agregado " + Number(game.agregado_mandante || 0) + "–" + Number(game.agregado_visitante || 0));
     return parts.join(" · ") || "Fase em andamento";
   }
 

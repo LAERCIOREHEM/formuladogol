@@ -545,7 +545,7 @@ def build_openai_payload(triage: Mapping[str, Any], model: str) -> dict[str, Any
         "jornalística específica: destacar o maior fato comprovado da rodada, priorizar uma mudança de favorito ao título quando ela ocorrer e, "
         "na ausência disso, a oscilação esportivamente mais relevante em título, Libertadores ou rebaixamento. Evite fórmulas genéricas repetidas "
         "como 'ganha espaço e recua nas projeções'. Use termos que descrevam a intenção real da página, como Brasileirão, título, Libertadores ou "
-        "rebaixamento quando forem o assunto central. Se não houver editorial elegível, "
+        "rebaixamento quando forem o assunto central. Para editorial_rodada, produza entre 420 e 700 palavras no corpo das seções; cada parágrafo deve ser substantivo e compatível com o schema. Se não houver editorial elegível, "
         "retorne null no campo correspondente. Não transforme avisos isolados de fonte em incidente crítico quando os dados finais estão íntegros."
     )
     payload: dict[str, Any] = {

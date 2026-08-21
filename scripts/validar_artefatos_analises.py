@@ -105,6 +105,19 @@ def validate(root: Path) -> None:
             total_cards = text.count('class="analysis-cup-video-card analysis-inline-video"') + text.count('class="analysis-cup-video-card analysis-cup-video-external"')
             assert total_cards == expected_videos, f"{slug}: cards de vídeo divergentes"
             assert '<iframe' not in ''.join(re.findall(r'<div class="analysis-cup-legs">.*?</div>\s*</article>', text, flags=re.S)), f"{slug}: iframe carregado antes do clique; lazy-load quebrado"
+        elif article_type == "continentais_fase":
+            confrontos = int(article.get("confrontos") or 0)
+            assert confrontos >= 1, f"{slug}: editorial continental sem confrontos"
+            assert article.get("fase_encerrada"), f"{slug}: fase continental ausente"
+            assert 'data-fdg-analise-competicao="continentais"' in text, f"{slug}: marcador continental ausente"
+            assert text.count('class="analysis-cup-tie"') == confrontos, f"{slug}: confrontos continentais divergentes"
+            assert "Partida 1 de 2" in text or "PARTIDA 1 DE 2" in text, f"{slug}: identificação da ida ausente"
+            assert "Partida 2 de 2" in text or "PARTIDA 2 DE 2" in text, f"{slug}: identificação da volta ausente"
+            assert "AGREGADO" in text, f"{slug}: agregado ausente"
+            expected_videos = int(article.get("melhores_momentos_vinculados") or 0)
+            total_cards = text.count('class="analysis-cup-video-card analysis-inline-video"') + text.count('class="analysis-cup-video-card analysis-cup-video-external"')
+            assert total_cards == expected_videos, f"{slug}: melhores momentos continentais divergentes ({total_cards}/{expected_videos})"
+            assert len(article.get("classificados") or []) <= len(article.get("clubes_brasileiros") or []), f"{slug}: classificados continentais inválidos"
         elif article_type == "acuracia_temporada":
             temporada = int(article.get("temporada") or 2026)
             assert f'data-fdg-acuracia-temporada="{temporada}"' in text, f"{slug}: marcador do balanço de acurácia ausente"
