@@ -7,7 +7,7 @@
     "jogos_sem_transmissao_14d": 0,
     "jogos_sem_transmissao_fora_14d": 2,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 2,
+    "registros_preservados": 4,
     "jogos_estaveis_sem_reconsulta_editorial": 38,
     "fontes_com_falha": 1
   },
@@ -21,18 +21,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 8340
+      "duracao_ms": 6383
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 16,
-      "duracao_ms": 10879
+      "jogos_com_canal": 14,
+      "duracao_ms": 6852
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 5,
       "jogos_com_canal": 0,
-      "duracao_ms": 59210
+      "duracao_ms": 38852
     },
     "espn": {
       "ok": true,
@@ -40,7 +40,7 @@
       "eventos_na_janela": 20,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 1460
+      "duracao_ms": 1551
     },
     "youtube_oficial": {
       "ok": true,
@@ -54,7 +54,7 @@
       "rodada": 27,
       "jogo": "Chapecoense x Internacional",
       "data_iso": "2026-09-12T15:00:00-03:00",
-      "faltam_horas": 535.3,
+      "faltam_horas": 535.1,
       "nivel": "futuro"
     },
     {
@@ -62,11 +62,22 @@
       "rodada": 28,
       "jogo": "Athletico-PR x Bahia",
       "data_iso": "2026-09-19T15:00:00-03:00",
-      "faltam_horas": 703.3,
+      "faltam_horas": 703.1,
       "nivel": "futuro"
     }
   ],
   "preservados": [
+    {
+      "event_id": "401841230",
+      "jogo": "Bahia x Remo",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
     {
       "event_id": "401841232",
       "jogo": "Coritiba x Athletico-PR",
@@ -84,6 +95,17 @@
         "Globo",
         "Prime Video"
       ]
+    },
+    {
+      "event_id": "401841244",
+      "jogo": "Remo x Santos",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
     }
   ],
   "erros": [
@@ -98,5 +120,5 @@
     "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/08/18/cartola-2026-com-gol-e-duas-assistencias-carrascal-do-flamengo-e-o-craque-da-rodada-23.ghtml",
     "https://ge.globo.com/gato-mestre/noticia/2026/08/18/franclim-carvalho-e-o-15o-tecnico-demitido-no-brasileirao-2026-veja-a-lista.ghtml"
   ],
-  "atualizado_em": "2026-08-21T07:41:19-03:00"
+  "atualizado_em": "2026-08-21T07:51:30-03:00"
 }
