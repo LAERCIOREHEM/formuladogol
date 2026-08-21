@@ -3,7 +3,7 @@
   "projeto": "Fórmula do Gol",
   "tipo": "agenda_clubes_brasileirao",
   "descricao": "Agenda do Brasileirão e dos clubes da Série A 2026 na Copa do Brasil, Libertadores e Sul-Americana.",
-  "gerado_em": "2026-08-21T05:11:27-03:00",
+  "gerado_em": "2026-08-21T16:10:56-03:00",
   "periodo": {
     "inicio": "2026-08-21T00:00:00-03:00",
     "fim": "2026-09-30T23:59:59.999999-03:00",
@@ -15,9 +15,9 @@
     "probabilidades": "disponíveis apenas para partidas do Brasileirão com saída AF-Previsão publicada"
   },
   "resumo": {
-    "total_jogos": 58,
+    "total_jogos": 59,
     "por_competicao": {
-      "brasileirao": 50,
+      "brasileirao": 51,
       "copa_do_brasil": 8
     }
   },
@@ -1031,6 +1031,47 @@
       "possui_clube_serie_a_2026": true,
       "probabilidades_disponiveis": false,
       "fonte": "dados-br/competicoes-af-previsao/copa-do-brasil.json"
+    },
+    {
+      "event_id": "401841006",
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Campeonato Brasileiro Série A",
+      "competicao_nome_curto": "Brasileirão",
+      "espn_league": "bra.1",
+      "data_iso": "2026-09-02T19:30:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "pré-jogo",
+      "rodada": 4,
+      "fase": "",
+      "perna": null,
+      "estadio": "Estadio do Maracana",
+      "mandante": {
+        "espn_id": "",
+        "nome": "Flamengo",
+        "sigla": "FLA",
+        "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
+        "pais": "BRA",
+        "serie_a_2026": true
+      },
+      "visitante": {
+        "espn_id": "",
+        "nome": "Mirassol",
+        "sigla": "MIR",
+        "escudo": "https://s.sde.globo.com/media/organizations/2024/08/20/mirassol-novo-svg-71690.svg",
+        "pais": "BRA",
+        "serie_a_2026": true
+      },
+      "placar_mandante": null,
+      "placar_visitante": null,
+      "adiado": true,
+      "data_definir": false,
+      "possui_clube_serie_a_2026": true,
+      "probabilidades_disponiveis": true,
+      "fonte": "dados-br/calendario-completo.json (fallback canônico)",
+      "fonte_calendario": "CBF oficial — agenda de credenciamento",
+      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "data_fonte_anterior": ""
     },
     {
       "event_id": "401909110",
