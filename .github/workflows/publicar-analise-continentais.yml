@@ -62,7 +62,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          FILES=(analises dados-br/analises.json dados-br/melhores-momentos-continentais.json sitemap.xml news-sitemap.xml feed.xml)
+          FILES=(analises dados-br/analises.json dados-br/melhores-momentos-continentais.json dados-br/historico-probabilidades-continentais.json sitemap.xml news-sitemap.xml feed.xml)
           if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Nenhuma alteração editorial necessária."
