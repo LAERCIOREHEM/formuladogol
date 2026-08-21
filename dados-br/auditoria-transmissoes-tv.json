@@ -7,7 +7,7 @@
     "jogos_sem_transmissao_14d": 0,
     "jogos_sem_transmissao_fora_14d": 2,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 18,
+    "registros_preservados": 4,
     "jogos_estaveis_sem_reconsulta_editorial": 38,
     "fontes_com_falha": 1
   },
@@ -21,18 +21,18 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 7500
+      "duracao_ms": 5813
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 0,
-      "duracao_ms": 3646
+      "jogos_com_canal": 14,
+      "duracao_ms": 8231
     },
     "ge_artigos": {
       "ok": true,
       "artigos_consultados": 5,
       "jogos_com_canal": 0,
-      "duracao_ms": 54498
+      "duracao_ms": 39810
     },
     "espn": {
       "ok": true,
@@ -40,7 +40,7 @@
       "eventos_na_janela": 20,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 6169
+      "duracao_ms": 1628
     },
     "youtube_oficial": {
       "ok": true,
@@ -54,7 +54,7 @@
       "rodada": 27,
       "jogo": "Chapecoense x Internacional",
       "data_iso": "2026-09-12T15:00:00-03:00",
-      "faltam_horas": 530.8,
+      "faltam_horas": 530.6,
       "nivel": "futuro"
     },
     {
@@ -62,20 +62,11 @@
       "rodada": 28,
       "jogo": "Athletico-PR x Bahia",
       "data_iso": "2026-09-19T15:00:00-03:00",
-      "faltam_horas": 698.8,
+      "faltam_horas": 698.6,
       "nivel": "futuro"
     }
   ],
   "preservados": [
-    {
-      "event_id": "401841231",
-      "jogo": "Atlético-MG x Fluminense",
-      "canais": [
-        "Premiere",
-        "SporTV",
-        "Prime Video"
-      ]
-    },
     {
       "event_id": "401841230",
       "jogo": "Bahia x Remo",
@@ -88,58 +79,10 @@
       ]
     },
     {
-      "event_id": "401841229",
-      "jogo": "Botafogo x Bragantino",
-      "canais": [
-        "GE TV",
-        "SporTV"
-      ]
-    },
-    {
       "event_id": "401841232",
       "jogo": "Coritiba x Athletico-PR",
       "canais": [
         "Premiere",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841237",
-      "jogo": "Flamengo x Corinthians",
-      "canais": [
-        "GE TV",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841236",
-      "jogo": "Grêmio x Vasco da Gama",
-      "canais": [
-        "Premiere",
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841235",
-      "jogo": "Mirassol x Vitória",
-      "canais": [
-        "Premiere",
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841234",
-      "jogo": "Palmeiras x São Paulo",
-      "canais": [
-        "GE TV",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841233",
-      "jogo": "Santos x Cruzeiro",
-      "canais": [
-        "GE TV",
         "SporTV"
       ]
     },
@@ -154,37 +97,6 @@
       ]
     },
     {
-      "event_id": "401841240",
-      "jogo": "Corinthians x Fluminense",
-      "canais": [
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841241",
-      "jogo": "Flamengo x Bragantino",
-      "canais": [
-        "GE TV",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841246",
-      "jogo": "Grêmio x Palmeiras",
-      "canais": [
-        "GE TV",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841245",
-      "jogo": "Mirassol x Botafogo",
-      "canais": [
-        "Paramount+",
-        "Disney+ / ESPN"
-      ]
-    },
-    {
       "event_id": "401841244",
       "jogo": "Remo x Santos",
       "canais": [
@@ -193,30 +105,6 @@
         "SporTV",
         "Prime Video",
         "Disney+ / ESPN"
-      ]
-    },
-    {
-      "event_id": "401841243",
-      "jogo": "São Paulo x Internacional",
-      "canais": [
-        "GE TV",
-        "SporTV"
-      ]
-    },
-    {
-      "event_id": "401841247",
-      "jogo": "Vasco da Gama x Coritiba",
-      "canais": [
-        "Premiere",
-        "Globo"
-      ]
-    },
-    {
-      "event_id": "401841242",
-      "jogo": "Vitória x Cruzeiro",
-      "canais": [
-        "GE TV",
-        "SporTV"
       ]
     }
   ],
@@ -232,5 +120,5 @@
     "https://ge.globo.com/gato-mestre/noticia/2026/08/18/palpite-ge-2026-andre-loffredo-e-o-maior-pontuador-veja-erros-e-acertos-da-23a-rodada-do-brasileiro.ghtml",
     "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/08/18/cartola-2026-com-gol-e-duas-assistencias-carrascal-do-flamengo-e-o-craque-da-rodada-23.ghtml"
   ],
-  "atualizado_em": "2026-08-21T12:11:27-03:00"
+  "atualizado_em": "2026-08-21T12:21:16-03:00"
 }
