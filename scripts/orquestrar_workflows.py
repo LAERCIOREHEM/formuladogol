@@ -1036,24 +1036,40 @@ def cup_editorial_decision() -> Decision | None:
 
 def continental_editorial_decision() -> Decision | None:
     try:
-        from gerar_analise_continental import SNAPS, MM_PATH, latest_publishable, build_ties, build_article, load as continental_load
+        from gerar_analise_continental import (
+            SNAPS, MM_PATH, CONT_HISTORY_PATH, latest_publishable, active_rank, baseline_ready,
+            build_ties, build_article, load as continental_load, mark_ids, current_stats_marks, stats_dossier
+        )
         snapshots = {key: continental_load(path, {}) for key, path in SNAPS.items()}
         rank = latest_publishable(snapshots)
         if not rank:
+            work_rank = active_rank(snapshots)
+            if work_rank and baseline_ready(snapshots, work_rank):
+                history = continental_load(CONT_HISTORY_PATH, {"marcos": []}) or {"marcos": []}
+                before_id, _ = mark_ids(work_rank)
+                if not any((mark or {}).get("id") == before_id for mark in (history.get("marcos") or [])):
+                    return Decision("editorial_continentais", "Partidas de ida continentais dos brasileiros encerradas; preservar fotografia estatística anterior às voltas.")
             return None
         ties = [tie for comp, snap in snapshots.items() for tie in build_ties(comp, snap, rank)]
         if not ties:
             return None
         highlights = continental_load(MM_PATH, {"jogos": {}}) or {"jogos": {}}
-        expected = build_article(rank, ties, highlights, datetime.now(ZoneInfo("America/Sao_Paulo")).replace(microsecond=0))
+        history = continental_load(CONT_HISTORY_PATH, {"marcos": []}) or {"marcos": []}
+        before, after, _ = current_stats_marks(rank, ties, history)
+        stats = stats_dossier(before, after) if before and after else {}
+        expected = build_article(rank, ties, highlights, datetime.now(ZoneInfo("America/Sao_Paulo")).replace(microsecond=0), stats)
     except Exception:
         return None
     manifest = load_json(ANALYSES_PATH, {})
     article = next((item for item in (manifest.get("artigos") or []) if isinstance(item, Mapping) and item.get("id_editorial") == expected.get("id_editorial")), None)
     if article is None:
         return Decision("editorial_continentais", f"Fase continental {expected.get('fase_encerrada')} encerrada no recorte brasileiro e editorial ainda não existe.")
-    if str(article.get("hash_dossie") or "") != str(expected.get("hash_dossie") or "") or str(article.get("hash_melhores_momentos") or "") != str(expected.get("hash_melhores_momentos") or ""):
-        return Decision("editorial_continentais", "Editorial continental publicado está desatualizado em relação aos confrontos ou melhores momentos.")
+    if (
+        str(article.get("hash_dossie") or "") != str(expected.get("hash_dossie") or "")
+        or str(article.get("hash_melhores_momentos") or "") != str(expected.get("hash_melhores_momentos") or "")
+        or str(article.get("hash_estatisticas") or "") != str(expected.get("hash_estatisticas") or "")
+    ):
+        return Decision("editorial_continentais", "Editorial continental publicado está desatualizado em relação aos confrontos, melhores momentos ou quadro estatístico.")
     return None
 
 def decide(
