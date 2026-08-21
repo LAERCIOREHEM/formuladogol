@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-20T20:51:19-03:00",
+  "gerado_em": "2026-08-20T21:01:29-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,12 +17,12 @@
     "ordem": 600,
     "nome": "2026 CONMEBOL Sudamericana, Round of 16 / Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 4
+    "eventos_pendentes": 2
   },
   "resumo": {
     "eventos": 144,
-    "finalizados": 140,
-    "pendentes": 4,
+    "finalizados": 142,
+    "pendentes": 2,
     "equipes": 56,
     "equipes_serie_a_2026": 7
   },
@@ -5583,9 +5583,9 @@
     {
       "event_id": "401902449",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "90'+1'",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5619,9 +5619,9 @@
     {
       "event_id": "401902740",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "89'",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5646,10 +5646,10 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 4
       },
-      "vencedor": null,
+      "vencedor": "Vasco da Gama",
       "penaltis": false
     },
     {
@@ -5730,6 +5730,6 @@
     "fase": "2026 CONMEBOL Sudamericana, Round of 16",
     "fase_ordem": 600,
     "chaves": 8,
-    "equipes_ativas": 12
+    "equipes_ativas": 10
   }
 }

@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-08-17T21:56:00-03:00",
   "referencia_esportiva_em": "2026-08-17T21:56:00-03:00",
-  "calculado_em": "2026-08-20T20:52:59-03:00",
+  "calculado_em": "2026-08-20T21:03:26-03:00",
   "status": "ok",
-  "hash_entrada": "04fe502d97ce2b5d98192717c21cf693580492fbf638746683cbddea3a442384",
+  "hash_entrada": "037f19a71c5af749d52a2a08f2a26037c227bd774b2766a85e28ace38793af8d",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -472,15 +472,13 @@
         "fase_atual": "2026 CONMEBOL Sudamericana, Round of 16",
         "fase_ordem": 600,
         "chaves_atuais": 8,
-        "equipes_ativas": 12,
+        "equipes_ativas": 10,
         "clubes_ativos": [
           "Atlético-MG",
           "Boca Juniors",
           "Botafogo",
           "Cienciano del Cusco",
-          "Club Olimpia",
           "Independiente Santa Fe",
-          "Macará",
           "Montevideo City Torque",
           "River Plate",
           "Santos",
@@ -494,27 +492,27 @@
           1
         ],
         "pareamento_futuro": "chave",
-        "partidas_concluidas_no_ajuste": 140,
+        "partidas_concluidas_no_ajuste": 142,
         "principais_chances_titulo": [
           {
             "clube": "Boca Juniors",
-            "probabilidade_pct": 30.82015
+            "probabilidade_pct": 31.34245
           },
           {
             "clube": "Montevideo City Torque",
-            "probabilidade_pct": 15.0679
-          },
-          {
-            "clube": "Independiente Santa Fe",
-            "probabilidade_pct": 10.3008
+            "probabilidade_pct": 15.51945
           },
           {
             "clube": "Cienciano del Cusco",
-            "probabilidade_pct": 10.02445
+            "probabilidade_pct": 11.80305
+          },
+          {
+            "clube": "Independiente Santa Fe",
+            "probabilidade_pct": 11.7144
           },
           {
             "clube": "River Plate",
-            "probabilidade_pct": 9.0087
+            "probabilidade_pct": 9.9085
           }
         ]
       }
@@ -522,14 +520,14 @@
     "alocacao_vagas": {
       "vagas_brasileirao_base": 5,
       "vagas_sul_americana": 6,
-      "media_clubes_serie_a_2026_na_libertadores": 7.718272,
+      "media_clubes_serie_a_2026_na_libertadores": 7.783313,
       "minimo_clubes_serie_a_2026_na_libertadores": 7,
       "maximo_clubes_serie_a_2026_na_libertadores": 9,
-      "media_total_clubes_brasileiros_na_libertadores": 7.718272,
+      "media_total_clubes_brasileiros_na_libertadores": 7.783313,
       "minimo_total_clubes_brasileiros_na_libertadores": 7,
       "maximo_total_clubes_brasileiros_na_libertadores": 9,
       "media_vagas_consumidas_por_clubes_brasileiros_fora_da_serie_a_2026": 0.0,
-      "soma_probabilidades_libertadores_pct": 771.8272,
+      "soma_probabilidades_libertadores_pct": 778.3313,
       "soma_probabilidades_sul_americana_pct": 600.0,
       "regra_decomposicao": "vias exclusivas: G5 do Brasileirão primeiro; títulos/copa apenas quando necessários; sobreposições descem como repasse",
       "regra_elegibilidade": "títulos da Copa do Brasil, Libertadores e Sul-Americana classificam mesmo que o clube seja rebaixado; a posição na liga limita apenas as vagas obtidas pelo Brasileirão"
@@ -562,7 +560,7 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-08-20T20:51:17-03:00",
+          "gerado_em": "2026-08-20T21:01:28-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 600,
@@ -577,22 +575,22 @@
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-08-20T20:51:19-03:00",
+          "gerado_em": "2026-08-20T21:01:29-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 600,
             "nome": "2026 CONMEBOL Sudamericana, Round of 16 / Oitavas de final",
             "eventos": 16,
-            "eventos_pendentes": 4
+            "eventos_pendentes": 2
           },
-          "eventos_finalizados": 140,
-          "eventos_pendentes": 4,
+          "eventos_finalizados": 142,
+          "eventos_pendentes": 2,
           "modo_coleta": "incremental"
         }
       ],
       "referencia_mais_antiga_em": "2026-08-20T20:51:16-03:00",
-      "referencia_mais_recente_em": "2026-08-20T20:51:19-03:00",
-      "snapshots_atualizados_em": "2026-08-20T20:51:19-03:00"
+      "referencia_mais_recente_em": "2026-08-20T21:01:29-03:00",
+      "snapshots_atualizados_em": "2026-08-20T21:01:29-03:00"
     }
   },
   "validacoes": {
@@ -600,7 +598,7 @@
     "soma_campeao_pct": 100.0,
     "soma_g4_pct": 400.0,
     "soma_g6_pct": 600.0,
-    "soma_libertadores_consolidada_pct": 771.8272,
+    "soma_libertadores_consolidada_pct": 778.3313,
     "soma_sul_americana_base_pct": 600.0,
     "soma_sul_americana_consolidada_pct": 600.0,
     "soma_rebaixamento_pct": 400.0,
