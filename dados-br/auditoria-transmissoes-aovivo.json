@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 60,
-    "jogos_foco": 60,
+    "jogos_na_janela": 58,
+    "jogos_foco": 58,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 44,
+    "candidatos_oficiais_encontrados": 38,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 35,
-    "search_api_jogos_pulados_grade_estavel": 25,
+    "search_api_jogos_pulados_grade_estavel": 23,
     "transmissoes_publicadas": 5,
-    "sem_transmissao": 55,
+    "sem_transmissao": 53,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -68,30 +68,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401902741",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Botafogo x Cienciano del Cusco",
-      "data_iso": "2026-08-20T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401874149",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Corinthians x Rosário Central",
-      "data_iso": "2026-08-20T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
     {
       "event_id": "401841205",
       "rodada": 24,
@@ -883,16 +859,6 @@
   ],
   "rejeitados": [
     {
-      "video_id": "3YfWrTW-Aoc",
-      "url": "https://www.youtube.com/watch?v=3YfWrTW-Aoc",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "CORINTHIANS x ROSARIO CENTRAL | NARRAÇÃO AO VIVO | OITAVAS DE FINAL | LIBERTADORES 2026 | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-08-20T20:30:00-03:00",
-      "motivo": "conteúdo rejeitado: narracao"
-    },
-    {
       "video_id": "LLpNUqHVam8",
       "url": "https://www.youtube.com/watch?v=LLpNUqHVam8",
       "fonte": "sbt",
@@ -903,16 +869,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "N8XnijsbLhc",
-      "url": "https://www.youtube.com/watch?v=N8XnijsbLhc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "CORINTHIANS X ROSARIO CENTRAL: NARRAÇÃO AO VIVO | LIBERTADORES DA AMÉRICA | NOCHE DE COPA",
-      "status": "live",
-      "inicio_programado": "2026-08-20T21:00:00-03:00",
-      "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
-    },
-    {
       "video_id": "3zFZiMlEFGE",
       "url": "https://www.youtube.com/watch?v=3zFZiMlEFGE",
       "fonte": "getv",
@@ -920,16 +876,6 @@
       "titulo": "A DIVISÃO MAIS ACIRRADA DA NFL: O GUIA DA AFC NORTE PARA 2026 | Primeira Descida | ge.globo",
       "status": "upcoming",
       "inicio_programado": "2026-08-23T19:25:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "LDLC6MWP6Fc",
-      "url": "https://www.youtube.com/watch?v=LDLC6MWP6Fc",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "MELHOR DIVISÃO DA NFL? O GUIA DA AFC OESTE PARA 2026 | Primeira Descida | ge.globo",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-20T23:59:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -960,16 +906,6 @@
       "titulo": "TENNESSEE TITANS X SEATTLE SEAHAWKS | AQUECIMENTO AO VIVO | NFL | #live | sportv",
       "status": "upcoming",
       "inicio_programado": "2026-08-23T20:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "eFxY6C6kgjw",
-      "url": "https://www.youtube.com/watch?v=eFxY6C6kgjw",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO E COM IMAGENS: LAS VEGAS RAIDERS X HOUSTON TEXANS | PRÉ-TEMPORADA 2026/27 | NFL | ge tv",
-      "status": "live",
-      "inicio_programado": "2026-08-20T20:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1020,16 +956,6 @@
       "titulo": "AO VIVO: PALMEIRAS X RB BRAGANTINO | PAULISTÃO F 2026 | 7ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-08-26T17:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "BtxN65z-K3Y",
-      "url": "https://www.youtube.com/watch?v=BtxN65z-K3Y",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: BORUSSIA DORTMUND X BAYERN DE MUNIQUE | FINAL DA SUPERCOPA DA ALEMANHA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T14:20:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1100,16 +1026,6 @@
       "titulo": "AO VIVO: REAL MADRID X REAL SOCIEDAD | LALIGA 26/27 | 1ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-08-26T15:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "SexZS1j7teY",
-      "url": "https://www.youtube.com/watch?v=SexZS1j7teY",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ELCHE X BARCELONA | LALIGA 26/27 | 2ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-23T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1275,16 +1191,6 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401902741",
-      "jogo": "Botafogo x Cienciano del Cusco",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401874149",
-      "jogo": "Corinthians x Rosário Central",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
       "event_id": "401841205",
       "jogo": "Fluminense x Remo",
       "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
@@ -1401,24 +1307,6 @@
     }
   ],
   "sem_transmissao": [
-    {
-      "event_id": "401902741",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Botafogo x Cienciano del Cusco",
-      "data_iso": "2026-08-20T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401874149",
-      "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Corinthians x Rosário Central",
-      "data_iso": "2026-08-20T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
     {
       "event_id": "401841205",
       "rodada": 24,
@@ -1899,13 +1787,13 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-20T21:41:02-03:00"
+  "atualizado_em": "2026-08-21T06:31:09-03:00"
 }
