@@ -813,6 +813,19 @@ jobs:
                   assert artigo.get("fase_seguinte"), f"{artigo['slug']}: fase seguinte/desfecho ausente"
                   assert 'data-fdg-analise-competicao="copa-do-brasil"' in text, f"{artigo['slug']}: marcador da competição ausente"
                   assert "Tabela do Brasileirão" not in text and "analysis-kpis" not in text, f"{artigo['slug']}: layout incorreto"
+              elif tipo == "continentais_fase":
+                  confrontos = int(artigo.get("confrontos") or 0)
+                  assert confrontos >= 1, f"{artigo['slug']}: editorial continental sem confrontos"
+                  assert artigo.get("fase_encerrada"), f"{artigo['slug']}: fase continental ausente"
+                  assert 'data-fdg-analise-competicao="continentais"' in text, f"{artigo['slug']}: marcador continental ausente"
+                  assert text.count('class="analysis-cup-tie"') == confrontos, f"{artigo['slug']}: confrontos continentais divergentes"
+                  assert "Partida 1 de 2" in text or "PARTIDA 1 DE 2" in text, f"{artigo['slug']}: identificação da ida ausente"
+                  assert "Partida 2 de 2" in text or "PARTIDA 2 DE 2" in text, f"{artigo['slug']}: identificação da volta ausente"
+                  assert "AGREGADO" in text, f"{artigo['slug']}: agregado ausente"
+                  expected_videos = int(artigo.get("melhores_momentos_vinculados") or 0)
+                  total_cards = text.count('class="analysis-cup-video-card analysis-inline-video"') + text.count('class="analysis-cup-video-card analysis-cup-video-external"')
+                  assert total_cards == expected_videos, f"{artigo['slug']}: melhores momentos continentais divergentes ({total_cards}/{expected_videos})"
+                  assert len(artigo.get("classificados") or []) <= len(artigo.get("clubes_brasileiros") or []), f"{artigo['slug']}: classificados continentais inválidos"
               else:
                   raise AssertionError(f"{artigo['slug']}: tipo editorial desconhecido: {tipo}")
           historico_continental = json.loads((site / "dados-br/historico-probabilidades-continentais.json").read_text(encoding="utf-8"))
