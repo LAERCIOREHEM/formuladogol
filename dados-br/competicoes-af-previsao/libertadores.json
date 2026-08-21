@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-20T21:01:28-03:00",
+  "gerado_em": "2026-08-20T21:21:21-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,12 +17,12 @@
     "ordem": 600,
     "nome": "Oitavas de final",
     "eventos": 16,
-    "eventos_pendentes": 3
+    "eventos_pendentes": 2
   },
   "resumo": {
     "eventos": 142,
-    "finalizados": 139,
-    "pendentes": 3,
+    "finalizados": 140,
+    "pendentes": 2,
     "equipes": 47,
     "equipes_serie_a_2026": 8
   },
@@ -5467,9 +5467,9 @@
     {
       "event_id": "401874142",
       "data_iso": "2026-08-20T19:00:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "Pênaltis",
+      "estado": "post",
+      "concluido": true,
+      "status": "PF - Pen",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5483,7 +5483,7 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": true,
-        "vencedor": false,
+        "vencedor": true,
         "placar": 0
       },
       "visitante": {
@@ -5497,7 +5497,7 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Liga de Quito",
       "penaltis": true
     },
     {
@@ -5578,6 +5578,6 @@
     "fase": "Oitavas de final",
     "fase_ordem": 600,
     "chaves": 8,
-    "equipes_ativas": 11
+    "equipes_ativas": 10
   }
 }

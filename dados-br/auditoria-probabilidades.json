@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-08-17T21:56:00-03:00",
   "referencia_esportiva_em": "2026-08-17T21:56:00-03:00",
-  "calculado_em": "2026-08-20T21:03:26-03:00",
+  "calculado_em": "2026-08-20T21:23:21-03:00",
   "status": "ok",
-  "hash_entrada": "037f19a71c5af749d52a2a08f2a26037c227bd774b2766a85e28ace38793af8d",
+  "hash_entrada": "883d73201057f3fae24d6556322baf0d24cd60ce74fbcf07a7690a493796b247",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -422,7 +422,7 @@
         "fase_atual": "Oitavas de final",
         "fase_ordem": 600,
         "chaves_atuais": 8,
-        "equipes_ativas": 11,
+        "equipes_ativas": 10,
         "clubes_ativos": [
           "Corinthians",
           "Deportes Tolima",
@@ -431,7 +431,6 @@
           "Fluminense",
           "Independiente del Valle",
           "Liga de Quito",
-          "Mirassol",
           "Palmeiras",
           "Platense",
           "Rosário Central"
@@ -443,27 +442,27 @@
           1
         ],
         "pareamento_futuro": "chave",
-        "partidas_concluidas_no_ajuste": 139,
+        "partidas_concluidas_no_ajuste": 140,
         "principais_chances_titulo": [
           {
             "clube": "Flamengo",
-            "probabilidade_pct": 29.9329
+            "probabilidade_pct": 29.3836
           },
           {
             "clube": "Palmeiras",
-            "probabilidade_pct": 19.4382
+            "probabilidade_pct": 19.4626
           },
           {
             "clube": "Estudiantes de La Plata",
-            "probabilidade_pct": 15.65225
+            "probabilidade_pct": 15.63905
           },
           {
             "clube": "Rosário Central",
-            "probabilidade_pct": 10.3607
+            "probabilidade_pct": 10.3207
           },
           {
             "clube": "Independiente del Valle",
-            "probabilidade_pct": 7.9948
+            "probabilidade_pct": 8.08385
           }
         ]
       },
@@ -520,14 +519,14 @@
     "alocacao_vagas": {
       "vagas_brasileirao_base": 5,
       "vagas_sul_americana": 6,
-      "media_clubes_serie_a_2026_na_libertadores": 7.783313,
+      "media_clubes_serie_a_2026_na_libertadores": 7.766035,
       "minimo_clubes_serie_a_2026_na_libertadores": 7,
       "maximo_clubes_serie_a_2026_na_libertadores": 9,
-      "media_total_clubes_brasileiros_na_libertadores": 7.783313,
+      "media_total_clubes_brasileiros_na_libertadores": 7.766035,
       "minimo_total_clubes_brasileiros_na_libertadores": 7,
       "maximo_total_clubes_brasileiros_na_libertadores": 9,
       "media_vagas_consumidas_por_clubes_brasileiros_fora_da_serie_a_2026": 0.0,
-      "soma_probabilidades_libertadores_pct": 778.3313,
+      "soma_probabilidades_libertadores_pct": 776.6035,
       "soma_probabilidades_sul_americana_pct": 600.0,
       "regra_decomposicao": "vias exclusivas: G5 do Brasileirão primeiro; títulos/copa apenas quando necessários; sobreposições descem como repasse",
       "regra_elegibilidade": "títulos da Copa do Brasil, Libertadores e Sul-Americana classificam mesmo que o clube seja rebaixado; a posição na liga limita apenas as vagas obtidas pelo Brasileirão"
@@ -560,22 +559,22 @@
         {
           "chave": "libertadores",
           "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-08-20T21:01:28-03:00",
+          "gerado_em": "2026-08-20T21:21:21-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 600,
             "nome": "Oitavas de final",
             "eventos": 16,
-            "eventos_pendentes": 3
+            "eventos_pendentes": 2
           },
-          "eventos_finalizados": 139,
-          "eventos_pendentes": 3,
+          "eventos_finalizados": 140,
+          "eventos_pendentes": 2,
           "modo_coleta": "incremental"
         },
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-08-20T21:01:29-03:00",
+          "gerado_em": "2026-08-20T21:21:22-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 600,
@@ -589,8 +588,8 @@
         }
       ],
       "referencia_mais_antiga_em": "2026-08-20T20:51:16-03:00",
-      "referencia_mais_recente_em": "2026-08-20T21:01:29-03:00",
-      "snapshots_atualizados_em": "2026-08-20T21:01:29-03:00"
+      "referencia_mais_recente_em": "2026-08-20T21:21:22-03:00",
+      "snapshots_atualizados_em": "2026-08-20T21:21:22-03:00"
     }
   },
   "validacoes": {
@@ -598,7 +597,7 @@
     "soma_campeao_pct": 100.0,
     "soma_g4_pct": 400.0,
     "soma_g6_pct": 600.0,
-    "soma_libertadores_consolidada_pct": 778.3313,
+    "soma_libertadores_consolidada_pct": 776.6035,
     "soma_sul_americana_base_pct": 600.0,
     "soma_sul_americana_consolidada_pct": 600.0,
     "soma_rebaixamento_pct": 400.0,
