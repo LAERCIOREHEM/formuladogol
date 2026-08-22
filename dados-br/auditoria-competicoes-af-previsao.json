@@ -2,12 +2,12 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-08-21T05:11:27-03:00",
+  "gerado_em": "2026-08-21T22:01:30-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "mudanca_esportiva": true,
-  "hash_estado_antes": "f198e8075fc3fa794c0dd1170f6b9da6f5b0398d5adfdb642f81a61ccea8c380",
-  "hash_estado_depois": "0cbafd5afe73ac7e53af7c2fcd7f424be84412b7291543aad946fe4f4d1d0a33",
+  "hash_estado_antes": "0cbafd5afe73ac7e53af7c2fcd7f424be84412b7291543aad946fe4f4d1d0a33",
+  "hash_estado_depois": "c76cb7cbd47f0c3e0ca5803a46443e288542fac282de1ba912a9cc1a44bf7513",
   "fonte": "ESPN",
   "temporada": 2026,
   "competicoes": [
@@ -15,7 +15,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-08-21T05:11:24-03:00",
+      "gerado_em": "2026-08-21T22:01:24-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 150,
       "finalizados": 142,
@@ -46,7 +46,7 @@
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
       "gerado_em": "2026-08-20T23:41:19-03:00",
       "cache_efetivo_minutos": 45,
-      "erro": "libertadores: ValueError: snapshot não está pronto para o AF: libertadores: fase atual inconsistente (49 equipes, 68 chaves)",
+      "erro": "libertadores: ValueError: snapshot não está pronto para o AF: libertadores: fase atual inconsistente (49 equipes, 69 chaves)",
       "fallback_seguro_para_af": true,
       "motivos_fallback": []
     },
@@ -54,11 +54,11 @@
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-08-21T05:11:27-03:00",
+      "gerado_em": "2026-08-21T22:01:30-03:00",
       "cache_efetivo_minutos": 45,
-      "eventos": 144,
+      "eventos": 150,
       "finalizados": 143,
-      "pendentes": 1,
+      "pendentes": 7,
       "fase_atual": {
         "status": "em_andamento",
         "ordem": 600,
@@ -81,7 +81,7 @@
     }
   ],
   "falhas": [
-    "libertadores: ValueError: snapshot não está pronto para o AF: libertadores: fase atual inconsistente (49 equipes, 68 chaves)"
+    "libertadores: ValueError: snapshot não está pronto para o AF: libertadores: fase atual inconsistente (49 equipes, 69 chaves)"
   ],
   "falhas_bloqueantes": [],
   "fontes_totalmente_atualizadas": false,
