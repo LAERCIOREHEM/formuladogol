@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-20T23:41:19-03:00",
+  "gerado_em": "2026-08-22T22:13:42-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -20,19 +20,17 @@
     "eventos_pendentes": 1
   },
   "resumo": {
-    "eventos": 142,
+    "eventos": 155,
     "finalizados": 141,
-    "pendentes": 1,
-    "equipes": 47,
+    "pendentes": 14,
+    "equipes": 49,
     "equipes_serie_a_2026": 8
   },
   "coleta": {
-    "modo": "incremental",
-    "janela_inicio": "2026-07-30T00:00:00-03:00",
-    "janela_fim": "2026-12-18T23:59:59-03:00",
-    "requisicoes": 4,
-    "ultima_completa_em": "2026-08-04T02:11:23-03:00",
-    "reconstrucao_completa_preservada_apos_falha": "reconstrução completa omitiu resultados históricos já confirmados: 401865517"
+    "modo": "completa",
+    "requisicoes": 9,
+    "ultima_completa_em": "2026-08-22T22:13:42-03:00",
+    "fases_preservadas_por_event_id": 16
   },
   "equipes": [
     {
@@ -159,7 +157,7 @@
       "sigla": "COR",
       "pais": null,
       "serie_a_2026": true,
-      "jogos": 8
+      "jogos": 10
     },
     {
       "espn_id": "2022",
@@ -213,7 +211,7 @@
       "sigla": "EST",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 8
+      "jogos": 10
     },
     {
       "espn_id": "819",
@@ -222,7 +220,7 @@
       "sigla": "FLA",
       "pais": null,
       "serie_a_2026": true,
-      "jogos": 8
+      "jogos": 10
     },
     {
       "espn_id": "3445",
@@ -231,7 +229,7 @@
       "sigla": "FLU",
       "pais": null,
       "serie_a_2026": true,
-      "jogos": 8
+      "jogos": 10
     },
     {
       "espn_id": "7385",
@@ -321,7 +319,7 @@
       "sigla": "LDU",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 8
+      "jogos": 10
     },
     {
       "espn_id": "5492",
@@ -375,7 +373,7 @@
       "sigla": "PAL",
       "pais": null,
       "serie_a_2026": true,
-      "jogos": 8
+      "jogos": 10
     },
     {
       "espn_id": "2683",
@@ -393,7 +391,7 @@
       "sigla": "PLA",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 8
+      "jogos": 10
     },
     {
       "espn_id": "17",
@@ -412,6 +410,24 @@
       "pais": null,
       "serie_a_2026": false,
       "jogos": 10
+    },
+    {
+      "espn_id": "131554",
+      "nome": "TBD Away",
+      "nome_espn": "TBD Away",
+      "sigla": "TBD Away",
+      "pais": null,
+      "serie_a_2026": false,
+      "jogos": 6
+    },
+    {
+      "espn_id": "131556",
+      "nome": "TBD Home",
+      "nome_espn": "TBD Home",
+      "sigla": "TBD Home",
+      "pais": null,
+      "serie_a_2026": false,
+      "jogos": 6
     },
     {
       "espn_id": "2687",
@@ -5563,6 +5579,474 @@
         "nome": "Deportes Tolima",
         "nome_espn": "Deportes Tolima",
         "sigla": "TOL",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912518",
+      "data_iso": "2026-09-09T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 1,
+      "estadio": "Estadio do Maracana",
+      "mandante": {
+        "espn_id": "3445",
+        "nome": "Fluminense",
+        "nome_espn": "Fluminense",
+        "sigla": "FLU",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "7764",
+        "nome": "Platense",
+        "nome_espn": "Platense",
+        "sigla": "PLA",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912527",
+      "data_iso": "2026-09-09T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 1,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "2029",
+        "nome": "Palmeiras",
+        "nome_espn": "Palmeiras",
+        "sigla": "PAL",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "4816",
+        "nome": "Liga de Quito",
+        "nome_espn": "Liga de Quito",
+        "sigla": "LDU",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912541",
+      "data_iso": "2026-09-09T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 1,
+      "estadio": "Estadio Jorge Luis Hirschi",
+      "mandante": {
+        "espn_id": "8",
+        "nome": "Estudiantes de La Plata",
+        "nome_espn": "Estudiantes de La Plata",
+        "sigla": "EST",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "874",
+        "nome": "Corinthians",
+        "nome_espn": "Corinthians",
+        "sigla": "COR",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912543",
+      "data_iso": "2026-09-09T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 1,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "131556",
+        "nome": "TBD Home",
+        "nome_espn": "TBD Home",
+        "sigla": "TBD Home",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "819",
+        "nome": "Flamengo",
+        "nome_espn": "Flamengo",
+        "sigla": "FLA",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912517",
+      "data_iso": "2026-09-16T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "7764",
+        "nome": "Platense",
+        "nome_espn": "Platense",
+        "sigla": "PLA",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "3445",
+        "nome": "Fluminense",
+        "nome_espn": "Fluminense",
+        "sigla": "FLU",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912525",
+      "data_iso": "2026-09-16T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "4816",
+        "nome": "Liga de Quito",
+        "nome_espn": "Liga de Quito",
+        "sigla": "LDU",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "2029",
+        "nome": "Palmeiras",
+        "nome_espn": "Palmeiras",
+        "sigla": "PAL",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912526",
+      "data_iso": "2026-09-16T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "819",
+        "nome": "Flamengo",
+        "nome_espn": "Flamengo",
+        "sigla": "FLA",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "131554",
+        "nome": "TBD Away",
+        "nome_espn": "TBD Away",
+        "sigla": "TBD Away",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912540",
+      "data_iso": "2026-09-16T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "874",
+        "nome": "Corinthians",
+        "nome_espn": "Corinthians",
+        "sigla": "COR",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "8",
+        "nome": "Estudiantes de La Plata",
+        "nome_espn": "Estudiantes de La Plata",
+        "sigla": "EST",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912522",
+      "data_iso": "2026-10-14T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 1,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "131556",
+        "nome": "TBD Home",
+        "nome_espn": "TBD Home",
+        "sigla": "TBD Home",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "131554",
+        "nome": "TBD Away",
+        "nome_espn": "TBD Away",
+        "sigla": "TBD Away",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912523",
+      "data_iso": "2026-10-14T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 1,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "131556",
+        "nome": "TBD Home",
+        "nome_espn": "TBD Home",
+        "sigla": "TBD Home",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "131554",
+        "nome": "TBD Away",
+        "nome_espn": "TBD Away",
+        "sigla": "TBD Away",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912520",
+      "data_iso": "2026-10-21T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "131556",
+        "nome": "TBD Home",
+        "nome_espn": "TBD Home",
+        "sigla": "TBD Home",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "131554",
+        "nome": "TBD Away",
+        "nome_espn": "TBD Away",
+        "sigla": "TBD Away",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912521",
+      "data_iso": "2026-10-21T15:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "131556",
+        "nome": "TBD Home",
+        "nome_espn": "TBD Home",
+        "sigla": "TBD Home",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "131554",
+        "nome": "TBD Away",
+        "nome_espn": "TBD Away",
+        "sigla": "TBD Away",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912519",
+      "data_iso": "2026-11-28T17:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Final",
+      "fase_ordem": 900,
+      "semana": null,
+      "perna": null,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "131556",
+        "nome": "TBD Home",
+        "nome_espn": "TBD Home",
+        "sigla": "TBD Home",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "131554",
+        "nome": "TBD Away",
+        "nome_espn": "TBD Away",
+        "sigla": "TBD Away",
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,

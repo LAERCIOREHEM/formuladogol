@@ -2,12 +2,12 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-08-21T22:01:30-03:00",
+  "gerado_em": "2026-08-22T22:13:44-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "mudanca_esportiva": true,
-  "hash_estado_antes": "0cbafd5afe73ac7e53af7c2fcd7f424be84412b7291543aad946fe4f4d1d0a33",
-  "hash_estado_depois": "c76cb7cbd47f0c3e0ca5803a46443e288542fac282de1ba912a9cc1a44bf7513",
+  "hash_estado_antes": "c76cb7cbd47f0c3e0ca5803a46443e288542fac282de1ba912a9cc1a44bf7513",
+  "hash_estado_depois": "75ae9b4bb3b3e79830dd22da5b20cd8998305c24fa69d4c4f47a68e311a290e4",
   "fonte": "ESPN",
   "temporada": 2026,
   "competicoes": [
@@ -15,7 +15,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-08-21T22:01:24-03:00",
+      "gerado_em": "2026-08-22T22:13:39-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 150,
       "finalizados": 142,
@@ -34,27 +34,45 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-07-31T00:00:00-03:00",
-        "janela_fim": "2026-12-19T23:59:59-03:00",
+        "janela_inicio": "2026-08-01T00:00:00-03:00",
+        "janela_fim": "2026-12-20T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-08-18T18:21:33-03:00"
       }
     },
     {
       "competicao": "libertadores",
-      "status": "preservado_apos_falha_seguro",
+      "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-08-20T23:41:19-03:00",
+      "gerado_em": "2026-08-22T22:13:42-03:00",
       "cache_efetivo_minutos": 45,
-      "erro": "libertadores: ValueError: snapshot não está pronto para o AF: libertadores: fase atual inconsistente (49 equipes, 69 chaves)",
-      "fallback_seguro_para_af": true,
-      "motivos_fallback": []
+      "eventos": 155,
+      "finalizados": 141,
+      "pendentes": 14,
+      "fase_atual": {
+        "status": "em_andamento",
+        "ordem": 600,
+        "nome": "Oitavas de final",
+        "eventos": 16,
+        "eventos_pendentes": 1
+      },
+      "summary_pendentes_vencidos": {
+        "consultados": 0,
+        "atualizados": 0,
+        "pendentes": []
+      },
+      "coleta": {
+        "modo": "completa",
+        "requisicoes": 9,
+        "ultima_completa_em": "2026-08-22T22:13:42-03:00",
+        "fases_preservadas_por_event_id": 16
+      }
     },
     {
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-08-21T22:01:30-03:00",
+      "gerado_em": "2026-08-22T22:13:44-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 150,
       "finalizados": 143,
@@ -73,18 +91,16 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-07-31T00:00:00-03:00",
-        "janela_fim": "2026-12-19T23:59:59-03:00",
+        "janela_inicio": "2026-08-01T00:00:00-03:00",
+        "janela_fim": "2026-12-20T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-08-18T18:21:39-03:00"
       }
     }
   ],
-  "falhas": [
-    "libertadores: ValueError: snapshot não está pronto para o AF: libertadores: fase atual inconsistente (49 equipes, 69 chaves)"
-  ],
+  "falhas": [],
   "falhas_bloqueantes": [],
-  "fontes_totalmente_atualizadas": false,
+  "fontes_totalmente_atualizadas": true,
   "snapshots_prontos_para_af": true,
   "regras_operacionais": {
     "cache_padrao_minutos": 45,
