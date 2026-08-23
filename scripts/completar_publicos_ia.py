@@ -560,6 +560,12 @@ def self_test() -> int:
     assert payload["text"]["format"]["strict"] is True
     assert payload["max_tool_calls"] == 4
 
+    # Estado tem de sobreviver mesmo quando não há chave nem pendência: é o único
+    # rastro auditável de que a camada rodou.
+    vazio = atualizar_estado({}, [], [], [], max_tentativas=8, erro="OPENAI_API_KEY ausente", agora=agora)
+    assert vazio["ultima_execucao"]["erro"] == "OPENAI_API_KEY ausente"
+    assert vazio["gerado_em"] == agora.isoformat()
+
     print("Self-test completar_publicos_ia: OK")
     return 0
 
@@ -587,16 +593,43 @@ def main() -> int:
         agora=agora,
     )
 
-    if not pendentes:
-        print("Nenhuma partida elegível para a camada de IA.")
+    def encerrar(motivo: str, *, contar_tentativa: bool) -> int:
+        """Sempre deixa rastro em disco: sem isto não há como auditar a camada."""
+        if args.dry_run:
+            print(f"[dry-run] {motivo}")
+            print("novos=false")
+            return 0
+        if contar_tentativa:
+            novo_estado = atualizar_estado(estado, pendentes, [], [], args.max_tentativas, motivo, agora)
+        else:
+            novo_estado = dict(estado)
+            novo_estado.setdefault("jogos", estado.get("jogos") or {})
+            novo_estado["gerado_em"] = agora.isoformat()
+            novo_estado["ultima_execucao"] = {
+                "pendentes_avaliados": len(pendentes),
+                "aceitos": 0,
+                "rejeitados": 0,
+                "nao_encontrados": 0,
+                "erro": motivo,
+            }
+            novo_estado["esgotados"] = sorted(
+                k for k, v in (novo_estado.get("jogos") or {}).items()
+                if isinstance(v, Mapping) and v.get("esgotado")
+            )
+        salvar_json(ESTADO, novo_estado)
+        print(motivo)
         print("novos=false")
         return 0
 
+    if not pendentes:
+        return encerrar("Nenhuma partida elegível para a camada de IA.", contar_tentativa=False)
+
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
-        print("OPENAI_API_KEY ausente; camada de IA ignorada.", file=sys.stderr)
-        print("novos=false")
-        return 0
+        print("ERRO DE CONFIGURAÇÃO: OPENAI_API_KEY não chegou ao runner.", file=sys.stderr)
+        print("Verifique Settings > Secrets and variables > Actions > Repository secrets.", file=sys.stderr)
+        # Falha de configuração não consome tentativa: a partida continua elegível.
+        return encerrar("OPENAI_API_KEY ausente no ambiente do workflow", contar_tentativa=False)
 
     model = os.environ.get("OPENAI_PUBLICOS_MODEL", os.environ.get("OPENAI_MODEL", DEFAULT_MODEL)).strip() or DEFAULT_MODEL
     max_tool_calls = min(8, max(2, len(pendentes) * 2))
