@@ -67,10 +67,19 @@ jobs:
           # Camada de resgate: a matéria consolidada da rodada no ge só sai quando
           # a rodada inteira termina, mas a reportagem de cada jogo traz a ficha
           # técnica poucas horas após o apito. Só roda quando ainda há lacuna.
+          set +e
           python scripts/completar_publicos_ia.py \
             --grace-horas 2 \
             --max-jogos 10 \
-            --max-tentativas 8 || echo "Camada de IA indisponível nesta execução; seguindo com o determinístico."
+            --max-tentativas 8 2>&1 | tee /tmp/camada-ia.log
+          IA_RC=${PIPESTATUS[0]}
+          set -e
+          if [[ "$IA_RC" != "0" ]]; then
+            echo "Camada de IA terminou com codigo $IA_RC; seguindo com o deterministico."
+          fi
+          if grep -q "OPENAI_API_KEY ausente" /tmp/camada-ia.log; then
+            echo "::error::OPENAI_API_KEY nao chegou ao runner. Cadastre em Settings > Secrets and variables > Actions > Repository secrets."
+          fi
 
           # A camada de IA grava complementos e propaga para jogos-detalhes, mas
           # não reescreve a auditoria. Sem esta reconsolidação (offline, sem rede)
@@ -137,12 +146,27 @@ jobs:
             else
               echo "- **Resultado:** nenhuma informação nova; snapshot preservado"
             fi
+            echo ""
+            echo "### Camada de IA"
+            echo ""
+            echo '```'
+            if [[ -s /tmp/camada-ia.log ]]; then
+              tail -n 40 /tmp/camada-ia.log
+            else
+              echo "camada de IA não produziu saída"
+            fi
+            echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           exit 0
 
-      - name: Commitar somente quando houver público novo
+      - name: Commitar públicos novos e o estado da camada de IA
         id: publish
-        if: ${{ inputs.dry_run != true && steps.coleta.outputs.novos == 'true' }}
+        env:
+          NOVOS_PUBLICOS: ${{ steps.coleta.outputs.novos }}
+        # Commita também quando NÃO houve público novo: o contador de tentativas
+        # da camada de IA precisa persistir, senão o marcador de "esgotado" nunca
+        # avança e o orquestrador redispara este workflow para sempre.
+        if: ${{ inputs.dry_run != true }}
         shell: bash
         run: |
           set -euo pipefail
@@ -182,7 +206,12 @@ jobs:
               exit 0
             fi
             git add -- "${FILES[@]}"
-            git commit -m "Atualizar públicos do Brasileirão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            if [[ "${NOVOS_PUBLICOS:-false}" == "true" ]]; then
+              MSG="Atualizar públicos do Brasileirão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            else
+              MSG="Registrar tentativa da camada de IA de público - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            fi
+            git commit -m "$MSG"
             if git push origin HEAD:main; then
               echo "published=true" >> "$GITHUB_OUTPUT"
               exit 0
@@ -193,7 +222,7 @@ jobs:
           exit 1
 
       - name: Disparar deploy após público publicado
-        if: steps.publish.outputs.published == 'true'
+        if: ${{ steps.publish.outputs.published == 'true' && steps.coleta.outputs.novos == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
