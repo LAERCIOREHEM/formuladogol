@@ -641,8 +641,108 @@ def normalize_completed_knockout_stage(events: list[dict[str, Any]]) -> None:
             event["fase"] = label
 
 
+def normalize_generic_pending_knockout_cohorts(events: list[dict[str, Any]]) -> int:
+    """Separa a fase seguinte quando ela chega como ``Ida/Volta`` genérico.
+
+    Caso típico: ainda existe uma chave atrasada das oitavas, já identificada
+    como rank 600, enquanto a ESPN publica todas as quartas futuras com
+    ``fase_ordem=100``. Sem separar essa coorte futura, o rank 100 vence como
+    "fase atual" e mistura o histórico genérico inteiro do torneio.
+
+    A inferência só é autorizada quando a fase corrente explícita está
+    estruturalmente completa e a coorte genérica futura contém EXATAMENTE a
+    quantidade de equipes esperada na fase seguinte. Assim, uma publicação
+    parcial (um ou dois confrontos apenas) nunca é promovida indevidamente.
+    """
+    explicit_pending = [
+        event for event in events
+        if not event.get("concluido") and phase_metadata_is_specific(event)
+    ]
+    if not explicit_pending:
+        return 0
+
+    current_rank = min(int(event.get("fase_ordem") or 0) for event in explicit_pending)
+    current_events = [
+        event for event in events if int(event.get("fase_ordem") or 0) == current_rank
+    ]
+    current_pairs = {event_pair_key(event) for event in current_events}
+    current_participants = {team for pair in current_pairs for team in pair if team}
+    if (
+        not current_pairs
+        or len(current_participants) != 2 * len(current_pairs)
+        or len(current_participants) < 4
+        or len(current_participants) & (len(current_participants) - 1)
+    ):
+        return 0
+    expected_next_team_count = len(current_participants) // 2
+
+    generic_pending: list[tuple[datetime, dict[str, Any]]] = []
+    for event in events:
+        if event.get("concluido") or phase_metadata_is_specific(event):
+            continue
+        when = parse_datetime(event.get("data_iso"))
+        if when is not None:
+            generic_pending.append((when, event))
+    if not generic_pending:
+        return 0
+
+    generic_pending.sort(key=lambda item: (item[0], str(item[1].get("event_id") or "")))
+
+    # Ida e volta normalmente cabem em 7–10 dias. 14 dias suporta pequenos
+    # ajustes de calendário sem colar fases distintas numa única coorte.
+    max_gap = timedelta(days=14)
+    cohorts: list[list[tuple[datetime, dict[str, Any]]]] = []
+    current: list[tuple[datetime, dict[str, Any]]] = []
+    last_when: datetime | None = None
+    for item in generic_pending:
+        when = item[0]
+        if current and last_when is not None and when - last_when > max_gap:
+            cohorts.append(current)
+            current = []
+        current.append(item)
+        last_when = when
+    if current:
+        cohorts.append(current)
+
+    changed = 0
+    for cohort in cohorts:
+        cohort_events = [item[1] for item in cohort]
+        pairs = {event_pair_key(event) for event in cohort_events}
+        participants = {team for pair in pairs for team in pair if team}
+        inferred = knockout_stage_from_team_count(len(participants))
+        if (
+            not inferred
+            or len(participants) != expected_next_team_count
+            or len(participants) != 2 * len(pairs)
+            or any(not all(pair) for pair in pairs)
+        ):
+            continue
+
+        rank, label = inferred
+        if rank <= current_rank:
+            continue
+
+        lower = min(item[0] for item in cohort) - timedelta(days=35)
+        upper = max(item[0] for item in cohort) + timedelta(days=35)
+        for event in events:
+            if phase_metadata_is_specific(event) or event_pair_key(event) not in pairs:
+                continue
+            when = parse_datetime(event.get("data_iso"))
+            if when is None or not (lower <= when <= upper):
+                continue
+            event["fase_ordem"] = rank
+            event["fase"] = label
+            changed += 1
+    return changed
+
+
 def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
     """Corrige fases que a ESPN devolve apenas como Ida/Volta/status agregado."""
+    # Primeiro separa fases futuras genéricas já publicadas pela ESPN. Isso é
+    # essencial quando uma fase anterior ainda possui uma partida adiada: sem
+    # essa normalização, ``fase_ordem=100`` vira a menor ordem pendente e todo
+    # o histórico genérico do torneio é interpretado como uma única fase.
+    normalize_generic_pending_knockout_cohorts(events)
     pending = [event for event in events if not event.get("concluido")]
     if not pending:
         return
@@ -1453,6 +1553,122 @@ def self_test() -> None:
     assert rebuilt["ordem"] == 600
     assert rebuilt["eventos"] == 16
     assert rebuilt["eventos_pendentes"] == 6
+
+    # Regressão 2026-08-22: uma oitava atrasada continua pendente enquanto a
+    # ESPN já publica as quartas como simples "Ida/Volta". Antes, as quartas
+    # ficavam com fase_ordem=100 e eram misturadas a TODO o histórico genérico,
+    # produzindo erros como "49 equipes, 68 chaves". A fase atrasada deve
+    # permanecer corrente (600) e a coorte futura deve ser normalizada para 700.
+    overlapping: list[dict[str, Any]] = []
+
+    def normalized_test_event(
+        event_id: str,
+        when: str,
+        home: str,
+        away: str,
+        *,
+        rank: int,
+        label: str,
+        completed: bool,
+        home_goals: int | None = None,
+        away_goals: int | None = None,
+    ) -> dict[str, Any]:
+        winner = None
+        if completed and home_goals is not None and away_goals is not None:
+            if home_goals > away_goals:
+                winner = home
+            elif away_goals > home_goals:
+                winner = away
+        return {
+            "event_id": event_id,
+            "data_iso": when,
+            "estado": "post" if completed else "pre",
+            "concluido": completed,
+            "status": "Finalizado" if completed else "Agendado",
+            "fase": label,
+            "fase_ordem": rank,
+            "semana": None,
+            "perna": None,
+            "estadio": "Arena",
+            "mandante": {
+                "espn_id": f"{event_id}-h",
+                "nome": home,
+                "nome_espn": home,
+                "sigla": "H",
+                "pais": "ARG",
+                "serie_a_2026": False,
+                "mandante": True,
+                "vencedor": winner == home,
+                "placar": home_goals,
+            },
+            "visitante": {
+                "espn_id": f"{event_id}-a",
+                "nome": away,
+                "nome_espn": away,
+                "sigla": "A",
+                "pais": "ARG",
+                "serie_a_2026": False,
+                "mandante": False,
+                "vencedor": winner == away,
+                "placar": away_goals,
+            },
+            "vencedor": winner,
+            "penaltis": False,
+        }
+
+    # Oitavas: sete chaves encerradas e uma volta adiada ainda pendente.
+    for tie in range(8):
+        a = f"R16 {2 * tie:02d}"
+        b = f"R16 {2 * tie + 1:02d}"
+        overlapping.append(normalized_test_event(
+            f"r16-{tie}-1", "2026-08-12T20:00:00-03:00", a, b,
+            rank=600, label="Oitavas de final", completed=True, home_goals=2, away_goals=0,
+        ))
+        second_completed = tie < 7
+        overlapping.append(normalized_test_event(
+            f"r16-{tie}-2",
+            "2026-08-19T20:00:00-03:00" if second_completed else "2026-08-25T21:30:00-03:00",
+            b, a, rank=600, label="Oitavas de final", completed=second_completed,
+            home_goals=0 if second_completed else None,
+            away_goals=1 if second_completed else None,
+        ))
+
+    # Quartas futuras já expostas, mas degradadas para fase genérica=100.
+    quarterfinalists = [f"R16 {2 * tie:02d}" for tie in range(8)]
+    for tie in range(4):
+        a = quarterfinalists[2 * tie]
+        b = quarterfinalists[2 * tie + 1]
+        overlapping.append(normalized_test_event(
+            f"qf-{tie}-1", "2026-09-16T20:00:00-03:00", a, b,
+            rank=100, label="Ida", completed=False,
+        ))
+        overlapping.append(normalized_test_event(
+            f"qf-{tie}-2", "2026-09-23T20:00:00-03:00", b, a,
+            rank=100, label="Volta", completed=False,
+        ))
+
+    # Ruído histórico genérico que não pode contaminar as quartas futuras.
+    for old in range(20):
+        overlapping.append(normalized_test_event(
+            f"old-{old}", "2026-03-01T20:00:00-03:00",
+            f"Hist {old:02d}A", f"Hist {old:02d}B",
+            rank=100, label="Fase não identificada", completed=True, home_goals=1, away_goals=0,
+        ))
+
+    normalized_count = normalize_generic_pending_knockout_cohorts(overlapping)
+    assert normalized_count == 8
+    assert all(
+        event["fase_ordem"] == 700 and event["fase"] == "Quartas de final"
+        for event in overlapping if str(event.get("event_id", "")).startswith("qf-")
+    )
+    normalize_active_knockout_stage(overlapping)
+    overlap_snapshot = build_snapshot_from_normalized(spec, overlapping)
+    assert overlap_snapshot["fase_atual"]["ordem"] == 600
+    assert overlap_snapshot["fase_atual"]["eventos"] == 16
+    assert overlap_snapshot["fase_atual"]["eventos_pendentes"] == 1
+    overlap_structure = validate_competition_snapshot_structure(overlap_snapshot)
+    assert overlap_structure["fase_ordem"] == 600
+    assert overlap_structure["chaves"] == 8
 
     # Regressão pós-apito da Copa do Brasil: quando a última pendência vira
     # finalizada, a ESPN pode substituir TODOS os rótulos da fase por textos
