@@ -46,6 +46,7 @@ jobs:
           python -m py_compile \
             scripts/auditoria_ia_diaria.py \
             scripts/gerar_analise_rodada.py \
+            scripts/gerar_marcos_af_previsao.py \
             scripts/gerar_analise_copa_do_brasil.py \
             scripts/buscar_melhores_momentos_copa_do_brasil.py \
             scripts/atualizar_transmissoes_tv_brasileirao.py \
@@ -54,6 +55,9 @@ jobs:
             scripts/validar_python_embutido_workflow.py
           python scripts/auditoria_ia_diaria.py --self-test
           python scripts/gerar_analise_rodada.py --self-test
+          python scripts/gerar_marcos_af_previsao.py --self-test
+          python scripts/gerar_marcos_af_previsao.py
+          python scripts/gerar_marcos_af_previsao.py --validar
           python scripts/gerar_analise_copa_do_brasil.py --self-test
           python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
           python scripts/validar_artefatos_analises.py
@@ -180,6 +184,7 @@ jobs:
             analises
             css/br-analises.css
             dados-br/analises.json
+            dados-br/marcos-af-previsao.json
             dados-br/historico-probabilidades-continentais.json
             sitemap.xml
             news-sitemap.xml
@@ -193,6 +198,7 @@ jobs:
             analises
             css/br-analises.css
             dados-br/analises.json
+            dados-br/marcos-af-previsao.json
             dados-br/historico-probabilidades-continentais.json
             sitemap.xml
             news-sitemap.xml

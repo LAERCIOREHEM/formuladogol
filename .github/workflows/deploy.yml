@@ -169,6 +169,7 @@ jobs:
             dados-br/elencos.json
             dados-br/estatisticas-competicao.json
             dados-br/historico-probabilidades.json
+            dados-br/marcos-af-previsao.json
             dados-br/historico-probabilidades-jogos.json
             dados-br/historico-probabilidades-continentais.json
             dados-br/historico-ranking-desempenho.json
@@ -764,6 +765,13 @@ jobs:
           manifest_analises = json.loads((site / "dados-br/analises.json").read_text(encoding="utf-8"))
           artigos_analises = manifest_analises.get("artigos") or []
           assert manifest_analises.get("total_artigos") == len(artigos_analises) >= 1, "manifesto editorial vazio ou divergente"
+          marcos_af = json.loads((site / "dados-br/marcos-af-previsao.json").read_text(encoding="utf-8"))
+          lista_marcos_af = marcos_af.get("marcos") or []
+          assert marcos_af.get("total_marcos") == len(lista_marcos_af) >= 1, "marcos públicos do AF-Previsão ausentes ou divergentes"
+          marcos_por_rodada = {int(item.get("rodada") or 0): item for item in lista_marcos_af if item.get("tipo") == "brasileirao_fechamento"}
+          for marco in lista_marcos_af:
+              clubes = marco.get("clubes") or []
+              assert len(clubes) == 20 and len({str(item.get("clube") or "") for item in clubes}) == 20, f"{marco.get('id')}: marco AF sem vinte clubes"
           paginas_analise = ["analises/index.html"] + [f"analises/{item['slug']}" for item in artigos_analises]
           for page_name in paginas_analise:
               page = site / page_name
@@ -802,6 +810,12 @@ jobs:
                   rodada = int(artigo.get("rodada") or 0)
                   assert rodada and f'data-fdg-analise-rodada="{rodada}"' in text, f"{artigo['slug']}: marcador de rodada ausente"
                   assert text.count('class="analysis-game-card"') == int(artigo.get("jogos_concluidos") or 0), f"{artigo['slug']}: jogos divergentes"
+                  marco = marcos_por_rodada.get(rodada)
+                  assert marco is not None, f"{artigo['slug']}: editorial sem marco AF público da R{rodada}"
+                  meta = artigo.get("af_marco") or {}
+                  assert meta.get("marco_id") == marco.get("id"), f"{artigo['slug']}: marco editorial diverge da evolução pública"
+                  assert meta.get("snapshot_depois_hash") == (marco.get("fonte") or {}).get("hash_snapshot"), f"{artigo['slug']}: snapshot DEPOIS diverge do marco público"
+                  assert meta.get("hash_20_clubes_depois") == marco.get("hash_20_clubes"), f"{artigo['slug']}: 20 clubes do editorial divergem do marco público"
               elif tipo == "copa_do_brasil_fase":
                   confrontos = int(artigo.get("confrontos") or 0)
                   classificados = artigo.get("classificados") or []

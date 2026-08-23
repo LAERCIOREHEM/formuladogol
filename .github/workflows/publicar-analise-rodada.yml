@@ -42,8 +42,11 @@ jobs:
       - name: Validar gerador e dados editoriais
         run: |
           set -euo pipefail
-          python -m py_compile scripts/gerar_analise_rodada.py scripts/validar_artefatos_analises.py
+          python -m py_compile scripts/gerar_analise_rodada.py scripts/gerar_marcos_af_previsao.py scripts/validar_artefatos_analises.py
           python scripts/gerar_analise_rodada.py --self-test
+          python scripts/gerar_marcos_af_previsao.py --self-test
+          python scripts/gerar_marcos_af_previsao.py
+          python scripts/gerar_marcos_af_previsao.py --validar
           python -m json.tool dados-br/config-analises.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
@@ -76,7 +79,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          FILES=(analises css/br-analises.css dados-br/analises.json sitemap.xml news-sitemap.xml feed.xml)
+          FILES=(analises css/br-analises.css dados-br/analises.json dados-br/marcos-af-previsao.json sitemap.xml news-sitemap.xml feed.xml)
           EXISTING=()
           for f in "${FILES[@]}"; do [[ -e "$f" ]] && EXISTING+=("$f"); done
           FILES=("${EXISTING[@]}")

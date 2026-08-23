@@ -78,6 +78,7 @@ jobs:
             scripts/atualizar_competicoes_af_previsao.py \
             scripts/validar_python_embutido_workflow.py \
             scripts/gerar_probabilidades_brasileirao.py \
+            scripts/gerar_marcos_af_previsao.py \
             scripts/reconciliar_af_continental.py \
             scripts/gerar_probabilidades_jogos.py \
             scripts/gerar_acuracia_af_previsao.py \
@@ -102,6 +103,7 @@ jobs:
           python scripts/atualizar_competicoes_af_previsao.py --self-test
           python scripts/af_previsao_continental.py --self-test
           python scripts/gerar_probabilidades_brasileirao.py --self-test
+          python scripts/gerar_marcos_af_previsao.py --self-test
           python scripts/gerar_probabilidades_jogos.py --self-test
           python scripts/gerar_acuracia_af_previsao.py --self-test
           python scripts/gerar_balanco_acuracia_temporada.py --self-test
@@ -426,6 +428,12 @@ jobs:
         if: steps.af_gate.outputs.base_valida == 'true'
         run: python scripts/gerar_probabilidades_brasileirao.py --sincronizar-historico-publicado
 
+      - name: Atualizar marcos públicos imutáveis do AF-Previsão
+        if: steps.af_gate.outputs.base_valida == 'true'
+        run: |
+          python scripts/gerar_marcos_af_previsao.py
+          python scripts/gerar_marcos_af_previsao.py --validar
+
       - name: Auditar histórico e preparar avaliação final do AF-Previsão
         if: steps.af_generate.outputs.af_updated == 'true'
         run: python scripts/avaliar_af_previsao.py --strict
@@ -535,7 +543,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "Arquivos JSON presentes e validos:"
-          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/auditoria-publicos.json dados-br/transmissoes-tv.json dados-br/auditoria-transmissoes-tv.json dados-br/status-atualizacao.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/historico-ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/agenda-clubes-br.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/avaliacao-af-previsao.json dados-br/historico-probabilidades-jogos.json dados-br/acuracia-af-previsao.json; do
+          for arq in tabela.json espn_eventos.json jogos.json resultados.json dados-br/ajustes-calendario.json dados-br/resultados-manuais.json dados-br/publicos-complementares.json dados-br/auditoria-publicos.json dados-br/transmissoes-tv.json dados-br/auditoria-transmissoes-tv.json dados-br/status-atualizacao.json dados-br/calendario-completo.json dados-br/auditoria-calendario.json dados-br/estatisticas.json dados-br/ranking-desempenho.json dados-br/historico-ranking-desempenho.json dados-br/auditoria-ranking-desempenho.json dados-br/jogadores.json dados-br/lideres-jogadores.json dados-br/auditoria-lideres-jogadores.json dados-br/jogos-detalhes.json dados-br/auditoria-jogos-detalhes.json dados-br/estatisticas-competicao.json dados-br/auditoria-estatisticas.json dados-br/auditoria-cobertura-resultados.json dados-br/competicoes-af-previsao/copa-do-brasil.json dados-br/competicoes-af-previsao/libertadores.json dados-br/competicoes-af-previsao/sul-americana.json dados-br/auditoria-competicoes-af-previsao.json dados-br/agenda-clubes-br.json dados-br/probabilidades-brasileirao.json dados-br/probabilidades-por-pontuacao.json dados-br/probabilidades-jogos.json dados-br/auditoria-probabilidades-jogos.json dados-br/probabilidades-bolao.json dados-br/participantes-bolao-classificacao.json dados-br/auditoria-probabilidades.json dados-br/historico-probabilidades.json dados-br/marcos-af-previsao.json dados-br/avaliacao-af-previsao.json dados-br/historico-probabilidades-jogos.json dados-br/acuracia-af-previsao.json; do
             if [ ! -f "$arq" ]; then
               echo "ERRO: $arq nao foi gerado."
               exit 1
@@ -1044,6 +1052,8 @@ jobs:
             "dados-br/status-atualizacao.json"
             "dados-br/historico-probabilidades-jogos.json"
             "dados-br/acuracia-af-previsao.json"
+            "dados-br/marcos-af-previsao.json"
+            "dados-br/analises.json"
           )
           if [[ "${CONTINENTAL_READY:-false}" == "true" ]]; then
             if [[ "${CONTINENTAL_CHANGED:-false}" != "true" || "${AF_UPDATED:-false}" == "true" ]]; then
@@ -1162,6 +1172,7 @@ jobs:
             "analises"
             "dados-br/analises.json"
             "dados-br/historico-probabilidades-continentais.json"
+            "dados-br/marcos-af-previsao.json"
             "dados-br/melhores-momentos-copa-do-brasil.json"
             "sitemap.xml"
             "news-sitemap.xml"
