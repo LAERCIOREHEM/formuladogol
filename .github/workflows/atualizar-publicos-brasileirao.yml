@@ -45,8 +45,10 @@ jobs:
           set -euo pipefail
           python -m py_compile \
             scripts/atualizar_publicos_brasileirao.py \
+            scripts/completar_publicos_ia.py \
             scripts/gerar_estatisticas_competicao_brasileirao.py
           python scripts/atualizar_publicos_brasileirao.py --self-test
+          python scripts/completar_publicos_ia.py --self-test
           python -m json.tool resultados.json >/dev/null
           python -m json.tool dados-br/jogos-detalhes.json >/dev/null
           python -m json.tool dados-br/publicos-complementares.json >/dev/null
@@ -55,10 +57,21 @@ jobs:
       - name: Buscar somente públicos ainda ausentes
         id: coleta
         shell: bash
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           set -euo pipefail
           cp dados-br/publicos-complementares.json /tmp/publicos-antes.json
           python scripts/atualizar_publicos_brasileirao.py --max-rodadas 3
+
+          # Camada de resgate: a matéria consolidada da rodada no ge só sai quando
+          # a rodada inteira termina, mas a reportagem de cada jogo traz a ficha
+          # técnica poucas horas após o apito. Só roda quando ainda há lacuna.
+          python scripts/completar_publicos_ia.py \
+            --grace-horas 2 \
+            --max-jogos 10 \
+            --max-tentativas 8 || echo "Camada de IA indisponível nesta execução; seguindo com o determinístico."
+
           NOVOS="$(python - <<'PY'
           import json
           antes = json.load(open('/tmp/publicos-antes.json', encoding='utf-8'))
@@ -132,6 +145,7 @@ jobs:
 
           FILES=(
             "dados-br/publicos-complementares.json"
+            "dados-br/estado-publicos-ia.json"
             "dados-br/auditoria-publicos.json"
             "dados-br/jogos-detalhes.json"
             "dados-br/estatisticas-competicao.json"
