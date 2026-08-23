@@ -1,13 +1,35 @@
 {
   "_comentario": "Controle de tentativas da camada de IA de público. \"esgotados\" faz o orquestrador parar de redisparar o coletor para partidas cujo público nunca foi divulgado.",
-  "gerado_em": "2026-08-23T11:48:52-03:00",
-  "jogos": {},
+  "gerado_em": "2026-08-23T18:21:11-03:00",
+  "jogos": {
+    "401841200": {
+      "tentativas": 1,
+      "ultima_tentativa": "2026-08-23T18:21:11-03:00",
+      "rodada": 24,
+      "partida": "Vitória x Bahia",
+      "esgotado": false
+    },
+    "401841202": {
+      "tentativas": 1,
+      "ultima_tentativa": "2026-08-23T18:21:11-03:00",
+      "rodada": 24,
+      "partida": "Bragantino x Grêmio",
+      "esgotado": false
+    },
+    "401841203": {
+      "tentativas": 1,
+      "ultima_tentativa": "2026-08-23T18:21:11-03:00",
+      "rodada": 24,
+      "partida": "Palmeiras x Vasco da Gama",
+      "esgotado": false
+    }
+  },
   "esgotados": [],
   "ultima_execucao": {
-    "pendentes_avaliados": 0,
+    "pendentes_avaliados": 3,
     "aceitos": 0,
     "rejeitados": 0,
-    "nao_encontrados": 0,
-    "erro": "Nenhuma partida elegível para a camada de IA."
+    "nao_encontrados": 3,
+    "erro": ""
   }
 }
