@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-08-17T22:28:45-03:00",
+  "atualizado_em": "2026-08-22T22:19:30-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
@@ -9,8 +9,8 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 1627,
-    "playlist_items": 26,
+    "unidades": 1625,
+    "playlist_items": 24,
     "search": 16,
     "channels": 1,
     "videos": 0
@@ -20,46 +20,72 @@
     "fim": null
   },
   "resumo_geral_antes": {
-    "jogos_resultados": 225,
-    "ge": 220,
+    "jogos_resultados": 227,
+    "ge": 222,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 225
+    "com_fonte_preferida": 227
   },
   "resumo_geral_depois": {
-    "jogos_resultados": 225,
-    "ge": 220,
+    "jogos_resultados": 227,
+    "ge": 222,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 225
+    "com_fonte_preferida": 227
   },
   "resumo_janela_antes": {
-    "jogos_resultados": 225,
-    "ge": 220,
+    "jogos_resultados": 227,
+    "ge": 222,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 225
+    "com_fonte_preferida": 227
   },
   "resumo_janela_depois": {
-    "jogos_resultados": 225,
-    "ge": 220,
+    "jogos_resultados": 227,
+    "ge": 222,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 225
+    "com_fonte_preferida": 227
   },
   "mantidos_preferidos_na_janela": [
+    {
+      "event_id": "401841204",
+      "rodada": 24,
+      "mandante": "Internacional",
+      "visitante": "Atlético-MG",
+      "placar_mandante": 0,
+      "placar_visitante": 0,
+      "motivo": "mantido: fonte preferida (ge)",
+      "fonte_anterior": "GE TV / YouTube",
+      "channel_title": "",
+      "titulo_anterior": "INTERNACIONAL 0 X 0 ATLÉTICO-MG | MELHORES MOMENTOS | 24ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+      "url_anterior": "https://www.youtube.com/watch?v=4hGzHO6domw"
+    },
+    {
+      "event_id": "401841205",
+      "rodada": 24,
+      "mandante": "Fluminense",
+      "visitante": "Remo",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "motivo": "mantido: fonte preferida (ge)",
+      "fonte_anterior": "GE TV / YouTube",
+      "channel_title": "",
+      "titulo_anterior": "FLUMINENSE 2 X 1 REMO | MELHORES MOMENTOS | 24ª RODADA CAMPEONATO BRASILEIRO 2026 | ge.globo",
+      "url_anterior": "https://www.youtube.com/watch?v=o-_hD5Q8f4Q"
+    },
     {
       "event_id": "401841191",
       "rodada": 23,
@@ -2968,8 +2994,8 @@
       "motivo": "fonte_valida_mas_prioridade_da_transmissao_e_ge",
       "fonte_anterior": "UOL Esporte / YouTube",
       "channel_title": "UOL Esporte",
-      "titulo_anterior": "MIRASSOL 2 X 1 GRÊMIO | MELHORES MOMENTOS | BRASILEIRÃO 2026",
-      "url_anterior": "https://www.youtube.com/watch?v=D_qYFxrgQqI",
+      "titulo_anterior": "Arbitragem gera polêmica em Grêmio x Mirassol; veja lances",
+      "url_anterior": "https://www.youtube.com/watch?v=5AfhJ_bGIms",
       "fonte_nova": "UOL Esporte / YouTube",
       "channel_title_novo": "UOL Esporte",
       "titulo_novo": "Arbitragem gera polêmica em Grêmio x Mirassol; veja lances",
@@ -2984,8 +3010,8 @@
       "placar_mandante": 2,
       "placar_visitante": 2,
       "motivo": "fonte_valida_mas_prioridade_da_transmissao_e_ge",
-      "fonte_anterior": "Amazon Prime Video / YouTube",
-      "channel_title": "",
+      "fonte_anterior": "Prime Video / YouTube",
+      "channel_title": "Prime Video Sport Brasil",
       "titulo_anterior": "MIRASSOL 2 X 2 SANTOS | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
       "url_anterior": "https://www.youtube.com/watch?v=aivF0uxPFtY",
       "fonte_nova": "Prime Video / YouTube",
@@ -3089,7 +3115,7 @@
         "prime"
       ],
       "query": "\"Mirassol x Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 3
+      "resultados": 2
     },
     {
       "event_id": "401841155",
