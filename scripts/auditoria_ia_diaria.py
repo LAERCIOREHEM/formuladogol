@@ -1247,8 +1247,15 @@ def self_test() -> int:
     status, reasons = final_status(quiet_triage, {}, [], [], previous_failures=1, ai_error="timeout")
     assert status == "critico" and any("dois dias" in reason for reason in reasons)
 
-    # Arquitetura: nenhum outro script ou workflow pode possuir uma chamada direta
-    # à OpenAI. Assim a centralização diária é testada no próprio runner.
+    # Arquitetura: a chamada direta à OpenAI é restrita a um conjunto FECHADO de
+    # consumidores, testado aqui no próprio runner. Além da auditoria diária, a
+    # camada de resgate de público (completar_publicos_ia.py) precisa de busca web
+    # em tempo quase real, porque a matéria consolidada da rodada no ge só sai
+    # depois que a rodada inteira termina — janela em que o site ficaria sem o
+    # dado de público que alimenta as Estatísticas.
+    OPENAI_CONSUMIDORES = {"auditoria_ia_diaria.py", "completar_publicos_ia.py"}
+    OPENAI_WORKFLOWS = {"auditoria-ia-diaria.yml", "atualizar-publicos-brasileirao.yml"}
+
     direct_api = []
     for script in SCRIPT_DIR.glob("*.py"):
         try:
@@ -1257,7 +1264,8 @@ def self_test() -> int:
             continue
         if "api.openai.com/v1/responses" in text:
             direct_api.append(script.name)
-    assert direct_api == [Path(__file__).name], f"chamada OpenAI fora da auditoria diária: {direct_api}"
+    assert set(direct_api) <= OPENAI_CONSUMIDORES, f"chamada OpenAI fora dos consumidores autorizados: {sorted(set(direct_api) - OPENAI_CONSUMIDORES)}"
+    assert Path(__file__).name in direct_api, "auditoria diária deveria manter sua própria chamada OpenAI"
     workflow_secret_refs = []
     for workflow in (ROOT / ".github" / "workflows").glob("*.yml"):
         try:
@@ -1266,7 +1274,8 @@ def self_test() -> int:
             continue
         if "secrets.OPENAI_API_KEY" in text:
             workflow_secret_refs.append(workflow.name)
-    assert workflow_secret_refs == ["auditoria-ia-diaria.yml"], f"OPENAI_API_KEY exposta a outros workflows: {workflow_secret_refs}"
+    assert set(workflow_secret_refs) <= OPENAI_WORKFLOWS, f"OPENAI_API_KEY exposta a workflows não autorizados: {sorted(set(workflow_secret_refs) - OPENAI_WORKFLOWS)}"
+    assert "auditoria-ia-diaria.yml" in workflow_secret_refs, "auditoria diária perdeu acesso ao segredo"
 
     previous = {"alerta": {"ultimo_fingerprint": alert_fingerprint("critico", ["x"]), "ultimo_enviado_em": "2026-08-01T12:00:00-03:00"}}
     assert not should_send_alert(previous, "critico", ["x"], datetime.fromisoformat("2026-08-02T12:00:00-03:00"))

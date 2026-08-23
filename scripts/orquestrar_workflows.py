@@ -63,6 +63,7 @@ ESPN_EVENTS_PATH = ROOT / "espn_eventos.json"
 STATUS_UPDATE_PATH = ROOT / "dados-br" / "status-atualizacao.json"
 PUBLIC_COMPLEMENTS_PATH = ROOT / "dados-br" / "publicos-complementares.json"
 PUBLIC_AUDIT_PATH = ROOT / "dados-br" / "auditoria-publicos.json"
+PUBLIC_AI_STATE_PATH = ROOT / "dados-br" / "estado-publicos-ia.json"
 DETAILS_PATH = ROOT / "dados-br" / "jogos-detalhes.json"
 MM_PATH = ROOT / "dados-br" / "melhores-momentos.json"
 MM_MANUAL_PATH = ROOT / "dados-br" / "melhores-momentos-manual.json"
@@ -629,6 +630,20 @@ def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> l
     complements = comp_payload.get("jogos") if isinstance(comp_payload, Mapping) else {}
     if not isinstance(complements, Mapping):
         complements = {}
+    # Partidas cujo público já se provou não divulgado por nenhuma fonte permitida
+    # deixam de ser pendência: sem isto o orquestrador redispara o coletor para
+    # sempre, gastando minuto de Actions sem chance de sucesso.
+    ai_state = load_json(PUBLIC_AI_STATE_PATH, {})
+    exhausted: set[str] = set()
+    if isinstance(ai_state, Mapping):
+        listed = ai_state.get("esgotados")
+        if isinstance(listed, list):
+            exhausted = {str(item) for item in listed if str(item or "").strip()}
+        games_state = ai_state.get("jogos")
+        if isinstance(games_state, Mapping):
+            for key, value in games_state.items():
+                if isinstance(value, Mapping) and value.get("esgotado") is True:
+                    exhausted.add(str(key))
     min_age = int(config.get("publicos", {}).get("primeira_tentativa_apos_final_minutos") or 15)
     pending: list[tuple[dict[str, Any], datetime]] = []
     for raw in rows or []:
@@ -636,7 +651,7 @@ def pending_publics(config: Mapping[str, Any], now: datetime, tz: ZoneInfo) -> l
             continue
         row = dict(raw)
         event_id = str(row.get("event_id") or row.get("id") or "").strip()
-        if not event_id:
+        if not event_id or event_id in exhausted:
             continue
         detail = details.get(event_id) if isinstance(details, Mapping) else None
         complement = complements.get(event_id) if isinstance(complements, Mapping) else None
