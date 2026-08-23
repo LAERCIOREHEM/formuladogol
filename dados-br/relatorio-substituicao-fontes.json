@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-08-22T22:19:30-03:00",
+  "atualizado_em": "2026-08-22T22:38:59-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
@@ -9,8 +9,8 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 1625,
-    "playlist_items": 24,
+    "unidades": 1626,
+    "playlist_items": 25,
     "search": 16,
     "channels": 1,
     "videos": 0
@@ -20,44 +20,44 @@
     "fim": null
   },
   "resumo_geral_antes": {
-    "jogos_resultados": 227,
+    "jogos_resultados": 228,
     "ge": 222,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "com_fonte_preferida": 227
   },
   "resumo_geral_depois": {
-    "jogos_resultados": 227,
-    "ge": 222,
+    "jogos_resultados": 228,
+    "ge": 223,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 227
+    "com_fonte_preferida": 228
   },
   "resumo_janela_antes": {
-    "jogos_resultados": 227,
+    "jogos_resultados": 228,
     "ge": 222,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "com_fonte_preferida": 227
   },
   "resumo_janela_depois": {
-    "jogos_resultados": 227,
-    "ge": 222,
+    "jogos_resultados": 228,
+    "ge": 223,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 227
+    "com_fonte_preferida": 228
   },
   "mantidos_preferidos_na_janela": [
     {
@@ -2949,6 +2949,20 @@
   ],
   "substituidos_para_fontes_preferidas": [
     {
+      "event_id": "401841206",
+      "rodada": 24,
+      "mandante": "Cruzeiro",
+      "visitante": "Flamengo",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "motivo": "sem_link_preferido",
+      "fonte_nova": "GE TV / YouTube",
+      "channel_title_novo": "ge tv",
+      "titulo_novo": "FLAMENGO 2 X 1 CRUZEIRO | MELHORES MOMENTOS | CONMEBOL LIBERTADORES 2026 | ge tv",
+      "url_nova": "https://www.youtube.com/watch?v=pGOvtqZ-69s",
+      "metodo": "playlistItems"
+    },
+    {
       "event_id": "401841158",
       "rodada": 20,
       "mandante": "Athletico-PR",
@@ -3128,7 +3142,7 @@
         "prime"
       ],
       "query": "\"Mirassol x Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 6
+      "resultados": 0
     },
     {
       "event_id": "401841155",
@@ -3219,7 +3233,7 @@
         "prime"
       ],
       "query": "\"Bahia x Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 2
+      "resultados": 3
     },
     {
       "event_id": "401840998",
