@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import sys
@@ -35,6 +36,24 @@ def validate(root: Path) -> None:
     assert "analysis-round-nav" in hub, "hub sem arquivo interno de análises"
     menu_slugs = [str(article.get("slug") or "") for article in articles]
     menu_labels = [str(article.get("rotulo_menu") or "") for article in articles]
+
+    milestones_path = root / "dados-br" / "marcos-af-previsao.json"
+    assert milestones_path.exists(), "marcos públicos do AF-Previsão ausentes"
+    milestones = json.loads(milestones_path.read_text(encoding="utf-8"))
+    milestone_rows = milestones.get("marcos") or []
+    assert milestones.get("total_marcos") == len(milestone_rows), "marcos AF-Previsão divergentes"
+    milestone_by_round = {
+        int(item.get("rodada") or 0): item
+        for item in milestone_rows
+        if item.get("tipo") == "brasileirao_fechamento"
+    }
+    milestone_ids = [str(item.get("id") or "") for item in milestone_rows]
+    assert all(milestone_ids) and len(milestone_ids) == len(set(milestone_ids)), "marcos AF-Previsão com ids ausentes/duplicados"
+    for milestone in milestone_rows:
+        clubs = milestone.get("clubes") or []
+        assert len(clubs) == 20 and len({str(row.get("clube") or "") for row in clubs}) == 20, f"{milestone.get('id')}: marco sem vinte clubes"
+        canonical = json.dumps(clubs, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        assert milestone.get("hash_20_clubes") == hashlib.sha256(canonical.encode("utf-8")).hexdigest(), f"{milestone.get('id')}: hash dos vinte clubes divergente"
 
     for article in articles:
         identifier = editorial_id(article)
@@ -84,6 +103,13 @@ def validate(root: Path) -> None:
             assert f'data-fdg-analise-rodada="{round_number}"' in text, f"{slug}: marcador de rodada ausente"
             assert text.count('class="analysis-game-card"') == int(article.get("jogos_concluidos") or 0), f"{slug}: jogos divergentes"
             assert "Padrão dos percentuais" in text, f"{slug}: explicação de percentuais ausente"
+            milestone = milestone_by_round.get(round_number)
+            assert milestone is not None, f"{slug}: editorial sem marco público imutável da R{round_number}"
+            af_meta = article.get("af_marco") or {}
+            assert af_meta.get("marco_id") == milestone.get("id"), f"{slug}: marco editorial diverge da evolução pública"
+            assert af_meta.get("snapshot_depois_hash") == (milestone.get("fonte") or {}).get("hash_snapshot"), f"{slug}: snapshot DEPOIS diverge do marco público"
+            assert af_meta.get("hash_20_clubes_depois") == milestone.get("hash_20_clubes"), f"{slug}: os 20 clubes do editorial divergem do marco público"
+            assert af_meta.get("snapshot_antes_hash"), f"{slug}: snapshot ANTES não está auditado"
         elif article_type == "copa_do_brasil_fase":
             confrontos = int(article.get("confrontos") or 0)
             classificados = article.get("classificados") or []

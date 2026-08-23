@@ -32,7 +32,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="favicon-formula-do-gol-512.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-formula-do-gol.png">
   <link rel="shortcut icon" href="favicon-formula-do-gol.ico">
-  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260817-gols-contra-v3">
+  <link rel="stylesheet" href="css/br-estatisticas.css?v=20260823-marcos-af-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260801-footer-institucional-v1">
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
@@ -316,7 +316,7 @@
                   <p><strong>&lt;0,001% não é impossível:</strong> significa que o evento ficou abaixo da resolução visual publicada; o diagnóstico matemático de impossibilidade é tratado separadamente.</p>
                   <p><strong>Posição e pontos:</strong> aparecem como inteiros para facilitar a leitura; as médias decimais permanecem guardadas no JSON para auditoria.</p>
                   <p><strong>Tendência recente:</strong> o modelo incorpora uma camada de suavização exponencial inspirada na lógica de Holt-Winters para captar evolução ou queda recente. Ela usa os últimos 12 jogos de forma parcimoniosa, pesa 8% e não pode alterar em mais de 10% a taxa de gols prevista para uma partida.</p>
-                  <p><strong>Histórico auditável:</strong> cada clube guarda, no próprio card, a evolução de posição, pontos e probabilidades. Os snapshots só são criados quando o estado esportivo muda e ficam encadeados por SHA-256 para permitir a avaliação posterior do modelo.</p>
+                  <p><strong>Histórico auditável:</strong> o AF-Previsão preserva todos os snapshots técnicos quando o estado esportivo muda e, para a evolução pública, fixa marcos imutáveis de fechamento. Assim, a linha Rxx mostrada no clube usa exatamente o mesmo estado probabilístico dos editoriais da rodada; os registros permanecem protegidos por SHA-256.</p>
                 </div>
               </div>
 
@@ -361,7 +361,7 @@
                     </article>
                     <article id="metodo-residuais">
                       <span class="probability-method-step">07</span>
-                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,001%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico cria um novo snapshot apenas quando o estado esportivo muda e registra rodada, projeções, distribuição completa das posições e probabilidades. Os registros são encadeados por SHA-256, permitindo detectar alterações retroativas, e aparecem de forma compacta dentro do card de cada clube. A avaliação final só será exibida nesta própria aba depois da conclusão do Brasileirão e das competições que alteram as vagas continentais; até lá, nenhum bloco vazio ocupa a página.</p></div>
+                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,001%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico técnico cria um novo snapshot quando o estado esportivo muda e registra rodada, projeções, distribuição completa das posições e probabilidades. Sobre ele, a interface publica apenas marcos imutáveis de fechamento — Rxx para o Brasileirão e CB/CONT para fechamentos continentais auditados —, sempre vinculados por SHA-256 ao snapshot factual correspondente. Uma rodada que não alcance o critério de fechamento editorial não recebe um marco Rxx artificial; seus efeitos continuam preservados no histórico após cada jogo do clube, disponível como detalhe secundário. A avaliação final só será exibida nesta própria aba depois da conclusão do Brasileirão e das competições que alteram as vagas continentais; até lá, nenhum bloco vazio ocupa a página.</p></div>
                     </article>
                     <article id="metodo-validacao">
                       <span class="probability-method-step">08</span>
@@ -465,7 +465,7 @@
 
   <script src="js/br-estatisticas-ordem.js?v=20260816-ordem-canonica-v1"></script>
   <script src="js/br-classificacao-live.js?v=20260816-live-fatos-v1"></script>
-  <script src="js/br-estatisticas.js?v=20260817-gols-contra-v3"></script>
+  <script src="js/br-estatisticas.js?v=20260823-marcos-af-v1"></script>
   <script src="js/br-config.js?v=20260712-menu-publico-login-v1"></script>
   <script src="js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>

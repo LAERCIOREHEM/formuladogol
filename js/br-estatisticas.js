@@ -14,6 +14,7 @@
     probabilities: "dados-br/probabilidades-brasileirao.json",
     probabilitiesAudit: "dados-br/auditoria-probabilidades.json",
     probabilitiesHistory: "dados-br/historico-probabilidades.json",
+    probabilityMilestones: "dados-br/marcos-af-previsao.json",
     probabilityModelsAudit: "dados-br/auditoria-modelos-af-previsao.json",
     probabilityEvaluation: "dados-br/avaliacao-af-previsao.json",
     pointsThresholds: "dados-br/probabilidades-por-pontuacao.json",
@@ -48,6 +49,7 @@
     probabilities: null,
     probabilitiesAudit: null,
     probabilitiesHistory: null,
+    probabilityMilestones: null,
     probabilityModelsAudit: null,
     probabilityEvaluation: null,
     pointsThresholds: null,
@@ -1751,6 +1753,17 @@
   }
 
   function probabilityClubHistoryRows(clubName, limit = 12) {
+    const milestones = Array.isArray(state.probabilityMilestones?.marcos) ? state.probabilityMilestones.marcos : [];
+    return milestones
+      .map((milestone) => {
+        const entry = probabilityHistoryClubRow(milestone, clubName);
+        return entry ? { ...entry, stateKey: String(milestone?.hash_marco || milestone?.id || "") } : null;
+      })
+      .filter(Boolean)
+      .slice(-Math.max(1, Number(limit) || 12));
+  }
+
+  function probabilityClubGameHistoryRows(clubName, limit = 10) {
     const snapshots = Array.isArray(state.probabilitiesHistory?.snapshots) ? state.probabilitiesHistory.snapshots : [];
     const rows = [];
     snapshots.forEach((snapshot) => {
@@ -1760,19 +1773,22 @@
       if (rows.length && rows[rows.length - 1].stateKey === key) return;
       rows.push({ ...entry, stateKey: key });
     });
-    return rows.slice(-Math.max(1, Number(limit) || 12));
+    return rows.slice(-Math.max(1, Number(limit) || 10));
   }
 
   function probabilityHistoryReference(snapshot, row) {
+    const milestoneLabel = String(snapshot?.rotulo || "").trim();
+    if (milestoneLabel) return milestoneLabel;
     const clubRound = Number(row?.rodada_referencia_clube);
     if (Number.isFinite(clubRound) && clubRound > 0) return `R${integer(clubRound)}`;
     const globalRound = Number(snapshot?.rodada_referencia);
     if (Number.isFinite(globalRound) && globalRound > 0) return `R${integer(globalRound)}`;
-    return dateBR(snapshot?.gerado_em);
+    return dateBR(snapshot?.referencia_em || snapshot?.gerado_em);
   }
 
   function probabilityClubHistoryDetails(club) {
     const historyRows = probabilityClubHistoryRows(club?.clube, 10);
+    const gameHistoryRows = probabilityClubGameHistoryRows(club?.clube, 8);
     const currentCalculatedAt = state.probabilities?.calculado_em || state.probabilities?.gerado_em || "";
     const currentEntry = club ? {
       snapshot: { gerado_em: currentCalculatedAt },
@@ -1795,13 +1811,20 @@
       const lib = probabilityDisplayText(isCurrent ? probabilityFieldDetail(club, "libertadores") : null, probabilityHistoryValue(row, "libertadores_pct"));
       const sula = probabilityDisplayText(isCurrent ? probabilityFieldDetail(club, "sul_americana") : null, probabilityHistoryValue(row, "sul_americana_pct"));
       const relegation = probabilityDisplayText(isCurrent ? probabilityFieldDetail(club, "rebaixamento") : null, Number(row?.rebaixamento_pct));
-      const referenceDetail = isCurrent ? "cálculo vigente" : dateBR(snapshot?.gerado_em);
+      const referenceDetail = isCurrent ? "cálculo vigente" : dateBR(snapshot?.referencia_em || snapshot?.gerado_em);
       return `<tr${isCurrent ? ' class="is-current"' : ""}><th scope="row"${isCurrent && snapshot?.gerado_em ? ` title="Calculado em ${escapeAttr(dateTimeBR(snapshot.gerado_em))}"` : ""}><span>${escapeHtml(reference)}</span><small>${escapeHtml(referenceDetail)}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(title)}</td><td>${escapeHtml(lib)}</td><td>${escapeHtml(sula)}</td><td>${escapeHtml(relegation)}</td></tr>`;
     }).join("");
+    const gameBody = gameHistoryRows.map(({ snapshot, row, position, points }) => {
+      const clubRound = Number(row?.rodada_referencia_clube);
+      const reference = clubRound > 0 ? `Após jogo · R${integer(clubRound)}` : "Após jogo";
+      return `<tr><th scope="row"><span>${escapeHtml(reference)}</span><small>${escapeHtml(dateBR(snapshot?.gerado_em))}</small></th><td>${position ? `${integer(position)}º` : "—"}</td><td>${points ?? "—"}</td><td>${escapeHtml(probabilityDisplayText(null, Number(row?.campeao_pct)))}</td><td>${escapeHtml(probabilityDisplayText(null, probabilityHistoryValue(row, "libertadores_pct")))}</td><td>${escapeHtml(probabilityDisplayText(null, probabilityHistoryValue(row, "sul_americana_pct")))}</td><td>${escapeHtml(probabilityDisplayText(null, Number(row?.rebaixamento_pct)))}</td></tr>`;
+    }).join("");
+    const gameHistory = gameHistoryRows.length ? `<details class="probability-game-history-details"><summary>Ver histórico após cada jogo do clube <span>${integer(gameHistoryRows.length)} registros recentes</span></summary><div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${gameBody}</tbody></table></div><p>Esta camada registra a fotografia imediatamente após partidas do próprio clube. Ela é informativa e não substitui os marcos globais usados pelos editoriais.</p></details>` : "";
     const forecastHistory = displayRows.length ? `<section class="club-forecast-history">
-      <div class="club-evolution-head"><div><span>AF-Previsão ${probabilityClubContext(club?.clube)}</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado histórico" : "estados históricos"} + cálculo atual</small></div>
+      <div class="club-evolution-head"><div><span>AF-Previsão ${probabilityClubContext(club?.clube)}</span><strong>Evolução da previsão</strong></div><small>${integer(historyRows.length)} ${historyRows.length === 1 ? "marco fechado" : "marcos fechados"} + cálculo atual</small></div>
       <div class="probability-history-scroll"><table><thead><tr><th>Referência</th><th>Pos.</th><th>Pts</th><th>Título</th><th>Libertadores</th><th>Sul-Americana</th><th>Queda</th></tr></thead><tbody>${body}</tbody></table></div>
-      <p>As linhas históricas avançam quando o clube conclui outra partida. A linha ATUAL acompanha o cálculo vigente e pode mudar quando jogos de outros clubes alteram a classificação projetada, sem criar um snapshot histórico artificial.</p>
+      <p>Rxx representa o fechamento global imutável da rodada usado pelos editoriais. Rodadas sem fechamento editorial elegível não geram um marco Rxx; seus efeitos continuam preservados no histórico após cada jogo. Marcos CB/CONT registram fechamentos continentais auditados. A linha ATUAL é dinâmica e pode mudar a qualquer novo fato esportivo.</p>
+      ${gameHistory}
     </section>` : "";
     return `<details class="probability-history-details">
       <summary>Evolução do clube <span>AF-Score + AF-Previsão ${probabilityClubContext(club?.clube)}</span></summary>
@@ -2275,9 +2298,9 @@
   function renderProbabilityEvolution() {
     const target = $("probabilidades-evolucao");
     if (!target) return;
-    const snapshots = Array.isArray(state.probabilitiesHistory?.snapshots) ? state.probabilitiesHistory.snapshots : [];
+    const snapshots = Array.isArray(state.probabilityMilestones?.marcos) ? state.probabilityMilestones.marcos : [];
     if (!snapshots.length) {
-      target.innerHTML = `<section class="probability-evolution-section"><div class="probability-section-head"><div><div class="kicker">Histórico versionado</div><h3>Evolução das probabilidades</h3></div><span>0 snapshots</span></div><div class="probability-evolution-empty"><strong>O histórico ainda não começou.</strong><p>Quando o primeiro estado íntegro for publicado, esta área passará a guardar a evolução sem criar registros artificiais a cada execução.</p></div></section>`;
+      target.innerHTML = `<section class="probability-evolution-section"><div class="probability-section-head"><div><div class="kicker">Histórico versionado</div><h3>Evolução das probabilidades</h3></div><span>0 marcos</span></div><div class="probability-evolution-empty"><strong>Os marcos públicos ainda não começaram.</strong><p>A evolução principal usa apenas fechamentos imutáveis e auditados; o histórico técnico completo continua preservado separadamente.</p></div></section>`;
       return;
     }
     const latest = snapshots[snapshots.length - 1];
@@ -2302,15 +2325,17 @@
       const explicit = String(club?.exibicao?.[detailKey] || "").trim();
       const display = probabilityDisplayText(explicit ? { exibicao: explicit } : null, value);
       const relative = value <= 0 ? 0 : Math.max(2, (value / max) * 100);
-      return `<div class="probability-evolution-row"><time>${escapeHtml(dateTimeBR(snapshot?.gerado_em))}</time><div><i style="width:${relative.toFixed(2)}%"></i></div><strong>${escapeHtml(display)}</strong></div>`;
+      const label = probabilityHistoryReference(snapshot, club);
+      const detail = dateBR(snapshot?.referencia_em || snapshot?.gerado_em);
+      return `<div class="probability-evolution-row"><time><strong>${escapeHtml(label)}</strong><small>${escapeHtml(detail)}</small></time><div><i style="width:${relative.toFixed(2)}%"></i></div><strong>${escapeHtml(display)}</strong></div>`;
     }).join("");
     target.innerHTML = `<section class="probability-evolution-section">
-      <div class="probability-section-head"><div><div class="kicker">Histórico versionado</div><h3>Evolução das probabilidades</h3></div><span>${integer(historyRows.length)} ${historyRows.length === 1 ? "estado do clube" : "estados do clube"}</span></div>
+      <div class="probability-section-head"><div><div class="kicker">Histórico versionado</div><h3>Evolução das probabilidades</h3></div><span>${integer(historyRows.length)} ${historyRows.length === 1 ? "marco público" : "marcos públicos"}</span></div>
       <div class="probability-evolution-controls">
         <label><span>Clube</span><select data-probability-history-club>${clubNames.map((name) => `<option value="${escapeAttr(name)}"${name === state.probabilityHistoryClub ? " selected" : ""}>${escapeHtml(name)}</option>`).join("")}</select></label>
         <label><span>Evento</span><select data-probability-history-metric>${Object.entries(PROBABILITY_HISTORY_METRICS).map(([key, item]) => `<option value="${key}"${key === state.probabilityHistoryMetric ? " selected" : ""}>${escapeHtml(item.label)}</option>`).join("")}</select></label>
       </div>
-      <div class="probability-evolution-caption"><strong>${escapeHtml(state.probabilityHistoryClub)}</strong><span>${escapeHtml(metric.label)} · uma referência por partida concluída do clube</span></div>
+      <div class="probability-evolution-caption"><strong>${escapeHtml(state.probabilityHistoryClub)}</strong><span>${escapeHtml(metric.label)} · fechamentos imutáveis usados também pelos editoriais</span></div>
       ${historyRows.length ? `<div class="probability-evolution-list">${rowsHtml}</div>` : `<div class="probability-evolution-empty"><strong>Sem série suficiente para esta combinação.</strong></div>`}
     </section>`;
   }
@@ -2341,7 +2366,7 @@
       <article><span>Margem numérica</span><strong>${Number.isFinite(margin) ? `±${number(margin, 3)} p.p.` : "—"}</strong><small>pior caso aproximado, 95%</small></article>
       <article><span>Forma recente</span><strong>${Number.isFinite(trendWindow) ? `${integer(trendWindow)} jogos` : "Aguardando"}</strong><small>${Number.isFinite(trendWeight) ? `${number(trendWeight * 100, 0)}% de peso` : "peso controlado"}${Number.isFinite(trendLimit) ? ` · limite ±${number(trendLimit, 0)}%` : ""}</small></article>
       <article><span>Resolução visual</span><strong>&lt;${number(threshold, 3)}%</strong><small>zero observado não vira impossibilidade</small></article>
-      <article><span>Histórico público</span><strong>${integer(state.probabilitiesHistory?.total_snapshots ?? state.probabilityEvaluation?.cobertura?.snapshots)}</strong><small>${state.probabilityEvaluation?.integridade_historico?.encadeado ? "cadeia SHA-256 íntegra" : "encadeamento após a próxima atualização"}</small></article>`;
+      <article><span>Marcos públicos</span><strong>${integer(state.probabilityMilestones?.total_marcos ?? 0)}</strong><small>fechamentos imutáveis · histórico técnico preservado</small></article>`;
   }
 
   function renderProbabilityEvaluation() {
@@ -2615,7 +2640,7 @@
   }
 
   async function carregarDados() {
-    const [leaders, competition, details, ranking, rankingHistory, table, results, schedule, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityModelsAudit, probabilityEvaluation, pointsThresholds, updateStatus, continentalAudit] = await Promise.all([
+    const [leaders, competition, details, ranking, rankingHistory, table, results, schedule, audit, probabilities, probabilitiesAudit, probabilitiesHistory, probabilityMilestones, probabilityModelsAudit, probabilityEvaluation, pointsThresholds, updateStatus, continentalAudit] = await Promise.all([
       fetchJson(FILES.leaders, { status: "aguardando_workflow", artilharia: [], assistencias: [] }),
       fetchJson(FILES.competition, { resumo: {}, performance_por_partida: {}, sequencias: {}, publico: {}, gols_por_clube: [], jogos: [] }),
       fetchJson(FILES.details, { jogos: {} }),
@@ -2628,6 +2653,7 @@
       fetchJson(FILES.probabilities, { status: "aguardando_workflow", clubes: [], partidas_restantes: [] }),
       fetchJson(FILES.probabilitiesAudit, { status: "aguardando_workflow" }),
       fetchJson(FILES.probabilitiesHistory, { total_snapshots: 0, snapshots: [] }),
+      fetchJson(FILES.probabilityMilestones, { total_marcos: 0, marcos: [] }),
       fetchJson(FILES.probabilityModelsAudit, { status: "aguardando_workflow" }),
       fetchJson(FILES.probabilityEvaluation, { status: "aguardando_primeira_execucao", publicar_na_interface: false }),
       fetchJson(FILES.pointsThresholds, { status: "aguardando_workflow", niveis: [] }),
@@ -2647,6 +2673,7 @@
     state.probabilities = probabilities;
     state.probabilitiesAudit = probabilitiesAudit;
     state.probabilitiesHistory = probabilitiesHistory;
+    state.probabilityMilestones = probabilityMilestones;
     state.probabilityModelsAudit = probabilityModelsAudit;
     state.probabilityEvaluation = probabilityEvaluation;
     state.pointsThresholds = pointsThresholds;

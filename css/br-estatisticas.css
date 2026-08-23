@@ -2606,3 +2606,26 @@ body > .container > section.hero > img {
   .stats-own-goal-row > div:nth-child(2) span { font-size:9px; }
   .stats-own-goal-value > strong { font-size:21px; }
 }
+
+/* AF-Previsão: marcos públicos canônicos + histórico técnico por jogo. */
+.probability-evolution-row time strong,
+.probability-evolution-row time small { display: block; text-align: left; }
+.probability-evolution-row time strong { color: #f8fafc; font-size: 10px; font-weight: 950; letter-spacing: .02em; }
+.probability-evolution-row time small { margin-top: 2px; color: var(--muted-2); font-size: 8px; }
+.probability-game-history-details { margin-top: 11px; border-top: 1px solid rgba(148,163,184,.10); }
+.probability-game-history-details > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 1px 0;
+  color: #cbd5e1;
+  font-size: 9px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.probability-game-history-details > summary span { color: var(--muted-2); font-size: 8px; font-weight: 600; }
+.probability-game-history-details > p { margin: 8px 1px 0; color: var(--muted-2); font-size: 8px; line-height: 1.45; }
+@media (max-width: 560px) {
+  .probability-game-history-details > summary { align-items: flex-start; flex-direction: column; gap: 3px; }
+}

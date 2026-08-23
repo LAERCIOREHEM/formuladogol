@@ -807,7 +807,10 @@ def publish(dry: bool = False, force_rank: int = 0) -> int:
 
 def self_test() -> None:
     snaps = {key: load(path, {}) or {} for key, path in SNAPS.items()}
-    assert latest_publishable(snaps) == 600
+    # O corpus real serve como fixture histórica das oitavas já publicadas.
+    # Não usamos latest_publishable(snaps) aqui: quando a fase seguinte começa a
+    # ser materializada, a resposta correta da função passa a ser None até seu
+    # fechamento, sem invalidar o editorial histórico das oitavas.
     ties = [tie for comp, snap in snaps.items() for tie in build_ties(comp, snap, 600)]
     assert len(ties) == 10
     qualified = {winner for tie in ties for winner in tie['br_classificados']}

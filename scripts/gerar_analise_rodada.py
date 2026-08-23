@@ -32,6 +32,7 @@ TOTAL_JOGOS_RODADA = 10
 ARQUIVO_MANIFESTO = Path("dados-br/analises.json")
 ARQUIVO_CONFIG = Path("dados-br/config-analises.json")
 ARQUIVO_ACURACIA = Path("dados-br/acuracia-af-previsao.json")
+ARQUIVO_MARCOS_AF = Path("dados-br/marcos-af-previsao.json")
 CAMINHO_ANALISES = Path("analises")
 MARCADOR = "fdg-analise-rodada"
 LIMITE_CLUBES_MOVIMENTOS = 8
@@ -319,24 +320,52 @@ def estado_rodada(rodada: int, momento: datetime, config: dict[str, Any]) -> dic
     }
 
 
+def marco_af_da_rodada(rodada: int) -> dict[str, Any] | None:
+    if not ARQUIVO_MARCOS_AF.exists():
+        return None
+    dados = carregar_json(ARQUIVO_MARCOS_AF)
+    return next((
+        marco for marco in dados.get("marcos") or []
+        if marco.get("tipo") == "brasileirao_fechamento" and int(marco.get("rodada") or 0) == rodada
+    ), None)
+
+
 def snapshots_da_rodada(rodada: int) -> tuple[dict[str, Any], dict[str, Any]]:
     historico = carregar_json(Path("dados-br/historico-probabilidades.json"))
     snapshots = historico.get("snapshots") or []
     if not snapshots:
         raise ErroAnalise("Histórico de probabilidades vazio")
+
+    # Contrato canônico: quando existe um marco público, o editorial DEVE usar
+    # exatamente esse snapshot como fotografia final. Assim a página de evolução
+    # e a matéria publicada nunca contam histórias probabilísticas diferentes.
+    marco = marco_af_da_rodada(rodada)
     fim = None
-    for snapshot in snapshots:
-        if int(snapshot.get("rodada_referencia") or 0) == rodada:
-            fim = snapshot
+    if marco:
+        hash_fim = str((marco.get("fonte") or {}).get("hash_snapshot") or "").strip()
+        fim = next((item for item in snapshots if str(item.get("hash_snapshot") or "") == hash_fim), None)
+        if fim is None:
+            raise ErroAnalise(f"Marco AF da rodada {rodada} aponta para snapshot técnico inexistente: {hash_fim}")
+    else:
+        # Compatibilidade para self-tests/migração inicial. Em produção, o workflow
+        # gera os marcos antes de qualquer editorial novo.
+        for snapshot in snapshots:
+            if int(snapshot.get("rodada_referencia") or 0) == rodada:
+                fim = snapshot
     if fim is None:
         raise ErroAnalise(f"Não existe snapshot de probabilidades para a rodada {rodada}")
+
     jogos_fim = sum(int(c.get("jogos_atuais") or 0) for c in fim.get("clubes") or []) // 2
     candidatos = []
     for snapshot in snapshots:
         jogos = sum(int(c.get("jogos_atuais") or 0) for c in snapshot.get("clubes") or []) // 2
         referencia = int(snapshot.get("rodada_referencia") or 0)
-        if referencia < rodada and jogos < jogos_fim and snapshot.get("gerado_em", "") <= fim.get("gerado_em", ""):
-            candidatos.append((referencia, jogos, snapshot.get("gerado_em", ""), snapshot))
+        if (
+            referencia < rodada
+            and jogos < jogos_fim
+            and str(snapshot.get("gerado_em") or "") <= str(fim.get("gerado_em") or "")
+        ):
+            candidatos.append((referencia, jogos, str(snapshot.get("gerado_em") or ""), snapshot))
     if not candidatos:
         raise ErroAnalise(f"Não existe snapshot anterior à rodada {rodada}")
     inicio = max(candidatos, key=lambda item: (item[0], item[1], item[2]))[3]
@@ -445,6 +474,9 @@ def montar_dossie(rodada: int, estado: dict[str, Any]) -> dict[str, Any]:
         "rodada": rodada,
         "snapshot_antes": inicio.get("gerado_em"),
         "snapshot_depois": fim.get("gerado_em"),
+        "snapshot_antes_hash": inicio.get("hash_snapshot"),
+        "snapshot_depois_hash": fim.get("hash_snapshot"),
+        "marco_af_id": (marco_af_da_rodada(rodada) or {}).get("id"),
         "simulacoes": int(fim.get("simulacoes") or 0),
         "estado": estado,
         "jogos": [complemento_jogo(j, videos, detalhes) for j in jogos],
@@ -624,6 +656,23 @@ def resumo_editorial(dossie: dict[str, Any]) -> dict[str, Any]:
 def hash_editorial(dossie: dict[str, Any]) -> str:
     return hashlib.sha256(
         json.dumps(resumo_editorial(dossie), ensure_ascii=False, sort_keys=True).encode()
+    ).hexdigest()
+
+
+def hash_dossie_publicavel(dossie: dict[str, Any]) -> str:
+    """Hash factual do artigo sem metadados de ligação do marco AF.
+
+    Os hashes do snapshot/marco são provas de integridade armazenadas em af_marco,
+    mas não alteram o conteúdo factual do dossiê. Mantê-los fora deste hash evita
+    invalidar editoriais históricos apenas por uma migração de rastreabilidade.
+    """
+    payload = {
+        chave: valor
+        for chave, valor in dossie.items()
+        if chave not in {"snapshot_antes_hash", "snapshot_depois_hash", "marco_af_id"}
+    }
+    return hashlib.sha256(
+        json.dumps(payload, ensure_ascii=False, sort_keys=True).encode()
     ).hexdigest()
 
 
@@ -1225,7 +1274,13 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
         "modificado_em": modificado,
         "jogos_concluidos": dossie["estado"]["jogos_concluidos"],
         "jogos_pendentes": dossie["estado"]["jogos_pendentes"],
-        "hash_dossie": hashlib.sha256(json.dumps(dossie, ensure_ascii=False, sort_keys=True).encode()).hexdigest(),
+        "hash_dossie": hash_dossie_publicavel(dossie),
+        "af_marco": {
+            "marco_id": dossie.get("marco_af_id"),
+            "snapshot_antes_hash": dossie.get("snapshot_antes_hash"),
+            "snapshot_depois_hash": dossie.get("snapshot_depois_hash"),
+            "hash_20_clubes_depois": (marco_af_da_rodada(rodada) or {}).get("hash_20_clubes"),
+        },
         "email_assunto": f"Fórmula do Gol: análise da rodada {rodada} publicada",
         "email_chamada": f"A análise da rodada {rodada} do Brasileirão já está no ar.",
     }
@@ -1325,9 +1380,7 @@ def executar(args: argparse.Namespace) -> int:
         print(f"Rodada {rodada} não elegível: {estado['motivo']} ({estado['jogos_concluidos']}/{TOTAL_JOGOS_RODADA}).")
         return 0
     dossie = montar_dossie(rodada, estado)
-    hash_dossie = hashlib.sha256(
-        json.dumps(dossie, ensure_ascii=False, sort_keys=True).encode()
-    ).hexdigest()
+    hash_dossie = hash_dossie_publicavel(dossie)
     hash_fatos_editoriais = hash_editorial(dossie)
     manifesto = carregar_manifesto()
     artigos = manifesto.get("artigos") or []
