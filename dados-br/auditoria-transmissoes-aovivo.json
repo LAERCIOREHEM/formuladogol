@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 63,
-    "jogos_foco": 63,
-    "descobertas_antecipadas": 0,
+    "jogos_na_janela": 68,
+    "jogos_foco": 1,
+    "descobertas_antecipadas": 5,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 39,
-    "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 40,
-    "search_api_jogos_pulados_grade_estavel": 23,
+    "candidatos_oficiais_encontrados": 22,
+    "search_api_fallback_chamadas": 4,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 5,
-    "sem_transmissao": 58,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,54 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841205",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Fluminense x Remo",
-      "data_iso": "2026-08-22T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841204",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Internacional x Atlético-MG",
-      "data_iso": "2026-08-22T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841206",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Cruzeiro x Flamengo",
-      "data_iso": "2026-08-22T20:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841202",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bragantino x Grêmio",
-      "data_iso": "2026-08-23T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841203",
       "rodada": 24,
       "competicao_chave": "brasileirao",
@@ -128,7 +80,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841200",
@@ -137,66 +89,6 @@
       "competicao_nome": "Brasileirão",
       "jogo": "Vitória x Bahia",
       "data_iso": "2026-08-23T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841199",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x São Paulo",
-      "data_iso": "2026-08-23T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841201",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Santos x Mirassol",
-      "data_iso": "2026-08-23T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841207",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Coritiba x Corinthians",
-      "data_iso": "2026-08-23T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841198",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Athletico-PR",
-      "data_iso": "2026-08-24T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401909066",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Cruzeiro x Atlético-MG",
-      "data_iso": "2026-08-25T21:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -214,7 +106,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401909113",
@@ -228,43 +120,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401909064",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Internacional x Grêmio",
-      "data_iso": "2026-08-27T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841216",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Vitória",
-      "data_iso": "2026-08-29T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841209",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Bragantino",
-      "data_iso": "2026-08-29T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841212",
@@ -278,235 +134,7 @@
         "CazéTV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841208",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Athletico-PR x Fluminense",
-      "data_iso": "2026-08-30T11:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841214",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Corinthians x Santos",
-      "data_iso": "2026-08-30T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841213",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Botafogo",
-      "data_iso": "2026-08-30T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841217",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Chapecoense",
-      "data_iso": "2026-08-30T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841211",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Mirassol x Palmeiras",
-      "data_iso": "2026-08-30T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841215",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Internacional",
-      "data_iso": "2026-08-30T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841210",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Remo x Coritiba",
-      "data_iso": "2026-08-31T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401909112",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Atlético-MG x Cruzeiro",
-      "data_iso": "2026-09-01T21:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841006",
-      "rodada": 4,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Mirassol",
-      "data_iso": "2026-09-02T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401909110",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Santos x Palmeiras",
-      "data_iso": "2026-09-02T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401909111",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Vitória x Vasco da Gama",
-      "data_iso": "2026-09-02T21:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401909114",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Grêmio x Internacional",
-      "data_iso": "2026-09-03T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841224",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bragantino x Bahia",
-      "data_iso": "2026-09-05T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841219",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Coritiba x Mirassol",
-      "data_iso": "2026-09-05T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841226",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Atlético-MG",
-      "data_iso": "2026-09-05T18:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841227",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Fluminense x Vasco da Gama",
-      "data_iso": "2026-09-05T21:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841218",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Cruzeiro x Athletico-PR",
-      "data_iso": "2026-09-06T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841223",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Internacional x Santos",
-      "data_iso": "2026-09-06T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841225",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Remo x Flamengo",
-      "data_iso": "2026-09-06T16:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841221",
@@ -520,338 +148,10 @@
         "CazéTV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841220",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Corinthians x Chapecoense",
-      "data_iso": "2026-09-06T19:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841222",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vitória x Grêmio",
-      "data_iso": "2026-09-07T20:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401912542",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Boca Juniors x São Paulo",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401913073",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Santos x Atlético-MG",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841231",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Fluminense",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841230",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Remo",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Bragantino",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841228",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Internacional",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841232",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Coritiba x Athletico-PR",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841237",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Corinthians",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841236",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Vasco da Gama",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841235",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Mirassol x Vitória",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841234",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x São Paulo",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841233",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Santos x Cruzeiro",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401913071",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-09-16T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401912524",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "São Paulo x Boca Juniors",
-      "data_iso": "2026-09-16T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841238",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Athletico-PR x Bahia",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841239",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Chapecoense",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841240",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Corinthians x Fluminense",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841241",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Bragantino",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841246",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Palmeiras",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841245",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Mirassol x Botafogo",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841244",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Remo x Santos",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841243",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Internacional",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841247",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vasco da Gama x Coritiba",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
-      "event_id": "401841242",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vitória x Cruzeiro",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     }
   ],
   "aceitos": [
-    {
-      "event_id": "401909113",
-      "jogo": "Vasco da Gama x Vitória",
-      "fonte": "getv",
-      "video_id": "2ocY9xQVQiE",
-      "url": "https://www.youtube.com/watch?v=2ocY9xQVQiE",
-      "titulo": "AO VIVO: VASCO X VITÓRIA | QUARTAS DE FINAL | COPA DO BRASIL 2026 | ge tv",
-      "status": "upcoming",
-      "confianca": 0.875,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (90 min de diferença)"
-      ]
-    },
     {
       "event_id": "401841203",
       "jogo": "Palmeiras x Vasco da Gama",
@@ -859,6 +159,23 @@
       "video_id": "YXH_s6XP0R0",
       "url": "https://www.youtube.com/watch?v=YXH_s6XP0R0",
       "titulo": "PALMEIRAS X VASCO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
+      "status": "live",
+      "confianca": 0.925,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
+        "horário compatível (90 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401909113",
+      "jogo": "Vasco da Gama x Vitória",
+      "fonte": "getv",
+      "video_id": "2ocY9xQVQiE",
+      "url": "https://www.youtube.com/watch?v=2ocY9xQVQiE",
+      "titulo": "AO VIVO: VASCO X VITÓRIA | QUARTAS DE FINAL | COPA DO BRASIL 2026 | ge tv",
       "status": "upcoming",
       "confianca": 0.875,
       "motivos": [
@@ -929,6 +246,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "eYgY4y7lx70",
+      "url": "https://www.youtube.com/watch?v=eYgY4y7lx70",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: GETAFE X RACING CLUB | LALIGA 26/27 | 2ª RODADA",
+      "status": "live",
+      "inicio_programado": "2026-08-23T13:50:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "0XbwqAxBbvQ",
       "url": "https://www.youtube.com/watch?v=0XbwqAxBbvQ",
       "fonte": "getv",
@@ -979,16 +306,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "nPpLjkNSfis",
-      "url": "https://www.youtube.com/watch?v=nPpLjkNSfis",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: BIG 3 | FINAL + ALL STAR GAME | BASQUETE 3X3 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T13:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "zlinlSwQ3t0",
       "url": "https://www.youtube.com/watch?v=zlinlSwQ3t0",
       "fonte": "getv",
@@ -997,26 +314,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-23T18:30:00-03:00",
       "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
-      "video_id": "RqLQygVzwKE",
-      "url": "https://www.youtube.com/watch?v=RqLQygVzwKE",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "Magdalena, Patricia Salvador, Lu Barsoti e Thaís Pacholek X BR’OZ | Viva A Noite (22/08/26)",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-23T02:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "2XfDrmDWSiQ",
-      "url": "https://www.youtube.com/watch?v=2XfDrmDWSiQ",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: MANCHESTER CITY X BOURNEMOUTH | PREMIER LEAGUE 26/27 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-23T08:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
     },
     {
       "video_id": "46jYLHeKJQI",
@@ -1039,46 +336,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "7yL-kkc9Ev0",
-      "url": "https://www.youtube.com/watch?v=7yL-kkc9Ev0",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "DJOKOVIC FALA COM BARRETTO SOBRE SEU NOVO DOCUMENTÁRIO, AMIZADE COM GUGA, JOÃO FONSECA E OLIMPÍADAS",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T20:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "CetqZZvAy14",
-      "url": "https://www.youtube.com/watch?v=CetqZZvAy14",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): TROYES X PARIS FC | LIGUE 1 26/27 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T15:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "EEDufeV7ZuU",
-      "url": "https://www.youtube.com/watch?v=EEDufeV7ZuU",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): LE MANS X STADE BRESTOIS | LIGUE 1 26/27 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T15:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "L2yxDn8LXU4",
-      "url": "https://www.youtube.com/watch?v=L2yxDn8LXU4",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: VALENCIA X CELTA DE VIGO | LALIGA 26/27 | 2ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T13:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "P2zX1MvKxpY",
       "url": "https://www.youtube.com/watch?v=P2zX1MvKxpY",
       "fonte": "cazetv",
@@ -1087,16 +344,6 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-24T14:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "RCaUvDXQirE",
-      "url": "https://www.youtube.com/watch?v=RCaUvDXQirE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "MELHORES MOMENTOS: ATP CHALLENGER DE KINGSTON",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T22:00:00-03:00",
-      "motivo": "conteúdo rejeitado: melhores momentos"
     },
     {
       "video_id": "SWprYWItU4s",
@@ -1129,96 +376,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "U1ar65xJMd0",
-      "url": "https://www.youtube.com/watch?v=U1ar65xJMd0",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ATLÉTICO DE MADRID X VILLARREAL | LALIGA 26/27 | 2ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-23T11:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "VR2qJrtUD_k",
-      "url": "https://www.youtube.com/watch?v=VR2qJrtUD_k",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: LENS X AUXERRE | LIGUE 1 26/27 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T12:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "dViWumhVwUs",
-      "url": "https://www.youtube.com/watch?v=dViWumhVwUs",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): TOULOUSE X LYON | LIGUE 1 26/27 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T15:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "dVpdjMuKAtc",
-      "url": "https://www.youtube.com/watch?v=dVpdjMuKAtc",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ATHLETIC BILBAO X SEVILLA | LALIGA 26/27 | 2ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T11:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "dgqUKFUS1NE",
-      "url": "https://www.youtube.com/watch?v=dgqUKFUS1NE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ESPANYOL X REAL MADRID | LALIGA 26/27 | 2ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T15:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "eYgY4y7lx70",
-      "url": "https://www.youtube.com/watch?v=eYgY4y7lx70",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: GETAFE X RACING CLUB | LALIGA 26/27 | 2ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-23T13:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "gcW4KK1W4rw",
-      "url": "https://www.youtube.com/watch?v=gcW4KK1W4rw",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): ANGERS X LILLE | LIGUE 1 26/27 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-23T09:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "jmNzFYNKE1c",
-      "url": "https://www.youtube.com/watch?v=jmNzFYNKE1c",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: LE HAVRE X MÔNACO | LIGUE 1 26/27 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-23T11:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "nri8Dl2c3aE",
-      "url": "https://www.youtube.com/watch?v=nri8Dl2c3aE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): NICE X LORIENT | LIGUE 1 26/27 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T15:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "nyXX7v1q-xY",
       "url": "https://www.youtube.com/watch?v=nyXX7v1q-xY",
       "fonte": "cazetv",
@@ -1247,172 +404,10 @@
       "status": "upcoming",
       "inicio_programado": "2026-08-24T14:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "yUIRg4cvsv0",
-      "url": "https://www.youtube.com/watch?v=yUIRg4cvsv0",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ESTREIA DO SEIS EM UM! BAYERN X BORUSSIA NA SUPERCOPA DA ALEMANHA E REAL MADRID NA LALIGA",
-      "status": "upcoming",
-      "inicio_programado": "2026-08-22T18:20:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401841205",
-      "jogo": "Fluminense x Remo",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841204",
-      "jogo": "Internacional x Atlético-MG",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841206",
-      "jogo": "Cruzeiro x Flamengo",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841201",
-      "jogo": "Santos x Mirassol",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841207",
-      "jogo": "Coritiba x Corinthians",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841198",
-      "jogo": "Botafogo x Athletico-PR",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401909066",
-      "jogo": "Cruzeiro x Atlético-MG",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401909064",
-      "jogo": "Internacional x Grêmio",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841216",
-      "jogo": "Atlético-MG x Vitória",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841209",
-      "jogo": "São Paulo x Bragantino",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841208",
-      "jogo": "Athletico-PR x Fluminense",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841217",
-      "jogo": "Grêmio x Chapecoense",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841211",
-      "jogo": "Mirassol x Palmeiras",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841215",
-      "jogo": "Bahia x Internacional",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841210",
-      "jogo": "Remo x Coritiba",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401909112",
-      "jogo": "Atlético-MG x Cruzeiro",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401909114",
-      "jogo": "Grêmio x Internacional",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841224",
-      "jogo": "Bragantino x Bahia",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841219",
-      "jogo": "Coritiba x Mirassol",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841226",
-      "jogo": "São Paulo x Atlético-MG",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841227",
-      "jogo": "Fluminense x Vasco da Gama",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841220",
-      "jogo": "Corinthians x Chapecoense",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
-    {
-      "event_id": "401841222",
-      "jogo": "Vitória x Grêmio",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
   "sem_transmissao": [
-    {
-      "event_id": "401841205",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Fluminense x Remo",
-      "data_iso": "2026-08-22T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841204",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Internacional x Atlético-MG",
-      "data_iso": "2026-08-22T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841206",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Cruzeiro x Flamengo",
-      "data_iso": "2026-08-22T20:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841202",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bragantino x Grêmio",
-      "data_iso": "2026-08-23T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
     {
       "event_id": "401841200",
       "rodada": 24,
@@ -1421,494 +416,18 @@
       "jogo": "Vitória x Bahia",
       "data_iso": "2026-08-23T16:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841199",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x São Paulo",
-      "data_iso": "2026-08-23T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841201",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Santos x Mirassol",
-      "data_iso": "2026-08-23T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841207",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Coritiba x Corinthians",
-      "data_iso": "2026-08-23T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841198",
-      "rodada": 24,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Athletico-PR",
-      "data_iso": "2026-08-24T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401909066",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Cruzeiro x Atlético-MG",
-      "data_iso": "2026-08-25T21:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401909064",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Internacional x Grêmio",
-      "data_iso": "2026-08-27T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841216",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Vitória",
-      "data_iso": "2026-08-29T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841209",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Bragantino",
-      "data_iso": "2026-08-29T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841208",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Athletico-PR x Fluminense",
-      "data_iso": "2026-08-30T11:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841214",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Corinthians x Santos",
-      "data_iso": "2026-08-30T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841213",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Botafogo",
-      "data_iso": "2026-08-30T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841217",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Chapecoense",
-      "data_iso": "2026-08-30T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841211",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Mirassol x Palmeiras",
-      "data_iso": "2026-08-30T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841215",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Internacional",
-      "data_iso": "2026-08-30T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841210",
-      "rodada": 25,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Remo x Coritiba",
-      "data_iso": "2026-08-31T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401909112",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Atlético-MG x Cruzeiro",
-      "data_iso": "2026-09-01T21:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841006",
-      "rodada": 4,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Mirassol",
-      "data_iso": "2026-09-02T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401909110",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Santos x Palmeiras",
-      "data_iso": "2026-09-02T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401909111",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Vitória x Vasco da Gama",
-      "data_iso": "2026-09-02T21:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401909114",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Grêmio x Internacional",
-      "data_iso": "2026-09-03T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841224",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bragantino x Bahia",
-      "data_iso": "2026-09-05T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841219",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Coritiba x Mirassol",
-      "data_iso": "2026-09-05T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841226",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Atlético-MG",
-      "data_iso": "2026-09-05T18:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841227",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Fluminense x Vasco da Gama",
-      "data_iso": "2026-09-05T21:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841218",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Cruzeiro x Athletico-PR",
-      "data_iso": "2026-09-06T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841223",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Internacional x Santos",
-      "data_iso": "2026-09-06T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841225",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Remo x Flamengo",
-      "data_iso": "2026-09-06T16:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841220",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Corinthians x Chapecoense",
-      "data_iso": "2026-09-06T19:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841222",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vitória x Grêmio",
-      "data_iso": "2026-09-07T20:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401912542",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Boca Juniors x São Paulo",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401913073",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Santos x Atlético-MG",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841231",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Fluminense",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841230",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Bahia x Remo",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Bragantino",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841228",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Internacional",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841232",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Coritiba x Athletico-PR",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841237",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Corinthians",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841236",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Vasco da Gama",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841235",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Mirassol x Vitória",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841234",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Palmeiras x São Paulo",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841233",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Santos x Cruzeiro",
-      "data_iso": "2026-09-12T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401913071",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Atlético-MG x Santos",
-      "data_iso": "2026-09-16T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401912524",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "São Paulo x Boca Juniors",
-      "data_iso": "2026-09-16T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841238",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Athletico-PR x Bahia",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841239",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Atlético-MG x Chapecoense",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841240",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Corinthians x Fluminense",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841241",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Flamengo x Bragantino",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841246",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Grêmio x Palmeiras",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841245",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Mirassol x Botafogo",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841244",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Remo x Santos",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841243",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "São Paulo x Internacional",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841247",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vasco da Gama x Coritiba",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    },
-    {
-      "event_id": "401841242",
-      "rodada": 28,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vitória x Cruzeiro",
-      "data_iso": "2026-09-19T15:00:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 87,
+    "unidades": 488,
     "requisicoes": {
       "channels": 4,
-      "videos": 43,
-      "playlistItems": 40
+      "videos": 44,
+      "playlistItems": 40,
+      "search": 4
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-21T22:20:58-03:00"
+  "atualizado_em": "2026-08-23T14:31:00-03:00"
 }
