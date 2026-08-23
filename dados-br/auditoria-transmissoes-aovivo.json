@@ -15,13 +15,13 @@
   "resumo": {
     "jogos_na_janela": 68,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 5,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 23,
+    "candidatos_oficiais_encontrados": 24,
     "search_api_fallback_chamadas": 4,
     "search_api_jogos_elegiveis": 1,
     "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 5,
+    "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
   },
@@ -93,6 +93,20 @@
       "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
+    },
+    {
+      "event_id": "401841199",
+      "rodada": 24,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Chapecoense x São Paulo",
+      "data_iso": "2026-08-23T18:30:00-03:00",
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401909065",
@@ -231,6 +245,23 @@
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
         "horário compatível (60 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401841199",
+      "jogo": "Chapecoense x São Paulo",
+      "fonte": "cazetv",
+      "video_id": "FYdll9LanTc",
+      "url": "https://www.youtube.com/watch?v=FYdll9LanTc",
+      "titulo": "AO VIVO: CHAPECOENSE X SÃO PAULO | BRASILEIRÃO 2026 | 24ª RODADA",
+      "status": "live",
+      "confianca": 0.925,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
+        "horário compatível (90 min de diferença)"
       ]
     }
   ],
@@ -390,7 +421,7 @@
       "url": "https://www.youtube.com/watch?v=nyXX7v1q-xY",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: PARIS SAINT-GERMAIN X RENNES | LIGUE 1 26/27 | 1ª RODADA",
+      "titulo": "AO VIVO: RENNES X PARIS SAINT-GERMAIN | LIGUE 1 26/27 | 1ª RODADA",
       "status": "live",
       "inicio_programado": "2026-08-23T14:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -439,5 +470,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-23T16:31:02-03:00"
+  "atualizado_em": "2026-08-23T17:01:05-03:00"
 }
