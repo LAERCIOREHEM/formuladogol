@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-23T05:11:12.010494-03:00",
+  "gerado_em": "2026-08-23T11:41:25.254997-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 228,
   "total_com_estatisticas": 228,
-  "total_com_publico": 225,
+  "total_com_publico": 228,
   "total_com_eventos": 228,
   "total_com_jogadores": 228,
   "total_eventos_validados": 228,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estadio Mineirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 34166,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/cruzeiro-2-x-1-flamengo-o-publico-para-o-jogo-no-mineirao",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -579,7 +579,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T05:11:11.228722-03:00"
+      "atualizado_em": "2026-08-23T05:11:11.228722-03:00",
+      "renda": 2021735.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841204": {
       "event_id": "401841204",
@@ -591,9 +593,9 @@
       "placar_mandante": 0,
       "placar_visitante": 0,
       "estadio": "Estadio Beira-Rio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 20464,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/internacional-x-atletico-o-publico-para-a-partida-do-campeonato-brasileiro",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -1143,7 +1145,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T05:11:11.569117-03:00"
+      "atualizado_em": "2026-08-23T05:11:11.569117-03:00",
+      "renda": 1042600.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841205": {
       "event_id": "401841205",
@@ -1155,9 +1159,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 30215,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/22/hulk-faz-gol-chorado-fluminense-bate-remo-de-virada-no-rio-e-espanta-zebra-no-brasileirao.htm",
       "arbitro": "João Vitor Gobi",
       "stats": [
         {
@@ -1700,7 +1704,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T05:11:11.926808-03:00"
+      "atualizado_em": "2026-08-23T05:11:11.926808-03:00",
+      "renda": 1525343.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841191": {
       "event_id": "401841191",
@@ -128258,5 +128264,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 220,
+  "total_com_renda": 228
 }
