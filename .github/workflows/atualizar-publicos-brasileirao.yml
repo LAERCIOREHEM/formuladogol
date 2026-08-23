@@ -72,11 +72,18 @@ jobs:
             --max-jogos 10 \
             --max-tentativas 8 || echo "Camada de IA indisponível nesta execução; seguindo com o determinístico."
 
+          # A camada de IA grava complementos e propaga para jogos-detalhes, mas
+          # não reescreve a auditoria. Sem esta reconsolidação (offline, sem rede)
+          # auditoria-publicos.json fica defasada e as asserções de cobertura da
+          # etapa seguinte acusam divergência.
+          python scripts/atualizar_publicos_brasileirao.py --sem-rede
+
           NOVOS="$(python - <<'PY'
           import json
           antes = json.load(open('/tmp/publicos-antes.json', encoding='utf-8'))
           depois = json.load(open('dados-br/publicos-complementares.json', encoding='utf-8'))
-          print('true' if (antes.get('jogos') or {}) != (depois.get('jogos') or {}) else 'false')
+          mudou = (antes.get('jogos') or {}) != (depois.get('jogos') or {})
+          print('true' if mudou else 'false')
           PY
           )"
           echo "novos=$NOVOS" >> "$GITHUB_OUTPUT"
