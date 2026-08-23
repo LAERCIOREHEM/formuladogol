@@ -641,55 +641,93 @@ def normalize_completed_knockout_stage(events: list[dict[str, Any]]) -> None:
             event["fase"] = label
 
 
+def _next_knockout_stage(rank: int) -> tuple[int, str] | None:
+    ladder = {
+        400: (500, "Fase de 32"),
+        500: (600, "Oitavas de final"),
+        550: (600, "Oitavas de final"),
+        600: (700, "Quartas de final"),
+        700: (800, "Semifinal"),
+        800: (900, "Final"),
+    }
+    return ladder.get(int(rank or 0))
+
+
 def normalize_generic_pending_knockout_cohorts(events: list[dict[str, Any]]) -> int:
-    """Separa a fase seguinte quando ela chega como ``Ida/Volta`` genérico.
+    """Separa fases futuras genéricas sem exigir que a ESPN publique a fase inteira.
 
-    Caso típico: ainda existe uma chave atrasada das oitavas, já identificada
-    como rank 600, enquanto a ESPN publica todas as quartas futuras com
-    ``fase_ordem=100``. Sem separar essa coorte futura, o rank 100 vence como
-    "fase atual" e mistura o histórico genérico inteiro do torneio.
+    A ESPN pode começar a expor as quartas como simples ``Ida``/``Volta``
+    enquanto uma oitava atrasada ainda está pendente. O feed também pode
+    materializar somente parte das quartas. A versão anterior só normalizava
+    a coorte quando TODAS as equipes esperadas já apareciam; uma publicação
+    parcial deixava ``fase_ordem=100`` e fazia todo o histórico genérico virar
+    a suposta fase atual.
 
-    A inferência só é autorizada quando a fase corrente explícita está
-    estruturalmente completa e a coorte genérica futura contém EXATAMENTE a
-    quantidade de equipes esperada na fase seguinte. Assim, uma publicação
-    parcial (um ou dois confrontos apenas) nunca é promovida indevidamente.
+    Aqui a fase explícita mais recente funciona como âncora. Eventos genéricos
+    pendentes posteriores são separados em coortes cronológicas e recebem os
+    ranks seguintes (quartas, semi, final), mesmo quando a coorte ainda é
+    parcial. Isso não promove a fase parcial para o AF enquanto existe uma fase
+    anterior pendente; apenas impede que o rank 100 contamine a detecção.
     """
-    explicit_pending = [
-        event for event in events
+    specific_ranks = sorted(
+        {
+            int(event.get("fase_ordem") or 0)
+            for event in events
+            if phase_metadata_is_specific(event) and int(event.get("fase_ordem") or 0) < 900
+        },
+        reverse=True,
+    )
+    if not specific_ranks:
+        return 0
+
+    # Prefere a fase explícita que ainda tem jogo pendente; se ela acabou nesta
+    # mesma coleta, ancora na fase explícita mais avançada já conhecida.
+    pending_specific = [
+        int(event.get("fase_ordem") or 0)
+        for event in events
         if not event.get("concluido") and phase_metadata_is_specific(event)
     ]
-    if not explicit_pending:
-        return 0
-
-    current_rank = min(int(event.get("fase_ordem") or 0) for event in explicit_pending)
-    current_events = [
-        event for event in events if int(event.get("fase_ordem") or 0) == current_rank
+    anchor_rank = min(pending_specific) if pending_specific else specific_ranks[0]
+    anchor_events = [
+        event for event in events if int(event.get("fase_ordem") or 0) == anchor_rank
     ]
-    current_pairs = {event_pair_key(event) for event in current_events}
-    current_participants = {team for pair in current_pairs for team in pair if team}
-    if (
-        not current_pairs
-        or len(current_participants) != 2 * len(current_pairs)
-        or len(current_participants) < 4
-        or len(current_participants) & (len(current_participants) - 1)
-    ):
+    anchor_pairs = {event_pair_key(event) for event in anchor_events}
+    anchor_dates = [
+        when for event in anchor_events
+        if (when := parse_datetime(event.get("data_iso"))) is not None
+    ]
+    if not anchor_pairs or not anchor_dates:
         return 0
-    expected_next_team_count = len(current_participants) // 2
 
-    generic_pending: list[tuple[datetime, dict[str, Any]]] = []
+    changed = 0
+    # Se um evento da própria fase âncora veio genérico, recupera o rank pelo
+    # confronto conhecido antes de tratar as fases futuras.
     for event in events:
         if event.get("concluido") or phase_metadata_is_specific(event):
             continue
+        if event_pair_key(event) in anchor_pairs:
+            event["fase_ordem"] = anchor_rank
+            event["fase"] = anchor_events[0].get("fase") or "Fase eliminatória"
+            changed += 1
+
+    generic_pending: list[tuple[datetime, dict[str, Any]]] = []
+    anchor_last = max(anchor_dates)
+    for event in events:
+        if event.get("concluido") or phase_metadata_is_specific(event):
+            continue
+        if event_pair_key(event) in anchor_pairs:
+            continue
         when = parse_datetime(event.get("data_iso"))
-        if when is not None:
+        if when is None:
+            continue
+        # Eventos realmente futuros em relação à fase âncora. Uma tolerância de
+        # 12h absorve horários deslocados sem confundir jogos da mesma rodada.
+        if when >= anchor_last - timedelta(hours=12):
             generic_pending.append((when, event))
     if not generic_pending:
-        return 0
+        return changed
 
     generic_pending.sort(key=lambda item: (item[0], str(item[1].get("event_id") or "")))
-
-    # Ida e volta normalmente cabem em 7–10 dias. 14 dias suporta pequenos
-    # ajustes de calendário sem colar fases distintas numa única coorte.
     max_gap = timedelta(days=14)
     cohorts: list[list[tuple[datetime, dict[str, Any]]]] = []
     current: list[tuple[datetime, dict[str, Any]]] = []
@@ -704,37 +742,20 @@ def normalize_generic_pending_knockout_cohorts(events: list[dict[str, Any]]) -> 
     if current:
         cohorts.append(current)
 
-    changed = 0
+    rank_cursor = anchor_rank
     for cohort in cohorts:
-        cohort_events = [item[1] for item in cohort]
-        pairs = {event_pair_key(event) for event in cohort_events}
-        participants = {team for pair in pairs for team in pair if team}
-        inferred = knockout_stage_from_team_count(len(participants))
-        if (
-            not inferred
-            or len(participants) != expected_next_team_count
-            or len(participants) != 2 * len(pairs)
-            or any(not all(pair) for pair in pairs)
-        ):
-            continue
-
-        rank, label = inferred
-        if rank <= current_rank:
-            continue
-
-        lower = min(item[0] for item in cohort) - timedelta(days=35)
-        upper = max(item[0] for item in cohort) + timedelta(days=35)
-        for event in events:
-            if phase_metadata_is_specific(event) or event_pair_key(event) not in pairs:
+        next_stage = _next_knockout_stage(rank_cursor)
+        if next_stage is None:
+            break
+        rank_cursor, label = next_stage
+        for _when, event in cohort:
+            pair = event_pair_key(event)
+            if not all(pair):
                 continue
-            when = parse_datetime(event.get("data_iso"))
-            if when is None or not (lower <= when <= upper):
-                continue
-            event["fase_ordem"] = rank
+            event["fase_ordem"] = rank_cursor
             event["fase"] = label
             changed += 1
     return changed
-
 
 def normalize_active_knockout_stage(events: list[dict[str, Any]]) -> None:
     """Corrige fases que a ESPN devolve apenas como Ida/Volta/status agregado."""
@@ -1233,13 +1254,46 @@ def migrate_legacy_snapshot(snapshot: dict[str, Any], spec: CompetitionSpec) -> 
     return migrated
 
 
+def preserved_snapshot_age_warnings(
+    snapshot: dict[str, Any] | None,
+    *,
+    max_snapshot_age_hours: int = 24,
+) -> list[str]:
+    """Idade do fallback é observabilidade, não evidência factual de erro.
+
+    Um snapshot com 46h pode continuar perfeitamente válido quando o próximo
+    jogo conhecido ainda está no futuro. O que invalida o AF é existir partida
+    na janela crítica ou vencida sem confirmação, e não a passagem arbitrária
+    de 24 horas.
+    """
+    if not snapshot:
+        return []
+    generated = parse_datetime(snapshot.get("gerado_em"))
+    if not generated:
+        return ["snapshot anterior sem horário válido"]
+    age = now_brt() - generated
+    if age > timedelta(hours=max_snapshot_age_hours):
+        return [
+            f"snapshot anterior tem {age.total_seconds() / 3600:.1f}h; "
+            f"limite de observabilidade={max_snapshot_age_hours}h (não bloqueante sem fato esportivo novo)"
+        ]
+    return []
+
+
 def preserved_snapshot_safe_for_af(
     snapshot: dict[str, Any] | None,
     *,
     live_window_hours: int,
     max_snapshot_age_hours: int = 24,
 ) -> tuple[bool, list[str]]:
-    """Aceita fallback factual somente fora de janela de jogo e por tempo limitado."""
+    """Aceita fallback apenas quando não existe risco factual esportivo.
+
+    A idade isolada do arquivo não torna uma fotografia factual insegura. Um
+    fallback é bloqueado se a estrutura não puder alimentar o AF, se houver
+    jogo na janela crítica sem confirmação ou se existir partida vencida ainda
+    marcada como pendente. A idade acima do limite é registrada separadamente
+    como alerta operacional.
+    """
     reasons: list[str] = []
     if not snapshot or snapshot.get("status") != "ok":
         return False, ["snapshot anterior ausente ou inválido"]
@@ -1248,17 +1302,12 @@ def preserved_snapshot_safe_for_af(
     except ContinentalDataNotReady as exc:
         return False, [f"snapshot anterior não simulável: {exc}"]
 
-    generated = parse_datetime(snapshot.get("gerado_em"))
-    now = now_brt()
-    if not generated:
-        reasons.append("snapshot anterior sem horário válido")
-    else:
-        age = now - generated
-        if age > timedelta(hours=max_snapshot_age_hours):
-            reasons.append(
-                f"snapshot anterior tem {age.total_seconds() / 3600:.1f}h; limite={max_snapshot_age_hours}h"
-            )
+    # Mantém o argumento por compatibilidade e para que o chamador possa gerar
+    # preserved_snapshot_age_warnings com o mesmo limite. Não adiciona idade a
+    # `reasons`: sem fato esportivo novo, idade é alerta e não bloqueio.
+    _ = max_snapshot_age_hours
 
+    now = now_brt()
     before = timedelta(hours=2)
     after = timedelta(hours=max(4, live_window_hours))
     for event in snapshot.get("eventos") or []:
@@ -1278,7 +1327,6 @@ def preserved_snapshot_safe_for_af(
             )
             break
     return not reasons, reasons
-
 
 def run_update(
     force: bool,
@@ -1382,6 +1430,7 @@ def run_update(
             safe_preserved, safe_reasons = preserved_snapshot_safe_for_af(
                 previous, live_window_hours=live_window_hours
             )
+            age_warnings = preserved_snapshot_age_warnings(previous)
             if not safe_preserved:
                 blocking_failures.append(
                     f"{spec.key}: snapshot preservado não é seguro para o AF: "
@@ -1400,6 +1449,7 @@ def run_update(
                     "erro": message,
                     "fallback_seguro_para_af": safe_preserved,
                     "motivos_fallback": safe_reasons,
+                    "alertas_fallback": age_warnings,
                 }
             )
     after_snapshots = load_existing_snapshots()
@@ -1669,6 +1719,49 @@ def self_test() -> None:
     overlap_structure = validate_competition_snapshot_structure(overlap_snapshot)
     assert overlap_structure["fase_ordem"] == 600
     assert overlap_structure["chaves"] == 8
+
+    # Regressão 2026-08-23: a ESPN pode publicar só PARTE das quartas. A fase
+    # futura parcial também precisa sair do rank 100; caso contrário o mesmo
+    # histórico genérico volta a contaminar a fase corrente.
+    partial_overlap = [
+        copy.deepcopy(event) for event in overlapping
+        if not str(event.get("event_id", "")).startswith("qf-")
+        or str(event.get("event_id", "")).startswith(("qf-0-", "qf-1-", "qf-2-"))
+    ]
+    for event in partial_overlap:
+        if str(event.get("event_id", "")).startswith("qf-"):
+            event["fase_ordem"] = 100
+            event["fase"] = "Ida" if str(event.get("event_id", "")).endswith("-1") else "Volta"
+    partial_changed = normalize_generic_pending_knockout_cohorts(partial_overlap)
+    assert partial_changed == 6
+    assert all(
+        event["fase_ordem"] == 700
+        for event in partial_overlap if str(event.get("event_id", "")).startswith("qf-")
+    )
+    normalize_active_knockout_stage(partial_overlap)
+    partial_snapshot = build_snapshot_from_normalized(spec, partial_overlap)
+    assert partial_snapshot["fase_atual"]["ordem"] == 600
+    partial_structure = validate_competition_snapshot_structure(partial_snapshot)
+    assert partial_structure["fase_ordem"] == 600
+    assert partial_structure["chaves"] == 8
+
+    # Idade isolada não pode derrubar o Brasileirão quando não há fato
+    # continental novo: reproduz exatamente o fallback de ~46,3h observado.
+    stale_but_factually_safe = copy.deepcopy(overlap_snapshot)
+    stale_but_factually_safe["gerado_em"] = (now_brt() - timedelta(hours=46.3)).isoformat()
+    safe, reasons = preserved_snapshot_safe_for_af(
+        stale_but_factually_safe, live_window_hours=4
+    )
+    assert safe and reasons == []
+    age_alerts = preserved_snapshot_age_warnings(stale_but_factually_safe)
+    assert age_alerts and "não bloqueante" in age_alerts[0]
+
+    # Continua fail-closed quando existe jogo vencido sem confirmação.
+    overdue_preserved = copy.deepcopy(stale_but_factually_safe)
+    pending_event = next(event for event in overdue_preserved["eventos"] if not event.get("concluido"))
+    pending_event["data_iso"] = (now_brt() - timedelta(hours=8)).isoformat()
+    safe, reasons = preserved_snapshot_safe_for_af(overdue_preserved, live_window_hours=4)
+    assert not safe and any("vencido" in reason for reason in reasons)
 
     # Regressão pós-apito da Copa do Brasil: quando a última pendência vira
     # finalizada, a ESPN pode substituir TODOS os rótulos da fase por textos
