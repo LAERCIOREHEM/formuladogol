@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-23T19:11:01.066275-03:00",
+  "gerado_em": "2026-08-23T19:41:24.812351-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 231,
   "total_com_estatisticas": 231,
-  "total_com_publico": 228,
+  "total_com_publico": 231,
   "total_com_eventos": 231,
   "total_com_jogadores": 231,
   "total_eventos_validados": 231,
@@ -20,9 +20,9 @@
       "placar_mandante": 0,
       "placar_visitante": 2,
       "estadio": "Estadio Manoel Barradas",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 30553,
+      "publico_tipo": "total",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/23/bahia-supera-vitoria-no-barradao-encerra-jejum-historico-e-ganha-folego-no-brasileirao.amp.htm",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -569,7 +569,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T19:10:58.851979-03:00"
+      "atualizado_em": "2026-08-23T19:10:58.851979-03:00",
+      "renda": 668608,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841202": {
       "event_id": "401841202",
@@ -581,9 +583,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estádio Municipal Cicero de Souza Marques",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 4485,
+      "publico_tipo": "total",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/23/red-bull-bragantino-marca-nos-acrescimos-e-deixa-gremio-ameacado-as-vesperas-de-gre-nal.amp.htm",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -1121,7 +1123,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T19:10:59.532776-03:00"
+      "atualizado_em": "2026-08-23T19:10:59.532776-03:00",
+      "renda": 141570,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841203": {
       "event_id": "401841203",
@@ -1133,9 +1137,9 @@
       "placar_mandante": 4,
       "placar_visitante": 1,
       "estadio": "Allianz Parque",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 36382,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/23/palmeiras-acorda-no-2-tempo-goleia-o-vasco-e-volta-a-abrir-vantagem-na-ponta-do-brasileirao.amp.htm",
       "arbitro": "Braulio Da Silva Machado",
       "stats": [
         {
@@ -1706,7 +1710,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T19:10:59.885954-03:00"
+      "atualizado_em": "2026-08-23T19:10:59.885954-03:00",
+      "renda": 3328075.68,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841206": {
       "event_id": "401841206",
@@ -129962,5 +129968,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 220,
+  "total_com_renda": 231
 }
