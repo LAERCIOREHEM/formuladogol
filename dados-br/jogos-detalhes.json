@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-23T20:41:20.025062-03:00",
+  "gerado_em": "2026-08-23T21:21:33.077399-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 233,
   "total_com_estatisticas": 233,
-  "total_com_publico": 231,
+  "total_com_publico": 232,
   "total_com_eventos": 233,
   "total_com_jogadores": 233,
   "total_eventos_validados": 233,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Arena Condá",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 12404,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/23/sao-paulo-em-novo-vexame-perde-da-chapecoense-e-da-razao-a-crespo-briga-e-para-nao-cair.amp.htm",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -561,7 +561,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T20:41:16.587099-03:00"
+      "atualizado_em": "2026-08-23T20:41:16.587099-03:00",
+      "renda": 847590,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841201": {
       "event_id": "401841201",
@@ -131102,5 +131104,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 220,
+  "total_com_renda": 232
 }
