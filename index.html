@@ -859,6 +859,7 @@
     align-items: center;
     gap: 12px;
     min-width: 0;
+    overflow: hidden;
   }
   .resultado-time.mandante {
     justify-content: flex-end;
@@ -873,6 +874,7 @@
     flex-direction: column;
     gap: 5px;
     min-width: 0;
+    max-width: 100%;
   }
   .resultado-time.mandante .resultado-team-text { align-items: flex-end; }
   .resultado-time.visitante .resultado-team-text { align-items: flex-start; }
@@ -885,6 +887,7 @@
     white-space: nowrap;
     line-height: 1.05;
     text-shadow: 0 1px 10px rgba(0,0,0,.22);
+    max-width: 100%;
   }
   .resultado-escudo {
     width: clamp(40px, 4.4vw, 58px);
@@ -936,6 +939,9 @@
     color: var(--text-tertiary);
     text-align: right;
     white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   @media (max-width: 720px) {
     .resultado-card {
@@ -953,23 +959,23 @@
     }
     .resultado-data { text-align: right; }
     .resultado-jogo {
-      gap: 8px;
+      gap: 6px;
       width: 100%;
     }
     .resultado-time {
-      gap: 6px;
+      gap: 5px;
     }
     .resultado-nome {
-      font-size: clamp(14px, 4vw, 18px);
-      max-width: 31vw;
+      font-size: clamp(13px, 3.4vw, 15px);
+      max-width: 100%;
     }
     .resultado-escudo, .escudo-fallback-pequeno {
-      width: clamp(34px, 10vw, 46px);
-      height: clamp(34px, 10vw, 46px);
+      width: clamp(30px, 8.4vw, 40px);
+      height: clamp(30px, 8.4vw, 40px);
     }
     .resultado-placar {
-      font-size: clamp(26px, 8.5vw, 38px);
-      min-width: 74px;
+      font-size: clamp(24px, 7.5vw, 34px);
+      min-width: 50px;
       letter-spacing: .5px;
     }
     .resultado-placar .placar-x { margin: 0 2px; }
@@ -986,8 +992,9 @@
     .resultado-card { padding: 11px 9px; }
     .resultado-jogo { gap: 5px; }
     .resultado-time { gap: 5px; }
-    .resultado-nome { font-size: 13.5px; max-width: 28vw; }
-    .resultado-placar { font-size: 25px; min-width: 66px; }
+    .resultado-nome { font-size: 13px; max-width: 100%; }
+    .resultado-placar { font-size: 23px; min-width: 54px; }
+    .resultado-escudo, .escudo-fallback-pequeno { width: 30px; height: 30px; }
     .resultado-rodada { padding: 3px 7px; font-size: 10px; }
   }
 
