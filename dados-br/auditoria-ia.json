@@ -1,17 +1,16 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-08-23",
-  "executado_em": "2026-08-23T05:56:33-03:00",
+  "data_brt": "2026-08-24",
+  "executado_em": "2026-08-24T06:11:59-03:00",
   "status": "atencao",
-  "resumo": "A auditoria não identificou falhas críticas nem evidência inequívoca para complementar os públicos pendentes. As lacunas de público referem-se a partidas encerradas há menos de vinte e quatro horas, e os avisos isolados de fontes de transmissão não comprometem a cobertura final.",
+  "resumo": "A auditoria determinística aponta atenção por falhas isoladas em fontes de transmissão, sem perda crítica de cobertura. Não há pendências de público, transmissão ou melhores momentos que exijam ação.",
   "triagem": {
-    "data_hora_brt": "2026-08-23T05:56:33-03:00",
+    "data_hora_brt": "2026-08-24T06:11:59-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
       "avisos": [
-        "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
-        "3 público(s) ainda elegíveis para complementação"
+        "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
       ],
       "indicadores": {
         "estatisticas_erros_criticos": 0,
@@ -20,38 +19,13 @@
         "detalhes_falhas": 0,
         "jogos_sem_estatisticas": 0,
         "transmissoes_criticas": 0,
-        "publicos_antigos_sem_dado": 1,
+        "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 0.8
+        "ultimo_sucesso_horas": 1.0
       }
     },
     "pendencias": {
-      "publicos": [
-        {
-          "event_id": "401841205",
-          "rodada": 24,
-          "data_iso": "2026-08-22T16:00",
-          "mandante": "Fluminense",
-          "visitante": "Remo",
-          "horas_desde_fim": 12.1
-        },
-        {
-          "event_id": "401841204",
-          "rodada": 24,
-          "data_iso": "2026-08-22T18:30",
-          "mandante": "Internacional",
-          "visitante": "Atlético-MG",
-          "horas_desde_fim": 9.4
-        },
-        {
-          "event_id": "401841206",
-          "rodada": 24,
-          "data_iso": "2026-08-22T20:30",
-          "mandante": "Cruzeiro",
-          "visitante": "Flamengo",
-          "horas_desde_fim": 7.5
-        }
-      ],
+      "publicos": [],
       "transmissoes": [],
       "melhores_momentos_apos_24h": []
     },
@@ -81,61 +55,20 @@
     "limite_chamadas_dia": 1,
     "falhas_consecutivas": 0,
     "erro": "",
-    "web_habilitada": true,
-    "web_searches": 1,
-    "web_tool_calls": 1,
-    "web_acoes": [
-      {
-        "type": "search",
-        "queries": [
-          "site:ge.globo.com Fluminense Remo Internacional Atlético-MG Cruzeiro Flamengo 22 agosto 2026 público Brasileirão"
-        ]
-      }
-    ],
-    "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/22/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-24a-rodada.ghtml",
-      "https://ge.globo.com/futebol/times/cruzeiro/noticia/2026/08/11/cruzeiro-x-flamengo-tem-ingressos-esgotados-para-duelo-no-mineirao.ghtml",
-      "https://ge.globo.com/gato-mestre/noticia/2026/05/31/veja-os-publicos-da-18a-rodada-do-campeonato-brasileiro.ghtml",
-      "https://ge.globo.com/gato-mestre/noticia/2026/07/26/veja-os-publicos-da-20a-rodada-do-campeonato-brasileiro.ghtml",
-      "https://ge.globo.com/gato-mestre/noticia/2026/08/06/veja-os-publicos-dos-jogos-de-volta-das-oitavas-de-final-da-copa-do-brasil.ghtml",
-      "https://ge.globo.com/gato-mestre/noticia/2026/08/09/flamengo-x-vitoria-tem-o-maior-publico-da-22a-rodada-do-brasileirao-veja-a-lista.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/08/22/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-24a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/05/24/veja-os-publicos-da-17a-rodada-do-campeonato-brasileiro.ghtml",
-      "https://ge.globo.com/google/amp/gato-mestre/noticia/2026/07/24/flamengo-domina-rankings-de-publico-e-renda-no-primeiro-turno-do-brasileiro-2026-veja-balanco.ghtml",
-      "https://ge.globo.com/pa/futebol/times/remo/noticia/2026/08/21/ze-welison-exalta-torcida-do-remo-como-visitante-antes-de-mais-um-jogo-fora-na-serie-a.ghtml",
-      "https://ge.globo.com/rs/futebol/brasileirao-serie-a/noticia/2026/06/22/brasileirao-serie-a-veja-tabela-detalhada-das-rodadas-19-a-24.ghtml",
-      "https://ge.globo.com/rs/futebol/times/internacional/noticia/2026/08/14/inter-tem-sequencia-para-melhorar-no-beira-rio-e-embalar-antes-de-gre-nal-da-copa-do-brasil.ghtml"
-    ]
+    "web_habilitada": false,
+    "web_searches": 0,
+    "web_tool_calls": 0,
+    "web_acoes": [],
+    "fontes_web": []
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "A auditoria não identificou falhas críticas nem evidência inequívoca para complementar os públicos pendentes. As lacunas de público referem-se a partidas encerradas há menos de vinte e quatro horas, e os avisos isolados de fontes de transmissão não comprometem a cobertura final.",
+    "resumo": "A auditoria determinística aponta atenção por falhas isoladas em fontes de transmissão, sem perda crítica de cobertura. Não há pendências de público, transmissão ou melhores momentos que exijam ação.",
     "problemas": [
       {
-        "categoria": "publico",
-        "severidade": "info",
-        "mensagem": "Há três públicos elegíveis para complementação, mas todos os jogos têm menos de vinte e quatro horas desde o encerramento e não foi localizada fonte que declarasse diretamente público presente ou público total.",
-        "event_id": "401841205",
-        "requer_intervencao": false
-      },
-      {
-        "categoria": "publico",
-        "severidade": "info",
-        "mensagem": "Há três públicos elegíveis para complementação, mas todos os jogos têm menos de vinte e quatro horas desde o encerramento e não foi localizada fonte que declarasse diretamente público presente ou público total.",
-        "event_id": "401841204",
-        "requer_intervencao": false
-      },
-      {
-        "categoria": "publico",
-        "severidade": "info",
-        "mensagem": "Há três públicos elegíveis para complementação, mas todos os jogos têm menos de vinte e quatro horas desde o encerramento e não foi localizada fonte que declarasse diretamente público presente ou público total.",
-        "event_id": "401841206",
-        "requer_intervencao": false
-      },
-      {
-        "categoria": "transmissao",
-        "severidade": "info",
-        "mensagem": "Avisos de falha em fontes de transmissão não resultaram em perda crítica de cobertura e não há pendências de transmissão autorizadas para correção.",
+        "categoria": "fonte",
+        "severidade": "atencao",
+        "mensagem": "Há fontes de transmissão com falha, mas sem perda crítica de cobertura ou impacto nos dados finais.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -362,6 +295,19 @@
       "resumo": "A auditoria não identificou falhas críticas nem evidência inequívoca para complementar os públicos pendentes. As lacunas de público referem-se a partidas encerradas há menos de vinte e quatro horas, e os avisos isolados de fontes de transmissão não comprometem a cobertura final.",
       "chamadas_openai": 1,
       "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-08-24",
+      "executado_em": "2026-08-24T06:11:59-03:00",
+      "status": "atencao",
+      "resumo": "A auditoria determinística aponta atenção por falhas isoladas em fontes de transmissão, sem perda crítica de cobertura. Não há pendências de público, transmissão ou melhores momentos que exijam ação.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
       "publicos_aplicados": 0,
       "transmissoes_aplicadas": 0,
       "editoriais_aplicados": [],
