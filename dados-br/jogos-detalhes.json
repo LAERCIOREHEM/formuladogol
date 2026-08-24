@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-23T21:41:12.333987-03:00",
+  "gerado_em": "2026-08-23T22:01:29.374628-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 234,
   "total_com_estatisticas": 234,
-  "total_com_publico": 232,
+  "total_com_publico": 234,
   "total_com_eventos": 234,
   "total_com_jogadores": 234,
   "total_eventos_validados": 234,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Couto Pereira",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 32798,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/23/palmeiras-2-x-1-vasco-tem-o-maior-publico-da-24a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -579,7 +579,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T21:41:08.266085-03:00"
+      "atualizado_em": "2026-08-23T21:41:08.266085-03:00",
+      "publico_pagante": 32656,
+      "renda": 1962976.5,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841199": {
       "event_id": "401841199",
@@ -593,7 +596,7 @@
       "estadio": "Arena Condá",
       "publico": 12404,
       "publico_tipo": "presente",
-      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/23/sao-paulo-em-novo-vexame-perde-da-chapecoense-e-da-razao-a-crespo-briga-e-para-nao-cair.amp.htm",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/23/palmeiras-2-x-1-vasco-tem-o-maior-publico-da-24a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Rafael Rodrigo Klein",
       "stats": [
         {
@@ -1134,7 +1137,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-23T21:41:08.622486-03:00",
       "renda": 847590,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841201": {
       "event_id": "401841201",
@@ -1146,9 +1149,9 @@
       "placar_mandante": 1,
       "placar_visitante": 1,
       "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 14751,
+      "publico_tipo": "total",
+      "publico_fonte": "https://uol.com.br/esporte/futebol/ultimas-noticias/2026/08/23/santos-mirassol-pelo-campeonato-brasileiro.ghtm",
       "arbitro": "Edina Alves Batista",
       "stats": [
         {
@@ -1708,7 +1711,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-23T21:41:08.992011-03:00"
+      "atualizado_em": "2026-08-23T21:41:08.992011-03:00",
+      "publico_pagante": 14751,
+      "renda": 528657.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841200": {
       "event_id": "401841200",
@@ -1721,8 +1727,8 @@
       "placar_visitante": 2,
       "estadio": "Estadio Manoel Barradas",
       "publico": 30553,
-      "publico_tipo": "total",
-      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/23/bahia-supera-vitoria-no-barradao-encerra-jejum-historico-e-ganha-folego-no-brasileirao.amp.htm",
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/23/palmeiras-2-x-1-vasco-tem-o-maior-publico-da-24a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Raphael Claus",
       "stats": [
         {
@@ -2278,7 +2284,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-23T21:41:09.731715-03:00",
       "renda": 668608,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 30370
     },
     "401841202": {
       "event_id": "401841202",
@@ -2291,8 +2298,8 @@
       "placar_visitante": 0,
       "estadio": "Estádio Municipal Cicero de Souza Marques",
       "publico": 4485,
-      "publico_tipo": "total",
-      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/23/red-bull-bragantino-marca-nos-acrescimos-e-deixa-gremio-ameacado-as-vesperas-de-gre-nal.amp.htm",
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/23/palmeiras-2-x-1-vasco-tem-o-maior-publico-da-24a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -2832,7 +2839,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-23T21:41:10.188901-03:00",
       "renda": 141570,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841203": {
       "event_id": "401841203",
@@ -3419,7 +3426,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-23T21:41:10.578199-03:00",
       "renda": 3328075.68,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 36382
     },
     "401841206": {
       "event_id": "401841206",
@@ -3433,7 +3441,7 @@
       "estadio": "Estadio Mineirão",
       "publico": 34166,
       "publico_tipo": "presente",
-      "publico_fonte": "https://itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/cruzeiro-2-x-1-flamengo-o-publico-para-o-jogo-no-mineirao",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/23/palmeiras-2-x-1-vasco-tem-o-maior-publico-da-24a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Rodrigo Jose Pereira De Lima",
       "stats": [
         {
@@ -3992,7 +4000,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-23T21:41:11.421146-03:00",
       "renda": 2021735.5,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841204": {
       "event_id": "401841204",
@@ -4006,7 +4014,7 @@
       "estadio": "Estadio Beira-Rio",
       "publico": 20464,
       "publico_tipo": "presente",
-      "publico_fonte": "https://itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/internacional-x-atletico-o-publico-para-a-partida-do-campeonato-brasileiro",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/23/palmeiras-2-x-1-vasco-tem-o-maior-publico-da-24a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "Lucas Casagrande",
       "stats": [
         {
@@ -4558,7 +4566,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-23T21:41:11.830726-03:00",
       "renda": 1042600.5,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 17716
     },
     "401841205": {
       "event_id": "401841205",
@@ -4572,7 +4581,7 @@
       "estadio": "Estadio do Maracana",
       "publico": 30215,
       "publico_tipo": "presente",
-      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/22/hulk-faz-gol-chorado-fluminense-bate-remo-de-virada-no-rio-e-espanta-zebra-no-brasileirao.htm",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/23/palmeiras-2-x-1-vasco-tem-o-maior-publico-da-24a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "João Vitor Gobi",
       "stats": [
         {
@@ -5116,8 +5125,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-23T21:41:12.250108-03:00",
-      "renda": 1525343.5,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "renda": 1525342.5,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 27822
     },
     "401841191": {
       "event_id": "401841191",
@@ -131675,5 +131685,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 226,
+  "total_com_renda": 234
 }
