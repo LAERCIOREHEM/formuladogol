@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-24T22:11:11.725477-03:00",
+  "gerado_em": "2026-08-24T22:41:01.639258-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 235,
   "total_com_estatisticas": 235,
-  "total_com_publico": 234,
+  "total_com_publico": 235,
   "total_com_eventos": 235,
   "total_com_jogadores": 235,
   "total_eventos_validados": 235,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 3,
       "estadio": "Joao Havelange Stadium",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 7086,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/23/palmeiras-2-x-1-vasco-tem-o-maior-publico-da-24a-rodada-do-brasileirao-veja-a-lista.ghtml",
       "arbitro": "André Luis Skettino Policarpo Bento",
       "stats": [
         {
@@ -578,7 +578,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-24T22:01:13.565926-03:00"
+      "atualizado_em": "2026-08-24T22:01:13.565926-03:00",
+      "publico_pagante": 6209,
+      "renda": 178760,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841207": {
       "event_id": "401841207",
@@ -1151,7 +1154,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-24T22:01:14.121518-03:00",
       "publico_pagante": 32656,
-      "renda": 1962976.5,
+      "renda": 1962977,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841199": {
@@ -2282,7 +2285,7 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-24T22:01:14.926629-03:00",
-      "renda": 528657.5,
+      "renda": 528658,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
       "publico_pagante": 14751
     },
@@ -3996,7 +3999,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-24T22:01:16.180625-03:00",
       "publico_pagante": 36382,
-      "renda": 3328075.68,
+      "renda": 3328076,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841206": {
@@ -4569,7 +4572,7 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-24T19:21:10.435060-03:00",
-      "renda": 2021735.5,
+      "renda": 2021736,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841204": {
@@ -5136,7 +5139,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-24T12:21:44.874224-03:00",
       "publico_pagante": 17716,
-      "renda": 1042600.5,
+      "renda": 1042601,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841205": {
@@ -5696,7 +5699,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-24T12:21:45.245000-03:00",
       "publico_pagante": 27822,
-      "renda": 1525342.5,
+      "renda": 1525343,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841191": {
@@ -132256,6 +132259,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 226,
-  "total_com_renda": 234
+  "total_com_publico_pagante": 227,
+  "total_com_renda": 235
 }
