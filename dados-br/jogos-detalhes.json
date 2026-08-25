@@ -1,6 +1,6 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-24T22:01:16.264205-03:00",
+  "gerado_em": "2026-08-24T22:11:11.725477-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 235,
   "total_com_estatisticas": 235,
@@ -2283,7 +2283,8 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-24T22:01:14.926629-03:00",
       "renda": 528657.5,
-      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 14751
     },
     "401841200": {
       "event_id": "401841200",
@@ -132254,5 +132255,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 226,
+  "total_com_renda": 234
 }
