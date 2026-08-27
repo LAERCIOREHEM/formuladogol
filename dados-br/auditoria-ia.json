@@ -1,16 +1,19 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-08-26",
-  "executado_em": "2026-08-26T06:09:56-03:00",
-  "status": "atencao",
-  "resumo": "A auditoria determinística aponta avisos em fontes de transmissão, mas sem perda crítica de cobertura. Não há pendências elegíveis para correção de público ou transmissão, nem melhores momentos pendentes. Não há editorial disponível no dossiê.",
+  "data_brt": "2026-08-27",
+  "executado_em": "2026-08-27T16:11:04-03:00",
+  "status": "critico",
+  "resumo": "A integridade dos dados esportivos finais permanece preservada, sem falhas críticas em estatísticas, calendário, detalhes ou cobertura de transmissão. O status crítico decorre exclusivamente da defasagem de 59 horas desde o último sucesso do coletor principal. Há uma transmissão futura elegível para complementação, mas não foi localizada fonte permitida que declarasse diretamente um canal para o evento.",
   "triagem": {
-    "data_hora_brt": "2026-08-26T06:09:56-03:00",
+    "data_hora_brt": "2026-08-27T16:11:04-03:00",
     "saude": {
-      "status_deterministico": "atencao",
-      "criticos": [],
+      "status_deterministico": "critico",
+      "criticos": [
+        "último sucesso principal ocorreu há 59.0 h"
+      ],
       "avisos": [
-        "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura"
+        "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
+        "1 transmissão(ões) ainda elegíveis para complementação"
       ],
       "indicadores": {
         "estatisticas_erros_criticos": 0,
@@ -21,12 +24,22 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 25.0
+        "ultimo_sucesso_horas": 59.0
       }
     },
     "pendencias": {
       "publicos": [],
-      "transmissoes": [],
+      "transmissoes": [
+        {
+          "event_id": "401841006",
+          "rodada": 4,
+          "data_iso": "2026-09-02T19:30:00-03:00",
+          "mandante": "",
+          "visitante": "",
+          "nivel": "aviso",
+          "horas_ate_jogo": 147.3
+        }
+      ],
       "melhores_momentos_apos_24h": []
     },
     "editoriais": {
@@ -55,20 +68,54 @@
     "limite_chamadas_dia": 1,
     "falhas_consecutivas": 0,
     "erro": "",
-    "web_habilitada": false,
-    "web_searches": 0,
-    "web_tool_calls": 0,
-    "web_acoes": [],
-    "fontes_web": []
+    "web_habilitada": true,
+    "web_searches": 1,
+    "web_tool_calls": 1,
+    "web_acoes": [
+      {
+        "type": "search",
+        "queries": [
+          "401841006 transmissão 2 setembro 2026"
+        ]
+      }
+    ],
+    "fontes_web": [
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-b/2026",
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999",
+      "https://credencial.cbf.com.br/competicoes/listar/24/4",
+      "https://ge.globo.com/ba/playlist/globo-esporte-ba-assista-ao-programa-desta-segunda-feira-02-de-setembro.ghtml",
+      "https://ge.globo.com/futebol/times/flamengo/noticia/2026/08/21/cbf-marca-data-do-jogo-atrasado-entre-flamengo-x-mirassol.ghtml",
+      "https://ge.globo.com/google/amp/futebol/brasileirao-serie-a/noticia/2026/08/21/cbf-avalia-realizacao-de-jogo-atrasado-entre-flamengo-x-mirassol-para-o-dia-2-de-setembro.ghtml",
+      "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
+      "https://www.bol.uol.com.br/esporte/2026/08/21/cbf-marca-data-para-o-flamengo-x-mirassol-pelo-brasileirao.ghtm",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/2674/liga/BRA.1",
+      "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/copa-do-brasil/copa-do-brasil-datas-horarios-e-onde-assistir-aos-jogos-das-quartas-de-final-2",
+      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/08/21/com-palmeiras-de-olho-cbf-define-data-de-jogo-atrasado-entre-flamengo-e-mirassol.amp.htm"
+    ]
   },
   "resultado_ia": {
-    "status_geral": "atencao",
-    "resumo": "A auditoria determinística aponta avisos em fontes de transmissão, mas sem perda crítica de cobertura. Não há pendências elegíveis para correção de público ou transmissão, nem melhores momentos pendentes. Não há editorial disponível no dossiê.",
+    "status_geral": "critico",
+    "resumo": "A integridade dos dados esportivos finais permanece preservada, sem falhas críticas em estatísticas, calendário, detalhes ou cobertura de transmissão. O status crítico decorre exclusivamente da defasagem de 59 horas desde o último sucesso do coletor principal. Há uma transmissão futura elegível para complementação, mas não foi localizada fonte permitida que declarasse diretamente um canal para o evento.",
     "problemas": [
       {
         "categoria": "fonte",
+        "severidade": "critico",
+        "mensagem": "O último sucesso do coletor principal ocorreu há 59 horas, ultrapassando o limite operacional indicado pelo dossiê e exigindo intervenção para restabelecer a atualização regular.",
+        "event_id": "",
+        "requer_intervencao": true
+      },
+      {
+        "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Três fontes de transmissão falharam, sem perda crítica de cobertura nos dados finais.",
+        "mensagem": "O evento futuro 401841006 permanece elegível para complementação de transmissão. A busca confirmou a realização de Flamengo x Mirassol na data e no horário da pendência, mas não encontrou fonte permitida que declarasse diretamente o canal de exibição; nenhuma correção é proposta.",
+        "event_id": "401841006",
+        "requer_intervencao": false
+      },
+      {
+        "categoria": "fonte",
+        "severidade": "atencao",
+        "mensagem": "Há três falhas de fontes de transmissão sem perda crítica de cobertura final. O aviso deve ser acompanhado, mas não caracteriza incidente crítico isoladamente.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -87,12 +134,15 @@
     "transmissoes_aplicadas": [],
     "editoriais_aplicados": []
   },
-  "criticos_nao_resolvidos": [],
+  "criticos_nao_resolvidos": [
+    "último sucesso principal ocorreu há 59.0 h",
+    "O último sucesso do coletor principal ocorreu há 59 horas, ultrapassando o limite operacional indicado pelo dossiê e exigindo intervenção para restabelecer a atualização regular."
+  ],
   "alerta": {
     "ultimo_fingerprint": "",
     "ultimo_enviado_em": "",
     "envio_nesta_execucao": false,
-    "detalhe": "não necessário"
+    "detalhe": "RESEND_API_KEY/EMAIL_DESTINO não configurados"
   },
   "historico": [
     {
@@ -340,6 +390,22 @@
       "transmissoes_aplicadas": 0,
       "editoriais_aplicados": [],
       "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-08-27",
+      "executado_em": "2026-08-27T16:11:04-03:00",
+      "status": "critico",
+      "resumo": "A integridade dos dados esportivos finais permanece preservada, sem falhas críticas em estatísticas, calendário, detalhes ou cobertura de transmissão. O status crítico decorre exclusivamente da defasagem de 59 horas desde o último sucesso do coletor principal. Há uma transmissão futura elegível para complementação, mas não foi localizada fonte permitida que declarasse diretamente um canal para o evento.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [
+        "último sucesso principal ocorreu há 59.0 h",
+        "O último sucesso do coletor principal ocorreu há 59 horas, ultrapassando o limite operacional indicado pelo dossiê e exigindo intervenção para restabelecer a atualização regular."
+      ],
       "email_enviado": false
     }
   ]
