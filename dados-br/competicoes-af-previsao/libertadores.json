@@ -9,30 +9,30 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-27T16:28:26-03:00",
+  "gerado_em": "2026-08-28T12:01:37-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
     "status": "em_andamento",
-    "ordem": 600,
-    "nome": "Oitavas de final",
-    "eventos": 16,
-    "eventos_pendentes": 1
+    "ordem": 700,
+    "nome": "Quartas de final",
+    "eventos": 8,
+    "eventos_pendentes": 8
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 141,
-    "pendentes": 14,
+    "finalizados": 142,
+    "pendentes": 13,
     "equipes": 49,
     "equipes_serie_a_2026": 8
   },
   "coleta": {
     "modo": "incremental",
-    "janela_inicio": "2026-08-04T00:00:00-03:00",
-    "janela_fim": "2026-12-23T23:59:59-03:00",
+    "janela_inicio": "2026-08-07T00:00:00-03:00",
+    "janela_fim": "2026-12-26T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-08-22T22:13:42-03:00",
-    "ajustes_editoriais_aplicados": 15
+    "ajustes_editoriais_aplicados": 7
   },
   "equipes": [
     {
@@ -5557,9 +5557,9 @@
     {
       "event_id": "401874147",
       "data_iso": "2026-08-25T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Ter., Agosto 25º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5573,8 +5573,8 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 3
       },
       "visitante": {
         "espn_id": "5489",
@@ -5585,9 +5585,9 @@
         "serie_a_2026": false,
         "mandante": false,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Independiente del Valle",
       "penaltis": false
     },
     {
@@ -5595,7 +5595,7 @@
       "data_iso": "2026-09-08T19:00:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Ter., Setembro 8º at 6:00 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5635,7 +5635,7 @@
       "data_iso": "2026-09-09T19:00:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qua., Setembro 9º at 6:00 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5675,7 +5675,7 @@
       "data_iso": "2026-09-09T21:30:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qua., Setembro 9º at 8:30 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5715,7 +5715,7 @@
       "data_iso": "2026-09-10T21:30:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qui., Setembro 10º at 8:30 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5755,7 +5755,7 @@
       "data_iso": "2026-09-15T19:00:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Ter., Setembro 15º at 6:00 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5795,7 +5795,7 @@
       "data_iso": "2026-09-16T19:00:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qua., Setembro 16º at 6:00 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5835,7 +5835,7 @@
       "data_iso": "2026-09-16T21:30:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qua., Setembro 16º at 8:30 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5875,7 +5875,7 @@
       "data_iso": "2026-09-17T21:30:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qui., Setembro 17º at 8:30 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -6090,5 +6090,12 @@
       "vencedor": null,
       "penaltis": false
     }
-  ]
+  ],
+  "validacao_af": {
+    "status": "pronto",
+    "fase": "Quartas de final",
+    "fase_ordem": 700,
+    "chaves": 4,
+    "equipes_ativas": 8
+  }
 }

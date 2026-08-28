@@ -9,29 +9,29 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-25T05:11:27-03:00",
+  "gerado_em": "2026-08-28T12:01:39-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
     "status": "em_andamento",
-    "ordem": 600,
-    "nome": "2026 CONMEBOL Sudamericana, Round of 16 / Oitavas de final",
-    "eventos": 16,
-    "eventos_pendentes": 1
+    "ordem": 700,
+    "nome": "Quartas de final",
+    "eventos": 8,
+    "eventos_pendentes": 8
   },
   "resumo": {
-    "eventos": 150,
-    "finalizados": 143,
-    "pendentes": 7,
+    "eventos": 152,
+    "finalizados": 144,
+    "pendentes": 8,
     "equipes": 56,
     "equipes_serie_a_2026": 7
   },
   "coleta": {
-    "modo": "incremental",
-    "janela_inicio": "2026-08-04T00:00:00-03:00",
-    "janela_fim": "2026-12-23T23:59:59-03:00",
-    "requisicoes": 4,
-    "ultima_completa_em": "2026-08-18T18:21:39-03:00"
+    "modo": "completa",
+    "requisicoes": 9,
+    "ultima_completa_em": "2026-08-28T12:01:39-03:00",
+    "fases_preservadas_por_event_id": 22,
+    "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
     {
@@ -293,7 +293,7 @@
       "sigla": "SFE",
       "pais": null,
       "serie_a_2026": false,
-      "jogos": 4
+      "jogos": 6
     },
     {
       "espn_id": "8416",
@@ -536,7 +536,7 @@
       "sigla": "VAS",
       "pais": null,
       "serie_a_2026": true,
-      "jogos": 10
+      "jogos": 12
     }
   ],
   "eventos": [
@@ -5691,9 +5691,9 @@
     {
       "event_id": "401903295",
       "data_iso": "2026-08-26T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Agosto 26º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "PF - Pen",
       "fase": "Oitavas de final",
       "fase_ordem": 600,
       "semana": null,
@@ -5708,7 +5708,7 @@
         "serie_a_2026": false,
         "mandante": true,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "visitante": {
         "espn_id": "5488",
@@ -5718,6 +5718,42 @@
         "pais": null,
         "serie_a_2026": false,
         "mandante": false,
+        "vencedor": true,
+        "placar": 1
+      },
+      "vencedor": "Independiente Santa Fe",
+      "penaltis": true
+    },
+    {
+      "event_id": "401913960",
+      "data_iso": "2026-09-08T19:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "Ter., Setembro 8º at 6:00 PM EDT",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 1,
+      "estadio": "Estadio Nemesio Camacho El Campín",
+      "mandante": {
+        "espn_id": "5488",
+        "nome": "Independiente Santa Fe",
+        "nome_espn": "Independiente Santa Fe",
+        "sigla": "SFE",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "3454",
+        "nome": "Vasco da Gama",
+        "nome_espn": "Vasco da Gama",
+        "sigla": "VAS",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": false,
         "vencedor": false,
         "placar": 0
       },
@@ -5726,10 +5762,10 @@
     },
     {
       "event_id": "401912542",
-      "data_iso": "2026-09-09T15:00:00-03:00",
+      "data_iso": "2026-09-08T21:30:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Ter., Setembro 8º at 8:30 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5762,10 +5798,10 @@
     },
     {
       "event_id": "401913073",
-      "data_iso": "2026-09-09T15:00:00-03:00",
+      "data_iso": "2026-09-09T19:00:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qua., Setembro 9º at 6:00 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5798,10 +5834,10 @@
     },
     {
       "event_id": "401913074",
-      "data_iso": "2026-09-09T15:00:00-03:00",
+      "data_iso": "2026-09-10T21:30:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qui., Setembro 10º at 8:30 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5833,11 +5869,47 @@
       "penaltis": false
     },
     {
-      "event_id": "401912524",
-      "data_iso": "2026-09-16T15:00:00-03:00",
+      "event_id": "401913959",
+      "data_iso": "2026-09-15T19:00:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Ter., Setembro 15º at 6:00 PM EDT",
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "semana": null,
+      "perna": 2,
+      "estadio": "Estádio São Januário",
+      "mandante": {
+        "espn_id": "3454",
+        "nome": "Vasco da Gama",
+        "nome_espn": "Vasco da Gama",
+        "sigla": "VAS",
+        "pais": null,
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "5488",
+        "nome": "Independiente Santa Fe",
+        "nome_espn": "Independiente Santa Fe",
+        "sigla": "SFE",
+        "pais": null,
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401912524",
+      "data_iso": "2026-09-15T21:30:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "Ter., Setembro 15º at 8:30 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5870,10 +5942,10 @@
     },
     {
       "event_id": "401913071",
-      "data_iso": "2026-09-16T15:00:00-03:00",
+      "data_iso": "2026-09-16T19:00:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qua., Setembro 16º at 6:00 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5906,15 +5978,15 @@
     },
     {
       "event_id": "401913072",
-      "data_iso": "2026-09-16T15:00:00-03:00",
+      "data_iso": "2026-09-17T21:30:00-03:00",
       "estado": "pre",
       "concluido": false,
-      "status": "P.A.",
+      "status": "Qui., Setembro 17º at 8:30 PM EDT",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
       "perna": 2,
-      "estadio": "",
+      "estadio": "Estadio Centenario",
       "mandante": {
         "espn_id": "19002",
         "nome": "Montevideo City Torque",
@@ -5943,9 +6015,9 @@
   ],
   "validacao_af": {
     "status": "pronto",
-    "fase": "2026 CONMEBOL Sudamericana, Round of 16",
-    "fase_ordem": 600,
-    "chaves": 8,
-    "equipes_ativas": 9
+    "fase": "Quartas de final",
+    "fase_ordem": 700,
+    "chaves": 4,
+    "equipes_ativas": 8
   }
 }

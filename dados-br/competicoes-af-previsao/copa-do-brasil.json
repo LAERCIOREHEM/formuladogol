@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-08-25T05:11:25-03:00",
+  "gerado_em": "2026-08-28T12:01:36-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,21 +17,21 @@
     "ordem": 700,
     "nome": "Quartas de final",
     "eventos": 8,
-    "eventos_pendentes": 8
+    "eventos_pendentes": 4
   },
   "resumo": {
     "eventos": 150,
-    "finalizados": 142,
-    "pendentes": 8,
+    "finalizados": 146,
+    "pendentes": 4,
     "equipes": 126,
     "equipes_serie_a_2026": 21
   },
   "coleta": {
-    "modo": "incremental",
-    "janela_inicio": "2026-08-04T00:00:00-03:00",
-    "janela_fim": "2026-12-23T23:59:59-03:00",
-    "requisicoes": 4,
-    "ultima_completa_em": "2026-08-18T18:21:33-03:00"
+    "modo": "completa",
+    "requisicoes": 9,
+    "ultima_completa_em": "2026-08-28T12:01:36-03:00",
+    "fases_preservadas_por_event_id": 24,
+    "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
     {
@@ -6285,9 +6285,9 @@
     {
       "event_id": "401909066",
       "data_iso": "2026-08-25T21:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Ter., Agosto 25º at 8:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -6302,7 +6302,7 @@
         "serie_a_2026": true,
         "mandante": true,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "visitante": {
         "espn_id": "7632",
@@ -6313,7 +6313,7 @@
         "serie_a_2026": true,
         "mandante": false,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "vencedor": null,
       "penaltis": false
@@ -6321,9 +6321,9 @@
     {
       "event_id": "401909065",
       "data_iso": "2026-08-26T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Agosto 26º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -6337,8 +6337,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 3
       },
       "visitante": {
         "espn_id": "2674",
@@ -6351,15 +6351,15 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Palmeiras",
       "penaltis": false
     },
     {
       "event_id": "401909113",
       "data_iso": "2026-08-26T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Agosto 26º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -6373,8 +6373,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
       "visitante": {
         "espn_id": "3457",
@@ -6387,15 +6387,15 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Vasco da Gama",
       "penaltis": false
     },
     {
       "event_id": "401909064",
       "data_iso": "2026-08-27T20:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qui., Agosto 27º at 7:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,

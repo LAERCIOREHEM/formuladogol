@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-08-24T21:54:00-03:00",
   "referencia_esportiva_em": "2026-08-24T21:54:00-03:00",
-  "calculado_em": "2026-08-24T22:03:19-03:00",
+  "calculado_em": "2026-08-28T12:03:02-03:00",
   "status": "ok",
-  "hash_entrada": "669770064398aab4dd40962f0274e936c96879d30231faa39d1588817566ef42",
+  "hash_entrada": "3cc5aa37d6e0ef32397208dd07d70fc0559e605d17adfe5f8ab959abb9bd59e3",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -365,7 +365,7 @@
   "diagnostico_af_score": {
     "disponivel": true,
     "cobertura_clubes": 20,
-    "correlacao_pearson_com_forca_map": 0.847679,
+    "correlacao_pearson_com_forca_map": 0.846547,
     "aplicado_na_producao": false,
     "motivo": "O AF-Score não possui série histórica homogênea em 2023–2025. Incluí-lo agora impediria backtesting temporal equivalente e poderia introduzir vazamento."
   },
@@ -393,39 +393,38 @@
           1
         ],
         "pareamento_futuro": "sorteio",
-        "partidas_concluidas_no_ajuste": 142,
+        "partidas_concluidas_no_ajuste": 146,
         "principais_chances_titulo": [
           {
             "clube": "Palmeiras",
-            "probabilidade_pct": 37.4996
-          },
-          {
-            "clube": "Cruzeiro",
-            "probabilidade_pct": 14.08205
+            "probabilidade_pct": 51.4259
           },
           {
             "clube": "Grêmio",
-            "probabilidade_pct": 10.9823
+            "probabilidade_pct": 11.3668
           },
           {
             "clube": "Atlético-MG",
-            "probabilidade_pct": 9.71555
+            "probabilidade_pct": 10.62915
           },
           {
             "clube": "Vasco da Gama",
-            "probabilidade_pct": 8.4919
+            "probabilidade_pct": 9.3315
+          },
+          {
+            "clube": "Cruzeiro",
+            "probabilidade_pct": 8.6832
           }
         ]
       },
       "libertadores": {
         "status": "simulado",
-        "fase_atual": "Oitavas de final",
-        "fase_ordem": 600,
-        "chaves_atuais": 8,
-        "equipes_ativas": 9,
+        "fase_atual": "Quartas de final",
+        "fase_ordem": 700,
+        "chaves_atuais": 4,
+        "equipes_ativas": 8,
         "clubes_ativos": [
           "Corinthians",
-          "Deportes Tolima",
           "Estudiantes de La Plata",
           "Flamengo",
           "Fluminense",
@@ -435,81 +434,78 @@
           "Platense"
         ],
         "rodadas_simuladas_tamanhos": [
-          8,
           4,
           2,
           1
         ],
         "pareamento_futuro": "chave",
-        "partidas_concluidas_no_ajuste": 141,
+        "partidas_concluidas_no_ajuste": 142,
         "principais_chances_titulo": [
           {
             "clube": "Flamengo",
-            "probabilidade_pct": 31.989
+            "probabilidade_pct": 27.8562
           },
           {
             "clube": "Palmeiras",
-            "probabilidade_pct": 20.03775
+            "probabilidade_pct": 21.70595
           },
           {
             "clube": "Estudiantes de La Plata",
-            "probabilidade_pct": 16.09925
+            "probabilidade_pct": 13.71425
           },
           {
             "clube": "Independiente del Valle",
-            "probabilidade_pct": 8.9073
+            "probabilidade_pct": 9.3925
           },
           {
-            "clube": "Corinthians",
-            "probabilidade_pct": 6.9105
+            "clube": "Fluminense",
+            "probabilidade_pct": 7.5006
           }
         ]
       },
       "sul_americana": {
         "status": "simulado",
-        "fase_atual": "2026 CONMEBOL Sudamericana, Round of 16",
-        "fase_ordem": 600,
-        "chaves_atuais": 8,
-        "equipes_ativas": 9,
+        "fase_atual": "Quartas de final",
+        "fase_ordem": 700,
+        "chaves_atuais": 4,
+        "equipes_ativas": 8,
         "clubes_ativos": [
           "Atlético-MG",
           "Boca Juniors",
           "Cienciano del Cusco",
           "Independiente Santa Fe",
           "Montevideo City Torque",
-          "River Plate",
           "Santos",
           "São Paulo",
           "Vasco da Gama"
         ],
         "rodadas_simuladas_tamanhos": [
-          8,
           4,
           2,
           1
         ],
         "pareamento_futuro": "chave",
-        "partidas_concluidas_no_ajuste": 143,
+        "partidas_concluidas_no_ajuste": 144,
         "principais_chances_titulo": [
           {
             "clube": "Boca Juniors",
-            "probabilidade_pct": 31.79235
-          },
-          {
-            "clube": "Montevideo City Torque",
-            "probabilidade_pct": 15.65345
+            "probabilidade_pct": 29.59095
           },
           {
             "clube": "Independiente Santa Fe",
-            "probabilidade_pct": 12.30235
+            "probabilidade_pct": 22.7004
           },
           {
-            "clube": "River Plate",
-            "probabilidade_pct": 10.37575
+            "clube": "Montevideo City Torque",
+            "probabilidade_pct": 18.77325
           },
           {
             "clube": "Cienciano del Cusco",
-            "probabilidade_pct": 9.9706
+            "probabilidade_pct": 9.42455
+          },
+          {
+            "clube": "Atlético-MG",
+            "probabilidade_pct": 8.20105
           }
         ]
       }
@@ -517,14 +513,14 @@
     "alocacao_vagas": {
       "vagas_brasileirao_base": 5,
       "vagas_sul_americana": 6,
-      "media_clubes_serie_a_2026_na_libertadores": 7.844099,
+      "media_clubes_serie_a_2026_na_libertadores": 7.825437,
       "minimo_clubes_serie_a_2026_na_libertadores": 7,
       "maximo_clubes_serie_a_2026_na_libertadores": 9,
-      "media_total_clubes_brasileiros_na_libertadores": 7.844099,
+      "media_total_clubes_brasileiros_na_libertadores": 7.825437,
       "minimo_total_clubes_brasileiros_na_libertadores": 7,
       "maximo_total_clubes_brasileiros_na_libertadores": 9,
       "media_vagas_consumidas_por_clubes_brasileiros_fora_da_serie_a_2026": 0.0,
-      "soma_probabilidades_libertadores_pct": 784.40995,
+      "soma_probabilidades_libertadores_pct": 782.5437,
       "soma_probabilidades_sul_americana_pct": 600.0,
       "regra_decomposicao": "vias exclusivas: G5 do Brasileirão primeiro; títulos/copa apenas quando necessários; sobreposições descem como repasse",
       "regra_elegibilidade": "títulos da Copa do Brasil, Libertadores e Sul-Americana classificam mesmo que o clube seja rebaixado; a posição na liga limita apenas as vagas obtidas pelo Brasileirão"
@@ -542,7 +538,22 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-08-24T22:01:25-03:00",
+          "gerado_em": "2026-08-28T12:01:36-03:00",
+          "fase_atual": {
+            "status": "em_andamento",
+            "ordem": 700,
+            "nome": "Quartas de final",
+            "eventos": 8,
+            "eventos_pendentes": 4
+          },
+          "eventos_finalizados": 146,
+          "eventos_pendentes": 4,
+          "modo_coleta": "completa"
+        },
+        {
+          "chave": "libertadores",
+          "nome": "CONMEBOL Libertadores",
+          "gerado_em": "2026-08-28T12:01:37-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 700,
@@ -551,43 +562,28 @@
             "eventos_pendentes": 8
           },
           "eventos_finalizados": 142,
-          "eventos_pendentes": 8,
-          "modo_coleta": "incremental"
-        },
-        {
-          "chave": "libertadores",
-          "nome": "CONMEBOL Libertadores",
-          "gerado_em": "2026-08-24T22:01:26-03:00",
-          "fase_atual": {
-            "status": "em_andamento",
-            "ordem": 600,
-            "nome": "Oitavas de final",
-            "eventos": 16,
-            "eventos_pendentes": 1
-          },
-          "eventos_finalizados": 141,
-          "eventos_pendentes": 14,
+          "eventos_pendentes": 13,
           "modo_coleta": "incremental"
         },
         {
           "chave": "sul_americana",
           "nome": "CONMEBOL Sudamericana",
-          "gerado_em": "2026-08-24T22:01:26-03:00",
+          "gerado_em": "2026-08-28T12:01:39-03:00",
           "fase_atual": {
             "status": "em_andamento",
-            "ordem": 600,
-            "nome": "2026 CONMEBOL Sudamericana, Round of 16 / Oitavas de final",
-            "eventos": 16,
-            "eventos_pendentes": 1
+            "ordem": 700,
+            "nome": "Quartas de final",
+            "eventos": 8,
+            "eventos_pendentes": 8
           },
-          "eventos_finalizados": 143,
-          "eventos_pendentes": 7,
-          "modo_coleta": "incremental"
+          "eventos_finalizados": 144,
+          "eventos_pendentes": 8,
+          "modo_coleta": "completa"
         }
       ],
-      "referencia_mais_antiga_em": "2026-08-24T22:01:25-03:00",
-      "referencia_mais_recente_em": "2026-08-24T22:01:26-03:00",
-      "snapshots_atualizados_em": "2026-08-24T22:01:26-03:00"
+      "referencia_mais_antiga_em": "2026-08-28T12:01:36-03:00",
+      "referencia_mais_recente_em": "2026-08-28T12:01:39-03:00",
+      "snapshots_atualizados_em": "2026-08-28T12:01:39-03:00"
     }
   },
   "validacoes": {
@@ -595,7 +591,7 @@
     "soma_campeao_pct": 100.0,
     "soma_g4_pct": 400.0,
     "soma_g6_pct": 600.0,
-    "soma_libertadores_consolidada_pct": 784.40995,
+    "soma_libertadores_consolidada_pct": 782.5437,
     "soma_sul_americana_base_pct": 600.0,
     "soma_sul_americana_consolidada_pct": 600.0,
     "soma_rebaixamento_pct": 400.0,
