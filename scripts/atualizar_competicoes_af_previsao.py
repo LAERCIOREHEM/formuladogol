@@ -60,6 +60,7 @@ BRT = ZoneInfo("America/Sao_Paulo")
 SEASON = int(os.environ.get("AF_PREVISAO_TEMPORADA", "2026"))
 DATA_DIR = ROOT / "dados-br" / "competicoes-af-previsao"
 AUDIT_PATH = ROOT / "dados-br" / "auditoria-competicoes-af-previsao.json"
+OVERRIDES_PATH = ROOT / "dados-br" / "ajustes-competicoes.json"
 SNAPSHOT_SCHEMA_VERSION = 2
 BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/scoreboard"
 SUMMARY_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/{league}/summary"
@@ -151,6 +152,35 @@ def load_json(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"{path}: raiz JSON precisa ser objeto")
     return data
+
+
+def apply_confirmed_event_overrides(
+    spec: CompetitionSpec, events: list[dict[str, Any]]
+) -> int:
+    """Aplica correções públicas por event_id sobre horários ESPN provisórios."""
+    if not OVERRIDES_PATH.exists():
+        return 0
+    payload = load_json(OVERRIDES_PATH)
+    overrides = payload.get("eventos") or {}
+    if not isinstance(overrides, dict):
+        raise ValueError(f"{OVERRIDES_PATH}: 'eventos' precisa ser objeto")
+    changed = 0
+    for event in events:
+        override = overrides.get(str(event.get("event_id") or ""))
+        if not isinstance(override, dict):
+            continue
+        if str(override.get("competicao_chave") or "") != spec.key:
+            continue
+        for field in ("data_iso", "estadio", "mandante", "visitante"):
+            if field in override and event.get(field) != override[field]:
+                event[field] = copy.deepcopy(override[field])
+                changed += 1
+        source_key = str(override.get("fonte") or "")
+        event["ajuste_editorial"] = {
+            "fonte": source_key,
+            "url": str((payload.get("fontes") or {}).get(source_key) or ""),
+        }
+    return changed
 
 
 def fetch_json(url: str, timeout: int = 30, attempts: int = 3) -> dict[str, Any]:
@@ -880,6 +910,7 @@ def build_snapshot_from_normalized(
     collection: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     events = copy.deepcopy(normalized_events)
+    overrides_applied = apply_confirmed_event_overrides(spec, events)
     events.sort(key=lambda item: (item.get("data_iso") or "", item.get("event_id") or ""))
     normalize_active_knockout_stage(events)
     normalize_completed_knockout_stage(events)
@@ -926,7 +957,10 @@ def build_snapshot_from_normalized(
             "equipes": len(team_map),
             "equipes_serie_a_2026": sum(bool(team.get("serie_a_2026")) for team in team_map.values()),
         },
-        "coleta": collection or {"modo": "completa", "requisicoes": None, "ultima_completa_em": generated},
+        "coleta": {
+            **(collection or {"modo": "completa", "requisicoes": None, "ultima_completa_em": generated}),
+            "ajustes_editoriais_aplicados": overrides_applied,
+        },
         "equipes": sorted(team_map.values(), key=lambda item: normalize_text(item.get("nome"))),
         "eventos": events,
     }
@@ -1749,6 +1783,12 @@ def self_test() -> None:
     # continental novo: reproduz exatamente o fallback de ~46,3h observado.
     stale_but_factually_safe = copy.deepcopy(overlap_snapshot)
     stale_but_factually_safe["gerado_em"] = (now_brt() - timedelta(hours=46.3)).isoformat()
+    # O autoteste precisa continuar determinístico depois das datas sintéticas
+    # de 2026: posiciona apenas suas pendências fora da janela crítica atual.
+    for index, event in enumerate(
+        item for item in stale_but_factually_safe["eventos"] if not item.get("concluido")
+    ):
+        event["data_iso"] = (now_brt() + timedelta(days=7, minutes=index)).isoformat()
     safe, reasons = preserved_snapshot_safe_for_af(
         stale_but_factually_safe, live_window_hours=4
     )
