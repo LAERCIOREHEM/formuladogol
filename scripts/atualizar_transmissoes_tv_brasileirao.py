@@ -1444,7 +1444,32 @@ def collect(
     return payload, audit
 
 
+def selftest_invariante_auditoria() -> None:
+    """A auditoria SEMPRE conta exatamente os jogos publicados na saída."""
+    now = dt.datetime(2026, 7, 24, 10, 0, tzinfo=TZ)
+    agenda = {"jogos": [
+        {"event_id": "1", "rodada": 20, "mandante": "Palmeiras", "visitante": "Santos",
+         "data_iso": "2026-07-25T16:00:00-03:00"},
+        {"event_id": "2", "rodada": 20, "mandante": "Flamengo", "visitante": "Vasco da Gama",
+         "data_iso": "2026-07-26T18:30:00-03:00"},
+    ]}
+    manual = {"transmissoes": [{"event_id": "1", "canais": ["Premiere"], "exclusivo": True}]}
+    # "existing" carrega um jogo velho, fora da agenda, como acontece em produção
+    existing = {"jogos": {"999": {"event_id": "999", "mandante": "X", "visitante": "Y",
+                                  "data_iso": "2026-07-01T16:00:00-03:00", "canais": ["Premiere"],
+                                  "confianca": "manual"}}}
+    cfg = {**DEFAULT_CONFIG, "habilitar_cbf": False, "habilitar_ge": False,
+           "habilitar_espn": False, "habilitar_ge_artigos": False}
+    payload, audit = collect(agenda=agenda, existing=existing, manual=manual, cfg=cfg, now=now)
+    assert audit["resumo"]["jogos_com_transmissao"] == len(payload["jogos"]), (
+        "invariante quebrada: auditoria diverge da saída "
+        f"({audit['resumo']['jogos_com_transmissao']} vs {len(payload['jogos'])})"
+    )
+    assert "999" not in payload["jogos"], "jogo fora da agenda vazou para a saída"
+
+
 def selftest() -> None:
+    selftest_invariante_auditoria()
     now = dt.datetime(2026, 7, 24, 10, 0, tzinfo=TZ)
     agenda = {
         "jogos": [
@@ -1571,10 +1596,22 @@ def main() -> int:
 
     changed_output = semantic_payload(existing) != semantic_payload(payload)
     changed_audit = semantic_payload(old_audit) != semantic_payload(audit)
-    if changed_output:
+
+    # A auditoria e a saída são duas metades do MESMO snapshot: por construção
+    # audit["resumo"]["jogos_com_transmissao"] == len(payload["jogos"]).
+    # Gravá-las sob condições independentes permite que uma avance sem a outra
+    # (a auditoria muda quase sempre, porque "faltam_horas" é relativo a agora;
+    # a saída só muda quando a grade muda). Quando isso acontece, as travas de
+    # consistência a jusante quebram e derrubam pipelines inteiros que nem
+    # produzem estes arquivos. Portanto: se qualquer metade mudou, grave as duas.
+    desalinhado = int((old_audit.get("resumo") or {}).get("jogos_com_transmissao") or -1) != len(
+        (existing.get("jogos") or {})
+    )
+    if changed_output or changed_audit or desalinhado:
         atomic_write_json(OUTPUT, payload)
-    if changed_audit:
         atomic_write_json(AUDIT_OUTPUT, audit)
+        if desalinhado and not (changed_output or changed_audit):
+            print("Auditoria e saída de TV estavam dessincronizadas; ambas foram reescritas.")
     print(
         f"Transmissões TV: {len(payload['jogos'])} jogo(s); "
         f"alterado={str(changed_output).lower()}; auditoria_alterada={str(changed_audit).lower()}; "

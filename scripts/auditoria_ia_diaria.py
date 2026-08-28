@@ -818,6 +818,23 @@ def apply_transmission_corrections(items: Sequence[Mapping[str, Any]], moment: d
     if applied and not dry_run:
         payload["atualizado_em"] = moment.isoformat()
         save_json(TRANSMISSIONS_PATH, payload)
+        # A auditoria conta os jogos publicados. Ao acrescentar entradas aqui sem
+        # reescrevê-la, o contador fica menor que a saída e as travas de
+        # consistência a jusante quebram — inclusive a do pipeline principal do
+        # Brasileirão, que nem produz estes arquivos e não consegue repará-los.
+        resumo = audit.get("resumo")
+        if isinstance(resumo, dict):
+            resumo["jogos_com_transmissao"] = len(payload["jogos"])
+            resumo["complementos_auditoria_ia"] = int(resumo.get("complementos_auditoria_ia") or 0) + len(applied)
+            pendentes = audit.get("sem_transmissao")
+            if isinstance(pendentes, list):
+                audit["sem_transmissao"] = [
+                    item for item in pendentes
+                    if str((item or {}).get("event_id") or "") not in set(applied)
+                ]
+                resumo["jogos_sem_transmissao_14d"] = len(audit["sem_transmissao"])
+            audit["atualizado_em"] = moment.isoformat()
+            save_json(TRANSMISSIONS_AUDIT_PATH, audit)
     return applied
 
 

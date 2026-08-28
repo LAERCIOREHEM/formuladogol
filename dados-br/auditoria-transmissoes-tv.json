@@ -2,14 +2,15 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 58,
-    "jogos_com_transmissao": 45,
-    "jogos_sem_transmissao_na_janela": 13,
-    "jogos_sem_transmissao_14d": 6,
-    "jogos_sem_transmissao_fora_14d": 7,
+    "jogos_com_transmissao": 66,
+    "jogos_sem_transmissao_na_janela": 5,
+    "jogos_sem_transmissao_14d": 2,
+    "jogos_sem_transmissao_fora_14d": 3,
     "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 14,
     "jogos_estaveis_sem_reconsulta_editorial": 25,
-    "fontes_com_falha": 1
+    "fontes_com_falha": 1,
+    "reconciliado_offline": true
   },
   "fontes": {
     "cbf": {
@@ -57,41 +58,9 @@
       "nivel": "aviso"
     },
     {
-      "event_id": "401912518",
-      "rodada": 0,
-      "jogo": "Fluminense x Platense",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "faltam_horas": 307.4,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401912527",
-      "rodada": 0,
-      "jogo": "Palmeiras x Liga de Quito",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "faltam_horas": 307.4,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401912541",
-      "rodada": 0,
-      "jogo": "Estudiantes de La Plata x Corinthians",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "faltam_horas": 307.4,
-      "nivel": "aviso"
-    },
-    {
       "event_id": "401912542",
       "rodada": 0,
       "jogo": "Boca Juniors x São Paulo",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "faltam_horas": 307.4,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401912543",
-      "rodada": 0,
-      "jogo": "TBD Home x Flamengo",
       "data_iso": "2026-09-09T15:00:00-03:00",
       "faltam_horas": 307.4,
       "nivel": "aviso"
@@ -107,41 +76,9 @@
       "nivel": "aviso"
     },
     {
-      "event_id": "401912518",
-      "rodada": 0,
-      "jogo": "Fluminense x Platense",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "faltam_horas": 307.4,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401912527",
-      "rodada": 0,
-      "jogo": "Palmeiras x Liga de Quito",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "faltam_horas": 307.4,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401912541",
-      "rodada": 0,
-      "jogo": "Estudiantes de La Plata x Corinthians",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "faltam_horas": 307.4,
-      "nivel": "aviso"
-    },
-    {
       "event_id": "401912542",
       "rodada": 0,
       "jogo": "Boca Juniors x São Paulo",
-      "data_iso": "2026-09-09T15:00:00-03:00",
-      "faltam_horas": 307.4,
-      "nivel": "aviso"
-    },
-    {
-      "event_id": "401912543",
-      "rodada": 0,
-      "jogo": "TBD Home x Flamengo",
       "data_iso": "2026-09-09T15:00:00-03:00",
       "faltam_horas": 307.4,
       "nivel": "aviso"
@@ -155,41 +92,9 @@
       "nivel": "futuro"
     },
     {
-      "event_id": "401912517",
-      "rodada": 0,
-      "jogo": "Platense x Fluminense",
-      "data_iso": "2026-09-16T15:00:00-03:00",
-      "faltam_horas": 475.4,
-      "nivel": "futuro"
-    },
-    {
       "event_id": "401912524",
       "rodada": 0,
       "jogo": "São Paulo x Boca Juniors",
-      "data_iso": "2026-09-16T15:00:00-03:00",
-      "faltam_horas": 475.4,
-      "nivel": "futuro"
-    },
-    {
-      "event_id": "401912525",
-      "rodada": 0,
-      "jogo": "Liga de Quito x Palmeiras",
-      "data_iso": "2026-09-16T15:00:00-03:00",
-      "faltam_horas": 475.4,
-      "nivel": "futuro"
-    },
-    {
-      "event_id": "401912526",
-      "rodada": 0,
-      "jogo": "Flamengo x TBD Away",
-      "data_iso": "2026-09-16T15:00:00-03:00",
-      "faltam_horas": 475.4,
-      "nivel": "futuro"
-    },
-    {
-      "event_id": "401912540",
-      "rodada": 0,
-      "jogo": "Corinthians x Estudiantes de La Plata",
       "data_iso": "2026-09-16T15:00:00-03:00",
       "faltam_horas": 475.4,
       "nivel": "futuro"
@@ -341,5 +246,5 @@
     "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/08/25/cartola-2026-com-gols-e-desarmes-flaco-lopez-do-palmeiras-e-o-craque-da-rodada-24.ghtml",
     "https://ge.globo.com/mg/futebol/copa-do-brasil/noticia/2026/08/25/cruzeiro-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-08-27T19:37:53-03:00"
+  "atualizado_em": "2026-08-21T23:51:27-03:00"
 }
