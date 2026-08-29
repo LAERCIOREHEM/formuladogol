@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-08-28",
-  "executado_em": "2026-08-28T17:17:28-03:00",
+  "data_brt": "2026-08-29",
+  "executado_em": "2026-08-29T10:54:36-03:00",
   "status": "atencao",
-  "resumo": "A auditoria não identificou falhas críticas nem alterações permitidas. Há uma pendência de transmissão para jogo futuro, mas a fonte consultada confirmou apenas a identificação da partida e não declarou diretamente os canais.",
+  "resumo": "A integridade dos dados finais permanece preservada. Há uma pendência elegível de transmissão para o evento 401841006, mas a fonte oficial localizada confirma o jogo Flamengo x Mirassol em dois de setembro, sem declarar diretamente qualquer canal de exibição; por isso, não há correção segura a aplicar.",
   "triagem": {
-    "data_hora_brt": "2026-08-28T17:17:28-03:00",
+    "data_hora_brt": "2026-08-29T10:54:36-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
@@ -22,7 +22,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 5.2
+        "ultimo_sucesso_horas": 5.7
       }
     },
     "pendencias": {
@@ -35,7 +35,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 122.2
+          "horas_ate_jogo": 104.6
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -73,40 +73,40 @@
       {
         "type": "search",
         "queries": [
-          "401841006 transmissão 2 setembro 2026 futebol"
+          "401841006 transmissão 2 setembro 2026"
         ]
       }
     ],
     "fontes_web": [
       "https://credencial.cbf.com.br/competicoes/listar/24/4",
-      "https://credencial.cbf.com.br/competicoes/listar/42/2",
-      "https://ge.globo.com/futebol-americano/nfl/noticia/2026/08/19/sportv-e-ge-tv-transmitem-com-exclusividade-o-primeiro-jogo-da-historia-da-nfl-no-maracana.ghtml",
       "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/feminino-a1/2026/corinthians-x-cruzeiro/835267",
+      "https://www.bol.uol.com.br/esporte/2026/08/21/cbf-marca-data-para-o-flamengo-x-mirassol-pelo-brasileirao.ghtm",
       "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/cruzeiro-x-athletico-paranaense/832145",
       "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-mirassol/831919",
       "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/fluminense-x-vasco-da-gama-saf/832140",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/vitoria-x-gremio/832148",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/red-bull-bragantino-x-bahia/832144",
       "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/ceara-x-sport-recife/833136",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/vitoria-x-vasco-da-gama-saf/835156",
-      "https://www.itatiaia.com.br/esportes/futebol/futebol-nacional/copa-do-brasil/copa-do-brasil-datas-horarios-e-onde-assistir-aos-jogos-das-quartas-de-final-2"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/gremio-novorizontino-saf-x-avai/833133",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/2674/liga/BRA.1",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/9967/liga/BRA.1",
+      "https://www.uol.com.br/esporte/ultimas-noticias/agencia/2026/08/21/com-palmeiras-de-olho-cbf-define-data-de-jogo-atrasado-entre-flamengo-e-mirassol.amp.htm"
     ]
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "A auditoria não identificou falhas críticas nem alterações permitidas. Há uma pendência de transmissão para jogo futuro, mas a fonte consultada confirmou apenas a identificação da partida e não declarou diretamente os canais.",
+    "resumo": "A integridade dos dados finais permanece preservada. Há uma pendência elegível de transmissão para o evento 401841006, mas a fonte oficial localizada confirma o jogo Flamengo x Mirassol em dois de setembro, sem declarar diretamente qualquer canal de exibição; por isso, não há correção segura a aplicar.",
     "problemas": [
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "A transmissão do evento permanece elegível para complementação. A consulta à fonte oficial confirmou Flamengo x Mirassol em dois de setembro, mas não informou canais de exibição; portanto, não há evidência inequívoca para correção.",
+        "mensagem": "O evento 401841006 segue sem complementação de transmissão. A página oficial da CBF confirma a partida e seus dados de calendário, mas não informa canal de exibição de forma direta; manter a pendência sem sobrescrever dados. ([cbf.com.br](https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-mirassol/831919?utm_source=openai))",
         "event_id": "401841006",
-        "requer_intervencao": true
+        "requer_intervencao": false
       },
       {
         "categoria": "fonte",
         "severidade": "info",
-        "mensagem": "As falhas isoladas de fontes de transmissão não comprometem a cobertura final e não configuram incidente crítico.",
+        "mensagem": "As falhas isoladas de fontes de transmissão não causaram perda crítica de cobertura segundo os indicadores determinísticos; requer apenas acompanhamento.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -401,6 +401,19 @@
       "executado_em": "2026-08-28T17:17:28-03:00",
       "status": "atencao",
       "resumo": "A auditoria não identificou falhas críticas nem alterações permitidas. Há uma pendência de transmissão para jogo futuro, mas a fonte consultada confirmou apenas a identificação da partida e não declarou diretamente os canais.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-08-29",
+      "executado_em": "2026-08-29T10:54:36-03:00",
+      "status": "atencao",
+      "resumo": "A integridade dos dados finais permanece preservada. Há uma pendência elegível de transmissão para o evento 401841006, mas a fonte oficial localizada confirma o jogo Flamengo x Mirassol em dois de setembro, sem declarar diretamente qualquer canal de exibição; por isso, não há correção segura a aplicar.",
       "chamadas_openai": 1,
       "web_searches": 1,
       "publicos_aplicados": 0,
