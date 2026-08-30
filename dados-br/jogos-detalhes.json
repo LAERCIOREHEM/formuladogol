@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-30T18:51:20.060496-03:00",
+  "gerado_em": "2026-08-30T19:21:26.048780-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 241,
   "total_com_estatisticas": 241,
-  "total_com_publico": 239,
+  "total_com_publico": 240,
   "total_com_eventos": 241,
   "total_com_jogadores": 241,
   "total_eventos_validados": 241,
@@ -564,9 +564,9 @@
       "placar_mandante": 3,
       "placar_visitante": 0,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 65970,
+      "publico_tipo": "total",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/30/flamengo-supera-a-marca-de-1-milhao-de-ingressos-vendidos-como-mandante-em-2026.ghtml",
       "arbitro": "Alex Gomes Stefano",
       "stats": [
         {
@@ -1093,7 +1093,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-30T18:35:16.676700-03:00"
+      "atualizado_em": "2026-08-30T18:35:16.676700-03:00",
+      "publico_pagante": 61934,
+      "renda": 5770680,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841208": {
       "event_id": "401841208",
@@ -135631,6 +135634,6 @@
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
   },
-  "total_com_publico_pagante": 231,
-  "total_com_renda": 239
+  "total_com_publico_pagante": 232,
+  "total_com_renda": 240
 }

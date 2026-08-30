@@ -1,6 +1,6 @@
 {
   "_comentario": "Controle de tentativas da camada de IA de público. \"esgotados\" faz o orquestrador parar de redisparar o coletor para partidas cujo público nunca foi divulgado.",
-  "gerado_em": "2026-08-30T19:11:05-03:00",
+  "gerado_em": "2026-08-30T19:21:18-03:00",
   "jogos": {
     "401841207": {
       "tentativas": 1,
@@ -23,13 +23,6 @@
       "partida": "Athletico-PR x Fluminense",
       "esgotado": true,
       "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
-    },
-    "401841213": {
-      "tentativas": 4,
-      "ultima_tentativa": "2026-08-30T19:11:05-03:00",
-      "rodada": 25,
-      "partida": "Flamengo x Botafogo",
-      "esgotado": false
     }
   },
   "esgotados": [
@@ -37,9 +30,9 @@
   ],
   "ultima_execucao": {
     "pendentes_avaliados": 1,
-    "aceitos": 0,
+    "aceitos": 1,
     "rejeitados": 0,
-    "nao_encontrados": 1,
+    "nao_encontrados": 0,
     "erro": ""
   }
 }
