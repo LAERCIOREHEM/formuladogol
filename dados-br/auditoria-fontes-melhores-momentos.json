@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-08-24T22:51:19-03:00",
+  "atualizado_em": "2026-08-29T21:21:26-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,9 +13,9 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 235,
-    "jogos_com_video": 235,
-    "ge_globo": 228,
+    "jogos_resultados": 236,
+    "jogos_com_video": 236,
+    "ge_globo": 229,
     "amazon_prime_video": 2,
     "cazetv": 3,
     "uol_esporte": 2,
@@ -3674,6 +3674,22 @@
         "titulo": "VITÓRIA 0 X 2 BAHIA | MELHORES MOMENTOS | 24ª RODADA | BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=5PGO-tHVAX8",
         "confianca": 1.0
+      },
+      {
+        "event_id": "401841216",
+        "rodada": 25,
+        "mandante": "Atlético-MG",
+        "visitante": "Vitória",
+        "placar_mandante": 2,
+        "placar_visitante": 1,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "playlistItems",
+        "channel_title": "ge tv",
+        "titulo": "ATLÉTICO-MG 2 X 1 VITÓRIA | MELHORES MOMENTOS | 25ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=dFMhqLTQ18c",
+        "confianca": 1.0
       }
     ],
     "amazon_prime_video": [
@@ -3687,7 +3703,7 @@
         "categoria_fonte": "amazon_prime_video",
         "origem_vinculo": "automatico",
         "fonte": "Prime Video / YouTube",
-        "fonte_busca": "playlistItems",
+        "fonte_busca": "search.list oficial por channelId",
         "channel_title": "Prime Video Sport Brasil",
         "titulo": "MIRASSOL 2 X 2 SANTOS | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
         "url": "https://www.youtube.com/watch?v=aivF0uxPFtY",
@@ -3705,7 +3721,7 @@
         "fonte": "Prime Video / YouTube",
         "fonte_busca": "playlistItems",
         "channel_title": "Prime Video Sport Brasil",
-        "titulo": "CRUZEIRO 2x1 FLAMENGO | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
+        "titulo": "CRUZEIRO 2 X 1 FLAMENGO | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
         "url": "https://www.youtube.com/watch?v=bkOQtKtJISg",
         "confianca": 1.0
       }

@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-08-24T22:51:19-03:00",
+  "atualizado_em": "2026-08-29T21:21:17-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
@@ -9,9 +9,9 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 1626,
-    "playlist_items": 25,
-    "search": 16,
+    "unidades": 1927,
+    "playlist_items": 26,
+    "search": 19,
     "channels": 1,
     "videos": 0
   },
@@ -20,44 +20,44 @@
     "fim": null
   },
   "resumo_geral_antes": {
-    "jogos_resultados": 235,
+    "jogos_resultados": 236,
     "ge": 230,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "com_fonte_preferida": 235
   },
   "resumo_geral_depois": {
-    "jogos_resultados": 235,
-    "ge": 228,
+    "jogos_resultados": 236,
+    "ge": 229,
     "caze": 3,
     "prime": 2,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 235
+    "com_fonte_preferida": 236
   },
   "resumo_janela_antes": {
-    "jogos_resultados": 235,
+    "jogos_resultados": 236,
     "ge": 230,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "com_fonte_preferida": 235
   },
   "resumo_janela_depois": {
-    "jogos_resultados": 235,
-    "ge": 228,
+    "jogos_resultados": 236,
+    "ge": 229,
     "caze": 3,
     "prime": 2,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 235
+    "com_fonte_preferida": 236
   },
   "mantidos_preferidos_na_janela": [
     {
@@ -3027,6 +3027,20 @@
   ],
   "substituidos_para_fontes_preferidas": [
     {
+      "event_id": "401841216",
+      "rodada": 25,
+      "mandante": "Atlético-MG",
+      "visitante": "Vitória",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "motivo": "sem_link_preferido",
+      "fonte_nova": "GE TV / YouTube",
+      "channel_title_novo": "ge tv",
+      "titulo_novo": "ATLÉTICO-MG 2 X 1 VITÓRIA | MELHORES MOMENTOS | 25ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+      "url_nova": "https://www.youtube.com/watch?v=dFMhqLTQ18c",
+      "metodo": "playlistItems"
+    },
+    {
       "event_id": "401841199",
       "rodada": 24,
       "mandante": "Chapecoense",
@@ -3058,7 +3072,7 @@
       "url_anterior": "https://www.youtube.com/watch?v=GhV-hg9QQCY",
       "fonte_nova": "Prime Video / YouTube",
       "channel_title_novo": "Prime Video Sport Brasil",
-      "titulo_novo": "CRUZEIRO 2x1 FLAMENGO | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
+      "titulo_novo": "CRUZEIRO 2 X 1 FLAMENGO | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
       "url_nova": "https://www.youtube.com/watch?v=bkOQtKtJISg",
       "metodo": "playlistItems"
     },
@@ -3132,7 +3146,7 @@
       "channel_title_novo": "Prime Video Sport Brasil",
       "titulo_novo": "MIRASSOL 2 X 2 SANTOS | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
       "url_nova": "https://www.youtube.com/watch?v=aivF0uxPFtY",
-      "metodo": "playlistItems"
+      "metodo": "search.list oficial por channelId"
     }
   ],
   "removidos_por_fonte_nao_preferida": [],
@@ -3359,6 +3373,45 @@
         "prime"
       ],
       "query": "\"Bahia x Chapecoense\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841010",
+      "rodada": 5,
+      "jogo": "Mirassol x Santos",
+      "canal": "ge",
+      "prioridade_fontes": [
+        "ge",
+        "caze",
+        "prime"
+      ],
+      "query": "\"Mirassol 2 x 2 Santos\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 6
+    },
+    {
+      "event_id": "401841010",
+      "rodada": 5,
+      "jogo": "Mirassol x Santos",
+      "canal": "caze",
+      "prioridade_fontes": [
+        "ge",
+        "caze",
+        "prime"
+      ],
+      "query": "\"Mirassol 2 x 2 Santos\" \"melhores momentos\" \"Brasileirão 2026\"",
+      "resultados": 3
+    },
+    {
+      "event_id": "401841010",
+      "rodada": 5,
+      "jogo": "Mirassol x Santos",
+      "canal": "prime",
+      "prioridade_fontes": [
+        "ge",
+        "caze",
+        "prime"
+      ],
+      "query": "\"Mirassol 2 x 2 Santos\" \"melhores momentos\" \"Brasileirão 2026\"",
       "resultados": 6
     }
   ],
