@@ -2,7 +2,7 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-08-29T23:31:31-03:00",
+  "gerado_em": "2026-08-30T05:11:35-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "mudanca_esportiva": false,
@@ -15,7 +15,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-08-29T23:31:28-03:00",
+      "gerado_em": "2026-08-30T05:11:34-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 150,
       "finalizados": 146,
@@ -34,8 +34,8 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-08-08T00:00:00-03:00",
-        "janela_fim": "2026-12-27T23:59:59-03:00",
+        "janela_inicio": "2026-08-09T00:00:00-03:00",
+        "janela_fim": "2026-12-28T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-08-28T12:01:36-03:00",
         "ajustes_editoriais_aplicados": 0
@@ -45,7 +45,7 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-08-29T23:31:31-03:00",
+      "gerado_em": "2026-08-30T05:11:35-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 155,
       "finalizados": 142,
@@ -63,10 +63,11 @@
         "pendentes": []
       },
       "coleta": {
-        "modo": "completa",
-        "requisicoes": 9,
+        "modo": "incremental",
+        "janela_inicio": "2026-08-09T00:00:00-03:00",
+        "janela_fim": "2026-12-28T23:59:59-03:00",
+        "requisicoes": 4,
         "ultima_completa_em": "2026-08-29T23:31:31-03:00",
-        "fases_preservadas_por_event_id": 29,
         "ajustes_editoriais_aplicados": 7
       }
     },
@@ -74,7 +75,7 @@
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-08-29T23:31:31-03:00",
+      "gerado_em": "2026-08-30T05:11:35-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 152,
       "finalizados": 144,
@@ -93,8 +94,8 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-08-08T00:00:00-03:00",
-        "janela_fim": "2026-12-27T23:59:59-03:00",
+        "janela_inicio": "2026-08-09T00:00:00-03:00",
+        "janela_fim": "2026-12-28T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-08-28T12:01:39-03:00",
         "ajustes_editoriais_aplicados": 0
