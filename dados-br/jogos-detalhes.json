@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-29T23:31:21.196625-03:00",
+  "gerado_em": "2026-08-30T00:11:30.357559-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 238,
   "total_com_estatisticas": 238,
-  "total_com_publico": 237,
+  "total_com_publico": 238,
   "total_com_eventos": 238,
   "total_com_jogadores": 238,
   "total_eventos_validados": 238,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 1,
       "estadio": "Estádio São Januário",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 19021,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/29/vasco-ganha-bem-de-time-alternativo-do-cruzeiro-encerra-jejum-e-deixa-o-z-4-do-brasileirao.htm",
       "arbitro": "Fernando Antonio Mendes De Salles Nascimento Fillho",
       "stats": [
         {
@@ -579,7 +579,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-29T23:31:20.036129-03:00"
+      "atualizado_em": "2026-08-29T23:31:20.036129-03:00",
+      "renda": 757036,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841209": {
       "event_id": "401841209",
@@ -133969,5 +133971,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 230,
+  "total_com_renda": 238
 }
