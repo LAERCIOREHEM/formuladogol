@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-08-29T22:51:10-03:00",
+  "atualizado_em": "2026-08-30T00:21:14-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
@@ -9,8 +9,8 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 1926,
-    "playlist_items": 25,
+    "unidades": 1927,
+    "playlist_items": 26,
     "search": 19,
     "channels": 1,
     "videos": 0
@@ -20,44 +20,44 @@
     "fim": null
   },
   "resumo_geral_antes": {
-    "jogos_resultados": 237,
+    "jogos_resultados": 238,
     "ge": 232,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "com_fonte_preferida": 237
   },
   "resumo_geral_depois": {
-    "jogos_resultados": 237,
+    "jogos_resultados": 238,
     "ge": 230,
-    "caze": 3,
+    "caze": 4,
     "prime": 2,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 237
+    "com_fonte_preferida": 238
   },
   "resumo_janela_antes": {
-    "jogos_resultados": 237,
+    "jogos_resultados": 238,
     "ge": 232,
     "caze": 2,
     "prime": 1,
     "uol": 2,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 1,
     "com_fonte_preferida": 237
   },
   "resumo_janela_depois": {
-    "jogos_resultados": 237,
+    "jogos_resultados": 238,
     "ge": 230,
-    "caze": 3,
+    "caze": 4,
     "prime": 2,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 237
+    "com_fonte_preferida": 238
   },
   "mantidos_preferidos_na_janela": [
     {
@@ -3053,6 +3053,20 @@
   ],
   "substituidos_para_fontes_preferidas": [
     {
+      "event_id": "401841212",
+      "rodada": 25,
+      "mandante": "Vasco da Gama",
+      "visitante": "Cruzeiro",
+      "placar_mandante": 3,
+      "placar_visitante": 1,
+      "motivo": "sem_link_preferido",
+      "fonte_nova": "CazéTV / YouTube",
+      "channel_title_novo": "CazéTV",
+      "titulo_novo": "MELHORES MOMENTOS: VASCO 3 X 1 CRUZEIRO | BRASILEIRÃO 2026 | 25ª RODADA | 29/08/26",
+      "url_nova": "https://www.youtube.com/watch?v=I8e2dSTUcMM",
+      "metodo": "playlistItems"
+    },
+    {
       "event_id": "401841199",
       "rodada": 24,
       "mandante": "Chapecoense",
@@ -3242,7 +3256,7 @@
         "prime"
       ],
       "query": "\"Mirassol x Grêmio\" \"melhores momentos\" \"Brasileirão 2026\"",
-      "resultados": 6
+      "resultados": 0
     },
     {
       "event_id": "401841155",
