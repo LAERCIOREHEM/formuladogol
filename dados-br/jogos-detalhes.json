@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-29T20:41:21.964037-03:00",
+  "gerado_em": "2026-08-29T21:11:27.248338-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 236,
   "total_com_estatisticas": 236,
-  "total_com_publico": 235,
+  "total_com_publico": 236,
   "total_com_eventos": 236,
   "total_com_jogadores": 236,
   "total_eventos_validados": 236,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Arena MRV",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 23370,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/29/atletico-mg-aposta-em-reservas-e-ganha-do-vitoria-antes-de-jogo-decisivo-na-copa-do-brasil.amp.htm",
       "arbitro": "Edina Alves Batista",
       "stats": [
         {
@@ -560,7 +560,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-29T20:31:27.991890-03:00"
+      "atualizado_em": "2026-08-29T20:31:27.991890-03:00",
+      "renda": 1053636.8,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841198": {
       "event_id": "401841198",
@@ -132815,5 +132817,5 @@
     }
   },
   "total_com_publico_pagante": 230,
-  "total_com_renda": 235
+  "total_com_renda": 236
 }
