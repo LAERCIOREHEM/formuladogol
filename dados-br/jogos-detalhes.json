@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-29T22:12:22.682440-03:00",
+  "gerado_em": "2026-08-29T22:41:13.390851-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 237,
   "total_com_estatisticas": 237,
-  "total_com_publico": 236,
+  "total_com_publico": 237,
   "total_com_eventos": 237,
   "total_com_jogadores": 237,
   "total_eventos_validados": 237,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 1,
       "estadio": "Estádio Cícero Pompeu de Toledo",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 34954,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/08/29/sao-paulo-bate-bragantino-volta-a-vencer-no-brasileiro-apos-10-jogos-e-finda-drama-de-dorival.amp.htm",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -589,7 +589,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-29T22:12:22.170771-03:00"
+      "atualizado_em": "2026-08-29T22:12:22.170771-03:00",
+      "renda": 1296830,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841216": {
       "event_id": "401841216",
@@ -133396,5 +133398,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 230,
+  "total_com_renda": 237
 }
