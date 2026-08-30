@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-08-30T19:31:21-03:00",
+  "atualizado_em": "2026-08-30T20:51:59-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,18 +13,35 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 241,
+    "jogos_resultados": 243,
     "jogos_com_video": 241,
     "ge_globo": 233,
     "amazon_prime_video": 1,
     "cazetv": 4,
     "uol_esporte": 3,
     "outros": 0,
-    "sem_video": 0,
+    "sem_video": 2,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [],
+  "sem_video": [
+    {
+      "event_id": "401841217",
+      "rodada": 25,
+      "mandante": "Grêmio",
+      "visitante": "Chapecoense",
+      "placar_mandante": 3,
+      "placar_visitante": 1
+    },
+    {
+      "event_id": "401841211",
+      "rodada": 25,
+      "mandante": "Mirassol",
+      "visitante": "Palmeiras",
+      "placar_mandante": 1,
+      "placar_visitante": 1
+    }
+  ],
   "detalhamento": {
     "ge_globo": [
       {
