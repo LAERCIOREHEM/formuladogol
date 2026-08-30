@@ -23,7 +23,7 @@
     "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
-    "erros": 0
+    "erros": 3
   },
   "canais_resolvidos": {
     "getv": {
@@ -237,7 +237,7 @@
       "fonte": "getv",
       "video_id": "sgngQoT8VIc",
       "url": "https://www.youtube.com/watch?v=sgngQoT8VIc",
-      "titulo": "FLAMENGO X BOTAFOGO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
+      "titulo": "AO VIVO! FLAMENGO 3 X 0 BOTAFOGO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | Tropa ge tv",
       "status": "live",
       "confianca": 0.925,
       "motivos": [
@@ -449,16 +449,20 @@
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
-  "erros": [],
+  "erros": [
+    "Falha no search.list live de SBT: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"window_start_time\": \"1788073200\",\n          \"quota_unit\": \"1/d/{project}\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          \"quota_limit\": \"defaultSearchListPerDayPerProject\",\n          \"quota_location\": \"global\",\n          \"service\": \"yo",
+    "Falha no search.list live de SBT: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"window_start_time\": \"1788073200\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          \"quota_limit_value\": \"100\",\n          \"service\": \"youtube.googleapis.com\",\n          \"quota_unit\": \"1/d/{pro",
+    "Falha no search.list live de CazéTV: YouTube API HTTP 429 em search: {\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n    \"errors\": [\n      {\n        \"message\": \"Quota exceeded for quota metric 'Search Queries' and limit 'Search Queries per day' of service 'youtube.googleapis.com' for consumer 'project_number:566098724493'.\",\n        \"domain\": \"global\",\n        \"reason\": \"rateLimitExceeded\"\n      }\n    ],\n    \"status\": \"RESOURCE_EXHAUSTED\",\n    \"details\": [\n      {\n        \"@type\": \"type.googleapis.com/google.rpc.ErrorInfo\",\n        \"reason\": \"RATE_LIMIT_EXCEEDED\",\n        \"domain\": \"googleapis.com\",\n        \"metadata\": {\n          \"quota_limit_value\": \"100\",\n          \"quota_limit\": \"defaultSearchListPerDayPerProject\",\n          \"window_start_time\": \"1788073200\",\n          \"quota_metric\": \"youtube.googleapis.com/search_list\",\n          \"consumer\": \"projects/566098724493\",\n          \"quota_u"
+  ],
   "quota_estimada_youtube": {
-    "unidades": 488,
+    "unidades": 188,
     "requisicoes": {
       "channels": 4,
       "videos": 44,
       "playlistItems": 40,
-      "search": 4
+      "search": 1
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-08-30T18:01:11-03:00"
+  "atualizado_em": "2026-08-30T18:11:11-03:00"
 }
