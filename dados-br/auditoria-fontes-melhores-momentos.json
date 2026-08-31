@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-08-30T21:11:16-03:00",
+  "atualizado_em": "2026-08-30T21:21:32-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -14,26 +14,17 @@
   },
   "resumo": {
     "jogos_resultados": 243,
-    "jogos_com_video": 242,
+    "jogos_com_video": 243,
     "ge_globo": 234,
-    "amazon_prime_video": 2,
+    "amazon_prime_video": 3,
     "cazetv": 4,
     "uol_esporte": 2,
     "outros": 0,
-    "sem_video": 1,
+    "sem_video": 0,
     "percentual_fontes_preferidas": 100.0
   },
   "outros_sites_ainda_em_uso": [],
-  "sem_video": [
-    {
-      "event_id": "401841211",
-      "rodada": 25,
-      "mandante": "Mirassol",
-      "visitante": "Palmeiras",
-      "placar_mandante": 1,
-      "placar_visitante": 1
-    }
-  ],
+  "sem_video": [],
   "detalhamento": {
     "ge_globo": [
       {
@@ -3812,6 +3803,22 @@
         "channel_title": "Prime Video Sport Brasil",
         "titulo": "CRUZEIRO 2 X 1 FLAMENGO | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
         "url": "https://www.youtube.com/watch?v=bkOQtKtJISg",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841211",
+        "rodada": 25,
+        "mandante": "Mirassol",
+        "visitante": "Palmeiras",
+        "placar_mandante": 1,
+        "placar_visitante": 1,
+        "categoria_fonte": "amazon_prime_video",
+        "origem_vinculo": "automatico",
+        "fonte": "Prime Video / YouTube",
+        "fonte_busca": "playlistItems",
+        "channel_title": "Prime Video Sport Brasil",
+        "titulo": "MIRASSOL 1 X 1 PALMEIRAS | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
+        "url": "https://www.youtube.com/watch?v=FyB6YFQV_Mc",
         "confianca": 1.0
       }
     ],
