@@ -60,14 +60,65 @@ FUSO_BRASILIA = timezone(timedelta(hours=-3))
 OPENAI_URL = "https://api.openai.com/v1/responses"
 DEFAULT_MODEL = "gpt-5.6-terra"
 
-# Mesma allowlist da auditoria diária: a camada de IA nunca recebe web aberta.
+# Público e renda são ficha técnica, não interpretação editorial. Quem publica
+# primeiro é a imprensa regional e os portais dos clubes — e a allowlist curta
+# da auditoria diária deixava tudo isso de fora, cegando a busca para matérias
+# que qualquer pessoa acha no Google em dez segundos. A proteção real não é o
+# domínio: é a validação determinística mais abaixo (URL precisa constar entre
+# as páginas efetivamente lidas, faixa de sanidade, confiança mínima, pagante
+# nunca vira presente, nunca sobrescreve valor existente).
 ALLOWED_WEB_DOMAINS = (
+    # oficiais e agências
     "cbf.com.br",
     "ge.globo.com",
     "globoesporte.globo.com",
+    "sportv.globo.com",
+    "oglobo.globo.com",
     "espn.com.br",
     "uol.com.br",
+    "folha.uol.com.br",
+    "band.uol.com.br",
+    "lance.com.br",
+    "gazetaesportiva.com",
+    "terra.com.br",
+    "r7.com",
+    "estadao.com.br",
+    "metropoles.com",
+    "cnnbrasil.com.br",
+    # imprensa regional: costuma publicar a ficha técnica primeiro
+    "bahianoticias.com.br",
     "itatiaia.com.br",
+    "otempo.com.br",
+    "em.com.br",
+    "gauchazh.clicrbs.com.br",
+    "nsctotal.com.br",
+    "diariodonordeste.verdesmares.com.br",
+    "opovo.com.br",
+    "correiobraziliense.com.br",
+    "gp1.com.br",
+    "oliberal.com",
+    "acritica.com",
+    # portais oficiais dos clubes
+    "santosfc.com.br",
+    "palmeiras.com.br",
+    "flamengo.com.br",
+    "corinthians.com.br",
+    "saopaulofc.net",
+    "fluminense.com.br",
+    "vasco.com.br",
+    "botafogo.com.br",
+    "cruzeiro.com.br",
+    "atletico.com.br",
+    "internacional.com.br",
+    "gremio.net",
+    "esporteclubebahia.com.br",
+    "ecvitoria.com.br",
+    "athleticoparanaense.com",
+    "coritiba.com.br",
+    "chapecoense.com",
+    "redbullbragantino.com.br",
+    "mirassolfc.com.br",
+    "remo.com.br",
 )
 
 MIN_CONFIANCA = 0.90
@@ -580,12 +631,33 @@ def main() -> int:
     parser.add_argument("--grace-horas", type=float, default=GRACE_HORAS_PADRAO)
     parser.add_argument("--max-tentativas", type=int, default=MAX_TENTATIVAS_PADRAO)
     parser.add_argument("--max-jogos", type=int, default=MAX_JOGOS_PADRAO)
+    parser.add_argument(
+        "--reabrir-esgotados",
+        action="store_true",
+        help=(
+            "Zera o marcador de esgotado e o contador de tentativas. Use quando a causa "
+            "das falhas anteriores foi corrigida (por exemplo, ampliação da allowlist de "
+            "fontes): sem isto, jogos abandonados por um defeito antigo nunca voltam a ser tentados."
+        ),
+    )
     args = parser.parse_args()
 
     if args.self_test:
         return self_test()
 
     agora = agora_brt()
+
+    if args.reabrir_esgotados and not args.dry_run:
+        estado_atual = carregar_json(ESTADO, {})
+        jogos_estado = estado_atual.get("jogos") if isinstance(estado_atual.get("jogos"), dict) else {}
+        reabertos = [k for k, v in jogos_estado.items() if isinstance(v, Mapping) and v.get("esgotado")]
+        if reabertos or jogos_estado:
+            estado_atual["jogos"] = {}
+            estado_atual["esgotados"] = []
+            estado_atual["reaberto_em"] = agora.isoformat()
+            salvar_json(ESTADO, estado_atual)
+            print(f"Reabertos {len(reabertos)} jogo(s) esgotado(s); contadores zerados.")
+
     pendentes, estado = pendencias(
         grace_horas=args.grace_horas,
         max_tentativas=args.max_tentativas,
@@ -622,7 +694,21 @@ def main() -> int:
         return 0
 
     if not pendentes:
-        return encerrar("Nenhuma partida elegível para a camada de IA.", contar_tentativa=False)
+        # "Nenhuma elegível" é ambíguo e já escondeu um defeito: pode ser que
+        # nada esteja faltando, ou que tudo tenha sido marcado como esgotado.
+        # O log precisa dizer qual dos dois.
+        jogos_estado = estado.get("jogos") if isinstance(estado.get("jogos"), dict) else {}
+        esgotados = [k for k, v in jogos_estado.items() if isinstance(v, Mapping) and v.get("esgotado")]
+        if esgotados:
+            print(f"::warning::{len(esgotados)} partida(s) marcada(s) como esgotada(s) e fora da fila: "
+                  f"{', '.join(sorted(esgotados)[:6])}. Se a causa das falhas foi corrigida, "
+                  f"rode com --reabrir-esgotados.")
+            return encerrar(
+                f"Nenhuma partida elegível: {len(esgotados)} esgotada(s), o resto já tem público.",
+                contar_tentativa=False,
+            )
+        return encerrar("Nenhuma partida elegível: todas as partidas finalizadas já têm público.",
+                        contar_tentativa=False)
 
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
@@ -632,7 +718,7 @@ def main() -> int:
         return encerrar("OPENAI_API_KEY ausente no ambiente do workflow", contar_tentativa=False)
 
     model = os.environ.get("OPENAI_PUBLICOS_MODEL", os.environ.get("OPENAI_MODEL", DEFAULT_MODEL)).strip() or DEFAULT_MODEL
-    max_tool_calls = min(8, max(2, len(pendentes) * 2))
+    max_tool_calls = min(20, max(4, len(pendentes) * 4))
 
     print(f"Consultando {len(pendentes)} partida(s) sem público (modelo {model}, até {max_tool_calls} buscas).")
     for p in pendentes:
