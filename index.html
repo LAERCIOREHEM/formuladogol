@@ -3812,12 +3812,13 @@ function formatarChanceBolao(item) {
 }
 function formatarPercentualPreciso(valorBruto, exibicaoExplicita = '') {
   const valor = Number(valorBruto);
+  const explicita = String(exibicaoExplicita || '').trim();
+  // O back-end é a autoridade sobre certeza e impossibilidade: ele conhece a
+  // aritmética da eliminação, o front-end só tem o número.
+  if (/^(0%|100%|~0%|~100%)$/.test(explicita)) return explicita;
   if (!Number.isFinite(valor)) return '—';
-  const explicita = String(exibicaoExplicita || '').trim().replace(/\s/g, '');
-  if (valor === 0 && /^(0|0,0+)%$/.test(explicita)) return '0%';
-  if (valor >= 0 && valor < .001) return '<0,001%';
-  if (valor >= 100) return '>99,999%';
-  if (valor > 99.999) return '>99,999%';
+  if (valor >= 0 && valor < .001) return '~0%';
+  if (valor > 99.999) return '~100%';
   let casas = valor < .1 ? 3 : valor < 1 ? 2 : 1;
   while (casas < 3 && Number(valor.toFixed(casas)) >= 100) casas += 1;
   return valor.toLocaleString('pt-BR',{minimumFractionDigits:casas,maximumFractionDigits:casas}) + '%';
@@ -4682,9 +4683,9 @@ function metasObjetivosChance(prob, tipo) {
 function metasObjetivosFormatarChance(valor) {
   const n = Number(valor);
   if (!Number.isFinite(n)) return '—';
-  if (n <= 0) return '0%';
-  if (n < .001) return '<0,001%';
-  if (n > 99.999) return '>99,999%';
+  if (n <= 0) return '~0%';        // era '0%'
+  if (n < .001) return '~0%';      // era '<0,001%'
+  if (n > 99.999) return '~100%';  // era '>99,999%'
   const casas = n < .1 ? 3 : n < 1 ? 2 : 1;
   return n.toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas }) + '%';
 }
