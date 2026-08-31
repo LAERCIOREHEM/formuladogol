@@ -6,6 +6,10 @@ on:
   # FINAL sem público e o backoff da pendência venceu.
   workflow_dispatch:
     inputs:
+      reabrir_esgotados:
+        description: "Zerar o marcador de esgotado (use após corrigir a causa das falhas, ex.: allowlist de fontes)"
+        type: boolean
+        default: false
       dry_run:
         description: 'Testar coleta sem publicar arquivos'
         required: false
@@ -59,14 +63,33 @@ jobs:
         shell: bash
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REABRIR: ${{ inputs.reabrir_esgotados }}
         run: |
           set -euo pipefail
           cp dados-br/publicos-complementares.json /tmp/publicos-antes.json
-          python scripts/atualizar_publicos_brasileirao.py --max-rodadas 3
 
-          # Camada de resgate: a matéria consolidada da rodada no ge só sai quando
-          # a rodada inteira termina, mas a reportagem de cada jogo traz a ficha
-          # técnica poucas horas após o apito. Só roda quando ainda há lacuna.
+          # ORDEM INVERTIDA: a camada de IA vem PRIMEIRO.
+          # O coletor determinístico varre o sitemap do ge e, na prática, gasta
+          # ~90s em ge_artigos + ~8s na CBF para achar zero público, porque a
+          # matéria consolidada da rodada só sai quando a rodada inteira termina.
+          # A busca por partida acha a ficha técnica poucas horas após o apito.
+          # Rodando a IA antes, o determinístico só precisa varrer o que sobrou.
+          if [[ "${REABRIR:-false}" == "true" ]]; then
+            python scripts/completar_publicos_ia.py --reabrir-esgotados --dry-run >/dev/null 2>&1 || true
+            python - <<'PY'
+          import json, pathlib
+          caminho = pathlib.Path('dados-br/estado-publicos-ia.json')
+          try:
+              estado = json.loads(caminho.read_text(encoding='utf-8'))
+          except Exception:
+              estado = {}
+          estado['jogos'] = {}
+          estado['esgotados'] = []
+          caminho.write_text(json.dumps(estado, ensure_ascii=False, indent=2) + "\n", encoding='utf-8')
+          print('Marcadores de esgotado zerados a pedido do disparo manual.')
+          PY
+          fi
+
           set +e
           python scripts/completar_publicos_ia.py \
             --grace-horas 2 \
@@ -74,6 +97,8 @@ jobs:
             --max-tentativas 8 2>&1 | tee /tmp/camada-ia.log
           IA_RC=${PIPESTATUS[0]}
           set -e
+
+          python scripts/atualizar_publicos_brasileirao.py --max-rodadas 3
           if [[ "$IA_RC" != "0" ]]; then
             echo "Camada de IA terminou com codigo $IA_RC; seguindo com o deterministico."
           fi
