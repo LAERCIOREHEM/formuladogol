@@ -226,11 +226,23 @@ def pendencias(
             continue
         det = jogos_det.get(event_id) if isinstance(jogos_det, Mapping) else None
         cmp_ = jogos_comp.get(event_id) if isinstance(jogos_comp, Mapping) else None
-        if numero_publico((det or {}).get("publico")) is not None:
-            continue
-        if numero_publico((cmp_ or {}).get("publico")) is not None:
-            continue
         if not isinstance(det, Mapping) or det.get("placar_mandante") is None:
+            continue
+        # Público e renda são lacunas INDEPENDENTES. Antes, assim que o público
+        # entrava a partida saía da fila para sempre e a renda nunca era
+        # buscada de novo — foi assim que Grêmio x Chapecoense ficou pela
+        # metade. Agora a partida permanece elegível enquanto faltar qualquer
+        # um dos dois, e o dossiê diz ao modelo exatamente o que procurar.
+        tem_publico = (
+            numero_publico(det.get("publico")) is not None
+            or numero_publico((cmp_ or {}).get("publico")) is not None
+        )
+        tem_renda = (
+            numero_renda(det.get("renda")) is not None
+            or numero_renda((cmp_ or {}).get("renda")) is not None
+        )
+        faltando = [campo for campo, presente in (("publico", tem_publico), ("renda", tem_renda)) if not presente]
+        if not faltando:
             continue
         estado_jogo = tentativas.get(event_id) if isinstance(tentativas.get(event_id), Mapping) else {}
         if estado_jogo.get("esgotado") is True:
@@ -253,6 +265,7 @@ def pendencias(
             "placar": f"{det.get('placar_mandante')}x{det.get('placar_visitante')}",
             "horas_desde_inicio": round(horas, 1),
             "tentativas_anteriores": int(estado_jogo.get("tentativas") or 0),
+            "faltando": faltando,
         })
 
     pendentes.sort(key=lambda item: item["data_iso"], reverse=True)
@@ -274,12 +287,13 @@ def schema_resposta() -> dict[str, Any]:
             "pagantes": {"anyOf": [{"type": "integer", "minimum": 1, "maximum": MAX_PUBLICO}, {"type": "null"}]},
             "renda": {"anyOf": [{"type": "number", "minimum": 0}, {"type": "null"}]},
             "fonte_url": {"type": "string", "maxLength": 1200},
+            "fonte_url_renda": {"type": "string", "maxLength": 1200},
             "confianca": {"type": "number", "minimum": 0, "maximum": 1},
             "justificativa": {"type": "string", "minLength": 3, "maxLength": 400},
         },
         "required": [
             "event_id", "encontrado", "publico", "tipo",
-            "pagantes", "renda", "fonte_url", "confianca", "justificativa",
+            "pagantes", "renda", "fonte_url", "fonte_url_renda", "confianca", "justificativa",
         ],
     }
     return {
@@ -292,15 +306,22 @@ def schema_resposta() -> dict[str, Any]:
 
 def montar_payload(pendentes: Sequence[Mapping[str, Any]], model: str, max_tool_calls: int) -> dict[str, Any]:
     instrucao = (
-        "Você localiza o público de partidas do Campeonato Brasileiro Série A já encerradas. "
-        "Para CADA partida da lista, busque a reportagem do jogo ou a ficha técnica em fontes esportivas "
-        "reconhecidas e extraia o público. Regras inegociáveis: "
+        "Você localiza PÚBLICO e RENDA de partidas do Campeonato Brasileiro Série A já encerradas. "
+        "O campo 'faltando' de cada partida diz exatamente o que está em falta: busque TODOS os itens "
+        "listados ali, não apenas o primeiro. Público e renda têm o mesmo peso. "
+        "Se a primeira página trouxer só um dos dois, faça uma NOVA busca para o outro — a renda costuma "
+        "aparecer na ficha técnica sob rótulos como 'Renda', 'Renda bruta' ou 'Borderô', muitas vezes numa "
+        "matéria diferente daquela que traz o público. Quando a renda vier de outra página, informe a URL "
+        "dela em 'fonte_url_renda'; quando vier da mesma, repita a URL. "
+        "Para CADA partida, busque a reportagem do jogo ou a ficha técnica em fontes esportivas "
+        "reconhecidas. Regras inegociáveis: "
         "(1) informe como 'presente' apenas o público presente/total declarado pela fonte; "
         "(2) NUNCA converta público pagante em presente — se a fonte só traz pagantes, preencha 'pagantes' "
         "e deixe 'publico' nulo com tipo 'indefinido'; "
         "(3) fonte_url deve ser a URL exata da página que você efetivamente leu e que declara o número; "
-        "(4) se não encontrar o número para uma partida, devolva encontrado=false com publico nulo — "
-        "não estime, não interpole, não use capacidade do estádio nem média histórica; "
+        "(4) se não encontrar algum número, devolva-o como nulo — não estime, não interpole, não use "
+        "capacidade do estádio, preço médio de ingresso nem média histórica; devolver público sem renda "
+        "é aceitável, mas só depois de procurar a renda de verdade em mais de uma fonte; "
         "(5) confianca reflete a certeza de que o número pertence àquela partida específica "
         "(confira mandante, visitante, data e placar antes de responder). "
         "Responda exatamente no JSON Schema, uma entrada por event_id recebido."
@@ -432,11 +453,18 @@ def validar(
             rejeitados.append({"event_id": event_id, "motivos": ["modelo declarou que não encontrou"], "nao_e_erro": True})
             continue
 
+        faltando = set(por_id[event_id].get("faltando") or ["publico", "renda"])
         publico = numero_publico(item.get("publico"))
-        if publico is None:
-            motivos.append("público ausente ou fora da faixa de sanidade")
-        if item.get("tipo") not in {"presente", "total"}:
-            motivos.append("tipo não é presente/total")
+        renda_bruta = numero_renda(item.get("renda"))
+        # Quando só a renda está em falta, exigir público seria descartar a
+        # resposta útil e deixar a partida pela metade para sempre.
+        if "publico" in faltando:
+            if publico is None:
+                motivos.append("público ausente ou fora da faixa de sanidade")
+            if item.get("tipo") not in {"presente", "total"}:
+                motivos.append("tipo não é presente/total")
+        elif publico is None and renda_bruta is None:
+            motivos.append("nada aproveitável: renda continua ausente")
 
         try:
             confianca = float(item.get("confianca") or 0)
@@ -445,39 +473,62 @@ def validar(
         if confianca < MIN_CONFIANCA:
             motivos.append(f"confiança {confianca:.2f} abaixo de {MIN_CONFIANCA:.2f}")
 
-        fonte = normalizar_url(item.get("fonte_url"))
-        if not fonte:
-            motivos.append("fonte_url inválida")
-        elif not dominio_permitido(fonte):
-            motivos.append("domínio fora da allowlist")
-        elif fonte not in fontes_web:
-            motivos.append("fonte não consta entre as páginas efetivamente lidas pela busca")
+        def checar_fonte(url_bruta: Any, rotulo: str) -> str:
+            alvo = normalizar_url(url_bruta)
+            if not alvo:
+                motivos.append(f"{rotulo} inválida")
+            elif not dominio_permitido(alvo):
+                motivos.append(f"{rotulo}: domínio fora da allowlist")
+            elif alvo not in fontes_web:
+                motivos.append(f"{rotulo} não consta entre as páginas efetivamente lidas pela busca")
+            else:
+                return alvo
+            return ""
+
+        fonte = checar_fonte(item.get("fonte_url"), "fonte_url") if publico is not None else ""
+        if publico is None and "publico" not in faltando:
+            # Só a renda estava faltando: a fonte principal não é exigida.
+            motivos = [m for m in motivos if not m.startswith("fonte_url")]
 
         pagantes = numero_publico(item.get("pagantes"))
         if pagantes is not None and publico is not None and pagantes > publico:
             motivos.append("pagantes maior que público presente")
             pagantes = None
-        renda = numero_renda(item.get("renda"))
+
+        renda = renda_bruta
+        fonte_renda = ""
+        if renda is not None:
+            bruta_renda = item.get("fonte_url_renda") or item.get("fonte_url")
+            fonte_renda = checar_fonte(bruta_renda, "fonte_url_renda")
+            if not fonte_renda:
+                # Renda sem fonte verificável é descartada, mas não invalida o
+                # público, que tem fonte própria já checada acima.
+                motivos = [m for m in motivos if not m.startswith("fonte_url_renda")]
+                renda = None
 
         if motivos:
             rejeitados.append({"event_id": event_id, "motivos": motivos, "proposta": item})
             continue
 
         registro: dict[str, Any] = {
-            "tipo": str(item.get("tipo")),
-            "fonte": fonte,
             "origem": "openai:web_search",
-            "publico_status": "divulgado",
-            "pagantes_status": "divulgado" if pagantes is not None else "",
-            "renda_status": "divulgado" if renda is not None else "",
             "fonte_adicional": "Camada de IA sobre reportagem do jogo",
-            "publico": publico,
             "confianca": round(confianca, 3),
         }
+        if publico is not None:
+            registro["tipo"] = str(item.get("tipo"))
+            registro["fonte"] = fonte
+            registro["publico_status"] = "divulgado"
+            registro["publico"] = publico
         if pagantes is not None:
             registro["pagantes"] = pagantes
+            registro["pagantes_status"] = "divulgado"
         if renda is not None:
             registro["renda"] = renda
+            registro["renda_status"] = "divulgado"
+            registro["fonte_renda"] = fonte_renda or fonte
+        if not registro.get("fonte"):
+            registro["fonte"] = fonte or fonte_renda
         aceitos.append({"event_id": event_id, "registro": registro, "justificativa": str(item.get("justificativa") or "")})
 
     return aceitos, rejeitados
@@ -494,11 +545,24 @@ def aplicar(aceitos: Sequence[Mapping[str, Any]]) -> int:
     gravados = 0
     for item in aceitos:
         event_id = str(item["event_id"])
-        atual = jogos.get(event_id)
-        if isinstance(atual, Mapping) and numero_publico(atual.get("publico")) is not None:
-            continue  # jamais sobrescreve complemento existente
-        jogos[event_id] = dict(item["registro"])
-        gravados += 1
+        atual = dict(jogos.get(event_id) or {}) if isinstance(jogos.get(event_id), Mapping) else {}
+        novo_reg = dict(item["registro"])
+        # Complementa campo a campo: jamais sobrescreve um valor já existente,
+        # mas preenche o que falta. É o que permite a renda chegar depois do
+        # público, numa execução seguinte, sem apagar nada.
+        mudou = False
+        for chave, valor in novo_reg.items():
+            if chave in {"publico", "renda", "pagantes"}:
+                if atual.get(chave) not in (None, "", 0):
+                    continue
+            elif atual.get(chave) not in (None, ""):
+                if chave not in {"confianca", "origem", "fonte_adicional"}:
+                    continue
+            atual[chave] = valor
+            mudou = True
+        if mudou:
+            jogos[event_id] = atual
+            gravados += 1
     if not gravados:
         return 0
     comp["jogos"] = jogos
@@ -557,27 +621,57 @@ def atualizar_estado(
 # self-test
 # --------------------------------------------------------------------------- #
 def self_test() -> int:
-    fontes = {"https://ge.globo.com/futebol/times/fluminense/noticia/2026/08/22/exemplo.ghtml"}
+    # As URLs de fontes_web chegam normalizadas por coletar_fontes(); o teste
+    # precisa usar a mesma forma, senão compara maçã com laranja.
+    fontes = {normalizar_url("https://ge.globo.com/futebol/times/fluminense/noticia/2026/08/22/exemplo.ghtml")}
     pend = [{"event_id": "1", "rodada": 24, "data_iso": "2026-08-22T16:00",
              "mandante": "Fluminense", "visitante": "Remo", "estadio": "Maracanã",
-             "placar": "2x0", "horas_desde_inicio": 14.0, "tentativas_anteriores": 0}]
+             "placar": "2x0", "horas_desde_inicio": 14.0, "tentativas_anteriores": 0,
+             "faltando": ["publico", "renda"]}]
+    URL = normalizar_url("https://ge.globo.com/futebol/times/fluminense/noticia/2026/08/22/exemplo.ghtml")
 
     ok = [{"event_id": "1", "encontrado": True, "publico": 41234, "tipo": "presente",
            "pagantes": 38000, "renda": 2100000.0,
-           "fonte_url": "https://ge.globo.com/futebol/times/fluminense/noticia/2026/08/22/exemplo.ghtml",
+           "fonte_url": URL, "fonte_url_renda": URL,
            "confianca": 0.97, "justificativa": "ficha técnica da partida"}]
     aceitos, rejeitados = validar(ok, pend, fontes)
     assert len(aceitos) == 1 and not rejeitados, (aceitos, rejeitados)
     assert aceitos[0]["registro"]["publico"] == 41234
     assert aceitos[0]["registro"]["pagantes"] == 38000
 
-    fora = [dict(ok[0], fonte_url="https://exemplo-aleatorio.com/x")]
+    fora = [dict(ok[0], fonte_url="https://exemplo-aleatorio.com/x", fonte_url_renda="https://exemplo-aleatorio.com/x")]
     _, rej = validar(fora, pend, fontes)
-    assert rej and "domínio fora da allowlist" in rej[0]["motivos"]
+    assert rej and any("allowlist" in m for m in rej[0]["motivos"]), rej
 
-    nao_lida = [dict(ok[0], fonte_url="https://ge.globo.com/outra/materia.ghtml")]
+    nao_lida = [dict(ok[0], fonte_url="https://ge.globo.com/outra/materia.ghtml",
+                     fonte_url_renda="https://ge.globo.com/outra/materia.ghtml")]
     _, rej = validar(nao_lida, pend, fontes)
     assert rej and any("efetivamente lidas" in m for m in rej[0]["motivos"])
+
+    # Renda de OUTRA página, também lida pela busca: aceita as duas fontes.
+    URL2 = normalizar_url("https://www.uol.com.br/esporte/2026/08/30/ficha.htm")
+    duas = [dict(ok[0], fonte_url_renda=URL2)]
+    ac, rej = validar(duas, pend, fontes | {URL2})
+    assert len(ac) == 1 and not rej, (ac, rej)
+    assert ac[0]["registro"]["fonte_renda"] == URL2
+
+    # Renda com fonte não lida: descarta SÓ a renda, preserva o público.
+    renda_ruim = [dict(ok[0], fonte_url_renda="https://ge.globo.com/inventada.ghtml")]
+    ac, rej = validar(renda_ruim, pend, fontes)
+    assert len(ac) == 1 and not rej, (ac, rej)
+    assert ac[0]["registro"]["publico"] == 41234
+    assert "renda" not in ac[0]["registro"], "renda sem fonte verificável não pode entrar"
+
+    # Partida onde SÓ a renda falta: resposta sem público continua aproveitável.
+    so_renda_pend = [dict(pend[0], faltando=["renda"])]
+    so_renda = [{"event_id": "1", "encontrado": True, "publico": None, "tipo": "indefinido",
+                 "pagantes": None, "renda": 1850000.0,
+                 "fonte_url": "", "fonte_url_renda": URL2,
+                 "confianca": 0.95, "justificativa": "ficha técnica traz apenas a renda"}]
+    ac, rej = validar(so_renda, so_renda_pend, fontes | {URL2})
+    assert len(ac) == 1 and not rej, (ac, rej)
+    assert ac[0]["registro"]["renda"] == 1850000.0
+    assert "publico" not in ac[0]["registro"]
 
     baixa = [dict(ok[0], confianca=0.5)]
     _, rej = validar(baixa, pend, fontes)
