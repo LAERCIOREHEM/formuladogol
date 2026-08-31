@@ -1320,6 +1320,14 @@
       const detail = probabilityFieldDetail(club, field);
       return normalized[index] > 0 || (detail?.impossivel_estruturalmente !== true && detail?.possivel_estruturalmente !== false);
     });
+    // Destino que não apareceu em NENHUMA simulação não recebe o piso visual de
+    // 0,001%: esse piso comunicava "raro" onde o certo é "não observado". Ele
+    // sai da divisão com zero unidades e o arredondamento conjunto compensa nos
+    // demais, mantendo a soma dos três destinos em 100%.
+    const emptyObserved = fields.map((field, index) => {
+      const detail = probabilityFieldDetail(club, field);
+      return detail?.zero_observado === true && normalized[index] <= 0;
+    });
     let digits = 3;
     for (const candidate of [1, 2, 3]) {
       const quantum = 10 ** (-candidate);
@@ -1330,13 +1338,13 @@
     }
     const factor = 10 ** digits;
     const scaled = normalized.map((value) => value * factor);
-    const units = scaled.map((value, index) => possible[index] ? Math.max(1, Math.floor(value + 1e-9)) : 0);
+    const units = scaled.map((value, index) => (possible[index] && !emptyObserved[index]) ? Math.max(1, Math.floor(value + 1e-9)) : 0);
     let difference = 100 * factor - units.reduce((sum, value) => sum + value, 0);
     while (difference !== 0) {
       const candidates = scaled.map((value, index) => ({
         index,
         remainder: value - Math.floor(value),
-        removable: units[index] - (possible[index] ? 1 : 0),
+        removable: units[index] - ((possible[index] && !emptyObserved[index]) ? 1 : 0),
       })).filter((item) => difference > 0 || item.removable > 0)
         .sort((a, b) => difference > 0 ? b.remainder - a.remainder : b.removable - a.removable);
       const target = candidates[0]?.index;
@@ -1348,7 +1356,10 @@
       const detail = probabilityFieldDetail(club, field);
       const impossible = detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false;
       if (impossible && units[index] === 0) return [field, "0%"];
-      if (units[index] === 100 * factor && possible.filter(Boolean).length === 1) return [field, "100%"];
+      if (emptyObserved[index]) return [field, "~0%"];
+      if (units[index] === 100 * factor) {
+        return [field, detail?.certeza_estrutural === true ? "100%" : "~100%"];
+      }
       return [field, `${number(units[index] / factor, digits)}%`];
     }));
   }
@@ -2272,7 +2283,7 @@
           }).join("")}</tbody>
         </table>
       </div>
-      <p class="probability-continental-note"><strong>Destino continental:</strong> Libertadores + Sul-Americana + sem competição continental = <strong>100%</strong> em cada clube. Os três valores são arredondados em conjunto e usam de uma a três casas conforme a precisão necessária; uma possibilidade válida abaixo da resolução recebe o piso visual de 0,001%, compensado no maior destino. Rebaixamento é um risco independente, pois uma vaga conquistada por copa pode coexistir com queda.</p>
+      <p class="probability-continental-note"><strong>Destino continental:</strong> Libertadores + Sul-Americana + sem competição continental = <strong>100%</strong> em cada clube. Os três valores são arredondados em conjunto e usam de uma a três casas conforme a precisão necessária; um destino que não apareceu em nenhuma simulação aparece como <strong>~0%</strong> e o arredondamento é compensado nos demais. Rebaixamento é um risco independente, pois uma vaga conquistada por copa pode coexistir com queda.</p>
     </section>`;
     const shell = target.querySelector(".probability-table-shell");
     if (shell && previousScrollLeft) shell.scrollLeft = previousScrollLeft;
