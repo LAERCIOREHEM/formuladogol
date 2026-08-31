@@ -1992,6 +1992,8 @@
   .team-needs-objective.is-impossible .team-needs-target strong { color:#f4a2b0; }
   .team-needs-note { margin:10px 0 0; color:#7f93a2; font-size:9px; line-height:1.5; }
   .team-needs-note strong { color:#aebfca; }
+  .legenda-probabilidade { margin:10px 0 0; padding:9px 11px; border:1px solid #1a2a3c; border-radius:9px; background:rgba(255,255,255,.02); color:#7f93a2; font-size:9.5px; line-height:1.6; }
+  .legenda-probabilidade strong { color:#cfe0ec; font-weight:800; }
   @media (max-width: 980px) { .team-needs-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
   @media (max-width: 640px) {
     .team-needs-card { margin:14px 0; padding:13px 11px; border-radius:15px; }
@@ -4680,6 +4682,12 @@ function metasObjetivosChance(prob, tipo) {
   return NaN;
 }
 
+function legendaProbabilidadeHtml() {
+  // Legenda fixa: no celular nao existe hover, entao a diferenca entre certeza
+  // matematica e resultado de simulacao precisa estar sempre visivel na tela.
+  return `<p class="legenda-probabilidade"><strong>0%</strong> e <strong>100%</strong> indicam impossibilidade ou certeza matemática, já provadas pela pontuação. <strong>~0%</strong> e <strong>~100%</strong> indicam o resultado de 2 milhões de simulações, sem prova matemática.</p>`;
+}
+
 function metasObjetivosFormatarChance(valor) {
   const n = Number(valor);
   if (!Number.isFinite(n)) return '—';
@@ -4809,6 +4817,7 @@ function renderObjetivosTime() {
   html += `<div class="team-needs-grid">${defs.map(def => metasObjetivosCard(def, nivel, clubeTabela, clubeProb)).join('')}</div>`;
   const gerado = state.probabilidadesBrasileirao && state.probabilidadesBrasileirao.gerado_em ? formatarDataHoraBrCompleta(state.probabilidadesBrasileirao.gerado_em) : '—';
   html += `<p class="team-needs-note"><strong>Como ler:</strong> os pontos são patamares gerais observados nos 2 milhões de universos do AF-Previsão; não são garantia matemática. “Sul-Americana+” significa terminar com pelo menos uma vaga continental (Sul-Americana ou Libertadores). ${live ? 'A pontuação acima acompanha a classificação ao vivo; as probabilidades “AF atual” permanecem as da última simulação concluída. ' : ''}Última simulação: ${brEscapeHtml(gerado)}.</p>`;
+  html += legendaProbabilidadeHtml();
   target.innerHTML = html;
 }
 
