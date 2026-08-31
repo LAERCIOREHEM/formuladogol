@@ -1273,13 +1273,18 @@
 
   function probabilityDisplayText(detail, value, digits = 1) {
     const n = Number(value);
-    if (!Number.isFinite(n)) return "—";
     const explicit = String(detail?.exibicao || "").replace(/\s/g, "");
-    if (n === 0 && /^(0|0,0+)%$/.test(explicit)) return "0%";
+    // O back-end conhece a aritmética da eliminação; o front-end só tem o
+    // número. Quando ele já decidiu o rótulo, a decisão dele prevalece.
+    if (/^(0%|100%|~0%|~100%)$/.test(explicit)) return explicit;
+    if (!Number.isFinite(n)) return "—";
     if (detail?.impossivel_estruturalmente === true || detail?.possivel_estruturalmente === false) return "0%";
-    if (n >= 0 && n < 0.001) return "<0,001%";
-    if (n >= 100) return detail?.certeza_estrutural === true ? "100%" : ">99,999%";
-    if (n > 99.999) return ">99,999%";
+    if (detail?.certeza_estrutural === true && n >= 100) return "100%";
+    // O til marca resultado empírico: nunca observado é diferente de
+    // observado e raro, e ambos são diferentes de impossível.
+    if (detail?.zero_observado === true || n === 0) return "~0%";
+    if (n > 0 && n < 0.001) return "<0,001%";
+    if (n >= 99.999) return "~100%";
     let precision = n < 0.1 ? 3 : n < 1 ? 2 : 1;
     while (precision < 3 && Number(n.toFixed(precision)) >= 100) precision += 1;
     return `${number(n, precision)}%`;
@@ -1523,7 +1528,7 @@
     const title = impossible
       ? String(detail?.motivo_impossibilidade || "Via estruturalmente indisponível para o clube.")
       : residual
-        ? "Evento não é tratado como impossível: ficou abaixo da resolução visual de 0,001%."
+        ? "Não apareceu em nenhuma das 2 milhões de simulações, mas ainda é matematicamente possível."
         : help;
     return `<div class="probability-metric probability-tone-${escapeAttr(tone)}"${title ? ` title="${escapeAttr(title)}"` : ""}>
       <span>${escapeHtml(label)}${residual ? '<em class="probability-residual-mark" aria-label="Probabilidade residual">ⓘ</em>' : ""}</span>
