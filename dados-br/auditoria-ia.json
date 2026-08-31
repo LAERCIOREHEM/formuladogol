@@ -1,16 +1,17 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-08-30",
-  "executado_em": "2026-08-30T10:53:58-03:00",
+  "data_brt": "2026-08-31",
+  "executado_em": "2026-08-31T13:16:34-03:00",
   "status": "atencao",
-  "resumo": "A auditoria não identificou falhas críticas nos dados finais. Há uma pendência elegível de transmissão para o evento 401841006, mas a busca não trouxe fonte autorizada que declarasse diretamente os canais do jogo; nenhuma correção foi proposta.",
+  "resumo": "A auditoria mantém status de atenção por lacunas elegíveis de público e transmissão, sem inconsistências críticas nos dados finais. A busca autorizada não encontrou fonte permitida que declarasse diretamente os dados pendentes; por isso, nenhuma correção foi proposta.",
   "triagem": {
-    "data_hora_brt": "2026-08-30T10:53:58-03:00",
+    "data_hora_brt": "2026-08-31T13:16:34-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
       "avisos": [
         "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
+        "2 público(s) ainda elegíveis para complementação",
         "1 transmissão(ões) ainda elegíveis para complementação"
       ],
       "indicadores": {
@@ -20,13 +21,30 @@
         "detalhes_falhas": 0,
         "jogos_sem_estatisticas": 0,
         "transmissoes_criticas": 0,
-        "publicos_antigos_sem_dado": 0,
+        "publicos_antigos_sem_dado": 2,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 0.5
+        "ultimo_sucesso_horas": 8.1
       }
     },
     "pendencias": {
-      "publicos": [],
+      "publicos": [
+        {
+          "event_id": "401841208",
+          "rodada": 25,
+          "data_iso": "2026-08-30T11:00",
+          "mandante": "Athletico-PR",
+          "visitante": "Fluminense",
+          "horas_desde_fim": 24.3
+        },
+        {
+          "event_id": "401841215",
+          "rodada": 25,
+          "data_iso": "2026-08-30T19:30",
+          "mandante": "Bahia",
+          "visitante": "Internacional",
+          "horas_desde_fim": 15.9
+        }
+      ],
       "transmissoes": [
         {
           "event_id": "401841006",
@@ -35,7 +53,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 80.6
+          "horas_ate_jogo": 54.2
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -73,42 +91,43 @@
       {
         "type": "search",
         "queries": [
-          "401841006 transmissão"
+          "site:ge.globo.com OR site:espn.com.br OR site:uol.com.br OR site:itatiaia.com.br \"Athletico-PR\" \"Fluminense\" \"30/08/2026\" público OR \"Bahia\" \"Internacional\" \"30/08/2026\" público OR \"401841006\" transmissão"
         ]
       }
     ],
-    "fontes_web": [
-      "https://economia.uol.com.br/noticias/reuters/2026/05/21/energisa-vende-cinco-ativos-de-transmissao-a-taesa-por-r15-bi.amp.htm",
-      "https://ge.globo.com/ajuda",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/05/16/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-16a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/05/30/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-18a-rodada.ghtml",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ms/futebol/sul-mato-grossense-serie-b/noticia/2026/07/02/serie-b-de-ms-onde-assistir-ao-vivo-aos-jogos-da-terceira-rodada.ghtml",
-      "https://ge.globo.com/google/amp/ms/futebol/sul-mato-grossense-serie-b/noticia/2026/07/07/serie-b-de-ms-onde-assistir-ao-vivo-aos-jogos-da-quarta-rodada.ghtml",
-      "https://ge.globo.com/ms/futebol/sul-mato-grossense-serie-b/noticia/2026/07/22/serie-b-de-ms-onde-assistir-ao-vivo-aos-jogos-da-penultima-rodada.ghtml",
-      "https://natelinha.uol.com.br/televisao/2026/06/14/tv-tira-grade-do-ar-e-exibe-pedido-para-assistir-jogo-do-brasil-na-cazetv-243414.php",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-d/2026/tuna-luso-x-trem/834316",
-      "https://www.uol.com.br/esporte/onde-assistir",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/07/25/transmissao-ao-vivo-de-vasco-x-mirassol-pelo-brasileirao-veja-onde-assistir.amp.htm"
-    ]
+    "fontes_web": []
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "A auditoria não identificou falhas críticas nos dados finais. Há uma pendência elegível de transmissão para o evento 401841006, mas a busca não trouxe fonte autorizada que declarasse diretamente os canais do jogo; nenhuma correção foi proposta.",
+    "resumo": "A auditoria mantém status de atenção por lacunas elegíveis de público e transmissão, sem inconsistências críticas nos dados finais. A busca autorizada não encontrou fonte permitida que declarasse diretamente os dados pendentes; por isso, nenhuma correção foi proposta.",
     "problemas": [
       {
-        "categoria": "transmissao",
+        "categoria": "fonte",
         "severidade": "atencao",
-        "mensagem": "O evento 401841006 permanece sem complementação de transmissão. Não houve evidência direta e inequívoca em fonte autorizada para indicar canais.",
-        "event_id": "401841006",
+        "mensagem": "As falhas de fontes de transmissão são avisos isolados e não comprometem a cobertura final, conforme o dossiê determinístico.",
+        "event_id": "",
         "requer_intervencao": false
       },
       {
-        "categoria": "fonte",
-        "severidade": "info",
-        "mensagem": "As falhas isoladas de fontes de transmissão não comprometeram a cobertura final e não configuram incidente crítico.",
-        "event_id": "",
-        "requer_intervencao": false
+        "categoria": "publico",
+        "severidade": "atencao",
+        "mensagem": "Público ainda elegível para complementação, mas não foi localizada fonte permitida com declaração direta e inequívoca de público presente ou total.",
+        "event_id": "401841208",
+        "requer_intervencao": true
+      },
+      {
+        "categoria": "publico",
+        "severidade": "atencao",
+        "mensagem": "Público ainda elegível para complementação, mas não foi localizada fonte permitida com declaração direta e inequívoca de público presente ou total.",
+        "event_id": "401841215",
+        "requer_intervencao": true
+      },
+      {
+        "categoria": "transmissao",
+        "severidade": "atencao",
+        "mensagem": "Transmissão ainda elegível para complementação, mas não foi localizada fonte permitida que declarasse diretamente os canais do evento.",
+        "event_id": "401841006",
+        "requer_intervencao": true
       }
     ],
     "correcoes_publico": [],
@@ -427,6 +446,19 @@
       "executado_em": "2026-08-30T10:53:58-03:00",
       "status": "atencao",
       "resumo": "A auditoria não identificou falhas críticas nos dados finais. Há uma pendência elegível de transmissão para o evento 401841006, mas a busca não trouxe fonte autorizada que declarasse diretamente os canais do jogo; nenhuma correção foi proposta.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-08-31",
+      "executado_em": "2026-08-31T13:16:34-03:00",
+      "status": "atencao",
+      "resumo": "A auditoria mantém status de atenção por lacunas elegíveis de público e transmissão, sem inconsistências críticas nos dados finais. A busca autorizada não encontrou fonte permitida que declarasse diretamente os dados pendentes; por isso, nenhuma correção foi proposta.",
       "chamadas_openai": 1,
       "web_searches": 1,
       "publicos_aplicados": 0,
