@@ -919,6 +919,73 @@ def calculate_bolao_probabilities(
         },
     }
 
+def structural_status(
+    state: "CurrentState",
+    forecasts: Sequence["MatchForecast"],
+) -> dict[str, dict[str, dict[str, Any]]]:
+    """Decide, por clube e critério, o que já está PROVADO pela aritmética.
+
+    Só declara "impossível" ou "garantido" quando a conclusão vale para qualquer
+    combinação de resultados restantes. O teste é conservador de propósito: pode
+    deixar de detectar uma eliminação que exigiria raciocínio combinatório mais
+    profundo, e nesse caso o rótulo continua sendo o empírico (~0%). O que ele
+    nunca faz é o contrário — afirmar impossibilidade que não existe.
+
+    Limites usados, com 3 pontos por vitória:
+        mínimo final do clube i = pontos atuais (perde tudo)
+        máximo final do clube i = pontos atuais + 3 x jogos restantes
+    O clube j pode terminar acima de i se max_j >= min_i, porque empate em
+    pontos ainda pode ser desempatado a favor de j. E j termina acima de i em
+    qualquer cenário se min_j > max_i.
+    """
+    teams = list(state.teams)
+    position_of = {team: position for position, team in enumerate(teams)}
+    remaining = [0] * len(teams)
+    for forecast in forecasts:
+        remaining[position_of[forecast.fixture.home]] += 1
+        remaining[position_of[forecast.fixture.away]] += 1
+
+    minimo = [int(state.points[i]) for i in range(len(teams))]
+    maximo = [int(state.points[i]) + 3 * remaining[i] for i in range(len(teams))]
+
+    top_k = {"campeao": 1, "g4": 4, "libertadores_base": 5, "g6": 6}
+    ACIMA_PARA_CAIR = 16  # posição >= 17 exige 16 clubes acima
+
+    resultado: dict[str, dict[str, dict[str, Any]]] = {}
+    for i, team in enumerate(teams):
+        certos_acima = sum(1 for j in range(len(teams)) if j != i and minimo[j] > maximo[i])
+        podem_acima = sum(1 for j in range(len(teams)) if j != i and maximo[j] >= minimo[i])
+        criterios: dict[str, dict[str, Any]] = {}
+
+        for chave, k in top_k.items():
+            impossivel = certos_acima >= k
+            criterios[chave] = {
+                "possivel": not impossivel,
+                "certo": bool(podem_acima < k and not impossivel),
+                "motivo": (
+                    f"{certos_acima} clube(s) terminam acima em qualquer cenário; "
+                    f"o máximo possível deste clube é {maximo[i]} pontos"
+                ) if impossivel else None,
+            }
+
+        impossivel_cair = podem_acima < ACIMA_PARA_CAIR
+        criterios["rebaixamento"] = {
+            "possivel": not impossivel_cair,
+            "certo": bool(certos_acima >= ACIMA_PARA_CAIR and not impossivel_cair),
+            "motivo": (
+                f"apenas {podem_acima} clube(s) ainda podem terminar acima; "
+                f"o rebaixamento exigiria {ACIMA_PARA_CAIR}"
+            ) if impossivel_cair else None,
+        }
+
+        # A faixa 6º-11º não tem teste de fronteira simples e confiável:
+        # permanece empírica de propósito, sem afirmar nada.
+        criterios["sul_americana_base"] = {"possivel": True, "certo": False, "motivo": None}
+
+        resultado[team] = criterios
+    return resultado
+
+
 def run_monte_carlo(
     state: CurrentState,
     forecasts: Sequence[MatchForecast],
@@ -995,6 +1062,8 @@ def run_monte_carlo(
     projection_sort_keys: dict[str, tuple[float, float, float, float, float]] = {}
     position_matrix: dict[str, list[float]] = {}
     convergence_deltas: list[float] = []
+    # Aritmética antes da estatística: o que já está provado não depende de sorteio.
+    structural = structural_status(state, forecasts)
     for index, team in enumerate(state.teams):
         team_positions = positions[:, index]
         counts = np.bincount(team_positions, minlength=21)[1:21]
@@ -1045,7 +1114,14 @@ def run_monte_carlo(
                     key: round(value * 100.0, 6) for key, value in probabilities.items()
                 },
                 "probabilidades_detalhes": {
-                    key: display_probability(count, simulations, display_threshold_pct)
+                    key: display_probability(
+                        count,
+                        simulations,
+                        display_threshold_pct,
+                        structurally_possible=structural[team].get(key, {}).get("possivel", True),
+                        structurally_certain=structural[team].get(key, {}).get("certo", False),
+                        impossibility_reason=structural[team].get(key, {}).get("motivo"),
+                    )
                     for key, count in criterion_counts.items()
                 },
                 # A média marginal continua publicada para auditoria. A posição
@@ -1226,7 +1302,9 @@ def build_points_thresholds(
         target_fraction = target / 100.0
         row: dict[str, Any] = {
             "probabilidade_pct": target,
-            "rotulo": "100% nos cenários" if target == 100.0 else (f"{target:g}%".replace(".", ",")),
+            # Mesmo vocabulário da tabela de clubes: o til marca resultado
+            # empírico das simulações, sem prova matemática.
+            "rotulo": "~100% dos cenários" if target == 100.0 else (f"{target:g}%".replace(".", ",")),
         }
         for key, curve in curves.items():
             threshold = next((point for point, probability in zip(points, curve) if probability + 1e-12 >= target_fraction), None)
