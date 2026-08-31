@@ -152,7 +152,7 @@
           "name": "O que significa chance de Libertadores ou rebaixamento?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "É a proporção de simulações em que o clube obteve aquele desfecho ao final de todas as 380 partidas do Brasileirão 2026. Valores abaixo de 0,001% significam que o evento ficou abaixo da resolução visual publicada — mas não é tratado como impossível apenas por isso. O modelo é atualizado após cada rodada."
+            "text": "É a proporção de simulações em que o clube obteve aquele desfecho ao final de todas as 380 partidas do Brasileirão 2026. O til marca resultado empírico: ~0% significa que o desfecho não apareceu em nenhuma das 2 milhões de simulações, mas segue matematicamente possível; ~100% significa que apareceu em todas, sem ser garantido. Já 0% e 100% sem til indicam impossibilidade ou certeza matemática provadas pela pontuação. O modelo é atualizado após cada rodada."
           }
         },
         {
@@ -283,7 +283,7 @@
               <p class="probability-intro">O AF-Previsão combina o Brasileirão com os possíveis desfechos da Copa do Brasil, da CONMEBOL Libertadores e da CONMEBOL Sudamericana, incluindo sobreposições e repasses de vagas. Probabilidade não é certeza nem cotação de aposta.</p>
               <div class="probability-notice" role="note">
                 <span aria-hidden="true">ⓘ</span>
-                <p><strong>Leitura importante:</strong> valores como <b>&lt;0,001%</b> indicam um cenário residual, não impossibilidade matemática. As chances de Libertadores e Sul-Americana são <strong>consolidadas</strong> pelas diferentes vias de classificação.</p>
+                <p><strong>Leitura importante:</strong> <b>0%</b> e <b>100%</b> indicam impossibilidade ou certeza matemática, já provadas pela pontuação. <b>~0%</b> e <b>~100%</b> indicam o resultado de 2 milhões de simulações, sem prova matemática. As chances de Libertadores e Sul-Americana são <strong>consolidadas</strong> pelas diferentes vias de classificação.</p>
               </div>
               <div id="probabilidades-status" aria-live="polite"></div>
               <a class="probability-method-link" href="#metodologia-probabilidades" data-probability-method>Entenda o modelo e consulte a nota técnica ↓</a>
@@ -303,7 +303,7 @@
                 <article><span>1</span><h4>O que o modelo observa?</h4><p>Resultados, mandos, placares e calendário do Brasileirão, além do estado factual das três copas que podem alterar as vagas continentais.</p></article>
                 <article><span>2</span><h4>O que ele projeta?</h4><p>A força ofensiva e defensiva transforma cada jogo restante em probabilidades. A forma dos últimos 12 jogos entra apenas como ajuste leve e limitado.</p></article>
                 <article><span>3</span><h4>Como nasce o percentual?</h4><p>O campeonato e os mata-matas são simulados 2 milhões de vezes. A chance publicada é a frequência do desfecho nesses universos.</p></article>
-                <article><span>4</span><h4>Como interpretar?</h4><p>Um número alto não é garantia. Um valor abaixo de 0,001% não é zero absoluto. Cada novo resultado pode alterar toda a projeção.</p></article>
+                <article><span>4</span><h4>Como interpretar?</h4><p>Um número alto não é garantia. <b>~0%</b> não é zero absoluto: é o que não apareceu em nenhuma simulação, mas ainda pode acontecer. Só <b>0%</b> sem til é impossível de verdade. Cada novo resultado pode alterar toda a projeção.</p></article>
               </div>
 
               <div class="probability-audit-grid" id="probabilidades-auditoria-metodo" aria-live="polite"></div>
@@ -313,7 +313,7 @@
                 <div>
                   <p><strong>Chance consolidada:</strong> Libertadores e Sul-Americana consideram Brasileirão, títulos, Copa do Brasil e repasses aplicáveis.</p>
                   <p><strong>Vias exclusivas:</strong> o detalhamento não conta o mesmo universo duas vezes; a soma dos caminhos fecha com a chance total.</p>
-                  <p><strong>&lt;0,001% não é impossível:</strong> significa que o evento ficou abaixo da resolução visual publicada; o diagnóstico matemático de impossibilidade é tratado separadamente.</p>
+                  <p><strong>~0% não é impossível:</strong> significa que o desfecho não apareceu em nenhuma das 2 milhões de simulações, mas a aritmética do campeonato ainda permite. Quando a impossibilidade é provada pela pontuação, a página mostra <strong>0%</strong> sem til, com o motivo registrado.</p>
                   <p><strong>Posição e pontos:</strong> aparecem como inteiros para facilitar a leitura; as médias decimais permanecem guardadas no JSON para auditoria.</p>
                   <p><strong>Tendência recente:</strong> o modelo incorpora uma camada de suavização exponencial inspirada na lógica de Holt-Winters para captar evolução ou queda recente. Ela usa os últimos 12 jogos de forma parcimoniosa, pesa 8% e não pode alterar em mais de 10% a taxa de gols prevista para uma partida.</p>
                   <p><strong>Histórico auditável:</strong> o AF-Previsão preserva todos os snapshots técnicos quando o estado esportivo muda e, para a evolução pública, fixa marcos imutáveis de fechamento. Assim, a linha Rxx mostrada no clube usa exatamente o mesmo estado probabilístico dos editoriais da rodada; os registros permanecem protegidos por SHA-256.</p>
@@ -361,7 +361,7 @@
                     </article>
                     <article id="metodo-residuais">
                       <span class="probability-method-step">07</span>
-                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando a estimativa fica abaixo do limiar visual, a página mostra <strong>&lt;0,001%</strong>. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico técnico cria um novo snapshot quando o estado esportivo muda e registra rodada, projeções, distribuição completa das posições e probabilidades. Sobre ele, a interface publica apenas marcos imutáveis de fechamento — Rxx para o Brasileirão e CB/CONT para fechamentos continentais auditados —, sempre vinculados por SHA-256 ao snapshot factual correspondente. Uma rodada que não alcance o critério de fechamento editorial não recebe um marco Rxx artificial; seus efeitos continuam preservados no histórico após cada jogo do clube, disponível como detalhe secundário. A avaliação final só será exibida nesta própria aba depois da conclusão do Brasileirão e das competições que alteram as vagas continentais; até lá, nenhum bloco vazio ocupa a página.</p></div>
+                      <div><h4>Probabilidades residuais, resolução e histórico</h4><p>Quando o desfecho não aparece em nenhuma simulação, a página mostra <strong>~0%</strong>; quando aparece pouquíssimas vezes, mostra <strong>&lt;0,001%</strong>; e quando a pontuação já provou a impossibilidade, mostra <strong>0%</strong> sem til. O JSON mantém o percentual sem arredondamento, o número de ocorrências, o total de simulações e a indicação de zero observado. Se o evento não aparece nenhuma vez, também é guardado um limite superior aproximado de 95% pela regra dos três.</p><p>O histórico técnico cria um novo snapshot quando o estado esportivo muda e registra rodada, projeções, distribuição completa das posições e probabilidades. Sobre ele, a interface publica apenas marcos imutáveis de fechamento — Rxx para o Brasileirão e CB/CONT para fechamentos continentais auditados —, sempre vinculados por SHA-256 ao snapshot factual correspondente. Uma rodada que não alcance o critério de fechamento editorial não recebe um marco Rxx artificial; seus efeitos continuam preservados no histórico após cada jogo do clube, disponível como detalhe secundário. A avaliação final só será exibida nesta própria aba depois da conclusão do Brasileirão e das competições que alteram as vagas continentais; até lá, nenhum bloco vazio ocupa a página.</p></div>
                     </article>
                     <article id="metodo-validacao">
                       <span class="probability-method-step">08</span>
