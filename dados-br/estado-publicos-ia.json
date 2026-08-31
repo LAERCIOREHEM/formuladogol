@@ -1,47 +1,13 @@
 {
   "_comentario": "Controle de tentativas da camada de IA de público. \"esgotados\" faz o orquestrador parar de redisparar o coletor para partidas cujo público nunca foi divulgado.",
-  "gerado_em": "2026-08-31T14:52:43-03:00",
-  "jogos": {
-    "401841207": {
-      "tentativas": 1,
-      "ultima_tentativa": "2026-08-23T21:51:20-03:00",
-      "rodada": 24,
-      "partida": "Coritiba x Corinthians",
-      "esgotado": false
-    },
-    "401841198": {
-      "tentativas": 3,
-      "ultima_tentativa": "2026-08-24T22:31:05-03:00",
-      "rodada": 24,
-      "partida": "Botafogo x Athletico-PR",
-      "esgotado": false
-    },
-    "401841208": {
-      "tentativas": 8,
-      "ultima_tentativa": "2026-08-30T18:41:33-03:00",
-      "rodada": 25,
-      "partida": "Athletico-PR x Fluminense",
-      "esgotado": true,
-      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
-    },
-    "401841215": {
-      "tentativas": 8,
-      "ultima_tentativa": "2026-08-30T23:01:19-03:00",
-      "rodada": 25,
-      "partida": "Bahia x Internacional",
-      "esgotado": true,
-      "motivo": "público não divulgado por nenhuma fonte permitida após o limite de tentativas"
-    }
-  },
-  "esgotados": [
-    "401841208",
-    "401841215"
-  ],
+  "gerado_em": "2026-08-31T15:11:51-03:00",
+  "jogos": {},
+  "esgotados": [],
   "ultima_execucao": {
-    "pendentes_avaliados": 0,
-    "aceitos": 0,
+    "pendentes_avaliados": 2,
+    "aceitos": 2,
     "rejeitados": 0,
     "nao_encontrados": 0,
-    "erro": "Nenhuma partida elegível para a camada de IA."
+    "erro": ""
   }
 }

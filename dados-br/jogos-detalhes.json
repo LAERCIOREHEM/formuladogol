@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-31T05:11:35.117364-03:00",
+  "gerado_em": "2026-08-31T15:12:00.101791-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 244,
   "total_com_estatisticas": 244,
-  "total_com_publico": 242,
+  "total_com_publico": 244,
   "total_com_eventos": 244,
   "total_com_jogadores": 244,
   "total_eventos_validados": 244,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 2,
       "estadio": "Arena Fonte Nova",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 31244,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://bahianoticias.com.br/esportes/bahia/34008-confira-publico-e-renda-de-bahia-x-internacional-pelo-brasileirao-2026",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -609,7 +609,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-31T05:11:31.606418-03:00"
+      "atualizado_em": "2026-08-31T05:11:31.606418-03:00",
+      "publico_pagante": 31117,
+      "renda": 886645,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841217": {
       "event_id": "401841217",
@@ -2840,9 +2843,9 @@
       "placar_mandante": 3,
       "placar_visitante": 3,
       "estadio": "Arena da Baixada",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 36182,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/pr/futebol/times/athletico-pr/noticia/2026/08/31/athletico-x-fluminense-bate-recorde-de-publico-na-arena-da-baixada-no-brasileirao.ghtml",
       "arbitro": "Felipe Fernandes De Lima",
       "stats": [
         {
@@ -3402,7 +3405,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-08-31T05:11:33.582924-03:00"
+      "atualizado_em": "2026-08-31T05:11:33.582924-03:00",
+      "publico_pagante": 35231,
+      "renda": 1719640,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841212": {
       "event_id": "401841212",
@@ -137365,5 +137371,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 234,
+  "total_com_renda": 242
 }
