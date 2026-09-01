@@ -1,0 +1,96 @@
+name: Deploy Push Worker
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/push-worker/**'
+      - '.github/workflows/deploy-push-worker.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fdg-push-worker
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    defaults:
+      run:
+        working-directory: cloudflare/push-worker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar credenciais Cloudflare
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'ERRO: secret CLOUDFLARE_API_TOKEN ausente.'; exit 1; }
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'ERRO: secret CLOUDFLARE_ACCOUNT_ID ausente.'; exit 1; }
+
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+
+      - name: Validar código
+        run: npm run check
+
+      - name: Localizar ou criar D1
+        id: d1
+        shell: bash
+        run: |
+          set -euo pipefail
+          DB_NAME='formula-do-gol-push'
+          get_id() {
+            npx wrangler d1 list --json | node -e '
+              let s="";process.stdin.on("data",d=>s+=d);process.stdin.on("end",()=>{
+                const rows=JSON.parse(s); const row=rows.find(x=>x.name===process.argv[1]);
+                if(row) process.stdout.write(row.uuid || row.id || "");
+              });' "$DB_NAME"
+          }
+          DB_ID="$(get_id)"
+          if [ -z "$DB_ID" ]; then
+            echo "D1 $DB_NAME ainda não existe; criando..."
+            npx wrangler d1 create "$DB_NAME"
+            DB_ID="$(get_id)"
+          fi
+          test -n "$DB_ID" || { echo 'ERRO: não foi possível resolver o ID do D1.'; exit 1; }
+          echo "database_id=$DB_ID" >> "$GITHUB_OUTPUT"
+          echo "D1 pronto: $DB_NAME"
+
+      - name: Gerar configuração Wrangler
+        env:
+          FDG_D1_DATABASE_ID: ${{ steps.d1.outputs.database_id }}
+        run: npm run render-config
+
+      - name: Aplicar schema D1
+        run: npx wrangler d1 execute DB --remote --file=migrations/0001_init.sql --config wrangler.generated.jsonc
+
+      - name: Deploy Worker + Durable Object + custom domain
+        run: npx wrangler deploy --config wrangler.generated.jsonc
+
+      - name: Smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"ok":true'; then
+              echo 'Push Worker saudável.'
+              exit 0
+            fi
+            sleep 6
+          done
+          echo 'ERRO: healthcheck do Push Worker não confirmou prontidão.'
+          exit 1
