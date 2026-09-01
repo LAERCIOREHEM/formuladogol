@@ -148,6 +148,10 @@
     return api('/v1/dispatch/status', { method: 'GET' });
   }
 
+  async function opsStatus() {
+    return api('/v1/ops/status', { method: 'GET' });
+  }
+
   async function getPreferences() {
     return api(`/v1/preferences?installationId=${encodeURIComponent(installationId())}`, { method: 'GET' });
   }
@@ -223,7 +227,7 @@
 
   window.FormulaDoGolPush = Object.freeze({
     supported, configure, loadRemoteConfig, getRegistration, requestPermission, getSubscription,
-    subscribe, unsubscribe, sendRemoteTest, sendQueueTest, dispatchStatus, getPreferences, savePreferences, monitorStatus, monitorEvents,
+    subscribe, unsubscribe, sendRemoteTest, sendQueueTest, dispatchStatus, opsStatus, getPreferences, savePreferences, monitorStatus, monitorEvents,
     showTestNotification, setBadge, clearBadge, diagnostics, installationId
   });
 })();

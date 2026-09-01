@@ -333,6 +333,7 @@ export class SportsMonitor {
     await this.writeStatus({
       lastPollAt: startedAt,
       lastPollCompletedAt: Date.now(),
+      lastPollSuccessAt: sourceErrors.length ? num(snapshot.status.lastPollSuccessAt, 0) : Date.now(),
       lastPollDurationMs: Date.now() - startedAt,
       lastPollError: sourceErrors.join(' | ').slice(0, 2000),
       observedGames,
@@ -360,6 +361,7 @@ export class SportsMonitor {
       lastAgendaError: text(snapshot.status.lastAgendaError),
       lastPollAt: num(snapshot.status.lastPollAt, 0),
       lastPollCompletedAt: num(snapshot.status.lastPollCompletedAt, 0),
+      lastPollSuccessAt: num(snapshot.status.lastPollSuccessAt, 0),
       lastPollDurationMs: num(snapshot.status.lastPollDurationMs, 0),
       lastPollError: text(snapshot.status.lastPollError),
       summariesFetched: num(snapshot.status.summariesFetched, 0),
@@ -379,7 +381,10 @@ export class SportsMonitor {
     if (url.pathname === '/poll' && request.method === 'POST') return Response.json(await this.pollOnce());
     if (url.pathname === '/status' && request.method === 'GET') {
       const status = await this.state.storage.get('status') || {};
-      return Response.json(status.lastBootstrapAt ? await this.publicStatus() : await this.bootstrap());
+      const now = Date.now();
+      const staleBootstrap = !num(status.lastBootstrapAt, 0) || now - num(status.lastBootstrapAt, 0) > 3 * 60_000;
+      const staleLivePoll = num(status.activeGames, 0) > 0 && now - num(status.lastPollCompletedAt, 0) > 90_000;
+      return Response.json((staleBootstrap || staleLivePoll) ? await this.bootstrap() : await this.publicStatus());
     }
     if (url.pathname === '/recent' && request.method === 'GET') {
       const recentEvents = await this.state.storage.get('recentEvents') || [];

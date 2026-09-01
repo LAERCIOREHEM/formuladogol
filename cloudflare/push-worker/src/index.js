@@ -1,7 +1,8 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
 import { SportsMonitor } from './sports-monitor.js';
-import { dispatchStatus, handleQueueBatch, recoverPendingDispatches } from './push-dispatch.js';
+import { dispatchStatus, handleQueueBatch } from './push-dispatch.js';
+import { opsStatus, runOperationalMaintenance } from './ops.js';
 
 export { PushState, SportsMonitor };
 
@@ -63,6 +64,11 @@ async function rateLimit(request, env, installationId, route) {
   const actor = cleanId(installationId) || 'anonymous';
   const result = await env.PUBLIC_RATE_LIMITER.limit({ key: `${actor}:${route}` });
   return Boolean(result && result.success);
+}
+
+async function allowStatusRead(request, env, route) {
+  const actor = cleanId(request.headers.get('CF-Connecting-IP'), 128) || 'status-reader';
+  return rateLimit(request, env, actor, route);
 }
 
 function singletonState(env) {
@@ -303,14 +309,7 @@ async function handleTest(request, env) {
 
 export default {
   async scheduled(controller, env, ctx) {
-    const monitor = singletonMonitor(env);
-    ctx.waitUntil(Promise.all([
-      monitor.fetch('https://internal/bootstrap', { method: 'POST' }).then(async (response) => {
-        if (!response.ok) throw new Error(`sports_monitor_bootstrap_${response.status}`);
-        return response.arrayBuffer();
-      }),
-      recoverPendingDispatches(env)
-    ]));
+    ctx.waitUntil(runOperationalMaintenance(env, singletonMonitor(env)));
   },
 
   async queue(batch, env) {
@@ -333,18 +332,20 @@ export default {
       ]);
       const state = await stateResponse.json();
       const monitor = await monitorResponse.json();
+      const operational = await opsStatus(env, monitor);
       return json(request, {
-        ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok),
+        ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
-        version: 5,
+        version: 6,
         sportsMonitorReady: Boolean(monitor?.ok),
+        operationalState: operational?.state || 'unknown',
         sports: {
           watchCount: Number(monitor?.watchCount || 0),
           activeGames: Number(monitor?.activeGames || 0),
           pendingGoals: Number(monitor?.pendingGoals || 0),
           lastPollAt: Number(monitor?.lastPollAt || 0)
         }
-      });
+      }, operational?.ok ? 200 : 503, { 'Cache-Control': 'no-store' });
     }
 
     const origin = request.headers.get('Origin') || '';
@@ -358,14 +359,25 @@ export default {
       if (url.pathname === '/v1/preferences' && request.method === 'PUT') return handlePutPreferences(request, env);
       if (url.pathname === '/v1/test' && request.method === 'POST') return handleTest(request, env);
       if (url.pathname === '/v1/queue-test' && request.method === 'POST') return handleQueueTest(request, env);
-      if (url.pathname === '/v1/dispatch/status' && request.method === 'GET') return json(request, await dispatchStatus(env), 200, { 'Cache-Control': 'no-store' });
+      if (url.pathname === '/v1/dispatch/status' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'dispatch-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+        return json(request, await dispatchStatus(env), 200, { 'Cache-Control': 'no-store' });
+      }
       if (url.pathname === '/v1/monitor/status' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'monitor-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         const response = await singletonMonitor(env).fetch('https://internal/status');
         return json(request, await response.json(), response.status, { 'Cache-Control': 'no-store' });
       }
       if (url.pathname === '/v1/monitor/events' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'monitor-events'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         const response = await singletonMonitor(env).fetch('https://internal/recent');
         return json(request, await response.json(), response.status, { 'Cache-Control': 'no-store' });
+      }
+      if (url.pathname === '/v1/ops/status' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'ops-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+        const response = await singletonMonitor(env).fetch('https://internal/status');
+        const monitor = await response.json();
+        return json(request, await opsStatus(env, monitor), 200, { 'Cache-Control': 'no-store' });
       }
       return json(request, { ok: false, error: 'not_found' }, 404);
     } catch (error) {

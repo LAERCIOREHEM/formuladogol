@@ -144,6 +144,39 @@ export async function recoverPendingDispatches(env, limit = 20) {
   return recovered;
 }
 
+
+export async function recoverStuckDeliveries(env, limit = 50) {
+  if (!env.PUSH_QUEUE) return 0;
+  const result = await env.DB.prepare(`
+    SELECT d.event_key, d.subscription_id
+    FROM push_deliveries d
+    JOIN push_subscriptions s ON s.subscription_id=d.subscription_id AND s.active=1
+    WHERE d.status IN ('sending','retry')
+      AND d.updated_at < datetime('now','-3 minutes')
+      AND d.attempts < 12
+    ORDER BY d.updated_at ASC
+    LIMIT ?
+  `).bind(Math.max(1, Math.min(200, Number(limit) || 50))).all();
+
+  const grouped = new Map();
+  for (const row of result.results || []) {
+    const eventKey = text(row.event_key);
+    const subscriptionId = text(row.subscription_id);
+    if (!eventKey || !subscriptionId) continue;
+    if (!grouped.has(eventKey)) grouped.set(eventKey, []);
+    grouped.get(eventKey).push(subscriptionId);
+  }
+
+  let recovered = 0;
+  for (const [eventKey, ids] of grouped.entries()) {
+    for (const subscriptionIds of chunkArray(ids, DELIVERY_BATCH_SIZE)) {
+      await env.PUSH_QUEUE.send({ kind: 'delivery_batch', eventKey, subscriptionIds, recovered: true });
+      recovered += subscriptionIds.length;
+    }
+  }
+  return recovered;
+}
+
 async function eligibleTargets(env, event, afterSubscriptionId = '') {
   const flagColumn = event.type === 'goal_overturned' ? 'p.overturned_goals' : 'p.goals';
   const homeSlug = teamSlug(event.home?.name);
