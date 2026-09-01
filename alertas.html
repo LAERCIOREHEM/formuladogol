@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="/css/br-institucional.css?v=20260722-evolucao-af-score-v1">
   <link rel="stylesheet" href="/css/br-global.css?v=20260801-footer-institucional-v1">
   <link rel="stylesheet" href="/css/br-social-footer.css?v=20260811-social-v2-tiktok">
-  <link rel="stylesheet" href="/css/br-pwa.css?v=20260901-pwa-v1">
+  <link rel="stylesheet" href="/css/br-pwa.css?v=20260901-pwa-onboarding-v2">
   <link rel="stylesheet" href="/css/br-alertas.css?v=20260901-alertas-v1">
 </head>
 <body>
@@ -30,6 +30,23 @@
     </nav>
     <main class="fdg-alerts-shell">
       <section class="fdg-alerts-hero panel"><div class="panel-inner"><div class="kicker">NOTIFICAÇÕES NO CELULAR</div><h1>🔔 Alertas de gol</h1><p class="fdg-alerts-lead">Escolha o que este aparelho deve acompanhar. Não há cadastro, login ou senha: as preferências ficam vinculadas apenas à assinatura Web Push deste navegador.</p></div></section>
+
+      <section id="fdg-install-onboarding" class="fdg-install-onboarding panel" data-pwa-onboarding hidden aria-live="polite">
+        <div class="panel-inner fdg-install-onboarding-inner">
+          <div class="fdg-install-onboarding-icon" aria-hidden="true"><img src="/notification-fg-192.png" alt=""></div>
+          <div class="fdg-install-onboarding-content">
+            <div class="kicker" data-pwa-onboarding-kicker>APP FÓRMULA DO GOL</div>
+            <h2 data-pwa-onboarding-title>Instale o Fórmula do Gol</h2>
+            <p data-pwa-onboarding-copy>Receba gols mesmo com o site fechado no celular ou computador.</p>
+            <div class="fdg-install-onboarding-actions" data-pwa-onboarding-actions>
+              <button type="button" class="fdg-install-onboarding-primary" data-pwa-onboarding-install>INSTALAR AGORA</button>
+              <button type="button" class="fdg-install-onboarding-secondary" data-pwa-onboarding-dismiss>Agora não</button>
+            </div>
+            <p class="fdg-install-onboarding-help" data-pwa-onboarding-help>Depois de instalar, escolha abaixo seu time, um jogo específico ou todos os jogos e permita as notificações.</p>
+          </div>
+        </div>
+      </section>
+
       <div id="fdg-alertas-app" aria-live="polite"><div class="fdg-alerts-empty">Carregando preferências de alertas…</div></div>
     </main>
     <footer class="site-footer br-disclaimer">
@@ -41,7 +58,7 @@
   <script src="/js/br-menu.js?v=20260901-alertas-v1"></script>
   <script src="/js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>
   <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>
-  <script src="/js/br-pwa.js?v=20260901-pwa-v1" defer></script>
+  <script src="/js/br-pwa.js?v=20260901-pwa-onboarding-v2" defer></script>
   <script src="/js/br-push.js?v=20260901-push-v3" defer></script>
   <script src="/js/br-alertas.js?v=20260901-alertas-v1" defer></script>
 </body>

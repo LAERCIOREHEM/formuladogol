@@ -1,7 +1,9 @@
 (function () {
   'use strict';
 
-  const VERSION = '20260901-pwa-v1';
+  const VERSION = '20260901-pwa-onboarding-v2';
+  const ONBOARDING_DISMISS_KEY = 'fdg_pwa_install_dismissed_until_v1';
+  const ONBOARDING_DISMISS_MS = 7 * 24 * 60 * 60 * 1000;
   let deferredPrompt = null;
   let installRoot = null;
   let modal = null;
@@ -40,6 +42,30 @@
     }
   }
 
+  function getDismissedUntil() {
+    try {
+      const value = Number(localStorage.getItem(ONBOARDING_DISMISS_KEY) || 0);
+      return Number.isFinite(value) ? value : 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  function onboardingIsDismissed() {
+    return !isStandalone() && getDismissedUntil() > Date.now();
+  }
+
+  function dismissOnboarding() {
+    try {
+      localStorage.setItem(ONBOARDING_DISMISS_KEY, String(Date.now() + ONBOARDING_DISMISS_MS));
+    } catch (_) {}
+    updateInstallOnboarding();
+  }
+
+  function clearOnboardingDismissal() {
+    try { localStorage.removeItem(ONBOARDING_DISMISS_KEY); } catch (_) {}
+  }
+
   function ensureModal() {
     if (modal) return modal;
 
@@ -50,7 +76,7 @@
       '<div class="br-pwa-modal-backdrop" data-pwa-close></div>',
       '<section class="br-pwa-dialog" role="dialog" aria-modal="true" aria-labelledby="br-pwa-title">',
       '  <button type="button" class="br-pwa-close" data-pwa-close aria-label="Fechar">×</button>',
-      '  <div class="br-pwa-dialog-icon" aria-hidden="true">⚽</div>',
+      '  <div class="br-pwa-dialog-icon" aria-hidden="true">📲</div>',
       '  <h2 id="br-pwa-title">Instalar o Fórmula do Gol</h2>',
       '  <div class="br-pwa-dialog-copy" data-pwa-copy></div>',
       '  <div class="br-pwa-dialog-actions">',
@@ -97,15 +123,19 @@
         '  <li>Toque em <strong>Compartilhar</strong>.</li>',
         '  <li>Escolha <strong>Adicionar à Tela de Início</strong>.</li>',
         '  <li>Confirme em <strong>Adicionar</strong>.</li>',
+        '  <li>Abra o <strong>Fórmula do Gol pelo novo ícone</strong> e volte a <strong>Alertas</strong>.</li>',
         '</ol>',
-        '<p class="br-pwa-note">Depois, abra o Fórmula do Gol pelo novo ícone da Tela de Início.</p>'
+        '<p class="br-pwa-note">Se “Adicionar à Tela de Início” não aparecer no navegador atual, abra esta página no Safari e repita os passos.</p>'
       ].join('');
       install.hidden = true;
     } else if (deferredPrompt) {
-      copy.innerHTML = '<p>Instale o Fórmula do Gol como aplicativo para abrir mais rápido e preparar o aparelho para os alertas esportivos.</p>';
+      copy.innerHTML = '<p>Instale o Fórmula do Gol como aplicativo. Depois, escolha seus alertas e receba gols mesmo com o site fechado.</p>';
       install.hidden = false;
+    } else if (isStandalone()) {
+      copy.innerHTML = '<p>O Fórmula do Gol já está aberto como aplicativo neste aparelho.</p>';
+      install.hidden = true;
     } else {
-      copy.innerHTML = '<p>Use a opção <strong>Instalar aplicativo</strong> ou <strong>Adicionar à Tela de Início</strong> no menu do seu navegador.</p>';
+      copy.innerHTML = '<p>Abra o menu do navegador e escolha <strong>Instalar aplicativo</strong> ou <strong>Adicionar à Tela de Início</strong>. Depois, abra o Fórmula do Gol pelo ícone criado.</p>';
       install.hidden = true;
     }
 
@@ -116,19 +146,25 @@
   }
 
   async function runInstallPrompt() {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      openModal();
+      return;
+    }
+
     const prompt = deferredPrompt;
     deferredPrompt = null;
 
     try {
       await prompt.prompt();
-      await prompt.userChoice;
+      const choice = await prompt.userChoice;
+      if (choice && choice.outcome === 'accepted') clearOnboardingDismissal();
     } catch (_) {
       // O navegador continua sendo a autoridade do fluxo de instalação.
     }
 
     closeModal();
     updateInstallEntry();
+    updateInstallOnboarding();
   }
 
   function ensureInstallEntry() {
@@ -146,6 +182,13 @@
   }
 
   function updateInstallEntry() {
+    // A página de Alertas possui um onboarding próprio e mais claro; evita CTA duplicado no rodapé.
+    if (document.querySelector('[data-pwa-onboarding]')) {
+      if (installRoot) installRoot.remove();
+      installRoot = null;
+      return;
+    }
+
     if (isStandalone()) {
       if (installRoot) installRoot.remove();
       installRoot = null;
@@ -162,25 +205,104 @@
     if (root) root.hidden = false;
   }
 
+  function updateInstallOnboarding() {
+    const root = document.querySelector('[data-pwa-onboarding]');
+    if (!root) return;
+
+    const kicker = root.querySelector('[data-pwa-onboarding-kicker]');
+    const title = root.querySelector('[data-pwa-onboarding-title]');
+    const copy = root.querySelector('[data-pwa-onboarding-copy]');
+    const actions = root.querySelector('[data-pwa-onboarding-actions]');
+    const install = root.querySelector('[data-pwa-onboarding-install]');
+    const dismiss = root.querySelector('[data-pwa-onboarding-dismiss]');
+    const help = root.querySelector('[data-pwa-onboarding-help]');
+
+    if (!title || !copy || !actions || !install || !dismiss || !help) return;
+
+    root.classList.toggle('is-installed', isStandalone());
+    root.classList.toggle('is-ios', isIOS() && !isStandalone());
+
+    if (isStandalone()) {
+      root.hidden = false;
+      if (kicker) kicker.textContent = 'APP INSTALADO';
+      title.textContent = '✅ Fórmula do Gol instalado neste aparelho';
+      copy.textContent = 'Agora escolha abaixo seu time, uma partida específica ou todos os jogos para receber os alertas.';
+      actions.hidden = true;
+      help.hidden = true;
+      return;
+    }
+
+    if (onboardingIsDismissed()) {
+      root.hidden = true;
+      return;
+    }
+
+    root.hidden = false;
+    actions.hidden = false;
+    help.hidden = false;
+    if (kicker) kicker.textContent = 'APP FÓRMULA DO GOL';
+    title.textContent = 'Instale o Fórmula do Gol';
+    copy.textContent = 'Receba gols mesmo com o site fechado no celular ou computador.';
+
+    if (isIOS()) {
+      install.textContent = 'COMO INSTALAR NO IPHONE';
+      help.textContent = 'No iPhone: Compartilhar → Adicionar à Tela de Início. Depois abra o Fórmula do Gol pelo novo ícone e volte a Alertas.';
+    } else if (deferredPrompt) {
+      install.textContent = 'INSTALAR AGORA';
+      help.textContent = 'Depois de instalar, escolha abaixo seu time, um jogo específico ou todos os jogos e permita as notificações.';
+    } else {
+      install.textContent = 'COMO INSTALAR';
+      help.textContent = 'Se o botão nativo ainda não estiver disponível, use “Instalar aplicativo” ou “Adicionar à Tela de Início” no menu do navegador.';
+    }
+  }
+
+  function bindInstallOnboarding() {
+    const root = document.querySelector('[data-pwa-onboarding]');
+    if (!root || root.dataset.pwaBound === '1') return;
+    root.dataset.pwaBound = '1';
+
+    const install = root.querySelector('[data-pwa-onboarding-install]');
+    const dismiss = root.querySelector('[data-pwa-onboarding-dismiss]');
+
+    install?.addEventListener('click', () => {
+      if (deferredPrompt && !isIOS()) runInstallPrompt();
+      else openModal();
+    });
+    dismiss?.addEventListener('click', dismissOnboarding);
+    updateInstallOnboarding();
+  }
+
+  function refreshInstallUi() {
+    updateInstallEntry();
+    updateInstallOnboarding();
+  }
+
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
     deferredPrompt = event;
-    updateInstallEntry();
+    refreshInstallUi();
   });
 
   window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
+    clearOnboardingDismissal();
     closeModal();
-    updateInstallEntry();
+    refreshInstallUi();
   });
 
-  window.addEventListener('pageshow', () => {
-    updateInstallEntry();
-  });
+  window.addEventListener('pageshow', refreshInstallUi);
+
+  try {
+    const standaloneMedia = window.matchMedia('(display-mode: standalone)');
+    if (typeof standaloneMedia.addEventListener === 'function') {
+      standaloneMedia.addEventListener('change', refreshInstallUi);
+    }
+  } catch (_) {}
 
   document.addEventListener('DOMContentLoaded', () => {
     registerServiceWorker();
-    updateInstallEntry();
+    bindInstallOnboarding();
+    refreshInstallUi();
   }, { once: true });
 
   window.FormulaDoGolPWA = Object.freeze({
@@ -188,6 +310,7 @@
     isStandalone,
     isIOS,
     registerServiceWorker,
-    openInstallHelp: openModal
+    openInstallHelp: openModal,
+    refreshInstallUi
   });
 })();

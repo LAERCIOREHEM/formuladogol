@@ -168,3 +168,146 @@ html.br-pwa-modal-open body {
     width: 100%;
   }
 }
+
+/* E6-R2 — onboarding de instalação na área de Alertas */
+.fdg-install-onboarding {
+  margin: 16px 0;
+  overflow: hidden;
+  border-color: rgba(16, 185, 129, 0.38);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.16), transparent 34%),
+    linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(15, 29, 38, 0.7));
+}
+
+.fdg-install-onboarding[hidden],
+.fdg-install-onboarding-actions[hidden],
+.fdg-install-onboarding-help[hidden] {
+  display: none !important;
+}
+
+.fdg-install-onboarding-inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.fdg-install-onboarding-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 18px;
+  background: rgba(16, 185, 129, 0.08);
+  overflow: hidden;
+}
+
+.fdg-install-onboarding-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fdg-install-onboarding-content h2 {
+  margin: 4px 0 8px;
+  font-size: clamp(1.22rem, 3vw, 1.55rem);
+  line-height: 1.18;
+}
+
+.fdg-install-onboarding-content > p {
+  margin: 0;
+  line-height: 1.52;
+}
+
+.fdg-install-onboarding-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.fdg-install-onboarding-primary,
+.fdg-install-onboarding-secondary {
+  appearance: none;
+  min-height: 42px;
+  border-radius: 11px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 850;
+  letter-spacing: 0.015em;
+  padding: 10px 15px;
+}
+
+.fdg-install-onboarding-primary {
+  border: 1px solid #10b981;
+  background: #10b981;
+  color: #04100b;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.16);
+}
+
+.fdg-install-onboarding-primary:hover,
+.fdg-install-onboarding-primary:focus-visible {
+  filter: brightness(1.06);
+  outline: 2px solid #6ee7b7;
+  outline-offset: 2px;
+}
+
+.fdg-install-onboarding-secondary {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.035);
+  color: inherit;
+}
+
+.fdg-install-onboarding-secondary:hover,
+.fdg-install-onboarding-secondary:focus-visible {
+  background: rgba(255, 255, 255, 0.075);
+  outline: 2px solid rgba(148, 163, 184, 0.55);
+  outline-offset: 2px;
+}
+
+.fdg-install-onboarding-help {
+  margin-top: 11px !important;
+  color: #9fb0bc;
+  font-size: 0.88rem;
+}
+
+.fdg-install-onboarding.is-ios .fdg-install-onboarding-primary {
+  min-width: 210px;
+}
+
+.fdg-install-onboarding.is-installed {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.07);
+}
+
+.fdg-install-onboarding.is-installed .fdg-install-onboarding-icon {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+@media (max-width: 620px) {
+  .fdg-install-onboarding-inner {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .fdg-install-onboarding-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+  }
+
+  .fdg-install-onboarding-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .fdg-install-onboarding-primary,
+  .fdg-install-onboarding-secondary {
+    width: 100%;
+  }
+}
+
