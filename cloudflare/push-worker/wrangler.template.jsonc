@@ -11,7 +11,9 @@
     }
   ],
   "triggers": {
-    "crons": ["* * * * *"]
+    "crons": [
+      "* * * * *"
+    ]
   },
   "observability": {
     "enabled": true
@@ -38,11 +40,15 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["PushState"]
+      "new_sqlite_classes": [
+        "PushState"
+      ]
     },
     {
       "tag": "v2",
-      "new_sqlite_classes": ["SportsMonitor"]
+      "new_sqlite_classes": [
+        "SportsMonitor"
+      ]
     }
   ],
   "ratelimits": [
@@ -54,5 +60,23 @@
         "period": 60
       }
     }
-  ]
+  ],
+  "queues": {
+    "producers": [
+      {
+        "binding": "PUSH_QUEUE",
+        "queue": "formula-do-gol-push-delivery"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "formula-do-gol-push-delivery",
+        "max_batch_size": 1,
+        "max_batch_timeout": 1,
+        "max_retries": 8,
+        "max_concurrency": 5,
+        "retry_delay": 15
+      }
+    ]
+  }
 }

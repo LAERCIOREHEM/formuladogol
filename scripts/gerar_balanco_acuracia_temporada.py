@@ -214,7 +214,7 @@ def render_page(editorial: Mapping[str, Any], published: str, modified: str, art
     </main>
     {rodape('../')}
   </div>
-  <script src="../js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
+  <script src="../js/br-menu.js?v=20260901-alertas-v1"></script>
   <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>
   <script src="../js/br-analises.js?v=20260805-editorial-continental-v1"></script>
 </body>

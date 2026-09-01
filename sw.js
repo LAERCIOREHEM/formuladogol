@@ -1,14 +1,49 @@
 /* Fórmula do Gol — Service Worker PWA / Web Push
- * Execução 3 — 2026-09-01
+ * Execução 5 — 2026-09-01
  *
  * IMPORTANTE: este Service Worker NÃO intercepta fetch e NÃO mantém cache
  * de placares, agenda, probabilidades ou qualquer dado esportivo dinâmico.
  */
 
-const SW_VERSION = '20260901-push-core-v1';
+const SW_VERSION = '20260901-alertas-v1';
 const DEFAULT_ICON = '/favicon-formula-do-gol-192.png';
 const DEFAULT_BADGE = '/favicon-formula-do-gol-96.png';
 const DEFAULT_URL = '/aovivo.html';
+const BADGE_DB = 'fdg-pwa-state-v1';
+const BADGE_STORE = 'state';
+
+function openStateDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(BADGE_DB, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(BADGE_STORE)) db.createObjectStore(BADGE_STORE);
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function badgeState(nextValue) {
+  if (typeof indexedDB === 'undefined') return 0;
+  const db = await openStateDb();
+  try {
+    if (nextValue === undefined) {
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(BADGE_STORE, 'readonly');
+        const req = tx.objectStore(BADGE_STORE).get('badgeCount');
+        req.onsuccess = () => resolve(Number(req.result || 0));
+        req.onerror = () => reject(req.error);
+      });
+    }
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(BADGE_STORE, 'readwrite');
+      tx.objectStore(BADGE_STORE).put(Math.max(0, Math.floor(Number(nextValue) || 0)), 'badgeCount');
+      tx.oncomplete = resolve; tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error);
+    });
+    return Math.max(0, Math.floor(Number(nextValue) || 0));
+  } finally { db.close(); }
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
@@ -37,22 +72,29 @@ async function setBadgeFromPayload(payload) {
 
   try {
     if (payload && payload.clearBadge) {
-      if (typeof self.navigator.clearAppBadge === 'function') {
-        await self.navigator.clearAppBadge();
-      } else {
-        await self.navigator.setAppBadge(0);
-      }
+      await badgeState(0).catch(() => 0);
+      if (typeof self.navigator.clearAppBadge === 'function') await self.navigator.clearAppBadge();
+      else await self.navigator.setAppBadge(0);
+      return;
+    }
+
+    const increment = Number(payload && payload.badgeIncrement);
+    if (Number.isFinite(increment) && increment > 0) {
+      const current = await badgeState().catch(() => 0);
+      const next = Math.max(1, current + Math.floor(increment));
+      await badgeState(next).catch(() => next);
+      await self.navigator.setAppBadge(next);
       return;
     }
 
     const raw = payload && payload.badgeCount;
     const count = Number(raw);
     if (Number.isFinite(count) && count >= 0) {
+      await badgeState(Math.floor(count)).catch(() => count);
       await self.navigator.setAppBadge(Math.floor(count));
       return;
     }
 
-    // Sem contador explícito, mostra somente o indicador quando suportado.
     await self.navigator.setAppBadge();
   } catch (_) {
     // Badge é complemento: falha nunca deve impedir a notificação.
@@ -114,6 +156,7 @@ self.addEventListener('notificationclick', (event) => {
     focusOrOpen(data.url || DEFAULT_URL),
     (async () => {
       try {
+        await badgeState(0).catch(() => 0);
         if (self.navigator && typeof self.navigator.clearAppBadge === 'function') {
           await self.navigator.clearAppBadge();
         } else if (self.navigator && typeof self.navigator.setAppBadge === 'function') {
@@ -148,6 +191,7 @@ self.addEventListener('message', (event) => {
   if (message.type === 'FDG_CLEAR_BADGE') {
     event.waitUntil((async () => {
       try {
+        await badgeState(0).catch(() => 0);
         if (self.navigator && typeof self.navigator.clearAppBadge === 'function') {
           await self.navigator.clearAppBadge();
         } else if (self.navigator && typeof self.navigator.setAppBadge === 'function') {

@@ -2378,6 +2378,8 @@
 
   function renderMain(g, summary, all) {
     if (!g) {
+      delete app.dataset.eventId;
+      document.dispatchEvent(new CustomEvent('fdg:live-game-changed', { detail: { eventId: '' } }));
       app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Nenhuma partida futura foi encontrada na agenda publicada. O robô continuará tentando atualizar os dados.</div></div></div>';
       return;
     }
@@ -2401,6 +2403,7 @@
     const probabilityDraw = probabilityDesktop && probabilityDesktop.draw ? probabilityDesktop.draw : "";
     const probabilityAway = probabilityDesktop && probabilityDesktop.away ? probabilityDesktop.away : "";
     contarVermelhos(g, summary);
+    app.dataset.eventId = String(g.id || '');
 
     app.innerHTML = '<section class="live-main-card"><div class="live-card-inner">' +
       '<div class="live-round-row"><span class="live-round-badge">' + esc(roundText + delayed) + '</span>' +
@@ -2419,6 +2422,7 @@
       '<section class="panel live-subpanel live-stats-panel"><div class="panel-inner"><div class="live-section-head"><h2>📊 Estatísticas</h2><span class="live-section-note">ESPN summary</span></div>' + renderStats(g, summary) + '</div></section>' +
       renderLineups(g, summary) +
       renderNextList(all, g);
+    document.dispatchEvent(new CustomEvent('fdg:live-game-changed', { detail: { eventId: app.dataset.eventId || '' } }));
   }
 
   async function renderPage(expectedRefreshGeneration = null) {

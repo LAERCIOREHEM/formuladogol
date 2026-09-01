@@ -423,10 +423,34 @@
     analyses.insertAdjacentElement('afterend', accuracy);
   }
 
+  function ensureAlertsLink(nav) {
+    if (!nav) return;
+    var existing = nav.querySelector('[data-br-alertas]');
+    if (existing) {
+      if (basename() === 'alertas.html') { existing.classList.add('active'); existing.setAttribute('aria-current', 'page'); }
+      else { existing.classList.remove('active'); existing.removeAttribute('aria-current'); }
+      return;
+    }
+    var links = nav.querySelectorAll('a');
+    var live = null;
+    for (var i = 0; i < links.length; i += 1) {
+      var href = String(links[i].getAttribute('href') || '').toLowerCase();
+      if (href.indexOf('aovivo') >= 0) { live = links[i]; break; }
+    }
+    if (!live) return;
+    var alerts = document.createElement('a');
+    alerts.href = '/alertas.html';
+    alerts.textContent = '🔔 Alertas';
+    alerts.setAttribute('data-br-alertas', '1');
+    if (basename() === 'alertas.html') { alerts.classList.add('active'); alerts.setAttribute('aria-current', 'page'); }
+    live.insertAdjacentElement('afterend', alerts);
+  }
+
   function applyMenu(nav) {
     if (!nav) return;
     removeLegacyAgendaLink(nav);
     ensureAccuracyLink(nav);
+    ensureAlertsLink(nav);
     normalizeMenuLinks(nav);
     Array.prototype.forEach.call(nav.querySelectorAll("[data-br-private]"), function (item) {
       var visible = PRIVATE_MODULES_ENABLED && authState.authenticated;
@@ -609,6 +633,7 @@
     Array.prototype.forEach.call(document.querySelectorAll(".nav[data-br-auth-menu]"), function (nav) {
       removeLegacyAgendaLink(nav);
       ensureAccuracyLink(nav);
+      ensureAlertsLink(nav);
       wireNav(nav);
     });
   }

@@ -7,6 +7,7 @@ import {
   normalizeScoreboardEvent,
   summarizeMatch
 } from './sports-engine.js';
+import { enqueueSportsEvent } from './push-dispatch.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ESPN_ROOT = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
@@ -226,7 +227,7 @@ export class SportsMonitor {
 
   async recordEvent(event) {
     const row = eventRow(event);
-    await this.env.DB.prepare(`
+    const inserted = await this.env.DB.prepare(`
       INSERT OR IGNORE INTO sports_events (
         event_key,event_id,event_type,source_play_key,league,competition_key,competition_name,
         home_team_id,home_team_name,away_team_id,away_team_name,scoring_team_id,scoring_team_name,
@@ -239,6 +240,13 @@ export class SportsMonitor {
       row.athlete_id,row.athlete_name,row.minute,row.home_score,row.away_score,row.own_goal,row.penalty_goal,row.shootout,
       row.detected_at,row.confirmed_at,row.payload_json
     ).run();
+    if (Number(inserted?.meta?.changes || 0) > 0) {
+      try {
+        await enqueueSportsEvent(this.env, row.event_key);
+      } catch (error) {
+        console.error('sports_event_queue_enqueue_failed', row.event_key, String(error?.message || error));
+      }
+    }
   }
 
   async pollOnce() {

@@ -398,6 +398,7 @@
           <p>${escapeHtml(c.momento)}</p>
         </div>
       </div>
+      <div class="fdg-team-alert-slot" data-fdg-team-alert-slot data-team-id="${escapeHtml(slug(c.nome))}" data-team-name="${escapeHtml(c.nome)}"></div>
       <div class="info-grid">
         <div class="info-card"><span>Cidade / UF</span><strong>${escapeHtml(c.cidade)}-${escapeHtml(c.uf)}</strong></div>
         <div class="info-card"><span>Estádio</span><strong>${escapeHtml(c.estadio)}</strong></div>

@@ -1,6 +1,7 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
 import { SportsMonitor } from './sports-monitor.js';
+import { dispatchStatus, handleQueueBatch, recoverPendingDispatches } from './push-dispatch.js';
 
 export { PushState, SportsMonitor };
 
@@ -185,7 +186,9 @@ async function handleSubscribe(request, env) {
     Number.isFinite(Number(sub.expirationTime)) ? Number(sub.expirationTime) : null,
     String(request.headers.get('User-Agent') || '').slice(0, 512)
   ).run();
-  const preferences = await savePreferences(env, installationId, body.preferences || {});
+  const preferences = Object.prototype.hasOwnProperty.call(body, 'preferences')
+    ? await savePreferences(env, installationId, body.preferences || {})
+    : await getPreferences(env, installationId);
   await env.DB.prepare(`INSERT INTO push_audit (installation_id, subscription_id, event_type, status) VALUES (?, ?, 'subscribe', 201)`)
     .bind(installationId, subscriptionId).run();
 
@@ -233,6 +236,22 @@ async function sendToSubscription(env, row, payload) {
     { subject: keys.subject, publicKey: keys.publicKey, privateKey: keys.privateKey }
   );
   return fetch(subscription.endpoint, requestInit);
+}
+
+async function handleQueueTest(request, env) {
+  const body = await readBody(request);
+  const installationId = cleanId(body.installationId);
+  if (!installationId) return json(request, { ok: false, error: 'invalid_installation' }, 400);
+  if (!(await rateLimit(request, env, installationId, 'queue-test'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+  const row = await env.DB.prepare(`
+    SELECT subscription_id FROM push_subscriptions
+    WHERE installation_id=? AND active=1
+    ORDER BY updated_at DESC LIMIT 1
+  `).bind(installationId).first();
+  if (!row) return json(request, { ok: false, error: 'subscription_not_found' }, 404);
+  if (!env.PUSH_QUEUE) return json(request, { ok: false, error: 'queue_unavailable' }, 503);
+  await env.PUSH_QUEUE.send({ kind: 'direct_test', installationId });
+  return json(request, { ok: true, queued: true }, 202);
 }
 
 async function handleTest(request, env) {
@@ -285,10 +304,17 @@ async function handleTest(request, env) {
 export default {
   async scheduled(controller, env, ctx) {
     const monitor = singletonMonitor(env);
-    ctx.waitUntil(monitor.fetch('https://internal/bootstrap', { method: 'POST' }).then(async (response) => {
-      if (!response.ok) throw new Error(`sports_monitor_bootstrap_${response.status}`);
-      return response.arrayBuffer();
-    }));
+    ctx.waitUntil(Promise.all([
+      monitor.fetch('https://internal/bootstrap', { method: 'POST' }).then(async (response) => {
+        if (!response.ok) throw new Error(`sports_monitor_bootstrap_${response.status}`);
+        return response.arrayBuffer();
+      }),
+      recoverPendingDispatches(env)
+    ]));
+  },
+
+  async queue(batch, env) {
+    await handleQueueBatch(batch, env);
   },
 
   async fetch(request, env) {
@@ -310,7 +336,7 @@ export default {
       return json(request, {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok),
         service: 'formula-do-gol-push',
-        version: 4,
+        version: 5,
         sportsMonitorReady: Boolean(monitor?.ok),
         sports: {
           watchCount: Number(monitor?.watchCount || 0),
@@ -331,6 +357,8 @@ export default {
       if (url.pathname === '/v1/preferences' && request.method === 'GET') return handleGetPreferences(request, env);
       if (url.pathname === '/v1/preferences' && request.method === 'PUT') return handlePutPreferences(request, env);
       if (url.pathname === '/v1/test' && request.method === 'POST') return handleTest(request, env);
+      if (url.pathname === '/v1/queue-test' && request.method === 'POST') return handleQueueTest(request, env);
+      if (url.pathname === '/v1/dispatch/status' && request.method === 'GET') return json(request, await dispatchStatus(env), 200, { 'Cache-Control': 'no-store' });
       if (url.pathname === '/v1/monitor/status' && request.method === 'GET') {
         const response = await singletonMonitor(env).fetch('https://internal/status');
         return json(request, await response.json(), response.status, { 'Cache-Control': 'no-store' });

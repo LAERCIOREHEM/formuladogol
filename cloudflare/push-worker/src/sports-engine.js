@@ -326,8 +326,8 @@ function emittedEvent(type, play, match, observation, now) {
     competitionKey: match.competitionKey,
     competitionName: match.competitionName,
     kickoff: match.kickoff,
-    home: { id: text(match.home?.id), name: text(match.home?.name), score: num(observation?.home?.score, 0) },
-    away: { id: text(match.away?.id), name: text(match.away?.name), score: num(observation?.away?.score, 0) },
+    home: { id: text(match.home?.id), name: text(match.home?.name), abbreviation: text(match.home?.abbreviation), score: num(observation?.home?.score, 0) },
+    away: { id: text(match.away?.id), name: text(match.away?.name), abbreviation: text(match.away?.abbreviation), score: num(observation?.away?.score, 0) },
     scoringTeam: { id: text(scoringTeam.id), name: text(scoringTeam.name) },
     athlete: { id: text(play.athleteId), name: text(play.athleteName) },
     minute: text(play.minute),
@@ -432,7 +432,8 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     for (const play of Object.values(match.plays)) {
       if (play.status !== 'pending') continue;
       const age = now - num(play.firstSeenAt, now);
-      if (num(play.stableCount, 1) >= GOAL_CONFIRM_OBSERVATIONS && age >= GOAL_CONFIRM_MS) {
+      const scorerReady = Boolean(text(play.athleteName));
+      if (scorerReady && num(play.stableCount, 1) >= GOAL_CONFIRM_OBSERVATIONS && age >= GOAL_CONFIRM_MS) {
         play.status = 'confirmed';
         play.confirmedAt = now;
         emitted.push(emittedEvent('goal', play, match, observation, now));

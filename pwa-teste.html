@@ -22,9 +22,9 @@
 </head>
 <body>
   <main class="pwa-test-shell">
-    <div class="kicker">EXECUÇÃO 4 · MOTOR ESPORTIVO</div>
+    <div class="kicker">EXECUÇÃO 5 · ALERTAS E FAN-OUT</div>
     <h1>PWA e notificações — teste do aparelho</h1>
-    <p>Esta página técnica não aparece no menu nem deve ser indexada. Ela valida instalação, Web Push e agora também o motor esportivo que acompanha as partidas no backend Cloudflare.</p>
+    <p>Esta página técnica não aparece no menu nem deve ser indexada. Ela valida instalação, Web Push, motor esportivo e a fila real que distribui os alertas aos aparelhos inscritos.</p>
 
     <div class="pwa-test-grid">
       <section class="pwa-test-card"><h2>Instalação</h2><button class="pwa-test-button" id="btn-install" type="button">Abrir instruções de instalação</button></section>
@@ -32,6 +32,8 @@
       <section class="pwa-test-card"><h2>Web Push real</h2><button class="pwa-test-button" id="btn-remote" type="button">Inscrever e enviar teste real</button></section>
       <section class="pwa-test-card"><h2>Cancelar Web Push</h2><button class="pwa-test-button" id="btn-unsubscribe" type="button">Cancelar inscrição deste aparelho</button></section>
       <section class="pwa-test-card"><h2>Motor esportivo</h2><button class="pwa-test-button" id="btn-monitor" type="button">Atualizar status do monitor</button></section>
+      <section class="pwa-test-card"><h2>Fila real</h2><button class="pwa-test-button" id="btn-queue" type="button">Testar entrega pela Queue</button></section>
+      <section class="pwa-test-card"><h2>Fan-out</h2><button class="pwa-test-button" id="btn-dispatch" type="button">Atualizar status da distribuição</button></section>
       <section class="pwa-test-card"><h2>Badge</h2><button class="pwa-test-button" id="btn-badge" type="button">Colocar badge 1</button></section>
       <section class="pwa-test-card"><h2>Limpar badge</h2><button class="pwa-test-button" id="btn-clear" type="button">Limpar badge</button></section>
     </div>
@@ -42,7 +44,7 @@
   </main>
 
   <script src="/js/br-pwa.js?v=20260901-pwa-v1"></script>
-  <script src="/js/br-push.js?v=20260901-sports-monitor-v1"></script>
+  <script src="/js/br-push.js?v=20260901-push-v2"></script>
   <script>
     (function(){
       const out=document.getElementById('diagnostics');
@@ -59,6 +61,8 @@
       document.getElementById('btn-remote').addEventListener('click',async()=>{try{await window.FormulaDoGolPush.sendRemoteTest();await refresh('Web Push real enviado pelo Cloudflare. Pode fechar a página e repetir o teste depois.');}catch(e){await refresh('Falha Web Push: '+e.message);}});
       document.getElementById('btn-unsubscribe').addEventListener('click',async()=>{try{const ok=await window.FormulaDoGolPush.unsubscribe();await refresh(ok?'Inscrição Web Push cancelada.':'Este aparelho não tinha inscrição ativa.');}catch(e){await refresh('Falha ao cancelar: '+e.message);}});
       document.getElementById('btn-monitor').addEventListener('click',async()=>{try{const [status,recent]=await Promise.all([window.FormulaDoGolPush.monitorStatus(),window.FormulaDoGolPush.monitorEvents()]);await refresh('MOTOR ESPORTIVO\n'+JSON.stringify(status,null,2)+'\n\nEVENTOS CONFIRMADOS RECENTES\n'+JSON.stringify(recent.events||[],null,2));}catch(e){await refresh('Falha ao consultar motor esportivo: '+e.message);}});
+      document.getElementById('btn-queue').addEventListener('click',async()=>{try{const result=await window.FormulaDoGolPush.sendQueueTest();await refresh('TESTE DA QUEUE ENFILEIRADO\n'+JSON.stringify(result,null,2)+'\n\nA notificação chegará pelo mesmo consumidor usado pelos gols reais.');}catch(e){await refresh('Falha no teste da Queue: '+e.message);}});
+      document.getElementById('btn-dispatch').addEventListener('click',async()=>{try{const status=await window.FormulaDoGolPush.dispatchStatus();await refresh('DISTRIBUIÇÃO DE ALERTAS\n'+JSON.stringify(status,null,2));}catch(e){await refresh('Falha ao consultar distribuição: '+e.message);}});
       document.getElementById('btn-badge').addEventListener('click',async()=>{try{const ok=await window.FormulaDoGolPush.setBadge(1);await refresh(ok?'Badge solicitado.':'Badging API não suportada neste navegador.');}catch(e){await refresh('Falha: '+e.message);}});
       document.getElementById('btn-clear').addEventListener('click',async()=>{try{const ok=await window.FormulaDoGolPush.clearBadge();await refresh(ok?'Badge limpo.':'Badging API não suportada neste navegador.');}catch(e){await refresh('Falha: '+e.message);}});
       window.addEventListener('load',()=>refresh());

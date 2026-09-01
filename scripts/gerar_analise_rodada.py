@@ -1262,7 +1262,7 @@ def gerar_artigo(dossie: dict[str, Any], editorial: dict[str, Any], publicado: s
     </main>
     {rodape('../')}
   </div>
-  <script src="../js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
+  <script src="../js/br-menu.js?v=20260901-alertas-v1"></script>
   <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>
   <script src="../js/br-analises.js?v=20260805-editorial-continental-v1"></script>
 </body>
@@ -1318,7 +1318,7 @@ def gerar_hub(artigos: list[dict[str, Any]]) -> str:
     </main>
     {rodape('../')}
   </div>
-  <script src="../js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
+  <script src="../js/br-menu.js?v=20260901-alertas-v1"></script>
   <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>
 </body>
 </html>'''

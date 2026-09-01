@@ -106,6 +106,22 @@ const doubleConfirmed = applyObservation(doubleState, two, twoPlays, t0 + 71_000
 assert.equal(doubleConfirmed.emitted.filter((e) => e.type === 'goal').length, 2);
 assert.deepEqual(doubleConfirmed.emitted.map((e) => [e.scoreAfter.home, e.scoreAfter.away]), [[1,0],[1,1]]);
 
+// A notificação exige autoria: placar confirmado sem nome do jogador permanece pendente.
+const scorerZero = normalizeScoreboardEvent(rawScore(0, 0, "60'"), game.league, game);
+let scorerState = applyObservation(initialMatchState(scorerZero), scorerZero, null, t0).match;
+const scorerOne = normalizeScoreboardEvent(rawScore(0, 1, "64'"), game.league, game);
+const missingScorer = extractScoringPlays(summary(goal('scorer', '2022', 'unknown', "63'", 0, 1)), scorerOne);
+scorerState = applyObservation(scorerState, scorerOne, missingScorer, t0 + 10_000).match;
+scorerState = applyObservation(scorerState, scorerOne, missingScorer, t0 + 40_000).match;
+let scorerStep = applyObservation(scorerState, scorerOne, missingScorer, t0 + 71_000);
+scorerState = scorerStep.match;
+assert.equal(scorerStep.emitted.length, 0, 'sem autor não envia alerta de gol');
+assert.equal(scorerState.plays[`${game.eventId}:scorer`].status, 'pending');
+const knownScorer = extractScoringPlays(summary(goal('scorer', '2022', 'p3', "63'", 0, 1)), scorerOne);
+scorerStep = applyObservation(scorerState, scorerOne, knownScorer, t0 + 101_000);
+assert.equal(scorerStep.emitted.length, 1, 'confirma assim que a ESPN publica a autoria estável');
+assert.equal(scorerStep.emitted[0].athlete.name, 'Lucas Lima');
+
 // Gol contra e disputa de pênaltis são classificados separadamente.
 const special = extractScoringPlays(summary(
   goal('og', '2022', 'p1', "50'", 1, 1, 'Own Goal'),

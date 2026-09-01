@@ -111,14 +111,12 @@
         applicationServerKey: base64UrlToUint8Array(state.config.vapidPublicKey)
       });
     }
-    await api('/v1/subscribe', {
-      method: 'POST',
-      body: JSON.stringify({
-        installationId: installationId(),
-        subscription: serializeSubscription(current),
-        preferences: input.preferences || {}
-      })
-    });
+    const payload = {
+      installationId: installationId(),
+      subscription: serializeSubscription(current)
+    };
+    if (Object.prototype.hasOwnProperty.call(input, 'preferences')) payload.preferences = input.preferences || {};
+    await api('/v1/subscribe', { method: 'POST', body: JSON.stringify(payload) });
     return current;
   }
 
@@ -139,6 +137,15 @@
   async function sendRemoteTest() {
     await subscribe();
     return api('/v1/test', { method: 'POST', body: JSON.stringify({ installationId: installationId() }) });
+  }
+
+  async function sendQueueTest() {
+    await subscribe();
+    return api('/v1/queue-test', { method: 'POST', body: JSON.stringify({ installationId: installationId() }) });
+  }
+
+  async function dispatchStatus() {
+    return api('/v1/dispatch/status', { method: 'GET' });
   }
 
   async function getPreferences() {
@@ -184,6 +191,11 @@
   }
 
   async function clearBadge() {
+    try {
+      const registration = await getRegistration();
+      const target = navigator.serviceWorker.controller || registration?.active;
+      if (target) target.postMessage({ type: 'FDG_CLEAR_BADGE' });
+    } catch (_) {}
     if ('clearAppBadge' in navigator) { await navigator.clearAppBadge(); return true; }
     if ('setAppBadge' in navigator) { await navigator.setAppBadge(0); return true; }
     return false;
@@ -211,7 +223,7 @@
 
   window.FormulaDoGolPush = Object.freeze({
     supported, configure, loadRemoteConfig, getRegistration, requestPermission, getSubscription,
-    subscribe, unsubscribe, sendRemoteTest, getPreferences, savePreferences, monitorStatus, monitorEvents,
+    subscribe, unsubscribe, sendRemoteTest, sendQueueTest, dispatchStatus, getPreferences, savePreferences, monitorStatus, monitorEvents,
     showTestNotification, setBadge, clearBadge, diagnostics, installationId
   });
 })();
