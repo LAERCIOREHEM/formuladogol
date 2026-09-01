@@ -21,6 +21,9 @@ on:
       - 'sitemap.xml'
       - 'news-sitemap.xml'
       - 'feed.xml'
+      - 'manifest.webmanifest'
+      - 'sw.js'
+      - 'pwa-teste.html'
       - 'tabela.json'
       - 'resultados.json'
       - 'jogos.json'
@@ -40,6 +43,7 @@ on:
       - 'css/br-sobre.css'
       - 'css/br-analises.css'
       - 'css/br-social-footer.css'
+      - 'css/br-pwa.css'
       - 'js/br-aovivo.js'
       - 'js/br-agenda.js'
       - 'js/br-analises.js'
@@ -54,6 +58,8 @@ on:
       - 'js/br-menu.js'
       - 'js/br-museu.js'
       - 'js/br-social-footer.js'
+      - 'js/br-pwa.js'
+      - 'js/br-push.js'
       - 'dados-br/**'
       - 'analises/**'
       - 'jogos/**'
@@ -113,6 +119,9 @@ jobs:
             sitemap.xml
             news-sitemap.xml
             feed.xml
+            manifest.webmanifest
+            sw.js
+            pwa-teste.html
             tabela.json
             resultados.json
             jogos.json
@@ -139,6 +148,7 @@ jobs:
             css/br-sobre.css
             css/br-analises.css
             css/br-social-footer.css
+            css/br-pwa.css
           )
 
           PUBLIC_JS=(
@@ -156,6 +166,8 @@ jobs:
             js/br-menu.js
             js/br-museu.js
             js/br-social-footer.js
+            js/br-pwa.js
+            js/br-push.js
           )
 
           PUBLIC_DATA=(
