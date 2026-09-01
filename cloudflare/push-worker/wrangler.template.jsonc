@@ -1,0 +1,47 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "formula-do-gol-push",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "push.formuladogol.com.br",
+      "custom_domain": true
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "formula-do-gol-push",
+      "database_id": "__D1_DATABASE_ID__"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "PUSH_STATE",
+        "class_name": "PushState"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["PushState"]
+    }
+  ],
+  "ratelimits": [
+    {
+      "name": "PUBLIC_RATE_LIMITER",
+      "namespace_id": "260901301",
+      "simple": {
+        "limit": 30,
+        "period": 60
+      }
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 /* Fórmula do Gol — Service Worker PWA / Web Push
- * Execução 2 — 2026-09-01
+ * Execução 3 — 2026-09-01
  *
  * IMPORTANTE: este Service Worker NÃO intercepta fetch e NÃO mantém cache
  * de placares, agenda, probabilidades ou qualquer dado esportivo dinâmico.
  */
 
-const SW_VERSION = '20260901-pwa-v1';
+const SW_VERSION = '20260901-push-core-v1';
 const DEFAULT_ICON = '/favicon-formula-do-gol-192.png';
 const DEFAULT_BADGE = '/favicon-formula-do-gol-96.png';
 const DEFAULT_URL = '/aovivo.html';
