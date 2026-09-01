@@ -5,9 +5,9 @@
  * de placares, agenda, probabilidades ou qualquer dado esportivo dinâmico.
  */
 
-const SW_VERSION = '20260901-alertas-v1';
-const DEFAULT_ICON = '/favicon-formula-do-gol-192.png';
-const DEFAULT_BADGE = '/favicon-formula-do-gol-96.png';
+const SW_VERSION = '20260901-alertas-v2-notification-icon';
+const DEFAULT_ICON = '/notification-fg-192.png';
+const DEFAULT_BADGE = '/notification-fg-96.png';
 const DEFAULT_URL = '/aovivo.html';
 const BADGE_DB = 'fdg-pwa-state-v1';
 const BADGE_STORE = 'state';

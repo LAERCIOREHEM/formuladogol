@@ -179,7 +179,7 @@
     const registration = await getRegistration();
     await registration.showNotification('Fórmula do Gol — teste local', {
       body: 'Notificação local funcionando neste aparelho.',
-      icon: '/favicon-formula-do-gol-192.png', badge: '/favicon-formula-do-gol-96.png',
+      icon: '/notification-fg-192.png', badge: '/notification-fg-96.png',
       tag: 'fdg-pwa-test', renotify: false, data: { url: '/pwa-teste.html' }
     });
     await setBadge(1); return true;
