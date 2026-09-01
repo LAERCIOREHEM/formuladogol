@@ -1,12 +1,13 @@
 {
   "name": "formula-do-gol-push-worker",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "scripts": {
-    "check": "node --check src/index.js && node --check src/push-state.js && node --check scripts/render-config.mjs",
+    "check": "node --check src/index.js && node --check src/push-state.js && node --check src/sports-engine.js && node --check src/sports-monitor.js && node --check scripts/render-config.mjs && node --check tests/test-sports-engine.mjs && node --check tests/test-sports-monitor.mjs",
     "render-config": "node scripts/render-config.mjs",
-    "deploy": "wrangler deploy --config wrangler.generated.jsonc"
+    "deploy": "wrangler deploy --config wrangler.generated.jsonc",
+    "test:sports": "node tests/test-sports-engine.mjs && node tests/test-sports-monitor.mjs"
   },
   "dependencies": {
     "@block65/webcrypto-web-push": "1.0.2"

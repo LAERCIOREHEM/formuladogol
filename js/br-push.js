@@ -152,6 +152,15 @@
     });
   }
 
+
+  async function monitorStatus() {
+    return api('/v1/monitor/status', { method: 'GET' });
+  }
+
+  async function monitorEvents() {
+    return api('/v1/monitor/events', { method: 'GET' });
+  }
+
   async function showTestNotification() {
     if (!window.isSecureContext) throw new Error('O teste exige HTTPS.');
     const result = await requestPermission();
@@ -202,7 +211,7 @@
 
   window.FormulaDoGolPush = Object.freeze({
     supported, configure, loadRemoteConfig, getRegistration, requestPermission, getSubscription,
-    subscribe, unsubscribe, sendRemoteTest, getPreferences, savePreferences,
+    subscribe, unsubscribe, sendRemoteTest, getPreferences, savePreferences, monitorStatus, monitorEvents,
     showTestNotification, setBadge, clearBadge, diagnostics, installationId
   });
 })();

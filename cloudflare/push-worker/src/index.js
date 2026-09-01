@@ -1,7 +1,8 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
+import { SportsMonitor } from './sports-monitor.js';
 
-export { PushState };
+export { PushState, SportsMonitor };
 
 const ALLOWED_ORIGINS = new Set([
   'https://formuladogol.com.br',
@@ -66,6 +67,11 @@ async function rateLimit(request, env, installationId, route) {
 function singletonState(env) {
   const id = env.PUSH_STATE.idFromName('global');
   return env.PUSH_STATE.get(id);
+}
+
+function singletonMonitor(env) {
+  const id = env.SPORTS_MONITOR.idFromName('global');
+  return env.SPORTS_MONITOR.get(id);
 }
 
 async function vapidKeys(env) {
@@ -277,6 +283,14 @@ async function handleTest(request, env) {
 }
 
 export default {
+  async scheduled(controller, env, ctx) {
+    const monitor = singletonMonitor(env);
+    ctx.waitUntil(monitor.fetch('https://internal/bootstrap', { method: 'POST' }).then(async (response) => {
+      if (!response.ok) throw new Error(`sports_monitor_bootstrap_${response.status}`);
+      return response.arrayBuffer();
+    }));
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === 'OPTIONS') {
@@ -287,9 +301,24 @@ export default {
 
     if (url.pathname === '/health' && request.method === 'GET') {
       const db = await env.DB.prepare('SELECT 1 AS ok').first();
-      const stateResponse = await singletonState(env).fetch('https://internal/health');
+      const [stateResponse, monitorResponse] = await Promise.all([
+        singletonState(env).fetch('https://internal/health'),
+        singletonMonitor(env).fetch('https://internal/status')
+      ]);
       const state = await stateResponse.json();
-      return json(request, { ok: Boolean(db?.ok) && Boolean(state?.vapidReady), service: 'formula-do-gol-push', version: 3 });
+      const monitor = await monitorResponse.json();
+      return json(request, {
+        ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok),
+        service: 'formula-do-gol-push',
+        version: 4,
+        sportsMonitorReady: Boolean(monitor?.ok),
+        sports: {
+          watchCount: Number(monitor?.watchCount || 0),
+          activeGames: Number(monitor?.activeGames || 0),
+          pendingGoals: Number(monitor?.pendingGoals || 0),
+          lastPollAt: Number(monitor?.lastPollAt || 0)
+        }
+      });
     }
 
     const origin = request.headers.get('Origin') || '';
@@ -302,6 +331,14 @@ export default {
       if (url.pathname === '/v1/preferences' && request.method === 'GET') return handleGetPreferences(request, env);
       if (url.pathname === '/v1/preferences' && request.method === 'PUT') return handlePutPreferences(request, env);
       if (url.pathname === '/v1/test' && request.method === 'POST') return handleTest(request, env);
+      if (url.pathname === '/v1/monitor/status' && request.method === 'GET') {
+        const response = await singletonMonitor(env).fetch('https://internal/status');
+        return json(request, await response.json(), response.status, { 'Cache-Control': 'no-store' });
+      }
+      if (url.pathname === '/v1/monitor/events' && request.method === 'GET') {
+        const response = await singletonMonitor(env).fetch('https://internal/recent');
+        return json(request, await response.json(), response.status, { 'Cache-Control': 'no-store' });
+      }
       return json(request, { ok: false, error: 'not_found' }, 404);
     } catch (error) {
       const code = error?.message === 'payload_too_large' ? 413 : 500;

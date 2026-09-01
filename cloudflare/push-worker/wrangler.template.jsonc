@@ -10,6 +10,9 @@
       "custom_domain": true
     }
   ],
+  "triggers": {
+    "crons": ["* * * * *"]
+  },
   "observability": {
     "enabled": true
   },
@@ -25,6 +28,10 @@
       {
         "name": "PUSH_STATE",
         "class_name": "PushState"
+      },
+      {
+        "name": "SPORTS_MONITOR",
+        "class_name": "SportsMonitor"
       }
     ]
   },
@@ -32,6 +39,10 @@
     {
       "tag": "v1",
       "new_sqlite_classes": ["PushState"]
+    },
+    {
+      "tag": "v2",
+      "new_sqlite_classes": ["SportsMonitor"]
     }
   ],
   "ratelimits": [
