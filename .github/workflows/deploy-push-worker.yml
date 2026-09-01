@@ -50,6 +50,9 @@ jobs:
       - name: Testar motor esportivo
         run: npm run test:sports
 
+      - name: Testar distribuição de push
+        run: npm run test:push
+
       - name: Localizar ou criar D1
         id: d1
         shell: bash
@@ -72,6 +75,22 @@ jobs:
           test -n "$DB_ID" || { echo 'ERRO: não foi possível resolver o ID do D1.'; exit 1; }
           echo "database_id=$DB_ID" >> "$GITHUB_OUTPUT"
           echo "D1 pronto: $DB_NAME"
+
+      - name: Localizar ou criar Queue de alertas
+        shell: bash
+        run: |
+          set -euo pipefail
+          QUEUE_NAME='formula-do-gol-push-delivery'
+          if npx wrangler queues info "$QUEUE_NAME" >/dev/null 2>&1; then
+            echo "Queue pronta: $QUEUE_NAME"
+          else
+            echo "Queue $QUEUE_NAME ainda não existe; criando..."
+            if ! npx wrangler queues create "$QUEUE_NAME" --message-retention-period-secs 86400; then
+              echo 'ERRO: não foi possível criar a Queue.'
+              echo 'Confirme que CLOUDFLARE_API_TOKEN possui Account > Queues > Edit.'
+              exit 1
+            fi
+          fi
 
       - name: Gerar configuração Wrangler
         env:
@@ -99,6 +118,8 @@ jobs:
               echo 'Push Worker saudável.'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":4'
               echo 'Motor esportivo saudável.'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/dispatch/status | grep -q '"dispatchVersion":5'
+              echo 'Fila de alertas saudável.'
               exit 0
             fi
             sleep 6
