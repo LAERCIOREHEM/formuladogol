@@ -47,6 +47,9 @@ jobs:
       - name: Validar código
         run: npm run check
 
+      - name: Testar motor esportivo
+        run: npm run test:sports
+
       - name: Localizar ou criar D1
         id: d1
         shell: bash
@@ -76,7 +79,13 @@ jobs:
         run: npm run render-config
 
       - name: Aplicar schema D1
-        run: npx wrangler d1 execute DB --remote --file=migrations/0001_init.sql --config wrangler.generated.jsonc
+        shell: bash
+        run: |
+          set -euo pipefail
+          for migration in migrations/*.sql; do
+            echo "Aplicando $migration"
+            npx wrangler d1 execute DB --remote --file="$migration" --config wrangler.generated.jsonc
+          done
 
       - name: Deploy Worker + Durable Object + custom domain
         run: npx wrangler deploy --config wrangler.generated.jsonc
@@ -88,6 +97,8 @@ jobs:
           for i in 1 2 3 4 5 6 7 8 9 10; do
             if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"ok":true'; then
               echo 'Push Worker saudável.'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":4'
+              echo 'Motor esportivo saudável.'
               exit 0
             fi
             sleep 6
