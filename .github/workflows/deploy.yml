@@ -33,6 +33,7 @@ on:
       - 'transmissoes.json'
       - 'favicon-formula-do-gol*'
       - 'apple-touch-icon-formula-do-gol.png'
+      - 'notification-fg-*.png'
       - 'og-image-formula-do-gol-v2.jpg'
       - 'img/**'
       - 'css/br-global.css'
@@ -140,6 +141,8 @@ jobs:
             favicon-formula-do-gol-192.png
             favicon-formula-do-gol-512.png
             apple-touch-icon-formula-do-gol.png
+            notification-fg-192.png
+            notification-fg-96.png
             og-image-formula-do-gol-v2.jpg
           )
 
@@ -704,6 +707,8 @@ jobs:
               "favicon-formula-do-gol-192.png",
               "favicon-formula-do-gol-512.png",
               "apple-touch-icon-formula-do-gol.png",
+              "notification-fg-192.png",
+              "notification-fg-96.png",
               "favicon-formula-do-gol.ico",
               "og-image-formula-do-gol-v2.jpg",
           ]
