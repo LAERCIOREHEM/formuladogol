@@ -905,7 +905,8 @@ def rodape(prefixo: str) -> str:
     return f'''<footer class="site-footer">
       <nav class="br-footer-links" aria-label="Links institucionais"><a href="{prefixo}sobre.html">ⓘ Sobre o Fórmula do Gol</a></nav>
       <div class="br-footer-copy"><span class="footer-title">Fórmula do Gol</span> — Site independente, informativo e sem fins lucrativos, criado, desenvolvido e mantido exclusivamente por Laércio Rehem. Não é afiliado, patrocinado ou endossado pela CBF, clubes, ESPN ou qualquer titular de direitos. Dados de jogos e resultados provêm da API pública da ESPN. Escudos, nomes e marcas dos clubes pertencem aos seus respectivos titulares e são exibidos exclusivamente para identificação e contexto esportivo.</div>
-    </footer>'''
+    </footer>
+    <script src="/js/br-pwa.js?v=20260901-pwa-v1" defer></script>'''
 
 
 def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publicado: str | None = None, modificado: str | None = None) -> str:
@@ -943,10 +944,16 @@ def cabecalho_html(titulo: str, descricao: str, canonical: str, tipo: str, publi
   <meta name="twitter:description" content="{esc(descricao)}">
   <meta name="twitter:image" content="{SITE}/og-image-formula-do-gol-v2.jpg">
   <meta name="theme-color" content="#10b981">
+  <meta name="application-name" content="Fórmula do Gol">
+  <meta name="apple-mobile-web-app-title" content="Fórmula do Gol">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-formula-do-gol-32.png">
   <link rel="apple-touch-icon" href="../apple-touch-icon-formula-do-gol.png">
   <link rel="stylesheet" href="../css/br-global.css?v=20260802-analises-v1">
   <link rel="stylesheet" href="/css/br-social-footer.css?v=20260811-social-v2-tiktok">
+  <link rel="stylesheet" href="/css/br-pwa.css?v=20260901-pwa-v1">
   <link rel="stylesheet" href="../css/br-analises.css?v=20260811-movimentos-v1">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC');gtag('config','AW-18273186827');gtag('event','ads_conversion_PAGE_VIEW_1',{{}});</script>

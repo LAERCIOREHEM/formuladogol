@@ -1,0 +1,170 @@
+.br-pwa-install-entry {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 14px;
+}
+
+.br-pwa-install-entry[hidden],
+.br-pwa-modal[hidden] {
+  display: none !important;
+}
+
+.br-pwa-install-button,
+.br-pwa-primary,
+.br-pwa-secondary,
+.br-pwa-close {
+  font: inherit;
+}
+
+.br-pwa-install-button {
+  appearance: none;
+  border: 1px solid rgba(16, 185, 129, 0.42);
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.1);
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  padding: 9px 14px;
+}
+
+.br-pwa-install-button:hover,
+.br-pwa-install-button:focus-visible {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.72);
+  outline: none;
+}
+
+.br-pwa-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+}
+
+.br-pwa-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 8, 15, 0.72);
+  backdrop-filter: blur(3px);
+}
+
+.br-pwa-dialog {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(92vw, 440px);
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 18px;
+  background: #0f1d26;
+  color: #f8fafc;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  padding: 24px;
+}
+
+.br-pwa-dialog h2 {
+  margin: 8px 34px 10px 0;
+  color: #f8fafc;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.br-pwa-dialog p {
+  margin: 0 0 12px;
+  color: #d7e0e7;
+  line-height: 1.55;
+}
+
+.br-pwa-dialog ol {
+  margin: 12px 0 14px 22px;
+  padding: 0;
+  color: #e5edf2;
+  line-height: 1.6;
+}
+
+.br-pwa-dialog li + li {
+  margin-top: 5px;
+}
+
+.br-pwa-dialog .br-pwa-note {
+  margin-bottom: 0;
+  color: #9fb0bc;
+  font-size: 0.9rem;
+}
+
+.br-pwa-dialog-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.br-pwa-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #e5edf2;
+  cursor: pointer;
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.br-pwa-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  margin-top: 20px;
+}
+
+.br-pwa-primary,
+.br-pwa-secondary {
+  appearance: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.br-pwa-primary {
+  border: 1px solid #10b981;
+  background: #10b981;
+  color: #04100b;
+}
+
+.br-pwa-secondary {
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: transparent;
+  color: #f8fafc;
+}
+
+.br-pwa-primary:focus-visible,
+.br-pwa-secondary:focus-visible,
+.br-pwa-close:focus-visible {
+  outline: 2px solid #6ee7b7;
+  outline-offset: 2px;
+}
+
+html.br-pwa-modal-open,
+html.br-pwa-modal-open body {
+  overflow: hidden;
+}
+
+@media (max-width: 520px) {
+  .br-pwa-dialog {
+    width: calc(100vw - 24px);
+    padding: 20px;
+  }
+
+  .br-pwa-dialog-actions {
+    flex-direction: column;
+  }
+
+  .br-pwa-primary,
+  .br-pwa-secondary {
+    width: 100%;
+  }
+}

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#10b981">
+  <meta name="application-name" content="Fórmula do Gol">
+  <meta name="apple-mobile-web-app-title" content="Fórmula do Gol">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Teste PWA — Fórmula do Gol</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-formula-do-gol-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-formula-do-gol.png">
+  <link rel="stylesheet" href="/css/br-global.css?v=20260801-footer-institucional-v1">
+  <link rel="stylesheet" href="/css/br-institucional.css?v=20260722-evolucao-af-score-v1">
+  <link rel="stylesheet" href="/css/br-pwa.css?v=20260901-pwa-v1">
+  <style>
+    .pwa-test-shell{max-width:820px;margin:0 auto;padding:28px 18px 48px}.pwa-test-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:18px 0}.pwa-test-card{border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:16px;background:rgba(15,29,38,.78)}.pwa-test-card h2{font-size:1rem;margin:0 0 10px}.pwa-test-button{width:100%;border:1px solid rgba(16,185,129,.55);border-radius:10px;background:rgba(16,185,129,.13);color:inherit;font:inherit;font-weight:800;padding:10px;cursor:pointer}.pwa-test-output{white-space:pre-wrap;word-break:break-word;border-radius:12px;padding:14px;background:#07131a;color:#d8e4ea;min-height:130px}.pwa-test-note{color:#8fa3af;font-size:.92rem}
+  </style>
+</head>
+<body>
+  <main class="pwa-test-shell">
+    <div class="kicker">EXECUÇÃO 2 · DIAGNÓSTICO</div>
+    <h1>PWA e notificações — teste do aparelho</h1>
+    <p>Esta página técnica não aparece no menu nem deve ser indexada. Ela valida instalação, Service Worker, permissão de notificações e badge antes da conexão com o backend.</p>
+
+    <div class="pwa-test-grid">
+      <section class="pwa-test-card"><h2>Instalação</h2><button class="pwa-test-button" id="btn-install" type="button">Abrir instruções de instalação</button></section>
+      <section class="pwa-test-card"><h2>Notificação local</h2><button class="pwa-test-button" id="btn-notification" type="button">Solicitar permissão e testar</button></section>
+      <section class="pwa-test-card"><h2>Badge</h2><button class="pwa-test-button" id="btn-badge" type="button">Colocar badge 1</button></section>
+      <section class="pwa-test-card"><h2>Limpar badge</h2><button class="pwa-test-button" id="btn-clear" type="button">Limpar badge</button></section>
+    </div>
+
+    <h2>Diagnóstico</h2>
+    <pre id="diagnostics" class="pwa-test-output">Carregando…</pre>
+    <p class="pwa-test-note">A assinatura Web Push remota permanece desativada nesta execução porque a VAPID_PUBLIC_KEY e a API Cloudflare serão criadas na Execução 3.</p>
+  </main>
+
+  <script src="/js/br-pwa.js?v=20260901-pwa-v1"></script>
+  <script src="/js/br-push.js?v=20260901-push-client-v1"></script>
+  <script>
+    (function(){
+      const out=document.getElementById('diagnostics');
+      async function refresh(extra){
+        try{
+          const d=await window.FormulaDoGolPush.diagnostics();
+          d.installed=window.FormulaDoGolPWA.isStandalone();
+          d.iOS=window.FormulaDoGolPWA.isIOS();
+          out.textContent=(extra?extra+'\n\n':'')+JSON.stringify(d,null,2);
+        }catch(e){out.textContent='ERRO: '+(e&&e.message?e.message:String(e));}
+      }
+      document.getElementById('btn-install').addEventListener('click',()=>window.FormulaDoGolPWA.openInstallHelp());
+      document.getElementById('btn-notification').addEventListener('click',async()=>{try{await window.FormulaDoGolPush.showTestNotification();await refresh('Notificação de teste enviada.');}catch(e){await refresh('Falha: '+e.message);}});
+      document.getElementById('btn-badge').addEventListener('click',async()=>{try{const ok=await window.FormulaDoGolPush.setBadge(1);await refresh(ok?'Badge solicitado.':'Badging API não suportada neste navegador.');}catch(e){await refresh('Falha: '+e.message);}});
+      document.getElementById('btn-clear').addEventListener('click',async()=>{try{const ok=await window.FormulaDoGolPush.clearBadge();await refresh(ok?'Badge limpo.':'Badging API não suportada neste navegador.');}catch(e){await refresh('Falha: '+e.message);}});
+      window.addEventListener('load',()=>refresh());
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{
+  "id": "/",
+  "name": "Fórmula do Gol",
+  "short_name": "Fórmula do Gol",
+  "description": "Estatísticas, probabilidades, agenda e acompanhamento ao vivo do futebol brasileiro.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/estatisticas.html?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0a161e",
+  "theme_color": "#10b981",
+  "categories": ["sports", "news"],
+  "icons": [
+    {
+      "src": "/favicon-formula-do-gol-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-formula-do-gol-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ao vivo",
+      "short_name": "Ao vivo",
+      "description": "Acompanhar partidas em andamento",
+      "url": "/aovivo.html?source=pwa-shortcut",
+      "icons": [
+        {
+          "src": "/favicon-formula-do-gol-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Agenda",
+      "short_name": "Agenda",
+      "description": "Ver os próximos jogos",
+      "url": "/agenda.html?source=pwa-shortcut",
+      "icons": [
+        {
+          "src": "/favicon-formula-do-gol-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Estatísticas",
+      "short_name": "Estatísticas",
+      "description": "Abrir as estatísticas do Brasileirão",
+      "url": "/estatisticas.html?source=pwa-shortcut",
+      "icons": [
+        {
+          "src": "/favicon-formula-do-gol-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
