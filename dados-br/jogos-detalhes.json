@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-08-31T22:41:22.593431-03:00",
+  "gerado_em": "2026-08-31T23:11:21.757042-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 245,
   "total_com_estatisticas": 245,
-  "total_com_publico": 244,
+  "total_com_publico": 245,
   "total_com_eventos": 245,
   "total_com_jogadores": 245,
   "total_eventos_validados": 245,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 3,
       "estadio": "Mangueirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 30791,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://ge.globo.com/gato-mestre/noticia/2026/08/31/veja-os-publicos-da-25a-rodada-do-campeonato-brasileiro.ghtml",
       "arbitro": "Daiane Caroline Muniz Dos Santos",
       "stats": [
         {
@@ -586,7 +586,8 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-08-31T22:11:23.154574-03:00",
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "renda": 431593
     },
     "401841215": {
       "event_id": "401841215",
@@ -137960,5 +137961,5 @@
     }
   },
   "total_com_publico_pagante": 239,
-  "total_com_renda": 244
+  "total_com_renda": 245
 }
