@@ -3,6 +3,7 @@ import { PushState } from './push-state.js';
 import { SportsMonitor } from './sports-monitor.js';
 import { dispatchStatus, handleQueueBatch } from './push-dispatch.js';
 import { opsStatus, runOperationalMaintenance } from './ops.js';
+import { probeEspnSources } from './espn-source.js';
 
 export { PushState, SportsMonitor };
 
@@ -337,6 +338,7 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 6,
+        revision: '6-R',
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
@@ -367,6 +369,11 @@ export default {
         if (!(await allowStatusRead(request, env, 'monitor-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
         const response = await singletonMonitor(env).fetch('https://internal/status');
         return json(request, await response.json(), response.status, { 'Cache-Control': 'no-store' });
+      }
+      if (url.pathname === '/v1/monitor/source-probe' && request.method === 'GET') {
+        if (!(await allowStatusRead(request, env, 'source-probe'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
+        const probe = await probeEspnSources();
+        return json(request, probe, probe.ok ? 200 : 503, { 'Cache-Control': 'no-store' });
       }
       if (url.pathname === '/v1/monitor/events' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'monitor-events'))) return json(request, { ok: false, error: 'rate_limited' }, 429);

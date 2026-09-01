@@ -8,9 +8,9 @@ import {
   summarizeMatch
 } from './sports-engine.js';
 import { enqueueSportsEvent } from './push-dispatch.js';
+import { fetchEspnScoreboard, fetchEspnSummary } from './espn-source.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
-const ESPN_ROOT = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
 const PRE_WINDOW_MS = 6 * 60 * 60_000;
 const POST_WINDOW_MS = 5 * 60 * 60_000;
@@ -59,7 +59,7 @@ export function selectAgendaCandidates(payload, nowMs = Date.now()) {
   return out;
 }
 
-async function fetchJson(url) {
+async function fetchAgendaJson(url) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
@@ -82,18 +82,6 @@ function brDateKey(isoOrMs) {
     timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit'
   }).formatToParts(date).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
   return `${parts.year}${parts.month}${parts.day}`;
-}
-
-function scoreboardUrl(league, games) {
-  const days = games.map((game) => brDateKey(game.kickoff)).filter(Boolean).sort();
-  const start = days[0] || brDateKey(Date.now());
-  const end = days.at(-1) || start;
-  const dates = start === end ? start : `${start}-${end}`;
-  return `${ESPN_ROOT}/${encodeURIComponent(league)}/scoreboard?dates=${dates}&limit=100`;
-}
-
-function summaryUrl(league, eventId) {
-  return `${ESPN_ROOT}/${encodeURIComponent(league)}/summary?event=${encodeURIComponent(eventId)}`;
 }
 
 function eventMap(payload) {
@@ -181,7 +169,7 @@ export class SportsMonitor {
     let candidates = [];
     let agendaError = '';
     try {
-      const agenda = await fetchJson(AGENDA_URL);
+      const agenda = await fetchAgendaJson(AGENDA_URL);
       candidates = selectAgendaCandidates(agenda, now);
     } catch (error) {
       agendaError = text(error?.message || error);
@@ -273,11 +261,21 @@ export class SportsMonitor {
 
     const scoreboardResults = new Map();
     const sourceErrors = [];
+    const scoreboardSources = {};
+    const sourceAttempts = {};
+    const summarySources = {};
     await Promise.all([...byLeague.entries()].map(async ([league, games]) => {
       try {
-        const payload = await fetchJson(scoreboardUrl(league, games));
-        scoreboardResults.set(league, eventMap(payload));
+        const days = games.map((game) => brDateKey(game.kickoff)).filter(Boolean).sort();
+        const start = days[0] || brDateKey(Date.now());
+        const end = days.at(-1) || start;
+        const dates = start === end ? start : `${start}-${end}`;
+        const result = await fetchEspnScoreboard(league, dates);
+        scoreboardResults.set(league, eventMap(result.data));
+        scoreboardSources[league] = result.source;
+        sourceAttempts[league] = result.attempts;
       } catch (error) {
+        sourceAttempts[league] = Array.isArray(error?.attempts) ? error.attempts : [];
         sourceErrors.push(`${league}: ${text(error?.message || error)}`);
       }
     }));
@@ -306,9 +304,10 @@ export class SportsMonitor {
       let plays = null;
       if (needsSummary(previous, observation)) {
         try {
-          const summary = await fetchJson(summaryUrl(game.league, game.eventId));
-          plays = extractScoringPlays(summary, observation);
+          const summaryResult = await fetchEspnSummary(game.league, game.eventId);
+          plays = extractScoringPlays(summaryResult.data, observation);
           summariesFetched += 1;
+          summarySources[summaryResult.source] = num(summarySources[summaryResult.source], 0) + 1;
         } catch (error) {
           sourceErrors.push(`${game.league}/${game.eventId}/summary: ${text(error?.message || error)}`);
         }
@@ -340,7 +339,11 @@ export class SportsMonitor {
       activeGames: liveGames,
       summariesFetched,
       emittedThisPoll: newlyEmitted.length,
-      totalRecentEvents: recentEvents.length
+      totalRecentEvents: recentEvents.length,
+      scoreboardSources,
+      summarySources,
+      sourceAttempts,
+      sourceLayerVersion: '6-R1'
     });
     await this.ensureNextAlarm();
     return this.publicStatus();
@@ -366,6 +369,10 @@ export class SportsMonitor {
       lastPollError: text(snapshot.status.lastPollError),
       summariesFetched: num(snapshot.status.summariesFetched, 0),
       emittedThisPoll: num(snapshot.status.emittedThisPoll, 0),
+      sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R1'),
+      scoreboardSources: snapshot.status.scoreboardSources && typeof snapshot.status.scoreboardSources === 'object' ? snapshot.status.scoreboardSources : {},
+      summarySources: snapshot.status.summarySources && typeof snapshot.status.summarySources === 'object' ? snapshot.status.summarySources : {},
+      sourceAttempts: snapshot.status.sourceAttempts && typeof snapshot.status.sourceAttempts === 'object' ? snapshot.status.sourceAttempts : {},
       matches
     };
   }

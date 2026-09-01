@@ -36,3 +36,24 @@ A Execução 6 acrescenta:
 - teste sintético ponta a ponta: placar → confirmação anti-VAR → payload → anulação sem duplicação.
 
 A disputa de pênaltis continua separada do fluxo de gols regulamentares.
+
+## Execução 6-R — resiliência da fonte ESPN
+
+A E6-R remove a dependência operacional exclusiva de `site.api.espn.com`, que pode responder HTTP 403 a subrequests originados em Workers.
+
+Para placares, a ordem é:
+
+1. `cdn.espn.com/core/soccer/scoreboard?xhr=1&league=...`;
+2. `cdn.espn.com/core/{league}/scoreboard?xhr=1`;
+3. `site.api.espn.com/apis/site/v2/.../scoreboard` como fallback.
+
+Para detalhes do gol, a ordem é:
+
+1. game package CDN por `soccer`;
+2. game package CDN por competição;
+3. summary do Site API;
+4. plays do Core API como último fallback.
+
+O endpoint técnico `GET /v1/monitor/source-probe` testa, a partir do próprio Worker, a conectividade das quatro competições monitoradas. O workflow de deploy chama esse endpoint depois da publicação e falha se qualquer competição ficar sem uma fonte de scoreboard utilizável. Assim, um workflow verde na E6-R também comprova Worker -> ESPN, e não apenas Worker/D1/Queue.
+
+O status do monitor passa a expor `sourceLayerVersion`, `scoreboardSources`, `summarySources` e `sourceAttempts`. Falhas de uma fonte primária que sejam recuperadas por fallback não contaminam `lastPollError`; esse campo passa a representar somente falha efetiva depois de esgotadas as fontes disponíveis.
