@@ -707,11 +707,20 @@ jobs:
               "favicon-formula-do-gol-192.png",
               "favicon-formula-do-gol-512.png",
               "apple-touch-icon-formula-do-gol.png",
-              "notification-fg-192.png",
-              "notification-fg-96.png",
               "favicon-formula-do-gol.ico",
               "og-image-formula-do-gol-v2.jpg",
           ]
+          notification_files = [
+              "notification-fg-192.png",
+              "notification-fg-96.png",
+          ]
+
+          # Ícones de push não pertencem ao HTML das páginas. Eles são assets do
+          # Service Worker e devem existir no pacote público e ser referenciados por ele.
+          sw_text = (site / "sw.js").read_text(encoding="utf-8")
+          for notification in notification_files:
+              assert (site / notification).is_file(), f"ícone de notificação ausente no pacote público: {notification}"
+              assert f"/{notification}" in sw_text, f"sw.js não referencia o ícone de notificação: {notification}"
 
           class RefParser(HTMLParser):
               def __init__(self):
