@@ -35,7 +35,7 @@
   <meta name="theme-color" content="#0a161e">
   <link rel="stylesheet" href="css/br-estatisticas.css?v=20260723-player-card-fix-v1">
   <link rel="stylesheet" href="css/br-global.css?v=20260801-footer-institucional-v1">
-  <link rel="stylesheet" href="css/br-aovivo.css?v=20260807-youtube-embed-v1">
+  <link rel="stylesheet" href="css/br-aovivo.css?v=20260901-live-hardening-v1">
 <!-- Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script>
 <script>
@@ -92,6 +92,9 @@
     </nav>
 
     <main>
+      <div class="live-freshness-row" aria-label="Estado da atualização ao vivo">
+        <span id="live-update-badge" class="live-update-badge" role="status" aria-live="polite">Conectando à ESPN…</span>
+      </div>
       <div id="live-alert" class="live-alert" role="status" aria-live="polite"></div>
       <section id="live-switcher" class="live-switcher" aria-label="Escolher partida" hidden></section>
       <section id="live-app" aria-live="polite">
@@ -120,7 +123,7 @@
 
   <script src="js/br-clube-retorno.js?v=20260717-retorno-exato-v1"></script>
   <script src="js/br-estatisticas-ordem.js?v=20260816-ordem-canonica-v1"></script>
-  <script src="js/br-aovivo.js?v=20260818-sbt-live-v3"></script>
+  <script src="js/br-aovivo.js?v=20260901-live-hardening-v1"></script>
   <script src="js/br-config.js?v=20260723-copa-publica-v1"></script>
   <script src="js/br-menu.js?v=20260808-jogos-unificados-v1"></script>
   <script src="js/br-feedback.js?v=20260713-disclaimers-publicos-v1"></script>

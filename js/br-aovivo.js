@@ -15,6 +15,10 @@
   const FINAL_RETENTION_OTHER_MS = 60 * 60000;
   const PRE_GAME_WINDOW_BEFORE_MS = 30 * 60000;
   const PRE_GAME_WINDOW_AFTER_MS = 90 * 60000;
+  const FETCH_TIMEOUT_MS = 12000;
+  const STALE_DATA_MS = REFRESH_MS * 2 + 15000;
+  const FRESHNESS_CHECK_MS = 5000;
+  const IMMEDIATE_REFRESH_DEBOUNCE_MS = 750;
 
   const $ = (sel) => document.querySelector(sel);
   const app = $("#live-app");
@@ -203,11 +207,22 @@
     renderSerial: 0,
     summaryAbortController: null,
     ultimaAtualizacao: null,
+    ultimaTentativa: null,
+    ultimoSucessoEspn: null,
     ultimaFalha: "",
     timer: null,
     tickTimer: null,
+    freshnessTimer: null,
     carregando: false,
+    carregandoDesde: 0,
     primeiraCarga: true,
+    refreshRequested: false,
+    pendingRefreshReason: "",
+    refreshGeneration: 0,
+    immediateRefreshAt: 0,
+    activeFetchControllers: new Set(),
+    espnSuccessByLeague: {},
+    espnFailureByLeague: {},
     finalizadosEm: cachedFinalTimes(),
     probabilidadesJogos: null
   };
@@ -483,6 +498,7 @@
       raw: ev,
       competition: comp,
       source: "espn",
+      sourceFetchedAt: Number(info.sourceFetchedAt || 0),
       competitionKey: String(info.competitionKey || "brasileirao"),
       competitionName: String(info.competitionName || "Campeonato Brasileiro Série A"),
       competitionShort: String(info.competitionShort || "Brasileirão"),
@@ -566,10 +582,61 @@
     };
   }
 
+  function isAbortError(error) {
+    return Boolean(error && error.name === "AbortError");
+  }
+
+  function abortActiveFetches() {
+    if (state.summaryAbortController) {
+      try { state.summaryAbortController.abort(); } catch (_) {}
+    }
+    for (const controller of Array.from(state.activeFetchControllers)) {
+      try { controller.abort(); } catch (_) {}
+    }
+  }
+
   async function fetchJson(url, options = {}) {
-    const r = await fetch(url, Object.assign({ cache: "no-store" }, options));
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
+    const requestOptions = Object.assign({ cache: "no-store" }, options || {});
+    const explicitTimeout = Number(requestOptions.timeoutMs);
+    const timeoutMs = Number.isFinite(explicitTimeout) && explicitTimeout > 0 ? explicitTimeout : FETCH_TIMEOUT_MS;
+    delete requestOptions.timeoutMs;
+
+    const externalSignal = requestOptions.signal || null;
+    const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+    let timeoutId = null;
+    let timedOut = false;
+    let externalAbortHandler = null;
+
+    if (controller) {
+      if (externalSignal) {
+        externalAbortHandler = () => controller.abort();
+        if (externalSignal.aborted) controller.abort();
+        else externalSignal.addEventListener("abort", externalAbortHandler, { once: true });
+      }
+      requestOptions.signal = controller.signal;
+      state.activeFetchControllers.add(controller);
+      timeoutId = setTimeout(() => {
+        timedOut = true;
+        try { controller.abort(); } catch (_) {}
+      }, timeoutMs);
+    }
+
+    try {
+      const r = await fetch(url, requestOptions);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return await r.json();
+    } catch (error) {
+      if (timedOut) {
+        const timeoutError = new Error("Tempo limite excedido ao consultar a fonte (" + Math.round(timeoutMs / 1000) + "s)");
+        timeoutError.name = "TimeoutError";
+        throw timeoutError;
+      }
+      throw error;
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (externalSignal && externalAbortHandler) externalSignal.removeEventListener("abort", externalAbortHandler);
+      if (controller) state.activeFetchControllers.delete(controller);
+    }
   }
 
   function youtubeVideoId(value) {
@@ -986,30 +1053,67 @@
       leagues.get(league).push(game);
     });
 
-    const requests = Array.from(leagues.entries()).map(async ([league, localGames]) => {
+    const leagueEntries = Array.from(leagues.entries());
+    const requests = leagueEntries.map(async ([league, localGames]) => {
       const url = ESPN_API_ROOT + "/" + encodeURIComponent(league) + "/scoreboard?dates=" + ini + "-" + fim + "&limit=100&_=" + Date.now();
       const data = await fetchJson(url);
-      return (data.events || []).map((event) => {
+      const fetchedAt = Date.now();
+      const games = (data.events || []).map((event) => {
         const eventId = String(event && event.id || "");
         const local = localGames.find((game) => String(game.id || "") === eventId) || null;
         const leagueMeta = LEAGUE_META[league] || {};
-        const meta = local || {
+        const baseMeta = local || {
           espnLeague: league,
           competitionKey: leagueMeta.competitionKey || "",
           competitionName: leagueMeta.competitionName || "",
           competitionShort: leagueMeta.competitionShort || "",
           probabilitiesAvailable: league === DEFAULT_LEAGUE
         };
-        return normalizeEvent(event, meta);
+        return normalizeEvent(event, Object.assign({}, baseMeta, { sourceFetchedAt: fetchedAt }));
       }).filter(Boolean);
+      return { league, fetchedAt, games };
     });
 
     const settled = await Promise.allSettled(requests);
-    const normalized = settled.flatMap((result) => result.status === "fulfilled" ? result.value : [])
+    const successfulLeagues = new Set();
+    const failedLeagues = new Set();
+    const freshNormalized = [];
+    let latestSuccessAt = 0;
+    let firstFailure = null;
+
+    settled.forEach((result, index) => {
+      const league = leagueEntries[index] && leagueEntries[index][0];
+      if (!league) return;
+      if (result.status === "fulfilled") {
+        successfulLeagues.add(league);
+        latestSuccessAt = Math.max(latestSuccessAt, Number(result.value.fetchedAt || 0));
+        state.espnSuccessByLeague[league] = Number(result.value.fetchedAt || Date.now());
+        delete state.espnFailureByLeague[league];
+        freshNormalized.push(...(result.value.games || []));
+      } else {
+        failedLeagues.add(league);
+        const reason = result.reason && result.reason.message ? result.reason.message : String(result.reason || "Falha ESPN");
+        state.espnFailureByLeague[league] = { at: Date.now(), message: reason };
+        if (!firstFailure) firstFailure = result.reason;
+      }
+    });
+
+    if (leagueEntries.length && !successfulLeagues.size) {
+      if (firstFailure && isAbortError(firstFailure)) throw firstFailure;
+      throw firstFailure || new Error("ESPN indisponível para as competições consultadas");
+    }
+
+    const normalized = freshNormalized
       .filter((game) => directGameIsEligible(game))
       .map(mergeLocal);
-    if (!normalized.length && settled.some((result) => result.status === "rejected")) {
-      throw new Error("ESPN indisponível para as competições consultadas");
+
+    // Uma falha isolada de uma competição não pode apagar o último placar válido
+    // dessa mesma competição. Preservamos apenas esses registros e marcamos a fonte
+    // como defasada na interface até a ESPN responder novamente.
+    const preserved = state.diretos.filter((game) => failedLeagues.has(String(game.espnLeague || DEFAULT_LEAGUE)));
+    const nextDiretos = normalized.slice();
+    for (const oldGame of preserved) {
+      if (!nextDiretos.some((game) => sameFixture(game, oldGame))) nextDiretos.push(oldGame);
     }
 
     for (const game of normalized) {
@@ -1027,7 +1131,15 @@
       if (Date.now() - state.finalizadosEm[key] > 12 * 3600000) delete state.finalizadosEm[key];
     }
     saveFinalTimes();
-    state.diretos = normalized;
+    state.diretos = nextDiretos;
+    if (latestSuccessAt > 0) state.ultimoSucessoEspn = new Date(latestSuccessAt);
+
+    return {
+      requestedLeagues: leagueEntries.map(([league]) => league),
+      successfulLeagues: Array.from(successfulLeagues),
+      failedLeagues: Array.from(failedLeagues),
+      latestSuccessAt
+    };
   }
 
   function sameFixture(a, b) {
@@ -2309,7 +2421,7 @@
       renderNextList(all, g);
   }
 
-  async function renderPage() {
+  async function renderPage(expectedRefreshGeneration = null) {
     const renderSerial = ++state.renderSerial;
     const all = allGames();
     const { selected, priorities } = chooseGame(all);
@@ -2319,13 +2431,10 @@
     // Ao trocar rapidamente de partida, uma resposta anterior pode chegar depois.
     // Nunca permitimos que ela redesenhe o jogo atualmente selecionado.
     if (renderSerial !== state.renderSerial) return;
+    if (expectedRefreshGeneration !== null && expectedRefreshGeneration !== state.refreshGeneration) return;
     renderMain(selected, summary, all);
     updateCountdowns();
-    if (badge) {
-      badge.classList.toggle("is-live", Boolean(selected && selected.state === "in"));
-      badge.classList.remove("is-error");
-      badge.textContent = state.ultimaAtualizacao ? "Atualizado " + formatClockTime(state.ultimaAtualizacao) + " · 30s" : "Atualizando a cada 30s";
-    }
+    updateFreshnessUi(selected);
   }
 
   function updateCountdowns() {
@@ -2338,6 +2447,7 @@
   }
 
   function showAlert(msg) {
+    if (!alertBox) return;
     if (!msg) {
       alertBox.classList.remove("show");
       alertBox.textContent = "";
@@ -2347,40 +2457,199 @@
     alertBox.classList.add("show");
   }
 
-  async function refresh() {
-    if (state.carregando || document.hidden) return;
+  function sourceTimestampForGame(game) {
+    if (!game) return 0;
+    const direct = Number(game.sourceFetchedAt || 0);
+    if (direct > 0) return direct;
+    const league = String(game.espnLeague || DEFAULT_LEAGUE);
+    return Number(state.espnSuccessByLeague[league] || 0);
+  }
+
+  function sourceFailureForGame(game) {
+    if (!game) return null;
+    const league = String(game.espnLeague || DEFAULT_LEAGUE);
+    return state.espnFailureByLeague[league] || null;
+  }
+
+  function isLiveGame(game) {
+    return Boolean(game && gameState(game).key === "live");
+  }
+
+  function isDisplayedDataStale(game, referenceMs = Date.now()) {
+    if (!isLiveGame(game)) return false;
+    if (String(game.source || "") !== "espn") return true;
+    const sourceTs = sourceTimestampForGame(game);
+    return !sourceTs || referenceMs - sourceTs > STALE_DATA_MS;
+  }
+
+  function updateFreshnessUi(selected) {
+    const live = isLiveGame(selected);
+    const sourceTs = sourceTimestampForGame(selected);
+    const stale = isDisplayedDataStale(selected);
+    const sourceFailure = sourceFailureForGame(selected);
+
+    if (badge) {
+      badge.classList.toggle("is-live", live && !stale && !sourceFailure);
+      badge.classList.toggle("is-stale", Boolean(live && (stale || sourceFailure)));
+      badge.classList.toggle("is-error", Boolean(state.ultimaFalha));
+
+      if (state.ultimaFalha) {
+        badge.textContent = sourceTs
+          ? "Dado preservado · ESPN " + formatClockTime(new Date(sourceTs))
+          : "Fonte temporariamente indisponível";
+      } else if (live && sourceFailure) {
+        badge.textContent = sourceTs
+          ? "Dado preservado · ESPN " + formatClockTime(new Date(sourceTs))
+          : "Reconectando à ESPN…";
+      } else if (stale) {
+        badge.textContent = sourceTs
+          ? "Atualização atrasada · ESPN " + formatClockTime(new Date(sourceTs))
+          : "Reconectando à ESPN…";
+      } else if (live && sourceTs) {
+        badge.textContent = "ESPN · " + formatClockTime(new Date(sourceTs)) + " · 30s";
+      } else if (state.ultimaAtualizacao) {
+        badge.textContent = "Atualizado " + formatClockTime(state.ultimaAtualizacao) + " · 30s";
+      } else {
+        badge.textContent = "Conectando à ESPN…";
+      }
+    }
+
+    if (state.ultimaFalha) {
+      const suffix = sourceTs ? " Último dado ESPN recebido às " + formatClockTime(new Date(sourceTs)) + "." : "";
+      showAlert("A ESPN não respondeu nesta tentativa. O último dado válido permanece identificado na tela e uma nova tentativa ocorrerá automaticamente." + suffix);
+    } else if (live && sourceFailure) {
+      const suffix = sourceTs ? " O placar exibido foi recebido às " + formatClockTime(new Date(sourceTs)) + "." : "";
+      showAlert("A ESPN não respondeu para esta partida na tentativa mais recente. O dado anterior foi preservado e o site já está tentando reconectar." + suffix);
+    } else if (stale) {
+      showAlert("A atualização desta partida está atrasada. O placar exibido está identificado como preservado e uma nova consulta à ESPN foi acionada.");
+    } else {
+      showAlert("");
+    }
+  }
+
+  function currentSelectedGame() {
+    try {
+      return chooseGame(allGames()).selected || null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function scheduleNextRefresh(delay = REFRESH_MS, reason = "timer") {
+    clearTimeout(state.timer);
+    state.timer = setTimeout(() => refresh(reason), Math.max(0, Number(delay) || 0));
+  }
+
+  function requestImmediateRefresh(reason) {
+    if (document.hidden) {
+      state.refreshRequested = true;
+      state.pendingRefreshReason = reason || "visible";
+      return;
+    }
+
+    const now = Date.now();
+    if (now - state.immediateRefreshAt < IMMEDIATE_REFRESH_DEBOUNCE_MS) return;
+    state.immediateRefreshAt = now;
+    clearTimeout(state.timer);
+
+    if (state.carregando) {
+      state.refreshRequested = true;
+      state.pendingRefreshReason = reason || "superseded";
+      // Invalida a geração atual antes do abort para impedir que uma resposta
+      // velha redesenhe a tela enquanto a atualização nova é preparada.
+      state.refreshGeneration += 1;
+      abortActiveFetches();
+      return;
+    }
+
+    state.refreshRequested = false;
+    state.pendingRefreshReason = "";
+    refresh(reason || "immediate");
+  }
+
+  async function refresh(reason = "timer") {
+    if (document.hidden) {
+      state.refreshRequested = true;
+      state.pendingRefreshReason = reason;
+      return;
+    }
+    if (state.carregando) {
+      state.refreshRequested = true;
+      state.pendingRefreshReason = reason;
+      return;
+    }
+
+    clearTimeout(state.timer);
     state.carregando = true;
+    state.carregandoDesde = Date.now();
+    state.ultimaTentativa = new Date();
+    const generation = ++state.refreshGeneration;
+
     try {
       if (state.primeiraCarga) await loadLocal();
-      await Promise.all([loadScoreboard(), loadTransmissions()]);
+      if (generation !== state.refreshGeneration) return;
+
+      const [scoreboardHealth] = await Promise.all([loadScoreboard(), loadTransmissions()]);
+      if (generation !== state.refreshGeneration) return;
+
       state.ultimaAtualizacao = new Date();
       state.ultimaFalha = "";
       state.primeiraCarga = false;
-      showAlert("");
-      await renderPage();
-    } catch (e) {
-      console.warn("Ao vivo indisponível:", e);
-      state.ultimaFalha = e && e.message ? e.message : String(e);
-      if (badge) {
-        badge.classList.add("is-error");
-        badge.classList.remove("is-live");
-        badge.textContent = "Fonte temporariamente indisponível";
+      await renderPage(generation);
+
+      // Se apenas outra competição falhou, a partida selecionada continua marcada
+      // pela sua própria fonte/idade; não transformamos uma falha parcial em erro
+      // global. O mapa por liga é consumido por updateFreshnessUi().
+      if (scoreboardHealth && scoreboardHealth.failedLeagues && scoreboardHealth.failedLeagues.length) {
+        updateFreshnessUi(currentSelectedGame());
       }
-      showAlert("A ESPN não respondeu nesta tentativa. A última informação válida permanece na tela e uma nova tentativa ocorrerá automaticamente.");
-      if (state.primeiraCarga) {
-        try {
-          await Promise.all([loadLocal(), loadTransmissions()]);
-          state.primeiraCarga = false;
-          await renderPage();
-        } catch (_) {
-          app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Não foi possível carregar a agenda agora. Tente novamente em alguns instantes.</div></div></div>';
+    } catch (e) {
+      const superseded = generation !== state.refreshGeneration || (isAbortError(e) && state.refreshRequested);
+      if (!superseded) {
+        console.warn("Ao vivo indisponível:", e);
+        state.ultimaFalha = e && e.message ? e.message : String(e);
+        if (state.primeiraCarga) {
+          try {
+            await Promise.all([loadLocal(), loadTransmissions()]);
+            if (generation !== state.refreshGeneration) return;
+            state.primeiraCarga = false;
+            await renderPage(generation);
+          } catch (_) {
+            if (app) app.innerHTML = '<div class="panel"><div class="panel-inner"><div class="live-empty">Não foi possível carregar a agenda agora. Tente novamente em alguns instantes.</div></div></div>';
+          }
         }
+        updateFreshnessUi(currentSelectedGame());
       }
     } finally {
       state.carregando = false;
-      clearTimeout(state.timer);
-      state.timer = setTimeout(refresh, REFRESH_MS);
+      state.carregandoDesde = 0;
+
+      if (state.refreshRequested && !document.hidden) {
+        const nextReason = state.pendingRefreshReason || "pending";
+        state.refreshRequested = false;
+        state.pendingRefreshReason = "";
+        scheduleNextRefresh(0, nextReason);
+      } else {
+        scheduleNextRefresh(REFRESH_MS, "timer");
+      }
     }
+  }
+
+  function freshnessWatchdog() {
+    if (document.hidden) return;
+    const selected = currentSelectedGame();
+    if (!isLiveGame(selected)) return;
+
+    const now = Date.now();
+    const stale = isDisplayedDataStale(selected, now);
+    if (!stale) return;
+
+    updateFreshnessUi(selected);
+
+    const lastAttemptAt = state.ultimaTentativa instanceof Date ? state.ultimaTentativa.getTime() : 0;
+    const requestTooOld = state.carregando && state.carregandoDesde > 0 && now - state.carregandoDesde > FETCH_TIMEOUT_MS + 1500;
+    const canRetry = !lastAttemptAt || now - lastAttemptAt >= Math.min(REFRESH_MS, 15000);
+    if (requestTooOld || canRetry) requestImmediateRefresh("freshness-watchdog");
   }
 
   document.addEventListener("click", (event) => {
@@ -2396,12 +2665,23 @@
   });
 
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      clearTimeout(state.timer);
-      refresh();
-    }
+    if (!document.hidden) requestImmediateRefresh("visibilitychange");
+  });
+
+  window.addEventListener("pageshow", () => {
+    requestImmediateRefresh("pageshow");
+  });
+
+  window.addEventListener("focus", () => {
+    requestImmediateRefresh("focus");
+  });
+
+  window.addEventListener("online", () => {
+    requestImmediateRefresh("online");
   });
 
   state.tickTimer = setInterval(updateCountdowns, 1000);
-  refresh();
+  state.freshnessTimer = setInterval(freshnessWatchdog, FRESHNESS_CHECK_MS);
+  requestImmediateRefresh("initial");
+
 })();

@@ -15,6 +15,12 @@
   gap: 16px;
 }
 .br-live-heading h1 { margin-top: 2px; }
+.live-freshness-row {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 34px;
+  margin: 0 0 10px;
+}
 .live-update-badge {
   flex: 0 0 auto;
   display: inline-flex;
@@ -43,6 +49,12 @@
   box-shadow: 0 0 12px rgba(251,113,133,.72);
   animation: br-live-pulse 1.2s ease-in-out infinite;
 }
+.live-update-badge.is-stale {
+  border-color: rgba(251,191,36,.34);
+  background: rgba(251,191,36,.09);
+  color: #fde68a;
+}
+.live-update-badge.is-stale::before { background: #fbbf24; box-shadow: 0 0 10px rgba(251,191,36,.46); }
 .live-update-badge.is-error {
   border-color: rgba(251,113,133,.32);
   background: rgba(251,113,133,.08);
@@ -338,6 +350,8 @@
 }
 
 @media (max-width: 560px) {
+  .live-freshness-row { justify-content: center; }
+  .live-update-badge { max-width: 100%; white-space: normal; text-align: center; line-height: 1.2; }
   .live-prob-kicker { display: none; }
   .live-team > .live-prob-badge,
   .live-score-center > .live-prob-badge { display: none; }

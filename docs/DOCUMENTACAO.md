@@ -70,7 +70,7 @@ O menu principal do `index.html` expõe: **Estatísticas, Jogos, Ao vivo, Tabela
 | `br-acuracia.js` | Renderiza o painel público de acurácia/timeline do AF‑Previsão. |
 | `br-agenda.js` | Agenda consolidada dos clubes, filtros por competição/mês e canais/players. |
 | `br-analises.js` | Interação dos artigos editoriais, inclusive modal seguro de vídeo YouTube. |
-| `br-aovivo.js` | Central ao vivo multicompetição; scoreboard ESPN 30 s, agenda e transmissões. |
+| `js/br-aovivo.js` | Central ao vivo multicompetição; scoreboard ESPN 30 s, retomada imediata de aba, timeout de rede, controle de freshness, agenda e transmissões. |
 | `br-apostas.js` | Login, palpites, administração e ligações Supabase do módulo privado preservado. |
 | `br-classificacao-live.js` | Motor compartilhado que projeta classificação com placares `in`/FINAL ainda não incorporado. |
 | `br-clube-retorno.js` | Preserva contexto/âncora de retorno ao navegar para fichas de clubes. |
