@@ -401,10 +401,10 @@ export class SportsMonitor {
     const now = Date.now();
     const result = await fetchEspnTechnicalScoreboard(HOT_MATCH_TEST_CONSTANTS.LEAGUE, HOT_MATCH_TEST_CONSTANTS.DATE_KEY);
     const raw = hotMatchTargetEvent(result.data?.events || []);
-    if (!raw) throw new Error(`ESPN não encontrou ${HOT_MATCH_TEST_CONSTANTS.MATCHUP} no scoreboard da Coppa Italia`);
+    if (!raw) throw new Error(`ESPN não encontrou ${HOT_MATCH_TEST_CONSTANTS.MATCHUP} no scoreboard ESPN`);
     const observation = normalizeScoreboardEvent(raw, HOT_MATCH_TEST_CONSTANTS.LEAGUE, {
       eventId: text(raw?.id), league: HOT_MATCH_TEST_CONSTANTS.LEAGUE,
-      competitionKey: 'technical_hot_match_test', competitionName: 'Coppa Italia · teste ESPN real',
+      competitionKey: 'technical_hot_match_test', competitionName: HOT_MATCH_TEST_CONSTANTS.COMPETITION_NAME,
       home: { name: HOT_MATCH_TEST_CONSTANTS.HOME }, away: { name: HOT_MATCH_TEST_CONSTANTS.AWAY }
     });
     const kickoffMs = Date.parse(observation.kickoff || '');
@@ -449,7 +449,7 @@ export class SportsMonitor {
       if (!raw) throw new Error('jogo técnico sumiu do scoreboard ESPN');
       let observation = normalizeScoreboardEvent(raw, HOT_MATCH_TEST_CONSTANTS.LEAGUE, {
         eventId: text(current.eventId), league: HOT_MATCH_TEST_CONSTANTS.LEAGUE,
-        competitionKey: 'technical_hot_match_test', competitionName: 'Coppa Italia · teste ESPN real',
+        competitionKey: 'technical_hot_match_test', competitionName: HOT_MATCH_TEST_CONSTANTS.COMPETITION_NAME,
         home: { name: HOT_MATCH_TEST_CONSTANTS.HOME }, away: { name: HOT_MATCH_TEST_CONSTANTS.AWAY }
       });
       let next = { ...current, kickoff: text(observation.kickoff || current.kickoff), lastCheckAt: now,
@@ -766,6 +766,8 @@ export class SportsMonitor {
       ok: true,
       engineVersion: 4,
       overturnPolicyVersion: SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION,
+      goalDetectionPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION,
+      goalReconciliationPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION,
       watchCount: Object.keys(snapshot.watchlist).length,
       matchCount: matches.length,
       activeGames: matches.filter((m) => m.state === 'in').length,

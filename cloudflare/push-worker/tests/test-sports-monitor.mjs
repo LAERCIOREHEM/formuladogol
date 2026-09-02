@@ -161,54 +161,54 @@ console.log('sports-monitor: PASS');
 }
 
 
-// 6-H2: teste quente de partida real, invisível ao site, reutiliza o mesmo motor de gol R5/R4.
+// 6-H3: Osnabrück × Bayern, invisível ao site, reutiliza o motor R7/R6 + anti-VAR R4.
 {
   const oldNow = Date.now;
   const oldFetch = globalThis.fetch;
-  let h2Now = Date.parse('2026-09-02T15:44:00Z'); // 12:44 Brasília
+  let h2Now = Date.parse('2026-09-02T18:29:00Z'); // 15:29 Brasília
   Date.now = () => h2Now;
   let h2Phase = 'pre';
-  const h2EventId = '999001';
-  const h2Kickoff = '2026-09-02T16:00:00Z';
+  const h2EventId = '401875174';
+  const h2Kickoff = '2026-09-02T18:45:00Z';
   const h2Scoreboard = () => ({ events: [{
     id: h2EventId, date: h2Kickoff,
     status: h2Phase === 'pre'
       ? { type: { state: 'pre', completed: false, shortDetail: 'Scheduled' }, displayClock: '', period: 0 }
       : { type: { state: 'in', completed: false, shortDetail: "5'" }, displayClock: "5'", period: 1 },
     competitions: [{ competitors: [
-      { homeAway: 'home', score: h2Phase === 'pre' ? '0' : '1', team: { id: '118', displayName: 'Udinese', abbreviation: 'UDI' } },
-      { homeAway: 'away', score: '0', team: { id: '175', displayName: 'Venezia', abbreviation: 'VEN' } }
+      { homeAway: 'home', score: '0', team: { id: '118', displayName: 'VfL Osnabrück', abbreviation: 'OSN' } },
+      { homeAway: 'away', score: h2Phase === 'pre' ? '0' : '1', team: { id: '132', displayName: 'Bayern Munich', abbreviation: 'FCB' } }
     ] }]
   }] });
   globalThis.fetch = async (url) => {
     const href = String(url);
-    if (href.includes('/scoreboard') && href.includes('ita.coppa_italia')) return Response.json(h2Scoreboard());
-    if (href.includes('/playbyplay') && href.includes('ita.coppa_italia')) {
+    if (href.includes('/scoreboard') && href.includes('ger.dfb_pokal')) return Response.json(h2Scoreboard());
+    if (href.includes('/playbyplay') && href.includes('ger.dfb_pokal')) {
       return Response.json({ gamepackageJSON: { plays: h2Phase === 'pre' ? [] : [{
-        id: 'h2-goal-1', scoringPlay: true, text: 'Goal Udinese', type: { text: 'Goal' },
-        team: { id: '118' }, athletesInvolved: [{ id: '77', displayName: 'Teste Atacante' }],
-        clock: { displayValue: "5'" }, homeScore: 1, awayScore: 0
+        id: 'h2-goal-1', scoringPlay: true, text: 'Goal Bayern Munich', type: { text: 'Goal' },
+        team: { id: '132' }, athletesInvolved: [{ id: '77', displayName: 'Teste Atacante' }],
+        clock: { displayValue: "5'" }, homeScore: 0, awayScore: 1
       }] } });
     }
-    if (href.includes('/leagues/ita.coppa_italia/') && href.includes('/plays')) {
+    if (href.includes('/leagues/ger.dfb_pokal/') && href.includes('/plays')) {
       return Response.json({ items: h2Phase === 'pre' ? [{ id: 'warmup', text: 'Pre-match' }] : [{
-        id: 'h2-goal-1', scoringPlay: true, text: 'Goal Udinese', type: { text: 'Goal' },
-        team: { id: '118' }, athletesInvolved: [{ id: '77', displayName: 'Teste Atacante' }],
-        clock: { displayValue: "5'" }, homeScore: 1, awayScore: 0
+        id: 'h2-goal-1', scoringPlay: true, text: 'Goal Bayern Munich', type: { text: 'Goal' },
+        team: { id: '132' }, athletesInvolved: [{ id: '77', displayName: 'Teste Atacante' }],
+        clock: { displayValue: "5'" }, homeScore: 0, awayScore: 1
       }] });
     }
-    throw new Error(`H2 URL inesperada: ${href}`);
+    throw new Error(`H3 URL inesperada: ${href}`);
   };
   try {
     const target = hotMatchTargetEvent(h2Scoreboard().events);
     assert.equal(target.id, h2EventId);
-    assert.equal(hotMatchPrematchDue(h2Kickoff, Date.parse('2026-09-02T15:45:00Z')), true);
+    assert.equal(hotMatchPrematchDue(h2Kickoff, Date.parse('2026-09-02T18:30:00Z')), true);
     const prem = buildHotMatchPrematchEvent({ installationId: 'inst-h2', eventId: h2EventId, kickoff: h2Kickoff }, {
-      eventId: h2EventId, kickoff: h2Kickoff, home: { name: 'Udinese' }, away: { name: 'Venezia' }
+      eventId: h2EventId, kickoff: h2Kickoff, home: { name: 'VfL Osnabrück' }, away: { name: 'Bayern de Munique' }
     }, h2Now);
     assert.equal(prem.testInstallationId, 'inst-h2');
     assert.equal(prem.technicalEspnTest, true);
-    const marked = markHotMatchTechnicalEvent({ eventKey: 'goal:x', eventId: h2EventId, type: 'goal', sourcePlayKey: 'g1', notificationDraft: { title: '⚽ GOL DA UDINESE!', body: 'Udinese 1 × 0 Venezia' } }, { installationId: 'inst-h2' });
+    const marked = markHotMatchTechnicalEvent({ eventKey: 'goal:x', eventId: h2EventId, type: 'goal', sourcePlayKey: 'g1', notificationDraft: { title: '⚽ GOL DO BAYERN DE MUNIQUE!', body: 'VfL Osnabrück 0 × 1 Bayern de Munique' } }, { installationId: 'inst-h2' });
     assert.equal(marked.testInstallationId, 'inst-h2');
     assert.match(marked.notificationDraft.title, /TESTE ESPN REAL/);
 
@@ -220,7 +220,7 @@ console.log('sports-monitor: PASS');
     assert.equal(armed.eventId, h2EventId);
     assert.equal(armed.score, '0-0');
 
-    h2Now = Date.parse('2026-09-02T15:45:00Z');
+    h2Now = Date.parse('2026-09-02T18:30:00Z');
     await monitor.pollHotMatchTest();
     assert.equal(db.matchEvents.size, 1, 'alerta de 15 min deve ser criado pela hora ESPN do jogo');
     const premRow = [...db.matchEvents.values()][0];
@@ -229,7 +229,7 @@ console.log('sports-monitor: PASS');
     assert.equal(premPayload.testInstallationId, 'inst-h2');
 
     h2Phase = 'goal';
-    h2Now = Date.parse('2026-09-02T16:05:00Z');
+    h2Now = Date.parse('2026-09-02T18:50:00Z');
     await monitor.pollHotMatchTest();
     let hotStatus = await monitor.publicStatus();
     assert.equal(hotStatus.hotMatchTest.pendingGoals, 1, 'primeira evidência real fica pendente');
@@ -247,11 +247,14 @@ console.log('sports-monitor: PASS');
     assert.equal(goalPayload.type, 'goal');
     assert.equal(goalPayload.technicalEspnTest, true);
     assert.equal(goalPayload.testInstallationId, 'inst-h2');
+    assert.equal(goalPayload.scoreAfter.home, 0);
+    assert.equal(goalPayload.scoreAfter.away, 1);
     assert.match(goalPayload.notificationDraft.title, /TESTE ESPN REAL/);
+    assert.match(goalPayload.notificationDraft.title, /BAYERN/);
   } finally {
     Date.now = oldNow;
     globalThis.fetch = oldFetch;
   }
 }
 
-console.log('hot-match H2 integration: PASS');
+console.log('hot-match H3 integration: PASS');

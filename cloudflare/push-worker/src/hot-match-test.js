@@ -1,10 +1,14 @@
-const HOT_MATCH_VERSION = '6-H2';
-const HOT_MATCH_LEAGUE = 'ita.coppa_italia';
+const HOT_MATCH_VERSION = '6-H3';
+const HOT_MATCH_LEAGUE = 'ger.dfb_pokal';
 const HOT_MATCH_DATE_KEY = '20260902';
-const HOT_MATCH_HOME = 'Udinese';
-const HOT_MATCH_AWAY = 'Venezia';
+const HOT_MATCH_HOME = 'VfL Osnabrück';
+const HOT_MATCH_AWAY = 'Bayern de Munique';
+const HOT_MATCH_HOME_SEARCH = 'Osnabruck';
+const HOT_MATCH_AWAY_SEARCH = 'Bayern';
 const HOT_MATCH_MATCHUP = `${HOT_MATCH_HOME} × ${HOT_MATCH_AWAY}`;
-const HOT_MATCH_EXPECTED_KICKOFF = '2026-09-02T16:00:00.000Z'; // 13:00 Brasília / 18:00 CEST
+const HOT_MATCH_COMPETITION_NAME = 'DFB-Pokal · teste ESPN real';
+const HOT_MATCH_EXPECTED_KICKOFF = '2026-09-02T18:45:00.000Z'; // 15:45 Brasília / 20:45 CEST
+const HOT_MATCH_LOCAL_TIME = '15:45';
 const HOT_MATCH_POLL_MS = 10_000;
 const HOT_MATCH_SLOW_POLL_MS = 60_000;
 const HOT_MATCH_FAST_PRE_MS = 20 * 60_000;
@@ -26,8 +30,8 @@ function teamName(competitor) {
 }
 
 export function hotMatchTargetEvent(events) {
-  const homeNeedle = normalized(HOT_MATCH_HOME);
-  const awayNeedle = normalized(HOT_MATCH_AWAY);
+  const homeNeedle = normalized(HOT_MATCH_HOME_SEARCH);
+  const awayNeedle = normalized(HOT_MATCH_AWAY_SEARCH);
   for (const event of Array.isArray(events) ? events : []) {
     const competitors = competitorsOf(event);
     const names = competitors.map(teamName).map(normalized);
@@ -54,7 +58,7 @@ export function buildHotMatchPrematchEvent(test, observation, nowMs = Date.now()
     sourcePlayKey: '',
     league: HOT_MATCH_LEAGUE,
     competitionKey: 'technical_hot_match_test',
-    competitionName: 'Coppa Italia · teste ESPN real',
+    competitionName: HOT_MATCH_COMPETITION_NAME,
     kickoff,
     home: { ...(observation?.home || {}), score: 0 },
     away: { ...(observation?.away || {}), score: 0 },
@@ -67,7 +71,7 @@ export function buildHotMatchPrematchEvent(test, observation, nowMs = Date.now()
     technicalEspnTestVersion: HOT_MATCH_VERSION,
     notificationDraft: {
       title: '🧪 TESTE ESPN REAL — JOGO EM 15 MIN',
-      body: `${HOT_MATCH_MATCHUP} começa às 13:00 · horário vindo da ESPN`
+      body: `${HOT_MATCH_MATCHUP} começa às ${HOT_MATCH_LOCAL_TIME} · horário vindo da ESPN`
     }
   };
 }
@@ -76,14 +80,17 @@ export function markHotMatchTechnicalEvent(event, test) {
   const source = event && typeof event === 'object' ? structuredClone(event) : {};
   const installationId = text(test?.installationId);
   const eventId = text(source.eventId || test?.eventId);
-  const sourceKey = text(source.sourcePlayKey || source.eventKey || source.type || Date.now());
+  // R7: preserve a identidade semântica criada pelo motor (placar pós-gol),
+  // em vez de usar o ID instável da jogada ESPN. Isso torna a deduplicação
+  // idempotente mesmo quando duas fontes descrevem o mesmo gol com IDs diferentes.
+  const sourceKey = text(source.eventKey || source.sourcePlayKey || source.type || Date.now());
   const title = text(source.notificationDraft?.title || 'Atualização do jogo');
   const body = text(source.notificationDraft?.body || HOT_MATCH_MATCHUP);
   return {
     ...source,
     eventKey: `${text(source.type)}:fdg-hot-match:${eventId}:${installationId}:${sourceKey}`,
     competitionKey: 'technical_hot_match_test',
-    competitionName: 'Coppa Italia · teste ESPN real',
+    competitionName: HOT_MATCH_COMPETITION_NAME,
     testInstallationId: installationId,
     technicalEspnTest: true,
     technicalEspnTestVersion: HOT_MATCH_VERSION,
@@ -140,7 +147,9 @@ export const HOT_MATCH_TEST_CONSTANTS = Object.freeze({
   HOME: HOT_MATCH_HOME,
   AWAY: HOT_MATCH_AWAY,
   MATCHUP: HOT_MATCH_MATCHUP,
+  COMPETITION_NAME: HOT_MATCH_COMPETITION_NAME,
   EXPECTED_KICKOFF: HOT_MATCH_EXPECTED_KICKOFF,
+  LOCAL_TIME: HOT_MATCH_LOCAL_TIME,
   POLL_MS: HOT_MATCH_POLL_MS,
   SLOW_POLL_MS: HOT_MATCH_SLOW_POLL_MS,
   FAST_PRE_MS: HOT_MATCH_FAST_PRE_MS,

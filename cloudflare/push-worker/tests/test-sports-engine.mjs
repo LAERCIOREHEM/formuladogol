@@ -153,10 +153,102 @@ let scorerStep = applyObservation(scorerState, scorerOne, missingScorer, t0 + 31
 scorerState = scorerStep.match;
 assert.equal(scorerStep.emitted.length, 1, 'sem autor ainda envia alerta de gol após estabilidade');
 assert.equal(scorerState.plays[`${game.eventId}:scorer`].status, 'confirmed');
-assert.match(scorerStep.emitted[0].notificationDraft.body, /Autoria aguardando confirmação/);
+assert.doesNotMatch(scorerStep.emitted[0].notificationDraft.body, /Autoria aguardando confirmação/);
+assert.match(scorerStep.emitted[0].notificationDraft.body, /63'/);
 const knownScorer = extractScoringPlays(summary(goal('scorer', '2022', 'p3', "63'", 0, 1)), scorerOne);
 scorerStep = applyObservation(scorerState, scorerOne, knownScorer, t0 + 41_000);
 assert.equal(scorerStep.emitted.length, 0, 'autoria tardia atualiza estado sem duplicar o gol');
+
+// R6: placar subiu mas play-by-play está vazio/atrasado. O placar estável precisa
+// confirmar o gol sozinho, para o Push nunca depender de uma estrutura de plays específica.
+const sbZero = normalizeScoreboardEvent(rawScore(0, 0, "5'"), game.league, game);
+let sbState = applyObservation(initialMatchState(sbZero), sbZero, null, t0).match;
+const sbOne = normalizeScoreboardEvent(rawScore(0, 1, "9'"), game.league, game);
+let sbStep = applyObservation(sbState, sbOne, [], t0 + 5_000);
+sbState = sbStep.match;
+assert.equal(sbStep.emitted.length, 0);
+let sbFallback = Object.values(sbState.plays).find((p) => p.scoreFallback === true);
+assert.ok(sbFallback, 'scoreboard 0x1 deve criar gol pendente mesmo com play-by-play vazio');
+assert.equal(sbFallback.side, 'away');
+assert.equal(sbFallback.status, 'pending');
+sbStep = applyObservation(sbState, sbOne, [], t0 + 15_000);
+sbState = sbStep.match;
+assert.equal(sbStep.emitted.length, 0, '10 s ainda respeita anti-VAR');
+sbStep = applyObservation(sbState, sbOne, [], t0 + 26_000);
+sbState = sbStep.match;
+assert.equal(sbStep.emitted.filter((e) => e.type === 'goal').length, 1, 'placar estável confirma gol mesmo sem play-by-play');
+assert.match(sbStep.emitted[0].notificationDraft.title, /CRUZEIRO/);
+assert.equal(sbStep.emitted[0].athlete.name, '');
+assert.equal(sbStep.emitted[0].scoreAfter.away, 1);
+assert.doesNotMatch(sbStep.emitted[0].notificationDraft.body, /Autoria aguardando confirmação/);
+
+// Recuperação pós-deploy: se o Worker já viu 0x1, mas perdeu a jogada, o déficit
+// entre placar e gols conhecidos também deve reconstruir um pending sem novo delta.
+let recoverState = applyObservation(initialMatchState(sbZero), sbZero, null, t0).match;
+recoverState.away.score = 1;
+recoverState.lastScoreChangeAt = t0 + 5_000;
+recoverState.lastObservedAt = t0 + 5_000;
+const recovered1 = applyObservation(recoverState, sbOne, [], t0 + 30_000);
+recoverState = recovered1.match;
+assert.equal(recovered1.emitted.length, 0);
+assert.ok(Object.values(recoverState.plays).some((p) => p.scoreFallback === true && p.status === 'pending'));
+const recovered2 = applyObservation(recoverState, sbOne, [], t0 + 40_000);
+assert.equal(recovered2.emitted.filter((e) => e.type === 'goal').length, 1, 'R6 deve recuperar gol perdido após deploy');
+
+// R7: regressão do teste real Udinese × Venezia. Uma jogada textual incompleta
+// (sem equipe e sem placar) não pode produzir "GOL DO TIME · 0x0". Quando o
+// scoreboard chega a 0x1, nasce uma única identidade; o play-by-play posterior
+// apenas enriquece essa mesma identidade e nunca cria um segundo push.
+const r7Zero = normalizeScoreboardEvent(rawScore(0, 0, "1'"), game.league, game);
+let r7State = applyObservation(initialMatchState(r7Zero), r7Zero, null, t0).match;
+const ambiguousRaw = { id: 'ambiguous-a', scoringPlay: true, text: 'Goal', type: { text: 'Goal' }, clock: { displayValue: "9'" } };
+const ambiguousAtZero = extractScoringPlays({ scoringPlays: [ambiguousRaw] }, r7Zero);
+let r7Step = applyObservation(r7State, r7Zero, ambiguousAtZero, t0 + 5_000);
+r7State = r7Step.match;
+assert.equal(r7Step.emitted.length, 0);
+assert.equal(Object.values(r7State.plays).filter((p) => p.status === 'pending').length, 0, 'goal sem identidade/placar em 0x0 deve ser ignorado');
+
+const r7One = normalizeScoreboardEvent(rawScore(0, 1, "13'"), game.league, game);
+const ambiguousAtOne = extractScoringPlays({ scoringPlays: [ambiguousRaw] }, r7One);
+r7Step = applyObservation(r7State, r7One, ambiguousAtOne, t0 + 10_000);
+r7State = r7Step.match;
+assert.equal(r7Step.emitted.length, 0);
+let r7Pending = Object.values(r7State.plays).filter((p) => p.status === 'pending');
+assert.equal(r7Pending.length, 1, '0x1 deve criar somente um fallback sem duplicar a descrição ambígua');
+assert.equal(r7Pending[0].scoreFallback, true);
+assert.equal(r7Pending[0].side, 'away');
+
+const detailedR7 = extractScoringPlays(summary(goal('espn-detail-a', '2022', 'p3', "9'", 0, 1)), r7One);
+r7Step = applyObservation(r7State, r7One, detailedR7, t0 + 20_000);
+r7State = r7Step.match;
+r7Pending = Object.values(r7State.plays).filter((p) => p.status === 'pending');
+assert.equal(r7Pending.length, 1, 'detalhe ESPN deve enriquecer o fallback, não criar outro gol');
+assert.equal(r7Pending[0].scoreFallback, false);
+assert.equal(r7Pending[0].athleteName, 'Lucas Lima');
+
+r7Step = applyObservation(r7State, r7One, detailedR7, t0 + 31_000);
+r7State = r7Step.match;
+assert.equal(r7Step.emitted.filter((e) => e.type === 'goal').length, 1, 'R7 deve emitir exatamente um gol');
+assert.equal(r7Step.emitted[0].scoreAfter.home, 0);
+assert.equal(r7Step.emitted[0].scoreAfter.away, 1);
+assert.match(r7Step.emitted[0].notificationDraft.title, /CRUZEIRO/);
+assert.doesNotMatch(r7Step.emitted[0].notificationDraft.title, /TIME/);
+assert.doesNotMatch(r7Step.emitted[0].notificationDraft.body, /Autoria aguardando confirmação/);
+assert.match(r7Step.emitted[0].notificationDraft.body, /Lucas Lima, 9'/);
+assert.match(r7Step.emitted[0].eventKey, /score:0-1:away$/);
+
+const detailedR7NewId = extractScoringPlays(summary(goal('espn-detail-b', '2022', 'p3', "9'", 0, 1)), r7One);
+const r7Repeat = applyObservation(r7State, r7One, detailedR7NewId, t0 + 41_000);
+assert.equal(r7Repeat.emitted.length, 0, 'troca de ID ESPN não pode disparar o mesmo 0x1 novamente');
+assert.equal(Object.values(r7Repeat.match.plays).filter((p) => p.status === 'confirmed').length, 1);
+
+// Se o placar volta antes da confirmação, o fallback é descartado e nenhum push sai.
+let rollbackState = applyObservation(initialMatchState(sbZero), sbZero, null, t0).match;
+rollbackState = applyObservation(rollbackState, sbOne, [], t0 + 5_000).match;
+const rollbackObs = normalizeScoreboardEvent(rawScore(0, 0, "10'"), game.league, game);
+const rollbackStep = applyObservation(rollbackState, rollbackObs, [], t0 + 15_000);
+assert.equal(rollbackStep.emitted.length, 0);
+assert.equal(Object.values(rollbackStep.match.plays).find((p) => p.scoreFallback === true)?.status, 'rejected');
 
 // Gol contra e disputa de pênaltis são classificados separadamente.
 const special = extractScoringPlays(summary(
@@ -175,6 +267,8 @@ const agenda = { jogos: [
 assert.deepEqual(selectAgendaCandidates(agenda, Date.parse('2026-09-01T23:50:00Z')).map((x) => x.eventId), [game.eventId]);
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_CONFIRM_MS, 20_000);
 assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R4');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION, '6-R7');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R7');
 
 // ESPN às vezes publica state=post sem completed; relógio ao vivo não pode virar final fantasma.
 const phantom = rawScore(0, 0, "22'", 'post');

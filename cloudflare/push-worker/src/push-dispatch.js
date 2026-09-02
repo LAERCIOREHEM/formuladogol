@@ -495,7 +495,7 @@ export async function dispatchStatus(env) {
     dispatchVersion: 5,
     segmentedTestVersion: '6-T1',
     hotEspnTestVersion: '6-H1',
-    hotMatchTestVersion: '6-H2',
+    hotMatchTestVersion: '6-H3',
     activeSubscriptions: num(subscriptions?.count, 0),
     pendingEvents: num(pending?.count, 0),
     deliveries: {

@@ -317,8 +317,17 @@ export function initialMatchState(observation) {
   };
 }
 
+function credibleRegulationPlay(play) {
+  if (!play || play.shootout) return false;
+  const home = play.homeScoreAfter == null ? null : num(play.homeScoreAfter, 0);
+  const away = play.awayScoreAfter == null ? null : num(play.awayScoreAfter, 0);
+  if (home == null || away == null || home + away <= 0) return false;
+  const side = text(play.side);
+  return side === 'home' || side === 'away' || Boolean(text(play.teamId));
+}
+
 function activeRegulationPlays(match) {
-  return Object.values(match?.plays || {}).filter((play) => play && !play.shootout && !['rejected', 'overturned'].includes(play.status));
+  return Object.values(match?.plays || {}).filter((play) => play && credibleRegulationPlay(play) && !['rejected', 'overturned'].includes(play.status));
 }
 
 function goalCountFromScore(observation) {
@@ -351,6 +360,98 @@ function sameSemanticGoal(existing, incoming) {
   return true;
 }
 
+function representedScoreFromPlays(match) {
+  let home = 0;
+  let away = 0;
+  const active = activeRegulationPlays(match).sort((a, b) => num(a?.order, 0) - num(b?.order, 0));
+  for (const play of active) {
+    if (play?.homeScoreAfter != null && play?.awayScoreAfter != null) {
+      home = Math.max(home, num(play.homeScoreAfter, home));
+      away = Math.max(away, num(play.awayScoreAfter, away));
+      continue;
+    }
+    if (play?.side === 'home') home += 1;
+    else if (play?.side === 'away') away += 1;
+  }
+  return { home, away };
+}
+
+function summaryExactlyMatchesScore(regulation, observation) {
+  const targetHome = num(observation?.home?.score, 0);
+  const targetAway = num(observation?.away?.score, 0);
+  const credible = (Array.isArray(regulation) ? regulation : []).filter(credibleRegulationPlay);
+  if (credible.length !== targetHome + targetAway) return false;
+  let home = 0;
+  let away = 0;
+  for (const play of credible.sort((a, b) => num(a?.order, 0) - num(b?.order, 0))) {
+    home = num(play.homeScoreAfter, home);
+    away = num(play.awayScoreAfter, away);
+  }
+  return home === targetHome && away === targetAway;
+}
+
+function semanticGoalEventKey(type, play, match) {
+  const home = play?.homeScoreAfter == null ? 'x' : num(play.homeScoreAfter, 0);
+  const away = play?.awayScoreAfter == null ? 'x' : num(play.awayScoreAfter, 0);
+  const side = text(play?.side || play?.teamId || 'unknown');
+  return `${type}:${text(match?.eventId)}:score:${home}-${away}:${side}`;
+}
+
+function ensureScoreboardFallbackGoals(match, observation, now) {
+  if (!match?.initialized || !match?.baselineComplete) return [];
+  const targetHome = num(observation?.home?.score, 0);
+  const targetAway = num(observation?.away?.score, 0);
+  const represented = representedScoreFromPlays(match);
+  const missingHome = Math.max(0, targetHome - represented.home);
+  const missingAway = Math.max(0, targetAway - represented.away);
+  if (missingHome === 0 && missingAway === 0) return [];
+  // Se as duas equipes avançaram desde a última evidência detalhada, a ordem dos gols
+  // é ambígua. Nesse caso esperamos o play-by-play em vez de inventar sequência.
+  if (missingHome > 0 && missingAway > 0) return [];
+
+  const created = [];
+  let home = represented.home;
+  let away = represented.away;
+  const side = missingHome > 0 ? 'home' : 'away';
+  const count = side === 'home' ? missingHome : missingAway;
+  for (let i = 0; i < count; i += 1) {
+    if (side === 'home') home += 1;
+    else away += 1;
+    const team = side === 'home' ? match.home || {} : match.away || {};
+    const candidate = {
+      key: `${match.eventId}:score-fallback:${home}-${away}`,
+      sourceId: '',
+      teamId: text(team.id),
+      side,
+      athleteId: '',
+      athleteName: '',
+      minute: '',
+      period: num(observation?.period, 0),
+      description: 'Scoreboard score increase',
+      ownGoal: false,
+      penalty: false,
+      shootout: false,
+      homeScoreAfter: home,
+      awayScoreAfter: away,
+      order: num(observation?.period, 0) * 100000 + (home + away),
+      scoreFallback: true
+    };
+    const semantic = Object.entries(match.plays || {}).find(([, existing]) => sameSemanticGoal(existing, candidate));
+    if (semantic) continue;
+    const firstSeenAt = num(match.lastScoreChangeAt, 0) || now;
+    match.plays[candidate.key] = {
+      ...candidate,
+      status: 'pending',
+      firstSeenAt,
+      stableCount: 1,
+      missingCount: 0,
+      lastStableObservationAt: now
+    };
+    created.push(match.plays[candidate.key]);
+  }
+  return created;
+}
+
 export function needsSummary(match, observation) {
   const current = match || initialMatchState(observation);
   const scoreTotal = goalCountFromScore(observation);
@@ -379,11 +480,13 @@ function notificationDraft(type, play, match, observation) {
     return { title: '🚫 GOL ANULADO', body: `O placar voltou para ${match.home?.name || 'Mandante'} ${num(observation?.home?.score, 0)} × ${num(observation?.away?.score, 0)} ${match.away?.name || 'Visitante'}` };
   }
   const scoringTeam = scoringTeamFor(play, match);
-  const athlete = play.athleteName ? `${play.athleteName}${play.ownGoal ? ' (contra)' : play.penalty ? ' (pênalti)' : ''}` : 'Autoria aguardando confirmação';
+  const athlete = play.athleteName ? `${play.athleteName}${play.ownGoal ? ' (contra)' : play.penalty ? ' (pênalti)' : ''}` : '';
   const minute = play.minute ? `${play.minute}` : '';
+  const detail = [athlete, minute].filter(Boolean).join(', ');
+  const teamName = text(scoringTeam.name);
   return {
-    title: `⚽ GOL DO ${text(scoringTeam.name || 'TIME').toUpperCase()}!`,
-    body: `${[athlete, minute].filter(Boolean).join(', ')} · ${scoreText}`
+    title: teamName ? `⚽ GOL DO ${teamName.toUpperCase()}!` : '⚽ GOL!',
+    body: detail ? `${detail} · ${scoreText}` : scoreText
   };
 }
 
@@ -391,7 +494,7 @@ function emittedEvent(type, play, match, observation, now) {
   const scoringTeam = scoringTeamFor(play, match);
   const draft = notificationDraft(type, play, match, observation);
   return {
-    eventKey: `${type}:${play.key}`,
+    eventKey: semanticGoalEventKey(type, play, match),
     type,
     sourcePlayKey: play.key,
     eventId: match.eventId,
@@ -494,7 +597,11 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   const previousScoreTotal = goalCountFromScore(match);
   const currentScoreTotal = goalCountFromScore(observation);
   const hasSummary = Array.isArray(scoringPlays);
-  const regulation = hasSummary ? scoringPlays.filter((play) => !play.shootout) : null;
+  const rawRegulation = hasSummary ? scoringPlays.filter((play) => !play.shootout) : null;
+  // R7: uma descrição textual de "goal" sem equipe/placar não é suficiente para
+  // criar identidade de gol. Ela pode chegar antes do scoreboard e foi a origem do
+  // falso "GOL DO TIME · 0×0" no teste Udinese × Venezia.
+  const regulation = hasSummary ? rawRegulation.filter(credibleRegulationPlay) : null;
 
   match.eventId = text(observation.eventId || match.eventId);
   match.league = text(observation.league || match.league);
@@ -564,12 +671,20 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     return { match, emitted, diagnostic: 'baseline_still_waiting' };
   }
 
-  if (!hasSummary) return { match, emitted, diagnostic: 'scoreboard_only' };
-
   const observedKeys = new Set();
-  const summaryConsistent = regulation.length === currentScoreTotal;
+  const summaryConsistent = hasSummary && summaryExactlyMatchesScore(regulation, observation);
 
-  for (const play of regulation) {
+  // R7: limpa pendências legadas sem identidade de placar. Nunca gera correção/push;
+  // apenas impede que um "goal" incompleto antigo concorra com o fallback correto.
+  for (const play of Object.values(match.plays || {})) {
+    if (!play?.shootout && play?.status === 'pending' && !credibleRegulationPlay(play)) {
+      play.status = 'rejected';
+      play.rejectedAt = now;
+      play.rejectedReason = 'r7_invalid_goal_identity';
+    }
+  }
+
+  for (const play of (regulation || [])) {
     let storageKey = play.key;
     let existing = match.plays[storageKey];
     if (!existing) {
@@ -587,12 +702,20 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     const preservedStatus = existing.status;
     const firstSeenAt = existing.firstSeenAt;
     const confirmedAt = existing.confirmedAt;
+    const wasScoreFallback = existing.scoreFallback === true;
     Object.assign(existing, play, { key: canonicalKey });
     existing.firstSeenAt = firstSeenAt;
     existing.confirmedAt = confirmedAt;
     existing.status = preservedStatus;
+    if (wasScoreFallback && play.scoreFallback !== true) {
+      existing.scoreFallback = false;
+      existing.enrichedFromDetailedAt = now;
+    }
     existing.missingCount = 0;
-    if (existing.status === 'pending') existing.stableCount = num(existing.stableCount, 1) + 1;
+    if (existing.status === 'pending' && num(existing.lastStableObservationAt, 0) !== now) {
+      existing.stableCount = num(existing.stableCount, 1) + 1;
+      existing.lastStableObservationAt = now;
+    }
     if (existing.status === 'overturned' && scoreStillContainsPlay(existing, observation)) {
       existing.status = 'confirmed';
       existing.overturnedAt = 0;
@@ -624,22 +747,52 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     }
   }
 
-  if (summaryConsistent) {
-    for (const play of Object.values(match.plays)) {
-      if (play.status !== 'pending') continue;
-      const age = now - num(play.firstSeenAt, now);
-      // O push não pode ficar preso esperando autoria. Se a ESPN já confirmou a
-      // jogada e o placar por duas leituras, o gol é enviado mesmo que o nome do
-      // marcador ainda não tenha chegado. A mensagem já possui fallback seguro.
-      if (num(play.stableCount, 1) >= GOAL_CONFIRM_OBSERVATIONS && age >= GOAL_CONFIRM_MS) {
-        play.status = 'confirmed';
-        play.confirmedAt = now;
-        emitted.push(emittedEvent('goal', play, match, observation, now));
-      }
+  // R6: só criamos o fallback depois de tentar reconciliar o play-by-play.
+  // Assim, quando a ESPN entrega a jogada completa preservamos o ID/autoria reais;
+  // o placar assume apenas quando o resumo está ausente ou incompleto.
+  if (!summaryConsistent) ensureScoreboardFallbackGoals(match, observation, now);
+
+  // Scoreboard fallback: cada nova observação estável incrementa a confiança,
+  // mesmo quando a ESPN ainda não entregou uma jogada utilizável no play-by-play.
+  for (const play of Object.values(match.plays)) {
+    if (play?.status !== 'pending' || !play?.scoreFallback) continue;
+    if (!scoreStillContainsPlay(play, observation)) {
+      play.status = 'rejected';
+      play.rejectedAt = now;
+      continue;
+    }
+    if (num(play.lastStableObservationAt, 0) !== now) {
+      play.stableCount = num(play.stableCount, 1) + 1;
+      play.lastStableObservationAt = now;
     }
   }
 
-  return { match, emitted, diagnostic: summaryConsistent ? 'summary_consistent' : 'summary_inconsistent' };
+  for (const play of Object.values(match.plays)) {
+    if (play.status !== 'pending') continue;
+    if (!credibleRegulationPlay(play)) {
+      play.status = 'rejected';
+      play.rejectedAt = now;
+      play.rejectedReason = 'r7_invalid_goal_identity';
+      continue;
+    }
+    const age = now - num(play.firstSeenAt, now);
+    const canConfirmFromSummary = summaryConsistent;
+    const canConfirmFromStableScore = play.scoreFallback === true && scoreStillContainsPlay(play, observation);
+    if ((canConfirmFromSummary || canConfirmFromStableScore)
+        && num(play.stableCount, 1) >= GOAL_CONFIRM_OBSERVATIONS
+        && age >= GOAL_CONFIRM_MS) {
+      play.status = 'confirmed';
+      play.confirmedAt = now;
+      emitted.push(emittedEvent('goal', play, match, observation, now));
+    }
+  }
+
+  const fallbackPending = Object.values(match.plays).some((play) => play?.status === 'pending' && play?.scoreFallback === true);
+  return {
+    match,
+    emitted,
+    diagnostic: summaryConsistent ? 'summary_consistent' : fallbackPending || emitted.some((event) => event.type === 'goal') ? 'scoreboard_fallback' : hasSummary ? 'summary_inconsistent' : 'scoreboard_only'
+  };
 }
 
 export function matchNeedsFastPolling(match, nowMs = Date.now()) {
@@ -680,5 +833,7 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   GOAL_CONFIRM_MS,
   GOAL_CONFIRM_OBSERVATIONS,
   OVERTURN_CONFIRM_OBSERVATIONS,
-  OVERTURN_POLICY_VERSION: '6-R4'
+  OVERTURN_POLICY_VERSION: '6-R4',
+  GOAL_DETECTION_POLICY_VERSION: '6-R7',
+  GOAL_RECONCILIATION_POLICY_VERSION: '6-R7'
 });

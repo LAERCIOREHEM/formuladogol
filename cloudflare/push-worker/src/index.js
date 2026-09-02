@@ -407,8 +407,8 @@ async function handleHotMatchTest(request, env) {
   const result = await response.json();
   return json(request, {
     ...result,
-    hotMatchTestVersion: '6-H2',
-    note: 'Udinese × Venezia é apenas um observador técnico: não entra na agenda, Ao Vivo, jogos futuros ou qualquer página pública. O horário e os gols são lidos da ESPN.'
+    hotMatchTestVersion: '6-H3',
+    note: 'VfL Osnabrück × Bayern de Munique é apenas um observador técnico: não entra na agenda, Ao Vivo, jogos futuros ou qualquer página pública. O horário e os gols são lidos da ESPN.'
   }, response.status, { 'Cache-Control': 'no-store' });
 }
 
