@@ -117,7 +117,7 @@ jobs:
         run: |
           set -euo pipefail
           for i in 1 2 3 4 5 6 7 8 9 10; do
-            if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-R"'; then
+            if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-E"'; then
               echo 'Push Worker saudável.'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":4'
               echo 'Motor esportivo saudável.'
