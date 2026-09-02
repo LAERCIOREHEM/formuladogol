@@ -199,7 +199,9 @@ function isOwnGoal(item) {
 
 function athleteOf(item, roster) {
   const involved = Array.isArray(item?.athletesInvolved) ? item.athletesInvolved : [];
-  const athlete = involved[0] || item?.athlete || item?.player || null;
+  const participants = Array.isArray(item?.participants) ? item.participants : [];
+  const participant = participants.find((entry) => entry?.athlete || entry?.player) || participants[0] || null;
+  const athlete = involved[0] || item?.athlete || item?.player || participant?.athlete || participant?.player || participant || null;
   if (!athlete) return { id: '', name: '' };
   const id = text(athlete.id);
   const name = compactPlayerName((id && roster[id]) || athlete.shortName || athlete.displayName || athlete.fullName || athlete.name);
@@ -544,7 +546,7 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   for (const play of regulation) {
     const existing = match.plays[play.key];
     if (!existing) {
-      match.plays[play.key] = { ...play, status: 'pending', firstSeenAt: now, stableCount: 1, missingCount: 0 };
+      match.plays[play.key] = { ...play, status: 'pending', firstSeenAt: num(match.lastScoreChangeAt, 0) || now, stableCount: 1, missingCount: 0 };
       continue;
     }
     Object.assign(existing, play);

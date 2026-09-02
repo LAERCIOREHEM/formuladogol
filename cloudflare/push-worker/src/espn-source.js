@@ -83,15 +83,33 @@ export function unwrapSummary(payload) {
     payload
   ].filter(Boolean);
   for (const candidate of candidates) {
-    if (
-      Array.isArray(candidate?.scoringPlays) || Array.isArray(candidate?.plays) ||
-      Array.isArray(candidate?.rosters) || candidate?.boxscore || candidate?.header
-    ) return candidate;
-  }
-  for (const candidate of walkObjects(payload, 4)) {
     if (Array.isArray(candidate?.scoringPlays) || Array.isArray(candidate?.plays)) return candidate;
   }
-  throw new Error('payload de jogo sem dados utilizáveis');
+  for (const candidate of walkObjects(payload, 6)) {
+    if (Array.isArray(candidate?.scoringPlays) || Array.isArray(candidate?.plays)) return candidate;
+  }
+  throw new Error('payload de jogo sem plays/scoringPlays');
+}
+
+function goalDescriptor(item) {
+  return text([
+    item?.type?.text, item?.type?.name, item?.type?.description,
+    item?.text, item?.shortText, item?.description
+  ].filter(Boolean).join(' ')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function looksLikeGoal(item) {
+  if (!item || typeof item !== 'object') return false;
+  if (item.scoringPlay === true) return true;
+  return /(^|[^a-z])(goal|gol)([^a-z]|$)/.test(goalDescriptor(item));
+}
+
+export function summaryGoalCount(summary) {
+  if (!summary || typeof summary !== 'object') return 0;
+  const primary = Array.isArray(summary.scoringPlays) ? summary.scoringPlays : [];
+  if (primary.length) return primary.filter(looksLikeGoal).length;
+  const plays = Array.isArray(summary.plays) ? summary.plays : [];
+  return plays.filter(looksLikeGoal).length;
 }
 
 function withBust(url) {
@@ -123,13 +141,23 @@ function summaryCandidates(league, eventId) {
   const qEvent = encodeURIComponent(eventId);
   return [
     {
+      name: 'espn_cdn_league_game',
+      url: `${CDN_ROOT}/${qLeague}/game?xhr=1&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
+      name: 'espn_cdn_league_playbyplay',
+      url: `${CDN_ROOT}/${qLeague}/playbyplay?xhr=1&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
       name: 'espn_cdn_soccer_game',
       url: `${CDN_ROOT}/soccer/game?xhr=1&league=${qLeague}&gameId=${qEvent}`,
       transform: unwrapSummary
     },
     {
-      name: 'espn_cdn_league_game',
-      url: `${CDN_ROOT}/${qLeague}/game?xhr=1&gameId=${qEvent}`,
+      name: 'espn_cdn_soccer_playbyplay',
+      url: `${CDN_ROOT}/soccer/playbyplay?xhr=1&league=${qLeague}&gameId=${qEvent}`,
       transform: unwrapSummary
     },
     {
@@ -149,13 +177,14 @@ function summaryCandidates(league, eventId) {
   ];
 }
 
-async function firstSuccessful(candidates, transform, fetchImpl = globalThis.fetch) {
+async function firstSuccessful(candidates, transform, fetchImpl = globalThis.fetch, validate = null) {
   const attempts = [];
   for (const candidate of candidates) {
     const startedAt = Date.now();
     try {
       const raw = await fetchJson(withBust(candidate.url), fetchImpl);
       const data = (candidate.transform || transform)(raw);
+      if (validate) validate(data, candidate.name);
       return {
         ok: true,
         source: candidate.name,
@@ -182,10 +211,20 @@ export async function fetchEspnScoreboard(league, dates, fetchImpl = globalThis.
   return firstSuccessful(scoreboardCandidates(league, dates), unwrapScoreboard, fetchImpl);
 }
 
-export async function fetchEspnSummary(league, eventId, fetchImpl = globalThis.fetch) {
+export async function fetchEspnSummary(league, eventId, fetchImpl = globalThis.fetch, expectedGoals = 0) {
   if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
   if (!text(eventId)) throw new Error('eventId ausente');
-  return firstSuccessful(summaryCandidates(league, eventId), unwrapSummary, fetchImpl);
+  const minimumGoals = Math.max(0, Number(expectedGoals) || 0);
+  return firstSuccessful(
+    summaryCandidates(league, eventId),
+    unwrapSummary,
+    fetchImpl,
+    (data, source) => {
+      if (minimumGoals <= 0) return;
+      const found = summaryGoalCount(data);
+      if (found < minimumGoals) throw new Error(`${source}: summary incompleto (${found}/${minimumGoals} gols)`);
+    }
+  );
 }
 
 export async function probeEspnSources(fetchImpl = globalThis.fetch, dateKey = '') {
@@ -209,7 +248,7 @@ export async function probeEspnSources(fetchImpl = globalThis.fetch, dateKey = '
   const failed = Object.entries(leagues).filter(([, item]) => !item.ok).map(([league]) => league);
   return {
     ok: failed.length === 0,
-    sourceLayerVersion: '6-R1',
+    sourceLayerVersion: '6-R3',
     checkedAt: new Date().toISOString(),
     failed,
     leagues

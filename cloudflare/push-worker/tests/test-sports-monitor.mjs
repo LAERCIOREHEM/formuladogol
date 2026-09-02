@@ -89,7 +89,7 @@ try {
   assert.equal(status.activeGames, 1);
   assert.equal(status.lastPollError, '');
   assert.ok(status.lastPollSuccessAt > 0);
-  assert.equal(status.sourceLayerVersion, '6-R1');
+  assert.equal(status.sourceLayerVersion, '6-R3');
   assert.equal(status.scoreboardSources['bra.copa_do_brazil'], 'espn_cdn_soccer');
   assert.equal(db.events.size, 0);
   assert.ok(storage.alarm > now, 'alarme de 30 s deve ser armado durante jogo');

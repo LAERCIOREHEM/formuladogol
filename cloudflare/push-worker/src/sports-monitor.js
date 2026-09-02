@@ -207,6 +207,13 @@ function eventMap(payload) {
   return map;
 }
 
+function scoreboardScoringDetails(raw) {
+  const competition = raw?.competitions?.[0] || raw?.competition || {};
+  const candidates = [competition?.details, raw?.details, competition?.scoringPlays, raw?.scoringPlays];
+  for (const value of candidates) if (Array.isArray(value) && value.length) return value;
+  return [];
+}
+
 function activeWatchEntry(entry, now) {
   const kickoff = Date.parse(entry?.kickoff || '');
   if (!Number.isFinite(kickoff)) return false;
@@ -395,6 +402,7 @@ export class SportsMonitor {
     const scoreboardSources = {};
     const sourceAttempts = {};
     const summarySources = {};
+    const summaryGoalCounts = {};
     await Promise.all([...byLeague.entries()].map(async ([league, games]) => {
       try {
         const days = games.map((game) => brDateKey(game.kickoff)).filter(Boolean).sort();
@@ -434,13 +442,27 @@ export class SportsMonitor {
       const previous = matches[game.eventId] || initialMatchState(observation);
       let plays = null;
       if (needsSummary(previous, observation)) {
-        try {
-          const summaryResult = await fetchEspnSummary(game.league, game.eventId);
-          plays = extractScoringPlays(summaryResult.data, observation);
-          summariesFetched += 1;
-          summarySources[summaryResult.source] = num(summarySources[summaryResult.source], 0) + 1;
-        } catch (error) {
-          sourceErrors.push(`${game.league}/${game.eventId}/summary: ${text(error?.message || error)}`);
+        const expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
+        const scoreboardDetails = scoreboardScoringDetails(raw);
+        if (scoreboardDetails.length) {
+          const candidate = extractScoringPlays({ scoringPlays: scoreboardDetails }, observation);
+          const regulationCount = candidate.filter((play) => !play.shootout).length;
+          if (regulationCount >= expectedGoals && (expectedGoals === 0 || candidate.some((play) => text(play.athleteName)))) {
+            plays = candidate;
+            summarySources.espn_scoreboard_details = num(summarySources.espn_scoreboard_details, 0) + 1;
+            summaryGoalCounts[game.eventId] = regulationCount;
+          }
+        }
+        if (!plays) {
+          try {
+            const summaryResult = await fetchEspnSummary(game.league, game.eventId, globalThis.fetch, expectedGoals);
+            plays = extractScoringPlays(summaryResult.data, observation);
+            summariesFetched += 1;
+            summarySources[summaryResult.source] = num(summarySources[summaryResult.source], 0) + 1;
+            summaryGoalCounts[game.eventId] = plays.filter((play) => !play.shootout).length;
+          } catch (error) {
+            sourceErrors.push(`${game.league}/${game.eventId}/summary: ${text(error?.message || error)}`);
+          }
         }
       }
       const result = applyObservation(previous, observation, plays, startedAt);
@@ -473,8 +495,9 @@ export class SportsMonitor {
       totalRecentEvents: recentEvents.length,
       scoreboardSources,
       summarySources,
+      summaryGoalCounts,
       sourceAttempts,
-      sourceLayerVersion: '6-R1'
+      sourceLayerVersion: '6-R3'
     });
     await this.ensureNextAlarm();
     return this.publicStatus();
@@ -501,9 +524,10 @@ export class SportsMonitor {
       summariesFetched: num(snapshot.status.summariesFetched, 0),
       emittedThisPoll: num(snapshot.status.emittedThisPoll, 0),
       scheduleEventsThisBootstrap: num(snapshot.status.scheduleEventsThisBootstrap, 0),
-      sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R1'),
+      sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R3'),
       scoreboardSources: snapshot.status.scoreboardSources && typeof snapshot.status.scoreboardSources === 'object' ? snapshot.status.scoreboardSources : {},
       summarySources: snapshot.status.summarySources && typeof snapshot.status.summarySources === 'object' ? snapshot.status.summarySources : {},
+      summaryGoalCounts: snapshot.status.summaryGoalCounts && typeof snapshot.status.summaryGoalCounts === 'object' ? snapshot.status.summaryGoalCounts : {},
       sourceAttempts: snapshot.status.sourceAttempts && typeof snapshot.status.sourceAttempts === 'object' ? snapshot.status.sourceAttempts : {},
       matches
     };

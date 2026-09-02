@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fetchEspnScoreboard, fetchEspnSummary, probeEspnSources, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
+import { fetchEspnScoreboard, fetchEspnSummary, probeEspnSources, summaryGoalCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
 
 const event = {
   id: '401909112',
@@ -10,6 +10,8 @@ const event = {
 assert.equal(unwrapScoreboard({ events: [event] }).events.length, 1);
 assert.equal(unwrapScoreboard({ content: { events: [event] } }).events[0].id, event.id);
 assert.ok(unwrapSummary({ gamepackageJSON: { plays: [{ id: 'p1' }] } }).plays);
+assert.throws(() => unwrapSummary({ gamepackageJSON: { header: {}, boxscore: {} } }), /sem plays\/scoringPlays/);
+assert.equal(summaryGoalCount({ plays: [{ scoringPlay: true, text: 'Goal' }, { text: 'Yellow Card' }] }), 1);
 
 {
   const calls = [];
@@ -45,15 +47,60 @@ assert.ok(unwrapSummary({ gamepackageJSON: { plays: [{ id: 'p1' }] } }).plays);
 {
   const fakeFetch = async (url) => {
     const href = String(url);
-    if (href.includes('/core/soccer/game')) return new Response('blocked', { status: 403, headers: { 'content-type': 'text/plain' } });
     if (href.includes('/core/bra.copa_do_brazil/game')) {
       return Response.json({ gamepackageJSON: { plays: [{ id: 'g1', scoringPlay: true, text: 'Goal' }] } });
     }
     throw new Error(`não deveria chegar em ${href}`);
   };
-  const result = await fetchEspnSummary('bra.copa_do_brazil', event.id, fakeFetch);
+  const result = await fetchEspnSummary('bra.copa_do_brazil', event.id, fakeFetch, 1);
   assert.equal(result.source, 'espn_cdn_league_game');
   assert.equal(result.data.plays[0].id, 'g1');
+}
+
+// Regressão do primeiro gol real: um endpoint CDN pode responder 200 com header/boxscore,
+// mas sem play-by-play. Isso NÃO pode encerrar o fallback como "summary válido".
+{
+  const calls = [];
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    calls.push(href);
+    if (href.includes('/core/bra.copa_do_brazil/game')) {
+      return Response.json({ gamepackageJSON: { header: { id: event.id }, boxscore: { teams: [] } } });
+    }
+    if (href.includes('/core/bra.copa_do_brazil/playbyplay')) {
+      return Response.json({ gamepackageJSON: { plays: [{
+        id: 'kaio-30', scoringPlay: true, text: 'Goal',
+        team: { id: '2022' }, athletesInvolved: [{ id: '19', displayName: 'Kaio Jorge' }],
+        clock: { displayValue: "30'" }, homeScore: 0, awayScore: 1
+      }] } });
+    }
+    throw new Error(`não deveria chegar em ${href}`);
+  };
+  const result = await fetchEspnSummary('bra.copa_do_brazil', event.id, fakeFetch, 1);
+  assert.equal(result.source, 'espn_cdn_league_playbyplay');
+  assert.equal(summaryGoalCount(result.data), 1);
+  assert.equal(result.attempts.length, 2);
+  assert.equal(result.attempts[0].ok, false);
+  assert.match(result.attempts[0].error, /sem plays\/scoringPlays/);
+  assert.equal(result.attempts[1].ok, true);
+  assert.equal(calls.length, 2);
+}
+
+// Mesmo com plays, uma resposta sem o número de gols que o placar exige é incompleta.
+{
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/bra.copa_do_brazil/game')) {
+      return Response.json({ gamepackageJSON: { plays: [{ id: 'card', text: 'Yellow Card' }] } });
+    }
+    if (href.includes('/core/bra.copa_do_brazil/playbyplay')) {
+      return Response.json({ gamepackageJSON: { plays: [{ id: 'g1', scoringPlay: true, text: 'Goal' }] } });
+    }
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnSummary('bra.copa_do_brazil', event.id, fakeFetch, 1);
+  assert.equal(result.source, 'espn_cdn_league_playbyplay');
+  assert.match(result.attempts[0].error, /summary incompleto/);
 }
 
 {
@@ -64,7 +111,7 @@ assert.ok(unwrapSummary({ gamepackageJSON: { plays: [{ id: 'p1' }] } }).plays);
   };
   const probe = await probeEspnSources(fakeFetch, '20260901');
   assert.equal(probe.ok, true);
-  assert.equal(probe.sourceLayerVersion, '6-R1');
+  assert.equal(probe.sourceLayerVersion, '6-R3');
   assert.equal(Object.keys(probe.leagues).length, 4);
   assert.deepEqual(probe.failed, []);
   assert.ok(Object.values(probe.leagues).every((row) => row.source === 'espn_cdn_soccer'));
