@@ -66,10 +66,10 @@ assert.equal(step.emitted.length, 0);
 assert.equal(state.plays[`${game.eventId}:g2`].status, 'pending');
 assert.equal(state.plays[`${game.eventId}:g2`].penalty, true);
 
-step = applyObservation(state, obs38, plays, t0 + 35_000);
+step = applyObservation(state, obs38, plays, t0 + 15_000);
 state = step.match;
-assert.equal(step.emitted.length, 0, '30 s ainda não confirma');
-step = applyObservation(state, obs38, plays, t0 + 66_000);
+assert.equal(step.emitted.length, 0, '10 s ainda não confirma');
+step = applyObservation(state, obs38, plays, t0 + 26_000);
 state = step.match;
 assert.equal(step.emitted.length, 1, 'gol estável confirma após janela anti-VAR');
 assert.equal(step.emitted[0].type, 'goal');
@@ -78,16 +78,16 @@ assert.equal(step.emitted[0].penalty, true);
 assert.equal(step.emitted[0].scoreAfter.home, 2);
 assert.match(step.emitted[0].notificationDraft.title, /ATLÉTICO-MG/);
 
-step = applyObservation(state, obs38, plays, t0 + 96_000);
+step = applyObservation(state, obs38, plays, t0 + 36_000);
 state = step.match;
 assert.equal(step.emitted.length, 0, 'não duplica gol confirmado');
 
 const reverted = normalizeScoreboardEvent(rawScore(1, 0, "40'"), game.league, game);
 const revertedPlays = extractScoringPlays(summary(goal('g1', '7632', 'p1', "12'", 1, 0)), reverted);
-step = applyObservation(state, reverted, revertedPlays, t0 + 126_000);
+step = applyObservation(state, reverted, revertedPlays, t0 + 46_000);
 state = step.match;
 assert.equal(step.emitted.length, 0, 'primeira evidência de reversão não dispara correção');
-step = applyObservation(state, reverted, revertedPlays, t0 + 156_000);
+step = applyObservation(state, reverted, revertedPlays, t0 + 56_000);
 state = step.match;
 assert.equal(step.emitted.length, 1, 'segunda evidência confirma gol anulado');
 assert.equal(step.emitted[0].type, 'goal_overturned');
@@ -98,14 +98,14 @@ let falseState = applyObservation(initialMatchState(falseBase), falseBase, null,
 const falseGoalObs = normalizeScoreboardEvent(rawScore(0, 1, "30'"), game.league, game);
 const falseGoalPlay = extractScoringPlays(summary(goal('stable-a', '2022', 'p3', "30'", 0, 1)), falseGoalObs);
 falseState = applyObservation(falseState, falseGoalObs, falseGoalPlay, t0 + 5_000).match;
-falseState = applyObservation(falseState, falseGoalObs, falseGoalPlay, t0 + 35_000).match;
-let falseConfirmed = applyObservation(falseState, falseGoalObs, falseGoalPlay, t0 + 66_000);
+falseState = applyObservation(falseState, falseGoalObs, falseGoalPlay, t0 + 15_000).match;
+let falseConfirmed = applyObservation(falseState, falseGoalObs, falseGoalPlay, t0 + 26_000);
 falseState = falseConfirmed.match;
 assert.equal(falseConfirmed.emitted.filter((e) => e.type === 'goal').length, 1);
-let missingFeed = applyObservation(falseState, falseGoalObs, [], t0 + 96_000);
+let missingFeed = applyObservation(falseState, falseGoalObs, [], t0 + 36_000);
 falseState = missingFeed.match;
 assert.equal(missingFeed.emitted.length, 0, 'feed sem jogadas não pode anular com placar ainda 0x1');
-missingFeed = applyObservation(falseState, falseGoalObs, [], t0 + 126_000);
+missingFeed = applyObservation(falseState, falseGoalObs, [], t0 + 46_000);
 falseState = missingFeed.match;
 assert.equal(missingFeed.emitted.length, 0, 'duas ausências do feed não podem criar falso gol anulado');
 assert.equal(falseState.plays[`${game.eventId}:stable-a`].status, 'confirmed');
@@ -113,7 +113,7 @@ assert.equal(falseState.plays[`${game.eventId}:stable-a`].missingCount, 0);
 
 // A ESPN pode mudar o ID da mesma jogada entre feeds/deploys: reconciliar pelo placar pós-gol + time.
 const sameGoalNewId = extractScoringPlays(summary(goal('stable-b', '2022', 'p3', "30'", 0, 1)), falseGoalObs);
-const changedId = applyObservation(falseState, falseGoalObs, sameGoalNewId, t0 + 156_000);
+const changedId = applyObservation(falseState, falseGoalObs, sameGoalNewId, t0 + 56_000);
 falseState = changedId.match;
 assert.equal(changedId.emitted.length, 0, 'mudança de scoringPlay.id não pode duplicar nem anular gol');
 assert.equal(Object.values(falseState.plays).filter((p) => p.status === 'confirmed').length, 1);
@@ -122,8 +122,8 @@ assert.equal(falseState.plays[`${game.eventId}:stable-a`].status, 'confirmed');
 // Cura estado legado criado pelo bug anterior: se o placar ainda contém o gol e ele reaparece no summary, volta a confirmed sem novo push.
 const legacyFalseState = structuredClone(falseState);
 legacyFalseState.plays[`${game.eventId}:stable-a`].status = 'overturned';
-legacyFalseState.plays[`${game.eventId}:stable-a`].overturnedAt = t0 + 160_000;
-const healed = applyObservation(legacyFalseState, falseGoalObs, sameGoalNewId, t0 + 186_000);
+legacyFalseState.plays[`${game.eventId}:stable-a`].overturnedAt = t0 + 60_000;
+const healed = applyObservation(legacyFalseState, falseGoalObs, sameGoalNewId, t0 + 66_000);
 assert.equal(healed.emitted.length, 0);
 assert.equal(healed.match.plays[`${game.eventId}:stable-a`].status, 'confirmed');
 assert.ok(healed.match.plays[`${game.eventId}:stable-a`].recoveredFromFalseOverturnAt > 0);
@@ -137,26 +137,26 @@ const twoPlays = extractScoringPlays(summary(
   goal('d2', '2022', 'p3', "19'", 1, 1)
 ), two);
 doubleState = applyObservation(doubleState, two, twoPlays, t0 + 10_000).match;
-doubleState = applyObservation(doubleState, two, twoPlays, t0 + 40_000).match;
-const doubleConfirmed = applyObservation(doubleState, two, twoPlays, t0 + 71_000);
+doubleState = applyObservation(doubleState, two, twoPlays, t0 + 20_000).match;
+const doubleConfirmed = applyObservation(doubleState, two, twoPlays, t0 + 31_000);
 assert.equal(doubleConfirmed.emitted.filter((e) => e.type === 'goal').length, 2);
 assert.deepEqual(doubleConfirmed.emitted.map((e) => [e.scoreAfter.home, e.scoreAfter.away]), [[1,0],[1,1]]);
 
-// A notificação exige autoria: placar confirmado sem nome do jogador permanece pendente.
+// A autoria nunca pode bloquear o push: se o placar/jogada estão estáveis, envia o gol com fallback.
 const scorerZero = normalizeScoreboardEvent(rawScore(0, 0, "60'"), game.league, game);
 let scorerState = applyObservation(initialMatchState(scorerZero), scorerZero, null, t0).match;
 const scorerOne = normalizeScoreboardEvent(rawScore(0, 1, "64'"), game.league, game);
 const missingScorer = extractScoringPlays(summary(goal('scorer', '2022', 'unknown', "63'", 0, 1)), scorerOne);
 scorerState = applyObservation(scorerState, scorerOne, missingScorer, t0 + 10_000).match;
-scorerState = applyObservation(scorerState, scorerOne, missingScorer, t0 + 40_000).match;
-let scorerStep = applyObservation(scorerState, scorerOne, missingScorer, t0 + 71_000);
+scorerState = applyObservation(scorerState, scorerOne, missingScorer, t0 + 20_000).match;
+let scorerStep = applyObservation(scorerState, scorerOne, missingScorer, t0 + 31_000);
 scorerState = scorerStep.match;
-assert.equal(scorerStep.emitted.length, 0, 'sem autor não envia alerta de gol');
-assert.equal(scorerState.plays[`${game.eventId}:scorer`].status, 'pending');
+assert.equal(scorerStep.emitted.length, 1, 'sem autor ainda envia alerta de gol após estabilidade');
+assert.equal(scorerState.plays[`${game.eventId}:scorer`].status, 'confirmed');
+assert.match(scorerStep.emitted[0].notificationDraft.body, /Autoria aguardando confirmação/);
 const knownScorer = extractScoringPlays(summary(goal('scorer', '2022', 'p3', "63'", 0, 1)), scorerOne);
-scorerStep = applyObservation(scorerState, scorerOne, knownScorer, t0 + 101_000);
-assert.equal(scorerStep.emitted.length, 1, 'confirma assim que a ESPN publica a autoria estável');
-assert.equal(scorerStep.emitted[0].athlete.name, 'Lucas Lima');
+scorerStep = applyObservation(scorerState, scorerOne, knownScorer, t0 + 41_000);
+assert.equal(scorerStep.emitted.length, 0, 'autoria tardia atualiza estado sem duplicar o gol');
 
 // Gol contra e disputa de pênaltis são classificados separadamente.
 const special = extractScoringPlays(summary(
@@ -173,7 +173,7 @@ const agenda = { jogos: [
   { event_id: 'bad', espn_league: 'eng.1', data_iso: game.kickoff, mandante: {}, visitante: {} }
 ] };
 assert.deepEqual(selectAgendaCandidates(agenda, Date.parse('2026-09-01T23:50:00Z')).map((x) => x.eventId), [game.eventId]);
-assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_CONFIRM_MS, 45_000);
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_CONFIRM_MS, 20_000);
 assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R4');
 
 // ESPN às vezes publica state=post sem completed; relógio ao vivo não pode virar final fantasma.

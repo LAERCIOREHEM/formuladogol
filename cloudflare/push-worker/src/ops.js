@@ -1,7 +1,7 @@
 import { recoverPendingDispatches, recoverStuckDeliveries } from './push-dispatch.js';
 
 const OPS_VERSION = 6;
-const STALE_ACTIVE_POLL_MS = 120_000;
+const STALE_ACTIVE_POLL_MS = 35_000;
 const STALE_BOOTSTRAP_MS = 5 * 60_000;
 const STUCK_DISPATCH_MINUTES = 10;
 const STUCK_DELIVERY_MINUTES = 5;

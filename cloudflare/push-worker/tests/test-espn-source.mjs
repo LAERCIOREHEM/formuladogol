@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fetchEspnScoreboard, fetchEspnSummary, probeEspnSources, summaryGoalCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, probeEspnSources, summaryGoalCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
 
 const event = {
   id: '401909112',
@@ -115,6 +115,56 @@ assert.equal(summaryGoalCount({ plays: [{ scoringPlay: true, text: 'Goal' }, { t
   assert.equal(Object.keys(probe.leagues).length, 4);
   assert.deepEqual(probe.failed, []);
   assert.ok(Object.values(probe.leagues).every((row) => row.source === 'espn_cdn_soccer'));
+}
+
+
+// R5: durante jogo, consulta múltiplos scoreboards e escolhe o evento mais recente.
+{
+  const stale = {
+    ...event,
+    status: { type: { state: 'in', completed: false, shortDetail: "50'" }, displayClock: "50'", period: 2 },
+    competitions: [{ competitors: [
+      { homeAway: 'home', score: '0', team: { id: '7632', displayName: 'Atlético-MG' } },
+      { homeAway: 'away', score: '1', team: { id: '2022', displayName: 'Cruzeiro' } }
+    ] }]
+  };
+  const fresh = structuredClone(stale);
+  fresh.status.type.shortDetail = "53'";
+  fresh.status.displayClock = "53'";
+  fresh.competitions[0].competitors[0].score = '1';
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/bra.copa_do_brazil/scoreboard')) return Response.json({ content: { events: [fresh] } });
+    if (href.includes('/core/soccer/scoreboard')) return Response.json({ content: { events: [stale] } });
+    if (href.includes('site.web.api.espn.com')) return Response.json({ events: [stale] });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnScoreboardFresh('bra.copa_do_brazil', '20260901', fakeFetch);
+  assert.equal(result.source, 'espn_freshest_merge');
+  assert.equal(result.selectedSources[event.id], 'espn_cdn_league');
+  const chosen = result.data.events[0];
+  assert.equal(chosen.status.displayClock, "53'");
+  assert.equal(chosen.competitions[0].competitors[0].score, '1');
+}
+
+// R5: play-by-play ao vivo é independente do scoreboard e escolhe o feed com mais gols.
+{
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/bra.copa_do_brazil/playbyplay')) {
+      return Response.json({ gamepackageJSON: { plays: [{ id: 'g1', scoringPlay: true, text: 'Goal', homeScore: 0, awayScore: 1 }] } });
+    }
+    if (href.includes('/core/soccer/playbyplay')) {
+      return Response.json({ gamepackageJSON: { plays: [
+        { id: 'g1', scoringPlay: true, text: 'Goal', homeScore: 0, awayScore: 1 },
+        { id: 'g2', scoringPlay: true, text: 'Goal', homeScore: 1, awayScore: 1 }
+      ] } });
+    }
+    throw new Error(`não deveria chegar em ${href}`);
+  };
+  const result = await fetchEspnLivePlays('bra.copa_do_brazil', event.id, fakeFetch);
+  assert.equal(result.source, 'espn_cdn_soccer_playbyplay');
+  assert.equal(summaryGoalCount(result.data), 2);
 }
 
 console.log('espn-source: PASS');

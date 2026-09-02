@@ -74,7 +74,9 @@ globalThis.fetch = async (url) => {
       mandante: { espn_id: '7632', nome: 'Atlético-MG' }, visitante: { espn_id: '2022', nome: 'Cruzeiro' }
     }] });
   }
-  if (href.includes('/scoreboard')) return Response.json(phase === 'zero' ? scoreboard(0, "5'") : scoreboard(1, "9'"));
+  // Regressão R5: o scoreboard pode continuar 0x0 enquanto o play-by-play já publicou o gol.
+  if (href.includes('/scoreboard')) return Response.json(phase === 'zero' ? scoreboard(0, "5'") : scoreboard(0, "9'"));
+  if (href.includes('/playbyplay')) return Response.json(phase === 'zero' ? { gamepackageJSON: { plays: [] } } : gameSummary());
   if (href.includes('/summary')) return Response.json(gameSummary());
   throw new Error(`URL inesperada: ${href}`);
 };
@@ -90,31 +92,35 @@ try {
   assert.equal(status.lastPollError, '');
   assert.ok(status.lastPollSuccessAt > 0);
   assert.equal(status.sourceLayerVersion, '6-R3');
-  assert.equal(status.scoreboardSources['bra.copa_do_brazil'], 'espn_cdn_soccer');
+  assert.equal(status.scoreboardSources['bra.copa_do_brazil'], 'espn_freshest_merge');
   assert.equal(db.events.size, 0);
-  assert.ok(storage.alarm > now, 'alarme de 30 s deve ser armado durante jogo');
+  assert.equal(storage.alarm, now + 10_000, 'alarme de 10 s deve ser armado durante jogo');
 
   phase = 'goal';
-  now += 30_000;
+  now += 10_000;
   await monitor.alarm();
   assert.equal(db.events.size, 0, 'primeira detecção fica pendente');
   status = await monitor.publicStatus();
   assert.equal(status.pendingGoals, 1);
+  assert.equal(status.matches[0].score, '1-0', 'play-by-play deve promover placar mesmo com scoreboard atrasado');
+  assert.equal(status.livePolicyVersion, '6-R5');
+  assert.equal(status.fastPollMs, 10_000);
+  assert.equal(status.minPollGapMs, 8_000);
 
-  now += 30_000;
+  now += 10_000;
   await monitor.alarm();
-  assert.equal(db.events.size, 0, '30 s de estabilidade ainda não bastam');
+  assert.equal(db.events.size, 0, '10 s de estabilidade ainda não bastam');
 
-  now += 31_000;
+  now += 11_000;
   await monitor.alarm();
-  assert.equal(db.events.size, 1, 'gol confirmado deve ser persistido uma vez');
+  assert.equal(db.events.size, 1, 'gol confirmado deve ser persistido após 20 s');
   const row = [...db.events.values()][0];
   assert.equal(row[1], eventId);
   assert.equal(row[2], 'goal');
   assert.equal(row[12], 'Atlético-MG');
   assert.equal(row[14], 'João Pedro');
 
-  now += 30_000;
+  now += 10_000;
   await monitor.alarm();
   assert.equal(db.events.size, 1, 'poll posterior não duplica o evento');
 

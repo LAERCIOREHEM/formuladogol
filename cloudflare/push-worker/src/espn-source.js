@@ -1,7 +1,9 @@
 const SITE_ROOT = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
+const SITE_WEB_ROOT = 'https://site.web.api.espn.com/apis/site/v2/sports/soccer';
 const CDN_ROOT = 'https://cdn.espn.com/core';
 const CORE_ROOT = 'https://sports.core.api.espn.com/v2/sports/soccer/leagues';
 const FETCH_TIMEOUT_MS = 10_000;
+const LIVE_FETCH_TIMEOUT_MS = 3_500;
 const ALLOWED_LEAGUES = Object.freeze([
   'bra.1',
   'bra.copa_do_brazil',
@@ -22,9 +24,9 @@ function requestHeaders() {
   };
 }
 
-async function fetchJson(url, fetchImpl = globalThis.fetch) {
+async function fetchJson(url, fetchImpl = globalThis.fetch, timeoutMs = FETCH_TIMEOUT_MS) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), Math.max(500, Number(timeoutMs) || FETCH_TIMEOUT_MS));
   try {
     const response = await fetchImpl(url, {
       signal: controller.signal,
@@ -136,6 +138,107 @@ function scoreboardCandidates(league, dates) {
   ];
 }
 
+function scoreboardFreshCandidates(league, dates) {
+  const qLeague = encodeURIComponent(league);
+  const qDates = encodeURIComponent(dates);
+  return [
+    {
+      name: 'espn_cdn_league',
+      url: `${CDN_ROOT}/${qLeague}/scoreboard?xhr=1&dates=${qDates}&limit=100`
+    },
+    {
+      name: 'espn_cdn_soccer',
+      url: `${CDN_ROOT}/soccer/scoreboard?xhr=1&league=${qLeague}&dates=${qDates}&limit=100`
+    },
+    {
+      name: 'espn_site_web_api',
+      url: `${SITE_WEB_ROOT}/${qLeague}/scoreboard?dates=${qDates}&limit=100`
+    }
+  ];
+}
+
+function livePlayCandidates(league, eventId) {
+  const qLeague = encodeURIComponent(league);
+  const qEvent = encodeURIComponent(eventId);
+  return [
+    {
+      name: 'espn_cdn_league_playbyplay',
+      url: `${CDN_ROOT}/${qLeague}/playbyplay?xhr=1&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
+      name: 'espn_cdn_soccer_playbyplay',
+      url: `${CDN_ROOT}/soccer/playbyplay?xhr=1&league=${qLeague}&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
+      name: 'espn_core_plays',
+      url: `${CORE_ROOT}/${qLeague}/events/${qEvent}/competitions/${qEvent}/plays?limit=300&lang=pt&region=br`,
+      transform: (payload) => {
+        const plays = Array.isArray(payload?.items) ? payload.items : Array.isArray(payload?.plays) ? payload.plays : [];
+        if (!plays.length) throw new Error('core plays sem itens');
+        return { plays };
+      }
+    }
+  ];
+}
+
+function eventIdOf(event) {
+  return text(event?.id || event?.competitions?.[0]?.id || event?.competition?.id);
+}
+
+function eventClockNumber(event) {
+  const competition = event?.competitions?.[0] || event?.competition || {};
+  const status = event?.status || competition?.status || {};
+  const raw = text(status?.displayClock || status?.type?.shortDetail || status?.type?.detail);
+  const match = raw.match(/(\d{1,3})(?:\s*\+\s*(\d+))?/);
+  if (!match) return -1;
+  return Number(match[1] || 0) * 100 + Number(match[2] || 0);
+}
+
+function eventPeriod(event) {
+  const competition = event?.competitions?.[0] || event?.competition || {};
+  const status = event?.status || competition?.status || {};
+  return Number(status?.period || competition?.period || 0) || 0;
+}
+
+function eventStateRank(event) {
+  const competition = event?.competitions?.[0] || event?.competition || {};
+  const status = event?.status || competition?.status || {};
+  const type = status?.type || {};
+  const state = text(type?.state).toLowerCase();
+  if (type?.completed === true || state === 'post') return 3;
+  if (state === 'in') return 2;
+  return 1;
+}
+
+function eventScoreTotal(event) {
+  const competition = event?.competitions?.[0] || event?.competition || {};
+  const competitors = Array.isArray(competition?.competitors) ? competition.competitors : [];
+  return competitors.reduce((sum, competitor) => {
+    const raw = competitor?.score?.value ?? competitor?.score?.displayValue ?? competitor?.score;
+    const value = Number(raw);
+    return sum + (Number.isFinite(value) && value > 0 ? value : 0);
+  }, 0);
+}
+
+function fresherEvent(candidate, current) {
+  if (!current) return true;
+  const candidateState = eventStateRank(candidate);
+  const currentState = eventStateRank(current);
+  if (candidateState !== currentState) return candidateState > currentState;
+  const candidatePeriod = eventPeriod(candidate);
+  const currentPeriod = eventPeriod(current);
+  if (candidatePeriod !== currentPeriod) return candidatePeriod > currentPeriod;
+  const candidateClock = eventClockNumber(candidate);
+  const currentClock = eventClockNumber(current);
+  if (candidateClock !== currentClock) return candidateClock > currentClock;
+  const candidateScore = eventScoreTotal(candidate);
+  const currentScore = eventScoreTotal(current);
+  if (candidateScore !== currentScore) return candidateScore > currentScore;
+  return false;
+}
+
 function summaryCandidates(league, eventId) {
   const qLeague = encodeURIComponent(league);
   const qEvent = encodeURIComponent(eventId);
@@ -211,6 +314,86 @@ export async function fetchEspnScoreboard(league, dates, fetchImpl = globalThis.
   return firstSuccessful(scoreboardCandidates(league, dates), unwrapScoreboard, fetchImpl);
 }
 
+export async function fetchEspnScoreboardFresh(league, dates, fetchImpl = globalThis.fetch) {
+  if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
+  const attempts = [];
+  const successful = [];
+  await Promise.all(scoreboardFreshCandidates(league, dates).map(async (candidate) => {
+    const startedAt = Date.now();
+    try {
+      const raw = await fetchJson(withBust(candidate.url), fetchImpl, LIVE_FETCH_TIMEOUT_MS);
+      const data = unwrapScoreboard(raw);
+      successful.push({ source: candidate.name, data });
+      attempts.push({ source: candidate.name, ok: true, durationMs: Date.now() - startedAt });
+    } catch (error) {
+      attempts.push({
+        source: candidate.name,
+        ok: false,
+        durationMs: Date.now() - startedAt,
+        error: text(error?.message || error).slice(0, 240)
+      });
+    }
+  }));
+  if (!successful.length) {
+    const fallback = await fetchEspnScoreboard(league, dates, fetchImpl);
+    return { ...fallback, selectedSources: {}, source: fallback.source };
+  }
+
+  const merged = new Map();
+  const selectedSources = {};
+  for (const result of successful) {
+    for (const event of result.data?.events || []) {
+      const id = eventIdOf(event);
+      if (!id) continue;
+      const current = merged.get(id);
+      if (fresherEvent(event, current)) {
+        merged.set(id, event);
+        selectedSources[id] = result.source;
+      }
+    }
+  }
+  return {
+    ok: true,
+    source: successful.length > 1 ? 'espn_freshest_merge' : successful[0].source,
+    sources: successful.map((item) => item.source),
+    selectedSources,
+    data: { events: [...merged.values()] },
+    attempts
+  };
+}
+
+export async function fetchEspnLivePlays(league, eventId, fetchImpl = globalThis.fetch) {
+  if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
+  if (!text(eventId)) throw new Error('eventId ausente');
+  const candidates = livePlayCandidates(league, eventId);
+  const primary = candidates.slice(0, 2);
+  const attempts = [];
+  const successful = [];
+  await Promise.all(primary.map(async (candidate) => {
+    const startedAt = Date.now();
+    try {
+      const raw = await fetchJson(withBust(candidate.url), fetchImpl, LIVE_FETCH_TIMEOUT_MS);
+      const data = (candidate.transform || unwrapSummary)(raw);
+      successful.push({ source: candidate.name, data });
+      attempts.push({ source: candidate.name, ok: true, durationMs: Date.now() - startedAt });
+    } catch (error) {
+      attempts.push({ source: candidate.name, ok: false, durationMs: Date.now() - startedAt, error: text(error?.message || error).slice(0, 240) });
+    }
+  }));
+  if (successful.length) {
+    successful.sort((a, b) => {
+      const goalDiff = summaryGoalCount(b.data) - summaryGoalCount(a.data);
+      if (goalDiff) return goalDiff;
+      const aCount = (Array.isArray(a.data?.scoringPlays) ? a.data.scoringPlays.length : Array.isArray(a.data?.plays) ? a.data.plays.length : 0);
+      const bCount = (Array.isArray(b.data?.scoringPlays) ? b.data.scoringPlays.length : Array.isArray(b.data?.plays) ? b.data.plays.length : 0);
+      return bCount - aCount;
+    });
+    return { ok: true, source: successful[0].source, data: successful[0].data, attempts };
+  }
+  const fallback = await firstSuccessful(candidates.slice(2), unwrapSummary, fetchImpl);
+  return { ...fallback, attempts: [...attempts, ...(fallback.attempts || [])] };
+}
+
 export async function fetchEspnSummary(league, eventId, fetchImpl = globalThis.fetch, expectedGoals = 0) {
   if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
   if (!text(eventId)) throw new Error('eventId ausente');
@@ -257,8 +440,10 @@ export async function probeEspnSources(fetchImpl = globalThis.fetch, dateKey = '
 
 export const ESPN_SOURCE_CONSTANTS = Object.freeze({
   SITE_ROOT,
+  SITE_WEB_ROOT,
   CDN_ROOT,
   CORE_ROOT,
   FETCH_TIMEOUT_MS,
+  LIVE_FETCH_TIMEOUT_MS,
   ALLOWED_LEAGUES
 });

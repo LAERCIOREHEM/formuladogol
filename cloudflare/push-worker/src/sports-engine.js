@@ -1,4 +1,4 @@
-const GOAL_CONFIRM_MS = 45_000;
+const GOAL_CONFIRM_MS = 20_000;
 const GOAL_CONFIRM_OBSERVATIONS = 2;
 const OVERTURN_CONFIRM_OBSERVATIONS = 2;
 
@@ -628,8 +628,10 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     for (const play of Object.values(match.plays)) {
       if (play.status !== 'pending') continue;
       const age = now - num(play.firstSeenAt, now);
-      const scorerReady = Boolean(text(play.athleteName));
-      if (scorerReady && num(play.stableCount, 1) >= GOAL_CONFIRM_OBSERVATIONS && age >= GOAL_CONFIRM_MS) {
+      // O push não pode ficar preso esperando autoria. Se a ESPN já confirmou a
+      // jogada e o placar por duas leituras, o gol é enviado mesmo que o nome do
+      // marcador ainda não tenha chegado. A mensagem já possui fallback seguro.
+      if (num(play.stableCount, 1) >= GOAL_CONFIRM_OBSERVATIONS && age >= GOAL_CONFIRM_MS) {
         play.status = 'confirmed';
         play.confirmedAt = now;
         emitted.push(emittedEvent('goal', play, match, observation, now));
@@ -646,7 +648,9 @@ export function matchNeedsFastPolling(match, nowMs = Date.now()) {
   if (match.state === 'in') return true;
   if (Object.values(match.plays || {}).some((play) => play?.status === 'pending')) return true;
   const kickoff = Date.parse(match.kickoff || '');
-  if (Number.isFinite(kickoff) && kickoff >= now - 15 * 60_000 && kickoff <= now + 15 * 60_000) return true;
+  // Acelera somente perto da partida: 20 min antes e até 45 min após o horário
+  // previsto enquanto a fonte ainda não marcou o jogo como ao vivo.
+  if (Number.isFinite(kickoff) && kickoff >= now - 45 * 60_000 && kickoff <= now + 20 * 60_000) return true;
   return false;
 }
 

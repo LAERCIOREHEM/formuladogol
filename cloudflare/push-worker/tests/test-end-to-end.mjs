@@ -25,8 +25,8 @@ const play = {
 };
 
 state = applyObservation(state, goalObs, [play], t0 + 5_000).match;
-state = applyObservation(state, goalObs, [play], t0 + 35_000).match;
-const confirmed = applyObservation(state, goalObs, [play], t0 + 66_000);
+state = applyObservation(state, goalObs, [play], t0 + 15_000).match;
+const confirmed = applyObservation(state, goalObs, [play], t0 + 26_000);
 assert.equal(confirmed.emitted.length, 1);
 const event = confirmed.emitted[0];
 assert.equal(event.type, 'goal');
@@ -40,21 +40,21 @@ assert.match(push.body, /Atlético-MG 0 × 1 Cruzeiro/);
 assert.equal(push.data.url, `/aovivo.html?event=${eventId}`);
 assert.equal(push.badgeIncrement, 1);
 
-const next = applyObservation(confirmed.match, goalObs, [play], t0 + 96_000);
+const next = applyObservation(confirmed.match, goalObs, [play], t0 + 36_000);
 assert.equal(next.emitted.length, 0, 'poll repetido não pode duplicar o push');
 
 // O feed detalhado pode oscilar ou trocar de origem após deploy. Sem rollback do placar, isso nunca é gol anulado.
-let feedGap = applyObservation(next.match, goalObs, [], t0 + 106_000);
+let feedGap = applyObservation(next.match, goalObs, [], t0 + 46_000);
 assert.equal(feedGap.emitted.length, 0);
-feedGap = applyObservation(feedGap.match, goalObs, [], t0 + 116_000);
+feedGap = applyObservation(feedGap.match, goalObs, [], t0 + 56_000);
 assert.equal(feedGap.emitted.length, 0, 'placar 0x1 mantido impede falso GOL ANULADO');
 assert.equal(feedGap.match.plays[`${eventId}:g1`].status, 'confirmed');
 
 const revertedObs = structuredClone(base);
 revertedObs.clock = "16'";
-let reverted = applyObservation(feedGap.match, revertedObs, [], t0 + 126_000);
+let reverted = applyObservation(feedGap.match, revertedObs, [], t0 + 66_000);
 assert.equal(reverted.emitted.length, 0);
-reverted = applyObservation(reverted.match, revertedObs, [], t0 + 156_000);
+reverted = applyObservation(reverted.match, revertedObs, [], t0 + 76_000);
 assert.equal(reverted.emitted.length, 1);
 assert.equal(reverted.emitted[0].type, 'goal_overturned');
 const correction = buildSportsPushPayload(reverted.emitted[0]);

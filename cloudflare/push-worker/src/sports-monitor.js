@@ -9,7 +9,7 @@ import {
   SPORTS_ENGINE_CONSTANTS
 } from './sports-engine.js';
 import { enqueueSportsEvent } from './push-dispatch.js';
-import { fetchEspnScoreboard, fetchEspnSummary } from './espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScoreboardFresh, fetchEspnSummary } from './espn-source.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
@@ -17,14 +17,17 @@ const PRE_WINDOW_MS = 6 * 60 * 60_000;
 const POST_WINDOW_MS = 5 * 60 * 60_000;
 const PRESERVE_WATCH_MS = 6 * 60 * 60_000;
 const FINAL_RETENTION_MS = 10 * 60_000;
-const FAST_POLL_MS = 30_000;
+const FAST_POLL_MS = 10_000;
 const FETCH_TIMEOUT_MS = 10_000;
-const MIN_POLL_GAP_MS = 20_000;
+const MIN_POLL_GAP_MS = 8_000;
 const MAX_RECENT_EVENTS = 50;
 const SCHEDULE_WINDOW_MS = 14 * 24 * 60 * 60_000;
 const REMINDER_MIN_MS = 13 * 60_000;
 const REMINDER_MAX_MS = 16 * 60_000;
 const SCHEDULE_CHANGE_MIN_MS = 2 * 60_000;
+const LIVE_POLL_PRE_MS = 20 * 60_000;
+const LIVE_POLL_LATE_START_MS = 45 * 60_000;
+const LIVE_POLICY_VERSION = '6-R5';
 
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
@@ -215,6 +218,44 @@ function scoreboardScoringDetails(raw) {
   return [];
 }
 
+function regulationPlays(plays) {
+  return Array.isArray(plays) ? plays.filter((play) => !play?.shootout) : [];
+}
+
+function scoreFromLatestPlay(plays) {
+  let home = null;
+  let away = null;
+  for (const play of regulationPlays(plays)) {
+    if (play?.homeScoreAfter != null && Number.isFinite(Number(play.homeScoreAfter))) home = Number(play.homeScoreAfter);
+    if (play?.awayScoreAfter != null && Number.isFinite(Number(play.awayScoreAfter))) away = Number(play.awayScoreAfter);
+  }
+  if (home == null || away == null) return null;
+  return { home: Math.max(0, home), away: Math.max(0, away) };
+}
+
+function promoteObservationFromPlays(observation, plays) {
+  const derived = scoreFromLatestPlay(plays);
+  if (!derived) return observation;
+  const scoreboardTotal = num(observation?.home?.score, 0) + num(observation?.away?.score, 0);
+  const playTotal = derived.home + derived.away;
+  if (playTotal <= scoreboardTotal) return observation;
+  return {
+    ...observation,
+    home: { ...(observation?.home || {}), score: derived.home },
+    away: { ...(observation?.away || {}), score: derived.away },
+    scorePromotedFromPlayByPlay: true
+  };
+}
+
+function shouldPollGame(entry, match, now) {
+  if (match?.state === 'in') return true;
+  if (Object.values(match?.plays || {}).some((play) => play?.status === 'pending')) return true;
+  const kickoff = Date.parse(entry?.kickoff || match?.kickoff || '');
+  if (!Number.isFinite(kickoff)) return false;
+  const remaining = kickoff - now;
+  return remaining <= LIVE_POLL_PRE_MS && remaining >= -LIVE_POLL_LATE_START_MS;
+}
+
 function activeWatchEntry(entry, now) {
   const kickoff = Date.parse(entry?.kickoff || '');
   if (!Number.isFinite(kickoff)) return false;
@@ -320,17 +361,22 @@ export class SportsMonitor {
       if (!watchlist[eventId] && activeWatchEntry(previous, now)) watchlist[eventId] = previous;
     }
     await this.state.storage.put('watchlist', watchlist);
+    const shouldPollEspn = Object.values(watchlist).some((entry) => shouldPollGame(entry, current.matches?.[entry.eventId], now));
     await this.writeStatus({
       lastBootstrapAt: now,
       lastAgendaSuccessAt: agendaError ? current.status.lastAgendaSuccessAt || 0 : now,
       lastAgendaError: agendaError,
       scheduleBaselineAt: agendaError ? num(current.status.scheduleBaselineAt, 0) : (num(current.status.scheduleBaselineAt, 0) || now),
       scheduleEventsThisBootstrap: scheduleEvents.length,
-      watchCount: Object.keys(watchlist).length
+      watchCount: Object.keys(watchlist).length,
+      livePolicyVersion: LIVE_POLICY_VERSION,
+      fastPollMs: FAST_POLL_MS,
+      minPollGapMs: MIN_POLL_GAP_MS,
+      espnPollingSuppressed: !shouldPollEspn
     });
 
     const lastPollAt = num(current.status.lastPollAt, 0);
-    if (Object.keys(watchlist).length && now - lastPollAt >= MIN_POLL_GAP_MS) await this.pollOnce();
+    if (shouldPollEspn && now - lastPollAt >= MIN_POLL_GAP_MS) await this.pollOnce();
     await this.ensureNextAlarm();
     return this.publicStatus();
   }
@@ -386,9 +432,20 @@ export class SportsMonitor {
     const startedAt = Date.now();
     const snapshot = await this.readState();
     if (startedAt - num(snapshot.status.lastPollAt, 0) < MIN_POLL_GAP_MS) return this.publicStatus();
-    const watchEntries = Object.values(snapshot.watchlist).filter((entry) => activeWatchEntry(entry, startedAt));
+    const activeEntries = Object.values(snapshot.watchlist).filter((entry) => activeWatchEntry(entry, startedAt));
+    const watchEntries = activeEntries.filter((entry) => shouldPollGame(entry, snapshot.matches?.[entry.eventId], startedAt));
     if (!watchEntries.length) {
-      await this.writeStatus({ lastPollAt: startedAt, lastPollDurationMs: 0, activeGames: 0, lastPollError: '' });
+      await this.writeStatus({
+        lastPollAt: startedAt,
+        lastPollCompletedAt: Date.now(),
+        lastPollDurationMs: Date.now() - startedAt,
+        activeGames: Object.values(snapshot.matches).filter((match) => match?.state === 'in').length,
+        lastPollError: '',
+        livePolicyVersion: LIVE_POLICY_VERSION,
+        fastPollMs: FAST_POLL_MS,
+        minPollGapMs: MIN_POLL_GAP_MS,
+        espnPollingSuppressed: true
+      });
       return this.publicStatus();
     }
 
@@ -404,16 +461,18 @@ export class SportsMonitor {
     const sourceAttempts = {};
     const summarySources = {};
     const summaryGoalCounts = {};
+    const scoreboardSelectedSources = {};
     await Promise.all([...byLeague.entries()].map(async ([league, games]) => {
       try {
         const days = games.map((game) => brDateKey(game.kickoff)).filter(Boolean).sort();
         const start = days[0] || brDateKey(Date.now());
         const end = days.at(-1) || start;
         const dates = start === end ? start : `${start}-${end}`;
-        const result = await fetchEspnScoreboard(league, dates);
+        const result = await fetchEspnScoreboardFresh(league, dates);
         scoreboardResults.set(league, eventMap(result.data));
         scoreboardSources[league] = result.source;
         sourceAttempts[league] = result.attempts;
+        for (const [eventId, source] of Object.entries(result.selectedSources || {})) scoreboardSelectedSources[eventId] = source;
       } catch (error) {
         sourceAttempts[league] = Array.isArray(error?.attempts) ? error.attempts : [];
         sourceErrors.push(`${league}: ${text(error?.message || error)}`);
@@ -431,7 +490,7 @@ export class SportsMonitor {
       const raw = scoreboardResults.get(game.league)?.get(game.eventId);
       if (!raw) continue;
       observedGames += 1;
-      const observation = normalizeScoreboardEvent(raw, game.league, game);
+      let observation = normalizeScoreboardEvent(raw, game.league, game);
       if (observation.state === 'in') liveGames += 1;
       const previousWatch = watchlist[game.eventId] || game;
       watchlist[game.eventId] = {
@@ -442,7 +501,26 @@ export class SportsMonitor {
       };
       const previous = matches[game.eventId] || initialMatchState(observation);
       let plays = null;
-      if (needsSummary(previous, observation)) {
+
+      // Durante jogo ao vivo o play-by-play é consultado em toda leitura rápida.
+      // Ele costuma receber a jogada de gol antes do scoreboard CDN. Se trouxer
+      // um placar mais novo, promovemos a observação e o anti-VAR passa a contar
+      // a partir dessa evidência, sem esperar o placar CDN alcançar o site.
+      if (observation.state === 'in' || previous?.state === 'in') {
+        try {
+          const liveResult = await fetchEspnLivePlays(game.league, game.eventId, globalThis.fetch);
+          const liveCandidate = extractScoringPlays(liveResult.data, observation);
+          plays = liveCandidate;
+          observation = promoteObservationFromPlays(observation, liveCandidate);
+          summariesFetched += 1;
+          summarySources[liveResult.source] = num(summarySources[liveResult.source], 0) + 1;
+          summaryGoalCounts[game.eventId] = regulationPlays(liveCandidate).length;
+        } catch (error) {
+          sourceErrors.push(`${game.league}/${game.eventId}/live-plays: ${text(error?.message || error)}`);
+        }
+      }
+
+      if (needsSummary(previous, observation) && (!plays || regulationPlays(plays).length < (num(observation.home?.score, 0) + num(observation.away?.score, 0)))) {
         const expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
         const scoreboardDetails = scoreboardScoringDetails(raw);
         if (scoreboardDetails.length) {
@@ -495,10 +573,15 @@ export class SportsMonitor {
       emittedThisPoll: newlyEmitted.length,
       totalRecentEvents: recentEvents.length,
       scoreboardSources,
+      scoreboardSelectedSources,
       summarySources,
       summaryGoalCounts,
       sourceAttempts,
-      sourceLayerVersion: '6-R3'
+      sourceLayerVersion: '6-R3',
+      livePolicyVersion: LIVE_POLICY_VERSION,
+      fastPollMs: FAST_POLL_MS,
+      minPollGapMs: MIN_POLL_GAP_MS,
+      espnPollingSuppressed: false
     });
     await this.ensureNextAlarm();
     return this.publicStatus();
@@ -527,7 +610,12 @@ export class SportsMonitor {
       emittedThisPoll: num(snapshot.status.emittedThisPoll, 0),
       scheduleEventsThisBootstrap: num(snapshot.status.scheduleEventsThisBootstrap, 0),
       sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R3'),
+      livePolicyVersion: text(snapshot.status.livePolicyVersion || LIVE_POLICY_VERSION),
+      fastPollMs: num(snapshot.status.fastPollMs, FAST_POLL_MS),
+      minPollGapMs: num(snapshot.status.minPollGapMs, MIN_POLL_GAP_MS),
+      espnPollingSuppressed: snapshot.status.espnPollingSuppressed === true,
       scoreboardSources: snapshot.status.scoreboardSources && typeof snapshot.status.scoreboardSources === 'object' ? snapshot.status.scoreboardSources : {},
+      scoreboardSelectedSources: snapshot.status.scoreboardSelectedSources && typeof snapshot.status.scoreboardSelectedSources === 'object' ? snapshot.status.scoreboardSelectedSources : {},
       summarySources: snapshot.status.summarySources && typeof snapshot.status.summarySources === 'object' ? snapshot.status.summarySources : {},
       summaryGoalCounts: snapshot.status.summaryGoalCounts && typeof snapshot.status.summaryGoalCounts === 'object' ? snapshot.status.summaryGoalCounts : {},
       sourceAttempts: snapshot.status.sourceAttempts && typeof snapshot.status.sourceAttempts === 'object' ? snapshot.status.sourceAttempts : {},
