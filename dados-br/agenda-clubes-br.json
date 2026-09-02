@@ -3,9 +3,9 @@
   "projeto": "Fórmula do Gol",
   "tipo": "agenda_clubes_brasileirao",
   "descricao": "Agenda do Brasileirão e dos clubes da Série A 2026 na Copa do Brasil, Libertadores e Sul-Americana.",
-  "gerado_em": "2026-09-01T23:21:34-03:00",
+  "gerado_em": "2026-09-02T05:11:49-03:00",
   "periodo": {
-    "inicio": "2026-09-01T00:00:00-03:00",
+    "inicio": "2026-09-02T00:00:00-03:00",
     "fim": "2026-10-31T23:59:59.999999-03:00",
     "regra": "de hoje até o último dia do mês seguinte"
   },
@@ -15,94 +15,15 @@
     "probabilidades": "disponíveis apenas para partidas do Brasileirão com saída AF-Previsão publicada"
   },
   "resumo": {
-    "total_jogos": 50,
+    "total_jogos": 48,
     "por_competicao": {
-      "copa_do_brasil": 4,
-      "brasileirao": 32,
+      "copa_do_brasil": 3,
+      "brasileirao": 31,
       "libertadores": 8,
       "sul_americana": 6
     }
   },
   "jogos": [
-    {
-      "event_id": "401909112",
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "competicao_nome_curto": "Copa do Brasil",
-      "espn_league": "bra.copa_do_brazil",
-      "data_iso": "2026-09-01T21:00:00-03:00",
-      "estado": "post",
-      "concluido": true,
-      "status": "Finalizado",
-      "rodada": 0,
-      "fase": "Quartas de final",
-      "perna": 2,
-      "estadio": "Arena MRV",
-      "mandante": {
-        "espn_id": "7632",
-        "nome": "Atlético-MG",
-        "sigla": "CAM",
-        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/7632.png",
-        "pais": "BRA",
-        "serie_a_2026": true
-      },
-      "visitante": {
-        "espn_id": "2022",
-        "nome": "Cruzeiro",
-        "sigla": "CRU",
-        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/2022.png",
-        "pais": "BRA",
-        "serie_a_2026": true
-      },
-      "placar_mandante": 2,
-      "placar_visitante": 1,
-      "adiado": false,
-      "data_definir": false,
-      "possui_clube_serie_a_2026": true,
-      "probabilidades_disponiveis": false,
-      "fonte": "dados-br/competicoes-af-previsao/copa-do-brasil.json"
-    },
-    {
-      "event_id": "401841006",
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Campeonato Brasileiro Série A",
-      "competicao_nome_curto": "Brasileirão",
-      "espn_league": "bra.1",
-      "data_iso": "2026-09-02T19:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Data a definir",
-      "rodada": 4,
-      "fase": "",
-      "perna": null,
-      "estadio": "Estadio do Maracana",
-      "mandante": {
-        "espn_id": "",
-        "nome": "Flamengo",
-        "sigla": "FLA",
-        "escudo": "https://s.sde.globo.com/media/organizations/2018/04/10/Flamengo-2018.svg",
-        "pais": "BRA",
-        "serie_a_2026": true
-      },
-      "visitante": {
-        "espn_id": "",
-        "nome": "Mirassol",
-        "sigla": "MIR",
-        "escudo": "https://s.sde.globo.com/media/organizations/2024/08/20/mirassol-novo-svg-71690.svg",
-        "pais": "BRA",
-        "serie_a_2026": true
-      },
-      "placar_mandante": null,
-      "placar_visitante": null,
-      "adiado": true,
-      "data_definir": false,
-      "possui_clube_serie_a_2026": true,
-      "probabilidades_disponiveis": true,
-      "fonte": "jogos.json",
-      "fonte_calendario": "CBF oficial — agenda de credenciamento",
-      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
-      "data_fonte_anterior": ""
-    },
     {
       "event_id": "401909110",
       "competicao_chave": "copa_do_brasil",
