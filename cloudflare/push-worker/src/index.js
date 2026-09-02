@@ -1,7 +1,7 @@
 import { buildPushPayload } from '@block65/webcrypto-web-push';
 import { PushState } from './push-state.js';
 import { SportsMonitor } from './sports-monitor.js';
-import { dispatchStatus, handleQueueBatch } from './push-dispatch.js';
+import { dispatchStatus, enqueueSportsEvent, handleQueueBatch } from './push-dispatch.js';
 import { opsStatus, runOperationalMaintenance } from './ops.js';
 import { probeEspnSources } from './espn-source.js';
 
@@ -261,6 +261,81 @@ async function sendToSubscription(env, row, payload) {
   return fetch(subscription.endpoint, requestInit);
 }
 
+function chapecoensePreferenceMatch(preferences) {
+  const p = preferences || {};
+  if (p.allGames === true) return 'all_games';
+  const teams = Array.isArray(p.teams) ? p.teams.map((value) => String(value || '').trim().toLowerCase()) : [];
+  if (teams.some((value) => ['abbr:cha', 'team:chapecoense', 'chapecoense'].includes(value))) return 'chapecoense';
+  return '';
+}
+
+function brClockLabel(timestamp) {
+  try {
+    return new Intl.DateTimeFormat('pt-BR', {
+      timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+    }).format(new Date(timestamp));
+  } catch (_) {
+    return new Date(timestamp).toISOString();
+  }
+}
+
+async function handleSegmentedTeamTest(request, env) {
+  const body = await readBody(request);
+  const installationId = cleanId(body.installationId);
+  if (!installationId) return json(request, { ok: false, error: 'invalid_installation' }, 400);
+  if (!(await rateLimit(request, env, installationId, 'segmented-team-test'))) {
+    return json(request, { ok: false, error: 'rate_limited' }, 429);
+  }
+
+  const active = await env.DB.prepare(`
+    SELECT subscription_id FROM push_subscriptions
+    WHERE installation_id=? AND active=1
+    ORDER BY updated_at DESC LIMIT 1
+  `).bind(installationId).first();
+  if (!active) return json(request, { ok: false, error: 'subscription_not_found' }, 404);
+
+  const preferences = await getPreferences(env, installationId);
+  const eligibleBy = chapecoensePreferenceMatch(preferences);
+  if (!eligibleBy || preferences.prematch15 === false) {
+    return json(request, {
+      ok: false, error: 'not_eligible_for_chapecoense_test',
+      detail: 'Ative Todos os jogos ou Chapecoense e mantenha Jogo em 15 minutos habilitado.',
+      preferences
+    }, 409);
+  }
+
+  // Janela curta de propósito: mantém o teste abaixo do recovery threshold de
+  // dispatch e permite repetir a prova em qualquer horário sem esperar jogo real.
+  const delaySeconds = Math.max(30, Math.min(180, Math.floor(Number(body.delaySeconds) || 120)));
+  const scheduledAtMs = Date.now() + delaySeconds * 1000;
+  const scheduledAt = new Date(scheduledAtMs).toISOString();
+  const eventKey = `prematch_15:fdg-segmented-test:${installationId}:${scheduledAtMs}`;
+  const eventId = `fdg-segmented-test-${scheduledAtMs}`;
+  const payload = {
+    eventKey, eventId, type: 'prematch_15', confirmedAt: scheduledAt,
+    league: 'fdg.test', competitionKey: 'fdg_test', competitionName: 'Teste técnico Fórmula do Gol',
+    home: { id: '', name: 'Chapecoense', abbreviation: 'CHA', score: null },
+    away: { id: '', name: 'Teste Fórmula do Gol', abbreviation: 'FDG', score: null },
+    testInstallationId: installationId,
+    notificationDraft: {
+      title: '🧪 TESTE CHAPECOENSE',
+      body: `Evento técnico previsto para ${brClockLabel(scheduledAtMs)} · filtro Chapecoense/Todos os jogos`
+    }
+  };
+
+  await env.DB.prepare(`
+    INSERT OR IGNORE INTO match_events (event_key,event_id,event_type,confirmed_at,payload_json)
+    VALUES (?,?,?,?,?)
+  `).bind(eventKey, eventId, 'prematch_15', scheduledAt, JSON.stringify(payload)).run();
+  await enqueueSportsEvent(env, eventKey, { delaySeconds });
+
+  return json(request, {
+    ok: true, queued: true, segmentedTestVersion: '6-T1', team: 'Chapecoense',
+    eligibleBy, delaySeconds, scheduledAt, scheduledAtBrasilia: brClockLabel(scheduledAtMs),
+    note: 'A página pode ser fechada. A entrega passa pela mesma Queue e pelo mesmo filtro de preferências dos alertas esportivos.'
+  }, 202);
+}
+
 async function handleQueueTest(request, env) {
   const body = await readBody(request);
   const installationId = cleanId(body.installationId);
@@ -376,6 +451,7 @@ export default {
       if (url.pathname === '/v1/preferences' && request.method === 'GET') return handleGetPreferences(request, env);
       if (url.pathname === '/v1/preferences' && request.method === 'PUT') return handlePutPreferences(request, env);
       if (url.pathname === '/v1/test' && request.method === 'POST') return handleTest(request, env);
+      if (url.pathname === '/v1/segmented-team-test' && request.method === 'POST') return handleSegmentedTeamTest(request, env);
       if (url.pathname === '/v1/queue-test' && request.method === 'POST') return handleQueueTest(request, env);
       if (url.pathname === '/v1/dispatch/status' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'dispatch-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);

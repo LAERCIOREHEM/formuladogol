@@ -236,6 +236,11 @@ def brasileirao_games(
         official_date = str(official.data_iso if official else "")
         chosen_date = official_date or raw_date
         provisional = canonical_round in provisional_rounds and not official_date
+        raw_status = str(raw.get("status") or "")
+        official_resolved = bool(official_date)
+        public_status = raw_status
+        if official_resolved and ("data a definir" in raw_status.lower() or "adiad" in raw_status.lower()):
+            public_status = "Agendado"
         yield {
             "event_id": event_id,
             "competicao_chave": "brasileirao",
@@ -245,7 +250,7 @@ def brasileirao_games(
             "data_iso": chosen_date,
             "estado": str(raw.get("estado") or "pre").lower(),
             "concluido": str(raw.get("estado") or "").lower() == "post",
-            "status": str(raw.get("status") or ""),
+            "status": public_status,
             "rodada": canonical_round,
             "fase": "",
             "perna": None,
@@ -254,7 +259,9 @@ def brasileirao_games(
             "visitante": away,
             "placar_mandante": raw.get("placar_mandante"),
             "placar_visitante": raw.get("placar_visitante"),
-            "adiado": raw.get("adiado") is True,
+            # Confirmação CBF de data/hora encerra o estado corrente de adiamento,
+            # mesmo que um snapshot/manual antigo ainda carregue esse marcador.
+            "adiado": False if official_resolved else raw.get("adiado") is True,
             "data_definir": bool((raw.get("data_definir") is True or provisional) and not official_date),
             "possui_clube_serie_a_2026": True,
             "probabilidades_disponiveis": bool(event_id and event_id in probability_ids),

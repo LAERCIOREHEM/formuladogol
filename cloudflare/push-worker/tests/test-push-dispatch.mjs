@@ -60,4 +60,16 @@ assert.deepEqual(chunkArray(['a','b','c','d','e'], 2), [['a','b'],['c','d'],['e'
 assert.equal(PUSH_DISPATCH_CONSTANTS.DELIVERY_BATCH_SIZE, 5);
 assert.equal(PUSH_DISPATCH_CONSTANTS.TARGET_PAGE_SIZE, 400);
 
+const segmented = buildSportsPushPayload({
+  eventKey: 'prematch_15:fdg-segmented-test:device:1',
+  type: 'prematch_15', eventId: 'fdg-segmented-test-1', confirmedAt: event.confirmedAt,
+  testInstallationId: 'fdg-device-1',
+  home: { name: 'Chapecoense', abbreviation: 'CHA' },
+  away: { name: 'Teste Fórmula do Gol', abbreviation: 'FDG' },
+  notificationDraft: { title: '🧪 TESTE CHAPECOENSE', body: 'Evento técnico previsto para 10:45:00' }
+});
+assert.equal(segmented.title, '🧪 TESTE CHAPECOENSE');
+assert.equal(segmented.data.type, 'prematch_15');
+assert.equal(segmented.data.url, '/agenda.html');
+
 console.log('push-dispatch: PASS');

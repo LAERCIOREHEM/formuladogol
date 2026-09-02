@@ -144,6 +144,14 @@
     return api('/v1/queue-test', { method: 'POST', body: JSON.stringify({ installationId: installationId() }) });
   }
 
+  async function scheduleChapecoenseTest(delaySeconds = 120) {
+    await subscribe();
+    return api('/v1/segmented-team-test', {
+      method: 'POST',
+      body: JSON.stringify({ installationId: installationId(), delaySeconds: Number(delaySeconds) || 120 })
+    });
+  }
+
   async function dispatchStatus() {
     return api('/v1/dispatch/status', { method: 'GET' });
   }
@@ -227,7 +235,7 @@
 
   window.FormulaDoGolPush = Object.freeze({
     supported, configure, loadRemoteConfig, getRegistration, requestPermission, getSubscription,
-    subscribe, unsubscribe, sendRemoteTest, sendQueueTest, dispatchStatus, opsStatus, getPreferences, savePreferences, monitorStatus, monitorEvents,
+    subscribe, unsubscribe, sendRemoteTest, sendQueueTest, scheduleChapecoenseTest, dispatchStatus, opsStatus, getPreferences, savePreferences, monitorStatus, monitorEvents,
     showTestNotification, setBadge, clearBadge, diagnostics, installationId
   });
 })();

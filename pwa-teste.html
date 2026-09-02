@@ -33,6 +33,7 @@
       <section class="pwa-test-card"><h2>Cancelar Web Push</h2><button class="pwa-test-button" id="btn-unsubscribe" type="button">Cancelar inscrição deste aparelho</button></section>
       <section class="pwa-test-card"><h2>Motor esportivo</h2><button class="pwa-test-button" id="btn-monitor" type="button">Atualizar status do monitor</button></section>
       <section class="pwa-test-card"><h2>Fila real</h2><button class="pwa-test-button" id="btn-queue" type="button">Testar entrega pela Queue</button></section>
+      <section class="pwa-test-card"><h2>Teste segmentado</h2><button class="pwa-test-button" id="btn-chape" type="button">Agendar Chapecoense em 2 min</button><p class="pwa-test-note">Só este aparelho recebe, e somente se estiver elegível por Chapecoense ou Todos os jogos. A página pode ser fechada.</p></section>
       <section class="pwa-test-card"><h2>Fan-out</h2><button class="pwa-test-button" id="btn-dispatch" type="button">Atualizar status da distribuição</button></section>
       <section class="pwa-test-card"><h2>Produção</h2><button class="pwa-test-button" id="btn-ops" type="button">Ver saúde completa do sistema</button></section>
       <section class="pwa-test-card"><h2>Badge</h2><button class="pwa-test-button" id="btn-badge" type="button">Colocar badge 1</button></section>
@@ -45,7 +46,7 @@
   </main>
 
   <script src="/js/br-pwa.js?v=20260901-pwa-v1"></script>
-  <script src="/js/br-push.js?v=20260901-push-v4-icon"></script>
+  <script src="/js/br-push.js?v=20260902-segmented-test-v1"></script>
   <script>
     (function(){
       const out=document.getElementById('diagnostics');
@@ -63,6 +64,7 @@
       document.getElementById('btn-unsubscribe').addEventListener('click',async()=>{try{const ok=await window.FormulaDoGolPush.unsubscribe();await refresh(ok?'Inscrição Web Push cancelada.':'Este aparelho não tinha inscrição ativa.');}catch(e){await refresh('Falha ao cancelar: '+e.message);}});
       document.getElementById('btn-monitor').addEventListener('click',async()=>{try{const [status,recent]=await Promise.all([window.FormulaDoGolPush.monitorStatus(),window.FormulaDoGolPush.monitorEvents()]);await refresh('MOTOR ESPORTIVO\n'+JSON.stringify(status,null,2)+'\n\nEVENTOS CONFIRMADOS RECENTES\n'+JSON.stringify(recent.events||[],null,2));}catch(e){await refresh('Falha ao consultar motor esportivo: '+e.message);}});
       document.getElementById('btn-queue').addEventListener('click',async()=>{try{const result=await window.FormulaDoGolPush.sendQueueTest();await refresh('TESTE DA QUEUE ENFILEIRADO\n'+JSON.stringify(result,null,2)+'\n\nA notificação chegará pelo mesmo consumidor usado pelos gols reais.');}catch(e){await refresh('Falha no teste da Queue: '+e.message);}});
+      document.getElementById('btn-chape').addEventListener('click',async()=>{try{const result=await window.FormulaDoGolPush.scheduleChapecoenseTest(120);await refresh('TESTE SEGMENTADO CHAPECOENSE AGENDADO\n'+JSON.stringify(result,null,2)+'\n\nPode fechar o site. Compare o horário scheduledAtBrasilia com a chegada da notificação.');}catch(e){await refresh('Falha no teste segmentado: '+e.message+'\nAtive Chapecoense ou Todos os jogos e o alerta de 15 minutos neste aparelho.');}});
       document.getElementById('btn-dispatch').addEventListener('click',async()=>{try{const status=await window.FormulaDoGolPush.dispatchStatus();await refresh('DISTRIBUIÇÃO DE ALERTAS\n'+JSON.stringify(status,null,2));}catch(e){await refresh('Falha ao consultar distribuição: '+e.message);}});
       document.getElementById('btn-ops').addEventListener('click',async()=>{try{const status=await window.FormulaDoGolPush.opsStatus();await refresh('SAÚDE DE PRODUÇÃO — EXECUÇÃO 6\n'+JSON.stringify(status,null,2));}catch(e){await refresh('Falha ao consultar saúde operacional: '+e.message);}});
       document.getElementById('btn-badge').addEventListener('click',async()=>{try{const ok=await window.FormulaDoGolPush.setBadge(1);await refresh(ok?'Badge solicitado.':'Badging API não suportada neste navegador.');}catch(e){await refresh('Falha: '+e.message);}});

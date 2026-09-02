@@ -137,15 +137,18 @@ async function getEvent(env, eventKey) {
   return row ? { row, payload: parseEventRow(row) } : null;
 }
 
-export async function enqueueSportsEvent(env, eventKey) {
+export async function enqueueSportsEvent(env, eventKey, options = {}) {
   const key = text(eventKey);
   if (!key || !env.PUSH_QUEUE) return false;
+  const delaySeconds = Math.max(0, Math.min(86400, Math.floor(num(options?.delaySeconds, 0))));
   await env.DB.prepare(`
     INSERT OR IGNORE INTO push_event_dispatch (event_key, status)
     VALUES (?, 'pending')
   `).bind(key).run();
   try {
-    await env.PUSH_QUEUE.send({ kind: 'event_dispatch', eventKey: key, afterSubscriptionId: '' });
+    const message = { kind: 'event_dispatch', eventKey: key, afterSubscriptionId: '' };
+    if (delaySeconds > 0) await env.PUSH_QUEUE.send(message, { delaySeconds });
+    else await env.PUSH_QUEUE.send(message);
     await env.DB.prepare(`
       UPDATE push_event_dispatch
       SET status='enqueued', enqueued_at=CURRENT_TIMESTAMP, last_error=NULL, updated_at=CURRENT_TIMESTAMP
@@ -239,12 +242,17 @@ async function eligibleTargets(env, event, afterSubscriptionId = '') {
   const homeAbbrToken = homeAbbr ? `abbr:${homeAbbr}` : '';
   const awayAbbrToken = awayAbbr ? `abbr:${awayAbbr}` : '';
   const eventId = text(event.eventId);
+  // Testes técnicos podem limitar a audiência a uma única instalação, mas
+  // continuam atravessando EXATAMENTE a mesma seleção all_games/time/jogo.
+  // Eventos esportivos reais deixam esse campo vazio e não sofrem restrição.
+  const audienceInstallationId = text(event.testInstallationId);
   const result = await env.DB.prepare(`
     SELECT s.subscription_id, s.installation_id
     FROM push_subscriptions s
     JOIN push_preferences_v2 p ON p.installation_id=s.installation_id
     WHERE s.active=1
       AND s.subscription_id > ?
+      AND (?='' OR s.installation_id=?)
       AND ${flagColumn}=1
       AND (
         p.all_games=1
@@ -260,7 +268,7 @@ async function eligibleTargets(env, event, afterSubscriptionId = '') {
     ORDER BY s.subscription_id ASC
     LIMIT ?
   `).bind(
-    text(afterSubscriptionId), eventId,
+    text(afterSubscriptionId), audienceInstallationId, audienceInstallationId, eventId,
     homeEspn, awayEspn, homeAbbrToken, awayAbbrToken, homeNamed, awayNamed, homeLegacy, awayLegacy,
     TARGET_PAGE_SIZE + 1
   ).all();
@@ -484,6 +492,7 @@ export async function dispatchStatus(env) {
   return {
     ok: true,
     dispatchVersion: 5,
+    segmentedTestVersion: '6-T1',
     activeSubscriptions: num(subscriptions?.count, 0),
     pendingEvents: num(pending?.count, 0),
     deliveries: {

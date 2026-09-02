@@ -788,7 +788,13 @@ def aplicar_ajustes_calendario(eventos: list[dict[str, Any]]) -> None:
         rodada = ajuste.get("rodada")
         if rodada not in (None, ""):
             alvo["rodada"] = int(rodada)
-        alvo["adiado"] = True
+        # ``adiado`` representa o ESTADO ATUAL da partida, não o fato histórico
+        # de ela já ter sido remarcada. Uma correção com data confirmada deixa
+        # de ser adiada; ``data_definir`` continua sendo tratada como adiada.
+        if "adiado" in ajuste:
+            alvo["adiado"] = bool(ajuste.get("adiado") is True)
+        else:
+            alvo["adiado"] = bool(ajuste.get("data_definir") is True)
         alvo["ajuste_calendario"] = True
         alvo["motivo_ajuste"] = str(ajuste.get("motivo") or "").strip()
 
@@ -2333,7 +2339,7 @@ def validar_contra_ranking(tabela_payload: dict[str, Any]) -> None:
 
 
 def selftest_execucao_6() -> None:
-    global ARQ_RESULTADOS_MANUAIS
+    global ARQ_RESULTADOS_MANUAIS, ARQ_AJUSTES_CALENDARIO
     import tempfile
 
     original = ARQ_RESULTADOS_MANUAIS
@@ -2426,6 +2432,37 @@ def selftest_execucao_6() -> None:
     )
     assert "finalizado_em" not in futuro_inconsistente
     assert not evento_realmente_finalizado(futuro_inconsistente, agora_teste)
+
+    # Regressão de calendário: uma partida que foi adiada mas recebeu nova
+    # data oficial não pode continuar marcada como ``adiado``/"Data a definir".
+    original_ajustes = ARQ_AJUSTES_CALENDARIO
+    try:
+        with tempfile.TemporaryDirectory() as tmp:
+            ARQ_AJUSTES_CALENDARIO = Path(tmp) / "ajustes-calendario.json"
+            ARQ_AJUSTES_CALENDARIO.write_text(json.dumps({"ajustes": [{
+                "event_id": "sync-rescheduled",
+                "rodada": 4,
+                "mandante": "Flamengo",
+                "visitante": "Mirassol",
+                "data_iso": "2026-09-02T19:30",
+                "adiado": False,
+                "estado": "pre",
+                "status": "Agendado",
+            }]}), encoding="utf-8")
+            base_dt = datetime(2026, 9, 2, 19, 30, tzinfo=FUSO_BRASILIA)
+            reagendado = {
+                "event_id": "sync-rescheduled", "rodada": 4,
+                "mandante_nome": "Flamengo", "visitante_nome": "Mirassol",
+                "data_iso": None, "data_dt": None, "_sort": float("inf"),
+                "estado": "pre", "concluido": False, "adiado": True,
+                "status": "Data a definir",
+            }
+            aplicar_ajustes_calendario([reagendado])
+            assert reagendado["data_iso"] == base_dt.strftime("%Y-%m-%dT%H:%M")
+            assert reagendado["adiado"] is False
+            assert reagendado["status"] == "Agendado"
+    finally:
+        ARQ_AJUSTES_CALENDARIO = original_ajustes
 
     tabela_teste = {
         "tabela": [
