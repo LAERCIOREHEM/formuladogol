@@ -159,6 +159,36 @@ const knownScorer = extractScoringPlays(summary(goal('scorer', '2022', 'p3', "63
 scorerStep = applyObservation(scorerState, scorerOne, knownScorer, t0 + 41_000);
 assert.equal(scorerStep.emitted.length, 0, 'autoria tardia atualiza estado sem duplicar o gol');
 
+// R8: quando a ESPN ainda não entrega athlete estruturado, tentamos enriquecer
+// a autoria pelo texto da jogada durante a própria janela anti-VAR.
+const textOnlyPlay = extractScoringPlays(summary({
+  id: 'txt-1', scoringPlay: true, team: { id: '2022' },
+  clock: { displayValue: "5'" }, homeScore: 0, awayScore: 1,
+  text: 'Goal scored by Robin Meißner', description: 'Goal scored by Robin Meißner', type: { text: 'Goal' }
+}), scorerOne);
+assert.equal(textOnlyPlay[0].athleteName, 'Robin Meißner');
+const espnNarrativePlay = extractScoringPlays(summary({
+  id: 'txt-2', scoringPlay: true, team: { id: '2022' },
+  clock: { displayValue: "5'" }, homeScore: 0, awayScore: 1,
+  text: "Goal! VfL Osnabrück 1, Bayern Munich 0. Robin Meißner (VfL Osnabrück) right footed shot from the centre of the box to the bottom left corner.",
+  description: "Goal! VfL Osnabrück 1, Bayern Munich 0. Robin Meißner (VfL Osnabrück) right footed shot.",
+  type: { text: 'Goal' }
+}), scorerOne);
+assert.equal(espnNarrativePlay[0].athleteName, 'Robin Meißner', 'R8 deve extrair o marcador também do texto narrativo típico da ESPN');
+const enrichZero = normalizeScoreboardEvent(rawScore(0, 0, "2'"), game.league, game);
+let enrichState = applyObservation(initialMatchState(enrichZero), enrichZero, null, t0).match;
+const enrichOne = normalizeScoreboardEvent(rawScore(0, 1, "5'"), game.league, game);
+let enrichStep = applyObservation(enrichState, enrichOne, [], t0 + 5_000);
+enrichState = enrichStep.match;
+assert.equal(Object.values(enrichState.plays).filter((p) => p.scoreFallback === true).length, 1);
+enrichStep = applyObservation(enrichState, enrichOne, textOnlyPlay, t0 + 15_000);
+enrichState = enrichStep.match;
+assert.equal(enrichStep.emitted.length, 0);
+enrichStep = applyObservation(enrichState, enrichOne, textOnlyPlay, t0 + 26_000);
+assert.equal(enrichStep.emitted.filter((e) => e.type === 'goal').length, 1, 'fallback enriquecido deve sair já com o nome do jogador');
+assert.equal(enrichStep.emitted[0].athlete.name, 'Robin Meißner');
+assert.match(enrichStep.emitted[0].notificationDraft.body, /Robin Meißner/);
+
 // R6: placar subiu mas play-by-play está vazio/atrasado. O placar estável precisa
 // confirmar o gol sozinho, para o Push nunca depender de uma estrutura de plays específica.
 const sbZero = normalizeScoreboardEvent(rawScore(0, 0, "5'"), game.league, game);
@@ -267,8 +297,9 @@ const agenda = { jogos: [
 assert.deepEqual(selectAgendaCandidates(agenda, Date.parse('2026-09-01T23:50:00Z')).map((x) => x.eventId), [game.eventId]);
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_CONFIRM_MS, 20_000);
 assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R4');
-assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION, '6-R7');
-assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R7');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION, '6-R8');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R8');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION, '6-R8');
 
 // ESPN às vezes publica state=post sem completed; relógio ao vivo não pode virar final fantasma.
 const phantom = rawScore(0, 0, "22'", 'post');

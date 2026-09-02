@@ -768,6 +768,7 @@ export class SportsMonitor {
       overturnPolicyVersion: SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION,
       goalDetectionPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION,
       goalReconciliationPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION,
+      goalScorerEnrichmentPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION,
       watchCount: Object.keys(snapshot.watchlist).length,
       matchCount: matches.length,
       activeGames: matches.filter((m) => m.state === 'in').length,

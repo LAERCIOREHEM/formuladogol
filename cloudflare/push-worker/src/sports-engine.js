@@ -197,15 +197,77 @@ function isOwnGoal(item) {
   return item?.ownGoal === true || /own goal|gol contra/.test(descriptor);
 }
 
+function cleanParsedAthleteName(value) {
+  let candidate = text(value)
+    .replace(/^[-–:,\s]+/, '')
+    .replace(/[-–:,\s]+$/, '')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+\d{1,3}(?:\+\d+)?['’]?$/u, '')
+    .replace(/\s+\((?:contra|p[êe]nalti|penalty)\)$/iu, '')
+    .trim();
+  if (!candidate) return '';
+  const blocked = new Set([
+    'goal', 'gol', 'goal scored', 'goal by', 'scored by', 'marcado por', 'marca por', 'marcou', 'goal scored by',
+    'penalty', 'penalty goal', 'own goal', 'gol contra', 'var', 'kickoff', 'halftime', 'full time', 'fim de jogo'
+  ]);
+  if (blocked.has(normalized(candidate))) return '';
+  const words = candidate.split(' ').filter(Boolean);
+  if (!words.length || words.length > 5) return '';
+  let alphaWords = 0;
+  for (const word of words) {
+    const bare = word.replace(/^[^A-Za-zÀ-ÖØ-öø-ÿ]+|[^A-Za-zÀ-ÖØ-öø-ÿ'’.-]+$/g, '');
+    if (!bare) return '';
+    const lower = normalized(bare);
+    if (!lower || ['goal', 'gol', 'scores', 'score', 'scored', 'marca', 'marcou', 'penalty', 'own', 'contra', 'var'].includes(lower)) return '';
+    if (/[A-Za-zÀ-ÖØ-öø-ÿ]/.test(bare)) alphaWords += 1;
+  }
+  if (!alphaWords) return '';
+  return compactPlayerName(candidate);
+}
+
+function parseAthleteNameFromText(...values) {
+  const person = `([A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]+(?:\\s+[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]+){0,4})`;
+  const patterns = [
+    new RegExp(`(?:goal scored by|scored by|goal by|gol de|gol do|gol da|marcado por|marca(?:do)? por)\\s+${person}`, 'iu'),
+    new RegExp(`(?:^|[.!?]\\s+)${person}\\s*\\([^)]{1,80}\\)\\s*(?:goal|scores?|scored|right footed|left footed|header|converts|shot|finaliza|cabeceia)?`, 'iu'),
+    new RegExp(`^${person}\\s*(?:\\(|-|scores?\\b|scored\\b|marca\\b|marcou\\b|goal\\b|gol\\b)`, 'iu'),
+    new RegExp(`^${person}\\s*,\\s*\\d{1,3}(?:\\+\\d+)?['’]?$`, 'u')
+  ];
+  for (const raw of values) {
+    const source = text(raw)
+      .replace(/^\d{1,3}(?:\+\d+)?['’]?\s*[-–:]?\s*/u, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!source) continue;
+    for (const pattern of patterns) {
+      const match = source.match(pattern);
+      const candidate = cleanParsedAthleteName(match?.[1] || '');
+      if (candidate) return candidate;
+    }
+    const exact = cleanParsedAthleteName(source);
+    if (exact) return exact;
+  }
+  return '';
+}
+
 function athleteOf(item, roster) {
   const involved = Array.isArray(item?.athletesInvolved) ? item.athletesInvolved : [];
   const participants = Array.isArray(item?.participants) ? item.participants : [];
   const participant = participants.find((entry) => entry?.athlete || entry?.player) || participants[0] || null;
   const athlete = involved[0] || item?.athlete || item?.player || participant?.athlete || participant?.player || participant || null;
-  if (!athlete) return { id: '', name: '' };
-  const id = text(athlete.id);
-  const name = compactPlayerName((id && roster[id]) || athlete.shortName || athlete.displayName || athlete.fullName || athlete.name);
-  return { id, name };
+  const id = text(athlete?.id);
+  const structuredName = compactPlayerName((id && roster[id]) || athlete?.shortName || athlete?.displayName || athlete?.fullName || athlete?.name);
+  const inferredName = parseAthleteNameFromText(
+    item?.text,
+    item?.description,
+    item?.shortText,
+    item?.headline,
+    item?.title,
+    item?.note,
+    item?.type?.text,
+    item?.type?.description
+  );
+  return { id, name: structuredName || inferredName };
 }
 
 function rawScore(item, key) {
@@ -834,6 +896,7 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   GOAL_CONFIRM_OBSERVATIONS,
   OVERTURN_CONFIRM_OBSERVATIONS,
   OVERTURN_POLICY_VERSION: '6-R4',
-  GOAL_DETECTION_POLICY_VERSION: '6-R7',
-  GOAL_RECONCILIATION_POLICY_VERSION: '6-R7'
+  GOAL_DETECTION_POLICY_VERSION: '6-R8',
+  GOAL_RECONCILIATION_POLICY_VERSION: '6-R8',
+  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R8'
 });
