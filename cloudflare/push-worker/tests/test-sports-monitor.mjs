@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { SportsMonitor } from '../src/sports-monitor.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, hotEspnSnapshot } from '../src/hot-espn-test.js';
+import { buildHotMatchPrematchEvent, hotMatchPrematchDue, hotMatchTargetEvent, markHotMatchTechnicalEvent } from '../src/hot-match-test.js';
 
 class FakeStorage {
   constructor() { this.map = new Map(); this.alarm = null; }
@@ -158,3 +159,99 @@ console.log('sports-monitor: PASS');
   Date.now = realNow;
   globalThis.fetch = realFetch;
 }
+
+
+// 6-H2: teste quente de partida real, invisível ao site, reutiliza o mesmo motor de gol R5/R4.
+{
+  const oldNow = Date.now;
+  const oldFetch = globalThis.fetch;
+  let h2Now = Date.parse('2026-09-02T15:44:00Z'); // 12:44 Brasília
+  Date.now = () => h2Now;
+  let h2Phase = 'pre';
+  const h2EventId = '999001';
+  const h2Kickoff = '2026-09-02T16:00:00Z';
+  const h2Scoreboard = () => ({ events: [{
+    id: h2EventId, date: h2Kickoff,
+    status: h2Phase === 'pre'
+      ? { type: { state: 'pre', completed: false, shortDetail: 'Scheduled' }, displayClock: '', period: 0 }
+      : { type: { state: 'in', completed: false, shortDetail: "5'" }, displayClock: "5'", period: 1 },
+    competitions: [{ competitors: [
+      { homeAway: 'home', score: h2Phase === 'pre' ? '0' : '1', team: { id: '118', displayName: 'Udinese', abbreviation: 'UDI' } },
+      { homeAway: 'away', score: '0', team: { id: '175', displayName: 'Venezia', abbreviation: 'VEN' } }
+    ] }]
+  }] });
+  globalThis.fetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/scoreboard') && href.includes('ita.coppa_italia')) return Response.json(h2Scoreboard());
+    if (href.includes('/playbyplay') && href.includes('ita.coppa_italia')) {
+      return Response.json({ gamepackageJSON: { plays: h2Phase === 'pre' ? [] : [{
+        id: 'h2-goal-1', scoringPlay: true, text: 'Goal Udinese', type: { text: 'Goal' },
+        team: { id: '118' }, athletesInvolved: [{ id: '77', displayName: 'Teste Atacante' }],
+        clock: { displayValue: "5'" }, homeScore: 1, awayScore: 0
+      }] } });
+    }
+    if (href.includes('/leagues/ita.coppa_italia/') && href.includes('/plays')) {
+      return Response.json({ items: h2Phase === 'pre' ? [{ id: 'warmup', text: 'Pre-match' }] : [{
+        id: 'h2-goal-1', scoringPlay: true, text: 'Goal Udinese', type: { text: 'Goal' },
+        team: { id: '118' }, athletesInvolved: [{ id: '77', displayName: 'Teste Atacante' }],
+        clock: { displayValue: "5'" }, homeScore: 1, awayScore: 0
+      }] });
+    }
+    throw new Error(`H2 URL inesperada: ${href}`);
+  };
+  try {
+    const target = hotMatchTargetEvent(h2Scoreboard().events);
+    assert.equal(target.id, h2EventId);
+    assert.equal(hotMatchPrematchDue(h2Kickoff, Date.parse('2026-09-02T15:45:00Z')), true);
+    const prem = buildHotMatchPrematchEvent({ installationId: 'inst-h2', eventId: h2EventId, kickoff: h2Kickoff }, {
+      eventId: h2EventId, kickoff: h2Kickoff, home: { name: 'Udinese' }, away: { name: 'Venezia' }
+    }, h2Now);
+    assert.equal(prem.testInstallationId, 'inst-h2');
+    assert.equal(prem.technicalEspnTest, true);
+    const marked = markHotMatchTechnicalEvent({ eventKey: 'goal:x', eventId: h2EventId, type: 'goal', sourcePlayKey: 'g1', notificationDraft: { title: '⚽ GOL DA UDINESE!', body: 'Udinese 1 × 0 Venezia' } }, { installationId: 'inst-h2' });
+    assert.equal(marked.testInstallationId, 'inst-h2');
+    assert.match(marked.notificationDraft.title, /TESTE ESPN REAL/);
+
+    const storage = new FakeStorage();
+    const db = new FakeDB();
+    const monitor = new SportsMonitor({ storage }, { DB: db });
+    const armed = await monitor.armHotMatchTest('inst-h2');
+    assert.equal(armed.state, 'armed');
+    assert.equal(armed.eventId, h2EventId);
+    assert.equal(armed.score, '0-0');
+
+    h2Now = Date.parse('2026-09-02T15:45:00Z');
+    await monitor.pollHotMatchTest();
+    assert.equal(db.matchEvents.size, 1, 'alerta de 15 min deve ser criado pela hora ESPN do jogo');
+    const premRow = [...db.matchEvents.values()][0];
+    const premPayload = JSON.parse(premRow[4]);
+    assert.equal(premPayload.type, 'prematch_15');
+    assert.equal(premPayload.testInstallationId, 'inst-h2');
+
+    h2Phase = 'goal';
+    h2Now = Date.parse('2026-09-02T16:05:00Z');
+    await monitor.pollHotMatchTest();
+    let hotStatus = await monitor.publicStatus();
+    assert.equal(hotStatus.hotMatchTest.pendingGoals, 1, 'primeira evidência real fica pendente');
+    assert.equal(db.events.size, 0);
+
+    h2Now += 10_000;
+    await monitor.pollHotMatchTest();
+    assert.equal(db.events.size, 0, '10 s ainda não confirmam gol');
+
+    h2Now += 11_000;
+    await monitor.pollHotMatchTest();
+    assert.equal(db.events.size, 1, '20 s + duas observações confirmam o gol técnico pelo motor real');
+    const goalRow = [...db.events.values()][0];
+    const goalPayload = JSON.parse(goalRow[23]);
+    assert.equal(goalPayload.type, 'goal');
+    assert.equal(goalPayload.technicalEspnTest, true);
+    assert.equal(goalPayload.testInstallationId, 'inst-h2');
+    assert.match(goalPayload.notificationDraft.title, /TESTE ESPN REAL/);
+  } finally {
+    Date.now = oldNow;
+    globalThis.fetch = oldFetch;
+  }
+}
+
+console.log('hot-match H2 integration: PASS');

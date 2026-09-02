@@ -160,6 +160,14 @@
     });
   }
 
+  async function armHotMatchTest() {
+    await subscribe();
+    return api('/v1/hot-match-test', {
+      method: 'POST',
+      body: JSON.stringify({ installationId: installationId() })
+    });
+  }
+
   async function dispatchStatus() {
     return api('/v1/dispatch/status', { method: 'GET' });
   }
@@ -243,7 +251,7 @@
 
   window.FormulaDoGolPush = Object.freeze({
     supported, configure, loadRemoteConfig, getRegistration, requestPermission, getSubscription,
-    subscribe, unsubscribe, sendRemoteTest, sendQueueTest, scheduleChapecoenseTest, armHotEspnTest, dispatchStatus, opsStatus, getPreferences, savePreferences, monitorStatus, monitorEvents,
+    subscribe, unsubscribe, sendRemoteTest, sendQueueTest, scheduleChapecoenseTest, armHotEspnTest, armHotMatchTest, dispatchStatus, opsStatus, getPreferences, savePreferences, monitorStatus, monitorEvents,
     showTestNotification, setBadge, clearBadge, diagnostics, installationId
   });
 })();

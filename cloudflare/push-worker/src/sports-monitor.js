@@ -9,8 +9,9 @@ import {
   SPORTS_ENGINE_CONSTANTS
 } from './sports-engine.js';
 import { enqueueSportsEvent } from './push-dispatch.js';
-import { fetchEspnLivePlays, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays } from './espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard } from './espn-source.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, hotEspnSnapshot, publicHotEspnTest } from './hot-espn-test.js';
+import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue, hotMatchTargetEvent, HOT_MATCH_TEST_CONSTANTS, markHotMatchTechnicalEvent, publicHotMatchTest } from './hot-match-test.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
@@ -306,13 +307,14 @@ export class SportsMonitor {
   }
 
   async readState() {
-    const [watchlist, matches, status, recentEvents, scheduleSnapshot, hotEspnTest] = await Promise.all([
+    const [watchlist, matches, status, recentEvents, scheduleSnapshot, hotEspnTest, hotMatchTest] = await Promise.all([
       this.state.storage.get('watchlist'),
       this.state.storage.get('matches'),
       this.state.storage.get('status'),
       this.state.storage.get('recentEvents'),
       this.state.storage.get('scheduleSnapshot'),
-      this.state.storage.get('hotEspnTest')
+      this.state.storage.get('hotEspnTest'),
+      this.state.storage.get('hotMatchTest')
     ]);
     return {
       watchlist: watchlist && typeof watchlist === 'object' ? watchlist : {},
@@ -320,7 +322,8 @@ export class SportsMonitor {
       status: status && typeof status === 'object' ? status : {},
       recentEvents: Array.isArray(recentEvents) ? recentEvents : [],
       scheduleSnapshot: scheduleSnapshot && typeof scheduleSnapshot === 'object' ? scheduleSnapshot : {},
-      hotEspnTest: hotEspnTest && typeof hotEspnTest === 'object' ? hotEspnTest : {}
+      hotEspnTest: hotEspnTest && typeof hotEspnTest === 'object' ? hotEspnTest : {},
+      hotMatchTest: hotMatchTest && typeof hotMatchTest === 'object' ? hotMatchTest : {}
     };
   }
 
@@ -393,6 +396,104 @@ export class SportsMonitor {
     }
   }
 
+
+  async armHotMatchTest(installationId) {
+    const now = Date.now();
+    const result = await fetchEspnTechnicalScoreboard(HOT_MATCH_TEST_CONSTANTS.LEAGUE, HOT_MATCH_TEST_CONSTANTS.DATE_KEY);
+    const raw = hotMatchTargetEvent(result.data?.events || []);
+    if (!raw) throw new Error(`ESPN não encontrou ${HOT_MATCH_TEST_CONSTANTS.MATCHUP} no scoreboard da Coppa Italia`);
+    const observation = normalizeScoreboardEvent(raw, HOT_MATCH_TEST_CONSTANTS.LEAGUE, {
+      eventId: text(raw?.id), league: HOT_MATCH_TEST_CONSTANTS.LEAGUE,
+      competitionKey: 'technical_hot_match_test', competitionName: 'Coppa Italia · teste ESPN real',
+      home: { name: HOT_MATCH_TEST_CONSTANTS.HOME }, away: { name: HOT_MATCH_TEST_CONSTANTS.AWAY }
+    });
+    const kickoffMs = Date.parse(observation.kickoff || '');
+    if (!Number.isFinite(kickoffMs)) throw new Error('ESPN não informou horário válido para o jogo técnico');
+    if (observation.state === 'post' || kickoffMs < now - 15 * 60_000) throw new Error('o jogo técnico já terminou ou a janela de teste foi perdida');
+    const initialized = applyObservation(initialMatchState(observation), observation, [], now).match;
+    const hotMatchTest = {
+      version: HOT_MATCH_TEST_CONSTANTS.VERSION,
+      state: 'armed',
+      installationId: text(installationId),
+      eventId: text(observation.eventId),
+      kickoff: text(observation.kickoff),
+      armedAt: now,
+      expiresAt: kickoffMs + HOT_MATCH_TEST_CONSTANTS.POST_MS,
+      lastCheckAt: now,
+      lastSource: text(result.selectedSources?.[observation.eventId] || result.source),
+      lastError: '',
+      prematchSentAt: 0,
+      emittedCount: 0,
+      match: initialized
+    };
+    await this.state.storage.put('hotMatchTest', hotMatchTest);
+    const delay = hotMatchNextPollDelay(hotMatchTest, now);
+    const currentAlarm = await this.state.storage.getAlarm();
+    const desired = now + delay;
+    if (currentAlarm == null || currentAlarm > desired + 2_000) await this.state.storage.setAlarm(desired);
+    return publicHotMatchTest(hotMatchTest);
+  }
+
+  async pollHotMatchTest() {
+    const current = await this.state.storage.get('hotMatchTest') || {};
+    if (current?.state !== 'armed') return publicHotMatchTest(current);
+    const now = Date.now();
+    if (now >= num(current.expiresAt, 0)) {
+      const expired = { ...current, state: 'expired', lastCheckAt: now };
+      await this.state.storage.put('hotMatchTest', expired);
+      return publicHotMatchTest(expired);
+    }
+    try {
+      const scoreboard = await fetchEspnTechnicalScoreboard(HOT_MATCH_TEST_CONSTANTS.LEAGUE, HOT_MATCH_TEST_CONSTANTS.DATE_KEY);
+      const raw = (scoreboard.data?.events || []).find((event) => text(event?.id) === text(current.eventId)) || hotMatchTargetEvent(scoreboard.data?.events || []);
+      if (!raw) throw new Error('jogo técnico sumiu do scoreboard ESPN');
+      let observation = normalizeScoreboardEvent(raw, HOT_MATCH_TEST_CONSTANTS.LEAGUE, {
+        eventId: text(current.eventId), league: HOT_MATCH_TEST_CONSTANTS.LEAGUE,
+        competitionKey: 'technical_hot_match_test', competitionName: 'Coppa Italia · teste ESPN real',
+        home: { name: HOT_MATCH_TEST_CONSTANTS.HOME }, away: { name: HOT_MATCH_TEST_CONSTANTS.AWAY }
+      });
+      let next = { ...current, kickoff: text(observation.kickoff || current.kickoff), lastCheckAt: now,
+        lastSource: text(scoreboard.selectedSources?.[observation.eventId] || scoreboard.source), lastError: '' };
+
+      if (!num(next.prematchSentAt, 0) && hotMatchPrematchDue(next.kickoff, now)) {
+        await this.recordEvent(buildHotMatchPrematchEvent(next, observation, now));
+        next.prematchSentAt = now;
+        next.emittedCount = num(next.emittedCount, 0) + 1;
+      }
+
+      let plays = null;
+      const previousMatch = next.match || initialMatchState(observation);
+      const scoreChanged = num(previousMatch?.home?.score, 0) + num(previousMatch?.away?.score, 0)
+        !== num(observation?.home?.score, 0) + num(observation?.away?.score, 0);
+      if (observation.state === 'in' || previousMatch?.state === 'in' || scoreChanged) {
+        try {
+          const live = await fetchEspnTechnicalLivePlays(HOT_MATCH_TEST_CONSTANTS.LEAGUE, observation.eventId);
+          plays = extractScoringPlays(live.data, observation);
+          observation = promoteObservationFromPlays(observation, plays);
+          next.lastSource = text(live.source);
+        } catch (error) {
+          next.lastError = `play-by-play: ${text(error?.message || error)}`.slice(0, 500);
+        }
+      }
+
+      const applied = applyObservation(previousMatch, observation, plays, now);
+      const allowed = new Set(['goal', 'goal_overturned']);
+      for (const event of applied.emitted) {
+        if (!allowed.has(text(event?.type))) continue;
+        await this.recordEvent(markHotMatchTechnicalEvent(event, next));
+        next.emittedCount = num(next.emittedCount, 0) + 1;
+      }
+      next.match = applied.match;
+      if (observation.state === 'post') next.state = 'completed';
+      await this.state.storage.put('hotMatchTest', next);
+      return publicHotMatchTest(next);
+    } catch (error) {
+      const failed = { ...current, lastCheckAt: now, lastError: text(error?.message || error).slice(0, 500) };
+      await this.state.storage.put('hotMatchTest', failed);
+      return publicHotMatchTest(failed);
+    }
+  }
+
   async bootstrap() {
     const now = Date.now();
     const current = await this.readState();
@@ -451,9 +552,14 @@ export class SportsMonitor {
     const now = Date.now();
     const fast = Object.values(snapshot.matches).some((match) => matchNeedsFastPolling(match, now));
     const hot = snapshot.hotEspnTest?.state === 'armed' && num(snapshot.hotEspnTest?.expiresAt, 0) > now;
-    if (fast || hot) {
+    const hotMatch = snapshot.hotMatchTest?.state === 'armed' && num(snapshot.hotMatchTest?.expiresAt, 0) > now;
+    if (fast || hot || hotMatch) {
       const currentAlarm = await this.state.storage.getAlarm();
-      const desired = now + (hot ? Math.min(FAST_POLL_MS, HOT_ESPN_TEST_CONSTANTS.POLL_MS) : FAST_POLL_MS);
+      const delays = [];
+      if (fast) delays.push(FAST_POLL_MS);
+      if (hot) delays.push(HOT_ESPN_TEST_CONSTANTS.POLL_MS);
+      if (hotMatch) delays.push(hotMatchNextPollDelay(snapshot.hotMatchTest, now));
+      const desired = now + Math.min(...delays);
       if (currentAlarm == null || currentAlarm > desired + 5_000) await this.state.storage.setAlarm(desired);
     }
   }
@@ -686,12 +792,14 @@ export class SportsMonitor {
       summaryGoalCounts: snapshot.status.summaryGoalCounts && typeof snapshot.status.summaryGoalCounts === 'object' ? snapshot.status.summaryGoalCounts : {},
       sourceAttempts: snapshot.status.sourceAttempts && typeof snapshot.status.sourceAttempts === 'object' ? snapshot.status.sourceAttempts : {},
       hotEspnTest: publicHotEspnTest(snapshot.hotEspnTest),
+      hotMatchTest: publicHotMatchTest(snapshot.hotMatchTest),
       matches
     };
   }
 
   async alarm() {
     await this.pollHotEspnTest();
+    await this.pollHotMatchTest();
     await this.pollOnce();
     await this.ensureNextAlarm();
   }
@@ -720,6 +828,20 @@ export class SportsMonitor {
     if (url.pathname === '/hot-test/status' && request.method === 'GET') {
       const hotEspnTest = await this.state.storage.get('hotEspnTest') || {};
       return Response.json({ ok: true, hotEspnTest: publicHotEspnTest(hotEspnTest) });
+    }
+    if (url.pathname === '/hot-match-test/arm' && request.method === 'POST') {
+      const body = await request.json();
+      const installationId = text(body?.installationId);
+      if (!installationId) return Response.json({ ok: false, error: 'invalid_installation' }, { status: 400 });
+      try {
+        return Response.json({ ok: true, hotMatchTest: await this.armHotMatchTest(installationId) }, { status: 202 });
+      } catch (error) {
+        return Response.json({ ok: false, error: 'espn_hot_match_test_unavailable', detail: text(error?.message || error) }, { status: 503 });
+      }
+    }
+    if (url.pathname === '/hot-match-test/status' && request.method === 'GET') {
+      const hotMatchTest = await this.state.storage.get('hotMatchTest') || {};
+      return Response.json({ ok: true, hotMatchTest: publicHotMatchTest(hotMatchTest) });
     }
     if (url.pathname === '/recent' && request.method === 'GET') {
       const recentEvents = await this.state.storage.get('recentEvents') || [];

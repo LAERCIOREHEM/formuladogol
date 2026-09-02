@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fetchEspnLivePlays, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, probeEspnSources, summaryGoalCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard, probeEspnSources, summaryGoalCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
 
 const event = {
   id: '401909112',
@@ -183,6 +183,50 @@ assert.equal(summaryGoalCount({ plays: [{ scoringPlay: true, text: 'Goal' }, { t
   const result = await fetchEspnTechnicalHotTestPlays('401911806', fakeFetch);
   assert.equal(result.source, 'espn_core_plays');
   assert.equal(result.data.plays.length, 2);
+}
+
+
+// 6-H2: scoreboard técnico da Coppa Italia pode ser consultado sem ampliar as ligas de produção.
+{
+  const target = {
+    id: '999001', date: '2026-09-02T16:00:00Z',
+    status: { type: { state: 'pre', completed: false } },
+    competitions: [{ competitors: [
+      { homeAway: 'home', score: '0', team: { id: '118', displayName: 'Udinese' } },
+      { homeAway: 'away', score: '0', team: { id: '175', displayName: 'Venezia' } }
+    ] }]
+  };
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/ita.coppa_italia/scoreboard')) return Response.json({ content: { events: [target] } });
+    if (href.includes('/core/soccer/scoreboard')) return Response.json({ content: { events: [target] } });
+    if (href.includes('site.web.api.espn.com')) return Response.json({ events: [target] });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnTechnicalScoreboard('ita.coppa_italia', '20260902', fakeFetch);
+  assert.equal(result.data.events[0].id, '999001');
+  assert.equal(result.source, 'espn_freshest_merge');
+}
+
+// 6-H2: play-by-play técnico usa a mesma seleção pela fonte mais avançada do R5.
+{
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/ita.coppa_italia/playbyplay')) {
+      return Response.json({ gamepackageJSON: { plays: [{ id: 'u1', scoringPlay: true, text: 'Goal', homeScore: 1, awayScore: 0 }] } });
+    }
+    if (href.includes('/core/soccer/playbyplay')) {
+      return Response.json({ gamepackageJSON: { plays: [
+        { id: 'u1', scoringPlay: true, text: 'Goal', homeScore: 1, awayScore: 0 },
+        { id: 'v1', scoringPlay: true, text: 'Goal', homeScore: 1, awayScore: 1 }
+      ] } });
+    }
+    if (href.includes('/leagues/ita.coppa_italia/')) return new Response('blocked', { status: 404, headers: { 'content-type': 'text/plain' } });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnTechnicalLivePlays('ita.coppa_italia', '999001', fakeFetch);
+  assert.equal(result.source, 'espn_cdn_soccer_playbyplay');
+  assert.equal(summaryGoalCount(result.data), 2);
 }
 
 console.log('espn-source: PASS');

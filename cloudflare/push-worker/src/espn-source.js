@@ -394,6 +394,83 @@ export async function fetchEspnLivePlays(league, eventId, fetchImpl = globalThis
   return { ...fallback, attempts: [...attempts, ...(fallback.attempts || [])] };
 }
 
+export async function fetchEspnTechnicalScoreboard(league, dates, fetchImpl = globalThis.fetch) {
+  const qLeague = text(league);
+  const qDates = text(dates);
+  if (!qLeague || !qDates) throw new Error('liga/data técnica ausente');
+  const attempts = [];
+  const successful = [];
+  await Promise.all(scoreboardFreshCandidates(qLeague, qDates).map(async (candidate) => {
+    const startedAt = Date.now();
+    try {
+      const raw = await fetchJson(withBust(candidate.url), fetchImpl, LIVE_FETCH_TIMEOUT_MS);
+      const data = unwrapScoreboard(raw);
+      successful.push({ source: candidate.name, data });
+      attempts.push({ source: candidate.name, ok: true, durationMs: Date.now() - startedAt });
+    } catch (error) {
+      attempts.push({ source: candidate.name, ok: false, durationMs: Date.now() - startedAt, error: text(error?.message || error).slice(0, 240) });
+    }
+  }));
+  if (!successful.length) {
+    const fallback = await firstSuccessful(scoreboardCandidates(qLeague, qDates), unwrapScoreboard, fetchImpl);
+    return { ...fallback, selectedSources: {}, source: fallback.source };
+  }
+  const merged = new Map();
+  const selectedSources = {};
+  for (const result of successful) {
+    for (const event of result.data?.events || []) {
+      const id = eventIdOf(event);
+      if (!id) continue;
+      const current = merged.get(id);
+      if (fresherEvent(event, current)) {
+        merged.set(id, event);
+        selectedSources[id] = result.source;
+      }
+    }
+  }
+  return {
+    ok: true,
+    source: successful.length > 1 ? 'espn_freshest_merge' : successful[0].source,
+    sources: successful.map((item) => item.source),
+    selectedSources,
+    data: { events: [...merged.values()] },
+    attempts
+  };
+}
+
+export async function fetchEspnTechnicalLivePlays(league, eventId, fetchImpl = globalThis.fetch) {
+  const qLeague = text(league);
+  const qEvent = text(eventId);
+  if (!qLeague || !qEvent) throw new Error('liga/eventId técnico ausente');
+  const candidates = livePlayCandidates(qLeague, qEvent);
+  const attempts = [];
+  const successful = [];
+  await Promise.all(candidates.slice(0, 3).map(async (candidate) => {
+    const startedAt = Date.now();
+    try {
+      const raw = await fetchJson(withBust(candidate.url), fetchImpl, LIVE_FETCH_TIMEOUT_MS);
+      const data = (candidate.transform || unwrapSummary)(raw);
+      successful.push({ source: candidate.name, data });
+      attempts.push({ source: candidate.name, ok: true, durationMs: Date.now() - startedAt });
+    } catch (error) {
+      attempts.push({ source: candidate.name, ok: false, durationMs: Date.now() - startedAt, error: text(error?.message || error).slice(0, 240) });
+    }
+  }));
+  if (!successful.length) {
+    const error = new Error(attempts.map((item) => `${item.source}: ${item.error}`).join(' | ') || 'play-by-play técnico indisponível');
+    error.attempts = attempts;
+    throw error;
+  }
+  successful.sort((a, b) => {
+    const goalDiff = summaryGoalCount(b.data) - summaryGoalCount(a.data);
+    if (goalDiff) return goalDiff;
+    const ac = Array.isArray(a.data?.plays) ? a.data.plays.length : Array.isArray(a.data?.scoringPlays) ? a.data.scoringPlays.length : 0;
+    const bc = Array.isArray(b.data?.plays) ? b.data.plays.length : Array.isArray(b.data?.scoringPlays) ? b.data.scoringPlays.length : 0;
+    return bc - ac;
+  });
+  return { ok: true, source: successful[0].source, data: successful[0].data, attempts };
+}
+
 export async function fetchEspnTechnicalHotTestPlays(eventId, fetchImpl = globalThis.fetch) {
   const league = 'ita.coppa_italia';
   const qEvent = encodeURIComponent(text(eventId));

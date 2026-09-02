@@ -373,6 +373,45 @@ async function handleHotEspnTest(request, env) {
   }, response.status, { 'Cache-Control': 'no-store' });
 }
 
+
+async function handleHotMatchTest(request, env) {
+  const body = await readBody(request);
+  const installationId = cleanId(body.installationId);
+  if (!installationId) return json(request, { ok: false, error: 'invalid_installation' }, 400);
+  if (!(await rateLimit(request, env, installationId, 'hot-match-test'))) {
+    return json(request, { ok: false, error: 'rate_limited' }, 429);
+  }
+
+  const active = await env.DB.prepare(`
+    SELECT subscription_id FROM push_subscriptions
+    WHERE installation_id=? AND active=1
+    ORDER BY updated_at DESC LIMIT 1
+  `).bind(installationId).first();
+  if (!active) return json(request, { ok: false, error: 'subscription_not_found' }, 404);
+
+  const preferences = await getPreferences(env, installationId);
+  if (preferences.allGames !== true || preferences.prematch15 === false || preferences.goals === false) {
+    return json(request, {
+      ok: false,
+      error: 'not_eligible_for_hot_match_test',
+      detail: 'Neste aparelho, mantenha Todos os jogos, Jogo em 15 minutos e Gols habilitados para reproduzir o fluxo real.',
+      preferences
+    }, 409);
+  }
+
+  const response = await singletonMonitor(env).fetch('https://internal/hot-match-test/arm', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ installationId })
+  });
+  const result = await response.json();
+  return json(request, {
+    ...result,
+    hotMatchTestVersion: '6-H2',
+    note: 'Udinese × Venezia é apenas um observador técnico: não entra na agenda, Ao Vivo, jogos futuros ou qualquer página pública. O horário e os gols são lidos da ESPN.'
+  }, response.status, { 'Cache-Control': 'no-store' });
+}
+
 async function handleQueueTest(request, env) {
   const body = await readBody(request);
   const installationId = cleanId(body.installationId);
@@ -490,6 +529,7 @@ export default {
       if (url.pathname === '/v1/test' && request.method === 'POST') return handleTest(request, env);
       if (url.pathname === '/v1/segmented-team-test' && request.method === 'POST') return handleSegmentedTeamTest(request, env);
       if (url.pathname === '/v1/hot-espn-test' && request.method === 'POST') return handleHotEspnTest(request, env);
+      if (url.pathname === '/v1/hot-match-test' && request.method === 'POST') return handleHotMatchTest(request, env);
       if (url.pathname === '/v1/queue-test' && request.method === 'POST') return handleQueueTest(request, env);
       if (url.pathname === '/v1/dispatch/status' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'dispatch-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);

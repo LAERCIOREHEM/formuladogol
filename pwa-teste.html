@@ -33,6 +33,7 @@
       <section class="pwa-test-card"><h2>Cancelar Web Push</h2><button class="pwa-test-button" id="btn-unsubscribe" type="button">Cancelar inscrição deste aparelho</button></section>
       <section class="pwa-test-card"><h2>Motor esportivo</h2><button class="pwa-test-button" id="btn-monitor" type="button">Atualizar status do monitor</button></section>
       <section class="pwa-test-card"><h2>Fila real</h2><button class="pwa-test-button" id="btn-queue" type="button">Testar entrega pela Queue</button></section>
+      <section class="pwa-test-card"><h2>Teste quente — jogo 13h</h2><button class="pwa-test-button" id="btn-hot-match" type="button">Armar Udinese × Venezia</button><p class="pwa-test-note"><strong>Udinese × Venezia · 13h (Brasília)</strong>. Teste técnico invisível ao site: a ESPN fornece o horário, o alerta de 15 minutos e, depois, os gols reais. Usa o mesmo motor R5 + anti-VAR R4 + Queue. Só este aparelho recebe.</p></section>
       <section class="pwa-test-card"><h2>Teste quente ESPN</h2><button class="pwa-test-button" id="btn-hot-espn" type="button">Armar próxima jogada ESPN</button><p class="pwa-test-note">Sassuolo × Frosinone (ESPN 401911806). Não existe horário programado: cria um baseline agora e só dispara quando a ESPN acrescentar uma nova jogada real. Só este aparelho recebe.</p></section>
       <section class="pwa-test-card"><h2>Fan-out</h2><button class="pwa-test-button" id="btn-dispatch" type="button">Atualizar status da distribuição</button></section>
       <section class="pwa-test-card"><h2>Produção</h2><button class="pwa-test-button" id="btn-ops" type="button">Ver saúde completa do sistema</button></section>
@@ -46,7 +47,7 @@
   </main>
 
   <script src="/js/br-pwa.js?v=20260901-pwa-v1"></script>
-  <script src="/js/br-push.js?v=20260902-hot-espn-v1"></script>
+  <script src="/js/br-push.js?v=20260902-hot-match-v2"></script>
   <script>
     (function(){
       const out=document.getElementById('diagnostics');
@@ -64,6 +65,7 @@
       document.getElementById('btn-unsubscribe').addEventListener('click',async()=>{try{const ok=await window.FormulaDoGolPush.unsubscribe();await refresh(ok?'Inscrição Web Push cancelada.':'Este aparelho não tinha inscrição ativa.');}catch(e){await refresh('Falha ao cancelar: '+e.message);}});
       document.getElementById('btn-monitor').addEventListener('click',async()=>{try{const [status,recent]=await Promise.all([window.FormulaDoGolPush.monitorStatus(),window.FormulaDoGolPush.monitorEvents()]);await refresh('MOTOR ESPORTIVO\n'+JSON.stringify(status,null,2)+'\n\nEVENTOS CONFIRMADOS RECENTES\n'+JSON.stringify(recent.events||[],null,2));}catch(e){await refresh('Falha ao consultar motor esportivo: '+e.message);}});
       document.getElementById('btn-queue').addEventListener('click',async()=>{try{const result=await window.FormulaDoGolPush.sendQueueTest();await refresh('TESTE DA QUEUE ENFILEIRADO\n'+JSON.stringify(result,null,2)+'\n\nA notificação chegará pelo mesmo consumidor usado pelos gols reais.');}catch(e){await refresh('Falha no teste da Queue: '+e.message);}});
+      document.getElementById('btn-hot-match').addEventListener('click',async()=>{try{const result=await window.FormulaDoGolPush.armHotMatchTest();await refresh('TESTE QUENTE H2 ARMADO — UDINESE × VENEZIA\n'+JSON.stringify(result,null,2)+'\n\nPode fechar o site. Este jogo NÃO entra em Agenda/Ao Vivo. Às ~12h45 deve chegar o aviso de 15 minutos; depois, cada gol real detectado na ESPN passa pelo motor R5, anti-VAR R4, Queue e Web Push.');}catch(e){await refresh('Falha no teste quente H2: '+e.message+'\nConfirme Todos os jogos + Jogo em 15 minutos + Gols neste aparelho.');}});
       document.getElementById('btn-hot-espn').addEventListener('click',async()=>{try{const result=await window.FormulaDoGolPush.armHotEspnTest();await refresh('TESTE QUENTE ESPN ARMADO\n'+JSON.stringify(result,null,2)+'\n\nPode fechar o site. NÃO há timer: o disparo acontecerá somente quando o play-by-play da ESPN acrescentar uma jogada nova em Sassuolo × Frosinone.');}catch(e){await refresh('Falha no teste quente ESPN: '+e.message+'\nConfirme que este aparelho está com Jogo em 15 minutos e Todos os jogos habilitados.');}});
       document.getElementById('btn-dispatch').addEventListener('click',async()=>{try{const status=await window.FormulaDoGolPush.dispatchStatus();await refresh('DISTRIBUIÇÃO DE ALERTAS\n'+JSON.stringify(status,null,2));}catch(e){await refresh('Falha ao consultar distribuição: '+e.message);}});
       document.getElementById('btn-ops').addEventListener('click',async()=>{try{const status=await window.FormulaDoGolPush.opsStatus();await refresh('SAÚDE DE PRODUÇÃO — EXECUÇÃO 6\n'+JSON.stringify(status,null,2));}catch(e){await refresh('Falha ao consultar saúde operacional: '+e.message);}});
