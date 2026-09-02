@@ -5,7 +5,8 @@ import {
   matchNeedsFastPolling,
   needsSummary,
   normalizeScoreboardEvent,
-  summarizeMatch
+  summarizeMatch,
+  SPORTS_ENGINE_CONSTANTS
 } from './sports-engine.js';
 import { enqueueSportsEvent } from './push-dispatch.js';
 import { fetchEspnScoreboard, fetchEspnSummary } from './espn-source.js';
@@ -509,6 +510,7 @@ export class SportsMonitor {
     return {
       ok: true,
       engineVersion: 4,
+      overturnPolicyVersion: SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION,
       watchCount: Object.keys(snapshot.watchlist).length,
       matchCount: matches.length,
       activeGames: matches.filter((m) => m.state === 'in').length,

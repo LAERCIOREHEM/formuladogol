@@ -325,6 +325,32 @@ function goalCountFromScore(observation) {
   return num(observation?.home?.score, 0) + num(observation?.away?.score, 0);
 }
 
+function scoreStillContainsPlay(play, observation) {
+  const requiredHome = play?.homeScoreAfter == null ? null : num(play.homeScoreAfter, 0);
+  const requiredAway = play?.awayScoreAfter == null ? null : num(play.awayScoreAfter, 0);
+  if (requiredHome == null || requiredAway == null) return true;
+  const currentHome = num(observation?.home?.score, 0);
+  const currentAway = num(observation?.away?.score, 0);
+  return currentHome >= requiredHome && currentAway >= requiredAway;
+}
+
+function sameSemanticGoal(existing, incoming) {
+  if (!existing || !incoming || existing.shootout || incoming.shootout) return false;
+  const existingHome = existing.homeScoreAfter == null ? null : num(existing.homeScoreAfter, 0);
+  const existingAway = existing.awayScoreAfter == null ? null : num(existing.awayScoreAfter, 0);
+  const incomingHome = incoming.homeScoreAfter == null ? null : num(incoming.homeScoreAfter, 0);
+  const incomingAway = incoming.awayScoreAfter == null ? null : num(incoming.awayScoreAfter, 0);
+  if (existingHome == null || existingAway == null || incomingHome == null || incomingAway == null) return false;
+  if (existingHome !== incomingHome || existingAway !== incomingAway) return false;
+  const existingTeam = text(existing.teamId);
+  const incomingTeam = text(incoming.teamId);
+  if (existingTeam && incomingTeam && existingTeam !== incomingTeam) return false;
+  const existingSide = text(existing.side);
+  const incomingSide = text(incoming.side);
+  if (existingSide && incomingSide && existingSide !== incomingSide) return false;
+  return true;
+}
+
 export function needsSummary(match, observation) {
   const current = match || initialMatchState(observation);
   const scoreTotal = goalCountFromScore(observation);
@@ -540,30 +566,55 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
 
   if (!hasSummary) return { match, emitted, diagnostic: 'scoreboard_only' };
 
-  const summaryKeys = new Set(regulation.map((play) => play.key));
+  const observedKeys = new Set();
   const summaryConsistent = regulation.length === currentScoreTotal;
 
   for (const play of regulation) {
-    const existing = match.plays[play.key];
+    let storageKey = play.key;
+    let existing = match.plays[storageKey];
     if (!existing) {
-      match.plays[play.key] = { ...play, status: 'pending', firstSeenAt: num(match.lastScoreChangeAt, 0) || now, stableCount: 1, missingCount: 0 };
+      const semanticMatch = Object.entries(match.plays).find(([, candidate]) => sameSemanticGoal(candidate, play));
+      if (semanticMatch) {
+        [storageKey, existing] = semanticMatch;
+      }
+    }
+    observedKeys.add(storageKey);
+    if (!existing) {
+      match.plays[storageKey] = { ...play, status: 'pending', firstSeenAt: num(match.lastScoreChangeAt, 0) || now, stableCount: 1, missingCount: 0 };
       continue;
     }
-    Object.assign(existing, play);
+    const canonicalKey = existing.key || storageKey;
+    const preservedStatus = existing.status;
+    const firstSeenAt = existing.firstSeenAt;
+    const confirmedAt = existing.confirmedAt;
+    Object.assign(existing, play, { key: canonicalKey });
+    existing.firstSeenAt = firstSeenAt;
+    existing.confirmedAt = confirmedAt;
+    existing.status = preservedStatus;
     existing.missingCount = 0;
     if (existing.status === 'pending') existing.stableCount = num(existing.stableCount, 1) + 1;
+    if (existing.status === 'overturned' && scoreStillContainsPlay(existing, observation)) {
+      existing.status = 'confirmed';
+      existing.overturnedAt = 0;
+      existing.recoveredFromFalseOverturnAt = now;
+    }
   }
 
   for (const [key, play] of Object.entries(match.plays)) {
-    if (play.shootout || summaryKeys.has(key)) continue;
+    if (play.shootout || observedKeys.has(key)) continue;
     if (play.status === 'pending') {
-      if (currentScoreTotal < previousScoreTotal || summaryConsistent) {
+      if (!scoreStillContainsPlay(play, observation) || summaryConsistent) {
         play.status = 'rejected';
         play.rejectedAt = now;
       }
       continue;
     }
-    if (play.status === 'confirmed' && (currentScoreTotal < previousScoreTotal || num(play.missingCount, 0) > 0)) {
+    if (play.status === 'confirmed') {
+      const rollbackConfirmedByScore = !scoreStillContainsPlay(play, observation);
+      if (!rollbackConfirmedByScore) {
+        play.missingCount = 0;
+        continue;
+      }
       play.missingCount = num(play.missingCount, 0) + 1;
       if (play.missingCount >= OVERTURN_CONFIRM_OBSERVATIONS) {
         play.status = 'overturned';
@@ -624,5 +675,6 @@ export function summarizeMatch(match) {
 export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   GOAL_CONFIRM_MS,
   GOAL_CONFIRM_OBSERVATIONS,
-  OVERTURN_CONFIRM_OBSERVATIONS
+  OVERTURN_CONFIRM_OBSERVATIONS,
+  OVERTURN_POLICY_VERSION: '6-R4'
 });
