@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-01",
-  "executado_em": "2026-09-01T10:35:59-03:00",
+  "data_brt": "2026-09-02",
+  "executado_em": "2026-09-02T09:52:17-03:00",
   "status": "atencao",
-  "resumo": "A auditoria não identificou falhas críticas nos dados finais. Há avisos operacionais de fontes de transmissão e uma pendência futura elegível para complementação, mas sem evidência direta suficiente para propor correção.",
+  "resumo": "A base determinística está íntegra nos indicadores críticos. Há uma transmissão elegível para complementação, mas a pendência não traz identificação das equipes e não há evidência direta suficiente para propor correção.",
   "triagem": {
-    "data_hora_brt": "2026-09-01T10:35:59-03:00",
+    "data_hora_brt": "2026-09-02T09:52:17-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
@@ -22,7 +22,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 5.4
+        "ultimo_sucesso_horas": 4.6
       }
     },
     "pendencias": {
@@ -35,7 +35,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 32.9
+          "horas_ate_jogo": 9.6
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -670,8 +670,8 @@
     "tentativa_efetuada": true,
     "chamadas_nesta_execucao": 1,
     "limite_chamadas_dia": 1,
-    "falhas_consecutivas": 1,
-    "erro": "falha ao aplicar saída validada: Command '['/opt/hostedtoolcache/Python/3.12.14/x64/bin/python', 'scripts/gerar_analise_rodada.py', '--rodada', '25', '--editorial-json', '/tmp/tmp_o5mac2x.json', '--origem-editorial', 'openai:gpt-5.6-terra:auditoria-diaria']' returned non-zero exit status 1.",
+    "falhas_consecutivas": 0,
+    "erro": "",
     "web_habilitada": true,
     "web_searches": 0,
     "web_tool_calls": 0,
@@ -680,20 +680,20 @@
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "A auditoria não identificou falhas críticas nos dados finais. Há avisos operacionais de fontes de transmissão e uma pendência futura elegível para complementação, mas sem evidência direta suficiente para propor correção.",
+    "resumo": "A base determinística está íntegra nos indicadores críticos. Há uma transmissão elegível para complementação, mas a pendência não traz identificação das equipes e não há evidência direta suficiente para propor correção.",
     "problemas": [
       {
-        "categoria": "fonte",
+        "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Há falhas em fontes de transmissão sem perda crítica de cobertura. Os dados finais permanecem íntegros, portanto o aviso não caracteriza incidente crítico.",
-        "event_id": "",
-        "requer_intervencao": false
+        "mensagem": "A transmissão do evento permanece pendente de complementação. Como a pendência não identifica mandante ou visitante, não há base inequívoca para localizar uma fonte que declare diretamente os canais do jogo.",
+        "event_id": "401841006",
+        "requer_intervencao": true
       },
       {
-        "categoria": "transmissao",
+        "categoria": "fonte",
         "severidade": "info",
-        "mensagem": "A transmissão do evento permanece elegível para complementação, mas não há fonte direta e inequívoca no dossiê que permita propor canais sem risco de sobrescrever ou inferir informação.",
-        "event_id": "401841006",
+        "mensagem": "Falhas isoladas em fontes de transmissão não afetaram a cobertura crítica final, conforme os indicadores determinísticos.",
+        "event_id": "",
         "requer_intervencao": false
       }
     ],
@@ -701,29 +701,28 @@
     "correcoes_transmissao": [],
     "melhores_momentos_pendentes": [],
     "editorial_rodada": {
-      "titulo": "Flamengo assume a dianteira nas projeções do título após vitória no clássico",
-      "linha_fina": "A rodada reposicionou a disputa pelo Brasileirão: o Flamengo venceu com autoridade, enquanto o Palmeiras empatou fora de casa e viu a condição de favorito mudar de mãos.",
+      "titulo": "Flamengo vira favorito ao título e aperta a disputa com o Palmeiras",
+      "linha_fina": "A goleada no clássico muda o comando das projeções do Brasileirão, enquanto o líder empata fora de casa e vê a vantagem diminuir.",
       "secoes": [
         {
-          "titulo": "A disputa pelo título muda de referência",
+          "titulo": "A mudança no topo das projeções",
           "paragrafos": [
-            "O Brasileirão saiu da rodada com uma mudança clara na corrida pelo título. O Flamengo venceu o Botafogo em um clássico de placar elástico e transformou o resultado em avanço decisivo nas projeções. O Palmeiras, que começou a jornada na liderança e carregava a maior probabilidade de conquista, empatou com o Mirassol. A diferença na resposta dos dois principais concorrentes foi suficiente para inverter o favoritismo estimado, ainda que a tabela preserve o time paulista no primeiro lugar.",
-            "A rodada não encerra a disputa, mas altera o ponto de partida para a sequência do campeonato. O Flamengo reduziu a distância em campo e elevou sua perspectiva depois de somar uma vitória expressiva. O Palmeiras acrescentou apenas um ponto e sofreu a maior queda entre os candidatos mais próximos ao troféu. Em uma competição equilibrada na parte alta, a troca de posição nas projeções evidencia que cada resultado passa a pesar mais sobre o cenário final.",
-            "O Athletico-PR também deixou pontos pelo caminho ao empatar com o Fluminense, permanecendo entre os primeiros colocados, mas com redução em sua projeção de título. O Fluminense, por sua vez, valorizou o ponto conquistado fora de casa e reforçou sua condição na faixa que aponta para a Libertadores. A parte superior da tabela continua concentrada, porém a rodada estabeleceu o Flamengo como a equipe que mais aproveitou a oportunidade entre os concorrentes diretos."
+            "A rodada colocou uma nova leitura sobre a corrida pelo título do Brasileirão. O Palmeiras segue na liderança da classificação, mas o empate com o Mirassol reduziu sua força nas projeções. Ao mesmo tempo, o Flamengo transformou o clássico em resultado de impacto, venceu o Botafogo por três a zero e assumiu a condição de favorito ao campeonato no recorte calculado depois dos jogos. A troca no topo das probabilidades é o fato mais relevante de uma rodada que manteve o primeiro lugar da tabela, mas alterou o equilíbrio da disputa.",
+            "A aproximação acontece também porque o Flamengo ainda tinha uma partida a menos antes de entrar em campo. A vitória o levou a uma distância curta do Palmeiras, preservando margem concreta para encurtar a diferença na classificação. O líder somou fora de casa, o que evita uma perda maior de terreno, mas deixou de ampliar sua pontuação num fim de semana em que o rival direto teve atuação decisiva no placar. Entre a estabilidade da posição palmeirense e o avanço flamenguista, as projeções passaram a enxergar vantagem rubro-negra na briga principal."
           ]
         },
         {
-          "titulo": "A briga continental ganha novos participantes",
+          "titulo": "O pelotão de cima ganha novos contornos",
           "paragrafos": [
-            "A vitória do Bahia sobre o Internacional teve efeito importante na zona de classificação continental. O clube subiu posições, ampliou de forma marcante sua projeção para a Libertadores e se aproximou do grupo que sustenta essa disputa. Atlético-MG e Coritiba também avançaram com triunfos que elevaram suas perspectivas, enquanto o São Paulo ganhou terreno depois de superar o Bragantino. São resultados que comprimem a luta por vagas e aumentam o custo de tropeços para quem vinha mais confortável.",
-            "Na outra direção, Cruzeiro, Bragantino, Corinthians e Santos tiveram perda de projeção para a Libertadores. O Cruzeiro caiu diante do Vasco da Gama e perdeu posição na tabela. O Bragantino foi superado pelo São Paulo, enquanto Corinthians e Santos viveram um confronto de impacto duplo: a vitória santista trouxe alívio maior na luta contra a queda, mas não evitou redução na expectativa continental. Para o Corinthians, a derrota em casa aprofundou a distância em relação à faixa mais alta e elevou a preocupação com a metade inferior."
+            "Atrás da dupla, a rodada também redesenhou o bloco que disputa presença na Libertadores. O Athletico Paranaense empatou com o Fluminense em jogo movimentado e manteve a terceira colocação, embora tenha perdido espaço na projeção de título. O Fluminense sustentou seu lugar entre os primeiros e melhorou sua perspectiva continental. O Bahia venceu o Internacional em confronto de muitos gols, subiu na tabela e registrou uma das maiores altas na projeção de Libertadores, aproximando-se de forma mais consistente do grupo de classificação.",
+            "O Cruzeiro viveu o movimento contrário. A derrota para o Vasco da Gama custou posição na tabela e provocou queda relevante na probabilidade de Libertadores. Também perderam terreno nesse recorte Bragantino, derrotado pelo São Paulo, e Corinthians, superado pelo Santos. Já Atlético Mineiro e Coritiba aproveitaram vitórias para avançar na zona intermediária e melhorar suas perspectivas continentais. A rodada, portanto, não se limitou ao duelo entre os candidatos ao título: ela tornou mais acirrada a disputa pelas vagas mais altas do campeonato."
           ]
         },
         {
-          "titulo": "A zona de rebaixamento segue aberta",
+          "titulo": "A luta contra o rebaixamento permanece aberta",
           "paragrafos": [
-            "O resultado mais expressivo na parte de baixo foi a vitória do Vasco da Gama sobre o Cruzeiro. O time deixou a zona de rebaixamento e reduziu de maneira relevante seu risco projetado, embora a situação ainda exija atenção. Santos e Grêmio também encontraram vitórias que diminuíram a pressão, enquanto o São Paulo aproveitou seu resultado para ganhar margem. A reação desses clubes tornou a disputa pela permanência ainda mais móvel.",
-            "No sentido contrário, Remo, Internacional, Vitória, Mirassol e Corinthians terminaram a rodada com risco maior de rebaixamento. O Remo sofreu derrota em casa para o Coritiba e passou a conviver com o cenário mais delicado entre os times que perderam terreno. O Internacional caiu diante do Bahia e entrou na zona de rebaixamento. A Chapecoense segue na última posição e com quadro extremamente adverso. O campeonato entra na próxima etapa com a liderança ainda paulista na tabela, o Flamengo à frente nas projeções do título e uma luta intensa tanto pela Libertadores quanto pela permanência."
+            "Na parte inferior, os resultados produziram mudanças expressivas sem encerrar nenhuma disputa. O Vasco da Gama venceu o Cruzeiro e deixou a zona de rebaixamento, reduzindo de maneira importante seu risco projetado. O Santos também respirou ao vencer o Corinthians fora de casa, enquanto o Grêmio superou a Chapecoense e ganhou fôlego. São Paulo e Coritiba tiveram avanços que ajudam a afastar o risco, ainda que suas campanhas continuem inseridas em uma faixa de tabela marcada por aproximações.",
+            "O cenário foi mais duro para Remo e Internacional. O Remo perdeu em casa para o Coritiba e passou a carregar o maior aumento de risco da rodada entre os clubes ameaçados. O Internacional caiu diante do Bahia, entrou na zona de rebaixamento e viu sua projeção piorar. Vitória, Mirassol e Corinthians também saíram pressionados por derrotas ou resultados insuficientes. A Chapecoense permaneceu na última posição e com risco muito elevado. Com o campeonato avançando, a rodada deixou uma mensagem clara: a disputa pelo título ganhou um novo favorito, mas a batalha pela permanência segue capaz de mudar a cada resultado."
           ]
         }
       ]
@@ -736,7 +735,9 @@
     "rejeitadas": [],
     "publicos_aplicados": [],
     "transmissoes_aplicadas": [],
-    "editoriais_aplicados": []
+    "editoriais_aplicados": [
+      "rodada-25"
+    ]
   },
   "criticos_nao_resolvidos": [],
   "alerta": {
@@ -1071,6 +1072,21 @@
       "publicos_aplicados": 0,
       "transmissoes_aplicadas": 0,
       "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-02",
+      "executado_em": "2026-09-02T09:52:17-03:00",
+      "status": "atencao",
+      "resumo": "A base determinística está íntegra nos indicadores críticos. Há uma transmissão elegível para complementação, mas a pendência não traz identificação das equipes e não há evidência direta suficiente para propor correção.",
+      "chamadas_openai": 1,
+      "web_searches": 0,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [
+        "rodada-25"
+      ],
       "criticos": [],
       "email_enviado": false
     }
