@@ -336,6 +336,43 @@ async function handleSegmentedTeamTest(request, env) {
   }, 202);
 }
 
+async function handleHotEspnTest(request, env) {
+  const body = await readBody(request);
+  const installationId = cleanId(body.installationId);
+  if (!installationId) return json(request, { ok: false, error: 'invalid_installation' }, 400);
+  if (!(await rateLimit(request, env, installationId, 'hot-espn-test'))) {
+    return json(request, { ok: false, error: 'rate_limited' }, 429);
+  }
+
+  const active = await env.DB.prepare(`
+    SELECT subscription_id FROM push_subscriptions
+    WHERE installation_id=? AND active=1
+    ORDER BY updated_at DESC LIMIT 1
+  `).bind(installationId).first();
+  if (!active) return json(request, { ok: false, error: 'subscription_not_found' }, 404);
+
+  const preferences = await getPreferences(env, installationId);
+  if (preferences.prematch15 === false || preferences.allGames !== true) {
+    return json(request, {
+      ok: false, error: 'not_eligible_for_hot_espn_test',
+      detail: 'Neste aparelho, mantenha Jogo em 15 minutos e Todos os jogos habilitados para reproduzir a seleção real do fan-out.',
+      preferences
+    }, 409);
+  }
+
+  const response = await singletonMonitor(env).fetch('https://internal/hot-test/arm', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ installationId })
+  });
+  const result = await response.json();
+  return json(request, {
+    ...result,
+    hotEspnTestVersion: '6-H1',
+    note: 'Sem timer de disparo: a notificação só é criada quando o play-by-play da ESPN acrescentar uma nova jogada após o baseline.'
+  }, response.status, { 'Cache-Control': 'no-store' });
+}
+
 async function handleQueueTest(request, env) {
   const body = await readBody(request);
   const installationId = cleanId(body.installationId);
@@ -452,6 +489,7 @@ export default {
       if (url.pathname === '/v1/preferences' && request.method === 'PUT') return handlePutPreferences(request, env);
       if (url.pathname === '/v1/test' && request.method === 'POST') return handleTest(request, env);
       if (url.pathname === '/v1/segmented-team-test' && request.method === 'POST') return handleSegmentedTeamTest(request, env);
+      if (url.pathname === '/v1/hot-espn-test' && request.method === 'POST') return handleHotEspnTest(request, env);
       if (url.pathname === '/v1/queue-test' && request.method === 'POST') return handleQueueTest(request, env);
       if (url.pathname === '/v1/dispatch/status' && request.method === 'GET') {
         if (!(await allowStatusRead(request, env, 'dispatch-status'))) return json(request, { ok: false, error: 'rate_limited' }, 429);

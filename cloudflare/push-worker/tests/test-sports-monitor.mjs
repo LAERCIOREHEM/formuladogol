@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { SportsMonitor } from '../src/sports-monitor.js';
+import { buildHotEspnTestEvent, detectHotEspnMutation, hotEspnSnapshot } from '../src/hot-espn-test.js';
 
 class FakeStorage {
   constructor() { this.map = new Map(); this.alarm = null; }
@@ -124,7 +125,35 @@ try {
   await monitor.alarm();
   assert.equal(db.events.size, 1, 'poll posterior não duplica o evento');
 
-  console.log('sports-monitor: PASS');
+  
+
+// 6-H1: baseline não dispara; uma nova jogada real adicionada pela ESPN dispara uma única mutação.
+{
+  const baseline = hotEspnSnapshot({ plays: [
+    { id: 'p1', text: 'Shot saved', clock: { displayValue: "45'+1'" } },
+    { id: 'p2', text: 'End of first half', clock: { displayValue: "45'+3'" } }
+  ] });
+  const same = hotEspnSnapshot({ plays: [
+    { id: 'p1', text: 'Shot saved', clock: { displayValue: "45'+1'" } },
+    { id: 'p2', text: 'End of first half', clock: { displayValue: "45'+3'" } }
+  ] });
+  assert.equal(detectHotEspnMutation(baseline, same), null, 'baseline idêntico não pode disparar');
+
+  const changed = hotEspnSnapshot({ plays: [
+    { id: 'p1', text: 'Shot saved', clock: { displayValue: "45'+1'" } },
+    { id: 'p2', text: 'End of first half', clock: { displayValue: "45'+3'" } },
+    { id: 'p3', text: 'Second Half begins', clock: { displayValue: "46'" } }
+  ] });
+  const mutation = detectHotEspnMutation(baseline, changed);
+  assert.equal(mutation.key, 'p3');
+  assert.equal(mutation.clock, "46'");
+  const event = buildHotEspnTestEvent({ installationId: 'install-test' }, mutation, 'espn_core_plays', now);
+  assert.equal(event.type, 'prematch_15');
+  assert.equal(event.testInstallationId, 'install-test');
+  assert.match(event.notificationDraft.title, /ESPN REAL/);
+}
+
+console.log('sports-monitor: PASS');
 } finally {
   Date.now = realNow;
   globalThis.fetch = realFetch;

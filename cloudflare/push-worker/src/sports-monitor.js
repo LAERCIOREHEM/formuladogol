@@ -9,7 +9,8 @@ import {
   SPORTS_ENGINE_CONSTANTS
 } from './sports-engine.js';
 import { enqueueSportsEvent } from './push-dispatch.js';
-import { fetchEspnLivePlays, fetchEspnScoreboardFresh, fetchEspnSummary } from './espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays } from './espn-source.js';
+import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, hotEspnSnapshot, publicHotEspnTest } from './hot-espn-test.js';
 
 const AGENDA_URL = 'https://formuladogol.com.br/dados-br/agenda-clubes-br.json';
 const ALLOWED_LEAGUES = new Set(['bra.1', 'bra.copa_do_brazil', 'conmebol.libertadores', 'conmebol.sudamericana']);
@@ -305,19 +306,21 @@ export class SportsMonitor {
   }
 
   async readState() {
-    const [watchlist, matches, status, recentEvents, scheduleSnapshot] = await Promise.all([
+    const [watchlist, matches, status, recentEvents, scheduleSnapshot, hotEspnTest] = await Promise.all([
       this.state.storage.get('watchlist'),
       this.state.storage.get('matches'),
       this.state.storage.get('status'),
       this.state.storage.get('recentEvents'),
-      this.state.storage.get('scheduleSnapshot')
+      this.state.storage.get('scheduleSnapshot'),
+      this.state.storage.get('hotEspnTest')
     ]);
     return {
       watchlist: watchlist && typeof watchlist === 'object' ? watchlist : {},
       matches: matches && typeof matches === 'object' ? matches : {},
       status: status && typeof status === 'object' ? status : {},
       recentEvents: Array.isArray(recentEvents) ? recentEvents : [],
-      scheduleSnapshot: scheduleSnapshot && typeof scheduleSnapshot === 'object' ? scheduleSnapshot : {}
+      scheduleSnapshot: scheduleSnapshot && typeof scheduleSnapshot === 'object' ? scheduleSnapshot : {},
+      hotEspnTest: hotEspnTest && typeof hotEspnTest === 'object' ? hotEspnTest : {}
     };
   }
 
@@ -326,6 +329,68 @@ export class SportsMonitor {
     const next = { ...current, ...patch };
     await this.state.storage.put('status', next);
     return next;
+  }
+
+  async armHotEspnTest(installationId) {
+    const now = Date.now();
+    const result = await fetchEspnTechnicalHotTestPlays(HOT_ESPN_TEST_CONSTANTS.EVENT_ID);
+    const baseline = hotEspnSnapshot(result.data);
+    const hotEspnTest = {
+      version: HOT_ESPN_TEST_CONSTANTS.VERSION,
+      state: 'armed',
+      installationId: text(installationId),
+      armedAt: now,
+      expiresAt: now + HOT_ESPN_TEST_CONSTANTS.TTL_MS,
+      baselineKeys: baseline.keys,
+      baselinePlayCount: baseline.count,
+      currentPlayCount: baseline.count,
+      lastCheckAt: now,
+      lastSource: text(result.source),
+      lastError: '',
+      firedAt: 0,
+      firedPlay: null
+    };
+    await this.state.storage.put('hotEspnTest', hotEspnTest);
+    const currentAlarm = await this.state.storage.getAlarm();
+    const desired = now + HOT_ESPN_TEST_CONSTANTS.POLL_MS;
+    if (currentAlarm == null || currentAlarm > desired + 2_000) await this.state.storage.setAlarm(desired);
+    return publicHotEspnTest(hotEspnTest);
+  }
+
+  async pollHotEspnTest() {
+    const current = await this.state.storage.get('hotEspnTest') || {};
+    if (current?.state !== 'armed') return publicHotEspnTest(current);
+    const now = Date.now();
+    if (now >= num(current.expiresAt, 0)) {
+      const expired = { ...current, state: 'expired', lastCheckAt: now };
+      await this.state.storage.put('hotEspnTest', expired);
+      return publicHotEspnTest(expired);
+    }
+    try {
+      const result = await fetchEspnTechnicalHotTestPlays(HOT_ESPN_TEST_CONSTANTS.EVENT_ID);
+      const snapshot = hotEspnSnapshot(result.data);
+      const baseline = { count: num(current.baselinePlayCount, 0), keys: Array.isArray(current.baselineKeys) ? current.baselineKeys : [] };
+      const mutation = detectHotEspnMutation(baseline, snapshot);
+      if (mutation) {
+        const event = buildHotEspnTestEvent(current, mutation, result.source, now);
+        await this.recordEvent(event);
+        const fired = {
+          ...current, state: 'fired', currentPlayCount: snapshot.count, lastCheckAt: now,
+          lastSource: text(result.source), lastError: '', firedAt: now, firedPlay: mutation
+        };
+        await this.state.storage.put('hotEspnTest', fired);
+        return publicHotEspnTest(fired);
+      }
+      const updated = {
+        ...current, currentPlayCount: snapshot.count, lastCheckAt: now, lastSource: text(result.source), lastError: ''
+      };
+      await this.state.storage.put('hotEspnTest', updated);
+      return publicHotEspnTest(updated);
+    } catch (error) {
+      const failed = { ...current, lastCheckAt: now, lastError: text(error?.message || error).slice(0, 500) };
+      await this.state.storage.put('hotEspnTest', failed);
+      return publicHotEspnTest(failed);
+    }
   }
 
   async bootstrap() {
@@ -385,9 +450,10 @@ export class SportsMonitor {
     const snapshot = await this.readState();
     const now = Date.now();
     const fast = Object.values(snapshot.matches).some((match) => matchNeedsFastPolling(match, now));
-    if (fast) {
+    const hot = snapshot.hotEspnTest?.state === 'armed' && num(snapshot.hotEspnTest?.expiresAt, 0) > now;
+    if (fast || hot) {
       const currentAlarm = await this.state.storage.getAlarm();
-      const desired = now + FAST_POLL_MS;
+      const desired = now + (hot ? Math.min(FAST_POLL_MS, HOT_ESPN_TEST_CONSTANTS.POLL_MS) : FAST_POLL_MS);
       if (currentAlarm == null || currentAlarm > desired + 5_000) await this.state.storage.setAlarm(desired);
     }
   }
@@ -619,11 +685,13 @@ export class SportsMonitor {
       summarySources: snapshot.status.summarySources && typeof snapshot.status.summarySources === 'object' ? snapshot.status.summarySources : {},
       summaryGoalCounts: snapshot.status.summaryGoalCounts && typeof snapshot.status.summaryGoalCounts === 'object' ? snapshot.status.summaryGoalCounts : {},
       sourceAttempts: snapshot.status.sourceAttempts && typeof snapshot.status.sourceAttempts === 'object' ? snapshot.status.sourceAttempts : {},
+      hotEspnTest: publicHotEspnTest(snapshot.hotEspnTest),
       matches
     };
   }
 
   async alarm() {
+    await this.pollHotEspnTest();
     await this.pollOnce();
     await this.ensureNextAlarm();
   }
@@ -638,6 +706,20 @@ export class SportsMonitor {
       const staleBootstrap = !num(status.lastBootstrapAt, 0) || now - num(status.lastBootstrapAt, 0) > 3 * 60_000;
       const staleLivePoll = num(status.activeGames, 0) > 0 && now - num(status.lastPollCompletedAt, 0) > 90_000;
       return Response.json((staleBootstrap || staleLivePoll) ? await this.bootstrap() : await this.publicStatus());
+    }
+    if (url.pathname === '/hot-test/arm' && request.method === 'POST') {
+      const body = await request.json();
+      const installationId = text(body?.installationId);
+      if (!installationId) return Response.json({ ok: false, error: 'invalid_installation' }, { status: 400 });
+      try {
+        return Response.json({ ok: true, hotEspnTest: await this.armHotEspnTest(installationId) }, { status: 202 });
+      } catch (error) {
+        return Response.json({ ok: false, error: 'espn_hot_test_unavailable', detail: text(error?.message || error) }, { status: 503 });
+      }
+    }
+    if (url.pathname === '/hot-test/status' && request.method === 'GET') {
+      const hotEspnTest = await this.state.storage.get('hotEspnTest') || {};
+      return Response.json({ ok: true, hotEspnTest: publicHotEspnTest(hotEspnTest) });
     }
     if (url.pathname === '/recent' && request.method === 'GET') {
       const recentEvents = await this.state.storage.get('recentEvents') || [];

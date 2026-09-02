@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fetchEspnLivePlays, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, probeEspnSources, summaryGoalCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, probeEspnSources, summaryGoalCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
 
 const event = {
   id: '401909112',
@@ -165,6 +165,24 @@ assert.equal(summaryGoalCount({ plays: [{ scoringPlay: true, text: 'Goal' }, { t
   const result = await fetchEspnLivePlays('bra.copa_do_brazil', event.id, fakeFetch);
   assert.equal(result.source, 'espn_cdn_soccer_playbyplay');
   assert.equal(summaryGoalCount(result.data), 2);
+}
+
+
+// 6-H1: o teste quente usa o play-by-play real da Coppa Italia, sem ampliar o probe de produção.
+{
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/leagues/ita.coppa_italia/events/401911806/competitions/401911806/plays')) {
+      return Response.json({ items: [
+        { id: 'hot-1', text: 'Shot saved', clock: { displayValue: "46'" } },
+        { id: 'hot-2', text: 'Corner', clock: { displayValue: "47'" } }
+      ] });
+    }
+    throw new Error(`não deveria chegar em ${href}`);
+  };
+  const result = await fetchEspnTechnicalHotTestPlays('401911806', fakeFetch);
+  assert.equal(result.source, 'espn_core_plays');
+  assert.equal(result.data.plays.length, 2);
 }
 
 console.log('espn-source: PASS');

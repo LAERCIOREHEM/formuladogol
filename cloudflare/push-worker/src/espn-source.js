@@ -394,6 +394,34 @@ export async function fetchEspnLivePlays(league, eventId, fetchImpl = globalThis
   return { ...fallback, attempts: [...attempts, ...(fallback.attempts || [])] };
 }
 
+export async function fetchEspnTechnicalHotTestPlays(eventId, fetchImpl = globalThis.fetch) {
+  const league = 'ita.coppa_italia';
+  const qEvent = encodeURIComponent(text(eventId));
+  if (!qEvent) throw new Error('eventId ausente');
+  const candidates = [
+    {
+      name: 'espn_core_plays',
+      url: `${CORE_ROOT}/${league}/events/${qEvent}/competitions/${qEvent}/plays?limit=300&lang=pt&region=br`,
+      transform: (payload) => {
+        const plays = Array.isArray(payload?.items) ? payload.items : Array.isArray(payload?.plays) ? payload.plays : [];
+        if (!plays.length) throw new Error('core plays sem itens');
+        return { plays };
+      }
+    },
+    {
+      name: 'espn_cdn_league_playbyplay',
+      url: `${CDN_ROOT}/${league}/playbyplay?xhr=1&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
+      name: 'espn_cdn_soccer_playbyplay',
+      url: `${CDN_ROOT}/soccer/playbyplay?xhr=1&league=${league}&gameId=${qEvent}`,
+      transform: unwrapSummary
+    }
+  ];
+  return firstSuccessful(candidates, unwrapSummary, fetchImpl);
+}
+
 export async function fetchEspnSummary(league, eventId, fetchImpl = globalThis.fetch, expectedGoals = 0) {
   if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
   if (!text(eventId)) throw new Error('eventId ausente');

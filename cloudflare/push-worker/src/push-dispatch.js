@@ -68,7 +68,8 @@ export function buildSportsPushPayload(event) {
   const type = text(item.type);
   const sourcePlayKey = text(item.sourcePlayKey || item.eventKey);
   const goalFamily = type === 'goal' || type === 'goal_overturned';
-  const tagSeed = goalFamily ? `goal-${sourcePlayKey}` : `${type}-${eventId || sourcePlayKey}`;
+  const technicalEspnTest = item.technicalEspnTest === true;
+  const tagSeed = technicalEspnTest ? `technical-espn-${sourcePlayKey}` : goalFamily ? `goal-${sourcePlayKey}` : `${type}-${eventId || sourcePlayKey}`;
   return {
     title: text(draft.title || defaultTitle(type)),
     body: text(draft.body || 'Atualização do Fórmula do Gol.'),
@@ -77,7 +78,7 @@ export function buildSportsPushPayload(event) {
     badgeIncrement: 1,
     timestamp: Number.isFinite(Date.parse(item.confirmedAt || '')) ? Date.parse(item.confirmedAt) : Date.now(),
     data: {
-      url: notificationUrl(type, eventId),
+      url: technicalEspnTest ? '/pwa-teste.html' : notificationUrl(type, eventId),
       eventId,
       eventKey: text(item.eventKey),
       type,
@@ -493,6 +494,7 @@ export async function dispatchStatus(env) {
     ok: true,
     dispatchVersion: 5,
     segmentedTestVersion: '6-T1',
+    hotEspnTestVersion: '6-H1',
     activeSubscriptions: num(subscriptions?.count, 0),
     pendingEvents: num(pending?.count, 0),
     deliveries: {

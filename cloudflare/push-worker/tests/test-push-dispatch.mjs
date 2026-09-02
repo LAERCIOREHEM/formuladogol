@@ -72,4 +72,15 @@ assert.equal(segmented.title, '🧪 TESTE CHAPECOENSE');
 assert.equal(segmented.data.type, 'prematch_15');
 assert.equal(segmented.data.url, '/agenda.html');
 
+
+const hotEspn = buildSportsPushPayload({
+  eventKey: 'technical_espn_test:401911806:device:p3',
+  type: 'prematch_15', eventId: '401911806', confirmedAt: event.confirmedAt,
+  testInstallationId: 'fdg-device-1', technicalEspnTest: true,
+  notificationDraft: { title: '🧪 ESPN REAL — EVENTO DETECTADO', body: "46' · Second Half begins" }
+});
+assert.equal(hotEspn.data.type, 'prematch_15');
+assert.equal(hotEspn.data.url, '/pwa-teste.html');
+assert.equal(hotEspn.title, '🧪 ESPN REAL — EVENTO DETECTADO');
+
 console.log('push-dispatch: PASS');
