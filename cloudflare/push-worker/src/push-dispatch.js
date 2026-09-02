@@ -34,29 +34,68 @@ async function vapidKeys(env) {
   return response.json();
 }
 
+export function preferenceColumnForEvent(type) {
+  const map = {
+    goal: 'p.goals',
+    goal_overturned: 'p.overturned_goals',
+    prematch_15: 'p.prematch_15',
+    final_whistle: 'p.final_whistle',
+    schedule_changed: 'p.schedule_changes',
+    match_postponed: 'p.schedule_changes',
+    shootout_start: 'p.shootout_alerts',
+    qualification: 'p.qualification_alerts'
+  };
+  return map[text(type)] || '';
+}
+
+function defaultTitle(type) {
+  return ({
+    goal: '⚽ GOL!', goal_overturned: '🚫 GOL ANULADO', prematch_15: '⏰ Jogo começa em 15 minutos',
+    final_whistle: '🏁 Fim de jogo', schedule_changed: '🕒 Horário alterado', match_postponed: '🚨 Jogo adiado',
+    shootout_start: '⚡ DECISÃO NOS PÊNALTIS!', qualification: '🏆 Classificado!'
+  })[text(type)] || 'Fórmula do Gol';
+}
+
+function notificationUrl(type, eventId) {
+  if (['prematch_15', 'schedule_changed', 'match_postponed'].includes(text(type))) return '/agenda.html';
+  return eventId ? `/aovivo.html?event=${encodeURIComponent(eventId)}` : '/aovivo.html';
+}
+
 export function buildSportsPushPayload(event) {
   const item = event || {};
   const draft = item.notificationDraft || {};
   const eventId = text(item.eventId);
+  const type = text(item.type);
   const sourcePlayKey = text(item.sourcePlayKey || item.eventKey);
+  const goalFamily = type === 'goal' || type === 'goal_overturned';
+  const tagSeed = goalFamily ? `goal-${sourcePlayKey}` : `${type}-${eventId || sourcePlayKey}`;
   return {
-    title: text(draft.title || (item.type === 'goal_overturned' ? '🚫 GOL ANULADO' : '⚽ GOL!')),
-    body: text(draft.body || 'Atualização de placar no Fórmula do Gol.'),
-    tag: `fdg-goal-${sourcePlayKey}`.slice(0, 120),
+    title: text(draft.title || defaultTitle(type)),
+    body: text(draft.body || 'Atualização do Fórmula do Gol.'),
+    tag: `fdg-${tagSeed}`.slice(0, 120),
     renotify: true,
     badgeIncrement: 1,
     timestamp: Number.isFinite(Date.parse(item.confirmedAt || '')) ? Date.parse(item.confirmedAt) : Date.now(),
     data: {
-      url: eventId ? `/aovivo.html?event=${encodeURIComponent(eventId)}` : '/aovivo.html',
+      url: notificationUrl(type, eventId),
       eventId,
       eventKey: text(item.eventKey),
-      type: text(item.type),
+      type,
       sourcePlayKey
     }
   };
 }
 
-async function sendToSubscription(env, row, payload) {
+function deliveryOptions(type) {
+  const value = text(type);
+  if (value === 'prematch_15') return { ttl: 900, urgency: 'high' };
+  if (value === 'schedule_changed' || value === 'match_postponed') return { ttl: 21600, urgency: 'normal' };
+  if (value === 'final_whistle' || value === 'qualification') return { ttl: 3600, urgency: 'high' };
+  if (value === 'shootout_start') return { ttl: 600, urgency: 'high' };
+  return { ttl: 180, urgency: 'high' };
+}
+
+async function sendToSubscription(env, row, payload, eventType = '') {
   const keys = await vapidKeys(env);
   const subscription = {
     endpoint: row.endpoint,
@@ -64,7 +103,7 @@ async function sendToSubscription(env, row, payload) {
     keys: { p256dh: row.p256dh, auth: row.auth }
   };
   const requestInit = await buildPushPayload(
-    { data: payload, options: { ttl: 180, urgency: 'high' } },
+    { data: payload, options: deliveryOptions(eventType) },
     subscription,
     { subject: keys.subject, publicKey: keys.publicKey, privateKey: keys.privateKey }
   );
@@ -83,11 +122,18 @@ function parseEventRow(row) {
 }
 
 async function getEvent(env, eventKey) {
-  const row = await env.DB.prepare(`
+  let row = await env.DB.prepare(`
     SELECT event_key, event_type, payload_json
     FROM sports_events
     WHERE event_key=?
   `).bind(eventKey).first();
+  if (!row) {
+    row = await env.DB.prepare(`
+      SELECT event_key, event_type, payload_json
+      FROM match_events
+      WHERE event_key=?
+    `).bind(eventKey).first();
+  }
   return row ? { row, payload: parseEventRow(row) } : null;
 }
 
@@ -178,7 +224,8 @@ export async function recoverStuckDeliveries(env, limit = 50) {
 }
 
 async function eligibleTargets(env, event, afterSubscriptionId = '') {
-  const flagColumn = event.type === 'goal_overturned' ? 'p.overturned_goals' : 'p.goals';
+  const flagColumn = preferenceColumnForEvent(event.type);
+  if (!flagColumn) return [];
   const homeSlug = teamSlug(event.home?.name);
   const awaySlug = teamSlug(event.away?.name);
   const homeEspn = text(event.home?.id) ? `espn:${text(event.home.id)}` : '';
@@ -195,7 +242,7 @@ async function eligibleTargets(env, event, afterSubscriptionId = '') {
   const result = await env.DB.prepare(`
     SELECT s.subscription_id, s.installation_id
     FROM push_subscriptions s
-    JOIN push_preferences p ON p.installation_id=s.installation_id
+    JOIN push_preferences_v2 p ON p.installation_id=s.installation_id
     WHERE s.active=1
       AND s.subscription_id > ?
       AND ${flagColumn}=1
@@ -291,7 +338,7 @@ async function deliverOne(env, eventKey, eventPayload, row) {
   const payload = buildSportsPushPayload(eventPayload);
   let response;
   try {
-    response = await sendToSubscription(env, row, payload);
+    response = await sendToSubscription(env, row, payload, eventPayload?.type);
   } catch (error) {
     await env.DB.prepare(`
       UPDATE push_deliveries

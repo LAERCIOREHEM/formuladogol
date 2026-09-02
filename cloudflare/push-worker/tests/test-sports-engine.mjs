@@ -7,7 +7,7 @@ import {
   normalizeScoreboardEvent,
   SPORTS_ENGINE_CONSTANTS
 } from '../src/sports-engine.js';
-import { selectAgendaCandidates } from '../src/sports-monitor.js';
+import { deriveScheduleEvents, selectAgendaCandidates, selectScheduleSnapshot } from '../src/sports-monitor.js';
 
 const t0 = Date.parse('2026-09-01T23:55:00Z');
 const game = {
@@ -144,5 +144,76 @@ const phantom = rawScore(0, 0, "22'", 'post');
 phantom.status.type.completed = false;
 const phantomObs = normalizeScoreboardEvent(phantom, game.league, game);
 assert.equal(phantomObs.state, 'in');
+
+// Ciclo de mata-mata: entrada nos pênaltis, apito final e classificação.
+const cupBase = {
+  eventId: game.eventId, league: game.league, competitionKey: 'copa_do_brasil', competitionName: 'Copa do Brasil', kickoff: game.kickoff,
+  state: 'in', completed: false, clock: "120'", period: 4, shootoutActive: false, shootoutScore: { home: null, away: null },
+  home: { id: '7632', name: 'Atlético-MG', abbreviation: 'CAM', score: 1, winner: false },
+  away: { id: '2022', name: 'Cruzeiro', abbreviation: 'CRU', score: 1, winner: false }
+};
+let lifeState = applyObservation(initialMatchState(cupBase), cupBase, [
+  { key: 'base-h', side: 'home', teamId: '7632', athleteId: 'p1', athleteName: 'João Pedro', minute: "30'", shootout: false, homeScoreAfter: 1, awayScoreAfter: 0 },
+  { key: 'base-a', side: 'away', teamId: '2022', athleteId: 'p3', athleteName: 'Lucas Lima', minute: "70'", shootout: false, homeScoreAfter: 1, awayScoreAfter: 1 }
+], t0).match;
+const shootoutObs = structuredClone(cupBase);
+shootoutObs.shootoutActive = true;
+shootoutObs.clock = 'Pênaltis';
+let lifecycle = applyObservation(lifeState, shootoutObs, null, t0 + 30_000);
+lifeState = lifecycle.match;
+assert.equal(lifecycle.emitted.filter((e) => e.type === 'shootout_start').length, 1, 'entrada nos pênaltis deve emitir um alerta');
+assert.match(lifecycle.emitted.find((e) => e.type === 'shootout_start').notificationDraft.title, /PÊNALTIS/);
+
+const finalCup = structuredClone(shootoutObs);
+finalCup.state = 'post'; finalCup.completed = true; finalCup.clock = 'Fim';
+finalCup.home.winner = false; finalCup.away.winner = true;
+finalCup.shootoutScore = { home: 4, away: 5 };
+lifecycle = applyObservation(lifeState, finalCup, null, t0 + 60_000);
+lifeState = lifecycle.match;
+assert.equal(lifecycle.emitted.filter((e) => e.type === 'final_whistle').length, 1);
+assert.equal(lifecycle.emitted.filter((e) => e.type === 'qualification').length, 1);
+assert.match(lifecycle.emitted.find((e) => e.type === 'qualification').notificationDraft.title, /CRUZEIRO CLASSIFICADO/);
+assert.match(lifecycle.emitted.find((e) => e.type === 'qualification').notificationDraft.body, /Pênaltis: 4 × 5/);
+const repeatedFinal = applyObservation(lifeState, finalCup, null, t0 + 90_000);
+assert.equal(repeatedFinal.emitted.length, 0, 'fim e classificação não podem duplicar');
+
+// A primeira perna de um confronto não pode gerar classificado/eliminado.
+const firstLegBase = structuredClone(cupBase); firstLegBase.leg = 1;
+let firstLegState = applyObservation(initialMatchState(firstLegBase), firstLegBase, null, t0).match;
+const firstLegFinal = structuredClone(firstLegBase); firstLegFinal.state = 'post'; firstLegFinal.completed = true; firstLegFinal.home.winner = true;
+const firstLegStep = applyObservation(firstLegState, firstLegFinal, null, t0 + 60_000);
+assert.equal(firstLegStep.emitted.filter((e) => e.type === 'qualification').length, 0, 'ida não define classificação');
+assert.equal(firstLegStep.emitted.filter((e) => e.type === 'final_whistle').length, 1, 'fim de jogo continua válido na ida');
+
+// Brasileirão nunca gera evento de mata-mata mesmo se um status estranho mencionar pênaltis.
+const leagueBase = structuredClone(cupBase); leagueBase.league = 'bra.1'; leagueBase.competitionKey = 'brasileirao'; leagueBase.competitionName = 'Brasileirão';
+let leagueState = applyObservation(initialMatchState(leagueBase), leagueBase, null, t0).match;
+const leaguePenalty = structuredClone(leagueBase); leaguePenalty.shootoutActive = true;
+const leagueStep = applyObservation(leagueState, leaguePenalty, null, t0 + 30_000);
+assert.equal(leagueStep.emitted.filter((e) => e.type === 'shootout_start').length, 0);
+
+// Agenda essencial: lembrete 15 min, mudança de horário e adiamento.
+const reminderNow = Date.parse('2026-09-01T23:45:30Z'); // 14m30 antes de 21h BRT
+const schedulePayload = { jogos: [{
+  event_id: game.eventId, espn_league: game.league, data_iso: game.kickoff, competicao_chave: 'copa_do_brasil', competicao_nome_curto: 'Copa do Brasil',
+  mandante: { espn_id: '7632', nome: 'Atlético-MG', sigla: 'CAM' }, visitante: { espn_id: '2022', nome: 'Cruzeiro', sigla: 'CRU' }, adiado: false
+}] };
+const snap = selectScheduleSnapshot(schedulePayload, reminderNow, {});
+let scheduleEvents = deriveScheduleEvents({}, snap, reminderNow, false);
+assert.equal(scheduleEvents.filter((e) => e.type === 'prematch_15').length, 1);
+assert.match(scheduleEvents[0].notificationDraft.body, /Atlético-MG × Cruzeiro/);
+
+const movedPayload = structuredClone(schedulePayload);
+movedPayload.jogos[0].data_iso = '2026-09-01T21:30:00-03:00';
+const movedSnap = selectScheduleSnapshot(movedPayload, reminderNow, snap);
+scheduleEvents = deriveScheduleEvents(snap, movedSnap, reminderNow, true);
+assert.equal(scheduleEvents.filter((e) => e.type === 'schedule_changed').length, 1);
+
+const postponedPayload = structuredClone(movedPayload);
+postponedPayload.jogos[0].adiado = true;
+postponedPayload.jogos[0].status = 'Jogo adiado';
+const postponedSnap = selectScheduleSnapshot(postponedPayload, reminderNow, movedSnap);
+scheduleEvents = deriveScheduleEvents(movedSnap, postponedSnap, reminderNow, true);
+assert.equal(scheduleEvents.filter((e) => e.type === 'match_postponed').length, 1);
 
 console.log('sports-engine: PASS');

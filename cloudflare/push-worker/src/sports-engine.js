@@ -51,7 +51,8 @@ function teamShape(competitor) {
   return {
     id: text(t.id || competitor?.id),
     name: text(t.displayName || t.shortDisplayName || t.name || t.location || competitor?.displayName),
-    abbreviation: text(t.abbreviation || competitor?.abbreviation)
+    abbreviation: text(t.abbreviation || competitor?.abbreviation),
+    winner: competitor?.winner === true
   };
 }
 
@@ -59,6 +60,26 @@ function scoreOf(competitor) {
   if (competitor == null) return 0;
   const raw = competitor.score?.value ?? competitor.score?.displayValue ?? competitor.score;
   return Math.max(0, num(raw, 0));
+}
+
+function shootoutScoreOf(competitor) {
+  const raw = competitor?.shootoutScore?.value ?? competitor?.shootoutScore?.displayValue ?? competitor?.shootoutScore
+    ?? competitor?.penaltyShootoutScore?.value ?? competitor?.penaltyShootoutScore?.displayValue ?? competitor?.penaltyShootoutScore;
+  if (raw == null || raw === '') return null;
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+function aggregateScoreOf(competitor) {
+  const raw = competitor?.aggregateScore?.value ?? competitor?.aggregateScore?.displayValue ?? competitor?.aggregateScore;
+  if (raw == null || raw === '') return null;
+  const value = Number(raw);
+  return Number.isFinite(value) && value >= 0 ? value : null;
+}
+
+export function isCupCompetition(value) {
+  const key = normalized(value);
+  return /copa do brasil|copa_do_brasil|libertadores|sudamericana|sul americana/.test(key);
 }
 
 export function normalizeScoreboardEvent(event, league, agendaGame = null) {
@@ -69,7 +90,8 @@ export function normalizeScoreboardEvent(event, league, agendaGame = null) {
   const status = event?.status || competition?.status || {};
   const statusType = status?.type || {};
   const sourceState = text(statusType.state || (statusType.completed ? 'post' : 'pre')).toLowerCase();
-  const statusText = normalized([statusType.name, statusType.description, statusType.detail, statusType.shortDetail, status.displayClock].filter(Boolean).join(' '));
+  const statusLabel = [statusType.name, statusType.description, statusType.detail, statusType.shortDetail, status.displayClock].filter(Boolean).join(' ');
+  const statusText = normalized(statusLabel);
   const explicitFinal = statusType.completed === true || /(^| )(ft|full time|final|fim de jogo)( |$)/.test(statusText);
   const clockLooksLive = /^\d{1,3}(?:\+\d+)?/.test(text(status.displayClock || statusType.shortDetail));
   let safeState = sourceState === 'in' ? 'in' : explicitFinal ? 'post' : 'pre';
@@ -82,16 +104,28 @@ export function normalizeScoreboardEvent(event, league, agendaGame = null) {
   if (!home.id) home.id = text(agendaHome.id);
   if (!away.name) away.name = text(agendaAway.name);
   if (!away.id) away.id = text(agendaAway.id);
+  const homeShootout = shootoutScoreOf(homeRaw);
+  const awayShootout = shootoutScoreOf(awayRaw);
+  const homeAggregate = aggregateScoreOf(homeRaw);
+  const awayAggregate = aggregateScoreOf(awayRaw);
+  const shootoutByStatus = /penalty shootout|shootout|penaltis|penalties|disputa de penaltis/.test(statusText);
+  const shootoutActive = shootoutByStatus || num(homeShootout, 0) > 0 || num(awayShootout, 0) > 0;
   return {
     eventId: text(event?.id || competition?.id || agendaGame?.eventId),
     league: text(league || agendaGame?.league),
     competitionKey: text(agendaGame?.competitionKey),
     competitionName: text(agendaGame?.competitionName),
+    phase: text(agendaGame?.phase),
+    leg: agendaGame?.leg == null ? null : num(agendaGame.leg, 0),
     kickoff: text(event?.date || competition?.date || agendaGame?.kickoff),
     state: safeState,
     completed: statusType.completed === true,
     clock: text(status.displayClock || statusType.shortDetail || statusType.detail),
+    statusLabel: text(statusLabel),
     period: num(status.period || competition.period, 0),
+    shootoutActive,
+    shootoutScore: { home: homeShootout, away: awayShootout },
+    aggregateScore: { home: homeAggregate, away: awayAggregate },
     home: { ...home, score: scoreOf(homeRaw) },
     away: { ...away, score: scoreOf(awayRaw) },
     observedAt: Date.now()
@@ -254,6 +288,8 @@ export function initialMatchState(observation) {
     league: text(observation?.league),
     competitionKey: text(observation?.competitionKey),
     competitionName: text(observation?.competitionName),
+    phase: text(observation?.phase),
+    leg: observation?.leg == null ? null : num(observation.leg, 0),
     kickoff: text(observation?.kickoff),
     initialized: false,
     baselineComplete: false,
@@ -261,6 +297,15 @@ export function initialMatchState(observation) {
     completed: Boolean(observation?.completed),
     clock: text(observation?.clock),
     period: num(observation?.period, 0),
+    shootoutActive: Boolean(observation?.shootoutActive),
+    shootoutScore: {
+      home: observation?.shootoutScore?.home ?? null,
+      away: observation?.shootoutScore?.away ?? null
+    },
+    aggregateScore: {
+      home: observation?.aggregateScore?.home ?? null,
+      away: observation?.aggregateScore?.away ?? null
+    },
     home: { ...(observation?.home || {}), score: num(observation?.home?.score, 0) },
     away: { ...(observation?.away || {}), score: num(observation?.away?.score, 0) },
     plays: {},
@@ -344,10 +389,80 @@ function emittedEvent(type, play, match, observation, now) {
   };
 }
 
+
+function lifecycleEvent(type, match, observation, now) {
+  const homeScore = num(observation?.home?.score, 0);
+  const awayScore = num(observation?.away?.score, 0);
+  const homeName = text(match.home?.name || 'Mandante');
+  const awayName = text(match.away?.name || 'Visitante');
+  const scoreText = `${homeName} ${homeScore} × ${awayScore} ${awayName}`;
+  let title = 'Atualização do jogo';
+  let body = scoreText;
+  let winner = null;
+  let loser = null;
+
+  if (type === 'final_whistle') {
+    title = '🏁 Fim de jogo';
+    body = `${scoreText}${match.competitionName ? ` · ${match.competitionName}` : ''}`;
+  } else if (type === 'shootout_start') {
+    title = '⚡ DECISÃO NOS PÊNALTIS!';
+    body = `${scoreText}${match.competitionName ? ` · ${match.competitionName}` : ''}`;
+  } else if (type === 'qualification') {
+    const homeWon = observation?.home?.winner === true;
+    const awayWon = observation?.away?.winner === true;
+    const shootHome = observation?.shootoutScore?.home;
+    const shootAway = observation?.shootoutScore?.away;
+    const aggHome = observation?.aggregateScore?.home;
+    const aggAway = observation?.aggregateScore?.away;
+    winner = homeWon && !awayWon ? match.home : awayWon && !homeWon ? match.away : null;
+    if (!winner && shootHome != null && shootAway != null && num(shootHome, 0) !== num(shootAway, 0)) {
+      winner = num(shootHome, 0) > num(shootAway, 0) ? match.home : match.away;
+    }
+    if (!winner && aggHome != null && aggAway != null && num(aggHome, 0) !== num(aggAway, 0)) {
+      winner = num(aggHome, 0) > num(aggAway, 0) ? match.home : match.away;
+    }
+    loser = winner && winner.id === match.home?.id ? match.away : winner ? match.home : null;
+    if (!winner) return null;
+    title = `🏆 ${text(winner.name).toUpperCase()} CLASSIFICADO!`;
+    const aggregateText = aggHome != null && aggAway != null ? ` · Agregado: ${num(aggHome, 0)} × ${num(aggAway, 0)}` : '';
+    const shootoutText = shootHome != null && shootAway != null && (num(shootHome, 0) > 0 || num(shootAway, 0) > 0)
+      ? ` · Pênaltis: ${num(shootHome, 0)} × ${num(shootAway, 0)}` : '';
+    body = `${text(winner.name)} avança; ${text(loser?.name)} está eliminado. ${scoreText}${aggregateText}${shootoutText}`;
+  }
+
+  return {
+    eventKey: `${type}:${match.eventId}${winner?.id ? `:${text(winner.id)}` : ''}`,
+    type,
+    sourcePlayKey: '',
+    eventId: match.eventId,
+    league: match.league,
+    competitionKey: match.competitionKey,
+    competitionName: match.competitionName,
+    kickoff: match.kickoff,
+    home: { id: text(match.home?.id), name: homeName, abbreviation: text(match.home?.abbreviation), score: homeScore },
+    away: { id: text(match.away?.id), name: awayName, abbreviation: text(match.away?.abbreviation), score: awayScore },
+    scoringTeam: {}, athlete: {}, minute: '', ownGoal: false, penalty: false,
+    shootout: type === 'shootout_start' || Boolean(observation?.shootoutActive),
+    scoreAfter: { home: homeScore, away: awayScore },
+    winner: winner ? { id: text(winner.id), name: text(winner.name), abbreviation: text(winner.abbreviation) } : null,
+    loser: loser ? { id: text(loser.id), name: text(loser.name), abbreviation: text(loser.abbreviation) } : null,
+    shootoutScore: {
+      home: observation?.shootoutScore?.home ?? null,
+      away: observation?.shootoutScore?.away ?? null
+    },
+    detectedAt: new Date(now).toISOString(),
+    confirmedAt: new Date(now).toISOString(),
+    notificationDraft: { title, body }
+  };
+}
+
 export function applyObservation(previous, observation, scoringPlays, nowMs = Date.now()) {
   const now = num(nowMs, Date.now());
   const match = structuredClone(previous || initialMatchState(observation));
   const emitted = [];
+  const wasInitialized = Boolean(match.initialized);
+  const previousState = text(match.state);
+  const previousShootoutActive = Boolean(match.shootoutActive);
   const previousScoreTotal = goalCountFromScore(match);
   const currentScoreTotal = goalCountFromScore(observation);
   const hasSummary = Array.isArray(scoringPlays);
@@ -357,11 +472,22 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   match.league = text(observation.league || match.league);
   match.competitionKey = text(observation.competitionKey || match.competitionKey);
   match.competitionName = text(observation.competitionName || match.competitionName);
+  match.phase = text(observation.phase || match.phase);
+  if (observation.leg != null) match.leg = num(observation.leg, 0);
   match.kickoff = text(observation.kickoff || match.kickoff);
   match.state = text(observation.state || match.state);
   match.completed = Boolean(observation.completed);
   match.clock = text(observation.clock || match.clock);
   match.period = num(observation.period, match.period || 0);
+  match.shootoutActive = Boolean(observation.shootoutActive);
+  match.shootoutScore = {
+    home: observation?.shootoutScore?.home ?? match.shootoutScore?.home ?? null,
+    away: observation?.shootoutScore?.away ?? match.shootoutScore?.away ?? null
+  };
+  match.aggregateScore = {
+    home: observation?.aggregateScore?.home ?? match.aggregateScore?.home ?? null,
+    away: observation?.aggregateScore?.away ?? match.aggregateScore?.away ?? null
+  };
   match.home = { ...(match.home || {}), ...(observation.home || {}), score: num(observation.home?.score, 0) };
   match.away = { ...(match.away || {}), ...(observation.away || {}), score: num(observation.away?.score, 0) };
   match.lastObservedAt = now;
@@ -381,6 +507,23 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     }
     match.baselineComplete = false;
     return { match, emitted, diagnostic: 'baseline_waiting_summary' };
+  }
+
+  if (wasInitialized) {
+    const cup = isCupCompetition(match.competitionKey) || isCupCompetition(match.competitionName) || isCupCompetition(match.league);
+    const decisiveCupMatch = cup && num(match.leg, 0) !== 1;
+    if (decisiveCupMatch && observation.state === 'in' && Boolean(observation.shootoutActive) && !previousShootoutActive) {
+      const event = lifecycleEvent('shootout_start', match, observation, now);
+      if (event) emitted.push(event);
+    }
+    if (previousState !== 'post' && observation.state === 'post') {
+      const finalEvent = lifecycleEvent('final_whistle', match, observation, now);
+      if (finalEvent) emitted.push(finalEvent);
+      if (decisiveCupMatch) {
+        const qualificationEvent = lifecycleEvent('qualification', match, observation, now);
+        if (qualificationEvent) emitted.push(qualificationEvent);
+      }
+    }
   }
 
   if (!match.baselineComplete) {
@@ -459,8 +602,11 @@ export function summarizeMatch(match) {
   return {
     eventId: match?.eventId || '',
     league: match?.league || '',
+    phase: match?.phase || '',
+    leg: match?.leg ?? null,
     state: match?.state || '',
     clock: match?.clock || '',
+    shootoutActive: Boolean(match?.shootoutActive),
     score: `${num(match?.home?.score, 0)}-${num(match?.away?.score, 0)}`,
     home: match?.home?.name || '',
     away: match?.away?.name || '',

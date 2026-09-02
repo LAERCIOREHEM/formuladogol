@@ -1,7 +1,7 @@
 {
   "name": "formula-do-gol-push-worker",
   "private": true,
-  "version": "1.3.1",
+  "version": "1.4.0",
   "type": "module",
   "scripts": {
     "check": "node --check src/index.js && node --check src/push-state.js && node --check src/sports-engine.js && node --check src/sports-monitor.js && node --check src/push-dispatch.js && node --check src/ops.js && node --check src/espn-source.js && node --check scripts/render-config.mjs && node --check tests/test-espn-source.mjs && node --check tests/test-sports-engine.mjs && node --check tests/test-sports-monitor.mjs && node --check tests/test-push-dispatch.mjs && node --check tests/test-ops.mjs && node --check tests/test-end-to-end.mjs",

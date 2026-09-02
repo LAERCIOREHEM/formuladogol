@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { buildSportsPushPayload, chunkArray, teamSlug, PUSH_DISPATCH_CONSTANTS } from '../src/push-dispatch.js';
+import { buildSportsPushPayload, chunkArray, preferenceColumnForEvent, teamSlug, PUSH_DISPATCH_CONSTANTS } from '../src/push-dispatch.js';
 
 assert.equal(teamSlug('Atlético-MG'), 'atletico-mg');
 assert.equal(teamSlug('Grêmio'), 'gremio');
@@ -36,6 +36,25 @@ const overturned = buildSportsPushPayload({
 });
 assert.equal(overturned.tag, payload.tag, 'gol e anulação compartilham a mesma tag para atualização da notificação');
 assert.equal(overturned.title, '🚫 GOL ANULADO');
+
+const reminder = buildSportsPushPayload({
+  eventKey: 'prematch_15:401909112:1788307200000', type: 'prematch_15', eventId: '401909112', confirmedAt: event.confirmedAt,
+  notificationDraft: { title: '⏰ Jogo começa em 15 minutos', body: 'Atlético-MG × Cruzeiro · 21:00' }
+});
+assert.equal(reminder.data.url, '/agenda.html');
+assert.match(reminder.tag, /^fdg-prematch_15-/);
+const final = buildSportsPushPayload({ ...event, eventKey: 'final_whistle:401909112', type: 'final_whistle', sourcePlayKey: '', notificationDraft: { title: '🏁 Fim de jogo', body: 'Atlético-MG 1 × 2 Cruzeiro' } });
+assert.equal(final.data.url, '/aovivo.html?event=401909112');
+assert.match(final.tag, /^fdg-final_whistle-/);
+assert.equal(preferenceColumnForEvent('goal'), 'p.goals');
+assert.equal(preferenceColumnForEvent('goal_overturned'), 'p.overturned_goals');
+assert.equal(preferenceColumnForEvent('prematch_15'), 'p.prematch_15');
+assert.equal(preferenceColumnForEvent('final_whistle'), 'p.final_whistle');
+assert.equal(preferenceColumnForEvent('schedule_changed'), 'p.schedule_changes');
+assert.equal(preferenceColumnForEvent('match_postponed'), 'p.schedule_changes');
+assert.equal(preferenceColumnForEvent('shootout_start'), 'p.shootout_alerts');
+assert.equal(preferenceColumnForEvent('qualification'), 'p.qualification_alerts');
+assert.equal(preferenceColumnForEvent('unknown'), '');
 
 assert.deepEqual(chunkArray(['a','b','c','d','e'], 2), [['a','b'],['c','d'],['e']]);
 assert.equal(PUSH_DISPATCH_CONSTANTS.DELIVERY_BATCH_SIZE, 5);

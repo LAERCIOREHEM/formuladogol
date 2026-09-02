@@ -7,7 +7,11 @@
   const DEFAULTS = Object.freeze({
     goals: true,
     overturnedGoals: true,
-    finalWhistle: false,
+    prematch15: true,
+    finalWhistle: true,
+    scheduleChanges: true,
+    shootoutAlerts: true,
+    qualificationAlerts: true,
     allGames: false,
     teams: [],
     games: []
@@ -62,7 +66,11 @@
     return {
       goals: src.goals !== false,
       overturnedGoals: src.overturnedGoals !== false,
-      finalWhistle: false,
+      prematch15: src.prematch15 !== false,
+      finalWhistle: src.finalWhistle !== false,
+      scheduleChanges: src.scheduleChanges !== false,
+      shootoutAlerts: src.shootoutAlerts !== false,
+      qualificationAlerts: src.qualificationAlerts !== false,
       allGames: src.allGames === true,
       teams: uniq(src.teams, 10),
       games: uniq(src.games, 30)
@@ -185,6 +193,11 @@
     const next = clonePreferences();
     if (key === 'goals') next.goals = Boolean(enabled);
     if (key === 'overturnedGoals') next.overturnedGoals = Boolean(enabled);
+    if (key === 'prematch15') next.prematch15 = Boolean(enabled);
+    if (key === 'finalWhistle') next.finalWhistle = Boolean(enabled);
+    if (key === 'scheduleChanges') next.scheduleChanges = Boolean(enabled);
+    if (key === 'shootoutAlerts') next.shootoutAlerts = Boolean(enabled);
+    if (key === 'qualificationAlerts') next.qualificationAlerts = Boolean(enabled);
     if (!state.subscription && hasScope(next)) {
       await persist(next, true);
     } else {
@@ -355,9 +368,15 @@
         ${renderGames()}
       </div></section>
       <section class="panel fdg-alert-panel"><div class="panel-inner">
-        <div class="fdg-alert-section-head"><div><div class="kicker">Tipos</div><h2>O que receber?</h2></div></div>
+        <div class="fdg-alert-section-head"><div><div class="kicker">Essenciais</div><h2>O que receber?</h2></div></div>
+        <label class="fdg-alert-switch"><span><strong>⏰ Jogo em 15 minutos</strong><small>Lembrete pouco antes de a bola rolar.</small></span><input type="checkbox" data-fdg-type="prematch15" ${p.prematch15 ? 'checked' : ''}><i></i></label>
         <label class="fdg-alert-switch"><span><strong>⚽ Gols</strong><small>Autor, minuto e placar atualizado.</small></span><input type="checkbox" data-fdg-type="goals" ${p.goals ? 'checked' : ''}><i></i></label>
         <label class="fdg-alert-switch"><span><strong>🚫 Gols anulados</strong><small>Correção automática quando o placar é revertido após a confirmação.</small></span><input type="checkbox" data-fdg-type="overturnedGoals" ${p.overturnedGoals ? 'checked' : ''}><i></i></label>
+        <label class="fdg-alert-switch"><span><strong>🏁 Fim de jogo</strong><small>Placar final assim que a partida for encerrada.</small></span><input type="checkbox" data-fdg-type="finalWhistle" ${p.finalWhistle ? 'checked' : ''}><i></i></label>
+        <label class="fdg-alert-switch"><span><strong>🚨 Horário alterado ou jogo adiado</strong><small>Avisa quando uma partida acompanhada muda de horário/data ou é adiada.</small></span><input type="checkbox" data-fdg-type="scheduleChanges" ${p.scheduleChanges ? 'checked' : ''}><i></i></label>
+        <div class="fdg-alert-section-head"><div><div class="kicker">Mata-mata</div><h2>Alertas das Copas</h2></div></div>
+        <label class="fdg-alert-switch"><span><strong>⚡ Decisão nos pênaltis</strong><small>Copa do Brasil, Libertadores e Sul-Americana.</small></span><input type="checkbox" data-fdg-type="shootoutAlerts" ${p.shootoutAlerts ? 'checked' : ''}><i></i></label>
+        <label class="fdg-alert-switch"><span><strong>🏆 Classificado / eliminado</strong><small>Resultado da classificação quando a fonte confirma o vencedor do confronto.</small></span><input type="checkbox" data-fdg-type="qualificationAlerts" ${p.qualificationAlerts ? 'checked' : ''}><i></i></label>
       </div></section>
       <section class="panel fdg-alert-panel fdg-alert-danger"><div class="panel-inner">
         <h2>Este aparelho</h2>

@@ -19,7 +19,11 @@ const FINAL_RETENTION_MS = 10 * 60_000;
 const FAST_POLL_MS = 30_000;
 const FETCH_TIMEOUT_MS = 10_000;
 const MIN_POLL_GAP_MS = 20_000;
-const MAX_RECENT_EVENTS = 30;
+const MAX_RECENT_EVENTS = 50;
+const SCHEDULE_WINDOW_MS = 14 * 24 * 60 * 60_000;
+const REMINDER_MIN_MS = 13 * 60_000;
+const REMINDER_MAX_MS = 16 * 60_000;
+const SCHEDULE_CHANGE_MIN_MS = 2 * 60_000;
 
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
@@ -33,13 +37,22 @@ function normalizeAgendaGame(item) {
   const league = text(item?.espn_league || 'bra.1');
   const eventId = text(item?.event_id || item?.id);
   const kickoff = text(item?.data_iso || item?.date);
-  if (!eventId || !ALLOWED_LEAGUES.has(league) || !Number.isFinite(Date.parse(kickoff))) return null;
+  if (!eventId || !ALLOWED_LEAGUES.has(league)) return null;
+  const statusText = text(item?.status).toLowerCase();
+  const postponed = item?.adiado === true || /adiad|postpon/.test(statusText);
+  const cancelled = /cancelad|cancelled|canceled/.test(statusText);
   return {
     eventId,
     league,
     kickoff,
     competitionKey: text(item?.competicao_chave || 'brasileirao'),
     competitionName: text(item?.competicao_nome_curto || item?.competicao_nome || ''),
+    phase: text(item?.fase),
+    leg: item?.perna == null ? null : num(item.perna, 0),
+    postponed,
+    cancelled,
+    dateTbd: item?.data_definir === true,
+    statusText: text(item?.status),
     home: teamFromAgenda(item?.mandante || item?.home),
     away: teamFromAgenda(item?.visitante || item?.away)
   };
@@ -53,10 +66,111 @@ export function selectAgendaCandidates(payload, nowMs = Date.now()) {
     const game = normalizeAgendaGame(row);
     if (!game) continue;
     const kickoff = Date.parse(game.kickoff);
+    if (!Number.isFinite(kickoff)) continue;
     if (kickoff < now - POST_WINDOW_MS || kickoff > now + PRE_WINDOW_MS) continue;
     out.push(game);
   }
   return out;
+}
+
+
+export function selectScheduleSnapshot(payload, nowMs = Date.now(), previousSnapshot = {}) {
+  const now = num(nowMs, Date.now());
+  const rows = Array.isArray(payload?.jogos) ? payload.jogos : Array.isArray(payload) ? payload : [];
+  const previous = previousSnapshot && typeof previousSnapshot === 'object' ? previousSnapshot : {};
+  const out = {};
+  for (const row of rows) {
+    const game = normalizeAgendaGame(row);
+    if (!game) continue;
+    const kickoff = Date.parse(game.kickoff);
+    const tracked = Object.prototype.hasOwnProperty.call(previous, game.eventId);
+    const inWindow = Number.isFinite(kickoff) && kickoff >= now - POST_WINDOW_MS && kickoff <= now + SCHEDULE_WINDOW_MS;
+    if (!tracked && !inWindow) continue;
+    out[game.eventId] = game;
+  }
+  return out;
+}
+
+function brKickoffLabel(value) {
+  const date = new Date(value || '');
+  if (!Number.isFinite(date.getTime())) return 'data a confirmar';
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+  }).format(date).replace(',', '');
+}
+
+function scheduleEvent(type, game, now, previous = null) {
+  const kickoffMs = Date.parse(game?.kickoff || '');
+  const previousMs = Date.parse(previous?.kickoff || '');
+  const base = {
+    type,
+    sourcePlayKey: '',
+    eventId: text(game?.eventId),
+    league: text(game?.league),
+    competitionKey: text(game?.competitionKey),
+    competitionName: text(game?.competitionName),
+    kickoff: text(game?.kickoff),
+    home: { ...(game?.home || {}), score: 0 },
+    away: { ...(game?.away || {}), score: 0 },
+    scoringTeam: {}, athlete: {}, minute: '', ownGoal: false, penalty: false, shootout: false,
+    scoreAfter: { home: 0, away: 0 },
+    detectedAt: new Date(now).toISOString(),
+    confirmedAt: new Date(now).toISOString(),
+    previousKickoff: text(previous?.kickoff),
+    notificationDraft: { title: '', body: '' }
+  };
+  const matchup = `${text(game?.home?.name || 'Mandante')} × ${text(game?.away?.name || 'Visitante')}`;
+  if (type === 'prematch_15') {
+    base.eventKey = `prematch_15:${base.eventId}:${Number.isFinite(kickoffMs) ? kickoffMs : text(game?.kickoff)}`;
+    base.notificationDraft = {
+      title: '⏰ Jogo começa em 15 minutos',
+      body: `${matchup} · ${brKickoffLabel(game?.kickoff)}${game?.competitionName ? ` · ${game.competitionName}` : ''}`
+    };
+  } else if (type === 'match_postponed') {
+    base.eventKey = `match_postponed:${base.eventId}:${Number.isFinite(previousMs) ? previousMs : text(previous?.kickoff)}:${Number.isFinite(kickoffMs) ? kickoffMs : text(game?.kickoff)}`;
+    base.notificationDraft = {
+      title: game?.cancelled ? '🚨 Jogo cancelado' : '🚨 Jogo adiado',
+      body: `${matchup}. ${Number.isFinite(kickoffMs) && !game?.dateTbd ? `Nova referência: ${brKickoffLabel(game.kickoff)}.` : 'Nova data a confirmar.'}`
+    };
+  } else {
+    base.eventKey = `schedule_changed:${base.eventId}:${Number.isFinite(previousMs) ? previousMs : text(previous?.kickoff)}:${Number.isFinite(kickoffMs) ? kickoffMs : text(game?.kickoff)}`;
+    const restored = previous?.postponed && !game?.postponed;
+    base.notificationDraft = {
+      title: restored ? '🕒 Nova data confirmada' : '🕒 Horário do jogo alterado',
+      body: `${matchup}: ${brKickoffLabel(game?.kickoff)}${game?.competitionName ? ` · ${game.competitionName}` : ''}`
+    };
+  }
+  return base;
+}
+
+export function deriveScheduleEvents(previousSnapshot, nextSnapshot, nowMs = Date.now(), hadBaseline = true) {
+  const now = num(nowMs, Date.now());
+  const previous = previousSnapshot && typeof previousSnapshot === 'object' ? previousSnapshot : {};
+  const next = nextSnapshot && typeof nextSnapshot === 'object' ? nextSnapshot : {};
+  const events = [];
+  for (const game of Object.values(next)) {
+    const kickoff = Date.parse(game?.kickoff || '');
+    const remaining = kickoff - now;
+    if (!game?.postponed && !game?.cancelled && Number.isFinite(kickoff) && remaining >= REMINDER_MIN_MS && remaining <= REMINDER_MAX_MS) {
+      events.push(scheduleEvent('prematch_15', game, now));
+    }
+    if (!hadBaseline) continue;
+    const old = previous[game.eventId];
+    if (!old) continue;
+    if ((!old.postponed && game.postponed) || (!old.cancelled && game.cancelled)) {
+      events.push(scheduleEvent('match_postponed', game, now, old));
+      continue;
+    }
+    const oldKickoff = Date.parse(old.kickoff || '');
+    if (old.postponed && !game.postponed) {
+      events.push(scheduleEvent('schedule_changed', game, now, old));
+      continue;
+    }
+    if (Number.isFinite(oldKickoff) && Number.isFinite(kickoff) && Math.abs(kickoff - oldKickoff) >= SCHEDULE_CHANGE_MIN_MS) {
+      events.push(scheduleEvent('schedule_changed', game, now, old));
+    }
+  }
+  return events;
 }
 
 async function fetchAgendaJson(url) {
@@ -142,17 +256,19 @@ export class SportsMonitor {
   }
 
   async readState() {
-    const [watchlist, matches, status, recentEvents] = await Promise.all([
+    const [watchlist, matches, status, recentEvents, scheduleSnapshot] = await Promise.all([
       this.state.storage.get('watchlist'),
       this.state.storage.get('matches'),
       this.state.storage.get('status'),
-      this.state.storage.get('recentEvents')
+      this.state.storage.get('recentEvents'),
+      this.state.storage.get('scheduleSnapshot')
     ]);
     return {
       watchlist: watchlist && typeof watchlist === 'object' ? watchlist : {},
       matches: matches && typeof matches === 'object' ? matches : {},
       status: status && typeof status === 'object' ? status : {},
-      recentEvents: Array.isArray(recentEvents) ? recentEvents : []
+      recentEvents: Array.isArray(recentEvents) ? recentEvents : [],
+      scheduleSnapshot: scheduleSnapshot && typeof scheduleSnapshot === 'object' ? scheduleSnapshot : {}
     };
   }
 
@@ -167,13 +283,20 @@ export class SportsMonitor {
     const now = Date.now();
     const current = await this.readState();
     let candidates = [];
+    let scheduleSnapshot = { ...current.scheduleSnapshot };
     let agendaError = '';
+    let scheduleEvents = [];
     try {
       const agenda = await fetchAgendaJson(AGENDA_URL);
       candidates = selectAgendaCandidates(agenda, now);
+      scheduleSnapshot = selectScheduleSnapshot(agenda, now, current.scheduleSnapshot);
+      scheduleEvents = deriveScheduleEvents(current.scheduleSnapshot, scheduleSnapshot, now, Boolean(current.status.scheduleBaselineAt));
     } catch (error) {
       agendaError = text(error?.message || error);
     }
+
+    for (const event of scheduleEvents) await this.recordEvent(event);
+    if (!agendaError) await this.state.storage.put('scheduleSnapshot', scheduleSnapshot);
 
     const watchlist = {};
     for (const candidate of candidates) {
@@ -193,6 +316,8 @@ export class SportsMonitor {
       lastBootstrapAt: now,
       lastAgendaSuccessAt: agendaError ? current.status.lastAgendaSuccessAt || 0 : now,
       lastAgendaError: agendaError,
+      scheduleBaselineAt: agendaError ? num(current.status.scheduleBaselineAt, 0) : (num(current.status.scheduleBaselineAt, 0) || now),
+      scheduleEventsThisBootstrap: scheduleEvents.length,
       watchCount: Object.keys(watchlist).length
     });
 
@@ -215,19 +340,25 @@ export class SportsMonitor {
 
   async recordEvent(event) {
     const row = eventRow(event);
-    const inserted = await this.env.DB.prepare(`
-      INSERT OR IGNORE INTO sports_events (
-        event_key,event_id,event_type,source_play_key,league,competition_key,competition_name,
-        home_team_id,home_team_name,away_team_id,away_team_name,scoring_team_id,scoring_team_name,
-        athlete_id,athlete_name,minute,home_score,away_score,own_goal,penalty_goal,shootout,
-        detected_at,confirmed_at,payload_json
-      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-    `).bind(
-      row.event_key,row.event_id,row.event_type,row.source_play_key,row.league,row.competition_key,row.competition_name,
-      row.home_team_id,row.home_team_name,row.away_team_id,row.away_team_name,row.scoring_team_id,row.scoring_team_name,
-      row.athlete_id,row.athlete_name,row.minute,row.home_score,row.away_score,row.own_goal,row.penalty_goal,row.shootout,
-      row.detected_at,row.confirmed_at,row.payload_json
-    ).run();
+    const goalEvent = row.event_type === 'goal' || row.event_type === 'goal_overturned';
+    const inserted = goalEvent
+      ? await this.env.DB.prepare(`
+        INSERT OR IGNORE INTO sports_events (
+          event_key,event_id,event_type,source_play_key,league,competition_key,competition_name,
+          home_team_id,home_team_name,away_team_id,away_team_name,scoring_team_id,scoring_team_name,
+          athlete_id,athlete_name,minute,home_score,away_score,own_goal,penalty_goal,shootout,
+          detected_at,confirmed_at,payload_json
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+      `).bind(
+        row.event_key,row.event_id,row.event_type,row.source_play_key,row.league,row.competition_key,row.competition_name,
+        row.home_team_id,row.home_team_name,row.away_team_id,row.away_team_name,row.scoring_team_id,row.scoring_team_name,
+        row.athlete_id,row.athlete_name,row.minute,row.home_score,row.away_score,row.own_goal,row.penalty_goal,row.shootout,
+        row.detected_at,row.confirmed_at,row.payload_json
+      ).run()
+      : await this.env.DB.prepare(`
+        INSERT OR IGNORE INTO match_events (event_key,event_id,event_type,confirmed_at,payload_json)
+        VALUES (?, ?, ?, ?, ?)
+      `).bind(row.event_key,row.event_id,row.event_type,row.confirmed_at,row.payload_json).run();
     if (Number(inserted?.meta?.changes || 0) > 0) {
       try {
         await enqueueSportsEvent(this.env, row.event_key);
@@ -369,6 +500,7 @@ export class SportsMonitor {
       lastPollError: text(snapshot.status.lastPollError),
       summariesFetched: num(snapshot.status.summariesFetched, 0),
       emittedThisPoll: num(snapshot.status.emittedThisPoll, 0),
+      scheduleEventsThisBootstrap: num(snapshot.status.scheduleEventsThisBootstrap, 0),
       sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R1'),
       scoreboardSources: snapshot.status.scoreboardSources && typeof snapshot.status.scoreboardSources === 'object' ? snapshot.status.scoreboardSources : {},
       summarySources: snapshot.status.summarySources && typeof snapshot.status.summarySources === 'object' ? snapshot.status.summarySources : {},

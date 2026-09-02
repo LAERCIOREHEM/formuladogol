@@ -38,13 +38,14 @@ async function cleanupOldRows(env) {
     env.DB.prepare(`DELETE FROM push_deliveries WHERE updated_at < datetime('now','-90 days')`),
     env.DB.prepare(`DELETE FROM push_event_dispatch WHERE updated_at < datetime('now','-90 days')`),
     env.DB.prepare(`DELETE FROM sports_events WHERE created_at < datetime('now','-90 days')`),
+    env.DB.prepare(`DELETE FROM match_events WHERE created_at < datetime('now','-90 days')`),
     env.DB.prepare(`DELETE FROM push_subscriptions WHERE active=0 AND updated_at < datetime('now','-180 days')`),
     env.DB.prepare(`
-      DELETE FROM push_preferences
+      DELETE FROM push_preferences_v2
       WHERE updated_at < datetime('now','-180 days')
         AND NOT EXISTS (
           SELECT 1 FROM push_subscriptions s
-          WHERE s.installation_id=push_preferences.installation_id AND s.active=1
+          WHERE s.installation_id=push_preferences_v2.installation_id AND s.active=1
         )
     `)
   ];
@@ -86,7 +87,7 @@ export function assessOperationalHealth(input, nowMs = Date.now()) {
 }
 
 async function dbMetrics(env) {
-  const [subs, events, dispatch, deliveries, recentDeliveries, latency, latest] = await Promise.all([
+  const [subs, events, matchEvents, dispatch, deliveries, recentDeliveries, latency, latest] = await Promise.all([
     env.DB.prepare(`
       SELECT
         SUM(CASE WHEN active=1 THEN 1 ELSE 0 END) AS active,
@@ -99,6 +100,16 @@ async function dbMetrics(env) {
         SUM(CASE WHEN event_type='goal_overturned' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS overturned24h,
         COUNT(*) AS total
       FROM sports_events
+    `).first(),
+    env.DB.prepare(`
+      SELECT
+        SUM(CASE WHEN event_type='prematch_15' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS prematch24h,
+        SUM(CASE WHEN event_type='final_whistle' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS final24h,
+        SUM(CASE WHEN event_type IN ('schedule_changed','match_postponed') AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS schedule24h,
+        SUM(CASE WHEN event_type='shootout_start' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS shootout24h,
+        SUM(CASE WHEN event_type='qualification' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS qualification24h,
+        COUNT(*) AS total
+      FROM match_events
     `).first(),
     env.DB.prepare(`
       SELECT
@@ -136,7 +147,10 @@ async function dbMetrics(env) {
     `).first(),
     env.DB.prepare(`
       SELECT
-        (SELECT MAX(confirmed_at) FROM sports_events) AS last_event_at,
+        (SELECT MAX(ts) FROM (
+          SELECT MAX(confirmed_at) AS ts FROM sports_events
+          UNION ALL SELECT MAX(confirmed_at) AS ts FROM match_events
+        )) AS last_event_at,
         (SELECT MAX(sent_at) FROM push_deliveries WHERE status='sent') AS last_push_at
     `).first()
   ]);
@@ -144,7 +158,11 @@ async function dbMetrics(env) {
   return {
     subscriptions: { active: num(subs?.active, 0), inactive: num(subs?.inactive, 0) },
     events: {
-      total: num(events?.total, 0), goals24h: num(events?.goals24h, 0), overturned24h: num(events?.overturned24h, 0),
+      total: num(events?.total, 0) + num(matchEvents?.total, 0),
+      goals24h: num(events?.goals24h, 0), overturned24h: num(events?.overturned24h, 0),
+      prematch24h: num(matchEvents?.prematch24h, 0), final24h: num(matchEvents?.final24h, 0),
+      schedule24h: num(matchEvents?.schedule24h, 0), shootout24h: num(matchEvents?.shootout24h, 0),
+      qualification24h: num(matchEvents?.qualification24h, 0),
       lastEventAt: iso(latest?.last_event_at)
     },
     dispatch: {

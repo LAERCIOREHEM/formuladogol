@@ -16,13 +16,16 @@ class FakeStorage {
 }
 
 class FakeDB {
-  constructor() { this.events = new Map(); }
+  constructor() { this.events = new Map(); this.matchEvents = new Map(); }
   prepare(sql) {
     return {
       bind: (...args) => ({
         run: async () => {
           if (/INSERT OR IGNORE INTO sports_events/.test(sql)) {
             if (!this.events.has(args[0])) this.events.set(args[0], args);
+          }
+          if (/INSERT OR IGNORE INTO match_events/.test(sql)) {
+            if (!this.matchEvents.has(args[0])) this.matchEvents.set(args[0], args);
           }
           return { success: true };
         }

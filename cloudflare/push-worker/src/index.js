@@ -96,7 +96,11 @@ function normalizePreferences(input) {
   return {
     goals: src.goals !== false,
     overturnedGoals: src.overturnedGoals !== false,
-    finalWhistle: src.finalWhistle === true,
+    prematch15: src.prematch15 !== false,
+    finalWhistle: src.finalWhistle !== false,
+    scheduleChanges: src.scheduleChanges !== false,
+    shootoutAlerts: src.shootoutAlerts !== false,
+    qualificationAlerts: src.qualificationAlerts !== false,
     allGames: src.allGames === true,
     teams: cleanList(src.teams, 10),
     games: cleanList(src.games, 30)
@@ -106,13 +110,17 @@ function normalizePreferences(input) {
 async function savePreferences(env, installationId, preferences) {
   const p = normalizePreferences(preferences);
   await env.DB.prepare(`
-    INSERT INTO push_preferences
-      (installation_id, goals, overturned_goals, final_whistle, all_games, teams_json, games_json, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    INSERT INTO push_preferences_v2
+      (installation_id, goals, overturned_goals, prematch_15, final_whistle, schedule_changes, shootout_alerts, qualification_alerts, all_games, teams_json, games_json, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(installation_id) DO UPDATE SET
       goals=excluded.goals,
       overturned_goals=excluded.overturned_goals,
+      prematch_15=excluded.prematch_15,
       final_whistle=excluded.final_whistle,
+      schedule_changes=excluded.schedule_changes,
+      shootout_alerts=excluded.shootout_alerts,
+      qualification_alerts=excluded.qualification_alerts,
       all_games=excluded.all_games,
       teams_json=excluded.teams_json,
       games_json=excluded.games_json,
@@ -121,7 +129,11 @@ async function savePreferences(env, installationId, preferences) {
     installationId,
     p.goals ? 1 : 0,
     p.overturnedGoals ? 1 : 0,
+    p.prematch15 ? 1 : 0,
     p.finalWhistle ? 1 : 0,
+    p.scheduleChanges ? 1 : 0,
+    p.shootoutAlerts ? 1 : 0,
+    p.qualificationAlerts ? 1 : 0,
     p.allGames ? 1 : 0,
     JSON.stringify(p.teams),
     JSON.stringify(p.games)
@@ -131,15 +143,19 @@ async function savePreferences(env, installationId, preferences) {
 
 async function getPreferences(env, installationId) {
   const row = await env.DB.prepare(`
-    SELECT goals, overturned_goals, final_whistle, all_games, teams_json, games_json
-    FROM push_preferences WHERE installation_id=?
+    SELECT goals, overturned_goals, prematch_15, final_whistle, schedule_changes, shootout_alerts, qualification_alerts, all_games, teams_json, games_json
+    FROM push_preferences_v2 WHERE installation_id=?
   `).bind(installationId).first();
   if (!row) return normalizePreferences({});
   const parse = (raw) => { try { return JSON.parse(raw || '[]'); } catch (_) { return []; } };
   return normalizePreferences({
     goals: Boolean(row.goals),
     overturnedGoals: Boolean(row.overturned_goals),
+    prematch15: Boolean(row.prematch_15),
     finalWhistle: Boolean(row.final_whistle),
+    scheduleChanges: Boolean(row.schedule_changes),
+    shootoutAlerts: Boolean(row.shootout_alerts),
+    qualificationAlerts: Boolean(row.qualification_alerts),
     allGames: Boolean(row.all_games),
     teams: parse(row.teams_json),
     games: parse(row.games_json)
@@ -338,7 +354,7 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 6,
-        revision: '6-R',
+        revision: '6-E',
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
