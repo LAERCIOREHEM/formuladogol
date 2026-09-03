@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '20260901-pwa-onboarding-v2';
+  const VERSION = '20260903-pwa-onboarding-v3';
   const ONBOARDING_DISMISS_KEY = 'fdg_pwa_install_dismissed_until_v1';
   const ONBOARDING_DISMISS_MS = 7 * 24 * 60 * 60 * 1000;
   let deferredPrompt = null;
@@ -118,14 +118,16 @@
 
     if (isIOS() && !isStandalone()) {
       copy.innerHTML = [
-        '<p>No iPhone/iPad, a instalação é feita pelo menu do navegador:</p>',
+        '<p><strong>No iPhone/iPad, faça a instalação pelo Safari.</strong></p>',
+        '<p>Se esta página estiver aberta no <strong>Google Chrome</strong>, abra o <strong>Safari</strong> e acesse <strong>formuladogol.com.br/alertas.html</strong>.</p>',
         '<ol>',
-        '  <li>Toque em <strong>Compartilhar</strong>.</li>',
-        '  <li>Escolha <strong>Adicionar à Tela de Início</strong>.</li>',
+        '  <li>No Safari, toque em <strong>Compartilhar</strong> (quadrado com seta para cima).</li>',
+        '  <li>Role a lista e toque em <strong>Adicionar à Tela de Início</strong>.</li>',
+        '  <li>Se essa opção não aparecer, role até o fim, toque em <strong>Editar Ações</strong> e habilite <strong>Adicionar à Tela de Início</strong>.</li>',
         '  <li>Confirme em <strong>Adicionar</strong>.</li>',
-        '  <li>Abra o <strong>Fórmula do Gol pelo novo ícone</strong> e volte a <strong>Alertas</strong>.</li>',
+        '  <li>Depois, abra o <strong>Fórmula do Gol pelo novo ícone</strong>, volte a <strong>Alertas</strong> e permita as notificações.</li>',
         '</ol>',
-        '<p class="br-pwa-note">Se “Adicionar à Tela de Início” não aparecer no navegador atual, abra esta página no Safari e repita os passos.</p>'
+        '<p class="br-pwa-note"><strong>Safari é o caminho recomendado no iPhone.</strong> Alguns navegadores podem também oferecer “Adicionar à Tela de Início”, mas a orientação do Fórmula do Gol usa o Safari para evitar diferenças entre versões do iOS e do navegador.</p>'
       ].join('');
       install.hidden = true;
     } else if (deferredPrompt) {
@@ -246,7 +248,7 @@
 
     if (isIOS()) {
       install.textContent = 'COMO INSTALAR NO IPHONE';
-      help.textContent = 'No iPhone: Compartilhar → Adicionar à Tela de Início. Depois abra o Fórmula do Gol pelo novo ícone e volte a Alertas.';
+      help.textContent = 'No iPhone, use preferencialmente o Safari: Compartilhar → Adicionar à Tela de Início. Se estiver no Chrome, abra esta página no Safari. Se a opção não aparecer no Safari, use Editar Ações para habilitá-la.';
     } else if (deferredPrompt) {
       install.textContent = 'INSTALAR AGORA';
       help.textContent = 'Depois de instalar, escolha abaixo seu time, um jogo específico ou todos os jogos e permita as notificações.';
