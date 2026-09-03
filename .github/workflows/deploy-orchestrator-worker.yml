@@ -54,6 +54,22 @@ jobs:
       - name: Instalar dependências
         run: npm install --no-audit --no-fund
 
+      - name: Validar permissões do token GitHub
+        shell: bash
+        run: |
+          set -euo pipefail
+          API='https://api.github.com/repos/LAERCIOREHEM/formuladogol'
+          COMMON=(-fsS --max-time 15 -H "Authorization: Bearer ${FDG_ORCHESTRATOR_GITHUB_TOKEN}" -H 'X-GitHub-Api-Version: 2026-03-10')
+          curl "${COMMON[@]}" -H 'Accept: application/vnd.github+json' "${API}/actions/workflows?per_page=1" >/dev/null || {
+            echo 'ERRO: o token precisa de Actions: Read and write para disparar workflows.'
+            exit 1
+          }
+          curl "${COMMON[@]}" -H 'Accept: application/vnd.github.raw+json' "${API}/contents/dados-br/config-analises.json?ref=main" >/tmp/fdg-config-analises.json || {
+            echo 'ERRO: o token precisa de Contents: Read-only para ler artefatos internos do orquestrador.'
+            exit 1
+          }
+          node -e 'JSON.parse(require("fs").readFileSync("/tmp/fdg-config-analises.json","utf8")); console.log("Token GitHub OK: Actions + Contents(read).")'
+
       - name: Validar código e contratos
         run: npm run validate
 
