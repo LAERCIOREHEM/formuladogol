@@ -90,5 +90,16 @@
         "minutos": 1440
       }
     ]
+  },
+  "backoff_falhas": {
+    "ativo": true,
+    "falhas_para_pausar": 3,
+    "espera_minutos": [
+      15,
+      60,
+      240,
+      720
+    ],
+    "teto_minutos": 1440
   }
 }

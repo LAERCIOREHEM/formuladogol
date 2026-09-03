@@ -1533,8 +1533,26 @@ def self_test() -> int:
     assert "O líder caiu; o perseguidor hesitou" in pagina
     assert "A análise editorial utiliza somente um dossiê factual auditado" in pagina
     assert len(re.findall(r'class="analysis-video(?:\s|\")', pagina)) == 10
-    assert pagina.count('analysis-video-external') == 1
-    assert 'https://www.youtube.com/watch?v=JDF3vatmswE' in pagina
+    # ATENÇÃO: não asserte contagem de 'analysis-video-external' sobre a página
+    # real. A fonte de cada vídeo é dado MUTÁVEL: substituir-fontes-mm.yml troca
+    # CazeTV/não-embeddável por GE TV a qualquer momento, o que já quebrou este
+    # self-test e travou o orquestrador em laço. Aqui testamos a LÓGICA de
+    # renderização com entradas sintéticas, que é determinística.
+    _jogo_base = {"linha": "Time A 1 × 0 Time B", "mandante": "Time A", "visitante": "Time B", "event_id": "selftest-1"}
+    _externo = renderizar_jogo({**_jogo_base, "melhores_momentos": {
+        "url": "https://www.youtube.com/watch?v=JDF3vatmswE", "fonte": "CazeTV", "titulo": "MM"}})
+    assert _externo.count("analysis-video-external") == 1
+    assert 'https://www.youtube.com/watch?v=JDF3vatmswE' in _externo
+    _nao_embed = renderizar_jogo({**_jogo_base, "melhores_momentos": {
+        "url": "https://youtu.be/JDF3vatmswE", "fonte": "GE TV", "embeddable": False, "titulo": "MM"}})
+    assert _nao_embed.count("analysis-video-external") == 1
+    _embed = renderizar_jogo({**_jogo_base, "melhores_momentos": {
+        "url": "https://www.youtube.com/watch?v=JDF3vatmswE", "fonte": "GE TV", "embeddable": True, "titulo": "MM"}})
+    assert "analysis-video-external" not in _embed and 'data-video-id="JDF3vatmswE"' in _embed
+    _sem_video = renderizar_jogo({**_jogo_base, "melhores_momentos": {}})
+    assert "analysis-video" not in _sem_video
+    # A página real pode ter de 0 a 10 links externos; qualquer valor é legítimo.
+    assert 0 <= pagina.count('analysis-video-external') <= 10
     assert pagina.count('class="analysis-stats-toggle"') == 10
     assert pagina.count('class="analysis-game-details"') == 10
     assert "Placar e resumo" not in pagina

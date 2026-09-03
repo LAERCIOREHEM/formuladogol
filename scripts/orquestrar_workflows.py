@@ -103,6 +103,11 @@ REPO_WRITERS = {
     "Publicar análise editorial continental",
     "Publicar análise editorial da rodada",
     "Revisar melhores momentos Brasileirão oficiais",
+    # Faziam 'git push' sem estar registrados aqui: o orquestrador não os
+    # enxergava e podia despachar um escritor concorrente, gerando falha de
+    # push (non-fast-forward) e, por consequência, mais retentativas.
+    "Apurar Apostas Brasileirão",
+    "Deploy site (GitHub Pages)",
 }
 
 CUP_ARTICLES = {
@@ -114,6 +119,12 @@ CUP_ARTICLES = {
 
 DEFAULT_CONFIG: dict[str, Any] = {
     "timezone": "America/Sao_Paulo",
+    "backoff_falhas": {
+        "ativo": True,
+        "falhas_para_pausar": 3,
+        "espera_minutos": [15, 60, 240, 720],
+        "teto_minutos": 1440,
+    },
     "atualizar_brasileirao": {
         "sondagem_antes_minutos": 45,
         "sondagem_depois_minutos": 240,
@@ -502,6 +513,98 @@ def last_run(runs: Sequence[Mapping[str, Any]], workflow_name: str, tz: ZoneInfo
         return None, None
     candidates.sort(key=lambda item: item[0], reverse=True)
     return candidates[0]
+
+
+# Mapeia a ação decidida -> nome do workflow que ela dispara. Usado pelo
+# circuit breaker: se o workflow-alvo vem falhando em série, não adianta
+# despachar de novo a cada 10 minutos.
+ACAO_PARA_WORKFLOW: dict[str, str] = {
+    "atualizar_brasileirao": WORKFLOW_MAIN,
+    "publicos": WORKFLOW_PUBLICOS,
+    "melhores_momentos": WORKFLOW_MM,
+    "transmissao_aovivo": WORKFLOW_TRANSMISSOES,
+    "transmissoes_tv": WORKFLOW_TRANSMISSOES,
+    "editorial_rodada": WORKFLOW_EDITORIAL_RODADA,
+    "editorial_copa_do_brasil": WORKFLOW_EDITORIAL_COPA,
+    "editorial_continentais": WORKFLOW_EDITORIAL_CONTINENTAIS,
+}
+
+
+def falhas_consecutivas(runs: Sequence[Mapping[str, Any]], workflow_name: str, tz: ZoneInfo) -> tuple[int, datetime | None]:
+    """Quantas execuções concluídas mais recentes do workflow terminaram em falha.
+
+    Retorna (contagem, horário da falha mais recente). Para na primeira execução
+    bem-sucedida. Execuções ainda em andamento são ignoradas.
+    """
+    concluidas: list[tuple[datetime, Mapping[str, Any]]] = []
+    for run in runs:
+        if str(run.get("name") or "") != workflow_name:
+            continue
+        if str(run.get("status") or "") != "completed":
+            continue
+        when = run_time(run, tz)
+        if when:
+            concluidas.append((when, run))
+    concluidas.sort(key=lambda item: item[0], reverse=True)
+
+    total = 0
+    ultima: datetime | None = None
+    for when, run in concluidas:
+        if str(run.get("conclusion") or "") == "success":
+            break
+        # 'cancelled' e 'skipped' não contam como falha real do código.
+        if str(run.get("conclusion") or "") not in {"failure", "timed_out", "startup_failure"}:
+            break
+        total += 1
+        if ultima is None:
+            ultima = when
+    return total, ultima
+
+
+def backoff_por_falha(
+    decision: "Decision",
+    *,
+    config: Mapping[str, Any],
+    runs: Sequence[Mapping[str, Any]],
+    now: datetime,
+    tz: ZoneInfo,
+) -> "Decision":
+    """Circuit breaker: segura o despacho de um workflow que está falhando em série.
+
+    Sem isto, um erro determinístico (ex.: assert quebrado no self-test) faz o
+    orquestrador redespachar o mesmo workflow a cada ciclo do cron externo,
+    indefinidamente. Foi exatamente o que gerou ~1.370 execuções falhadas de
+    'Publicar análise editorial da rodada'.
+    """
+    cfg = config.get("backoff_falhas") or {}
+    if not bool(cfg.get("ativo", True)):
+        return decision
+    limite = int(cfg.get("falhas_para_pausar", 3))
+    escala = [int(v) for v in (cfg.get("espera_minutos") or [15, 60, 240, 720])]
+    teto = int(cfg.get("teto_minutos", 1440))
+
+    alvo = ACAO_PARA_WORKFLOW.get(decision.action)
+    if not alvo:
+        return decision
+
+    total, ultima = falhas_consecutivas(runs, alvo, tz)
+    if total < limite or ultima is None:
+        return decision
+
+    indice = min(total - limite, len(escala) - 1)
+    espera = min(escala[indice], teto)
+    liberado_em = ultima + timedelta(minutes=espera)
+    if now >= liberado_em:
+        return decision
+
+    restante = int((liberado_em - now).total_seconds() // 60)
+    return Decision(
+        "none",
+        (
+            f"Backoff: '{alvo}' falhou {total}x seguidas; próxima tentativa em ~{restante} min. "
+            f"Corrija a causa ou rode o workflow manualmente para resetar."
+        ),
+    )
 
 
 def active_writer(runs: Sequence[Mapping[str, Any]], current_run_id: str = "") -> Mapping[str, Any] | None:
@@ -1198,6 +1301,40 @@ def self_test() -> int:
     assert not time_reached(datetime(2026, 8, 9, 5, 0, tzinfo=tz), "06:30")
     assert mm_retry_interval(1.0, config) == 10
     assert mm_retry_interval(3.0, config) == 30
+
+    # --- Circuit breaker por falha repetida ---------------------------------
+    def _run(conclusion: str, minutos_atras: int) -> dict[str, Any]:
+        return {
+            "name": WORKFLOW_EDITORIAL_RODADA,
+            "status": "completed",
+            "conclusion": conclusion,
+            "created_at": (now - timedelta(minutes=minutos_atras)).astimezone(timezone.utc).isoformat(),
+        }
+
+    alvo = Decision("editorial_rodada", "teste", round_number="20")
+    # Duas falhas: ainda abaixo do limite, despacha normalmente.
+    runs_2 = [_run("failure", 5), _run("failure", 15)]
+    assert backoff_por_falha(alvo, config=config, runs=runs_2, now=now, tz=tz).action == "editorial_rodada"
+    assert falhas_consecutivas(runs_2, WORKFLOW_EDITORIAL_RODADA, tz)[0] == 2
+    # Três falhas recentes: segura por 15 min.
+    runs_3 = [_run("failure", 5), _run("failure", 15), _run("failure", 25)]
+    travado = backoff_por_falha(alvo, config=config, runs=runs_3, now=now, tz=tz)
+    assert travado.action == "none" and "Backoff" in travado.reason
+    # Passada a espera, libera uma nova tentativa.
+    runs_3_antigo = [_run("failure", 40), _run("failure", 50), _run("failure", 60)]
+    assert backoff_por_falha(alvo, config=config, runs=runs_3_antigo, now=now, tz=tz).action == "editorial_rodada"
+    # Um sucesso zera a contagem, mesmo com falhas mais antigas.
+    runs_ok = [_run("success", 2), _run("failure", 5), _run("failure", 15), _run("failure", 25)]
+    assert falhas_consecutivas(runs_ok, WORKFLOW_EDITORIAL_RODADA, tz)[0] == 0
+    assert backoff_por_falha(alvo, config=config, runs=runs_ok, now=now, tz=tz).action == "editorial_rodada"
+    # 'cancelled' não conta como falha de código.
+    runs_cancel = [_run("cancelled", 5), _run("failure", 15), _run("failure", 25)]
+    assert falhas_consecutivas(runs_cancel, WORKFLOW_EDITORIAL_RODADA, tz)[0] == 0
+    # Escalonamento: 5 falhas -> espera de 240 min.
+    runs_5 = [_run("failure", m) for m in (5, 15, 25, 35, 45)]
+    assert backoff_por_falha(alvo, config=config, runs=runs_5, now=now, tz=tz).action == "none"
+    # Ação 'none' nunca é afetada pelo breaker.
+    assert backoff_por_falha(Decision("none", "x"), config=config, runs=runs_5, now=now, tz=tz).action == "none"
     assert mm_retry_interval(12.0, config) == 120
     assert mm_retry_interval(40.0, config) == 360
     assert mm_retry_interval(100.0, config) == 720
@@ -1373,6 +1510,7 @@ def main() -> int:
         tz=tz,
         current_run_id=os.environ.get("GITHUB_RUN_ID", ""),
     )
+    decision = backoff_por_falha(decision, config=config, runs=runs, now=now, tz=tz)
     payload = {
         "agora": now.isoformat(),
         "jogos_agenda": len(games),
