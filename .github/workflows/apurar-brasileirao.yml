@@ -8,9 +8,16 @@ on:
 permissions:
   contents: write
 
+# Sem isto, dois disparos próximos rodavam em paralelo e o segundo falhava no
+# push (non-fast-forward), acionando retentativa em cascata.
+concurrency:
+  group: fdg-apurar-brasileirao
+  cancel-in-progress: false
+
 jobs:
   apurar:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
