@@ -1,0 +1,175 @@
+# ==============================================================================
+# Fórmula do Gol — .gitignore
+#
+# ATENÇÃO: o repositório é PÚBLICO. A prioridade deste arquivo é impedir que
+# credenciais entrem no histórico. Uma chave commitada continua acessível no
+# histórico do Git mesmo depois de removida do código.
+# ==============================================================================
+
+# ------------------------------------------------------------------ SEGREDOS --
+# Nunca versionar. Use Settings > Secrets do GitHub para os workflows.
+.env
+.env.*
+!.env.example
+*.env
+secrets.json
+credentials.json
+service-account*.json
+supabase-service-role*
+*.pem
+*.key
+!*-public.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+.netrc
+.npmrc
+.pypirc
+config.local.*
+segredos/
+.secrets/
+
+# --------------------------------------------------------------------- PYTHON --
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+.installed.cfg
+MANIFEST
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# Testes e cobertura
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+nosetests.xml
+.hypothesis/
+
+# ---------------------------------------------------- NODE / CLOUDFLARE WORKER --
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.wrangler/
+.dev.vars
+.dev.vars.*
+wrangler.toml.local
+
+# --------------------------------------------------------- SAÍDAS TEMPORÁRIAS --
+# Rascunhos e artefatos locais que não devem ir para o site publicado.
+tmp/
+temp/
+.tmp/
+*.tmp
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*~
+rascunho/
+saida-local/
+_local/
+
+# Logs
+*.log
+logs/
+
+# ------------------------------------------------------------------- SISTEMA --
+# Windows (ambiente principal de trabalho)
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ---------------------------------------------------------------------- IDEs --
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.iml
+*.sublime-workspace
+*.sublime-project
+.spyderproject
+.ropeproject
+
+# ------------------------------------------------------- MÍDIA DE TRABALHO --
+# Material bruto da produção de redes sociais. Os entregáveis finais vão para
+# as plataformas, não para o repositório — arquivos grandes incham o clone.
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.aiff
+*.psd
+*.ai
+*.aep
+*.prproj
+midia-bruta/
+audio-bruto/
+!img/**
+!**/notification-fg-*.png
+
+# ------------------------------------------------------ ARQUIVOS DUPLICADOS --
+# Existem cópias de workflows na RAIZ do repositório, além das versões válidas
+# em .github/workflows/. As da raiz não são executadas pelo GitHub e só geram
+# confusão. Confira e apague; depois de removidas, estas linhas evitam que
+# voltem por engano.
+/atualizar-elencos-brasileirao.yml
+/buscar-melhores-momentos-getv.yml
+/buscar-transmissoes-aovivo-brasileirao.yml
+/deploy.yml
+/publicar-analise-copa-do-brasil.yml
+/publicar-analise-rodada.yml
+
+# ------------------------------------------------------------------ EXCEÇÕES --
+# Estes DEVEM permanecer versionados — não remover as linhas abaixo.
+!CNAME
+!robots.txt
+!sitemap.xml
+!news-sitemap.xml
+!feed.xml
+!manifest.webmanifest
+!requirements*.txt
+!dados-br/**
