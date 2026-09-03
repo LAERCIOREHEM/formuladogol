@@ -1,5 +1,5 @@
 name: Buscar melhores momentos oficiais
-run-name: Melhores momentos · ${{ inputs.modo || 'incremental' }}
+run-name: Melhores momentos · ${{ inputs.modo || 'incremental' }} · ${{ inputs.event_id || 'todos' }}
 
 on:
   workflow_dispatch:
@@ -12,6 +12,10 @@ on:
         options:
           - backfill
           - incremental
+      event_id:
+        description: "Opcional: buscar somente o jogo ESPN informado"
+        required: false
+        default: ""
       rodada_inicio:
         description: "Rodada inicial. Vazio = usar config/rodadas recentes."
         required: false
@@ -76,6 +80,7 @@ jobs:
           INPUT_MODO: ${{ inputs.modo }}
           INPUT_RODADA_INICIO: ${{ inputs.rodada_inicio }}
           INPUT_RODADA_FIM: ${{ inputs.rodada_fim }}
+          INPUT_EVENT_ID: ${{ inputs.event_id }}
         shell: bash
         run: |
           set -euo pipefail
@@ -86,6 +91,9 @@ jobs:
           fi
 
           CMD=(python scripts/buscar_melhores_momentos_getv.py --modo "$MODO")
+          if [ -n "${INPUT_EVENT_ID:-}" ]; then
+            CMD+=(--event-id "${INPUT_EVENT_ID}")
+          fi
           if [ -n "${INPUT_RODADA_INICIO:-}" ]; then
             CMD+=(--rodada-inicio "${INPUT_RODADA_INICIO}")
           fi
@@ -102,6 +110,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           INPUT_RODADA_INICIO: ${{ inputs.rodada_inicio }}
           INPUT_RODADA_FIM: ${{ inputs.rodada_fim }}
+          INPUT_EVENT_ID: ${{ inputs.event_id }}
           INPUT_MAX_SEARCH_TOTAL: ${{ inputs.max_search_total }}
           INPUT_MAX_CONSULTAS_POR_JOGO: ${{ inputs.max_consultas_por_jogo }}
         shell: bash
@@ -119,6 +128,9 @@ jobs:
             --paginas-caze 12 \
             --paginas-prime 8)
 
+          if [ -n "${INPUT_EVENT_ID:-}" ]; then
+            CMD+=(--event-id "${INPUT_EVENT_ID}")
+          fi
           if [ -n "${INPUT_RODADA_INICIO:-}" ]; then
             CMD+=(--rodada-inicio "${INPUT_RODADA_INICIO}")
           fi
@@ -130,6 +142,7 @@ jobs:
           "${CMD[@]}"
 
       - name: Buscar melhores momentos oficiais da fase atual da Copa do Brasil
+        if: ${{ inputs.event_id == '' }}
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
@@ -212,15 +225,27 @@ jobs:
         run: |
           set -euo pipefail
           echo "published=false" >> "$GITHUB_OUTPUT"
+          if git diff --quiet -- "dados-br/melhores-momentos-copa-do-brasil.json"; then
+            echo "cup_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "cup_changed=true" >> "$GITHUB_OUTPUT"
+          fi
           cd "$GITHUB_WORKSPACE"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          FILES=(
+          # Somente conteúdo público/factual pode transformar este run em
+          # publicação. Auditorias, quota, timestamp e catálogo de playlists são
+          # anexados ao mesmo commit quando HÁ novidade, mas nunca provocam
+          # commit/deploy sozinhos.
+          PUBLIC_FILES=(
             "dados-br/melhores-momentos.json"
             "dados-br/melhores-momentos-manual.json"
             "dados-br/melhores-momentos-copa-do-brasil.json"
+          )
+          FILES=(
+            "${PUBLIC_FILES[@]}"
             "dados-br/getv-playlists.json"
             "dados-br/auditoria-melhores-momentos.json"
             "dados-br/auditoria-cobertura-resultados.json"
@@ -228,16 +253,15 @@ jobs:
             "dados-br/relatorio-substituicao-fontes.json"
           )
 
-          # O sincronizador altera somente HTMLs editoriais que realmente ficaram
-          # defasados em relação aos JSONs de Melhores Momentos. Incluí-los
-          # dinamicamente permite corrigir um editorial mesmo quando o vídeo já
-          # estava no JSON antes desta execução.
           while IFS= read -r arquivo; do
-            [[ -n "$arquivo" ]] && FILES+=("$arquivo")
+            if [[ -n "$arquivo" ]]; then
+              PUBLIC_FILES+=("$arquivo")
+              FILES+=("$arquivo")
+            fi
           done < <(git diff --name-only -- 'analises/*.html')
 
-          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
-            echo "Nenhuma mudança nos JSONs de melhores momentos. Nada para commitar."
+          if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
+            echo "Nenhuma mudança factual de melhores momentos. Auditorias isoladas não geram commit/deploy."
             exit 0
           fi
 
@@ -263,8 +287,8 @@ jobs:
               fi
             done
 
-            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
-              echo "Após atualizar com origin/main, nada mudou — sem commit."
+            if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
+              echo "Após atualizar com origin/main, nenhuma mudança factual permaneceu — sem commit."
               exit 0
             fi
 
@@ -293,3 +317,13 @@ jobs:
           set -euo pipefail
           gh workflow run deploy.yml --ref main
           echo "Deploy disparado para os melhores momentos recém-publicados."
+
+      - name: Reprocessar editorial da Copa somente se os vídeos da Copa mudaram
+        if: steps.publish.outputs.published == 'true' && steps.publish.outputs.cup_changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run publicar-analise-copa-do-brasil.yml --ref main
+          echo "Editorial da Copa solicitado porque o arquivo factual de melhores momentos da Copa mudou."

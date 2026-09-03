@@ -2,8 +2,8 @@ name: Orquestrador inteligente Fórmula do Gol
 run-name: Orquestrador · ${{ github.event_name }}
 
 on:
-  # NÃO há schedule aqui. O único cron externo (cron-job.org) chama este
-  # workflow por workflow_dispatch. Toda a inteligência fica no script.
+  # Fallback MANUAL. A operação automática primária foi movida para o Worker
+  # Cloudflare formula-do-gol-orchestrator; cron-job.org não deve chamar isto.
   workflow_dispatch:
     inputs:
       dry_run:
@@ -114,7 +114,11 @@ jobs:
               gh workflow run atualizar-publicos-brasileirao.yml --ref main
               ;;
             melhores_momentos)
-              gh workflow run buscar-melhores-momentos-getv.yml --ref main -f modo=incremental
+              if [[ -n "${EVENT_ID:-}" ]]; then
+                gh workflow run buscar-melhores-momentos-getv.yml --ref main -f modo=incremental -f event_id="$EVENT_ID"
+              else
+                gh workflow run buscar-melhores-momentos-getv.yml --ref main -f modo=incremental
+              fi
               ;;
             transmissao_aovivo)
               test -n "$EVENT_ID"

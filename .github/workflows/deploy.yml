@@ -78,12 +78,13 @@ permissions:
   id-token: write
   deployments: read
 
-# Uma publicação nova substitui uma anterior ainda em andamento. O deploy nasce
-# somente de push com arquivo público alterado (ou chamada manual), evitando fila
-# de versões obsoletas e execuções cinzas criadas por workflow_run.
+# Lock global de escrita/publicação. Este workflow também pode persistir o estado
+# da notificação editorial em main; portanto precisa compartilhar o mesmo grupo
+# dos demais writers para eliminar corrida de push. O mesmo lock também serializa
+# os deploys do Pages.
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: repo-write-main
+  cancel-in-progress: false
 
 jobs:
   deploy:

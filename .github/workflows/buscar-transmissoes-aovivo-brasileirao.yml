@@ -97,7 +97,7 @@ jobs:
             echo "Executando player ao vivo: ${CMD[*]}"
             "${CMD[@]}"
           else
-            # A varredura de grade já é pouco frequente (72h quando saudável).
+            # A varredura de grade já é pouco frequente (até 7 dias quando 30 dias estão cobertos).
             # Aproveitamos essa execução para colher, SEM search.list caro,
             # players GE TV/SBT/CazéTV que já estejam agendados em /streams/uploads.
             # Isso evita depender dos últimos 90 minutos antes do jogo.
@@ -218,20 +218,24 @@ jobs:
           # O modo TV também executa a colheita barata de players futuros.
           # Portanto, transmissoes-aovivo*.json SEMPRE entram no commit; caso
           # contrário a live exata pode ser encontrada e descartada no fim do run.
-          FILES=(
+          PUBLIC_FILES=(
             "dados-br/agenda-clubes-br.json"
             "dados-br/transmissoes-aovivo.json"
+          )
+          FILES=(
+            "${PUBLIC_FILES[@]}"
             "dados-br/auditoria-transmissoes-aovivo.json"
           )
           if [[ "$MODO" != "aovivo" ]]; then
+            PUBLIC_FILES+=("dados-br/transmissoes-tv.json")
             FILES+=(
               "dados-br/transmissoes-tv.json"
               "dados-br/auditoria-transmissoes-tv.json"
             )
           fi
 
-          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
-            echo "Nenhuma transmissão nova ou mudança de auditoria. Nada para commitar."
+          if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
+            echo "Nenhuma mudança factual de agenda/transmissão. Auditoria isolada não gera commit/deploy."
             exit 0
           fi
 
@@ -252,8 +256,8 @@ jobs:
               cp -a "$TMP_DIR/$f" "$f"
             done
 
-            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
-              echo "Origin/main já possui o mesmo conteúdo. Sem commit."
+            if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
+              echo "Origin/main já possui o mesmo conteúdo factual. Sem commit."
               exit 0
             fi
 

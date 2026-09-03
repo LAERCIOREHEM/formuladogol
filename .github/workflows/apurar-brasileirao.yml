@@ -1,8 +1,7 @@
 name: Apurar Apostas Brasileirão
 
 on:
-  # Execução apenas por workflow_dispatch. O cron-job.org chama este gatilho
-  # somente na janela de jogos definida pelo administrador.
+  # Execução apenas por workflow_dispatch/manual. Não depende de cron-job.org.
   workflow_dispatch:
 
 permissions:
@@ -11,7 +10,7 @@ permissions:
 # Sem isto, dois disparos próximos rodavam em paralelo e o segundo falhava no
 # push (non-fast-forward), acionando retentativa em cascata.
 concurrency:
-  group: fdg-apurar-brasileirao
+  group: repo-write-main
   cancel-in-progress: false
 
 jobs:
