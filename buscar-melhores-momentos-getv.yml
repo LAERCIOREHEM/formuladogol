@@ -1,0 +1,329 @@
+name: Buscar melhores momentos oficiais
+run-name: Melhores momentos · ${{ inputs.modo || 'incremental' }} · ${{ inputs.event_id || 'todos' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "Tipo de execução dos melhores momentos oficiais"
+        required: true
+        default: "incremental"
+        type: choice
+        options:
+          - backfill
+          - incremental
+      event_id:
+        description: "Opcional: buscar somente o jogo ESPN informado"
+        required: false
+        default: ""
+      rodada_inicio:
+        description: "Rodada inicial. Vazio = usar config/rodadas recentes."
+        required: false
+        default: ""
+      rodada_fim:
+        description: "Rodada final. Vazio = usar config/rodadas recentes."
+        required: false
+        default: ""
+      max_search_total:
+        description: "Limite de search.list em canais oficiais na etapa reforçada"
+        required: true
+        default: "25"
+      max_consultas_por_jogo:
+        description: "Consultas por jogo em cada canal oficial"
+        required: true
+        default: "2"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  buscar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validar scripts offline
+        run: |
+          python -m py_compile scripts/buscar_melhores_momentos_getv.py
+          python -m py_compile scripts/buscar_melhores_momentos_copa_do_brasil.py
+          python -m py_compile scripts/substituir_fontes_preferidas_mm.py
+          python -m py_compile scripts/gerar_auditoria_cobertura_resultados.py
+          python -m py_compile scripts/gerar_relatorio_fontes_melhores_momentos.py
+          python -m py_compile scripts/sincronizar_midias_editoriais.py
+          python scripts/buscar_melhores_momentos_getv.py --dry-run --modo incremental
+          python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
+          python scripts/substituir_fontes_preferidas_mm.py --selftest
+          python scripts/sincronizar_midias_editoriais.py --self-test
+          python scripts/gerar_relatorio_fontes_melhores_momentos.py --dry-run
+
+      - name: Buscar vídeos prioritários na GE TV por playlists
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_MODO: ${{ inputs.modo }}
+          INPUT_RODADA_INICIO: ${{ inputs.rodada_inicio }}
+          INPUT_RODADA_FIM: ${{ inputs.rodada_fim }}
+          INPUT_EVENT_ID: ${{ inputs.event_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODO="${INPUT_MODO:-incremental}"
+          if [ "${EVENT_NAME}" = "schedule" ]; then
+            MODO="incremental"
+          fi
+
+          CMD=(python scripts/buscar_melhores_momentos_getv.py --modo "$MODO")
+          if [ -n "${INPUT_EVENT_ID:-}" ]; then
+            CMD+=(--event-id "${INPUT_EVENT_ID}")
+          fi
+          if [ -n "${INPUT_RODADA_INICIO:-}" ]; then
+            CMD+=(--rodada-inicio "${INPUT_RODADA_INICIO}")
+          fi
+          if [ -n "${INPUT_RODADA_FIM:-}" ]; then
+            CMD+=(--rodada-fim "${INPUT_RODADA_FIM}")
+          fi
+
+          echo "Executando: ${CMD[*]}"
+          "${CMD[@]}"
+
+      - name: Sanear e buscar fontes preferidas com fallback UOL após 48h
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_RODADA_INICIO: ${{ inputs.rodada_inicio }}
+          INPUT_RODADA_FIM: ${{ inputs.rodada_fim }}
+          INPUT_EVENT_ID: ${{ inputs.event_id }}
+          INPUT_MAX_SEARCH_TOTAL: ${{ inputs.max_search_total }}
+          INPUT_MAX_CONSULTAS_POR_JOGO: ${{ inputs.max_consultas_por_jogo }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MAX_SEARCH="${INPUT_MAX_SEARCH_TOTAL:-25}"
+          MAX_POR_JOGO="${INPUT_MAX_CONSULTAS_POR_JOGO:-2}"
+
+          CMD=(python scripts/substituir_fontes_preferidas_mm.py \
+            --max-search-total "$MAX_SEARCH" \
+            --max-consultas-por-jogo "$MAX_POR_JOGO" \
+            --paginas-getv 2 \
+            --paginas-getv-uploads 4 \
+            --paginas-caze 12 \
+            --paginas-prime 8)
+
+          if [ -n "${INPUT_EVENT_ID:-}" ]; then
+            CMD+=(--event-id "${INPUT_EVENT_ID}")
+          fi
+          if [ -n "${INPUT_RODADA_INICIO:-}" ]; then
+            CMD+=(--rodada-inicio "${INPUT_RODADA_INICIO}")
+          fi
+          if [ -n "${INPUT_RODADA_FIM:-}" ]; then
+            CMD+=(--rodada-fim "${INPUT_RODADA_FIM}")
+          fi
+
+          echo "Executando: ${CMD[*]}"
+          "${CMD[@]}"
+
+      - name: Buscar melhores momentos oficiais da fase atual da Copa do Brasil
+        if: ${{ inputs.event_id == '' }}
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
+
+      - name: Bloquear vídeos de jogos não encerrados ou fontes não autorizadas
+        run: |
+          python - <<'PY'
+          import json
+          import re
+          from pathlib import Path
+          from urllib.parse import parse_qs, urlparse
+          from scripts.substituir_fontes_preferidas_mm import chave_jogo_dict, classificar_video, preferido
+
+          def youtube_video_id_da_url(raw):
+              raw = str(raw or '').strip()
+              if not raw:
+                  return ''
+              parsed = urlparse(raw)
+              host = parsed.netloc.lower().split(':', 1)[0]
+              video_id = ''
+              if host in {'youtu.be', 'www.youtu.be'}:
+                  video_id = parsed.path.strip('/').split('/', 1)[0]
+              elif host == 'youtube.com' or host.endswith('.youtube.com'):
+                  if parsed.path.rstrip('/') == '/watch':
+                      video_id = (parse_qs(parsed.query).get('v') or [''])[0]
+                  else:
+                      partes = [x for x in parsed.path.split('/') if x]
+                      if len(partes) >= 2 and partes[0] in {'embed', 'shorts', 'live'}:
+                          video_id = partes[1]
+              return video_id if re.fullmatch(r'[A-Za-z0-9_-]{6,20}', video_id or '') else ''
+
+          resultados = json.loads(Path('resultados.json').read_text(encoding='utf-8')).get('resultados') or []
+          ids = {str(j.get('event_id') or j.get('id') or '') for j in resultados if str(j.get('event_id') or j.get('id') or '')}
+          chaves = {chave_jogo_dict(j) for j in resultados}
+          erros = []
+
+          for arquivo in ['dados-br/melhores-momentos.json', 'dados-br/melhores-momentos-manual.json']:
+              dados = json.loads(Path(arquivo).read_text(encoding='utf-8'))
+              for key, item in (dados.get('jogos') or {}).items():
+                  event_id = str(item.get('event_id') or '')
+                  chave = str(item.get('chave') or '')
+                  if not chave and item.get('rodada') and item.get('mandante') and item.get('visitante'):
+                      chave = chave_jogo_dict({
+                          'rodada': item.get('rodada'),
+                          'mandante': {'nome': item.get('mandante')},
+                          'visitante': {'nome': item.get('visitante')},
+                      })
+                  if not ((event_id and event_id in ids) or (chave and chave in chaves)):
+                      erros.append(f'{arquivo}:{key}: jogo ainda não está em resultados.json')
+                  if not preferido(item):
+                      erros.append(f'{arquivo}:{key}: fonte não autorizada ({item.get("fonte") or item.get("channel_title") or "sem fonte"})')
+                  video_id_url = youtube_video_id_da_url(item.get('url'))
+                  if not video_id_url:
+                      erros.append(f'{arquivo}:{key}: Melhores Momentos deve apontar para vídeo exato do YouTube; URL inválida: {item.get("url") or "sem URL"}')
+                  video_id_declarado = str(item.get('video_id') or '').strip()
+                  if video_id_declarado and video_id_url and video_id_declarado != video_id_url:
+                      erros.append(f'{arquivo}:{key}: video_id {video_id_declarado} diverge do vídeo da URL {video_id_url}')
+                  if classificar_video(item) == 'caze' and item.get('embeddable') is not False:
+                      erros.append(f'{arquivo}:{key}: CazéTV nunca pode ser embeddable em Melhores Momentos')
+
+          if erros:
+              raise SystemExit('Validação de melhores momentos falhou:\n- ' + '\n- '.join(erros[:30]))
+          print(f'OK: {len(ids)} resultados; todos os vínculos são vídeos exatos do YouTube em fontes autorizadas; CazéTV sem embed.')
+          PY
+
+      - name: Sincronizar melhores momentos nos editoriais já publicados
+        run: |
+          set -euo pipefail
+          python scripts/sincronizar_midias_editoriais.py
+          python scripts/validar_artefatos_analises.py
+
+      - name: Gerar auditorias da aba Resultados e das fontes
+        run: |
+          python scripts/gerar_auditoria_cobertura_resultados.py
+          python scripts/gerar_relatorio_fontes_melhores_momentos.py
+
+      - name: Commitar JSONs se mudaram
+        id: publish
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "published=false" >> "$GITHUB_OUTPUT"
+          if git diff --quiet -- "dados-br/melhores-momentos-copa-do-brasil.json"; then
+            echo "cup_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "cup_changed=true" >> "$GITHUB_OUTPUT"
+          fi
+          cd "$GITHUB_WORKSPACE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Somente conteúdo público/factual pode transformar este run em
+          # publicação. Auditorias, quota, timestamp e catálogo de playlists são
+          # anexados ao mesmo commit quando HÁ novidade, mas nunca provocam
+          # commit/deploy sozinhos.
+          PUBLIC_FILES=(
+            "dados-br/melhores-momentos.json"
+            "dados-br/melhores-momentos-manual.json"
+            "dados-br/melhores-momentos-copa-do-brasil.json"
+          )
+          FILES=(
+            "${PUBLIC_FILES[@]}"
+            "dados-br/getv-playlists.json"
+            "dados-br/auditoria-melhores-momentos.json"
+            "dados-br/auditoria-cobertura-resultados.json"
+            "dados-br/auditoria-fontes-melhores-momentos.json"
+            "dados-br/relatorio-substituicao-fontes.json"
+          )
+
+          while IFS= read -r arquivo; do
+            if [[ -n "$arquivo" ]]; then
+              PUBLIC_FILES+=("$arquivo")
+              FILES+=("$arquivo")
+            fi
+          done < <(git diff --name-only -- 'analises/*.html')
+
+          if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
+            echo "Nenhuma mudança factual de melhores momentos. Auditorias isoladas não geram commit/deploy."
+            exit 0
+          fi
+
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            if [[ -e "$f" ]]; then
+              mkdir -p "$TMP_DIR/$(dirname "$f")"
+              cp -a "$f" "$TMP_DIR/$f"
+            fi
+          done
+
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              if [[ -e "$TMP_DIR/$f" ]]; then
+                rm -rf "$f"
+                mkdir -p "$(dirname "$f")"
+                cp -a "$TMP_DIR/$f" "$f"
+              fi
+            done
+
+            if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
+              echo "Após atualizar com origin/main, nenhuma mudança factual permaneceu — sem commit."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar melhores momentos oficiais - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+            if git push origin HEAD:main; then
+              echo "Push OK na tentativa $i."
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "Push rejeitado na tentativa $i; tentando novamente sobre origin/main mais recente..."
+            sleep 3
+          done
+
+          echo "ERRO: Push falhou após 5 tentativas."
+          exit 1
+
+      - name: Disparar deploy após melhores momentos publicados
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run deploy.yml --ref main
+          echo "Deploy disparado para os melhores momentos recém-publicados."
+
+      - name: Reprocessar editorial da Copa somente se os vídeos da Copa mudaram
+        if: steps.publish.outputs.published == 'true' && steps.publish.outputs.cup_changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run publicar-analise-copa-do-brasil.yml --ref main
+          echo "Editorial da Copa solicitado porque o arquivo factual de melhores momentos da Copa mudou."

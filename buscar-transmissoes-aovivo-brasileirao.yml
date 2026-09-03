@@ -1,0 +1,288 @@
+name: Buscar transmissões dos clubes do Brasileirão
+run-name: Transmissões · ${{ inputs.modo || 'completo' }} · ${{ inputs.event_id || 'todos' }}
+
+on:
+  # Sem schedule e sem push automático. O orquestrador decide quando há trabalho.
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: 'aovivo = player GE TV/SBT/CazéTV; tv = grade futura; completo = ambos'
+        required: true
+        default: 'completo'
+        type: choice
+        options:
+          - aovivo
+          - tv
+          - completo
+      event_id:
+        description: 'Opcional: pesquisar apenas um event_id da ESPN no modo aovivo'
+        required: false
+        default: ''
+        type: string
+      dry_run:
+        description: 'Somente auditar, sem gravar nem publicar'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  buscar:
+    name: Procurar transmissões oficiais
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar cliente HTTP com fingerprint de navegador
+        run: python -m pip install --disable-pip-version-check --no-cache-dir curl-cffi==0.15.0
+
+      - name: Validar script e configuração
+        run: |
+          set -euo pipefail
+          python -m py_compile scripts/gerar_agenda_clubes_brasileirao.py
+          python scripts/gerar_agenda_clubes_brasileirao.py --self-test
+          python scripts/gerar_agenda_clubes_brasileirao.py
+          python -m py_compile scripts/buscar_transmissoes_aovivo_brasileirao.py
+          python scripts/buscar_transmissoes_aovivo_brasileirao.py --selftest
+          python -m py_compile scripts/atualizar_transmissoes_tv_brasileirao.py
+          python scripts/atualizar_transmissoes_tv_brasileirao.py --selftest
+          python -m json.tool dados-br/agenda-clubes-br.json > /dev/null
+          python -m json.tool dados-br/config-transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/config-transmissoes-tv.json > /dev/null
+          python -m json.tool dados-br/transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/transmissoes-aovivo-manual.json > /dev/null
+          python -m json.tool dados-br/auditoria-transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/transmissoes-tv.json > /dev/null
+          python -m json.tool dados-br/auditoria-transmissoes-tv.json > /dev/null
+          python -m json.tool transmissoes.json > /dev/null
+
+      - name: Buscar transmissões oficiais
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          INPUT_MODO: ${{ inputs.modo }}
+          INPUT_EVENT_ID: ${{ inputs.event_id }}
+          INPUT_DRY_RUN: ${{ inputs.dry_run }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MODO="${INPUT_MODO:-completo}"
+          if [[ "$MODO" != "tv" ]]; then
+            CMD=(python scripts/buscar_transmissoes_aovivo_brasileirao.py)
+            if [[ -n "${INPUT_EVENT_ID:-}" ]]; then
+              CMD+=(--event-id "${INPUT_EVENT_ID}")
+            fi
+            if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+              CMD+=(--dry-run)
+            fi
+            echo "Executando player ao vivo: ${CMD[*]}"
+            "${CMD[@]}"
+          else
+            # A varredura de grade já é pouco frequente (até 7 dias quando 30 dias estão cobertos).
+            # Aproveitamos essa execução para colher, SEM search.list caro,
+            # players GE TV/SBT/CazéTV que já estejam agendados em /streams/uploads.
+            # Isso evita depender dos últimos 90 minutos antes do jogo.
+            CMD=(python scripts/buscar_transmissoes_aovivo_brasileirao.py --no-search)
+            if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+              CMD+=(--dry-run)
+            fi
+            echo "Modo tv: colheita barata de players futuros: ${CMD[*]}"
+            "${CMD[@]}"
+          fi
+
+          if [[ "$MODO" != "aovivo" ]]; then
+            TV_CMD=(python scripts/atualizar_transmissoes_tv_brasileirao.py)
+            if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
+              TV_CMD+=(--dry-run)
+            fi
+            echo "Executando grade de TV: ${TV_CMD[*]}"
+            "${TV_CMD[@]}"
+          else
+            echo "Modo aovivo: atualização da grade de TV não será executada."
+          fi
+
+      - name: Validar relatórios gerados
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != true }}
+        run: |
+          set -euo pipefail
+          python -m json.tool dados-br/transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/auditoria-transmissoes-aovivo.json > /dev/null
+          python -m json.tool dados-br/transmissoes-tv.json > /dev/null
+          python -m json.tool dados-br/auditoria-transmissoes-tv.json > /dev/null
+          python - <<'PY'
+          import json
+          from urllib.parse import urlparse, parse_qs
+          from scripts.atualizar_transmissoes_tv_brasileirao import ALLOWED_CHANNELS
+
+          out = json.load(open('dados-br/transmissoes-aovivo.json', encoding='utf-8'))
+          assert isinstance(out.get('jogos'), dict), 'transmissoes-aovivo.json sem objeto jogos'
+          for event_id, jogo in out['jogos'].items():
+              assert str(jogo.get('event_id')) == str(event_id), f'event_id divergente em {event_id}'
+              principal = jogo.get('principal')
+              assert isinstance(principal, dict), f'{event_id}: sem principal válido'
+              assert principal.get('fonte') in {'cazetv', 'getv', 'sbt', 'sbt_sports'}, f'{event_id}: fonte não permitida'
+              url = principal.get('url', '')
+              parsed = urlparse(url)
+              host = parsed.netloc.lower()
+              assert host in {'www.youtube.com', 'youtube.com', 'youtu.be', 'www.youtu.be'}, f'{event_id}: URL fora do YouTube'
+              if host in {'youtu.be', 'www.youtu.be'}:
+                  video_id = parsed.path.strip('/').split('/')[0]
+              else:
+                  video_id = (parse_qs(parsed.query).get('v') or [''])[0]
+              assert len(video_id) == 11, f'{event_id}: URL sem video_id válido'
+              if jogo.get('alternativas'):
+                  assert principal.get('fonte') == 'getv', f'{event_id}: com duas fontes, GE TV deve ser principal'
+          aud = json.load(open('dados-br/auditoria-transmissoes-aovivo.json', encoding='utf-8'))
+          assert isinstance(aud.get('resumo'), dict), 'auditoria sem resumo'
+          assert isinstance(aud.get('rejeitados'), list), 'auditoria sem rejeitados'
+          assert isinstance(aud.get('sem_transmissao'), list), 'auditoria sem sem_transmissao'
+          tv = json.load(open('dados-br/transmissoes-tv.json', encoding='utf-8'))
+          assert isinstance(tv.get('jogos'), dict), 'transmissoes-tv.json sem objeto jogos'
+          permitidos = ALLOWED_CHANNELS
+          for event_id, jogo in tv['jogos'].items():
+              assert str(jogo.get('event_id')) == str(event_id), f'TV: event_id divergente em {event_id}'
+              assert jogo.get('canais'), f'TV: {event_id} sem canais'
+              assert jogo.get('confianca') in {'confirmado', 'manual', 'preservado'}, f'TV: confiança inválida em {event_id}'
+              assert isinstance(jogo.get('fontes'), list) and jogo['fontes'], f'TV: {event_id} sem evidências'
+              assert isinstance(jogo.get('acessos'), list), f'TV: {event_id} sem lista de acessos'
+              invalidos = set(jogo['canais']) - permitidos
+              assert not invalidos, f'TV: canal não permitido em {event_id}: {sorted(invalidos)}'
+              if jogo.get('estavel') is True and jogo.get('canais') == ['Globo']:
+                  raise AssertionError(f'TV: {event_id} não pode considerar Globo isolada como grade estável')
+              for acesso in jogo.get('acessos') or []:
+                  assert str(acesso.get('url') or '').startswith('https://'), f'TV: acesso inválido em {event_id}'
+
+          # Grade editorial fixa é um contrato incremental: depois de verificada,
+          # não pode desaparecer numa execução futura. Player integral GE/SBT/Cazé
+          # pode SOMAR, mas nunca substituir os canais já confirmados.
+          manual = json.load(open('transmissoes.json', encoding='utf-8'))
+          from scripts.atualizar_transmissoes_tv_brasileirao import extract_channels
+          for regra in manual.get('transmissoes') or []:
+              if str(regra.get('modo') or '').lower() != 'fixo' or not regra.get('event_id'):
+                  continue
+              event_id = str(regra['event_id'])
+              saida = tv['jogos'].get(event_id)
+              if not saida:
+                  continue  # fora da janela corrente do coletor
+              esperados = set(extract_channels(regra.get('transmissao') or regra.get('canais')))
+              atuais = set(saida.get('canais') or [])
+              assert esperados <= atuais, f'TV: {event_id} perdeu canal fixo: {sorted(esperados - atuais)}'
+              if regra.get('exclusivo') is True:
+                  assert atuais == esperados, f'TV: {event_id} exclusivo recebeu canal indevido: {sorted(atuais - esperados)}'
+
+          aud_tv = json.load(open('dados-br/auditoria-transmissoes-tv.json', encoding='utf-8'))
+          resumo_tv = aud_tv.get('resumo') or {}
+          assert isinstance(aud_tv.get('fontes'), dict), 'auditoria TV sem fontes'
+          assert isinstance(aud_tv.get('sem_transmissao'), list), 'auditoria TV sem lista de pendências'
+          assert int(resumo_tv.get('jogos_com_transmissao') or 0) == len(tv['jogos']), 'auditoria TV diverge da saída'
+          criticos = int(resumo_tv.get('jogos_criticos_sem_transmissao_72h') or 0)
+          if criticos:
+              print(f'::warning title=Transmissões pendentes::{criticos} jogo(s) nas próximas 72h ainda sem canal confirmado')
+          print(f'YouTube e transmissões TV validados; prioridade GE TV/SBT/CazéTV; críticos sem canal: {criticos}')
+          PY
+
+      - name: Commitar somente quando houver mudança real
+        id: publish
+        if: ${{ inputs.dry_run != true }}
+        env:
+          INPUT_MODO: ${{ inputs.modo }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "published=false" >> "$GITHUB_OUTPUT"
+          cd "$GITHUB_WORKSPACE"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          MODO="${INPUT_MODO:-completo}"
+          # O modo TV também executa a colheita barata de players futuros.
+          # Portanto, transmissoes-aovivo*.json SEMPRE entram no commit; caso
+          # contrário a live exata pode ser encontrada e descartada no fim do run.
+          PUBLIC_FILES=(
+            "dados-br/agenda-clubes-br.json"
+            "dados-br/transmissoes-aovivo.json"
+          )
+          FILES=(
+            "${PUBLIC_FILES[@]}"
+            "dados-br/auditoria-transmissoes-aovivo.json"
+          )
+          if [[ "$MODO" != "aovivo" ]]; then
+            PUBLIC_FILES+=("dados-br/transmissoes-tv.json")
+            FILES+=(
+              "dados-br/transmissoes-tv.json"
+              "dados-br/auditoria-transmissoes-tv.json"
+            )
+          fi
+
+          if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
+            echo "Nenhuma mudança factual de agenda/transmissão. Auditoria isolada não gera commit/deploy."
+            exit 0
+          fi
+
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            mkdir -p "$TMP_DIR/$(dirname "$f")"
+            cp -a "$f" "$TMP_DIR/$f"
+          done
+
+          for i in 1 2 3 4 5; do
+            echo "Tentativa de push $i/5..."
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+
+            for f in "${FILES[@]}"; do
+              mkdir -p "$(dirname "$f")"
+              cp -a "$TMP_DIR/$f" "$f"
+            done
+
+            if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
+              echo "Origin/main já possui o mesmo conteúdo factual. Sem commit."
+              exit 0
+            fi
+
+            git add -- "${FILES[@]}"
+            git commit -m "Atualizar agenda e transmissões dos clubes do Brasileirão - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+
+            if git push origin HEAD:main; then
+              echo "Push concluído na tentativa $i."
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "Push rejeitado; tentando novamente sobre origin/main atualizado..."
+            sleep 3
+          done
+
+          echo "ERRO: push falhou após 5 tentativas."
+          exit 1
+
+      - name: Disparar deploy após transmissão publicada
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh workflow run deploy.yml --ref main
+          echo "Deploy disparado para a atualização de transmissões."

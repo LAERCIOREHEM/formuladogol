@@ -1,0 +1,137 @@
+name: Deploy Orchestrator Worker
+run-name: Deploy Orchestrator · ${{ inputs.mode || 'shadow' }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Modo do orquestrador Cloudflare"
+        required: true
+        default: "shadow"
+        type: choice
+        options:
+          - shadow
+          - active
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fdg-orchestrator-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      FDG_ORCHESTRATOR_GITHUB_TOKEN: ${{ secrets.FDG_ORCHESTRATOR_GITHUB_TOKEN }}
+      REQUESTED_MODE: ${{ inputs.mode || 'shadow' }}
+    defaults:
+      run:
+        working-directory: cloudflare/orchestrator-worker
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validar credenciais
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'ERRO: secret CLOUDFLARE_API_TOKEN ausente.'; exit 1; }
+          test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'ERRO: secret CLOUDFLARE_ACCOUNT_ID ausente.'; exit 1; }
+          test -n "${FDG_ORCHESTRATOR_GITHUB_TOKEN:-}" || { echo 'ERRO: secret FDG_ORCHESTRATOR_GITHUB_TOKEN ausente.'; exit 1; }
+          case "${REQUESTED_MODE}" in shadow|active) ;; *) echo 'ERRO: mode inválido.'; exit 1 ;; esac
+
+      - name: Instalar dependências
+        run: npm install --no-audit --no-fund
+
+      - name: Validar código e contratos
+        run: npm run validate
+
+      # Primeiro publica SHADOW em qualquer situação. Assim uma primeira
+      # instalação jamais consegue disparar Actions antes de o secret GitHub
+      # estar gravado no Worker.
+      - name: Renderizar configuração segura SHADOW
+        env:
+          FDG_ORCHESTRATOR_MODE: shadow
+        run: npm run render-config
+
+      - name: Deploy base SHADOW + Durable Object + Cron Trigger
+        run: npx wrangler deploy --config wrangler.generated.jsonc
+
+      - name: Gravar token GitHub somente como secret do Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$FDG_ORCHESTRATOR_GITHUB_TOKEN" | npx wrangler secret put GITHUB_TOKEN --config wrangler.generated.jsonc
+
+      - name: Ativar somente quando solicitado
+        if: ${{ inputs.mode == 'active' }}
+        env:
+          FDG_ORCHESTRATOR_MODE: active
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run render-config
+          npx wrangler deploy --config wrangler.generated.jsonc
+
+      - name: Smoke test de health
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED="${REQUESTED_MODE}"
+          URL='https://orchestrator.formuladogol.com.br/health'
+          for i in $(seq 1 20); do
+            BODY="$(curl -fsS --max-time 10 "$URL" 2>/dev/null || true)"
+            if printf '%s' "$BODY" | grep -q '"service":"formula-do-gol-orchestrator"' \
+              && printf '%s' "$BODY" | grep -q "\"mode\":\"$EXPECTED\"" \
+              && printf '%s' "$BODY" | grep -q '"liveBrowserUntouched":true'; then
+              echo "Health OK em modo $EXPECTED."
+              printf '%s\n' "$BODY"
+              exit 0
+            fi
+            sleep 6
+          done
+          echo "ERRO: health não confirmou modo $EXPECTED em $URL"
+          exit 1
+
+      - name: Confirmar estado persistente
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS --max-time 15 https://orchestrator.formuladogol.com.br/status | tee /tmp/orchestrator-status.json
+          node -e '
+            const fs=require("fs");
+            const p=JSON.parse(fs.readFileSync("/tmp/orchestrator-status.json","utf8"));
+            if(!p.ok || p.engine!=="fdg-cloudflare-orchestrator") process.exit(1);
+            console.log(`Estado OK; mode=${p.mode}; lastTickAt=${p.lastTickAt||"ainda aguardando primeiro cron"}`);
+          '
+
+      - name: Resumo
+        shell: bash
+        run: |
+          {
+            echo '## Orquestrador Cloudflare'
+            echo ''
+            echo "- **Modo:** \`${REQUESTED_MODE}\`"
+            echo '- **Worker:** `formula-do-gol-orchestrator`'
+            echo '- **Cron:** `* * * * *` (1 minuto)'
+            echo '- **Estado:** Durable Object SQLite `OrchestratorState`'
+            echo '- **Health:** https://orchestrator.formuladogol.com.br/health'
+            echo '- **Status:** https://orchestrator.formuladogol.com.br/status'
+            echo ''
+            if [[ "${REQUESTED_MODE}" == 'shadow' ]]; then
+              echo '**Não desative o cron-job.org ainda.** Valide decisões em SHADOW primeiro.'
+            else
+              echo '**ACTIVE confirmado.** Após validar uma decisão real correta, desative o cron-job.org.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

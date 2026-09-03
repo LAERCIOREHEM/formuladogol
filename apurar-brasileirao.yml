@@ -1,0 +1,46 @@
+name: Apurar Apostas Brasileirão
+
+on:
+  # Execução apenas por workflow_dispatch/manual. Não depende de cron-job.org.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Sem isto, dois disparos próximos rodavam em paralelo e o segundo falhava no
+# push (non-fast-forward), acionando retentativa em cascata.
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+
+jobs:
+  apurar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Apurar apostas com sigilo
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          BRASILEIRAO_TEMPORADA: '2026'
+        run: python scripts/apurar_rodada.py
+
+      - name: Commit apuração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dados-br/apuracao.json dados-br/ranking-apostas.json
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração de apuração."
+          else
+            git commit -m "Apura apostas do Brasileirão com sigilo"
+            git push
+          fi
