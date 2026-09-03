@@ -738,6 +738,9 @@ def rodar(args: argparse.Namespace) -> int:
     )
 
     def na_janela(j: Dict[str, Any]) -> bool:
+        event_id = str(j.get("event_id") or j.get("id") or "").strip()
+        if args.event_id and event_id != str(args.event_id).strip():
+            return False
         r = int(j.get("rodada") or 0)
         if args.rodada_inicio and r < args.rodada_inicio:
             return False
@@ -919,6 +922,7 @@ def rodar(args: argparse.Namespace) -> int:
         "youtube_ativo": bool(youtube_ativo),
         "quota_estimada_youtube": dict(QUOTA),
         "rodadas_processadas": {"inicio": args.rodada_inicio or None, "fim": args.rodada_fim or None},
+        "event_id_alvo": str(args.event_id or "") or None,
         "resumo_geral_antes": antes,
         "resumo_geral_depois": depois,
         "resumo_janela_antes": antes_janela,
@@ -1027,6 +1031,7 @@ def criar_parser() -> argparse.ArgumentParser:
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--sem-youtube", action="store_true", help="não consulta YouTube; apenas remove fontes não preferidas e gera relatório")
     ap.add_argument("--rodada-inicio", type=int, default=0)
+    ap.add_argument("--event-id", default="", help="restringe buscas de rede a um único event_id publicado")
     ap.add_argument("--rodada-fim", type=int, default=0)
     ap.add_argument("--paginas-getv", type=int, default=2, help="páginas de playlists GE por rodada")
     ap.add_argument(

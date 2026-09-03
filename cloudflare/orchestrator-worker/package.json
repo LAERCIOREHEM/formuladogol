@@ -1,0 +1,15 @@
+{
+  "name": "formula-do-gol-orchestrator",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "render-config": "node scripts/render-config.mjs",
+    "check": "node --check src/index.js && node --check src/orchestrator-state.js && node --check src/logic.js && node --check src/github.js && node --check src/sources.js && node --check scripts/render-config.mjs",
+    "test": "node --test tests/*.mjs",
+    "validate": "npm run check && npm test"
+  },
+  "devDependencies": {
+    "wrangler": "^4.33.1"
+  }
+}

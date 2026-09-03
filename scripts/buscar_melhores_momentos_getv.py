@@ -441,6 +441,7 @@ def main() -> int:
     ap.add_argument("--modo", choices=["backfill", "incremental"], default="incremental")
     ap.add_argument("--rodada-inicio", type=int, default=None)
     ap.add_argument("--rodada-fim", type=int, default=None)
+    ap.add_argument("--event-id", default="", help="restringe a busca a um único jogo já publicado em resultados.json")
     ap.add_argument("--dry-run", action="store_true", help="valida estrutura sem chamar YouTube API")
     ap.add_argument("--sleep", type=float, default=0.05)
     args = ap.parse_args()
@@ -468,14 +469,23 @@ def main() -> int:
         return chave in chaves_resultados
 
     jogos_publicados = [j for j in jogos_all if consta_em_resultados(j)]
-    ri, rf = rodadas_alvo(args, jogos_all, config)
-    jogos = [j for j in jogos_publicados if ri <= j.rodada <= rf]
+    event_id_alvo = str(args.event_id or "").strip()
+    if event_id_alvo:
+        alvo = next((j for j in jogos_publicados if str(j.event_id or "") == event_id_alvo), None)
+        if alvo is None:
+            raise SystemExit(f"event_id {event_id_alvo} não está publicado em resultados.json/agenda; busca dirigida cancelada.")
+        ri = rf = int(alvo.rodada)
+        jogos = [alvo]
+    else:
+        ri, rf = rodadas_alvo(args, jogos_all, config)
+        jogos = [j for j in jogos_publicados if ri <= j.rodada <= rf]
     if not jogos:
         raise SystemExit(f"Nenhum jogo publicado em resultados.json encontrado para rodadas {ri}-{rf}.")
 
     api_key = os.environ.get("YOUTUBE_API_KEY", "").strip()
     if args.dry_run:
-        print(f"DRY RUN OK: {len(jogos)} jogos nas rodadas {ri}-{rf}; config em {config_path}.")
+        alvo_txt = f"; event_id={event_id_alvo}" if event_id_alvo else ""
+        print(f"DRY RUN OK: {len(jogos)} jogos nas rodadas {ri}-{rf}{alvo_txt}; config em {config_path}.")
         return 0
     if not api_key:
         raise SystemExit("Secret/variável YOUTUBE_API_KEY não encontrada. Crie o secret no GitHub antes de rodar o workflow.")
@@ -542,12 +552,24 @@ def main() -> int:
         "total_vinculados": len(merged_jogos),
         "jogos": dict(sorted(merged_jogos.items(), key=lambda kv: (kv[1].get("rodada") or 999, kv[1].get("mandante") or ""))),
     }
+    # Em busca dirigida por event_id, a varredura lê somente a rodada-alvo.
+    # Não podemos substituir getv-playlists.json inteiro por esse subconjunto,
+    # pois isso apagaria o catálogo das outras rodadas e fabricaria commit.
+    if event_id_alvo:
+        merged_playlists = {str(p.get("playlist_id") or ""): p for p in (prev_playlists.get("playlists") or []) if p.get("playlist_id")}
+        for pl in playlists:
+            if pl.get("playlist_id"):
+                merged_playlists[str(pl.get("playlist_id"))] = pl
+        playlists_publicadas = sorted(merged_playlists.values(), key=lambda p: (p.get("rodada") or 999, p.get("titulo") or ""))
+    else:
+        playlists_publicadas = playlists
+
     playlists_json = {
         "atualizado_em": agora_iso(),
         "fonte": "GE TV / YouTube",
         "channel_id": channel_id,
-        "total_playlists": len(playlists),
-        "playlists": playlists,
+        "total_playlists": len(playlists_publicadas),
+        "playlists": playlists_publicadas,
     }
     auditoria = {
         "atualizado_em": agora_iso(),
@@ -573,7 +595,7 @@ def main() -> int:
     # aparecer vínculo novo/alterado ou mudança real na lista de playlists.
     prev_jogos = prev.get("jogos") or {}
     prev_pl_sem_data = [{k: v for k, v in p.items() if k != "published_at"} for p in (prev_playlists.get("playlists") or [])]
-    new_pl_sem_data = [{k: v for k, v in p.items() if k != "published_at"} for p in playlists]
+    new_pl_sem_data = [{k: v for k, v in p.items() if k != "published_at"} for p in playlists_publicadas]
     houve_mudanca = (prev_jogos != merged_jogos) or (prev_pl_sem_data != new_pl_sem_data)
 
     if houve_mudanca or not (root / "dados-br" / "auditoria-melhores-momentos.json").exists():

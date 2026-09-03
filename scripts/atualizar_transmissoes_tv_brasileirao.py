@@ -183,16 +183,46 @@ def atomic_write_json(path: Path, payload: Any) -> None:
     tmp.replace(path)
 
 
+VOLATILE_SEMANTIC_KEYS = {
+    "atualizado_em",
+    "consultado_em",
+    "capturado_em",
+    "duracao_ms",
+    # Estado derivado exclusivamente da passagem do relógio. A proximidade do
+    # jogo é calculada pelo orquestrador a partir de data_iso; não é conteúdo
+    # novo de transmissão e não pode, sozinha, provocar commit/deploy.
+    "faltam_horas",
+    "nivel",
+}
+
+
 def semantic_payload(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {
             k: semantic_payload(v)
             for k, v in value.items()
-            if k not in {"atualizado_em", "consultado_em", "duracao_ms"}
+            if k not in VOLATILE_SEMANTIC_KEYS
         }
     if isinstance(value, list):
         return [semantic_payload(v) for v in value]
     return value
+
+
+def semantic_audit_payload(audit: Mapping[str, Any]) -> dict[str, Any]:
+    """Retorna apenas o estado factual da cobertura que merece persistência.
+
+    Saúde transitória das fontes (HTTP, duração, erros e URLs editoriais
+    descobertas) continua aparecendo no log do run, mas não transforma uma
+    varredura sem novidade em commit + deploy do site.
+    """
+    resumo = audit.get("resumo") if isinstance(audit, Mapping) else {}
+    resumo = resumo if isinstance(resumo, Mapping) else {}
+    return {
+        "jogos_na_janela": int(resumo.get("jogos_na_janela") or 0),
+        "jogos_com_transmissao": int(resumo.get("jogos_com_transmissao") or 0),
+        "sem_transmissao_futura": semantic_payload(audit.get("sem_transmissao_futura") or []),
+        "preservados": semantic_payload(audit.get("preservados") or []),
+    }
 
 
 def canonical_closed_channel(value: Any) -> Optional[str]:
@@ -1458,9 +1488,14 @@ def selftest_invariante_auditoria() -> None:
     existing = {"jogos": {"999": {"event_id": "999", "mandante": "X", "visitante": "Y",
                                   "data_iso": "2026-07-01T16:00:00-03:00", "canais": ["Premiere"],
                                   "confianca": "manual"}}}
-    cfg = {**DEFAULT_CONFIG, "habilitar_cbf": False, "habilitar_ge": False,
-           "habilitar_espn": False, "habilitar_ge_artigos": False}
-    payload, audit = collect(agenda=agenda, existing=existing, manual=manual, cfg=cfg, now=now)
+    cfg = {**DEFAULT_CONFIG, "habilitar_ge_artigos": False}
+    payload, audit = collect(
+        agenda=agenda, existing=existing, manual=manual, cfg=cfg, now=now,
+        source_payloads={
+            "cbf_rows": [], "cbf_copa_rows": [], "ge_agenda_html": "",
+            "espn_scoreboard": {"events": []}, "espn_summaries": {},
+        },
+    )
     assert audit["resumo"]["jogos_com_transmissao"] == len(payload["jogos"]), (
         "invariante quebrada: auditoria diverge da saída "
         f"({audit['resumo']['jogos_com_transmissao']} vs {len(payload['jogos'])})"
@@ -1570,7 +1605,19 @@ def selftest() -> None:
     assert not any(item["nome"] == "SBT no YouTube" for item in sbt_access), "link genérico SBT não deve duplicar vídeo exato"
     generic_access = access_options_for_game({"event_id":"2","canais":["CazéTV"]}, {"jogos":{}})
     assert generic_access == [{"nome":"CazéTV no YouTube","url":"https://www.youtube.com/@CazeTV/streams","tipo":"acesso_oficial"}]
-    print("SELFTEST OK: CBF, GE, ESPN, manual, preservação, auditoria e links editoriais")
+
+    # Relógio e saúde transitória da fonte não podem fabricar publicação.
+    old_audit = {"resumo": {"jogos_na_janela": 1, "jogos_com_transmissao": 0},
+                 "sem_transmissao_futura": [{"event_id": "9", "data_iso": "2026-09-10T20:00:00-03:00", "faltam_horas": 100.0, "nivel": "aviso"}],
+                 "preservados": [], "atualizado_em": "2026-09-01T10:00:00-03:00",
+                 "fontes": {"cbf": {"ok": False, "duracao_ms": 1000}}}
+    new_audit = copy.deepcopy(old_audit)
+    new_audit["atualizado_em"] = "2026-09-01T11:00:00-03:00"
+    new_audit["sem_transmissao_futura"][0]["faltam_horas"] = 99.0
+    new_audit["sem_transmissao_futura"][0]["nivel"] = "critico"
+    new_audit["fontes"]["cbf"] = {"ok": True, "duracao_ms": 50}
+    assert semantic_audit_payload(old_audit) == semantic_audit_payload(new_audit)
+    print("SELFTEST OK: CBF, GE, ESPN, manual, preservação, auditoria semântica e links editoriais")
 
 
 def main() -> int:
@@ -1595,15 +1642,14 @@ def main() -> int:
         return 0
 
     changed_output = semantic_payload(existing) != semantic_payload(payload)
-    changed_audit = semantic_payload(old_audit) != semantic_payload(audit)
+    changed_audit = semantic_audit_payload(old_audit) != semantic_audit_payload(audit)
 
-    # A auditoria e a saída são duas metades do MESMO snapshot: por construção
-    # audit["resumo"]["jogos_com_transmissao"] == len(payload["jogos"]).
-    # Gravá-las sob condições independentes permite que uma avance sem a outra
-    # (a auditoria muda quase sempre, porque "faltam_horas" é relativo a agora;
-    # a saída só muda quando a grade muda). Quando isso acontece, as travas de
-    # consistência a jusante quebram e derrubam pipelines inteiros que nem
-    # produzem estes arquivos. Portanto: se qualquer metade mudou, grave as duas.
+    # A auditoria e a saída são duas metades do MESMO snapshot. Campos puramente
+    # voláteis (timestamps, faltam_horas, nivel, latência/erro transitório de
+    # fonte) NÃO são publicação. Assim uma execução sem nova grade termina sem
+    # alterar arquivo, sem commit e sem disparar Deploy Pages. Se houver mudança
+    # factual em qualquer metade, ambas são gravadas juntas para permanecerem
+    # consistentes.
     desalinhado = int((old_audit.get("resumo") or {}).get("jogos_com_transmissao") or -1) != len(
         (existing.get("jogos") or {})
     )
@@ -1614,7 +1660,7 @@ def main() -> int:
             print("Auditoria e saída de TV estavam dessincronizadas; ambas foram reescritas.")
     print(
         f"Transmissões TV: {len(payload['jogos'])} jogo(s); "
-        f"alterado={str(changed_output).lower()}; auditoria_alterada={str(changed_audit).lower()}; "
+        f"alterado={str(changed_output).lower()}; auditoria_factual_alterada={str(changed_audit).lower()}; "
         f"críticos_sem_canal={audit['resumo']['jogos_criticos_sem_transmissao_72h']}"
     )
     return 0

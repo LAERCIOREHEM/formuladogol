@@ -11,9 +11,10 @@ apenas decide, em cada ciclo, qual é a única próxima ação útil.
 Política resumida
 -----------------
 1. Primeira busca do player oficial tem prioridade perecível única; depois, Atualizar Brasileirão volta a ter prioridade máxima:
-   - pré-jogo, se a base estiver antiga;
    - imediatamente quando a ESPN detectar FINAL ainda não incorporado;
+   - contingência pós-jogo se a sonda falhar;
    - uma manutenção de segurança por dia.
+   O início do jogo, sozinho, NÃO dispara atualização pesada.
    Placar/gol AO VIVO NÃO dispara pipeline pesado: a classificação live é
    calculada no navegador a partir do scoreboard ESPN.
 2. Públicos pendentes:
@@ -128,9 +129,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "atualizar_brasileirao": {
         "sondagem_antes_minutos": 45,
         "sondagem_depois_minutos": 240,
-        "intervalo_pre_jogo_minutos": 60,
-        "retentativa_final_pendente_minutos": 10,
-        "fallback_final_estimado_minutos": 105,
+        "retentativa_final_pendente_minutos": 15,
+        "fallback_final_estimado_minutos": 130,
         "manutencao_diaria_apos": "05:10",
     },
     "publicos": {
@@ -145,24 +145,27 @@ DEFAULT_CONFIG: dict[str, Any] = {
         ],
     },
     "melhores_momentos": {
-        "primeira_tentativa_apos_final_minutos": 10,
+        "primeira_tentativa_apos_final_minutos": 20,
         "intervalos_retentativa": [
-            {"ate_horas": 2, "minutos": 10},
-            {"ate_horas": 6, "minutos": 30},
-            {"ate_horas": 24, "minutos": 120},
-            {"ate_horas": 72, "minutos": 360},
-            {"ate_horas": 99999, "minutos": 720},
+            {"ate_horas": 0.75, "minutos": 25},
+            {"ate_horas": 1.5, "minutos": 45},
+            {"ate_horas": 3, "minutos": 90},
+            {"ate_horas": 6, "minutos": 180},
+            {"ate_horas": 12, "minutos": 360},
+            {"ate_horas": 24, "minutos": 720},
+            {"ate_horas": 99999, "minutos": 1440},
         ],
         "ignorar_rodada_zero": True,
     },
     "transmissoes": {
         "tv_diaria_apos": "06:30",
-        "tv_intervalo_saudavel_horas": 72,
+        "tv_intervalo_saudavel_horas": 168,
         "tv_intervalo_pendencia_horas": 24,
+        "tv_intervalo_pendencia_30d_horas": 72,
         "tv_retentativa_critica_horas": 6,
         "aovivo_antes_minutos": 90,
         "aovivo_depois_minutos": 180,
-        "aovivo_intervalo_minutos": 10,
+        "aovivo_checkpoints_minutos": [-90, -45, -20, -5, 10, 30],
     },
     "github": {"branch": "main", "historico_runs": 100, "bloquear_se_writer_ativo": True},
 }
@@ -676,14 +679,9 @@ def main_update_decision(
     # Gol, empate, virada e início AO VIVO não justificam o pipeline pesado.
     # Tabela e Estatísticas consultam o scoreboard ESPN no navegador a cada 30 s.
 
-    pre_interval = int(cfg.get("intervalo_pre_jogo_minutos") or 60)
-    imminent = [game for game in pre if game.kickoff <= now + timedelta(minutes=before)]
-    if imminent and since_success >= pre_interval:
-        labels = ", ".join(game.label for game in imminent[:4])
-        return Decision(
-            "atualizar_brasileirao",
-            f"Pré-jogo: base será sincronizada antes do início de {labels}.",
-        )
+    # O início de uma partida não justifica mais o pipeline pesado. Alterações
+    # factuais de calendário entram pela manutenção/sonda; AO VIVO segue direto
+    # da ESPN no navegador a cada 30 s.
 
     maintenance_after = str(cfg.get("manutencao_diaria_apos") or "05:10")
     if time_reached(now, maintenance_after) and (last_success is None or last_success.date() < now.date()):
@@ -964,37 +962,39 @@ def transmission_live_decision(
     only_never_checked: bool = False,
 ) -> Decision | None:
     cfg = config["transmissoes"]
-    before = int(cfg.get("aovivo_antes_minutos") or 90)
-    after = int(cfg.get("aovivo_depois_minutos") or 180)
-    interval = int(cfg.get("aovivo_intervalo_minutos") or 10)
+    checkpoints = [int(v) for v in (cfg.get("aovivo_checkpoints_minutos") or [-90, -45, -20, -5, 10, 30])]
+    checkpoints = sorted(set(checkpoints))
+    if not checkpoints:
+        return None
+    before = abs(min(checkpoints))
+    after = max(checkpoints)
     linked = live_entries(LIVE_PATH) | live_entries(LIVE_MANUAL_PATH)
-    candidates: list[tuple[Game, str]] = []
+    candidates: list[tuple[Game, str, int]] = []
     for game in games:
         if game.event_id in final_ids or game.event_id in linked:
             continue
-        if not (game.kickoff - timedelta(minutes=before) <= now <= game.kickoff + timedelta(minutes=after)):
+        delta = (now - game.kickoff).total_seconds() / 60.0
+        if delta < min(checkpoints) or delta > max(checkpoints):
             continue
         allowed, reason = live_search_allowed(game.event_id)
-        if allowed:
-            candidates.append((game, reason))
+        if not allowed:
+            continue
+        last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains=f"aovivo · {game.event_id}")
+        if only_never_checked and last is not None:
+            continue
+        last_delta = ((last - game.kickoff).total_seconds() / 60.0) if last is not None else None
+        due = [cp for cp in checkpoints if cp <= delta and (last_delta is None or cp > last_delta)]
+        if not due:
+            continue
+        candidates.append((game, reason, max(due)))
     if not candidates:
         return None
     candidates.sort(key=lambda item: abs((item[0].kickoff - now).total_seconds()))
-    selected: tuple[Game, str] | None = None
-    for candidate_game, candidate_policy in candidates:
-        last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains=f"aovivo · {candidate_game.event_id}")
-        if only_never_checked and last is not None:
-            continue
-        if not only_never_checked and minutes_since(last, now) < interval:
-            continue
-        selected = (candidate_game, candidate_policy)
-        break
-    if selected is None:
-        return None
-    game, policy = selected
+    game, policy, checkpoint = candidates[0]
+    label = f"T{checkpoint:+d}"
     return Decision(
         "transmissao_aovivo",
-        f"Player oficial ainda não localizado para {game.label}; {policy}.",
+        f"Checkpoint {label} do player oficial para {game.label}; {policy}.",
         event_id=game.event_id,
         mode="aovivo",
     )
@@ -1009,11 +1009,9 @@ def tv_decision(
 ) -> Decision | None:
     """Agenda a varredura completa de TV com cadência proporcional à pendência.
 
-    O orquestrador pode continuar sendo chamado a cada 10 minutos, mas o modo
-    ``tv`` não acompanha essa cadência: cobertura saudável usa 72h; pendências
-    em até 14 dias usam 24h; somente lacunas a menos de 72h autorizam retry de
-    6h. Assim ``Transmissões · tv · todos`` deixa de gerar varredura diária
-    quando a grade relevante já está completa.
+    Esta função existe apenas como fallback manual do antigo runner GitHub. O
+    Cloudflare primário calcula a cobertura diretamente da agenda: 6h se houver
+    lacuna <72h, 24h em até 14d, 72h em 15-30d e 168h quando o mês está completo.
     """
     cfg = config["transmissoes"]
     last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains="· tv")
@@ -1034,10 +1032,12 @@ def tv_decision(
 
     critical = _count("jogos_criticos_sem_transmissao_72h")
     missing_14d = _count("jogos_sem_transmissao_14d")
+    missing_future = _count("jogos_sem_transmissao_fora_14d")
     age_minutes = minutes_since(last, now)
     critical_hours = float(cfg.get("tv_retentativa_critica_horas") or 6)
     pending_hours = float(cfg.get("tv_intervalo_pendencia_horas") or 24)
-    healthy_hours = float(cfg.get("tv_intervalo_saudavel_horas") or 72)
+    pending_30d_hours = float(cfg.get("tv_intervalo_pendencia_30d_horas") or 72)
+    healthy_hours = float(cfg.get("tv_intervalo_saudavel_horas") or 168)
 
     # Primeira execução: conserva a janela matinal para evitar varredura
     # desnecessária à meia-noite após um deploy/recriação de histórico.
@@ -1064,10 +1064,17 @@ def tv_decision(
             mode="tv",
         )
 
-    if missing_14d == 0 and age_minutes >= healthy_hours * 60:
+    if missing_14d == 0 and missing_future > 0 and age_minutes >= pending_30d_hours * 60:
         return Decision(
             "transmissoes_tv",
-            f"Cobertura dos próximos 14 dias completa; manutenção preventiva após {healthy_hours:g}h.",
+            f"Há {missing_future} jogo(s) futuros fora de 14 dias ainda sem grade; manutenção após {pending_30d_hours:g}h.",
+            mode="tv",
+        )
+
+    if missing_14d == 0 and missing_future == 0 and age_minutes >= healthy_hours * 60:
+        return Decision(
+            "transmissoes_tv",
+            f"Cobertura futura completa; manutenção preventiva semanal após {healthy_hours:g}h.",
             mode="tv",
         )
     return None
@@ -1306,8 +1313,9 @@ def self_test() -> int:
     assert parse_dt("2026-08-09T21:24:00-03:00", tz).hour == 21
     assert time_reached(now, "06:30")
     assert not time_reached(datetime(2026, 8, 9, 5, 0, tzinfo=tz), "06:30")
-    assert mm_retry_interval(1.0, config) == 10
-    assert mm_retry_interval(3.0, config) == 30
+    assert mm_retry_interval(0.5, config) == 25
+    assert mm_retry_interval(1.0, config) == 45
+    assert mm_retry_interval(3.0, config) == 90
 
     # --- Circuit breaker por falha repetida ---------------------------------
     def _run(conclusion: str, minutos_atras: int) -> dict[str, Any]:
@@ -1342,9 +1350,10 @@ def self_test() -> int:
     assert backoff_por_falha(alvo, config=config, runs=runs_5, now=now, tz=tz).action == "none"
     # Ação 'none' nunca é afetada pelo breaker.
     assert backoff_por_falha(Decision("none", "x"), config=config, runs=runs_5, now=now, tz=tz).action == "none"
-    assert mm_retry_interval(12.0, config) == 120
-    assert mm_retry_interval(40.0, config) == 360
-    assert mm_retry_interval(100.0, config) == 720
+    assert mm_retry_interval(5.0, config) == 180
+    assert mm_retry_interval(10.0, config) == 360
+    assert mm_retry_interval(20.0, config) == 720
+    assert mm_retry_interval(100.0, config) == 1440
 
     # Último run e bloqueio de writer.
     runs = [
@@ -1426,16 +1435,17 @@ def self_test() -> int:
             assert not allowed
     finally:
         globals()["TV_PATH"] = original_tv_path
-    # TV futura: o cron pode consultar a cada 10 min, mas a varredura completa
-    # deve respeitar 72h quando saudável, 24h com pendência e 6h se crítica.
+    # TV futura no fallback: 168h saudável, 72h pendência futura, 24h em 14d
+    # e 6h se crítica. O Worker Cloudflare é a fonte operacional primária.
     tx_cfg = deep_merge(DEFAULT_CONFIG, {"transmissoes": {
         "tv_diaria_apos": "06:30",
-        "tv_intervalo_saudavel_horas": 72,
+        "tv_intervalo_saudavel_horas": 168,
         "tv_intervalo_pendencia_horas": 24,
+        "tv_intervalo_pendencia_30d_horas": 72,
         "tv_retentativa_critica_horas": 6,
     }})
     tx_now = datetime(2026, 8, 16, 12, 0, tzinfo=tz)
-    healthy_summary = {"jogos_sem_transmissao_14d": 0, "jogos_criticos_sem_transmissao_72h": 0}
+    healthy_summary = {"jogos_sem_transmissao_14d": 0, "jogos_sem_transmissao_fora_14d": 0, "jogos_criticos_sem_transmissao_72h": 0}
     recent_tv = [{
         "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
         "created_at": "2026-08-15T15:00:00Z", "display_title": "Transmissões · tv · todos",
@@ -1443,16 +1453,16 @@ def self_test() -> int:
     assert tv_decision(tx_cfg, tx_now, tz, recent_tv, healthy_summary) is None
     old_tv = [{
         "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
-        "created_at": "2026-08-13T15:00:00Z", "display_title": "Transmissões · tv · todos",
+        "created_at": "2026-08-08T15:00:00Z", "display_title": "Transmissões · tv · todos",
     }]
     assert tv_decision(tx_cfg, tx_now, tz, old_tv, healthy_summary).action == "transmissoes_tv"
-    pending_summary = {"jogos_sem_transmissao_14d": 2, "jogos_criticos_sem_transmissao_72h": 0}
+    pending_summary = {"jogos_sem_transmissao_14d": 2, "jogos_sem_transmissao_fora_14d": 0, "jogos_criticos_sem_transmissao_72h": 0}
     day_old_tv = [{
         "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
         "created_at": "2026-08-15T14:00:00Z", "display_title": "Transmissões · tv · todos",
     }]
     assert tv_decision(tx_cfg, tx_now, tz, day_old_tv, pending_summary).action == "transmissoes_tv"
-    critical_summary = {"jogos_sem_transmissao_14d": 1, "jogos_criticos_sem_transmissao_72h": 1}
+    critical_summary = {"jogos_sem_transmissao_14d": 1, "jogos_sem_transmissao_fora_14d": 0, "jogos_criticos_sem_transmissao_72h": 1}
     six_hours_tv = [{
         "name": WORKFLOW_TRANSMISSOES, "status": "completed", "conclusion": "success",
         "created_at": "2026-08-16T08:00:00Z", "display_title": "Transmissões · tv · todos",
