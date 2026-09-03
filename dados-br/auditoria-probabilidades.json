@@ -5,9 +5,9 @@
   "etapa": "Execução 5 — histórico encadeado e avaliação científica preparada",
   "gerado_em": "2026-09-02T21:24:00-03:00",
   "referencia_esportiva_em": "2026-09-02T21:24:00-03:00",
-  "calculado_em": "2026-09-02T23:33:07-03:00",
+  "calculado_em": "2026-09-02T23:43:27-03:00",
   "status": "ok",
-  "hash_entrada": "358c92ae625551a57836a333c6d2b4710afe0880aece77f49b6d8fc76b210994",
+  "hash_entrada": "e66967da80152421a6b4bb5cad82d3c3cfc436607a22cb6252bf0441835382b1",
   "responsavel": {
     "nome": "Laércio Rehem",
     "formacao": "Matemático pela Universidade Federal da Bahia (UFBA), Analista de Sistemas",
@@ -360,7 +360,7 @@
     "motivo": "A Execução 1 mostrou melhora de calibração, mas piora nas três regras próprias de pontuação. A versão 1.0 mantém rho=0 e publica esta sensibilidade para reavaliação versionada.",
     "diferenca_media_absoluta_1x2_pontos_percentuais": 1.250667,
     "diferenca_maxima_1x2_pontos_percentuais": 2.150867,
-    "alteracao_media_massa_placares_baixos_pontos_percentuais": 0.0
+    "alteracao_media_massa_placares_baixos_pontos_percentuais": -0.0
   },
   "diagnostico_af_score": {
     "disponivel": true,
@@ -376,15 +376,13 @@
         "fase_atual": "Quartas de final",
         "fase_ordem": 700,
         "chaves_atuais": 4,
-        "equipes_ativas": 7,
+        "equipes_ativas": 5,
         "clubes_ativos": [
           "Atlético-MG",
           "Grêmio",
           "Internacional",
           "Palmeiras",
-          "Santos",
-          "Vasco da Gama",
-          "Vitória"
+          "Vasco da Gama"
         ],
         "rodadas_simuladas_tamanhos": [
           4,
@@ -392,27 +390,27 @@
           1
         ],
         "pareamento_futuro": "sorteio",
-        "partidas_concluidas_no_ajuste": 147,
+        "partidas_concluidas_no_ajuste": 149,
         "principais_chances_titulo": [
           {
             "clube": "Palmeiras",
-            "probabilidade_pct": 51.17575
+            "probabilidade_pct": 49.86915
           },
           {
             "clube": "Atlético-MG",
-            "probabilidade_pct": 19.1028
-          },
-          {
-            "clube": "Grêmio",
-            "probabilidade_pct": 11.6032
+            "probabilidade_pct": 18.2319
           },
           {
             "clube": "Vasco da Gama",
-            "probabilidade_pct": 9.68295
+            "probabilidade_pct": 15.6235
+          },
+          {
+            "clube": "Grêmio",
+            "probabilidade_pct": 11.0029
           },
           {
             "clube": "Internacional",
-            "probabilidade_pct": 5.49105
+            "probabilidade_pct": 5.27255
           }
         ]
       },
@@ -537,16 +535,16 @@
         {
           "chave": "copa_do_brasil",
           "nome": "Copa do Brasil",
-          "gerado_em": "2026-09-02T23:31:43-03:00",
+          "gerado_em": "2026-09-02T23:41:38-03:00",
           "fase_atual": {
             "status": "em_andamento",
             "ordem": 700,
             "nome": "Quartas de final",
             "eventos": 8,
-            "eventos_pendentes": 3
+            "eventos_pendentes": 1
           },
-          "eventos_finalizados": 147,
-          "eventos_pendentes": 3,
+          "eventos_finalizados": 149,
+          "eventos_pendentes": 1,
           "modo_coleta": "incremental"
         },
         {
@@ -580,9 +578,9 @@
           "modo_coleta": "incremental"
         }
       ],
-      "referencia_mais_antiga_em": "2026-09-02T23:31:43-03:00",
-      "referencia_mais_recente_em": "2026-09-02T23:31:44-03:00",
-      "snapshots_atualizados_em": "2026-09-02T23:31:44-03:00"
+      "referencia_mais_antiga_em": "2026-09-02T23:31:44-03:00",
+      "referencia_mais_recente_em": "2026-09-02T23:41:38-03:00",
+      "snapshots_atualizados_em": "2026-09-02T23:41:38-03:00"
     }
   },
   "validacoes": {

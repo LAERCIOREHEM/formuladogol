@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-02T23:31:43-03:00",
+  "gerado_em": "2026-09-02T23:41:38-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,12 +17,12 @@
     "ordem": 700,
     "nome": "Quartas de final",
     "eventos": 8,
-    "eventos_pendentes": 3
+    "eventos_pendentes": 1
   },
   "resumo": {
     "eventos": 150,
-    "finalizados": 147,
-    "pendentes": 3,
+    "finalizados": 149,
+    "pendentes": 1,
     "equipes": 126,
     "equipes_serie_a_2026": 21
   },
@@ -6466,9 +6466,9 @@
     {
       "event_id": "401909110",
       "data_iso": "2026-09-02T21:30:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "INT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -6502,9 +6502,9 @@
     {
       "event_id": "401909111",
       "data_iso": "2026-09-02T21:30:00-03:00",
-      "estado": "in",
-      "concluido": false,
-      "status": "INT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -6529,10 +6529,10 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": false,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 2
       },
-      "vencedor": null,
+      "vencedor": "Vasco da Gama",
       "penaltis": false
     },
     {
@@ -6577,6 +6577,6 @@
     "fase": "Quartas de final",
     "fase_ordem": 700,
     "chaves": 4,
-    "equipes_ativas": 7
+    "equipes_ativas": 5
   }
 }
