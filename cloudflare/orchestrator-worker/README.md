@@ -46,3 +46,14 @@ A avaliação de tarefas lentas roda no máximo a cada 5 minutos e usa artefatos
 
 Se houver qualquer dúvida após a ativação, execute novamente **Deploy Orchestrator Worker** escolhendo `shadow`.
 O Worker continua observando, mas para de criar `workflow_dispatch` no GitHub.
+
+## Fontes do repositório (v1.0.1)
+
+O Worker tenta cada JSON primeiro em `SITE_BASE`. Se o artefato não estiver publicado no Pages ou a fonte pública estiver temporariamente indisponível, ele faz fallback autenticado para o mesmo caminho no branch configurado do GitHub via Contents API. Isso evita publicar no site arquivos puramente operacionais como auditorias e configurações.
+
+O Fine-grained PAT `FDG_ORCHESTRATOR_GITHUB_TOKEN` precisa de:
+
+- `Actions: Read and write` — para `workflow_dispatch` e inspeção de writers;
+- `Contents: Read-only` — somente para leitura dos JSON operacionais. Não é concedida escrita em conteúdo.
+
+No `/status`, `hints.fontesRepositorio` informa quais fontes foram lidas pelo fallback do GitHub. Elas não são tratadas como `fontesDegradadas` se a leitura autenticada tiver sucesso.

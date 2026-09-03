@@ -69,3 +69,9 @@ Para impedir imediatamente novos dispatches automáticos sem remover infraestrut
 ## Gate de publicação
 
 A existência de uma Action não implica deploy. Os workflows alterados neste pacote distinguem conteúdo factual de auditoria/timestamp. Sem mudança factual de transmissão ou vídeo, não há deploy do site.
+
+## Correção 1.0.1 — artefatos não publicados no Pages
+
+Alguns JSON operacionais existem no `main`, mas não pertencem ao conjunto publicado pelo GitHub Pages. O Orchestrator 1.0.1 resolve isso sem expor novos arquivos no site: tenta `SITE_BASE` primeiro e usa GitHub Contents API como fallback autenticado para o mesmo caminho. O PAT deve manter `Actions: Read and write` e acrescentar `Contents: Read-only`.
+
+Após o deploy em `shadow`, confirme `/health` com `version: 1.0.1` e `/status`. `fontesDegradadas` não deve conter os antigos HTTP 404 quando os arquivos existirem no repositório; `hints.fontesRepositorio` pode listá-los como fallback normal.

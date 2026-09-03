@@ -23,7 +23,7 @@ import {
   tvIntervalHours,
 } from './logic.js';
 import { activeWriter, dispatchSpec, dispatchWorkflow } from './github.js';
-import { fetchSiteBundle, probeEspn } from './sources.js';
+import { fetchSiteBundle, probeEspn, repositoryFallbacks } from './sources.js';
 
 // O caminho rápido roda a cada minuto e precisa ser extremamente barato:
 // a agenda já contém event_id, competição, horário e o estado local concluído.
@@ -131,7 +131,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.0.0'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.0.1'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -324,6 +324,8 @@ export class OrchestratorState {
 
     const degraded = [...bundleErrors(bundle), ...bundleErrors(fastBundle)];
     if (degraded.length) hints.fontesDegradadas = degraded.slice(0, 12);
+    const repositorySources = [...repositoryFallbacks(bundle), ...repositoryFallbacks(fastBundle)];
+    if (repositorySources.length) hints.fontesRepositorio = repositorySources.slice(0, 20);
 
     // 1) Manutenção diária: apenas se o snapshot publicado ainda não registra sucesso hoje.
     const lastMainSuccess = parseDate(statusUpdate?.ultimo_sucesso || statusUpdate?.atualizado_em);

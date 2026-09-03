@@ -91,3 +91,18 @@ test('Wrangler contract uses independent SQLite Durable Object and one-minute cr
   assert.match(wrangler, /"OrchestratorState"/);
   assert.doesNotMatch(wrangler, /formula-do-gol-push/);
 });
+
+test('repository fallback contract keeps internal artifacts out of Pages dependency', async () => {
+  const src = await read('cloudflare/orchestrator-worker/src/sources.js');
+  assert.match(src, /application\/vnd\.github\.raw\+json/);
+  assert.match(src, /fetchRepositoryJson/);
+  assert.match(src, /repositoryFallbacks/);
+  const state = await read('cloudflare/orchestrator-worker/src/orchestrator-state.js');
+  assert.match(state, /fontesRepositorio/);
+});
+
+test('deploy validates Contents read permission before changing Worker', async () => {
+  const workflow = await read('.github/workflows/deploy-orchestrator-worker.yml');
+  assert.match(workflow, /Contents: Read-only/);
+  assert.match(workflow, /config-analises\.json\?ref=main/);
+});
