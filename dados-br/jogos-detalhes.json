@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-02T22:21:56.752469-03:00",
+  "gerado_em": "2026-09-02T22:31:19.786734-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 246,
   "total_com_estatisticas": 246,
-  "total_com_publico": 245,
+  "total_com_publico": 246,
   "total_com_eventos": 246,
   "total_com_jogadores": 246,
   "total_eventos_validados": 246,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 60155,
+      "publico_tipo": "total",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/02/flamengo-bate-mirassol-em-jogo-atrasado-e-cola-no-lider-palmeiras.htm",
       "arbitro": "Daronco, Anderson",
       "stats": [
         {
@@ -556,7 +556,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-02T22:18:13.101268-03:00"
+      "atualizado_em": "2026-09-02T22:18:13.101268-03:00",
+      "renda": 3882407.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841210": {
       "event_id": "401841210",
@@ -138509,5 +138511,5 @@
     }
   },
   "total_com_publico_pagante": 239,
-  "total_com_renda": 245
+  "total_com_renda": 246
 }
