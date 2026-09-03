@@ -2152,6 +2152,105 @@ def diagnosticar_sincronia_tabela_resultados(
     return list(anomalias) + sem_delta
 
 
+def reconstruir_tabela_pelos_resultados(
+    tabela_payload: dict[str, Any], resultados_payload: dict[str, Any]
+) -> dict[str, Any] | None:
+    """Monta a classificação a partir EXCLUSIVAMENTE dos resultados publicados.
+
+    Existe para desatar um impasse real: a ESPN atualiza scoreboard e standings
+    em endpoints independentes, e o standings costuma demorar dezenas de minutos
+    depois do apito final. Enquanto os dois discordam, nada era gravado — nem o
+    ``resultados.json`` — e a partida recém-encerrada nunca entrava no
+    repositório. O orquestrador, que decide pela presença do event_id em
+    ``resultados.json``, redisparava o mesmo workflow indefinidamente.
+
+    Somar pontos é aritmética determinística: 3 por vitória, 1 por empate. A
+    ESPN continua sendo a fonte dos PLACARES; ela deixa de ser a fonte da SOMA,
+    que nunca precisou ser dela. O invariante que importa é preservado: tabela e
+    resultados passam a descrever exatamente o mesmo estado esportivo, porque um
+    é derivado do outro.
+
+    Devolve ``None`` se os resultados não permitirem reconstrução confiável.
+    """
+    resultados = resultados_payload.get("resultados") or []
+    acumulado = {
+        clube: {"jogos": 0, "pontos": 0, "vitorias": 0, "empates": 0,
+                "derrotas": 0, "gp": 0, "gc": 0}
+        for clube in CANONICOS
+    }
+    vistos: set[str] = set()
+    for item in resultados:
+        event_id = str(item.get("event_id") or "").strip()
+        if event_id:
+            if event_id in vistos:
+                return None
+            vistos.add(event_id)
+        mandante_bruto = item.get("mandante")
+        visitante_bruto = item.get("visitante")
+        mandante_nome = mandante_bruto.get("nome") if isinstance(mandante_bruto, dict) else mandante_bruto
+        visitante_nome = visitante_bruto.get("nome") if isinstance(visitante_bruto, dict) else visitante_bruto
+        mandante = para_canonico(mandante_nome, item.get("mandante_nome"))
+        visitante = para_canonico(visitante_nome, item.get("visitante_nome"))
+        try:
+            gols_mandante = int(item.get("placar_mandante"))
+            gols_visitante = int(item.get("placar_visitante"))
+        except (TypeError, ValueError):
+            return None
+        if mandante not in acumulado or visitante not in acumulado or mandante == visitante:
+            return None
+        casa, fora = acumulado[mandante], acumulado[visitante]
+        casa["jogos"] += 1
+        fora["jogos"] += 1
+        casa["gp"] += gols_mandante
+        casa["gc"] += gols_visitante
+        fora["gp"] += gols_visitante
+        fora["gc"] += gols_mandante
+        if gols_mandante > gols_visitante:
+            casa["pontos"] += 3
+            casa["vitorias"] += 1
+            fora["derrotas"] += 1
+        elif gols_mandante < gols_visitante:
+            fora["pontos"] += 3
+            fora["vitorias"] += 1
+            casa["derrotas"] += 1
+        else:
+            casa["pontos"] += 1
+            fora["pontos"] += 1
+            casa["empates"] += 1
+            fora["empates"] += 1
+
+    linhas = []
+    for clube, dados in acumulado.items():
+        jogos = int(dados["jogos"])
+        pontos = int(dados["pontos"])
+        linhas.append({
+            "time": clube,
+            "pontos": pontos,
+            "jogos": jogos,
+            "vitorias": int(dados["vitorias"]),
+            "empates": int(dados["empates"]),
+            "derrotas": int(dados["derrotas"]),
+            "gp": int(dados["gp"]),
+            "gc": int(dados["gc"]),
+            "sg": int(dados["gp"]) - int(dados["gc"]),
+            "aproveitamento": int(round(100 * pontos / (3 * jogos))) if jogos else 0,
+        })
+    # Mesmo critério de desempate da tabela oficial do Brasileirão.
+    linhas.sort(key=lambda l: (-l["pontos"], -l["vitorias"], -l["sg"], -l["gp"], l["time"]))
+    for indice, linha in enumerate(linhas, start=1):
+        linha["pos"] = indice
+
+    novo = dict(tabela_payload)
+    novo["tabela"] = [
+        {"pos": l["pos"], "time": l["time"], "pontos": l["pontos"], "jogos": l["jogos"],
+         "vitorias": l["vitorias"], "empates": l["empates"], "derrotas": l["derrotas"],
+         "gp": l["gp"], "gc": l["gc"], "sg": l["sg"], "aproveitamento": l["aproveitamento"]}
+        for l in linhas
+    ]
+    novo["origem_classificacao"] = "reconstruida_dos_resultados"
+    return novo
+
+
 def resumir_discrepancias(discrepancias: list[dict[str, Any]], limite: int = 8) -> str:
     amostra = "; ".join(
         f"{item['clube']} {item['campo']}={item['reconstruido']}/{item['oficial']}"
@@ -2439,17 +2538,23 @@ def selftest_execucao_6() -> None:
     try:
         with tempfile.TemporaryDirectory() as tmp:
             ARQ_AJUSTES_CALENDARIO = Path(tmp) / "ajustes-calendario.json"
+            # A data precisa ser RELATIVA a agora. Com data fixa, o teste vira
+            # bomba-relógio: ``estado_manual_ainda_valido`` compara o horário do
+            # ajuste com agora_brt(), então no dia em que aquela data chega o
+            # teste passa a falhar para sempre, sem ninguém ter tocado no código.
+            base_dt = (agora_brt() + timedelta(days=3)).replace(
+                hour=19, minute=30, second=0, microsecond=0
+            )
             ARQ_AJUSTES_CALENDARIO.write_text(json.dumps({"ajustes": [{
                 "event_id": "sync-rescheduled",
                 "rodada": 4,
                 "mandante": "Flamengo",
                 "visitante": "Mirassol",
-                "data_iso": "2026-09-02T19:30",
+                "data_iso": base_dt.strftime("%Y-%m-%dT%H:%M"),
                 "adiado": False,
                 "estado": "pre",
                 "status": "Agendado",
             }]}), encoding="utf-8")
-            base_dt = datetime(2026, 9, 2, 19, 30, tzinfo=FUSO_BRASILIA)
             reagendado = {
                 "event_id": "sync-rescheduled", "rodada": 4,
                 "mandante_nome": "Flamengo", "visitante_nome": "Mirassol",
@@ -2461,8 +2566,68 @@ def selftest_execucao_6() -> None:
             assert reagendado["data_iso"] == base_dt.strftime("%Y-%m-%dT%H:%M")
             assert reagendado["adiado"] is False
             assert reagendado["status"] == "Agendado"
+
+        # Ramo oposto, que a data fixa nunca chegou a exercitar: passado o
+        # horário, o ajuste antigo NÃO pode continuar mandando no estado — a
+        # fonte esportiva volta a ser soberana.
+        with tempfile.TemporaryDirectory() as tmp:
+            ARQ_AJUSTES_CALENDARIO = Path(tmp) / "ajustes-calendario.json"
+            passado = (agora_brt() - timedelta(days=2)).replace(
+                hour=19, minute=30, second=0, microsecond=0
+            )
+            ARQ_AJUSTES_CALENDARIO.write_text(json.dumps({"ajustes": [{
+                "event_id": "sync-vencido",
+                "rodada": 4,
+                "mandante": "Flamengo",
+                "visitante": "Mirassol",
+                "data_iso": passado.strftime("%Y-%m-%dT%H:%M"),
+                "adiado": False,
+                "estado": "pre",
+                "status": "Agendado",
+            }]}), encoding="utf-8")
+            disputado = {
+                "event_id": "sync-vencido", "rodada": 4,
+                "mandante_nome": "Flamengo", "visitante_nome": "Mirassol",
+                "data_iso": None, "data_dt": None, "_sort": float("inf"),
+                "estado": "post", "concluido": False, "adiado": True,
+                "status": "Encerrado",
+            }
+            aplicar_ajustes_calendario([disputado])
+            assert disputado["data_iso"] == passado.strftime("%Y-%m-%dT%H:%M")
+            assert disputado["status"] == "Encerrado", disputado["status"]
     finally:
         ARQ_AJUSTES_CALENDARIO = original_ajustes
+
+    # Reconstrução da classificação a partir dos resultados: precisa fechar
+    # exatamente contra a mesma auditoria que bloqueia a publicação.
+    resultados_reconstrucao = {"resultados": [
+        {"event_id": "rec-1", "mandante": {"nome": "Flamengo"}, "visitante": {"nome": "Mirassol"},
+         "placar_mandante": 2, "placar_visitante": 0},
+        {"event_id": "rec-2", "mandante": {"nome": "Palmeiras"}, "visitante": {"nome": "Santos"},
+         "placar_mandante": 1, "placar_visitante": 1},
+    ]}
+    tabela_defasada = {"fonte": "ESPN", "tabela": [
+        {"time": clube, "jogos": 0, "pontos": 0, "vitorias": 0, "empates": 0,
+         "derrotas": 0, "gp": 0, "gc": 0}
+        for clube in CANONICOS
+    ]}
+    # A tabela defasada NÃO fecha contra os resultados: é o impasse real.
+    assert diagnosticar_sincronia_tabela_resultados(tabela_defasada, resultados_reconstrucao)
+    reconstruida = reconstruir_tabela_pelos_resultados(tabela_defasada, resultados_reconstrucao)
+    assert reconstruida is not None
+    assert not diagnosticar_sincronia_tabela_resultados(reconstruida, resultados_reconstrucao)
+    linhas_rec = {linha["time"]: linha for linha in reconstruida["tabela"]}
+    assert linhas_rec["Flamengo"]["pontos"] == 3 and linhas_rec["Flamengo"]["vitorias"] == 1
+    assert linhas_rec["Mirassol"]["pontos"] == 0 and linhas_rec["Mirassol"]["derrotas"] == 1
+    assert linhas_rec["Palmeiras"]["pontos"] == 1 and linhas_rec["Santos"]["pontos"] == 1
+    assert linhas_rec["Flamengo"]["sg"] == 2 and linhas_rec["Flamengo"]["pos"] == 1
+    assert len(reconstruida["tabela"]) == len(CANONICOS)
+    assert [l["pos"] for l in reconstruida["tabela"]] == list(range(1, len(CANONICOS) + 1))
+    assert reconstruida["origem_classificacao"] == "reconstruida_dos_resultados"
+    # Resultado corrompido não pode virar classificação inventada.
+    assert reconstruir_tabela_pelos_resultados(tabela_defasada, {"resultados": [
+        {"event_id": "rec-x", "mandante": {"nome": "Flamengo"}, "visitante": {"nome": "Mirassol"},
+         "placar_mandante": None, "placar_visitante": 0}]}) is None
 
     tabela_teste = {
         "tabela": [
@@ -2676,6 +2841,53 @@ def main() -> None:
                 + resumir_discrepancias(discrepancias)
             )
             print(f"::warning::{ultima_falha}")
+
+            # ÚLTIMO RECURSO, só na tentativa final: o standings da ESPN pode
+            # levar dezenas de minutos para incorporar uma partida que o
+            # scoreboard já encerrou. Bloquear a publicação inteira nesse
+            # intervalo deixava a partida recém-encerrada fora do
+            # resultados.json, e o orquestrador — que decide pela presença do
+            # event_id ali — redisparava este workflow em loop, sem estatística,
+            # sem AF-Previsão e sem nada mudar no site.
+            #
+            # A saída é derivar a classificação dos próprios resultados. Não é
+            # afrouxamento: o invariante exigido (tabela e resultados descrevendo
+            # o mesmo estado) fica garantido por construção, porque um passa a
+            # ser calculado a partir do outro. E é auto-corretivo: assim que a
+            # ESPN regularizar, a próxima execução volta a publicar o standings
+            # oficial pelo caminho normal.
+            if tentativa >= MAX_TENTATIVAS_SINCRONIA:
+                tabela_local = reconstruir_tabela_pelos_resultados(tabela, resultados)
+                if tabela_local is not None:
+                    pendentes = diagnosticar_sincronia_tabela_resultados(tabela_local, resultados)
+                    if not pendentes:
+                        fallbacks = listar_fallbacks_eventos(eventos_normalizados)
+                        gravar_json_atomico("tabela.json", tabela_local)
+                        gravar_json_atomico("jogos.json", jogos)
+                        gravar_json_atomico("resultados.json", resultados)
+                        gravar_json_atomico("espn_eventos.json", eventos_json)
+                        motivo = (
+                            "classificação reconstruída a partir dos resultados porque o "
+                            "standings da ESPN ainda não incorporou as últimas partidas; "
+                            "placares seguem sendo da ESPN. Divergência observada: "
+                            + resumir_discrepancias(discrepancias)
+                        )
+                        print(f"::warning::{motivo}")
+                        escrever_outputs_github(
+                            sincronizado=True,
+                            motivo=motivo,
+                            tentativas=tentativa,
+                            status="aviso",
+                            fallbacks=fallbacks,
+                        )
+                        print("== ARQUIVOS GERADOS (classificação reconstruída) ==")
+                        print(f"  tabela.json        {len(tabela_local['tabela'])} times, derivada dos resultados")
+                        print(f"  resultados.json    {len(resultados['resultados'])} resultados")
+                        return
+                    print(
+                        "::warning::Reconstrução da classificação não fechou; "
+                        "preservando o snapshot anterior."
+                    )
         except Exception as exc:  # noqa: BLE001
             if not erro_transitorio_de_fonte(exc):
                 print(f"ERRO FATAL: {type(exc).__name__}: {exc}")
