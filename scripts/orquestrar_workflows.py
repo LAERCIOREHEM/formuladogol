@@ -1077,6 +1077,13 @@ def round_editorial_decision(now: datetime) -> Decision | None:
     try:
         from gerar_analise_rodada import carregar_json as editorial_load
         from gerar_analise_rodada import estado_rodada, montar_dossie
+        # CRÍTICO: o hash tem de ser calculado pela MESMA função que o gerador
+        # usa para gravar 'hash_dossie' no manifesto. hash_dossie_publicavel()
+        # exclui snapshot_antes_hash, snapshot_depois_hash e marco_af_id.
+        # Calcular aqui um sha256 do dossiê inteiro produzia um valor que jamais
+        # coincidia com o publicado, fazendo o orquestrador concluir "não
+        # publicado" em todo ciclo e redespachar o editorial indefinidamente.
+        from gerar_analise_rodada import hash_dossie_publicavel
     except Exception as exc:  # pragma: no cover - diagnóstico defensivo
         return None
     try:
@@ -1091,7 +1098,7 @@ def round_editorial_decision(now: datetime) -> Decision | None:
         rodada = max(eligible)
         state = estado_rodada(rodada, now, config)
         dossier = montar_dossie(rodada, state)
-        digest = hashlib.sha256(json.dumps(dossier, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        digest = hash_dossie_publicavel(dossier)
     except Exception:
         # Sem snapshot AF correspondente, ainda não há editorial válido a publicar.
         return None
@@ -1460,7 +1467,34 @@ def self_test() -> int:
     assert public_retry_interval(100.0, config) == 720
     assert public_retry_interval(500.0, config) == 1440
 
-    print("OK self-test: prioridade, tempo, backoff, gol ao vivo sem pipeline pesado e decisão pós-FINAL.")
+    # --- Contrato de hash entre orquestrador e gerador ----------------------
+    # Este teste existe porque a divergência entre as duas formas de calcular o
+    # hash do dossiê fez o orquestrador redespachar o editorial em laço, mesmo
+    # com todos os runs terminando em sucesso. Se alguém voltar a calcular o
+    # hash aqui de outro jeito, este teste quebra na hora.
+    try:
+        from gerar_analise_rodada import hash_dossie_publicavel as _hdp
+    except Exception:
+        _hdp = None
+    if _hdp is not None:
+        _d = {
+            "rodada": 20,
+            "jogos": [{"linha": "A 1 × 0 B"}],
+            "snapshot_antes_hash": "aaa",
+            "snapshot_depois_hash": "bbb",
+            "marco_af_id": "ccc",
+        }
+        _d2 = dict(_d, snapshot_antes_hash="zzz", snapshot_depois_hash="yyy", marco_af_id="xxx")
+        # Metadados de rastreabilidade não podem alterar o hash publicável.
+        assert _hdp(_d) == _hdp(_d2), "hash_dossie_publicavel não pode depender de metadados AF"
+        # E precisa diferir do sha256 ingênuo do dossiê inteiro — que era
+        # exatamente o cálculo errado usado aqui antes.
+        _ingenuo = hashlib.sha256(json.dumps(_d, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        assert _hdp(_d) != _ingenuo, "regressão: voltaram a usar o sha256 do dossiê inteiro"
+        # Mudança factual real precisa mudar o hash.
+        assert _hdp(dict(_d, jogos=[{"linha": "A 2 × 0 B"}])) != _hdp(_d)
+
+    print("OK self-test: prioridade, tempo, backoff, contrato de hash, gol ao vivo sem pipeline pesado e decisão pós-FINAL.")
     return 0
 
 
