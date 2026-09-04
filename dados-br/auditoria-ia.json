@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-03",
-  "executado_em": "2026-09-03T09:55:32-03:00",
+  "data_brt": "2026-09-04",
+  "executado_em": "2026-09-04T12:05:57-03:00",
   "status": "atencao",
-  "resumo": "A auditoria não identificou falhas críticas nos dados finais. Permanecem duas pendências de transmissão para jogos futuros, sem evidência direta e inequívoca que permita complementar os canais com segurança.",
+  "resumo": "Dados finais íntegros nos indicadores determinísticos. Há duas pendências de transmissão para 08/09/2026, mas não foi possível associar inequivocamente os event_ids aos jogos citados pela fonte consultada, pois o dossiê não informa mandante ou visitante; nenhuma correção automática foi proposta.",
   "triagem": {
-    "data_hora_brt": "2026-09-03T09:55:32-03:00",
+    "data_hora_brt": "2026-09-04T12:05:57-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
@@ -22,7 +22,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 4.7
+        "ultimo_sucesso_horas": 6.8
       }
     },
     "pendencias": {
@@ -35,7 +35,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 129.1
+          "horas_ate_jogo": 102.9
         },
         {
           "event_id": "401912542",
@@ -44,14 +44,10 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 131.6
+          "horas_ate_jogo": 105.4
         }
       ],
       "melhores_momentos_apos_24h": []
-    },
-    "editoriais": {
-      "rodada": null,
-      "copa_do_brasil": null
     },
     "politica": {
       "ia_maximo_chamadas_dia": 1,
@@ -82,61 +78,55 @@
       {
         "type": "search",
         "queries": [
-          "401913960 OR 401912542 transmissão"
+          "401913960 OR 401912542 transmissão 8 setembro 2026 futebol"
         ]
       }
     ],
     "fontes_web": [
-      "https://congressoemfoco.uol.com.br/wp-content/uploads/2023/11/liminar-record-edir-macedo.pdf",
-      "https://migalhas.uol.com.br/arquivos/2015/8/art20150807-04.pdf",
-      "https://migalhas.uol.com.br/arquivos/2018/10/art20181004-11.pdf",
-      "https://migalhas.uol.com.br/arquivos/2018/10/art20181005-01.pdf",
-      "https://natelinha.uol.com.br/amp/noticias/2017/09/03/nfl-volta-nesta-semana-sem-esporte-interativo-espn-fara-transmissao-exclusiva-110213.php",
-      "https://natelinha.uol.com.br/amp/televisao/2021/05/18/sbt-confirma-transmissao-da-copa-america-2021-164160.php",
-      "https://natelinha.uol.com.br/amp/televisao/2026/03/19/reporter-escapa-de-missil-em-transmissao-no-libano-video-239489.php",
-      "https://natelinha.uol.com.br/noticias/2010/11/16/passione-gerson-pode-estar-vendo-transmissao-ao-vivo-no-pc-35152.php",
-      "https://natelinha.uol.com.br/noticias/2011/08/21/tv-azteca-compra-direitos-de-transmissao-de-festival-chileno-42217.php",
-      "https://natelinha.uol.com.br/televisao/2021/04/16/meteoro-explode-durante-transmissao-ao-vivo-de-reporter-162476.php",
-      "https://natelinha.uol.com.br/televisao/2021/05/18/sbt-confirma-transmissao-da-copa-america-2021-164160.php",
-      "https://natelinha.uol.com.br/televisao/2022/01/30/falha-na-transmissao-do-cariocao-revolta-torcedores-volta-globo-176036.php",
-      "https://natelinha.uol.com.br/televisao/2022/05/28/sbt-confirma-transmissao-da-copa-america-feminina-e-volta-do-amarelinho-182348.php",
-      "https://natelinha.uol.com.br/televisao/2024/07/27/voz-misteriosa-atrapalha-transmissao-da-olimpiada-de-paris-na-globo-214823.php",
-      "https://natelinha.uol.com.br/televisao/2026/03/19/reporter-escapa-de-missil-em-transmissao-no-libano-video-239489.php",
-      "https://portaldobitcoin.uol.com.br/wp-content/uploads/sites/6/2024/08/20240813-pas-19957-008369-2022-11-parecer-comite-de-termo-de-compromisso.pdf",
-      "https://www.uol.com.br/tilt/noticias/redacao/2025/03/30/globo-encerra-sinal-para-antenas-parabolicas-antigas-a-partir-de-hoje.htm"
+      "https://ge.globo.com/agenda",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
+      "https://ge.globo.com/futebol-americano/nfl/noticia/2026/08/19/sportv-e-ge-tv-transmitem-com-exclusividade-o-primeiro-jogo-da-historia-da-nfl-no-maracana.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/08/14/cbf-divulga-tabela-detalhada-das-rodadas-25-e-26-da-serie-a-do-brasileirao.ghtml",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://ge.globo.com/programas/segue-o-jogo",
+      "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/corinthians-x-chapecoense/832143",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/botafogo-x-gremio-novorizontino-saf/833142",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/fortaleza-saf-x-avai/833146",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-25-e-26-do-brasileirao-betano",
+      "https://www.itatiaia.com.br/esportes/agenda",
+      "https://www.itatiaia.com.br/esportes/futebol/futebol-internacional/copa-sul-americana/copa-sul-americana-datas-horarios-e-onde-assistir-os-confrontos-das-quartas-de-final"
     ]
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "A auditoria não identificou falhas críticas nos dados finais. Permanecem duas pendências de transmissão para jogos futuros, sem evidência direta e inequívoca que permita complementar os canais com segurança.",
+    "resumo": "Dados finais íntegros nos indicadores determinísticos. Há duas pendências de transmissão para 08/09/2026, mas não foi possível associar inequivocamente os event_ids aos jogos citados pela fonte consultada, pois o dossiê não informa mandante ou visitante; nenhuma correção automática foi proposta.",
     "problemas": [
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Pendência de transmissão permanece elegível para complementação, mas não foi localizada fonte permitida que declare diretamente os canais do evento.",
+        "mensagem": "A fonte consultada declara transmissões para jogos de 08/09/2026, mas o dossiê não contém os participantes dos event_ids 401913960 e 401912542. Sem vínculo direto e inequívoco entre cada event_id e a partida, a complementação não é segura.",
         "event_id": "401913960",
-        "requer_intervencao": false
+        "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Pendência de transmissão permanece elegível para complementação, mas não foi localizada fonte permitida que declare diretamente os canais do evento.",
+        "mensagem": "A fonte consultada declara transmissões para jogos de 08/09/2026, mas o dossiê não contém os participantes dos event_ids 401913960 e 401912542. Sem vínculo direto e inequívoco entre cada event_id e a partida, a complementação não é segura.",
         "event_id": "401912542",
-        "requer_intervencao": false
+        "requer_intervencao": true
       },
       {
         "categoria": "fonte",
         "severidade": "info",
-        "mensagem": "As falhas isoladas de fontes de transmissão não configuram incidente crítico, pois o dossiê informa ausência de perda crítica de cobertura.",
+        "mensagem": "As três falhas de fontes de transmissão permanecem como aviso operacional, sem perda crítica de cobertura ou impacto nos dados finais.",
         "event_id": "",
         "requer_intervencao": false
       }
     ],
     "correcoes_publico": [],
     "correcoes_transmissao": [],
-    "melhores_momentos_pendentes": [],
-    "editorial_rodada": null,
-    "editorial_copa": null
+    "melhores_momentos_pendentes": []
   },
   "correcoes": {
     "publicos_aceitos": [],
@@ -502,6 +492,19 @@
       "executado_em": "2026-09-03T09:55:32-03:00",
       "status": "atencao",
       "resumo": "A auditoria não identificou falhas críticas nos dados finais. Permanecem duas pendências de transmissão para jogos futuros, sem evidência direta e inequívoca que permita complementar os canais com segurança.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-04",
+      "executado_em": "2026-09-04T12:05:57-03:00",
+      "status": "atencao",
+      "resumo": "Dados finais íntegros nos indicadores determinísticos. Há duas pendências de transmissão para 08/09/2026, mas não foi possível associar inequivocamente os event_ids aos jogos citados pela fonte consultada, pois o dossiê não informa mandante ou visitante; nenhuma correção automática foi proposta.",
       "chamadas_openai": 1,
       "web_searches": 1,
       "publicos_aplicados": 0,
