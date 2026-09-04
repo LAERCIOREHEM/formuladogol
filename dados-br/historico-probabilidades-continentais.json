@@ -4387,7 +4387,955 @@
       ],
       "origem_marco": "primeira_fotografia_pos_fechamento",
       "hash_marco": "5ef4355d0924108b8602436662a12c8c40b8fe142c8a00a5a99620231c033fbf"
+    },
+    {
+      "id": "copa-do-brasil-2026-quartas-fechamento",
+      "competicao": "copa_do_brasil",
+      "competicao_nome": "Copa do Brasil",
+      "temporada": 2026,
+      "fase": "Quartas de final",
+      "fase_ordem": 700,
+      "tipo": "depois",
+      "descricao": "Primeira fotografia imutável do AF-Previsão após o encerramento integral de Quartas de final.",
+      "registrado_em": "2026-09-03T22:42:51-03:00",
+      "fonte": {
+        "probabilidades_calculadas_em": "2026-09-03T22:42:51-03:00",
+        "probabilidades_referencia_esportiva_em": "2026-09-02T21:24:00-03:00",
+        "probabilidades_hash_entrada": "9e9bed50f464997a0c4a8bf8edcd0160b0cd63f4802f95d60d44dff31f67366b",
+        "probabilidades_hash_snapshots": "02109b3a778e99da2ec075266270c274abc1027e5cc119b0632b7d7eb386c3f7",
+        "copa_snapshot_gerado_em": "2026-09-03T22:41:07-03:00",
+        "copa_fase_atual": {
+          "status": "encerrada",
+          "ordem": 700,
+          "nome": "Quartas de final",
+          "eventos": 8,
+          "eventos_pendentes": 0
+        }
+      },
+      "clubes_serie_a_na_fase": [
+        "Atlético-MG",
+        "Cruzeiro",
+        "Grêmio",
+        "Internacional",
+        "Palmeiras",
+        "Santos",
+        "Vasco da Gama",
+        "Vitória"
+      ],
+      "classificados": [
+        "Atlético-MG",
+        "Grêmio",
+        "Palmeiras",
+        "Vasco da Gama"
+      ],
+      "eliminados": [
+        "Cruzeiro",
+        "Internacional",
+        "Santos",
+        "Vitória"
+      ],
+      "confrontos": [
+        {
+          "ordem": 1,
+          "chave": "atletico mg::cruzeiro",
+          "equipe_a": {
+            "nome": "Atlético-MG",
+            "espn_id": "7632",
+            "sigla": "CAM",
+            "serie_a_2026": true
+          },
+          "equipe_b": {
+            "nome": "Cruzeiro",
+            "espn_id": "2022",
+            "sigla": "CRU",
+            "serie_a_2026": true
+          },
+          "jogos": [
+            {
+              "event_id": "401909066",
+              "perna": 1,
+              "data_iso": "2026-08-25T21:00:00-03:00",
+              "estadio": "Estadio Mineirão",
+              "mandante": "Cruzeiro",
+              "visitante": "Atlético-MG",
+              "placar_mandante": 1,
+              "placar_visitante": 1,
+              "concluido": true,
+              "vencedor": null,
+              "penaltis": false
+            },
+            {
+              "event_id": "401909112",
+              "perna": 2,
+              "data_iso": "2026-09-01T21:00:00-03:00",
+              "estadio": "Arena MRV",
+              "mandante": "Atlético-MG",
+              "visitante": "Cruzeiro",
+              "placar_mandante": 2,
+              "placar_visitante": 1,
+              "concluido": true,
+              "vencedor": "Atlético-MG",
+              "penaltis": false
+            }
+          ],
+          "agregado": {
+            "Atlético-MG": 3,
+            "Cruzeiro": 2
+          },
+          "concluido": true,
+          "classificado": "Atlético-MG",
+          "eliminado": "Cruzeiro",
+          "decidido_nos_penaltis": false
+        },
+        {
+          "ordem": 2,
+          "chave": "palmeiras::santos",
+          "equipe_a": {
+            "nome": "Palmeiras",
+            "espn_id": "2029",
+            "sigla": "PAL",
+            "serie_a_2026": true
+          },
+          "equipe_b": {
+            "nome": "Santos",
+            "espn_id": "2674",
+            "sigla": "SAN",
+            "serie_a_2026": true
+          },
+          "jogos": [
+            {
+              "event_id": "401909065",
+              "perna": 1,
+              "data_iso": "2026-08-26T21:30:00-03:00",
+              "estadio": "Allianz Parque",
+              "mandante": "Palmeiras",
+              "visitante": "Santos",
+              "placar_mandante": 3,
+              "placar_visitante": 0,
+              "concluido": true,
+              "vencedor": "Palmeiras",
+              "penaltis": false
+            },
+            {
+              "event_id": "401909110",
+              "perna": 2,
+              "data_iso": "2026-09-02T21:30:00-03:00",
+              "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
+              "mandante": "Santos",
+              "visitante": "Palmeiras",
+              "placar_mandante": 0,
+              "placar_visitante": 0,
+              "concluido": true,
+              "vencedor": "Palmeiras",
+              "penaltis": false
+            }
+          ],
+          "agregado": {
+            "Palmeiras": 3,
+            "Santos": 0
+          },
+          "concluido": true,
+          "classificado": "Palmeiras",
+          "eliminado": "Santos",
+          "decidido_nos_penaltis": false
+        },
+        {
+          "ordem": 3,
+          "chave": "vasco da gama::vitoria",
+          "equipe_a": {
+            "nome": "Vasco da Gama",
+            "espn_id": "3454",
+            "sigla": "VAS",
+            "serie_a_2026": true
+          },
+          "equipe_b": {
+            "nome": "Vitória",
+            "espn_id": "3457",
+            "sigla": "VIT",
+            "serie_a_2026": true
+          },
+          "jogos": [
+            {
+              "event_id": "401909113",
+              "perna": 1,
+              "data_iso": "2026-08-26T21:30:00-03:00",
+              "estadio": "Estádio São Januário",
+              "mandante": "Vasco da Gama",
+              "visitante": "Vitória",
+              "placar_mandante": 1,
+              "placar_visitante": 0,
+              "concluido": true,
+              "vencedor": "Vasco da Gama",
+              "penaltis": false
+            },
+            {
+              "event_id": "401909111",
+              "perna": 2,
+              "data_iso": "2026-09-02T21:30:00-03:00",
+              "estadio": "Estadio Manoel Barradas",
+              "mandante": "Vitória",
+              "visitante": "Vasco da Gama",
+              "placar_mandante": 0,
+              "placar_visitante": 2,
+              "concluido": true,
+              "vencedor": "Vasco da Gama",
+              "penaltis": false
+            }
+          ],
+          "agregado": {
+            "Vasco da Gama": 3,
+            "Vitória": 0
+          },
+          "concluido": true,
+          "classificado": "Vasco da Gama",
+          "eliminado": "Vitória",
+          "decidido_nos_penaltis": false
+        },
+        {
+          "ordem": 4,
+          "chave": "gremio::internacional",
+          "equipe_a": {
+            "nome": "Grêmio",
+            "espn_id": "6273",
+            "sigla": "GRE",
+            "serie_a_2026": true
+          },
+          "equipe_b": {
+            "nome": "Internacional",
+            "espn_id": "1936",
+            "sigla": "INT",
+            "serie_a_2026": true
+          },
+          "jogos": [
+            {
+              "event_id": "401909064",
+              "perna": 1,
+              "data_iso": "2026-08-27T20:00:00-03:00",
+              "estadio": "Estadio Beira-Rio",
+              "mandante": "Internacional",
+              "visitante": "Grêmio",
+              "placar_mandante": 0,
+              "placar_visitante": 0,
+              "concluido": true,
+              "vencedor": null,
+              "penaltis": false
+            },
+            {
+              "event_id": "401909114",
+              "perna": 2,
+              "data_iso": "2026-09-03T20:00:00-03:00",
+              "estadio": "Arena do Grêmio",
+              "mandante": "Grêmio",
+              "visitante": "Internacional",
+              "placar_mandante": 3,
+              "placar_visitante": 1,
+              "concluido": true,
+              "vencedor": "Grêmio",
+              "penaltis": false
+            }
+          ],
+          "agregado": {
+            "Grêmio": 3,
+            "Internacional": 1
+          },
+          "concluido": true,
+          "classificado": "Grêmio",
+          "eliminado": "Internacional",
+          "decidido_nos_penaltis": false
+        }
+      ],
+      "clubes": [
+        {
+          "clube": "Atlético-MG",
+          "posicao_atual": 8,
+          "pontos_atuais": 36,
+          "jogos_atuais": 24,
+          "posicao_projetada": 7,
+          "pontos_projetados": {
+            "media": 56,
+            "media_estimada": 56.379,
+            "mediana": 56,
+            "percentil_10": 50,
+            "percentil_90": 62,
+            "minimo_simulado": 37,
+            "maximo_simulado": 78
+          },
+          "libertadores_total": {
+            "percentual_estimado": 73.89115,
+            "exibicao": "73,9%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "libertadores_vias": {
+            "via_brasileirao": {
+              "percentual_estimado": 28.2616,
+              "exibicao": "28,3%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_copa_do_brasil": {
+              "percentual_estimado": 28.3576,
+              "exibicao": "28,4%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_titulo_libertadores": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_sul_americana": {
+              "percentual_estimado": 5.85735,
+              "exibicao": "5,9%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_repasse": {
+              "percentual_estimado": 11.4146,
+              "exibicao": "11,4%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "copa_do_brasil_subvias": {
+            "campeao": {
+              "percentual_estimado": 11.64585,
+              "exibicao": "11,6%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "vice": {
+              "percentual_estimado": 5.75225,
+              "exibicao": "5,8%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "vice_herda_vaga_direta": {
+              "percentual_estimado": 10.9595,
+              "exibicao": "11,0%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "sul_americana_total": {
+            "percentual_estimado": 25.094,
+            "exibicao": "25,1%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "rebaixamento": {
+            "percentual_estimado": 0.0645,
+            "exibicao": "0,065%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          }
+        },
+        {
+          "clube": "Cruzeiro",
+          "posicao_atual": 6,
+          "pontos_atuais": 39,
+          "jogos_atuais": 25,
+          "posicao_projetada": 5,
+          "pontos_projetados": {
+            "media": 59,
+            "media_estimada": 58.673,
+            "mediana": 59,
+            "percentil_10": 53,
+            "percentil_90": 65,
+            "minimo_simulado": 40,
+            "maximo_simulado": 78
+          },
+          "libertadores_total": {
+            "percentual_estimado": 69.6626,
+            "exibicao": "69,7%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "libertadores_vias": {
+            "via_brasileirao": {
+              "percentual_estimado": 45.3054,
+              "exibicao": "45,3%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_copa_do_brasil": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_libertadores": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_sul_americana": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_repasse": {
+              "percentual_estimado": 24.3572,
+              "exibicao": "24,4%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "copa_do_brasil_subvias": {
+            "campeao": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "vice": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "vice_herda_vaga_direta": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            }
+          },
+          "sul_americana_total": {
+            "percentual_estimado": 29.898,
+            "exibicao": "29,9%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "rebaixamento": {
+            "percentual_estimado": 0.0097,
+            "exibicao": "0,010%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          }
+        },
+        {
+          "clube": "Grêmio",
+          "posicao_atual": 15,
+          "pontos_atuais": 28,
+          "jogos_atuais": 24,
+          "posicao_projetada": 14,
+          "pontos_projetados": {
+            "media": 45,
+            "media_estimada": 45.232,
+            "mediana": 45,
+            "percentil_10": 39,
+            "percentil_90": 51,
+            "minimo_simulado": 28,
+            "maximo_simulado": 68
+          },
+          "libertadores_total": {
+            "percentual_estimado": 45.3304,
+            "exibicao": "45,3%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "libertadores_vias": {
+            "via_brasileirao": {
+              "percentual_estimado": 0.28145,
+              "exibicao": "0,28%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_copa_do_brasil": {
+              "percentual_estimado": 44.1612,
+              "exibicao": "44,2%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_titulo_libertadores": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_sul_americana": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_repasse": {
+              "percentual_estimado": 0.88775,
+              "exibicao": "0,89%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "copa_do_brasil_subvias": {
+            "campeao": {
+              "percentual_estimado": 18.395,
+              "exibicao": "18,4%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "vice": {
+              "percentual_estimado": 7.1206,
+              "exibicao": "7,1%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "vice_herda_vaga_direta": {
+              "percentual_estimado": 18.6456,
+              "exibicao": "18,6%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "sul_americana_total": {
+            "percentual_estimado": 23.6913,
+            "exibicao": "23,7%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "rebaixamento": {
+            "percentual_estimado": 21.52495,
+            "exibicao": "21,5%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          }
+        },
+        {
+          "clube": "Internacional",
+          "posicao_atual": 18,
+          "pontos_atuais": 25,
+          "jogos_atuais": 25,
+          "posicao_projetada": 17,
+          "pontos_projetados": {
+            "media": 42,
+            "media_estimada": 42.277,
+            "mediana": 42,
+            "percentil_10": 36,
+            "percentil_90": 48,
+            "minimo_simulado": 26,
+            "maximo_simulado": 64
+          },
+          "libertadores_total": {
+            "percentual_estimado": 0.26295,
+            "exibicao": "0,26%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "libertadores_vias": {
+            "via_brasileirao": {
+              "percentual_estimado": 0.02605,
+              "exibicao": "0,026%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_copa_do_brasil": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_libertadores": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_sul_americana": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_repasse": {
+              "percentual_estimado": 0.2369,
+              "exibicao": "0,24%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "copa_do_brasil_subvias": {
+            "campeao": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "vice": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "vice_herda_vaga_direta": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            }
+          },
+          "sul_americana_total": {
+            "percentual_estimado": 19.53605,
+            "exibicao": "19,5%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "rebaixamento": {
+            "percentual_estimado": 46.4297,
+            "exibicao": "46,4%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          }
+        },
+        {
+          "clube": "Palmeiras",
+          "posicao_atual": 1,
+          "pontos_atuais": 52,
+          "jogos_atuais": 25,
+          "posicao_projetada": 2,
+          "pontos_projetados": {
+            "media": 77,
+            "media_estimada": 76.657,
+            "mediana": 77,
+            "percentil_10": 71,
+            "percentil_90": 82,
+            "minimo_simulado": 56,
+            "maximo_simulado": 91
+          },
+          "libertadores_total": {
+            "percentual_estimado": 99.99875,
+            "exibicao": "99,999%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "libertadores_vias": {
+            "via_brasileirao": {
+              "percentual_estimado": 99.9855,
+              "exibicao": "99,99%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_copa_do_brasil": {
+              "percentual_estimado": 0.0084,
+              "exibicao": "0,008%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_titulo_libertadores": {
+              "percentual_estimado": 0.00315,
+              "exibicao": "0,003%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_titulo_sul_americana": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_repasse": {
+              "percentual_estimado": 0.0017,
+              "exibicao": "0,002%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "copa_do_brasil_subvias": {
+            "campeao": {
+              "percentual_estimado": 0.00535,
+              "exibicao": "0,005%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "vice": {
+              "percentual_estimado": 0.00265,
+              "exibicao": "0,003%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "vice_herda_vaga_direta": {
+              "percentual_estimado": 0.0004,
+              "exibicao": "<0,001%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "sul_americana_total": {
+            "percentual_estimado": 0.00125,
+            "exibicao": "0,001%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "rebaixamento": {
+            "percentual_estimado": 0.0,
+            "exibicao": "<0,001%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          }
+        },
+        {
+          "clube": "Santos",
+          "posicao_atual": 14,
+          "pontos_atuais": 29,
+          "jogos_atuais": 24,
+          "posicao_projetada": 13,
+          "pontos_projetados": {
+            "media": 46,
+            "media_estimada": 45.521,
+            "mediana": 45,
+            "percentil_10": 40,
+            "percentil_90": 52,
+            "minimo_simulado": 29,
+            "maximo_simulado": 69
+          },
+          "libertadores_total": {
+            "percentual_estimado": 6.19785,
+            "exibicao": "6,2%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "libertadores_vias": {
+            "via_brasileirao": {
+              "percentual_estimado": 0.404,
+              "exibicao": "0,40%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_copa_do_brasil": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_libertadores": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_sul_americana": {
+              "percentual_estimado": 4.2959,
+              "exibicao": "4,3%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_repasse": {
+              "percentual_estimado": 1.49795,
+              "exibicao": "1,5%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "copa_do_brasil_subvias": {
+            "campeao": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "vice": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "vice_herda_vaga_direta": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            }
+          },
+          "sul_americana_total": {
+            "percentual_estimado": 40.14525,
+            "exibicao": "40,1%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "rebaixamento": {
+            "percentual_estimado": 19.97645,
+            "exibicao": "20,0%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          }
+        },
+        {
+          "clube": "Vasco da Gama",
+          "posicao_atual": 17,
+          "pontos_atuais": 25,
+          "jogos_atuais": 24,
+          "posicao_projetada": 18,
+          "pontos_projetados": {
+            "media": 41,
+            "media_estimada": 41.017,
+            "mediana": 41,
+            "percentil_10": 35,
+            "percentil_90": 47,
+            "minimo_simulado": 25,
+            "maximo_simulado": 64
+          },
+          "libertadores_total": {
+            "percentual_estimado": 40.6147,
+            "exibicao": "40,6%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "libertadores_vias": {
+            "via_brasileirao": {
+              "percentual_estimado": 0.01885,
+              "exibicao": "0,019%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_copa_do_brasil": {
+              "percentual_estimado": 38.1465,
+              "exibicao": "38,1%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_titulo_libertadores": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_sul_americana": {
+              "percentual_estimado": 2.3443,
+              "exibicao": "2,3%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_repasse": {
+              "percentual_estimado": 0.10505,
+              "exibicao": "0,11%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "copa_do_brasil_subvias": {
+            "campeao": {
+              "percentual_estimado": 14.75115,
+              "exibicao": "14,8%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "vice": {
+              "percentual_estimado": 7.0292,
+              "exibicao": "7,0%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "vice_herda_vaga_direta": {
+              "percentual_estimado": 16.36615,
+              "exibicao": "16,4%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "sul_americana_total": {
+            "percentual_estimado": 9.49595,
+            "exibicao": "9,5%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "rebaixamento": {
+            "percentual_estimado": 55.70395,
+            "exibicao": "55,7%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          }
+        },
+        {
+          "clube": "Vitória",
+          "posicao_atual": 13,
+          "pontos_atuais": 29,
+          "jogos_atuais": 25,
+          "posicao_projetada": 15,
+          "pontos_projetados": {
+            "media": 44,
+            "media_estimada": 44.187,
+            "mediana": 44,
+            "percentil_10": 39,
+            "percentil_90": 50,
+            "minimo_simulado": 29,
+            "maximo_simulado": 66
+          },
+          "libertadores_total": {
+            "percentual_estimado": 0.8239,
+            "exibicao": "0,82%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "libertadores_vias": {
+            "via_brasileirao": {
+              "percentual_estimado": 0.11485,
+              "exibicao": "0,11%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            },
+            "via_copa_do_brasil": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_libertadores": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_titulo_sul_americana": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "via_repasse": {
+              "percentual_estimado": 0.70905,
+              "exibicao": "0,71%",
+              "possivel_estruturalmente": true,
+              "impossivel_estruturalmente": false
+            }
+          },
+          "copa_do_brasil_subvias": {
+            "campeao": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "vice": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            },
+            "vice_herda_vaga_direta": {
+              "percentual_estimado": 0.0,
+              "exibicao": "0%",
+              "possivel_estruturalmente": false,
+              "impossivel_estruturalmente": true
+            }
+          },
+          "sul_americana_total": {
+            "percentual_estimado": 34.10695,
+            "exibicao": "34,1%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          },
+          "rebaixamento": {
+            "percentual_estimado": 26.5872,
+            "exibicao": "26,6%",
+            "possivel_estruturalmente": true,
+            "impossivel_estruturalmente": false
+          }
+        }
+      ],
+      "hash_marco": "00ed2e883ac79a639fe465581d04916393bd3eda462ad2168f5851c3b0068b4f"
     }
   ],
-  "total_marcos": 5
+  "total_marcos": 6
 }

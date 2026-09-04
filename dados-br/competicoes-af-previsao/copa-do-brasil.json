@@ -9,20 +9,20 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-03T05:11:48-03:00",
+  "gerado_em": "2026-09-03T22:41:07-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "em_andamento",
+    "status": "encerrada",
     "ordem": 700,
     "nome": "Quartas de final",
     "eventos": 8,
-    "eventos_pendentes": 1
+    "eventos_pendentes": 0
   },
   "resumo": {
     "eventos": 150,
-    "finalizados": 149,
-    "pendentes": 1,
+    "finalizados": 150,
+    "pendentes": 0,
     "equipes": 126,
     "equipes_serie_a_2026": 21
   },
@@ -6538,9 +6538,9 @@
     {
       "event_id": "401909114",
       "data_iso": "2026-09-03T20:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qui., Setembro 3º at 7:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -6554,8 +6554,8 @@
         "pais": "BRA",
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 3
       },
       "visitante": {
         "espn_id": "1936",
@@ -6566,9 +6566,9 @@
         "serie_a_2026": true,
         "mandante": false,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
-      "vencedor": null,
+      "vencedor": "Grêmio",
       "penaltis": false
     }
   ],
@@ -6577,6 +6577,6 @@
     "fase": "Quartas de final",
     "fase_ordem": 700,
     "chaves": 4,
-    "equipes_ativas": 5
+    "equipes_ativas": 4
   }
 }
