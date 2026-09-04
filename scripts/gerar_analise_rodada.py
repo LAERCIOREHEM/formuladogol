@@ -26,6 +26,8 @@ from urllib.parse import parse_qs, urlparse
 
 
 FUSO_BR = timezone(timedelta(hours=-3))
+from editorial_ia import EditorialAIError, generate_editorial
+
 SITE = "https://formuladogol.com.br"
 TEMPORADA = 2026
 TOTAL_JOGOS_RODADA = 10
@@ -585,22 +587,22 @@ def schema_editorial() -> dict[str, Any]:
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "titulo": {"type": "string", "minLength": 35, "maxLength": 130},
-            "linha_fina": {"type": "string", "minLength": 60, "maxLength": 220},
+            "titulo": {"type": "string", "minLength": 30, "maxLength": 140},
+            "linha_fina": {"type": "string", "minLength": 60, "maxLength": 260},
             "secoes": {
                 "type": "array",
-                "minItems": 3,
+                "minItems": 2,
                 "maxItems": 4,
                 "items": {
                     "type": "object",
                     "additionalProperties": False,
                     "properties": {
-                        "titulo": {"type": "string", "minLength": 18, "maxLength": 85},
+                        "titulo": {"type": "string", "minLength": 12, "maxLength": 90},
                         "paragrafos": {
                             "type": "array",
-                            "minItems": 2,
+                            "minItems": 1,
                             "maxItems": 3,
-                            "items": {"type": "string", "minLength": 420, "maxLength": 900},
+                            "items": {"type": "string", "minLength": 90, "maxLength": 1000},
                         },
                     },
                     "required": ["titulo", "paragrafos"],
@@ -684,9 +686,9 @@ def validar_editorial(editorial: dict[str, Any], dossie: dict[str, Any]) -> None
     if set(editorial) != {"titulo", "linha_fina", "secoes"}:
         raise ErroAnalise("Editorial fora do schema esperado")
     secoes = editorial.get("secoes") or []
-    if len(secoes) not in {3, 4} or any(set(secao) != {"titulo", "paragrafos"} for secao in secoes):
+    if not 2 <= len(secoes) <= 4 or any(set(secao) != {"titulo", "paragrafos"} for secao in secoes):
         raise ErroAnalise("Editorial incompleto")
-    if any(len(secao.get("paragrafos") or []) not in {2, 3} for secao in secoes):
+    if any(not 1 <= len(secao.get("paragrafos") or []) <= 3 for secao in secoes):
         raise ErroAnalise("Quantidade de parágrafos fora do padrão editorial")
     campos = [editorial["titulo"], editorial["linha_fina"]]
     for secao in secoes:
@@ -695,10 +697,7 @@ def validar_editorial(editorial: dict[str, Any], dossie: dict[str, Any]) -> None
     if not all(isinstance(x, str) and x.strip() for x in campos):
         raise ErroAnalise("Editorial incompleto")
     texto = " ".join(campos)
-    texto_sem_rodada = texto.replace(str(dossie["rodada"]), "")
-    if re.search(r"\d", texto_sem_rodada):
-        raise ErroAnalise("A IA incluiu algarismos; conteúdo rejeitado para impedir dado não auditado")
-    proibidos = ["vale destacar", "em um cenário", "a narrativa", "mergulhar", "jornada", "não apenas", "o futebol nos ensina", "mais do que nunca"]
+    proibidos = ["vale destacar", "a narrativa", "mergulhar", "jornada", "o futebol nos ensina", "mais do que nunca", "dossiê factual", "snapshot"]
     if any(frase in texto.casefold() for frase in proibidos):
         raise ErroAnalise("Editorial contém linguagem artificial proibida")
     clubes = {c["clube"] for c in dossie["clubes"]}
@@ -1425,11 +1424,20 @@ def executar(args: argparse.Namespace) -> int:
             validar_editorial(candidato, dossie)
             if not re.search(rf"\b{rodada}\b", candidato["titulo"]):
                 candidato["titulo"] = f"Rodada {rodada}: {candidato['titulo']}"
-            editorial, origem = candidato, args.origem_editorial or "openai:auditoria-diaria"
+            editorial, origem = candidato, args.origem_editorial or "openai:editorial-externo"
+        elif args.usar_ia and not args.sem_ia:
+            try:
+                candidato, origem = generate_editorial("brasileirao", resumo_editorial(dossie), schema_editorial())
+                if not re.search(rf"\b{rodada}\b", candidato["titulo"]):
+                    candidato["titulo"] = f"Rodada {rodada}: {candidato['titulo']}"
+                validar_editorial(candidato, dossie)
+                editorial = candidato
+                print(f"Editorial jornalístico da rodada gerado pela camada dedicada ({origem}).")
+            except (EditorialAIError, ErroAnalise) as exc:
+                print(f"::warning title=Editorial IA indisponível::Fallback jornalístico determinístico aplicado. {exc}")
+                editorial, origem = fallback, "deterministico-jornalistico-contingencia"
         else:
-            # A única chamada diária à OpenAI pertence a auditoria_ia_diaria.py.
-            # Sem --editorial-json, este gerador sempre usa a contingência determinística.
-            editorial, origem = fallback, "editorial_curado" if rodada == 20 else "deterministico"
+            editorial, origem = fallback, "editorial_curado" if rodada == 20 else "deterministico-jornalistico"
     validar_editorial(editorial, dossie)
     publicado = anterior.get("publicado_em") if anterior else momento.replace(microsecond=0).isoformat()
     modificado = momento.replace(microsecond=0).isoformat()
@@ -1572,7 +1580,8 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--rodada", type=int, choices=range(1, 39))
     parser.add_argument("--forcar", action="store_true", help="Gera mesmo fora da janela ou substitui conteúdo idêntico")
-    parser.add_argument("--sem-ia", action="store_true", help="Compatibilidade: sem --editorial-json o editorial é sempre determinístico")
+    parser.add_argument("--usar-ia", action="store_true", help="Usa OpenAI somente depois que a rodada estiver fechada e o dossiê factual pronto")
+    parser.add_argument("--sem-ia", action="store_true", help="Força o fallback jornalístico determinístico")
     parser.add_argument("--dry-run", action="store_true", help="Valida e mostra o resultado sem gravar arquivos")
     parser.add_argument("--editorial-json", help="Editorial já produzido por uma camada externa; não chama a OpenAI")
     parser.add_argument("--origem-editorial", default="", help="Rótulo de origem usado com --editorial-json")

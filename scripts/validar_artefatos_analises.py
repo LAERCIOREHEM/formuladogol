@@ -92,6 +92,8 @@ def validate(root: Path) -> None:
         assert nav_html.count('aria-current="page"') == 1, f"{slug}: página ativa precisa ser única"
         assert re.search(rf'href="{re.escape(slug)}" class="active" aria-current="page"', nav_html), f"{slug}: artigo atual não está marcado como ativo"
         assert "analysis-copy-section" in text, f"{slug}: corpo editorial ausente"
+        assert text.count("<h1>") == 1 and text.count("</h1>") == 1, f"{slug}: H1 duplicado"
+        assert text.count('class="analysis-copy"') == 1, f"{slug}: bloco editorial principal duplicado"
         assert slug in hub, f"{slug}: card ausente do hub"
         assert str(article["rotulo_menu"]) in hub, f"{slug}: subaba ausente do hub"
         assert "0,000%" not in text, f"{slug}: percentual proibido"
@@ -120,6 +122,20 @@ def validate(root: Path) -> None:
             assert article.get("fase_encerrada") and article.get("fase_seguinte"), f"{slug}: metadados da fase ausentes"
             assert 'data-fdg-analise-competicao="copa-do-brasil"' in text, f"{slug}: marcador da competição ausente"
             assert "Tabela do Brasileirão" not in text and "analysis-kpis" not in text, f"{slug}: layout indevidamente herdado da rodada"
+            for club in classificados:
+                assert club in text, f"{slug}: classificado {club!r} ausente da página"
+            phase_closed = str(article.get("fase_encerrada") or "").casefold()
+            if phase_closed.startswith("quartas"):
+                assert 'class="analysis-qualified-spotlight"' in text, f"{slug}: capa dos semifinalistas ausente"
+                assert text.count('class="analysis-qualified-card"') == 4, f"{slug}: quartas encerradas devem destacar quatro semifinalistas"
+                assert "Libertadores 2027" in text, f"{slug}: consequência continental da semifinal ausente"
+                last = str(article.get("ultimo_classificado") or "").strip()
+                if last:
+                    assert last in title or last in description or last in str(article.get("editorial") or {}), f"{slug}: último classificado não protagoniza a narrativa"
+            elif phase_closed.startswith("semifinal"):
+                assert 'class="analysis-qualified-spotlight"' in text, f"{slug}: capa dos finalistas ausente"
+                assert text.count('class="analysis-qualified-card"') == 2, f"{slug}: semifinal encerrada deve destacar dois finalistas"
+                assert "Libertadores 2027" in text, f"{slug}: vaga continental dos finalistas ausente"
             if 'class="analysis-status status-eliminated"' in text:
                 assert re.search(r"Via Copa.*0%", text, flags=re.I | re.S), f"{slug}: eliminação sem zero explícito"
             expected_videos = int(article.get("melhores_momentos_vinculados") or 0)

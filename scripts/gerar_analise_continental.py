@@ -29,6 +29,8 @@ from gerar_analise_rodada import (
     agora_br,
     data_curta,
 )
+from editorial_ia import EditorialAIError, generate_editorial
+
 
 SNAPS = {
     'libertadores': ROOT / 'dados-br/competicoes-af-previsao/libertadores.json',
@@ -50,7 +52,7 @@ KNOWN_SHOOTOUTS = {
     '401874156': {'winner': 'Fluminense', 'winner_score': 5, 'loser_score': 4},
     '401874142': {'winner': 'Liga de Quito', 'winner_score': 5, 'loser_score': 4},
 }
-RENDER_VERSION = 7
+RENDER_VERSION = 8
 
 
 class ContinentalEditorialError(RuntimeError):
@@ -325,6 +327,98 @@ def editorial_copy(rank: int, ties: Sequence[Mapping[str, Any]]) -> dict[str, An
             ]},
         ],
     }
+
+
+def continental_editorial_schema() -> dict[str, Any]:
+    return {
+        'type': 'object',
+        'additionalProperties': False,
+        'properties': {
+            'titulo': {'type': 'string', 'minLength': 30, 'maxLength': 140},
+            'linha_fina': {'type': 'string', 'minLength': 60, 'maxLength': 260},
+            'secoes': {
+                'type': 'array', 'minItems': 2, 'maxItems': 4,
+                'items': {
+                    'type': 'object', 'additionalProperties': False,
+                    'properties': {
+                        'titulo': {'type': 'string', 'minLength': 12, 'maxLength': 90},
+                        'paragrafos': {'type': 'array', 'minItems': 1, 'maxItems': 3, 'items': {'type': 'string', 'minLength': 90, 'maxLength': 1000}},
+                    },
+                    'required': ['titulo', 'paragrafos'],
+                },
+            },
+        },
+        'required': ['titulo', 'linha_fina', 'secoes'],
+    }
+
+
+def continental_editorial_dossier(rank: int, ties: Sequence[Mapping[str, Any]], stats: Mapping[str, Any] | None) -> dict[str, Any]:
+    qualified = sorted({winner for tie in ties for winner in tie['br_classificados']})
+    participants = sorted({club for tie in ties for club in tie['brasileiros']})
+    eliminated = sorted(set(participants) - set(qualified))
+    confrontos = []
+    for tie in ties:
+        confrontos.append({
+            'competicao': COMP_NAMES[tie['competicao']],
+            'times': tie['times'],
+            'agregado': tie['agregado'],
+            'vencedor': tie['vencedor'],
+            'eliminado': tie['eliminado'],
+            'brasileiros': tie['brasileiros'],
+            'br_classificados': tie['br_classificados'],
+            'penaltis': tie['penaltis'],
+            'jogos': [
+                {
+                    'event_id': str(event.get('event_id') or ''),
+                    'data_iso': event.get('data_iso'),
+                    'mandante': nm(event.get('mandante') or {}),
+                    'visitante': nm(event.get('visitante') or {}),
+                    'placar_mandante': int((event.get('mandante') or {}).get('placar') or 0),
+                    'placar_visitante': int((event.get('visitante') or {}).get('placar') or 0),
+                    'penaltis': event.get('penaltis'),
+                }
+                for event in tie['pernas']
+            ],
+        })
+    comparisons = sorted(list((stats or {}).get('comparacoes') or []), key=lambda row: (row.get('situacao') != 'classificado', -abs(float(row.get('lib_delta') or 0)), row.get('clube') or ''))
+    return {
+        'competicao': 'Libertadores + Sul-Americana',
+        'fase_ordem': rank,
+        'fase_encerrada': PHASES[rank][0],
+        'fase_seguinte': PHASES.get(rank + 100, ('Encerramento', '', ''))[0],
+        'classificados_brasileiros': qualified,
+        'eliminados_brasileiros': eliminated,
+        'participantes_brasileiros': participants,
+        'confrontos': confrontos,
+        'probabilidades_e_movimentos': comparisons,
+        'simulacoes': 2_000_000,
+    }
+
+
+def validate_continental_editorial(editorial: Mapping[str, Any], dossier: Mapping[str, Any]) -> None:
+    if set(editorial) != {'titulo', 'linha_fina', 'secoes'}:
+        raise ContinentalEditorialError('editorial continental fora do schema')
+    sections = editorial.get('secoes') or []
+    if not 2 <= len(sections) <= 4 or any(not 1 <= len(section.get('paragrafos') or []) <= 5 for section in sections):
+        raise ContinentalEditorialError('editorial continental com estrutura inválida')
+    values = [editorial.get('titulo'), editorial.get('linha_fina')]
+    for section in sections:
+        values.append(section.get('titulo'))
+        values.extend(section.get('paragrafos') or [])
+    if not all(isinstance(value, str) and value.strip() for value in values):
+        raise ContinentalEditorialError('editorial continental incompleto')
+    folded = ' '.join(values).casefold()
+    if not any(term in folded for term in ('libertadores', 'sul-americana', 'sul americana')):
+        raise ContinentalEditorialError('manchete/texto não identifica as competições continentais')
+    known = set(dossier.get('classificados_brasileiros') or []) | set(dossier.get('eliminados_brasileiros') or [])
+    if known and not any(name.casefold() in folded for name in known):
+        raise ContinentalEditorialError('editorial continental não menciona clubes do dossiê')
+    forbidden = ('dossiê', 'snapshot', 'a narrativa', 'mergulhar', 'jornada')
+    if any(term in folded for term in forbidden):
+        raise ContinentalEditorialError('editorial continental contém linguagem burocrática/artificial')
+    words = len(re.findall(r'\b[\wÀ-ÿ-]+\b', ' '.join(p for sec in sections for p in sec.get('paragrafos') or [])))
+    if not 180 <= words <= 1000:
+        raise ContinentalEditorialError(f'editorial continental fora do tamanho esperado: {words} palavras')
 
 
 def pct_detail(club: Mapping[str, Any], metric: str) -> dict[str, Any]:
@@ -615,9 +709,9 @@ def render_stats(stats: Mapping[str, Any]) -> str:
     )
 
 
-def build_article(rank: int, ties: Sequence[Mapping[str, Any]], mm: Mapping[str, Any], now: datetime, stats: Mapping[str, Any] | None = None) -> dict[str, Any]:
+def build_article(rank: int, ties: Sequence[Mapping[str, Any]], mm: Mapping[str, Any], now: datetime, stats: Mapping[str, Any] | None = None, content: Mapping[str, Any] | None = None, origin: str = 'deterministico-jornalistico') -> dict[str, Any]:
     phase, slug_phase, menu_label = PHASES[rank]
-    content = editorial_copy(rank, ties)
+    content = dict(content or editorial_copy(rank, ties))
     article_id = f'continentais-2026-{slug_phase}-brasileiros'
     slug = article_id + '.html'
     qualified = sorted({winner for tie in ties for winner in tie['br_classificados']})
@@ -653,7 +747,8 @@ def build_article(rank: int, ties: Sequence[Mapping[str, Any]], mm: Mapping[str,
         'editorial': content,
         'email_assunto': f'Fórmula do Gol: fechamento continental de {phase}',
         'email_chamada': f'{phase} encerradas para os brasileiros. Veja classificados, agregados, melhores momentos e o impacto nas probabilidades.',
-        'origem_editorial': 'deterministico',
+        'origem_editorial': origin,
+        'hash_editorial_contexto': canon(continental_editorial_dossier(rank, ties, stats)),
     }
 
 
@@ -685,7 +780,7 @@ def render_page(article: Mapping[str, Any], ties: Sequence[Mapping[str, Any]], m
     navigation_history.append({'id_editorial': article_id, 'rotulo_menu': article['rotulo_menu'], 'slug': article['slug'], 'publicado_em': published})
     stats_html = render_stats(stats or {})
     head = cabecalho_html(title, desc, url, 'NewsArticle', published, modified).replace(
-        'br-analises.css?v=20260811-movimentos-v1', 'br-analises.css?v=20260821-continentais-v2'
+        'br-analises.css?v=20260811-movimentos-v1', 'br-analises.css?v=20260904-editorial-v2'
     )
     return head + f'''
 <body data-fdg-editorial-id="{esc(article_id)}" data-fdg-analise-competicao="continentais">
@@ -743,7 +838,7 @@ def capture_baseline(rank: int, ties: Sequence[Mapping[str, Any]], history: dict
     return update_mark(history, mark)
 
 
-def publish(dry: bool = False, force_rank: int = 0) -> int:
+def publish(dry: bool = False, force_rank: int = 0, usar_ia: bool = False, sem_ia: bool = False) -> int:
     snaps = {key: load(path, {}) or {} for key, path in SNAPS.items()}
     history = load_cont_history()
     rank = force_rank or latest_publishable(snaps)
@@ -773,9 +868,32 @@ def publish(dry: bool = False, force_rank: int = 0) -> int:
     now = agora_br().replace(microsecond=0)
     manifest = load(MANIFEST, {'schema_version': 2, 'site': 'Fórmula do Gol', 'artigos': []}) or {'schema_version': 2, 'site': 'Fórmula do Gol', 'artigos': []}
     articles = list(manifest.get('artigos') or [])
-    article = build_article(rank, ties, mm, now, stats)
-    old = next((item for item in articles if item.get('id_editorial') == article['id_editorial']), None)
-    same = bool(old and old.get('hash_dossie') == article['hash_dossie'] and old.get('hash_melhores_momentos') == article['hash_melhores_momentos'] and old.get('hash_estatisticas') == article['hash_estatisticas'])
+    phase, slug_phase, _ = PHASES[rank]
+    article_id = f'continentais-2026-{slug_phase}-brasileiros'
+    old = next((item for item in articles if item.get('id_editorial') == article_id), None)
+    editorial_context = continental_editorial_dossier(rank, ties, stats)
+    context_hash = canon(editorial_context)
+    fallback = editorial_copy(rank, ties)
+    content: Mapping[str, Any] = fallback
+    origin = 'deterministico-jornalistico'
+    if old and old.get('hash_editorial_contexto') == context_hash and str(old.get('origem_editorial') or '').startswith('openai:') and isinstance(old.get('editorial'), Mapping):
+        content = old['editorial']
+        origin = str(old.get('origem_editorial'))
+        validate_continental_editorial(content, editorial_context)
+        print('Dossiê continental inalterado: editorial OpenAI preservado sem nova chamada.')
+    elif usar_ia and not sem_ia:
+        try:
+            generated, origin = generate_editorial('continentais', editorial_context, continental_editorial_schema())
+            validate_continental_editorial(generated, editorial_context)
+            content = generated
+            print(f'Editorial continental gerado pela camada dedicada ({origin}).')
+        except (EditorialAIError, ContinentalEditorialError) as exc:
+            print(f'::warning title=Editorial IA indisponível::Fallback continental determinístico aplicado. {exc}')
+            content = fallback
+            origin = 'deterministico-jornalistico-contingencia'
+    validate_continental_editorial(content, editorial_context)
+    article = build_article(rank, ties, mm, now, stats, content, origin)
+    same = bool(old and old.get('hash_dossie') == article['hash_dossie'] and old.get('hash_melhores_momentos') == article['hash_melhores_momentos'] and old.get('hash_estatisticas') == article['hash_estatisticas'] and old.get('hash_editorial') == article['hash_editorial'])
     if same and not history_changed:
         print('NONE: editorial continental já está atualizado.')
         return 0
@@ -832,6 +950,8 @@ def self_test() -> None:
         {'fase_ordem': 700, 'perna': 2, 'data_iso': '2026-09-08T21:30:00-03:00', 'mandante': dict(side_x), 'visitante': dict(side_br), 'concluido': False},
     ]}, 'sul_americana': {'eventos': []}}
     assert latest_publishable(future) is None and baseline_ready(future, 700) is True
+    context = continental_editorial_dossier(600, ties, {'comparacoes': []})
+    validate_continental_editorial(editorial_copy(600, ties), context)
     print('OK: self-test editorial continental.')
 
 
@@ -840,11 +960,13 @@ def main() -> int:
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--self-test', action='store_true')
     parser.add_argument('--fase-ordem', type=int, default=0)
+    parser.add_argument('--usar-ia', action='store_true', help='Usa OpenAI somente quando o fechamento continental estiver elegível')
+    parser.add_argument('--sem-ia', action='store_true', help='Força o fallback jornalístico determinístico')
     args = parser.parse_args()
     if args.self_test:
         self_test()
         return 0
-    return publish(args.dry_run, args.fase_ordem)
+    return publish(args.dry_run, args.fase_ordem, args.usar_ia, args.sem_ia)
 
 
 if __name__ == '__main__':

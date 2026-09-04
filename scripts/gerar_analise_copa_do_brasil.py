@@ -3,7 +3,7 @@
 
 O fluxo é deliberadamente conservador: detecta automaticamente a fase atual,
 só publica quando todos os confrontos do snapshot terminarem, preserva marcos
-históricos imutáveis e mantém placares/percentuais fora da redação por IA.
+históricos imutáveis e entrega à camada editorial dedicada apenas fatos auditados.
 """
 from __future__ import annotations
 
@@ -51,12 +51,14 @@ from gerar_analise_rodada import (  # noqa: E402
     atualizar_sitemap,
 )
 from gerar_probabilidades_brasileirao import current_publication_freshness  # noqa: E402
+from editorial_ia import EditorialAIError, generate_editorial  # noqa: E402
 
 HISTORY_PATH = ROOT / "dados-br" / "historico-probabilidades-continentais.json"
 PROBABILITIES_PATH = ROOT / "dados-br" / "probabilidades-brasileirao.json"
 COPA_PATH = ROOT / "dados-br" / "competicoes-af-previsao" / "copa-do-brasil.json"
 MANIFEST_PATH = ROOT / "dados-br" / "analises.json"
 HIGHLIGHTS_PATH = ROOT / "dados-br" / "melhores-momentos-copa-do-brasil.json"
+CONFIG_PATH = ROOT / "dados-br" / "config-analises.json"
 PHASE_CONFIGS: dict[int, dict[str, Any]] = {
     600: {
         "fase": "Oitavas de final", "seguinte": "Quartas de final", "slug_fase": "oitavas",
@@ -64,7 +66,7 @@ PHASE_CONFIGS: dict[int, dict[str, Any]] = {
         "article_slug": "copa-do-brasil-2026-classificados-quartas.html",
         "before_id": "copa-do-brasil-2026-oitavas-antes-jogos-de-volta",
         "after_id": "copa-do-brasil-2026-oitavas-fechamento",
-        "expected_ties": 8, "rotulo_menu": "CB · QF",
+        "expected_ties": 8, "expected_games": 16, "rotulo_menu": "CB · QF",
         "categoria": "COPA DO BRASIL · QUARTAS DE FINAL",
         "tag": "COPA DO BRASIL · CLASSIFICADOS ÀS QUARTAS",
     },
@@ -74,7 +76,7 @@ PHASE_CONFIGS: dict[int, dict[str, Any]] = {
         "article_slug": "copa-do-brasil-2026-classificados-semifinal.html",
         "before_id": "copa-do-brasil-2026-quartas-antes",
         "after_id": "copa-do-brasil-2026-quartas-fechamento",
-        "expected_ties": 4, "rotulo_menu": "CB · SF",
+        "expected_ties": 4, "expected_games": 8, "rotulo_menu": "CB · SF",
         "categoria": "COPA DO BRASIL · SEMIFINAL",
         "tag": "COPA DO BRASIL · CLASSIFICADOS À SEMIFINAL",
     },
@@ -84,7 +86,7 @@ PHASE_CONFIGS: dict[int, dict[str, Any]] = {
         "article_slug": "copa-do-brasil-2026-finalistas.html",
         "before_id": "copa-do-brasil-2026-semifinal-antes",
         "after_id": "copa-do-brasil-2026-semifinal-fechamento",
-        "expected_ties": 2, "rotulo_menu": "CB · FINAL",
+        "expected_ties": 2, "expected_games": 4, "rotulo_menu": "CB · FINAL",
         "categoria": "COPA DO BRASIL · FINAL",
         "tag": "COPA DO BRASIL · FINALISTAS DEFINIDOS",
     },
@@ -94,7 +96,7 @@ PHASE_CONFIGS: dict[int, dict[str, Any]] = {
         "article_slug": "copa-do-brasil-2026-campeao.html",
         "before_id": "copa-do-brasil-2026-final-antes",
         "after_id": "copa-do-brasil-2026-final-fechamento",
-        "expected_ties": 1, "rotulo_menu": "CB · CAMPEÃO",
+        "expected_ties": 1, "expected_games": 1, "rotulo_menu": "CB · CAMPEÃO",
         "categoria": "COPA DO BRASIL · CAMPEÃO",
         "tag": "COPA DO BRASIL · CAMPEÃO DEFINIDO",
     },
@@ -116,7 +118,7 @@ def activate_phase(rank: int) -> dict[str, Any]:
     AFTER_ID = str(cfg["after_id"])
     PHASE_RANK = rank
     EXPECTED_TIES = int(cfg["expected_ties"])
-    EXPECTED_GAMES = EXPECTED_TIES * 2
+    EXPECTED_GAMES = int(cfg.get("expected_games") or EXPECTED_TIES * 2)
     return cfg
 
 
@@ -476,6 +478,39 @@ def metric(row: Mapping[str, Any], path: Sequence[str]) -> dict[str, Any]:
     return value if isinstance(value, dict) else metric_detail(None)
 
 
+def editorial_config() -> dict[str, Any]:
+    try:
+        config = load_json(CONFIG_PATH)
+    except EditorialCopaError:
+        return {}
+    return ((config.get("editorial_ia") or {}).get("copa_do_brasil_2026") or {})
+
+
+def latest_closed_tie(confrontos: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
+    def last_date(tie: Mapping[str, Any]) -> str:
+        return max((str(game.get("data_iso") or "") for game in tie.get("jogos") or []), default="")
+    closed = [dict(tie) for tie in confrontos if tie.get("concluido")]
+    return max(closed, key=lambda tie: (last_date(tie), int(tie.get("ordem") or 0)), default=None)
+
+
+def compact_metric(detail: Mapping[str, Any] | None) -> dict[str, Any]:
+    detail = detail or {}
+    return {
+        "percentual": float(detail.get("percentual_estimado") or 0),
+        "exibicao": str(detail.get("exibicao") or "0%"),
+    }
+
+
+def continental_consequence() -> str:
+    if PHASE_RANK == 700:
+        return "Quem avançar à final da Copa do Brasil garante vaga na Libertadores 2027; o campeão vai à fase de grupos e o vice-campeão à fase preliminar."
+    if PHASE_RANK == 800:
+        return "Os dois finalistas da Copa do Brasil já estão garantidos na Libertadores 2027; o campeão irá à fase de grupos e o vice-campeão à fase preliminar."
+    if PHASE_RANK == 900:
+        return "Campeão e vice da Copa do Brasil têm vaga na Libertadores 2027; o campeão vai à fase de grupos e o vice-campeão à fase preliminar."
+    return "A Copa do Brasil oferece ao campeão vaga na fase de grupos e ao vice-campeão vaga na fase preliminar da Libertadores 2027."
+
+
 def dossier(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:
     before_rows = {row["clube"]: row for row in before.get("clubes") or []}
     after_rows = {row["clube"]: row for row in after.get("clubes") or []}
@@ -507,67 +542,136 @@ def dossier(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:
                 "vice_depois": metric(new, ("copa_do_brasil_subvias", "vice")),
             }
         )
-    comparisons.sort(
-        key=lambda row: (
-            row["situacao"] != "classificado",
-            -abs(row["via_copa_delta"]),
-            row["clube"],
-        )
-    )
+    comparisons.sort(key=lambda row: (row["situacao"] != "classificado", -abs(row["via_copa_delta"]), row["clube"]))
+    confrontos = after.get("confrontos") or []
+    ultimo = latest_closed_tie(confrontos)
+    altas_total = sorted(comparisons, key=lambda row: row["libertadores_delta"], reverse=True)
+    baixas_total = sorted(comparisons, key=lambda row: row["libertadores_delta"])
+    altas_copa = sorted(comparisons, key=lambda row: row["via_copa_delta"], reverse=True)
     return {
         "id_editorial": ARTICLE_ID,
         "competicao": "Copa do Brasil",
+        "fase_ordem": PHASE_RANK,
         "fase_encerrada": current_phase_config()["fase"],
         "fase_seguinte": current_phase_config()["seguinte"],
+        "formato_fase_seguinte": (editorial_config().get("formato") or {}).get(str(current_phase_config()["seguinte"]).casefold(), ""),
         "classificados": after.get("classificados") or [],
         "eliminados": after.get("eliminados") or [],
-        "confrontos": after.get("confrontos") or [],
+        "confrontos": confrontos,
+        "ultimo_confronto_encerrado": ultimo,
+        "ultimo_classificado": str((ultimo or {}).get("classificado") or ""),
         "comparacoes": comparisons,
+        "destaques_calculados": {
+            "maior_alta_libertadores": altas_total[0] if altas_total else None,
+            "maior_queda_libertadores": baixas_total[0] if baixas_total else None,
+            "maior_alta_via_copa": altas_copa[0] if altas_copa else None,
+        },
+        "regra_libertadores_2027": (editorial_config().get("vagas_libertadores_2027") or {}),
+        "consequencia_continental": continental_consequence(),
         "antes": before.get("fonte") or {},
         "depois": after.get("fonte") or {},
-        "simulacoes": int(
-            next(iter(after_rows.values())).get("libertadores_total", {}).get("simulacoes") or 2_000_000
-        ),
+        "simulacoes": int(next(iter(after_rows.values())).get("libertadores_total", {}).get("simulacoes") or 2_000_000),
         "hash_antes": before.get("hash_marco"),
         "hash_depois": after.get("hash_marco"),
     }
 
 
+def _join_names(names: Sequence[str]) -> str:
+    values = [str(name) for name in names if str(name).strip()]
+    if not values:
+        return ""
+    if len(values) == 1:
+        return values[0]
+    return ", ".join(values[:-1]) + " e " + values[-1]
+
+
+def _pct_text(detail: Mapping[str, Any] | None) -> str:
+    detail = detail or {}
+    value = float(detail.get("percentual_estimado") or 0)
+    possible = bool(detail.get("possivel_estruturalmente", True))
+    if value == 0:
+        return "<0,001%" if possible and detail.get("possivel_estruturalmente") is True else "0%"
+    if value < 0.001:
+        return "<0,001%"
+    if value >= 99.95:
+        return ">99,9%"
+    decimals = 3 if value < 0.1 else 2 if value < 1 else 1
+    return (f"{value:.{decimals}f}%").replace(".", ",")
+
+
+def _pp_text(value: float) -> str:
+    value = float(value)
+    if value == 0:
+        return "0 p.p."
+    sign = "+" if value > 0 else "-"
+    absolute = abs(value)
+    if absolute < 0.001:
+        return f"{sign} <0,001 p.p."
+    decimals = 3 if absolute < 0.1 else 1
+    number = f"{absolute:.{decimals}f}".replace(".", ",")
+    return f"{sign}{number} p.p."
+
+
 def narrative_fallback(data: dict[str, Any]) -> dict[str, Any]:
     cfg = current_phase_config()
-    rises = sorted(data["comparacoes"], key=lambda row: row["via_copa_delta"], reverse=True)
-    falls = sorted(data["comparacoes"], key=lambda row: row["via_copa_delta"])
-    risers = [row["clube"] for row in rises if row["via_copa_delta"] > 0][:3]
-    losers = [row["clube"] for row in falls if row["situacao"] == "eliminado"][:3]
-    rise_text = ", ".join(risers[:-1]) + (" e " + risers[-1] if len(risers) > 1 else risers[0] if risers else "os clubes classificados da Série A")
-    loss_text = ", ".join(losers[:-1]) + (" e " + losers[-1] if len(losers) > 1 else losers[0] if losers else "os clubes eliminados")
-    if PHASE_RANK == 900:
-        title = "Copa do Brasil: campeão definido após o fechamento da final"
-        deck = "A decisão encerrou a Copa do Brasil e consolidou o impacto do torneio no caminho continental dos clubes da Série A."
-        opening = "A final encerrou a Copa do Brasil com o campeão definido em campo. Esta página registra a decisão com base nos placares oficiais e preserva a fotografia estatística usada para medir o efeito do desfecho sobre os clubes da Série A."
+    qualified = list(data.get("classificados") or [])
+    eliminated = list(data.get("eliminados") or [])
+    last = data.get("ultimo_confronto_encerrado") or {}
+    last_winner = str(data.get("ultimo_classificado") or "")
+    last_loser = str(last.get("eliminado") or "")
+    aggregate = last.get("agregado") or {}
+    last_score = ""
+    if last_winner and last_loser:
+        last_score = f"{int(aggregate.get(last_winner) or 0)} x {int(aggregate.get(last_loser) or 0)}"
+    by_name = {row["clube"]: row for row in data.get("comparacoes") or []}
+    qualified_stats = [by_name[name] for name in qualified if name in by_name]
+    qualified_stats.sort(key=lambda row: row["libertadores_depois"]["percentual_estimado"], reverse=True)
+    stats_text = "; ".join(
+        f"{row['clube']} {_pct_text(row['libertadores_depois'])} ({_pp_text(row['libertadores_delta'])})"
+        for row in qualified_stats
+    )
+    biggest = data.get("destaques_calculados") or {}
+    top_up = biggest.get("maior_alta_libertadores") or {}
+    top_cup = biggest.get("maior_alta_via_copa") or {}
+    rule = data.get("regra_libertadores_2027") or {}
+    if PHASE_RANK == 700 and last_winner:
+        title = f"{last_winner} fecha o quarteto: Copa do Brasil define os quatro semifinalistas"
+        deck = f"{last_winner} eliminou {last_loser} por {last_score} no agregado e se juntou a {_join_names([x for x in qualified if x != last_winner])}; quem avançar à final garante vaga na Libertadores 2027."
+    elif PHASE_RANK == 800:
+        title = f"Copa do Brasil define os finalistas: {_join_names(qualified)} vão decidir o título"
+        deck = "Os dois classificados à final também asseguram presença na Libertadores 2027, com campeão na fase de grupos e vice na fase preliminar."
+    elif PHASE_RANK == 900:
+        champion = qualified[0] if qualified else "Campeão"
+        title = f"{champion} é campeão da Copa do Brasil e garante vaga direta na Libertadores"
+        deck = "A decisão encerra o mata-mata nacional e consolida as vagas continentais de campeão e vice-campeão para 2027."
     else:
-        target = str(cfg["seguinte"]).casefold()
-        title = f"Copa do Brasil: classificados para {target} e impacto na Libertadores"
-        deck = f"O fechamento de {cfg['fase']} definiu quem segue para {cfg['seguinte']} e mudou a rota continental dos clubes da Série A."
-        opening = f"{cfg['fase']} terminou com todos os confrontos resolvidos e a lista de classificados definida. A página registra o fechamento sem antecipar chaveamentos ou informações que não estejam no snapshot oficial."
-    return {
-        "titulo": title,
-        "linha_fina": deck,
-        "secoes": [
-            {"titulo": "A fase terminou com o quadro definido", "paragrafos": [
-                opening,
-                "A leitura parte dos placares oficiais, do agregado de cada confronto e da identificação objetiva de quem avançou e quem foi eliminado. O recorte editorial não atribui causas que os dados disponíveis não comprovem e separa rigorosamente fato esportivo, interpretação e projeção estatística.",
-            ]},
-            {"titulo": "A sobrevivência mantém aberta a rota continental", "paragrafos": [
-                f"Entre os clubes da Série A presentes na fase, {rise_text} aparecem entre os beneficiados pela permanência no torneio. Avançar não garante vaga continental, mas mantém aberta a via específica da Copa do Brasil considerada pelo modelo e altera a distribuição dos caminhos possíveis nas simulações.",
-                "Esse efeito é calculado sem dupla contagem: quando uma classificação já seria obtida por outra via, a decomposição estatística preserva apenas a rota necessária no cenário simulado. Por isso, a leitura da via da Copa deve permanecer separada da chance total de Libertadores.",
-            ]},
-            {"titulo": "Para os eliminados, a via da Copa se encerra", "paragrafos": [
-                f"A eliminação retirou de {loss_text} a possibilidade de alcançar a Libertadores pela Copa do Brasil. A chance consolidada ainda pode existir por outras vias esportivas previstas no modelo, de acordo com a situação de cada clube no conjunto das competições.",
-                "A comparação usa dois marcos imutáveis, um anterior e outro posterior à fase. Assim, a variação associada ao mata-mata permanece auditável e não é reescrita por atualizações posteriores do campeonato nacional. O objetivo é conservar uma comparação histórica verificável, e não adaptar retrospectivamente os números ao resultado conhecido.",
-            ]},
-        ],
-    }
+        title = f"Copa do Brasil define classificados para {str(cfg['seguinte']).casefold()}: {_join_names(qualified[:4])} puxam a lista"
+        deck = f"O fechamento de {cfg['fase']} confirmou quem segue vivo no mata-mata e redesenhou as probabilidades de Libertadores dos clubes da Série A."
+    rule_text = str(data.get("consequencia_continental") or rule.get("texto_editorial") or "").strip()
+    sections = [
+        {
+            "titulo": "O fato que fechou a fase",
+            "paragrafos": [
+                (f"{last_winner} foi o último classificado de {cfg['fase']}. O confronto contra {last_loser} terminou em {last_score} no agregado, completando o grupo formado por {_join_names(qualified)}." if last_winner else f"{cfg['fase']} terminou com {_join_names(qualified)} classificados para {cfg['seguinte']}."),
+                f"Os eliminados foram {_join_names(eliminated)}. A página mantém abaixo todos os jogos de ida e volta, os agregados e os melhores momentos já vinculados, mas a notícia central é a definição de quem continua vivo na Copa do Brasil.",
+            ],
+        },
+        {
+            "titulo": ("A semifinal vale também uma vaga continental" if PHASE_RANK == 700 else "Os finalistas já têm passaporte continental" if PHASE_RANK == 800 else "Título e vaga continental definidos" if PHASE_RANK == 900 else "A rota continental segue em jogo"),
+            "paragrafos": [
+                rule_text or "A rota continental segue aberta aos classificados conforme as vagas previstas para a Copa do Brasil.",
+                (f"No AF-Previsão após o fechamento, as chances totais de Libertadores dos classificados ficaram assim: {stats_text}. Esses percentuais combinam todas as vias possíveis, não apenas a Copa do Brasil." if stats_text else "As probabilidades totais de Libertadores continuam sendo calculadas considerando todas as vias disponíveis no modelo."),
+            ],
+        },
+        {
+            "titulo": "Quem mais ganhou força com o mata-mata",
+            "paragrafos": [
+                (f"{top_up.get('clube')} registrou o maior salto na chance total de Libertadores entre os clubes desta fase: {_pp_text(float(top_up.get('libertadores_delta') or 0))}, chegando a {_pct_text(top_up.get('libertadores_depois'))}." if top_up else "O fechamento mudou de maneira desigual as chances continentais dos clubes envolvidos."),
+                (f"Pela via específica da Copa do Brasil, o maior avanço foi de {top_cup.get('clube')}, com {_pp_text(float(top_cup.get('via_copa_delta') or 0))} Para os eliminados, essa via caiu a 0%, embora alguns ainda possam chegar à Libertadores por outros caminhos." if top_cup else "Para os eliminados, a via específica da Copa do Brasil se encerrou; outras rotas continuam dependendo da situação de cada clube."),
+            ],
+        },
+    ]
+    return {"titulo": title, "linha_fina": deck, "secoes": sections}
 
 
 def editorial_schema() -> dict[str, Any]:
@@ -575,23 +679,18 @@ def editorial_schema() -> dict[str, Any]:
         "type": "object",
         "additionalProperties": False,
         "properties": {
-            "titulo": {"type": "string", "minLength": 45, "maxLength": 125},
-            "linha_fina": {"type": "string", "minLength": 80, "maxLength": 220},
+            "titulo": {"type": "string", "minLength": 35, "maxLength": 135},
+            "linha_fina": {"type": "string", "minLength": 70, "maxLength": 260},
             "secoes": {
                 "type": "array",
-                "minItems": 3,
-                "maxItems": 3,
+                "minItems": 2,
+                "maxItems": 4,
                 "items": {
                     "type": "object",
                     "additionalProperties": False,
                     "properties": {
-                        "titulo": {"type": "string", "minLength": 20, "maxLength": 85},
-                        "paragrafos": {
-                            "type": "array",
-                            "minItems": 2,
-                            "maxItems": 2,
-                            "items": {"type": "string", "minLength": 120, "maxLength": 650},
-                        },
+                        "titulo": {"type": "string", "minLength": 12, "maxLength": 90},
+                        "paragrafos": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"type": "string", "minLength": 90, "maxLength": 900}},
                     },
                     "required": ["titulo", "paragrafos"],
                 },
@@ -604,40 +703,41 @@ def editorial_schema() -> dict[str, Any]:
 def editorial_summary(data: dict[str, Any]) -> dict[str, Any]:
     return {
         "competicao": data["competicao"],
+        "fase_ordem": data.get("fase_ordem"),
         "fase_encerrada": data["fase_encerrada"],
         "fase_seguinte": data["fase_seguinte"],
+        "ultimo_classificado": data.get("ultimo_classificado"),
+        "ultimo_confronto_encerrado": data.get("ultimo_confronto_encerrado"),
         "classificados": data["classificados"],
         "eliminados": data["eliminados"],
-        "clubes_serie_a": [
+        "confrontos": data["confrontos"],
+        "probabilidades": [
             {
-                "clube": row["clube"],
-                "situacao": row["situacao"],
-                "movimento_via_copa": (
-                    "alta" if row["via_copa_delta"] > 0 else "queda" if row["via_copa_delta"] < 0 else "estavel"
-                ),
-                "movimento_libertadores_total": (
-                    "alta" if row["libertadores_delta"] > 0 else "queda" if row["libertadores_delta"] < 0 else "estavel"
-                ),
+                "clube": row["clube"], "situacao": row["situacao"],
+                "libertadores_antes": compact_metric(row["libertadores_antes"]),
+                "libertadores_depois": compact_metric(row["libertadores_depois"]),
+                "libertadores_delta_pp": row["libertadores_delta"],
+                "via_copa_antes": compact_metric(row["via_copa_antes"]),
+                "via_copa_depois": compact_metric(row["via_copa_depois"]),
+                "via_copa_delta_pp": row["via_copa_delta"],
             }
             for row in data["comparacoes"]
         ],
+        "destaques_calculados": data.get("destaques_calculados"),
+        "regra_libertadores_2027": data.get("regra_libertadores_2027"),
+        "consequencia_continental": data.get("consequencia_continental"),
+        "simulacoes": data.get("simulacoes"),
     }
 
 
 def validate_editorial(editorial: dict[str, Any], data: dict[str, Any]) -> None:
     if set(editorial) != {"titulo", "linha_fina", "secoes"}:
         raise EditorialCopaError("editorial fora do schema")
-    if "Copa do Brasil" not in editorial["titulo"]:
+    if "copa do brasil" not in editorial["titulo"].casefold():
         raise EditorialCopaError("título não identifica a Copa do Brasil")
-    title_fold = editorial["titulo"].casefold()
-    if PHASE_RANK == 900:
-        if "campe" not in title_fold:
-            raise EditorialCopaError("título não comunica a definição do campeão")
-    elif not any(term in title_fold for term in ("classific", "finalist")):
-        raise EditorialCopaError("título não comunica a definição dos classificados")
     sections = editorial.get("secoes") or []
-    if len(sections) != 3 or any(len(section.get("paragrafos") or []) != 2 for section in sections):
-        raise EditorialCopaError("editorial deve ter três seções curtas")
+    if not 2 <= len(sections) <= 4 or any(not 1 <= len(section.get("paragrafos") or []) <= 3 for section in sections):
+        raise EditorialCopaError("editorial deve ter de duas a quatro seções substantivas")
     values = [editorial["titulo"], editorial["linha_fina"]]
     for section in sections:
         values.append(section.get("titulo"))
@@ -645,17 +745,22 @@ def validate_editorial(editorial: dict[str, Any], data: dict[str, Any]) -> None:
     if not all(isinstance(value, str) and value.strip() for value in values):
         raise EditorialCopaError("editorial incompleto")
     text = " ".join(values)
-    if re.search(r"\d", text):
-        raise EditorialCopaError("editorial narrativo incluiu algarismos")
-    forbidden = ["vale destacar", "a narrativa", "mergulhar", "jornada"]
-    if any(term in text.casefold() for term in forbidden):
-        raise EditorialCopaError("editorial contém afirmação ou linguagem proibida")
+    folded = text.casefold()
+    forbidden = ["vale destacar", "a narrativa", "mergulhar", "jornada", "dossiê", "snapshot oficial"]
+    if any(term in folded for term in forbidden):
+        raise EditorialCopaError("editorial contém linguagem burocrática ou artificial proibida")
     known = set(data["classificados"]) | set(data["eliminados"])
-    if not any(name.casefold() in text.casefold() for name in known):
-        raise EditorialCopaError("editorial não menciona nenhum clube do dossiê")
-    word_count = len(re.findall(r"\b[\wÀ-ÿ-]+\b", " ".join(p for s in sections for p in s["paragrafos"])))
-    if not 240 <= word_count <= 650:
-        raise EditorialCopaError(f"editorial fora do tamanho sucinto: {word_count} palavras")
+    if len([name for name in known if name.casefold() in folded]) < min(2, len(known)):
+        raise EditorialCopaError("editorial cita poucos clubes do fechamento")
+    if PHASE_RANK == 700:
+        last = str(data.get("ultimo_classificado") or "")
+        if last and last.casefold() not in folded:
+            raise EditorialCopaError("editorial não cita o último classificado que fechou as quartas")
+        if "libertadores" not in folded or "final" not in folded:
+            raise EditorialCopaError("editorial das quartas não comunica a consequência da semifinal para a Libertadores")
+    word_count = len(re.findall(r"\b[\wÀ-ÿ-]+\b", " ".join(p for sec in sections for p in sec["paragrafos"])))
+    if not 180 <= word_count <= 900:
+        raise EditorialCopaError(f"editorial fora do tamanho esperado: {word_count} palavras")
 
 
 def team_logo(team: Mapping[str, Any]) -> str:
@@ -778,6 +883,39 @@ def comparison_table(data: dict[str, Any]) -> str:
       <table class="analysis-table analysis-cup-prob-table"><thead><tr><th>Clube</th><th>Situação</th><th>Libertadores antes</th><th>Depois</th><th>Variação</th><th>Via Copa antes</th><th>Depois</th><th>Variação</th></tr></thead><tbody>''' + "".join(rows) + "</tbody></table></div>"
 
 
+
+def render_classified_spotlight(data: Mapping[str, Any]) -> str:
+    if PHASE_RANK == 900:
+        return ""
+    team_objs: dict[str, Mapping[str, Any]] = {}
+    for tie in data.get("confrontos") or []:
+        for key in ("equipe_a", "equipe_b"):
+            team = tie.get(key) or {}
+            name = str(team.get("nome") or "")
+            if name:
+                team_objs[name] = team
+    comparisons = {row["clube"]: row for row in data.get("comparacoes") or []}
+    cards = []
+    qualified = list(data.get("classificados") or [])
+    last_qualified = str(data.get("ultimo_classificado") or "").strip()
+    if last_qualified in qualified:
+        qualified = [last_qualified] + [name for name in qualified if name != last_qualified]
+    for name in qualified:
+        team = team_objs.get(name, {"nome": name})
+        logo = team_logo(team)
+        img = f'<img src="{esc(logo)}" alt="" loading="eager">' if logo else '<span aria-hidden="true">⚽</span>'
+        row = comparisons.get(name) or {}
+        probability = _pct_text(row.get("libertadores_depois"))
+        cards.append(
+            f'<article class="analysis-qualified-card"><div class="analysis-qualified-crest">{img}</div>'
+            f'<div><strong>{esc(name)}</strong><span>Libertadores {esc(probability)}</span></div></article>'
+        )
+    if not cards:
+        return ""
+    rule = str(data.get("consequencia_continental") or (data.get("regra_libertadores_2027") or {}).get("texto_editorial") or "").strip()
+    callout = f'<p class="analysis-qualified-callout"><strong>Rota Libertadores:</strong> {esc(rule)}</p>' if rule and PHASE_RANK in {700, 800} else ""
+    return '<section class="analysis-qualified-spotlight" aria-label="Classificados da Copa do Brasil"><div class="analysis-qualified-grid">' + ''.join(cards) + '</div>' + callout + '</section>'
+
 def render_article(data: dict[str, Any], editorial: dict[str, Any], published: str, modified: str, articles: list[dict[str, Any]]) -> tuple[str, dict[str, Any]]:
     cfg = current_phase_config()
     sections = "".join(
@@ -786,6 +924,7 @@ def render_article(data: dict[str, Any], editorial: dict[str, Any], published: s
         + "</section>" for section in editorial["secoes"]
     )
     highlights = load_highlights()
+    spotlight = render_classified_spotlight(data)
     ties = "".join(render_tie(tie, highlights) for tie in data["confrontos"])
     highlight_hash = canonical_hash(highlights)
     highlight_count = sum(1 for tie in data["confrontos"] for game in tie.get("jogos") or [] if str(game.get("event_id") or "") in highlights)
@@ -799,13 +938,14 @@ def render_article(data: dict[str, Any], editorial: dict[str, Any], published: s
     else:
         phase_help = f"Os {EXPECTED_TIES} classificados estão definidos para {cfg['seguinte']}."
         phase_heading = "Os confrontos e quem avançou"
-    page = cabecalho_html(editorial["titulo"], editorial["linha_fina"], ARTICLE_URL, "NewsArticle", published, modified) + f'\n<body data-fdg-editorial-id="{ARTICLE_ID}" data-fdg-analise-competicao="copa-do-brasil">\n  <div class="container analysis-shell">\n    <header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol"></header>\n    {menu("../", True)}\n    {submenu_rodadas(navigation_history, id_ativo=ARTICLE_ID)}\n    <main>\n      <article class="analysis-article">\n        <header class="analysis-article-header">\n          <div class="analysis-kicker"><span>ANÁLISE</span><span>•</span><time datetime="{esc(published)}">{esc(data_curta(published))}</time></div>\n          <span class="analysis-tag">{esc(cfg["tag"])}</span>\n          <h1>{esc(editorial["titulo"])}</h1>\n          <p class="analysis-deck">{esc(editorial["linha_fina"])}</p>\n          <div class="analysis-byline">Por <a href="../sobre.html">Laércio Rehem</a></div>\n        </header>\n        <section class="analysis-copy"><h2>O fechamento de {esc(cfg["fase"])}</h2><div class="analysis-copy-sections">{sections}</div></section>\n        <section><h2>{esc(phase_heading)}</h2><p class="analysis-help">{esc(phase_help)}</p><div class="analysis-cup-ties">{ties}</div></section>\n        <section><h2>O impacto para os clubes da Série A</h2><p class="analysis-help">A comparação usa um marco imutável anterior à fase e o primeiro AF-Previsão publicado após seu encerramento integral. No celular, arraste a tabela para o lado.</p>\n          <p class="analysis-snapshot-line"><span>Antes: {esc(data_curta(before_date))}</span><span>Depois: {esc(data_curta(after_date))}</span></p>\n          <p class="analysis-percent-legend"><strong>Como ler:</strong> a chance total de Libertadores considera todas as vias. A coluna <b>Via Copa</b> mostra somente os cenários em que a Copa do Brasil foi necessária para a classificação. Clube eliminado recebe <b>0%</b> nessa via.</p>\n          {comparison_table(data)}\n        </section>\n        <aside class="analysis-method"><strong>Leitura dos dados:</strong> resultados e classificados vêm do snapshot auditado da ESPN. As probabilidades são estimativas do AF-Previsão em 2.000.000 simulações. Os marcos anterior e posterior são imutáveis e identificados por hash.</aside>\n        <nav class="analysis-next" aria-label="Mais conteúdo"><a href="./">← Todas as análises</a><a href="../estatisticas.html#probabilidades">Probabilidades do Brasileirão 2026 →</a></nav>\n      </article>\n    </main>\n    {rodape("../")}\n  </div>\n  <script src="../js/br-menu.js?v=20260901-alertas-v1"></script>\n  <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>\n  <script src="../js/br-analises.js?v=20260807-copa-highlights-inline-v1"></script>\n</body>\n</html>'
+    head = cabecalho_html(editorial["titulo"], editorial["linha_fina"], ARTICLE_URL, "NewsArticle", published, modified).replace("br-analises.css?v=20260811-movimentos-v1", "br-analises.css?v=20260904-editorial-v2")
+    page = head + f'\n<body data-fdg-editorial-id="{ARTICLE_ID}" data-fdg-analise-competicao="copa-do-brasil">\n  <div class="container analysis-shell">\n    <header class="hero" aria-label="Fórmula do Gol — A matemática por trás do futebol"><img src="../img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol"></header>\n    {menu("../", True)}\n    {submenu_rodadas(navigation_history, id_ativo=ARTICLE_ID)}\n    <main>\n      <article class="analysis-article">\n        <header class="analysis-article-header">\n          <div class="analysis-kicker"><span>ANÁLISE</span><span>•</span><time datetime="{esc(published)}">{esc(data_curta(published))}</time></div>\n          <span class="analysis-tag">{esc(cfg["tag"])}</span>\n          <h1>{esc(editorial["titulo"])}</h1>\n          <p class="analysis-deck">{esc(editorial["linha_fina"])}</p>\n          <div class="analysis-byline">Por <a href="../sobre.html">Laércio Rehem</a></div>\n        </header>\n        {spotlight}\n        <section class="analysis-copy"><h2>O fechamento de {esc(cfg["fase"])}</h2><div class="analysis-copy-sections">{sections}</div></section>\n        <section><h2>{esc(phase_heading)}</h2><p class="analysis-help">{esc(phase_help)}</p><div class="analysis-cup-ties">{ties}</div></section>\n        <section><h2>O impacto para os clubes da Série A</h2><p class="analysis-help">A comparação usa um marco imutável anterior à fase e o primeiro AF-Previsão publicado após seu encerramento integral. No celular, arraste a tabela para o lado.</p>\n          <p class="analysis-snapshot-line"><span>Antes: {esc(data_curta(before_date))}</span><span>Depois: {esc(data_curta(after_date))}</span></p>\n          <p class="analysis-percent-legend"><strong>Como ler:</strong> a chance total de Libertadores considera todas as vias. A coluna <b>Via Copa</b> mostra somente os cenários em que a Copa do Brasil foi necessária para a classificação. Clube eliminado recebe <b>0%</b> nessa via.</p>\n          {comparison_table(data)}\n        </section>\n        <aside class="analysis-method"><strong>Leitura dos dados:</strong> resultados e classificados vêm do snapshot auditado da ESPN. As probabilidades são estimativas do AF-Previsão em 2.000.000 simulações. Os marcos anterior e posterior são imutáveis e identificados por hash.</aside>\n        <nav class="analysis-next" aria-label="Mais conteúdo"><a href="./">← Todas as análises</a><a href="../estatisticas.html#probabilidades">Probabilidades do Brasileirão 2026 →</a></nav>\n      </article>\n    </main>\n    {rodape("../")}\n  </div>\n  <script src="../js/br-menu.js?v=20260901-alertas-v1"></script>\n  <script src="/js/br-social-footer.js?v=20260811-social-v2-tiktok" defer></script>\n  <script src="../js/br-analises.js?v=20260807-copa-highlights-inline-v1"></script>\n</body>\n</html>'
     if PHASE_RANK == 900:
         email_subject = "Fórmula do Gol: campeão da Copa do Brasil definido"
         email_call = "A final terminou. Veja o campeão e o impacto do desfecho para os clubes da Série A."
     else:
-        email_subject = f"Fórmula do Gol: fechamento de {cfg['fase']} da Copa do Brasil"
-        email_call = f"{cfg['fase']} terminou. Veja os classificados para {cfg['seguinte']} e o impacto do mata-mata."
+        email_subject = f"Fórmula do Gol: {editorial['titulo']}"
+        email_call = editorial["linha_fina"]
     metadata = {
         "tipo": "copa_do_brasil_fase", "id_editorial": ARTICLE_ID, "rotulo_menu": cfg["rotulo_menu"],
         "categoria": cfg["categoria"], "competicao": "Copa do Brasil", "fase_encerrada": cfg["fase"],
@@ -813,6 +953,7 @@ def render_article(data: dict[str, Any], editorial: dict[str, Any], published: s
         "titulo": editorial["titulo"], "linha_fina": editorial["linha_fina"], "publicado_em": published,
         "modificado_em": modified, "jogos_concluidos": int(data.get("jogos_concluidos") or sum(len(t.get("jogos") or []) for t in data["confrontos"])),
         "jogos_pendentes": 0, "confrontos": EXPECTED_TIES, "classificados": data["classificados"],
+        "ultimo_classificado": data.get("ultimo_classificado"),
         "hash_dossie": canonical_hash(data), "hash_editorial": canonical_hash(editorial_summary(data)),
         "hash_melhores_momentos": highlight_hash, "melhores_momentos_vinculados": highlight_count,
         "editorial": editorial, "email_assunto": email_subject, "email_chamada": email_call,
@@ -941,22 +1082,23 @@ def execute(args: argparse.Namespace) -> int:
         except (OSError, json.JSONDecodeError) as exc:
             raise EditorialCopaError(f"Editorial externo inválido: {exc}") from exc
         validate_editorial(editorial, data)
-        origin = args.origem_editorial or "openai:auditoria-diaria"
-    elif same_dossier and not args.forcar and isinstance(stored_editorial, dict):
+        origin = args.origem_editorial or "openai:editorial-externo"
+    elif same_dossier and not args.forcar and isinstance(stored_editorial, dict) and str(existing.get("origem_editorial") or "").startswith("openai:"):
+        validate_editorial(stored_editorial, data)
+        editorial = stored_editorial
+        origin = str(existing.get("origem_editorial") or "editorial-preservado")
+        print("Dossiê inalterado: editorial OpenAI existente preservado sem nova chamada.")
+    elif args.usar_ia and not args.sem_ia:
         try:
-            validate_editorial(stored_editorial, data)
-        except EditorialCopaError as exc:
-            print(f"::warning::Editorial armazenado não passou na validação atual ({exc}); será regenerado.")
-            editorial, origin = fallback, "deterministico-contingencia"
+            editorial, origin = generate_editorial("copa_do_brasil", editorial_summary(data), editorial_schema())
             validate_editorial(editorial, data)
-        else:
-            editorial = stored_editorial
-            origin = str(existing.get("origem_editorial") or "editorial-preservado")
-            print("Texto editorial já publicado preservado; atualizando somente melhores momentos/metadados.")
+            print(f"Editorial jornalístico gerado pela camada dedicada ({origin}).")
+        except (EditorialAIError, EditorialCopaError) as exc:
+            print(f"::warning title=Editorial IA indisponível::Fallback jornalístico determinístico aplicado. {exc}")
+            editorial, origin = fallback, "deterministico-jornalistico-contingencia"
+            validate_editorial(editorial, data)
     else:
-        # A OpenAI é centralizada na auditoria diária. Este gerador somente aceita
-        # editorial externo validado ou produz a contingência determinística.
-        editorial, origin = fallback, "deterministico"
+        editorial, origin = fallback, "deterministico-jornalistico"
         validate_editorial(editorial, data)
     published = existing.get("publicado_em") if existing else agora_br().replace(microsecond=0).isoformat()
     modified = agora_br().replace(microsecond=0).isoformat()
@@ -1107,6 +1249,20 @@ def self_test() -> int:
     assert len(overdue) == 1
     assert phase_rank_from_snapshot({"fase_atual": {"ordem": 700}, "eventos": []}) == 700
     activate_phase(700); assert ARTICLE_ID == "copa-do-brasil-2026-classificados-semifinal" and EXPECTED_TIES == 4
+    sample_spotlight = render_classified_spotlight({
+        "classificados": ["Grêmio", "Vasco da Gama", "Palmeiras", "Atlético-MG"],
+        "comparacoes": [
+            {"clube": "Grêmio", "libertadores_depois": {"percentual_estimado": 0.453}},
+            {"clube": "Vasco da Gama", "libertadores_depois": {"percentual_estimado": 0.406}},
+            {"clube": "Palmeiras", "libertadores_depois": {"percentual_estimado": 0.9999}},
+            {"clube": "Atlético-MG", "libertadores_depois": {"percentual_estimado": 0.739}},
+        ],
+        "regra_libertadores_2027": {"texto_editorial": "Quem avançar à final garante vaga na Libertadores 2027."},
+        "ultimo_classificado": "Grêmio",
+        "consequencia_continental": "Quem avançar à final garante vaga na Libertadores 2027.",
+    })
+    assert sample_spotlight.count('class="analysis-qualified-card"') == 4
+    assert "Rota Libertadores" in sample_spotlight and "Libertadores 2027" in sample_spotlight
     activate_phase(800); assert ARTICLE_ID == "copa-do-brasil-2026-finalistas" and EXPECTED_TIES == 2
     activate_phase(900); assert ARTICLE_ID == "copa-do-brasil-2026-campeao" and EXPECTED_TIES == 1
     activate_phase(600)
@@ -1117,7 +1273,8 @@ def self_test() -> int:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--forcar", action="store_true", help="Regenera o texto depois que a fase estiver elegível")
-    parser.add_argument("--sem-ia", action="store_true", help="Compatibilidade: sem --editorial-json o editorial é sempre determinístico")
+    parser.add_argument("--usar-ia", action="store_true", help="Usa a camada editorial OpenAI somente depois que a fase estiver factual e estatisticamente fechada")
+    parser.add_argument("--sem-ia", action="store_true", help="Força o fallback jornalístico determinístico")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument(
         "--falhar-se-snapshot-atrasado",

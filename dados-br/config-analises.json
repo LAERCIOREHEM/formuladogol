@@ -4,5 +4,40 @@
   "minimo_jogos_para_fechamento_editorial": 8,
   "espera_apos_ultimo_jogo_horas": 8,
   "distancia_jogo_adiado_horas": 72,
-  "observacao": "Publica após os 10 jogos ou após a janela principal quando a pendência estiver adiada por pelo menos 72 horas."
+  "observacao": "Publica após os 10 jogos ou após a janela principal quando a pendência estiver adiada por pelo menos 72 horas.",
+  "editorial_ia": {
+    "schema_version": 2,
+    "modelo_padrao": "gpt-5.6-sol",
+    "reasoning_effort": "high",
+    "politica": {
+      "somente_apos_fechamento_deterministico": true,
+      "uma_chamada_por_dossie_novo": true,
+      "permitir_numeros_auditados": true,
+      "proibir_fatos_ausentes_do_dossie": true,
+      "fallback_deterministico_em_falha": true,
+      "prioridade_narrativa": [
+        "fato_novo",
+        "protagonistas",
+        "consequencia_esportiva",
+        "probabilidades",
+        "proximo_objetivo"
+      ]
+    },
+    "copa_do_brasil_2026": {
+      "vagas_libertadores_2027": {
+        "campeao": "fase de grupos",
+        "vice_campeao": "fase preliminar",
+        "finalista_garante_vaga": true,
+        "texto_editorial": "Quem avançar à final da Copa do Brasil garante vaga na Libertadores 2027; o campeão vai à fase de grupos e o vice-campeão à fase preliminar.",
+        "fonte_oficial": "CBF",
+        "fonte_url": "https://www.cbf.com.br/futebol-brasileiro/noticias/se/a/copa-do-brasil-de-2026-tera-recorde-de-participantes-e-17-estreantes"
+      },
+      "formato": {
+        "oitavas": "ida e volta",
+        "quartas": "ida e volta",
+        "semifinal": "ida e volta",
+        "final": "jogo unico"
+      }
+    }
+  }
 }

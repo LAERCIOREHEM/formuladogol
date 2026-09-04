@@ -423,12 +423,6 @@ def build_triage(moment: datetime) -> dict[str, Any]:
     publics = public_gaps(moment, details)
     trans = transmission_gaps(moment, transmissions)
     highlights = highlight_gaps(moment)
-    round_candidate: dict[str, Any] | None
-    try:
-        round_candidate = round_editorial_candidate(moment)
-    except Exception as exc:
-        round_candidate = {"erro": str(exc)[:500]}
-    cup_candidate = copa_editorial_candidate()
     health = core_health(moment, publics, trans, highlights)
     return {
         "data_hora_brt": moment.isoformat(),
@@ -437,10 +431,6 @@ def build_triage(moment: datetime) -> dict[str, Any]:
             "publicos": publics,
             "transmissoes": trans,
             "melhores_momentos_apos_24h": highlights,
-        },
-        "editoriais": {
-            "rodada": round_candidate,
-            "copa_do_brasil": cup_candidate,
         },
         "politica": {
             "ia_maximo_chamadas_dia": 1,
@@ -467,8 +457,6 @@ def problem_schema() -> dict[str, Any]:
 
 
 def audit_schema() -> dict[str, Any]:
-    round_schema = schema_editorial()
-    cup_schema = copa.editorial_schema()
     return {
         "type": "object",
         "additionalProperties": False,
@@ -518,10 +506,8 @@ def audit_schema() -> dict[str, Any]:
                     "required": ["event_id", "status", "fonte_url", "justificativa"],
                 },
             },
-            "editorial_rodada": {"anyOf": [round_schema, {"type": "null"}]},
-            "editorial_copa": {"anyOf": [cup_schema, {"type": "null"}]},
         },
-        "required": ["status_geral", "resumo", "problemas", "correcoes_publico", "correcoes_transmissao", "melhores_momentos_pendentes", "editorial_rodada", "editorial_copa"],
+        "required": ["status_geral", "resumo", "problemas", "correcoes_publico", "correcoes_transmissao", "melhores_momentos_pendentes"],
     }
 
 
@@ -539,14 +525,10 @@ def build_openai_payload(triage: Mapping[str, Any], model: str) -> dict[str, Any
         "lista de pendências, a evidência for inequívoca e a fonte consultada declarar diretamente o dado. Público deve ser PRESENTE "
         "ou TOTAL; nunca converta público pagante em presente. Não sobrescreva dados existentes. Para melhores momentos, nunca proponha "
         "vínculo automático: apenas classifique a pendência; jogos com menos de vinte e quatro horas nem aparecem no dossiê. "
-        "Se web_search estiver disponível, use-o apenas para lacunas factuais; prefira UMA única busca que cubra as pendências e não "
-        "pesquise apenas para enriquecer prosa editorial. Os editoriais devem usar SOMENTE o dossiê fornecido, sem fatos externos, sem "
-        "algarismos na redação e sem inventar desempenho tático, jogadores, declarações ou causas. O título deve funcionar como uma manchete "
-        "jornalística específica: destacar o maior fato comprovado da rodada, priorizar uma mudança de favorito ao título quando ela ocorrer e, "
-        "na ausência disso, a oscilação esportivamente mais relevante em título, Libertadores ou rebaixamento. Evite fórmulas genéricas repetidas "
-        "como 'ganha espaço e recua nas projeções'. Use termos que descrevam a intenção real da página, como Brasileirão, título, Libertadores ou "
-        "rebaixamento quando forem o assunto central. Para editorial_rodada, produza entre 420 e 700 palavras no corpo das seções; cada parágrafo deve ser substantivo e compatível com o schema. Se não houver editorial elegível, "
-        "retorne null no campo correspondente. Não transforme avisos isolados de fonte em incidente crítico quando os dados finais estão íntegros."
+        "Se web_search estiver disponível, use-o apenas para lacunas factuais; prefira UMA única busca que cubra as pendências. "
+        "Esta auditoria NÃO produz nem reescreve editoriais: a redação jornalística pertence aos workflows de fechamento de rodada e copas, "
+        "que usam uma camada OpenAI dedicada somente quando existe matéria elegível. Não transforme avisos isolados de fonte em incidente crítico "
+        "quando os dados finais estão íntegros."
     )
     payload: dict[str, Any] = {
         "model": model,
@@ -1053,7 +1035,6 @@ def run(*, dry_run: bool = False, moment: datetime | None = None) -> dict[str, A
         try:
             applied_public = apply_public_corrections(accepted_public, moment, dry_run=False)
             applied_trans = apply_transmission_corrections(accepted_trans, moment, dry_run=False)
-            applied_editorials = apply_editorials(parsed, triage, model, dry_run=False)
         except Exception as exc:
             ai_error = f"falha ao aplicar saída validada: {exc}"[:1000]
 
@@ -1164,7 +1145,7 @@ def self_test() -> int:
     assert not allowed_source_url("https://example.com/noticia")
     assert normalize_url("https://GE.GLOBO.COM/a/?utm=x#z") == "https://ge.globo.com/a"
     schema = audit_schema()
-    assert schema["properties"]["editorial_rodada"]["anyOf"][1] == {"type": "null"}
+    assert "editorial_rodada" not in schema["properties"] and "editorial_copa" not in schema["properties"]
 
     triage = {
         "pendencias": {
@@ -1173,7 +1154,6 @@ def self_test() -> int:
             "melhores_momentos_apos_24h": [{"event_id": "3", "horas_desde_fim": 25}],
         },
         "saude": {"status_deterministico": "atencao", "criticos": []},
-        "editoriais": {"rodada": None, "copa_do_brasil": None},
     }
     payload = build_openai_payload(triage, DEFAULT_MODEL)
     assert payload["tools"][0]["type"] == "web_search" and payload["tool_choice"] == "auto"
@@ -1270,8 +1250,8 @@ def self_test() -> int:
     # em tempo quase real, porque a matéria consolidada da rodada no ge só sai
     # depois que a rodada inteira termina — janela em que o site ficaria sem o
     # dado de público que alimenta as Estatísticas.
-    OPENAI_CONSUMIDORES = {"auditoria_ia_diaria.py", "completar_publicos_ia.py"}
-    OPENAI_WORKFLOWS = {"auditoria-ia-diaria.yml", "atualizar-publicos-brasileirao.yml"}
+    OPENAI_CONSUMIDORES = {"auditoria_ia_diaria.py", "completar_publicos_ia.py", "editorial_ia.py"}
+    OPENAI_WORKFLOWS = {"auditoria-ia-diaria.yml", "atualizar-publicos-brasileirao.yml", "publicar-analise-rodada.yml", "publicar-analise-copa-do-brasil.yml", "publicar-analise-continentais.yml"}
 
     direct_api = []
     for script in SCRIPT_DIR.glob("*.py"):

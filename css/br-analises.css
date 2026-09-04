@@ -84,3 +84,17 @@ body[data-fdg-analise-competicao="continentais"] .analysis-cup-video-external .a
 body[data-fdg-analise-competicao="continentais"] .analysis-movement-highlights{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:1100px){body[data-fdg-analise-competicao="continentais"] .analysis-movement-highlights{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){body[data-fdg-analise-competicao="continentais"] .analysis-movement-highlights{grid-template-columns:1fr}}
+
+/* Editorial V2 — capa de classificados da Copa do Brasil (04/09/2026). */
+.analysis-qualified-spotlight{margin:8px 0 26px!important;padding:16px;border:1px solid rgba(200,255,83,.22);border-radius:16px;background:linear-gradient(135deg,rgba(200,255,83,.075),rgba(101,201,255,.045))}
+.analysis-qualified-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.analysis-qualified-card{display:flex;align-items:center;gap:10px;min-width:0;padding:11px;border:1px solid rgba(155,176,189,.14);border-radius:12px;background:rgba(5,22,30,.78)}
+.analysis-qualified-crest{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px}
+.analysis-qualified-crest img{display:block;max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 7px rgba(0,0,0,.3))}
+.analysis-qualified-card>div:last-child{display:grid;gap:3px;min-width:0}
+.analysis-qualified-card strong{overflow:hidden;color:var(--an-text);font-size:13px;line-height:1.15;text-overflow:ellipsis;white-space:nowrap}
+.analysis-qualified-card span{color:var(--an-lime);font-size:10px;font-weight:900}
+.analysis-qualified-callout{margin:12px 0 0;padding:10px 12px;border-radius:10px;background:rgba(246,201,72,.09);color:#dbe7c2;font-size:12px;line-height:1.45;text-align:left!important;text-align-last:left!important}
+.analysis-qualified-callout strong{color:var(--an-gold)}
+@media(max-width:820px){.analysis-qualified-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.analysis-qualified-spotlight{padding:11px}.analysis-qualified-grid{grid-template-columns:1fr}.analysis-qualified-card{padding:9px 10px}.analysis-qualified-crest{flex-basis:38px;width:38px;height:38px}}
