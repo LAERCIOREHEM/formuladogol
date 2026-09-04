@@ -159,8 +159,6 @@ jobs:
           python -m json.tool dados-br/jogos-detalhes.json >/dev/null
           python -m json.tool dados-br/estatisticas-competicao.json >/dev/null
           python -m json.tool dados-br/transmissoes-tv.json >/dev/null
-          python -m json.tool dados-br/analises.json >/dev/null
-          python scripts/validar_artefatos_analises.py
 
       - name: Publicar auditoria e correções validadas com push robusto
         if: steps.ai_gate.outputs.run_daily == 'true'
@@ -181,28 +179,12 @@ jobs:
             dados-br/jogos-detalhes.json
             dados-br/estatisticas-competicao.json
             dados-br/transmissoes-tv.json
-            analises
-            css/br-analises.css
-            dados-br/analises.json
-            dados-br/marcos-af-previsao.json
-            dados-br/historico-probabilidades-continentais.json
-            sitemap.xml
-            news-sitemap.xml
-            feed.xml
           )
           SITE_FILES=(
             dados-br/publicos-complementares.json
             dados-br/jogos-detalhes.json
             dados-br/estatisticas-competicao.json
             dados-br/transmissoes-tv.json
-            analises
-            css/br-analises.css
-            dados-br/analises.json
-            dados-br/marcos-af-previsao.json
-            dados-br/historico-probabilidades-continentais.json
-            sitemap.xml
-            news-sitemap.xml
-            feed.xml
           )
 
           EXISTING=()
@@ -263,7 +245,7 @@ jobs:
         run: |
           set -euo pipefail
           gh workflow run deploy.yml --ref main
-          echo "Deploy disparado porque houve correção ou editorial visível no site."
+          echo "Deploy disparado porque a auditoria diária corrigiu conteúdo operacional visível no site."
       - name: Notificar falha operacional grave do próprio workflow
         if: ${{ failure() }}
         env:

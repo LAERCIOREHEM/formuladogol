@@ -42,7 +42,8 @@ jobs:
       - name: Validar gerador e dados editoriais
         run: |
           set -euo pipefail
-          python -m py_compile scripts/gerar_analise_rodada.py scripts/gerar_marcos_af_previsao.py scripts/validar_artefatos_analises.py
+          python -m py_compile scripts/editorial_ia.py scripts/gerar_analise_rodada.py scripts/gerar_marcos_af_previsao.py scripts/validar_artefatos_analises.py
+          python scripts/editorial_ia.py --self-test
           python scripts/gerar_analise_rodada.py --self-test
           python scripts/gerar_marcos_af_previsao.py --self-test
           python scripts/gerar_marcos_af_previsao.py
@@ -50,14 +51,17 @@ jobs:
           python -m json.tool dados-br/config-analises.json >/dev/null
           python scripts/validar_artefatos_analises.py
 
-      - name: Detectar e gerar análise determinística
+      - name: Detectar fechamento e gerar análise jornalística
         env:
           RODADA: ${{ inputs.rodada }}
           FORCAR: ${{ inputs.forcar }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_EDITORIAL_MODEL: ${{ vars.OPENAI_EDITORIAL_MODEL || 'gpt-5.6-sol' }}
+          OPENAI_EDITORIAL_REASONING: high
         shell: bash
         run: |
           set -euo pipefail
-          args=(--sem-ia)
+          args=(--usar-ia)
           if [[ -n "${RODADA:-}" ]]; then args+=(--rodada "$RODADA"); fi
           if [[ "${FORCAR:-false}" == "true" ]]; then args+=(--forcar); fi
           python scripts/gerar_analise_rodada.py "${args[@]}"

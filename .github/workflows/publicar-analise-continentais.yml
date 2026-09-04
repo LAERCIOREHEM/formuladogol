@@ -31,7 +31,8 @@ jobs:
       - name: Validar geradores offline
         run: |
           set -euo pipefail
-          python -m py_compile scripts/gerar_analise_continental.py scripts/buscar_melhores_momentos_continentais.py
+          python -m py_compile scripts/editorial_ia.py scripts/gerar_analise_continental.py scripts/buscar_melhores_momentos_continentais.py
+          python scripts/editorial_ia.py --self-test
           python scripts/gerar_analise_continental.py --self-test
           python scripts/buscar_melhores_momentos_continentais.py --self-test
 
@@ -48,7 +49,11 @@ jobs:
           fi
 
       - name: Gerar editorial continental quando elegível
-        run: python scripts/gerar_analise_continental.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_EDITORIAL_MODEL: ${{ vars.OPENAI_EDITORIAL_MODEL || 'gpt-5.6-sol' }}
+          OPENAI_EDITORIAL_REASONING: high
+        run: python scripts/gerar_analise_continental.py --usar-ia
 
       - name: Validar artefatos editoriais
         run: |

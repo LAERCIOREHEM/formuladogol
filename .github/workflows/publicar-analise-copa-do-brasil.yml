@@ -44,10 +44,12 @@ jobs:
         run: |
           set -euo pipefail
           python -m py_compile \
+            scripts/editorial_ia.py \
             scripts/gerar_analise_rodada.py \
             scripts/gerar_analise_copa_do_brasil.py \
             scripts/buscar_melhores_momentos_copa_do_brasil.py \
             scripts/validar_artefatos_analises.py
+          python scripts/editorial_ia.py --self-test
           python scripts/gerar_analise_rodada.py --self-test
           python scripts/gerar_analise_copa_do_brasil.py --self-test
           python scripts/buscar_melhores_momentos_copa_do_brasil.py --self-test
@@ -59,13 +61,16 @@ jobs:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: python scripts/buscar_melhores_momentos_copa_do_brasil.py
 
-      - name: Detectar fechamento e gerar editorial determinístico
+      - name: Detectar fechamento e gerar editorial jornalístico
         env:
           FORCAR: ${{ inputs.forcar }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_EDITORIAL_MODEL: ${{ vars.OPENAI_EDITORIAL_MODEL || 'gpt-5.6-sol' }}
+          OPENAI_EDITORIAL_REASONING: high
         shell: bash
         run: |
           set -euo pipefail
-          args=(--sem-ia --falhar-se-snapshot-atrasado --tolerancia-snapshot-horas 4)
+          args=(--usar-ia --falhar-se-snapshot-atrasado --tolerancia-snapshot-horas 4)
           if [[ "${FORCAR:-false}" == "true" ]]; then args+=(--forcar); fi
           python scripts/gerar_analise_copa_do_brasil.py "${args[@]}"
 
