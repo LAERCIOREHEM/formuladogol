@@ -13,15 +13,15 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 56,
-    "jogos_foco": 56,
+    "jogos_na_janela": 55,
+    "jogos_foco": 55,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 54,
+    "candidatos_oficiais_encontrados": 53,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 45,
-    "search_api_jogos_pulados_grade_estavel": 11,
-    "transmissoes_publicadas": 6,
+    "search_api_jogos_pulados_grade_estavel": 10,
+    "transmissoes_publicadas": 5,
     "sem_transmissao": 50,
     "erros": 0
   },
@@ -68,20 +68,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401909114",
-      "rodada": 0,
-      "competicao_chave": "copa_do_brasil",
-      "competicao_nome": "Copa do Brasil",
-      "jogo": "Grêmio x Internacional",
-      "data_iso": "2026-09-03T20:00:00-03:00",
-      "principal": "CazéTV",
-      "fontes_encontradas": [
-        "CazéTV"
-      ],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
     {
       "event_id": "401841224",
       "rodada": 26,
@@ -833,22 +819,6 @@
         "identifica transmissão ao vivo",
         "horário compatível (60 min de diferença)"
       ]
-    },
-    {
-      "event_id": "401909114",
-      "jogo": "Grêmio x Internacional",
-      "fonte": "cazetv",
-      "video_id": "bETGueMONLQ",
-      "url": "https://www.youtube.com/watch?v=bETGueMONLQ",
-      "titulo": "AO VIVO: GRENAL DECISIVO! GRÊMIO X INTER DECIDEM O ÚLTIMO SEMIFINALISTA DA COPA | GERAL CAZÉTV",
-      "status": "upcoming",
-      "confianca": 0.8417,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (130 min de diferença)"
-      ]
     }
   ],
   "rejeitados": [
@@ -913,6 +883,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "O7CfCTT65xw",
+      "url": "https://www.youtube.com/watch?v=O7CfCTT65xw",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "A LISTA DOS CLÁSSICOS COM AS MAIORES FREGUESIAS DO BRASIL! | Panela Sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-06T19:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "QI_orExVqdI",
       "url": "https://www.youtube.com/watch?v=QI_orExVqdI",
       "fonte": "getv",
@@ -943,13 +923,13 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "_CCXureQnic",
-      "url": "https://www.youtube.com/watch?v=_CCXureQnic",
+      "video_id": "uhlZKJQeMVc",
+      "url": "https://www.youtube.com/watch?v=uhlZKJQeMVc",
       "fonte": "sbt",
       "canal": "SBT",
-      "titulo": "Galvão Bueno revela bastidores de momentos com Senna e Pelé | The Noite (31/08/26)",
+      "titulo": "AO VIVO: assista à grande final do Miss Mundo 2026 | Venha torcer pela brasileira Gabriela Botelho 🔴",
       "status": "upcoming",
-      "inicio_programado": "2026-09-04T12:00:00-03:00",
+      "inicio_programado": "2026-09-05T09:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -973,16 +953,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "44En7SSpO2Y",
-      "url": "https://www.youtube.com/watch?v=44En7SSpO2Y",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: TOULOUSE X LILLE | LIGUE 1 26/27 | 3ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-03T15:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "4doFeBXGvbw",
       "url": "https://www.youtube.com/watch?v=4doFeBXGvbw",
       "fonte": "cazetv",
@@ -993,16 +963,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "5x5JJyZqdUw",
-      "url": "https://www.youtube.com/watch?v=5x5JJyZqdUw",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ESTADOS UNIDOS X CHINA | COPA DO MUNDO DE BASQUETE FEMININO 2026 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-04T08:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "8Gg04eqb2cg",
       "url": "https://www.youtube.com/watch?v=8Gg04eqb2cg",
       "fonte": "cazetv",
@@ -1010,6 +970,16 @@
       "titulo": "AO VIVO: EVERTON X MANCHESTER UNITED | PREMIER LEAGUE 26/27 | 3ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-06T09:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "AS9ADhobslo",
+      "url": "https://www.youtube.com/watch?v=AS9ADhobslo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): LIGUE 1 | NICE X LE MANS | LIGUE 1 26/27 | 3ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-05T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1029,7 +999,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: FRANÇA X COREIA DO SUL | COPA DO MUNDO DE BASQUETE FEMININO 2026 | 2ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-05T15:15:00-03:00",
+      "inicio_programado": "2026-09-05T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1039,7 +1009,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: ROMA X ATALANTA | SÉRIE A ITALIANA 26/27 | 3ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-05T15:15:00-03:00",
+      "inicio_programado": "2026-09-05T15:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1049,7 +1019,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: ITÁLIA X ESTADOS UNIDOS | COPA DO MUNDO DE BASQUETE FEMININO 2026 | 2ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-06T15:15:00-03:00",
+      "inicio_programado": "2026-09-06T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1059,7 +1029,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: SKATE VERTICAL | STU NATIONAL | ETAPA DE BRASÍLIA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-06T16:00:00-03:00",
+      "inicio_programado": "2026-09-06T14:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1069,7 +1039,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: ESPANYOL X SEVILLA | LA LIGA 26/27 | 4ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-06T15:30:00-03:00",
+      "inicio_programado": "2026-09-06T15:20:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1077,9 +1047,9 @@
       "url": "https://www.youtube.com/watch?v=K6EYOUQFU5I",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: PARIS SAINT-GERMAIN X MÔNACO | LIGUE 1 26/27 | 3ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-04T15:00:00-03:00",
+      "titulo": "AO VIVO: PSG X MÔNACO | LIGUE 1 26/27 | 3ª RODADA",
+      "status": "live",
+      "inicio_programado": "2026-09-04T15:05:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1093,16 +1063,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "Q5l2-lFzdPI",
-      "url": "https://www.youtube.com/watch?v=Q5l2-lFzdPI",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: TIME BRASIL NA COPA DO MUNDO DE CANOAGEM SLALOM | ETAPA DA FRANÇA | DIA 2",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-04T07:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "RNErqAA2y2s",
       "url": "https://www.youtube.com/watch?v=RNErqAA2y2s",
       "fonte": "cazetv",
@@ -1110,16 +1070,6 @@
       "titulo": "AO VIVO: LENS X LORIENT | LIGUE 1 26/27 | 3ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-05T12:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "SmUoJxrZkYk",
-      "url": "https://www.youtube.com/watch?v=SmUoJxrZkYk",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: REAL SOCIEDAD X CELTA | LALIGA 26/27 | 6ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-03T15:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1139,7 +1089,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: BRASIL X TANZÂNIA | COPA DO MUNDO FIFA FEMININA SUB-20 2026 | 1ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-05T09:15:00-03:00",
+      "inicio_programado": "2026-09-05T09:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1158,8 +1108,28 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: REAL BETIS X REAL MADRID | LALIGA 26/27 | 4ª RODADA",
+      "status": "live",
+      "inicio_programado": "2026-09-04T14:25:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "XtnH-Tv5VlQ",
+      "url": "https://www.youtube.com/watch?v=XtnH-Tv5VlQ",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: QUEM FEZ, FEZ | 04/09",
       "status": "upcoming",
-      "inicio_programado": "2026-09-04T15:00:00-03:00",
+      "inicio_programado": "2026-09-04T17:55:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "Z84I1_QW6Qs",
+      "url": "https://www.youtube.com/watch?v=Z84I1_QW6Qs",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE) : TÊNIS DE MESA | WTT CONTENDER ALMATY | FINAIS",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-06T03:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1189,7 +1159,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: VALENCIA X BARCELONA | LALIGA 26/27 | 4ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-06T10:15:00-03:00",
+      "inicio_programado": "2026-09-06T09:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1200,16 +1170,6 @@
       "titulo": "AO VIVO: SÁBADO DE GRANDES JOGOS NAS PRINCIPAIS LIGAS NO MUNDO! | SEIS EM UM",
       "status": "upcoming",
       "inicio_programado": "2026-09-05T17:35:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "cYYv9lmHtH8",
-      "url": "https://www.youtube.com/watch?v=cYYv9lmHtH8",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: LYON X AUXERRE | LIGUE 1 26/27 | 3ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-04T13:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1319,7 +1279,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: MÁLAGA X LEVANTE | LA LIGA 26/27 | 4ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-06T13:00:00-03:00",
+      "inicio_programado": "2026-09-06T13:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -1329,16 +1289,21 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: SCHALKE 04 X BAYERN DE MUNIQUE | BUNDESLIGA 26/27 | 2ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-05T12:30:00-03:00",
+      "inicio_programado": "2026-09-05T12:20:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "wymDa5wAnTo",
+      "url": "https://www.youtube.com/watch?v=wymDa5wAnTo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO (SOM AMBIENTE): ANGERS X RENNES | LIGUE 1 26/27 | 3ª RODADA",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-06T12:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "search_api_pulados": [
-    {
-      "event_id": "401909114",
-      "jogo": "Grêmio x Internacional",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    },
     {
       "event_id": "401841224",
       "jogo": "Bragantino x Bahia",
@@ -1852,5 +1817,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-03T16:51:04-03:00"
+  "atualizado_em": "2026-09-04T16:39:00-03:00"
 }
