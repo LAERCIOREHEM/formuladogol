@@ -1,6 +1,9 @@
 FDG — AJUSTE DE ÍCONE PWA / APP ICON — 2026-09-05
 
-Arquivos incluídos neste pacote:
+Pacote com ícone FG sem o círculo externo.
+Suba estes arquivos na raiz do repositório, substituindo os existentes.
+
+Arquivos incluídos:
 - manifest.webmanifest
 - apple-touch-icon-formula-do-gol.png
 - favicon-formula-do-gol.ico
@@ -9,13 +12,7 @@ Arquivos incluídos neste pacote:
 - favicon-formula-do-gol-96.png
 - favicon-formula-do-gol-192.png
 - favicon-formula-do-gol-512.png
-- FG-icone-base-20260905.png
 
-Objetivo:
-- Atualizar o ícone do app/PWA do Fórmula do Gol com a nova arte FG.
-- Melhorar a aparência do splash/launch icon em Android/iPhone.
-- Marcar os ícones do manifest como "any maskable" para melhor adaptação a launchers Android.
-
-Observação operacional:
-- Novas instalações passam a usar a nova identidade.
-- Em aparelhos já instalados, o ícone pode atualizar sozinho, mas em muitos casos é recomendável remover o atalho/app da tela inicial e instalar novamente.
+Observação:
+- Em instalações já existentes, alguns aparelhos podem manter o ícone antigo em cache.
+- Se isso ocorrer, remova o atalho/app da tela inicial e adicione novamente.
