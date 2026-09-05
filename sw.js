@@ -5,7 +5,7 @@
  * de placares, agenda, probabilidades ou qualquer dado esportivo dinâmico.
  */
 
-const SW_VERSION = '20260901-alertas-v2-notification-icon';
+const SW_VERSION = '20260905-push-resiliencia-v1';
 const DEFAULT_ICON = '/notification-fg-192.png';
 const DEFAULT_BADGE = '/notification-fg-96.png';
 const DEFAULT_URL = '/aovivo.html';
@@ -171,13 +171,115 @@ self.addEventListener('notificationclose', () => {
   // Reservado para telemetria de entrega na Execução 3/5.
 });
 
-self.addEventListener('pushsubscriptionchange', (event) => {
-  event.waitUntil((async () => {
-    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of windows) {
-      client.postMessage({ type: 'FDG_PUSH_SUBSCRIPTION_CHANGED', swVersion: SW_VERSION });
+async function readStateValue(key) {
+  if (typeof indexedDB === 'undefined') return null;
+  const db = await openStateDb();
+  try {
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(BADGE_STORE, 'readonly');
+      const req = tx.objectStore(BADGE_STORE).get(key);
+      req.onsuccess = () => resolve(req.result ?? null);
+      req.onerror = () => reject(req.error);
+    });
+  } finally { db.close(); }
+}
+
+function base64UrlToUint8Array(value) {
+  const padding = '='.repeat((4 - (value.length % 4)) % 4);
+  const base64 = (value + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(base64);
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i += 1) out[i] = raw.charCodeAt(i);
+  return out;
+}
+
+async function pushApi(apiBase, path, body) {
+  if (!apiBase) return null;
+  const response = await fetch(`${apiBase}${path}`, {
+    method: 'POST',
+    mode: 'cors',
+    cache: 'no-store',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return response.ok ? response : null;
+}
+
+async function resolveServerKey(event, apiBase) {
+  const fromEvent = event?.oldSubscription?.options?.applicationServerKey;
+  if (fromEvent) return fromEvent;
+  const cached = await readStateValue('vapidPublicKey').catch(() => null);
+  if (cached) return base64UrlToUint8Array(String(cached));
+  if (!apiBase) return null;
+  try {
+    const response = await fetch(`${apiBase}/v1/config`, { cache: 'no-store', mode: 'cors' });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data?.vapidPublicKey ? base64UrlToUint8Array(String(data.vapidPublicKey)) : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+/* O navegador pode invalidar a PushSubscription sozinho (rotação do FCM/APNs,
+ * limpeza interna, expiração). Sem este bloco o aparelho fica mudo e o backend
+ * continua tratando o endpoint morto como ativo — foi o que produziu o estado
+ * "preferências ligadas, mas nenhuma notificação chega". */
+async function handleSubscriptionChange(event) {
+  const apiBase = String((await readStateValue('apiBase').catch(() => null)) || 'https://push.formuladogol.com.br');
+  const installationId = String((await readStateValue('installationId').catch(() => null)) || '');
+  const oldEndpoint = String(event?.oldSubscription?.endpoint || '');
+
+  let renewed = null;
+  try {
+    renewed = await self.registration.pushManager.getSubscription();
+    if (!renewed) {
+      const applicationServerKey = await resolveServerKey(event, apiBase);
+      if (applicationServerKey) {
+        renewed = await self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey });
+      }
     }
-  })());
+  } catch (_) {
+    renewed = null;
+  }
+
+  if (installationId) {
+    try {
+      if (renewed) {
+        const json = renewed.toJSON();
+        await pushApi(apiBase, '/v1/subscribe', {
+          installationId,
+          subscription: {
+            endpoint: renewed.endpoint,
+            expirationTime: renewed.expirationTime ?? json.expirationTime ?? null,
+            keys: { p256dh: json.keys?.p256dh || '', auth: json.keys?.auth || '' }
+          }
+        });
+        if (oldEndpoint && oldEndpoint !== renewed.endpoint) {
+          await pushApi(apiBase, '/v1/unsubscribe', { installationId, endpoint: oldEndpoint });
+        }
+      } else {
+        // Não conseguiu renovar: encerra o endpoint no backend para não enviar
+        // gols para um destino morto e não inflar as métricas de assinantes.
+        await pushApi(apiBase, '/v1/unsubscribe', oldEndpoint
+          ? { installationId, endpoint: oldEndpoint }
+          : { installationId });
+      }
+    } catch (_) {}
+  }
+
+  const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  for (const client of windows) {
+    client.postMessage({
+      type: 'FDG_PUSH_SUBSCRIPTION_CHANGED',
+      swVersion: SW_VERSION,
+      renewed: Boolean(renewed)
+    });
+  }
+}
+
+self.addEventListener('pushsubscriptionchange', (event) => {
+  event.waitUntil(handleSubscriptionChange(event));
 });
 
 self.addEventListener('message', (event) => {
