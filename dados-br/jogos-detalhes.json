@@ -1,15 +1,600 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-05T05:11:12.212885-03:00",
+  "gerado_em": "2026-09-05T18:11:05.891622-03:00",
   "fonte": "ESPN summary + scoreboard",
-  "total_jogos": 246,
-  "total_com_estatisticas": 246,
+  "total_jogos": 247,
+  "total_com_estatisticas": 247,
   "total_com_publico": 246,
-  "total_com_eventos": 246,
-  "total_com_jogadores": 246,
-  "total_eventos_validados": 246,
+  "total_com_eventos": 247,
+  "total_com_jogadores": 247,
+  "total_eventos_validados": 247,
   "total_eventos_pendentes_detalhes": 0,
   "jogos": {
+    "401841224": {
+      "event_id": "401841224",
+      "event_id_fonte_detalhes": "401841224",
+      "rodada": 26,
+      "data_iso": "2026-09-05T16:00",
+      "mandante": "Bragantino",
+      "visitante": "Bahia",
+      "placar_mandante": 2,
+      "placar_visitante": 3,
+      "estadio": "Estádio Municipal Cicero de Souza Marques",
+      "publico": null,
+      "publico_tipo": "",
+      "publico_fonte": "",
+      "arbitro": "Maguielson Lima Barbosa",
+      "stats": [
+        {
+          "nome": "Posse",
+          "home": "50.7%",
+          "away": "49.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "24",
+          "away": "11"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "10",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "17"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "9"
+        },
+        {
+          "nome": "Passes",
+          "home": "390",
+          "away": "379"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "326",
+          "away": "311"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "13",
+          "away": "14"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "8",
+          "away": "2"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "7",
+          "away": "25"
+        },
+        {
+          "nome": "Cortes",
+          "home": "21",
+          "away": "47"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "10",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        }
+      ],
+      "estatisticas": [
+        {
+          "nome": "Posse",
+          "home": "50.7%",
+          "away": "49.3%"
+        },
+        {
+          "nome": "Finalizações",
+          "home": "24",
+          "away": "11"
+        },
+        {
+          "nome": "Chutes no gol",
+          "home": "10",
+          "away": "5"
+        },
+        {
+          "nome": "Chutes bloqueados",
+          "home": "6",
+          "away": "1"
+        },
+        {
+          "nome": "Aproveitamento dos chutes",
+          "home": "40%",
+          "away": "50%",
+          "note": "chutes no gol ÷ finalizações"
+        },
+        {
+          "nome": "Faltas",
+          "home": "11",
+          "away": "17"
+        },
+        {
+          "nome": "Defesas",
+          "home": "2",
+          "away": "9"
+        },
+        {
+          "nome": "Passes",
+          "home": "390",
+          "away": "379"
+        },
+        {
+          "nome": "Passes certos",
+          "home": "326",
+          "away": "311"
+        },
+        {
+          "nome": "Precisão de passe",
+          "home": "80%",
+          "away": "80%"
+        },
+        {
+          "nome": "Desarmes",
+          "home": "13",
+          "away": "14"
+        },
+        {
+          "nome": "Interceptações",
+          "home": "8",
+          "away": "2"
+        },
+        {
+          "nome": "Cruzamentos",
+          "home": "7",
+          "away": "25"
+        },
+        {
+          "nome": "Cortes",
+          "home": "21",
+          "away": "47"
+        },
+        {
+          "nome": "Escanteios",
+          "home": "10",
+          "away": "8"
+        },
+        {
+          "nome": "Amarelos",
+          "home": "2",
+          "away": "2"
+        },
+        {
+          "nome": "Vermelhos",
+          "home": "0",
+          "away": "0"
+        },
+        {
+          "nome": "Impedimentos",
+          "home": "1",
+          "away": "0"
+        }
+      ],
+      "gols": [
+        {
+          "minuto": "14'",
+          "jogador": "Lucas Barbosa",
+          "time": "Bragantino",
+          "assistencias": [
+            "Wallace Yan"
+          ],
+          "descricao": "Goal 70 Goal! RB Bragantino 1, Bahia 0. Lucas Barbosa (RB Bragantino) left footed shot from the centre of the box to the bottom right corner. Assisted by Wallace Yan with a through ball. Lucas Barbosa Goal"
+        },
+        {
+          "minuto": "34'",
+          "jogador": "Luciano Juba",
+          "time": "Bahia",
+          "assistencias": [],
+          "descricao": "Penalty - Scored 98 Goal! RB Bragantino 1, Bahia 1. Luciano Juba (Bahia) converts the penalty with a left footed shot to the centre of the goal. Luciano Juba Penalty - Scored"
+        },
+        {
+          "minuto": "38'",
+          "jogador": "Alejo Veliz",
+          "time": "Bahia",
+          "assistencias": [
+            "Rodrigo Nestor"
+          ],
+          "descricao": "Goal - Header 137 Goal! RB Bragantino 1, Bahia 2. Alejo Veliz (Bahia) header from very close range to the bottom left corner. Assisted by Rodrigo Nestor with a cross following a corner. Alejo Veliz Goal - Header"
+        },
+        {
+          "minuto": "45'+1'",
+          "jogador": "Santiago Ramos",
+          "time": "Bragantino",
+          "assistencias": [],
+          "descricao": "Own Goal 97 Own Goal by Santiago Ramos Mingo, Bahia. RB Bragantino 2, Bahia 2. Santiago Ramos Own Goal"
+        },
+        {
+          "minuto": "50'",
+          "jogador": "Erick",
+          "time": "Bahia",
+          "assistencias": [
+            "Rodrigo Nestor"
+          ],
+          "descricao": "Goal - Header 137 Goal! RB Bragantino 2, Bahia 3. Erick (Bahia) header from very close range to the bottom left corner. Assisted by Rodrigo Nestor with a cross following a corner. Erick Goal - Header"
+        }
+      ],
+      "cartoes": [
+        {
+          "tipo": "amarelo",
+          "minuto": "43'",
+          "jogador": "Fernando",
+          "time": "Bragantino",
+          "descricao": "Yellow Card 94 Fernando (RB Bragantino) is shown the yellow card. Fernando Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "51'",
+          "jogador": "Erick",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Erick (Bahia) is shown the yellow card for a bad foul. Erick Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "62'",
+          "jogador": "Luciano Juba",
+          "time": "Bahia",
+          "descricao": "Yellow Card 94 Luciano Juba (Bahia) is shown the yellow card for a bad foul. Luciano Juba Yellow Card"
+        },
+        {
+          "tipo": "amarelo",
+          "minuto": "90'+12'",
+          "jogador": "Alix Vinicius",
+          "time": "Bragantino",
+          "descricao": "Yellow Card 94 Alix (RB Bragantino) is shown the yellow card. Alix Vinicius Yellow Card"
+        }
+      ],
+      "jogadores": [
+        {
+          "athlete_id": "318291",
+          "nome": "Alejo Veliz",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "124439",
+          "nome": "Cristian Olivera",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "219090",
+          "nome": "David Duarte",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "253796",
+          "nome": "Erick",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "333907",
+          "nome": "Erick Pulga",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "304757",
+          "nome": "Luciano Juba",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "285757",
+          "nome": "Nicolás Acevedo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "266664",
+          "nome": "Rodrigo Nestor",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "381149",
+          "nome": "Román Gómez",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "224106",
+          "nome": "Ronaldo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "82782",
+          "nome": "Santiago Ramos",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "269675",
+          "nome": "Ademir",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "299932",
+          "nome": "Caio Alexandre",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "269910",
+          "nome": "Jean Lucas",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "227241",
+          "nome": "Michel Araújo",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "198360",
+          "nome": "Willian José",
+          "time": "Bahia",
+          "team_id": "9967",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "257335",
+          "nome": "Alix Vinicius",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "307934",
+          "nome": "Fabinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "267902",
+          "nome": "Fernando",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "334375",
+          "nome": "Gustavo Marques",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "335360",
+          "nome": "José Herrera",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "311087",
+          "nome": "José Hurtado",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "229555",
+          "nome": "Juninho Capixaba",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "248584",
+          "nome": "Lucas Barbosa",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "339001",
+          "nome": "Rodriguinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "145092",
+          "nome": "Tiago Volpi",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "358167",
+          "nome": "Wallace Yan",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": true,
+          "entrou": false
+        },
+        {
+          "athlete_id": "357358",
+          "nome": "Gustavinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "333314",
+          "nome": "Henry Mosquera",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "421416",
+          "nome": "Jhuan Nunes",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "418512",
+          "nome": "Ryan Augusto",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        },
+        {
+          "athlete_id": "383987",
+          "nome": "Vinicinho",
+          "time": "Bragantino",
+          "team_id": "6079",
+          "titular": false,
+          "entrou": true
+        }
+      ],
+      "jogadores_preservados_de_execucao_anterior": false,
+      "validacao_eventos": {
+        "gols_esperados": {
+          "Bragantino": 2,
+          "Bahia": 3
+        },
+        "gols_extraidos": {
+          "Bragantino": 2,
+          "Bahia": 3
+        },
+        "gols_completos": true,
+        "gols_sem_excesso": true,
+        "gols_time_desconhecido": 0,
+        "gols_duplicados": 0,
+        "gols_compativeis": true,
+        "gols_ok": true,
+        "cartoes_esperados": {
+          "Bragantino": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Bahia": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_extraidos": {
+          "Bragantino": {
+            "amarelo": 2,
+            "vermelho": 0
+          },
+          "Bahia": {
+            "amarelo": 2,
+            "vermelho": 0
+          }
+        },
+        "cartoes_completos": true,
+        "cartoes_sem_excesso": true,
+        "cartoes_time_desconhecido": 0,
+        "cartoes_duplicados": 0,
+        "cartoes_compativeis": true,
+        "cartoes_ok": true,
+        "ok": true,
+        "pendente_detalhes": false,
+        "tipo_pendencia": "",
+        "motivo": ""
+      },
+      "fonte": "ESPN summary + scoreboard",
+      "resultado_manual": false,
+      "origem_resultado": "",
+      "motivo_resultado_manual": "",
+      "preservado_de_execucao_anterior": false,
+      "atualizado_em": "2026-09-05T18:11:05.807830-03:00"
+    },
     "401913077": {
       "event_id": "401913077",
       "event_id_fonte_detalhes": "401913077",

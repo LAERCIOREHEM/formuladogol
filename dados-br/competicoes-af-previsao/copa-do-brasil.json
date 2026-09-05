@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-05T05:11:23-03:00",
+  "gerado_em": "2026-09-05T18:11:16-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -27,10 +27,11 @@
     "equipes_serie_a_2026": 21
   },
   "coleta": {
-    "modo": "completa",
-    "requisicoes": 9,
+    "modo": "incremental",
+    "janela_inicio": "2026-08-15T00:00:00-03:00",
+    "janela_fim": "2027-01-03T23:59:59-03:00",
+    "requisicoes": 4,
     "ultima_completa_em": "2026-09-05T05:11:23-03:00",
-    "fases_preservadas_por_event_id": 24,
     "ajustes_editoriais_aplicados": 0
   },
   "equipes": [
