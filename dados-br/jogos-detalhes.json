@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-05T18:22:00.668650-03:00",
+  "gerado_em": "2026-09-05T20:31:21.864905-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 247,
   "total_com_estatisticas": 247,
-  "total_com_publico": 246,
+  "total_com_publico": 247,
   "total_com_eventos": 247,
   "total_com_jogadores": 247,
   "total_eventos_validados": 247,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 3,
       "estadio": "Estádio Municipal Cicero de Souza Marques",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 3090,
+      "publico_tipo": "total",
+      "publico_fonte": "https://oliberal.com/esportes/bahia-embala-pos-copa-e-faz-trinca-em-cima-do-red-bull-bragantino-em-nova-virada-no-brasileirao-1.1165388",
       "arbitro": "Maguielson Lima Barbosa",
       "stats": [
         {
@@ -593,7 +593,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-05T18:11:05.807830-03:00"
+      "atualizado_em": "2026-09-05T18:11:05.807830-03:00",
+      "renda": 96655,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401913077": {
       "event_id": "401913077",
@@ -139097,5 +139099,5 @@
     }
   },
   "total_com_publico_pagante": 240,
-  "total_com_renda": 246
+  "total_com_renda": 247
 }
