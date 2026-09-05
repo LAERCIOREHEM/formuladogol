@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-04",
-  "executado_em": "2026-09-04T12:05:57-03:00",
+  "data_brt": "2026-09-05",
+  "executado_em": "2026-09-05T11:00:21-03:00",
   "status": "atencao",
-  "resumo": "Dados finais íntegros nos indicadores determinísticos. Há duas pendências de transmissão para 08/09/2026, mas não foi possível associar inequivocamente os event_ids aos jogos citados pela fonte consultada, pois o dossiê não informa mandante ou visitante; nenhuma correção automática foi proposta.",
+  "resumo": "Dados finais íntegros, sem incidentes críticos. Permanecem duas pendências de transmissão para jogos futuros em 08/09/2026; a busca encontrou programação compatível por data e horário, mas o dossiê não informa mandante e visitante e a fonte não declara os event_id, impedindo associação inequívoca para correção automática.",
   "triagem": {
-    "data_hora_brt": "2026-09-04T12:05:57-03:00",
+    "data_hora_brt": "2026-09-05T11:00:21-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
@@ -22,7 +22,7 @@
         "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 6.8
+        "ultimo_sucesso_horas": 5.8
       }
     },
     "pendencias": {
@@ -35,7 +35,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 102.9
+          "horas_ate_jogo": 80.0
         },
         {
           "event_id": "401912542",
@@ -44,7 +44,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "aviso",
-          "horas_ate_jogo": 105.4
+          "horas_ate_jogo": 82.5
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -83,43 +83,43 @@
       }
     ],
     "fontes_web": [
-      "https://ge.globo.com/agenda",
       "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
       "https://ge.globo.com/futebol-americano/nfl/noticia/2026/08/19/sportv-e-ge-tv-transmitem-com-exclusividade-o-primeiro-jogo-da-historia-da-nfl-no-maracana.ghtml",
       "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/08/14/cbf-divulga-tabela-detalhada-das-rodadas-25-e-26-da-serie-a-do-brasileirao.ghtml",
       "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
       "https://ge.globo.com/programas/segue-o-jogo",
       "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/corinthians-x-chapecoense/832143",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/botafogo-x-gremio-novorizontino-saf/833142",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-corinthians/832151",
       "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/fortaleza-saf-x-avai/833146",
       "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-25-e-26-do-brasileirao-betano",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/com-grandes-jogos-26-rodada-do-brasileirao-movimentara-fim-de-semana",
       "https://www.itatiaia.com.br/esportes/agenda",
       "https://www.itatiaia.com.br/esportes/futebol/futebol-internacional/copa-sul-americana/copa-sul-americana-datas-horarios-e-onde-assistir-os-confrontos-das-quartas-de-final"
     ]
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Dados finais íntegros nos indicadores determinísticos. Há duas pendências de transmissão para 08/09/2026, mas não foi possível associar inequivocamente os event_ids aos jogos citados pela fonte consultada, pois o dossiê não informa mandante ou visitante; nenhuma correção automática foi proposta.",
+    "resumo": "Dados finais íntegros, sem incidentes críticos. Permanecem duas pendências de transmissão para jogos futuros em 08/09/2026; a busca encontrou programação compatível por data e horário, mas o dossiê não informa mandante e visitante e a fonte não declara os event_id, impedindo associação inequívoca para correção automática.",
     "problemas": [
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "A fonte consultada declara transmissões para jogos de 08/09/2026, mas o dossiê não contém os participantes dos event_ids 401913960 e 401912542. Sem vínculo direto e inequívoco entre cada event_id e a partida, a complementação não é segura.",
+        "mensagem": "Não foi possível vincular inequivocamente canais aos event_id 401913960 e 401912542: há fonte com partidas e transmissões nos mesmos horários, porém sem identificação dos event_id e sem equipes no dossiê.",
         "event_id": "401913960",
         "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "A fonte consultada declara transmissões para jogos de 08/09/2026, mas o dossiê não contém os participantes dos event_ids 401913960 e 401912542. Sem vínculo direto e inequívoco entre cada event_id e a partida, a complementação não é segura.",
+        "mensagem": "Não foi possível vincular inequivocamente canais aos event_id 401913960 e 401912542: há fonte com partidas e transmissões nos mesmos horários, porém sem identificação dos event_id e sem equipes no dossiê.",
         "event_id": "401912542",
         "requer_intervencao": true
       },
       {
         "categoria": "fonte",
         "severidade": "info",
-        "mensagem": "As três falhas de fontes de transmissão permanecem como aviso operacional, sem perda crítica de cobertura ou impacto nos dados finais.",
+        "mensagem": "As três falhas isoladas de fontes de transmissão não configuram incidente crítico, pois não houve perda crítica de cobertura nem inconsistência nos dados finais.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -505,6 +505,19 @@
       "executado_em": "2026-09-04T12:05:57-03:00",
       "status": "atencao",
       "resumo": "Dados finais íntegros nos indicadores determinísticos. Há duas pendências de transmissão para 08/09/2026, mas não foi possível associar inequivocamente os event_ids aos jogos citados pela fonte consultada, pois o dossiê não informa mandante ou visitante; nenhuma correção automática foi proposta.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-05",
+      "executado_em": "2026-09-05T11:00:21-03:00",
+      "status": "atencao",
+      "resumo": "Dados finais íntegros, sem incidentes críticos. Permanecem duas pendências de transmissão para jogos futuros em 08/09/2026; a busca encontrou programação compatível por data e horário, mas o dossiê não informa mandante e visitante e a fonte não declara os event_id, impedindo associação inequívoca para correção automática.",
       "chamadas_openai": 1,
       "web_searches": 1,
       "publicos_aplicados": 0,
