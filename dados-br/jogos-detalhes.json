@@ -1,6 +1,6 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-05T18:11:05.891622-03:00",
+  "gerado_em": "2026-09-05T18:22:00.668650-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 247,
   "total_com_estatisticas": 247,
@@ -1721,8 +1721,9 @@
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-02T10:53:52.325060-03:00",
-      "renda": 431593,
-      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
+      "renda": 834525,
+      "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados.",
+      "publico_pagante": 27281
     },
     "401841215": {
       "event_id": "401841215",
@@ -5127,7 +5128,7 @@
       "preservado_de_execucao_anterior": false,
       "atualizado_em": "2026-09-01T05:11:25.459184-03:00",
       "publico_pagante": 35231,
-      "renda": 2336565,
+      "renda": 1719640,
       "dados_publico_fonte_adicional": "Público total/presente, pagantes e renda: ge/Gato Mestre, quando divulgados."
     },
     "401841212": {
@@ -139094,5 +139095,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 240,
+  "total_com_renda": 246
 }
