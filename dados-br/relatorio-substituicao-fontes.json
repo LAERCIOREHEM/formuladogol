@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-09-05T18:26:57-03:00",
+  "atualizado_em": "2026-09-05T20:48:08-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
@@ -9,8 +9,8 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 26,
-    "playlist_items": 25,
+    "unidades": 1,
+    "playlist_items": 0,
     "search": 0,
     "channels": 1,
     "videos": 0
@@ -19,36 +19,36 @@
     "inicio": null,
     "fim": null
   },
-  "event_id_alvo": "401841224",
+  "event_id_alvo": "401841226",
   "resumo_geral_antes": {
-    "jogos_resultados": 247,
-    "ge": 241,
-    "caze": 1,
-    "prime": 2,
-    "uol": 2,
-    "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 246
-  },
-  "resumo_geral_depois": {
-    "jogos_resultados": 247,
-    "ge": 242,
+    "jogos_resultados": 248,
+    "ge": 243,
     "caze": 1,
     "prime": 2,
     "uol": 2,
     "outros": 0,
     "sem_video": 0,
-    "com_fonte_preferida": 247
+    "com_fonte_preferida": 248
+  },
+  "resumo_geral_depois": {
+    "jogos_resultados": 248,
+    "ge": 243,
+    "caze": 1,
+    "prime": 2,
+    "uol": 2,
+    "outros": 0,
+    "sem_video": 0,
+    "com_fonte_preferida": 248
   },
   "resumo_janela_antes": {
     "jogos_resultados": 1,
-    "ge": 0,
+    "ge": 1,
     "caze": 0,
     "prime": 0,
     "uol": 0,
     "outros": 0,
-    "sem_video": 1,
-    "com_fonte_preferida": 0
+    "sem_video": 0,
+    "com_fonte_preferida": 1
   },
   "resumo_janela_depois": {
     "jogos_resultados": 1,
@@ -60,23 +60,22 @@
     "sem_video": 0,
     "com_fonte_preferida": 1
   },
-  "mantidos_preferidos_na_janela": [],
-  "substituidos_para_fontes_preferidas": [
+  "mantidos_preferidos_na_janela": [
     {
-      "event_id": "401841224",
+      "event_id": "401841226",
       "rodada": 26,
-      "mandante": "Bragantino",
-      "visitante": "Bahia",
+      "mandante": "São Paulo",
+      "visitante": "Atlético-MG",
       "placar_mandante": 2,
-      "placar_visitante": 3,
-      "motivo": "sem_link_preferido",
-      "fonte_nova": "GE TV / YouTube",
-      "channel_title_novo": "ge tv",
-      "titulo_novo": "BRAGANTINO 2 X 3 BAHIA | MELHORES MOMENTOS | 26ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url_nova": "https://www.youtube.com/watch?v=qIqeNXt0GqM",
-      "metodo": "playlistItems"
+      "placar_visitante": 0,
+      "motivo": "mantido: fonte preferida (ge)",
+      "fonte_anterior": "GE TV / YouTube",
+      "channel_title": "",
+      "titulo_anterior": "SÃO PAULO 2 X ATLÉTICO-MG | MELHORES MOMENTOS | 26ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+      "url_anterior": "https://www.youtube.com/watch?v=-1htwornQ6Q"
     }
   ],
+  "substituidos_para_fontes_preferidas": [],
   "removidos_por_fonte_nao_preferida": [],
   "removidos_por_jogo_nao_finalizado": [],
   "ainda_sem_link_preferido": [],
