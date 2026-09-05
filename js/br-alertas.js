@@ -20,6 +20,8 @@
     loaded: false,
     loading: false,
     subscription: null,
+    subscriptionKnown: false,
+    reconciled: false,
     preferences: { ...DEFAULTS },
     clubs: [],
     agenda: [],
@@ -114,11 +116,18 @@
     }
     state.loading = true;
     try {
-      state.subscription = await PUSH.getSubscription().catch(() => null);
+      state.subscriptionKnown = false;
+      try {
+        state.subscription = await PUSH.getSubscription();
+        state.subscriptionKnown = true;
+      } catch (_) {
+        state.subscription = null;
+      }
       const result = await PUSH.getPreferences().catch(() => null);
       state.preferences = normalizePreferences(result?.preferences || DEFAULTS);
       state.error = '';
       state.loaded = true;
+      await reconcileGhostSubscription();
     } catch (error) {
       state.error = text(error?.message || error);
       state.loaded = true;
@@ -126,6 +135,19 @@
       state.loading = false;
     }
     return state;
+  }
+
+  // O navegador perdeu a PushSubscription, mas o backend ainda pode considerar
+  // este aparelho ativo. Desativa o endpoint morto — sem tocar em nenhuma outra
+  // instalação e sem apagar as preferências salvas.
+  async function reconcileGhostSubscription() {
+    if (state.reconciled) return;
+    if (!state.subscriptionKnown || state.subscription) return;
+    if (!PUSH.supported()) return;
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    if (!hasScope()) return;
+    state.reconciled = true;
+    try { await PUSH.reconcile(); } catch (_) {}
   }
 
   async function persist(next, activating) {
@@ -138,14 +160,13 @@
 
     if (activating && !state.subscription) {
       await PUSH.subscribe({ preferences: prefs });
-      state.subscription = await PUSH.getSubscription();
-    } else if (state.subscription) {
-      await PUSH.savePreferences(prefs);
+      state.subscription = await PUSH.getSubscription().catch(() => null);
+      state.subscriptionKnown = true;
     } else {
-      // Sem assinatura não há necessidade de gravar uma preferência inativa no backend.
-      state.preferences = prefs;
-      updateSurfaces();
-      return prefs;
+      // Sempre grava. Desligar um alerta precisa valer no backend mesmo quando
+      // este aparelho não tem PushSubscription — caso contrário a preferência
+      // "ressuscita" no próximo refresh.
+      await PUSH.savePreferences(prefs);
     }
     state.preferences = prefs;
     state.error = '';
@@ -208,10 +229,13 @@
 
   async function disableDevice() {
     await ensureLoaded();
-    if (!state.subscription) return;
     try { await PUSH.savePreferences({ ...DEFAULTS, teams: [], games: [] }); } catch (_) {}
+    // unsubscribe() já cai em reconcile() quando não existe assinatura local,
+    // então o estado fantasma também é limpo por este botão.
     await PUSH.unsubscribe();
     state.subscription = null;
+    state.subscriptionKnown = true;
+    state.reconciled = true;
     state.preferences = normalizePreferences(DEFAULTS);
     updateSurfaces();
     renderManager();
@@ -307,6 +331,11 @@
     const permission = 'Notification' in window ? Notification.permission : 'unsupported';
     if (iosNeedsInstall()) return '<div class="fdg-alert-status is-warning"><strong>Instalação necessária no iPhone.</strong><span>Adicione o Fórmula do Gol à Tela de Início e abra pelo ícone para ativar Web Push.</span></div>';
     if (permission === 'denied') return '<div class="fdg-alert-status is-error"><strong>Notificações bloqueadas.</strong><span>Reative a permissão do Fórmula do Gol nas configurações do navegador/sistema.</span></div>';
+    if (!state.subscription && hasScope()) {
+      const detail = PUSH.lastSubscribeError?.();
+      const extra = detail ? ` Último erro: ${escapeHtml(detail.name)} — ${escapeHtml(detail.message)}.` : '';
+      return `<div class="fdg-alert-status is-warning"><strong>Suas escolhas estão salvas, mas este aparelho está desconectado das notificações.</strong><span>Toque novamente em um clube, partida ou “Todos os jogos” para reconectar.${extra}</span></div>`;
+    }
     if (!state.subscription) return '<div class="fdg-alert-status"><strong>Alertas ainda não ativados neste aparelho.</strong><span>Escolha um clube, uma partida ou “Todos os jogos”. A permissão será solicitada somente após sua ação.</span></div>';
     if (!hasScope()) return '<div class="fdg-alert-status is-warning"><strong>Notificações autorizadas, mas nenhum jogo está selecionado.</strong><span>Escolha abaixo quando deseja receber os alertas.</span></div>';
     return '<div class="fdg-alert-status is-ok"><strong>Alertas ativos neste aparelho.</strong><span>O Fórmula do Gol pode enviar notificações mesmo com o site fechado.</span></div>';
@@ -381,7 +410,7 @@
       <section class="panel fdg-alert-panel fdg-alert-danger"><div class="panel-inner">
         <h2>Este aparelho</h2>
         <p>As escolhas ficam associadas anonimamente a este navegador/aparelho. Não há conta, login ou senha.</p>
-        <div class="fdg-alert-actions"><a class="fdg-alert-link" href="/privacidade.html">Política de privacidade</a><button type="button" class="fdg-alert-disable" data-fdg-disable ${state.subscription ? '' : 'disabled'}>Desativar notificações neste aparelho</button></div>
+        <div class="fdg-alert-actions"><a class="fdg-alert-link" href="/privacidade.html">Política de privacidade</a><button type="button" class="fdg-alert-disable" data-fdg-disable ${(state.subscription || hasScope()) ? '' : 'disabled'}>Desativar notificações neste aparelho</button></div>
       </div></section>`;
   }
 
