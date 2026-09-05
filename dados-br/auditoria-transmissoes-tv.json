@@ -2,13 +2,13 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 55,
-    "jogos_com_transmissao": 47,
-    "jogos_sem_transmissao_na_janela": 8,
+    "jogos_com_transmissao": 48,
+    "jogos_sem_transmissao_na_janela": 7,
     "jogos_sem_transmissao_14d": 4,
-    "jogos_sem_transmissao_fora_14d": 4,
+    "jogos_sem_transmissao_fora_14d": 3,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 9,
-    "jogos_estaveis_sem_reconsulta_editorial": 18,
+    "registros_preservados": 28,
+    "jogos_estaveis_sem_reconsulta_editorial": 19,
     "fontes_com_falha": 1
   },
   "fontes": {
@@ -21,26 +21,26 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 8330
+      "duracao_ms": 6619
     },
     "ge_agenda": {
       "ok": true,
-      "jogos_com_canal": 20,
-      "duracao_ms": 18233
+      "jogos_com_canal": 0,
+      "duracao_ms": 7464
     },
     "ge_artigos": {
       "ok": true,
-      "artigos_consultados": 3,
-      "jogos_com_canal": 0,
-      "duracao_ms": 47311
+      "artigos_consultados": 7,
+      "jogos_com_canal": 1,
+      "duracao_ms": 98851
     },
     "espn": {
       "ok": true,
       "competicoes_consultadas": 2,
-      "eventos_na_janela": 37,
+      "eventos_na_janela": 36,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 5104
+      "duracao_ms": 10384
     },
     "youtube_oficial": {
       "ok": true,
@@ -53,7 +53,7 @@
       "rodada": 0,
       "jogo": "Independiente Santa Fe x Vasco da Gama",
       "data_iso": "2026-09-08T19:00:00-03:00",
-      "faltam_horas": 98.3,
+      "faltam_horas": 74.3,
       "nivel": "aviso"
     },
     {
@@ -61,7 +61,7 @@
       "rodada": 0,
       "jogo": "Boca Juniors x São Paulo",
       "data_iso": "2026-09-08T21:30:00-03:00",
-      "faltam_horas": 100.8,
+      "faltam_horas": 76.8,
       "nivel": "aviso"
     },
     {
@@ -69,7 +69,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "faltam_horas": 266.3,
+      "faltam_horas": 242.3,
       "nivel": "aviso"
     },
     {
@@ -77,7 +77,7 @@
       "rodada": 0,
       "jogo": "São Paulo x Boca Juniors",
       "data_iso": "2026-09-15T21:30:00-03:00",
-      "faltam_horas": 268.8,
+      "faltam_horas": 244.8,
       "nivel": "aviso"
     }
   ],
@@ -87,7 +87,7 @@
       "rodada": 0,
       "jogo": "Independiente Santa Fe x Vasco da Gama",
       "data_iso": "2026-09-08T19:00:00-03:00",
-      "faltam_horas": 98.3,
+      "faltam_horas": 74.3,
       "nivel": "aviso"
     },
     {
@@ -95,7 +95,7 @@
       "rodada": 0,
       "jogo": "Boca Juniors x São Paulo",
       "data_iso": "2026-09-08T21:30:00-03:00",
-      "faltam_horas": 100.8,
+      "faltam_horas": 76.8,
       "nivel": "aviso"
     },
     {
@@ -103,7 +103,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "faltam_horas": 266.3,
+      "faltam_horas": 242.3,
       "nivel": "aviso"
     },
     {
@@ -111,7 +111,7 @@
       "rodada": 0,
       "jogo": "São Paulo x Boca Juniors",
       "data_iso": "2026-09-15T21:30:00-03:00",
-      "faltam_horas": 268.8,
+      "faltam_horas": 244.8,
       "nivel": "aviso"
     },
     {
@@ -119,7 +119,7 @@
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 794.8,
+      "faltam_horas": 770.8,
       "nivel": "futuro"
     },
     {
@@ -127,15 +127,7 @@
       "rodada": 29,
       "jogo": "Vitória x Chapecoense",
       "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 795.3,
-      "nivel": "futuro"
-    },
-    {
-      "event_id": "401841257",
-      "rodada": 29,
-      "jogo": "Botafogo x Vasco da Gama",
-      "data_iso": "2026-10-07T20:30:00-03:00",
-      "faltam_horas": 795.8,
+      "faltam_horas": 771.3,
       "nivel": "futuro"
     },
     {
@@ -143,11 +135,61 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 820.8,
+      "faltam_horas": 796.8,
       "nivel": "futuro"
     }
   ],
   "preservados": [
+    {
+      "event_id": "401913073",
+      "jogo": "Santos x Atlético-MG",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841232",
+      "jogo": "Coritiba x Athletico-PR",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841231",
+      "jogo": "Atlético-MG x Fluminense",
+      "canais": [
+        "Premiere",
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841236",
+      "jogo": "Grêmio x Vasco da Gama",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841228",
+      "jogo": "Chapecoense x Internacional",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
     {
       "event_id": "401841234",
       "jogo": "Palmeiras x São Paulo",
@@ -166,6 +208,28 @@
       ]
     },
     {
+      "event_id": "401841233",
+      "jogo": "Santos x Cruzeiro",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841235",
+      "jogo": "Mirassol x Vitória",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
       "event_id": "401841230",
       "jogo": "Bahia x Remo",
       "canais": [
@@ -178,8 +242,48 @@
       ]
     },
     {
+      "event_id": "401913071",
+      "jogo": "Atlético-MG x Santos",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841176",
+      "jogo": "Botafogo x Grêmio",
+      "canais": [
+        "SporTV",
+        "Prime Video"
+      ]
+    },
+    {
       "event_id": "401841239",
       "jogo": "Atlético-MG x Chapecoense",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841245",
+      "jogo": "Mirassol x Botafogo",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841244",
+      "jogo": "Remo x Santos",
       "canais": [
         "GE TV",
         "Premiere",
@@ -215,6 +319,18 @@
       ]
     },
     {
+      "event_id": "401841240",
+      "jogo": "Corinthians x Fluminense",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
       "event_id": "401841242",
       "jogo": "Vitória x Cruzeiro",
       "canais": [
@@ -223,8 +339,83 @@
       ]
     },
     {
+      "event_id": "401841241",
+      "jogo": "Flamengo x Bragantino",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841238",
+      "jogo": "Athletico-PR x Bahia",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841253",
+      "jogo": "Bragantino x Mirassol",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841255",
+      "jogo": "Internacional x Corinthians",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
       "event_id": "401841249",
       "jogo": "Cruzeiro x São Paulo",
+      "canais": [
+        "SporTV"
+      ]
+    },
+    {
+      "event_id": "401841251",
+      "jogo": "Santos x Flamengo",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "Globo",
+        "Prime Video"
+      ]
+    },
+    {
+      "event_id": "401841256",
+      "jogo": "Athletico-PR x Atlético-MG",
+      "canais": [
+        "GE TV",
+        "Premiere",
+        "SporTV",
+        "Globo",
+        "Prime Video",
+        "Disney+ / ESPN"
+      ]
+    },
+    {
+      "event_id": "401841254",
+      "jogo": "Palmeiras x Bahia",
       "canais": [
         "SporTV"
       ]
@@ -236,9 +427,13 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [
-    "https://ge.globo.com/cartola/dicas/noticia/2026/09/04/cartola-rodada-26-esta-boa-para-defensores-e-visitantes-aponta-mapa-da-mitada.ghtml",
-    "https://ge.globo.com/gato-mestre/dicas/noticia/2026/09/03/veja-a-expectativa-de-gols-xg-e-as-dicas-de-sg-para-a-rodada-26-do-cartola-2026.ghtml",
-    "https://ge.globo.com/cartola-fc/video/viveros-artilheiro-salva-o-time-do-dandan-no-cartola-26a-rodada-do-brasileirao-pac-14918706.ghtml"
+    "https://ge.globo.com/gato-mestre/noticia/2026/09/05/palpite-ge-2026-veja-as-apostas-de-apresentadores-e-comentaristas-para-a-26a-rodada-do-brasileirao.ghtml",
+    "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/brasileirao-serie-a/noticia/2026/09/05/bragantino-x-bahia-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/pr/futebol/noticia/2026/09/05/parana-clube-x-cascavel-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/ba/futebol/times/bahia/noticia/2026/09/05/bahia-visita-o-bragantino-para-voltar-ao-g-4-depois-de-dez-rodadas-e-trajetoria-de-recuperacao.ghtml",
+    "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/05/sao-paulo-x-atletico-mg-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+    "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/05/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-26a-rodada.ghtml",
+    "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/09/05/fluminense-x-vasco-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
   ],
-  "atualizado_em": "2026-09-04T16:39:33-03:00"
+  "atualizado_em": "2026-09-05T16:40:27-03:00"
 }
