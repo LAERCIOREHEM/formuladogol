@@ -222,13 +222,22 @@ async function handleUnsubscribe(request, env) {
   const body = await readBody(request);
   const installationId = cleanId(body.installationId);
   const endpoint = String(body.endpoint || '').trim();
-  if (!installationId || !endpointIsValid(endpoint)) return json(request, { ok: false, error: 'invalid_request' }, 400);
+  if (!installationId) return json(request, { ok: false, error: 'invalid_request' }, 400);
+  if (endpoint && !endpointIsValid(endpoint)) return json(request, { ok: false, error: 'invalid_request' }, 400);
   if (!(await rateLimit(request, env, installationId, 'unsubscribe'))) return json(request, { ok: false, error: 'rate_limited' }, 429);
-  await env.DB.prepare(`UPDATE push_subscriptions SET active=0, updated_at=CURRENT_TIMESTAMP WHERE installation_id=? AND endpoint=?`)
-    .bind(installationId, endpoint).run();
-  await env.DB.prepare(`INSERT INTO push_audit (installation_id, event_type, status) VALUES (?, 'unsubscribe', 200)`)
-    .bind(installationId).run();
-  return json(request, { ok: true });
+
+  // Sem endpoint = reconciliação: o navegador desta instalação perdeu a
+  // PushSubscription, então qualquer endpoint guardado aqui está morto.
+  // O escopo é sempre a própria installation_id: nenhuma outra é afetada.
+  const result = endpoint
+    ? await env.DB.prepare(`UPDATE push_subscriptions SET active=0, updated_at=CURRENT_TIMESTAMP WHERE installation_id=? AND endpoint=?`)
+      .bind(installationId, endpoint).run()
+    : await env.DB.prepare(`UPDATE push_subscriptions SET active=0, updated_at=CURRENT_TIMESTAMP WHERE installation_id=? AND active=1`)
+      .bind(installationId).run();
+
+  await env.DB.prepare(`INSERT INTO push_audit (installation_id, event_type, status) VALUES (?, ?, 200)`)
+    .bind(installationId, endpoint ? 'unsubscribe' : 'reconcile').run();
+  return json(request, { ok: true, deactivated: Number(result?.meta?.changes || 0) });
 }
 
 async function handleGetPreferences(request, env) {
