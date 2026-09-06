@@ -130,9 +130,13 @@ try {
   assert.equal(row[12], 'Atlético-MG');
   assert.equal(row[14], 'João Pedro');
   status = await monitor.publicStatus();
+  assert.equal(status.goalReconciliationPolicyVersion, '6-R9-R1');
   assert.equal(status.goalScorerEnrichmentPolicyVersion, '6-R9');
   assert.equal(status.scorerMissingAtDispatch, 0, 'R9 não deve despachar sem autor quando CORE já o publicou');
   assert.ok(numForTest(status.scorerSources.espn_core_plays) >= 1, 'telemetria deve atribuir a autoria ao CORE');
+  assert.equal(status.goalReconciliation[eventId].scoreboardGoals, 1);
+  assert.equal(status.goalReconciliation[eventId].canonicalGoals, 1);
+  assert.equal(status.goalReconciliation[eventId].state, 'canonical_score_match');
 
   now += 10_000;
   await monitor.alarm();

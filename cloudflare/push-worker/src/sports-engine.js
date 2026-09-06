@@ -1,6 +1,7 @@
 const GOAL_CONFIRM_MS = 20_000;
 const GOAL_CONFIRM_OBSERVATIONS = 2;
 const OVERTURN_CONFIRM_OBSERVATIONS = 2;
+const GOAL_LATE_SUPPRESS_MS = 180_000;
 
 function text(value) {
   return String(value == null ? '' : value).trim();
@@ -540,6 +541,169 @@ function sameSemanticGoal(existing, incoming) {
   return true;
 }
 
+function scoreState(play) {
+  if (!credibleRegulationPlay(play)) return null;
+  const home = num(play?.homeScoreAfter, -1);
+  const away = num(play?.awayScoreAfter, -1);
+  if (home < 0 || away < 0) return null;
+  return { home, away, total: home + away, key: `${home}-${away}` };
+}
+
+function expectedTeamId(observation, side) {
+  if (side === 'home') return text(observation?.home?.id);
+  if (side === 'away') return text(observation?.away?.id);
+  return '';
+}
+
+function sourceEvidenceBonus(play) {
+  const sources = mergeSourceLists(play?.sources, [play?.sourceName, play?.athleteSource]);
+  let score = 0;
+  if (sources.includes('espn_scoreboard_details')) score += 35;
+  if (sources.includes('espn_core_plays')) score += 25;
+  if (sources.some((value) => /playbyplay/.test(value))) score += 10;
+  return score;
+}
+
+function transitionCompatibility(play, expectedSide, observation) {
+  const playSide = text(play?.side);
+  const playTeam = text(play?.teamId);
+  const teamId = expectedTeamId(observation, expectedSide);
+  let score = goalDetailScore(play) + sourceEvidenceBonus(play);
+  let contradiction = false;
+  if (playSide) {
+    if (playSide === expectedSide) score += 80;
+    else { score -= 10_000; contradiction = true; }
+  }
+  if (playTeam && teamId) {
+    if (playTeam === teamId) score += 80;
+    else { score -= 10_000; contradiction = true; }
+  }
+  return { score, contradiction };
+}
+
+function canonicalPlayForTransition(candidates, expectedSide, observation) {
+  const rows = (Array.isArray(candidates) ? candidates : []).filter(Boolean);
+  if (!rows.length) return null;
+  const ranked = rows.map((play) => ({ play, ...transitionCompatibility(play, expectedSide, observation) }))
+    .sort((a, b) => b.score - a.score || num(a.play?.order, 0) - num(b.play?.order, 0));
+  const compatible = ranked.filter((row) => !row.contradiction);
+  const selectedRows = compatible.length ? compatible : ranked.slice(0, 1);
+  let selected = { ...selectedRows[0].play };
+  for (const row of selectedRows.slice(1)) selected = mergeGoalDetails(selected, row.play);
+
+  const teamId = expectedTeamId(observation, expectedSide);
+  const selectedCompatibility = transitionCompatibility(selected, expectedSide, observation);
+  selected.canonicalQuality = selectedCompatibility.score;
+  selected.side = expectedSide;
+  if (teamId) selected.teamId = teamId;
+  selected.canonicalScoreEvidence = true;
+  selected.canonicalSourceConflict = selectedCompatibility.contradiction;
+
+  // Se todas as variantes contradizem matematicamente o lado que marcou, a
+  // identidade do placar continua útil para confirmar o gol, mas a autoria é
+  // insegura. Preferimos um gol sem nome a atribuir o jogador ao time errado.
+  if (selectedCompatibility.contradiction) {
+    selected.athleteId = '';
+    selected.athleteName = '';
+    selected.athleteStructured = false;
+    selected.athleteSource = '';
+  }
+  return selected;
+}
+
+/**
+ * R9-R1: transforma variantes ESPN em uma sequência canônica compatível com
+ * o placar corrente. Um feed pode manter um gol anulado/duplicado e entregar
+ * quatro linhas para um placar 0x3; isso não pode invalidar os três gols reais.
+ *
+ * A reconciliação procura um caminho 0x0 -> placar atual com exatamente uma
+ * transição de gol por passo. Variantes excedentes, estados acima do placar e
+ * estados incompatíveis ficam fora da sequência usada para confirmação.
+ */
+export function reconcileScoringPlays(scoringPlays, observation) {
+  const raw = (Array.isArray(scoringPlays) ? scoringPlays : []).filter((play) => !play?.shootout && credibleRegulationPlay(play));
+  const targetHome = num(observation?.home?.score, 0);
+  const targetAway = num(observation?.away?.score, 0);
+  const targetTotal = targetHome + targetAway;
+  if (targetTotal <= 0) {
+    return {
+      plays: [], rawGoalVariants: raw.length, canonicalGoals: 0, scoreboardGoals: 0,
+      discardedGoalVariants: raw.length, state: raw.length ? 'scoreboard_zero_discards_raw' : 'canonical_zero'
+    };
+  }
+
+  const withinScore = raw.filter((play) => {
+    const state = scoreState(play);
+    return state && state.total >= 1 && state.total <= targetTotal
+      && state.home <= targetHome && state.away <= targetAway;
+  });
+  const groups = new Map();
+  for (const play of withinScore) {
+    const state = scoreState(play);
+    if (!groups.has(state.key)) groups.set(state.key, []);
+    groups.get(state.key).push(play);
+  }
+
+  let paths = new Map([['0-0', { home: 0, away: 0, quality: 0, plays: [] }]]);
+  for (let total = 1; total <= targetTotal; total += 1) {
+    const next = new Map();
+    for (const [stateKey, candidates] of groups.entries()) {
+      const [home, away] = stateKey.split('-').map(Number);
+      if (home + away !== total) continue;
+      const parents = [];
+      if (home > 0) parents.push({ key: `${home - 1}-${away}`, side: 'home' });
+      if (away > 0) parents.push({ key: `${home}-${away - 1}`, side: 'away' });
+      for (const parentSpec of parents) {
+        const parent = paths.get(parentSpec.key);
+        if (!parent) continue;
+        const play = canonicalPlayForTransition(candidates, parentSpec.side, observation);
+        if (!play) continue;
+        const quality = parent.quality + num(play.canonicalQuality, transitionCompatibility(play, parentSpec.side, observation).score);
+        const current = next.get(stateKey);
+        if (!current || quality > current.quality) {
+          next.set(stateKey, { home, away, quality, plays: [...parent.plays, play] });
+        }
+      }
+    }
+    paths = next;
+    if (!paths.size) break;
+  }
+
+  const exact = paths.get(`${targetHome}-${targetAway}`);
+  if (exact && exact.plays.length === targetTotal) {
+    const plays = exact.plays.map((play, index) => ({ ...play, canonicalOrdinal: index + 1, canonicalScoreEvidence: true }));
+    return {
+      plays,
+      rawGoalVariants: raw.length,
+      canonicalGoals: plays.length,
+      scoreboardGoals: targetTotal,
+      discardedGoalVariants: Math.max(0, raw.length - plays.length),
+      state: 'canonical_score_match'
+    };
+  }
+
+  // Fallback conservador: quando não existe caminho completo, preserva apenas
+  // ordinais sem conflito de placar. Eles podem enriquecer estado/fallback, mas
+  // não transformam um resumo inconsistente em "exato".
+  const partial = [];
+  for (let total = 1; total <= targetTotal; total += 1) {
+    const states = [...groups.entries()].filter(([key]) => key.split('-').map(Number).reduce((a, b) => a + b, 0) === total);
+    if (states.length !== 1) continue;
+    const [, candidates] = states[0];
+    const best = [...candidates].sort((a, b) => goalDetailScore(b) + sourceEvidenceBonus(b) - goalDetailScore(a) - sourceEvidenceBonus(a))[0];
+    if (best) partial.push({ ...best, canonicalScoreEvidence: false, canonicalOrdinal: total });
+  }
+  partial.sort((a, b) => num(a?.canonicalOrdinal, 0) - num(b?.canonicalOrdinal, 0));
+  return {
+    plays: partial,
+    rawGoalVariants: raw.length,
+    canonicalGoals: partial.length,
+    scoreboardGoals: targetTotal,
+    discardedGoalVariants: Math.max(0, raw.length - partial.length),
+    state: partial.length ? 'partial_score_evidence' : raw.length ? 'raw_incompatible_with_score' : 'no_score_evidence'
+  };
+}
+
 function representedScoreFromPlays(match) {
   let home = 0;
   let away = 0;
@@ -783,7 +947,8 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   // R7: uma descrição textual de "goal" sem equipe/placar não é suficiente para
   // criar identidade de gol. Ela pode chegar antes do scoreboard e foi a origem do
   // falso "GOL DO TIME · 0×0" no teste Udinese × Venezia.
-  const regulation = hasSummary ? rawRegulation.filter(credibleRegulationPlay) : null;
+  const reconciliation = hasSummary ? reconcileScoringPlays(rawRegulation, observation) : null;
+  const regulation = hasSummary ? reconciliation.plays : null;
 
   match.eventId = text(observation.eventId || match.eventId);
   match.league = text(observation.league || match.league);
@@ -854,7 +1019,8 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   }
 
   const observedKeys = new Set();
-  const summaryConsistent = hasSummary && summaryExactlyMatchesScore(regulation, observation);
+  const summaryConsistent = hasSummary && reconciliation?.state === 'canonical_score_match'
+    && summaryExactlyMatchesScore(regulation, observation);
 
   // R7: limpa pendências legadas sem identidade de placar. Nunca gera correção/push;
   // apenas impede que um "goal" incompleto antigo concorra com o fallback correto.
@@ -959,13 +1125,22 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     }
     const age = now - num(play.firstSeenAt, now);
     const canConfirmFromSummary = summaryConsistent;
-    const canConfirmFromStableScore = play.scoreFallback === true && scoreStillContainsPlay(play, observation);
+    const canConfirmFromStableScore = (play.scoreFallback === true || play.canonicalScoreEvidence === true)
+      && scoreStillContainsPlay(play, observation);
     if ((canConfirmFromSummary || canConfirmFromStableScore)
         && num(play.stableCount, 1) >= GOAL_CONFIRM_OBSERVATIONS
         && age >= GOAL_CONFIRM_MS) {
       play.status = 'confirmed';
       play.confirmedAt = now;
-      emitted.push(emittedEvent('goal', play, match, observation, now));
+      // Não cria backlog de gols antigos após deploy/outage. O estado é curado
+      // para que os próximos gols sejam detectados normalmente, mas uma pendência
+      // com mais de 3 minutos não reaparece como notificação retroativa.
+      if (age > GOAL_LATE_SUPPRESS_MS) {
+        play.lateSuppressedAt = now;
+        play.lateSuppressedReason = 'r9r1_stale_pending';
+      } else {
+        emitted.push(emittedEvent('goal', play, match, observation, now));
+      }
     }
   }
 
@@ -973,7 +1148,9 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   return {
     match,
     emitted,
-    diagnostic: summaryConsistent ? 'summary_consistent' : fallbackPending || emitted.some((event) => event.type === 'goal') ? 'scoreboard_fallback' : hasSummary ? 'summary_inconsistent' : 'scoreboard_only'
+    diagnostic: summaryConsistent ? 'summary_consistent'
+      : fallbackPending || emitted.some((event) => event.type === 'goal') ? 'scoreboard_fallback'
+        : hasSummary ? `summary_${text(reconciliation?.state || 'inconsistent')}` : 'scoreboard_only'
   };
 }
 
@@ -1006,6 +1183,7 @@ export function summarizeMatch(match) {
     pendingGoals: plays.filter((p) => p.status === 'pending').length,
     confirmedGoals: plays.filter((p) => p.status === 'confirmed').length,
     overturnedGoals: plays.filter((p) => p.status === 'overturned').length,
+    lateSuppressedGoals: plays.filter((p) => num(p?.lateSuppressedAt, 0) > 0).length,
     lastObservedAt: match?.lastObservedAt || 0,
     lastSummaryAt: match?.lastSummaryAt || 0
   };
@@ -1015,8 +1193,9 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   GOAL_CONFIRM_MS,
   GOAL_CONFIRM_OBSERVATIONS,
   OVERTURN_CONFIRM_OBSERVATIONS,
+  GOAL_LATE_SUPPRESS_MS,
   OVERTURN_POLICY_VERSION: '6-R4',
   GOAL_DETECTION_POLICY_VERSION: '6-R8',
-  GOAL_RECONCILIATION_POLICY_VERSION: '6-R8',
+  GOAL_RECONCILIATION_POLICY_VERSION: '6-R9-R1',
   GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R9'
 });

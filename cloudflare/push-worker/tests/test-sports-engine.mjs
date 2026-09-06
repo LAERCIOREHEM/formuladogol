@@ -6,6 +6,7 @@ import {
   mergeScoringPlayVariants,
   needsSummary,
   normalizeScoreboardEvent,
+  reconcileScoringPlays,
   scorerCoverage,
   unresolvedScorersForTransition,
   SPORTS_ENGINE_CONSTANTS
@@ -223,6 +224,79 @@ const r9TwoMerged = mergeScoringPlayVariants([
 assert.equal(r9TwoMerged.length, 2);
 assert.deepEqual(r9TwoMerged.map((play) => play.athleteName), ['João Pedro', 'Lucas Lima']);
 assert.equal(scorerCoverage(r9TwoMerged, r9TwoObs).missingScorers, 0);
+
+// R9-R1: regressão do caso real Internacional 0x3 Santos. A fusão multi-fonte
+// pode carregar uma quarta variante (gol anulado/duplicado) mesmo com o placar
+// oficial em 0x3. Essa sobra não pode travar os três gols válidos em pending.
+const r9r1Zero = normalizeScoreboardEvent(rawScore(0, 0, "2'"), game.league, game);
+let r9r1State = applyObservation(initialMatchState(r9r1Zero), r9r1Zero, null, t0).match;
+const r9r1Three = normalizeScoreboardEvent(rawScore(0, 3, "45'+4'"), game.league, game);
+const r9r1Raw = extractScoringPlays({ scoringPlays: [
+  { id: 'san-1', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 's1', displayName: 'Guilherme Santos' }], clock: { displayValue: "8'" }, homeScore: 0, awayScore: 1, text: 'Goal', type: { text: 'Goal' } },
+  { id: 'san-2', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 's2', displayName: 'Neymar Junior' }], clock: { displayValue: "21'" }, homeScore: 0, awayScore: 2, text: 'Goal', type: { text: 'Goal' } },
+  { id: 'san-3', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 's3', displayName: 'Álvaro Barreal' }], clock: { displayValue: "39'" }, homeScore: 0, awayScore: 3, text: 'Goal', type: { text: 'Goal' } },
+  // Variante excedente que uma superfície ESPN ainda pode manter após VAR.
+  { id: 'san-var-extra', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 'sx', displayName: 'Jogador Fantasma' }], clock: { displayValue: "41'" }, homeScore: 0, awayScore: 4, text: 'Goal overturned after VAR', type: { text: 'Goal' } }
+] }, r9r1Three, 'espn_core_plays');
+const r9r1Recon = reconcileScoringPlays(r9r1Raw, r9r1Three);
+assert.equal(r9r1Recon.rawGoalVariants, 4);
+assert.equal(r9r1Recon.scoreboardGoals, 3);
+assert.equal(r9r1Recon.canonicalGoals, 3);
+assert.equal(r9r1Recon.discardedGoalVariants, 1);
+assert.equal(r9r1Recon.state, 'canonical_score_match');
+assert.deepEqual(r9r1Recon.plays.map((play) => [play.homeScoreAfter, play.awayScoreAfter]), [[0, 1], [0, 2], [0, 3]]);
+assert.deepEqual(r9r1Recon.plays.map((play) => play.athleteName), ['Guilherme Santos', 'Neymar', 'Álvaro Barreal']);
+
+let r9r1Step = applyObservation(r9r1State, r9r1Three, r9r1Raw, t0 + 5_000);
+r9r1State = r9r1Step.match;
+assert.equal(r9r1Step.emitted.length, 0);
+assert.equal(Object.values(r9r1State.plays).filter((play) => play.status === 'pending').length, 3, 'somente os três gols canônicos entram em pending');
+assert.equal(Object.values(r9r1State.plays).some((play) => play.homeScoreAfter === 0 && play.awayScoreAfter === 4), false, 'variante 0x4 excedente não entra no estado');
+const r9r1PersistedR9State = structuredClone(r9r1State);
+r9r1PersistedR9State.plays[`${game.eventId}:san-1`].status = 'confirmed';
+r9r1PersistedR9State.plays[`${game.eventId}:san-1`].confirmedAt = t0 + 6_000;
+r9r1PersistedR9State.plays[`${game.eventId}:san-2`].stableCount = 4;
+r9r1PersistedR9State.plays[`${game.eventId}:san-3`].stableCount = 4;
+r9r1PersistedR9State.plays[`${game.eventId}:legacy-extra`] = {
+  key: `${game.eventId}:legacy-extra`, sourceId: 'legacy-extra', teamId: '2022', side: 'away',
+  athleteId: 'sx', athleteName: 'Jogador Fantasma', minute: "41'", shootout: false,
+  homeScoreAfter: 0, awayScoreAfter: 4, status: 'pending', firstSeenAt: t0 + 5_000, stableCount: 4, missingCount: 0
+};
+const r9r1Healed = applyObservation(r9r1PersistedR9State, r9r1Three, r9r1Raw, t0 + 31_000);
+assert.equal(r9r1Healed.emitted.filter((event) => event.type === 'goal').length, 2, 'deploy R9-R1 deve destravar somente os dois gols válidos que estavam pending');
+assert.deepEqual(r9r1Healed.emitted.map((event) => event.scoreAfter.away), [2, 3]);
+assert.equal(r9r1Healed.match.plays[`${game.eventId}:san-1`].status, 'confirmed', 'gol já confirmado não pode duplicar');
+assert.equal(r9r1Healed.match.plays[`${game.eventId}:legacy-extra`].status, 'rejected', 'variante excedente legada deve ser descartada');
+
+// Se o deploy ocorrer muito depois, cura o estado mas NÃO cria backlog de gols.
+const r9r1StaleState = structuredClone(r9r1PersistedR9State);
+const r9r1Stale = applyObservation(r9r1StaleState, r9r1Three, r9r1Raw, t0 + 5 * 60_000);
+assert.equal(r9r1Stale.emitted.filter((event) => event.type === 'goal').length, 0, 'gols antigos não podem reaparecer como push retroativo');
+assert.equal(Object.values(r9r1Stale.match.plays).filter((play) => play.status === 'confirmed').length, 3, 'estado antigo deve ser curado silenciosamente');
+assert.equal(Object.values(r9r1Stale.match.plays).filter((play) => play.lateSuppressedAt > 0).length, 2, 'somente as pendências antigas ficam marcadas como suprimidas');
+r9r1State = applyObservation(r9r1State, r9r1Three, r9r1Raw, t0 + 15_000).match;
+r9r1Step = applyObservation(r9r1State, r9r1Three, r9r1Raw, t0 + 26_000);
+r9r1State = r9r1Step.match;
+assert.equal(r9r1Step.emitted.filter((event) => event.type === 'goal').length, 3, '0x3 oficial deve confirmar os três gols apesar da quarta variante bruta');
+assert.equal(Object.values(r9r1State.plays).filter((play) => play.status === 'confirmed').length, 3);
+assert.equal(Object.values(r9r1State.plays).filter((play) => play.status === 'pending').length, 0);
+assert.deepEqual(r9r1Step.emitted.map((event) => event.athlete.name), ['Guilherme Santos', 'Neymar', 'Álvaro Barreal']);
+
+// Variante duplicada com o mesmo placar, mas time conflitante: o caminho do
+// placar determina matematicamente quem marcou e a evidência compatível vence.
+const r9r1ConflictRaw = extractScoringPlays({ scoringPlays: [
+  { id: 'c1', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 'p3', displayName: 'Lucas Lima' }], clock: { displayValue: "10'" }, homeScore: 0, awayScore: 1, text: 'Goal', type: { text: 'Goal' } },
+  { id: 'c2-wrong', scoringPlay: true, team: { id: '7632' }, athletesInvolved: [{ id: 'p1', displayName: 'João Pedro da Silva' }], clock: { displayValue: "20'" }, homeScore: 0, awayScore: 2, text: 'Goal', type: { text: 'Goal' } },
+  { id: 'c2-right', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 'p2', displayName: 'Carlos Souza Junior' }], clock: { displayValue: "20'" }, homeScore: 0, awayScore: 2, text: 'Goal', type: { text: 'Goal' } },
+  { id: 'c3', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 'p3', displayName: 'Lucas Lima' }], clock: { displayValue: "30'" }, homeScore: 0, awayScore: 3, text: 'Goal', type: { text: 'Goal' } }
+] }, r9r1Three, 'espn_scoreboard_details');
+const r9r1Conflict = reconcileScoringPlays(r9r1ConflictRaw, r9r1Three);
+assert.equal(r9r1Conflict.state, 'canonical_score_match');
+assert.equal(r9r1Conflict.canonicalGoals, 3);
+assert.equal(r9r1Conflict.plays[1].side, 'away');
+assert.equal(r9r1Conflict.plays[1].teamId, '2022');
+assert.equal(r9r1Conflict.plays[1].athleteName, 'Carlos Souza');
+
 const enrichZero = normalizeScoreboardEvent(rawScore(0, 0, "2'"), game.league, game);
 let enrichState = applyObservation(initialMatchState(enrichZero), enrichZero, null, t0).match;
 const enrichOne = normalizeScoreboardEvent(rawScore(0, 1, "5'"), game.league, game);
@@ -344,9 +418,10 @@ const agenda = { jogos: [
 ] };
 assert.deepEqual(selectAgendaCandidates(agenda, Date.parse('2026-09-01T23:50:00Z')).map((x) => x.eventId), [game.eventId]);
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_CONFIRM_MS, 20_000);
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_LATE_SUPPRESS_MS, 180_000);
 assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R4');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION, '6-R8');
-assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R8');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R9-R1');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION, '6-R9');
 
 // ESPN às vezes publica state=post sem completed; relógio ao vivo não pode virar final fantasma.

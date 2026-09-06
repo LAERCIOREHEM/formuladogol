@@ -6,6 +6,7 @@ import {
   mergeScoringPlayVariants,
   needsSummary,
   normalizeScoreboardEvent,
+  reconcileScoringPlays,
   scorerCoverage,
   summarizeMatch,
   unresolvedScorersForTransition,
@@ -653,6 +654,7 @@ export class SportsMonitor {
     const sourceAttempts = {};
     const summarySources = {};
     const summaryGoalCounts = {};
+    const goalReconciliation = {};
     const scorerSourcesThisPoll = {};
     let scorerEnrichmentAttemptsThisPoll = 0;
     let scorerEnrichmentResolvedThisPoll = 0;
@@ -786,6 +788,18 @@ export class SportsMonitor {
           sourceErrors.push(`${game.league}/${game.eventId}/summary: ${text(error?.message || error)}`);
         }
       }
+
+      // R9-R1: telemetria canônica separa "quantas variantes ESPN chegaram"
+      // de "quantos gols são compatíveis com o placar". Isso torna explícito o
+      // caso real Inter 0x3 Santos em que havia 4 linhas brutas para 3 gols.
+      const reconciliation = reconcileScoringPlays(plays || [], observation);
+      goalReconciliation[game.eventId] = {
+        scoreboardGoals: reconciliation.scoreboardGoals,
+        rawGoalVariants: reconciliation.rawGoalVariants,
+        canonicalGoals: reconciliation.canonicalGoals,
+        discardedGoalVariants: reconciliation.discardedGoalVariants,
+        state: reconciliation.state
+      };
       const result = applyObservation(previous, observation, plays, startedAt);
       for (const event of result.emitted) {
         if (event?.type === 'goal') {
@@ -823,6 +837,7 @@ export class SportsMonitor {
       scoreboardSelectedSources,
       summarySources,
       summaryGoalCounts,
+      goalReconciliation,
       sourceAttempts,
       scorerEnrichmentAttempts: num(snapshot.status.scorerEnrichmentAttempts, 0) + scorerEnrichmentAttemptsThisPoll,
       scorerEnrichmentResolved: num(snapshot.status.scorerEnrichmentResolved, 0) + scorerEnrichmentResolvedThisPoll,
@@ -877,6 +892,7 @@ export class SportsMonitor {
       scoreboardSelectedSources: snapshot.status.scoreboardSelectedSources && typeof snapshot.status.scoreboardSelectedSources === 'object' ? snapshot.status.scoreboardSelectedSources : {},
       summarySources: snapshot.status.summarySources && typeof snapshot.status.summarySources === 'object' ? snapshot.status.summarySources : {},
       summaryGoalCounts: snapshot.status.summaryGoalCounts && typeof snapshot.status.summaryGoalCounts === 'object' ? snapshot.status.summaryGoalCounts : {},
+      goalReconciliation: snapshot.status.goalReconciliation && typeof snapshot.status.goalReconciliation === 'object' ? snapshot.status.goalReconciliation : {},
       sourceAttempts: snapshot.status.sourceAttempts && typeof snapshot.status.sourceAttempts === 'object' ? snapshot.status.sourceAttempts : {},
       scorerEnrichmentAttempts: num(snapshot.status.scorerEnrichmentAttempts, 0),
       scorerEnrichmentResolved: num(snapshot.status.scorerEnrichmentResolved, 0),
