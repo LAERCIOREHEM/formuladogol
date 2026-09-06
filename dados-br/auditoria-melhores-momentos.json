@@ -1,22 +1,46 @@
 {
-  "atualizado_em": "2026-09-06T18:26:57-03:00",
+  "atualizado_em": "2026-09-06T18:52:27-03:00",
   "fonte": "GE TV / YouTube",
   "modo": "incremental",
   "rodadas_processadas": {
-    "inicio": 26,
+    "inicio": 23,
     "fim": 26
   },
-  "youtube_requests": 12,
+  "youtube_requests": 15,
   "resumo": {
-    "playlists_encontradas": 1,
-    "videos_lidos": 9,
-    "jogos_processados": 1,
-    "jogos_vinculados_nesta_execucao": 1,
-    "jogos_vinculados_total": 207,
-    "candidatos_duvidosos": 0,
-    "jogos_sem_video": 0
+    "playlists_encontradas": 4,
+    "videos_lidos": 39,
+    "jogos_processados": 37,
+    "jogos_vinculados_nesta_execucao": 34,
+    "jogos_vinculados_total": 209,
+    "candidatos_duvidosos": 3,
+    "jogos_sem_video": 3
   },
   "playlists": [
+    {
+      "playlist_id": "PLI2X_HV4VqoY",
+      "titulo": "23ª rodada do Brasileirão 2026",
+      "rodada": 23,
+      "published_at": "2026-08-17T01:09:00.917466599Z",
+      "item_count": 10,
+      "url": "https://www.youtube.com/playlist?list=PLI2X_HV4VqoY"
+    },
+    {
+      "playlist_id": "PLOojXWaL6JH0",
+      "titulo": "24ª rodada do Brasileirão 2026",
+      "rodada": 24,
+      "published_at": "2026-08-17T01:09:07.863956387Z",
+      "item_count": 11,
+      "url": "https://www.youtube.com/playlist?list=PLOojXWaL6JH0"
+    },
+    {
+      "playlist_id": "PLJmANmncYejE",
+      "titulo": "25ª rodada do Brasileirão 2026",
+      "rodada": 25,
+      "published_at": "2026-08-17T01:09:14.734231088Z",
+      "item_count": 9,
+      "url": "https://www.youtube.com/playlist?list=PLJmANmncYejE"
+    },
     {
       "playlist_id": "PLSsHnfgq7BVs",
       "titulo": "26ª rodada do Brasileirão 2026",
@@ -26,6 +50,91 @@
       "url": "https://www.youtube.com/playlist?list=PLSsHnfgq7BVs"
     }
   ],
-  "candidatos_duvidosos": [],
-  "jogos_sem_video": []
+  "candidatos_duvidosos": [
+    {
+      "event_id": "401841216",
+      "chave": "401841216",
+      "rodada": 25,
+      "mandante": "Atlético-MG",
+      "visitante": "Vitória",
+      "placar_mandante": 2,
+      "placar_visitante": 1,
+      "video_id": "944Wf6ml_Ik",
+      "titulo": "SÃO PAULO 2 X 1 BRAGANTINO | MELHORES MOMENTOS | 25ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+      "url": "https://www.youtube.com/watch?v=944Wf6ml_Ik",
+      "thumbnail": "https://i.ytimg.com/vi/944Wf6ml_Ik/maxresdefault.jpg",
+      "playlist_id": "PLJmANmncYejE",
+      "published_at": "2026-08-30T01:18:40Z",
+      "fonte": "GE TV / YouTube",
+      "confianca": 0.46,
+      "motivos": [
+        "rodada da playlist confere",
+        "título compatível com melhores momentos",
+        "placar confere"
+      ]
+    },
+    {
+      "event_id": "401841214",
+      "chave": "401841214",
+      "rodada": 25,
+      "mandante": "Corinthians",
+      "visitante": "Santos",
+      "placar_mandante": 0,
+      "placar_visitante": 1,
+      "video_id": "gKBVcygj6kQ",
+      "titulo": "REMO 2 X 3 CORITIBA | MELHORES MOMENTOS | 25ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+      "url": "https://www.youtube.com/watch?v=gKBVcygj6kQ",
+      "thumbnail": "https://i.ytimg.com/vi/gKBVcygj6kQ/maxresdefault.jpg",
+      "playlist_id": "PLJmANmncYejE",
+      "published_at": "2026-09-01T01:12:08Z",
+      "fonte": "GE TV / YouTube",
+      "confianca": 0.38,
+      "motivos": [
+        "rodada da playlist confere",
+        "título compatível com melhores momentos"
+      ]
+    },
+    {
+      "event_id": "401841224",
+      "chave": "401841224",
+      "rodada": 26,
+      "mandante": "Bragantino",
+      "visitante": "Bahia",
+      "placar_mandante": 2,
+      "placar_visitante": 3,
+      "video_id": "vpweBaulap8",
+      "titulo": "INTERNACIONAL 2 X 3 SANTOS | MELHORES MOMENTOS | 26ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+      "url": "https://www.youtube.com/watch?v=vpweBaulap8",
+      "thumbnail": "https://i.ytimg.com/vi/vpweBaulap8/maxresdefault.jpg",
+      "playlist_id": "PLSsHnfgq7BVs",
+      "published_at": "2026-09-06T21:26:40Z",
+      "fonte": "GE TV / YouTube",
+      "confianca": 0.46,
+      "motivos": [
+        "rodada da playlist confere",
+        "título compatível com melhores momentos",
+        "placar confere"
+      ]
+    }
+  ],
+  "jogos_sem_video": [
+    {
+      "event_id": "401841216",
+      "rodada": 25,
+      "mandante": "Atlético-MG",
+      "visitante": "Vitória"
+    },
+    {
+      "event_id": "401841214",
+      "rodada": 25,
+      "mandante": "Corinthians",
+      "visitante": "Santos"
+    },
+    {
+      "event_id": "401841224",
+      "rodada": 26,
+      "mandante": "Bragantino",
+      "visitante": "Bahia"
+    }
+  ]
 }
