@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-05",
-  "executado_em": "2026-09-05T11:00:21-03:00",
+  "data_brt": "2026-09-06",
+  "executado_em": "2026-09-06T11:23:56-03:00",
   "status": "atencao",
-  "resumo": "Dados finais íntegros, sem incidentes críticos. Permanecem duas pendências de transmissão para jogos futuros em 08/09/2026; a busca encontrou programação compatível por data e horário, mas o dossiê não informa mandante e visitante e a fonte não declara os event_id, impedindo associação inequívoca para correção automática.",
+  "resumo": "Auditoria concluída sem correções automáticas. As duas pendências críticas de transmissão permanecem sem complementação, pois não foi localizada fonte permitida que declarasse diretamente os canais de exibição para os event_id informados.",
   "triagem": {
-    "data_hora_brt": "2026-09-05T11:00:21-03:00",
+    "data_hora_brt": "2026-09-06T11:23:56-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
@@ -19,10 +19,10 @@
         "detalhes_inconsistencias": 0,
         "detalhes_falhas": 0,
         "jogos_sem_estatisticas": 0,
-        "transmissoes_criticas": 0,
+        "transmissoes_criticas": 2,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 5.8
+        "ultimo_sucesso_horas": 6.2
       }
     },
     "pendencias": {
@@ -34,8 +34,8 @@
           "data_iso": "2026-09-08T19:00:00-03:00",
           "mandante": "",
           "visitante": "",
-          "nivel": "aviso",
-          "horas_ate_jogo": 80.0
+          "nivel": "critico",
+          "horas_ate_jogo": 55.6
         },
         {
           "event_id": "401912542",
@@ -43,8 +43,8 @@
           "data_iso": "2026-09-08T21:30:00-03:00",
           "mandante": "",
           "visitante": "",
-          "nivel": "aviso",
-          "horas_ate_jogo": 82.5
+          "nivel": "critico",
+          "horas_ate_jogo": 58.1
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -78,48 +78,34 @@
       {
         "type": "search",
         "queries": [
-          "401913960 OR 401912542 transmissão 8 setembro 2026 futebol"
+          "\"401913960\" OR \"401912542\" transmissão 8 setembro 2026 futebol"
         ]
       }
     ],
-    "fontes_web": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/08/08/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-22a-rodada.ghtml",
-      "https://ge.globo.com/futebol-americano/nfl/noticia/2026/08/19/sportv-e-ge-tv-transmitem-com-exclusividade-o-primeiro-jogo-da-historia-da-nfl-no-maracana.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/08/14/cbf-divulga-tabela-detalhada-das-rodadas-25-e-26-da-serie-a-do-brasileirao.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/programas/segue-o-jogo",
-      "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/flamengo-x-corinthians/832151",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/fortaleza-saf-x-avai/833146",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-25-e-26-do-brasileirao-betano",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/com-grandes-jogos-26-rodada-do-brasileirao-movimentara-fim-de-semana",
-      "https://www.itatiaia.com.br/esportes/agenda",
-      "https://www.itatiaia.com.br/esportes/futebol/futebol-internacional/copa-sul-americana/copa-sul-americana-datas-horarios-e-onde-assistir-os-confrontos-das-quartas-de-final"
-    ]
+    "fontes_web": []
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Dados finais íntegros, sem incidentes críticos. Permanecem duas pendências de transmissão para jogos futuros em 08/09/2026; a busca encontrou programação compatível por data e horário, mas o dossiê não informa mandante e visitante e a fonte não declara os event_id, impedindo associação inequívoca para correção automática.",
+    "resumo": "Auditoria concluída sem correções automáticas. As duas pendências críticas de transmissão permanecem sem complementação, pois não foi localizada fonte permitida que declarasse diretamente os canais de exibição para os event_id informados.",
     "problemas": [
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Não foi possível vincular inequivocamente canais aos event_id 401913960 e 401912542: há fonte com partidas e transmissões nos mesmos horários, porém sem identificação dos event_id e sem equipes no dossiê.",
+        "mensagem": "Pendência elegível para complementação, mas sem evidência inequívoca em fonte permitida que declare diretamente os canais de transmissão. Nenhum dado existente foi sobrescrito.",
         "event_id": "401913960",
         "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Não foi possível vincular inequivocamente canais aos event_id 401913960 e 401912542: há fonte com partidas e transmissões nos mesmos horários, porém sem identificação dos event_id e sem equipes no dossiê.",
+        "mensagem": "Pendência elegível para complementação, mas sem evidência inequívoca em fonte permitida que declare diretamente os canais de transmissão. Nenhum dado existente foi sobrescrito.",
         "event_id": "401912542",
         "requer_intervencao": true
       },
       {
         "categoria": "fonte",
         "severidade": "info",
-        "mensagem": "As três falhas isoladas de fontes de transmissão não configuram incidente crítico, pois não houve perda crítica de cobertura nem inconsistência nos dados finais.",
+        "mensagem": "As falhas isoladas de fontes de transmissão não foram classificadas como incidente crítico, pois o dossiê não indica perda crítica de cobertura nem inconsistência nos dados finais.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -518,6 +504,19 @@
       "executado_em": "2026-09-05T11:00:21-03:00",
       "status": "atencao",
       "resumo": "Dados finais íntegros, sem incidentes críticos. Permanecem duas pendências de transmissão para jogos futuros em 08/09/2026; a busca encontrou programação compatível por data e horário, mas o dossiê não informa mandante e visitante e a fonte não declara os event_id, impedindo associação inequívoca para correção automática.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-06",
+      "executado_em": "2026-09-06T11:23:56-03:00",
+      "status": "atencao",
+      "resumo": "Auditoria concluída sem correções automáticas. As duas pendências críticas de transmissão permanecem sem complementação, pois não foi localizada fonte permitida que declarasse diretamente os canais de exibição para os event_id informados.",
       "chamadas_openai": 1,
       "web_searches": 1,
       "publicos_aplicados": 0,
