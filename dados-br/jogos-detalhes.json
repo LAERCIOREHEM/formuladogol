@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-06T18:11:18.504819-03:00",
+  "gerado_em": "2026-09-06T19:33:22.854172-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 253,
   "total_com_estatisticas": 253,
-  "total_com_publico": 250,
+  "total_com_publico": 252,
   "total_com_eventos": 253,
   "total_com_jogadores": 253,
   "total_eventos_validados": 253,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 3,
       "estadio": "Estadio Beira-Rio",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 23748,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/06/santos-afunda-inter-com-redencao-de-gabigol-e-se-afasta-de-vez-da-zona-de-queda-no-brasileirao.htm",
       "arbitro": "Alex Gomes Stefano",
       "stats": [
         {
@@ -612,7 +612,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-06T18:11:15.667539-03:00"
+      "atualizado_em": "2026-09-06T18:11:15.667539-03:00",
+      "renda": 1115794.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841225": {
       "event_id": "401841225",
@@ -1184,9 +1186,9 @@
       "placar_mandante": 3,
       "placar_visitante": 1,
       "estadio": "Estadio Mineirão",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 26320,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gazetaesportiva.com/todas-as-noticias/cruzeiro-vence-e-encerra-serie-de-10-rodadas-sem-derrota-do-athletico-pr",
       "arbitro": "Daiane Caroline Muniz Dos Santos",
       "stats": [
         {
@@ -1748,7 +1750,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-06T18:11:16.537679-03:00"
+      "atualizado_em": "2026-09-06T18:11:16.537679-03:00",
+      "renda": 1055965,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841219": {
       "event_id": "401841219",
@@ -142536,5 +142540,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 241,
+  "total_com_renda": 252
 }
