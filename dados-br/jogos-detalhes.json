@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-05T23:11:05.789389-03:00",
+  "gerado_em": "2026-09-06T00:20:04.520768-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 249,
   "total_com_estatisticas": 249,
-  "total_com_publico": 248,
+  "total_com_publico": 249,
   "total_com_eventos": 249,
   "total_com_jogadores": 249,
   "total_eventos_validados": 249,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estadio do Maracana",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 38750,
+      "publico_tipo": "total",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/05/fluminense-se-vinga-de-eliminacao-na-copa-do-brasil-segue-no-g-4-e-afunda-o-vasco-no-z-4.htm",
       "arbitro": "Davi De Oliveira Lacerda",
       "stats": [
         {
@@ -574,7 +574,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-05T23:11:04.918853-03:00"
+      "atualizado_em": "2026-09-05T23:11:04.918853-03:00",
+      "renda": 2887181,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841226": {
       "event_id": "401841226",
@@ -140213,5 +140215,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 240,
+  "total_com_renda": 249
 }
