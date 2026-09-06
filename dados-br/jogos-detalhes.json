@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-06T13:11:19.720886-03:00",
+  "gerado_em": "2026-09-06T14:20:12.041273-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 250,
   "total_com_estatisticas": 250,
-  "total_com_publico": 249,
+  "total_com_publico": 250,
   "total_com_eventos": 250,
   "total_com_jogadores": 250,
   "total_eventos_validados": 250,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 2,
       "estadio": "Couto Pereira",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 26209,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://terra.com.br/esportes/coritiba/mirassol-vira-contra-o-coritiba-desencanta-apos-5-jogos-no-brasileirao-e-se-mantem-fora-do-z-4%2C35a9f779e2f28a027773cd6729aeeaa84xouytqb.html",
       "arbitro": "André Luis Skettino Policarpo Bento",
       "stats": [
         {
@@ -586,7 +586,10 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-06T13:11:18.349614-03:00"
+      "atualizado_em": "2026-09-06T13:11:18.349614-03:00",
+      "publico_pagante": 26100,
+      "renda": 804278.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841227": {
       "event_id": "401841227",
@@ -140793,5 +140796,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 241,
+  "total_com_renda": 250
 }
