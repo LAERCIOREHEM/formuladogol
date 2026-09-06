@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-05T20:43:40.677371-03:00",
+  "gerado_em": "2026-09-05T21:56:23.760114-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 248,
   "total_com_estatisticas": 248,
-  "total_com_publico": 247,
+  "total_com_publico": 248,
   "total_com_eventos": 248,
   "total_com_jogadores": 248,
   "total_eventos_validados": 248,
@@ -20,9 +20,9 @@
       "placar_mandante": 2,
       "placar_visitante": 0,
       "estadio": "Estádio Cícero Pompeu de Toledo",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 39068,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://gauchazh.clicrbs.com.br/esportes/noticia/2026/09/sao-paulo-joga-mais-leve-apos-fim-de-jejum-supera-atletico-mg-e-ultrapassa-o-corinthians-cmtp1ai4a02eh0165nv1gwd4b.html",
       "arbitro": "Braulio Da Silva Machado",
       "stats": [
         {
@@ -556,7 +556,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-05T20:43:40.213526-03:00"
+      "atualizado_em": "2026-09-05T20:43:40.213526-03:00",
+      "renda": 1711850,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841224": {
       "event_id": "401841224",
@@ -139645,5 +139647,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 240,
+  "total_com_renda": 248
 }
