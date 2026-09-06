@@ -3,8 +3,11 @@ import {
   applyObservation,
   extractScoringPlays,
   initialMatchState,
+  mergeScoringPlayVariants,
   needsSummary,
   normalizeScoreboardEvent,
+  scorerCoverage,
+  unresolvedScorersForTransition,
   SPORTS_ENGINE_CONSTANTS
 } from '../src/sports-engine.js';
 import { deriveScheduleEvents, selectAgendaCandidates, selectScheduleSnapshot } from '../src/sports-monitor.js';
@@ -175,6 +178,51 @@ const espnNarrativePlay = extractScoringPlays(summary({
   type: { text: 'Goal' }
 }), scorerOne);
 assert.equal(espnNarrativePlay[0].athleteName, 'Robin Meißner', 'R8 deve extrair o marcador também do texto narrativo típico da ESPN');
+
+// R9: o mesmo gol vindo de fontes diferentes é fundido por identidade semântica.
+// O feed com autoria complementa o feed mais rápido sem criar um segundo evento.
+const r9Missing = extractScoringPlays({ plays: [{
+  id: 'cdn-g1', scoringPlay: true, team: { id: '2022' }, clock: { displayValue: "63'" },
+  homeScore: 0, awayScore: 1, text: 'Goal', type: { text: 'Goal' }
+}] }, scorerOne, 'espn_cdn_league_playbyplay');
+const r9Core = extractScoringPlays({ plays: [{
+  id: 'core-g1', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 'p3', displayName: 'Lucas Lima' }],
+  clock: { displayValue: "63'" }, homeScore: 0, awayScore: 1, text: 'Goal', type: { text: 'Goal' }
+}] }, scorerOne, 'espn_core_plays');
+const r9Merged = mergeScoringPlayVariants([
+  { source: 'espn_cdn_league_playbyplay', plays: r9Missing },
+  { source: 'espn_core_plays', plays: r9Core }
+]);
+assert.equal(r9Merged.length, 1, 'mesmo placar/equipe deve representar um único gol');
+assert.equal(r9Merged[0].athleteName, 'Lucas Lima');
+assert.equal(r9Merged[0].athleteSource, 'espn_core_plays');
+assert.equal(r9Merged[0].athleteStructured, true);
+assert.ok(r9Merged[0].sources.includes('espn_cdn_league_playbyplay'));
+assert.ok(r9Merged[0].sources.includes('espn_core_plays'));
+assert.equal(unresolvedScorersForTransition(scorerState, scorerOne, r9Merged), 0);
+const r9Coverage = scorerCoverage(r9Merged, scorerOne);
+assert.equal(r9Coverage.expectedGoals, 1);
+assert.equal(r9Coverage.namedScorers, 1);
+assert.equal(r9Coverage.missingScorers, 0);
+
+// R9: dois gols entre polls podem ter a autoria distribuída entre feeds diferentes;
+// a fusão deve enriquecer cada identidade de placar sem perder/duplicar nenhum.
+const r9TwoObs = normalizeScoreboardEvent(rawScore(1, 1, "20'"), game.league, game);
+const r9CdnTwo = extractScoringPlays({ plays: [
+  { id: 'cdn-a', scoringPlay: true, team: { id: '7632' }, clock: { displayValue: "11'" }, homeScore: 1, awayScore: 0, text: 'Goal', type: { text: 'Goal' } },
+  { id: 'cdn-b', scoringPlay: true, team: { id: '2022' }, athletesInvolved: [{ id: 'p3', displayName: 'Lucas Lima' }], clock: { displayValue: "19'" }, homeScore: 1, awayScore: 1, text: 'Goal', type: { text: 'Goal' } }
+] }, r9TwoObs, 'espn_cdn_soccer_playbyplay');
+const r9CoreTwo = extractScoringPlays({ plays: [
+  { id: 'core-a', scoringPlay: true, team: { id: '7632' }, athletesInvolved: [{ id: 'p1', displayName: 'João Pedro da Silva' }], clock: { displayValue: "11'" }, homeScore: 1, awayScore: 0, text: 'Goal', type: { text: 'Goal' } },
+  { id: 'core-b', scoringPlay: true, team: { id: '2022' }, clock: { displayValue: "19'" }, homeScore: 1, awayScore: 1, text: 'Goal', type: { text: 'Goal' } }
+] }, r9TwoObs, 'espn_core_plays');
+const r9TwoMerged = mergeScoringPlayVariants([
+  { source: 'espn_cdn_soccer_playbyplay', plays: r9CdnTwo },
+  { source: 'espn_core_plays', plays: r9CoreTwo }
+]);
+assert.equal(r9TwoMerged.length, 2);
+assert.deepEqual(r9TwoMerged.map((play) => play.athleteName), ['João Pedro', 'Lucas Lima']);
+assert.equal(scorerCoverage(r9TwoMerged, r9TwoObs).missingScorers, 0);
 const enrichZero = normalizeScoreboardEvent(rawScore(0, 0, "2'"), game.league, game);
 let enrichState = applyObservation(initialMatchState(enrichZero), enrichZero, null, t0).match;
 const enrichOne = normalizeScoreboardEvent(rawScore(0, 1, "5'"), game.league, game);
@@ -299,7 +347,7 @@ assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_CONFIRM_MS, 20_000);
 assert.equal(SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION, '6-R4');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION, '6-R8');
 assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION, '6-R8');
-assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION, '6-R8');
+assert.equal(SPORTS_ENGINE_CONSTANTS.GOAL_SCORER_ENRICHMENT_POLICY_VERSION, '6-R9');
 
 // ESPN às vezes publica state=post sem completed; relógio ao vivo não pode virar final fantasma.
 const phantom = rawScore(0, 0, "22'", 'post');

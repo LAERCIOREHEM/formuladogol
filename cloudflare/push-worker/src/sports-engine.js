@@ -267,7 +267,7 @@ function athleteOf(item, roster) {
     item?.type?.text,
     item?.type?.description
   );
-  return { id, name: structuredName || inferredName };
+  return { id, name: structuredName || inferredName, structured: Boolean(structuredName) };
 }
 
 function rawScore(item, key) {
@@ -276,7 +276,7 @@ function rawScore(item, key) {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
 }
 
-export function extractScoringPlays(summary, match) {
+export function extractScoringPlays(summary, match, sourceName = '') {
   const primary = Array.isArray(summary?.scoringPlays) ? summary.scoringPlays : [];
   const fallback = Array.isArray(summary?.plays) ? summary.plays : [];
   const source = primary.length ? primary : fallback.filter(isGoalItem);
@@ -308,6 +308,10 @@ export function extractScoringPlays(summary, match) {
       side,
       athleteId: athlete.id,
       athleteName: athlete.name,
+      athleteStructured: athlete.structured,
+      athleteSource: athlete.name ? text(sourceName) : '',
+      sourceName: text(sourceName),
+      sources: text(sourceName) ? [text(sourceName)] : [],
       minute,
       period: num(item?.period?.number || item?.period || item?.clock?.period, 0),
       description,
@@ -344,6 +348,120 @@ export function extractScoringPlays(summary, match) {
     }
   }
   return rows;
+}
+
+function goalDetailScore(play) {
+  if (!play) return -1;
+  let score = 0;
+  if (text(play.athleteName)) score += 100;
+  if (play.athleteStructured === true) score += 35;
+  if (text(play.athleteId)) score += 20;
+  if (text(play.teamId) || text(play.side)) score += 20;
+  if (play.homeScoreAfter != null && play.awayScoreAfter != null) score += 20;
+  if (text(play.minute)) score += 10;
+  if (text(play.sourceId)) score += 5;
+  if (text(play.description)) score += 2;
+  return score;
+}
+
+function mergeSourceLists(a, b) {
+  return [...new Set([...(Array.isArray(a) ? a : []), ...(Array.isArray(b) ? b : [])].map(text).filter(Boolean))];
+}
+
+function mergeGoalDetails(existing, incoming) {
+  const out = { ...existing };
+  out.sources = mergeSourceLists(existing?.sources, incoming?.sources || [incoming?.sourceName]);
+  if (!text(out.teamId) && text(incoming?.teamId)) out.teamId = text(incoming.teamId);
+  if (!text(out.side) && text(incoming?.side)) out.side = text(incoming.side);
+  if (out.homeScoreAfter == null && incoming?.homeScoreAfter != null) out.homeScoreAfter = incoming.homeScoreAfter;
+  if (out.awayScoreAfter == null && incoming?.awayScoreAfter != null) out.awayScoreAfter = incoming.awayScoreAfter;
+  if (!text(out.minute) && text(incoming?.minute)) out.minute = text(incoming.minute);
+  if (!text(out.sourceId) && text(incoming?.sourceId)) out.sourceId = text(incoming.sourceId);
+  if (!text(out.description) || text(incoming?.description).length > text(out.description).length) out.description = text(incoming?.description || out.description);
+  out.ownGoal = Boolean(out.ownGoal || incoming?.ownGoal);
+  out.penalty = Boolean(out.penalty || incoming?.penalty);
+  out.scoreFallback = Boolean(out.scoreFallback && incoming?.scoreFallback);
+
+  const existingName = text(out.athleteName);
+  const incomingName = text(incoming?.athleteName);
+  const sameName = existingName && incomingName && normalized(existingName) === normalized(incomingName);
+  let takeIncomingScorer = false;
+  if (!existingName && incomingName) takeIncomingScorer = true;
+  else if (sameName && incoming?.athleteStructured === true && out.athleteStructured !== true) takeIncomingScorer = true;
+  else if (existingName && incomingName && !sameName) {
+    if (incoming?.athleteStructured === true && out.athleteStructured !== true) takeIncomingScorer = true;
+    else if (incoming?.athleteStructured === out.athleteStructured && text(incoming?.athleteId) && !text(out.athleteId)) takeIncomingScorer = true;
+    else {
+      out.scorerConflict = true;
+      out.scorerCandidates = [...new Set([...(Array.isArray(out.scorerCandidates) ? out.scorerCandidates : []), existingName, incomingName].filter(Boolean))];
+    }
+  }
+  if (takeIncomingScorer) {
+    out.athleteName = incomingName;
+    out.athleteId = text(incoming?.athleteId);
+    out.athleteStructured = incoming?.athleteStructured === true;
+    out.athleteSource = text(incoming?.athleteSource || incoming?.sourceName);
+  } else {
+    if (!text(out.athleteId) && text(incoming?.athleteId) && (!incomingName || sameName)) out.athleteId = text(incoming.athleteId);
+    if (!text(out.athleteSource) && existingName) out.athleteSource = text(existing?.athleteSource || existing?.sourceName);
+    out.athleteStructured = Boolean(out.athleteStructured || (sameName && incoming?.athleteStructured === true));
+  }
+
+  // Conserva a identidade canônica, mas deixa o sourceName apontar para a versão
+  // mais rica para telemetria/diagnóstico.
+  if (goalDetailScore(incoming) > goalDetailScore(existing)) out.sourceName = text(incoming?.sourceName || out.sourceName);
+  return out;
+}
+
+export function mergeScoringPlayVariants(variants) {
+  const merged = [];
+  for (const variant of (Array.isArray(variants) ? variants : [])) {
+    const source = text(variant?.source);
+    for (const raw of (Array.isArray(variant?.plays) ? variant.plays : [])) {
+      const play = {
+        ...raw,
+        sourceName: text(raw?.sourceName || source),
+        athleteSource: text(raw?.athleteSource || (raw?.athleteName ? source : '')),
+        sources: mergeSourceLists(raw?.sources, source ? [source] : [])
+      };
+      const index = merged.findIndex((candidate) => sameSemanticGoal(candidate, play));
+      if (index < 0) merged.push(play);
+      else merged[index] = mergeGoalDetails(merged[index], play);
+    }
+  }
+  return merged.sort((a, b) => num(a?.order, 0) - num(b?.order, 0) || text(a?.key).localeCompare(text(b?.key)));
+}
+
+export function unresolvedScorersForTransition(match, observation, plays) {
+  const previousTotal = goalCountFromScore(match || {});
+  const targetTotal = goalCountFromScore(observation || {});
+  const credible = (Array.isArray(plays) ? plays : []).filter(credibleRegulationPlay);
+  let missing = 0;
+  if (targetTotal > previousTotal) {
+    const newGoals = credible.filter((play) => {
+      const total = num(play?.homeScoreAfter, 0) + num(play?.awayScoreAfter, 0);
+      return total > previousTotal && total <= targetTotal;
+    });
+    missing += Math.max(0, targetTotal - previousTotal - newGoals.length);
+    missing += newGoals.filter((play) => !text(play?.athleteName)).length;
+  }
+  for (const play of Object.values(match?.plays || {})) {
+    if (play?.status === 'pending' && credibleRegulationPlay(play) && !text(play?.athleteName) && scoreStillContainsPlay(play, observation)) missing += 1;
+  }
+  return missing;
+}
+
+export function scorerCoverage(plays, observation) {
+  const targetTotal = goalCountFromScore(observation || {});
+  const credible = (Array.isArray(plays) ? plays : []).filter(credibleRegulationPlay);
+  const relevant = credible.filter((play) => num(play?.homeScoreAfter, 0) + num(play?.awayScoreAfter, 0) <= targetTotal);
+  return {
+    expectedGoals: targetTotal,
+    playCount: relevant.length,
+    namedScorers: relevant.filter((play) => text(play?.athleteName)).length,
+    structuredScorers: relevant.filter((play) => text(play?.athleteName) && play?.athleteStructured === true).length,
+    missingScorers: Math.max(0, targetTotal - relevant.filter((play) => text(play?.athleteName)).length)
+  };
 }
 
 export function initialMatchState(observation) {
@@ -568,6 +686,8 @@ function emittedEvent(type, play, match, observation, now) {
     away: { id: text(match.away?.id), name: text(match.away?.name), abbreviation: text(match.away?.abbreviation), score: num(observation?.away?.score, 0) },
     scoringTeam: { id: text(scoringTeam.id), name: text(scoringTeam.name) },
     athlete: { id: text(play.athleteId), name: text(play.athleteName) },
+    scorerSource: text(play.athleteSource || play.sourceName),
+    scorerConfidence: play.athleteName ? (play.athleteStructured === true ? 'structured' : 'inferred') : 'missing',
     minute: text(play.minute),
     ownGoal: Boolean(play.ownGoal),
     penalty: Boolean(play.penalty),
@@ -898,5 +1018,5 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   OVERTURN_POLICY_VERSION: '6-R4',
   GOAL_DETECTION_POLICY_VERSION: '6-R8',
   GOAL_RECONCILIATION_POLICY_VERSION: '6-R8',
-  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R8'
+  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R9'
 });

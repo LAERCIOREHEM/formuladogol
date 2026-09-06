@@ -3,6 +3,8 @@ import { SportsMonitor } from '../src/sports-monitor.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, hotEspnSnapshot } from '../src/hot-espn-test.js';
 import { buildHotMatchPrematchEvent, hotMatchPrematchDue, hotMatchTargetEvent, markHotMatchTechnicalEvent } from '../src/hot-match-test.js';
 
+function numForTest(value) { const n = Number(value); return Number.isFinite(n) ? n : 0; }
+
 class FakeStorage {
   constructor() { this.map = new Map(); this.alarm = null; }
   async get(key) { return this.map.get(key); }
@@ -57,11 +59,11 @@ function scoreboard(score, clock) {
   };
 }
 
-function gameSummary() {
+function gameSummary(withScorer = false) {
   return {
-    rosters: [{ roster: [{ athlete: { id: '9', displayName: 'João Pedro da Silva' } }] }],
+    rosters: withScorer ? [{ roster: [{ athlete: { id: '9', displayName: 'João Pedro da Silva' } }] }] : [],
     scoringPlays: [{
-      id: 'goal-1', scoringPlay: true, team: { id: '7632' }, athletesInvolved: [{ id: '9' }],
+      id: 'goal-1', scoringPlay: true, team: { id: '7632' }, athletesInvolved: withScorer ? [{ id: '9', displayName: 'João Pedro da Silva' }] : [{ id: '9' }],
       clock: { displayValue: "8'" }, homeScore: 1, awayScore: 0, text: 'Goal', type: { text: 'Goal' }
     }]
   };
@@ -76,10 +78,16 @@ globalThis.fetch = async (url) => {
       mandante: { espn_id: '7632', nome: 'Atlético-MG' }, visitante: { espn_id: '2022', nome: 'Cruzeiro' }
     }] });
   }
-  // Regressão R5: o scoreboard pode continuar 0x0 enquanto o play-by-play já publicou o gol.
+  // Regressão R5/R9: o scoreboard pode continuar 0x0 enquanto o play-by-play
+  // já publicou o gol. Os CDNs propositalmente vêm SEM nome; o CORE traz o
+  // marcador. A integração deve fundir tudo antes do dispatch.
   if (href.includes('/scoreboard')) return Response.json(phase === 'zero' ? scoreboard(0, "5'") : scoreboard(0, "9'"));
-  if (href.includes('/playbyplay')) return Response.json(phase === 'zero' ? { gamepackageJSON: { plays: [] } } : gameSummary());
-  if (href.includes('/summary')) return Response.json(gameSummary());
+  if (href.includes('/competitions/') && href.includes('/plays?')) {
+    return Response.json(phase === 'zero' ? { items: [{ id: 'shot', text: 'Shot saved' }] } : { items: gameSummary(true).scoringPlays });
+  }
+  if (href.includes('/playbyplay')) return Response.json(phase === 'zero' ? { gamepackageJSON: { plays: [] } } : gameSummary(false));
+  if (href.includes('/game?')) return Response.json(phase === 'zero' ? { gamepackageJSON: { plays: [] } } : { gamepackageJSON: gameSummary(false) });
+  if (href.includes('/summary')) return Response.json(gameSummary(true));
   throw new Error(`URL inesperada: ${href}`);
 };
 
@@ -93,7 +101,7 @@ try {
   assert.equal(status.activeGames, 1);
   assert.equal(status.lastPollError, '');
   assert.ok(status.lastPollSuccessAt > 0);
-  assert.equal(status.sourceLayerVersion, '6-R3');
+  assert.equal(status.sourceLayerVersion, '6-R9');
   assert.equal(status.scoreboardSources['bra.copa_do_brazil'], 'espn_freshest_merge');
   assert.equal(db.events.size, 0);
   assert.equal(storage.alarm, now + 10_000, 'alarme de 10 s deve ser armado durante jogo');
@@ -121,6 +129,10 @@ try {
   assert.equal(row[2], 'goal');
   assert.equal(row[12], 'Atlético-MG');
   assert.equal(row[14], 'João Pedro');
+  status = await monitor.publicStatus();
+  assert.equal(status.goalScorerEnrichmentPolicyVersion, '6-R9');
+  assert.equal(status.scorerMissingAtDispatch, 0, 'R9 não deve despachar sem autor quando CORE já o publicou');
+  assert.ok(numForTest(status.scorerSources.espn_core_plays) >= 1, 'telemetria deve atribuir a autoria ao CORE');
 
   now += 10_000;
   await monitor.alarm();

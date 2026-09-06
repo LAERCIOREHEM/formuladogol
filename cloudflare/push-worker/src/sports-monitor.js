@@ -3,13 +3,16 @@ import {
   extractScoringPlays,
   initialMatchState,
   matchNeedsFastPolling,
+  mergeScoringPlayVariants,
   needsSummary,
   normalizeScoreboardEvent,
+  scorerCoverage,
   summarizeMatch,
+  unresolvedScorersForTransition,
   SPORTS_ENGINE_CONSTANTS
 } from './sports-engine.js';
 import { enqueueSportsEvent } from './push-dispatch.js';
-import { fetchEspnLivePlays, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard } from './espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard } from './espn-source.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, hotEspnSnapshot, publicHotEspnTest } from './hot-espn-test.js';
 import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue, hotMatchTargetEvent, HOT_MATCH_TEST_CONSTANTS, markHotMatchTechnicalEvent, publicHotMatchTest } from './hot-match-test.js';
 
@@ -222,6 +225,22 @@ function scoreboardScoringDetails(raw) {
 
 function regulationPlays(plays) {
   return Array.isArray(plays) ? plays.filter((play) => !play?.shootout) : [];
+}
+
+function extractedVariant(source, data, observation) {
+  const name = text(source);
+  return { source: name, plays: extractScoringPlays(data, observation, name) };
+}
+
+function addCounter(target, key, amount = 1) {
+  const name = text(key) || 'unknown';
+  target[name] = num(target[name], 0) + Math.max(0, num(amount, 0));
+}
+
+function mergedCounters(base, extra) {
+  const out = { ...(base && typeof base === 'object' ? base : {}) };
+  for (const [key, value] of Object.entries(extra && typeof extra === 'object' ? extra : {})) addCounter(out, key, value);
+  return out;
 }
 
 function scoreFromLatestPlay(plays) {
@@ -629,10 +648,15 @@ export class SportsMonitor {
 
     const scoreboardResults = new Map();
     const sourceErrors = [];
+    const sourceWarnings = [];
     const scoreboardSources = {};
     const sourceAttempts = {};
     const summarySources = {};
     const summaryGoalCounts = {};
+    const scorerSourcesThisPoll = {};
+    let scorerEnrichmentAttemptsThisPoll = 0;
+    let scorerEnrichmentResolvedThisPoll = 0;
+    let scorerMissingAtDispatchThisPoll = 0;
     const scoreboardSelectedSources = {};
     await Promise.all([...byLeague.entries()].map(async ([league, games]) => {
       try {
@@ -673,51 +697,101 @@ export class SportsMonitor {
       };
       const previous = matches[game.eventId] || initialMatchState(observation);
       let plays = null;
+      const playVariants = [];
 
-      // Durante jogo ao vivo o play-by-play é consultado em toda leitura rápida.
-      // Ele costuma receber a jogada de gol antes do scoreboard CDN. Se trouxer
-      // um placar mais novo, promovemos a observação e o anti-VAR passa a contar
-      // a partir dessa evidência, sem esperar o placar CDN alcançar o site.
+      // R9: durante jogo ao vivo fundimos os três feeds rápidos da ESPN
+      // (CDN league, CDN soccer e CORE plays). Antes o CORE só era consultado
+      // se os dois CDNs falhassem, o que fazia a autoria disponível no CORE ser
+      // ignorada quando o placar já estava correto no CDN.
       if (observation.state === 'in' || previous?.state === 'in') {
         try {
           const liveResult = await fetchEspnLivePlays(game.league, game.eventId, globalThis.fetch);
-          const liveCandidate = extractScoringPlays(liveResult.data, observation);
-          plays = liveCandidate;
-          observation = promoteObservationFromPlays(observation, liveCandidate);
+          const variants = Array.isArray(liveResult.variants) && liveResult.variants.length
+            ? liveResult.variants
+            : [{ source: liveResult.source, data: liveResult.data }];
+          for (const variant of variants) {
+            const extracted = extractedVariant(variant.source, variant.data, observation);
+            playVariants.push(extracted);
+            addCounter(summarySources, variant.source);
+          }
+          plays = mergeScoringPlayVariants(playVariants);
+          observation = promoteObservationFromPlays(observation, plays);
           summariesFetched += 1;
-          summarySources[liveResult.source] = num(summarySources[liveResult.source], 0) + 1;
-          summaryGoalCounts[game.eventId] = regulationPlays(liveCandidate).length;
+          summaryGoalCounts[game.eventId] = regulationPlays(plays).length;
         } catch (error) {
           sourceErrors.push(`${game.league}/${game.eventId}/live-plays: ${text(error?.message || error)}`);
         }
       }
 
-      if (needsSummary(previous, observation) && (!plays || regulationPlays(plays).length < (num(observation.home?.score, 0) + num(observation.away?.score, 0)))) {
-        const expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
-        const scoreboardDetails = scoreboardScoringDetails(raw);
-        if (scoreboardDetails.length) {
-          const candidate = extractScoringPlays({ scoringPlays: scoreboardDetails }, observation);
-          const regulationCount = candidate.filter((play) => !play.shootout).length;
-          if (regulationCount >= expectedGoals && (expectedGoals === 0 || candidate.some((play) => text(play.athleteName)))) {
-            plays = candidate;
-            summarySources.espn_scoreboard_details = num(summarySources.espn_scoreboard_details, 0) + 1;
-            summaryGoalCounts[game.eventId] = regulationCount;
+      let expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
+      const scoreboardDetails = scoreboardScoringDetails(raw);
+      if (scoreboardDetails.length) {
+        const variant = extractedVariant('espn_scoreboard_details', { scoringPlays: scoreboardDetails }, observation);
+        playVariants.push(variant);
+        plays = mergeScoringPlayVariants(playVariants);
+        observation = promoteObservationFromPlays(observation, plays);
+        expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
+        addCounter(summarySources, 'espn_scoreboard_details');
+        summaryGoalCounts[game.eventId] = regulationPlays(plays).length;
+      }
+
+      // A autoria é perseguida dentro da própria janela anti-VAR. Só fazemos a
+      // camada adicional quando um gol novo/pendente ainda está sem marcador ou
+      // quando os feeds rápidos ainda não cobrem todo o placar.
+      let unresolvedBefore = unresolvedScorersForTransition(previous, observation, plays || []);
+      const countBefore = regulationPlays(plays).length;
+      const needsCoverage = needsSummary(previous, observation) && countBefore < expectedGoals;
+      if (unresolvedBefore > 0 || needsCoverage) {
+        if (unresolvedBefore > 0) scorerEnrichmentAttemptsThisPoll += 1;
+        try {
+          const enrichment = await fetchEspnScorerEnrichment(game.league, game.eventId, globalThis.fetch, expectedGoals);
+          const variants = Array.isArray(enrichment.variants) && enrichment.variants.length
+            ? enrichment.variants
+            : [{ source: enrichment.source, data: enrichment.data }];
+          for (const variant of variants) {
+            playVariants.push(extractedVariant(variant.source, variant.data, observation));
+            addCounter(summarySources, variant.source);
           }
+          plays = mergeScoringPlayVariants(playVariants);
+          observation = promoteObservationFromPlays(observation, plays);
+          expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
+          summariesFetched += 1;
+          summaryGoalCounts[game.eventId] = regulationPlays(plays).length;
+          if (unresolvedBefore > 0) {
+            const unresolvedAfter = unresolvedScorersForTransition(previous, observation, plays);
+            scorerEnrichmentResolvedThisPoll += Math.max(0, unresolvedBefore - unresolvedAfter);
+            unresolvedBefore = unresolvedAfter;
+          }
+        } catch (error) {
+          // Não bloqueia gol. A política continua fail-open: se nenhuma superfície
+          // ESPN publicar o atleta dentro do budget, o gol sai sem autoria.
+          sourceWarnings.push(`${game.league}/${game.eventId}/scorer-enrichment: ${text(error?.message || error)}`);
         }
-        if (!plays) {
-          try {
-            const summaryResult = await fetchEspnSummary(game.league, game.eventId, globalThis.fetch, expectedGoals);
-            plays = extractScoringPlays(summaryResult.data, observation);
-            summariesFetched += 1;
-            summarySources[summaryResult.source] = num(summarySources[summaryResult.source], 0) + 1;
-            summaryGoalCounts[game.eventId] = plays.filter((play) => !play.shootout).length;
-          } catch (error) {
-            sourceErrors.push(`${game.league}/${game.eventId}/summary: ${text(error?.message || error)}`);
-          }
+      }
+
+      // Último fallback de cobertura: necessário para feeds raros que não aparecem
+      // nem no PBP, nem no CORE, nem nas superfícies de enriquecimento. Ele é usado
+      // para completar gols, não para atrasar um evento cuja identidade já está boa.
+      if (needsSummary(previous, observation) && regulationPlays(plays).length < expectedGoals) {
+        try {
+          const summaryResult = await fetchEspnSummary(game.league, game.eventId, globalThis.fetch, expectedGoals);
+          playVariants.push(extractedVariant(summaryResult.source, summaryResult.data, observation));
+          plays = mergeScoringPlayVariants(playVariants);
+          observation = promoteObservationFromPlays(observation, plays);
+          expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
+          summariesFetched += 1;
+          addCounter(summarySources, summaryResult.source);
+          summaryGoalCounts[game.eventId] = regulationPlays(plays).length;
+        } catch (error) {
+          sourceErrors.push(`${game.league}/${game.eventId}/summary: ${text(error?.message || error)}`);
         }
       }
       const result = applyObservation(previous, observation, plays, startedAt);
       for (const event of result.emitted) {
+        if (event?.type === 'goal') {
+          if (text(event?.athlete?.name)) addCounter(scorerSourcesThisPoll, event?.scorerSource || 'unknown');
+          else scorerMissingAtDispatchThisPoll += 1;
+        }
         await this.recordEvent(event);
         newlyEmitted.push(event);
       }
@@ -739,6 +813,7 @@ export class SportsMonitor {
       lastPollSuccessAt: sourceErrors.length ? num(snapshot.status.lastPollSuccessAt, 0) : Date.now(),
       lastPollDurationMs: Date.now() - startedAt,
       lastPollError: sourceErrors.join(' | ').slice(0, 2000),
+      lastScorerEnrichmentWarning: sourceWarnings.join(' | ').slice(0, 2000),
       observedGames,
       activeGames: liveGames,
       summariesFetched,
@@ -749,7 +824,15 @@ export class SportsMonitor {
       summarySources,
       summaryGoalCounts,
       sourceAttempts,
-      sourceLayerVersion: '6-R3',
+      scorerEnrichmentAttempts: num(snapshot.status.scorerEnrichmentAttempts, 0) + scorerEnrichmentAttemptsThisPoll,
+      scorerEnrichmentResolved: num(snapshot.status.scorerEnrichmentResolved, 0) + scorerEnrichmentResolvedThisPoll,
+      scorerMissingAtDispatch: num(snapshot.status.scorerMissingAtDispatch, 0) + scorerMissingAtDispatchThisPoll,
+      scorerSources: mergedCounters(snapshot.status.scorerSources, scorerSourcesThisPoll),
+      scorerCoverage: Object.fromEntries(Object.entries(matches).map(([eventId, match]) => {
+        const currentPlays = Object.values(match?.plays || {}).filter((play) => !play?.shootout && !['rejected', 'overturned'].includes(play?.status));
+        return [eventId, scorerCoverage(currentPlays, match)];
+      })),
+      sourceLayerVersion: '6-R9',
       livePolicyVersion: LIVE_POLICY_VERSION,
       fastPollMs: FAST_POLL_MS,
       minPollGapMs: MIN_POLL_GAP_MS,
@@ -781,10 +864,11 @@ export class SportsMonitor {
       lastPollSuccessAt: num(snapshot.status.lastPollSuccessAt, 0),
       lastPollDurationMs: num(snapshot.status.lastPollDurationMs, 0),
       lastPollError: text(snapshot.status.lastPollError),
+      lastScorerEnrichmentWarning: text(snapshot.status.lastScorerEnrichmentWarning),
       summariesFetched: num(snapshot.status.summariesFetched, 0),
       emittedThisPoll: num(snapshot.status.emittedThisPoll, 0),
       scheduleEventsThisBootstrap: num(snapshot.status.scheduleEventsThisBootstrap, 0),
-      sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R3'),
+      sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R9'),
       livePolicyVersion: text(snapshot.status.livePolicyVersion || LIVE_POLICY_VERSION),
       fastPollMs: num(snapshot.status.fastPollMs, FAST_POLL_MS),
       minPollGapMs: num(snapshot.status.minPollGapMs, MIN_POLL_GAP_MS),
@@ -794,6 +878,11 @@ export class SportsMonitor {
       summarySources: snapshot.status.summarySources && typeof snapshot.status.summarySources === 'object' ? snapshot.status.summarySources : {},
       summaryGoalCounts: snapshot.status.summaryGoalCounts && typeof snapshot.status.summaryGoalCounts === 'object' ? snapshot.status.summaryGoalCounts : {},
       sourceAttempts: snapshot.status.sourceAttempts && typeof snapshot.status.sourceAttempts === 'object' ? snapshot.status.sourceAttempts : {},
+      scorerEnrichmentAttempts: num(snapshot.status.scorerEnrichmentAttempts, 0),
+      scorerEnrichmentResolved: num(snapshot.status.scorerEnrichmentResolved, 0),
+      scorerMissingAtDispatch: num(snapshot.status.scorerMissingAtDispatch, 0),
+      scorerSources: snapshot.status.scorerSources && typeof snapshot.status.scorerSources === 'object' ? snapshot.status.scorerSources : {},
+      scorerCoverage: snapshot.status.scorerCoverage && typeof snapshot.status.scorerCoverage === 'object' ? snapshot.status.scorerCoverage : {},
       hotEspnTest: publicHotEspnTest(snapshot.hotEspnTest),
       hotMatchTest: publicHotMatchTest(snapshot.hotMatchTest),
       matches

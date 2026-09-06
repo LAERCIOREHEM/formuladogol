@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { fetchEspnLivePlays, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard, probeEspnSources, summaryGoalCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
+import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboard, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard, probeEspnSources, summaryGoalCount, summaryNamedScorerHintCount, unwrapScoreboard, unwrapSummary } from '../src/espn-source.js';
 
 const event = {
   id: '401909112',
@@ -12,6 +12,7 @@ assert.equal(unwrapScoreboard({ content: { events: [event] } }).events[0].id, ev
 assert.ok(unwrapSummary({ gamepackageJSON: { plays: [{ id: 'p1' }] } }).plays);
 assert.throws(() => unwrapSummary({ gamepackageJSON: { header: {}, boxscore: {} } }), /sem plays\/scoringPlays/);
 assert.equal(summaryGoalCount({ plays: [{ scoringPlay: true, text: 'Goal' }, { text: 'Yellow Card' }] }), 1);
+assert.equal(summaryNamedScorerHintCount({ plays: [{ scoringPlay: true, text: 'Goal scored by Kaio Jorge' }] }), 1);
 
 {
   const calls = [];
@@ -111,7 +112,7 @@ assert.equal(summaryGoalCount({ plays: [{ scoringPlay: true, text: 'Goal' }, { t
   };
   const probe = await probeEspnSources(fakeFetch, '20260901');
   assert.equal(probe.ok, true);
-  assert.equal(probe.sourceLayerVersion, '6-R3');
+  assert.equal(probe.sourceLayerVersion, '6-R9');
   assert.equal(Object.keys(probe.leagues).length, 4);
   assert.deepEqual(probe.failed, []);
   assert.ok(Object.values(probe.leagues).every((row) => row.source === 'espn_cdn_soccer'));
@@ -165,6 +166,51 @@ assert.equal(summaryGoalCount({ plays: [{ scoringPlay: true, text: 'Goal' }, { t
   const result = await fetchEspnLivePlays('bra.copa_do_brazil', event.id, fakeFetch);
   assert.equal(result.source, 'espn_cdn_soccer_playbyplay');
   assert.equal(summaryGoalCount(result.data), 2);
+  assert.equal(result.variants.length, 2, 'R9 preserva todos os feeds ao-vivo bem-sucedidos para fusão');
+}
+
+// R9: CORE é consultado mesmo quando ambos os CDNs respondem. É justamente essa
+// superfície que pode trazer o atleta antes dos CDNs sem atrasar a confirmação.
+{
+  const calls = [];
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    calls.push(href);
+    if (href.includes('/core/bra.copa_do_brazil/playbyplay')) {
+      return Response.json({ gamepackageJSON: { plays: [{ id: 'g1', scoringPlay: true, text: 'Goal', team: { id: '2022' }, homeScore: 0, awayScore: 1 }] } });
+    }
+    if (href.includes('/core/soccer/playbyplay')) {
+      return Response.json({ gamepackageJSON: { plays: [{ id: 'g1b', scoringPlay: true, text: 'Goal', team: { id: '2022' }, homeScore: 0, awayScore: 1 }] } });
+    }
+    if (href.includes('/leagues/bra.copa_do_brazil/events/401909112/competitions/401909112/plays')) {
+      return Response.json({ items: [{ id: 'core-g1', scoringPlay: true, text: 'Goal', team: { id: '2022' }, athletesInvolved: [{ id: '19', displayName: 'Kaio Jorge' }], homeScore: 0, awayScore: 1 }] });
+    }
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnLivePlays('bra.copa_do_brazil', event.id, fakeFetch);
+  assert.equal(result.variants.length, 3);
+  assert.ok(result.variants.some((row) => row.source === 'espn_core_plays'));
+  assert.ok(calls.some((href) => href.includes('/competitions/401909112/plays')));
+  const core = result.variants.find((row) => row.source === 'espn_core_plays');
+  assert.equal(summaryNamedScorerHintCount(core.data), 1);
+}
+
+// R9: microcamada final usa apenas superfícies complementares (game/site summary),
+// com execução paralela e sem exigir que uma única fonte tenha toda a partida.
+{
+  const fakeFetch = async (url) => {
+    const href = String(url);
+    if (href.includes('/core/bra.copa_do_brazil/game')) {
+      return Response.json({ gamepackageJSON: { plays: [{ id: 'g1', scoringPlay: true, text: 'Goal scored by Kaio Jorge', team: { id: '2022' }, homeScore: 0, awayScore: 1 }] } });
+    }
+    if (href.includes('/core/soccer/game')) return new Response('blocked', { status: 503, headers: { 'content-type': 'text/plain' } });
+    if (href.includes('site.api.espn.com')) return Response.json({ plays: [{ id: 'g1-site', scoringPlay: true, text: 'Goal', team: { id: '2022' }, homeScore: 0, awayScore: 1 }] });
+    throw new Error(`URL inesperada ${href}`);
+  };
+  const result = await fetchEspnScorerEnrichment('bra.copa_do_brazil', event.id, fakeFetch, 1);
+  assert.ok(result.variants.length >= 1);
+  assert.equal(result.source, 'espn_cdn_league_game');
+  assert.equal(summaryNamedScorerHintCount(result.data), 1);
 }
 
 

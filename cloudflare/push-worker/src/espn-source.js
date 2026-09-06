@@ -4,6 +4,7 @@ const CDN_ROOT = 'https://cdn.espn.com/core';
 const CORE_ROOT = 'https://sports.core.api.espn.com/v2/sports/soccer/leagues';
 const FETCH_TIMEOUT_MS = 10_000;
 const LIVE_FETCH_TIMEOUT_MS = 3_500;
+const SCORER_ENRICH_TIMEOUT_MS = 2_500;
 const ALLOWED_LEAGUES = Object.freeze([
   'bra.1',
   'bra.copa_do_brazil',
@@ -112,6 +113,27 @@ export function summaryGoalCount(summary) {
   if (primary.length) return primary.filter(looksLikeGoal).length;
   const plays = Array.isArray(summary.plays) ? summary.plays : [];
   return plays.filter(looksLikeGoal).length;
+}
+
+function scorerNameHint(item) {
+  const involved = Array.isArray(item?.athletesInvolved) ? item.athletesInvolved : [];
+  const participants = Array.isArray(item?.participants) ? item.participants : [];
+  const participant = participants.find((entry) => entry?.athlete || entry?.player) || participants[0] || null;
+  const athlete = involved[0] || item?.athlete || item?.player || participant?.athlete || participant?.player || participant || null;
+  const structured = text(athlete?.shortName || athlete?.displayName || athlete?.fullName || athlete?.name);
+  if (structured) return structured;
+  const narrative = text([item?.text, item?.description, item?.shortText, item?.headline, item?.title].filter(Boolean).join(' '));
+  if (!narrative) return '';
+  const match = narrative.match(/(?:goal scored by|scored by|goal by|gol de|gol do|gol da|marcado por)\s+([A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]+(?:\s+[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]+){0,4})/iu)
+    || narrative.match(/(?:^|[.!?]\s+)([A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]+(?:\s+[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’.-]+){0,4})\s*\([^)]{1,80}\)/u);
+  return text(match?.[1]);
+}
+
+export function summaryNamedScorerHintCount(summary) {
+  if (!summary || typeof summary !== 'object') return 0;
+  const primary = Array.isArray(summary.scoringPlays) ? summary.scoringPlays : [];
+  const source = primary.length ? primary : (Array.isArray(summary.plays) ? summary.plays.filter(looksLikeGoal) : []);
+  return source.filter((item) => looksLikeGoal(item) && scorerNameHint(item)).length;
 }
 
 function withBust(url) {
@@ -280,6 +302,65 @@ function summaryCandidates(league, eventId) {
   ];
 }
 
+function scorerEnrichmentCandidates(league, eventId) {
+  const qLeague = encodeURIComponent(league);
+  const qEvent = encodeURIComponent(eventId);
+  // Os três feeds abaixo complementam os feeds ao-vivo já consultados
+  // (league play-by-play, soccer play-by-play e CORE plays). Assim evitamos
+  // repetir requests e ganhamos novas superfícies onde a ESPN costuma publicar
+  // o atleta antes/de forma mais completa.
+  return [
+    {
+      name: 'espn_cdn_league_game',
+      url: `${CDN_ROOT}/${qLeague}/game?xhr=1&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
+      name: 'espn_cdn_soccer_game',
+      url: `${CDN_ROOT}/soccer/game?xhr=1&league=${qLeague}&gameId=${qEvent}`,
+      transform: unwrapSummary
+    },
+    {
+      name: 'espn_site_api_summary',
+      url: `${SITE_ROOT}/${qLeague}/summary?event=${qEvent}`,
+      transform: unwrapSummary
+    }
+  ];
+}
+
+async function parallelSuccessful(candidates, fetchImpl = globalThis.fetch, timeoutMs = LIVE_FETCH_TIMEOUT_MS) {
+  const attempts = [];
+  const successful = [];
+  await Promise.all(candidates.map(async (candidate) => {
+    const startedAt = Date.now();
+    try {
+      const raw = await fetchJson(withBust(candidate.url), fetchImpl, timeoutMs);
+      const data = (candidate.transform || unwrapSummary)(raw);
+      successful.push({ source: candidate.name, data });
+      attempts.push({ source: candidate.name, ok: true, durationMs: Date.now() - startedAt });
+    } catch (error) {
+      attempts.push({
+        source: candidate.name,
+        ok: false,
+        durationMs: Date.now() - startedAt,
+        error: text(error?.message || error).slice(0, 240)
+      });
+    }
+  }));
+  attempts.sort((a, b) => candidates.findIndex((c) => c.name === a.source) - candidates.findIndex((c) => c.name === b.source));
+  successful.sort((a, b) => {
+    const goalDiff = summaryGoalCount(b.data) - summaryGoalCount(a.data);
+    if (goalDiff) return goalDiff;
+    const scorerDiff = summaryNamedScorerHintCount(b.data) - summaryNamedScorerHintCount(a.data);
+    if (scorerDiff) return scorerDiff;
+    const ac = Array.isArray(a.data?.plays) ? a.data.plays.length : Array.isArray(a.data?.scoringPlays) ? a.data.scoringPlays.length : 0;
+    const bc = Array.isArray(b.data?.plays) ? b.data.plays.length : Array.isArray(b.data?.scoringPlays) ? b.data.scoringPlays.length : 0;
+    if (bc !== ac) return bc - ac;
+    return candidates.findIndex((c) => c.name === a.source) - candidates.findIndex((c) => c.name === b.source);
+  });
+  return { successful, attempts };
+}
+
 async function firstSuccessful(candidates, transform, fetchImpl = globalThis.fetch, validate = null) {
   const attempts = [];
   for (const candidate of candidates) {
@@ -366,32 +447,56 @@ export async function fetchEspnLivePlays(league, eventId, fetchImpl = globalThis
   if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
   if (!text(eventId)) throw new Error('eventId ausente');
   const candidates = livePlayCandidates(league, eventId);
-  const primary = candidates.slice(0, 2);
-  const attempts = [];
-  const successful = [];
-  await Promise.all(primary.map(async (candidate) => {
-    const startedAt = Date.now();
-    try {
-      const raw = await fetchJson(withBust(candidate.url), fetchImpl, LIVE_FETCH_TIMEOUT_MS);
-      const data = (candidate.transform || unwrapSummary)(raw);
-      successful.push({ source: candidate.name, data });
-      attempts.push({ source: candidate.name, ok: true, durationMs: Date.now() - startedAt });
-    } catch (error) {
-      attempts.push({ source: candidate.name, ok: false, durationMs: Date.now() - startedAt, error: text(error?.message || error).slice(0, 240) });
-    }
-  }));
-  if (successful.length) {
-    successful.sort((a, b) => {
-      const goalDiff = summaryGoalCount(b.data) - summaryGoalCount(a.data);
-      if (goalDiff) return goalDiff;
-      const aCount = (Array.isArray(a.data?.scoringPlays) ? a.data.scoringPlays.length : Array.isArray(a.data?.plays) ? a.data.plays.length : 0);
-      const bCount = (Array.isArray(b.data?.scoringPlays) ? b.data.scoringPlays.length : Array.isArray(b.data?.plays) ? b.data.plays.length : 0);
-      return bCount - aCount;
-    });
-    return { ok: true, source: successful[0].source, data: successful[0].data, attempts };
+  // R9: consulta os dois CDNs e o CORE em paralelo. Antes o CORE só era usado
+  // quando ambos os CDNs falhavam, embora frequentemente seja justamente ele
+  // quem traga athletesInvolved/nome do marcador primeiro.
+  const { successful, attempts } = await parallelSuccessful(candidates, fetchImpl, LIVE_FETCH_TIMEOUT_MS);
+  if (!successful.length) {
+    const error = new Error(attempts.map((item) => `${item.source}: ${item.error}`).join(' | ') || 'play-by-play ao vivo indisponível');
+    error.attempts = attempts;
+    throw error;
   }
-  const fallback = await firstSuccessful(candidates.slice(2), unwrapSummary, fetchImpl);
-  return { ...fallback, attempts: [...attempts, ...(fallback.attempts || [])] };
+  return {
+    ok: true,
+    source: successful[0].source,
+    data: successful[0].data,
+    variants: successful.map((item) => ({ source: item.source, data: item.data })),
+    attempts
+  };
+}
+
+export async function fetchEspnScorerEnrichment(league, eventId, fetchImpl = globalThis.fetch, expectedGoals = 0) {
+  if (!ALLOWED_LEAGUES.includes(league)) throw new Error(`liga ESPN não permitida: ${league}`);
+  if (!text(eventId)) throw new Error('eventId ausente');
+  const minimumGoals = Math.max(0, Number(expectedGoals) || 0);
+  const candidates = scorerEnrichmentCandidates(league, eventId);
+  const { successful, attempts } = await parallelSuccessful(candidates, fetchImpl, SCORER_ENRICH_TIMEOUT_MS);
+  const usable = successful.filter((item) => summaryGoalCount(item.data) > 0);
+  if (!usable.length) {
+    const error = new Error(attempts.map((item) => `${item.source}: ${item.error || 'sem gols'}`).join(' | ') || 'enriquecimento de autoria indisponível');
+    error.attempts = attempts;
+    throw error;
+  }
+  // Não exigimos que uma fonte isolada tenha TODOS os gols: o objetivo desta
+  // chamada é complementar os feeds ao vivo e a fusão semântica é feita depois.
+  // Ainda assim, priorizamos feeds com cobertura de placar e autoria mais completas.
+  usable.sort((a, b) => {
+    const aGoals = summaryGoalCount(a.data);
+    const bGoals = summaryGoalCount(b.data);
+    const aCoverage = minimumGoals > 0 && aGoals >= minimumGoals ? 1 : 0;
+    const bCoverage = minimumGoals > 0 && bGoals >= minimumGoals ? 1 : 0;
+    if (bCoverage !== aCoverage) return bCoverage - aCoverage;
+    const scorerDiff = summaryNamedScorerHintCount(b.data) - summaryNamedScorerHintCount(a.data);
+    if (scorerDiff) return scorerDiff;
+    return bGoals - aGoals;
+  });
+  return {
+    ok: true,
+    source: usable[0].source,
+    data: usable[0].data,
+    variants: usable.map((item) => ({ source: item.source, data: item.data })),
+    attempts
+  };
 }
 
 export async function fetchEspnTechnicalScoreboard(league, dates, fetchImpl = globalThis.fetch) {
@@ -536,7 +641,7 @@ export async function probeEspnSources(fetchImpl = globalThis.fetch, dateKey = '
   const failed = Object.entries(leagues).filter(([, item]) => !item.ok).map(([league]) => league);
   return {
     ok: failed.length === 0,
-    sourceLayerVersion: '6-R3',
+    sourceLayerVersion: '6-R9',
     checkedAt: new Date().toISOString(),
     failed,
     leagues
@@ -550,5 +655,6 @@ export const ESPN_SOURCE_CONSTANTS = Object.freeze({
   CORE_ROOT,
   FETCH_TIMEOUT_MS,
   LIVE_FETCH_TIMEOUT_MS,
+  SCORER_ENRICH_TIMEOUT_MS,
   ALLOWED_LEAGUES
 });
