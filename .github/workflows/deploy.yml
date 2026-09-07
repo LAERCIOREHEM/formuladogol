@@ -70,8 +70,10 @@ on:
       - 'scripts/gerar_fundacao_organica.py'
       - 'scripts/gerar_paginas_clubes.py'
       - 'scripts/gerar_paginas_jogos.py'
+      - 'scripts/gerar_hubs_competicoes.py'
       - 'css/br-clube.css'
       - 'css/br-jogo.css'
+      - 'css/br-competicoes.css'
       - 'jogos/**'
       - 'tabela/**'
       - 'resultados/**'
@@ -167,6 +169,7 @@ jobs:
             css/br-alertas.css
             css/br-clube.css
             css/br-jogo.css
+            css/br-competicoes.css
           )
 
           PUBLIC_JS=(
@@ -380,6 +383,14 @@ jobs:
         run: |
           python scripts/gerar_paginas_jogos.py --site-root _site --check
 
+      - name: ORG-6 — hubs de competições, Discover e mascotes
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --disable-pip-version-check pillow \
+            || python3 -m pip install --quiet --disable-pip-version-check --break-system-packages pillow
+          python scripts/gerar_hubs_competicoes.py --site-root _site --repo-root . --check
+
       - name: Gerar lastmod dos sitemaps (Acurácia v3)
         run: |
           echo "DEPLOY_SCHEMA=social-footer-v1-2026-08-11"
@@ -455,6 +466,7 @@ jobs:
               "dados-br/estatisticas-competicao.json",
               "dados-br/acuracia-af-previsao.json",
               "dados-br/analises.json",
+              "dados-br/mascotes.json",
               "tabela.json",
               "resultados.json",
           ]
@@ -569,7 +581,17 @@ jobs:
           except SystemExit:
               data_status_global = agora.strftime("%Y-%m-%d")
 
+          ORG6_HUB_URLS = {
+              "https://formuladogol.com.br/competicoes/",
+              "https://formuladogol.com.br/brasileirao/",
+              "https://formuladogol.com.br/copa-do-brasil/",
+              "https://formuladogol.com.br/libertadores/",
+              "https://formuladogol.com.br/sul-americana/",
+          }
+
           def resolver(url, lastmod_existente=""):
+              if url in ORG6_HUB_URLS and re.fullmatch(r"\d{4}-\d{2}-\d{2}", lastmod_existente or ""):
+                  return lastmod_existente
               if CLUB_PAGE_RE.fullmatch(url):
                   return data_da_pagina(CLUB_PAGE_DEPS, url)
               if GAME_PAGE_RE.fullmatch(url):
@@ -1076,6 +1098,17 @@ jobs:
               "https://formuladogol.com.br/copa2026/museu.html",
           }
           expected_urls.add("https://formuladogol.com.br/analises/")
+
+          # ORG-6: clusters canônicos de competição para busca e Discover.
+          expected_urls.update({
+              "https://formuladogol.com.br/competicoes/",
+              "https://formuladogol.com.br/brasileirao/",
+              "https://formuladogol.com.br/copa-do-brasil/",
+              "https://formuladogol.com.br/libertadores/",
+              "https://formuladogol.com.br/sul-americana/",
+          })
+          for org6_rel in ("competicoes", "brasileirao", "copa-do-brasil", "libertadores", "sul-americana"):
+              assert (site / org6_rel / "index.html").is_file(), f"ORG-6: hub ausente: {org6_rel}"
 
           # ORG-4: o sitemap deve refletir os 20 clubes da fonte oficial, não uma
           # lista manual sujeita a esquecer um time ou conservar slug legado.
