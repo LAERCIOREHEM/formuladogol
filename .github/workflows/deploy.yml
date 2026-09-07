@@ -170,6 +170,7 @@ jobs:
             css/br-clube.css
             css/br-jogo.css
             css/br-competicoes.css
+            css/br-arquivo-jogos.css
           )
 
           PUBLIC_JS=(
@@ -391,6 +392,10 @@ jobs:
             || python3 -m pip install --quiet --disable-pip-version-check --break-system-packages pillow
           python scripts/gerar_hubs_competicoes.py --site-root _site --repo-root . --check
 
+      - name: ORG-7 — fechamento orgânico e arquivo integral de partidas
+        run: |
+          python scripts/gerar_fechamento_organico.py --site-root _site --check
+
       - name: Gerar lastmod dos sitemaps (Acurácia v3)
         run: |
           echo "DEPLOY_SCHEMA=social-footer-v1-2026-08-11"
@@ -587,6 +592,7 @@ jobs:
               "https://formuladogol.com.br/copa-do-brasil/",
               "https://formuladogol.com.br/libertadores/",
               "https://formuladogol.com.br/sul-americana/",
+              "https://formuladogol.com.br/brasileirao/jogos/",
           }
 
           def resolver(url, lastmod_existente=""):
@@ -660,6 +666,12 @@ jobs:
       # original em alta resolucao continua versionado e intacto, e o artefato
       # sai leve em toda publicacao, sem depender de ninguem lembrar de rodar o
       # script antes do commit. Custo medido: ~26 s para 1.140 imagens.
+      - name: ORG-7 — gate final de SEO, linkagem e indexabilidade
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/validar_org_final.py --site-root _site --check
+
       - name: Otimizar imagens do pacote publico
         shell: bash
         run: |
@@ -1109,6 +1121,11 @@ jobs:
           })
           for org6_rel in ("competicoes", "brasileirao", "copa-do-brasil", "libertadores", "sul-americana"):
               assert (site / org6_rel / "index.html").is_file(), f"ORG-6: hub ausente: {org6_rel}"
+
+          # ORG-7: arquivo indexável de partidas fecha a linkagem interna de
+          # todas as páginas /jogo/ sem alterar a rota dinâmica /jogos.
+          expected_urls.add("https://formuladogol.com.br/brasileirao/jogos/")
+          assert (site / "brasileirao" / "jogos" / "index.html").is_file(), "ORG-7: arquivo de jogos ausente"
 
           # ORG-4: o sitemap deve refletir os 20 clubes da fonte oficial, não uma
           # lista manual sujeita a esquecer um time ou conservar slug legado.
@@ -1585,25 +1602,31 @@ jobs:
       - name: Notificar buscadores via IndexNow
         if: success()
         run: |
-          # IndexNow avisa Bing, Yandex, Naver e DuckDuckGo em uma única chamada.
-          # O Google NÃO suporta o protocolo — o sitemap com lastmod real já
-          # cobre o Google. A chave está em 78f8b10d32edcce04827b713eae52df5.txt na raiz do site.
+          # IndexNow recebe a mesma superfície indexável publicada no sitemap.
+          # O Google não usa o protocolo; para ele, sitemap + lastmod seguem sendo
+          # a fonte de descoberta. O lote atual é muito inferior ao limite do
+          # protocolo e é deduplicado antes do envio.
           python - <<'INNER'
-          import json, pathlib, urllib.request, urllib.error
+          import json, pathlib, urllib.request, urllib.error, xml.etree.ElementTree as ET
 
           CHAVE = "78f8b10d32edcce04827b713eae52df5"
           HOST  = "formuladogol.com.br"
-          URLS  = [
-              "https://formuladogol.com.br/",
-              "https://formuladogol.com.br/estatisticas.html",
-              "https://formuladogol.com.br/aovivo.html",
-              "https://formuladogol.com.br/clubes.html",
-              "https://formuladogol.com.br/museu.html",
-              "https://formuladogol.com.br/copa2026/",
-          ]
-          manifesto = json.loads(pathlib.Path("dados-br/analises.json").read_text(encoding="utf-8"))
-          URLS.append("https://formuladogol.com.br/analises/")
-          URLS.extend(item["url"] for item in (manifesto.get("artigos") or [])[-5:])
+          NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
+          sitemap = pathlib.Path("_site/sitemap.xml")
+          root = ET.parse(sitemap).getroot()
+          URLS = []
+          seen = set()
+          for node in root.findall(f"{{{NS}}}url/{{{NS}}}loc"):
+              url = (node.text or "").strip()
+              if not url.startswith("https://" + HOST + "/"):
+                  continue
+              if url not in seen:
+                  seen.add(url)
+                  URLS.append(url)
+          if not URLS:
+              raise SystemExit("IndexNow: sitemap sem URLs publicáveis")
+          if len(URLS) > 10000:
+              raise SystemExit(f"IndexNow: lote acima de 10.000 URLs: {len(URLS)}")
 
           payload = json.dumps({
               "host": HOST,
@@ -1636,9 +1659,7 @@ jobs:
               429: "AVISO - rate limit",
           }
           print("IndexNow: HTTP " + str(status) + " - " + CODIGOS.get(status, "codigo desconhecido"))
-          print("URLs submetidas: " + str(len(URLS)))
-          for u in URLS:
-              print("  " + u)
+          print("URLs submetidas a partir do sitemap: " + str(len(URLS)))
           if status not in (200, 202):
               print("IndexNow: deploy continua mesmo com este aviso")
           INNER
