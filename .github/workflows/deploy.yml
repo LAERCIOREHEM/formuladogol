@@ -406,6 +406,7 @@ jobs:
           python - <<'PY'
           import glob
           import json
+          from functools import lru_cache
           import pathlib
           import re
           import xml.etree.ElementTree as ET
@@ -502,6 +503,7 @@ jobs:
               raise SystemExit("ERRO lastmod: manifesto editorial vazio")
           data_hub_analises = max(artigos_analise.values())
 
+          @lru_cache(maxsize=None)
           def data_do_arquivo(rel):
               caminho = site / rel
               if not caminho.is_file():
@@ -592,7 +594,7 @@ jobs:
               "https://formuladogol.com.br/copa-do-brasil/",
               "https://formuladogol.com.br/libertadores/",
               "https://formuladogol.com.br/sul-americana/",
-              "https://formuladogol.com.br/brasileirao/jogos/",
+              "https://formuladogol.com.br/brasileirao-jogos.html",
           }
 
           def resolver(url, lastmod_existente=""):
@@ -1124,8 +1126,8 @@ jobs:
 
           # ORG-7: arquivo indexável de partidas fecha a linkagem interna de
           # todas as páginas /jogo/ sem alterar a rota dinâmica /jogos.
-          expected_urls.add("https://formuladogol.com.br/brasileirao/jogos/")
-          assert (site / "brasileirao" / "jogos" / "index.html").is_file(), "ORG-7: arquivo de jogos ausente"
+          expected_urls.add("https://formuladogol.com.br/brasileirao-jogos.html")
+          assert (site / "brasileirao-jogos.html").is_file(), "ORG-7R: arquivo canônico de jogos ausente"
 
           # ORG-4: o sitemap deve refletir os 20 clubes da fonte oficial, não uma
           # lista manual sujeita a esquecer um time ou conservar slug legado.
@@ -1447,6 +1449,62 @@ jobs:
           error_count: 20
           reporting_interval: 5000
         timeout-minutes: 12
+
+      - name: ORG-7R — smoke test público pós-deploy
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import time
+          import urllib.error
+          import urllib.request
+          import xml.etree.ElementTree as ET
+
+          HOST = "https://formuladogol.com.br"
+          NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
+          root = ET.parse("_site/sitemap.xml").getroot()
+          urls = [(n.text or "").strip() for n in root.findall(f"{{{NS}}}url/{{{NS}}}loc") if (n.text or "").strip()]
+          jogos = [u for u in urls if "/jogo/" in u]
+          clubes = [u for u in urls if "/clube/" in u]
+          criticas = [
+              HOST + "/",
+              HOST + "/brasileirao-jogos.html",
+              HOST + "/brasileirao/",
+              HOST + "/clubes.html",
+          ]
+          for grupo in (jogos, clubes):
+              if grupo:
+                  criticas.extend([grupo[0], grupo[len(grupo)//2], grupo[-1]])
+          criticas = list(dict.fromkeys(criticas))
+
+          def check(url):
+              last = None
+              for tentativa in range(1, 7):
+                  try:
+                      sep = "&" if "?" in url else "?"
+                      req = urllib.request.Request(
+                          url + sep + "org7r_smoke=" + str(int(time.time())),
+                          headers={"User-Agent":"FormulaDoGol-Deploy-Smoke/1.0","Cache-Control":"no-cache"},
+                      )
+                      with urllib.request.urlopen(req, timeout=20) as resp:
+                          status = int(resp.status)
+                          body = resp.read(400000).decode("utf-8", errors="replace")
+                      if status == 200 and "<title>404" not in body[:500].lower():
+                          return status
+                      last = f"HTTP {status}"
+                  except urllib.error.HTTPError as exc:
+                      last = f"HTTP {exc.code}"
+                  except urllib.error.URLError as exc:
+                      last = str(exc.reason)
+                  time.sleep(10 * tentativa)
+              raise SystemExit(f"ORG-7R SMOKE FALHOU: {url} -> {last}")
+
+          for url in criticas:
+              status = check(url)
+              print(f"SMOKE {status}: {url}")
+          print(f"ORG-7R PUBLIC SMOKE PASS: {len(criticas)} URLs críticas")
+          PY
 
       - name: Confirmar e avisar publicação editorial
         if: success()
