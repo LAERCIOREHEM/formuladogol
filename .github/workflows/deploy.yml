@@ -69,7 +69,9 @@ on:
       - 'analises/**'
       - 'scripts/gerar_fundacao_organica.py'
       - 'scripts/gerar_paginas_clubes.py'
+      - 'scripts/gerar_paginas_jogos.py'
       - 'css/br-clube.css'
+      - 'css/br-jogo.css'
       - 'jogos/**'
       - 'tabela/**'
       - 'resultados/**'
@@ -164,6 +166,7 @@ jobs:
             css/br-pwa.css
             css/br-alertas.css
             css/br-clube.css
+            css/br-jogo.css
           )
 
           PUBLIC_JS=(
@@ -194,6 +197,7 @@ jobs:
             dados-br/avaliacao-af-previsao.json
             dados-br/acuracia-af-previsao.json
             dados-br/clubes.json
+            dados-br/calendario-completo.json
             dados-br/elencos.json
             dados-br/estatisticas-competicao.json
             dados-br/historico-probabilidades.json
@@ -372,6 +376,10 @@ jobs:
         run: |
           python scripts/gerar_paginas_clubes.py --site-root _site --check
 
+      - name: ORG-5 — páginas SEO de partidas do Brasileirão
+        run: |
+          python scripts/gerar_paginas_jogos.py --site-root _site --check
+
       - name: Gerar lastmod dos sitemaps (Acurácia v3)
         run: |
           echo "DEPLOY_SCHEMA=social-footer-v1-2026-08-11"
@@ -451,6 +459,22 @@ jobs:
               "resultados.json",
           ]
           CLUB_PAGE_RE = re.compile(r"^https://formuladogol\.com\.br/clube/[a-z0-9-]+/$")
+
+          # ORG-5: uma página de jogo pode mudar com calendário, probabilidades,
+          # transmissão, placar e detalhes. Todas as fontes abaixo já integram o
+          # pacote público; o lastmod representa o dado mais recente do conjunto.
+          GAME_PAGE_DEPS = [
+              "dados-br/calendario-completo.json",
+              "dados-br/probabilidades-jogos.json",
+              "dados-br/historico-probabilidades-jogos.json",
+              "dados-br/jogos-detalhes.json",
+              "dados-br/transmissoes-tv.json",
+              "dados-br/probabilidades-brasileirao.json",
+              "dados-br/ranking-desempenho.json",
+              "tabela.json",
+              "resultados.json",
+          ]
+          GAME_PAGE_RE = re.compile(r"^https://formuladogol\.com\.br/jogo/[a-z0-9-]+-\d{4}-\d{2}-\d{2}/$")
 
           analises_manifesto = json.loads((site / "dados-br/analises.json").read_text(encoding="utf-8"))
           artigos_analise = {
@@ -548,6 +572,8 @@ jobs:
           def resolver(url, lastmod_existente=""):
               if CLUB_PAGE_RE.fullmatch(url):
                   return data_da_pagina(CLUB_PAGE_DEPS, url)
+              if GAME_PAGE_RE.fullmatch(url):
+                  return data_da_pagina(GAME_PAGE_DEPS, url)
               if url in DEPS:
                   return data_da_pagina(DEPS[url], url)
               if url in STATIC_LASTMOD:
@@ -1067,8 +1093,32 @@ jobs:
           for slug in club_slugs:
               assert (site / "clube" / slug / "index.html").is_file(), f"página de clube ausente: {slug}"
           expected_urls.update(f"https://formuladogol.com.br/clube/{slug}/" for slug in club_slugs)
+
+          # ORG-5: URLs reais somente para partidas com data confirmada.
+          calendario_manifesto = json.loads((site / "dados-br/calendario-completo.json").read_text(encoding="utf-8"))
+          calendario_jogos = calendario_manifesto.get("jogos") or []
+          assert len(calendario_jogos) == 380, f"calendário: esperado 380 jogos, recebido {len(calendario_jogos)}"
+          game_urls = set()
+          for jogo_item in calendario_jogos:
+              if jogo_item.get("data_definir") or not jogo_item.get("data_iso"):
+                  continue
+              casa = slug_clube(jogo_item.get("mandante"))
+              fora = slug_clube(jogo_item.get("visitante"))
+              dia = str(jogo_item.get("data_iso"))[:10]
+              jogo_url = f"https://formuladogol.com.br/jogo/{casa}-x-{fora}-{dia}/"
+              game_urls.add(jogo_url)
+              game_slug = jogo_url.rstrip("/").split("/")[-1]
+              assert (site / "jogo" / game_slug / "index.html").is_file(), f"página de jogo ausente: {game_slug}"
+          expected_game_count = sum(
+              1 for jogo_item in calendario_jogos
+              if not jogo_item.get("data_definir") and jogo_item.get("data_iso")
+          )
+          assert len(game_urls) == expected_game_count, (
+              f"ORG-5: esperado {expected_game_count} URLs com data confirmada, recebido {len(game_urls)}"
+          )
+          expected_urls.update(game_urls)
           expected_urls.update(artigo["url"] for artigo in artigos_analises)
-          assert set(urls) == expected_urls, f"sitemap divergente: {urls!r}"
+          assert set(urls) == expected_urls, f"sitemap divergente: esperado {len(expected_urls)} URLs; recebido {len(set(urls))}"
 
           # Guarda do lastmod: uma data ausente equivale a não informar frescor;
           # uma data congelada no passado é pior, porque afirma ao Google que
