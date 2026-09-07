@@ -67,6 +67,7 @@ on:
       - 'js/br-alertas.js'
       - 'dados-br/**'
       - 'analises/**'
+      - 'scripts/gerar_fundacao_organica.py'
       - 'jogos/**'
       - 'tabela/**'
       - 'resultados/**'
@@ -358,6 +359,11 @@ jobs:
           target.parent.mkdir(parents=True, exist_ok=True)
           target.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
           PY
+
+
+      - name: ORG-1 — Fundação orgânica e pré-renderização
+        run: |
+          python scripts/gerar_fundacao_organica.py --site-root _site --check
 
       - name: Gerar lastmod dos sitemaps (Acurácia v3)
         run: |
