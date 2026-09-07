@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-06",
-  "executado_em": "2026-09-06T11:23:56-03:00",
+  "data_brt": "2026-09-07",
+  "executado_em": "2026-09-07T13:39:52-03:00",
   "status": "atencao",
-  "resumo": "Auditoria concluída sem correções automáticas. As duas pendências críticas de transmissão permanecem sem complementação, pois não foi localizada fonte permitida que declarasse diretamente os canais de exibição para os event_id informados.",
+  "resumo": "Sem correções automáticas propostas. As duas pendências de transmissão permanecem sem evidência direta em fonte elegível; as falhas isoladas de fontes não configuram incidente crítico adicional.",
   "triagem": {
-    "data_hora_brt": "2026-09-06T11:23:56-03:00",
+    "data_hora_brt": "2026-09-07T13:39:52-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
@@ -22,7 +22,7 @@
         "transmissoes_criticas": 2,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 6.2
+        "ultimo_sucesso_horas": 8.4
       }
     },
     "pendencias": {
@@ -35,7 +35,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "critico",
-          "horas_ate_jogo": 55.6
+          "horas_ate_jogo": 29.3
         },
         {
           "event_id": "401912542",
@@ -44,7 +44,7 @@
           "mandante": "",
           "visitante": "",
           "nivel": "critico",
-          "horas_ate_jogo": 58.1
+          "horas_ate_jogo": 31.8
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -78,7 +78,7 @@
       {
         "type": "search",
         "queries": [
-          "\"401913960\" OR \"401912542\" transmissão 8 setembro 2026 futebol"
+          "site:espn.com.br \"401913960\" OR \"401912542\" transmissão"
         ]
       }
     ],
@@ -86,26 +86,26 @@
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Auditoria concluída sem correções automáticas. As duas pendências críticas de transmissão permanecem sem complementação, pois não foi localizada fonte permitida que declarasse diretamente os canais de exibição para os event_id informados.",
+    "resumo": "Sem correções automáticas propostas. As duas pendências de transmissão permanecem sem evidência direta em fonte elegível; as falhas isoladas de fontes não configuram incidente crítico adicional.",
     "problemas": [
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Pendência elegível para complementação, mas sem evidência inequívoca em fonte permitida que declare diretamente os canais de transmissão. Nenhum dado existente foi sobrescrito.",
+        "mensagem": "Transmissão ainda pendente para jogo futuro. A consulta em fonte elegível não retornou declaração direta de canais para complementar o registro.",
         "event_id": "401913960",
         "requer_intervencao": true
       },
       {
         "categoria": "transmissao",
         "severidade": "atencao",
-        "mensagem": "Pendência elegível para complementação, mas sem evidência inequívoca em fonte permitida que declare diretamente os canais de transmissão. Nenhum dado existente foi sobrescrito.",
+        "mensagem": "Transmissão ainda pendente para jogo futuro. A consulta em fonte elegível não retornou declaração direta de canais para complementar o registro.",
         "event_id": "401912542",
         "requer_intervencao": true
       },
       {
         "categoria": "fonte",
         "severidade": "info",
-        "mensagem": "As falhas isoladas de fontes de transmissão não foram classificadas como incidente crítico, pois o dossiê não indica perda crítica de cobertura nem inconsistência nos dados finais.",
+        "mensagem": "Foram registradas falhas em fontes de transmissão, mas não há evidência de perda crítica de cobertura ou de corrupção dos dados finais.",
         "event_id": "",
         "requer_intervencao": false
       }
@@ -517,6 +517,19 @@
       "executado_em": "2026-09-06T11:23:56-03:00",
       "status": "atencao",
       "resumo": "Auditoria concluída sem correções automáticas. As duas pendências críticas de transmissão permanecem sem complementação, pois não foi localizada fonte permitida que declarasse diretamente os canais de exibição para os event_id informados.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-07",
+      "executado_em": "2026-09-07T13:39:52-03:00",
+      "status": "atencao",
+      "resumo": "Sem correções automáticas propostas. As duas pendências de transmissão permanecem sem evidência direta em fonte elegível; as falhas isoladas de fontes não configuram incidente crítico adicional.",
       "chamadas_openai": 1,
       "web_searches": 1,
       "publicos_aplicados": 0,
