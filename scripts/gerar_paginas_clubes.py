@@ -143,5 +143,18 @@ def render(site_dir:Path, repo_root:Path):
     print('ORG-3 PASS:', ', '.join(checks))
 
 if __name__=='__main__':
-    ap=argparse.ArgumentParser(); ap.add_argument('--site-dir',default='_site'); ap.add_argument('--repo-root',default='.')
-    a=ap.parse_args(); render(Path(a.site_dir).resolve(),Path(a.repo_root).resolve())
+    ap=argparse.ArgumentParser(
+        description='Gera e valida a página completa do Flamengo (ORG-3).',
+    )
+    # Compatibilidade: a ORG-2/deploy usa --site-root; versões locais da ORG-3
+    # também aceitavam --site-dir. Ambos apontam para o mesmo destino.
+    ap.add_argument('--site-dir', '--site-root', dest='site_dir', default='_site')
+    ap.add_argument('--repo-root', default='.')
+    # O workflow histórico chama o gerador com --check. A geração é determinística
+    # e idempotente; em modo check ela é executada normalmente e os gates
+    # estruturais no fim de render() validam o artefato recém-gerado.
+    ap.add_argument('--check', action='store_true', help='gera de forma idempotente e executa os gates ORG-3')
+    a=ap.parse_args()
+    render(Path(a.site_dir).resolve(), Path(a.repo_root).resolve())
+    if a.check:
+        print('ORG-3 CHECK PASS')
