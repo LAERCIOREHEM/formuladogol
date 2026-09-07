@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-09-06T20:46:29-03:00",
+  "atualizado_em": "2026-09-06T22:21:46-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,12 +13,12 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 254,
-    "jogos_com_video": 254,
+    "jogos_resultados": 255,
+    "jogos_com_video": 255,
     "ge_globo": 248,
     "amazon_prime_video": 2,
     "cazetv": 2,
-    "uol_esporte": 2,
+    "uol_esporte": 3,
     "outros": 0,
     "sem_video": 0,
     "percentual_fontes_preferidas": 100.0
@@ -3998,22 +3998,6 @@
     ],
     "amazon_prime_video": [
       {
-        "event_id": "401841010",
-        "rodada": 5,
-        "mandante": "Mirassol",
-        "visitante": "Santos",
-        "placar_mandante": 2,
-        "placar_visitante": 2,
-        "categoria_fonte": "amazon_prime_video",
-        "origem_vinculo": "automatico",
-        "fonte": "Prime Video / YouTube",
-        "fonte_busca": "search.list oficial por channelId",
-        "channel_title": "Prime Video Sport Brasil",
-        "titulo": "MIRASSOL 2 X 2 SANTOS | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
-        "url": "https://www.youtube.com/watch?v=aivF0uxPFtY",
-        "confianca": 1.0
-      },
-      {
         "event_id": "401841158",
         "rodada": 20,
         "mandante": "Athletico-PR",
@@ -4027,6 +4011,22 @@
         "channel_title": "Prime Video Sport Brasil",
         "titulo": "ATHLETICO-PR 2 X 0 INTERNACIONAL | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
         "url": "https://www.youtube.com/watch?v=l_qf0g_5BOQ",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841220",
+        "rodada": 26,
+        "mandante": "Corinthians",
+        "visitante": "Chapecoense",
+        "placar_mandante": 1,
+        "placar_visitante": 2,
+        "categoria_fonte": "amazon_prime_video",
+        "origem_vinculo": "automatico",
+        "fonte": "Prime Video / YouTube",
+        "fonte_busca": "playlistItems",
+        "channel_title": "Prime Video Sport Brasil",
+        "titulo": "CORINTHIANS 1 X 2 CHAPECOENSE | MELHORES MOMENTOS | CAMPEONATO BRASILEIRO 2026",
+        "url": "https://www.youtube.com/watch?v=IfTrnQeUm70",
         "confianca": 1.0
       }
     ],
@@ -4079,6 +4079,22 @@
         "channel_title": "UOL Esporte",
         "titulo": "BAHIA 2 X 0 CHAPECOENSE | MELHORES MOMENTOS | BRASILEIRÃO 2026",
         "url": "https://www.youtube.com/watch?v=bQOiH-8ShZE",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841010",
+        "rodada": 5,
+        "mandante": "Mirassol",
+        "visitante": "Santos",
+        "placar_mandante": 2,
+        "placar_visitante": 2,
+        "categoria_fonte": "uol_esporte",
+        "origem_vinculo": "automatico",
+        "fonte": "UOL Esporte / YouTube",
+        "fonte_busca": "search.list oficial por channelId",
+        "channel_title": "UOL Esporte",
+        "titulo": "MIRASSOL 2 X 2 SANTOS: GABIGOL SALVA EMPATE PARA O PEIXE; VEJA MELHORES MOMENTOS PELO BRASILEIRÃO",
+        "url": "https://www.youtube.com/watch?v=LeezduYU6uQ",
         "confianca": 1.0
       },
       {
