@@ -2785,7 +2785,7 @@ body > .container > section.hero > img {
 
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260801-footer-institucional-v1">
-<link rel="stylesheet" href="css/br-jogos.css?v=20260808-jogos-unificados-v1">
+<link rel="stylesheet" href="css/br-jogos.css?v=20260907-org7r-final-v1">
 <!-- Dados estruturados: raiz do grafo (Organization, Person, WebSite, WebPage).
      As demais páginas referenciam #website e #organization definidos aqui. -->
 <script type="application/ld+json">
@@ -5617,6 +5617,26 @@ function htmlChipPeriodo(key, label) {
   return `<button type="button" class="br-games-chip ${ativo ? 'ativo' : ''}" onclick="setFiltroPeriodoJogos('${key}')" aria-pressed="${ativo ? 'true' : 'false'}">${label}</button>`;
 }
 
+
+function slugSeoPartida(valor) {
+  return String(valor || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+}
+function urlPaginaJogoBrasileirao(jogo) {
+  if (!jogo || jogo.data_definir === true || !jogo.data_iso) return '';
+  const comp = String(jogo.competicao_chave || 'brasileirao');
+  if (jogo.competicao_chave && comp !== 'brasileirao') return '';
+  const mandante = typeof jogo.mandante === 'object' ? (jogo.mandante || {}).nome : jogo.mandante;
+  const visitante = typeof jogo.visitante === 'object' ? (jogo.visitante || {}).nome : jogo.visitante;
+  const data = String(jogo.data_iso || '').slice(0, 10);
+  if (!mandante || !visitante || !/^\d{4}-\d{2}-\d{2}$/.test(data)) return '';
+  return `/jogo/${slugSeoPartida(mandante)}-x-${slugSeoPartida(visitante)}-${data}/`;
+}
+
 function renderJogos() {
   const container = document.getElementById('view-jogos');
   if (!state.jogosCarregados) {
@@ -5646,6 +5666,7 @@ function renderJogos() {
     html += `<span class="br-games-heading-note">Brasileirão · Copa do Brasil · Libertadores · Sul-Americana${atualizado ? ' · atualizado ' + brEscapeHtml(atualizado) : ''}<span class="br-update-status-dot" role="img" aria-label="Status da atualização" title="Status da atualização"></span></span>`;
   }
   html += '</div>';
+  html += '<div class="br-games-archive-strip"><span>Quer consultar qualquer rodada?</span><a class="br-game-action" href="/brasileirao-jogos.html">🗂️ Arquivo completo do Brasileirão</a></div>';
 
   html += '<section class="br-games-filters" aria-label="Filtros dos jogos">';
   html += '<div class="br-games-filter-block"><span class="br-games-filter-title">Competição</span><div class="br-games-chips">';
@@ -5715,6 +5736,8 @@ function renderJogos() {
       const liveEmbed = entradaAoVivoJogo(j);
       const eventId = String(j.event_id || j.id || '');
       const assistir = liveEmbed && eventId ? `<a class="br-game-action br-game-action-live" href="aovivo.html?event=${encodeURIComponent(eventId)}">▶ Assistir aqui</a>` : '';
+      const paginaJogo = jogoUnificadoEhBrasileirao(j) ? urlPaginaJogoBrasileirao(j) : '';
+      const detalhesPagina = paginaJogo ? `<a class="br-game-action br-game-action-detail" href="${brEscapeAttr(paginaJogo)}">📄 Detalhes da partida</a>` : '';
 
       html += `<article class="jogo-card ${estado.estado} br-game-unified" data-competition="${brEscapeAttr(compKey)}" data-event-id="${brEscapeAttr(eventId)}">
         <div class="jogo-card-top br-game-card-top">
@@ -5739,7 +5762,7 @@ function renderJogos() {
       if (estado.gols && estado.gols.length) html += `<div class="jogo-gols">⚽ ${estado.gols.map(brEscapeHtml).join(' · ')}</div>`;
       html += '</div>';
       const mmJogo = jogoUnificadoEhBrasileirao(j) ? htmlMelhoresMomentos(j, 'jogo') : '';
-      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span><div class="br-game-actions-right">${assistir}<span class="fdg-game-alert-slot" data-fdg-game-alert-slot data-event-id="${brEscapeAttr(eventId)}"></span>${mmJogo}</div></div>`;
+      html += `<div class="jogo-actions"><span class="jogo-source-pill">Dados: ESPN</span><div class="br-game-actions-right">${detalhesPagina}${assistir}<span class="fdg-game-alert-slot" data-fdg-game-alert-slot data-event-id="${brEscapeAttr(eventId)}"></span>${mmJogo}</div></div>`;
       html += '</article>';
     }
     html += '</div>';
@@ -6040,6 +6063,7 @@ function renderResultados() {
   }
   html += '</div>';
   html += '</div>';
+  html += '<div class="br-games-archive-strip br-results-archive-strip"><span>Todos os jogos e rodadas do Brasileirão</span><a class="br-game-action" href="/brasileirao-jogos.html">🗂️ Abrir arquivo completo</a></div>';
 
   // Estatística rápida quando filtra por time
   if (filtroTime && resultadosFiltrados.length > 0) {
@@ -6091,6 +6115,7 @@ function renderResultados() {
 
       const dataFmt = formatarDataResultado(r.data_iso);
       const extrasResultado = [htmlMelhoresMomentos(r, 'resultado'), htmlEstatisticasJogo(r)].filter(Boolean).join('');
+      const paginaResultado = urlPaginaJogoBrasileirao(r);
 
       html += `<div class="resultado-card ${classeJogo}">
         <div class="resultado-meta">
@@ -6102,6 +6127,7 @@ function renderResultados() {
           <div class="resultado-placar">${pm} <span class="placar-x">×</span> ${pv}</div>
           ${linkClubeBrasileirao(v.nome, `<span class="resultado-escudo">${escudoVisitante}</span><span class="resultado-team-text"><span class="resultado-nome">${v.nome || '?'}</span></span>`, 'resultado-time visitante br-club-link')}
         </div>
+        ${paginaResultado ? `<div class="resultado-page-row"><a class="br-game-action br-game-action-detail" href="${brEscapeAttr(paginaResultado)}">📄 Ver página da partida</a></div>` : ''}
         ${htmlResumoResultadoDetalhes(r)}
         ${extrasResultado ? `<div class="resultado-extra">${extrasResultado}</div>` : ''}
       </div>`;

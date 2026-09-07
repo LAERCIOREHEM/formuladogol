@@ -324,3 +324,22 @@
     max-width: 112px;
   }
 }
+
+
+/* ORG-7R — navegação explícita para catálogo e páginas individuais. */
+.br-games-archive-strip {
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin:0 0 12px; padding:9px 11px; min-width:0;
+  border:1px solid rgba(163,230,53,.16); border-radius:14px;
+  background:rgba(163,230,53,.045); color:#cbd5e1; font-size:12px;
+}
+.br-games-archive-strip > * { min-width:0; }
+.br-game-action-detail { border-color:rgba(163,230,53,.28); color:#d9ff76; background:rgba(163,230,53,.07); }
+.br-game-action-detail:hover { border-color:rgba(163,230,53,.55); color:#f4ffd2; }
+.resultado-page-row { display:flex; justify-content:center; width:100%; min-width:0; margin:7px 0 2px; }
+@media (max-width:680px) {
+  .br-games-archive-strip { align-items:stretch; flex-direction:column; }
+  .br-games-archive-strip .br-game-action,
+  .resultado-page-row .br-game-action { width:100%; white-space:normal; text-align:center; }
+  .br-game-actions-right .br-game-action-detail { flex-basis:100%; width:100%; white-space:normal; }
+}

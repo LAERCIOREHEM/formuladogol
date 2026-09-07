@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 
 SITE = "https://formuladogol.com.br"
 NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
-HUBS = {"/competicoes/", "/brasileirao/", "/copa-do-brasil/", "/libertadores/", "/sul-americana/", "/brasileirao/jogos/"}
+HUBS = {"/competicoes/", "/brasileirao/", "/copa-do-brasil/", "/libertadores/", "/sul-americana/", "/brasileirao-jogos.html"}
 
 
 def load(path: Path, fallback):
@@ -89,10 +89,28 @@ def validate(site: Path) -> dict[str,int]:
     linked_clubs={SITE+m for m in re.findall(r'href="(/clube/[^"#?]+/)"',club_hub)}
     if linked_clubs!=expected_clubs:
         problems.append(f"hub de clubes não cobre 20/20: {len(linked_clubs)}/{len(expected_clubs)}")
-    archive=(site/"brasileirao/jogos/index.html").read_text(encoding="utf-8")
+    archive=(site/"brasileirao-jogos.html").read_text(encoding="utf-8")
     linked_games={SITE+m for m in re.findall(r'href="(/jogo/[^"#?]+/)"',archive)}
     if linked_games!=expected_games:
         problems.append(f"arquivo de jogos não cobre todas as partidas: {len(linked_games)}/{len(expected_games)}")
+
+    # ORG-7R: a malha precisa ser navegável também pelas superfícies de uso
+    # diário, não apenas pelo sitemap e pelos clubes.
+    root_index=(site/"index.html").read_text(encoding="utf-8")
+    if '/brasileirao-jogos.html' not in root_index:
+        problems.append("Jogos/Resultados não expõem o arquivo canônico do Brasileirão")
+    if 'urlPaginaJogoBrasileirao' not in root_index:
+        problems.append("helper de links para páginas individuais ausente no front principal")
+    if 'Detalhes da partida' not in root_index or 'Ver página da partida' not in root_index:
+        problems.append("CTAs de páginas individuais ausentes em Jogos/Resultados")
+
+    legacy=site/"brasileirao"/"jogos"/"index.html"
+    if not legacy.is_file():
+        problems.append("alias legado /brasileirao/jogos/ ausente")
+    else:
+        legacy_text=legacy.read_text(encoding="utf-8")
+        if 'noindex,follow' not in legacy_text or 'brasileirao-jogos.html' not in legacy_text:
+            problems.append("alias legado não aponta corretamente para a canônica")
 
     # Toda partida mantém links para ambos os clubes; isso fecha o ciclo de
     # linkagem arquivo -> jogo -> clube -> jogos recentes/próximos.

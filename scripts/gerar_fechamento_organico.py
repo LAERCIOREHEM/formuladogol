@@ -24,7 +24,8 @@ from typing import Any
 SITE = "https://formuladogol.com.br"
 NS = "http://www.sitemaps.org/schemas/sitemap/0.9"
 FUSO_BR = timezone(timedelta(hours=-3))
-ARCHIVE_URL = f"{SITE}/brasileirao/jogos/"
+ARCHIVE_URL = f"{SITE}/brasileirao-jogos.html"
+LEGACY_ARCHIVE_URL = f"{SITE}/brasileirao/jogos/"
 
 
 def load(path: Path, fallback: Any) -> Any:
@@ -163,18 +164,32 @@ def render_archive(site: Path, calendar_manifest: dict[str, Any], results_manife
         ],
     }
     page = f'''<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)}</title><meta name="description" content="{esc(desc)}"><meta name="robots" content="index,follow,max-image-preview:large"><link rel="canonical" href="{ARCHIVE_URL}"><meta property="og:type" content="website"><meta property="og:title" content="Jogos do Brasileirão 2026"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{ARCHIVE_URL}"><meta property="og:image" content="{SITE}/og-image-formula-do-gol-v2.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#10b981"><link rel="stylesheet" href="/css/br-institucional.css?v=20260722-evolucao-af-score-v1"><link rel="stylesheet" href="/css/br-global.css?v=20260801-footer-institucional-v1"><link rel="stylesheet" href="/css/br-arquivo-jogos.css?v=20260907-org7-v1"><script async src="https://www.googletagmanager.com/gtag/js?id=G-3956SD5HFC"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}gtag('js',new Date());gtag('config','G-3956SD5HFC',{{page_title:{json.dumps(title,ensure_ascii=False)},page_location:{json.dumps(ARCHIVE_URL)},page_path:'/brasileirao/jogos/'}});</script><script type="application/ld+json">{json.dumps(schema,ensure_ascii=False,separators=(',',':'))}</script></head><body><div class="container"><header class="hero"><img src="/img/header-formula-do-gol-v2.png" alt="Fórmula do Gol — A matemática por trás do futebol" fetchpriority="high"></header>{nav()}<main class="org7-page"><nav class="org7-breadcrumb" aria-label="Navegação estrutural"><a href="/">Fórmula do Gol</a><span>›</span><a href="/brasileirao/">Brasileirão</a><span>›</span><span>Jogos</span></nav><section class="org7-hero"><div class="org7-kicker">BRASILEIRÃO 2026</div><h1>Arquivo de jogos do Brasileirão 2026</h1><p>{esc(desc)}</p><div class="org7-actions"><a href="/brasileirao/">Probabilidades do campeonato</a><a href="/tabela">Tabela</a><a href="/resultados">Resultados</a><a href="/clubes.html">Clubes</a></div><div class="org7-updated">Calendário atualizado em {lastmod[8:10]}/{lastmod[5:7]}/{lastmod[:4]} · {len(confirmed)} partidas com data confirmada</div></section><section class="org7-index"><div class="org7-section-head"><div><div class="org7-kicker">RODADA A RODADA</div><h2>Todas as partidas com URL individual</h2></div></div>{''.join(sections)}</section></main><footer class="site-footer br-disclaimer"><nav class="br-footer-links"><a href="/sobre.html">ⓘ Sobre o Fórmula do Gol</a></nav><div class="br-footer-copy">Fórmula do Gol — site independente, informativo e sem fins lucrativos. Dados esportivos organizados a partir de fontes públicas; modelos, projeções e apresentação são próprios.</div></footer></div><script src="/js/br-menu.js?v=20260901-alertas-v1"></script></body></html>'''
-    target = site / "brasileirao" / "jogos"
-    target.mkdir(parents=True, exist_ok=True)
-    (target / "index.html").write_text(page, encoding="utf-8")
+    # ORG-7R: URL canônica em arquivo HTML de raiz. Isso elimina dependência
+    # de resolução de diretório entre GitHub Pages e a camada Cloudflare.
+    (site / "brasileirao-jogos.html").write_text(page, encoding="utf-8")
+
+    # Mantém a rota anterior somente como alias de compatibilidade, fora do sitemap.
+    legacy_target = site / "brasileirao" / "jogos"
+    legacy_target.mkdir(parents=True, exist_ok=True)
+    legacy_page = (
+        '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
+        '<meta name="viewport" content="width=device-width,initial-scale=1">'
+        '<meta name="robots" content="noindex,follow">'
+        f'<link rel="canonical" href="{ARCHIVE_URL}">'
+        '<meta http-equiv="refresh" content="0;url=/brasileirao-jogos.html">'
+        '<title>Jogos do Brasileirão 2026 | Fórmula do Gol</title></head>'
+        '<body><p><a href="/brasileirao-jogos.html">Abrir arquivo de jogos do Brasileirão 2026</a></p></body></html>'
+    )
+    (legacy_target / "index.html").write_text(legacy_page, encoding="utf-8")
     return lastmod, len(confirmed)
 
 
 def patch_brasileirao_hub(site: Path) -> None:
     path = site / "brasileirao" / "index.html"
     text = path.read_text(encoding="utf-8")
-    if 'href="/brasileirao/jogos/"' not in text:
+    if 'href="/brasileirao-jogos.html"' not in text:
         marker = '<a class="org6-btn" href="/jogos">Jogos</a>'
-        replacement = marker + '<a class="org6-btn" href="/brasileirao/jogos/">Arquivo de partidas</a>'
+        replacement = marker + '<a class="org6-btn" href="/brasileirao-jogos.html">Arquivo de partidas</a>'
         if marker not in text:
             raise AssertionError("ORG-7: botão Jogos não encontrado no hub do Brasileirão")
         text = text.replace(marker, replacement, 1)
@@ -193,6 +208,9 @@ def update_sitemap(site: Path, lastmod: str) -> None:
     root = tree.getroot()
     nodes = root.findall(f"{{{NS}}}url")
     existing = {(n.findtext(f"{{{NS}}}loc") or "").strip(): n for n in nodes}
+    if LEGACY_ARCHIVE_URL in existing:
+        root.remove(existing[LEGACY_ARCHIVE_URL])
+        existing.pop(LEGACY_ARCHIVE_URL, None)
     if ARCHIVE_URL not in existing:
         node = ET.SubElement(root, f"{{{NS}}}url")
         ET.SubElement(node, f"{{{NS}}}loc").text = ARCHIVE_URL
@@ -206,7 +224,7 @@ def update_sitemap(site: Path, lastmod: str) -> None:
 
 
 def validate(site: Path, expected_games: int) -> None:
-    archive = site / "brasileirao" / "jogos" / "index.html"
+    archive = site / "brasileirao-jogos.html"
     text = archive.read_text(encoding="utf-8")
     if text.count("<h1") != 1:
         raise AssertionError("ORG-7: arquivo de jogos sem H1 único")
@@ -222,7 +240,7 @@ def validate(site: Path, expected_games: int) -> None:
     if len(links) != expected_games:
         raise AssertionError(f"ORG-7: esperado {expected_games} links de jogo; recebido {len(links)}")
     hub = (site / "brasileirao" / "index.html").read_text(encoding="utf-8")
-    if 'href="/brasileirao/jogos/"' not in hub:
+    if 'href="/brasileirao-jogos.html"' not in hub:
         raise AssertionError("ORG-7: hub do Brasileirão não aponta para arquivo")
     club_links = set(re.findall(r'href="(/clube/[^"#?]+/)"', hub))
     if len(club_links) < 8:
@@ -230,7 +248,9 @@ def validate(site: Path, expected_games: int) -> None:
     sitemap = ET.parse(site / "sitemap.xml").getroot()
     urls = [(n.text or "").strip() for n in sitemap.findall(f"{{{NS}}}url/{{{NS}}}loc")]
     if urls.count(ARCHIVE_URL) != 1:
-        raise AssertionError("ORG-7: arquivo deve aparecer exatamente uma vez no sitemap")
+        raise AssertionError("ORG-7R: arquivo canônico deve aparecer exatamente uma vez no sitemap")
+    if LEGACY_ARCHIVE_URL in urls:
+        raise AssertionError("ORG-7R: rota antiga não deve permanecer no sitemap")
 
 
 def build(site: Path, *, check: bool) -> dict[str, int]:
