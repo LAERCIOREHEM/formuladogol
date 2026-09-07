@@ -327,6 +327,11 @@
       return hay.includes(termo);
     });
   }
+  const CLUB_PAGES = new Set(["flamengo"]);
+  function paginaClubeUrl(c){
+    const s = slug(c?.nome || "");
+    return CLUB_PAGES.has(s) ? `/clube/${s}/` : "";
+  }
   function renderGrid(){
     const lista = clubesFiltrados();
     if (!lista.length) {
@@ -337,11 +342,10 @@
       const t = tabelaDo(c.nome);
       const r = rankingDo(c.nome);
       const p = probabilidadeDo(c.nome);
+      const pageUrl = paginaClubeUrl(c);
+      const head = `<div class="club-head">${escudoHtml(c)}<div><div class="club-name">${escapeHtml(c.nome)}</div><div class="club-sub">${escapeHtml(c.cidade)}-${escapeHtml(c.uf)} · ${escapeHtml(c.apelido)}</div></div></div>`;
       return `<article class="club-card ${state.selecionado === c.nome ? "active" : ""}" tabindex="0" role="button" data-clube="${escapeAttr(c.nome)}">
-        <div class="club-head">
-          ${escudoHtml(c)}
-          <div><div class="club-name">${escapeHtml(c.nome)}</div><div class="club-sub">${escapeHtml(c.cidade)}-${escapeHtml(c.uf)} · ${escapeHtml(c.apelido)}</div></div>
-        </div>
+        ${pageUrl ? `<a class="club-page-link" href="${pageUrl}" aria-label="Abrir página completa do ${escapeAttr(c.nome)}">${head}</a>` : head}
         <p>${escapeHtml(c.curiosidade)}</p>
         <div class="club-kpis">
           <div class="kpi"><strong>${t.pos || "—"}º</strong><span>posição</span></div>
@@ -350,11 +354,12 @@
         </div>
         ${probabilidadeResumoHtml(p)}
         ${rankingResumoHtml(r)}
+        ${pageUrl ? `<a class="club-page-cta" href="${pageUrl}">Página completa do clube →</a>` : ""}
       </article>`;
     }).join("");
     $("#grid-clubes").querySelectorAll(".club-card").forEach(card => {
       const select = () => selecionar(card.dataset.clube);
-      card.addEventListener("click", select);
+      card.addEventListener("click", ev => { if (ev.target.closest("a")) return; select(); });
       card.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(); } });
     });
   }
