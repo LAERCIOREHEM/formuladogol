@@ -368,7 +368,7 @@ jobs:
         run: |
           python scripts/gerar_fundacao_organica.py --site-root _site --check
 
-      - name: ORG-2 — Arquitetura de clubes + piloto Flamengo
+      - name: ORG-4 — 20 páginas completas de clubes
         run: |
           python scripts/gerar_paginas_clubes.py --site-root _site --check
 
@@ -422,11 +422,6 @@ jobs:
                   "dados-br/ranking-desempenho.json", "dados-br/probabilidades-brasileirao.json",
                   "tabela.json", "espn_eventos.json",
               ],
-              "https://formuladogol.com.br/clube/flamengo/": [
-                  "dados-br/clubes.json", "dados-br/ranking-desempenho.json",
-                  "dados-br/probabilidades-brasileirao.json", "dados-br/agenda-clubes-br.json",
-                  "tabela.json",
-              ],
               "https://formuladogol.com.br/museu.html": [
                   "dados-br/museu-brasileirao.json",
               ],
@@ -437,6 +432,25 @@ jobs:
           STATIC_LASTMOD = {
               "https://formuladogol.com.br/sobre.html": "2026-08-01",
           }
+
+          # ORG-4: todas as páginas /clube/<slug>/ agregam o mesmo conjunto de
+          # fontes reais. O slug é dinâmico; não mantemos uma lista manual por time.
+          CLUB_PAGE_DEPS = [
+              "dados-br/clubes.json",
+              "dados-br/ranking-desempenho.json",
+              "dados-br/historico-ranking-desempenho.json",
+              "dados-br/probabilidades-brasileirao.json",
+              "dados-br/marcos-af-previsao.json",
+              "dados-br/agenda-clubes-br.json",
+              "dados-br/probabilidades-jogos.json",
+              "dados-br/lideres-jogadores.json",
+              "dados-br/estatisticas-competicao.json",
+              "dados-br/acuracia-af-previsao.json",
+              "dados-br/analises.json",
+              "tabela.json",
+              "resultados.json",
+          ]
+          CLUB_PAGE_RE = re.compile(r"^https://formuladogol\.com\.br/clube/[a-z0-9-]+/$")
 
           analises_manifesto = json.loads((site / "dados-br/analises.json").read_text(encoding="utf-8"))
           artigos_analise = {
@@ -532,6 +546,8 @@ jobs:
               data_status_global = agora.strftime("%Y-%m-%d")
 
           def resolver(url, lastmod_existente=""):
+              if CLUB_PAGE_RE.fullmatch(url):
+                  return data_da_pagina(CLUB_PAGE_DEPS, url)
               if url in DEPS:
                   return data_da_pagina(DEPS[url], url)
               if url in STATIC_LASTMOD:
@@ -1034,7 +1050,23 @@ jobs:
               "https://formuladogol.com.br/copa2026/museu.html",
           }
           expected_urls.add("https://formuladogol.com.br/analises/")
-          expected_urls.add("https://formuladogol.com.br/clube/flamengo/")
+
+          # ORG-4: o sitemap deve refletir os 20 clubes da fonte oficial, não uma
+          # lista manual sujeita a esquecer um time ou conservar slug legado.
+          import unicodedata
+          def slug_clube(valor):
+              ascii_name = unicodedata.normalize("NFKD", str(valor or "")).encode("ascii", "ignore").decode("ascii")
+              return re.sub(r"[^a-z0-9]+", "-", ascii_name.lower()).strip("-")
+
+          clubes_manifesto = json.loads((site / "dados-br/clubes.json").read_text(encoding="utf-8"))
+          clubes_lista = clubes_manifesto.get("clubes") or []
+          club_slugs = {slug_clube(item.get("nome")) for item in clubes_lista if item.get("nome")}
+          assert len(clubes_lista) == 20, f"clubes.json: esperado 20 clubes, recebido {len(clubes_lista)}"
+          assert len(club_slugs) == 20, f"clubes.json: slugs não únicos: {sorted(club_slugs)!r}"
+          assert "gremio" in club_slugs and "gr-mio" not in club_slugs, "slug de Grêmio incorreto"
+          for slug in club_slugs:
+              assert (site / "clube" / slug / "index.html").is_file(), f"página de clube ausente: {slug}"
+          expected_urls.update(f"https://formuladogol.com.br/clube/{slug}/" for slug in club_slugs)
           expected_urls.update(artigo["url"] for artigo in artigos_analises)
           assert set(urls) == expected_urls, f"sitemap divergente: {urls!r}"
 
