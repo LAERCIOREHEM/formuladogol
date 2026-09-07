@@ -522,7 +522,7 @@ def render_page(
   <link rel="stylesheet" href="/css/br-institucional.css?v=20260722-evolucao-af-score-v1">
   <link rel="stylesheet" href="/css/br-global.css?v=20260801-footer-institucional-v1">
   <link rel="stylesheet" href="/css/br-alertas.css?v=20260905-push-resiliencia-v1">
-  <link rel="stylesheet" href="/css/br-clube.css?v=20260907-org4-v1">
+  <link rel="stylesheet" href="/css/br-clube.css?v=20260907-org4r-mobile-v1">
   <script type="application/ld+json">{json_ld}</script>
 </head>
 <body>

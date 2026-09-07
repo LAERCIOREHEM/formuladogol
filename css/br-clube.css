@@ -18,3 +18,91 @@
 @media(max-width:1050px){.club-change-grid,.club-route-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.club-grid-five{grid-template-columns:repeat(3,minmax(0,1fr))}.result-grid,.accuracy-timeline{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.club-change-grid,.club-route-grid,.result-grid,.accuracy-timeline{grid-template-columns:1fr}.game-probs{grid-template-columns:1fr}.club-live-callout{justify-content:stretch}.club-live-callout .club-btn{width:100%}.club-grid-five{grid-template-columns:repeat(2,minmax(0,1fr))}.club-grid-five .club-metric:last-child:nth-child(odd){grid-column:1/-1}.ga-column{width:100%}.competition-chip{width:100%;justify-content:space-between}}
 @media(max-width:380px){.club-grid-five{grid-template-columns:1fr}.club-grid-five .club-metric:last-child:nth-child(odd){grid-column:auto}}
+
+/* ORG-4R — correção estrutural de responsividade mobile.
+   Impede que conteúdos com largura intrínseca (especialmente a tabela do
+   AF-Previsão) ampliem a coluna principal e sejam cortados pela viewport. */
+.club-page{
+  grid-template-columns:minmax(0,1fr);
+  min-width:0;
+  width:100%;
+  max-width:100%;
+}
+.club-page>*{
+  min-width:0;
+  max-width:100%;
+}
+.club-hero-card,
+.club-section{
+  min-width:0;
+  width:100%;
+  max-width:100%;
+}
+.club-identity,
+.club-identity>*,
+.club-section-head,
+.club-section-head>*,
+.game-card,
+.game-match>*,
+.result-card,
+.result-score>*,
+.timeline-card,
+.alert-box>*{
+  min-width:0;
+}
+.table-scroll{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-inline:contain;
+}
+.club-answer,
+.club-section h2,
+.club-subtle,
+.game-meta,
+.game-match,
+.result-score span,
+.result-card em,
+.club-projection span,
+.fact strong,
+.analysis-card,
+.competition-chip{
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+
+@media(max-width:700px){
+  .club-section h2{
+    font-size:clamp(1.04rem,5vw,1.16rem);
+  }
+  .club-name-row h1{
+    font-size:clamp(1.35rem,7vw,1.65rem);
+    overflow-wrap:anywhere;
+  }
+  .club-projection{
+    grid-template-columns:1fr;
+    gap:4px;
+  }
+  .club-projection strong{
+    font-size:1.45rem;
+  }
+  .club-answer{
+    font-size:.9rem;
+    line-height:1.52;
+  }
+  .game-match{
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  .game-match>*{
+    max-width:100%;
+  }
+  .result-score{
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  }
+  .result-score strong{
+    font-size:.9rem;
+  }
+}
