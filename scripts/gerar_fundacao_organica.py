@@ -112,7 +112,7 @@ def prerender_clubes(root: Path) -> None:
         pos_proj = p.get("posicao_classificacao_projetada") or p.get("posicao_projetada") or "—"
         pts_proj = (p.get("pontos_projetados") or {}).get("media") or "—"
         cards.append(f'''<article class="club-card seo-prerender-club" data-clube="{esc(nome)}" {ORG1_MARK}="club-card">
-          <a href="clubes.html#{esc(slug)}" aria-label="Ver dados de {esc(nome)}" style="color:inherit;text-decoration:none;display:block;position:relative;z-index:1">
+          <a href="/clube/{esc(slug)}/" aria-label="Abrir página completa de {esc(nome)}" style="color:inherit;text-decoration:none;display:block;position:relative;z-index:1">
             <div class="club-head">
               <img class="club-logo" src="{esc(escudo)}" alt="Escudo do {esc(nome)}" loading="lazy">
               <div><div class="club-name">{esc(nome)}</div><div class="club-sub">{esc(c.get('cidade') or '')}-{esc(c.get('uf') or '')} · {esc(c.get('apelido') or '')}</div></div>
@@ -208,8 +208,12 @@ def validate(root: Path) -> None:
     if cards != 20:
         raise SystemExit(f"ORG-1: pré-render de clubes divergente: {cards}/20")
     for c in load_json(root, "dados-br/clubes.json").get("clubes") or []:
-        if f'data-clube="{esc(c.get("nome") or "")}"' not in clubes_html:
-            raise SystemExit(f"ORG-1: clube ausente no HTML pré-renderizado: {c.get('nome')}")
+        nome = c.get("nome") or ""
+        slug = slugify(nome)
+        if f'data-clube="{esc(nome)}"' not in clubes_html:
+            raise SystemExit(f"ORG-1: clube ausente no HTML pré-renderizado: {nome}")
+        if f'href="/clube/{esc(slug)}/"' not in clubes_html:
+            raise SystemExit(f"ORG-1: link orgânico do clube ausente/incorreto: {nome} -> /clube/{slug}/")
 
     # 3) Snapshots de conteúdo dinâmico presentes.
     live = (root / "aovivo.html").read_text(encoding="utf-8")

@@ -746,3 +746,12 @@ body.modal-open { overflow: hidden; }
   hyphens: auto;
   overflow-wrap: break-word;
 }
+
+/* ORG-4 — hub dos clubes: card inteiro aponta para a página individual */
+.club-card[data-club-url]{cursor:pointer}
+.club-page-link{outline:none}
+.club-page-link:focus-visible{border-radius:14px;box-shadow:0 0 0 3px rgba(163,230,53,.28)}
+.club-performance-pill{display:grid;gap:3px;margin-top:8px;padding:8px 10px;border:1px solid rgba(163,230,53,.20);border-radius:13px;background:linear-gradient(135deg,rgba(163,230,53,.075),rgba(16,185,129,.055));color:#d7eadc;font-size:11px;line-height:1.25}
+.club-performance-pill strong{color:#eaffc7;font-size:12px;font-weight:950}.club-performance-pill span{color:var(--muted);font-size:10px;font-weight:800}
+.club-probability-pill span{color:var(--muted);font-size:10px;font-weight:800}
+.club-page-cta{display:inline-flex;margin-top:10px;color:#c9ff73;font-size:11px;font-weight:950;letter-spacing:.01em}
