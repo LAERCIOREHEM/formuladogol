@@ -202,6 +202,7 @@ def render_page(
     estat: dict[str, Any],
     accuracy: dict[str, Any],
     analyses: list[dict[str, Any]],
+    mascotes: dict[str, dict[str, Any]],
 ) -> tuple[str, str, str]:
     name = str(club.get("nome") or "").strip()
     slug = slugify(name)
@@ -479,6 +480,22 @@ def render_page(
         if value
     )
 
+    # ORG-6: restaura o mascote visual que existia na antiga experiência de
+    # clubes.html. O asset já pertence ao repositório e fica na seção de
+    # identidade para não pressionar o hero em telas estreitas.
+    mascot_info = mascotes.get(name) or {}
+    mascot_path = str(mascot_info.get("arquivo") or "").strip()
+    mascot_label = str(club.get("mascote") or mascot_info.get("nome") or "Mascote").strip()
+    mascot_html = ""
+    if mascot_path:
+        mascot_src = "/" + mascot_path.lstrip("/")
+        mascot_html = (
+            f'<figure class="club-mascot">'
+            f'<div class="club-mascot-art"><img src="{esc(mascot_src)}" alt="Mascote do {esc(name)} no Fórmula do Gol" loading="lazy" decoding="async"></div>'
+            f'<figcaption><small>Mascote do clube</small><strong>{esc(mascot_label)}</strong>'
+            f'<span>Ilustração preservada do acervo visual do Fórmula do Gol.</span></figcaption></figure>'
+        )
+
     # Campanha usa diretamente o ranking oficial, que replica a base estatística já publicada.
     campaign = {
         "Jogos": rank.get("jogos", games_current),
@@ -659,7 +676,10 @@ def render_page(
 
     <section class="club-section">
       <div class="club-section-head"><div><div class="club-kicker">Identidade</div><h2>Sobre o {esc(name)}</h2></div></div>
-      <div class="club-identity-facts">{identity_html}</div>{identity_texts}
+      <div class="club-identity-layout">
+        {mascot_html}
+        <div class="club-identity-copy"><div class="club-identity-facts">{identity_html}</div>{identity_texts}</div>
+      </div>
     </section>
   </main>
 
@@ -795,6 +815,7 @@ def render(site_dir: Path, repo_root: Path) -> None:
     estat = load(data / "estatisticas-competicao.json", {})
     accuracy = load(data / "acuracia-af-previsao.json", {})
     analyses = load(data / "analises.json", {}).get("artigos") or []
+    mascotes = load(data / "mascotes.json", {}).get("mascotes") or {}
 
     missing = []
     for club in clubs:
@@ -830,6 +851,7 @@ def render(site_dir: Path, repo_root: Path) -> None:
             estat=estat,
             accuracy=accuracy,
             analyses=analyses,
+            mascotes=mascotes,
         )
         target = site_dir / "clube" / slug / "index.html"
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -848,6 +870,7 @@ def render(site_dir: Path, repo_root: Path) -> None:
         data / "estatisticas-competicao.json",
         data / "acuracia-af-previsao.json",
         data / "analises.json",
+        data / "mascotes.json",
         results_path,
     ]
     update_sitemap(site_dir, canonicals, latest_sources_date(source_paths))
