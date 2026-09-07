@@ -36,6 +36,25 @@ def slugify(value: str) -> str:
     return re.sub(r"[^a-zA-Z0-9]+", "-", text).strip("-").lower()
 
 
+def game_page_url(game: dict[str, Any], *, require_brasileirao: bool = False) -> str:
+    """Retorna a rota ORG-5 apenas quando a partida tem data confirmada."""
+    if game.get("data_definir"):
+        return ""
+    if require_brasileirao:
+        key = str(game.get("competicao_chave") or "").strip().lower()
+        label = str(game.get("competicao_nome_curto") or game.get("competicao_nome") or "").lower()
+        if key and key != "brasileirao" and "brasileir" not in label:
+            return ""
+    raw = str(game.get("data_iso") or "").strip()
+    if len(raw) < 10:
+        return ""
+    home = team_name(game, "mandante")
+    away = team_name(game, "visitante")
+    if not home or not away:
+        return ""
+    return f"/jogo/{slugify(home)}-x-{slugify(away)}-{raw[:10]}/"
+
+
 def fmt_date(raw: Any, *, short: bool = False) -> str:
     value = str(raw or "").strip()
     if not value:
@@ -287,7 +306,7 @@ def render_page(
             <div class="game-meta">{esc(game.get('competicao_nome_curto') or game.get('competicao_nome') or 'Futebol')} · {esc(fmt_date(game.get('data_iso')))}</div>
             <div class="game-match"><span>{esc(team_name(game, 'mandante'))}</span><span>×</span><span>{esc(team_name(game, 'visitante'))}</span></div>
             {probline}
-            <div class="game-actions"><a class="club-btn secondary" href="/jogos">Ver jogos</a><span data-fdg-game-alert-slot data-event-id="{esc(event_id)}"></span></div>
+            <div class="game-actions">{f'<a class="club-btn" href="{esc(game_page_url(game, require_brasileirao=True))}">Análise do jogo</a>' if game_page_url(game, require_brasileirao=True) else ''}<a class="club-btn secondary" href="/jogos">Ver jogos</a><span data-fdg-game-alert-slot data-event-id="{esc(event_id)}"></span></div>
           </div>''')
     games_html = "".join(game_cards) or render_empty("Nenhum próximo jogo está mapeado neste snapshot.")
 
@@ -306,6 +325,7 @@ def render_page(
             <small>R{esc(game.get('rodada', '—'))} · {esc(fmt_date(game.get('data_iso'), short=True))}</small>
             <div class="result-score"><span>{esc(team_name(game, 'mandante'))}</span><strong>{esc(game.get('placar_mandante', '—'))} × {esc(game.get('placar_visitante', '—'))}</strong><span>{esc(team_name(game, 'visitante'))}</span></div>
             <em>{esc(game.get('estadio') or 'Estádio não informado')}</em>
+            {f'<div class="game-actions"><a class="club-btn secondary" href="{esc(game_page_url(game))}">Ver partida</a></div>' if game_page_url(game) else ''}
           </div>''')
     results_html = "".join(result_cards) or render_empty("Ainda não há resultados mapeados para este clube.")
 
