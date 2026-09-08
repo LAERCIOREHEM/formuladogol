@@ -44,6 +44,7 @@
           "horário compatível (0 min de diferença)"
         ],
         "origem_busca": "uploads",
+        "escopo": "partida",
         "embeddable": false
       },
       "alternativas": []
@@ -79,6 +80,7 @@
           "horário compatível (90 min de diferença)"
         ],
         "origem_busca": "uploads",
+        "escopo": "partida",
         "embeddable": true
       },
       "alternativas": []
@@ -114,7 +116,44 @@
           "horário compatível (0 min de diferença)"
         ],
         "origem_busca": "uploads",
+        "escopo": "partida",
         "embeddable": false
+      },
+      "alternativas": []
+    },
+    "401841242": {
+      "event_id": "401841242",
+      "rodada": 28,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Vitória",
+      "visitante": "Cruzeiro",
+      "data_iso": "2026-09-20T16:00:00-03:00",
+      "estadio": "Estadio Manoel Barradas",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "gGpphhcxZPU",
+        "url": "https://www.youtube.com/watch?v=gGpphhcxZPU",
+        "status": "upcoming",
+        "inicio_programado": "2026-09-20T14:30:00-03:00",
+        "inicio_real": "",
+        "titulo": "VITÓRIA X CRUZEIRO | AO VIVO E COM IMAGENS | BRASILEIRÃO 2026 | ge tv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/gGpphhcxZPU/maxresdefault_live.jpg",
+        "confianca": 0.875,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (90 min de diferença)"
+        ],
+        "origem_busca": "uploads",
+        "escopo": "partida",
+        "embeddable": true
       },
       "alternativas": []
     },
@@ -149,10 +188,11 @@
           "horário compatível (0 min de diferença)"
         ],
         "origem_busca": "uploads",
+        "escopo": "partida",
         "embeddable": false
       },
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-09-07T23:11:14-03:00"
+  "atualizado_em": "2026-09-08T13:03:10-03:00"
 }
