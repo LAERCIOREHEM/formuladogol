@@ -13,15 +13,15 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 46,
-    "jogos_foco": 46,
+    "jogos_na_janela": 45,
+    "jogos_foco": 45,
     "descobertas_antecipadas": 0,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 32,
+    "candidatos_oficiais_encontrados": 28,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 40,
+    "search_api_jogos_elegiveis": 39,
     "search_api_jogos_pulados_grade_estavel": 6,
-    "transmissoes_publicadas": 5,
+    "transmissoes_publicadas": 4,
     "sem_transmissao": 41,
     "erros": 0
   },
@@ -68,20 +68,6 @@
     }
   },
   "jogos_analisados": [
-    {
-      "event_id": "401841222",
-      "rodada": 26,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Vitória x Grêmio",
-      "data_iso": "2026-09-07T20:00:00-03:00",
-      "principal": "GE TV",
-      "fontes_encontradas": [
-        "GE TV"
-      ],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
     {
       "event_id": "401912518",
       "rodada": 0,
@@ -633,22 +619,6 @@
   ],
   "aceitos": [
     {
-      "event_id": "401841222",
-      "jogo": "Vitória x Grêmio",
-      "fonte": "getv",
-      "video_id": "PeiBsjSNCas",
-      "url": "https://www.youtube.com/watch?v=PeiBsjSNCas",
-      "titulo": "VITÓRIA X GRÊMIO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
-      "status": "upcoming",
-      "confianca": 0.9,
-      "motivos": [
-        "os dois clubes aparecem no título",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "horário compatível (60 min de diferença)"
-      ]
-    },
-    {
       "event_id": "401841237",
       "jogo": "Flamengo x Corinthians",
       "fonte": "getv",
@@ -715,16 +685,6 @@
   ],
   "rejeitados": [
     {
-      "video_id": "HCOjXjixEdQ",
-      "url": "https://www.youtube.com/watch?v=HCOjXjixEdQ",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! FLAMENGO E PALMEIRAS BRIGAM PELA PONTA, CONVOCAÇÃO E LIBERTADORES! | Panela Sportv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-07T16:57:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "wtuhJp2GeP4",
       "url": "https://www.youtube.com/watch?v=wtuhJp2GeP4",
       "fonte": "getv",
@@ -745,16 +705,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "lSmt4JWY4aw",
-      "url": "https://www.youtube.com/watch?v=lSmt4JWY4aw",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: COREIA DO NORTE X PORTUGAL | COPA DO MUNDO FIFA FEMININA SUB-20 2026 | 1ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-07T09:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "0YoG6mISrUc",
       "url": "https://www.youtube.com/watch?v=0YoG6mISrUc",
       "fonte": "getv",
@@ -765,13 +715,23 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "2yKpj0d-rx8",
-      "url": "https://www.youtube.com/watch?v=2yKpj0d-rx8",
+      "video_id": "2JI6BE3RMmU",
+      "url": "https://www.youtube.com/watch?v=2JI6BE3RMmU",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: CORINTHIANS X CRUZEIRO | AQUECIMENTO DELAS | BRASILEIRÃO FEMININO 2026 | sportv",
+      "titulo": "AO VIVO! PRIMEIRA DESCIDA TRAZ AS PREVISÕES PARA A TEMPORADA 2026! #podcast | ge.globo",
       "status": "upcoming",
-      "inicio_programado": "2026-09-07T15:45:00-03:00",
+      "inicio_programado": "2026-09-08T11:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "44ont0jx11Q",
+      "url": "https://www.youtube.com/watch?v=44ont0jx11Q",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! NA PONTA DOS DEDOS: A VITÓRIA DE KIMI ANTONELLI NO GP DA ITÁLIA | #podcast | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-08T14:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -782,6 +742,16 @@
       "titulo": "AO VIVO: ESTUDIANTES X CORINTHIANS | QUARTAS DE FINAL | LIBERTADORES 2026 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-09T19:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "7k1-vzZJ-g8",
+      "url": "https://www.youtube.com/watch?v=7k1-vzZJ-g8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO! UBUNTU ESPORTE CLUBE RECEBE A LATERAL SUELLEN ROCHA E A TÉCNICA RENATA COSTA | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-08T12:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -829,7 +799,7 @@
       "url": "https://www.youtube.com/watch?v=qwuLyXkheks",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO! QUARTAS DA LIBERTADORES, CONVOCAÇÃO E O NOVO CICLO DA SELEÇÃO! | Denilson Show",
+      "titulo": "AO VIVO! QUARTAS DA LIBERTADORES, CONVOCAÇÃO E O NOVO CICLO DA SELEÇÃO! | Denilson Show | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-08T16:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -875,23 +845,13 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "BtlbDcaZTcA",
-      "url": "https://www.youtube.com/watch?v=BtlbDcaZTcA",
+      "video_id": "P1pf8M9nLLM",
+      "url": "https://www.youtube.com/watch?v=P1pf8M9nLLM",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: FLAMENGO ASSUME A PONTA! O CAMPEONATO BRASILEIRO TEM UM NOVO LÍDER! | GERAL CAZÉTV",
+      "titulo": "AO VIVO: TÊNIS DE MESA | HUGO CALDERANO NO WTT CHAMPIONS DE MACAU | 16 AVOS DE FINAL",
       "status": "upcoming",
-      "inicio_programado": "2026-09-07T18:20:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "aAiW4Ha7iGE",
-      "url": "https://www.youtube.com/watch?v=aAiW4Ha7iGE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: GETAFE X CELTA | LALIGA 26/27 | 4ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-07T13:45:00-03:00",
+      "inicio_programado": "2026-09-08T09:20:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -901,7 +861,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: BRASIL X CANADÁ | COPA DO MUNDO FIFA FEMININA SUB-20 2026 | 2ª RODADA",
       "status": "upcoming",
-      "inicio_programado": "2026-09-08T09:30:00-03:00",
+      "inicio_programado": "2026-09-08T09:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -935,36 +895,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "jwLqkdr8RcA",
-      "url": "https://www.youtube.com/watch?v=jwLqkdr8RcA",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ELCHE X REAL SOCIEDAD | LALIGA 26/27 | 4ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-07T16:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "o_A4-8na-0s",
-      "url": "https://www.youtube.com/watch?v=o_A4-8na-0s",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ESPANHA X NIGÉRIA | COPA DO MUNDO FIFA FEMININA SUB-20 2026 | 1ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-07T12:25:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "rOiRsW5zf_g",
-      "url": "https://www.youtube.com/watch?v=rOiRsW5zf_g",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ESTADOS UNIDOS X REPÚBLICA TCHECA | COPA DO MUNDO DE BASQUETE FEMININO 2026 | 3ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-07T15:15:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "uvQvOzjlgvg",
       "url": "https://www.youtube.com/watch?v=uvQvOzjlgvg",
       "fonte": "cazetv",
@@ -983,6 +913,16 @@
       "status": "upcoming",
       "inicio_programado": "2026-09-08T18:30:00-03:00",
       "motivo": "conteúdo rejeitado: acompanhamento sem imagens do jogo"
+    },
+    {
+      "video_id": "wPOFS4ACUTo",
+      "url": "https://www.youtube.com/watch?v=wPOFS4ACUTo",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: TÊNIS DE MESA | BRUNA TAKAHASHI NO WTT CHAMPIONS DE MACAU | 16 AVOS DE FINAL",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-09T09:20:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
     }
   ],
   "search_api_pulados": [
@@ -1390,13 +1330,13 @@
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-07T11:03:06-03:00"
+  "atualizado_em": "2026-09-07T23:11:14-03:00"
 }
