@@ -69,18 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401913960",
-      "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Independiente Santa Fe x Vasco da Gama",
-      "data_iso": "2026-09-08T19:00:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401912542",
       "rodada": 0,
       "competicao_chave": "sul_americana",
@@ -93,6 +81,18 @@
       ],
       "manual": false,
       "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401912527",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Palmeiras x Liga de Quito",
+      "data_iso": "2026-09-09T19:00:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841228",
@@ -571,19 +571,19 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401913960",
-      "jogo": "Independiente Santa Fe x Vasco da Gama",
+      "event_id": "401912527",
+      "jogo": "Palmeiras x Liga de Quito",
       "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
     }
   ],
   "sem_transmissao": [
     {
-      "event_id": "401913960",
+      "event_id": "401912527",
       "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Independiente Santa Fe x Vasco da Gama",
-      "data_iso": "2026-09-08T19:00:00-03:00",
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Palmeiras x Liga de Quito",
+      "data_iso": "2026-09-09T19:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -597,5 +597,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-08T18:55:06-03:00"
+  "atualizado_em": "2026-09-08T19:01:03-03:00"
 }
