@@ -17,7 +17,7 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 35,
+    "candidatos_oficiais_encontrados": 36,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 0,
     "search_api_jogos_pulados_grade_estavel": 1,
@@ -69,11 +69,11 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401912518",
+      "event_id": "401913960",
       "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Fluminense x Platense",
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Independiente Santa Fe x Vasco da Gama",
       "data_iso": "2026-09-08T19:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
@@ -409,6 +409,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "QpsVcocBcd8",
+      "url": "https://www.youtube.com/watch?v=QpsVcocBcd8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "SABE DE QUEM?! ADIVINHE QUEM MARCOU ESSE GOL NA LIBERTADORES! | Panela Sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-10T00:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "RBNVGCX3BkM",
       "url": "https://www.youtube.com/watch?v=RBNVGCX3BkM",
       "fonte": "getv",
@@ -561,18 +571,18 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401912518",
-      "jogo": "Fluminense x Platense",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+      "event_id": "401913960",
+      "jogo": "Independiente Santa Fe x Vasco da Gama",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
     }
   ],
   "sem_transmissao": [
     {
-      "event_id": "401912518",
+      "event_id": "401913960",
       "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Fluminense x Platense",
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Independiente Santa Fe x Vasco da Gama",
       "data_iso": "2026-09-08T19:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
@@ -587,5 +597,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-08T18:49:05-03:00"
+  "atualizado_em": "2026-09-08T18:55:06-03:00"
 }
