@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-07T22:11:16.482811-03:00",
+  "gerado_em": "2026-09-07T23:55:15.143709-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 256,
   "total_com_estatisticas": 256,
-  "total_com_publico": 255,
+  "total_com_publico": 256,
   "total_com_eventos": 256,
   "total_com_jogadores": 256,
   "total_eventos_validados": 256,
@@ -20,9 +20,9 @@
       "placar_mandante": 1,
       "placar_visitante": 0,
       "estadio": "Estadio Manoel Barradas",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 8934,
+      "publico_tipo": "total",
+      "publico_fonte": "https://uol.com.br/esporte/ultimas-noticias/agencia/2026/09/07/vitoria-vence-duelo-direto-contra-o-gremio-quebra-jejum-e-se-afasta-do-z-4-do-brasileiro.amp.htm",
       "arbitro": "Savio Pereira Sampaio",
       "stats": [
         {
@@ -582,7 +582,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-07T22:11:13.699657-03:00"
+      "atualizado_em": "2026-09-07T22:11:13.699657-03:00",
+      "renda": 215031,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841220": {
       "event_id": "401841220",
@@ -144246,5 +144248,7 @@
       "renda": 588128,
       "dados_publico_fonte_adicional": "Gato Mestre/ge: público, pagantes e renda da rodada"
     }
-  }
+  },
+  "total_com_publico_pagante": 246,
+  "total_com_renda": 256
 }
