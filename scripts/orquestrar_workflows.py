@@ -88,6 +88,7 @@ WORKFLOW_MAIN = "Atualizar Brasileirao (ESPN)"
 WORKFLOW_MM = "Buscar melhores momentos oficiais"
 WORKFLOW_PUBLICOS = "Atualizar públicos do Brasileirão"
 WORKFLOW_TRANSMISSOES = "Buscar transmissões dos clubes do Brasileirão"
+WORKFLOW_GUARDIAN = "Guardião IA de transmissões"
 WORKFLOW_EDITORIAL_RODADA = "Publicar análise editorial da rodada"
 WORKFLOW_EDITORIAL_COPA = "Publicar análise editorial da Copa do Brasil"
 WORKFLOW_EDITORIAL_CONTINENTAIS = "Publicar análise editorial continental"
@@ -100,6 +101,7 @@ REPO_WRITERS = {
     "Buscar melhores momentos oficiais",
     "Atualizar públicos do Brasileirão",
     "Buscar transmissões dos clubes do Brasileirão",
+    "Guardião IA de transmissões",
     "Publicar análise editorial da Copa do Brasil",
     "Publicar análise editorial continental",
     "Publicar análise editorial da rodada",
@@ -166,6 +168,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "aovivo_antes_minutos": 90,
         "aovivo_depois_minutos": 180,
         "aovivo_checkpoints_minutos": [-90, -45, -20, -5, 10, 30],
+        "guardiao_checkpoints_minutos": [-1440, -360, -90, -15, 10],
     },
     "github": {"branch": "main", "historico_runs": 100, "bloquear_se_writer_ativo": True},
 }
@@ -242,6 +245,7 @@ class Decision:
     event_id: str = ""
     round_number: str = ""
     mode: str = ""
+    checkpoint: str = ""
     details: tuple[str, ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
@@ -251,6 +255,7 @@ class Decision:
             "event_id": self.event_id,
             "rodada": self.round_number,
             "modo": self.mode,
+            "checkpoint": self.checkpoint,
             "detalhes": list(self.details),
         }
 
@@ -526,6 +531,7 @@ ACAO_PARA_WORKFLOW: dict[str, str] = {
     "publicos": WORKFLOW_PUBLICOS,
     "melhores_momentos": WORKFLOW_MM,
     "transmissao_aovivo": WORKFLOW_TRANSMISSOES,
+    "transmissoes_guardian": WORKFLOW_GUARDIAN,
     "transmissoes_tv": WORKFLOW_TRANSMISSOES,
     "editorial_rodada": WORKFLOW_EDITORIAL_RODADA,
     "editorial_copa_do_brasil": WORKFLOW_EDITORIAL_COPA,
@@ -971,12 +977,15 @@ def transmission_live_decision(
     linked = live_entries(LIVE_PATH) | live_entries(LIVE_MANUAL_PATH)
     candidates: list[tuple[Game, str, int]] = []
     for game in games:
-        if game.event_id in final_ids or game.event_id in linked:
+        if game.event_id in final_ids:
             continue
         delta = (now - game.kickoff).total_seconds() / 60.0
         if delta < min(checkpoints) or delta > max(checkpoints):
             continue
-        allowed, reason = live_search_allowed(game.event_id)
+        if game.event_id in linked:
+            allowed, reason = True, "player já publicado; revalidar status real do YouTube"
+        else:
+            allowed, reason = live_search_allowed(game.event_id)
         if not allowed:
             continue
         last, _ = last_run(runs, WORKFLOW_TRANSMISSOES, tz, title_contains=f"aovivo · {game.event_id}")
@@ -997,6 +1006,44 @@ def transmission_live_decision(
         f"Checkpoint {label} do player oficial para {game.label}; {policy}.",
         event_id=game.event_id,
         mode="aovivo",
+        checkpoint=str(checkpoint),
+    )
+
+
+def transmission_guardian_decision(
+    config: Mapping[str, Any],
+    now: datetime,
+    games: Sequence[Game],
+    final_ids: set[str],
+    tz: ZoneInfo,
+    runs: Sequence[Mapping[str, Any]],
+) -> Decision | None:
+    cfg = config["transmissoes"]
+    checkpoints = sorted(set(int(v) for v in (cfg.get("guardiao_checkpoints_minutos") or [-1440, -360, -90, -15, 10])))
+    if not checkpoints:
+        return None
+    candidates: list[tuple[Game, int, float]] = []
+    for game in games:
+        if game.event_id in final_ids:
+            continue
+        delta = (now - game.kickoff).total_seconds() / 60.0
+        if delta < min(checkpoints) or delta > max(checkpoints):
+            continue
+        last, _ = last_run(runs, WORKFLOW_GUARDIAN, tz, title_contains=game.event_id)
+        last_delta = ((last - game.kickoff).total_seconds() / 60.0) if last is not None else None
+        due = [cp for cp in checkpoints if cp <= delta and (last_delta is None or cp > last_delta)]
+        if due:
+            candidates.append((game, max(due), delta))
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: abs(item[2]))
+    game, checkpoint, _ = candidates[0]
+    return Decision(
+        "transmissoes_guardian",
+        f"Guardião de transmissão T{checkpoint:+d} para {game.label}.",
+        event_id=game.event_id,
+        mode="guardian",
+        checkpoint=str(checkpoint),
     )
 
 
@@ -1234,6 +1281,10 @@ def decide(
     if live_first:
         return live_first
 
+    guardian = transmission_guardian_decision(config, now, games, final_ids, tz, runs)
+    if guardian:
+        return guardian
+
     # 1. Dado esportivo sempre vence nas retentativas subsequentes.
     main = main_update_decision(
         config=config,
@@ -1297,6 +1348,7 @@ def write_github_output(path: str, decision: Decision) -> None:
         "event_id": decision.event_id,
         "rodada": decision.round_number,
         "modo": decision.mode,
+        "checkpoint": decision.checkpoint,
     }
     with open(path, "a", encoding="utf-8") as handle:
         for key, value in values.items():

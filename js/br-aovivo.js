@@ -952,9 +952,9 @@
     let youtube = "";
     if (rawVideoId && principal) {
       const sourceName = sourceDisplayName(principal);
-      const liveNow = String(principal.status || "").toLowerCase() === "live" || game.state === "in";
+      const liveNow = String(principal.status || "").toLowerCase() === "live";
       const kickoff = game.date instanceof Date ? game.date.getTime() : NaN;
-      const preLive = !liveNow && isFinite(kickoff) && Date.now() >= kickoff - 60 * 60000;
+      const preLive = !liveNow && String(principal.status || "").toLowerCase() === "upcoming" && isFinite(kickoff) && Date.now() < kickoff && Date.now() >= kickoff - 60 * 60000;
       const liveStyle = liveNow || preLive;
       const finished = gameState(game).key === "post";
       const isCaze = sourceIsCaze(principal.fonte) || sourceIsCaze(sourceName);

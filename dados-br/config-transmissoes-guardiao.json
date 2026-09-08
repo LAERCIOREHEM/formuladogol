@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "descricao": "Guardião IA para auditoria final de transmissões próximas. A IA pesquisa e reconcilia fontes; regras determinísticas validam antes de publicar.",
+  "modelo_padrao": "gpt-5.6-sol",
+  "janela_antes_horas": 24,
+  "janela_depois_minutos": 30,
+  "checkpoints_minutos": [-1440, -360, -90, -15, 10],
+  "checkpoints_auditoria_completa": [-1440, -90],
+  "confianca_minima": 0.9,
+  "max_tool_calls": 3,
+  "search_context_size": "medium",
+  "dominios_permitidos": [
+    "conmebol.com",
+    "cbf.com.br",
+    "ge.globo.com",
+    "globoesporte.globo.com",
+    "espn.com.br",
+    "uol.com.br",
+    "cnnbrasil.com.br",
+    "folha.uol.com.br",
+    "paramountplus.com",
+    "globoplay.globo.com",
+    "primevideo.com",
+    "disneyplus.com",
+    "sbt.com.br",
+    "record.r7.com",
+    "youtube.com"
+  ],
+  "dominios_fortes": [
+    "conmebol.com",
+    "cbf.com.br",
+    "ge.globo.com",
+    "espn.com.br",
+    "uol.com.br",
+    "cnnbrasil.com.br",
+    "folha.uol.com.br",
+    "paramountplus.com",
+    "globoplay.globo.com",
+    "primevideo.com",
+    "disneyplus.com",
+    "sbt.com.br",
+    "record.r7.com"
+  ],
+  "politica": [
+    "A auditoria T-24 é obrigatória para toda partida com clube da Série A na janela do Guardião.",
+    "T-90 repete auditoria completa para detectar mudança de grade próxima ao início.",
+    "T-6 e T-15 usam IA quando ainda há lacuna, fonte preservada/fraca ou player YouTube a conferir.",
+    "T+10 usa IA apenas quando existe player YouTube ou canal digital aberto que precise confirmação; a API do YouTube continua sendo a autoridade do estado live/upcoming/completed.",
+    "A IA nunca publica canal fora da allowlist e a fonte indicada precisa constar entre as páginas efetivamente retornadas pelo web_search.",
+    "Override editorial manual continua com precedência máxima; o Guardião não apaga uma trava manual explícita.",
+    "Um vídeo de aquecimento, narração, watchalong, tempo real ou pré/pós-jogo nunca conta como transmissão integral da partida."
+  ]
+}

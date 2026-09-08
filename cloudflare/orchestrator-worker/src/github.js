@@ -6,6 +6,7 @@ const WRITER_NAMES = new Set([
   'Buscar melhores momentos oficiais',
   'Atualizar públicos do Brasileirão',
   'Buscar transmissões dos clubes do Brasileirão',
+  'Guardião IA de transmissões',
   'Publicar análise editorial da Copa do Brasil',
   'Publicar análise editorial continental',
   'Publicar análise editorial da rodada',
@@ -64,6 +65,8 @@ export function dispatchSpec(decision) {
       return { workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: decision.eventId || '' } };
     case 'transmissao_aovivo':
       return { workflow: 'buscar-transmissoes-aovivo-brasileirao.yml', inputs: { modo: 'aovivo', event_id: decision.eventId || '' } };
+    case 'transmissoes_guardian':
+      return { workflow: 'auditar-transmissoes-ia.yml', inputs: { event_id: decision.eventId || '', checkpoint: String(decision.checkpoint ?? '') } };
     case 'transmissoes_tv':
       return { workflow: 'buscar-transmissoes-aovivo-brasileirao.yml', inputs: { modo: 'tv' } };
     case 'editorial_copa_do_brasil':

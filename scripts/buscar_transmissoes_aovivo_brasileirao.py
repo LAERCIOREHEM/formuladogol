@@ -213,6 +213,7 @@ class Candidate:
             "confianca": round(self.confidence, 4),
             "motivos": self.reasons,
             "origem_busca": self.source,
+            "escopo": "partida",
             "embeddable": self.embeddable,
         }
 

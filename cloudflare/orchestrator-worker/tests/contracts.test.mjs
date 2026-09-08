@@ -106,3 +106,25 @@ test('deploy validates Contents read permission before changing Worker', async (
   assert.match(workflow, /Contents: Read-only/);
   assert.match(workflow, /config-analises\.json\?ref=main/);
 });
+
+
+test('AI transmission Guardian has OpenAI/web-search and checkpoint contracts', async () => {
+  const yml = await read('.github/workflows/auditar-transmissoes-ia.yml');
+  const guardian = await read('scripts/guardiao_transmissoes_ia.py');
+  const state = await read('cloudflare/orchestrator-worker/src/orchestrator-state.js');
+  assert.match(yml, /OPENAI_API_KEY/);
+  assert.match(yml, /gpt-5\.6-sol/);
+  assert.match(guardian, /web_search/);
+  assert.match(guardian, /Guardião IA de transmissões/);
+  assert.match(state, /guardiancp:/);
+  assert.match(state, /transmissoes_guardian/);
+  const index = await read('cloudflare/orchestrator-worker/src/index.js');
+  assert.match(index, /transmissionGuardian:\s*true/);
+  assert.match(index, /1\.1\.0/);
+});
+
+test('live player state never inherits match live state', async () => {
+  const live = await read('js/br-aovivo.js');
+  assert.doesNotMatch(live, /principal\.status[^;]*\|\|\s*game\.state\s*===\s*["']in["']/);
+  assert.match(live, /principal\.status[^;]*===\s*["']live["']/);
+});

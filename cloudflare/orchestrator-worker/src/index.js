@@ -48,12 +48,14 @@ export default {
       return json({
         ok: true,
         service: 'formula-do-gol-orchestrator',
-        version: String(env.ORCHESTRATOR_VERSION || '1.0.1'),
+        version: String(env.ORCHESTRATOR_VERSION || '1.1.0'),
         mode: String(env.ORCHESTRATOR_MODE || 'shadow'),
         cron: '* * * * *',
         liveBrowserUntouched: true,
         liveBrowserRefreshSeconds: 30,
         githubHeartbeatRemoved: true,
+        transmissionGuardian: true,
+        transmissionGuardianCheckpointsMinutes: [-1440, -360, -90, -15, 10],
       });
     }
     if (url.pathname === '/status' || url.pathname === '/v1/status') {

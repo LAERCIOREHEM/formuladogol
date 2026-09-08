@@ -6,6 +6,7 @@ import {
   cupEditorialDecision,
   latestEligibleRound,
   liveCheckpointDue,
+  guardianCheckpointDue,
   liveLinkedIds,
   liveSearchAllowed,
   localFinalIds,
@@ -131,7 +132,7 @@ export class OrchestratorState {
     return {
       ok: true,
       engine: 'fdg-cloudflare-orchestrator',
-      version: String(this.env.ORCHESTRATOR_VERSION || '1.0.1'),
+      version: String(this.env.ORCHESTRATOR_VERSION || '1.1.0'),
       mode: String(this.env.ORCHESTRATOR_MODE || 'shadow'),
       ...status,
       recentDecisions: history.slice(-10).reverse(),
@@ -347,10 +348,13 @@ export class OrchestratorState {
     const linkedLive = liveLinkedIds(liveAuto, liveManual);
     const liveCandidates = [];
     for (const game of liveSourcesReady ? games : []) {
-      if (finalIds.has(game.eventId) || linkedLive.has(game.eventId)) continue;
+      if (finalIds.has(game.eventId)) continue;
       const delta = (now.getTime() - game.kickoff.getTime()) / 60000;
       if (delta < POLICY.transmissoes.liveCheckpointsMinutes[0] || delta > POLICY.transmissoes.liveCheckpointsMinutes.at(-1)) continue;
-      const policy = liveSearchAllowed(game.eventId, tv);
+      const alreadyLinked = linkedLive.has(game.eventId);
+      const policy = alreadyLinked
+        ? { allowed: true, reason: 'player já publicado; revalidar status real do YouTube' }
+        : liveSearchAllowed(game.eventId, tv);
       if (!policy.allowed) continue;
       const lastCheckpoint = await this.state.storage.get(`livecp:${game.eventId}`);
       const cp = liveCheckpointDue(game, now, typeof lastCheckpoint === 'number' ? lastCheckpoint : null);
@@ -365,6 +369,30 @@ export class OrchestratorState {
         reason: `Checkpoint T${cp >= 0 ? '+' : ''}${cp} do player oficial para ${gameLabel(game)}; ${policy}.`,
         retryMinutes: 1,
         stateUpdates: { [`livecp:${game.eventId}`]: cp }, hints,
+      };
+    }
+
+    // 2b) Guardião IA: auditoria T-24/T-6/T-90/T-15/T+10. A IA decide
+    // a grade somente dentro do workflow; o Worker apenas agenda checkpoints.
+    const guardianCandidates = [];
+    for (const game of games) {
+      if (finalIds.has(game.eventId)) continue;
+      const delta = (now.getTime() - game.kickoff.getTime()) / 60000;
+      const cps = POLICY.transmissoes.guardianCheckpointsMinutes;
+      if (delta < cps[0] || delta > cps.at(-1)) continue;
+      const lastCheckpoint = await this.state.storage.get(`guardiancp:${game.eventId}`);
+      const cp = guardianCheckpointDue(game, now, typeof lastCheckpoint === 'number' ? lastCheckpoint : null);
+      if (cp == null) continue;
+      guardianCandidates.push({ game, cp, delta });
+    }
+    guardianCandidates.sort((a, b) => Math.abs(a.delta) - Math.abs(b.delta));
+    if (guardianCandidates.length) {
+      const { game, cp } = guardianCandidates[0];
+      return {
+        action: 'transmissoes_guardian', eventId: game.eventId, checkpoint: cp,
+        reason: `Guardião de transmissão T${cp >= 0 ? '+' : ''}${cp} para ${gameLabel(game)}.`,
+        retryMinutes: 1,
+        stateUpdates: { [`guardiancp:${game.eventId}`]: cp }, hints,
       };
     }
 

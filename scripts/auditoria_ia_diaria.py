@@ -1250,8 +1250,8 @@ def self_test() -> int:
     # em tempo quase real, porque a matéria consolidada da rodada no ge só sai
     # depois que a rodada inteira termina — janela em que o site ficaria sem o
     # dado de público que alimenta as Estatísticas.
-    OPENAI_CONSUMIDORES = {"auditoria_ia_diaria.py", "completar_publicos_ia.py", "editorial_ia.py"}
-    OPENAI_WORKFLOWS = {"auditoria-ia-diaria.yml", "atualizar-publicos-brasileirao.yml", "publicar-analise-rodada.yml", "publicar-analise-copa-do-brasil.yml", "publicar-analise-continentais.yml"}
+    OPENAI_CONSUMIDORES = {"auditoria_ia_diaria.py", "completar_publicos_ia.py", "editorial_ia.py", "guardiao_transmissoes_ia.py"}
+    OPENAI_WORKFLOWS = {"auditoria-ia-diaria.yml", "atualizar-publicos-brasileirao.yml", "publicar-analise-rodada.yml", "publicar-analise-copa-do-brasil.yml", "publicar-analise-continentais.yml", "auditar-transmissoes-ia.yml"}
 
     direct_api = []
     for script in SCRIPT_DIR.glob("*.py"):

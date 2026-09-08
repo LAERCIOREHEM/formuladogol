@@ -66,6 +66,7 @@ AUDIT_OUTPUT = ROOT / "dados-br" / "auditoria-transmissoes-tv.json"
 CONFIG_PATH = ROOT / "dados-br" / "config-transmissoes-tv.json"
 MANUAL = ROOT / "transmissoes.json"
 LIVE_YOUTUBE = ROOT / "dados-br" / "transmissoes-aovivo.json"
+GUARDIAN = ROOT / "dados-br" / "transmissoes-guardiao.json"
 
 PROVIDERS: list[tuple[str, tuple[str, ...]]] = [
     ("Premiere", ("premiere", "premiere clubes")),
@@ -367,6 +368,7 @@ class Evidence:
     captured_at: str = ""
     authority: int = 0
     detail: str = ""
+    exclusive: bool = False
 
     def public(self) -> dict[str, Any]:
         return {
@@ -376,6 +378,7 @@ class Evidence:
             "capturado_em": self.captured_at,
             "autoridade": self.authority,
             "detalhe": self.detail,
+            **({"exclusivo": True} if self.exclusive else {}),
         }
 
 
@@ -984,15 +987,22 @@ def exact_live_access(live_output: Mapping[str, Any], event_id: str) -> list[dic
 def access_options_for_game(entry: Mapping[str, Any], live_output: Mapping[str, Any]) -> list[dict[str, str]]:
     out: list[dict[str, str]] = []
     seen: set[tuple[str, str]] = set()
+    allowed_channels = set(extract_channels(entry.get("canais")))
     exact = exact_live_access(live_output, str(entry.get("event_id") or ""))
     exact_channels: set[str] = set()
     for item in exact:
+        channel = ""
         if "GE TV" in item["nome"]:
-            exact_channels.add("GE TV")
-        if "SBT" in item["nome"]:
-            exact_channels.add("SBT")
-        if "CazéTV" in item["nome"]:
-            exact_channels.add("CazéTV")
+            channel = "GE TV"
+        elif "SBT" in item["nome"]:
+            channel = "SBT"
+        elif "CazéTV" in item["nome"]:
+            channel = "CazéTV"
+        # Um player exato só pode aparecer se a grade FINAL ainda declarar o
+        # respectivo canal. Isso impede link antigo de pré-jogo de "boiar" no site.
+        if not channel or channel not in allowed_channels:
+            continue
+        exact_channels.add(channel)
         key = (item["nome"], item["url"])
         if key not in seen:
             seen.add(key); out.append(item)
@@ -1072,12 +1082,81 @@ def live_youtube_evidence(
     return out
 
 
-def existing_evidence(existing: Mapping[str, Any], games: Sequence[Mapping[str, Any]], captured_at: str) -> dict[str, list[Evidence]]:
+def guardian_evidence(
+    guardian: Mapping[str, Any], games: Sequence[Mapping[str, Any]], captured_at: str, now: dt.datetime
+) -> dict[str, list[Evidence]]:
+    """Converte o overlay do Guardião IA em evidência de alta autoridade.
+
+    O overlay representa a grade COMPLETA verificada para o jogo; portanto ele
+    substitui evidências automáticas conflitantes, mas permanece abaixo do
+    override editorial manual (autoridade 1000).
+    """
+    out: dict[str, list[Evidence]] = {}
+    game_ids = {str(g.get("event_id") or g.get("id") or "") for g in games}
+    rows = guardian.get("jogos") if isinstance(guardian, Mapping) else {}
+    for event_id, item in (rows or {}).items():
+        if str(event_id) not in game_ids or not isinstance(item, Mapping):
+            continue
+        if str(item.get("status") or "").lower() not in {"confirmado", "corrigido"}:
+            continue
+        valid_until = parse_dt(item.get("vigente_ate"))
+        if valid_until and now > valid_until:
+            continue
+        channels = extract_channels(item.get("canais"))
+        if not channels:
+            continue
+        refs = []
+        for source in item.get("fontes") or []:
+            if isinstance(source, Mapping) and source.get("url"):
+                refs.append(str(source.get("url")))
+        confidence = item.get("confianca")
+        checkpoint = item.get("checkpoint")
+        out.setdefault(str(event_id), []).append(Evidence(
+            source="Guardião IA verificado",
+            channels=channels,
+            reference=" | ".join(refs) or "dados-br/transmissoes-guardiao.json",
+            captured_at=str(item.get("capturado_em") or captured_at),
+            authority=900,
+            detail=f"grade completa reconciliada por web_search; confiança={confidence}; checkpoint={checkpoint}",
+            exclusive=item.get("exclusivo") is True,
+        ))
+    return out
+
+
+def _snapshot_channels_without_stale_youtube(item: Mapping[str, Any]) -> list[str]:
+    """Preserva apenas canais sustentados por evidência não-YouTube anterior.
+
+    Usado na reconciliação local após revalidar o player. Se um GE TV/CazéTV/SBT
+    existia SOMENTE porque um vídeo oficial estava live e esse vídeo terminou,
+    o canal não pode sobreviver por simples snapshot.
+    """
+    all_channels = extract_channels(item.get("canais"))
+    if not all_channels:
+        return []
+    sources = item.get("fontes") or []
+    if not isinstance(sources, list) or not sources:
+        return all_channels
+    supported: list[str] = []
+    saw_non_youtube = False
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        name = str(source.get("fonte") or "")
+        if name == "YouTube oficial validado":
+            continue
+        saw_non_youtube = True
+        for channel in extract_channels(source.get("canais")):
+            if channel not in supported:
+                supported.append(channel)
+    return supported if saw_non_youtube else []
+
+
+def existing_evidence(existing: Mapping[str, Any], games: Sequence[Mapping[str, Any]], captured_at: str, *, drop_youtube_only: bool = False) -> dict[str, list[Evidence]]:
     out: dict[str, list[Evidence]] = {}
     for event_id, item in (existing.get("jogos") or {}).items():
         if not isinstance(item, Mapping):
             continue
-        channels = extract_channels(item.get("canais"))
+        channels = _snapshot_channels_without_stale_youtube(item) if drop_youtube_only else extract_channels(item.get("canais"))
         if not channels:
             continue
         game = match_game(games, event_id=str(event_id))
@@ -1104,6 +1183,8 @@ def channels_are_stable(channels: Sequence[str], selected: Sequence[Evidence], p
     """
     if policy.get("modo") == "fixo":
         return True
+    if any(e.source == "Guardião IA verificado" and e.authority >= 900 for e in selected):
+        return True
     unique = list(dict.fromkeys(str(c) for c in channels if c))
     if unique in (["Prime Video"], ["Paramount+"]):
         return True
@@ -1126,6 +1207,7 @@ def consolidate_game(
         return None
     policy = dict(manual_policy or {})
     manual = [e for e in evidences if e.authority >= 1000]
+    guardian = [e for e in evidences if e.source == "Guardião IA verificado" and 900 <= e.authority < 1000]
     current = [e for e in evidences if e.source != "snapshot anterior preservado"]
     youtube = [e for e in current if e.source == "YouTube oficial validado"]
     previous = [e for e in evidences if e.source == "snapshot anterior preservado"]
@@ -1141,6 +1223,10 @@ def consolidate_game(
             selected = manual + youtube
         else:
             selected = manual
+    elif guardian:
+        # O Guardião publica uma grade COMPLETA e verificada; não fazer união
+        # com fontes automáticas antigas, pois isso ressuscitaria canais removidos.
+        selected = guardian
     elif current:
         selected = current
     elif previous and not automatic_sources_responded:
@@ -1175,7 +1261,7 @@ def consolidate_game(
         "origem": " + ".join(dict.fromkeys(source_names)),
         "confianca": "manual" if manual else ("preservado" if preservation else "confirmado"),
         "estavel": channels_are_stable(channels, selected, policy),
-        "exclusivo": bool(manual and policy.get("exclusivo") is True),
+        "exclusivo": bool((manual and policy.get("exclusivo") is True) or (guardian and any(e.exclusive for e in guardian))),
         "fontes": [e.public() for e in sorted(selected, key=lambda e: e.authority, reverse=True)],
     }
 
@@ -1185,9 +1271,11 @@ def collect(
     agenda: Mapping[str, Any],
     existing: Mapping[str, Any],
     manual: Mapping[str, Any],
+    guardian: Optional[Mapping[str, Any]] = None,
     cfg: Mapping[str, Any],
     now: dt.datetime,
     source_payloads: Optional[Mapping[str, Any]] = None,
+    local_only: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     all_games = agenda_games(agenda)
     games = [g for g in all_games if in_collection_window(g, now, cfg)]
@@ -1199,6 +1287,15 @@ def collect(
     source_status: dict[str, dict[str, Any]] = {}
     errors: list[str] = []
     payloads = dict(source_payloads or {})
+    if local_only:
+        # Fixtures vazios impedem qualquer acesso CBF/ESPN; GE é desabilitado
+        # por uma cópia local da configuração abaixo.
+        payloads.setdefault("cbf_rows", [])
+        payloads.setdefault("cbf_copa_rows", [])
+        payloads.setdefault("espn_scoreboards", {})
+        payloads.setdefault("espn_scoreboard", {"events": []})
+        payloads.setdefault("espn_summaries", {})
+        cfg = {**dict(cfg), "habilitar_ge_agenda": False, "habilitar_ge_artigos": False, "habilitar_espn_summary": False}
     manual_policies = {
         str(game.get("event_id") or game.get("id") or ""): manual_policy_for_game(manual, game)
         for game in games
@@ -1213,6 +1310,10 @@ def collect(
         game for game in games
         if str(game.get("event_id") or game.get("id") or "") not in stable_ids
     ]
+
+    guardian_found = guardian_evidence(guardian or {}, games, captured_at, now)
+    merge_evidence(evidence_by_game, guardian_found)
+    source_status["guardiao_ia"] = {"ok": True, "jogos_com_canal": len(guardian_found)}
 
     # CBF: Série A e Copa do Brasil são consultadas separadamente para que
     # uma indisponibilidade não derrube a outra fonte oficial.
@@ -1343,10 +1444,13 @@ def collect(
             if scoreboard is None and league == "bra.1" and payloads.get("espn_scoreboard") is not None:
                 scoreboard = payloads.get("espn_scoreboard")
             if scoreboard is None:
-                scoreboard = fetch_json(
-                    reference + "?" + urllib.parse.urlencode({"dates": dates, "limit": 300}),
-                    timeout=timeout, attempts=attempts,
-                )
+                if local_only:
+                    scoreboard = {"events": []}
+                else:
+                    scoreboard = fetch_json(
+                        reference + "?" + urllib.parse.urlencode({"dates": dates, "limit": 300}),
+                        timeout=timeout, attempts=attempts,
+                    )
             found, present = espn_scoreboard_entries(scoreboard, league_games, captured_at, reference)
             merge_evidence(espn_found_all, found)
             present_ids.update(present)
@@ -1395,9 +1499,9 @@ def collect(
 
     # Override manual e snapshot anterior entram por último, com políticas próprias.
     merge_evidence(evidence_by_game, manual_evidence(manual, games, captured_at))
-    merge_evidence(evidence_by_game, existing_evidence(existing, games, captured_at))
+    merge_evidence(evidence_by_game, existing_evidence(existing, games, captured_at, drop_youtube_only=local_only))
 
-    any_automatic_ok = any(source_status.get(name, {}).get("ok") for name in ("cbf", "ge_agenda", "ge_artigos", "espn", "youtube_oficial"))
+    any_automatic_ok = any(source_status.get(name, {}).get("ok") for name in ("cbf", "ge_agenda", "ge_artigos", "espn", "youtube_oficial", "guardiao_ia"))
     generated: dict[str, Any] = {}
     for game in games:
         event_id = str(game.get("event_id") or game.get("id") or "")
@@ -1415,7 +1519,7 @@ def collect(
     payload = {
         "descricao": "Transmissões oficiais por TV ou streaming dos clubes do Brasileirão.",
         "politica": {
-            "fontes": ["CBF oficial", "GE Agenda", "GE guias editoriais", "ESPN", "YouTube oficial validado", "override manual"],
+            "fontes": ["CBF oficial", "GE Agenda", "GE guias editoriais", "ESPN", "YouTube oficial validado", "Guardião IA verificado", "override manual"],
             "regra_preservacao": "resposta vazia ou falha de uma fonte nunca apaga transmissão válida já publicada",
             "regra_publicacao": "somente canais oficiais da lista permitida; evidências ficam registradas por jogo",
             "youtube_exato": "links exatos de GE TV/SBT/CazéTV permanecem em dados-br/transmissoes-aovivo.json",
@@ -1460,6 +1564,7 @@ def collect(
             "jogos_sem_transmissao_fora_14d": len(missing_all) - len(missing),
             "jogos_criticos_sem_transmissao_72h": sum(1 for item in missing if item["nivel"] == "critico"),
             "registros_preservados": len(preserved),
+            "jogos_guardiao_ia": len(guardian_found),
             "jogos_estaveis_sem_reconsulta_editorial": len(stable_ids),
             "fontes_com_falha": sum(1 for item in source_status.values() if not item.get("ok")),
         },
@@ -1605,6 +1710,60 @@ def selftest() -> None:
     assert not any(item["nome"] == "SBT no YouTube" for item in sbt_access), "link genérico SBT não deve duplicar vídeo exato"
     generic_access = access_options_for_game({"event_id":"2","canais":["CazéTV"]}, {"jogos":{}})
     assert generic_access == [{"nome":"CazéTV no YouTube","url":"https://www.youtube.com/@CazeTV/streams","tipo":"acesso_oficial"}]
+    stale_access = access_options_for_game({"event_id":"1","canais":["Premiere"]}, live_test)
+    assert not any(item.get("tipo") == "player_oficial" for item in stale_access)
+    assert any(item["nome"] == "Premiere no Globoplay" for item in stale_access)
+
+    # Guardião: grade completa verificada substitui automáticos conflitantes,
+    # mas override manual explícito continua acima dela.
+    guardian = {"jogos": {"1": {
+        "event_id": "1", "status": "corrigido", "canais": ["Paramount+"], "exclusivo": True,
+        "confianca": 0.99, "checkpoint": -90,
+        "capturado_em": "2026-07-24T10:00:00-03:00",
+        "vigente_ate": "2026-07-26T00:00:00-03:00",
+        "fontes": [{"url": "https://ge.globo.com/teste"}],
+    }}}
+    guardian_payload, _ = collect(
+        agenda={"jogos": [agenda["jogos"][0]]},
+        existing={"jogos": {"1": {
+            "event_id": "1", "mandante": "Santos", "visitante": "Chapecoense",
+            "data_iso": agenda["jogos"][0]["data_iso"], "canais": ["GE TV", "Premiere"],
+            "fontes": [
+                {"fonte": "YouTube oficial validado", "canais": ["GE TV"]},
+                {"fonte": "GE Agenda", "canais": ["Premiere"]},
+            ],
+        }}},
+        manual={"transmissoes": []}, guardian=guardian,
+        cfg={**DEFAULT_CONFIG, "habilitar_ge_agenda": False, "habilitar_ge_artigos": False, "habilitar_espn_summary": False},
+        now=now, source_payloads={"cbf_rows": [], "cbf_copa_rows": [], "espn_scoreboard": {"events": []}}, local_only=True,
+    )
+    assert guardian_payload["jogos"]["1"]["canais"] == ["Paramount+"]
+    assert guardian_payload["jogos"]["1"]["estavel"] is True
+    assert guardian_payload["jogos"]["1"]["exclusivo"] is True
+    manual_wins, _ = collect(
+        agenda={"jogos": [agenda["jogos"][0]]}, existing={"jogos": {}},
+        manual={"transmissoes": [{"event_id": "1", "canais": ["Premiere"], "exclusivo": True}]},
+        guardian=guardian, cfg={**DEFAULT_CONFIG, "habilitar_ge_agenda": False, "habilitar_ge_artigos": False, "habilitar_espn_summary": False},
+        now=now, source_payloads={"cbf_rows": [], "cbf_copa_rows": [], "espn_scoreboard": {"events": []}}, local_only=True,
+    )
+    assert manual_wins["jogos"]["1"]["canais"] == ["Premiere"]
+    assert manual_wins["jogos"]["1"]["confianca"] == "manual"
+
+    # Reconciliação local remove canal que só existia por YouTube antigo.
+    stale_only = {"jogos": {"1": {
+        "event_id": "1", "mandante": "Santos", "visitante": "Chapecoense",
+        "data_iso": agenda["jogos"][0]["data_iso"], "canais": ["GE TV", "Premiere"],
+        "fontes": [
+            {"fonte": "YouTube oficial validado", "canais": ["GE TV"]},
+            {"fonte": "GE Agenda", "canais": ["Premiere"]},
+        ],
+    }}}
+    stale_payload, _ = collect(
+        agenda={"jogos": [agenda["jogos"][0]]}, existing=stale_only, manual={"transmissoes": []}, guardian={},
+        cfg={**DEFAULT_CONFIG, "habilitar_ge_agenda": False, "habilitar_ge_artigos": False, "habilitar_espn_summary": False},
+        now=now, source_payloads={"cbf_rows": [], "cbf_copa_rows": [], "espn_scoreboard": {"events": []}, "aovivo_output": {"jogos": {}}}, local_only=True,
+    )
+    assert stale_payload["jogos"]["1"]["canais"] == ["Premiere"]
 
     # Relógio e saúde transitória da fonte não podem fabricar publicação.
     old_audit = {"resumo": {"jogos_na_janela": 1, "jogos_com_transmissao": 0},
@@ -1624,6 +1783,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--selftest", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--local-only", action="store_true", help="Reconcilia somente overlay/manual/YouTube/snapshot; não acessa CBF/GE/ESPN")
     args = parser.parse_args()
     if args.selftest:
         selftest()
@@ -1635,7 +1795,8 @@ def main() -> int:
     existing = load_json(OUTPUT, {"jogos": {}})
     old_audit = load_json(AUDIT_OUTPUT, {})
     manual = load_json(MANUAL, {"transmissoes": []})
-    payload, audit = collect(agenda=agenda, existing=existing, manual=manual, cfg=cfg, now=now)
+    guardian = load_json(GUARDIAN, {"jogos": {}})
+    payload, audit = collect(agenda=agenda, existing=existing, manual=manual, guardian=guardian, cfg=cfg, now=now, local_only=args.local_only)
 
     if args.dry_run:
         print(json.dumps({"transmissoes": payload, "auditoria": audit}, ensure_ascii=False, indent=2))

@@ -9,6 +9,7 @@ import {
   cupEditorialDecision,
   latestEligibleRound,
   liveCheckpointDue,
+  guardianCheckpointDue,
   mmRetryInterval,
   normalizeAgenda,
   pendingHighlights,
@@ -51,6 +52,17 @@ test('player search uses six checkpoints instead of 10-minute polling', () => {
   assert.equal(liveCheckpointDue(game, d('2026-09-03T21:16:00Z'), -90), -45);
   assert.equal(liveCheckpointDue(game, d('2026-09-03T22:11:00Z'), -5), 10);
   assert.equal(liveCheckpointDue(game, d('2026-09-03T22:31:00Z'), 30), null);
+});
+
+test('transmission Guardian uses T-24/T-6/T-90/T-15/T+10 checkpoints', () => {
+  const game = { kickoff: d('2026-09-08T22:00:00Z') };
+  assert.deepEqual(POLICY.transmissoes.guardianCheckpointsMinutes, [-1440, -360, -90, -15, 10]);
+  assert.equal(guardianCheckpointDue(game, d('2026-09-07T21:59:00Z'), null), null);
+  assert.equal(guardianCheckpointDue(game, d('2026-09-07T22:00:00Z'), null), -1440);
+  assert.equal(guardianCheckpointDue(game, d('2026-09-08T16:01:00Z'), -1440), -360);
+  assert.equal(guardianCheckpointDue(game, d('2026-09-08T20:31:00Z'), -360), -90);
+  assert.equal(guardianCheckpointDue(game, d('2026-09-08T21:46:00Z'), -90), -15);
+  assert.equal(guardianCheckpointDue(game, d('2026-09-08T22:11:00Z'), -15), 10);
 });
 
 test('TV cadence is proportional to missing coverage', () => {
@@ -166,5 +178,9 @@ test('dispatch mapping is targeted and deterministic', () => {
     workflow: 'buscar-melhores-momentos-getv.yml', inputs: { modo: 'incremental', event_id: '401' },
   });
   assert.equal(dispatchSpec({ action: 'editorial_rodada', round: 22 }).inputs.rodada, '22');
+  assert.deepEqual(dispatchSpec({ action: 'transmissoes_guardian', eventId: '401', checkpoint: -90 }), {
+    workflow: 'auditar-transmissoes-ia.yml', inputs: { event_id: '401', checkpoint: '-90' },
+  });
   assert.equal(actionKey({ action: 'transmissao_aovivo', eventId: '401', checkpoint: -20 }), 'transmissao_aovivo:401:-20');
+  assert.equal(actionKey({ action: 'transmissoes_guardian', eventId: '401', checkpoint: -90 }), 'transmissoes_guardian:401:-90');
 });

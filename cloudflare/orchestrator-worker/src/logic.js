@@ -24,6 +24,7 @@ export const POLICY = Object.freeze({
   },
   transmissoes: {
     liveCheckpointsMinutes: [-90, -45, -20, -5, 10, 30],
+    guardianCheckpointsMinutes: [-1440, -360, -90, -15, 10],
     tvAfter: '06:30',
     tvCriticalHours: 6,
     tvMissing14dHours: 24,
@@ -250,6 +251,10 @@ export function liveCheckpointDue(game, now, lastCheckpoint = null, checkpoints 
   const delta = (parseDate(now).getTime() - game.kickoff.getTime()) / 60000;
   const due = checkpoints.filter((cp) => cp <= delta && (lastCheckpoint == null || cp > lastCheckpoint));
   return due.length ? Math.max(...due) : null;
+}
+
+export function guardianCheckpointDue(game, now, lastCheckpoint = null, checkpoints = POLICY.transmissoes.guardianCheckpointsMinutes) {
+  return liveCheckpointDue(game, now, lastCheckpoint, checkpoints);
 }
 
 export function tvCoverage(games, tv, now, days = 30) {
