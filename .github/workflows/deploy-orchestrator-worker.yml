@@ -110,7 +110,8 @@ jobs:
             BODY="$(curl -fsS --max-time 10 "$URL" 2>/dev/null || true)"
             if printf '%s' "$BODY" | grep -q '"service":"formula-do-gol-orchestrator"' \
               && printf '%s' "$BODY" | grep -q "\"mode\":\"$EXPECTED\"" \
-              && printf '%s' "$BODY" | grep -q '"liveBrowserUntouched":true'; then
+              && printf '%s' "$BODY" | grep -q '"liveBrowserUntouched":true' \
+              && printf '%s' "$BODY" | grep -q '"transmissionGuardian":true'; then
               echo "Health OK em modo $EXPECTED."
               printf '%s\n' "$BODY"
               exit 0

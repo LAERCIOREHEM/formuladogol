@@ -68,6 +68,7 @@ jobs:
           python -m json.tool dados-br/agenda-clubes-br.json > /dev/null
           python -m json.tool dados-br/config-transmissoes-aovivo.json > /dev/null
           python -m json.tool dados-br/config-transmissoes-tv.json > /dev/null
+          python -m json.tool dados-br/config-transmissoes-guardiao.json > /dev/null
           python -m json.tool dados-br/transmissoes-aovivo.json > /dev/null
           python -m json.tool dados-br/transmissoes-aovivo-manual.json > /dev/null
           python -m json.tool dados-br/auditoria-transmissoes-aovivo.json > /dev/null
@@ -109,16 +110,16 @@ jobs:
             "${CMD[@]}"
           fi
 
-          if [[ "$MODO" != "aovivo" ]]; then
-            TV_CMD=(python scripts/atualizar_transmissoes_tv_brasileirao.py)
-            if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then
-              TV_CMD+=(--dry-run)
-            fi
-            echo "Executando grade de TV: ${TV_CMD[*]}"
-            "${TV_CMD[@]}"
-          else
-            echo "Modo aovivo: atualização da grade de TV não será executada."
+          TV_CMD=(python scripts/atualizar_transmissoes_tv_brasileirao.py)
+          if [[ "$MODO" == "aovivo" ]]; then
+            # Depois de revalidar o estado do vídeo, reconcilia localmente a grade.
+            # Assim um GE TV/CazéTV/SBT de pré-jogo que terminou não sobrevive
+            # como canal apenas por snapshot anterior.
+            TV_CMD+=(--local-only)
           fi
+          if [[ "${INPUT_DRY_RUN:-false}" == "true" ]]; then TV_CMD+=(--dry-run); fi
+          echo "Executando reconciliação de TV: ${TV_CMD[*]}"
+          "${TV_CMD[@]}"
 
       - name: Validar relatórios gerados
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != true }}
@@ -226,13 +227,11 @@ jobs:
             "${PUBLIC_FILES[@]}"
             "dados-br/auditoria-transmissoes-aovivo.json"
           )
-          if [[ "$MODO" != "aovivo" ]]; then
-            PUBLIC_FILES+=("dados-br/transmissoes-tv.json")
-            FILES+=(
-              "dados-br/transmissoes-tv.json"
-              "dados-br/auditoria-transmissoes-tv.json"
-            )
-          fi
+          PUBLIC_FILES+=("dados-br/transmissoes-tv.json")
+          FILES+=(
+            "dados-br/transmissoes-tv.json"
+            "dados-br/auditoria-transmissoes-tv.json"
+          )
 
           if [[ -z "$(git status --porcelain -- "${PUBLIC_FILES[@]}")" ]]; then
             echo "Nenhuma mudança factual de agenda/transmissão. Auditoria isolada não gera commit/deploy."

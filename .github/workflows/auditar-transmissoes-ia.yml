@@ -1,0 +1,213 @@
+name: Guardião IA de transmissões
+run-name: Guardião transmissões · ${{ inputs.event_id }} · T${{ inputs.checkpoint }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      event_id:
+        description: 'event_id da partida a auditar'
+        required: true
+        type: string
+      checkpoint:
+        description: 'Checkpoint em minutos (ex.: -1440, -360, -90, -15, 10)'
+        required: false
+        default: '-1440'
+        type: string
+      force:
+        description: 'Forçar pesquisa mesmo fora da janela/sem anomalia'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: repo-write-main
+  cancel-in-progress: false
+  queue: max
+
+jobs:
+  auditar:
+    name: Pesquisar, validar e corrigir transmissão
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar cliente HTTP do coletor
+        run: python -m pip install --disable-pip-version-check --no-cache-dir curl-cffi==0.15.0
+
+      - name: Validar Guardião e coletores offline
+        run: |
+          set -euo pipefail
+          python -m py_compile \
+            scripts/guardiao_transmissoes_ia.py \
+            scripts/atualizar_transmissoes_tv_brasileirao.py \
+            scripts/buscar_transmissoes_aovivo_brasileirao.py \
+            scripts/gerar_agenda_clubes_brasileirao.py
+          python scripts/guardiao_transmissoes_ia.py --self-test
+          python scripts/atualizar_transmissoes_tv_brasileirao.py --selftest
+          python scripts/buscar_transmissoes_aovivo_brasileirao.py --selftest
+          python scripts/gerar_agenda_clubes_brasileirao.py --self-test
+          python -m json.tool dados-br/config-transmissoes-guardiao.json >/dev/null
+          python -m json.tool dados-br/config-transmissoes-tv.json >/dev/null
+          python -m json.tool dados-br/config-transmissoes-aovivo.json >/dev/null
+
+      - name: Atualizar agenda consolidada
+        run: python scripts/gerar_agenda_clubes_brasileirao.py
+
+      - name: Revalidar player YouTube já conhecido
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          EVENT_ID: ${{ inputs.event_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${YOUTUBE_API_KEY:-}" ]]; then
+            echo "::warning title=YouTube não revalidado::YOUTUBE_API_KEY ausente; Guardião continuará com Web Search."
+            exit 0
+          fi
+          python scripts/buscar_transmissoes_aovivo_brasileirao.py --event-id "$EVENT_ID" --no-search
+
+      - name: Atualizar fontes determinísticas antes da IA
+        run: python scripts/atualizar_transmissoes_tv_brasileirao.py
+
+      - name: Executar Guardião GPT-5.6 Sol com Web Search
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_TRANSMISSION_MODEL: ${{ vars.OPENAI_TRANSMISSION_MODEL || vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
+          EVENT_ID: ${{ inputs.event_id }}
+          CHECKPOINT: ${{ inputs.checkpoint }}
+          FORCE: ${{ inputs.force }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          CMD=(python scripts/guardiao_transmissoes_ia.py --event-id "$EVENT_ID" --checkpoint "$CHECKPOINT")
+          if [[ "${FORCE:-false}" == "true" ]]; then CMD+=(--force); fi
+          "${CMD[@]}"
+
+      - name: Reconciliar grade final sem nova rede
+        run: python scripts/atualizar_transmissoes_tv_brasileirao.py --local-only
+
+      - name: Validar publicação reconciliada
+        env:
+          EVENT_ID: ${{ inputs.event_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m json.tool dados-br/transmissoes-aovivo.json >/dev/null
+          python -m json.tool dados-br/transmissoes-tv.json >/dev/null
+          python -m json.tool dados-br/auditoria-transmissoes-tv.json >/dev/null
+          if [[ -f dados-br/transmissoes-guardiao.json ]]; then python -m json.tool dados-br/transmissoes-guardiao.json >/dev/null; fi
+          if [[ -f dados-br/auditoria-transmissoes-guardiao.json ]]; then python -m json.tool dados-br/auditoria-transmissoes-guardiao.json >/dev/null; fi
+          python - <<'PY'
+          import json, os
+          event_id = os.environ['EVENT_ID']
+          tv = json.load(open('dados-br/transmissoes-tv.json', encoding='utf-8'))
+          guardian = {}
+          try:
+              guardian = json.load(open('dados-br/transmissoes-guardiao.json', encoding='utf-8'))
+          except FileNotFoundError:
+              pass
+          manual = json.load(open('transmissoes.json', encoding='utf-8'))
+          g = (guardian.get('jogos') or {}).get(event_id)
+          out = (tv.get('jogos') or {}).get(event_id)
+          manual_rule = next((x for x in manual.get('transmissoes') or [] if str(x.get('event_id') or '') == event_id), None)
+          if g and not manual_rule:
+              assert out, f'{event_id}: Guardião resolveu mas TV final não publicou o jogo'
+              assert set(out.get('canais') or []) == set(g.get('canais') or []), \
+                  f"{event_id}: grade final diverge do Guardião: {out.get('canais')} != {g.get('canais')}"
+          print('Reconciliação do Guardião validada para', event_id)
+          PY
+
+      - name: Commitar apenas mudança factual/auditoria do Guardião
+        id: publish
+        env:
+          EVENT_ID: ${{ inputs.event_id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "published=false" >> "$GITHUB_OUTPUT"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          FILES=(
+            dados-br/agenda-clubes-br.json
+            dados-br/transmissoes-aovivo.json
+            dados-br/auditoria-transmissoes-aovivo.json
+            dados-br/transmissoes-tv.json
+            dados-br/auditoria-transmissoes-tv.json
+          )
+          [[ -f dados-br/transmissoes-guardiao.json ]] && FILES+=(dados-br/transmissoes-guardiao.json)
+          [[ -f dados-br/auditoria-transmissoes-guardiao.json ]] && FILES+=(dados-br/auditoria-transmissoes-guardiao.json)
+
+          if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+            echo "Guardião confirmou o estado atual; nada para publicar."
+            exit 0
+          fi
+
+          TMP_DIR="$(mktemp -d)"
+          for f in "${FILES[@]}"; do
+            [[ -f "$f" ]] || continue
+            mkdir -p "$TMP_DIR/$(dirname "$f")"
+            cp -a "$f" "$TMP_DIR/$f"
+          done
+
+          for i in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            git clean -fd
+            for f in "${FILES[@]}"; do
+              [[ -f "$TMP_DIR/$f" ]] || continue
+              mkdir -p "$(dirname "$f")"
+              cp -a "$TMP_DIR/$f" "$f"
+            done
+            if [[ -z "$(git status --porcelain -- "${FILES[@]}")" ]]; then
+              echo "origin/main já contém o mesmo resultado."
+              exit 0
+            fi
+            git add -- "${FILES[@]}"
+            git commit -m "Auditar transmissão ${EVENT_ID} com Guardião IA - $(TZ='America/Sao_Paulo' date '+%d/%m/%Y %H:%M BRT')"
+            if git push origin HEAD:main; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "ERRO: push falhou após 5 tentativas" >&2
+          exit 1
+
+      - name: Disparar deploy quando houver correção publicada
+        if: steps.publish.outputs.published == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
+
+      - name: Resumo
+        if: always()
+        env:
+          EVENT_ID: ${{ inputs.event_id }}
+          CHECKPOINT: ${{ inputs.checkpoint }}
+        shell: bash
+        run: |
+          {
+            echo "## Guardião IA de transmissões"
+            echo ""
+            echo "- event_id: \`$EVENT_ID\`"
+            echo "- checkpoint: \`T$CHECKPOINT\`"
+            echo "- modelo padrão: \`gpt-5.6-sol\`"
+            echo "- política: fontes determinísticas → Web Search → validação → overlay → reconciliação local"
+          } >> "$GITHUB_STEP_SUMMARY"

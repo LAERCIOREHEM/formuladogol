@@ -79,6 +79,7 @@ jobs:
           MOTIVO: ${{ steps.plano.outputs.motivo }}
           EVENT_ID: ${{ steps.plano.outputs.event_id }}
           RODADA: ${{ steps.plano.outputs.rodada }}
+          CHECKPOINT: ${{ steps.plano.outputs.checkpoint }}
           MODO: ${{ steps.plano.outputs.modo }}
         shell: bash
         run: |
@@ -93,6 +94,7 @@ jobs:
             if [[ -n "${EVENT_ID:-}" ]]; then echo "- **event_id:** \`${EVENT_ID}\`"; fi
             if [[ -n "${RODADA:-}" ]]; then echo "- **rodada:** \`${RODADA}\`"; fi
             if [[ -n "${MODO:-}" ]]; then echo "- **modo:** \`${MODO}\`"; fi
+            if [[ -n "${CHECKPOINT:-}" ]]; then echo "- **checkpoint:** \`${CHECKPOINT}\`"; fi
           } >> "$GITHUB_STEP_SUMMARY"
           exit 0
 
@@ -123,6 +125,10 @@ jobs:
             transmissao_aovivo)
               test -n "$EVENT_ID"
               gh workflow run buscar-transmissoes-aovivo-brasileirao.yml --ref main -f modo=aovivo -f event_id="$EVENT_ID"
+              ;;
+            transmissoes_guardian)
+              test -n "$EVENT_ID"
+              gh workflow run auditar-transmissoes-ia.yml --ref main -f event_id="$EVENT_ID" -f checkpoint="${CHECKPOINT:--1440}"
               ;;
             transmissoes_tv)
               gh workflow run buscar-transmissoes-aovivo-brasileirao.yml --ref main -f modo=tv
