@@ -2,20 +2,20 @@
   "descricao": "Auditoria da consolidação de transmissões dos clubes do Brasileirão.",
   "resumo": {
     "jogos_na_janela": 45,
-    "jogos_com_transmissao": 39,
-    "jogos_sem_transmissao_na_janela": 6,
-    "jogos_sem_transmissao_14d": 3,
+    "jogos_com_transmissao": 40,
+    "jogos_sem_transmissao_na_janela": 5,
+    "jogos_sem_transmissao_14d": 2,
     "jogos_sem_transmissao_fora_14d": 3,
-    "jogos_criticos_sem_transmissao_72h": 1,
+    "jogos_criticos_sem_transmissao_72h": 0,
     "registros_preservados": 25,
-    "jogos_guardiao_ia": 1,
+    "jogos_guardiao_ia": 2,
     "jogos_estaveis_sem_reconsulta_editorial": 9,
     "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
       "ok": true,
-      "jogos_com_canal": 1
+      "jogos_com_canal": 2
     },
     "cbf": {
       "ok": true,
@@ -27,7 +27,7 @@
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 3747
+      "duracao_ms": 3133
     },
     "espn": {
       "ok": true,
@@ -44,19 +44,11 @@
   },
   "sem_transmissao": [
     {
-      "event_id": "401912542",
-      "rodada": 0,
-      "jogo": "Boca Juniors x São Paulo",
-      "data_iso": "2026-09-08T21:30:00-03:00",
-      "faltam_horas": 8.3,
-      "nivel": "critico"
-    },
-    {
       "event_id": "401913959",
       "rodada": 0,
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "faltam_horas": 173.8,
+      "faltam_horas": 173.7,
       "nivel": "aviso"
     },
     {
@@ -64,25 +56,17 @@
       "rodada": 0,
       "jogo": "São Paulo x Boca Juniors",
       "data_iso": "2026-09-15T21:30:00-03:00",
-      "faltam_horas": 176.3,
+      "faltam_horas": 176.2,
       "nivel": "aviso"
     }
   ],
   "sem_transmissao_futura": [
     {
-      "event_id": "401912542",
-      "rodada": 0,
-      "jogo": "Boca Juniors x São Paulo",
-      "data_iso": "2026-09-08T21:30:00-03:00",
-      "faltam_horas": 8.3,
-      "nivel": "critico"
-    },
-    {
       "event_id": "401913959",
       "rodada": 0,
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "faltam_horas": 173.8,
+      "faltam_horas": 173.7,
       "nivel": "aviso"
     },
     {
@@ -90,7 +74,7 @@
       "rodada": 0,
       "jogo": "São Paulo x Boca Juniors",
       "data_iso": "2026-09-15T21:30:00-03:00",
-      "faltam_horas": 176.3,
+      "faltam_horas": 176.2,
       "nivel": "aviso"
     },
     {
@@ -98,7 +82,7 @@
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 702.3,
+      "faltam_horas": 702.2,
       "nivel": "futuro"
     },
     {
@@ -106,7 +90,7 @@
       "rodada": 29,
       "jogo": "Vitória x Chapecoense",
       "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 702.8,
+      "faltam_horas": 702.7,
       "nivel": "futuro"
     },
     {
@@ -114,7 +98,7 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 728.3,
+      "faltam_horas": 728.2,
       "nivel": "futuro"
     }
   ],
@@ -369,5 +353,5 @@
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
   "artigos_ge_descobertos": [],
-  "atualizado_em": "2026-09-08T13:11:38-03:00"
+  "atualizado_em": "2026-09-08T13:17:28-03:00"
 }
