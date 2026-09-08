@@ -241,67 +241,33 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Independiente Santa Fe x Vasco da Gama, jogo de ida das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 8 de setembro de 2026, às 19h (horário de Brasília; 17h em Bogotá), no Estádio El Campín. A transmissão integral é exclusiva do Paramount+. Não há canal de TV aberta, TV por assinatura ou YouTube confirmado para o jogo completo."
+    },
+    {
+      "event_id": "401912518",
+      "jogo": "Fluminense x Platense",
+      "data_iso": "2026-09-08T19:00:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-09-08T18:50:40-03:00",
+      "chamada_openai": false,
+      "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+      "canais_antes": [
+        "Disney+ / ESPN"
+      ],
+      "status": "sem_chamada"
     }
   ],
   "ultima_execucao": {
-    "event_id": "401913960",
-    "jogo": "Independiente Santa Fe x Vasco da Gama",
+    "event_id": "401912518",
+    "jogo": "Fluminense x Platense",
     "data_iso": "2026-09-08T19:00:00-03:00",
-    "checkpoint": -90,
-    "executado_em": "2026-09-08T17:39:50-03:00",
-    "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "checkpoint": -15,
+    "executado_em": "2026-09-08T18:50:40-03:00",
+    "chamada_openai": false,
+    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
     "canais_antes": [
-      "Paramount+"
+      "Disney+ / ESPN"
     ],
-    "status": "confirmado",
-    "modelo": "gpt-5.6-terra",
-    "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2025/05/2_5_2025-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2025/12/Fixture_CONMEBOL-Sudamericana-2026_Primera-Fase_v23.12.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/04/Boletin-Aperturas_13_04_2026.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/04/Copia-de-25_4_2026-Planilla-Sudamericana-Semana-18-Fase-Grupos-Fecha-3.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/05/1_5_2026-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
-      "https://gol.conmebol.com/libertadores/es/fixture/view/1712",
-      "https://gol.conmebol.com/sudamericana/en",
-      "https://gol.conmebol.com/sudamericana/en/news/independiente-santa-fe-v-vasco-da-gama-first-leg-conmebol-sudamericana-quarter-finals-kick",
-      "https://gol.conmebol.com/sudamericana/en/team/97",
-      "https://gol.conmebol.com/sudamericana/es",
-      "https://gol.conmebol.com/sudamericana/es/news/calendario-conmebol-sudamericana-2026-dias-horarios-y-sedes-de-la-fase-de-grupos",
-      "https://gol.conmebol.com/sudamericana/es/news/los-ocho-mejores-de-la-gran-conquista-asi-se-jugaran-los-cuartos-de-final-de-la-conmebol",
-      "https://gol.conmebol.com/sudamericana/es/news/rumbo-barranquilla-asi-se-jugara-la-ida-de-los-cuartos-de-final-de-la-conmebol-sudamericana",
-      "https://gol.conmebol.com/sudamericana/es/team/97",
-      "https://gol.conmebol.com/sudamericana/pt-br",
-      "https://gol.conmebol.com/sudamericana/pt-br/news/independiente-santa-fe-x-vasco-da-gama-pela-ida-das-quartas-de-final-da-conmebol-sudamericana",
-      "https://gol.conmebol.com/sudamericana/pt-br/news/rumo-barranquilla-assim-se-joga-ida-das-quartas-de-final-da-conmebol-sudamericana",
-      "https://search.folha.uol.com.br/search",
-      "https://www.cnnbrasil.com.br/esportes/futebol/futebol-internacional",
-      "https://www.cnnbrasil.com.br/esportes/futebol/futebol-internacional/sulamericana/conmebol-define-datas-e-horarios-das-quartas-de-final-da-sul-americana-2026",
-      "https://www.cnnbrasil.com.br/esportes/futebol/futebol-internacional/sulamericana/santa-fe-x-vasco-horario-e-onde-assistir-as-quartas-da-sul-americana",
-      "https://www.cnnbrasil.com.br/esportes/futebol/futebol-internacional/sulamericana/veja-classificados-e-confrontos-das-quartas-de-final-da-copa-sul-americana",
-      "https://www.cnnbrasil.com.br/esportes/lances-ao-vivo/conmebol-sul-americana-2026/08-09-2026/santa-fe-x-vasco-da-gama",
-      "https://www.cnnbrasil.com.br/sulamericana",
-      "https://www.cnnbrasil.com.br/tudo-sobre/vasco",
-      "https://www1.folha.uol.com.br/esporte/2026/05/oitavas-de-final-da-libertadores-tera-duelo-brasileiro-entre-flamengo-e-cruzeiro.shtml",
-      "https://www1.folha.uol.com.br/esporte/2026/08/sem-neymar-santos-avanca-na-sul-americana-e-encara-o-atletico-mg-nas-quartas.shtml",
-      "https://www1.folha.uol.com.br/esporte/2026/09/fla-vira-novo-lider-e-sao-paulo-joga-a-crise-para-o-corinthians.shtml",
-      "https://www1.folha.uol.com.br/esporte/2026/09/veja-onde-assistir-aos-jogos-das-quartas-de-final-da-libertadores-e-da-sul-americana.shtml"
-    ],
-    "canais_depois": [
-      "Paramount+"
-    ],
-    "exclusivo": true,
-    "confianca": 0.99,
-    "fontes_aceitas": [
-      "https://www.cnnbrasil.com.br/esportes/futebol/futebol-internacional/sulamericana/santa-fe-x-vasco-horario-e-onde-assistir-as-quartas-da-sul-americana",
-      "https://www1.folha.uol.com.br/esporte/2026/09/veja-onde-assistir-aos-jogos-das-quartas-de-final-da-libertadores-e-da-sul-americana.shtml",
-      "https://gol.conmebol.com/sudamericana/pt-br/news/independiente-santa-fe-x-vasco-da-gama-pela-ida-das-quartas-de-final-da-conmebol-sudamericana"
-    ],
-    "youtube": [],
-    "youtube_removidos": [],
-    "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Independiente Santa Fe x Vasco da Gama, jogo de ida das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 8 de setembro de 2026, às 19h (horário de Brasília; 17h em Bogotá), no Estádio El Campín. A transmissão integral é exclusiva do Paramount+. Não há canal de TV aberta, TV por assinatura ou YouTube confirmado para o jogo completo."
+    "status": "sem_chamada"
   },
-  "atualizado_em": "2026-09-08T17:39:50-03:00"
+  "atualizado_em": "2026-09-08T18:50:40-03:00"
 }
