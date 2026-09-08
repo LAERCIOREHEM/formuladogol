@@ -17,10 +17,10 @@
     "jogos_foco": 1,
     "descobertas_antecipadas": 5,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 30,
+    "candidatos_oficiais_encontrados": 33,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 5,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401912542",
+      "event_id": "401912518",
       "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Boca Juniors x São Paulo",
-      "data_iso": "2026-09-08T21:30:00-03:00",
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Fluminense x Platense",
+      "data_iso": "2026-09-08T19:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -235,16 +235,6 @@
   ],
   "rejeitados": [
     {
-      "video_id": "44ont0jx11Q",
-      "url": "https://www.youtube.com/watch?v=44ont0jx11Q",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO! NA PONTA DOS DEDOS: A VITÓRIA DE KIMI ANTONELLI NO GP DA ITÁLIA | #podcast | ge.globo",
-      "status": "live",
-      "inicio_programado": "2026-09-08T14:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "wtuhJp2GeP4",
       "url": "https://www.youtube.com/watch?v=wtuhJp2GeP4",
       "fonte": "getv",
@@ -255,13 +245,13 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "LLpNUqHVam8",
-      "url": "https://www.youtube.com/watch?v=LLpNUqHVam8",
-      "fonte": "sbt",
-      "canal": "SBT",
-      "titulo": "SBT Ao Vivo",
+      "video_id": "g2TiJLIFR7A",
+      "url": "https://www.youtube.com/watch?v=g2TiJLIFR7A",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "REPRISE:  EVERTON X MANCHESTER UNITED | PREMIER LEAGUE 26/27 | 3ª RODADA",
       "status": "live",
-      "inicio_programado": "2025-02-24T18:51:26-03:00",
+      "inicio_programado": "2026-09-08T17:00:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -289,7 +279,7 @@
       "url": "https://www.youtube.com/watch?v=87NerY2s9V8",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: DETROIT LIONS X BUFFALO BILLS | NFL 2026/27 | ge tv",
+      "titulo": "AO VIVO: BUFFALO BILLS X DETROIT LIONS | NFL 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-17T20:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -299,17 +289,47 @@
       "url": "https://www.youtube.com/watch?v=F_zyo3Em_0Q",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: JACKSONVILLE JAGUARS X DENVER BRONCOS | NFL 2026/27 | ge tv",
+      "titulo": "AO VIVO: DENVER BRONCOS X JACKSONVILLE JAGUARS | NFL 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-20T16:25:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "JrxVBwnjXQ8",
+      "url": "https://www.youtube.com/watch?v=JrxVBwnjXQ8",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "CONVOCAÇÃO DA SELEÇÃO: A TIERLIST | Panela sportv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-08T21:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "NSuMkx2IDhg",
+      "url": "https://www.youtube.com/watch?v=NSuMkx2IDhg",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: REPÚBLICA TCHECA X CROÁCIA | UEFA NATIONS LEAGUE 2026 | FASE DE GRUPOS |  ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-26T15:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "NuWrnSw2Dn4",
+      "url": "https://www.youtube.com/watch?v=NuWrnSw2Dn4",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: TUDO DAS QUARTAS DA LIBERTADORES, DIRETO DOS ESTÁDIOS! | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-09-08T17:05:00-03:00",
+      "motivo": "confiança insuficiente (56.42%)"
     },
     {
       "video_id": "Q4Z-jGTCGbU",
       "url": "https://www.youtube.com/watch?v=Q4Z-jGTCGbU",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: GREEN BAY PACKERS X MINNESOTA VIKINGS | NFL 2026/27 | ge tv",
+      "titulo": "AO VIVO: MINNESOTA VIKINGS X GREEN BAY PACKERS  | NFL 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-13T16:25:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -325,14 +345,34 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "VqiVhVCR47Q",
-      "url": "https://www.youtube.com/watch?v=VqiVhVCR47Q",
+      "video_id": "RBNVGCX3BkM",
+      "url": "https://www.youtube.com/watch?v=RBNVGCX3BkM",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: TUDO DAS QUARTAS DA LIBERTADORES, DIRETO DOS ESTÁDIOS! | ge tv",
+      "titulo": "AO VIVO: SÃO BERNARDO X ATLÉTICO GO | BRASILEIRÃO SÉRIE B 2026 | ge tv",
       "status": "upcoming",
-      "inicio_programado": "2026-09-08T17:00:00-03:00",
-      "motivo": "confiança insuficiente (51.00%)"
+      "inicio_programado": "2026-09-19T19:00:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "UfNZHVddEXw",
+      "url": "https://www.youtube.com/watch?v=UfNZHVddEXw",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AARON DONALD ESTÁ DE VOLTA AO LOS ANGELES RAMS | Primeira Descida | ge.globo",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-08T21:47:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "k6WVoUs2wCI",
+      "url": "https://www.youtube.com/watch?v=k6WVoUs2wCI",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "INDEPENDIENTE DEL VALLE X FLAMENGO | NARRAÇÃO AO VIVO | QUARTAS DE FINAL | LIBERTADORES 2026 | ge tv",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-10T20:30:00-03:00",
+      "motivo": "conteúdo rejeitado: narracao"
     },
     {
       "video_id": "oErQIqXlspI",
@@ -350,7 +390,7 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO! QUARTAS DA LIBERTADORES, CONVOCAÇÃO E O NOVO CICLO DA SELEÇÃO! | Denilson Show | ge tv",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-08T16:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -359,7 +399,7 @@
       "url": "https://www.youtube.com/watch?v=sYJaOUmZWsk",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: ATLANTA FALCONS X GREEN BAY PACKERS | NFL 2026/27 | ge tv",
+      "titulo": "AO VIVO: GREEN BAY PACKERS X ATLANTA FALCONS | NFL 2026/27 | ge tv",
       "status": "upcoming",
       "inicio_programado": "2026-09-24T20:15:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -395,26 +435,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "egm9wCyhXac",
-      "url": "https://www.youtube.com/watch?v=egm9wCyhXac",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "BOTAFOGO X PALMEIRAS | BRASILEIRÃO 2026 | 26ª RODADA | REPRISE",
-      "status": "live",
-      "inicio_programado": "2026-09-08T09:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "g2TiJLIFR7A",
-      "url": "https://www.youtube.com/watch?v=g2TiJLIFR7A",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "REPRISE:  EVERTON X MANCHESTER UNITED | PREMIER LEAGUE 26/27 | 3ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-08T17:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "gzC3i-IGksU",
       "url": "https://www.youtube.com/watch?v=gzC3i-IGksU",
       "fonte": "cazetv",
@@ -435,16 +455,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "izA8_c0ob8Y",
-      "url": "https://www.youtube.com/watch?v=izA8_c0ob8Y",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ALEMANHA X COREIA DO SUL  | COPA DO MUNDO DE BASQUETE FEMININO 2026 | 2ª FASE",
-      "status": "live",
-      "inicio_programado": "2026-09-08T15:35:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "jEYwLzuNUus",
       "url": "https://www.youtube.com/watch?v=jEYwLzuNUus",
       "fonte": "cazetv",
@@ -452,6 +462,26 @@
       "titulo": "AO VIVO: COLÔMBIA X PORTUGAL | COPA DO MUNDO FIFA FEMININA SUB-20 2026 | 2ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-10T12:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "kAeTANPxKg4",
+      "url": "https://www.youtube.com/watch?v=kAeTANPxKg4",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: FLUMINENSE E VASCO ENTRAM EM CAMPO PELOS GRAMADOS DA AMÉRICA! | GERAL CAZÉTV",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-08T20:55:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
+      "video_id": "ru1-aL0U8qA",
+      "url": "https://www.youtube.com/watch?v=ru1-aL0U8qA",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: TÊNIS DE MESA | HUGO CALDERANO NO WTT CHAMPIONS DE MACAU | OITAVAS DE FINAL",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-10T09:20:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -485,27 +515,33 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401912518",
+      "jogo": "Fluminense x Platense",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401912542",
+      "event_id": "401912518",
       "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Boca Juniors x São Paulo",
-      "data_iso": "2026-09-08T21:30:00-03:00",
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Fluminense x Platense",
+      "data_iso": "2026-09-08T19:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 87,
+    "unidades": 88,
     "requisicoes": {
       "channels": 4,
-      "videos": 43,
+      "videos": 44,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-08T15:32:03-03:00"
+  "atualizado_em": "2026-09-08T17:32:18-03:00"
 }
