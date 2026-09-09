@@ -20,20 +20,24 @@ class FakeStorage {
 }
 
 class FakeDB {
-  constructor() { this.events = new Map(); this.essentialEvents = new Map(); this.preflight = new Map(); this.incidents = new Map(); }
+  constructor() { this.events = new Map(); this.essentialEvents = new Map(); this.matchEvents = new Map(); this.preflight = new Map(); this.incidents = new Map(); }
   prepare(sql) {
     return {
       bind: (...args) => ({
         run: async () => {
+          let changes = 0;
           if (/INSERT OR IGNORE INTO sports_events/.test(sql)) {
-            if (!this.events.has(args[0])) this.events.set(args[0], args);
+            if (!this.events.has(args[0])) { this.events.set(args[0], args); changes = 1; }
           }
           if (/INSERT OR IGNORE INTO essential_match_events/.test(sql)) {
-            if (!this.essentialEvents.has(args[0])) this.essentialEvents.set(args[0], args);
+            if (!this.essentialEvents.has(args[0])) { this.essentialEvents.set(args[0], args); changes = 1; }
           }
-          if (/INSERT INTO monitor_preflight/.test(sql)) this.preflight.set(`${args[0]}:${args[1]}`, args);
-          if (/INSERT OR IGNORE INTO monitor_incidents/.test(sql)) this.incidents.set(args[0], args);
-          return { success: true };
+          if (/INSERT OR IGNORE INTO match_events/.test(sql)) {
+            if (!this.matchEvents.has(args[0])) { this.matchEvents.set(args[0], args); changes = 1; }
+          }
+          if (/INSERT INTO monitor_preflight/.test(sql)) { this.preflight.set(`${args[0]}:${args[1]}`, args); changes = 1; }
+          if (/INSERT OR IGNORE INTO monitor_incidents/.test(sql)) { this.incidents.set(args[0], args); changes = 1; }
+          return { success: true, meta: { changes } };
         }
       })
     };
@@ -170,6 +174,29 @@ try {
   assert.equal(event.type, 'match_start');
   assert.equal(event.testInstallationId, 'install-test');
   assert.match(event.notificationDraft.title, /ESPN REAL/);
+}
+
+// R10R3: o lembrete T-15 tem duas vias (cron/bootstrap e alarme do DO).
+// Aqui validamos a via do alarme diretamente sobre a watchlist, sem ESPN.
+{
+  const storage = new FakeStorage();
+  const db = new FakeDB();
+  const queue = [];
+  const reminderNow = Date.parse('2026-09-01T23:45:30Z');
+  await storage.put('watchlist', {
+    [eventId]: { eventId, league: 'bra.copa_do_brazil', competitionKey: 'copa_do_brasil', competitionName: 'Copa do Brasil', kickoff,
+      home: { id: '7632', name: 'Atlético-MG' }, away: { id: '2022', name: 'Cruzeiro' }, postponed: false, cancelled: false }
+  });
+  const monitor = new SportsMonitor({ storage }, { DB: db, PUSH_QUEUE: { send: async (body) => queue.push(body) } });
+  assert.equal(await monitor.emitPrematchReminders(reminderNow), 1);
+  assert.equal(db.matchEvents.size, 1);
+  assert.equal(queue.length, 1);
+  const premRow = [...db.matchEvents.values()][0];
+  const premPayload = JSON.parse(premRow[4]);
+  assert.equal(premPayload.type, 'prematch_15');
+  assert.match(premPayload.notificationDraft.title, /15 minutos/);
+  assert.equal(await monitor.emitPrematchReminders(reminderNow + 10_000), 0, 'mesmo T-15 não pode duplicar');
+  assert.equal(queue.length, 1, 'deduplicação deve impedir novo fan-out');
 }
 
 console.log('sports-monitor: PASS');

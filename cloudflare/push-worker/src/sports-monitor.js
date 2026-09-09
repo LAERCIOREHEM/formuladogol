@@ -42,7 +42,7 @@ const FAST_POLL_PRE_MS = 20 * 60_000;
 const AUX_SUMMARY_INTERVAL_MS = 30_000;
 const LIVE_POLL_LATE_START_MS = 45 * 60_000;
 const LIVE_POLICY_VERSION = '6-R10';
-const ESSENTIAL_EVENT_TYPES = new Set(['goal', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
+const ESSENTIAL_EVENT_TYPES = new Set(['prematch_15', 'goal', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
@@ -162,11 +162,21 @@ function scheduleEvent(type, game, now, previous = null) {
   return base;
 }
 
-export function deriveScheduleEvents() {
-  // 6-R10: o produto público aceita somente Gol, Vermelho, Escalação, Início e Final.
-  // Mantemos esta exportação apenas por compatibilidade com testes/helpers antigos;
-  // eventos de agenda, lembrete e mudança de horário não são mais gerados.
-  return [];
+export function deriveScheduleEvents(previousSnapshot, nextSnapshot, nowMs = Date.now()) {
+  // 6-R10R3: somente o lembrete T-15 volta a ser público. Mudança de horário,
+  // adiamento, classificação, pênaltis e demais alertas continuam suprimidos.
+  const now = num(nowMs, Date.now());
+  const next = nextSnapshot && typeof nextSnapshot === 'object' ? nextSnapshot : {};
+  const events = [];
+  for (const game of Object.values(next)) {
+    const kickoff = Date.parse(game?.kickoff || '');
+    const remaining = kickoff - now;
+    if (!game?.postponed && !game?.cancelled && Number.isFinite(kickoff)
+        && remaining >= REMINDER_MIN_MS && remaining <= REMINDER_MAX_MS) {
+      events.push(scheduleEvent('prematch_15', game, now));
+    }
+  }
+  return events;
 }
 
 async function fetchAgendaJson(url) {
@@ -513,13 +523,13 @@ export class SportsMonitor {
       const agenda = await fetchAgendaJson(AGENDA_URL);
       candidates = selectAgendaCandidates(agenda, now);
       scheduleSnapshot = selectScheduleSnapshot(agenda, now, current.scheduleSnapshot);
-      // Alertas de agenda/reminder foram retirados do produto 6-R10. Mantemos apenas o snapshot factual.
-      scheduleEvents = [];
+      scheduleEvents = deriveScheduleEvents(current.scheduleSnapshot, scheduleSnapshot, now, Boolean(current.status.scheduleBaselineAt));
     } catch (error) {
       agendaError = text(error?.message || error);
     }
 
-    // Nenhum alerta legado de agenda é publicado no contrato de cinco alertas.
+    // Publica somente o lembrete T-15; demais eventos legados de agenda seguem bloqueados.
+    for (const event of scheduleEvents) await this.recordEvent(event);
     if (!agendaError) await this.state.storage.put('scheduleSnapshot', scheduleSnapshot);
 
     const watchlist = {};
@@ -583,10 +593,28 @@ export class SportsMonitor {
     }
   }
 
+  async emitPrematchReminders(nowMs = Date.now()) {
+    const now = num(nowMs, Date.now());
+    const snapshot = await this.readState();
+    const events = deriveScheduleEvents({}, snapshot.watchlist, now);
+    let created = 0;
+    for (const event of events) {
+      if (await this.recordEvent(event)) created += 1;
+    }
+    if (created > 0) {
+      await this.writeStatus({
+        lastPrematchReminderAt: now,
+        prematchRemindersThisWake: created
+      });
+    }
+    return created;
+  }
+
   async recordEvent(event) {
     const row = eventRow(event);
     if (!ESSENTIAL_EVENT_TYPES.has(row.event_type)) return false;
     const goalEvent = row.event_type === 'goal';
+    const prematchEvent = row.event_type === 'prematch_15';
     const inserted = goalEvent
       ? await this.env.DB.prepare(`
         INSERT OR IGNORE INTO sports_events (
@@ -601,10 +629,15 @@ export class SportsMonitor {
         row.athlete_id,row.athlete_name,row.minute,row.home_score,row.away_score,row.own_goal,row.penalty_goal,row.shootout,
         row.detected_at,row.confirmed_at,row.payload_json
       ).run()
-      : await this.env.DB.prepare(`
-        INSERT OR IGNORE INTO essential_match_events (event_key,event_id,event_type,confirmed_at,payload_json)
-        VALUES (?, ?, ?, ?, ?)
-      `).bind(row.event_key,row.event_id,row.event_type,row.confirmed_at,row.payload_json).run();
+      : prematchEvent
+        ? await this.env.DB.prepare(`
+          INSERT OR IGNORE INTO match_events (event_key,event_id,event_type,confirmed_at,payload_json)
+          VALUES (?, ?, ?, ?, ?)
+        `).bind(row.event_key,row.event_id,row.event_type,row.confirmed_at,row.payload_json).run()
+        : await this.env.DB.prepare(`
+          INSERT OR IGNORE INTO essential_match_events (event_key,event_id,event_type,confirmed_at,payload_json)
+          VALUES (?, ?, ?, ?, ?)
+        `).bind(row.event_key,row.event_id,row.event_type,row.confirmed_at,row.payload_json).run();
     const created = Number(inserted?.meta?.changes || 0) > 0;
     if (created) {
       try {
@@ -621,7 +654,7 @@ export class SportsMonitor {
       eventId: text(game?.eventId), league: text(game?.league), competitionKey: text(game?.competitionKey),
       competitionName: text(game?.competitionName), home: game?.home || {}, away: game?.away || {}
     };
-    const types = ['goal', 'red_card', 'match_start', 'final_whistle'];
+    const types = ['prematch_15', 'goal', 'red_card', 'match_start', 'final_whistle'];
     if (game?.league === 'bra.1') types.splice(2, 0, 'lineup_confirmed');
     const pairs = await Promise.all(types.map(async (type) => [type, await countEligibleTargets(this.env, { ...base, type })]));
     return Object.fromEntries(pairs);
@@ -1051,7 +1084,7 @@ export class SportsMonitor {
     return {
       ok: true,
       engineVersion: 5,
-      essentialAlertPolicyVersion: SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION || '6-R10',
+      essentialAlertPolicyVersion: SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION || '6-R10R3',
       readinessVersion: READINESS_VERSION,
       overturnPolicyVersion: SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION,
       goalDetectionPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION,
@@ -1072,7 +1105,9 @@ export class SportsMonitor {
       lastScorerEnrichmentWarning: text(snapshot.status.lastScorerEnrichmentWarning),
       summariesFetched: num(snapshot.status.summariesFetched, 0),
       emittedThisPoll: num(snapshot.status.emittedThisPoll, 0),
-      scheduleEventsThisBootstrap: 0,
+      scheduleEventsThisBootstrap: num(snapshot.status.scheduleEventsThisBootstrap, 0),
+      lastPrematchReminderAt: num(snapshot.status.lastPrematchReminderAt, 0),
+      prematchRemindersThisWake: num(snapshot.status.prematchRemindersThisWake, 0),
       readinessRed: num(snapshot.status.readinessRed, 0),
       preflight: snapshot.preflight,
       sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R9'),
@@ -1098,6 +1133,9 @@ export class SportsMonitor {
   }
 
   async alarm() {
+    // O alarme do Durable Object já acorda a cada 10 s na janela T-20; por isso
+    // ele funciona como segunda via do T-15, independente do cron de 1 minuto.
+    await this.emitPrematchReminders();
     await this.pollHotEspnTest();
     await this.pollHotMatchTest();
     await this.pollOnce();

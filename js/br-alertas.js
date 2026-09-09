@@ -5,6 +5,7 @@
   if (!PUSH) return;
 
   const DEFAULTS = Object.freeze({
+    prematch15: true,
     goals: true,
     redCards: true,
     lineups: true,
@@ -64,6 +65,7 @@
   function normalizePreferences(value) {
     const src = value || {};
     return {
+      prematch15: src.prematch15 !== false,
       goals: src.goals !== false,
       redCards: src.redCards !== false,
       lineups: src.lineups !== false,
@@ -208,6 +210,7 @@
   async function setEventType(key, enabled) {
     await ensureLoaded();
     const next = clonePreferences();
+    if (key === 'prematch15') next.prematch15 = Boolean(enabled);
     if (key === 'goals') next.goals = Boolean(enabled);
     if (key === 'redCards') next.redCards = Boolean(enabled);
     if (key === 'lineups') next.lineups = Boolean(enabled);
@@ -391,7 +394,8 @@
         ${renderGames()}
       </div></section>
       <section class="panel fdg-alert-panel"><div class="panel-inner">
-        <div class="fdg-alert-section-head"><div><div class="kicker">Essenciais</div><h2>O que receber?</h2></div><span>5 tipos</span></div>
+        <div class="fdg-alert-section-head"><div><div class="kicker">Essenciais</div><h2>O que receber?</h2></div><span>6 tipos</span></div>
+        <label class="fdg-alert-switch"><span><strong>⏰ Jogo em 15 minutos</strong><small>Avisa 15 minutos antes do horário marcado da partida.</small></span><input type="checkbox" data-fdg-type="prematch15" ${p.prematch15 ? 'checked' : ''}><i></i></label>
         <label class="fdg-alert-switch"><span><strong>▶️ Início da partida</strong><small>Avisa quando a ESPN confirma que a bola rolou.</small></span><input type="checkbox" data-fdg-type="matchStart" ${p.matchStart ? 'checked' : ''}><i></i></label>
         <label class="fdg-alert-switch"><span><strong>⚽ Gols</strong><small>Autor, minuto e placar atualizado quando a fonte permite.</small></span><input type="checkbox" data-fdg-type="goals" ${p.goals ? 'checked' : ''}><i></i></label>
         <label class="fdg-alert-switch"><span><strong>🟥 Cartões vermelhos</strong><small>Expulsões confirmadas, com jogador e minuto quando disponíveis.</small></span><input type="checkbox" data-fdg-type="redCards" ${p.redCards ? 'checked' : ''}><i></i></label>

@@ -30,6 +30,10 @@ assert.match(payload.tag, /^fdg-goal-/);
 
 assert.throws(() => buildSportsPushPayload({ ...event, type: 'goal_overturned' }), /unsupported_public_alert_type/, 'gol anulado é correção interna e não pode virar push público');
 
+const prematch = buildSportsPushPayload({ ...event, eventKey: 'prematch_15:401909112:1788307200000', type: 'prematch_15', notificationDraft: { title: '⏰ Jogo começa em 15 minutos', body: 'Atlético-MG × Cruzeiro · 21:00' } });
+assert.match(prematch.tag, /^fdg-prematch_15-/);
+assert.equal(prematch.data.url, '/aovivo.html?event=401909112');
+
 const red = buildSportsPushPayload({ ...event, eventKey: 'red_card:401909112:r1', type: 'red_card', notificationDraft: { title: '🟥 EXPULSÃO DO CRUZEIRO!', body: "Jogador, 63' · Atlético-MG 0 × 1 Cruzeiro" } });
 assert.match(red.tag, /^fdg-red_card-/);
 assert.equal(red.data.url, '/aovivo.html?event=401909112');
@@ -40,12 +44,13 @@ assert.match(startAlert.tag, /^fdg-match_start-/);
 const final = buildSportsPushPayload({ ...event, eventKey: 'final_whistle:401909112', type: 'final_whistle', sourcePlayKey: '', notificationDraft: { title: '🏁 Fim de jogo', body: 'Atlético-MG 1 × 2 Cruzeiro' } });
 assert.equal(final.data.url, '/aovivo.html?event=401909112');
 assert.match(final.tag, /^fdg-final_whistle-/);
+assert.equal(preferenceColumnForEvent('prematch_15'), 'COALESCE(r.prematch_15,1)');
 assert.equal(preferenceColumnForEvent('goal'), 'p.goals');
 assert.equal(preferenceColumnForEvent('red_card'), 'p.red_cards');
 assert.equal(preferenceColumnForEvent('lineup_confirmed'), 'p.lineups');
 assert.equal(preferenceColumnForEvent('match_start'), 'p.match_start');
 assert.equal(preferenceColumnForEvent('final_whistle'), 'p.final_whistle');
-for (const legacy of ['goal_overturned','prematch_15','schedule_changed','match_postponed','shootout_start','qualification']) assert.equal(preferenceColumnForEvent(legacy), '', `${legacy} deve estar fora do contrato público`);
+for (const legacy of ['goal_overturned','schedule_changed','match_postponed','shootout_start','qualification']) assert.equal(preferenceColumnForEvent(legacy), '', `${legacy} deve estar fora do contrato público`);
 assert.equal(preferenceColumnForEvent('unknown'), '');
 
 assert.deepEqual(chunkArray(['a','b','c','d','e'], 2), [['a','b'],['c','d'],['e']]);

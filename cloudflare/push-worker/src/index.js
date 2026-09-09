@@ -94,6 +94,7 @@ function normalizePreferences(input) {
     ? [...new Set(value.map((item) => cleanId(item, 96)).filter(Boolean))].slice(0, maxItems)
     : [];
   return {
+    prematch15: src.prematch15 !== false,
     goals: src.goals !== false,
     redCards: src.redCards !== false,
     lineups: src.lineups !== false,
@@ -132,17 +133,32 @@ async function savePreferences(env, installationId, preferences) {
     JSON.stringify(p.teams),
     JSON.stringify(p.games)
   ).run();
+
+  // Clientes antigos em cache não conhecem prematch15. Nesse caso, preservar
+  // a escolha já existente; para instalação sem linha, o default é ON.
+  if (Object.prototype.hasOwnProperty.call(preferences || {}, 'prematch15')) {
+    await env.DB.prepare(`
+      INSERT INTO push_reminder_preferences (installation_id, prematch_15, updated_at)
+      VALUES (?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(installation_id) DO UPDATE SET
+        prematch_15=excluded.prematch_15, updated_at=CURRENT_TIMESTAMP
+    `).bind(installationId, p.prematch15 ? 1 : 0).run();
+  }
   return p;
 }
 
 async function getPreferences(env, installationId) {
   const row = await env.DB.prepare(`
-    SELECT goals, red_cards, lineups, match_start, final_whistle, all_games, teams_json, games_json
-    FROM push_preferences_v3 WHERE installation_id=?
+    SELECT p.goals, p.red_cards, p.lineups, p.match_start, p.final_whistle, p.all_games, p.teams_json, p.games_json,
+           COALESCE(r.prematch_15, 1) AS prematch_15
+    FROM push_preferences_v3 p
+    LEFT JOIN push_reminder_preferences r ON r.installation_id=p.installation_id
+    WHERE p.installation_id=?
   `).bind(installationId).first();
   if (!row) return normalizePreferences({});
   const parse = (raw) => { try { return JSON.parse(raw || '[]'); } catch (_) { return []; } };
   return normalizePreferences({
+    prematch15: Boolean(row.prematch_15),
     goals: Boolean(row.goals),
     redCards: Boolean(row.red_cards),
     lineups: Boolean(row.lineups),
@@ -506,7 +522,7 @@ export default {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
         version: 7,
-        revision: '6-R10',
+        revision: '6-R10R3',
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {

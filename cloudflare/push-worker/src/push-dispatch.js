@@ -3,7 +3,7 @@ import { buildPushPayload } from '@block65/webcrypto-web-push';
 const DELIVERY_BATCH_SIZE = 5;
 const TARGET_PAGE_SIZE = 400;
 const MAX_QUEUE_RETRY_DELAY = 300;
-const PUBLIC_ALERT_TYPES = new Set(['goal', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
+const PUBLIC_ALERT_TYPES = new Set(['prematch_15', 'goal', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
@@ -37,6 +37,7 @@ async function vapidKeys(env) {
 
 export function preferenceColumnForEvent(type) {
   const map = {
+    prematch_15: 'COALESCE(r.prematch_15,1)',
     goal: 'p.goals',
     red_card: 'p.red_cards',
     lineup_confirmed: 'p.lineups',
@@ -48,6 +49,7 @@ export function preferenceColumnForEvent(type) {
 
 function defaultTitle(type) {
   return ({
+    prematch_15: '⏰ Jogo começa em 15 minutos',
     goal: '⚽ GOL!',
     red_card: '🟥 CARTÃO VERMELHO!',
     lineup_confirmed: '👥 ESCALAÇÕES CONFIRMADAS',
@@ -89,6 +91,7 @@ export function buildSportsPushPayload(event) {
 
 function deliveryOptions(type) {
   const value = text(type);
+  if (value === 'prematch_15') return { ttl: 900, urgency: 'high' };
   if (value === 'lineup_confirmed') return { ttl: 3600, urgency: 'normal' };
   if (value === 'match_start') return { ttl: 900, urgency: 'high' };
   if (value === 'red_card') return { ttl: 900, urgency: 'high' };
@@ -133,6 +136,13 @@ async function getEvent(env, eventKey) {
       SELECT event_key, event_type, payload_json
       FROM essential_match_events
       WHERE event_key=?
+    `).bind(eventKey).first();
+  }
+  if (!row) {
+    row = await env.DB.prepare(`
+      SELECT event_key, event_type, payload_json
+      FROM match_events
+      WHERE event_key=? AND event_type='prematch_15'
     `).bind(eventKey).first();
   }
   return row ? { row, payload: parseEventRow(row) } : null;
@@ -251,6 +261,7 @@ export async function eligibleTargets(env, event, afterSubscriptionId = '') {
     SELECT s.subscription_id, s.installation_id
     FROM push_subscriptions s
     JOIN push_preferences_v3 p ON p.installation_id=s.installation_id
+    LEFT JOIN push_reminder_preferences r ON r.installation_id=s.installation_id
     WHERE s.active=1
       AND s.subscription_id > ?
       AND (?='' OR s.installation_id=?)

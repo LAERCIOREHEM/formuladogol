@@ -122,7 +122,13 @@ async function dbMetrics(env) {
         COUNT(*) AS total
       FROM essential_match_events
     `).first(),
-    env.DB.prepare(`SELECT COUNT(*) AS total FROM match_events`).first(),
+    env.DB.prepare(`
+      SELECT
+        SUM(CASE WHEN event_type='prematch_15' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS prematch24h,
+        COUNT(*) AS total
+      FROM match_events
+      WHERE event_type='prematch_15'
+    `).first(),
     env.DB.prepare(`
       SELECT
         SUM(CASE WHEN status IN ('pending','enqueued') THEN 1 ELSE 0 END) AS pending,
@@ -152,6 +158,8 @@ async function dbMetrics(env) {
         SELECT event_key, confirmed_at FROM sports_events WHERE event_type='goal'
         UNION ALL
         SELECT event_key, confirmed_at FROM essential_match_events
+        UNION ALL
+        SELECT event_key, confirmed_at FROM match_events WHERE event_type='prematch_15'
       )
       SELECT
         AVG((julianday(d.sent_at)-julianday(e.confirmed_at))*86400000.0) AS avg_ms,
@@ -167,6 +175,7 @@ async function dbMetrics(env) {
         (SELECT MAX(ts) FROM (
           SELECT MAX(confirmed_at) AS ts FROM sports_events WHERE event_type='goal'
           UNION ALL SELECT MAX(confirmed_at) AS ts FROM essential_match_events
+          UNION ALL SELECT MAX(confirmed_at) AS ts FROM match_events WHERE event_type='prematch_15'
         )) AS last_event_at,
         (SELECT MAX(sent_at) FROM push_deliveries WHERE status='sent') AS last_push_at
     `).first(),
