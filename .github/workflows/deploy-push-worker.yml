@@ -37,15 +37,22 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Validar credenciais Cloudflare
+      - name: Validar credenciais obrigatórias
         shell: bash
         run: |
           set -euo pipefail
           test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'ERRO: secret CLOUDFLARE_API_TOKEN ausente.'; exit 1; }
           test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'ERRO: secret CLOUDFLARE_ACCOUNT_ID ausente.'; exit 1; }
           test -n "${FDG_PUSH_OPENAI_API_KEY:-}" || { echo 'ERRO: secret OPENAI_API_KEY ausente; o Guardião IA não pode operar.'; exit 1; }
-          test -n "${FDG_PUSH_RESEND_API_KEY:-}" || { echo 'ERRO: secret RESEND_API_KEY ausente; incidentes T-10/T+3 ficariam silenciosos.'; exit 1; }
-          test -n "${FDG_PUSH_EMAIL_DESTINO:-}" || { echo 'ERRO: secret EMAIL_DESTINO ausente; incidentes T-10/T+3 ficariam silenciosos.'; exit 1; }
+
+          # Resend é apenas o canal administrativo de contingência. A ausência
+          # dele NÃO pode bloquear o deploy nem os cinco alertas esportivos.
+          if [ -z "${FDG_PUSH_RESEND_API_KEY:-}" ] || [ -z "${FDG_PUSH_EMAIL_DESTINO:-}" ]; then
+            echo 'AVISO: RESEND_API_KEY/EMAIL_DESTINO não configurados.'
+            echo 'Os incidentes T-10/T+3 continuarão registrados no D1/ops, mas sem e-mail administrativo.'
+          else
+            echo 'Canal administrativo por e-mail configurado.'
+          fi
 
       - name: Instalar dependências
         run: npm install --no-audit --no-fund
@@ -123,8 +130,17 @@ jobs:
         run: |
           set -euo pipefail
           printf '%s' "$FDG_PUSH_OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY --config wrangler.generated.jsonc
-          printf '%s' "$FDG_PUSH_RESEND_API_KEY" | npx wrangler secret put RESEND_API_KEY --config wrangler.generated.jsonc
-          printf '%s' "$FDG_PUSH_EMAIL_DESTINO" | npx wrangler secret put EMAIL_DESTINO --config wrangler.generated.jsonc
+
+          # E-mail administrativo é opcional. Se os secrets não existirem no
+          # GitHub, não envia valor vazio e não apaga eventual secret já salvo
+          # diretamente no Cloudflare Worker.
+          if [ -n "${FDG_PUSH_RESEND_API_KEY:-}" ] && [ -n "${FDG_PUSH_EMAIL_DESTINO:-}" ]; then
+            printf '%s' "$FDG_PUSH_RESEND_API_KEY" | npx wrangler secret put RESEND_API_KEY --config wrangler.generated.jsonc
+            printf '%s' "$FDG_PUSH_EMAIL_DESTINO" | npx wrangler secret put EMAIL_DESTINO --config wrangler.generated.jsonc
+            echo 'Segredos de e-mail administrativo atualizados.'
+          else
+            echo 'E-mail administrativo não configurado; preservando qualquer configuração já existente no Worker.'
+          fi
 
       - name: Smoke test
         shell: bash
