@@ -46,7 +46,7 @@ jobs:
           test -n "${FDG_PUSH_OPENAI_API_KEY:-}" || { echo 'ERRO: secret OPENAI_API_KEY ausente; o Guardião IA não pode operar.'; exit 1; }
 
           # Resend é apenas o canal administrativo de contingência. A ausência
-          # dele NÃO pode bloquear o deploy nem os cinco alertas esportivos.
+          # dele NÃO pode bloquear o deploy nem os seis alertas esportivos.
           if [ -z "${FDG_PUSH_RESEND_API_KEY:-}" ] || [ -z "${FDG_PUSH_EMAIL_DESTINO:-}" ]; then
             echo 'AVISO: RESEND_API_KEY/EMAIL_DESTINO não configurados.'
             echo 'Os incidentes T-10/T+3 continuarão registrados no D1/ops, mas sem e-mail administrativo.'
@@ -147,17 +147,17 @@ jobs:
         run: |
           set -euo pipefail
           for i in 1 2 3 4 5 6 7 8 9 10; do
-            if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-R10"'; then
+            if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-R10R3"'; then
               echo 'Push Worker saudável.'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":5'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"overturnPolicyVersion":"6-R4"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"livePolicyVersion":"6-R10"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"goalReconciliationPolicyVersion":"6-R9-R1"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"goalScorerEnrichmentPolicyVersion":"6-R9"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"essentialAlertPolicyVersion":"6-R10"'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"essentialAlertPolicyVersion":"6-R10R3"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"readinessVersion":"6-R10"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"fastPollMs":10000'
-              echo 'Motor esportivo, cinco alertas, readiness T-30/T-10/T+3, reconciliação R9-R1 e push rápido saudáveis.'
+              echo 'Motor esportivo, seis alertas (incluindo T-15), readiness T-30/T-10/T+3, reconciliação R9-R1 e push rápido saudáveis.'
               curl -fsS --max-time 20 https://push.formuladogol.com.br/v1/monitor/source-probe | grep -q '"sourceLayerVersion":"6-R9"'
               echo 'Fontes ESPN R9 acessíveis a partir do próprio Cloudflare Worker.'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/dispatch/status | grep -q '"dispatchVersion":5'
