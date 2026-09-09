@@ -101,7 +101,11 @@ def validate(site: Path) -> dict[str,int]:
         problems.append("Jogos/Resultados não expõem o arquivo canônico do Brasileirão")
     if 'urlPaginaJogoBrasileirao' not in root_index:
         problems.append("helper de links para páginas individuais ausente no front principal")
-    if 'Detalhes da partida' not in root_index or 'Ver página da partida' not in root_index:
+    # Não valide o texto literal dos CTAs: o rótulo pode ser encurtado sem
+    # remover a navegação. O contrato relevante é estrutural — Jogos e
+    # Resultados precisam montar links para a URL individual calculada pelo
+    # helper canônico.
+    if 'href="${brEscapeAttr(paginaJogo)}"' not in root_index or 'href="${brEscapeAttr(paginaResultado)}"' not in root_index:
         problems.append("CTAs de páginas individuais ausentes em Jogos/Resultados")
 
     legacy=site/"brasileirao"/"jogos"/"index.html"
