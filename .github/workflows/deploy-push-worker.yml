@@ -22,6 +22,9 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      FDG_PUSH_OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      FDG_PUSH_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      FDG_PUSH_EMAIL_DESTINO: ${{ secrets.EMAIL_DESTINO }}
     defaults:
       run:
         working-directory: cloudflare/push-worker
@@ -40,6 +43,9 @@ jobs:
           set -euo pipefail
           test -n "${CLOUDFLARE_API_TOKEN:-}" || { echo 'ERRO: secret CLOUDFLARE_API_TOKEN ausente.'; exit 1; }
           test -n "${CLOUDFLARE_ACCOUNT_ID:-}" || { echo 'ERRO: secret CLOUDFLARE_ACCOUNT_ID ausente.'; exit 1; }
+          test -n "${FDG_PUSH_OPENAI_API_KEY:-}" || { echo 'ERRO: secret OPENAI_API_KEY ausente; o Guardião IA não pode operar.'; exit 1; }
+          test -n "${FDG_PUSH_RESEND_API_KEY:-}" || { echo 'ERRO: secret RESEND_API_KEY ausente; incidentes T-10/T+3 ficariam silenciosos.'; exit 1; }
+          test -n "${FDG_PUSH_EMAIL_DESTINO:-}" || { echo 'ERRO: secret EMAIL_DESTINO ausente; incidentes T-10/T+3 ficariam silenciosos.'; exit 1; }
 
       - name: Instalar dependências
         run: npm install --no-audit --no-fund
@@ -112,25 +118,35 @@ jobs:
       - name: Deploy Worker + Durable Object + custom domain
         run: npx wrangler deploy --config wrangler.generated.jsonc
 
+      - name: Configurar segredos do Guardião de prontidão
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$FDG_PUSH_OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY --config wrangler.generated.jsonc
+          printf '%s' "$FDG_PUSH_RESEND_API_KEY" | npx wrangler secret put RESEND_API_KEY --config wrangler.generated.jsonc
+          printf '%s' "$FDG_PUSH_EMAIL_DESTINO" | npx wrangler secret put EMAIL_DESTINO --config wrangler.generated.jsonc
+
       - name: Smoke test
         shell: bash
         run: |
           set -euo pipefail
           for i in 1 2 3 4 5 6 7 8 9 10; do
-            if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-E"'; then
+            if curl -fsS --max-time 10 https://push.formuladogol.com.br/health | grep -q '"revision":"6-R10"'; then
               echo 'Push Worker saudável.'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":4'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"engineVersion":5'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"overturnPolicyVersion":"6-R4"'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"livePolicyVersion":"6-R5"'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"livePolicyVersion":"6-R10"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"goalReconciliationPolicyVersion":"6-R9-R1"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"goalScorerEnrichmentPolicyVersion":"6-R9"'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"essentialAlertPolicyVersion":"6-R10"'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"readinessVersion":"6-R10"'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/monitor/status | grep -q '"fastPollMs":10000'
-              echo 'Motor esportivo, anti-falso-VAR, reconciliação R9-R1, autoria R9 e push rápido saudáveis.'
+              echo 'Motor esportivo, cinco alertas, readiness T-30/T-10/T+3, reconciliação R9-R1 e push rápido saudáveis.'
               curl -fsS --max-time 20 https://push.formuladogol.com.br/v1/monitor/source-probe | grep -q '"sourceLayerVersion":"6-R9"'
               echo 'Fontes ESPN R9 acessíveis a partir do próprio Cloudflare Worker.'
               curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/dispatch/status | grep -q '"dispatchVersion":5'
               echo 'Fila de alertas saudável.'
-              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/ops/status | grep -q '"opsVersion":6'
+              curl -fsS --max-time 10 https://push.formuladogol.com.br/v1/ops/status | grep -q '"opsVersion":7'
               echo 'Hardening operacional E6 saudável.'
               exit 0
             fi
