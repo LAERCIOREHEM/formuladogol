@@ -69,12 +69,12 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401913073",
+      "event_id": "401912541",
       "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Santos x Atlético-MG",
-      "data_iso": "2026-09-09T19:00:00-03:00",
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Estudiantes de La Plata x Corinthians",
+      "data_iso": "2026-09-09T21:30:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
@@ -250,8 +250,8 @@
       "fonte": "getv",
       "canal": "ge tv",
       "titulo": "AO VIVO: CONVOCAÇÃO DA SELEÇÃO BRASILEIRA PARA OS AMISTOSOS | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-09T15:00:00-03:00",
+      "status": "live",
+      "inicio_programado": "2026-09-09T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -262,16 +262,6 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2025-02-24T18:51:26-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "-mUcvXfmpA8",
-      "url": "https://www.youtube.com/watch?v=-mUcvXfmpA8",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: JAPÃO X ESTADOS UNIDOS | COPA DO MUNDO FIFA FEMININA SUB-20 2026 | 2ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-09T12:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -415,12 +405,22 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "K4P897AVgVI",
+      "url": "https://www.youtube.com/watch?v=K4P897AVgVI",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "ESTREIA DO PODCAST QUADRA ABERTA! COM TUDO DA RETA FINAL DO ÚLTIMO GRAND SLAM DO ANO",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-09T17:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "OFBRQFhZtco",
       "url": "https://www.youtube.com/watch?v=OFBRQFhZtco",
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO: ITÁLIA X AUSTRÁLIA | COPA DO MUNDO DE BASQUETE FEMININO 2026 | 2ª FASE",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-09T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -509,8 +509,8 @@
       "url": "https://www.youtube.com/watch?v=xz7fo9aq100",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: ESPECIAL CONVOCAÇÃO DA SELEÇÃO BRASILEIRA | GERAL CAZÉTV",
-      "status": "upcoming",
+      "titulo": "AO VIVO: CONVOCAÇÃO DA SELEÇÃO BRASILEIRA PARA AMISTOSOS! ANCELOTTI INICIA O CICLO DA COPA DE 2030",
+      "status": "live",
       "inicio_programado": "2026-09-09T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -528,24 +528,24 @@
   "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401913073",
+      "event_id": "401912541",
       "rodada": 0,
-      "competicao_chave": "sul_americana",
-      "competicao_nome": "Sul-Americana",
-      "jogo": "Santos x Atlético-MG",
-      "data_iso": "2026-09-09T19:00:00-03:00",
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Estudiantes de La Plata x Corinthians",
+      "data_iso": "2026-09-09T21:30:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
   "erros": [],
   "quota_estimada_youtube": {
-    "unidades": 88,
+    "unidades": 87,
     "requisicoes": {
       "channels": 4,
-      "videos": 44,
+      "videos": 43,
       "playlistItems": 40
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-09T13:10:48-03:00"
+  "atualizado_em": "2026-09-09T15:30:53-03:00"
 }
