@@ -15,13 +15,13 @@
   "resumo": {
     "jogos_na_janela": 42,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 5,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 34,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 5,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
+    "transmissoes_publicadas": 6,
     "sem_transmissao": 1,
     "erros": 0
   },
@@ -69,16 +69,30 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401912541",
+      "event_id": "401912527",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Estudiantes de La Plata x Corinthians",
-      "data_iso": "2026-09-09T21:30:00-03:00",
+      "jogo": "Palmeiras x Liga de Quito",
+      "data_iso": "2026-09-09T19:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
+    },
+    {
+      "event_id": "401841232",
+      "rodada": 27,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Coritiba x Athletico-PR",
+      "data_iso": "2026-09-11T21:00:00-03:00",
+      "principal": "GE TV",
+      "fontes_encontradas": [
+        "GE TV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841228",
@@ -152,6 +166,22 @@
     }
   ],
   "aceitos": [
+    {
+      "event_id": "401841232",
+      "jogo": "Coritiba x Athletico-PR",
+      "fonte": "getv",
+      "video_id": "Iz0UgMaICZA",
+      "url": "https://www.youtube.com/watch?v=Iz0UgMaICZA",
+      "titulo": "CORITIBA X ATHLETICO-PR | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+      "status": "upcoming",
+      "confianca": 0.9,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (60 min de diferença)"
+      ]
+    },
     {
       "event_id": "401841237",
       "jogo": "Flamengo x Corinthians",
@@ -241,18 +271,18 @@
       "canal": "ge tv",
       "titulo": "NEW ENGLAND PATRIOTS X SEATTLE SEAHAWKS | AQUECIMENTO AO VIVO | NFL | #live | sportv",
       "status": "upcoming",
-      "inicio_programado": "2026-09-09T22:20:00-03:00",
+      "inicio_programado": "2026-09-09T20:20:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "wtuhJp2GeP4",
-      "url": "https://www.youtube.com/watch?v=wtuhJp2GeP4",
+      "video_id": "oErQIqXlspI",
+      "url": "https://www.youtube.com/watch?v=oErQIqXlspI",
       "fonte": "getv",
       "canal": "ge tv",
-      "titulo": "AO VIVO: CONVOCAÇÃO DA SELEÇÃO BRASILEIRA PARA OS AMISTOSOS | ge tv",
+      "titulo": "AO VIVO: SUPER PRÉ-JOGO DE ESTUDIANTES X CORINTHIANS | QUARTAS DE FINAL | LIBERTADORES 2026 | ge tv",
       "status": "live",
-      "inicio_programado": "2026-09-09T14:30:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
+      "inicio_programado": "2026-09-09T17:30:00-03:00",
+      "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
       "video_id": "LLpNUqHVam8",
@@ -365,16 +395,6 @@
       "motivo": "conteúdo rejeitado: narracao"
     },
     {
-      "video_id": "oErQIqXlspI",
-      "url": "https://www.youtube.com/watch?v=oErQIqXlspI",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: SUPER PRÉ-JOGO DE ESTUDIANTES X CORINTHIANS | QUARTAS DE FINAL | LIBERTADORES 2026 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-09T17:30:00-03:00",
-      "motivo": "conteúdo rejeitado: pre jogo"
-    },
-    {
       "video_id": "r2yKlymu7O0",
       "url": "https://www.youtube.com/watch?v=r2yKlymu7O0",
       "fonte": "getv",
@@ -402,16 +422,6 @@
       "titulo": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-10-10T17:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "K4P897AVgVI",
-      "url": "https://www.youtube.com/watch?v=K4P897AVgVI",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "ESTREIA DO PODCAST QUADRA ABERTA! COM TUDO DA RETA FINAL DO ÚLTIMO GRAND SLAM DO ANO",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-09T17:45:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -475,6 +485,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "njjFozBH9jE",
+      "url": "https://www.youtube.com/watch?v=njjFozBH9jE",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "ESTREIA DO PODCAST QUADRA ABERTA! COM TUDO DA RETA FINAL DO ÚLTIMO GRAND SLAM DO ANO",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-09T17:45:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "ru1-aL0U8qA",
       "url": "https://www.youtube.com/watch?v=ru1-aL0U8qA",
       "fonte": "cazetv",
@@ -509,7 +529,7 @@
       "url": "https://www.youtube.com/watch?v=xz7fo9aq100",
       "fonte": "cazetv",
       "canal": "CazéTV",
-      "titulo": "AO VIVO: CONVOCAÇÃO DA SELEÇÃO BRASILEIRA PARA AMISTOSOS! ANCELOTTI INICIA O CICLO DA COPA DE 2030",
+      "titulo": "REPRISE: VALENCIA X BARCELONA | LALIGA 26/27 | 4ª RODADA",
       "status": "live",
       "inicio_programado": "2026-09-09T14:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
@@ -525,15 +545,21 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401912527",
+      "jogo": "Palmeiras x Liga de Quito",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
+    }
+  ],
   "sem_transmissao": [
     {
-      "event_id": "401912541",
+      "event_id": "401912527",
       "rodada": 0,
       "competicao_chave": "libertadores",
       "competicao_nome": "Libertadores",
-      "jogo": "Estudiantes de La Plata x Corinthians",
-      "data_iso": "2026-09-09T21:30:00-03:00",
+      "jogo": "Palmeiras x Liga de Quito",
+      "data_iso": "2026-09-09T19:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
   ],
@@ -547,5 +573,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-09T15:30:53-03:00"
+  "atualizado_em": "2026-09-09T17:30:55-03:00"
 }
