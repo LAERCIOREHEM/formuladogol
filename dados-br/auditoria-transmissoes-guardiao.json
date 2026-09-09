@@ -406,45 +406,109 @@
         "avaliação YouTube refere URL que não está no dossiê atual"
       ],
       "resumo": "Confirmado para o Brasil: Boca Juniors x São Paulo, jogo de ida das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 8 de setembro de 2026, às 21h30 (horário de Brasília), na Bombonera. A transmissão integral será em SBT, ESPN e Disney+; no schema, ESPN e Disney+ foram consolidados como “Disney+ / ESPN”. Não é exclusivo. O ge lista SBT, ESPN e Disney+, e o SBT confirma a transmissão do duelo também pela TV aberta, +SBT e YouTube do SBT Sports."
+    },
+    {
+      "event_id": "401912541",
+      "jogo": "Estudiantes de La Plata x Corinthians",
+      "data_iso": "2026-09-09T21:30:00-03:00",
+      "checkpoint": -1440,
+      "executado_em": "2026-09-08T23:10:37-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV",
+        "Globo",
+        "Paramount+"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cdn.conmebol.com/wp-content/uploads/2025/08/Fixture_Cuartos-de-Final_CONMEBOL-Libertadores-2025_v22.08.2025.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-1.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-2.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
+        "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Libertadores-Semana-15-Fase-Grupos-Fecha-1_vf.pdf",
+        "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
+        "https://ge.globo.com/futebol/times/corinthians/noticia/2026/09/07/sem-yuri-alberto-corinthians-chega-a-argentina-para-jogo-da-libertadores-veja-relacionados.ghtml",
+        "https://ge.globo.com/google/amp/futebol/libertadores/noticia/2026/06/03/oitavas-da-libertadores-2026-veja-data-hora-e-onde-assistir-aos-jogos.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/corinthians/noticia/2026/09/08/adversario-do-corinthians-estudiantes-nasceu-em-sapataria-e-fez-historia-na-libertadores.ghtml",
+        "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/06/corinthians-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/sp/futebol/libertadores/jogo/09-09-2026/estudiantes-lp-corinthians.ghtml",
+        "https://gol.conmebol.com/libertadores/en",
+        "https://gol.conmebol.com/libertadores/en/fixture/view/1670",
+        "https://gol.conmebol.com/libertadores/en/news/eight-teams-chasing-title-conmebol-libertadores-quarter-final-line-confirmed",
+        "https://gol.conmebol.com/libertadores/es/news/ocho-por-el-titulo-quedaron-definidos-los-cuartos-de-final-de-la-conmebol-libertadores",
+        "https://gol.conmebol.com/libertadores/pt-br/news/estudiantes-vs-corinthians-por-la-ida-de-los-cuartos-de-final-de-la-conmebol-libertadores",
+        "https://gol.conmebol.com/libertadores/pt-br/news/oito-pelo-titulo-estao-definidos-os-confrontos-das-quartas-de-final-da-conmebol-libertadores"
+      ],
+      "canais_depois": [
+        "GE TV",
+        "Globo",
+        "Paramount+"
+      ],
+      "exclusivo": false,
+      "confianca": 0.98,
+      "fontes_aceitas": [
+        "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
+        "https://ge.globo.com/sp/futebol/libertadores/jogo/09-09-2026/estudiantes-lp-corinthians.ghtml",
+        "https://gol.conmebol.com/libertadores/en/fixture/view/1670"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Estudiantes de La Plata x Corinthians, jogo de ida das quartas de final da CONMEBOL Libertadores, será em 09/09/2026, às 21h30 (horário de Brasília), no Estádio Jorge Luis Hirschi, em La Plata. A grade completa indicada é Globo, GE TV e Paramount+. Não é exclusivo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401912542",
-    "jogo": "Boca Juniors x São Paulo",
-    "data_iso": "2026-09-08T21:30:00-03:00",
-    "checkpoint": -90,
-    "executado_em": "2026-09-08T20:10:04-03:00",
+    "event_id": "401912541",
+    "jogo": "Estudiantes de La Plata x Corinthians",
+    "data_iso": "2026-09-09T21:30:00-03:00",
+    "checkpoint": -1440,
+    "executado_em": "2026-09-08T23:10:37-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "SBT",
-      "Disney+ / ESPN"
+      "GE TV",
+      "Globo",
+      "Paramount+"
     ],
-    "status": "nao_resolvido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2019/01/manual-broadcasting-2019-por.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/08/Fixture_Cuartos-de-Final_CONMEBOL-Libertadores-2025_v22.08.2025.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-1.pdf",
+      "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR-2.pdf",
       "https://cdn.conmebol.com/wp-content/uploads/2025/12/CL-2026-Manual-de-Clubes-POR.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/04/11_4_2026-Planilla-Sudamericana-Semana-16-Fase-Grupos-Fecha-2.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/05/1_5_2026-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
-      "https://ge.globo.com/futebol/copa-sul-americana",
-      "https://ge.globo.com/google/amp/futebol/times/sao-paulo/noticia/2026/09/08/boca-juniors-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://gol.conmebol.com/sudamericana/en/news/boca-juniors-vs-sao-paulo-historic-clash-between-giants",
-      "https://gol.conmebol.com/sudamericana/en/news/great-conquests-eight-best-how-conmebol-sudamericana-quarter-finals-will-be-played",
-      "https://gol.conmebol.com/sudamericana/es",
-      "https://gol.conmebol.com/sudamericana/es/news/boca-juniors-en-la-conmebol-sudamericana-2026-resultados-plantel-y-calendario",
-      "https://gol.conmebol.com/sudamericana/pt-br",
-      "https://gol.conmebol.com/sudamericana/pt-br/fixture/view/1685",
-      "https://gol.conmebol.com/sudamericana/pt-br/news/boca-juniors-na-conmebol-sudamericana-2026-resultados-elenco-e-calendario",
-      "https://gol.conmebol.com/sudamericana/pt-br/news/os-oito-melhores-da-grande-conquista-assim-serao-disputadas-quartas-de-final-da-conmebol",
-      "https://gol.conmebol.com/sudamericana/pt-br/team/53",
-      "https://sports.sbt.com.br/noticia/sbt-sports/sao-paulo-x-boca-jrs-sbt-transmite-as-quartas-da-sula"
+      "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Libertadores-Semana-15-Fase-Grupos-Fecha-1_vf.pdf",
+      "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
+      "https://ge.globo.com/futebol/times/corinthians/noticia/2026/09/07/sem-yuri-alberto-corinthians-chega-a-argentina-para-jogo-da-libertadores-veja-relacionados.ghtml",
+      "https://ge.globo.com/google/amp/futebol/libertadores/noticia/2026/06/03/oitavas-da-libertadores-2026-veja-data-hora-e-onde-assistir-aos-jogos.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/corinthians/noticia/2026/09/08/adversario-do-corinthians-estudiantes-nasceu-em-sapataria-e-fez-historia-na-libertadores.ghtml",
+      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/09/06/corinthians-x-chapecoense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/sp/futebol/libertadores/jogo/09-09-2026/estudiantes-lp-corinthians.ghtml",
+      "https://gol.conmebol.com/libertadores/en",
+      "https://gol.conmebol.com/libertadores/en/fixture/view/1670",
+      "https://gol.conmebol.com/libertadores/en/news/eight-teams-chasing-title-conmebol-libertadores-quarter-final-line-confirmed",
+      "https://gol.conmebol.com/libertadores/es/news/ocho-por-el-titulo-quedaron-definidos-los-cuartos-de-final-de-la-conmebol-libertadores",
+      "https://gol.conmebol.com/libertadores/pt-br/news/estudiantes-vs-corinthians-por-la-ida-de-los-cuartos-de-final-de-la-conmebol-libertadores",
+      "https://gol.conmebol.com/libertadores/pt-br/news/oito-pelo-titulo-estao-definidos-os-confrontos-das-quartas-de-final-da-conmebol-libertadores"
     ],
-    "rejeicoes": [
-      "avaliação YouTube refere URL que não está no dossiê atual"
+    "canais_depois": [
+      "GE TV",
+      "Globo",
+      "Paramount+"
     ],
-    "resumo": "Confirmado para o Brasil: Boca Juniors x São Paulo, jogo de ida das quartas de final da CONMEBOL Sul-Americana, nesta terça-feira, 8 de setembro de 2026, às 21h30 (horário de Brasília), na Bombonera. A transmissão integral será em SBT, ESPN e Disney+; no schema, ESPN e Disney+ foram consolidados como “Disney+ / ESPN”. Não é exclusivo. O ge lista SBT, ESPN e Disney+, e o SBT confirma a transmissão do duelo também pela TV aberta, +SBT e YouTube do SBT Sports."
+    "exclusivo": false,
+    "confianca": 0.98,
+    "fontes_aceitas": [
+      "https://ge.globo.com/futebol/libertadores/noticia/2026/08/27/quartas-da-libertadores-veja-data-e-hora-dos-jogos.ghtml",
+      "https://ge.globo.com/sp/futebol/libertadores/jogo/09-09-2026/estudiantes-lp-corinthians.ghtml",
+      "https://gol.conmebol.com/libertadores/en/fixture/view/1670"
+    ],
+    "youtube": [],
+    "youtube_removidos": [],
+    "overlay_alterado": true,
+    "resumo": "Confirmado para o Brasil: Estudiantes de La Plata x Corinthians, jogo de ida das quartas de final da CONMEBOL Libertadores, será em 09/09/2026, às 21h30 (horário de Brasília), no Estádio Jorge Luis Hirschi, em La Plata. A grade completa indicada é Globo, GE TV e Paramount+. Não é exclusivo."
   },
-  "atualizado_em": "2026-09-08T20:10:04-03:00"
+  "atualizado_em": "2026-09-08T23:10:37-03:00"
 }
