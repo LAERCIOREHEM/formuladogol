@@ -336,10 +336,14 @@
 .br-games-archive-strip > * { min-width:0; }
 .br-game-action-detail { border-color:rgba(163,230,53,.28); color:#d9ff76; background:rgba(163,230,53,.07); }
 .br-game-action-detail:hover { border-color:rgba(163,230,53,.55); color:#f4ffd2; }
-.resultado-page-row { display:flex; justify-content:center; width:100%; min-width:0; margin:7px 0 2px; }
+.resultado-page-row {
+  grid-column:1 / -1;
+  display:flex; justify-content:center; width:100%; min-width:0; margin:4px 0 1px;
+}
+.resultado-page-row .br-game-action { min-height:30px; padding:5px 10px; font-size:10.5px; }
 @media (max-width:680px) {
   .br-games-archive-strip { align-items:stretch; flex-direction:column; }
-  .br-games-archive-strip .br-game-action,
-  .resultado-page-row .br-game-action { width:100%; white-space:normal; text-align:center; }
+  .br-games-archive-strip .br-game-action { width:100%; white-space:normal; text-align:center; }
+  .resultado-page-row .br-game-action { width:auto; max-width:100%; min-height:30px; padding:5px 9px; font-size:10px; white-space:normal; text-align:center; }
   .br-game-actions-right .br-game-action-detail { flex-basis:100%; width:100%; white-space:normal; }
 }

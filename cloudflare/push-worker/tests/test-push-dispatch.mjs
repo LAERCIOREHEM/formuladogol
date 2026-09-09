@@ -28,32 +28,24 @@ assert.equal(payload.data.url, '/aovivo.html?event=401909112');
 assert.equal(payload.badgeIncrement, 1);
 assert.match(payload.tag, /^fdg-goal-/);
 
-const overturned = buildSportsPushPayload({
-  ...event,
-  eventKey: 'goal_overturned:401909112:g2',
-  type: 'goal_overturned',
-  notificationDraft: { title: '🚫 GOL ANULADO', body: 'O placar voltou para Atlético-MG 0 × 0 Cruzeiro' }
-});
-assert.equal(overturned.tag, payload.tag, 'gol e anulação compartilham a mesma tag para atualização da notificação');
-assert.equal(overturned.title, '🚫 GOL ANULADO');
+assert.throws(() => buildSportsPushPayload({ ...event, type: 'goal_overturned' }), /unsupported_public_alert_type/, 'gol anulado é correção interna e não pode virar push público');
 
-const reminder = buildSportsPushPayload({
-  eventKey: 'prematch_15:401909112:1788307200000', type: 'prematch_15', eventId: '401909112', confirmedAt: event.confirmedAt,
-  notificationDraft: { title: '⏰ Jogo começa em 15 minutos', body: 'Atlético-MG × Cruzeiro · 21:00' }
-});
-assert.equal(reminder.data.url, '/agenda.html');
-assert.match(reminder.tag, /^fdg-prematch_15-/);
+const red = buildSportsPushPayload({ ...event, eventKey: 'red_card:401909112:r1', type: 'red_card', notificationDraft: { title: '🟥 EXPULSÃO DO CRUZEIRO!', body: "Jogador, 63' · Atlético-MG 0 × 1 Cruzeiro" } });
+assert.match(red.tag, /^fdg-red_card-/);
+assert.equal(red.data.url, '/aovivo.html?event=401909112');
+const lineup = buildSportsPushPayload({ ...event, eventKey: 'lineup_confirmed:401909112:l1', type: 'lineup_confirmed', notificationDraft: { title: '👥 ESCALAÇÕES CONFIRMADAS', body: 'Atlético-MG × Cruzeiro · Os times estão definidos.' } });
+assert.match(lineup.tag, /^fdg-lineup_confirmed-/);
+const startAlert = buildSportsPushPayload({ ...event, eventKey: 'match_start:401909112', type: 'match_start', notificationDraft: { title: '▶️ Bola rolando!', body: 'Atlético-MG × Cruzeiro' } });
+assert.match(startAlert.tag, /^fdg-match_start-/);
 const final = buildSportsPushPayload({ ...event, eventKey: 'final_whistle:401909112', type: 'final_whistle', sourcePlayKey: '', notificationDraft: { title: '🏁 Fim de jogo', body: 'Atlético-MG 1 × 2 Cruzeiro' } });
 assert.equal(final.data.url, '/aovivo.html?event=401909112');
 assert.match(final.tag, /^fdg-final_whistle-/);
 assert.equal(preferenceColumnForEvent('goal'), 'p.goals');
-assert.equal(preferenceColumnForEvent('goal_overturned'), 'p.overturned_goals');
-assert.equal(preferenceColumnForEvent('prematch_15'), 'p.prematch_15');
+assert.equal(preferenceColumnForEvent('red_card'), 'p.red_cards');
+assert.equal(preferenceColumnForEvent('lineup_confirmed'), 'p.lineups');
+assert.equal(preferenceColumnForEvent('match_start'), 'p.match_start');
 assert.equal(preferenceColumnForEvent('final_whistle'), 'p.final_whistle');
-assert.equal(preferenceColumnForEvent('schedule_changed'), 'p.schedule_changes');
-assert.equal(preferenceColumnForEvent('match_postponed'), 'p.schedule_changes');
-assert.equal(preferenceColumnForEvent('shootout_start'), 'p.shootout_alerts');
-assert.equal(preferenceColumnForEvent('qualification'), 'p.qualification_alerts');
+for (const legacy of ['goal_overturned','prematch_15','schedule_changed','match_postponed','shootout_start','qualification']) assert.equal(preferenceColumnForEvent(legacy), '', `${legacy} deve estar fora do contrato público`);
 assert.equal(preferenceColumnForEvent('unknown'), '');
 
 assert.deepEqual(chunkArray(['a','b','c','d','e'], 2), [['a','b'],['c','d'],['e']]);
@@ -61,25 +53,25 @@ assert.equal(PUSH_DISPATCH_CONSTANTS.DELIVERY_BATCH_SIZE, 5);
 assert.equal(PUSH_DISPATCH_CONSTANTS.TARGET_PAGE_SIZE, 400);
 
 const segmented = buildSportsPushPayload({
-  eventKey: 'prematch_15:fdg-segmented-test:device:1',
-  type: 'prematch_15', eventId: 'fdg-segmented-test-1', confirmedAt: event.confirmedAt,
+  eventKey: 'match_start:fdg-segmented-test:device:1',
+  type: 'match_start', eventId: 'fdg-segmented-test-1', confirmedAt: event.confirmedAt,
   testInstallationId: 'fdg-device-1',
   home: { name: 'Chapecoense', abbreviation: 'CHA' },
   away: { name: 'Teste Fórmula do Gol', abbreviation: 'FDG' },
   notificationDraft: { title: '🧪 TESTE CHAPECOENSE', body: 'Evento técnico previsto para 10:45:00' }
 });
 assert.equal(segmented.title, '🧪 TESTE CHAPECOENSE');
-assert.equal(segmented.data.type, 'prematch_15');
-assert.equal(segmented.data.url, '/agenda.html');
+assert.equal(segmented.data.type, 'match_start');
+assert.equal(segmented.data.url, '/aovivo.html?event=fdg-segmented-test-1');
 
 
 const hotEspn = buildSportsPushPayload({
   eventKey: 'technical_espn_test:401911806:device:p3',
-  type: 'prematch_15', eventId: '401911806', confirmedAt: event.confirmedAt,
+  type: 'match_start', eventId: '401911806', confirmedAt: event.confirmedAt,
   testInstallationId: 'fdg-device-1', technicalEspnTest: true,
   notificationDraft: { title: '🧪 ESPN REAL — EVENTO DETECTADO', body: "46' · Second Half begins" }
 });
-assert.equal(hotEspn.data.type, 'prematch_15');
+assert.equal(hotEspn.data.type, 'match_start');
 assert.equal(hotEspn.data.url, '/pwa-teste.html');
 assert.equal(hotEspn.title, '🧪 ESPN REAL — EVENTO DETECTADO');
 

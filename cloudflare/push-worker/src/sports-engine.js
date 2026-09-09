@@ -878,7 +878,10 @@ function lifecycleEvent(type, match, observation, now) {
   let winner = null;
   let loser = null;
 
-  if (type === 'final_whistle') {
+  if (type === 'match_start') {
+    title = '▶️ Bola rolando!';
+    body = `${homeName} × ${awayName}${match.competitionName ? ` · ${match.competitionName}` : ''}`;
+  } else if (type === 'final_whistle') {
     title = '🏁 Fim de jogo';
     body = `${scoreText}${match.competitionName ? ` · ${match.competitionName}` : ''}`;
   } else if (type === 'shootout_start') {
@@ -980,11 +983,21 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
     match.initialized = true;
     if (currentScoreTotal === 0) {
       match.baselineComplete = true;
+      const kickoffMs = Date.parse(match.kickoff || '');
+      if (observation.state === 'in' && Number.isFinite(kickoffMs) && now - kickoffMs <= 15 * 60_000) {
+        const startEvent = lifecycleEvent('match_start', match, observation, now);
+        if (startEvent) emitted.push(startEvent);
+      }
       return { match, emitted, diagnostic: 'baseline_zero' };
     }
     if (hasSummary && regulation.length >= currentScoreTotal) {
       for (const play of regulation) match.plays[play.key] = { ...play, status: 'baseline', firstSeenAt: now, stableCount: 1, missingCount: 0 };
       match.baselineComplete = true;
+      const kickoffMs = Date.parse(match.kickoff || '');
+      if (observation.state === 'in' && Number.isFinite(kickoffMs) && now - kickoffMs <= 15 * 60_000) {
+        const startEvent = lifecycleEvent('match_start', match, observation, now);
+        if (startEvent) emitted.push(startEvent);
+      }
       return { match, emitted, diagnostic: 'baseline_existing_goals' };
     }
     match.baselineComplete = false;
@@ -992,6 +1005,10 @@ export function applyObservation(previous, observation, scoringPlays, nowMs = Da
   }
 
   if (wasInitialized) {
+    if (previousState === 'pre' && observation.state === 'in') {
+      const startEvent = lifecycleEvent('match_start', match, observation, now);
+      if (startEvent) emitted.push(startEvent);
+    }
     const cup = isCupCompetition(match.competitionKey) || isCupCompetition(match.competitionName) || isCupCompetition(match.league);
     const decisiveCupMatch = cup && num(match.leg, 0) !== 1;
     if (decisiveCupMatch && observation.state === 'in' && Boolean(observation.shootoutActive) && !previousShootoutActive) {
@@ -1197,5 +1214,6 @@ export const SPORTS_ENGINE_CONSTANTS = Object.freeze({
   OVERTURN_POLICY_VERSION: '6-R4',
   GOAL_DETECTION_POLICY_VERSION: '6-R8',
   GOAL_RECONCILIATION_POLICY_VERSION: '6-R9-R1',
-  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R9'
+  GOAL_SCORER_ENRICHMENT_POLICY_VERSION: '6-R9',
+  ESSENTIAL_ALERT_POLICY_VERSION: '6-R10'
 });

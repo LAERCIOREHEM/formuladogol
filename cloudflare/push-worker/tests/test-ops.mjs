@@ -10,6 +10,7 @@ let health = assessOperationalHealth({
 }, now);
 assert.equal(health.ok, true);
 assert.equal(health.state, 'healthy');
+assert.equal(OPS_CONSTANTS.OPS_VERSION, 7);
 
 health = assessOperationalHealth({
   monitor: { watchCount: 1, activeGames: 1, lastBootstrapAt: now - 30_000, lastPollCompletedAt: now - OPS_CONSTANTS.STALE_ACTIVE_POLL_MS - 1 },
@@ -27,6 +28,13 @@ assert.equal(health.ok, true);
 assert.equal(health.state, 'warning');
 assert.ok(health.warnings.some((x) => x.startsWith('espn:')));
 assert.ok(health.warnings.includes('entregas_em_retry'));
+
+health = assessOperationalHealth({
+  monitor: { watchCount: 1, activeGames: 0, lastBootstrapAt: now - 30_000, readinessRed: 1 },
+  dispatch: { stuckDispatches: 0, stuckDeliveries: 0, retry: 0, failed24h: 0 }
+}, now);
+assert.equal(health.ok, false);
+assert.ok(health.errors.includes('jogo_sem_prontidao_push'));
 
 class FakeDB {
   constructor(rows) { this.rows = rows; this.updates = 0; }

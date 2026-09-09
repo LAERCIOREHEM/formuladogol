@@ -52,9 +52,9 @@ export function buildHotMatchPrematchEvent(test, observation, nowMs = Date.now()
   const eventId = text(observation?.eventId || test?.eventId);
   const kickoff = text(observation?.kickoff || test?.kickoff);
   return {
-    eventKey: `prematch_15:fdg-hot-match:${eventId}:${installationId}`,
+    eventKey: `match_start:fdg-hot-match:${eventId}:${installationId}`,
     eventId,
-    type: 'prematch_15',
+    type: 'match_start',
     sourcePlayKey: '',
     league: HOT_MATCH_LEAGUE,
     competitionKey: 'technical_hot_match_test',

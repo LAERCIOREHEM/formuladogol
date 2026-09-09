@@ -111,11 +111,11 @@ export function buildHotEspnTestEvent(hotTest, mutation, source, now = Date.now(
   const clockText = item.clock ? `${item.clock} · ` : '';
   const goal = item.scoringPlay === true;
   const installationId = text(hotTest?.installationId);
-  const eventKey = `prematch_15:fdg-hot-espn:${HOT_TEST_EVENT_ID}:${installationId}:${text(item.key || now)}`;
+  const eventKey = `match_start:fdg-hot-espn:${HOT_TEST_EVENT_ID}:${installationId}:${text(item.key || now)}`;
   return {
     eventKey,
     eventId: HOT_TEST_EVENT_ID,
-    type: 'prematch_15',
+    type: 'match_start',
     sourcePlayKey: text(item.key),
     league: HOT_TEST_LEAGUE,
     competitionKey: 'technical_hot_test',

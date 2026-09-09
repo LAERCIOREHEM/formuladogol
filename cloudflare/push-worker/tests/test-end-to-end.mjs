@@ -57,8 +57,6 @@ assert.equal(reverted.emitted.length, 0);
 reverted = applyObservation(reverted.match, revertedObs, [], t0 + 76_000);
 assert.equal(reverted.emitted.length, 1);
 assert.equal(reverted.emitted[0].type, 'goal_overturned');
-const correction = buildSportsPushPayload(reverted.emitted[0]);
-assert.equal(correction.title, '🚫 GOL ANULADO');
-assert.equal(correction.tag, push.tag, 'a correção deve atualizar a mesma família de notificação');
+assert.throws(() => buildSportsPushPayload(reverted.emitted[0]), /unsupported_public_alert_type/, 'gol anulado permanece proteção interna anti-VAR e não é um dos cinco pushes');
 
 console.log('end-to-end-synthetic: PASS');

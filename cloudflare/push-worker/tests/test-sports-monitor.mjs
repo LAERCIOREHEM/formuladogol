@@ -20,7 +20,7 @@ class FakeStorage {
 }
 
 class FakeDB {
-  constructor() { this.events = new Map(); this.matchEvents = new Map(); }
+  constructor() { this.events = new Map(); this.essentialEvents = new Map(); this.preflight = new Map(); this.incidents = new Map(); }
   prepare(sql) {
     return {
       bind: (...args) => ({
@@ -28,9 +28,11 @@ class FakeDB {
           if (/INSERT OR IGNORE INTO sports_events/.test(sql)) {
             if (!this.events.has(args[0])) this.events.set(args[0], args);
           }
-          if (/INSERT OR IGNORE INTO match_events/.test(sql)) {
-            if (!this.matchEvents.has(args[0])) this.matchEvents.set(args[0], args);
+          if (/INSERT OR IGNORE INTO essential_match_events/.test(sql)) {
+            if (!this.essentialEvents.has(args[0])) this.essentialEvents.set(args[0], args);
           }
+          if (/INSERT INTO monitor_preflight/.test(sql)) this.preflight.set(`${args[0]}:${args[1]}`, args);
+          if (/INSERT OR IGNORE INTO monitor_incidents/.test(sql)) this.incidents.set(args[0], args);
           return { success: true };
         }
       })
@@ -113,7 +115,7 @@ try {
   status = await monitor.publicStatus();
   assert.equal(status.pendingGoals, 1);
   assert.equal(status.matches[0].score, '1-0', 'play-by-play deve promover placar mesmo com scoreboard atrasado');
-  assert.equal(status.livePolicyVersion, '6-R5');
+  assert.equal(status.livePolicyVersion, '6-R10');
   assert.equal(status.fastPollMs, 10_000);
   assert.equal(status.minPollGapMs, 8_000);
 
@@ -165,7 +167,7 @@ try {
   assert.equal(mutation.key, 'p3');
   assert.equal(mutation.clock, "46'");
   const event = buildHotEspnTestEvent({ installationId: 'install-test' }, mutation, 'espn_core_plays', now);
-  assert.equal(event.type, 'prematch_15');
+  assert.equal(event.type, 'match_start');
   assert.equal(event.testInstallationId, 'install-test');
   assert.match(event.notificationDraft.title, /ESPN REAL/);
 }
@@ -238,10 +240,10 @@ console.log('sports-monitor: PASS');
 
     h2Now = Date.parse('2026-09-02T18:30:00Z');
     await monitor.pollHotMatchTest();
-    assert.equal(db.matchEvents.size, 1, 'alerta de 15 min deve ser criado pela hora ESPN do jogo');
-    const premRow = [...db.matchEvents.values()][0];
+    assert.equal(db.essentialEvents.size, 1, 'teste técnico pré-jogo usa o transporte permitido match_start');
+    const premRow = [...db.essentialEvents.values()][0];
     const premPayload = JSON.parse(premRow[4]);
-    assert.equal(premPayload.type, 'prematch_15');
+    assert.equal(premPayload.type, 'match_start');
     assert.equal(premPayload.testInstallationId, 'inst-h2');
 
     h2Phase = 'goal';

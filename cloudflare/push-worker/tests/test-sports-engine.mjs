@@ -54,7 +54,7 @@ assert.equal(needsSummary(state, obs22), true);
 let plays = extractScoringPlays(summary(goal('g1', '7632', 'p1', "12'", 1, 0)), obs22);
 let step = applyObservation(state, obs22, plays, t0);
 state = step.match;
-assert.equal(step.emitted.length, 0, 'gol anterior ao monitor vira baseline');
+assert.deepEqual(step.emitted.map((e) => e.type), ['match_start'], 'baseline ao vivo perto do início emite somente início; gol anterior vira baseline');
 assert.equal(state.baselineComplete, true);
 assert.equal(state.plays[`${game.eventId}:g1`].status, 'baseline');
 
@@ -477,28 +477,24 @@ const leaguePenalty = structuredClone(leagueBase); leaguePenalty.shootoutActive 
 const leagueStep = applyObservation(leagueState, leaguePenalty, null, t0 + 30_000);
 assert.equal(leagueStep.emitted.filter((e) => e.type === 'shootout_start').length, 0);
 
-// Agenda essencial: lembrete 15 min, mudança de horário e adiamento.
-const reminderNow = Date.parse('2026-09-01T23:45:30Z'); // 14m30 antes de 21h BRT
+// Agenda continua sendo snapshot factual, mas não publica lembrete/mudança/adiamento:
+// o contrato público 6-R10 possui somente cinco tipos de alerta.
+const reminderNow = Date.parse('2026-09-01T23:45:30Z');
 const schedulePayload = { jogos: [{
   event_id: game.eventId, espn_league: game.league, data_iso: game.kickoff, competicao_chave: 'copa_do_brasil', competicao_nome_curto: 'Copa do Brasil',
   mandante: { espn_id: '7632', nome: 'Atlético-MG', sigla: 'CAM' }, visitante: { espn_id: '2022', nome: 'Cruzeiro', sigla: 'CRU' }, adiado: false
 }] };
 const snap = selectScheduleSnapshot(schedulePayload, reminderNow, {});
-let scheduleEvents = deriveScheduleEvents({}, snap, reminderNow, false);
-assert.equal(scheduleEvents.filter((e) => e.type === 'prematch_15').length, 1);
-assert.match(scheduleEvents[0].notificationDraft.body, /Atlético-MG × Cruzeiro/);
-
+assert.equal(Object.keys(snap).length, 1);
+assert.deepEqual(deriveScheduleEvents({}, snap, reminderNow, false), []);
 const movedPayload = structuredClone(schedulePayload);
 movedPayload.jogos[0].data_iso = '2026-09-01T21:30:00-03:00';
 const movedSnap = selectScheduleSnapshot(movedPayload, reminderNow, snap);
-scheduleEvents = deriveScheduleEvents(snap, movedSnap, reminderNow, true);
-assert.equal(scheduleEvents.filter((e) => e.type === 'schedule_changed').length, 1);
-
+assert.deepEqual(deriveScheduleEvents(snap, movedSnap, reminderNow, true), []);
 const postponedPayload = structuredClone(movedPayload);
 postponedPayload.jogos[0].adiado = true;
 postponedPayload.jogos[0].status = 'Jogo adiado';
 const postponedSnap = selectScheduleSnapshot(postponedPayload, reminderNow, movedSnap);
-scheduleEvents = deriveScheduleEvents(movedSnap, postponedSnap, reminderNow, true);
-assert.equal(scheduleEvents.filter((e) => e.type === 'match_postponed').length, 1);
+assert.deepEqual(deriveScheduleEvents(movedSnap, postponedSnap, reminderNow, true), []);
 
 console.log('sports-engine: PASS');

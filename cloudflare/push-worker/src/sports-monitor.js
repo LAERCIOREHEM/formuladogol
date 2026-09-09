@@ -12,7 +12,13 @@ import {
   unresolvedScorersForTransition,
   SPORTS_ENGINE_CONSTANTS
 } from './sports-engine.js';
-import { enqueueSportsEvent } from './push-dispatch.js';
+import { countEligibleTargets, enqueueSportsEvent } from './push-dispatch.js';
+import {
+  PRECHECK_FROM_MS, PRECHECK_POLL_MS, READINESS_VERSION,
+  resolveScoreboardEvent, extractRedCards, mergeRedCards, applyRedCardObservations,
+  extractLineupSnapshot, applyLineupObservation, dueReadinessCheckpoints, readinessSnapshot,
+  aiResolverRequest, parseOpenAIJson
+} from './readiness-guardian.js';
 import { fetchEspnLivePlays, fetchEspnScorerEnrichment, fetchEspnScoreboardFresh, fetchEspnSummary, fetchEspnTechnicalHotTestPlays, fetchEspnTechnicalLivePlays, fetchEspnTechnicalScoreboard } from './espn-source.js';
 import { buildHotEspnTestEvent, detectHotEspnMutation, HOT_ESPN_TEST_CONSTANTS, hotEspnSnapshot, publicHotEspnTest } from './hot-espn-test.js';
 import { buildHotMatchPrematchEvent, hotMatchNextPollDelay, hotMatchPrematchDue, hotMatchTargetEvent, HOT_MATCH_TEST_CONSTANTS, markHotMatchTechnicalEvent, publicHotMatchTest } from './hot-match-test.js';
@@ -31,9 +37,12 @@ const SCHEDULE_WINDOW_MS = 14 * 24 * 60 * 60_000;
 const REMINDER_MIN_MS = 13 * 60_000;
 const REMINDER_MAX_MS = 16 * 60_000;
 const SCHEDULE_CHANGE_MIN_MS = 2 * 60_000;
-const LIVE_POLL_PRE_MS = 20 * 60_000;
+const LIVE_POLL_PRE_MS = PRECHECK_FROM_MS;
+const FAST_POLL_PRE_MS = 20 * 60_000;
+const AUX_SUMMARY_INTERVAL_MS = 30_000;
 const LIVE_POLL_LATE_START_MS = 45 * 60_000;
-const LIVE_POLICY_VERSION = '6-R5';
+const LIVE_POLICY_VERSION = '6-R10';
+const ESSENTIAL_EVENT_TYPES = new Set(['goal', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
@@ -153,34 +162,11 @@ function scheduleEvent(type, game, now, previous = null) {
   return base;
 }
 
-export function deriveScheduleEvents(previousSnapshot, nextSnapshot, nowMs = Date.now(), hadBaseline = true) {
-  const now = num(nowMs, Date.now());
-  const previous = previousSnapshot && typeof previousSnapshot === 'object' ? previousSnapshot : {};
-  const next = nextSnapshot && typeof nextSnapshot === 'object' ? nextSnapshot : {};
-  const events = [];
-  for (const game of Object.values(next)) {
-    const kickoff = Date.parse(game?.kickoff || '');
-    const remaining = kickoff - now;
-    if (!game?.postponed && !game?.cancelled && Number.isFinite(kickoff) && remaining >= REMINDER_MIN_MS && remaining <= REMINDER_MAX_MS) {
-      events.push(scheduleEvent('prematch_15', game, now));
-    }
-    if (!hadBaseline) continue;
-    const old = previous[game.eventId];
-    if (!old) continue;
-    if ((!old.postponed && game.postponed) || (!old.cancelled && game.cancelled)) {
-      events.push(scheduleEvent('match_postponed', game, now, old));
-      continue;
-    }
-    const oldKickoff = Date.parse(old.kickoff || '');
-    if (old.postponed && !game.postponed) {
-      events.push(scheduleEvent('schedule_changed', game, now, old));
-      continue;
-    }
-    if (Number.isFinite(oldKickoff) && Number.isFinite(kickoff) && Math.abs(kickoff - oldKickoff) >= SCHEDULE_CHANGE_MIN_MS) {
-      events.push(scheduleEvent('schedule_changed', game, now, old));
-    }
-  }
-  return events;
+export function deriveScheduleEvents() {
+  // 6-R10: o produto público aceita somente Gol, Vermelho, Escalação, Início e Final.
+  // Mantemos esta exportação apenas por compatibilidade com testes/helpers antigos;
+  // eventos de agenda, lembrete e mudança de horário não são mais gerados.
+  return [];
 }
 
 async function fetchAgendaJson(url) {
@@ -327,14 +313,15 @@ export class SportsMonitor {
   }
 
   async readState() {
-    const [watchlist, matches, status, recentEvents, scheduleSnapshot, hotEspnTest, hotMatchTest] = await Promise.all([
+    const [watchlist, matches, status, recentEvents, scheduleSnapshot, hotEspnTest, hotMatchTest, preflight] = await Promise.all([
       this.state.storage.get('watchlist'),
       this.state.storage.get('matches'),
       this.state.storage.get('status'),
       this.state.storage.get('recentEvents'),
       this.state.storage.get('scheduleSnapshot'),
       this.state.storage.get('hotEspnTest'),
-      this.state.storage.get('hotMatchTest')
+      this.state.storage.get('hotMatchTest'),
+      this.state.storage.get('preflight')
     ]);
     return {
       watchlist: watchlist && typeof watchlist === 'object' ? watchlist : {},
@@ -343,7 +330,8 @@ export class SportsMonitor {
       recentEvents: Array.isArray(recentEvents) ? recentEvents : [],
       scheduleSnapshot: scheduleSnapshot && typeof scheduleSnapshot === 'object' ? scheduleSnapshot : {},
       hotEspnTest: hotEspnTest && typeof hotEspnTest === 'object' ? hotEspnTest : {},
-      hotMatchTest: hotMatchTest && typeof hotMatchTest === 'object' ? hotMatchTest : {}
+      hotMatchTest: hotMatchTest && typeof hotMatchTest === 'object' ? hotMatchTest : {},
+      preflight: preflight && typeof preflight === 'object' ? preflight : {}
     };
   }
 
@@ -525,12 +513,13 @@ export class SportsMonitor {
       const agenda = await fetchAgendaJson(AGENDA_URL);
       candidates = selectAgendaCandidates(agenda, now);
       scheduleSnapshot = selectScheduleSnapshot(agenda, now, current.scheduleSnapshot);
-      scheduleEvents = deriveScheduleEvents(current.scheduleSnapshot, scheduleSnapshot, now, Boolean(current.status.scheduleBaselineAt));
+      // Alertas de agenda/reminder foram retirados do produto 6-R10. Mantemos apenas o snapshot factual.
+      scheduleEvents = [];
     } catch (error) {
       agendaError = text(error?.message || error);
     }
 
-    for (const event of scheduleEvents) await this.recordEvent(event);
+    // Nenhum alerta legado de agenda é publicado no contrato de cinco alertas.
     if (!agendaError) await this.state.storage.put('scheduleSnapshot', scheduleSnapshot);
 
     const watchlist = {};
@@ -570,13 +559,23 @@ export class SportsMonitor {
   async ensureNextAlarm() {
     const snapshot = await this.readState();
     const now = Date.now();
-    const fast = Object.values(snapshot.matches).some((match) => matchNeedsFastPolling(match, now));
+    const fastByMatch = Object.values(snapshot.matches).some((match) => matchNeedsFastPolling(match, now));
+    const fastByKickoff = Object.values(snapshot.watchlist).some((entry) => {
+      const kickoff = Date.parse(entry?.kickoff || '');
+      return Number.isFinite(kickoff) && kickoff - now <= FAST_POLL_PRE_MS && kickoff - now >= -LIVE_POLL_LATE_START_MS;
+    });
+    const preflight = Object.values(snapshot.watchlist).some((entry) => {
+      const kickoff = Date.parse(entry?.kickoff || '');
+      return Number.isFinite(kickoff) && kickoff - now <= PRECHECK_FROM_MS && kickoff - now > FAST_POLL_PRE_MS;
+    });
+    const fast = fastByMatch || fastByKickoff;
     const hot = snapshot.hotEspnTest?.state === 'armed' && num(snapshot.hotEspnTest?.expiresAt, 0) > now;
     const hotMatch = snapshot.hotMatchTest?.state === 'armed' && num(snapshot.hotMatchTest?.expiresAt, 0) > now;
-    if (fast || hot || hotMatch) {
+    if (fast || preflight || hot || hotMatch) {
       const currentAlarm = await this.state.storage.getAlarm();
       const delays = [];
       if (fast) delays.push(FAST_POLL_MS);
+      else if (preflight) delays.push(PRECHECK_POLL_MS);
       if (hot) delays.push(HOT_ESPN_TEST_CONSTANTS.POLL_MS);
       if (hotMatch) delays.push(hotMatchNextPollDelay(snapshot.hotMatchTest, now));
       const desired = now + Math.min(...delays);
@@ -586,7 +585,8 @@ export class SportsMonitor {
 
   async recordEvent(event) {
     const row = eventRow(event);
-    const goalEvent = row.event_type === 'goal' || row.event_type === 'goal_overturned';
+    if (!ESSENTIAL_EVENT_TYPES.has(row.event_type)) return false;
+    const goalEvent = row.event_type === 'goal';
     const inserted = goalEvent
       ? await this.env.DB.prepare(`
         INSERT OR IGNORE INTO sports_events (
@@ -602,16 +602,114 @@ export class SportsMonitor {
         row.detected_at,row.confirmed_at,row.payload_json
       ).run()
       : await this.env.DB.prepare(`
-        INSERT OR IGNORE INTO match_events (event_key,event_id,event_type,confirmed_at,payload_json)
+        INSERT OR IGNORE INTO essential_match_events (event_key,event_id,event_type,confirmed_at,payload_json)
         VALUES (?, ?, ?, ?, ?)
       `).bind(row.event_key,row.event_id,row.event_type,row.confirmed_at,row.payload_json).run();
-    if (Number(inserted?.meta?.changes || 0) > 0) {
+    const created = Number(inserted?.meta?.changes || 0) > 0;
+    if (created) {
       try {
         await enqueueSportsEvent(this.env, row.event_key);
       } catch (error) {
         console.error('sports_event_queue_enqueue_failed', row.event_key, String(error?.message || error));
       }
     }
+    return created;
+  }
+
+  async audienceDryRun(game) {
+    const base = {
+      eventId: text(game?.eventId), league: text(game?.league), competitionKey: text(game?.competitionKey),
+      competitionName: text(game?.competitionName), home: game?.home || {}, away: game?.away || {}
+    };
+    const types = ['goal', 'red_card', 'match_start', 'final_whistle'];
+    if (game?.league === 'bra.1') types.splice(2, 0, 'lineup_confirmed');
+    const pairs = await Promise.all(types.map(async (type) => [type, await countEligibleTargets(this.env, { ...base, type })]));
+    return Object.fromEntries(pairs);
+  }
+
+  async persistPreflight(game, checkpoint, readiness, aiAttempted = false, aiRecovered = false) {
+    await this.env.DB.prepare(`
+      INSERT INTO monitor_preflight (
+        event_id,checkpoint,league,kickoff,readiness,source_event_id,resolution_strategy,source_state,
+        teams_ok,monitor_initialized,audience_json,reasons_json,ai_attempted,ai_recovered,checked_at,updated_at
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
+      ON CONFLICT(event_id,checkpoint) DO UPDATE SET
+        readiness=excluded.readiness,source_event_id=excluded.source_event_id,resolution_strategy=excluded.resolution_strategy,
+        source_state=excluded.source_state,teams_ok=excluded.teams_ok,monitor_initialized=excluded.monitor_initialized,
+        audience_json=excluded.audience_json,reasons_json=excluded.reasons_json,ai_attempted=excluded.ai_attempted,
+        ai_recovered=excluded.ai_recovered,checked_at=excluded.checked_at,updated_at=CURRENT_TIMESTAMP
+    `).bind(
+      text(game?.eventId), text(checkpoint), text(game?.league), text(game?.kickoff), text(readiness?.readiness),
+      text(readiness?.sourceEventId), text(readiness?.strategy), text(readiness?.sourceState), readiness?.teamsOk ? 1 : 0,
+      readiness?.monitorInitialized ? 1 : 0, JSON.stringify(readiness?.audience || {}), JSON.stringify(readiness?.reasons || []),
+      aiAttempted ? 1 : 0, aiRecovered ? 1 : 0, text(readiness?.checkedAt || new Date().toISOString())
+    ).run();
+    if (readiness?.ready) return;
+    const incidentKey = `push_readiness:${text(game?.eventId)}:${text(checkpoint)}`;
+    const detail = JSON.stringify({ readiness, matchup: `${text(game?.home?.name)} x ${text(game?.away?.name)}` });
+    const inserted = await this.env.DB.prepare(`
+      INSERT OR IGNORE INTO monitor_incidents (incident_key,event_id,checkpoint,severity,detail,email_status)
+      VALUES (?,?,?,?,?,'pending')
+    `).bind(incidentKey, text(game?.eventId), text(checkpoint), 'error', detail).run();
+    if (Number(inserted?.meta?.changes || 0) > 0) await this.notifyReadinessIncident(game, checkpoint, readiness, incidentKey);
+  }
+
+  async notifyReadinessIncident(game, checkpoint, readiness, incidentKey) {
+    const apiKey = text(this.env.RESEND_API_KEY);
+    const to = text(this.env.EMAIL_DESTINO);
+    if (!apiKey || !to) return false;
+    const from = text(this.env.EMAIL_REMETENTE || 'Fórmula do Gol <onboarding@resend.dev>');
+    const subject = `🚨 FDG Push ${String(checkpoint || '').toUpperCase()}: jogo não está READY`;
+    const body = [
+      `${text(game?.home?.name)} x ${text(game?.away?.name)}`,
+      `Evento: ${text(game?.eventId)} · ${text(game?.league)}`,
+      `Início: ${text(game?.kickoff)}`,
+      `Motivos: ${(readiness?.reasons || []).join(', ') || 'não informado'}`,
+      `Fonte ESPN: ${text(readiness?.sourceEventId) || 'não resolvida'}`,
+      `Audiência simulada: ${JSON.stringify(readiness?.audience || {})}`
+    ].join('\n');
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST', headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ from, to: [to], subject, text: body })
+      });
+      await this.env.DB.prepare(`UPDATE monitor_incidents SET email_status=?, updated_at=CURRENT_TIMESTAMP WHERE incident_key=?`)
+        .bind(response.ok ? 'sent' : `http_${response.status}`, incidentKey).run();
+      return response.ok;
+    } catch (error) {
+      await this.env.DB.prepare(`UPDATE monitor_incidents SET email_status=?, updated_at=CURRENT_TIMESTAMP WHERE incident_key=?`)
+        .bind(`error:${text(error?.message || error).slice(0,120)}`, incidentKey).run();
+      return false;
+    }
+  }
+
+  async resolveWithAi(game, checkpoint) {
+    const apiKey = text(this.env.OPENAI_API_KEY);
+    if (!apiKey) return { attempted: false, recovered: false, resolved: null, reason: 'openai_key_missing' };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 25_000);
+    try {
+      const response = await fetch('https://api.openai.com/v1/responses', {
+        method: 'POST', signal: controller.signal,
+        headers: { authorization: `Bearer ${apiKey}`, 'content-type': 'application/json' },
+        body: JSON.stringify(aiResolverRequest(game, checkpoint))
+      });
+      if (!response.ok) return { attempted: true, recovered: false, resolved: null, reason: `openai_http_${response.status}` };
+      const parsed = parseOpenAIJson(await response.json());
+      const candidate = text(parsed?.candidate_event_id);
+      if (!candidate) return { attempted: true, recovered: false, resolved: null, reason: text(parsed?.status || 'no_candidate') };
+      const summary = await fetchEspnSummary(game.league, candidate, globalThis.fetch, 0);
+      const comp = summary?.data?.header?.competitions?.[0] || summary?.data?.competitions?.[0];
+      if (!comp) return { attempted: true, recovered: false, resolved: null, reason: 'candidate_without_espn_competition' };
+      const raw = { id: candidate, date: comp.date || summary?.data?.header?.competitions?.[0]?.date || game.kickoff, competitions: [comp] };
+      const validated = resolveScoreboardEvent([raw], game);
+      if (!validated || text(validated.sourceEventId) !== candidate) {
+        return { attempted: true, recovered: false, resolved: null, reason: 'candidate_failed_espn_identity_validation' };
+      }
+      return { attempted: true, recovered: true, resolved: { ...validated, strategy: 'ai_resolved_espn_validated' }, reason: '' };
+    } catch (error) {
+      return { attempted: true, recovered: false, resolved: null, reason: text(error?.message || error).slice(0,300) };
+    } finally { clearTimeout(timer); }
   }
 
   async pollOnce() {
@@ -679,26 +777,65 @@ export class SportsMonitor {
 
     const matches = { ...snapshot.matches };
     const watchlist = { ...snapshot.watchlist };
+    const preflight = structuredClone(snapshot.preflight || {});
     const newlyEmitted = [];
+    let readinessRed = 0;
     let summariesFetched = 0;
     let observedGames = 0;
     let liveGames = 0;
 
     for (const game of watchEntries) {
-      const raw = scoreboardResults.get(game.league)?.get(game.eventId);
-      if (!raw) continue;
+      const leagueEvents = scoreboardResults.get(game.league) || new Map();
+      const preflightState = preflight[game.eventId] || {};
+      const dueCheckpoints = dueReadinessCheckpoints(game, preflightState, startedAt);
+      let resolved = resolveScoreboardEvent(leagueEvents, { ...game, sourceEventId: watchlist[game.eventId]?.sourceEventId || game.sourceEventId });
+      let aiAttempted = false;
+      let aiRecovered = false;
+      if (!resolved && dueCheckpoints.length) {
+        const ai = await this.resolveWithAi(game, dueCheckpoints[0].key);
+        aiAttempted = ai.attempted;
+        aiRecovered = ai.recovered;
+        if (ai.resolved) resolved = ai.resolved;
+        if (ai.reason) sourceWarnings.push(`${game.league}/${game.eventId}/readiness-ai: ${ai.reason}`);
+      }
+
+      if (!resolved?.raw) {
+        if (dueCheckpoints.length) {
+          let audience = {};
+          try { audience = await this.audienceDryRun(game); } catch (error) { sourceWarnings.push(`${game.eventId}/audience: ${text(error?.message || error)}`); }
+          const nextPreflight = { ...preflightState };
+          for (const cp of dueCheckpoints) {
+            const readiness = readinessSnapshot(game, null, matches[game.eventId], audience, cp.key, startedAt);
+            readinessRed += 1;
+            await this.persistPreflight(game, cp.key, readiness, aiAttempted, aiRecovered);
+            nextPreflight[cp.key] = { completedAt: startedAt, ...readiness, aiAttempted, aiRecovered };
+          }
+          preflight[game.eventId] = nextPreflight;
+        }
+        continue;
+      }
+
+      const raw = resolved.raw;
+      const sourceEventId = text(resolved.sourceEventId || game.eventId);
       observedGames += 1;
-      let observation = normalizeScoreboardEvent(raw, game.league, game);
+      let observation = normalizeScoreboardEvent(raw, game.league, { ...game, eventId: game.eventId });
+      observation.eventId = game.eventId;
+      observation.sourceEventId = sourceEventId;
       if (observation.state === 'in') liveGames += 1;
       const previousWatch = watchlist[game.eventId] || game;
       watchlist[game.eventId] = {
         ...game,
+        sourceEventId,
+        resolutionStrategy: resolved.strategy,
         lastState: observation.state,
         lastObservedAt: startedAt,
         finalSince: observation.state === 'post' ? (num(previousWatch.finalSince, 0) || startedAt) : 0
       };
       const previous = matches[game.eventId] || initialMatchState(observation);
       let plays = null;
+      let fullSummaryData = null;
+      let fullSummarySource = '';
+      const redCardVariants = [extractRedCards(raw, observation, 'espn_scoreboard')];
       const playVariants = [];
 
       // R9: durante jogo ao vivo fundimos os três feeds rápidos da ESPN
@@ -707,13 +844,14 @@ export class SportsMonitor {
       // ignorada quando o placar já estava correto no CDN.
       if (observation.state === 'in' || previous?.state === 'in') {
         try {
-          const liveResult = await fetchEspnLivePlays(game.league, game.eventId, globalThis.fetch);
+          const liveResult = await fetchEspnLivePlays(game.league, sourceEventId, globalThis.fetch);
           const variants = Array.isArray(liveResult.variants) && liveResult.variants.length
             ? liveResult.variants
             : [{ source: liveResult.source, data: liveResult.data }];
           for (const variant of variants) {
             const extracted = extractedVariant(variant.source, variant.data, observation);
             playVariants.push(extracted);
+            redCardVariants.push(extractRedCards(variant.data, observation, variant.source));
             addCounter(summarySources, variant.source);
           }
           plays = mergeScoringPlayVariants(playVariants);
@@ -746,7 +884,7 @@ export class SportsMonitor {
       if (unresolvedBefore > 0 || needsCoverage) {
         if (unresolvedBefore > 0) scorerEnrichmentAttemptsThisPoll += 1;
         try {
-          const enrichment = await fetchEspnScorerEnrichment(game.league, game.eventId, globalThis.fetch, expectedGoals);
+          const enrichment = await fetchEspnScorerEnrichment(game.league, sourceEventId, globalThis.fetch, expectedGoals);
           const variants = Array.isArray(enrichment.variants) && enrichment.variants.length
             ? enrichment.variants
             : [{ source: enrichment.source, data: enrichment.data }];
@@ -776,8 +914,11 @@ export class SportsMonitor {
       // para completar gols, não para atrasar um evento cuja identidade já está boa.
       if (needsSummary(previous, observation) && regulationPlays(plays).length < expectedGoals) {
         try {
-          const summaryResult = await fetchEspnSummary(game.league, game.eventId, globalThis.fetch, expectedGoals);
+          const summaryResult = await fetchEspnSummary(game.league, sourceEventId, globalThis.fetch, expectedGoals);
           playVariants.push(extractedVariant(summaryResult.source, summaryResult.data, observation));
+          redCardVariants.push(extractRedCards(summaryResult.data, observation, summaryResult.source));
+          fullSummaryData = summaryResult.data;
+          fullSummarySource = summaryResult.source;
           plays = mergeScoringPlayVariants(playVariants);
           observation = promoteObservationFromPlays(observation, plays);
           expectedGoals = num(observation.home?.score, 0) + num(observation.away?.score, 0);
@@ -786,6 +927,27 @@ export class SportsMonitor {
           summaryGoalCounts[game.eventId] = regulationPlays(plays).length;
         } catch (error) {
           sourceErrors.push(`${game.league}/${game.eventId}/summary: ${text(error?.message || error)}`);
+        }
+      }
+
+      // 6-R10: Summary auxiliar periódico para cartão vermelho e, apenas no Brasileirão,
+      // escalações. Não é fonte de placar: serve somente a estes dois alertas essenciais.
+      const kickoffMs = Date.parse(game.kickoff || observation.kickoff || '');
+      const pregameLineupWindow = game.league === 'bra.1' && Number.isFinite(kickoffMs)
+        && startedAt >= kickoffMs - 60 * 60_000 && startedAt <= kickoffMs + 10 * 60_000
+        && !num(previous?.lineupConfirmedAt, 0);
+      const liveDisciplineWindow = observation.state === 'in' || previous?.state === 'in';
+      const lastAuxSummaryAt = num(previous?.lastAuxSummaryAt, 0);
+      if (!fullSummaryData && (pregameLineupWindow || liveDisciplineWindow) && startedAt - lastAuxSummaryAt >= AUX_SUMMARY_INTERVAL_MS) {
+        try {
+          const auxSummary = await fetchEspnSummary(game.league, sourceEventId, globalThis.fetch, 0);
+          fullSummaryData = auxSummary.data;
+          fullSummarySource = auxSummary.source;
+          redCardVariants.push(extractRedCards(auxSummary.data, observation, auxSummary.source));
+          summariesFetched += 1;
+          addCounter(summarySources, auxSummary.source);
+        } catch (error) {
+          sourceWarnings.push(`${game.league}/${game.eventId}/aux-summary: ${text(error?.message || error)}`);
         }
       }
 
@@ -801,15 +963,39 @@ export class SportsMonitor {
         state: reconciliation.state
       };
       const result = applyObservation(previous, observation, plays, startedAt);
-      for (const event of result.emitted) {
+      let nextMatch = result.match;
+      if (fullSummaryData) nextMatch.lastAuxSummaryAt = startedAt;
+
+      const redStep = applyRedCardObservations(nextMatch, mergeRedCards(...redCardVariants), observation, startedAt);
+      nextMatch = redStep.match;
+      let lineupStep = { match: nextMatch, emitted: [] };
+      if (game.league === 'bra.1' && fullSummaryData) {
+        const lineupSnapshot = extractLineupSnapshot(fullSummaryData, observation);
+        lineupStep = applyLineupObservation(nextMatch, lineupSnapshot, observation, startedAt);
+        nextMatch = lineupStep.match;
+      }
+
+      for (const event of [...result.emitted, ...redStep.emitted, ...lineupStep.emitted]) {
         if (event?.type === 'goal') {
           if (text(event?.athlete?.name)) addCounter(scorerSourcesThisPoll, event?.scorerSource || 'unknown');
           else scorerMissingAtDispatchThisPoll += 1;
         }
-        await this.recordEvent(event);
-        newlyEmitted.push(event);
+        if (await this.recordEvent(event)) newlyEmitted.push(event);
       }
-      matches[game.eventId] = result.match;
+      matches[game.eventId] = nextMatch;
+
+      if (dueCheckpoints.length) {
+        let audience = {};
+        try { audience = await this.audienceDryRun(game); } catch (error) { sourceWarnings.push(`${game.eventId}/audience: ${text(error?.message || error)}`); }
+        const nextPreflight = { ...preflightState };
+        for (const cp of dueCheckpoints) {
+          const readiness = readinessSnapshot(game, resolved, nextMatch, audience, cp.key, startedAt);
+          if (!readiness.ready) readinessRed += 1;
+          await this.persistPreflight(game, cp.key, readiness, aiAttempted, aiRecovered);
+          nextPreflight[cp.key] = { completedAt: startedAt, ...readiness, aiAttempted, aiRecovered };
+        }
+        preflight[game.eventId] = nextPreflight;
+      }
     }
 
     let recentEvents = [...snapshot.recentEvents, ...newlyEmitted];
@@ -820,7 +1006,7 @@ export class SportsMonitor {
       if (match?.state === 'post' && Number.isFinite(kickoff) && kickoff < finishedCutoff) delete matches[eventId];
     }
 
-    await this.state.storage.put({ watchlist, matches, recentEvents });
+    await this.state.storage.put({ watchlist, matches, recentEvents, preflight });
     await this.writeStatus({
       lastPollAt: startedAt,
       lastPollCompletedAt: Date.now(),
@@ -851,7 +1037,9 @@ export class SportsMonitor {
       livePolicyVersion: LIVE_POLICY_VERSION,
       fastPollMs: FAST_POLL_MS,
       minPollGapMs: MIN_POLL_GAP_MS,
-      espnPollingSuppressed: false
+      espnPollingSuppressed: false,
+      readinessVersion: READINESS_VERSION,
+      readinessRed
     });
     await this.ensureNextAlarm();
     return this.publicStatus();
@@ -862,7 +1050,9 @@ export class SportsMonitor {
     const matches = Object.values(snapshot.matches).map(summarizeMatch).sort((a, b) => a.eventId.localeCompare(b.eventId));
     return {
       ok: true,
-      engineVersion: 4,
+      engineVersion: 5,
+      essentialAlertPolicyVersion: SPORTS_ENGINE_CONSTANTS.ESSENTIAL_ALERT_POLICY_VERSION || '6-R10',
+      readinessVersion: READINESS_VERSION,
       overturnPolicyVersion: SPORTS_ENGINE_CONSTANTS.OVERTURN_POLICY_VERSION,
       goalDetectionPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_DETECTION_POLICY_VERSION,
       goalReconciliationPolicyVersion: SPORTS_ENGINE_CONSTANTS.GOAL_RECONCILIATION_POLICY_VERSION,
@@ -882,7 +1072,9 @@ export class SportsMonitor {
       lastScorerEnrichmentWarning: text(snapshot.status.lastScorerEnrichmentWarning),
       summariesFetched: num(snapshot.status.summariesFetched, 0),
       emittedThisPoll: num(snapshot.status.emittedThisPoll, 0),
-      scheduleEventsThisBootstrap: num(snapshot.status.scheduleEventsThisBootstrap, 0),
+      scheduleEventsThisBootstrap: 0,
+      readinessRed: num(snapshot.status.readinessRed, 0),
+      preflight: snapshot.preflight,
       sourceLayerVersion: text(snapshot.status.sourceLayerVersion || '6-R9'),
       livePolicyVersion: text(snapshot.status.livePolicyVersion || LIVE_POLICY_VERSION),
       fastPollMs: num(snapshot.status.fastPollMs, FAST_POLL_MS),

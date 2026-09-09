@@ -6,12 +6,10 @@
 
   const DEFAULTS = Object.freeze({
     goals: true,
-    overturnedGoals: true,
-    prematch15: true,
+    redCards: true,
+    lineups: true,
+    matchStart: true,
     finalWhistle: true,
-    scheduleChanges: true,
-    shootoutAlerts: true,
-    qualificationAlerts: true,
     allGames: false,
     teams: [],
     games: []
@@ -67,12 +65,10 @@
     const src = value || {};
     return {
       goals: src.goals !== false,
-      overturnedGoals: src.overturnedGoals !== false,
-      prematch15: src.prematch15 !== false,
+      redCards: src.redCards !== false,
+      lineups: src.lineups !== false,
+      matchStart: src.matchStart !== false,
       finalWhistle: src.finalWhistle !== false,
-      scheduleChanges: src.scheduleChanges !== false,
-      shootoutAlerts: src.shootoutAlerts !== false,
-      qualificationAlerts: src.qualificationAlerts !== false,
       allGames: src.allGames === true,
       teams: uniq(src.teams, 10),
       games: uniq(src.games, 30)
@@ -213,12 +209,10 @@
     await ensureLoaded();
     const next = clonePreferences();
     if (key === 'goals') next.goals = Boolean(enabled);
-    if (key === 'overturnedGoals') next.overturnedGoals = Boolean(enabled);
-    if (key === 'prematch15') next.prematch15 = Boolean(enabled);
+    if (key === 'redCards') next.redCards = Boolean(enabled);
+    if (key === 'lineups') next.lineups = Boolean(enabled);
+    if (key === 'matchStart') next.matchStart = Boolean(enabled);
     if (key === 'finalWhistle') next.finalWhistle = Boolean(enabled);
-    if (key === 'scheduleChanges') next.scheduleChanges = Boolean(enabled);
-    if (key === 'shootoutAlerts') next.shootoutAlerts = Boolean(enabled);
-    if (key === 'qualificationAlerts') next.qualificationAlerts = Boolean(enabled);
     if (!state.subscription && hasScope(next)) {
       await persist(next, true);
     } else {
@@ -397,15 +391,12 @@
         ${renderGames()}
       </div></section>
       <section class="panel fdg-alert-panel"><div class="panel-inner">
-        <div class="fdg-alert-section-head"><div><div class="kicker">Essenciais</div><h2>O que receber?</h2></div></div>
-        <label class="fdg-alert-switch"><span><strong>⏰ Jogo em 15 minutos</strong><small>Lembrete pouco antes de a bola rolar.</small></span><input type="checkbox" data-fdg-type="prematch15" ${p.prematch15 ? 'checked' : ''}><i></i></label>
-        <label class="fdg-alert-switch"><span><strong>⚽ Gols</strong><small>Autor, minuto e placar atualizado.</small></span><input type="checkbox" data-fdg-type="goals" ${p.goals ? 'checked' : ''}><i></i></label>
-        <label class="fdg-alert-switch"><span><strong>🚫 Gols anulados</strong><small>Correção automática quando o placar é revertido após a confirmação.</small></span><input type="checkbox" data-fdg-type="overturnedGoals" ${p.overturnedGoals ? 'checked' : ''}><i></i></label>
-        <label class="fdg-alert-switch"><span><strong>🏁 Fim de jogo</strong><small>Placar final assim que a partida for encerrada.</small></span><input type="checkbox" data-fdg-type="finalWhistle" ${p.finalWhistle ? 'checked' : ''}><i></i></label>
-        <label class="fdg-alert-switch"><span><strong>🚨 Horário alterado ou jogo adiado</strong><small>Avisa quando uma partida acompanhada muda de horário/data ou é adiada.</small></span><input type="checkbox" data-fdg-type="scheduleChanges" ${p.scheduleChanges ? 'checked' : ''}><i></i></label>
-        <div class="fdg-alert-section-head"><div><div class="kicker">Mata-mata</div><h2>Alertas das Copas</h2></div></div>
-        <label class="fdg-alert-switch"><span><strong>⚡ Decisão nos pênaltis</strong><small>Copa do Brasil, Libertadores e Sul-Americana.</small></span><input type="checkbox" data-fdg-type="shootoutAlerts" ${p.shootoutAlerts ? 'checked' : ''}><i></i></label>
-        <label class="fdg-alert-switch"><span><strong>🏆 Classificado / eliminado</strong><small>Resultado da classificação quando a fonte confirma o vencedor do confronto.</small></span><input type="checkbox" data-fdg-type="qualificationAlerts" ${p.qualificationAlerts ? 'checked' : ''}><i></i></label>
+        <div class="fdg-alert-section-head"><div><div class="kicker">Essenciais</div><h2>O que receber?</h2></div><span>5 tipos</span></div>
+        <label class="fdg-alert-switch"><span><strong>▶️ Início da partida</strong><small>Avisa quando a ESPN confirma que a bola rolou.</small></span><input type="checkbox" data-fdg-type="matchStart" ${p.matchStart ? 'checked' : ''}><i></i></label>
+        <label class="fdg-alert-switch"><span><strong>⚽ Gols</strong><small>Autor, minuto e placar atualizado quando a fonte permite.</small></span><input type="checkbox" data-fdg-type="goals" ${p.goals ? 'checked' : ''}><i></i></label>
+        <label class="fdg-alert-switch"><span><strong>🟥 Cartões vermelhos</strong><small>Expulsões confirmadas, com jogador e minuto quando disponíveis.</small></span><input type="checkbox" data-fdg-type="redCards" ${p.redCards ? 'checked' : ''}><i></i></label>
+        <label class="fdg-alert-switch"><span><strong>👥 Escalações confirmadas</strong><small>Times definidos — disponível somente nos jogos do Brasileirão.</small></span><input type="checkbox" data-fdg-type="lineups" ${p.lineups ? 'checked' : ''}><i></i></label>
+        <label class="fdg-alert-switch"><span><strong>🏁 Fim de jogo</strong><small>Placar final assim que a ESPN encerrar a partida.</small></span><input type="checkbox" data-fdg-type="finalWhistle" ${p.finalWhistle ? 'checked' : ''}><i></i></label>
       </div></section>
       <section class="panel fdg-alert-panel fdg-alert-danger"><div class="panel-inner">
         <h2>Este aparelho</h2>

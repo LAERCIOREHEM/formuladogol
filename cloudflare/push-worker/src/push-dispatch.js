@@ -3,6 +3,7 @@ import { buildPushPayload } from '@block65/webcrypto-web-push';
 const DELIVERY_BATCH_SIZE = 5;
 const TARGET_PAGE_SIZE = 400;
 const MAX_QUEUE_RETRY_DELAY = 300;
+const PUBLIC_ALERT_TYPES = new Set(['goal', 'red_card', 'lineup_confirmed', 'match_start', 'final_whistle']);
 
 function text(value) { return String(value == null ? '' : value).trim(); }
 function num(value, fallback = 0) { const n = Number(value); return Number.isFinite(n) ? n : fallback; }
@@ -37,27 +38,25 @@ async function vapidKeys(env) {
 export function preferenceColumnForEvent(type) {
   const map = {
     goal: 'p.goals',
-    goal_overturned: 'p.overturned_goals',
-    prematch_15: 'p.prematch_15',
-    final_whistle: 'p.final_whistle',
-    schedule_changed: 'p.schedule_changes',
-    match_postponed: 'p.schedule_changes',
-    shootout_start: 'p.shootout_alerts',
-    qualification: 'p.qualification_alerts'
+    red_card: 'p.red_cards',
+    lineup_confirmed: 'p.lineups',
+    match_start: 'p.match_start',
+    final_whistle: 'p.final_whistle'
   };
   return map[text(type)] || '';
 }
 
 function defaultTitle(type) {
   return ({
-    goal: '⚽ GOL!', goal_overturned: '🚫 GOL ANULADO', prematch_15: '⏰ Jogo começa em 15 minutos',
-    final_whistle: '🏁 Fim de jogo', schedule_changed: '🕒 Horário alterado', match_postponed: '🚨 Jogo adiado',
-    shootout_start: '⚡ DECISÃO NOS PÊNALTIS!', qualification: '🏆 Classificado!'
+    goal: '⚽ GOL!',
+    red_card: '🟥 CARTÃO VERMELHO!',
+    lineup_confirmed: '👥 ESCALAÇÕES CONFIRMADAS',
+    match_start: '▶️ Bola rolando!',
+    final_whistle: '🏁 Fim de jogo'
   })[text(type)] || 'Fórmula do Gol';
 }
 
 function notificationUrl(type, eventId) {
-  if (['prematch_15', 'schedule_changed', 'match_postponed'].includes(text(type))) return '/agenda.html';
   return eventId ? `/aovivo.html?event=${encodeURIComponent(eventId)}` : '/aovivo.html';
 }
 
@@ -67,8 +66,9 @@ export function buildSportsPushPayload(event) {
   const eventId = text(item.eventId);
   const type = text(item.type);
   const sourcePlayKey = text(item.sourcePlayKey || item.eventKey);
-  const goalFamily = type === 'goal' || type === 'goal_overturned';
+  const goalFamily = type === 'goal';
   const technicalEspnTest = item.technicalEspnTest === true;
+  if (!PUBLIC_ALERT_TYPES.has(type)) throw new Error(`unsupported_public_alert_type:${type || 'empty'}`);
   const tagSeed = technicalEspnTest ? `technical-espn-${sourcePlayKey}` : goalFamily ? `goal-${sourcePlayKey}` : `${type}-${eventId || sourcePlayKey}`;
   return {
     title: text(draft.title || defaultTitle(type)),
@@ -89,10 +89,10 @@ export function buildSportsPushPayload(event) {
 
 function deliveryOptions(type) {
   const value = text(type);
-  if (value === 'prematch_15') return { ttl: 900, urgency: 'high' };
-  if (value === 'schedule_changed' || value === 'match_postponed') return { ttl: 21600, urgency: 'normal' };
-  if (value === 'final_whistle' || value === 'qualification') return { ttl: 3600, urgency: 'high' };
-  if (value === 'shootout_start') return { ttl: 600, urgency: 'high' };
+  if (value === 'lineup_confirmed') return { ttl: 3600, urgency: 'normal' };
+  if (value === 'match_start') return { ttl: 900, urgency: 'high' };
+  if (value === 'red_card') return { ttl: 900, urgency: 'high' };
+  if (value === 'final_whistle') return { ttl: 3600, urgency: 'high' };
   return { ttl: 180, urgency: 'high' };
 }
 
@@ -131,7 +131,7 @@ async function getEvent(env, eventKey) {
   if (!row) {
     row = await env.DB.prepare(`
       SELECT event_key, event_type, payload_json
-      FROM match_events
+      FROM essential_match_events
       WHERE event_key=?
     `).bind(eventKey).first();
   }
@@ -227,7 +227,7 @@ export async function recoverStuckDeliveries(env, limit = 50) {
   return recovered;
 }
 
-async function eligibleTargets(env, event, afterSubscriptionId = '') {
+export async function eligibleTargets(env, event, afterSubscriptionId = '') {
   const flagColumn = preferenceColumnForEvent(event.type);
   if (!flagColumn) return [];
   const homeSlug = teamSlug(event.home?.name);
@@ -250,7 +250,7 @@ async function eligibleTargets(env, event, afterSubscriptionId = '') {
   const result = await env.DB.prepare(`
     SELECT s.subscription_id, s.installation_id
     FROM push_subscriptions s
-    JOIN push_preferences_v2 p ON p.installation_id=s.installation_id
+    JOIN push_preferences_v3 p ON p.installation_id=s.installation_id
     WHERE s.active=1
       AND s.subscription_id > ?
       AND (?='' OR s.installation_id=?)
@@ -274,6 +274,20 @@ async function eligibleTargets(env, event, afterSubscriptionId = '') {
     TARGET_PAGE_SIZE + 1
   ).all();
   return result.results || [];
+}
+
+export async function countEligibleTargets(env, event) {
+  let after = '';
+  let total = 0;
+  for (let pageNo = 0; pageNo < 100; pageNo += 1) {
+    const rows = await eligibleTargets(env, event, after);
+    const page = rows.slice(0, TARGET_PAGE_SIZE);
+    total += page.length;
+    if (rows.length <= TARGET_PAGE_SIZE || !page.length) break;
+    after = text(page.at(-1)?.subscription_id);
+    if (!after) break;
+  }
+  return total;
 }
 
 async function expandSportsEvent(messageBody, env) {

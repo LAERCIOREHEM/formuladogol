@@ -95,12 +95,10 @@ function normalizePreferences(input) {
     : [];
   return {
     goals: src.goals !== false,
-    overturnedGoals: src.overturnedGoals !== false,
-    prematch15: src.prematch15 !== false,
+    redCards: src.redCards !== false,
+    lineups: src.lineups !== false,
+    matchStart: src.matchStart !== false,
     finalWhistle: src.finalWhistle !== false,
-    scheduleChanges: src.scheduleChanges !== false,
-    shootoutAlerts: src.shootoutAlerts !== false,
-    qualificationAlerts: src.qualificationAlerts !== false,
     allGames: src.allGames === true,
     teams: cleanList(src.teams, 10),
     games: cleanList(src.games, 30)
@@ -110,17 +108,15 @@ function normalizePreferences(input) {
 async function savePreferences(env, installationId, preferences) {
   const p = normalizePreferences(preferences);
   await env.DB.prepare(`
-    INSERT INTO push_preferences_v2
-      (installation_id, goals, overturned_goals, prematch_15, final_whistle, schedule_changes, shootout_alerts, qualification_alerts, all_games, teams_json, games_json, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    INSERT INTO push_preferences_v3
+      (installation_id, goals, red_cards, lineups, match_start, final_whistle, all_games, teams_json, games_json, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     ON CONFLICT(installation_id) DO UPDATE SET
       goals=excluded.goals,
-      overturned_goals=excluded.overturned_goals,
-      prematch_15=excluded.prematch_15,
+      red_cards=excluded.red_cards,
+      lineups=excluded.lineups,
+      match_start=excluded.match_start,
       final_whistle=excluded.final_whistle,
-      schedule_changes=excluded.schedule_changes,
-      shootout_alerts=excluded.shootout_alerts,
-      qualification_alerts=excluded.qualification_alerts,
       all_games=excluded.all_games,
       teams_json=excluded.teams_json,
       games_json=excluded.games_json,
@@ -128,12 +124,10 @@ async function savePreferences(env, installationId, preferences) {
   `).bind(
     installationId,
     p.goals ? 1 : 0,
-    p.overturnedGoals ? 1 : 0,
-    p.prematch15 ? 1 : 0,
+    p.redCards ? 1 : 0,
+    p.lineups ? 1 : 0,
+    p.matchStart ? 1 : 0,
     p.finalWhistle ? 1 : 0,
-    p.scheduleChanges ? 1 : 0,
-    p.shootoutAlerts ? 1 : 0,
-    p.qualificationAlerts ? 1 : 0,
     p.allGames ? 1 : 0,
     JSON.stringify(p.teams),
     JSON.stringify(p.games)
@@ -143,19 +137,17 @@ async function savePreferences(env, installationId, preferences) {
 
 async function getPreferences(env, installationId) {
   const row = await env.DB.prepare(`
-    SELECT goals, overturned_goals, prematch_15, final_whistle, schedule_changes, shootout_alerts, qualification_alerts, all_games, teams_json, games_json
-    FROM push_preferences_v2 WHERE installation_id=?
+    SELECT goals, red_cards, lineups, match_start, final_whistle, all_games, teams_json, games_json
+    FROM push_preferences_v3 WHERE installation_id=?
   `).bind(installationId).first();
   if (!row) return normalizePreferences({});
   const parse = (raw) => { try { return JSON.parse(raw || '[]'); } catch (_) { return []; } };
   return normalizePreferences({
     goals: Boolean(row.goals),
-    overturnedGoals: Boolean(row.overturned_goals),
-    prematch15: Boolean(row.prematch_15),
+    redCards: Boolean(row.red_cards),
+    lineups: Boolean(row.lineups),
+    matchStart: Boolean(row.match_start),
     finalWhistle: Boolean(row.final_whistle),
-    scheduleChanges: Boolean(row.schedule_changes),
-    shootoutAlerts: Boolean(row.shootout_alerts),
-    qualificationAlerts: Boolean(row.qualification_alerts),
     allGames: Boolean(row.all_games),
     teams: parse(row.teams_json),
     games: parse(row.games_json)
@@ -166,7 +158,7 @@ async function handleConfig(request, env) {
   const keys = await vapidKeys(env);
   return json(request, {
     ok: true,
-    apiVersion: 1,
+    apiVersion: 2,
     vapidPublicKey: keys.publicKey,
     pushEnabled: true
   }, 200, { 'Cache-Control': 'public, max-age=300' });
@@ -305,10 +297,10 @@ async function handleSegmentedTeamTest(request, env) {
 
   const preferences = await getPreferences(env, installationId);
   const eligibleBy = chapecoensePreferenceMatch(preferences);
-  if (!eligibleBy || preferences.prematch15 === false) {
+  if (!eligibleBy || preferences.matchStart === false) {
     return json(request, {
       ok: false, error: 'not_eligible_for_chapecoense_test',
-      detail: 'Ative Todos os jogos ou Chapecoense e mantenha Jogo em 15 minutos habilitado.',
+      detail: 'Ative Todos os jogos ou Chapecoense e mantenha Início da partida habilitado.',
       preferences
     }, 409);
   }
@@ -318,10 +310,10 @@ async function handleSegmentedTeamTest(request, env) {
   const delaySeconds = Math.max(30, Math.min(180, Math.floor(Number(body.delaySeconds) || 120)));
   const scheduledAtMs = Date.now() + delaySeconds * 1000;
   const scheduledAt = new Date(scheduledAtMs).toISOString();
-  const eventKey = `prematch_15:fdg-segmented-test:${installationId}:${scheduledAtMs}`;
+  const eventKey = `match_start:fdg-segmented-test:${installationId}:${scheduledAtMs}`;
   const eventId = `fdg-segmented-test-${scheduledAtMs}`;
   const payload = {
-    eventKey, eventId, type: 'prematch_15', confirmedAt: scheduledAt,
+    eventKey, eventId, type: 'match_start', confirmedAt: scheduledAt,
     league: 'fdg.test', competitionKey: 'fdg_test', competitionName: 'Teste técnico Fórmula do Gol',
     home: { id: '', name: 'Chapecoense', abbreviation: 'CHA', score: null },
     away: { id: '', name: 'Teste Fórmula do Gol', abbreviation: 'FDG', score: null },
@@ -333,9 +325,9 @@ async function handleSegmentedTeamTest(request, env) {
   };
 
   await env.DB.prepare(`
-    INSERT OR IGNORE INTO match_events (event_key,event_id,event_type,confirmed_at,payload_json)
+    INSERT OR IGNORE INTO essential_match_events (event_key,event_id,event_type,confirmed_at,payload_json)
     VALUES (?,?,?,?,?)
-  `).bind(eventKey, eventId, 'prematch_15', scheduledAt, JSON.stringify(payload)).run();
+  `).bind(eventKey, eventId, 'match_start', scheduledAt, JSON.stringify(payload)).run();
   await enqueueSportsEvent(env, eventKey, { delaySeconds });
 
   return json(request, {
@@ -361,10 +353,10 @@ async function handleHotEspnTest(request, env) {
   if (!active) return json(request, { ok: false, error: 'subscription_not_found' }, 404);
 
   const preferences = await getPreferences(env, installationId);
-  if (preferences.prematch15 === false || preferences.allGames !== true) {
+  if (preferences.goals === false || preferences.allGames !== true) {
     return json(request, {
       ok: false, error: 'not_eligible_for_hot_espn_test',
-      detail: 'Neste aparelho, mantenha Jogo em 15 minutos e Todos os jogos habilitados para reproduzir a seleção real do fan-out.',
+      detail: 'Neste aparelho, mantenha Gols e Todos os jogos habilitados para reproduzir a seleção real do fan-out.',
       preferences
     }, 409);
   }
@@ -399,11 +391,11 @@ async function handleHotMatchTest(request, env) {
   if (!active) return json(request, { ok: false, error: 'subscription_not_found' }, 404);
 
   const preferences = await getPreferences(env, installationId);
-  if (preferences.allGames !== true || preferences.prematch15 === false || preferences.goals === false) {
+  if (preferences.allGames !== true || preferences.goals === false) {
     return json(request, {
       ok: false,
       error: 'not_eligible_for_hot_match_test',
-      detail: 'Neste aparelho, mantenha Todos os jogos, Jogo em 15 minutos e Gols habilitados para reproduzir o fluxo real.',
+      detail: 'Neste aparelho, mantenha Todos os jogos e Gols habilitados para reproduzir o fluxo real.',
       preferences
     }, 409);
   }
@@ -513,14 +505,15 @@ export default {
       return json(request, {
         ok: Boolean(db?.ok) && Boolean(state?.vapidReady) && Boolean(monitor?.ok) && Boolean(operational?.ok),
         service: 'formula-do-gol-push',
-        version: 6,
-        revision: '6-E',
+        version: 7,
+        revision: '6-R10',
         sportsMonitorReady: Boolean(monitor?.ok),
         operationalState: operational?.state || 'unknown',
         sports: {
           watchCount: Number(monitor?.watchCount || 0),
           activeGames: Number(monitor?.activeGames || 0),
           pendingGoals: Number(monitor?.pendingGoals || 0),
+          readinessRed: Number(monitor?.readinessRed || 0),
           lastPollAt: Number(monitor?.lastPollAt || 0)
         }
       }, operational?.ok ? 200 : 503, { 'Cache-Control': 'no-store' });

@@ -1,6 +1,6 @@
 import { recoverPendingDispatches, recoverStuckDeliveries } from './push-dispatch.js';
 
-const OPS_VERSION = 6;
+const OPS_VERSION = 7;
 const STALE_ACTIVE_POLL_MS = 35_000;
 const STALE_BOOTSTRAP_MS = 5 * 60_000;
 const STUCK_DISPATCH_MINUTES = 10;
@@ -39,6 +39,9 @@ async function cleanupOldRows(env) {
     env.DB.prepare(`DELETE FROM push_event_dispatch WHERE updated_at < datetime('now','-90 days')`),
     env.DB.prepare(`DELETE FROM sports_events WHERE created_at < datetime('now','-90 days')`),
     env.DB.prepare(`DELETE FROM match_events WHERE created_at < datetime('now','-90 days')`),
+    env.DB.prepare(`DELETE FROM essential_match_events WHERE created_at < datetime('now','-90 days')`),
+    env.DB.prepare(`DELETE FROM monitor_preflight WHERE updated_at < datetime('now','-90 days')`),
+    env.DB.prepare(`DELETE FROM monitor_incidents WHERE updated_at < datetime('now','-90 days')`),
     env.DB.prepare(`DELETE FROM push_subscriptions WHERE active=0 AND updated_at < datetime('now','-180 days')`),
     env.DB.prepare(`
       DELETE FROM push_preferences_v2
@@ -46,6 +49,14 @@ async function cleanupOldRows(env) {
         AND NOT EXISTS (
           SELECT 1 FROM push_subscriptions s
           WHERE s.installation_id=push_preferences_v2.installation_id AND s.active=1
+        )
+    `),
+    env.DB.prepare(`
+      DELETE FROM push_preferences_v3
+      WHERE updated_at < datetime('now','-180 days')
+        AND NOT EXISTS (
+          SELECT 1 FROM push_subscriptions s
+          WHERE s.installation_id=push_preferences_v3.installation_id AND s.active=1
         )
     `)
   ];
@@ -81,13 +92,14 @@ export function assessOperationalHealth(input, nowMs = Date.now()) {
   if (num(dispatch.stuckDeliveries, 0) > 0) errors.push('entregas_push_travadas');
   if (num(dispatch.retry, 0) > 0) warnings.push('entregas_em_retry');
   if (num(dispatch.failed24h, 0) > 0) warnings.push('falhas_permanentes_nas_ultimas_24h');
+  if (num(monitor.readinessRed, 0) > 0) errors.push('jogo_sem_prontidao_push');
 
   const state = errors.length ? 'degraded' : warnings.length ? 'warning' : activeGames > 0 ? 'live' : 'healthy';
   return { ok: errors.length === 0, state, warnings, errors };
 }
 
 async function dbMetrics(env) {
-  const [subs, events, matchEvents, dispatch, deliveries, recentDeliveries, latency, latest] = await Promise.all([
+  const [subs, goals, essential, legacy, dispatch, deliveries, recentDeliveries, latency, latest, readiness, incidents] = await Promise.all([
     env.DB.prepare(`
       SELECT
         SUM(CASE WHEN active=1 THEN 1 ELSE 0 END) AS active,
@@ -97,20 +109,20 @@ async function dbMetrics(env) {
     env.DB.prepare(`
       SELECT
         SUM(CASE WHEN event_type='goal' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS goals24h,
-        SUM(CASE WHEN event_type='goal_overturned' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS overturned24h,
         COUNT(*) AS total
       FROM sports_events
+      WHERE event_type='goal'
     `).first(),
     env.DB.prepare(`
       SELECT
-        SUM(CASE WHEN event_type='prematch_15' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS prematch24h,
+        SUM(CASE WHEN event_type='red_card' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS red24h,
+        SUM(CASE WHEN event_type='lineup_confirmed' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS lineup24h,
+        SUM(CASE WHEN event_type='match_start' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS start24h,
         SUM(CASE WHEN event_type='final_whistle' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS final24h,
-        SUM(CASE WHEN event_type IN ('schedule_changed','match_postponed') AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS schedule24h,
-        SUM(CASE WHEN event_type='shootout_start' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS shootout24h,
-        SUM(CASE WHEN event_type='qualification' AND created_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS qualification24h,
         COUNT(*) AS total
-      FROM match_events
+      FROM essential_match_events
     `).first(),
+    env.DB.prepare(`SELECT COUNT(*) AS total FROM match_events`).first(),
     env.DB.prepare(`
       SELECT
         SUM(CASE WHEN status IN ('pending','enqueued') THEN 1 ELSE 0 END) AS pending,
@@ -136,34 +148,63 @@ async function dbMetrics(env) {
       WHERE updated_at >= datetime('now','-24 hours')
     `).first(),
     env.DB.prepare(`
+      WITH all_events AS (
+        SELECT event_key, confirmed_at FROM sports_events WHERE event_type='goal'
+        UNION ALL
+        SELECT event_key, confirmed_at FROM essential_match_events
+      )
       SELECT
         AVG((julianday(d.sent_at)-julianday(e.confirmed_at))*86400000.0) AS avg_ms,
         MAX((julianday(d.sent_at)-julianday(e.confirmed_at))*86400000.0) AS max_ms,
         COUNT(*) AS samples
       FROM push_deliveries d
-      JOIN sports_events e ON e.event_key=d.event_key
+      JOIN all_events e ON e.event_key=d.event_key
       WHERE d.status='sent' AND d.sent_at IS NOT NULL
         AND d.sent_at >= datetime('now','-24 hours')
     `).first(),
     env.DB.prepare(`
       SELECT
         (SELECT MAX(ts) FROM (
-          SELECT MAX(confirmed_at) AS ts FROM sports_events
-          UNION ALL SELECT MAX(confirmed_at) AS ts FROM match_events
+          SELECT MAX(confirmed_at) AS ts FROM sports_events WHERE event_type='goal'
+          UNION ALL SELECT MAX(confirmed_at) AS ts FROM essential_match_events
         )) AS last_event_at,
         (SELECT MAX(sent_at) FROM push_deliveries WHERE status='sent') AS last_push_at
+    `).first(),
+    env.DB.prepare(`
+      SELECT
+        SUM(CASE WHEN readiness='green' AND updated_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS green24h,
+        SUM(CASE WHEN readiness='red' AND updated_at >= datetime('now','-24 hours') THEN 1 ELSE 0 END) AS red24h,
+        MAX(checked_at) AS last_check_at
+      FROM monitor_preflight
+    `).first(),
+    env.DB.prepare(`
+      SELECT
+        SUM(CASE WHEN email_status='pending' THEN 1 ELSE 0 END) AS pending,
+        COUNT(*) AS total,
+        MAX(created_at) AS last_incident_at
+      FROM monitor_incidents
     `).first()
   ]);
 
   return {
     subscriptions: { active: num(subs?.active, 0), inactive: num(subs?.inactive, 0) },
     events: {
-      total: num(events?.total, 0) + num(matchEvents?.total, 0),
-      goals24h: num(events?.goals24h, 0), overturned24h: num(events?.overturned24h, 0),
-      prematch24h: num(matchEvents?.prematch24h, 0), final24h: num(matchEvents?.final24h, 0),
-      schedule24h: num(matchEvents?.schedule24h, 0), shootout24h: num(matchEvents?.shootout24h, 0),
-      qualification24h: num(matchEvents?.qualification24h, 0),
+      totalPublic: num(goals?.total, 0) + num(essential?.total, 0),
+      legacySuppressed: num(legacy?.total, 0),
+      goals24h: num(goals?.goals24h, 0),
+      redCards24h: num(essential?.red24h, 0),
+      lineups24h: num(essential?.lineup24h, 0),
+      matchStart24h: num(essential?.start24h, 0),
+      final24h: num(essential?.final24h, 0),
       lastEventAt: iso(latest?.last_event_at)
+    },
+    readiness: {
+      green24h: num(readiness?.green24h, 0),
+      red24h: num(readiness?.red24h, 0),
+      lastCheckAt: iso(readiness?.last_check_at),
+      incidentsPendingEmail: num(incidents?.pending, 0),
+      incidentsTotal: num(incidents?.total, 0),
+      lastIncidentAt: iso(incidents?.last_incident_at)
     },
     dispatch: {
       pending: num(dispatch?.pending, 0), stuckDispatches: num(dispatch?.stuck, 0),

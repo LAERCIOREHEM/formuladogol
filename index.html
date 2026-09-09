@@ -2785,7 +2785,7 @@ body > .container > section.hero > img {
 
 </style>
 <link rel="stylesheet" href="css/br-global.css?v=20260801-footer-institucional-v1">
-<link rel="stylesheet" href="css/br-jogos.css?v=20260907-org7r-final-v1">
+<link rel="stylesheet" href="css/br-jogos.css?v=20260909-push-r10-cta-v1">
 <!-- Dados estruturados: raiz do grafo (Organization, Person, WebSite, WebPage).
      As demais páginas referenciam #website e #organization definidos aqui. -->
 <script type="application/ld+json">
@@ -6127,7 +6127,7 @@ function renderResultados() {
           <div class="resultado-placar">${pm} <span class="placar-x">×</span> ${pv}</div>
           ${linkClubeBrasileirao(v.nome, `<span class="resultado-escudo">${escudoVisitante}</span><span class="resultado-team-text"><span class="resultado-nome">${v.nome || '?'}</span></span>`, 'resultado-time visitante br-club-link')}
         </div>
-        ${paginaResultado ? `<div class="resultado-page-row"><a class="br-game-action br-game-action-detail" href="${brEscapeAttr(paginaResultado)}">📄 Ver página da partida</a></div>` : ''}
+        ${paginaResultado ? `<div class="resultado-page-row"><a class="br-game-action br-game-action-detail" href="${brEscapeAttr(paginaResultado)}">📄 Ver partida</a></div>` : ''}
         ${htmlResumoResultadoDetalhes(r)}
         ${extrasResultado ? `<div class="resultado-extra">${extrasResultado}</div>` : ''}
       </div>`;
