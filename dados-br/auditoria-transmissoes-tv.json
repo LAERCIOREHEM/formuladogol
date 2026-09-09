@@ -7,45 +7,35 @@
     "jogos_sem_transmissao_14d": 2,
     "jogos_sem_transmissao_fora_14d": 3,
     "jogos_criticos_sem_transmissao_72h": 0,
-    "registros_preservados": 25,
-    "jogos_guardiao_ia": 2,
+    "registros_preservados": 24,
+    "jogos_guardiao_ia": 3,
     "jogos_estaveis_sem_reconsulta_editorial": 7,
-    "fontes_com_falha": 1
+    "fontes_com_falha": 0
   },
   "fontes": {
     "guardiao_ia": {
       "ok": true,
-      "jogos_com_canal": 2
+      "jogos_com_canal": 3
     },
     "cbf": {
-      "ok": false,
-      "competicoes_ok": [],
+      "ok": true,
+      "competicoes_ok": [
+        "brasileirao"
+      ],
       "registros": 0,
       "erros": [
-        "Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
         "Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
       ],
-      "duracao_ms": 8274
-    },
-    "ge_agenda": {
-      "ok": true,
-      "jogos_com_canal": 0,
-      "duracao_ms": 7395
-    },
-    "ge_artigos": {
-      "ok": true,
-      "artigos_consultados": 3,
-      "jogos_com_canal": 0,
-      "duracao_ms": 51977
+      "duracao_ms": 3291
     },
     "espn": {
       "ok": true,
       "competicoes_consultadas": 2,
-      "eventos_na_janela": 35,
+      "eventos_na_janela": 0,
       "scoreboard_com_canal": 0,
       "summary_com_canal": 0,
-      "duracao_ms": 11524
+      "duracao_ms": 0
     },
     "youtube_oficial": {
       "ok": true,
@@ -58,7 +48,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "faltam_horas": 151.6,
+      "faltam_horas": 149.8,
       "nivel": "aviso"
     },
     {
@@ -66,7 +56,7 @@
       "rodada": 0,
       "jogo": "São Paulo x Boca Juniors",
       "data_iso": "2026-09-15T21:30:00-03:00",
-      "faltam_horas": 154.1,
+      "faltam_horas": 152.3,
       "nivel": "aviso"
     }
   ],
@@ -76,7 +66,7 @@
       "rodada": 0,
       "jogo": "Vasco da Gama x Independiente Santa Fe",
       "data_iso": "2026-09-15T19:00:00-03:00",
-      "faltam_horas": 151.6,
+      "faltam_horas": 149.8,
       "nivel": "aviso"
     },
     {
@@ -84,7 +74,7 @@
       "rodada": 0,
       "jogo": "São Paulo x Boca Juniors",
       "data_iso": "2026-09-15T21:30:00-03:00",
-      "faltam_horas": 154.1,
+      "faltam_horas": 152.3,
       "nivel": "aviso"
     },
     {
@@ -92,7 +82,7 @@
       "rodada": 29,
       "jogo": "Remo x Grêmio",
       "data_iso": "2026-10-07T19:30:00-03:00",
-      "faltam_horas": 680.1,
+      "faltam_horas": 678.3,
       "nivel": "futuro"
     },
     {
@@ -100,7 +90,7 @@
       "rodada": 29,
       "jogo": "Vitória x Chapecoense",
       "data_iso": "2026-10-07T20:00:00-03:00",
-      "faltam_horas": 680.6,
+      "faltam_horas": 678.8,
       "nivel": "futuro"
     },
     {
@@ -108,23 +98,11 @@
       "rodada": 29,
       "jogo": "Fluminense x Coritiba",
       "data_iso": "2026-10-08T21:30:00-03:00",
-      "faltam_horas": 706.1,
+      "faltam_horas": 704.3,
       "nivel": "futuro"
     }
   ],
   "preservados": [
-    {
-      "event_id": "401913073",
-      "jogo": "Santos x Atlético-MG",
-      "canais": [
-        "GE TV",
-        "Premiere",
-        "SporTV",
-        "Globo",
-        "Prime Video",
-        "Disney+ / ESPN"
-      ]
-    },
     {
       "event_id": "401841232",
       "jogo": "Coritiba x Athletico-PR",
@@ -359,14 +337,9 @@
     }
   ],
   "erros": [
-    "CBF: Brasileirão: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis | https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://www.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis",
     "CBF: Copa do Brasil: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: RuntimeError: nenhuma tabela detalhada oficial da CBF pôde ser lida :: https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999?documento=Tabela+Detalhada: página carregada sem partidas reconhecíveis"
   ],
-  "artigos_ge_descobertos": [
-    "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/09/09/palmeiras-x-ldu-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-    "https://ge.globo.com/gato-mestre/noticia/2026/09/08/palpite-ge-2026-rodada-26-tem-empate-triplo-entre-os-vencedores-veja-acertos-e-erros.ghtml",
-    "https://ge.globo.com/cartola/craque-da-rodada/noticia/2026/09/08/cartola-2026-marcinho-da-chape-detona-corinthians-e-e-o-craque-da-rodada-26.ghtml"
-  ],
-  "atualizado_em": "2026-09-09T11:26:14-03:00"
+  "artigos_ge_descobertos": [],
+  "atualizado_em": "2026-09-09T13:12:38-03:00"
 }

@@ -19,8 +19,8 @@
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 34,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 5,
     "sem_transmissao": 1,
     "erros": 0
@@ -69,11 +69,11 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401912527",
+      "event_id": "401913073",
       "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Palmeiras x Liga de Quito",
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Santos x Atlético-MG",
       "data_iso": "2026-09-09T19:00:00-03:00",
       "principal": "",
       "fontes_encontradas": [],
@@ -525,20 +525,14 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401912527",
-      "jogo": "Palmeiras x Liga de Quito",
-      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
   "sem_transmissao": [
     {
-      "event_id": "401912527",
+      "event_id": "401913073",
       "rodada": 0,
-      "competicao_chave": "libertadores",
-      "competicao_nome": "Libertadores",
-      "jogo": "Palmeiras x Liga de Quito",
+      "competicao_chave": "sul_americana",
+      "competicao_nome": "Sul-Americana",
+      "jogo": "Santos x Atlético-MG",
       "data_iso": "2026-09-09T19:00:00-03:00",
       "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
     }
@@ -553,5 +547,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-09T13:04:47-03:00"
+  "atualizado_em": "2026-09-09T13:10:48-03:00"
 }
