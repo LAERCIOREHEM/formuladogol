@@ -1182,11 +1182,12 @@
       performance.jogo_com_mais_gols,
     ].filter(Boolean).map(performanceCard).join("");
 
-    target.innerHTML = `<div class="stats-champ-grid">
+    const gridHtml = `<div class="stats-champ-grid">
       <section class="panel"><div class="panel-inner"><div class="section-head"><div><div class="kicker">📈 Recordes</div><h2>Performance por partida</h2></div></div>${performanceHtml ? `<div class="stats-record-grid">${performanceHtml}</div>` : emptyState("Performance por partida ainda não consolidada.")}</div></section>
       <section class="panel"><div class="panel-inner"><div class="section-head"><div><div class="kicker">🔁 Momento</div><h2>Sequências</h2></div></div>${sequenceRows()}</div></section>
-    </div>
-    <section class="panel stats-attendance-panel"><div class="panel-inner">
+    </div>`;
+
+    const attendanceHtml = `<section class="panel stats-attendance-panel"><div class="panel-inner">
       <div class="section-head"><div><div class="kicker">👥 Torcida</div><h2>Público</h2></div><span class="badge">Cobertura de público</span></div>
       ${(() => {
         const total = Number(state.competition?.resumo?.jogos_finalizados) || totalFinishedGames();
@@ -1208,6 +1209,10 @@
         ${ranking.length > 5 ? `<button class="stats-expand-btn" type="button" data-expand-attendance>${state.expanded.publico ? "Mostrar somente os 5 primeiros ↑" : `Ver ranking completo (${ranking.length}) ↓`}</button>` : ""}` : emptyState(filteredAttendance.club ? "Nenhum jogo deste recorte possui público informado." : "Nenhum clube deste recorte possui público informado.")}
       <p class="stats-source-note">${escapeHtml(attendance.observacao || "Média calculada somente sobre partidas com público informado.")}${filteredAttendance.missingCount ? ` Neste recorte, ${integer(filteredAttendance.missingCount)} ${filteredAttendance.missingCount === 1 ? "partida ainda não possui" : "partidas ainda não possuem"} público informado e não ${filteredAttendance.missingCount === 1 ? "entra" : "entram"} nos cálculos.` : ""}</p>
     </div></section>`;
+
+    // Público é o bloco mais consultado desta aba: entra primeiro.
+    // Recordes e Sequências são conteúdo estático e descem para o rodapé.
+    target.innerHTML = attendanceHtml + gridHtml;
   }
 
   function metricBar(label, value, selected = false) {
