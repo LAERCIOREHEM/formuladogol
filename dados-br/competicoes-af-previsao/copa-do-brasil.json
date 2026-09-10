@@ -9,27 +9,27 @@
     "pareamento_apos_fase_atual": "sorteio",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-09T00:11:29-03:00",
+  "gerado_em": "2026-09-10T18:04:18-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
-    "status": "encerrada",
-    "ordem": 700,
-    "nome": "Quartas de final",
-    "eventos": 8,
-    "eventos_pendentes": 0
+    "status": "em_andamento",
+    "ordem": 800,
+    "nome": "Semifinal",
+    "eventos": 4,
+    "eventos_pendentes": 4
   },
   "resumo": {
-    "eventos": 150,
+    "eventos": 155,
     "finalizados": 150,
-    "pendentes": 0,
-    "equipes": 126,
+    "pendentes": 5,
+    "equipes": 128,
     "equipes_serie_a_2026": 21
   },
   "coleta": {
     "modo": "incremental",
-    "janela_inicio": "2026-08-19T00:00:00-03:00",
-    "janela_fim": "2027-01-07T23:59:59-03:00",
+    "janela_inicio": "2026-08-20T00:00:00-03:00",
+    "janela_fim": "2027-01-08T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-05T05:11:23-03:00",
     "ajustes_editoriais_aplicados": 0
@@ -177,7 +177,7 @@
       "sigla": "CAM",
       "pais": "BRA",
       "serie_a_2026": true,
-      "jogos": 6
+      "jogos": 8
     },
     {
       "espn_id": "9966",
@@ -519,7 +519,7 @@
       "sigla": "GRE",
       "pais": "BRA",
       "serie_a_2026": true,
-      "jogos": 6
+      "jogos": 8
     },
     {
       "espn_id": "131674",
@@ -816,7 +816,7 @@
       "sigla": "PAL",
       "pais": "BRA",
       "serie_a_2026": true,
-      "jogos": 6
+      "jogos": 8
     },
     {
       "espn_id": "131685",
@@ -1062,6 +1062,24 @@
       "jogos": 3
     },
     {
+      "espn_id": "131554",
+      "nome": "TBD Away",
+      "nome_espn": "TBD Away",
+      "sigla": "TBD Away",
+      "pais": "BRA",
+      "serie_a_2026": false,
+      "jogos": 1
+    },
+    {
+      "espn_id": "131556",
+      "nome": "TBD Home",
+      "nome_espn": "TBD Home",
+      "sigla": "TBD Home",
+      "pais": "BRA",
+      "serie_a_2026": false,
+      "jogos": 1
+    },
+    {
       "espn_id": "131678",
       "nome": "Tirol",
       "nome_espn": "Tirol",
@@ -1122,7 +1140,7 @@
       "sigla": "VAS",
       "pais": "BRA",
       "serie_a_2026": true,
-      "jogos": 6
+      "jogos": 8
     },
     {
       "espn_id": "131683",
@@ -6570,13 +6588,193 @@
       },
       "vencedor": "Grêmio",
       "penaltis": false
+    },
+    {
+      "event_id": "401913105",
+      "data_iso": "2026-11-01T17:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 1,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "2029",
+        "nome": "Palmeiras",
+        "nome_espn": "Palmeiras",
+        "sigla": "PAL",
+        "pais": "BRA",
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "3454",
+        "nome": "Vasco da Gama",
+        "nome_espn": "Vasco da Gama",
+        "sigla": "VAS",
+        "pais": "BRA",
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401913109",
+      "data_iso": "2026-11-01T17:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 1,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "6273",
+        "nome": "Grêmio",
+        "nome_espn": "Grêmio",
+        "sigla": "GRE",
+        "pais": "BRA",
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "7632",
+        "nome": "Atlético-MG",
+        "nome_espn": "Atlético-MG",
+        "sigla": "CAM",
+        "pais": "BRA",
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401913107",
+      "data_iso": "2026-11-08T17:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "3454",
+        "nome": "Vasco da Gama",
+        "nome_espn": "Vasco da Gama",
+        "sigla": "VAS",
+        "pais": "BRA",
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "2029",
+        "nome": "Palmeiras",
+        "nome_espn": "Palmeiras",
+        "sigla": "PAL",
+        "pais": "BRA",
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401913108",
+      "data_iso": "2026-11-08T17:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Semifinal",
+      "fase_ordem": 800,
+      "semana": null,
+      "perna": 2,
+      "estadio": "",
+      "mandante": {
+        "espn_id": "7632",
+        "nome": "Atlético-MG",
+        "nome_espn": "Atlético-MG",
+        "sigla": "CAM",
+        "pais": "BRA",
+        "serie_a_2026": true,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "6273",
+        "nome": "Grêmio",
+        "nome_espn": "Grêmio",
+        "sigla": "GRE",
+        "pais": "BRA",
+        "serie_a_2026": true,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
+    },
+    {
+      "event_id": "401913106",
+      "data_iso": "2026-12-06T17:00:00-03:00",
+      "estado": "pre",
+      "concluido": false,
+      "status": "P.A.",
+      "fase": "Final",
+      "fase_ordem": 900,
+      "semana": null,
+      "perna": null,
+      "estadio": "Arena BRB Mané Garrincha",
+      "mandante": {
+        "espn_id": "131556",
+        "nome": "TBD Home",
+        "nome_espn": "TBD Home",
+        "sigla": "TBD Home",
+        "pais": "BRA",
+        "serie_a_2026": false,
+        "mandante": true,
+        "vencedor": false,
+        "placar": 0
+      },
+      "visitante": {
+        "espn_id": "131554",
+        "nome": "TBD Away",
+        "nome_espn": "TBD Away",
+        "sigla": "TBD Away",
+        "pais": "BRA",
+        "serie_a_2026": false,
+        "mandante": false,
+        "vencedor": false,
+        "placar": 0
+      },
+      "vencedor": null,
+      "penaltis": false
     }
   ],
   "validacao_af": {
     "status": "pronto",
-    "fase": "Quartas de final",
-    "fase_ordem": 700,
-    "chaves": 4,
+    "fase": "Semifinal",
+    "fase_ordem": 800,
+    "chaves": 2,
     "equipes_ativas": 4
   }
 }

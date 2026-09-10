@@ -9,7 +9,7 @@
     "pareamento_apos_fase_atual": "chave",
     "final_partida_unica": true
   },
-  "gerado_em": "2026-09-09T00:11:30-03:00",
+  "gerado_em": "2026-09-10T18:04:18-03:00",
   "fonte": "ESPN",
   "status": "ok",
   "fase_atual": {
@@ -17,19 +17,19 @@
     "ordem": 700,
     "nome": "Quartas de final",
     "eventos": 8,
-    "eventos_pendentes": 7
+    "eventos_pendentes": 5
   },
   "resumo": {
     "eventos": 155,
-    "finalizados": 143,
-    "pendentes": 12,
+    "finalizados": 145,
+    "pendentes": 10,
     "equipes": 49,
     "equipes_serie_a_2026": 8
   },
   "coleta": {
     "modo": "incremental",
-    "janela_inicio": "2026-08-19T00:00:00-03:00",
-    "janela_fim": "2027-01-07T23:59:59-03:00",
+    "janela_inicio": "2026-08-20T00:00:00-03:00",
+    "janela_fim": "2027-01-08T23:59:59-03:00",
     "requisicoes": 4,
     "ultima_completa_em": "2026-09-06T05:12:17-03:00",
     "ajustes_editoriais_aplicados": 7
@@ -5633,9 +5633,9 @@
     {
       "event_id": "401912527",
       "data_iso": "2026-09-09T19:00:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Setembro 9º at 6:00 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5649,8 +5649,8 @@
         "pais": null,
         "serie_a_2026": true,
         "mandante": true,
-        "vencedor": false,
-        "placar": 0
+        "vencedor": true,
+        "placar": 1
       },
       "visitante": {
         "espn_id": "4816",
@@ -5663,7 +5663,7 @@
         "vencedor": false,
         "placar": 0
       },
-      "vencedor": null,
+      "vencedor": "Palmeiras",
       "penaltis": false,
       "ajuste_editorial": {
         "fonte": "ge_quartas_libertadores_2026",
@@ -5673,9 +5673,9 @@
     {
       "event_id": "401912541",
       "data_iso": "2026-09-09T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qua., Setembro 9º at 8:30 PM EDT",
+      "estado": "post",
+      "concluido": true,
+      "status": "Finalizado",
       "fase": "Quartas de final",
       "fase_ordem": 700,
       "semana": null,
@@ -5690,7 +5690,7 @@
         "serie_a_2026": false,
         "mandante": true,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "visitante": {
         "espn_id": "874",
@@ -5701,7 +5701,7 @@
         "serie_a_2026": true,
         "mandante": false,
         "vencedor": false,
-        "placar": 0
+        "placar": 1
       },
       "vencedor": null,
       "penaltis": false,
