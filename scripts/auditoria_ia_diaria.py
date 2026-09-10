@@ -1251,7 +1251,10 @@ def self_test() -> int:
     # depois que a rodada inteira termina — janela em que o site ficaria sem o
     # dado de público que alimenta as Estatísticas.
     OPENAI_CONSUMIDORES = {"auditoria_ia_diaria.py", "completar_publicos_ia.py", "editorial_ia.py", "guardiao_transmissoes_ia.py"}
-    OPENAI_WORKFLOWS = {"auditoria-ia-diaria.yml", "atualizar-publicos-brasileirao.yml", "publicar-analise-rodada.yml", "publicar-analise-copa-do-brasil.yml", "publicar-analise-continentais.yml", "auditar-transmissoes-ia.yml"}
+    # deploy-push-worker.yml consta aqui porque grava OPENAI_API_KEY como secret
+    # do Worker via `wrangler secret put`; quem consome a chave em runtime é o
+    # sports-monitor.js. O workflow não chama a OpenAI diretamente.
+    OPENAI_WORKFLOWS = {"auditoria-ia-diaria.yml", "atualizar-publicos-brasileirao.yml", "publicar-analise-rodada.yml", "publicar-analise-copa-do-brasil.yml", "publicar-analise-continentais.yml", "auditar-transmissoes-ia.yml", "deploy-push-worker.yml"}
 
     direct_api = []
     for script in SCRIPT_DIR.glob("*.py"):
