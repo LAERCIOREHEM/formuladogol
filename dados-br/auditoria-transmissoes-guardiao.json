@@ -884,20 +884,51 @@
         "Disney+ / ESPN"
       ],
       "status": "sem_chamada"
+    },
+    {
+      "event_id": "401841232",
+      "jogo": "Coritiba x Athletico-PR",
+      "data_iso": "2026-09-11T21:00:00-03:00",
+      "checkpoint": -360,
+      "executado_em": "2026-09-11T15:05:13-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+      "canais_antes": [
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "nao_resolvido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/11/coritiba-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "rejeicoes": [
+        "exclusive=true exige exatamente um canal/plataforma na grade completa"
+      ],
+      "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, 27ª rodada, nesta sexta-feira, 11/09/2026, às 21h (horário de Brasília), no Couto Pereira. A transmissão integral e exclusiva é de Premiere e SporTV. GE fará apenas cobertura em Tempo Real, não transmissão do jogo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401912543",
-    "jogo": "Independiente del Valle x Flamengo",
-    "data_iso": "2026-09-10T21:30:00-03:00",
-    "checkpoint": -15,
-    "executado_em": "2026-09-10T21:20:24-03:00",
-    "chamada_openai": false,
-    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+    "event_id": "401841232",
+    "jogo": "Coritiba x Athletico-PR",
+    "data_iso": "2026-09-11T21:00:00-03:00",
+    "checkpoint": -360,
+    "executado_em": "2026-09-11T15:05:13-03:00",
+    "chamada_openai": true,
+    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
     "canais_antes": [
-      "Disney+ / ESPN"
+      "Premiere",
+      "SporTV"
     ],
-    "status": "sem_chamada"
+    "status": "nao_resolvido",
+    "modelo": "gpt-5.6-terra",
+    "fontes_web": [
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/11/coritiba-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+    ],
+    "rejeicoes": [
+      "exclusive=true exige exatamente um canal/plataforma na grade completa"
+    ],
+    "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, 27ª rodada, nesta sexta-feira, 11/09/2026, às 21h (horário de Brasília), no Couto Pereira. A transmissão integral e exclusiva é de Premiere e SporTV. GE fará apenas cobertura em Tempo Real, não transmissão do jogo."
   },
-  "atualizado_em": "2026-09-10T21:20:24-03:00"
+  "atualizado_em": "2026-09-11T15:05:13-03:00"
 }
