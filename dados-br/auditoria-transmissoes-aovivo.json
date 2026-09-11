@@ -15,14 +15,14 @@
   "resumo": {
     "jogos_na_janela": 39,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 5,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 57,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 6,
-    "sem_transmissao": 0,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,6 +69,18 @@
   },
   "jogos_analisados": [
     {
+      "event_id": "401912543",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Independiente del Valle x Flamengo",
+      "data_iso": "2026-09-10T21:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
       "event_id": "401841232",
       "rodada": 27,
       "competicao_chave": "brasileirao",
@@ -80,7 +92,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841228",
@@ -763,8 +775,24 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
-  "sem_transmissao": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401912543",
+      "jogo": "Independiente del Valle x Flamengo",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
+  "sem_transmissao": [
+    {
+      "event_id": "401912543",
+      "rodada": 0,
+      "competicao_chave": "libertadores",
+      "competicao_nome": "Libertadores",
+      "jogo": "Independiente del Valle x Flamengo",
+      "data_iso": "2026-09-10T21:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 88,
@@ -775,5 +803,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-10T21:01:08-03:00"
+  "atualizado_em": "2026-09-10T21:19:00-03:00"
 }

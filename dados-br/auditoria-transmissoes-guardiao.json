@@ -871,61 +871,33 @@
       ],
       "overlay_alterado": true,
       "resumo": "Grade oficial no Brasil confirmada: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, rodada 27, sexta-feira, 11/09/2026, às 21h (BRT), no Couto Pereira. A página oficial da CBF lista Premiere e SporTV para a transmissão integral. O link da GE TV no YouTube é apenas de aquecimento ao vivo, programado para 20h, portanto não é incluído como canal da partida."
+    },
+    {
+      "event_id": "401912543",
+      "jogo": "Independiente del Valle x Flamengo",
+      "data_iso": "2026-09-10T21:30:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-09-10T21:20:24-03:00",
+      "chamada_openai": false,
+      "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+      "canais_antes": [
+        "Disney+ / ESPN"
+      ],
+      "status": "sem_chamada"
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841232",
-    "jogo": "Coritiba x Athletico-PR",
-    "data_iso": "2026-09-11T21:00:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-10T21:02:52-03:00",
-    "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "event_id": "401912543",
+    "jogo": "Independiente del Valle x Flamengo",
+    "data_iso": "2026-09-10T21:30:00-03:00",
+    "checkpoint": -15,
+    "executado_em": "2026-09-10T21:20:24-03:00",
+    "chamada_openai": false,
+    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
     "canais_antes": [
-      "GE TV"
+      "Disney+ / ESPN"
     ],
-    "status": "corrigido",
-    "modelo": "gpt-5.6-terra",
-    "fontes_web": [
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/61590",
-      "https://ge.globo.com/google/amp/cartola/noticia/2026/09/07/cartola-tera-nove-jogos-validos-na-rodada-27-saiba-quando-o-mercado-fecha.ghtml",
-      "https://ge.globo.com/google/amp/pr/futebol/times/coritiba/noticia/2026/09/01/coritiba-x-athletico-coxa-solicita-a-cbf-mudanca-de-data-do-athletiba.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/10/athletiba-o-que-mudou-para-coritiba-e-athletico-desde-o-classico-do-primeiro-turno-da-serie-a.ghtml",
-      "https://s3.static.brasilescola.uol.com.br/be/2026/02/portaria-pe-de-meia-datas-2026.pdf",
-      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/894275",
-      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/922690",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-mirassol/832147",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/coritiba-vence-remo-e-agora-esta-em-setimo-lugar",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/cruzeiro-vence-coritiba-e-pula-de-11-para-setimo-no-brasileirao",
-      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/sub-17/2026/20052",
-      "https://www.youtube.com/watch?v=aDhpile9ScE",
-      "https://www.youtube.com/watch?v=qFhQq3Zrnqc"
-    ],
-    "canais_depois": [
-      "Premiere",
-      "SporTV"
-    ],
-    "exclusivo": false,
-    "confianca": 0.98,
-    "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
-    ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=Iz0UgMaICZA",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título informado no dossiê é “CORITIBA X ATHLETICO-PR | AQUECIMENTO AO VIVO”, com início às 20h; isso caracteriza conteúdo pré-jogo, não evidência de transmissão integral da partida às 21h."
-      }
-    ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=Iz0UgMaICZA"
-    ],
-    "overlay_alterado": true,
-    "resumo": "Grade oficial no Brasil confirmada: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, rodada 27, sexta-feira, 11/09/2026, às 21h (BRT), no Couto Pereira. A página oficial da CBF lista Premiere e SporTV para a transmissão integral. O link da GE TV no YouTube é apenas de aquecimento ao vivo, programado para 20h, portanto não é incluído como canal da partida."
+    "status": "sem_chamada"
   },
-  "atualizado_em": "2026-09-10T21:02:52-03:00"
+  "atualizado_em": "2026-09-10T21:20:24-03:00"
 }
