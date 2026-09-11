@@ -940,41 +940,89 @@
         "confiança 0.550 abaixo do limiar"
       ],
       "resumo": "Partida confirmada: Atlético-MG x Fluminense, Brasileirão 2026, fase única, sábado, 12/09/2026, às 16h (BRT), na Arena MRV. A página oficial da CBF confirma data, horário, local e competição; a página do ge confirma o confronto e o horário. Porém, nas páginas efetivamente verificadas nesta checagem, não havia indicação explícita do(s) detentor(es) da transmissão integral para este jogo. O dossiê anterior aponta Premiere via GE Agenda, mas não foi possível corroborar essa grade diretamente agora; por isso, não confirmo canais nem exclusividade."
+    },
+    {
+      "event_id": "401841236",
+      "jogo": "Grêmio x Vasco da Gama",
+      "data_iso": "2026-09-12T16:00:00-03:00",
+      "checkpoint": -1440,
+      "executado_em": "2026-09-11T16:13:44-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://ge.globo.com/futebol/copa-sul-americana/noticia/2026/08/27/quartas-de-final-da-sul-americana-2026-veja-datas-e-horarios-dos-confrontos.ghtml",
+        "https://ge.globo.com/google/amp/futebol/times/vasco/noticia/2026/09/09/alan-lescano-e-regularizado-no-bid-e-pode-estrear-pelo-vasco.ghtml",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/03/22/vasco-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/09/08/gremio-tem-duvidas-no-ataque-contra-o-vasco-por-suspensao-e-lesionados-saiba-situacao.ghtml",
+        "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/09/10/veja-as-alternativas-de-luis-castro-para-montar-o-ataque-do-gremio-contra-o-vasco.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/gremio-x-vasco-da-gama-saf/832157",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-25-e-26-do-brasileirao-betano",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/vitoria-bate-gremio-e-se-distancia-do-z-4-do-brasileirao-da-serie-a",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/palmeiras-e-vasco-avancam-as-semifinais-da-copa-do-brasil",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/a/gremio-bate-inter-por-3-a-1-e-avanca-a-semifinal-da-copa-do-brasil"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": true,
+      "confianca": 0.98,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/gremio-x-vasco-da-gama-saf/832157",
+        "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Grêmio x Vasco da Gama, Brasileirão Série A 2026, rodada 27, sábado, 12/09/2026, às 16h (BRT), na Arena do Grêmio. A ficha oficial da CBF lista exclusivamente o Premiere como transmissor. Não há URL de YouTube no dossiê."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841231",
-    "jogo": "Atlético-MG x Fluminense",
+    "event_id": "401841236",
+    "jogo": "Grêmio x Vasco da Gama",
     "data_iso": "2026-09-12T16:00:00-03:00",
     "checkpoint": -1440,
-    "executado_em": "2026-09-11T16:08:03-03:00",
+    "executado_em": "2026-09-11T16:13:44-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
       "Premiere"
     ],
-    "status": "nao_resolvido",
+    "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
       "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/08/22/fluminense-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/atletico-mg-x-fluminense-tudo-que-voce-precisa-saber-sobre-o-jogo-da-rodada-14.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/12-09-2026/atletico-mg-fluminense.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/05/10/atletico-mg-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-fluminense-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/rodada-11-tudo-o-que-voce-precisa-saber-sobre-atletico-mg-x-fluminense.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
-      "https://www.espn.com.br/futebol/resultados/_/liga/bra.1/data/20260912",
-      "https://www.espn.com.br/futebol/time/calendario/_/id/7632/bra.camp.mineiro",
-      "https://www.espn.com.br/futebol/time/calendario/_/id/7632/liga/BRA.1"
+      "https://ge.globo.com/futebol/copa-sul-americana/noticia/2026/08/27/quartas-de-final-da-sul-americana-2026-veja-datas-e-horarios-dos-confrontos.ghtml",
+      "https://ge.globo.com/google/amp/futebol/times/vasco/noticia/2026/09/09/alan-lescano-e-regularizado-no-bid-e-pode-estrear-pelo-vasco.ghtml",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://ge.globo.com/rj/futebol/brasileirao-serie-a/noticia/2026/03/22/vasco-x-gremio-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/09/08/gremio-tem-duvidas-no-ataque-contra-o-vasco-por-suspensao-e-lesionados-saiba-situacao.ghtml",
+      "https://ge.globo.com/rs/futebol/times/gremio/noticia/2026/09/10/veja-as-alternativas-de-luis-castro-para-montar-o-ataque-do-gremio-contra-o-vasco.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/gremio-x-vasco-da-gama-saf/832157",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-25-e-26-do-brasileirao-betano",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro/campeonato-brasileiro-serie-a/vitoria-bate-gremio-e-se-distancia-do-z-4-do-brasileirao-da-serie-a",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/palmeiras-e-vasco-avancam-as-semifinais-da-copa-do-brasil",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil/a/gremio-bate-inter-por-3-a-1-e-avanca-a-semifinal-da-copa-do-brasil"
     ],
-    "rejeicoes": [
-      "modelo não conseguiu confirmar a grade",
-      "grade vazia",
-      "confiança 0.550 abaixo do limiar"
+    "canais_depois": [
+      "Premiere"
     ],
-    "resumo": "Partida confirmada: Atlético-MG x Fluminense, Brasileirão 2026, fase única, sábado, 12/09/2026, às 16h (BRT), na Arena MRV. A página oficial da CBF confirma data, horário, local e competição; a página do ge confirma o confronto e o horário. Porém, nas páginas efetivamente verificadas nesta checagem, não havia indicação explícita do(s) detentor(es) da transmissão integral para este jogo. O dossiê anterior aponta Premiere via GE Agenda, mas não foi possível corroborar essa grade diretamente agora; por isso, não confirmo canais nem exclusividade."
+    "exclusivo": true,
+    "confianca": 0.98,
+    "fontes_aceitas": [
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/gremio-x-vasco-da-gama-saf/832157",
+      "https://ge.globo.com/google/amp/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+    ],
+    "youtube": [],
+    "youtube_removidos": [],
+    "overlay_alterado": true,
+    "resumo": "Confirmado para o Brasil: Grêmio x Vasco da Gama, Brasileirão Série A 2026, rodada 27, sábado, 12/09/2026, às 16h (BRT), na Arena do Grêmio. A ficha oficial da CBF lista exclusivamente o Premiere como transmissor. Não há URL de YouTube no dossiê."
   },
-  "atualizado_em": "2026-09-11T16:08:03-03:00"
+  "atualizado_em": "2026-09-11T16:13:44-03:00"
 }
