@@ -906,29 +906,75 @@
         "exclusive=true exige exatamente um canal/plataforma na grade completa"
       ],
       "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, 27ª rodada, nesta sexta-feira, 11/09/2026, às 21h (horário de Brasília), no Couto Pereira. A transmissão integral e exclusiva é de Premiere e SporTV. GE fará apenas cobertura em Tempo Real, não transmissão do jogo."
+    },
+    {
+      "event_id": "401841231",
+      "jogo": "Atlético-MG x Fluminense",
+      "data_iso": "2026-09-12T16:00:00-03:00",
+      "checkpoint": -1440,
+      "executado_em": "2026-09-11T16:08:03-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere"
+      ],
+      "status": "nao_resolvido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/08/22/fluminense-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/atletico-mg-x-fluminense-tudo-que-voce-precisa-saber-sobre-o-jogo-da-rodada-14.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/12-09-2026/atletico-mg-fluminense.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/05/10/atletico-mg-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-fluminense-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/rodada-11-tudo-o-que-voce-precisa-saber-sobre-atletico-mg-x-fluminense.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+        "https://www.espn.com.br/futebol/resultados/_/liga/bra.1/data/20260912",
+        "https://www.espn.com.br/futebol/time/calendario/_/id/7632/bra.camp.mineiro",
+        "https://www.espn.com.br/futebol/time/calendario/_/id/7632/liga/BRA.1"
+      ],
+      "rejeicoes": [
+        "modelo não conseguiu confirmar a grade",
+        "grade vazia",
+        "confiança 0.550 abaixo do limiar"
+      ],
+      "resumo": "Partida confirmada: Atlético-MG x Fluminense, Brasileirão 2026, fase única, sábado, 12/09/2026, às 16h (BRT), na Arena MRV. A página oficial da CBF confirma data, horário, local e competição; a página do ge confirma o confronto e o horário. Porém, nas páginas efetivamente verificadas nesta checagem, não havia indicação explícita do(s) detentor(es) da transmissão integral para este jogo. O dossiê anterior aponta Premiere via GE Agenda, mas não foi possível corroborar essa grade diretamente agora; por isso, não confirmo canais nem exclusividade."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841232",
-    "jogo": "Coritiba x Athletico-PR",
-    "data_iso": "2026-09-11T21:00:00-03:00",
-    "checkpoint": -360,
-    "executado_em": "2026-09-11T15:05:13-03:00",
+    "event_id": "401841231",
+    "jogo": "Atlético-MG x Fluminense",
+    "data_iso": "2026-09-12T16:00:00-03:00",
+    "checkpoint": -1440,
+    "executado_em": "2026-09-11T16:08:03-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+    "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere",
-      "SporTV"
+      "Premiere"
     ],
     "status": "nao_resolvido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/11/coritiba-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      "https://credencial.cbf.com.br/competicoes/listar/42/1",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/08/22/fluminense-x-remo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/atletico-mg-x-fluminense-tudo-que-voce-precisa-saber-sobre-o-jogo-da-rodada-14.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/12-09-2026/atletico-mg-fluminense.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/05/10/atletico-mg-x-botafogo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/atletico-mg-x-fluminense-veja-onde-assistir-escalacoes-desfalques-e-arbitragem.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/rodada-11-tudo-o-que-voce-precisa-saber-sobre-atletico-mg-x-fluminense.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
+      "https://www.espn.com.br/futebol/resultados/_/liga/bra.1/data/20260912",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/7632/bra.camp.mineiro",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/7632/liga/BRA.1"
     ],
     "rejeicoes": [
-      "exclusive=true exige exatamente um canal/plataforma na grade completa"
+      "modelo não conseguiu confirmar a grade",
+      "grade vazia",
+      "confiança 0.550 abaixo do limiar"
     ],
-    "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, 27ª rodada, nesta sexta-feira, 11/09/2026, às 21h (horário de Brasília), no Couto Pereira. A transmissão integral e exclusiva é de Premiere e SporTV. GE fará apenas cobertura em Tempo Real, não transmissão do jogo."
+    "resumo": "Partida confirmada: Atlético-MG x Fluminense, Brasileirão 2026, fase única, sábado, 12/09/2026, às 16h (BRT), na Arena MRV. A página oficial da CBF confirma data, horário, local e competição; a página do ge confirma o confronto e o horário. Porém, nas páginas efetivamente verificadas nesta checagem, não havia indicação explícita do(s) detentor(es) da transmissão integral para este jogo. O dossiê anterior aponta Premiere via GE Agenda, mas não foi possível corroborar essa grade diretamente agora; por isso, não confirmo canais nem exclusividade."
   },
-  "atualizado_em": "2026-09-11T15:05:13-03:00"
+  "atualizado_em": "2026-09-11T16:08:03-03:00"
 }
