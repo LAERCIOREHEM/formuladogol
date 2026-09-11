@@ -1174,56 +1174,73 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado: Botafogo x Bragantino, Brasileirão (27ª rodada), será em 12/09/2026, às 20h30 (horário de Brasília), no Nilton Santos. A grade disponível para o Brasil indica transmissão integral pelo Prime Video. Não há evidência consultada que confirme exclusividade."
+    },
+    {
+      "event_id": "401841232",
+      "jogo": "Coritiba x Athletico-PR",
+      "data_iso": "2026-09-11T21:00:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-09-11T20:50:26-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+      "canais_antes": [
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "nao_resolvido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/653061",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2025/307285/coritiba-saf-x-goias/829942",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/athletico-paranaense-x-chapecoense/831997",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-palmeiras/832077",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2025/568268/athletico-paranaense-x-vila-nova/829952",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2025/647904/athletico-paranaense-x-vila-nova/829952",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/com-grandes-jogos-26-rodada-do-brasileirao-movimentara-fim-de-semana",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/coritiba-vence-remo-e-agora-esta-em-setimo-lugar",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/detalhes/campeonato-brasileiro-serie-a/coritiba-e-goias-rivalizam-pela-lideranca-da-serie-b-nesta-sexta",
+        "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20052"
+      ],
+      "rejeicoes": [
+        "exclusive=true exige exatamente um canal/plataforma na grade completa"
+      ],
+      "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, 27ª rodada, nesta sexta-feira, 11/09/2026, às 21h (BRT), no Couto Pereira, Curitiba. A transmissão integral e exclusiva é de Premiere e SporTV. GE TV não integra a grade da partida: o link do YouTube é de aquecimento/pré-jogo, não do jogo completo."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841229",
-    "jogo": "Botafogo x Bragantino",
-    "data_iso": "2026-09-12T20:30:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-11T20:32:54-03:00",
+    "event_id": "401841232",
+    "jogo": "Coritiba x Athletico-PR",
+    "data_iso": "2026-09-11T21:00:00-03:00",
+    "checkpoint": -15,
+    "executado_em": "2026-09-11T20:50:26-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
     "canais_antes": [
-      "Prime Video"
+      "Premiere",
+      "SporTV"
     ],
-    "status": "confirmado",
+    "status": "nao_resolvido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cdn.conmebol.com/wp-content/uploads/2024/02/CONMEBOL_REPORTE_ANUAL_POR_2023.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2024/03/Fixture_CONMEBOL-Libertadores-Fase-3_-03-2024.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/03/27_3_2026-Planilla-Sudamericana-Semana-15-Fase-Grupos-Fecha-1.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/04/11_4_2026-Planilla-Sudamericana-Semana-16-Fase-Grupos-Fecha-2.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/04/Copia-de-25_4_2026-Planilla-Sudamericana-Semana-18-Fase-Grupos-Fecha-3.pdf",
-      "https://cdn.conmebol.com/wp-content/uploads/2026/05/1_5_2026-Planilla-Sudamericana-Semana-19-Fase-Grupos-Fecha-4.pdf",
-      "https://ge.globo.com/futebol/brasileirao-serie-a/noticia/2026/08/24/botafogo-x-athletico-pr-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/sp/ribeirao-preto-e-regiao/futebol/brasileirao-serie-b/noticia/2026/09/09/botafogo-sp-x-novorizontino-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/vale-do-paraiba-regiao/futebol/times/bragantino/noticia/2026/09/07/bragantino-tem-um-suspenso-e-a-volta-de-dois-jogadores-para-partida-contra-o-botafogo.ghtml",
-      "https://ge.globo.com/video/botafogo-recebe-o-bragantino-hoje-as-19h-ao-vivo-no-sportv-13797687.ghtml",
-      "https://ge.globo.com/video/botafogo-x-bragantino-hoje-as-18h30-ao-vivo-no-premiere-13886687.ghtml",
-      "https://globoplay.globo.com/v/11064018",
-      "https://globoplay.globo.com/v/13820930",
-      "https://www.espn.com.br/futebol/partida/_/jogoId/401841229/red-bull-bragantino-botafogo",
-      "https://www.espn.com.br/futebol/time/calendario",
-      "https://www.espn.com.br/futebol/time/calendario/_/id/6086/bra.2",
-      "https://www.uol.com.br/esporte/futebol/times/botafogo",
-      "https://www.youtube.com/watch?v=DUK8JWGJt7o",
-      "https://www.youtube.com/watch?v=nWIbR0ZvuKo"
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/653061",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2025/307285/coritiba-saf-x-goias/829942",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/athletico-paranaense-x-chapecoense/831997",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-palmeiras/832077",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2025/568268/athletico-paranaense-x-vila-nova/829952",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2025/647904/athletico-paranaense-x-vila-nova/829952",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/com-grandes-jogos-26-rodada-do-brasileirao-movimentara-fim-de-semana",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/coritiba-vence-remo-e-agora-esta-em-setimo-lugar",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/detalhes/campeonato-brasileiro-serie-a/coritiba-e-goias-rivalizam-pela-lideranca-da-serie-b-nesta-sexta",
+      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20052"
     ],
-    "canais_depois": [
-      "Prime Video"
+    "rejeicoes": [
+      "exclusive=true exige exatamente um canal/plataforma na grade completa"
     ],
-    "exclusivo": false,
-    "confianca": 0.96,
-    "fontes_aceitas": [
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://www.uol.com.br/esporte/futebol/times/botafogo"
-    ],
-    "youtube": [],
-    "youtube_removidos": [],
-    "overlay_alterado": true,
-    "resumo": "Confirmado: Botafogo x Bragantino, Brasileirão (27ª rodada), será em 12/09/2026, às 20h30 (horário de Brasília), no Nilton Santos. A grade disponível para o Brasil indica transmissão integral pelo Prime Video. Não há evidência consultada que confirme exclusividade."
+    "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, 27ª rodada, nesta sexta-feira, 11/09/2026, às 21h (BRT), no Couto Pereira, Curitiba. A transmissão integral e exclusiva é de Premiere e SporTV. GE TV não integra a grade da partida: o link do YouTube é de aquecimento/pré-jogo, não do jogo completo."
   },
-  "atualizado_em": "2026-09-11T20:32:54-03:00"
+  "atualizado_em": "2026-09-11T20:50:26-03:00"
 }
