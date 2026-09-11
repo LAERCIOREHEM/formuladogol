@@ -1073,50 +1073,111 @@
       "youtube_removidos": [],
       "overlay_alterado": true,
       "resumo": "Confirmado para o Brasil: Palmeiras x São Paulo, pelo Campeonato Brasileiro Série A 2026 (fase única, 27ª rodada), será no sábado, 12/09/2026, às 18h30 (horário de Brasília), no Nubank Parque. A página oficial da CBF lista Premiere para a partida. Não há evidência consultada de outra emissora/plataforma oficial na grade, nem declaração explícita que permita afirmar exclusividade contratual."
+    },
+    {
+      "event_id": "401841232",
+      "jogo": "Coritiba x Athletico-PR",
+      "data_iso": "2026-09-11T21:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-09-11T19:39:15-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/jogo/11-09-2026/coritiba-atletico-pr.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/11/coritiba-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/653061",
+        "https://www.cbf.com.br/futebol-brasileiro/calendario",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/athletico-paranaense-x-mirassol/832067",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/com-grandes-jogos-26-rodada-do-brasileirao-movimentara-fim-de-semana",
+        "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/coritiba-vence-remo-e-agora-esta-em-setimo-lugar",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+        "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20052",
+        "https://www.cbf.com.br/futebol-brasileiro/times/copa-do-brasil/masculino/2026/20052"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/11/coritiba-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=Iz0UgMaICZA",
+          "scope": "pre_game",
+          "valid_for_match": false,
+          "reason": "O título informado identifica o conteúdo como “AQUECIMENTO AO VIVO”, com início programado às 20h, uma hora antes da partida. Trata-se de pré-jogo, não evidência de transmissão integral do Coritiba x Athletico-PR."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=Iz0UgMaICZA"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, rodada 27, nesta sexta-feira, 11/09/2026, às 21h (BRT), no Couto Pereira, em Curitiba. A transmissão integral é de Premiere e SporTV. A CBF lista ambos para o jogo; o ge também confirma SporTV e Premiere e informa que sua cobertura própria é apenas em Tempo Real."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841234",
-    "jogo": "Palmeiras x São Paulo",
-    "data_iso": "2026-09-12T18:30:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-11T18:35:57-03:00",
+    "event_id": "401841232",
+    "jogo": "Coritiba x Athletico-PR",
+    "data_iso": "2026-09-11T21:00:00-03:00",
+    "checkpoint": -90,
+    "executado_em": "2026-09-11T19:39:15-03:00",
     "chamada_openai": true,
     "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
-      "Premiere"
+      "Premiere",
+      "SporTV"
     ],
     "status": "confirmado",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/ajuda",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/05/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-26a-rodada.ghtml",
-      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/07/21/palmeiras-vive-nova-maratona-depois-da-copa-e-pode-ter-ate-18-jogos-em-dois-meses.ghtml",
-      "https://ge.globo.com/futebol/times/palmeiras/noticia/2026/09/03/briga-acirrada-compare-e-simule-jogos-de-palmeiras-e-flamengo-na-disputa-pelo-titulo-brasileiro.ghtml",
-      "https://ge.globo.com/google/amp/futebol/times/palmeiras/noticia/2026/09/11/palmeiras-faz-analises-para-avaliar-desgaste-e-prepara-mudancas-contra-sao-paulo.ghtml",
-      "https://ge.globo.com/google/amp/rj/futebol/brasileirao-serie-a/noticia/2026/09/06/botafogo-x-palmeiras-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/sp/futebol/brasileirao-serie-a/noticia/2026/05/02/palmeiras-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/futebol/campeonato-paulista/noticia/2026/01/24/palmeiras-x-sao-paulo-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/tem-esporte/futebol/brasileirao-serie-a/noticia/2026/08/24/cbf-altera-horario-do-jogo-entre-mirassol-e-palmeiras.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/palmeiras-x-sao-paulo/832154",
-      "https://www.youtube.com/watch?v=M-zo8R6noxE",
-      "https://www.youtube.com/watch?v=XJvxi5OUtts"
+      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/jogo/11-09-2026/coritiba-atletico-pr.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/11/coritiba-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/653061",
+      "https://www.cbf.com.br/futebol-brasileiro/calendario",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/athletico-paranaense-x-mirassol/832067",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/com-grandes-jogos-26-rodada-do-brasileirao-movimentara-fim-de-semana",
+      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/coritiba-vence-remo-e-agora-esta-em-setimo-lugar",
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
+      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20052",
+      "https://www.cbf.com.br/futebol-brasileiro/times/copa-do-brasil/masculino/2026/20052"
     ],
     "canais_depois": [
-      "Premiere"
+      "Premiere",
+      "SporTV"
     ],
     "exclusivo": false,
     "confianca": 0.99,
     "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/palmeiras-x-sao-paulo/832154",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/09/11/coritiba-x-athletico-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
     ],
-    "youtube": [],
-    "youtube_removidos": [],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=Iz0UgMaICZA",
+        "scope": "pre_game",
+        "valid_for_match": false,
+        "reason": "O título informado identifica o conteúdo como “AQUECIMENTO AO VIVO”, com início programado às 20h, uma hora antes da partida. Trata-se de pré-jogo, não evidência de transmissão integral do Coritiba x Athletico-PR."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=Iz0UgMaICZA"
+    ],
     "overlay_alterado": true,
-    "resumo": "Confirmado para o Brasil: Palmeiras x São Paulo, pelo Campeonato Brasileiro Série A 2026 (fase única, 27ª rodada), será no sábado, 12/09/2026, às 18h30 (horário de Brasília), no Nubank Parque. A página oficial da CBF lista Premiere para a partida. Não há evidência consultada de outra emissora/plataforma oficial na grade, nem declaração explícita que permita afirmar exclusividade contratual."
+    "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, rodada 27, nesta sexta-feira, 11/09/2026, às 21h (BRT), no Couto Pereira, em Curitiba. A transmissão integral é de Premiere e SporTV. A CBF lista ambos para o jogo; o ge também confirma SporTV e Premiere e informa que sua cobertura própria é apenas em Tempo Real."
   },
-  "atualizado_em": "2026-09-11T18:35:57-03:00"
+  "atualizado_em": "2026-09-11T19:39:15-03:00"
 }
