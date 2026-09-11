@@ -2,12 +2,12 @@
   "schema_version": 2,
   "projeto": "AF-Previsão Continental",
   "etapa": "Execução 2.5 — coleta independente e incremental das competições que alteram vagas",
-  "gerado_em": "2026-09-10T18:04:19-03:00",
+  "gerado_em": "2026-09-11T00:11:24-03:00",
   "status": "ok",
   "coleta_confiavel": true,
   "mudanca_esportiva": true,
-  "hash_estado_antes": "cb7456494ed9c266939775f48d6e0b55bebc198e97f856972594519c6be155c5",
-  "hash_estado_depois": "18b6a952362df07a52ee2e7bd234a2b232b82c9bb32e946166c8c3ed0334b799",
+  "hash_estado_antes": "18b6a952362df07a52ee2e7bd234a2b232b82c9bb32e946166c8c3ed0334b799",
+  "hash_estado_depois": "ab1f0c322c75bf2d1f663d9dc01bb6429c5273fa8df497473dbfb65d2c82aa2c",
   "fonte": "ESPN",
   "temporada": 2026,
   "competicoes": [
@@ -15,7 +15,7 @@
       "competicao": "copa_do_brasil",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/copa-do-brasil.json",
-      "gerado_em": "2026-09-10T18:04:18-03:00",
+      "gerado_em": "2026-09-11T00:11:23-03:00",
       "cache_efetivo_minutos": 45,
       "eventos": 155,
       "finalizados": 150,
@@ -34,8 +34,8 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-08-20T00:00:00-03:00",
-        "janela_fim": "2027-01-08T23:59:59-03:00",
+        "janela_inicio": "2026-08-21T00:00:00-03:00",
+        "janela_fim": "2027-01-09T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-09-05T05:11:23-03:00",
         "ajustes_editoriais_aplicados": 0
@@ -45,17 +45,17 @@
       "competicao": "libertadores",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/libertadores.json",
-      "gerado_em": "2026-09-10T18:04:18-03:00",
-      "cache_efetivo_minutos": 0,
+      "gerado_em": "2026-09-11T00:11:24-03:00",
+      "cache_efetivo_minutos": 5,
       "eventos": 155,
-      "finalizados": 145,
-      "pendentes": 10,
+      "finalizados": 146,
+      "pendentes": 9,
       "fase_atual": {
         "status": "em_andamento",
         "ordem": 700,
         "nome": "Quartas de final",
         "eventos": 8,
-        "eventos_pendentes": 5
+        "eventos_pendentes": 4
       },
       "summary_pendentes_vencidos": {
         "consultados": 0,
@@ -64,8 +64,8 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-08-20T00:00:00-03:00",
-        "janela_fim": "2027-01-08T23:59:59-03:00",
+        "janela_inicio": "2026-08-21T00:00:00-03:00",
+        "janela_fim": "2027-01-09T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-09-06T05:12:17-03:00",
         "ajustes_editoriais_aplicados": 7
@@ -75,17 +75,17 @@
       "competicao": "sul_americana",
       "status": "atualizado",
       "arquivo": "dados-br/competicoes-af-previsao/sul-americana.json",
-      "gerado_em": "2026-09-10T18:04:19-03:00",
-      "cache_efetivo_minutos": 0,
+      "gerado_em": "2026-09-11T00:11:24-03:00",
+      "cache_efetivo_minutos": 5,
       "eventos": 152,
-      "finalizados": 147,
-      "pendentes": 5,
+      "finalizados": 148,
+      "pendentes": 4,
       "fase_atual": {
         "status": "em_andamento",
         "ordem": 700,
         "nome": "Quartas de final",
         "eventos": 8,
-        "eventos_pendentes": 5
+        "eventos_pendentes": 4
       },
       "summary_pendentes_vencidos": {
         "consultados": 0,
@@ -94,8 +94,8 @@
       },
       "coleta": {
         "modo": "incremental",
-        "janela_inicio": "2026-08-20T00:00:00-03:00",
-        "janela_fim": "2027-01-08T23:59:59-03:00",
+        "janela_inicio": "2026-08-21T00:00:00-03:00",
+        "janela_fim": "2027-01-09T23:59:59-03:00",
         "requisicoes": 4,
         "ultima_completa_em": "2026-09-05T05:11:25-03:00",
         "ajustes_editoriais_aplicados": 0

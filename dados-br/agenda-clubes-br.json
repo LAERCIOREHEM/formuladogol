@@ -3,9 +3,9 @@
   "projeto": "Fórmula do Gol",
   "tipo": "agenda_clubes_brasileirao",
   "descricao": "Agenda do Brasileirão e dos clubes da Série A 2026 na Copa do Brasil, Libertadores e Sul-Americana.",
-  "gerado_em": "2026-09-10T18:04:19-03:00",
+  "gerado_em": "2026-09-11T00:11:24-03:00",
   "periodo": {
-    "inicio": "2026-09-10T00:00:00-03:00",
+    "inicio": "2026-09-11T00:00:00-03:00",
     "fim": "2026-10-31T23:59:59.999999-03:00",
     "regra": "de hoje até o último dia do mês seguinte"
   },
@@ -15,58 +15,14 @@
     "probabilidades": "disponíveis apenas para partidas do Brasileirão com saída AF-Previsão publicada"
   },
   "resumo": {
-    "total_jogos": 39,
+    "total_jogos": 38,
     "por_competicao": {
-      "libertadores": 5,
       "brasileirao": 31,
+      "libertadores": 4,
       "sul_americana": 3
     }
   },
   "jogos": [
-    {
-      "event_id": "401912543",
-      "competicao_chave": "libertadores",
-      "competicao_nome": "CONMEBOL Libertadores",
-      "competicao_nome_curto": "Libertadores",
-      "espn_league": "conmebol.libertadores",
-      "data_iso": "2026-09-10T21:30:00-03:00",
-      "estado": "pre",
-      "concluido": false,
-      "status": "Qui., Setembro 10º at 8:30 PM EDT",
-      "rodada": 0,
-      "fase": "Quartas de final",
-      "perna": 1,
-      "confronto_id": "17086-819",
-      "partida_numero": 1,
-      "partidas_total": 2,
-      "agregado_mandante": 0,
-      "agregado_visitante": 0,
-      "agregado_disponivel": true,
-      "estadio": "Olímpico Atahualpa",
-      "mandante": {
-        "espn_id": "17086",
-        "nome": "Independiente del Valle",
-        "sigla": "IDV",
-        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/17086.png",
-        "pais": "ECU",
-        "serie_a_2026": false
-      },
-      "visitante": {
-        "espn_id": "819",
-        "nome": "Flamengo",
-        "sigla": "FLA",
-        "escudo": "https://a.espncdn.com/i/teamlogos/soccer/500/819.png",
-        "pais": "",
-        "serie_a_2026": true
-      },
-      "placar_mandante": 0,
-      "placar_visitante": 0,
-      "adiado": false,
-      "data_definir": false,
-      "possui_clube_serie_a_2026": true,
-      "probabilidades_disponiveis": false,
-      "fonte": "dados-br/competicoes-af-previsao/libertadores.json"
-    },
     {
       "event_id": "401841232",
       "competicao_chave": "brasileirao",
@@ -104,8 +60,8 @@
       "possui_clube_serie_a_2026": true,
       "probabilidades_disponiveis": true,
       "fonte": "jogos.json",
-      "fonte_calendario": "CBF oficial — agenda de credenciamento",
-      "origem_calendario": "https://credencial.cbf.com.br/competicoes/listar/42/1/",
+      "fonte_calendario": "ESPN",
+      "origem_calendario": "",
       "data_fonte_anterior": ""
     },
     {
@@ -798,7 +754,7 @@
       "confronto_id": "17086-819",
       "partida_numero": 2,
       "partidas_total": 2,
-      "agregado_mandante": 0,
+      "agregado_mandante": 2,
       "agregado_visitante": 0,
       "agregado_disponivel": true,
       "estadio": "Maracanã",
