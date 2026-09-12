@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "data_brt": "2026-09-08",
-  "executado_em": "2026-09-08T12:18:28-03:00",
+  "data_brt": "2026-09-12",
+  "executado_em": "2026-09-12T11:22:17-03:00",
   "status": "atencao",
-  "resumo": "Foram encontradas fontes diretas para complementar as duas pendências críticas de transmissão. Não há pendências de público nem de melhores momentos, e não foram identificados problemas em placares, classificação, estatísticas, cartões, gols ou cálculos.",
+  "resumo": "Nenhuma correção automática proposta. As duas pendências de transmissão referem-se a jogos futuros em 15/09/2026 e não foi localizada, em fonte permitida, declaração direta e inequívoca dos canais.",
   "triagem": {
-    "data_hora_brt": "2026-09-08T12:18:28-03:00",
+    "data_hora_brt": "2026-09-12T11:22:17-03:00",
     "saude": {
       "status_deterministico": "atencao",
       "criticos": [],
       "avisos": [
-        "3 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
+        "2 fonte(s) de transmissão falharam, sem perda crítica de cobertura",
         "2 transmissão(ões) ainda elegíveis para complementação"
       ],
       "indicadores": {
@@ -19,32 +19,32 @@
         "detalhes_inconsistencias": 0,
         "detalhes_falhas": 0,
         "jogos_sem_estatisticas": 0,
-        "transmissoes_criticas": 2,
+        "transmissoes_criticas": 0,
         "publicos_antigos_sem_dado": 0,
         "melhores_momentos_mais_48h": 0,
-        "ultimo_sucesso_horas": 7.0
+        "ultimo_sucesso_horas": 6.1
       }
     },
     "pendencias": {
       "publicos": [],
       "transmissoes": [
         {
-          "event_id": "401913960",
+          "event_id": "401913959",
           "rodada": 0,
-          "data_iso": "2026-09-08T19:00:00-03:00",
+          "data_iso": "2026-09-15T19:00:00-03:00",
           "mandante": "",
           "visitante": "",
-          "nivel": "critico",
-          "horas_ate_jogo": 6.7
+          "nivel": "aviso",
+          "horas_ate_jogo": 79.6
         },
         {
-          "event_id": "401912542",
+          "event_id": "401912524",
           "rodada": 0,
-          "data_iso": "2026-09-08T21:30:00-03:00",
+          "data_iso": "2026-09-15T21:30:00-03:00",
           "mandante": "",
           "visitante": "",
-          "nivel": "critico",
-          "horas_ate_jogo": 9.2
+          "nivel": "aviso",
+          "horas_ate_jogo": 82.1
         }
       ],
       "melhores_momentos_apos_24h": []
@@ -78,113 +78,48 @@
       {
         "type": "search",
         "queries": [
-          "401913960 OR 401912542 transmissão 8 setembro 2026 futebol"
+          "\"401913959\" OR \"401912524\" transmissão"
         ]
       }
     ],
-    "fontes_web": [
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/08/14/cbf-divulga-tabela-detalhada-das-rodadas-25-e-26-da-serie-a-do-brasileirao.ghtml",
-      "https://jc.uol.com.br/blog-do-torcedor/onde-assistir/2026/09/08/qual-jogo-da-copa-passa-no-sbt-hoje-08-09-veja-horario-e-onde-assistir.html",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2026/fortaleza-saf-x-avai/833146",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/cbf-detalha-rodadas-27-a-30-do-brasileirao-betano",
-      "https://www.itatiaia.com.br/esportes/agenda",
-      "https://www.itatiaia.com.br/esportes/futebol/futebol-internacional/copa-sul-americana/copa-sul-americana-datas-horarios-e-onde-assistir-os-confrontos-das-quartas-de-final",
-      "https://www.uol.com.br/esporte/onde-assistir",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/08/fluminense-x-platense-horario-e-onde-assistir-ao-jogo-da-libertadores.amp.htm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/08/fluminense-x-platense-horario-e-onde-assistir-ao-jogo-da-libertadores.ghtm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/08/jogo-do-vasco-hoje-pela-sul-americana-que-horas-comeca-e-onde-assistir.amp.htm",
-      "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/08/real-madrid-x-internazionale-horario-e-onde-assistir-ao-jogo-da-liga-dos-campeoes.amp.htm",
-      "https://www.uol.com.br/play/colunas/uol-play/2026/09/08/champions-league-2026-confira-os-jogos-que-agitam-a-primeira-rodada.htm"
-    ]
+    "fontes_web": []
   },
   "resultado_ia": {
     "status_geral": "atencao",
-    "resumo": "Foram encontradas fontes diretas para complementar as duas pendências críticas de transmissão. Não há pendências de público nem de melhores momentos, e não foram identificados problemas em placares, classificação, estatísticas, cartões, gols ou cálculos.",
+    "resumo": "Nenhuma correção automática proposta. As duas pendências de transmissão referem-se a jogos futuros em 15/09/2026 e não foi localizada, em fonte permitida, declaração direta e inequívoca dos canais.",
     "problemas": [
       {
         "categoria": "transmissao",
-        "severidade": "info",
-        "mensagem": "A pendência de transmissão do evento foi complementada por fonte jornalística que declara diretamente os canais da partida no horário correspondente.",
-        "event_id": "401913960",
+        "severidade": "atencao",
+        "mensagem": "Há 2 transmissões elegíveis para complementação, mas sem evidência direta de canal disponível nas fontes permitidas para os event_id pendentes.",
+        "event_id": "401913959",
         "requer_intervencao": false
       },
       {
         "categoria": "transmissao",
-        "severidade": "info",
-        "mensagem": "A pendência de transmissão do evento foi complementada por fonte jornalística que declara diretamente os canais da partida no horário correspondente.",
-        "event_id": "401912542",
+        "severidade": "atencao",
+        "mensagem": "Há 2 transmissões elegíveis para complementação, mas sem evidência direta de canal disponível nas fontes permitidas para os event_id pendentes.",
+        "event_id": "401912524",
         "requer_intervencao": false
       },
       {
         "categoria": "fonte",
-        "severidade": "atencao",
-        "mensagem": "As falhas isoladas de três fontes de transmissão não configuram incidente crítico, pois há cobertura factual suficiente para as duas pendências elegíveis.",
+        "severidade": "info",
+        "mensagem": "Duas fontes de transmissão falharam, sem perda crítica de cobertura; os dados finais permanecem íntegros.",
         "event_id": "",
         "requer_intervencao": false
       }
     ],
     "correcoes_publico": [],
-    "correcoes_transmissao": [
-      {
-        "event_id": "401913960",
-        "canais": [
-          "Paramount+"
-        ],
-        "fonte_url": "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/08/jogo-do-vasco-hoje-pela-sul-americana-que-horas-comeca-e-onde-assistir.amp.htm",
-        "confianca": 0.98,
-        "justificativa": "A fonte declara diretamente que Santa Fe x Vasco, em 08/09/2026 às 19h, terá transmissão do Paramount+."
-      },
-      {
-        "event_id": "401912542",
-        "canais": [
-          "SBT",
-          "ESPN",
-          "Disney+"
-        ],
-        "fonte_url": "https://www.itatiaia.com.br/esportes/futebol/futebol-internacional/copa-sul-americana/copa-sul-americana-datas-horarios-e-onde-assistir-os-confrontos-das-quartas-de-final/",
-        "confianca": 0.98,
-        "justificativa": "A fonte declara diretamente que Boca Juniors x São Paulo, em 08/09/2026 às 21h30, terá transmissão de SBT, ESPN e Disney+."
-      }
-    ],
+    "correcoes_transmissao": [],
     "melhores_momentos_pendentes": []
   },
   "correcoes": {
     "publicos_aceitos": [],
-    "transmissoes_aceitas": [
-      {
-        "event_id": "401913960",
-        "canais": [
-          "Paramount+"
-        ],
-        "fonte_url": "https://www.uol.com.br/esporte/ultimas-noticias/2026/09/08/jogo-do-vasco-hoje-pela-sul-americana-que-horas-comeca-e-onde-assistir.amp.htm",
-        "confianca": 0.98,
-        "justificativa": "A fonte declara diretamente que Santa Fe x Vasco, em 08/09/2026 às 19h, terá transmissão do Paramount+."
-      }
-    ],
-    "rejeitadas": [
-      {
-        "tipo": "transmissao",
-        "event_id": "401912542",
-        "motivos": [
-          "canal fora da lista permitida"
-        ],
-        "proposta": {
-          "event_id": "401912542",
-          "canais": [
-            "SBT",
-            "ESPN",
-            "Disney+"
-          ],
-          "fonte_url": "https://www.itatiaia.com.br/esportes/futebol/futebol-internacional/copa-sul-americana/copa-sul-americana-datas-horarios-e-onde-assistir-os-confrontos-das-quartas-de-final/",
-          "confianca": 0.98,
-          "justificativa": "A fonte declara diretamente que Boca Juniors x São Paulo, em 08/09/2026 às 21h30, terá transmissão de SBT, ESPN e Disney+."
-        }
-      }
-    ],
+    "transmissoes_aceitas": [],
+    "rejeitadas": [],
     "publicos_aplicados": [],
-    "transmissoes_aplicadas": [
-      "401913960"
-    ],
+    "transmissoes_aplicadas": [],
     "editoriais_aplicados": []
   },
   "criticos_nao_resolvidos": [],
@@ -612,6 +547,19 @@
       "web_searches": 1,
       "publicos_aplicados": 0,
       "transmissoes_aplicadas": 1,
+      "editoriais_aplicados": [],
+      "criticos": [],
+      "email_enviado": false
+    },
+    {
+      "data_brt": "2026-09-12",
+      "executado_em": "2026-09-12T11:22:17-03:00",
+      "status": "atencao",
+      "resumo": "Nenhuma correção automática proposta. As duas pendências de transmissão referem-se a jogos futuros em 15/09/2026 e não foi localizada, em fonte permitida, declaração direta e inequívoca dos canais.",
+      "chamadas_openai": 1,
+      "web_searches": 1,
+      "publicos_aplicados": 0,
+      "transmissoes_aplicadas": 0,
       "editoriais_aplicados": [],
       "criticos": [],
       "email_enviado": false
