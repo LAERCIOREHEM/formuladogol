@@ -1351,20 +1351,95 @@
         "Premiere"
       ],
       "status": "sem_chamada"
+    },
+    {
+      "event_id": "401841231",
+      "jogo": "Atlético-MG x Fluminense",
+      "data_iso": "2026-09-12T16:00:00-03:00",
+      "checkpoint": -90,
+      "executado_em": "2026-09-12T14:39:16-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "Premiere",
+        "Globo"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://credencial.cbf.com.br/competicoes/listar/42/1",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+        "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/09/12/atletico-mg-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/12-09-2026/atletico-mg-fluminense.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://globoplay.globo.com/v/12950806",
+        "https://globoplay.globo.com/v/14450455",
+        "https://globoplay.globo.com/v/2199616",
+        "https://globoplay.globo.com/v/4185691",
+        "https://globoplay.globo.com/v/4428017",
+        "https://globoplay.globo.com/v/9860395",
+        "https://www.espn.com.br/futebol/time/calendario/_/id/7632/liga/BRA.1"
+      ],
+      "canais_depois": [
+        "Premiere"
+      ],
+      "exclusivo": true,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/09/12/atletico-mg-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+        "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/12-09-2026/atletico-mg-fluminense.ghtml",
+        "https://credencial.cbf.com.br/competicoes/listar/42/1"
+      ],
+      "youtube": [],
+      "youtube_removidos": [],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Atlético-MG x Fluminense, Brasileirão Série A (27ª rodada), sábado, 12/09/2026, às 16h (horário de Brasília), na Arena MRV. A transmissão integral oficial indicada é exclusiva do Premiere. O ge fará cobertura em Tempo Real, o que não configura transmissão de vídeo do jogo; não há evidência atual para Globo ou GE TV nesta partida."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841234",
-    "jogo": "Palmeiras x São Paulo",
-    "data_iso": "2026-09-12T18:30:00-03:00",
-    "checkpoint": -360,
-    "executado_em": "2026-09-12T12:33:22-03:00",
-    "chamada_openai": false,
-    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+    "event_id": "401841231",
+    "jogo": "Atlético-MG x Fluminense",
+    "data_iso": "2026-09-12T16:00:00-03:00",
+    "checkpoint": -90,
+    "executado_em": "2026-09-12T14:39:16-03:00",
+    "chamada_openai": true,
+    "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
+      "Premiere",
+      "Globo"
+    ],
+    "status": "corrigido",
+    "modelo": "gpt-5.6-terra",
+    "fontes_web": [
+      "https://credencial.cbf.com.br/competicoes/listar/42/1",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+      "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/09/12/atletico-mg-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/12-09-2026/atletico-mg-fluminense.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://globoplay.globo.com/v/12950806",
+      "https://globoplay.globo.com/v/14450455",
+      "https://globoplay.globo.com/v/2199616",
+      "https://globoplay.globo.com/v/4185691",
+      "https://globoplay.globo.com/v/4428017",
+      "https://globoplay.globo.com/v/9860395",
+      "https://www.espn.com.br/futebol/time/calendario/_/id/7632/liga/BRA.1"
+    ],
+    "canais_depois": [
       "Premiere"
     ],
-    "status": "sem_chamada"
+    "exclusivo": true,
+    "confianca": 0.99,
+    "fontes_aceitas": [
+      "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/09/12/atletico-mg-x-fluminense-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/jogo/12-09-2026/atletico-mg-fluminense.ghtml",
+      "https://credencial.cbf.com.br/competicoes/listar/42/1"
+    ],
+    "youtube": [],
+    "youtube_removidos": [],
+    "overlay_alterado": true,
+    "resumo": "Confirmado para o Brasil: Atlético-MG x Fluminense, Brasileirão Série A (27ª rodada), sábado, 12/09/2026, às 16h (horário de Brasília), na Arena MRV. A transmissão integral oficial indicada é exclusiva do Premiere. O ge fará cobertura em Tempo Real, o que não configura transmissão de vídeo do jogo; não há evidência atual para Globo ou GE TV nesta partida."
   },
-  "atualizado_em": "2026-09-12T12:33:22-03:00"
+  "atualizado_em": "2026-09-12T14:39:16-03:00"
 }
