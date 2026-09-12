@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 37,
+    "jogos_na_janela": 36,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 5,
+    "descobertas_antecipadas": 7,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 48,
+    "candidatos_oficiais_encontrados": 44,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
-    "transmissoes_publicadas": 6,
-    "sem_transmissao": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
+    "transmissoes_publicadas": 7,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -83,6 +83,18 @@
       "descoberta_antecipada": true
     },
     {
+      "event_id": "401841234",
+      "rodada": 27,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Palmeiras x São Paulo",
+      "data_iso": "2026-09-12T18:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
+      "manual": false,
+      "descoberta_antecipada": false
+    },
+    {
       "event_id": "401841233",
       "rodada": 27,
       "competicao_chave": "brasileirao",
@@ -108,7 +120,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841245",
@@ -145,6 +157,20 @@
       "competicao_nome": "Brasileirão",
       "jogo": "Internacional x Corinthians",
       "data_iso": "2026-10-07T19:30:00-03:00",
+      "principal": "CazéTV",
+      "fontes_encontradas": [
+        "CazéTV"
+      ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841262",
+      "rodada": 30,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Vasco da Gama x Remo",
+      "data_iso": "2026-10-10T17:00:00-03:00",
       "principal": "CazéTV",
       "fontes_encontradas": [
         "CazéTV"
@@ -225,6 +251,22 @@
       "video_id": "7uq9nMdsVFU",
       "url": "https://www.youtube.com/watch?v=7uq9nMdsVFU",
       "titulo": "AO VIVO: INTERNACIONAL X CORINTHIANS | BRASILEIRÃO 2026 | 29ª RODADA",
+      "status": "upcoming",
+      "confianca": 0.95,
+      "motivos": [
+        "os dois clubes aparecem no título",
+        "identifica Brasileirão/competição",
+        "identifica transmissão ao vivo",
+        "horário compatível (0 min de diferença)"
+      ]
+    },
+    {
+      "event_id": "401841262",
+      "jogo": "Vasco da Gama x Remo",
+      "fonte": "cazetv",
+      "video_id": "90fW7TbZ9sg",
+      "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg",
+      "titulo": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
       "status": "upcoming",
       "confianca": 0.95,
       "motivos": [
@@ -444,16 +486,6 @@
       "motivo": "conteúdo rejeitado: pre jogo"
     },
     {
-      "video_id": "0y8X_7dOaTY",
-      "url": "https://www.youtube.com/watch?v=0y8X_7dOaTY",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): PARIS FC X LYON | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-12T15:40:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "0yxdrt1C_kM",
       "url": "https://www.youtube.com/watch?v=0yxdrt1C_kM",
       "fonte": "cazetv",
@@ -481,36 +513,6 @@
       "titulo": "AO VIVO: RB LEIPZIG X HAMBURGO | BUNDESLIGA 26/27 | 3ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-13T09:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "6gIOGJMvp4s",
-      "url": "https://www.youtube.com/watch?v=6gIOGJMvp4s",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: REAL MADRID X RAYO VALLECANO | LALIGA 26/27 | 5ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-12T14:50:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "90fW7TbZ9sg",
-      "url": "https://www.youtube.com/watch?v=90fW7TbZ9sg",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: VASCO X REMO | BRASILEIRÃO 2026 | 30ª RODADA",
-      "status": "upcoming",
-      "inicio_programado": "2026-10-10T17:00:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "91pX2Qg0KcE",
-      "url": "https://www.youtube.com/watch?v=91pX2Qg0KcE",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): FC LORIENT X TOULOUSE | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-12T15:40:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -584,6 +586,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "Xut5iFQoL5U",
+      "url": "https://www.youtube.com/watch?v=Xut5iFQoL5U",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: ALEMANHA X ESPANHA | COPA DO MUNDO DE BASQUETE | DISPUTA DE 3º LUGAR",
+      "status": "upcoming",
+      "inicio_programado": "2026-09-13T11:15:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "Y3hJeYLO4dI",
       "url": "https://www.youtube.com/watch?v=Y3hJeYLO4dI",
       "fonte": "cazetv",
@@ -591,16 +603,6 @@
       "titulo": "AO VIVO (SOM AMBIENTE): LILLE X ESTAC TROYES | LIGUE 1 26/27 | 4ª RODADA",
       "status": "upcoming",
       "inicio_programado": "2026-09-13T09:55:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "YZMJixyygbw",
-      "url": "https://www.youtube.com/watch?v=YZMJixyygbw",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): LE HAVRE X ANGERS | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-12T15:40:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -654,16 +656,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "qf9E5VgbE8A",
-      "url": "https://www.youtube.com/watch?v=qf9E5VgbE8A",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO (SOM AMBIENTE): AUXERRE X NICE | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "live",
-      "inicio_programado": "2026-09-12T15:40:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "yeYmlsq10Aw",
       "url": "https://www.youtube.com/watch?v=yeYmlsq10Aw",
       "fonte": "cazetv",
@@ -674,8 +666,24 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
-  "sem_transmissao": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841234",
+      "jogo": "Palmeiras x São Paulo",
+      "motivo": "grade exclusiva confirmada sem GE TV/SBT/CazéTV"
+    }
+  ],
+  "sem_transmissao": [
+    {
+      "event_id": "401841234",
+      "rodada": 27,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Palmeiras x São Paulo",
+      "data_iso": "2026-09-12T18:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 87,
@@ -686,5 +694,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-12T17:32:37-03:00"
+  "atualizado_em": "2026-09-12T18:15:43-03:00"
 }
