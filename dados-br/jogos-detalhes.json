@@ -1,10 +1,10 @@
 {
   "_comentario": "Gerado por scripts/buscar_detalhes_jogos_brasileirao.py. Gols e cartões são deduplicados e validados contra placar/boxscore.",
-  "gerado_em": "2026-09-11T23:32:29.468737-03:00",
+  "gerado_em": "2026-09-12T04:20:48.443539-03:00",
   "fonte": "ESPN summary + scoreboard",
   "total_jogos": 257,
   "total_com_estatisticas": 257,
-  "total_com_publico": 256,
+  "total_com_publico": 257,
   "total_com_eventos": 257,
   "total_com_jogadores": 257,
   "total_eventos_validados": 257,
@@ -20,9 +20,9 @@
       "placar_mandante": 3,
       "placar_visitante": 3,
       "estadio": "Couto Pereira",
-      "publico": null,
-      "publico_tipo": "",
-      "publico_fonte": "",
+      "publico": 26243,
+      "publico_tipo": "presente",
+      "publico_fonte": "https://itatiaia.com.br/esportes/futebol/futebol-nacional/brasileirao-serie-a/com-um-a-menos-coritiba-busca-empate-historico-contra-athletico-pr-pelo-brasileiro",
       "arbitro": "Paulo Cezar Zanovelli Da Silva",
       "stats": [
         {
@@ -637,7 +637,9 @@
       "origem_resultado": "",
       "motivo_resultado_manual": "",
       "preservado_de_execucao_anterior": false,
-      "atualizado_em": "2026-09-11T23:27:42.891243-03:00"
+      "atualizado_em": "2026-09-11T23:27:42.891243-03:00",
+      "renda": 1524470.5,
+      "dados_publico_fonte_adicional": "Camada de IA sobre reportagem do jogo"
     },
     "401841222": {
       "event_id": "401841222",
@@ -144882,5 +144884,5 @@
     }
   },
   "total_com_publico_pagante": 249,
-  "total_com_renda": 256
+  "total_com_renda": 257
 }
