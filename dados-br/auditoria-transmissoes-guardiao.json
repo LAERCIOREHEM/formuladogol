@@ -1207,40 +1207,111 @@
         "exclusive=true exige exatamente um canal/plataforma na grade completa"
       ],
       "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, 27ª rodada, nesta sexta-feira, 11/09/2026, às 21h (BRT), no Couto Pereira, Curitiba. A transmissão integral e exclusiva é de Premiere e SporTV. GE TV não integra a grade da partida: o link do YouTube é de aquecimento/pré-jogo, não do jogo completo."
+    },
+    {
+      "event_id": "401841233",
+      "jogo": "Santos x Cruzeiro",
+      "data_iso": "2026-09-12T21:00:00-03:00",
+      "checkpoint": -1440,
+      "executado_em": "2026-09-11T21:08:13-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "checkpoint de auditoria completa",
+      "canais_antes": [
+        "GE TV",
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "corrigido",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://ge.globo.com/agenda",
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+        "https://ge.globo.com/futebol/times/cruzeiro",
+        "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/03/22/cruzeiro-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+        "https://ge.globo.com/mg/triangulo-mineiro/futebol/futebol-feminino/brasileiro-feminino/noticia/2026/02/23/cruzeiro-x-santos-pelo-brasileirao-feminino-onde-assistir-ao-vivo-horario-e-mais.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+        "https://ge.globo.com/programas/segue-o-jogo",
+        "https://ge.globo.com/sp",
+        "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos",
+        "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/09/10/cuca-elogia-reforcos-do-santos-agradece-a-diretoria-e-planeja-usar-cebolinha-contra-o-cruzeiro.ghtml",
+        "https://ge.globo.com/video/recheado-de-ex-cruzeirenses-santos-enfrenta-kaio-jorge-e-gabigol-14159294.ghtml"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+        "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=-Nl3QPf55Zw",
+          "scope": "pre_game",
+          "valid_for_match": false,
+          "reason": "O título informado, “SANTOS X CRUZEIRO | AQUECIMENTO AO VIVO”, identifica conteúdo de aquecimento/pré-jogo, não transmissão integral. A lista atualizada do ge para esta partida aponta somente SporTV e Premiere como transmissão."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=-Nl3QPf55Zw"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado: Santos x Cruzeiro, Brasileirão 2026 (27ª rodada), será em sábado, 12 de setembro de 2026, às 21h (horário de Brasília), na Vila Belmiro. A transmissão integral no Brasil é de SporTV e Premiere. O link do YouTube informado é de aquecimento/pré-jogo e não comprova exibição integral da partida; portanto, GE TV não integra a grade da partida."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841232",
-    "jogo": "Coritiba x Athletico-PR",
-    "data_iso": "2026-09-11T21:00:00-03:00",
-    "checkpoint": -15,
-    "executado_em": "2026-09-11T20:50:26-03:00",
+    "event_id": "401841233",
+    "jogo": "Santos x Cruzeiro",
+    "data_iso": "2026-09-12T21:00:00-03:00",
+    "checkpoint": -1440,
+    "executado_em": "2026-09-11T21:08:13-03:00",
     "chamada_openai": true,
-    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+    "motivo_chamada": "checkpoint de auditoria completa",
     "canais_antes": [
+      "GE TV",
       "Premiere",
       "SporTV"
     ],
-    "status": "nao_resolvido",
+    "status": "corrigido",
     "modelo": "gpt-5.6-terra",
     "fontes_web": [
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
-      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/653061",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2025/307285/coritiba-saf-x-goias/829942",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/athletico-paranaense-x-chapecoense/831997",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-athletico-paranaense/832158",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/coritiba-saf-x-palmeiras/832077",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2025/568268/athletico-paranaense-x-vila-nova/829952",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-b/2025/647904/athletico-paranaense-x-vila-nova/829952",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/com-grandes-jogos-26-rodada-do-brasileirao-movimentara-fim-de-semana",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/campeonato-brasileiro-serie-a/a/coritiba-vence-remo-e-agora-esta-em-setimo-lugar",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/detalhes/campeonato-brasileiro-serie-a/coritiba-e-goias-rivalizam-pela-lideranca-da-serie-b-nesta-sexta",
-      "https://www.cbf.com.br/futebol-brasileiro/times/campeonato-brasileiro/serie-a/2026/20052"
+      "https://ge.globo.com/agenda",
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+      "https://ge.globo.com/futebol/times/cruzeiro",
+      "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/03/22/cruzeiro-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
+      "https://ge.globo.com/mg/triangulo-mineiro/futebol/futebol-feminino/brasileiro-feminino/noticia/2026/02/23/cruzeiro-x-santos-pelo-brasileirao-feminino-onde-assistir-ao-vivo-horario-e-mais.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
+      "https://ge.globo.com/programas/segue-o-jogo",
+      "https://ge.globo.com/sp",
+      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos",
+      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/09/10/cuca-elogia-reforcos-do-santos-agradece-a-diretoria-e-planeja-usar-cebolinha-contra-o-cruzeiro.ghtml",
+      "https://ge.globo.com/video/recheado-de-ex-cruzeirenses-santos-enfrenta-kaio-jorge-e-gabigol-14159294.ghtml"
     ],
-    "rejeicoes": [
-      "exclusive=true exige exatamente um canal/plataforma na grade completa"
+    "canais_depois": [
+      "Premiere",
+      "SporTV"
     ],
-    "resumo": "Confirmado para o Brasil: Coritiba x Athletico-PR, Brasileirão Série A 2026, fase única, 27ª rodada, nesta sexta-feira, 11/09/2026, às 21h (BRT), no Couto Pereira, Curitiba. A transmissão integral e exclusiva é de Premiere e SporTV. GE TV não integra a grade da partida: o link do YouTube é de aquecimento/pré-jogo, não do jogo completo."
+    "exclusivo": false,
+    "confianca": 0.99,
+    "fontes_aceitas": [
+      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
+      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
+    ],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=-Nl3QPf55Zw",
+        "scope": "pre_game",
+        "valid_for_match": false,
+        "reason": "O título informado, “SANTOS X CRUZEIRO | AQUECIMENTO AO VIVO”, identifica conteúdo de aquecimento/pré-jogo, não transmissão integral. A lista atualizada do ge para esta partida aponta somente SporTV e Premiere como transmissão."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=-Nl3QPf55Zw"
+    ],
+    "overlay_alterado": true,
+    "resumo": "Confirmado: Santos x Cruzeiro, Brasileirão 2026 (27ª rodada), será em sábado, 12 de setembro de 2026, às 21h (horário de Brasília), na Vila Belmiro. A transmissão integral no Brasil é de SporTV e Premiere. O link do YouTube informado é de aquecimento/pré-jogo e não comprova exibição integral da partida; portanto, GE TV não integra a grade da partida."
   },
-  "atualizado_em": "2026-09-11T20:50:26-03:00"
+  "atualizado_em": "2026-09-11T21:08:13-03:00"
 }
