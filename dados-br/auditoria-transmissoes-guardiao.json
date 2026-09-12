@@ -1259,59 +1259,35 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado: Santos x Cruzeiro, Brasileirão 2026 (27ª rodada), será em sábado, 12 de setembro de 2026, às 21h (horário de Brasília), na Vila Belmiro. A transmissão integral no Brasil é de SporTV e Premiere. O link do YouTube informado é de aquecimento/pré-jogo e não comprova exibição integral da partida; portanto, GE TV não integra a grade da partida."
+    },
+    {
+      "event_id": "401841231",
+      "jogo": "Atlético-MG x Fluminense",
+      "data_iso": "2026-09-12T16:00:00-03:00",
+      "checkpoint": -360,
+      "executado_em": "2026-09-12T10:02:41-03:00",
+      "chamada_openai": false,
+      "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+      "canais_antes": [
+        "Premiere",
+        "Globo"
+      ],
+      "status": "sem_chamada"
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841233",
-    "jogo": "Santos x Cruzeiro",
-    "data_iso": "2026-09-12T21:00:00-03:00",
-    "checkpoint": -1440,
-    "executado_em": "2026-09-11T21:08:13-03:00",
-    "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "event_id": "401841231",
+    "jogo": "Atlético-MG x Fluminense",
+    "data_iso": "2026-09-12T16:00:00-03:00",
+    "checkpoint": -360,
+    "executado_em": "2026-09-12T10:02:41-03:00",
+    "chamada_openai": false,
+    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
     "canais_antes": [
-      "GE TV",
       "Premiere",
-      "SporTV"
+      "Globo"
     ],
-    "status": "corrigido",
-    "modelo": "gpt-5.6-terra",
-    "fontes_web": [
-      "https://ge.globo.com/agenda",
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
-      "https://ge.globo.com/futebol/times/cruzeiro",
-      "https://ge.globo.com/google/amp/mg/futebol/brasileirao-serie-a/noticia/2026/03/22/cruzeiro-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/mg/triangulo-mineiro/futebol/futebol-feminino/brasileiro-feminino/noticia/2026/02/23/cruzeiro-x-santos-pelo-brasileirao-feminino-onde-assistir-ao-vivo-horario-e-mais.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml",
-      "https://ge.globo.com/programas/segue-o-jogo",
-      "https://ge.globo.com/sp",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/times/santos/noticia/2026/09/10/cuca-elogia-reforcos-do-santos-agradece-a-diretoria-e-planeja-usar-cebolinha-contra-o-cruzeiro.ghtml",
-      "https://ge.globo.com/video/recheado-de-ex-cruzeirenses-santos-enfrenta-kaio-jorge-e-gabigol-14159294.ghtml"
-    ],
-    "canais_depois": [
-      "Premiere",
-      "SporTV"
-    ],
-    "exclusivo": false,
-    "confianca": 0.99,
-    "fontes_aceitas": [
-      "https://ge.globo.com/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
-      "https://ge.globo.com/pr/futebol/brasileirao-serie-a/noticia/2026/08/31/cbf-detalha-datas-e-horarios-dos-jogos-das-rodadas-27-a-30-do-brasileirao-veja-a-tabela.ghtml"
-    ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=-Nl3QPf55Zw",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título informado, “SANTOS X CRUZEIRO | AQUECIMENTO AO VIVO”, identifica conteúdo de aquecimento/pré-jogo, não transmissão integral. A lista atualizada do ge para esta partida aponta somente SporTV e Premiere como transmissão."
-      }
-    ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=-Nl3QPf55Zw"
-    ],
-    "overlay_alterado": true,
-    "resumo": "Confirmado: Santos x Cruzeiro, Brasileirão 2026 (27ª rodada), será em sábado, 12 de setembro de 2026, às 21h (horário de Brasília), na Vila Belmiro. A transmissão integral no Brasil é de SporTV e Premiere. O link do YouTube informado é de aquecimento/pré-jogo e não comprova exibição integral da partida; portanto, GE TV não integra a grade da partida."
+    "status": "sem_chamada"
   },
-  "atualizado_em": "2026-09-11T21:08:13-03:00"
+  "atualizado_em": "2026-09-12T10:02:41-03:00"
 }
