@@ -2,7 +2,7 @@
   "schema_version": 1,
   "projeto": "AF-Previsão",
   "temporada": 2026,
-  "gerado_em": "2026-09-11T00:13:08-03:00",
+  "gerado_em": "2026-09-11T23:13:54-03:00",
   "status": "ok",
   "escopo_publico": {
     "inicio_historico_classificacao": "2026-07-17T22:05:00-03:00",
@@ -20,11 +20,11 @@
     "ultima_previsao_temporada": "2026-09-07T21:56:00-03:00"
   },
   "jogos": {
-    "jogos_avaliados": 59,
+    "jogos_avaliados": 60,
     "maior_probabilidade": {
-      "amostra": 59,
+      "amostra": 60,
       "confirmadas": 25,
-      "taxa_confirmacao_pct": 42.37
+      "taxa_confirmacao_pct": 41.67
     },
     "alta_confianca_80": {
       "amostra": 0,
@@ -58,20 +58,20 @@
           20,
           30
         ],
-        "amostra": 84,
-        "probabilidade_media_pct": 26.0752,
-        "frequencia_observada_pct": 29.7619,
-        "erro_absoluto_pp": 3.6867
+        "amostra": 85,
+        "probabilidade_media_pct": 26.0794,
+        "frequencia_observada_pct": 29.4118,
+        "erro_absoluto_pp": 3.3323
       },
       {
         "faixa_pct": [
           30,
           40
         ],
-        "amostra": 20,
-        "probabilidade_media_pct": 34.5282,
-        "frequencia_observada_pct": 40.0,
-        "erro_absoluto_pp": 5.4718
+        "amostra": 22,
+        "probabilidade_media_pct": 34.733,
+        "frequencia_observada_pct": 40.9091,
+        "erro_absoluto_pp": 6.1761
       },
       {
         "faixa_pct": [
@@ -115,8 +115,8 @@
       }
     ],
     "metricas_tecnicas": {
-      "brier_multiclasse_medio": 0.2053359,
-      "log_loss_medio": 1.02513934
+      "brier_multiclasse_medio": 0.20540855,
+      "log_loss_medio": 1.0252752
     },
     "por_rodada": [
       {
@@ -178,12 +178,22 @@
         "previsoes_fortes_60_confirmadas": 1,
         "taxa_confirmacao_pct": 53.85,
         "taxa_fortes_60_pct": 50.0
+      },
+      {
+        "rodada": 27,
+        "jogos_avaliados": 1,
+        "maior_probabilidade_avaliada": 1,
+        "maior_probabilidade_confirmada": 0,
+        "previsoes_fortes_60_total": 0,
+        "previsoes_fortes_60_confirmadas": 0,
+        "taxa_confirmacao_pct": 0.0,
+        "taxa_fortes_60_pct": null
       }
     ]
   },
   "classificacao": {
     "status": "em_acompanhamento",
-    "mensagem": "Campeonato em andamento: maior número de jogos por clube é 26/38.",
+    "mensagem": "Campeonato em andamento: maior número de jogos por clube é 27/38.",
     "faixa_80": {
       "status": "em_acompanhamento",
       "mensagem": "A cobertura da faixa de 80% será aferida contra posição e pontuação finais do Brasileirão 2026."
