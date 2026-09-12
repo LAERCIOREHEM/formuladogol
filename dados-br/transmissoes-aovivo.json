@@ -13,43 +13,6 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "jogos": {
-    "401841232": {
-      "event_id": "401841232",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "espn_league": "bra.1",
-      "mandante": "Coritiba",
-      "visitante": "Athletico-PR",
-      "data_iso": "2026-09-11T21:00:00-03:00",
-      "estadio": "Couto Pereira",
-      "origem": "automático",
-      "principal": {
-        "fonte": "getv",
-        "nome": "GE TV",
-        "video_id": "Iz0UgMaICZA",
-        "url": "https://www.youtube.com/watch?v=Iz0UgMaICZA",
-        "status": "live",
-        "inicio_programado": "2026-09-11T20:00:00-03:00",
-        "inicio_real": "2026-09-11T19:56:01-03:00",
-        "titulo": "CORITIBA X ATHLETICO-PR | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
-        "canal": "ge tv",
-        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
-        "thumbnail": "https://i.ytimg.com/vi/Iz0UgMaICZA/maxresdefault_live.jpg",
-        "confianca": 0.95,
-        "motivos": [
-          "os dois clubes aparecem no título",
-          "identifica Brasileirão/competição",
-          "identifica transmissão ao vivo",
-          "transmissão já está ao vivo",
-          "horário compatível (60 min de diferença)"
-        ],
-        "origem_busca": "streams-page",
-        "escopo": "partida",
-        "embeddable": true
-      },
-      "alternativas": []
-    },
     "401841228": {
       "event_id": "401841228",
       "rodada": 27,
@@ -83,6 +46,42 @@
         "origem_busca": "uploads",
         "escopo": "partida",
         "embeddable": false
+      },
+      "alternativas": []
+    },
+    "401841233": {
+      "event_id": "401841233",
+      "rodada": 27,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "espn_league": "bra.1",
+      "mandante": "Santos",
+      "visitante": "Cruzeiro",
+      "data_iso": "2026-09-12T21:00:00-03:00",
+      "estadio": "Estádio Vila Belmiro (Urbano Caldeira)",
+      "origem": "automático",
+      "principal": {
+        "fonte": "getv",
+        "nome": "GE TV",
+        "video_id": "-Nl3QPf55Zw",
+        "url": "https://www.youtube.com/watch?v=-Nl3QPf55Zw",
+        "status": "upcoming",
+        "inicio_programado": "2026-09-12T20:00:00-03:00",
+        "inicio_real": "",
+        "titulo": "SANTOS X CRUZEIRO | AQUECIMENTO AO VIVO | BRASILEIRÃO 2026 | #live | sportv",
+        "canal": "ge tv",
+        "channel_id": "UCgCKagVhzGnZcuP9bSMgMCg",
+        "thumbnail": "https://i.ytimg.com/vi/-Nl3QPf55Zw/maxresdefault_live.jpg",
+        "confianca": 0.9,
+        "motivos": [
+          "os dois clubes aparecem no título",
+          "identifica Brasileirão/competição",
+          "identifica transmissão ao vivo",
+          "horário compatível (60 min de diferença)"
+        ],
+        "origem_busca": "streams-page",
+        "escopo": "partida",
+        "embeddable": true
       },
       "alternativas": []
     },
@@ -231,5 +230,5 @@
       "alternativas": []
     }
   },
-  "atualizado_em": "2026-09-11T20:31:01-03:00"
+  "atualizado_em": "2026-09-11T21:11:06-03:00"
 }
