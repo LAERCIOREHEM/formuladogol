@@ -1893,59 +1893,33 @@
       ],
       "overlay_alterado": true,
       "resumo": "Confirmado: Santos x Cruzeiro, Campeonato Brasileiro Série A 2026, fase única, rodada 27, sábado, 12/09/2026, às 21h (BRT), na Vila Belmiro. A transmissão integral no Brasil é de Premiere e SporTV; não é exclusiva. A página oficial da CBF lista Premiere e Sportv, e o ge confirma que ambos transmitem ao vivo para todo o Brasil. O link da GE TV no dossiê é de aquecimento/pré-jogo, não da partida integral."
+    },
+    {
+      "event_id": "401841229",
+      "jogo": "Botafogo x Bragantino",
+      "data_iso": "2026-09-12T20:30:00-03:00",
+      "checkpoint": -15,
+      "executado_em": "2026-09-12T20:19:15-03:00",
+      "chamada_openai": false,
+      "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+      "canais_antes": [
+        "Prime Video"
+      ],
+      "status": "sem_chamada"
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841233",
-    "jogo": "Santos x Cruzeiro",
-    "data_iso": "2026-09-12T21:00:00-03:00",
-    "checkpoint": -90,
-    "executado_em": "2026-09-12T19:37:53-03:00",
-    "chamada_openai": true,
-    "motivo_chamada": "checkpoint de auditoria completa",
+    "event_id": "401841229",
+    "jogo": "Botafogo x Bragantino",
+    "data_iso": "2026-09-12T20:30:00-03:00",
+    "checkpoint": -15,
+    "executado_em": "2026-09-12T20:19:15-03:00",
+    "chamada_openai": false,
+    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
     "canais_antes": [
-      "Premiere",
-      "SporTV"
+      "Prime Video"
     ],
-    "status": "confirmado",
-    "modelo": "gpt-5.6-terra",
-    "fontes_web": [
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026",
-      "https://cbf-hml.cbf.com.br/futebol-brasileiro/tabelas/copa-do-brasil/masculino/2026/1999",
-      "https://credencial.cbf.com.br/competicoes/listar/42/1",
-      "https://ge.globo.com/futebol/copa-do-brasil/noticia/2026/06/22/oitavas-de-final-da-copa-do-brasil-2026-veja-datas-e-horarios.ghtml",
-      "https://ge.globo.com/google/amp/ba/futebol/brasileirao-serie-a/noticia/2026/09/11/brasileirao-2026-veja-onde-assistir-ao-vivo-aos-jogos-da-27a-rodada.ghtml",
-      "https://ge.globo.com/google/amp/mg/futebol/copa-do-brasil/noticia/2026/09/01/atletico-mg-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/google/amp/rs/futebol/copa-do-brasil/noticia/2026/08/11/quartas-da-copa-do-brasil-2026-veja-datas-e-horarios-dos-jogos.ghtml",
-      "https://ge.globo.com/mg/futebol/brasileirao-serie-a/noticia/2026/03/22/cruzeiro-x-santos-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/09/12/santos-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-cruzeiro/832153",
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/masculino/2026/santos-fc-x-palmeiras/835157",
-      "https://www.cbf.com.br/futebol-brasileiro/noticias/copa-brasil-masculino/a/galo-e-cruzeiro-decidem-vaga-na-semifinal-da-copa-betano-do-brasil-nesta-terca"
-    ],
-    "canais_depois": [
-      "Premiere",
-      "SporTV"
-    ],
-    "exclusivo": false,
-    "confianca": 0.99,
-    "fontes_aceitas": [
-      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-cruzeiro/832153",
-      "https://ge.globo.com/sp/santos-e-regiao/futebol/brasileirao-serie-a/noticia/2026/09/12/santos-x-cruzeiro-onde-assistir-ao-vivo-horario-e-escalacoes.ghtml"
-    ],
-    "youtube": [
-      {
-        "url": "https://www.youtube.com/watch?v=-Nl3QPf55Zw",
-        "scope": "pre_game",
-        "valid_for_match": false,
-        "reason": "O título informado no dossiê diz “AQUECIMENTO AO VIVO” e o início está marcado para 20h, uma hora antes do jogo das 21h. Trata-se de conteúdo de pré-jogo, sem evidência de transmissão integral da partida."
-      }
-    ],
-    "youtube_removidos": [
-      "https://www.youtube.com/watch?v=-Nl3QPf55Zw"
-    ],
-    "overlay_alterado": true,
-    "resumo": "Confirmado: Santos x Cruzeiro, Campeonato Brasileiro Série A 2026, fase única, rodada 27, sábado, 12/09/2026, às 21h (BRT), na Vila Belmiro. A transmissão integral no Brasil é de Premiere e SporTV; não é exclusiva. A página oficial da CBF lista Premiere e Sportv, e o ge confirma que ambos transmitem ao vivo para todo o Brasil. O link da GE TV no dossiê é de aquecimento/pré-jogo, não da partida integral."
+    "status": "sem_chamada"
   },
-  "atualizado_em": "2026-09-12T19:37:53-03:00"
+  "atualizado_em": "2026-09-12T20:19:15-03:00"
 }
