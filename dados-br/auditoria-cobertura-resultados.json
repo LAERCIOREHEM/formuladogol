@@ -1,15 +1,15 @@
 {
-  "atualizado_em": "2026-09-12T05:15:10-03:00",
+  "atualizado_em": "2026-09-12T18:12:55-03:00",
   "fonte": "auditoria local do site",
   "resumo": {
-    "jogos_resultados": 257,
+    "jogos_resultados": 259,
     "melhores_momentos_automaticos": 213,
     "melhores_momentos_manuais": 47,
     "jogos_com_melhores_momentos": 257,
-    "jogos_sem_melhores_momentos": 0,
-    "jogos_com_estatisticas": 257,
+    "jogos_sem_melhores_momentos": 2,
+    "jogos_com_estatisticas": 259,
     "jogos_sem_estatisticas": 0,
-    "percentual_video": 100.0,
+    "percentual_video": 99.2,
     "percentual_estatisticas": 100.0
   },
   "por_rodada": {
@@ -196,13 +196,34 @@
       "sem_estatisticas": 0
     },
     "27": {
-      "jogos": 1,
+      "jogos": 3,
       "com_video": 1,
-      "sem_video": 0,
-      "com_estatisticas": 1,
+      "sem_video": 2,
+      "com_estatisticas": 3,
       "sem_estatisticas": 0
     }
   },
-  "jogos_sem_melhores_momentos": [],
+  "jogos_sem_melhores_momentos": [
+    {
+      "event_id": "401841231",
+      "rodada": 27,
+      "mandante": "Atlético-MG",
+      "visitante": "Fluminense",
+      "placar_mandante": 3,
+      "placar_visitante": 1,
+      "data_iso": "2026-09-12T16:00",
+      "motivo": "sem melhores momentos vinculado"
+    },
+    {
+      "event_id": "401841236",
+      "rodada": 27,
+      "mandante": "Grêmio",
+      "visitante": "Vasco da Gama",
+      "placar_mandante": 1,
+      "placar_visitante": 2,
+      "data_iso": "2026-09-12T16:00",
+      "motivo": "sem melhores momentos vinculado"
+    }
+  ],
   "jogos_sem_estatisticas": []
 }
