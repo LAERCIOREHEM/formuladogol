@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-09-12T18:27:39-03:00",
+  "atualizado_em": "2026-09-12T19:20:49-03:00",
   "fonte": "auditoria local das fontes dos melhores momentos",
   "politica": {
     "regra": "GE/Globo/sportv/Premiere/Globoplay, Amazon Prime Video e CazéTV são prioritários. UOL Esporte é aceito como fallback após 48 horas ou por vínculo manual conferido.",
@@ -13,9 +13,9 @@
     "criterio_classificacao": "A auditoria classifica pela fonte/canal/origem do vínculo, não pelo título do vídeo, para evitar falso ge.globo em canais não oficiais."
   },
   "resumo": {
-    "jogos_resultados": 259,
-    "jogos_com_video": 258,
-    "ge_globo": 251,
+    "jogos_resultados": 260,
+    "jogos_com_video": 259,
+    "ge_globo": 252,
     "amazon_prime_video": 2,
     "cazetv": 2,
     "uol_esporte": 3,
@@ -26,10 +26,10 @@
   "outros_sites_ainda_em_uso": [],
   "sem_video": [
     {
-      "event_id": "401841236",
+      "event_id": "401841228",
       "rodada": 27,
-      "mandante": "Grêmio",
-      "visitante": "Vasco da Gama",
+      "mandante": "Chapecoense",
+      "visitante": "Internacional",
       "placar_mandante": 1,
       "placar_visitante": 2
     }
@@ -4050,6 +4050,22 @@
         "channel_title": "ge tv",
         "titulo": "CORITIBA 3 X 3 ATHLETICO-PR | MELHORES MOMENTOS | 27ª RODADA BRASILEIRÃO 2026 | ge.globo",
         "url": "https://www.youtube.com/watch?v=GKrVwyx13V8",
+        "confianca": 1.0
+      },
+      {
+        "event_id": "401841236",
+        "rodada": 27,
+        "mandante": "Grêmio",
+        "visitante": "Vasco da Gama",
+        "placar_mandante": 1,
+        "placar_visitante": 2,
+        "categoria_fonte": "ge_globo",
+        "origem_vinculo": "automatico",
+        "fonte": "GE TV / YouTube",
+        "fonte_busca": "playlistItems",
+        "channel_title": "ge tv",
+        "titulo": "GRÊMIO 1 X 2 VASCO | MELHORES MOMENTOS | 27ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+        "url": "https://www.youtube.com/watch?v=xg3Vx6ks8mM",
         "confianca": 1.0
       }
     ],

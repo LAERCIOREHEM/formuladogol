@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-09-12T18:27:38-03:00",
+  "atualizado_em": "2026-09-12T19:20:48-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
@@ -9,8 +9,8 @@
   "dry_run": false,
   "youtube_ativo": true,
   "quota_estimada_youtube": {
-    "unidades": 1,
-    "playlist_items": 0,
+    "unidades": 26,
+    "playlist_items": 25,
     "search": 0,
     "channels": 1,
     "videos": 0
@@ -19,36 +19,36 @@
     "inicio": null,
     "fim": null
   },
-  "event_id_alvo": "401841231",
+  "event_id_alvo": "401841236",
   "resumo_geral_antes": {
-    "jogos_resultados": 259,
+    "jogos_resultados": 260,
     "ge": 251,
     "caze": 2,
     "prime": 2,
     "uol": 3,
     "outros": 0,
-    "sem_video": 1,
+    "sem_video": 2,
     "com_fonte_preferida": 258
   },
   "resumo_geral_depois": {
-    "jogos_resultados": 259,
-    "ge": 251,
+    "jogos_resultados": 260,
+    "ge": 252,
     "caze": 2,
     "prime": 2,
     "uol": 3,
     "outros": 0,
     "sem_video": 1,
-    "com_fonte_preferida": 258
+    "com_fonte_preferida": 259
   },
   "resumo_janela_antes": {
     "jogos_resultados": 1,
-    "ge": 1,
+    "ge": 0,
     "caze": 0,
     "prime": 0,
     "uol": 0,
     "outros": 0,
-    "sem_video": 0,
-    "com_fonte_preferida": 1
+    "sem_video": 1,
+    "com_fonte_preferida": 0
   },
   "resumo_janela_depois": {
     "jogos_resultados": 1,
@@ -60,22 +60,23 @@
     "sem_video": 0,
     "com_fonte_preferida": 1
   },
-  "mantidos_preferidos_na_janela": [
+  "mantidos_preferidos_na_janela": [],
+  "substituidos_para_fontes_preferidas": [
     {
-      "event_id": "401841231",
+      "event_id": "401841236",
       "rodada": 27,
-      "mandante": "Atlético-MG",
-      "visitante": "Fluminense",
-      "placar_mandante": 3,
-      "placar_visitante": 1,
-      "motivo": "mantido: fonte preferida (ge)",
-      "fonte_anterior": "GE TV / YouTube",
-      "channel_title": "",
-      "titulo_anterior": "ATLÉTICO-MG 3 X 1 FLUMINENSE | MELHORES MOMENTOS | 27ª RODADA BRASILEIRÃO 2026 | ge.globo",
-      "url_anterior": "https://www.youtube.com/watch?v=3riutY42AGo"
+      "mandante": "Grêmio",
+      "visitante": "Vasco da Gama",
+      "placar_mandante": 1,
+      "placar_visitante": 2,
+      "motivo": "sem_link_preferido",
+      "fonte_nova": "GE TV / YouTube",
+      "channel_title_novo": "ge tv",
+      "titulo_novo": "GRÊMIO 1 X 2 VASCO | MELHORES MOMENTOS | 27ª RODADA | BRASILEIRÃO 2026 | ge.globo",
+      "url_nova": "https://www.youtube.com/watch?v=xg3Vx6ks8mM",
+      "metodo": "playlistItems"
     }
   ],
-  "substituidos_para_fontes_preferidas": [],
   "removidos_por_fonte_nao_preferida": [],
   "removidos_por_jogo_nao_finalizado": [],
   "ainda_sem_link_preferido": [],
