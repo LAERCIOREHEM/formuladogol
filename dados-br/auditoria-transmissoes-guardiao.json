@@ -1451,20 +1451,109 @@
         "Prime Video"
       ],
       "status": "sem_chamada"
+    },
+    {
+      "event_id": "401841233",
+      "jogo": "Santos x Cruzeiro",
+      "data_iso": "2026-09-12T21:00:00-03:00",
+      "checkpoint": -360,
+      "executado_em": "2026-09-12T15:06:00-03:00",
+      "chamada_openai": true,
+      "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
+      "canais_antes": [
+        "Premiere",
+        "SporTV"
+      ],
+      "status": "confirmado",
+      "modelo": "gpt-5.6-terra",
+      "fontes_web": [
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/293428",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/308416",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/310733",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/337830",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/504612",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/546648",
+        "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/694865",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/chapecoense-x-internacional/832160",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/palmeiras-x-sao-paulo/832154",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-cruzeiro/832153",
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/sub-20/2026/santos-fc-x-cuiaba/835243",
+        "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026"
+      ],
+      "canais_depois": [
+        "Premiere",
+        "SporTV"
+      ],
+      "exclusivo": false,
+      "confianca": 0.99,
+      "fontes_aceitas": [
+        "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-cruzeiro/832153"
+      ],
+      "youtube": [
+        {
+          "url": "https://www.youtube.com/watch?v=-Nl3QPf55Zw",
+          "scope": "pre_game",
+          "valid_for_match": false,
+          "reason": "O título informado no dossiê identifica o conteúdo como “Aquecimento ao vivo”, programado para começar às 20h, antes do jogo das 21h. Isso caracteriza pré-jogo, não transmissão integral da partida."
+        }
+      ],
+      "youtube_removidos": [
+        "https://www.youtube.com/watch?v=-Nl3QPf55Zw"
+      ],
+      "overlay_alterado": true,
+      "resumo": "Confirmado para o Brasil: Santos x Cruzeiro, Brasileirão Série A 2026, fase única, rodada 27, sábado (12/09/2026), às 21h (BRT), na Vila Belmiro. A página oficial da CBF lista a transmissão completa em Premiere e SporTV; portanto, não é exclusiva."
     }
   ],
   "ultima_execucao": {
-    "event_id": "401841229",
-    "jogo": "Botafogo x Bragantino",
-    "data_iso": "2026-09-12T20:30:00-03:00",
+    "event_id": "401841233",
+    "jogo": "Santos x Cruzeiro",
+    "data_iso": "2026-09-12T21:00:00-03:00",
     "checkpoint": -360,
-    "executado_em": "2026-09-12T14:49:52-03:00",
-    "chamada_openai": false,
-    "motivo_chamada": "grade forte já confirmada; checkpoint intermediário não exige nova chamada",
+    "executado_em": "2026-09-12T15:06:00-03:00",
+    "chamada_openai": true,
+    "motivo_chamada": "há player YouTube que precisa auditoria de escopo/estado",
     "canais_antes": [
-      "Prime Video"
+      "Premiere",
+      "SporTV"
     ],
-    "status": "sem_chamada"
+    "status": "confirmado",
+    "modelo": "gpt-5.6-terra",
+    "fontes_web": [
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/293428",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/308416",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/310733",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/337830",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/504612",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/546648",
+      "https://www.cbf.com.br/futebol-brasileiro/atletas/campeonato-brasileiro/serie-a/2026/694865",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/chapecoense-x-internacional/832160",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/palmeiras-x-sao-paulo/832154",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-cruzeiro/832153",
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/copa-do-brasil/sub-20/2026/santos-fc-x-cuiaba/835243",
+      "https://www.cbf.com.br/futebol-brasileiro/tabelas/campeonato-brasileiro/serie-a/2026"
+    ],
+    "canais_depois": [
+      "Premiere",
+      "SporTV"
+    ],
+    "exclusivo": false,
+    "confianca": 0.99,
+    "fontes_aceitas": [
+      "https://www.cbf.com.br/futebol-brasileiro/jogos/campeonato-brasileiro/serie-a/2026/santos-fc-x-cruzeiro/832153"
+    ],
+    "youtube": [
+      {
+        "url": "https://www.youtube.com/watch?v=-Nl3QPf55Zw",
+        "scope": "pre_game",
+        "valid_for_match": false,
+        "reason": "O título informado no dossiê identifica o conteúdo como “Aquecimento ao vivo”, programado para começar às 20h, antes do jogo das 21h. Isso caracteriza pré-jogo, não transmissão integral da partida."
+      }
+    ],
+    "youtube_removidos": [
+      "https://www.youtube.com/watch?v=-Nl3QPf55Zw"
+    ],
+    "overlay_alterado": true,
+    "resumo": "Confirmado para o Brasil: Santos x Cruzeiro, Brasileirão Série A 2026, fase única, rodada 27, sábado (12/09/2026), às 21h (BRT), na Vila Belmiro. A página oficial da CBF lista a transmissão completa em Premiere e SporTV; portanto, não é exclusiva."
   },
-  "atualizado_em": "2026-09-12T14:49:52-03:00"
+  "atualizado_em": "2026-09-12T15:06:00-03:00"
 }
