@@ -19,8 +19,8 @@
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 47,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 0,
-    "search_api_jogos_pulados_grade_estavel": 1,
+    "search_api_jogos_elegiveis": 1,
+    "search_api_jogos_pulados_grade_estavel": 0,
     "transmissoes_publicadas": 6,
     "sem_transmissao": 0,
     "erros": 0
@@ -80,7 +80,7 @@
         "CazéTV"
       ],
       "manual": false,
-      "descoberta_antecipada": true
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841233",
@@ -94,7 +94,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": false
+      "descoberta_antecipada": true
     },
     {
       "event_id": "401841237",
@@ -241,17 +241,28 @@
       "video_id": "XBQnGKkz3Q0",
       "url": "https://www.youtube.com/watch?v=XBQnGKkz3Q0",
       "titulo": "AO VIVO: CHAPECOENSE X INTERNACIONAL | BRASILEIRÃO 2026 | 27ª RODADA",
-      "status": "upcoming",
-      "confianca": 0.875,
+      "status": "live",
+      "confianca": 0.925,
       "motivos": [
         "os dois clubes aparecem no título",
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
+        "transmissão já está ao vivo",
         "horário compatível (90 min de diferença)"
       ]
     }
   ],
   "rejeitados": [
+    {
+      "video_id": "-T-G_2z0F7c",
+      "url": "https://www.youtube.com/watch?v=-T-G_2z0F7c",
+      "fonte": "getv",
+      "canal": "ge tv",
+      "titulo": "AO VIVO: FLAMENGO X SÃO PAULO | SEMIFINAL | BRASILEIRÃO FEMININO 2026 | ge tv",
+      "status": "live",
+      "inicio_programado": "2026-09-12T15:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
     {
       "video_id": "LLpNUqHVam8",
       "url": "https://www.youtube.com/watch?v=LLpNUqHVam8",
@@ -260,16 +271,6 @@
       "titulo": "SBT Ao Vivo",
       "status": "live",
       "inicio_programado": "2025-02-24T18:51:26-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
-      "video_id": "-T-G_2z0F7c",
-      "url": "https://www.youtube.com/watch?v=-T-G_2z0F7c",
-      "fonte": "getv",
-      "canal": "ge tv",
-      "titulo": "AO VIVO: FLAMENGO X SÃO PAULO | SEMIFINAL | BRASILEIRÃO FEMININO 2026 | ge tv",
-      "status": "upcoming",
-      "inicio_programado": "2026-09-12T15:30:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
@@ -518,7 +519,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): FC LORIENT X TOULOUSE | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-12T15:40:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -598,7 +599,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): LE HAVRE X ANGERS | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-12T15:40:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -648,7 +649,7 @@
       "fonte": "cazetv",
       "canal": "CazéTV",
       "titulo": "AO VIVO (SOM AMBIENTE): AUXERRE X NICE | LIGUE 1 26/27 | 4ª RODADA",
-      "status": "upcoming",
+      "status": "live",
       "inicio_programado": "2026-09-12T15:40:00-03:00",
       "motivo": "não identifica com segurança os dois clubes"
     },
@@ -663,13 +664,7 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [
-    {
-      "event_id": "401841233",
-      "jogo": "Santos x Cruzeiro",
-      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
-    }
-  ],
+  "search_api_pulados": [],
   "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
@@ -681,5 +676,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-12T15:04:35-03:00"
+  "atualizado_em": "2026-09-12T15:31:41-03:00"
 }
