@@ -1,5 +1,5 @@
 {
-  "atualizado_em": "2026-09-12T19:20:48-03:00",
+  "atualizado_em": "2026-09-12T20:01:01-03:00",
   "fonte": "sanitização e busca oficial de melhores momentos do Brasileirão",
   "politica": {
     "regra": "A grade de transmissão define a prioridade: Prime Video -> Prime Video Sport Brasil; GE TV/Globo/sportv/Premiere/Globoplay -> GE TV; CazéTV/Record -> CazéTV. As demais fontes primárias são fallback; UOL só após 48 horas.",
@@ -19,18 +19,8 @@
     "inicio": null,
     "fim": null
   },
-  "event_id_alvo": "401841236",
+  "event_id_alvo": "401841228",
   "resumo_geral_antes": {
-    "jogos_resultados": 260,
-    "ge": 251,
-    "caze": 2,
-    "prime": 2,
-    "uol": 3,
-    "outros": 0,
-    "sem_video": 2,
-    "com_fonte_preferida": 258
-  },
-  "resumo_geral_depois": {
     "jogos_resultados": 260,
     "ge": 252,
     "caze": 2,
@@ -39,6 +29,16 @@
     "outros": 0,
     "sem_video": 1,
     "com_fonte_preferida": 259
+  },
+  "resumo_geral_depois": {
+    "jogos_resultados": 260,
+    "ge": 252,
+    "caze": 3,
+    "prime": 2,
+    "uol": 3,
+    "outros": 0,
+    "sem_video": 0,
+    "com_fonte_preferida": 260
   },
   "resumo_janela_antes": {
     "jogos_resultados": 1,
@@ -52,8 +52,8 @@
   },
   "resumo_janela_depois": {
     "jogos_resultados": 1,
-    "ge": 1,
-    "caze": 0,
+    "ge": 0,
+    "caze": 1,
     "prime": 0,
     "uol": 0,
     "outros": 0,
@@ -63,17 +63,17 @@
   "mantidos_preferidos_na_janela": [],
   "substituidos_para_fontes_preferidas": [
     {
-      "event_id": "401841236",
+      "event_id": "401841228",
       "rodada": 27,
-      "mandante": "Grêmio",
-      "visitante": "Vasco da Gama",
+      "mandante": "Chapecoense",
+      "visitante": "Internacional",
       "placar_mandante": 1,
       "placar_visitante": 2,
       "motivo": "sem_link_preferido",
-      "fonte_nova": "GE TV / YouTube",
-      "channel_title_novo": "ge tv",
-      "titulo_novo": "GRÊMIO 1 X 2 VASCO | MELHORES MOMENTOS | 27ª RODADA | BRASILEIRÃO 2026 | ge.globo",
-      "url_nova": "https://www.youtube.com/watch?v=xg3Vx6ks8mM",
+      "fonte_nova": "CazéTV / YouTube",
+      "channel_title_novo": "CazéTV",
+      "titulo_novo": "MELHORES MOMENTOS: CHAPECOENSE 1 X 2 INTERNACIONAL | BRASILEIRÃO 2026 | 27ª RODADA | 12/09/26",
+      "url_nova": "https://www.youtube.com/watch?v=2yI-YnMO1v0",
       "metodo": "playlistItems"
     }
   ],
