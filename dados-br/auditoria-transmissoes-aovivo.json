@@ -15,14 +15,14 @@
   "resumo": {
     "jogos_na_janela": 37,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 5,
+    "descobertas_antecipadas": 6,
     "busca_streams_executada": true,
-    "candidatos_oficiais_encontrados": 48,
+    "candidatos_oficiais_encontrados": 47,
     "search_api_fallback_chamadas": 0,
-    "search_api_jogos_elegiveis": 1,
-    "search_api_jogos_pulados_grade_estavel": 0,
+    "search_api_jogos_elegiveis": 0,
+    "search_api_jogos_pulados_grade_estavel": 1,
     "transmissoes_publicadas": 6,
-    "sem_transmissao": 0,
+    "sem_transmissao": 1,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -79,6 +79,18 @@
       "fontes_encontradas": [
         "CazéTV"
       ],
+      "manual": false,
+      "descoberta_antecipada": true
+    },
+    {
+      "event_id": "401841234",
+      "rodada": 27,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Palmeiras x São Paulo",
+      "data_iso": "2026-09-12T18:30:00-03:00",
+      "principal": "",
+      "fontes_encontradas": [],
       "manual": false,
       "descoberta_antecipada": false
     },
@@ -460,7 +472,7 @@
       "canal": "CazéTV",
       "titulo": "AO VIVO: REACT DA FINAL FEMININA DO US OPEN | ARYNA SABALENKA X ELENA RYBAKINA | ESPECIAL US OPEN",
       "status": "upcoming",
-      "inicio_programado": "2026-09-12T16:45:00-03:00",
+      "inicio_programado": "2026-09-12T17:15:00-03:00",
       "motivo": "conteúdo rejeitado: react"
     },
     {
@@ -574,16 +586,6 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
-      "video_id": "XiPW6devQ04",
-      "url": "https://www.youtube.com/watch?v=XiPW6devQ04",
-      "fonte": "cazetv",
-      "canal": "CazéTV",
-      "titulo": "AO VIVO: ESPANHA X ESTADOS UNIDOS | COPA DO MUNDO DE BASQUETE FEMININO | SEMIFINAL",
-      "status": "live",
-      "inicio_programado": "2026-09-12T14:45:00-03:00",
-      "motivo": "não identifica com segurança os dois clubes"
-    },
-    {
       "video_id": "Y3hJeYLO4dI",
       "url": "https://www.youtube.com/watch?v=Y3hJeYLO4dI",
       "fonte": "cazetv",
@@ -674,8 +676,24 @@
       "motivo": "não identifica com segurança os dois clubes"
     }
   ],
-  "search_api_pulados": [],
-  "sem_transmissao": [],
+  "search_api_pulados": [
+    {
+      "event_id": "401841234",
+      "jogo": "Palmeiras x São Paulo",
+      "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
+    }
+  ],
+  "sem_transmissao": [
+    {
+      "event_id": "401841234",
+      "rodada": 27,
+      "competicao_chave": "brasileirao",
+      "competicao_nome": "Brasileirão",
+      "jogo": "Palmeiras x São Paulo",
+      "data_iso": "2026-09-12T18:30:00-03:00",
+      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
+    }
+  ],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 87,
@@ -686,5 +704,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-12T16:46:22-03:00"
+  "atualizado_em": "2026-09-12T17:03:33-03:00"
 }
