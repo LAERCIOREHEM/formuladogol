@@ -13,16 +13,16 @@
     "descoberta_antecipada": "Cada execução reaproveita /streams + uploads para publicar também players exatos de outros jogos futuros já identificados; search.list continua restrito ao jogo-foco."
   },
   "resumo": {
-    "jogos_na_janela": 36,
+    "jogos_na_janela": 35,
     "jogos_foco": 1,
-    "descobertas_antecipadas": 7,
+    "descobertas_antecipadas": 5,
     "busca_streams_executada": true,
     "candidatos_oficiais_encontrados": 41,
     "search_api_fallback_chamadas": 0,
     "search_api_jogos_elegiveis": 0,
     "search_api_jogos_pulados_grade_estavel": 1,
-    "transmissoes_publicadas": 7,
-    "sem_transmissao": 1,
+    "transmissoes_publicadas": 6,
+    "sem_transmissao": 0,
     "erros": 0
   },
   "canais_resolvidos": {
@@ -69,32 +69,6 @@
   },
   "jogos_analisados": [
     {
-      "event_id": "401841228",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Chapecoense x Internacional",
-      "data_iso": "2026-09-12T17:00:00-03:00",
-      "principal": "CazéTV",
-      "fontes_encontradas": [
-        "CazéTV"
-      ],
-      "manual": false,
-      "descoberta_antecipada": true
-    },
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Bragantino",
-      "data_iso": "2026-09-12T20:30:00-03:00",
-      "principal": "",
-      "fontes_encontradas": [],
-      "manual": false,
-      "descoberta_antecipada": false
-    },
-    {
       "event_id": "401841233",
       "rodada": 27,
       "competicao_chave": "brasileirao",
@@ -106,7 +80,7 @@
         "GE TV"
       ],
       "manual": false,
-      "descoberta_antecipada": true
+      "descoberta_antecipada": false
     },
     {
       "event_id": "401841237",
@@ -274,23 +248,6 @@
         "identifica Brasileirão/competição",
         "identifica transmissão ao vivo",
         "horário compatível (0 min de diferença)"
-      ]
-    },
-    {
-      "event_id": "401841228",
-      "jogo": "Chapecoense x Internacional",
-      "fonte": "cazetv",
-      "video_id": "XBQnGKkz3Q0",
-      "url": "https://www.youtube.com/watch?v=XBQnGKkz3Q0",
-      "titulo": "AO VIVO: INTER VENCE O DUELO DOS DESESPERADOS, MAS SEGUE NA ZONA | RODA DE BOBO",
-      "status": "live",
-      "confianca": 0.745,
-      "motivos": [
-        "um clube aparece no título e o outro na descrição",
-        "identifica Brasileirão/competição",
-        "identifica transmissão ao vivo",
-        "transmissão já está ao vivo",
-        "horário compatível (90 min de diferença)"
       ]
     }
   ],
@@ -556,6 +513,16 @@
       "motivo": "não identifica com segurança os dois clubes"
     },
     {
+      "video_id": "XBQnGKkz3Q0",
+      "url": "https://www.youtube.com/watch?v=XBQnGKkz3Q0",
+      "fonte": "cazetv",
+      "canal": "CazéTV",
+      "titulo": "AO VIVO: INTER VENCE O DUELO DOS DESESPERADOS, MAS SEGUE NA ZONA | RODA DE BOBO",
+      "status": "live",
+      "inicio_programado": "2026-09-12T15:30:00-03:00",
+      "motivo": "não identifica com segurança os dois clubes"
+    },
+    {
       "video_id": "Xut5iFQoL5U",
       "url": "https://www.youtube.com/watch?v=Xut5iFQoL5U",
       "fonte": "cazetv",
@@ -638,22 +605,12 @@
   ],
   "search_api_pulados": [
     {
-      "event_id": "401841229",
-      "jogo": "Botafogo x Bragantino",
+      "event_id": "401841233",
+      "jogo": "Santos x Cruzeiro",
       "motivo": "grade estável confirmada sem indício de GE TV/SBT/CazéTV"
     }
   ],
-  "sem_transmissao": [
-    {
-      "event_id": "401841229",
-      "rodada": 27,
-      "competicao_chave": "brasileirao",
-      "competicao_nome": "Brasileirão",
-      "jogo": "Botafogo x Bragantino",
-      "data_iso": "2026-09-12T20:30:00-03:00",
-      "motivo": "nenhuma transmissão oficial validada em GE TV, SBT ou CazéTV"
-    }
-  ],
+  "sem_transmissao": [],
   "erros": [],
   "quota_estimada_youtube": {
     "unidades": 87,
@@ -664,5 +621,5 @@
     },
     "observacao": "A descoberta usa /streams + uploads em todos os jogos. search.list fica restrito aos canais oficiais de GE TV/SBT/CazéTV, à janela crítica e a jogos cuja grade ainda torna esses canais plausíveis."
   },
-  "atualizado_em": "2026-09-12T19:02:43-03:00"
+  "atualizado_em": "2026-09-12T19:31:42-03:00"
 }
